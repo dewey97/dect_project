@@ -1,0 +1,113 @@
+{
+  "$schema": "https://veritas.dev/schemas/case.v1.json",
+  "caseId": "CASE-001",
+  "title": "Bức Tranh Bị Đánh Tráo (The Canvas of Silence)",
+  "difficulty": "SENIOR",
+  "estimatedDurationMinutes": 120,
+  "metadata": {
+    "author": "VERITAS Studio",
+    "version": "4.0.0",
+    "releaseDate": "2026-07-21",
+    "tags": ["Murder", "Art Studio", "Strangle", "Alibi Clash", "Moral Choice"]
+  },
+  "objectives": [
+    {
+      "id": "OBJ-01",
+      "chapter": 1,
+      "title": "Bác bỏ giả thiết tử vong do kiệt sức/thuốc ngủ",
+      "requiredEvidenceIds": ["EVI-STRANGLE-ROPE", "EVI-KEY-FRAGMENT"]
+    },
+    {
+      "id": "OBJ-02",
+      "chapter": 2,
+      "title": "Đánh sập ngoại phạm xem TV ở nhà của Lê Trọng Tấn",
+      "requiredEvidenceIds": ["EVI-KEY-FRAGMENT", "EVI-STATEMENT-HOME"]
+    }
+  ],
+  "entities": {
+    "victims": [
+      {
+        "id": "VIC-001",
+        "name": "Đỗ Hoàng Nam",
+        "age": 32,
+        "role": "Họa sĩ chép tranh tài hoa",
+        "status": "DECEASED"
+      }
+    ],
+    "suspects": [
+      {
+        "id": "SUS-001",
+        "name": "Lê Trọng Tấn",
+        "age": 48,
+        "role": "Chủ chuỗi phòng tranh ArtSpace",
+        "relationshipToVictim": "Chủ nợ / Ép hợp đồng bản quyền"
+      },
+      {
+        "id": "SUS-002",
+        "name": "Phạm Minh Đức",
+        "age": 30,
+        "role": "Họa sĩ bạn vẽ cùng xưởng",
+        "relationshipToVictim": "Bạn thân / Kẻ trộm tranh"
+      },
+      {
+        "id": "SUS-003",
+        "name": "Trần Thu Hà",
+        "age": 29,
+        "role": "Nhà môi giới nghệ thuật"
+      }
+    ],
+    "locations": [
+      {
+        "id": "LOC-STUDIO3",
+        "name": "Xưởng vẽ Tầng 3 - ArtSpace Building",
+        "coordinates": { "lat": 10.7781, "lng": 106.6991 }
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "id": "EVI-STRANGLE-ROPE",
+      "type": "FORENSIC_REPORT",
+      "title": "Báo cáo vết siết cổ bằng dây dù rèm cửa",
+      "description": "Vết bầm mảnh hằn sâu ở sụn nhẫn cổ trùng khớp với tiết diện sợi dây dù kéo rèm cửa trong xưởng."
+    },
+    {
+      "id": "EVI-KEY-FRAGMENT",
+      "type": "FORENSIC_EVIDENCE",
+      "title": "Mảnh kim loại chìa khóa phụ gãy kẹt trong ổ khóa",
+      "description": "Đầu nấc kim loại bị sứt gãy kẹt trong lẫy khóa cửa xưởng trùng khớp 100% với phôi chìa khóa trong xe ô tô của Lê Trọng Tấn."
+    },
+    {
+      "id": "EVI-STATEMENT-HOME",
+      "type": "STATEMENT_LOG",
+      "title": "Lời khai xem TV ở nhà của Lê Trọng Tấn",
+      "description": "Khai báo ở nhà xem TV với vợ từ 21:30 đến 23:00."
+    }
+  ],
+  "alibiClashes": [
+    {
+      "id": "CLASH-001",
+      "suspectId": "SUS-001",
+      "claimedAlibiTime": "2026-07-21T22:20:00Z",
+      "claimedLocation": "Nhà riêng",
+      "contradictingEvidenceIds": ["EVI-KEY-FRAGMENT", "EVI-STATEMENT-HOME"],
+      "clashDescription": "Tấn khai ở nhà xem TV lúc 22:20 nhưng mảnh chìa khóa phụ bị gãy của ông ta kẹt trong ổ khóa xưởng vẽ nạn nhân đúng mốc thời gian này."
+    }
+  ],
+  "solution": {
+    "culpritId": "SUS-001",
+    "motive": "COPYRIGHT_EXTORTION_COVERUP",
+    "requiredProofGraph": [
+      {
+        "from": "EVI-STRANGLE-ROPE",
+        "to": "SUS-001",
+        "relation": "WEAPON_OWNER"
+      },
+      {
+        "from": "EVI-KEY-FRAGMENT",
+        "to": "CLASH-001",
+        "relation": "PROVES_CONTRADICTION"
+      }
+    ]
+  }
+}

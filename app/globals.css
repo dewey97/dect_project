@@ -1,0 +1,399 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+  ============================================================
+  NEO-NOIR DETECTIVE OS — DESIGN SYSTEM
+  ------------------------------------------------------------
+  Palette (5 colors total):
+    - background   deep charcoal / near-black investigation room
+    - foreground   bone-white document text
+    - muted        cold steel gray (metadata, timestamps)
+    - primary      evidence amber (redaction / marker accent)
+    - destructive  classified crimson (urgent / restricted)
+  The app is always dark. Light mode is intentionally disabled
+  to preserve the cinematic investigation-workstation mood.
+  ============================================================
+*/
+:root,
+.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.12 0.005 265); /* Darker black-gray for better visual depth */
+  --foreground: oklch(0.92 0.008 90); /* Brighter bone white */
+
+  --card: oklch(0.18 0.008 265); /* High-contrast card base */
+  --card-foreground: oklch(0.92 0.008 90);
+
+  --popover: oklch(0.16 0.008 265);
+  --popover-foreground: oklch(0.92 0.008 90);
+
+  /* Evidence amber — the signature accent */
+  --primary: oklch(0.78 0.14 74);
+  --primary-foreground: oklch(0.18 0.02 74);
+
+  --secondary: oklch(0.24 0.01 265);
+  --secondary-foreground: oklch(0.92 0.008 90);
+
+  --muted: oklch(0.22 0.008 265);
+  --muted-foreground: oklch(0.72 0.01 260); /* Brighter gray for contrast */
+
+  --accent: oklch(0.26 0.012 265);
+  --accent-foreground: oklch(0.94 0.008 90);
+
+  /* Classified crimson */
+  --destructive: oklch(0.55 0.19 25);
+
+  --border: oklch(0.28 0.01 265 / 60%);
+  --input: oklch(0.28 0.01 265 / 70%);
+  --ring: oklch(0.78 0.14 74 / 60%);
+
+  --chart-1: oklch(0.78 0.14 74);
+  --chart-2: oklch(0.6 0.06 230);
+  --chart-3: oklch(0.55 0.19 25);
+  --chart-4: oklch(0.64 0.012 260);
+  --chart-5: oklch(0.4 0.01 265);
+
+  --radius: 0.5rem;
+
+  --sidebar: oklch(0.18 0.008 265);
+  --sidebar-foreground: oklch(0.9 0.008 90);
+  --sidebar-primary: oklch(0.78 0.14 74);
+  --sidebar-primary-foreground: oklch(0.18 0.02 74);
+  --sidebar-accent: oklch(0.26 0.01 265);
+  --sidebar-accent-foreground: oklch(0.92 0.008 90);
+  --sidebar-border: oklch(0.3 0.01 265 / 60%);
+  --sidebar-ring: oklch(0.78 0.14 74 / 60%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    /* prevent overscroll glow on mobile so the OS feels native */
+    overscroll-behavior-y: none;
+  }
+}
+
+@layer utilities {
+  /* Section eyebrows / metadata. Override color when needed (e.g. text-primary). */
+  .label-system {
+    @apply font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground;
+  }
+
+  /* Inline status pills & micro-tags (Locked, Open, Flagged). Color set by context. */
+  .label-tag {
+    @apply font-mono text-[0.65rem] uppercase tracking-[0.15em];
+  }
+
+  /* The NOCTURNE wordmark. */
+  .label-brand {
+    @apply font-mono text-xs font-semibold uppercase tracking-[0.3em];
+  }
+
+  /* Faint scan-line vignette layered behind the app for CRT mood */
+  .noir-scanlines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      color-mix(in oklch, var(--foreground) 3%, transparent) 0px,
+      color-mix(in oklch, var(--foreground) 3%, transparent) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+
+  /* Subtle top-down spotlight, like an interrogation lamp */
+  .noir-spotlight {
+    background:
+      radial-gradient(
+        120% 80% at 50% -10%,
+        color-mix(in oklch, var(--primary) 10%, transparent),
+        transparent 60%
+      ),
+      var(--background);
+  }
+
+  /* Hairline etched divider */
+  .etched-border {
+    border-color: color-mix(in oklch, var(--foreground) 8%, transparent);
+  }
+
+  /* Respect one-handed reach: safe-area aware bottom padding */
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
+  }
+
+  /* Page transition animation */
+  @keyframes fade-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-slide-up {
+    animation: fade-slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Slow breathing/pulse for OS status lights */
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.65;
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Ink stamp animation */
+  @keyframes stamp-ink {
+    0% {
+      opacity: 0;
+      transform: scale(2.2) rotate(-18deg);
+      filter: blur(2px);
+    }
+    45% {
+      opacity: 0.9;
+      transform: scale(0.96) rotate(-8deg);
+      filter: blur(0.5px);
+    }
+    100% {
+      opacity: 0.85;
+      transform: scale(1) rotate(-10deg);
+      filter: blur(0);
+    }
+  }
+
+  .animate-stamp {
+    animation: stamp-ink 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  /* Forensic scanning scanline */
+  @keyframes forensics-scan {
+    0% {
+      top: 0%;
+      opacity: 0.3;
+    }
+    50% {
+      top: 100%;
+      opacity: 0.8;
+    }
+    100% {
+      top: 0%;
+      opacity: 0.3;
+    }
+  }
+
+  .animate-scan-line {
+    animation: forensics-scan 3s ease-in-out infinite;
+  }
+
+  /* CRT Terminal boot-up flicker */
+  @keyframes crt-flicker {
+    0% { opacity: 0.27; }
+    5% { opacity: 0.85; }
+    10% { opacity: 0.34; }
+    15% { opacity: 0.95; }
+    20% { opacity: 0.52; }
+    25% { opacity: 0.88; }
+    30% { opacity: 0.99; }
+    100% { opacity: 1; }
+  }
+
+  .animate-crt-flicker {
+    animation: crt-flicker 0.4s ease-out forwards;
+  }
+
+  /* Forensic aged-paper texture overlay style */
+  .bg-aged-paper {
+    background-color: oklch(0.92 0.05 85);
+    color: oklch(0.18 0.01 85);
+    background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 0);
+    background-size: 8px 8px;
+  }
+}
+
+/* ============================================================
+   ADDITIONAL THEME IDENTITIES
+   ============================================================ */
+
+/* 2. Tokyo Neon Cyberpunk */
+.theme-cyber {
+  --background: #06060c; /* Deep obsidian blue-black */
+  --foreground: #f1f5f9; /* Soft bright gray */
+
+  --card: #0d0d18; /* Dark violet-gray */
+  --card-foreground: #f1f5f9;
+
+  --popover: #0a0a14;
+  --popover-foreground: #f1f5f9;
+
+  --primary: #00f0ff; /* Electric Cyber Cyan */
+  --primary-foreground: #06060c;
+
+  --secondary: #16162a; /* Muted violet border/background */
+  --secondary-foreground: #f1f5f9;
+
+  --muted: #131326;
+  --muted-foreground: #64748b; /* Slate-400 */
+
+  --accent: #ff007f; /* Hot Neon Pink */
+  --accent-foreground: #ffffff;
+
+  --destructive: #ef4444; /* Standard alert red */
+
+  --border: rgba(0, 240, 255, 0.15);
+  --input: rgba(0, 240, 255, 0.2);
+  --ring: rgba(0, 240, 255, 0.5);
+}
+
+/* 3. Federal Bureau Blue */
+.theme-federal {
+  --background: #0f172a; /* Slate-900 (Navy slate) */
+  --foreground: #f8fafc; /* Slate-50 */
+
+  --card: #1e293b; /* Slate-800 */
+  --card-foreground: #f8fafc;
+
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+
+  --primary: #38bdf8; /* Sky Blue */
+  --primary-foreground: #0f172a;
+
+  --secondary: #334155; /* Slate-700 */
+  --secondary-foreground: #f8fafc;
+
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8; /* Slate-400 */
+
+  --accent: #2dd4bf; /* Mint Teal */
+  --accent-foreground: #0f172a;
+
+  --destructive: #f43f5e; /* Rose-500 */
+
+  --border: rgba(56, 189, 248, 0.15);
+  --input: rgba(56, 189, 248, 0.2);
+  --ring: rgba(56, 189, 248, 0.5);
+}
+
+/* 4. Vintage Sepia / Rusty Paper (Premium light cream paper) */
+.theme-sepia {
+  color-scheme: light;
+  --background: #f5f2eb; /* Warm linen book paper */
+  --foreground: #2c2420; /* Vintage dark brown ink */
+
+  --card: #eae5d8; /* Warm folder manila paper */
+  --card-foreground: #2c2420;
+
+  --popover: #eae5d8;
+  --popover-foreground: #2c2420;
+
+  --primary: #7c2d12; /* Rich dark terracotta brown */
+  --primary-foreground: #f5f2eb;
+
+  --secondary: #dcd6c5;
+  --secondary-foreground: #2c2420;
+
+  --muted: #e4decb;
+  --muted-foreground: #6b6359;
+
+  --accent: #c2410c; /* Burnt wax orange-red */
+  --accent-foreground: #f5f2eb;
+
+  --destructive: #991b1b; /* Dried blood red */
+
+  --border: rgba(124, 45, 18, 0.2);
+  --input: rgba(124, 45, 18, 0.25);
+  --ring: rgba(124, 45, 18, 0.5);
+}
+
+/* 5. Crimson Forensic (Classified Red) */
+.theme-crimson {
+  --background: #0a0505; /* Black with deep burgundy tint */
+  --foreground: #f5f5f7; /* Bright bone white */
+
+  --card: #140b0b; /* Dark charcoal-red */
+  --card-foreground: #f5f5f7;
+
+  --popover: #140b0b;
+  --popover-foreground: #f5f5f7;
+
+  --primary: #e11d48; /* Crimson Blood Red */
+  --primary-foreground: #ffffff;
+
+  --secondary: #221212;
+  --secondary-foreground: #f5f5f7;
+
+  --muted: #1d1010;
+  --muted-foreground: #a1a1aa; /* Zinc-400 */
+
+  --accent: #fda4af; /* Rose-300 */
+  --accent-foreground: #0a0505;
+
+  --destructive: #e11d48;
+
+  --border: rgba(225, 29, 72, 0.18);
+  --input: rgba(225, 29, 72, 0.22);
+  --ring: rgba(225, 29, 72, 0.55);
+}
+
+
+
