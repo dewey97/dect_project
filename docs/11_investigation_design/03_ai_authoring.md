@@ -41,9 +41,9 @@ AI phải trả lời rõ ràng **5 câu hỏi phản biện** sau cho mỗi ý 
 
 1. **Tính khả thi logic:** Ý tưởng này có thể dựng được một dòng thời gian vật lý hợp lý không? Có hành vi nào đòi hỏi nhân vật ở hai nơi cùng lúc, hoặc thực hiện điều bất khả thi trong thời gian cho phép không?
 2. **Tính độc đáo:** Ý tưởng này có đang rơi vào khuôn mẫu trinh thám quen thuộc không? (Vd: hung thủ luôn là người thân, chất độc bí ẩn, nhật ký thú tội). Nếu có, AI phải đề xuất biến tấu để tạo khác biệt.
-3. **Rủi ro khiên cưỡng:** Ý tưởng này có dễ rơi vào lỗi nào trong [09_pitfalls.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/09_pitfalls.md) không? (Vd: dồn ép dòng thời gian, biến kịch bản thành phòng giải đố, hung thủ đột ngột mất cảnh giác). AI phải chỉ rõ rủi ro và cách phòng tránh.
+3. **Rủi ro khiên cưỡng:** Ý tưởng này có dễ rơi vào lỗi nào trong [09_pitfalls.md](file:///d:/code_world/dect_project/docs/11_investigation_design/09_pitfalls.md) không? (Vd: dồn ép dòng thời gian, biến kịch bản thành phòng giải đố, hung thủ đột ngột mất cảnh giác). AI phải chỉ rõ rủi ro và cách phòng tránh.
 4. **Sức nặng cảm xúc:** Khi vụ án kết thúc, người chơi sẽ cảm thấy gì? Có đủ giằng xé bi kịch hoặc sự sảng khoái đột phá tư duy không? Hay chỉ là một câu đố khô khan?
-5. **Tương thích cấp độ khó:** Ý tưởng này phù hợp với cấp độ khó nào trong [04_clues_and_difficulty.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/04_clues_and_difficulty.md)? Số lượng nghi phạm, độ sâu suy luận, tỷ lệ nhiễu có nằm trong khung cho phép không?
+5. **Tương thích cấp độ khó:** Ý tưởng này phù hợp với cấp độ khó nào trong [04_clues_and_difficulty.md](file:///d:/code_world/dect_project/docs/11_investigation_design/04_clues_and_difficulty.md)? Số lượng nghi phạm, độ sâu suy luận, tỷ lệ nhiễu có nằm trong khung cho phép không?
 
 AI trình bày kết quả đánh giá kèm theo bản phác thảo ý tưởng, bao gồm: **điểm mạnh, rủi ro tiềm ẩn, và đề xuất điều chỉnh** (nếu có).
 
@@ -75,29 +75,29 @@ Sau khi hạt giống sáng tạo đã được xác nhận, AI bắt buộc ph�
 ```
 
 ### 📍 Giai Đoạn 1: Thiết Lập Thực Tế & Dòng Thời Gian
-- **Bối cảnh không gian & Thời điểm:** Xác định địa điểm hiện trường, bố cục vật lý, thời tiết, ánh sáng, và khoảng cách di chuyển giữa các điểm. Tham chiếu [11_world_building.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/11_world_building.md).
-- **Cấp độ khó mục tiêu:** Chọn cấp độ (Dễ / Trung Bình / Khó / Chuyên Gia) và cam kết tuân thủ khung thông số định lượng tương ứng trong [04_clues_and_difficulty.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/04_clues_and_difficulty.md).
+- **Bối cảnh không gian & Thời điểm:** Xác định địa điểm hiện trường, bố cục vật lý, thời tiết, ánh sáng, và khoảng cách di chuyển giữa các điểm. Tham chiếu [11_world_building.md](file:///d:/code_world/dect_project/docs/11_investigation_design/11_world_building.md).
+- **Cấp độ khó mục tiêu:** Chọn cấp độ (Dễ / Trung Bình / Khó / Chuyên Gia) và cam kết tuân thủ khung thông số định lượng tương ứng trong [04_clues_and_difficulty.md](file:///d:/code_world/dect_project/docs/11_investigation_design/04_clues_and_difficulty.md).
 - **Động cơ gốc rễ:** Động cơ gốc rễ sâu kín nhất (huyết thống con nuôi, nợ nần, chèn ép bản quyền tác phẩm).
 - **Dòng thời gian thực tế:** Bảng dòng thời gian thực tế diễn ra vụ án theo từng phút. Đảm bảo thời gian di chuyển vật lý khớp thực tế 100% với bối cảnh không gian đã chốt.
 - **[QUY TẮC PHÊ DUYỆT]:** AI phải xuất bản sản phẩm Giai đoạn 1 và **dừng lại đợi sự chấp thuận rõ ràng của người dùng** trước khi được phép chuyển sang Giai đoạn 2.
 
 ### 📍 Giai Đoạn 2: Thiết Lập Tội Ác & Chứng Cứ Thô
-- **Hành vi gây án:** Mô tả hành vi gây án vật lý cụ thể (siết cổ bằng dây rèm, xô ngã đập đầu, đạp trượt kích ô tô). AI bắt buộc tham chiếu hoặc chọn áp dụng mô hình tội phạm phù hợp từ Thư viện thiết kế [10_design_patterns.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/10_design_patterns.md).
-- **Kết quả pháp y dự kiến:** Mô tả nguyên nhân tử vong chuẩn xác về y khoa, dấu vết trên thi thể (vết bầm, vết siết, tổn thương nội tạng) phải khớp 100% với hành vi gây án đã thiết kế. Tham chiếu quy tắc chống lỗi "Hạ thấp chuyên môn pháp y" trong [09_pitfalls.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/09_pitfalls.md).
+- **Hành vi gây án:** Mô tả hành vi gây án vật lý cụ thể (siết cổ bằng dây rèm, xô ngã đập đầu, đạp trượt kích ô tô). AI bắt buộc tham chiếu hoặc chọn áp dụng mô hình tội phạm phù hợp từ Thư viện thiết kế [10_design_patterns.md](file:///d:/code_world/dect_project/docs/11_investigation_design/10_design_patterns.md).
+- **Kết quả pháp y dự kiến:** Mô tả nguyên nhân tử vong chuẩn xác về y khoa, dấu vết trên thi thể (vết bầm, vết siết, tổn thương nội tạng) phải khớp 100% với hành vi gây án đã thiết kế. Tham chiếu quy tắc chống lỗi "Hạ thấp chuyên môn pháp y" trong [09_pitfalls.md](file:///d:/code_world/dect_project/docs/11_investigation_design/09_pitfalls.md).
 - **Danh sách chứng cứ:** Danh sách các dấu vết vật lý/kỹ thuật số sinh ra từ hành vi gây án, gán mã định danh `EVI-XXX` tạm thời.
 - **[QUY TẮC PHÊ DUYỆT]:** AI xuất bản sản phẩm Giai đoạn 2 và **dừng lại đợi người dùng phê duyệt** mới được sang Giai đoạn 3.
 
 ### 📍 Giai Đoạn 3: Thiết Lập Nghi Phạm & Manh Mối Giải Mã
-- **Hồ sơ nhân vật:** Hồ sơ các nhân vật theo đúng 8 mục của Quy chuẩn thiết kế nhân vật ([05_narrative_consistency.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/05_narrative_consistency.md)).
-- **Hệ thống manh mối:** Phân loại theo đúng **4 phân hạng chính thức**: Manh mối bắt buộc, Manh mối bối cảnh, Manh mối lạc hướng (phải có động cơ tâm lý riêng), và Manh mối thế giới. Tuân thủ định nghĩa và tỷ lệ trong [04_clues_and_difficulty.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/04_clues_and_difficulty.md).
+- **Hồ sơ nhân vật:** Hồ sơ các nhân vật theo đúng 8 mục của Quy chuẩn thiết kế nhân vật ([05_narrative_consistency.md](file:///d:/code_world/dect_project/docs/11_investigation_design/05_narrative_consistency.md)).
+- **Hệ thống manh mối:** Phân loại theo đúng **4 phân hạng chính thức**: Manh mối bắt buộc, Manh mối bối cảnh, Manh mối lạc hướng (phải có động cơ tâm lý riêng), và Manh mối thế giới. Tuân thủ định nghĩa và tỷ lệ trong [04_clues_and_difficulty.md](file:///d:/code_world/dect_project/docs/11_investigation_design/04_clues_and_difficulty.md).
 - **Thiết lập Đánh sập Ngoại phạm:** Thiết kế lời khai ngoại phạm và Chứng cứ then chốt dùng để đánh sập ngoại phạm đó.
 - **[QUY TẮC PHÊ DUYỆT]:** AI xuất bản sản phẩm Giai đoạn 3 và **dừng lại đợi người dùng phê duyệt** mới được sang Giai đoạn 4.
 
 ### 📍 Giai Đoạn 4: Kiểm Định & Viết Kịch Bản
 Chỉ sau khi cả 3 Giai đoạn trước đã được phê duyệt riêng rẽ, AI mới đi đến bước cuối cùng:
-- **Kiểm tra logic:** Tự quét đối chiếu các lỗi khiên cưỡng ([09_pitfalls.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/09_pitfalls.md)) và các tiêu chuẩn kiểm định hợp lệ ([06_validation_standards.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/06_validation_standards.md)).
-- **Đồ thị xâu chuỗi kết án:** Vẽ rõ đồ thị xâu chuỗi lập luận kết án (Chứng cứ → Suy luận → Mâu thuẫn → Kết án) theo đúng cấu trúc trong [07_case_design_template.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/07_case_design_template.md). Đây là bước bắt buộc trước khi viết kịch bản.
-- **Biên soạn kịch bản:** Biên soạn kịch bản hoàn chỉnh bằng Tiếng Việt theo cấu trúc khung của [08_storyline_template.md](file:///d:/code_world/dect_project/docs/11_INVESTIGATION_DESIGN/08_storyline_template.md), tích hợp Bảng thông số đánh giá ở đầu trang.
+- **Kiểm tra logic:** Tự quét đối chiếu các lỗi khiên cưỡng ([09_pitfalls.md](file:///d:/code_world/dect_project/docs/11_investigation_design/09_pitfalls.md)) và các tiêu chuẩn kiểm định hợp lệ ([06_validation_standards.md](file:///d:/code_world/dect_project/docs/11_investigation_design/06_validation_standards.md)).
+- **Đồ thị xâu chuỗi kết án:** Vẽ rõ đồ thị xâu chuỗi lập luận kết án (Chứng cứ → Suy luận → Mâu thuẫn → Kết án) theo đúng cấu trúc trong [07_case_design_template.md](file:///d:/code_world/dect_project/docs/11_investigation_design/07_case_design_template.md). Đây là bước bắt buộc trước khi viết kịch bản.
+- **Biên soạn kịch bản:** Biên soạn kịch bản hoàn chỉnh bằng Tiếng Việt theo cấu trúc khung của [08_storyline_template.md](file:///d:/code_world/dect_project/docs/11_investigation_design/08_storyline_template.md), tích hợp Bảng thông số đánh giá ở đầu trang.
 - **Xuất bản cấu trúc dữ liệu:** Xuất bản file dữ liệu máy đọc `case.json`.
 
 ---

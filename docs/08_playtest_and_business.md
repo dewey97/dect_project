@@ -1,3 +1,7 @@
+
+<!-- START OF MERGED FILE: 09_PLAYTEST/08_playtest_and_business.md -->
+
+---
 # QUY TRÌNH KIỂM THỬ & CÂN BẰNG TRẢI NGHIỆM CHƠI (PLAYTEST & BALANCING) — VERITAS
 
 > **Nhiệm vụ Cốt lõi:** Hướng dẫn quy trình 3 giai đoạn để chạy thử (Playtest) và tinh chỉnh độ cân bằng kịch bản trước khi nạp vào môi trường Next.js 16 Web OS chính thức.
@@ -43,3 +47,85 @@ Dựa trên số liệu thu thập từ Giai đoạn 3 (Blind Playtest), Designe
   - Tăng độ nhiễu (Clue Noise Ratio) lên thêm 10% (gieo thêm hành vi lén lút có động cơ riêng cho nghi phạm phụ).
   - Tăng độ phức tạp Alibi Clash bằng cách chèn thêm mốc thời gian trung gian trong timeline.
   - Giảm độ hiển thị trực diện của các Mandatory Clues (Vd: Thay vì tìm thấy trực tiếp, phải soi đèn Flash mặt sau tờ hóa đơn mới lộ ra).
+
+---
+
+<!-- END OF MERGED FILE: {src} -->
+
+---
+
+<!-- START OF MERGED FILE: 09_PLAYTEST/08_playtest_and_business.md -->
+
+---
+# CƠ SỞ DỮ LIỆU LỖI LOGIC & PHẦN MỀM (BUG DATABASE) — VERITAS
+
+Tài liệu theo dõi các lỗi đứt gãy kịch bản, lỗi gãy đồ thị chứng cứ và lỗi UI.
+
+---
+
+* **Loại lỗi 1 — Logic Plot Holes:** Mâu thuẫn mốc thời gian giữa các tệp kịch bản.
+* **Loại lỗi 2 — Graph Mismatch:** Mã bằng chứng trong file JSON Schema không khớp với UI.
+* **Loại lỗi 3 — UI Friction:** Lỗi hiển thị Timeline trên màn hình nhỏ.
+---
+
+<!-- END OF MERGED FILE: {src} -->
+
+---
+
+<!-- START OF MERGED FILE: 10_BUSINESS/08_playtest_and_business.md -->
+
+---
+# CHIẾN LƯỢC TẬP TRUNG THỊ TRƯỜNG & MARKETING (MARKETING PLAN) — VERITAS
+
+> **Kênh tiếp cận:** Tập trung vào cộng đồng người hâm mộ trinh thám, board game suy luận và game thủ trinh thám số (*Her Story, Obra Dinn*).
+
+---
+
+* **Teaser Trailers:** Video mô phỏng màn hình khởi động dòng lệnh máy trạm chuyên nghiệp.
+* **Kênh Streamers / Content Creators:** Gửi trước bản dùng thử các vụ án cho các YouTuber/Streamer chuyên giải đố.
+* **Cộng đồng Board Game:** Tham gia các hội chợ triển lãm Board Game để giới thiệu trải nghiệm Hybrid (Vật lý + Web Companion).
+---
+
+<!-- END OF MERGED FILE: {src} -->
+
+---
+
+<!-- START OF MERGED FILE: 10_BUSINESS/08_playtest_and_business.md -->
+
+---
+# CHIẾN LƯỢC ĐỊNH GIÁ & MÔ HÌNH DÒNG TIỀN (MONETIZATION & PRICING) — VERITAS
+
+---
+
+## 01. Cấu Trúc Bán Vụ Án
+* Free Diagnostic Tutorial: $0
+* Single Digital Case: $4.99 - $9.99
+* Physical Collector Box: $29.99 - $39.99
+* Season Pass: $24.99
+
+## 02. Nguyên Tắc Kinh Doanh Đạo Đức
+* Tuyệt đối không bán gợi ý hay vật phẩm gian lận. Bán trọn gói nội dung vụ án.
+
+---
+
+<!-- END OF MERGED FILE: {src} -->
+
+---
+
+<!-- START OF MERGED FILE: 10_BUSINESS/08_playtest_and_business.md -->
+
+---
+# CHIẾN LƯỢC PHÁT HÀNH STEAM & BOARD GAME (PUBLISHING STRATEGY) — VERITAS
+
+---
+
+## 01. Chiến Lược Steam Release
+* Đóng gói Next.js thành app Native (Electron/Tauri) phát hành trên Steam.
+* Tích hợp Steam Wishlists & Steam Achievements.
+
+## 02. Chiến Lược Board Game Manufacturing
+* Đóng gói bản Collector Box vật lý với tài liệu in giấy Couché 250gsm + Mã kích hoạt Web.
+
+---
+
+<!-- END OF MERGED FILE: {src} -->
