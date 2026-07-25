@@ -180,6 +180,28 @@ export default function EvidenceBoardPage() {
   const dragInfo = useRef<{ itemId: string; startX: number; startY: number } | null>(null)
   const [zoomedActive, setZoomedActive] = useState(false)
   const hasDragged = useRef(false)
+  const [morphOrigin, setMorphOrigin] = useState<{
+    tx: number;
+    ty: number;
+    sx: number;
+    sy: number;
+  } | null>(null)
+
+  const triggerZoom = (item: BoardItem, element: HTMLElement) => {
+    const rect = element.getBoundingClientRect()
+    const tw = Math.min(480, window.innerWidth - 32)
+    const th = item.type === 'note' ? 220 : 380
+    const cx = window.innerWidth / 2
+    const cy = window.innerHeight / 2
+    const ix = rect.left + rect.width / 2
+    const iy = rect.top + rect.height / 2
+    const tx = ix - cx
+    const ty = iy - cy
+    const sx = rect.width / tw
+    const sy = rect.height / th
+    setMorphOrigin({ tx, ty, sx, sy })
+    setZoomedItem(item)
+  }
 
   // Trigger zoom opening transition
   useEffect(() => {
@@ -323,7 +345,7 @@ export default function EvidenceBoardPage() {
     if (!hasDragged.current) {
       const item = items.find((it) => it.id === itemId)
       if (item) {
-        setZoomedItem(item)
+        triggerZoom(item, e.currentTarget as HTMLElement)
       }
     }
   }
@@ -557,9 +579,19 @@ export default function EvidenceBoardPage() {
           <div 
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              "relative max-w-lg w-full bg-card border border-border rounded-xl shadow-2xl p-6 flex flex-col gap-4 transition-all duration-300 ease-out transform cursor-default",
-              zoomedActive ? "scale-100 translate-y-0 opacity-100" : "scale-95 translate-y-4 opacity-0"
+              "relative max-w-lg w-full bg-card border border-border rounded-xl shadow-2xl p-6 flex flex-col gap-4 transition-all duration-300 ease-out cursor-default",
+              zoomedActive ? "opacity-100" : "opacity-0"
             )}
+            style={
+              morphOrigin
+                ? {
+                    transform: zoomedActive
+                      ? 'translate(0px, 0px) scale(1)'
+                      : `translate(${morphOrigin.tx}px, ${morphOrigin.ty}px) scale(${morphOrigin.sx}, ${morphOrigin.sy})`,
+                    transformOrigin: 'center center',
+                  }
+                : undefined
+            }
           >
             
             <button
