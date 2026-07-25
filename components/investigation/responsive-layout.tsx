@@ -53,18 +53,6 @@ export function ResponsiveLayout({
 
           {pathname !== '/dashboard' && <SystemHeader />}
 
-          {/* WORKSPACE TOOLBAR (Only shown on Desktop) */}
-          <div className="hidden lg:flex items-center justify-between border-b border-border/40 py-2.5 px-4 bg-card/10 text-[0.65rem] font-sans select-none z-20">
-            {/* Left Side: Case Status */}
-            <div className="flex items-center gap-2 text-primary/80 text-[0.6rem] tracking-wider font-bold">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500"></span>
-              </span>
-              <span>KHÔNG GIAN LÀM VIỆC CHUYÊN ÁN</span>
-            </div>
-          </div>
-
 
           {/* MAIN DYNAMIC PAGE WORKSPACE */}
           <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
