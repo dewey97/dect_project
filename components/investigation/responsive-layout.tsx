@@ -46,7 +46,7 @@ export function ResponsiveLayout({
       )}>
         
         {/* COLUMN 0: Left Navigation Sidebar (Desktop only) - Stretches from top to bottom */}
-        {pathname !== '/dashboard' && <LeftActivityBar />}
+        <LeftActivityBar />
 
         {/* Right side content pane wrapping header, toolbar and workspace */}
         <div className="flex-1 flex flex-col h-full overflow-hidden relative">
@@ -54,31 +54,17 @@ export function ResponsiveLayout({
           {pathname !== '/dashboard' && <SystemHeader />}
 
           {/* WORKSPACE TOOLBAR (Only shown on Desktop) */}
-          <div className="hidden lg:flex items-center justify-between border-b border-border/40 py-2.5 px-4 bg-card/10 text-[0.65rem] font-mono select-none z-20">
+          <div className="hidden lg:flex items-center justify-between border-b border-border/40 py-2.5 px-4 bg-card/10 text-[0.65rem] font-sans select-none z-20">
             {/* Left Side: Case Status */}
-            <div className="flex items-center gap-2 text-primary/80 font-mono text-[0.6rem] tracking-wider">
+            <div className="flex items-center gap-2 text-primary/80 text-[0.6rem] tracking-wider font-bold">
               <span className="relative flex size-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500"></span>
               </span>
-              <span>BÀN LÀM VIỆC ĐIỀU TRA</span>
-            </div>
-
-            {/* Right Side: Tech Details Toggle */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowTechDetails(!showTechDetails)}
-                className={cn(
-                  "flex items-center gap-1.5 border rounded px-2.5 py-1 transition-colors cursor-pointer font-bold",
-                  showTechDetails 
-                    ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500" 
-                    : "border-border bg-muted/10 text-muted-foreground"
-                )}
-              >
-                {showTechDetails ? '☑ Chi tiết pháp y: Bật' : '☐ Chi tiết pháp y: Tắt'}
-              </button>
+              <span>KHÔNG GIAN LÀM VIỆC CHUYÊN ÁN</span>
             </div>
           </div>
+
 
           {/* MAIN DYNAMIC PAGE WORKSPACE */}
           <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
@@ -154,11 +140,9 @@ export function ResponsiveLayout({
           )}
 
           {/* BOTTOM NAVIGATION BAR (Hidden on Desktop) */}
-          {pathname !== '/dashboard' && (
-            <div className="mt-auto lg:hidden">
-              <BottomNav />
-            </div>
-          )}
+          <div className="mt-auto lg:hidden">
+            <BottomNav />
+          </div>
 
         </div>
 

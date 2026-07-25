@@ -16,18 +16,16 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true)
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true)
-  const [showTechDetails, setShowTechDetails] = useState(false)
+  const [showTechDetails] = useState(false)
 
   // Load defaults from localStorage if available
   useEffect(() => {
     try {
       const savedLeft = localStorage.getItem('nocturne_leftSidebar')
       const savedRight = localStorage.getItem('nocturne_rightSidebar')
-      const savedTech = localStorage.getItem('nocturne_techDetails')
 
       if (savedLeft !== null) setLeftSidebarOpen(savedLeft === 'true')
       if (savedRight !== null) setRightSidebarOpen(savedRight === 'true')
-      if (savedTech !== null) setShowTechDetails(savedTech === 'true')
     } catch {
       // localStorage not available (SSR)
     }
