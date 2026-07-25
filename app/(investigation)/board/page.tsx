@@ -314,19 +314,19 @@ export default function EvidenceBoardPage() {
       <div className="px-4">
         <ScreenHeader
           eyebrow="BẰNG CHỨNG HÌNH SỰ"
-          title="Evidence Board"
+          title="Bảng Chứng Cứ"
           description="Kéo thả sắp xếp tài liệu, xâu chuỗi thông tin vụ án bằng dây chỉ đỏ. Click để xem chi tiết."
         />
       </div>
 
       {/* Toolbar */}
-      <div className="mx-4 mb-4 flex items-center justify-between border-b border-border/40 pb-3">
-        <span className="font-mono text-[0.6rem] text-muted-foreground uppercase tracking-widest">
-          Sơ đồ liên kết chứng cứ // BẢNG TỰ DO
+      <div className="mx-4 mb-4 flex items-center justify-between border-b border-border/40 pb-3 font-sans">
+        <span className="text-[0.6rem] text-muted-foreground uppercase tracking-widest font-bold">
+          Sơ đồ liên kết chứng cứ // BẢN ĐỒ CHUYÊN ÁN
         </span>
         <button
           onClick={handleReset}
-          className="flex items-center gap-1.5 font-mono text-[0.65rem] border border-destructive/20 bg-destructive/5 hover:bg-destructive/10 text-destructive px-3 py-1 rounded transition-all cursor-pointer font-bold uppercase active:scale-95"
+          className="flex items-center gap-1.5 text-[0.65rem] border border-destructive/20 bg-destructive/5 hover:bg-destructive/10 text-destructive px-3 py-1 rounded transition-all cursor-pointer font-bold uppercase active:scale-95"
         >
           <RotateCcw className="size-3" /> Dọn sạch bảng
         </button>
@@ -405,6 +405,7 @@ export default function EvidenceBoardPage() {
 
                 {/* Unpin button */}
                 <button
+                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => {
                     e.stopPropagation()
                     handleUnpinClue(item.id)
@@ -425,11 +426,12 @@ export default function EvidenceBoardPage() {
                       "{item.content}"
                     </p>
                     <button
+                      onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation()
                         setZoomedItem(item)
                       }}
-                      className="mt-2 text-[0.55rem] font-mono font-bold uppercase bg-amber-200/50 hover:bg-amber-300/60 transition-colors py-1 rounded text-center"
+                      className="mt-2 text-[0.55rem] font-sans font-bold uppercase bg-amber-200/50 hover:bg-amber-300/60 transition-colors py-1 rounded text-center"
                     >
                       Phóng to
                     </button>
@@ -447,17 +449,18 @@ export default function EvidenceBoardPage() {
                           }}
                         />
                       ) : (
-                        <div className="flex-1 bg-zinc-100 flex items-center justify-center text-[0.6rem] font-mono text-muted-foreground">
-                          NO PREVIEW
+                        <div className="flex-1 bg-zinc-100 flex items-center justify-center text-[0.65rem] font-sans text-muted-foreground">
+                          KHÔNG CÓ HÌNH ẢNH
                         </div>
                       )}
                       
                       <div className="mt-2 pt-2 border-t border-zinc-200 flex items-center justify-between">
-                        <span className="text-[0.65rem] font-mono font-bold text-zinc-800 truncate max-w-[120px]">
+                        <span className="text-[0.65rem] font-sans font-bold text-zinc-800 truncate max-w-[120px]">
                           {item.title}
                         </span>
                         
                         <button
+                          onPointerDown={(e) => e.stopPropagation()}
                           onClick={(e) => {
                             e.stopPropagation()
                             setZoomedItem(item)
@@ -501,13 +504,13 @@ export default function EvidenceBoardPage() {
                 >
                   <div className="min-w-0">
                     <span className={cn(
-                      "text-[0.55rem] font-mono font-black uppercase px-1 rounded inline-block mb-1.5",
+                      "text-[0.55rem] font-sans font-black uppercase px-1 rounded inline-block mb-1.5",
                       clue.type === 'victim' && "bg-rose-500/10 text-rose-400 border border-rose-500/20",
                       clue.type === 'suspect' && "bg-sky-500/10 text-sky-400 border border-sky-500/20",
                       clue.type === 'newspaper' && "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
                       clue.type === 'note' && "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                     )}>
-                      {clue.type}
+                      {clue.type === 'victim' ? 'Nạn nhân' : clue.type === 'suspect' ? 'Nghi phạm' : clue.type === 'newspaper' ? 'Tin báo' : 'Ghi chú'}
                     </span>
                     <h4 className="font-sans text-[0.7rem] font-bold text-foreground truncate" title={clue.title}>
                       {clue.title}
@@ -516,13 +519,13 @@ export default function EvidenceBoardPage() {
                   
                   <div className="mt-3 flex items-center justify-between">
                     {isPinned ? (
-                      <span className="text-[0.6rem] font-mono text-primary font-bold">
+                      <span className="text-[0.6rem] font-sans text-primary font-bold">
                         Đã ghim
                       </span>
                     ) : (
                       <button
                         onClick={() => handlePinClue(clue.id)}
-                        className="flex items-center gap-1 text-[0.6rem] font-mono font-bold bg-primary/10 hover:bg-primary/25 border border-primary/25 text-primary px-2 py-0.5 rounded transition-all w-full justify-center cursor-pointer"
+                        className="flex items-center gap-1 text-[0.6rem] font-sans font-bold bg-primary/10 hover:bg-primary/25 border border-primary/25 text-primary px-2 py-0.5 rounded transition-all w-full justify-center cursor-pointer"
                       >
                         <Plus className="size-3" /> Ghim lên bảng
                       </button>
@@ -549,7 +552,7 @@ export default function EvidenceBoardPage() {
 
             <div className="border-b border-border/40 pb-2 flex items-center gap-2">
               <Pin className="size-4 text-red-500" />
-              <span className="font-mono text-xs text-primary font-bold uppercase tracking-wider">
+              <span className="font-sans text-xs text-primary font-bold uppercase tracking-wider">
                 {zoomedItem.title}
               </span>
             </div>
@@ -568,14 +571,14 @@ export default function EvidenceBoardPage() {
                   className="max-h-[380px] w-auto object-contain"
                 />
               ) : (
-                <div className="py-24 text-muted-foreground font-mono text-xs">
+                <div className="py-24 text-muted-foreground font-sans text-xs">
                   Không có hình ảnh hiển thị.
                 </div>
               )}
             </div>
 
-            <div className="text-center">
-              <span className="font-mono text-[0.65rem] text-muted-foreground uppercase">
+            <div className="text-center font-sans">
+              <span className="text-[0.65rem] text-muted-foreground uppercase">
                 Bằng chứng thuộc Hồ sơ vụ án: {activeCase?.title}
               </span>
             </div>

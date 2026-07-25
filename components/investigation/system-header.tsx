@@ -10,43 +10,16 @@ export function SystemHeader() {
   const activeCase = CASES.find((c) => c.status === 'active')
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-md">
-      {/* Brand & Case Overview Row */}
-      <div className="flex flex-col gap-2.5 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-
-        {/* Case Info Dashboard Panel */}
+    <header className="sticky top-0 z-30 border-b border-border/30 bg-background/95 backdrop-blur-md">
+      <div className="px-4 py-3.5 flex items-center justify-between">
         {activeCase ? (
-          <div className="rounded-lg border border-border/50 bg-card/40 p-3">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <span className="font-mono text-[0.65rem] text-primary font-bold uppercase tracking-wider">
-                  Mã hồ sơ: {activeCase.code}
-                </span>
-                <h2 className="mt-0.5 font-sans text-base font-bold tracking-tight text-foreground truncate">
-                  {activeCase.title}
-                </h2>
-              </div>
-            </div>
-
-            {/* Objective & Status banner */}
-            <div className="mt-2 flex flex-col gap-1 border-t border-border/40 pt-2 text-[0.7rem]">
-              <div className="flex items-start gap-1.5">
-                <Target className="size-3.5 text-primary shrink-0 mt-0.5" />
-                <p className="font-sans leading-relaxed text-muted-foreground">
-                  <span className="font-semibold text-foreground font-mono text-[0.65rem] tracking-wider mr-1">
-                    MỤC TIÊU:
-                  </span>
-                  {activeCase.objective || activeCase.briefing}
-                </p>
-              </div>
-            </div>
-          </div>
+          <h2 className="font-sans text-xs font-black tracking-[0.25em] text-primary uppercase">
+            CHUYÊN ÁN: {activeCase.title.replace('Vụ án ', '')}
+          </h2>
         ) : (
-          <div className="rounded-lg border border-dashed border-border/50 p-3 text-center">
-            <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
-              KHÔNG PHÁT HIỆN VỤ ÁN HOẠT ĐỘNG
-            </span>
-          </div>
+          <h2 className="font-sans text-xs font-black tracking-[0.25em] text-muted-foreground uppercase">
+            CHƯA CÓ CHUYÊN ÁN HOẠT ĐỘNG
+          </h2>
         )}
       </div>
     </header>
