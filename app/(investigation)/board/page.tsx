@@ -479,17 +479,14 @@ export default function EvidenceBoardPage() {
     <div className="pb-10 min-h-dvh flex flex-col">
       <div className="px-4">
         <ScreenHeader
-          eyebrow="BẰNG CHỨNG HÌNH SỰ"
+          eyebrow=""
           title="Bảng Chứng Cứ"
           description="Kéo thả sắp xếp tài liệu, xâu chuỗi thông tin vụ án bằng dây chỉ đỏ. Click để xem chi tiết."
         />
       </div>
 
       {/* Toolbar */}
-      <div className="mx-4 mb-4 flex items-center justify-between border-b border-border/40 pb-3 font-sans">
-        <span className="text-[0.6rem] text-muted-foreground uppercase tracking-widest font-bold">
-          Sơ đồ liên kết chứng cứ // BẢN ĐỒ CHUYÊN ÁN
-        </span>
+      <div className="mx-4 mb-4 flex items-center justify-end border-b border-border/40 pb-3 font-sans">
         <button
           onClick={handleReset}
           className="flex items-center gap-1.5 text-[0.65rem] border border-destructive/20 bg-destructive/5 hover:bg-destructive/10 text-destructive px-3 py-1 rounded transition-all cursor-pointer font-bold uppercase active:scale-95"
