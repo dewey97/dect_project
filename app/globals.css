@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Special+Elite&family=Caveat:wght@400;700&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
@@ -7,6 +8,9 @@
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-typewriter: 'Special Elite', 'Courier Prime', Courier, monospace;
+  --font-handwriting: 'Caveat', cursive;
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -122,9 +126,56 @@
     /* prevent overscroll glow on mobile so the OS feels native */
     overscroll-behavior-y: none;
   }
+
+  /* Custom detective-themed scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0d0d11; /* Very dark background to match the theme */
+    border-left: 1px solid rgba(229, 184, 90, 0.08);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(229, 184, 90, 0.2); /* Muted primary amber */
+    border-radius: 5px;
+    border: 2px solid #0d0d11;
+    transition: background 0.2s;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(229, 184, 90, 0.45); /* Bright primary amber on hover */
+  }
+  /* Firefox fallback */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(229, 184, 90, 0.2) #0d0d11;
+  }
 }
 
 @layer utilities {
+  /* Vintage paper texture with soft beige grain */
+  .paper-texture {
+    background-color: oklch(0.95 0.02 80);
+    color: oklch(0.15 0.01 80);
+    background-image: 
+      radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0),
+      radial-gradient(rgba(0,0,0,0.02) 1px, transparent 0);
+    background-size: 8px 8px;
+    background-position: 0 0, 4px 4px;
+    position: relative;
+  }
+
+  /* Polaroid-style photo frame with subtle tilt & photo shadow */
+  .polaroid-frame {
+    background: #fbfaf6;
+    padding: 8px 8px 32px 8px;
+    border: 1px solid rgba(0,0,0,0.12);
+    box-shadow: 
+      0 10px 20px rgba(0,0,0,0.4),
+      inset 0 0 12px rgba(0,0,0,0.03);
+    border-radius: 2px;
+  }
+
   /* Section eyebrows / metadata. Override color when needed (e.g. text-primary). */
   .label-system {
     @apply font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground;

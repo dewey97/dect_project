@@ -1,4 +1,4 @@
-# VỤ ÁN 000: TRỐN TÌM (THE HIDE-AND-SEEK MYSTERY) — KỊCH BẢN PHÁ ÁN
+# VỤ ÁN 000: TRỐN TÌM  — KỊCH BẢN PHÁ ÁN
 
 ## 📊 BẢNG THÔNG SỐ ĐỊNH LƯỢNG VỤ ÁN (EVALUATION RUBRIC)
 

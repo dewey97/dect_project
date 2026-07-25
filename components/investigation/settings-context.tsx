@@ -16,7 +16,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(true)
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true)
-  const [showTechDetails] = useState(false)
+  const [showTechDetails, setShowTechDetails] = useState(false)
 
   // Load defaults from localStorage if available
   useEffect(() => {

@@ -174,7 +174,7 @@ const CASES_LIST: CaseData[] = [
     description:
       "Rò rỉ dữ liệu sinh học đột biến tại tổ hợp phân tích bio-tech",
     status: "active",
-    bgImage: "/evidence-board-bg.png",
+    bgImage: "/evidence-board-bg2.jpg",
     pins: [
       {
         id: "c2-pin-0",
@@ -225,7 +225,7 @@ const CASES_LIST: CaseData[] = [
     description:
       "Vụ tấn công ransomware mã hóa toàn bộ dữ liệu máy chủ tài chính",
     status: "active",
-    bgImage: "/evidence-board-bg.png",
+    bgImage: "/evidence-board-bg3.jpg",
     pins: [
       {
         id: "c3-pin-0",
@@ -399,7 +399,12 @@ interface TooltipState {
   y: number;
 }
 
-export function HeroInteractive({ className }: { className?: string }) {
+interface HeroInteractiveProps {
+  className?: string;
+  controlledCaseId?: string;
+}
+
+export function HeroInteractive({ className, controlledCaseId }: HeroInteractiveProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -465,7 +470,8 @@ export function HeroInteractive({ className }: { className?: string }) {
   const [innerRect, setInnerRect] = useState<BoardBounds | null>(null);
 
   // ── Case and mode states ──
-  const [currentCaseId, setCurrentCaseId] = useState<string>("case-01");
+  const [internalCaseId, setInternalCaseId] = useState<string>("case-01");
+  const currentCaseId = controlledCaseId ?? internalCaseId;
   const [boardMode, setBoardMode] = useState<BoardMode>("zoom");
 
   const activeCase =
@@ -1083,6 +1089,20 @@ export function HeroInteractive({ className }: { className?: string }) {
     setTooltip(null);
     requestRenderRef.current();
   }, []);
+
+  // ────────────────────────────────────────
+  // Sync external controlled case id
+  // ────────────────────────────────────────
+  useEffect(() => {
+    if (controlledCaseId && controlledCaseId !== internalCaseId) {
+      setInternalCaseId(controlledCaseId);
+      updateUserPins([]);
+      updateUserConnections([]);
+      updateConnectionStartId(null);
+      hoveredPinRef.current = null;
+      setTooltip(null);
+    }
+  }, [controlledCaseId, internalCaseId, updateUserPins, updateUserConnections, updateConnectionStartId]);
 
   // ────────────────────────────────────────
   // Animation & Setup
@@ -1894,76 +1914,10 @@ export function HeroInteractive({ className }: { className?: string }) {
           </button>
 
 
-          {/* Case Arrow Navigation */}
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              aria-label="Hồ sơ trước"
-              onClick={(e) => {
-                e.stopPropagation();
-                const currentIdx = CASES_LIST.findIndex((c) => c.id === currentCaseId);
-                // Find previous non-locked case
-                for (let i = currentIdx - 1; i >= 0; i--) {
-                  if (CASES_LIST[i].status !== "locked") {
-                    setCurrentCaseId(CASES_LIST[i].id);
-                    updateUserPins([]);
-                    updateUserConnections([]);
-                    updateConnectionStartId(null);
-                    hoveredPinRef.current = null;
-                    setTooltip(null);
-                    resetZoom();
-                    break;
-                  }
-                }
-              }}
-              disabled={(() => {
-                const idx = CASES_LIST.findIndex((c) => c.id === currentCaseId);
-                return !CASES_LIST.slice(0, idx).some((c) => c.status !== "locked");
-              })()}
-              className={cn(
-                "flex h-6 w-6 items-center justify-center rounded-full text-[0.55rem] transition-all",
-                "text-amber-200/70 hover:text-amber-100 hover:bg-amber-900/20",
-                "disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent",
-              )}
-            >
-              ◀
-            </button>
-            <span className="font-mono text-[0.5rem] font-bold uppercase tracking-wider text-amber-200/80 min-w-[80px] text-center select-none">
-              {activeCase.title}
-            </span>
-            <button
-              type="button"
-              aria-label="Hồ sơ sau"
-              onClick={(e) => {
-                e.stopPropagation();
-                const currentIdx = CASES_LIST.findIndex((c) => c.id === currentCaseId);
-                // Find next non-locked case
-                for (let i = currentIdx + 1; i < CASES_LIST.length; i++) {
-                  if (CASES_LIST[i].status !== "locked") {
-                    setCurrentCaseId(CASES_LIST[i].id);
-                    updateUserPins([]);
-                    updateUserConnections([]);
-                    updateConnectionStartId(null);
-                    hoveredPinRef.current = null;
-                    setTooltip(null);
-                    resetZoom();
-                    break;
-                  }
-                }
-              }}
-              disabled={(() => {
-                const idx = CASES_LIST.findIndex((c) => c.id === currentCaseId);
-                return !CASES_LIST.slice(idx + 1).some((c) => c.status !== "locked");
-              })()}
-              className={cn(
-                "flex h-6 w-6 items-center justify-center rounded-full text-[0.55rem] transition-all",
-                "text-amber-200/70 hover:text-amber-100 hover:bg-amber-900/20",
-                "disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent",
-              )}
-            >
-              ▶
-            </button>
-            </div>
+          {/* Case title label */}
+          <span className="font-mono text-[0.5rem] font-bold uppercase tracking-wider text-amber-200/80 min-w-[80px] text-center select-none">
+            {activeCase.title}
+          </span>
         </div>
         )}
         {tooltip && tooltipStyle && (

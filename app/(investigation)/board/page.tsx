@@ -444,7 +444,11 @@ export default function EvidenceBoardPage() {
     if (!hasDragged.current) {
       const item = items.find((it) => it.id === itemId)
       if (item) {
-        openZoom(item, e.currentTarget as HTMLElement)
+        const target = e.target as HTMLElement
+        const isImgClick = target.tagName === "IMG" || target.classList.contains("clue-image-container") || target.closest(".clue-image-container")
+        if (item.imgUrl && isImgClick) {
+          openZoom(item, e.currentTarget as HTMLElement)
+        }
       }
     }
   }

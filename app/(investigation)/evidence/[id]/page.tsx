@@ -45,7 +45,7 @@ export default function DeviceSimulatorPage() {
       if (!id) return
       
       const currentCase = await getActiveCase()
-      setActiveCase(currentCase)
+      setActiveCase(currentCase || null)
 
       const dev = await getDevice(id)
       if (dev) {
