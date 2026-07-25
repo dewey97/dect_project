@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { ScreenHeader } from '@/components/investigation/screen-header'
 import { getActiveCase } from '@/lib/mock-data'
 import type { Case } from '@/lib/types'
@@ -180,47 +180,25 @@ export default function EvidenceBoardPage() {
   const dragInfo = useRef<{ itemId: string; startX: number; startY: number } | null>(null)
   const [zoomedActive, setZoomedActive] = useState(false)
   const hasDragged = useRef(false)
-  const [morphOrigin, setMorphOrigin] = useState<{
-    tx: number;
-    ty: number;
-    sx: number;
-    sy: number;
-  } | null>(null)
+  
+  interface MorphTransform {
+    x: number
+    y: number
+    scaleX: number
+    scaleY: number
+  }
+
+  const [sourceRect, setSourceRect] = useState<DOMRect | null>(null)
+  const [morphTransform, setMorphTransform] = useState<MorphTransform | null>(null)
+  const modalContentRef = useRef<HTMLDivElement>(null)
 
   const dragFrameRef = useRef<number | null>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const triggerZoom = (item: BoardItem, element: HTMLElement) => {
     const rect = element.getBoundingClientRect()
-    
-    let tw = 0
-    let th = 0
-    
-    if (item.type === 'note') {
-      tw = Math.min(380, window.innerWidth - 32)
-      th = 220
-    } else {
-      const maxW = window.innerWidth * 0.9
-      const maxH = window.innerHeight * 0.8
-      const ratio = rect.width / rect.height
-      tw = maxW
-      th = maxW / ratio
-      if (th > maxH) {
-        th = maxH
-        tw = maxH * ratio
-      }
-    }
-    
-    const cx = window.innerWidth / 2
-    const cy = window.innerHeight / 2
-    const ix = rect.left + rect.width / 2
-    const iy = rect.top + rect.height / 2
-    const tx = ix - cx
-    const ty = iy - cy
-    const sx = rect.width / tw
-    const sy = rect.height / th
-    
-    setMorphOrigin({ tx, ty, sx, sy })
+    setSourceRect(rect)
+    setZoomedActive(false)
     setZoomedItem(item)
   }
 
@@ -232,27 +210,57 @@ export default function EvidenceBoardPage() {
     triggerZoom(item, element)
   }
 
+  const MORPH_DURATION = 500
   const closeZoom = () => {
+    if (zoomedItem) {
+      const sourceElement = document.querySelector<HTMLElement>(
+        `[data-board-item-id="${zoomedItem.id}"]`
+      )
+      if (sourceElement) {
+        setSourceRect(sourceElement.getBoundingClientRect())
+      }
+    }
+
     setZoomedActive(false)
+
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current)
     }
     closeTimerRef.current = setTimeout(() => {
       setZoomedItem(null)
-      setMorphOrigin(null)
+      setSourceRect(null)
+      setMorphTransform(null)
       closeTimerRef.current = null
-    }, 250)
+    }, MORPH_DURATION)
   }
 
-  // Trigger zoom opening transition
-  useEffect(() => {
-    if (zoomedItem) {
-      const timer = setTimeout(() => setZoomedActive(true), 20)
-      return () => clearTimeout(timer)
-    } else {
-      setZoomedActive(false)
-    }
-  }, [zoomedItem])
+  // Calculate FLIP morph origin before browser paint
+  useLayoutEffect(() => {
+    if (!zoomedItem || !sourceRect || !modalContentRef.current) return
+
+    const targetRect = modalContentRef.current.getBoundingClientRect()
+
+    const sourceCenterX = sourceRect.left + sourceRect.width / 2
+    const sourceCenterY = sourceRect.top + sourceRect.height / 2
+
+    const targetCenterX = targetRect.left + targetRect.width / 2
+    const targetCenterY = targetRect.top + targetRect.height / 2
+
+    setMorphTransform({
+      x: sourceCenterX - targetCenterX,
+      y: sourceCenterY - targetCenterY,
+      scaleX: sourceRect.width / targetRect.width,
+      scaleY: sourceRect.height / targetRect.height,
+    })
+
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setZoomedActive(true)
+      })
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [zoomedItem, sourceRect])
 
   // Cleanup timers on unmount
   useEffect(() => {
@@ -417,6 +425,19 @@ export default function EvidenceBoardPage() {
     }
   }
 
+  const morphStyle =
+    morphTransform && !zoomedActive
+      ? {
+          transform: `translate3d(${morphTransform.x}px, ${morphTransform.y}px, 0) scale(${morphTransform.scaleX}, ${morphTransform.scaleY})`,
+          opacity: 0.7,
+          filter: 'brightness(0.85)',
+        }
+      : {
+          transform: 'translate3d(0, 0, 0) scale(1)',
+          opacity: 1,
+          filter: 'brightness(1)',
+        }
+
   return (
     <div className="pb-10 min-h-dvh flex flex-col">
       <div className="px-4">
@@ -489,6 +510,7 @@ export default function EvidenceBoardPage() {
             return (
               <div
                 key={item.id}
+                data-board-item-id={item.id}
                 onPointerDown={(e) => handlePointerDown(e, item.id)}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
@@ -497,7 +519,7 @@ export default function EvidenceBoardPage() {
                   isNote
                     ? 'bg-amber-100/95 border border-amber-300 text-amber-950 font-sans shadow-lg shadow-amber-950/20 p-3.5 pt-6'
                     : 'bg-transparent text-card-foreground hover:scale-102 transition-transform duration-200',
-                  isZoomed && 'opacity-0 pointer-events-none'
+                  isZoomed && zoomedActive && 'invisible pointer-events-none'
                 )}
                 style={{
                   left: item.x,
@@ -539,14 +561,13 @@ export default function EvidenceBoardPage() {
                 ) : (
                   <div className="w-full h-full flex flex-col pointer-events-none">
                     {item.imgUrl ? (
-                      <div
-                        className="w-full h-full overflow-hidden relative rounded border border-primary/20 shadow-md group-hover:shadow-xl group-hover:border-primary/50 transition-all duration-200"
-                        style={{
-                          backgroundImage: `url(${item.imgUrl})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center'
-                        }}
-                      >
+                      <div className="w-full h-full overflow-hidden relative rounded border border-primary/20 shadow-md group-hover:shadow-xl group-hover:border-primary/50 transition-all duration-200">
+                        <img
+                          src={item.imgUrl}
+                          alt=""
+                          draggable={false}
+                          className="w-full h-full object-cover select-none pointer-events-none"
+                        />
                         {/* Hover Overlay with ZoomIn Icon */}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors duration-200">
                           <ZoomIn className="size-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 scale-90 group-hover:scale-100" />
@@ -636,55 +657,45 @@ export default function EvidenceBoardPage() {
         <div 
           onClick={closeZoom}
           className={cn(
-            "fixed inset-0 bg-transparent z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-300 ease-out cursor-zoom-out",
-            zoomedActive ? "opacity-100" : "opacity-0 pointer-events-none"
+            "fixed inset-0 z-50 flex flex-col items-center justify-center p-4 transition-[background-color,backdrop-filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-zoom-out",
+            zoomedActive
+              ? "bg-black/75 backdrop-blur-[3px]"
+              : "bg-black/0 backdrop-blur-none pointer-events-none"
           )}
         >
           {zoomedItem.type === 'note' ? (
             <div 
+              ref={modalContentRef}
               onClick={(e) => e.stopPropagation()}
-              className={cn(
-                "relative max-w-sm w-full bg-amber-100 border border-amber-300 text-amber-950 p-8 rounded shadow-2xl font-sans flex items-center justify-center text-center transition-all duration-300 ease-out cursor-default",
-                zoomedActive ? "opacity-100" : "opacity-0"
-              )}
-              style={
-                morphOrigin
-                  ? {
-                      transform: zoomedActive
-                        ? 'translate(0px, 0px) scale(1)'
-                        : `translate(${morphOrigin.tx}px, ${morphOrigin.ty}px) scale(${morphOrigin.sx}, ${morphOrigin.sy})`,
-                      transformOrigin: 'center center',
-                    }
-                  : undefined
-              }
+              className="relative max-w-sm w-full bg-amber-100 border border-amber-300 text-amber-950 p-8 rounded shadow-2xl font-sans flex items-center justify-center text-center will-change-transform transition-[transform,opacity,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-default"
+              style={{
+                ...morphStyle,
+                transformOrigin: 'center center',
+              }}
             >
-              <p className="text-sm font-semibold leading-relaxed italic">
+              <p className="text-sm font-semibold leading-relaxed italic select-none">
                 "{zoomedItem.content}"
               </p>
             </div>
           ) : (
             <div 
+              ref={modalContentRef}
               onClick={(e) => e.stopPropagation()}
-              className={cn(
-                "relative transition-all duration-300 ease-out transform cursor-default flex items-center justify-center",
-                zoomedActive ? "opacity-100" : "opacity-0"
-              )}
-              style={
-                morphOrigin
-                  ? {
-                      transform: zoomedActive
-                        ? 'translate(0px, 0px) scale(1)'
-                        : `translate(${morphOrigin.tx}px, ${morphOrigin.ty}px) scale(${morphOrigin.sx}, ${morphOrigin.sy})`,
-                      transformOrigin: 'center center',
-                    }
-                  : undefined
-              }
+              className="relative will-change-transform transition-[transform,opacity,filter] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-default flex items-center justify-center"
+              style={{
+                ...morphStyle,
+                transformOrigin: 'center center',
+              }}
             >
               {zoomedItem.imgUrl ? (
                 <img
                   src={zoomedItem.imgUrl}
                   alt={zoomedItem.title}
-                  className="max-h-[80vh] max-w-[90vw] w-auto h-auto rounded-lg shadow-[0_25px_60px_rgba(0,0,0,0.85)] border border-primary/20 select-none pointer-events-none"
+                  draggable={false}
+                  className={cn(
+                    "block max-h-[80vh] max-w-[90vw] object-contain rounded-lg shadow-[0_25px_60px_rgba(0,0,0,0.85)] border border-primary/20 select-none pointer-events-none transition-opacity duration-300",
+                    zoomedActive ? "opacity-100" : "opacity-70"
+                  )}
                 />
               ) : (
                 <div className="py-24 text-muted-foreground font-sans text-xs bg-card p-6 rounded border border-border">
