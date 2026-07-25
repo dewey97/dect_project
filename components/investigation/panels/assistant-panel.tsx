@@ -14,6 +14,7 @@ import {
   SystemAlert
 } from '@/components/investigation/assistant-console-components'
 import { getAssistantConversation } from '@/lib/content-service'
+import { getActiveCase } from '@/lib/mock-data'
 import type { AssistantConversation } from '@/lib/types'
 import { Shield, Wifi } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -59,7 +60,9 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
   // Load dynamic content from Content Engine Layer
   useEffect(() => {
     async function loadIntel() {
-      const data = await getAssistantConversation('case-001')
+      const activeCase = await getActiveCase()
+      const queryId = activeCase?.id === 'case-01' ? 'case-001' : (activeCase?.id || 'case-001')
+      const data = await getAssistantConversation(queryId)
       if (data) {
         setIntel(data)
         setMessages([

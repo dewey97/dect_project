@@ -12,6 +12,19 @@ import type {
 
 export const CASES: Case[] = [
   {
+    id: 'case-000',
+    code: 'TEST-99',
+    title: 'Kiểm Thử Hệ Thống (UX Test)',
+    logline: 'Vụ án siêu đơn giản để kiểm thử nhanh toàn bộ luồng UX.',
+    briefing: 'Chào mừng điều tra viên đến với phiên kiểm thử hệ thống. Hãy mở khóa thiết bị di động, tìm mâu thuẫn lời khai và nộp báo cáo kết án để hoàn thành.',
+    objective: 'Mở khóa điện thoại và kết án hung thủ.',
+    estimatedTime: '1 phút',
+    status: 'locked',
+    difficulty: 1,
+    progress: 0,
+    location: 'Phòng Thí Nghiệm UX'
+  },
+  {
     id: 'case-01',
     code: 'NX-4471',
     title: 'Ánh Sáng Cảng Biển (The Harbor Lights)',
@@ -71,6 +84,20 @@ export const CASES: Case[] = [
 ]
 
 export const DEVICES: Device[] = [
+  {
+    id: 'dev-00',
+    caseId: 'case-000',
+    kind: 'phone',
+    label: 'Điện thoại của Thomas',
+    owner: 'Thomas Vance',
+    locked: false,
+    status: 'unlocked',
+    evidenceId: 'EVID-TEST-A',
+    recoveryLevel: 100,
+    lastUpdated: '24-07-2026 // 17:00',
+    previewStats: 'TIN NHẮN // HÌNH ẢNH',
+    pinLength: 4
+  },
   {
     id: 'dev-01',
     caseId: 'case-01',
@@ -143,6 +170,71 @@ export const DEVICES: Device[] = [
 
 export const EVIDENCE: Evidence[] = [
   {
+    id: 'ev-will',
+    caseId: 'case-000',
+    deviceId: 'dev-02',
+    kind: 'message',
+    title: 'Bản sao di chúc bị tráo',
+    preview: 'Mai tráo bản sao vào hộp sắt để lấy di chúc gốc đi giám định.',
+    timestamp: '11:15',
+    evidenceId: 'EV-WILL-COPY',
+    recoveredBy: 'DET. TESTER',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+  },
+  {
+    id: 'ev-whistle',
+    caseId: 'case-000',
+    deviceId: 'dev-00',
+    kind: 'message',
+    title: 'Còi đồng Gia Huy biến mất',
+    preview: 'Hà lấy chiếc còi đồng trong hộp sắt nhằm che giấu bí mật Gia Huy.',
+    timestamp: '17:50',
+    evidenceId: 'EV-WHISTLE-GONE',
+    recoveredBy: 'DET. TESTER',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+  },
+  {
+    id: 'ev-map',
+    caseId: 'case-000',
+    deviceId: 'dev-03',
+    kind: 'document',
+    title: 'Bản vẽ sửa nhà gốc',
+    preview: 'Bản vẽ gốc Khang dùng để khống chế và tống tiền Lê Quang Vũ.',
+    timestamp: '15:35',
+    evidenceId: 'EV-MAP-ORIGIN',
+    recoveredBy: 'DET. TESTER',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+  },
+  {
+    id: 'ev-gps-vu',
+    caseId: 'case-000',
+    deviceId: 'dev-03',
+    kind: 'gps',
+    title: 'Định vị GPS của Vũ',
+    preview: 'Nhật ký GPS ghi nhận Vũ quay lại căn nhà cũ vào ban đêm để trộm hồ sơ.',
+    timestamp: '20:45',
+    evidenceId: 'EV-GPS-VU',
+    recoveredBy: 'DET. TESTER',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+  },
+  {
+    id: 'ev-sms-mai',
+    caseId: 'case-000',
+    deviceId: 'dev-00',
+    kind: 'message',
+    title: 'Tin nhắn Mai đe dọa Khang',
+    preview: 'Tôi đe dọa anh lần cuối, anh sẽ không lấy được một đồng nào đâu!',
+    timestamp: '14:20',
+    evidenceId: 'EV-SMS-MAI',
+    recoveredBy: 'DET. TESTER',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+  },
+  {
     id: 'ev-01',
     caseId: 'case-01',
     deviceId: 'dev-02',
@@ -198,6 +290,15 @@ export const EVIDENCE: Evidence[] = [
 ]
 
 export const TRACE_CARDS: TraceCard[] = [
+  {
+    id: 'trace-test-01',
+    caseId: 'case-000',
+    code: 'T-TEST-01',
+    name: 'V. Marsh',
+    category: 'suspect',
+    description: 'Nghi phạm của vụ án kiểm thử.',
+    collected: true,
+  },
   {
     id: 'trace-01',
     caseId: 'case-01',

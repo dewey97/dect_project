@@ -93,7 +93,7 @@ const CASES_LIST: CaseData[] = [
   {
     id: "case-01",
     title: "VẬN ĐƠN BẤT THƯỜNG",
-    description: "Thomas Vance — 34T, quản đốc bến cảng",
+    description: "Vụ mất tích bí ẩn tại Cầu cảng số 9",
     status: "active",
     bgImage: "/evidence-board-bg.png",
     pins: [
@@ -102,7 +102,7 @@ const CASES_LIST: CaseData[] = [
         x: 0.22,
         y: 0.24,
         label: "NẠN NHÂN",
-        detail: "Thomas Vance — 34T, quản đốc bến cảng",
+        detail: "Nạn nhân chính của vụ án",
       },
       {
         id: "c1-pin-1",
@@ -173,7 +173,7 @@ const CASES_LIST: CaseData[] = [
     title: "BÓNG MA PHÒNG THÍ NGHIỆM",
     description:
       "Rò rỉ dữ liệu sinh học đột biến tại tổ hợp phân tích bio-tech",
-    status: "locked",
+    status: "active",
     bgImage: "/evidence-board-bg.png",
     pins: [
       {
@@ -224,7 +224,7 @@ const CASES_LIST: CaseData[] = [
     title: "DẤU VẾT KỸ THUẬT SỐ",
     description:
       "Vụ tấn công ransomware mã hóa toàn bộ dữ liệu máy chủ tài chính",
-    status: "locked",
+    status: "active",
     bgImage: "/evidence-board-bg.png",
     pins: [
       {
@@ -460,6 +460,9 @@ export function HeroInteractive({ className }: { className?: string }) {
   const [zoomActive, setZoomActive] = useState(false);
 
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+
+  // Inner board bounds in screen-space (for positioning HTML overlays)
+  const [innerRect, setInnerRect] = useState<BoardBounds | null>(null);
 
   // ── Case and mode states ──
   const [currentCaseId, setCurrentCaseId] = useState<string>("case-01");
@@ -1151,6 +1154,10 @@ export function HeroInteractive({ className }: { className?: string }) {
         );
       }
 
+      // Update inner bounds rect for HTML overlay positioning
+      const ib = getInnerBoardBounds(width, height, boardFrameRef.current);
+      setInnerRect(ib);
+
       requestRenderRef.current();
     };
 
@@ -1754,6 +1761,11 @@ export function HeroInteractive({ className }: { className?: string }) {
     frameImage.src = BOARD_FRAME_SRC;
     frameImage.onload = () => {
       boardFrameRef.current = frameImage;
+      // Recalculate inner bounds now that frame dimensions are known
+      const { width, height } = containerSizeRef.current;
+      if (width > 0 && height > 0) {
+        setInnerRect(getInnerBoardBounds(width, height, frameImage));
+      }
       requestRenderRef.current();
     };
     frameImage.onerror = () => {
@@ -1808,108 +1820,6 @@ export function HeroInteractive({ className }: { className?: string }) {
         className,
       )}
     >
-      {/* Top Header Panel integrated into the wooden frame */}
-      <div
-        data-board-ui
-        className={cn(
-          "flex h-12 shrink-0 items-center justify-between px-6 z-30",
-          "border-b border-border/10 bg-[#160f0a]/90 backdrop-blur-[3px]",
-        )}
-      >
-        {/* Left: Visual alignment spacer/placeholder */}
-        <div className="flex items-center gap-2">
-
-        </div>
-
-        {/* Center: Case Description */}
-        <div className="hidden max-w-sm truncate text-center md:block">
-          <span className="font-mono text-[0.52rem] uppercase tracking-wider text-muted-foreground/60">
-            {activeCase.description}
-          </span>
-        </div>
-
-        {/* Right: Mode Selector Buttons + Paper Clip Case Switcher */}
-        <div className="flex items-center gap-4">
-          {/* Mode Switcher (🔍 & 📌) shifted to the right */}
-          <div className="flex items-center gap-1.5 rounded-md border border-amber-900/25 bg-[#1b1109]/40 p-0.5">
-            <button
-              type="button"
-              aria-label="Chế độ Zoom"
-              aria-pressed={boardMode === "zoom"}
-              title="Chế độ Zoom (Phóng to/Kéo di chuyển)"
-              onClick={(e) => {
-                e.stopPropagation();
-                updateConnectionStartId(null);
-                setBoardMode("zoom");
-              }}
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-full text-[0.7rem] transition-all duration-300",
-                boardMode === "zoom"
-                  ? "bg-primary/20 text-primary border border-primary/45 shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] scale-95 font-bold"
-                  : "text-muted-foreground hover:bg-muted/10 hover:text-foreground",
-              )}
-            >
-              🔍
-            </button>
-            <button
-              type="button"
-              aria-label="Chế độ Ghim"
-              aria-pressed={boardMode === "pin"}
-              title="Chế độ Ghim (Đánh ghim & Nối dây)"
-              onClick={(e) => {
-                e.stopPropagation();
-                switchToPinMode();
-              }}
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-full text-[0.7rem] transition-all duration-300",
-                boardMode === "pin"
-                  ? "bg-primary/20 text-primary border border-primary/45 shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] scale-95 font-bold"
-                  : "text-muted-foreground hover:bg-muted/10 hover:text-foreground",
-              )}
-            >
-              📌
-            </button>
-          </div>
-
-          {/* Paper Clip Styled Case Switcher */}
-          <div className="relative flex items-center gap-1.5 rounded-md border border-amber-900/35 bg-[#2c1d11]/80 px-2 py-1 shadow-inner backdrop-blur-sm">
-            {/* Paper clip styling icon representation */}
-            <span className="text-[0.65rem] opacity-75" title="Hồ sơ vụ án">
-              📎
-            </span>
-            <select
-              value={currentCaseId}
-              onChange={(e) => {
-                const targetCaseId = e.target.value;
-                setCurrentCaseId(targetCaseId);
-                // Clear active user states when changing cases
-                updateUserPins([]);
-                updateUserConnections([]);
-                updateConnectionStartId(null);
-                hoveredPinRef.current = null;
-                setTooltip(null);
-                resetZoom();
-              }}
-              className={cn(
-                "bg-transparent font-mono text-[0.55rem] font-bold uppercase tracking-wider text-amber-200/90 outline-none cursor-pointer",
-                "pr-1",
-              )}
-            >
-              {CASES_LIST.map((c) => (
-                <option
-                  key={c.id}
-                  value={c.id}
-                  className="bg-[#1b1109] text-amber-100"
-                  disabled={c.status === "locked"}
-                >
-                  {c.status === "locked" ? "🔒 " : ""}HỒ SƠ: {c.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
       {/* Main Canvas view area container */}
       <div
         ref={containerRef}
@@ -1942,7 +1852,120 @@ export function HeroInteractive({ className }: { className?: string }) {
           className="absolute inset-0 h-full w-full"
         />
 
-        {/* Tooltip */}
+        {/* Floating toolbar — center-top of the inner evidence board */}
+        {innerRect && (
+        <div
+          data-board-ui
+          style={{
+            position: "absolute",
+            top: innerRect.y - 12,
+            left: innerRect.x + innerRect.width / 2,
+            transform: "translate(-50%, -50%)",
+          }}
+          className={cn(
+            "z-20",
+            "flex items-center gap-2",
+            "px-2.5 py-1.5",
+          )}
+        >
+          {/* Mode Toggle */}
+          <button
+            type="button"
+            data-board-ui
+            aria-label={boardMode === "zoom" ? "Chuyển sang chế độ Ghim" : "Chuyển sang chế độ Zoom"}
+            title={boardMode === "zoom" ? "Chuyển sang chế độ Ghim" : "Chuyển sang chế độ Zoom"}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (boardMode === "zoom") {
+                switchToPinMode();
+              } else {
+                updateConnectionStartId(null);
+                setBoardMode("zoom");
+              }
+            }}
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-full text-[0.85rem] transition-all duration-300",
+              boardMode === "pin"
+                ? "text-primary"
+                : "text-amber-200/80",
+            )}
+          >
+            {boardMode === "zoom" ? "🔍" : "📌"}
+          </button>
+
+
+          {/* Case Arrow Navigation */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              aria-label="Hồ sơ trước"
+              onClick={(e) => {
+                e.stopPropagation();
+                const currentIdx = CASES_LIST.findIndex((c) => c.id === currentCaseId);
+                // Find previous non-locked case
+                for (let i = currentIdx - 1; i >= 0; i--) {
+                  if (CASES_LIST[i].status !== "locked") {
+                    setCurrentCaseId(CASES_LIST[i].id);
+                    updateUserPins([]);
+                    updateUserConnections([]);
+                    updateConnectionStartId(null);
+                    hoveredPinRef.current = null;
+                    setTooltip(null);
+                    resetZoom();
+                    break;
+                  }
+                }
+              }}
+              disabled={(() => {
+                const idx = CASES_LIST.findIndex((c) => c.id === currentCaseId);
+                return !CASES_LIST.slice(0, idx).some((c) => c.status !== "locked");
+              })()}
+              className={cn(
+                "flex h-6 w-6 items-center justify-center rounded-full text-[0.55rem] transition-all",
+                "text-amber-200/70 hover:text-amber-100 hover:bg-amber-900/20",
+                "disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent",
+              )}
+            >
+              ◀
+            </button>
+            <span className="font-mono text-[0.5rem] font-bold uppercase tracking-wider text-amber-200/80 min-w-[80px] text-center select-none">
+              {activeCase.title}
+            </span>
+            <button
+              type="button"
+              aria-label="Hồ sơ sau"
+              onClick={(e) => {
+                e.stopPropagation();
+                const currentIdx = CASES_LIST.findIndex((c) => c.id === currentCaseId);
+                // Find next non-locked case
+                for (let i = currentIdx + 1; i < CASES_LIST.length; i++) {
+                  if (CASES_LIST[i].status !== "locked") {
+                    setCurrentCaseId(CASES_LIST[i].id);
+                    updateUserPins([]);
+                    updateUserConnections([]);
+                    updateConnectionStartId(null);
+                    hoveredPinRef.current = null;
+                    setTooltip(null);
+                    resetZoom();
+                    break;
+                  }
+                }
+              }}
+              disabled={(() => {
+                const idx = CASES_LIST.findIndex((c) => c.id === currentCaseId);
+                return !CASES_LIST.slice(idx + 1).some((c) => c.status !== "locked");
+              })()}
+              className={cn(
+                "flex h-6 w-6 items-center justify-center rounded-full text-[0.55rem] transition-all",
+                "text-amber-200/70 hover:text-amber-100 hover:bg-amber-900/20",
+                "disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent",
+              )}
+            >
+              ▶
+            </button>
+            </div>
+        </div>
+        )}
         {tooltip && tooltipStyle && (
           <div style={tooltipStyle} className="z-20 animate-fade-slide-up">
             <div

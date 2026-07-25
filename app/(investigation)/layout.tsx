@@ -3,6 +3,7 @@ import { SystemHeader } from '@/components/investigation/system-header'
 import { ResponsiveLayout } from '@/components/investigation/responsive-layout'
 import { getActiveCase, getDevices, getEvidence, getTraceCards } from '@/lib/mock-data'
 import { SettingsProvider } from '@/components/investigation/settings-context'
+import { CheckpointsProvider } from '@/components/investigation/checkpoints-context'
 
 /**
  * The investigation OS shell. Adapts between:
@@ -22,14 +23,16 @@ export default async function InvestigationLayout({
 
   return (
     <SettingsProvider>
-      <ResponsiveLayout
-        activeCase={activeCase}
-        devices={devices}
-        evidence={evidence}
-        traceCards={traceCards}
-      >
-        {children}
-      </ResponsiveLayout>
+      <CheckpointsProvider>
+        <ResponsiveLayout
+          activeCase={activeCase}
+          devices={devices}
+          evidence={evidence}
+          traceCards={traceCards}
+        >
+          {children}
+        </ResponsiveLayout>
+      </CheckpointsProvider>
     </SettingsProvider>
   )
 }

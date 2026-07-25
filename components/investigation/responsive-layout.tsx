@@ -9,6 +9,7 @@ import type { Case, EvidenceDevice, Evidence, TraceCard } from '@/lib/types'
 import { BottomNav } from '@/components/investigation/bottom-nav'
 import { PageTransition } from '@/components/investigation/page-transition'
 import { SystemHeader } from '@/components/investigation/system-header'
+import { LeftActivityBar } from './left-activity-bar'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/components/investigation/settings-context'
 
@@ -53,19 +54,19 @@ export function ResponsiveLayout({
   return (
     <div className="flex min-h-dvh w-full justify-center">
       
-      {/* MOBILE LAYOUT VIEWPORT CONTAINER (max-w-[30rem] on mobile, expand to screen width on desktop) */}
+      {/* MOBILE LAYOUT VIEWPORT CONTAINER (max-w-[30rem] on mobile, edge-to-edge on desktop) */}
       <div className={cn(
-        "relative flex min-h-dvh w-full flex-col border-x border-border bg-background transition-all duration-300",
-        "max-w-[30rem] lg:max-w-[86rem] lg:w-full lg:px-6 lg:py-4 lg:h-dvh lg:overflow-hidden"
+        "relative flex min-h-dvh w-full bg-background transition-all duration-300",
+        "max-w-[30rem] border-x border-border lg:border-none lg:max-w-none lg:w-screen lg:h-dvh lg:overflow-hidden flex-col lg:flex-row"
       )}>
         
-        {/* CRT Scanline Overlay */}
-        <div
-          aria-hidden="true"
-          className="noir-scanlines pointer-events-none absolute inset-0 z-0 opacity-40"
-        />
+        {/* COLUMN 0: Left Navigation Sidebar (Desktop only) - Stretches from top to bottom */}
+        <LeftActivityBar />
 
-        <SystemHeader />
+        {/* Right side content pane wrapping header, toolbar and grid workspace */}
+        <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+
+          <SystemHeader />
 
         {/* WORKSPACE TOOLBAR & PROGRESS FLOW (Only shown on Desktop) */}
         <div className="hidden lg:flex items-center justify-between border-b border-border/40 py-2.5 px-4 bg-card/10 text-[0.65rem] font-mono select-none z-20">
@@ -77,28 +78,13 @@ export function ResponsiveLayout({
             {leftSidebarOpen ? '◀ Ẩn Tang Vật' : '▶ Hiện Tang Vật'}
           </button>
 
-          {/* Center: Dynamic Step Flow Helper */}
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <span className={cn(
-              "px-2 py-0.5 rounded border transition-colors",
-              pathname === '/evidence' || pathname === '/dashboard' ? "text-primary border-primary/30 bg-primary/5 font-bold" : "border-transparent"
-            )}>
-              01 // CHỌN TANG VẬT
+          {/* Center: System Status Indicator */}
+          <div className="flex items-center gap-2 text-primary/80 font-mono text-[0.6rem] tracking-wider">
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500"></span>
             </span>
-            <span className="text-muted-foreground/30">➔</span>
-            <span className={cn(
-              "px-2 py-0.5 rounded border transition-colors",
-              pathname.startsWith('/evidence/') ? "text-primary border-primary/30 bg-primary/5 font-bold" : "border-transparent"
-            )}>
-              02 // PHÂN TÍCH BẰNG CHỨNG
-            </span>
-            <span className="text-muted-foreground/30">➔</span>
-            <span className={cn(
-              "px-2 py-0.5 rounded border transition-colors",
-              pathname.includes('/assistant') || pathname.includes('/trace') ? "text-primary border-primary/30 bg-primary/5 font-bold" : "border-transparent"
-            )}>
-              03 // ĐÚC KẾT & PHÁ ÁN
-            </span>
+            <span>SECURE WORKSPACE // CONSOLE ACTIVE</span>
           </div>
 
           {/* Right Side: Tech Details Toggle & Right Sidebar Toggle */}
@@ -126,7 +112,6 @@ export function ResponsiveLayout({
 
         {/* RESPONSIVE GRID LAYOUT WRAPPER */}
         <div className={gridColumnsClass}>
-          
           {/* COLUMN 1: Evidence List Panel (Hidden on Mobile Page routes, always shown on Desktop) */}
           {leftSidebarOpen && (
             <aside className="hidden lg:flex lg:flex-col border-r border-border/60 pr-6 overflow-y-auto h-full pb-6">
@@ -165,9 +150,11 @@ export function ResponsiveLayout({
 
         </div>
 
-        {/* MOBILE BOTTOM NAVIGATION BAR (Hidden on Desktop) */}
-        <div className="lg:hidden">
+        {/* BOTTOM NAVIGATION BAR (Hidden on Desktop) */}
+        <div className="mt-auto lg:hidden">
           <BottomNav />
+        </div>
+
         </div>
 
       </div>

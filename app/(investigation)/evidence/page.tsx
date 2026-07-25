@@ -1,15 +1,36 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { getActiveCase, getDevices, getEvidence } from '@/lib/mock-data'
 import { ScreenHeader } from '@/components/investigation/screen-header'
 import { EvidenceDeviceCard } from '@/components/investigation/evidence-device-card'
 import { EvidenceItemCard } from '@/components/investigation/evidence-item-card'
 import { EmptyState } from '@/components/investigation/empty-state'
-import { ShieldAlert, Cpu, FileText, Mic, MapPin } from 'lucide-react'
+import { useCheckpoints } from '@/components/investigation/checkpoints-context'
+import type { Case, Device, Evidence } from '@/lib/types'
+import { ShieldAlert, Cpu, FileText, Mic, MapPin, Lock } from 'lucide-react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
-export default async function EvidencePage() {
-  const activeCase = await getActiveCase()
-  const devices = activeCase ? await getDevices(activeCase.id) : []
-  const evidence = activeCase ? await getEvidence(activeCase.id) : []
+export default function EvidencePage() {
+  const [activeCase, setActiveCase] = useState<Case | null>(null)
+  const [devices, setDevices] = useState<Device[]>([])
+  const [evidence, setEvidence] = useState<Evidence[]>([])
+  const { isDeviceLockedByCheckpoint } = useCheckpoints()
+
+  useEffect(() => {
+    async function loadData() {
+      const currentCase = await getActiveCase()
+      if (currentCase) {
+        setActiveCase(currentCase)
+        const devs = await getDevices(currentCase.id)
+        const evids = await getEvidence(currentCase.id)
+        setDevices(devs)
+        setEvidence(evids)
+      }
+    }
+    loadData()
+  }, [])
 
   // Group evidence into categories
   const documents = evidence.filter(
@@ -61,11 +82,35 @@ export default async function EvidencePage() {
               </h3>
             </div>
             <div className="grid grid-cols-1 gap-3">
-              {devices.map((device) => (
-                <Link key={device.id} href={`/evidence/${device.id}`}>
-                  <EvidenceDeviceCard device={device} />
-                </Link>
-              ))}
+              {devices.map((device) => {
+                const isLocked = isDeviceLockedByCheckpoint(activeCase.id, device.id)
+                const displayDevice = isLocked
+                  ? {
+                      ...device,
+                      status: 'locked' as const,
+                      locked: true,
+                      previewStats: 'YÊU CẦU GIẢI QUYẾT CHECKPOINT'
+                    }
+                  : device
+
+                if (isLocked) {
+                  return (
+                    <div key={device.id} className="relative select-none cursor-not-allowed">
+                      <EvidenceDeviceCard device={displayDevice} />
+                      <div className="absolute top-2 right-2 bg-destructive/10 border border-destructive/20 text-destructive text-[0.55rem] font-mono font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                        <Lock className="size-3" />
+                        CHECKPOINT LOCKED
+                      </div>
+                    </div>
+                  )
+                }
+
+                return (
+                  <Link key={device.id} href={`/evidence/${device.id}`}>
+                    <EvidenceDeviceCard device={displayDevice} />
+                  </Link>
+                )
+              })}
             </div>
           </section>
         )}

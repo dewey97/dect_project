@@ -274,3 +274,16 @@ export interface DetectiveProfile {
   totalCases: number
   averageRating: DifficultyRating
 }
+
+export interface Checkpoint {
+  id: string
+  caseId: string
+  title: string
+  question: string
+  hint: string
+  options: string[]
+  correctAnswer: string
+  unlockedEvidenceId?: string // e.g. 'dev-02'
+  status: 'locked' | 'active' | 'completed'
+}
+

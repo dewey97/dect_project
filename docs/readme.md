@@ -16,6 +16,6 @@ Hệ thống tài liệu dự án **VERITAS — Evidence-Driven Investigation Pl
 | 📄 [06_ux_ui_design_system.md](./06_ux_ui_design_system.md) | `06_ux_ui_design_system.md` | Thư viện component, token thiết kế, typography, quy tắc styling và hướng dẫn tương thích thiết bị (responsive). |
 | 📄 [07_technical_guide.md](./07_technical_guide.md) | `07_technical_guide.md` | Cấu trúc dự án Next.js, tech stack, database schema, hướng dẫn phát triển và kiến trúc các công cụ xử lý (engines). |
 | 📄 [08_playtest_and_business.md](./08_playtest_and_business.md) | `08_playtest_and_business.md` | Hướng dẫn playtest, định dạng báo cáo lỗi, mô hình kinh doanh và chiến lược tiếp thị. |
-| 📁 [08_cases/](./08_cases/) | `case_001/`, `case_002/` | Thư mục chứa kịch bản và thiết kế của từng vụ án (`case_001`, `case_002`...). |
+| 📁 [08_cases/](./08_cases/) | `case_000/`, `case_001/`, `case_002/` | Thư mục chứa kịch bản và thiết kế của từng vụ án (`case_000`, `case_001`, `case_002`...). |
 | 📁 [11_investigation_design/](./11_investigation_design/) | 12 tài liệu thiết kế | **Kinh Thánh Thiết Kế Cuộc Điều Tra:** Hệ thống thuật ngữ (Ontology), Logic Engine, AI Authoring, Pitfalls, Pattern Library... |
 | 📄 [99_reference.md](./99_reference.md) | `99_reference.md` | Ý tưởng nghiên cứu và phân tích đối thủ truyền cảm hứng. |

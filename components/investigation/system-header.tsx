@@ -13,30 +13,14 @@ export function SystemHeader() {
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-md">
       {/* Brand & Case Overview Row */}
       <div className="flex flex-col gap-2.5 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
-            <BrandMark />
-          </Link>
-          {activeCase && (
-            <div className="flex items-center gap-1.5 rounded bg-primary/10 border border-primary/20 px-2 py-0.5 text-primary animate-pulse-slow">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full size-1.5 bg-primary"></span>
-              </span>
-              <span className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.15em]">
-                {activeCase.status === 'active' ? 'Đang điều tra' : 'Hồ sơ đã đóng'}
-              </span>
-            </div>
-          )}
-        </div>
 
         {/* Case Info Dashboard Panel */}
         {activeCase ? (
           <div className="rounded-lg border border-border/50 bg-card/40 p-3">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <span className="font-mono text-[0.6rem] text-primary uppercase tracking-widest">
-                  HỒ SƠ VỤ ÁN // {activeCase.code}
+                <span className="font-mono text-[0.65rem] text-primary font-bold uppercase tracking-wider">
+                  Mã hồ sơ: {activeCase.code}
                 </span>
                 <h2 className="mt-0.5 font-sans text-base font-bold tracking-tight text-foreground truncate">
                   {activeCase.title}
@@ -46,8 +30,8 @@ export function SystemHeader() {
                 <span className="font-mono text-xs font-semibold text-primary">
                   {activeCase.progress}%
                 </span>
-                <span className="font-mono text-[0.55rem] text-muted-foreground uppercase tracking-wider">
-                  TIẾN ĐỘ
+                <span className="font-sans text-[0.55rem] text-muted-foreground font-semibold uppercase tracking-wider">
+                  Tiến độ
                 </span>
               </div>
             </div>

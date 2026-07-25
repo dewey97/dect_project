@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { ScreenHeader } from '@/components/investigation/screen-header'
 import { Button } from '@/components/ui/button'
 import { getConclusionOptions, getTimelineEvents } from '@/lib/content-service'
+import { getActiveCase } from '@/lib/mock-data'
+import { useCheckpoints } from '@/components/investigation/checkpoints-context'
+import { Lock } from 'lucide-react'
 import {
   ArrowLeft,
   ArrowUp,
@@ -22,6 +25,8 @@ import { cn } from '@/lib/utils'
 
 export default function ConclusionPage() {
   const router = useRouter()
+  const { isConclusionUnlocked } = useCheckpoints()
+  const [activeCase, setActiveCase] = useState<any>(null)
 
   // Options states loaded dynamically from Content Engine
   const [suspects, setSuspects] = useState<any[]>([])
@@ -45,16 +50,21 @@ export default function ConclusionPage() {
   // Load Content Engine Data
   useEffect(() => {
     async function loadOptions() {
-      const options = await getConclusionOptions('case-001')
-      const initialTimeline = await getTimelineEvents('case-001')
-      if (options) {
-        setSuspects(options.suspects)
-        setMotives(options.motives)
-        setMethods(options.methods)
-        setEvidenceList(options.evidenceList)
-      }
-      if (initialTimeline) {
-        setTimeline(initialTimeline)
+      const currentCase = await getActiveCase()
+      if (currentCase) {
+        setActiveCase(currentCase)
+        const queryId = currentCase.id === 'case-01' ? 'case-001' : currentCase.id
+        const options = await getConclusionOptions(queryId)
+        const initialTimeline = await getTimelineEvents(queryId)
+        if (options) {
+          setSuspects(options.suspects)
+          setMotives(options.motives)
+          setMethods(options.methods)
+          setEvidenceList(options.evidenceList)
+        }
+        if (initialTimeline) {
+          setTimeline(initialTimeline)
+        }
       }
     }
     loadOptions()
@@ -110,6 +120,47 @@ export default function ConclusionPage() {
         return prev + 5
       })
     }, 100)
+  }
+
+  const isConclusionLocked = activeCase ? !isConclusionUnlocked(activeCase.id) : false
+
+  if (isConclusionLocked) {
+    return (
+      <div className="pb-10 px-4 flex flex-col gap-6">
+        <div className="pt-2">
+          <button
+            onClick={() => router.push('/assistant')}
+            className="flex items-center gap-1.5 font-mono text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit animate-fade-in"
+          >
+            <ArrowLeft className="size-3.5" />
+            Back to Assistant
+          </button>
+        </div>
+
+        <div className="rounded-xl border border-destructive/30 bg-destructive/5 flex flex-col items-center justify-center text-center p-12 relative overflow-hidden min-h-[350px]">
+          <div aria-hidden="true" className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-0" />
+          
+          <div className="flex size-14 items-center justify-center rounded-lg bg-destructive/10 text-destructive border border-destructive/20 mb-5 z-10 animate-pulse">
+            <Lock className="size-7" />
+          </div>
+          
+          <h3 className="font-mono text-sm font-bold text-destructive uppercase tracking-widest z-10 flex items-center gap-1.5">
+            KẾT ÁN BỊ KHÓA
+          </h3>
+          
+          <p className="mt-3 text-pretty text-xs text-muted-foreground max-w-[320px] leading-relaxed z-10 font-sans">
+            Bạn cần phải hoàn thành tất cả các mục tiêu chặng trong phần <strong>Mục tiêu (Checkpoints)</strong> để có thể tiến hành kết án và nộp báo cáo chính thức.
+          </p>
+
+          <button
+            onClick={() => router.push('/checkpoints')}
+            className="mt-6 font-mono text-xs uppercase tracking-wider border border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10 px-5 py-2.5 rounded font-bold transition-all z-10 active:scale-95"
+          >
+            Đi đến Checkpoints
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

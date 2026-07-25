@@ -100,7 +100,8 @@ export default function MarketingLandingPage() {
         price: '890.000đ',
         originalPrice: '1.100.000đ',
         badge: 'Được chơi nhiều nhất',
-        desc: 'Vụ mất tích đầy bí ẩn của quản đốc Thomas Vance tại cảng biển hoang vắng.'
+        desc: 'Vụ mất tích đầy bí ẩn của quản đốc Thomas Vance tại cảng biển hoang vắng.',
+        image: '/nocturne_case_9.png'
       },
       {
         id: 'case-north',
@@ -111,7 +112,8 @@ export default function MarketingLandingPage() {
         price: '950.000đ',
         originalPrice: '1.200.000đ',
         badge: 'Độ khó cao',
-        desc: 'Giải mã mạng lưới buôn lậu và các vụ ám hại có tổ chức sâu bên dưới Cảng Bắc.'
+        desc: 'Giải mã mạng lưới buôn lậu và các vụ ám hại có tổ chức sâu bên dưới Cảng Bắc.',
+        image: '/nocturne_case_north.png'
       }
     ],
     combo: [
@@ -124,7 +126,8 @@ export default function MarketingLandingPage() {
         price: '1.650.000đ',
         originalPrice: '2.050.000đ',
         badge: 'Tiết kiệm 15%',
-        desc: 'Trọn bộ 2 vụ án Cầu Cảng Số 9 & Mật Mã Cảng Bắc. Trải nghiệm điều tra xuyên suốt từ sơ cấp đến cao cấp.'
+        desc: 'Trọn bộ 2 vụ án Cầu Cảng Số 9 & Mật Mã Cảng Bắc. Trải nghiệm điều tra xuyên suốt từ sơ cấp đến cao cấp.',
+        image: '/nocturne_combo_dual.png'
       }
     ],
     accessories: [
@@ -137,7 +140,8 @@ export default function MarketingLandingPage() {
         price: '120.000đ',
         originalPrice: '150.000đ',
         badge: 'Phụ kiện',
-        desc: 'Kính lúp phóng đại quang học chuyên dụng giúp đọc các mã số cực nhỏ khắc trên chìa khóa vật lý.'
+        desc: 'Kính lúp phóng đại quang học chuyên dụng giúp đọc các mã số cực nhỏ khắc trên chìa khóa vật lý.',
+        image: '/nocturne_acc_magnifier.png'
       }
     ]
   }
@@ -244,10 +248,11 @@ export default function MarketingLandingPage() {
         <div className="relative z-10 w-full max-w-6xl mx-auto px-6 flex justify-start lg:pl-0 pointer-events-none">
           <div className="w-full max-w-md flex flex-col items-start gap-5 pointer-events-auto lg:translate-x-[-1.5rem]">
             <h1 className="text-balance text-3xl lg:text-4xl font-black leading-tight tracking-tight uppercase">
-              Sẵn sàng trở thành thám tử phá án ngay tại nhà?
+              Những vụ án chưa có lời giải...
             </h1>
-            <p className="text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground font-mono">
-              Giải mã hồ sơ hiện vật thực tế kết hợp hệ thống pháp y kỹ thuật số trực tuyến để tìm kiếm sự thật đằng sau những vụ án mạng bí ẩn.
+            <p className="text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground font-mono italic">
+              "Khi bạn đã loại bỏ tất cả những điều không thể, thì điều còn lại, dù vô lý đến đâu, cũng chính là sự thật."
+              <span className="block mt-1 not-italic text-primary/60">— Sherlock Holmes</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-2">
               <Button
@@ -487,8 +492,12 @@ export default function MarketingLandingPage() {
                 {SHOWCASE_ITEMS[activeShowcase].desc}
               </p>
             </div>
-            <div className="mt-8 h-32 bg-accent/25 border border-dashed border-border/60 rounded flex items-center justify-center text-muted-foreground text-[0.6rem] font-mono uppercase">
-              [ Ảnh minh họa hiện vật hộp game ]
+            <div className="mt-8 relative h-48 overflow-hidden rounded border border-border/40 bg-accent/10">
+              <img
+                src="/nocturne_game_box.png"
+                alt="Nocturne Detective Game Box"
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              />
             </div>
           </div>
 
@@ -636,8 +645,19 @@ export default function MarketingLandingPage() {
                   )}
                 </div>
 
+                {/* Product Image */}
+                {product.image && (
+                  <div className="mt-3.5 relative h-40 w-full overflow-hidden rounded border border-border/20 bg-accent/5">
+                    <img 
+                      src={product.image} 
+                      alt={product.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                    />
+                  </div>
+                )}
+
                 <h3 className={cn(
-                  "text-base font-black mt-3 uppercase tracking-tight",
+                  "text-base font-black mt-3.5 uppercase tracking-tight",
                   product.difficulty >= 4 ? "text-destructive" : "text-foreground"
                 )}>
                   {product.title}

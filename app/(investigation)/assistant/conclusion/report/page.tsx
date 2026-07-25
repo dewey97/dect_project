@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ScreenHeader } from '@/components/investigation/screen-header'
 import { Button } from '@/components/ui/button'
 import { getEvaluation, getRewards } from '@/lib/content-service'
+import { getActiveCase } from '@/lib/mock-data'
 import type { Evaluation, Reward } from '@/lib/types'
 import {
   Award,
@@ -26,8 +27,10 @@ export default function VictoryReportPage() {
   // Load Content Engine Evaluation Data
   useEffect(() => {
     async function loadReport() {
-      const evalData = await getEvaluation('case-001')
-      const rewardsData = await getRewards('case-001')
+      const activeCase = await getActiveCase()
+      const queryId = activeCase?.id === 'case-01' ? 'case-001' : (activeCase?.id || 'case-001')
+      const evalData = await getEvaluation(queryId)
+      const rewardsData = await getRewards(queryId)
       if (evalData) setEvaluation(evalData)
       if (rewardsData) setRewards(rewardsData)
     }

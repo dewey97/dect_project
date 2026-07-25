@@ -36,23 +36,12 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
       {/* Case ID / Barcode Tape Header */}
       <div className="flex items-start justify-between gap-3 border-b border-border/40 pb-2.5 z-10">
         <div className="flex flex-col">
-          <span className="font-mono text-[0.6rem] text-primary tracking-widest uppercase">
-            EVID_ID // {device.evidenceId}
+          <span className="font-sans text-[0.65rem] font-bold text-primary tracking-wide uppercase">
+            Mã bằng chứng: {device.evidenceId}
           </span>
-          <span className="font-mono text-[0.55rem] text-muted-foreground mt-0.5">
-            CUSTODY LOGGED: {device.lastUpdated}
+          <span className="font-sans text-[0.55rem] text-muted-foreground mt-0.5">
+            Thời gian ghi nhận: {device.lastUpdated}
           </span>
-        </div>
-
-        {/* Barcode Mockup */}
-        <div className="flex items-center gap-0.5 h-6 opacity-45 group-hover:opacity-75 transition-opacity" aria-hidden="true">
-          <div className="w-[2px] h-full bg-foreground" />
-          <div className="w-[1px] h-full bg-foreground" />
-          <div className="w-[4px] h-full bg-foreground" />
-          <div className="w-[2px] h-full bg-foreground" />
-          <div className="w-[1px] h-full bg-foreground" />
-          <div className="w-[3px] h-full bg-foreground" />
-          <div className="w-[1px] h-full bg-foreground" />
         </div>
       </div>
 
@@ -61,8 +50,8 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
         <h4 className="font-sans text-sm font-bold text-foreground group-hover:text-primary transition-colors">
           {device.label}
         </h4>
-        <span className="font-mono text-[0.6rem] text-muted-foreground uppercase">
-          OWNER: {device.owner}
+        <span className="font-sans text-[0.6rem] text-muted-foreground uppercase">
+          Sở hữu: {device.owner}
         </span>
       </div>
 
@@ -70,13 +59,13 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
       <div className="mt-4 p-2.5 rounded bg-muted/40 border border-border/50 z-10 flex flex-col gap-1.5 min-h-[60px] justify-center">
         {isLocked && (
           <div className="flex items-center gap-2">
-            <Lock className="size-4 text-destructive/80 animate-pulse shrink-0" />
+            <Lock className="size-4 text-destructive/85 shrink-0" />
             <div className="min-w-0">
-              <p className="font-mono text-[0.625rem] font-bold text-destructive uppercase tracking-wider">
-                ENCRYPTED
+              <p className="font-sans text-[0.65rem] font-bold text-destructive uppercase tracking-wider">
+                ĐÃ KHÓA MẬT MÃ
               </p>
               <p className="font-sans text-[0.65rem] text-muted-foreground leading-none">
-                Authentication Required
+                Yêu cầu giải quyết mục tiêu để mở
               </p>
             </div>
           </div>
