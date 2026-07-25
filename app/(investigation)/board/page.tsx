@@ -479,7 +479,6 @@ export default function EvidenceBoardPage() {
     <div className="pb-10 min-h-dvh flex flex-col">
       <div className="px-4">
         <ScreenHeader
-          eyebrow=""
           title="BẢNG ĐIỀU TRA"
           description="Kéo thả sắp xếp tài liệu, xâu chuỗi thông tin vụ án bằng dây chỉ đỏ. Click để xem chi tiết."
         />
@@ -491,7 +490,7 @@ export default function EvidenceBoardPage() {
       <div className="flex-1 px-4 relative">
         <div
           ref={boardRef}
-          className="relative w-full h-[720px] rounded-xl border border-border/80 overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] select-none"
+          className="relative w-full h-[900px] rounded-xl border border-border/80 overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] select-none"
           style={{
             backgroundImage: "url('/evidence_board_cork.png')",
             backgroundSize: 'cover',

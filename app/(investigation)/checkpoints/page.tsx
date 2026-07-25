@@ -17,6 +17,7 @@ export default function CheckpointsPage() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, boolean>>({})
   const [successes, setSuccesses] = useState<Record<string, boolean>>({})
+  const [expandedHints, setExpandedHints] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     async function loadData() {
@@ -106,23 +107,7 @@ export default function CheckpointsPage() {
                   isLocked && 'border-border/40 opacity-40 select-none pointer-events-none'
                 )}
               >
-                {/* Header info */}
-                <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                  <span className="font-mono text-[0.65rem] text-primary font-bold uppercase tracking-widest">
-                    Mục tiêu {idx + 1} // {cp.title}
-                  </span>
-                  
-                  <span
-                    className={cn(
-                      'label-tag px-2 py-0.5 rounded border text-[0.55rem] font-bold font-mono',
-                      isActive && 'text-primary border-primary/30 bg-primary/5',
-                      isCompleted && 'text-emerald-500 border-emerald-500/30 bg-emerald-500/5',
-                      isLocked && 'text-muted-foreground border-border bg-muted/10'
-                    )}
-                  >
-                    {isCompleted ? 'ĐÃ HOÀN THÀNH' : isActive ? 'ĐANG HOẠT ĐỘNG' : 'ĐÃ KHÓA'}
-                  </span>
-                </div>
+
 
                 {/* Content */}
                 {isLocked ? (
@@ -137,13 +122,24 @@ export default function CheckpointsPage() {
                     </p>
 
                     {/* Hint section */}
-                    {isActive && (
-                      <div className="flex gap-2 items-start bg-primary/5 border border-primary/10 rounded-md p-3 text-[0.7rem] text-muted-foreground">
-                        <Lightbulb className="size-4 text-primary shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-mono font-bold text-primary mr-1">GỢI Ý:</span>
-                          {cp.hint}
-                        </div>
+                    {isActive && cp.hint && (
+                      <div className="flex flex-col gap-2 mt-1">
+                        {!expandedHints[cp.id] ? (
+                          <button
+                            onClick={() => setExpandedHints(prev => ({ ...prev, [cp.id]: true }))}
+                            className="flex items-center gap-1.5 text-[0.65rem] font-mono font-bold text-primary/70 hover:text-primary transition-colors cursor-pointer w-fit"
+                          >
+                            <Lightbulb className="size-3.5" /> Xem gợi ý
+                          </button>
+                        ) : (
+                          <div className="flex gap-2 items-start bg-primary/5 border border-primary/10 rounded-md p-3 text-[0.7rem] text-muted-foreground animate-fade-in">
+                            <Lightbulb className="size-4 text-primary shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-mono font-bold text-primary mr-1">GỢI Ý:</span>
+                              {cp.hint}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
