@@ -22,7 +22,7 @@ export const CASES: Case[] = [
     status: 'active',
     difficulty: 2,
     progress: 0,
-    location: 'Khu giải tỏa Cảng phía Bắc'
+    location: 'Khu giải tỏa Bờ Sông'
   },
   {
     id: 'case-01',
