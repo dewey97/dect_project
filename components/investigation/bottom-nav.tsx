@@ -11,7 +11,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Investigation navigation"
-      className="pb-safe sticky bottom-0 z-30 rounded-t-2xl border-t border-border/80 bg-card/85 backdrop-blur-md shadow-[0_-8px_30px_rgb(0,0,0,0.5)]"
+      className="pb-safe fixed bottom-0 left-0 right-0 w-full z-30 rounded-t-2xl border-t border-border/80 bg-card/85 backdrop-blur-md shadow-[0_-8px_30px_rgb(0,0,0,0.5)]"
     >
       <ul className="flex items-stretch justify-around px-2 pt-1.5">
         {NAV_ITEMS.map((item) => {

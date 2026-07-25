@@ -56,7 +56,7 @@ export function ResponsiveLayout({
 
           {/* MAIN DYNAMIC PAGE WORKSPACE */}
           <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
-            <main className="flex-1 flex flex-col overflow-y-auto h-full px-4 pb-6 pt-4">
+            <main className="flex-1 flex flex-col overflow-y-auto h-full px-4 pb-24 lg:pb-6 pt-4">
               <PageTransition>{children}</PageTransition>
             </main>
           </div>
