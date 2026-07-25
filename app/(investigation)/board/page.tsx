@@ -187,6 +187,9 @@ export default function EvidenceBoardPage() {
     sy: number;
   } | null>(null)
 
+  const dragFrameRef = useRef<number | null>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const triggerZoom = (item: BoardItem, element: HTMLElement) => {
     const rect = element.getBoundingClientRect()
     
@@ -221,6 +224,26 @@ export default function EvidenceBoardPage() {
     setZoomedItem(item)
   }
 
+  const openZoom = (item: BoardItem, element: HTMLElement) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+    triggerZoom(item, element)
+  }
+
+  const closeZoom = () => {
+    setZoomedActive(false)
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+    }
+    closeTimerRef.current = setTimeout(() => {
+      setZoomedItem(null)
+      setMorphOrigin(null)
+      closeTimerRef.current = null
+    }, 250)
+  }
+
   // Trigger zoom opening transition
   useEffect(() => {
     if (zoomedItem) {
@@ -230,6 +253,14 @@ export default function EvidenceBoardPage() {
       setZoomedActive(false)
     }
   }, [zoomedItem])
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+      if (dragFrameRef.current !== null) cancelAnimationFrame(dragFrameRef.current)
+    }
+  }, [])
 
   // Load active case and saved layout from localStorage
   useEffect(() => {
@@ -333,24 +364,33 @@ export default function EvidenceBoardPage() {
     if (!dragInfo.current) return
     const { itemId, startX, startY } = dragInfo.current
 
-    let newX = e.clientX - startX
-    let newY = e.clientY - startY
+    const clientX = e.clientX
+    const clientY = e.clientY
 
-    if (newX < 10) newX = 10
-    if (newY < 10) newY = 10
-
-    const item = items.find((it) => it.id === itemId)
-    if (item && (Math.abs(newX - item.x) > 4 || Math.abs(newY - item.y) > 4)) {
-      hasDragged.current = true
+    if (dragFrameRef.current !== null) {
+      cancelAnimationFrame(dragFrameRef.current)
     }
 
-    const updated = items.map((item) => {
-      if (item.id === itemId) {
-        return { ...item, x: newX, y: newY }
+    dragFrameRef.current = requestAnimationFrame(() => {
+      let newX = clientX - startX
+      let newY = clientY - startY
+
+      if (newX < 10) newX = 10
+      if (newY < 10) newY = 10
+
+      const item = items.find((it) => it.id === itemId)
+      if (item && (Math.abs(newX - item.x) > 4 || Math.abs(newY - item.y) > 4)) {
+        hasDragged.current = true
       }
-      return item
+
+      const updated = items.map((item) => {
+        if (item.id === itemId) {
+          return { ...item, x: newX, y: newY }
+        }
+        return item
+      })
+      setItems(updated)
     })
-    setItems(updated)
   }
 
   const handlePointerUp = (e: React.PointerEvent) => {
@@ -363,7 +403,7 @@ export default function EvidenceBoardPage() {
     if (!hasDragged.current) {
       const item = items.find((it) => it.id === itemId)
       if (item) {
-        triggerZoom(item, e.currentTarget as HTMLElement)
+        openZoom(item, e.currentTarget as HTMLElement)
       }
     }
   }
@@ -594,10 +634,7 @@ export default function EvidenceBoardPage() {
       {/* Lightbox / Zoom Overlay Modal */}
       {zoomedItem && (
         <div 
-          onClick={() => {
-            setZoomedActive(false)
-            setTimeout(() => setZoomedItem(null), 250)
-          }}
+          onClick={closeZoom}
           className={cn(
             "fixed inset-0 bg-transparent z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-300 ease-out cursor-zoom-out",
             zoomedActive ? "opacity-100" : "opacity-0 pointer-events-none"
