@@ -10,34 +10,25 @@ interface ComponentProps {
   className?: string
 }
 
-// 1. AssistantMessage
+// 1. AssistantMessage (Messenger Received Bubble style)
 export function AssistantMessage({ children, className }: ComponentProps) {
   return (
-    <div className={cn('flex flex-col gap-1 max-w-[85%] self-start bg-card/65 border border-border/80 p-3.5 rounded-r-lg rounded-bl-lg shadow-sm font-sans', className)}>
-      <span className="font-mono text-[0.55rem] text-primary uppercase tracking-widest font-bold">
-        OPERATOR // MINH
-      </span>
-      <p className="text-xs leading-relaxed text-foreground">{children}</p>
+    <div className={cn('flex flex-col gap-1 max-w-[85%] self-start bg-muted/90 text-foreground p-3 rounded-2xl rounded-tl-sm shadow-sm font-sans text-xs leading-relaxed', className)}>
+      <p>{children}</p>
     </div>
   )
 }
 
-// 2. DetectiveAction
+// 2. DetectiveAction (Messenger Sent Bubble style)
 export function DetectiveAction({ children, className }: ComponentProps) {
   return (
-    <div className={cn('flex flex-col gap-1 max-w-[80%] self-end bg-primary/5 border border-primary/20 p-3 rounded-l-lg rounded-br-lg shadow-sm font-mono text-right', className)}>
-      <span className="font-mono text-[0.55rem] text-primary/70 uppercase tracking-widest">
-        DETECTIVE // INPUT
-      </span>
-      <div className="flex items-center justify-end gap-1.5 text-xs text-foreground font-semibold">
-        <Terminal className="size-3 text-primary shrink-0" />
-        <span>{children}</span>
-      </div>
+    <div className={cn('flex flex-col gap-1 max-w-[80%] self-end bg-primary text-background p-3 rounded-2xl rounded-tr-sm shadow-sm font-sans text-xs leading-relaxed text-left', className)}>
+      <span>{children}</span>
     </div>
   )
 }
 
-// 3. SuggestionChip
+// 3. SuggestionChip (Messenger Pill Button style)
 interface SuggestionChipProps {
   label: string
   onClick: () => void
@@ -51,19 +42,18 @@ export function SuggestionChip({ label, onClick, disabled, className }: Suggesti
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'flex items-center gap-2 rounded-lg border border-border bg-card p-3.5 text-left text-xs font-bold text-foreground transition-all duration-150',
-        'hover:-translate-y-0.5 hover:border-primary/45 hover:text-primary active:translate-y-0',
-        'disabled:opacity-40 disabled:hover:translate-y-0 disabled:border-border disabled:text-muted-foreground w-full font-mono uppercase tracking-wider',
+        'flex items-center justify-center text-center rounded-full border border-primary/20 bg-primary/5 p-3 text-xs font-semibold text-primary transition-all duration-150',
+        'hover:-translate-y-0.5 hover:bg-primary/10 active:translate-y-0',
+        'disabled:opacity-40 disabled:hover:translate-y-0 disabled:border-border disabled:text-muted-foreground w-full font-sans',
         className
       )}
     >
-      <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-      <span className="flex-1 truncate">{label}</span>
+      <span className="truncate">{label}</span>
     </button>
   )
 }
 
-// 4. HintCard
+// 4. HintCard (Soft Warning Bubble style)
 interface HintCardProps {
   level: 1 | 2 | 3
   hint: string
@@ -72,35 +62,35 @@ interface HintCardProps {
 
 export function HintCard({ level, hint, className }: HintCardProps) {
   const borderColors = {
-    1: 'border-amber-500/40 bg-amber-500/5',
-    2: 'border-orange-500/50 bg-orange-500/5 shadow-[0_0_12px_rgba(249,115,22,0.05)]',
-    3: 'border-destructive/50 bg-destructive/5 shadow-[0_0_15px_rgba(220,38,38,0.08)] animate-pulse-slow',
+    1: 'border-amber-200 bg-amber-50/90 text-amber-950 dark:bg-amber-950/20 dark:border-amber-900/50 dark:text-amber-200',
+    2: 'border-orange-200 bg-orange-50/90 text-orange-950 dark:bg-orange-950/20 dark:border-orange-900/50 dark:text-orange-200',
+    3: 'border-rose-200 bg-rose-50/90 text-rose-950 dark:bg-rose-950/20 dark:border-rose-900/50 dark:text-rose-200',
   }
 
   const levelLabels = {
-    1: 'LEVEL 1 // SUBTLE GUIDANCE',
-    2: 'LEVEL 2 // SPECIFIC EVIDENCE POINTER',
-    3: 'LEVEL 3 // DIRECT FIELD OPERATION',
+    1: 'Gợi ý cấp 1',
+    2: 'Gợi ý cấp 2',
+    3: 'Chỉ dẫn trực tiếp',
   }
 
   return (
     <div className={cn(
-      'flex flex-col gap-2 max-w-[85%] self-start rounded-r-lg rounded-bl-lg border p-4 shadow-sm font-sans',
+      'flex flex-col gap-1.5 max-w-[85%] self-start rounded-2xl rounded-tl-sm border p-3.5 shadow-sm font-sans',
       borderColors[level],
       className
     )}>
-      <div className="flex items-center gap-1.5 font-mono text-[0.55rem] font-bold text-primary tracking-widest uppercase">
-        <HelpCircle className="size-3.5 shrink-0 text-primary" />
+      <div className="flex items-center gap-1.5 text-[0.65rem] font-bold tracking-wide uppercase opacity-85">
+        <HelpCircle className="size-3.5 shrink-0" />
         <span>{levelLabels[level]}</span>
       </div>
-      <p className="text-xs leading-relaxed text-foreground italic">
+      <p className="text-xs leading-relaxed italic">
         "{hint}"
       </p>
     </div>
   )
 }
 
-// 5. EvidenceReference
+// 5. EvidenceReference (Messenger Link Share style)
 interface EvidenceReferenceProps {
   evidenceId: string
   title: string
@@ -110,13 +100,13 @@ interface EvidenceReferenceProps {
 
 export function EvidenceReference({ evidenceId, title, previewText, className }: EvidenceReferenceProps) {
   return (
-    <div className={cn('flex flex-col gap-2 max-w-[85%] self-start bg-card/65 border border-border p-3.5 rounded-r-lg rounded-bl-lg shadow-sm font-sans', className)}>
-      <span className="font-mono text-[0.55rem] text-primary uppercase tracking-widest font-bold">
-        OPERATOR // ATTACHED_LOG
+    <div className={cn('flex flex-col gap-2 max-w-[85%] self-start bg-muted/90 p-3 rounded-2xl rounded-tl-sm shadow-sm font-sans', className)}>
+      <span className="text-[0.6rem] text-muted-foreground font-bold tracking-wide uppercase">
+        Tài liệu đính kèm
       </span>
       <Link
         href="/evidence"
-        className="group flex items-center gap-2 rounded border border-border/80 bg-background/50 p-2.5 hover:border-primary/30 transition-colors"
+        className="group flex items-center gap-2.5 rounded-xl border border-border/80 bg-background/70 p-2.5 hover:border-primary/30 transition-colors"
       >
         <LinkIcon className="size-4 text-primary shrink-0 group-hover:scale-105 transition-transform" />
         <div className="min-w-0">
@@ -129,14 +119,14 @@ export function EvidenceReference({ evidenceId, title, previewText, className }:
   )
 }
 
-// 6. CaseWarning
+// 6. CaseWarning (Messenger Soft Warning Alert style)
 export function CaseWarning({ children, className }: ComponentProps) {
   return (
-    <div className={cn('flex items-start gap-2.5 max-w-[85%] self-start border border-destructive/35 bg-destructive/5 p-3.5 rounded-r-lg rounded-bl-lg shadow-sm font-sans', className)}>
-      <AlertOctagon className="size-4 text-destructive shrink-0 mt-0.5 animate-pulse" />
+    <div className={cn('flex items-start gap-2.5 max-w-[85%] self-start border border-destructive/20 bg-destructive/5 p-3.5 rounded-2xl rounded-tl-sm shadow-sm font-sans', className)}>
+      <AlertOctagon className="size-4 text-destructive shrink-0 mt-0.5" />
       <div className="flex flex-col gap-1 min-w-0">
-        <span className="font-mono text-[0.55rem] text-destructive uppercase tracking-widest font-bold">
-          SECURITY WARNING // ANOMALY
+        <span className="text-[0.6rem] text-destructive uppercase tracking-wide font-bold">
+          Cảnh báo hồ sơ
         </span>
         <p className="text-xs leading-relaxed text-foreground">{children}</p>
       </div>
@@ -144,7 +134,7 @@ export function CaseWarning({ children, className }: ComponentProps) {
   )
 }
 
-// 7. RecoveredInformation
+// 7. RecoveredInformation (Messenger Data Table style)
 interface RecoveredInformationProps {
   title: string
   dataRows: { label: string; value: string }[]
@@ -153,18 +143,18 @@ interface RecoveredInformationProps {
 
 export function RecoveredInformation({ title, dataRows, className }: RecoveredInformationProps) {
   return (
-    <div className={cn('flex flex-col gap-2 max-w-[90%] self-start bg-card/75 border border-border/90 p-3.5 rounded-r-lg rounded-bl-lg shadow-md font-sans w-full', className)}>
-      <span className="font-mono text-[0.55rem] text-primary uppercase tracking-widest font-bold flex items-center gap-1">
-        <Cpu className="size-3.5" /> RECONSTRUCTED INTELLIGENCE
+    <div className={cn('flex flex-col gap-2 max-w-[90%] self-start bg-muted/95 p-3.5 rounded-2xl rounded-tl-sm shadow-md font-sans w-full', className)}>
+      <span className="text-[0.6rem] text-primary tracking-wide font-bold flex items-center gap-1">
+        <Cpu className="size-3.5 animate-pulse" /> DỮ LIỆU KHÔI PHỤC
       </span>
-      <div className="rounded border border-border/60 bg-background/50 p-2.5 flex flex-col gap-1.5">
-        <span className="font-mono text-[0.6rem] text-muted-foreground uppercase block border-b border-border/20 pb-1 mb-1 font-bold">
-          FILE: {title}
+      <div className="rounded-xl border border-border/60 bg-background/80 p-2.5 flex flex-col gap-1.5">
+        <span className="text-[0.6rem] text-muted-foreground uppercase block border-b border-border/20 pb-1 mb-1 font-bold">
+          Tệp: {title}
         </span>
-        <div className="flex flex-col gap-1 font-mono text-[0.625rem] leading-normal text-muted-foreground">
+        <div className="flex flex-col gap-1 font-sans text-xs leading-normal text-muted-foreground">
           {dataRows.map((row, idx) => (
             <div key={idx} className="flex justify-between gap-4 border-b border-border/10 pb-0.5">
-              <span>{row.label.toUpperCase()}:</span>
+              <span>{row.label}:</span>
               <span className="text-foreground font-semibold">{row.value}</span>
             </div>
           ))}
@@ -174,12 +164,12 @@ export function RecoveredInformation({ title, dataRows, className }: RecoveredIn
   )
 }
 
-// 8. SystemAlert
+// 8. SystemAlert (Centered Info text style)
 export function SystemAlert({ children, className }: ComponentProps) {
   return (
     <div className={cn('w-full flex justify-center my-2', className)}>
-      <div className="rounded border border-border/40 bg-muted/20 px-3 py-1 font-mono text-[0.55rem] text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
-        <span className="size-1 bg-emerald-500 rounded-full animate-ping" />
+      <div className="rounded-full bg-muted/50 px-3 py-1 font-sans text-[0.6rem] text-muted-foreground flex items-center gap-1.5 shadow-sm border border-border/30">
+        <span className="size-1.5 bg-emerald-500 rounded-full" />
         <span>{children}</span>
       </div>
     </div>

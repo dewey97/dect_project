@@ -255,11 +255,12 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
 
         {/* Typing Loader Indicator */}
         {isTyping && (
-          <div className="flex flex-col gap-1 max-w-[85%] self-start bg-card/60 border border-border p-3.5 rounded-r-lg rounded-bl-lg shadow-sm font-mono animate-pulse">
-            <span className="text-[0.55rem] text-primary uppercase font-bold tracking-widest flex items-center gap-1">
-              <span className="flex size-1.5 bg-primary rounded-full animate-ping" />
-              MINH // DECIPHERING DATA...
-            </span>
+          <div className="flex items-center gap-1 max-w-[85%] self-start bg-muted/90 p-3 px-4 rounded-2xl rounded-tl-sm shadow-sm">
+            <div className="flex gap-1">
+              <span className="size-1.5 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:-0.3s]" />
+              <span className="size-1.5 bg-muted-foreground/60 rounded-full animate-bounce [animation-delay:-0.15s]" />
+              <span className="size-1.5 bg-muted-foreground/60 rounded-full animate-bounce" />
+            </div>
           </div>
         )}
 
