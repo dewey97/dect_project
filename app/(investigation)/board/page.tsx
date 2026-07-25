@@ -485,15 +485,7 @@ export default function EvidenceBoardPage() {
         />
       </div>
 
-      {/* Toolbar */}
-      <div className="mx-4 mb-4 flex items-center justify-end border-b border-border/40 pb-3 font-sans">
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-1.5 text-[0.65rem] border border-destructive/20 bg-destructive/5 hover:bg-destructive/10 text-destructive px-3 py-1 rounded transition-all cursor-pointer font-bold uppercase active:scale-95"
-        >
-          <RotateCcw className="size-3" /> Dọn sạch bảng
-        </button>
-      </div>
+
 
       {/* Main Board Area */}
       <div className="flex-1 px-4 relative">
