@@ -189,8 +189,25 @@ export default function EvidenceBoardPage() {
 
   const triggerZoom = (item: BoardItem, element: HTMLElement) => {
     const rect = element.getBoundingClientRect()
-    const tw = Math.min(480, window.innerWidth - 32)
-    const th = item.type === 'note' ? 220 : 380
+    
+    let tw = 0
+    let th = 0
+    
+    if (item.type === 'note') {
+      tw = Math.min(380, window.innerWidth - 32)
+      th = 220
+    } else {
+      const maxW = window.innerWidth * 0.9
+      const maxH = window.innerHeight * 0.8
+      const ratio = rect.width / rect.height
+      tw = maxW
+      th = maxW / ratio
+      if (th > maxH) {
+        th = maxH
+        tw = maxH * ratio
+      }
+    }
+    
     const cx = window.innerWidth / 2
     const cy = window.innerHeight / 2
     const ix = rect.left + rect.width / 2
@@ -199,6 +216,7 @@ export default function EvidenceBoardPage() {
     const ty = iy - cy
     const sx = rect.width / tw
     const sy = rect.height / th
+    
     setMorphOrigin({ tx, ty, sx, sy })
     setZoomedItem(item)
   }
@@ -572,72 +590,63 @@ export default function EvidenceBoardPage() {
             setTimeout(() => setZoomedItem(null), 250)
           }}
           className={cn(
-            "fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-300 ease-out cursor-zoom-out",
+            "fixed inset-0 bg-transparent z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-300 ease-out cursor-zoom-out",
             zoomedActive ? "opacity-100" : "opacity-0 pointer-events-none"
           )}
         >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className={cn(
-              "relative max-w-lg w-full bg-card border border-border rounded-xl shadow-2xl p-6 flex flex-col gap-4 transition-all duration-300 ease-out cursor-default",
-              zoomedActive ? "opacity-100" : "opacity-0"
-            )}
-            style={
-              morphOrigin
-                ? {
-                    transform: zoomedActive
-                      ? 'translate(0px, 0px) scale(1)'
-                      : `translate(${morphOrigin.tx}px, ${morphOrigin.ty}px) scale(${morphOrigin.sx}, ${morphOrigin.sy})`,
-                    transformOrigin: 'center center',
-                  }
-                : undefined
-            }
-          >
-            
-            <button
-              onClick={() => {
-                setZoomedActive(false)
-                setTimeout(() => setZoomedItem(null), 250)
-              }}
-              className="absolute top-4 right-4 p-1.5 rounded-full border border-border bg-card/65 text-muted-foreground hover:text-foreground transition-all active:scale-95 cursor-pointer"
+          {zoomedItem.type === 'note' ? (
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className={cn(
+                "relative max-w-sm w-full bg-amber-100 border border-amber-300 text-amber-950 p-8 rounded shadow-2xl font-sans flex items-center justify-center text-center transition-all duration-300 ease-out cursor-default",
+                zoomedActive ? "opacity-100" : "opacity-0"
+              )}
+              style={
+                morphOrigin
+                  ? {
+                      transform: zoomedActive
+                        ? 'translate(0px, 0px) scale(1)'
+                        : `translate(${morphOrigin.tx}px, ${morphOrigin.ty}px) scale(${morphOrigin.sx}, ${morphOrigin.sy})`,
+                      transformOrigin: 'center center',
+                    }
+                  : undefined
+              }
             >
-              <X className="size-4" />
-            </button>
-
-            <div className="border-b border-border/40 pb-2 flex items-center gap-2">
-              <Pin className="size-4 text-red-500" />
-              <span className="font-sans text-xs text-primary font-bold uppercase tracking-wider">
-                {zoomedItem.title}
-              </span>
+              <p className="text-sm font-semibold leading-relaxed italic">
+                "{zoomedItem.content}"
+              </p>
             </div>
-
-            <div className="flex justify-center items-center rounded overflow-hidden border border-border/60 bg-muted/20">
-              {zoomedItem.type === 'note' ? (
-                <div className="bg-amber-100 border border-amber-300 text-amber-950 p-8 w-full min-h-[220px] font-sans flex items-center justify-center text-center">
-                  <p className="text-sm font-semibold leading-relaxed italic">
-                    "{zoomedItem.content}"
-                  </p>
-                </div>
-              ) : zoomedItem.imgUrl ? (
+          ) : (
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className={cn(
+                "relative transition-all duration-300 ease-out transform cursor-default flex items-center justify-center",
+                zoomedActive ? "opacity-100" : "opacity-0"
+              )}
+              style={
+                morphOrigin
+                  ? {
+                      transform: zoomedActive
+                        ? 'translate(0px, 0px) scale(1)'
+                        : `translate(${morphOrigin.tx}px, ${morphOrigin.ty}px) scale(${morphOrigin.sx}, ${morphOrigin.sy})`,
+                      transformOrigin: 'center center',
+                    }
+                  : undefined
+              }
+            >
+              {zoomedItem.imgUrl ? (
                 <img
                   src={zoomedItem.imgUrl}
                   alt={zoomedItem.title}
-                  className="max-h-[380px] w-auto object-contain select-none pointer-events-none"
+                  className="max-h-[80vh] max-w-[90vw] w-auto h-auto rounded-lg shadow-[0_25px_60px_rgba(0,0,0,0.85)] border border-primary/20 select-none pointer-events-none"
                 />
               ) : (
-                <div className="py-24 text-muted-foreground font-sans text-xs">
+                <div className="py-24 text-muted-foreground font-sans text-xs bg-card p-6 rounded border border-border">
                   Không có hình ảnh hiển thị.
                 </div>
               )}
             </div>
-
-            <div className="text-center font-sans">
-              <span className="text-[0.65rem] text-muted-foreground uppercase">
-                Bằng chứng thuộc Hồ sơ vụ án: {activeCase?.title}
-              </span>
-            </div>
-
-          </div>
+          )}
         </div>
       )}
     </div>
