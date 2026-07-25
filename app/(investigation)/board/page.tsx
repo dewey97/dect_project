@@ -445,6 +445,7 @@ export default function EvidenceBoardPage() {
           {/* Draggable items */}
           {items.map((item) => {
             const isNote = item.type === 'note'
+            const isZoomed = zoomedItem?.id === item.id
             return (
               <div
                 key={item.id}
@@ -455,7 +456,8 @@ export default function EvidenceBoardPage() {
                   'absolute rounded shadow-lg transition-transform cursor-move z-30 select-none overflow-hidden touch-none flex flex-col group',
                   isNote
                     ? 'bg-amber-100/95 border border-amber-300 text-amber-950 font-sans shadow-lg shadow-amber-950/20 p-3.5 pt-6'
-                    : 'bg-transparent text-card-foreground hover:scale-102 transition-transform duration-200'
+                    : 'bg-transparent text-card-foreground hover:scale-102 transition-transform duration-200',
+                  isZoomed && 'opacity-0 pointer-events-none'
                 )}
                 style={{
                   left: item.x,
