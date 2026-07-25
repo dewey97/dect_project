@@ -178,9 +178,14 @@ export default function EvidenceBoardPage() {
   
   const boardRef = useRef<HTMLDivElement>(null)
   const dragInfo = useRef<{ itemId: string; startX: number; startY: number } | null>(null)
-  const [zoomedActive, setZoomedActive] = useState(false)
   const hasDragged = useRef(false)
   
+  type MorphPhase = 'idle' | 'opening' | 'open' | 'closing'
+  const [morphPhase, setMorphPhase] = useState<MorphPhase>('idle')
+  const [previewReady, setPreviewReady] = useState(false)
+
+  const zoomedActive = morphPhase === 'open' || morphPhase === 'closing'
+
   interface MorphTransform {
     x: number
     y: number
@@ -195,33 +200,45 @@ export default function EvidenceBoardPage() {
   const dragFrameRef = useRef<number | null>(null)
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const triggerZoom = (item: BoardItem, element: HTMLElement) => {
-    const rect = element.getBoundingClientRect()
-    setSourceRect(rect)
-    setZoomedActive(false)
-    setZoomedItem(item)
-  }
-
   const openZoom = (item: BoardItem, element: HTMLElement) => {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current)
       closeTimerRef.current = null
     }
-    triggerZoom(item, element)
+    setSourceRect(element.getBoundingClientRect())
+    setMorphTransform(null)
+    setPreviewReady(item.type === 'note')
+    setMorphPhase('opening')
+    setZoomedItem(item)
   }
 
   const MORPH_DURATION = 500
   const closeZoom = () => {
-    if (zoomedItem) {
-      const sourceElement = document.querySelector<HTMLElement>(
-        `[data-board-item-id="${zoomedItem.id}"]`
-      )
-      if (sourceElement) {
-        setSourceRect(sourceElement.getBoundingClientRect())
-      }
+    if (!zoomedItem || morphPhase === 'closing') {
+      return
     }
 
-    setZoomedActive(false)
+    const escapedId = typeof CSS !== 'undefined' && CSS.escape
+      ? CSS.escape(zoomedItem.id)
+      : zoomedItem.id
+
+    const sourceElement = document.querySelector<HTMLElement>(
+      `[data-board-item-id="${escapedId}"]`
+    )
+
+    if (sourceElement && modalContentRef.current) {
+      const newSourceRect = sourceElement.getBoundingClientRect()
+      const targetRect = modalContentRef.current.getBoundingClientRect()
+
+      setMorphTransform({
+        x: newSourceRect.left + newSourceRect.width / 2 - (targetRect.left + targetRect.width / 2),
+        y: newSourceRect.top + newSourceRect.height / 2 - (targetRect.top + targetRect.height / 2),
+        scaleX: newSourceRect.width / targetRect.width,
+        scaleY: newSourceRect.height / targetRect.height,
+      })
+    }
+
+    setMorphPhase('closing')
 
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current)
@@ -230,15 +247,27 @@ export default function EvidenceBoardPage() {
       setZoomedItem(null)
       setSourceRect(null)
       setMorphTransform(null)
+      setMorphPhase('idle')
       closeTimerRef.current = null
     }, MORPH_DURATION)
   }
 
   // Calculate FLIP morph origin before browser paint
   useLayoutEffect(() => {
-    if (!zoomedItem || !sourceRect || !modalContentRef.current) return
+    if (
+      morphPhase !== 'opening' ||
+      !zoomedItem ||
+      !sourceRect ||
+      !modalContentRef.current ||
+      !previewReady
+    ) {
+      return
+    }
 
     const targetRect = modalContentRef.current.getBoundingClientRect()
+    if (targetRect.width <= 0 || targetRect.height <= 0) {
+      return
+    }
 
     const sourceCenterX = sourceRect.left + sourceRect.width / 2
     const sourceCenterY = sourceRect.top + sourceRect.height / 2
@@ -253,14 +282,18 @@ export default function EvidenceBoardPage() {
       scaleY: sourceRect.height / targetRect.height,
     })
 
-    const frame = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setZoomedActive(true)
+    let secondFrame = 0
+    const firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => {
+        setMorphPhase('open')
       })
     })
 
-    return () => cancelAnimationFrame(frame)
-  }, [zoomedItem, sourceRect])
+    return () => {
+      cancelAnimationFrame(firstFrame)
+      cancelAnimationFrame(secondFrame)
+    }
+  }, [morphPhase, zoomedItem, sourceRect, previewReady])
 
   // Cleanup timers on unmount
   useEffect(() => {
@@ -425,11 +458,15 @@ export default function EvidenceBoardPage() {
     }
   }
 
+  const shouldUseSourceTransform =
+    morphPhase === 'opening' ||
+    morphPhase === 'closing'
+
   const morphStyle =
-    morphTransform && !zoomedActive
+    morphTransform && shouldUseSourceTransform
       ? {
           transform: `translate3d(${morphTransform.x}px, ${morphTransform.y}px, 0) scale(${morphTransform.scaleX}, ${morphTransform.scaleY})`,
-          opacity: 0.7,
+          opacity: morphPhase === 'closing' ? 0.4 : 0.72,
           filter: 'brightness(0.85)',
         }
       : {
@@ -692,6 +729,8 @@ export default function EvidenceBoardPage() {
                   src={zoomedItem.imgUrl}
                   alt={zoomedItem.title}
                   draggable={false}
+                  onLoad={() => setPreviewReady(true)}
+                  onError={() => setPreviewReady(true)}
                   className={cn(
                     "block max-h-[80vh] max-w-[90vw] object-contain rounded-lg shadow-[0_25px_60px_rgba(0,0,0,0.85)] border border-primary/20 select-none pointer-events-none transition-opacity duration-300",
                     zoomedActive ? "opacity-100" : "opacity-70"
