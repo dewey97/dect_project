@@ -178,6 +178,18 @@ export default function EvidenceBoardPage() {
   
   const boardRef = useRef<HTMLDivElement>(null)
   const dragInfo = useRef<{ itemId: string; startX: number; startY: number } | null>(null)
+  const [zoomedActive, setZoomedActive] = useState(false)
+  const hasDragged = useRef(false)
+
+  // Trigger zoom opening transition
+  useEffect(() => {
+    if (zoomedItem) {
+      const timer = setTimeout(() => setZoomedActive(true), 20)
+      return () => clearTimeout(timer)
+    } else {
+      setZoomedActive(false)
+    }
+  }, [zoomedItem])
 
   // Load active case and saved layout from localStorage
   useEffect(() => {
@@ -265,6 +277,8 @@ export default function EvidenceBoardPage() {
     const updated = [...filtered, item]
     setItems(updated)
 
+    hasDragged.current = false
+
     dragInfo.current = {
       itemId,
       startX: e.clientX - item.x,
@@ -285,6 +299,11 @@ export default function EvidenceBoardPage() {
     if (newX < 10) newX = 10
     if (newY < 10) newY = 10
 
+    const item = items.find((it) => it.id === itemId)
+    if (item && (Math.abs(newX - item.x) > 4 || Math.abs(newY - item.y) > 4)) {
+      hasDragged.current = true
+    }
+
     const updated = items.map((item) => {
       if (item.id === itemId) {
         return { ...item, x: newX, y: newY }
@@ -296,8 +315,17 @@ export default function EvidenceBoardPage() {
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (!dragInfo.current) return
+    const { itemId } = dragInfo.current
     dragInfo.current = null
     savePositions(items)
+
+    // If it was a simple click down & up, zoom it!
+    if (!hasDragged.current) {
+      const item = items.find((it) => it.id === itemId)
+      if (item) {
+        setZoomedItem(item)
+      }
+    }
   }
 
   const getPinCenter = (itemId: string) => {
@@ -384,10 +412,10 @@ export default function EvidenceBoardPage() {
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
                 className={cn(
-                  'absolute rounded shadow-lg transition-transform border cursor-move z-30 select-none overflow-hidden touch-none flex flex-col group',
+                  'absolute rounded shadow-lg transition-transform cursor-move z-30 select-none overflow-hidden touch-none flex flex-col group',
                   isNote
-                    ? 'bg-amber-100/95 border-amber-300 text-amber-950 font-sans shadow-amber-950/20'
-                    : 'bg-card border-border/80 text-card-foreground'
+                    ? 'bg-amber-100/95 border border-amber-300 text-amber-950 font-sans shadow-lg shadow-amber-950/20 p-3.5 pt-6'
+                    : 'bg-transparent text-card-foreground hover:scale-102 transition-transform duration-200'
                 )}
                 style={{
                   left: item.x,
@@ -397,7 +425,7 @@ export default function EvidenceBoardPage() {
                 }}
               >
                 {/* Red Pin Header */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-40 flex items-center justify-center">
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-40 flex items-center justify-center pointer-events-none">
                   <div className="size-4 rounded-full bg-red-600 border border-red-700 shadow-[0_2px_4px_rgba(0,0,0,0.6)] flex items-center justify-center relative">
                     <div className="size-1 rounded-full bg-white/60 absolute top-0.5 left-0.5" />
                   </div>
@@ -410,67 +438,43 @@ export default function EvidenceBoardPage() {
                     e.stopPropagation()
                     handleUnpinClue(item.id)
                   }}
-                  className="absolute top-1 right-1 z-40 p-0.5 rounded-full bg-black/60 hover:bg-black/85 text-white/80 hover:text-white transition-opacity opacity-0 group-hover:opacity-100"
+                  className="absolute top-1.5 right-1.5 z-40 p-0.5 rounded-full bg-black/60 hover:bg-black/85 text-white/80 hover:text-white transition-opacity opacity-0 group-hover:opacity-100"
                   title="Gỡ khỏi bảng"
                 >
-                  <X className="size-3" />
+                  <X className="size-3.5" />
                 </button>
 
                 {/* Content body */}
                 {isNote ? (
-                  <div className="flex-1 p-3 pt-6 flex flex-col justify-between">
-                    <p className="text-[0.7rem] font-bold uppercase tracking-wider font-mono opacity-80 border-b border-amber-300/40 pb-1 mb-2">
+                  <div className="flex-1 flex flex-col justify-between h-full pointer-events-none">
+                    <p className="text-[0.75rem] font-bold uppercase tracking-wider font-sans opacity-85 border-b border-amber-300/40 pb-1 mb-2">
                       {item.title}
                     </p>
-                    <p className="flex-1 text-[0.7rem] font-medium leading-relaxed italic overflow-hidden">
+                    <p className="flex-1 text-[0.75rem] font-medium leading-relaxed italic overflow-hidden">
                       "{item.content}"
                     </p>
-                    <button
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setZoomedItem(item)
-                      }}
-                      className="mt-2 text-[0.55rem] font-sans font-bold uppercase bg-amber-200/50 hover:bg-amber-300/60 transition-colors py-1 rounded text-center"
-                    >
-                      Phóng to
-                    </button>
                   </div>
                 ) : (
-                  <div className="flex-1 flex flex-col">
-                    <div className="flex-1 bg-white p-2.5 pt-6 flex flex-col justify-between">
-                      {item.imgUrl ? (
-                        <div
-                          className="flex-1 bg-zinc-200 border border-zinc-300 overflow-hidden relative"
-                          style={{
-                            backgroundImage: `url(${item.imgUrl})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center'
-                          }}
-                        />
-                      ) : (
-                        <div className="flex-1 bg-zinc-100 flex items-center justify-center text-[0.65rem] font-sans text-muted-foreground">
-                          KHÔNG CÓ HÌNH ẢNH
+                  <div className="w-full h-full flex flex-col pointer-events-none">
+                    {item.imgUrl ? (
+                      <div
+                        className="w-full h-full overflow-hidden relative rounded border border-primary/20 shadow-md group-hover:shadow-xl group-hover:border-primary/50 transition-all duration-200"
+                        style={{
+                          backgroundImage: `url(${item.imgUrl})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      >
+                        {/* Hover Overlay with ZoomIn Icon */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors duration-200">
+                          <ZoomIn className="size-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 scale-90 group-hover:scale-100" />
                         </div>
-                      )}
-                      
-                      <div className="mt-2 pt-2 border-t border-zinc-200 flex items-center justify-between">
-                        <span className="text-[0.65rem] font-sans font-bold text-zinc-800 truncate max-w-[120px]">
-                          {item.title}
-                        </span>
-                        
-                        <button
-                          onPointerDown={(e) => e.stopPropagation()}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setZoomedItem(item)
-                          }}
-                          className="p-1 rounded hover:bg-zinc-100 text-zinc-600 transition-colors"
-                        >
-                          <ZoomIn className="size-3.5" />
-                        </button>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="w-full h-full bg-zinc-800 border border-border flex items-center justify-center text-[0.65rem] font-sans text-muted-foreground">
+                        KHÔNG CÓ HÌNH ẢNH
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -540,12 +544,30 @@ export default function EvidenceBoardPage() {
 
       {/* Lightbox / Zoom Overlay Modal */}
       {zoomedItem && (
-        <div className="fixed inset-0 bg-background/95 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 animate-fade-in">
-          <div className="relative max-w-lg w-full bg-card border border-border rounded-xl shadow-2xl p-6 flex flex-col gap-4">
+        <div 
+          onClick={() => {
+            setZoomedActive(false)
+            setTimeout(() => setZoomedItem(null), 250)
+          }}
+          className={cn(
+            "fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 transition-opacity duration-300 ease-out cursor-zoom-out",
+            zoomedActive ? "opacity-100" : "opacity-0 pointer-events-none"
+          )}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className={cn(
+              "relative max-w-lg w-full bg-card border border-border rounded-xl shadow-2xl p-6 flex flex-col gap-4 transition-all duration-300 ease-out transform cursor-default",
+              zoomedActive ? "scale-100 translate-y-0 opacity-100" : "scale-95 translate-y-4 opacity-0"
+            )}
+          >
             
             <button
-              onClick={() => setZoomedItem(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-full border border-border bg-card/65 text-muted-foreground hover:text-foreground transition-all active:scale-95"
+              onClick={() => {
+                setZoomedActive(false)
+                setTimeout(() => setZoomedItem(null), 250)
+              }}
+              className="absolute top-4 right-4 p-1.5 rounded-full border border-border bg-card/65 text-muted-foreground hover:text-foreground transition-all active:scale-95 cursor-pointer"
             >
               <X className="size-4" />
             </button>
@@ -568,7 +590,7 @@ export default function EvidenceBoardPage() {
                 <img
                   src={zoomedItem.imgUrl}
                   alt={zoomedItem.title}
-                  className="max-h-[380px] w-auto object-contain"
+                  className="max-h-[380px] w-auto object-contain select-none pointer-events-none"
                 />
               ) : (
                 <div className="py-24 text-muted-foreground font-sans text-xs">
