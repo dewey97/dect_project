@@ -26,23 +26,23 @@ export function EvidenceHeader({ device }: EvidenceHeaderProps) {
         showTechDetails ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2 md:grid-cols-3"
       )}>
         <div>
-          <span className="block font-mono text-[0.55rem] text-muted-foreground uppercase">MÃ SỐ VẬT CHỨNG</span>
-          <span className="font-mono text-sm font-bold text-foreground">{device.evidenceId}</span>
+          <span className="block font-sans text-[0.55rem] text-muted-foreground uppercase">MÃ SỐ VẬT CHỨNG</span>
+          <span className="font-sans text-sm font-bold text-foreground">{device.evidenceId}</span>
         </div>
         <div>
-          <span className="block font-mono text-[0.55rem] text-muted-foreground uppercase">CHỦ THIẾT BỊ</span>
+          <span className="block font-sans text-[0.55rem] text-muted-foreground uppercase">CHỦ THIẾT BỊ</span>
           <span className="font-sans text-sm font-bold text-foreground">{device.owner}</span>
         </div>
         <div>
-          <span className="block font-mono text-[0.55rem] text-muted-foreground uppercase">PHƯƠNG THỨC GIẢI MÃ</span>
-          <span className="font-mono text-xs font-semibold text-emerald-500 uppercase flex items-center gap-1 mt-0.5">
+          <span className="block font-sans text-[0.55rem] text-muted-foreground uppercase">TRẠNG THÁI</span>
+          <span className="font-sans text-xs font-semibold text-emerald-500 uppercase flex items-center gap-1 mt-0.5">
             {isLocked ? (
               <span className="text-destructive flex items-center gap-1">
-                <Lock className="size-3" /> KHÓA_BẢO_MẬT
+                <Lock className="size-3" /> ĐANG KHÓA
               </span>
             ) : (
               <span className="text-emerald-500 flex items-center gap-1">
-                <Unlock className="size-3" /> ĐÃ_VƯỢT_PIN
+                <Unlock className="size-3" /> ĐÃ MỞ KHÓA
               </span>
             )}
           </span>

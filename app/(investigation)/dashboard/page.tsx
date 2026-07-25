@@ -11,9 +11,9 @@ export default async function DashboardPage() {
   return (
     <div className="pb-6">
       <ScreenHeader
-        eyebrow="Case Files"
-        title="Investigations"
-        description="Active and sealed case files. Activate a new file with the code from your game box."
+        eyebrow="Danh mục Hồ sơ"
+        title="Hồ sơ chuyên án"
+        description="Danh sách các chuyên án đang điều tra và đã niêm phong. Nhập mã kích hoạt từ hộp bài vật lý của bạn để mở chuyên án mới."
         action={
           <Button
             size="sm"
@@ -23,7 +23,7 @@ export default async function DashboardPage() {
             nativeButton={false}
           >
             <KeyRound className="size-4" aria-hidden="true" />
-            Activate
+            Kích hoạt
           </Button>
         }
       />

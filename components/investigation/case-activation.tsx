@@ -75,13 +75,13 @@ export function CaseActivation() {
           <div className="flex-1 flex items-center justify-center relative my-4 z-10">
             <div className="relative w-64 h-48 bg-amber-950/15 border-2 border-primary/45 rounded-lg rounded-tl-none shadow-[0_15px_30px_rgba(0,0,0,0.4)] flex flex-col justify-between p-4 transform hover:scale-102 transition-transform duration-200">
               
-              <div className="absolute -top-6 left-0 h-6 w-24 bg-background border-t-2 border-x-2 border-primary/45 rounded-t-md flex items-center justify-center font-mono text-[0.55rem] text-primary font-bold">
-                NX-4471 // ACTV
+              <div className="absolute -top-6 left-0 h-6 w-28 bg-background border-t-2 border-x-2 border-primary/45 rounded-t-md flex items-center justify-center font-sans text-[0.55rem] text-primary font-bold">
+                NX-4471 // HIỆN LƯU
               </div>
 
               <div className="flex justify-between items-start pt-2">
                 <div className="flex flex-col gap-0.5">
-                  <span className="font-mono text-[0.55rem] text-muted-foreground uppercase">TÀI SẢN CỦA:</span>
+                  <span className="font-sans text-[0.55rem] text-muted-foreground uppercase">TÀI SẢN CỦA:</span>
                   <span className="font-sans text-[0.65rem] font-bold text-foreground uppercase">CỤC CẢNH SÁT</span>
                 </div>
                 <div className="flex flex-col items-end">
@@ -90,23 +90,23 @@ export function CaseActivation() {
                       <div key={idx} className={cn("h-full bg-background", idx % 3 === 0 ? "w-1" : "w-[0.5px]")} />
                     ))}
                   </div>
-                  <span className="font-mono text-[0.45rem] text-muted-foreground mt-0.5">EVID-902-12</span>
+                  <span className="font-sans text-[0.45rem] text-muted-foreground mt-0.5">EVID-902-12</span>
                 </div>
               </div>
 
-              <div className="my-auto self-center transform -rotate-12 border-2 border-dashed border-destructive/60 px-4 py-1 text-destructive/60 font-mono font-black text-xs uppercase tracking-widest rounded select-none">
+              <div className="my-auto self-center transform -rotate-12 border-2 border-dashed border-destructive/60 px-4 py-1 text-destructive/60 font-sans font-black text-xs uppercase tracking-widest rounded select-none">
                 HỒ SƠ BẢO MẬT
               </div>
 
-              <div className="border-t border-primary/20 pt-2 flex items-center gap-1.5 font-mono text-[0.55rem] text-muted-foreground">
+              <div className="border-t border-primary/20 pt-2 flex items-center gap-1.5 font-sans text-[0.55rem] text-muted-foreground">
                 <FileText className="size-3 text-primary" />
-                <span>KỆ LƯU TRỮ AN TOÀN // PHÂN KHU 12</span>
+                <span>KỆ LƯU TRỮ TÀI LIỆU // KHU VỰC 12</span>
               </div>
             </div>
           </div>
 
-          <div className="font-mono text-[0.55rem] text-muted-foreground/80 leading-relaxed border-t border-border/40 pt-4 z-10">
-            CẢNH BÁO: Mọi nỗ lực xâm nhập xác thực trái phép sẽ bị ghi nhận địa chỉ IP máy trạm điều hành gửi về tổng cục.
+          <div className="font-sans text-[0.55rem] text-muted-foreground/80 leading-relaxed border-t border-border/40 pt-4 z-10">
+            CẢNH BÁO: Mọi nỗ lực truy cập hồ sơ chuyên án không hợp lệ sẽ được ghi nhận báo cáo về trung tâm chỉ huy.
           </div>
         </div>
 
@@ -123,17 +123,17 @@ export function CaseActivation() {
                   <Cpu className="size-6" />
                 </div>
                 <span className="label-system text-primary mt-2">CỔNG BẢO MẬT</span>
-                <h2 className="text-xl font-bold uppercase tracking-wide">Kết nối máy trạm</h2>
+                <h2 className="text-xl font-bold uppercase tracking-wide">Kết nối hồ sơ chuyên án</h2>
                 <p className="text-xs text-muted-foreground leading-relaxed font-sans">
-                  Thiết lập kênh truyền mã hóa và tải phân vùng phục hồi phân tích vật chứng kỹ thuật số.
+                  Thiết lập kết nối an toàn và đồng bộ cơ sở dữ liệu vật chứng điều tra chuyên án.
                 </p>
               </div>
 
               {/* Terminal Logs Panel */}
-              <div className="w-full rounded-lg border border-border/80 bg-card/45 p-4 my-6 font-mono text-[0.625rem] text-muted-foreground flex flex-col gap-1.5 min-h-[180px] justify-end shadow-inner">
-                <div className="flex items-center gap-1 text-[0.55rem] font-bold text-primary border-b border-border/20 pb-1.5 mb-1 tracking-widest uppercase">
+              <div className="w-full rounded-lg border border-border/80 bg-card/45 p-4 my-6 font-sans text-[0.65rem] text-muted-foreground flex flex-col gap-1.5 min-h-[180px] justify-end shadow-inner">
+                <div className="flex items-center gap-1.5 text-[0.6rem] font-bold text-primary border-b border-border/20 pb-1.5 mb-1 tracking-widest uppercase">
                   <Terminal className="size-3 shrink-0" />
-                  <span>TRÌNH TỰ KHỞI ĐỘNG HỆ THỐNG</span>
+                  <span>TRÌNH TỰ TẢI HỒ SƠ CHUYÊN ÁN</span>
                 </div>
                 <div className="flex flex-col gap-1 flex-1 justify-end">
                   {bootLogs.map((log, idx) => (
@@ -148,7 +148,7 @@ export function CaseActivation() {
                     <div className="flex items-center gap-1 text-primary animate-pulse">
                       <span className="shrink-0">&gt;</span>
                       <RefreshCw className="size-3 animate-spin" />
-                      <span>ĐANG_TẢI_PHÂN_VÙNG...</span>
+                      <span>Đang tải hồ sơ chuyên án...</span>
                     </div>
                   )}
                 </div>
