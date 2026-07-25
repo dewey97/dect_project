@@ -536,7 +536,7 @@ export default function EvidenceBoardPage() {
             Chưa phát hiện manh mối nào để đưa lên bảng.
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {unlockedClues.map((clue) => {
               const isPinned = items.some(item => item.id === clue.id)
               
@@ -544,34 +544,41 @@ export default function EvidenceBoardPage() {
                 <div
                   key={clue.id}
                   className={cn(
-                    "rounded-lg border p-3 flex flex-col justify-between transition-all bg-card/45 relative overflow-hidden",
-                    isPinned ? "border-primary/20 opacity-55" : "border-border/60 hover:border-primary/45"
+                    "relative aspect-[4/3] rounded-lg p-4 flex flex-col justify-between transition-all overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none border border-amber-950/10 group",
+                    isPinned ? "opacity-45 scale-98" : "hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(0,0,0,0.5)] active:scale-98"
                   )}
+                  style={{
+                    backgroundImage: "url('/manila_folder.png')",
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center',
+                    backgroundColor: '#ffffff',
+                  }}
                 >
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1 flex flex-col pt-3 pointer-events-none">
                     <span className={cn(
-                      "text-[0.55rem] font-sans font-black uppercase px-1 rounded inline-block mb-1.5",
-                      clue.type === 'victim' && "bg-rose-500/10 text-rose-400 border border-rose-500/20",
-                      clue.type === 'suspect' && "bg-sky-500/10 text-sky-400 border border-sky-500/20",
-                      clue.type === 'newspaper' && "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20",
-                      clue.type === 'note' && "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                      "text-[0.55rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border w-fit mb-2 text-center",
+                      clue.type === 'victim' && "border-red-600/30 text-red-800 bg-red-500/5",
+                      clue.type === 'suspect' && "border-blue-600/30 text-blue-800 bg-blue-500/5",
+                      clue.type === 'newspaper' && "border-yellow-600/30 text-yellow-900 bg-yellow-500/5",
+                      clue.type === 'note' && "border-amber-600/30 text-amber-950 bg-amber-500/5"
                     )}>
                       {clue.type === 'victim' ? 'Nạn nhân' : clue.type === 'suspect' ? 'Nghi phạm' : clue.type === 'newspaper' ? 'Tin báo' : 'Ghi chú'}
                     </span>
-                    <h4 className="font-sans text-[0.7rem] font-bold text-foreground truncate" title={clue.title}>
+                    <h4 className="font-sans text-[0.7rem] font-black text-amber-950 leading-snug line-clamp-2 max-h-[34px] overflow-hidden">
                       {clue.title}
                     </h4>
                   </div>
                   
-                  <div className="mt-3 flex items-center justify-between">
+                  <div className="mt-2 flex items-center justify-between z-10">
                     {isPinned ? (
-                      <span className="text-[0.6rem] font-sans text-primary font-bold">
-                        Đã ghim
+                      <span className="text-[0.6rem] font-sans text-amber-900/60 font-bold mx-auto">
+                        Đã ghim lên bảng
                       </span>
                     ) : (
                       <button
                         onClick={() => handlePinClue(clue.id)}
-                        className="flex items-center gap-1 text-[0.6rem] font-sans font-bold bg-primary/10 hover:bg-primary/25 border border-primary/25 text-primary px-2 py-0.5 rounded transition-all w-full justify-center cursor-pointer"
+                        className="flex items-center gap-1 text-[0.6rem] font-sans font-bold bg-amber-950/10 hover:bg-amber-950/20 border border-amber-950/20 text-amber-950 px-2 py-1 rounded transition-all w-full justify-center cursor-pointer shadow-sm active:scale-95"
                       >
                         <Plus className="size-3" /> Ghim lên bảng
                       </button>
