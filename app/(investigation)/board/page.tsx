@@ -480,7 +480,7 @@ export default function EvidenceBoardPage() {
       <div className="px-4">
         <ScreenHeader
           eyebrow=""
-          title="Bảng Chứng Cứ"
+          title="BẢNG ĐIỀU TRA"
           description="Kéo thả sắp xếp tài liệu, xâu chuỗi thông tin vụ án bằng dây chỉ đỏ. Click để xem chi tiết."
         />
       </div>
