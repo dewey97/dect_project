@@ -26,28 +26,12 @@ export function SystemHeader() {
                   {activeCase.title}
                 </h2>
               </div>
-              <div className="flex flex-col items-end shrink-0">
-                <span className="font-mono text-xs font-semibold text-primary">
-                  {activeCase.progress}%
-                </span>
-                <span className="font-sans text-[0.55rem] text-muted-foreground font-semibold uppercase tracking-wider">
-                  Tiến độ
-                </span>
-              </div>
-            </div>
-
-            {/* Micro Progress Bar */}
-            <div className="mt-2 h-1 w-full rounded-full bg-muted/60 overflow-hidden">
-              <div
-                className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${activeCase.progress}%` }}
-              />
             </div>
 
             {/* Objective & Status banner */}
-            <div className="mt-2.5 flex flex-col gap-1 border-t border-border/40 pt-2 text-[0.7rem]">
+            <div className="mt-2 flex flex-col gap-1 border-t border-border/40 pt-2 text-[0.7rem]">
               <div className="flex items-start gap-1.5">
-                <Target className="size-3.5 text-primary shrink-0 mt-0.5 animate-pulse" />
+                <Target className="size-3.5 text-primary shrink-0 mt-0.5" />
                 <p className="font-sans leading-relaxed text-muted-foreground">
                   <span className="font-semibold text-foreground font-mono text-[0.65rem] tracking-wider mr-1">
                     MỤC TIÊU:

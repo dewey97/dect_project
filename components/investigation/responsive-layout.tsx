@@ -1,17 +1,16 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { EvidencePanel } from './panels/evidence-panel'
-import { TracePanel } from './panels/trace-panel'
-import { AssistantPanel } from './panels/assistant-panel'
 import type { Case, EvidenceDevice, Evidence, TraceCard } from '@/lib/types'
 import { BottomNav } from '@/components/investigation/bottom-nav'
 import { PageTransition } from '@/components/investigation/page-transition'
 import { SystemHeader } from '@/components/investigation/system-header'
 import { LeftActivityBar } from './left-activity-bar'
+import { AssistantPanel } from './panels/assistant-panel'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/components/investigation/settings-context'
+import { MessageSquare, X, Minimize2, Shield, Wifi } from 'lucide-react'
 
 interface ResponsiveLayoutProps {
   children: ReactNode
@@ -29,27 +28,13 @@ export function ResponsiveLayout({
   traceCards
 }: ResponsiveLayoutProps) {
   const pathname = usePathname()
-  const {
-    leftSidebarOpen,
-    setLeftSidebarOpen,
-    rightSidebarOpen,
-    setRightSidebarOpen,
-    showTechDetails,
-    setShowTechDetails
-  } = useSettings()
+  const { showTechDetails, setShowTechDetails } = useSettings()
+  
+  // Floating Messenger Chat Box State
+  const [isChatOpen, setIsChatOpen] = useState(false)
 
-  // Determine what to display on the right column of the desktop layout to avoid duplication
-  const showTraceOnRight = pathname === '/assistant'
-  const isConclusionPage = pathname?.startsWith('/assistant/conclusion')
-
-  // Dynamic grid template columns class based on sidebar open states
-  const gridColumnsClass = cn(
-    "relative z-10 flex-1 flex flex-col lg:grid lg:gap-6 overflow-hidden",
-    leftSidebarOpen && rightSidebarOpen && "lg:grid-cols-[300px_1fr_330px]",
-    leftSidebarOpen && !rightSidebarOpen && "lg:grid-cols-[300px_1fr]",
-    !leftSidebarOpen && rightSidebarOpen && "lg:grid-cols-[1fr_330px]",
-    !leftSidebarOpen && !rightSidebarOpen && "lg:grid-cols-[1fr]"
-  )
+  // Only show the floating bubble if we are NOT on the main /assistant page
+  const showFloatingBubble = pathname !== '/assistant' && !pathname?.startsWith('/assistant/conclusion')
 
   return (
     <div className="flex min-h-dvh w-full justify-center">
@@ -63,97 +48,115 @@ export function ResponsiveLayout({
         {/* COLUMN 0: Left Navigation Sidebar (Desktop only) - Stretches from top to bottom */}
         <LeftActivityBar />
 
-        {/* Right side content pane wrapping header, toolbar and grid workspace */}
+        {/* Right side content pane wrapping header, toolbar and workspace */}
         <div className="flex-1 flex flex-col h-full overflow-hidden relative">
 
           <SystemHeader />
 
-        {/* WORKSPACE TOOLBAR & PROGRESS FLOW (Only shown on Desktop) */}
-        <div className="hidden lg:flex items-center justify-between border-b border-border/40 py-2.5 px-4 bg-card/10 text-[0.65rem] font-mono select-none z-20">
-          {/* Left Side: Left Sidebar Toggle */}
-          <button
-            onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-            className="flex items-center gap-1 border border-primary/20 bg-primary/5 rounded px-2.5 py-1 hover:bg-primary/10 transition-colors cursor-pointer text-primary font-bold"
-          >
-            {leftSidebarOpen ? '◀ Ẩn Tang Vật' : '▶ Hiện Tang Vật'}
-          </button>
-
-          {/* Center: System Status Indicator */}
-          <div className="flex items-center gap-2 text-primary/80 font-mono text-[0.6rem] tracking-wider">
-            <span className="relative flex size-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500"></span>
-            </span>
-            <span>SECURE WORKSPACE // CONSOLE ACTIVE</span>
-          </div>
-
-          {/* Right Side: Tech Details Toggle & Right Sidebar Toggle */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setShowTechDetails(!showTechDetails)}
-              className={cn(
-                "flex items-center gap-1.5 border rounded px-2.5 py-1 transition-colors cursor-pointer font-bold",
-                showTechDetails 
-                  ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500" 
-                  : "border-border bg-muted/10 text-muted-foreground"
-              )}
-            >
-              {showTechDetails ? '☑ Chi tiết pháp y: Bật' : '☐ Chi tiết pháp y: Tắt'}
-            </button>
-
-            <button
-              onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
-              className="flex items-center gap-1 border border-primary/20 bg-primary/5 rounded px-2.5 py-1 hover:bg-primary/10 transition-colors cursor-pointer text-primary font-bold"
-            >
-              {rightSidebarOpen ? 'Ẩn Trợ Lý ▶' : '◀ Hiện Trợ Lý'}
-            </button>
-          </div>
-        </div>
-
-        {/* RESPONSIVE GRID LAYOUT WRAPPER */}
-        <div className={gridColumnsClass}>
-          {/* COLUMN 1: Evidence List Panel (Hidden on Mobile Page routes, always shown on Desktop) */}
-          {leftSidebarOpen && (
-            <aside className="hidden lg:flex lg:flex-col border-r border-border/60 pr-6 overflow-y-auto h-full pb-6">
-              <span className="label-system mb-4 text-primary block border-b border-primary/20 pb-1 font-bold">
-                DANH MỤC HỒ SƠ TANG VẬT
+          {/* WORKSPACE TOOLBAR (Only shown on Desktop) */}
+          <div className="hidden lg:flex items-center justify-between border-b border-border/40 py-2.5 px-4 bg-card/10 text-[0.65rem] font-mono select-none z-20">
+            {/* Left Side: Case Status */}
+            <div className="flex items-center gap-2 text-primary/80 font-mono text-[0.6rem] tracking-wider">
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500"></span>
               </span>
-              <EvidencePanel activeCase={activeCase} devices={devices} evidence={evidence} />
-            </aside>
-          )}
+              <span>BÀN LÀM VIỆC ĐIỀU TRA</span>
+            </div>
 
-          {/* COLUMN 2: Dynamic Page Workspace (Visible on both Mobile and Desktop) */}
-          <main className="flex-1 flex flex-col overflow-y-auto h-full px-1 pb-6">
-            <PageTransition>{children}</PageTransition>
-          </main>
+            {/* Right Side: Tech Details Toggle */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowTechDetails(!showTechDetails)}
+                className={cn(
+                  "flex items-center gap-1.5 border rounded px-2.5 py-1 transition-colors cursor-pointer font-bold",
+                  showTechDetails 
+                    ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-500" 
+                    : "border-border bg-muted/10 text-muted-foreground"
+                )}
+              >
+                {showTechDetails ? '☑ Chi tiết pháp y: Bật' : '☐ Chi tiết pháp y: Tắt'}
+              </button>
+            </div>
+          </div>
 
-          {/* COLUMN 3: Context Panel (Hidden on Mobile Page routes, always shown on Desktop) */}
-          {rightSidebarOpen && (
-            <aside className="hidden lg:flex lg:flex-col border-l border-border/60 pl-6 overflow-y-auto h-full pb-6">
-              {showTraceOnRight ? (
-                <>
-                  <span className="label-system mb-4 text-primary block border-b border-primary/20 pb-1 font-bold">
-                    KHO LƯU TRỮ TRACE
+          {/* MAIN DYNAMIC PAGE WORKSPACE */}
+          <div className="relative z-10 flex-1 flex flex-col overflow-hidden">
+            <main className="flex-1 flex flex-col overflow-y-auto h-full px-4 pb-6 pt-4">
+              <PageTransition>{children}</PageTransition>
+            </main>
+          </div>
+
+          {/* FLOATING MESSENGER-STYLE CHAT BUBBLE & POPUP (Desktop only) */}
+          {showFloatingBubble && (
+            <div className="hidden lg:block fixed bottom-6 right-6 z-50">
+              {/* Floating Chat Bubble Button */}
+              {!isChatOpen && (
+                <button
+                  onClick={() => setIsChatOpen(true)}
+                  className="size-14 rounded-full bg-primary hover:bg-primary-hover text-primary-foreground shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer relative group"
+                >
+                  <MessageSquare className="size-6 text-background" />
+                  
+                  {/* Glowing active ping dot */}
+                  <span className="absolute -top-0.5 -right-0.5 flex size-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full size-3 bg-emerald-500 border border-card"></span>
                   </span>
-                  <TracePanel cards={traceCards} />
-                </>
-              ) : (
-                <>
-                  <span className="label-system mb-4 text-primary block border-b border-primary/20 pb-1 font-bold">
-                    ĐIỀU PHỐI VIÊN MINH
+
+                  {/* Tooltip on hover */}
+                  <span className="absolute right-16 scale-0 group-hover:scale-100 transition-all duration-200 bg-card border border-border px-3 py-1.5 rounded-lg text-[0.7rem] font-sans font-bold text-foreground shadow-md whitespace-nowrap">
+                    Trợ lý Minh
                   </span>
-                  <AssistantPanel showHeader={false} />
-                </>
+                </button>
               )}
-            </aside>
+
+              {/* Messenger-style Popup Chat Window */}
+              {isChatOpen && (
+                <div className="w-[360px] h-[500px] bg-card/95 backdrop-blur border border-border/80 rounded-xl shadow-2xl flex flex-col overflow-hidden animate-fade-in">
+                  
+                  {/* Chat Header (Messenger Style) */}
+                  <div className="bg-muted/40 border-b border-border/50 px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="relative size-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-serif text-sm font-black text-primary">
+                        M
+                        <span className="absolute bottom-0 right-0 size-2 rounded-full bg-emerald-500 border border-card" />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-sans text-[0.8rem] font-bold text-foreground leading-none">
+                          Điều phối viên Minh
+                        </h4>
+                        <span className="font-sans text-[0.6rem] text-muted-foreground mt-0.5 block">
+                          Đang hoạt động
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => setIsChatOpen(false)}
+                        className="p-1 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                        title="Thu nhỏ"
+                      >
+                        <Minimize2 className="size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Chat Body (renders AssistantPanel without header) */}
+                  <div className="flex-1 overflow-hidden">
+                    <AssistantPanel showHeader={false} className="h-full" />
+                  </div>
+
+                </div>
+              )}
+            </div>
           )}
 
-        </div>
-
-        {/* BOTTOM NAVIGATION BAR (Hidden on Desktop) */}
-        <div className="mt-auto lg:hidden">
-          <BottomNav />
-        </div>
+          {/* BOTTOM NAVIGATION BAR (Hidden on Desktop) */}
+          <div className="mt-auto lg:hidden">
+            <BottomNav />
+          </div>
 
         </div>
 

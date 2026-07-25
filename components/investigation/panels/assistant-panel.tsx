@@ -264,8 +264,7 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
         </div>
       </div>
 
-      {/* Main chat history list */}
-      <div className="flex-1 overflow-y-auto px-4 flex flex-col gap-4 max-h-[50vh] lg:max-h-[60vh]">
+      <div className="flex-1 overflow-y-auto px-4 flex flex-col gap-4">
         {messages.map((msg) => {
           if (msg.type === 'system') return <SystemAlert key={msg.id}>{msg.text}</SystemAlert>
           if (msg.type === 'detective') return <DetectiveAction key={msg.id}>{msg.text}</DetectiveAction>
@@ -291,10 +290,6 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
 
       {/* Bottom Suggestion Action Chips Panel */}
       <div className="border-t border-border bg-background/95 p-3.5 flex flex-col gap-2 mt-auto">
-        <span className="font-mono text-[0.55rem] text-muted-foreground uppercase tracking-widest block mb-1">
-          DECISION CODES // NO KEYBOARD DETECTED
-        </span>
-
         {currentBranch === 'root' && intel && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {intel.initialChips.map((chip) => (
