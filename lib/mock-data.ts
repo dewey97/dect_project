@@ -14,15 +14,15 @@ export const CASES: Case[] = [
   {
     id: 'case-000',
     code: 'TEST-99',
-    title: 'Kiểm Thử Hệ Thống (UX Test)',
-    logline: 'Vụ án siêu đơn giản để kiểm thử nhanh toàn bộ luồng UX.',
-    briefing: 'Chào mừng điều tra viên đến với phiên kiểm thử hệ thống. Hãy mở khóa thiết bị di động, tìm mâu thuẫn lời khai và nộp báo cáo kết án để hoàn thành.',
-    objective: 'Mở khóa điện thoại và kết án hung thủ.',
-    estimatedTime: '1 phút',
-    status: 'locked',
-    difficulty: 1,
+    title: 'Vụ án Trốn Tìm (Hide-and-Seek)',
+    logline: 'Một vụ án mạng xảy ra tại căn nhà chuẩn bị giải tỏa, mở ra những mâu thuẫn tranh chấp thừa kế và bí mật quá khứ đen tối.',
+    briefing: 'Điều tra cái chết của Khang tại một căn nhà cũ thuộc diện giải tỏa bồi thường. Hiện trường xáo trộn với nhiều dấu vết đột nhập tìm tài liệu, đồng thời phát hiện chiếc hộp sắt chứa đựng bí mật về vụ mất tích từ thuở nhỏ của Gia Huy.',
+    objective: 'Phân tích di chúc bị tráo, hồ sơ đo đạc sai lệch và tìm ra thủ phạm sát hại Khang.',
+    estimatedTime: '20-30 phút',
+    status: 'active',
+    difficulty: 2,
     progress: 0,
-    location: 'Phòng Thí Nghiệm UX'
+    location: 'Khu giải tỏa Cảng phía Bắc'
   },
   {
     id: 'case-01',
@@ -33,7 +33,7 @@ export const CASES: Case[] = [
       'Thám tử, bạn được chỉ định dẫn đầu cuộc điều tra pháp y về sự biến mất của Thomas Vance, một nhân viên ghi chép sổ sách tại Cầu cảng số 9. Hãy kiểm tra thiết bị di động thu hồi được và lần theo các điểm sai lệch hàng hóa để tìm ra kẻ thủ ác.',
     objective: 'Giải mã tin nhắn điện thoại nạn nhân và tìm ra nghi phạm.',
     estimatedTime: '60-90 phút',
-    status: 'active',
+    status: 'locked',
     difficulty: 2,
     progress: 45,
     location: 'Cảng phía Bắc, Phân khu Bến tàu 12',
