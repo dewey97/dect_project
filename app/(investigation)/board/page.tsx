@@ -499,7 +499,7 @@ export default function EvidenceBoardPage() {
       <div className="flex-1 px-4 relative">
         <div
           ref={boardRef}
-          className="relative w-full h-[580px] rounded-xl border border-border/80 overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] select-none"
+          className="relative w-full h-[720px] rounded-xl border border-border/80 overflow-hidden shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] select-none"
           style={{
             backgroundImage: "url('/evidence_board_cork.png')",
             backgroundSize: 'cover',
