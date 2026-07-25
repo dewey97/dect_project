@@ -116,12 +116,12 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
     switch (action) {
       case 'root_timeline':
         triggerReply(
-          'Reconstruct victim timeline logs',
+          'Phục dựng nhật ký dòng thời gian nạn nhân',
           'timeline',
           [
             {
               type: 'system',
-              text: 'RECONSTRUCTING DATA SECTORS // TIMELINE_DB'
+              text: 'ĐANG PHỤC DỰNG PHÂN VÙNG DỮ LIỆU // DÒNG THỜI GIAN'
             },
             {
               type: 'info',
@@ -130,7 +130,7 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
             },
             {
               type: 'assistant',
-              text: 'Forensic timeline indicates the victim was instructed to meet at 23:41 and discard their device. However, GPS logs place the victim at Warehouse 12 shortly afterward. This implies a diversion.'
+              text: 'Dòng thời gian pháp y ghi nhận các mốc di chuyển và hoạt động của các nghi phạm xung quanh thời điểm xảy ra án mạng. Hãy đối chiếu định vị GPS để tìm ra mâu thuẫn ngoại phạm.'
             }
           ]
         )
@@ -138,7 +138,7 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
 
       case 'root_messages':
         triggerReply(
-          'Review recovered messages index',
+          'Xem chỉ mục tin nhắn khôi phục',
           'messages',
           [
             {
@@ -149,7 +149,7 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
             },
             {
               type: 'assistant',
-              text: 'This email manifest and message ledger represent the last recorded communication before the victim disappeared. The sender is identified as "The Foreman".'
+              text: 'Các tệp tin nhắn và hội thoại đã khôi phục thành công. Bạn có thể mở chi tiết thiết bị tang vật tương ứng để đọc nội dung.'
             }
           ]
         )
@@ -157,7 +157,7 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
 
       case 'root_hint1':
         triggerReply(
-          'Request graded hint // Level 1',
+          'Yêu cầu gợi ý // Cấp độ 1',
           'hint1',
           [
             {
@@ -171,7 +171,7 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
 
       case 'need_hint2':
         triggerReply(
-          'Request graded hint // Level 2',
+          'Yêu cầu gợi ý // Cấp độ 2',
           'hint2',
           [
             {
@@ -185,12 +185,12 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
 
       case 'need_hint3':
         triggerReply(
-          'Request graded hint // Level 3',
+          'Yêu cầu gợi ý // Cấp độ 3',
           'hint3',
           [
             {
               type: 'warning',
-              text: 'CRITICAL OPERATION INTELLIGENCE UNLOCKED'
+              text: 'ĐÃ BẺ KHÓA THÀNH CÔNG CHỈ DẪN TRỰC TIẾP'
             },
             {
               type: 'hint',
@@ -203,12 +203,12 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
 
       case 'root_trace':
         triggerReply(
-          'Review active Trace intelligence',
+          'Xem thông tin phân tích Trace',
           'trace',
           [
             {
               type: 'assistant',
-              text: 'Trace intelligence database is online. We have collected profiles on "The Foreman" (T-01) and "Warehouse 12" (T-02). Review the physical trace card markers on your board game matching these codes.'
+              text: 'Cơ sở dữ liệu Trace đang hoạt động ổn định. Các thông tin thu thập được từ thẻ bài vật lý liên quan đã được đồng bộ đầy đủ.'
             }
           ]
         )
@@ -216,12 +216,12 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
 
       case 'reset_root':
         triggerReply(
-          'Return to main protocols',
+          'Quay lại menu chính',
           'root',
           [
             {
               type: 'assistant',
-              text: 'Main directory active. Select your next query protocol.'
+              text: 'Đã quay lại danh mục giao thức chính. Hãy chọn yêu cầu tiếp theo của bạn.'
             }
           ]
         )

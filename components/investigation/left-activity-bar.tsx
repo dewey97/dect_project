@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { NAV_ITEMS } from '@/lib/navigation'
 import { cn } from '@/lib/utils'
-import { LogOut, FolderOpen } from 'lucide-react'
+import { LayoutGrid, FolderOpen } from 'lucide-react'
 
 export function LeftActivityBar() {
   const pathname = usePathname()
@@ -78,12 +78,12 @@ export function LeftActivityBar() {
       <div className="w-full flex justify-center">
         <Link
           href="/dashboard"
-          title="Thoát hồ sơ"
-          className="group relative flex w-full h-[54px] flex-col items-center justify-center gap-1 text-muted-foreground hover:text-destructive transition-colors duration-200"
+          title="Danh sách hồ sơ vụ án"
+          className="group relative flex w-full h-[54px] flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors duration-200"
         >
-          <LogOut className="size-4.5 transition-transform group-hover:-translate-x-0.5 active:scale-95" />
+          <LayoutGrid className="size-4.5 transition-transform group-hover:scale-105 active:scale-95" />
           <span className="font-sans text-[0.55rem] font-bold tracking-wider">
-            Thoát
+            Hồ sơ
           </span>
         </Link>
       </div>

@@ -46,12 +46,12 @@ export function ResponsiveLayout({
       )}>
         
         {/* COLUMN 0: Left Navigation Sidebar (Desktop only) - Stretches from top to bottom */}
-        <LeftActivityBar />
+        {pathname !== '/dashboard' && <LeftActivityBar />}
 
         {/* Right side content pane wrapping header, toolbar and workspace */}
         <div className="flex-1 flex flex-col h-full overflow-hidden relative">
 
-          <SystemHeader />
+          {pathname !== '/dashboard' && <SystemHeader />}
 
           {/* WORKSPACE TOOLBAR (Only shown on Desktop) */}
           <div className="hidden lg:flex items-center justify-between border-b border-border/40 py-2.5 px-4 bg-card/10 text-[0.65rem] font-mono select-none z-20">
@@ -154,9 +154,11 @@ export function ResponsiveLayout({
           )}
 
           {/* BOTTOM NAVIGATION BAR (Hidden on Desktop) */}
-          <div className="mt-auto lg:hidden">
-            <BottomNav />
-          </div>
+          {pathname !== '/dashboard' && (
+            <div className="mt-auto lg:hidden">
+              <BottomNav />
+            </div>
+          )}
 
         </div>
 
