@@ -971,7 +971,7 @@ export default function MarketingLandingPage() {
       </footer>
 
       {/* FLOATING CONTROL PANELS */}
-      <div className="fixed bottom-6 right-6 z-50 font-mono text-[0.6rem] flex flex-col items-end gap-2.5">
+      <div className="fixed bottom-6 right-6 z-[999] font-mono text-[0.6rem] flex flex-col items-end gap-2.5">
         {/* Toggle options popover */}
         {showThemeSelector && (
           <div className="bg-card/95 backdrop-blur-md border border-primary/30 rounded-lg p-3 shadow-[0_4px_24px_rgba(0,0,0,0.5)] flex flex-col gap-1.5 w-44 animate-fade-slide-up">
