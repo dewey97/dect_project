@@ -41,14 +41,9 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
   
   const [messages, setMessages] = useState<MessageLog[]>([
     {
-      id: 'init-sys',
-      type: 'system',
-      text: 'SECURE LINK // COM_CHANNEL_MINH // ESTABLISHED'
-    },
-    {
       id: 'init-asst',
       type: 'assistant',
-      text: 'DETECTIVE. Connecting secure operator coordination log...'
+      text: 'Xin chào thám tử, tôi là điều phối viên Minh. Tôi sẽ đồng hành cùng bạn trong vụ án này.'
     }
   ])
 
@@ -66,11 +61,6 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
       if (data) {
         setIntel(data)
         setMessages([
-          {
-            id: 'init-sys',
-            type: 'system',
-            text: 'SECURE LINK // COM_CHANNEL_MINH // ESTABLISHED'
-          },
           {
             id: 'init-asst',
             type: 'assistant',
@@ -251,18 +241,6 @@ export function AssistantPanel({ showHeader = true, className }: AssistantPanelP
           description="Review coordinated timelines, attachments, and graded hints."
         />
       )}
-
-      {/* Connection status header bar */}
-      <div className="mx-4 mb-3 border border-primary/20 bg-primary/5 rounded-lg p-2.5 flex items-center justify-between font-mono text-[0.6rem] text-primary">
-        <div className="flex items-center gap-1.5">
-          <Wifi className="size-3.5 animate-pulse" />
-          <span>LINK STATUS: SECURE_STABLE</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <Shield className="size-3.5" />
-          <span>SEC // LEVEL II</span>
-        </div>
-      </div>
 
       <div className="flex-1 overflow-y-auto px-4 flex flex-col gap-4">
         {messages.map((msg) => {
