@@ -72,8 +72,8 @@ export default function DeviceSimulatorPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center font-mono text-xs text-primary animate-pulse">
-        CONNECTING SECURE DEVICE FEED...
+      <div className="flex min-h-[400px] items-center justify-center font-sans text-xs text-primary animate-pulse">
+        ĐANG TẢI DỮ LIỆU VẬT CHỨNG...
       </div>
     )
   }
@@ -84,16 +84,16 @@ export default function DeviceSimulatorPage() {
         <div className="pt-4">
           <Link
             href="/evidence"
-            className="flex items-center gap-1.5 font-mono text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
+            className="flex items-center gap-1.5 font-sans text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
           >
             <ArrowLeft className="size-3.5" />
-            Back to Evidence Locker
+            Quay lại Kho Vật chứng
           </Link>
         </div>
         <EmptyState
           icon={ShieldAlert}
-          title="Device Not Found"
-          description="The requested device is not registered in the custody log."
+          title="Không tìm thấy vật chứng"
+          description="Vật chứng yêu cầu không tồn tại trong sổ đăng ký tiếp nhận."
         />
       </div>
     )
@@ -108,10 +108,10 @@ export default function DeviceSimulatorPage() {
         <div className="pt-4">
           <Link
             href="/evidence"
-            className="flex items-center gap-1.5 font-mono text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
+            className="flex items-center gap-1.5 font-sans text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
           >
             <ArrowLeft className="size-3.5" />
-            Back to Evidence Locker
+            Quay lại Kho Vật chứng
           </Link>
         </div>
 
@@ -121,8 +121,8 @@ export default function DeviceSimulatorPage() {
             <Lock className="size-7" />
           </div>
           
-          <h3 className="font-mono text-sm font-bold text-destructive uppercase tracking-widest z-10 flex items-center gap-1.5">
-            <AlertCircle className="size-4" /> TRUY CẬP BỊ TỪ CHỐI // THIẾT BỊ BỊ KHÓA
+          <h3 className="font-sans text-sm font-bold text-destructive uppercase tracking-widest z-10 flex items-center gap-1.5">
+            <AlertCircle className="size-4" /> TRUY CẬP BỊ TỪ CHỐI // THIẾT BỊ ĐANG KHÓA
           </h3>
           
           <p className="mt-3 text-pretty text-xs text-muted-foreground max-w-[320px] leading-relaxed z-10 font-sans">
@@ -160,10 +160,10 @@ export default function DeviceSimulatorPage() {
       <div className="pt-2">
         <Link
           href="/evidence"
-          className="flex items-center gap-1.5 font-mono text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
+          className="flex items-center gap-1.5 font-sans text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
         >
           <ArrowLeft className="size-3.5" />
-          Back to Evidence Locker
+          Quay lại Kho Vật chứng
         </Link>
       </div>
 
@@ -180,31 +180,31 @@ export default function DeviceSimulatorPage() {
           <Cpu className="size-6 text-primary" />
         </div>
         
-        <span className="font-mono text-xs font-bold text-foreground uppercase tracking-widest z-10">
-          SECTOR RECONSTRUCTION IN PROGRESS
+        <span className="font-sans text-xs font-bold text-foreground uppercase tracking-widest z-10">
+          ĐANG PHỤC HỒI DỮ LIỆU TÀI LIỆU
         </span>
         
-        <p className="mt-2 text-pretty text-xs text-muted-foreground max-w-[260px] leading-relaxed z-10">
-          This partition ({device.kind.toUpperCase()}) is currently being decrypted via brute-force dictionary attacks. Reconstructed data blocks will populate upon completion.
+        <p className="mt-2 text-pretty text-xs text-muted-foreground max-w-[260px] leading-relaxed z-10 font-sans">
+          Thiết bị này đang được tiến hành phân tích nghiệp vụ. Các tệp tin, hình ảnh và lịch sử liên lạc sẽ được tự động hiển thị đầy đủ khi hoàn tất.
         </p>
 
-        <span className="font-mono text-[0.6rem] text-primary mt-4 border border-primary/30 bg-primary/5 rounded px-2 py-0.5 animate-pulse z-10">
-          ESTIMATED TIME REMAINING: 4H 12M
+        <span className="font-sans text-[0.6rem] text-primary mt-4 border border-primary/30 bg-primary/5 rounded px-2 py-0.5 animate-pulse z-10">
+          THỜI GIAN DỰ KIẾN: 5 PHÚT
         </span>
       </div>
 
       {/* 4. Recovery Status Panel */}
       <RecoveryStatusPanel
         progress={device.recoveryLevel}
-        statusText={`PARTITION BRUTE-FORCE IN PROGRESS`}
+        statusText={`ĐANG TRÍCH XUẤT DỮ LIỆU`}
       />
 
       {/* 5. Chain of Custody / Integrity Indicator */}
       <IntegrityIndicator
-        recoveredBy="DET. NIGHTJAR"
+        recoveredBy="ĐTV. NOCTURNE"
         timestamp={device.lastUpdated}
         integrityStatus={device.recoveryLevel === 100 ? 'secured' : 'analyzing'}
-        chainOfCustody="VERIFIED LOG"
+        chainOfCustody="BIÊN BẢN HỢP LỆ"
       />
     </div>
   )

@@ -15,11 +15,11 @@ export function RecoveryStatusPanel({
 }: RecoveryStatusPanelProps) {
   return (
     <div className={cn(
-      'rounded-lg border border-border/60 bg-card/25 p-3 flex flex-col gap-2 font-mono text-[0.65rem] text-muted-foreground',
+      'rounded-lg border border-border/60 bg-card/25 p-3.5 flex flex-col gap-2 font-sans text-[0.65rem] text-muted-foreground',
       className
     )}>
       <div className="flex items-center justify-between font-bold text-foreground">
-        <span>TIẾN ĐỘ KHÔI PHỤC PHÁP Y</span>
+        <span>TIẾN TRÌNH KHÔI PHỤC DỮ LIỆU</span>
         <span className="text-primary">{progress}%</span>
       </div>
 
@@ -35,8 +35,8 @@ export function RecoveryStatusPanel({
       </div>
 
       {statusText && (
-        <span className="text-[0.6rem] text-muted-foreground/80 uppercase">
-          TRẠNG THÁI PHÂN VÙNG // {statusText}
+        <span className="text-[0.6rem] text-muted-foreground/80 uppercase font-semibold">
+          TRẠNG THÁI: {statusText}
         </span>
       )}
     </div>

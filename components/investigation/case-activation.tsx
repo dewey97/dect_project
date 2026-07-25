@@ -17,14 +17,13 @@ export function CaseActivation() {
   const [bootStep, setBootStep] = useState(0)
 
   const LOG_SEQUENCE = [
-    'SYS // INITIATING NOCTURNE COGNITIVE OS',
-    'SYS // ĐIỂM TRUY CẬP: VĂN PHÒNG_NIGHTJAR',
-    'LINK // BẢO MẬT ĐƯỜNG TRUYỀN COM_CHANNEL... OK',
-    'MODULE // TẢI MÔ-ĐUN GIẢI MÃ v4.81... OK',
-    'MODULE // TẢI BỘ XEM DỮ LIỆU EXTRACTION CHIP-OFF... OK',
-    'DATA // PHÂN TÍCH CHỈ MỤC THIẾT BỊ THU GIỮ... OK',
-    'SECURITY // THIẾT LẬP PHONG BÌ NIÊM PHONG PHÁP Y... OK',
-    'SYS // MÁY TRẠM NOCTURNE ĐÃ SẴN SÀNG HOẠT ĐỘNG'
+    'HỆ THỐNG // ĐANG KHỞI ĐỘNG HỒ SƠ CHUYÊN ÁN NOCTURNE',
+    'HỆ THỐNG // ĐIỂM TRUY CẬP: VĂN PHÒNG ĐIỀU TRA',
+    'KÊNH LIÊN LẠC // THIẾT LẬP ĐƯỜNG TRUYỀN BẢO MẬT... HOÀN TẤT',
+    'DỮ LIỆU // TẢI HỒ SƠ VẬT CHỨNG VÀ TÀI LIỆU... HOÀN TẤT',
+    'DỮ LIỆU // ĐỒNG BỘ BẢN ĐỒ CHỨNG CỨ VẬT LÝ... HOÀN TẤT',
+    'PHÁP LÝ // XÁC MINH BIÊN BẢN NIÊM PHONG... HOÀN TẤT',
+    'HỆ THỐNG // KHÔNG GIAN ĐIỀU TRA ĐÃ SẴN SÀNG HOẠT ĐỘNG'
   ]
 
   useEffect(() => {

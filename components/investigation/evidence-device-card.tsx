@@ -28,23 +28,6 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
         (isUnlocked || isCompleted) && 'border-emerald-500/30'
       )}
     >
-      {/* Forensic Scanning Overlay (Only on analyzing/unlocking) */}
-      {(isAnalyzing || isUnlocking) && (
-        <div className="absolute inset-x-0 h-1/2 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none z-0 animate-scan-line" />
-      )}
-
-      {/* Case ID / Barcode Tape Header */}
-      <div className="flex items-start justify-between gap-3 border-b border-border/40 pb-2.5 z-10">
-        <div className="flex flex-col">
-          <span className="font-sans text-[0.65rem] font-bold text-primary tracking-wide uppercase">
-            Mã bằng chứng: {device.evidenceId}
-          </span>
-          <span className="font-sans text-[0.55rem] text-muted-foreground mt-0.5">
-            Thời gian ghi nhận: {device.lastUpdated}
-          </span>
-        </div>
-      </div>
-
       {/* Main Info */}
       <div className="mt-3 z-10">
         <h4 className="font-sans text-sm font-bold text-foreground group-hover:text-primary transition-colors">
@@ -75,8 +58,8 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
           <div className="flex items-center gap-2">
             <Hourglass className="size-4 text-amber-500 animate-spin shrink-0" />
             <div className="min-w-0 flex-1">
-              <p className="font-mono text-[0.625rem] font-bold text-amber-500 uppercase tracking-wider">
-                UNLOCKING
+              <p className="font-sans text-[0.65rem] font-bold text-amber-500 uppercase tracking-wider">
+                ĐANG MỞ KHÓA
               </p>
               <p className="font-sans text-[0.65rem] text-muted-foreground truncate leading-none">
                 {device.previewStats}
@@ -89,8 +72,8 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
           <div className="flex items-center gap-2">
             <Cpu className="size-4 text-primary animate-pulse shrink-0" />
             <div className="min-w-0 flex-1">
-              <p className="font-mono text-[0.625rem] font-bold text-primary uppercase tracking-wider">
-                ANALYZING SECTORS
+              <p className="font-sans text-[0.65rem] font-bold text-primary uppercase tracking-wider">
+                ĐANG TRÍCH XUẤT DỮ LIỆU
               </p>
               <p className="font-sans text-[0.65rem] text-muted-foreground truncate leading-none">
                 {device.previewStats}
@@ -103,8 +86,8 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
           <div className="flex items-center gap-2">
             <Unlock className="size-4 text-emerald-500 shrink-0" />
             <div className="min-w-0 flex-1">
-              <p className="font-mono text-[0.625rem] font-bold text-emerald-500 uppercase tracking-wider">
-                DECRYPTED // ONLINE
+              <p className="font-sans text-[0.65rem] font-bold text-emerald-500 uppercase tracking-wider">
+                ĐÃ TRUY CẬP // SẴN SÀNG
               </p>
               <p className="font-sans text-[0.65rem] text-muted-foreground truncate leading-none">
                 {device.previewStats}
@@ -115,9 +98,9 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
       </div>
 
       {/* Bottom Section: Progress & Custody Details */}
-      <div className="mt-4 pt-2.5 border-t border-border/40 flex items-center justify-between z-10 text-[0.6rem] font-mono text-muted-foreground">
+      <div className="mt-4 pt-2.5 border-t border-border/40 flex items-center justify-between z-10 text-[0.6rem] font-sans text-muted-foreground">
         <div>
-          <span>RECOVERY: </span>
+          <span>DỮ LIỆU THU THẬP: </span>
           <span className={cn(
             'font-bold',
             isCompleted && 'text-emerald-500',
@@ -130,14 +113,14 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
 
         <div className="flex items-center gap-1">
           {isLocked ? (
-            <span className="text-destructive font-bold text-[0.55rem] tracking-wider">SECURE_LOCK</span>
+            <span className="text-destructive font-bold text-[0.55rem] tracking-wider">ĐANG KHÓA</span>
           ) : isCompleted || isUnlocked ? (
             <span className="text-emerald-500 font-bold text-[0.55rem] tracking-wider flex items-center gap-0.5">
               <Eye className="size-3" />
-              INSPECT
+              MỞ XEM
             </span>
           ) : (
-            <span className="text-primary font-bold text-[0.55rem] tracking-wider">BUSY</span>
+            <span className="text-primary font-bold text-[0.55rem] tracking-wider">ĐANG XỬ LÝ</span>
           )}
         </div>
       </div>

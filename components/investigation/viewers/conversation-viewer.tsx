@@ -86,19 +86,19 @@ export function ConversationViewer({ threads }: ConversationViewerProps) {
                 )}
               >
                 <span className={cn(
-                  'font-mono text-[0.55rem] uppercase mb-1',
+                  'font-sans text-[0.55rem] uppercase mb-1',
                   msg.role === 'sent' ? 'text-primary/70' : 'text-muted-foreground'
                 )}>
-                  {msg.role === 'corrupted' ? 'PHÂN ĐOẠN DỮ LIỆU BỊ HỎNG' : `${msg.sender.toUpperCase()} // ${msg.timestamp}`}
+                  {msg.role === 'corrupted' ? 'TIN NHẮN ĐÃ BỊ XÓA' : `${msg.sender} vào ${msg.timestamp}`}
                 </span>
                 
                 {msg.role === 'corrupted' ? (
                   <>
-                    <p className="font-mono text-[0.7rem] leading-relaxed text-muted-foreground select-none">
+                    <p className="font-sans text-[0.7rem] leading-relaxed text-muted-foreground select-none italic">
                       {msg.text}
                     </p>
-                    <span className="text-[0.55rem] text-destructive font-semibold font-mono mt-1 flex items-center gap-1">
-                      <AlertTriangle className="size-3" /> LỖI TOÀN VẸN: PHÂN VÙNG BỊ HỦY HOẠI
+                    <span className="text-[0.55rem] text-destructive font-semibold font-sans mt-1 flex items-center gap-1">
+                      <AlertTriangle className="size-3" /> KHÔNG THỂ KHÔI PHỤC NỘI DUNG TẤM TẬP CHỨNG CỨ
                     </span>
                   </>
                 ) : (

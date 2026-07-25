@@ -49,14 +49,14 @@ export default function EvidencePage() {
     return (
       <div className="pb-6">
         <ScreenHeader
-          eyebrow="Evidence Locker"
-          title="Forensics Lab"
-          description="Confiscated digital devices and intelligence files."
+          eyebrow="Tủ Vật Chứng"
+          title="Phòng Vật Chứng"
+          description="Nơi lưu trữ các tài liệu điều tra và tang vật thu giữ."
         />
         <EmptyState
           icon={ShieldAlert}
-          title="Forensics Offline"
-          description="No digital evidence has been recovered."
+          title="Chưa Có Vật Chứng"
+          description="Chưa có tài liệu hoặc thiết bị vật chứng nào được thu thập."
         />
       </div>
     )
@@ -65,9 +65,9 @@ export default function EvidencePage() {
   return (
     <div className="pb-6">
       <ScreenHeader
-        eyebrow={`FILE: ${activeCase.code}`}
-        title="Forensic Workspace"
-        description="Review decrypted devices, text records, audio pings, and tracking files."
+        eyebrow={`HỒ SƠ CHUYÊN ÁN: ${activeCase.code}`}
+        title="Kho Tài Liệu & Vật Chứng"
+        description="Xem xét các thiết bị vật chứng, hồ sơ văn bản, ghi âm và dấu vết di chuyển thu thập được."
       />
 
       <div className="flex flex-col gap-6 px-4">
@@ -77,8 +77,8 @@ export default function EvidencePage() {
           <section className="flex flex-col gap-3">
             <div className="flex items-center gap-2 border-b border-border/50 pb-2">
               <Cpu className="size-4 text-primary" />
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
-                Digital Devices ({devices.length})
+              <h3 className="font-sans text-xs font-bold uppercase tracking-wider text-foreground">
+                Thiết bị vật chứng ({devices.length})
               </h3>
             </div>
             <div className="grid grid-cols-1 gap-3">
@@ -97,9 +97,9 @@ export default function EvidencePage() {
                   return (
                     <div key={device.id} className="relative select-none cursor-not-allowed">
                       <EvidenceDeviceCard device={displayDevice} />
-                      <div className="absolute top-2 right-2 bg-destructive/10 border border-destructive/20 text-destructive text-[0.55rem] font-mono font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                      <div className="absolute top-2 right-2 bg-destructive/10 border border-destructive/20 text-destructive text-[0.55rem] font-sans font-bold px-2 py-0.5 rounded flex items-center gap-1">
                         <Lock className="size-3" />
-                        CHECKPOINT LOCKED
+                        ĐANG KHÓA CẦN MỞ KHÓA
                       </div>
                     </div>
                   )
@@ -120,8 +120,8 @@ export default function EvidencePage() {
           <section className="flex flex-col gap-3">
             <div className="flex items-center gap-2 border-b border-border/50 pb-2">
               <FileText className="size-4 text-primary" />
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
-                Documents ({documents.length})
+              <h3 className="font-sans text-xs font-bold uppercase tracking-wider text-foreground">
+                Tài liệu & Thư từ ({documents.length})
               </h3>
             </div>
             <div className="flex flex-col gap-2.5">
@@ -137,8 +137,8 @@ export default function EvidencePage() {
           <section className="flex flex-col gap-3">
             <div className="flex items-center gap-2 border-b border-border/50 pb-2">
               <Mic className="size-4 text-primary" />
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
-                Audio Evidence ({audioEvidence.length})
+              <h3 className="font-sans text-xs font-bold uppercase tracking-wider text-foreground">
+                Tệp ghi âm ({audioEvidence.length})
               </h3>
             </div>
             <div className="flex flex-col gap-2.5">
@@ -154,8 +154,8 @@ export default function EvidencePage() {
           <section className="flex flex-col gap-3">
             <div className="flex items-center gap-2 border-b border-border/50 pb-2">
               <MapPin className="size-4 text-primary" />
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
-                Location Evidence ({locationEvidence.length})
+              <h3 className="font-sans text-xs font-bold uppercase tracking-wider text-foreground">
+                Dấu vết di chuyển ({locationEvidence.length})
               </h3>
             </div>
             <div className="flex flex-col gap-2.5">
