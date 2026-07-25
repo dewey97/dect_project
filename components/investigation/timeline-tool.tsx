@@ -22,65 +22,59 @@ interface EvidenceCard {
 }
 
 export function TimelineTool() {
-  const [activeSuspect, setActiveSuspect] = useState<'thomas' | 'marsh' | 'foreman'>('thomas')
+  const [activeSuspect, setActiveSuspect] = useState<'khang' | 'mai' | 'vu'>('khang')
 
   // Initial timeline slots configuration for the active suspect
   const [slots, setSlots] = useState<Record<string, TimelineSlot[]>>({
-    thomas: [
+    khang: [
       { 
-        time: '18:20', 
-        label: 'Nhật ký bến cảng', 
-        expectedId: 't-1', 
+        time: '08:30', 
+        label: 'Lập di chúc', 
+        expectedId: 'k-1', 
         currentCardId: null 
       },
       { 
-        time: '23:14', 
+        time: '20:10', 
         label: 'Lời khai ngoại phạm', 
-        expectedId: 't-2', 
+        expectedId: 'k-2', 
         currentCardId: null,
-        clashCardId: 't-3',
-        conflictMsg: 'Thomas khai đang ngủ ở nhà, nhưng dữ liệu định vị GPS lại ghi nhận thiết bị di động của anh ta đang di chuyển tại Cầu cảng số 9!'
+        clashCardId: 'k-3',
+        conflictMsg: 'Khang nhắn tin báo đang xem bóng đá tại nhà riêng, nhưng định vị GPS thực tế lại ghi nhận điện thoại của anh ta đang di chuyển tại khu giải tỏa Bờ Sông!'
       },
       { 
-        time: '23:41', 
-        label: 'Tin nhắn Burner Phone', 
-        expectedId: 't-4', 
-        currentCardId: null 
-      },
-      { 
-        time: '00:30', 
-        label: '[ĐIỂM MÙ THỜI GIAN]', 
-        expectedId: 't-5', 
+        time: '21:00', 
+        label: 'Mất tín hiệu', 
+        expectedId: 'k-4', 
         currentCardId: null 
       }
     ],
-    marsh: [
+    mai: [
       { 
-        time: '18:20', 
-        label: 'Gửi Email báo cáo', 
+        time: '11:30', 
+        label: 'Lịch sử tìm kiếm', 
         expectedId: 'm-1', 
         currentCardId: null 
       },
       { 
-        time: '23:58', 
-        label: 'Ghi âm Cầu cảng', 
+        time: '20:15', 
+        label: 'Ngoại phạm tại Spa', 
         expectedId: 'm-2', 
         currentCardId: null,
         clashCardId: 'm-3',
-        conflictMsg: 'Marsh khai rằng ông ta đã về nhà lúc 23:30, nhưng file ghi âm tang vật thu được tại Cầu cảng lúc 23:58 vẫn ghi nhận tiếng nói lầm bầm cùng tiếng hải âu ở nền!'
+        conflictMsg: 'Mai khai đang làm liệu trình tại Spa từ 19:30 đến 21:30, nhưng lại phát hiện vé gửi xe máy của cô ấy tại bãi đất gần hiện trường lúc 20:15!'
       }
     ],
-    foreman: [
+    vu: [
       { 
         time: '18:20', 
-        label: 'Ký sổ sách bến cảng', 
-        expectedId: 'f-1', 
+        label: 'Hồ sơ đo đạc khống', 
+        expectedId: 'v-1', 
         currentCardId: null 
       },
       { 
-        time: '23:14', 
-        label: 'Camera Cổng kho 12', 
-        expectedId: 'f-2', 
+        time: '20:30', 
+        label: 'Camera an ninh', 
+        expectedId: 'v-2', 
         currentCardId: null 
       }
     ]
@@ -88,17 +82,20 @@ export function TimelineTool() {
 
   // Available evidence cards to be placed
   const [cards, setCards] = useState<EvidenceCard[]>([
-    // Thomas cards
-    { id: 't-1', title: 'Bản vận đơn sai lệch', owner: 'Thomas', type: 'forensic', content: 'Số container không khớp sổ sách tại cầu cảng.' },
-    { id: 't-2', title: 'Tin nhắn: "Tôi đang ngủ"', owner: 'Thomas', type: 'testimony', content: 'Thomas nhắn cho Marsh báo đã về nhà ngủ sớm.' },
-    { id: 't-3', title: 'GPS: Cầu cảng số 9', owner: 'Thomas', type: 'forensic', content: 'Định vị GPS ghi nhận thiết bị tại Cầu cảng số 9 lúc 23:14.' },
-    { id: 't-4', title: 'Tin nhắn hẹn gặp', owner: 'Thomas', type: 'forensic', content: 'Tin nhắn từ Marsh yêu cầu gặp mặt không mang điện thoại.' },
-    { id: 't-5', title: 'Mất tín hiệu hoàn toàn', owner: 'Thomas', type: 'forensic', content: 'Điện thoại bị tắt nguồn/hủy sim đột ngột.' },
+    // Khang cards
+    { id: 'k-1', title: 'Bản di chúc viết tay', owner: 'Khang', type: 'forensic', content: 'Di chúc tự viết tay để lại toàn bộ tài sản cho bố mẹ đẻ.' },
+    { id: 'k-2', title: 'Tin nhắn: "Tôi đang ở nhà"', owner: 'Khang', type: 'testimony', content: 'Khang nhắn tin cho bạn báo đang ở nhà xem bóng đá.' },
+    { id: 'k-3', title: 'GPS: Khu giải tỏa Bờ Sông', owner: 'Khang', type: 'forensic', content: 'Định vị GPS ghi nhận thiết bị tại căn nhà cũ lúc 20:10.' },
+    { id: 'k-4', title: 'Mất tín hiệu điện thoại', owner: 'Khang', type: 'forensic', content: 'Điện thoại của Khang bị tắt nguồn đột ngột từ 21:00.' },
     
-    // Marsh cards
-    { id: 'm-1', title: 'Email: Sửa đổi bản kê', owner: 'V. Marsh', type: 'forensic', content: 'Marsh gửi email từ chối xác nhận lỗi hàng hóa.' },
-    { id: 'm-2', title: 'Tệp ghi âm 004', owner: 'V. Marsh', type: 'forensic', content: 'Ghi âm âm thanh nói chuyện lầm bầm của Marsh.' },
-    { id: 'm-3', title: 'Lời khai: Về nhà lúc 23:30', owner: 'V. Marsh', type: 'testimony', content: 'Marsh khai đã lái xe về nhà nghỉ ngơi từ 23:30.' }
+    // Mai cards
+    { id: 'm-1', title: 'Lịch sử tìm kiếm giám định', owner: 'Trần Ngọc Mai', type: 'forensic', content: 'Tìm kiếm dịch vụ giám định chữ viết tư nhân lúc 11:30.' },
+    { id: 'm-2', title: 'Lời khai: Đi Spa chăm sóc da', owner: 'Trần Ngọc Mai', type: 'testimony', content: 'Mai khai đi làm đẹp tại Spa quận Hai Bà Trưng cả tối.' },
+    { id: 'm-3', title: 'Vé gửi xe gần hiện trường', owner: 'Trần Ngọc Mai', type: 'forensic', content: 'Phát hiện vé gửi xe máy của Mai tại bãi đất gần hiện trường lúc 20:15.' },
+
+    // Vũ cards
+    { id: 'v-1', title: 'Bản vẽ đo đạc sai lệch', owner: 'Lê Quang Vũ', type: 'forensic', content: 'Vũ ký biên bản khống diện tích đất đền bù.' },
+    { id: 'v-2', title: 'Camera ghi nhận bóng người', owner: 'Lê Quang Vũ', type: 'forensic', content: 'Camera nhà đối diện ghi nhận bóng dáng giống Vũ lúc 20:45.' }
   ])
 
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
@@ -158,9 +155,9 @@ export function TimelineTool() {
         </span>
         <div className="flex items-center gap-3">
           {[
-            { id: 'thomas' as const, name: 'T. Vance (Nạn nhân)', color: 'border-primary' },
-            { id: 'marsh' as const, name: 'V. Marsh (Quản lý)', color: 'border-destructive' },
-            { id: 'foreman' as const, name: 'Quản Đốc (Bến tàu)', color: 'border-amber-600' }
+            { id: 'khang' as const, name: 'N.V. Khang (Nạn nhân)', color: 'border-primary' },
+            { id: 'mai' as const, name: 'T.N. Mai (Vợ)', color: 'border-destructive' },
+            { id: 'vu' as const, name: 'L.Q. Vũ (Em rể)', color: 'border-amber-600' }
           ].map((suspect) => (
             <button
               key={suspect.id}
@@ -284,7 +281,11 @@ export function TimelineTool() {
 
           <div className="flex flex-col gap-2.5 overflow-y-auto max-h-[300px] pr-1">
             {cards
-              .filter(card => card.owner.toLowerCase().includes(activeSuspect === 'thomas' ? 'thomas' : activeSuspect === 'marsh' ? 'marsh' : 'foreman'))
+              .filter(card => {
+                if (activeSuspect === 'khang') return card.owner.toLowerCase().includes('khang')
+                if (activeSuspect === 'mai') return card.owner.toLowerCase().includes('mai')
+                return card.owner.toLowerCase().includes('vũ') || card.owner.toLowerCase().includes('vu')
+              })
               .map((card) => {
                 const isPlaced = Object.values(slots).flat().some(s => s.currentCardId === card.id)
 
