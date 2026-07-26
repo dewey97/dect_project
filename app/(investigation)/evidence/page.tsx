@@ -65,7 +65,6 @@ export default function EvidencePage() {
   return (
     <div className="pb-6">
       <ScreenHeader
-        eyebrow={`HỒ SƠ CHUYÊN ÁN: ${activeCase.code}`}
         title="Kho Tài Liệu & Vật Chứng"
         description="Xem xét các thiết bị vật chứng, hồ sơ văn bản, ghi âm và dấu vết di chuyển thu thập được."
       />

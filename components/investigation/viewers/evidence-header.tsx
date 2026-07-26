@@ -63,7 +63,7 @@ export function EvidenceHeader({ device }: EvidenceHeaderProps) {
         <div className="mt-4 pt-3.5 border-t border-border/40 grid grid-cols-1 md:grid-cols-2 gap-3 text-[0.65rem] font-mono text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <Shield className="size-3.5 text-emerald-500 shrink-0" />
-            <span>KIỂM TRA TOÀN VẸN: <span className="text-emerald-500 font-bold">KHỚP MÃ HẤP SHA-256 (SECURED)</span></span>
+            <span>TÌNH TRẠNG NIÊM PHONG: <span className="text-emerald-500 font-bold">NGUYÊN VẸN</span></span>
           </div>
           <div className="flex items-center gap-1.5 md:justify-end">
             <Clock className="size-3.5 text-primary shrink-0" />

@@ -25,6 +25,7 @@ export interface Case {
   progress: number
   hidden?: boolean
   location: string
+  coverImage?: string
   openedAt?: string
 }
 
@@ -76,6 +77,8 @@ export interface EvidenceDevice {
   evidenceId: string
   recoveryLevel: number
   lastUpdated: string
+  thumbnail?: string
+  description?: string
   previewStats?: string
   pinLength?: number
 }
@@ -97,6 +100,7 @@ export interface Evidence {
   recoveredBy: string
   integrityStatus: 'secured' | 'corrupted' | 'analyzing'
   chainOfCustody: string
+  thumbnail?: string
 }
 
 /** Message content in a thread */

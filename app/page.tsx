@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { BrandMark } from '@/components/investigation/brand-mark'
@@ -36,8 +38,11 @@ import {
   Search,
   Palette,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from 'lucide-react'
+import { UserNav } from '@/components/auth/user-nav'
+import { LandingBanner } from '@/components/public/landing-banner'
 import { cn } from '@/lib/utils'
 
 export default function MarketingLandingPage() {
@@ -132,17 +137,8 @@ export default function MarketingLandingPage() {
         className="noir-scanlines pointer-events-none absolute inset-0 opacity-15 z-20"
       />
 
-      {/* TOP ANNOUNCEMENT TAPE BANNER */}
-      <div className="w-full relative z-50 overflow-hidden flex items-center justify-center pointer-events-none">
-        <div 
-          className="w-full h-6.5 bg-amber-500 text-black flex items-center justify-center px-6 font-mono text-[0.72rem] font-black uppercase tracking-[0.15em] border-b border-black/80"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.06) 10px, rgba(0,0,0,0.06) 20px)'
-          }}
-        >
-          <span>✦ CẬP NHẬT: VỤ ÁN MỚI ĐÃ ĐƯỢC KÍCH HOẠT ✦</span>
-        </div>
-      </div>
+      {/* TOP ANNOUNCEMENT TAPE BANNER (DYNAMIC FROM DB) */}
+      <LandingBanner />
 
       {/* STICKY HEADER NAV */}
       <header className="sticky top-0 w-full z-50 border-b border-border/10 bg-card/90 backdrop-blur-md">
@@ -182,14 +178,8 @@ export default function MarketingLandingPage() {
               </span>
             </button>
 
-            {/* Nút Đăng nhập máy trạm (Chỉ để icon User/LogIn) */}
-            <button 
-              onClick={() => router.push('/activate')}
-              className="p-2 hover:text-primary transition-colors cursor-pointer flex items-center justify-center"
-              title="Đăng nhập máy trạm"
-            >
-              <User className="size-4.5" />
-            </button>
+            {/* Nút Đăng nhập / Đăng xuất (Tự động thay đổi theo trạng thái) */}
+            <UserNav />
           </div>
         </div>
       </header>

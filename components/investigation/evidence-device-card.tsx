@@ -1,6 +1,6 @@
 'use client'
 
-import { Lock, Unlock, ShieldAlert, Cpu, Eye, Hourglass } from 'lucide-react'
+import { Lock, Unlock, Cpu, Hourglass } from 'lucide-react'
 import type { Device } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -20,109 +20,50 @@ export function EvidenceDeviceCard({ device, onClick }: EvidenceDeviceCardProps)
     <div
       onClick={onClick}
       className={cn(
-        'group relative flex flex-col justify-between overflow-hidden rounded-lg border bg-card/45 backdrop-blur-md p-4 transition-all duration-200 cursor-pointer',
-        'hover:-translate-y-0.5 hover:rotate-[0.5deg] hover:shadow-md hover:shadow-primary/5 active:translate-y-0 active:rotate-0',
+        'group relative flex items-center gap-4 overflow-hidden rounded-lg border bg-card/60 backdrop-blur-md p-3 transition-all duration-300 cursor-pointer',
+        'hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/5 active:translate-y-0',
         isLocked && 'border-border/80 opacity-75',
-        isUnlocking && 'border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.05)]',
-        isAnalyzing && 'border-primary/45 shadow-[0_0_12px_rgba(199,145,55,0.08)]',
+        isUnlocking && 'border-amber-500/40',
+        isAnalyzing && 'border-primary/45',
         (isUnlocked || isCompleted) && 'border-emerald-500/30'
       )}
     >
-      {/* Main Info */}
-      <div className="mt-3 z-10">
-        <h4 className="font-sans text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+      {/* Thumbnail Area - Square */}
+      <div className={cn(
+        "relative size-20 shrink-0 overflow-hidden rounded bg-muted/30 border border-border/40",
+        isLocked && "grayscale opacity-80"
+      )}>
+        {device.thumbnail ? (
+          <img
+            src={device.thumbnail}
+            alt={device.label}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-card">
+            <Cpu className="size-8 text-muted-foreground/30" />
+          </div>
+        )}
+
+
+      </div>
+
+      {/* Info Section */}
+      <div className="flex flex-col min-w-0 flex-1 justify-center">
+        <h4 className="font-sans text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate">
           {device.label}
         </h4>
-        <span className="font-sans text-[0.6rem] text-muted-foreground uppercase">
-          Sở hữu: {device.owner}
-        </span>
-      </div>
 
-      {/* Middle State Status Block */}
-      <div className="mt-4 p-2.5 rounded bg-muted/40 border border-border/50 z-10 flex flex-col gap-1.5 min-h-[60px] justify-center">
-        {isLocked && (
-          <div className="flex items-center gap-2">
-            <Lock className="size-4 text-destructive/85 shrink-0" />
-            <div className="min-w-0">
-              <p className="font-sans text-[0.65rem] font-bold text-destructive uppercase tracking-wider">
-                ĐÃ KHÓA MẬT MÃ
-              </p>
-              <p className="font-sans text-[0.65rem] text-muted-foreground leading-none">
-                Yêu cầu giải quyết mục tiêu để mở
-              </p>
-            </div>
-          </div>
-        )}
-
-        {isUnlocking && (
-          <div className="flex items-center gap-2">
-            <Hourglass className="size-4 text-amber-500 animate-spin shrink-0" />
-            <div className="min-w-0 flex-1">
-              <p className="font-sans text-[0.65rem] font-bold text-amber-500 uppercase tracking-wider">
-                ĐANG MỞ KHÓA
-              </p>
-              <p className="font-sans text-[0.65rem] text-muted-foreground truncate leading-none">
-                {device.previewStats}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {isAnalyzing && (
-          <div className="flex items-center gap-2">
-            <Cpu className="size-4 text-primary animate-pulse shrink-0" />
-            <div className="min-w-0 flex-1">
-              <p className="font-sans text-[0.65rem] font-bold text-primary uppercase tracking-wider">
-                ĐANG TRÍCH XUẤT DỮ LIỆU
-              </p>
-              <p className="font-sans text-[0.65rem] text-muted-foreground truncate leading-none">
-                {device.previewStats}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {(isUnlocked || isCompleted) && (
-          <div className="flex items-center gap-2">
-            <Unlock className="size-4 text-emerald-500 shrink-0" />
-            <div className="min-w-0 flex-1">
-              <p className="font-sans text-[0.65rem] font-bold text-emerald-500 uppercase tracking-wider">
-                ĐÃ TRUY CẬP // SẴN SÀNG
-              </p>
-              <p className="font-sans text-[0.65rem] text-muted-foreground truncate leading-none">
-                {device.previewStats}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom Section: Progress & Custody Details */}
-      <div className="mt-4 pt-2.5 border-t border-border/40 flex items-center justify-between z-10 text-[0.6rem] font-sans text-muted-foreground">
-        <div>
-          <span>DỮ LIỆU THU THẬP: </span>
-          <span className={cn(
-            'font-bold',
-            isCompleted && 'text-emerald-500',
-            isLocked && 'text-destructive',
-            (isAnalyzing || isUnlocking) && 'text-primary'
-          )}>
-            {device.recoveryLevel}%
+        {/* Status text / Description */}
+        <p className="mt-1.5 font-sans text-[0.7rem] text-muted-foreground line-clamp-3 leading-relaxed">
+          {device.description}
+          <span className="block mt-0.5 font-semibold">
+            {isLocked && "Trạng thái: Đang bị khóa mã bảo mật."}
+            {isUnlocking && "Trạng thái: Đang tiến hành bẻ khóa..."}
+            {isAnalyzing && "Trạng thái: Đang phân tích dữ liệu..."}
+            {(isUnlocked || isCompleted) && "Trạng thái: Đã mở khóa thành công."}
           </span>
-        </div>
-
-        <div className="flex items-center gap-1">
-          {isLocked ? (
-            <span className="text-destructive font-bold text-[0.55rem] tracking-wider">ĐANG KHÓA</span>
-          ) : isCompleted || isUnlocked ? (
-            <span className="text-emerald-500 font-bold text-[0.55rem] tracking-wider flex items-center gap-0.5">
-              <Eye className="size-3" />
-              MỞ XEM
-            </span>
-          ) : (
-            <span className="text-primary font-bold text-[0.55rem] tracking-wider">ĐANG XỬ LÝ</span>
-          )}
-        </div>
+        </p>
       </div>
     </div>
   )

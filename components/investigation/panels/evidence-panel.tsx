@@ -70,7 +70,7 @@ export function EvidencePanel({ activeCase, devices, evidence, className }: Evid
                 Documents ({documents.length})
               </h3>
             </div>
-            <div className="flex flex-col gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {documents.map((item) => (
                 <EvidenceItemCard key={item.id} item={item} />
               ))}
@@ -87,7 +87,7 @@ export function EvidencePanel({ activeCase, devices, evidence, className }: Evid
                 Audio Evidence ({audioEvidence.length})
               </h3>
             </div>
-            <div className="flex flex-col gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {audioEvidence.map((item) => (
                 <EvidenceItemCard key={item.id} item={item} />
               ))}
@@ -104,7 +104,7 @@ export function EvidencePanel({ activeCase, devices, evidence, className }: Evid
                 Location Evidence ({locationEvidence.length})
               </h3>
             </div>
-            <div className="flex flex-col gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {locationEvidence.map((item) => (
                 <EvidenceItemCard key={item.id} item={item} />
               ))}

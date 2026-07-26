@@ -17,13 +17,13 @@ export function CaseActivation() {
   const [bootStep, setBootStep] = useState(0)
 
   const LOG_SEQUENCE = [
-    'HỆ THỐNG // ĐANG KHỞI ĐỘNG HỒ SƠ CHUYÊN ÁN NOCTURNE',
-    'HỆ THỐNG // ĐIỂM TRUY CẬP: VĂN PHÒNG ĐIỀU TRA',
-    'KÊNH LIÊN LẠC // THIẾT LẬP ĐƯỜNG TRUYỀN BẢO MẬT... HOÀN TẤT',
-    'DỮ LIỆU // TẢI HỒ SƠ VẬT CHỨNG VÀ TÀI LIỆU... HOÀN TẤT',
-    'DỮ LIỆU // ĐỒNG BỘ BẢN ĐỒ CHỨNG CỨ VẬT LÝ... HOÀN TẤT',
-    'PHÁP LÝ // XÁC MINH BIÊN BẢN NIÊM PHONG... HOÀN TẤT',
-    'HỆ THỐNG // KHÔNG GIAN ĐIỀU TRA ĐÃ SẴN SÀNG HOẠT ĐỘNG'
+    'HỒ SƠ // MỞ NIÊM PHONG CHUYÊN ÁN NOCTURNE...',
+    'TIẾP NHẬN // YÊU CẦU TRÍCH XUẤT TÀI LIỆU...',
+    'KIỂM KÊ // ĐỐI CHIẾU DANH MỤC VẬT CHỨNG... XÁC NHẬN',
+    'PHÁP Y // TẢI BÁO CÁO KHÁM NGHIỆM... XÁC NHẬN',
+    'HIỆN TRƯỜNG // CẬP NHẬT SƠ ĐỒ VÀ HÌNH ẢNH... XÁC NHẬN',
+    'PHÁP LÝ // KIỂM TRA THẨM QUYỀN TRUY CẬP... HỢP LỆ',
+    'SẴN SÀNG // BÀN GIAO TOÀN BỘ TÀI LIỆU ĐIỀU TRA'
   ]
 
   useEffect(() => {
@@ -120,20 +120,20 @@ export function CaseActivation() {
             <div className="flex-1 flex flex-col justify-between my-6">
               <div className="flex flex-col items-start gap-3 mt-4">
                 <div className="flex size-12 items-center justify-center rounded bg-primary/10 text-primary border border-primary/20 animate-pulse">
-                  <Cpu className="size-6" />
+                  <FolderOpen className="size-6" />
                 </div>
-                <span className="label-system text-primary mt-2">CỔNG BẢO MẬT</span>
-                <h2 className="text-xl font-bold uppercase tracking-wide">Kết nối hồ sơ chuyên án</h2>
+                <span className="label-system text-primary mt-2">KHO LƯU TRỮ TRUNG TÂM</span>
+                <h2 className="text-xl font-bold uppercase tracking-wide">Yêu cầu trích xuất hồ sơ</h2>
                 <p className="text-xs text-muted-foreground leading-relaxed font-sans">
-                  Thiết lập kết nối an toàn và đồng bộ cơ sở dữ liệu vật chứng điều tra chuyên án.
+                  Truy xuất tài liệu từ kho vật chứng và chuẩn bị không gian điều tra chuyên án.
                 </p>
               </div>
 
               {/* Terminal Logs Panel */}
               <div className="w-full rounded-lg border border-border/80 bg-card/45 p-4 my-6 font-sans text-[0.65rem] text-muted-foreground flex flex-col gap-1.5 min-h-[180px] justify-end shadow-inner">
                 <div className="flex items-center gap-1.5 text-[0.6rem] font-bold text-primary border-b border-border/20 pb-1.5 mb-1 tracking-widest uppercase">
-                  <Terminal className="size-3 shrink-0" />
-                  <span>TRÌNH TỰ TẢI HỒ SƠ CHUYÊN ÁN</span>
+                  <FileText className="size-3 shrink-0" />
+                  <span>TRÌNH TỰ TẢI HỒ SƠ VỤ ÁN</span>
                 </div>
                 <div className="flex flex-col gap-1 flex-1 justify-end">
                   {bootLogs.map((log, idx) => (
@@ -148,7 +148,7 @@ export function CaseActivation() {
                     <div className="flex items-center gap-1 text-primary animate-pulse">
                       <span className="shrink-0">&gt;</span>
                       <RefreshCw className="size-3 animate-spin" />
-                      <span>Đang tải hồ sơ chuyên án...</span>
+                      <span>Đang trích xuất tài liệu...</span>
                     </div>
                   )}
                 </div>
@@ -160,8 +160,8 @@ export function CaseActivation() {
                 size="lg"
                 className="h-14 w-full gap-2 text-sm font-bold uppercase tracking-widest transition-transform active:scale-[0.98]"
               >
-                <Key className="size-4" />
-                Khởi chạy Máy trạm
+                <FolderOpen className="size-4" />
+                Mở hồ sơ điều tra
               </Button>
             </div>
           )}

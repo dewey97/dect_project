@@ -28,7 +28,7 @@ export function MediaPlayer({ track }: MediaPlayerProps) {
         </div>
         <div className="min-w-0 flex-1">
           <span className="font-mono text-[0.55rem] text-primary uppercase tracking-widest block">
-            AUDIO_IMAGE // RECONSTRUCTED
+            BĂNG GHI ÂM // ĐÃ LỌC TẠP ÂM
           </span>
           <h5 className="text-xs font-bold text-foreground truncate mt-0.5">{track.title}</h5>
           <span className="font-mono text-[0.6rem] text-muted-foreground uppercase">
@@ -71,7 +71,7 @@ export function MediaPlayer({ track }: MediaPlayerProps) {
 
         <div className="flex items-center gap-1.5 font-mono text-[0.55rem] text-muted-foreground">
           <Volume2 className="size-3.5 text-muted-foreground" />
-          <span>VERIFIED CH_01</span>
+          <span>KÊNH ÂM THANH GỐC</span>
         </div>
       </div>
     </div>

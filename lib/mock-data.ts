@@ -22,7 +22,8 @@ export const CASES: Case[] = [
     status: 'active',
     difficulty: 2,
     progress: 0,
-    location: 'Khu giải tỏa Bờ Sông'
+    location: 'Khu giải tỏa Bờ Sông',
+    coverImage: 'https://images.unsplash.com/photo-1518599904199-0ca897819ddb?auto=format&fit=crop&q=80&w=600'
   },
   {
     id: 'case-01',
@@ -37,6 +38,7 @@ export const CASES: Case[] = [
     difficulty: 2,
     progress: 45,
     location: 'Cảng phía Bắc, Phân khu Bến tàu 12',
+    coverImage: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&q=80&w=600',
     openedAt: '02:14',
   },
   {
@@ -52,6 +54,7 @@ export const CASES: Case[] = [
     difficulty: 3,
     progress: 0,
     location: 'Trung tâm Hành chính',
+    coverImage: 'https://images.unsplash.com/photo-1541888078949-c988b422119d?auto=format&fit=crop&q=80&w=600',
   },
   {
     id: 'case-03',
@@ -66,6 +69,7 @@ export const CASES: Case[] = [
     difficulty: 4,
     progress: 0,
     location: 'Rossmore Heights',
+    coverImage: 'https://images.unsplash.com/photo-1481277542470-605612bd2d61?auto=format&fit=crop&q=80&w=600',
   },
   {
     id: 'case-xx',
@@ -95,8 +99,10 @@ export const DEVICES: Device[] = [
     evidenceId: 'EVID-TEST-A',
     recoveryLevel: 100,
     lastUpdated: '24-07-2026 // 17:00',
+    description: 'Thiết bị liên lạc cá nhân thu giữ tại túi áo nạn nhân.',
     previewStats: 'TIN NHẮN // HÌNH ẢNH',
-    pinLength: 4
+    pinLength: 4,
+    thumbnail: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'dev-01',
@@ -109,8 +115,10 @@ export const DEVICES: Device[] = [
     evidenceId: 'DEV-0144',
     recoveryLevel: 98,
     lastUpdated: '23:14',
+    description: 'Chiếc điện thoại phụ dùng để liên lạc mờ ám, tìm thấy trong hộc tủ lạnh.',
     previewStats: 'Đã giải mã thành công phân vùng',
     pinLength: 4,
+    thumbnail: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'dev-02',
@@ -123,8 +131,10 @@ export const DEVICES: Device[] = [
     evidenceId: 'DEV-0209',
     recoveryLevel: 45,
     lastUpdated: '12:45',
+    description: 'Máy tính xách tay đặt tại bàn làm việc ở văn phòng.',
     previewStats: 'Cần xác thực mã Pin bảo mật',
     pinLength: 6,
+    thumbnail: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'dev-03',
@@ -137,8 +147,10 @@ export const DEVICES: Device[] = [
     evidenceId: 'DEV-0312',
     recoveryLevel: 40,
     lastUpdated: '01:05',
+    description: 'Máy ghi âm kỹ thuật số giấu dưới gầm ghế sofa.',
     previewStats: 'Đang brute-force giải mã hash...',
     pinLength: 6,
+    thumbnail: 'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'dev-04',
@@ -151,7 +163,9 @@ export const DEVICES: Device[] = [
     evidenceId: 'DEV-0410',
     recoveryLevel: 80,
     lastUpdated: '02:10',
+    description: 'Ổ cứng di động chứa bản sao lưu sổ sách kế toán.',
     previewStats: 'Đang khôi phục các khối bị xóa...',
+    thumbnail: 'https://images.unsplash.com/photo-1624026363063-ce20c15112bd?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'dev-05',
@@ -164,7 +178,8 @@ export const DEVICES: Device[] = [
     evidenceId: 'DEV-0562',
     recoveryLevel: 100,
     lastUpdated: '03:22',
-    previewStats: '1 video (Cầu cảng lúc nửa đêm)',
+    description: 'Máy ảnh an ninh thu hình ban đêm tại cổng nhà kho.',
+    previewStats: '1 ĐOẠN VIDEO',
   },
 ]
 
@@ -181,6 +196,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. TESTER',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
+    thumbnail: 'https://images.unsplash.com/photo-1618044733300-9472054094ee?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ev-whistle',
@@ -194,6 +210,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. TESTER',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
+    thumbnail: 'https://images.unsplash.com/photo-1584433144859-1fc3ab64a957?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ev-map',
@@ -207,6 +224,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. TESTER',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
+    thumbnail: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ev-gps-vu',
@@ -220,6 +238,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. TESTER',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
+    thumbnail: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ev-sms-mai',
@@ -233,6 +252,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. TESTER',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
+    thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ev-01',
@@ -247,6 +267,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. NIGHTJAR',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
+    thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ev-02',
@@ -260,6 +281,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. NIGHTJAR',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
+    thumbnail: 'https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ev-03',
@@ -273,6 +295,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. NIGHTJAR',
     integrityStatus: 'analyzing',
     chainOfCustody: 'LOGGED',
+    thumbnail: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=400'
   },
   {
     id: 'ev-04',
@@ -286,6 +309,7 @@ export const EVIDENCE: Evidence[] = [
     recoveredBy: 'DET. NIGHTJAR',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
+    thumbnail: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=400'
   },
 ]
 
