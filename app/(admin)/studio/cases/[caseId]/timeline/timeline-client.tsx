@@ -38,6 +38,7 @@ type Track = {
   id: string
   name: string
   avatar: string
+  avatar_url?: string
   role: string
   events: TrackEvent[]
   occupation?: string
@@ -104,6 +105,17 @@ function buildInitialTracks(events: DbTimelineEvent[], initialCharacters: any[])
       isFatal: ev.is_fatal
     })
   })
+
+  // Ensure a __GLOBAL__ track always exists
+  if (!tracksMap.has('__GLOBAL__')) {
+    tracksMap.set('__GLOBAL__', {
+      id: '__GLOBAL__',
+      name: '__GLOBAL__',
+      avatar: 'GL',
+      role: 'SYSTEM',
+      events: []
+    })
+  }
 
   return Array.from(tracksMap.values())
 }
@@ -209,6 +221,71 @@ export default function TimelineClient({
     return () => window.removeEventListener('click', handleClickOutside)
   }, [])
 
+  // Calculate distinct day offsets available in the timeline
+  const dayOffsets = useMemo(() => {
+    const offsets = new Set<number>()
+    // Add default Day 1 & Day 2 (offsets 0 and 1)
+    offsets.add(0)
+    offsets.add(1)
+    // Add any offsets found in events
+    tracks.forEach(track => {
+      track.events.forEach(ev => {
+        offsets.add(ev.dayOffset ?? 0)
+      })
+    })
+    // Add any extra days added by the user
+    extraDays.forEach(d => offsets.add(d))
+    return Array.from(offsets).sort((a, b) => a - b)
+  }, [tracks, extraDays])
+
+  const caseDays = useMemo(() => dayOffsets.filter(o => o >= 0), [dayOffsets])
+  const caseDaysCount = caseDays.length || 1
+  const totalMinutes = caseDaysCount * 1440
+
+  const hasAutoScrolledRef = React.useRef(false)
+
+  // Auto-scroll to the earliest activity block only once when page loads
+  React.useEffect(() => {
+    if (hasAutoScrolledRef.current) return
+    const scrollContainer = scrollContainerRef.current
+    if (!scrollContainer) return
+
+    // Get all events for the current active day (if any), otherwise all events across active case days
+    let targetEvents = tracks.flatMap(t => 
+      t.events.filter(e => (e.dayOffset ?? 0) === activeDayOffset)
+    )
+
+    // Fallback: if no events on current day, look across all case days
+    if (targetEvents.length === 0) {
+      targetEvents = tracks.flatMap(t => 
+        t.events.filter(e => (e.dayOffset ?? 0) >= 0)
+      )
+    }
+
+    if (targetEvents.length > 0) {
+      hasAutoScrolledRef.current = true
+      // Find minimum absolute minute from start of timeline
+      const minAbsMinute = Math.min(...targetEvents.map(e => (e.dayOffset ?? 0) * 1440 + e.startMin))
+      // Leave a 45-minute padding before the first event
+      const paddedAbsMinute = Math.max(0, minAbsMinute - 45)
+      
+      const totalCanvasMinutes = 1440 * caseDaysCount
+
+      const timer = setTimeout(() => {
+        if (!scrollContainerRef.current) return
+        const scrollWidth = scrollContainerRef.current.scrollWidth
+        const scrollPos = (paddedAbsMinute / totalCanvasMinutes) * scrollWidth
+
+        scrollContainerRef.current.scrollTo({
+          left: scrollPos,
+          behavior: 'smooth'
+        })
+      }, 200)
+
+      return () => clearTimeout(timer)
+    }
+  }, [activeDayOffset, caseDaysCount, tracks])
+
   // Update Event coordinates (drag & drop handler)
   const handleUpdateEvent = (trackId: string, eventId: string, absoluteStart: number, absoluteEnd: number) => {
     const newDayOffset = Math.floor(absoluteStart / 1440)
@@ -275,6 +352,7 @@ export default function TimelineClient({
         id: track.id,
         name: updatedData.name,
         role: updatedData.role,
+        avatar_url: updatedData.avatar_url,
         occupation: updatedData.occupation,
         relationship: updatedData.relationship,
         quirks: updatedData.quirks,
@@ -354,25 +432,7 @@ export default function TimelineClient({
     return clashes
   }, [tracks, viewMode])
 
-  const dayOffsets = useMemo(() => {
-    const offsets = new Set<number>()
-    // Add default Day 1 & Day 2 (offsets 0 and 1)
-    offsets.add(0)
-    offsets.add(1)
-    // Add any offsets found in events
-    tracks.forEach(track => {
-      track.events.forEach(ev => {
-        offsets.add(ev.dayOffset ?? 0)
-      })
-    })
-    // Add any extra days added by the user
-    extraDays.forEach(d => offsets.add(d))
-    return Array.from(offsets).sort((a, b) => a - b)
-  }, [tracks, extraDays])
 
-  const caseDays = useMemo(() => dayOffsets.filter(o => o >= 0), [dayOffsets])
-  const caseDaysCount = caseDays.length || 1
-  const totalMinutes = caseDaysCount * 1440
 
   const timeTicks = useMemo(() => {
     const ticks = []
@@ -400,9 +460,15 @@ export default function TimelineClient({
   }, [caseDaysCount, caseDays])
 
   const getDayLabel = (offset: number) => {
-    if (offset === 0) return 'Ngày 1 (Vụ án)'
+    if (offset === 0) return 'Day 0'
     if (offset > 0) return `Ngày ${offset + 1}`
     const absDays = Math.abs(offset)
+    if (absDays >= 365) {
+      const years = Math.floor(absDays / 365)
+      const remDays = absDays % 365
+      const months = Math.floor(remDays / 30)
+      return `${years} năm${months ? ` ${months} tháng` : ''} trước`
+    }
     if (absDays >= 30) {
       const months = Math.floor(absDays / 30)
       const remDays = absDays % 30
@@ -527,6 +593,25 @@ export default function TimelineClient({
           >
             <ZoomIn className="size-4" />
           </button>
+          <button
+            onClick={() => setShowAddPastModal(true)}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-white/10 hover:border-white/20 text-zinc-300 hover:text-zinc-100 bg-zinc-800/40 rounded transition-colors"
+          >
+            <Plus className="size-3.5" /> Mốc Quá Khứ
+          </button>
+          <button
+            onClick={() => {
+              const currentCaseDays = dayOffsets.filter(o => o >= 0)
+              const nextDayOffset = currentCaseDays.length
+              setExtraDays(prev => [...prev, nextDayOffset])
+              setTimeout(() => {
+                handleDaySelect(nextDayOffset)
+              }, 50)
+            }}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-primary/20 hover:border-primary/40 text-primary hover:text-primary/95 bg-primary/5 rounded transition-colors"
+          >
+            <Plus className="size-3.5" /> Ngày Tiếp Theo
+          </button>
           <div className="w-px h-4 bg-white/10 mx-1" />
           <button 
             onClick={async () => {
@@ -543,7 +628,7 @@ export default function TimelineClient({
               })))
               
               const [resChars, resEvents] = await Promise.all([
-                saveCharacters(caseId, tracks),
+                saveCharacters(caseId, tracks.filter(t => t.id !== '__GLOBAL__')),
                 saveTimelineEvents(caseId, payload)
               ])
               
@@ -564,9 +649,9 @@ export default function TimelineClient({
       </div>
 
       {/* MASTER TIMELINE NAVIGATOR */}
-      <div className="px-4 py-3 border-b border-white/10 bg-zinc-950/60 flex items-center justify-between gap-4 shrink-0 overflow-x-auto select-none">
+      <div className="px-4 py-3 border-b border-white/10 bg-zinc-950/60 flex justify-center shrink-0 overflow-x-auto select-none">
         
-        <div className="flex items-center gap-16 flex-1 justify-center relative max-w-4xl mx-auto h-14">
+        <div className="flex items-center gap-24 flex-1 justify-center relative max-w-4xl mx-auto h-16">
           {/* Connecting line */}
           <div className="absolute left-8 right-8 top-1/2 h-0.5 bg-zinc-800/80 -translate-y-1/2 z-0" />
           
@@ -581,55 +666,42 @@ export default function TimelineClient({
                 className="relative z-10 flex flex-col items-center justify-center group focus:outline-none cursor-pointer min-w-[70px] h-full"
               >
                 {/* Circle Node */}
-                <div className={`size-3.5 rounded-full flex items-center justify-center border transition-all duration-300 z-10 bg-zinc-950 ${
-                  isActive 
-                    ? 'border-primary shadow-[0_0_12px_rgba(244,63,94,0.8)] scale-125' 
-                    : isHistorical 
-                      ? 'border-zinc-700 group-hover:border-zinc-400 group-hover:scale-110'
-                      : 'border-zinc-600 group-hover:border-zinc-300 group-hover:scale-110'
-                }`}>
-                  <div className={`size-1.5 rounded-full transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-primary' 
+                <div className={`rounded-full flex items-center justify-center border transition-all duration-300 z-10 bg-zinc-950 ${
+                  offset === 0
+                    ? isActive
+                      ? 'size-5 border-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.9)] scale-110'
+                      : 'size-5 border-rose-600/60 shadow-[0_0_8px_rgba(244,63,94,0.3)] hover:border-rose-500'
+                    : isActive 
+                      ? 'size-3.5 border-primary shadow-[0_0_12px_rgba(244,63,94,0.8)] scale-125' 
                       : isHistorical 
-                        ? 'bg-zinc-800 group-hover:bg-zinc-500'
-                        : 'bg-zinc-700 group-hover:bg-zinc-400'
+                        ? 'size-3.5 border-zinc-700 group-hover:border-zinc-400 group-hover:scale-110'
+                        : 'size-3.5 border-zinc-600 group-hover:border-zinc-300 group-hover:scale-110'
+                }`}>
+                  <div className={`rounded-full transition-all duration-300 ${
+                    offset === 0
+                      ? 'size-2 bg-rose-500 animate-pulse'
+                      : isActive 
+                        ? 'size-1.5 bg-primary' 
+                        : isHistorical 
+                          ? 'size-1.5 bg-zinc-800 group-hover:bg-zinc-500'
+                          : 'size-1.5 bg-zinc-700 group-hover:bg-zinc-400'
                   }`} />
                 </div>
                 {/* Label (Absolutely positioned below the circle so it doesn't affect vertical alignment) */}
-                <span className={`absolute top-[36px] left-1/2 -translate-x-1/2 whitespace-nowrap transition-colors duration-300 text-[10px] font-medium ${
-                  isActive 
-                    ? 'text-primary font-bold' 
-                    : 'text-zinc-500 group-hover:text-zinc-300'
+                <span className={`absolute top-[44px] left-1/2 -translate-x-1/2 whitespace-nowrap transition-colors duration-300 text-[10px] font-medium ${
+                  offset === 0
+                    ? isActive
+                      ? 'text-rose-400 font-bold tracking-wide scale-105'
+                      : 'text-rose-500/80 font-semibold group-hover:text-rose-400'
+                    : isActive 
+                      ? 'text-primary font-bold' 
+                      : 'text-zinc-500 group-hover:text-zinc-300'
                 }`}>
                   {getDayLabel(offset)}
                 </span>
               </button>
             )
           })}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowAddPastModal(true)}
-            className="px-2 py-1 text-[10px] font-semibold border border-white/5 hover:border-white/15 text-zinc-400 hover:text-zinc-200 bg-zinc-900/40 rounded transition-colors"
-          >
-            + Mốc Quá Khứ
-          </button>
-          <button
-            onClick={() => {
-              const currentCaseDays = dayOffsets.filter(o => o >= 0)
-              const nextDayOffset = currentCaseDays.length
-              setExtraDays(prev => [...prev, nextDayOffset])
-              // Scroll to the new day once state has updated
-              setTimeout(() => {
-                handleDaySelect(nextDayOffset)
-              }, 50)
-            }}
-            className="px-2 py-1 text-[10px] font-semibold border border-primary/20 hover:border-primary/40 text-primary hover:text-primary/95 bg-primary/5 rounded transition-colors"
-          >
-            + Ngày Tiếp Theo
-          </button>
         </div>
       </div>
 
@@ -642,7 +714,7 @@ export default function TimelineClient({
             <span className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Cast & Tracks</span>
           </div>
           <div className="flex-1 overflow-auto scrollbar-none">
-            {tracks.map(track => (
+            {tracks.filter(t => t.id !== '__GLOBAL__').map(track => (
               <button 
                 key={track.id} 
                 onClick={() => setSelectedCharacterId(track.id)}

@@ -19,8 +19,9 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { Network, Plus, Trash2, X, Save, ShieldAlert, Link2, Eye, UserMinus, Upload, Loader2, User } from 'lucide-react'
-import { saveCharacters, uploadCharacterAvatar } from '@/lib/actions/character-actions'
+import { uploadCharacterAvatar, saveCharacters } from '@/lib/actions/character-actions'
 import { saveRelationships } from '@/lib/actions/relationship-actions'
+import { CharacterPanel } from '@/components/admin/character-panel'
 import { toast } from '@/components/ui/toast'
 
 // --- CUSTOM CHARACTER NODE ---
@@ -479,210 +480,95 @@ export default function RelationshipsClient({
           </ReactFlow>
         </div>
 
-        {/* SIDE INSPECTOR PANEL */}
-        <div 
-          className={`absolute top-0 bottom-0 right-0 w-[420px] z-50 bg-zinc-950/95 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${selectedNodeId || selectedEdgeId ? 'translate-x-0' : 'translate-x-full'}`}
-        >
-          {/* INSPECT CHARACTER */}
-          {selectedNodeId && selectedCharacter && (
-            <div className="flex-1 flex flex-col h-full overflow-hidden">
-              <div className="h-14 border-b border-white/10 flex items-center justify-between px-4 shrink-0 bg-zinc-900/40">
-                <h3 className="font-semibold text-sm text-zinc-100 flex items-center gap-2">
-                  Hồ Sơ Nhân Vật
-                </h3>
-                <button onClick={handlePaneClick} className="p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors">
-                  <X className="size-4" />
-                </button>
+      {/* UNIFIED CHARACTER PANEL DRAWER */}
+      <CharacterPanel
+        isOpen={!!selectedNodeId && !!selectedCharacter}
+        character={selectedCharacter}
+        onClose={() => setSelectedNodeId(null)}
+        onChangeField={(field, val) => updateCharacterField(field, val)}
+        onDelete={() => handleDeleteCharacter()}
+      />
+
+      {/* INSPECT RELATIONSHIP (EDGE) */}
+      <div 
+        className={`absolute top-0 bottom-0 right-0 w-[420px] z-50 bg-zinc-950/95 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${selectedEdgeId && selectedEdge ? 'translate-x-0 pointer-events-auto' : 'translate-x-full pointer-events-none'}`}
+      >
+        {selectedEdgeId && selectedEdge && (
+          <div className="flex-1 flex flex-col h-full overflow-hidden">
+            <div className="h-14 border-b border-white/10 flex items-center justify-between px-4 shrink-0 bg-zinc-900/40">
+              <h3 className="font-semibold text-sm text-zinc-100 flex items-center gap-2">
+                Thiết Lập Quan Hệ
+              </h3>
+              <button onClick={handlePaneClick} className="p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors">
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 p-4 space-y-5 overflow-y-auto">
+              <div className="bg-zinc-900/50 border border-white/5 rounded-lg p-3">
+                <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Liên kết đối tượng</div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-zinc-100">
+                    {characters.find(c => c.id === selectedEdge.source)?.name || 'Unknown'}
+                  </span>
+                  <span className="text-zinc-500 px-2">↔</span>
+                  <span className="font-medium text-zinc-100">
+                    {characters.find(c => c.id === selectedEdge.target)?.name || 'Unknown'}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
-                {/* HEADER CARD: Ảnh trái + Tên/Vai trò phải */}
-                <div className="flex items-start gap-3">
-                  {/* Avatar clickable upload */}
-                  <label className={`relative w-[75px] h-[100px] bg-zinc-900 overflow-hidden flex items-center justify-center shrink-0 cursor-pointer group/avatar transition-colors rounded-none ${
-                    selectedCharacter.avatar_url 
-                      ? 'border-0' 
-                      : 'border border-white/10 hover:border-primary/50'
+              <div>
+                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Loại quan hệ</label>
+                <input 
+                  type="text" 
+                  value={(selectedEdge.data as any)?.relation_type || 'Giao thiệp'} 
+                  onChange={e => updateEdgeField('relation_type', e.target.value)} 
+                  placeholder="Ví dụ: Vợ chồng, Nợ nần, Thù hằn..."
+                  className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Điểm hảo cảm / Mức độ (Affinity)</label>
+                  <span className={`text-xs font-mono font-bold ${
+                    ((selectedEdge.data as any)?.affinity_score ?? 0) > 0 ? 'text-emerald-400' :
+                    ((selectedEdge.data as any)?.affinity_score ?? 0) < 0 ? 'text-rose-400' : 'text-zinc-400'
                   }`}>
-                    {selectedCharacter.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={selectedCharacter.avatar_url} alt="" className="w-full h-full object-contain" />
-                    ) : (
-                      <div className="flex items-center justify-center text-zinc-600 select-none">
-                        <User className="size-6 stroke-[1.5]" aria-hidden="true" />
-                      </div>
-                    )}
-                    {/* Overlay hover */}
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity">
-                      {isUploading ? (
-                        <Loader2 className="size-5 animate-spin text-primary" />
-                      ) : (
-                        <Upload className="size-5 text-white/80" />
-                      )}
-                    </div>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleAvatarUpload} 
-                      disabled={isUploading}
-                      className="hidden" 
-                    />
-                  </label>
-
-                  {/* Tên + Vai trò */}
-                  <div className="flex-1 space-y-2 pt-1">
-                    <input 
-                      type="text" 
-                      value={selectedCharacter.name} 
-                      onChange={e => updateCharacterField('name', e.target.value)} 
-                      placeholder="Tên nhân vật..."
-                      className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
-                    />
-                    <select 
-                      value={selectedCharacter.role} 
-                      onChange={e => updateCharacterField('role', e.target.value)} 
-                      className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
-                    >
-                      <option value="SUSPECT">Nghi phạm (Suspect)</option>
-                      <option value="VICTIM">Nạn nhân (Victim)</option>
-                      <option value="KILLER">Hung thủ (Killer)</option>
-                      <option value="WITNESS">Nhân chứng (Witness)</option>
-                      <option value="DETECTIVE">Thám tử (Detective)</option>
-                    </select>
-                  </div>
+                    {((selectedEdge.data as any)?.affinity_score ?? 0) > 0 ? '+' : ''}
+                    {(selectedEdge.data as any)?.affinity_score ?? 0}
+                  </span>
                 </div>
-
-                {/* Triple Truth Attributes */}
-                <div className="border-t border-white/5 pt-4 space-y-4">
-                  <div className="flex items-center gap-1.5 text-xs text-primary font-semibold uppercase tracking-wider mb-2">
-                    <ShieldAlert className="size-4" />
-                    Bộ Ba Bản Chất
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Động cơ thực tế (Motive)</label>
-                    <textarea 
-                      rows={3}
-                      value={selectedCharacter.real_motive || ''} 
-                      onChange={e => updateCharacterField('real_motive', e.target.value)} 
-                      placeholder="Lý do muốn gây hại nạn nhân..."
-                      className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 p-2 focus:outline-none focus:border-primary resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Bí mật ngụy tạo (Red Herring Secret)</label>
-                    <textarea 
-                      rows={3}
-                      value={selectedCharacter.red_herring_secret || ''} 
-                      onChange={e => updateCharacterField('red_herring_secret', e.target.value)} 
-                      placeholder="Hành vi mờ ám muốn che giấu thám tử để tự bào chữa..."
-                      className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 p-2 focus:outline-none focus:border-primary resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Chứng cứ ngoại phạm thực tế (Real Alibi)</label>
-                    <textarea 
-                      rows={3}
-                      value={selectedCharacter.real_alibi || ''} 
-                      onChange={e => updateCharacterField('real_alibi', e.target.value)} 
-                      placeholder="Sự thật chính xác nhân vật ở đâu, làm gì khi án mạng xảy ra..."
-                      className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 p-2 focus:outline-none focus:border-primary resize-none"
-                    />
-                  </div>
+                <input 
+                  type="range"
+                  min="-100"
+                  max="100"
+                  step="10"
+                  value={(selectedEdge.data as any)?.affinity_score ?? 0}
+                  onChange={e => updateEdgeField('affinity_score', parseInt(e.target.value, 10))}
+                  className="w-full accent-primary h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-[8px] text-zinc-500 mt-1 font-mono uppercase">
+                  <span>-100 Thù hận</span>
+                  <span>0 Xã giao</span>
+                  <span>+100 Thân thiết</span>
                 </div>
-              </div>
-
-              <div className="p-4 border-t border-white/10 shrink-0 bg-zinc-900/20">
-                <button
-                  onClick={handleDeleteCharacter}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-950/20 border border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300 font-medium rounded transition-colors text-xs"
-                >
-                  <UserMinus className="size-4" />
-                  Xoá Nhân Vật Khỏi Vụ Án
-                </button>
               </div>
             </div>
-          )}
 
-          {/* INSPECT RELATIONSHIP (EDGE) */}
-          {selectedEdgeId && selectedEdge && (
-            <div className="flex-1 flex flex-col h-full overflow-hidden">
-              <div className="h-14 border-b border-white/10 flex items-center justify-between px-4 shrink-0 bg-zinc-900/40">
-                <h3 className="font-semibold text-sm text-zinc-100 flex items-center gap-2">
-                  Thiết Lập Quan Hệ
-                </h3>
-                <button onClick={handlePaneClick} className="p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors">
-                  <X className="size-4" />
-                </button>
-              </div>
-
-              <div className="flex-1 p-4 space-y-5 overflow-y-auto">
-                <div className="bg-zinc-900/50 border border-white/5 rounded-lg p-3">
-                  <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Liên kết đối tượng</div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-zinc-100">
-                      {characters.find(c => c.id === selectedEdge.source)?.name || 'Unknown'}
-                    </span>
-                    <span className="text-zinc-500 px-2">↔</span>
-                    <span className="font-medium text-zinc-100">
-                      {characters.find(c => c.id === selectedEdge.target)?.name || 'Unknown'}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Loại quan hệ</label>
-                  <input 
-                    type="text" 
-                    value={(selectedEdge.data as any)?.relation_type || 'Giao thiệp'} 
-                    onChange={e => updateEdgeField('relation_type', e.target.value)} 
-                    placeholder="e.g. Ruột thịt, Vợ chồng, Thù ghét, Trợ lý"
-                    className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5">
-                    <span>Độ thân thiết / căng thẳng</span>
-                    <span className={`font-mono text-xs ${
-                      ((selectedEdge.data as any)?.affinity_score ?? 0) < 0 ? 'text-red-400' : 
-                      ((selectedEdge.data as any)?.affinity_score ?? 0) > 0 ? 'text-emerald-400' : 'text-zinc-400'
-                    }`}>
-                      {((selectedEdge.data as any)?.affinity_score ?? 0) > 0 ? '+' : ''}{(selectedEdge.data as any)?.affinity_score ?? 0}
-                    </span>
-                  </div>
-                  <input 
-                    type="range"
-                    min="-100"
-                    max="100"
-                    step="10"
-                    value={(selectedEdge.data as any)?.affinity_score ?? 0}
-                    onChange={e => updateEdgeField('affinity_score', parseInt(e.target.value, 10))}
-                    className="w-full accent-primary h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-[8px] text-zinc-500 mt-1 font-mono uppercase">
-                    <span>-100 Thù hận</span>
-                    <span>0 Xã giao</span>
-                    <span>+100 Thân thiết</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 border-t border-white/10 shrink-0 bg-zinc-900/20">
-                <button
-                  onClick={handleDeleteEdge}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-zinc-900 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 font-medium rounded transition-colors text-xs"
-                >
-                  <Trash2 className="size-4" />
-                  Xoá Quan Hệ Này
-                </button>
-              </div>
+            <div className="p-4 border-t border-white/10 shrink-0 bg-zinc-900/20">
+              <button
+                onClick={handleDeleteEdge}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-zinc-900 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 font-medium rounded transition-colors text-xs"
+              >
+                <Trash2 className="size-4" />
+                Xoá Quan Hệ Này
+              </button>
             </div>
-          )}
-
-        </div>
+          </div>
+        )}
+      </div>
 
       </div>
 

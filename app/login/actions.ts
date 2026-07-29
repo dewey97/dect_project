@@ -46,3 +46,24 @@ export async function signup(formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/login?message=' + encodeURIComponent('Vui lòng kiểm tra email để hoàn tất đăng ký!'))
 }
+
+export async function loginWithGoogle() {
+  const supabase = await createClient()
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  })
+
+  if (error) {
+    redirect('/login?message=' + encodeURIComponent(error.message || 'Không thể đăng nhập bằng Google.'))
+  }
+
+  if (data?.url) {
+    redirect(data.url)
+  }
+}
+

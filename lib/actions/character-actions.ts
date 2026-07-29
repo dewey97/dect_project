@@ -16,7 +16,7 @@ export async function uploadCharacterAvatar(formData: FormData) {
     // Tạo tên file độc nhất để tránh bị ghi đè trùng tên
     const fileExt = file.name.split('.').pop()
     const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
-    const filePath = `avatars/${fileName}`
+    const filePath = fileName
 
     // Upload lên bucket tên là 'avatars'
     let { data, error } = await supabase.storage
@@ -86,6 +86,11 @@ export async function saveCharacters(caseId: string, characters: any[]) {
     const isUuid = (str: string) => 
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
 
+    const getValidAvatarUrl = (url?: string) => {
+      if (!url || typeof url !== 'string') return null
+      return (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) ? url : null
+    }
+
     // 1. Delete characters not present in the new list
     const existingIds = characters
       .map(c => c.id)
@@ -108,11 +113,12 @@ export async function saveCharacters(caseId: string, characters: any[]) {
 
     if (characters.length > 0) {
       const formattedCharacters = characters.map(c => {
+        const validUrl = getValidAvatarUrl(c.avatar_url) || getValidAvatarUrl(c.avatar)
         const item: any = {
           case_id: caseId,
           name: c.name,
           role: c.role || 'SUSPECT',
-          avatar_url: c.avatar_url || c.avatar || '',
+          avatar_url: validUrl,
           position_x: c.position_x ?? 0,
           position_y: c.position_y ?? 0,
           real_motive: c.real_motive || c.motive || '',

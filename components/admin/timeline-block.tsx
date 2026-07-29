@@ -44,6 +44,7 @@ export function TimelineBlock({
 
   // Local drag state for smooth dragging without triggering global history saves
   const [dragState, setDragState] = useState<{ startMin: number, endMin: number } | null>(null)
+  const latestDragRef = useRef<{ startMin: number, endMin: number } | null>(null)
 
   const currentStart = dragState ? dragState.startMin : startMin
   const currentEnd = dragState ? dragState.endMin : endMin
@@ -101,24 +102,24 @@ export function TimelineBlock({
         if (newEnd - newStart < MINIMUM_MINUTES) newEnd = newStart + MINIMUM_MINUTES
       }
 
-      setDragState({ startMin: newStart, endMin: newEnd })
+      const nextDrag = { startMin: newStart, endMin: newEnd }
+      latestDragRef.current = nextDrag
+      setDragState(nextDrag)
     }
 
     const handlePointerUp = (upEvt: PointerEvent) => {
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('pointerup', handlePointerUp)
       
+      const finalDrag = latestDragRef.current
+      latestDragRef.current = null
+      setDragState(null)
+
       // If it didn't move much, treat it as a click
       if (!hasMoved && action === 'move') {
         onSelectEvent()
-      } else {
-        // Only save to global state on mouse up to prevent history spam
-        setDragState(prev => {
-          if (prev) {
-            onUpdateEvent(trackId, event.id, prev.startMin, prev.endMin)
-          }
-          return null
-        })
+      } else if (finalDrag) {
+        onUpdateEvent(trackId, event.id, finalDrag.startMin, finalDrag.endMin)
       }
     }
 
