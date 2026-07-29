@@ -562,23 +562,6 @@ export default function TimelineClient({
 
         <div className="flex items-center gap-2">
           <button 
-            onClick={() => { if (historyIndex > 0) setHistoryIndex(historyIndex - 1) }}
-            disabled={historyIndex === 0}
-            className="p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Undo (Ctrl+Z)"
-          >
-            <Undo2 className="size-4" />
-          </button>
-          <button 
-            onClick={() => { if (historyIndex < history.length - 1) setHistoryIndex(historyIndex + 1) }}
-            disabled={historyIndex === history.length - 1}
-            className="p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Redo (Ctrl+Shift+Z)"
-          >
-            <Redo2 className="size-4" />
-          </button>
-          <div className="w-px h-4 bg-white/10 mx-1" />
-          <button 
             onClick={() => setZoomLevel(prev => Math.max(prev - 25, 50))}
             className="p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors"
             title="Zoom Out"
@@ -651,7 +634,7 @@ export default function TimelineClient({
       {/* MASTER TIMELINE NAVIGATOR */}
       <div className="px-4 py-3 border-b border-white/10 bg-zinc-950/60 flex justify-center shrink-0 overflow-x-auto select-none">
         
-        <div className="flex items-center gap-24 flex-1 justify-center relative max-w-4xl mx-auto h-16">
+        <div className="flex items-center gap-36 flex-1 justify-center relative mx-auto h-16">
           {/* Connecting line */}
           <div className="absolute left-8 right-8 top-1/2 h-0.5 bg-zinc-800/80 -translate-y-1/2 z-0" />
           
