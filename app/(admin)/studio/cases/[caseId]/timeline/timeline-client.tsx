@@ -248,7 +248,7 @@ export default function TimelineClient({
     tracks.forEach(track => {
       track.events.forEach(ev => {
         const offset = ev.dayOffset ?? 0
-        if (offset < 0 && ev.location && ev.location.includes('|||')) {
+        if (offset !== 0 && ev.location && ev.location.includes('|||')) {
           const parts = ev.location.split('|||')
           if (parts.length === 4) {
             labels[offset] = parts[0]
