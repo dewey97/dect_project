@@ -1084,7 +1084,7 @@ export default function TimelineClient({
               </button>
             </div>
 
-            <div className="space-y-4 max-w-3xl">
+            <div className="space-y-4 max-w-6xl">
               {(() => {
                 const globalTrack = tracks.find(t => t.id === '__GLOBAL__')
                 const dayEvents = globalTrack ? globalTrack.events.filter(e => e.dayOffset === activeDayOffset) : []
