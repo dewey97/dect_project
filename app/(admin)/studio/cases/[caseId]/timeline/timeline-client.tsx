@@ -937,47 +937,36 @@ export default function TimelineClient({
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 border-t border-white/5 pt-4">
-                        <div className="md:col-span-1">
-                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
-                          <input
-                            type="text"
-                            value={specificDay}
-                            onChange={e => {
-                              const newDay = e.target.value
-                              const newRaw = `${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
-                              handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
-                            }}
-                            placeholder="Ví dụ: 15/08/2026"
-                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all"
-                            spellCheck={false}
-                          />
-                        </div>
-                        <div className="md:col-span-1">
-                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
-                          <input
-                            type="text"
-                            value={parsedLoc}
-                            onChange={e => {
-                              const newLoc = e.target.value
-                              const newRaw = `${specificDay}|||${newLoc}|||${involvedNames.join(',')}`
-                              handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
-                            }}
-                            placeholder="Nơi chốn"
-                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all"
-                            spellCheck={false}
-                          />
-                        </div>
-                        <div className="md:col-span-1">
-                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Tính chất</label>
-                          <select
-                            value={event.type}
-                            onChange={e => handleSaveDetails('__GLOBAL__', event.id, { type: e.target.value as any })}
-                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-2.5 py-2 text-xs text-zinc-300 focus:outline-none focus:border-primary cursor-pointer"
-                          >
-                            <option value="TRUTH">Truth (Sự thật)</option>
-                            <option value="LIE">Lie (Giả dối)</option>
-                          </select>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/5 pt-4">
+                        <div className="md:col-span-1 flex flex-col gap-3">
+                          <div>
+                            <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
+                            <input
+                              type="date"
+                              value={specificDay}
+                              onChange={e => {
+                                const newDay = e.target.value
+                                const newRaw = `${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
+                                handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                              }}
+                              className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all dark:[color-scheme:dark]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
+                            <input
+                              type="text"
+                              value={parsedLoc}
+                              onChange={e => {
+                                const newLoc = e.target.value
+                                const newRaw = `${specificDay}|||${newLoc}|||${involvedNames.join(',')}`
+                                handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                              }}
+                              placeholder="Nơi chốn"
+                              className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all"
+                              spellCheck={false}
+                            />
+                          </div>
                         </div>
                         <div className="md:col-span-2">
                           <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Nhân vật tham gia</label>
