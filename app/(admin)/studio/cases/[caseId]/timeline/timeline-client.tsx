@@ -94,7 +94,9 @@ function buildInitialTracks(events: DbTimelineEvent[], initialCharacters: any[])
     let startMin = 0
     let endMin = 0
     
-    if (ev.start_min < 0) {
+    const isGlobalNarrative = ev.character_name === '__GLOBAL__' || ev.character_name === 'Narrative'
+    
+    if (isGlobalNarrative) {
       dayOffset = Math.floor(ev.start_min / 1440)
       startMin = ev.start_min - (dayOffset * 1440)
       endMin = ev.end_min - (dayOffset * 1440)
