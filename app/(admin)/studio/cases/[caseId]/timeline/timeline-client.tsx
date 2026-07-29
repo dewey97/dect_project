@@ -153,7 +153,7 @@ export default function TimelineClient({
   const [showAddCharModal, setShowAddCharModal] = useState(false)
   const [newCharForm, setNewCharForm] = useState({ name: '', role: 'SUSPECT' })
   const [showAddPastModal, setShowAddPastModal] = useState(false)
-  const [pastDaysInput, setPastDaysInput] = useState('30')
+  const [pastDaysInput, setPastDaysInput] = useState('8 năm trước')
   const [isEditingOffset, setIsEditingOffset] = useState(false)
   const [editOffsetInput, setEditOffsetInput] = useState('')
   
@@ -234,6 +234,9 @@ export default function TimelineClient({
   }, [])
 
   const [tempMilestoneLabels, setTempMilestoneLabels] = useState<Record<number, string>>({})
+  const [draggingOffset, setDraggingOffset] = useState<number | null>(null)
+  const [draggedLeft, setDraggedLeft] = useState<number>(0)
+  const draggedLeftRef = React.useRef(0)
 
   // Dynamic scanning of milestone labels parsed from existing events
   const milestoneLabels = useMemo(() => {
@@ -293,27 +296,6 @@ export default function TimelineClient({
   }, [tracks])
 
   const totalMinutes = activeTimelineMinutes
-
-  // Calculate dynamic spacing layout for navigator points (compressing very large gaps with square-root)
-  const navigatorLayout = useMemo(() => {
-    if (dayOffsets.length === 0) return { nodes: [], totalWidth: 0 }
-    
-    const nodes: { offset: number; left: number }[] = []
-    let currentLeft = 50 // Base padding start
-    
-    nodes.push({ offset: dayOffsets[0], left: currentLeft })
-    
-    for (let i = 0; i < dayOffsets.length - 1; i++) {
-      const diff = dayOffsets[i + 1] - dayOffsets[i]
-      const weight = Math.pow(diff, 0.33) // Flatten the curve for more subtle differences
-      const segmentWidth = 100 + weight * 15 // 100px base + 15px * weight
-      currentLeft += segmentWidth
-      nodes.push({ offset: dayOffsets[i + 1], left: currentLeft })
-    }
-    
-    const totalWidth = currentLeft + 50 // Base padding end
-    return { nodes, totalWidth }
-  }, [dayOffsets])
 
   const hasAutoScrolledRef = React.useRef(false)
 
@@ -563,6 +545,79 @@ export default function TimelineClient({
     }
   }
 
+  // Handle horizontal dragging of past milestone nodes
+  const handleNodeDragStart = (e: React.PointerEvent<HTMLButtonElement>, offset: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    const startX = e.clientX
+    // Clamp/map initial offset value to represent left coordinate
+    let initialLeft = 750 + offset
+    if (offset < -700) initialLeft = 50
+    if (offset > -70) initialLeft = 680
+    
+    setDraggingOffset(offset)
+    setDraggedLeft(initialLeft)
+    draggedLeftRef.current = initialLeft
+    
+    const handleMove = (moveEv: PointerEvent) => {
+      const deltaX = moveEv.clientX - startX
+      const newLeft = Math.max(50, Math.min(680, initialLeft + deltaX))
+      setDraggedLeft(newLeft)
+      draggedLeftRef.current = newLeft
+    }
+    
+    const handleEnd = () => {
+      window.removeEventListener('pointermove', handleMove)
+      window.removeEventListener('pointerup', handleEnd)
+      
+      setDraggingOffset(null)
+      
+      const finalLeft = Math.max(50, Math.min(680, draggedLeftRef.current))
+      const newOffset = finalLeft - 750
+      
+      if (newOffset !== offset) {
+        // 1. Update all events at offset to newOffset
+        const newTracks = tracks.map(t => {
+          if (t.id === '__GLOBAL__') {
+            return {
+              ...t,
+              events: t.events.map(ev => {
+                if (ev.dayOffset === offset) {
+                  return { ...ev, dayOffset: newOffset }
+                }
+                return ev
+              })
+            }
+          }
+          return t
+        })
+        
+        // 2. Update extraDays
+        setExtraDays(prev => {
+          const filtered = prev.filter(o => o !== offset)
+          return [...filtered, newOffset]
+        })
+        
+        // 3. Update tempMilestoneLabels
+        setTempMilestoneLabels(prev => {
+          const newLabels = { ...prev }
+          if (newLabels[offset]) {
+            newLabels[newOffset] = newLabels[offset]
+            delete newLabels[offset]
+          }
+          return newLabels
+        })
+        
+        pushState(newTracks)
+        setActiveDayOffset(newOffset)
+      }
+    }
+    
+    window.addEventListener('pointermove', handleMove)
+    window.addEventListener('pointerup', handleEnd)
+  }
+
   const handleScroll = () => {
     // Scroll doesn't paginate days anymore on a single continuous timeline
   }
@@ -658,28 +713,45 @@ export default function TimelineClient({
       </div>
 
       {/* MASTER TIMELINE NAVIGATOR */}
-      <div className="px-4 py-3 border-b border-white/10 bg-zinc-950/60 flex justify-center shrink-0 overflow-x-auto select-none scrollbar-none">
+      <div className="px-4 py-3 border-b border-white/10 bg-zinc-950/60 flex justify-center shrink-0 select-none">
         <div 
-          className="relative h-16 flex items-center shrink-0"
-          style={{ width: `${navigatorLayout.totalWidth}px` }}
+          className="relative h-16 flex items-center shrink-0 w-[800px]"
         >
           {/* Connecting line */}
           <div 
-            className="absolute top-1/2 h-0.5 bg-zinc-800/80 -translate-y-1/2 z-0" 
-            style={{
-              left: `${navigatorLayout.nodes[0]?.left ?? 0}px`,
-              width: `${(navigatorLayout.nodes[navigatorLayout.nodes.length - 1]?.left ?? 0) - (navigatorLayout.nodes[0]?.left ?? 0)}px`
-            }}
+            className="absolute top-1/2 h-0.5 bg-zinc-800/80 -translate-y-1/2 z-0 left-[50px] right-[50px]"
           />
           
-          {navigatorLayout.nodes.map(({ offset, left }) => {
+          {dayOffsets.map((offset) => {
             const isActive = activeDayOffset === offset
             const isHistorical = offset < 0
+            
+            // Calculate absolute left coordinate
+            let left = 750
+            if (offset < 0) {
+              if (draggingOffset === offset) {
+                left = draggedLeft
+              } else {
+                // If it's a legacy offset that is out of range, clamp it
+                if (offset < -700) {
+                  left = 50
+                } else if (offset > -70) {
+                  left = 680
+                } else {
+                  left = 750 + offset
+                }
+              }
+            }
             
             return (
               <button
                 key={offset}
                 onClick={() => handleDaySelect(offset)}
+                onPointerDown={(e) => {
+                  if (offset < 0) {
+                    handleNodeDragStart(e, offset)
+                  }
+                }}
                 className="absolute z-10 flex flex-col items-center justify-center group focus:outline-none cursor-pointer min-w-[70px] -translate-x-1/2 h-full"
                 style={{ left: `${left}px` }}
               >
@@ -694,7 +766,7 @@ export default function TimelineClient({
                       : isHistorical 
                         ? 'size-3.5 border-zinc-700 group-hover:border-zinc-400 group-hover:scale-110'
                         : 'size-3.5 border-zinc-600 group-hover:border-zinc-300 group-hover:scale-110'
-                }`}>
+                } ${isHistorical ? 'cursor-ew-resize active:scale-95' : ''}`}>
                   <div className={`rounded-full transition-all duration-300 ${
                     offset === 0
                       ? 'size-2 bg-rose-500 animate-pulse'
