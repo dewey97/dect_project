@@ -262,17 +262,17 @@ export default function TimelineClient({
     const offsets = new Set<number>()
     // Add Day 0 representing the continuous active timeline
     offsets.add(0)
-    // Add any past offsets found in events (negative offsets)
+    // Add any non-zero offsets found in events (past < 0 and future > 0)
     tracks.forEach(track => {
       track.events.forEach(ev => {
-        if ((ev.dayOffset ?? 0) < 0) {
+        if ((ev.dayOffset ?? 0) !== 0) {
           offsets.add(ev.dayOffset ?? 0)
         }
       })
     })
-    // Add any extra past days added by the user
+    // Add any extra days added by the user
     extraDays.forEach(d => {
-      if (d < 0) offsets.add(d)
+      if (d !== 0) offsets.add(d)
     })
     return Array.from(offsets).sort((a, b) => a - b)
   }, [tracks, extraDays])
