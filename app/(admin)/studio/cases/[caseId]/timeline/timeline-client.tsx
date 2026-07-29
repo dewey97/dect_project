@@ -562,7 +562,7 @@ export default function TimelineClient({
     
     const handleMove = (moveEv: PointerEvent) => {
       const deltaX = moveEv.clientX - startX
-      const newLeft = Math.max(50, Math.min(680, initialLeft + deltaX))
+      const newLeft = Math.round(Math.max(50, Math.min(680, initialLeft + deltaX)))
       setDraggedLeft(newLeft)
       draggedLeftRef.current = newLeft
     }
@@ -573,7 +573,7 @@ export default function TimelineClient({
       
       setDraggingOffset(null)
       
-      const finalLeft = Math.max(50, Math.min(680, draggedLeftRef.current))
+      const finalLeft = Math.round(Math.max(50, Math.min(680, draggedLeftRef.current)))
       const newOffset = finalLeft - 750
       
       if (newOffset !== offset) {
