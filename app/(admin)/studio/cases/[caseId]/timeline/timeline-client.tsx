@@ -441,7 +441,7 @@ export default function TimelineClient({
       for (let h = 0; h < 24; h++) {
         ticks.push({
           label: `${h}:${h === 24 ? '00' : '00'}`,
-          subLabel: h === 0 ? `Ngày ${dayOffset + 1}` : undefined,
+          subLabel: h === 0 ? (dayOffset === 0 ? 'Day 0' : `Day ${dayOffset}`) : undefined,
           minute: d * 1440 + h * 60
         })
         ticks.push({
@@ -453,7 +453,7 @@ export default function TimelineClient({
     // Add last tick
     ticks.push({
       label: `0:00`,
-      subLabel: `Ngày ${caseDaysCount + 1}`,
+      subLabel: `Day ${caseDaysCount}`,
       minute: caseDaysCount * 1440
     })
     return ticks
@@ -461,7 +461,7 @@ export default function TimelineClient({
 
   const getDayLabel = (offset: number) => {
     if (offset === 0) return 'Day 0'
-    if (offset > 0) return `Ngày ${offset + 1}`
+    if (offset > 0) return `Day ${offset}`
     const absDays = Math.abs(offset)
     if (absDays >= 365) {
       const years = Math.floor(absDays / 365)
