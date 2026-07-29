@@ -1128,22 +1128,7 @@ export default function TimelineClient({
 
                 return (
                   <div key={event.id} className="relative flex-1 flex flex-col bg-zinc-900/40 border border-white/5 rounded-xl p-5 shadow-sm hover:border-white/10 transition-all">
-                    {/* Delete Event Button - top right */}
-                    <div className="absolute top-4 right-4">
-                      <button
-                        onClick={() => {
-                          if (event.id.startsWith('new-virtual-')) return
-                          handleDeleteEvent('__GLOBAL__', event.id)
-                        }}
-                        className="p-1.5 bg-zinc-950 hover:bg-rose-950/40 text-zinc-500 hover:text-rose-400 border border-white/5 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-zinc-950 disabled:hover:text-zinc-500"
-                        title="Xóa sự việc"
-                        disabled={event.id.startsWith('new-virtual-')}
-                      >
-                        <X className="size-3.5" />
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-10 gap-6 pr-8 flex-1">
+                    <div className="grid grid-cols-1 md:grid-cols-10 gap-6 flex-1">
                       {/* LEFT COLUMN: Large Textarea */}
                       <div className="md:col-span-7 flex flex-col gap-1.5 h-full">
                         <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Sự việc xảy ra</label>
