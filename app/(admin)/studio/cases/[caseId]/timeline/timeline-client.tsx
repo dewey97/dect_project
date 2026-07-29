@@ -154,6 +154,8 @@ export default function TimelineClient({
   const [newCharForm, setNewCharForm] = useState({ name: '', role: 'SUSPECT' })
   const [showAddPastModal, setShowAddPastModal] = useState(false)
   const [pastDaysInput, setPastDaysInput] = useState('8 năm trước')
+  const [showAddFutureModal, setShowAddFutureModal] = useState(false)
+  const [futureDaysInput, setFutureDaysInput] = useState('5 năm sau')
   const [isEditingOffset, setIsEditingOffset] = useState(false)
   const [editOffsetInput, setEditOffsetInput] = useState('')
   
@@ -547,16 +549,16 @@ export default function TimelineClient({
     }
   }
 
-  // Handle horizontal dragging of past milestone nodes
+  // Handle horizontal dragging of past/future milestone nodes
   const handleNodeDragStart = (e: React.PointerEvent<HTMLButtonElement>, offset: number) => {
     e.preventDefault()
     e.stopPropagation()
     
     const startX = e.clientX
     // Clamp/map initial offset value to represent left coordinate
-    let initialLeft = 1150 + offset
-    if (offset < -1100) initialLeft = 50
-    if (offset > -70) initialLeft = 1080
+    const minL = offset < 0 ? 50 : 670
+    const maxL = offset < 0 ? 530 : 1150
+    let initialLeft = Math.max(minL, Math.min(maxL, 600 + offset))
     
     isDraggingRef.current = false
     setDraggingOffset(offset)
@@ -568,7 +570,7 @@ export default function TimelineClient({
       if (Math.abs(deltaX) > 3) {
         isDraggingRef.current = true
       }
-      const newLeft = Math.round(Math.max(50, Math.min(1080, initialLeft + deltaX)))
+      const newLeft = Math.round(Math.max(minL, Math.min(maxL, initialLeft + deltaX)))
       setDraggedLeft(newLeft)
       draggedLeftRef.current = newLeft
     }
@@ -579,8 +581,8 @@ export default function TimelineClient({
       
       setDraggingOffset(null)
       
-      const finalLeft = Math.round(Math.max(50, Math.min(1080, draggedLeftRef.current)))
-      const newOffset = finalLeft - 1150
+      const finalLeft = Math.round(Math.max(minL, Math.min(maxL, draggedLeftRef.current)))
+      const newOffset = finalLeft - 600
       
       if (newOffset !== offset) {
         // 1. Update all events at offset to newOffset across all character tracks
@@ -684,6 +686,12 @@ export default function TimelineClient({
           >
             <Plus className="size-3.5" /> Mốc Quá Khứ
           </button>
+          <button
+            onClick={() => setShowAddFutureModal(true)}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-white/10 hover:border-white/20 text-zinc-300 hover:text-zinc-100 bg-zinc-800/40 rounded transition-colors"
+          >
+            <Plus className="size-3.5" /> Mốc Tương Lai
+          </button>
           <div className="w-px h-4 bg-white/10 mx-1" />
           <button 
             onClick={async () => {
@@ -733,21 +741,17 @@ export default function TimelineClient({
           {dayOffsets.map((offset) => {
             const isActive = activeDayOffset === offset
             const isHistorical = offset < 0
+            const isFuture = offset > 0
             
             // Calculate absolute left coordinate
-            let left = 1150
-            if (offset < 0) {
+            let left = 600
+            if (offset !== 0) {
               if (draggingOffset === offset) {
                 left = draggedLeft
               } else {
-                // If it's a legacy offset that is out of range, clamp it
-                if (offset < -1100) {
-                  left = 50
-                } else if (offset > -70) {
-                  left = 1080
-                } else {
-                  left = 1150 + offset
-                }
+                const minL = offset < 0 ? 50 : 670
+                const maxL = offset < 0 ? 530 : 1150
+                left = Math.max(minL, Math.min(maxL, 600 + offset))
               }
             }
             
@@ -756,7 +760,7 @@ export default function TimelineClient({
                 key={offset}
                 onClick={() => handleDaySelect(offset)}
                 onPointerDown={(e) => {
-                  if (offset < 0) {
+                  if (offset !== 0) {
                     handleNodeDragStart(e, offset)
                   }
                 }}
@@ -771,10 +775,10 @@ export default function TimelineClient({
                       : 'size-5 border-rose-600/60 shadow-[0_0_8px_rgba(244,63,94,0.3)] hover:border-rose-500'
                     : isActive 
                       ? 'size-3.5 border-primary shadow-[0_0_12px_rgba(244,63,94,0.8)] scale-125' 
-                      : isHistorical 
+                      : isHistorical || isFuture
                         ? 'size-3.5 border-zinc-700 group-hover:border-zinc-400 group-hover:scale-110'
                         : 'size-3.5 border-zinc-600 group-hover:border-zinc-300 group-hover:scale-110'
-                } ${isHistorical ? 'cursor-ew-resize active:scale-95' : ''}`}>
+                } ${offset !== 0 ? 'cursor-ew-resize active:scale-95' : ''}`}>
                   <div className={`rounded-full transition-all duration-300 ${
                     offset === 0
                       ? 'size-2 bg-rose-500 animate-pulse'
@@ -847,7 +851,7 @@ export default function TimelineClient({
         />
 
         {/* X-Axis: Canvas or Historical List Editor */}
-        {activeDayOffset >= 0 ? (
+        {activeDayOffset === 0 ? (
           <div 
             ref={scrollContainerRef}
             onPointerDown={handlePanStart}
@@ -1345,13 +1349,72 @@ export default function TimelineClient({
                     // Find the minimum negative offset currently in use to assign a new ordered ID
                     const existingOffsets = dayOffsets.filter(o => o < 0)
                     const minOffset = existingOffsets.length > 0 ? Math.min(...existingOffsets) : 0
-                    const newOffset = minOffset - 1
+                    const newOffset = minOffset - 100
                     
                     setExtraDays(prev => [...prev, newOffset])
                     setTempMilestoneLabels(prev => ({ ...prev, [newOffset]: labelText }))
                     setActiveDayOffset(newOffset)
                     setShowAddPastModal(false)
                     setPastDaysInput('8 năm trước')
+                  }
+                }}
+                className="px-3 py-1.5 text-xs bg-primary text-primary-foreground font-medium rounded hover:bg-primary/90 transition-colors"
+              >
+                Tạo mốc
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE FUTURE MILESTONE MODAL */}
+      {showAddFutureModal && (
+        <div className="absolute inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200">
+          <div className="w-96 bg-zinc-900 border border-white/10 rounded-xl p-5 shadow-2xl space-y-4">
+            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
+              <Plus className="size-4 text-primary animate-pulse" />
+              Tạo Mốc Tương Lai Mới
+            </h3>
+            
+            <div>
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Tên mốc thời gian</label>
+              <input 
+                type="text" 
+                value={futureDaysInput}
+                onChange={e => setFutureDaysInput(e.target.value)}
+                placeholder="Ví dụ: 5 năm sau, Tương lai, Ngày mai..."
+                className="w-full bg-zinc-950 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
+                autoFocus
+                spellCheck={false}
+              />
+              <p className="text-[10px] text-zinc-500 mt-1">Nhập tên gọi cho mốc thời gian tương lai này (Ví dụ: "5 năm sau", "Tương lai"...).</p>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button 
+                onClick={() => {
+                  setShowAddFutureModal(false)
+                  setFutureDaysInput('5 năm sau')
+                }}
+                className="px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-200 bg-zinc-800 rounded transition-colors"
+              >
+                Hủy
+              </button>
+              
+              <button 
+                onClick={() => {
+                  const labelText = futureDaysInput.trim()
+                  if (labelText) {
+                    // Find the maximum positive offset currently in use to assign a new ordered ID
+                    const existingOffsets = dayOffsets.filter(o => o > 0)
+                    const maxOffset = existingOffsets.length > 0 ? Math.max(...existingOffsets) : 0
+                    const newOffset = maxOffset + 100
+                    
+                    setExtraDays(prev => [...prev, newOffset])
+                    setTempMilestoneLabels(prev => ({ ...prev, [newOffset]: labelText }))
+                    setActiveDayOffset(newOffset)
+                    setShowAddFutureModal(false)
+                    setFutureDaysInput('5 năm sau')
                   }
                 }}
                 className="px-3 py-1.5 text-xs bg-primary text-primary-foreground font-medium rounded hover:bg-primary/90 transition-colors"
