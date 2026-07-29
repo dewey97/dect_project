@@ -1102,11 +1102,17 @@ export default function TimelineClient({
                   // Parse location, specific day, and involved characters
                   const rawLocation = event.location || ''
                   const parts = rawLocation.split('|||')
+                  let milestoneLabel = ''
                   let specificDay = ''
                   let parsedLoc = ''
                   let involvedNames: string[] = []
 
-                  if (parts.length === 3) {
+                  if (parts.length === 4) {
+                    milestoneLabel = parts[0] || ''
+                    specificDay = parts[1] || ''
+                    parsedLoc = parts[2] || ''
+                    involvedNames = parts[3] ? parts[3].split(',').filter(Boolean) : []
+                  } else if (parts.length === 3) {
                     specificDay = parts[0] || ''
                     parsedLoc = parts[1] || ''
                     involvedNames = parts[2] ? parts[2].split(',').filter(Boolean) : []
@@ -1153,9 +1159,9 @@ export default function TimelineClient({
                               <input
                                 type="date"
                                 value={specificDay}
-                                onChange={e => {
+                               onChange={e => {
                                   const newDay = e.target.value
-                                  const newRaw = `${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
+                                  const newRaw = `${milestoneLabel}|||${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
                                   handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
                                 }}
                                 className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all dark:[color-scheme:dark]"
@@ -1169,7 +1175,7 @@ export default function TimelineClient({
                               value={parsedLoc}
                               onChange={e => {
                                 const newLoc = e.target.value
-                                const newRaw = `${specificDay}|||${newLoc}|||${involvedNames.join(',')}`
+                                const newRaw = `${milestoneLabel}|||${specificDay}|||${newLoc}|||${involvedNames.join(',')}`
                                 handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
                               }}
                               placeholder="Nơi chốn"
@@ -1194,7 +1200,7 @@ export default function TimelineClient({
                                       } else {
                                         newInvolved.push(char.name)
                                       }
-                                      const newRaw = `${specificDay}|||${parsedLoc}|||${newInvolved.join(',')}`
+                                      const newRaw = `${milestoneLabel}|||${specificDay}|||${parsedLoc}|||${newInvolved.join(',')}`
                                       handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
                                     }}
                                     className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border transition-all ${
