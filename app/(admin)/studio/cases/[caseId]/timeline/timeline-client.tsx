@@ -1154,19 +1154,21 @@ export default function TimelineClient({
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/5 pt-4">
                         <div className="md:col-span-1 flex flex-col gap-3">
-                          <div>
-                            <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
-                            <input
-                              type="date"
-                              value={specificDay}
-                              onChange={e => {
-                                const newDay = e.target.value
-                                const newRaw = `${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
-                                handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
-                              }}
-                              className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all dark:[color-scheme:dark]"
-                            />
-                          </div>
+                          {activeDayOffset > 0 && (
+                            <div>
+                              <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
+                              <input
+                                type="date"
+                                value={specificDay}
+                                onChange={e => {
+                                  const newDay = e.target.value
+                                  const newRaw = `${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
+                                  handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                                }}
+                                className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all dark:[color-scheme:dark]"
+                              />
+                            </div>
+                          )}
                           <div>
                             <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
                             <input
