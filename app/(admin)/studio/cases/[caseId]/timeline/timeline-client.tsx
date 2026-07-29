@@ -776,7 +776,7 @@ export default function TimelineClient({
                 ))}
 
                 {/* Render Track Lanes */}
-                {tracks.map((track, trackIdx) => (
+                {tracks.filter(t => t.id !== '__GLOBAL__').map((track, trackIdx) => (
                   <div 
                     key={`lane-${track.id}`} 
                     className="absolute w-full h-20 border-b border-white/5 hover:bg-white/[0.02] transition-colors" 
@@ -825,108 +825,160 @@ export default function TimelineClient({
             </div>
           </div>
         ) : (
-          /* Historical Events List Editor */
+          /* Historical Events List Editor - Unified Narrative Track */
           <div className="flex-1 overflow-y-auto bg-zinc-950/20 p-6 space-y-6">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <h3 className="text-base font-semibold text-zinc-100">{getDayLabel(activeDayOffset)}</h3>
-                <p className="text-xs text-zinc-400 mt-1">Các mốc sự kiện quan trọng trong quá khứ được sắp xếp theo nhân vật.</p>
+                <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
+                  <span className="px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded text-xs">Quá khứ</span>
+                  {getDayLabel(activeDayOffset)}
+                </h3>
+                <p className="text-xs text-zinc-400 mt-1">
+                  Trục tự sự chung cho các sự kiện xảy ra trong quá khứ.
+                </p>
               </div>
+              <button
+                onClick={() => {
+                  const newEvent: TrackEvent = {
+                    id: `new-${Date.now()}`,
+                    title: 'Sự việc mới',
+                    location: '|||', // Serialized format: location|||involvedChar1,involvedChar2
+                    dayOffset: activeDayOffset,
+                    startMin: 0,
+                    endMin: 0,
+                    type: 'TRUTH'
+                  }
+                  const newTracks = tracks.map(t => {
+                    if (t.id === '__GLOBAL__') {
+                      return { ...t, events: [...t.events, newEvent] }
+                    }
+                    return t
+                  })
+                  pushState(newTracks)
+                }}
+                className="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all"
+              >
+                <Plus className="size-3.5" /> Thêm sự việc
+              </button>
             </div>
 
-            <div className="space-y-6 max-w-3xl">
-              {tracks.map(track => {
-                const dayEvents = track.events.filter(e => e.dayOffset === activeDayOffset)
-                
-                return (
-                  <div key={track.id} className="bg-zinc-900/40 border border-white/5 rounded-xl p-4 space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="size-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-medium text-zinc-400">
-                          {track.avatar}
-                        </div>
-                        <span className="text-sm font-semibold text-zinc-300">{track.name}</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const newEvent: TrackEvent = {
-                            id: `new-${Date.now()}`,
-                            title: 'Mốc sự kiện mới',
-                            location: 'Hiện trường',
-                            dayOffset: activeDayOffset,
-                            startMin: 0,
-                            endMin: 0,
-                            type: 'TRUTH'
-                          }
-                          const newTracks = tracks.map(t => {
-                            if (t.id === track.id) {
-                              return { ...t, events: [...t.events, newEvent] }
-                            }
-                            return t
-                          })
-                          pushState(newTracks)
-                        }}
-                        className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1"
-                      >
-                        <Plus className="size-3" /> Thêm sự kiện
-                      </button>
-                    </div>
+            <div className="space-y-4 max-w-3xl">
+              {(() => {
+                const globalTrack = tracks.find(t => t.id === '__GLOBAL__')
+                const dayEvents = globalTrack ? globalTrack.events.filter(e => e.dayOffset === activeDayOffset) : []
+                const availableChars = tracks.filter(t => t.id !== '__GLOBAL__')
 
-                    {dayEvents.length === 0 ? (
-                      <p className="text-xs text-zinc-500 italic py-2">Chưa có sự kiện nào được ghi nhận cho nhân vật này.</p>
-                    ) : (
-                      <div className="space-y-3">
-                        {dayEvents.map(event => (
-                          <div key={event.id} className="flex items-center gap-3 bg-zinc-950/60 p-3 rounded-lg border border-white/5">
-                            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
-                              <div>
-                                <label className="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider block mb-1">Tên sự kiện</label>
-                                <input
-                                  type="text"
-                                  value={event.title}
-                                  onChange={e => handleSaveDetails(track.id, event.id, { title: e.target.value })}
-                                  placeholder="Sự việc xảy ra"
-                                  className="w-full bg-zinc-900 border border-white/5 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-primary"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider block mb-1">Địa điểm</label>
-                                <input
-                                  type="text"
-                                  value={event.location}
-                                  onChange={e => handleSaveDetails(track.id, event.id, { location: e.target.value })}
-                                  placeholder="Nơi chốn"
-                                  className="w-full bg-zinc-900 border border-white/5 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-primary"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider block mb-1">Tính chất</label>
-                                <select
-                                  value={event.type}
-                                  onChange={e => handleSaveDetails(track.id, event.id, { type: e.target.value as any })}
-                                  className="w-full bg-zinc-900 border border-white/5 rounded px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-primary"
-                                >
-                                  <option value="TRUTH">Sự thật khách quan (Truth)</option>
-                                  <option value="LIE">Lời khai ngoại phạm (Lie)</option>
-                                </select>
-                              </div>
-                            </div>
-                            <div className="flex items-center self-end pb-1.5">
-                              <button
-                                onClick={() => handleDeleteEvent(track.id, event.id)}
-                                className="p-1.5 bg-zinc-900 hover:bg-rose-950/40 text-zinc-400 hover:text-rose-400 border border-white/5 rounded transition-colors"
-                                title="Xóa mốc sự kiện"
-                              >
-                                <X className="size-3.5" />
-                              </button>
-                            </div>
+                if (dayEvents.length === 0) {
+                  return (
+                    <div className="bg-zinc-900/20 border border-dashed border-white/5 rounded-xl p-8 text-center">
+                      <p className="text-sm text-zinc-500 italic">Chưa có câu chuyện hay sự việc lịch sử nào được ghi nhận cho mốc thời gian này.</p>
+                    </div>
+                  )
+                }
+
+                return dayEvents.map(event => {
+                  // Parse location and involved characters
+                  const rawLocation = event.location || ''
+                  const parts = rawLocation.split('|||')
+                  const parsedLoc = parts[0] || ''
+                  const involvedNames = parts[1] ? parts[1].split(',').filter(Boolean) : []
+
+                  return (
+                    <div key={event.id} className="bg-zinc-900/40 border border-white/5 rounded-xl p-5 space-y-4 shadow-sm hover:border-white/10 transition-all">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Sự việc xảy ra</label>
+                          <textarea
+                            value={event.title}
+                            onChange={e => handleSaveDetails('__GLOBAL__', event.id, { title: e.target.value })}
+                            placeholder="Mô tả sự việc chi tiết tại mốc thời gian này..."
+                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-primary transition-all resize-y min-h-[70px]"
+                          />
+                        </div>
+                        
+                        <div className="flex flex-col gap-2">
+                          <div className="flex justify-end gap-1">
+                            <button
+                              onClick={() => handleDeleteEvent('__GLOBAL__', event.id)}
+                              className="p-2 bg-zinc-950 hover:bg-rose-950/40 text-zinc-500 hover:text-rose-400 border border-white/5 rounded-lg transition-colors"
+                              title="Xóa sự việc"
+                            >
+                              <X className="size-3.5" />
+                            </button>
                           </div>
-                        ))}
+                          
+                          <div>
+                            <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Tính chất</label>
+                            <select
+                              value={event.type}
+                              onChange={e => handleSaveDetails('__GLOBAL__', event.id, { type: e.target.value as any })}
+                              className="bg-zinc-950 border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-primary cursor-pointer"
+                            >
+                              <option value="TRUTH">Truth (Sự thật)</option>
+                              <option value="LIE">Lie (Giả dối)</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                )
-              })}
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/5 pt-4">
+                        <div className="md:col-span-1">
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
+                          <input
+                            type="text"
+                            value={parsedLoc}
+                            onChange={e => {
+                              const newLoc = e.target.value
+                              const newRaw = `${newLoc}|||${involvedNames.join(',')}`
+                              handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                            }}
+                            placeholder="Nơi chốn"
+                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all"
+                          />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Nhân vật tham gia</label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {availableChars.map(char => {
+                              const isChecked = involvedNames.includes(char.name)
+                              return (
+                                <button
+                                  key={char.id}
+                                  type="button"
+                                  onClick={() => {
+                                    let newInvolved = [...involvedNames]
+                                    if (isChecked) {
+                                      newInvolved = newInvolved.filter(name => name !== char.name)
+                                    } else {
+                                      newInvolved.push(char.name)
+                                    }
+                                    const newRaw = `${parsedLoc}|||${newInvolved.join(',')}`
+                                    handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                                  }}
+                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border transition-all ${
+                                    isChecked
+                                      ? 'bg-primary/20 border-primary/40 text-white font-medium shadow-[0_0_10px_rgba(244,63,94,0.15)]'
+                                      : 'bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                  }`}
+                                >
+                                  <div className={`size-4 rounded-full text-[8px] flex items-center justify-center font-bold transition-all ${
+                                    isChecked 
+                                      ? 'bg-primary text-white' 
+                                      : 'bg-zinc-800 text-zinc-400'
+                                  }`}>
+                                    {char.avatar}
+                                  </div>
+                                  {char.name}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              })()}
             </div>
           </div>
         )}
