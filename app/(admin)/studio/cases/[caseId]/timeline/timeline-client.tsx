@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { Clock, Play, ZoomIn, ZoomOut, Ghost, Filter, Settings2, Lock, Undo2, Redo2, Plus, X, Save } from 'lucide-react'
+import { Clock, Play, ZoomIn, ZoomOut, Ghost, Filter, Settings2, Lock, Undo2, Redo2, Plus, X, Save, Edit3, Trash2 } from 'lucide-react'
 import { TimelineBlock } from '@/components/admin/timeline-block'
 import { CharacterPanel } from '@/components/admin/character-panel'
 import { DbTimelineEvent } from '@/lib/types/database'
@@ -154,6 +154,8 @@ export default function TimelineClient({
   const [newCharForm, setNewCharForm] = useState({ name: '', role: 'SUSPECT' })
   const [showAddPastModal, setShowAddPastModal] = useState(false)
   const [pastDaysInput, setPastDaysInput] = useState('30')
+  const [isEditingOffset, setIsEditingOffset] = useState(false)
+  const [editOffsetInput, setEditOffsetInput] = useState('')
   
   // History State for Undo/Redo
   const [history, setHistory] = useState<Track[][]>([buildInitialTracks(initialEvents, initialCharacters)])
@@ -841,10 +843,102 @@ export default function TimelineClient({
           <div className="flex-1 overflow-y-auto bg-zinc-950/20 p-6 space-y-6">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-                  <span className="px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded text-xs">Quá khứ</span>
-                  {getDayLabel(activeDayOffset)}
-                </h3>
+                {isEditingOffset ? (
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded text-xs">Quá khứ</span>
+                    <input
+                      type="number"
+                      value={editOffsetInput}
+                      onChange={e => setEditOffsetInput(e.target.value)}
+                      className="bg-zinc-950 border border-white/10 rounded px-2.5 py-1 text-xs text-zinc-200 focus:outline-none focus:border-primary w-24"
+                      placeholder="Số ngày..."
+                      autoFocus
+                      spellCheck={false}
+                    />
+                    <button
+                      onClick={() => {
+                        const val = parseInt(editOffsetInput, 10)
+                        if (!isNaN(val) && val > 0) {
+                          const newOffset = -val
+                          const oldOffset = activeDayOffset
+                          
+                          // 1. Update all events at oldOffset to newOffset
+                          const newTracks = tracks.map(t => {
+                            if (t.id === '__GLOBAL__') {
+                              return {
+                                ...t,
+                                events: t.events.map(ev => {
+                                  if (ev.dayOffset === oldOffset) {
+                                    return { ...ev, dayOffset: newOffset }
+                                  }
+                                  return ev
+                                })
+                              }
+                            }
+                            return t
+                          })
+                          
+                          // 2. Update extraDays state to swap oldOffset for newOffset
+                          setExtraDays(prev => {
+                            const filtered = prev.filter(o => o !== oldOffset)
+                            return [...filtered, newOffset]
+                          })
+                          
+                          pushState(newTracks)
+                          setActiveDayOffset(newOffset)
+                          setIsEditingOffset(false)
+                        }
+                      }}
+                      className="px-2 py-1 bg-primary text-primary-foreground font-semibold rounded text-xs hover:bg-primary/90 transition-colors"
+                    >
+                      Lưu
+                    </button>
+                    <button
+                      onClick={() => setIsEditingOffset(false)}
+                      className="px-2 py-1 bg-zinc-800 text-zinc-400 rounded text-xs hover:bg-zinc-700 transition-colors"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                ) : (
+                  <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded text-xs">Quá khứ</span>
+                    {getDayLabel(activeDayOffset)}
+                    <button
+                      onClick={() => {
+                        setEditOffsetInput(Math.abs(activeDayOffset).toString())
+                        setIsEditingOffset(true)
+                      }}
+                      className="p-1 text-zinc-500 hover:text-zinc-300 rounded hover:bg-white/5 transition-all ml-1"
+                      title="Sửa mốc thời gian"
+                    >
+                      <Edit3 className="size-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('Bạn có chắc chắn muốn xóa mốc quá khứ này cùng toàn bộ các sự việc bên trong không?')) {
+                          const oldOffset = activeDayOffset
+                          const newTracks = tracks.map(t => {
+                            if (t.id === '__GLOBAL__') {
+                              return {
+                                ...t,
+                                events: t.events.filter(ev => ev.dayOffset !== oldOffset)
+                              }
+                            }
+                            return t
+                          })
+                          setExtraDays(prev => prev.filter(o => o !== oldOffset))
+                          pushState(newTracks)
+                          setActiveDayOffset(0) // Return to Day 0
+                        }
+                      }}
+                      className="p-1 text-zinc-500 hover:text-rose-400 rounded hover:bg-white/5 transition-all"
+                      title="Xóa mốc quá khứ"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  </h3>
+                )}
                 <p className="text-xs text-zinc-400 mt-1">
                   Trục tự sự chung cho các sự kiện xảy ra trong quá khứ.
                 </p>
