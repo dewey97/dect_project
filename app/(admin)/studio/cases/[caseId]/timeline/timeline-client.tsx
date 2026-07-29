@@ -554,9 +554,9 @@ export default function TimelineClient({
     
     const startX = e.clientX
     // Clamp/map initial offset value to represent left coordinate
-    let initialLeft = 750 + offset
-    if (offset < -700) initialLeft = 50
-    if (offset > -70) initialLeft = 680
+    let initialLeft = 1150 + offset
+    if (offset < -1100) initialLeft = 50
+    if (offset > -70) initialLeft = 1080
     
     isDraggingRef.current = false
     setDraggingOffset(offset)
@@ -568,7 +568,7 @@ export default function TimelineClient({
       if (Math.abs(deltaX) > 3) {
         isDraggingRef.current = true
       }
-      const newLeft = Math.round(Math.max(50, Math.min(680, initialLeft + deltaX)))
+      const newLeft = Math.round(Math.max(50, Math.min(1080, initialLeft + deltaX)))
       setDraggedLeft(newLeft)
       draggedLeftRef.current = newLeft
     }
@@ -579,8 +579,8 @@ export default function TimelineClient({
       
       setDraggingOffset(null)
       
-      const finalLeft = Math.round(Math.max(50, Math.min(680, draggedLeftRef.current)))
-      const newOffset = finalLeft - 750
+      const finalLeft = Math.round(Math.max(50, Math.min(1080, draggedLeftRef.current)))
+      const newOffset = finalLeft - 1150
       
       if (newOffset !== offset) {
         // 1. Update all events at offset to newOffset across all character tracks
@@ -723,7 +723,7 @@ export default function TimelineClient({
       {/* MASTER TIMELINE NAVIGATOR */}
       <div className="px-4 py-3 border-b border-white/10 bg-zinc-950/60 flex justify-center shrink-0 select-none">
         <div 
-          className="relative h-16 flex items-center shrink-0 w-[800px]"
+          className="relative h-16 flex items-center shrink-0 w-[1200px]"
         >
           {/* Connecting line */}
           <div 
@@ -735,18 +735,18 @@ export default function TimelineClient({
             const isHistorical = offset < 0
             
             // Calculate absolute left coordinate
-            let left = 750
+            let left = 1150
             if (offset < 0) {
               if (draggingOffset === offset) {
                 left = draggedLeft
               } else {
                 // If it's a legacy offset that is out of range, clamp it
-                if (offset < -700) {
+                if (offset < -1100) {
                   left = 50
                 } else if (offset > -70) {
-                  left = 680
+                  left = 1080
                 } else {
-                  left = 750 + offset
+                  left = 1150 + offset
                 }
               }
             }
@@ -760,7 +760,7 @@ export default function TimelineClient({
                     handleNodeDragStart(e, offset)
                   }
                 }}
-                className="absolute z-10 flex flex-col items-center justify-center group focus:outline-none cursor-pointer min-w-[70px] -translate-x-1/2 h-full"
+                className="absolute z-10 flex flex-col items-center justify-center group focus:outline-none cursor-pointer w-20 -translate-x-1/2 h-full"
                 style={{ left: `${left}px` }}
               >
                 {/* Circle Node */}
