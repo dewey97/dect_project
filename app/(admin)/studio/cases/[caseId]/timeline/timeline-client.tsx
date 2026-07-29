@@ -1121,34 +1121,33 @@ export default function TimelineClient({
                   }
 
                   return (
-                    <div key={event.id} className="bg-zinc-900/40 border border-white/5 rounded-xl p-5 space-y-4 shadow-sm hover:border-white/10 transition-all">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Sự việc xảy ra</label>
+                    <div key={event.id} className="relative bg-zinc-900/40 border border-white/5 rounded-xl p-5 shadow-sm hover:border-white/10 transition-all">
+                      {/* Delete Event Button - top right */}
+                      <div className="absolute top-4 right-4">
+                        <button
+                          onClick={() => handleDeleteEvent('__GLOBAL__', event.id)}
+                          className="p-1.5 bg-zinc-950 hover:bg-rose-950/40 text-zinc-500 hover:text-rose-400 border border-white/5 rounded-lg transition-colors"
+                          title="Xóa sự việc"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pr-8">
+                        {/* LEFT COLUMN: Large Textarea */}
+                        <div className="md:col-span-2 flex flex-col gap-1.5">
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Sự việc xảy ra</label>
                           <textarea
                             value={event.title}
                             onChange={e => handleSaveDetails('__GLOBAL__', event.id, { title: e.target.value })}
                             placeholder="Mô tả sự việc chi tiết tại mốc thời gian này..."
-                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-primary transition-all resize-y min-h-[70px]"
+                            className="w-full flex-1 bg-zinc-950 border border-white/5 rounded-lg px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-primary transition-all resize-y min-h-[180px]"
                             spellCheck={false}
                           />
                         </div>
-                        
-                        <div className="flex flex-col gap-2">
-                          <div className="flex justify-end gap-1">
-                            <button
-                              onClick={() => handleDeleteEvent('__GLOBAL__', event.id)}
-                              className="p-2 bg-zinc-950 hover:bg-rose-950/40 text-zinc-500 hover:text-rose-400 border border-white/5 rounded-lg transition-colors"
-                              title="Xóa sự việc"
-                            >
-                              <X className="size-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/5 pt-4">
-                        <div className="md:col-span-1 flex flex-col gap-3">
+                        {/* RIGHT COLUMN: Metadata (Date, Location, Involved Characters) */}
+                        <div className="md:col-span-1 flex flex-col gap-4 border-l border-white/5 pl-6">
                           {activeDayOffset > 0 && (
                             <div>
                               <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
@@ -1164,6 +1163,7 @@ export default function TimelineClient({
                               />
                             </div>
                           )}
+                          
                           <div>
                             <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
                             <input
@@ -1179,43 +1179,44 @@ export default function TimelineClient({
                               spellCheck={false}
                             />
                           </div>
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Nhân vật tham gia</label>
-                          <div className="flex flex-wrap gap-1.5">
-                            {availableChars.map(char => {
-                              const isChecked = involvedNames.includes(char.name)
-                              return (
-                                <button
-                                  key={char.id}
-                                  type="button"
-                                  onClick={() => {
-                                    let newInvolved = [...involvedNames]
-                                    if (isChecked) {
-                                      newInvolved = newInvolved.filter(name => name !== char.name)
-                                    } else {
-                                      newInvolved.push(char.name)
-                                    }
-                                    const newRaw = `${specificDay}|||${parsedLoc}|||${newInvolved.join(',')}`
-                                    handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
-                                  }}
-                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border transition-all ${
-                                    isChecked
-                                      ? 'bg-primary/20 border-primary/40 text-white font-medium shadow-[0_0_10px_rgba(244,63,94,0.15)]'
-                                      : 'bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
-                                  }`}
-                                >
-                                  <div className={`size-4 rounded-full text-[8px] flex items-center justify-center font-bold transition-all ${
-                                    isChecked 
-                                      ? 'bg-primary text-white' 
-                                      : 'bg-zinc-800 text-zinc-400'
-                                  }`}>
-                                    {char.avatar}
-                                  </div>
-                                  {char.name}
-                                </button>
-                              )
-                            })}
+
+                          <div>
+                            <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Nhân vật tham gia</label>
+                            <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto pr-1">
+                              {availableChars.map(char => {
+                                const isChecked = involvedNames.includes(char.name)
+                                return (
+                                  <button
+                                    key={char.id}
+                                    type="button"
+                                    onClick={() => {
+                                      let newInvolved = [...involvedNames]
+                                      if (isChecked) {
+                                        newInvolved = newInvolved.filter(name => name !== char.name)
+                                      } else {
+                                        newInvolved.push(char.name)
+                                      }
+                                      const newRaw = `${specificDay}|||${parsedLoc}|||${newInvolved.join(',')}`
+                                      handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                                    }}
+                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border transition-all ${
+                                      isChecked
+                                        ? 'bg-primary/20 border-primary/40 text-white font-medium shadow-[0_0_10px_rgba(244,63,94,0.15)]'
+                                        : 'bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                    }`}
+                                  >
+                                    <div className={`size-4 rounded-full text-[8px] flex items-center justify-center font-bold transition-all ${
+                                      isChecked 
+                                        ? 'bg-primary text-white' 
+                                        : 'bg-zinc-800 text-zinc-400'
+                                    }`}>
+                                      {char.avatar}
+                                    </div>
+                                    {char.name}
+                                  </button>
+                                )
+                              })}
+                            </div>
                           </div>
                         </div>
                       </div>
