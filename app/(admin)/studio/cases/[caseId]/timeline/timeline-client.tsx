@@ -388,6 +388,28 @@ export default function TimelineClient({
   }
 
   const handleSaveDetails = (trackId: string, eventId: string, details: Partial<TrackEvent>) => {
+    if (eventId.startsWith('new-virtual-')) {
+      const actualId = `new-${Date.now()}`
+      const newEvent: TrackEvent = {
+        id: actualId,
+        title: details.title ?? '',
+        location: details.location ?? `${getDayLabel(activeDayOffset)}||||||`,
+        dayOffset: activeDayOffset,
+        startMin: 0,
+        endMin: 0,
+        type: 'TRUTH',
+        ...details
+      }
+      const newTracks = tracks.map(t => {
+        if (t.id === '__GLOBAL__') {
+          return { ...t, events: [...t.events, newEvent] }
+        }
+        return t
+      })
+      pushState(newTracks)
+      return
+    }
+
     const newTracks = tracks.map(track => {
       if (track.id !== trackId) return track
       return {
@@ -937,301 +959,281 @@ export default function TimelineClient({
                   </div>
                 ))}
               </div>
-
             </div>
           </div>
         ) : (
           /* Historical Events List Editor - Unified Narrative Track */
-          <div className="flex-1 overflow-y-auto bg-zinc-950/20 p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div>
-                {isEditingOffset ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={editOffsetInput}
-                      onChange={e => setEditOffsetInput(e.target.value)}
-                      className="bg-zinc-950 border border-white/10 rounded px-2.5 py-1 text-xs text-zinc-200 focus:outline-none focus:border-primary w-44"
-                      placeholder="Mốc thời gian..."
-                      autoFocus
-                      spellCheck={false}
-                    />
-                    <button
-                      onClick={() => {
-                        const newLabel = editOffsetInput.trim()
-                        if (newLabel) {
-                          const targetOffset = activeDayOffset
-                          
-                          // 1. Update all events at targetOffset with the new label in location field
-                          const newTracks = tracks.map(t => {
-                            if (t.id === '__GLOBAL__') {
-                              return {
-                                ...t,
-                                events: t.events.map(ev => {
-                                  if (ev.dayOffset === targetOffset) {
-                                    const rawLocation = ev.location || ''
-                                    const parts = rawLocation.split('|||')
-                                    let specificDay = ''
-                                    let parsedLoc = ''
-                                    let involvedNames: string[] = []
+          <div className="flex-1 flex flex-col bg-zinc-950/20 p-6">
+            <div className="flex items-center gap-2 mb-4 shrink-0">
+              {isEditingOffset ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={editOffsetInput}
+                    onChange={e => setEditOffsetInput(e.target.value)}
+                    className="bg-zinc-950 border border-white/10 rounded px-2.5 py-1 text-xs text-zinc-200 focus:outline-none focus:border-primary w-44"
+                    placeholder="Mốc thời gian..."
+                    autoFocus
+                    spellCheck={false}
+                  />
+                  <button
+                    onClick={() => {
+                      const newLabel = editOffsetInput.trim()
+                      if (newLabel) {
+                        const targetOffset = activeDayOffset
+                        
+                        // 1. Update all events at targetOffset with the new label in location field
+                        const newTracks = tracks.map(t => {
+                          if (t.id === '__GLOBAL__') {
+                            return {
+                              ...t,
+                              events: t.events.map(ev => {
+                                if (ev.dayOffset === targetOffset) {
+                                  const rawLocation = ev.location || ''
+                                  const parts = rawLocation.split('|||')
+                                  let specificDay = ''
+                                  let parsedLoc = ''
+                                  let involvedNames: string[] = []
 
-                                    if (parts.length === 4) {
-                                      specificDay = parts[1] || ''
-                                      parsedLoc = parts[2] || ''
-                                      involvedNames = parts[3] ? parts[3].split(',').filter(Boolean) : []
-                                    } else if (parts.length === 3) {
-                                      specificDay = parts[0] || ''
-                                      parsedLoc = parts[1] || ''
-                                      involvedNames = parts[2] ? parts[2].split(',').filter(Boolean) : []
-                                    } else if (parts.length === 2) {
-                                      specificDay = ''
-                                      parsedLoc = parts[0] || ''
-                                      involvedNames = parts[1] ? parts[1].split(',').filter(Boolean) : []
-                                    } else {
-                                      specificDay = ''
-                                      parsedLoc = rawLocation
-                                      involvedNames = []
-                                    }
-                                    
-                                    const newRaw = `${newLabel}|||${specificDay}|||${parsedLoc}|||${involvedNames.join(',')}`
-                                    return { ...ev, location: newRaw }
+                                  if (parts.length === 4) {
+                                    specificDay = parts[1] || ''
+                                    parsedLoc = parts[2] || ''
+                                    involvedNames = parts[3] ? parts[3].split(',').filter(Boolean) : []
+                                  } else if (parts.length === 3) {
+                                    specificDay = parts[0] || ''
+                                    parsedLoc = parts[1] || ''
+                                    involvedNames = parts[2] ? parts[2].split(',').filter(Boolean) : []
+                                  } else if (parts.length === 2) {
+                                    specificDay = ''
+                                    parsedLoc = parts[0] || ''
+                                    involvedNames = parts[1] ? parts[1].split(',').filter(Boolean) : []
+                                  } else {
+                                    specificDay = ''
+                                    parsedLoc = rawLocation
+                                    involvedNames = []
                                   }
-                                  return ev
-                                })
-                              }
+                                  
+                                  const newRaw = `${newLabel}|||${specificDay}|||${parsedLoc}|||${involvedNames.join(',')}`
+                                  return { ...ev, location: newRaw }
+                                }
+                                return ev
+                              })
                             }
-                            return t
-                          })
-                          
-                          setTempMilestoneLabels(prev => ({ ...prev, [targetOffset]: newLabel }))
-                          pushState(newTracks)
-                          setIsEditingOffset(false)
-                        }
-                      }}
-                      className="px-2 py-1 bg-primary text-primary-foreground font-semibold rounded text-xs hover:bg-primary/90 transition-colors"
-                    >
-                      Lưu
-                    </button>
-                    <button
-                      onClick={() => setIsEditingOffset(false)}
-                      className="px-2 py-1 bg-zinc-800 text-zinc-400 rounded text-xs hover:bg-zinc-700 transition-colors"
-                    >
-                      Hủy
-                    </button>
-                  </div>
-                ) : (
-                  <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-                    {getDayLabel(activeDayOffset)}
-                    <button
-                      onClick={() => {
-                        setEditOffsetInput(getDayLabel(activeDayOffset))
-                        setIsEditingOffset(true)
-                      }}
-                      className="p-1 text-zinc-500 hover:text-zinc-300 rounded hover:bg-white/5 transition-all ml-1"
-                      title="Sửa mốc thời gian"
-                    >
-                      <Edit3 className="size-3.5" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (confirm('Bạn có chắc chắn muốn xóa mốc quá khứ này cùng toàn bộ các sự việc bên trong không?')) {
-                          const oldOffset = activeDayOffset
-                          const newTracks = tracks.map(t => {
-                            if (t.id === '__GLOBAL__') {
-                              return {
-                                ...t,
-                                events: t.events.filter(ev => ev.dayOffset !== oldOffset)
-                              }
+                          }
+                          return t
+                        })
+                        
+                        setTempMilestoneLabels(prev => ({ ...prev, [targetOffset]: newLabel }))
+                        pushState(newTracks)
+                        setIsEditingOffset(false)
+                      }
+                    }}
+                    className="px-2 py-1 bg-primary text-primary-foreground font-semibold rounded text-xs hover:bg-primary/90 transition-colors"
+                  >
+                    Lưu
+                  </button>
+                  <button
+                    onClick={() => setIsEditingOffset(false)}
+                    className="px-2 py-1 bg-zinc-800 text-zinc-400 rounded text-xs hover:bg-zinc-700 transition-colors"
+                  >
+                    Hủy
+                  </button>
+                </div>
+              ) : (
+                <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
+                  {getDayLabel(activeDayOffset)}
+                  <button
+                    onClick={() => {
+                      setEditOffsetInput(getDayLabel(activeDayOffset))
+                      setIsEditingOffset(true)
+                    }}
+                    className="p-1 text-zinc-500 hover:text-zinc-300 rounded hover:bg-white/5 transition-all ml-1"
+                    title="Sửa mốc thời gian"
+                  >
+                    <Edit3 className="size-3.5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm('Bạn có chắc chắn muốn xóa mốc thời gian này cùng toàn bộ các sự việc bên trong không?')) {
+                        const oldOffset = activeDayOffset
+                        const newTracks = tracks.map(t => {
+                          if (t.id === '__GLOBAL__') {
+                            return {
+                              ...t,
+                              events: t.events.filter(ev => ev.dayOffset !== oldOffset)
                             }
-                            return t
-                          })
-                          setExtraDays(prev => prev.filter(o => o !== oldOffset))
-                          pushState(newTracks)
-                          setActiveDayOffset(0) // Return to Day 0
-                        }
-                      }}
-                      className="p-1 text-zinc-500 hover:text-rose-400 rounded hover:bg-white/5 transition-all"
-                      title="Xóa mốc quá khứ"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </button>
-                  </h3>
-                )}
-              </div>
-              <button
-                onClick={() => {
-                  const label = getDayLabel(activeDayOffset)
-                  const newEvent: TrackEvent = {
-                    id: `new-${Date.now()}`,
-                    title: 'Sự việc mới',
-                    location: `${label}||||||`, // Serialized format: milestoneLabel|||specificDay|||location|||involvedChar1,involvedChar2
-                    dayOffset: activeDayOffset,
-                    startMin: 0,
-                    endMin: 0,
-                    type: 'TRUTH'
-                  }
-                  const newTracks = tracks.map(t => {
-                    if (t.id === '__GLOBAL__') {
-                      return { ...t, events: [...t.events, newEvent] }
-                    }
-                    return t
-                  })
-                  pushState(newTracks)
-                }}
-                className="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all"
-              >
-                <Plus className="size-3.5" /> Thêm sự việc
-              </button>
+                          }
+                          return t
+                        })
+                        setExtraDays(prev => prev.filter(o => o !== oldOffset))
+                        pushState(newTracks)
+                        setActiveDayOffset(0) // Return to Day 0
+                      }
+                    }}
+                    className="p-1 text-zinc-500 hover:text-rose-400 rounded hover:bg-white/5 transition-all"
+                    title="Xóa mốc thời gian"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </h3>
+              )}
             </div>
 
-            <div className="space-y-4 max-w-6xl">
+            <div className="max-w-6xl flex-1 flex flex-col">
               {(() => {
                 const globalTrack = tracks.find(t => t.id === '__GLOBAL__')
                 const dayEvents = globalTrack ? globalTrack.events.filter(e => e.dayOffset === activeDayOffset) : []
                 const availableChars = tracks.filter(t => t.id !== '__GLOBAL__')
 
-                if (dayEvents.length === 0) {
-                  return (
-                    <div className="bg-zinc-900/20 border border-dashed border-white/5 rounded-xl p-8 text-center">
-                      <p className="text-sm text-zinc-500 italic">Chưa có câu chuyện hay sự việc lịch sử nào được ghi nhận cho mốc thời gian này.</p>
-                    </div>
-                  )
+                let event = dayEvents[0]
+                if (!event) {
+                  // Fallback virtual event if dayEvents is empty
+                  event = {
+                    id: `new-virtual-${activeDayOffset}`,
+                    title: '',
+                    location: `${getDayLabel(activeDayOffset)}||||||`,
+                    dayOffset: activeDayOffset,
+                    startMin: 0,
+                    endMin: 0,
+                    type: 'TRUTH'
+                  }
                 }
 
-                return dayEvents.map(event => {
-                  // Parse location, specific day, and involved characters
-                  const rawLocation = event.location || ''
-                  const parts = rawLocation.split('|||')
-                  let milestoneLabel = ''
-                  let specificDay = ''
-                  let parsedLoc = ''
-                  let involvedNames: string[] = []
+                // Parse location, specific day, and involved characters
+                const rawLocation = event.location || ''
+                const parts = rawLocation.split('|||')
+                let milestoneLabel = ''
+                let specificDay = ''
+                let parsedLoc = ''
+                let involvedNames: string[] = []
 
-                  if (parts.length === 4) {
-                    milestoneLabel = parts[0] || ''
-                    specificDay = parts[1] || ''
-                    parsedLoc = parts[2] || ''
-                    involvedNames = parts[3] ? parts[3].split(',').filter(Boolean) : []
-                  } else if (parts.length === 3) {
-                    specificDay = parts[0] || ''
-                    parsedLoc = parts[1] || ''
-                    involvedNames = parts[2] ? parts[2].split(',').filter(Boolean) : []
-                  } else if (parts.length === 2) {
-                    specificDay = ''
-                    parsedLoc = parts[0] || ''
-                    involvedNames = parts[1] ? parts[1].split(',').filter(Boolean) : []
-                  } else {
-                    specificDay = ''
-                    parsedLoc = rawLocation
-                    involvedNames = []
-                  }
+                if (parts.length === 4) {
+                  milestoneLabel = parts[0] || ''
+                  specificDay = parts[1] || ''
+                  parsedLoc = parts[2] || ''
+                  involvedNames = parts[3] ? parts[3].split(',').filter(Boolean) : []
+                } else if (parts.length === 3) {
+                  specificDay = parts[0] || ''
+                  parsedLoc = parts[1] || ''
+                  involvedNames = parts[2] ? parts[2].split(',').filter(Boolean) : []
+                } else if (parts.length === 2) {
+                  specificDay = ''
+                  parsedLoc = parts[0] || ''
+                  involvedNames = parts[1] ? parts[1].split(',').filter(Boolean) : []
+                } else {
+                  specificDay = ''
+                  parsedLoc = rawLocation
+                  involvedNames = []
+                }
 
-                  return (
-                    <div key={event.id} className="relative bg-zinc-900/40 border border-white/5 rounded-xl p-5 shadow-sm hover:border-white/10 transition-all">
-                      {/* Delete Event Button - top right */}
-                      <div className="absolute top-4 right-4">
-                        <button
-                          onClick={() => handleDeleteEvent('__GLOBAL__', event.id)}
-                          className="p-1.5 bg-zinc-950 hover:bg-rose-950/40 text-zinc-500 hover:text-rose-400 border border-white/5 rounded-lg transition-colors"
-                          title="Xóa sự việc"
-                        >
-                          <X className="size-3.5" />
-                        </button>
+                return (
+                  <div key={event.id} className="relative flex-1 flex flex-col bg-zinc-900/40 border border-white/5 rounded-xl p-5 shadow-sm hover:border-white/10 transition-all">
+                    {/* Delete Event Button - top right */}
+                    <div className="absolute top-4 right-4">
+                      <button
+                        onClick={() => {
+                          if (event.id.startsWith('new-virtual-')) return
+                          handleDeleteEvent('__GLOBAL__', event.id)
+                        }}
+                        className="p-1.5 bg-zinc-950 hover:bg-rose-950/40 text-zinc-500 hover:text-rose-400 border border-white/5 rounded-lg transition-colors disabled:opacity-30 disabled:hover:bg-zinc-950 disabled:hover:text-zinc-500"
+                        title="Xóa sự việc"
+                        disabled={event.id.startsWith('new-virtual-')}
+                      >
+                        <X className="size-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-10 gap-6 pr-8 flex-1">
+                      {/* LEFT COLUMN: Large Textarea */}
+                      <div className="md:col-span-7 flex flex-col gap-1.5 h-full">
+                        <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Sự việc xảy ra</label>
+                        <textarea
+                          value={event.title}
+                          onChange={e => handleSaveDetails('__GLOBAL__', event.id, { title: e.target.value })}
+                          placeholder="Mô tả sự việc chi tiết tại mốc thời gian này..."
+                          className="w-full flex-1 bg-zinc-950 border border-white/5 rounded-lg px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-primary transition-all resize-none h-full min-h-[350px]"
+                          spellCheck={false}
+                        />
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-10 gap-6 pr-8">
-                        {/* LEFT COLUMN: Large Textarea */}
-                        <div className="md:col-span-7 flex flex-col gap-1.5">
-                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Sự việc xảy ra</label>
-                          <textarea
-                            value={event.title}
-                            onChange={e => handleSaveDetails('__GLOBAL__', event.id, { title: e.target.value })}
-                            placeholder="Mô tả sự việc chi tiết tại mốc thời gian này..."
-                            className="w-full flex-1 bg-zinc-950 border border-white/5 rounded-lg px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-primary transition-all resize-y min-h-[380px]"
+                      {/* RIGHT COLUMN: Metadata (Date, Location, Involved Characters) */}
+                      <div className="md:col-span-3 flex flex-col gap-4 border-l border-white/5 pl-6">
+                        <div>
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
+                          <input
+                            type="date"
+                            value={specificDay}
+                            onChange={e => {
+                              const newDay = e.target.value
+                              const newRaw = `${milestoneLabel || getDayLabel(activeDayOffset)}|||${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
+                              handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                            }}
+                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all dark:[color-scheme:dark]"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
+                          <input
+                            type="text"
+                            value={parsedLoc}
+                            onChange={e => {
+                              const newLoc = e.target.value
+                              const newRaw = `${milestoneLabel || getDayLabel(activeDayOffset)}|||${specificDay}|||${newLoc}|||${involvedNames.join(',')}`
+                              handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                            }}
+                            placeholder="Nơi chốn"
+                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all"
                             spellCheck={false}
                           />
                         </div>
 
-                        {/* RIGHT COLUMN: Metadata (Date, Location, Involved Characters) */}
-                        <div className="md:col-span-3 flex flex-col gap-4 border-l border-white/5 pl-6">
-                            <div>
-                              <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
-                              <input
-                                type="date"
-                                value={specificDay}
-                               onChange={e => {
-                                  const newDay = e.target.value
-                                  const newRaw = `${milestoneLabel}|||${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
-                                  handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
-                                }}
-                                className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all dark:[color-scheme:dark]"
-                              />
-                            </div>
-                          
-                          <div>
-                            <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
-                            <input
-                              type="text"
-                              value={parsedLoc}
-                              onChange={e => {
-                                const newLoc = e.target.value
-                                const newRaw = `${milestoneLabel}|||${specificDay}|||${newLoc}|||${involvedNames.join(',')}`
-                                handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
-                              }}
-                              placeholder="Nơi chốn"
-                              className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all"
-                              spellCheck={false}
-                            />
-                          </div>
-
-                          <div>
-                            <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Nhân vật tham gia</label>
-                            <div className="flex flex-wrap gap-1.5">
-                              {availableChars.map(char => {
-                                const isChecked = involvedNames.includes(char.name)
-                                return (
-                                  <button
-                                    key={char.id}
-                                    type="button"
-                                    onClick={() => {
-                                      let newInvolved = [...involvedNames]
-                                      if (isChecked) {
-                                        newInvolved = newInvolved.filter(name => name !== char.name)
-                                      } else {
-                                        newInvolved.push(char.name)
-                                      }
-                                      const newRaw = `${milestoneLabel}|||${specificDay}|||${parsedLoc}|||${newInvolved.join(',')}`
-                                      handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
-                                    }}
-                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border transition-all ${
-                                      isChecked
-                                        ? 'bg-primary/20 border-primary/40 text-white font-medium shadow-[0_0_10px_rgba(244,63,94,0.15)]'
-                                        : 'bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
-                                    }`}
-                                  >
-                                    <div className={`size-4 rounded-full text-[8px] flex items-center justify-center font-bold transition-all ${
-                                      isChecked 
-                                        ? 'bg-primary text-white' 
-                                        : 'bg-zinc-800 text-zinc-400'
-                                    }`}>
-                                      {char.avatar}
-                                    </div>
-                                    {char.name}
-                                  </button>
-                                )
-                              })}
-                            </div>
+                        <div>
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Nhân vật tham gia</label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {availableChars.map(char => {
+                              const isChecked = involvedNames.includes(char.name)
+                              return (
+                                <button
+                                  key={char.id}
+                                  type="button"
+                                  onClick={() => {
+                                    let newInvolved = [...involvedNames]
+                                    if (isChecked) {
+                                      newInvolved = newInvolved.filter(name => name !== char.name)
+                                    } else {
+                                      newInvolved.push(char.name)
+                                    }
+                                    const newRaw = `${milestoneLabel || getDayLabel(activeDayOffset)}|||${specificDay}|||${parsedLoc}|||${newInvolved.join(',')}`
+                                    handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                                  }}
+                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border transition-all ${
+                                    isChecked
+                                      ? 'bg-primary/20 border-primary/40 text-white font-medium shadow-[0_0_10px_rgba(244,63,94,0.15)]'
+                                      : 'bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                                  }`}
+                                >
+                                  <div className={`size-4 rounded-full text-[8px] flex items-center justify-center font-bold transition-all ${
+                                    isChecked 
+                                      ? 'bg-primary text-white' 
+                                      : 'bg-zinc-800 text-zinc-400'
+                                  }`}>
+                                    {char.avatar}
+                                  </div>
+                                  {char.name}
+                                </button>
+                              )
+                            })}
                           </div>
                         </div>
                       </div>
                     </div>
-                  )
-                })
+                  </div>
+                )
               })()}
             </div>
           </div>
         )}
-
       </div>
 
       {/* CREATE CHARACTER MODAL */}
