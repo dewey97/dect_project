@@ -276,8 +276,6 @@ export default function TimelineClient({
     })
     return Array.from(offsets).sort((a, b) => a - b)
   }, [tracks, extraDays])
-
-  const caseDays = useMemo(() => dayOffsets.filter(o => o >= 0), [dayOffsets])
   
   // Calculate dynamic duration of the active timeline based on the latest event
   const activeTimelineMinutes = useMemo(() => {
@@ -530,9 +528,6 @@ export default function TimelineClient({
     return `${absDays} ngày trước`
   }
 
-  // Flag to temporarily disable scroll detection during smooth scroll
-  const isScrollingRef = React.useRef(false)
-  const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
   const isDraggingRef = React.useRef(false)
 
   const handleDaySelect = (offset: number) => {
