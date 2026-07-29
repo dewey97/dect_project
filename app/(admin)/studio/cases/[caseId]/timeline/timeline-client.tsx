@@ -1133,15 +1133,15 @@ export default function TimelineClient({
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pr-8">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pr-8">
                         {/* LEFT COLUMN: Large Textarea */}
-                        <div className="md:col-span-2 flex flex-col gap-1.5">
+                        <div className="md:col-span-3 flex flex-col gap-1.5">
                           <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Sự việc xảy ra</label>
                           <textarea
                             value={event.title}
                             onChange={e => handleSaveDetails('__GLOBAL__', event.id, { title: e.target.value })}
                             placeholder="Mô tả sự việc chi tiết tại mốc thời gian này..."
-                            className="w-full flex-1 bg-zinc-950 border border-white/5 rounded-lg px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-primary transition-all resize-y min-h-[180px]"
+                            className="w-full flex-1 bg-zinc-950 border border-white/5 rounded-lg px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-primary transition-all resize-y min-h-[380px]"
                             spellCheck={false}
                           />
                         </div>
