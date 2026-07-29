@@ -531,8 +531,10 @@ export default function TimelineClient({
   // Flag to temporarily disable scroll detection during smooth scroll
   const isScrollingRef = React.useRef(false)
   const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+  const isDraggingRef = React.useRef(false)
 
   const handleDaySelect = (offset: number) => {
+    if (isDraggingRef.current) return // Prevent clicking while or immediately after dragging
     setActiveDayOffset(offset)
     setSelectedEventId(null)
     
@@ -556,12 +558,16 @@ export default function TimelineClient({
     if (offset < -700) initialLeft = 50
     if (offset > -70) initialLeft = 680
     
+    isDraggingRef.current = false
     setDraggingOffset(offset)
     setDraggedLeft(initialLeft)
     draggedLeftRef.current = initialLeft
     
     const handleMove = (moveEv: PointerEvent) => {
       const deltaX = moveEv.clientX - startX
+      if (Math.abs(deltaX) > 3) {
+        isDraggingRef.current = true
+      }
       const newLeft = Math.round(Math.max(50, Math.min(680, initialLeft + deltaX)))
       setDraggedLeft(newLeft)
       draggedLeftRef.current = newLeft
@@ -577,20 +583,17 @@ export default function TimelineClient({
       const newOffset = finalLeft - 750
       
       if (newOffset !== offset) {
-        // 1. Update all events at offset to newOffset
+        // 1. Update all events at offset to newOffset across all character tracks
         const newTracks = tracks.map(t => {
-          if (t.id === '__GLOBAL__') {
-            return {
-              ...t,
-              events: t.events.map(ev => {
-                if (ev.dayOffset === offset) {
-                  return { ...ev, dayOffset: newOffset }
-                }
-                return ev
-              })
-            }
+          return {
+            ...t,
+            events: t.events.map(ev => {
+              if (ev.dayOffset === offset) {
+                return { ...ev, dayOffset: newOffset }
+              }
+              return ev
+            })
           }
-          return t
         })
         
         // 2. Update extraDays
@@ -612,6 +615,11 @@ export default function TimelineClient({
         pushState(newTracks)
         setActiveDayOffset(newOffset)
       }
+      
+      // Delay resetting dragging flag to swallow the trailing click event
+      setTimeout(() => {
+        isDraggingRef.current = false
+      }, 50)
     }
     
     window.addEventListener('pointermove', handleMove)
