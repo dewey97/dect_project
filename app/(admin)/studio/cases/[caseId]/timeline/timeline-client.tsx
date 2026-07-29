@@ -907,6 +907,7 @@ export default function TimelineClient({
                             onChange={e => handleSaveDetails('__GLOBAL__', event.id, { title: e.target.value })}
                             placeholder="Mô tả sự việc chi tiết tại mốc thời gian này..."
                             className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-primary transition-all resize-y min-h-[70px]"
+                            spellCheck={false}
                           />
                         </div>
                         
@@ -920,22 +921,10 @@ export default function TimelineClient({
                               <X className="size-3.5" />
                             </button>
                           </div>
-                          
-                          <div>
-                            <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Tính chất</label>
-                            <select
-                              value={event.type}
-                              onChange={e => handleSaveDetails('__GLOBAL__', event.id, { type: e.target.value as any })}
-                              className="bg-zinc-950 border border-white/5 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-primary cursor-pointer"
-                            >
-                              <option value="TRUTH">Truth (Sự thật)</option>
-                              <option value="LIE">Lie (Giả dối)</option>
-                            </select>
-                          </div>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/5 pt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-white/5 pt-4">
                         <div className="md:col-span-1">
                           <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
                           <input
@@ -948,7 +937,19 @@ export default function TimelineClient({
                             }}
                             placeholder="Nơi chốn"
                             className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all"
+                            spellCheck={false}
                           />
+                        </div>
+                        <div className="md:col-span-1">
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Tính chất</label>
+                          <select
+                            value={event.type}
+                            onChange={e => handleSaveDetails('__GLOBAL__', event.id, { type: e.target.value as any })}
+                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-2.5 py-2 text-xs text-zinc-300 focus:outline-none focus:border-primary cursor-pointer"
+                          >
+                            <option value="TRUTH">Truth (Sự thật)</option>
+                            <option value="LIE">Lie (Giả dối)</option>
+                          </select>
                         </div>
                         <div className="md:col-span-2">
                           <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Nhân vật tham gia</label>
@@ -1018,6 +1019,7 @@ export default function TimelineClient({
                   placeholder="Nhập tên nhân vật..."
                   className="w-full bg-zinc-950 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
                   autoFocus
+                  spellCheck={false}
                 />
               </div>
               
@@ -1089,6 +1091,7 @@ export default function TimelineClient({
                 placeholder="e.g. 30, 7, 3"
                 className="w-full bg-zinc-950 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
                 autoFocus
+                spellCheck={false}
               />
               <p className="text-[10px] text-zinc-500 mt-1">Nhập số ngày trước ngày xảy ra vụ án (ví dụ nhập 30 để tạo mốc "30 ngày trước").</p>
             </div>
