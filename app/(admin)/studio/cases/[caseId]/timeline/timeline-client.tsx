@@ -233,6 +233,25 @@ export default function TimelineClient({
     return () => window.removeEventListener('click', handleClickOutside)
   }, [])
 
+  const [tempMilestoneLabels, setTempMilestoneLabels] = useState<Record<number, string>>({})
+
+  // Dynamic scanning of milestone labels parsed from existing events
+  const milestoneLabels = useMemo(() => {
+    const labels: Record<number, string> = {}
+    tracks.forEach(track => {
+      track.events.forEach(ev => {
+        const offset = ev.dayOffset ?? 0
+        if (offset < 0 && ev.location && ev.location.includes('|||')) {
+          const parts = ev.location.split('|||')
+          if (parts.length === 4) {
+            labels[offset] = parts[0]
+          }
+        }
+      })
+    })
+    return { ...tempMilestoneLabels, ...labels }
+  }, [tracks, tempMilestoneLabels])
+
   // Calculate distinct day offsets available in the timeline
   const dayOffsets = useMemo(() => {
     const offsets = new Set<number>()
@@ -512,6 +531,8 @@ export default function TimelineClient({
   const getDayLabel = (offset: number) => {
     if (offset === 0) return 'Day 0'
     if (offset > 0) return `Day ${offset}`
+    if (milestoneLabels[offset]) return milestoneLabels[offset]
+    
     const absDays = Math.abs(offset)
     if (absDays >= 365) {
       const years = Math.floor(absDays / 365)
@@ -847,29 +868,53 @@ export default function TimelineClient({
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded text-xs">Quá khứ</span>
                     <input
-                      type="number"
+                      type="text"
                       value={editOffsetInput}
                       onChange={e => setEditOffsetInput(e.target.value)}
-                      className="bg-zinc-950 border border-white/10 rounded px-2.5 py-1 text-xs text-zinc-200 focus:outline-none focus:border-primary w-24"
-                      placeholder="Số ngày..."
+                      className="bg-zinc-950 border border-white/10 rounded px-2.5 py-1 text-xs text-zinc-200 focus:outline-none focus:border-primary w-44"
+                      placeholder="Mốc thời gian..."
                       autoFocus
                       spellCheck={false}
                     />
                     <button
                       onClick={() => {
-                        const val = parseInt(editOffsetInput, 10)
-                        if (!isNaN(val) && val > 0) {
-                          const newOffset = -val
-                          const oldOffset = activeDayOffset
+                        const newLabel = editOffsetInput.trim()
+                        if (newLabel) {
+                          const targetOffset = activeDayOffset
                           
-                          // 1. Update all events at oldOffset to newOffset
+                          // 1. Update all events at targetOffset with the new label in location field
                           const newTracks = tracks.map(t => {
                             if (t.id === '__GLOBAL__') {
                               return {
                                 ...t,
                                 events: t.events.map(ev => {
-                                  if (ev.dayOffset === oldOffset) {
-                                    return { ...ev, dayOffset: newOffset }
+                                  if (ev.dayOffset === targetOffset) {
+                                    const rawLocation = ev.location || ''
+                                    const parts = rawLocation.split('|||')
+                                    let specificDay = ''
+                                    let parsedLoc = ''
+                                    let involvedNames: string[] = []
+
+                                    if (parts.length === 4) {
+                                      specificDay = parts[1] || ''
+                                      parsedLoc = parts[2] || ''
+                                      involvedNames = parts[3] ? parts[3].split(',').filter(Boolean) : []
+                                    } else if (parts.length === 3) {
+                                      specificDay = parts[0] || ''
+                                      parsedLoc = parts[1] || ''
+                                      involvedNames = parts[2] ? parts[2].split(',').filter(Boolean) : []
+                                    } else if (parts.length === 2) {
+                                      specificDay = ''
+                                      parsedLoc = parts[0] || ''
+                                      involvedNames = parts[1] ? parts[1].split(',').filter(Boolean) : []
+                                    } else {
+                                      specificDay = ''
+                                      parsedLoc = rawLocation
+                                      involvedNames = []
+                                    }
+                                    
+                                    const newRaw = `${newLabel}|||${specificDay}|||${parsedLoc}|||${involvedNames.join(',')}`
+                                    return { ...ev, location: newRaw }
                                   }
                                   return ev
                                 })
@@ -878,14 +923,8 @@ export default function TimelineClient({
                             return t
                           })
                           
-                          // 2. Update extraDays state to swap oldOffset for newOffset
-                          setExtraDays(prev => {
-                            const filtered = prev.filter(o => o !== oldOffset)
-                            return [...filtered, newOffset]
-                          })
-                          
+                          setTempMilestoneLabels(prev => ({ ...prev, [targetOffset]: newLabel }))
                           pushState(newTracks)
-                          setActiveDayOffset(newOffset)
                           setIsEditingOffset(false)
                         }
                       }}
@@ -906,7 +945,7 @@ export default function TimelineClient({
                     {getDayLabel(activeDayOffset)}
                     <button
                       onClick={() => {
-                        setEditOffsetInput(Math.abs(activeDayOffset).toString())
+                        setEditOffsetInput(getDayLabel(activeDayOffset))
                         setIsEditingOffset(true)
                       }}
                       className="p-1 text-zinc-500 hover:text-zinc-300 rounded hover:bg-white/5 transition-all ml-1"
@@ -945,10 +984,11 @@ export default function TimelineClient({
               </div>
               <button
                 onClick={() => {
+                  const label = getDayLabel(activeDayOffset)
                   const newEvent: TrackEvent = {
                     id: `new-${Date.now()}`,
                     title: 'Sự việc mới',
-                    location: '|||', // Serialized format: location|||involvedChar1,involvedChar2
+                    location: `${label}||||||`, // Serialized format: milestoneLabel|||specificDay|||location|||involvedChar1,involvedChar2
                     dayOffset: activeDayOffset,
                     startMin: 0,
                     endMin: 0,
@@ -1194,24 +1234,24 @@ export default function TimelineClient({
             </h3>
             
             <div>
-              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Số ngày trước vụ án</label>
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Tên mốc thời gian</label>
               <input 
-                type="number" 
+                type="text" 
                 value={pastDaysInput}
                 onChange={e => setPastDaysInput(e.target.value)}
-                placeholder="e.g. 30, 7, 3"
+                placeholder="Ví dụ: 8 năm trước, Thời thơ ấu, Tuần trước..."
                 className="w-full bg-zinc-950 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
                 autoFocus
                 spellCheck={false}
               />
-              <p className="text-[10px] text-zinc-500 mt-1">Nhập số ngày trước ngày xảy ra vụ án (ví dụ nhập 30 để tạo mốc "30 ngày trước").</p>
+              <p className="text-[10px] text-zinc-500 mt-1">Nhập tên gọi cho mốc thời gian quá khứ này (Ví dụ: "Thời thơ ấu", "10 năm trước"...).</p>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
               <button 
                 onClick={() => {
                   setShowAddPastModal(false)
-                  setPastDaysInput('30')
+                  setPastDaysInput('8 năm trước')
                 }}
                 className="px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-200 bg-zinc-800 rounded transition-colors"
               >
@@ -1220,13 +1260,18 @@ export default function TimelineClient({
               
               <button 
                 onClick={() => {
-                  const val = parseInt(pastDaysInput, 10)
-                  if (!isNaN(val) && val > 0) {
-                    const newOffset = -val
+                  const labelText = pastDaysInput.trim()
+                  if (labelText) {
+                    // Find the minimum negative offset currently in use to assign a new ordered ID
+                    const existingOffsets = dayOffsets.filter(o => o < 0)
+                    const minOffset = existingOffsets.length > 0 ? Math.min(...existingOffsets) : 0
+                    const newOffset = minOffset - 1
+                    
                     setExtraDays(prev => [...prev, newOffset])
+                    setTempMilestoneLabels(prev => ({ ...prev, [newOffset]: labelText }))
                     setActiveDayOffset(newOffset)
                     setShowAddPastModal(false)
-                    setPastDaysInput('30')
+                    setPastDaysInput('8 năm trước')
                   }
                 }}
                 className="px-3 py-1.5 text-xs bg-primary text-primary-foreground font-medium rounded hover:bg-primary/90 transition-colors"
