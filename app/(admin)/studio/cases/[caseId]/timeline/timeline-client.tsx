@@ -1148,7 +1148,6 @@ export default function TimelineClient({
 
                         {/* RIGHT COLUMN: Metadata (Date, Location, Involved Characters) */}
                         <div className="md:col-span-1 flex flex-col gap-4 border-l border-white/5 pl-6">
-                          {activeDayOffset > 0 && (
                             <div>
                               <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
                               <input
@@ -1162,7 +1161,6 @@ export default function TimelineClient({
                                 className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all dark:[color-scheme:dark]"
                               />
                             </div>
-                          )}
                           
                           <div>
                             <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
