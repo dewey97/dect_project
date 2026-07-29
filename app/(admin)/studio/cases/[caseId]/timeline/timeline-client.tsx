@@ -1133,7 +1133,7 @@ export default function TimelineClient({
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pr-8">
+                      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 pr-8">
                         {/* LEFT COLUMN: Large Textarea */}
                         <div className="md:col-span-3 flex flex-col gap-1.5">
                           <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block">Sự việc xảy ra</label>
@@ -1147,7 +1147,7 @@ export default function TimelineClient({
                         </div>
 
                         {/* RIGHT COLUMN: Metadata (Date, Location, Involved Characters) */}
-                        <div className="md:col-span-1 flex flex-col gap-4 border-l border-white/5 pl-6">
+                        <div className="md:col-span-2 flex flex-col gap-4 border-l border-white/5 pl-6">
                             <div>
                               <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
                               <input
@@ -1180,7 +1180,7 @@ export default function TimelineClient({
 
                           <div>
                             <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1.5">Nhân vật tham gia</label>
-                            <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto pr-1">
+                            <div className="flex flex-wrap gap-1.5">
                               {availableChars.map(char => {
                                 const isChecked = involvedNames.includes(char.name)
                                 return (
