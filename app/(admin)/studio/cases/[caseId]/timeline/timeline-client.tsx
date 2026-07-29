@@ -947,7 +947,6 @@ export default function TimelineClient({
               <div>
                 {isEditingOffset ? (
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded text-xs">Quá khứ</span>
                     <input
                       type="text"
                       value={editOffsetInput}
@@ -1022,7 +1021,6 @@ export default function TimelineClient({
                   </div>
                 ) : (
                   <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded text-xs">Quá khứ</span>
                     {getDayLabel(activeDayOffset)}
                     <button
                       onClick={() => {
@@ -1059,9 +1057,6 @@ export default function TimelineClient({
                     </button>
                   </h3>
                 )}
-                <p className="text-xs text-zinc-400 mt-1">
-                  Trục tự sự chung cho các sự kiện xảy ra trong quá khứ.
-                </p>
               </div>
               <button
                 onClick={() => {
