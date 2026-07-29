@@ -514,8 +514,8 @@ export default function TimelineClient({
 
   const getDayLabel = (offset: number) => {
     if (offset === 0) return 'Day 0'
-    if (offset > 0) return `Day ${offset}`
     if (milestoneLabels[offset]) return milestoneLabels[offset]
+    if (offset > 0) return `Day ${offset}`
     
     const absDays = Math.abs(offset)
     if (absDays >= 365) {
