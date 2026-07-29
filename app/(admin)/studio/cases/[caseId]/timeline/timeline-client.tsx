@@ -253,8 +253,8 @@ export default function TimelineClient({
     
     for (let i = 0; i < dayOffsets.length - 1; i++) {
       const diff = dayOffsets[i + 1] - dayOffsets[i]
-      const weight = Math.pow(diff, 0.5) // Squishing effect for large differences
-      const segmentWidth = 90 + weight * 25 // 90px minimum spacing + 25px per compressed day weight
+      const weight = Math.pow(diff, 0.33) // Flatten the curve for more subtle differences
+      const segmentWidth = 100 + weight * 15 // 100px base + 15px * weight
       currentLeft += segmentWidth
       nodes.push({ offset: dayOffsets[i + 1], left: currentLeft })
     }
