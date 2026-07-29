@@ -513,9 +513,7 @@ export default function TimelineClient({
     const absDays = Math.abs(offset)
     if (absDays >= 365) {
       const years = Math.floor(absDays / 365)
-      const remDays = absDays % 365
-      const months = Math.floor(remDays / 30)
-      return `${years} năm${months ? ` ${months} tháng` : ''} trước`
+      return `${years} năm trước`
     }
     if (absDays >= 30) {
       const months = Math.floor(absDays / 30)
