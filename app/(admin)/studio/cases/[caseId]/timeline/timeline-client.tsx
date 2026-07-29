@@ -90,9 +90,19 @@ function buildInitialTracks(events: DbTimelineEvent[], initialCharacters: any[])
     }
     
     // Decode start_min and end_min into dayOffset and relative minutes
-    const dayOffset = Math.floor(ev.start_min / 1440)
-    const startMin = ev.start_min - (dayOffset * 1440)
-    const endMin = ev.end_min - (dayOffset * 1440)
+    let dayOffset = 0
+    let startMin = 0
+    let endMin = 0
+    
+    if (ev.start_min < 0) {
+      dayOffset = Math.floor(ev.start_min / 1440)
+      startMin = ev.start_min - (dayOffset * 1440)
+      endMin = ev.end_min - (dayOffset * 1440)
+    } else {
+      dayOffset = 0
+      startMin = ev.start_min
+      endMin = ev.end_min
+    }
     
     tracksMap.get(charName)!.events.push({
       id: ev.id,
@@ -224,23 +234,44 @@ export default function TimelineClient({
   // Calculate distinct day offsets available in the timeline
   const dayOffsets = useMemo(() => {
     const offsets = new Set<number>()
-    // Add default Day 1 & Day 2 (offsets 0 and 1)
+    // Add Day 0 representing the continuous active timeline
     offsets.add(0)
-    offsets.add(1)
-    // Add any offsets found in events
+    // Add any past offsets found in events (negative offsets)
     tracks.forEach(track => {
       track.events.forEach(ev => {
-        offsets.add(ev.dayOffset ?? 0)
+        if ((ev.dayOffset ?? 0) < 0) {
+          offsets.add(ev.dayOffset ?? 0)
+        }
       })
     })
-    // Add any extra days added by the user
-    extraDays.forEach(d => offsets.add(d))
+    // Add any extra past days added by the user
+    extraDays.forEach(d => {
+      if (d < 0) offsets.add(d)
+    })
     return Array.from(offsets).sort((a, b) => a - b)
   }, [tracks, extraDays])
 
   const caseDays = useMemo(() => dayOffsets.filter(o => o >= 0), [dayOffsets])
-  const caseDaysCount = caseDays.length || 1
-  const totalMinutes = caseDaysCount * 1440
+  
+  // Calculate dynamic duration of the active timeline based on the latest event
+  const activeTimelineMinutes = useMemo(() => {
+    let maxMin = 1440 // Default 24 hours
+    tracks.forEach(track => {
+      track.events.forEach(ev => {
+        if ((ev.dayOffset ?? 0) >= 0) {
+          const absEnd = (ev.dayOffset ?? 0) * 1440 + ev.endMin
+          if (absEnd > maxMin) {
+            maxMin = absEnd
+          }
+        }
+      })
+    })
+    // Pad 6 hours (360 minutes) and round to the nearest hour
+    const padded = maxMin + 360
+    return Math.ceil(padded / 60) * 60
+  }, [tracks])
+
+  const totalMinutes = activeTimelineMinutes
 
   // Calculate dynamic spacing layout for navigator points (compressing very large gaps with square-root)
   const navigatorLayout = useMemo(() => {
@@ -290,7 +321,7 @@ export default function TimelineClient({
       // Leave a 45-minute padding before the first event
       const paddedAbsMinute = Math.max(0, minAbsMinute - 45)
       
-      const totalCanvasMinutes = 1440 * caseDaysCount
+      const totalCanvasMinutes = activeTimelineMinutes
 
       const timer = setTimeout(() => {
         if (!scrollContainerRef.current) return
@@ -305,7 +336,7 @@ export default function TimelineClient({
 
       return () => clearTimeout(timer)
     }
-  }, [activeDayOffset, caseDaysCount, tracks])
+  }, [activeDayOffset, activeTimelineMinutes, tracks])
 
   // Update Event coordinates (drag & drop handler)
   const handleUpdateEvent = (trackId: string, eventId: string, absoluteStart: number, absoluteEnd: number) => {
@@ -457,28 +488,24 @@ export default function TimelineClient({
 
   const timeTicks = useMemo(() => {
     const ticks = []
-    for (let d = 0; d < caseDaysCount; d++) {
-      const dayOffset = caseDays[d]
-      for (let h = 0; h < 24; h++) {
+    const totalHours = activeTimelineMinutes / 60
+    for (let h = 0; h <= totalHours; h++) {
+      const hourInDay = h % 24
+      const dayIndex = Math.floor(h / 24)
+      ticks.push({
+        label: `${hourInDay}:00`,
+        subLabel: hourInDay === 0 ? `Day ${dayIndex}` : undefined,
+        minute: h * 60
+      })
+      if (h < totalHours) {
         ticks.push({
-          label: `${h}:${h === 24 ? '00' : '00'}`,
-          subLabel: h === 0 ? (dayOffset === 0 ? 'Day 0' : `Day ${dayOffset}`) : undefined,
-          minute: d * 1440 + h * 60
-        })
-        ticks.push({
-          label: `${h}:30`,
-          minute: d * 1440 + h * 60 + 30
+          label: `${hourInDay}:30`,
+          minute: h * 60 + 30
         })
       }
     }
-    // Add last tick
-    ticks.push({
-      label: `0:00`,
-      subLabel: `Day ${caseDaysCount}`,
-      minute: caseDaysCount * 1440
-    })
     return ticks
-  }, [caseDaysCount, caseDays])
+  }, [activeTimelineMinutes])
 
   const getDayLabel = (offset: number) => {
     if (offset === 0) return 'Day 0'
@@ -508,45 +535,15 @@ export default function TimelineClient({
     
     if (offset >= 0 && scrollContainerRef.current) {
       const container = scrollContainerRef.current
-      const dayIndex = caseDays.indexOf(offset)
-      if (dayIndex !== -1) {
-        isScrollingRef.current = true
-        if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current)
-        
-        const scrollWidth = container.scrollWidth
-        const dayWidth = scrollWidth / caseDaysCount
-        
-        container.scrollTo({
-          left: dayIndex * dayWidth,
-          behavior: 'smooth'
-        })
-        
-        // Re-enable scroll listener after animation finishes (~300ms)
-        scrollTimeoutRef.current = setTimeout(() => {
-          isScrollingRef.current = false
-        }, 500)
-      }
+      container.scrollTo({
+        left: 0,
+        behavior: 'smooth'
+      })
     }
   }
 
   const handleScroll = () => {
-    if (isScrollingRef.current || activeDayOffset < 0) return
-    const container = scrollContainerRef.current
-    if (!container) return
-    
-    const scrollLeft = container.scrollLeft
-    const scrollWidth = container.scrollWidth
-    if (scrollWidth === 0) return
-    
-    const dayWidth = scrollWidth / caseDaysCount
-    const currentDayIndex = Math.min(
-      caseDaysCount - 1,
-      Math.max(0, Math.round(scrollLeft / dayWidth))
-    )
-    const targetOffset = caseDays[currentDayIndex]
-    if (targetOffset !== undefined && targetOffset !== activeDayOffset) {
-      setActiveDayOffset(targetOffset)
-    }
+    // Scroll doesn't paginate days anymore on a single continuous timeline
   }
 
   return (
@@ -602,19 +599,6 @@ export default function TimelineClient({
             className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-white/10 hover:border-white/20 text-zinc-300 hover:text-zinc-100 bg-zinc-800/40 rounded transition-colors"
           >
             <Plus className="size-3.5" /> Mốc Quá Khứ
-          </button>
-          <button
-            onClick={() => {
-              const currentCaseDays = dayOffsets.filter(o => o >= 0)
-              const nextDayOffset = currentCaseDays.length
-              setExtraDays(prev => [...prev, nextDayOffset])
-              setTimeout(() => {
-                handleDaySelect(nextDayOffset)
-              }, 50)
-            }}
-            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-primary/20 hover:border-primary/40 text-primary hover:text-primary/95 bg-primary/5 rounded transition-colors"
-          >
-            <Plus className="size-3.5" /> Ngày Tiếp Theo
           </button>
           <div className="w-px h-4 bg-white/10 mx-1" />
           <button 
@@ -771,7 +755,7 @@ export default function TimelineClient({
           >
             <div 
               className="h-full flex flex-col relative transition-all duration-300"
-              style={{ width: `${(zoomLevel / 100) * 2400 * caseDaysCount}px` }}
+              style={{ width: `${(zoomLevel / 100) * 2400 * (activeTimelineMinutes / 1440)}px` }}
             >
               
               {/* Time Ticks Header */}
@@ -1125,6 +1109,7 @@ export default function TimelineClient({
                   const val = parseInt(pastDaysInput, 10)
                   if (!isNaN(val) && val > 0) {
                     const newOffset = -val
+                    setExtraDays(prev => [...prev, newOffset])
                     setActiveDayOffset(newOffset)
                     setShowAddPastModal(false)
                     setPastDaysInput('30')
