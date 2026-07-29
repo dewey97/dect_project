@@ -7,6 +7,7 @@ type TrackEvent = {
   id: string
   title: string
   location: string
+  dayOffset?: number
   startMin: number
   endMin: number
   type: 'TRUTH' | 'LIE'
@@ -129,7 +130,7 @@ export function TimelineBlock({
     const totalH = Math.floor(minutes / 60) + 18
     const h = totalH >= 24 ? totalH - 24 : totalH
     const m = Math.floor(minutes % 60)
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
+    return `${h}:${m.toString().padStart(2, '0')}`
   }
 
   const handleSaveEdit = () => {

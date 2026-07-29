@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Folders, Users, Clock, Map, Settings, LogOut, Search, ArrowLeft, Edit3, MessageSquare, Play, Bell } from 'lucide-react'
+import { LayoutDashboard, Folders, Users, Clock, Map, Settings, LogOut, Search, ArrowLeft, Edit3, MessageSquare, Play, Bell, Network } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import { getUnreadFeedbackCount } from '@/lib/actions/feedback-actions'
@@ -34,6 +34,7 @@ export function AdminSidebar() {
   const caseNavItems = caseId ? [
     { name: 'Story Overview', href: `/studio/cases/${caseId}/overview`, icon: Edit3 },
     { name: 'Timeline', href: `/studio/cases/${caseId}/timeline`, icon: Clock },
+    { name: 'Relationship', href: `/studio/cases/${caseId}/relationships`, icon: Network },
     { name: 'Evidence Board', href: `/studio/cases/${caseId}/evidence`, icon: Search },
     { name: 'Locations', href: `/studio/cases/${caseId}/locations`, icon: Map },
   ] : []
@@ -103,10 +104,13 @@ export function AdminSidebar() {
       {/* FOOTER ACTIONS */}
       <div className="p-4 border-t border-border/40 space-y-2">
         {/* Launch Game / Playtest */}
-        <button className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-primary text-primary-foreground font-bold rounded-md hover:bg-primary/90 shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all">
+        <Link 
+          href={caseId ? `/play/${caseId}` : '/studio/cases'}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-primary text-primary-foreground font-bold rounded-md hover:bg-primary/90 shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all text-xs tracking-wider"
+        >
           <Play className="size-4" fill="currentColor" />
-          PLAYTEST
-        </button>
+          {caseId ? 'PLAYTEST CASE' : 'SELECT CASE TO PLAY'}
+        </Link>
 
         <div className="flex items-center gap-2 pt-2">
           {/* Exit Studio */}

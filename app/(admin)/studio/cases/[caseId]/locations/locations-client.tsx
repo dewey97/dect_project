@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react'
 import { InteractiveMap, MapNode } from '@/components/admin/interactive-map'
-import { X, Save, Trash } from 'lucide-react'
+import { Save, Trash } from 'lucide-react'
+import { AdminDrawer } from '@/components/admin/admin-drawer'
+import { toast } from '@/components/ui/toast'
 
 import { DbLocation } from '@/lib/types/database'
 import { saveLocations } from '@/lib/actions/map-actions'
@@ -40,11 +42,9 @@ export default function LocationsClient({ caseId, initialLocations }: { caseId: 
       <div className="h-14 border-b border-white/10 bg-zinc-900/40 flex items-center justify-between px-4 shrink-0 z-20 relative backdrop-blur-md">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-zinc-100">Interactive Map Engine</span>
+            <span className="text-sm font-semibold text-zinc-100">Bản Đồ Địa Điểm Vụ Án</span>
             <span className="px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-mono font-bold tracking-wider uppercase border border-primary/30">Macro Mode</span>
           </div>
-          <div className="h-4 w-px bg-white/10 mx-2" />
-          <span className="text-xs text-zinc-500">World Map view (Drag to pan, Scroll to zoom, Double-click to pin)</span>
         </div>
         <button 
           onClick={async () => {
@@ -60,9 +60,9 @@ export default function LocationsClient({ caseId, initialLocations }: { caseId: 
             const res = await saveLocations(caseId, payload)
             setIsSaving(false)
             if (res.success) {
-              alert('Saved successfully!')
+              toast.success('Lưu bản đồ địa điểm thành công!')
             } else {
-              alert('Error saving: ' + res.error)
+              toast.error('Lỗi khi lưu bản đồ: ' + res.error)
             }
           }}
           disabled={isSaving}
@@ -83,89 +83,68 @@ export default function LocationsClient({ caseId, initialLocations }: { caseId: 
         />
 
         {/* NODE INSPECTOR (Side Panel) */}
-        <div 
-          className={`absolute top-0 bottom-0 right-0 w-[400px] z-[200] bg-zinc-950/95 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${selectedNodeId ? 'translate-x-0' : 'translate-x-full'}`}
-        >
-          {selectedNode && (
-            <>
-              {/* Panel Header */}
-              <div className="h-14 border-b border-white/10 flex items-center justify-between px-4 shrink-0 bg-zinc-900/40">
-                <h3 className="font-medium text-sm text-zinc-100 flex items-center gap-2">
-                  Map Node Properties
-                </h3>
-                <button onClick={() => setSelectedNodeId(null)} className="p-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors">
-                  <X className="size-4" />
-                </button>
-              </div>
+        {selectedNode && (
+          <AdminDrawer
+            isOpen={!!selectedNodeId}
+            onClose={() => setSelectedNodeId(null)}
+            title="Thông Tin Địa Điểm"
+            footer={
+              <button 
+                onClick={() => handleDeleteNode(selectedNode.id)}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-950/20 border border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300 font-medium rounded transition-colors text-xs"
+              >
+                <Trash className="size-3.5" /> Xóa địa điểm khỏi bản đồ
+              </button>
+            }
+          >
+            <div>
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Tên địa điểm</label>
+              <input 
+                type="text" 
+                value={selectedNode.title}
+                onChange={(e) => handleUpdateNode(selectedNode.id, { title: e.target.value })}
+                className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary" 
+              />
+            </div>
 
-              {/* Panel Body */}
-              <div className="flex-1 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-800 space-y-6">
-                <div>
-                  <label className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1 block">Node Title</label>
-                  <input 
-                    type="text" 
-                    value={selectedNode.title}
-                    onChange={(e) => handleUpdateNode(selectedNode.id, { title: e.target.value })}
-                    className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary" 
-                  />
+            <div>
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Loại địa điểm</label>
+              <select 
+                value={selectedNode.type}
+                onChange={(e) => handleUpdateNode(selectedNode.id, { type: e.target.value as any })}
+                className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
+              >
+                <option value="CASE">Địa điểm vụ án (Macro Location)</option>
+                <option value="LOCATION">Khu vực / Phòng ốc (Micro Area)</option>
+                <option value="EVIDENCE">Điểm phát hiện chứng cứ (Evidence Point)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Tọa độ trên bản đồ</label>
+              <div className="flex gap-2">
+                <div className="flex-1 bg-zinc-900 border border-white/10 rounded px-3 py-1.5 flex items-center justify-between">
+                  <span className="text-xs text-zinc-500">X</span>
+                  <span className="text-sm font-mono text-zinc-300">{Math.round(selectedNode.x)}</span>
                 </div>
-
-                <div>
-                  <label className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1 block">Node Type</label>
-                  <select 
-                    value={selectedNode.type}
-                    onChange={(e) => handleUpdateNode(selectedNode.id, { type: e.target.value as any })}
-                    className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-primary"
-                  >
-                    <option value="CASE">Case Location (Macro)</option>
-                    <option value="LOCATION">Room / Area (Micro)</option>
-                    <option value="EVIDENCE">Evidence Point (Micro)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1 block">Coordinates</label>
-                  <div className="flex gap-2">
-                    <div className="flex-1 bg-zinc-900 border border-white/10 rounded px-3 py-1.5 flex items-center justify-between">
-                      <span className="text-xs text-zinc-500">X</span>
-                      <span className="text-sm font-mono text-zinc-300">{Math.round(selectedNode.x)}</span>
-                    </div>
-                    <div className="flex-1 bg-zinc-900 border border-white/10 rounded px-3 py-1.5 flex items-center justify-between">
-                      <span className="text-xs text-zinc-500">Y</span>
-                      <span className="text-sm font-mono text-zinc-300">{Math.round(selectedNode.y)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1 block">Description / Notes</label>
-                  <textarea 
-                    value={selectedNode.details || ''}
-                    onChange={(e) => handleUpdateNode(selectedNode.id, { details: e.target.value })}
-                    placeholder="Enter details about this pin..."
-                    className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 h-32 focus:outline-none focus:border-primary resize-none placeholder:text-zinc-700" 
-                  />
+                <div className="flex-1 bg-zinc-900 border border-white/10 rounded px-3 py-1.5 flex items-center justify-between">
+                  <span className="text-xs text-zinc-500">Y</span>
+                  <span className="text-sm font-mono text-zinc-300">{Math.round(selectedNode.y)}</span>
                 </div>
               </div>
+            </div>
 
-              {/* Panel Footer */}
-              <div className="p-4 border-t border-white/5 flex gap-2 shrink-0 bg-zinc-950">
-                <button 
-                  onClick={() => handleDeleteNode(selectedNode.id)}
-                  className="flex-1 py-2 text-xs font-medium bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded hover:bg-rose-500/20 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Trash className="size-3.5" /> Delete
-                </button>
-                <button 
-                  onClick={() => setSelectedNodeId(null)}
-                  className="flex-1 py-2 text-xs font-medium bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Save className="size-3.5" /> Done
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+            <div>
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1.5 block">Mô tả / Ghi chú địa điểm</label>
+              <textarea 
+                value={selectedNode.details || ''}
+                onChange={(e) => handleUpdateNode(selectedNode.id, { details: e.target.value })}
+                placeholder="Nhập thông tin mô tả, manh mối, hoặc ghi chú về địa điểm này..."
+                className="w-full bg-zinc-900 border border-white/10 rounded text-sm text-zinc-100 p-2 h-32 focus:outline-none focus:border-primary resize-none placeholder:text-zinc-700" 
+              />
+            </div>
+          </AdminDrawer>
+        )}
       </div>
     </div>
   )

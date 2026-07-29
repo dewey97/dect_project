@@ -94,6 +94,60 @@ export async function getCaseOverview(caseId: string) {
   }
 }
 
+/** Upload ảnh bìa Vụ án lên Storage */
+export async function uploadCaseCover(formData: FormData) {
+  try {
+    const file = formData.get('file') as File
+    if (!file) {
+      return { success: false, error: 'Không tìm thấy file để tải lên.' }
+    }
+
+    const supabase = await createClient()
+
+    const fileExt = file.name.split('.').pop()
+    const fileName = `covers/${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
+
+    let { error } = await supabase.storage
+      .from('avatars')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+
+    if (error && (error.message.includes('Bucket not found') || error.message.includes('not found'))) {
+      const { error: createError } = await supabase.storage.createBucket('avatars', { public: true })
+      if (!createError) {
+        const retry = await supabase.storage
+          .from('avatars')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          })
+        error = retry.error
+      }
+    }
+
+    if (error) {
+      if (error.message.includes('Bucket not found') || error.message.includes('not found')) {
+        return { 
+          success: false, 
+          error: "Chưa có Bucket 'avatars' trên Supabase. Vui lòng vào Supabase Dashboard > Storage > Create new bucket tên 'avatars' và bật Public." 
+        }
+      }
+      throw error
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(fileName)
+
+    return { success: true, url: publicUrlData.publicUrl }
+  } catch (error: any) {
+    console.error('Error uploading cover:', error)
+    return { success: false, error: error.message || 'Lỗi khi tải ảnh bìa lên Storage.' }
+  }
+}
+
 /** Cập nhật thông tin Vụ án */
 export async function updateCaseOverview(caseId: string, payload: Partial<DbCase>) {
   try {

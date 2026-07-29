@@ -25,24 +25,29 @@ export async function saveTimelineEvents(caseId: string, events: any[]) {
   try {
     const supabase = await createClient()
 
-    // Xóa events cũ
-    await supabase.from('timeline_events').delete().eq('case_id', caseId)
+    const isUuid = (str: string) => 
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
 
-    if (events.length > 0) {
-      const formattedEvents = events.map(e => ({
-        id: e.id,
-        case_id: caseId,
-        character_name: e.character_name,
-        event_title: e.event_title,
-        location: e.location || null,
-        start_min: e.start_min,
-        end_min: e.end_min,
-        is_truth: e.is_truth ?? true,
-        is_fatal: e.is_fatal ?? false
-      }))
+    const formattedEvents = events.map(e => ({
+      id: isUuid(e.id) ? e.id : crypto.randomUUID(),
+      case_id: caseId,
+      character_name: e.character_name,
+      event_title: e.event_title,
+      location: e.location || null,
+      start_min: e.start_min,
+      end_min: e.end_min,
+      is_truth: e.is_truth ?? true,
+      is_fatal: e.is_fatal ?? false
+    }))
 
-      const { error } = await supabase.from('timeline_events').insert(formattedEvents)
+    const eventIds = formattedEvents.map(e => e.id)
+
+    if (eventIds.length > 0) {
+      await supabase.from('timeline_events').delete().eq('case_id', caseId).not('id', 'in', `(${eventIds.join(',')})`)
+      const { error } = await supabase.from('timeline_events').upsert(formattedEvents, { onConflict: 'id' })
       if (error) throw error
+    } else {
+      await supabase.from('timeline_events').delete().eq('case_id', caseId)
     }
 
     revalidatePath(`/studio/cases/${caseId}/timeline`)

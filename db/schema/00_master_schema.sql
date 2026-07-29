@@ -122,3 +122,14 @@ CREATE TABLE public.player_answers (
 CREATE INDEX idx_player_answers_session ON public.player_answers(session_id);
 ALTER TABLE public.player_answers ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow All Actions for Answers" ON public.player_answers FOR ALL USING (true);
+
+-- 9. STORAGE BUCKET (AVATARS & COVERS)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Public Read Access for avatars" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
+CREATE POLICY "Public Upload Access for avatars" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'avatars');
+CREATE POLICY "Public Update Access for avatars" ON storage.objects FOR UPDATE USING (bucket_id = 'avatars');
+CREATE POLICY "Public Delete Access for avatars" ON storage.objects FOR DELETE USING (bucket_id = 'avatars');
+

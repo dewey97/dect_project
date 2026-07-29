@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'NOCTURNE // Investigation System',
+  title: 'My website',
   description:
-    'The digital investigation system for the NOCTURNE detective board game. Activate a case, unlock confiscated devices, and follow the evidence.',
+    'This is my website.',
   generator: 'v0.app',
   applicationName: 'NOCTURNE',
   appleWebApp: {

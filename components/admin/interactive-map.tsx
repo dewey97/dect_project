@@ -27,6 +27,22 @@ export function InteractiveMap({ nodes, onNodesChange, selectedNodeId, onSelectN
   const [scale, setScale] = useState(1)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   
+  const [containerSize, setContainerSize] = useState({ width: 1000, height: 600 })
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (containerRef.current) {
+        setContainerSize({
+          width: containerRef.current.clientWidth,
+          height: containerRef.current.clientHeight
+        })
+      }
+    }
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
+  
   // Drag State
   const [isDragging, setIsDragging] = useState(false)
   const dragStart = useRef({ x: 0, y: 0 })
@@ -168,23 +184,61 @@ export function InteractiveMap({ nodes, onNodesChange, selectedNodeId, onSelectN
   }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-zinc-950 flex flex-col">
-      {/* Map Toolbar */}
-      <div className="absolute top-4 left-4 z-10 flex gap-2">
+    <div className="relative w-full h-full overflow-hidden bg-zinc-950 flex flex-col select-none">
+      {/* Map Controls (Zoom & Reset) ở góc dưới bên trái - Đồng bộ 100% style ReactFlow Controls */}
+      <div className="absolute bottom-[15px] left-[15px] z-10 flex flex-col bg-zinc-900 border border-white/10 rounded shadow-xl overflow-hidden">
+        <button 
+          onClick={() => handleZoom(1.25)} 
+          className="w-[26px] h-[26px] flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors border-b border-white/10 group"
+          title="Zoom In"
+        >
+          <svg viewBox="0 0 32 32" width="10" height="10" stroke="currentColor" strokeWidth="3" fill="none" className="stroke-zinc-400 group-hover:stroke-zinc-100"><path d="M16 4 V28 M4 16 H28" /></svg>
+        </button>
+        <button 
+          onClick={() => handleZoom(0.8)} 
+          className="w-[26px] h-[26px] flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors border-b border-white/10 group"
+          title="Zoom Out"
+        >
+          <svg viewBox="0 0 32 32" width="10" height="10" stroke="currentColor" strokeWidth="3" fill="none" className="stroke-zinc-400 group-hover:stroke-zinc-100"><path d="M4 16 H28" /></svg>
+        </button>
         <button 
           onClick={handleResetView}
-          className="bg-zinc-900/80 backdrop-blur-sm border border-white/10 text-zinc-300 text-xs font-medium px-3 py-1.5 rounded-md hover:bg-zinc-800 transition-colors shadow-lg"
+          className="w-[26px] h-[26px] flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors group"
+          title="Reset View"
         >
-          Reset View
+          <svg viewBox="0 0 32 32" width="10" height="10" stroke="currentColor" strokeWidth="3" fill="none" className="stroke-zinc-400 group-hover:stroke-zinc-100"><path d="M4 12 V4 H12 M20 4 H28 V12 M28 20 V28 H20 M12 28 H4 V20" /></svg>
         </button>
-        <div className="bg-zinc-900/80 backdrop-blur-sm border border-white/10 text-zinc-400 text-xs font-mono rounded-md shadow-lg flex items-center overflow-hidden">
-          <button onClick={() => handleZoom(0.8)} className="px-3 py-1.5 hover:bg-zinc-800 hover:text-zinc-100 transition-colors border-r border-white/10">-</button>
-          <span className="px-3 w-14 text-center">{Math.round(scale * 100)}%</span>
-          <button onClick={() => handleZoom(1.25)} className="px-3 py-1.5 hover:bg-zinc-800 hover:text-zinc-100 transition-colors border-l border-white/10">+</button>
-        </div>
-        <div className="bg-zinc-900/80 backdrop-blur-sm border border-white/10 text-zinc-400 text-xs px-3 py-1.5 rounded-md shadow-lg flex items-center gap-2">
-          <MapPin className="size-3.5 text-primary" /> Double-click to drop pin
-        </div>
+      </div>
+
+      {/* MiniMap tự vẽ (Góc dưới bên phải) - Đồng bộ 100% kích thước và style ReactFlow MiniMap */}
+      <div className="absolute bottom-[15px] right-[15px] z-20 w-[200px] h-[150px] bg-zinc-950 border border-white/10 rounded-lg overflow-hidden shadow-xl pointer-events-none">
+        {/* Khung viewport thu nhỏ mô phỏng góc nhìn hiện tại với viền siêu mỏng 0.5px và lớp mask bóng tối phủ ngoài */}
+        <div 
+          className="absolute border-[0.5px] border-blue-500/50 transition-all"
+          style={{
+            // Phép tính dựa trên pan/scale thực tế và kích thước container để phản chiếu khung camera
+            width: `${Math.max(10, Math.min(200, (containerSize.width / 15) / scale))}px`,
+            height: `${Math.max(10, Math.min(150, (containerSize.height / 15) / scale))}px`,
+            left: `${Math.max(0, Math.min(200, 100 - (pan.x / 15) / scale))}px`,
+            top: `${Math.max(0, Math.min(150, 75 - (pan.y / 15) / scale))}px`,
+            transform: 'translate(-50%, -50%)',
+            // Sử dụng box-shadow cực rộng để che phủ phần bên ngoài viewport box bằng màu mờ của zinc-950 giống React Flow
+            boxShadow: '0 0 0 9999px rgba(9, 9, 11, 0.75)'
+          }}
+        />
+        {/* Vẽ các điểm chấm địa điểm màu xanh lá */}
+        {nodes.map(node => {
+          const miniX = 100 + (node.x / 15)
+          const miniY = 75 + (node.y / 15)
+          if (miniX < 0 || miniX > 200 || miniY < 0 || miniY > 150) return null
+          return (
+            <div 
+              key={`mini-${node.id}`}
+              className="absolute w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_4px_#10b981]"
+              style={{ left: `${miniX}px`, top: `${miniY}px`, transform: 'translate(-50%, -50%)' }}
+            />
+          )
+        })}
       </div>
 
       {/* The Infinite Canvas */}

@@ -6,6 +6,7 @@ import { ScanLine, ArrowRight, ShieldQuestion, FolderOpen, FileText, Terminal, R
 import { Button } from '@/components/ui/button'
 import { BrandMark } from '@/components/investigation/brand-mark'
 import { cn } from '@/lib/utils'
+import { toast } from '@/components/ui/toast'
 
 export function CaseActivation() {
   const router = useRouter()
@@ -217,7 +218,7 @@ export function CaseActivation() {
               {/* Footer Info */}
               <button
                 type="button"
-                onClick={() => alert('Mã kích hoạt vụ án dạng NX-4471 được in ở bìa trong của hồ sơ tài liệu vật lý đi kèm hộp game.')}
+                onClick={() => toast.info('Mã kích hoạt vụ án dạng NX-4471 được in ở bìa trong của hồ sơ tài liệu vật lý đi kèm hộp game.')}
                 className="mx-auto inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors active:text-foreground hover:text-primary pt-2 font-sans"
               >
                 <ShieldQuestion className="size-4" aria-hidden="true" />

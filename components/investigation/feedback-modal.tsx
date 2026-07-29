@@ -5,6 +5,7 @@ import { MessageSquare, X, Send, Star, AlertCircle } from 'lucide-react'
 import { submitFeedback } from '@/lib/actions/feedback-actions'
 import { DbFeedback } from '@/lib/types/database'
 import { usePathname } from 'next/navigation'
+import { toast } from '@/components/ui/toast'
 
 export function FeedbackModal() {
   const pathname = usePathname()
@@ -33,6 +34,7 @@ export function FeedbackModal() {
     setIsSubmitting(false)
     if (res.success) {
       setIsSuccess(true)
+      toast.success('Cảm ơn bạn đã gửi phản hồi góp ý!')
       setTimeout(() => {
         setIsOpen(false)
         setIsSuccess(false)
@@ -42,7 +44,7 @@ export function FeedbackModal() {
         setType('FEEDBACK')
       }, 2000)
     } else {
-      alert('Lỗi khi gửi góp ý: ' + res.error)
+      toast.error('Lỗi khi gửi góp ý: ' + res.error)
     }
   }
 

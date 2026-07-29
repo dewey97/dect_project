@@ -24,22 +24,27 @@ export async function saveLocations(caseId: string, locations: any[]) {
   try {
     const supabase = await createClient()
 
-    // Xóa locations cũ
-    await supabase.from('locations').delete().eq('case_id', caseId)
+    const isUuid = (str: string) => 
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
 
-    if (locations.length > 0) {
-      const formattedLocations = locations.map(loc => ({
-        id: loc.id,
-        case_id: caseId,
-        title: loc.title,
-        type: loc.type,
-        details: loc.details || null,
-        position_x: loc.x,
-        position_y: loc.y
-      }))
+    const formattedLocations = locations.map(loc => ({
+      id: isUuid(loc.id) ? loc.id : crypto.randomUUID(),
+      case_id: caseId,
+      title: loc.title,
+      type: loc.type,
+      details: loc.details || null,
+      position_x: loc.x,
+      position_y: loc.y
+    }))
 
-      const { error } = await supabase.from('locations').insert(formattedLocations)
+    const locationIds = formattedLocations.map(l => l.id)
+
+    if (locationIds.length > 0) {
+      await supabase.from('locations').delete().eq('case_id', caseId).not('id', 'in', `(${locationIds.join(',')})`)
+      const { error } = await supabase.from('locations').upsert(formattedLocations, { onConflict: 'id' })
       if (error) throw error
+    } else {
+      await supabase.from('locations').delete().eq('case_id', caseId)
     }
 
     revalidatePath(`/studio/cases/${caseId}/locations`)

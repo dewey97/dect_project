@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { deleteCase } from '@/lib/actions/case-actions'
 
+import { toast } from '@/components/ui/toast'
+
 export function DeleteCaseButton({ caseId, caseTitle }: { caseId: string, caseTitle: string }) {
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -11,8 +13,10 @@ export function DeleteCaseButton({ caseId, caseTitle }: { caseId: string, caseTi
     if (window.confirm(`Are you sure you want to delete "${caseTitle}"?\nThis action cannot be undone.`)) {
       setIsDeleting(true)
       const res = await deleteCase(caseId)
-      if (!res.success) {
-        alert('Failed to delete case: ' + res.error)
+      if (res.success) {
+        toast.success(`Đã xóa vụ án "${caseTitle}" thành công!`)
+      } else {
+        toast.error('Failed to delete case: ' + res.error)
         setIsDeleting(false)
       }
     }

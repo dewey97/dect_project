@@ -4,14 +4,18 @@ import { useState } from 'react'
 import { Copy } from 'lucide-react'
 import { duplicateCase } from '@/lib/actions/case-actions'
 
+import { toast } from '@/components/ui/toast'
+
 export function DuplicateCaseButton({ caseId }: { caseId: string }) {
   const [isDuplicating, setIsDuplicating] = useState(false)
 
   const handleDuplicate = async () => {
     setIsDuplicating(true)
     const res = await duplicateCase(caseId)
-    if (!res.success) {
-      alert('Failed to duplicate case: ' + res.error)
+    if (res.success) {
+      toast.success('Nhân bản vụ án thành công!')
+    } else {
+      toast.error('Failed to duplicate case: ' + res.error)
     }
     setIsDuplicating(false)
   }

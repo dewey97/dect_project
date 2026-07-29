@@ -4,10 +4,13 @@ import React, { useState } from 'react'
 import { Save, Settings2, Bell, Shield, Users } from 'lucide-react'
 import { DbAppSettings } from '@/lib/types/database'
 import { updateAppSettings } from '@/lib/actions/settings-actions'
+import { toast } from '@/components/ui/toast'
 
 export function SettingsClient({ initialSettings }: { initialSettings: DbAppSettings }) {
   const [isSaving, setIsSaving] = useState(false)
   const [settings, setSettings] = useState<DbAppSettings>(initialSettings)
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -18,9 +21,9 @@ export function SettingsClient({ initialSettings }: { initialSettings: DbAppSett
     })
     setIsSaving(false)
     if (res.success) {
-      alert('Settings updated successfully!')
+      toast.success('Cập nhật cài đặt Studio thành công!')
     } else {
-      alert('Failed to update settings: ' + res.error)
+      toast.error('Lỗi khi cập nhật cài đặt: ' + res.error)
     }
   }
 
@@ -150,9 +153,47 @@ export function SettingsClient({ initialSettings }: { initialSettings: DbAppSett
               </div>
             </div>
 
-            <button className="w-full py-2 border border-dashed border-white/20 text-zinc-400 text-sm font-medium rounded hover:text-zinc-200 hover:border-white/40 hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
-              <Users className="size-4" /> Invite Co-Writer
-            </button>
+            {showInviteModal ? (
+              <div className="p-4 bg-zinc-900 border border-indigo-500/30 rounded-lg space-y-3 animate-in fade-in duration-200">
+                <h4 className="text-xs font-bold text-indigo-300 uppercase tracking-wider">Mời đồng tác giả mới</h4>
+                <input 
+                  type="email" 
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="Nhập email đồng tác giả..."
+                  className="w-full bg-zinc-950 border border-white/10 rounded text-sm text-zinc-100 px-3 py-2 focus:outline-none focus:border-indigo-500"
+                />
+                <div className="flex justify-end gap-2 pt-1">
+                  <button 
+                    onClick={() => setShowInviteModal(false)}
+                    className="px-3 py-1.5 text-xs text-zinc-400 hover:text-zinc-200"
+                  >
+                    Hủy
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if (!inviteEmail || !inviteEmail.includes('@')) {
+                        toast.error('Vui lòng nhập địa chỉ Email hợp lệ.')
+                        return
+                      }
+                      toast.success(`Đã gửi lời mời đồng tác giả tới: ${inviteEmail}`)
+                      setInviteEmail('')
+                      setShowInviteModal(false)
+                    }}
+                    className="px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded transition-colors"
+                  >
+                    Gửi lời mời
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setShowInviteModal(true)}
+                className="w-full py-2 border border-dashed border-white/20 text-zinc-400 text-sm font-medium rounded hover:text-zinc-200 hover:border-white/40 hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+              >
+                <Users className="size-4" /> Invite Co-Writer
+              </button>
+            )}
           </div>
 
         </div>

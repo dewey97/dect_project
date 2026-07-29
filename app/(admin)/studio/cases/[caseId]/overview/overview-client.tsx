@@ -1,13 +1,15 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
-import { FileText, Save, Image as ImageIcon, X } from 'lucide-react'
-import { updateCaseOverview } from '@/lib/actions/case-actions'
+import { FileText, Save, Image as ImageIcon, X, Loader2 } from 'lucide-react'
+import { updateCaseOverview, uploadCaseCover } from '@/lib/actions/case-actions'
 import { DbCase } from '@/lib/types/database'
+import { toast } from '@/components/ui/toast'
 
 export function OverviewClient({ initialData }: { initialData: DbCase }) {
   const [coverUrl, setCoverUrl] = useState<string | null>(initialData.cover_image_url)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   
   const [title, setTitle] = useState(initialData.title || '')
   const [synopsis, setSynopsis] = useState(initialData.synopsis || '')
@@ -17,18 +19,30 @@ export function OverviewClient({ initialData }: { initialData: DbCase }) {
   
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert('File quá lớn! Vui lòng chọn ảnh dưới 2MB để lưu vào database tạm thời.')
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File quá lớn! Vui lòng chọn ảnh dưới 5MB.')
         return
       }
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setCoverUrl(reader.result as string)
+      setIsUploading(true)
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        const res = await uploadCaseCover(formData)
+        if (res.success && res.url) {
+          setCoverUrl(res.url)
+          toast.success('Tải ảnh bìa lên thành công!')
+        } else {
+          toast.error('Upload thất bại: ' + res.error)
+        }
+      } catch (err: any) {
+        toast.error('Lỗi khi tải ảnh lên: ' + err.message)
+      } finally {
+        setIsUploading(false)
+        e.target.value = ''
       }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -44,9 +58,9 @@ export function OverviewClient({ initialData }: { initialData: DbCase }) {
     })
     setIsSaving(false)
     if (res.success) {
-      alert('Đã lưu thành công!')
+      toast.success('Đã lưu tổng quan vụ án thành công!')
     } else {
-      alert('Lỗi: ' + res.error)
+      toast.error('Lỗi: ' + res.error)
     }
   }
 
@@ -115,7 +129,7 @@ export function OverviewClient({ initialData }: { initialData: DbCase }) {
             <label className="text-sm font-medium text-zinc-300">Status</label>
             <select 
               value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              onChange={(e) => setStatus(e.target.value as any)}
               className="w-full bg-zinc-900/50 border border-white/10 rounded-md py-2 px-3 text-sm focus:outline-none focus:border-primary transition-colors text-zinc-100"
             >
               <option value="DRAFT">Draft (Not visible to players)</option>

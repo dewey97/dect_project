@@ -8,39 +8,63 @@ export async function saveEvidenceBoard(caseId: string, nodes: any[], edges: any
   try {
     const supabase = await createClient()
 
-    // 1. Delete old board data for this case
-    await supabase.from('evidence_edges').delete().eq('case_id', caseId)
-    await supabase.from('evidence_nodes').delete().eq('case_id', caseId)
+    const isUuid = (str: string) => 
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
 
-    // 2. Format Nodes
-    const formattedNodes = nodes.map(n => ({
-      id: n.id,
-      case_id: caseId,
-      type: n.type,
-      position_x: n.position.x,
-      position_y: n.position.y,
-      label: n.data?.label || '',
-      description: n.data?.description || '',
-      category: n.data?.category || '',
-      logic_data: n.data || {}
-    }))
+    // 1. Format Nodes với UUID hợp lệ
+    const formattedNodes = nodes.map(n => {
+      const nodeId = isUuid(n.id) ? n.id : crypto.randomUUID()
+      return {
+        id: nodeId,
+        case_id: caseId,
+        type: n.type,
+        position_x: n.position.x,
+        position_y: n.position.y,
+        label: n.data?.label || '',
+        description: n.data?.description || '',
+        category: n.data?.category || '',
+        logic_data: n.data || {}
+      }
+    })
 
-    // 3. Format Edges (Bỏ id để Postgres tự sinh UUID)
-    const formattedEdges = edges.map(e => ({
-      case_id: caseId,
-      source_node_id: e.source,
-      target_node_id: e.target
-    }))
+    const nodeIds = formattedNodes.map(n => n.id)
 
-    // 4. Insert Nodes
+    // 2. Xóa các nodes không còn tồn tại
+    if (nodeIds.length > 0) {
+      await supabase.from('evidence_nodes').delete().eq('case_id', caseId).not('id', 'in', `(${nodeIds.join(',')})`)
+    } else {
+      await supabase.from('evidence_nodes').delete().eq('case_id', caseId)
+    }
+
+    // 3. Upsert Nodes
     if (formattedNodes.length > 0) {
-      const { error: nodeError } = await supabase.from('evidence_nodes').insert(formattedNodes)
+      const { error: nodeError } = await supabase.from('evidence_nodes').upsert(formattedNodes, { onConflict: 'id' })
       if (nodeError) throw nodeError
     }
 
-    // 5. Insert Edges
+    // 4. Format Edges
+    const formattedEdges = edges.map(e => {
+      const edgeId = e.id && isUuid(e.id) ? e.id : crypto.randomUUID()
+      return {
+        id: edgeId,
+        case_id: caseId,
+        source_node_id: e.source,
+        target_node_id: e.target
+      }
+    })
+
+    const edgeIds = formattedEdges.map(e => e.id)
+
+    // 5. Xóa các edges không còn tồn tại
+    if (edgeIds.length > 0) {
+      await supabase.from('evidence_edges').delete().eq('case_id', caseId).not('id', 'in', `(${edgeIds.join(',')})`)
+    } else {
+      await supabase.from('evidence_edges').delete().eq('case_id', caseId)
+    }
+
+    // 6. Upsert Edges
     if (formattedEdges.length > 0) {
-      const { error: edgeError } = await supabase.from('evidence_edges').insert(formattedEdges)
+      const { error: edgeError } = await supabase.from('evidence_edges').upsert(formattedEdges, { onConflict: 'id' })
       if (edgeError) throw edgeError
     }
 
