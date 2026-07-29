@@ -242,6 +242,27 @@ export default function TimelineClient({
   const caseDaysCount = caseDays.length || 1
   const totalMinutes = caseDaysCount * 1440
 
+  // Calculate dynamic spacing layout for navigator points (compressing very large gaps with square-root)
+  const navigatorLayout = useMemo(() => {
+    if (dayOffsets.length === 0) return { nodes: [], totalWidth: 0 }
+    
+    const nodes: { offset: number; left: number }[] = []
+    let currentLeft = 50 // Base padding start
+    
+    nodes.push({ offset: dayOffsets[0], left: currentLeft })
+    
+    for (let i = 0; i < dayOffsets.length - 1; i++) {
+      const diff = dayOffsets[i + 1] - dayOffsets[i]
+      const weight = Math.pow(diff, 0.5) // Squishing effect for large differences
+      const segmentWidth = 90 + weight * 25 // 90px minimum spacing + 25px per compressed day weight
+      currentLeft += segmentWidth
+      nodes.push({ offset: dayOffsets[i + 1], left: currentLeft })
+    }
+    
+    const totalWidth = currentLeft + 50 // Base padding end
+    return { nodes, totalWidth }
+  }, [dayOffsets])
+
   const hasAutoScrolledRef = React.useRef(false)
 
   // Auto-scroll to the earliest activity block only once when page loads
@@ -632,13 +653,21 @@ export default function TimelineClient({
       </div>
 
       {/* MASTER TIMELINE NAVIGATOR */}
-      <div className="px-4 py-3 border-b border-white/10 bg-zinc-950/60 flex justify-center shrink-0 overflow-x-auto select-none">
-        
-        <div className="flex items-center gap-36 flex-1 justify-center relative mx-auto h-16">
+      <div className="px-4 py-3 border-b border-white/10 bg-zinc-950/60 flex justify-center shrink-0 overflow-x-auto select-none scrollbar-none">
+        <div 
+          className="relative h-16 flex items-center shrink-0"
+          style={{ width: `${navigatorLayout.totalWidth}px` }}
+        >
           {/* Connecting line */}
-          <div className="absolute left-8 right-8 top-1/2 h-0.5 bg-zinc-800/80 -translate-y-1/2 z-0" />
+          <div 
+            className="absolute top-1/2 h-0.5 bg-zinc-800/80 -translate-y-1/2 z-0" 
+            style={{
+              left: `${navigatorLayout.nodes[0]?.left ?? 0}px`,
+              width: `${(navigatorLayout.nodes[navigatorLayout.nodes.length - 1]?.left ?? 0) - (navigatorLayout.nodes[0]?.left ?? 0)}px`
+            }}
+          />
           
-          {dayOffsets.map((offset) => {
+          {navigatorLayout.nodes.map(({ offset, left }) => {
             const isActive = activeDayOffset === offset
             const isHistorical = offset < 0
             
@@ -646,7 +675,8 @@ export default function TimelineClient({
               <button
                 key={offset}
                 onClick={() => handleDaySelect(offset)}
-                className="relative z-10 flex flex-col items-center justify-center group focus:outline-none cursor-pointer min-w-[70px] h-full"
+                className="absolute z-10 flex flex-col items-center justify-center group focus:outline-none cursor-pointer min-w-[70px] -translate-x-1/2 h-full"
+                style={{ left: `${left}px` }}
               >
                 {/* Circle Node */}
                 <div className={`rounded-full flex items-center justify-center border transition-all duration-300 z-10 bg-zinc-950 ${
@@ -674,7 +704,7 @@ export default function TimelineClient({
                 <span className={`absolute top-[44px] left-1/2 -translate-x-1/2 whitespace-nowrap transition-colors duration-300 text-[10px] font-medium ${
                   offset === 0
                     ? isActive
-                      ? 'text-rose-400 font-bold tracking-wide scale-105'
+                      ? 'text-rose-450 font-bold tracking-wide scale-105'
                       : 'text-rose-500/80 font-semibold group-hover:text-rose-400'
                     : isActive 
                       ? 'text-primary font-bold' 
