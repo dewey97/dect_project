@@ -889,11 +889,26 @@ export default function TimelineClient({
                 }
 
                 return dayEvents.map(event => {
-                  // Parse location and involved characters
+                  // Parse location, specific day, and involved characters
                   const rawLocation = event.location || ''
                   const parts = rawLocation.split('|||')
-                  const parsedLoc = parts[0] || ''
-                  const involvedNames = parts[1] ? parts[1].split(',').filter(Boolean) : []
+                  let specificDay = ''
+                  let parsedLoc = ''
+                  let involvedNames: string[] = []
+
+                  if (parts.length === 3) {
+                    specificDay = parts[0] || ''
+                    parsedLoc = parts[1] || ''
+                    involvedNames = parts[2] ? parts[2].split(',').filter(Boolean) : []
+                  } else if (parts.length === 2) {
+                    specificDay = ''
+                    parsedLoc = parts[0] || ''
+                    involvedNames = parts[1] ? parts[1].split(',').filter(Boolean) : []
+                  } else {
+                    specificDay = ''
+                    parsedLoc = rawLocation
+                    involvedNames = []
+                  }
 
                   return (
                     <div key={event.id} className="bg-zinc-900/40 border border-white/5 rounded-xl p-5 space-y-4 shadow-sm hover:border-white/10 transition-all">
@@ -922,7 +937,22 @@ export default function TimelineClient({
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-white/5 pt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 border-t border-white/5 pt-4">
+                        <div className="md:col-span-1">
+                          <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Ngày cụ thể</label>
+                          <input
+                            type="text"
+                            value={specificDay}
+                            onChange={e => {
+                              const newDay = e.target.value
+                              const newRaw = `${newDay}|||${parsedLoc}|||${involvedNames.join(',')}`
+                              handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
+                            }}
+                            placeholder="Ví dụ: 15/08/2026"
+                            className="w-full bg-zinc-950 border border-white/5 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-primary transition-all"
+                            spellCheck={false}
+                          />
+                        </div>
                         <div className="md:col-span-1">
                           <label className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">Địa điểm xảy ra</label>
                           <input
@@ -930,7 +960,7 @@ export default function TimelineClient({
                             value={parsedLoc}
                             onChange={e => {
                               const newLoc = e.target.value
-                              const newRaw = `${newLoc}|||${involvedNames.join(',')}`
+                              const newRaw = `${specificDay}|||${newLoc}|||${involvedNames.join(',')}`
                               handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
                             }}
                             placeholder="Nơi chốn"
@@ -965,7 +995,7 @@ export default function TimelineClient({
                                     } else {
                                       newInvolved.push(char.name)
                                     }
-                                    const newRaw = `${parsedLoc}|||${newInvolved.join(',')}`
+                                    const newRaw = `${specificDay}|||${parsedLoc}|||${newInvolved.join(',')}`
                                     handleSaveDetails('__GLOBAL__', event.id, { location: newRaw })
                                   }}
                                   className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border transition-all ${
