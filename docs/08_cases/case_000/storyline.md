@@ -7,7 +7,7 @@
 ## 📖 CHƯƠNG I: TIỀN ĐỀ QUÁ KHỨ & BI KỊCH NĂM XƯA
 
 ### 1. Nhóm 4 Đứa Trẻ & Vụ Tai Nạn 12 Năm Trước
-* **Địa điểm:** Căn nhà cổ hẻo lánh tại khu Bờ Sông (thị trấn cũ).
+* **Địa điểm:** Căn nhà số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội (khu vực giải tỏa đền bù).
 * **Nhân vật:** Nguyễn Văn Khang (lớn tính hung hăng, bốc đồng, hay bắt nạt), Tùng (anh trai Gia Huy, tính cách hiền lành nhưng mặc cảm), Hà (thích Khang từ nhỏ, đứng về phía Khang), Gia Huy (em trai Tùng, nhỏ tuổi, yếu ớt).
 * **Diễn biến vụ tai nạn:** Trong một lần chơi trốn tìm tại căn nhà bỏ hoang, Gia Huy chui vào khoang tủ âm tường cũ nát để trốn. Khang phát hiện nhưng cố tình gài chốt gỗ bên ngoài để trêu chọc và bỏ đi. Cả nhóm sau đó tan rùng về nhà mà không ai quay lại mở tủ.
 * **Hậu quả:** Gia Huy bị kẹt trong khoang tủ kín, không ai phát hiện kịp thời và qua đời do ngạt khí.
