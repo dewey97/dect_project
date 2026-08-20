@@ -247,6 +247,19 @@ Rules for writing and designing cases in `docs/08_CASES/`:
    - **Phần Danh Mục Nhân Vật ở đầu:** Chỉ ghi các thông tin căn bản (Key Profiles) bao gồm: *Họ tên, Tuổi, Chức danh/Quan hệ* và cụm ngắn **`Lý do nghi vấn`** (khoanh vùng khách quan ban đầu: chìa khóa phụ, dấu vết vật lý, lịch sử cuộc gọi). **CẤM viết trước diễn biến tâm lý, động cơ ẩn hay bí mật cá nhân.**
    - **Phần Khai Quật Tâm Lý:** Diễn biến tâm lý giằng xé, nợ nần, lòng tham hay động cơ diệt khẩu của mỗi nhân vật **bắt buộc phải được người chơi tự bóc tách qua từng giai đoạn phá án** thông qua bằng chứng thu được.
 
+---
+
+## 13. Agent Workflow & Interaction Rules
+
+1. **Strict Commit Control (Quy tắc Git Commit):**
+   - Agent **TUYỆT ĐỐI KHÔNG TỰ ĐỘNG CHẠY `git commit`** sau khi thực hiện công việc.
+   - Chỉ thực hiện `git commit` khi người dùng phát lệnh hoặc yêu cầu trực tiếp (Ví dụ: "commit", "commit đi", "hãy commit cho tôi").
+
+2. **Consultative & Proposal-First Workflow (Quy tắc Thảo luận & Đề xuất trước khi thực thi):**
+   - Khi người dùng đặt vấn đề, đưa ra yêu cầu mới hoặc thắc mắc: Agent **bắt buộc phải giải thích, phân tích vấn đề và đưa ra các phương án/đề xuất** trước.
+   - **CHỈ TIẾN HÀNH VIẾT CODE HOẶC CHỈNH SỬA FILE KHI NGƯỜI DÙNG ĐÃ CHỌN/ĐỒNG Ý (BẤM/NÓI "OKE" HOẶC CHỌN PHƯƠNG ÁN)**.
+   - Không tự ý thực thi viết mã hoặc sửa file hàng loạt trước khi có phản hồi đồng ý của người dùng.
+
 
 
 

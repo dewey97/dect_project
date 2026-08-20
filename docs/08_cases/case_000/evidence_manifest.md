@@ -9,7 +9,7 @@
 | ID | Tên Manh Mối / Tài Liệu | Nội Dung Tóm Tắt | Manh Mối Ẩn / Điểm Nút Thắt (Hidden Clue) | Đối Tượng | Phase | Vai Trò Gameplay | Cặp Ghép So Sánh |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: |
 | `f1-1` | `01_bao_cao_kham_nghiem_tu_thi.pdf` | Báo cáo khám nghiệm tử thi sơ bộ | 02 nhóm vết thương riêng biệt: vết bầm gáy xô xát & vết đâm đứt động mạch cảnh mất máu | Khang | Phase 0 | [Mở màn] Khám nghiệm tử thi | `f4-1` |
-| `f1-2` | `02_bien_ban_kham_nghiem_hien_truong.pdf` | Biên bản khám nghiệm hiện trường | Bộ bình trà bị đập vỡ vụn dưới sàn & Dấu giày size 37 nữ ở cửa sau | Khang, Hà | Phase 0 | [Mở màn] Hiện trường | `07d` |
+| `f1-2` | `02_bien_ban_kham_nghiem_hien_truong.pdf` | Biên bản khám nghiệm hiện trường | Bộ bình trà bị đập vỡ vụn dưới sàn nhà & Dấu giày nam size 41 & Cửa sau bị bật chốt | Khang, Tùng | Phase 0 | [Mở màn] Hiện trường | `07d` |
 | `f1-3` | `03_bao_cao_tien_do_dieu_tra.pdf` | Báo cáo tiến độ điều tra ban đầu | Tổng hợp rà soát dấu vết vân tay, camera an ninh và triệu tập 04 nghi phạm | Mai, Vũ, Tùng, Hà | Phase 0 | [Dẫn dắt tiến độ] | N/A |
 | `f1-4` | `04_bao_cao_xac_minh_nhan_than_khang.pdf` | Báo cáo nhân thân nạn nhân Khang | Bố mẹ mất sớm, ông qua đời 3 tháng trước, lối sống ăn tiêu bốc đồng/trăng hoa | Khang | Phase 0 | [Tài liệu bối cảnh] | N/A |
 | `f1-5` | `05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` | Ma trận rà soát mâu thuẫn 04 nghi phạm | Phân lập 4 động cơ: Tranh chấp nhà đất (Mai), Gian lận đo đạc (Vũ), Tai nạn 1998 (Tùng), Ghen tuông (Hà) | Mai, Vũ, Tùng, Hà | Phase 0 | [Ma trận nghi vấn] | N/A |

@@ -51,10 +51,12 @@
 * **18:30 – Đột nhập 1 (Trần Ngọc Mai):** Mai và Vũ đến nhà Khang tranh cãi gay gắt về di chúc. Nhân lúc Khang vào bếp, Mai lén mở hộp sắt trong tủ âm tường, **tráo bản sao di chúc giả vào và lấy bản gốc mang đi cho luật sư giám định**. Mai rời đi lúc 19:00.
 * **19:30 – Đột nhập 2 (Lê Quang Vũ):** Sau khi đưa Mai về, Vũ nói dối vợ đi nhậu nhưng lén quay lại qua cửa sau căn nhà nhằm tìm bản vẽ sửa nhà gốc trong tủ để tiêu hủy chứng cứ gian lận đền bù. Không tìm thấy, Vũ rời đi lúc 19:45 (camera cây xăng ghi nhận).
 * **20:00 - 20:15 – Đột nhập 3 & Xô xát (Tùng):** Tùng quay về quê (sắp đến ngày giỗ 12 năm của em trai) và đến gặp Khang lúc 20:00. Khang buông lời nhạo báng cái chết của Gia Huy và đe dọa Tùng. Hai bên giằng co gay gắt, **đập vỡ bộ bình cốc thủy tinh dưới sàn**. Tùng xô ngã Khang đập đầu vào mép tủ khiến Khang bị chấn thương bầm tím và ngất xỉu tại chỗ. Tùng hoảng sợ tưởng Khang đã chết nên tháo chạy lúc **20:15** (camera cây xăng ghi nhận).
-* **20:45 - 21:00 – Đột nhập 4 & Án mạng thực sự (Trần Thị Hà):** Hà âm thầm bám theo Tùng và Khang từ chiều. Thấy Tùng tháo chạy hoảng loạn, Hà lén chui vào nhà qua cửa sau lúc 20:45. 
-  * Hà thấy Khang nằm bất tỉnh ngửa trên sàn bên cạnh đống bình trà vỡ.
-  * Khi lại gần định cứu Khang, Hà phát hiện màn hình điện thoại Khang sáng lên với **tin nhắn tình nhân mới** cùng dòng tin nhắn chia tay phớt lờ Hà.
-  * Trong uất ức ghen tuông cuồng loạn bộc phát, Hà vơ mảnh thủy tinh vỡ sắc nhọn dưới sàn **đâm mạnh vào cổ Khang**, gây đứt động mạch cảnh. Khang tử vong do mất máu cấp lúc **21:00 - 21:15**. Hà lau vết máu trên tay rồi lẩn trốn trong đêm.
+* **20:45 - 21:00 – Đột nhập 4 & Án mạng thực sự (Trần Thị Hà):** Hà âm thầm bám theo Tùng và Khang từ chiều. 
+  * Lúc **20:15**, nấp ở góc hẻm tối ngoài ngõ, Hà thấy Tùng tháo chạy xộc ra trong hoảng loạn rồi rồ ga xe máy bỏ đi. 
+  * Hà lo sợ đứng nấp quan sát suốt 30 phút (từ 20:15 đến 20:45) xem Khang có đuổi theo không. Thấy căn nhà đóng kín im lìm hoàn toàn, Hà sốt ruột lén chui vào nhà qua cửa sau lúc 20:45 để kiểm tra.
+  * Hà bàng hoàng thấy Khang nằm bất tỉnh ngửa trên sàn bên cạnh đống bình trà bị đập vỡ vụn.
+  * Khi lại gần định cứu Khang, đúng lúc **20:40 - 20:45**, màn hình điện thoại Khang sáng lên hiển thị **tin nhắn tình nhân mới** rủ đi du lịch đền bù cùng dòng tin nhắn chửi đuổi phớt lờ Hà.
+  * Trong uất ức ghen tuông cuồng loạn bộc phát, Hà vơ mảnh thủy tinh vỡ sắc nhọn dưới sàn **đâm mạnh vào cổ Khang**, gây đứt động mạch cảnh. Khang tử vong do mất máu cấp lúc **21:00 - 21:15**. Hà lau vết máu rồi lẩn trốn trong đêm.
 
 ---
 
