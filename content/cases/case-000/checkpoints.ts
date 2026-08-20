@@ -5,8 +5,8 @@ export const checkpoints000: Checkpoint[] = [
     id: 'cp-000-1',
     caseId: 'case-000',
     title: 'Hành động của Trần Ngọc Mai',
-    question: 'Trần Ngọc Mai đã làm gì với bản di chúc gốc được giấu trong hộp sắt tủ âm tường?',
-    hint: 'Hãy mở rộng thông tin nghi phạm Trần Ngọc Mai trong danh sách nghi phạm để xem bí mật riêng của cô ấy.',
+    question: 'Trần Ngọc Mai đã làm gì với bản di chúc gốc giấu trong tủ âm tường?',
+    hint: 'Mở rộng thông tin nghi phạm Trần Ngọc Mai để kiểm tra hành vi của cô ấy.',
     options: [
       'Lấy bản gốc đi giám định và tráo bản sao',
       'Đốt bản di chúc gốc',
@@ -19,31 +19,31 @@ export const checkpoints000: Checkpoint[] = [
   {
     id: 'cp-000-2',
     caseId: 'case-000',
-    title: 'Mục đích đột nhập của Lê Quang Vũ',
-    question: 'Lê Quang Vũ quay lại căn nhà cũ vào buổi tối nhằm mục đích gì?',
-    hint: 'Hãy đọc tin nhắn của Lê Quang Vũ gửi cho Vợ trong điện thoại của Vũ sau khi mở khóa.',
+    title: 'Sự thật về cuộc xô xát của Tùng',
+    question: 'Tùng đã gây ra điều gì khi chạm trán Khang tại căn nhà lúc 20:00?',
+    hint: 'Kiểm tra báo cáo vết thương bầm tím và mảnh vỡ bình trà thủy tinh.',
     options: [
-      'Tìm bản vẽ gốc để tiêu hủy chứng cứ sai phạm',
-      'Lấy trộm tiền mặt trong tủ âm tường',
-      'Thuyết phục Khang chia thêm tiền đền bù'
+      'Làm vỡ bộ bình trà, xô Khang ngất xỉu rồi hoảng sợ bỏ đi lúc 20:15',
+      'Dùng mảnh thủy tinh đâm chết Khang tại chỗ',
+      'Lấy trộm tiền đền bù rồi trốn đi'
     ],
-    correctAnswer: 'Tìm bản vẽ gốc để tiêu hủy chứng cứ sai phạm',
-    unlockedEvidenceId: 'dev-03', // Mở khóa điện thoại của Vũ
+    correctAnswer: 'Làm vỡ bộ bình trà, xô Khang ngất xỉu rồi hoảng sợ bỏ đi lúc 20:15',
+    unlockedEvidenceId: 'dev-03', // Mở khóa chứng cứ giai đoạn 3
     status: 'locked'
   },
   {
     id: 'cp-000-3',
     caseId: 'case-000',
-    title: 'Vật chứng Gia Huy biến mất',
-    question: 'Hà đã đột nhập hiện trường để lấy đi thứ gì nhằm che giấu bí mật về cái chết của Gia Huy năm xưa?',
-    hint: 'Hãy đọc thông tin nghi phạm của Hà để tìm hiểu về hành vi lấy vật chứng.',
+    title: 'Sự lỡ lời lật tẩy Hung thủ thật sự',
+    question: 'Chi tiết lỡ lời nào trong lời khai ban đầu chứng minh Hà mới là kẻ đâm chết Khang?',
+    hint: 'Đối chiếu lời khai khẳng định ở nhà cả tối của Hà với chi tiết hiện trường sau khi Tùng làm vỡ bình trà.',
     options: [
-      'Chiếc còi đồng của Gia Huy',
-      'Bản di chúc viết tay của ông nội',
-      'Bản vẽ sửa nhà gốc của Khang'
+      'Hà mô tả Khang gục ngã cạnh bộ bình trà vỡ (dù khai ở nhà cả tối)',
+      'Hà khai nhìn thấy Tùng mang theo dao nhọn',
+      'Hà thừa nhận đã tranh chấp di chúc với Mai'
     ],
-    correctAnswer: 'Chiếc còi đồng của Gia Huy',
-    unlockedEvidenceId: 'conclusion', // Mở khóa nút nộp báo cáo kết án
+    correctAnswer: 'Hà mô tả Khang gục ngã cạnh bộ bình trà vỡ (dù khai ở nhà cả tối)',
+    unlockedEvidenceId: 'conclusion', // Mở khóa nộp báo cáo kết án
     status: 'locked'
   }
 ]

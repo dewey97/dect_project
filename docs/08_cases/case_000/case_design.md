@@ -1,36 +1,40 @@
 # VỤ ÁN 000: TRỐN TÌM (CASE DESIGN) — VERITAS
 
 > **Cổng kích hoạt vụ án:** `TEST-99`
-> **Loại hình vụ án:** Chấn thương sọ não do xô ngã & dàn dựng hiện trường giả trong căn nhà cũ diện giải tỏa.
+> **Loại hình vụ án:** Án mạng do bị đâm bởi mảnh thủy tinh vỡ, xô xát giằng co & dàn dựng hiện trường giả trong căn nhà cũ diện giải tỏa.
 > **Thời lượng trải nghiệm:** 20 - 30 phút.
-> **Cơ chế đặc trưng:** Trích xuất tin nhắn điện thoại khôi phục, Khóa thiết bị theo Checkpoint, So khớp mâu thuẫn lời khai (Alibi Clash) về thời gian đột nhập của các bên, Nộp báo cáo kết án S-Rank.
+> **Cơ chế đặc trưng:** Trích xuất tin nhắn điện thoại khôi phục, Khóa thiết bị theo Checkpoint, Báo cáo khám nghiệm pháp y 2 giai đoạn tổn thương, So khớp mâu thuẫn lời khai (Alibi Clash) về thời gian tử vong & chi tiết lỡ lời của Hà, Nộp báo cáo kết án S-Rank.
 
 ---
 
 ## 01. Bối Cảnh Vụ Án & Động Cơ Hậu Trường (Story Backstory & Plot Twist)
 
 ### 📍 Bối cảnh
-Tại căn nhà cũ chuẩn bị tháo dỡ giải tỏa đền bù, thi thể của **Nguyễn Văn Khang (35 tuổi)** được phát hiện tử vong. Khang gục ngã gần khoang sau của chiếc tủ âm tường lớn. Hiện trường bị xáo trộn mạnh với dấu vết lục lọi tủ kệ và di chuyển tài liệu.
+Tại căn nhà cũ chuẩn bị tháo dỡ giải tỏa đền bù tại thị trấn cũ hẻo lánh (không có camera an ninh), thi thể của **Nguyễn Văn Khang (35 tuổi)** được hàng xóm phát hiện sau vài ngày. Khang nằm ngửa gục ngã trên sàn nhà cạnh bộ bình trà thủy tinh bị đập vỡ. Hiện trường bị xáo trộn mạnh với dấu vết lục lọi tủ kệ, di chúc và hồ sơ đất đai vương vãi.
 
-### 🎭 Câu Chuyện Hậu Trường & Plot Twist
-* **Định kiến ban đầu:** Vụ đột nhập trộm tài sản hoặc cướp tiền đền bù của các đối tượng bên ngoài dẫn tới xô xát chết người.
-* **Cú Bẻ Lái Kịch Bản (Double Plot Twist):**
-  - **Trần Ngọc Mai** đột nhập tráo bản sao di chúc giả vào hộp sắt và mang bản gốc đi giám định nhằm chống lại sự thâu tóm của Khang.
-  - **Lê Quang Vũ** đột nhập ban đêm qua cửa sau để tìm kiếm bản vẽ sửa nhà gốc nhằm tiêu hủy chứng cứ mình đã lập khống hồ sơ diện tích đất lấn chiếm cho Khang.
-  - **Hà** đột nhập lấy chiếc còi đồng cũ của Gia Huy khỏi hộp sắt để tránh bị Khang tống tiền bằng bí mật năm xưa.
-  - **Tùng** mới thực sự là kẻ chạm trán Khang vào ban đêm. Khang dùng chiếc còi đồng và trò trốn tìm quá khứ để đe dọa ép Tùng ký giấy ủy quyền thừa kế. Trong lúc giằng co, Tùng xô ngã Khang đập đầu vào tủ chết tại chỗ, sau đó bỏ mặc nạn nhân và dàn dựng hiện trường giả để đánh lạc hướng cơ quan điều tra.
+### 🎭 Câu Chuyện Hậu Trường & Plot Twist 3 Giai Đoạn
+* **Giai đoạn 1 (Mai & Vũ - Tranh chấp tài sản & Nợ nần):**
+  - **Trần Ngọc Mai** đột nhập tráo bản sao di chúc giả vào hộp sắt và mang bản gốc đi giám định nhằm chống lại việc Khang thâu tóm tiền đền bù.
+  - **Lê Quang Vũ** (chồng Mai) làm ăn thua lỗ nợ nần Khang (giấu Mai), bị Khang tống tiền bằng bản vẽ khống. Vũ đột nhập ban đêm qua cửa sau để tìm kiếm bản vẽ sửa nhà gốc nhằm tiêu hủy.
+* **Giai đoạn 2 (Tùng - Hung thủ giả định / Red Herring 2):**
+  - **Tùng** (bạn cũ, anh trai của Gia Huy - đứa trẻ tử vong năm xưa khi chơi trốn tìm) tìm đến Khang do bị Khang đe dọa bí mật quá khứ để ép ký giấy ủy quyền thừa kế.
+  - Khang chọc tức Tùng, hai bên xảy ra xô xát nảy lửa làm rơi vỡ bộ bình cốc thủy tinh. Tùng xô ngã Khang đập đầu vào tủ khiến Khang bị thương bầm tím và bất tỉnh. Tùng tưởng Khang chỉ ngất nên bỏ mặc nạn nhân lẩn ra ngoài lúc ~20:15.
+* **Giai đoạn 3 (Hà - Hung thủ thực sự / True Killer):**
+  - **Hà** (bạn gái cũ của Khang) có tâm lý kiểm soát cuồng loạn méo mó. Sau khi bị Khang chia tay và phớt lờ, Hà âm thầm bám theo Tùng và Khang.
+  - Sau khi Tùng rời đi, Hà lẻn vào nhà thấy Khang nằm bất tỉnh, đồng thời phát hiện bằng chứng Khang có người phụ nữ mới. Trong cơn ghen tuông điên loạn và uất ức bị bỏ rơi, Hà cầm mảnh thủy tinh vỡ từ bộ bình trà đâm vào chỗ hiểm của Khang gây đứt động mạch mất máu tử vong cấp (khoảng 21:00 - 21:30).
+  - Khi làm việc với cảnh sát, Hà giả vờ là người thân quen hỗ trợ điều tra và lỡ lời lộ chi tiết chỉ có người ở hiện trường sau xô xát mới biết.
 
 ---
 
 ## 02. Tuyến Nhân Vật & Ma Trận Nghi Phạm (Key Profiles)
 
-| Nhân Vật | Vai Trò | Lý Do Nghi Vấn | Lời Khai Ngoại Phạm (Alibi) |
+| Nhân Vật | Vai Trò | Lý Do Nghi Vấn | Lời Khai Ngoại Phạm (Alibi) & Thực Tế |
 | :--- | :--- | :--- | :--- |
-| 🪦 **Nguyễn Văn Khang** | Nạn nhân | Tử vong tại hiện trường, đầu chấn thương do ngã đập vào tủ kệ. | Tử vong tối muộn ngày 24/07. |
-| 👩 **Trần Ngọc Mai** | Nghi phạm 1 | Em họ nạn nhân; tranh chấp quyền thừa kế căn nhà; dấu tay trên hộp sắt và tủ âm tường. | Khai báo rời hiện trường sớm. Đã tráo bản sao di chúc đem bản gốc đi giám định chữ ký. |
-| 👷 **Lê Quang Vũ** | Nghi phạm 2 | Nhân viên đo đạc; lén lút quay lại hiện trường ban đêm (camera ghi nhận); bị tống tiền vì lập hồ sơ khống. | Khai báo ở cây xăng từ chiều tối. Thực tế đột nhập qua cửa sau tìm bản vẽ sửa nhà gốc để tiêu hủy. |
-| 👩 **Hà** | Nghi phạm 3 | Bạn thuở nhỏ của nạn nhân; dấu vết can thiệp hộp sắt chứa đồ chơi cũ của Gia Huy. | Khai báo về nhà từ chiều. Thực tế lấy đi chiếc còi đồng để phi tang ký ức tống tiền của Khang. |
-| 👨 **Tùng** | Nghi phạm 4 / Thủ phạm | Bạn cũ; bị Khang dùng cái chết của Gia Huy tống tiền ép ký giấy tờ thừa kế. | Khai báo không đến căn nhà vào buổi tối. Dấu vết giằng co và vết trượt ngã tại tủ âm tường chỉ ra sự hiện diện của Tùng. |
+| 🪦 **Nguyễn Văn Khang** | Nạn nhân | Bị đâm bởi mảnh thủy tinh vỡ dẫn đến tử vong do mất máu cấp; có vết bầm tím do xô xát. | Tử vong tối muộn ngày 24/07. |
+| 👩 **Trần Ngọc Mai** | Nghi phạm 1 | Em họ nạn nhân; tranh chấp di chúc thừa kế; dấu tay trên hộp sắt. | Khai rời hiện trường sớm. Đã tráo bản sao di chúc đem bản gốc đi giám định chữ ký. |
+| 👷 **Lê Quang Vũ** | Nghi phạm 2 | Nhân viên đo đạc; chồng Mai; nợ tiền Khang do làm ăn thua lỗ; bị Khang tống tiền hồ sơ khống. | Khai ở cây xăng từ chiều tối. Thực tế đột nhập qua cửa sau tìm bản vẽ sửa nhà gốc để tiêu hủy. |
+| 👨 **Tùng** | Nghi phạm 3 (Hung thủ giả định) | Bạn cũ / Anh trai Gia Huy; bị Khang tống tiền bí mật quá khứ; xảy ra xô xát tại hiện trường. | Khai không đến. Dấu vết xô xát & bộ bình vỡ chứng minh Tùng có mặt, nhưng Tùng chỉ làm Khang bất tỉnh rồi rời đi lúc 20:15. |
+| 👩 **Hà** | Nghi phạm 4 (THỦ PHẠM THỰC SỰ) | Bạn gái cũ của Khang; ghen tuông cuồng loạn; bám theo nạn nhân; xuất hiện sau khi Tùng rời đi. | Khai ở nhà cả tối. Thực tế lén vào nhà, phát hiện Khang ngất + có người mới $\rightarrow$ Dùng mảnh thủy tinh đâm chết Khang. |
 
 ---
 
@@ -44,14 +48,14 @@ Tại căn nhà cũ chuẩn bị tháo dỡ giải tỏa đền bù, thi thể c
          ┌──────────────────────────┼──────────────────────────┐
          ▼                          ▼                          ▼
   [1. Hung thủ chính]       [2. Động cơ thực sự]       [3. Alibi Clash Proof]
-     TÙNG (tung)             CHE GIẤU BÍ MẬT QUÁ KHỨ    EV-WHISTLE-GONE & EV-SMS-MAI
+     HÀ (ha)                 GHEN TUÔNG CUỒNG LOẠN      EV-GLASS-SHARD & EV-TIME-MISMATCH
 ```
 
-1. **Chỉ danh Hung thủ:** `tung` (Tùng).
-2. **Xác định Động cơ:** Che giấu bí mật quá khứ (`past-secret`).
+1. **Chỉ danh Hung thủ:** `ha` (Trần Thị Hà).
+2. **Xác định Động cơ:** Mâu thuẫn tình cảm / Ghen tuông cuồng loạn (`romantic-jealousy`).
 3. **Đính kèm Mâu thuẫn Ngoại phạm (Alibi Clash Proof):**
-   * Hà lấy đi chiếc còi đồng (`EV-WHISTLE-GONE`) và Mai tráo di chúc gốc lấy bản sao (`EV-WILL-COPY`) cùng Vũ trộm bản vẽ để xóa vết gian lận (`EV-MAP-ORIGIN`) chỉ giải thích sự xáo trộn tài sản tại hiện trường.
-   * Riêng chiếc còi đồng biến mất chứng minh Khang đã dùng nó để tống tiền cả nhóm. Tùng là kẻ duy nhất gặp Khang vào ban đêm để giải quyết mâu thuẫn tống tiền này, dẫn đến giằng co xô ngã nạn nhân.
+   * Báo cáo pháp y chỉ ra tổn thương 2 giai đoạn: Vết bầm xô xát (Tùng gây ra ~20:15) khác với vết đâm đứt động mạch do mảnh thủy tinh (`EV-GLASS-SHARD`) gây mất máu tử vong cấp (khoảng 21:00-21:30).
+   * Lời khai lỡ lời của Hà mô tả hiện trường gục ngã bên mảnh vỡ thủy tinh (`EV-TIME-MISMATCH`) chứng minh Hà có mặt tại hiện trường sau khi bộ bình trà bị Tùng đập vỡ.
 
 ---
 

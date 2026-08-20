@@ -265,37 +265,36 @@ export default function TimelineClient({
     // Add Day 0 representing the continuous active timeline
     offsets.add(0)
     // Add any non-zero offsets found in events (past < 0 and future > 0)
+    // Exclude Day 1 (offset === 1) as it is merged into the Day 0 48h canvas
     tracks.forEach(track => {
       track.events.forEach(ev => {
-        if ((ev.dayOffset ?? 0) !== 0) {
+        if ((ev.dayOffset ?? 0) !== 0 && (ev.dayOffset ?? 0) !== 1) {
           offsets.add(ev.dayOffset ?? 0)
         }
       })
     })
     // Add any extra days added by the user
     extraDays.forEach(d => {
-      if (d !== 0) offsets.add(d)
+      if (d !== 0 && d !== 1) offsets.add(d)
     })
     return Array.from(offsets).sort((a, b) => a - b)
   }, [tracks, extraDays])
   
-  // Calculate dynamic duration of the active timeline based on the latest event
+  // Calculate dynamic duration of the active timeline based on whether Day 1 events or day exists
+  // If Day 1 exists, set to exactly 48 hours (2880 minutes). Otherwise, set to exactly 24 hours (1440 minutes).
   const activeTimelineMinutes = useMemo(() => {
-    let maxMin = 1440 // Default 24 hours
-    tracks.forEach(track => {
-      track.events.forEach(ev => {
-        if ((ev.dayOffset ?? 0) >= 0) {
-          const absEnd = (ev.dayOffset ?? 0) * 1440 + ev.endMin
-          if (absEnd > maxMin) {
-            maxMin = absEnd
+    let hasDay1 = extraDays.includes(1)
+    if (!hasDay1) {
+      tracks.forEach(track => {
+        track.events.forEach(ev => {
+          if ((ev.dayOffset ?? 0) === 1) {
+            hasDay1 = true
           }
-        }
+        })
       })
-    })
-    // Pad 6 hours (360 minutes) and round to the nearest hour
-    const padded = maxMin + 360
-    return Math.ceil(padded / 60) * 60
-  }, [tracks])
+    }
+    return hasDay1 ? 2880 : 1440
+  }, [tracks, extraDays])
 
   const totalMinutes = activeTimelineMinutes
 
@@ -925,8 +924,8 @@ export default function TimelineClient({
                     
                     {/* Render Events inside the lane */}
                     {track.events.map(event => {
-                      // Hide historical events on the canvas
-                      if ((event.dayOffset ?? 0) < 0) return null
+                      // Hide historical events and future events beyond Day 1 (dayOffset >= 2) on the canvas
+                      if ((event.dayOffset ?? 0) < 0 || (event.dayOffset ?? 0) >= 2) return null
                       
                       // Filter based on view mode
                       if (viewMode === 'truth' && event.type === 'LIE') return null

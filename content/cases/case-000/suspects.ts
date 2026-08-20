@@ -6,35 +6,35 @@ export const suspects000: Suspect[] = [
     caseId: 'case-000',
     name: 'Trần Ngọc Mai',
     role: 'Em họ Khang / Đồng thừa kế',
-    background: '36 tuổi. Nghi ngờ Khang làm giả di chúc viết tay của ông nội nhằm chiếm phần lớn tiền bồi thường giải phóng mặt bằng của căn nhà chung.',
-    alibi: 'Đột nhập lấy di chúc thật đi giám định chữ viết trước khi án mạng xảy ra, có chứng cứ ngoại phạm từ văn phòng giám định và luật sư.',
+    background: '36 tuổi. Nghi ngờ Khang làm giả di chúc viết tay của ông nội nhằm chiếm toàn bộ tiền bồi thường đất đai.',
+    alibi: 'Đột nhập tráo di chúc giả lấy bản thật đi giám định chữ viết trước khi án mạng xảy ra; có chứng cứ ngoại phạm từ văn phòng giám định và luật sư.',
     collected: true
   },
   {
     id: 'vu',
     caseId: 'case-000',
     name: 'Lê Quang Vũ',
-    role: 'Nhân viên đo đạc khảo sát',
-    background: '39 tuổi. Đã nhận tiền của Khang để mô tả hiện trạng đất sai lệch. Bị Khang tống tiền bằng bản vẽ gốc nên cố gắng tìm cách lấy lại tài liệu.',
-    alibi: 'Có mặt tại bến xe/cây xăng vào khung giờ án mạng xảy ra, tuy nhiên camera an ninh ghi nhận từng quay lại căn nhà vào buổi tối để trộm tài liệu.',
-    collected: true
-  },
-  {
-    id: 'ha',
-    caseId: 'case-000',
-    name: 'Hà',
-    role: 'Bạn thuở nhỏ của nạn nhân',
-    background: 'Thuộc nhóm trẻ năm xưa liên quan đến cái chết của Gia Huy. Đột nhập lấy chiếc còi đồng của Huy khỏi hộp sắt để tránh bị Khang đe dọa ép buộc.',
-    alibi: 'Về nhà trước khi Khang tử vong. Chỉ lấy đi chiếc còi và xóa tin nhắn liên quan.',
+    role: 'Chồng Mai / Cán bộ đo đạc khảo sát',
+    background: '39 tuổi. Nợ tiền Khang do làm ăn thua lỗ (giấu Mai). Đã nhận tiền để đo khống thêm 45m2 đất cho Khang, bị Khang dùng bản vẽ gốc tống tiền đe dọa.',
+    alibi: 'Đột nhập cửa sau vào buổi tối để trộm lại bản vẽ tiêu hủy chứng cứ gian lận, rời đi trước khi án mạng xảy ra.',
     collected: true
   },
   {
     id: 'tung',
     caseId: 'case-000',
     name: 'Tùng',
-    role: 'Bạn thuở nhỏ / Thủ phạm',
-    background: 'Bị Khang liên tục tống tiền và đe dọa vạch trần bí mật cái chết của Gia Huy năm xưa nhằm ép ký các giấy tờ thừa kế có lợi cho Khang.',
-    alibi: 'Khai báo rời khỏi hiện trường sớm, tuy nhiên dấu vết chứng minh anh đã giằng co với Khang dẫn tới cú ngã chí mạng của nạn nhân, bỏ mặc thi thể và dàn dựng hiện trường giả.',
+    role: 'Bạn cũ / Anh trai Gia Huy (Red Herring)',
+    background: '35 tuổi. Bị Khang tống tiền và đe dọa vạch trần bí mật tai nạn của Gia Huy năm xưa nhằm ép ký giấy tờ ủy quyền thừa kế.',
+    alibi: 'Khai báo không đến. Thực tế có đến xô xát gay gắt làm vỡ bộ bình trà thủy tinh và đẩy Khang bất tỉnh rồi hoảng sợ tháo chạy lúc 20:15, lầm tưởng mình lỡ tay đánh chết Khang.',
+    collected: true
+  },
+  {
+    id: 'ha',
+    caseId: 'case-000',
+    name: 'Trần Thị Hà',
+    role: 'Bạn gái cũ của nạn nhân / THỦ PHẠM THỰC SỰ',
+    background: '35 tuổi. Có tâm lý kiểm soát cuồng loạn méo mó. Sau khi bị Khang đòi chia tay và phớt lờ, Hà luôn âm thầm bám theo dõi nạn nhân.',
+    alibi: 'Khai báo ở nhà cả tối. Thực tế lén vào nhà sau khi Tùng rời đi, thấy Khang ngất xỉu + phát hiện Khang có nhân tình mới nên dùng mảnh thủy tinh vỡ đâm chết nạn nhân lúc 21:00.',
     collected: true
   }
 ]
