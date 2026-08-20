@@ -58,36 +58,18 @@
 
 ---
 
-## 🔍 CHƯƠNG IV: TIẾN TRÌNH ĐIỀU TRA 3 GIAI ĐOẠN (GAMEPLAY)
+## 🎮 CHƯƠNG IV: LIÊN KẾT THIẾT KẾ GAMEPLAY & LUỒNG ĐIỀU TRA
 
-### 🟢 GIAI ĐOẠN 0: Khám Nghệ Hiện Trường & Rà Soát Ban Đầu
-* Hàng xóm phát hiện mùi lạ và báo cảnh sát. Cảnh sát niêm phong hiện trường.
-* **Manh mối mở màn:**
-  * Báo cáo tử thi sơ bộ (`f1-1`): Phát hiện 2 nhóm tổn thương (vết bầm xô xát & vết đâm đứt động mạch mất máu).
-  * Báo cáo nhân thân (`f1-4`): Khang mồ côi bố mẹ, ông nội vừa mất, sống trăng hoa, mâu thuẫn tài sản.
-  * Biên bản hiện trường (`f1-2`) & Ảnh (`p1`, `p2`, `p3`): Bộ bình trà vỡ vụn, giấy tờ vương vãi, mảnh thủy tinh dính máu.
-  * Lời khai hàng xóm (`f1-6`): Đêm 24/07 nghe tiếng cãi vã lớn và tiếng vỡ bình thủy tinh.
-  * Rà soát chuyên đề (`f1-5`): Khoanh vùng 4 đối tượng Mai, Vũ, Tùng, Hà.
-
-### 🟡 GIAI ĐOẠN 1: Bóc Tách Tranh Chấp Tài Sản (Mai & Vũ)
-* **Mâu thuẫn di chúc:** Người chơi phân tích file `di_chuc_ong_noi_gia_mao.pdf` (`f2-1`) và phát hiện di chúc ghi năm 2018 nhưng lại chứa từ ngữ địa chính 2021 $\rightarrow$ di chúc bị Khang làm giả.
-* **Lý do loại trừ Mai:** Kết quả giám định (`f2-2`) và email luật sư (`e2`) chứng minh Mai chỉ lấy di chúc đi giám định hợp pháp.
-* **Mâu thuẫn đo đạc:** Phân tích bản đồ gốc 75m2 (`f2-3`) và giấy nợ 350 triệu (`f2-4`) giải thích việc Vũ lén lút đột nhập trộm bản vẽ tiêu hủy chứng cứ gian lận.
-
-### 🔴 GIAI ĐOẠN 2: Khai Quật Quá Khứ & Cuộc Xô Xát (Tùng)
-* **Bí mật bi kịch:** Bài báo cũ 12 năm trước (`p5`) và bức ảnh 4 đứa trẻ (`p4`) làm rõ bí mật cái chết của Gia Huy khi chơi trốn tìm.
-* **Cuộc xô xát:** Camera cây xăng (`f3-1`) chứng minh Tùng xuất hiện lúc 20:00 và tháo chạy hoảng hốt lúc 20:15.
-* **Bẫy Red Herring đỉnh điểm:** Tùng thừa nhận giằng co làm vỡ bình trà và xô Khang bất tỉnh, tự tin mình là kẻ gây ra cái chết. Người chơi bị hướng nghi vấn Tùng là thủ phạm.
-
-### 🟣 GIAI ĐOẠN 3: Lật Tẩy Hung Thủ Thực Sự (Hà)
-* **Eureka Clue 1 (Khung giờ pháp y):** Báo cáo pháp y bổ sung (`f4-1`) xác định Khang ngất do Tùng xô không nguy hiểm tính mạng, nguyên nhân tử vong thực sự là **vết đâm thủy tinh mất máu cấp lúc 21:00** (45 phút sau khi Tùng đã bỏ đi).
-* **Eureka Clue 2 (Alibi Clash lỡ lời):** Trong biên bản lời khai ban đầu (`f4-2`), Hà khai *"ở nhà cả tối không đi đâu"*, nhưng lại lỡ lời mô tả: *"Tôi thấy Khang nằm gục cạnh bộ bình trà vỡ vụn dưới sàn"*. Bộ bình trà chỉ bị đập vỡ sau 20:00 $\rightarrow$ Khẳng định Hà đã xuất hiện tại hiện trường sau 20:15.
-* **Eureka Clue 3 (Động cơ bộc phát):** Ảnh tin nhắn Khang nhắn tình nhân mới (`p6`) làm rõ cơn ghen tuông cuồng loạn khiến Hà cầm mảnh thủy tinh đâm chết Khang.
+Toàn bộ chi tiết luồng tương tác của người chơi, công cụ thám tử, các kịch bản rẽ nhánh đoán sai/đúng và hệ thống gợi ý 3 cấp độ được phân tách hoàn toàn tại tài liệu riêng:
+👉 **[gameplay_design.md](file:///d:/code_world/dect_project/docs/08_cases/case_000/gameplay_design.md)**
 
 ---
 
-## 🏆 KẾT LUẬN & BÁO CÁO S-RANK
-* **Hung thủ bị kết án:** **Trần Thị Hà** (`ha`).
-* **Động cơ:** Ghen tuông cuồng loạn / Mâu thuẫn tình cảm bị phớt lờ (`romantic-jealousy`).
-* **Phương thức:** Dùng mảnh thủy tinh vỡ từ bộ bình trà đâm đứt động mạch cổ nạn nhân (`glass-shard-stab`).
-* **Bằng chứng xác thực đính kèm:** `f4-1` (Báo cáo giờ tử vong 21:00) & `f4-2` (Lời khai lỡ lời của Hà về bình trà vỡ).
+## 🏆 CHƯƠNG V: KẾT LUẬN VỤ ÁN (TRUE ENDING SUMMARY)
+
+* **Hung thủ thực sự bị kết án:** **Trần Thị Hà** (`ha`).
+* **Động cơ phạm tội:** Ghen tuông cuồng loạn bộc phát / Uất ức bị phớt lờ và bị từ bỏ tình cảm (`romantic-jealousy`).
+* **Phương thức thực hiện:** Dùng mảnh thủy tinh sắc nhọn vỡ từ bộ bình trà đâm mạnh đứt động mạch cảnh vùng cổ nạn nhân Khang (`glass-shard-stab`).
+* **Cặp bằng chứng cốt lõi lật tẩy:**
+  1. `12_bao_cao_phap_y_bo_sung_va_loi_khai_ha_lo_loi.pdf` (Khung giờ tử vong 21:00, sau khi Tùng đã tháo chạy lúc 20:15).
+  2. `07d_bien_ban_loi_khai_tran_thi_ha.pdf` (Lời khai lỡ lời của Hà mô tả bộ bình trà vỡ trong khi khai ở nhà cả tối).
