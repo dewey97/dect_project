@@ -1,128 +1,67 @@
-# DANH MỤC MANH MỐI & LÝ DO ĐƯA VÀO VỤ ÁN: CASE-000 (VỤ ÁN TRỐN TÌM)
+# VỤ ÁN 000: TRỐN TÌM (HIDE-AND-SEEK) — DANH MỤC MANH MỐI & TÀI NGUYÊN GAME (EVIDENCE MANIFEST)
 
-> **Tài liệu tham chiếu thiết kế nội dung:** Danh sách toàn bộ các file tài liệu PDF, hình ảnh hiện trường, email, tin nhắn SMS, ghi chú và các mốc checkpoint kèm theo **lý do chi tiết và vai trò gameplay** của từng mục, được bổ sung đầy đủ theo đúng yêu cầu Giai đoạn 0.
-
----
-
-## 🟢 GIAI ĐOẠN 0: KHÁM NGHIỆM BAN ĐẦU & NẠN NHÂN KHANG (`dev-00`)
-
-### 1. Bộ Báo Cáo & Biên Bản Cảnh Sát (Police Reports & PDFs)
-
-#### 📄 `bao_cao_kham_nghiem_tu_thi_so_01.pdf` (`f1-1`)
-* **Nội dung:** Xác nhận nạn nhân Nguyễn Văn Khang (35 tuổi) tử vong do đứt động mạch gây mất máu cấp (khung giờ 20:30 - 21:30 ngày 24/07). Phát hiện vết bầm tím do xô xát giằng co.
-* **Lý do đưa vào & Vai trò:** **Core Evidence.** Phân định 2 tổn thương (vết bầm tím xô xát vs. vết đâm thủy tinh tử vong) để lật tẩy Tùng chỉ làm ngất nạn nhân còn Hà đâm chết.
-
-#### 📄 `bien_ban_kham_nghiem_hien_truong.pdf` (`f1-2`)
-* **Nội dung:** Ghi nhận hiện trường bị xáo trộn mạnh: phòng khách bừa bộn, tủ âm tường xê dịch, các mảnh vỡ bình cốc thủy tinh vụn dưới sàn nhà, di chúc và giấy tờ vương vãi.
-* **Lý do đưa vào & Vai trò:** Thiết lập bối cảnh hiện trường bừa bộn do nhiều đợt đột nhập độc lập.
-
-#### 📄 `bao_cao_tien_do_dieu_tra.pdf` (`f1-3`)
-* **Nội dung:** Tóm tắt tiến trình điều tra ban đầu của ban chuyên án: xác định mốc thời gian phát hiện thi thể, khoanh vùng danh sách các đối tượng tiếp xúc cuối cùng.
-* **Lý do đưa vào & Vai trò:** Cung cấp thông tin nền cho người chơi nắm bắt tiến độ và định hướng các bước tiếp theo.
-
-#### 📄 `bao_cao_xac_minh_nhan_than_khang.pdf` (`f1-4`)
-* **Nội dung:** Hoàn cảnh nạn nhân: Bố mẹ đã mất lâu, ông nội vừa mới qua đời, độc thân. Nạn nhân đứng tên căn nhà diện giải tỏa, có tính cách bốc đồng, trăng hoa và mâu thuẫn tài chính.
-* **Lý do đưa vào & Vai trò:** Giải thích gia cảnh nạn nhân, vì sao căn nhà trở thành tâm điểm tranh chấp thừa kế.
-
-#### 📄 `bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` (`f1-5`)
-* **Nội dung:** Rà soát 4 mối quan hệ mâu thuẫn chính của Khang: Mai (tranh chấp di chúc), Vũ (nợ nần & đo đạc sai), Tùng (hiềm khích quá khứ), Hà (bạn gái cũ mới chia tay).
-* **Lý do đưa vào & Vai trò:** **Mở rộng ma trận nghi phạm.** Định hướng người chơi chú ý cả 4 đối tượng nghi vấn ngay khi mở vụ án.
-
-#### 📄 `bien_ban_lay_loi_khai_hang_xom.pdf` (`f1-6`)
-* **Nội dung (Không cần ảnh):** Lời khai nhân chứng xung quanh: Nạn nhân sống trăng hoa, thường xuyên cãi vã. Đêm 24/07 có tiếng tranh cãi lớn, tiếng đập vỡ đồ thủy tinh, và có người lén lút ra vào cửa sau.
-* **Lý do đưa vào & Vai trò:** Xác nhận tiếng vỡ bình thủy tinh xảy ra trong đêm án mạng và củng cố chi tiết nạn nhân trăng hoa, tính xấu.
-
-#### 📄 `bien_ban_lay_loi_khai_ban_dau_nghi_pham.pdf` (`f1-7`)
-* **Nội dung:** Tập hợp lời khai sơ bộ ban đầu của Mai, Vũ, Tùng, Hà khi được cảnh sát triệu tập.
-* **Lý do đưa vào & Vai trò:** Cung cấp lời khai ngoại phạm (Alibi) ban đầu của 4 nghi phạm để người chơi so khớp tìm điểm dối trá ở các giai đoạn sau.
+> **Tài liệu Danh mục Manh mối:** Tổng hợp toàn bộ hồ sơ, tài liệu PDF, hình ảnh vật chứng, tin nhắn trích xuất và vai trò gameplay trong Vụ án 000.
 
 ---
 
-### 2. Bộ Ảnh Hiện Trường & Manh Mối (Photos)
+## 📊 BẢNG TỔNG HỢP TOÀN BỘ MANH MỐI & ASSET DỰ ÁN
 
-#### 🖼️ `photo-crime-scene-overview.jpg` (`p1`)
-* **Nội dung:** **Ảnh phòng khách:** Toàn cảnh phòng khách nhà cũ, ghế gỗ bị xê dịch, bộ bình cốc thủy tinh vỡ vụn dưới sàn.
-* **Lý do đưa vào & Vai trò:** Trực quan hóa hiện trường xáo trộn sau cuộc xô xát của Tùng.
-
-#### 🖼️ `photo-scattered-documents.jpg` (`p2`)
-* **Nội dung:** **Ảnh giấy tờ vương vãi:** Các tờ bản vẽ địa chính, đơn từ đền bù và mảnh di chúc bị văng ra sàn nhà gần tủ âm tường.
-* **Lý do đưa vào & Vai trò:** Trực quan hóa hành vi lục lọi tài sản và tráo di chúc của Mai / Vũ.
-
-#### 🖼️ `photo-glass-shard-detail.jpg` (`p3`)
-* **Nội dung:** **Ảnh các mảnh vỡ thủy tinh:** Mảnh vỡ bình trà thủy tinh nhọn dính vết máu đứt động mạch và dấu vân tay dạng miết.
-* **Lý do đưa vào & Vai trò:** **Core Evidence:** Trực quan hóa vũ khí đâm chết nạn nhân.
-
-#### 🖼️ `photo-childhood-group.jpg` (`p4`)
-* **Nội dung:** **Ảnh hồi nhỏ bọn trẻ:** Bức ảnh đen trắng ố vàng chụp 4 đứa trẻ (Khang, Tùng, Hà, Gia Huy) quàng khăn đỏ đứng trước căn nhà cũ.
-* **Lý do đưa vào & Vai trò:** Manh mối gợi mở câu chuyện bí mật quá khứ nhóm bạn.
-
-#### 🖼️ `photo-old-newspaper.jpg` (`p5`)
-* **Nội dung:** **Báo về vụ tai nạn hồi nhỏ:** Bài báo cũ 12 năm trước: *"Bé trai mắc kẹt tử vong trong căn nhà bỏ hoang tại khu Bờ Sông"*.
-* **Lý do đưa vào & Vai trò:** Xác nhận vụ tai nạn của Gia Huy năm xưa, tạo động cơ bị tống tiền cho Tùng và Hà.
-
----
-
-## 🟡 GIAI ĐOẠN 1: HỒ SƠ THỪA KẾ & NỢ NẦN (MAI & VŨ - `dev-02`)
-
-#### 📄 `di_chuc_ong_noi_gia_mao.pdf` (`f2-1`)
-* **Nội dung:** Di chúc viết tay ngày 15/04/2018 dùng thuật ngữ *"Mã thửa địa chính 2021"*.
-* **Lý do:** Giúp người chơi lật tẩy di chúc bị giả mạo.
-
-#### 📄 `ket_qua_giam_dinh_chu_ky_so_88.pdf` (`f2-2`)
-* **Nội dung:** Giám định chữ ký xác nhận mực đè giả mạo.
-* **Lý do:** Loại trừ Mai khỏi việc giết người (đi giám định hợp pháp).
-
-#### 📄 `ban_do_dia_chinh_goc_2019.pdf` (`f2-3`)
-* **Nội dung:** Bản đồ gốc thể hiện đất thực tế chỉ có 75m2 (Vũ đo khống thành 120m2).
-* **Lý do:** Làm rõ động cơ Vũ bị Khang tống tiền.
-
-#### 📄 `giay_ghi_no_ca_nhan_vu.pdf` (`f2-4`)
-* **Nội dung:** Giấy nợ Vũ nợ Khang 350 triệu đồng giấu Mai.
-* **Lý do:** Động cơ bí mật để Vũ đột nhập trộm bản vẽ tiêu hủy chứng cứ.
+| ID | Tên Manh Mối / Tài Liệu | Nội Dung Tóm Tắt | Manh Mối Ẩn / Điểm Nút Thắt (Hidden Clue) | Đối Tượng | Phase | Vai Trò Gameplay | Cặp Ghép So Sánh |
+| :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: |
+| `f1-1` | `01_bao_cao_kham_nghiem_tu_thi.pdf` | Báo cáo khám nghiệm tử thi sơ bộ | 02 nhóm vết thương riêng biệt: vết bầm gáy xô xát & vết đâm đứt động mạch cảnh mất máu | Khang | Phase 0 | [Mở màn] Khám nghiệm tử thi | `f4-1` |
+| `f1-2` | `02_bien_ban_kham_nghiem_hien_truong.pdf` | Biên bản khám nghiệm hiện trường | Bộ bình trà bị đập vỡ vụn dưới sàn & Dấu giày size 37 nữ ở cửa sau | Khang, Hà | Phase 0 | [Mở màn] Hiện trường | `07d` |
+| `f1-3` | `03_bao_cao_tien_do_dieu_tra.pdf` | Báo cáo tiến độ điều tra ban đầu | Tổng hợp rà soát dấu vết vân tay, camera an ninh và triệu tập 04 nghi phạm | Mai, Vũ, Tùng, Hà | Phase 0 | [Dẫn dắt tiến độ] | N/A |
+| `f1-4` | `04_bao_cao_xac_minh_nhan_than_khang.pdf` | Báo cáo nhân thân nạn nhân Khang | Bố mẹ mất sớm, ông qua đời 3 tháng trước, lối sống ăn tiêu bốc đồng/trăng hoa | Khang | Phase 0 | [Tài liệu bối cảnh] | N/A |
+| `f1-5` | `05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` | Ma trận rà soát mâu thuẫn 04 nghi phạm | Phân lập 4 động cơ: Tranh chấp nhà đất (Mai), Gian lận đo đạc (Vũ), Tai nạn 1998 (Tùng), Ghen tuông (Hà) | Mai, Vũ, Tùng, Hà | Phase 0 | [Ma trận nghi vấn] | N/A |
+| `f1-6` | `06_bien_ban_lay_loi_khai_hang_xom.pdf` | Biên bản lời khai hàng xóm | Tiếng cãi vã lớn + tiếng đập vỡ bình trà lúc hơn 20:00 & bóng người chui cửa sau | Tùng, Hà | Phase 0 | [Xác minh mốc giờ] | `f1-2` |
+| `07a` | `07a_bien_ban_loi_khai_tran_ngoc_mai.pdf` | Lời khai Q&A Trần Ngọc Mai | Thừa nhận cãi vã lúc 18:30, lén tráo di chúc gốc mang đi nhờ luật sư giám định, rời đi lúc 19:00 | Mai | Phase 0 | [Nghi vấn di chúc] | `f2-1`, `f2-2` |
+| `07b` | `07b_bien_ban_loi_khai_le_quang_vu.pdf` | Lời khai Q&A Lê Quang Vũ | Khai đi nhậu từ 19:40-22:00, chối bỏ vay nợ tiền bạc hay có mâu thuẫn tài chính với Khang | Vũ | Phase 0 | [Nghi vấn gian lận] | `f2-4` |
+| `07c` | `07c_bien_ban_loi_khai_tung.pdf` | Lời khai Q&A Tùng | Khai giằng co làm vỡ bình trà lúc 20:00, xô Khang ngất đập đầu vào tủ, tháo chạy hoảng sợ lúc 20:15 | Tùng | Phase 0 | [Bẫy Red Herring] | `f3-1`, `f4-1` |
+| `07d` | `07d_bien_ban_loi_khai_tran_thi_ha.pdf` | Lời khai Q&A Trần Thị Hà | Khai ở nhà cả tối không đi đâu nhưng **LỠ LỜI MÔ TẢ KHANG NẰM GỤC BÊN BÌNH TRÀ VỠ** | Hà | Phase 0/3 | [Eureka Clue / Alibi Clash] | `f1-2`, `f4-1` |
+| `f2-1` | `08_di_chuc_ong_noi_gia_mao.pdf` | Tờ di chúc viết tay của ông nội | **Di chúc ghi ngày 15/04/2018 nhưng lại chứa từ ngữ "Mã thửa địa chính 2021-BS14"** | Khang, Mai | Phase 1 | [Bằng chứng giả mạo] | `07a`, `f2-2` |
+| `f2-2` | `09_ket_qua_giam_dinh_chu_ky.pdf` | Kết quả giám định của Viện KHHS | Di chúc bị Khang viết chèn đè bằng mực bi hóa dầu 2024 $\rightarrow$ Giải thích hành vi lấy di chúc của Mai | Mai | Phase 1 | [Loại trừ nghi phạm Mai] | `f2-1` |
+| `f2-3` / `f2-4` | `10_ban_do_dia_chinh_va_giay_no_vu.pdf` | Bản đồ gốc 75m2 & Giấy nợ 350M | Khang ép Vũ đo khống lên 120m2 rồi tống tiền $\rightarrow$ Động cơ Vũ đột nhập lén trộm bản vẽ lúc 19:30 | Vũ | Phase 1 | [Loại trừ nghi phạm Vũ] | `07b` |
+| `f3-1` / `n3` | `11_bien_ban_trich_xuat_camera_va_tro_tron_tim.pdf` | Camera cây xăng & Giấy note 1998 | Camera xác nhận Tùng rời đi lúc 20:15. Giấy note tiết lộ vị trí trốn ngạt khí của Gia Huy năm 1998 | Tùng | Phase 2 | [Bí mật quá khứ & Red Herring] | `07c`, `f4-1` |
+| `f4-1` | `12_bao_cao_phap_y_bo_sung_va_loi_khai_ha_lo_loi.pdf` | Báo cáo giám định pháp y bổ sung | **Khung giờ tử vong chính xác là 21:00-21:15** (45 phút sau khi Tùng đã tháo chạy lúc 20:15) | Tùng, Hà | Phase 3 | [Eureka Clue / Minh oan Tùng] | `07c`, `07d` |
+| `f4-3` | `13_tong_hop_tin_nhan_sms_va_email.pdf` | Tổng hợp SMS, Email & Tin nhắn mới | Màn hình tin nhắn tình nhân mới lúc 20:40 đâm thẳng vào mắt Hà $\rightarrow$ Đạn kích hoạt ghen tuông | Hà | Phase 3 | [Động cơ hung thủ thực sự] | `07d` |
+| `p1` | `photo-crime-scene-overview.jpg` | Ảnh hiện trường phòng khách | Ảnh hiện trường bàn trà bị xáo trộn và bộ bình trà bị đập vỡ | Khang, Tùng | Phase 0 | [Vật chứng hiện trường] | `f1-2` |
+| `p3` | `photo-glass-shard-detail.jpg` | Ảnh mảnh thủy tinh sắc nhọn dính máu | Mảnh vỡ bình trà sắc nhọn 8cm dính máu khô và dấu vân tay miết (Hung khí thực sự) | Hà | Phase 0/3 | [Hung khí vụ án] | `f1-1`, `f4-1` |
+| `p4` | `photo-childhood-group.jpg` | Ảnh kỷ niệm 4 đứa trẻ năm 1998 | Ảnh chụp Khang, Tùng, Hà, Gia Huy trước căn nhà cổ Bờ Sông | Tùng, Hà, Khang | Phase 2 | [Kỷ vật quá khứ] | `n3` |
+| `p5` | `photo-old-newspaper.jpg` | Bài báo cũ năm 1998 | Bài báo cắt về vụ tai nạn ngạt khí tủ âm tường của bé trai 8 tuổi | Tùng, Khang | Phase 2 | [Hồ sơ vụ tai nạn] | `p4` |
+| `p6` | `photo-messages-cheating.jpg` | Ảnh tin nhắn điện thoại Khang | Ảnh màn hình tin nhắn tình nhân mới hẹn đi du lịch đền bù lúc 20:40 | Hà | Phase 3 | [Bằng chứng ghen tuông] | `f4-3` |
 
 ---
 
-## 🔴 GIAI ĐOẠN 2: BÍ MẬT QUÁ KHỨ & XÔ XÁT (TÙNG - `dev-03`)
+## 📑 CHƯƠNG I: CHI TIẾT TÀI LIỆU VĂN BẢN (PDF / LATEX DOCUMENTS)
 
-#### 📄 `bien_ban_trich_xuat_cam_ra_cay_xang.pdf` (`f3-1`)
-* **Nội dung:** Camera cây xăng ghi nhận Tùng rời hiện trường lúc 20:15.
-* **Lý do:** Xác định mốc thời gian Tùng rời đi (~20:15).
+### 🟢 GIAI ĐOẠN 0: KHÁM NGHIỆM & RÀ SOÁT BAN ĐẦU
+1. **`01_bao_cao_kham_nghiem_tu_thi.pdf` (`f1-1`)**: Phát hiện 2 nhóm tổn thương (bầm tím gáy do xô xát & đứt động mạch cảnh do vật sắc đâm).
+2. **`02_bien_ban_kham_nghiem_hien_truong.pdf` (`f1-2`)**: Hiện trường xáo trộn, bình trà vỡ vụn, mảnh thủy tinh dính máu, dấu giày nhỏ size 37 ở cửa sau.
+3. **`03_bao_cao_tien_do_dieu_tra.pdf` (`f1-3`)**: Tiến độ điều tra, rà soát dấu vết và triệu tập 4 nghi phạm.
+4. **`04_bao_cao_xac_minh_nhan_than_khang.pdf` (`f1-4`)**: Lý lịch Khang mồ côi bố mẹ, ông mới mất, trăng hoa và ăn tiêu bốc đồng.
+5. **`05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` (`f1-5`)**: Ma trận rà soát động cơ 4 đối tượng Mai, Vũ, Tùng, Hà.
+6. **`06_bien_ban_lay_loi_khai_hang_xom.pdf` (`f1-6`)**: Lời khai hàng xóm nghe tiếng cãi vã & tiếng đập vỡ bình trà lúc hơn 20:00.
+7. **04 Biên bản lời khai nghi phạm riêng biệt (`07a`, `07b`, `07c`, `07d`)**: Tường trình Q&A chi tiết của từng nghi phạm.
 
-#### 📝 `ghi_chu_tro_tron_tim_1998.txt` (`n3`)
-* **Nội dung:** Giấy note vị trí trốn tìm kèm ký hiệu *Quân XE*.
-* **Lý do:** Manh mối mở rộng mạng lưới 5 Quân Cờ (Lore Universe).
+### 🟡 GIAI ĐOẠN 1: TRANH CHẤP DI CHÚC & ĐẤT ĐAI
+8. **`08_di_chuc_ong_noi_gia_mao.pdf` (`f2-1`)**: Tờ di chúc ghi năm 2018 nhưng chứa cụm từ *"Mã thửa địa chính 2021-BS14"* $\rightarrow$ Chứng minh di chúc bị Khang làm giả.
+9. **`09_ket_qua_giam_dinh_chu_ky.pdf` (`f2-2`)**: Viện KHHS kết luận mực bi hóa dầu năm 2024 viết đè chèn $\rightarrow$ Giải thích việc Mai mang di chúc đi giám định (Loại trừ Mai).
+10. **`10_ban_do_dia_chinh_va_giay_no_vu.pdf` (`f2-3`, `f2-4`)**: Bản đồ đất gốc 75m2 & Giấy nợ 350M $\rightarrow$ Giải thích động cơ Vũ lén vào trộm bản vẽ tiêu hủy chứng cứ gian lận (Loại trừ Vũ).
 
----
+### 🔴 GIAI ĐOẠN 2: BÍ MẬT QUÁ KHỨ & CUỘC XÔ XÁT
+11. **`11_bien_ban_trich_xuat_camera_va_tro_tron_tim.pdf` (`f3-1`, `n3`)**: Camera cây xăng ghi nhận Tùng tháo chạy lúc 20:15 + Mảnh giấy note vị trí trốn ngạt khí năm 1998 của Gia Huy $\rightarrow$ Bẫy Red Herring hướng nghi vấn sang Tùng.
 
-## 🟣 GIAI ĐOẠN 3: LẬT TẨY HUNG THỦ THỰC SỰ (HÀ - `conclusion`)
-
-#### 📄 `bao_cao_phap_y_bo_sung_dinh_cao.pdf` (`f4-1`)
-* **Nội dung:** Xác định thời điểm tử vong chính xác là **21:00 - 21:15** (45 phút sau khi Tùng đã bỏ đi).
-* **Lý do:** Core Evidence phủ nhận Tùng giết Khang, chứng minh có kẻ thứ hai ra tay.
-
-#### 📄 `bien_ban_lay_loi_khai_ban_dau_ha.pdf` (`f4-2`)
-* **Nội dung:** Hà khai ở nhà cả tối nhưng lỡ lời mô tả Khang gục ngã bên bộ bình trà vỡ.
-* **Lý do:** Alibi Clash chốt hạ chứng minh Hà có mặt tại hiện trường sau 20:15.
-
-#### 🖼️ `photo-messages-cheating.jpg` (`p6`)
-* **Nội dung:** Ảnh màn hình Khang nhắn tin tình nhân mới.
-* **Lý do:** Động cơ ghen tuông cuồng loạn bộc phát của Hà.
+### 🟣 GIAI ĐOẠN 3: LẬT TẨY HUNG THỦ THỰC SỰ
+12. **`12_bao_cao_phap_y_bo_sung_va_loi_khai_ha_lo_loi.pdf` (`f4-1`)**: Báo cáo pháp y bổ sung xác định **khung giờ tử vong chính xác là 21:00-21:15** (45 phút sau khi Tùng đã bỏ chạy lúc 20:15) $\rightarrow$ Minh oan cho Tùng.
+13. **`13_tong_hop_tin_nhan_sms_va_email.pdf` (`f4-3`)**: SMS tống tiền, Email luật sư & Ảnh tin nhắn tình nhân mới lúc 20:40 $\rightarrow$ Động cơ ghen tuông cuồng loạn bộc phát của Hà.
 
 ---
 
-## 📊 BẢNG TỔNG HỢP TOÀN BỘ FILE & ASSET GIAI ĐOẠN 0
+## 🖼️ CHƯƠNG II: CHI TIẾT HÌNH ẢNH VẬT CHỨNG (PHOTO ASSETS)
 
-| ID | Tên File / Asset | Loại Asset | Đã Đưa Vào Manifest? | Trạng Thái Thiết Kế Content |
-| :--- | :--- | :--- | :---: | :---: |
-| `f1-1` | `bao_cao_kham_nghiem_tu_thi_so_01.pdf` | PDF | ✅ ĐÃ CÓ | Báo cáo tử thi: Vết bầm tím & Đứt động mạch mất máu |
-| `f1-2` | `bien_ban_kham_nghiem_hien_truong.pdf` | PDF | ✅ ĐÃ CÓ | Biên bản hiện trường xáo trộn & bình trà vỡ |
-| `f1-3` | `bao_cao_tien_do_dieu_tra.pdf` | PDF | ✅ MỚI BỔ SUNG | Báo cáo tiến độ điều tra ban đầu |
-| `f1-4` | `bao_cao_xac_minh_nhan_than_khang.pdf` | PDF | ✅ MỚI BỔ SUNG | Bố mẹ mất sớm, ông qua đời, tính cách trăng hoa/bốc đồng |
-| `f1-5` | `bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` | PDF | ✅ MỚI BỔ SUNG | Rà soát mâu thuẫn 4 đối tượng Mai, Vũ, Tùng, Hà |
-| `f1-6` | `bien_ban_lay_loi_khai_hang_xom.pdf` | PDF/Text | ✅ MỚI BỔ SUNG | Lời khai hàng xóm: tiếng cãi vã, tiếng đập vỡ, Khang trăng hoa |
-| `f1-7` | `bien_ban_lay_loi_khai_ban_dau_nghi_pham.pdf` | PDF | ✅ MỚI BỔ SUNG | Lời khai sơ bộ ban đầu của 4 nghi phạm |
-| `p1` | `photo-crime-scene-overview.jpg` | Photo | ✅ ĐÃ CÓ | Ảnh hiện trường phòng khách & bình trà vỡ |
-| `p2` | `photo-scattered-documents.jpg` | Photo | ✅ MỚI BỔ SUNG | Ảnh giấy tờ vương vãi tại hiện trường |
-| `p3` | `photo-glass-shard-detail.jpg` | Photo | ✅ ĐÃ CÓ | Ảnh các mảnh vỡ thủy tinh dính máu |
-| `p4` | `photo-childhood-group.jpg` | Photo | ✅ ĐÃ CÓ | Ảnh hồi nhỏ bọn trẻ (4 đứa) |
-| `p5` | `photo-old-newspaper.jpg` | Photo | ✅ ĐÃ CÓ | Báo về vụ tai nạn trốn tìm năm xưa |
+1. **`photo-crime-scene-overview.jpg` (`p1`)**: Ảnh hiện trường phòng khách với bàn trà bị xáo trộn và bộ bình trà bị đập vỡ vụn.
+2. **`photo-scattered-documents.jpg` (`p2`)**: Ảnh các tờ bản vẽ đền bù và di chúc vương vãi gần khoang tủ âm tường.
+3. **`photo-glass-shard-detail.jpg` (`p3`)**: Ảnh mảnh thủy tinh vỡ sắc nhọn 8cm dính máu khô và dấu vân tay miết (Hung khí vụ án).
+4. **`photo-childhood-group.jpg` (`p4`)**: Bức ảnh ố vàng chụp 4 đứa trẻ (Khang, Tùng, Hà, Gia Huy) trước căn nhà cổ Bờ Sông năm 1998.
+5. **`photo-old-newspaper.jpg` (`p5`)**: Bài báo cắt từ nhật báo cũ năm 1998 về vụ tai nạn ngạt khí trong tủ âm tường của bé trai 8 tuổi.
+6. **`photo-messages-cheating.jpg` (`p6`)**: Ảnh chụp màn hình điện thoại Khang hiển thị tin nhắn tình nhân mới rủ đi du lịch lúc 20:40.
