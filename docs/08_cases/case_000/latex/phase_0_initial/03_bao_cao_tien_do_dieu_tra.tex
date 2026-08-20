@@ -1,61 +1,85 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[vietnamese]{babel}
-\usepackage[margin=2cm]{geometry}
-\usepackage{tcolorbox}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{mathptmx} % Font Times New Roman
 \usepackage{enumitem}
-\usepackage{fancyhdr}
 
-\pagestyle{fancy}
-\fancyhf{}
-\lhead{\textbf{CÔNG AN THÀNH PHỐ - PHÒNG CSHS}}
-\rhead{\textbf{CHUYÊN ÁN TEST-99}}
-\cfoot{Trang \thepage}
+\pagestyle{plain}
+\linespread{1.15}
 
 \begin{document}
 
+% --- HEADER QUỐC HIỆU & CƠ QUAN BAN HÀNH ---
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+    \begin{center}
+        \small
+        CÔNG AN THÀNH PHỐ HÀ NỘI\\
+        \textbf{\underline{PHÒNG CẢNH SÁT HÌNH SỰ}}\\[0.1cm]
+        Số: 03/BC-CSHS\\
+        \textit{V/v tiến độ điều tra ban đầu vụ án Khang}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.52\textwidth}
+    \begin{center}
+        \small
+        \textbf{CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM}\\
+        \textbf{\underline{Độc lập - Tự do - Hạnh phúc}}\\[0.1cm]
+        \textit{Hà Nội, ngày 25 tháng 07 năm 2026}
+    \end{center}
+\end{minipage}
+
+\vspace{0.6cm}
+
+% --- TIÊU ĐỀ VĂN BẢN ---
 \begin{center}
-    \textbf{\Large CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM}\\
-    \textbf{\large Độc lập - Tự do - Hạnh phúc}\\
-    \rule{8cm}{0.5pt}\\[0.5cm]
-    
-    \textbf{\LARGE BÁO CÁO TIẾN ĐỘ ĐIỀU TRA BAN ĐẦU}\\
-    \textbf{Chuyên án:} \texttt{TEST-99}
+    \textbf{\large BÁO CÁO TIẾN ĐỘ ĐIỀU TRA BAN ĐẦU}\\
+    \textit{(Chuyên án TEST-99 — Án mạng tại Phân khu Cảng)}
 \end{center}
 
 \vspace{0.3cm}
 
-\begin{tcolorbox}[colback=gray!10!white,colframe=black!75!black,title=\textbf{THÔNG TIN BÁO CÁO}]
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Đơn vị thụ lý:} Ban Chuyên án Công an Thành phố
-    \item \textbf{Chủ trì ký duyệt:} Đại úy Lê Minh - Trưởng ban chuyên án
-    \item \textbf{Ngày lập:} 25/07/2026
-\end{itemize}
-\end{tcolorbox}
+\noindent Ban Chuyên án báo cáo Thủ trưởng Cơ quan CSĐT Công an TP. Hà Nội tiến độ triển khai lực lượng điều tra vụ án mạng xảy ra ngày 24/07/2026 tại số 14 Đường Bờ Sông như sau:
 
-\section*{I. TÓM TẮT VỤ VIỆC}
-Vào lúc 08:00 ngày 25/07/2026, nhận tin báo từ người dân khu phố Bờ Sông về việc phát hiện mùi hôi phát ra từ căn nhà số 14. Lực lượng chức năng tiến hành phá dây xích cửa chính và phát hiện thi thể ông Nguyễn Văn Khang (35 tuổi) tử vong tại phòng khách.
-
-\section*{II. KẾT QUẢ ĐIỀU TRA BAN ĐẦU}
-\begin{enumerate}
-    \item \textbf{Thời điểm tử vong:} Xác định nạn nhân tử vong khoảng tối muộn ngày 24/07/2026.
-    \item \textbf{Tính chất hiện trường:} Có dấu vết lục lọi tủ âm tường và tranh chấp tài sản/di chúc. Hiện trường có mảnh bình trà vỡ và nhiều giấy tờ đền bù bị xới tung.
-    \item \textbf{Triển khai lực lượng:}
-    \begin{itemize}
-        \item Thu thập dấu vết vân tay, mẫu máu tại hiện trường.
-        \item Rà soát toàn bộ camera an ninh tại khu vực cây xăng và bến xe (cách hiện trường 300m).
-        \item Trích xuất danh bạ, tin nhắn điện thoại cá nhân của nạn nhân Khang.
-        \item Triệu tập khẩn cấp 04 đối tượng nghi vấn có liên quan trực tiếp đến nạn nhân.
-    \end{itemize}
+\section*{I. KẾT QUẢ RÀ SOÁT DẤU VẾT VẬT CHỨNG}
+\begin{enumerate}[label=\arabic*., leftmargin=1.5cm]
+    \item \textbf{Vân tay thu giữ:} Thu được dấu vân tay của nạn nhân Khang và vân tay dạng miết của nữ giới trên mảnh thủy tinh vỡ sắc nhọn `p3`. Đang tiến hành đối sánh mẫu vân tay của các đối tượng liên quan.
+    \item \textbf{Trích xuất Camera an ninh:} Khu vực ngõ nhà nạn nhân là hẻm giải tỏa không có camera trực tiếp. Đã trích xuất camera cây xăng cách 300m thu ghi hình ảnh xe máy nghi vấn đi vào ngõ trong khung giờ từ 18:00 đến 22:00.
 \end{enumerate}
 
-\vspace{1cm}
+\section*{II. KẾT QUẢ TRIỆU TẬP 04 NGHI PHẠM BẰNG CHỨNG BAN ĐẦU}
+\begin{enumerate}[label=\arabic*., leftmargin=1.5cm]
+    \item \textbf{Trần Ngọc Mai (Em họ):} Có tranh chấp gay gắt di chúc nhà đất. Thừa nhận sang nhà Khang lúc 18:30 và tráo lấy tờ di chúc gốc mang đi. Khai có alibi làm việc với Luật sư Minh từ 19:30.
+    \item \textbf{Lê Quang Vũ (Chồng Mai):} Đang gánh khoản nợ 350 triệu với Khang. Khai chở Mai đến luật sư lúc 19:30 rồi đi nhậu đến 22:00.
+    \item \textbf{Nguyễn Thanh Tùng (Bạn cũ):} Có mối thù quá khứ vụ tai nạn ngạt khí em trai năm 1998. Camera ghi nhận Tùng chạy hoảng hoảng rời khỏi ngõ lúc 20:15.
+    \item \textbf{Trần Thị Hà (Bạn gái cũ):} Bạn gái vừa chia tay, ghen tuông. Khai ở nhà xem tivi cả tối, không có mặt tại hiện trường.
+\end{enumerate}
 
-\begin{flushright}
-    \textit{Bờ Sông, ngày 25 tháng 07 năm 2026}\\
-    \textbf{Trưởng Ban Chuyên Án}\\
-    \vspace{1.5cm}
-    \textbf{Đại úy Lê Minh} (Đã ký)
-\end{flushright}
+\section*{III. KẾ HOẠCH ĐIỀU TRA TIẾP THEO}
+Tập trung làm rõ mâu thuẫn di chúc (Phase 1), xác minh Alibi của Vũ và Mai, đồng thời rà soát trích xuất dữ liệu camera cây xăng chi tiết.
+
+\vspace{0.8cm}
+
+% --- CHỮ KÝ NGHỊ ĐỊNH 30 ---
+\noindent
+\begin{minipage}[t]{0.45\textwidth}
+    \small
+    \textbf{\textit{Nơi nhận:}}\\
+    - Thủ trưởng Cơ quan CSĐT (b/c);\\
+    - Viện KSMND TP. Hà Nội;\\
+    - Trưởng Ban Chuyên án;\\
+    - Lưu: VT, CSHS.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.5\textwidth}
+    \begin{center}
+        \small
+        \textbf{TRƯỞNG BAN CHUYÊN ÁN}\\
+        \textit{(Ký, ghi rõ họ tên)}\\[1.5cm]
+        \textbf{Đại úy Lê Minh}
+    \end{center}
+\end{minipage}
 
 \end{document}
