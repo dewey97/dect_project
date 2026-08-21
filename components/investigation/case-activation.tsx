@@ -85,8 +85,114 @@ const CASES_CATALOG: CaseItem[] = [
     textColor: 'text-[#24150a]',
     tapeRotateClass: 'rotate-[-0.9deg]',
     archiveYear: '2012'
+  },
+  {
+    id: 'case-003',
+    code: 'CASE #003',
+    title: 'Bóng Đêm Cầu Cảng',
+    summary: 'Vụ án đắm tàu hàng vận tải và sự biến mất không dấu vết của viên thuyền trưởng cùng hòm niêm phong.',
+    status: 'locked',
+    estimatedTime: '45-60 phút',
+    difficulty: 'Phức tạp',
+    validCodes: ['CASE-003'],
+    tabPosition: 'left',
+    folderBg: 'bg-[#a6723c]',
+    folderBorder: 'border border-[#3d2b1c]/30',
+    textColor: 'text-[#24150a]',
+    tapeRotateClass: 'rotate-[1.8deg]',
+    archiveYear: '2007'
+  },
+  {
+    id: 'case-004',
+    code: 'CASE #004',
+    title: 'Tiếng Còi Lúc Nửa Đêm',
+    summary: 'Những vụ cháy bí ẩn liên tiếp tại nhà máy dệt cũ liên quan đến bản hợp đồng chuyển nhượng lừa đảo.',
+    status: 'locked',
+    estimatedTime: '50-70 phút',
+    difficulty: 'Chuyên gia',
+    validCodes: ['CASE-004'],
+    tabPosition: 'center',
+    folderBg: 'bg-[#966330]',
+    folderBorder: 'border border-[#3d2b1c]/30',
+    textColor: 'text-[#24150a]',
+    tapeRotateClass: 'rotate-[-1.2deg]',
+    archiveYear: '1995'
+  },
+  {
+    id: 'case-005',
+    code: 'CASE #005',
+    title: 'Bức Thư Tay Bằng Mực Tím',
+    summary: 'Vụ mất tích của nhà thơ trẻ và những lá thư mật chứa ký tự mã hóa bằng thơ ca.',
+    status: 'locked',
+    estimatedTime: '60-80 phút',
+    difficulty: 'Chuyên gia',
+    validCodes: ['CASE-005'],
+    tabPosition: 'right',
+    folderBg: 'bg-[#875525]',
+    folderBorder: 'border border-[#3d2b1c]/30',
+    textColor: 'text-[#24150a]',
+    tapeRotateClass: 'rotate-[2.1deg]',
+    archiveYear: '1989'
+  },
+  {
+    id: 'case-006',
+    code: 'CASE #006',
+    title: 'Vết Máu Trên Phím Đàn',
+    summary: 'Cái chết bất thường của nghệ sĩ dương cầm ngay trước đêm diễn kỷ niệm và chiếc đĩa than bị tráo.',
+    status: 'locked',
+    estimatedTime: '40-50 phút',
+    difficulty: 'Nâng cao',
+    validCodes: ['CASE-006'],
+    tabPosition: 'left',
+    folderBg: 'bg-[#d99757]',
+    folderBorder: 'border border-[#3d2b1c]/30',
+    textColor: 'text-[#24150a]',
+    tapeRotateClass: 'rotate-[-1.6deg]',
+    archiveYear: '2015'
+  },
+  {
+    id: 'case-007',
+    code: 'CASE #007',
+    title: 'Mật Mã Trong Kho Khóa',
+    summary: 'Vụ trộm ngân quỹ mật không rách lưới và bản di chúc thứ hai được phát hiện trong két sắt chìm.',
+    status: 'locked',
+    estimatedTime: '60-90 phút',
+    difficulty: 'Huyền thoại',
+    validCodes: ['CASE-007'],
+    tabPosition: 'right',
+    folderBg: 'bg-[#c48443]',
+    folderBorder: 'border border-[#3d2b1c]/30',
+    textColor: 'text-[#24150a]',
+    tapeRotateClass: 'rotate-[0.9deg]',
+    archiveYear: '2018'
   }
 ]
+
+const SEAMLESS_TEXTURE_OFFSETS = [
+  'bg-[position:0px_0px]',
+  'bg-[position:150px_220px]',
+  'bg-[position:310px_90px]',
+  'bg-[position:450px_350px]',
+  'bg-[position:80px_410px]',
+  'bg-[position:270px_180px]',
+  'bg-[position:390px_480px]',
+  'bg-[position:210px_310px]'
+]
+
+function getFolderToneFilter(archiveYear?: string) {
+  const year = archiveYear ? parseInt(archiveYear, 10) : 2000
+  if (year < 1990) {
+    return 'brightness(0.98) sepia(0.08) contrast(1.02)'
+  } else if (year < 1998) {
+    return 'brightness(0.99) sepia(0.06) contrast(1.01)'
+  } else if (year < 2005) {
+    return 'brightness(1.00) sepia(0.05) contrast(1.00)'
+  } else if (year < 2014) {
+    return 'brightness(1.01) sepia(0.04) contrast(0.99)'
+  } else {
+    return 'brightness(1.01) sepia(0.03) contrast(0.98)'
+  }
+}
 
 export function CaseActivation() {
   const router = useRouter()
@@ -153,48 +259,75 @@ export function CaseActivation() {
   }
 
   return (
-    <main className="relative flex min-h-screen w-full flex-col justify-between items-center bg-[#0d0a08] text-[#e5d8cb] font-sans overflow-x-hidden p-4 sm:p-6 lg:p-8">
+    <main className="relative flex h-screen max-h-screen w-full flex-col justify-center items-center bg-[#0d0a08] text-[#e5d8cb] font-sans overflow-hidden p-3 sm:p-5">
       
-      {/* Brand Header */}
-      <div className="w-full max-w-6xl flex items-center justify-between pt-2 pb-4 border-b border-[#33261c]">
-        <BrandMark />
-        <div className="flex items-center gap-2 font-mono text-[0.65rem] text-[#d4a373] uppercase tracking-widest bg-[#241a12] px-3 py-1 rounded border border-[#4d3827]">
-          <ScanLine className="size-3.5 text-[#d4a373]" />
-          <span>HỆ THỐNG TRUY CẬP CHUYÊN ÁN</span>
-        </div>
-      </div>
-
       {/* Main Showcase Section (Shifts Whole Drawer to the Left when Case Selected) */}
       <div className={cn(
-        "w-full max-w-4xl my-auto py-6 flex flex-col items-center transition-transform duration-500 ease-in-out",
-        selectedCase && !isOpeningFolder ? "lg:-translate-x-44 xl:-translate-x-56" : "translate-x-0"
+        "w-full max-w-5xl h-full max-h-[92vh] my-auto flex flex-col items-center justify-center transition-transform duration-500 ease-in-out",
+        selectedCase && !isOpeningFolder ? "lg:-translate-x-48 xl:-translate-x-60" : "translate-x-0"
       )}>
 
-        {/* VINTAGE SOLID KRAFT FILE CABINET DRAWER (FULL SIZE ALWAYS, TRANSLATES LEFT ON SELECTION) */}
-        <div className="w-full bg-[#16110b] border-2 border-[#3d2c1e] rounded-2xl shadow-[0_35px_90px_rgba(0,0,0,0.98)] p-4 sm:p-8 relative overflow-hidden flex flex-col gap-5">
+        {/* HYPER-REALISTIC GUNMETAL STEEL FILE CABINET DRAWER (MODERATE 92VH FIT) */}
+        <div className="w-full h-full max-h-[92vh] bg-gradient-to-b from-[#1e2328] via-[#14181c] to-[#0c0e11] border-4 border-[#343b42] rounded-2xl shadow-[0_45px_110px_rgba(0,0,0,0.99)] p-4 sm:p-5 relative overflow-hidden flex flex-col justify-between gap-3">
           
-          {/* Cabinet Drawer Handle & Frame Bar */}
-          <div className="w-full bg-[#241a12] border border-[#4a3625] rounded-xl px-5 py-3 flex items-center justify-between shadow-inner z-40">
-            <div className="flex items-center gap-3">
-              <div className="size-3.5 rounded-full bg-[#d9a066]" />
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#e6d3c1]">
-                NGĂN KÉO TỦ MẬT // DANH MỤC HỒ SƠ CHUYÊN ÁN
-              </span>
-            </div>
+          {/* Metallic Inner Bezel & Dark Felt Interior Lining */}
+          <div className="absolute inset-1 border border-[#485058]/40 rounded-xl pointer-events-none z-20" />
+          <div className="absolute inset-0 bg-[#0e1114] opacity-90 pointer-events-none" />
 
-            <div className="font-mono text-[0.65rem] text-[#ad9885] bg-[#140e0a] px-3 py-1 rounded border border-[#36261a]">
-              TỔNG SỐ: {CASES_CATALOG.length} TẬP HỒ SƠ KRAFT
-            </div>
+          {/* 4 Corner Riveted Steel Brackets */}
+          <div className="absolute top-2 left-2 size-4 border-t-2 border-l-2 border-[#5c6570] rounded-tl pointer-events-none z-20 flex items-center justify-center">
+            <div className="size-1 rounded-full bg-[#8a95a3] shadow-inner" />
+          </div>
+          <div className="absolute top-2 right-2 size-4 border-t-2 border-r-2 border-[#5c6570] rounded-tr pointer-events-none z-20 flex items-center justify-center">
+            <div className="size-1 rounded-full bg-[#8a95a3] shadow-inner" />
+          </div>
+          <div className="absolute bottom-2 left-2 size-4 border-b-2 border-l-2 border-[#5c6570] rounded-bl pointer-events-none z-20 flex items-center justify-center">
+            <div className="size-1 rounded-full bg-[#8a95a3] shadow-inner" />
+          </div>
+          <div className="absolute bottom-2 right-2 size-4 border-b-2 border-r-2 border-[#5c6570] rounded-br pointer-events-none z-20 flex items-center justify-center">
+            <div className="size-1 rounded-full bg-[#8a95a3] shadow-inner" />
           </div>
 
-          {/* AUTHENTIC SOLID STACKED DEEP KRAFT FOLDERS (STRICT TIGHTER OVERLAP) */}
-          <div className="w-full flex flex-col pt-6 pb-4 relative min-h-[380px] sm:min-h-[400px] justify-end">
+          {/* Steel Mechanical Drawer Slide Rails (Left & Right Flanks) */}
+          <div className="absolute top-0 bottom-0 left-0 w-2.5 bg-gradient-to-r from-[#485058] via-[#2a3036] to-[#121518] border-r border-[#485058]/50 z-20 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-2.5 bg-gradient-to-l from-[#485058] via-[#2a3036] to-[#121518] border-l border-[#485058]/50 z-20 pointer-events-none" />
+
+          {/* Top Metallic Drawer Lip with Chrome U-Handle & Stainless Steel Label Plate */}
+          <div className="w-full flex items-center justify-between px-3 sm:px-6 py-2 bg-gradient-to-r from-[#1a1e22] via-[#2d333a] to-[#1a1e22] border-b border-[#485058]/40 rounded-t-lg relative z-20 shadow-md shrink-0">
+            
+            {/* Stainless Steel Security Tag Holder */}
+            <div className="flex items-center gap-2 bg-[#0d1013] border border-[#485058] px-3 py-1 rounded shadow-inner">
+              <div className="size-1.5 rounded-full bg-[#8a95a3]" />
+              <span className="font-mono text-[11px] font-bold text-[#b0bac6] uppercase tracking-wider">
+                DRAWER #04 // PHÒNG LƯU TRỮ CHUYÊN ÁN MẬT
+              </span>
+              <div className="size-1.5 rounded-full bg-[#8a95a3]" />
+            </div>
+
+            {/* Heavy-Duty 3D Chrome Metal Drawer Pull Handle */}
+            <div className="hidden sm:flex items-center gap-1.5 px-6 py-1 bg-gradient-to-b from-[#7a8594] via-[#485058] to-[#1e2328] border border-[#8a95a3]/60 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+              <div className="w-16 h-1.5 bg-gradient-to-r from-[#2a3036] via-[#a3b0c2] to-[#2a3036] rounded-full shadow-inner" />
+            </div>
+
+            {/* Security Status Badge */}
+            <div className="flex items-center gap-1.5 text-amber-500/90 font-mono text-[10px] font-bold uppercase tracking-widest bg-[#161a1e] px-2.5 py-1 rounded border border-amber-500/30">
+              <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+              KHU VỰC BẢO MẬT CẤP D
+            </div>
+
+          </div>
+
+          {/* AUTHENTIC SOLID STACKED DEEP KRAFT FOLDERS (BALANCED MODERATE STACK) */}
+          <div className="w-full flex flex-col pt-2 pb-1 relative min-h-[390px] sm:min-h-[420px] justify-end z-10 my-auto">
             
             {CASES_CATALOG.map((cItem, index) => {
               const isHovered = hoveredCaseId === cItem.id
               const isSelected = selectedCase?.id === cItem.id
               // Strict fixed Z-index: never jumps over folders rendered above it
               const layerZIndex = (index + 1) * 10
+
+              const posClass = SEAMLESS_TEXTURE_OFFSETS[index % SEAMLESS_TEXTURE_OFFSETS.length]
+              const toneFilter = getFolderToneFilter(cItem.archiveYear)
 
               return (
                 <div
@@ -205,13 +338,13 @@ export function CaseActivation() {
                   className={cn(
                     'group relative w-full transition-all duration-300 ease-out cursor-pointer flex flex-col',
                     // Elevates UP on hover ONLY, snaps back flat when selected to show panel
-                    isHovered ? '-translate-y-10 sm:-translate-y-14' : 'translate-y-0',
+                    isHovered ? '-translate-y-8 sm:-translate-y-12' : 'translate-y-0',
                     // Hide during opening transition
                     isOpeningFolder && isSelected && 'opacity-0'
                   )}
                   style={{
-                    // Staggered Deep Tighter Overlap Margin (-15rem)
-                    marginTop: index > 0 ? '-15rem' : '0',
+                    // Balanced Moderate Overlap Margin (-15.0rem)
+                    marginTop: index > 0 ? '-15.0rem' : '0',
                     // Strict fixed Z-index layer order
                     zIndex: layerZIndex
                   }}
@@ -226,29 +359,47 @@ export function CaseActivation() {
                   )}>
                     {/* Integrated Kraft Tab Header */}
                     <div className={cn(
-                      'px-6 py-2 rounded-t-xl font-mono text-xs font-black uppercase tracking-wider border-t border-x border-[#3d2b1c]/30 shadow-md flex items-center gap-2 transition-all',
+                      'px-6 py-2.5 rounded-t-xl font-mono text-xs font-black uppercase tracking-wider border-t border-x border-[#3d2b1c]/30 shadow-md flex items-center gap-2 transition-all relative overflow-hidden',
                       cItem.folderBg,
                       cItem.textColor,
                       isHovered || isSelected ? 'brightness-110 shadow-lg' : 'brightness-95'
                     )}>
-                      <Paperclip className="size-3.5 shrink-0 opacity-80" />
-                      <span className="font-[family-name:var(--font-handwriting)] text-sm font-bold tracking-wide">{cItem.code} // {cItem.title}</span>
+                      {/* 100% FULL COVERAGE SEAMLESS 4K KRAFT PAPER TEXTURE OVERLAY */}
+                      <div 
+                        className={cn(
+                          "absolute inset-0 bg-[url('/textures/kraft_paper_texture_large.png')] bg-repeat bg-[size:500px_500px] mix-blend-multiply opacity-80 pointer-events-none rounded-t-xl",
+                          posClass
+                        )}
+                        style={{ filter: toneFilter }}
+                      />
+
+                      <Paperclip className="size-3.5 shrink-0 opacity-80 relative z-10" />
+                      <span className="font-[family-name:var(--font-handwriting)] text-sm font-bold tracking-wide relative z-10">{cItem.code} // {cItem.title}</span>
                     </div>
                   </div>
 
-                  {/* CLEAN MINIMAL KRAFT FOLDER COVER BODY */}
+                  {/* CLEAN MINIMAL KRAFT FOLDER COVER BODY WITH DEEP CONTACT DROP SHADOW */}
                   <div className={cn(
-                    'w-full rounded-xl p-5 sm:p-7 flex flex-col justify-between relative overflow-hidden transition-all min-h-[220px] sm:min-h-[260px]',
+                    'w-full rounded-xl p-5 sm:p-7 flex flex-col justify-between relative overflow-hidden transition-all min-h-[220px] sm:min-h-[240px]',
                     cItem.folderBg,
                     cItem.folderBorder,
                     cItem.textColor,
                     isHovered || isSelected
-                      ? 'shadow-[0_40px_90px_rgba(0,0,0,0.98)] brightness-105 ring-2 ring-[#2b1b0e]/30'
-                      : 'shadow-[0_15px_35px_rgba(0,0,0,0.85)] brightness-95'
+                      ? 'shadow-[0_50px_100px_rgba(0,0,0,0.99)] brightness-105 ring-2 ring-[#2b1b0e]/40'
+                      : 'shadow-[0_30px_65px_rgba(0,0,0,0.96)] brightness-95'
                   )}>
                     
+                    {/* 100% FULL COVERAGE SEAMLESS 4K KRAFT PAPER TEXTURE OVERLAY */}
+                    <div 
+                      className={cn(
+                        "absolute inset-0 bg-[url('/textures/kraft_paper_texture_large.png')] bg-repeat bg-[size:500px_500px] mix-blend-multiply opacity-80 pointer-events-none rounded-xl",
+                        posClass
+                      )}
+                      style={{ filter: toneFilter }}
+                    />
+
                     {/* Clean Folder Header with Authentic Playpen_Sans Handwritten Tape Label & Red Rubber Stamp */}
-                    <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start justify-between gap-3 relative z-10">
                       
                       {/* Handwritten Marker Title on Vintage Paper Tape Label */}
                       <div className="inline-block">
@@ -268,7 +419,7 @@ export function CaseActivation() {
                     </div>
 
                     {/* VINTAGE KRAFT FOLDER DEEP LOWER BODY DETAILS */}
-                    <div className="mt-auto pt-8 flex items-center justify-between border-t border-[#2b1b0e]/20 opacity-75 font-mono text-[0.65rem]">
+                    <div className="mt-auto pt-8 flex items-center justify-between border-t border-[#2b1b0e]/20 opacity-75 font-mono text-[0.65rem] relative z-10">
                       <div className="flex items-center gap-2">
                         <FileCheck2 className="size-3.5 text-[#2b1b0e]" />
                         <span className="font-bold">MÃ LƯU TRỮ VỤ ÁN: VERITAS-{cItem.code.replace(' ', '')}-99</span>
@@ -292,18 +443,24 @@ export function CaseActivation() {
       {selectedCase && !isOpeningFolder && (
         <div className="fixed inset-y-0 right-0 sm:right-6 lg:right-12 z-50 w-full sm:w-[440px] p-4 sm:p-6 flex items-center justify-center pointer-events-none">
           
-          <div className="relative w-full bg-[#d9a066] border-4 border-[#2b1b0e] text-[#2b1b0e] rounded-2xl p-6 sm:p-8 shadow-[0_35px_95px_rgba(0,0,0,0.98)] flex flex-col gap-5 pointer-events-auto animate-in slide-in-from-right duration-300">
+          <div className="relative w-full bg-[#d9a066] border-4 border-[#2b1b0e] text-[#2b1b0e] rounded-2xl p-6 sm:p-8 shadow-[0_35px_95px_rgba(0,0,0,0.98)] flex flex-col gap-5 pointer-events-auto animate-in slide-in-from-right duration-300 overflow-hidden">
             
+            {/* AUTHENTIC 4K REAL KRAFT PAPER TEXTURE OVERLAY */}
+            <div 
+              className="absolute inset-0 bg-[url('/textures/kraft_paper_texture_large.png')] bg-repeat bg-[size:500px_500px] mix-blend-multiply opacity-80 pointer-events-none rounded-xl"
+              style={{ filter: getFolderToneFilter(selectedCase.archiveYear) }}
+            />
+
             {/* Close Button */}
             <button
               onClick={() => setSelectedCase(null)}
-              className="absolute top-4 right-4 text-[#2b1b0e] hover:text-red-900 p-1.5 rounded-full transition-colors cursor-pointer font-bold border border-[#2b1b0e]/20 hover:bg-[#2b1b0e]/10"
+              className="absolute top-4 right-4 text-[#2b1b0e] hover:text-red-900 p-1.5 rounded-full transition-colors cursor-pointer font-bold border border-[#2b1b0e]/20 hover:bg-[#2b1b0e]/10 z-20"
             >
               <X className="size-5" />
             </button>
 
             {/* Panel Header with Handwritten Title */}
-            <div className="flex items-start gap-4 border-b border-[#2b1b0e]/30 pb-4">
+            <div className="flex items-start gap-4 border-b border-[#2b1b0e]/30 pb-4 relative z-10">
               <div className="size-12 rounded-xl bg-[#2b1b0e] text-[#f2e6d8] flex items-center justify-center shrink-0 shadow-md">
                 <KeyRound className="size-6 text-[#d9a066]" />
               </div>
@@ -318,13 +475,13 @@ export function CaseActivation() {
             </div>
 
             {/* Case Summary Preview in Activation Panel */}
-            <div className="p-3.5 bg-[#c98f55] border border-[#2b1b0e] rounded-xl text-xs leading-relaxed italic font-sans font-bold shadow-inner">
+            <div className="p-3.5 bg-[#c98f55] border border-[#2b1b0e] rounded-xl text-xs leading-relaxed italic font-sans font-bold shadow-inner relative z-10">
               "{selectedCase.summary}"
             </div>
 
             {/* Locked Sealed Case Notification vs Code Entry Form */}
             {selectedCase.status === 'locked' ? (
-              <div className="space-y-4 pt-2">
+              <div className="space-y-4 pt-2 relative z-10">
                 <div className="p-4 bg-[#2b1b0e] border border-red-900/40 rounded-xl text-center space-y-1 shadow-inner">
                   <span className="font-mono text-xs font-black text-red-400 uppercase flex items-center justify-center gap-1.5">
                     <Lock className="size-4" /> CHUYÊN ÁN ĐANG ĐƯỢC NIÊM PHONG
@@ -344,7 +501,7 @@ export function CaseActivation() {
               </div>
             ) : (
               /* Code Entry Form */
-              <form onSubmit={handleActivateSubmit} className="space-y-4 pt-1">
+              <form onSubmit={handleActivateSubmit} className="space-y-4 pt-1 relative z-10">
                 <div>
                   <label className="font-mono text-xs font-black text-[#2b1b0e] uppercase block mb-2">
                     Nhập mã kích hoạt vụ án ({selectedCase.title}):
@@ -427,7 +584,7 @@ export function CaseActivation() {
             {/* FLIPPING 3D KRAFT COVER (FLIPS OPEN UPWARDS BY 165 DEGREES) */}
             <div 
               className={cn(
-                "absolute inset-0 rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-[#3d2b1c]/40 transition-transform duration-700 ease-in-out shadow-2xl z-10",
+                "absolute inset-0 rounded-2xl p-6 sm:p-8 flex flex-col justify-between border-2 border-[#3d2b1c]/40 transition-transform duration-700 ease-in-out shadow-2xl z-10 overflow-hidden",
                 selectedCase.folderBg,
                 selectedCase.textColor,
                 folderFlipped ? "rotate-x-[-165deg] opacity-0" : "rotate-x-0 opacity-100"
@@ -437,7 +594,13 @@ export function CaseActivation() {
                 transformStyle: 'preserve-3d'
               }}
             >
-              <div className="flex items-start justify-between">
+              {/* AUTHENTIC 4K REAL KRAFT PAPER TEXTURE OVERLAY */}
+              <div 
+                className="absolute inset-0 bg-[url('/textures/kraft_paper_texture_large.png')] bg-repeat bg-[size:500px_500px] mix-blend-multiply opacity-80 pointer-events-none rounded-xl"
+                style={{ filter: getFolderToneFilter(selectedCase.archiveYear) }}
+              />
+
+              <div className="flex items-start justify-between relative z-10">
                 <div className="inline-block">
                   <span className={cn(
                     "font-[family-name:var(--font-handwriting)] text-3xl font-bold text-[#1a0f07] bg-[#f4e8d8] px-4 py-1.5 rounded shadow-sm border border-[#2b1b0e]/20 inline-block",

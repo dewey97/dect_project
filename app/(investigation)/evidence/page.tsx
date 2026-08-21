@@ -254,7 +254,7 @@ export default function EvidencePage() {
                   <button
                     onClick={() => setFilterTab('evidence')}
                     className={cn(
-                      'px-2.5 py-1 rounded font-bold transition-all cursor-pointer border',
+                      'px-2.5 py-1 rounded-none font-bold transition-all cursor-pointer border',
                       filterTab === 'evidence'
                         ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
                         : 'bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] border-[#4a3625]'
@@ -277,7 +277,7 @@ export default function EvidencePage() {
                         key={doc.id}
                         onClick={() => handleSelectPdf(doc)}
                         className={cn(
-                          'group flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer shadow-sm',
+                          'group flex items-center justify-between p-3 rounded-none border transition-all cursor-pointer shadow-sm',
                           isSelected
                             ? 'bg-[#38271a] border-[#6b4b32] text-amber-200'
                             : 'bg-[#241b13] hover:bg-[#2d2218] border-[#3e2e20] text-[#e5d8cb]'
@@ -285,7 +285,7 @@ export default function EvidencePage() {
                       >
                         <div className="flex items-center gap-3 overflow-hidden">
                           <div className={cn(
-                            'size-8 rounded flex items-center justify-center font-bold text-xs shrink-0 transition-colors',
+                            'size-8 rounded-none flex items-center justify-center font-bold text-xs shrink-0 transition-colors',
                             isSelected ? 'bg-[#d9a066] text-[#1a0f07]' : 'bg-[#18120c] text-[#d9a066] border border-[#3e2e20]'
                           )}>
                             <FileText className="size-4" />
@@ -304,7 +304,7 @@ export default function EvidencePage() {
                         </div>
 
                         <button className={cn(
-                          'flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded transition-all shrink-0 border',
+                          'flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded-none transition-all shrink-0 border',
                           isSelected
                             ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
                             : 'text-[#d9a066] bg-[#18120c] border-[#3e2e20] group-hover:bg-[#d9a066] group-hover:text-[#1a0f07]'
@@ -325,7 +325,7 @@ export default function EvidencePage() {
                         key={item.id}
                         onClick={() => handleSelectEvidence(item)}
                         className={cn(
-                          'group flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer shadow-sm',
+                          'group flex items-center justify-between p-3 rounded-none border transition-all cursor-pointer shadow-sm',
                           isSelected
                             ? 'bg-[#38271a] border-[#6b4b32] text-amber-200'
                             : 'bg-[#241b13] hover:bg-[#2d2218] border-[#3e2e20] text-[#e5d8cb]'
@@ -333,7 +333,7 @@ export default function EvidencePage() {
                       >
                         <div className="flex items-center gap-3 overflow-hidden">
                           <div className={cn(
-                            'size-8 rounded flex items-center justify-center font-bold text-xs shrink-0 transition-colors',
+                            'size-8 rounded-none flex items-center justify-center font-bold text-xs shrink-0 transition-colors',
                             isSelected ? 'bg-[#d9a066] text-[#1a0f07]' : 'bg-[#18120c] text-[#d9a066] border border-[#3e2e20]'
                           )}>
                             <ImageIcon className="size-4" />
@@ -352,7 +352,7 @@ export default function EvidencePage() {
                         </div>
 
                         <button className={cn(
-                          'flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded transition-all shrink-0 border',
+                          'flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded-none transition-all shrink-0 border',
                           isSelected
                             ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
                             : 'text-[#d9a066] bg-[#18120c] border-[#3e2e20] group-hover:bg-[#d9a066] group-hover:text-[#1a0f07]'
@@ -403,7 +403,7 @@ export default function EvidencePage() {
 
                     {isAllCompleted ? (
                       /* VICTORY CARD WHEN ALL QUESTIONS SOLVED */
-                      <div className="p-6 bg-[#1b261b] border border-emerald-800/60 rounded-xl text-center space-y-3 shadow-md">
+                      <div className="p-6 bg-[#1b261b] border border-emerald-800/60 rounded-none text-center space-y-3 shadow-md">
                         <div className="size-12 rounded-full bg-emerald-950 border border-emerald-700 text-emerald-400 mx-auto flex items-center justify-center">
                           <CheckCircle2 className="size-6" />
                         </div>
@@ -415,7 +415,7 @@ export default function EvidencePage() {
                         </p>
                         <button
                           onClick={resetProgress}
-                          className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-xs font-bold rounded transition-all cursor-pointer shadow-md"
+                          className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-xs font-bold rounded-none transition-all cursor-pointer shadow-md"
                         >
                           🔄 THỰC HIỆN LẠI CHUYÊN ÁN
                         </button>
@@ -435,14 +435,14 @@ export default function EvidencePage() {
                         return (
                           <div
                             key={cp.id}
-                            className="p-4 sm:p-5 bg-[#201812] border border-[#443324] rounded-xl flex flex-col gap-3.5 shadow-md"
+                            className="p-4 sm:p-5 bg-[#201812] border border-[#443324] rounded-none flex flex-col gap-3.5 shadow-md"
                           >
                             {/* Header */}
                             <div className="flex items-center justify-between">
                               <span className="font-mono text-[0.65rem] text-[#d9a066] font-bold uppercase tracking-wider">
                                 CÂU HỎI HIỆN TẠI ({idx + 1}/{checkpoints.length})
                               </span>
-                              <span className="font-mono text-[0.6rem] text-[#d9a066] bg-[#140e0a] px-2 py-0.5 rounded border border-[#38271a] font-bold uppercase">
+                              <span className="font-mono text-[0.6rem] text-[#d9a066] bg-[#140e0a] px-2 py-0.5 rounded-none border border-[#38271a] font-bold uppercase">
                                 ĐANG PHÁ ÁN
                               </span>
                             </div>
@@ -467,7 +467,7 @@ export default function EvidencePage() {
                                       disabled={hasSuccess}
                                       onClick={() => handleAnswerSelect(cp.id, opt)}
                                       className={cn(
-                                        'w-full text-left p-2.5 rounded border text-xs font-sans transition-all flex justify-between items-center cursor-pointer',
+                                        'w-full text-left p-2.5 rounded-none border text-xs font-sans transition-all flex justify-between items-center cursor-pointer',
                                         isSelected
                                           ? 'border-[#6b4b32] bg-[#342417] text-amber-200 font-semibold shadow-sm'
                                           : 'border-[#3a2b1e] bg-[#18120c] hover:border-[#523d2b] text-[#d4c3b3]'
@@ -486,7 +486,7 @@ export default function EvidencePage() {
                                   <button
                                     type="button"
                                     onClick={() => unlockNextHint(cp.id, hints.length)}
-                                    className="font-mono text-xs uppercase tracking-wider text-[#d9a066] bg-[#18120c] hover:bg-[#d9a066] hover:text-[#1a0f07] border border-[#3e2e20] px-3 py-2 rounded font-bold transition-all cursor-pointer shrink-0"
+                                    className="font-mono text-xs uppercase tracking-wider text-[#d9a066] bg-[#18120c] hover:bg-[#d9a066] hover:text-[#1a0f07] border border-[#3e2e20] px-3 py-2 rounded-none font-bold transition-all cursor-pointer shrink-0"
                                   >
                                     {hintLevel === 0 
                                       ? `GỢI Ý (1/${hints.length})` 
@@ -501,7 +501,7 @@ export default function EvidencePage() {
                                   disabled={!selectedOpt || hasSuccess}
                                   onClick={() => handleSubmitAnswer(cp)}
                                   className={cn(
-                                    'font-mono text-xs uppercase tracking-wider px-4 py-2 rounded font-bold transition-all cursor-pointer shrink-0 ml-auto border',
+                                    'font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-none font-bold transition-all cursor-pointer shrink-0 ml-auto border',
                                     selectedOpt
                                       ? 'bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] border-[#d9a066] shadow-md active:scale-95'
                                       : 'bg-[#18120c] text-[#6b5847] border-[#2e2318] opacity-50 pointer-events-none'
@@ -526,7 +526,7 @@ export default function EvidencePage() {
 
                             {/* Opened Hint Display Container */}
                             {hints.length > 0 && hintLevel > 0 && (
-                              <div className="p-3 rounded-lg border bg-[#2d2015] border-[#5e432c] text-amber-200 transition-all text-xs space-y-1 shadow-inner">
+                              <div className="p-3 rounded-none border bg-[#2d2015] border-[#5e432c] text-amber-200 transition-all text-xs space-y-1 shadow-inner">
                                 <span className="font-mono text-[0.65rem] uppercase font-bold text-[#d9a066] block">
                                   GỢI Ý TƯ DUY ({hintLevel}/{hints.length})
                                 </span>
@@ -550,32 +550,16 @@ export default function EvidencePage() {
         {/* ========================================================================= */}
         {/* RIGHT COLUMN: VINTAGE EVIDENCE INSPECTION DESK (PDF or EVIDENCE DETAIL) */}
         {/* ========================================================================= */}
-        <div className="hidden lg:flex flex-1 h-full bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex-col">
+        <div className="hidden lg:flex flex-1 h-full bg-[#16120e] border-2 border-[#3d2c1e] rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex-col">
           
           {selectedView.type === 'pdf' ? (
-            /* PDF READER VIEW */
-            <div className="flex flex-col w-full h-full">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#3d2c1e] bg-[#241a12]">
-                <div className="flex items-center gap-2.5 overflow-hidden">
-                  <FileText className="size-4 text-[#d9a066] shrink-0" />
-                  <div className="flex flex-col overflow-hidden">
-                    <h3 className="font-sans font-bold text-xs sm:text-sm text-[#f2e6d8] truncate">
-                      {selectedView.data.title}
-                    </h3>
-                    <span className="font-mono text-[0.6rem] text-[#ad9885]">
-                      MÃ TỆP: {selectedView.data.code}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex-1 w-full h-full bg-[#0d0a08] relative">
-                <iframe
-                  src={`${selectedView.data.url}#toolbar=0&navpanes=0`}
-                  className="w-full h-full border-0"
-                  title={selectedView.data.title}
-                />
-              </div>
+            /* PDF READER VIEW (DIRECT A4 FULL HEIGHT PREVIEW) */
+            <div className="w-full h-full bg-[#0d0a08] relative">
+              <iframe
+                src={`${selectedView.data.url}#toolbar=0&navpanes=0`}
+                className="w-full h-full border-0"
+                title={selectedView.data.title}
+              />
             </div>
           ) : (
             /* PHYSICAL EVIDENCE DETAIL VIEW (VINTAGE TYPEWRITER DOSSIER THEME) */
