@@ -1,21 +1,28 @@
 # Kiến Trúc Tài Liệu VERITAS (Mục Lục Master)
 
-Hệ thống tài liệu dự án **VERITAS — Evidence-Driven Investigation Platform** (Đã tinh gọn & quy hoạch tối ưu).
+Hệ thống tài liệu dự án **VERITAS — Evidence-Driven Investigation Platform** (Đã chuẩn hóa, tinh gọn & quy hoạch tối ưu).
 
 ---
 
 ## 📁 Thư Mục Tài Liệu Chính
 
-| Tệp Tài Liệu / Thư Mục | Tài Liệu Master Cốt Lõi | Nội Dung & Chức Năng |
+| Thư Mục Chính | Tên Tài Liệu / Nội Dung | Mô Tả & Chức Năng |
 | :--- | :--- | :--- |
-| 📄 [01_product_vision.md](./01_product_vision.md) | `01_product_vision.md` | Định vị cốt lõi, tầm nhìn, các trụ cột sản phẩm và lộ trình phát triển. |
-| 📄 [02_world_building.md](./02_world_building.md) | `02_world_building.md` | Thiết lập thế giới, Mạng lưới 5 Quân Cờ, các mạch cốt truyện (Lore Threads), và cơ sở dữ liệu manh mối thế giới. |
-| 📄 [03_game_design.md](./03_game_design.md) | `03_game_design.md` | Vòng lặp gameplay, chế độ chơi, độ khó và nền kinh tế game. |
-| 📄 [04_system_specifications.md](./04_system_specifications.md) | `04_system_specifications.md` | Tài liệu đặc tả kỹ thuật hợp nhất cho tất cả 15 hệ thống cốt lõi của game. |
-| 📄 [05_content_and_writing_guidelines.md](./05_content_and_writing_guidelines.md) | `05_content_and_writing_guidelines.md` | Zod/JSON case schemas, quy tắc viết kịch bản, thuật ngữ và tính cách Trợ lý Minh. |
-| 📄 [06_ux_ui_design_system.md](./06_ux_ui_design_system.md) | `06_ux_ui_design_system.md` | Thư viện component, token thiết kế, typography, quy tắc styling và hướng dẫn tương thích thiết bị (responsive). |
-| 📄 [07_technical_guide.md](./07_technical_guide.md) | `07_technical_guide.md` | Cấu trúc dự án Next.js, tech stack, database schema, hướng dẫn phát triển và kiến trúc các công cụ xử lý (engines). |
-| 📄 [08_playtest_and_business.md](./08_playtest_and_business.md) | `08_playtest_and_business.md` | Hướng dẫn playtest, định dạng báo cáo lỗi, mô hình kinh doanh và chiến lược tiếp thị. |
-| 📁 [08_cases/](./08_cases/) | `case_000/`, `case_001/`, `case_002/` | Thư mục chứa kịch bản và thiết kế của từng vụ án (`case_000`, `case_001`, `case_002`...). |
-| 📁 [11_investigation_design/](./11_investigation_design/) | 12 tài liệu thiết kế | **Kinh Thánh Thiết Kế Cuộc Điều Tra:** Hệ thống thuật ngữ (Ontology), Logic Engine, AI Authoring, Pitfalls, Pattern Library... |
-| 📄 [99_reference.md](./99_reference.md) | `99_reference.md` | Ý tưởng nghiên cứu và phân tích đối thủ truyền cảm hứng. |
+| 📁 [core_specs/](./core_specs/) | 10 Tài Liệu Đặc Tả Master | **Bộ Đặc Tả Hệ Thống Cốt Lõi:** Product Vision, World Bible, Game Design, System Specs, Writing Guidelines, UI/UX Design System, Technical Guide, Database Schema, Admin Studio Spec, Playtest & Business Model. |
+| 📁 [investigation_design/](./investigation_design/) | 6 Chuyên Đề Sáng Tác | **Kinh Thánh Thiết Kế Cuộc Điều Tra:** Thuật ngữ (Ontology), Triết lý phá án, AI Authoring Flow, Ma trận Manh mối, Validation Standards & Pitfalls. |
+| 📁 [cases/](./cases/) | `case_000/`, `case_001/`, `case_002/` | **Hồ Sơ Vụ Án:** Thư mục lưu trữ kịch bản, bằng chứng & dữ liệu JSON của từng vụ án (`case_000`, `case_001`...). |
+
+---
+
+## 📑 Chi Tiết 10 Tài Liệu Đặc Tả Cốt Lõi (`docs/core_specs/`)
+
+1. 📄 [01_product_vision.md](./core_specs/01_product_vision.md) — Tầm nhìn sản phẩm, định vị cốt lõi, mô hình phễu kinh doanh và lộ trình phát triển.
+2. 📄 [02_world_building.md](./core_specs/02_world_building.md) — Thế giới hư cấu hiện đại (Fictional Reality), Mạng lưới 5 Quân Cờ và Cơ sở dữ liệu Mạch cốt truyện (Lore Threads).
+3. 📄 [03_game_design.md](./core_specs/03_game_design.md) — Vòng lặp gameplay cốt lõi, chế độ chơi, ma trận độ khó và nền kinh tế game.
+4. 📄 [04_system_specifications.md](./core_specs/04_system_specifications.md) — Đặc tả kỹ thuật hợp nhất cho tất cả các màn hình & hệ thống chức năng của game.
+5. 📄 [05_content_and_writing_guidelines.md](./core_specs/05_content_and_writing_guidelines.md) — Zod/JSON Case Data Schema, quy tắc biên kịch, thuật ngữ và giọng văn.
+6. 📄 [06_ux_ui_design_system.md](./core_specs/06_ux_ui_design_system.md) — Thư viện Component, Token thiết kế, Typography và Quy tắc Styling UI.
+7. 📄 [07_technical_guide.md](./core_specs/07_technical_guide.md) — Cấu trúc mã nguồn Next.js 16, Tech stack, hướng dẫn phát triển cục bộ và biên dịch vụ án.
+8. 📄 [08_database_schema.md](./core_specs/08_database_schema.md) — Cấu trúc bảng CSDL Supabase (PostgreSQL) cho Vụ án, Manh mối và Tài khoản.
+9. 📄 [09_admin_studio_guide.md](./core_specs/09_admin_studio_guide.md) — Cẩm năng đặc tả tính năng và thiết kế UI/UX cho hệ thống Admin Studio (Case Editor).
+10. 📄 [10_playtest_and_business.md](./core_specs/10_playtest_and_business.md) — Quy trình Playtest, báo cáo lỗi, chiến lược tiếp thị và mô hình phát hành.
