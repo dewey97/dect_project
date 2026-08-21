@@ -2,8 +2,8 @@ import * as THREE from 'three'
 
 export const VolumetricLightBeamShader = {
   uniforms: {
-    uColor: { value: new THREE.Color('#fbbf24') },
-    uMaxOpacity: { value: 0.22 },
+    uColor: { value: new THREE.Color('#fde68a') },
+    uMaxOpacity: { value: 0.14 },
   },
   vertexShader: `
     varying vec2 vUv;

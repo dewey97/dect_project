@@ -52,6 +52,64 @@ export function MetallicDrawer3D({
     return texture
   }, [drawer.code])
 
+  // Canvas Texture mặt kim loại gang đúc xước sần & sờn góc 4 cạnh
+  const metalTexture = useMemo(() => {
+    if (typeof document === 'undefined') return null
+    const canvas = document.createElement('canvas')
+    canvas.width = 512
+    canvas.height = 300
+    const ctx = canvas.getContext('2d')
+    if (ctx) {
+      // 1. Nền kim loại gang đúc xám sẫm
+      ctx.fillStyle = '#26262a'
+      ctx.fillRect(0, 0, 512, 300)
+
+      // 2. Hạt noise nếp sần gang đúc (Cast iron grain noise)
+      for (let i = 0; i < 900; i++) {
+        const nx = Math.random() * 512
+        const ny = Math.random() * 300
+        const opacity = Math.random() * 0.12
+        ctx.fillStyle = i % 2 === 0 ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity * 1.5})`
+        ctx.fillRect(nx, ny, 2, 2)
+      }
+
+      // 3. Vết xước kim loại phay xước nhẹ vừa phải (Brushed metal hairline scratches)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)'
+      ctx.lineWidth = 1.2
+      for (let i = 0; i < 40; i++) {
+        const sx = Math.random() * 500
+        const sy = Math.random() * 290
+        const len = 15 + Math.random() * 50
+        const angle = -0.05 + (Math.random() - 0.5) * 0.25
+        ctx.beginPath()
+        ctx.moveTo(sx, sy)
+        ctx.lineTo(sx + Math.cos(angle) * len, sy + Math.sin(angle) * len)
+        ctx.stroke()
+      }
+
+      // 4. Sờn xước sáng bạc 4 góc & viền kim loại mài sờn (Scuffed metallic edge highlights)
+      ctx.strokeStyle = 'rgba(212, 212, 216, 0.40)'
+      ctx.lineWidth = 4
+      ctx.strokeRect(5, 5, 502, 290)
+
+      const corners = [
+        [10, 10], [502, 10], [10, 290], [502, 290]
+      ]
+      corners.forEach(([cx, cy]) => {
+        const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 30)
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.48)')
+        grad.addColorStop(0.5, 'rgba(212, 212, 216, 0.22)')
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)')
+        ctx.fillStyle = grad
+        ctx.beginPath()
+        ctx.arc(cx, cy, 30, 0, Math.PI * 2)
+        ctx.fill()
+      })
+    }
+    const texture = new THREE.CanvasTexture(canvas)
+    return texture
+  }, [])
+
   useFrame((_, delta) => {
     if (!meshRef.current) return
     // Rút tủ ra 1.85m khi click mở
@@ -83,9 +141,10 @@ export function MetallicDrawer3D({
       >
         <boxGeometry args={[2.0, 1.2, 0.2]} />
         <meshStandardMaterial
-          color={effectiveHovered ? '#3f3f46' : '#27272a'}
-          metalness={0.9}
-          roughness={0.18}
+          map={metalTexture || undefined}
+          color={effectiveHovered ? '#cccccc' : '#e4e4e7'}
+          metalness={0.85}
+          roughness={0.26}
         />
       </mesh>
 

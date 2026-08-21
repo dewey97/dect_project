@@ -69,7 +69,7 @@ function Scene3DRig({
       <CameraRig activeDrawerId={activeDrawerId} isInspecting={isInspecting} />
 
       {/* ÁNH SÁNG NỀN VÀNG ẤM SÁNG RÕ TOÀN BỘ 60 Ô TỦ */}
-      <ambientLight intensity={2.4} color="#ffffff" />
+      <ambientLight intensity={1.6} color="#ffffff" />
       <directionalLight position={[10, 15, 12]} intensity={3.5} color="#ffffff" castShadow />
       <directionalLight position={[-10, 8, 10]} intensity={2.2} color="#f0f9ff" />
 

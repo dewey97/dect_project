@@ -37,9 +37,18 @@ export function InteractiveFileFolder3D({
     const ctx = canvas.getContext('2d')
     if (ctx) {
       // Nền cùng tông màu Kraft da bò
-      ctx.fillStyle = hovered ? '#fef08a' : file.folderBgColor || '#d9a066'
+      ctx.fillStyle = hovered ? '#fde68a' : file.folderBgColor || '#d9a066'
       ctx.fillRect(0, 0, 160, 56)
-      ctx.strokeStyle = '#3d2b1c'
+
+      // Hạt noise mờ nhẹ trên thẻ tab
+      for (let i = 0; i < 80; i++) {
+        const nx = (Math.sin(i * 17.1) * 0.5 + 0.5) * 160
+        const ny = (Math.cos(i * 43.7) * 0.5 + 0.5) * 56
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)'
+        ctx.fillRect(nx, ny, 2, 2)
+      }
+
+      ctx.strokeStyle = 'rgba(61, 43, 28, 0.8)'
       ctx.lineWidth = 3
       ctx.strokeRect(3, 3, 154, 50)
       ctx.fillStyle = '#2b1b0e'
@@ -64,8 +73,38 @@ export function InteractiveFileFolder3D({
       ctx.fillStyle = file.folderBgColor || '#d9a066'
       ctx.fillRect(0, 0, 512, 384)
 
-      // Viền nét đứt nhẹ xung quanh bìa
-      ctx.strokeStyle = '#3d2b1c'
+      // Vân hạt Kraft Paper Noise & sờn phai thời gian
+      for (let i = 0; i < 450; i++) {
+        const nx = (Math.sin(i * 12.9898 + idx) * 0.5 + 0.5) * 512
+        const ny = (Math.cos(i * 78.233 + idx) * 0.5 + 0.5) * 384
+        ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.05)'
+        ctx.fillRect(nx, ny, 2, 2)
+      }
+
+      // Vết ố thời gian & mờ tối 4 góc bìa (Radial Vignette / Vintage Stains)
+      const stainGrad = ctx.createRadialGradient(256, 192, 100, 256, 192, 290)
+      stainGrad.addColorStop(0, 'rgba(0, 0, 0, 0)')
+      stainGrad.addColorStop(1, 'rgba(45, 25, 8, 0.32)')
+      ctx.fillStyle = stainGrad
+      ctx.fillRect(0, 0, 512, 384)
+
+      // Nếp gấp sống bìa nếp gập ngang (Fold crease lines)
+      ctx.beginPath()
+      ctx.moveTo(0, 192)
+      ctx.lineTo(512, 192)
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.09)'
+      ctx.lineWidth = 3
+      ctx.stroke()
+
+      ctx.beginPath()
+      ctx.moveTo(0, 191)
+      ctx.lineTo(512, 191)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)'
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      // Viền nét đứt nhẹ sờn góc xung quanh bìa
+      ctx.strokeStyle = 'rgba(61, 43, 28, 0.75)'
       ctx.lineWidth = 4
       ctx.strokeRect(8, 8, 496, 368)
 
@@ -153,12 +192,12 @@ export function InteractiveFileFolder3D({
       {/* 1. TRANG GIẤY A4 TRẮNG KEM NHÔ RA BÊN TRONG HỒ SƠ (INNER DOCUMENT PAPER SHEETS) */}
       <mesh position={[0, 0.08, -0.012]}>
         <boxGeometry args={[1.55, 1.25, 0.008]} />
-        <meshStandardMaterial color="#fef3c7" roughness={0.6} />
+        <meshStandardMaterial color="#d6c7b2" roughness={0.8} />
       </mesh>
       {/* Trang giấy thứ 2 lót lệch nhẹ */}
       <mesh position={[0.03, 0.06, -0.02]}>
         <boxGeometry args={[1.52, 1.22, 0.008]} />
-        <meshStandardMaterial color="#fef08a" roughness={0.7} />
+        <meshStandardMaterial color="#c4b49f" roughness={0.85} />
       </mesh>
 
       {/* 2. BÌA GIẤY KRAFT 3D (THÂN MỎNG CHUẨN BÌA GIẤY 0.02m) */}
@@ -172,8 +211,8 @@ export function InteractiveFileFolder3D({
           <meshStandardMaterial map={folderCoverTexture} roughness={0.5} />
         ) : (
           <meshStandardMaterial
-            color={hovered ? '#fef08a' : file.folderBgColor || (idx === 0 ? '#fef3c7' : '#f59e0b')}
-            roughness={0.5}
+            color={hovered ? '#fde68a' : file.folderBgColor || (idx === 0 ? '#d6c7b2' : '#b87e45')}
+            roughness={0.7}
           />
         )}
       </mesh>
@@ -190,8 +229,8 @@ export function InteractiveFileFolder3D({
           <meshStandardMaterial map={tabTexture} roughness={0.4} />
         ) : (
           <meshStandardMaterial
-            color={hovered ? '#fef08a' : file.folderBgColor || '#d9a066'}
-            roughness={0.4}
+            color={hovered ? '#fde68a' : file.folderBgColor || '#d9a066'}
+            roughness={0.6}
           />
         )}
       </mesh>

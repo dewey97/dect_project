@@ -48,7 +48,7 @@ export function SwingingCeilingLamp() {
         {/* 3. BÓNG ĐÈN SỢI ĐỐT VÀNG KIM (GLOWING BULB) */}
         <mesh position={[0, -3.4, 0]}>
           <sphereGeometry args={[0.16, 16, 16]} />
-          <meshStandardMaterial color="#fbbf24" emissive="#f59e0b" emissiveIntensity={4.0} />
+          <meshStandardMaterial color="#fef08a" emissive="#fde68a" emissiveIntensity={2.2} />
         </mesh>
 
         {/* 4. LUỒNG NÓN ÁNH ĐÈN 3D VOLUMETRIC GRADIENT FADE TỎA TỪ VÒM CHAO ĐÈN (TRUNCATED CONE) */}
@@ -67,8 +67,8 @@ export function SwingingCeilingLamp() {
           <shaderMaterial
             args={[{
               uniforms: {
-                uColor: { value: new THREE.Color('#f59e0b') },
-                uMaxOpacity: { value: 0.38 },
+                uColor: { value: new THREE.Color('#fde68a') },
+                uMaxOpacity: { value: 0.22 },
               },
               vertexShader: VolumetricLightBeamShader.vertexShader,
               fragmentShader: VolumetricLightBeamShader.fragmentShader,
@@ -92,7 +92,7 @@ export function SwingingCeilingLamp() {
             angle={0.88}
             penumbra={0.5}
             intensity={6.2}
-            color="#fbbf24"
+            color="#fef08a"
             distance={30}
           />
         )}
