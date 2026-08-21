@@ -19,8 +19,9 @@ const FileCabinet3D = dynamic(
 
 export default function CabinetDemoPage() {
   return (
-    <main className="min-h-screen bg-stone-950 flex flex-col items-center justify-center p-4">
+    <main className="w-screen h-screen bg-stone-950 overflow-hidden relative">
       <FileCabinet3D />
     </main>
   )
 }
+
