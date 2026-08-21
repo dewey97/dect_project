@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { CaseFile } from './3d-cabinet/cabinet-types'
@@ -121,6 +122,7 @@ function Scene3DRig({
 }
 
 export default function Real3DFilingCabinet() {
+  const router = useRouter()
   const [activeDrawerId, setActiveDrawerId] = useState<string | null>(null)
   const [inspectingFile, setInspectingFile] = useState<CaseFile | null>(null)
 
@@ -135,12 +137,10 @@ export default function Real3DFilingCabinet() {
       return
     }
 
-    if (targetFile.validCodes?.includes(cleanCode)) {
-      setActivatedCase(targetFile.id)
-      setActivationError(null)
-    } else {
-      setActivationError('Mã xác thực không chính xác! Vui lòng kiểm tra lại.')
-    }
+    // Đang chế độ test: Chấp nhận mọi mã nhập vào và chuyển thẳng tới /evidence
+    setActivatedCase(targetFile.id)
+    setActivationError(null)
+    router.push('/evidence')
   }
 
   const handleSelectDrawer = (id: string | null) => {

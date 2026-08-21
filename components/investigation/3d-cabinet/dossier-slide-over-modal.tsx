@@ -60,7 +60,7 @@ export function DossierSlideOverModal({
 
               {/* Handwritten Marker Title on Vintage Paper Tape */}
               <div className="mt-3 inline-block">
-                <span className="text-xl sm:text-2xl font-bold text-[#1a0f07] tracking-wide leading-none bg-[#f4e8d8] px-3.5 py-1.5 rounded shadow-sm border border-[#2b1b0e]/20 inline-block rotate-[-1.8deg]">
+                <span className="text-xl sm:text-2xl font-bold text-[#1a0f07] tracking-wide leading-none bg-[#d8c4a9] px-3.5 py-1.5 rounded shadow-sm border border-[#2b1b0e]/20 inline-block rotate-[-1.8deg]">
                   {inspectingFile.title}
                 </span>
               </div>
@@ -77,13 +77,13 @@ export function DossierSlideOverModal({
                 <h4 className="font-bold text-[11px] uppercase text-[#2b1b0e] tracking-wider flex items-center gap-1.5">
                   <Search className="w-3.5 h-3.5 text-[#2b1b0e]" /> Tóm tắt hồ sơ điều tra:
                 </h4>
-                <p className="text-[#2b1b0e] mt-1.5 leading-relaxed bg-[#f4e8d8]/60 p-3 rounded-lg border border-[#2b1b0e]/20 font-sans font-medium">
+                <p className="text-[#2b1b0e] mt-1.5 leading-relaxed bg-[#c8b396]/70 p-3 rounded-lg border border-[#2b1b0e]/20 font-sans font-medium">
                   {inspectingFile.summary}
                 </p>
               </div>
 
               {inspectingFile.details && (
-                <div className="bg-[#f4e8d8] p-3 rounded-lg border border-[#2b1b0e]/20">
+                <div className="bg-[#d8c4a9] p-3 rounded-lg border border-[#2b1b0e]/20">
                   <h4 className="font-bold text-[11px] uppercase text-[#2b1b0e] tracking-wider">
                     Ghi chú chuyên môn:
                   </h4>
@@ -136,10 +136,10 @@ export function DossierSlideOverModal({
                         MÃ HỢP LỆ! XÁC THỰC THÀNH CÔNG.
                       </span>
                       <button
-                        onClick={() => router.push('/activate')}
+                        onClick={() => router.push('/evidence')}
                         className="px-3.5 py-1.5 bg-emerald-500 text-stone-950 font-black rounded text-[11px] hover:bg-emerald-400 transition-colors flex items-center gap-1"
                       >
-                        VÀO PHÒNG ĐIỀU TRA →
+                        VÀO KHO MANH MỐI →
                       </button>
                     </div>
                   )}
@@ -157,10 +157,10 @@ export function DossierSlideOverModal({
 
               {inspectingFile.caseUrl ? (
                 <button
-                  onClick={() => router.push('/activate')}
+                  onClick={() => router.push('/evidence')}
                   className="px-5 py-2 bg-[#2b1b0e] text-amber-300 rounded-lg text-xs font-black hover:bg-[#3d2714] shadow-lg transition-all flex items-center gap-2"
                 >
-                  <FolderOpen className="w-4 h-4" /> VÀO TRANG XÁC THỰC (/activate)
+                  <FolderOpen className="w-4 h-4" /> VÀO KHO MANH MỐI (/evidence)
                 </button>
               ) : (
                 <button

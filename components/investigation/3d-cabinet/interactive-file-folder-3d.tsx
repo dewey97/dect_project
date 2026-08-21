@@ -37,7 +37,7 @@ export function InteractiveFileFolder3D({
     const ctx = canvas.getContext('2d')
     if (ctx) {
       // Nền cùng tông màu Kraft da bò
-      ctx.fillStyle = hovered ? '#fde68a' : file.folderBgColor || '#d9a066'
+      ctx.fillStyle = hovered ? '#cba052' : file.folderBgColor || '#d9a066'
       ctx.fillRect(0, 0, 160, 56)
 
       // Hạt noise mờ nhẹ trên thẻ tab
@@ -112,7 +112,7 @@ export function InteractiveFileFolder3D({
       ctx.save()
       ctx.translate(24, 28)
       ctx.rotate(-0.03)
-      ctx.fillStyle = '#f4e8d8'
+      ctx.fillStyle = '#cbb89d'
       ctx.shadowColor = 'rgba(0, 0, 0, 0.35)'
       ctx.shadowBlur = 6
       ctx.fillRect(0, 0, 300, 60)
@@ -192,12 +192,12 @@ export function InteractiveFileFolder3D({
       {/* 1. TRANG GIẤY A4 TRẮNG KEM NHÔ RA BÊN TRONG HỒ SƠ (INNER DOCUMENT PAPER SHEETS) */}
       <mesh position={[0, 0.08, -0.012]}>
         <boxGeometry args={[1.55, 1.25, 0.008]} />
-        <meshStandardMaterial color="#d6c7b2" roughness={0.8} />
+        <meshStandardMaterial color="#a89882" roughness={0.95} />
       </mesh>
       {/* Trang giấy thứ 2 lót lệch nhẹ */}
       <mesh position={[0.03, 0.06, -0.02]}>
         <boxGeometry args={[1.52, 1.22, 0.008]} />
-        <meshStandardMaterial color="#c4b49f" roughness={0.85} />
+        <meshStandardMaterial color="#968672" roughness={0.95} />
       </mesh>
 
       {/* 2. BÌA GIẤY KRAFT 3D (THÂN MỎNG CHUẨN BÌA GIẤY 0.02m) */}
@@ -208,11 +208,11 @@ export function InteractiveFileFolder3D({
       >
         <boxGeometry args={[1.65, 1.25, 0.02]} />
         {folderCoverTexture ? (
-          <meshStandardMaterial map={folderCoverTexture} roughness={0.5} />
+          <meshStandardMaterial map={folderCoverTexture} roughness={0.9} />
         ) : (
           <meshStandardMaterial
-            color={hovered ? '#fde68a' : file.folderBgColor || (idx === 0 ? '#d6c7b2' : '#b87e45')}
-            roughness={0.7}
+            color={hovered ? '#cba052' : file.folderBgColor || (idx === 0 ? '#d6c7b2' : '#b87e45')}
+            roughness={0.85}
           />
         )}
       </mesh>
@@ -226,11 +226,11 @@ export function InteractiveFileFolder3D({
       >
         <boxGeometry args={[0.54, 0.18, 0.02]} />
         {tabTexture ? (
-          <meshStandardMaterial map={tabTexture} roughness={0.4} />
+          <meshStandardMaterial map={tabTexture} roughness={0.85} />
         ) : (
           <meshStandardMaterial
-            color={hovered ? '#fde68a' : file.folderBgColor || '#d9a066'}
-            roughness={0.6}
+            color={hovered ? '#cba052' : file.folderBgColor || '#d9a066'}
+            roughness={0.85}
           />
         )}
       </mesh>
