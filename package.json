@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:latex": "node scripts/build_latex.js",
     "start": "next start",
     "lint": "eslint ."
   },
@@ -22,6 +23,8 @@
     "framer-motion": "^13.1.0",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
+    "pdf-lib": "^1.17.1",
+    "pdfkit": "^0.19.1",
     "react": "^19",
     "react-dom": "^19",
     "recharts": "^3.10.0",

@@ -12,3 +12,11 @@
 ## 3. Project Architecture & Style Standards
 - Tuân thủ nghiêm ngặt các quy định trong `PROJECT_RULES.md`.
 - Đảm bảo tính nhất quán của hệ thống tài liệu: `storyline.md` (Cốt truyện thuần túy), `gameplay_design.md` (Cơ chế & Luồng chơi), `evidence_manifest.md` (Danh mục manh mối & Master Asset Table), và bộ tài liệu LaTeX trong `latex/` & PDF trong `pdf/`.
+
+## 4. Automated LaTeX Compilation & Cleanup Protocol (Quy trình Tự động Biên dịch & Dọn dẹp LaTeX)
+Khi Agent chỉnh sửa hoặc cập nhật nội dung bất kỳ file nguồn `.tex` nào (trong `docs/cases/case_000/documents/latex/...`):
+- **Biên dịch đúng file vừa sửa**: Chỉ chạy biên dịch `pdflatex` đối với **chính file `.tex` vừa được chỉnh sửa** (thông qua lệnh `npm run build:latex -- <tên_file>`), không build lại toàn bộ các file khác.
+- **Cập nhật Thư mục Đích**: Tự động chuyển file PDF thu được vào đúng vị trí trong `public/documents/case_000/<phase>/` và `docs/cases/case_000/documents/<phase>/` (ghi đè/thay thế PDF cũ).
+- **Quản lý File Log & File Tạm**:
+  - File `.log` của quá trình biên dịch sẽ được chuyển/lưu vào thư mục `.vscode/latex_logs/` để tiện tra cứu khi cần.
+  - Tự động xóa sạch các file tạm rác do LaTeX sinh ra (`.aux`, `.out`, `.fls`, `.fdb_latexmk`, `.pdf` thừa) tại thư mục nguồn `.tex`, giữ cho thư mục `latex/` luôn 100% sạch sẽ chỉ chứa các file nguồn `.tex`.

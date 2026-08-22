@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { 
   FileText, 
-  FolderOpen, 
   Search, 
   ShieldCheck, 
   AlertCircle, 
@@ -12,13 +11,11 @@ import {
   Shield,
   ImageIcon,
   Paperclip,
-  Clock,
-  FileCheck2,
   Lock
 } from 'lucide-react'
 import { PDFViewerModal } from '@/components/investigation/pdf-viewer-modal'
 import { useCheckpoints } from '@/components/investigation/checkpoints-context'
-import { CASES, EVIDENCE } from '@/lib/mock-data'
+import { CASES } from '@/lib/mock-data'
 import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 import type { Evidence, Checkpoint } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -28,71 +25,223 @@ interface PDFDocument {
   title: string
   code: string
   url: string
+  phase: number
+}
+
+interface PhysicalEvidence extends Evidence {
+  phase: number
 }
 
 const CASE_000_PDFS: PDFDocument[] = [
+  // Phase 0: Initial
   {
     id: 'pdf-01',
-    title: 'Báo cáo khám nghiệm tử thi sơ bộ',
-    code: 'PDF-001',
-    url: '/pdf/case_000/phase_0_initial/01_bao_cao_kham_nghiem_tu_thi.pdf'
+    title: '01. Báo cáo khám nghiệm tử thi sơ bộ',
+    code: 'f1-1',
+    url: '/documents/case_000/phase_0_initial/01_bao_cao_kham_nghiem_tu_thi.pdf',
+    phase: 0
   },
   {
     id: 'pdf-02',
-    title: 'Biên bản khám nghiệm hiện trường vụ án',
-    code: 'PDF-002',
-    url: '/pdf/case_000/phase_0_initial/02_bien_ban_kham_nghiem_hien_truong.pdf'
+    title: '02. Biên bản khám nghiệm hiện trường vụ án',
+    code: 'f1-2',
+    url: '/documents/case_000/phase_0_initial/02_bien_ban_kham_nghiem_hien_truong.pdf',
+    phase: 0
   },
   {
     id: 'pdf-03',
-    title: 'Báo cáo tiến độ điều tra ban đầu',
-    code: 'PDF-003',
-    url: '/pdf/case_000/phase_0_initial/03_bao_cao_tien_do_dieu_tra.pdf'
+    title: '03. Báo cáo tiến độ điều tra ban đầu',
+    code: 'f1-3',
+    url: '/documents/case_000/phase_0_initial/03_bao_cao_tien_do_dieu_tra.pdf',
+    phase: 0
   },
   {
     id: 'pdf-04',
-    title: 'Biên bản lấy lời khai: Trần Ngọc Mai',
-    code: 'PDF-004',
-    url: '/pdf/case_000/phase_0_initial/07a_bien_ban_loi_khai_tran_ngoc_mai.pdf'
+    title: '04. Lời khai Q&A: Trần Ngọc Mai',
+    code: '07a',
+    url: '/documents/case_000/phase_0_initial/07a_bien_ban_loi_khai_tran_ngoc_mai.pdf',
+    phase: 0
   },
   {
     id: 'pdf-05',
-    title: 'Biên bản lấy lời khai: Lê Quang Vũ',
-    code: 'PDF-005',
-    url: '/pdf/case_000/phase_0_initial/07b_bien_ban_loi_khai_le_quang_vu.pdf'
+    title: '05. Lời khai Q&A: Lê Quang Vũ',
+    code: '07b',
+    url: '/documents/case_000/phase_0_initial/07b_bien_ban_loi_khai_le_quang_vu.pdf',
+    phase: 0
   },
   {
     id: 'pdf-06',
-    title: 'Biên bản lấy lời khai: Tùng',
-    code: 'PDF-006',
-    url: '/pdf/case_000/phase_0_initial/07c_bien_ban_loi_khai_tung.pdf'
+    title: '06. Lời khai Q&A: Nguyễn Thanh Tùng',
+    code: '07c',
+    url: '/documents/case_000/phase_0_initial/07c_bien_ban_loi_khai_tung.pdf',
+    phase: 0
   },
   {
     id: 'pdf-07',
-    title: 'Biên bản lấy lời khai: Trần Thị Hà',
-    code: 'PDF-007',
-    url: '/pdf/case_000/phase_0_initial/07d_bien_ban_loi_khai_tran_thi_ha.pdf'
+    title: '07. Lời khai Q&A: Trần Thị Hà (Lời khai đầu)',
+    code: '07d',
+    url: '/documents/case_000/phase_0_initial/07d_bien_ban_loi_khai_tran_thi_ha.pdf',
+    phase: 0
+  },
+
+  // Phase 1: Inheritance & Land Dispute
+  {
+    id: 'pdf-08',
+    title: '08. Tờ di chúc ông nội bị tẩy xóa làm giả',
+    code: 'f2-1',
+    url: '/documents/case_000/phase_1_inheritance/08_di_chuc_ong_noi_gia_mao.pdf',
+    phase: 1
+  },
+  {
+    id: 'pdf-09',
+    title: '09. Kết quả giám định tuổi mực & vết tẩy xóa (Viện KHHS)',
+    code: 'f2-2',
+    url: '/documents/case_000/phase_1_inheritance/09_ket_qua_giam_dinh_chu_ky.pdf',
+    phase: 1
+  },
+  {
+    id: 'pdf-10',
+    title: '10. Bản đồ địa chính đất gốc 75m2 & Giấy nợ 350M',
+    code: 'f2-3',
+    url: '/documents/case_000/phase_1_inheritance/10_ban_do_dia_chinh_va_giay_no_vu.pdf',
+    phase: 1
+  },
+
+  // Phase 2: Past Secret & Hide-and-Seek
+  {
+    id: 'pdf-11',
+    title: '11. Biên bản camera cây xăng & Mật mã trốn tìm 1998',
+    code: 'f3-1',
+    url: '/documents/case_000/phase_2_altercation/11_bien_ban_trich_xuat_camera_va_tro_tron_tim.pdf',
+    phase: 2
+  },
+
+  // Phase 3: Conclusion & Forensic Breakthrough
+  {
+    id: 'pdf-12',
+    title: '12. Báo cáo pháp y bổ sung giờ tử vong 21:00',
+    code: 'f4-1',
+    url: '/documents/case_000/phase_3_conclusion/12_bao_cao_phap_y_bo_sung_va_loi_khai_ha_lo_loi.pdf',
+    phase: 3
+  },
+  {
+    id: 'pdf-13',
+    title: '13. Tổng hợp SMS, Email & Tin nhắn tình nhân 20:40',
+    code: 'f4-3',
+    url: '/documents/case_000/phase_3_conclusion/13_tong_hop_tin_nhan_sms_va_email.pdf',
+    phase: 3
+  }
+]
+
+const CASE_000_EVIDENCE: PhysicalEvidence[] = [
+  {
+    id: 'ev-p1',
+    caseId: 'case-000',
+    kind: 'photo',
+    title: 'p1. Ảnh hiện trường phòng khách & bộ bình trà vỡ',
+    preview: 'Hiện trường phòng khách xáo trộn, bộ bình trà bị đập vỡ vụn trên sàn gỗ kèm đốm máu loang.',
+    timestamp: '20:00',
+    evidenceId: 'EV-SCENE-OVERVIEW',
+    recoveredBy: 'ĐIỀU TRA VIÊN',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+    thumbnail: '/photos/photo-crime-scene-overview.jpg',
+    phase: 0
+  },
+  {
+    id: 'ev-p3',
+    caseId: 'case-000',
+    kind: 'photo',
+    title: 'p3. Mảnh thủy tinh ceramic 8cm dính máu (Hung khí)',
+    preview: 'Mảnh vỡ sắc nhọn 8cm dính vết máu khô và dấu vân tay miết (vật chứng đâm đứt động mạch cảnh).',
+    timestamp: '21:00',
+    evidenceId: 'EV-GLASS-SHARD',
+    recoveredBy: 'ĐIỀU TRA VIÊN',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+    thumbnail: '/photos/photo-glass-shard-detail.jpg',
+    phase: 0
+  },
+  {
+    id: 'ev-p2',
+    caseId: 'case-000',
+    kind: 'photo',
+    title: 'p2. Ảnh hiện trường các giấy tờ di chúc văng vãi',
+    preview: 'Bản vẽ địa chính 75m2 và tờ di chúc bị cày xới nằm gần khoang tủ gỗ âm tường.',
+    timestamp: '19:30',
+    evidenceId: 'EV-SCATTERED-DOCS',
+    recoveredBy: 'ĐIỀU TRA VIÊN',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+    thumbnail: '/photos/photo-scattered-documents.jpg',
+    phase: 1
+  },
+  {
+    id: 'ev-p4',
+    caseId: 'case-000',
+    kind: 'photo',
+    title: 'p4. Ảnh Polaroid kỷ niệm 4 đứa trẻ (1998)',
+    preview: 'Bức ảnh ố vàng chụp Khang, Tùng, Hà và Gia Huy chơi trốn tìm trước căn nhà cũ năm 1998.',
+    timestamp: '14/10/1998',
+    evidenceId: 'EV-CHILDHOOD-POLAROID',
+    recoveredBy: 'ĐIỀU TRA VIÊN',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+    thumbnail: '/photos/photo-childhood-group.jpg',
+    phase: 2
+  },
+  {
+    id: 'ev-p5',
+    caseId: 'case-000',
+    kind: 'photo',
+    title: 'p5. Bài báo cũ 1998 về tai nạn ngạt khí tủ gỗ',
+    preview: 'Trang nhật báo cắt năm 1998 đưa tin tai nạn ngạt khí tủ gỗ thương tâm của bé Gia Huy.',
+    timestamp: '15/10/1998',
+    evidenceId: 'EV-OLD-NEWSPAPER',
+    recoveredBy: 'ĐIỀU TRA VIÊN',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+    thumbnail: '/photos/photo-old-newspaper.jpg',
+    phase: 2
+  },
+  {
+    id: 'ev-p6',
+    caseId: 'case-000',
+    kind: 'photo',
+    title: 'p6. Ảnh tin nhắn điện thoại tình nhân mới (20:40)',
+    preview: 'Màn hình điện thoại nạn nhân sáng tin nhắn tình nhân mới rủ đi du lịch lúc 20:40 PM.',
+    timestamp: '20:40',
+    evidenceId: 'EV-CHEATING-SMS',
+    recoveredBy: 'ĐIỀU TRA VIÊN',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+    thumbnail: '/photos/photo-messages-cheating.jpg',
+    phase: 3
   }
 ]
 
 // Types for right column view
 type SelectedView = 
   | { type: 'pdf'; data: PDFDocument }
-  | { type: 'evidence'; data: Evidence }
+  | { type: 'evidence'; data: PhysicalEvidence }
 
 // Hardcoded hint maps for case-000 checkpoints
 const HINTS_MAP: Record<string, string[]> = {
+  'cp-000-0': [
+    'Báo cáo tử thi chỉ rõ 2 vùng tổn thương: Cú va đập chẩm gáy (20:00) gây ngất & Vết đâm đứt động mạch cảnh (21:00).',
+    'Ma trận mâu thuẫn khoanh vùng 4 đối tượng có động cơ: Mai, Vũ, Tùng và Hà.'
+  ],
   'cp-000-1': [
-    'Đối soát kỹ mốc thời gian trong Biên bản khám nghiệm tử thi và Lời khai của Trần Ngọc Mai.',
-    'Chú ý chi tiết bản di chúc gốc giấu sau tủ âm tường cũ.'
+    'Đọc Kết quả giám định 09 để xem phân tích vết tẩy xóa hóa chất và tuổi mực bi dầu 2024.',
+    'Khang tẩy tên Mai trên di chúc 2018. Mai có chứng cứ ngoại phạm tại văn phòng luật sư, Vũ có chứng cứ ngoại phạm tại quán nhậu.'
   ],
   'cp-000-2': [
     'Kiểm tra lại báo cáo vết bầm tím sau gáy nạn nhân.',
-    'So sánh mốc thời gian Tùng hoảng sợ bỏ đi lúc 20:15 với mảnh vỡ bình trà.'
+    'So sánh mốc thời gian Tùng hoảng sợ tháo chạy trên camera (20:15) với mốc giờ tử vong thực tế.'
   ],
   'cp-000-3': [
     'Đối chiếu chi tiết lỡ lời trong lời khai ban đầu của Trần Thị Hà với hiện trường.',
-    'Hà khai ở nhà cả tối nhưng lại mô tả chính xác Khang gục ngã cạnh bộ bình trà vỡ.'
+    'Hà khai ở nhà cả tối nhưng lại mô tả chính xác Khang gục ngã cạnh bộ bình trà vỡ (vỡ lúc 20:00 bởi Tùng).'
   ]
 }
 
@@ -118,8 +267,11 @@ export default function EvidencePage() {
   // Mobile PDF modal state
   const [isMobilePdfOpen, setIsMobilePdfOpen] = useState(false)
 
-  // Unified index filter tab: 'all' | 'pdf' | 'evidence'
+  // Category filter: 'all' | 'pdf' | 'evidence'
   const [filterTab, setFilterTab] = useState<'all' | 'pdf' | 'evidence'>('all')
+
+  // Phase filter: 'all' | 0 | 1 | 2 | 3
+  const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<'all' | number>('all')
 
   useEffect(() => {
     if (checkpoints000 && checkpoints000.length > 0) {
@@ -127,14 +279,25 @@ export default function EvidencePage() {
     }
   }, [completedCheckpointIds])
 
+  // Helper check if phase is unlocked
+  const isPhaseUnlocked = (phase: number) => {
+    if (phase === 0) return true
+    if (phase === 1) return completedCheckpointIds.includes('cp-000-0')
+    if (phase === 2) return completedCheckpointIds.includes('cp-000-1')
+    if (phase === 3) return completedCheckpointIds.includes('cp-000-2')
+    return false
+  }
+
   const handleSelectPdf = (doc: PDFDocument) => {
+    if (!isPhaseUnlocked(doc.phase)) return
     setSelectedView({ type: 'pdf', data: doc })
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setIsMobilePdfOpen(true)
     }
   }
 
-  const handleSelectEvidence = (item: Evidence) => {
+  const handleSelectEvidence = (item: PhysicalEvidence) => {
+    if (!isPhaseUnlocked(item.phase)) return
     setSelectedView({ type: 'evidence', data: item })
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setIsMobilePdfOpen(false)
@@ -172,6 +335,19 @@ export default function EvidencePage() {
     }
   }
 
+  // Filter items
+  const filteredPdfs = CASE_000_PDFS.filter((doc) => {
+    if (filterTab === 'evidence') return false
+    if (selectedPhaseFilter !== 'all' && doc.phase !== selectedPhaseFilter) return false
+    return true
+  })
+
+  const filteredEvidence = CASE_000_EVIDENCE.filter((item) => {
+    if (filterTab === 'pdf') return false
+    if (selectedPhaseFilter !== 'all' && item.phase !== selectedPhaseFilter) return false
+    return true
+  })
+
   return (
     <div className="h-screen w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-4">
       
@@ -206,163 +382,241 @@ export default function EvidencePage() {
             </div>
 
             <p className="mt-3 text-xs text-[#ad9885] leading-relaxed font-sans border-t border-[#3b2b1e] pt-2.5">
-              {activeCase?.summary || 'Hồ sơ lưu trữ các biên bản khám nghiệm, tài liệu lời khai và chứng cứ liên quan đến vụ tử vong nghi vấn của Nguyễn Văn Khang.'}
+              {activeCase?.briefing || 'Hồ sơ lưu trữ các biên bản khám nghiệm, tài liệu lời khai và chứng cứ liên quan đến vụ tử vong nghi vấn của Nguyễn Văn Khang.'}
             </p>
 
           </header>
 
           <div className="p-4 sm:p-6 space-y-6">
             
-            {/* UNIFIED DOSSIER INDEX WITH VINTAGE FILTER CHIPS */}
+            {/* UNIFIED DOSSIER INDEX WITH PHASE UNLOCK SYSTEM */}
             <section className="space-y-3">
               
-              {/* Header & Filter Chips */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#3d2c1e] pb-3">
-                <div className="flex items-center gap-2">
-                  <Paperclip className="size-4 text-[#d9a066]" />
-                  <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#e6d3c1]">
-                    DANH MỤC HỒ SƠ & TANG CHỨNG
-                  </h2>
+              {/* Header & Category / Phase Filter Chips */}
+              <div className="flex flex-col gap-3 border-b border-[#3d2c1e] pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Paperclip className="size-4 text-[#d9a066]" />
+                    <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#e6d3c1]">
+                      DANH MỤC HỒ SƠ & TANG CHỨNG THEO PHASE
+                    </h2>
+                  </div>
+
+                  {/* Type Filter Chips */}
+                  <div className="flex items-center gap-1 font-mono text-[0.6rem]">
+                    <button
+                      onClick={() => setFilterTab('all')}
+                      className={cn(
+                        'px-2 py-0.5 font-bold transition-all cursor-pointer border',
+                        filterTab === 'all'
+                          ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
+                          : 'bg-[#241a12] text-[#ad9885] border-[#4a3625]'
+                      )}
+                    >
+                      TẤT CẢ
+                    </button>
+                    <button
+                      onClick={() => setFilterTab('pdf')}
+                      className={cn(
+                        'px-2 py-0.5 font-bold transition-all cursor-pointer border',
+                        filterTab === 'pdf'
+                          ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
+                          : 'bg-[#241a12] text-[#ad9885] border-[#4a3625]'
+                      )}
+                    >
+                      📄 PDF
+                    </button>
+                    <button
+                      onClick={() => setFilterTab('evidence')}
+                      className={cn(
+                        'px-2 py-0.5 font-bold transition-all cursor-pointer border',
+                        filterTab === 'evidence'
+                          ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
+                          : 'bg-[#241a12] text-[#ad9885] border-[#4a3625]'
+                      )}
+                    >
+                      📸 TANG VẬT
+                    </button>
+                  </div>
                 </div>
 
-                {/* Filter Chips */}
-                <div className="flex items-center gap-1.5 font-mono text-[0.65rem]">
+                {/* Phase Selection Chips */}
+                <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 font-mono text-[0.625rem]">
                   <button
-                    onClick={() => setFilterTab('all')}
+                    onClick={() => setSelectedPhaseFilter('all')}
                     className={cn(
-                      'px-2.5 py-1 rounded font-bold transition-all cursor-pointer border',
-                      filterTab === 'all'
+                      'px-2.5 py-1 font-bold transition-all cursor-pointer shrink-0 border',
+                      selectedPhaseFilter === 'all'
                         ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
-                        : 'bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] border-[#4a3625]'
+                        : 'bg-[#1e1711] text-[#ad9885] hover:text-[#e6d3c1] border-[#3d2c1e]'
                     )}
                   >
-                    TẤT CẢ ({CASE_000_PDFS.length + EVIDENCE.length})
+                    TẤT CẢ PHASE
                   </button>
 
-                  <button
-                    onClick={() => setFilterTab('pdf')}
-                    className={cn(
-                      'px-2.5 py-1 rounded font-bold transition-all cursor-pointer border',
-                      filterTab === 'pdf'
-                        ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
-                        : 'bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] border-[#4a3625]'
-                    )}
-                  >
-                    📄 FILE PDF ({CASE_000_PDFS.length})
-                  </button>
-
-                  <button
-                    onClick={() => setFilterTab('evidence')}
-                    className={cn(
-                      'px-2.5 py-1 rounded-none font-bold transition-all cursor-pointer border',
-                      filterTab === 'evidence'
-                        ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
-                        : 'bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] border-[#4a3625]'
-                    )}
-                  >
-                    📸 TANG VẬT ({EVIDENCE.length})
-                  </button>
+                  {[0, 1, 2, 3].map((p) => {
+                    const unlocked = isPhaseUnlocked(p)
+                    const isSelected = selectedPhaseFilter === p
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => setSelectedPhaseFilter(p)}
+                        className={cn(
+                          'px-2.5 py-1 font-bold transition-all cursor-pointer shrink-0 border flex items-center gap-1',
+                          isSelected
+                            ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
+                            : unlocked
+                              ? 'bg-[#1e1711] text-[#e6d3c1] hover:bg-[#2e2319] border-[#4a3625]'
+                              : 'bg-[#140e0a] text-[#6e5a49] border-[#2b1f16]'
+                        )}
+                      >
+                        {!unlocked && <Lock className="size-2.5 text-amber-700" />}
+                        <span>PHASE {p}</span>
+                      </button>
+                    )
+                  })}
                 </div>
+
               </div>
 
-              {/* Combined Items List (Vintage Flat Paper Cards) */}
+              {/* Combined Items List Grouped or Filtered */}
               <div className="grid grid-cols-1 gap-2">
                 
                 {/* Render PDFs */}
-                {(filterTab === 'all' || filterTab === 'pdf') &&
-                  CASE_000_PDFS.map((doc) => {
-                    const isSelected = selectedView.type === 'pdf' && selectedView.data.id === doc.id
-                    return (
-                      <div
-                        key={doc.id}
-                        onClick={() => handleSelectPdf(doc)}
-                        className={cn(
-                          'group flex items-center justify-between p-3 rounded-none border transition-all cursor-pointer shadow-sm',
-                          isSelected
-                            ? 'bg-[#38271a] border-[#6b4b32] text-amber-200'
-                            : 'bg-[#241b13] hover:bg-[#2d2218] border-[#3e2e20] text-[#e5d8cb]'
-                        )}
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <div className={cn(
-                            'size-8 rounded-none flex items-center justify-center font-bold text-xs shrink-0 transition-colors',
-                            isSelected ? 'bg-[#d9a066] text-[#1a0f07]' : 'bg-[#18120c] text-[#d9a066] border border-[#3e2e20]'
-                          )}>
-                            <FileText className="size-4" />
-                          </div>
-                          <div className="flex flex-col overflow-hidden">
-                            <span className={cn(
-                              'font-sans font-semibold text-xs truncate transition-colors',
-                              isSelected ? 'text-[#f4e8d8] font-bold' : 'text-[#e5d8cb] group-hover:text-[#d9a066]'
-                            )}>
-                              {doc.title}
-                            </span>
-                            <span className="font-mono text-[0.6rem] text-[#ad9885]">
-                              📄 HỒ SƠ BIÊN BẢN // {doc.code}
-                            </span>
-                          </div>
-                        </div>
+                {filteredPdfs.map((doc) => {
+                  const unlocked = isPhaseUnlocked(doc.phase)
+                  const isSelected = selectedView.type === 'pdf' && selectedView.data.id === doc.id
 
-                        <button className={cn(
-                          'flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded-none transition-all shrink-0 border',
+                  return (
+                    <div
+                      key={doc.id}
+                      onClick={() => handleSelectPdf(doc)}
+                      className={cn(
+                        'group flex items-center justify-between p-3 rounded-none border transition-all shadow-sm',
+                        unlocked ? 'cursor-pointer' : 'cursor-not-allowed opacity-60',
+                        isSelected
+                          ? 'bg-[#38271a] border-[#6b4b32] text-amber-200'
+                          : unlocked
+                            ? 'bg-[#241b13] hover:bg-[#2d2218] border-[#3e2e20] text-[#e5d8cb]'
+                            : 'bg-[#18120c] border-[#2b1f16] text-[#7a6858]'
+                      )}
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className={cn(
+                          'size-8 rounded-none flex items-center justify-center font-bold text-xs shrink-0 transition-colors',
                           isSelected
-                            ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
-                            : 'text-[#d9a066] bg-[#18120c] border-[#3e2e20] group-hover:bg-[#d9a066] group-hover:text-[#1a0f07]'
+                            ? 'bg-[#d9a066] text-[#1a0f07]'
+                            : unlocked
+                              ? 'bg-[#18120c] text-[#d9a066] border border-[#3e2e20]'
+                              : 'bg-[#120d09] text-[#5e4b3c] border border-[#231810]'
                         )}>
-                          <Search className="size-3" />
-                          <span>{isSelected ? 'ĐANG XEM' : 'CHI TIẾT'}</span>
-                        </button>
+                          {unlocked ? <FileText className="size-4" /> : <Lock className="size-4" />}
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                          <span className={cn(
+                            'font-sans font-semibold text-xs truncate transition-colors',
+                            isSelected ? 'text-[#f4e8d8] font-bold' : unlocked ? 'text-[#e5d8cb] group-hover:text-[#d9a066]' : 'text-[#8c7867]'
+                          )}>
+                            {doc.title}
+                          </span>
+                          <span className="font-mono text-[0.6rem] text-[#ad9885] flex items-center gap-1.5">
+                            <span className="text-[#d9a066] font-bold">[PHASE {doc.phase}]</span>
+                            <span>📄 HỒ SƠ // {doc.code}</span>
+                          </span>
+                        </div>
                       </div>
-                    )
-                  })}
+
+                      <button className={cn(
+                        'flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded-none transition-all shrink-0 border',
+                        isSelected
+                          ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
+                          : unlocked
+                            ? 'text-[#d9a066] bg-[#18120c] border-[#3e2e20] group-hover:bg-[#d9a066] group-hover:text-[#1a0f07]'
+                            : 'text-[#6b5645] bg-[#120d09] border-[#2b1f16]'
+                      )}>
+                        {unlocked ? (
+                          <>
+                            <Search className="size-3" />
+                            <span>{isSelected ? 'ĐANG XEM' : 'CHI TIẾT'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="size-3" />
+                            <span>KHOÁ PHASE {doc.phase}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )
+                })}
 
                 {/* Render Evidence Items */}
-                {(filterTab === 'all' || filterTab === 'evidence') &&
-                  EVIDENCE.map((item) => {
-                    const isSelected = selectedView.type === 'evidence' && selectedView.data.id === item.id
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => handleSelectEvidence(item)}
-                        className={cn(
-                          'group flex items-center justify-between p-3 rounded-none border transition-all cursor-pointer shadow-sm',
-                          isSelected
-                            ? 'bg-[#38271a] border-[#6b4b32] text-amber-200'
-                            : 'bg-[#241b13] hover:bg-[#2d2218] border-[#3e2e20] text-[#e5d8cb]'
-                        )}
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <div className={cn(
-                            'size-8 rounded-none flex items-center justify-center font-bold text-xs shrink-0 transition-colors',
-                            isSelected ? 'bg-[#d9a066] text-[#1a0f07]' : 'bg-[#18120c] text-[#d9a066] border border-[#3e2e20]'
-                          )}>
-                            <ImageIcon className="size-4" />
-                          </div>
-                          <div className="flex flex-col overflow-hidden">
-                            <span className={cn(
-                              'font-sans font-semibold text-xs truncate transition-colors',
-                              isSelected ? 'text-[#f4e8d8] font-bold' : 'text-[#e5d8cb] group-hover:text-[#d9a066]'
-                            )}>
-                              {item.title}
-                            </span>
-                            <span className="font-mono text-[0.6rem] text-[#ad9885]">
-                              📸 TANG CHỨNG VẬT LÝ // {item.evidenceId}
-                            </span>
-                          </div>
-                        </div>
+                {filteredEvidence.map((item) => {
+                  const unlocked = isPhaseUnlocked(item.phase)
+                  const isSelected = selectedView.type === 'evidence' && selectedView.data.id === item.id
 
-                        <button className={cn(
-                          'flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded-none transition-all shrink-0 border',
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleSelectEvidence(item)}
+                      className={cn(
+                        'group flex items-center justify-between p-3 rounded-none border transition-all shadow-sm',
+                        unlocked ? 'cursor-pointer' : 'cursor-not-allowed opacity-60',
+                        isSelected
+                          ? 'bg-[#38271a] border-[#6b4b32] text-amber-200'
+                          : unlocked
+                            ? 'bg-[#241b13] hover:bg-[#2d2218] border-[#3e2e20] text-[#e5d8cb]'
+                            : 'bg-[#18120c] border-[#2b1f16] text-[#7a6858]'
+                      )}
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className={cn(
+                          'size-8 rounded-none flex items-center justify-center font-bold text-xs shrink-0 transition-colors',
                           isSelected
-                            ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
-                            : 'text-[#d9a066] bg-[#18120c] border-[#3e2e20] group-hover:bg-[#d9a066] group-hover:text-[#1a0f07]'
+                            ? 'bg-[#d9a066] text-[#1a0f07]'
+                            : unlocked
+                              ? 'bg-[#18120c] text-[#d9a066] border border-[#3e2e20]'
+                              : 'bg-[#120d09] text-[#5e4b3c] border border-[#231810]'
                         )}>
-                          <Search className="size-3" />
-                          <span>{isSelected ? 'ĐANG XEM' : 'CHI TIẾT'}</span>
-                        </button>
+                          {unlocked ? <ImageIcon className="size-4" /> : <Lock className="size-4" />}
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                          <span className={cn(
+                            'font-sans font-semibold text-xs truncate transition-colors',
+                            isSelected ? 'text-[#f4e8d8] font-bold' : unlocked ? 'text-[#e5d8cb] group-hover:text-[#d9a066]' : 'text-[#8c7867]'
+                          )}>
+                            {item.title}
+                          </span>
+                          <span className="font-mono text-[0.6rem] text-[#ad9885] flex items-center gap-1.5">
+                            <span className="text-[#d9a066] font-bold">[PHASE {item.phase}]</span>
+                            <span>📸 TANG CHỨNG // {item.evidenceId}</span>
+                          </span>
+                        </div>
                       </div>
-                    )
-                  })}
+
+                      <button className={cn(
+                        'flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded-none transition-all shrink-0 border',
+                        isSelected
+                          ? 'bg-[#d9a066] text-[#1a0f07] border-[#d9a066]'
+                          : unlocked
+                            ? 'text-[#d9a066] bg-[#18120c] border-[#3e2e20] group-hover:bg-[#d9a066] group-hover:text-[#1a0f07]'
+                            : 'text-[#6b5645] bg-[#120d09] border-[#2b1f16]'
+                      )}>
+                        {unlocked ? (
+                          <>
+                            <Search className="size-3" />
+                            <span>{isSelected ? 'ĐANG XEM' : 'CHI TIẾT'}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="size-3" />
+                            <span>KHOÁ PHASE {item.phase}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )
+                })}
 
               </div>
             </section>
@@ -440,7 +694,7 @@ export default function EvidencePage() {
                             {/* Header */}
                             <div className="flex items-center justify-between">
                               <span className="font-mono text-[0.65rem] text-[#d9a066] font-bold uppercase tracking-wider">
-                                CÂU HỎI HIỆN TẠI ({idx + 1}/{checkpoints.length})
+                                CÂU HỎI KẾT LUẬN PHASE {idx} ({idx + 1}/{checkpoints.length})
                               </span>
                               <span className="font-mono text-[0.6rem] text-[#d9a066] bg-[#140e0a] px-2 py-0.5 rounded-none border border-[#38271a] font-bold uppercase">
                                 ĐANG PHÁ ÁN
@@ -481,7 +735,7 @@ export default function EvidencePage() {
                               </div>
 
                               <div className="mt-3 flex items-center justify-between gap-3 pt-2 border-t border-[#36271c]">
-                                {/* Left Fixed Hint Button (Pure text font-mono, no icon, loops back to 1 when max reached) */}
+                                {/* Left Fixed Hint Button */}
                                 {hints.length > 0 ? (
                                   <button
                                     type="button"
@@ -519,7 +773,7 @@ export default function EvidencePage() {
                               )}
                               {hasSuccess && (
                                 <p className="text-[0.65rem] font-mono text-emerald-400 flex items-center gap-1 mt-1">
-                                  <CheckCircle2 className="size-3.5" /> CHÍNH XÁC! CHUYỂN CÂU TIẾP...
+                                  <CheckCircle2 className="size-3.5" /> CHÍNH XÁC! MỞ KHÓA TÀI LIỆU PHASE KẾ TIẾP...
                                 </p>
                               )}
                             </div>
@@ -556,7 +810,7 @@ export default function EvidencePage() {
             /* PDF READER VIEW (DIRECT A4 FULL HEIGHT PREVIEW) */
             <div className="w-full h-full bg-[#0d0a08] relative">
               <iframe
-                src={`${selectedView.data.url}#toolbar=0&navpanes=0`}
+                src={`${selectedView.data.url}?v=${Date.now()}#toolbar=0&navpanes=0`}
                 className="w-full h-full border-0"
                 title={selectedView.data.title}
               />

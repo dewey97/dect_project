@@ -260,13 +260,12 @@ Rules for writing and designing cases in `docs/08_CASES/`:
    - **CHỈ TIẾN HÀNH VIẾT CODE HOẶC CHỈNH SỬA FILE KHI NGƯỜI DÙNG ĐÃ CHỌN/ĐỒNG Ý (BẤM/NÓI "OKE" HOẶC CHỌN PHƯƠNG ÁN)**.
    - Không tự ý thực thi viết mã hoặc sửa file hàng loạt trước khi có phản hồi đồng ý của người dùng.
 
+---
 
+## 14. Automated LaTeX Compilation & Directory Cleanliness
 
-
-
-
-
-
-
-
-
+- Thư mục `docs/cases/case_000/documents/latex/` chỉ chứa duy nhất các file nguồn `.tex`.
+- Mọi thao tác cập nhật/chỉnh sửa `.tex` bắt buộc đi kèm tự động chạy biên dịch `pdflatex`.
+- Output `.pdf` tự động được chuyển đè vào thư mục `public/documents/case_000/<phase>/`.
+- File nhật ký biên dịch `.log` tự động gom vào `.vscode/latex_logs/`.
+- Xóa sạch các file phụ rác (`.aux`, `.out`, `.fls`, `.fdb_latexmk`) ngay sau khi biên dịch xong.

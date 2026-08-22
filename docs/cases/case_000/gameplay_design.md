@@ -50,18 +50,18 @@
 
 | Chi tiết Dữ liệu Trích xuất | Suy luận Logic Rút ra | Quyết định Gameplay |
 | :--- | :--- | :--- |
-| **Di chúc `08` (`f2-1`):** Ngày lập ghi **15/04/2018** <-> Văn bản chứa cụm từ *"Mã thửa địa chính 2021-BS14"* | Mã địa chính năm 2021 không thể tồn tại vào năm 2018 -> Khang tự tay viết chèn đè nội dung để cướp đền bù | Phát hiện hành vi làm giả di chúc của nạn nhân Khang |
-| **Kết quả giám định `09` (`f2-2`) & Lời khai `07a`:** Mực bi hóa dầu 2024 viết đè + Mai gặp Luật sư Minh lúc 19:30 | Mai phát hiện di chúc giả nên tráo di chúc gốc đem nhờ luật sư giám định hợp pháp. Mai không có động cơ giết người | **LOẠI TRỪ NGHI PHẠM TRẦN NGỌC MAI** |
-| **Bản đồ đất `10` (`f2-3`, `f2-4`) & Lời khai `07b`:** Đất gốc 75m2 + Vũ nợ Khang 350M + Vũ có Alibi nhậu từ 19:40 | Khang ép Vũ đo khống lên 120m2 rồi tống tiền. Vũ lén chui cửa sau lúc 19:30 chỉ để trộm bản vẽ 75m2 tiêu hủy gian lận | **LOẠI TRỪ NGHI PHẠM LÊ QUANG VŨ** |
+| **Di chúc `08` (`f2-1`):** Vết tẩy xóa hóa chất ở dòng tên Mai + Dòng chữ chèn đè *"Toàn quyền cho Khang"* bằng mực bi hóa dầu 2024 | Khang dùng hóa chất xóa tên Mai trên di chúc 2018 để cướp toàn bộ tiền đền bù bồi thường | Phát hiện hành vi tẩy xóa làm giả di chúc của nạn nhân Khang |
+| **Kết quả giám định `09` (`f2-2`) & Lời khai `07a`:** Soi tia hồng ngoại hiện vết tẩy + Mai gặp Luật sư Minh lúc 19:30 | Mai phát hiện di chúc bị tẩy xóa nên tráo đem nhờ luật sư giám định hợp pháp. Mai có chứng cứ ngoại phạm | **LOẠI TRỪ NGHI PHẠM TRẦN NGỌC MAI** |
+| **Bản đồ đất `10` (`f2-3`, `f2-4`) & Lời khai `07b`:** Đất gốc 75m2 + Vũ nợ Khang 350M + Vũ có chứng cứ ngoại phạm (quán nhậu 19:40-22:00) | Khang ép Vũ đo khống lên 120m2 rồi tống tiền. Vũ lén chui cửa sau lúc 19:30 chỉ để trộm bản vẽ 75m2 tiêu hủy gian lận | **LOẠI TRỪ NGHI PHẠM LÊ QUANG VŨ** |
 
 > **CÂU HỎI KEY 1 (Chuyển Giai đoạn 2):**  
-> *"Điểm bất thường nào trên tờ di chúc (08) chứng minh di chúc bị làm giả và giải thích lý do Mai cùng Vũ không phải hung thủ tại hiện trường?"*  
-> **Đáp án chuyển Phase:** Di chúc ghi lập ngày 15/04/2018 nhưng chứa từ *"Mã thửa địa chính 2021-BS14"* -> Khang tự làm giả di chúc. Mai chỉ mang di chúc đi gặp luật sư (Alibi 19:30-20:30). Vũ chỉ trộm bản vẽ 75m2 tiêu hủy gian lận (Alibi nhậu từ 19:40).
+> *"Dấu vết tẩy xóa nào trên tờ di chúc (08) chứng minh di chúc bị làm giả và giải thích lý do Mai cùng Vũ không phải hung thủ tại hiện trường?"*  
+> **Đáp án chuyển Phase:** Soi tia UV hiện vết tẩy xóa hóa chất ở tên Mai + Mực bi hóa dầu 2024 viết đè trên di chúc 2018. Mai có chứng cứ ngoại phạm tại văn phòng luật sư (19:30-20:30). Vũ có chứng cứ ngoại phạm tại quán nhậu (19:40-22:00).
 
 > **GỢI Ý DÀNH CHO CÂU HỎI KEY 1:**  
-> - **1 (-5đ):** So sánh ngày lập di chúc viết tay với mốc thời gian xuất hiện của mã địa chính ghi trong văn bản.  
-> - **2 (-10đ):** Di chúc lập năm 2018 nhưng chứa mã địa chính 2021 -> Khang làm giả di chúc. Mai mang đi nhờ luật sư giám định, Vũ có alibi nhậu từ 19:40.  
-> - **3 (-20đ):** Chọn lý do di chúc giả năm 2018/2021 và xác nhận Alibi ngoại phạm của Mai và Vũ.
+> - **1 (-5đ):** Đọc Kết quả giám định `09` để xem phân tích vết tẩy xóa hóa chất và tuổi mực bi.  
+> - **2 (-10đ):** Khang dùng hóa chất xóa tên Mai trên di chúc 2018 để cướp đền bù. Mai mang di chúc đi gặp luật sư, Vũ có chứng cứ ngoại phạm nhậu từ 19:40.  
+> - **3 (-20đ):** Chọn lý do di chúc bị tẩy xóa mực và xác nhận chứng cứ ngoại phạm vắng mặt tại hiện trường của Mai và Vũ.
 
 ---
 

@@ -3,7 +3,7 @@
 > **Cổng kích hoạt vụ án:** `TEST-99`
 > **Loại hình vụ án:** Án mạng do đâm mảnh thủy tinh vỡ, xô xát giằng co & dàn dựng hiện trường giả trong căn nhà cũ diện giải tỏa.
 > **Thời lượng trải nghiệm:** 20 - 30 phút.
-> **Cơ chế đặc trưng:** Trích xuất tin nhắn điện thoại, Khóa thiết bị Checkpoint, Báo cáo khám nghiệm 2 giai đoạn tổn thương, So khớp mâu thuẫn lời khai (Alibi Clash) & Báo cáo kết án S-Rank.
+> **Cơ chế đặc trưng:** Trích xuất tin nhắn điện thoại, Khóa thiết bị Checkpoint, Báo cáo khám nghiệm 2 giai đoạn tổn thương, Đối chất mốc giờ ngoại phạm (Time-Mismatch Clash) & Báo cáo kết án S-Rank.
 
 ---
 
@@ -11,7 +11,7 @@
 
 ### 1. Ma Trận Nghi Phạm & Lời Khai (Key Profiles)
 
-| Nhân Vật | Vai Trò | Lý Do Nghi Vấn | Lời Khai Ngoại Phạm (Alibi) & Thực Tế |
+| Nhân Vật | Vai Trò | Lý Do Nghi Vấn | Lời Khai Ngoại Phạm & Thực Tế |
 | :--- | :--- | :--- | :--- |
 | 🪦 **Nguyễn Văn Khang** | Nạn nhân | Tử vong do mảnh thủy tinh đâm đứt động mạch cổ; có vết bầm tím do xô xát. | Tử vong muộn ngày 24/07. |
 | 👩 **Trần Ngọc Mai** | Nghi phạm 1 | Em họ nạn nhân; tranh chấp di chúc thừa kế; dấu tay trên hộp sắt. | Khai rời hiện trường sớm. Đã tráo bản sao di chúc đem bản gốc đi giám định. |
@@ -27,12 +27,12 @@
                                     │
          ┌──────────────────────────┼──────────────────────────┐
          ▼                          ▼                          ▼
-  [1. Hung thủ chính]       [2. Động cơ thực sự]       [3. Alibi Clash Proof]
+  [1. Hung thủ chính]       [2. Động cơ thực sự]       [3. Bằng chứng Mâu thuẫn Mốc giờ]
      HÀ (ha)                 GHEN TUÔNG CUỒNG LOẠN      EV-GLASS-SHARD & EV-TIME-MISMATCH
 ```
 1. **Chỉ danh Hung thủ:** `ha` (Trần Thị Hà).
 2. **Xác định Động cơ:** Mâu thuẫn tình cảm / Ghen tuông cuồng loạn (`romantic-jealousy`).
-3. **Đính kèm Alibi Clash:** Báo cáo pháp y tổn thương 2 giai đoạn (`EV-GLASS-SHARD`) & Lời khai lỡ lời của Hà mô tả bộ bình trà vỡ (`EV-TIME-MISMATCH`).
+3. **Đính kèm Chứng cứ Mâu thuẫn mốc giờ ngoại phạm:** Báo cáo pháp y tổn thương 2 giai đoạn (`EV-GLASS-SHARD`) & Lời khai lỡ lời của Hà mô tả bộ bình trà vỡ (`EV-TIME-MISMATCH`).
 
 ---
 
