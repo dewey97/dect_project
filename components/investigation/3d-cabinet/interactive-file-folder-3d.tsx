@@ -21,7 +21,7 @@ export function InteractiveFileFolder3D({
 
   // Căn chỉnh khoảng cách z & y để dàn trải rộng trọn vẹn trong lòng tủ
   const spacingZ = totalFiles > 4 ? 0.36 : 0.45
-  const startZ = totalFiles > 4 ? -0.76 : -0.65
+  const startZ = totalFiles > 4 ? -0.60 : -0.50
   const startY = totalFiles > 4 ? 0.08 : 0.12
   const spacingY = totalFiles > 4 ? 0.06 : 0.08
 
@@ -155,10 +155,10 @@ export function InteractiveFileFolder3D({
 
   useFrame((_, delta) => {
     if (!folderRef.current) return
-    // Khi di chuột, bìa hồ sơ nẩy nhô hẳn lên cao y + 0.48m
-    const targetY = hovered ? startY + 0.48 : startY + idx * spacingY
-    const targetZ = hovered ? startZ + idx * spacingZ + 0.22 : startZ + idx * spacingZ
-    const targetRotX = hovered ? -0.05 : -0.22
+    // Khi di chuột, bìa hồ sơ nẩy nhô hẳn lên cao y + 0.42m trong lòng tủ
+    const targetY = hovered ? startY + 0.42 : startY + idx * spacingY
+    const targetZ = hovered ? startZ + idx * spacingZ + 0.04 : startZ + idx * spacingZ
+    const targetRotX = hovered ? -0.14 : -0.22
 
     const step = Math.min(delta * 9, 1)
     folderRef.current.position.y += (targetY - folderRef.current.position.y) * step
@@ -233,12 +233,6 @@ export function InteractiveFileFolder3D({
             roughness={0.85}
           />
         )}
-      </mesh>
-
-      {/* 4. GHIM KẸP GIẤY KIM LOẠI 3D (3D CHROME PAPERCLIP) */}
-      <mesh position={[tabX - 0.2, 0.68, 0.015]} rotation={[0, 0, Math.PI / 8]}>
-        <torusGeometry args={[0.04, 0.008, 12, 24]} />
-        <meshStandardMaterial color="#a1a1aa" metalness={0.95} roughness={0.1} />
       </mesh>
     </group>
   )

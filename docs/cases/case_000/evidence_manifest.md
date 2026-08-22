@@ -26,7 +26,7 @@
 | `f4-3` | `13_tong_hop_tin_nhan_sms_va_email.pdf` | Tổng hợp SMS, Email & Tin nhắn mới | Màn hình tin nhắn tình nhân mới lúc 20:40 đâm thẳng vào mắt Hà $\rightarrow$ Đạn kích hoạt ghen tuông | Hà | Phase 3 | [Động cơ hung thủ thực sự] | `07d` |
 | `p1` | `photo-crime-scene-overview.jpg` | Ảnh hiện trường phòng khách | Ảnh hiện trường bàn trà bị xáo trộn và bộ bình trà bị đập vỡ | Khang, Tùng | Phase 0 | [Vật chứng hiện trường] | `f1-2` |
 | `p3` | `photo-glass-shard-detail.jpg` | Ảnh mảnh thủy tinh sắc nhọn dính máu | Mảnh vỡ bình trà sắc nhọn 8cm dính máu khô và dấu vân tay miết (Hung khí thực sự) | Hà | Phase 0/3 | [Hung khí vụ án] | `f1-1`, `f4-1` |
-| `p4` | `photo-childhood-group.jpg` | Ảnh kỷ niệm 4 đứa trẻ năm 1998 | Ảnh chụp Khang, Tùng, Hà, Gia Huy trước căn nhà cổ Bờ Sông | Tùng, Hà, Khang | Phase 2 | [Kỷ vật quá khứ] | `n3` |
+| `p4` | `photo-childhood-group-broken.jpg` | Khung ảnh 4 đứa trẻ bị đập vỡ | Khung gỗ nứt rạn mặt kính chứa bức ảnh được cho là Cụ Thành bế Khang chụp cùng những đứa trẻ hàng xóm năm 1998 | Tùng, Hà, Khang | Phase 0/2 | [Dấu vết xáo trộn & Ẩn số danh tính những đứa trẻ hàng xóm] | `f1-2`, `n3` |
 | `p5` | `photo-old-newspaper.jpg` | Bài báo cũ năm 1998 | Bài báo cắt về vụ tai nạn ngạt khí tủ âm tường của bé trai 8 tuổi | Tùng, Khang | Phase 2 | [Hồ sơ vụ tai nạn] | `p4` |
 | `p6` | `photo-messages-cheating.jpg` | Ảnh tin nhắn điện thoại Khang | Ảnh màn hình tin nhắn tình nhân mới hẹn đi du lịch đền bù lúc 20:40 | Hà | Phase 3 | [Bằng chứng ghen tuông] | `f4-3` |
 

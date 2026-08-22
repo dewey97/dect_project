@@ -36,7 +36,6 @@ import {
   LogIn,
   ShoppingCart,
   Search,
-  Palette,
   ChevronLeft,
   ChevronRight,
   Sparkles
@@ -50,25 +49,7 @@ export default function MarketingLandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [activeShowcase, setActiveShowcase] = useState<'dossier' | 'phone' | 'key'>('dossier')
   const [activeCategory, setActiveCategory] = useState<'single' | 'combo' | 'accessories'>('single')
-  const [theme, setTheme] = useState<'noir' | 'cyber' | 'federal' | 'sepia' | 'crimson'>('noir')
-  const [showThemeSelector, setShowThemeSelector] = useState(false)
-  const [activeRule, setActiveRule] = useState<'means' | 'motive' | 'opportunity'>('means')
-  const [showEvidenceStamp, setShowEvidenceStamp] = useState(false)
-  const [hoveredFolder, setHoveredFolder] = useState<number>(0)
-  const [activePoster, setActivePoster] = useState<number>(1) // Default to center poster
 
-
-  // Apply theme to document element
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-    const root = document.documentElement
-    // Remove all possible themes
-    root.classList.remove('theme-cyber', 'theme-federal', 'theme-sepia', 'theme-crimson')
-    // Add active theme class (except default 'noir')
-    if (theme !== 'noir') {
-      root.classList.add(`theme-${theme}`)
-    }
-  }, [theme])
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index)
@@ -203,7 +184,7 @@ export default function MarketingLandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-2">
               <Button
-                onClick={() => router.push('/activate')}
+                onClick={() => router.push('/cabinet-demo')}
                 size="lg"
                 className="h-12 px-6 font-mono text-xs font-bold uppercase tracking-widest transition-transform active:scale-[0.98]"
               >
@@ -960,53 +941,7 @@ export default function MarketingLandingPage() {
         </div>
       </footer>
 
-      {/* FLOATING CONTROL PANELS */}
-      <div className="fixed bottom-6 right-6 z-[9999] pointer-events-auto font-mono text-[0.6rem] flex flex-col items-end gap-2.5">
-        {/* Toggle options popover */}
-        {showThemeSelector && (
-          <div className="bg-card/95 backdrop-blur-md border border-primary/30 rounded-lg p-3 shadow-[0_4px_24px_rgba(0,0,0,0.5)] flex flex-col gap-1.5 w-44 animate-fade-slide-up">
-            <span className="text-primary font-bold uppercase tracking-wider block border-b border-border/10 pb-1 mb-1 text-center text-[0.55rem]">
-              STYLE BỘ NHẬN DIỆN
-            </span>
-            {[
-              { id: 'noir' as const, label: 'Classic Noir', desc: 'Mặc định thám tử' },
-              { id: 'cyber' as const, label: 'Neon Cyber', desc: 'Hacker tương lai' },
-              { id: 'federal' as const, label: 'Federal Navy', desc: 'FBI chính thống' },
-              { id: 'sepia' as const, label: 'Vintage Sepia', desc: 'Hồ sơ hoài cổ' },
-              { id: 'crimson' as const, label: 'Crimson Forensic', desc: 'Hồ sơ đỏ cấp mật' },
-            ].map((t) => (
-              <button
-                key={t.id}
-                onClick={() => {
-                  setTheme(t.id)
-                  setShowThemeSelector(false)
-                }}
-                className={cn(
-                  "w-full text-left px-2 py-1.5 rounded transition-all cursor-pointer flex flex-col border",
-                  theme === t.id
-                    ? "bg-primary/20 text-primary border-primary/40 font-bold"
-                    : "bg-transparent text-muted-foreground border-transparent hover:bg-muted/10 hover:text-foreground"
-                )}
-              >
-                <span className="text-[0.65rem]">{t.label}</span>
-                <span className="text-[0.5rem] opacity-75">{t.desc}</span>
-              </button>
-            ))}
-          </div>
-        )}
 
-        {/* Circular Floating Button */}
-        <button
-          onClick={() => setShowThemeSelector(!showThemeSelector)}
-          className={cn(
-            "w-10 h-10 rounded-full flex items-center justify-center border text-muted-foreground shadow-lg hover:text-foreground transition-all cursor-pointer bg-card/90 backdrop-blur-md",
-            showThemeSelector ? "border-primary text-primary" : "border-border/60"
-          )}
-          title="Chọn style bộ nhận diện"
-        >
-          <Palette className="size-4.5" />
-        </button>
-      </div>
 
     </main>
   )
