@@ -5,6 +5,7 @@ class DetectiveAudioSynth {
   private ctx: AudioContext | null = null
   private rainNode: AudioBufferSourceNode | null = null
   private rainGainNode: GainNode | null = null
+  private dropletTimer: ReturnType<typeof setTimeout> | null = null
   public isMuted: boolean = false
   public isRainPlaying: boolean = false
 
@@ -30,6 +31,45 @@ class DetectiveAudioSynth {
       this.startRainSound()
     }
     return this.isMuted
+  }
+
+  public playSingleDroplet() {
+    if (this.isMuted) return
+    const ctx = this.getContext()
+    if (!ctx) return
+
+    try {
+      const now = ctx.currentTime
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+
+      // High pitched droplet 'tí tách' sound
+      const startFreq = 1800 + Math.random() * 1600
+      const endFreq = 600 + Math.random() * 400
+
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(startFreq, now)
+      osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.025)
+
+      const vol = 0.015 + Math.random() * 0.025
+      gain.gain.setValueAtTime(vol, now)
+      gain.gain.exponentialRampToValueAtTime(0.0005, now + 0.028)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+
+      osc.start(now)
+      osc.stop(now + 0.03)
+    } catch {}
+  }
+
+  private scheduleNextDroplet() {
+    if (!this.isRainPlaying || this.isMuted) return
+    const delay = 1200 + Math.random() * 2800
+    this.dropletTimer = setTimeout(() => {
+      this.playSingleDroplet()
+      this.scheduleNextDroplet()
+    }, delay)
   }
 
   public startRainSound() {
@@ -65,6 +105,8 @@ class DetectiveAudioSynth {
       this.rainNode = whiteNoise
       this.rainGainNode = gain
       this.isRainPlaying = true
+
+      this.scheduleNextDroplet()
     } catch {}
   }
 
@@ -75,6 +117,10 @@ class DetectiveAudioSynth {
         this.rainNode.disconnect()
       } catch {}
       this.rainNode = null
+    }
+    if (this.dropletTimer) {
+      clearTimeout(this.dropletTimer)
+      this.dropletTimer = null
     }
     this.isRainPlaying = false
   }
@@ -219,6 +265,42 @@ class DetectiveAudioSynth {
         osc.start(now + idx * 0.1)
         osc.stop(now + idx * 0.1 + 0.32)
       })
+    } catch {}
+  }
+
+  // Paper Rustle / Book Page Flip Sound Effect
+  public playPaperRustle() {
+    if (this.isMuted) return
+    const ctx = this.getContext()
+    if (!ctx) return
+
+    try {
+      const now = ctx.currentTime
+      const bufferSize = ctx.sampleRate * 0.15 // 150ms
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
+      const data = buffer.getChannelData(0)
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1
+      }
+
+      const noise = ctx.createBufferSource()
+      noise.buffer = buffer
+
+      const filter = ctx.createBiquadFilter()
+      filter.type = 'bandpass'
+      filter.frequency.setValueAtTime(1200, now)
+      filter.Q.setValueAtTime(3, now)
+
+      const gain = ctx.createGain()
+      gain.gain.setValueAtTime(0.08, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14)
+
+      noise.connect(filter)
+      filter.connect(gain)
+      gain.connect(ctx.destination)
+
+      noise.start(now)
+      noise.stop(now + 0.15)
     } catch {}
   }
 }

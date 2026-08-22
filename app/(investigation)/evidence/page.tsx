@@ -12,9 +12,12 @@ import { cn } from '@/lib/utils'
 import type { PDFDocument, PhysicalEvidence, SelectedView, CombinedItem } from '@/components/investigation/evidence/evidence-types'
 import { CASE_000_PDFS, CASE_000_EVIDENCE } from '@/components/investigation/evidence/evidence-data'
 import { CASE_000_NARRATOR } from '@/content/cases/case-000/narrator'
+import { CASE_000_FINDINGS, Finding } from '@/content/cases/case-000/findings'
 import { TypewriterNarrator } from '@/components/investigation/evidence/typewriter-narrator'
 import { PhaseUnlockedModal, UnlockedModalData } from '@/components/investigation/evidence/phase-unlocked-modal'
+import { DetectiveJournalDrawer } from '@/components/investigation/evidence/detective-journal-drawer'
 import { CaseCheckpointsSection } from '@/components/investigation/evidence/case-checkpoints-section'
+import { InvestigationModeModal, InvestigationMode } from '@/components/investigation/evidence/investigation-mode-modal'
 import { EvidenceDetailInspector } from '@/components/investigation/evidence/evidence-detail-inspector'
 
 export default function EvidencePage() {
@@ -23,6 +26,39 @@ export default function EvidencePage() {
   
   // Audio Mute State
   const [isAudioMuted, setIsAudioMuted] = useState(detectiveAudio.isMuted)
+
+  // Discovered Findings State
+  const [discoveredFindingIds, setDiscoveredFindingIds] = useState<string[]>([])
+
+  // Investigation Game Mode State ('casual' | 'hardcore' | null)
+  const [investigationMode, setInvestigationMode] = useState<InvestigationMode | null>(null)
+  const [isModeModalOpen, setIsModeModalOpen] = useState(false)
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('veritas_discovered_findings')
+      if (saved) {
+        setDiscoveredFindingIds(JSON.parse(saved))
+      }
+
+      const savedMode = localStorage.getItem('veritas_investigation_mode') as InvestigationMode | null
+      if (savedMode) {
+        setInvestigationMode(savedMode)
+      } else {
+        setIsModeModalOpen(true)
+      }
+    } catch {
+      setIsModeModalOpen(true)
+    }
+  }, [])
+
+  const handleSelectMode = (mode: InvestigationMode) => {
+    setInvestigationMode(mode)
+    setIsModeModalOpen(false)
+    try {
+      localStorage.setItem('veritas_investigation_mode', mode)
+    } catch {}
+  }
 
   // Checkpoint questions state
   const [checkpoints, setCheckpoints] = useState(checkpoints000)
@@ -104,6 +140,47 @@ export default function EvidencePage() {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setIsMobilePdfOpen(false)
     }
+  }
+
+  const currentPhaseIndex = completedCheckpointIds.length // 0, 1, 2, 3
+
+  const handleFindingDiscovered = (finding: Finding) => {
+    setDiscoveredFindingIds((prev) => {
+      if (prev.includes(finding.id)) return prev
+      const next = [...prev, finding.id]
+      try {
+        localStorage.setItem('veritas_discovered_findings', JSON.stringify(next))
+      } catch {}
+
+      // If this is a KEY FINDING for the current active phase, trigger phase advancement!
+      if (finding.isKeyFinding && finding.phase === currentPhaseIndex) {
+        const cpId = `cp-000-${finding.phase}`
+        completeCheckpoint(cpId)
+
+        const nextPhase = finding.phase + 1
+        if (nextPhase <= 3) {
+          setTimeout(() => {
+            const newPdfs = CASE_000_PDFS.filter((d) => d.phase === nextPhase)
+            const newEvidence = CASE_000_EVIDENCE.filter((e) => e.phase === nextPhase)
+            setUnlockedModalData({
+              unlockedPhase: nextPhase,
+              newPdfs,
+              newEvidence
+            })
+          }, 800)
+        }
+      }
+
+      return next
+    })
+  }
+
+  const resetFindingsProgress = () => {
+    try {
+      localStorage.removeItem('veritas_discovered_findings')
+      localStorage.removeItem('veritas_completed_checkpoints')
+      window.location.reload()
+    } catch {}
   }
 
   const unlockNextHint = (cpId: string, maxHints: number) => {
@@ -202,6 +279,15 @@ export default function EvidencePage() {
               </div>
 
               <div className="flex items-center gap-2 sm:self-start">
+                <button
+                  type="button"
+                  onClick={() => setIsModeModalOpen(true)}
+                  className="px-2 py-1 bg-[#18120c] hover:bg-[#342417] border border-[#3e2e20] text-[0.6rem] font-mono font-bold text-[#d9a066] transition-colors cursor-pointer flex items-center gap-1"
+                  title="Đổi chế độ điều tra"
+                >
+                  <span>{investigationMode === 'hardcore' ? '🔴 THÁM TỬ THÂM NIÊN' : '🟢 CHẾ ĐỘ TẬP SỰ'}</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setIsAudioMuted(detectiveAudio.toggleMute())}
@@ -411,24 +497,43 @@ export default function EvidencePage() {
               </div>
             </section>
 
-            {/* CHECKPOINTS SECTION */}
-            <CaseCheckpointsSection
-              checkpoints={checkpoints}
-              completedCheckpointIds={completedCheckpointIds}
-              selectedAnswers={selectedAnswers}
-              checkpointErrors={checkpointErrors}
-              checkpointSuccesses={checkpointSuccesses}
-              unlockedHintLevel={unlockedHintLevel}
-              onAnswerSelect={handleAnswerSelect}
-              onSubmitAnswer={handleSubmitAnswer}
-              onUnlockNextHint={unlockNextHint}
-            />
+            {/* CASUAL MODE: INLINE CHECKPOINT QUESTIONS */}
+            {investigationMode === 'casual' && (
+              <CaseCheckpointsSection
+                checkpoints={checkpoints}
+                completedCheckpointIds={completedCheckpointIds}
+                selectedAnswers={selectedAnswers}
+                checkpointErrors={checkpointErrors}
+                checkpointSuccesses={checkpointSuccesses}
+                unlockedHintLevel={unlockedHintLevel}
+                onAnswerSelect={handleAnswerSelect}
+                onSubmitAnswer={handleSubmitAnswer}
+                onUnlockNextHint={unlockNextHint}
+              />
+            )}
           </div>
         </div>
 
         {/* RIGHT COLUMN: EVIDENCE DETAIL INSPECTOR */}
         <EvidenceDetailInspector selectedView={selectedView} />
       </div>
+
+      {/* HARDCORE MODE: FLOATING DETECTIVE LEATHER JOURNAL DRAWER */}
+      {investigationMode === 'hardcore' && (
+        <DetectiveJournalDrawer
+          currentPhase={currentPhaseIndex > 3 ? 3 : currentPhaseIndex}
+          allFindings={CASE_000_FINDINGS}
+          discoveredFindingIds={discoveredFindingIds}
+          onFindingDiscovered={handleFindingDiscovered}
+          onResetProgress={resetFindingsProgress}
+        />
+      )}
+
+      {/* INITIAL INVESTIGATION MODE SELECTION MODAL */}
+      <InvestigationModeModal
+        isOpen={isModeModalOpen}
+        onSelectMode={handleSelectMode}
+      />
 
       {/* MOBILE FULL SCREEN PDF MODAL */}
       <PDFViewerModal
