@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { DbCase, CaseStatus } from '@/lib/types/database'
 import { revalidatePath } from 'next/cache'
 

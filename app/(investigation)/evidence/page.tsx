@@ -19,6 +19,7 @@ import { DetectiveJournalDrawer } from '@/components/investigation/evidence/dete
 import { CaseCheckpointsSection } from '@/components/investigation/evidence/case-checkpoints-section'
 import { InvestigationModeModal, InvestigationMode } from '@/components/investigation/evidence/investigation-mode-modal'
 import { EvidenceDetailInspector } from '@/components/investigation/evidence/evidence-detail-inspector'
+import { EpilogueModal } from '@/components/investigation/epilogue-modal'
 
 export default function EvidencePage() {
   const activeCase = CASES.find((c) => c.id === 'case-000')
@@ -50,6 +51,10 @@ export default function EvidencePage() {
     } catch {
       setIsModeModalOpen(true)
     }
+
+    const handleOpenEpilogue = () => setIsEpilogueOpen(true)
+    window.addEventListener('open-epilogue-modal', handleOpenEpilogue)
+    return () => window.removeEventListener('open-epilogue-modal', handleOpenEpilogue)
   }, [])
 
   const handleSelectMode = (mode: InvestigationMode) => {
@@ -84,23 +89,18 @@ export default function EvidencePage() {
   // Phase filter: 'all' | 0 | 1 | 2 | 3
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<'all' | number>('all')
 
-  // Unlocked Modal state
-  const [unlockedModalData, setUnlockedModalData] = useState<UnlockedModalData | null>(null)
+  // Unlocked Modal state - Initialized immediately for Phase 0 to avoid 1s delay
+  const [unlockedModalData, setUnlockedModalData] = useState<UnlockedModalData | null>(() => {
+    return {
+      unlockedPhase: 0,
+      newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
+      newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
+    }
+  })
 
   useEffect(() => {
     if (checkpoints000 && checkpoints000.length > 0) {
       setCheckpoints(checkpoints000)
-    }
-
-    // On initial start or reset (Phase 0), open the unified PhaseUnlockedModal for Phase 0
-    if (completedCheckpointIds.length === 0) {
-      const initialPdfs = CASE_000_PDFS.filter((d) => d.phase === 0)
-      const initialEvidence = CASE_000_EVIDENCE.filter((e) => e.phase === 0)
-      setUnlockedModalData({
-        unlockedPhase: 0,
-        newPdfs: initialPdfs,
-        newEvidence: initialEvidence
-      })
     }
 
     const handleFirstUserInteraction = () => {
@@ -226,6 +226,9 @@ export default function EvidencePage() {
             newPdfs,
             newEvidence
           })
+        } else if (cp.id === 'cp-000-3') {
+          // Final checkpoint cp-000-3 completed! Immediately trigger Epilogue Stories modal
+          setIsEpilogueOpen(true)
         }
       }, 1000)
     } else {
@@ -233,6 +236,9 @@ export default function EvidencePage() {
       setCheckpointErrors((prev) => ({ ...prev, [cp.id]: true }))
     }
   }
+
+  // Epilogue Modal state when case is fully solved
+  const [isEpilogueOpen, setIsEpilogueOpen] = useState(false)
 
   // State controlling whether the narrative monologue is visible on main page
   const [showMainNarrator, setShowMainNarrator] = useState(true)
@@ -285,7 +291,7 @@ export default function EvidencePage() {
                   className="px-2 py-1 bg-[#18120c] hover:bg-[#342417] border border-[#3e2e20] text-[0.6rem] font-mono font-bold text-[#d9a066] transition-colors cursor-pointer flex items-center gap-1"
                   title="Đổi chế độ điều tra"
                 >
-                  <span>{investigationMode === 'hardcore' ? '🔴 THÁM TỬ THÂM NIÊN' : '🟢 CHẾ ĐỘ TẬP SỰ'}</span>
+                  <span>{investigationMode === 'hardcore' ? 'THÂM NIÊN' : 'TẬP SỰ'}</span>
                 </button>
 
                 <button
@@ -296,9 +302,6 @@ export default function EvidencePage() {
                 >
                   {isAudioMuted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
                 </button>
-                <div className="inline-flex border-2 border-red-800 text-red-700 bg-red-950/20 font-mono text-[0.65rem] uppercase tracking-widest px-2.5 py-1 rotate-[-3deg] rounded font-black shadow-sm shrink-0 select-none">
-                  🔴 BẢO MẬT HỒ SƠ
-                </div>
               </div>
             </div>
 
@@ -315,7 +318,7 @@ export default function EvidencePage() {
                   <div className="flex items-center gap-2">
                     <Paperclip className="size-4 text-[#d9a066]" />
                     <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#e6d3c1]">
-                      DANH MỤC HỒ SƠ & TANG CHỨNG THEO GIAI ĐOẠN
+                      DANH MỤC HỒ SƠ & TANG CHỨNG
                     </h2>
                   </div>
 
@@ -553,6 +556,12 @@ export default function EvidencePage() {
         onSelectPdf={handleSelectPdf}
         onSelectEvidence={handleSelectEvidence}
         onSetPhaseFilter={(phase) => setSelectedPhaseFilter(phase)}
+      />
+
+      {/* POST-CASE EPILOGUE STORIES MODAL */}
+      <EpilogueModal
+        isOpen={isEpilogueOpen}
+        onClose={() => setIsEpilogueOpen(false)}
       />
     </div>
   )

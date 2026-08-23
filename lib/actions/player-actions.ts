@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { DbProfile } from '@/lib/types/database'
 
 export async function getPlayers() {

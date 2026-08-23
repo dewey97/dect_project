@@ -21,3 +21,5 @@ node_modules
 *.synctex*
 *.fls
 *.fdb_latexmk
+build_log.txt
+*.tsbuildinfo

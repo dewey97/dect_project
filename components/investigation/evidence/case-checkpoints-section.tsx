@@ -61,22 +61,38 @@ export function CaseCheckpointsSection({
       </div>
 
       {isAllCompleted ? (
-        <div className="p-6 bg-[#1b261b] border border-emerald-800/60 rounded-none text-center space-y-3 shadow-md">
-          <div className="size-12 rounded-full bg-emerald-950 border border-emerald-700 text-emerald-400 mx-auto flex items-center justify-center">
-            <CheckCircle2 className="size-6" />
-          </div>
-          <h3 className="font-serif text-lg font-bold text-emerald-300 uppercase tracking-tight">
-            ĐÃ HOÀN THÀNH TẤT CẢ KẾT LUẬN CHUYÊN ÁN
-          </h3>
-          <p className="text-xs text-[#d4c3b3] max-w-md mx-auto leading-relaxed">
-            Chúc mừng điều tra viên! Bạn đã bóc tách toàn bộ mâu thuẫn, đối soát tang chứng và đưa ra đáp án chính xác phá giải vụ án Trốn Tìm.
+        <div className="p-5 bg-[#14100c] border border-[#3e2e20] rounded-none space-y-4 shadow-md">
+          <p className="text-xs text-[#ad9885] font-serif leading-relaxed">
+            Toàn bộ mâu thuẫn mốc giờ và tang chứng đã được bóc tách hoàn toàn. Bạn có thể xem lại ký sự hậu án hoặc tiến hành thực hiện lại chuyên án.
           </p>
-          <button
-            onClick={resetProgress}
-            className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-xs font-bold rounded-none transition-all cursor-pointer shadow-md"
-          >
-            🔄 THỰC HIỆN LẠI CHUYÊN ÁN
-          </button>
+
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <button
+              onClick={() => {
+                // Dispatch event or reload to open Epilogue Modal
+                try {
+                  window.dispatchEvent(new CustomEvent('open-epilogue-modal'))
+                } catch {}
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-xs font-bold rounded-none transition-all cursor-pointer shadow-md"
+            >
+              📖 ĐỌC KÝ SỰ HẬU ÁN
+            </button>
+
+            <button
+              onClick={resetProgress}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#261d15] hover:bg-[#382b1f] text-[#d9a066] border border-[#4a3a2c] font-mono text-xs font-bold rounded-none transition-all cursor-pointer"
+            >
+              🔄 PHÁ ÁN LẠI (RESET)
+            </button>
+
+            <a
+              href="/"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#17130f] hover:bg-[#211b15] text-zinc-400 hover:text-zinc-200 border border-[#2e241a] font-mono text-xs font-bold rounded-none transition-all ml-auto"
+            >
+              🚪 THOÁT VỀ TRANG CHỦ
+            </a>
+          </div>
         </div>
       ) : currentCp ? (
         (() => {

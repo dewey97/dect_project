@@ -14,28 +14,32 @@
 * `f1-1`: Báo cáo khám nghiệm tử thi sơ bộ (`01_bao_cao_kham_nghiem_tu_thi.pdf`)
 * `f1-2`: Biên bản khám nghiệm hiện trường (`02_bien_ban_kham_nghiem_hien_truong.pdf`)
 * `f1-3`: Báo cáo tiến độ điều tra ban đầu (`03_bao_cao_tien_do_dieu_tra.pdf`)
-* `f1-4`: Báo cáo xác minh nhân thân Khang (`04_bao_cao_xac_minh_nhan_than_khang.pdf`)
-* `f1-5`: Ma trận mâu thuẫn nghi phạm (`05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf`)
+* `f1-4a`: Báo cáo xác minh nhân thân Khang (`04_bao_cao_xac_minh_nhan_than_khang.pdf`)
+* `f1-4b`: Báo cáo rà soát sơ yếu lý lịch người liên quan (`04b_bao_cao_ra_soat_ly_lich_nghi_pham.pdf`)
+* `08-tx`: Báo cáo trích xuất tin nhắn điện thoại Khang (`08_trich_xuat_tin_nhan_dieu_tra_ban_dau.pdf`)
+* `f1-5`: Báo cáo chuyên đề mâu thuẫn nghi phạm (`05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf`)
 * `f1-6`: Biên bản lời khai hàng xóm (`06_bien_ban_lay_loi_khai_hang_xom.pdf`)
 * `07a` – `07d`: 04 Biên bản lời khai nghi phạm riêng biệt sau khi triệu tập (Mai, Vũ, Tùng, Hà)
+* `p2`: Ảnh hiện trường các giấy tờ & ảnh kỷ niệm văng vãi dưới sàn phòng khách (`photo_scattered_docs.jpg`)
 
 #### 2. Bảng Ma Trận Suy Luận Giai Đoạn 0
 
 | Chi tiết Dữ liệu Trích xuất | Suy luận Logic Rút ra | Quyết định Gameplay |
 | :--- | :--- | :--- |
 | **Báo cáo tử thi `01` (`f1-1`):** Vết bầm chẩm gáy 6x4cm + Vết đâm cổ 3.5cm đứt động mạch cảnh | Nạn nhân chịu 2 tác động cơ học khác nhau: Cú va đập ngất tạm thời + Vết đâm đứt động mạch tử vong | Phân lập 2 giai đoạn tổn thương riêng biệt trên thi thể |
-| **Biên bản hiện trường `02` (`f1-2`):** Bộ bình trà bị đập vỡ vụn dưới sàn + Cửa sau bị bật chốt | Hiện trường từng xảy ra xô xát gây vỡ đồ thủy tinh + Có dấu vết đột nhập qua cửa sau | Đặt nghi vấn về vụ xô xát vật lý tại phòng khách |
-| **Báo cáo nhân thân `04` & Ma trận `05` (`f1-4`, `f1-5`):** Khang bốc đồng, mâu thuẫn đất đai & tống tiền | Khoanh vùng 04 đối tượng có động cơ gay gắt với nạn nhân Khang | Lập kế hoạch triệu tập 04 nghi phạm: Mai, Vũ, Tùng, Hà |
+| **Biên bản hiện trường `02` (`f1-2`) & Ảnh `p2`:** Bộ bình trà bị đập vỡ vụn dưới sàn + Cửa sau bị bật chốt + Giấy tờ & ảnh văng vãi | Hiện trường từng xảy ra xô xát gây vỡ đồ thủy tinh + Có dấu vết đột nhập qua cửa sau | Đặt nghi vấn về vụ xô xát vật lý tại phòng khách |
+| **Báo cáo nhân thân `04a`, `04b` & Tin nhắn `08`:** Khang cho vay bốc họ; Tin nhắn khất nợ từ số máy `0985.xxx.341` bị đe dọa mang giấy tờ sang | Soi danh bạ `04b`: Số `0985.xxx.341` thuộc sở hữu của Lê Quang Vũ -> Vũ bị Khang khống chế nợ nần bí mật giấu Mai | Khoanh vùng mâu thuẫn tiền bạc giấu giếm của Lê Quang Vũ |
+| **Biên bản lời khai Mai `07a` & Vũ `07b`:** Hai vợ chồng đi chung xe máy sang lúc 18:30; Vũ bảo Mai đi xe về trước lúc 19:00 vì "có bạn đi ô tô qua đón đi nhậu" | Vũ cố tình cho vợ về trước để tạo khoảng trống từ 19:00 - 19:40 lén chui cửa sau nhà Khang lúc 19:30 tìm giấy nợ | Khoanh vùng mốc giờ bất minh của Vũ trước khi ra quán nhậu |
 | **Biên bản lời khai Hà `07d`:** Khai ở nhà cả tối + "Bán đứng" Tùng (*"Dạo này tôi thấy Tùng lảng vảng..."*) + **Lỡ lời nhắc đến bình trà vỡ** | Hà cố tình hướng điều tra sang Tùng. Chi tiết "bình trà vỡ" là hạt giống mâu thuẫn được gieo từ đầu. | Ghi nhận lời khai Hà làm manh mối ẩn cho Phase 3 |
 
 > **CÂU HỎI KEY 0 (Chuyển Giai đoạn 1):**  
-> *"Dựa trên báo cáo tử thi và hiện trường sơ bộ, hãy xác định 2 tổn thương trên thi thể nạn nhân và danh sách 4 đối tượng được đề xuất triệu tập làm rõ?"*  
-> **Đáp án chuyển Phase:** 2 tổn thương (bầm gáy ngất tạm thời & đứt động mạch cảnh mất máu) + 4 đối tượng triệu tập (Mai, Vũ, Tùng, Hà).
+> *"Dựa trên việc đối chiếu Biên bản khám nghiệm hiện trường (`02`), Lời khai hàng xóm (`06`) và Báo cáo trích xuất tin nhắn (`08`): Sự kiện bất thường nào đã xảy ra tại phòng khách lúc khoảng 20:00, và danh sách các nghi phạm có mâu thuẫn gay gắt cần phải triệu tập ngay gồm những ai?"*  
+> **Đáp án chuyển Phase:** Xảy ra vụ xô xát giằng co gây vỡ bộ bình trà (hàng xóm nghe tiếng vỡ xoảng lúc >20:00) khiến nạn nhân va đập chẩm gáy + Các nghi phạm triệu tập (Trần Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà).
 
 > **GỢI Ý DÀNH CHO CÂU HỎI KEY 0:**  
-> - **1 (-5đ):** Đọc Báo cáo chuyên đề `05` (`f1-5`) để xem ma trận 4 mối quan hệ mâu thuẫn xung quanh nạn nhân.  
-> - **2 (-10đ):** Phân lập mâu thuẫn thành 2 nhóm lớn: Mâu thuẫn tài sản gia đình (Mai/Vũ) và Mâu thuẫn cá nhân quá khứ/tình cảm (Tùng/Hà).  
-> - **3 (-20đ):** Xác nhận đủ 4 đối tượng triệu tập: Trần Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà.
+> - **1 (-5đ):** Đối chiếu thời gian nghe thấy tiếng đồ gốm/thủy tinh vỡ trong Lời khai hàng xóm `06` với vật chứng bộ bình trà bị đập vỡ trong Biên bản hiện trường `02`.  
+> - **2 (-10đ):** Đọc Báo cáo trích xuất tin nhắn `08` kết hợp Báo cáo chuyên đề `05` để khoanh vùng tất cả các đối tượng có tranh chấp nhà đất, nợ nần, quá khứ hoặc ghen tuông với nạn nhân.  
+> - **3 (-20đ):** Xác nhận sự kiện xô xát làm vỡ bình trà lúc ~20:00 và triệu tập đủ các nghi phạm: Trần Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà.
 
 ---
 
@@ -53,16 +57,16 @@
 | :--- | :--- | :--- |
 | **Di chúc `08` (`f2-1`):** Vết tẩy xóa hóa chất ở dòng tên Mai + Dòng chữ chèn đè *"Toàn quyền cho Khang"* bằng mực bi dầu 2024 | Khang dùng hóa chất xóa tên Mai trên di chúc 2018 để cướp toàn bộ tiền đền bù bồi thường | Phát hiện hành vi tẩy xóa làm giả di chúc của nạn nhân Khang |
 | **Kết quả giám định `09` (`f2-2`) & Lời khai `07a`:** Soi hồng ngoại hiện vết tẩy + Mai gặp Luật sư Minh lúc 19:30 | Mai phát hiện di chúc bị tẩy xóa nên lén tráo di chúc gốc đem nhờ luật sư giám định hợp pháp. Mai có chứng cứ ngoại phạm | **LOẠI TRỪ NGHI PHẠM TRẦN NGỌC MAI** |
-| **Bản đồ đất `10` (`f2-3`, `f2-4`) & Lời khai `07b`:** Đất gốc 75m2 + Vũ nợ Khang 350M + Vũ nhậu từ 19:40-22:00 | Khang ép Vũ đo khống lên 120m2 rồi tống tiền. Vũ lén chui cửa sau lúc 19:30 chỉ để trộm bản vẽ 75m2 tiêu hủy gian lận | **LOẠI TRỪ NGHI PHẠM LÊ QUANG VŨ** |
+| **Bản đồ đất `10` (`f2-3`, `f2-4`) <-> Lời khai `07b`:** Bản gốc địa chính chỉ có 75m2 nhưng bản vẽ đo đạc mới bị phình lên 120m2 do chính KTV Lê Quang Vũ ký tên | Vũ nợ bốc họ Khang 350M bí mật (giấu Mai). Khang đe dọa méc Mai nên Vũ buộc phải dùng chuyên môn đo đạc làm giả bản vẽ 120m2 cho Khang để trừ nợ. Vũ lén chui cửa sau lúc 19:30 tìm giấy nợ tiêu hủy. | **LOẠI TRỪ NGHI PHẠM LÊ QUANG VŨ** |
 
 > **CÂU HỎI KEY 1 (Chuyển Giai đoạn 2):**  
-> *"Dấu vết tẩy xóa nào trên tờ di chúc (08) chứng minh di chúc bị làm giả và giải thích lý do Mai cùng Vũ không phải hung thủ tại hiện trường?"*  
-> **Đáp án chuyển Phase:** Soi tia UV hiện vết tẩy xóa hóa chất ở tên Mai + Mực bi dầu 2024 viết đè trên di chúc 2018. Mai có chứng cứ ngoại phạm tại văn phòng luật sư (19:30-20:30). Vũ có chứng cứ ngoại phạm tại quán nhậu (19:40-22:00).
+> *"Dựa trên việc đối chiếu Kết quả giám định di chúc (`09`), Bản đồ địa chính đất (`10`) và Báo cáo rà soát lý lịch (`04b`): Bằng chứng nào xác nhận di chúc bị Khang làm giả, và động cơ thực sự nào giải thích việc Lê Quang Vũ tiếp tay vẽ khống diện tích đất 120m2 cho Khang?"*  
+> **Đáp án chuyển Phase:** Vết tẩy xóa hóa chất tên Mai trên di chúc bị viết đè mực bi dầu 2024. Vũ bị Khang dùng khoản nợ bốc họ 350M bí mật (giấu Mai) đe dọa nên buộc phải dùng chuyên môn đo đạc làm giả bản vẽ 120m2 cho Khang để xóa nợ.
 
 > **GỢI Ý DÀNH CHO CÂU HỎI KEY 1:**  
-> - **1 (-5đ):** Đọc Kết quả giám định `09` để xem phân tích vết tẩy xóa hóa chất và tuổi mực bi.  
-> - **2 (-10đ):** Khang dùng hóa chất xóa tên Mai trên di chúc 2018 để cướp đền bù. Mai mang di chúc đi gặp luật sư, Vũ có chứng cứ ngoại phạm nhậu từ 19:40.  
-> - **3 (-20đ):** Chọn lý do di chúc bị tẩy xóa mực và xác nhận chứng cứ ngoại phạm vắng mặt tại hiện trường của Mai và Vũ.
+> - **1 (-5đ):** Đọc Kết quả giám định `09` để xem kỹ thuật soi tia hồng ngoại phát hiện vết tẩy xóa tên Mai và mực bi dầu 2024 viết đè.  
+> - **2 (-10đ):** So sánh số điện thoại sim rác `0985.xxx.341` trong Báo cáo `04b` với các tin nhắn khất nợ đe dọa trong Trích xuất SMS `08`.  
+> - **3 (-20đ):** Di chúc bị Khang xóa tên Mai. Vũ bị Khang dùng khoản nợ bốc họ 350M bí mật đe dọa ép phải dùng chuyên môn đo đạc làm giả bản vẽ 120m2 cho Khang để trừ nợ.
 
 ---
 
@@ -78,20 +82,31 @@
 
 | Chi tiết Dữ liệu Trích xuất | Suy luận Logic Rút ra | Quyết định Gameplay |
 | :--- | :--- | :--- |
-| **Bài báo `p5` & Mảnh giấy note `n3`:** Gia Huy chết ngạt tủ gỗ năm 1998 do Khang gài chốt + Khang dùng còi đồng tống tiền Tùng | Khang cố tình nhốt Gia Huy làm ngạt chết năm 1998, nay đe dọa tống tiền Tùng. Tùng có thù hận sâu sắc 12 năm | Giải mã bí mật bi kịch quá khứ năm 1998 |
+| **Ảnh giấy tờ văng vãi `p2` <-> Khung ảnh `p4`:** Ảnh `p2` phát hiện bức ảnh 2 anh em ố vàng (đứa trẻ bên phải đeo còi đồng ở cổ) + Bài báo ngạt khí 1998 | So sánh với ảnh 5 người `p4`: Đứa trẻ đeo còi đồng chính là bé Gia Huy (em Tùng). Tùng mang bài báo và ảnh em trai đến đối chất rồi bỏ quên khi tháo chạy | **GIẢI MÃ THÂN THẬN ĐỨA TRẺ ĐEO CÒI ĐỒNG & BÍ MẬT 1998** |
+| **Bài báo `p5` & Giấy note `n3`:** Gia Huy chết ngạt tủ gỗ năm 1998 do Khang gài chốt + Tùng có thù hận sâu sắc 12 năm | Khang cố tình nhốt Gia Huy làm ngạt chết năm 1998, nay đe dọa tống tiền Tùng | Giải mã bi kịch quá khứ & Động cơ của Tùng |
 | **Camera cây xăng `11` (`f3-1`) & Lời khai `07c`:** Tùng chạy hoảng loạn lúc **20:15** + Tùng nhận xô Khang đập đầu ngất xỉu lúc 20:00 | **Bẫy Red Herring:** Tùng có thù sâu sắc + đập vỡ bình trà + xô Khang ngất + hoảng loạn bỏ chạy -> Tùng tưởng mình đã làm Khang chết | **SẬP BÃY RED HERRING:** Nộp kết luận bắt Tùng -> **GAME BÁO SAI!** |
+
+---
+
+## 📖 CƠ CHẾ GIAO DIỆN HỒ SƠ HẬU ÁN (EPILOGUE DASHBOARD)
+
+1. **Điều kiện mở khóa**: Người chơi hoàn thành Báo cáo Kết luận Chuyên án đạt Hạng **S-Rank** (hoặc A-Rank).
+2. **Quy tắc hiển thị UI**:  
+   - Giao diện Victory Screen giữ nguyên bảng điểm Radar & Báo cáo kết án ngắn gọn.
+   - Hiển thị thêm nút bấm phụ **`[📖 Đọc Ký Sự Hậu Án: 4 Góc Khất Tâm Lý]`** *(Hoàn toàn tùy chọn - Optional)*.
+3. **Trải nghiệm người chơi (UX)**: Chỉ khi người chơi chủ động bấm nút, hệ thống mới khởi chạy Modal/Drawer mở khóa 4 thẻ ký sự điện ảnh (Hà, Vũ, Mai, Bi kịch Trốn Tìm 1998) kèm âm thanh nền ambient trầm buồn lắng đọng.
 
 > **CẢNH BÁO SẬP RED HERRING TÙNG:**  
 > Nếu người chơi nộp kết luận bắt Tùng ở Giai đoạn 2, hệ thống phản hồi: *"Cú xô ngã của Tùng chỉ gây chấn thương nhẹ và ngất xỉu tạm thời. Tùng KHÔNG PHẢI là kẻ đâm đứt động mạch cổ nạn nhân!"*
 
 > **CÂU HỎI KEY 2 (Chuyển Giai đoạn 3):**  
-> *"Bi kịch năm 1998 là gì và hành vi xô xát của Tùng lúc 20:00 tại hiện trường có gây ra cái chết trực tiếp cho nạn nhân không?"*  
-> **Đáp án chuyển Phase:** Năm 1998 Gia Huy (em Tùng) ngạt chết trong tủ gỗ do Khang gài chốt. Tùng xô Khang đập đầu ngất xỉu và làm vỡ bình trà lúc 20:00 rồi tháo chạy lúc 20:15. Cú xô ngã của Tùng KHÔNG gây tử vong trực tiếp.
+> *"Dựa trên bài báo cũ năm 1998 và các kỷ vật tại hiện trường, động cơ thù hận sâu sắc nào đã thúc đẩy Nguyễn Thanh Tùng đến tìm nạn nhân đêm 24/07?"*  
+> **Đáp án chuyển Phase:** Khang cố tình gài chốt nhốt em trai Tùng (bé Gia Huy) ngạt chết trong tủ gỗ năm 1998. Tùng mang kỷ vật đến đối chất đêm 24/07 và xảy ra giằng co xô xát.
 
 > **GỢI Ý DÀNH CHO CÂU HỎI KEY 2:**  
-> - **1 (-5đ):** Đọc bài báo cũ `p5` và mảnh giấy note `n3` để tìm nguyên nhân Tùng tìm gặp Khang.  
-> - **2 (-10đ):** Tùng thừa nhận xô Khang ngất xỉu lúc 20:00 và chạy trốn lúc 20:15. Nhưng hãy kiểm tra xem vết bầm gáy có phải nguyên nhân tử vong chính không.  
-> - **3 (-20đ):** Tùng chỉ làm Khang ngất và làm vỡ bình trà lúc 20:00, không đâm chết Khang.
+> - **1 (-5đ):** Đối chiếu bức ảnh 2 anh em ố vàng ở đống giấy tờ văng vãi `p2` với ảnh lồng kính gia đình 5 người `p4` để nhận diện đứa trẻ đeo chiếc còi đồng ở cổ.  
+> - **2 (-10đ):** Đọc bài báo cũ 1998 `p5` để làm rõ bi kịch quá khứ năm 1998 xảy ra giữa gia đình Tùng và Khang.  
+> - **3 (-20đ):** Tùng căm hận Khang vì cái chết ngạt của em trai Gia Huy năm 1998 nên mang bài báo và ảnh cũ đến đối chất đêm 24/07.
 
 ---
 

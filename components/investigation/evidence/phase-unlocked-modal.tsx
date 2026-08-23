@@ -1,11 +1,12 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, FileText, ImageIcon, Search } from 'lucide-react'
 import { PDFDocument, PhysicalEvidence } from './evidence-types'
 import { CASE_000_NARRATOR } from '@/content/cases/case-000/narrator'
 import { TypewriterNarrator } from './typewriter-narrator'
+import { detectiveAudio } from '@/lib/investigation-audio'
 
 export interface UnlockedModalData {
   unlockedPhase: number
@@ -28,82 +29,154 @@ export function PhaseUnlockedModal({
   onSelectEvidence,
   onSetPhaseFilter,
 }: PhaseUnlockedModalProps) {
+  const [isStoryStarted, setIsStoryStarted] = React.useState(false)
+
+  React.useEffect(() => {
+    setIsStoryStarted(false)
+  }, [unlockedModalData])
+
+  const handleStartStory = () => {
+    setIsStoryStarted(true)
+    if (unlockedModalData && unlockedModalData.unlockedPhase === 0) {
+      setTimeout(() => {
+        detectiveAudio.playCeramicShatterSound()
+      }, 3000)
+    }
+  }
+
   return (
     <AnimatePresence>
       {unlockedModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-lg bg-[#1e1610] border-2 border-[#5c4028] text-[#e5d8cb] p-6 rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden font-mono flex flex-col gap-5"
-          >
-            {/* Header Title */}
-            <div className="border-b border-[#422e1d] pb-3 space-y-1">
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#f4e8d8] tracking-tight">
-                {unlockedModalData.unlockedPhase === 0
-                  ? 'BẮT ĐẦU CHUYÊN ÁN: GIAI ĐOẠN 0'
-                  : `ĐÃ MỞ KHÓA TÀI LIỆU GIAI ĐOẠN ${unlockedModalData.unlockedPhase}`}
-              </h3>
-              <p className="text-xs text-[#ad9885] font-sans">
-                Ban chuyên án đã cấp phép truy cập các văn bản hồ sơ và vật chứng tang vật thu thập được.
-              </p>
-            </div>
+        <div className="fixed inset-0 z-50 w-screen h-screen bg-[#0c0805] text-[#e5d8cb] overflow-hidden flex flex-col font-sans select-none">
+          {/* CRT Background scanlines */}
+          <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-10" />
 
-            {/* Horror Narrator Monologue Box */}
-            {CASE_000_NARRATOR[unlockedModalData.unlockedPhase] && (
-              <TypewriterNarrator
-                text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
-              />
-            )}
+          {/* Main Fullscreen Split View Content Area */}
+          <div className="relative z-20 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden">
+            {/* Left Column (60% width): Clean Pure Storytelling Screen */}
+            <div className="lg:col-span-7 border-b lg:border-b-0 lg:border-r border-[#261b12] p-8 lg:p-14 flex flex-col justify-center items-center bg-black overflow-y-auto custom-scrollbar">
+              {CASE_000_NARRATOR[unlockedModalData.unlockedPhase] && (
+                <div className="space-y-6 max-w-xl mx-auto w-full flex flex-col items-start">
+                  <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full">
+                    {CASE_000_NARRATOR[unlockedModalData.unlockedPhase].date}
+                  </div>
 
-            {/* Unlocked Items List Container */}
-            <div className="space-y-2 bg-[#140e0a] p-3.5 border border-[#38271a] max-h-[200px] overflow-y-auto custom-scrollbar">
-              <span className="font-mono text-[0.65rem] text-[#d9a066] uppercase font-bold block mb-1">
-                Danh mục tài liệu & tang vật mới nhận:
-              </span>
-
-              {unlockedModalData.newPdfs.map((pdf) => (
-                <div key={pdf.id} className="flex items-center gap-2.5 p-2 bg-[#221810] border border-[#3e2c1e]">
-                  <FileText className="size-4 text-[#d9a066] shrink-0" />
-                  <div className="flex flex-col overflow-hidden">
-                    <span className="font-sans font-semibold text-xs text-[#f2e6d8] truncate">{pdf.title}</span>
-                    <span className="font-mono text-[0.6rem] text-[#ad9885]">📄 VĂN BẢN HỒ SƠ // {pdf.code}</span>
+                  <div className="pt-2 w-full">
+                    {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
+                      <div className="py-12 flex flex-col items-center justify-center w-full">
+                        <button
+                          onClick={handleStartStory}
+                          className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
+                        >
+                          [ TRỐN TÌM ]
+                        </button>
+                      </div>
+                    ) : (
+                      <TypewriterNarrator
+                        text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
+                        speed={12}
+                      />
+                    )}
                   </div>
                 </div>
-              ))}
+              )}
+            </div>
 
-              {unlockedModalData.newEvidence.map((ev) => (
-                <div key={ev.id} className="flex items-center gap-2.5 p-2 bg-[#221810] border border-[#3e2c1e]">
-                  <ImageIcon className="size-4 text-[#d9a066] shrink-0" />
-                  <div className="flex flex-col overflow-hidden">
-                    <span className="font-sans font-semibold text-xs text-[#f2e6d8] truncate">{ev.title}</span>
-                    <span className="font-mono text-[0.6rem] text-[#ad9885]">📸 TANG CHỨNG // {ev.evidenceId}</span>
-                  </div>
+            {/* Right Column (40% width): Unlocked Evidence Archives */}
+            <div className="lg:col-span-5 p-6 lg:p-10 bg-[#160f0a] flex flex-col justify-between overflow-hidden">
+              <div className="flex flex-col h-full overflow-hidden">
+                <div className="flex items-center justify-between border-b border-[#3d2a1b] pb-3 mb-4">
+                  <span className="font-mono text-xs text-[#d9a066] uppercase font-bold tracking-wider flex items-center gap-2">
+                    <FileText className="size-4" />
+                    TÀI LIỆU & TANG VẬT MỚI
+                  </span>
+                  <span className="font-mono text-xs text-[#ad9885] bg-[#221810] px-2 py-0.5 border border-[#3e2c1e]">
+                    {unlockedModalData.newPdfs.length + unlockedModalData.newEvidence.length} VẬT PHẨM
+                  </span>
                 </div>
-              ))}
-            </div>
 
-            {/* Action Button */}
-            <div className="flex items-center justify-end pt-2 border-t border-[#3e2c1e]">
-              <button
-                onClick={() => {
-                  if (unlockedModalData.newPdfs.length > 0) {
-                    onSelectPdf(unlockedModalData.newPdfs[0])
-                  } else if (unlockedModalData.newEvidence.length > 0) {
-                    onSelectEvidence(unlockedModalData.newEvidence[0])
-                  }
-                  onSetPhaseFilter(unlockedModalData.unlockedPhase)
-                  onClose()
-                }}
-                className="w-full sm:w-auto px-5 py-2.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-xs font-bold rounded-none transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
-              >
-                <Search className="size-4" />
-                <span>TIẾP TỤC ĐIỀU TRA</span>
-              </button>
+                {/* Evidence List Scroll Container */}
+                <div className="flex-1 space-y-3 overflow-y-auto pr-1 custom-scrollbar">
+                  {unlockedModalData.newPdfs.map((pdf) => (
+                    <div
+                      key={pdf.id}
+                      className="group flex items-start gap-3 p-3.5 bg-[#221810] border border-[#3e2c1e] shadow-md"
+                    >
+                      <div className="p-2 bg-[#170f0a] border border-[#443021] text-[#d9a066]">
+                        <FileText className="size-5" />
+                      </div>
+                      <div className="flex flex-col overflow-hidden flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[0.65rem] text-[#d9a066] uppercase font-semibold">
+                            VĂN BẢN HỒ SƠ
+                          </span>
+                          <span className="font-mono text-[0.65rem] text-[#ad9885]">
+                            {pdf.code}
+                          </span>
+                        </div>
+                        <span className="font-sans font-bold text-sm text-[#f2e6d8] truncate">
+                          {pdf.title}
+                        </span>
+                        {pdf.description && (
+                          <span className="font-sans text-xs text-[#ad9885] line-clamp-1 mt-0.5">
+                            {pdf.description}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {unlockedModalData.newEvidence.map((ev) => (
+                    <div
+                      key={ev.id}
+                      className="group flex items-start gap-3 p-3.5 bg-[#221810] border border-[#3e2c1e] shadow-md"
+                    >
+                      <div className="p-2 bg-[#170f0a] border border-[#443021] text-[#d9a066]">
+                        <ImageIcon className="size-5" />
+                      </div>
+                      <div className="flex flex-col overflow-hidden flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[0.65rem] text-amber-500 uppercase font-semibold">
+                            TANG CHỨNG VẬT LÝ
+                          </span>
+                          <span className="font-mono text-[0.65rem] text-[#ad9885]">
+                            {ev.evidenceId}
+                          </span>
+                        </div>
+                        <span className="font-sans font-bold text-sm text-[#f2e6d8] truncate">
+                          {ev.title}
+                        </span>
+                        {ev.description && (
+                          <span className="font-sans text-xs text-[#ad9885] line-clamp-1 mt-0.5">
+                            {ev.description}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bottom Action Section */}
+                <div className="pt-4 border-t border-[#3d2a1b] mt-4">
+                  <button
+                    onClick={() => {
+                      if (unlockedModalData.newPdfs.length > 0) {
+                        onSelectPdf(unlockedModalData.newPdfs[0])
+                      } else if (unlockedModalData.newEvidence.length > 0) {
+                        onSelectEvidence(unlockedModalData.newEvidence[0])
+                      }
+                      onSetPhaseFilter(unlockedModalData.unlockedPhase)
+                      onClose()
+                    }}
+                    className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99]"
+                  >
+                    <Search className="size-4.5" />
+                    <span>PHÁ ÁN</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
     </AnimatePresence>

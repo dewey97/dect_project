@@ -29,6 +29,7 @@
 | `p4` | `photo-childhood-group-broken.jpg` | Khung ảnh 4 đứa trẻ bị đập vỡ | Khung gỗ nứt rạn mặt kính chứa bức ảnh được cho là Cụ Thành bế Khang chụp cùng những đứa trẻ hàng xóm năm 1998 | Tùng, Hà, Khang | Phase 0/2 | [Dấu vết xáo trộn & Ẩn số danh tính những đứa trẻ hàng xóm] | `f1-2`, `n3` |
 | `p5` | `photo-old-newspaper.jpg` | Bài báo cũ năm 1998 | Bài báo cắt về vụ tai nạn ngạt khí tủ âm tường của bé trai 8 tuổi | Tùng, Khang | Phase 2 | [Hồ sơ vụ tai nạn] | `p4` |
 | `p6` | `photo-messages-cheating.jpg` | Ảnh tin nhắn điện thoại Khang | Ảnh màn hình tin nhắn tình nhân mới hẹn đi du lịch đền bù lúc 20:40 | Hà | Phase 3 | [Bằng chứng ghen tuông] | `f4-3` |
+| `p7` | `cuong_ve_xe_tung.png` | Ảnh cuống vé xe khách 19:30 | Cuống vé xe khách Hoàng Long tuyến Hà Nội - Hải Phòng, xuất bến 19:30 ngày 24/07/2026, ghế 14B | Tùng | Phase 0 | [Bằng chứng ngoại phạm của Tùng] | `07c`, `f3-1` |
 
 ---
 
@@ -37,16 +38,20 @@
 ### 🟢 GIAI ĐOẠN 0: KHÁM NGHIỆM & RÀ SOÁT BAN ĐẦU
 1. **`01_bao_cao_kham_nghiem_tu_thi.pdf` (`f1-1`)**: Phát hiện 2 nhóm tổn thương (bầm tím gáy do xô xát & đứt động mạch cảnh do vật sắc đâm).
 2. **`02_bien_ban_kham_nghiem_hien_truong.pdf` (`f1-2`)**: Hiện trường xáo trộn, bình trà vỡ vụn, mảnh thủy tinh dính máu, dấu giày nhỏ size 37 ở cửa sau.
-3. **`03_bao_cao_tien_do_dieu_tra.pdf` (`f1-3`)**: Tiến độ điều tra, rà soát dấu vết và triệu tập 4 nghi phạm.
-4. **`04_bao_cao_xac_minh_nhan_than_khang.pdf` (`f1-4`)**: Lý lịch Khang mồ côi bố mẹ, ông mới mất, trăng hoa và ăn tiêu bốc đồng.
-5. **`05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` (`f1-5`)**: Ma trận rà soát động cơ 4 đối tượng Mai, Vũ, Tùng, Hà.
+3. **`04_bao_cao_xac_minh_nhan_than_khang.pdf` (`f1-4a`)**: Lý lịch Khang mồ côi bố mẹ, làm nghề cho vay bốc họ / vay nặng lãi.
+4. **`04b_bao_cao_ra_soat_ly_lich_nghi_pham.pdf` (`f1-4b`)**: Báo cáo rà soát sơ yếu lý lịch 06 người liên quan (Hà, Mai, Vũ, Phạm Văn Hùng, Nguyễn Thanh Tùng, Nam "Còi") kèm số điện thoại & tóm tắt lý lịch tư pháp.
+5. **`08_trich_xuat_tin_nhan_dieu_tra_ban_dau.pdf` (`08-tx`)**: Báo cáo trích xuất tin nhắn điện thoại Khang (chứa tin nhắn xin khất nợ từ số máy rác `0985.xxx.341`).
 6. **`06_bien_ban_lay_loi_khai_hang_xom.pdf` (`f1-6`)**: Lời khai hàng xóm nghe tiếng cãi vã & tiếng đập vỡ bình trà lúc hơn 20:00.
 7. **04 Biên bản lời khai nghi phạm riêng biệt (`07a`, `07b`, `07c`, `07d`)**: Tường trình Q&A chi tiết của từng nghi phạm.
+7. **`03_bao_cao_tien_do_dieu_tra.pdf` (`f1-3`)**: Báo cáo tổng hợp tiến độ điều tra ban đầu.
+8. **`05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` (`f1-5`)**: Báo cáo chuyên đề mâu thuẫn & mối quan hệ (Ma trận rà soát động cơ 4 đối tượng).
+
 
 ### 🟡 GIAI ĐOẠN 1: TRANH CHẤP DI CHÚC & ĐẤT ĐAI
 8. **`08_di_chuc_ong_noi_gia_mao.pdf` (`f2-1`)**: Tờ di chúc ghi năm 2018 nhưng chứa cụm từ *"Mã thửa địa chính 2021-BS14"* $\rightarrow$ Chứng minh di chúc bị Khang làm giả.
 9. **`09_ket_qua_giam_dinh_chu_ky.pdf` (`f2-2`)**: Viện KHHS kết luận mực bi hóa dầu năm 2024 viết đè chèn $\rightarrow$ Giải thích việc Mai mang di chúc đi giám định (Loại trừ Mai).
-10. **`10_ban_do_dia_chinh_va_giay_no_vu.pdf` (`f2-3`, `f2-4`)**: Bản đồ đất gốc 75m2 & Giấy nợ 350M $\rightarrow$ Giải thích động cơ Vũ lén vào trộm bản vẽ tiêu hủy chứng cứ gian lận (Loại trừ Vũ).
+10a. **`10a_trich_luc_ban_do_dia_chinh_goc_75m2.pdf` (`f2-3a`)**: Trích lực bản đồ địa chính & Sổ đỏ gốc (Sở TNMT) chứng nhận diện tích đất chính thức là 75.0m2 đứng tên Cụ Thành.
+10b. **`10b_ban_trich_do_ky_thuat_den_bu_120m2.pdf` (`f2-3b`)**: Bản trích đo kỹ thuật đền bù giải tỏa đợt 1 (Ban QLDA) kê khai vống lên 120.0m2 do KTV Lê Quang Vũ trực tiếp lập bản vẽ & ký duyệt.
 
 ### 🔴 GIAI ĐOẠN 2: BÍ MẬT QUÁ KHỨ & CUỘC XÔ XÁT
 11. **`11_bien_ban_trich_xuat_camera_va_tro_tron_tim.pdf` (`f3-1`, `n3`)**: Camera cây xăng ghi nhận Tùng tháo chạy lúc 20:15 + Mảnh giấy note vị trí trốn ngạt khí năm 1998 của Gia Huy $\rightarrow$ Bẫy Red Herring hướng nghi vấn sang Tùng.

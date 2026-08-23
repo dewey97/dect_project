@@ -35,7 +35,8 @@ function CameraRig({
       targetLookAt = [lookX, y - 0.1, z + 0.5]
     }
 
-    const step = Math.min(delta * 3.5, 1)
+    const clampedDelta = Math.min(delta, 0.033)
+    const step = Math.min(clampedDelta * 3.5, 0.15)
 
     // Smooth Lerp Camera Position
     state.camera.position.x += (targetCamPos[0] - state.camera.position.x) * step

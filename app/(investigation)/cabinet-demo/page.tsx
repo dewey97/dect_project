@@ -9,9 +9,8 @@ const FileCabinet3D = dynamic(
   { 
     ssr: false,
     loading: () => (
-      <div className="w-full h-[600px] flex flex-col items-center justify-center bg-stone-950 text-amber-500 font-mono text-sm">
-        <div className="w-8 h-8 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mb-3" />
-        Đang tải mô hình tủ 3D WebGL (Three.js)...
+      <div className="w-full h-screen flex items-center justify-center bg-stone-950">
+        <div className="w-7 h-7 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     )
   }
@@ -24,4 +23,3 @@ export default function CabinetDemoPage() {
     </main>
   )
 }
-

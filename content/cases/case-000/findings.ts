@@ -35,8 +35,8 @@ export const CASE_000_FINDINGS: Finding[] = [
     description: 'Cả 4 người thân thiết (Trần Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà) đều có động cơ tranh chấp đất đai hoặc nợ nần.',
     evidenceRef: 'f1-5 / f1-6',
     keywordGroups: [
-      ['nghi phạm', 'nghi pham', 'bốn người', 'bon nguoi', '4 người', '4 nguoi', 'mâu thuẫn', 'mau thuan', 'động cơ', 'dong co'],
-      ['mai', 'vũ', 'vu', 'tùng', 'tung', 'hà', 'ha']
+      ['nghi phạm', 'nghi pham', 'bốn người', 'bon nguoi', '4 người', '4 nguoi', 'tất cả', 'tat ca', 'nhiều người', 'nhieu nguoi', 'cả 4', 'ca 4', 'các đối tượng', 'cac doi tuong'],
+      ['mâu thuẫn', 'mau thuan', 'động cơ', 'dong co', 'nợ nần', 'no nan', 'tranh chấp', 'tranh chap']
     ],
     hint: 'Theo Báo cáo 05, có bao nhiêu đối tượng có mâu thuẫn trực tiếp với Khang?'
   },

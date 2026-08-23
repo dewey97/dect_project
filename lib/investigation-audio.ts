@@ -303,6 +303,88 @@ class DetectiveAudioSynth {
       noise.stop(now + 0.15)
     } catch {}
   }
+
+  // Ceramic / Glass Shattering Sound Effect (Bộ bình gốm vỡ rớt sàn chân thực 100%)
+  public playCeramicShatterSound() {
+    if (this.isMuted) return
+    const ctx = this.getContext()
+    if (!ctx) return
+
+    try {
+      const now = ctx.currentTime
+
+      // 1. Heavy Ceramic Impact Thud (Cú nổ va đập khối gốm sứ nung dập xuống sàn)
+      const thudOsc = ctx.createOscillator()
+      const thudGain = ctx.createGain()
+      thudOsc.type = 'sawtooth'
+      thudOsc.frequency.setValueAtTime(720, now)
+      thudOsc.frequency.exponentialRampToValueAtTime(45, now + 0.06)
+      thudGain.gain.setValueAtTime(0.35, now)
+      thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08)
+      thudOsc.connect(thudGain)
+      thudGain.connect(ctx.destination)
+      thudOsc.start(now)
+      thudOsc.stop(now + 0.09)
+
+      // 2. High-Frequency Glass/Porcelain Shatter Burst (Cú vỡ xoảng đanh 7500Hz)
+      const bufferSize = Math.floor(ctx.sampleRate * 0.35)
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
+      const data = buffer.getChannelData(0)
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.035))
+      }
+      const noise = ctx.createBufferSource()
+      noise.buffer = buffer
+
+      const bpFilter = ctx.createBiquadFilter()
+      bpFilter.type = 'bandpass'
+      bpFilter.frequency.setValueAtTime(7500, now)
+      bpFilter.Q.setValueAtTime(5.5, now)
+
+      const hpFilter = ctx.createBiquadFilter()
+      hpFilter.type = 'highpass'
+      hpFilter.frequency.setValueAtTime(4200, now)
+
+      const noiseGain = ctx.createGain()
+      noiseGain.gain.setValueAtTime(0.42, now)
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.32)
+
+      noise.connect(bpFilter)
+      bpFilter.connect(hpFilter)
+      hpFilter.connect(noiseGain)
+      noiseGain.connect(ctx.destination)
+
+      noise.start(now)
+      noise.stop(now + 0.35)
+
+      // 3. 20 Cascading Shard Bounces (Tiếng 20 mảnh gốm sắc vỡ rơi văng lách cách rải rác)
+      const shardFreqs = [
+        4500, 7200, 3800, 8400, 5600, 9200, 4900, 6800,
+        4100, 8100, 5900, 8800, 4600, 7100, 5200, 7900,
+        6400, 8900, 4300, 7600
+      ]
+
+      shardFreqs.forEach((freq, idx) => {
+        const delay = idx * 0.02 + Math.random() * 0.018
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+
+        osc.type = 'sine'
+        osc.frequency.setValueAtTime(freq, now + delay)
+        osc.frequency.exponentialRampToValueAtTime(freq * (0.6 + Math.random() * 0.2), now + delay + 0.08)
+
+        const vol = (0.12 - idx * 0.005) * (Math.random() * 0.5 + 0.7)
+        gain.gain.setValueAtTime(Math.max(vol, 0.01), now + delay)
+        gain.gain.exponentialRampToValueAtTime(0.0002, now + delay + 0.1)
+
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+
+        osc.start(now + delay)
+        osc.stop(now + delay + 0.12)
+      })
+    } catch {}
+  }
 }
 
 export const detectiveAudio = new DetectiveAudioSynth()

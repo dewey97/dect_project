@@ -19,40 +19,48 @@ export const CASE_000_PDFS: PDFDocument[] = [
     order: 20
   },
   {
-    id: 'pdf-03',
-    title: '03. Báo cáo tiến độ điều tra ban đầu',
-    code: 'f1-3',
-    url: '/documents/case_000/phase_0_initial/03_bao_cao_tien_do_dieu_tra.pdf',
+    id: 'pdf-04a',
+    title: '03. Bản trích yếu lý lịch và nhân thân nạn nhân Khang',
+    code: 'f1-4a',
+    url: '/documents/case_000/phase_0_initial/04_bao_cao_xac_minh_nhan_than_khang.pdf',
     phase: 0,
     order: 30
   },
   {
-    id: 'pdf-04',
-    title: '04. Báo cáo xác minh nhân thân nạn nhân Khang',
-    code: 'f1-4',
-    url: '/documents/case_000/phase_0_initial/04_bao_cao_xac_minh_nhan_than_khang.pdf',
+    id: 'pdf-04b',
+    title: '04. Báo cáo rà soát sơ yếu lý lịch người liên quan',
+    code: 'f1-4b',
+    url: '/documents/case_000/phase_0_initial/04b_bao_cao_ra_soat_ly_lich_nghi_pham.pdf',
+    phase: 0,
+    order: 35
+  },
+  {
+    id: 'pdf-08-tx',
+    title: '05. Báo cáo trích xuất tin nhắn điện thoại Khang',
+    code: '08-tx',
+    url: '/documents/case_000/phase_0_initial/08_trich_xuat_tin_nhan_dieu_tra_ban_dau.pdf',
     phase: 0,
     order: 40
   },
   {
-    id: 'pdf-05',
-    title: '05. Báo cáo chuyên đề mâu thuẫn & mối quan hệ',
-    code: 'f1-5',
-    url: '/documents/case_000/phase_0_initial/05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf',
+    id: 'pdf-06',
+    title: '05. Biên bản lấy lời khai: Nguyễn Thị Lụa',
+    code: 'f1-6',
+    url: '/documents/case_000/phase_0_initial/06_bien_ban_lay_loi_khai_hang_xom.pdf',
     phase: 0,
     order: 50
   },
   {
-    id: 'pdf-06',
-    title: '06. Biên bản lấy lời khai hàng xóm',
-    code: 'f1-6',
-    url: '/documents/case_000/phase_0_initial/06_bien_ban_lay_loi_khai_hang_xom.pdf',
+    id: 'pdf-07d',
+    title: '06. Biên bản lấy lời khai: Trần Thị Hà',
+    code: '07d',
+    url: '/documents/case_000/phase_0_initial/07d_bien_ban_loi_khai_tran_thi_ha.pdf',
     phase: 0,
     order: 60
   },
   {
     id: 'pdf-07a',
-    title: '07a. Lời khai Q&A: Trần Ngọc Mai',
+    title: '07. Biên bản lấy lời khai: Trần Ngọc Mai',
     code: '07a',
     url: '/documents/case_000/phase_0_initial/07a_bien_ban_loi_khai_tran_ngoc_mai.pdf',
     phase: 0,
@@ -60,7 +68,7 @@ export const CASE_000_PDFS: PDFDocument[] = [
   },
   {
     id: 'pdf-07b',
-    title: '07b. Lời khai Q&A: Lê Quang Vũ',
+    title: '08. Biên bản lấy lời khai: Lê Quang Vũ',
     code: '07b',
     url: '/documents/case_000/phase_0_initial/07b_bien_ban_loi_khai_le_quang_vu.pdf',
     phase: 0,
@@ -68,19 +76,27 @@ export const CASE_000_PDFS: PDFDocument[] = [
   },
   {
     id: 'pdf-07c',
-    title: '07c. Lời khai Q&A: Nguyễn Thanh Tùng',
+    title: '09. Biên bản lấy lời khai: Nguyễn Thanh Tùng',
     code: '07c',
     url: '/documents/case_000/phase_0_initial/07c_bien_ban_loi_khai_tung.pdf',
     phase: 0,
     order: 90
   },
   {
-    id: 'pdf-07d',
-    title: '07d. Lời khai Q&A: Trần Thị Hà (Lời khai đầu)',
-    code: '07d',
-    url: '/documents/case_000/phase_0_initial/07d_bien_ban_loi_khai_tran_thi_ha.pdf',
+    id: 'pdf-03',
+    title: '10. Báo cáo tổng hợp tiến độ điều tra ban đầu',
+    code: 'f1-3',
+    url: '/documents/case_000/phase_0_initial/03_bao_cao_tien_do_dieu_tra.pdf',
     phase: 0,
     order: 100
+  },
+  {
+    id: 'pdf-05',
+    title: '11. Báo cáo chuyên đề mâu thuẫn & mối quan hệ',
+    code: 'f1-5',
+    url: '/documents/case_000/phase_0_initial/05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf',
+    phase: 0,
+    order: 110
   },
 
   // Phase 1: Inheritance & Land Dispute
@@ -101,12 +117,20 @@ export const CASE_000_PDFS: PDFDocument[] = [
     order: 120
   },
   {
-    id: 'pdf-10',
-    title: '10. Bản đồ địa chính đất gốc 75m2 & Giấy nợ 350M',
-    code: 'f2-3',
-    url: '/documents/case_000/phase_1_inheritance/10_ban_do_dia_chinh_va_giay_no_vu.pdf',
+    id: 'pdf-10a',
+    title: '10a. Trích lục bản đồ địa chính & Sổ đỏ gốc (75.0m2)',
+    code: 'f2-3a',
+    url: '/documents/case_000/phase_1_inheritance/10a_trich_luc_ban_do_dia_chinh_goc_75m2.pdf',
     phase: 1,
     order: 130
+  },
+  {
+    id: 'pdf-10b',
+    title: '10b. Bản trích đo kỹ thuật đền bù giải tỏa đợt 1 (120.0m2)',
+    code: 'f2-3b',
+    url: '/documents/case_000/phase_1_inheritance/10b_ban_trich_do_ky_thuat_den_bu_120m2.pdf',
+    phase: 1,
+    order: 131
   },
 
   // Phase 2: Past Secret & Hide-and-Seek
@@ -150,7 +174,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
-    thumbnail: '/evidence-board-bg.png',
+    thumbnail: '/photo_scene_overview.jpg',
     phase: 0,
     order: 21
   },
@@ -165,7 +189,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
-    thumbnail: '/means_evidence.png',
+    thumbnail: '/photo_glass_shard.jpg',
     phase: 0,
     order: 22
   },
@@ -174,7 +198,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     caseId: 'case-000',
     kind: 'photo',
     title: 'p4. Khung ảnh gỗ bị đập vỡ & nứt kính (1998)',
-    preview: 'Bức ảnh lồng kính gỗ bị đập vỡ vụn dưới sàn phòng khách, mặt kính rạn nứt nếp hình được cho là Cụ Thành đang bế Khang chụp cùng những đứa trẻ hàng xóm năm 1998.',
+    preview: 'Bức ảnh lồng kính gỗ bị đập vỡ vụn dưới sàn, góc chụp chính diện năm 1998: Cụ Thành bế Khang trong lòng, xung quanh là 4 đứa trẻ (Tùng, Gia Huy, Hà và bé Mai nhỏ hơn hẳn đứng phía trước).',
     timestamp: '20:00',
     evidenceId: 'EV-CHILDHOOD-BROKEN-FRAME',
     recoveredBy: 'ĐIỀU TRA VIÊN',
@@ -185,19 +209,34 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     order: 23
   },
   {
+    id: 'ev-p7',
+    caseId: 'case-000',
+    kind: 'photo',
+    title: 'p7. Cuống vé xe khách 19:30 (Bằng chứng Tùng)',
+    preview: 'Cuống vé xe khách liên tỉnh Hoàng Long tuyến Hà Nội - Hải Phòng, xuất bến 19:30 ngày 24/07/2026, ghế 14B.',
+    timestamp: '19:30',
+    evidenceId: 'EV-BUS-TICKET-TUNG',
+    recoveredBy: 'ĐIỀU TRA VIÊN',
+    integrityStatus: 'secured',
+    chainOfCustody: 'VERIFIED',
+    thumbnail: '/cuong_ve_xe_tung.png',
+    phase: 0,
+    order: 24
+  },
+  {
     id: 'ev-p2',
     caseId: 'case-000',
     kind: 'photo',
-    title: 'p2. Ảnh hiện trường các giấy tờ di chúc văng vãi',
-    preview: 'Bản vẽ địa chính 75m2 và tờ di chúc bị cày xới nằm gần khoang tủ gỗ âm tường.',
-    timestamp: '19:30',
+    title: 'p2. Ảnh hiện trường các giấy tờ & ảnh kỷ niệm văng vãi',
+    preview: 'Bản vẽ địa chính và hồ sơ văng vãi dưới sàn phòng khách. Trong đống giấy tờ lẫn một bài báo cắt năm 1998 và một bức ảnh nhỏ chụp 2 đứa trẻ (bé trai đứng bên phải đeo chiếc còi đồng ở cổ).',
+    timestamp: '20:00',
     evidenceId: 'EV-SCATTERED-DOCS',
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
-    thumbnail: '/motive_evidence.png',
-    phase: 1,
-    order: 131
+    thumbnail: '/photo_scattered_docs.jpg',
+    phase: 0,
+    order: 25
   },
   {
     id: 'ev-p5',
@@ -210,7 +249,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
-    thumbnail: '/newspaper_clipping.png',
+    thumbnail: '/photo_old_newspaper.jpg',
     phase: 2,
     order: 141
   },
@@ -225,7 +264,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
-    thumbnail: '/opportunity_evidence.png',
+    thumbnail: '/photo_cheating_sms.jpg',
     phase: 3,
     order: 161
   }

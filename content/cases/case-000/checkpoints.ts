@@ -5,15 +5,15 @@ export const checkpoints000: Checkpoint[] = [
     id: 'cp-000-0',
     caseId: 'case-000',
     title: 'Giai đoạn 0: Màn Sương Hiện Trường & Biên Bản Tử Thi',
-    question: 'Dựa trên báo cáo khám nghiệm tử thi sơ bộ (01) và hiện trường (02), hãy xác định 2 vùng tổn thương chính trên thi thể Khang và danh sách 4 đối tượng nghi vấn?',
-    hint: 'Báo cáo khám nghiệm tử thi ghi nhận vết bầm chẩm gáy 6x4cm và vết đâm 3.5cm đứt động mạch cảnh.',
+    question: 'Dựa trên việc đối chiếu Biên bản hiện trường (02), Lời khai hàng xóm (06) và Trích xuất tin nhắn (08), nhận định nào phản ánh chính xác nhất diễn biến bất thường lúc ~20:00 và kế hoạch triệu tập ban đầu?',
+    hint: 'Hãy đối chiếu mốc giờ hàng xóm nghe tiếng vỡ xoảng đồ sứ/thủy tinh với dấu vết hiện trường phòng khách và ma trận mâu thuẫn nghi phạm.',
     options: [
-      '2 tổn thương (bầm ngắt chẩm gáy & đứt động mạch cảnh) + 4 nghi phạm (Mai, Vũ, Tùng, Hà)',
-      '2 tổn thương (rạn xương sọ chẩm & đâm thủng vòm họng) + 4 nghi phạm (Mai, Vũ, Tùng, Hà)',
-      '2 tổn thương (gãy xương sườn & đứt động mạch cảnh) + 4 nghi phạm (Mai, Vũ, Tùng, Hà)',
-      '2 tổn thương (vết bầm ở vùng ngực & chấn thương sọ nội) + 4 nghi phạm (Mai, Vũ, Tùng, Hà)'
+      'Hiện trường xảy ra xô xát giằng co làm đập vỡ bộ bình trà lúc ~20:00 gây chấn thương chẩm gáy; cần triệu tập nhóm nghi phạm có mâu thuẫn gay gắt gồm Mai, Vũ, Tùng và Hà.',
+      'Hiện trường chỉ là một vụ đột nhập lén lút lúc 19:30 không có xô xát; nạn nhân tự làm vỡ bình trà và chỉ cần triệu tập duy nhất nghi phạm Lê Quang Vũ.',
+      'Nạn nhân bị đâm chết tại chỗ ngay từ 18:30 khi cãi vã với Mai; hàng xóm nghe nhầm tiếng động và chỉ cần triệu tập Trần Ngọc Mai.',
+      'Vụ xô xát làm vỡ bình trà xảy ra lúc nửa đêm 24:00; nạn nhân bị gài bẫy và cần triệu tập tất cả hàng xóm xung quanh.'
     ],
-    correctAnswer: '2 tổn thương (bầm ngắt chẩm gáy & đứt động mạch cảnh) + 4 nghi phạm (Mai, Vũ, Tùng, Hà)',
+    correctAnswer: 'Hiện trường xảy ra xô xát giằng co làm đập vỡ bộ bình trà lúc ~20:00 gây chấn thương chẩm gáy; cần triệu tập nhóm nghi phạm có mâu thuẫn gay gắt gồm Mai, Vũ, Tùng và Hà.',
     unlockedEvidenceId: 'f2-1',
     status: 'active'
   },
@@ -36,16 +36,16 @@ export const checkpoints000: Checkpoint[] = [
   {
     id: 'cp-000-2',
     caseId: 'case-000',
-    title: 'Giai đoạn 2: Tiếng Xô Xát Đêm 24/07 & Kỷ Vật Tủ Âm Tường',
-    question: 'Diễn biến xô xát giữa Tùng và Khang lúc 20:00 gây ra tổn thương nào, và tại sao Tùng không phải là hung thủ gây ra cái chết trực tiếp?',
-    hint: 'Tùng thừa nhận xô ngã Khang ngất xỉu và làm vỡ bình trà lúc 20:00, tháo chạy lúc 20:15. Hãy kiểm tra xem vết bầm gáy có gây tử vong đứt động mạch không.',
+    title: 'Giai đoạn 2: Kỷ Vật Quá Khứ & Tiếng Xô Xát Đêm 24/07',
+    question: 'Dựa trên bài báo cũ năm 1998 và các kỷ vật tại hiện trường, động cơ thù hận sâu sắc nào đã thúc đẩy Nguyễn Thanh Tùng đến tìm nạn nhân đêm 24/07?',
+    hint: 'Đối chiếu bức ảnh 2 anh em (đeo còi đồng) ở đống giấy tờ văng vãi p2 với bài báo 1998 và ảnh gia đình p4 để làm rõ bi kịch quá khứ giữa Tùng và Khang.',
     options: [
-      'Tùng làm vỡ bình trà & xô Khang đập đầu ngất xỉu lúc 20:00 (chỉ gây vết bầm gáy, Khang chưa tử vong khi Tùng bỏ chạy 20:15).',
-      'Tùng xô Khang ngã đập đầu vào bộ bình trà vỡ khiến mảnh thủy tinh đâm đứt động mạch cảnh ngay tại chỗ lúc 20:00.',
-      'Tùng vật lộn siết cổ Khang ngất xỉu rồi dùng kéo đâm vào cổ nạn nhân trước khi hoảng hốt tháo chạy lúc 20:15.',
-      'Tùng đến hiện trường lúc 20:00 nhưng không xảy ra xô xát, Khang đã tử vong từ trước khi Tùng bước vào nhà.'
+      'Khang gài chốt nhốt em trai Tùng (bé Gia Huy) ngạt chết trong tủ gỗ năm 1998; Tùng mang kỷ vật đến đối chất đêm 24/07 và xảy ra giằng co xô xát.',
+      'Tùng nợ Khang khoản tiền bốc họ 350M từ năm 1998 và đến để xin khất nợ.',
+      'Tùng tranh chấp mảnh đất 75m2 đền bù của cụ Thành và muốn ép Khang chia phần.',
+      'Tùng đến để làm chứng cho cuộc cãi vã giữa Mai và Khang về tờ di chúc 2018.'
     ],
-    correctAnswer: 'Tùng làm vỡ bình trà & xô Khang đập đầu ngất xỉu lúc 20:00 (chỉ gây vết bầm gáy, Khang chưa tử vong khi Tùng bỏ chạy 20:15).',
+    correctAnswer: 'Khang gài chốt nhốt em trai Tùng (bé Gia Huy) ngạt chết trong tủ gỗ năm 1998; Tùng mang kỷ vật đến đối chất đêm 24/07 và xảy ra giằng co xô xát.',
     unlockedEvidenceId: 'f4-1',
     status: 'locked'
   },

@@ -168,8 +168,8 @@ export function DetectiveJournalDrawer({
 
   return (
     <>
-      {/* FLOATING DETECTIVE JOURNAL BUTTON (STUCK TO BOTTOM RIGHT) */}
-      <div className="fixed bottom-6 right-6 z-40">
+      {/* FLOATING DETECTIVE JOURNAL BUTTON (STUCK TO BOTTOM RIGHT, LEFT OF FEEDBACK BUTTON) */}
+      <div className="fixed bottom-6 right-24 z-40">
         <button
           type="button"
           onClick={toggleDrawer}

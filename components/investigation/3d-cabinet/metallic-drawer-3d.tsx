@@ -114,7 +114,9 @@ export function MetallicDrawer3D({
     if (!meshRef.current) return
     // Rút tủ ra 1.85m khi click mở
     const targetZ = isOpen ? 1.85 : 0
-    const step = Math.min(delta * 4.5, 1)
+    // Clamping delta để tránh spike jump ở lần click đầu tiên
+    const clampedDelta = Math.min(delta, 0.033)
+    const step = Math.min(clampedDelta * 4.5, 0.15)
 
     meshRef.current.position.z += (targetZ - meshRef.current.position.z) * step
     setCurrentZ(meshRef.current.position.z)

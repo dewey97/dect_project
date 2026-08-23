@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 
 /**
  * Kiểm tra xem người dùng hiện tại có authenticated và có role admin (hoặc creator) không.

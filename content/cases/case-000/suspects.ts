@@ -6,8 +6,8 @@ export const suspects000: Suspect[] = [
     caseId: 'case-000',
     name: 'Trần Ngọc Mai',
     role: 'Em họ nạn nhân',
-    background: 'Có tranh chấp thừa kế di chúc với Khang. Phát hiện di chúc bị sửa chữa.',
-    alibi: 'Làm việc tại Văn phòng Luật sư Minh từ 19:30 đến 20:30.',
+    background: 'Tranh chấp di chúc đền bù nhà đất với Khang. Khai sang nhà Khang lúc 18:30 rồi rời đi lúc 19:00.',
+    alibi: 'Khai ở nhà một mình từ 19:30 xem tivi (Không có bằng chứng/người làm chứng).',
     collected: true
   },
   {
@@ -15,26 +15,26 @@ export const suspects000: Suspect[] = [
     caseId: 'case-000',
     name: 'Lê Quang Vũ',
     role: 'Chồng Mai / Nhân viên đo đạc',
-    background: 'Nợ Khang 350 triệu đồng và bị Khang ép đo khống diện tích đất.',
-    alibi: 'Có mặt tại quán nhậu từ 19:40 đến 22:00.',
+    background: 'Nợ Khang 350 triệu đồng và bị Khang ép đo khống đất đai. Khai đi nhậu một mình sau khi rời nhà Khang.',
+    alibi: 'Khai ngồi uống bia một mình ở quán nhậu từ 19:40 đến 21:30 (Không có người làm chứng).',
     collected: true
   },
   {
     id: 'tung',
     caseId: 'case-000',
     name: 'Nguyễn Thanh Tùng',
-    role: 'Bạn cũ / Anh trai Gia Huy',
-    background: 'Bị Khang tống tiền liên quan đến bi kịch trốn tìm năm 1998 khiến Gia Huy qua đời.',
-    alibi: 'Đến cãi vã xô ngã Khang lúc 20:00 nhưng bỏ chạy lúc 20:15.',
+    role: 'Bạn cũ có hiềm khích',
+    background: 'Ban đầu đưa vé xe khách 19:30 để chối tội. Khi bị vạch trần thì lúng túng thừa nhận có đến nhà Khang lúc 20:00 nhưng chối không xô đập hay hại Khang.',
+    alibi: 'Trưng vé xe khách liên tỉnh khởi hành lúc 19:30 (Bằng chứng ngoại phạm giả).',
     collected: true
   },
   {
     id: 'ha',
     caseId: 'case-000',
     name: 'Trần Thị Hà',
-    role: 'Bạn gái cũ của Khang (Thủ phạm)',
-    background: 'Ghen tuông cuồng loạn. Theo dõi Khang và chui qua cửa sau lúc 20:45.',
-    alibi: 'Khai ở nhà cả tối nhưng lỡ lời mô tả chi tiết vết ngục bên bộ bình trà vỡ.',
+    role: 'Bạn gái hiện tại của Khang',
+    background: 'Bạn gái hiện tại (yêu 3 năm). Tỏ ra êm ấm, cung cấp danh sách mâu thuẫn gồm Tùng (lảng vảng) cùng các nghi vấn nhiễu chú Hùng & Nam Còi.',
+    alibi: 'Khai ở nhà xem tivi một mình cả tối 24/07.',
     collected: true
   }
 ]
