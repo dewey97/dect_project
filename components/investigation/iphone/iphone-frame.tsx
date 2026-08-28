@@ -94,33 +94,33 @@ export function IPhoneFrame({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center py-4 select-none">
+    <div className="flex flex-col items-center justify-center py-1 sm:py-4 select-none w-full max-w-full">
       {/* iPhone Hardware Outer Shell */}
-      <div className="relative w-[345px] h-[690px] bg-[#121214] rounded-[52px] p-3 shadow-2xl border-[7px] border-[#2C2C30] ring-1 ring-white/10 flex flex-col justify-between overflow-hidden">
+      <div className="relative w-[min(345px,94vw)] h-[min(690px,calc(100dvh-140px))] min-h-[520px] bg-[#121214] rounded-[42px] sm:rounded-[52px] p-2 sm:p-3 shadow-2xl border-[5px] sm:border-[7px] border-[#2C2C30] ring-1 ring-white/10 flex flex-col justify-between overflow-hidden">
         
         {/* Subtle Metallic Bezel Highlights */}
-        <div className="absolute inset-0 rounded-[46px] pointer-events-none border border-white/10" />
+        <div className="absolute inset-0 rounded-[38px] sm:rounded-[46px] pointer-events-none border border-white/10" />
 
         {/* SCREEN CONTAINER */}
-        <div className="relative w-full h-full bg-[#000000] rounded-[40px] overflow-hidden flex flex-col justify-between">
+        <div className="relative w-full h-full bg-[#000000] rounded-[34px] sm:rounded-[40px] overflow-hidden flex flex-col justify-between">
           
           {/* iOS TOP STATUS BAR & DYNAMIC ISLAND */}
-          <div className="relative z-30 h-10 px-6 flex items-center justify-between text-white text-[12px] font-semibold tracking-tight shrink-0 bg-[#000000]">
+          <div className="relative z-30 h-8 sm:h-10 px-4 sm:px-6 flex items-center justify-between text-white text-[11px] sm:text-[12px] font-semibold tracking-tight shrink-0 bg-[#000000]">
             {/* Clock */}
-            <span className="font-sans ml-1 text-[13px]">20:45</span>
+            <span className="font-sans ml-0.5 sm:ml-1 text-[12px] sm:text-[13px]">20:45</span>
 
             {/* Dynamic Island */}
-            <div className="absolute left-1/2 -translate-x-1/2 top-2 h-6 w-24 bg-[#000000] rounded-full flex items-center justify-between px-2 shadow-inner border border-white/10">
-              <div className="size-2.5 rounded-full bg-[#1C1C1E] border border-[#2C2C2E]" />
-              <div className="size-2 rounded-full bg-[#0A84FF]/40 animate-pulse" />
+            <div className="absolute left-1/2 -translate-x-1/2 top-1.5 sm:top-2 h-5 sm:h-6 w-20 sm:w-24 bg-[#000000] rounded-full flex items-center justify-between px-2 shadow-inner border border-white/10">
+              <div className="size-2 sm:size-2.5 rounded-full bg-[#1C1C1E] border border-[#2C2C2E]" />
+              <div className="size-1.5 sm:size-2 rounded-full bg-[#0A84FF]/40 animate-pulse" />
             </div>
 
             {/* Icons */}
-            <div className="flex items-center gap-1.5 mr-1">
-              <span className="text-[10px] font-bold text-white/90">5G</span>
-              <Wifi className="size-3 text-white" />
-              <div className="flex items-center gap-1 font-mono text-[10px] text-white">
-                <BatteryMedium className="size-3.5 text-white fill-white" />
+            <div className="flex items-center gap-1 sm:gap-1.5 mr-0.5 sm:mr-1">
+              <span className="text-[9px] sm:text-[10px] font-bold text-white/90">5G</span>
+              <Wifi className="size-2.5 sm:size-3 text-white" />
+              <div className="flex items-center gap-1 font-mono text-[9px] sm:text-[10px] text-white">
+                <BatteryMedium className="size-3 sm:size-3.5 text-white fill-white" />
               </div>
             </div>
           </div>
@@ -217,21 +217,21 @@ export function IPhoneFrame({
               </div>
             ) : (
               /* 3. HOME SCREEN APP GRID */
-              <div className="flex-1 flex flex-col justify-between p-4 bg-gradient-to-b from-[#141416] to-[#000000]">
+              <div className="flex-1 flex flex-col justify-between p-3 sm:p-4 bg-gradient-to-b from-[#141416] to-[#000000] overflow-hidden">
                 {/* Apps Grid - 8 core apps */}
-                <div className="grid grid-cols-4 gap-y-4 gap-x-2 pt-2">
+                <div className="grid grid-cols-4 gap-y-3 sm:gap-y-4 gap-x-2 pt-1 sm:pt-2">
                   {/* Messages */}
                   <button
                     onClick={() => setActiveApp('messages')}
                     className="flex flex-col items-center group active:scale-90 transition-transform"
                   >
-                    <div className="relative size-12 rounded-2xl bg-gradient-to-b from-[#34C759] to-[#28A745] flex items-center justify-center text-white shadow-lg border border-white/20">
-                      <MessageSquare className="size-5.5 fill-white" />
-                      <span className="absolute -top-1 -right-1 size-4 rounded-full bg-[#FF3B30] text-white text-[9.5px] font-bold flex items-center justify-center ring-2 ring-black">
+                    <div className="relative size-11 sm:size-12 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#34C759] to-[#28A745] flex items-center justify-center text-white shadow-lg border border-white/20">
+                      <MessageSquare className="size-5 sm:size-5.5 fill-white" />
+                      <span className="absolute -top-1 -right-1 size-3.5 sm:size-4 rounded-full bg-[#FF3B30] text-white text-[8.5px] sm:text-[9.5px] font-bold flex items-center justify-center ring-2 ring-black">
                         1
                       </span>
                     </div>
-                    <span className="text-[10.5px] font-medium text-white/90 mt-1">Tin nhắn</span>
+                    <span className="text-[9.5px] sm:text-[10.5px] font-medium text-white/90 mt-1">Tin nhắn</span>
                   </button>
 
                   {/* Phone / Voicemail */}
@@ -239,13 +239,13 @@ export function IPhoneFrame({
                     onClick={() => setActiveApp('phone')}
                     className="flex flex-col items-center group active:scale-90 transition-transform"
                   >
-                    <div className="relative size-12 rounded-2xl bg-gradient-to-b from-[#30D158] to-[#248A3D] flex items-center justify-center text-white shadow-lg border border-white/20">
-                      <Phone className="size-5.5 fill-white" />
-                      <span className="absolute -top-1 -right-1 size-4 rounded-full bg-[#FF3B30] text-white text-[9.5px] font-bold flex items-center justify-center ring-2 ring-black">
+                    <div className="relative size-11 sm:size-12 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#30D158] to-[#248A3D] flex items-center justify-center text-white shadow-lg border border-white/20">
+                      <Phone className="size-5 sm:size-5.5 fill-white" />
+                      <span className="absolute -top-1 -right-1 size-3.5 sm:size-4 rounded-full bg-[#FF3B30] text-white text-[8.5px] sm:text-[9.5px] font-bold flex items-center justify-center ring-2 ring-black">
                         3
                       </span>
                     </div>
-                    <span className="text-[10.5px] font-medium text-white/90 mt-1">Điện thoại</span>
+                    <span className="text-[9.5px] sm:text-[10.5px] font-medium text-white/90 mt-1">Điện thoại</span>
                   </button>
 
                   {/* Safari */}
@@ -253,10 +253,10 @@ export function IPhoneFrame({
                     onClick={() => setActiveApp('safari')}
                     className="flex flex-col items-center group active:scale-90 transition-transform"
                   >
-                    <div className="size-12 rounded-2xl bg-gradient-to-b from-[#0A84FF] to-[#0066CC] flex items-center justify-center text-white shadow-lg border border-white/20">
-                      <Globe className="size-5.5" />
+                    <div className="size-11 sm:size-12 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#0A84FF] to-[#0066CC] flex items-center justify-center text-white shadow-lg border border-white/20">
+                      <Globe className="size-5 sm:size-5.5" />
                     </div>
-                    <span className="text-[10.5px] font-medium text-white/90 mt-1">Safari</span>
+                    <span className="text-[9.5px] sm:text-[10.5px] font-medium text-white/90 mt-1">Safari</span>
                   </button>
 
                   {/* Notes */}
@@ -264,10 +264,10 @@ export function IPhoneFrame({
                     onClick={() => setActiveApp('notes')}
                     className="flex flex-col items-center group active:scale-90 transition-transform"
                   >
-                    <div className="size-12 rounded-2xl bg-gradient-to-b from-[#FFD60A] to-[#D4A800] flex items-center justify-center text-black shadow-lg border border-white/20">
-                      <FileText className="size-5.5" />
+                    <div className="size-11 sm:size-12 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#FFD60A] to-[#D4A800] flex items-center justify-center text-black shadow-lg border border-white/20">
+                      <FileText className="size-5 sm:size-5.5" />
                     </div>
-                    <span className="text-[10.5px] font-medium text-white/90 mt-1">Ghi chú</span>
+                    <span className="text-[9.5px] sm:text-[10.5px] font-medium text-white/90 mt-1">Ghi chú</span>
                   </button>
 
                   {/* Photos */}
@@ -275,10 +275,10 @@ export function IPhoneFrame({
                     onClick={() => setActiveApp('photos')}
                     className="flex flex-col items-center group active:scale-90 transition-transform"
                   >
-                    <div className="size-12 rounded-2xl bg-gradient-to-b from-[#FF2D55] via-[#AF52DE] to-[#5856D6] flex items-center justify-center text-white shadow-lg border border-white/20">
-                      <ImageIcon className="size-5.5" />
+                    <div className="size-11 sm:size-12 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#FF2D55] via-[#AF52DE] to-[#5856D6] flex items-center justify-center text-white shadow-lg border border-white/20">
+                      <ImageIcon className="size-5 sm:size-5.5" />
                     </div>
-                    <span className="text-[10.5px] font-medium text-white/90 mt-1">Ảnh</span>
+                    <span className="text-[9.5px] sm:text-[10.5px] font-medium text-white/90 mt-1">Ảnh</span>
                   </button>
 
                   {/* Banking */}
@@ -286,10 +286,10 @@ export function IPhoneFrame({
                     onClick={() => setActiveApp('banking')}
                     className="flex flex-col items-center group active:scale-90 transition-transform"
                   >
-                    <div className="size-12 rounded-2xl bg-gradient-to-b from-[#0A84FF] via-[#30D158] to-[#1C1C1E] flex items-center justify-center text-white shadow-lg border border-white/20">
-                      <CreditCard className="size-5.5" />
+                    <div className="size-11 sm:size-12 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#0A84FF] via-[#30D158] to-[#1C1C1E] flex items-center justify-center text-white shadow-lg border border-white/20">
+                      <CreditCard className="size-5 sm:size-5.5" />
                     </div>
-                    <span className="text-[10.5px] font-medium text-white/90 mt-1">Ngân hàng</span>
+                    <span className="text-[9.5px] sm:text-[10.5px] font-medium text-white/90 mt-1">Ngân hàng</span>
                   </button>
 
                   {/* Maps */}
@@ -297,10 +297,10 @@ export function IPhoneFrame({
                     onClick={() => setActiveApp('maps')}
                     className="flex flex-col items-center group active:scale-90 transition-transform"
                   >
-                    <div className="size-12 rounded-2xl bg-gradient-to-b from-[#30D158] via-[#FF9F0A] to-[#0A84FF] flex items-center justify-center text-white shadow-lg border border-white/20">
-                      <MapPin className="size-5.5" />
+                    <div className="size-11 sm:size-12 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#30D158] via-[#FF9F0A] to-[#0A84FF] flex items-center justify-center text-white shadow-lg border border-white/20">
+                      <MapPin className="size-5 sm:size-5.5" />
                     </div>
-                    <span className="text-[10.5px] font-medium text-white/90 mt-1">Bản đồ</span>
+                    <span className="text-[9.5px] sm:text-[10.5px] font-medium text-white/90 mt-1">Bản đồ</span>
                   </button>
 
                   {/* Contacts */}
@@ -308,38 +308,38 @@ export function IPhoneFrame({
                     onClick={() => setActiveApp('contacts')}
                     className="flex flex-col items-center group active:scale-90 transition-transform"
                   >
-                    <div className="size-12 rounded-2xl bg-gradient-to-b from-[#5856D6] to-[#3A3A3C] flex items-center justify-center text-white shadow-lg border border-white/20">
-                      <Users className="size-5.5" />
+                    <div className="size-11 sm:size-12 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#5856D6] to-[#3A3A3C] flex items-center justify-center text-white shadow-lg border border-white/20">
+                      <Users className="size-5 sm:size-5.5" />
                     </div>
-                    <span className="text-[10.5px] font-medium text-white/90 mt-1">Danh bạ</span>
+                    <span className="text-[9.5px] sm:text-[10.5px] font-medium text-white/90 mt-1">Danh bạ</span>
                   </button>
                 </div>
 
                 {/* iOS Glassmorphic Dock */}
-                <div className="h-16 rounded-[28px] bg-white/10 backdrop-blur-xl border border-white/15 px-3 py-1.5 flex items-center justify-around shadow-2xl mb-1">
+                <div className="h-14 sm:h-16 rounded-[22px] sm:rounded-[28px] bg-white/10 backdrop-blur-xl border border-white/15 px-2.5 sm:px-3 py-1 flex items-center justify-around shadow-2xl mb-0.5 sm:mb-1">
                   <button
                     onClick={() => setActiveApp('phone')}
-                    className="size-11 rounded-xl bg-gradient-to-b from-[#30D158] to-[#248A3D] flex items-center justify-center text-white active:scale-90 transition-transform shadow"
+                    className="size-10 sm:size-11 rounded-lg sm:rounded-xl bg-gradient-to-b from-[#30D158] to-[#248A3D] flex items-center justify-center text-white active:scale-90 transition-transform shadow"
                   >
-                    <Phone className="size-5 fill-white" />
+                    <Phone className="size-4.5 sm:size-5 fill-white" />
                   </button>
                   <button
                     onClick={() => setActiveApp('safari')}
-                    className="size-11 rounded-xl bg-gradient-to-b from-[#0A84FF] to-[#0066CC] flex items-center justify-center text-white active:scale-90 transition-transform shadow"
+                    className="size-10 sm:size-11 rounded-lg sm:rounded-xl bg-gradient-to-b from-[#0A84FF] to-[#0066CC] flex items-center justify-center text-white active:scale-90 transition-transform shadow"
                   >
-                    <Globe className="size-5" />
+                    <Globe className="size-4.5 sm:size-5" />
                   </button>
                   <button
                     onClick={() => setActiveApp('messages')}
-                    className="size-11 rounded-xl bg-gradient-to-b from-[#34C759] to-[#28A745] flex items-center justify-center text-white active:scale-90 transition-transform shadow"
+                    className="size-10 sm:size-11 rounded-lg sm:rounded-xl bg-gradient-to-b from-[#34C759] to-[#28A745] flex items-center justify-center text-white active:scale-90 transition-transform shadow"
                   >
-                    <MessageSquare className="size-5 fill-white" />
+                    <MessageSquare className="size-4.5 sm:size-5 fill-white" />
                   </button>
                   <button
                     onClick={() => setActiveApp('photos')}
-                    className="size-11 rounded-xl bg-gradient-to-b from-[#FF2D55] via-[#AF52DE] to-[#5856D6] flex items-center justify-center text-white active:scale-90 transition-transform shadow"
+                    className="size-10 sm:size-11 rounded-lg sm:rounded-xl bg-gradient-to-b from-[#FF2D55] via-[#AF52DE] to-[#5856D6] flex items-center justify-center text-white active:scale-90 transition-transform shadow"
                   >
-                    <ImageIcon className="size-5" />
+                    <ImageIcon className="size-4.5 sm:size-5" />
                   </button>
                 </div>
               </div>

@@ -95,49 +95,52 @@ export function PhoneSimulator({
   }
 
   return (
-    <div className="flex flex-col gap-5 px-4 pb-10">
+    <div className="flex flex-col gap-3 sm:gap-5 px-2 sm:px-4 pb-6 sm:pb-10">
       
       {/* Return Navigation & View Mode Toggle */}
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 sm:pt-2">
         <button
           onClick={() => router.push('/evidence')}
           className="flex items-center gap-1.5 font-mono text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
         >
           <ArrowLeft className="size-3.5" />
-          Quay lại Phòng Lab Bằng Chứng
+          <span className="hidden sm:inline">Quay lại Phòng Lab Bằng Chứng</span>
+          <span className="sm:hidden">Kho Bằng Chứng</span>
         </button>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center gap-1 bg-card/60 border border-border p-1 rounded-lg">
+        <div className="flex items-center gap-1 bg-card/60 border border-border p-0.5 sm:p-1 rounded-lg">
           <button
             onClick={() => setViewMode('iphone')}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-all',
+              'flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded text-[11px] sm:text-xs font-medium transition-all',
               viewMode === 'iphone'
                 ? 'bg-primary text-primary-foreground font-bold shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            <Smartphone className="size-3.5" />
+            <Smartphone className="size-3 sm:size-3.5" />
             <span>Mô phỏng iPhone</span>
           </button>
           <button
             onClick={() => setViewMode('forensics')}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-all',
+              'flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded text-[11px] sm:text-xs font-medium transition-all',
               viewMode === 'forensics'
                 ? 'bg-primary text-primary-foreground font-bold shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            <Terminal className="size-3.5" />
-            <span>Bảng Phục Hồi Pháp Y</span>
+            <Terminal className="size-3 sm:size-3.5" />
+            <span>Bảng Pháp Y</span>
           </button>
         </div>
       </div>
 
-      {/* 1. Evidence Header */}
-      <EvidenceHeader device={device} />
+      {/* 1. Evidence Header (Collapsible / Compact on mobile iPhone view) */}
+      <div className={cn(viewMode === 'iphone' && "hidden sm:block")}>
+        <EvidenceHeader device={device} />
+      </div>
 
       {/* 2. MAIN WORKSPACE */}
       {viewMode === 'iphone' ? (
