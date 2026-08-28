@@ -51,48 +51,71 @@
 
 ---
 
-## II. DẤU HIỆU CÀI CẮM SỚM Ở GIAI ĐOẠN ĐẦU (EARLY FORESHADOWING CLUES)
+## II. HỆ THỐNG MANH MỐI & DẤU HIỆU CÀI CẮM SỚM (CORE CLUES & FORESHADOWING)
 
 > [!NOTE]
-> **THỦ PHÁP CÀI CẮM MANH MỐI (NARRATIVE FORESHADOWING):**  
-> Ở Giai đoạn 0 và 1, người chơi sẽ bắt gặp 4 chi tiết này rải rác trong các tài liệu hiện trường. Thoạt nhìn, chúng chỉ giống như sự chăm sóc chu đáo, tận tụy của một cô bạn gái hiền lành. Nhưng khi toàn bộ vụ án được giải mã ở Phase 3, xâu chuỗi lại, người chơi sẽ rợn tóc gáy nhận ra đây là các hành vi **rình rập (stalking) và kiểm soát sinh học (biological control)** đã diễn ra suốt nhiều tháng!
+> **THỦ PHÁP CÀI CẮM MANH MỐI (NARRATIVE FORESHADOWING & CONTRADICTIONS):**  
+> Ở Giai đoạn 0 và 1, người chơi sẽ bắt gặp các chi tiết này rải rác trong lời khai, trích xuất viễn thông và tài liệu hiện trường. Thoạt nhìn, chúng giống như lời khai bình thường và sự chăm sóc chu đáo của một cô bạn gái hiền lành. Nhưng khi toàn bộ vụ án được giải mã ở Phase 3, xâu chuỗi lại, người chơi sẽ bẻ gãy hoàn toàn chứng cứ ngoại phạm và nhận ra các hành vi **rình rập (stalking) và kiểm soát sinh học (biological control)** rợn người!
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                  4 MANH MỐI ÁM ẢNH CÀI CẮM Ở GIAI ĐOẠN ĐẦU                  │
+│                 6 MANH MỐI & SƠ HỞ CỐT LÕI CỦA TRẦN THỊ HÀ                  │
 ├──────────────────────┬──────────────────────────────────────────────────────┤
-│ 🍵 Hũ trà "an thần" │ Lén pha thuốc an thần liều nhẹ để Khang mệt mỏi nằm ở│
-│    có vị lờ lợ       │ nhà, không thể ra ngoài ăn chơi hay đi gặp phụ nữ.   │
+│ 📺 Alibi VTV3        │ Khai xem "phim bộ VTV3" lúc 20h–21h tối Thứ Sáu      │
+│    "nhớ nhầm" lịch   │ (Thực tế Thứ Sáu VTV3 CHỈ chiếu gameshow thực tế).   │
 ├──────────────────────┼──────────────────────────────────────────────────────┤
-│ 🧵 Áo len đan dở    │ Đan áo len giữa mùa hè 39°C — khát vọng bọc kín da   │
+│ 🚂 Tiếng còi tàu hỏa │ Hộp thư thoại 20:32 lọt tiếng còi tàu & chuông rào   │
+│    trong hộp thư thoại│ chắn (chỉ có trước cổng nhà Khang, phòng trọ Hà 1km).│
+├──────────────────────┼──────────────────────────────────────────────────────┤
+│ 🍵 Hũ trà "an thần"  │ Lén pha thuốc Diazepam liều nhẹ để Khang mệt mỏi nằm │
+│    có vị lờ lợ       │ bẹp ở nhà, không thể ra ngoài ăn chơi hay gặp phụ nữ.│
+├──────────────────────┼──────────────────────────────────────────────────────┤
+│ 🧵 Áo len đan dở     │ Đan áo len giữa mùa hè 39°C — khát vọng bọc kín da   │
 │    giữa mùa hè 39°C  │ thịt Khang bằng vật phẩm do chính tay mình tạo ra.   │
 ├──────────────────────┼──────────────────────────────────────────────────────┤
-│ 👁️ "Bóng ma trùm mũ" │ 1-2h sáng bóng người nhỏ gầy trùm áo khoác có mũ     │
-│    dưới cây xoan     │ đứng bất động nhìn lên phòng Khang (lời khai Cô Lụa) │
+│ 👁️ "Bóng ma trùm mũ"  │ 1–2h sáng bóng người nhỏ gầy trùm áo khoác có mũ     │
+│    dưới cây xoan     │ đứng bất động nhìn lên phòng Khang (lời khai Cô Lụa).│
 ├──────────────────────┼──────────────────────────────────────────────────────┤
-│ 📱 Giám sát từng mm  │ Tin nhắn theo dõi: Sợi tóc trên gối ngắn hơn 1 phân, │
+│ 📱 Giám sát từng mm   │ Tin nhắn theo dõi: Sợi tóc trên gối ngắn hơn 1 phân, │
 │    cơ thể qua chat   │ cúc áo bị lỏng chỉ cấm ai khác chạm vào.             │
 └──────────────────────┴──────────────────────────────────────────────────────┘
 ```
 
-### 1. Hũ trà hoa cúc dưỡng tâm có vị "lờ lợ" (Vật chứng bàn trà — Phase 0)
+### 1. Sơ hở ngụy tạo ngoại phạm: "Xem phim bộ VTV3 tối Thứ Sáu" (Lời khai `07d` vs Lời khai `06`)
+* **Vị trí xuất hiện:** Trong Biên bản lấy lời khai nghi phạm lần 1 (`07d`), Hà khẳng định chắc nịch:  
+  > *"Tối qua sau khi ăn cơm xong, từ 20h00 đến 21h15 tôi nằm trên giường tại phòng trọ xem phim bộ truyền hình VTV3 cho đỡ buồn, xem hết tập phim mới tắt tivi đi ngủ."*
+* **Mâu thuẫn bộc lộ:** 
+  * Tối xảy ra án mạng là **Thứ Sáu, ngày 24/07/2026**. Khung giờ vàng cuối tuần trên kênh VTV3 **chỉ phát sóng chương trình gameshow / truyền hình thực tế**, hoàn toàn KHÔNG chiếu bất kỳ bộ phim truyền hình Việt Nam nào (phim bộ chỉ chiếu từ Thứ Hai đến Thứ Năm).
+  * Biên bản lời khai số `06` của Cô Lụa (số 16 sát vách) xác nhận tối Thứ Sáu bà ngồi xem gameshow thực tế trên VTV3.
+* **Ý nghĩa điều tra:** Hà không hề mở tivi tối hôm đó nên đã bịa đại theo thói quen xem phim ngày thường $\rightarrow$ Vạch trần bằng chứng ngoại phạm giả mạo!
+
+### 2. Bẫy âm thanh địa lý: Tiếng còi tàu hỏa trong Hộp thư thoại 20:32 (Trích xuất `08` / `iPhone Simulator`)
+* **Vị trí xuất hiện:** Trong ứng dụng Hộp thư thoại (Voicemail) trên điện thoại của Khang, có 01 tin nhắn thoại do Hà gửi lúc **20 giờ 32 phút đêm 24/07**:
+  > *"Anh Khang à, sao em gọi mãi anh không nghe máy? Thôi nếu anh mệt thì ngủ sớm đi nhé, mai em sang..."*
+* **Manh mối âm thanh ẩn (Audio Forensics):** Phía sau giọng nói thì thầm nhỏ nhẹ của Hà lọt rất rõ **tiếng còi tàu hỏa diesel hú vang 2 hồi dài cùng tiếng chuông rào chắn đường sắt leng keng**.
+* **Đòn búa tạ bẻ gãy lời khai:**
+  * Phòng trọ của Hà ở Ngõ 12 cách đường ray hơn 1,2km, xung quanh nhà cao tầng san sát, không thể nào thu được tiếng còi tàu và chuông rào chắn rõ mồn một.
+  * Nơi duy nhất cách rào chắn đường sắt đúng 30 mét chính là **ngay trước cổng nhà số 14 của Khang và nhà Cô Lụa**!
+  * Chứng minh lúc 20:32 Hà đang đứng rình mò trước cổng nhà Khang chứ không hề ở phòng trọ xem tivi!
+
+### 3. Hũ trà hoa cúc dưỡng tâm có vị "lờ lợ" (Vật chứng bàn trà — Phase 0)
 * **Vị trí xuất hiện:** Nằm trên bàn trà trong Biên bản khám nghiệm hiện trường (`02`). Cạnh bộ ấm chén vỡ có một hũ thủy tinh đựng hoa cúc sấy khô, trên nắp dán mảnh giấy note vàng nắn nót chữ viết tay của Hà:  
   > *"Em sao trà kỹ lắm, vị hơi đậm một chút nhưng ngủ rất sâu. Tối nay anh đừng đi đâu ra ngoài nhé, uống một tách rồi nghỉ sớm đi."*.
 * **Manh mối liên kết (Trích xuất tin nhắn chat `08`):** Trong nhóm chat bạn bè rủ đi bar tối 22/07, Khang từng từ chối: *"Thôi tao chịu, đợt này chả hiểu sao cứ tầm 8h tối húp xong bát canh với cốc trà con Hà mang sang là mắt díp tịt lại, người nhũn như cọng bún, nằm bẹp giường không nhấc nổi cái chân..."* (bạn bè chỉ tưởng trêu đùa bị người yêu vắt kiệt sức).
-* **Bản chất bệnh hoạn:** Hà đã nghiền thuốc an thần liều thấp (Sedative) trộn vào trà để hạn chế sự di chuyển của Khang, giữ Khang cố định trong căn nhà.
+* **Bản chất bệnh hoạn:** Hà đã nghiền thuốc an thần liều thấp (Sedative Diazepam) trộn vào trà để hạn chế sự di chuyển của Khang, giữ Khang cố định trong căn nhà.
 
-### 2. Chiếc áo len đỏ đan dở giữa đợt nắng nóng 39°C (Hiện trường phòng ngủ — Phase 0)
+### 4. Chiếc áo len đỏ đan dở giữa đợt nắng nóng 39°C (Hiện trường phòng ngủ — Phase 0)
 * **Vị trí xuất hiện:** Trong Biên bản khám nghiệm số 02, điều tra viên ghi nhận trên đầu giường ngủ tầng 2 của Khang có *01 cuộn len màu đỏ thẫm cùng chiếc áo len đang đan dở, nồng nặc mùi tinh dầu hoa nhài đặc trưng của Hà*.
 * **Điểm dị thường:** Vụ án xảy ra vào **ngày 24/07 (giữa đợt nắng nóng đỉnh điểm mùa hè Hà Nội)**. 
 * **Lời giải thích của Hà ở Phase 0 (`07d`):** Hà khóc sụt sùi khai: *"Em muốn đan sớm để mùa đông năm nay anh ấy chỉ mặc chiếc áo do chính tay em đan..."*. Nhưng thực tế, Hà muốn từng thớ sợi vải tiếp xúc với da thịt người yêu phải do chính ngón tay cô ta dệt nên.
 
-### 3. Lời khai rùng rợn về "Bóng ma trùm mũ" của Cô Lụa hàng xóm (Biên bản nhân chứng 06)
+### 5. Lời khai rùng rợn về "Bóng ma trùm mũ" của Cô Lụa hàng xóm (Biên bản nhân chứng 06)
 * **Vị trí xuất hiện:** Biên bản lấy lời khai nhân chứng số `06/BB-LK`. Bà Nguyễn Thị Lụa (61 tuổi, cư trú tại số 16 Đường Bờ Sông sát vách nhà Khang) cung cấp một tình tiết mơ hồ nhưng gây rợn người:
   > *"Đêm hôm trời nhá nhem, mắt người già như tôi lại kèm nhèm... Nhưng dạo gần đây, có mấy đêm tầm 1 - 2 giờ sáng tôi dậy đi vệ sinh, nhìn qua khe rèm cửa sổ chỉ thấy một **bóng người nhỏ con, gầy gò, trùm kín áo khoác gió có mũ** đứng im lìm như hóa đá dưới bóng cây xoan đầu ngõ. Cái bóng đó cứ ngước mặt nhìn chằm chằm lên cửa sổ phòng ngủ thằng Khang suốt cả tiếng đồng hồ không hề nhúc nhích... Trông lờ mờ rợn hết cả tóc gáy! Tôi đánh bạo gọi với ra 'Ai đứng đấy đấy?' thì cái bóng giật bắn mình rồi lủi nhanh như sóc vào ngõ tối mất dạng... Tôi chịu không rõ là nam hay nữ, chỉ thấy người nhỏ thó, mặc áo trùm đầu..."*
 * **Ý nghĩa đánh lạc hướng ban đầu:** Ban đầu người chơi có thể nghi ngờ là Tùng (dáng người gầy gò đi trả thù) hoặc kẻ trộm, chủ nợ theo dõi nhà Khang.
 * **Sự thật khi bóc tách ở Phase 3:** Dáng người nhỏ con gầy gò (cao 1m56) và chiếc áo gió mỏng có mũ trùm đầu chính là trang phục quen thuộc của Hà thu giữ trong tủ đồ!
 
-### 4. Lịch sử tin nhắn "chăm sóc từng milimet thể xác" (Trích xuất tin nhắn `08` — Phase 0)
+### 6. Lịch sử tin nhắn "chăm sóc từng milimet thể xác" (Trích xuất tin nhắn `08` — Phase 0)
 * **Vị trí xuất hiện:** Trong bảng sao kê điện thoại của Khang, ngoài tin nhắn đe dọa lúc 19:15, các ngày trước đó xuất hiện hàng loạt tin nhắn mang tính giám sát kỳ quái:
   * *[22/07/2026 14:10]*: *"Hôm nay anh đi cắt tóc ở tiệm anh Tuấn đúng không? Em thấy sợi tóc mai rơi trên gối sáng nay ngắn hơn bình thường 1 phân..."*
   * *[23/07/2026 08:30]*: *"Chiếc cúc áo thứ hai trên sơ mi xanh của anh bị lỏng chỉ rồi, để tối em sang khâu lại. Anh tuyệt đối đừng để ai khác chạm tay vào áo anh nhé."*
