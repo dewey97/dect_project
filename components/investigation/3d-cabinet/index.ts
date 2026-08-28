@@ -1,7 +1,0 @@
-export { default } from '../file_cabinet_3d'
-export * from './cabinet-types'
-export * from './cabinet-data'
-export { MetallicDrawer3D } from './metallic-drawer-3d'
-export { InteractiveFileFolder3D } from './interactive-file-folder-3d'
-export { SwingingCeilingLamp } from './swinging-ceiling-lamp'
-export { DossierSlideOverModal } from './dossier-slide-over-modal'
