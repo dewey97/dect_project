@@ -73,8 +73,8 @@
 │ 🧵 Áo len đan dở     │ Đan áo len giữa mùa hè 39°C — khát vọng bọc kín da   │
 │    giữa mùa hè 39°C  │ thịt Khang bằng vật phẩm do chính tay mình tạo ra.   │
 ├──────────────────────┼──────────────────────────────────────────────────────┤
-│ 👁️ "Bóng ma trùm mũ"  │ 1–2h sáng bóng người nhỏ gầy trùm áo khoác có mũ     │
-│    dưới cây xoan     │ đứng bất động nhìn lên phòng Khang (lời khai Cô Lụa).│
+│ 🚬 Kẻ đứng hút thuốc │ Thằng Khang bị nhiều người thù ghét; tối muộn có bóng│
+│    dưới cây xoan     │ người đứng hút thuốc rình mò nhà nó (lời khai 06).   │
 ├──────────────────────┼──────────────────────────────────────────────────────┤
 │ 📱 Giám sát từng mm   │ Tin nhắn theo dõi: Sợi tóc trên gối ngắn hơn 1 phân, │
 │    cơ thể qua chat   │ cúc áo bị lỏng chỉ cấm ai khác chạm vào.             │
@@ -109,11 +109,10 @@
 * **Điểm dị thường:** Vụ án xảy ra vào **ngày 24/07 (giữa đợt nắng nóng đỉnh điểm mùa hè Hà Nội)**. 
 * **Lời giải thích của Hà ở Phase 0 (`07d`):** Hà khóc sụt sùi khai: *"Em muốn đan sớm để mùa đông năm nay anh ấy chỉ mặc chiếc áo do chính tay em đan..."*. Nhưng thực tế, Hà muốn từng thớ sợi vải tiếp xúc với da thịt người yêu phải do chính ngón tay cô ta dệt nên.
 
-### 5. Lời khai rùng rợn về "Bóng ma trùm mũ" của Cô Lụa hàng xóm (Biên bản nhân chứng 06)
-* **Vị trí xuất hiện:** Biên bản lấy lời khai nhân chứng số `06/BB-LK`. Bà Nguyễn Thị Lụa (61 tuổi, cư trú tại số 16 Đường Bờ Sông sát vách nhà Khang) cung cấp một tình tiết mơ hồ nhưng gây rợn người:
-  > *"Đêm hôm trời nhá nhem, mắt người già như tôi lại kèm nhèm... Nhưng dạo gần đây, có mấy đêm tầm 1 - 2 giờ sáng tôi dậy đi vệ sinh, nhìn qua khe rèm cửa sổ chỉ thấy một **bóng người nhỏ con, gầy gò, trùm kín áo khoác gió có mũ** đứng im lìm như hóa đá dưới bóng cây xoan đầu ngõ. Cái bóng đó cứ ngước mặt nhìn chằm chằm lên cửa sổ phòng ngủ thằng Khang suốt cả tiếng đồng hồ không hề nhúc nhích... Trông lờ mờ rợn hết cả tóc gáy! Tôi đánh bạo gọi với ra 'Ai đứng đấy đấy?' thì cái bóng giật bắn mình rồi lủi nhanh như sóc vào ngõ tối mất dạng... Tôi chịu không rõ là nam hay nữ, chỉ thấy người nhỏ thó, mặc áo trùm đầu..."*
-* **Ý nghĩa đánh lạc hướng ban đầu:** Ban đầu người chơi có thể nghi ngờ là Tùng (dáng người gầy gò đi trả thù) hoặc kẻ trộm, chủ nợ theo dõi nhà Khang.
-* **Sự thật khi bóc tách ở Phase 3:** Dáng người nhỏ con gầy gò (cao 1m56) và chiếc áo gió mỏng có mũ trùm đầu chính là trang phục quen thuộc của Hà thu giữ trong tủ đồ!
+### 5. Lời khai nhân chứng Cô Lụa: Kẻ đứng hút thuốc rình mò dưới cây xoan (Biên bản nhân chứng 06)
+* **Vị trí xuất hiện:** Biên bản lấy lời khai nhân chứng số `06/BB-HX`. Bà Nguyễn Thị Lụa (61 tuổi, cư trú tại số 16 Đường Bờ Sông sát vách nhà Khang) cung cấp lời khai:
+  > *"Thằng Khang này thì nổi tiếng ăn chơi ngỗ ngược, nợ nần nhiều người thù ghét rồi cán bộ ạ... Dạo gần đây có mấy hôm tối muộn tầm 1 - 2 giờ sáng tôi dậy đi vệ sinh, nhìn qua khe rèm cửa sổ còn thấy có bóng ai đứng hút thuốc dưới gốc cây xoan đầu ngõ, đốm thuốc đỏ le lói cứ ngước mặt nhìn chằm chằm lên phòng ngủ nhà nó suốt cả buổi cơ mà..."*
+* **Ý nghĩa đánh lạc hướng (Red Herring):** Tạo nghi vấn rất thực tế và sống động hướng sang các mối thù hằn xã hội, con nợ/chủ nợ hoặc Nguyễn Thanh Tùng (thợ xây, thói quen hút thuốc lá) trước khi chân tướng của các nghi phạm được làm sáng tỏ.
 
 ### 6. Lịch sử tin nhắn "chăm sóc từng milimet thể xác" (Trích xuất tin nhắn `08` — Phase 0)
 * **Vị trí xuất hiện:** Trong bảng sao kê điện thoại của Khang, ngoài tin nhắn đe dọa lúc 19:15, các ngày trước đó xuất hiện hàng loạt tin nhắn mang tính giám sát kỳ quái:

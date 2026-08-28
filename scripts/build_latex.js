@@ -53,7 +53,7 @@ function compileAndCleanLatex() {
 
       try {
         // Run pdflatex directly in the phase folder
-        execSync(`"${pdflatexPath}" -interaction=nonstopmode "${texPath}"`, {
+        execSync(`"${pdflatexPath}" -interaction=nonstopmode "${texFile}"`, {
           cwd: phaseLatexDir,
           stdio: 'pipe'
         });
