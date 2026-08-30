@@ -27,46 +27,46 @@
 | Chi tiết Dữ liệu Trích xuất | Suy luận Logic Rút ra | Quyết định Gameplay |
 | :--- | :--- | :--- |
 | **Báo cáo tử thi `01` (`f1-1`):** Vết bầm chẩm gáy 6x4cm + Vết đâm cổ 3.5cm đứt động mạch cảnh | Nạn nhân chịu 2 tác động cơ học khác nhau: Cú va đập ngất tạm thời + Vết đâm đứt động mạch tử vong | Phân lập 2 giai đoạn tổn thương riêng biệt trên thi thể |
-| **Biên bản hiện trường `02` (`f1-2`) & Ảnh `p2`:** Bộ bình trà bị đập vỡ vụn dưới sàn + Cửa sau bị bật chốt + Giấy tờ & ảnh văng vãi | Hiện trường từng xảy ra xô xát gây vỡ đồ thủy tinh + Có dấu vết đột nhập qua cửa sau | Đặt nghi vấn về vụ xô xát vật lý tại phòng khách |
-| **Biên bản hiện trường `02` & Tin nhắn `08`:** Khang cho vay bốc họ; Tin nhắn khất nợ từ số máy rác `0985.xxx.341` <-> Hóa đơn nạp tiền di động vò nát dưới bàn trà đứng tên thanh toán `LE QUANG VU` | Đối chiếu số `0985.xxx.341` trên hóa đơn MoMo tên LE QUANG VU -> Vũ bị Khang khống chế nợ nần 350M bí mật giấu Mai | Khoanh vùng mâu thuẫn tiền bạc giấu giếm của Lê Quang Vũ |
-| **Biên bản lời khai Mai `07a` & Vũ `07b`:** Hai vợ chồng đi chung xe máy sang lúc 18:30; Vũ bảo Mai đi xe về trước lúc 19:00 vì "có bạn đi ô tô qua đón đi nhậu" | Vũ cố tình cho vợ về trước để tạo khoảng trống từ 19:00 - 19:40 lén chui cửa sau nhà Khang lúc 19:30 tìm giấy nợ | Khoanh vùng mốc giờ bất minh của Vũ trước khi ra quán nhậu |
+| **Biên bản hiện trường `02` (`f1-2`) & Ảnh `p2`:** Bộ bình trà bị đập vỡ vụn dưới sàn + Cúc áo xanh đen dưới gầm bàn + Giấy tờ tranh chấp đất văng vãi | Hiện trường từng xảy ra xô xát vật lý gây vỡ đồ thủy tinh + Có dấu vết giằng co đứt cúc áo | Đặt nghi vấn về vụ xô xát vật lý tại phòng khách |
+| **Biên bản lời khai Mai `07a` & Vũ `07b`:** Hai vợ chồng sang lúc 18:30; Mai cãi vã đòi đất 200m² ném hồ sơ về lúc 18:50; Vũ ở lại lấy cớ đi nhậu với bạn | Vũ có vết bầm gò má trái mới và cổ áo sơ mi xanh đen bị mất cúc trùng khớp cúc áo dưới gầm bàn | Phát hiện mâu thuẫn bạo lực giấu giếm của Lê Quang Vũ |
 | **Biên bản lời khai Hà `07d`:** Khai ở nhà cả tối + "Bán đứng" Tùng (*"Dạo này tôi thấy Tùng lảng vảng..."*) + **Lỡ lời nhắc đến bình trà vỡ** | Hà cố tình hướng điều tra sang Tùng. Chi tiết "bình trà vỡ" là hạt giống mâu thuẫn được gieo từ đầu. | Ghi nhận lời khai Hà làm manh mối ẩn cho Phase 3 |
 
 > **CÂU HỎI KEY 0 (Chuyển Giai đoạn 1):**  
-> *"Dựa trên việc đối chiếu Biên bản khám nghiệm hiện trường (`02`), Lời khai hàng xóm (`06`) và Báo cáo trích xuất tin nhắn (`08`): Sự kiện bất thường nào đã xảy ra tại phòng khách lúc khoảng 20:00, và danh sách các nghi phạm có mâu thuẫn gay gắt cần phải triệu tập ngay gồm những ai?"*  
+> *"Dựa trên việc đối chiếu Biên bản khám nghiệm hiện trường (`02`), Lời khai hàng xóm (`06`) và Các biên bản lời khai (`07a`-`07d`): Sự kiện bất thường nào đã xảy ra tại phòng khách lúc khoảng 20:00, và danh sách các nghi phạm có mâu thuẫn gay gắt cần phải triệu tập ngay gồm những ai?"*  
 > **Đáp án chuyển Phase:** Xảy ra vụ xô xát giằng co gây vỡ bộ bình trà (hàng xóm nghe tiếng vỡ xoảng lúc >20:00) khiến nạn nhân va đập chẩm gáy + Các nghi phạm triệu tập (Trần Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà).
 
 > **GỢI Ý DÀNH CHO CÂU HỎI KEY 0:**  
 > - **1 (-5đ):** Đối chiếu thời gian nghe thấy tiếng đồ gốm/thủy tinh vỡ trong Lời khai hàng xóm `06` với vật chứng bộ bình trà bị đập vỡ trong Biên bản hiện trường `02`.  
-> - **2 (-10đ):** So sánh hóa đơn nạp tiền đứng tên thanh toán LE QUANG VU trong Biên bản hiện trường `02` với các tin nhắn khất nợ từ số `0985.xxx.341` trong Trích xuất SMS `08`.  
+> - **2 (-10đ):** Đối chiếu chiếc cúc áo xanh đen rơi dưới gầm bàn phòng khách với vết bầm tím trên gò má và cổ áo xộc xệch của Lê Quang Vũ trong Lời khai `07b`.  
 > - **3 (-20đ):** Xác nhận sự kiện xô xát làm vỡ bình trà lúc ~20:00 và triệu tập đủ các nghi phạm: Trần Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà.
 
 ---
 
-### GIAI ĐOẠN 1: BÓC TÁCH TRANH CHẤP DI CHÚC & ĐẤT ĐAI (MAI & VŨ)
+### GIAI ĐOẠN 1: BÓC TÁCH TRANH CHẤP DI SẢN & KHOẢN NỢ BỐC HỌ (MAI & VŨ)
 
 #### 1. Các tài liệu tiếp cận (Phase 1 Unlocks)
-* `f2-1`: Di chúc ông nội bị làm giả (`08_di_chuc_ong_noi_gia_mao.pdf`)
-* `f2-2`: Kết quả giám định chữ ký & mực (`09_ket_qua_giam_dinh_chu_ky.pdf`)
-* `f2-3`: Bản đồ địa chính đất 75m2 (`10_ban_do_dia_chinh_va_giay_no_vu.pdf`)
-* `f2-4`: Giấy nợ 350M Lê Quang Vũ (`10_ban_do_dia_chinh_va_giay_no_vu.pdf`)
+* `f2-1`: Bộ 3 mẫu chữ ký & Giám định đồ nét (`08_bo_ba_chu_ky_va_giam_dinh_do_net.pdf`)
+* `f2-2`: Lịch phát sóng & Sự cố đài truyền hình TH3 (`09_lich_phat_song_va_su_co_kenh_th3.pdf`)
+* `f2-3`: Giám định vết hằn sổ nợ 150M (`10a_giam_dinh_vet_han_so_no_vu.pdf`)
+* `f2-4`: Hóa đơn POS & Tra cứu Unix Timestamp (`10b_hoa_don_pos_unix_timestamp.pdf`)
 
 #### 2. Bảng Ma Trận Suy Luận Giai Đoạn 1
 
 | Chi tiết Dữ liệu Trích xuất | Suy luận Logic Rút ra | Quyết định Gameplay |
 | :--- | :--- | :--- |
-| **Di chúc `08` (`f2-1`):** Vết tẩy xóa hóa chất ở dòng tên Mai + Dòng chữ chèn đè *"Toàn quyền cho Khang"* bằng mực bi dầu 2024 | Khang dùng hóa chất xóa tên Mai trên di chúc 2018 để cướp toàn bộ tiền đền bù bồi thường | Phát hiện hành vi tẩy xóa làm giả di chúc của nạn nhân Khang |
-| **Kết quả giám định `09` (`f2-2`) & Lời khai `07a`:** Soi hồng ngoại hiện vết tẩy + Mai gặp Luật sư Minh lúc 19:30 | Mai phát hiện di chúc bị tẩy xóa nên lén tráo di chúc gốc đem nhờ luật sư giám định hợp pháp. Mai có chứng cứ ngoại phạm | **LOẠI TRỪ NGHI PHẠM TRẦN NGỌC MAI** |
-| **Bản đồ đất `10` (`f2-3`, `f2-4`) <-> Lời khai `07b`:** Bản gốc địa chính chỉ có 75m2 nhưng bản vẽ đo đạc mới bị phình lên 120m2 do chính KTV Lê Quang Vũ ký tên | Vũ nợ bốc họ Khang 350M bí mật (giấu Mai). Khang đe dọa méc Mai nên Vũ buộc phải dùng chuyên môn đo đạc làm giả bản vẽ 120m2 cho Khang để trừ nợ. Vũ lén chui cửa sau lúc 19:30 tìm giấy nợ tiêu hủy. | **LOẠI TRỪ NGHI PHẠM LÊ QUANG VŨ** |
+| **Bộ 3 mẫu chữ ký `08` (`f2-1`):** Chữ ký trên Giấy ủy quyền (`EV-SIGN-01`) trùng khít 100% nét ký trên Biên bản gia đình (`EV-SIGN-02`) | Khang dùng kỹ thuật đồ nét (tracing) sao chép chữ ký thật của Mai để làm giả Giấy ủy quyền chiếm đoạt đất 200m² thế chấp ngân hàng | Xác nhận hành vi lừa đảo của Khang & Động cơ đòi công lý chính đáng của Mai |
+| **Sự cố đài TH3 `09` (`f2-2`) & Lời khai `07a`:** Kênh TH3 sập trạm phát sóng cáp Phân khu X đúng 12 phút (20:00 - 20:12) | Mai khai đúng sự cố màn hình xanh TV chỉ xảy ra tại khu nhà mình, chứng minh Mai ở nhà suốt buổi tối | **LOẠI TRỪ NGHI PHẠM TRẦN NGỌC MAI** |
+| **Vết hằn nét bút sổ nợ `10a` (`f2-3`):** Chà bóng than chì hiện nội dung nợ bốc họ 150.000.000đ của Vũ hạn 30/07 | Vũ giấu Mai nợ Khang 150M, bị Khang tống tiền đe dọa báo gia đình nên ở lại van xin lúc 19:00 - 19:15, bị Khang tát và xé sổ nợ | Làm rõ nguồn gốc vết bầm mặt, cúc áo đứt và lời khai gian dối của Vũ |
+| **Hóa đơn POS `10b` (`f2-4`):** Mã Barcode `1787924110` giải mã Unix Time ra 20:35:10 tại trạm xăng Km18 (cách 14km) | Vũ mua nước giải rượu cách hiện trường 14km đường đê ngập lúc 20:35:10, không thể kịp quay lại hiện trường lúc án mạng diễn ra (~21:00) | **LOẠI TRỪ NGHI PHẠM LÊ QUANG VŨ** |
 
 > **CÂU HỎI KEY 1 (Chuyển Giai đoạn 2):**  
-> *"Dựa trên việc đối chiếu Kết quả giám định di chúc (`09`), Bản đồ địa chính đất (`10`) và Báo cáo rà soát lý lịch (`04b`): Bằng chứng nào xác nhận di chúc bị Khang làm giả, và động cơ thực sự nào giải thích việc Lê Quang Vũ tiếp tay vẽ khống diện tích đất 120m2 cho Khang?"*  
-> **Đáp án chuyển Phase:** Vết tẩy xóa hóa chất tên Mai trên di chúc bị viết đè mực bi dầu 2024. Vũ bị Khang dùng khoản nợ bốc họ 350M bí mật (giấu Mai) đe dọa nên buộc phải dùng chuyên môn đo đạc làm giả bản vẽ 120m2 cho Khang để xóa nợ.
+> *"Dựa trên việc đối chiếu Bộ 3 mẫu chữ ký (`08`), Nhật ký sự cố kênh TH3 (`09`) và Biên bản giám định vết hằn sổ nợ (`10a`): Bằng chứng nào xác nhận Khang làm giả giấy tờ đất đai của Mai, và động cơ thực sự nào giải thích hành vi xé sổ nợ cùng lời khai gian dối của Lê Quang Vũ?"*  
+> **Đáp án chuyển Phase:** Kỹ thuật đồ nét (tracing fraud) giữa Giấy ủy quyền (`EV-SIGN-01`) và Biên bản gia đình (`EV-SIGN-02`) trùng khít 100% chứng minh Khang lừa đảo chiếm đất 200m² thế chấp ngân hàng. Vũ giấu vợ nợ bốc họ 150 triệu của Khang, bị tát và đe dọa báo gia đình nên trong cơn hoảng loạn đã cướp xé trang sổ nợ rồi tháo chạy.
 
 > **GỢI Ý DÀNH CHO CÂU HỎI KEY 1:**  
-> - **1 (-5đ):** Đọc Kết quả giám định `09` để xem kỹ thuật soi tia hồng ngoại phát hiện vết tẩy xóa tên Mai và mực bi dầu 2024 viết đè.  
-> - **2 (-10đ):** So sánh số điện thoại sim rác `0985.xxx.341` trong Báo cáo `04b` với các tin nhắn khất nợ đe dọa trong Trích xuất SMS `08`.  
-> - **3 (-20đ):** Di chúc bị Khang xóa tên Mai. Vũ bị Khang dùng khoản nợ bốc họ 350M bí mật đe dọa ép phải dùng chuyên môn đo đạc làm giả bản vẽ 120m2 cho Khang để trừ nợ.
+> - **1 (-5đ):** So sánh 3 mẫu chữ ký trong Hồ sơ `08` để thấy chữ ký Giấy ủy quyền trùng khít 100% từng nét uốn với Biên bản họp gia đình gốc (kỹ thuật đồ nét/tracing).  
+> - **2 (-10đ):** Dùng kỹ thuật chà bóng than chì trên trang sổ nợ `10a` để làm hiện lên vết hằn ghi chép khoản nợ 150 triệu của Lê Quang Vũ.  
+> - **3 (-20đ):** Khang đồ nét chữ ký làm giả Giấy ủy quyền đất 200m². Vũ bị đè nặng bởi khoản nợ bốc họ 150 triệu giấu gia đình nên hoảng loạn xé sổ nợ lúc 19:15.
 
 ---
 
@@ -155,12 +155,12 @@
 ## PHẦN II: CÁC KỊCH BẢN RẼ NHÁNH PHÁN QUYẾT (DECISION BRANCHES)
 
 ### 1. Buộc tội Sai 1: Trần Ngọc Mai (Em họ)
-* **Căn cứ sai:** Người chơi thấy Mai có tranh chấp di chúc và vân tay trên tủ.
-* **Phản hồi:** *"Mai làm việc tại VP Luật sư Minh từ 19:30 đến 20:30. Mai chỉ lấy di chúc đi giám định hợp pháp. Mai vô tội."* (Trừ 20 điểm).
+* **Căn cứ sai:** Người chơi thấy Mai có tranh chấp di sản đất 200m² và để lại vân tay cùng hồ sơ Đơn tố cáo tại hiện trường.
+* **Phản hồi:** *"Mai chỉ sang đối chất đòi lại đất lúc 18:30 và đã về nhà từ 19:30. Sự cố sập trạm phát sóng cáp kênh TH3 đúng 12 phút (20:00 - 20:12) tại Phân khu X xác nhận Mai ở nhà suốt buổi tối. Mai vô tội."* (Trừ 20 điểm).
 
 ### 2. Buộc tội Sai 2: Lê Quang Vũ (Chồng Mai)
-* **Căn cứ sai:** Thấy Vũ nợ Khang 350M và có dấu giày ở cửa sau.
-* **Phản hồi:** *"Vũ lén vào lúc 19:30 để trộm bản vẽ 75m2 tiêu hủy chứng cứ gian lận. Bạn nhậu xác nhận Vũ ở quán từ 19:40 đến 22:00. Vũ không có mặt lúc 21:00."* (Trừ 20 điểm).
+* **Căn cứ sai:** Thấy Vũ nợ Khang 150M, có vết bầm gò má và chiếc cúc áo sơ mi xanh đen đứt dưới gầm bàn.
+* **Phản hồi:** *"Vũ bị Khang tát và giật đứt cúc áo lúc 19:10 khi van xin hoãn nợ. Hóa đơn mua nước giải rượu tại Trạm xăng Km18 lúc 20:35:10 (cách 14km đường đê ngập) xác nhận Vũ không thể có mặt tại hiện trường lúc án mạng diễn ra (~21:00). Vũ vô tội."* (Trừ 20 điểm).
 
 ### 3. Buộc tội Sai 3: Tùng (Bạn cũ - Bẫy Red Herring)
 * **Căn cứ sai:** Bị sập bẫy do Tùng thừa nhận xô ngã Khang và camera ghi nhận Tùng chạy hoảng hốt lúc 20:15.

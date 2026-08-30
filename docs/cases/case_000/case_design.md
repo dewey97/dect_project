@@ -13,9 +13,9 @@
 
 | Nhân Vật | Vai Trò | Lý Do Nghi Vấn | Lời Khai Ngoại Phạm & Thực Tế |
 | :--- | :--- | :--- | :--- |
-| 🪦 **Nguyễn Văn Khang** | Nạn nhân | Tử vong do mảnh thủy tinh đâm đứt động mạch cổ; có vết bầm tím do xô xát. Tính cách bốc đồng, tàn nhẫn, làm nghề cho vay nặng lãi / thu họ côn đồ. | Tử vong lúc ~21:00 ngày 24/07. |
-| 👩 **Trần Ngọc Mai** | Nghi phạm 1 | Em họ nạn nhân; tranh chấp di chúc thừa kế; dấu tay trên hộp sắt. | Khai sang thăm 18:30. Thực tế phát hiện di chúc bị sửa nên lén tráo di chúc gốc mang đi nhờ luật sư giám định. |
-| 👷 **Lê Quang Vũ** | Nghi phạm 2 | Cán bộ đo đạc; chồng Mai; bốc họ nợ riêng Khang 350M giấu vợ; bị Khang tống tiền ép đo khống đất. | Khai ở cây xăng/nhậu. Thực tế ở lại chui cửa sau lúc 19:30 tìm giấy nợ 350M và bản vẽ gốc 75m2 tiêu hủy chứng cứ gian lận. |
+| 🪦 **Nguyễn Văn Khang** | Nạn nhân | Tử vong do mảnh thủy tinh đâm đứt động mạch cổ; có vết bầm tím do xô xát. Tính cách bốc đồng, tàn nhẫn, làm nghề cho vay nặng lãi / thu họ côn đồ. | Tử vong lúc ~21:00 ngày 24/07 (Đêm mưa lớn). |
+| 👩 **Trần Ngọc Mai** | Nghi phạm 1 | Em họ nạn nhân; tranh chấp di sản mảnh đất 200m²; ném Đơn tố cáo và hồ sơ xuống sàn; dấu vân tay trên mép bàn. | Khai sang đòi đất 18:30, về nhà 19:30 xem TV. Thực tế chứng minh ngoại phạm nhờ sự cố đài truyền hình cáp kênh TH3 sập sóng 12 phút (20:00 - 20:12) tại khu vực X. |
+| 👷 **Lê Quang Vũ** | Nghi phạm 2 | Chồng Mai; giấu vợ nợ riêng Khang 150M bốc họ; có vết bầm gò má và cúc áo đứt tại hiện trường. | Khai đi nhậu với bạn. Thực tế ở lại van xin hoãn nợ lúc 19:00 - 19:15 bị tát xô xát, sau đó uống rượu 1 mình và mua nước giải rượu lúc 20:22:15 (Unix Timestamp 1787923335). |
 | 👨 **Tùng** | Nghi phạm 3 (Hung thủ giả định) | Bạn cũ / Anh trai Gia Huy; mang thù hận vụ tai nạn 1998; xô xát tại hiện trường. | Khai không đến. Dấu vết xô xát & bộ bình trà vỡ lúc 20:00. Tùng tưởng mình làm Khang chết nên tháo chạy hoảng hốt lúc 20:15. |
 | 👩 **Hà** | Nghi phạm 4 (THỦ PHẠM THỰC SỰ) | Bạn gái hiện tại của Khang (đang rạn nứt / cãi nhau liên tục); tâm lý ghen tuông cuồng sở hữu, theo dõi Khang liên tục. | Khai ở nhà cả tối + Cố tình "bán đứng" Tùng ở Phase 1. Thực tế lén chui vào nhà lúc 20:45, thấy Khang ngất + đọc tin nhắn tình nhân mới ➔ Đâm chết Khang lúc 21:00. |
 
@@ -43,15 +43,15 @@
 - **Bi kịch trốn tìm năm 1998:** Khang, Hà, Tùng và Gia Huy (em trai Tùng) lớn lên cùng nhau. Khang từ nhỏ có tính bốc đồng, hay bắt nạt. Trong một trò chơi trốn tìm tại nhà cũ, Khang cố tình gài chốt gỗ bên ngoài tủ âm tường nhốt Gia Huy lại rồi bỏ đi. Gia Huy tử vong do ngạt khí. Sự việc năm đó bị báo chí ghi nhận là tai nạn ngoài ý muốn, nhưng Tùng luôn sống trong sự dằn dặt tự trách và căm hờn Khang.
 
 ### 2. Chuỗi Mâu Thuẫn Trước Đêm Án Mạng
-- **Di chúc giả:** Sau khi ông nội mất, Khang dùng hóa chất xóa tên Mai trên di chúc để chiếm trọn nhà đền bù hàng tỷ đồng.
-- **Khoản nợ thu họ của Vũ:** Khang làm nghề cho vay nặng lãi / bốc họ. Vũ sa lầy nợ Khang 350 triệu do làm ăn thua lỗ và giấu kín không cho vợ (Mai) biết. Khang dùng giấy nợ 350M và dọa méc Mai để ép Vũ (cán bộ địa chính) đo khống đất từ 75m2 lên 120m2 rồi dùng bản vẽ gốc tống tiền.
+- **Làm giả di chúc & Đồ nét chữ ký đất đai:** Sau khi ông nội mất, Khang dùng kỹ thuật đồ nét (tracing) sao chép chữ ký của Mai để tạo Giấy ủy quyền giả mạo, chiếm trọn mảnh đất 200m² đem thế chấp ngân hàng. Mai phát hiện tuần trước, thuê luật sư soạn Đơn tố cáo và Thỏa thuận trả đất sang đòi lại công lý.
+- **Khoản nợ bốc họ của Vũ:** Vũ giấu Mai nợ riêng Khang 150 triệu do đầu tư thua lỗ. Khang tính lãi cắt cổ, liên tục chặn đường đánh đập, uy hiếp sẽ gửi giấy nợ về cho gia đình Mai để ép Vũ ngăn cản Mai khởi kiện.
 - **Tống tiền Tùng:** Tùng quay về quê chuẩn bị giỗ 12 năm cho Gia Huy. Khang nhặt được chiếc còi đồng cũ của Gia Huy, đe dọa vạch trần vụ án năm xưa để ép Tùng ký giấy từ bỏ mọi quyền lợi nhà đất.
 - **Vật phẩm Tùng để quên tại hiện trường:** Khi Tùng mang bài báo cũ 1998 cùng bức ảnh 2 anh em (Tùng & Gia Huy đeo còi đồng) đến đối chất với Khang lúc 20:00, trong lúc xô xát giằng co và tháo chạy lúc 20:15, Tùng đã vô tình đánh rơi 2 kỷ vật này nằm lẫn trong đống giấy tờ văng vãi dưới sàn (`p2`). Người chơi đối chiếu ảnh 2 anh em ở `p2` với ảnh gia đình 5 người ở `p4` sẽ phát hiện đứa trẻ đeo còi đồng chính là bé Gia Huy (em Tùng).
 - **Mối quan hệ Hà & Khang:** Hà là bạn gái hiện tại của Khang nhưng mối quan hệ đang rạn nứt nghiêm trọng, cãi nhau liên tục do tính nết Khang gia tăng căng thẳng và có dấu hiệu bắt cá hai tay. Hà có tâm lý cuồng sở hữu độc hại, kiểm soát. Khang ngột ngạt đòi chia tay để quen tình nhân mới. Hà bị né tránh nên rơi vào trạng thái hoảng loạn, liên tục bám theo theo dõi Khang.
 
-### 3. Diễn Biến Đêm Án Mạng (24/07/2026)
-- **18:30 – Đột nhập 1 (Mai):** Mai sang nhà Khang cãi vã, lén tráo lấy tờ di chúc gốc mang đi nhờ luật sư giám định chữ ký.
-- **19:30 – Đột nhập 2 (Vũ):** Vũ giả vờ ra về cùng Mai nhưng ở lại lén chui cửa sau tìm giấy nợ 350M bí mật và bản vẽ địa chính gốc 75m2 để tiêu hủy nhưng không thấy.
+### 3. Diễn Biến Đêm Án Mạng (24/07/2026 - Đêm mưa lớn)
+- **18:30 – Đòi đất & Tranh chấp (Mai & Vũ):** Mai chở Vũ bằng xe máy đến nhà Khang. Mai đập bàn đưa Đơn tố cáo đòi lại 50% mảnh đất 200m². Khang thách thức. Đến 18:50, Mai ném xấp hồ sơ xuống sàn rồi lấy xe máy bỏ về nhà một mình lúc 19:30.
+- **19:00 - 19:15 – Van xin nợ nần & Xô xát (Vũ):** Vũ ở lại van xin Khang hoãn nợ 150M. Khang tát Vũ 2 cái, giật đứt cúc áo sơ mi xanh đen và đe dọa gửi giấy nợ cho Mai. Vũ xé sổ nợ rồi hoảng loạn tháo chạy lúc 19:15. Vũ ra quán rượu ven sông ngồi 19:30 - 20:30, sau đó mua nước giải rượu Ladodetox tại Trạm xăng Km12 lúc 20:22:15 (Unix Timestamp `1787923335`) rồi về nhà lúc 21:15.
 - **20:00 - 20:15 – Xô xát (Tùng):** 2 ngày trước, trong bữa nhậu say cùng nhóm bạn cũ, Khang lỡ lời khoe "chiến tích nhốt tủ Huy" thuở nhỏ. Tùng bàng hoàng cầm bài báo vụ án năm 1998 sang nhà Khang chất vấn lúc 20:00. Khang thờ ơ nhạo báng và giật xé rách bài báo thách thức. Tùng nổi giận giằng co làm rơi vỡ bộ bình trà, xô Khang đập gáy vào cạnh bàn/tủ ngất xỉu. Tùng kiểm tra thấy Khang còn thở nhưng quá hoảng hốt nên tháo chạy khỏi hiện trường lúc **20:15** để bắt xe khách về Hải Phòng.
 - **20:40 - 21:00 – Án mạng (Trần Thị Hà):** 
   - Lúc 20:40, màn hình điện thoại của Khang (đang nằm ngất dưới sàn) sáng lên tin nhắn rủ đi du lịch của tình nhân mới.

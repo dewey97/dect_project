@@ -9,18 +9,19 @@
 | ID | Tên Manh Mối / Tài Liệu | Nội Dung Tóm Tắt | Manh Mối Ẩn / Điểm Nút Thắt (Hidden Clue) | Đối Tượng | Phase | Vai Trò Gameplay | Cặp Ghép So Sánh |
 | :---: | :--- | :--- | :--- | :---: | :---: | :---: | :---: |
 | `f1-1` | `01_bao_cao_kham_nghiem_tu_thi.pdf` | Báo cáo khám nghiệm tử thi sơ bộ | 02 nhóm vết thương riêng biệt: vết bầm gáy xô xát & vết đâm đứt động mạch cảnh mất máu | Khang | Phase 0 | [Mở màn] Khám nghiệm tử thi | `f4-1` |
-| `f1-2` | `02_bien_ban_kham_nghiem_hien_truong.pdf` | Biên bản khám nghiệm hiện trường | Bộ bình trà bị đập vỡ vụn dưới sàn nhà & Dấu giày nam size 41 & Cửa sau bị bật chốt | Khang, Tùng | Phase 0 | [Mở màn] Hiện trường | `07d` |
+| `f1-2` | `02_bien_ban_kham_nghiem_hien_truong.pdf` | Biên bản khám nghiệm hiện trường | Bộ bình trà bị đập vỡ vụn dưới sàn nhà & Dấu giày nam size 41 & Cúc áo xanh đen dưới gầm bàn (`EV-SHIRT-BUTTON`) | Khang, Tùng, Vũ | Phase 0 | [Mở màn] Hiện trường | `07d`, `07b` |
 | `f1-3` | `03_bao_cao_tien_do_dieu_tra.pdf` | Báo cáo tiến độ điều tra ban đầu | Tổng hợp rà soát dấu vết vân tay, camera an ninh và triệu tập 04 nghi phạm | Mai, Vũ, Tùng, Hà | Phase 0 | [Dẫn dắt tiến độ] | N/A |
 | `f1-4` | `04_bao_cao_xac_minh_nhan_than_khang.pdf` | Báo cáo nhân thân nạn nhân Khang | Bố mẹ mất sớm, ông qua đời 3 tháng trước, lối sống ăn tiêu bốc đồng/trăng hoa | Khang | Phase 0 | [Tài liệu bối cảnh] | N/A |
-| `f1-5` | `05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` | Ma trận rà soát mâu thuẫn nghi phạm | Phân lập 4 động cơ: Tranh chấp nhà đất (Mai), Gian lận đo đạc (Vũ), Đối tượng số lạ 20:55 (Tùng - Ẩn danh), Ghen tuông (Hà) | Mai, Vũ, Ẩn danh, Hà | Phase 0 | [Ma trận nghi vấn] | N/A |
+| `f1-5` | `05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` | Ma trận rà soát mâu thuẫn nghi phạm | Phân lập 4 động cơ: Tranh chấp đất đai 200m² (Mai), Khoản nợ bốc họ 150M (Vũ), Đối tượng số lạ 20:55 (Tùng - Ẩn danh), Ghen tuông (Hà) | Mai, Vũ, Ẩn danh, Hà | Phase 0 | [Ma trận nghi vấn] | N/A |
 | `f1-6` | `06_bien_ban_lay_loi_khai_hang_xom.pdf` | Biên bản lời khai hàng xóm | Bố mẹ Tùng nhắc về em út mất & Tùng sang mời giỗ nhưng Khang không sang + Tiếng cãi vã xô xát lúc 20:00 | Bố mẹ Tùng, Hà | Phase 0 | [Xác minh mốc giờ & Manh mối ẩn] | `f1-2` |
-| `07a` | `07a_bien_ban_loi_khai_tran_ngoc_mai.pdf` | Lời khai Q&A Trần Ngọc Mai | Thừa nhận cãi vã lúc 18:30, lén tráo di chúc gốc mang đi nhờ luật sư giám định, rời đi lúc 19:00 | Mai | Phase 0 | [Nghi vấn di chúc] | `f2-1`, `f2-2` |
-| `07b` | `07b_bien_ban_loi_khai_le_quang_vu.pdf` | Lời khai Q&A Lê Quang Vũ | Khai đi nhậu từ 19:40-22:00, chối bỏ vay nợ tiền bạc hay có mâu thuẫn tài chính với Khang | Vũ | Phase 0 | [Nghi vấn gian lận] | `f2-4` |
+| `07a` | `07a_bien_ban_loi_khai_tran_ngoc_mai.pdf` | Lời khai Q&A Trần Ngọc Mai | Thừa nhận cãi vã đòi đất lúc 18:30, ném hồ sơ về lúc 18:50; khai xem TV kênh TH3 bị mất sóng lúc 20:00 | Mai | Phase 0 | [Nghi vấn di sản & Alibi TV] | `f2-1`, `f2-2` |
+| `07b` | `07b_bien_ban_loi_khai_le_quang_vu.pdf` | Lời khai Q&A Lê Quang Vũ | Khai chỉ ở lại nói chuyện phiếm rồi đi nhậu, chối nợ nần; có vết bầm gò má và đứt cúc áo | Vũ | Phase 0 | [Nghi vấn bạo lực & Giấu nợ] | `f2-3`, `f2-4` |
 | `07c` | `07c_bien_ban_loi_khai_tung.pdf` | Lời khai Q&A Tùng (Lần 1) | Khai làm công nhân xây dựng, chỉ gọi điện hỏi vay vốn lúc 20:55, phủ nhận đến nhà | Tùng | Phase 0/2 | [Bác bỏ bởi Ghim cài áo] | `p8`, `f3-1` |
 | `07d` | `07d_bien_ban_loi_khai_tran_thi_ha.pdf` | Lời khai Q&A Trần Thị Hà | Khai ở nhà cả tối không đi đâu nhưng **LỠ LỜI MÔ TẢ KHANG NẰM GỤC BÊN BÌNH TRÀ VỠ** | Hà | Phase 0/3 | [Eureka Clue / Mâu thuẫn mốc giờ] | `f1-2`, `f4-1` |
-| `f2-1` | `08_di_chuc_ong_noi_gia_mao.pdf` | Tờ di chúc viết tay của ông nội | **Vết tẩy xóa hóa chất tên Mai + Dòng chữ chèn đè bằng mực bi hóa dầu 2024** | Khang, Mai | Phase 1 | [Bằng chứng giả mạo] | `07a`, `f2-2` |
-| `f2-2` | `09_ket_qua_giam_dinh_chu_ky.pdf` | Kết quả giám định của Viện KHHS | Soi hồng ngoại phát hiện mực bi dầu 2024 viết đè trên mực bút máy 2018 $\rightarrow$ Giải thích hành vi tráo di chúc của Mai | Mai | Phase 1 | [Loại trừ nghi phạm Mai] | `f2-1` |
-| `f2-3` / `f2-4` | `10_ban_do_dia_chinh_va_giay_no_vu.pdf` | Bản đồ gốc 75m2 & Giấy nợ 350M | Khang ép Vũ đo khống lên 120m2 rồi tống tiền $\rightarrow$ Động cơ Vũ đột nhập lén trộm bản vẽ lúc 19:30 | Vũ | Phase 1 | [Loại trừ nghi phạm Vũ] | `07b` |
+| `f2-1` | `08_bo_ba_chu_ky_va_giam_dinh_do_net.pdf` | Bộ 3 mẫu chữ ký & Giám định đồ nét | **Chữ ký Giấy ủy quyền (`EV-SIGN-01`) trùng khít 100% Biên bản gia đình (`EV-SIGN-02`)** $\rightarrow$ Khang dùng kỹ thuật tracing làm giả | Mai, Khang | Phase 1 | [Bằng chứng đồ nét giả mạo] | `07a`, `f2-2` |
+| `f2-2` | `09_lich_phat_song_va_su_co_kenh_th3.pdf` | Nhật ký kỹ thuật truyền hình TH3 | Sự cố sập trạm phát sóng cáp cục bộ Phân khu X đúng 12 phút (20:00-20:12) $\rightarrow$ Chứng minh Mai ở nhà | Mai | Phase 1 | [Xác nhận ngoại phạm Mai] | `07a`, `f2-1` |
+| `f2-3` | `10a_giam_dinh_vet_han_so_no_vu.pdf` | Giám định vết hằn nét bút sổ nợ | Tô bóng bút chì hiện rõ khoản nợ bốc họ 150M của Vũ + Hạn chót 30/07 bị đe dọa báo gia đình | Vũ, Khang | Phase 1 | [Lột trần lời khai gian dối của Vũ] | `07b` |
+| `f2-4` | `10b_hoa_don_pos_unix_timestamp.pdf` | Hóa đơn nước giải rượu nhòe nước | Mã POS `1787924110` giải mã Unix Timestamp ra chính xác **20:35:10** tại trạm xăng Km18 (cách 14km) | Vũ | Phase 1 | [Xác nhận ngoại phạm Vũ] | `07b`, `f2-3` |
 | `f3-1` | `11_bien_ban_trich_xuat_camera_va_tro_tron_tim.pdf` | Camera cây xăng Petrolimex | Camera xác nhận Tùng vào ngõ 19:45 và rời bến lúc 20:15 | Tùng | Phase 2 | [Mốc giờ di chuyển] | `07c`, `f4-1` |
 | `f3-2` | `11a_bien_ban_kham_xet_phong_tro_tung.pdf` | Biên bản khám xét phòng trọ Tùng | Thu giữ hộp các-tông chứa Khung tranh 2 anh em có bút tích Hè 1998 xin lỗi Gia Huy | Tùng | Phase 2 | [Kỷ vật quá khứ] | `f3-3` |
 | `f3-3` | `11b_bai_bao_vu_an_ngat_khi_1998_ghep_manh.pdf` | Trích lục bài báo cũ 1998 | Vụ ngạt khí tủ âm tường của bé Gia Huy (câm, bệnh tim) và lời chia sẻ của Khang | Tùng, Khang | Phase 2 | [Động cơ đối chất] | `f3-2`, `f3-4` |
@@ -42,7 +43,7 @@
 
 ### 🟢 GIAI ĐOẠN 0: KHÁM NGHIỆM & RÀ SOÁT BAN ĐẦU
 1. **`01_bao_cao_kham_nghiem_tu_thi.pdf` (`f1-1`)**: Phát hiện 2 nhóm tổn thương (bầm tím gáy do xô xát & đứt động mạch cảnh do vật sắc đâm) + Dư lượng thuốc an thần Benzodiazepin.
-2. **`02_bien_ban_kham_nghiem_hien_truong.pdf` (`f1-2`)**: Hiện trường xáo trộn, bình trà vỡ vụn, mảnh thủy tinh dính máu, ghim cài áo công trường (`p8`), mảnh báo xé (`p5`), hũ trà hoa cúc dán note của Hà.
+2. **`02_bien_ban_kham_nghiem_hien_truong.pdf` (`f1-2`)**: Hiện trường xáo trộn, bình trà vỡ vụn, mảnh thủy tinh dính máu, ghim cài áo công trường (`p8`), mảnh báo xé (`p5`), cúc áo sơ mi xanh đen dưới gầm bàn (`EV-SHIRT-BUTTON`).
 3. **`04_bao_cao_xac_minh_nhan_than_khang.pdf` (`f1-4a`)**: Lý lịch Khang mồ côi bố mẹ, làm nghề cho vay bốc họ / vay nặng lãi.
 4. **`04b_bao_cao_ra_soat_ly_lich_nghi_pham.pdf` (`f1-4b`)**: Báo cáo rà soát sơ yếu lý lịch các đối tượng liên quan kèm số điện thoại & tóm tắt lý lịch tư pháp.
 5. **`08_trich_xuat_tin_nhan_dieu_tra_ban_dau.pdf` (`08-tx`)**: Báo cáo trích xuất tin nhắn điện thoại Khang (chứa tin nhắn xin khất nợ từ số máy rác `0985.xxx.341`).
@@ -51,11 +52,11 @@
 8. **`03_bao_cao_tien_do_dieu_tra.pdf` (`f1-3`)**: Báo cáo tổng hợp tiến độ điều tra ban đầu.
 9. **`05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf` (`f1-5`)**: Báo cáo chuyên đề mâu thuẫn & mối quan hệ (Ma trận rà soát động cơ 4 đối tượng).
 
-### 🟡 GIAI ĐOẠN 1: TRANH CHẤP DI CHÚC & ĐẤT ĐAI
-10. **`08_di_chuc_ong_noi_gia_mao.pdf` (`f2-1`)**: Tờ di chúc ghi năm 2018 nhưng tẩy xóa tên Mai và viết đè mực bi dầu 2024 $\rightarrow$ Chứng minh di chúc bị Khang làm giả.
-11. **`09_ket_qua_giam_dinh_chu_ky.pdf` (`f2-2`)**: Viện KHHS kết luận mực bi hóa dầu năm 2024 viết đè chèn $\rightarrow$ Giải thích việc Mai mang di chúc đi giám định (Loại trừ Mai).
-12. **`10a_trich_luc_ban_do_dia_chinh_goc_75m2.pdf` (`f2-3a`)**: Trích lục bản đồ địa chính gốc chứng nhận diện tích đất chính thức là 75.0m2 đứng tên Cụ Thành.
-13. **`10b_ban_trich_do_ky_thuat_den_bu_120m2.pdf` (`f2-3b`)**: Bản trích đo kỹ thuật kê khai vống lên 120.0m2 do KTV Lê Quang Vũ lập bản vẽ kèm giấy nợ 350M.
+### 🟡 GIAI ĐOẠN 1: TRANH CHẤP DI SẢN & KHOẢN NỢ BỐC HỌ
+10. **`08_bo_ba_chu_ky_va_giam_dinh_do_net.pdf` (`f2-1`)**: Hồ sơ đối chiếu 3 mẫu chữ ký của Mai (`EV-SIGN-01`, `EV-SIGN-02`, `EV-SIGN-03`) và kết luận giám định đồ nét (tracing fraud) của Khang.
+11. **`09_lich_phat_song_va_su_co_kenh_th3.pdf` (`f2-2`)**: Nhật ký kỹ thuật của Đài truyền hình xác nhận sự cố sập sóng cáp kênh TH3 trạm X đúng 12 phút (20:00 - 20:12) $\rightarrow$ Xác nhận ngoại phạm cho Mai.
+12. **`10a_giam_dinh_vet_han_so_no_vu.pdf` (`f2-3`)**: Biên bản giám định vết hằn nét bút than chì trên trang sổ nợ rách, phơi bày khoản nợ bốc họ 150M của Vũ.
+13. **`10b_hoa_don_pos_unix_timestamp.pdf` (`f2-4`)**: Hóa đơn mua nước giải rượu Ladodetox tại trạm xăng Km12 có mã POS `1787923335` giải mã Unix Time 20:22:15 $\rightarrow$ Xác nhận ngoại phạm cho Vũ.
 
 ### 🔴 GIAI ĐOẠN 2: BÍ MẬT QUÁ KHỨ & CUỘC XÔ XÁT
 14. **`11_bien_ban_trich_xuat_camera_va_tro_tron_tim.pdf` (`f3-1`)**: Camera cây xăng ghi nhận Tùng vào ngõ 19:45 và tháo chạy lúc 20:15.
