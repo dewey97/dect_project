@@ -6,7 +6,7 @@
 ### 📖 KÝ SỰ 1: BẢN DI CHÚC CỦA ÔNG NỘI & LỜI TẠ TỘI CỦA VŨ (NHÁNH MAI & VŨ)
 Hai tuần sau ngày Khang bị sát hại, Cơ quan Thi hành án dân sự đã chính thức hủy bỏ Giấy ủy quyền giả mạo và trao trả 50% quyền sở hữu mảnh đất 200m² hương hỏa cho Trần Ngọc Mai.
 
-Tại phòng khách gia đình ở Phố Đoàn Kết, Lê Quang Vũ quỳ sụp dưới chân vợ, bật khóc nức nở thú nhận toàn bộ khoản nợ 150 triệu đồng bốc họ do đầu tư thua lỗ. Mai nhìn chồng với đôi mắt ngấn lệ. Chị không ly hôn, nhưng nghiêm giọng yêu cầu Vũ cùng mình bán bớt một phần đất để trả dứt điểm khoản nợ tín dụng đen, chấm dứt chuỗi ngày sống trong dối trá và sợ hãi.
+Tại phòng khách gia đình ở Phố Đoàn Kết, Lê Quang Vũ quỳ sụp dưới chân vợ, bật khóc nức nở thú nhận toàn bộ khoản nợ 300 triệu đồng bốc họ do đầu tư thua lỗ. Mai nhìn chồng với đôi mắt ngấn lệ. Chị không ly hôn, nhưng nghiêm giọng yêu cầu Vũ cùng mình bán bớt một phần đất để trả dứt điểm khoản nợ tín dụng đen, chấm dứt chuỗi ngày sống trong dối trá và sợ hãi.
 
 ---
 

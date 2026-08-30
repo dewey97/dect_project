@@ -18,7 +18,7 @@ function safeCopyAndUnlink(src, dest, retries = 5) {
 function compileAndCleanLatex() {
   const targetFilter = process.argv[2] ? process.argv[2].toLowerCase() : null;
   const rootDir = path.join(__dirname, '..');
-  const latexBaseDir = path.join(rootDir, 'docs', 'cases', 'case_000', '03_documents', 'latex');
+  const latexBaseDir = path.join(rootDir, 'latex', 'case_000');
   const publicPdfBaseDir = path.join(rootDir, 'public', 'documents', 'case_000');
   const logDir = path.join(rootDir, '.vscode', 'latex_logs');
 
@@ -63,20 +63,16 @@ function compileAndCleanLatex() {
 
       const generatedPdf = path.join(phaseLatexDir, `${baseName}.pdf`);
       const destPdfPublic = path.join(publicPdfBaseDir, phase, `${baseName}.pdf`);
-      const destPdfDocs = path.join(rootDir, 'docs', 'cases', 'case_000', '03_documents', 'pdf', phase, `${baseName}.pdf`);
 
       if (fs.existsSync(generatedPdf)) {
         const publicDir = path.dirname(destPdfPublic);
-        const docsDir = path.dirname(destPdfDocs);
 
         if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
-        if (!fs.existsSync(docsDir)) fs.mkdirSync(docsDir, { recursive: true });
 
-        // Copy to both public and docs directory, then clean up temp pdf
+        // Copy to public directory, then clean up temp pdf
         fs.copyFileSync(generatedPdf, destPdfPublic);
-        fs.copyFileSync(generatedPdf, destPdfDocs);
         fs.unlinkSync(generatedPdf);
-        console.log(`✓ Updated PDF: public & docs for ${phase}/${baseName}.pdf`);
+        console.log(`✓ Updated PDF: public for ${phase}/${baseName}.pdf`);
         successCount++;
       } else {
         console.error(`❌ Failed to produce PDF for ${texFile}`);

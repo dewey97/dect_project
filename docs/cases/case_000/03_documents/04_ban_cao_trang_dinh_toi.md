@@ -35,7 +35,7 @@
 ### III. PHÂN HÓA TRÁCH NHIỆM CÁC ĐỐI TƯỢNG LIÊN QUAN (MINH OAN)
 
 1. **Trần Ngọc Mai:** Vô tội. Hành vi sang nhà Khang lúc 18:30 nhằm đòi lại quyền thừa kế hợp pháp sau khi phát hiện Khang đồ nét chữ ký đất 200m² (`08`). Có ngoại phạm vững chắc tại Tiệm thuốc Minh Châu lúc 19:42 (`09`).
-2. **Lê Quang Vũ:** Vô tội về hành vi giết người. Hành vi giằng xé sổ nợ bốc họ 150M lúc 19:10 (`10a`) xuất phát từ sự hoảng loạn sợ bị lộ với vợ. Có ngoại phạm tại Trạm xăng Km18 lúc 20:35 (`10b`).
+2. **Lê Quang Vũ:** Vô tội về hành vi giết người. Hành vi giằng xé sổ nợ bốc họ 300M lúc 19:10 (`10a`) xuất phát từ sự hoảng loạn sợ bị lộ với vợ. Có ngoại phạm tại Trạm xăng Km18 lúc 20:35 (`10b`).
 3. **Nguyễn Thanh Tùng:** Không phạm tội giết người. Cú xô ngã lúc 20:00 chỉ làm nạn nhân ngất xỉu (tổn thương giai đoạn 1). Tùng đã rời hiện trường lúc 20:15 và lên xe khách đi Hải Phòng lúc 20:30 (`11`).
 
 ---

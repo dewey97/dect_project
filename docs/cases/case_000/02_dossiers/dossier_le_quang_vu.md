@@ -106,7 +106,7 @@ ngồi im nghe cãi Vũ ở lại        bị tát, hoảng loạn    quán Bãi
 ```
 
 * **18:30 – 18:50:** Vũ ngồi im chịu trận trong khi Mai và Khang cãi nhau nảy lửa. Khi Mai ném hồ sơ bỏ về, Vũ viện cớ đi nhậu với bạn để ở lại xin gặp riêng Khang.
-* **19:00 – 19:15:** Mai vừa đi khuất, Vũ quỳ lạy van xin Khang cho gia hạn khoản nợ 150 triệu và xin đừng gửi giấy nợ cho Mai. Khang khinh bỉ chửi mắng, tát mạnh hai cái vào má trái làm Vũ ngã nhào, giật đứt một cúc áo sơ mi xanh đen văng xuống gầm bàn. Khang rút cuốn sổ nợ đập vào mặt Vũ đe dọa: *"Đêm nay tao sẽ cho cả nhà con Mai biết bộ mặt thật của mày!"* Trong cơn hoảng loạn cùng cực vì sợ mất hết danh dự và gia đình, Vũ liều mạng cướp lấy cuốn sổ, vội vàng xé toạc các trang ghi tên mình rồi đẩy Khang ra tháo chạy thục mạng dưới cơn mưa lúc **19:15**.
+* **19:00 – 19:15:** Mai vừa đi khuất, Vũ quỳ lạy van xin Khang cho gia hạn khoản nợ 300 triệu và xin đừng gửi giấy nợ cho Mai. Khang khinh bỉ chửi mắng, tát mạnh hai cái vào má trái làm Vũ ngã nhào, giật đứt một cúc áo sơ mi xanh đen văng xuống gầm bàn. Khang rút cuốn sổ nợ đập vào mặt Vũ đe dọa: *"Đêm nay tao sẽ cho cả nhà con Mai biết bộ mặt thật của mày!"* Trong cơn hoảng loạn cùng cực vì sợ mất hết danh dự và gia đình, Vũ liều mạng giằng cướp cuốn sổ, giật phăng nguyên cả trang số 12 ghi tên mình đứt khỏi gáy sổ, vò nát nhét túi rồi đẩy Khang ra tháo chạy thục mạng dưới cơn mưa lúc **19:15**.
 * **19:30 – 20:15:** Đầu óc quay cuồng, không dám về nhà đối mặt với Mai, Vũ lái xe máy dưới mưa ra quán rượu bình dân ven sông Bãi Trũng ngoại thành (cách nhà Khang **14km đường đê**) ngồi uống rượu một mình trong bế tắc.
 * **20:35:10:** Rời quán rượu với hơi men nồng nặc, sợ Mai ngửi thấy mùi cồn và phát hiện vết bầm trên mặt, Vũ tấp vào Cửa hàng tiện lợi 24/7 cạnh Trạm xăng Km18 Quốc Lộ mua 01 chai nước giải rượu *Ladodetox Nosamin* (55.000 VNĐ).
 * **21:30:** Sau khi đi xe máy hơn 40 phút dưới trời mưa lớn và đường ngập từ Km18 về đến nhà tại Phố Đoàn Kết, Vũ thấy Mai đã đi ngủ nên lén vào phòng tắm rửa mặt, uống thuốc giải rượu rồi lên giường nằm im run rẩy.
@@ -117,10 +117,10 @@ ngồi im nghe cãi Vũ ở lại        bị tát, hoảng loạn    quán Bãi
 ## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
 
 ### 1. Cơ chế Khám phá 1: Giám định Vết hằn nét bút trên Sổ nợ (`EV-DEBT-INDENTATION`)
-* **Vật chứng hiện trường:** Cuốn sổ tay bìa da đen của Khang nằm trên bàn làm việc bị xé rách nham nhở 3 trang giữa.
-* **Thao tác điều tra của Người chơi:** Sử dụng công cụ **Bút chì than / Đèn soi xiên (Forensic Oblique Light & Pencil Shading)** để chà nhẹ lên mặt giấy trắng trang kế tiếp.
+* **Vật chứng hiện trường:** Cuốn sổ tay bìa da đen của Khang nằm trên bàn làm việc bị giật xé đứt rời nguyên trang số 12 khỏi gáy sổ.
+* **Thao tác điều tra của Người chơi:** Dùng **Bút chì mềm 2B / Kỹ thuật chà than chì (Carbon Shading)** để chà nhẹ lên mặt trang giấy số 13 kế tiếp.
 * **Kết quả hiển thị:** Áp lực tỳ đè từ ngòi bút bi của Khang ở trang trước đã in hằn nguyên vẹn nội dung:
-  > *"Ngày 12/03/2026: Thằng Vũ (chồng con Mai) bốc họ 150.000.000đ. Lãi 5k/ngày. Hạn chót 30/07. Cầm cố: Danh dự gia đình, không trả tao méc bố vợ."*
+  > *"12/03/2026: V-Điện (Thằng rể nhà Mai) bốc họ: 300.000.000đ. Lãi suất: 5k/triệu/ngày. Hạn chót: 30/07. Cầm: Giấy phép hành nghề Kỹ sư điện + Uy tín nhà 45 Đoàn Kết. Không trả tao ném giấy nợ về nhà bố vợ và cơ quan vợ!"*
 * **Ý nghĩa phá án:** Lột trần lời khai gian dối của Vũ, làm rõ động cơ tống tiền bạo lực của Khang và chứng minh Vũ đã có mặt bên trong phòng khách giằng co xé sổ nợ lúc 19:10.
 
 ### 2. Cơ chế Khám phá 2: Giải mã Unix Timestamp & Bài toán Quãng đường (`EV-POS-RECEIPT-UNIX`)

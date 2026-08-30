@@ -91,7 +91,7 @@
   * Việc Khang cướp trắng mảnh đất hương hỏa của ông nội là giọt nước tràn ly khiến Mai quyết tâm trừng trị Khang bằng pháp luật.
 * **Với Lê Quang Vũ (Chồng):**
   * Mai yêu thương chồng nhưng có cá tính mạnh mẽ, cầu toàn và rất coi trọng thể diện gia đình.
-  * Mai không hề hay biết Vũ đang lén lút gánh một khoản nợ 150 triệu đồng bốc họ từ chính Khang do đầu tư thua lỗ. Sự nghiêm khắc của Mai vô tình tạo nên bức tường áp lực khiến Vũ không dám hé răng thú nhận.
+  * Mai không hề hay biết Vũ đang lén lút gánh một khoản nợ 300 triệu đồng bốc họ từ chính Khang do đầu tư thua lỗ. Sự nghiêm khắc của Mai vô tình tạo nên bức tường áp lực khiến Vũ không dám hé răng thú nhận.
 * **Với Nguyễn Thanh Tùng (Bạn cũ thuở nhỏ):**
   * Mai nhớ Tùng là người anh cả chu đáo thời thơ ấu, từng cùng tham gia buổi trốn tìm định mệnh năm 1998 khi bé Gia Huy gặp nạn. Khi nghe báo chí nhắc lại vụ tai nạn năm 1998, Mai luôn đau lòng và thương tiếc cho gia đình Tùng.
 * **Với Trần Thị Hà (Bạn gái Khang):**
