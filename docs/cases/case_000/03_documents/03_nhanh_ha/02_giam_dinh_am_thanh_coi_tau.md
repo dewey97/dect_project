@@ -10,8 +10,8 @@ Số: `13/KL-GDATA`
 
 ---
 
-# KẾT LUẬN GIÁM ĐỊNH ÂM THANH MÔI TRƯỜNG & LOG THIẾT BỊ
-*(V/v Giám định file ghi âm hộp thư thoại 20:32 và Log mở khóa Touch ID 20:48)*
+# KẾT LUẬN GIÁM ĐỊNH ÂM THANH MÔI TRƯỜNG NỀN
+*(V/v Giám định âm học file ghi âm hộp thư thoại lúc 20:32 đêm 24/07)*
 
 ---
 
@@ -37,10 +37,9 @@ Số: `13/KL-GDATA`
 
 ---
 
-### II. PHÂN TÍCH NHẬT KÝ MỞ KHÓA TOUCH ID LÚC 20:48 (MÃ: `EV-TOUCHID-LOG`)
-* Lúc **20:48:12**, điện thoại Khang ghi nhận mở khóa bằng vân tay ngón trỏ phải của nạn nhân.
-* Bác sĩ pháp y xác nhận nạn nhân đã bị Tùng xô ngã hôn mê từ **20:00**.
-* $\rightarrow$ **KẾT LUẬN:** Đã có người thứ ba (Hà) trực tiếp cầm bàn tay mềm nhũn của Khang đang bất tỉnh để áp vào nút cảm biến Touch ID nhằm mở khóa lướt đọc đoạn chat nhân tình đi Đà Lạt lúc 20:48.
+### II. ĐỐI CHIẾU LỊCH TRÌNH ĐOÀN TÀU VỚI LỜI KHAI
+* Theo xác nhận của Ga Hà Nội và lời khai nhân chứng tại hiện trường: Chuyến tàu hàng Nam - Bắc số hiệu `HBN-203` chạy qua đoạn giao cắt Đường Bờ Sông vào khung giờ **20:30 – 20:35**.
+* Tiếng còi tàu và chuông gác chắn lọt vào tin nhắn thoại lúc **20:32:15** là bằng chứng khoa học chứng minh người gửi (Trần Thị Hà) **đang có mặt ngay trước rào chắn cổng nhà Khang**, hoàn toàn bác bỏ lời khai đang ở phòng trọ cách đó 1.2km!
 
 ---
 

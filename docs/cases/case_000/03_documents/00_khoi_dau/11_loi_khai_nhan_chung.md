@@ -21,11 +21,11 @@ Cán bộ điều tra: Trung úy Nguyễn Văn Hoàng tiến hành lấy lời k
 ---
 
 ### I. LỜI KHAI BÀ NGUYỄN THỊ LỤA (60 TUỔI — SỐ 12 ĐƯỜNG BỜ SÔNG, SÁT VÁCH)
-* **18:30 — 18:50:** Trời mưa to, xe máy Trần Ngọc Mai chở chồng là Lê Quang Vũ sang nhà Khang. Nghe tiếng Mai đập bàn quát tháo đòi đất đai di chúc. Đến 18:50 Mai nổ máy xe phóng về một mình dưới mưa, Vũ ở lại bên trong.
-* **19:15:** Nghe tiếng Khang chửi bới rồi tiếng tát bốp bốp. Liền sau đó thấy Vũ ôm má trái, cổ áo xộc xệch hoảng loạn lao xe máy tháo chạy trong mưa.
-* **20:00 — 20:15:** Lúc đang ngồi xem tivi ở phòng khách, nghe tiếng cãi nhau lớn của đàn ông bên nhà Khang nhắc đến tên *"thằng Huy"*, rồi tiếng *"XOẢNG!"* vỡ vụn đồ gốm sứ. Đến 20:15 thấy một người đàn ông mặc áo bảo hộ công nhân xây dựng (sau này nhận diện là Tùng) hớt hải chạy vội ra ngõ.
-* **20:45:** Nhìn qua cửa sổ thấy một bóng người mặc áo gió trùm kín đầu màu xám đen đứng rình dưới gốc cây xoan đầu ngõ rồi lén lẻn vào nhà Khang. Trời mưa bão to nên bà Lụa khóa cửa đi ngủ.
-* **06:30 — 06:45 ngày 25/07 (Phát hiện thi thể & Báo án):** Sáng sớm ra quét ngõ, thấy cửa nhà Khang mở toang từ đêm qua, đèn phòng khách bật sáng, nước mưa tạt lênh láng. Bà Lụa sang gọi thì bàng hoàng phát hiện Khang nằm gục trên vũng máu bên cạnh bình trà vỡ, toàn thân co cứng. Bà hoảng hốt tri hô và gọi Công an Phường lúc 06:45.
+* **18:30 — 19:00:** Trời mưa to, có hai người đi chung xe máy sang nhà Khang (sau này biết là Mai và Vũ). Tôi nghe tiếng phụ nữ quát tháo đòi giấy tờ đất đai. Đến **đúng lúc nhạc hiệu Thời sự 19h00 VTV1 vang lên**, tôi nghe thấy tiếng xe máy nổ máy rồ ga phóng vụt ra khỏi ngõ.
+* **19:00 — 19:30:** Sau khi tiếng xe máy đi, bên nhà Khang vẫn có tiếng đàn ông to tiếng cãi cọ một lúc rồi thôi.
+* **20:00 — 20:15:** Tối thứ Sáu tôi ngồi ăn cơm xem chương trình Gameshow ca nhạc trên VTV3, nghe tiếng cãi nhau rất lớn của đàn ông bên nhà Khang nhắc đến tên *"thằng Huy"*, rồi tiếng *"XOẢNG!"* vỡ vụn đồ gốm sứ. Đến khoảng 20:15 thấy một người đàn ông mặc áo bảo hộ công nhân xây dựng hớt hải chạy vội ra ngõ.
+* **20:45:** Nhìn qua cửa sổ thấy một bóng người mặc áo gió trùm kín đầu màu xám đen đứng rình dưới gốc cây xoan đầu ngõ rồi lén lẻn vào nhà Khang. Trời mưa bão to nên tôi chốt cửa đi ngủ.
+* **06:30 — 06:45 ngày 25/07 (Phát hiện thi thể & Báo án):** Sáng sớm ra quét ngõ, thấy cửa nhà Khang mở toang từ đêm qua, đèn phòng khách bật sáng, nước mưa tạt lênh láng. Tôi sang gọi thì bàng hoàng phát hiện Khang nằm gục trên vũng máu bên cạnh bình trà vỡ, toàn thân co cứng. Tôi hoảng hốt tri hô và gọi Công an Phường lúc 06:45.
 
 ---
 

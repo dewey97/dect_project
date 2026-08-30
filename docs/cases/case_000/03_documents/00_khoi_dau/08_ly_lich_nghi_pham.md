@@ -44,11 +44,11 @@ Số: `04b/BC-RSLL`
 │ • Năm sinh: 18/03/1990 (36 tuổi). Giới tính: Nam.                          │
 │ • Số CCCD: 001090003412 (Cấp ngày 14/05/2021).                             │
 │ • ĐKHKTT: Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.           │
-│ • Chỗ ở hiện nay: Phòng 204, Khu nhà trọ công nhân số 18 Phố Cầu Bươu.      │
-│ • Nghề nghiệp: Thợ xây dựng — Công ty CP Xây dựng & Cầu đường Hà Thành.    │
+│ • Chỗ ở hiện nay: Phòng trọ công nhân số 18 Phố Cầu Bươu.                   │
+│ • Nghề nghiệp: Lao động tự do (Thợ hồ, sửa chữa nhà cửa dân dụng).          │
 │ • Số điện thoại chính chủ: 0913.882.901.                                    │
 │ • Tiền án, tiền sự: Không.                                                  │
-│ • Quan hệ: Bạn thuở nhỏ xóm Bờ Sông; Anh trai của bé Gia Huy (mất năm 1998).│
+│ • Quan hệ: Hàng xóm cùng xóm Bờ Sông thời niên thiếu của nạn nhân Khang.    │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ 4. TRẦN THỊ HÀ                                                              │
 ├─────────────────────────────────────────────────────────────────────────────┤

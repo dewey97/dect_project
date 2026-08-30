@@ -13,15 +13,15 @@ Tại phòng khách gia đình ở Phố Đoàn Kết, Lê Quang Vũ quỳ sụp
 ### 📖 KÝ SỰ 2: TIẾNG CÒI ĐỒNG TUỔI THƠ DƯỚI BIA MỘ (NHÁNH TÙNG & GIA HUY)
 Được viện kiểm sát đình chỉ điều tra tội giết người, Nguyễn Thanh Tùng trở về căn nhà cũ ở Xóm Bờ Sông.
 
-Vào một buổi chiều thu lặng gió, Tùng một mình mang theo bó hoa cúc trắng ra nghĩa trang thăm mộ em trai Gia Huy. Đứng trước bia mộ đứa em câm đoản mệnh đã khuất 28 năm, Tùng đặt chiếc khung tranh vẽ hai anh em xuống cỏ, cúi đầu tạ lỗi:
+Vào một buổi chiều thu lặng gió, Tùng một mình mang theo bó hoa cúc trắng và nén hương thơm ra nghĩa trang thăm mộ em trai Gia Huy. Đứng trước bia mộ đứa em câm đoản mệnh đã khuất 28 năm, Tùng cúi đầu tạ lỗi trong làn khói hương nghi ngút:
 > *"Huy ơi... anh đã tìm lại được sự thật cho em rồi. Kẻ nhốt em năm xưa đã phải trả giá... Em yên nghỉ nhé, từ nay anh sẽ không dằn vặt bản thân nữa."*
 
 ---
 
-### 📖 KÝ SỰ 3: CUỘN LEN ĐỎ ĐAN DỞ TRONG TRẠI TÂM THẦN PHÁP Y (NHÁNH TRẦN THỊ HÀ)
-Trần Thị Hà bị kết án Tù Chung thân và chuyển tới Viện Giám định Pháp y Tâm thần Trung ương để theo dõi hành vi ám ảnh cưỡng chế phân liệt.
+### 📖 KÝ SỰ 3: ÁNH MẮT VÔ HỒN TRONG PHÒNG BIỆT GIAM PHÁP Y (NHÁNH TRẦN THỊ HÀ)
+Trần Thị Hà bị truy tố tội Giết người và được đưa vào diện theo dõi điều trị tâm thần pháp y đặc biệt do hội chứng ái kỷ ám ảnh cưỡng chế phân liệt.
 
-Trong căn phòng giam kín có song sắt, Hà ngồi lặng lẽ bên mép giường, tay thoăn thoắt đan một chiếc khăn len màu đỏ thắm giữa cái nóng oi ả của mùa hè. Đôi mắt Hà vô hồn nhìn qua ô cửa nhỏ, miệng mấp máy lẩm bẩm bài hát thiếu nhi năm nào:
+Trong căn phòng giam kín có song sắt, Hà ngồi lặng lẽ bên mép giường, hai bàn tay đan chặt vào nhau rồi nhẹ nhàng vuốt ve khoảng không trước ngực như thể đang nâng niu lọn tóc của người tình. Đôi mắt Hà mở to vô hồn nhìn qua ô cửa nhỏ, miệng mấp máy lẩm bẩm bài hát thiếu nhi năm nào:
 > *"Năm... mười... mười lăm... hai mươi... Anh Khang trốn kỹ chưa? Em tìm thấy anh rồi... Anh mãi mãi là của em..."*
 
 ---

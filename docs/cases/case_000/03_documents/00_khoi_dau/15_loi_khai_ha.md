@@ -31,13 +31,10 @@ Vào hồi 19 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 ### NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)
 
 * **Hỏi (ĐTV Lê Minh):** Chị có quan hệ tình cảm thế nào với nạn nhân Khang và tối hôm qua (24/07/2026) chị ở đâu, làm gì?
-* **Đáp (Trần Thị Hà):** *(Khóc sụt sùi, giọng nhỏ nhẹ yếu ớt)* Em và anh Khang yêu nhau được hơn 3 năm rồi thưa cán bộ... Dạo này anh Khang hay mệt mỏi nên tối hôm kia em có mang sang cho anh ấy một hũ trà hoa cúc dặn anh ấy uống an thần ngủ sớm. Tối qua sau khi ăn cơm xong, từ 20h00 đến 21h15 em nằm ở phòng trọ xem phim bộ truyền hình VTV3 cho đỡ buồn, xem hết tập phim mới tắt tivi đi ngủ. Em ở nhà cả tối không hề đi đâu!
+* **Đáp (Trần Thị Hà):** *(Khóc sụt sùi, giọng nhỏ nhẹ yếu ớt)* Em và anh Khang yêu nhau được hơn 3 năm rồi thưa cán bộ... Dạo này anh Khang hay mệt mỏi nên em có tự tay sao một hũ trà hoa cúc mang sang dặn anh ấy uống an thần nghỉ sớm. Tối qua sau khi ăn cơm xong, từ 20h00 đến 21h30 em ở một mình trong phòng trọ xem phim bộ trên VTV3 cho đỡ buồn. Tập phim hôm qua đau lòng lắm, kể về một người đàn ông phản bội người con gái đã hy sinh cả tuổi thanh xuân cho anh ta... Xem xong em khóc ướt cả gối rồi mới tắt tivi đi ngủ. Em ở phòng trọ cả tối không hề bước chân ra ngoài!
 
 * **Hỏi (ĐTV Lê Minh):** Chị có biết ai có thù oán hay mâu thuẫn gì với anh Khang gần đây không?
-* **Đáp (Trần Thị Hà):** Em thấy dạo gần đây có anh Tùng thợ xây hay lảng vảng qua ngõ với vẻ mặt hằn học lắm... Chiều tối qua lúc anh Khang bị nạn, **em thấy anh Khang nằm gục mê man bên cạnh bộ bình trà vỡ vụn...** à ý em là... anh Tùng thợ xây tính nóng nảy, chắc chắn là anh Tùng sang gây sự đập vỡ đồ đạc rồi hại anh Khang! Cán bộ phải bắt anh Tùng đền mạng cho anh Khang!
-
-* **Hỏi (ĐTV Lê Minh):** Tại sao chị lại biết anh Khang bị hại nằm cạnh bộ bình trà vỡ vụn trong khi chị khai ở phòng trọ suốt đêm?
-* **Đáp (Trần Thị Hà):** *(Hơi khựng lại, hai tay đan chặt vào nhau)* Dạ... em... em nghe mấy người hàng xóm ban sáng đứng ngoài ngõ bàn tán xôn xao nên em nghe lỏm được thôi ạ...
+* **Đáp (Trần Thị Hà):** Em thấy dạo gần đây có anh Tùng thợ xây hay lảng vảng qua ngõ với vẻ mặt hằn học lắm... Em nghe anh Khang kể loáng thoáng giữa hai người có xích mích gì đó từ xưa. Anh Tùng tính tình cục cằn, hung hăng lắm, chắc chắn anh ta sang gây sự rồi làm hại anh Khang! Cán bộ phải điều tra anh Tùng để đòi lại công bằng cho anh Khang!
 
 ---
 

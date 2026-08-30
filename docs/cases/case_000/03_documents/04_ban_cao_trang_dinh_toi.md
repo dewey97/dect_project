@@ -22,21 +22,21 @@
 * **Tội danh truy tố:** Tội *"Giết người"* theo quy định tại Điểm n, Khoản 1, Điều 123 Bộ luật Hình sự.
 
 #### 2. Xác định Động cơ gây án cốt lõi:
-* **Động cơ:** **Cơn ghen tuông cuồng loạn và tâm lý sở hữu độc hại (Obsessive / Possessive Passion)**.
-* **Tình tiết bùng nổ:** Đọc được đoạn tin nhắn lúc 20:48 của người tình mới (Vy) rủ Khang đi resort Đà Lạt tuần sau $\rightarrow$ Nhận ra mình bị phản bội và ruồng bỏ nên đã xuống tay sát hại để *"nếu tao không có được thì không ai được phép có!"*.
+* **Động cơ:** **Cơn ghen tuông cuồng loạn và tâm lý cuồng sở hữu độc hại (Obsessive Passion)**.
+* **Tình tiết bùng nổ:** Hà lẻn vào lúc 20:45, thấy Khang nằm mê man bên vali đồ đạc chuẩn bị bỏ trốn $\rightarrow$ Nhận ra mình bị ruồng bỏ và lừa dối nên cơn ghen bùng nổ, vơ mảnh bình trà vỡ đâm cổ Khang lúc 21:00 để *"nếu tao không có được anh thì không ai được phép có!"*.
 
 #### 3. Cặp Chứng cứ Mâu thuẫn mốc giờ & Bóc trần ngoại phạm then chốt:
-* **Chứng cứ 1:** Báo cáo giám định pháp y bổ sung (`12`) xác định nạn nhân bị đâm chết vào khoảng **21:00 – 21:15**.
-* **Chứng cứ 2:** Lịch phát sóng VTV3 tối Thứ Sáu (`16`) bóc trần lời khai xem phim truyền hình lúc 20:00 – 21:15 của Hà là hoàn toàn bịa đặt (khung giờ này chỉ phát Gameshow).
-* **Vật chứng sinh học không thể chối cãi:** Lọn tóc mai dính máu nạn nhân giấu trong áo ngực của Hà (`14` / `EV-HAIR-DNA`) khớp 100% ADN của Khang.
+* **Chứng cứ 1:** Báo cáo giám định pháp y (`01_phap_y_hai_giai_doan`) xác định nạn nhân bị đâm tử vong vào khoảng **21:00 – 21:15**.
+* **Chứng cứ 2:** Móc xích tiếng còi tàu 20:32 trong hộp thư thoại (`02`) trùng khớp với giờ đoàn tàu hàng chạy qua trước nhà Khang (lời khai Tùng) + Lịch phát sóng VTV3 tối Thứ Sáu (`06`) bóc trần toàn bộ lời khai ngoại phạm của Hà.
+* **Vật chứng sinh học không thể chối cãi:** Lọn tóc mai dính máu nạn nhân giấu trong áo ngực của Hà (`04` / `EV-HAIR-DNA`) khớp 100% ADN của Khang.
 
 ---
 
-### III. PHÂN HÓA TRÁCH NHIỆM CÁC ĐỐI TƯỢNG LIÊN QUAN (MINH OAN)
+### III. PHÂN HÓA TRÁCH NHIỆM CÁC ĐỐI TƯỢNG LIÊN QUAN
 
-1. **Trần Ngọc Mai:** Vô tội. Hành vi sang nhà Khang lúc 18:30 nhằm đòi lại quyền thừa kế hợp pháp sau khi phát hiện Khang đồ nét chữ ký đất 200m² (`08`). Có ngoại phạm vững chắc tại Tiệm thuốc Minh Châu lúc 19:42 (`09`).
-2. **Lê Quang Vũ:** Vô tội về hành vi giết người. Hành vi giằng xé sổ nợ bốc họ 300M lúc 19:10 (`10a`) xuất phát từ sự hoảng loạn sợ bị lộ với vợ. Có ngoại phạm tại Trạm xăng Km18 lúc 20:35 (`10b`).
-3. **Nguyễn Thanh Tùng:** Không phạm tội giết người. Cú xô ngã lúc 20:00 chỉ làm nạn nhân ngất xỉu (tổn thương giai đoạn 1). Tùng đã rời hiện trường lúc 20:15 và lên xe khách đi Hải Phòng lúc 20:30 (`11`).
+1. **Trần Ngọc Mai:** Không liên quan đến án mạng. Hành vi sang nhà Khang lúc 18:30 nhằm đòi lại quyền thừa kế 200m² đất sau khi phát hiện Khang đồ nét chữ ký. Lời khai ở nhà xem tivi buổi tối trùng khớp với Thông báo sự cố mất sóng cáp quang lúc 20h10 trên Bảng tin khu phố (`18`).
+2. **Lê Quang Vũ:** Loại trừ khỏi diện nghi phạm trực tiếp thực hiện hành vi giết người. Hành vi giật xé sổ nợ bốc họ 300M lúc 19:10 xuất phát từ sự hoảng loạn sợ bị lộ với nhà vợ; Vũ rời khỏi nhà Khang lúc 19:25 và có bằng chứng thanh toán tại Quán Bia 88 lúc 20:45 (thời điểm hung thủ bắt đầu rình rập gây án).
+3. **Nguyễn Thanh Tùng:** Không phạm tội giết người. Cú xô ngã lúc 20:00 do uất hận bi kịch năm 1998 chỉ làm nạn nhân ngất xỉu (tổn thương giai đoạn 1). Tùng đã rời hiện trường lúc 20:15 và lên xe khách đi Hải Phòng lúc 20:30 (trước thời điểm nạn nhân bị sát hại lúc 21:00).
 
 ---
 

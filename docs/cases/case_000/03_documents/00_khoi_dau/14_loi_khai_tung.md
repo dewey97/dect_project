@@ -24,17 +24,20 @@ Vào hồi 17 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 * **Họ và tên:** **NGUYỄN THANH TÙNG** | **Giới tính:** Nam | **Sinh ngày:** 18/03/1990.
 * **CCCD số:** `001090003412` cấp ngày 14/05/2021 tại Cục CSQLHC về TTXH.
 * **Nơi ĐKHKTT:** Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
-* **Nghề nghiệp:** Công nhân xây dựng (Công ty Cổ phần Xây dựng Hà Thành).
+* **Nghề nghiệp:** Lao động tự do (Thợ nề, sửa chữa nhà dân dụng).
 
 ---
 
 ### NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)
 
-* **Hỏi (ĐTV Lê Minh):** Trong nhật ký cuộc gọi điện thoại của nạn nhân Khang, có 01 cuộc gọi từ số máy của anh lúc 20:55 đêm 24/07. Anh giải thích thế nào về cuộc gọi này và tối qua anh ở đâu?
-* **Đáp (Nguyễn Thanh Tùng):** *(Vẻ mặt mệt mỏi, mắt thâm quầng)* Thưa cán bộ, tôi về quê chuẩn bị làm đám giỗ cho em trai tôi. Tối qua tôi cần chút tiền vốn nên có bấm số gọi cho thằng Khang lúc 20:55 để hỏi vay ít tiền nhưng nó không bắt máy. Tôi chỉ ở nhà trọ đóng đồ rồi ra bến xe bắt xe khách đi Hải Phòng làm công trình chứ tối qua tôi tuyệt đối không hề bước chân sang nhà thằng Khang!
+* **Hỏi (ĐTV Lê Minh):** Tối ngày 24/07/2026, anh có sang nhà nạn nhân Khang tại số 14 Đường Bờ Sông không? Anh ở đâu và làm gì từ chập tối đến đêm?
+* **Đáp (Nguyễn Thanh Tùng):** *(Sắc mặt tái nhợt, mắt thâm quầng, hai bàn tay run rẩy bấu chặt gấu quần)* Dạ... thưa cán bộ... Tối qua khoảng chập tối tôi có tiện đường ghé qua nhà Khang một lát để hỏi thăm mấy câu về việc sửa nhà. Hai anh em chỉ nói chuyện xã giao vài phút bình thường rồi tôi đi ngay, tuyệt đối không có cãi cọ xô xát gì cả... Sau đó tôi ra bến xe bắt xe khách đi Hải Phòng làm việc suốt đêm!
 
-* **Hỏi (ĐTV Lê Minh):** Anh và nạn nhân Khang có mâu thuẫn hay thù oán gì trong quá khứ không?
-* **Đáp (Nguyễn Thanh Tùng):** Chúng tôi là bạn chơi chung từ bé, lớn lên mỗi đứa một việc nên ít gặp nhau. Em trai tôi (Gia Huy) mất từ năm 1998 lúc chơi trốn tìm, chuyện đã qua gần 30 năm rồi, tôi không còn để bụng chuyện trẻ con nữa...
+* **Hỏi (ĐTV Lê Minh):** Gò má trái của anh có vết bầm tím mới và các khớp mu bàn tay có dấu hiệu sưng tấy, ửng đỏ. Dấu vết này từ đâu mà có?
+* **Đáp (Nguyễn Thanh Tùng):** *(Giật mình, vội lấy tay che má, ngập ngừng phân trần)* Dạ... chiều qua lúc tôi làm thợ nề, tôi sơ ý bị trượt chân va mặt vào ống giàn giáo sắt và đập tay vào tường gạch... Tôi làm thợ hồ nên tay chân mặt mũi bầm dập là chuyện cơm bữa, không liên quan gì đến chuyện tối qua đâu ạ...
+
+* **Hỏi (ĐTV Lê Minh):** Anh và nạn nhân Khang có mâu thuẫn hay xích mích gì sâu sắc trong quá khứ không?
+* **Đáp (Nguyễn Thanh Tùng):** *(Giọng nói lắp bắp chột dạ)* Dạ... chúng tôi là bạn từ nhỏ cùng xóm... Lớn lên mỗi đứa một việc chứ không có thù oán gì cả thưa cán bộ...
 
 ---
 

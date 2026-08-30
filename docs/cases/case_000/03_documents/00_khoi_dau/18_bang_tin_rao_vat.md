@@ -16,21 +16,26 @@
 - Cho thuê phòng trọ khép kín ngõ 12 Bờ Sông, điện nước giá dân. 
   LH: Bác Lụa - 0978.123.xxx
 
-[MẨU TIN 2 - ĐÁNG CHÚ Ý]
+[MẨU TIN 2 - MẨU GIẤY DÁN BĂNG DÍNH GÓC BẢNG TIN]
 ┌───────────────────────────────────────────────────────────────────────────┐
-│ THANH LÝ ĐỒ NGHỀ XÂY DỰNG & MÁY KHOAN BÊ TÔNG CŨ                         │
+│ NHẬN SỬA NHÀ DÂN DỤNG, ĐỤC PHÁ BÊ TÔNG, THÔNG TẮC CỐNG,                   │
+│ XÂY TRÁT ỐP LÁT, SỬA ĐIỆN NƯỚC — VIỆC GÌ CŨNG LÀM                         │
 │                                                                           │
-│ Tôi cần chuyển công tác đi công trình xa nên cần thanh lý gấp:            │
-│ • 01 Máy khoan bê tông cầm tay Bosch (còn dùng tốt)                       │
-│ • 01 Bộ cờ-lê mỏ-lết và dây đo thợ nề                                     │
-│ • Giá thương lượng hữu nghị cho anh em thợ trong xóm.                     │
-│                                                                           │
-│ Liên hệ: TÙNG (Thợ xây dựng)                                              │
-│ Số điện thoại: 0913.882.901                                               │
-│ (Gọi điện sau giờ tan ca từ 17h30 hàng ngày).                             │
+│ Thợ nề tự do, nhận làm công nhật hoặc khoán gọn, giá bình dân.            │
+│ Liên hệ trực tiếp: 0913.882.901                                           │
+│ (Bác nào cần sửa chữa lặt vặt cứ gọi trực tiếp cho em Tùng nhé).          │
 └───────────────────────────────────────────────────────────────────────────┘
 
-[MẨU TIN 3]
+[MẨU TIN 3 - THÔNG BÁO TỔ DÂN PHỐ]
+┌───────────────────────────────────────────────────────────────────────────┐
+│ THÔNG BÁO SỰ CỐ TÍN HIỆU TRUYỀN HÌNH CÁP & MẠNG INTERNET                  │
+│ Ban Quản lý Tổ dân phố thông báo: Do ảnh hưởng trận dông sét tối 24/07    │
+│ làm chập đứt tuyến cáp quang nhánh Bờ Sông – Đoàn Kết lúc khoảng 20h10,  │
+│ gây mất tín hiệu tivi và mạng internet toàn khu vực đến sáng 25/07.       │
+│ Kính báo bà con nhân dân thông cảm trong thời gian chờ đơn vị khắc phục. │
+└───────────────────────────────────────────────────────────────────────────┘
+
+[MẨU TIN 4]
 - Nhận trông trẻ và dạy kèm toán cấp 1 buổi tối. 
   LH: Cô Hoa - 0904.556.xxx
 =============================================================================
@@ -39,6 +44,5 @@
 ---
 
 ### Ý NGHĨA NGHIỆP VỤ & TRUY VẾT
-* **Mối liên hệ số lạ:** Trong điện thoại của nạn nhân Khang (`dev-00`) có 01 cuộc gọi nhỡ lúc **20:55:04 đêm 24/07/2026** từ số máy `0913.882.901`.
-* Đối chiếu với Mẩu tin số 2 trên Bảng tin rao vặt `p9` $\rightarrow$ Xác định chủ nhân số máy lạ chính là **Nguyễn Thanh Tùng**.
-* $\rightarrow$ **Căn cứ phá vỡ vỏ bọc nghi phạm ẩn danh & Ra lệnh triệu tập Nguyễn Thanh Tùng!**
+1. **Xác minh số máy lạ (`0913.882.901`):** Trong điện thoại nạn nhân Khang (`16`) có cuộc gọi nhỡ lúc **20:55:04** từ số `0913.882.901` $\rightarrow$ Đối chiếu Mẩu tin 2 xác định danh tính là thợ xây **Nguyễn Thanh Tùng** (mở ra Nhánh B).
+2. **Xác minh ngoại phạm của Mai (`12`):** Mai khai về nhà lúc 19:50, đến hơn 20h đang xem tivi thì bị mất sóng cáp do dông sét $\rightarrow$ Đối chiếu Mẩu tin 3 xác nhận sự cố đứt cáp quang lúc 20h10 là hoàn toàn có thật! Chi tiết này chứng minh Mai thực sự có mặt ở nhà lúc đó, củng cố 100% bằng chứng ngoại phạm của Mai.

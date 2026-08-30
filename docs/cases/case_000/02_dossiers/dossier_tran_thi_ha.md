@@ -195,14 +195,8 @@
 * **20:00 – 20:15:** Hà đi bộ sang ngõ nhà Khang. Đứng nấp dưới bóng cây xoan đối diện cổng nhà Cô Lụa (số 16), Hà nghe thấy tiếng cãi vã dữ dội và tiếng ấm chén gốm sứ rơi vỡ xoảng từ phòng khách.
 * **20:18:** Tùng hốt hoảng lao ra khỏi cổng tháo chạy (sau khi xô Khang đập đầu vào tủ âm tường ngất xỉu).
 * **20:20 – 20:40:** Hà đứng im lìm theo dõi suốt 20 phút trong ngõ tối, không thấy Khang ra đóng cổng.
-* **20:45:** Hà lách qua cổng sắt khép hờ, bước vào qua cửa nách phòng khách.
-* **20:46:** Hà thấy Khang nằm úp mặt bất tỉnh cạnh góc bàn trà, vùng chẩm gáy rớm máu, dưới sàn là đống giấy tờ và mảnh vỡ ấm chén văng vãi.
-* **20:48 (HÀNH ĐỘNG ÉP TOUCH ID & KHOẢNH KHẮC KÍCH HOẠT SÁT TÂM):**  
-  * Bản năng kiểm soát và rình rập bệnh hoạn thôi thúc, Hà nhặt chiếc iPhone của Khang nằm trên sàn. Hà cầm bàn tay mềm nhũn của Khang đang hôn mê, áp ngón tay trỏ của anh ta vào nút cảm biến Touch ID để mở khóa màn hình.
-  * Hà thong thả lướt vào hộp thư tin nhắn và bàng hoàng đọc được đoạn chat tình tứ:
-    > **Người gửi:** `Em Vy (Đà Lạt)`  
-    > **Nội dung:** *"Anh Khang ơi, em book xong vé máy bay và resort Đà Lạt cho 2 đứa tuần sau rồi nhé! Anh nhớ giấu con mụ kế toán phiền phức kia kẻo nó lại làm loạn lên đấy. Mai qua đón em sớm nhé, yêu anh ❤️"*
-* **20:49 – 20:59:** Đọc từng chữ "con mụ kế toán phiền phức" cùng hình ảnh vé máy bay/phòng resort đã book sẵn cho chuyến đi sáng mai, ngọn lửa ghen tuông cuồng loạn bùng cháy thiêu rụi lý trí của Hà. Tâm lý biến thái trỗi dậy: Khang đang thở, và hơi thở này sắp sửa bay vào Đà Lạt để ôm ấp một người đàn bà khác. Hà không thể để điều đó xảy ra!
+* **20:48 (KHOẢNH KHẮC KÍCH HOẠT SÁT TÂM):**  
+  * Hà nhìn thấy Khang nằm bất tỉnh, bên cạnh là đồ đạc và chiếc điện thoại đang nhận tin nhắn giục giã từ nhân tình mới. Nhận ra Khang sắp rũ bỏ mình mãi mãi, ngọn lửa ghen tuông cuồng loạn bùng cháy thiêu rụi lý trí của Hà. Hà không thể để người đàn ông mình hy sinh cả thanh xuân thuộc về một người đàn bà khác!
 * **21:00 (HÀNH VI SÁT HẠI MANG TÍNH NGHI THỨC):**  
   * Hà nhặt mảnh thủy tinh lớn dài 8cm từ bộ bình trà vỡ dưới sàn.
   * Không hề la hét hay hung hãn, Hà cúi xuống đặt một nụ hôn lên trán Khang, vuốt ve mái tóc người yêu.
