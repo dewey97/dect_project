@@ -46,7 +46,7 @@
 
 #### 1. Các tài liệu tiếp cận (Phase 1 Unlocks)
 * `f2-1`: Bộ 3 mẫu chữ ký & Giám định đồ nét (`08_bo_ba_chu_ky_va_giam_dinh_do_net.pdf`)
-* `f2-2`: Lịch phát sóng & Sự cố đài truyền hình TH3 (`09_lich_phat_song_va_su_co_kenh_th3.pdf`)
+* `f2-2`: Hóa đơn & Camera Tiệm thuốc Tây Minh Châu (`09_hoa_don_va_camera_nha_thuoc_mai.pdf`)
 * `f2-3`: Giám định vết hằn sổ nợ 150M (`10a_giam_dinh_vet_han_so_no_vu.pdf`)
 * `f2-4`: Hóa đơn POS & Tra cứu Unix Timestamp (`10b_hoa_don_pos_unix_timestamp.pdf`)
 
@@ -55,7 +55,7 @@
 | Chi tiết Dữ liệu Trích xuất | Suy luận Logic Rút ra | Quyết định Gameplay |
 | :--- | :--- | :--- |
 | **Bộ 3 mẫu chữ ký `08` (`f2-1`):** Chữ ký trên Giấy ủy quyền (`EV-SIGN-01`) trùng khít 100% nét ký trên Biên bản gia đình (`EV-SIGN-02`) | Khang dùng kỹ thuật đồ nét (tracing) sao chép chữ ký thật của Mai để làm giả Giấy ủy quyền chiếm đoạt đất 200m² thế chấp ngân hàng | Xác nhận hành vi lừa đảo của Khang & Động cơ đòi công lý chính đáng của Mai |
-| **Sự cố đài TH3 `09` (`f2-2`) & Lời khai `07a`:** Kênh TH3 sập trạm phát sóng cáp Phân khu X đúng 12 phút (20:00 - 20:12) | Mai khai đúng sự cố màn hình xanh TV chỉ xảy ra tại khu nhà mình, chứng minh Mai ở nhà suốt buổi tối | **LOẠI TRỪ NGHI PHẠM TRẦN NGỌC MAI** |
+| **Hóa đơn & Camera Tiệm thuốc `09` (`f2-2`):** Mai mua Paracetamol & Urgo lúc 19:42 tại Phố Đoàn Kết (cách 4km) | Mai ghé tiệm thuốc dán ngón tay bị xước rồi về nhà lúc 19:50, chứng minh vết máu mép bàn là từ ngón tay Mai và Mai ở nhà suốt đêm | **LOẠI TRỪ NGHI PHẠM TRẦN NGỌC MAI** |
 | **Vết hằn nét bút sổ nợ `10a` (`f2-3`):** Chà bóng than chì hiện nội dung nợ bốc họ 150.000.000đ của Vũ hạn 30/07 | Vũ giấu Mai nợ Khang 150M, bị Khang tống tiền đe dọa báo gia đình nên ở lại van xin lúc 19:00 - 19:15, bị Khang tát và xé sổ nợ | Làm rõ nguồn gốc vết bầm mặt, cúc áo đứt và lời khai gian dối của Vũ |
 | **Hóa đơn POS `10b` (`f2-4`):** Mã Barcode `1787924110` giải mã Unix Time ra 20:35:10 tại trạm xăng Km18 (cách 14km) | Vũ mua nước giải rượu cách hiện trường 14km đường đê ngập lúc 20:35:10, không thể kịp quay lại hiện trường lúc án mạng diễn ra (~21:00) | **LOẠI TRỪ NGHI PHẠM LÊ QUANG VŨ** |
 
@@ -136,7 +136,7 @@
 | :--- | :--- | :--- |
 | **Báo cáo pháp y bổ sung `12` (`f4-1`) <-> Camera `11`:** Giờ tử vong chính xác **21:00 đến 21:15** <-> Tùng tháo chạy lúc **20:15** | Cú xô của Tùng chỉ làm Khang ngất. Nạn nhân bị đâm chết lúc 21:00 (45 phút sau khi Tùng đã bỏ chạy) | **MINH OAN CHO TÙNG** (Phá vỡ bẫy Red Herring) |
 | **Lời khai Hà `07d`:** Khai ở nhà cả tối <-> Lỡ lời: *"Tôi thấy Khang nằm gục CẠNH BỘ BÌNH TRÀ VỠ VỤN"* | Bộ bình trà chỉ bị Tùng đập vỡ lúc 20:00. Hà mô tả chính xác chứng tỏ Hà đã lén chui vào nhà SAU 20:15! | **BẮT LỖI LỠ LỜI LẬT TẨY HUNG THỦ HÀ** |
-| **Ảnh tin nhắn `p6` (`13`):** Tin nhắn tình nhân mới rủ Khang đi du lịch đền bù lúc 20:40 | Hà lén vào nhà lúc 20:45 thấy Khang ngất + đọc tin nhắn tình nhân mới -> Cơn ghen cuồng sở hữu đâm chết Khang lúc 21:00 | Hoàn thành bản kết luận phá án S-Rank |
+| **Ảnh tin nhắn `p6` (`13`):** Log Touch ID mở khóa lúc 20:48 + Tin nhắn tình nhân rủ đi Đà Lạt | Hà lẻn vào lúc 20:45 thấy Khang ngất, ép ngón tay Khang mở Touch ID đọc tin nhắn tình nhân -> Cơn ghen cuồng sở hữu đâm chết Khang lúc 21:00 | Hoàn thành bản kết luận phá án S-Rank |
 
 > **CÂU HỎI KEY 3 (Phán quyết Thắng cuộc S-Rank):**  
 > *"Ai là hung thủ thực sự đâm chết nạn nhân Khang lúc 21:00 và cặp bằng chứng nào lật tẩy lời khai giả mạo của đối tượng này?"*  

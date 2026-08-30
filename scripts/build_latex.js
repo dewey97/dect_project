@@ -18,7 +18,7 @@ function safeCopyAndUnlink(src, dest, retries = 5) {
 function compileAndCleanLatex() {
   const targetFilter = process.argv[2] ? process.argv[2].toLowerCase() : null;
   const rootDir = path.join(__dirname, '..');
-  const latexBaseDir = path.join(rootDir, 'docs', 'cases', 'case_000', 'documents', 'latex');
+  const latexBaseDir = path.join(rootDir, 'docs', 'cases', 'case_000', '03_documents', 'latex');
   const publicPdfBaseDir = path.join(rootDir, 'public', 'documents', 'case_000');
   const logDir = path.join(rootDir, '.vscode', 'latex_logs');
 
@@ -63,7 +63,7 @@ function compileAndCleanLatex() {
 
       const generatedPdf = path.join(phaseLatexDir, `${baseName}.pdf`);
       const destPdfPublic = path.join(publicPdfBaseDir, phase, `${baseName}.pdf`);
-      const destPdfDocs = path.join(rootDir, 'docs', 'cases', 'case_000', 'documents', phase, `${baseName}.pdf`);
+      const destPdfDocs = path.join(rootDir, 'docs', 'cases', 'case_000', '03_documents', 'pdf', phase, `${baseName}.pdf`);
 
       if (fs.existsSync(generatedPdf)) {
         const publicDir = path.dirname(destPdfPublic);

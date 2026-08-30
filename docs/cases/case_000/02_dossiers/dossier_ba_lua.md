@@ -106,22 +106,23 @@ cãi vã đòi đất   chạy trong mưa        vỡ xoảng bình trà,    tr�
 
 ---
 
-## V. CHUỖI SỰ KIỆN PHÁT HIỆN THI THỂ & BÁO CÔNG AN (21:20 – 22:05)
+## V. CHUỖI SỰ KIỆN PHÁT HIỆN THI THỂ & BÁO CÔNG AN (06:30 – 08:30 SÁNG 25/07)
 
 ```text
-21:20                 21:25               21:35                21:45                 22:05
+06:30 (25/07)         06:45               07:15                07:45                 08:30
   │                     │                   │                    │                     │
   ├─────────────────────┼───────────────────┼────────────────────┼─────────────────────┤
-Bà Lụa sang kiểm      Gọi 113 /           Công an Phường       Khám nghiệm sơ bộ:    Trinh sát ập đến
-tra, thấy thi thể     Công an Phường      có mặt bảo vệ        Thấy Đơn tố cáo       nhà Mai triệu tập
-bên vũng máu          báo tin khẩn cấp    hiện trường          ghi tên Trần Ngọc Mai khẩn cấp
+Bà Lụa quét ngõ,      Bà Lụa gọi 113 /    Công an Phường &     Khám nghiệm sơ bộ:    Triệu tập khẩn cấp
+thấy cửa mở toang,    báo Công an Phường  Đội Trọng án PC02    Thu giữ Đơn tố cáo    Trần Ngọc Mai & 
+phát hiện thi thể     báo tin khẩn cấp    phong tỏa hiện trường ghi tên Trần Ngọc Mai Lê Quang Vũ
 ```
 
-1. **21:20 – Phát hiện hiện trường:** Bà Lụa dắt cháu đi vệ sinh, nhìn sang thấy cửa chính nhà Khang vẫn hé mở dưới cơn mưa xối xả, gió tạt nước ướt đẫm thềm nhà, đèn tuýp bên trong vẫn sáng mờ. Thấy lạ, bà bước sang ngó vào và gọi: *"Khang ơi, sao không đóng cửa?"* Không ai đáp, bà bước vào 2 bước thì kinh hoàng phát hiện Khang đang nằm gục sấp dưới nền nhà bên cạnh vũng máu tươi loang lổ cạnh bộ bình trà vỡ.
-2. **21:25 – Báo án khẩn cấp:** Quá hoảng hốt, bà Lụa chạy thét ra đầu ngõ tri hô và bấm điện thoại gọi báo Công an Phường Phân khu Cảng.
-3. **21:35 – Lực lượng chức năng tiếp cận:** Công an Phường và Đội Cảnh sát hình sự có mặt, giăng dây bảo vệ hiện trường, bảo tồn nguyên vẹn dấu vết sinh học.
-4. **21:45 – Thu thập manh mối khẩn cấp:** Trong quá trình khám nghiệm nhanh quanh tử thi, điều tra viên phát hiện tập tài liệu `Đơn tố cáo lừa đảo chiếm đoạt tài sản` văng vãi dưới sàn, trên đó ghi rõ họ tên, số điện thoại và địa chỉ thường trú của **Trần Ngọc Mai** (Phố Đoàn Kết).
-5. **22:05 – Triệu tập Mai:** Chỉ huy Đội Trọng án lập tức điều động tổ công tác đặc nhiệm sang địa chỉ nhà Mai để triệu tập khẩn cấp và thu giữ tang vật có liên quan.
+1. **Đêm 24/07 (Sau 20:45):** Trời mưa bão sấm chớp dữ dội, bà Lụa khóa chặt cửa nhà mình đi ngủ, không sang nhà Khang vì nghĩ Khang lại tụ tập ăn nhậu say xỉn.
+2. **06:30 (Sáng 25/07) – Phát hiện hiện trường:** Sáng sớm trời tạnh ráo, bà Lụa ra quét ngõ thì ngạc nhiên thấy cổng sắt nhà Khang vẫn mở toang từ đêm qua, đèn tuýp phòng khách sáng trưng, gió lùa nước mưa tạt lênh láng thềm nhà. Thấy lạ, bà bước sang ngó vào và gọi: *"Khang ơi, dậy đóng cửa tắt đèn đi chứ mày!"* Không ai đáp, bà bước vào 2 bước thì kinh hoàng phát hiện Khang đang nằm gục sấp dưới sàn nhà, toàn thân co cứng trên vũng máu đen sẫm cạnh bộ bình trà vỡ vụn.
+3. **06:45 – Báo án khẩn cấp:** Quá hoảng hốt, bà Lụa chạy thét ra đầu ngõ tri hô dân phố và bấm điện thoại gọi báo Công an Phường Phân khu Cảng.
+4. **07:15 – Lực lượng chức năng tiếp cận:** Công an Phường, Đội Trọng án PC02 và Phòng Kỹ thuật Hình sự (PC09) có mặt, giăng dây phong tỏa hiện trường, tiến hành khám nghiệm tử thi và thu giữ dấu vết sinh học.
+5. **07:45 – Thu thập manh mối khẩn cấp:** Trong quá trình khám nghiệm hiện trường, điều tra viên phát hiện tập tài liệu `Đơn tố cáo lừa đảo chiếm đoạt tài sản` văng vãi dưới sàn, trên đó ghi rõ họ tên, số điện thoại và địa chỉ thường trú của **Trần Ngọc Mai** (Phố Đoàn Kết).
+6. **08:30 – Triệu tập Mai & Vũ:** Cơ quan Cảnh sát điều tra phát lệnh triệu tập khẩn cấp đối với Trần Ngọc Mai và Lê Quang Vũ lên trụ sở Công an để lấy lời khai đầu tiên.
 
 ---
 

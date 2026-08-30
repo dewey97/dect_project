@@ -27,27 +27,27 @@ Khác với mô hình làm bài kiểm tra tuần tự qua từng Phase, mô hì
    (Tập Hồ Sơ MAI & VŨ)                     (Tập Hồ Sơ TÙNG - ẨN)                    (Tập Hồ Sơ TRẦN HÀ)
    ───────────────────                     ─────────────────────                     ───────────────────
    • Kỹ thuật Đồ nét chữ ký đất 200m²      • Lần số lạ 20:55 qua Rao vặt             • Âm thanh còi tàu diesel 20:32
-   • Sự cố sập sóng TV TH3 (20:00)         • Bác bỏ alibi bằng Ghim cài áo           • Bóc trần ngoại phạm VTV3 thứ Sáu
+   • Hóa đơn & Camera Tiệm Thuốc (19:42)   • Bác bỏ alibi bằng Ghim cài áo           • Bóc trần ngoại phạm VTV3 thứ Sáu
    • Chà than chì sổ nợ rách 150M          • Bút tích sau khung tranh gỗ 1998        • Bắt lỗi lỡ lời "bình trà vỡ"
-   • Giải mã Unix Timestamp POS Km18       • Ghép Puzzle bài báo ngạt khí tủ         • Màn hình tin nhắn bồ nhí 20:40
-   • Red Herrings: Bùn đỏ & Cúc áo         • Bẫy Red Herring: Xô ngã lúc 20:00       • Tang vật: Lọn tóc ADN trong áo ngực
+   • Tra cứu dấu thời gian POS Km18        • Ghép mảnh bài báo ngạt khí tủ           • Ép Touch ID đọc tin nhắn 20:48
+   • Giải mã Red Herrings: Bùn & Cúc áo    • Phá bẫy xô ngã lúc 20:00 (vé xe)       • Tang vật: Lọn tóc ADN trong áo ngực
                │                                       │                                       │
                └───────────────────────────────────────┼───────────────────────────────────────┘
                                                        │
                                                        ▼
                            ┌────────────────────────────────────────────────────────┐
-                           │              BÀN KẾT ÁN CHUNG CUỘC (TERMINAL)          │
+                           │        BẢN CÁO TRẠNG ĐỊNH TỘI (KẾT LUẬN ĐIỀU TRA)      │
                            │  • Chỉ danh Thủ phạm chính: TRẦN THỊ HÀ (ha)           │
                            │  • Xác định Động cơ: Ghen tuông cuồng sở hữu độc hại   │
                            │  • Cặp chứng cứ mâu thuẫn mốc giờ: Pháp y 21:00 & 07d  │
-                           │  • Phán quyết S-Rank & Mở khóa 4 Ký Sự Hậu Án          │
+                           │  • Phán quyết Phá Án Hoàn Hảo & Mở 4 Ký Sự Hậu Án      │
                            │  • Thu thập Manh mối Tổ chức vĩ mô: QUÂN XE (TEST-99)  │
                            └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ⚡ II. CHUỖI DÂY CHUYỀN SỰ KIỆN ĐÊM MƯA LỚN (DOMINO CHAIN REACTION)
+## ⚡ II. CHUỖI PHẢN ỨNG DÂY CHUYỀN ĐÊM MƯA LỚN (DOMINO CHAIN REACTION)
 
 Mọi diễn biến trong đêm 24/07/2026 tạo thành một chuỗi Domino tác động liên hoàn đẩy nạn nhân đến cái chết:
 
@@ -61,29 +61,28 @@ Mọi diễn biến trong đêm 24/07/2026 tạo thành một chuỗi Domino tá
 [20:00 – 20:15] TÙNG sang đối chất vụ án 1998 -> Khang say rượu giật xé bài báo nhạo báng -> TÙNG xô ngã Khang đập gáy bất tỉnh, vỡ bình trà lúc 20:00 -> Tùng tháo chạy lúc 20:15, quên khép cổng dưới mưa.
        │
        ▼ (Hà rình rập ngoài ngõ thấy Tùng chạy và cổng hé mở -> Lén chui vào nhà lúc 20:45)
-[20:48 – 21:00] HÀ thấy Khang ngất, đúng lúc điện thoại Khang sáng tin nhắn rủ đi Đà Lạt của bồ mới (Vy) -> Cơn ghen cuồng loạn bùng nổ -> HÀ vơ mảnh thủy tinh đâm đứt động mạch cổ Khang lúc 21:00!
+[20:48 – 21:00] HÀ thấy Khang ngất, nắm ngón tay Khang ép vào Touch ID mở khóa điện thoại lướt đọc đoạn chat tình nhân đi Đà Lạt -> Cơn ghen cuồng loạn bùng nổ -> HÀ vơ mảnh thủy tinh đâm đứt động mạch cổ Khang lúc 21:00!
        │
        ▼ (Hà cắt lọn tóc mai dính máu nhét vào áo ngực rồi chuồn ra cửa sau lúc 21:08)
-[21:20 – 22:05] BÀ LỤA phát hiện thi thể -> Báo công an 21:25 -> Khám nghiệm thấy Đơn tố cáo tên Mai lúc 21:45 -> Triệu tập Mai lúc 22:05.
+[21:20 (24/07) – 06:30 (25/07)] Đêm mưa bão nhà nào cũng khóa cửa -> 06:30 sáng 25/07 BÀ LỤA quét ngõ thấy cửa mở toang, phát hiện thi thể -> Báo công an 06:45 -> Khám nghiệm thấy Đơn tố cáo tên Mai lúc 07:45 -> Triệu tập Mai & Vũ lúc 08:30.
 ```
 
 ---
 
-## 🛠️ III. HỆ THỐNG 9 CÔNG CỤ ĐIỀU TRA KỸ THUẬT SỐ TRÊN NOCTURNE (INVESTIGATION OS TOOLS)
+## 🛠️ III. HỆ THỐNG KỸ THUẬT NGHIỆP VỤ & THAO TÁC ĐIỀU TRA VẬT LÝ
 
-Hệ thống NOCTURNE cung cấp cho người chơi **9 công cụ nghiệp vụ tương tác trực quan**:
+Toàn bộ các manh mối trong vụ án được thiết kế để có thể **triển khai hoàn chỉnh thành Bộ Kit Hồ Sơ Thám Tử Vật Lý (Detective Case Box)** ngoài đời thực hoặc tương tác linh hoạt:
 
-| STT | Tên Công Cụ Kỹ Thuật Số | Mô Tả Chức Năng | Ứng Dụng Trong Vụ Án #000 |
+| STT | Tên Kỹ Thuật Nghiệp Vụ | Thao Tác Thực Hiện Vật Lý | Ứng Dụng Trong Vụ Án #000 |
 | :---: | :--- | :--- | :--- |
-| **1** | **`Optical Overlay Desk`**<br>(Bàn soi quang học) | Cho phép kéo thả, xoay và chỉnh độ trong suốt (opacity) để đặt chồng khít 2 tài liệu chữ ký. | Soi đè `Giấy ủy quyền giả (EV-SIGN-01)` và `Biên bản gia đình (EV-SIGN-02)` $\rightarrow$ Trùng khít 100% nét ký (Tracing Fraud). |
-| **2** | **`Carbon Pencil Shading Tool`**<br>(Công cụ cà than chì) | Thao tác chà bút chì / quét đèn chiếu xiên (Oblique Light) lên mặt giấy trắng. | Chà lên trang trắng sổ nợ rách `10a` $\rightarrow$ Hiện rõ vết hằn bút bi ghi nợ 150M của Lê Quang Vũ. |
-| **3** | **`Unix Timestamp Decoder`**<br>(Bộ giải mã Unix Epoch) | Nhập chuỗi số Barcode POS / Unix Timestamp để chuyển đổi ra ngày giờ thực GMT+7. | Nhập mã `1787924110` trên hóa đơn Km18 $\rightarrow$ Ra **20:35:10 - 24/07/2026** (Minh oan Vũ). |
-| **4** | **`Audio Spectrogram Analyzer`**<br>(Phổ ký & Bộ lọc âm thanh) | Bật/tắt các dải tần số để khử giọng nói người và khuếch đại âm thanh môi trường nền. | Lọc tin nhắn thoại 20:32 $\rightarrow$ Bóc tách tiếng còi tàu diesel & chuông rào chắn trước nhà Khang (Vạch trần Hà). |
-| **5** | **`Newspaper Puzzle Assembler`**<br>(Bàn ghép mảnh puzzle) | Kéo thả, xoay và ghép các mẩu giấy báo vụn bị xé rách tại hiện trường. | Ghép các mảnh báo rải rác `p5` thành bài báo hoàn chỉnh vụ ngạt khí tủ âm tường năm 1998. |
-| **6** | **`Phone / Voicemail Simulator`**<br>(Bộ giả lập điện thoại `dev-00`) | Giao diện điện thoại cảm ứng: đọc SMS, nghe hộp thư thoại, xem danh bạ, nhật ký cuộc gọi. | Khai thác tin nhắn đe dọa 19:15, Voicemail 20:32, tin nhắn bồ nhí 20:40, cuộc gọi nhỡ 20:55 của Tùng. |
-| **7** | **`3D Artifact & Frame Inspector`**<br>(Kính lúp & Xoay vật chứng 3D) | Xoay 360 độ vật phẩm, cạy nắp, tháo mặt sau khung tranh gỗ, soi cận cảnh vết máu. | Tháo mặt sau khung tranh `p4` tìm bút tích 1998; soi dấu vân tay miết trên mảnh kính `p3`; kiểm tra cúc áo `EV-SHIRT-BUTTON`. |
-| **8** | **`Broadcast & Technical Log Viewer`**<br>(Bảng tra cứu lịch sóng) | Xem lịch phát sóng các đài truyền hình (VTV3, TH3) và nhật ký sự cố trạm phát cáp. | Tra cứu sự cố sập cáp TH3 khu X (20:00-20:12) cho Mai & Bóc trần VTV3 thứ Sáu chỉ chiếu Gameshow cho Hà. |
-| **9** | **`Accusation & S-Rank Terminal`**<br>(Bàn kết án & Định tội) | Giao diện nộp cáo trạng: Chọn thủ phạm, chọn động cơ, kéo thả 2 chứng cứ đối chất mốc giờ. | Chấm điểm Radar, phân hạng S-Rank/A-Rank, kích hoạt mở khóa 4 Ký sự Hậu án và Quân Xe. |
+| **1** | **Soi đè quang học**<br>(Soi trước nguồn sáng) | Cầm 2 tờ văn bản (hoặc 1 tờ giấy + 1 tấm phim trong suốt) đặt chồng lên nhau đưa ra trước ánh sáng đèn/cửa sổ. | Đè `Giấy ủy quyền giả (08)` lên `Biên bản gia đình (08-bg)` $\rightarrow$ Hai chữ ký trùng khít 100% từng nét uốn (Khang đồ nét chữ ký của Mai để cướp đất 200m²). |
+| **2** | **Chà than chì & Soi góc nghiêng**<br>(Phát hiện vết hằn nét bút) | Cầm bút chì mềm (2B/4B) chà nhẹ hoặc chiếu đèn pin góc nghiêng lên mặt trang giấy trắng. | Chà lên trang giấy trắng kế tiếp trong cuốn sổ da bị xé rách $\rightarrow$ Nổi rõ vết hằn bút bi ghi nợ 150 triệu của Lê Quang Vũ. |
+| **3** | **Tra cứu Mã số giao dịch**<br>(Giải mã dấu thời gian POS) | Đọc dãy số in trên mã vạch hóa đơn thanh toán bằng giấy thực tế $\rightarrow$ Tra cứu bảng đối chiếu thời gian. | Đọc mã giao dịch `1787924110` trên hóa đơn mua nước giải rượu tại Km18 $\rightarrow$ Xác định chính xác lúc **20:35:10** (cách 14km, minh oan cho Vũ). |
+| **4** | **Tháo gỡ & Khám nghiệm hiện vật**<br>(Khám phá cấu trúc vật lý) | Trực tiếp lật mặt sau khung ảnh bằng giấy bồi, cạy khớp nối, soi chi tiết ghim cài áo kim loại và mảnh vỡ. | Tháo mặt sau khung tranh gỗ tìm bút tích tạ lỗi em trai năm 1998; kiểm tra bụi vôi vữa trên ghim cài áo xây dựng; kiểm tra dấu vân tay trên mảnh thủy tinh. |
+| **5** | **Ghép mảnh phục hồi tài liệu**<br>(Ghép giấy rách thực tế) | Dùng tay sắp xếp, xoay và ghép các mẩu giấy báo bị xé vụn dựa theo đường rách, thớ giấy và mặt chữ in. | Ghép các mảnh giấy báo cũ bị xé rải rác thành bài báo hoàn chỉnh về vụ án ngạt khí tủ âm tường năm 1998 của bé Gia Huy. |
+| **6** | **Đối chiếu Văn bản hành chính**<br>(Đọc chéo tài liệu nghiệp vụ) | Đọc và so sánh các văn bản hành chính in trên giấy A4/A5: Lịch phát sóng truyền hình, Biên bản sự cố cáp viễn thông, Biên bản hiện trường. | Đối chiếu lịch phát sóng VTV3 (tối thứ Sáu chỉ chiếu Gameshow, không có phim bộ) $\rightarrow$ Bóc trần lời khai giả mạo của Hà. |
+| **7** | **Giám định Âm thanh & Tạp âm**<br>(Nghe ghi âm / Đọc bóc băng) | Nghe đoạn ghi âm thực tế (hoặc đọc biên bản giám định bóc băng ghi âm có phân tích âm học môi trường). | Phát hiện tiếng còi tàu hỏa diesel và chuông chắn đường sắt lọt trong cuộc gọi lúc 20:32 $\rightarrow$ Vạch trần Hà đang đứng trước cổng nhà Khang. |
+| **8** | **Biên bản Kết luận Điều tra**<br>(Bản Cáo trạng phá án) | Điền thông tin thủ phạm, động cơ và đính kèm các tài liệu vật chứng làm căn cứ khởi tố vào biểu mẫu kết luận. | Hoàn thành bản kết án định tội Trần Thị Hà, bẻ gãy mốc giờ ngoại phạm và mở khóa hồ sơ hậu án. |
 
 ---
 
@@ -113,7 +112,7 @@ Hệ thống NOCTURNE cung cấp cho người chơi **9 công cụ nghiệp vụ
   - `19:15`: Nghe tiếng Khang tát bốp bốp, thấy Vũ ôm má trái, cổ áo xộc xệch hoảng loạn lao xe máy chạy trốn dưới mưa.
   - `20:00 – 20:15`: Đang xem TV kênh `TH3` (sóng phát bình thường) thì nghe tiếng cãi nhau lớn đàn ông nhắc tên "thằng Huy", tiếng *"XOẢNG"* vỡ bình trà lúc 20:00, rồi thấy bóng người mặc áo công nhân (Tùng) chạy tháo thân lúc 20:15.
   - `20:45`: Thấy bóng người mặc áo gió trùm kín đầu ("bóng ma cây xoan" — Hà) lẻn vào nhà Khang.
-  - `21:20`: Phát hiện thi thể Khang trên vũng máu $\rightarrow$ Báo công an lúc 21:25.
+  - `06:30 (Sáng 25/07)`: Sáng dậy quét ngõ thấy cửa nhà Khang mở toang từ đêm qua, phát hiện thi thể Khang co cứng trên vũng máu $\rightarrow$ Báo công an lúc 06:45.
 
 ### 4. Thiết bị Điện thoại tịch thu của Nạn nhân (`dev-00` - `Phone Simulator`):
 - `19:15`: Tin nhắn đe dọa của Hà (*"Đừng để em tìm tới nhà đấy!"*).
@@ -138,12 +137,12 @@ Hệ thống NOCTURNE cung cấp cho người chơi **9 công cụ nghiệp vụ
         ┌────────────────────────────────┴────────────────────────────────┐
         ▼                                                                 ▼
    [HỒ SƠ MAI]                                                       [HỒ SƠ VŨ]
-   • Minigame Soi Đè 3 Mẫu Chữ Ký                                    • Minigame Chà Than Chì Sổ Nợ Rách
+   • Thao Tác Soi Đè 2 Mẫu Chữ Ký                                    • Thao Tác Chà Than Chì Sổ Nợ Rách
      (Giấy ủy quyền trùng khít 100% Biên bản gia đình                  (Hiện vết hằn nợ 150M & dọa báo bố vợ)
-     -> Khang dùng kỹ thuật Tracing làm giả)                           -> Giải thích vết bầm má & cúc áo đứt lúc 19:15.
-   • Bằng Chứng Ngoại Phạm Sóng TV TH3                               • Giải Mã Unix Timestamp Hóa Đơn Km18
-     (Kênh TH3 sập cáp khu X đúng 20:00-20:12                          (Barcode 1787924110 -> 20:35:10, cách 14km)
-     -> Mai xem TV ở nhà suốt đêm)                                     -> Không thể kịp quay lại sát hại lúc 21:00.
+     -> Khang dùng kỹ thuật Đồ nét chữ ký làm giả)                    -> Giải thích vết bầm má & cúc áo đứt lúc 19:15.
+   • Hóa Đơn & Camera Nhà Thuốc Minh Châu                            • Tra Cứu Dấu Thời Gian Hóa Đơn Km18
+     (Mua Urgo & Paracetamol lúc 19:42 cách 4km                        (Mã POS 1787924110 -> 20:35:10, cách 14km)
+     -> Mai ở nhà riêng suốt đêm sau 19:50)                            -> Không thể kịp quay lại sát hại lúc 21:00.
         │                                                                 │
         └────────────────────────────────┬────────────────────────────────┘
                                          ▼
@@ -151,20 +150,21 @@ Hệ thống NOCTURNE cung cấp cho người chơi **9 công cụ nghiệp vụ
 ```
 
 #### 🧩 Chi tiết 4 Cơ chế Khám phá Nhánh A:
-1. **Cơ chế 1 — Minigame Bàn Soi Quang Học Soi Đè Chữ Ký (`EV-SIGNATURE-TRACING`):**
-   - Người chơi đặt `Giấy ủy quyền đất 200m2 (EV-SIGN-01)` đè lên `Biên bản gia đình gốc (EV-SIGN-02)`.
+1. **Cơ chế 1 — Thao Tác Soi Đè Quang Học Hai Mẫu Chữ Ký (`EV-SIGNATURE-TRACING`):**
+   - Người chơi đặt `Giấy ủy quyền đất 200m2 (EV-SIGN-01)` đè lên `Biên bản gia đình gốc (EV-SIGN-02)` đưa ra trước nguồn sáng (hoặc đặt chồng phim trong suốt).
    - *Kết quả giám định:* Hai chữ ký trùng khít 100% từng góc lượn, độ nghiêng và chấm mực. Khoa học hình sự khẳng định không ai ký tay tự nhiên 2 lần trùng khớp tuyệt đối $\rightarrow$ Khang đã **đồ nét (tracing)** để chiếm đoạt đất 200m² thế chấp ngân hàng. Đơn tố cáo của Mai là hành vi đòi công lý hợp pháp.
-2. **Cơ chế 2 — Đối chiếu Sự cố Sóng Truyền Hình (`EV-TV-GLITCH`):**
-   - Mai khai lúc 20:00 xem kênh `TH3` bị màn hình xanh 12 phút.
-   - Đối chiếu `Nhật ký kỹ thuật Đài TH3 (09)`: Trạm phát sóng cáp Phân khu X bị sập đúng **12 phút (20:00 – 20:12)**. Trong khi trạm Bờ Sông (nhà Khang / Bà Lụa) vẫn phát bình thường.
-   - $\rightarrow$ Chứng minh Mai ở nhà riêng suốt buổi tối. **MINH OAN CHO MAI.**
-3. **Cơ chế 3 — Minigame Chà Than Chì Trang Sổ Nợ Rách (`EV-DEBT-INDENTATION`):**
-   - Sử dụng công cụ chà bút chì than lên trang giấy trắng kế tiếp trong cuốn sổ da bị xé (`10a`).
+2. **Cơ chế 2 — Hóa Đơn & Ảnh Camera Tiệm Thuốc Tây Minh Châu (`EV-PHARMACY-RECEIPT` & `EV-PHARMACY-CAM`):**
+   - Hóa đơn in nhiệt tại Nhà thuốc Minh Châu (đầu Phố Đoàn Kết, cách nhà Khang 4km) ghi nhận Mai mua thuốc giảm đau Paracetamol, cồn đỏ và băng Urgo lúc **19:42:18 ngày 24/07/2026**.
+   - Trích xuất ảnh Camera an ninh quầy thuốc: Mai mặc áo mưa vàng, dán băng Urgo ngón trỏ tay phải (bị xước lúc đập bàn cãi nhau với Khang lúc 18:50) rồi rời tiệm về nhà lúc 19:46.
+   - Giải mã vết máu nhỏ trên mép bàn trà nhà Khang: Là máu từ ngón tay trỏ bị xước của Mai rớt ra lúc 18:50 (không phải máu xô xát án mạng).
+   - $\rightarrow$ Chứng minh Mai ở nhà riêng từ 19:50 suốt đêm. **MINH OAN CHO MAI.**
+3. **Cơ chế 3 — Thao Tác Chà Than Chì Trang Sổ Nợ Rách (`EV-DEBT-INDENTATION`):**
+   - Dùng bút chì mềm (2B) chà nhẹ lên trang giấy trắng kế tiếp trong cuốn sổ da bị xé (`10a`).
    - *Hiện rõ nét hằn:* *"Ngày 12/03/2026: Thằng Vũ (chồng con Mai) bốc họ 150.000.000đ. Lãi 5k/ngày. Hạn chót 30/07. Cầm cố: Danh dự gia đình, không trả tao méc bố vợ."*
    - Bóc trần lời khai gian dối của Vũ, làm rõ vết bầm gò má và cúc áo đứt là do Khang tát và giằng co lúc 19:10 khi Vũ van xin hoãn nợ.
-4. **Cơ chế 4 — Tra cứu Unix Timestamp & Bài toán Quãng đường (`EV-POS-RECEIPT-UNIX`):**
+4. **Cơ chế 4 — Tra Cứu Dấu Thời Gian POS & Bài Toán Quãng Đường (`EV-POS-RECEIPT-UNIX`):**
    - Hóa đơn mua nước giải rượu Ladodetox tại Trạm xăng Km18 Quốc Lộ bị nhòe nước mưa, mã Barcode `1787924110`.
-   - Tra cứu Unix Converter: `1787924110` $\rightarrow$ **20:35:10 ngày 24/07/2026**.
+   - Tra cứu Bảng chuyển đổi thời gian: Mã `1787924110` $\rightarrow$ **20:35:10 ngày 24/07/2026**.
    - Trạm xăng Km18 cách nhà Khang 14km đường đê ngập trơn trượt (mất 35-40 phút đi xe máy) $\rightarrow$ Vũ không thể có mặt tại hiện trường lúc án mạng diễn ra (~21:00). **MINH OAN CHO VŨ.**
 
 ---
@@ -247,20 +247,22 @@ Hệ thống NOCTURNE cung cấp cho người chơi **9 công cụ nghiệp vụ
    - Bình trà chỉ bị Tùng làm rơi vỡ lúc **20:00**. Nếu Hà ở phòng trọ cả tối thì làm sao biết Khang nằm cạnh đống bình trà vỡ? $\rightarrow$ Chứng minh Hà đã lẻn vào nhà Khang sau 20:00!
 4. **Cơ chế 4 — Mâu thuẫn mốc giờ tử vong (Báo cáo pháp y bổ sung `12`):**
    - Pháp y xác định Khang tử vong do đứt động mạch cảnh lúc **21:00 đến 21:15**. Camera xác nhận Tùng rời đi lúc 20:15 $\rightarrow$ Hung thủ ra tay đâm lúc 21:00 chính là Hà!
-5. **Cơ chế 5 — Động cơ Ái kỷ Điên loạn & Tang vật ADN lọn tóc:**
-   - Lúc 20:48, màn hình điện thoại Khang sáng tin nhắn rủ đi Đà Lạt của bồ mới (Vy) $\rightarrow$ Kích hoạt sát tâm.
-   - Hà thì thầm bài đếm số trốn tìm, vơ mảnh thủy tinh `p3` đâm đứt động mạch cổ Khang lúc 21:00 để "giữ anh lại mãi mãi bên em".
+5. **Cơ chế 5 — Mở khóa Touch ID Cưỡng bức & Động cơ Ái kỷ Điên loạn (`EV-TOUCHID-LOG`):**
+   - **Manh mối Pháp y Kỹ thuật số (Digital Forensics Log):** Nhật ký hệ thống trên điện thoại `dev-00` ghi nhận sự kiện mở khóa bằng vân tay Touch ID của nạn nhân vào lúc **20:48**.
+   - *Điểm bất thường pháp y:* Khang đã bị Tùng xô ngã chấn thương sọ não bất tỉnh từ **20:00** (Báo cáo pháp y `f1-1`). Việc Touch ID mở khóa lúc 20:48 chứng minh **đã có kẻ thứ ba cầm bàn tay của Khang đang mê man để áp vào nút mở khóa!**
+   - Hà thừa nhận: Thấy Khang ngất, Hà đã cầm ngón tay trỏ của Khang áp vào cảm biến Touch ID mở máy, thong thả lướt đọc toàn bộ đoạn chat tình tứ, ảnh vé máy bay đi Đà Lạt và lời mỉa mai gọi Hà là *"con mụ kế toán phiền phức"*.
+   - Cơn ghen cuồng sở hữu và triết lý ái kỷ biến thái trỗi dậy (*"Người sống sẽ phản bội, chỉ người chết mới mãi mãi chung thủy"*). Hà thì thầm bài đếm số trốn tìm, vơ mảnh thủy tinh `p3` đâm đứt động mạch cổ Khang lúc 21:00 để "khóa chốt chiếc tủ, giữ anh lại mãi mãi bên em".
    - Khám xét phòng trọ (`14`): Thu giữ chiếc áo gió trùm đầu dính bùn đỏ và **lọn tóc mai dính máu của Khang giấu trong áo ngực của Hà (kết quả giám định ADN trùng khớp 100%)**.
 
 ---
 
-## ⚖️ VI. BÀN KẾT ÁN CHUNG CUỘC: TERMINAL S-RANK VERDICT
+## ⚖️ VI. BIÊN BẢN KẾT LUẬN ĐIỀU TRA: CÁO TRẠNG ĐỊNH TỘI HUNG THỦ
 
-Người chơi mở **Bàn Kết Án (Accusation Terminal)** để nộp bản báo cáo định tội:
+Người điều tra hoàn thành **Bản Cáo Trạng Định Tội (Phá Án)** để nộp báo cáo:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                     BÁO CÁO KẾT TỘI CHUYÊN ÁN #000                      │
+│              BIÊN BẢN KẾT LUẬN ĐIỀU TRA CHUYÊN ÁN #000                  │
 ├─────────────────────────────────────────────────────────────────────────┤
 │ 1. CHỈ DANH THỦ PHẠM CHÍNH:                                             │
 │    [◉] TRẦN THỊ HÀ (ha)                                                 │
@@ -280,10 +282,10 @@ Người chơi mở **Bàn Kết Án (Accusation Terminal)** để nộp bản b
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 🏆 Tiêu chuẩn Xếp hạng Phá án (Ranking Rules):
-* **Hạng S (S-Rank - 100 Điểm):** Bắt đúng Hà + Đúng động cơ Ghen tuông + Đính kèm đúng 2 bằng chứng mốc giờ + Sử dụng $\le 1$ gợi ý.
-* **Hạng A (A-Rank - 80-95 Điểm):** Bắt đúng Hà nhưng sai 1 vật chứng hoặc dùng 2-3 gợi ý.
-* **Hạng B/C (Bị trừ 20-30 điểm):** Sập bẫy kết tội nhầm Tùng, Mai hoặc Vũ.
+### 🏆 Đánh Giá Kết Quả Phá Án:
+* **Phá Án Hoàn Hảo (100 Điểm):** Chỉ danh đúng Hà + Đúng động cơ Ghen tuông + Đính kèm đúng 2 bằng chứng mốc giờ + Không phụ thuộc gợi ý.
+* **Phá Án Đạt Yêu Cầu (80-95 Điểm):** Bắt đúng Hà nhưng thiếu 1 vật chứng.
+* **Sai Lệch Án Tích:** Sập bẫy kết tội oan Tùng, Mai hoặc Vũ.
 
 ---
 

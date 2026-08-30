@@ -102,19 +102,23 @@
 ## V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2026 - ĐÊM MƯA LỚN)
 
 ```text
-18:30                18:50           19:30           20:00 - 20:12          21:00          22:00
-  │                    │               │                   │                  │              │
-  ├────────────────────┼───────────────┼───────────────────┼──────────────────┼──────────────┤
-Chở Vũ sang          Ném hồ sơ       Về nhà riêng,   Kênh TH3 sập sóng,     Đi ngủ         Công an triệu
-đập bàn đòi đất      bỏ về 1 mình    nấu ăn/xem TV   chuyển sang đọc sách   (Khang bị đâm) tập khẩn cấp
+18:30 (24/07)        18:50           19:42           19:50                 22:00          08:30 (25/07)
+  │                    │               │               │                     │              │
+  ├────────────────────┼───────────────┼───────────────┼─────────────────────┼──────────────┤
+Chở Vũ sang          Ném hồ sơ       Ghé Tiệm Thuốc  Về nhà riêng,         Đi ngủ         Công an triệu
+đập bàn đòi đất,     bỏ về 1 mình,   Minh Châu mua   uống thuốc giảm đau,  bình thường    tập khẩn cấp
+xước ngón tay trỏ    lái xe dưới mưa Urgo & Para     đọc sách nghỉ ngơi
 ```
 
-* **18:30:** Trời bắt đầu đổ mưa rào. Mai đi xe máy chở Vũ đến nhà Khang tại số 14 Đường Bờ Sông. Mai xông vào nhà, đập bàn, rút tập hồ sơ pháp lý yêu cầu Khang ký vào Biên bản cam kết trả lại 50% diện tích đất hoặc ký hủy giấy ủy quyền. Khang thản nhiên cười cợt, thách thức Mai kiện.
-* **18:50:** Cãi vã lên đến đỉnh điểm. Khang chửi bới xúc phạm gia đình Mai. Mai phẫn nộ ném toàn bộ xấp giấy tờ và bản Đơn tố cáo xuống sàn nhà. Nhận thấy Khang ngoan cố, Mai tuyên bố sẽ nộp đơn thẳng lên Viện Kiểm Sát vào sáng thứ Hai rồi lấy xe máy phóng về trước. Lúc này, Vũ bảo ở lại có chút việc cá nhân và đi nhậu với bạn.
-* **19:30:** Mai lái xe máy về đến nhà tại Phố Đoàn Kết (Khu phố X). Do trời mưa to đường lầy lội, quần áo và xe bám bùn đất đỏ. Mai tắm rửa, treo quần dài vào móc trong nhà tắm rồi ra phòng khách nấu mì ăn và bật TV kênh `TH3`.
-* **20:00 – 20:12:** Trong lúc đang theo dõi bộ phim truyền hình giờ vàng trên kênh `TH3`, tín hiệu bị mất hoàn toàn, màn hình hiện màu xanh thông báo "Mất tín hiệu truyền dẫn cáp trạm X". Mai chờ 10 phút không thấy có lại nên tắt TV, vào phòng đọc sách.
-* **21:00:** Mai tắt đèn đi ngủ trong khi Khang bị thủ phạm thực sự (Hà) sát hại tại hiện trường.
-* **22:00:** Cơ quan công an phát hiện án mạng và triệu tập Mai do tìm thấy dấu vết giấy tờ mang tên cô tại hiện trường.
+* **18:30:** Trời bắt đầu đổ mưa rào. Mai đi xe máy chở Vũ đến nhà Khang tại số 14 Đường Bờ Sông. Mai xông vào nhà, đập bàn rút tập hồ sơ pháp lý yêu cầu Khang ký vào Biên bản hủy giấy ủy quyền. Trong lúc đập bàn và giằng co giấy tờ với Khang, ngón trỏ tay phải của Mai bị cạnh sắc kính cứa một vết xước rớm máu. Khang thản nhiên cười cợt, thách thức Mai kiện.
+* **18:50:** Cãi vã lên đến đỉnh điểm. Khang chửi bới xúc phạm gia đình Mai. Mai phẫn nộ ném toàn bộ xấp giấy tờ và bản Đơn tố cáo xuống sàn nhà, một vài giọt máu từ ngón tay xước của Mai rớt xuống mép bàn trà. Mai tuyên bố sẽ nộp đơn thẳng lên Viện Kiểm Sát vào sáng thứ Hai rồi lấy xe máy phóng về trước.
+* **19:35 – 19:46 (Ghé Tiệm Thuốc Tây Minh Châu):** Trên đường lái xe máy dưới mưa về qua đầu Phố Đoàn Kết, do vết thương ở ngón tay rát buốt và đầu đau nhức vì tức giận, Mai tấp vào **Nhà thuốc số 8 Minh Châu (đầu Phố Đoàn Kết, cách nhà Mai 100m, cách nhà Khang 4km)**.
+  - Mai mua 01 vỉ Paracetamol 500mg, 01 hộp băng cá nhân Urgo và 01 lọ cồn sát trùng Povidine.
+  - Hóa đơn in nhiệt ghi nhận thời gian giao dịch: **19:42:18 ngày 24/07/2026**.
+  - Camera an ninh tại quầy thuốc ghi nhận: Mai mặc áo mưa màu vàng, đứng dán miếng băng Urgo vào ngón trỏ tay phải trước khi ra xe về nhà lúc 19:46.
+* **19:50:** Mai về đến nhà tại số 45 Phố Đoàn Kết. Quần áo và xe bám bùn đỏ lầy lội do trời mưa. Mai tắm rửa, treo quần jean vào phòng tắm, uống thuốc giảm đau rồi vào phòng đọc sách nghỉ ngơi.
+* **21:30:** Vũ đi nhậu và mua nước giải rượu về đến nhà, người nồng nặc mùi rượu, vào phòng ngủ. Mai thấy chồng mệt nên không hỏi nhiều, tắt đèn đi ngủ.
+* **08:30 (Sáng 25/07):** Tổ công tác Đội Trọng án gõ cửa nhà triệu tập khẩn cấp Mai và Vũ lên cơ quan điều tra sau khi phát hiện Đơn tố cáo của Mai rơi tại hiện trường án mạng.
 
 ---
 
@@ -125,7 +129,8 @@ Chở Vũ sang          Ném hồ sơ       Về nhà riêng,   Kênh TH3 sập 
 | `EV-SIGN-01` | **Giấy ủy quyền chuyển nhượng quyền sử dụng đất** | Bản sao lưu tại phòng khách Khang. Chữ ký mang tên Trần Ngọc Mai. |
 | `EV-SIGN-02` | **Biên bản họp gia đình phân chia di sản (Gốc)** | Bản lưu trữ gia tộc. Chữ ký thật của Mai nhiều năm trước. |
 | `EV-SIGN-03` | **Đơn tố cáo lừa đảo chiếm đoạt tài sản** | Do Mai mang đến lúc 18:30. Chữ ký tươi mới nhất kèm con dấu văn phòng luật sư. |
-| `EV-TV-SCHEDULE` | **Lịch phát sóng & Nhật ký kỹ thuật Đài TH3** | Tài liệu xác nhận trạm phát sóng cáp khu vực X gặp sự cố chập điện mất tín hiệu đúng **12 phút (20:00 - 20:12)** tối 24/07. |
+| `EV-PHARMACY-RECEIPT` | **Hóa đơn bán lẻ Nhà thuốc Minh Châu** | Hóa đơn in nhiệt ghi rõ: Ngày 24/07/2026 - Giờ **19:42:18**, mặt hàng: Paracetamol + Băng cá nhân Urgo + Cồn đỏ Povidine. |
+| `EV-PHARMACY-CAM` | **Ảnh trích xuất Camera Nhà thuốc Minh Châu** | Hình ảnh Mai mặc áo mưa vàng, dán băng Urgo ngón trỏ tay phải lúc 19:45 tại quầy thuốc (cách hiện trường 4km). |
 | `EV-RED-MUD-HEM` | **Bùn đất sét đỏ trên gấu quần & xe máy** | Dấu vết đất bùn công trình ngõ nhà Khang (Vật chứng gây nhiễu). |
 
 ---
@@ -133,26 +138,29 @@ Chở Vũ sang          Ném hồ sơ       Về nhà riêng,   Kênh TH3 sập 
 ## VII. SƠ HỞ LỜI KHAI, RED HERRING & BẰNG CHỨNG NGOẠI PHẠM
 
 ### 1. Cơ chế Phá án: Kỹ thuật Đồ nét chữ ký (Signature Tracing Fraud)
-* **Thao tác của Người chơi:** So sánh đối chiếu 3 mẫu chữ ký (`EV-SIGN-01`, `EV-SIGN-02`, `EV-SIGN-03`).
+* **Thao tác của Người chơi:** So sánh đối chiếu 3 mẫu chữ ký (`EV-SIGN-01`, `EV-SIGN-02`, `EV-SIGN-03`) bằng cách soi đè trước nguồn sáng.
 * **Phát hiện khoa học hình sự:** 
   * Chữ ký trên `Giấy ủy quyền (EV-SIGN-01)` và `Biên bản gia đình (EV-SIGN-02)` khi đặt chồng khít lên nhau **trùng khớp 100% từng nét uốn, từng độ nghiêng và chấm mực**.
-  * Trong thực tế giám định, không một con người nào có thể ký tay 2 lần ở 2 thời điểm khác nhau mà trùng khớp tuyệt đối 100%. Điều này chứng minh Khang đã dùng giấy than hoặc bàn kính đèn soi để **đồ nét (tracing)** sao chép chữ ký của Mai.
+  * Trong thực tế giám định, không một con người nào có thể ký tay 2 lần ở 2 thời điểm khác nhau mà trùng khớp tuyệt đối 100%. Điều này chứng minh Khang đã dùng giấy than hoặc bàn kính đèn soi để **đồ nét (tracing)** sao chép chữ ký của Mai để chiếm đoạt đất 200m² thế chấp ngân hàng.
   * Chữ ký thật mới nhất trên `Đơn tố cáo (EV-SIGN-03)` có nét ký phóng khoáng, độ tỳ đè tự nhiên khác biệt.
 * **Ý nghĩa:** Minh oan cho Mai về cáo buộc "đồng thuận bán đất rồi đổi ý giết người diệt khẩu", khẳng định động cơ của Mai là đi đòi lại công lý bằng pháp luật.
 
 ### 2. Thông tin gây nhiễu (Red Herrings) nhắm vào Mai
-* **Bùn đất đỏ chưa khô trên gấu quần lúc 22:00:**
-  * *Bẫy suy luận:* Điều tra viên thấy gấu quần dầy của Mai lúc 22:00 vẫn ẩm ướt bùn đỏ, nghi ngờ Mai vừa mới từ nhà Khang về lúc 20:30 - 21:00.
-  * *Sự thật:* Do đêm mưa lớn, độ ẩm không khí đạt 98%, gấu quần jean dầy gập nếp treo trong phòng tắm kín gió không thể khô trong 2 tiếng rưỡi. Bùn đỏ bám từ chuyến đi lúc 18:30.
-* **Vết máu bắn trên Giấy ủy quyền:**
-  * *Bẫy suy luận:* Nghi ngờ tờ giấy bị vấy máu khi Mai xô xát đâm Khang.
-  * *Sự thật:* Tờ giấy bị Mai ném xuống sàn lúc 18:50, nằm dưới chân bàn. Vết máu bắn lên sau đó lúc 20:00 (khi Tùng xô Khang ngã) và 21:00 (khi Hà đâm Khang).
+* **Bùn đất đỏ chưa khô trên gấu quần lúc 08:30 sáng hôm sau:**
+  * *Bẫy suy luận:* Điều tra viên thấy gấu quần dầy của Mai vẫn ẩm ướt bùn đỏ, nghi ngờ Mai vừa mới từ nhà Khang về lúc nửa đêm.
+  * *Sự thật:* Do đêm mưa lớn, độ ẩm không khí đạt 98%, gấu quần jean dầy gập nếp treo trong phòng tắm kín gió không thể khô hoàn toàn. Bùn đỏ bám từ chuyến đi lúc 18:30.
+* **Vết máu nhỏ trên mép bàn trà & Giấy ủy quyền:**
+  * *Bẫy suy luận:* Nghi ngờ vết máu trên mép bàn là do Mai xô xát đâm chết Khang làm vương vãi.
+  * *Sự thật:* Kết quả giám định ADN và dấu vết thương tích xác nhận đây là máu từ vết xước ở ngón trỏ tay phải của Mai rớt ra lúc đập bàn giằng co giấy tờ lúc 18:50.
+* **Vết băng bó ở ngón trỏ của Mai:**
+  * Khớp 100% với việc Mai mua băng Urgo và cồn sát trùng tại Nhà thuốc Minh Châu lúc 19:42.
 
 ### 3. Bằng chứng Ngoại phạm Vững chắc (Alibi Clearance)
-* **Sự cố đài truyền hình cáp (TV Broadcast Glitch):**
-  * Lời khai của Mai về việc kênh `TH3` bị màn hình xanh lúc 20:00 được đối chiếu với **Nhật ký kỹ thuật của Đài Truyền Hình**: Sự cố sập trạm phát sóng cáp **chỉ xảy ra duy nhất tại Phân khu X (nơi nhà Mai cư ngụ)** trong đúng **12 phút (20:00 - 20:12)**.
-  * Tại khu vực Đường Bờ Sông (nhà Khang), trạm phát sóng cáp hoạt động hoàn toàn bình thường (nhân chứng: bà Lụa hàng xóm nhà Khang xác nhận vẫn xem trọn vẹn tập phim lúc 20:00).
-  * Chi tiết này chứng minh không thể có chuyện Mai đang ở nhà Khang mà lại biết chính xác sự cố sập kênh cáp chỉ diễn ra tại nhà riêng của mình!
+* **Hóa đơn & Camera Tiệm Thuốc Tây Minh Châu (`EV-PHARMACY-RECEIPT` & `EV-PHARMACY-CAM`):**
+  * Mai có mặt tại Nhà thuốc Minh Châu (Phố Đoàn Kết, cách nhà Khang 4km) lúc **19:42 – 19:46**.
+  * Về đến nhà lúc 19:50, uống thuốc giảm đau và ở trong nhà suốt đêm.
+  * Khoảng cách 4km trong đêm mưa gió lầy lội không thể có chuyện Mai đi bộ hay xe máy quay lại nhà Khang để gây án lúc 21:00 mà không ai trông thấy.
+  * $\rightarrow$ **MINH OAN TOÀN DIỆN CHO MAI VÔ TỘI.**
 
 ---
 

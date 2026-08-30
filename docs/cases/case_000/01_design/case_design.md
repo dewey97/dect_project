@@ -51,11 +51,12 @@
 
 ### 3. Diễn Biến Đêm Án Mạng (24/07/2026 - Đêm mưa lớn)
 - **18:30 – Đòi đất & Tranh chấp (Mai & Vũ):** Mai chở Vũ bằng xe máy đến nhà Khang. Mai đập bàn đưa Đơn tố cáo đòi lại 50% mảnh đất 200m². Khang thách thức. Đến 18:50, Mai ném xấp hồ sơ xuống sàn rồi lấy xe máy bỏ về nhà một mình lúc 19:30.
-- **19:00 - 19:15 – Van xin nợ nần & Xô xát (Vũ):** Vũ ở lại van xin Khang hoãn nợ 150M. Khang tát Vũ 2 cái, giật đứt cúc áo sơ mi xanh đen và đe dọa gửi giấy nợ cho Mai. Vũ xé sổ nợ rồi hoảng loạn tháo chạy lúc 19:15. Vũ ra quán rượu ven sông ngồi 19:30 - 20:30, sau đó mua nước giải rượu Ladodetox tại Trạm xăng Km12 lúc 20:22:15 (Unix Timestamp `1787923335`) rồi về nhà lúc 21:15.
+- **19:00 - 19:15 – Van xin nợ nần & Xô xát (Vũ):** Vũ ở lại van xin Khang hoãn nợ 150M. Khang tát Vũ 2 cái, giật đứt cúc áo sơ mi xanh đen và đe dọa gửi giấy nợ cho Mai. Vũ xé sổ nợ rồi hoảng loạn tháo chạy lúc 19:15. Vũ ra quán rượu ven sông Bãi Trũng ngồi 19:30 - 20:15, sau đó mua nước giải rượu Ladodetox tại Trạm xăng Km18 lúc 20:35:10 (Unix Timestamp `1787924110`) rồi về nhà lúc 21:30.
 - **20:00 - 20:15 – Xô xát (Tùng):** 2 ngày trước, trong bữa nhậu say cùng nhóm bạn cũ, Khang lỡ lời khoe "chiến tích nhốt tủ Huy" thuở nhỏ. Tùng bàng hoàng cầm bài báo vụ án năm 1998 sang nhà Khang chất vấn lúc 20:00. Khang thờ ơ nhạo báng và giật xé rách bài báo thách thức. Tùng nổi giận giằng co làm rơi vỡ bộ bình trà, xô Khang đập gáy vào cạnh bàn/tủ ngất xỉu. Tùng kiểm tra thấy Khang còn thở nhưng quá hoảng hốt nên tháo chạy khỏi hiện trường lúc **20:15** để bắt xe khách về Hải Phòng.
-- **20:40 - 21:00 – Án mạng (Trần Thị Hà):** 
-  - Lúc 20:40, màn hình điện thoại của Khang (đang nằm ngất dưới sàn) sáng lên tin nhắn rủ đi du lịch của tình nhân mới.
-  - Hà rình rập ngoài ngõ, thấy Tùng bỏ chạy và không thấy Khang ra khóa cửa nên lén chui vào lúc 20:45. Hà thấy Khang ngất bên bộ bình trà vỡ + đọc được tin nhắn tình nhân mới. Cơn ghen cuồng sở hữu bộc phát, Hà vơ mảnh thủy tinh vỡ đâm đứt động mạch cổ Khang lúc **~21:00**.
+- **20:45 - 21:00 – Án mạng (Trần Thị Hà):** 
+  - Hà rình rập ngoài ngõ, thấy Tùng bỏ chạy và không thấy Khang ra khóa cửa nên lén chui vào lúc 20:45. Hà thấy Khang ngất bất tỉnh bên bộ bình trà vỡ.
+  - Lúc 20:48, bản năng kiểm soát trỗi dậy, Hà cầm ngón tay trỏ của Khang ép vào Touch ID mở khóa điện thoại lướt đọc đoạn chat tình nhân đi Đà Lạt và lời mỉa mai gọi Hà là "con mụ kế toán phiền phức". Cơn ghen cuồng sở hữu bộc phát, Hà vơ mảnh thủy tinh vỡ đâm đứt động mạch cổ Khang lúc **~21:00**.
+- **06:30 Sáng 25/07 – Phát hiện thi thể & Triệu tập:** Bà Lụa sáng sớm ra quét ngõ phát hiện thi thể Khang co cứng trên vũng máu -> Báo công an lúc 06:45 -> 07:15 PC02 phong tỏa hiện trường -> 08:30 triệu tập Mai và Vũ.
 
 ---
 

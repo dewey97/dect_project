@@ -110,6 +110,7 @@ ngồi im nghe cãi Vũ ở lại        bị tát, hoảng loạn    quán Bãi
 * **19:30 – 20:15:** Đầu óc quay cuồng, không dám về nhà đối mặt với Mai, Vũ lái xe máy dưới mưa ra quán rượu bình dân ven sông Bãi Trũng ngoại thành (cách nhà Khang **14km đường đê**) ngồi uống rượu một mình trong bế tắc.
 * **20:35:10:** Rời quán rượu với hơi men nồng nặc, sợ Mai ngửi thấy mùi cồn và phát hiện vết bầm trên mặt, Vũ tấp vào Cửa hàng tiện lợi 24/7 cạnh Trạm xăng Km18 Quốc Lộ mua 01 chai nước giải rượu *Ladodetox Nosamin* (55.000 VNĐ).
 * **21:30:** Sau khi đi xe máy hơn 40 phút dưới trời mưa lớn và đường ngập từ Km18 về đến nhà tại Phố Đoàn Kết, Vũ thấy Mai đã đi ngủ nên lén vào phòng tắm rửa mặt, uống thuốc giải rượu rồi lên giường nằm im run rẩy.
+* **08:30 (Sáng 25/07):** Công an ập đến nhà triệu tập Mai và Vũ lên làm việc sau khi phát hiện thi thể Khang và các giấy tờ liên quan tại hiện trường.
 
 ---
 
