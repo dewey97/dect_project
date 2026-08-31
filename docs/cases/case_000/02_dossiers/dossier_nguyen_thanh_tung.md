@@ -36,10 +36,11 @@
 
 ### 📌 Cấp 2 — Hỏi cung tự thú & Pháp y 2 giai đoạn
 * **Lời tự thú của Tùng (`01_tu_thu_xo_xat_tung`):** Bị đập tan lời chối, Tùng bật khóc tự thú: Chiều 24/07 cầm mẩu báo sang bắt Khang ra mộ tạ tội. Khang trơ tráo buông lời cười cợt thách thức $\rightarrow$ Tùng xô Khang ngã đập đầu vỡ bình trà và rơi vỡ khung ảnh `p4` lúc 20:00.
-* **Chi tiết then chốt:** Tùng thấy Khang nằm bất động, cúi xuống kiểm tra thấy **Khang vẫn còn thở đều bình thường (chỉ bị ngất xỉu do cú đập mạnh ở đầu, hoàn toàn không chảy máu)**. Trong cơn nóng giận, Tùng bỏ mặc Khang rồi rời đi lúc 20:15 bắt xe ôm về phòng trọ công nhân ở Cầu Bươu.
-* **Minh oan tuyệt đối:**
-  1. **Lời tự thú & Pháp y 2 giai đoạn (`01_tu_thu_xo_xat_tung` & `01_phap_y_hai_giai_doan`):** Cú ngã lúc 20:00 chỉ gây chấn động não ngất xỉu tạm thời, Tùng rời đi lúc 20:15; nạn nhân tử vong trong khoảng **20:45 – 21:15 (~21:00)** do vết đâm đứt động mạch cảnh bởi mảnh thủy tinh `p3`.
-* $\rightarrow$ **LOẠI TRỪ TÙNG KHỎI DIỆN NGHI PHẠM GIẾT NGƯỜI TRỰC TIẾP!**
+* **Chi tiết then chốt:** Tùng thấy Khang nằm bất động, cúi xuống kiểm tra thấy **Khang vẫn còn thở đều bình thường**. Trong cơn nóng giận, Tùng bỏ mặc Khang rồi rời đi lúc 20:15 bắt xe ôm về phòng trọ công nhân ở Cầu Bươu.
+* **Minh oan khách quan:**
+  1. **Mốc giờ rời đi (20:15):** Lời khai nhân chứng bà Lụa (`11`) nhìn thấy thợ nề chạy ra khỏi ngõ lúc **20:15** + Thông báo gom rác đường tàu trên Bảng tin (`18`) khớp giờ hạ gác chắn đón tàu 20:30.
+  2. **Pháp y 2 giai đoạn (`04` & `01_phap_y_hai_giai_doan`):** Cú ngã lúc 20:00 chỉ gây chấn động sọ não kín ngất xỉu tạm thời; nạn nhân tử vong trong khoảng **20:45 – 21:15 (~21:00)** do vết đâm đứt động mạch cảnh bởi mảnh thủy tinh `p3`.
+* $\rightarrow$ **TÙNG ĐÃ RỜI ĐI TỪ 20:15 TRƯỚC THỜI ĐIỂM ÁN MẠNG XẢY RA LÚC 21:00!**
 * **🔑 Manh mối chuyển tiếp:** Tùng khai lúc chạy qua ngõ lúc 20:15 thấy nhân viên đường sắt bấm chuông hạ rào chắn chuẩn bị đón tàu đêm (khớp nối với Mẩu thông báo thu gom rác trên Bảng tin `18` về chuyến tàu hàng qua lúc 20:30).
 
 ---

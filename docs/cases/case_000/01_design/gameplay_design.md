@@ -177,18 +177,18 @@
 * 👉 **TÙNG TRỞ THÀNH NGHI PHẠM SỐ 1 CÓ ĐỘNG CƠ TRẢ THÙ RÕ RỆT VÀ MÃNH LIỆT NHẤT!**
 * 🔓 **Mở khóa Cấp 2:** Tiến hành **Hỏi cung chuyên sâu lần 2 & Lấy lời tự thú của Tùng** (`01_tu_thu_xo_xat_tung`).
 
-#### 🔹 [CẤP 2] HỎI CUNG TỰ THÚ XÔ NGÃ & MINH OAN BẰNG LỜI TỰ THÚ & PHÁP Y
-* **Tài liệu tiếp cận:** `01_tu_thu_xo_xat_tung` + `04_kham_nghiem_tu_thi` + `18_bang_tin_rao_vat`.
+#### 🔹 [CẤP 2] HỎI CUNG TỰ THÚ XÔ NGÃ & MINH OAN CHO NGUYỄN THANH TÙNG
+* **Tài liệu tiếp cận:** `01_tu_thu_xo_xat_tung` + `11_loi_khai_nhan_chung` + `04_kham_nghiem_tu_thi` + `18_bang_tin_rao_vat`.
 * **Dữ liệu đối chiếu & Lời khai của Tùng:**
   - **Hỏi cung chuyên sâu lần 2 (`01`):** Bị cảnh sát đập tan lời chối quanh bằng bằng chứng xô xát và bí mật 1996, Tùng bật khóc tự thú: Sang bắt Khang ra mộ tạ tội, Khang cười cợt thách thức $\rightarrow$ Tùng xô Khang ngã đập đầu vỡ bình trà và rơi vỡ khung ảnh `p4` lúc 20:00.
-  - **Chi tiết tâm lý then chốt:** Tùng khai thấy Khang ngã bất động mắt nhắm nghiền, Tùng cúi xuống lay kiểm tra thấy **Khang vẫn còn thở đều bình thường (chỉ bị ngất xỉu do cú đập mạnh ở đầu, hoàn toàn không chảy máu)**. Trong cơn nóng giận và căm ghét, Tùng nghĩ bụng *"Mặc xác mày, cho mày nằm đấy mà tự tỉnh!"* rồi bỏ đi lúc 20:15 bắt xe ôm về phòng trọ công nhân ở Cầu Bươu. Tùng hoàn toàn không biết sau đó Khang bị ai sát hại!
+  - **Chi tiết tâm lý then chốt:** Tùng khai thấy Khang ngã bất động mắt nhắm nghiền, Tùng cúi xuống lay kiểm tra thấy **Khang vẫn còn thở đều bình thường**. Trong cơn nóng giận và căm ghét, Tùng nghĩ bụng *"Mặc xác mày, cho mày nằm đấy mà tự tỉnh!"* rồi bỏ đi lúc 20:15 bắt xe ôm về phòng trọ công nhân ở Cầu Bươu.
 * 🎯 **Tương tác phán đoán của người chơi (Bẫy tư duy):**
   - Nếu người chơi vội vàng kết luận: *"Tùng là hung thủ giết Khang"* $\rightarrow$ **SAI!**
-  - Người chơi phải đối chiếu logic chứng minh Tùng không phải hung thủ trực tiếp:
-    1. **Lời tự thú của Tùng (`01`):** Tùng rời hiện trường lúc **20:15** khi Khang chỉ bị ngất xỉu và vẫn thở đều bình thường.
-    2. **Khám nghiệm tử thi (`04`):** Giờ chết chính xác là trong khoảng **20:45 – 21:15** do vết đâm đứt động mạch cảnh bởi mảnh thủy tinh `p3` (cú ngã lúc 20:00 chỉ gây chấn động ngất xỉu tạm thời).
-  - 💡 **Kết luận:** **Xác lập bằng chứng ngoại phạm khách quan, loại trừ Nguyễn Thanh Tùng khỏi diện nghi phạm trực tiếp gây án!**
-  - **🔑 Manh mối neo giữ then chốt:** Tùng khai lúc chạy qua ngõ lúc 20:15 thấy nhân viên đường sắt bấm chuông hạ rào chắn đón chuyến tàu đêm (khớp với **Mẩu thông báo thu gom rác trên Bảng tin khu phố `18`**: chuyến tàu hàng chạy qua ngõ lúc **20:30**).
+  - Người chơi đối chiếu các bằng chứng khách quan để loại trừ Tùng:
+    1. **Xác định mốc giờ Tùng rời hiện trường (20:15):** Lời khai nhân chứng bà Lụa (`11`) nhìn thấy người mặc áo thợ nề hớt hải chạy ra khỏi ngõ lúc **20:15** + Thông báo gom rác đường tàu trên Bảng tin (`18`) xác nhận việc gác chắn hạ đón chuyến tàu hàng 20:30.
+    2. **Khám nghiệm tử thi (`04`):** Nạn nhân tử vong trong khoảng **20:45 – 21:15 (~21:00)** do vết đâm đứt động mạch cảnh bởi mảnh thủy tinh `p3` (cú ngã lúc 20:00 chỉ gây chấn động sọ não kín làm ngất xỉu).
+  - 💡 **Kết luận:** **Tùng đã rời hiện trường từ 20:15 (trước thời điểm nạn nhân bị sát hại lúc ~21:00), loại trừ Tùng khỏi diện thủ phạm giết người!**
+  - **🔑 Manh mối neo giữ then chốt:** Mốc giờ tàu hàng chạy qua ngõ lúc **20:30** (khớp nối giữa lời khai của Tùng `01` và Bảng tin khu phố `18`).
 
 ---
 
