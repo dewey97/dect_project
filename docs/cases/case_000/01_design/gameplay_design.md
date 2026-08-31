@@ -61,7 +61,7 @@
   Mai và Vũ đi chung xe máy đến. Mai cãi vã đòi lại 50% đất 200m², ném xấp đơn tố cáo xuống sàn nhà. Vũ lừa Mai bảo mình bận đi nhậu nên giục Mai lấy xe máy phóng về nhà trước một mình. Đúng lúc nhạc hiệu Thời sự 19h00 VTV1 vang lên bên nhà bà Lụa (`11`), bà Lụa nghe thấy tiếng xe máy rồ ga phóng vụt ra khỏi ngõ $\rightarrow$ Người chơi đối chiếu suy ra Mai rời khỏi ngõ chính xác lúc **19:00**.
 
 * **19:00 – 19:30 (Vũ ở lại xin hoãn nợ):**  
-  Vũ quay vào phòng khách xin Khang hoãn món nợ 300M bốc họ. Khang tát bầm má Vũ, chửi bới và đe dọa báo gia đình vợ. Vũ hoảng loạn tháo chạy lúc 19:25, đặt xe ôm công nghệ đón ở đầu ngõ lúc 19:30 ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km) uống bia đến 20:45. Lúc chạy ra ngõ 19:25, Vũ nhìn thấy bóng người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
+  Vũ quay vào phòng khách xin Khang hoãn món nợ 300M bốc họ. Khang tát bầm má Vũ, chửi bới và đe dọa báo gia đình vợ. Vũ suy sụp rời đi uống rượu một mình (đặt xe ôm công nghệ lúc 19:30 đi đến Quán Bia 88 cách 3.8 km) uống bia đến 20:45. Lúc chạy ra ngõ 19:25, Vũ nhìn thấy bóng người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
 
 * **20:00 – 20:15 (Tùng đối chất vụ án 1996):**  
   Tùng cầm mẩu báo cũ năm 1996 sang bắt Khang ra mộ thắp hương tạ tội đúng ngày giỗ tròn 30 năm của bé Gia Huy. Khang trơ tráo buông lời cười cợt, nhạo báng. Cơn uất hận bùng nổ, Tùng xô Khang ngã đập đầu vào cạnh bàn làm rơi mẩu báo `p5`, vỡ bộ bình trà thủy tinh và khung ảnh `p4` lúc 20:00. Khang ngất xỉu mê man. Tùng kiểm tra thấy Khang vẫn còn thở đều nên tức giận bỏ mặc Khang tự tỉnh, rời đi lúc 20:15 bắt xe ôm về phòng trọ công nhân ở Cầu Bươu.
@@ -84,23 +84,23 @@
 * **Dữ liệu thu thập & Vật chứng tại hiện trường:**
   1. **Khám nghiệm tử thi (`04`):** Nạn nhân chết do đứt động mạch cảnh trong khoảng **20:45 – 21:15 (ước tính ~21:00)**; vùng chẩm gáy có vết tụ máu do va đập trước đó; đặc biệt thái dương trái có **một mảng tóc mai bị cắt sát da đầu** bằng vật sắc nhọn.
   2. **Vật chứng hiện trường (`05`):** Mảnh thủy tinh dính máu `p3` (vết vân tay miết trượt mờ, chưa đủ điều kiện tra tự động), bộ bình trà thủy tinh vỡ vụn `p1`, xấp đơn đòi đất `p2` (có 02 giọt máu khô `M1` trên góc mép), sổ nợ tín dụng đen `10a`, hũ trà hoa cúc dán note vàng `17`, điện thoại cảm ứng `dev-00` rơi úp mặt cạnh tay nạn nhân.
-  3. **Kỷ vật xóm Bờ Sông 1996:** Khung ảnh tuổi thơ vỡ kính `p4` (Khang ngỗ ngược, bé gái Hà mặc váy hoa, bé Mai nhỏ xíu được ông bế, Tùng có sẹo chữ V ở lông mày đang để bé Huy nhỏ thó đeo còi đồng nép sau lưng mình) + Mẩu báo cũ ố vàng năm 1996 `p5` đưa tin về bé trai N.G.H (7 tuổi) ngạt khí trong tủ gỗ khi chơi cùng các bạn nhỏ ngày 24/07/1996.
+  3. **Khung ảnh hồi nhỏ (`p4` & `p5`):** Khung ảnh tuổi thơ vỡ kính `p4` (Khang ngỗ ngược, bé gái Hà mặc váy hoa, bé Mai nhỏ xíu được ông bế, Tùng có sẹo chữ V ở lông mày đang để bé Huy nhỏ thó đeo còi đồng nép sau lưng mình) + Mẩu báo cũ ố vàng năm 1996 `p5` đưa tin về bé trai N.G.H (7 tuổi) ngạt khí trong tủ gỗ khi chơi cùng các bạn nhỏ ngày 24/07/1996.
   4. **Dữ liệu trích xuất điện thoại nạn nhân (`16` — Mã `dev-00`):** 
-     - **SMS 18/07 (1 tuần trước):** Hà van xin Khang đừng giận $\rightarrow$ Khang xóa lịch sử chat và không trả lời (dấu hiệu rạn nứt tình cảm sâu sắc từ trước).
-     - **SMS 23/07 14:22:** Khang đe dọa đòi nợ 300M số `0988.20.09.94`, dọa ném giấy nợ về nhà 45 Đoàn Kết cho bố vợ xem (dồn con nợ Vũ vào chân tường).
-     - **SMS 24/07 15:30:** Số lạ `0913.882.901` gửi: *"Tròn 30 năm rồi đó. M không có gì muốn nói với Huy à?"* (Manh mối ân oán giỗ 30 năm của Tùng).
-     - **SMS 24/07 17:45:** Thảo Vy gửi: *"Vé máy bay sáng mai 06:15 em book xong rồi nhé anh yêu. Tiền mặt anh chuẩn bị đủ chưa? Vào trong này sống luôn với em nhé!"* (Kế hoạch gom tiền bỏ trốn với nhân tình của Khang — **Trigger tâm lý chí mạng khi Hà mở máy lúc 20:45**).
-     - **SMS 24/07 19:15:** Hà nhắn đưa hũ trà hoa cúc mới sao sang (Khang tắt thông báo không đọc $\leftrightarrow$ Khớp hũ trà `17` trên bàn).
-     - **Nhật ký cuộc gọi & Voicemail 20:32:** Cuộc gọi nhỡ lúc 20:31:30 từ Hà $\rightarrow$ Chuyển Hộp thư thoại lúc 20:32:15: Hà thì thầm *"đang ở phòng trọ xem phim buồn quá tí nữa em chạy qua..."*, hậu cảnh lọt rõ **tiếng còi tàu hỏa diesel D19E kéo dài và tiếng chuông gác chắn đường sắt reo leng keng** (Bằng chứng bẻ gãy alibi, chứng minh Hà đang đứng ngay trước cổng rào chắn ngõ nhà Khang).
-  5. **Bảng tin & Ngoại cảnh trước cổng (`18` / `p9`):**
+     - **SMS 18/07 (1 tuần trước):** Hà van xin Khang đừng giận $\rightarrow$ Khang xóa lịch sử chat và không trả lời.
+     - **SMS 23/07 14:22:** Khang đe dọa đòi nợ 300M số `0988.20.09.94`.
+     - **SMS 24/07 15:30:** Số lạ `0913.882.901` gửi: *"Tròn 30 năm rồi đó. M không có gì muốn nói với Huy à?"*.
+     - **SMS 24/07 17:45:** Thảo Vy gửi: *"Vé máy bay sáng mai 06:15 em book xong rồi nhé anh yêu. Tiền mặt anh chuẩn bị đủ chưa? Vào trong này sống luôn với em nhé!"*.
+     - **SMS 24/07 19:15:** Hà nhắn đưa hũ trà hoa cúc mới sao sang.
+     - **Nhật ký cuộc gọi & Voicemail 20:32:** Cuộc gọi nhỡ lúc 20:31:30 từ Hà $\rightarrow$ Chuyển Hộp thư thoại lúc 20:32:15, hậu cảnh lọt tiếng còi tàu hỏa và chuông gác chắn đường sắt.
+  5. **Ảnh chụp bảng tin trước cổng nhà Khang (`18` / `p9`):**
      - Các vết xịt sơn đỏ đe dọa đòi nợ và cướp đất (*"ĐMM KHANG CHÓ TRẢ TIỀN BỐ"*, *"KHANG LỪA ĐẢO CƯỚP ĐẤT"*).
-     - **Mẩu 1 (Tờ rơi thợ nề):** Giấy viết tay dán băng dính (*"Nhận sửa nhà, đục bê tông, thông cống... LH: 0913.882.901 (Em Tùng thợ nề)"*) $\leftrightarrow$ Khớp số gửi SMS 15:30.
-     - **Mẩu 2 (Thông báo mất cáp):** Thông báo sự cố đứt cáp truyền hình & internet lúc 20h10 nhánh Bờ Sông – Đoàn Kết $\leftrightarrow$ Xác thực lời khai Mai ở nhà xem tivi bị mất sóng cáp lúc hơn 20h.
-     - **Mẩu 3 (Thông báo gom rác đường tàu):** Thông báo của Tổ dân phố số 4 về lịch thu gom rác ngõ Bờ Sông từ 19h30 đến 20h15, kết thúc trước khi gác chắn đóng đón **chuyến tàu hàng Bắc – Nam lúc 20h30 hàng đêm** $\leftrightarrow$ Cung cấp mốc giờ cố định 20:30 của đoàn tàu chạy qua ngõ nhà Khang.
+     - **Mẩu 1 (Tờ rơi thợ nề):** Giấy viết tay dán băng dính (*"Nhận sửa nhà, đục bê tông, thông cống... LH: 0913.882.901"*).
+     - **Mẩu 2 (Thông báo mất cáp):** Thông báo sự cố đứt cáp truyền hình & internet lúc 20h10 nhánh Bờ Sông – Đoàn Kết.
+     - **Mẩu 3 (Thông báo gom rác đường tàu):** Thông báo của Tổ dân phố số 4 về lịch thu gom rác ngõ Bờ Sông từ 19h30 đến 20h15, kết thúc trước khi gác chắn đóng đón **chuyến tàu hàng Bắc – Nam lúc 20h30 hàng đêm**.
   6. **Lời khai sơ bộ đáng chú ý (`11`–`15`):**
      - Bà Lụa (`11`): Mai phóng xe máy về đúng lúc nhạc Thời sự 19h00 VTV1; nghe cãi nhau và tiếng vỡ bình trà "XOẢNG" lúc hơn 20h00, thấy người mặc áo thợ nề hớt hải chạy ra ngõ lúc 20:15; từng nhìn thấy bóng người đứng rình dưới gốc cây xoan ngó vào nhà Khang.
-     - Vũ (`13`): Khai Mai vừa đi là mình bắt xe đi nhậu ngay (kèm ảnh chụp màn hình app xe `p10`); buột miệng so sánh với vợ: *"Con Hà nó yêu thằng Khang đến phát điên, ngày nào cũng trà đóm cơm bưng nước rót... Nghĩ mà ước gì vợ tôi được như con Hà."* (Cài cắm dấu hiệu tâm lý cuồng yêu của Hà ngay từ đầu).
-     - Hà (`15`): Khai ở phòng trọ xem phim bộ VTV3 từ 20h00 đến 21h30 kể về *"một người đàn ông phản bội người con gái đã hy sinh cả thanh xuân... xem xong em khóc ướt cả gối"* (Thủ phạm tự thuật lại vở kịch nội tâm và động cơ của chính mình dưới vỏ bọc một cô gái yếu đuối mê phim truyền hình).
+     - Vũ (`13`): Khai Mai vừa đi là mình bắt xe đi nhậu ngay (kèm ảnh chụp màn hình app xe `p10`); buột miệng so sánh với vợ: *"Con Hà nó yêu thằng Khang đến phát điên, ngày nào cũng trà đóm cơm bưng nước rót... Nghĩ mà ước gì vợ tôi được như con Hà."*.
+     - Hà (`15`): Khai ở phòng trọ xem phim bộ VTV3 từ 20h00 đến 21h30 kể về *"một người đàn ông phản bội người con gái đã hy sinh cả thanh xuân... xem xong em khóc ướt cả gối"*.
 
 * 💡 **Lựa chọn điều tra của người chơi:** Từ 18 tài liệu cơ sở ban đầu, người chơi phát hiện **02 luồng mâu thuẫn lớn** và có toàn quyền tự do chọn điều tra Tuyến A hoặc Tuyến B trước:
   - **Luồng 1 (Tranh chấp đất đai & Vay nợ bốc họ):** Xuất phát từ Đơn tố cáo đòi đất `p2` rơi dưới sàn, SMS đe dọa nợ 300M, sổ nợ theo dõi `10a`, và sự chênh lệch giờ giấc cuốc xe ôm `p10` $\rightarrow$ **Dẫn vào Tuyến Điều Tra A (Trần Ngọc Mai & Lê Quang Vũ)**.
@@ -128,10 +128,10 @@
 #### 🔹 [CẤP 1] TRUY VẾT "THẰNG LỆCH PHA" & MÓN NỢ 300M
 * **Tài liệu tiếp cận:** `07_loi_khai_lan_2_vu` + `13_loi_khai_vu` + `08_ly_lich_nghi_pham` (Lý lịch làm nghề kỹ sư điện, đặc điểm mắt trái lác nhẹ, nhà 45 Đoàn Kết) + `16_trich_xuat_dien_thoai` (SMS nợ 300M) + `10a_so_ghi_no_cua_khang` (`05_so_ghi_no_cua_khang`).
 * **Thao tác đối chiếu & Suy luận của người chơi:**
-  - Soi cuốn sổ nợ nhiều dòng `10a` của Khang: Quét mắt đọc từng dòng và tinh mắt nhận diện dòng 05: **Thằng Lệch Pha — 300.000.000 đ — SĐT: `0988.20.09.94` — Hạn: 20/07 — Ghi chú: `~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Dọa ném bố vợ`**.
-  - Đối chiếu SMS đòi nợ 300M trong máy Khang (`16`): Khang gửi lúc 14:22 ngày 23/07 đe dọa ném giấy nợ về nhà 45 Đoàn Kết cho bố vợ sau khi Vũ bùng hẹn ngày 20/07.
+  - Soi cuốn sổ nợ nhiều dòng `10a` của Khang: Quét mắt đọc từng dòng và tinh mắt nhận diện dòng 05: **Thằng Lệch Pha — 300.000.000 đ — SĐT: `0988.20.09.94` — Hạn: 20/07 — Ghi chú: `~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Phải mách nhà nó...`**.
+  - Đối chiếu SMS đòi nợ 300M trong máy Khang (`16`): Khang gửi lúc 14:22 ngày 23/07 dồn đòi nợ số `0988.20.09.94`.
   - Khớp nối biệt danh kép **"Lệch Pha"** (nghề kỹ sư điện + tật mắt trái lác nhẹ trong ảnh của Vũ `08`) + địa chỉ **45 Đoàn Kết** $\rightarrow$ Bóc trần Lê Quang Vũ chính là con nợ 300M đang bị dồn vào chân tường!
-  - Bị đập tan lời chối, Vũ thú nhận: Nán lại xin hoãn nợ, bị Khang tát và rút sổ nợ ra đe dọa rải tờ rơi báo bố vợ $\rightarrow$ Vũ hoảng loạn tháo chạy lúc 19:25 ra ngõ bắt xe ôm lúc 19:30 ra Quán Bia 88 ở Khu Cầu Cảng.
+  - Bị đập tan lời chối, Vũ thú nhận: Nán lại xin hoãn nợ, bị Khang tát và đe dọa $\rightarrow$ Vũ suy sụp rời đi uống rượu một mình (đặt xe ôm công nghệ lúc 19:30 đi đến Quán Bia 88 cách 3.8 km).
 * ❓ **Nghi vấn đặt ra:** Vũ có thực sự ngồi uống bia ở Quán Bia 88 suốt tối hay chỉ lấy cớ rồi quay lại giết Khang?
 * 🔓 **Mở khóa Cấp 2:** Thu thập **Nhật ký thu chi Quán Bia 88** (`06_so_thu_chi_quan_bia`).
 

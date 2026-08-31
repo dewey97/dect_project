@@ -108,7 +108,7 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 ## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
 
 ### 1. Cơ chế 1: Đối chiếu Sổ nợ `10a` & Biệt danh "Thằng Lệch Pha"
-* **Vật chứng:** Cuốn sổ ghi nợ tín dụng đen `10a` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.94 — Hạn: 20/07 — Ghi chú: ~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Dọa ném bố vợ*.
+* **Vật chứng:** Cuốn sổ ghi nợ tín dụng đen `10a` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.94 — Hạn: 20/07 — Ghi chú: ~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Phải mách nhà nó...*.
 * **Khớp nối suy luận:** Nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08` + địa chỉ 45 Đoàn Kết + SĐT `0988.20.09.94` $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ!
 
 ### 2. Cơ chế 2: Câu đố Sổ thu chi Quán Bia 88 (`06_so_thu_chi_quan_bia.md`)
