@@ -46,7 +46,7 @@
 | **Nơi cư trú hiện tại** | Số 45, Phố Đoàn Kết, Phường Trung Tâm (Ở rể cùng vợ Trần Ngọc Mai) |
 | **Nghề nghiệp** | Kỹ sư Điện & Lắp đặt thiết bị tự do |
 | **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Trần Ngọc Mai, sinh năm 1996) |
-| **Đặc điểm nhận dạng** | Nam, cao 1m70, mắt trái có tật lác nhẹ (lé nhẹ), đeo kính gọng đen, gò má trái có vết bầm tím mới |
+| **Đặc điểm nhận dạng** | Nam, cao 1m70, mắt trái có tật lác nhẹ (lé nhẹ), đeo kính gọng đen |
 
 ---
 
@@ -54,7 +54,7 @@
 
 1. **Lời khai gian dối ban đầu (`13`):** Vũ khai sau khi Mai nổ máy xe về lúc 19:00, Vũ cũng đi ra cổng cùng lúc rồi bắt xe đi nhậu ngay (xuất trình ảnh chụp màn hình app xe `p10`).
 2. **Sơ hở chênh lệch 30 phút:** Đối chiếu app xe `p10`, Vũ bấm đặt xe lúc **19:25:40** và tài xế đón lúc **19:30:15**. Điều này chứng minh Vũ đã nán lại trong nhà Khang **30 phút (19:00 – 19:30)** sau khi Mai đã về.
-3. **Dấu hiệu bạo lực trên cơ thể:** Gò má trái của Vũ có vết bầm tím tụ máu mới hình thành.
+3. **Tâm lý bất an:** Vũ có biểu hiện căng thẳng, sợ hãi tột độ, hai bàn tay run rẩy khi nhắc đến các khoản tiền bạc.
 
 ---
 
@@ -97,7 +97,7 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 ```
 
 * **18:30 – 19:00:** Vũ ngồi im trong khi Mai cãi nhau đòi đất với Khang. Đúng 19:00 Mai phóng xe về trước.
-* **19:00 – 19:25:** Vũ quỳ lạy xin hoãn món nợ 300 triệu. Khang chửi bới, tát mạnh vào má trái làm Vũ bầm mặt và đe dọa in 100 tờ rơi rải khắp phố Đoàn Kết. Vũ hoảng loạn vùng chạy thoát ra cửa sau luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25:40.
+* **19:00 – 19:25:** Vũ quỳ lạy xin hoãn món nợ 300 triệu. Khang chửi bới, rút cuốn sổ da đen đập mạnh vào ngực Vũ và đe dọa in 100 tờ rơi rải khắp phố Đoàn Kết. Vũ suy sụp, hoảng sợ vùng chạy thoát ra cửa sau luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25:40.
 * **19:25:** Đứng ở đầu ngõ đợi xe, Vũ nhìn thấy bóng một người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
 * **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 Set Nhắm Bình Dân + 3 chai bia Hà Nội.
 * **20:45:** Vũ thanh toán chuyển khoản **195.000đ** (Bàn số 7).
@@ -126,16 +126,16 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 
 | Yếu Tố Bẫy (Red Herring) | Suy Đoán Ban Đầu (Nghi Vấn) | Sự Thật Khách Quan Được Minh Oan |
 | :--- | :--- | :--- |
-| **Vết bầm tím má trái của Vũ** | Nghi Vũ vừa đánh nhau chí mạng với nạn nhân trước khi Khang chết. | Do Khang tát lúc 19:15 khi Vũ van xin hoãn nợ. |
-| **Món nợ 300M bị dồn vào chân tường** | Nghi Vũ giết chủ nợ để quỵt nợ. | Vũ hoảng loạn tháo chạy lúc 19:25 và ngồi uống bia tại Cầu Cảng suốt từ 19:40 đến 20:45. |
+| **Vũ nán lại 30 phút sau khi Mai về** | Nghi ngờ ở lại sát hại nạn nhân. | Nán lại xin hoãn nợ bị chửi bới, sau đó đặt xe ôm đi lúc 19:30. |
+| **Món nợ 300M bị dồn vào chân tường** | Nghi Vũ giết chủ nợ để quỵt nợ. | Vũ suy sụp rời đi và ngồi uống bia tại Cầu Cảng suốt từ 19:40 đến 20:45. |
 
 ---
 
 ## VIII. KÝ SỰ HẬU ÁN: GÁNH NẶNG GÁ NGHĨA & NỖI SỢ CỦA KẺ CÙNG ĐƯỜNG
 
-Ngồi trong phòng lấy lời khai, nhìn vào trang sổ nợ ghi số tiền 300 triệu, hai vai Vũ sụp xuống hoàn toàn. Giọt nước mắt muộn màng lăn qua vết bầm tím trên gò má.
+Ngồi trong phòng lấy lời khai, nhìn vào trang sổ nợ ghi số tiền 300 triệu, hai vai Vũ sụp xuống hoàn toàn. Giọt nước mắt muộn màng lăn dài trên gò má.
 
-*"Tôi hèn hạ lắm đúng không cán bộ? Tôi sợ nghèo, sợ người ta khinh thằng rể quê lên thành phố ăn bám nhà vợ, nên mới lao vào làm ăn rồi sa chân vào vay nóng của thằng Khang... Khi nó tát tôi, nó dọa gửi giấy nợ cho bố mẹ vợ, tôi chỉ muốn biến mất khỏi thế giới này..."*
+*"Tôi hèn hạ lắm đúng không cán bộ? Tôi sợ nghèo, sợ người ta khinh thằng rể quê lên thành phố ăn bám nhà vợ, nên mới lao vào làm ăn rồi sa chân vào vay nóng của thằng Khang... Khi nó sỉ nhục tôi, nó dọa gửi giấy nợ cho bố mẹ vợ, tôi chỉ muốn biến mất khỏi thế giới này..."*
 
 Vũ không giết người. Sự hèn nhát và sĩ diện hảo của Vũ suýt chút nữa đã biến anh thành kẻ thế mạng. Sau khi vụ án khép lại, Mai đã cùng Vũ bán bớt một phần đất được trả lại để thanh toán dứt điểm khoản nợ, cho Vũ một cơ hội làm lại cuộc đời.
 

@@ -38,7 +38,7 @@ Vào hồi 09 giờ 00 phút, ngày 26 tháng 07 năm 2026, tại Phòng Cảnh 
 
 * **Hỏi (ĐTV Lê Minh):** Tối 24/07, trong 30 phút ở lại từ 19:00 đến 19:30, anh đã làm gì trong nhà nạn nhân Khang?
 
-* **Đáp (Lê Quang Vũ):** Lúc vợ tôi tức giận ném giấy đòi đất rồi nổ máy xe về lúc 19:00, tôi cố tình nói dối Mai là đi nhậu với bạn để Mai về trước. Sau khi tiếng xe máy của Mai vừa khuất, tôi vội đóng cửa bước vào phòng khách quỳ lạy xin anh Khang cho tôi hoãn nợ. Nhưng anh Khang cười khẩy, tát thẳng vào mặt tôi một cái rất mạnh (làm má tôi bầm tím) rồi rút cuốn sổ da đen đập vào ngực tôi chửi: *"Mày bùng hẹn ngày 20 rồi, hạn chót ngày mai không nôn đủ 300 củ tao in 100 tờ rơi rải khắp phố Đoàn Kết cho bố vợ mày nhục mặt!"*. 
+* **Đáp (Lê Quang Vũ):** Lúc vợ tôi tức giận ném giấy đòi đất rồi nổ máy xe về lúc 19:00, tôi cố tình nói dối Mai là đi nhậu với bạn để Mai về trước. Sau khi tiếng xe máy của Mai vừa khuất, tôi vội đóng cửa bước vào phòng khách quỳ lạy xin anh Khang cho tôi hoãn nợ. Nhưng anh Khang cười khẩy, rút cuốn sổ da đen đập mạnh vào ngực tôi chửi: *"Mày bùng hẹn ngày 20 rồi, hạn chót ngày mai không nôn đủ 300 củ tao in 100 tờ rơi rải khắp phố Đoàn Kết cho bố vợ mày nhục mặt!"*. 
 
 Tôi van xin không được, sợ hãi cùng quẫn nên vùng chạy thoát ra khỏi cửa nách sau nhà, luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25. 
 

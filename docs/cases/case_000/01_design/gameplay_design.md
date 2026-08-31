@@ -61,7 +61,7 @@
   Mai và Vũ đi chung xe máy đến. Mai cãi vã đòi lại 50% đất 200m², ném xấp đơn tố cáo xuống sàn nhà. Vũ lừa Mai bảo mình bận đi nhậu nên giục Mai lấy xe máy phóng về nhà trước một mình. Đúng lúc nhạc hiệu Thời sự 19h00 VTV1 vang lên bên nhà bà Lụa (`11`), bà Lụa nghe thấy tiếng xe máy rồ ga phóng vụt ra khỏi ngõ $\rightarrow$ Người chơi đối chiếu suy ra Mai rời khỏi ngõ chính xác lúc **19:00**.
 
 * **19:00 – 19:30 (Vũ ở lại xin hoãn nợ):**  
-  Vũ quay vào phòng khách xin Khang hoãn món nợ 300M bốc họ. Khang tát bầm má Vũ, chửi bới và đe dọa báo gia đình vợ. Vũ suy sụp rời đi uống rượu một mình (đặt xe ôm công nghệ lúc 19:30 đi đến Quán Bia 88 cách 3.8 km) uống bia đến 20:45. Lúc chạy ra ngõ 19:25, Vũ nhìn thấy bóng người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
+  Vũ quay vào phòng khách xin Khang hoãn món nợ 300M bốc họ. Khang chửi bới, rút sổ nợ đe dọa mách gia đình vợ. Vũ suy sụp rời đi uống rượu một mình (đặt xe ôm công nghệ lúc 19:30 đi đến Quán Bia 88 cách 3.8 km) uống bia đến 20:45. Lúc chạy ra ngõ 19:25, Vũ nhìn thấy bóng người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
 
 * **20:00 – 20:15 (Tùng đối chất vụ án 1996):**  
   Tùng cầm mẩu báo cũ năm 1996 sang bắt Khang ra mộ thắp hương tạ tội đúng ngày giỗ tròn 30 năm của bé Gia Huy. Khang trơ tráo buông lời cười cợt, nhạo báng. Cơn uất hận bùng nổ, Tùng xô Khang ngã đập đầu vào cạnh bàn làm rơi mẩu báo `p5`, vỡ bộ bình trà thủy tinh và khung ảnh `p4` lúc 20:00. Khang ngất xỉu mê man. Tùng kiểm tra thấy Khang vẫn còn thở đều nên tức giận bỏ mặc Khang tự tỉnh, rời đi lúc 20:15 bắt xe ôm về phòng trọ công nhân ở Cầu Bươu.
