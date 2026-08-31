@@ -23,7 +23,7 @@
 
 #### 2. Xác định Động cơ gây án cốt lõi:
 * **Động cơ:** **Cơn ghen tuông cuồng loạn và tâm lý cuồng sở hữu độc hại (Obsessive Passion)**.
-* **Tình tiết bùng nổ:** Hà lẻn vào lúc 20:45, thấy Khang nằm mê man bên vali đồ đạc chuẩn bị bỏ trốn $\rightarrow$ Nhận ra mình bị ruồng bỏ và lừa dối nên cơn ghen bùng nổ, vơ mảnh bình trà vỡ đâm cổ Khang lúc 21:00 để *"nếu tao không có được anh thì không ai được phép có!"*.
+* **Tình tiết bùng nổ:** Hà lẻn vào lúc 20:45, thấy Khang nằm mê man, liền cầm điện thoại lấy ngón tay Khang mở khóa và phát hiện tin nhắn Khang hẹn bay đi xa sống với nhân tình Thảo Vy $\rightarrow$ Nhận ra mình bị ruồng bỏ và phản bội tàn nhẫn nên cơn ghen bùng nổ, vơ mảnh bình trà vỡ đâm cổ Khang lúc 21:00 để *"nếu tao không có được anh thì không ai được phép có!"*.
 
 #### 3. Cặp Chứng cứ Mâu thuẫn mốc giờ & Bóc trần ngoại phạm then chốt:
 * **Chứng cứ 1:** Báo cáo giám định pháp y (`01_phap_y_hai_giai_doan`) xác định nạn nhân bị đâm tử vong vào khoảng **21:00 – 21:15**.
@@ -34,9 +34,9 @@
 
 ### III. PHÂN HÓA TRÁCH NHIỆM CÁC ĐỐI TƯỢNG LIÊN QUAN
 
-1. **Trần Ngọc Mai:** Không liên quan đến án mạng. Hành vi sang nhà Khang lúc 18:30 nhằm đòi lại quyền thừa kế 200m² đất sau khi phát hiện Khang đồ nét chữ ký. Lời khai ở nhà xem tivi buổi tối trùng khớp với Thông báo sự cố mất sóng cáp quang lúc 20h10 trên Bảng tin khu phố (`18`).
-2. **Lê Quang Vũ:** Loại trừ khỏi diện nghi phạm trực tiếp thực hiện hành vi giết người. Hành vi giật xé sổ nợ bốc họ 300M lúc 19:10 xuất phát từ sự hoảng loạn sợ bị lộ với nhà vợ; Vũ rời khỏi nhà Khang lúc 19:25 và có bằng chứng thanh toán tại Quán Bia 88 lúc 20:45 (thời điểm hung thủ bắt đầu rình rập gây án).
-3. **Nguyễn Thanh Tùng:** Không phạm tội giết người. Cú xô ngã lúc 20:00 do uất hận bi kịch năm 1998 chỉ làm nạn nhân ngất xỉu (tổn thương giai đoạn 1). Tùng đã rời hiện trường lúc 20:15 và lên xe khách đi Hải Phòng lúc 20:30 (trước thời điểm nạn nhân bị sát hại lúc 21:00).
+1. **Trần Ngọc Mai:** Không liên quan đến án mạng. Hành vi sang nhà Khang lúc 18:30 nhằm đòi lại quyền thừa kế 200m² đất sau khi phát hiện Khang đồ nét chữ ký; Mai rời đi lúc 19:00 và về đến nhà lúc 19:45 (cách hiện trường 4km). Lời khai sinh hoạt ở nhà xem tivi buổi tối được xác thực khách quan bởi Thông báo sự cố mất sóng cáp quang lúc 20h10 trên Bảng tin khu phố (`18`).
+2. **Lê Quang Vũ:** Loại trừ khỏi diện nghi phạm trực tiếp thực hiện hành vi giết người. Khoản nợ bốc họ 300M xuất phát từ việc đầu tư làm ăn thua lỗ giấu vợ; sau khi bị Khang chửi bới, đe dọa lúc 19:00 – 19:25, Vũ đã vùng chạy ra khỏi nhà Khang lúc 19:25 và bắt xe ôm công nghệ ra Quán Bia 88 lúc 19:30, có bằng chứng thanh toán chuyển khoản lúc 20:45 tại địa điểm cách hiện trường 3.8km (thời điểm hung thủ bắt đầu rình rập gây án).
+3. **Nguyễn Thanh Tùng:** Không phạm tội giết người. Cú xô ngã lúc 20:00 do uất hận bi kịch năm 1996 chỉ làm nạn nhân choáng ngất (tổn thương giai đoạn 1). Tùng đã rời hiện trường lúc 20:15 (trước khung giờ nạn nhân bị sát hại trong khoảng 20:45 – 21:15 bởi Trần Thị Hà).
 
 ---
 

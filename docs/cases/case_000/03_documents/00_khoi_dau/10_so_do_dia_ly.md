@@ -27,9 +27,9 @@ Mã tài liệu: `00c-MAP`
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                 PHÂN KHU ĐƯỜNG BỜ SÔNG (PHÂN KHU CẢNG VEN ĐÊ)               │
 │                                                                             │
-│  [Bến Xe Khách Phía Đông] ◄────── 2.0 km ───────► [NHÀ NẠN NHÂN KHANG]     │
-│  • Tùng mua vé xe: 20:18                          (Số 14 Bờ Sông - HIỆN     │
-│  • Xe chạy Hải Phòng: 20:30                       TRƯỜNG ÁN MẠNG 21:00)     │
+│  [Phòng Trọ Công Nhân Tùng] ◄──── 3.5 km ───────► [NHÀ NẠN NHÂN KHANG]      │
+│  (Số 18 Phố Cầu Bươu)                             (Số 14 Bờ Sông - HIỆN     │
+│  • Tùng rời ngõ: 20:15                            TRƯỜNG ÁN MẠNG 21:00)     │
 │                                                           ▲                 │
 │  • Gác chắn đường sắt đầu ngõ                             │ 1.2 km          │
 │    (Tàu hàng Nam - Bắc qua: 20:30 - 20:35)                ▼                 │
@@ -50,14 +50,13 @@ Mã tài liệu: `00c-MAP`
 
 ---
 
-### II. BẢNG TỔNG HỢP CỰ LY & THỜI GIAN DI CHUYỂN TỐI THIỂU (ĐÊM MƯA BÃO)
+### II. BẢNG TỔNG HỢP CỰ LY & THỜI GIAN DI CHUYỂN TỐI THIỂU
 
-| Tuyến Di Chuyển | Khoảng Cách | Phương Tiện | Thời Gian Tối Thiểu | Đánh Giá Khả Năng Có Mặt Lúc 21:00 |
+| Tuyến Di Chuyển | Khoảng Cách | Phương Tiện | Thời Gian Di Chuyển | Đánh Giá Ý Nghĩa Nghiệp Vụ |
 | :--- | :---: | :---: | :---: | :--- |
-| **Nhà Khang $\rightarrow$ Nhà Mai (Phố Đoàn Kết)** | 4.0 km | Xe máy | 15 – 20 phút | Mai ở nhà từ 19:45 (mất sóng tivi lúc 20:10) $\rightarrow$ **NGOẠI PHẠM VỮNG CHẮC**. |
-| **Quán Bia 88 (Cầu Cảng) $\rightarrow$ Nhà Khang** | 3.8 km | Xe ôm / Taxi | 10 – 12 phút | Vũ ở Quán Bia 88 lúc 20:45 $\rightarrow$ Không thể là kẻ mặc áo gió rình rập lúc 20:45 và đâm Khang lúc 21:00 $\rightarrow$ **NGOẠI PHẠM VỮNG CHẮC**. |
-| **Nhà Khang $\rightarrow$ Bến xe khách $\rightarrow$ Hải Phòng** | 2.0 km + Cao tốc | Xe ôm + Xe khách | Xuất bến 20:30 | Tùng đã ở trên cao tốc lúc 21:00 $\rightarrow$ **NGOẠI PHẠM VỮNG CHẮC**. |
-| **Phòng trọ Hà $\rightarrow$ Nhà Khang** | 1.2 km | Đi bộ / Áo mưa | 10 – 12 phút | Hà đi bộ từ 20:30, gọi voicemail 20:32 (lọt còi tàu), vào nhà 20:45 $\rightarrow$ **HUNG THỦ CÓ MẶT GÂY ÁN LÚC 21:00!** |
+| **Nhà Khang $\rightarrow$ Nhà Mai & Vũ** | 4.0 km | Xe máy | 10 – 12 phút | Mai rời đi 19:00 $\rightarrow$ có mặt tại nhà 19:45 (lời khai ở nhà khớp sự cố mất cáp 20:10). |
+| **Nhà Khang $\rightarrow$ Quán Bia 88** | 3.8 km | Xe ôm app | 10 – 12 phút | Vũ đón xe ôm lúc 19:30 $\rightarrow$ đến Quán Bia 88 lúc 19:42 $\rightarrow$ thanh toán CK lúc 20:45. |
+| **Phòng trọ Hà $\rightarrow$ Nhà Khang** | 1.2 km | Đi bộ trong ngõ | 10 – 12 phút | Hà đi bộ từ 20:30, gọi voicemail 20:32 (lọt còi tàu), vào nhà 20:45 $\rightarrow$ **HUNG THỦ CÓ MẶT GÂY ÁN LÚC 21:00!** |
 
 ---
 

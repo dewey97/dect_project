@@ -29,8 +29,8 @@
 
 ---
 
-### III. KẾT QUẢ GIÁM ĐỊNH HÓA PHÁP & TÂM LÝ TỘI PHẠM
-1. **Kết quả xét nghiệm hóa chất bên trong hũ trà:** Phát hiện các tinh thể bột màu trắng ngấm vào cánh hoa cúc, phân tích sắc ký khí xác định là **Diazepam (thuốc ngủ nhóm Benzodiazepin)** nghiền mịn.
-2. **Đánh giá tâm lý học hành vi:** 
-   - Lời dặn dò *"uống một tách rồi ngủ sâu... tối nay anh đừng đi đâu nhé"* là hành vi có chủ đích chuốc thuốc an thần nhằm làm suy yếu thể lực và phản xạ tự vệ của nạn nhân.
-   - Khiến Khang rơi vào trạng thái ngủ lịm và dễ dàng bị khống chế/sát hại.
+### III. KẾT QUẢ GIÁM ĐỊNH BÚT TÍCH & ĐÁNH GIÁ TÂM LÝ
+1. **Kết quả giám định bút tích:** Nét chữ trên giấy note trùng khớp hoàn toàn với mẫu chữ viết tay của **Trần Thị Hà** (SN 1994, bạn gái của nạn nhân).
+2. **Đánh giá dấu hiệu tâm lý:** 
+   - Lời nhắn gửi *"Em sao trà kỹ lắm... Tối nay anh đừng đi đâu nhé... Em sẽ luôn ở bên cạnh chăm sóc anh..."* thể hiện sự gắn bó, chăm sóc tỉ mỉ nhưng kèm theo xu hướng muốn kiểm soát hành tung của bạn trai.
+   - Xác nhận sự hiện diện và mối quan hệ tình cảm sâu đậm của Hà đối với nạn nhân Khang trước khi xảy ra án mạng.

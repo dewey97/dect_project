@@ -29,16 +29,14 @@ Mã sơ đồ: `P0-KNHT`
     │   │                                                                   │   │
     │   │                 ┌───────────────────────────────┐                 │   │
     │   │                 │        BÀN TRÀ GỖ DÀI         │                 │   │
-    │   │   [Ghế đẩu]     │ • Hũ trà hoa cúc dán note [p7]│    [Ghế đẩu]    │   │
+    │   │   [Ghế đẩu]     │ • Hũ trà hoa cúc dán note [17]│    [Ghế đẩu]    │   │
     │   │                 │ • Bao thuốc lá Thăng Long     │                 │   │
-    │   │   [p8] Ghim     │ • [M1] Giọt máu nhỏ mép bàn   │                 │   │
-    │   │   công trường   └───────────────┬───────────────┘                 │   │
-    │   │   dưới chân ghế                 │                                 │   │
-    │   │                    [EV-SHIRT-BUTTON] Cúc áo                       │   │
-    │   │                    xanh đen dưới gầm bàn                          │   │
-    │   │                                                                   │   │
-    │   │    [p1] BỘ BÌNH TRÀ GỐM SỨ VỠ VỤN                                 │   │
-    │   │    [p5] Các mảnh giấy báo 1998 xé rách                            │   │
+    │   │                 │ • [M1] Giọt máu nhỏ mép bàn   │                 │   │
+    │   │                 └───────────────┬───────────────┘                 │   │
+    │   │                                 │                                 │   │
+    │   │    [p1] BỘ BÌNH TRÀ THỦY TINH VỠ VỤN                              │   │
+    │   │    [p4] Khung ảnh kỷ niệm vỡ kính                                 │   │
+    │   │    [p5] Mẩu giấy báo cũ năm 1996                                  │   │
     │   │                                                                   │   │
     │   │                  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░                     │   │
     │   │                  ░  VŨNG MÁU LỚN LOANG RỘNG ░                     │   │
@@ -48,7 +46,7 @@ Mã sơ đồ: `P0-KNHT`
     │   │                  ░                          ░                     │   │
     │   │                  ░   [ TỬ THI NẠN NHÂN ]    ░                     │   │
     │   │                  ░   (Nằm sấp úp mặt)       ░                     │   │
-    │   │                  ░   [dev-00] iPhone 13     ░                     │   │
+    │   │                  ░   [dev-00] iPhone        ░                     │   │
     │   │                  ░   (Rơi gần bàn tay phải) ░                     │   │
     │   │                  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░                     │   │
     │   │                                                                   │   │
@@ -67,11 +65,10 @@ Mã sơ đồ: `P0-KNHT`
 
 1. **Tử thi nạn nhân Khang:** Nằm cách mép bàn trà gỗ 80cm về phía Nam, cách góc tủ gỗ âm tường 1.2m.
 2. **Hung khí `p3` (Mảnh thủy tinh sắc nhọn dính máu):** Rơi chếch phía trên vai trái nạn nhân 25cm, hướng nhọn đâm chỉ về phía cổ.
-3. **Bộ bình trà vỡ `p1` & Mảnh báo xé `p5`:** Nằm rải rác xung quanh chân bàn gỗ phía Tây Nam.
-4. **Cúc áo sơ mi xanh đen (`EV-SHIRT-BUTTON`):** Nằm lọt sâu dưới gầm bàn trà gỗ 15cm (khớp với vị trí giằng co cào rách áo giữa Khang và Vũ lúc 19:10).
-5. **Ghim cài áo kim loại `p8`:** Rơi sát chân ghế đẩu gỗ phía Tây phòng khách (khớp với vị trí Tùng ngồi đối chất lúc 20:00).
-6. **Xấp Đơn tố cáo đòi đất `p2`:** Vương vãi cách cửa chính 1.5m (Mai ném xuống sàn lúc 18:50 trước khi phóng xe về).
-7. **Lối tẩu thoát của hung thủ:** Cửa nách phía Nam mở hé, then cài trong đã bị gạt chốt (khớp với lời khai Hà lẻn ra cửa sau lúc 21:08).
+3. **Bộ bình trà vỡ `p1`, Khung ảnh `p4` & Mảnh báo xé `p5`:** Nằm rải rác xung quanh chân bàn gỗ phía Tây Nam.
+4. **Cuốn sổ nợ `10a`:** Rơi cạnh chân tủ âm tường, ghi chép danh sách theo dõi các con nợ tín dụng đen.
+5. **Xấp Đơn tố cáo đòi đất `p2`:** Vương vãi cách cửa chính 1.5m (Mai ném xuống sàn lúc 18:50 trước khi phóng xe về).
+6. **Lối tẩu thoát của hung thủ:** Cửa nách phía Nam mở hé, then cài trong đã bị gạt chốt (khớp với lối thoát của kẻ gây án).
 
 ---
 

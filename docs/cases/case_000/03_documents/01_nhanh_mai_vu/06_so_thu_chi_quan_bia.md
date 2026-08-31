@@ -23,8 +23,8 @@ Tiến hành làm việc với ông **Nguyễn Văn Hùng** (Sinh năm 1972 — 
 ---
 
 ### I. NỘI DUNG LÀM VIỆC & LỜI KHAI CỦA CHỦ QUÁN
-* Khoảng cách từ Quán Bia 88 về số 14 Đường Bờ Sông (hiện trường): **3.8 km** (khoảng 10–12 phút di chuyển bằng xe máy trong điều kiện mưa gió).
-* Ông Hùng xác nhận: *"Tối 24/07 trời mưa to gió lớn nên quán vắng tanh, chỉ có lèo tèo vài bàn khách. Tôi nhớ tầm hơn 19h30 có một người đàn ông đi xe ôm tới ngồi uống bia một mình ở bàn sát mép sông. Tôi có cuốn sổ tay kẻ ô ly ghi chép doanh thu từng bàn tối hôm đó, tôi xin cung cấp trang sổ này cho cán bộ điều tra."*
+* Khoảng cách từ Quán Bia 88 về số 14 Đường Bờ Sông (hiện trường): **3.8 km** (khoảng 10–12 phút di chuyển bằng xe máy).
+* Ông Hùng xác nhận: *"Tối 24/07 quán tôi phục vụ khách bình thường. Tôi nhớ tầm gần 20h có một anh khách lẻ đeo kính, mặt hơi bầm một bên, đi xe ôm tới ngồi uống bia một mình ở bàn số 7 sát mép sông gọi set nhắm và bia Hà Nội. Tôi có cuốn sổ tay kẻ ô ly ghi chép doanh thu từng bàn tối hôm đó, tôi xin cung cấp trang sổ này cho cán bộ điều tra."*
 
 ---
 

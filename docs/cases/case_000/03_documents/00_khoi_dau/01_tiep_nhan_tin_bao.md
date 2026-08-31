@@ -30,7 +30,7 @@ Số: `01/P-TNTB`
 ---
 
 ### III. TÓM TẮT NỘI DUNG TRÌNH BÁO BAN ĐẦU
-Khoảng 06 giờ 30 phút sáng nay (25/07/2026), bà Lụa ra quét dọn ngõ ngách sau cơn mưa bão lớn đêm qua thì nhìn thấy cổng sắt và cửa chính căn nhà số 14 Đường Bờ Sông (nhà anh Nguyễn Văn Khang) vẫn mở toang, đèn điện phòng khách bật sáng, nước mưa tạt lênh láng vào trong nhà.
+Khoảng 06 giờ 30 phút sáng nay (25/07/2026), bà Lụa ra quét dọn ngõ ngách thì nhìn thấy cổng sắt và cửa chính căn nhà số 14 Đường Bờ Sông (nhà anh Nguyễn Văn Khang) vẫn mở toang từ đêm qua, đèn điện phòng khách bật sáng trưng.
 
 Bà Lụa bước tới cửa cất tiếng gọi nhưng không thấy ai trả lời. Khi nhìn vào giữa phòng khách, bà hoảng hốt phát hiện anh Nguyễn Văn Khang đang nằm sấp bất động trên nền gạch, xung quanh loang một vũng máu sẫm màu rất lớn, bên cạnh có bộ bình trà bị đập vỡ vụn. Bà Lụa chạy lại lay gọi thì thấy người nạn nhân đã lạnh ngắt, toàn thân co cứng. Bà lập tức hô hoán hàng xóm xung quanh và chạy thẳng đến Công an Phường báo án.
 

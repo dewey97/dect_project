@@ -31,7 +31,7 @@ Vào hồi 17 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 ### NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)
 
 * **Hỏi (ĐTV Lê Minh):** Tối ngày 24/07/2026, anh có sang nhà nạn nhân Khang tại số 14 Đường Bờ Sông không? Anh ở đâu và làm gì từ chập tối đến đêm?
-* **Đáp (Nguyễn Thanh Tùng):** *(Sắc mặt tái nhợt, mắt thâm quầng, hai bàn tay run rẩy bấu chặt gấu quần)* Dạ... thưa cán bộ... Tối qua khoảng chập tối tôi có tiện đường ghé qua nhà Khang một lát để hỏi thăm mấy câu về việc sửa nhà. Hai anh em chỉ nói chuyện xã giao vài phút bình thường rồi tôi đi ngay, tuyệt đối không có cãi cọ xô xát gì cả... Sau đó tôi ra bến xe bắt xe khách đi Hải Phòng làm việc suốt đêm!
+* **Đáp (Nguyễn Thanh Tùng):** *(Sắc mặt tái nhợt, mắt thâm quầng, hai bàn tay run rẩy bấu chặt gấu quần)* Dạ... thưa cán bộ... Tối qua khoảng chập tối tôi có tiện đường ghé qua nhà Khang một lát để hỏi thăm mấy câu về việc sửa nhà. Hai anh em chỉ nói chuyện xã giao vài phút bình thường rồi tôi đi ngay, tuyệt đối không có cãi cọ xô xát gì cả... Sau đó tôi bắt xe ôm về thẳng phòng trọ công nhân ở Cầu Bươu ngủ suốt đêm!
 
 * **Hỏi (ĐTV Lê Minh):** Gò má trái của anh có vết bầm tím mới và các khớp mu bàn tay có dấu hiệu sưng tấy, ửng đỏ. Dấu vết này từ đâu mà có?
 * **Đáp (Nguyễn Thanh Tùng):** *(Giật mình, vội lấy tay che má, ngập ngừng phân trần)* Dạ... chiều qua lúc tôi làm thợ nề, tôi sơ ý bị trượt chân va mặt vào ống giàn giáo sắt và đập tay vào tường gạch... Tôi làm thợ hồ nên tay chân mặt mũi bầm dập là chuyện cơm bữa, không liên quan gì đến chuyện tối qua đâu ạ...

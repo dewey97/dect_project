@@ -29,7 +29,7 @@ Số: `02/BB-KNHT`
 ### II. MÔ TẢ ĐẶC ĐIỂM KHÔNG GIAN HIỆN TRƯỜNG
 1. **Cấu trúc nhà:** Nhà cấp 4 mái ngói cũ, diện tích khoảng 65m², gồm 1 phòng khách, 1 phòng ngủ và 1 gian bếp + công trình phụ phía sau. Cửa chính hướng ra ngõ Bờ Sông (cách tuyến đường sắt khoảng 30m). Có 1 cửa nách bằng gỗ mở ra khoảng sân sau.
 2. **Trạng thái khi tiếp cận (07:30 sáng 25/07):**
-   - Cổng sắt ngoài ngõ mở toang, cửa chính bằng gỗ mở rộng 2 cánh. Nước mưa đêm qua tạt ướt khoảng sàn phía trước cửa.
+   - Cổng sắt ngoài ngõ mở toang, cửa chính bằng gỗ mở rộng 2 cánh. Hệ thống đèn tuýp chiếu sáng phòng khách vẫn bật sáng.
    - Đèn tuýp phòng khách vẫn bật sáng. Cửa nách phía sau khép hờ, then cài trong đã bị gạt mở.
 
 ---
@@ -39,7 +39,7 @@ Số: `02/BB-KNHT`
 * **Vũng máu:** Vũng máu lớn loang quanh vùng cổ và ngực nạn nhân, đường kính khoảng 1.6m, máu đã đông đặc hoàn toàn, bề mặt tạo màng sẫm màu.
 * **Bàn trà gỗ giữa phòng:**
   - Trên mặt bàn: 01 hũ thủy tinh đựng hoa cúc khô dán mẩu giấy note viết tay màu vàng: *"Em sao trà kỹ lắm, vị hơi đậm một chút nhưng ngủ rất sâu. Tối nay anh đừng đi đâu nhé, uống một tách rồi nghỉ sớm đi."* Cạnh đó có 01 bao thuốc lá Thăng Long mở dở và 01 bao diêm.
-  - Trên mép góc bàn gỗ phía Đông Nam: Thu giữ 02 giọt máu khô nhỏ giọt (mẫu `M1`).
+  - Trên góc mép xấp Đơn tố cáo đòi đất (`p2`) rơi dưới sàn: Thu giữ 02 giọt máu khô nhỏ giọt (mẫu `M1`).
 
 ---
 
@@ -47,12 +47,11 @@ Số: `02/BB-KNHT`
 
 | Ký Hiệu | Tên Vật Chứng / Dấu Vết | Vị Trí Thu Giữ | Tình Trạng & Đặc Điểm Nhận Dạng |
 | :---: | :--- | :--- | :--- |
-| **`p3`** | **Mảnh thủy tinh dính máu (Hung khí)** | Nằm cách cổ nạn nhân 25cm về phía Tây | Mảnh thủy tinh vỡ từ thân ấm trà, dài 8.2cm, hình tam giác nhọn, có cạnh sắc bén, dính máu khô và 01 vết vân tay miết trượt mờ (vân tay không hoàn chỉnh do trơn trượt trong máu, chưa đủ điều kiện tra cứu tự động trên hệ thống). |
-| **`p1`** | **Bộ bình trà gốm sứ vỡ vụn** | Rải rác quanh chân bàn trà gỗ | Các mảnh vỡ của bộ ấm chén uống trà gốm tráng men xanh, vỡ toang do lực rơi mạnh từ trên cao xuống nền gạch. |
-| **`p4`** | **Khung ảnh kỷ niệm thời thơ ấu bị vỡ kính** | Rơi dưới sàn gần chân kệ tủ gỗ | Khung ảnh gỗ để bàn bị rơi vỡ mặt kính, chụp kỷ niệm xóm Bờ Sông hè 1998: Khang ngỗ ngược, Tùng (sẹo chữ V ở lông mày), bé Huy nhỏ thó đeo còi đồng nép sau lưng Tùng, bé gái Hà mặc váy hoa và bé Mai nhỏ xíu được ông bế. |
-| **`EV-SHIRT-BUTTON`** | **01 Cúc áo sơ mi nam** | Dưới gầm bàn trà, cách chân bàn 15cm | Cúc áo bằng nhựa 4 lỗ màu xanh đen (Navy), còn dính sợi chỉ thừa đứt chân chỉ. |
-| **`p5`** | **Các mảnh giấy báo cũ xé rách** | Rải rác quanh đống ấm chén vỡ | 05 mảnh giấy báo cũ ố vàng năm 1998 bị xé nham nhở, có các dòng chữ: *"Bé trai... tử vong do ngạt khí trong tủ gỗ..."*. |
-| **`10a`** | **Cuốn sổ ghi nợ bìa da đen** | Rơi cạnh chân tủ âm tường | Sổ tay bìa da đen, kích thước 12x18cm, bị xé rách mất trang số 12, các trang trước ghi danh sách vay nợ nặng lãi. |
+| **`p3`** | **Mảnh thủy tinh dính máu (Hung khí)** | Nằm cách cổ nạn nhân 25cm về phía Tây | Mảnh thủy tinh vỡ từ thân bình trà pha hoa cúc, dài 8.2cm, hình tam giác nhọn, có cạnh sắc bén, dính máu khô và 01 vết vân tay miết trượt mờ (vân tay không hoàn chỉnh do trơn trượt trong máu, chưa đủ điều kiện tra cứu tự động trên hệ thống). |
+| **`p1`** | **Bộ bình trà thủy tinh chịu nhiệt vỡ vụn** | Rải rác quanh chân bàn trà gỗ | Các mảnh vỡ của bộ bình trà thủy tinh chịu nhiệt pha hoa cúc, vỡ toang do lực rơi mạnh từ trên cao xuống nền gạch. |
+| **`p4`** | **Khung ảnh kỷ niệm thời thơ ấu bị vỡ kính** | Rơi dưới sàn gần chân kệ tủ gỗ | Khung ảnh gỗ để bàn bị rơi vỡ mặt kính, chụp kỷ niệm xóm Bờ Sông hè 1996: Khang ngỗ ngược, Tùng (sẹo chữ V ở lông mày), bé Huy nhỏ thó đeo còi đồng nép sau lưng Tùng, bé gái Hà mặc váy hoa và bé Mai nhỏ xíu được ông bế. |
+| **`p5`** | **Mẩu giấy báo cũ năm 1996** | Rơi cạnh đống mảnh vỡ bình trà | 01 mẩu giấy báo cũ ố vàng năm 1996 đưa tin: *"Bé trai... tử vong do ngạt khí trong tủ gỗ khi chơi cùng các bạn nhỏ..."*. |
+| **`10a`** | **Cuốn sổ ghi nợ bìa da đen** | Rơi cạnh chân tủ âm tường | Sổ tay bìa da đen, kích thước 12x18cm, liệt kê danh sách theo dõi các con nợ cá nhân, số tiền vay, SĐT và ghi chú đòi nợ tín dụng đen. |
 | **`p2`** | **Xấp hồ sơ Đơn tố cáo đòi đất 200m²** | Nằm xòe quạt trên sàn nhà phía cửa ra vào | Gồm `Đơn tố cáo lừa đảo`, `Dự thảo thỏa thuận trả lại tài sản` mang tên **Trần Ngọc Mai** (Phố Đoàn Kết). |
 | **`dev-00`** | **01 Điện thoại di động cảm ứng** | Rơi úp mặt gần bàn tay phải nạn nhân | Điện thoại nhãn hiệu iPhone màu đen của nạn nhân, máy còn 18% pin, màn hình khóa. |
 | **`D1`** | **Dấu vết giày nam** | In trên nền gạch dính bụi ướt phòng khách | Dấu giày thể thao đế cao su nam, kích cỡ tương đương Size 41. |

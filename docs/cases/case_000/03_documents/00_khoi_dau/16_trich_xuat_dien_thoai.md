@@ -26,18 +26,25 @@ Số: `08/BB-TXDT`
 
 | Thời Gian | Người Gửi / Người Nhận | Nội Dung Trích Xuất | Đánh Giá Nghiệp Vụ |
 | :--- | :--- | :--- | :--- |
-| **23/07 14:22** | `Khang` ➔ `0936.441.xxx` | *"300 triệu tiền họ hạn ngày 30 không trả tao ném giấy nợ về nhà 45 Đoàn Kết cho bố vợ mày xem mặt thằng rể quý!"* | Tin nhắn đe dọa đòi nợ 300M dồn con nợ vào chân tường. |
-| **24/07 15:30** | `0913.882.901` ➔ `Khang` | *"Hôm nay tròn đúng 28 năm. Mày có dám ra mộ thắp cho nó một nén hương không?"* | Tin nhắn nhắc ngày giỗ 28 năm từ số máy lạ (trùng số thợ xây Tùng trên bảng tin). |
-| **24/07 19:15** | `Hà Kế Toán` ➔ `Khang` | *"Anh đang ở với ai đúng không? Sao gọi không nghe máy? Đừng để em tìm tới tận nhà đấy!"* | Tin nhắn ghen tuông, kiểm soát của Hà trước thời điểm án mạng. |
+| **18/07 22:10** | `Hà Kế Toán` ➔ `Khang`<br>*(1 tuần trước)* | *"Anh Khang ơi, sao hôm nay anh lại nói những lời như vậy với em? Anh đừng giận em nữa được không, mình gặp nhau nói chuyện đàng hoàng nhé anh..."*<br>`[Đã xem - Không trả lời]` | Tin nhắn từ 1 tuần trước; Khang đã xóa toàn bộ lịch sử trò chuyện cũ trước đó và không hề phản hồi. |
+| **23/07 14:22** | `Khang` ➔ `0988.20.09.94` | *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"* | Tin nhắn đe dọa đòi nợ 300M dồn con nợ vào chân tường sau khi bị bùng hẹn. |
+| **24/07 15:30** | `0913.882.901` ➔ `Khang` | *"Tròn 30 năm rồi đó. M không có gì muốn nói với Huy à?"* | Tin nhắn ẩn ý nhắc ngày giỗ tròn 30 năm từ số máy lạ (trùng số thợ nề Tùng trên bảng tin). |
+| **24/07 17:45** | `Thảo Vy` ➔ `Khang` | *"Vé máy bay sáng mai 06:15 em book xong rồi nhé anh yêu. Tiền mặt anh chuẩn bị đủ chưa? Vào trong này sống luôn với em nhé!"* | Tin nhắn tình nhân mới rủ đi xa, làm rõ kế hoạch bỏ trốn của Khang. |
+| **24/07 19:15** | `Hà Kế Toán` ➔ `Khang`<br>*(🔕 Đã tắt thông báo)* | *"Anh Khang ơi, tối nay em đem hũ trà hoa cúc mới sao sang cho anh nhé... anh nhớ uống rồi nghỉ sớm nhé."*<br>`[Trạng thái: Đã gửi - Chưa xem]` | Sau 1 tuần im bặt, Hà nhắn tin nối lại liên lạc; Khang đã tắt thông báo và không xem tin nhắn. |
 
 ---
 
-### III. DỮ LIỆU HỘP THƯ THOẠI (VOICEMAIL)
+### III. NHẬT KÝ CUỘC GỌI & HỘP THƯ THOẠI (VOICEMAIL)
 
-1. **Hộp thư thoại lúc 20:32:15 đêm 24/07:**
+1. **Nhật ký cuộc gọi lúc 20:31:30 đêm 24/07:**
+   - **Người gọi đến:** `Trần Thị Hà` (SĐT: `0984.112.xxx`).
+   - **Trạng thái:** **Cuộc gọi nhỡ (Missed Call)** — Đổ chuông 45 giây nạn nhân không nghe máy $\rightarrow$ Hệ thống tự động chuyển tiếp sang Hộp thư thoại.
+
+2. **Ghi âm Hộp thư thoại (Voicemail) lúc 20:32:15 đêm 24/07:**
    - **Người gửi:** `Trần Thị Hà` (SĐT: `0984.112.xxx`).
-   - **Nội dung ghi âm:** *"Anh Khang à, sao em gọi mãi anh không nghe máy? Thôi nếu anh mệt thì uống trà rồi ngủ sớm đi nhé, mai em sang..."*
-   - **Phân tích âm học:** Phía sau giọng nói thì thầm lọt rất rõ **tiếng còi tàu hỏa diesel hú vang rền 2 hồi dài và tiếng chuông rào chắn đường sắt leng keng**.
+   - **Thời lượng:** 18 giây.
+   - **Nội dung ghi âm:** *"Anh Khang à, sao em gọi mãi anh không nghe máy thế? Em đang ở phòng trọ xem phim một mình buồn quá... tí nữa em chạy qua với anh nhé..."*
+   - **Phân tích âm học viễn thông:** Phía sau giọng nói thì thầm lọt rất rõ **tiếng còi tàu hỏa và tiếng chuông gác chắn đường sắt reo leng keng**.
 
 ---
 

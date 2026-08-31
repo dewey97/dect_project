@@ -29,6 +29,6 @@
 ---
 
 ### PHÂN TÍCH NGHIỆP VỤ BÓC TRẦN LỜI KHAI
-* **Lời khai của Trần Thị Hà:** *"Từ 20h00 đến 21h15 tối thứ Sáu 24/07 em nằm ở phòng trọ xem phim bộ truyền hình trên VTV3..."*.
+* **Lời khai của Trần Thị Hà:** *"Từ 20h00 đến 21h30 tối thứ Sáu 24/07 em ở một mình trong phòng trọ xem phim bộ trên VTV3..."*.
 * **Sự thật lịch phát sóng:** Tối thứ Sáu kênh VTV3 **chỉ phát sóng Gameshow thực tế từ 20:00 đến 21:30, hoàn toàn không có phim bộ truyền hình nào**.
 * $\rightarrow$ **KẾT LUẬN:** Trần Thị Hà bịa đặt thói quen xem phim ngày thường làm ngoại phạm giả, bộc lộ sự dối trá nghiêm trọng!

@@ -31,24 +31,22 @@ Vào hồi 09 giờ 00 phút, ngày 26 tháng 07 năm 2026, tại Phòng Cảnh 
 * **Hỏi (ĐTV Lê Minh):** Chúng tôi đã có trong tay dữ liệu:
   1. Lời khai nhân chứng xác nhận vợ anh (Trần Ngọc Mai) nổ máy xe rời đi lúc **19:00**.
   2. Ảnh chụp màn hình ứng dụng xe công nghệ trên máy của anh ghi nhận thời gian gửi lệnh đặt xe là **19:25:40** và tài xế đón lúc **19:30:15**.
-  3. Cuốn sổ nợ của Khang ghi rõ con nợ `V-Điện (0936.441.xxx) - 300.000.000đ` và dữ liệu nhà mạng xác nhận số SIM phụ này chính là của anh.
+  3. Cuốn sổ nợ của Khang ghi rõ con nợ `Thằng Lệch Pha` nợ `300.000.000đ` (SĐT `0988.20.09.94`, hạn 20/07 kèm ghi chú gạch xóa bùng hẹn ở 45 Đoàn Kết).
   Anh giải thích thế nào về việc anh đã ở lại trong nhà Khang suốt 30 phút (19:00 – 19:30) và giấu nhẹm món nợ này?
 
-* **Đáp (Lê Quang Vũ):** *(Mặt tái mét, ôm đầu bật khóc nức nở)* Dạ... thưa cán bộ... tôi xin khai thật hết... Tôi cờ bạc thua lỗ làm ăn nên có giấu vợ bốc bát họ của anh Khang 300 triệu từ đầu năm. Đến hạn không có tiền trả, anh Khang liên tục nhắn tin dọa sẽ đem giấy nợ về nhà 45 Đoàn Kết cho bố mẹ vợ tôi và cơ quan vợ tôi biết. Tôi ở rể, sợ mất mặt và sợ vợ ly hôn nên tôi hoảng loạn tột cùng...
+* **Đáp (Lê Quang Vũ):** *(Mặt tái mét, ôm đầu bật khóc nức nở)* Dạ... thưa cán bộ... tôi xin khai thật hết... Tôi nhận thầu điện bị đọng vốn nên có giấu vợ bốc bát họ của anh Khang 300 triệu từ đầu năm. Hạn trả là ngày 20/07 vừa rồi nhưng tôi không xoay được tiền nên bùng hẹn gặp ở nhà 45 Đoàn Kết. Anh Khang tức giận nhắn tin đe dọa sẽ ném giấy nợ về cho bố mẹ vợ tôi và cơ quan vợ tôi biết. Tôi ở rể, sợ mất mặt và sợ vợ ly hôn nên tôi hoảng loạn tột cùng...
 
 * **Hỏi (ĐTV Lê Minh):** Tối 24/07, trong 30 phút ở lại từ 19:00 đến 19:30, anh đã làm gì trong nhà nạn nhân Khang?
 
-* **Đáp (Lê Quang Vũ):** Lúc vợ tôi tức giận ném giấy đòi đất rồi nổ máy xe về lúc 19:00, tôi cố tình nói dối Mai là đi nhậu với bạn để Mai về trước. Sau khi tiếng xe máy của Mai vừa khuất, tôi vội đóng cửa bước vào phòng khách quỳ lạy xin anh Khang cho tôi hoãn nợ thêm 1 tháng. Nhưng anh Khang cười khẩy, tát thẳng vào mặt tôi một cái rất mạnh (làm má tôi bầm tím) rồi rút cuốn sổ da đen chỉ vào trang nợ của tôi chửi: *"Đến ngày 30 không nôn đủ 300 củ tao in 100 tờ rơi rải khắp phố Đoàn Kết cho bố vợ mày nhục mặt!"*. 
+* **Đáp (Lê Quang Vũ):** Lúc vợ tôi tức giận ném giấy đòi đất rồi nổ máy xe về lúc 19:00, tôi cố tình nói dối Mai là đi nhậu với bạn để Mai về trước. Sau khi tiếng xe máy của Mai vừa khuất, tôi vội đóng cửa bước vào phòng khách quỳ lạy xin anh Khang cho tôi hoãn nợ. Nhưng anh Khang cười khẩy, tát thẳng vào mặt tôi một cái rất mạnh (làm má tôi bầm tím) rồi rút cuốn sổ da đen đập vào ngực tôi chửi: *"Mày bùng hẹn ngày 20 rồi, hạn chót ngày mai không nôn đủ 300 củ tao in 100 tờ rơi rải khắp phố Đoàn Kết cho bố vợ mày nhục mặt!"*. 
 
-* **Hỏi (ĐTV Lê Minh):** Cúc áo sơ mi xanh đen đứt rơi dưới gầm bàn và trang số 12 bị xé đứt rời từ cuốn sổ nợ là do đâu?
+Tôi van xin không được, sợ hãi cùng quẫn nên vùng chạy thoát ra khỏi cửa nách sau nhà, luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25. 
 
-* **Đáp (Lê Quang Vũ):** Trong lúc anh Khang đứng dậy quay lưng với tay lấy bao thuốc lá, tôi quẫn bách quá liền lao tới chộp lấy cuốn sổ nợ trên bàn trà giật mạnh xé toạc trang số 12 có tên tôi. Anh Khang phát hiện liền quay lại túm cổ áo tôi giằng lại, làm giật đứt tung cúc áo sơ mi xanh đen của tôi rớt xuống gầm bàn. Tôi sợ hãi vùng chạy thoát ra khỏi cửa nách sau nhà, luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25. 
-
-Lúc trời đang mưa dầm đứng núp ở đầu ngõ đợi xe, tôi có nhìn thấy một bóng người mặc áo gió màu xám đen trùm mũ kín mít đang đứng nép dưới gốc cây xoan ngó chằm chằm vào nhà anh Khang. Lúc đó tôi đang quá hoảng loạn chỉ lo trốn nợ nên không dám lại gần... Đến 19:30 xe ôm đến đón tôi chạy thẳng ra Quán Bia 88 ở Khu Cầu Cảng ngồi uống bia một mình. Tôi gọi 1 Set Nhắm Bình Dân với 3 chai bia Hà Nội ngồi uống giải sầu một mình ở mép sông đến khuya mới bắt xe về...
+Lúc đứng ở đầu ngõ đợi xe, tôi có nhìn thấy một bóng người mặc áo gió màu xám đen trùm mũ kín mít đang đứng nép dưới gốc cây xoan ngó chằm chằm vào nhà anh Khang. Lúc đó tôi đang quá hoảng loạn chỉ lo trốn nợ nên không dám lại gần... Đến 19:30 xe ôm đến đón tôi chạy thẳng ra Quán Bia 88 ở Khu Cầu Cảng ngồi uống bia một mình. Tôi gọi 1 Set Nhắm Bình Dân với 3 chai bia Hà Nội ngồi uống giải sầu một mình ở mép sông đến khuya mới bắt xe về...
 
 * **Hỏi (ĐTV Lê Minh):** Lúc anh rời khỏi nhà lúc 19:25, tình trạng nạn nhân Khang thế nào? Anh có dùng vật nhọn đâm nạn nhân không?
 
-* **Đáp (Lê Quang Vũ):** Tôi thề có trời đất chứng giám, tôi chỉ xé tờ giấy nợ rồi bỏ chạy! Lúc tôi chạy ra khỏi cửa sau, anh Khang vẫn còn đứng sừng sững ở giữa phòng khách chửi bới ầm ĩ và đá cái ghế gỗ. Bộ bình trà trên bàn lúc đó vẫn còn nguyên vẹn chưa hề vỡ! Tôi không hề giết anh Khang, tôi chỉ là kẻ hèn nhát quỵt nợ thôi cán bộ ơi!
+* **Đáp (Lê Quang Vũ):** Tôi thề có trời đất chứng giám, tôi chỉ hoảng sợ vùng chạy thoát thân ra ngoài! Lúc tôi chạy ra khỏi cửa sau, anh Khang vẫn còn đứng sừng sững ở giữa phòng khách chửi bới ầm ĩ và đá cái ghế gỗ. Bộ bình trà trên bàn lúc đó vẫn còn nguyên vẹn chưa hề vỡ! Tôi không hề giết anh Khang, tôi chỉ là kẻ hèn nhát quỵt nợ thôi cán bộ ơi!
 
 ---
 

@@ -1,6 +1,6 @@
 # HỒ SƠ CHUYÊN ÁN #000 // TỐI MẬT
 # TẬP HỒ SƠ ĐIỀU TRA CHUYÊN SÂU: LÊ QUANG VŨ (VŨ)
-### MẬT DANH ĐIỀU TRA: `SUSPECT-02-VU` | VAI TRÒ CỐT TRUYỆN: NGHI PHẠM BỊ TỐNG TIỀN / BẪY BẠO LỰC HIỆN TRƯỜNG (BLACKMAILED DEBTOR)
+### MẬT DANH ĐIỀU TRA: `SUSPECT-02-VU` | VAI TRÒ CỐT TRUYỆN: NGHI PHẠM BỊ TỐNG TIỀN / CON NỢ BỊ DỒN VÀO ĐƯỜNG CÙNG (BLACKMAILED DEBTOR)
 ### PHÂN LOẠI TÂM LÝ: TỰ TI · SĨ DIỆN · BỊ DỒN VÀO ĐƯỜNG CÙNG · KHỦNG HOẢNG NỢ NẦN
 
 > **CƠ QUAN ĐIỀU TRA:** ĐỘI TRỌNG ÁN — PHÒNG CẢNH SÁT HÌNH SỰ (PC02)  
@@ -24,7 +24,7 @@
 ## MỤC LỤC HỒ SƠ
 1. [I. HỒ SƠ LÝ LỊCH CÁ NHÂN & NHÂN THÂN](#i-hồ-sơ-lý-lịch-cá-nhân--nhân-thân)
 2. [II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI KHAI GIAN BAN ĐẦU](#ii-dấu-hiệu-cài-cắm-sớm--hành-vi-khai-gian-ban-đầu)
-3. [III. NGUỒN CƠN MÓN NỢ 150 TRIỆU & NỖI SỢ BỊ BẠCH HÓA GIA ĐÌNH](#iii-nguồn-cơn-món-nợ-150-triệu--nỗi-sợ-bị-bạch-hóa-gia-đình)
+3. [III. NGUỒN CƠN MÓN NỢ 300 TRIỆU & NỖI SỢ BỊ BẠCH HÓA GIA ĐÌNH](#iii-nguồn-cơn-món-nợ-300-triệu--nỗi-sợ-bị-bạch-hóa-gia-đình)
 4. [IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT](#iv-mối-quan-hệ-đan-xen-với-các-nhân-vật)
 5. [V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2026 - ĐÊM MƯA LỚN)](#v-dòng-thời-gian-đêm-án-mạng-24072026---đêm-mưa-lớn)
 6. [VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)](#vi-hệ-thống-vật-chứng--cơ-chế-giải-mã-phá-án-puzzle-mechanics)
@@ -38,112 +38,87 @@
 | Mục | Thông tin chi tiết |
 | :--- | :--- |
 | **Họ và tên khai sinh** | **LÊ QUANG VŨ** |
-| **Tên thường gọi** | Vũ / Vũ "Trắc địa" |
-| **Ngày tháng năm sinh** | 04/11/1994 (32 tuổi tính đến thời điểm xảy ra vụ án) |
-| **Số CCCD** | 001194002891, cấp ngày 19/02/2021 tại Cục CSQLHC về TTXH |
+| **Tên thường gọi** | Vũ / "Thằng Lệch Pha" (Khang gọi mỉa mai do mắt lác và làm nghề điện) |
+| **Ngày tháng năm sinh** | 20/09/1994 (32 tuổi tính đến thời điểm xảy ra vụ án) |
+| **Số CCCD** | `001094005812`, cấp ngày 12/04/2021 tại Cục CSQLHC về TTXH |
+| **Số điện thoại** | `0988.20.09.94` (Khớp ngày tháng năm sinh `20.09.94`) |
 | **Quê quán** | Huyện Thanh Trì, TP. Hà Nội |
 | **Nơi cư trú hiện tại** | Số 45, Phố Đoàn Kết, Phường Trung Tâm (Ở rể cùng vợ Trần Ngọc Mai) |
-| **Nghề nghiệp** | Kỹ thuật viên đo đạc / Khảo sát công trình tự do |
+| **Nghề nghiệp** | Kỹ sư Điện & Lắp đặt thiết bị tự do |
 | **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Trần Ngọc Mai, sinh năm 1996) |
-| **Học vấn** | Kỹ sư Trắc địa — Đại học Mỏ - Địa chất |
-| **Đặc điểm nhận dạng** | Nam, cao 1m70, người hơi gầy, vai so, mắt nhìn tránh né thiếu tự tin, có vết bầm tím mới trên gò má trái |
+| **Đặc điểm nhận dạng** | Nam, cao 1m70, mắt trái có tật lác nhẹ (lé nhẹ), đeo kính gọng đen, gò má trái có vết bầm tím mới |
 
 ---
 
 ## II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI KHAI GIAN BAN ĐẦU
 
-> [!NOTE]
-> **HÀNH VI CHE GIẤU NGUY CƠ CAO (SUSPICIOUS CONCEALMENT):**  
-> Trong buổi thẩm vấn đầu tiên (Giai đoạn 0), Vũ chủ động khai báo gian dối để che giấu khoản nợ 150 triệu bốc họ từ Khang. Thái độ ấp úng, vết bầm trên mặt và chiếc cúc áo đứt tại hiện trường khiến Vũ trở thành đối tượng tình nghi số 1 về hành vi bạo lực trước khi bằng chứng khoa học hình sự được phơi bày!
-
-1. **Lời khai gian dối ban đầu:** Vũ khai sau khi Mai bỏ về lúc 18:50, Vũ chỉ đứng ngoài cửa nói vài câu xã giao vu vơ với Khang rồi đi uống bia cùng hội bạn thợ xây đến tận khuya. Vũ tuyệt đối không thừa nhận bước vào phòng khách hay có bất kỳ nợ nần gì với nạn nhân.
-2. **Dấu hiệu bạo lực trên cơ thể:** Gò má trái của Vũ có vết bầm tím tụ máu mới hình thành trong vòng 24 giờ. Cổ áo sơ mi màu xanh đen bị xộc xệch mất một cúc ngực.
-3. **Hiện trường xô xát:** Dưới gầm bàn trà phòng khách Khang rơi 01 chiếc cúc áo sơ mi nam màu xanh đen trùng khớp hoàn toàn với áo Vũ mặc tối hôm đó.
+1. **Lời khai gian dối ban đầu (`13`):** Vũ khai sau khi Mai nổ máy xe về lúc 19:00, Vũ cũng đi ra cổng cùng lúc rồi bắt xe đi nhậu ngay (xuất trình ảnh chụp màn hình app xe `p10`).
+2. **Sơ hở chênh lệch 30 phút:** Đối chiếu app xe `p10`, Vũ bấm đặt xe lúc **19:25:40** và tài xế đón lúc **19:30:15**. Điều này chứng minh Vũ đã nán lại trong nhà Khang **30 phút (19:00 – 19:30)** sau khi Mai đã về.
+3. **Dấu hiệu bạo lực trên cơ thể:** Gò má trái của Vũ có vết bầm tím tụ máu mới hình thành.
 
 ---
 
-## III. NGUỒN CƠN MÓN NỢ 150 TRIỆU & NỖI SỢ BỊ BẠCH HÓA GIA ĐÌNH
+## III. NGUỒN CƠN MÓN NỢ 300 TRIỆU & NỖI SỢ BỊ BẠCH HÓA GIA ĐÌNH
 
 ```text
                            ÁP LỰC ĐÈ NẶNG LÊN LÊ QUANG VŨ
                                          │
         ┌────────────────────────────────┴────────────────────────────────┐
         ▼                                                                 ▼
-[MÓN NỢ BỐC HỌ 150 TRIỆU]                                         [NỖI SỢ BỊ GIA ĐÌNH VỢ KHINH BỈ]
-- Đầu tư tiền ảo / vật liệu thua lỗ.                               - Ở rể, tự ti trước sự giỏi giang của Mai.
-- Vay nóng của Khang với lãi suất cắt cổ.                         - Khang dọa: "Nếu Mai kiện tao, tao gửi giấy nợ
-- Khang liên tục chặn đường đánh đập, đe dọa.                       về cho bố mẹ vợ mày xem mặt mũi rể quý!"
+[MÓN NỢ BỐC HỌ 300 TRIỆU]                                         [NỖI SỢ BỊ GIA ĐÌNH VỢ KHINH BỈ]
+- Nhận thầu công trình điện bị đọng vốn.                           - Ở rể, tự ti trước sự giỏi giang của Mai.
+- Vay nặng lãi của Khang (hạn trả 20/07).                          - Khang dọa: "Tao in 100 tờ rơi rải khắp phố
+- Khang liên tục đe dọa ném giấy nợ về nhà bố vợ.                    Đoàn Kết cho bố vợ mày nhục mặt!"
 ```
 
-1. **Sai lầm tài chính:** Đầu năm 2026, Vũ dồn vốn nhận thầu phụ công trình kết hợp đầu tư tiền kỹ thuật số nhưng bị lừa đảo thua lỗ sạch vốn. Không dám nói với Mai vì sợ vợ coi thường, Vũ tìm đến Khang vay nóng **150 triệu đồng** với lãi suất 5.000đ/triệu/ngày.
-2. **Bẫy tống tiền của Khang:** Khi phát hiện Mai chuẩn bị nộp đơn tố cáo mình chiếm đoạt đất, Khang lập tức triệu tập Vũ và sử dụng giấy nợ 150 triệu làm con bài tẩy ép Vũ phải khống chế, ngăn cản Mai khởi kiện. Khang đe dọa sẽ mang giấy nợ dán khắp ngõ và gửi về quê cho bố mẹ đẻ lẫn bố mẹ vợ nếu Vũ không làm theo lời hắn.
-3. **Thế cùng lực kiệt:** Bị kẹp giữa người vợ quyết liệt và gã chủ nợ côn đồ vô nhân tính, Vũ rơi vào trạng thái hoảng loạn cùng cực, sẵn sàng làm mọi cách để tiêu hủy tờ giấy nợ.
+1. **Sai lầm tài chính:** Đầu năm 2026, Vũ nhận thầu phụ lắp đặt điện nhưng bị đọng vốn. Sợ gia đình vợ coi thường, Vũ tìm đến Khang bốc bát họ **300 triệu đồng**.
+2. **Bùng hẹn ngày 20/07:** Đến hạn ngày 20/07 Vũ không xoay được tiền nên bùng hẹn gặp tại số 45 Đoàn Kết. Khang nhắn SMS đe dọa lúc 14:22 ngày 23/07: *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"*.
+3. **Thế cùng lực kiệt:** Khi thấy Mai sang đòi đất, Vũ nán lại quỳ lạy xin Khang hoãn nợ nhưng bị Khang tát sưng má và đe dọa rải tờ rơi khắp ngõ.
 
 ---
 
 ## IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT
 
-* **Với Nạn nhân Nguyễn Văn Khang (Chủ nợ bạo lực):**
-  * Vũ căm thù Khang đến tận xương tủy vì Khang liên tục sỉ nhục, dọa nạt, thậm chí chặn đường đánh đập đòi tiền. Khang coi Vũ như một con tốt thí để ép gia đình Mai nhượng bộ đất đai.
-* **Với Trần Ngọc Mai (Vợ):**
-  * Vũ vừa yêu thương vừa kính sợ Mai. Sự tự ti của một người đàn ông ở rể, kinh tế bấp bênh khiến Vũ không bao giờ dám thú nhận những sai lầm tiền bạc với vợ.
-* **Với Trần Thị Hà (Thủ phạm thực sự):**
-  * Vũ biết Hà là bạn gái Khang, từng thấy Hà nhiều lần lén lút đứng ngoài ngõ rình rập, theo dõi Khang với ánh mắt u uất đáng sợ.
-* **Với Nguyễn Thanh Tùng:**
-  * Vũ chỉ biết mặt Tùng qua lời kể chuyện thuở nhỏ của gia đình Mai, không có liên hệ cá nhân.
+* **Với Nạn nhân Nguyễn Văn Khang (Chủ nợ hung hãn):** Vũ căm ghét và sợ hãi Khang vì Khang liên tục sỉ nhục, dọa nạt báo gia đình vợ.
+* **Với Trần Ngọc Mai (Vợ):** Vũ vừa yêu thương vừa kính sợ Mai, tự ti vì ở rể nên không dám thú nhận nợ nần.
+* **Với Trần Thị Hà (Bạn gái Khang):** Vũ biết Hà yêu Khang điên dại, hay cơm bưng nước rót và lén lút rình rập ngoài ngõ.
 
 ---
 
-## V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2026 - ĐÊM MƯA LỚN)
+## V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2026)
 
 ```text
-18:30            18:50           19:00 - 19:15         19:30 - 20:15        20:35:10          21:30
-  │                │                   │                     │                  │               │
-  ├────────────────┼───────────────────┼─────────────────────┼──────────────────┼───────────────┤
-Sang cùng Mai    Mai bỏ về,      Van xin hoãn nợ,      Uống rượu 1 mình     Mua Ladodetox     Về đến nhà,
-ngồi im nghe cãi Vũ ở lại        bị tát, hoảng loạn    quán Bãi Trũng       Km18 (cách 14km)  lén lút đi ngủ
-                                 xé sổ nợ tháo chạy    (ngoại thành)
+18:30            19:00           19:00 - 19:25         19:30             20:45           21:30
+  │                │                   │                 │                 │               │
+  ├────────────────┼───────────────────┼─────────────────┼─────────────────┼───────────────┤
+Sang cùng Mai    Mai bỏ về,      Van xin hoãn nợ,      Xe ôm đón         Thanh toán CK   Về đến nhà
+ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88    195k Bàn 7      Phố Đoàn Kết
+đòi đất          xin nợ          tháo chạy ra ngõ      (cách 3.8 km)     Quán Bia 88     ngủ bình thường
 ```
 
-* **18:30 – 18:50:** Vũ ngồi im chịu trận trong khi Mai và Khang cãi nhau nảy lửa. Khi Mai ném hồ sơ bỏ về, Vũ viện cớ đi nhậu với bạn để ở lại xin gặp riêng Khang.
-* **19:00 – 19:15:** Mai vừa đi khuất, Vũ quỳ lạy van xin Khang cho gia hạn khoản nợ 300 triệu và xin đừng gửi giấy nợ cho Mai. Khang khinh bỉ chửi mắng, tát mạnh hai cái vào má trái làm Vũ ngã nhào, giật đứt một cúc áo sơ mi xanh đen văng xuống gầm bàn. Khang rút cuốn sổ nợ đập vào mặt Vũ đe dọa: *"Đêm nay tao sẽ cho cả nhà con Mai biết bộ mặt thật của mày!"* Trong cơn hoảng loạn cùng cực vì sợ mất hết danh dự và gia đình, Vũ liều mạng giằng cướp cuốn sổ, giật phăng nguyên cả trang số 12 ghi tên mình đứt khỏi gáy sổ, vò nát nhét túi rồi đẩy Khang ra tháo chạy thục mạng dưới cơn mưa lúc **19:15**.
-* **19:30 – 20:15:** Đầu óc quay cuồng, không dám về nhà đối mặt với Mai, Vũ lái xe máy dưới mưa ra quán rượu bình dân ven sông Bãi Trũng ngoại thành (cách nhà Khang **14km đường đê**) ngồi uống rượu một mình trong bế tắc.
-* **20:35:10:** Rời quán rượu với hơi men nồng nặc, sợ Mai ngửi thấy mùi cồn và phát hiện vết bầm trên mặt, Vũ tấp vào Cửa hàng tiện lợi 24/7 cạnh Trạm xăng Km18 Quốc Lộ mua 01 chai nước giải rượu *Ladodetox Nosamin* (55.000 VNĐ).
-* **21:30:** Sau khi đi xe máy hơn 40 phút dưới trời mưa lớn và đường ngập từ Km18 về đến nhà tại Phố Đoàn Kết, Vũ thấy Mai đã đi ngủ nên lén vào phòng tắm rửa mặt, uống thuốc giải rượu rồi lên giường nằm im run rẩy.
-* **08:30 (Sáng 25/07):** Công an ập đến nhà triệu tập Mai và Vũ lên làm việc sau khi phát hiện thi thể Khang và các giấy tờ liên quan tại hiện trường.
+* **18:30 – 19:00:** Vũ ngồi im trong khi Mai cãi nhau đòi đất với Khang. Đúng 19:00 Mai phóng xe về trước.
+* **19:00 – 19:25:** Vũ quỳ lạy xin hoãn món nợ 300 triệu. Khang chửi bới, tát mạnh vào má trái làm Vũ bầm mặt và đe dọa in 100 tờ rơi rải khắp phố Đoàn Kết. Vũ hoảng loạn vùng chạy thoát ra cửa sau luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25:40.
+* **19:25:** Đứng ở đầu ngõ đợi xe, Vũ nhìn thấy bóng một người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
+* **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 Set Nhắm Bình Dân + 3 chai bia Hà Nội.
+* **20:45:** Vũ thanh toán chuyển khoản **195.000đ** (Bàn số 7).
+* **21:30:** Vũ đi xe ôm về đến nhà tại số 45 Phố Đoàn Kết đi ngủ.
 
 ---
 
 ## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
 
-### 1. Cơ chế Khám phá 1: Giám định Vết hằn nét bút trên Sổ nợ (`EV-DEBT-INDENTATION`)
-* **Vật chứng hiện trường:** Cuốn sổ tay bìa da đen của Khang nằm trên bàn làm việc bị giật xé đứt rời nguyên trang số 12 khỏi gáy sổ.
-* **Thao tác điều tra của Người chơi:** Dùng **Bút chì mềm 2B / Kỹ thuật chà than chì (Carbon Shading)** để chà nhẹ lên mặt trang giấy số 13 kế tiếp.
-* **Kết quả hiển thị:** Áp lực tỳ đè từ ngòi bút bi của Khang ở trang trước đã in hằn nguyên vẹn nội dung:
-  > *"12/03/2026: V-Điện (Thằng rể nhà Mai) bốc họ: 300.000.000đ. Lãi suất: 5k/triệu/ngày. Hạn chót: 30/07. Cầm: Giấy phép hành nghề Kỹ sư điện + Uy tín nhà 45 Đoàn Kết. Không trả tao ném giấy nợ về nhà bố vợ và cơ quan vợ!"*
-* **Ý nghĩa phá án:** Lột trần lời khai gian dối của Vũ, làm rõ động cơ tống tiền bạo lực của Khang và chứng minh Vũ đã có mặt bên trong phòng khách giằng co xé sổ nợ lúc 19:10.
+### 1. Cơ chế 1: Đối chiếu Sổ nợ `10a` & Biệt danh "Thằng Lệch Pha"
+* **Vật chứng:** Cuốn sổ ghi nợ tín dụng đen `10a` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.94 — Hạn: 20/07 — Ghi chú: ~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Dọa ném bố vợ*.
+* **Khớp nối suy luận:** Nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08` + địa chỉ 45 Đoàn Kết + SĐT `0988.20.09.94` $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ!
 
-### 2. Cơ chế Khám phá 2: Giải mã Unix Timestamp & Bài toán Quãng đường (`EV-POS-RECEIPT-UNIX`)
-* **Vật chứng thu giữ:** Khám xét túi áo khoác của Vũ, phát hiện 01 tờ hóa đơn thanh toán bị ướt sũng nước mưa:
-
-```text
---------------------------------------------------
-             CỬA HÀNG TIỆN LỢI 24/7               
-         ĐC: Trạm xăng Km18 - Quốc Lộ 1A          
---------------------------------------------------
-Mặt hàng: 01 Nước giải rượu Ladodetox Nosamin     
-Đơn giá : 55,000 VNĐ                              
-Thời gian: [XX:XX:XX - BỊ NHÒE MỰC DO NƯỚC MƯA]   
-
-Mã tra cứu giao dịch điện tử (POS Barcode ID):    
-|||| ||| ||||| || |||| ||| |||| | ||| ||||        
-                  1787924110                      
---------------------------------------------------
-```
-
-* **Thao tác giải mã của Người chơi:** Nhập chuỗi số tra cứu `1787924110` vào **Công cụ Chuyển đổi Thời gian Hệ thống (Unix Epoch Converter)** trong máy điều tra NOCTURNE:
-  $$\text{Unix Timestamp } 1787924110 \longrightarrow \mathbf{20:35:10\text{ (GMT+7)} - 24/07/2026}$$
-* **Ý nghĩa vật chứng (Ngoại phạm khoảng cách):** Xác nhận lúc **20:35:10**, Vũ đang đứng thanh toán tại Trạm xăng Km18 (cách hiện trường 14km đường đê trơn trượt). Với thời tiết mưa to gió lớn, thời gian di chuyển từ Km18 về nhà Khang mất ít nhất 35 - 40 phút. Do đó, Vũ **hoàn toàn không thể có mặt tại nhà Khang lúc 20:45 – 21:00 (thời điểm Khang bị sát hại)**.
+### 2. Cơ chế 2: Câu đố Sổ thu chi Quán Bia 88 (`06_so_thu_chi_quan_bia.md`)
+* **Dữ liệu đối chiếu:**
+  * Vũ khai gọi: **1 Set Nhắm Bình Dân + 3 chai bia Hà Nội**.
+  * Bàn 1: 4 bia Hà Nội = 100.000đ $\rightarrow$ 1 chai = **25.000đ** (3 chai = **75.000đ**).
+  * Bàn 4: 1 Set Nhắm Bình Dân = **120.000đ**.
+  * Tổng số tiền: $75.000\text{đ} + 120.000\text{đ} = \mathbf{195.000\text{đ}}$.
+* **Kết quả quét sổ:** Dòng Bàn 7: *Bàn 7 (Khách lẻ): 195.000đ ➔ CK (20h45)*.
+* **Ý nghĩa phá án:** Lúc **20:45**, Vũ đang chuyển khoản tại Quán Bia 88 cách hiện trường **3.8 km** $\rightarrow$ Không thể có mặt tại nhà Khang lúc 20:45 (thời điểm hung thủ đứng rình) và 21:00 (lúc nạn nhân bị sát hại) $\rightarrow$ **MINH OAN TUYỆT ĐỐI CHO VŨ!**
 
 ---
 
@@ -151,23 +126,20 @@ Mã tra cứu giao dịch điện tử (POS Barcode ID):
 
 | Yếu Tố Bẫy (Red Herring) | Suy Đoán Ban Đầu (Nghi Vấn) | Sự Thật Khách Quan Được Minh Oan |
 | :--- | :--- | :--- |
-| **Vết bầm tím má trái của Vũ** | Nghi Vũ vừa đánh nhau chí mạng với nạn nhân trước khi Khang chết. | Do Khang tát lúc 19:05 khi Vũ van xin hoãn nợ. |
-| **Cúc áo xanh đen dưới gầm bàn** | Nghi Vũ là kẻ giằng co làm Khang ngã đập đầu tử vong. | Bị giật đứt trong vụ xô xát lúc 19:10, trước khi Tùng đến lúc 20:00. |
-| **Trang sổ nợ bị xé vụn** | Nghi hung thủ thủ tiêu chứng cứ nợ nần để che giấu tội giết người. | Vũ xé trong cơn phẫn nộ lúc 19:12 rồi bỏ chạy trong hoảng loạn. |
+| **Vết bầm tím má trái của Vũ** | Nghi Vũ vừa đánh nhau chí mạng với nạn nhân trước khi Khang chết. | Do Khang tát lúc 19:15 khi Vũ van xin hoãn nợ. |
+| **Món nợ 300M bị dồn vào chân tường** | Nghi Vũ giết chủ nợ để quỵt nợ. | Vũ hoảng loạn tháo chạy lúc 19:25 và ngồi uống bia tại Cầu Cảng suốt từ 19:40 đến 20:45. |
 
 ---
 
 ## VIII. KÝ SỰ HẬU ÁN: GÁNH NẶNG GÁ NGHĨA & NỖI SỢ CỦA KẺ CÙNG ĐƯỜNG
 
-> *(Hồ sơ ký sự trích xuất sau khi hoàn thành phá án S-Rank)*
+Ngồi trong phòng lấy lời khai, nhìn vào trang sổ nợ ghi số tiền 300 triệu, hai vai Vũ sụp xuống hoàn toàn. Giọt nước mắt muộn màng lăn qua vết bầm tím trên gò má.
 
-Ngồi trong phòng thẩm vấn, nhìn vào tờ giấy giám định nét bút hằn lên số tiền 150 triệu, hai vai Vũ sụp xuống hoàn toàn. Giọt nước mắt muộn màng lăn qua vết bầm tím trên gò má.
+*"Tôi hèn hạ lắm đúng không cán bộ? Tôi sợ nghèo, sợ người ta khinh thằng rể quê lên thành phố ăn bám nhà vợ, nên mới lao vào làm ăn rồi sa chân vào vay nóng của thằng Khang... Khi nó tát tôi, nó dọa gửi giấy nợ cho bố mẹ vợ, tôi chỉ muốn biến mất khỏi thế giới này..."*
 
-*"Tôi hèn hạ lắm đúng không cán bộ? Tôi sợ nghèo, sợ người ta khinh thằng rể quê lên thành phố ăn bám nhà vợ, nên mới lao vào trò tiền ảo rồi sa chân vào vay nóng của thằng Khang... Khi nó tát tôi, nó dọa gửi giấy nợ cho Mai, tôi chỉ muốn chết đi cho xong..."*
-
-Vũ không giết người. Nhưng chính sự hèn nhát, sĩ diện hảo và nỗi sợ hãi yếu đuối của Vũ đã biến anh thành một con cờ trong trò chơi tàn nhẫn của Khang. Thoát khỏi cáo buộc giết người, nhưng bản án lương tâm và sự đổ vỡ trong cuộc hôn nhân với Mai sẽ là gánh nặng theo Vũ suốt quãng đời còn lại.
+Vũ không giết người. Sự hèn nhát và sĩ diện hảo của Vũ suýt chút nữa đã biến anh thành kẻ thế mạng. Sau khi vụ án khép lại, Mai đã cùng Vũ bán bớt một phần đất được trả lại để thanh toán dứt điểm khoản nợ, cho Vũ một cơ hội làm lại cuộc đời.
 
 ---
 **NGƯỜI LẬP HỒ SƠ**  
-*Đại úy Nguyễn Văn Hưng — Cán bộ Điều tra Đội Trọng án*  
+*Đại úy Lê Minh — Cán bộ Điều tra Đội Trọng án*  
 *(Đã ký và đóng dấu nghiệp vụ)*

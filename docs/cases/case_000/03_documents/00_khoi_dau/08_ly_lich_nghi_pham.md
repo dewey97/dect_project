@@ -35,8 +35,9 @@ Số: `04b/BC-RSLL`
 │ • Số CCCD: 001094005812 (Cấp ngày 12/04/2021).                             │
 │ • ĐKHKTT: Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.                │
 │ • Nghề nghiệp: Kỹ sư Điện & Lắp đặt thiết bị tự do.                         │
-│ • Số điện thoại chính chủ: 0983.551.229.                                    │
-│ • Tiền án, tiền sự: Không. (Có dấu hiệu tham gia đầu tư tiền ảo thua lỗ).   │
+│ • Đặc điểm nhận dạng: Mắt trái có tật lác nhẹ (lé nhẹ); đeo kính gọng đen.  │
+│ • Số điện thoại liên lạc: 0988.20.09.94.                                    │
+│ • Tiền án, tiền sự: Không. (Kinh doanh làm ăn gặp khó khăn nợ nần).          │
 │ • Quan hệ: Chồng của Trần Ngọc Mai; Con nợ của nạn nhân Khang.              │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ 3. NGUYỄN THANH TÙNG                                                        │

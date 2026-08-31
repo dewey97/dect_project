@@ -22,12 +22,11 @@ Vào hồi 21 giờ 30 phút, ngày 25 tháng 07 năm 2026.
 
 ### DANH MỤC TANG VẬT TRỌNG YẾU THU GIỮ
 
-1. **Lọn tóc mai dính máu khô giấu trong áo ngực (Vật chứng chí mạng `EV-HAIR-DNA`):**
-   - Khám xét tư trang cá nhân, phát hiện bên trong lớp đệm áo ngực màu đen của Trần Thị Hà có giấu 01 túi nilon zip nhỏ chứa **01 lọn tóc nam giới dài khoảng 4cm, chân tóc có dính vệt máu khô**.
-   - Kết quả giám định ADN khẩn cấp: Mẫu tóc và vết máu trùng khớp 100% hồ sơ gen của nạn nhân **Nguyễn Văn Khang**.
-2. **Chiếc áo gió màu xám đen có mũ trùm đầu:** Treo sau cánh cửa phòng trọ, vải còn ẩm ướt, gấu áo dính bùn đất ngõ nhà Khang.
-3. **01 Kéo cắt chỉ bấm tay nhỏ:** Lưỡi kéo kim loại còn bám dính sợi tóc ngắn và vết máu mờ.
-4. **Hộp thuốc an thần Diazepam 5mg:** Vỉ thuốc 10 viên đã bị bóc mất 04 viên (loại thuốc đã hòa vào bình trà hoa cúc mang sang cho Khang).
+1. **Lọn tóc mai dính máu khô (`EV-HAIR-DNA`):**
+   - Khám xét tư trang cá nhân, phát hiện thu giữ **01 lọn tóc nam giới dài khoảng 4cm, chân tóc có dính vệt máu khô**.
+   - Kết quả giám định ADN khẩn cấp: Mẫu tóc và vết máu trùng khớp 100% hồ sơ gen của nạn nhân **Nguyễn Văn Khang** (khớp với mảng tóc mai bị cắt sát da đầu trong khám nghiệm tử thi).
+2. **Chiếc áo gió màu xám đen có mũ trùm đầu:** Treo sau cánh cửa phòng trọ, trên bề mặt bám dính phấn hoa cây xoan và gấu áo dính bụi đất đỏ đặc trưng của ngõ nhà Khang.
+3. **01 Chiếc kéo bấm nhỏ (kéo cắt chỉ thêu len):** Để trên bàn làm việc cạnh cuộn len, giám định vi vết phát hiện có dính sợi tóc và vệt máu vi lượng của nạn nhân.
 
 ---
 
