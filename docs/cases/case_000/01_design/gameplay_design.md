@@ -82,18 +82,23 @@
 
 * **Tài liệu tiếp cận:** 18 tài liệu cơ sở (`01_tiep_nhan_tin_bao` đến `18_bang_tin_rao_vat`).
 * **Dữ liệu thu thập & Vật chứng tại hiện trường:**
-  1. **Khám nghiệm tử thi (`04`):** Nạn nhân chết do đứt động mạch cảnh trong khoảng **20:45 – 21:15 (ước tính ~21:00)**; vùng chẩm gáy có vết tụ máu do va đập trước đó; đặc biệt thái dương trái có **một mảng tóc mai bị cắt sát da đầu**.
-  2. **Vật chứng hiện trường (`05`):** Mảnh thủy tinh dính máu `p3` (vết vân tay miết trượt mờ, chưa đủ điều kiện tra tự động), bộ bình trà thủy tinh vỡ `p1`, xấp đơn đòi đất `p2`, sổ nợ tín dụng đen `10a`, hũ trà hoa cúc dán note vàng `17`.
+  1. **Khám nghiệm tử thi (`04`):** Nạn nhân chết do đứt động mạch cảnh trong khoảng **20:45 – 21:15 (ước tính ~21:00)**; vùng chẩm gáy có vết tụ máu do va đập trước đó; đặc biệt thái dương trái có **một mảng tóc mai bị cắt sát da đầu** bằng vật sắc nhọn.
+  2. **Vật chứng hiện trường (`05`):** Mảnh thủy tinh dính máu `p3` (vết vân tay miết trượt mờ, chưa đủ điều kiện tra tự động), bộ bình trà thủy tinh vỡ vụn `p1`, xấp đơn đòi đất `p2` (có 02 giọt máu khô `M1` trên góc mép), sổ nợ tín dụng đen `10a`, hũ trà hoa cúc dán note vàng `17`, điện thoại cảm ứng `dev-00` rơi úp mặt cạnh tay nạn nhân.
   3. **Kỷ vật xóm Bờ Sông 1996:** Khung ảnh tuổi thơ vỡ kính `p4` (Khang ngỗ ngược, bé gái Hà mặc váy hoa, bé Mai nhỏ xíu được ông bế, Tùng có sẹo chữ V ở lông mày đang để bé Huy nhỏ thó đeo còi đồng nép sau lưng mình) + Mẩu báo cũ ố vàng năm 1996 `p5` đưa tin về bé trai N.G.H (7 tuổi) ngạt khí trong tủ gỗ khi chơi cùng các bạn nhỏ ngày 24/07/1996.
-  4. **Dữ liệu trích xuất điện thoại nạn nhân (`16`):** 
-     - SMS đòi nợ 300M gửi số `0988.20.09.94`.
-     - SMS 15:30 từ số lạ `0913.882.901`: *"Tròn 30 năm rồi đó. M không có gì muốn nói với Huy à?"*.
-     - Cuộc gọi nhỡ lúc 20:31:30 từ Hà $\rightarrow$ Tự động chuyển sang Voicemail lúc 20:32:15.
-  5. **Bảng ảnh ngoại cảnh bờ tường & Bảng tin trước cổng (`18`):**
+  4. **Dữ liệu trích xuất điện thoại nạn nhân (`16` — Mã `dev-00`):** 
+     - **SMS 18/07 (1 tuần trước):** Hà van xin Khang đừng giận $\rightarrow$ Khang xóa lịch sử chat và không trả lời (dấu hiệu rạn nứt tình cảm sâu sắc từ trước).
+     - **SMS 23/07 14:22:** Khang đe dọa đòi nợ 300M số `0988.20.09.94`, dọa ném giấy nợ về nhà 45 Đoàn Kết cho bố vợ xem (dồn con nợ Vũ vào chân tường).
+     - **SMS 24/07 15:30:** Số lạ `0913.882.901` gửi: *"Tròn 30 năm rồi đó. M không có gì muốn nói với Huy à?"* (Manh mối ân oán giỗ 30 năm của Tùng).
+     - **SMS 24/07 17:45:** Thảo Vy gửi: *"Vé máy bay sáng mai 06:15 em book xong rồi nhé anh yêu. Tiền mặt anh chuẩn bị đủ chưa? Vào trong này sống luôn với em nhé!"* (Kế hoạch gom tiền bỏ trốn với nhân tình của Khang — **Trigger tâm lý chí mạng khi Hà mở máy lúc 20:45**).
+     - **SMS 24/07 19:15:** Hà nhắn đưa hũ trà hoa cúc mới sao sang (Khang tắt thông báo không đọc $\leftrightarrow$ Khớp hũ trà `17` trên bàn).
+     - **Nhật ký cuộc gọi & Voicemail 20:32:** Cuộc gọi nhỡ lúc 20:31:30 từ Hà $\rightarrow$ Chuyển Hộp thư thoại lúc 20:32:15: Hà thì thầm *"đang ở phòng trọ xem phim buồn quá tí nữa em chạy qua..."*, hậu cảnh lọt rõ **tiếng còi tàu hỏa diesel D19E kéo dài và tiếng chuông gác chắn đường sắt reo leng keng** (Bằng chứng bẻ gãy alibi, chứng minh Hà đang đứng ngay trước cổng rào chắn ngõ nhà Khang).
+  5. **Bảng tin & Ngoại cảnh trước cổng (`18` / `p9`):**
      - Các vết xịt sơn đỏ đe dọa đòi nợ và cướp đất (*"ĐMM KHANG CHÓ TRẢ TIỀN BỐ"*, *"KHANG LỪA ĐẢO CƯỚP ĐẤT"*).
-     - Mẩu giấy dán băng dính thợ nề tự do (*"Nhận sửa nhà, đục bê tông, thông cống... LH: 0913.882.901 (Em Tùng thợ nề)"*).
-     - Mẩu thông báo sự cố mất tín hiệu truyền hình cáp khu vực lúc 20:10.
+     - **Mẩu 1 (Tờ rơi thợ nề):** Giấy viết tay dán băng dính (*"Nhận sửa nhà, đục bê tông, thông cống... LH: 0913.882.901 (Em Tùng thợ nề)"*) $\leftrightarrow$ Khớp số gửi SMS 15:30.
+     - **Mẩu 2 (Thông báo mất cáp):** Thông báo sự cố đứt cáp truyền hình & internet lúc 20h10 nhánh Bờ Sông – Đoàn Kết $\leftrightarrow$ Xác thực lời khai Mai ở nhà xem tivi bị mất sóng cáp lúc hơn 20h.
+     - **Mẩu 3 (Thông báo gom rác đường tàu):** Thông báo của Tổ dân phố số 4 về lịch thu gom rác ngõ Bờ Sông từ 19h30 đến 20h15, kết thúc trước khi gác chắn đóng đón **chuyến tàu hàng Bắc – Nam lúc 20h30 hàng đêm** $\leftrightarrow$ Cung cấp mốc giờ cố định 20:30 của đoàn tàu chạy qua ngõ nhà Khang.
   6. **Lời khai sơ bộ đáng chú ý (`11`–`15`):**
+     - Bà Lụa (`11`): Mai phóng xe máy về đúng lúc nhạc Thời sự 19h00 VTV1; nghe cãi nhau và tiếng vỡ bình trà "XOẢNG" lúc hơn 20h00, thấy người mặc áo thợ nề hớt hải chạy ra ngõ lúc 20:15; từng nhìn thấy bóng người đứng rình dưới gốc cây xoan ngó vào nhà Khang.
      - Vũ (`13`): Khai Mai vừa đi là mình bắt xe đi nhậu ngay (kèm ảnh chụp màn hình app xe `p10`); buột miệng so sánh với vợ: *"Con Hà nó yêu thằng Khang đến phát điên, ngày nào cũng trà đóm cơm bưng nước rót... Nghĩ mà ước gì vợ tôi được như con Hà."* (Cài cắm dấu hiệu tâm lý cuồng yêu của Hà ngay từ đầu).
      - Hà (`15`): Khai ở phòng trọ xem phim bộ VTV3 từ 20h00 đến 21h30 kể về *"một người đàn ông phản bội người con gái đã hy sinh cả thanh xuân... xem xong em khóc ướt cả gối"* (Thủ phạm tự thuật lại vở kịch nội tâm và động cơ của chính mình dưới vỏ bọc một cô gái yếu đuối mê phim truyền hình).
 
