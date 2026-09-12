@@ -1,22 +1,53 @@
-# AGENTS.md — Agent Working Rules & Guidelines
+# Detective Case System (dect_project) — Workspace Agent Guidelines
 
-## 1. Strict Commit Control (Quy tắc Git Commit)
-- Agent **TUYỆT ĐỐI KHÔNG TỰ ĐỘNG CHẠY `git commit`** sau khi chỉnh sửa file hay làm xong tác vụ.
-- Chỉ thực hiện lệnh `git commit` khi người dùng phát lệnh hoặc yêu cầu trực tiếp (Ví dụ: "commit", "commit đi", "hãy commit cho tôi").
+> **Dự án: dect_project** — Hệ thống game trinh thám điều tra tương tác, tài liệu chứng cứ vụ án và hồ sơ LaTeX.
+> *Kế thừa toàn bộ quy tắc Global từ `D:\code_world\AGENTS.md` (Strict Git Commit, Proposal-First, Code-Doc Sync).*
 
-## 2. Consultative & Proposal-First Workflow (Quy tắc Đề xuất trước khi thực thi)
-- Khi người dùng đặt vấn đề, đưa ra yêu cầu mới hoặc thắc mắc: Agent **bắt buộc phải giải thích, phân tích vấn đề và đưa ra các phương án/đề xuất** trước.
-- **CHỈ TIẾN HÀNH VIẾT CODE HOẶC CHỈNH SỬA FILE KHI NGƯỜI DÙNG ĐÃ XÁC NHẬN / ĐỒNG Ý ("OKE", CHỌN PHƯƠNG ÁN)**.
-- Không tự ý thực thi viết mã hoặc sửa file hàng loạt trước khi người dùng phê duyệt phương án.
+---
 
-## 3. Project Architecture & Style Standards
-- Tuân thủ nghiêm ngặt các quy định trong `PROJECT_RULES.md`.
-- Đảm bảo tính nhất quán của hệ thống tài liệu: `storyline.md` (Cốt truyện thuần túy), `gameplay_design.md` (Cơ chế & Luồng chơi), `evidence_manifest.md` (Danh mục manh mối & Master Asset Table), và bộ tài liệu LaTeX trong `latex/` & PDF trong `pdf/`.
+## 📚 Documentation Map (Bản Đồ Tài Liệu 2 Tầng)
+Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
 
-## 4. Automated LaTeX Compilation & Cleanup Protocol (Quy trình Tự động Biên dịch & Dọn dẹp LaTeX)
+* **⚙️ Technical Docs (Kỹ thuật hệ thống)**:
+  * Kiến trúc & Đặc tả: [`docs/core_specs/04_system_specifications.md`](docs/core_specs/04_system_specifications.md)
+  * Kỹ thuật & Setup: [`docs/core_specs/07_technical_guide.md`](docs/core_specs/07_technical_guide.md)
+  * Cơ sở dữ liệu: [`docs/core_specs/08_database_schema.md`](docs/core_specs/08_database_schema.md)
+  * Design System: [`docs/core_specs/06_ux_ui_design_system.md`](docs/core_specs/06_ux_ui_design_system.md)
+* **🧠 Domain Docs (Nghiệp vụ trinh thám)**:
+  * Game Design: [`docs/core_specs/03_game_design.md`](docs/core_specs/03_game_design.md)
+  * Quy tắc manh mối: [`docs/investigation_design/04_clues_and_narrative_rules.md`](docs/investigation_design/04_clues_and_narrative_rules.md)
+  * Bối cảnh thế giới: [`docs/core_specs/02_world_building.md`](docs/core_specs/02_world_building.md)
+  * Văn phong tài liệu: [`docs/core_specs/05_content_and_writing_guidelines.md`](docs/core_specs/05_content_and_writing_guidelines.md)
+
+---
+
+## 🕵️ 1. Cấu trúc Kiến trúc & Tính Nhất Quán của Dự Án
+Mọi sửa đổi liên quan đến nội dung vụ án phải đảm bảo tính đồng bộ 100% giữa 4 lớp tài liệu:
+* Cốt truyện thuần túy, mốc thời gian và sự thật vụ án.
+* Cơ chế giải đố, luồng suy luận và điều kiện mở khóa manh mối.
+* Danh mục tổng thể vật chứng & Master Asset Table (đường dẫn tài liệu, mã chứng cứ).
+* **Bộ tài liệu LaTeX (`latex/`) & PDF xuất bản (`public/documents/`)**: Hồ sơ pháp y, lời khai nhân chứng, biên bản hiện trường được hiển thị trong web app.
+
+---
+
+## 📑 2. Quy trình Tự Động Biên Dịch & Dọn Dẹp LaTeX (Automated LaTeX Protocol)
+
 Khi Agent chỉnh sửa hoặc cập nhật nội dung bất kỳ file nguồn `.tex` nào (trong `latex/case_000/...`):
-- **Biên dịch đúng file vừa sửa**: Chỉ chạy biên dịch `pdflatex` đối với **chính file `.tex` vừa được chỉnh sửa** (thông qua lệnh `npm run build:latex -- <tên_file>`), không build lại toàn bộ các file khác.
-- **Cập nhật Thư mục Đích**: Tự động chuyển file PDF thu được vào đúng vị trí trong `public/documents/case_000/<phase>/` (ghi đè/thay thế PDF cũ cho ứng dụng web).
-- **Quản lý File Log & File Tạm**:
-  - File `.log` của quá trình biên dịch sẽ được chuyển/lưu vào thư mục `.vscode/latex_logs/` để tiện tra cứu khi cần.
-  - Tự động xóa sạch các file tạm rác do LaTeX sinh ra (`.aux`, `.out`, `.fls`, `.fdb_latexmk`, `.pdf` thừa) tại thư mục nguồn `.tex`, giữ cho thư mục `latex/` luôn 100% sạch sẽ chỉ chứa các file nguồn `.tex`.
+
+1. **Biên dịch cục bộ đúng file vừa sửa**:
+   * Chỉ chạy lệnh biên dịch đối với **chính file `.tex` vừa sửa** thông qua lệnh:
+     ```bash
+     npm run build:latex -- <tên_file>
+     ```
+   * Không chạy build lại toàn bộ các file khác để tiết kiệm tài nguyên.
+2. **Tự động đồng bộ file PDF**:
+   * Đưa file PDF tạo thành vào đúng thư mục đích: `public/documents/case_000/<phase>/` để ứng dụng web hiển thị ngay.
+3. **Quản lý Log & Dọn Rác Triệt Để**:
+   * Di chuyển file `.log` biên dịch vào `.vscode/latex_logs/` để tra cứu khi cần debug.
+   * **Xóa sạch toàn bộ file rác tạm** do LaTeX sinh ra (`.aux`, `.out`, `.fls`, `.fdb_latexmk`, `.synctex.gz`) tại thư mục nguồn. Thư mục `latex/` luôn phải 100% sạch sẽ chỉ chứa file `.tex` và asset gốc.
+
+---
+
+## 🎨 3. Tiêu chuẩn Giao diện Trinh Thám & Thẩm mỹ
+* Giao diện phong cách hồ sơ trinh thám cổ điển/tối giản: Sử dụng typography sắc nét, màu sắc tài liệu cũ/chính luận.
+* Áp dụng nguyên tắc **`/taste`**: Không lạm dụng hiệu ứng neon sặc sỡ, đảm bảo trải nghiệm đọc hồ sơ chân thực trên cả Mobile và Desktop.

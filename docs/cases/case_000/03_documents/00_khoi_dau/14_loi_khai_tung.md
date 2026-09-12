@@ -21,8 +21,8 @@ Vào hồi 17 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 **Tiến hành lấy lời khai người liên quan:**
-* **Họ và tên:** **NGUYỄN THANH TÙNG** | **Giới tính:** Nam | **Sinh ngày:** 18/03/1990.
-* **CCCD số:** `001090003412` cấp ngày 14/05/2021 tại Cục CSQLHC về TTXH.
+* **Họ và tên:** **NGUYỄN THANH TÙNG** | **Giới tính:** Nam | **Sinh ngày:** 18/03/1986 (40 tuổi).
+* **CCCD số:** `001086003412` cấp ngày 14/05/2021 tại Cục CSQLHC về TTXH.
 * **Nơi ĐKHKTT:** Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Lao động tự do (Thợ nề, sửa chữa nhà dân dụng).
 

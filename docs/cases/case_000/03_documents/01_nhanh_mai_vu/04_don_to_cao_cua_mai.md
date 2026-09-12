@@ -13,14 +13,14 @@
 - Cơ quan Cảnh sát Điều tra Công an Thành phố Hà Nội.
 
 ### NGƯỜI LÀM ĐƠN TỐ CÁO:
-* **Họ và tên:** **TRẦN NGỌC MAI** | **Sinh ngày:** 15/05/1996.
-* **Số CCCD:** `001196004523` cấp ngày 10/08/2022.
+* **Họ và tên:** **TRẦN NGỌC MAI** | **Sinh ngày:** 15/05/1992.
+* **Số CCCD:** `001192004523` cấp ngày 10/08/2022.
 * **Nơi cư trú:** Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.
 
 ---
 
 ### NỘI DUNG TỐ CÁO:
-Tôi làm đơn này tố cáo hành vi vi phạm pháp luật hình sự đặc biệt nghiêm trọng của anh họ tôi là **NGUYỄN VĂN KHANG (SN 1993, trú tại số 14 Đường Bờ Sông)** về hành vi:
+Tôi làm đơn này tố cáo hành vi vi phạm pháp luật hình sự đặc biệt nghiêm trọng của anh họ tôi là **NGUYỄN VĂN KHANG (SN 1988, trú tại số 14 Đường Bờ Sông)** về hành vi:
 > *"Làm giả con dấu, tài liệu của cơ quan, tổ chức và Lừa đảo chiếm đoạt tài sản theo Điều 174 & 341 Bộ luật Hình sự".*
 
 **Diễn biến cụ thể:**  

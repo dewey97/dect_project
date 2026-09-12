@@ -136,7 +136,7 @@ export const CASE_000_PDFS: PDFDocument[] = [
   // Phase 2: Past Secret & Hide-and-Seek
   {
     id: 'pdf-11',
-    title: '11. Biên bản camera cây xăng & Mật mã trốn tìm 1998',
+    title: '11. Biên bản camera & Bi kịch trốn tìm 1996',
     code: 'f3-1',
     url: '/documents/case_000/phase_2_altercation/11_bien_ban_trich_xuat_camera_va_tro_tron_tim.pdf',
     phase: 2,
@@ -168,7 +168,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     caseId: 'case-000',
     kind: 'photo',
     title: 'p1. Ảnh hiện trường phòng khách & bộ bình trà vỡ',
-    preview: 'Hiện trường phòng khách xáo trộn, bộ bình trà bị đập vỡ vụn trên sàn gỗ kèm đốm máu loang.',
+    preview: 'Hiện trường phòng khách xáo trộn, bộ bình trà thủy tinh pha hoa cúc bị vỡ vụn trên sàn gạch.',
     timestamp: '20:00',
     evidenceId: 'EV-SCENE-OVERVIEW',
     recoveredBy: 'ĐIỀU TRA VIÊN',
@@ -182,8 +182,8 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     id: 'ev-p3',
     caseId: 'case-000',
     kind: 'photo',
-    title: 'p3. Mảnh thủy tinh ceramic 8cm dính máu (Hung khí)',
-    preview: 'Mảnh vỡ sắc nhọn 8cm dính vết máu khô và dấu vân tay miết (vật chứng đâm đứt động mạch cảnh).',
+    title: 'p3. Mảnh thủy tinh 8.2cm dính máu (Hung khí)',
+    preview: 'Mảnh vỡ bình trà sắc nhọn 8.2cm dính vết máu khô và dấu vân tay miết trượt (vật chứng đâm đứt động mạch cảnh).',
     timestamp: '21:00',
     evidenceId: 'EV-GLASS-SHARD',
     recoveredBy: 'ĐIỀU TRA VIÊN',
@@ -197,8 +197,8 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     id: 'ev-p4',
     caseId: 'case-000',
     kind: 'photo',
-    title: 'p4. Khung ảnh gỗ bị đập vỡ & nứt kính (1998)',
-    preview: 'Bức ảnh lồng kính gỗ bị đập vỡ vụn dưới sàn, góc chụp chính diện năm 1998: Cụ Thành bế Khang trong lòng, xung quanh là 4 đứa trẻ (Tùng, Gia Huy, Hà và bé Mai nhỏ hơn hẳn đứng phía trước).',
+    title: 'p4. Khung ảnh kỷ niệm xóm Bờ Sông hè 1996 bị vỡ kính',
+    preview: 'Bức ảnh chụp kỷ niệm xóm Bờ Sông hè 1996: Khang ngỗ ngược, Tùng (sẹo chữ V lông mày), bé Huy nhỏ thó đeo còi đồng nép sau lưng Tùng, bé Hà váy hoa và bé Mai được ông bế.',
     timestamp: '20:00',
     evidenceId: 'EV-CHILDHOOD-BROKEN-FRAME',
     recoveredBy: 'ĐIỀU TRA VIÊN',
@@ -209,13 +209,13 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     order: 23
   },
   {
-    id: 'ev-p7',
+    id: 'ev-p10',
     caseId: 'case-000',
     kind: 'photo',
-    title: 'p7. Cuống vé xe khách 19:30 (Bằng chứng Tùng)',
-    preview: 'Cuống vé xe khách liên tỉnh Hoàng Long tuyến Hà Nội - Hải Phòng, xuất bến 19:30 ngày 24/07/2026, ghế 14B.',
-    timestamp: '19:30',
-    evidenceId: 'EV-BUS-TICKET-TUNG',
+    title: 'p10. Ảnh chụp màn hình ứng dụng đặt xe ôm của Vũ',
+    preview: 'Lệnh đặt xe ôm của Vũ lúc 19:25:40, tài xế đón lúc 19:30:15 chạy ra Quán Bia 88.',
+    timestamp: '19:25',
+    evidenceId: 'EV-RIDE-VU',
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
@@ -227,9 +227,9 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     id: 'ev-p2',
     caseId: 'case-000',
     kind: 'photo',
-    title: 'p2. Ảnh hiện trường các giấy tờ & ảnh kỷ niệm văng vãi',
-    preview: 'Bản vẽ địa chính và hồ sơ văng vãi dưới sàn phòng khách. Trong đống giấy tờ lẫn một bài báo cắt năm 1998 và một bức ảnh nhỏ chụp 2 đứa trẻ (bé trai đứng bên phải đeo chiếc còi đồng ở cổ).',
-    timestamp: '20:00',
+    title: 'p2. Ảnh hiện trường xấp Đơn tố cáo đòi đất 200m²',
+    preview: 'Xấp Đơn tố cáo đòi lại đất của Mai văng vãi dưới sàn phòng khách, trên góc mép có dính 02 giọt máu khô (M1).',
+    timestamp: '18:50',
     evidenceId: 'EV-SCATTERED-DOCS',
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
@@ -242,9 +242,9 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     id: 'ev-p5',
     caseId: 'case-000',
     kind: 'photo',
-    title: 'p5. Bài báo cũ 1998 về tai nạn ngạt khí tủ gỗ',
-    preview: 'Trang nhật báo cắt năm 1998 đưa tin tai nạn ngạt khí tủ gỗ thương tâm của bé Gia Huy.',
-    timestamp: '15/10/1998',
+    title: 'p5. Mẩu báo cũ 1996 về tai nạn ngạt khí tủ gỗ',
+    preview: 'Trang nhật báo cắt năm 1996 đưa tin tai nạn ngạt khí tủ gỗ thương tâm của bé Gia Huy (7 tuổi) chiều 24/07/1996.',
+    timestamp: '24/07/1996',
     evidenceId: 'EV-OLD-NEWSPAPER',
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
@@ -257,9 +257,9 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     id: 'ev-p6',
     caseId: 'case-000',
     kind: 'photo',
-    title: 'p6. Ảnh tin nhắn điện thoại tình nhân mới (20:40)',
-    preview: 'Màn hình điện thoại nạn nhân sáng tin nhắn tình nhân mới rủ đi du lịch lúc 20:40 PM.',
-    timestamp: '20:40',
+    title: 'p6. Ảnh chuỗi chat Khang & Thảo Vy hẹn trốn đi Đà Lạt',
+    preview: 'Chuỗi tin nhắn trích xuất từ iPhone 8 Plus: Thảo Vy hẹn vé 06:15 sáng mai, Khang gom hơn 2 tỷ tiền mặt bỏ trốn và ruồng rẫy Hà.',
+    timestamp: '17:55',
     evidenceId: 'EV-CHEATING-SMS',
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
@@ -276,16 +276,16 @@ export const HINTS_MAP: Record<string, string[]> = {
     'Ma trận mâu thuẫn khoanh vùng 4 đối tượng có động cơ: Mai, Vũ, Tùng và Hà.'
   ],
   'cp-000-1': [
-    'Đọc Kết quả giám định 09 để xem phân tích vết tẩy xóa hóa chất và tuổi mực bi dầu 2024.',
-    'Khang tẩy tên Mai trên di chúc 2018. Mai có chứng cứ ngoại phạm tại văn phòng luật sư, Vũ có chứng cứ ngoại phạm tại quán nhậu.'
+    'Đọc Báo cáo giám định chữ ký DOC-A1 để xem phân tích chữ ký đồ nét tracing trên Giấy ủy quyền đất 200m².',
+    'Mai có chứng cứ rời đi lúc 19:00, Vũ có hóa đơn chuyển khoản Quán Bia 88 lúc 20:45 cách hiện trường 3.8km.'
   ],
   'cp-000-2': [
-    'Kiểm tra lại báo cáo vết bầm tím sau gáy nạn nhân.',
-    'So sánh mốc thời gian Tùng hoảng sợ tháo chạy trên camera (20:15) với mốc giờ tử vong thực tế.'
+    'Kiểm tra mốc ngày giỗ tròn 30 năm của bé Gia Huy (24/07/1996 - 24/07/2026).',
+    'So sánh mốc thời gian Tùng rời đi lúc 20:15 trước khi chuyến tàu hàng 20:30 chạy qua.'
   ],
   'cp-000-3': [
-    'Đối chiếu chi tiết lỡ lời trong lời khai ban đầu của Trần Thị Hà với hiện trường.',
-    'Hà khai ở nhà cả tối nhưng lại mô tả chính xác Khang gục ngã cạnh bộ bình trà vỡ (vỡ lúc 20:00 bởi Tùng).'
+    'Đối chiếu âm thanh còi tàu 20:32 trong Voicemail và lịch phát sóng VTV3 thứ Sáu (chỉ chiếu Gameshow) với lời khai của Hà.',
+    'Lọn tóc dính máu trong áo ngực của Hà khớp 100% ADN Khang là chứng cứ định tội tuyệt đối.'
   ]
 }
 
@@ -303,59 +303,64 @@ export const PHYSICAL_DIRECTIVES: Record<number, PhysicalDirective> = {
     envelopeType: 'folder',
     badgeText: '📦 TẬP HỒ SƠ BAN ĐẦU TRÊN BÀN',
     documents: [
-      { code: '01', title: 'Báo cáo khám nghiệm tử thi sơ bộ (f1-1)' },
-      { code: '02', title: 'Biên bản khám nghiệm hiện trường vụ án (f1-2)' },
-      { code: '03', title: 'Báo cáo tiến độ điều tra ban đầu (f1-3)' },
-      { code: '04a & 04b', title: 'Báo cáo nhân thân Khang & Lý lịch 6 người liên quan' },
-      { code: '05', title: 'Ma trận mâu thuẫn & mối quan hệ nghi phạm' },
-      { code: '06', title: 'Biên bản lấy lời khai hàng xóm (Nguyễn Thị Lụa)' },
-      { code: '07a - 07d', title: '04 Biên bản lời khai ban đầu (Mai, Vũ, Tùng, Hà)' },
-      { code: '08-tx', title: 'Báo cáo trích xuất tin nhắn điện thoại Khang' },
-      { code: 'p1 & p2', title: 'Ảnh chụp phòng khách & giấy tờ văng vãi dưới sàn' },
-      { code: 'p7', title: 'Cuống vé xe khách 19:30 Hoàng Long của Tùng' }
+      { code: '01', title: 'Phiếu tiếp nhận tin báo từ bà Lụa (06:45)' },
+      { code: '02', title: 'Quyết định khởi tố vụ án hình sự' },
+      { code: '03', title: 'Sơ đồ mặt bằng hiện trường phòng khách' },
+      { code: '04', title: 'Báo cáo khám nghiệm tử thi sơ bộ' },
+      { code: '05', title: 'Biên bản khám nghiệm hiện trường vụ án' },
+      { code: '06', title: 'Báo cáo tiến độ điều tra ban đầu' },
+      { code: '07 & 08', title: 'Nhân thân nạn nhân Khang & Lý lịch 4 nghi phạm' },
+      { code: '09 & 10', title: 'Ma trận mâu thuẫn & Sơ đồ địa lý di chuyển' },
+      { code: '11 - 15', title: '05 Biên bản lời khai ban đầu (Bà Lụa, Mai, Vũ, Tùng, Hà)' },
+      { code: '16', title: 'Biên bản trích xuất dữ liệu điện thoại Khang' },
+      { code: '17', title: 'Mẩu giấy note dán trên hũ trà hoa cúc' },
+      { code: '18', title: 'Bảng tin rao vặt trước cổng nhà Khang' }
     ],
     instructions:
-      'Cả nhóm cùng mở Bìa hồ sơ chính trên bàn cờ, chia nhau các biên bản lời khai và ảnh hiện trường. Hãy đối chiếu tiếng vỡ xoảng lúc >20:00 của hàng xóm với hiện trường để nhận diện vụ xô xát bất thường, sau đó chọn danh sách nghi phạm cần triệu tập bên dưới.'
+      'Cả nhóm cùng mở Bìa hồ sơ chính trên bàn cờ, chia nhau các biên bản lời khai và tài liệu hiện trường. Hãy đối chiếu tiếng vỡ xoảng bình trà lúc ~20:00 của hàng xóm với hiện trường để nhận diện vụ xô xát bất thường, sau đó chọn danh sách nghi phạm cần triệu tập bên dưới.'
   },
   1: {
-    envelopeName: 'PHONG BÌ 01 & 02: HỒ SƠ TRẦN NGỌC MAI & LÊ QUANG VŨ',
+    envelopeName: 'PHONG BÌ 01: HỒ SƠ TUYẾN A (TRẦN NGỌC MAI & LÊ QUANG VŨ)',
     envelopeType: 'envelope',
     badgeText: '✉️ XÉ NIÊM PHONG PHONG BÌ TRÊN BÀN CỜ',
     documents: [
-      { code: '08', title: 'Tờ di chúc ông nội viết tay năm 2018 bị làm giả (f2-1)' },
-      { code: '09', title: 'Kết quả giám định chữ ký & tuổi mực của Viện KHHS (f2-2)' },
-      { code: '10a', title: 'Trích lục bản đồ địa chính gốc 75.0m² (Sở TNMT)' },
-      { code: '10b', title: 'Bản trích đo kỹ thuật đền bù khống 120.0m² (Vũ ký duyệt)' },
-      { code: '10', title: 'Giấy nợ bốc họ 350 triệu giấu vợ của Lê Quang Vũ' }
+      { code: '01', title: 'Kết quả giám định chữ ký đồ nét tracing (DOC-A1)' },
+      { code: '02', title: 'Giấy ủy quyền đất 200m² bị làm giả (EV-SIGN-01)' },
+      { code: '03', title: 'Biên bản họp gia đình 2024 có chữ ký thật (EV-SIGN-02)' },
+      { code: '04', title: 'Đơn tố cáo lừa đảo mang chữ ký 2026 của Mai (EV-SIGN-03)' },
+      { code: '05', title: 'Trích sao sổ ghi nợ tín dụng đen 300M của Vũ (DOC-A5)' },
+      { code: '06', title: 'Sổ thu chi Quán Bia 88 xác nhận thanh toán 20:45 (DOC-A6)' },
+      { code: '07', title: 'Biên bản hỏi cung lần 2 đối với Lê Quang Vũ (DOC-A7)' }
     ],
     instructions:
-      'Hãy tìm và xé tem niêm phong của 02 Phong bì [TRẦN NGỌC MAI] và [LÊ QUANG VŨ] trên bàn cờ. Đọc kết quả giám định chữ ký bằng tia hồng ngoại và so sánh bản đồ 75m² vs 120m² để tìm bằng chứng minh oan cho hai đối tượng này.'
+      'Hãy tìm và xé tem niêm phong Phong bì Tuyến A trên bàn cờ. Đọc kết quả giám định chữ ký đồ nét tracing và giải câu đố Sổ thu chi Quán Bia 88 để tìm bằng chứng minh oan cho Mai & Vũ lúc 20:45.'
   },
   2: {
-    envelopeName: 'PHONG BÌ 03: HỒ SƠ NGUYỄN THANH TÙNG',
+    envelopeName: 'PHONG BÌ 02: HỒ SƠ TUYẾN B (NGUYỄN THANH TÙNG & BI KỊCH 1996)',
     envelopeType: 'envelope',
     badgeText: '✉️ XÉ NIÊM PHONG PHONG BÌ TRÊN BÀN CỜ',
     documents: [
-      { code: '11', title: 'Biên bản trích xuất camera an ninh cây xăng lúc 20:15 (f3-1)' },
-      { code: 'p5', title: 'Bài báo cũ năm 1998 về vụ ngạt khí tủ gỗ âm tường' },
-      { code: 'p4', title: 'Khung ảnh 4 đứa trẻ năm 1998 bị nứt rạn mặt kính' },
-      { code: 'n3', title: 'Mảnh giấy note mật mã vị trí trốn tìm năm 1998' }
+      { code: '01', title: 'Biên bản hỏi cung / Lời tự thú của Nguyễn Thanh Tùng (DOC-B1)' },
+      { code: 'p4', title: 'Khung ảnh kỷ niệm 5 đứa trẻ hè 1996 bị vỡ kính' },
+      { code: 'p5', title: 'Mẩu báo cũ năm 1996 về vụ ngạt khí tủ gỗ của bé Gia Huy' }
     ],
     instructions:
-      'Hãy tìm và xé tem niêm phong của Phong bì [NGUYỄN THANH TÙNG] trên bàn cờ. Đọc bài báo cũ 1998, đối chiếu khung ảnh kỷ niệm và xem biên bản camera cây xăng lúc 20:15 để làm rõ bi kịch quá khứ và động cơ của Tùng.'
+      'Hãy tìm và xé tem niêm phong Phong bì Tuyến B trên bàn cờ. Đọc mẩu báo cũ 1996, đối chiếu khung ảnh kỷ niệm và xem lời tự thú của Tùng để làm rõ bi kịch quá khứ và mốc giờ rời đi lúc 20:15 trước khi tàu hàng 20:30 chạy qua.'
   },
   3: {
-    envelopeName: 'PHONG BÌ 04: HỒ SƠ TRẦN THỊ HÀ (HỒ SƠ TỐI MẬT)',
+    envelopeName: 'PHONG BÌ 03: HỒ SƠ TUYẾN C (TRẦN THỊ HÀ - HỒ SƠ ĐỊNH TỘI)',
     envelopeType: 'envelope',
     badgeText: '✉️ XÉ NIÊM PHONG PHONG BÌ TRÊN BÀN CỜ',
     documents: [
-      { code: '12', title: 'Báo cáo pháp y bổ sung xác nhận giờ tử vong 21:00 (f4-1)' },
-      { code: '13', title: 'Tổng hợp tin nhắn SMS & Email tình nhân hẹn đi du lịch 20:40 (f4-3)' },
-      { code: 'p6', title: 'Ảnh chụp màn hình tin nhắn hẹn hò du lịch lúc 20:40' },
-      { code: 'p3', title: 'Ảnh mảnh thủy tinh sắc nhọn 8cm dính máu khô (hung khí)' }
+      { code: '01', title: 'Báo cáo pháp y tổn thương 2 giai đoạn (DOC-C1)' },
+      { code: '02', title: 'Giám định phổ âm thanh còi tàu trong Voicemail 20:32 (DOC-C2)' },
+      { code: '03', title: 'Biên bản khám xét phòng trọ: Áo gió & Kéo bấm (DOC-C3)' },
+      { code: '04', title: 'Giám định ADN 16 locus STR lọn tóc trong áo ngực (EV-HAIR-DNA)' },
+      { code: '05', title: 'Biên bản hỏi cung / Lời thú tội toàn bộ của Trần Thị Hà (DOC-C5)' },
+      { code: '06', title: 'Lịch phát sóng VTV3 tối thứ Sáu 24/07 (DOC-C6)' }
     ],
     instructions:
-      'Hãy xé tem niêm phong Phong bì cuối cùng: [TRẦN THỊ HÀ] trên bàn cờ. Đọc Báo cáo pháp y bổ sung 12, so sánh mốc giờ tử vong 21:00 với lời khai ban đầu (07d) của Hà để bắt lỗi lỡ lời và nộp bản kết án S-Rank!'
+      'Hãy xé tem niêm phong Phong bì cuối cùng: [TRẦN THỊ HÀ] trên bàn cờ. Đọc Báo cáo pháp y 2 giai đoạn, phân tích âm thanh còi tàu 20:32 và lọn tóc ADN để hoàn thành Bản Cáo Trạng Định Tội!'
   }
 }
 

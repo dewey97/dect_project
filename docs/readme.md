@@ -1,28 +1,33 @@
-# Kiến Trúc Tài Liệu VERITAS (Mục Lục Master)
+# Detective Case System (dect_project) — Documentation Map
 
-Hệ thống tài liệu dự án **VERITAS — Evidence-Driven Investigation Platform** (Đã chuẩn hóa, tinh gọn & quy hoạch tối ưu).
+> **Chỉ mục tài liệu dự án được chuẩn hóa theo 2 tầng: Kỹ thuật (Technical) & Nghiệp vụ (Domain).**
 
 ---
 
-## 📁 Thư Mục Tài Liệu Chính
+## ⚙️ 1. Tầng Kỹ Thuật (Technical Docs)
+Tài liệu về kiến trúc hệ thống, cơ sở dữ liệu, API, và quy trình kỹ thuật:
 
-| Thư Mục Chính | Tên Tài Liệu / Nội Dung | Mô Tả & Chức Năng |
+| Tài Liệu | Nội Dung / Phạm Vi | Đường Dẫn |
 | :--- | :--- | :--- |
-| 📁 [core_specs/](./core_specs/) | 10 Tài Liệu Đặc Tả Master | **Bộ Đặc Tả Hệ Thống Cốt Lõi:** Product Vision, World Bible, Game Design, System Specs, Writing Guidelines, UI/UX Design System, Technical Guide, Database Schema, Admin Studio Spec, Playtest & Business Model. |
-| 📁 [investigation_design/](./investigation_design/) | 6 Chuyên Đề Sáng Tác | **Kinh Thánh Thiết Kế Cuộc Điều Tra:** Thuật ngữ (Ontology), Triết lý phá án, AI Authoring Flow, Ma trận Manh mối, Validation Standards & Pitfalls. |
-| 📁 [cases/](./cases/) | `case_000/`, `case_001/`, `case_002/` | **Hồ Sơ Vụ Án:** Thư mục lưu trữ kịch bản, bằng chứng & dữ liệu JSON của từng vụ án (`case_000`, `case_001`...). |
+| **System Specifications** | Đặc tả kỹ thuật hệ thống, luồng dữ liệu & kiến trúc tổng thể | [`core_specs/04_system_specifications.md`](core_specs/04_system_specifications.md) |
+| **Technical Guide** | Hướng dẫn setup, cấu trúc code, quy trình build LaTeX | [`core_specs/07_technical_guide.md`](core_specs/07_technical_guide.md) |
+| **Database Schema** | Cấu trúc dữ liệu, bảng điều tra, manh mối & quan hệ | [`core_specs/08_database_schema.md`](core_specs/08_database_schema.md) |
+| **Design System & UI/UX** | Hệ thống màu sắc, typography phong cách trinh thám, component specs | [`core_specs/06_ux_ui_design_system.md`](core_specs/06_ux_ui_design_system.md) |
+| **Investigation Engine** | Kiến trúc engine điều tra và xử lý logic phá án | [`investigation_design/02_architecture_and_engine.md`](investigation_design/02_architecture_and_engine.md) |
+| **Validation & Pitfalls** | Các lỗi kỹ thuật cần tránh khi xây dựng engine | [`investigation_design/05_validation_and_pitfalls.md`](investigation_design/05_validation_and_pitfalls.md) |
 
 ---
 
-## 📑 Chi Tiết 10 Tài Liệu Đặc Tả Cốt Lõi (`docs/core_specs/`)
+## 🧠 2. Tầng Nghiệp Vụ Riêng (Domain Docs)
+Tài liệu về cốt truyện vụ án, cơ chế game trinh thám, lời khai và bằng chứng:
 
-1. 📄 [01_product_vision.md](./core_specs/01_product_vision.md) — Tầm nhìn sản phẩm, định vị cốt lõi, mô hình phễu kinh doanh và lộ trình phát triển.
-2. 📄 [02_world_building.md](./core_specs/02_world_building.md) — Thế giới hư cấu hiện đại (Fictional Reality), Mạng lưới 5 Quân Cờ và Cơ sở dữ liệu Mạch cốt truyện (Lore Threads).
-3. 📄 [03_game_design.md](./core_specs/03_game_design.md) — Vòng lặp gameplay cốt lõi, chế độ chơi, ma trận độ khó và nền kinh tế game.
-4. 📄 [04_system_specifications.md](./core_specs/04_system_specifications.md) — Đặc tả kỹ thuật hợp nhất cho tất cả các màn hình & hệ thống chức năng của game.
-5. 📄 [05_content_and_writing_guidelines.md](./core_specs/05_content_and_writing_guidelines.md) — Zod/JSON Case Data Schema, quy tắc biên kịch, thuật ngữ và giọng văn.
-6. 📄 [06_ux_ui_design_system.md](./core_specs/06_ux_ui_design_system.md) — Thư viện Component, Token thiết kế, Typography và Quy tắc Styling UI.
-7. 📄 [07_technical_guide.md](./core_specs/07_technical_guide.md) — Cấu trúc mã nguồn Next.js 16, Tech stack, hướng dẫn phát triển cục bộ và biên dịch vụ án.
-8. 📄 [08_database_schema.md](./core_specs/08_database_schema.md) — Cấu trúc bảng CSDL Supabase (PostgreSQL) cho Vụ án, Manh mối và Tài khoản.
-9. 📄 [09_admin_studio_guide.md](./core_specs/09_admin_studio_guide.md) — Cẩm năng đặc tả tính năng và thiết kế UI/UX cho hệ thống Admin Studio (Case Editor).
-10. 📄 [10_playtest_and_business.md](./core_specs/10_playtest_and_business.md) — Quy trình Playtest, báo cáo lỗi, chiến lược tiếp thị và mô hình phát hành.
+| Tài Liệu | Nội Dung / Phạm Vi | Đường Dẫn |
+| :--- | :--- | :--- |
+| **Product Vision** | Định hướng sản phẩm và trải nghiệm người chơi | [`core_specs/01_product_vision.md`](core_specs/01_product_vision.md) |
+| **World Building** | Bối cảnh thế giới, dòng thời gian và không gian vụ án | [`core_specs/02_world_building.md`](core_specs/02_world_building.md) |
+| **Game Design** | Cơ chế gameplay, luồng giải đố và điều kiện phá án | [`core_specs/03_game_design.md`](core_specs/03_game_design.md) |
+| **Content & Writing Guidelines** | Quy chuẩn văn phong tài liệu cảnh sát, biên bản hiện trường | [`core_specs/05_content_and_writing_guidelines.md`](core_specs/05_content_and_writing_guidelines.md) |
+| **Clues & Narrative Rules** | Quy tắc xâu chuỗi manh mối, logic suy luận & bẫy trinh thám | [`investigation_design/04_clues_and_narrative_rules.md`](investigation_design/04_clues_and_narrative_rules.md) |
+| **Ontology & Philosophy** | Triết lý điều tra & mô hình bản thể học chứng cứ | [`investigation_design/01_ontology_and_philosophy.md`](investigation_design/01_ontology_and_philosophy.md) |
+| **Authoring Templates** | Bản mẫu tạo hồ sơ vụ án mới | [`investigation_design/06_authoring_templates.md`](investigation_design/06_authoring_templates.md) |
+| **Admin Studio Guide** | Hướng dẫn quản trị và biên soạn vụ án trong studio | [`core_specs/09_admin_studio_guide.md`](core_specs/09_admin_studio_guide.md) |

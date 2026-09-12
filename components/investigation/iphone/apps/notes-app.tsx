@@ -19,12 +19,14 @@ export function NotesApp({ notes }: NotesAppProps) {
       id: 'n-01',
       title: 'Sổ nợ bốc họ & Lãi ngoài tháng 7/2026',
       content: '1. Lê Quang Vũ (Đo đạc): 350.000.000đ — Lãi tính 3.000đ/triệu/ngày. Đã hẹn tối 24/7 sang chốt dứt điểm.\n2. Nam "Còi": 80.000.000đ — Quá hạn 2 tháng.\n3. Hưng đồ gỗ: 120.000.000đ.',
+      meta: '24/07/2026',
       timestamp: '24/07/2026'
     },
     {
       id: 'n-02',
       title: 'Kế hoạch đền bù đất Bờ Sông (Thửa 2021-BS14)',
       content: 'Diện tích gốc: 75m2.\nBắt thằng Vũ vẽ lại trích đo lên 120m2 để ăn tiền đền bù đợt 1 Ban QLDA.\nTờ di chúc ông nội đã sửa xong ngày, con Mai không có cửa tranh.',
+      meta: '22/07/2026',
       timestamp: '22/07/2026'
     }
   ]
@@ -48,7 +50,7 @@ export function NotesApp({ notes }: NotesAppProps) {
               <ArrowLeft className="size-4" />
               <span>Ghi chú</span>
             </button>
-            <span className="text-[10px] text-[#8E8E93] font-mono">{selectedNote.timestamp}</span>
+            <span className="text-[10px] text-[#8E8E93] font-mono">{selectedNote.timestamp || selectedNote.meta}</span>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -92,7 +94,7 @@ export function NotesApp({ notes }: NotesAppProps) {
                 >
                   <div className="text-[13px] font-bold text-white truncate">{note.title}</div>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[10px] text-[#8E8E93] font-mono shrink-0">{note.timestamp}</span>
+                    <span className="text-[10px] text-[#8E8E93] font-mono shrink-0">{note.timestamp || note.meta}</span>
                     <span className="text-[11px] text-[#A1A1A6] truncate">{note.content.replace(/\n/g, ' ')}</span>
                   </div>
                 </div>

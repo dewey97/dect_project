@@ -48,20 +48,20 @@ const PHASE_VISUAL_CLUES: Record<string, PhaseVisualClue> = {
   },
   'cp-000-1': {
     imageUrl: '/photo_scattered_docs.jpg',
-    tag: 'TRANH CHẤP DI CHÚC & ĐỊA CHÍNH 2018',
-    subtitle: 'Tờ di chúc bị tẩy xóa bằng cồn và bản trích đo đất đền bù mâu thuẫn 75m² vs 120m².',
+    tag: 'GIẢ MẠO CHỮ KÝ ỦY QUYỀN ĐẤT 200M²',
+    subtitle: 'Chữ ký đồ nét tracing trên Giấy ủy quyền đất và món nợ 300 triệu bốc họ.',
     badgeColor: 'border-orange-700/80 bg-orange-950/90 text-orange-300'
   },
   'cp-000-2': {
     imageUrl: '/photo_old_newspaper.jpg',
-    tag: 'TÀI LIỆU QUÁ KHỨ 1998 // VỤ NGẠT KHÍ',
-    subtitle: 'Trang nhật báo cũ 1998 về tai nạn ngạt khí tủ gỗ & cuống vé xe khách rời bến lúc 19:30.',
+    tag: 'TÀI LIỆU QUÁ KHỨ 1996 // NGÀY GIỖ 30 NĂM',
+    subtitle: 'Trang nhật báo cũ 1996 về tai nạn ngạt khí tủ gỗ của bé Gia Huy & khung ảnh kỷ niệm bị vỡ.',
     badgeColor: 'border-sky-700/80 bg-sky-950/90 text-sky-300'
   },
   'cp-000-3': {
     imageUrl: '/photo_glass_shard.jpg',
     tag: 'VẬT CHỨNG QUYẾT ĐỊNH // 21:00 PM',
-    subtitle: 'Mảnh thủy tinh sắc nhọn 8cm dính máu khô & tin nhắn tình nhân rủ đi du lịch lúc 20:40.',
+    subtitle: 'Mảnh bình trà 8.2cm dính máu khô, còi tàu 20:32 & lọn tóc ADN trong áo ngực của Hà.',
     badgeColor: 'border-red-700/80 bg-red-950/90 text-red-300'
   }
 }

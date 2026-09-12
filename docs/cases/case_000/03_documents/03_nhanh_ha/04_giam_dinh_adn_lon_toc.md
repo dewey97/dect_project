@@ -21,7 +21,7 @@ Số: `14b/KL-GDADN`
 1. **Mẫu cần giám định (Mẫu X):** 
    - 01 lọn tóc nam giới dài 4.2cm thu giữ trong túi nilon zip nhỏ giấu tại lớp đệm áo ngực của Trần Thị Hà (`EV-HAIR-DNA`).
    - Vết máu khô bám dính trên phần chân lọn tóc trên.
-2. **Mẫu so sánh chuẩn (Mẫu N):** Mẫu máu tử thi của nạn nhân **Nguyễn Văn Khang (SN 1993)** do Phòng Kỹ thuật Hình sự cung cấp.
+2. **Mẫu so sánh chuẩn (Mẫu N):** Mẫu máu tử thi của nạn nhân **Nguyễn Văn Khang (SN 1988)** do Phòng Kỹ thuật Hình sự cung cấp.
 
 ---
 

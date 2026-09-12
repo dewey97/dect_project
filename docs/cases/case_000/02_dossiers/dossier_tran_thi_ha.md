@@ -13,7 +13,7 @@
 ```
                        ┌──────────────────────────────────────┐
                        │  ẢNH HỒ SƠ CĂN CƯỚC TỘI PHẠM (ID)    │
-                       │  MÃ SỐ ĐỐI TƯỢNG: 000-SP-HA-1994     │
+                       │  MÃ SỐ ĐỐI TƯỢNG: 000-SP-HA-1990     │
                        │  TÌNH TRẠNG: ĐÃ BỊ BẮT KHẨN CẤP      │
                        │  PHÂN LOẠI: NGUY HIỂM / LỆCH LẠC TÂM LÝ│
                        └──────────────────────────────────────┘
@@ -40,8 +40,8 @@
 | :--- | :--- |
 | **Họ và tên khai sinh** | **TRẦN THỊ HÀ** |
 | **Bí danh / Tên thường gọi**| Hà "Kế toán" / Bé Hà (thời niên thiếu) |
-| **Ngày tháng năm sinh** | 22/09/1994 (32 tuổi tính đến thời điểm xảy ra vụ án) |
-| **Số CCCD** | `001194008271`, cấp ngày 14/03/2021 tại Cục CSQLHC về TTXH |
+| **Ngày tháng năm sinh** | 22/09/1990 (36 tuổi tính đến thời điểm xảy ra vụ án) |
+| **Số CCCD** | `001190008271`, cấp ngày 14/03/2021 tại Cục CSQLHC về TTXH |
 | **Số điện thoại** | `0984.112.568` |
 | **Quê quán** | Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi cư trú hiện tại** | Số 8, Ngõ 12 Đường Bờ Sông (cách nhà nạn nhân và đường sắt **1.2 km** trong ngõ sâu) |
@@ -101,7 +101,7 @@
 * **20:00 – 20:15:** Hà nghe thấy tiếng cãi vã dữ dội và tiếng bình trà thủy tinh vỡ từ bên trong nhà Khang.
 * **20:15:** Tùng hốt hoảng chạy ra khỏi ngõ bắt xe ôm về phòng trọ Cầu Bươu.
 * **20:31 – 20:32:** Hà gọi điện cho Khang nhưng Khang không nghe máy $\rightarrow$ chuyển sang Voicemail lúc 20:32:15, đúng lúc đoàn tàu hàng chạy qua kéo còi và chuông gác chắn reo.
-* **20:45:** Thấy cổng không khóa, Hà lẻn vào nhà. Nhìn thấy Khang nằm mê man dưới sàn, Hà lấy tay Khang mở khóa điện thoại phát hiện tin nhắn Khang hẹn bỏ trốn đi xa với người tình mới Thảo Vy $\rightarrow$ Cơn cuồng ghen bùng nổ.
+* **20:45:** Thấy cổng không khóa, Hà lẻn vào nhà. Nhìn thấy Khang nằm mê man dưới sàn, Hà cầm chiếc iPhone 8 Plus rơi bên cạnh lấy ngón tay cái của Khang áp vào nút Home mở khóa Touch ID và phát hiện chuỗi tin nhắn Khang hẹn bay chuyến 06:15 sáng mai bỏ trốn đi xa với người tình mới Thảo Vy và chửi Hà là 'con phiền phức bám đuôi' $\rightarrow$ Cơn cuồng ghen bùng nổ.
 * **21:00 (HÀNH VI GÂY ÁN):** Hà nhặt mảnh vỡ bình trà thủy tinh `p3` dưới sàn đâm cứa đứt động mạch cảnh của Khang.
 * **21:04:** Nhìn Khang trút hơi thở cuối cùng, Hà lấy chiếc kéo bấm trong túi cắt lấy một lọn tóc mai dính máu gói vào túi zip giấu trong áo ngực.
 * **21:08:** Hà chuồn ra bằng cửa nách phía sau về phòng trọ tiêu hủy dấu vết.

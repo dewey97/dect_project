@@ -19,7 +19,7 @@
 │                                                                             │
 │   [VẾT SƠN ĐỎ XỊT LỚN TRÊN MẢNG TƯỜNG GẠCH]:                                │
 │   "ĐMM KHANG CHÓ TRẢ TIỀN BỐ MÀY!!!"                                        │
-│   "KHANG LỪA ĐẢO CƯỚP ĐẤT — MÀY KHÔNG THOÁT ĐƯỢC ĐÂU!"                      │
+│   "KHANG LỪA ĐẢO — MÀY KHÔNG THOÁT ĐƯỢC ĐÂU!"                                │
 │   (Vết sơn xịt nham nhở, có dấu hiệu bị cọ xóa dở dang cách đây vài ngày)   │
 │                                                                             │
 │ ─────────────────────────────────────────────────────────────────────────── │

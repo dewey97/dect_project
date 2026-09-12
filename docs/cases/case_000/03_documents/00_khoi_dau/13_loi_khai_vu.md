@@ -21,8 +21,8 @@ Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 **Tiến hành lấy lời khai người liên quan:**
-* **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1994.
-* **CCCD số:** `001094005812` cấp ngày 12/04/2021 tại Cục CSQLHC về TTXH.
+* **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991 (35 tuổi).
+* **CCCD số:** `001091005812` cấp ngày 12/04/2021 tại Cục CSQLHC về TTXH.
 * **Nơi ĐKHKTT:** Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.
 * **Nghề nghiệp:** Kỹ sư Điện tự do (Chồng của Trần Ngọc Mai).
 

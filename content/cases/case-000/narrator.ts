@@ -13,30 +13,30 @@ export const CASE_000_NARRATOR: Record<number, PhaseNarrator> = {
     subtitle: 'Đêm 24/07/2026',
     date: 'Đêm 24/07/2026',
     monologue:
-      'Căn nhà cũ số 14 Đường Bờ Sông chìm trong bóng tối tịch mịch.\n\nMùi trà xanh tươi quyện lẫn vị máu tanh nồng bốc lên từ bộ bình gốm sứ vỡ vụn dưới sàn phòng khách...\n\nTiếng bước chân lẩn khuất ngoài ngõ vắng vừa biến mất. Nạn nhân Khang gục xuống, nhưng sự thật dường như vẫn còn bị phong ấn...'
+      'Căn nhà cũ số 14 Đường Bờ Sông chìm trong bóng tối tịch mịch.\n\nMùi trà hoa cúc quyện lẫn vị máu tanh nồng bốc lên từ bộ bình thủy tinh vỡ vụn dưới sàn phòng khách...\n\nTiếng bước chân lẩn khuất ngoài ngõ vắng vừa biến mất. Nạn nhân Khang gục xuống, nhưng sự thật dường như vẫn còn bị phong ấn...'
   },
   1: {
     phase: 1,
-    title: 'GIAI ĐOẠN 1: TỜ DI CHÚC TẨY XÓA & VẾT MỰC BI 2024',
+    title: 'GIAI ĐOẠN 1: GIẢ MẠO CHỮ KÝ ĐẤT ĐAI & MÓN NỢ 300 TRIỆU',
     subtitle: 'Sáng 25/07/2026',
     date: 'Sáng 25/07/2026',
     monologue:
-      'Lòng tham và đất đai đền bù hàng tỷ đồng đã làm mờ mắt con người.\n\nTờ di chúc năm 2018 bị gột rửa bằng hóa chất độc hại để chèn lên dòng chữ bi hóa dầu năm 2024.\n\nNhưng liệu một tờ giấy bị tráo đổi có phải là ngọn nguồn thực sự dẫn đến vụ án mạng đẫm máu đêm mưa?'
+      'Lòng tham và quyền thừa kế thửa đất 200m² đã làm mờ mắt con người.\n\nChữ ký trên Giấy ủy quyền bị sao chép tinh vi bằng kỹ thuật đồ nét (tracing) hòng chiếm trọn tài sản của gia tộc.\n\nNhưng liệu mâu thuẫn đất đai có phải là ngọn nguồn thực sự dẫn đến vụ án mạng đẫm máu đêm mưa?'
   },
   2: {
     phase: 2,
-    title: 'GIAI ĐOẠN 2: KỶ VẬT QUÁ KHỨ & TIẾNG XÔ XÁT ĐÊM 24/07',
+    title: 'GIAI ĐOẠN 2: BI KỊCH TRỐN TÌM 1996 & NGÀY GIỖ 30 NĂM',
     subtitle: 'Chiều 25/07/2026',
     date: 'Chiều 25/07/2026',
     monologue:
-      'Trò chơi trốn tìm 12 năm trước tưởng chừng đã ngủ yên dưới lớp bụi thời gian...\n\nMột bài báo ố vàng, chiếc còi đồng im lìm và bóng người tháo chạy hoảng loạn lúc 20:15 trong đêm tối.\n\nSự căm hận tích tụ suốt hơn mười năm qua... liệu có phải là nhát đao cuối cùng lấy đi mạng sống của Khang?'
+      'Trò chơi trốn tìm 30 năm trước tưởng chừng đã ngủ yên dưới lớp bụi thời gian...\n\nMột mẩu báo cũ ố vàng 1996, khung ảnh kỷ niệm vỡ kính và tiếng cãi vã lúc 20:00 trong đêm tối.\n\nSự căm hận tích tụ suốt ba mươi năm qua... liệu có phải là nhát đao cuối cùng lấy đi mạng sống của Khang?'
   },
   3: {
     phase: 3,
-    title: 'GIAI ĐOẠN 3: PHÁN QUYẾT CUỐI CÙNG & ĐỘNG CƠ CUỒNG SỞ HỮU',
+    title: 'GIAI ĐOẠN 3: PHÁN QUYẾT CUỐI CÙNG & SỰ THẬT CƠN CUỒNG GHEN',
     subtitle: 'Đêm 25/07/2026',
     date: 'Đêm 25/07/2026',
     monologue:
-      'Màn đêm bao phủ căn nhà số 14 Đường Bờ Sông khi các báo cáo pháp y cuối cùng được giải mã...\n\nMọi lời khai nhân chứng bắt đầu rạn nứt. Mốc giờ tử vong thực tế lệch khỏi mọi suy đoán ban đầu.\n\nĐã đến lúc bóc tách lớp mặt nạ cuối cùng, chỉ ra kẻ thực sự vơ lấy mảnh thủy tinh đâm chết nạn nhân đêm đó!'
+      'Màn đêm bao phủ căn nhà số 14 Đường Bờ Sông khi các báo cáo giám định cuối cùng được giải mã...\n\nMọi lời khai ngoại phạm bắt đầu sụp đổ trước âm thanh còi tàu và lịch phát sóng truyền hình.\n\nĐã đến lúc bóc tách lớp mặt nạ cuối cùng, vạch trần kẻ cuồng yêu đã ra tay hạ sát nạn nhân đêm đó!'
   }
 }

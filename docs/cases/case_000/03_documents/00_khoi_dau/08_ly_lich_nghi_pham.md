@@ -21,8 +21,8 @@ Số: `04b/BC-RSLL`
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ 1. TRẦN NGỌC MAI                                                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ • Năm sinh: 15/05/1996 (30 tuổi). Giới tính: Nữ.                           │
-│ • Số CCCD: 001196004523 (Cấp ngày 10/08/2022).                             │
+│ • Năm sinh: 15/05/1992 (34 tuổi). Giới tính: Nữ.                           │
+│ • Số CCCD: 001192004523 (Cấp ngày 10/08/2022).                             │
 │ • ĐKHKTT: Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.                │
 │ • Nghề nghiệp: Chuyên viên Hành chính — Nhân sự (Công ty CP May Mặc).       │
 │ • Số điện thoại chính chủ: 0912.456.789.                                    │
@@ -31,30 +31,30 @@ Số: `04b/BC-RSLL`
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ 2. LÊ QUANG VŨ                                                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ • Năm sinh: 20/09/1994 (32 tuổi). Giới tính: Nam.                          │
-│ • Số CCCD: 001094005812 (Cấp ngày 12/04/2021).                             │
+│ • Năm sinh: 20/09/1991 (35 tuổi). Giới tính: Nam.                          │
+│ • Số CCCD: 001091005812 (Cấp ngày 12/04/2021).                             │
 │ • ĐKHKTT: Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.                │
 │ • Nghề nghiệp: Kỹ sư Điện & Lắp đặt thiết bị tự do.                         │
 │ • Đặc điểm nhận dạng: Mắt trái có tật lác nhẹ (lé nhẹ); đeo kính gọng đen.  │
-│ • Số điện thoại liên lạc: 0988.20.09.94.                                    │
+│ • Số điện thoại liên lạc: 0988.20.09.91.                                    │
 │ • Tiền án, tiền sự: Không. (Kinh doanh làm ăn gặp khó khăn nợ nần).          │
 │ • Quan hệ: Chồng của Trần Ngọc Mai; Con nợ của nạn nhân Khang.              │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ 3. NGUYỄN THANH TÙNG                                                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ • Năm sinh: 18/03/1990 (36 tuổi). Giới tính: Nam.                          │
-│ • Số CCCD: 001090003412 (Cấp ngày 14/05/2021).                             │
+│ • Năm sinh: 18/03/1986 (40 tuổi). Giới tính: Nam.                          │
+│ • Số CCCD: 001086003412 (Cấp ngày 14/05/2021).                             │
 │ • ĐKHKTT: Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.           │
 │ • Chỗ ở hiện nay: Phòng trọ công nhân số 18 Phố Cầu Bươu.                   │
 │ • Nghề nghiệp: Lao động tự do (Thợ hồ, sửa chữa nhà cửa dân dụng).          │
 │ • Số điện thoại chính chủ: 0913.882.901.                                    │
 │ • Tiền án, tiền sự: Không.                                                  │
-│ • Quan hệ: Hàng xóm cùng xóm Bờ Sông thời niên thiếu của nạn nhân Khang.    │
+│ • Quan hệ: Bạn bè cùng xóm Bờ Sông thời niên thiếu của nạn nhân Khang.      │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ 4. TRẦN THỊ HÀ                                                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ • Năm sinh: 22/09/1994 (32 tuổi). Giới tính: Nữ.                           │
-│ • Số CCCD: 001194008271 (Cấp ngày 14/03/2021).                             │
+│ • Năm sinh: 22/09/1990 (36 tuổi). Giới tính: Nữ.                           │
+│ • Số CCCD: 001190008271 (Cấp ngày 14/03/2021).                             │
 │ • ĐKHKTT: Số 8, Ngõ 12 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.     │
 │ • Nghề nghiệp: Kế toán tổng hợp — Công ty TNHH Vận tải Sông Hồng.           │
 │ • Số điện thoại chính chủ: 0984.112.568.                                    │

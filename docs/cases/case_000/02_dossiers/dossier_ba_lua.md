@@ -75,15 +75,15 @@
   │                   │                   │                    │               │
   ├───────────────────┼───────────────────┼────────────────────┼───────────────┤
 Mai chở Vũ sang     Vũ ở lại cãi cọ,    Xô xát dữ dội,       Bóng người áo   Bà Lụa quét ngõ,
-cãi vã đòi đất.     rồi tháo chạy ra    vỡ xoảng bình trà,   gió trùm đầu    phát hiện thi thể
-Mai về đúng 19:00   đầu ngõ bắt xe ôm   Tùng bỏ chạy         lẻn vào nhà     Khang trong vũng máu
+cãi vã đòi đất.     rồi tháo chạy ra    vỡ xoảng bình trà;   gió trùm đầu    phát hiện thi thể
+Mai về đúng 19:00   đầu ngõ bắt xe ôm   bà Lụa chốt cửa ngủ  lẻn vào nhà     Khang trong vũng máu
 ```
 
 ### 1. Mốc 18:30 – 19:00 (Trần Ngọc Mai & Lê Quang Vũ):
 > *"Tầm 18h30, tôi đang dọn dẹp hàng quán thì thấy cái Mai đi xe máy chở thằng Vũ chồng nó sang. Đến đúng lúc nhạc hiệu Thời sự 19h00 VTV1 vang lên bên nhà tôi, tôi nghe tiếng xe máy của cái Mai rồ ga phóng vụt ra khỏi ngõ một mình."*
 
-### 2. Mốc 20:00 – 20:15 (Tiếng bình trà vỡ & Bóng người thợ nề chạy ra):
-> *"Lúc 20h00, tôi đang ngồi ăn cơm xem Gameshow ca nhạc trên VTV3 thì giật mình vì bên nhà Khang có tiếng đàn ông to tiếng cãi cọ xô đẩy nhau. Đến tầm hơn 20h00 bỗng 'XOẢNG' một cái thật to — tiếng bình trà thủy tinh đập vỡ toang dưới nền gạch. Tôi hé rèm ngó sang thấy đèn phòng khách vẫn sáng, đến khoảng 20h15 thấy một người đàn ông mặc áo bảo hộ thợ nề (Tùng) hớt hải chạy vội ra ngõ rồi mất hút. Sau đó bên nhà nó im ắng hẳn nên tôi khóa cửa đi ngủ."*
+### 2. Mốc 20:00 — Hơn 20:00 (Tiếng xô xát & Bình trà vỡ xoảng):
+> *"Lúc 20h00, tôi đang ngồi ăn cơm xem Gameshow ca nhạc trên VTV3 thì giật mình vì bên nhà Khang có tiếng đàn ông to tiếng cãi cọ xô đẩy nhau. Đến tầm hơn 20h00 bỗng 'XOẢNG' một cái thật to — tiếng bình trà thủy tinh đập vỡ toang dưới nền gạch. Tôi sợ xảy ra đâm chém nhau vì chuyện nợ nần nên vội tắt bớt đèn phòng ngoài rồi chốt chặt cửa đi ngủ, không dám ngó sang nữa nên không rõ người đàn ông kia rời đi lúc nào."*
 
 ---
 

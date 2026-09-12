@@ -18,7 +18,7 @@ Số: `03/BC-CASC`
 **Kính gửi:** Ban Giám đốc Công an Thành phố Hà Nội
 
 ### I. TÓM TẮT DIỄN BIẾN BAN ĐẦU
-Hồi 06 giờ 45 phút ngày 25/07/2026, Công an Phường Phân khu Cảng tiếp nhận tin báo từ quần chúng nhân dân (bà Nguyễn Thị Lụa) về việc phát hiện anh **Nguyễn Văn Khang (SN 1993)** tử vong bất thường tại phòng khách nhà riêng số 14 Đường Bờ Sông.
+Hồi 06 giờ 45 phút ngày 25/07/2026, Công an Phường Phân khu Cảng tiếp nhận tin báo từ quần chúng nhân dân (bà Nguyễn Thị Lụa) về việc phát hiện anh **Nguyễn Văn Khang (SN 1988)** tử vong bất thường tại phòng khách nhà riêng số 14 Đường Bờ Sông.
 
 Ban Chỉ huy Phòng Cảnh sát Hình sự (PC02) đã khẩn cấp điều động Đội Điều tra Trọng án phối hợp cùng Phòng Kỹ thuật Hình sự (PC09) và VKSND TP. Hà Nội tiếp cận, phong tỏa và bảo vệ hiện trường nghiêm ngặt.
 

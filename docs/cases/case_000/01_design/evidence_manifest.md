@@ -16,20 +16,20 @@
 │ • 02_quyet_dinh_khoi_to.md  : Khởi tố vụ án hình sự                                              │
 │ • 03_so_do_hien_truong.md   : Định vị tang vật p1, p2, p3, p4, p5, 10a, 17                       │
 │ • 04_kham_nghiem_tu_thi.md  : Chết 20:45–21:15 (~21:00); mảng tóc mai bị cắt sát da đầu          │
-│ • 05_kham_nghiem_hien_truong: Thu giữ bình trà vỡ p1, hung khí p3, vết máu M1                    │
+│ • 05_kham_nghiem_hien_truong: Thu giữ bình trà vỡ p1, hung khí p3, vết máu M1, vân tay tách trà   │
 │ • 06_tien_do_dieu_tra.md    : Báo cáo tiến độ & ma trận 4 mâu thuẫn                              │
 │ • 07_nhan_than_nan_nhan.md  : Khang làm nghề cho vay nặng lãi, mồ côi                            │
-│ • 08_ly_lich_nghi_pham.md   : Trích lục lý lịch (Mai, Vũ, Tùng, Hà)                              │
+│ • 08_ly_lich_nghi_pham.md   : Trích lục lý lịch (Mở khóa sau khi tra cứu đủ 3 SĐT không tên)    │
 │ • 09_ma_tran_mau_thuan.md   : Phân lập 4 hướng điều tra                                          │
 │ • 10_so_do_dia_ly.md        : Khoảng cách di chuyển giữa các địa điểm                            │
-│ • 11_loi_khai_nhan_chung.md : Lời khai bà Lụa (19:00 VTV1, xô xát 20:00, bóng người 20:45)       │
+│ • 11_loi_khai_nhan_chung.md : Lời khai bà Lụa & phỏng vấn bố mẹ Tùng (người lớn sang mời giỗ)     │
 │ • 12_loi_khai_mai.md        : Mai khai đòi đất ném đơn rồi về 19:00                              │
 │ • 13_loi_khai_vu.md         : Vũ khai ra cùng Mai, đặt xe ôm 19:30 đi nhậu Quán Bia 88           │
-│ • 14_loi_khai_tung.md       : Tùng khai ghé vài phút, có vết bầm mặt & sưng tay                  │
+│ • 14_loi_khai_tung.md       : Tùng khai chỉ gọi 19:55 vay tiền, KHÔNG GẶP MẶT Khang đêm đó       │
 │ • 15_loi_khai_ha.md         : Hà khai ở phòng trọ xem phim VTV3 cả tối                           │
-│ • 16_trich_xuat_dien_thoai  : SMS nợ 300M, SMS 15:30 từ Tùng, Voicemail 20:32 lọt còi tàu        │
+│ • 16_trich_xuat_dien_thoai  : Nhật ký cuộc gọi (04 số không liên lạc: 2 Sổ nợ, 1 Rao vặt Tùng)   │
 │ • 17_giay_note_hoa_cuc.md   : Note viết tay dán hũ trà hoa cúc                                   │
-│ • 18_bang_tin_rao_vat.md    : SĐT thợ nề Tùng, tin mất cáp 20:10, giờ gom rác đường tàu 20:30    │
+│ • 18_bang_tin_rao_vat.md    : Rao vặt Tùng (SĐT 19:55), tin mất cáp 20:10, quy hoạch xóm Bờ Sông │
 └─────────────────────────────────┬──────────────────────────────────┬─────────────────────────────┘
                                   │                                  │
                [LỰA CHỌN TỰ DO 1] │                                  │ [LỰA CHỌN TỰ DO 2]
@@ -47,20 +47,28 @@
 │ • 06_so_thu_chi_quan_bia.md(DOC-A6 - Bàn 7 195k) │ │                                             │
 │ • 07_loi_khai_lan_2_vu.md  (DOC-A7 - Thấy áo gió)│ │ *(Kết hợp với p4, p5, Bảng tin từ Phase 0   │
 │                                                  │ │   và Pháp y Phase 0 để loại trừ Tùng)*      │
-│ ➔ KẾT QUẢ: Minh oan cho Vũ lúc 20:45             │ │                                             │
-│   (Thanh toán tại Quán Bia 88 cách 3.8km).       │ │ ➔ KẾT QUẢ: Loại trừ Tùng trước giờ chết!   │
+│ ➔ KẾT QUẢ: Minh oan cho Vũ lúc 20:45             │ │ ➔ KẾT QUẢ: Rơi vào ngõ cụt! Tùng có động cơ, │
+│   (Thanh toán tại Quán Bia 88 cách 3.8km).       │ │   có xô xát nhưng chưa thể định tội giết người.│
 └────────────────────────┬─────────────────────────┘ └──────────────────────┬──────────────────────┘
                          │                                                  │
                          └────────────────────────┬─────────────────────────┘
-                                                  │ (Sau khi hoàn tất cả 2 Tuyến A & B)
+                                                  │ (Mắc kẹt: Đã dùng hết chứng cứ ban đầu)
                                                   ▼
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ ❓ CÂU HỎI CHUYỂN TIẾP: CÚ HỘI TỤ 3 CHIỀU BÓC TRẦN NGOẠI PHẠM CỦA HÀ                             │
+│ 🎫 NÚT THẮT CHUYỂN TIẾP: LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG (`CARD-RE-INVESTIGATE`)                    │
+├──────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ • Thẻ cứng trong hộp điều tra: Quét mã QR ➔ Kích hoạt tái khám nghiệm / thực nghiệm hiện trường  │
+│ • Âm thanh thực nghiệm: Nghe thấy tiếng còi tàu hàng & chuông gác chắn đường sắt rú vang tại nhà │
+└─────────────────────────────────────────────────┬────────────────────────────────────────────────┘
+                                                  │
+                                                  ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ ❓ CÂU HỎI CHUYỂN TIẾP: CÚ HỘI TỤ ĐẬP TAN NGOẠI PHẠM CỦA TRẦN THỊ HÀ                             │
 ├──────────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 1. Mảnh ghép từ Tuyến A (Vũ): Thấy bóng áo gió rình dưới gốc cây xoan từ 19:25.                 │
-│ 2. Mảnh ghép từ Tuyến B (Tùng): Giờ tàu hàng chạy qua trước ngõ lúc 20:30 – 20:35.               │
-│ 3. Mảnh ghép từ Hồ sơ Hà: Voicemail 20:32 lọt tiếng còi tàu + Lịch VTV3 thứ Sáu không có phim.  │
-│ ➔ Bóc trần: Hà đang nói dối, thực chất đang đứng trước cổng nhà Khang lúc 20:32!                │
+│ 2. Mảnh ghép từ Khám xét lại: Tiếng còi tàu thực nghiệm khớp với Voicemail 20:32 trong máy Khang.│
+│ 3. Mảnh ghép từ Hồ sơ Hà: Lịch VTV3 thứ Sáu không có phim ➔ Hà đang đứng ở ngõ Khang lúc 20:32!  │
+│ ➔ Chuyển dịch nghi vấn 180 độ: Kẻ thứ ba lẻn vào nhà Khang chính là Hà!                         │
 └─────────────────────────────────────────────────┬────────────────────────────────────────────────┘
                                                   │
                                                   ▼
@@ -133,7 +141,19 @@
 1. **`photo-crime-scene-overview.jpg` (`p1`)**: Ảnh hiện trường phòng khách, bộ bình trà thủy tinh vỡ vụn dưới sàn.
 2. **`photo-scattered-documents.jpg` (`p2`)**: Ảnh xấp Đơn tố cáo và hồ sơ đất đai rơi xòe quạt gần cửa.
 3. **`photo-glass-shard-detail.jpg` (`p3`)**: Ảnh mảnh thủy tinh sắc nhọn dính máu khô dài 8.2cm (Hung khí vụ án).
-4. **`photo-childhood-group.jpg` (`p4`)**: Khung ảnh kỷ niệm xóm Bờ Sông hè 1996 (Khang, Tùng có sẹo lông mày, bé Huy đeo còi đồng, bé Hà váy hoa, bé Mai được ông bế).
-5. **`photo-old-newspaper.jpg` (`p5`)**: Mẩu báo cũ ố vàng năm 1996 đưa tin vụ tai nạn ngạt khí trong tủ gỗ của bé Gia Huy.
+4. **`photo-childhood-group.jpg` (`p4`)**: Bức ảnh chụp kỷ niệm Lễ Đại Đoàn Kết xóm Bờ Sông 20 năm trước (có Khang, Mai, Tùng có vết sẹo ở lông mày đang đứng bế bé Huy đeo chiếc còi màu cam trên cổ).
+5. **`photo-old-newspaper.jpg` (`p5`)**: Các mảnh bài báo cũ 20 năm trước bị xé nhỏ rải rác dưới sàn nhà Khang, ghép lại đọc tin tai nạn ngạt khí trong tủ gỗ của bé N.G.H (8 tuổi, câm bẩm sinh, bệnh tim), ảnh hiện trường có chiếc còi màu cam rớt ngoài tủ.
 6. **`photo-messages-cheating.jpg` (`p6`)**: Ảnh chụp màn hình tin nhắn điện thoại Khang.
 7. **`photo-ride-hailing-vu.jpg` (`p10`)**: Ảnh chụp màn hình ứng dụng đặt xe ôm của Vũ (đặt 19:25:40, đón 19:30:15).
+
+---
+
+## 🎫 DANH MỤC ĐẠO CỤ VẬT LÝ ĐẶC BIỆT (PHYSICAL & INTERACTIVE PROPS)
+
+1. **`CARD-RE-INVESTIGATE` (Thẻ Lệnh Khám Xét Lại Hiện Trường)**:
+   - **Quy cách:** Thẻ cứng in màu trang trọng, có mộc đỏ của Cơ quan CSĐT / VKSND.
+   - **Nội dung:** Lệnh tái khám nghiệm hiện trường số 09/LKX-CSĐT.
+   - **Mã QR tích hợp:** Quét để mở giao diện Web App thực nghiệm âm thanh tại hiện trường ban đêm (nghe tiếng còi tàu hàng & chuông gác chắn lúc 20:30).
+   - **Vai trò:** Kích hoạt khi cuộc điều tra bế tắc trước lời khai 1 chiều của Tùng; âm thanh còi tàu giúp bóc trần sự hiện diện của Hà lúc 20:32, bẻ gãy ngoại phạm VTV3 và giải tỏa nghi vấn cho Tùng.
+   - **Chú thích quy tắc:** *"Chỉ được khám xét lại hiện trường vào thời điểm đã sử dụng hết mọi bằng chứng nhưng chưa đi được đến kết luận chính xác và khách quan."*
+

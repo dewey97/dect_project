@@ -41,7 +41,7 @@ export const documents000: Record<string, Document[]> = {
   'dev-00': [
     {
       id: 'doc-01',
-      title: 'Ghi chép vị trí trốn tìm 1998 (Note n3)',
+      title: 'Ghi chép vị trí trốn tìm 1996 (Note n3)',
       content: 'Căn phòng phía Tây... khoang tủ gỗ âm tường... ký hiệu XE-CARD-000',
       meta: 'Phát hiện trong hộp sắt kỷ vật'
     }

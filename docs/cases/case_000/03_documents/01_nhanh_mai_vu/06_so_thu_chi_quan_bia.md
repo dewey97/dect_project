@@ -1,60 +1,35 @@
-# CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
-**Độc lập – Tự do – Hạnh phúc**
+*(Ghi chú của điều tra viên khi thu thập tài liệu: Chủ quán Nguyễn Văn Hùng nhận diện đúng ảnh của Lê Quang Vũ, xác nhận tối 24/07 Vũ có đến quán ngồi uống bia một mình nhưng không nhớ chính xác giờ Vũ rời đi, chỉ nhớ mang máng là Vũ đứng dậy thanh toán và ra về cùng lúc với một nhóm thanh niên.)*
 
 ---
 
-**CÔNG AN THÀNH PHỐ HÀ NỘI**  
-**PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `18/BB-XMTT`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+# SỔ BÁN HÀNG — QUÁN 88
+
+**T6 (24/7)**
+
+- B1 (2 khách): 4 bia + lạc luộc -> 60k (Tiền mặt 18:40)
+- **B6 (5 khách): Ốc xào + 5 bia -> 205k (Tiền mặt 20:45)**
+- B2 (3 khách): Lẩu riêu + 8 bia -> 450k (Tiền mặt 19:15)
+- B3 (1 khách): Mực nướng + 2 bia -> 115k (Tiền mặt 19:20)
+- B4 (4 khách): Gà rang muối + 2 nc ngọt + 2 bia -> 180k (Tiền mặt 19:25)
+- Chi tiền 2 bao đá cây: -40k (Tiền mặt 19:35)
+- B8 (1 khách): 1 bia + đĩa lạc -> 35k (Tiền mặt 19:40)
+- B13 (2 khách): -> 90k (Tiền mặt 20:10)
+- Mang về (1 khách): 2 chai bia + đĩa lạc -> 55k (Tiền mặt 20:50)
+- **B7 (1 khách): -> 195k (CK 20:45)**
+- B9 (1 khách): -> 50k (Tiền mặt 21:05)
+- B11 (2 khách): Lòng xào dưa + 4 bia -> 130k (Tiền mặt 21:15)
+- B10 (3 khách): -> 120k (Tiền mặt 21:25)
+- B12 (1 khách): 1 đĩa mực + 3 bia -> 135k (CK 21:50)
+- B14 (1 khách): Cơm rang dưa bò + 1 bia -> 85k (Tiền mặt 22:05)
+- B5 (6 khách): -> 260k (Tiền mặt 22:15)
+- B15 (2 khách): 4 bia hơi -> 60k (Tiền mặt 22:30)
 
 ---
+- Tiền mặt thu: 1.895k
+- Chuyển khoản: 330k (B7 + B12)
+- Chi tiền đá: -40k
+=> Tổng tiền mặt két: 1.855k / Tổng doanh thu: 2.225k
 
-# BIÊN BẢN XÁC MINH & THU THẬP TÀI LIỆU
-*(V/v Thu thập nhật ký bán hàng tối 24/07 tại Quán Bia 88 — Phân khu Cầu Cảng)*
+Bia còn 1 bom rưỡi gửi kho.
 
----
 
-Vào hồi 14 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Quán Bia hơi bình dân 88, Phân khu Cầu Cảng.  
-**Cán bộ xác minh:** Đại úy Lê Minh — Điều tra viên thụ lý chuyên án.
-
-Tiến hành làm việc với ông **Nguyễn Văn Hùng** (Sinh năm 1972 — Chủ cơ sở kinh doanh Quán Bia 88).
-
----
-
-### I. NỘI DUNG LÀM VIỆC & LỜI KHAI CỦA CHỦ QUÁN
-* Khoảng cách từ Quán Bia 88 về số 14 Đường Bờ Sông (hiện trường): **3.8 km** (khoảng 10–12 phút di chuyển bằng xe máy).
-* Ông Hùng xác nhận: *"Tối 24/07 quán tôi phục vụ khách bình thường. Tôi nhớ tầm gần 20h có một anh khách lẻ đeo kính, vẻ mặt thất thần suy sụp, đi xe ôm tới ngồi uống bia một mình ở bàn số 7 sát mép sông gọi set nhắm và bia Hà Nội. Tôi có cuốn sổ tay kẻ ô ly ghi chép doanh thu từng bàn tối hôm đó, tôi xin cung cấp trang sổ này cho cán bộ điều tra."*
-
----
-
-### II. NỘI DUNG TRANG SỔ BÁN HÀNG THU THẬP ĐƯỢC (TỐI 24/07/2026)
-
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                 NHẬT KÝ BÁN HÀNG QUÁN BIA 88 — TỐI 24/07/2026               │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ 1. Bàn 1 (2 người): 4 chai bia Hà Nội ➔ 100.000đ (Tiền mặt)                 │
-│ 2. Bàn 2 (3 người): 1 Nồi lẩu riêu cua + 6 chai bia ➔ 450.000đ (Tiền mặt)   │
-│ 3. Bàn 3 (Khách lẻ): 1 Đĩa mực nướng + 1 bia Hà Nội ➔ 115.000đ (Tiền mặt)   │
-│ 4. Bàn 4 (Gia đình): 1 Set Nhắm Bình Dân ➔ 120.000đ (Tiền mặt)              │
-│ 5. Bàn 6 (4 người): 1 Nồi ốc luộc + 5 chai bia ➔ 205.000đ (CK - 19h30)      │
-│ 6. Bàn 7 (Khách lẻ): 195.000đ ➔ CK (20h45)                                 │
-│ 7. Bàn 8 (2 người): 1 Nồi ốc luộc + 2 chai bia ➔ 130.000đ (Tiền mặt)        │
-│ 8. Bàn 9 (Khách lẻ): 2 chai bia Hà Nội ➔ 50.000đ (Tiền mặt)                 │
-│                                                                             │
-│ ➔ Tổng thu: 1.365.000đ (Tiền mặt: 965.000đ / Chuyển khoản: 400.000đ)        │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-Biên bản kết thúc vào hồi 15 giờ 15 phút cùng ngày.
-
-**CHỦ CƠ SỞ KINH DOANH**  
-*(Ký và ghi rõ họ tên)*  
-**Nguyễn Văn Hùng**
-
-**CÁN BỘ XÁC MINH**  
-*(Ký tên)*  
-**Đại úy Lê Minh**

@@ -3,316 +3,232 @@ import { Conversation } from '@/lib/types'
 export const conversations000: Record<string, Conversation[]> = {
   'dev-00': [
     {
-      id: 'conv-03',
-      name: 'Trần Thị Hà',
-      timestamp: '19:15',
-      previewText: 'Anh tại sao lại tránh mặt em? Đừng để em tìm tới nhà đấy!',
+      id: 'conv-05',
+      name: 'Bé Vy ❤️',
+      phoneNumber: '0978.552.xxx',
+      avatarColor: 'from-[#FF2D55] to-[#FF375F]',
+      timestamp: '17:55',
+      previewText: 'Nhớ lời anh đó nha! Em chuẩn bị xong hết vali rồi, sáng mai em đợi anh ở sân bay Nội Bài đấy! ✈️❤️',
       recoveryProgress: 100,
       unread: false,
       messages: [
-        // --- 21/07/2026 ---
+        {
+          id: 'm5-1',
+          sender: 'Khang',
+          role: 'sent',
+          text: 'Anh đang dồn nốt tiền cọc đất với mấy mối nợ bốc họ tối nay là cầm gọn hơn 2 tỷ tiền mặt. Sáng mai bay sớm vào với em nhé bé yêu.',
+          timestamp: '24/07 • 17:30',
+          status: 'Đã gửi • 17:30'
+        },
+        {
+          id: 'm5-2',
+          sender: 'Bé Vy ❤️',
+          role: 'received',
+          text: 'Vé máy bay chuyến 06:15 sáng mai em book xong cả 2 vé rồi nhé anh yêu! Mà còn con bé người yêu cũ bám đuôi anh thì sao? Nó có biết anh đi không?',
+          timestamp: '24/07 • 17:45',
+          attachment: {
+            type: 'image',
+            title: 'Ve_may_bay_VN125_0615.png',
+            thumbnail: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=400'
+          }
+        },
+        {
+          id: 'm5-3',
+          sender: 'Khang',
+          role: 'sent',
+          text: 'Kệ xác nó, con Hà phiền phức đấy anh tắt thông báo cả tuần nay rồi. Tối nay xong việc anh vứt sim là xong, vào trong đó nó tìm bằng mắt. Đời này anh chỉ cần em thôi ❤️',
+          timestamp: '24/07 • 17:50',
+          status: 'Đã gửi • 17:50',
+          isClue: true,
+          clueTitle: 'Động cơ gây án bùng nổ của Trần Thị Hà',
+          clueAnalysis:
+            'Khang ruồng rẫy Hà và gọi là "con phiền phức bám đuôi". Khi Hà lẻn vào nhà lúc 20:45 và dùng tay Khang mở khóa Touch ID chiếc iPhone này, đoạn chat độc địa này đã khiến cơn cuồng ghen của Hà bùng nổ dẫn đến hành vi sát hại lúc 21:00.'
+        },
+        {
+          id: 'm5-4',
+          sender: 'Bé Vy ❤️',
+          role: 'received',
+          text: 'Nhớ lời anh đó nha! Em chuẩn bị xong hết vali rồi, sáng mai em đợi anh ở sân bay Nội Bài đấy! ✈️❤️',
+          timestamp: '24/07 • 17:55',
+          status: 'Đã xem 17:56'
+        }
+      ]
+    },
+    {
+      id: 'conv-03',
+      name: 'Trần Thị Hà',
+      phoneNumber: '0984.112.568',
+      avatarColor: 'from-[#FF375F] to-[#AF52DE]',
+      isMuted: true,
+      timestamp: '20:32',
+      previewText: '[Thư thoại 0:18] "Anh Khang à, sao em gọi mãi anh không nghe máy thế?..." (Lọt tiếng còi tàu)',
+      recoveryProgress: 100,
+      unread: true,
+      messages: [
         {
           id: 'm3-d1-1',
           sender: 'Trần Thị Hà',
           role: 'received',
-          text: 'Hôm nay anh đi cắt tóc ở tiệm anh Tuấn đúng không? Em thấy sợi tóc mai rơi trên gối sáng nay ngắn hơn bình thường 1 phân...',
-          timestamp: '21/07 • 14:10'
+          text: 'Anh Khang ơi, sao hôm nay anh lại nói những lời như vậy với em? Anh đừng giận em nữa được không, mình gặp nhau nói chuyện đàng hoàng nhé anh...',
+          timestamp: '18/07 • 22:10',
+          status: 'Đã xem • Không trả lời'
         },
-        {
-          id: 'm3-d1-2',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Ừ anh tiện đường ghé gội đầu cắt tí thôi. Có thế em cũng để ý.',
-          timestamp: '21/07 • 14:35'
-        },
-        {
-          id: 'm3-d1-3',
-          sender: 'Trần Thị Hà',
-          role: 'received',
-          text: 'Mọi thứ thuộc về anh em đều nhớ rất rõ. Từng sợi tóc, từng nốt ruồi trên lưng anh.',
-          timestamp: '21/07 • 14:40'
-        },
-        // --- 22/07/2026 ---
         {
           id: 'm3-d2-1',
           sender: 'Trần Thị Hà',
           role: 'received',
-          text: 'Chiếc cúc áo thứ hai trên sơ mi xanh của anh bị lỏng chỉ rồi, để tối em sang khâu lại. Anh tuyệt đối đừng để ai khác chạm tay vào áo anh nhé.',
-          timestamp: '22/07 • 08:30'
-        },
-        {
-          id: 'm3-d2-2',
-          sender: 'Trần Thị Hà',
-          role: 'received',
           text: 'Chiều nay em mới mang hũ trà hoa cúc sang đặt trên bàn uống nước. Tối nhớ hãm uống cho dễ ngủ, dạo này anh hay thức khuya lắm.',
-          timestamp: '22/07 • 17:45'
+          timestamp: '22/07 • 17:45',
+          isClue: true,
+          clueTitle: 'Hũ trà hoa cúc tẩm độc chuẩn bị trước',
+          clueAnalysis:
+            'Hà đã chủ động mang hũ trà hoa cúc (chứa nồng độ thảo dược an thần ức chế thần kinh) sang đặt sẵn trên bàn phòng khách từ 2 ngày trước để đầu độc làm suy yếu Khang.'
         },
-        {
-          id: 'm3-d2-3',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Ừ anh thấy hũ trà rồi, đang uống thử đây.',
-          timestamp: '22/07 • 19:50'
-        },
-        // --- 23/07/2026 ---
-        {
-          id: 'm3-d3-1',
-          sender: 'Trần Thị Hà',
-          role: 'received',
-          text: 'Anh Khang hôm nay đi đâu từ chiều thế? Em đứng đợi trước ngõ mãi không thấy xe anh về.',
-          timestamp: '23/07 • 18:20'
-        },
-        {
-          id: 'm3-d3-2',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Anh đi gặp khách bốc họ, em đừng có rình trước cửa nhà anh nữa người ta dị nghị!',
-          timestamp: '23/07 • 18:55'
-        },
-        // --- 24/07/2026 (Hôm nay) ---
         {
           id: 'm3-1',
           sender: 'Trần Thị Hà',
           role: 'received',
-          text: 'Anh Khang ơi, tối nay anh có rảnh không? Mấy hôm nay anh bận việc gì mà gọi điện nghe máy ngập ngừng thế?',
-          timestamp: '19:00'
+          text: 'Anh Khang ơi, tối nay em đem hũ trà hoa cúc mới sao sang cho anh nhé... anh nhớ uống rồi nghỉ sớm nhé.',
+          timestamp: '24/07 • 19:15',
+          status: '🔕 Đã gửi • Chưa xem (Đã tắt thông báo)'
         },
         {
-          id: 'm3-2',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Tối nay anh có việc bận giải quyết chuyện nhà đất với người ta, em ở nhà đi đừng sang.',
-          timestamp: '19:08'
-        },
-        {
-          id: 'm3-3',
+          id: 'm3-voice',
           sender: 'Trần Thị Hà',
           role: 'received',
-          text: 'Anh tại sao lại tránh mặt em? Đừng để em tìm tới nhà đấy!',
-          timestamp: '19:15'
-        }
-      ]
-    },
-    {
-      id: 'conv-05',
-      name: 'Yến Nhi',
-      timestamp: '20:40',
-      previewText: 'Anh yêu nhớ book phòng view đồi thông ở Đà Lạt nhé...',
-      recoveryProgress: 100,
-      unread: true,
-      messages: [
-        // --- 22/07/2026 ---
-        {
-          id: 'm5-d1-1',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Cuối tuần này anh thu xong tiền đền bù đất là mình bay thẳng vào Đà Lạt nghỉ 1 tuần em nhé.',
-          timestamp: '22/07 • 15:20'
-        },
-        {
-          id: 'm5-d1-2',
-          sender: 'Yến Nhi',
-          role: 'received',
-          text: 'Thật không đấy anh yêu? Hay lại hứa lèo như lần trước?',
-          timestamp: '22/07 • 15:25'
-        },
-        {
-          id: 'm5-d1-3',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Anh chuyển cọc tour 12 triệu cho bên du lịch rồi, vé máy bay sáng 25/7 xuất phát nhé.',
-          timestamp: '22/07 • 15:30'
-        },
-        // --- 24/07/2026 (Hôm nay) ---
-        {
-          id: 'm5-1',
-          sender: 'Yến Nhi',
-          role: 'received',
-          text: 'Anh Khang ơi, tối nay anh xử lý xong việc bán nhà chưa? Mai mình đi nốt tour Đà Lạt nhé?',
-          timestamp: '20:38'
-        },
-        {
-          id: 'm5-2',
-          sender: 'Yến Nhi',
-          role: 'received',
-          text: 'Anh yêu nhớ book phòng view đồi thông ở Đà Lạt nhé, em chuẩn bị xong hết vali rồi đấy ❤️',
-          timestamp: '20:40'
-        }
-      ]
-    },
-    {
-      id: 'conv-01',
-      name: 'Trần Ngọc Mai (Em họ)',
-      timestamp: '18:50',
-      previewText: 'Có ngon thì cứ qua. Đừng có giở trò với tôi!',
-      recoveryProgress: 100,
-      unread: false,
-      messages: [
-        // --- 20/07/2026 ---
-        {
-          id: 'm1-d1-1',
-          sender: 'Trần Ngọc Mai',
-          role: 'received',
-          text: 'Anh Khang, bên Ban quản lý dự án sắp chốt danh sách nhận đền bù đợt 1 rồi đấy. Căn nhà của ông nội anh tính chia thế nào?',
-          timestamp: '20/07 • 09:15'
-        },
-        {
-          id: 'm1-d1-2',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Ông nội nuôi tôi từ nhỏ đến lớn, căn nhà đương nhiên để tôi thừa kế. Cô đi lấy chồng rồi đừng có hòng dòm ngó.',
-          timestamp: '20/07 • 09:30'
-        },
-        // --- 24/07/2026 (Hôm nay) ---
-        {
-          id: 'm1-1',
-          sender: 'Trần Ngọc Mai',
-          role: 'received',
-          text: 'Anh Khang, chuyện tờ di chúc của ông nội tại sao anh lại tự ý lấy về cất giữ? Phần tiền đền bù nhà đất bờ sông anh định nuốt riêng à?',
-          timestamp: '18:35'
-        },
-        {
-          id: 'm1-2',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Bản di chúc ông để lại cho ai người đó giữ. Cô đừng có xía vào.',
-          timestamp: '18:38'
-        },
-        {
-          id: 'm1-3',
-          sender: 'Trần Ngọc Mai',
-          role: 'received',
-          text: 'Anh đừng có coi thường vợ chồng tôi. Giấy tờ đất đứng tên ông nội chứ không phải tên một mình anh!',
-          timestamp: '18:42'
-        },
-        {
-          id: 'm1-4',
-          sender: 'Trần Ngọc Mai',
-          role: 'received',
-          text: 'Tối nay tôi với anh Vũ sẽ qua nhà anh nói chuyện cho rõ ràng chuyện di chúc và mảnh đất bến sông. Anh đừng có giấu!',
-          timestamp: '18:45'
-        },
-        {
-          id: 'm1-5',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Có ngon thì cứ qua. Đừng có giở trò với tôi!',
-          timestamp: '18:50'
+          text: '[HỘP THƯ THOẠI] "Anh Khang à, sao em gọi mãi anh không nghe máy thế? Em đang ở phòng trọ xem phim một mình buồn quá... tí nữa em chạy qua với anh nhé..."',
+          timestamp: '24/07 • 20:32',
+          attachment: {
+            type: 'audio',
+            title: 'Thu_thoai_2032_Ha_loi_khai_gia.wav',
+            duration: '0:18',
+            audioClue:
+              '⚠️ BẰNG CHỨNG PHÁ ÁN CHÍ MẠNG: Phía sau giọng nói thì thầm lọt rất rõ tiếng còi tàu hỏa diesel hú 2 hồi dài và tiếng chuông gác chắn đường sắt reo leng keng (khoảng cách < 30m). Địa điểm duy nhất thu được âm thanh này là gốc cây xoan trước ngõ nhà Khang (số 14 Bờ Sông), bóc trần hoàn toàn lời khai giả tạo của Hà là "ở phòng trọ ngõ 12 cách 1.2km xem phim".'
+          },
+          isClue: true,
+          clueTitle: 'Vạch trần chứng cứ ngoại phạm giả của Hà',
+          clueAnalysis:
+            'Tạp âm tiếng còi tàu 20:32 là chìa khóa chứng minh Hà có mặt tại hiện trường lúc nạn nhân bị hạ sát.'
         }
       ]
     },
     {
       id: 'conv-02',
       name: 'Lê Quang Vũ',
-      timestamp: '19:05',
-      previewText: 'Anh Khang, khoản nợ 350tr với chuyện số liệu đo đạc...',
+      phoneNumber: '0988.20.09.91',
+      avatarColor: 'from-[#0A84FF] to-[#5E5CE6]',
+      timestamp: '24/07 • 18:15',
+      previewText: 'Tối nay tôi chạy sang nhà anh, xin anh đừng làm to chuyện với gia đình vợ tôi...',
       recoveryProgress: 100,
       unread: false,
       messages: [
-        // --- 19/07/2026 ---
         {
           id: 'm2-d1-1',
           sender: 'Lê Quang Vũ',
           role: 'received',
-          text: 'Anh Khang, tiền lãi tháng này tôi xin khất thêm 5 ngày được không? Công trình đợt này bên địa chính chưa giải ngân kịp.',
+          text: 'Anh Khang, tiền nợ 300 triệu cho tôi khất thêm mấy ngày được không? Tôi đang xoay vốn công trình.',
           timestamp: '19/07 • 11:00'
         },
         {
           id: 'm2-d1-2',
           sender: 'Khang',
           role: 'sent',
-          text: 'Khất con c... Hạn đến ngày nào nộp đủ ngày đó. Không thì liệu cái ghế cán bộ của chú.',
-          timestamp: '19/07 • 11:15'
+          text: '300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!',
+          timestamp: '23/07 • 14:22',
+          attachment: {
+            type: 'image',
+            title: 'Giay_vay_no_viet_tay_300tr.jpg',
+            thumbnail: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=400'
+          },
+          isClue: true,
+          clueTitle: 'Sổ nợ bốc họ 300 triệu của Vũ',
+          clueAnalysis:
+            'Khang dùng khoản nợ tín dụng đen 300 triệu ép Vũ vẽ khống bản trích đo đất từ 75m2 lên 120m2.'
         },
-        // --- 24/07/2026 (Hôm nay) ---
         {
-          id: 'm2-1',
+          id: 'm2-d2-1',
           sender: 'Lê Quang Vũ',
           role: 'received',
-          text: 'Anh Khang, chiều nay bên công ty đo đạc giục nộp hồ sơ giải tỏa đền bù rồi. Anh trả lại bản vẽ chuẩn cho tôi.',
-          timestamp: '18:55'
+          text: 'Tối nay tôi chạy sang nhà anh lúc 19:00, mình nói chuyện riêng xin anh đừng làm to chuyện với gia đình vợ tôi...',
+          timestamp: '24/07 • 18:15',
+          status: 'Đã xem • 18:20'
+        }
+      ]
+    },
+    {
+      id: 'conv-01',
+      name: 'Trần Ngọc Mai (Em họ)',
+      phoneNumber: '0912.456.789',
+      avatarColor: 'from-[#30D158] to-[#0A84FF]',
+      timestamp: '24/07 • 18:50',
+      previewText: 'Có ngon thì cứ qua. Đừng có giở trò với tôi!',
+      recoveryProgress: 100,
+      unread: false,
+      messages: [
+        {
+          id: 'm1-1',
+          sender: 'Trần Ngọc Mai',
+          role: 'received',
+          text: 'Anh Khang, chuyện mảnh đất 200m2 của ông nội tại sao anh dám tự ý làm giả giấy ủy quyền mang đi thế chấp ngân hàng? Tôi đã nhờ luật sư lập đơn tố cáo rồi!',
+          timestamp: '24/07 • 18:35',
+          attachment: {
+            type: 'image',
+            title: 'Don_to_cao_chiem_doat_dat_ong_noi.pdf',
+            thumbnail: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=400'
+          },
+          isClue: true,
+          clueTitle: 'Tranh chấp đất đai 200m² gia bảo',
+          clueAnalysis:
+            'Mai phát hiện Khang làm giả chữ ký ông nội trên giấy ủy quyền chiếm trọn suất đất giải tỏa đền bù.'
         },
         {
-          id: 'm2-2',
+          id: 'm1-2',
           sender: 'Khang',
           role: 'sent',
-          text: 'Cứ báo số liệu khống lên 120m2 như tôi bảo đi. Chú mày còn thiếu nợ tôi 350 triệu đấy, quên rồi à?',
-          timestamp: '18:58'
+          text: 'Đất ông để lại cho tao làm nơi thờ tự, mày đi lấy chồng rồi đừng có dòm ngó.',
+          timestamp: '24/07 • 18:38'
         },
         {
-          id: 'm2-3',
-          sender: 'Lê Quang Vũ',
+          id: 'm1-3',
+          sender: 'Trần Ngọc Mai',
           role: 'received',
-          text: 'Tôi làm vậy là vi phạm pháp luật! Anh ép tôi quá đáng vừa thôi!',
-          timestamp: '19:02'
+          text: 'Tối nay tôi với anh Vũ sẽ qua nhà anh nói chuyện cho rõ ràng. Anh trả lại 50% đất cho tôi!',
+          timestamp: '24/07 • 18:45'
         },
         {
-          id: 'm2-4',
-          sender: 'Lê Quang Vũ',
-          role: 'received',
-          text: 'Anh Khang, khoản nợ 350tr với chuyện số liệu đo đạc bớt ép tôi đi. Tối nay vợ chồng tôi sang chốt hạ!',
-          timestamp: '19:05'
+          id: 'm1-4',
+          sender: 'Khang',
+          role: 'sent',
+          text: 'Có ngon thì cứ qua. Đừng có giở trò với tôi!',
+          timestamp: '24/07 • 18:50'
         }
       ]
     },
     {
       id: 'conv-04',
-      name: 'Hội Bạn Nhậu Bờ Sông (4)',
-      timestamp: '22/07 • 21:05',
-      previewText: 'Khang: Thôi tao chịu, đợt này chả hiểu sao cứ tầm 8h tối...',
+      name: '0913.882.901 (Số lạ - Thợ nề Tùng)',
+      phoneNumber: '0913.882.901',
+      avatarColor: 'from-[#FF9F0A] to-[#FF453A]',
+      timestamp: '24/07 • 15:30',
+      previewText: 'Tròn 30 năm rồi đó. M không có gì muốn nói với Huy à?',
       recoveryProgress: 100,
       unread: false,
       messages: [
-        // --- 20/07/2026 ---
         {
-          id: 'm4-d1-1',
-          sender: 'Tuấn "Bia"',
+          id: 'm4-1',
+          sender: '0913.882.901',
           role: 'received',
-          text: 'Tối thứ 6 tuần này làm bữa chia tay Tùng đi Hải Phòng nhé anh em.',
-          timestamp: '20/07 • 16:00'
-        },
-        {
-          id: 'm4-d1-2',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Thằng Tùng về làm gì thế? Lâu lắm không gặp nó.',
-          timestamp: '20/07 • 16:10'
-        },
-        // --- 22/07/2026 ---
-        {
-          id: 'm4-d2-1',
-          sender: 'Tuấn "Bia"',
-          role: 'received',
-          text: 'Hôm qua ngồi nhậu với thằng Tùng nhắc lại mấy trò nghịch ngợm hồi nhỏ trong xóm cười đau cả ruột, công nhận vui vãi.',
-          timestamp: '22/07 • 14:15'
-        },
-        {
-          id: 'm4-d2-2',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Haha nhớ chứ, hồi đó tao trốn chỗ nào tụi mày tìm hoài không ra. Đỉnh nhất là cái vụ tao gài chốt nhốt trong tủ, không ai nghĩ ra luôn!',
-          timestamp: '22/07 • 14:20'
-        },
-        {
-          id: 'm4-d2-3',
-          sender: 'Tuấn "Bia"',
-          role: 'received',
-          text: 'Vãi cả nhốt tủ, ác vl haha. Thôi tối nay ra làm vài quai tiếp không? Có mấy em bên trường múa sang giao lưu này!',
-          timestamp: '22/07 • 21:00'
-        },
-        {
-          id: 'm4-2',
-          sender: 'Khang',
-          role: 'sent',
-          text: 'Thôi tao chịu, đợt này chả hiểu sao cứ tầm 8h tối húp xong bát canh với cốc trà con Hà mang sang là mắt díp tịt lại, người nhũn như cọng bún, nằm bẹp giường không nhấc nổi cái chân...',
-          timestamp: '22/07 • 21:03'
-        },
-        {
-          id: 'm4-3',
-          sender: 'Tuấn "Bia"',
-          role: 'received',
-          text: 'Haha, mày bị con Hà nó vắt kiệt sức rồi chứ gì, thôi ngủ đi ông tướng.',
-          timestamp: '22/07 • 21:05'
+          text: 'Tròn 30 năm rồi đó. M không có gì muốn nói với Huy à?',
+          timestamp: '24/07 • 15:30',
+          attachment: {
+            type: 'image',
+            title: 'Chiec_coi_dong_Huy_1996.jpg',
+            thumbnail: 'https://images.unsplash.com/photo-1584433144859-1fc3ab64a957?auto=format&fit=crop&q=80&w=400'
+          },
+          isClue: true,
+          clueTitle: 'Ám hiệu ngày giỗ 30 năm bé Gia Huy',
+          clueAnalysis:
+            'Tin nhắn từ thợ nề Tùng khơi lại tai nạn ngạt khí tủ gỗ năm 1996 mà Khang chính là thủ phạm nhốt Huy dẫn đến cái chết thương tâm.'
         }
       ]
     }

@@ -31,8 +31,8 @@ interface BoardGameCompanionViewProps {
 
 const PHASE_TITLES = [
   'Màn sương hiện trường',
-  'Tranh chấp di chúc',
-  'Bẫy quá khứ 1998',
+  'Giả mạo ủy quyền đất',
+  'Bi kịch quá khứ 1996',
   'Phán quyết kết án'
 ]
 

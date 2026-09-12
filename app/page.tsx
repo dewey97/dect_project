@@ -15,7 +15,7 @@ export default function MarketingLandingPage() {
   const [activePoster, setActivePoster] = useState<number>(0)
 
   return (
-    <main className="noir-spotlight relative flex flex-col min-h-dvh w-full items-center overflow-x-clip bg-background text-foreground font-sans">
+    <main suppressHydrationWarning className="noir-spotlight relative flex flex-col min-h-dvh w-full items-center overflow-x-clip bg-background text-foreground font-sans">
       {/* CRT scanlines overlay */}
       <div
         aria-hidden="true"

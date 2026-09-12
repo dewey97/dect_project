@@ -1,6 +1,6 @@
 'use client'
 
-import { FileText, Mic, MapPin, Mail, MessageSquare } from 'lucide-react'
+import { FileText, Mic, MapPin, Mail, MessageSquare, Box } from 'lucide-react'
 import type { Evidence, EvidenceKind } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -11,6 +11,7 @@ const EVIDENCE_ICON: Record<EvidenceKind, typeof FileText> = {
   photo: FileText, // fallback
   gps: MapPin,
   document: FileText,
+  object: Box,
 }
 
 interface EvidenceItemCardProps {

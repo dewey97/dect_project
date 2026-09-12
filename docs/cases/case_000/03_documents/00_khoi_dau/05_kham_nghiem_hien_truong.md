@@ -53,14 +53,14 @@ Số: `02/BB-KNHT`
 | **`p5`** | **Mẩu giấy báo cũ năm 1996** | Rơi cạnh đống mảnh vỡ bình trà | 01 mẩu giấy báo cũ ố vàng năm 1996 đưa tin: *"Bé trai... tử vong do ngạt khí trong tủ gỗ khi chơi cùng các bạn nhỏ..."*. |
 | **`10a`** | **Cuốn sổ ghi nợ bìa da đen** | Rơi cạnh chân tủ âm tường | Sổ tay bìa da đen, kích thước 12x18cm, liệt kê danh sách theo dõi các con nợ cá nhân, số tiền vay, SĐT và ghi chú đòi nợ tín dụng đen. |
 | **`p2`** | **Xấp hồ sơ Đơn tố cáo đòi đất 200m²** | Nằm xòe quạt trên sàn nhà phía cửa ra vào | Gồm `Đơn tố cáo lừa đảo`, `Dự thảo thỏa thuận trả lại tài sản` mang tên **Trần Ngọc Mai** (Phố Đoàn Kết). |
-| **`dev-00`** | **01 Điện thoại di động cảm ứng** | Rơi úp mặt gần bàn tay phải nạn nhân | Điện thoại nhãn hiệu iPhone màu đen của nạn nhân, máy còn 18% pin, màn hình khóa. |
+| **`dev-00`** | **01 Điện thoại di động cảm ứng** | Rơi úp mặt gần bàn tay phải nạn nhân | Điện thoại nhãn hiệu iPhone 8 Plus màu đen của nạn nhân (có nút Home cảm biến Touch ID), máy còn 18% pin, màn hình khóa. |
 | **`D1`** | **Dấu vết giày nam** | In trên nền gạch dính bụi ướt phòng khách | Dấu giày thể thao đế cao su nam, kích cỡ tương đương Size 41. |
 
 ---
 
 ### V. KẾT LUẬN SƠ BỘ KHÁM NGHIỆM HIỆN TRƯỜNG
 1. Hiện trường phòng khách có dấu hiệu xáo trộn cơ học mạnh: Giằng co cãi vã, vỡ đồ gốm sứ và nạn nhân bị ngã va đầu.
-2. Vết máu trên mép bàn (`M1`) khác biệt với vũng máu chính tại cổ tử thi, cần giám định ADN riêng.
+2. Vết máu trên góc mép xấp Đơn tố cáo (`M1`) khác biệt với vũng máu chính tại cổ tử thi, cần giám định ADN riêng.
 3. Kẻ gây án đã sử dụng hung khí có sẵn tại hiện trường (mảnh bình trà vỡ `p3`) rồi tẩu thoát bằng cửa sau hoặc cổng chính.
 
 ---

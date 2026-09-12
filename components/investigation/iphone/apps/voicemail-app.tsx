@@ -16,6 +16,7 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { detectiveAudio } from '@/lib/investigation-audio'
 
 export function VoicemailApp() {
   const [activeTab, setActiveTab] = useState<'voicemail' | 'recents' | 'keypad'>('voicemail')
@@ -34,50 +35,57 @@ export function VoicemailApp() {
             setIsPlaying(false)
             return 0
           }
-          return prev + 5
+          return prev + 6
         })
-      }, 700)
+      }, 600)
     }
     return () => clearInterval(timer)
   }, [isPlaying])
 
   const togglePlay = () => {
-    if (!isPlaying && playbackProgress >= 100) {
-      setPlaybackProgress(0)
+    if (!isPlaying) {
+      if (playbackProgress >= 100) {
+        setPlaybackProgress(0)
+      }
+      setIsPlaying(true)
+      // Play realistic synthesized train horn & crossing bell sound
+      if (expandedId === 'vm-01') {
+        detectiveAudio.playTrainHornAndBellSound()
+      }
+    } else {
+      setIsPlaying(false)
     }
-    setIsPlaying(!isPlaying)
   }
 
   const voicemails = [
     {
       id: 'vm-01',
       sender: 'Trần Thị Hà',
-      phone: '0912.481.xxx',
+      phone: '0984.112.568',
       time: '20:32 (24/07)',
-      duration: '0:14',
+      duration: '0:18',
       transcript:
-        '"Anh Khang à, sao em gọi mãi anh không nghe máy? Thôi nếu anh mệt thì ngủ sớm đi nhé, mai em sang..."',
+        '"Anh Khang à, sao em gọi mãi anh không nghe máy thế? Em đang ở phòng trọ xem phim một mình buồn quá... tí nữa em chạy qua với anh nhé..."',
       audioClue:
-        '⚠️ Tạp âm nền lọt tiếng còi tàu hỏa diesel hú 2 hồi dài và tiếng chuông rào chắn đường sắt leng keng (Khoảng cách < 30m).'
+        '⚠️ Tạp âm nền lọt tiếng còi tàu hỏa diesel hú 2 hồi dài và tiếng chuông rào chắn đường sắt leng keng (Khoảng cách < 30m) chứng minh Hà đứng sát nhà Khang tại ngõ Bờ Sông!'
     },
     {
       id: 'vm-02',
       sender: 'Lê Quang Vũ',
-      phone: '0903.114.xxx',
+      phone: '0988.20.09.91',
       time: '19:20 (24/07)',
       duration: '0:08',
       transcript:
         '"Khang, nghe máy đi! Đừng có ép tôi vào đường cùng như thế!"',
-      audioClue: 'Tạp âm tiếng xe cộ đường phố đông đúc.'
+      audioClue: 'Tạp âm tiếng xe cộ đường phố đông đúc lúc Vũ vừa chạy ra đầu ngõ đặt xe ôm.'
     }
   ]
 
   const recents = [
-    { name: '0919.332.xxx (Số lạ)', type: 'Nhỡ', time: '20:55', count: 1, isMissed: true },
-    { name: 'Trần Thị Hà', type: 'Nhỡ', time: '20:31', count: 3, isMissed: true },
-    { name: 'Lê Quang Vũ', type: 'Nhỡ', time: '19:20', count: 1, isMissed: true },
-    { name: 'Trần Ngọc Mai', type: 'Cuộc gọi đến', time: '18:30', duration: '1:45', isMissed: false },
-    { name: 'Tuấn "Bia"', type: 'Cuộc gọi đi', time: '17:15', duration: '0:32', isMissed: false },
+    { name: 'Trần Thị Hà', phone: '0984.112.568', type: 'Nhỡ', time: '20:31', count: 1, isMissed: true },
+    { name: 'Lê Quang Vũ', phone: '0988.20.09.91', type: 'Nhỡ', time: '19:20', count: 1, isMissed: true },
+    { name: 'Trần Ngọc Mai', phone: '0912.456.789', type: 'Cuộc gọi đến', time: '18:30', duration: '1:45', isMissed: false },
+    { name: 'Tuấn "Bia 88"', phone: '0904.112.xxx', type: 'Cuộc gọi đi', time: '17:15', duration: '0:32', isMissed: false },
   ]
 
   return (
@@ -190,7 +198,7 @@ export function VoicemailApp() {
               <div key={idx} className="py-2.5 flex items-center justify-between px-1">
                 <div>
                   <div className={cn('text-[13px] font-semibold', call.isMissed ? 'text-[#FF453A]' : 'text-white')}>
-                    {call.name} {call.count > 1 && `(${call.count})`}
+                    {call.name} {call.count != null && call.count > 1 && `(${call.count})`}
                   </div>
                   <div className="text-[10px] text-[#8E8E93]">{call.type}</div>
                 </div>

@@ -21,7 +21,7 @@ Vào hồi 09 giờ 00 phút, ngày 26 tháng 07 năm 2026, tại Phòng Cảnh 
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 **Tiến hành hỏi cung đối tượng:**
-* **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1994.
+* **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991 (35 tuổi).
 * **Nơi ở hiện nay:** Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.
 
 ---
@@ -31,7 +31,7 @@ Vào hồi 09 giờ 00 phút, ngày 26 tháng 07 năm 2026, tại Phòng Cảnh 
 * **Hỏi (ĐTV Lê Minh):** Chúng tôi đã có trong tay dữ liệu:
   1. Lời khai nhân chứng xác nhận vợ anh (Trần Ngọc Mai) nổ máy xe rời đi lúc **19:00**.
   2. Ảnh chụp màn hình ứng dụng xe công nghệ trên máy của anh ghi nhận thời gian gửi lệnh đặt xe là **19:25:40** và tài xế đón lúc **19:30:15**.
-  3. Cuốn sổ nợ của Khang ghi rõ con nợ `Thằng Lệch Pha` nợ `300.000.000đ` (SĐT `0988.20.09.94`, hạn 20/07 kèm ghi chú gạch xóa bùng hẹn ở 45 Đoàn Kết).
+  3. Cuốn sổ nợ của Khang ghi rõ con nợ `Thằng Lệch Pha` nợ `300.000.000đ` (SĐT `0988.20.09.91`, hạn 20/07 kèm ghi chú gạch xóa bùng hẹn ở 45 Đoàn Kết).
   Anh giải thích thế nào về việc anh đã ở lại trong nhà Khang suốt 30 phút (19:00 – 19:30) và giấu nhẹm món nợ này?
 
 * **Đáp (Lê Quang Vũ):** *(Mặt tái mét, ôm đầu bật khóc nức nở)* Dạ... thưa cán bộ... tôi xin khai thật hết... Tôi nhận thầu điện bị đọng vốn nên có giấu vợ bốc bát họ của anh Khang 300 triệu từ đầu năm. Hạn trả là ngày 20/07 vừa rồi nhưng tôi không xoay được tiền nên bùng hẹn gặp ở nhà 45 Đoàn Kết. Anh Khang tức giận nhắn tin đe dọa sẽ ném giấy nợ về cho bố mẹ vợ tôi và cơ quan vợ tôi biết. Tôi ở rể, sợ mất mặt và sợ vợ ly hôn nên tôi hoảng loạn tột cùng...

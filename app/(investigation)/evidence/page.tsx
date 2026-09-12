@@ -20,6 +20,7 @@ import { CaseCheckpointsSection } from '@/components/investigation/evidence/case
 import { InvestigationModeModal, InvestigationMode } from '@/components/investigation/evidence/investigation-mode-modal'
 import { EvidenceDetailInspector } from '@/components/investigation/evidence/evidence-detail-inspector'
 import { EpilogueModal } from '@/components/investigation/epilogue-modal'
+import { JumpscareEndgame } from '@/components/investigation/jumpscare-endgame'
 import { PlayModeModal, PlayExperience } from '@/components/investigation/evidence/play-mode-modal'
 import { BoardGameCompanionView } from '@/components/investigation/evidence/board-game-companion-view'
 
@@ -251,8 +252,8 @@ export default function EvidencePage() {
             newEvidence
           })
         } else if (cp.id === 'cp-000-3') {
-          // Final checkpoint cp-000-3 completed! Immediately trigger Epilogue Stories modal
-          setIsEpilogueOpen(true)
+          // Final checkpoint cp-000-3 completed! Trigger jumpscare sequence before Epilogue
+          setIsJumpscareActive(true)
         }
       }, 1000)
     } else {
@@ -263,6 +264,9 @@ export default function EvidencePage() {
 
   // Epilogue Modal state when case is fully solved
   const [isEpilogueOpen, setIsEpilogueOpen] = useState(false)
+
+  // Jumpscare sequence state — triggers before epilogue
+  const [isJumpscareActive, setIsJumpscareActive] = useState(false)
 
   // State controlling whether the narrative monologue is visible on main page
   const [showMainNarrator, setShowMainNarrator] = useState(true)
@@ -642,6 +646,15 @@ export default function EvidencePage() {
         onSelectPdf={handleSelectPdf}
         onSelectEvidence={handleSelectEvidence}
         onSetPhaseFilter={(phase) => setSelectedPhaseFilter(phase)}
+      />
+
+      {/* JUMPSCARE ENDGAME SEQUENCE — plays before epilogue */}
+      <JumpscareEndgame
+        isActive={isJumpscareActive}
+        onComplete={() => {
+          setIsJumpscareActive(false)
+          setIsEpilogueOpen(true)
+        }}
       />
 
       {/* POST-CASE EPILOGUE STORIES MODAL */}

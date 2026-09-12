@@ -1,5 +1,5 @@
 # MẨU GIẤY NOTE DÁN TRÊN HŨ TRÀ HOA CÚC
-*(Mã vật chứng thu giữ trên bàn trà phòng khách: `p7`)*
+*(Mã vật chứng thu giữ trên bàn trà phòng khách: `17`)*
 
 ---
 
@@ -30,7 +30,7 @@
 ---
 
 ### III. KẾT QUẢ GIÁM ĐỊNH BÚT TÍCH & ĐÁNH GIÁ TÂM LÝ
-1. **Kết quả giám định bút tích:** Nét chữ trên giấy note trùng khớp hoàn toàn với mẫu chữ viết tay của **Trần Thị Hà** (SN 1994, bạn gái của nạn nhân).
+1. **Kết quả giám định bút tích:** Nét chữ trên giấy note trùng khớp hoàn toàn với mẫu chữ viết tay của **Trần Thị Hà** (SN 1990, bạn gái của nạn nhân).
 2. **Đánh giá dấu hiệu tâm lý:** 
    - Lời nhắn gửi *"Em sao trà kỹ lắm... Tối nay anh đừng đi đâu nhé... Em sẽ luôn ở bên cạnh chăm sóc anh..."* thể hiện sự gắn bó, chăm sóc tỉ mỉ nhưng kèm theo xu hướng muốn kiểm soát hành tung của bạn trai.
    - Xác nhận sự hiện diện và mối quan hệ tình cảm sâu đậm của Hà đối với nạn nhân Khang trước khi xảy ra án mạng.

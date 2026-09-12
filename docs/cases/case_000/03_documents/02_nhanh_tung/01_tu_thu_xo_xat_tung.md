@@ -28,7 +28,7 @@ Sau khi điều tra viên đưa ra các chứng cứ: Vết bầm tím gò má v
 >
 > Cơn uất hận bùng lên, tôi lao vào giằng co, xô mạnh thằng Khang ngã đập đầu vào cạnh bàn trà làm rơi mẩu báo, đổ vỡ toang bộ bình trà thủy tinh và làm rơi vỡ cái khung ảnh kỷ niệm xóm hồi nhỏ trên kệ xuống sàn. Khang đấm trúng má tôi một cái trước khi ngã vật ra sàn rồi nằm im bất động, mắt nhắm nghiền.
 >
-> Đến khoảng 20:15, tôi mở cửa nách sau nhà luồn ra đầu ngõ bắt xe ôm về phòng trọ công nhân ở Cầu Bươu. Lúc chạy qua đoạn giao cắt đường sắt đầu ngõ, tôi thấy nhân viên gác chắn đang bấm chuông hạ rào để chuẩn bị đón chuyến tàu hàng chạy qua trong đêm (chuyến 20:30).
+> Đến khoảng 20:15, tôi mở cửa nách sau nhà luồn ra đầu ngõ bắt xe ôm về phòng trọ công nhân ở Cầu Bươu. Lúc chạy qua đoạn giao cắt đường sắt đầu ngõ, tôi thấy nhân viên gác chắn đang chuẩn bị ca trực và loa phát thanh phường thông báo kết thúc giờ gom rác ngõ Bờ Sông trước khi đóng chắn đón chuyến tàu hàng qua lúc 20:30.
 >
 > Tôi căm thù nó thật, nhưng lúc tôi đi lúc 20:15 nó vẫn còn sống sờ sờ và thở đều! Tôi cứ tưởng cùng lắm nó chỉ nằm mê man một lúc rồi tự tỉnh dậy, ai ngờ sáng hôm sau nghe tin nó bị ai đó đâm chết! Cán bộ ơi, tôi chỉ xô ngã nó thôi chứ tôi thề có vong linh em tôi là tôi không hề giết nó!"*
 

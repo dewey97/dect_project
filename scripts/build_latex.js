@@ -15,6 +15,29 @@ function safeCopyAndUnlink(src, dest, retries = 5) {
   }
 }
 
+function resolvePdflatexPath() {
+  if (process.env.PDFLATEX_PATH && fs.existsSync(process.env.PDFLATEX_PATH)) {
+    return process.env.PDFLATEX_PATH;
+  }
+  try {
+    execSync('pdflatex --version', { stdio: 'ignore' });
+    return 'pdflatex';
+  } catch (e) {
+    // pdflatex not found in PATH
+  }
+  const candidatePaths = [
+    process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, 'Programs', 'MiKTeX', 'miktex', 'bin', 'x64', 'pdflatex.exe') : null,
+    'C:\\Program Files\\MiKTeX\\miktex\\bin\\x64\\pdflatex.exe',
+    'C:\\Program Files (x86)\\MiKTeX\\miktex\\bin\\x64\\pdflatex.exe',
+    'C:\\Users\\dell\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\pdflatex.exe',
+  ].filter(Boolean);
+
+  for (const p of candidatePaths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return 'pdflatex';
+}
+
 function compileAndCleanLatex() {
   const targetFilter = process.argv[2] ? process.argv[2].toLowerCase() : null;
   const rootDir = path.join(__dirname, '..');
@@ -26,7 +49,7 @@ function compileAndCleanLatex() {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
-  const pdflatexPath = 'C:\\Users\\dell\\AppData\\Local\\Programs\\MiKTeX\\miktex\\bin\\x64\\pdflatex.exe';
+  const pdflatexPath = resolvePdflatexPath();
   const phases = ['phase_0_initial', 'phase_1_inheritance', 'phase_2_altercation', 'phase_3_conclusion'];
 
   let successCount = 0;

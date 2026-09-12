@@ -17,8 +17,8 @@ Số: `04/BC-XMNT`
 
 ### I. LÝ LỊCH TƯ PHÁP & QUAN HỆ GIA ĐÌNH
 * **Họ và tên:** **NGUYỄN VĂN KHANG**
-* **Sinh ngày:** 10/11/1993 tại Hà Nội.
-* **Số CCCD:** `001093006721`.
+* **Sinh ngày:** 10/11/1988 tại Hà Nội (38 tuổi).
+* **Số CCCD:** `001088006721`.
 * **Trình độ học vấn:** 12/12.
 * **Tình trạng gia đình:**
   - Bố mẹ đẻ mất sớm do tai nạn giao thông năm 2010.

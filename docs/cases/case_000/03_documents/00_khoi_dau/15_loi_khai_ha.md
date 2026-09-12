@@ -21,8 +21,8 @@ Vào hồi 19 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 **Tiến hành lấy lời khai người liên quan:**
-* **Họ và tên:** **TRẦN THỊ HÀ** | **Giới tính:** Nữ | **Sinh ngày:** 22/09/1994.
-* **CCCD số:** `001194008271` cấp ngày 14/03/2021 tại Cục CSQLHC về TTXH.
+* **Họ và tên:** **TRẦN THỊ HÀ** | **Giới tính:** Nữ | **Sinh ngày:** 22/09/1990 (36 tuổi).
+* **CCCD số:** `001190008271` cấp ngày 14/03/2021 tại Cục CSQLHC về TTXH.
 * **Nơi ĐKHKTT:** Số 8, Ngõ 12 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Kế toán tổng hợp (Công ty Vận tải Sông Hồng — Bạn gái nạn nhân).
 

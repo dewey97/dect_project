@@ -27,8 +27,8 @@ Số: `01/BC-KNTT`
 
 ### II. LÝ LỊCH NẠN NHÂN
 * **Họ và tên:** **NGUYỄN VĂN KHANG** | **Giới tính:** Nam.
-* **Năm sinh:** 1993 (33 tuổi).
-* **Số định danh cá nhân:** `001093006721`.
+* **Năm sinh:** 1988 (38 tuổi).
+* **Số định danh cá nhân:** `001088006721`.
 * **Nơi ĐKHKTT:** Số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
 * **Thể trạng chung:** Cao 1m72, nặng 68kg, thể trạng cân đối, cơ bắp phát triển.
 

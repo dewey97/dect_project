@@ -385,6 +385,55 @@ class DetectiveAudioSynth {
       })
     } catch {}
   }
+
+  // Train Horn & Railway Crossing Bell Sound Effect (Tạp âm còi tàu diesel & chuông gác chắn đường sắt)
+  public playTrainHornAndBellSound() {
+    if (this.isMuted) return
+    const ctx = this.getContext()
+    if (!ctx) return
+
+    try {
+      const now = ctx.currentTime
+
+      // 1. Train Horn: 2 dissonant frequencies (e.g. 311Hz & 370Hz)
+      const horn1 = ctx.createOscillator()
+      const horn2 = ctx.createOscillator()
+      const hornGain = ctx.createGain()
+
+      horn1.type = 'sawtooth'
+      horn1.frequency.setValueAtTime(311, now)
+      horn2.type = 'sawtooth'
+      horn2.frequency.setValueAtTime(370, now)
+
+      hornGain.gain.setValueAtTime(0.001, now)
+      hornGain.gain.linearRampToValueAtTime(0.18, now + 0.1)
+      hornGain.gain.setValueAtTime(0.18, now + 0.9)
+      hornGain.gain.exponentialRampToValueAtTime(0.001, now + 1.3)
+
+      horn1.connect(hornGain)
+      horn2.connect(hornGain)
+      hornGain.connect(ctx.destination)
+
+      horn1.start(now)
+      horn2.start(now)
+      horn1.stop(now + 1.35)
+      horn2.stop(now + 1.35)
+
+      // 2. Crossing Bell Dings
+      ;[0.15, 0.55, 0.95].forEach((bellTime) => {
+        const bell = ctx.createOscillator()
+        const bellGain = ctx.createGain()
+        bell.type = 'sine'
+        bell.frequency.setValueAtTime(1480, now + bellTime)
+        bellGain.gain.setValueAtTime(0.07, now + bellTime)
+        bellGain.gain.exponentialRampToValueAtTime(0.0005, now + bellTime + 0.35)
+        bell.connect(bellGain)
+        bellGain.connect(ctx.destination)
+        bell.start(now + bellTime)
+        bell.stop(now + bellTime + 0.36)
+      })
+    } catch {}
+  }
 }
 
 export const detectiveAudio = new DetectiveAudioSynth()

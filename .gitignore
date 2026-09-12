@@ -25,3 +25,9 @@ build_log.txt
 *.tsbuildinfo
 .next_dev/
 .claude/
+
+# Temporary audio/video scratch files in root
+/*.wav
+/*.ogg
+/*.mp3
+/*.mp4

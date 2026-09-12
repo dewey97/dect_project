@@ -10,22 +10,23 @@ export const assistant000: AssistantConversation = {
   timelineInfo: {
     title: 'Mốc thời gian điều tra',
     rows: [
-      { label: '18:30', value: 'Trần Ngọc Mai có mặt tại nhà Khang' },
-      { label: '19:30', value: 'Lê Quang Vũ chui cửa sau tìm bản vẽ' },
-      { label: '20:00', value: 'Tùng xô ngã Khang & vỡ bình trà' },
-      { label: '20:15', value: 'Tùng tháo chạy khỏi hiện trường' },
-      { label: '20:45', value: 'Hà lén chui vào nhà' },
+      { label: '18:30', value: 'Trần Ngọc Mai & Lê Quang Vũ đến nhà Khang đòi đất' },
+      { label: '19:00', value: 'Mai rời đi về nhà (khớp tiếng xe lúc Thời sự VTV1)' },
+      { label: '19:30', value: 'Vũ rời đi ra Quán Bia 88 uống đến 20:45' },
+      { label: '20:00', value: 'Tùng xô ngã Khang & vỡ bình trà (ngày giỗ 30 năm)' },
+      { label: '20:15', value: 'Tùng tháo chạy khỏi hiện trường về Cầu Bươu' },
+      { label: '20:45', value: 'Hà lén chui vào nhà, mở khóa iPhone 8 Plus' },
       { label: '21:00', value: 'Nạn nhân bị đâm tử vong (Hung thủ: Hà)' }
     ]
   },
   recoveredMessageRef: {
-    evidenceId: 'EV-GLASS-SHARD',
-    title: 'Mảnh vỡ bình trà dính máu',
-    previewText: 'Vật sắc nhọn gây ra vết đâm đứt động mạch cảnh lúc 21:00'
+    evidenceId: 'EV-HAIR-DNA',
+    title: 'Lọn tóc mai dính máu trong áo ngực',
+    previewText: 'Khớp 100% ADN nạn nhân Nguyễn Văn Khang'
   },
   hints: [
-    { level: 1, text: 'Soi tia UV phát hiện vết tẩy xóa hóa chất và mực bi 2024 viết đè tên Mai trên di chúc 2018.' },
-    { level: 2, text: 'So sánh giờ Tùng tháo chạy (20:15) với giờ tử vong do đứt động mạch (21:00).' },
-    { level: 3, text: 'Lỗi lỡ lời của Hà trong lời khai 07d mô tả chi tiết vết gục bên bình trà vỡ.' }
+    { level: 1, text: 'Giám định kỹ thuật phát hiện chữ ký đồ nét tracing trên Giấy ủy quyền đất 200m² và hóa đơn Quán Bia 88 minh oan cho Mai & Vũ.' },
+    { level: 2, text: 'So sánh giờ Tùng rời đi (20:15) với giờ tử vong do đứt động mạch cảnh (21:00).' },
+    { level: 3, text: 'Âm thanh còi tàu 20:32 trong Voicemail và lịch VTV3 thứ Sáu (chỉ chiếu Gameshow) bóc trần toàn bộ alibi của Hà.' }
   ]
 }

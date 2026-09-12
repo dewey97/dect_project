@@ -12,13 +12,13 @@
 Hôm nay, ngày 15 tháng 04 năm 2026, tại TP. Hà Nội, chúng tôi gồm có:
 
 ### BÊN ỦY QUYỀN (BÊN A):
-* **Họ và tên:** **TRẦN NGỌC MAI** | **Sinh ngày:** 15/05/1996.
-* **Số CCCD:** `001196004523` cấp ngày 10/08/2022.
+* **Họ và tên:** **TRẦN NGỌC MAI** | **Sinh ngày:** 15/05/1992.
+* **Số CCCD:** `001192004523` cấp ngày 10/08/2022.
 * **Nơi ĐKHKTT:** Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.
 
 ### BÊN ĐƯỢC ỦY QUYỀN (BÊN B):
-* **Họ và tên:** **NGUYỄN VĂN KHANG** | **Sinh ngày:** 10/11/1993.
-* **Số CCCD:** `001093006721` cấp ngày 15/03/2021.
+* **Họ và tên:** **NGUYỄN VĂN KHANG** | **Sinh ngày:** 10/11/1988.
+* **Số CCCD:** `001088006721` cấp ngày 15/03/2021.
 * **Nơi ĐKHKTT:** Số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
 
 ---

@@ -20,14 +20,14 @@ export const photos000: Record<string, Photo[]> = {
       id: 'ph-03',
       filename: 'photo-childhood-group.jpg',
       size: '1.1 MB',
-      location: 'Khu vực sân nhà năm 1998',
+      location: 'Khu vực sân nhà hè năm 1996',
       status: 'recovered'
     },
     {
       id: 'ph-04',
       filename: 'photo-old-newspaper.jpg',
       size: '1.0 MB',
-      location: 'Kho tư liệu báo chí 1998',
+      location: 'Kho tư liệu báo chí 1996',
       status: 'recovered'
     },
     {

@@ -21,8 +21,8 @@ Vào hồi 14 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 **Tiến hành lấy lời khai người liên quan:**
-* **Họ và tên:** **TRẦN NGỌC MAI** | **Giới tính:** Nữ | **Sinh ngày:** 15/05/1996.
-* **CCCD số:** `001196004523` cấp ngày 10/08/2022 tại Cục CSQLHC về TTXH.
+* **Họ và tên:** **TRẦN NGỌC MAI** | **Giới tính:** Nữ | **Sinh ngày:** 15/05/1992 (34 tuổi).
+* **CCCD số:** `001192004523` cấp ngày 10/08/2022 tại Cục CSQLHC về TTXH.
 * **Nơi ĐKHKTT:** Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.
 * **Nghề nghiệp:** Chuyên viên Hành chính — Nhân sự. Mối quan hệ với nạn nhân: Em họ (con chú ruột).
 

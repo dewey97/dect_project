@@ -12,8 +12,8 @@ Hôm nay, ngày 10 tháng 01 năm 2024, tại nhà cụ Nguyễn Văn Thọ (s�
 
 ### THÀNH PHẦN THAM DỰ:
 1. **Chủ trì:** Cụ Nguyễn Văn Thọ (Ông nội — Sinh năm 1938).
-2. **Đại diện nhánh Trưởng:** Nguyễn Văn Khang (Cháu đích tôn — Sinh năm 1993).
-3. **Đại diện nhánh Thứ:** Trần Ngọc Mai (Cháu gái — Sinh năm 1996).
+2. **Đại diện nhánh Trưởng:** Nguyễn Văn Khang (Cháu đích tôn — Sinh năm 1988).
+3. **Đại diện nhánh Thứ:** Trần Ngọc Mai (Cháu gái — Sinh năm 1992).
 
 ---
 

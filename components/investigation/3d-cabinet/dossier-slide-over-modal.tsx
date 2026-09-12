@@ -70,7 +70,7 @@ export function DossierSlideOverModal({
             </div>
 
             {/* Activation Form y hệt màn Activate */}
-            {inspectingFile.isLocked ? (
+            {inspectingFile.status === 'locked' ? (
               <div className="space-y-3 pt-1 relative z-10">
                 <div className="p-3.5 bg-[#2b1b0e] border border-red-900/40 rounded-xl text-center space-y-1 shadow-inner">
                   <span className="font-mono text-xs font-black text-red-400 uppercase flex items-center justify-center gap-1.5">

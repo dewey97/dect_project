@@ -11,25 +11,28 @@ Số: `08/BB-TXDT`
 ---
 
 # BIÊN BẢN TRÍCH XUẤT DỮ LIỆU ĐIỆN THOẠI DI ĐỘNG
-*(Nạn nhân: Nguyễn Văn Khang — Thiết bị: iPhone 13 Pro Max — Mã vật chứng: `dev-00`)*
+*(Nạn nhân: Nguyễn Văn Khang — Thiết bị: iPhone 8 Plus — Mã vật chứng: `dev-00`)*
 
 ---
 
 ### I. THÔNG TIN THIẾT BỊ & PHƯƠNG PHÁP TRÍCH XUẤT
-* **Thiết bị thu giữ:** 01 Điện thoại thông minh iPhone 13 Pro Max màu đen, số IMEI: `356984110294812`.
+* **Thiết bị thu giữ:** 01 Điện thoại thông minh iPhone 8 Plus màu đen (có nút Home cảm biến vân tay Touch ID), số IMEI: `356984110294812`.
 * **Cán bộ kỹ thuật:** Đại úy Hoàng Mạnh Hùng — Đội Kỹ thuật số & Điện tử viễn thông (PC09).
 * **Phương pháp trích xuất:** Sử dụng thiết bị chuyên dụng UFED Cellebrite trích xuất dữ liệu vật lý toàn diện.
 
 ---
 
-### II. DỮ LIỆU TIN NHẮN SMS & ZALO ĐÁNG CHÚ Ý
+### II. DỮ LIỆU TIN NHẮN SMS & ỨNG DỤNG ĐÁNG CHÚ Ý
 
 | Thời Gian | Người Gửi / Người Nhận | Nội Dung Trích Xuất | Đánh Giá Nghiệp Vụ |
 | :--- | :--- | :--- | :--- |
 | **18/07 22:10** | `Hà Kế Toán` ➔ `Khang`<br>*(1 tuần trước)* | *"Anh Khang ơi, sao hôm nay anh lại nói những lời như vậy với em? Anh đừng giận em nữa được không, mình gặp nhau nói chuyện đàng hoàng nhé anh..."*<br>`[Đã xem - Không trả lời]` | Tin nhắn từ 1 tuần trước; Khang đã xóa toàn bộ lịch sử trò chuyện cũ trước đó và không hề phản hồi. |
-| **23/07 14:22** | `Khang` ➔ `0988.20.09.94` | *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"* | Tin nhắn đe dọa đòi nợ 300M dồn con nợ vào chân tường sau khi bị bùng hẹn. |
+| **23/07 14:22** | `Khang` ➔ `0988.20.09.91` | *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"* | Tin nhắn đe dọa đòi nợ 300M dồn con nợ vào chân tường sau khi bị bùng hẹn. |
 | **24/07 15:30** | `0913.882.901` ➔ `Khang` | *"Tròn 30 năm rồi đó. M không có gì muốn nói với Huy à?"* | Tin nhắn ẩn ý nhắc ngày giỗ tròn 30 năm từ số máy lạ (trùng số thợ nề Tùng trên bảng tin). |
-| **24/07 17:45** | `Thảo Vy` ➔ `Khang` | *"Vé máy bay sáng mai 06:15 em book xong rồi nhé anh yêu. Tiền mặt anh chuẩn bị đủ chưa? Vào trong này sống luôn với em nhé!"* | Tin nhắn tình nhân mới rủ đi xa, làm rõ kế hoạch bỏ trốn của Khang. |
+| **24/07 17:30** | `Khang` ➔ `Bé Vy ❤️` | *"Anh đang dồn nốt tiền cọc đất với mấy mối nợ bốc họ tối nay là cầm gọn hơn 2 tỷ tiền mặt. Sáng mai bay sớm vào với em nhé bé yêu."* | Chuỗi tin nhắn hội thoại 2 chiều qua lại làm rõ kế hoạch Khang gom tiền bỏ trốn cùng nhân tình mới. |
+| **24/07 17:45** | `Bé Vy ❤️` ➔ `Khang` | *"Vé máy bay chuyến 06:15 sáng mai em book xong cả 2 vé rồi nhé anh yêu! Mà còn con bé người yêu cũ bám đuôi anh thì sao? Nó có biết anh đi không?"* | Thảo Vy hỏi về người yêu cũ (Hà). |
+| **24/07 17:50** | `Khang` ➔ `Bé Vy ❤️` | *"Kệ xác nó, con Hà phiền phức đấy anh tắt thông báo cả tuần nay rồi. Tối nay xong việc anh vứt sim là xong, vào trong đó nó tìm bằng mắt. Đời này anh chỉ cần em thôi ❤️"* | Khang ruồng rẫy Hà, xúc phạm gọi là "con phiền phức bám đuôi". |
+| **24/07 17:55** | `Bé Vy ❤️` ➔ `Khang` | *"Nhớ lời anh đó nha! Em chuẩn bị xong hết vali rồi, sáng mai em đợi anh ở sân bay Nội Bài đấy! ✈️❤️"* | Chốt lịch hẹn ra sân bay sáng 25/07. |
 | **24/07 19:15** | `Hà Kế Toán` ➔ `Khang`<br>*(🔕 Đã tắt thông báo)* | *"Anh Khang ơi, tối nay em đem hũ trà hoa cúc mới sao sang cho anh nhé... anh nhớ uống rồi nghỉ sớm nhé."*<br>`[Trạng thái: Đã gửi - Chưa xem]` | Sau 1 tuần im bặt, Hà nhắn tin nối lại liên lạc; Khang đã tắt thông báo và không xem tin nhắn. |
 
 ---

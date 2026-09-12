@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   ArrowLeft,
   Search,
@@ -12,10 +12,22 @@ import {
   Circle,
   Pin,
   Trash2,
-  CheckCheck
+  CheckCheck,
+  Play,
+  Pause,
+  Volume2,
+  BellOff,
+  Sparkles,
+  Bookmark,
+  BookmarkCheck,
+  X,
+  Maximize2,
+  ShieldAlert,
+  AlertCircle
 } from 'lucide-react'
 import type { Conversation, Message } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { detectiveAudio } from '@/lib/investigation-audio'
 
 interface MessagesAppProps {
   threads: Conversation[]
@@ -28,6 +40,66 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
   const [isEditMode, setIsEditMode] = useState(false)
   const [selectedThreadIds, setSelectedThreadIds] = useState<string[]>([])
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null)
+
+  // Voice note interactive playback
+  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null)
+  const [playbackProgress, setPlaybackProgress] = useState(0)
+
+  // Modals
+  const [inspectingClue, setInspectingClue] = useState<Message | null>(null)
+  const [previewImage, setPreviewImage] = useState<{ url: string; title?: string } | null>(null)
+  const [pinnedClueIds, setPinnedClueIds] = useState<string[]>([])
+  const [pinnedNotification, setPinnedNotification] = useState<string | null>(null)
+
+  // Load pinned clues from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('khang_phone_pinned_clues')
+      if (saved) setPinnedClueIds(JSON.parse(saved))
+    } catch {}
+  }, [])
+
+  // Audio playback ticker
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (playingAudioId) {
+      timer = setInterval(() => {
+        setPlaybackProgress((prev) => {
+          if (prev >= 100) {
+            setPlayingAudioId(null)
+            return 0
+          }
+          return prev + 6
+        })
+      }, 500)
+    }
+    return () => clearInterval(timer)
+  }, [playingAudioId])
+
+  const togglePlayAudio = (msg: Message) => {
+    if (playingAudioId === msg.id) {
+      setPlayingAudioId(null)
+    } else {
+      setPlayingAudioId(msg.id)
+      setPlaybackProgress(0)
+      // Synthesize realistic acoustic train sound if this is the train clue
+      if (msg.attachment?.audioClue?.includes('còi tàu')) {
+        detectiveAudio.playTrainHornAndBellSound()
+      }
+    }
+  }
+
+  const togglePinClue = (clueId: string, title?: string) => {
+    setPinnedClueIds((prev) => {
+      const next = prev.includes(clueId) ? prev.filter((id) => id !== clueId) : [...prev, clueId]
+      try {
+        localStorage.setItem('khang_phone_pinned_clues', JSON.stringify(next))
+      } catch {}
+      return next
+    })
+    setPinnedNotification(pinnedClueIds.includes(clueId) ? 'Đã gỡ manh mối' : `Đã ghim: ${title || 'Manh mối'}`)
+    setTimeout(() => setPinnedNotification(null), 2500)
+  }
 
   // Touch/Drag swipe-to-back ref
   const touchStartX = useRef<number | null>(null)
@@ -42,8 +114,8 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
     const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX
     const diffX = clientX - touchStartX.current
     if (diffX > 60 && selectedThread) {
-      // Swiped right -> go back
       setSelectedThread(null)
+      setPlayingAudioId(null)
     }
     touchStartX.current = null
   }
@@ -69,38 +141,75 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
       onMouseDown={handleTouchStart}
       onMouseUp={handleTouchEnd}
     >
+      {/* Pinned Toast Notification */}
+      {pinnedNotification && (
+        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-50 px-3 py-1.5 rounded-full bg-[#1C1C1E]/95 border border-[#30D158]/40 shadow-xl text-[11px] text-[#30D158] font-semibold flex items-center gap-1.5 animate-in fade-in slide-in-from-top-2">
+          <BookmarkCheck className="size-3.5 text-[#30D158]" />
+          <span>{pinnedNotification}</span>
+        </div>
+      )}
+
       {/* THREAD DETAIL VIEW */}
       {selectedThread ? (
         <div className="flex flex-col h-full animate-in slide-in-from-right-4 duration-200">
           {/* iOS Chat Top Navigation Bar */}
           <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-[#161618]/95 backdrop-blur-md border-b border-[#2C2C2E] shrink-0 z-10">
             <button
-              onClick={() => setSelectedThread(null)}
+              onClick={() => {
+                setSelectedThread(null)
+                setPlayingAudioId(null)
+              }}
               className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium active:opacity-60 transition-opacity"
             >
               <ArrowLeft className="size-4" />
               <span>Tin nhắn</span>
             </button>
 
-            <div className="flex flex-col items-center max-w-[160px]">
-              <div className="size-7 rounded-full bg-gradient-to-tr from-[#3A3A3C] to-[#636366] text-white flex items-center justify-center font-bold text-[11px] border border-white/10 shadow-sm">
+            <div className="flex flex-col items-center max-w-[170px]">
+              <div
+                className={cn(
+                  'size-7 rounded-full text-white flex items-center justify-center font-bold text-[11px] border border-white/10 shadow-sm bg-gradient-to-tr',
+                  selectedThread.avatarColor || 'from-[#3A3A3C] to-[#636366]'
+                )}
+              >
                 {selectedThread.name.slice(0, 1)}
               </div>
-              <span className="text-[11px] font-semibold text-white truncate mt-0.5 max-w-full">
-                {selectedThread.name}
-              </span>
+              <div className="flex items-center gap-1 mt-0.5 max-w-full">
+                <span className="text-[11px] font-semibold text-white truncate">
+                  {selectedThread.name}
+                </span>
+                {selectedThread.isMuted && (
+                  <span title="Đã tắt thông báo" className="inline-flex shrink-0">
+                    <BellOff className="size-2.5 text-[#8E8E93]" />
+                  </span>
+                )}
+              </div>
+              {selectedThread.phoneNumber && (
+                <span className="text-[8.5px] text-[#8E8E93] font-mono leading-none">
+                  {selectedThread.phoneNumber}
+                </span>
+              )}
             </div>
 
-            <button className="text-[#0A84FF] active:opacity-60 p-1">
+            <button
+              onClick={() => {
+                if (selectedThread.messages.some((m) => m.isClue)) {
+                  const firstClue = selectedThread.messages.find((m) => m.isClue)
+                  if (firstClue) setInspectingClue(firstClue)
+                }
+              }}
+              className="text-[#0A84FF] active:opacity-60 p-1"
+              title="Thông tin hội thoại"
+            >
               <Info className="size-4" />
             </button>
           </div>
 
-          {/* Messages Stream - Long Multi-day Scrollable */}
-          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5 flex flex-col justify-start">
-            <div className="text-center my-2">
-              <span className="text-[9.5px] text-[#8E8E93] bg-[#1C1C1E]/80 px-2.5 py-1 rounded-full border border-white/5 font-mono">
-                Lịch sử hội thoại mã hóa đầu cuối iMessage
+          {/* Messages Stream */}
+          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 flex flex-col justify-start pb-10">
+            <div className="text-center my-1.5">
+              <span className="text-[9px] text-[#8E8E93] bg-[#1C1C1E]/80 px-2.5 py-1 rounded-full border border-white/5 font-mono">
+                Bản trích xuất iMessage & SMS // UFED Cellebrite
               </span>
             </div>
 
@@ -110,6 +219,9 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
                 idx === 0 ||
                 (msg.timestamp.includes('•') &&
                   !selectedThread.messages[idx - 1]?.timestamp.includes(msg.timestamp.split('•')[0]))
+
+              const isPlayingThis = playingAudioId === msg.id
+              const isPinned = pinnedClueIds.includes(msg.id)
 
               return (
                 <div key={msg.id} className="space-y-1">
@@ -125,11 +237,8 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
                   )}
 
                   <div
-                    onClick={() =>
-                      setActiveMessageId(activeMessageId === msg.id ? null : msg.id)
-                    }
                     className={cn(
-                      'flex flex-col max-w-[80%] group cursor-pointer',
+                      'flex flex-col max-w-[84%] group',
                       isMe ? 'self-end items-end ml-auto' : 'self-start items-start'
                     )}
                   >
@@ -138,26 +247,146 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
                         {msg.sender}
                       </span>
                     )}
+
+                    {/* Chat Bubble Container */}
                     <div
+                      onClick={() => setActiveMessageId(activeMessageId === msg.id ? null : msg.id)}
                       className={cn(
-                        'px-3 py-1.5 rounded-[18px] text-[12px] leading-relaxed break-words shadow-sm transition-all',
+                        'px-3 py-2 rounded-[18px] text-[12px] leading-relaxed break-words shadow-sm transition-all cursor-pointer relative',
                         isMe
                           ? 'bg-[#0A84FF] text-white rounded-br-[4px]'
                           : 'bg-[#26252A] text-[#F2F2F7] rounded-bl-[4px] border border-white/5'
                       )}
                     >
-                      {msg.text}
+                      {/* Image Attachment Preview */}
+                      {msg.attachment?.type === 'image' && msg.attachment.thumbnail && (
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setPreviewImage({
+                              url: msg.attachment?.thumbnail || '',
+                              title: msg.attachment?.title
+                            })
+                          }}
+                          className="mb-2 rounded-xl overflow-hidden border border-white/10 relative group/img cursor-pointer active:scale-95 transition-transform"
+                        >
+                          <img
+                            src={msg.attachment.thumbnail}
+                            alt={msg.attachment.title || 'Ảnh đính kèm'}
+                            className="w-full h-32 object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-1 text-[11px] font-semibold text-white">
+                            <Maximize2 className="size-3.5" /> Soi chi tiết
+                          </div>
+                          {msg.attachment.title && (
+                            <div className="p-1.5 bg-black/80 text-[10px] text-white/90 truncate font-mono">
+                              📎 {msg.attachment.title}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Audio Voice Note Bubble */}
+                      {msg.attachment?.type === 'audio' && (
+                        <div className="mb-2 p-2.5 rounded-xl bg-black/40 border border-white/10 space-y-2">
+                          <div className="flex items-center gap-2.5">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                togglePlayAudio(msg)
+                              }}
+                              className={cn(
+                                'size-8 rounded-full flex items-center justify-center transition-all shadow active:scale-90',
+                                isPlayingThis
+                                  ? 'bg-[#FF453A] text-white ring-2 ring-[#FF453A]/40 animate-pulse'
+                                  : 'bg-[#30D158] text-black'
+                              )}
+                            >
+                              {isPlayingThis ? (
+                                <Pause className="size-4 fill-white" />
+                              ) : (
+                                <Play className="size-4 fill-black ml-0.5" />
+                              )}
+                            </button>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between text-[10.5px]">
+                                <span className="font-semibold text-white flex items-center gap-1">
+                                  <Volume2 className="size-3 text-[#30D158]" /> Ghi âm thoại
+                                </span>
+                                <span className="font-mono text-[9.5px] text-[#8E8E93]">
+                                  {msg.attachment.duration || '0:18'}
+                                </span>
+                              </div>
+
+                              {/* Simulated Audio Waveform Bar */}
+                              <div className="flex items-center gap-0.5 mt-1.5 h-4">
+                                {[35, 60, 85, 45, 95, 75, 40, 80, 65, 30, 90, 50, 70, 85, 40, 60, 30].map(
+                                  (h, i) => (
+                                    <div
+                                      key={i}
+                                      style={{ height: `${h}%` }}
+                                      className={cn(
+                                        'w-1 rounded-full transition-all duration-300',
+                                        isPlayingThis
+                                          ? 'bg-[#30D158] animate-pulse'
+                                          : 'bg-white/30'
+                                      )}
+                                    />
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Audio Clue Callout Banner */}
+                          {msg.attachment.audioClue && (
+                            <div className="p-2 rounded-lg bg-[#FF9F0A]/10 border border-[#FF9F0A]/30 text-[10px] text-[#FFD60A] leading-relaxed">
+                              {msg.attachment.audioClue}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Main Message Text */}
+                      <p className="text-[12px]">{msg.text}</p>
+
+                      {/* Forensic Clue Trigger Badge */}
+                      {msg.isClue && (
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setInspectingClue(msg)
+                          }}
+                          className="mt-2 pt-1.5 border-t border-white/10 flex items-center justify-between gap-1 text-[10px] text-[#FFD60A] font-medium hover:underline cursor-pointer"
+                        >
+                          <span className="flex items-center gap-1 font-bold">
+                            <Sparkles className="size-3 text-[#FFD60A] animate-pulse" />
+                            {msg.clueTitle || 'Manh mối quan trọng'}
+                          </span>
+                          <span className="text-[9px] text-[#FFD60A]/80 font-mono">Soi hồ sơ →</span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Detailed timestamp reveal */}
-                    <span
-                      className={cn(
-                        'text-[8.5px] text-[#8E8E93] mt-0.5 px-1 font-mono transition-opacity',
-                        activeMessageId === msg.id ? 'opacity-100' : 'opacity-60'
+                    {/* Detailed Metadata / Status sub-bar */}
+                    <div className="flex items-center gap-1.5 text-[8.5px] text-[#8E8E93] mt-0.5 px-1 font-mono">
+                      <span>{msg.timestamp}</span>
+                      {msg.status && <span>• {msg.status}</span>}
+                      {msg.isClue && (
+                        <button
+                          onClick={() => togglePinClue(msg.id, msg.clueTitle)}
+                          className="hover:text-[#30D158] transition-colors ml-1"
+                          title="Ghim manh mối"
+                        >
+                          {isPinned ? (
+                            <BookmarkCheck className="size-3 text-[#30D158]" />
+                          ) : (
+                            <Bookmark className="size-3 text-[#8E8E93]" />
+                          )}
+                        </button>
                       )}
-                    >
-                      {msg.timestamp}
-                    </span>
+                    </div>
                   </div>
                 </div>
               )
@@ -169,8 +398,8 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
             <button className="size-7 rounded-full bg-[#2C2C2E] flex items-center justify-center text-[#8E8E93] active:bg-[#3A3A3C]">
               <Camera className="size-3.5" />
             </button>
-            <div className="flex-1 h-7 rounded-full bg-[#1C1C1E] border border-[#2C2C2E] px-3 flex items-center justify-between text-[#8E8E93] text-[12px]">
-              <span>iMessage</span>
+            <div className="flex-1 h-7 rounded-full bg-[#1C1C1E] border border-[#2C2C2E] px-3 flex items-center justify-between text-[#8E8E93] text-[11px] font-mono">
+              <span>Thiết bị tang vật [Chế độ chỉ đọc]</span>
               <Mic className="size-3.5" />
             </div>
           </div>
@@ -198,7 +427,7 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-[#8E8E93]" />
               <input
                 type="text"
-                placeholder="Tìm kiếm tin nhắn..."
+                placeholder="Tìm kiếm theo tên hoặc nội dung..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-7 rounded-lg bg-[#1C1C1E] pl-8 pr-3 text-[12px] text-white placeholder-[#8E8E93] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
@@ -240,7 +469,12 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
 
                   {/* Avatar */}
                   <div className="relative shrink-0">
-                    <div className="size-10 rounded-full bg-gradient-to-tr from-[#3A3A3C] to-[#545458] text-white flex items-center justify-center font-bold text-xs border border-white/10 shadow">
+                    <div
+                      className={cn(
+                        'size-10 rounded-full text-white flex items-center justify-center font-bold text-xs border border-white/10 shadow bg-gradient-to-tr',
+                        thread.avatarColor || 'from-[#3A3A3C] to-[#545458]'
+                      )}
+                    >
                       {thread.name.slice(0, 1)}
                     </div>
                     {thread.unread && (
@@ -251,18 +485,32 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span
-                        className={cn(
-                          'text-[13px] font-semibold text-white truncate',
-                          thread.unread && 'text-[#0A84FF]'
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span
+                          className={cn(
+                            'text-[13px] font-semibold text-white truncate',
+                            thread.unread && 'text-[#0A84FF]'
+                          )}
+                        >
+                          {thread.name}
+                        </span>
+                        {thread.isMuted && (
+                          <span title="Đã tắt thông báo" className="inline-flex shrink-0">
+                            <BellOff className="size-3 text-[#8E8E93]" />
+                          </span>
                         )}
-                      >
-                        {thread.name}
-                      </span>
+                      </div>
                       <span className="text-[10px] text-[#8E8E93] font-mono shrink-0 ml-1">
                         {thread.timestamp}
                       </span>
                     </div>
+
+                    {thread.phoneNumber && (
+                      <span className="text-[9.5px] text-[#636366] font-mono block">
+                        {thread.phoneNumber}
+                      </span>
+                    )}
+
                     <p className="text-[11.5px] text-[#8E8E93] truncate mt-0.5 leading-snug">
                       {thread.previewText}
                     </p>
@@ -299,6 +547,85 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
           )}
         </div>
       )}
+
+      {/* MODAL 1: Forensic Clue Inspector */}
+      {inspectingClue && (
+        <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md p-4 flex flex-col justify-center items-center animate-in fade-in-50">
+          <div className="w-full max-w-[300px] rounded-2xl bg-[#1C1C1E] border border-[#FFD60A]/40 p-4 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <span className="text-[11.5px] font-bold text-[#FFD60A] flex items-center gap-1.5 uppercase tracking-wider">
+                <ShieldAlert className="size-4 text-[#FFD60A]" /> Báo Cáo Manh Mối
+              </span>
+              <button
+                onClick={() => setInspectingClue(null)}
+                className="text-[#8E8E93] hover:text-white p-1"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2 text-left">
+              <div className="text-[12.5px] font-bold text-white">
+                {inspectingClue.clueTitle || 'Manh mối mấu chốt'}
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-[11px] text-white/90 italic">
+                "{inspectingClue.text}"
+              </div>
+
+              <div className="text-[11px] text-[#A1A1A6] leading-relaxed">
+                {inspectingClue.clueAnalysis}
+              </div>
+
+              <div className="text-[9.5px] font-mono text-[#8E8E93] pt-1">
+                Thời gian: {inspectingClue.timestamp} // Người gửi: {inspectingClue.sender}
+              </div>
+            </div>
+
+            <div className="pt-2 flex gap-2">
+              <button
+                onClick={() => {
+                  togglePinClue(inspectingClue.id, inspectingClue.clueTitle)
+                  setInspectingClue(null)
+                }}
+                className={cn(
+                  'flex-1 py-2 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5',
+                  pinnedClueIds.includes(inspectingClue.id)
+                    ? 'bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40'
+                    : 'bg-[#0A84FF] text-white hover:bg-[#0077ED]'
+                )}
+              >
+                <BookmarkCheck className="size-3.5" />
+                {pinnedClueIds.includes(inspectingClue.id) ? 'Đã ghim sổ tay' : 'Ghim vào sổ tay'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: Image Lightbox Preview */}
+      {previewImage && (
+        <div
+          onClick={() => setPreviewImage(null)}
+          className="absolute inset-0 z-50 bg-black/90 backdrop-blur-md p-4 flex flex-col justify-center items-center animate-in fade-in-50 cursor-pointer"
+        >
+          <div className="w-full max-w-[310px] space-y-2">
+            <div className="flex justify-between items-center text-white text-[12px] px-1 font-mono">
+              <span className="truncate">{previewImage.title || 'Ảnh tang vật đính kèm'}</span>
+              <button onClick={() => setPreviewImage(null)} className="p-1 text-[#8E8E93] hover:text-white">
+                <X className="size-4" />
+              </button>
+            </div>
+            <img
+              src={previewImage.url}
+              alt={previewImage.title || 'Preview'}
+              className="w-full max-h-[380px] object-contain rounded-2xl border border-white/20 shadow-2xl"
+            />
+            <p className="text-center text-[10px] text-[#8E8E93]">Chạm vào màn hình để đóng</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+

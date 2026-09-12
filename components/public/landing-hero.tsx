@@ -80,21 +80,21 @@ export function LandingHero({ activePoster }: LandingHeroProps) {
               "Khi bạn đã loại bỏ tất cả những điều không thể, thì điều còn lại, dù vô lý đến đâu, cũng chính là sự thật."
               <span className="block mt-1 not-italic text-primary/60">— Sherlock Holmes</span>
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-2">
+            <div className="relative group inline-flex mt-2">
+              {/* Huy hiệu kính lúp ở góc trên cùng bên trái */}
+              <div
+                className="absolute -top-3 -left-3 z-20 size-8 rounded-full bg-zinc-950 border border-primary/60 text-primary flex items-center justify-center shadow-lg shadow-black/80 ring-2 ring-background group-hover:scale-110 group-hover:border-primary group-hover:rotate-12 transition-all duration-300 pointer-events-none"
+                aria-hidden="true"
+              >
+                <Search className="size-4" strokeWidth={2.5} />
+              </div>
+
               <Button
                 onClick={() => router.push('/cabinet-demo')}
                 size="lg"
-                className="h-12 px-6 font-mono text-xs font-bold uppercase tracking-widest transition-transform active:scale-[0.98]"
+                className="relative h-14 sm:h-16 px-8 sm:px-10 font-mono text-sm sm:text-base font-black uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_25px_rgba(217,119,6,0.35)] hover:shadow-[0_0_40px_rgba(217,119,6,0.55)] border border-amber-400/50 transition-all duration-300 active:scale-[0.98] cursor-pointer"
               >
                 Phá Án Online
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => router.push('/cases')}
-                className="h-12 px-6 font-mono text-xs font-bold uppercase tracking-widest border-zinc-800 dark:border-zinc-800 text-zinc-100 bg-zinc-950 dark:bg-zinc-950 hover:bg-zinc-900 dark:hover:bg-zinc-900 hover:text-white"
-              >
-                Khám Phá Các Vụ Án
               </Button>
             </div>
           </div>

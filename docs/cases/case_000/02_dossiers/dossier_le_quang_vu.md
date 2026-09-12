@@ -13,7 +13,7 @@
 ```
                        ┌──────────────────────────────────────┐
                        │  ẢNH HỒ SƠ CĂN CƯỚC ĐIỀU TRA (ID)    │
-                       │  MÃ SỐ ĐỐI TƯỢNG: 000-SP-VU-1994     │
+                       │  MÃ SỐ ĐỐI TƯỢNG: 000-SP-VU-1991     │
                        │  TÌNH TRẠNG: ĐÃ BỊ TẠM GIỮ LẤY LỜI KHAI│
                        │  PHÂN LOẠI: CÓ ĐỘNG CƠ HÀNH HUNG     │
                        └──────────────────────────────────────┘
@@ -39,13 +39,13 @@
 | :--- | :--- |
 | **Họ và tên khai sinh** | **LÊ QUANG VŨ** |
 | **Tên thường gọi** | Vũ / "Thằng Lệch Pha" (Khang gọi mỉa mai do mắt lác và làm nghề điện) |
-| **Ngày tháng năm sinh** | 20/09/1994 (32 tuổi tính đến thời điểm xảy ra vụ án) |
-| **Số CCCD** | `001094005812`, cấp ngày 12/04/2021 tại Cục CSQLHC về TTXH |
-| **Số điện thoại** | `0988.20.09.94` (Khớp ngày tháng năm sinh `20.09.94`) |
+| **Ngày tháng năm sinh** | 20/09/1991 (35 tuổi tính đến thời điểm xảy ra vụ án) |
+| **Số CCCD** | `001091005812`, cấp ngày 12/04/2021 tại Cục CSQLHC về TTXH |
+| **Số điện thoại** | `0988.20.09.91` (Khớp ngày tháng năm sinh `20.09.91`) |
 | **Quê quán** | Huyện Thanh Trì, TP. Hà Nội |
 | **Nơi cư trú hiện tại** | Số 45, Phố Đoàn Kết, Phường Trung Tâm (Ở rể cùng vợ Trần Ngọc Mai) |
 | **Nghề nghiệp** | Kỹ sư Điện & Lắp đặt thiết bị tự do |
-| **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Trần Ngọc Mai, sinh năm 1996) |
+| **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Trần Ngọc Mai, sinh năm 1992) |
 | **Đặc điểm nhận dạng** | Nam, cao 1m70, mắt trái có tật lác nhẹ (lé nhẹ), đeo kính gọng đen |
 
 ---
@@ -108,8 +108,8 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 ## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
 
 ### 1. Cơ chế 1: Đối chiếu Sổ nợ `10a` & Biệt danh "Thằng Lệch Pha"
-* **Vật chứng:** Cuốn sổ ghi nợ tín dụng đen `10a` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.94 — Hạn: 20/07 — Ghi chú: ~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Phải mách nhà nó...*.
-* **Khớp nối suy luận:** Nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08` + địa chỉ 45 Đoàn Kết + SĐT `0988.20.09.94` $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ!
+* **Vật chứng:** Cuốn sổ ghi nợ tín dụng đen `10a` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.91 — Hạn: 20/07 — Ghi chú: ~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Phải mách nhà nó...*.
+* **Khớp nối suy luận:** Nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08` + địa chỉ 45 Đoàn Kết + SĐT `0988.20.09.91` $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ!
 
 ### 2. Cơ chế 2: Câu đố Sổ thu chi Quán Bia 88 (`06_so_thu_chi_quan_bia.md`)
 * **Dữ liệu đối chiếu:**

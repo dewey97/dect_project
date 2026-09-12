@@ -9,7 +9,7 @@ export type CaseStatus = 'locked' | 'active' | 'solved' | 'sealed'
 export type DifficultyRating = 1 | 2 | 3 | 4 | 5
 export type DeviceKind = 'phone' | 'laptop' | 'tablet' | 'drive' | 'recorder' | 'camera' | 'gps'
 export type DeviceStatus = 'locked' | 'unlocking' | 'unlocked' | 'analyzing' | 'completed'
-export type EvidenceKind = 'message' | 'email' | 'voice' | 'photo' | 'gps' | 'document'
+export type EvidenceKind = 'message' | 'email' | 'voice' | 'photo' | 'gps' | 'document' | 'object'
 
 /** A single investigation, activated with a code from the physical game box. */
 export interface Case {
@@ -110,16 +110,31 @@ export interface Message {
   role: 'sent' | 'received' | 'corrupted'
   text: string
   timestamp: string
+  status?: string // e.g. 'Đã xem 17:56', 'Chưa đọc', 'Đã gửi'
+  attachment?: {
+    type: 'image' | 'audio' | 'location'
+    title?: string
+    thumbnail?: string
+    url?: string
+    duration?: string
+    audioClue?: string
+  }
+  isClue?: boolean
+  clueTitle?: string
+  clueAnalysis?: string
 }
 
 /** Conversation thread containing messages */
 export interface Conversation {
   id: string
   name: string
+  phoneNumber?: string
+  avatarColor?: string
   timestamp: string
   previewText: string
   recoveryProgress: number
   unread: boolean
+  isMuted?: boolean
   messages: Message[]
 }
 
@@ -178,6 +193,7 @@ export interface Document {
   content: string
   meta: string
   damaged?: boolean
+  timestamp?: string
 }
 
 /** Recovered binary/Zip/PDF file info */

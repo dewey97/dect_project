@@ -56,7 +56,7 @@ Mã tài liệu: `00c-MAP`
 | :--- | :---: | :---: | :---: | :--- |
 | **Nhà Khang $\rightarrow$ Nhà Mai & Vũ** | 4.0 km | Xe máy | 10 – 12 phút | Mai rời đi 19:00 $\rightarrow$ có mặt tại nhà 19:45 (lời khai ở nhà khớp sự cố mất cáp 20:10). |
 | **Nhà Khang $\rightarrow$ Quán Bia 88** | 3.8 km | Xe ôm app | 10 – 12 phút | Vũ đón xe ôm lúc 19:30 $\rightarrow$ đến Quán Bia 88 lúc 19:42 $\rightarrow$ thanh toán CK lúc 20:45. |
-| **Phòng trọ Hà $\rightarrow$ Nhà Khang** | 1.2 km | Đi bộ trong ngõ | 10 – 12 phút | Hà đi bộ từ 20:30, gọi voicemail 20:32 (lọt còi tàu), vào nhà 20:45 $\rightarrow$ **HUNG THỦ CÓ MẶT GÂY ÁN LÚC 21:00!** |
+| **Phòng trọ Hà $\rightarrow$ Nhà Khang** | 1.2 km | Đi bộ trong ngõ | 10 – 12 phút | Hà đi bộ từ 19:20, rình dưới cây xoan từ 19:25, gọi voicemail 20:32 (lọt còi tàu), lẻn vào nhà 20:45 $\rightarrow$ **HUNG THỦ CÓ MẶT GÂY ÁN LÚC 21:00!** |
 
 ---
 

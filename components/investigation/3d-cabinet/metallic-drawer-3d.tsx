@@ -157,8 +157,8 @@ export function MetallicDrawer3D({
       </mesh>
 
       {/* 3. Ổ KHÓA TRÒN 3D CHUYÊN DỤNG (KEY LOCK CYLINDER) */}
-      <mesh position={[0.78, 0.38, 0.22]}>
-        <cylinderGeometry args={[0.07, 0.07, 0.08, 16]} rotation={[Math.PI / 2, 0, 0]} />
+      <mesh position={[0.78, 0.38, 0.22]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.07, 0.07, 0.08, 16]} />
         <meshStandardMaterial color="#27272a" metalness={0.95} roughness={0.1} />
       </mesh>
       {/* Lỗ khóa chìa */}
@@ -173,13 +173,13 @@ export function MetallicDrawer3D({
 
       {/* 4. TAY CẦM TRÒN KIM LOẠI UỐN BẬC (3D HANDLES) */}
       {/* Chân tay cầm trái */}
-      <mesh position={[-0.45, -0.18, 0.26]}>
-        <cylinderGeometry args={[0.04, 0.04, 0.1, 12]} rotation={[Math.PI / 2, 0, 0]} />
+      <mesh position={[-0.45, -0.18, 0.26]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.04, 0.04, 0.1, 12]} />
         <meshStandardMaterial color="#27272a" metalness={0.9} />
       </mesh>
       {/* Chân tay cầm phải */}
-      <mesh position={[0.45, -0.18, 0.26]}>
-        <cylinderGeometry args={[0.04, 0.04, 0.1, 12]} rotation={[Math.PI / 2, 0, 0]} />
+      <mesh position={[0.45, -0.18, 0.26]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.04, 0.04, 0.1, 12]} />
         <meshStandardMaterial color="#27272a" metalness={0.9} />
       </mesh>
       {/* Thanh nắm ngang */}

@@ -22,7 +22,6 @@ import { IPhoneFrame } from './iphone/iphone-frame'
 import { Smartphone, Terminal } from 'lucide-react'
 
 // Import Reusable Evidence Viewers
-import { EvidenceHeader } from './viewers/evidence-header'
 import { MetadataPanel } from './viewers/metadata-panel'
 import { ConversationViewer } from './viewers/conversation-viewer'
 import { PhotoGallery } from './viewers/photo-gallery'
@@ -95,10 +94,10 @@ export function PhoneSimulator({
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-5 px-2 sm:px-4 pb-6 sm:pb-10">
+    <div className="flex flex-col h-full w-full overflow-hidden px-1 sm:px-4 pt-1 sm:pt-2 pb-1 sm:pb-2">
       
       {/* Return Navigation & View Mode Toggle */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 sm:pt-2">
+      <div className="flex items-center justify-between gap-2 shrink-0 px-1">
         <button
           onClick={() => router.push('/evidence')}
           className="flex items-center gap-1.5 font-mono text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
@@ -137,24 +136,21 @@ export function PhoneSimulator({
         </div>
       </div>
 
-      {/* 1. Evidence Header (Collapsible / Compact on mobile iPhone view) */}
-      <div className={cn(viewMode === 'iphone' && "hidden sm:block")}>
-        <EvidenceHeader device={device} />
-      </div>
-
       {/* 2. MAIN WORKSPACE */}
       {viewMode === 'iphone' ? (
-        <IPhoneFrame
-          device={device}
-          threads={threads}
-          photos={photos}
-          notes={notes}
-          history={history}
-          files={files}
-          onSwitchToForensics={() => setViewMode('forensics')}
-        />
+        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center overflow-hidden pt-0.5">
+          <IPhoneFrame
+            device={device}
+            threads={threads}
+            photos={photos}
+            notes={notes}
+            history={history}
+            files={files}
+            onSwitchToForensics={() => setViewMode('forensics')}
+          />
+        </div>
       ) : (
-        <>
+        <div className="flex-1 min-h-0 w-full flex flex-col overflow-y-auto gap-3 sm:gap-4 pt-2 pb-8 custom-scrollbar">
           {/* Metadata Panel (only shown at root grid list) */}
           {!activeApp && <MetadataPanel device={device} />}
 
@@ -285,7 +281,7 @@ export function PhoneSimulator({
         </div>
 
       </div>
-        </>
+        </div>
       )}
 
     </div>
