@@ -148,8 +148,8 @@
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
 | **Nhật ký cuộc gọi** (`16`) | Trích xuất 12h: 5 SĐT gọi đến (2 số có tên sẵn, 3 số không tên) | Manh mối khởi đầu truy tìm danh tính Tùng | Hồ sơ điều tra ban đầu (Điện thoại Khang) |
-| **Biên bản lấy thông tin Chị Lan** (`16a`) | Bản tự thuật thông tin người liên quan Chị Lan Quán Nước | Bối cảnh liên lạc ban đầu (Nhiễu) | Hồ sơ điều tra ban đầu |
-| **Biên bản lấy thông tin Bình Còi** (`16b`) | Bản tự thuật thông tin người liên quan Bình Còi | Bối cảnh liên lạc ban đầu (Nhiễu) | Hồ sơ điều tra ban đầu |
+| **Biên bản lấy thông tin Chị Lan** (`16a`) | Bản tự thuật thông tin người liên quan Chị Lan Quán Nước | Nhiễu | Hồ sơ điều tra ban đầu |
+| **Biên bản lấy thông tin Bình Còi** (`16b`) | Bản tự thuật thông tin người liên quan Bình Còi | Nhiễu | Hồ sơ điều tra ban đầu |
 | **Trích sao Sổ ghi nợ** (`05`) | Danh sách con nợ (khớp SĐT ẩn danh Lê Quang Vũ & 18:45) | Tra cứu danh tính các SĐT ẩn danh nợ nần | Thu thập tại hiện trường nhà Khang |
 | **Bảng thông tin khu phố** (`18`) | Mục tin rao vặt bán vật liệu xây dựng (chứa SĐT Tùng) | Tra cứu SĐT 19:55 ➔ Tìm ra Nguyễn Thanh Tùng | Thu thập tại Bảng thông tin khu phố Đoàn Kết |
 | **Phỏng vấn bố mẹ Tùng** (`11`) | Lời khai bố mẹ Tùng: Khang từng chơi với 2 con trai nhà bà đến khi em út qua đời | Gieo ấn tượng mơ hồ về mối quan hệ quá khứ & sự xuất hiện của con lớn (Nhiễu) | Lời khai hàng xóm (Hồ sơ ban đầu) |
