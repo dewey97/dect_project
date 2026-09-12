@@ -135,9 +135,9 @@
 * **Giai đoạn 0 — Thu thập manh mối ban đầu & Truy tìm danh tính SĐT 19:55:**
   - **Bối cảnh ban đầu:** Tùng **chưa có tên trong danh sách nghi phạm** chính thức. Mục tiêu giai đoạn này là phân tích `Nhật ký cuộc gọi` (`16`) để tra cứu danh tính 2 SĐT không tên và tìm ra Tùng.
   - **Phân tích 4 SĐT trong Nhật ký cuộc gọi (`16`):**
-    - 📞 **2 SĐT có tên sẵn (Có sẵn Biên bản lấy thông tin dạng tự thuật ở Giai đoạn 0 — Nhiễu):**
-      - SĐT Chị Lan Quán Nước (`0932.889.102`) — Gọi lúc 17:30 ➔ Biên bản tự thuật thông tin người liên quan (con nợ đóng lãi đủ trong Sổ nợ `05`, không mâu thuẫn) *(Nhiễu)*
-      - SĐT Lê Quang Vũ (`0988.20.09.91`) — Gọi lúc 18:15 ➔ Biên bản tự thuật thông tin người liên quan *(Thuộc Tuyến A / Nhiễu đối với Tuyến B)*
+    - 📞 **2 SĐT có tên sẵn (Nhiễu ban đầu):**
+      - SĐT Chị Lan Quán Nước (`0932.889.102`) — Gọi lúc 17:30 ➔ Mở sẵn `Biên bản lấy thông tin` (`16a`) (con nợ đóng lãi đủ trong Sổ nợ `05`, không mâu thuẫn) *(Nhiễu)*
+      - SĐT Lê Quang Vũ (`0988.20.09.91`) — Gọi lúc 18:15 ➔ Đã có hồ sơ nghi phạm ở Tuyến A *(Nhiễu đối với Tuyến B)*
     - ❓ **2 SĐT không tên (Cần tra cứu danh tính để mở khóa Biên bản thông tin):**
       - SĐT ẩn danh 1 (`0912.xxx.888` - Gọi 18:45) ➔ Đối chiếu `Trích sao Sổ ghi nợ` (`05`) tra ra danh tính con nợ.
       - SĐT ẩn danh 2 (`0984.xxx.357` - Gọi 19:55) ➔ Đối chiếu mục tin rao vặt trên `Bảng thông tin khu phố` (`18`) tra ra chủ nhân **Nguyễn Thanh Tùng**.
@@ -147,7 +147,7 @@
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
 | **Nhật ký cuộc gọi** (`16`) | Trích xuất 12h: 4 SĐT gọi đến (2 số có tên sẵn, 2 số không tên) | Manh mối khởi đầu truy tìm danh tính Tùng | Hồ sơ điều tra ban đầu (Điện thoại Khang) |
-| **Biên bản lấy thông tin (2 SĐT có tên)** (`16a`) | Bản tự thuật thông tin người liên quan (Chị Lan & Lê Quang Vũ) (Dạng tự thuật, không phải Q&A) | Bối cảnh liên lạc ban đầu (Nhiễu) | Hồ sơ điều tra ban đầu |
+| **Biên bản lấy thông tin Chị Lan** (`16a`) | Bản tự thuật thông tin người liên quan Chị Lan Quán Nước | Bối cảnh liên lạc ban đầu (Nhiễu) | Hồ sơ điều tra ban đầu |
 | **Trích sao Sổ ghi nợ** (`05`) | Danh sách con nợ (khớp SĐT không tên 18:45) | Tra cứu danh tính SĐT không tên nợ nần | Thu thập tại hiện trường nhà Khang |
 | **Bảng thông tin khu phố** (`18`) | Mục tin rao vặt bán vật liệu xây dựng (chứa SĐT Tùng) | Tra cứu SĐT 19:55 ➔ Tìm ra Nguyễn Thanh Tùng | Thu thập tại Bảng thông tin khu phố Đoàn Kết |
 | **Phỏng vấn bố mẹ Tùng** (`11`) | Lời khai bố mẹ Tùng: Khang từng chơi với 2 con trai nhà bà đến khi em út qua đời | Gieo ấn tượng mơ hồ về mối quan hệ quá khứ & sự xuất hiện của con lớn (Nhiễu) | Lời khai hàng xóm (Hồ sơ ban đầu) |
