@@ -119,32 +119,59 @@
 ### 🟡 LỰA CHỌN 2: TẬP HỒ SƠ TUYẾN B — NGUYỄN THANH TÙNG (`02_nhanh_tung/`)
 
 #### 👨 Nguyễn Thanh Tùng (Mâu thuẫn Án cũ 20 năm trước)
-* **Giai đoạn 0 — Mở Tập hồ sơ ban đầu:**
+* **Giai đoạn 0 — Thu thập manh mối ban đầu & Truy tìm danh tính SĐT 19:55:**
+  - **Bối cảnh ban đầu:** Tùng **chưa có tên trong danh sách nghi phạm** chính thức. Mục tiêu giai đoạn này là gieo manh mối cuộc gọi 19:55 để cảnh sát tìm ra Tùng và lấy lời khai lần 1.
+  - **Danh mục tài liệu & Vật chứng ban đầu:**
+
+| Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
+| :--- | :--- | :--- | :--- |
+| **Nhật ký cuộc gọi** (`16`) | Trích xuất 12h: 4 SĐT gọi đến (1 có tên, 3 không tên; có SĐT gọi lúc 19:55) | Manh mối khởi đầu truy tìm danh tính Tùng | Hồ sơ điều tra ban đầu (Điện thoại Khang) |
+| **Trích sao Sổ ghi nợ** (`05`) | Danh sách con nợ (khớp được 2 SĐT không tên trong nhật ký cuộc gọi) | Tra cứu danh tính 2/3 SĐT không tên | Thu thập tại hiện trường nhà Khang |
+| **Bảng thông tin khu phố** (`18`) | 4 mục: Sự cố TV 20:00, **Tin rao vặt bán vật liệu xây dựng (chứa SĐT Tùng)**, Trưng cầu quy hoạch xóm, Cảnh báo cho vay nặng lãi | **Puzzle tra cứu SĐT 19:55** ➔ Tìm ra tên & SĐT Nguyễn Thanh Tùng | Thu thập tại Bảng thông tin khu phố Đoàn Kết |
+| **Phỏng vấn bố mẹ Tùng** (`11`) | Lời khai bố mẹ Tùng: Khang từng chơi với 2 con trai nhà bà đến khi em út qua đời; Mấy hôm trước bảo con lớn sang mời giỗ em mà chưa sang | Gieo ấn tượng mơ hồ về mối quan hệ quá khứ & sự xuất hiện của con lớn | Lời khai hàng xóm (Hồ sơ ban đầu) |
+| **Mảnh báo cũ xé vụn** (`p5`) | Các mảnh báo bị xé nhỏ rải rác trên sàn gần bàn (nơi Khang ngã). Ghép lại thành bài báo 20 năm trước: *"SỰ CỐ THƯƠNG TÂM: BÉ TRAI TỬ VONG KHI BỊ KẸT TRONG TỦ"* (Bé N.G.H 8 tuổi, câm, bệnh tim, chốt gỗ sập; ảnh có chiếc còi màu cam rớt ngoài tủ) | Manh mối bi kịch Trốn Tìm 1996 & bằng chứng có người mang báo đến xé | Khám nghiệm hiện trường sàn nhà Khang |
+| **Ảnh kỷ niệm 1996** (`p4`) | Ảnh Lễ Đại Đoàn Kết 20 năm trước: Khang, Mai, Tùng (sẹo ở lông mày đang bế Huy), Huy (đeo chiếc còi màu cam) | Manh mối khớp Tùng là anh trai bé Huy & nhận diện sẹo lông mày | Thu thập tại hiện trường nhà Khang |
+| **Dấu vân tay tách trà** (`p1`) | Dấu vân tay lạ trên tách trà phòng khách Khang (chưa xác định danh tính ban đầu) | Manh mối sinh học chờ đối chiếu | Khám nghiệm hiện trường phòng khách |
+
+  - **Suy luận đối chiếu & Mở khóa Lời khai 1:**
+    - ➔ Đối chiếu Nhật ký cuộc gọi (`16`) (SĐT 19:55) với Mục rao vặt bán vật liệu xây dựng trên Bảng tin khu phố (`18`): Tìm ra chủ nhân SĐT 19:55 chính là **Nguyễn Thanh Tùng**.
+    - ➔ Tìm đủ tên 3 người liên quan ➔ Mở khóa **Biên bản lấy thông tin người liên quan (Lý lịch & Lời khai lần 1 của Tùng `14`)**.
+
+---
+
+* 🔓 **GIAI ĐOẠN 1 — Lấy thông tin người liên quan lần 1 & Bóc trần Tùng nói dối:**
   - **Danh mục tài liệu tiếp cận:**
 
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
-| **Lời khai Nguyễn Thanh Tùng** (`14`) | Khai gọi điện lúc 19:55, chối không sang nhà Khang | Lời khai chối tới hiện trường | Hồ sơ điều tra ban đầu |
-| **Dấu vân tay tách trà** (`p1`) | Vân tay lạ trên tách trà phòng khách Khang | Chứng minh Tùng đã vào nhà uống trà | Khám nghiệm dấu vết tách trà phòng khách |
-| **Bức ảnh kỷ niệm 1996** (`p4`) | Ảnh 1996: Tùng (sẹo lông mày), Gia Huy (còi cam) | Manh mối nhận diện án cũ 1996 | Tìm thấy trong khung ảnh vỡ dưới sàn nhà |
-| **Bài báo cũ năm 1996** (`p5`) | Bài báo 1996 vụ án bé Gia Huy bị nhốt tủ | Động cơ trả thù cá nhân của Tùng | Tra cứu SĐT 19:55 trên Bảng tin `18` |
+| **Lời khai Tùng (lần 1)** (`14`) | Khai gọi 19:55 hỏi hẹn gặp vay tiền sửa nhà; Khai về quê làm đám giỗ 20 năm em trai; **Khẳng định CHỈ GỌI ĐIỆN, KHÔNG GẶP MẶT Khang** | Lời khai chối bỏ việc có mặt tại hiện trường | Mở khóa sau khi tra đủ danh tính SĐT 19:55 |
 
-  - **Suy luận đối chiếu:**
-    - ➔ Tùng chính là anh trai bé Gia Huy bị nhốt tủ năm 1996.
-    - ➔ Vân tay tách trà (`p1`) trùng khớp vân tay Tùng.
-    - ➔ Bóc trần Tùng nói dối: Tùng đã trực tiếp sang nhà Khang đối chất!
+  - **Suy luận đối chiếu & Bóc trần:**
+    - ➔ Ghép nối Mảnh báo xé vụn (`p5`) (tai nạn bé N.G.H tử vong trong tủ khi chơi trốn tìm) + Ảnh kỷ niệm (`p4`) (Tùng bế Huy đeo còi cam) + Lời khai Tùng (`14`) (về quê làm đám giỗ 20 năm em trai): Xác định Tùng chính là anh trai bé Huy.
+    - ➔ **Nghi vấn chí mạng**: Bài báo bị xé vụn ngay tại vị trí Khang ngã đập đầu ➔ Tùng có khả năng cao đã mang bài báo này đến gặp Khang đối chất và xé ném xuống sàn trong lúc xô xát bộc phát!
+    - ➔ **Hành động điều tra**: Tiến hành xét nghiệm đối chiếu Dấu vân tay Tùng với Dấu vân tay trên tách trà (`p1`) ➔ **Kết quả trùng khớp 100%**!
+    - ➔ **Bóc trần Tùng nói dối**: Chứng minh Tùng đã trực tiếp bước vào nhà Khang ngồi uống trà, không phải "chỉ gọi điện không gặp mặt".
 
-* 🔓 **GIAI ĐOẠN 1 — Mở Thẻ tài liệu tự thú (`01_tu_thu_xo_xat_tung`):**
+---
+
+* 🧩 **PUZZLE CÂU HỎI NHẬP TEXT (`Text Entry Question`):**
+  - **Câu hỏi hệ thống đặt ra cho người chơi**: *"Theo bạn vì sao Tùng đến gặp Khang?"*
+  - **Hành động người chơi**: Nhập câu trả lời bằng Text entry.
+  - **Kích hoạt:** Nhập chính xác ➔ Mở khóa buổi Thẩm vấn cuối & Thẻ tự thú của Tùng (`01_tu_thu_xo_xat_tung`).
+
+---
+
+* 🔓 **GIAI ĐOẠN 2 — Mở khóa Thẻ tài liệu tự thú & Bế tắc:**
   - **Danh mục tài liệu mở khóa:**
 
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
-| **Thẻ tự thú của Tùng** (`01`) | Tùng tự thú xô Khang ngất lúc 20:00 rồi bỏ chạy 20:15 | Xác nhận xô xát, nạn nhân vẫn thở khi đi | Giải đố chữ & bóc trần Tùng 1996 |
+| **Thẻ tự thú của Tùng** (`01`) | Tùng tự thú mang bài báo sang hỏi Khang sự thật 1996, xô Khang ngã đập đầu ngất lúc 20:00, rời đi lúc 20:15 khi Khang vẫn còn thở | Xác nhận xô xát, nạn nhân vẫn thở khi Tùng rời đi | Nhập đúng Text Entry trả lời câu hỏi lý do Tùng gặp Khang |
 
   - **Suy luận đối chiếu & Bế tắc:**
-    - ➔ Mở Lời tự thú: Tùng khai xô Khang ngã đập đầu ngất lúc 20:00 rồi bỏ chạy lúc 20:15.
-    - 🚨 **Suy luận bế tắc:** Lời khai *"Tôi bỏ đi khi Khang còn thở"* là lời khai 1 chiều, không thể xác minh Tùng có quay lại hay không.
-    - ➔ Vụ án rơi vào ngõ cụt bế tắc (`isTuyenBCompleted = true`).
+    - ➔ Lời tự thú của Tùng (`01`): Thừa nhận mang bài báo đến hỏi Khang, nảy sinh xô xát và xô Khang ngã đập đầu ngất lúc 20:00, sau đó bỏ chạy lúc 20:15 khi Khang vẫn còn thở.
+    - 🚨 **Suy luận bế tắc:** Lời khai *"Tôi bỏ đi khi Khang còn thở"* là lời khai 1 chiều; thương tích chí mạng đâm chết Khang diễn ra lúc ~21:00 bằng mảnh thủy tinh. Không thể kết tội Tùng giết người nếu không có chứng cứ bổ sung.
+    - ➔ Tuyến B rơi vào ngõ cụt bế tắc (`isTuyenBCompleted = true`).
 
 * 👉 **Kết luận Tập hồ sơ Tuyến B:** Tùng rơi vào bế tắc 1 chiều (`isTuyenBCompleted = true`).
 
