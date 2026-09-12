@@ -133,22 +133,31 @@
 ### 🟡 LỰA CHỌN 2: TẬP HỒ SƠ TUYẾN B — NGUYỄN THANH TÙNG (`02_nhanh_tung/`)
 
 * **Giai đoạn 0 — Thu thập manh mối ban đầu & Truy tìm danh tính SĐT 19:55:**
-  - **Bối cảnh ban đầu:** Tùng **chưa có tên trong danh sách nghi phạm** chính thức. Mục tiêu giai đoạn này là gieo manh mối cuộc gọi 19:55 để cảnh sát tìm ra Tùng và lấy lời khai lần 1.
+  - **Bối cảnh ban đầu:** Tùng **chưa có tên trong danh sách nghi phạm** chính thức. Mục tiêu giai đoạn này là phân tích `Nhật ký cuộc gọi` (`16`) để tra cứu danh tính 2 SĐT không tên và tìm ra Tùng.
+  - **Phân tích 4 SĐT trong Nhật ký cuộc gọi (`16`):**
+    - 📞 **2 SĐT có tên sẵn (Nhiễu ban đầu):**
+      - SĐT Bà Lụa (Hàng xóm / Chủ trọ) — Gọi lúc 17:30 *(Thông tin nền / Nhiễu)*
+      - SĐT Lê Quang Vũ (Em họ) — Gọi lúc 18:15 *(Thuộc Tuyến A / Nhiễu đối với Tuyến B)*
+    - ❓ **2 SĐT không tên (Cần giải đố / Tra cứu để mở khóa):**
+      - SĐT ẩn danh 1 (`0912.xxx.888` - Gọi 18:45) ➔ Đối chiếu `Trích sao Sổ ghi nợ` (`05`) tra ra danh tính con nợ.
+      - SĐT ẩn danh 2 (`0984.xxx.357` - Gọi 19:55) ➔ Đối chiếu mục tin rao vặt trên `Bảng thông tin khu phố` (`18`) tra ra chủ nhân **Nguyễn Thanh Tùng**.
+
   - **Danh mục tài liệu & Vật chứng manh mối:**
 
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
-| **Nhật ký cuộc gọi** (`16`) | Trích xuất 12h: 4 SĐT gọi đến (1 có tên, 3 không tên; có SĐT gọi lúc 19:55) | Manh mối khởi đầu truy tìm danh tính Tùng | Hồ sơ điều tra ban đầu (Điện thoại Khang) |
-| **Trích sao Sổ ghi nợ** (`05`) | Danh sách con nợ (khớp được 2 SĐT không tên trong nhật ký cuộc gọi) | Tra cứu danh tính 2/3 SĐT không tên | Thu thập tại hiện trường nhà Khang |
-| **Bảng thông tin khu phố** (`18`) | Mục tin rao vặt bán vật liệu xây dựng dự án ABC (chứa SĐT của Tùng) | Tra cứu SĐT 19:55 ➔ Từ đó tìm được tên chủ SĐT gọi đến (Nguyễn Thanh Tùng) | Thu thập tại Bảng thông tin khu phố Đoàn Kết |
-| **Phỏng vấn bố mẹ Tùng** (`11`) | Lời khai bố mẹ Tùng: Khang từng chơi với 2 con trai nhà bà đến khi em út qua đời; Mấy hôm trước bảo con lớn sang mời giỗ em mà chưa sang | Gieo ấn tượng mơ hồ về mối quan hệ quá khứ & sự xuất hiện của con lớn | Lời khai hàng xóm (Hồ sơ ban đầu) |
-| **Mảnh báo cũ xé vụn** (`p5`) | Các mảnh báo xé rải rác trên sàn, ghép lại thành bài báo 20 năm trước về vụ tai nạn bé N.G.H bị kẹt trong tủ | Manh mối bi kịch Trốn Tìm 1996 & bằng chứng có người mang báo đến xé | Khám nghiệm hiện trường sàn nhà Khang |
-| **Ảnh kỷ niệm 1996** (`p4`) | Ảnh Lễ Đại Đoàn Kết 20 năm trước (Khang, Mai, Tùng bế Huy), bị vỡ khung kính rớt dưới sàn nhà | Manh mối khớp Tùng là anh trai bé Huy & nhận diện sẹo lông mày | Thu thập trong khung ảnh vỡ dưới sàn nhà Khang |
-| **Dấu vân tay tách trà** (`p1`) | Dấu vân tay lạ trên tách trà phòng khách Khang (chưa xác định danh tính ban đầu) | Manh mối sinh học chờ đối chiếu | Khám nghiệm hiện trường phòng khách |
+| **Nhật ký cuộc gọi** (`16`) | Trích xuất 12h: 4 SĐT gọi đến (2 số có tên sẵn, 2 số không tên) | Manh mối khởi đầu truy tìm danh tính Tùng | Hồ sơ điều tra ban đầu (Điện thoại Khang) |
+| **Thông tin 2 SĐT có tên** (`16a`) | Thông tin 2 SĐT có tên sẵn (Bà Lụa & Lê Quang Vũ) | Bối cảnh liên lạc ban đầu (Nhiễu) | Nhật ký cuộc gọi điện thoại Khang |
+| **Trích sao Sổ ghi nợ** (`05`) | Danh sách con nợ (khớp SĐT không tên 18:45) | Tra cứu danh tính SĐT không tên nợ nần | Thu thập tại hiện trường nhà Khang |
+| **Bảng thông tin khu phố** (`18`) | Mục tin rao vặt bán vật liệu xây dựng (chứa SĐT Tùng) | Tra cứu SĐT 19:55 ➔ Tìm ra Nguyễn Thanh Tùng | Thu thập tại Bảng thông tin khu phố Đoàn Kết |
+| **Phỏng vấn bố mẹ Tùng** (`11`) | Lời khai bố mẹ Tùng: Khang từng chơi với 2 con trai nhà bà đến khi em út qua đời | Gieo ấn tượng mơ hồ về mối quan hệ quá khứ & sự xuất hiện của con lớn (Nhiễu) | Lời khai hàng xóm (Hồ sơ ban đầu) |
+| **Mảnh báo cũ xé vụn** (`p5`) | Các mảnh báo xé rải rác trên sàn, ghép lại thành bài báo 20 năm trước | Manh mối bi kịch Trốn Tìm 1996 & bằng chứng có người mang báo đến xé | Khám nghiệm hiện trường sàn nhà Khang |
+| **Ảnh kỷ niệm 1996** (`p4`) | Ảnh Lễ Đại Đoàn Kết 20 năm trước (Khang, Mai, Tùng bế Huy), vỡ khung kính | Manh mối khớp Tùng là anh trai bé Huy & nhận diện sẹo lông mày | Thu thập trong khung ảnh vỡ dưới sàn nhà Khang |
+| **Dấu vân tay tách trà** (`p1`) | Dấu vân tay lạ trên tách trà phòng khách Khang | Manh mối sinh học chờ đối chiếu | Khám nghiệm hiện trường phòng khách |
 
   - **Suy luận đối chiếu & Mở khóa Lời khai 1:**
     - ➔ Đối chiếu Nhật ký cuộc gọi (`16`) (SĐT 19:55) với Mục rao vặt bán vật liệu xây dựng trên Bảng tin khu phố (`18`): Tìm ra chủ nhân SĐT 19:55 chính là **Nguyễn Thanh Tùng**.
-    - ➔ Tìm đủ tên 3 người liên quan ➔ Mở khóa **Biên bản lấy thông tin người liên quan (Lý lịch & Lời khai lần 1 của Tùng `14`)**.
+    - ➔ Giải mã xong 2 SĐT không tên ➔ Mở khóa **Biên bản lấy thông tin người liên quan (Lý lịch & Lời khai lần 1 của Tùng `14`)**.
 
 ---
 
