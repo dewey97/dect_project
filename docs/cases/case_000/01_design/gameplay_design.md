@@ -136,8 +136,8 @@
   - **Bối cảnh ban đầu:** Tùng **chưa có tên trong danh sách nghi phạm** chính thức. Mục tiêu giai đoạn này là phân tích `Nhật ký cuộc gọi` (`16`) để tra cứu danh tính 2 SĐT không tên và tìm ra Tùng.
   - **Phân tích 4 SĐT trong Nhật ký cuộc gọi (`16`):**
     - 📞 **2 SĐT có tên sẵn (Nhiễu ban đầu):**
-      - SĐT Bà Lụa (Hàng xóm / Chủ trọ) — Gọi lúc 17:30 *(Thông tin nền / Nhiễu)*
-      - SĐT Lê Quang Vũ (Em họ) — Gọi lúc 18:15 *(Thuộc Tuyến A / Nhiễu đối với Tuyến B)*
+      - SĐT Chị Lan Quán Nước (`0932.889.102`) — Gọi lúc 17:30 *(Con nợ đóng lãi đủ trong Sổ nợ `05` / Nhiễu)*
+      - SĐT Lê Quang Vũ (`0988.20.09.91`) — Gọi lúc 18:15 *(Thuộc Tuyến A / Nhiễu đối với Tuyến B)*
     - ❓ **2 SĐT không tên (Cần giải đố / Tra cứu để mở khóa):**
       - SĐT ẩn danh 1 (`0912.xxx.888` - Gọi 18:45) ➔ Đối chiếu `Trích sao Sổ ghi nợ` (`05`) tra ra danh tính con nợ.
       - SĐT ẩn danh 2 (`0984.xxx.357` - Gọi 19:55) ➔ Đối chiếu mục tin rao vặt trên `Bảng thông tin khu phố` (`18`) tra ra chủ nhân **Nguyễn Thanh Tùng**.
@@ -147,7 +147,7 @@
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
 | **Nhật ký cuộc gọi** (`16`) | Trích xuất 12h: 4 SĐT gọi đến (2 số có tên sẵn, 2 số không tên) | Manh mối khởi đầu truy tìm danh tính Tùng | Hồ sơ điều tra ban đầu (Điện thoại Khang) |
-| **Thông tin 2 SĐT có tên** (`16a`) | Thông tin 2 SĐT có tên sẵn (Bà Lụa & Lê Quang Vũ) | Bối cảnh liên lạc ban đầu (Nhiễu) | Nhật ký cuộc gọi điện thoại Khang |
+| **Thông tin 2 SĐT có tên** (`16a`) | Thông tin 2 SĐT có tên sẵn trong Sổ nợ `05` (Chị Lan Quán Nước & Lê Quang Vũ) | Bối cảnh liên lạc ban đầu (Nhiễu) | Nhật ký cuộc gọi điện thoại Khang |
 | **Trích sao Sổ ghi nợ** (`05`) | Danh sách con nợ (khớp SĐT không tên 18:45) | Tra cứu danh tính SĐT không tên nợ nần | Thu thập tại hiện trường nhà Khang |
 | **Bảng thông tin khu phố** (`18`) | Mục tin rao vặt bán vật liệu xây dựng (chứa SĐT Tùng) | Tra cứu SĐT 19:55 ➔ Tìm ra Nguyễn Thanh Tùng | Thu thập tại Bảng thông tin khu phố Đoàn Kết |
 | **Phỏng vấn bố mẹ Tùng** (`11`) | Lời khai bố mẹ Tùng: Khang từng chơi với 2 con trai nhà bà đến khi em út qua đời | Gieo ấn tượng mơ hồ về mối quan hệ quá khứ & sự xuất hiện của con lớn (Nhiễu) | Lời khai hàng xóm (Hồ sơ ban đầu) |
