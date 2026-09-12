@@ -59,6 +59,20 @@
 
 ## 🎮 II. TIẾN TRÌNH ĐIỀU TRA THEO CÁC TẬP HỒ SƠ
 
+### 📋 GIAI ĐOẠN 0 — TÀI LIỆU NHIỄU & THÔNG TIN NỀN BAN ĐẦU
+- **Bối cảnh:** Toàn bộ các văn bản hành chính tố tụng và thông tin bối cảnh mở đầu vụ án (không trực tiếp dùng làm manh mối suy luận).
+
+| Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
+| :--- | :--- | :---: | :--- | :--- |
+| **Phiếu tiếp nhận tin báo** (`01`) | Tin báo từ bà Lụa (06:45 sáng 25/07) | ⚪ | Thông tin nền hành chính ban đầu | Hồ sơ điều tra ban đầu |
+| **Quyết định khởi tố** (`02`) | Quyết định khởi tố vụ án hình sự | ⚪ | Thủ tục tố tụng hành chính | Hồ sơ điều tra ban đầu |
+| **Báo cáo tiến độ** (`06`) | Báo cáo tiến độ ban đầu chuyên án | ⚪ | Báo cáo hành chính nội bộ | Hồ sơ điều tra ban đầu |
+| **Nhân thân nạn nhân** (`07`) | Khang làm vay nặng lãi, mồ côi | ⚪ | Bối cảnh nghề nghiệp & quan hệ Khang | Hồ sơ điều tra ban đầu |
+| **Ma trận mâu thuẫn** (`09`) | Phân lập 4 hướng mâu thuẫn | ⚪ | Bảng tóm tắt định hướng 2 tuyến A/B | Hồ sơ điều tra ban đầu |
+| **Giấy note hoa cúc** (`17`) | Mảnh note dán hũ trà hoa cúc | ⚪ | Bối cảnh tình cảm Hà - Khang | Hũ trà hoa cúc hiện trường |
+
+---
+
 ### 🟢 LỰA CHỌN 1: TẬP HỒ SƠ TUYẾN A — MAI & VŨ (`01_nhanh_mai_vu/`)
 
 #### 👩 Nhánh 1A — Trần Ngọc Mai (Tranh chấp Đất đai)
@@ -120,19 +134,7 @@
 
 * **Giai đoạn 0 — Thu thập manh mối ban đầu & Truy tìm danh tính SĐT 19:55:**
   - **Bối cảnh ban đầu:** Tùng **chưa có tên trong danh sách nghi phạm** chính thức. Mục tiêu giai đoạn này là gieo manh mối cuộc gọi 19:55 để cảnh sát tìm ra Tùng và lấy lời khai lần 1.
-  
-  - **1. Nhóm tài liệu nhiễu / thông tin nền (Đẩy lên đầu):**
-
-| Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
-| :--- | :--- | :---: | :--- | :--- |
-| **Phiếu tiếp nhận tin báo** (`01`) | Tin báo từ bà Lụa (06:45 sáng 25/07) | ⚪ | Thông tin nền hành chính ban đầu | Hồ sơ điều tra ban đầu |
-| **Quyết định khởi tố** (`02`) | Quyết định khởi tố vụ án hình sự | ⚪ | Thủ tục tố tụng hành chính | Hồ sơ điều tra ban đầu |
-| **Báo cáo tiến độ** (`06`) | Báo cáo tiến độ ban đầu chuyên án | ⚪ | Báo cáo hành chính nội bộ | Hồ sơ điều tra ban đầu |
-| **Nhân thân nạn nhân** (`07`) | Khang làm vay nặng lãi, mồ côi | ⚪ | Bối cảnh nghề nghiệp & quan hệ Khang | Hồ sơ điều tra ban đầu |
-| **Ma trận mâu thuẫn** (`09`) | Phân lập 4 hướng mâu thuẫn | ⚪ | Bảng tóm tắt định hướng 2 tuyến A/B | Hồ sơ điều tra ban đầu |
-| **Giấy note hoa cúc** (`17`) | Mảnh note dán hũ trà hoa cúc | ⚪ | Bối cảnh tình cảm Hà - Khang | Hũ trà hoa cúc hiện trường |
-
-  - **2. Nhóm tài liệu chứa manh mối cốt lõi (Manh mối điều tra):**
+  - **Danh mục tài liệu & Vật chứng manh mối:**
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
