@@ -67,10 +67,10 @@
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
-| **Lời khai Mai** (`12`) | Khai ném hồ sơ rồi phóng xe về thẳng nhà (đến nơi ~19:45), xem TV đến 20:10 thì mất sóng cáp | 🟢 **Manh mối** | Timeline di chuyển & ngoại phạm TV | Hồ sơ điều tra ban đầu |
-| **Lời khai bà Lụa** (`11`) | Thấy Mai nổ máy xe phóng đi đúng lúc Thời sự VTV1 cất lên (19:00) | 🟢 **Manh mối** | Xác nhận mốc giờ Mai rời hiện trường | Hồ sơ điều tra ban đầu |
-| **Bảng tin rao vặt** (`18`) | Thông báo đứt cáp quang lúc 20:10 ở Phố Đoàn Kết | 🟢 **Manh mối** | Chứng cứ xác thực ngoại phạm ở nhà | Thu thập tại Bảng tin khu phố Đoàn Kết |
-| **Đơn đòi đất 200m²** (`p2`) | Xấp đơn đòi đất 200m² tại hiện trường | 🟢 **Manh mối** | Động cơ mâu thuẫn tranh chấp đất | Văng vãi dưới sàn cửa chính hiện trường |
+| **Lời khai Mai** (`12`) | Khai ném hồ sơ rồi phóng xe về thẳng nhà (đến nơi ~19:45), xem TV đến 20:10 thì mất sóng cáp | 🟢 | Timeline di chuyển & ngoại phạm TV | Hồ sơ điều tra ban đầu |
+| **Lời khai bà Lụa** (`11`) | Thấy Mai nổ máy xe phóng đi đúng lúc Thời sự VTV1 cất lên (19:00) | 🟢 | Xác nhận mốc giờ Mai rời hiện trường | Hồ sơ điều tra ban đầu |
+| **Bảng tin rao vặt** (`18`) | Thông báo đứt cáp quang lúc 20:10 ở Phố Đoàn Kết | 🟢 | Chứng cứ xác thực ngoại phạm ở nhà | Thu thập tại Bảng tin khu phố Đoàn Kết |
+| **Đơn đòi đất 200m²** (`p2`) | Xấp đơn đòi đất 200m² tại hiện trường | 🟢 | Động cơ mâu thuẫn tranh chấp đất | Văng vãi dưới sàn cửa chính hiện trường |
 
   - **Suy luận đối chiếu:**
     - ➔ Lời khai Mai (`12`): Khai cãi nhau xong nổ máy về thẳng nhà ở Phố Đoàn Kết lúc ~19:45, không ghi nhớ chính xác mốc giờ rời nhà Khang.
@@ -87,11 +87,11 @@
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
-| **Lời khai Vũ (lần 1)** (`13`) | Khai vợ vừa đi thì rời đi ngay để đi uống bia một mình | 🟢 **Manh mối** | Lời khai rời đi ban đầu (bắt thóp nán lại) | Hồ sơ điều tra ban đầu |
-| **Lịch sử App đặt xe** (`16`) | Lịch sử app cho thấy Vũ đặt xe lúc 19:30 | 🟢 **Manh mối** | Bắt thóp Vũ nói dối mốc giờ (chênh 30p) | Vũ tự xuất trình khi lấy lời khai |
-| **Trích sao Sổ ghi nợ** (`05`) | Sổ nợ 300M (con nợ biệt danh *"Lệch Pha"*, quá hạn trả) | 🟢 **Manh mối** | Xác định động cơ mâu thuẫn nợ nần | Thu thập tại hiện trường |
-| **SMS đòi nợ của Khang** (`10`) | SMS Khang gửi đòi nợ 300M (đe dọa mách bố vợ) | 🟢 **Manh mối** | Manh mối khoanh vùng nghi phạm quá hạn | Điện thoại giả lập của Khang |
-| **Ảnh chân dung Lê Quang Vũ** (`p6`) | Ảnh chân dung Vũ (hiển thị đặc điểm mắt lác nhẹ) | 🟢 **Manh mối** | Manh mối nhận diện biệt danh "Lệch Pha" | Hồ sơ điều tra ban đầu |
+| **Lời khai Vũ (lần 1)** (`13`) | Khai vợ vừa đi thì rời đi ngay để đi uống bia một mình | 🟢 | Lời khai rời đi ban đầu (bắt thóp nán lại) | Hồ sơ điều tra ban đầu |
+| **Lịch sử App đặt xe** (`16`) | Lịch sử app cho thấy Vũ đặt xe lúc 19:30 | 🟢 | Bắt thóp Vũ nói dối mốc giờ (chênh 30p) | Vũ tự xuất trình khi lấy lời khai |
+| **Trích sao Sổ ghi nợ** (`05`) | Sổ nợ 300M (con nợ biệt danh *"Lệch Pha"*, quá hạn trả) | 🟢 | Xác định động cơ mâu thuẫn nợ nần | Thu thập tại hiện trường |
+| **SMS đòi nợ của Khang** (`10`) | SMS Khang gửi đòi nợ 300M (đe dọa mách bố vợ) | 🟢 | Manh mối khoanh vùng nghi phạm quá hạn | Điện thoại giả lập của Khang |
+| **Ảnh chân dung Lê Quang Vũ** (`p6`) | Ảnh chân dung Vũ (hiển thị đặc điểm mắt lác nhẹ) | 🟢 | Manh mối nhận diện biệt danh "Lệch Pha" | Hồ sơ điều tra ban đầu |
 
   - **Suy luận đối chiếu:**
     - ➔ Lời khai bà Lụa (`11`) (Mai đi 19:00) vs App đặt xe (`16`) (Vũ đặt xe 19:30): Bắt thóp Vũ nói dối mốc giờ rời đi, chứng minh Vũ nán lại hiện trường 30 phút (19:00 – 19:30).
@@ -103,8 +103,8 @@
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
-| **Lời khai Vũ (lần 2)** (`07`) | Thừa nhận nán lại 30p xin hoãn nợ 300M; Khai gọi 1 đĩa nem + uống đúng nửa thùng bia; Khai thấy bóng người áo gió rình dưới gốc cây xoan lúc 19:25 | 🟢 **Manh mối** | Tháo gỡ 30p ẩn số; Cung cấp manh mối đồ gọi (1 đĩa nem + nửa thùng bia) để khớp Sổ thu chi & bóng người cây xoan | Công an tiến hành hỏi cung động cơ gây án |
-| **Sổ thu chi Quán Bia 88** (`06`) | Danh sách bàn thanh toán trong ngày | 🟢 **Manh mối** | Manh mối tra cứu mốc giờ thanh toán của Vũ (B7: 195k lúc 20:45) | Công an đến Quán Bia 88 xác minh theo Lời khai 2; chủ quán xuất trình sổ |
+| **Lời khai Vũ (lần 2)** (`07`) | Thừa nhận nán lại 30p xin hoãn nợ 300M; Khai gọi 1 đĩa nem + uống đúng nửa thùng bia; Khai thấy bóng người áo gió rình dưới gốc cây xoan lúc 19:25 | 🟢 | Tháo gỡ 30p ẩn số; Cung cấp manh mối đồ gọi (1 đĩa nem + nửa thùng bia) để khớp Sổ thu chi & bóng người cây xoan | Công an tiến hành hỏi cung động cơ gây án |
+| **Sổ thu chi Quán Bia 88** (`06`) | Danh sách bàn thanh toán trong ngày | 🟢 | Manh mối tra cứu mốc giờ thanh toán của Vũ (B7: 195k lúc 20:45) | Công an đến Quán Bia 88 xác minh theo Lời khai 2; chủ quán xuất trình sổ |
 
   - **Suy luận đối chiếu & Minh oan:**
     - ➔ Lời khai lần 2 (`07`): Vũ thừa nhận nán lại 30 phút (19:00 – 19:30) van xin hoãn nợ 300M, đồng thời khai báo nhìn thấy một bóng người mặc áo gió xám rình rập dưới gốc cây xoan lúc 19:25 trước khi đón xe đi Quán Bia 88.
@@ -120,23 +120,29 @@
 
 * **Giai đoạn 0 — Thu thập manh mối ban đầu & Truy tìm danh tính SĐT 19:55:**
   - **Bối cảnh ban đầu:** Tùng **chưa có tên trong danh sách nghi phạm** chính thức. Mục tiêu giai đoạn này là gieo manh mối cuộc gọi 19:55 để cảnh sát tìm ra Tùng và lấy lời khai lần 1.
-  - **Danh mục tài liệu & Vật chứng ban đầu (Gồm cả tài liệu nhiễu/nền):**
+  
+  - **1. Nhóm tài liệu nhiễu / thông tin nền (Đẩy lên đầu):**
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
-| **Phiếu tiếp nhận tin báo** (`01`) | Tin báo từ bà Lụa (06:45 sáng 25/07) | ⚪ **Tài liệu nhiễu** | Thông tin nền hành chính ban đầu | Hồ sơ điều tra ban đầu |
-| **Quyết định khởi tố** (`02`) | Quyết định khởi tố vụ án hình sự | ⚪ **Tài liệu nhiễu** | Thủ tục tố tụng hành chính | Hồ sơ điều tra ban đầu |
-| **Báo cáo tiến độ** (`06`) | Báo cáo tiến độ ban đầu chuyên án | ⚪ **Tài liệu nhiễu** | Báo cáo hành chính nội bộ | Hồ sơ điều tra ban đầu |
-| **Nhân thân nạn nhân** (`07`) | Khang làm vay nặng lãi, mồ côi | ⚪ **Tài liệu nhiễu** | Bối cảnh nghề nghiệp & quan hệ Khang | Hồ sơ điều tra ban đầu |
-| **Ma trận mâu thuẫn** (`09`) | Phân lập 4 hướng mâu thuẫn | ⚪ **Tài liệu nhiễu** | Bảng tóm tắt định hướng 2 tuyến A/B | Hồ sơ điều tra ban đầu |
-| **Giấy note hoa cúc** (`17`) | Mảnh note dán hũ trà hoa cúc | ⚪ **Tài liệu nhiễu** | Bối cảnh tình cảm Hà - Khang | Hũ trà hoa cúc hiện trường |
-| **Nhật ký cuộc gọi** (`16`) | Trích xuất 12h: 4 SĐT gọi đến (1 có tên, 3 không tên; có SĐT gọi lúc 19:55) | 🟢 **Manh mối** | Manh mối khởi đầu truy tìm danh tính Tùng | Hồ sơ điều tra ban đầu (Điện thoại Khang) |
-| **Trích sao Sổ ghi nợ** (`05`) | Danh sách con nợ (khớp được 2 SĐT không tên trong nhật ký cuộc gọi) | 🟢 **Manh mối** | Tra cứu danh tính 2/3 SĐT không tên | Thu thập tại hiện trường nhà Khang |
-| **Bảng thông tin khu phố** (`18`) | Mục tin rao vặt bán vật liệu xây dựng dự án ABC (chứa SĐT của Tùng) | 🟢 **Manh mối** | Tra cứu SĐT 19:55 ➔ Từ đó tìm được tên chủ SĐT gọi đến (Nguyễn Thanh Tùng) | Thu thập tại Bảng thông tin khu phố Đoàn Kết |
-| **Phỏng vấn bố mẹ Tùng** (`11`) | Lời khai bố mẹ Tùng: Khang từng chơi với 2 con trai nhà bà đến khi em út qua đời; Mấy hôm trước bảo con lớn sang mời giỗ em mà chưa sang | 🟢 **Manh mối** | Gieo ấn tượng mơ hồ về mối quan hệ quá khứ & sự xuất hiện của con lớn | Lời khai hàng xóm (Hồ sơ ban đầu) |
-| **Mảnh báo cũ xé vụn** (`p5`) | Các mảnh báo xé rải rác trên sàn, ghép lại thành bài báo 20 năm trước về vụ tai nạn bé N.G.H bị kẹt trong tủ | 🟢 **Manh mối** | Manh mối bi kịch Trốn Tìm 1996 & bằng chứng có người mang báo đến xé | Khám nghiệm hiện trường sàn nhà Khang |
-| **Ảnh kỷ niệm 1996** (`p4`) | Ảnh Lễ Đại Đoàn Kết 20 năm trước (Khang, Mai, Tùng bế Huy), bị vỡ khung kính rớt dưới sàn nhà | 🟢 **Manh mối** | Manh mối khớp Tùng là anh trai bé Huy & nhận diện sẹo lông mày | Thu thập trong khung ảnh vỡ dưới sàn nhà Khang |
-| **Dấu vân tay tách trà** (`p1`) | Dấu vân tay lạ trên tách trà phòng khách Khang (chưa xác định danh tính ban đầu) | 🟢 **Manh mối** | Manh mối sinh học chờ đối chiếu | Khám nghiệm hiện trường phòng khách |
+| **Phiếu tiếp nhận tin báo** (`01`) | Tin báo từ bà Lụa (06:45 sáng 25/07) | ⚪ | Thông tin nền hành chính ban đầu | Hồ sơ điều tra ban đầu |
+| **Quyết định khởi tố** (`02`) | Quyết định khởi tố vụ án hình sự | ⚪ | Thủ tục tố tụng hành chính | Hồ sơ điều tra ban đầu |
+| **Báo cáo tiến độ** (`06`) | Báo cáo tiến độ ban đầu chuyên án | ⚪ | Báo cáo hành chính nội bộ | Hồ sơ điều tra ban đầu |
+| **Nhân thân nạn nhân** (`07`) | Khang làm vay nặng lãi, mồ côi | ⚪ | Bối cảnh nghề nghiệp & quan hệ Khang | Hồ sơ điều tra ban đầu |
+| **Ma trận mâu thuẫn** (`09`) | Phân lập 4 hướng mâu thuẫn | ⚪ | Bảng tóm tắt định hướng 2 tuyến A/B | Hồ sơ điều tra ban đầu |
+| **Giấy note hoa cúc** (`17`) | Mảnh note dán hũ trà hoa cúc | ⚪ | Bối cảnh tình cảm Hà - Khang | Hũ trà hoa cúc hiện trường |
+
+  - **2. Nhóm tài liệu chứa manh mối cốt lõi (Manh mối điều tra):**
+
+| Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
+| :--- | :--- | :---: | :--- | :--- |
+| **Nhật ký cuộc gọi** (`16`) | Trích xuất 12h: 4 SĐT gọi đến (1 có tên, 3 không tên; có SĐT gọi lúc 19:55) | 🟢 | Manh mối khởi đầu truy tìm danh tính Tùng | Hồ sơ điều tra ban đầu (Điện thoại Khang) |
+| **Trích sao Sổ ghi nợ** (`05`) | Danh sách con nợ (khớp được 2 SĐT không tên trong nhật ký cuộc gọi) | 🟢 | Tra cứu danh tính 2/3 SĐT không tên | Thu thập tại hiện trường nhà Khang |
+| **Bảng thông tin khu phố** (`18`) | Mục tin rao vặt bán vật liệu xây dựng dự án ABC (chứa SĐT của Tùng) | 🟢 | Tra cứu SĐT 19:55 ➔ Từ đó tìm được tên chủ SĐT gọi đến (Nguyễn Thanh Tùng) | Thu thập tại Bảng thông tin khu phố Đoàn Kết |
+| **Phỏng vấn bố mẹ Tùng** (`11`) | Lời khai bố mẹ Tùng: Khang từng chơi với 2 con trai nhà bà đến khi em út qua đời; Mấy hôm trước bảo con lớn sang mời giỗ em mà chưa sang | 🟢 | Gieo ấn tượng mơ hồ về mối quan hệ quá khứ & sự xuất hiện của con lớn | Lời khai hàng xóm (Hồ sơ ban đầu) |
+| **Mảnh báo cũ xé vụn** (`p5`) | Các mảnh báo xé rải rác trên sàn, ghép lại thành bài báo 20 năm trước về vụ tai nạn bé N.G.H bị kẹt trong tủ | 🟢 | Manh mối bi kịch Trốn Tìm 1996 & bằng chứng có người mang báo đến xé | Khám nghiệm hiện trường sàn nhà Khang |
+| **Ảnh kỷ niệm 1996** (`p4`) | Ảnh Lễ Đại Đoàn Kết 20 năm trước (Khang, Mai, Tùng bế Huy), bị vỡ khung kính rớt dưới sàn nhà | 🟢 | Manh mối khớp Tùng là anh trai bé Huy & nhận diện sẹo lông mày | Thu thập trong khung ảnh vỡ dưới sàn nhà Khang |
+| **Dấu vân tay tách trà** (`p1`) | Dấu vân tay lạ trên tách trà phòng khách Khang (chưa xác định danh tính ban đầu) | 🟢 | Manh mối sinh học chờ đối chiếu | Khám nghiệm hiện trường phòng khách |
 
   - **Suy luận đối chiếu & Mở khóa Lời khai 1:**
     - ➔ Đối chiếu Nhật ký cuộc gọi (`16`) (SĐT 19:55) với Mục rao vặt bán vật liệu xây dựng trên Bảng tin khu phố (`18`): Tìm ra chủ nhân SĐT 19:55 chính là **Nguyễn Thanh Tùng**.
@@ -149,7 +155,7 @@
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
-| **Lời khai Tùng (lần 1)** (`14`) | Khai gọi 19:55 hỏi hẹn gặp vay tiền sửa nhà; Khai về quê làm đám giỗ 20 năm em trai; **Khẳng định CHỈ GỌI ĐIỆN, KHÔNG GẶP MẶT Khang** | 🟢 **Manh mối** | Lời khai chối bỏ việc có mặt tại hiện trường | Mở khóa sau khi tra đủ danh tính SĐT 19:55 |
+| **Lời khai Tùng (lần 1)** (`14`) | Khai gọi 19:55 hỏi hẹn gặp vay tiền sửa nhà; Khai về quê làm đám giỗ 20 năm em trai; **Khẳng định CHỈ GỌI ĐIỆN, KHÔNG GẶP MẶT Khang** | 🟢 | Lời khai chối bỏ việc có mặt tại hiện trường | Mở khóa sau khi tra đủ danh tính SĐT 19:55 |
 
   - **Suy luận đối chiếu & Bóc trần:**
     - ➔ Ghép nối Mảnh báo xé vụn (`p5`) (tai nạn bé N.G.H tử vong trong tủ khi chơi trốn tìm) + Ảnh kỷ niệm (`p4`) (Tùng bế Huy đeo còi cam) + Lời khai Tùng (`14`) (về quê làm đám giỗ 20 năm em trai): Xác định Tùng chính là anh trai bé Huy.
@@ -169,7 +175,7 @@
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
-| **Thẻ tự thú của Tùng** (`01`) | Tùng tự thú mang bài báo sang hỏi Khang sự thật 1996, xô Khang ngã đập đầu ngất lúc 20:00, rời đi lúc 20:15 khi Khang vẫn còn thở | 🟢 **Manh mối** | Xác nhận xô xát, nạn nhân vẫn thở khi Tùng rời đi | Trả lời đúng câu hỏi tương tác lý do Tùng gặp Khang |
+| **Thẻ tự thú của Tùng** (`01`) | Tùng tự thú mang bài báo sang hỏi Khang sự thật 1996, xô Khang ngã đập đầu ngất lúc 20:00, rời đi lúc 20:15 khi Khang vẫn còn thở | 🟢 | Xác nhận xô xát, nạn nhân vẫn thở khi Tùng rời đi | Trả lời đúng câu hỏi tương tác lý do Tùng gặp Khang |
 
   - **Suy luận đối chiếu & Bế tắc:**
     - ➔ Lời tự thú của Tùng (`01`): Thừa nhận mang bài báo đến hỏi Khang, nảy sinh xô xát và xô Khang ngã đập đầu ngất lúc 20:00, sau đó bỏ chạy lúc 20:15 khi Khang vẫn còn thở.
@@ -196,9 +202,9 @@
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
-| **Lời khai Trần Thị Hà** (`15`) | Khai ở phòng trọ xem phim bộ VTV3 cả tối | 🟢 **Manh mối** | Lời khai ngụy trang bằng chứng TV | Hồ sơ điều tra ban đầu |
-| **Voice tin nhắn thoại Hà** (`01`) | Voice lúc 20:32 lọt tiếng còi tàu & chuông gác chắn | 🟢 **Manh mối** | Bằng chứng âm thanh tại hiện trường | Quét QR Lệnh khám xét hiện trường |
-| **Lịch phát sóng VTV3** (`02`) | Lịch VTV3 24/07: Trò chơi truyền hình, không có phim bộ | 🟢 **Manh mối** | Bẻ gãy ngoại phạm VTV3 của Hà | Trích xuất lịch phát sóng đài truyền hình |
+| **Lời khai Trần Thị Hà** (`15`) | Khai ở phòng trọ xem phim bộ VTV3 cả tối | 🟢 | Lời khai ngụy trang bằng chứng TV | Hồ sơ điều tra ban đầu |
+| **Voice tin nhắn thoại Hà** (`01`) | Voice lúc 20:32 lọt tiếng còi tàu & chuông gác chắn | 🟢 | Bằng chứng âm thanh tại hiện trường | Quét QR Lệnh khám xét hiện trường |
+| **Lịch phát sóng VTV3** (`02`) | Lịch VTV3 24/07: Trò chơi truyền hình, không có phim bộ | 🟢 | Bẻ gãy ngoại phạm VTV3 của Hà | Trích xuất lịch phát sóng đài truyền hình |
 
   - **Suy luận đối chiếu:**
     - ➔ Chứng minh Hà đang đứng ngay trước cửa nhà Khang lúc 20:32 chứ không ở phòng trọ.
@@ -208,9 +214,9 @@
 
 | Tên tài liệu / Mã | Nội dung | Phân loại | Mục đích / Vai trò | Cách xuất hiện |
 | :--- | :--- | :---: | :--- | :--- |
-| **Áo gió dính phấn hoa** (`03`) | Áo gió dính phấn hoa xoan tại phòng trọ Hà | 🟢 **Manh mối** | Khớp bóng người rình rập gốc cây xoan | Khám xét tủ quần áo phòng trọ Hà |
-| **Biên bản tử thi bổ sung** (`04`) | Tử thi bổ sung: Khang bị cắt một lọn tóc mai | 🟢 **Manh mối** | Manh mối hung thủ lấy vật kỷ niệm | Trích sao biên bản pháp y tử thi Khang |
-| **Lọn tóc mai dính máu** (`05`) | Lọn tóc mai dính máu (`EV-HAIR-DNA`) phòng Hà | 🟢 **Manh mối** | **Chứng cứ chí mạng:** ADN trùng 100% Khang | Thu giữ trong hộp trang sức phòng trọ Hà |
+| **Áo gió dính phấn hoa** (`03`) | Áo gió dính phấn hoa xoan tại phòng trọ Hà | 🟢 | Khớp bóng người rình rập gốc cây xoan | Khám xét tủ quần áo phòng trọ Hà |
+| **Biên bản tử thi bổ sung** (`04`) | Tử thi bổ sung: Khang bị cắt một lọn tóc mai | 🟢 | Manh mối hung thủ lấy vật kỷ niệm | Trích sao biên bản pháp y tử thi Khang |
+| **Lọn tóc mai dính máu** (`05`) | Lọn tóc mai dính máu (`EV-HAIR-DNA`) phòng Hà | 🟢 | **Chứng cứ chí mạng:** ADN trùng 100% Khang | Thu giữ trong hộp trang sức phòng trọ Hà |
 
   - **Suy luận đối chiếu:**
     - ➔ Áo gió dính phấn hoa xoan khớp bóng người rình rập trước cổng.
