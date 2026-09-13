@@ -18,12 +18,12 @@ Số: `04/BC-XMNT`
 ### I. LÝ LỊCH TƯ PHÁP & QUAN HỆ GIA ĐÌNH
 * **Họ và tên:** **NGUYỄN VĂN KHANG**
 * **Sinh ngày:** 10/11/1988 tại Hà Nội (28 tuổi).
-* **Số CCCD/CMND:** `001088006721`.
+* **Số CCCD/CMND:** `830514692`.
 * **Trình độ học vấn:** 12/12.
 * **Tình trạng gia đình:**
   - Bố mẹ đẻ mất sớm do tai nạn giao thông năm 2010.
   - Sống cùng ông nội (ông Nguyễn Văn Thọ) tại số 14 Đường Bờ Sông. Ông Thọ vừa qua đời cách đây 3 tháng.
-  - Họ hàng gần nhất: Gia đình chú ruột (bố của Nguyễn Ngọc Mai) cư ngụ tại Phường Phân khu Cảng.
+  - Họ hàng gần nhất: Gia đình chú ruột trú tại Phường Phân khu Cảng.
 
 ---
 
@@ -31,13 +31,9 @@ Số: `04/BC-XMNT`
 1. **Nghề nghiệp chính:** Không có công ăn việc làm ổn định. Mở dịch vụ "Tài chính tiêu dùng cá nhân" (thực chất là cho vay nặng lãi).
 2. **Tiền án, tiền sự:** 
    - 01 tiền sự năm 2012 về hành vi *"Gây rối trật tự công cộng"* (đánh nhau tại quán bia).
+3. **Đánh giá nguy cơ mâu thuẫn:**
+   - Do đặc thù nghề nghiệp cho vay nặng lãi, nạn nhân có quan hệ xã hội phức tạp, nhiều đối tượng có hiềm khích nợ nần hoặc tranh chấp tài sản.    
 
----
-
-### III. ĐÁNH GIÁ NGUY CƠ MÂU THUẪN
-Do đặc thù nghề nghiệp cho vay nặng lãi, nạn nhân có quan hệ xã hội phức tạp, nhiều đối tượng có hiềm khích nợ nần hoặc tranh chấp tài sản.
-
----
 
 **CÁN BỘ XÁC MINH**  
 *(Ký, ghi rõ họ tên)*  
