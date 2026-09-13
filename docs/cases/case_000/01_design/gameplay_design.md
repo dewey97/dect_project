@@ -17,8 +17,8 @@
  ├───────────────────────────────────┤      ├──────────────────────────────────────────┤
  │ 🧩 CÂU HỎI 2A (Thẩm tra Vũ):      │      │ 🧩 CÂU HỎI 2B (Thẩm tra Tùng):           │
  │  • Tên: Lê Quang Vũ               │      │  • Tên: Nguyễn Thanh Tùng                │
- │  • Động cơ + Ngoại phạm không rõ  │      │  • Địa điểm (Vân tay p1) & Mối quan hệ   │
- │  • Tài liệu: 05, dev-00, p6, 11, p10     │  • Bi kịch 1996: Báo xé p5 + Ảnh p4       │
+ │  • Động cơ + Ngoại phạm không rõ  │      │  • Lời khai (14) + Vân tay khung ảnh p4  │
+ │  • Tài liệu: 05, dev-00, p6, 11, p10     │  • Báo xé p5 + Ảnh kỷ niệm 1996 p4        │
  ├───────────────────────────────────┤      ├──────────────────────────────────────────┤
  │ 🔓 Mở khóa Lời khai 2 (07) &      │      │ 🔓 Mở khóa Thẻ tự thú (01)               │
  │    Sổ Quán Bia 88 (06)            │      │    (Xô ngã 20:00, bỏ đi 20:15)           │
@@ -47,7 +47,7 @@
 - **Vị trí:** Nút hội tụ chuyển từ Phase 1 ➔ Phase 2.
 - **Kích hoạt:** $\text{PermitActivation} = \text{isTuyenACompleted} \land \text{isTuyenBCompleted}$
   - `isTuyenACompleted`: Minh oan Vũ (Quán Bia 88 lúc 21:15).
-  - `isTuyenBCompleted`: Bóc trần Tùng (Vân tay tách trà + Tự thú xô xát).
+  - `isTuyenBCompleted`: Bóc trần Tùng (Vân tay khung ảnh vỡ p4 + Tự thú xô xát).
 - **Thông báo hệ thống:**
   - 🛑 *Chưa đủ:* Yêu cầu hoàn thành điều tra Mai, Vũ, Tùng trước.
   - 🔔 *Đủ điều kiện:* Gợi ý quét QR Thẻ cứng "LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG".
@@ -139,20 +139,15 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
   - **Suy luận đối chiếu:**
     - ➔ Ghép nối Mảnh báo xé vụn (`p5`) (tai nạn bé N.G.H tử vong trong tủ gỗ chiều 24/07/1996) + Ảnh kỷ niệm (`p4`) (Tùng bế Huy, sẹo mày chữ V) + Lý lịch Tùng (`14_ly_lich`): Khóa chặt Tùng là anh trai bé Huy và ngày xảy ra án mạng (24/07/2026) đúng ngày giỗ 30 năm.
     - ➔ Lời khai Tùng lần 1 (`14`): Khẳng định *"chỉ gọi điện 19:55, không gặp mặt Khang"*.
-    - ➔ Đối chiếu Dấu vân tay trên tách trà (`p1`): Kết quả trùng khớp 100% với Tùng ➔ **Bóc trần Tùng nói dối, Tùng đã vào nhà ngồi uống trà**.
+    - ➔ Đối chiếu Dấu vân tay trên khung bức ảnh vỡ (`p4`): Kết quả trùng khớp 100% với Tùng ➔ **Bóc trần Tùng nói dối "chỉ gọi điện không gặp", chứng minh Tùng đã trực tiếp đến hiện trường và cầm khung ảnh**.
 
 ---
 
 * 🧩 **CÂU HỎI 2B (Thẩm tra Nguyễn Thanh Tùng):**
-  - **Hình thức trả lời (3 bước):**
+  - **Hình thức trả lời (2 bước & câu dẫn định hướng):**
     - **Bước 1 (Nhập tên nghi phạm hiện trường):** `Nguyễn Thanh Tùng` (hoặc `Tùng`).
-    - **Bước 2 (Chọn loại mâu thuẫn):**
-      - [ ] ⏰ **Thời gian**
-      - [x] 📍 **Địa điểm** *(Chứng minh Tùng ngồi uống trà phòng khách, bóc trần lời khai "chỉ gọi điện không gặp")*
-      - [x] 🤝 **Mối quan hệ** *(Chứng minh động cơ ân oán bi kịch 1996 của em trai thay vì lý do "vay tiền thợ nề")*
-    - **Bước 3 (Chọn vật chứng chứng minh tương ứng):**
-      - *Nếu chọn Địa điểm:* `Dấu vân tay tách trà` (`p1`) đối chiếu `Lời khai Tùng lần 1` (`14`).
-      - *Nếu chọn Mối quan hệ:* `Mảnh báo cũ xé vụn` (`p5`) + `Ảnh kỷ niệm 1996` (`p4`).
+    - **Câu dẫn định hướng:** *"Dựa trên mâu thuẫn giữa lời khai chối bỏ với dấu vết hiện trường và động cơ bi kịch 1996"*
+    - **Bước 2 (Chọn 4 tài liệu & vật chứng chứng minh):** `Lời khai Tùng lần 1` (`14`) + `Dấu vân tay trên khung bức ảnh vỡ` (`p4`) + `Mảnh báo cũ xé vụn` (`p5`) + `Ảnh kỷ niệm 1996` (`p4`).
 
 ---
 
