@@ -43,7 +43,7 @@
 | **Số CCCD** | `001091005812`, cấp ngày 12/04/2011 |
 | **Số điện thoại** | `0988.20.09.91` (Khớp ngày tháng năm sinh `20.09.91`) |
 | **Quê quán** | Huyện Thanh Trì, TP. Hà Nội |
-| **Nơi cư trú hiện tại** | Số 45, Phố Đoàn Kết, Phường Trung Tâm (Ở rể cùng vợ Nguyễn Ngọc Mai) |
+| **Nơi cư trú hiện tại** | Số 45, Đường Đoàn Kết, Phường Phân Khu Cảng (Ở rể cùng vợ Nguyễn Ngọc Mai) |
 | **Nghề nghiệp** | Kỹ sư Điện & Lắp đặt thiết bị tự do |
 | **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Nguyễn Ngọc Mai, sinh năm 1992) |
 | **Đặc điểm nhận dạng** | Nam, cao 1m70, mắt trái có tật lác nhẹ (lé nhẹ), đeo kính gọng đen |

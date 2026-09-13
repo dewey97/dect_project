@@ -21,11 +21,11 @@ Số: `05a/LL-TP`
 | :--- | :--- |
 | **Họ và tên khai sinh** | **NGUYỄN NGỌC MAI** |
 | **Tên thường gọi** | Mai |
-| **Ngày tháng năm sinh** | 15/05/1992 (24 tuổi) |
+| **Ngày tháng năm sinh** | 15/05/1992 |
 | **Giới tính** | Nữ |
 | **Số CMND** | `001192004523` |
-| **Nơi ĐKHKTT** | Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội |
-| **Nơi ở hiện nay** | Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội (cách nhà Khang ~4km) |
+| **Nơi ĐKHKTT** | Số 45, Đường Đoàn Kết, Phường Phân Khu Cảng, TP. Hà Nội |
+| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Phân Khu Cảng, TP. Hà Nội (cách nhà Khang ~4km) |
 | **Nghề nghiệp** | Chuyên viên Hành chính — Nhân sự (Công ty CP May Mặc) |
 | **Số điện thoại chính chủ** | `0912.456.789` |
 | **Tình trạng hôn nhân** | Đã kết hôn (Chồng: Lê Quang Vũ, sinh năm 1991) |
@@ -34,14 +34,12 @@ Số: `05a/LL-TP`
 
 ---
 
-### II. ĐẶC ĐIỂM NHẬN DẠNG & LÝ DO ĐƯA VÀO DIỆN NGHI VẤN BAN ĐẦU
+### II. ĐẶC ĐIỂM NHẬN DẠNG & CĂN CỨ XÁC MINH BAN ĐẦU
 
-1. **Đặc điểm ngoại hình:** Nữ, cao 1m62, phong thái đĩnh đạc, gương mặt cương trực, ăn mặc lịch sự, tóc buộc gọn gàng.
-2. **Lý do đưa vào diện xác minh:**
-   - Đang có tranh chấp dân sự gay gắt với nạn nhân Khang liên quan đến quyền thừa kế mảnh đất 200m² của ông nội tại số 14 Đường Bờ Sông.
-   - Tại hiện trường án mạng, cơ quan điều tra thu giữ tập Đơn đòi đất và hồ sơ pháp lý mang tên Nguyễn Ngọc Mai rơi vãi dưới sàn nhà (`p2`).
-   - Có mặt tại nhà nạn nhân vào chiều tối xảy ra án mạng (24/07/2016).
-
+1. **Đặc điểm ngoại hình:** Nữ, cao 1m62.
+2. **Căn cứ xác minh:**
+   - Có tranh chấp dân sự với nạn nhân liên quan đến quyền thừa kế mảnh đất 200m² của ông nội tại số 14 Đường Bờ Sông.
+   - Có mặt tại nhà nạn nhân vào chiều tối xảy ra án mạng (24/07/2016) cùng chồng là Lê Quang Vũ.
 ---
 
 **ĐIỀU TRA VIÊN LẬP TRÍCH LỤC**  

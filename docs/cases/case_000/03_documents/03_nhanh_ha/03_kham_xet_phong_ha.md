@@ -11,7 +11,7 @@ Số: `03/BB-KXKC`
 ---
 
 # BIÊN BẢN KHÁM XÉT KHẨN CẤP PHÒNG TRỌ TRẦN THỊ HÀ
-*(Địa điểm: Số 8, Ngõ 12 Đường Bờ Sông, Phường Phân khu Cảng)*
+*(Địa điểm: Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân Khu Cảng)*
 
 ---
 

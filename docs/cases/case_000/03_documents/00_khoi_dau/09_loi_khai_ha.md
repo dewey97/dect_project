@@ -23,9 +23,9 @@ Vào hồi 19 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 **Tiến hành lấy lời khai người liên quan:**
 * **Họ và tên:** **TRẦN THỊ HÀ** | **Giới tính:** Nữ | **Sinh ngày:** 22/09/1990 (26 tuổi).
 * **CMND số:** `001190008271`.
-* **Nơi ĐKHKTT:** Số 8, Ngõ 12 Đường Bờ Kè, Phường Phân khu Cảng, TP. Hà Nội.
+* **Nơi ĐKHKTT:** Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân Khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Kế toán tổng hợp (Công ty TNHH Vận tải Sông Hồng).
-* **Mối quan hệ với nạn nhân:** Bạn gái 3 năm.
+* **Mối quan hệ với nạn nhân:** Bạn gái (3 năm).
 
 ---
 

@@ -43,7 +43,7 @@
 | **Số CCCD** | `001192004523`, cấp ngày 10/08/2012 |
 | **Số điện thoại** | `0912.456.789` |
 | **Quê quán** | Phường Phân khu Cảng, TP. Hà Nội |
-| **Nơi cư trú hiện tại** | Số 45, Phố Đoàn Kết, Phường Trung Tâm (cách nhà Khang ~4km) |
+| **Nơi cư trú hiện tại** | Số 45, Đường Đoàn Kết, Phường Phân Khu Cảng (cách nhà Khang ~4km) |
 | **Nghề nghiệp** | Chuyên viên Hành chính — Nhân sự |
 | **Tình trạng hôn nhân** | Đã kết hôn (Chồng: Lê Quang Vũ, sinh năm 1991) |
 | **Đặc điểm nhận dạng** | Nữ, cao 1m62, phong thái đĩnh đạc, tính cách cương trực, quyết đoán, ăn mặc chỉn chu |

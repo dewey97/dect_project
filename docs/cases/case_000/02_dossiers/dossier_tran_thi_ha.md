@@ -44,7 +44,7 @@
 | **Số CCCD** | `001190008271`, cấp ngày 14/03/2011 |
 | **Số điện thoại** | `0984.112.568` |
 | **Quê quán** | Phường Phân khu Cảng, TP. Hà Nội |
-| **Nơi cư trú hiện tại** | Số 8, Ngõ 10 Đường Bờ Sông (cách nhà nạn nhân và đường sắt **1.2 km** trong ngõ sâu) |
+| **Nơi cư trú hiện tại** | Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân Khu Cảng (cách nhà nạn nhân và đường sắt **1.2 km** trong ngõ sâu) |
 | **Nghề nghiệp** | Kế toán tổng hợp tại Công ty TNHH Vận tải Sông Hồng |
 | **Tình trạng hôn nhân** | Độc thân (Đang có quan hệ tình cảm phức tạp 3 năm với nạn nhân Khang) |
 | **Học vấn** | Cử nhân Kế toán — Đại học Kinh tế Quốc dân |
