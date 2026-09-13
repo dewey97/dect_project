@@ -119,13 +119,10 @@
 ---
 
 * 🧩 **CÂU HỎI 1:**
-  - **Hình thức trả lời (3 bước):**
+  - **Hình thức trả lời (2 bước & câu dẫn định hướng):**
     - **Bước 1 (Nhập tên nghi vấn):** `Lê Quang Vũ` (hoặc `Vũ`).
-    - **Bước 2 (Chọn loại mâu thuẫn):**
-      - [x] ⏰ **Thời gian**
-      - [ ] 📍 **Địa điểm**
-      - [ ] 🤝 **Mối quan hệ**
-    - **Bước 3 (Chọn tài liệu chứng minh):** `Lời khai bà Lụa` (`11`) + `Ảnh Screenshot App đặt xe` (`p10`).
+    - **Câu dẫn định hướng:** *"Dựa trên 2 tiêu chí điều tra là Động cơ và Bằng chứng ngoại phạm không rõ ràng"*
+    - **Bước 2 (Chọn tài liệu chứng minh):** `Sổ tay ghi nợ của Khang` (`05`) + `SMS đòi nợ của Khang` (`dev-00`) + `Ảnh chân dung Lê Quang Vũ` (`p6`) + `Lời khai bà Lụa` (`11`) + `Ảnh Screenshot App đặt xe` (`p10`).
 
 ---
 
