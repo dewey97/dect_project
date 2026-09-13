@@ -5,12 +5,12 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `03/HS-LL`  
+Số: `03/LL-TP`  
 *Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
-# BẢN TRÍCH LỤC HỒ SƠ LÝ LỊCH 
+# BẢN TRÍCH LỤC LÝ LỊCH TƯ PHÁP 
 *(Tra cứu theo SĐT `0984.180.357`)*
 
 ---
@@ -21,7 +21,7 @@ Số: `03/HS-LL`
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ • Họ và tên khai sinh: NGUYỄN THANH TÙNG                                    │
 │ • Năm sinh: 18/03/1988 (28 tuổi). Giới tính: Nam.                           │
-│ • Số CMND: 001086003412.                                                    │
+│ • Số CMND: 412879360.                                                    │
 │ • Nơi ĐKHKTT: Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.        │
 │ • Chỗ ở hiện nay: Phòng trọ công nhân số 18, Phố Cầu Bươu, TP. Hà Nội.      │
 │ • Nghề nghiệp: Thợ nề.        │
