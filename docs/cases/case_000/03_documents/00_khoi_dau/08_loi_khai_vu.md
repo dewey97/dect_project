@@ -22,7 +22,7 @@ Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 
 **Tiến hành lấy lời khai người liên quan:**
 * **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991 (25 tuổi).
-* **CMND số:** `001091005812`.
+* **CMND số:** `381762904`.
 * **Nơi ĐKHKTT:** Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Kỹ sư điện dân dụng. 
 * **Mối quan hệ với nạn nhân:** Em rể (Chồng của Nguyễn Ngọc Mai).
@@ -35,7 +35,7 @@ Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 * **Đáp (Lê Quang Vũ):** Khoảng 18h30 hai vợ chồng tôi đi chung xe máy sang nhà anh Khang. Nói chuyện một lúc thì vợ tôi bực tức ném giấy tờ rồi nổ máy xe phóng về trước. Lúc vợ tôi dắt xe ra thì tôi cũng đi bộ theo ra cổng cùng lúc với vợ tôi, rồi tôi đi bộ ra đầu ngõ mở app đặt xe ôm công nghệ đi nhậu giải sầu chứ không ở lại trong nhà làm gì. Vợ tôi vừa phóng xe đi là tôi cũng bắt xe đi luôn! Đây này, các anh xem ảnh chụp màn hình app xe của tôi đây!
 
 * **Hỏi (ĐTV Lê Minh):** Anh có biết về mâu thuẫn tranh chấp đất đai giữa vợ anh và nạn nhân Khang không?
-* **Đáp (Lê Quang Vũ):** Tôi có biết thưa cán bộ. Mảnh đất 200m² tại Bờ Sông là di sản của ông nội để lại, nhưng anh Khang tự ý đem đi thế chấp ngân hàng 1,2 tỷ đồng. Bố vợ tôi và Mai bức xúc lắm vì phía Ngân hàng dọa siết nợ. Tối 24/07 tôi đi cùng vợ sang đưa Đơn đòi di sản và bản Thỏa thuận ép anh Khang ký trả lại 100m², nhưng anh Khang chửi bới thách thức làm vợ tôi tức giận ném giấy tờ xuống sàn rồi bỏ về.
+* **Đáp (Lê Quang Vũ):** Tôi có biết thưa cán bộ. Mảnh đất 200m² tại Bờ Sông là tài sản của ông nội để lại, nhưng anh Khang tự ý đem đi thế chấp ngân hàng 1,2 tỷ đồng. Bố vợ tôi và Mai bức xúc lắm vì phía Ngân hàng dọa phát mãi miềng đất đó. Tối 24/07 tôi đi cùng vợ sang đưa Đơn đòi đất và bản Thỏa thuận ép anh Khang ký trả lại 100m², nhưng anh Khang chửi bới thách thức làm vợ tôi tức giận ném giấy tờ xuống sàn rồi bỏ về.
 
 * **Hỏi (ĐTV Lê Minh):** Anh khai bắt xe đi nhậu, vậy cụ thể anh uống ở đâu, ngồi với ai? Có ai làm chứng cho anh không?
 * **Đáp (Lê Quang Vũ):** Tôi buồn chuyện gia đình nên bắt xe ôm chạy ra mấy quán bia hơi vỉa hè ven sông Khu Cầu Cảng ngồi uống giải sầu một mình. Quán đông đúc ồn ào, tôi ngồi một mình trong góc tối chẳng quen ai và cũng chẳng để ý ai cả.
