@@ -29,7 +29,7 @@
 | **Tên thường gọi** | Khang "Bờ Sông" / Khang "Bốc Họ" |
 | **Ngày tháng năm sinh** | 10/11/1988 (28 tuổi tại thời điểm tử vong) |
 | **Số CCCD** | `001088006721`, cấp ngày 15/01/2011 |
-| **Số điện thoại chính chủ** | `0904.888.666` (Thiết bị iPhone 8 Plus `dev-00`) |
+| **Số điện thoại chính chủ** | `0904.888.666` (Thiết bị iPhone 6s Plus `dev-00`) |
 | **Quê quán** | Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi cư trú hiện tại** | Số 14, Đường Bờ Sông, Phường Phân khu Cảng (Nhà riêng hiện trường) |
 | **Nghề nghiệp** | Hoạt động tín dụng đen, cho vay nặng lãi, bốc bát họ tự do |

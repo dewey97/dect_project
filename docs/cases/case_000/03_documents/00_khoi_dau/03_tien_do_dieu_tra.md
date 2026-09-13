@@ -38,7 +38,7 @@ Lãnh đạo Phòng Cảnh sát Hình sự (PC02) đã khẩn cấp điều đ�
    - Khung ảnh bị rơi vỡ mặt kính (`p4`).
    - Các mảnh báo bị xé vụn rơi dưới sàn (`p5`).
    - Cuốn sổ tay ghi nợ (`10`).
-   - Điện thoại di động iPhone 8 Plus của nạn nhân (`dev-00`).
+   - Điện thoại di động iPhone 6s Plus của nạn nhân (`dev-00`).
 
 ---
 

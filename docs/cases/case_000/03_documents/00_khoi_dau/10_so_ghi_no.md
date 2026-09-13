@@ -14,7 +14,7 @@
 | **01** | **Tùng Xăm** | 50.000.000 đ | `0904.112.345` | 15/07 | Đã tất toán đủ bát họ 50 ngày. Đang hỏi bốc thêm bát mới 80 triệu. |
 | **02** | **Hải Lác Bến Phà** | 120.000.000 đ | `0918.776.543` | 20/07 | Khóa máy trốn nợ. Cho người canh bến phà, tóm được thì giữ xe. |
 | **03** | **Chị Lan Quán Nước** | 30.000.000 đ | `0932.889.102` | 25/07 | Đóng họ đều. Tiền lãi ngày cấn trừ vào tiền nước chè, thuốc lá hàng tuần. |
-| **04** | **Đạt Gà Chợ Cảng** | 80.000.000 đ | `0912.331.888` | 28/07 | 18:45 (24/7) gọi xin khất 1 tuần -> Không cho. Đến 28/7 ko trả: cho người xuống dẹp sạp gà. |
+| **04** | **Đạt Gà Chợ Cảng** | 80.000.000 đ | `0912.331.888` | 28/07 | 20:09 (24/7) gọi xin khất 1 tuần -> Không cho. Đến 28/7 ko trả: cho người xuống dẹp sạp gà. |
 | **05** | **Thằng Lệch Pha** | 300.000.000 đ | `0988.20.09.91` | 20/07 | ~~Hẹn 20/7 trả ở 45 Đoàn Kết~~ *(bút bi gạch xóa)*<br>Bùng hẹn, tắt máy. Hạn chót 25/7: rải tờ rơi + ném giấy nợ vào nhà bố vợ ở 45 Đoàn Kết! |
 | **06** | **Cường Mũi Két** | 150.000.000 đ | `0973.665.412` | 05/08 | Cầm cavet xe Wave Alpha đỏ + CCCD gốc. Đóng họ đúng hẹn. |
 | **07** | **Bình Còi** | 40.000.000 đ | `0915.223.789` | 10/08 | Bát 10 ăn 8, thu 50 ngày (đã thu 15 ngày). 18:00 gọi rủ bi-a -> Đã từ chối vì bận việc. |

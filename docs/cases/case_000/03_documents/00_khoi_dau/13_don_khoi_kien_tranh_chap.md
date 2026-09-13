@@ -4,7 +4,7 @@
 ---
 
 # ĐƠN KHỞI KIỆN
-### (V/v: Tranh chấp di sản thừa kế & Yêu cầu tuyên vô hiệu văn bản ủy quyền thế chấp QSDĐ)
+### (V/v: Tranh chấp tài sản thừa kế & Yêu cầu tuyên vô hiệu văn bản ủy quyền thế chấp Quyền sử dụng đất (sau đây gọi tắt là QSDĐ))
 
 *Hà Nội, ngày 22 tháng 07 năm 2016*
 
@@ -54,7 +54,7 @@
    Sau đó, Nguyễn Văn Khang mang toàn bộ Sổ đỏ 200m² đất đi thế chấp Ngân hàng TMCP Nông Nghiệp để vay khoản tiền **1.200.000.000 VNĐ** (Một tỷ hai trăm triệu đồng) phục vụ mục đích cá nhân mà không được sự đồng ý của nguyên đơn.
 
 3. **Yêu cầu khởi kiện & Thỏa thuận bắt buộc:**  
-   * Yêu cầu Tòa án tuyên hủy bỏ Hợp đồng thế chấp QSDĐ giữa bị đơn và Ngân hàng thương mại do văn bản ủy quyền vô hiệu.  
+   * Yêu cầu TAND TP. Hà Nội tuyên hủy bỏ Hợp đồng thế chấp QSDĐ giữa bị đơn và Ngân hàng TMCP Nông Nghiệp do văn bản ủy quyền vô hiệu.  
    * Yêu cầu ông Nguyễn Văn Khang nộp tiền giải chấp rút Giấy chứng nhận QSDĐ tại Ngân hàng về trước ngày 30/08/2016.  
    * Tiến hành thủ tục đo đạc, phân chia và sang tên trả lại **50% diện tích đất (100m²)** cho nguyên đơn (nhánh gia đình ông Nguyễn Văn Thành).
 

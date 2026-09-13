@@ -19,7 +19,7 @@ Số: `108/TB-NHNO-PKC`
 
 ### I. CĂN CỨ VĂN BẢN VÀ KHOẢN VAY:
 1. Căn cứ Hợp đồng tín dụng số `HDTD/2016-0412` ký ngày 15/04/2016 giữa Ngân hàng và ông Nguyễn Văn Khang.
-2. Căn cứ Hợp đồng thế chấp tài sản số `HDTC/2016-0412` bằng QSDĐ diện tích **200m²** (Sổ đỏ số `CH-009812` cấp tên ông Nguyễn Văn Thọ / Giấy ủy quyền ngày 10/04/2016 sang tên sử dụng cho ông Nguyễn Văn Khang).
+2. Căn cứ Hợp đồng thế chấp tài sản số `HDTC/2016-0412` bằng Quyền sử dụng đất (sau đây gọi tắt là QSDĐ) diện tích **200m²** (Giấy chứng nhận QSDĐ số `CH-009812` cấp tên ông Nguyễn Văn Thọ / Giấy ủy quyền ngày 10/04/2016 sang tên sử dụng cho ông Nguyễn Văn Khang).
 
 ---
 

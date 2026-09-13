@@ -61,21 +61,21 @@
 #### 🔍 1. Phân tích thông tin nền & Nhật ký cuộc gọi
 - **Bối cảnh:** Người tiếp cận hồ sơ ban đầu thu thập được `Nhật ký cuộc gọi` trên điện thoại của Khang (`dev-00`) gồm 6 cuộc gọi:
   - 📞 **3 SĐT đã lưu tên:** `Chị Lan Quán Nước` (17:30) & `Bình Còi` (18:00) (Nhiễu); `Hà Kế Toán` (20:31 - Cuộc gọi nhỡ ➔ Mở đầu Tuyến C).
-  - ❓ **3 SĐT ẩn danh cần tra cứu:** `0988.20.09.91` (18:15), `0912.331.888` (18:45), và `0984.180.357` (19:55).
+  - ❓ **3 SĐT ẩn danh cần tra cứu:** `0988.20.09.91` (18:15), `0984.180.357` (19:00), và `0912.331.888` (20:09).
 
 #### 📄 Danh mục tài liệu tiếp cận ban đầu:
 
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
-| **Nhật ký cuộc gọi** (`dev-00`) | Trích xuất 6 cuộc gọi (3 số lưu tên, 3 số lạ chưa lưu tên) | Manh mối tra cứu danh tính các nghi phạm | Điện thoại giả lập của Khang (`dev-00`) |
-| **Sổ ghi nợ** (`05`) | Khớp SĐT con nợ `0988.20.09.91` (300M) và `0912.331.888` | Tra cứu danh tính Vũ & Đạt Gà | Thu thập tại hiện trường |
-| **Bảng tin rao vặt** (`18`) | Tin rao VLXD chứa SĐT `0984.180.357` | Tra cứu danh tính Nguyễn Thanh Tùng | Thu thập tại Bảng tin trước cổng |
-| **Lời khai bà Lụa** (`11`) | Nhắc đến 2 con trai nhà bà xóm bên | Manh mối nền về mối quan hệ Tùng & Huy | Hồ sơ điều tra ban đầu |
+| **Nhật ký cuộc gọi** (`dev-00`) | Trích xuất các cuộc gọi trên máy nạn nhân | Manh mối tra cứu danh tính các nghi phạm | Điện thoại giả lập của Khang (`dev-00`) |
+| **Sổ ghi nợ** (`10`) | Khớp SĐT con nợ `0988.20.09.91` (300M) và `0912.331.888` (80M) | Tra cứu danh tính Vũ & Đạt Gà | Thu thập tại hiện trường |
+| **Bảng tin rao vặt** (`11`) | Tin rao VLXD chứa SĐT `0984.180.357` | Tra cứu danh tính Nguyễn Thanh Tùng | Thu thập tại Bảng tin trước cổng |
+| **Lời khai bà Lụa** (`06`) | Nhắc đến 2 con trai nhà bà xóm bên | Manh mối nền về mối quan hệ Tùng & Huy | Hồ sơ điều tra ban đầu |
 
 #### 💡 Suy luận đối chiếu danh tính:
-- ➔ `0988.20.09.91` (18:15) đối chiếu Sổ nợ (`05`) ➔ **Lê Quang Vũ** (Chồng Mai).
-- ➔ `0912.331.888` (18:45) đối chiếu Sổ nợ (`05`) ➔ **Đạt Gà Chợ Cảng**.
-- ➔ `0984.180.357` (19:55) đối chiếu Bảng tin (`18`) ➔ **Nguyễn Thanh Tùng** (Thợ nề).
+- ➔ `0988.20.09.91` (18:15) đối chiếu Sổ nợ (`10`) ➔ **Lê Quang Vũ** (Chồng Mai).
+- ➔ `0984.180.357` (19:00) đối chiếu Bảng tin (`11`) ➔ **Nguyễn Thanh Tùng** (Thợ nề).
+- ➔ `0912.331.888` (20:09) đối chiếu Sổ nợ (`10`) ➔ **Đạt Gà Chợ Cảng**.
 
 ---
 

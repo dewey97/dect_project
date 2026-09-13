@@ -11,7 +11,7 @@ Số: `12/BB-XMNKCG`
 ---
 
 # BIÊN BẢN XÁC MINH NHẬT KÝ CUỘC GỌI
-*(Trích xuất từ điện thoại di động iPhone 8 Plus của nạn nhân Nguyễn Văn Khang — Mã thiết bị: `dev-00`)*
+*(Trích xuất từ điện thoại di động iPhone 6s Plus của nạn nhân Nguyễn Văn Khang — Mã thiết bị: `dev-00`)*
 
 ---
 
@@ -22,8 +22,8 @@ Số: `12/BB-XMNKCG`
 | **01** | `17:30` | `0932.889.102` | **Chị Lan Quán Nước**<br>*(Nguyễn Thị Lan)* | Cuộc gọi đến<br>(42s) | **Hỏi:** Chiều tối ngày 24/07 lúc 17:30, chị gọi điện cho nạn nhân Nguyễn Văn Khang với nội dung và mục đích gì?<br>**Đáp:** Tôi bán nước chè ở đầu đường Bờ Sông. Thằng Khang hay uống nước và nợ tôi tiền nước chè, thuốc lá. Chiều qua lúc 17:30 tôi gọi giục nó trả nốt 50.000đ. Khang hẹn tối tiện đi qua sẽ gửi. Suốt từ chiều đến 21:30 tối qua tôi ngồi bán hàng liên tục ở quán đầu đường, có nhiều khách hàng xóm ngồi uống nước và nhân viên trực gác chắn đường sắt làm chứng. Đến 21:30 tôi dọn hàng cùng chồng rồi về nhà đóng cửa đi ngủ, tuyệt đối không vào nhà Khang. |
 | **02** | `18:00` | `0915.223.789` | **Bình Còi**<br>*(Trịnh Thanh Bình)* | Cuộc gọi đến<br>(1m15s) | **Hỏi:** Tối ngày 24/07 lúc 18:00, anh gọi điện cho nạn nhân Nguyễn Văn Khang với nội dung và mục đích gì?<br>**Đáp:** Tôi với anh Khang quen nhau qua mấy sới bi-a ở Khu Cầu Cảng. Tầm 18h00, tôi gọi điện rủ anh Khang tối rảnh qua CLB Bi-a 88 làm vài séc. Anh Khang bảo bận giải quyết việc cá nhân, hẹn hôm khác. Tối qua từ 19:00 - 23:30 tôi chơi bi-a ở CLB Bi-a 88 có gần chục người làm chứng. |
 | **03** | `18:15` | `0988.20.09.91` | *Chưa lưu danh bạ* | Cuộc gọi đi<br>(1m40s) | **Chưa liên hệ được** |
-| **04** | `19:00` | `0912.331.888` | *Chưa lưu danh bạ* | Cuộc gọi đến<br>(28s) | **Chưa liên hệ được** |
-| **05** | `20:09` | `0984.180.357` | *Chưa lưu danh bạ* | Cuộc gọi đến<br>(35s) | **Chưa liên hệ được** |
+| **04** | `19:00` | `0984.180.357` | *Chưa lưu danh bạ* | Cuộc gọi đến<br>(35s) | **Chưa liên hệ được** |
+| **05** | `20:09` | `0912.331.888` | *Chưa lưu danh bạ* | Cuộc gọi đến<br>(28s) | **Chưa liên hệ được** |
 
 ---
 

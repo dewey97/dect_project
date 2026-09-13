@@ -14,13 +14,13 @@
 ## 🧭 MỤC LỤC DANH MỤC HÌNH ẢNH
 
 1. [I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)](#i-danh-mục-ảnh-chân-dung-nhân-vật-portrait-avatars)
-   - [`avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 38 TUỔI)](#1-avatar_khang-nguyễn-văn-khang-nạn-nhân-38-tuổi)
-   - [`avatar_mai` — NGUYỄN NGỌC MAI (NGHI PHẠM 1 — 34 TUỔI)](#2-avatar_mai-trần-ngọc-mai-nghi-phạm-1-34-tuổi)
-   - [`avatar_vu` (`p6`) — LÊ QUANG VŨ (NGHI PHẠM 2 — 35 TUỔI — MẮT TRÁI LÁC NHẸ)](#3-avatar_vu-p6-lê-quang-vũ-nghi-phạm-2-35-tuổi-mắt-trái-lác-nhẹ)
-   - [`avatar_tung` — NGUYỄN THANH TÙNG (NGHI PHẠM 3 — 40 TUỔI — SẸO CHỮ V)](#4-avatar_tung-nguyễn-thanh-tùng-nghi-phạm-3-40-tuổi-sẹo-chữ-v)
-   - [`avatar_ha` — TRẦN THỊ HÀ (THỦ PHẠM CHÍNH — 36 TUỔI — CUỒNG YÊU ÁM ẢNH)](#5-avatar_ha-trần-thị-hà-thủ-phạm-chính-36-tuổi-cuồng-yêu-ám-ảnh)
+   - [`avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 28 TUỔI)](#1-avatar_khang-nguyễn-văn-khang-nạn-nhân-28-tuổi)
+   - [`avatar_mai` — NGUYỄN NGỌC MAI (NGHI PHẠM 1 — 24 TUỔI)](#2-avatar_mai-nguyễn-ngọc-mai-nghi-phạm-1-24-tuổi)
+   - [`avatar_vu` (`p6`) — LÊ QUANG VŨ (NGHI PHẠM 2 — 25 TUỔI — MẮT TRÁI LÁC NHẸ)](#3-avatar_vu-p6-lê-quang-vũ-nghi-phạm-2-25-tuổi-mắt-trái-lác-nhẹ)
+   - [`avatar_tung` — NGUYỄN THANH TÙNG (NGHI PHẠM 3 — 28 TUỔI — SẸO CHỮ V)](#4-avatar_tung-nguyễn-thanh-tùng-nghi-phạm-3-28-tuổi-sẹo-chữ-v)
+   - [`avatar_ha` — TRẦN THỊ HÀ (THỦ PHẠM CHÍNH — 26 TUỔI — CUỒNG YÊU ÁM ẢNH)](#5-avatar_ha-trần-thị-hà-thủ-phạm-chính-26-tuổi-cuồng-yêu-ám-ảnh)
    - [`avatar_lua` — BÀ NGUYỄN THỊ LỤA (NHÂN CHỨNG HÀNG XÓM — 60 TUỔI)](#6-avatar_lua-bà-nguyễn-thị-lụa-nhân-chứng-hàng-xóm-60-tuổi)
-   - [`avatar_dat` — TRẦN VĂN ĐẠT / ĐẠT GÀ (CHỢ CẢNG — 38 TUỔI)](#7-avatar_dat-trần-văn-đạt-đạt-gà-chợ-cảng-38-tuổi)
+   - [`avatar_dat` — TRẦN VĂN ĐẠT / ĐẠT GÀ (CHỢ CẢNG — 28 TUỔI)](#7-avatar_dat-trần-văn-đạt-đạt-gà-chợ-cảng-28-tuổi)
    - [`avatar_vy` — THẢO VY / BÉ VY ❤️ (NHÂN TÌNH NẠN NHÂN — 24 TUỔI)](#8-avatar_vy-thảo-vy-bé-vy-nhân-tình-nạn-nhân-24-tuổi)
    - [`avatar_huy` — BÉ NGUYỄN GIA HUY (EM TRAI TÙNG — 7 TUỔI, HÈ 1996)](#9-avatar_huy-bé-nguyễn-gia-huy-em-trai-tùng-7-tuổi-hè-1996)
 2. [II. DANH MỤC ẢNH HIỆN TRƯỜNG & TƯ LIỆU VẬT CHỨNG (`p1` – `p5`)](#ii-danh-mục-ảnh-hiện-trường-tư-liệu-vật-chứng-p1-p5)
@@ -36,218 +36,218 @@
 ---
 
 ## I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)
+> **Quy chuẩn đồng nhất toàn bộ nhân vật:** Tất cả ảnh chân dung nhân vật được chụp theo định dạng **ẢNH THẺ TIÊU CHUẨN CĂN CƯỚC / HỒ SƠ ĐIỀU TRA PHÔNG XANH DƯƠNG (Solid Royal Blue ID Backdrop)**, góc chụp chính diện thẳng (frontal headshot), bố cục cân đối từ ngực trở lên (chest-up passport/ID framing), ánh sáng studio đều hai bên, thể hiện chân thực và sắc nét các đặc điểm nhân trắc học và vật chứng nhận dạng cốt lõi.
 
 ---
 
-### 1. `avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 38 TUỔI)
+### 1. `avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 28 TUỔI)
 * **Tệp tin lưu trữ:** `avatar_khang.jpg` / `profile-khang.png`
-* **Mục đích nghiệp vụ:** Ảnh căn cước / ảnh hồ sơ trinh sát nhận diện nạn nhân chủ nợ tín dụng đen bị sát hại.
+* **Mục đích nghiệp vụ:** Ảnh căn cước / ảnh thẻ hồ sơ trinh sát nhận diện nạn nhân chủ nợ tín dụng đen bị sát hại.
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec):**
-  - Nam giới 38 tuổi, người Kinh thuần túy, tạng người to bè (endomorph), chiều cao khoảng 1m75.
+  - Nam giới 28 tuổi, người Kinh thuần túy, tạng người to bè (endomorph), chiều cao khoảng 1m75.
   - Khuôn mặt vuông chữ điền thô ráp, quai hàm bạnh sang hai bên, ngấn cằm dày.
-  - Lông mày rậm xếch ngược dữ tợn, mắt mí lót nhìn xéo trơ tráo, khóe miệng nhếch lên thành nụ cười khinh khỉnh ngạo mạn.
+  - Lông mày rậm xếch ngược dữ tợn, mắt mí lót nhìn thẳng trơ tráo, khóe miệng nhếch lên thành nụ cười khinh khỉnh ngạo mạn.
   - Râu quai nón lởm chởm màu xanh đen vừa nhú sau 2 ngày chưa cạo.
   - Cánh tay phải cơ bắp để lộ hình xăm mực tàu xanh đen hình Rồng thời Nguyễn uốn lượn từ bắp tay xuống cổ tay. Cổ áo polo dão màu xám đen để lộ sợi dây chuyền bạc 925 to bản dạng mắt xích.
-* **Thiết lập góc máy & ánh sáng:** Chụp ngang tầm mắt, cự ly 1.5 mét, phông nền tường bê tông phòng thẩm vấn có vạch đo chiều cao mờ phía sau. Đèn key light xiên 45 độ tạo bóng đổ góc cạnh gồ ghề.
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng ngang tầm mắt (frontal ID headshot), cự ly 1.5 mét, bố cục ảnh thẻ căn cước từ ngực trở lên. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)**. Ánh sáng studio đều hai bên, thể hiện sắc nét góc cạnh gương mặt và vẻ ngạo mạn, bất hảo.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Official police criminal identification dossier photograph of an arrogant 38-year-old Kinh Vietnamese man named Nguyen Van Khang, local loan shark. Heavy broad square jawline, thick thickset neck, masculine East Asian facial structure, high broad cheekbones. Intense intimidating dark eyes with a slight cynical upward smirk on chapped lips, dark coarse 2-day stubble along the jaw. Messy short black hair combed back with pomade. On his right forearm, an intricate traditional black-and-grey Vietnamese dragon tattoo with visible scales and sharp claws is clearly visible. Thick chunky silver link chain necklace resting on his chest inside an open-collar faded charcoal grey polo shirt. Authentic Vietnamese criminal mugshot aesthetic, raw gritty skin texture with visible enlarged pores, oily sheen, and minor acne scars. Neutral off-white police station wall with faint height measurement lines in background. Harsh low-key directional lighting from upper left, Hasselblad H6D-100c, 85mm f/2.8 lens for full facial sharpness, documentary realism, 8k resolution, raw photo. --ar 1:1 --style raw --s 75 --v 6.0
+Official national citizen identification ID photograph of an arrogant 28-year-old Kinh Vietnamese man named Nguyen Van Khang, local loan shark. Straight-on frontal headshot portrait, looking directly into the camera lens. Symmetrical composition, chest-up passport photo framing. Heavy broad square jawline, thick thickset neck, masculine East Asian facial structure, high broad cheekbones. Intense intimidating dark eyes with a slight cynical upward smirk on chapped lips, dark coarse 2-day stubble along the jaw. Messy short black hair combed back with pomade. On his right forearm, an intricate traditional black-and-grey Vietnamese dragon tattoo with visible scales and sharp claws is clearly visible. Thick chunky silver link chain necklace resting on his chest inside an open-collar faded charcoal grey polo shirt. PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP, smooth uniform blue background. Clean balanced studio portrait lighting, raw gritty skin texture with visible enlarged pores, oily sheen, and minor acne scars, documentary realism, 8k resolution, raw photo. --ar 1:1 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI):**
 ```text
-(caucasian:1.3), western face, smooth airbrushed skin, anime, 3d render, cartoon, smiling warmly, friendly, weak jaw, bald, thin eyebrows, blurry eyes, oversaturated, symmetrical lighting, clean neat studio portrait.
+(caucasian:1.3), western face, smooth airbrushed skin, anime, 3d render, cartoon, smiling warmly, friendly, weak jaw, bald, thin eyebrows, blurry eyes, oversaturated, non-blue background, complex background, outdoors, street, white background, wall background, room background.
 ```
 
 ---
 
-### 2. `avatar_mai` — NGUYỄN NGỌC MAI (NGHI PHẠM 1 — 34 TUỔI)
+### 2. `avatar_mai` — NGUYỄN NGỌC MAI (NGHI PHẠM 1 — 24 TUỔI)
 * **Tệp tin lưu trữ:** `avatar_mai.jpg` / `profile-mai.png`
-* **Mục đích nghiệp vụ:** Hồ sơ điều tra nghi phạm tranh chấp di sản đất đai 200m², nhân viên công sở đĩnh đạc.
+* **Mục đích nghiệp vụ:** Ảnh căn cước / ảnh thẻ hồ sơ điều tra nghi phạm tranh chấp di sản đất đai 200m², nhân viên công sở đĩnh đạc.
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec):**
-  - Nữ giới 34 tuổi, người Kinh miền Bắc, vóc dáng thanh mảnh cao 1m62, phong thái đĩnh đạc, cương trực.
+  - Nữ giới 24 tuổi, người Kinh miền Bắc, vóc dáng thanh mảnh cao 1m62, phong thái đĩnh đạc, cương trực.
   - Khuôn mặt trái xoan thanh tú, sống mũi cao thon tự nhiên (không phẫu thuật), bờ môi mỏng mím chặt kiên định biểu hiện sự bực bội kìm nén.
-  - Đôi mắt đen láy sắc sảo, hai mí rõ nét, quầng mắt hơi thâm nhẹ do mất ngủ nhiều đêm lo lắng chuyện đất đai.
+  - Đôi mắt đen láy sắc sảo nhìn thẳng, hai mí rõ nét, quầng mắt hơi thâm nhẹ do mất ngủ nhiều đêm lo lắng chuyện đất đai.
   - Mái tóc đen tuyền tự nhiên óng ả được chải mượt buộc gọn kiểu đuôi ngựa thấp phía sau gáy, để lộ đôi tai đeo khuyên nụ bạc tròn 3mm tối giản.
   - Trang phục công sở: Áo sơ mi lụa màu trắng kem cài kín cổ đức, khoác ngoài áo vest blazer màu be cát vải linen phẳng phiu.
-* **Thiết lập góc máy & ánh sáng:** Chụp cận cảnh chân dung góc 3/4, ánh sáng tự nhiên từ cửa sổ chiếu vào gương mặt, thể hiện sự chính trực và tự tôn gia tộc.
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng (frontal ID headshot), cự ly 1.5 mét, bố cục ảnh thẻ căn cước từ ngực trở lên. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)**. Ánh sáng studio đều, sắc nét từng chi tiết ánh mắt cương nghị và tự tôn gia tộc.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Cinematic investigation interview portrait of a 34-year-old Northern Vietnamese corporate woman named Tran Ngoc Mai. Refined oval East Asian facial structure, smooth fair-olive complexion with natural subtle skin texture and faint realistic tired under-eye shadows. Expressive, piercing dark brown almond-shaped eyes filled with stubborn pride and righteous anger, thin lips firmly pressed together in determination. Her straight natural black hair is pulled back into a neat, elegant low ponytail. Wearing minimalist small round 3mm silver stud earrings, a pristine ivory-white silk buttoned collared blouse under a structured beige linen blazer. Authentic Vietnamese police interrogation room setting, soft diffused window light from the side revealing delicate micro-expressions of pride and suppressed grief, neutral blurred wooden office partition in background. Shot on Sony A7R V with 85mm f/1.8 GM lens, tack-sharp focus on iris and eyelashes, subtle film noir color grade, hyper-realistic, 8k resolution. --ar 1:1 --style raw --s 75 --v 6.0
+Official national citizen identification ID photograph of a 24-year-old Northern Vietnamese corporate woman named Nguyen Ngoc Mai. Straight-on frontal headshot portrait, looking directly into the camera lens. Symmetrical composition, chest-up passport photo framing. Refined oval East Asian facial structure, smooth fair-olive complexion with natural subtle skin texture and faint realistic tired under-eye shadows. Expressive, piercing dark brown almond-shaped eyes filled with stubborn pride and righteous anger, thin lips firmly pressed together in solemn determination. Her straight natural black hair is pulled back into a neat, elegant low ponytail, ears clearly visible. Wearing minimalist small round 3mm silver stud earrings, a pristine ivory-white silk buttoned collared blouse under a structured beige linen blazer. PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP, smooth uniform blue background. Clean balanced studio portrait lighting with sharp focus on iris and eyelashes, realistic documentary ID photography, 8k resolution, raw photo. --ar 1:1 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI):**
 ```text
-(caucasian:1.3), blonde hair, dyed hair, heavy glamour makeup, false eyelashes, plastic surgery look, smiling, happy, seductive, messy hair, anime, 3d render, doll skin, oversaturated, blurry.
+(caucasian:1.3), blonde hair, dyed hair, heavy glamour makeup, false eyelashes, plastic surgery look, smiling, happy, seductive, messy hair, anime, 3d render, doll skin, oversaturated, blurry, non-blue background, outdoor background, office background, white background.
 ```
 
 ---
 
-### 3. `avatar_vu` (`p6`) — LÊ QUANG VŨ (NGHI PHẠM 2 — 35 TUỔI — MẮT TRÁI LÁC NHẸ)
+### 3. `avatar_vu` (`p6`) — LÊ QUANG VŨ (NGHI PHẠM 2 — 25 TUỔI — MẮT TRÁI LÁC NHẸ)
 * **Tệp tin lưu trữ:** `avatar_vu.jpg` / `profile-vu.png` (`p6`)
-* **Mục đích nghiệp vụ:** Nhận diện đối tượng *"Thằng Lệch Pha"* nợ 300 triệu; **VẬT CHỨNG NHẬN DẠNG CỐT LÕI KHÔNG ĐƯỢC PHÉP LỖI**.
+* **Mục đích nghiệp vụ:** Ảnh thẻ căn cước nhận diện đối tượng *"Thằng Lệch Pha"* nợ 300 triệu; **VẬT CHỨNG NHẬN DẠNG CỐT LÕI KHÔNG ĐƯỢC PHÉP LỖI**.
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec — CỰC KỲ CHI TIẾT):**
-  - Nam giới 35 tuổi, người Kinh, thể trạng gầy gò, má hơi hóp, cằm lẹm nhẹ, da mặt vàng vọt xỉn màu vì thiếu ngủ và áp lực trốn nợ.
+  - Nam giới 25 tuổi, người Kinh, thể trạng gầy gò, má hơi hóp, cằm lẹm nhẹ, da mặt vàng vọt xỉn màu vì thiếu ngủ và áp lực trốn nợ.
   - **ĐẶC TẢ KHUYẾT TẬT MẮT (CHỐNG LỖI AI TUYỆT ĐỐI):**
     - Đeo kính cận gọng vuông màu đen chất liệu nhựa acetate mỏng.
     - **Mắt phải (bình thường):** Đồng tử và con ngươi màu nâu đen nhìn thẳng 100% vào ống kính máy ảnh.
     - **Mắt trái (bị lác nhẹ):** Bị tật lác ngoài nhẹ (Mild Exotropia / Outward Strabismus), **con ngươi mắt trái lệch nhẹ ra góc ngoài khoảng 12 độ** so với trục nhìn thẳng. Hai mắt bất đối xứng góc nhìn một cách tự nhiên và chân thật, không bị biến dạng quái dị.
   - Biểu cảm: Toát mồ hôi hột li ti ở vùng trán và thái dương, quai hàm cắn chặt hơi run, ánh mắt lấm lét, sợ sệt, khúm núm của kẻ ở rể bị dồn vào chân tường.
-  - Trang phục: Áo sơ mi kẻ sọc caro vuông màu xanh navy và xám trắng hơi nhàu, cổ áo bẻ lệch, có cài chiếc bút bi kỹ thuật vỏ nhựa xanh ở túi ngực trái.
-* **Thiết lập góc máy & ánh sáng:** Khẩu độ phải đặt ở **f/2.8** (không dùng f/1.2 hay f/1.4 để tránh làm mờ con ngươi mắt trái). Ánh sáng đèn tuýp huỳnh quang phía trên phản chiếu một vệt sáng nhẹ trên tròng kính.
+  - Trang phục: Áo sơ mi kẻ sọc caro vuông màu xanh navy và xám trắng, có cài chiếc bút bi kỹ thuật vỏ nhựa xanh ở túi ngực trái.
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng (frontal ID headshot), cự ly 1.5 mét, bố cục ảnh thẻ căn cước từ ngực trở lên. Khẩu độ đặt ở **f/2.8** để cả hai mắt đều sắc nét hoàn hảo. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)**. Ánh sáng studio đều hai bên phản chiếu nhẹ trên tròng kính.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Ultra-detailed forensic identification portrait of a 35-year-old Vietnamese freelance electrical technician named Le Quang Vu. Lean, anxious face with slightly hollow cheeks, pale sallow skin tone, heavy dark purple eye bags from chronic stress and panic. CRITICAL ANATOMICAL FEATURE - STRABISMUS EYE DEFECT: He wears thin black rectangular acetate eyeglasses; his RIGHT EYE looks directly forward into the camera lens with a dark brown pupil, while his LEFT EYE HAS A CLEAR DISTINCT OUTWARD DRIFT (mild lateral strabismus / exotropia, left pupil angled approximately 12 degrees outwards toward the temple). Highly realistic, natural asymmetric eye alignment. Nervous beads of perspiration along his temples, tight trembling jaw, intimidated guilty expression. Dressed in a rumpled casual navy-blue and grey plaid short-sleeve button-up shirt with an electrician plastic click-pen in his left chest pocket. Authentic Vietnamese interrogation desk environment, cool fluorescent overhead lighting creating realistic subtle reflections on the lens rims. Shot on Canon EOS R5 with 85mm f/2.8 macro lens for full depth of field across both eyes, razor-sharp focus on pupils, authentic micro-pores and sweat glisten, realistic noir documentary photography, 8k resolution. --ar 1:1 --style raw --s 60 --v 6.0
+Official national citizen identification ID photograph of a 25-year-old Vietnamese freelance electrical technician named Le Quang Vu. Straight-on frontal headshot portrait, looking directly forward into the camera lens. Symmetrical chest-up passport photo framing. Lean, anxious face with slightly hollow cheeks, pale sallow skin tone, heavy dark purple eye bags from chronic stress and panic. CRITICAL ANATOMICAL FEATURE - STRABISMUS EYE DEFECT: He wears thin black rectangular acetate eyeglasses; his RIGHT EYE looks directly forward into the camera lens with a dark brown pupil, while his LEFT EYE HAS A CLEAR DISTINCT OUTWARD DRIFT (mild lateral strabismus / exotropia, left pupil angled approximately 12 degrees outwards toward the temple). Highly realistic, natural asymmetric eye alignment. Nervous beads of perspiration along his temples, tight trembling jaw, intimidated guilty expression. Dressed in a casual navy-blue and grey plaid button-up shirt with an electrician plastic click-pen in his left chest pocket. PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP, smooth uniform blue background. Clean balanced studio portrait lighting, shot on Canon EOS R5 with 85mm f/2.8 macro lens for full depth of field across both eyes, razor-sharp focus on pupils and spectacles, authentic micro-pores and sweat glisten, realistic noir documentary ID photography, 8k resolution. --ar 1:1 --style raw --s 60 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI — CHẶN LỖI MẮT):**
 ```text
-(bilateral crossed eyes:1.4), (both eyes crossed:1.4), severe disfigurement, monstrous eyes, missing glasses, round glasses, wireframe glasses, completely symmetrical eyes, happy smiling expression, confident, athletic, muscular, caucasian, anime, 3d CGI, blurred eyes.
+(bilateral crossed eyes:1.4), (both eyes crossed:1.4), severe disfigurement, monstrous eyes, missing glasses, round glasses, wireframe glasses, completely symmetrical eyes, happy smiling expression, confident, athletic, muscular, caucasian, anime, 3d CGI, blurred eyes, non-blue background, white background, room background.
 ```
 
 ---
 
-### 4. `avatar_tung` — NGUYỄN THANH TÙNG (NGHI PHẠM 3 — 40 TUỔI — SẸO CHỮ V)
+### 4. `avatar_tung` — NGUYỄN THANH TÙNG (NGHI PHẠM 3 — 28 TUỔI — SẸO CHỮ V)
 * **Tệp tin lưu trữ:** `avatar_tung.jpg` / `profile-tung.png`
-* **Mục đích nghiệp vụ:** Nhận diện anh trai bé Gia Huy; đối chiếu vết sẹo chữ V với ảnh kỷ niệm hè 1996 (`p4`).
+* **Mục đích nghiệp vụ:** Ảnh căn cước / ảnh thẻ hồ sơ nhận diện anh trai bé Gia Huy; đối chiếu vết sẹo chữ V với ảnh kỷ niệm hè 1996 (`p4`).
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec — CỰC KỲ CHI TIẾT):**
-  - Nam giới 40 tuổi, người Kinh, thợ nề lao động tự do, vóc người rắn rỏi, gân guốc, da ngăm đen rám nắng gió đặc trưng.
+  - Nam giới 28 tuổi, người Kinh, thợ nề lao động tự do, vóc người rắn rỏi, gân guốc, da ngăm đen rám nắng gió đặc trưng.
   - Khuôn mặt chữ điền khắc khổ, nhiều nếp nhăn sâu khắc khoải ở khóe mắt và trán.
   - **ĐẶC TẢ VẾT SẸO CỐT LÕI (CHỐNG LỖI AI TUYỆT ĐỐI):**
     - Tại **đuôi lông mày bên trái**, có một **vết sẹo cũ màu trắng ngà hình chữ "V" dài khoảng 1.5 cm**, vết sẹo làm đứt gãy hàng lông mày đen rậm (hairless scar line running through the outer tail of left eyebrow).
     - Tại **gò má bên phải**, có một **vết bầm tụ máu cơ học mới màu tím sẫm lẫn ánh đỏ** (đường kính 2.5 cm) do cú đấm xô xát tối qua.
-  - Ánh mắt: Trĩu nặng u uất, đau đớn, hốc mắt thâm quầng, ánh nhìn chứa đựng 30 năm dằn vặt khôn nguôi vì cái chết của đứa em tật nguyền.
-  - Tóc đen rễ tre cắt ngắn lấm tấm vài sợi bạc ở thái dương. Mặc áo phông cotton cổ tròn màu xanh rêu bạc màu, sờn mép cổ, vương vài hạt bụi vôi vữa trắng mờ.
-* **Thiết lập góc máy & ánh sáng:** Chụp cận mặt góc chính diện, ánh sáng chiaroscuro tương phản cao tôn lên từng nếp nhăn và vết sẹo.
+  - Ánh mắt: Trĩu nặng u uất, đau đớn, hốc mắt thâm quầng nhìn thẳng vào ống kính, ánh nhìn chứa đựng nỗi dằn vặt khôn nguôi vì cái chết của đứa em tật nguyền.
+  - Tóc đen rễ tre cắt ngắn. Mặc áo phông cotton cổ tròn màu xanh rêu bạc màu, sờn mép cổ.
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng (frontal ID headshot), cự ly 1.5 mét, bố cục ảnh thẻ căn cước từ ngực trở lên. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)**. Ánh sáng studio đều hai bên làm nổi bật chi tiết vết sẹo chữ V và vết bầm tím gò má.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Intense gritty character portrait of a 40-year-old Vietnamese construction mason named Nguyen Thanh Tung, a broken man carrying 30 years of guilt. Weathered sunburnt bronze complexion, rugged square jawline, deep sorrowful wrinkles around the eyes and forehead. CRITICAL IDENTIFYING MARKS: High on the outer tail of his LEFT EYEBROW is a PROMINENT OLD PALE-WHITE V-SHAPED SCAR (1.5cm long) causing a clean vertical gap in his thick black eyebrow hair. On his RIGHT CHEEKBONE is a fresh deep-purple and dark-red contusion bruise from a recent fight. His dark hollow eyes are filled with agonizing grief, haunted trauma, and unshed tears. Coarse short black crew-cut hair with realistic salt-and-pepper grey hairs around the ears. Wearing a faded, distressed army-green cotton work crewneck t-shirt with minor powdery white cement dust smudges on the shoulders. Cinematic high-contrast side lighting (chiaroscuro), deep moody shadows, shot on Nikon Z9 with 105mm f/2.5 lens, incredible tactile skin pores and scar texture, raw emotional photojournalism masterpiece, 8k resolution. --ar 1:1 --style raw --s 75 --v 6.0
+Official national citizen identification ID photograph of a 28-year-old rugged Vietnamese construction mason named Nguyen Thanh Tung, a broken man carrying unresolved guilt. Straight-on frontal headshot portrait, looking directly into the camera lens. Symmetrical chest-up passport photo framing. Weathered sunburnt bronze complexion, rugged square jawline, sorrowful lines around the eyes and forehead. CRITICAL IDENTIFYING MARKS: High on the outer tail of his LEFT EYEBROW is a PROMINENT OLD PALE-WHITE V-SHAPED SCAR (1.5cm long) causing a clean vertical gap in his thick black eyebrow hair. On his RIGHT CHEEKBONE is a fresh deep-purple and dark-red contusion bruise from a recent altercation. His dark hollow eyes are filled with agonizing grief and haunted trauma. Coarse short black crew-cut hair. Wearing a faded, distressed army-green cotton work crewneck t-shirt. PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP, smooth uniform blue background. Clean balanced studio portrait lighting, shot on Nikon Z9 with 85mm f/2.8 lens, incredible tactile skin pores, scar texture, and bruise clarity, raw emotional forensic realism, 8k resolution, raw photo. --ar 1:1 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI — CHẶN LỖI SẸO):**
 ```text
-(scar on wrong side:1.3), scar on right eyebrow, missing scar, smooth flawless skin, clean face, smiling, cheerful, clean fancy clothes, caucasian, female, anime, cartoon, 3d render, oversaturated, symmetrical lighting.
+(scar on wrong side:1.3), scar on right eyebrow, missing scar, smooth flawless skin, clean face, smiling, cheerful, clean fancy clothes, caucasian, female, anime, cartoon, 3d render, oversaturated, non-blue background, street, construction site background, white background.
 ```
 
 ---
 
-### 5. `avatar_ha` — TRẦN THỊ HÀ (THỦ PHẠM CHÍNH — 36 TUỔI — CUỒNG YÊU ÁM ẢNH)
+### 5. `avatar_ha` — TRẦN THỊ HÀ (THỦ PHẠM CHÍNH — 26 TUỔI — CUỒNG YÊU ÁM ẢNH)
 * **Tệp tin lưu trữ:** `avatar_ha.jpg` / `profile-ha.png`
-* **Mục đích nghiệp vụ:** Chân dung tâm lý tội phạm nữ sát thủ giết người vì cuồng ghen bệnh hoạn.
+* **Mục đích nghiệp vụ:** Ảnh căn cước / ảnh thẻ hồ sơ tâm lý tội phạm nữ sát thủ giết người vì cuồng ghen bệnh hoạn.
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec — CỰC KỲ CHI TIẾT):**
-  - Nữ giới 36 tuổi, người Kinh, tạng người gầy gò, xương quai xanh nhô cao, cổ gầy dài. Nước da trắng bợt, tái nhợt thiếu ánh mặt trời (sickly porcelain pale).
+  - Nữ giới 26 tuổi, người Kinh, tạng người gầy gò, xương quai xanh nhô cao, cổ gầy dài. Nước da trắng bợt, tái nhợt thiếu ánh mặt trời (sickly porcelain pale).
   - Gương mặt thon dài, cằm hơi nhọn, sống mũi thẳng nhưng nhỏ.
   - **ĐẶC TẢ ÁNH MẮT & BIỂU CẢM CUỒNG SI (CHỐNG LỖI AI):**
-    - Đôi mắt một mí to tròn (wide unblinking monolid eyes), con ngươi đen giãn to nhìn chằm chằm đầy ám ảnh vào ống kính máy ảnh (chilling obsessive dead-eyed stare).
+    - Đôi mắt một mí to tròn (wide unblinking monolid eyes), con ngươi đen giãn to nhìn thẳng chằm chằm đầy ám ảnh vào ống kính máy ảnh (chilling obsessive dead-eyed stare).
     - Vành mắt hơi ửng đỏ tấy do khóc nhiều và thức trắng đêm.
     - Khóe môi mỏng màu hồng nhạt hơi nhếch lên thành một nụ cười mỉm lạnh lẽo, vô hồn, toát lên sự giải thoát điên loạn (*"Anh ấy mãi mãi là của tao"*).
-  - Tóc đen nhánh dài buông xõa tự nhiên ngang vai, vài sợi tóc lòa xòa dính vào gò má tái nhợt. Mặc áo len cardigan mỏng màu xám nhạt cài kín cúc đến sát cổ họng.
-* **Thiết lập góc máy & ánh sáng:** Ánh sáng lạnh tông xanh cyan nhạt (cold blue-green forensic lighting) từ một ô cửa sổ thông gió chiếu chéo, tạo cảm giác rùng mình ngột ngạt.
+  - Tóc đen nhánh dài buông xõa tự nhiên ngang vai, kẹp gọn sau vành tai. Mặc áo len cardigan mỏng màu xám nhạt cài kín cúc đến sát cổ họng.
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng (frontal ID headshot), cự ly 1.5 mét, bố cục ảnh thẻ căn cước từ ngực trở lên. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)**. Ánh sáng studio đều hai bên làm nổi bật đôi mắt một mí cuồng si và làn da trắng bợt ghê rợn.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Chilling psychological thriller criminal portrait of a 36-year-old Vietnamese female accountant turned obsessive murderer named Tran Thi Ha. Frail slender build, strikingly pale translucent skin with an eerie sickly undertone and prominent collarbones. DISTURBING PSYCHOPATHIC FACIAL EXPRESSION: Wide, unblinking dark monolid eyes staring directly forward with a terrifying mix of fanatical devotion, morbid possessiveness, and cold detachment (obsessive yandere gaze). Faint, eerie tranquil smile lingering on her chapped pale lips. Natural raven-black straight shoulder-length hair falling loosely with a few strands clinging to her pale cheek. Wearing a plain, buttoned-up modest dove-grey knitted cardigan buttoned all the way up to her collarbone. Somber, cold-toned moody ambient lighting with teal-cyan undertones inside a police medical holding cell, dramatic soft shadows, shot on Leica SL2 with 75mm f/1.4 Summilux lens, razor-sharp focus on the glassy reflective pupils, intense psychological realism, 8k resolution. --ar 1:1 --style raw --s 75 --v 6.0
+Official national citizen identification ID photograph of a 26-year-old Vietnamese female accountant turned obsessive murderer named Tran Thi Ha. Straight-on frontal headshot portrait, looking directly into the camera lens. Symmetrical chest-up passport photo framing. Frail slender build, strikingly pale translucent skin with an eerie sickly undertone. DISTURBING PSYCHOPATHIC FACIAL EXPRESSION: Wide, unblinking dark monolid eyes staring directly forward with a terrifying mix of fanatical devotion, morbid possessiveness, and cold detachment (obsessive yandere gaze). Faint, eerie tranquil smile lingering on her chapped pale lips. Natural raven-black straight shoulder-length hair neatly tucked behind ears. Wearing a plain, buttoned-up modest dove-grey knitted cardigan buttoned all the way up to her collarbone. PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP, smooth uniform blue background. Clean balanced studio portrait lighting with razor-sharp focus on the glassy reflective monolid pupils and pale skin texture, chilling psychological realism, 8k resolution, raw photo. --ar 1:1 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI):**
 ```text
-(caucasian:1.3), blonde hair, double eyelids, cheerful normal smile, warm sunny lighting, glamour photography, heavy makeup, lipstick, anime, 3d CGI, cute, cartoon, distorted fingers, blurry eyes.
+(caucasian:1.3), blonde hair, double eyelids, cheerful normal smile, warm sunny lighting, glamour photography, heavy makeup, lipstick, anime, 3d CGI, cute, cartoon, distorted fingers, blurry eyes, non-blue background, hospital room, cell background, white background.
 ```
 
 ---
 
 ### 6. `avatar_lua` — BÀ NGUYỄN THỊ LỤA (NHÂN CHỨNG HÀNG XÓM — 60 TUỔI)
 * **Tệp tin lưu trữ:** `avatar_lua.jpg` / `profile-lua.png`
-* **Mục đích nghiệp vụ:** Nhân chứng chủ chốt nghe tiếng xe 19:00, tiếng cãi nhau 20:00 và phát hiện thi thể 06:30.
+* **Mục đích nghiệp vụ:** Ảnh căn cước / ảnh thẻ hồ sơ nhân chứng chủ chốt nghe tiếng xe 19:00, tiếng cãi nhau 20:00 và phát hiện thi thể 06:30.
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec):**
-  - Phụ nữ lớn tuổi 60 tuổi, người Kinh đồng bằng Bắc Bộ truyền thống, gương mặt phúc hậu hiền từ nhưng thần thái đang bàng hoàng, kinh hãi sau khi phát hiện án mạng.
+  - Phụ nữ lớn tuổi 60 tuổi, người Kinh đồng bằng Bắc Bộ truyền thống, gương mặt phúc hậu hiền từ nhưng thần thái nghiêm nghị, bàng hoàng sau khi phát hiện án mạng.
   - Làn da có nhiều đốm đồi mồi tự nhiên và nếp nhăn sâu khóe mắt, khóe miệng.
   - Mái tóc hoa râm (70% sợi bạc) được chải gọn gàng búi tròn truyền thống sau gáy bằng búi lưới đen.
-  - **ĐẶC ĐIỂM KÍNH LÃO:** Đeo chiếc kính lão gọng nhựa đồi mồi cổ điển trễ xuống 1/3 sống mũi, ánh mắt mở to quan sát tinh tường nhìn hơi chếch lên trên gọng kính.
-  - Mặc bộ đồ mặc nhà bằng vải lanh hoa nhí nền nâu sẫm điểm hoa vàng nhỏ (bộ đồ bà ba/đồ bộ kiểu miền Bắc).
-* **Thiết lập góc máy & ánh sáng:** Ánh sáng ban mai tự nhiên trong ngõ Bờ Sông, hậu cảnh là bức tường quét vôi vàng cũ kỹ rêu phong của Hà Nội.
+  - **ĐẶC ĐIỂM KÍNH LÃO:** Đeo chiếc kính lão gọng nhựa đồi mồi cổ điển trên sống mũi, ánh mắt nhìn thẳng qua tròng kính vào ống kính máy ảnh.
+  - Mặc áo lanh cổ đức hoa nhí nền nâu sẫm điểm hoa vàng nhỏ (bộ đồ bà ba/đồ bộ kiểu miền Bắc gọn gàng).
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng (frontal ID headshot), cự ly 1.5 mét, bố cục ảnh thẻ căn cước từ ngực trở lên. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)**. Ánh sáng studio đều, sắc nét từng nếp nhăn và đốm đồi mồi chân thực.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Authentic documentary portrait of a 60-year-old traditional Northern Vietnamese grandmother named Nguyen Thi Lua, key witness to a murder. Kind, weathered matriarchal East Asian face with genuine age spots and deep crow's feet wrinkles, expressing visible alarm, shock, and lingering horror. Classic salt-and-pepper grey hair neatly swept into a traditional low bun at the back of her head. Vintage brown tortoiseshell reading glasses resting slightly low on the bridge of her nose, her dark observant eyes peering acutely over the rims. Dressed in authentic Vietnamese comfortable short-sleeve floral-printed linen pajamas (traditional do bo with small yellow flowers on brown fabric). Early morning natural daylight filtering down a narrow Hanoi alleyway with aged yellow peeling plaster walls and damp green moss in the blurred background. Shot on Fujifilm GFX 100 II with 63mm f/2.8 lens, exceptional natural skin texture, cultural authenticity, raw documentary journalism style, 8k resolution. --ar 1:1 --style raw --s 75 --v 6.0
+Official national citizen identification ID photograph of a 60-year-old traditional Northern Vietnamese elderly woman named Nguyen Thi Lua, key witness to a murder. Straight-on frontal headshot portrait, looking directly into the camera lens. Symmetrical chest-up passport photo framing. Kind, weathered matriarchal East Asian face with genuine age spots and deep crow's feet wrinkles, expressing solemnity and lingering shock. Classic salt-and-pepper grey hair neatly swept into a traditional low bun at the back of her head. Vintage brown tortoiseshell reading glasses resting on the bridge of her nose, her dark observant eyes peering through the lenses. Dressed in authentic Vietnamese comfortable short-sleeve floral-printed linen collared shirt (traditional do bo with small yellow flowers on brown fabric). PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP, smooth uniform blue background. Clean balanced studio portrait lighting, shot on Fujifilm GFX 100 II with 85mm f/2.8 lens, exceptional natural elderly skin texture, authentic Vietnamese citizen ID photo aesthetic, 8k resolution, raw photo. --ar 1:1 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-(caucasian:1.3), western woman, smooth skin, plastic surgery, young face, blonde hair, smiling, laughing, cheerful, happy, glamour, heavy makeup, lipstick, modern western clothing, studio background, anime, 3d render, cartoon, blurry eyes, missing glasses, round sunglasses, extra ears, double chin.
+(caucasian:1.3), western woman, smooth skin, plastic surgery, young face, blonde hair, smiling, laughing, cheerful, happy, glamour, heavy makeup, lipstick, modern western clothing, anime, 3d render, cartoon, blurry eyes, missing glasses, non-blue background, outdoor alleyway, white background.
 ```
 
 ---
 
-### 7. `avatar_dat` — TRẦN VĂN ĐẠT / ĐẠT GÀ (CHỢ CẢNG — 38 TUỔI)
+### 7. `avatar_dat` — TRẦN VĂN ĐẠT / ĐẠT GÀ (CHỢ CẢNG — 28 TUỔI)
 * **Tệp tin lưu trữ:** `avatar_dat.jpg` / `profile-dat-ga.png`
-* **Mục đích nghiệp vụ:** Nghi phạm nợ nần bốc họ 80M, đối tượng nhiễu có ngoại phạm vững chắc tại Chợ Cảng.
+* **Mục đích nghiệp vụ:** Ảnh căn cước / ảnh thẻ hồ sơ nghi phạm nợ nần bốc họ 80M, đối tượng nhiễu có ngoại phạm vững chắc tại Chợ Cảng.
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec):**
-  - Nam giới 38 tuổi, người Kinh, tiểu thương mổ và bán gà sống tại chợ đầu mối. Thể hình thô đậm, cơ bắp cuồn cuộn nhưng nhiều mỡ dạn dày sương gió.
+  - Nam giới 28 tuổi, người Kinh, tiểu thương mổ và bán gà sống tại chợ đầu mối. Thể hình thô đậm, cơ bắp cuồn cuộn nhưng nhiều mỡ dạn dày sương gió.
   - Khuôn mặt vuông vức bặm trợn, gò má cao, râu ria lởm chởm quanh cằm. Da mặt nâu đồng bóng nhờn mồ hôi và dầu mỡ.
-  - Lông mày rậm nhíu chặt, biểu cảm cáu kỉnh, gắt gỏng, mắt đỏ ngầu do thiếu ngủ dậy từ 3h sáng chở gà.
-  - **TRANG PHỤC & ĐẶC ĐIỂM CHỐNG LỖI (ANTI-GLITCH):** Mặc áo thun ba lỗ màu xám ướt đẫm mồ hôi vùng ngực, khoác ngoài chiếc **tạp dề cao su chống thấm nước màu xanh rêu dày cộp, trên bề mặt bám dính vài giọt nước đục và 2-3 chiếc lông gà ướt**. TUYỆT ĐỐI KHÔNG vẽ mũ đầu bếp hay tạp dề trắng nhà hàng.
-* **Thiết lập góc máy & ánh sáng:** Ánh sáng bóng đèn tròn sợi đốt vàng ấm pha lẫn hơi nước ẩm ướt trong sạp chợ gia cầm rạng sáng.
+  - Lông mày rậm nhíu chặt nhìn thẳng vào ống kính, biểu cảm cáu kỉnh, gắt gỏng, mắt đỏ ngầu do thiếu ngủ dậy từ 3h sáng chở gà.
+  - **TRANG PHỤC:** Mặc áo polo cộc tay màu xanh rêu thẫm gọn gàng phù hợp chụp ảnh thẻ căn cước lao động.
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng (frontal ID headshot), cự ly 1.5 mét, bố cục ảnh thẻ căn cước từ ngực trở lên. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)**. Ánh sáng studio đều hai bên thể hiện rõ chất da nâu bóng dầu và vẻ cáu kỉnh bặm trợn.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Candid environmental documentary portrait of a 38-year-old rugged Vietnamese wet-market poultry vendor named Tran Van Dat, nicknamed Dat Ga. Burly, stocky muscular build, weathered oily tan skin glistening with sweat, hostile aggressive scowl, thick furrowed black eyebrows, and rough unkempt stubble along his jawline. Irritable bloodshot tired eyes from working 3 AM market shifts. Wearing a stained grey ribbed cotton tank top underneath a heavy-duty dark olive-green waterproof rubber butcher apron, spattered with water droplets and a few wet chicken feathers stuck to the chest. Gritty authentic Hanoi wholesale poultry market stall at dawn, misty humid air with stacked plastic poultry cages softly blurred in background. Warm tungsten overhead hanging bulb mixing with cool morning twilight, shot on Sony A1 with 50mm f/2.8 GM lens for full sharp textural depth, intense raw documentary aesthetic, visceral texture, 8k resolution. --ar 1:1 --style raw --s 75 --v 6.0
+Official national citizen identification ID photograph of a 28-year-old rugged Vietnamese wet-market poultry vendor named Tran Van Dat, nicknamed Dat Ga. Straight-on frontal headshot portrait, looking directly into the camera lens. Symmetrical chest-up passport photo framing. Burly, stocky muscular build, weathered oily tan skin glistening with sweat sheen, hostile aggressive scowl, thick furrowed black eyebrows, and rough unkempt stubble along his jawline. Irritable bloodshot tired eyes from working 3 AM wholesale market shifts. Wearing a dark olive-green work polo shirt with collar. PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP, smooth uniform blue background. Clean balanced studio portrait lighting, shot on Sony A1 with 85mm f/2.8 lens for full sharp textural depth, rough authentic working-class citizen ID portrait, visceral skin texture, 8k resolution, raw photo. --ar 1:1 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-(caucasian:1.3), white chef apron, chef hat, toque, clean clothes, handsome, smiling, friendly, weak, skinny, suit, tie, restaurant kitchen, stainless steel, smooth skin, anime, 3d render, cartoon, blurry, oversaturated, clean apron, missing feathers.
+(caucasian:1.3), white chef apron, chef hat, toque, clean clothes, handsome, smiling, friendly, weak, skinny, suit, tie, restaurant kitchen, stainless steel, smooth skin, anime, 3d render, cartoon, blurry, oversaturated, non-blue background, market background, white background.
 ```
 
 ---
 
 ### 8. `avatar_vy` — THẢO VY / BÉ VY ❤️ (NHÂN TÌNH NẠN NHÂN — 24 TUỔI)
 * **Tệp tin lưu trữ:** `avatar_vy.jpg` / `profile-vy.png`
-* **Mục đích nghiệp vụ:** Nhận diện người tình trẻ Khang hẹn trốn đi Đà Lạt chuyến 06:15 sáng; kích nổ cơn cuồng ghen của Hà.
+* **Mục đích nghiệp vụ:** Ảnh căn cước / ảnh thẻ hồ sơ nhận diện người tình trẻ Khang hẹn trốn đi Đà Lạt chuyến 06:15 sáng; kích nổ cơn cuồng ghen của Hà.
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec):**
-  - Nữ giới 24 tuổi, thế hệ trẻ (Gen Z) tại Hà Nội, phong cách hot girl sành điệu, sang chảnh.
-  - Khuôn mặt V-line thon gọn, làn da trắng sứ mịn màng không tì vết. Sống mũi cao thon nhỏ, môi mọng đánh son bóng màu đỏ cam quyến rũ.
-  - Mắt to tròn hai mí rõ nét, đường kẻ mắt eyeliner sắc lẹm vút nhẹ, hàng mi dài cong vút.
-  - Mái tóc nhuộm màu nâu caramel bồng bềnh uốn sóng nước hiện đại.
-  - Mặc áo hai dây bằng lụa satin cao cấp màu xanh ngọc bích khoét cổ sâu vừa phải, đeo sợi dây chuyền vàng trắng 18k mặt kim cương nhỏ tinh tế.
-  - **CHỈ DẪN CHỐNG LỖI TAY (ANTI-HAND DEFORMITY DIRECTIVE):** Chụp chân dung bán thân từ ngực trở lên (Head-and-shoulders portrait), **không để bàn tay xuất hiện trong khung hình** để loại trừ 100% rủi ro dị tật ngón tay khi AI vẽ tư thế selfie.
-* **Thiết lập góc máy & ánh sáng:** Chụp theo phong cách selfie chân dung điện thoại cao cấp (iPhone Portrait Mode) trong quán lounge/cafe đèn vàng lung linh mờ ảo.
+  - Nữ giới 24 tuổi, thế hệ trẻ tại Hà Nội, phong cách trẻ trung, xinh đẹp, hiện đại.
+  - Khuôn mặt V-line thon gọn, làn da trắng sứ mịn màng không tì vết. Sống mũi cao thon nhỏ, môi mọng đánh son màu đỏ cam nhẹ nhàng.
+  - Mắt to tròn hai mí rõ nét nhìn thẳng vào ống kính máy ảnh, đường kẻ mắt eyeliner sắc nét, hàng mi cong vút.
+  - Mái tóc nhuộm màu nâu caramel bồng bềnh uốn sóng nhẹ, vén gọn gàng sau vành tai để lộ rõ tai theo chuẩn ảnh thẻ căn cước.
+  - Trang phục: Áo sơ mi lụa trắng có cổ thanh lịch, đeo sợi dây chuyền vàng trắng 18k mặt đá nhỏ tinh tế.
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng (frontal ID headshot), cự ly 1.5 mét, bố cục ảnh thẻ căn cước từ ngực trở lên. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)**. Ánh sáng studio đều, tôn lên vẻ đẹp sắc sảo, trẻ trung.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-High-end head-and-shoulders smartphone portrait of a 24-year-old fashionable Vietnamese beauty named Thao Vy, social media influencer aesthetic. Flawless porcelain-white skin with delicate natural pore texture, slender modern V-line face shape, glossy plump coral-red lips, large expressive dark brown almond eyes with crisp winged black eyeliner and delicate long curled lashes. Voluminous wavy caramel-brown dyed hair cascading over one bare shoulder. Wearing a glamorous emerald-green silk satin camisole top with a dainty thin 18k white gold pendant necklace resting on her collarbone. No hands or fingers visible in frame. Flattering soft golden-hour ambient lighting inside an upscale modern cocktail lounge in Hanoi, luxurious bokeh circles in blurred background. Shot on simulated iPhone 15 Pro Max front portrait camera, crisp high-definition commercial fashion look, seductive confident smile, vibrant colors, 8k resolution. --ar 1:1 --style raw --s 75 --v 6.0
+Official national citizen identification ID photograph of a 24-year-old fashionable Vietnamese young woman named Thao Vy. Straight-on frontal headshot portrait, looking directly into the camera lens. Symmetrical chest-up passport photo framing. Flawless fair complexion with delicate natural skin texture, slender modern V-line face shape, glossy coral-red lips with a subtle composed smile, large dark brown almond eyes with neat subtle black eyeliner and delicate curled lashes. Wavy caramel-brown dyed hair neatly styled and tucked behind ears to reveal earlobes clearly. Wearing an elegant ivory-white silk button-up collared blouse with a dainty thin 18k white gold pendant necklace resting on her collarbone. PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP, smooth uniform blue background. Clean balanced studio portrait lighting, crisp sharp focus on eyes and facial features, authentic Vietnamese modern citizen ID portrait, 8k resolution, raw photo. --ar 1:1 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-(deformed hands:1.4), (extra fingers:1.4), (mutated fingers:1.4), hands in frame, holding phone in front of face, nsfw, topless, nude, excessive cleavage, (caucasian:1.3), blonde hair, blue eyes, plastic doll skin, uncanny valley, ugly, distorted face, mature woman, wrinkles, anime, 3d render, lowres, blurry.
+(deformed hands:1.4), (caucasian:1.3), blonde hair, blue eyes, plastic doll skin, uncanny valley, ugly, distorted face, mature woman, wrinkles, anime, 3d render, lowres, blurry, non-blue background, lounge background, selfie angle, hands in frame, excessive cleavage, white background.
 ```
 
 ---
 
 ### 9. `avatar_huy` — BÉ NGUYỄN GIA HUY (EM TRAI TÙNG — 7 TUỔI, HÈ 1996)
 * **Tệp tin lưu trữ:** `avatar_huy.jpg` / `profile-huy.png`
-* **Mục đích nghiệp vụ:** Nạn nhân bi kịch 30 năm trước; đối chiếu đặc điểm chiếc còi đồng với ảnh kỷ niệm hè 1996 (`p4`).
+* **Mục đích nghiệp vụ:** Ảnh thẻ học sinh / hồ sơ trích lục nạn nhân bi kịch 30 năm trước; đối chiếu đặc điểm chiếc còi đồng với ảnh kỷ niệm hè 1996 (`p4`).
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec — CỰC KỲ CHI TIẾT):**
   - Bé trai 7 tuổi người Kinh thời điểm mùa hè năm 1996, thể trạng nhỏ thó, gầy gò, hai bả vai nhô gầy, da bánh mật rám nắng thôn quê.
-  - Gương mặt ngây thơ, trong sáng vô ngần, hai má hơi hóp nhẹ vì bệnh tim bẩm sinh. Đôi mắt đen láy mở to sáng trong nhưng đượm vẻ câm lặng ngơ ngác (em bị câm không thể nói).
-  - Tóc cắt ngắn đầu đinh ba phân kiểu trẻ con nông thôn thập niên 90.
+  - Gương mặt ngây thơ, trong sáng vô ngần, hai má hơi hóp nhẹ vì bệnh tim bẩm sinh. Đôi mắt đen láy mở to sáng trong nhìn thẳng vào ống kính nhưng đượm vẻ câm lặng ngơ ngác (em bị câm không thể nói).
+  - Tóc cắt ngắn đầu đinh ba phân kiểu trẻ con thập niên 90.
   - **VẬT BẤT LY THÂN BẮT BUỘC (CORE EVIDENCE PROP):** Trước ngực đeo một **sợi dây dù màu cam cũ kỹ, đầu dây buộc một CHIẾC CÒI BẰNG ĐỒNG THAU NHỎ MÀU VÀNG NÂU** (bố mẹ đeo để em thổi báo hiệu khi nguy cấp).
-  - Mặc chiếc áo may-ô thun trắng cộc tay cũ kỹ đã ngả sang màu cháo lòng, cổ áo hơi rách sợi chỉ viền.
-* **Thiết lập góc máy & ánh sáng:** Màu ảnh phim nhựa cổ điển Kodak Gold 200 hè 1996, viền ảnh hơi mờ quang học, hạt film hoài niệm nhuốm màu thời gian.
+  - Mặc chiếc áo sơ mi cộc tay trắng học sinh tiểu học đơn sơ.
+* **Thiết lập góc máy & ánh sáng:** Chụp chính diện thẳng (frontal ID headshot), bố cục ảnh thẻ học sinh thập niên 1990 từ ngực trở lên. **Phông nền màu xanh dương tiêu chuẩn ảnh thẻ (solid vibrant royal blue ID backdrop)** có hiệu ứng hạt phim vintage hoài niệm.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Heartbreaking vintage 1996 color documentary photograph of a frail 7-year-old Kinh Vietnamese mute boy named Gia Huy in summer 1996. Delicate innocent childhood features, slender fragile build with slightly sunken cheeks, sun-kissed golden-tan skin. Large luminous, soulful dark brown eyes filled with pure innocence and quiet silence. Short traditional 3-millimeter buzz-cut black hair. ESSENTIAL ICONIC EVIDENCE PROP: Around his neck hangs an authentic weathered thin orange braided cord carrying a SMALL VINTAGE BRASS WHISTLE resting flat against his chest (used to whistle because he cannot speak). Wearing an authentic worn-out, slightly discolored ribbed white cotton tank top with frayed collar seams. Warm nostalgic Hanoi summer 1996 atmosphere, soft natural afternoon sunlight, authentic Kodak Gold 200 35mm film grain, warm nostalgic tones, vintage Leica M6 with 50mm f/2.8 lens, emotionally poignant historical masterpiece, 8k resolution. --ar 1:1 --style raw --s 75 --v 6.0
+Vintage 1996 standard Vietnamese elementary student identification ID photograph of a frail 7-year-old Kinh Vietnamese mute boy named Gia Huy in summer 1996. Straight-on frontal headshot portrait, looking directly into the camera lens. Symmetrical chest-up vintage ID photo framing. Delicate innocent childhood features, slender fragile build with slightly sunken cheeks, sun-kissed golden-tan skin. Large luminous, soulful dark brown eyes filled with pure innocence and quiet silence. Short traditional 3-millimeter buzz-cut black hair. ESSENTIAL ICONIC EVIDENCE PROP: Around his neck hangs an authentic weathered thin orange braided cord carrying a SMALL VINTAGE BRASS WHISTLE resting flat against his chest. Wearing a plain vintage white short-sleeve collared student shirt. PLAIN SOLID VIBRANT ROYAL BLUE ID STUDIO BACKDROP with subtle vintage 1990s photo studio texture. Soft nostalgic studio lighting, authentic Kodak film grain and tones, vintage Leica 50mm f/2.8 lens, emotionally poignant historical identification photo, 8k resolution. --ar 1:1 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-missing whistle, modern whistle, silver whistle, plastic whistle, missing orange cord, smiling happily, cheerful, laughing, chubby child, well-fed, (caucasian child:1.3), blonde hair, blue eyes, modern clothing, t-shirt with graphic print, smartphone, modern background, anime, 3d render, cartoon, blurry.
+missing whistle, modern whistle, silver whistle, plastic whistle, missing orange cord, smiling happily, cheerful, laughing, chubby child, well-fed, (caucasian child:1.3), blonde hair, blue eyes, modern clothing, t-shirt with graphic print, smartphone, modern background, anime, 3d render, cartoon, blurry, non-blue background, outdoor background, white background.
 ```
 
 ---

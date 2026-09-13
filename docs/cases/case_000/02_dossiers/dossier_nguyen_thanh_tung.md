@@ -56,9 +56,9 @@
 
 ## II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI CHỐI TỘI BAN ĐẦU
 
-1. **Cuộc gọi ẩn danh 19:55 (`dev-00`):** Trong Nhật ký cuộc gọi trên điện thoại Khang ghi nhận cuộc gọi đến lúc 19:55:05 từ số lạ `0984.180.357` đàm thoại 35 giây trước khi xảy ra tiếng cãi cọ xô xát.
+1. **Cuộc gọi ẩn danh 19:00 (`dev-00`):** Trong Nhật ký cuộc gọi trên điện thoại Khang ghi nhận cuộc gọi đến lúc 19:00 từ số lạ `0984.180.357` đàm thoại 35 giây trước khi Tùng tìm sang nhà Khang.
 2. **Mẩu tin rao vặt trên Bảng tin trước cổng (`18`):** Đối chiếu mẩu giấy viết tay dán góc Bảng tin trước cổng số 14 Bờ Sông: *"Nhận sửa nhà dân dụng, đục phá bê tông... LH: 0984.180.357 (em Tùng)"* $\rightarrow$ Tra cứu ra danh tính thợ nề Nguyễn Thanh Tùng.
-3. **Lời khai chối tội ban đầu (`14`):** Khi bị triệu tập lần 1, Tùng ra sức chối cãi: Khai chỉ gọi điện thoại 19:55 hỏi xem có việc thợ nề nhận làm và vay tiền mua vật liệu rồi ở phòng trọ Cầu Bươu ngủ suốt đêm, **khẳng định tuyệt đối không đến gặp mặt Khang và không bước chân vào phòng khách nhà Khang**.
+3. **Lời khai chối tội ban đầu (`14`):** Khi bị triệu tập lần 1, Tùng ra sức chối cãi: Khai chỉ gọi điện thoại 19:00 hỏi xem có việc thợ nề nhận làm và vay tiền mua vật liệu rồi ở phòng trọ Cầu Bươu ngủ suốt đêm, **khẳng định tuyệt đối không đến gặp mặt Khang và không bước chân vào phòng khách nhà Khang**.
 
 ---
 
@@ -93,15 +93,15 @@
 ## V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2016)
 
 ```text
-19:55             20:00                20:05 - 20:10            20:15               20:45
+19:00             20:00                20:05 - 20:10            20:15               20:45
   │                 │                        │                    │                   │
   ├─────────────────┼────────────────────────┼────────────────────┼───────────────────┤
-Gọi điện 19:55    Sang nhà Khang       Xô xát, xé mẩu báo,  Hoảng sợ tháo       Hà lẻn vào ra tay,
+Gọi điện 19:00    Sang nhà Khang       Xô xát, xé mẩu báo,  Hoảng sợ tháo       Hà lẻn vào ra tay,
 hẹn gặp đối chất  ngồi uống trà        xô Khang ngã đập     chạy ra cửa chính   Tùng đã về phòng
 bị Khang gạt đi   yêu cầu tạ tội       đầu ngất xỉu         về trọ Cầu Bươu     trọ ngủ
 ```
 
-* **19:55:** Tùng gọi điện thoại vào số máy Khang hẹn gặp. Khang gạt đi bảo bận việc.
+* **19:00:** Tùng gọi điện thoại vào số máy Khang hẹn gặp. Khang gạt đi bảo bận việc.
 * **20:00:** Tùng cầm mẩu báo cũ 1996 sang thẳng nhà Khang. Khang mở cửa, hai bên ngồi uống trà đối chất. Tùng yêu cầu Khang ra nghĩa trang thắp nhang tạ lỗi trước mộ Huy nhưng Khang buông lời cợt nhả thách thức *"Chuyện xưa như trái đất rồi, nhắc lại làm gì"*.
 * **20:05 – 20:10:** Cơn uất hận bùng nổ, Tùng xé nát mẩu báo ném xuống sàn rồi lao vào giằng co với Khang. Khang đấm trúng gò má Tùng. Tùng xô mạnh làm Khang ngã đập đầu vào cạnh bàn gỗ, làm vỡ toang bình trà thủy tinh và rơi vỡ khung ảnh `p4` lúc hơn 20:00 (bà Lụa nghe thấy tiếng xoảng vỡ).
 * **20:15:** Tùng thấy Khang nằm bất động mê man, cúi xuống kiểm tra thấy **Khang vẫn còn thở đều**. Quá hoảng loạn, Tùng vùng chạy tháo thân ra khỏi cửa chính, để mặc cổng và cửa mở toang rồi chạy một mạch ra đầu ngõ bắt xe ôm về phòng trọ Cầu Bươu.
@@ -111,9 +111,9 @@ bị Khang gạt đi   yêu cầu tạ tội       đầu ngất xỉu         v
 
 ## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ BÓC TRẦN (PUZZLE MECHANICS)
 
-### 1. Cơ chế 1: Giải mã danh tính SĐT 19:55 từ Bảng tin rao vặt (`18`)
-* **Vật chứng:** Cuộc gọi lúc 19:55:05 trong Nhật ký cuộc gọi máy Khang (`dev-00`) + Mẩu tin rao vặt viết tay thợ nề trên Bảng tin trước cổng (`18`).
-* **Ý nghĩa:** Giải mã đối tượng ẩn danh 19:55 chính là Nguyễn Thanh Tùng $\rightarrow$ Mở khóa Lời khai 1 (`14`) và Hồ sơ lý lịch Tùng (`14_ly_lich`).
+### 1. Cơ chế 1: Giải mã danh tính SĐT 19:00 từ Bảng tin rao vặt (`18`)
+* **Vật chứng:** Cuộc gọi lúc 19:00 trong Nhật ký cuộc gọi máy Khang (`dev-00`) + Mẩu tin rao vặt viết tay thợ nề trên Bảng tin trước cổng (`18`).
+* **Ý nghĩa:** Giải mã đối tượng ẩn danh 19:00 chính là Nguyễn Thanh Tùng $\rightarrow$ Mở khóa Lời khai 1 (`14`) và Hồ sơ lý lịch Tùng (`14_ly_lich`).
 
 ### 2. Cơ chế 2: Bóc trần lời khai nói dối "chỉ gọi điện" bằng Dấu vân tay (`p1`)
 * **Dữ liệu đối chiếu:** Tùng khai chỉ gọi điện thoại chứ không bước chân vào nhà Khang (`14`).

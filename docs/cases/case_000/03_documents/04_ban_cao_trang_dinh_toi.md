@@ -23,7 +23,7 @@
 
 #### 2. Xác định Động cơ gây án cốt lõi:
 * **Động cơ:** **Cơn ghen tuông cuồng loạn và tâm lý cuồng sở hữu độc hại (Obsessive Passion)**.
-* **Tình tiết bùng nổ:** Hà lẻn vào lúc 20:45, thấy Khang nằm mê man, liền cầm chiếc iPhone 8 Plus lấy ngón tay Khang áp vào nút Home mở khóa Touch ID và phát hiện chuỗi tin nhắn Khang hẹn bay chuyến 06:15 sáng mai đi xa sống với nhân tình Thảo Vy và gọi Hà là 'con bám đuôi phiền phức' $\rightarrow$ Nhận ra mình bị ruồng bỏ và phản bội tàn nhẫn nên cơn ghen bùng nổ, vơ mảnh bình trà vỡ đâm cổ Khang lúc 21:00 để *"nếu tao không có được anh thì không ai được phép có!"*.
+* **Tình tiết bùng nổ:** Hà lẻn vào lúc 20:45, thấy Khang nằm mê man, liền cầm chiếc iPhone 6s Plus lấy ngón tay Khang áp vào nút Home mở khóa Touch ID và phát hiện chuỗi tin nhắn Khang hẹn bay chuyến 06:15 sáng mai đi xa sống với nhân tình Thảo Vy và gọi Hà là 'con bám đuôi phiền phức' $\rightarrow$ Nhận ra mình bị ruồng bỏ và phản bội tàn nhẫn nên cơn ghen bùng nổ, vơ mảnh bình trà vỡ đâm cổ Khang lúc 21:00 để *"nếu tao không có được anh thì không ai được phép có!"*.
 
 #### 3. Cặp Chứng cứ Mâu thuẫn mốc giờ & Bóc trần ngoại phạm then chốt:
 * **Chứng cứ 1:** Báo cáo điều tra & Kết luận pháp y tử thi (`03_tien_do_dieu_tra`) xác định nạn nhân bị đâm tử vong vào khoảng **20:45 – 21:15 (ước tính ~21:00)** do đứt động mạch cảnh.
