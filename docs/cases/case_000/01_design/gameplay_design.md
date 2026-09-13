@@ -25,10 +25,13 @@
  │ ➔ Minh oan Vũ (isTuyenADone)      │      │ ➔ Bế tắc 1 chiều (isTuyenBDone)          │
  └─────────────────┬─────────────────┘      └────────────────────┬─────────────────────┘
                    │                                             │
-                   └──────────────────────┬──────────────────────┘
+                    └──────────────────────┬──────────────────────┘
                                           │ (Hoàn thành CẢ 2 Tuyến A & B)
                                           ▼
-                         🔑 NÚT HỘI TỤ (LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG)
+                         🔑 NÚT HỘI TỤ: CÂU HỎI LOẠI TRỪ 3 NGHI PHẠM
+                          │ (Nhập tên & lý do loại trừ Mai, Vũ, Tùng)
+                          ▼
+                         🔓 KÍCH HOẠT LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG
                           │ (Âm thanh còi tàu 20:30 & Phấn hoa xoan)
                           ▼
                          🔴 GIAI ĐOẠN 2: TUYẾN C (THỦ PHẠM TRẦN THỊ HÀ)
@@ -100,7 +103,7 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 #### 👩 Nhánh 1A — Trần Ngọc Mai (Tranh chấp Đất đai)
 * **Xác minh ngoại phạm:**
   - **Suy luận đối chiếu:**
-    - ➔ Lời khai Mai (`12`): Khai cãi nhau xong nổ máy về nhà ở Phố Đoàn Kết lúc ~19:45, xem TV đến 20:10 thì mất sóng cáp.
+    - ➔ Lời khai Mai (`12`): Khai cãi nhau xong nổ máy về nhà ở Phố Đoàn Kết, xem TV đến 20:10 thì mất sóng cáp.
     - ➔ Lời khai bà Lụa (`11`): Thấy Mai dắt xe nổ máy phóng đi đúng lúc Thời sự VTV1 cất lên (19:00).
     - ➔ Bảng tin rao vặt (`18`): Thông báo sự cố đứt cáp quang lúc 20:10 ở Phố Đoàn Kết khớp 100% lời khai Mai.
     - ➔ **Kết luận:** Mai có ngoại phạm khách quan ➔ Minh oan cho Mai.
@@ -160,14 +163,31 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 
 ---
 
-### 🔑 NÚT HỘI TỤ — KÍCH HOẠT LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG
+### 🔑 NÚT HỘI TỤ — CÂU HỎI LOẠI TRỪ NGHI PHẠM & KÍCH HOẠT LỆNH KHÁM XÉT
 
-* **Điều kiện mở khóa:** Hoàn thành cả Tuyến A (Mai & Vũ) và Tuyến B (Tùng).
-* **Cơ chế khám xét Point-and-Click:**
-  1. Quét mã QR Thẻ cứng *"LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG"*.
-  2. Khám xét các điểm tương tác (`•`) tại hiện trường:
-     - `•` **Cánh cửa sổ hướng ra gác chắn đường sắt:** Âm thanh còi tàu hỏa & chuông gác chắn rú vang lúc **20:30**.
-* **Kết quả:** Âm thanh còi tàu 20:30 khớp 100% tạp âm nền trong `Voice tin nhắn thoại Hà` (`01`) ➔ Bẻ gãy ngoại phạm VTV3 và mở khóa Tuyến C (Trần Thị Hà).
+* **Điều kiện kích hoạt:** Hoàn thành cả Tuyến A (Mai & Vũ) và Tuyến B (Tùng) (`isTuyenACompleted && isTuyenBCompleted`).
+
+* 🧩 **CÂU HỎI HỘI TỤ (Thẩm tra loại trừ 3 nghi phạm ban đầu):**
+  - **Mục tiêu:** Nhập tên và chọn bằng chứng/lý do loại trừ từng nghi phạm (Mai, Vũ, Tùng) khỏi diện hung thủ trực tiếp gây án lúc ~21:00:
+    1. **Trần Ngọc Mai:**
+       - **Tên nghi phạm:** `Trần Ngọc Mai` (hoặc `Mai`).
+       - **Lý do & Bằng chứng loại trừ:** Ngoại phạm khách quan ở nhà Phố Đoàn Kết xem TV bị đứt cáp quang lúc 20:10 (`Lời khai Mai 12` + `Bảng tin rao vặt 18`).
+    2. **Lê Quang Vũ:**
+       - **Tên nghi phạm:** `Lê Quang Vũ` (hoặc `Vũ`).
+       - **Lý do & Bằng chứng loại trừ:** Thanh toán chuyển khoản 195k tại Quán Bia 88 lúc 21:15 cách hiện trường 3.8km (`Lời khai Vũ 2 07` + `Sổ thu chi Quán Bia 88 06`).
+    3. **Nguyễn Thanh Tùng:**
+       - **Tên nghi phạm:** `Nguyễn Thanh Tùng` (hoặc `Tùng`).
+       - **Lý do & Bằng chứng loại trừ:** Tự thú xô ngã nạn nhân ngất lúc 20:00 rồi bỏ chạy lúc 20:15, không có mặt lúc nạn nhân bị đâm chết ~21:00 (`Thẻ tự thú của Tùng 01`).
+
+---
+
+* 🔓 **KÍCH HOẠT LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG:**
+  - Trả lời đúng **CÂU HỎI HỘI TỤ** ➔ Hệ thống xác nhận loại trừ cả 3 nghi phạm ban đầu ➔ Gợi ý quét mã QR Thẻ cứng *"LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG"*.
+  - **Cơ chế khám xét Point-and-Click:**
+    1. Quét mã QR Thẻ cứng *"LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG"*.
+    2. Khám xét các điểm tương tác (`•`) tại hiện trường:
+       - `•` **Cánh cửa sổ hướng ra gác chắn đường sắt:** Âm thanh còi tàu hỏa & chuông gác chắn rú vang lúc **20:30**.
+  - **Kết quả:** Âm thanh còi tàu 20:30 khớp 100% tạp âm nền trong `Voice tin nhắn thoại Hà` (`01`) ➔ Bẻ gãy ngoại phạm VTV3 và mở khóa Tập hồ sơ Tuyến C (Trần Thị Hà).
 
 ---
 
