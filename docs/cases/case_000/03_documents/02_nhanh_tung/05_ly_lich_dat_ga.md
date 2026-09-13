@@ -36,7 +36,7 @@ Số: `06/LL-TP`
 
 1. **Đặc điểm ngoại hình:** Nam, cao 1m66, sứt môi trên.
 2. **Căn cứ xác minh:**
-   - Có cuộc gọi đi từ nạn nhân lúc 19:45, thời lượng cuộc gọi 7 phút 23 giây.
+   - Có cuộc gọi đến cho nạn nhân lúc 19:45, thời lượng cuộc gọi 4 phút 23 giây.
 ---
 
 **ĐIỀU TRA VIÊN TRÍCH LỤC HỒ SƠ**  
