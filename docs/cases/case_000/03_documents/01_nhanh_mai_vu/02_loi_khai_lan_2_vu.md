@@ -40,13 +40,15 @@ Vào hồi 17 giờ 45 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 
 * **Đáp (Lê Quang Vũ):** Lúc vợ tôi tức giận ném giấy đòi đất rồi nổ máy xe về lúc 19:00, tôi cố tình nói dối Mai là đi nhậu với bạn để Mai về trước. Sau khi tiếng xe máy của Mai vừa khuất, tôi vội đóng cửa bước vào phòng khách quỳ lạy xin anh Khang cho tôi hoãn nợ. Nhưng anh Khang cười khẩy, rút cuốn sổ da đen đập mạnh vào ngực tôi chửi: *"Mày bùng hẹn ngày 20 rồi, hạn chót ngày mai không nôn đủ 300 củ tao in 100 tờ rơi rải khắp phố Đoàn Kết cho bố vợ mày nhục mặt!"*. 
 
-Tôi van xin không được, sợ hãi cùng quẫn nên vội vàng chạy tháo thân ra khỏi cửa chính, chạy một mạch ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25. 
+Tôi hoảng quá chả nghĩ được gì nữa, đầu óc thất thần tôi vùng chạy tháo thân ra khỏi cửa, đâm đầu chạy một mạch ra đầu ngõ... À, lúc đứng ở đầu ngõ đợi xe, tôi có để ý thấy một bóng người mặc áo gió trùm mũ kín mít đang đứng nép dưới gốc cây xoan ngó chằm chằm vào nhà anh Khang... Nhưng lúc đó tôi sợ bị đuổi theo nên không dám lại gần...
 
-Lúc đứng ở đầu ngõ đợi xe, tôi có nhìn thấy một bóng người mặc áo gió màu xám đen trùm mũ kín mít đang đứng nép dưới gốc cây xoan ngó chằm chằm vào nhà anh Khang. Lúc đó tôi đang quá hoảng loạn chỉ lo trốn nợ nên không dám lại gần... Đến 19:30 xe ôm đến đón tôi, khoảng 19:49 đến nơi tại Quán Bia 88 ở Khu Cầu Cảng và ngồi uống bia một mình. Tôi gọi 1 đĩa nem với uống đúng 5 lon bia ngồi giải sầu ở mép sông đến 21:15 mới chuyển khoản thanh toán ra về...
+Tôi bắt xe ôm ra Quán Bia 88 ở Cầu Cảng ngồi một mình ở góc sát mép sông, gọi 1 đĩa nem chua với 5 lon bia. Đó là lần tôi uống nhiều nhất trong đời cán bộ ạ, buồn đời nên nốc bia liên tục say bí bét chẳng để ý giờ giấc gì cả... Hình như mông mông tầm tám rưỡi gì đấy thì phải, tôi chả nhớ rõ nữa... Lúc về tôi chỉ nhớ là đứng dậy trả tiền mặt, à mà nhớ nhất là lúc bước ra bãi xe thì thấy ngay trước cửa quán có vụ xô xát, xô gạt bàn ghế giữa mấy thanh niên, tôi đứng ngó một lúc rồi mới bắt xe ôm về...
 
 * **Hỏi (ĐTV Lê Minh):** Lúc anh rời khỏi nhà lúc 19:25, tình trạng nạn nhân Khang thế nào? Anh có dùng vật nhọn đâm nạn nhân không?
 
-* **Đáp (Lê Quang Vũ):** Tôi thề có trời đất chứng giám, tôi chỉ hoảng sợ vùng chạy thoát thân ra ngoài! Lúc tôi chạy ra khỏi cửa chính, anh Khang vẫn còn đứng sừng sững ở giữa phòng khách chửi bới ầm ĩ và đá cái ghế gỗ. Bộ bình trà trên bàn lúc đó vẫn còn nguyên vẹn chưa hề vỡ! Tôi không hề giết anh Khang, tôi chỉ là kẻ hèn nhát quỵt nợ thôi cán bộ ơi!
+* **Đáp (Lê Quang Vũ):** Tôi thề có trời đất chứng giám, tôi chỉ hoảng sợ vùng chạy thoát thân ra ngoài! Lúc tôi chạy ra khỏi cửa chính, anh Khang vẫn còn đứng sừng sững ở giữa phòng khách chửi bới ầm ĩ và đá cái ghế gỗ. Bộ bình trà trên bàn lúc đó vẫn còn nguyên vẹn chưa hề vỡ! Tôi không hề giết anh Khang, tôi chỉ là kẻ hèn nhát quỵt nợ thôi cán bộ ơi...
+
+À... mà thưa cán bộ... nếu... nếu anh Khang chết rồi thì... khoản nợ 300 triệu đó tôi có phải trả nữa không ạ?
 
 ---
 

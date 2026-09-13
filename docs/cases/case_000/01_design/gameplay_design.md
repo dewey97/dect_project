@@ -127,7 +127,7 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 * 🔓 **GIAI ĐOẠN 1 — Mở khóa Lời khai 2 & Xác minh Quán bia:**
   - **Suy luận đối chiếu & Minh oan:**
     - ➔ Lời khai lần 2 (`07`): Vũ thừa nhận nán lại khoảng 30 phút xin hoãn nợ 300M, khai gọi 1 đĩa nem + 5 lon bia, và thấy bóng người trùm áo gió đứng rình dưới gốc cây xoan trước khi đón xe đi Quán Bia 88.
-    - ➔ Khớp nối Lời khai (`07`) với Sổ thu chi Quán Bia 88 (`06`): Bàn `B7 (1 khách): Nem chua + 5 lon bia -> 195k (CK 21:15)` chính là bàn của Vũ.
+    - ➔ Khớp nối Lời khai (`07`) với Sổ thu chi Quán Bia 88 (`06`): Bàn `B7 (1 khách): 195k (Tiền mặt 21:15)` (suy ra từ 1 nem chua 95k + 5 lon bia 100k) chính là bàn của Vũ.
     - ➔ Xác nhận Vũ ở Quán Bia 88 từ 19:49 đến 21:15 cách hiện trường 3.8km ➔ **Minh oan cho Vũ (`isTuyenACompleted = true`)**.
 
 ---
