@@ -45,7 +45,7 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 | Mã Ảnh | Nhân Vật | Vai Trò | Đặc Điểm Nhận Dạng Cốt Lõi | Mục Đích Nghiệp Vụ |
 | :---: | :--- | :--- | :--- | :--- |
 | **`avatar_khang`** | **Nguyễn Văn Khang** | Nạn nhân | Nam, 38 tuổi, thể hình to bè, xăm trổ rồng tay phải, nét mặt hung dữ, bất hảo. | Hồ sơ nạn nhân / Nhận diện người bị hại. |
-| **`avatar_mai`** | **Trần Ngọc Mai** | Nghi phạm 1 | Nữ, 34 tuổi, tóc buộc gọn, gương mặt cương trực, phong thái đĩnh đạc, trang phục công sở. | Hồ sơ nghi phạm tranh chấp đất đai. |
+| **`avatar_mai`** | **Nguyễn Ngọc Mai** | Nghi phạm 1 | Nữ, 34 tuổi, tóc buộc gọn, gương mặt cương trực, phong thái đĩnh đạc, trang phục công sở. | Hồ sơ nghi phạm tranh chấp đất đai. |
 | **`avatar_vu`** | **Lê Quang Vũ** (`p6`) | Nghi phạm 2 | Nam, 35 tuổi, đeo kính gọng đen, **mắt trái có tật lác nhẹ (lé nhẹ)**, vẻ mặt tự ti, sợ hãi. | Nhận diện con nợ biệt danh "Thằng Lệch Pha" nợ 300M. |
 | **`avatar_tung`** | **Nguyễn Thanh Tùng** | Nghi phạm 3 | Nam, 40 tuổi, da ngăm đen khắc khổ, **có sẹo chữ V ở đuôi lông mày trái**, vẻ mặt u uất. | Khớp nhận diện người anh trai trong Ảnh kỷ niệm 1996 (`p4`). |
 | **`avatar_ha`** | **Trần Thị Hà** | Thủ phạm | Nữ, 36 tuổi, vóc dáng gầy gò, mắt một mí to tròn u uất, ánh nhìn ám ảnh, bệnh hoạn. | Hồ sơ thủ phạm cuồng yêu ghen tuông. |
@@ -61,7 +61,7 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 | Mã Vật Chứng | Tên Ảnh Vật Chứng | Dạng Hình Ảnh | Mô Tả & Ý Nghĩa Nghiệp Vụ |
 | :---: | :--- | :--- | :--- |
 | **`p1`** | **Hiện trường & Dấu vân tay tách trà** | Ảnh chụp hiện trường | Ảnh chụp góc nghiêng tách trà phòng khách; kính lúp hiển thị rõ vân tay lạ trùng 100% Tùng $\rightarrow$ Bóc trần Tùng nói dối "chỉ gọi điện". |
-| **`p2`** | **Đơn đòi đất rơi vãi dưới sàn** | Ảnh chụp hiện trường | Ảnh xấp hồ sơ và Đơn đòi đất 200m² mang tên Trần Ngọc Mai rơi vãi dưới sàn $\rightarrow$ Mở khóa Tuyến A (Mai & Vũ). |
+| **`p2`** | **Đơn đòi đất rơi vãi dưới sàn** | Ảnh chụp hiện trường | Ảnh xấp hồ sơ và Đơn đòi đất 200m² mang tên Nguyễn Ngọc Mai rơi vãi dưới sàn $\rightarrow$ Mở khóa Tuyến A (Mai & Vũ). |
 | **`p3`** | **Mảnh bình trà vỡ dính máu** | Ảnh chụp vật chứng cận cảnh | Mảnh thủy tinh sắc nhọn dài 8.2cm dính máu Khang $\rightarrow$ Hung khí trực tiếp gây đứt động mạch cảnh lúc ~21:00. |
 | **`p4`** | **Ảnh kỷ niệm xóm Bờ Sông 1996** | Ảnh chụp tư liệu (vỡ kính) | Ảnh Lễ Đoàn Kết hè 1996: Tùng bế em trai Gia Huy đeo còi cam sau lưng $\rightarrow$ Khóa danh tính anh trai bé Huy. |
 | **`p5`** | **Mảnh báo cũ 1996 xé vụn** | Ảnh chụp tư liệu (ghép mảnh) | Các mẩu báo xé vụn ghép lại thành bài báo ngày 26/07/1996 (về bi kịch xảy ra chiều 24/07/1996) về vụ bé N.G.H chết ngạt trong tủ gỗ khi chơi trốn tìm. |
@@ -81,15 +81,14 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 ### 1. Giai đoạn 0 — Hồ sơ Khởi đầu (`00_khoi_dau/`):
 - `01_tiep_nhan_tin_bao.md` (Phiếu tiếp nhận tin báo từ bà Lụa lúc 06:45 sáng 25/07)
 - `02_quyet_dinh_khoi_to.md` (Quyết định khởi tố vụ án hình sự)
-- `05_trich_sao_so_ghi_no.md` (Sổ tay ghi nợ cá nhân của Khang thu tại hiện trường: theo dõi bốc bát họ, nợ nần "Thằng Lệch Pha" 300M, Đạt Gà 80M — dùng chung Tuyến A & B)
+- `so_ghi_no_05.md` (Sổ tay ghi nợ cá nhân của Khang thu tại hiện trường: theo dõi bốc bát họ, nợ nần "Thằng Lệch Pha" 300M, Đạt Gà 80M — dùng chung Tuyến A & B)
 - `06_tien_do_dieu_tra.md` (Báo cáo tiến độ ban đầu kèm kết quả pháp y tử thi ~21:00 và tóm tắt vật chứng hiện trường)
 - `07_nhan_than_nan_nhan.md` (Lý lịch nạn nhân Nguyễn Văn Khang)
-- `08a_ly_lich_tran_ngoc_mai.md` (Lý lịch tư pháp nghi phạm Trần Ngọc Mai)
+- `08a_ly_lich_tran_ngoc_mai.md` (Lý lịch tư pháp nghi phạm Nguyễn Ngọc Mai)
 - `08b_ly_lich_le_quang_vu.md` (Lý lịch tư pháp nghi phạm Lê Quang Vũ)
 - `08c_ly_lich_tran_thi_ha.md` (Lý lịch tư pháp nghi phạm Trần Thị Hà)
-- `09_ma_tran_mau_thuan.md` (Bảng phân tích ma trận mâu thuẫn 4 diện đối tượng)
 - `11_loi_khai_nhan_chung.md` (Lời khai bà Lụa: 19:00 VTV1 & lời khai phỏng vấn bố mẹ Tùng)
-- `12_loi_khai_mai.md` (Lời khai Trần Ngọc Mai lần 1: về nhà 19:45, xem TV 20:10 mất cáp)
+- `12_loi_khai_mai.md` (Lời khai Nguyễn Ngọc Mai lần 1: về nhà 19:45, xem TV 20:10 mất cáp)
 - `13_loi_khai_vu.md` (Lời khai Lê Quang Vũ lần 1: khai đi ngay cùng vợ lúc 19:00)
 - `15_loi_khai_ha.md` (Lời khai Trần Thị Hà lần 1: khai ở phòng trọ xem phim bộ VTV3 cả tối)
 - `18_bang_tin_rao_vat.md` (Bảng ảnh khám nghiệm ngoại cảnh — bờ tường & bảng tin trước cổng số 14 Đường Bờ Sông: mẩu thông báo đứt cáp nhánh Bờ Sông – Đoàn Kết lúc 20:10 & tin rao VLXD chứa SĐT Tùng `0984.180.357`)

@@ -56,7 +56,7 @@ export function EvidenceDetailInspector({ selectedView }: EvidenceDetailInspecto
               <div className="grid grid-cols-2 gap-3 pb-3 border-b border-[#3d2c1e] text-[0.7rem]">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[#ad9885] uppercase tracking-wider font-bold">Mốc thời gian ghi nhận:</span>
-                  <span className="text-[#f4e8d8] font-bold">{selectedView.data.timestamp || '24/07/2026'}</span>
+                  <span className="text-[#f4e8d8] font-bold">{selectedView.data.timestamp || '24/07/2016'}</span>
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[#ad9885] uppercase tracking-wider font-bold">Người thu thập vật chứng:</span>

@@ -5,7 +5,7 @@
 
 > **CƠ QUAN ĐIỀU TRA:** ĐỘI TRỌNG ÁN — PHÒNG CẢNH SÁT HÌNH SỰ (PC02)  
 > **VỤ ÁN:** ÁN MẠNG TẠI SỐ 14 ĐƯỜNG BỜ SÔNG (CHUYÊN ÁN "TRỐN TÌM")  
-> **NGÀY THỰC HIỆN HỒ SƠ:** 25/07/2026 (Sau khám xét hiện trường & Thẩm vấn đối tượng)  
+> **NGÀY THỰC HIỆN HỒ SƠ:** 25/07/2016 (Sau khám xét hiện trường & Thẩm vấn đối tượng)  
 > **ĐIỀU TRA VIÊN CHỦ TRÌ:** THƯỢNG TÁ TRẦN QUỐC DŨNG & CỘNG SỰ  
 
 ---
@@ -26,7 +26,7 @@
 2. [II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI KHAI GIAN BAN ĐẦU](#ii-dấu-hiệu-cài-cắm-sớm--hành-vi-khai-gian-ban-đầu)
 3. [III. NGUỒN CƠN MÓN NỢ 300 TRIỆU & NỖI SỢ BỊ BẠCH HÓA GIA ĐÌNH](#iii-nguồn-cơn-món-nợ-300-triệu--nỗi-sợ-bị-bạch-hóa-gia-đình)
 4. [IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT](#iv-mối-quan-hệ-đan-xen-với-các-nhân-vật)
-5. [V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2026)](#v-dòng-thời-gian-đêm-án-mạng-24072026)
+5. [V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2016)](#v-dòng-thời-gian-đêm-án-mạng-24072016)
 6. [VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)](#vi-hệ-thống-vật-chứng--cơ-chế-giải-mã-phá-án-puzzle-mechanics)
 7. [VII. SƠ HỞ LỜI KHAI, RED HERRING & BẰNG CHỨNG NGOẠI PHẠM](#vii-sơ-hở-lời-khai-red-herring--bằng-chứng-ngoại-phạm)
 8. [VIII. KÝ SỰ HẬU ÁN: GÁNH NẶNG GÁ NGHĨA & NỖI SỢ CỦA KẺ CÙNG ĐƯỜNG](#viii-ký-sự-hậu-án-gánh-nặng-gá-nghĩa--nỗi-sợ-của-kẻ-cùng-đường)
@@ -39,13 +39,13 @@
 | :--- | :--- |
 | **Họ và tên khai sinh** | **LÊ QUANG VŨ** |
 | **Tên thường gọi** | Vũ / "Thằng Lệch Pha" (Khang gọi mỉa mai do mắt lác và làm nghề điện) |
-| **Ngày tháng năm sinh** | 20/09/1991 (35 tuổi tính đến thời điểm xảy ra vụ án) |
-| **Số CCCD** | `001091005812`, cấp ngày 12/04/2021 tại Cục CSQLHC về TTXH |
+| **Ngày tháng năm sinh** | 20/09/1991 (25 tuổi tính đến thời điểm xảy ra vụ án) |
+| **Số CCCD** | `001091005812`, cấp ngày 12/04/2011 |
 | **Số điện thoại** | `0988.20.09.91` (Khớp ngày tháng năm sinh `20.09.91`) |
 | **Quê quán** | Huyện Thanh Trì, TP. Hà Nội |
-| **Nơi cư trú hiện tại** | Số 45, Phố Đoàn Kết, Phường Trung Tâm (Ở rể cùng vợ Trần Ngọc Mai) |
+| **Nơi cư trú hiện tại** | Số 45, Phố Đoàn Kết, Phường Trung Tâm (Ở rể cùng vợ Nguyễn Ngọc Mai) |
 | **Nghề nghiệp** | Kỹ sư Điện & Lắp đặt thiết bị tự do |
-| **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Trần Ngọc Mai, sinh năm 1992) |
+| **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Nguyễn Ngọc Mai, sinh năm 1992) |
 | **Đặc điểm nhận dạng** | Nam, cao 1m70, mắt trái có tật lác nhẹ (lé nhẹ), đeo kính gọng đen |
 
 ---
@@ -62,7 +62,7 @@
 
 ```text
                            ÁP LỰC ĐÈ NẶNG LÊN LÊ QUANG VŨ
-                                         │
+                                          │
         ┌────────────────────────────────┴────────────────────────────────┐
         ▼                                                                 ▼
 [MÓN NỢ BỐC HỌ 300 TRIỆU]                                         [NỖI SỢ BỊ GIA ĐÌNH VỢ KHINH BỈ]
@@ -71,7 +71,7 @@
 - Khang liên tục đe dọa ném giấy nợ về nhà bố vợ.                    Đoàn Kết cho bố vợ mày nhục mặt!"
 ```
 
-1. **Sai lầm tài chính:** Đầu năm 2026, Vũ nhận thầu phụ lắp đặt điện nhưng bị đọng vốn. Sợ gia đình vợ coi thường, Vũ tìm đến Khang bốc bát họ **300 triệu đồng**.
+1. **Sai lầm tài chính:** Đầu năm 2016, Vũ nhận thầu phụ lắp đặt điện nhưng bị đọng vốn. Sợ gia đình vợ coi thường, Vũ tìm đến Khang bốc bát họ **300 triệu đồng**.
 2. **Bùng hẹn ngày 20/07:** Đến hạn ngày 20/07 Vũ không xoay được tiền nên bùng hẹn gặp tại số 45 Đoàn Kết. Khang nhắn SMS đe dọa lúc 14:22 ngày 23/07: *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"*.
 3. **Thế cùng lực kiệt:** Khi thấy Mai sang đòi đất, Vũ nán lại quỳ lạy xin Khang hoãn nợ nhưng bị Khang tát sưng má và đe dọa rải tờ rơi khắp ngõ.
 
@@ -80,12 +80,22 @@
 ## IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT
 
 * **Với Nạn nhân Nguyễn Văn Khang (Chủ nợ hung hãn):** Vũ căm ghét và sợ hãi Khang vì Khang liên tục sỉ nhục, dọa nạt báo gia đình vợ.
-* **Với Trần Ngọc Mai (Vợ):** Vũ vừa yêu thương vừa kính sợ Mai, tự ti vì ở rể nên không dám thú nhận nợ nần.
+* **Với Nguyễn Ngọc Mai (Vợ):** Vũ vừa yêu thương vừa kính sợ Mai, tự ti vì ở rể nên không dám thú nhận nợ nần.
 * **Với Trần Thị Hà (Bạn gái Khang):** Vũ biết Hà yêu Khang điên dại, hay cơm bưng nước rót và lén lút rình rập ngoài ngõ.
 
 ---
 
-## V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2026)
+## V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2016)phố
+- Khang liên tục đe dọa ném giấy nợ về nhà bố vợ.                    Đoàn Kết cho bố vợ mày nhục mặt!"
+```
+
+* **Với Nạn nhân Nguyễn Văn Khang (Chủ nợ hung hãn):** Vũ căm ghét và sợ hãi Khang vì Khang liên tục sỉ nhục, dọa nạt báo gia đình vợ.
+* **Với Nguyễn Ngọc Mai (Vợ):** Vũ vừa yêu thương vừa kính sợ Mai, tự ti vì ở rể nên không dám thú nhận nợ nần.
+* **Với Trần Thị Hà (Bạn gái Khang):** Vũ biết Hà yêu Khang điên dại, hay cơm bưng nước rót và lén lút rình rập ngoài ngõ.
+
+---
+
+## V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2016)
 
 ```text
 18:30            19:00           19:00 - 19:25         19:30             20:45           21:30

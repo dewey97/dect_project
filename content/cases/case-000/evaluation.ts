@@ -1,7 +1,7 @@
 import { TimelineEvent, ConclusionOption, Evaluation } from '@/lib/types'
 
 export const timelineEvents000: TimelineEvent[] = [
-  { id: 't1', text: '18:30 — Trần Ngọc Mai đến đòi lại 50% đất 200m², ném Đơn tố cáo rồi rời đi lúc 19:00' },
+  { id: 't1', text: '18:30 — Nguyễn Ngọc Mai đến đòi lại 50% đất 200m², ném Đơn tố cáo rồi rời đi lúc 19:00' },
   { id: 't2', text: '19:00 — Lê Quang Vũ ở lại xin hoãn nợ 300M, bị Khang đe dọa rồi chạy ra Quán Bia 88 lúc 19:30' },
   { id: 't3', text: '20:00 — Nguyễn Thanh Tùng đến đối chất ngày giỗ 30 năm, xô Khang ngã đập đầu vỡ bình trà' },
   { id: 't4', text: '20:15 — Tùng rời hiện trường về phòng trọ Cầu Bươu khi Khang vẫn còn thở đều' },
@@ -11,7 +11,7 @@ export const timelineEvents000: TimelineEvent[] = [
 
 export const conclusionOptions000 = {
   suspects: [
-    { id: 'mai', title: 'Trần Ngọc Mai', desc: 'Em họ nạn nhân (Tranh chấp đất đai)' },
+    { id: 'mai', title: 'Nguyễn Ngọc Mai', desc: 'Em họ nạn nhân (Tranh chấp đất đai)' },
     { id: 'vu', title: 'Lê Quang Vũ', desc: 'Chồng Mai / Kỹ sư điện (Nợ 300M)' },
     { id: 'tung', title: 'Nguyễn Thanh Tùng', desc: 'Bạn thời thơ ấu (Bẫy Red Herring ngày giỗ 30 năm)' },
     { id: 'ha', title: 'Trần Thị Hà', desc: 'Bạn gái Khang (HUNG THỦ THỰC SỰ)' }

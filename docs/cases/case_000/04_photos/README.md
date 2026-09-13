@@ -15,7 +15,7 @@
 
 1. [I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)](#i-danh-mục-ảnh-chân-dung-nhân-vật-portrait-avatars)
    - [`avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 38 TUỔI)](#1-avatar_khang-nguyễn-văn-khang-nạn-nhân-38-tuổi)
-   - [`avatar_mai` — TRẦN NGỌC MAI (NGHI PHẠM 1 — 34 TUỔI)](#2-avatar_mai-trần-ngọc-mai-nghi-phạm-1-34-tuổi)
+   - [`avatar_mai` — NGUYỄN NGỌC MAI (NGHI PHẠM 1 — 34 TUỔI)](#2-avatar_mai-trần-ngọc-mai-nghi-phạm-1-34-tuổi)
    - [`avatar_vu` (`p6`) — LÊ QUANG VŨ (NGHI PHẠM 2 — 35 TUỔI — MẮT TRÁI LÁC NHẸ)](#3-avatar_vu-p6-lê-quang-vũ-nghi-phạm-2-35-tuổi-mắt-trái-lác-nhẹ)
    - [`avatar_tung` — NGUYỄN THANH TÙNG (NGHI PHẠM 3 — 40 TUỔI — SẸO CHỮ V)](#4-avatar_tung-nguyễn-thanh-tùng-nghi-phạm-3-40-tuổi-sẹo-chữ-v)
    - [`avatar_ha` — TRẦN THỊ HÀ (THỦ PHẠM CHÍNH — 36 TUỔI — CUỒNG YÊU ÁM ẢNH)](#5-avatar_ha-trần-thị-hà-thủ-phạm-chính-36-tuổi-cuồng-yêu-ám-ảnh)
@@ -62,7 +62,7 @@ Official police criminal identification dossier photograph of an arrogant 38-yea
 
 ---
 
-### 2. `avatar_mai` — TRẦN NGỌC MAI (NGHI PHẠM 1 — 34 TUỔI)
+### 2. `avatar_mai` — NGUYỄN NGỌC MAI (NGHI PHẠM 1 — 34 TUỔI)
 * **Tệp tin lưu trữ:** `avatar_mai.jpg` / `profile-mai.png`
 * **Mục đích nghiệp vụ:** Hồ sơ điều tra nghi phạm tranh chấp di sản đất đai 200m², nhân viên công sở đĩnh đạc.
 * **Mô tả giải phẫu & nhân trắc học (Vietnamese Technical Spec):**
@@ -278,11 +278,11 @@ giant fingerprint decal, printed fingerprint artwork, magnifying glass, floating
 
 ### 2. `p2` — ĐƠN ĐÒI ĐẤT 200M² RƠI VÃI DƯỚI SÀN (`photo-scattered-documents.jpg`)
 * **Mã vật chứng:** `p2`
-* **Ý nghĩa phá án:** Khởi động Tuyến A; xác định động cơ tranh chấp di sản thừa kế 200m² của Trần Ngọc Mai; Mai ném đơn xuống sàn lúc 19:00.
+* **Ý nghĩa phá án:** Khởi động Tuyến A; xác định động cơ tranh chấp di sản thừa kế 200m² của Nguyễn Ngọc Mai; Mai ném đơn xuống sàn lúc 19:00.
 * **Mô tả hiện trường & góc máy kỹ thuật:**
   - Góc chụp 45 độ từ trên xuống sàn phòng khách cạnh bậu cửa gỗ.
   - Sàn nhà lát **gạch hoa xi măng cổ điển họa tiết hình học màu vàng hoàng yến và xanh rêu** đặc trưng nhà phố Hà Nội cũ.
-  - Xấp giấy A4 nhăn nheo rơi vãi. Tờ giấy trên cùng lộ rõ dòng tiêu đề: **"CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM — ĐƠN ĐỀ NGHỊ GIẢI QUYẾT TRANH CHẤP ĐẤT ĐAI (200m² đất thừa kế)"** với chữ ký mực xanh **Trần Ngọc Mai**. Góc giấy có vệt bụi đế giày dẫm qua.
+  - Xấp giấy A4 nhăn nheo rơi vãi. Tờ giấy trên cùng lộ rõ dòng tiêu đề: **"CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM — ĐƠN ĐỀ NGHỊ GIẢI QUYẾT TRANH CHẤP ĐẤT ĐAI (200m² đất thừa kế)"** với chữ ký mực xanh **Nguyễn Ngọc Mai**. Góc giấy có vệt bụi đế giày dẫm qua.
 
 > 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO / GEMINI IMAGEN 3):**
 ```text
@@ -362,9 +362,9 @@ untorn newspaper, pristine paper, modern glossy magazine, English newspaper, com
 * **Ý nghĩa phá án:** Bắt thóp Vũ nói dối mốc giờ 19:00; chứng minh Vũ nán lại 30 phút (19:00 – 19:30) xin hoãn nợ 300M.
 * **Mô tả ảnh chi tiết (Vietnamese UI Spec):**
   - Ảnh chụp màn hình giao diện ứng dụng đặt xe công nghệ trên smartphone Android/iOS bằng tiếng Việt hoàn chỉnh.
-  - Màn hình biên lai cuốc xe *"Chi tiết chuyến đi đã hoàn thành"* ngày **24/07/2026**:
+  - Màn hình biên lai cuốc xe *"Chi tiết chuyến đi đã hoàn thành"* ngày **24/07/2016**:
     - **Loại xe:** Xe máy (Bike).
-    - **Thời gian gửi lệnh đặt xe (Booking Time):** `19:25:40 — 24/07/2026`.
+    - **Thời gian gửi lệnh đặt xe (Booking Time):** `19:25:40 — 24/07/2016`.
     - **Thời gian tài xế đón (Pickup Time):** `19:30:15`.
     - **Điểm đón (Pin xanh):** *Đầu Ngõ 14, Đường Bờ Sông, Phân khu Cảng*.
     - **Điểm trả (Pin đỏ):** *Quán Bia 88 — Ven Sông Khu Cầu Cảng (cách 3.8 km)*.
@@ -374,7 +374,7 @@ untorn newspaper, pristine paper, modern glossy magazine, English newspaper, com
 
 > 📝 **BULLETPROOF PROMPT / UI MOCKUP (MIDJOURNEY v6 / FLUX.1 PRO):**
 ```text
-Photorealistic direct screenshot of a mobile ride-hailing app interface on a modern smartphone screen in Vietnamese language. Clean modern mobile UI design with high-contrast typography. Title bar reads: "Chi tiet chuyen di". Ride completed receipt showing: Date "24/07/2026", Booking request timestamp "19:25:40", Pickup timestamp "19:30:15". Pickup point with green pin: "Dau Ngo 14, Duong Bo Song". Drop-off point with red pin: "Quan Bia 88 - Ven Song Cau Cang (3.8 km)". Vehicle icon: motorbike (Bike). Fare amount: "32.000 d" (Tien mat). Driver info: "Nguyen Van T. - Honda Wave Alpha 29X1-582.44", 5-star rating. Green status banner: "Chuyen di da hoan thanh 19:42". Crisp pixel-perfect UI graphics, authentic Vietnamese mobile app aesthetic, subtle glass screen glare and faint microscopic screen dust, photorealistic smartphone screen capture, 8k resolution. --ar 9:16 --style raw --s 50 --v 6.0
+Photorealistic direct screenshot of a mobile ride-hailing app interface on a modern smartphone screen in Vietnamese language. Clean modern mobile UI design with high-contrast typography. Title bar reads: "Chi tiet chuyen di". Ride completed receipt showing: Date "24/07/2016", Booking request timestamp "19:25:40", Pickup timestamp "19:30:15". Pickup point with green pin: "Dau Ngo 14, Duong Bo Song". Drop-off point with red pin: "Quan Bia 88 - Ven Song Cau Cang (3.8 km)". Vehicle icon: motorbike (Bike). Fare amount: "32.000 d" (Tien mat). Driver info: "Nguyen Van T. - Honda Wave Alpha 29X1-582.44", 5-star rating. Green status banner: "Chuyen di da hoan thanh 19:42". Crisp pixel-perfect UI graphics, authentic Vietnamese mobile app aesthetic, subtle glass screen glare and faint microscopic screen dust, photorealistic smartphone screen capture, 8k resolution. --ar 9:16 --style raw --s 50 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**

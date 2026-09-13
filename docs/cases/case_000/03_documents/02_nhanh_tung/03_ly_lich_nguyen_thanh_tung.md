@@ -5,8 +5,8 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `14/HS-LL`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+Số: `03/HS-LL`  
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -20,12 +20,12 @@ Số: `14/HS-LL`
 │ HỒ SƠ LÝ LỊCH TRÍCH LỤC: NGUYỄN THANH TÙNG                                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ • Họ và tên khai sinh: NGUYỄN THANH TÙNG                                    │
-│ • Năm sinh: 18/03/1986 (40 tuổi). Giới tính: Nam.                           │
-│ • Số CCCD: 001086003412 (Cấp ngày 14/05/2021 tại Cục CSQLHC về TTXH).       │
+│ • Năm sinh: 18/03/1986 (30 tuổi). Giới tính: Nam.                           │
+│ • Số CMND: 001086003412.                                                    │
 │ • Nơi ĐKHKTT: Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.        │
 │ • Chỗ ở hiện nay: Phòng trọ công nhân số 18, Phố Cầu Bươu, TP. Hà Nội.      │
 │ • Nghề nghiệp: Thợ nề, sửa chữa nhà cửa, đục bê tông dân dụng tự do.        │
-│ • Số điện thoại liên lạc: 0984.180.357 (Khớp tờ rơi dán trên Bảng tin 18). │
+│ • Số điện thoại liên lạc: 0984.180.357 (Khớp tờ rơi dán trên Bảng tin 11). │
 │ • Đặc điểm nhận dạng: Cao 1m68, da ngăm đen, có vết sẹo chữ V ở đuôi lông   │
 │   mày trái (Trùng khớp với đặc điểm nhận dạng trong Ảnh kỷ niệm 1996 p4).    │
 │ • Tiền án, tiền sự: Không có tiền án tiền sự.                               │

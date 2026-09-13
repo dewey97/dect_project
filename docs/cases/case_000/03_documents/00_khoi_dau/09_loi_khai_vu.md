@@ -5,8 +5,8 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `13/BB-LK`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+Số: `09/BB-LK`  
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -15,22 +15,22 @@ Số: `13/BB-LK`
 
 ---
 
-Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.  
+Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.  
 **Chúng tôi gồm:**
 1. Điều tra viên: Đại úy Lê Minh — Đội Điều tra Trọng án.
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 **Tiến hành lấy lời khai người liên quan:**
-* **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991 (35 tuổi).
-* **CCCD số:** `001091005812` cấp ngày 12/04/2021 tại Cục CSQLHC về TTXH.
+* **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991 (25 tuổi).
+* **CMND số:** `001091005812`.
 * **Nơi ĐKHKTT:** Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.
-* **Nghề nghiệp:** Kỹ sư Điện tự do. Mối quan hệ với nạn nhân: Em rể họ (Chồng của Trần Ngọc Mai).
+* **Nghề nghiệp:** Kỹ sư Điện tự do. Mối quan hệ với nạn nhân: Em rể họ (Chồng của Nguyễn Ngọc Mai).
 
 ---
 
 ### NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)
 
-* **Hỏi (ĐTV Lê Minh):** Tối ngày 24/07/2026, anh cùng vợ (Trần Ngọc Mai) đến nhà nạn nhân Khang lúc mấy giờ và rời đi khi nào?
+* **Hỏi (ĐTV Lê Minh):** Tối ngày 24/07/2016, anh cùng vợ (Nguyễn Ngọc Mai) đến nhà nạn nhân Khang lúc mấy giờ và rời đi khi nào?
 * **Đáp (Lê Quang Vũ):** Khoảng 18h30 hai vợ chồng tôi đi chung xe máy sang nhà anh Khang. Nói chuyện một lúc thì vợ tôi bực tức ném giấy tờ rồi nổ máy xe phóng về trước. Lúc vợ tôi dắt xe ra thì tôi cũng đi bộ theo ra cổng cùng lúc với vợ tôi, rồi tôi đi bộ ra đầu ngõ mở app đặt xe ôm công nghệ đi nhậu giải sầu chứ không ở lại trong nhà làm gì. Vợ tôi vừa phóng xe đi là tôi cũng bắt xe đi luôn! Đây này, các anh xem ảnh chụp màn hình app xe của tôi đây!
 
 * **Hỏi (ĐTV Lê Minh):** Anh khai bắt xe đi nhậu, vậy cụ thể anh uống ở đâu, ngồi với ai? Có ai làm chứng cho anh không?

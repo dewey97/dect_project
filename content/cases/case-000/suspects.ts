@@ -4,7 +4,7 @@ export const suspects000: Suspect[] = [
   {
     id: 'mai',
     caseId: 'case-000',
-    name: 'Trần Ngọc Mai',
+    name: 'Nguyễn Ngọc Mai',
     role: 'Em họ nạn nhân',
     background: 'Tranh chấp 50% di sản đất 200m² của ông nội. Phát hiện Khang làm giả chữ ký đồ nét (tracing) mang thế chấp ngân hàng. Ném Đơn tố cáo xuống sàn rồi rời đi lúc 19:00.',
     alibi: 'Rời đi lúc 19:00 (khớp tiếng xe máy lúc nhạc Thời sự VTV1), về đến nhà 19:45, xem tivi đến khi mất cáp lúc 20:10.',

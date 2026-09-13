@@ -5,8 +5,8 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `14a/BB-LK`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+Số: `04/BB-LK`  
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -15,11 +15,11 @@ Số: `14a/BB-LK`
 
 ---
 
-Vào hồi 15 giờ 15 phút, ngày 25 tháng 07 năm 2026, tại Trụ sở Công an Phường Phân khu Cảng.  
+Vào hồi 15 giờ 15 phút, ngày 25 tháng 07 năm 2016, tại Trụ sở Công an Phường Phân khu Cảng.  
 Cán bộ điều tra: Đại úy Hoàng Tuấn Dũng tiến hành lấy lời khai:
 
 * **Họ và tên:** **TRẦN VĂN ĐẠT** (Đạt Gà).
-* **Sinh năm:** 1988 (38 tuổi). Giới tính: Nam.
+* **Sinh năm:** 1988 (28 tuổi). Giới tính: Nam.
 * **Nơi cư trú:** Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Buôn bán gia cầm tại Chợ Cảng.
 * **Số điện thoại:** `0912.331.888`.

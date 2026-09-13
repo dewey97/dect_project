@@ -6,7 +6,7 @@
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
 Số: `05/BB-HCBC`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -15,7 +15,7 @@ Số: `05/BB-HCBC`
 
 ---
 
-Vào hồi 23 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Hỏi cung Trọng án — PC02.  
+Vào hồi 23 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Hỏi cung Trọng án — PC02.  
 Trước các chứng cứ đanh thép: Lọn tóc ADN trong áo ngực, Phổ âm thanh còi tàu 20:32, Áo gió dính phấn hoa cây xoan, và Sự thật lịch phát sóng VTV3, Trần Thị Hà đã cúi đầu nhận tội và khai nhận toàn bộ diễn biến tội ác:
 
 ---

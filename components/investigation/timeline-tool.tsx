@@ -89,9 +89,9 @@ export function TimelineTool() {
     { id: 'k-4', title: 'Mất tín hiệu điện thoại', owner: 'Khang', type: 'forensic', content: 'Điện thoại của Khang bị tắt nguồn đột ngột từ 21:00.' },
     
     // Mai cards
-    { id: 'm-1', title: 'Lịch sử tìm kiếm giám định', owner: 'Trần Ngọc Mai', type: 'forensic', content: 'Tìm kiếm dịch vụ giám định chữ viết tư nhân lúc 11:30.' },
-    { id: 'm-2', title: 'Lời khai: Đi Spa chăm sóc da', owner: 'Trần Ngọc Mai', type: 'testimony', content: 'Mai khai đi làm đẹp tại Spa quận Hai Bà Trưng cả tối.' },
-    { id: 'm-3', title: 'Vé gửi xe gần hiện trường', owner: 'Trần Ngọc Mai', type: 'forensic', content: 'Phát hiện vé gửi xe máy của Mai tại bãi đất gần hiện trường lúc 20:15.' },
+    { id: 'm-1', title: 'Lịch sử tìm kiếm giám định', owner: 'Nguyễn Ngọc Mai', type: 'forensic', content: 'Tìm kiếm dịch vụ giám định chữ viết tư nhân lúc 11:30.' },
+    { id: 'm-2', title: 'Lời khai: Đi Spa chăm sóc da', owner: 'Nguyễn Ngọc Mai', type: 'testimony', content: 'Mai khai đi làm đẹp tại Spa quận Hai Bà Trưng cả tối.' },
+    { id: 'm-3', title: 'Vé gửi xe gần hiện trường', owner: 'Nguyễn Ngọc Mai', type: 'forensic', content: 'Phát hiện vé gửi xe máy của Mai tại bãi đất gần hiện trường lúc 20:15.' },
 
     // Vũ cards
     { id: 'v-1', title: 'Bản vẽ đo đạc sai lệch', owner: 'Lê Quang Vũ', type: 'forensic', content: 'Vũ ký biên bản khống diện tích đất đền bù.' },

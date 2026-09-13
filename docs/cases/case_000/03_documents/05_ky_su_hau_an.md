@@ -1,10 +1,10 @@
 # KÝ SỰ HẬU ÁN: 3 MẢNH GHÉP SỐ PHẬN SAU VỤ ÁN
-*(Tài liệu mở khóa sau khi Phá Án Thành Công Chuyên Án #000)*
+*(Tài liệu mở khóa sau khi Phá Án Thành Công Vụ Án #000)*
 
 ---
 
 ### 📖 KÝ SỰ 1: BẢN DI CHÚC CỦA ÔNG NỘI & LỜI TẠ TỘI CỦA VŨ (NHÁNH MAI & VŨ)
-Hai tuần sau ngày Khang bị sát hại, Cơ quan Thi hành án dân sự đã chính thức hủy bỏ Giấy ủy quyền giả mạo và trao trả 50% quyền sở hữu mảnh đất 200m² hương hỏa cho Trần Ngọc Mai.
+Hai tuần sau ngày Khang bị sát hại, Cơ quan Thi hành án dân sự đã chính thức hủy bỏ Giấy ủy quyền giả mạo và trao trả 50% quyền sở hữu mảnh đất 200m² hương hỏa cho Nguyễn Ngọc Mai.
 
 Tại phòng khách gia đình ở Phố Đoàn Kết, Lê Quang Vũ quỳ sụp dưới chân vợ, bật khóc nức nở thú nhận toàn bộ khoản nợ 300 triệu đồng bốc họ do đầu tư thua lỗ. Mai nhìn chồng với đôi mắt ngấn lệ. Chị không ly hôn, nhưng nghiêm giọng yêu cầu Vũ cùng mình bán bớt một phần đất để trả dứt điểm khoản nợ tín dụng đen, chấm dứt chuỗi ngày sống trong dối trá và sợ hãi.
 
@@ -13,7 +13,7 @@ Tại phòng khách gia đình ở Phố Đoàn Kết, Lê Quang Vũ quỳ sụp
 ### 📖 KÝ SỰ 2: TIẾNG CÒI ĐỒNG TUỔI THƠ DƯỚI BIA MỘ (NHÁNH TÙNG & GIA HUY)
 Được viện kiểm sát đình chỉ điều tra tội giết người, Nguyễn Thanh Tùng trở về căn nhà cũ ở Xóm Bờ Sông.
 
-Vào một buổi chiều thu lặng gió, Tùng một mình mang theo bó hoa cúc trắng và nén hương thơm ra nghĩa trang thăm mộ em trai Gia Huy. Đứng trước bia mộ đứa em câm đoản mệnh đã khuất 30 năm, Tùng cúi đầu tạ lỗi trong làn khói hương nghi ngút:
+Vào một buổi chiều thu lặng gió, Tùng một mình mang theo bó hoa cúc trắng và nén hương thơm ra nghĩa trang thăm mộ em trai Gia Huy. Đứng trước bia mộ đứa em câm đoản mệnh đã khuất 20 năm, Tùng cúi đầu tạ lỗi trong làn khói hương nghi ngút:
 > *"Huy ơi... anh đã tìm lại được sự thật cho em rồi. Kẻ nhốt em năm xưa đã phải trả giá... Em yên nghỉ nhé, từ nay anh sẽ không dằn vặt bản thân nữa."*
 
 ---

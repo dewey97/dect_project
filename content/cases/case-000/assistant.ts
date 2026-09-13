@@ -10,7 +10,7 @@ export const assistant000: AssistantConversation = {
   timelineInfo: {
     title: 'Mốc thời gian điều tra',
     rows: [
-      { label: '18:30', value: 'Trần Ngọc Mai & Lê Quang Vũ đến nhà Khang đòi đất' },
+      { label: '18:30', value: 'Nguyễn Ngọc Mai & Lê Quang Vũ đến nhà Khang đòi đất' },
       { label: '19:00', value: 'Mai rời đi về nhà (khớp tiếng xe lúc Thời sự VTV1)' },
       { label: '19:30', value: 'Vũ rời đi ra Quán Bia 88 uống đến 20:45' },
       { label: '20:00', value: 'Tùng xô ngã Khang & vỡ bình trà (ngày giỗ 30 năm)' },

@@ -6,7 +6,7 @@
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
 Số: `03/BB-KXKC`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -15,7 +15,7 @@ Số: `03/BB-KXKC`
 
 ---
 
-Vào hồi 21 giờ 30 phút, ngày 25 tháng 07 năm 2026.  
+Vào hồi 21 giờ 30 phút, ngày 25 tháng 07 năm 2016.  
 Đơn vị chủ trì: Đại úy Lê Minh — Đội Điều tra Trọng án thực hiện Lệnh khám xét khẩn cấp số 45/LKX-PC02:
 
 ---

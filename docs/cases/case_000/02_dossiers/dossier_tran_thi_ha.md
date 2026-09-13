@@ -5,7 +5,7 @@
 
 > **CƠ QUAN ĐIỀU TRA:** ĐỘI TRỌNG ÁN — PHÒNG CẢNH SÁT HÌNH SỰ (PC02)  
 > **VỤ ÁN:** ÁN MẠNG TẠI SỐ 14 ĐƯỜNG BỜ SÔNG (CHUYÊN ÁN "TRỐN TÌM")  
-> **NGÀY THỰC HIỆN HỒ SƠ:** 25/07/2026 (Cập nhật sau khám xét khẩn cấp)  
+> **NGÀY THỰC HIỆN HỒ SƠ:** 25/07/2016 (Cập nhật sau khám xét khẩn cấp)  
 > **ĐIỀU TRA VIÊN CHỦ TRÌ:** THƯỢNG TÁ TRẦN QUỐC DŨNG & CỘNG SỰ  
 
 ---
@@ -26,7 +26,7 @@
 2. [II. HỆ THỐNG MANH MỐI & DẤU HIỆU CÀI CẮM SỚM](#ii-hệ-thống-manh-mối--dấu-hiệu-cài-cắm-sớm)
 3. [III. CHÂN DUNG TÂM LÝ BIẾN THÁI TRONG TÌNH YÊU](#iii-chân-dung-tâm-lý-biến-thái-trong-tình-yêu)
 4. [IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT](#iv-mối-quan-hệ-đan-xen-với-các-nhân-vật)
-5. [V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2026)](#v-dòng-thời-gian-hành-động-đêm-án-mạng-24072026)
+5. [V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2016)](#v-dòng-thời-gian-hành-động-đêm-án-mạng-24072016)
 6. [VI. HỆ THỐNG VẬT CHỨNG & TÀI LIỆU LIÊN QUAN ĐẾN HÀ](#vi-hệ-thống-vật-chứng--tài-liệu-liên-quan-đến-hà)
 7. [VII. TÁI HIỆN HIỆN TRƯỜNG KHOẢNH KHẮC GÂY ÁN (20:45 – 21:00)](#vii-tái-hiện-hiện-trường-khoảnh-khắc-gây-án-2045--2100)
 8. [VIII. SƠ HỞ CHÍ MẠNG & TRẬN ĐỐI CHẤT BẺ GÃY LỜI KHAI](#viii-sơ-hở-chí-mạng--trận-đối-chất-bẻ-gãy-lời-khai)
@@ -40,11 +40,11 @@
 | :--- | :--- |
 | **Họ và tên khai sinh** | **TRẦN THỊ HÀ** |
 | **Bí danh / Tên thường gọi**| Hà "Kế toán" / Bé Hà (thời niên thiếu) |
-| **Ngày tháng năm sinh** | 22/09/1990 (36 tuổi tính đến thời điểm xảy ra vụ án) |
-| **Số CCCD** | `001190008271`, cấp ngày 14/03/2021 tại Cục CSQLHC về TTXH |
+| **Ngày tháng năm sinh** | 22/09/1990 (26 tuổi tính đến thời điểm xảy ra vụ án) |
+| **Số CCCD** | `001190008271`, cấp ngày 14/03/2011 |
 | **Số điện thoại** | `0984.112.568` |
 | **Quê quán** | Phường Phân khu Cảng, TP. Hà Nội |
-| **Nơi cư trú hiện tại** | Số 8, Ngõ 12 Đường Bờ Sông (cách nhà nạn nhân và đường sắt **1.2 km** trong ngõ sâu) |
+| **Nơi cư trú hiện tại** | Số 8, Ngõ 10 Đường Bờ Sông (cách nhà nạn nhân và đường sắt **1.2 km** trong ngõ sâu) |
 | **Nghề nghiệp** | Kế toán tổng hợp tại Công ty TNHH Vận tải Sông Hồng |
 | **Tình trạng hôn nhân** | Độc thân (Đang có quan hệ tình cảm phức tạp 3 năm với nạn nhân Khang) |
 | **Học vấn** | Cử nhân Kế toán — Đại học Kinh tế Quốc dân |
@@ -95,7 +95,7 @@
 
 ---
 
-## V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2026)
+## V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2016)
 
 * **19:25:** Hà mặc áo gió trùm đầu, đứng rình rập dưới gốc cây xoan trước cổng nhà Khang (bị Vũ nhìn thấy lúc tháo chạy ra ngõ đón xe ôm).
 * **20:00 – 20:15:** Hà nghe thấy tiếng cãi vã dữ dội và tiếng bình trà thủy tinh vỡ từ bên trong nhà Khang.
@@ -156,6 +156,57 @@
 
 ---
 
+## VIII. SƠ Hở CHÍ MẠNG & TRẬN ĐỐI CHẤT BẺ GÃY LỜI KHAI
+
+* **Trận đối chất tại Phòng hỏi cung (`05_hoi_cung_tran_thi_ha.md`):**
+  1. Điều tra viên lật mở Lịch phát sóng VTV3: Tối thứ Sáu chỉ chiếu Gameshow, bác bỏ lời khai xem phim bộ.
+  2. Phát file ghi âm Voicemail 20:32: Lọt tiếng còi tàu hàng và chuông gác chắn chỉ có tại đầu ngõ nhà Khang (cách 30m), phòng trọ Hà cách 1.2km không thể có.
+  3. Đưa ra kết luận giám định ADN lọn tóc giấu trong áo ngực khớp 100% với nạn nhân.
+* **Lời thú tội:** Hà sụp đổ và khai nhận toàn bộ hành vi hạ sát Khang lúc 21:00 bằng mảnh vỡ bình trà `p3`.
+
+---
+
+## IX. KÝ SỰ HẬU ÁN: BÊN TRONG TÂM TRÍ KẺ SÁT NHÂN VÌ TÌNH
+
+```text
+       "Trò chơi trốn tìm năm 1996 đã chôn vùi một đứa trẻ...
+        Còn trò trốn tìm năm 2016 đã giam cầm một linh hồn điên dại.
+        Khang ơi, anh trốn đi đâu được nữa?
+        Anh mãi mãi thuộc về một mình em..."
+```              SƠ ĐỒ HIỆN TRƯỜNG PHÒNG KHÁCH
+                     ┌──────────────────────────────────────────────┐
+                     │             Cửa nách sau nhà                 │
+                     │          (Nơi Hà lén chuồn ra)               │
+                     │                    │                         │
+                     │                    ▼                         │
+                     │             ┌──────────────┐                 │
+                     │             │ Tủ âm tường  │ (Nơi Tùng xô    │
+                     │             └──────────────┘  Khang đập đầu) │
+                     │                                              │
+                     │    [Mảnh bình trà vỡ p3]                     │
+                     │    [Khung ảnh vỡ p4]                         │
+                     │    [Mẩu báo cũ 1996 p5]                      │
+                     │            ▲                                 │
+                     │            │                                 │
+                     │    ┌───────────────┐                         │
+                     │    │ NẠN NHÂN KHANG│                         │
+                     │    │ NẰM BẤT TỈNH  │                         │
+                     │    └───────┬───────┘                         │
+                     │            ▲                                 │
+                     │            │ (Hà cúi xuống, đâm mảnh thủy    │
+                     │            │  tinh p3 vào cổ lúc 21:00)      │
+                     │      [TRẦN THỊ HÀ]                           │
+                     │                                              │
+                     │   ┌───────────────┐   [HŨ TRÀ HOA CÚC        │
+                     │   │   Bàn trà gỗ  │    TRÊN BÀN TRÀ]         │
+                     │   └───────────────┘                          │
+                     │                                              │
+                     │               Cửa chính                      │
+                     └──────────────────────────────────────────────┘
+```
+
+---
+
 ## VIII. SƠ HỞ CHÍ MẠNG & TRẬN ĐỐI CHẤT BẺ GÃY LỜI KHAI
 
 * **Trận đối chất tại Phòng hỏi cung (`05_hoi_cung_tran_thi_ha.md`):**
@@ -170,7 +221,7 @@
 
 ```text
        "Trò chơi trốn tìm năm 1996 đã chôn vùi một đứa trẻ...
-        Còn trò trốn tìm năm 2026 đã giam cầm một linh hồn điên dại.
+        Còn trò trốn tìm năm 2016 đã giam cầm một linh hồn điên dại.
         Khang ơi, anh trốn đi đâu được nữa?
         Anh mãi mãi thuộc về một mình em..."
 ```

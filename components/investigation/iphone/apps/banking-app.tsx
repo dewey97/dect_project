@@ -25,7 +25,7 @@ export function BankingApp() {
       title: 'Chuyển tiền cọc Tour Đà Lạt (2 người)',
       receiver: 'CÔNG TY CP DU LỊCH VIỆT',
       amount: -12000000,
-      time: '15:30 (22/07/2026)',
+      time: '15:30 (22/07/2016)',
       category: 'Du lịch & Giải trí',
       note: 'Khang CK coc tour Da Lat 25/7 - Yen Nhi',
       isEvidence: true
@@ -35,7 +35,7 @@ export function BankingApp() {
       title: 'Nhận tiền trả nợ lãi tháng 7',
       receiver: 'LE QUANG VU',
       amount: 10500000,
-      time: '11:20 (19/07/2026)',
+      time: '11:20 (19/07/2016)',
       category: 'Thu hồi nợ',
       note: 'Vu tra lai thang 7 khoan 350tr',
       isEvidence: true
@@ -45,7 +45,7 @@ export function BankingApp() {
       title: 'Nhận tiền cọc mua đất Bờ Sông đợt 1',
       receiver: 'NGUYEN HOANG HAI',
       amount: 200000000,
-      time: '09:15 (15/07/2026)',
+      time: '09:15 (15/07/2016)',
       category: 'Bất động sản',
       note: 'Tien coc giay tay thua dat 14 bo song',
       isEvidence: true
@@ -55,7 +55,7 @@ export function BankingApp() {
       title: 'Thanh toán hóa đơn Tiệm vàng Kim Thành',
       receiver: 'TIEM VANG KIM THANH',
       amount: -18500000,
-      time: '16:45 (10/07/2026)',
+      time: '16:45 (10/07/2016)',
       category: 'Mua sắm trang sức',
       note: 'Mua day chuyen vang trang tang Nhi',
       isEvidence: false
@@ -112,7 +112,7 @@ export function BankingApp() {
           <span className="text-[13px] font-bold text-white tracking-tight">
             Lịch sử giao dịch gần đây
           </span>
-          <span className="text-[10px] text-[#8E8E93] font-mono">Tháng 7/2026</span>
+          <span className="text-[10px] text-[#8E8E93] font-mono">Tháng 7/2016</span>
         </div>
 
         <div className="space-y-2">

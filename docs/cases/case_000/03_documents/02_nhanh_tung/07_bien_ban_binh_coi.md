@@ -5,8 +5,8 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `16b/BB-TT`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+Số: `07/BB-TT`  
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -15,7 +15,7 @@ Số: `16b/BB-TT`
 
 ---
 
-Vào hồi 14 giờ 45 phút, ngày 25 tháng 07 năm 2026, tại Công an Phường Phân khu Cảng, TP. Hà Nội.  
+Vào hồi 14 giờ 45 phút, ngày 25 tháng 07 năm 2016, tại Công an Phường Phân khu Cảng, TP. Hà Nội.  
 Cán bộ điều tra: Trung úy Nguyễn Văn Hoàng tiến hành làm việc với người liên quan:
 
 * **Họ và tên:** **TRỊNH THANH BÌNH** (Bình Còi).

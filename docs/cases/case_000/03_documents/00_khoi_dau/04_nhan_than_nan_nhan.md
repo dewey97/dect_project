@@ -5,32 +5,32 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `07/BC-XMNT`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+Số: `04/BC-XMNT`  
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
 # BÁO CÁO XÁC MINH NHÂN THÂN NẠN NHÂN
-*(Nạn nhân: Nguyễn Văn Khang — Chuyên án #000)*
+*(Nạn nhân: Nguyễn Văn Khang — Vụ án mạng số 14 Đường Bờ Sông)*
 
 ---
 
 ### I. LÝ LỊCH TƯ PHÁP & QUAN HỆ GIA ĐÌNH
 * **Họ và tên:** **NGUYỄN VĂN KHANG**
-* **Sinh ngày:** 10/11/1988 tại Hà Nội (38 tuổi).
-* **Số CCCD:** `001088006721`.
+* **Sinh ngày:** 10/11/1988 tại Hà Nội (28 tuổi).
+* **Số CCCD/CMND:** `001088006721`.
 * **Trình độ học vấn:** 12/12.
 * **Tình trạng gia đình:**
   - Bố mẹ đẻ mất sớm do tai nạn giao thông năm 2010.
   - Sống cùng ông nội (ông Nguyễn Văn Thọ) tại số 14 Đường Bờ Sông. Ông Thọ vừa qua đời cách đây 3 tháng.
-  - Họ hàng gần nhất: Cô ruột (mẹ của Trần Ngọc Mai) cư ngụ tại phố Đoàn Kết.
+  - Họ hàng gần nhất: Gia đình chú ruột (bố của Nguyễn Ngọc Mai) cư ngụ tại phố Đoàn Kết.
 
 ---
 
 ### II. HOẠT ĐỘNG KINH TẾ & QUAN HỆ XÃ HỘI
 1. **Nghề nghiệp chính:** Không có công ăn việc làm ổn định. Mở dịch vụ "Tài chính tiêu dùng cá nhân" (thực chất là cho vay bốc họ, tín dụng đen lãi suất cao từ $3.000\text{đ} - 5.000\text{đ}/\text{triệu/ngày}$).
 2. **Tiền án, tiền sự:** 
-   - 01 tiền sự năm 2018 về hành vi *"Gây rối trật tự công cộng"* (đánh nhau tại quán bia).
+   - 01 tiền sự năm 2012 về hành vi *"Gây rối trật tự công cộng"* (đánh nhau tại quán bia).
    - Đang trong diện theo dõi của Công an Phường về hoạt động đòi nợ thuê.
 3. **Lối sống & Quan hệ tình cảm:**
    - Tính cách bốc đồng, ngỗ ngược, thích phô trương, có thói quen ăn chơi trăng hoa.

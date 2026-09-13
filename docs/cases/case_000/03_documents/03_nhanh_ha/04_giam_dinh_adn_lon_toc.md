@@ -6,7 +6,7 @@
 **VIỆN KHOA HỌC HÌNH SỰ — BỘ CÔNG AN**  
 **PHÒNG GIÁM ĐỊNH SINH HỌC PHÁP Y (C09)**  
 Số: `04/KL-GDADN`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -15,7 +15,7 @@ Số: `04/KL-GDADN`
 
 ---
 
-**Căn cứ:** Quyết định trưng cầu giám định khẩn cấp số 48/QĐ-PC02 ngày 25/07/2026 của Cơ quan CSĐT Công an TP. Hà Nội.
+**Căn cứ:** Quyết định trưng cầu giám định khẩn cấp số 48/QĐ-PC02 ngày 25/07/2016 của Cơ quan CSĐT Công an TP. Hà Nội.
 
 ### I. MẪU VẬT GIÁM ĐỊNH
 1. **Mẫu cần giám định (Mẫu X):** 

@@ -5,7 +5,7 @@
 
 > **CƠ QUAN ĐIỀU TRA:** ĐỘI TRỌNG ÁN — PHÒNG CẢNH SÁT HÌNH SỰ (PC02)  
 > **VỤ ÁN:** ÁN MẠNG TẠI SỐ 14 ĐƯỜNG BỜ SÔNG (CHUYÊN ÁN "TRỐN TÌM")  
-> **NGÀY THỰC HIỆN HỒ SƠ:** 25/07/2026 (Sau xác minh Nhật ký cuộc gọi `dev-00` & Sổ ghi nợ `05`)  
+> **NGÀY THỰC HIỆN HỒ SƠ:** 25/07/2016 (Sau xác minh Nhật ký cuộc gọi `dev-00` & Sổ ghi nợ `05`)  
 > **ĐIỀU TRA VIÊN CHỦ TRÌ:** ĐẠI ÚY HOÀNG TUẤN DŨNG & CỘNG SỰ  
 
 ---
@@ -27,12 +27,12 @@
 | :--- | :--- |
 | **Họ và tên khai sinh** | **TRẦN VĂN ĐẠT** |
 | **Tên thường gọi** | Đạt Gà / Đạt Chợ Cảng |
-| **Ngày tháng năm sinh** | 05/11/1988 (38 tuổi) |
-| **Số CCCD** | `001088009123`, cấp ngày 20/06/2021 tại Cục CSQLHC về TTXH |
+| **Ngày tháng năm sinh** | 05/11/1988 (28 tuổi) |
+| **Số CCCD** | `001088009123`, cấp ngày 20/06/2011 |
 | **Số điện thoại liên lạc** | `0912.331.888` (Khớp dòng 04 Sổ ghi nợ `05` và cuộc gọi 18:45 trên `dev-00`) |
 | **Nơi cư trú** | Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nghề nghiệp** | Tiểu thương bán gia cầm (gà sống) tại Khu Chợ Cảng |
-| **Tiền án, tiền sự** | 01 tiền sự gây rối trật tự công cộng (2022) |
+| **Tiền án, tiền sự** | 01 tiền sự gây rối trật tự công cộng |
 | **Mối quan hệ với nạn nhân** | Con nợ 80 triệu đồng tiền bốc họ của nạn nhân Khang |
 
 ---

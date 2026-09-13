@@ -5,13 +5,13 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `08c/LL-TP`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+Số: `06c/LL-TP`  
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
 # BẢNG TRÍCH LỤC LÝ LỊCH TƯ PHÁP: TRẦN THỊ HÀ
-*(Chuyên án #000 — Vụ án mạng tại số 14 Đường Bờ Sông)*
+*(Vụ án mạng tại số 14 Đường Bờ Sông)*
 
 ---
 
@@ -21,9 +21,9 @@ Số: `08c/LL-TP`
 | :--- | :--- |
 | **Họ và tên khai sinh** | **TRẦN THỊ HÀ** |
 | **Tên thường gọi** | Hà "Kế toán" / Bé Hà |
-| **Ngày tháng năm sinh** | 22/09/1990 (36 tuổi) |
+| **Ngày tháng năm sinh** | 22/09/1990 (26 tuổi) |
 | **Giới tính** | Nữ |
-| **Số CCCD** | `001190008271` (Cấp ngày 14/03/2021 tại Cục CSQLHC về TTXH) |
+| **Số CMND** | `001190008271` |
 | **Nơi ĐKHKTT** | Số 8, Ngõ 12 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi ở hiện nay** | Số 8, Ngõ 12 Đường Bờ Sông, Phường Phân khu Cảng (cách nhà Khang 1.2km) |
 | **Nghề nghiệp** | Kế toán tổng hợp (Công ty TNHH Vận tải Sông Hồng) |

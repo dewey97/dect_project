@@ -17,17 +17,17 @@ export function NotesApp({ notes }: NotesAppProps) {
   const allNotes: Document[] = notes.length > 0 ? notes : [
     {
       id: 'n-01',
-      title: 'Sổ nợ bốc họ & Lãi ngoài tháng 7/2026',
+      title: 'Sổ nợ bốc họ & Lãi ngoài tháng 7/2016',
       content: '1. Lê Quang Vũ (Đo đạc): 350.000.000đ — Lãi tính 3.000đ/triệu/ngày. Đã hẹn tối 24/7 sang chốt dứt điểm.\n2. Nam "Còi": 80.000.000đ — Quá hạn 2 tháng.\n3. Hưng đồ gỗ: 120.000.000đ.',
-      meta: '24/07/2026',
-      timestamp: '24/07/2026'
+      meta: '24/07/2016',
+      timestamp: '24/07/2016'
     },
     {
       id: 'n-02',
       title: 'Kế hoạch đền bù đất Bờ Sông (Thửa 2021-BS14)',
       content: 'Diện tích gốc: 75m2.\nBắt thằng Vũ vẽ lại trích đo lên 120m2 để ăn tiền đền bù đợt 1 Ban QLDA.\nTờ di chúc ông nội đã sửa xong ngày, con Mai không có cửa tranh.',
-      meta: '22/07/2026',
-      timestamp: '22/07/2026'
+      meta: '22/07/2016',
+      timestamp: '22/07/2016'
     }
   ]
 

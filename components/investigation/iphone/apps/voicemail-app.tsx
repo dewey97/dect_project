@@ -84,7 +84,7 @@ export function VoicemailApp() {
   const recents = [
     { name: 'Trần Thị Hà', phone: '0984.112.568', type: 'Nhỡ', time: '20:31', count: 1, isMissed: true },
     { name: 'Lê Quang Vũ', phone: '0988.20.09.91', type: 'Nhỡ', time: '19:20', count: 1, isMissed: true },
-    { name: 'Trần Ngọc Mai', phone: '0912.456.789', type: 'Cuộc gọi đến', time: '18:30', duration: '1:45', isMissed: false },
+    { name: 'Nguyễn Ngọc Mai', phone: '0912.456.789', type: 'Cuộc gọi đến', time: '18:30', duration: '1:45', isMissed: false },
     { name: 'Tuấn "Bia 88"', phone: '0904.112.xxx', type: 'Cuộc gọi đi', time: '17:15', duration: '0:32', isMissed: false },
   ]
 

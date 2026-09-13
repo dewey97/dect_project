@@ -68,7 +68,7 @@
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
 | **Nhật ký cuộc gọi** (`dev-00`) | Trích xuất 6 cuộc gọi (3 số lưu tên, 3 số lạ chưa lưu tên) | Manh mối tra cứu danh tính các nghi phạm | Điện thoại giả lập của Khang (`dev-00`) |
-| **Trích sao Sổ ghi nợ** (`05`) | Khớp SĐT con nợ `0988.20.09.91` (300M) và `0912.331.888` | Tra cứu danh tính Vũ & Đạt Gà | Thu thập tại hiện trường |
+| **Sổ ghi nợ** (`05`) | Khớp SĐT con nợ `0988.20.09.91` (300M) và `0912.331.888` | Tra cứu danh tính Vũ & Đạt Gà | Thu thập tại hiện trường |
 | **Bảng tin rao vặt** (`18`) | Tin rao VLXD chứa SĐT `0984.180.357` | Tra cứu danh tính Nguyễn Thanh Tùng | Thu thập tại Bảng tin trước cổng |
 | **Lời khai bà Lụa** (`11`) | Nhắc đến 2 con trai nhà bà xóm bên | Manh mối nền về mối quan hệ Tùng & Huy | Hồ sơ điều tra ban đầu |
 
@@ -100,7 +100,7 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 
 ### 🟢 LỰA CHỌN 1: TUYẾN A — MAI & VŨ (`01_nhanh_mai_vu/`)
 
-#### 👩 Nhánh 1A — Trần Ngọc Mai (Tranh chấp Đất đai)
+#### 👩 Nhánh 1A — Nguyễn Ngọc Mai (Tranh chấp Đất đai)
 * **Xác minh ngoại phạm:**
   - **Suy luận đối chiếu:**
     - ➔ Lời khai Mai (`12`): Khai cãi nhau xong nổ máy về nhà ở Phố Đoàn Kết, xem TV đến 20:10 thì mất sóng cáp.
@@ -137,7 +137,7 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 #### 🧱 Nhánh 2 — Nguyễn Thanh Tùng (Ân oán bi kịch 1996)
 * **Bóc trần lời khai nói dối & Động cơ thù hận:**
   - **Suy luận đối chiếu:**
-    - ➔ Ghép nối Mảnh báo xé vụn (`p5`) (tai nạn bé N.G.H tử vong trong tủ gỗ chiều 24/07/1996) + Ảnh kỷ niệm (`p4`) (Tùng bế Huy, sẹo mày chữ V) + Lý lịch Tùng (`14_ly_lich`): Khóa chặt Tùng là anh trai bé Huy và ngày xảy ra án mạng (24/07/2026) đúng ngày giỗ 30 năm.
+    - ➔ Ghép nối Mảnh báo xé vụn (`p5`) (tai nạn bé N.G.H tử vong trong tủ gỗ chiều 24/07/1996) + Ảnh kỷ niệm (`p4`) (Tùng bế Huy, sẹo mày chữ V) + Lý lịch Tùng (`14_ly_lich`): Khóa chặt Tùng là anh trai bé Huy và ngày xảy ra án mạng (24/07/2016) đúng ngày giỗ 20 năm.
     - ➔ Lời khai Tùng lần 1 (`14`): Khẳng định *"chỉ gọi điện 19:55, không gặp mặt Khang"*.
     - ➔ Đối chiếu Dấu vân tay trên khung bức ảnh vỡ (`p4`): Kết quả trùng khớp 100% với Tùng ➔ **Bóc trần Tùng nói dối "chỉ gọi điện không gặp", chứng minh Tùng đã trực tiếp đến hiện trường và cầm khung ảnh**.
 
@@ -164,8 +164,8 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 
 * 🧩 **CÂU HỎI HỘI TỤ (Thẩm tra loại trừ 3 nghi phạm ban đầu):**
   - **Mục tiêu:** Nhập tên và chọn bằng chứng/lý do loại trừ từng nghi phạm (Mai, Vũ, Tùng) khỏi diện hung thủ trực tiếp gây án lúc ~21:00:
-    1. **Trần Ngọc Mai:**
-       - **Tên nghi phạm:** `Trần Ngọc Mai` (hoặc `Mai`).
+    1. **Nguyễn Ngọc Mai:**
+       - **Tên nghi phạm:** `Nguyễn Ngọc Mai` (hoặc `Mai`).
        - **Lý do & Bằng chứng loại trừ:** Ngoại phạm khách quan ở nhà Phố Đoàn Kết xem TV bị đứt cáp quang lúc 20:10 (`Lời khai Mai 12` + `Bảng tin rao vặt 18`).
     2. **Lê Quang Vũ:**
        - **Tên nghi phạm:** `Lê Quang Vũ` (hoặc `Vũ`).

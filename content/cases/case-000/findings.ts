@@ -32,7 +32,7 @@ export const CASE_000_FINDINGS: Finding[] = [
     id: 'f-000-0-2',
     phase: 0,
     title: 'Ma trận 4 nghi phạm có động cơ mâu thuẫn',
-    description: 'Cả 4 người (Trần Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà) đều có động cơ tranh chấp đất đai, nợ nần, thù hận quá khứ hoặc ghen tuông.',
+    description: 'Cả 4 người (Nguyễn Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà) đều có động cơ tranh chấp đất đai, nợ nần, thù hận quá khứ hoặc ghen tuông.',
     evidenceRef: '08 / 09',
     keywordGroups: [
       ['nghi phạm', 'nghi pham', 'bốn người', 'bon nguoi', '4 người', '4 nguoi', 'tất cả', 'tat ca', 'nhiều người', 'nhieu nguoi', 'cả 4', 'ca 4', 'các đối tượng', 'cac doi tuong'],

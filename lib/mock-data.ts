@@ -100,7 +100,7 @@ export const DEVICES: Device[] = [
     status: 'unlocked',
     evidenceId: 'EV-PHONE-KHANG',
     recoveryLevel: 100,
-    lastUpdated: '24-07-2026 // 17:55',
+    lastUpdated: '24-07-2016 // 17:55',
     description: 'Thiết bị liên lạc cá nhân iPhone 8 Plus (pin còn 18%) thu giữ tại hiện trường vụ án, rơi úp mặt gần bàn tay phải nạn nhân.',
     previewStats: 'TIN NHẮN // HÌNH ẢNH // GHI ÂM',
     pinLength: 4,

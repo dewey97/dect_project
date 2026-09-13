@@ -5,8 +5,8 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `14/BB-LK1`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+Số: `02/BB-LK1`  
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -15,14 +15,14 @@ Số: `14/BB-LK1`
 
 ---
 
-Vào hồi 19 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.  
+Vào hồi 19 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.  
 **Chúng tôi gồm:**
 1. Điều tra viên: Đại úy Lê Minh — Đội Điều tra Trọng án.
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 **Tiến hành lấy lời khai người liên quan:**
-* **Họ và tên:** **NGUYỄN THANH TÙNG** | **Giới tính:** Nam | **Sinh ngày:** 18/03/1986 (40 tuổi).
-* **CCCD số:** `001086003412` cấp ngày 14/05/2021 tại Cục CSQLHC về TTXH.
+* **Họ và tên:** **NGUYỄN THANH TÙNG** | **Giới tính:** Nam | **Sinh ngày:** 18/03/1986 (30 tuổi).
+* **CMND số:** `001086003412`.
 * **Nơi ĐKHKTT:** Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
 * **Chỗ ở hiện nay:** Phòng trọ công nhân số 18, Phố Cầu Bươu, TP. Hà Nội.
 * **Nghề nghiệp:** Lao động tự do (Thợ nề, sửa chữa nhà dân dụng).

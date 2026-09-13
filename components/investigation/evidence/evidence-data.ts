@@ -60,7 +60,7 @@ export const CASE_000_PDFS: PDFDocument[] = [
   },
   {
     id: 'pdf-07a',
-    title: '07. Biên bản lấy lời khai: Trần Ngọc Mai',
+    title: '07. Biên bản lấy lời khai: Nguyễn Ngọc Mai',
     code: '07a',
     url: '/documents/case_000/phase_0_initial/07a_bien_ban_loi_khai_tran_ngoc_mai.pdf',
     phase: 0,
@@ -280,7 +280,7 @@ export const HINTS_MAP: Record<string, string[]> = {
     'Mai có chứng cứ rời đi lúc 19:00, Vũ có hóa đơn chuyển khoản Quán Bia 88 lúc 20:45 cách hiện trường 3.8km.'
   ],
   'cp-000-2': [
-    'Kiểm tra mốc ngày giỗ tròn 30 năm của bé Gia Huy (24/07/1996 - 24/07/2026).',
+    'Kiểm tra mốc ngày giỗ tròn 20 năm của bé Gia Huy (24/07/1996 - 24/07/2016).',
     'So sánh mốc thời gian Tùng rời đi lúc 20:15 trước khi chuyến tàu hàng 20:30 chạy qua.'
   ],
   'cp-000-3': [
@@ -299,7 +299,7 @@ export interface PhysicalDirective {
 
 export const PHYSICAL_DIRECTIVES: Record<number, PhysicalDirective> = {
   0: {
-    envelopeName: 'BÌA KẸP HỒ SƠ CHÍNH // KHỞI ĐIỂM CHUYÊN ÁN (MANILA FOLDER)',
+    envelopeName: 'BÌA KẸP HỒ SƠ CHÍNH // KHỞI ĐIỂM VỤ ÁN (MANILA FOLDER)',
     envelopeType: 'folder',
     badgeText: '📦 TẬP HỒ SƠ BAN ĐẦU TRÊN BÀN',
     documents: [
@@ -308,9 +308,9 @@ export const PHYSICAL_DIRECTIVES: Record<number, PhysicalDirective> = {
       { code: '03', title: 'Sơ đồ mặt bằng hiện trường phòng khách' },
       { code: '04', title: 'Báo cáo khám nghiệm tử thi sơ bộ' },
       { code: '05', title: 'Biên bản khám nghiệm hiện trường vụ án' },
-      { code: '06', title: 'Báo cáo tiến độ điều tra ban đầu' },
+      { code: '06', title: 'Báo cáo điều tra ban đầu' },
       { code: '07 & 08', title: 'Nhân thân nạn nhân Khang & Lý lịch 4 nghi phạm' },
-      { code: '09 & 10', title: 'Ma trận mâu thuẫn & Sơ đồ địa lý di chuyển' },
+      { code: '10', title: 'Sơ đồ địa lý di chuyển' },
       { code: '11 - 15', title: '05 Biên bản lời khai ban đầu (Bà Lụa, Mai, Vũ, Tùng, Hà)' },
       { code: '16', title: 'Biên bản trích xuất dữ liệu điện thoại Khang' },
       { code: '17', title: 'Mẩu giấy note dán trên hũ trà hoa cúc' },
@@ -326,9 +326,9 @@ export const PHYSICAL_DIRECTIVES: Record<number, PhysicalDirective> = {
     documents: [
       { code: '01', title: 'Kết quả giám định chữ ký đồ nét tracing (DOC-A1)' },
       { code: '02', title: 'Giấy ủy quyền đất 200m² bị làm giả (EV-SIGN-01)' },
-      { code: '03', title: 'Biên bản họp gia đình 2024 có chữ ký thật (EV-SIGN-02)' },
-      { code: '04', title: 'Đơn tố cáo lừa đảo mang chữ ký 2026 của Mai (EV-SIGN-03)' },
-      { code: '05', title: 'Trích sao sổ ghi nợ tín dụng đen 300M của Vũ (DOC-A5)' },
+      { code: '03', title: 'Biên bản họp gia đình 2014 có chữ ký thật (EV-SIGN-02)' },
+      { code: '04', title: 'Đơn tố cáo lừa đảo mang chữ ký 2016 của Mai (EV-SIGN-03)' },
+      { code: '05', title: 'Sổ ghi nợ tín dụng đen 300M của Vũ (DOC-A5)' },
       { code: '06', title: 'Sổ thu chi Quán Bia 88 xác nhận thanh toán 20:45 (DOC-A6)' },
       { code: '07', title: 'Biên bản hỏi cung lần 2 đối với Lê Quang Vũ (DOC-A7)' }
     ],

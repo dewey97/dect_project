@@ -6,12 +6,11 @@
 **CÔNG AN QUẬN / HUYỆN PHÂN KHU CẢNG**  
 **CÔNG AN PHƯỜNG PHÂN KHU CẢNG**  
 Số: `01/P-TNTB`  
-*Hà Nội, hồi 06 giờ 45 phút ngày 25 tháng 07 năm 2026*
+*Hà Nội, hồi 06 giờ 45 phút ngày 25 tháng 07 năm 2016*
 
 ---
 
 # PHIẾU TIẾP NHẬN NGUỒN TIN VỀ TỘI PHẠM
-*(Theo Điều 145, 146 Bộ luật Tố tụng hình sự năm 2015)*
 
 ---
 
@@ -22,7 +21,7 @@ Số: `01/P-TNTB`
 ---
 
 ### II. THÔNG TIN NGƯỜI BÁO TIN
-* **Họ và tên:** **NGUYỄN THỊ LỤA** | **Năm sinh:** 1966 (60 tuổi).
+* **Họ và tên:** **NGUYỄN THỊ LỤA** | **Năm sinh:** 1956.
 * **Số CCCD:** `001166002914`.
 * **Nơi cư trú:** Số 12, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội (nhà sát vách số 14).
 * **Hình thức báo tin:** Trực tiếp đến trụ sở Công an Phường trình báo khẩn cấp lúc 06:45.
@@ -30,7 +29,7 @@ Số: `01/P-TNTB`
 ---
 
 ### III. TÓM TẮT NỘI DUNG TRÌNH BÁO BAN ĐẦU
-Khoảng 06 giờ 30 phút sáng nay (25/07/2026), bà Lụa ra quét dọn ngõ ngách thì nhìn thấy cổng sắt và cửa chính căn nhà số 14 Đường Bờ Sông (nhà anh Nguyễn Văn Khang) vẫn mở toang từ đêm qua, đèn điện phòng khách bật sáng trưng.
+Khoảng 06 giờ 30 phút sáng nay (25/07/2016), bà Lụa ra quét dọn ngõ ngách thì nhìn thấy cổng sắt và cửa chính căn nhà số 14 Đường Bờ Sông (nhà anh Nguyễn Văn Khang) vẫn mở toang từ đêm qua, đèn điện phòng khách bật sáng trưng.
 
 Bà Lụa bước tới cửa cất tiếng gọi nhưng không thấy ai trả lời. Khi nhìn vào giữa phòng khách, bà hoảng hốt phát hiện anh Nguyễn Văn Khang đang nằm sấp bất động trên nền gạch, xung quanh loang một vũng máu sẫm màu rất lớn, bên cạnh có bộ bình trà bị đập vỡ vụn. Bà Lụa chạy lại lay gọi thì thấy người nạn nhân đã lạnh ngắt, toàn thân co cứng. Bà lập tức hô hoán hàng xóm xung quanh và chạy thẳng đến Công an Phường báo án.
 

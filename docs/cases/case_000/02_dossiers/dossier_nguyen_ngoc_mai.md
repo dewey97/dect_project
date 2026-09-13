@@ -1,11 +1,11 @@
 # HỒ SƠ CHUYÊN ÁN #000 // TỐI MẬT
-# TẬP HỒ SƠ ĐIỀU TRA CHUYÊN SÂU: TRẦN NGỌC MAI (MAI)
+# TẬP HỒ SƠ ĐIỀU TRA CHUYÊN SÂU: NGUYỄN NGỌC MAI (MAI)
 ### MẬT DANH ĐIỀU TRA: `SUSPECT-01-MAI` | VAI TRÒ CỐT TRUYỆN: NGHI PHẠM CHÍNH GIAI ĐOẠN 1 / TRANH CHẤP DI SẢN (HERITAGE DISPUTE)
 ### PHÂN LOẠI TÂM LÝ: TỰ TÔN GIA TỘC CAO · QUYẾT LIỆT BẢO VỆ TÀI SẢN · MANG NỖI ÂN HẬN QUÁ KHỨ
 
 > **CƠ QUAN ĐIỀU TRA:** ĐỘI TRỌNG ÁN — PHÒNG CẢNH SÁT HÌNH SỰ (PC02)  
 > **VỤ ÁN:** ÁN MẠNG TẠI SỐ 14 ĐƯỜNG BỜ SÔNG (CHUYÊN ÁN "TRỐN TÌM")  
-> **NGÀY THỰC HIỆN HỒ SƠ:** 25/07/2026 (Sau khi triệu tập đối chất lần 1 & Khám xét nơi ở)  
+> **NGÀY THỰC HIỆN HỒ SƠ:** 25/07/2016 (Sau khi triệu tập đối chất lần 1 & Khám xét nơi ở)  
 > **ĐIỀU TRA VIÊN CHỦ TRÌ:** THƯỢNG TÁ TRẦN QUỐC DŨNG & CỘNG SỰ  
 
 ---
@@ -26,7 +26,7 @@
 2. [II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI BAN ĐẦU](#ii-dấu-hiệu-cài-cắm-sớm--hành-vi-ban-đầu)
 3. [III. BẢN CHẤT XUNG ĐỘT & ĐỘNG CƠ TRANH CHẤP ĐẤT ĐAI](#iii-bản-chất-xung-đột--động-cơ-tranh-chấp-đất-đai)
 4. [IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT](#iv-mối-quan-hệ-đan-xen-với-các-nhân-vật)
-5. [V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2026)](#v-dòng-thời-gian-hành-động-đêm-án-mạng-24072026)
+5. [V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2016)](#v-dòng-thời-gian-hành-động-đêm-án-mạng-24072016)
 6. [VI. HỆ THỐNG VẬT CHỨNG & TÀI LIỆU LIÊN QUAN ĐẾN MAI](#vi-hệ-thống-vật-chứng--tài-liệu-liên-quan-đến-mai)
 7. [VII. SƠ HỞ LỜI KHAI, RED HERRING & BẰNG CHỨNG NGOẠI PHẠM](#vii-sơ-hở-lời-khai-red-herring--bằng-chứng-ngoại-phạm)
 8. [VIII. KÝ SỰ HẬU ÁN: BẢN DI CHÚC CỦA ÔNG NỘI & SỰ HÀN GẮN](#viii-ký-sự-hậu-án-bản-di-chúc-của-ông-nội--sự-hàn-gắn)
@@ -37,10 +37,10 @@
 
 | Mục | Thông tin chi tiết |
 | :--- | :--- |
-| **Họ và tên khai sinh** | **TRẦN NGỌC MAI** |
+| **Họ và tên khai sinh** | **NGUYỄN NGỌC MAI** |
 | **Tên thường gọi** | Mai / Cô Mai |
-| **Ngày tháng năm sinh** | 15/05/1992 (34 tuổi tính đến thời điểm xảy ra vụ án) |
-| **Số CCCD** | `001192004523`, cấp ngày 10/08/2022 tại Cục CSQLHC về TTXH |
+| **Ngày tháng năm sinh** | 15/05/1992 (24 tuổi tính đến thời điểm xảy ra vụ án) |
+| **Số CCCD** | `001192004523`, cấp ngày 10/08/2012 |
 | **Số điện thoại** | `0912.456.789` |
 | **Quê quán** | Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi cư trú hiện tại** | Số 45, Phố Đoàn Kết, Phường Trung Tâm (cách nhà Khang ~4km) |
@@ -65,7 +65,7 @@
                                            │
          ┌─────────────────────────────────┴─────────────────────────────────┐
          ▼                                                                   ▼
-[NGUYỄN VĂN KHANG]                                                   [TRẦN NGỌC MAI]
+[NGUYỄN VĂN KHANG]                                                   [NGUYỄN NGỌC MAI]
 - Gian dối chiếm đoạt quyền đứng tên Sổ đỏ                           - Phát hiện bị lừa qua phòng TN&MT.
 - Đem thế chấp ngân hàng lấy vốn bốc họ                               - Thuê luật sư soạn Đơn đòi lại đất 200m².
 - Thách thức kiện cáo ra tòa                                         - Tuyên bố: "Tao sẽ lấy lại đất bằng pháp luật!"
@@ -86,7 +86,7 @@
 
 ---
 
-## V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2026)
+## V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2016)
 
 ```text
 18:30 (24/07)        19:00                 19:45                 20:10               08:30 (25/07)
@@ -109,7 +109,7 @@ Chở Vũ sang          Ném hồ sơ xuống sàn,  Về đến nhà số 45   
 | Mã Vật Chứng | Tên Tài Liệu / Vật Phẩm | Mô Tả & Ý Nghĩa Nghiệp Vụ |
 | :--- | :--- | :--- |
 | **`p2`** | **Ảnh Đơn đòi đất rơi vãi dưới sàn** | Xấp hồ sơ đòi đất 200m² tại hiện trường $\rightarrow$ Xác định động cơ mâu thuẫn tranh chấp đất. |
-| **`12`** | **Lời khai Trần Ngọc Mai** | Khai ném hồ sơ rồi phóng xe về nhà (~19:45), xem TV đến 20:10 thì mất sóng cáp. |
+| **`12`** | **Lời khai Nguyễn Ngọc Mai** | Khai ném hồ sơ rồi phóng xe về nhà (~19:45), xem TV đến 20:10 thì mất sóng cáp. |
 | **`11`** | **Lời khai bà Lụa** | Xác nhận tiếng xe máy phóng đi đúng lúc nhạc Thời sự VTV1 cất lên (19:00). |
 | **`18`** | **Bảng tin trước cổng số 14 Bờ Sông** | Mẩu thông báo đứt cáp quang nhánh Bờ Sông – Đoàn Kết lúc 20:10 $\rightarrow$ Xác thực ngoại phạm ở nhà của Mai. |
 

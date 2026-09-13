@@ -6,5 +6,5 @@ export const victim000: Victim = {
   name: 'Nguyễn Văn Khang',
   alias: 'Khang',
   role: 'Nạn nhân',
-  status: 'Tử vong (21:00, 24/07/2026)'
+  status: 'Tử vong (21:00, 24/07/2016)'
 }

@@ -48,7 +48,7 @@ export function ContactsApp() {
     },
     {
       id: 'c-04',
-      name: 'Trần Ngọc Mai (Em họ)',
+      name: 'Nguyễn Ngọc Mai (Em họ)',
       phone: '0984.661.xxx',
       relationship: 'Em họ con chú',
       note: 'Nhăm nhe đòi chia tiền đền bù căn nhà số 14. Đang nghi ngờ di chúc bị sửa.',

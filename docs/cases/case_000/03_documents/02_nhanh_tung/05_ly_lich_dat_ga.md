@@ -5,8 +5,8 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `14a/HS-LL`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+Số: `05/HS-LL`  
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -21,16 +21,16 @@ Số: `14a/HS-LL`
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ • Họ và tên khai sinh: TRẦN VĂN ĐẠT                                         │
 │ • Tên thường gọi: Đạt Gà / Đạt Chợ Cảng                                     │
-│ • Năm sinh: 05/11/1988 (38 tuổi). Giới tính: Nam.                           │
-│ • Số CCCD: 001088009123 (Cấp ngày 20/06/2021 tại Cục CSQLHC về TTXH).       │
+│ • Năm sinh: 05/11/1988 (28 tuổi). Giới tính: Nam.                           │
+│ • Số CMND: 001088009123.                                                    │
 │ • Nơi ĐKHKTT: Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội.        │
 │ • Nghề nghiệp: Tiểu thương kinh doanh gia cầm tại Khu Chợ Cảng.             │
 │ • Số điện thoại liên lạc: 0912.331.888 (Khớp dòng 04 Sổ ghi nợ 05).         │
-│ • Tiền án, tiền sự: 01 tiền sự về hành vi gây rối trật tự công cộng (2022). │
+│ • Tiền án, tiền sự: 01 tiền sự về hành vi gây rối trật tự công cộng (2012). │
 │ • Mối quan hệ: Con nợ 80 triệu đồng tiền bốc họ của nạn nhân Khang.         │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ KẾT QUẢ XÁC MINH NGOẠI PHẠM (PC02 XÁC MINH TRỰC TIẾP TẠI CHỢ CẢNG):         │
-│ • Vào tối 24/07/2026, từ 18:00 đến 22:00: Trần Văn Đạt liên tục có mặt tại  │
+│ • Vào tối 24/07/2016, từ 18:00 đến 22:00: Trần Văn Đạt liên tục có mặt tại  │
 │   sạp gia cầm số 14 Chợ Cảng để bốc dỡ và giao hàng gà sống cho khách buôn. │
 │ • 03 tiểu thương lân cận (quầy thịt, quầy cá, bảo vệ chợ) cùng ký biên bản │
 │   xác nhận Đạt không rời khỏi chợ trong suốt khung giờ trên.                 │

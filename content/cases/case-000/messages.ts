@@ -103,7 +103,7 @@ export const conversations000: Record<string, Conversation[]> = {
             title: 'Thu_thoai_2032_Ha_loi_khai_gia.wav',
             duration: '0:18',
             audioClue:
-              '⚠️ BẰNG CHỨNG PHÁ ÁN CHÍ MẠNG: Phía sau giọng nói thì thầm lọt rất rõ tiếng còi tàu hỏa diesel hú 2 hồi dài và tiếng chuông gác chắn đường sắt reo leng keng (khoảng cách < 30m). Địa điểm duy nhất thu được âm thanh này là gốc cây xoan trước ngõ nhà Khang (số 14 Bờ Sông), bóc trần hoàn toàn lời khai giả tạo của Hà là "ở phòng trọ ngõ 12 cách 1.2km xem phim".'
+              '⚠️ BẰNG CHỨNG PHÁ ÁN CHÍ MẠNG: Phía sau giọng nói thì thầm lọt rất rõ tiếng còi tàu hỏa diesel hú 2 hồi dài và tiếng chuông gác chắn đường sắt reo leng keng (khoảng cách < 30m). Địa điểm duy nhất thu được âm thanh này là gốc cây xoan trước ngõ nhà Khang (số 14 Đường Bờ Sông), bóc trần hoàn toàn lời khai giả tạo của Hà là "ở phòng trọ cách 1.2km xem phim".'
           },
           isClue: true,
           clueTitle: 'Vạch trần chứng cứ ngoại phạm giả của Hà',
@@ -157,7 +157,7 @@ export const conversations000: Record<string, Conversation[]> = {
     },
     {
       id: 'conv-01',
-      name: 'Trần Ngọc Mai (Em họ)',
+      name: 'Nguyễn Ngọc Mai (Em họ)',
       phoneNumber: '0912.456.789',
       avatarColor: 'from-[#30D158] to-[#0A84FF]',
       timestamp: '24/07 • 18:50',
@@ -167,7 +167,7 @@ export const conversations000: Record<string, Conversation[]> = {
       messages: [
         {
           id: 'm1-1',
-          sender: 'Trần Ngọc Mai',
+          sender: 'Nguyễn Ngọc Mai',
           role: 'received',
           text: 'Anh Khang, chuyện mảnh đất 200m2 của ông nội tại sao anh dám tự ý làm giả giấy ủy quyền mang đi thế chấp ngân hàng? Tôi đã nhờ luật sư lập đơn tố cáo rồi!',
           timestamp: '24/07 • 18:35',
@@ -190,7 +190,7 @@ export const conversations000: Record<string, Conversation[]> = {
         },
         {
           id: 'm1-3',
-          sender: 'Trần Ngọc Mai',
+          sender: 'Nguyễn Ngọc Mai',
           role: 'received',
           text: 'Tối nay tôi với anh Vũ sẽ qua nhà anh nói chuyện cho rõ ràng. Anh trả lại 50% đất cho tôi!',
           timestamp: '24/07 • 18:45'

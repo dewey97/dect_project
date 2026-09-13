@@ -6,7 +6,7 @@
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
 Số: `01/BB-HC`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+*Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
 
@@ -15,16 +15,16 @@ Số: `01/BB-HC`
 
 ---
 
-Vào hồi 20 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Phòng Hỏi cung số 1 — PC02 Công an TP. Hà Nội.  
+Vào hồi 20 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Phòng Hỏi cung số 1 — PC02 Công an TP. Hà Nội.  
 Sau khi điều tra viên đưa ra các chứng cứ: Vết bầm tím gò má và các khớp tay sưng tấy do xô xát, khung ảnh tuổi thơ `p4` bị rơi vỡ và mẩu báo cũ 1996 `p5` thu giữ tại hiện trường, Nguyễn Thanh Tùng đã bật khóc nức nở và tự thú toàn bộ:
 
 ---
 
 ### LỜI TỰ THÚ CỦA NGUYỄN THANH TÙNG
 
-> *"Thưa cán bộ, tôi xin khai hết sự thật! Suốt 30 năm qua, gia đình tôi chưa bao giờ nguôi ngoai nỗi đau mất thằng Huy, còn thằng Khang thì chưa từng một lần cúi đầu nhận lỗi hay thắp cho em tôi một nén nhang.
+> *"Thưa cán bộ, tôi xin khai hết sự thật! Suốt 20 năm qua, gia đình tôi chưa bao giờ nguôi ngoai nỗi đau mất thằng Huy, còn thằng Khang thì chưa từng một lần cúi đầu nhận lỗi hay thắp cho em tôi một nén nhang.
 >
-> Chiều tối 24/07 đúng ngày giỗ tròn 30 năm của em tôi, sau khi gọi điện thoại lúc 19h55 bảo muốn sang gặp nói chuyện nhưng nó tỏ thái độ gạt đi, đến 20h00 tôi quyết định cầm mẩu báo năm xưa sang tận nhà thằng Khang để bắt nó phải cùng tôi ra nghĩa trang tạ tội trước bia mộ thằng Huy. Tôi ngồi uống trà với nó, nhưng thằng Khang trơ tráo, buông lời cười cợt, nhạo báng thách thức.
+> Chiều tối 24/07 đúng ngày giỗ tròn 20 năm của em tôi, sau khi gọi điện thoại lúc 19h55 bảo muốn sang gặp nói chuyện nhưng nó tỏ thái độ gạt đi, đến 20h00 tôi quyết định cầm mẩu báo năm xưa sang tận nhà thằng Khang để bắt nó phải cùng tôi ra nghĩa trang tạ tội trước bia mộ thằng Huy. Tôi ngồi uống trà với nó, nhưng thằng Khang trơ tráo, buông lời cười cợt, nhạo báng thách thức.
 >
 > Cơn uất hận bùng lên, tôi xé nát mẩu báo ném xuống sàn rồi lao vào giằng co, xô mạnh thằng Khang ngã đập đầu vào cạnh bàn trà làm đổ vỡ toang bộ bình trà thủy tinh và làm rơi vỡ cái khung ảnh kỷ niệm xóm hồi nhỏ trên kệ xuống sàn. Khang đấm trúng má tôi một cái trước khi ngã vật ra sàn rồi nằm im bất động, mắt nhắm nghiền.
 >

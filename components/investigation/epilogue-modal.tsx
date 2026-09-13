@@ -18,14 +18,14 @@ const EPILOGUE_STORIES = [
     title: '1998 — Bi Kịch Trốn Tìm',
     subtitle: 'Nguyễn Thanh Tùng & Chiếc còi đồng im lìm',
     icon: Radio,
-    monologue: `Trò chơi trốn tìm 12 năm trước chưa bao giờ thực sự kết thúc...\n\nKhang từ nhỏ đã bốc đồng và ganh tị với tình bạn giữa Tùng và Gia Huy. Ngày hôm đó năm 1998, Khang cố tình gài chốt gỗ nhốt Gia Huy (cậu bé câm bẩm sinh, mắc bệnh tim) vào tủ rồi bỏ đi chơi. Gia Huy hoảng sợ đập tủ trong vô vọng rồi phát bệnh tử vong.\n\nSuốt 12 năm qua, Tùng sống dằn dặt trong nỗi tự trách vì đã không tìm thấy em trai. Cho đến hai hôm trước đêm án mạng, trong cơn say ngà ngà tại bàn nhậu, Khang vô tình buông lời đùa cợt khoe "chiến tích" gài chốt nhốt tủ năm xưa. Tùng bàng hoàng nhận ra sự thật đau đớn.\n\nĐêm 24/07/2026, Tùng mang bài báo cũ và bức ảnh 2 anh em sang nhà Khang chất vấn. Khang thờ ơ xé nát bài báo thách thức khiến Tùng bùng nổ cơn thịnh nộ. Cú xô ngã trong lúc giằng co chỉ làm Khang bất tỉnh tạm thời...\n\nTrò chơi trốn tìm năm 1998 cuối cùng đã khép lại bằng một tấn bi kịch kéo dài suốt hai thế hệ.`
+    monologue: `Trò chơi trốn tìm 12 năm trước chưa bao giờ thực sự kết thúc...\n\nKhang từ nhỏ đã bốc đồng và ganh tị với tình bạn giữa Tùng và Gia Huy. Ngày hôm đó năm 1998, Khang cố tình gài chốt gỗ nhốt Gia Huy (cậu bé câm bẩm sinh, mắc bệnh tim) vào tủ rồi bỏ đi chơi. Gia Huy hoảng sợ đập tủ trong vô vọng rồi phát bệnh tử vong.\n\nSuốt 12 năm qua, Tùng sống dằn dặt trong nỗi tự trách vì đã không tìm thấy em trai. Cho đến hai hôm trước đêm án mạng, trong cơn say ngà ngà tại bàn nhậu, Khang vô tình buông lời đùa cợt khoe "chiến tích" gài chốt nhốt tủ năm xưa. Tùng bàng hoàng nhận ra sự thật đau đớn.\n\nĐêm 24/07/2016, Tùng mang bài báo cũ và bức ảnh 2 anh em sang nhà Khang chất vấn. Khang thờ ơ xé nát bài báo thách thức khiến Tùng bùng nổ cơn thịnh nộ. Cú xô ngã trong lúc giằng co chỉ làm Khang bất tỉnh tạm thời...\n\nTrò chơi trốn tìm năm 1998 cuối cùng đã khép lại bằng một tấn bi kịch kéo dài suốt hai thế hệ.`
   },
   {
     id: 'ha',
     title: 'Hà — Ký Sự Hậu Án Biệt Giam',
     subtitle: 'Trần Thị Hà — Linh hồn điên dại vì tình',
     icon: Heart,
-    monologue: `"Trò chơi trốn tìm năm 1998 đã chôn vùi một đứa trẻ...\nCòn trò trốn tìm năm 2026 đã giam cầm một linh hồn điên dại.\nKhang ơi, anh trốn đi đâu được nữa?\nMáu của anh đang ở trên môi em..."\n\nNgồi trong phòng biệt giam số 4, hai bàn tay bị còng chặt vào thanh sắt, ánh mắt Hà không hề có chút ăn năn. Hà ngửa đầu nhìn lên ô thông gió nhỏ xíu trên cao, nơi ánh trăng lạnh lẽo hắt vào tường bê tông xám xịt và lẩm bẩm hát lại bài đồng dao thuở nhỏ.\n\nVới một kẻ mang tâm lý ái kỷ chiếm hữu bệnh hoạn, cái chết của Khang không phải là sự kết thúc, mà là sự "bảo quản vĩnh cửu" cho một tình yêu lệch lạc. Hà đã biến người mình yêu thành một bức tượng bất tử không bao giờ có thể phản bội hay rời xa mình.\n\nNhưng cái giá phải trả là bản án nghiêm khắc của pháp luật và một linh hồn vĩnh viễn mục rữa sau song sắt nhà tù...`
+    monologue: ` "Trò chơi trốn tìm năm 1998 đã chôn vùi một đứa trẻ...\nCòn trò trốn tìm năm 2016 đã giam cầm một linh hồn điên dại.\nKhang ơi, anh trốn đi đâu được nữa?\nMáu của anh đang ở trên môi em..."\n\nNgồi trong phòng biệt giam số 4, hai bàn tay bị còng chặt vào thanh sắt, ánh mắt Hà không hề có chút ăn năn. Hà ngửa đầu nhìn lên ô thông gió nhỏ xíu trên cao, nơi ánh trăng lạnh lẽo hắt vào tường bê tông xám xịt và lẩm bẩm hát lại bài đồng dao thuở nhỏ.\n\nVới một kẻ mang tâm lý ái kỷ chiếm hữu bệnh hoạn, cái chết của Khang không phải là sự kết thúc, mà là sự "bảo quản vĩnh cửu" cho một tình yêu lệch lạc. Hà đã biến người mình yêu thành một bức tượng bất tử không bao giờ có thể phản bội hay rời xa mình.\n\nNhưng cái giá phải trả là bản án nghiêm khắc của pháp luật và một linh hồn vĩnh viễn mục rữa sau song sắt nhà tù...`
   },
   {
     id: 'vu',
@@ -37,7 +37,7 @@ const EPILOGUE_STORIES = [
   {
     id: 'mai',
     title: 'Mai — Bản Di Chúc Ông Nội',
-    subtitle: 'Trần Ngọc Mai — Lời tạ tội muộn màng',
+    subtitle: 'Nguyễn Ngọc Mai — Lời tạ tội muộn màng',
     icon: Scale,
     monologue: `Mai luôn nghi ngờ Khang cướp di chúc, nhưng khi cầm bản di chúc gốc đến văn phòng luật sư, Mai mới bàng hoàng biết ông nội vốn đã chia đều căn nhà cho cả 2 anh em từ năm 2018.\n\nKhang vì lòng tham đã dùng hóa chất tẩy tên Mai để chiếm trọn khoản tiền đền bù. Sự tham lam của Khang và sự nghi hận của Mai đã phá nát tình anh em ruột thịt.\n\nMai nhận lại mảnh đất đền bù nhưng mất đi người anh họ và đối mặt với người chồng (Vũ) đang vướng vào vòng lao lý vì gian lận đo đạc địa chính.`
   }
