@@ -23,7 +23,7 @@ Vào hồi 19 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 **Tiến hành lấy lời khai người liên quan:**
 * **Họ và tên:** **TRẦN THỊ HÀ** | **Giới tính:** Nữ | **Sinh ngày:** 22/09/1990 (26 tuổi).
 * **CMND số:** `001190008271`.
-* **Nơi ĐKHKTT:** Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân Khu Cảng, TP. Hà Nội.
+* **Nơi ĐKHKTT:** Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Kế toán tổng hợp (Công ty TNHH Vận tải Sông Hồng).
 * **Mối quan hệ với nạn nhân:** Bạn gái (3 năm).
 
@@ -34,6 +34,9 @@ Vào hồi 19 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 * **Hỏi (ĐTV Lê Minh):** Chị có quan hệ thế nào với nạn nhân Khang và tối hôm qua chị ở đâu, làm gì?
 * **Đáp (Trần Thị Hà):** *(Khóc sụt sùi, giọng nhỏ nhẹ yếu ớt)* Em và anh Khang yêu nhau được hơn 3 năm rồi thưa cán bộ... Bọn em còn đã có kế hoạch cuối năm nay kết hôn. Thế mà đâu ai ngờ anh ấy lại bỏ em mà đi _(khóc nức nở)_.
 Tối qua sau khi ăn cơm xong, em ở một mình trong phòng trọ xem phim bộ trên VTV3 cho đỡ buồn. Tập phim hôm qua đau lòng lắm, kể về một người đàn ông phản bội người con gái đã hy sinh cả tuổi thanh xuân cho anh ta... Xem xong em khóc ướt cả gối rồi mới tắt tivi đi ngủ. 
+
+* **Hỏi (ĐTV Lê Minh):** Theo thông tin xác minh từ các nhân chứng lân cận, khoảng một tuần trở lại đây chị rất ít khi sang nhà nạn nhân Khang dọn dẹp cơm nước như trước. Lý do vì sao?
+* **Đáp (Trần Thị Hà):** *(Cúi mặt, ngập ngừng)* Thưa cán bộ, công ty vận tải bên em đang vào đợt quyết toán tài chính cuối quý nên công việc kế toán rất áp lực, em thường phải làm tăng ca đến 20h00 tối mới về. Mặt khác, dạo gần đây anh Khang hay gắt gỏng vô cớ, đi đêm về hôm và giấu em nhiều chuyện... Em chạnh lòng nên mới hạn chế sang để hai bên cùng thoải mái, chứ không có mâu thuẫn gì lớn cả...
 
 * **Hỏi (ĐTV Lê Minh):** Chị có biết ai có thù oán hay mâu thuẫn gì với anh Khang gần đây không?
 * **Đáp (Trần Thị Hà):** *(Lấy khăn tay chấm nước mắt, giọng run run)* Anh Khang làm nghề cho vay nặng lãi phức tạp lắm cán bộ ơi... Mấy con nợ bị anh ấy siết nợ nên chắc căm ghét anh ấy lắm. Mấy hôm trước ngoài bờ tường gạch trước cổng còn bị người ta xịt sơn đỏ chửi bới đòi mạng nữa cơ... Em sợ xảy ra chuyện nên khuyên anh ấy bỏ nghề mãi mà anh ấy không chịu nghe... Em nghi là mấy con nợ giang hồ hung tợn đến trả thù anh ấy!

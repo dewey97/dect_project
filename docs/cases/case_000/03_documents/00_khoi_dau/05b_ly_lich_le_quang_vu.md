@@ -24,8 +24,8 @@ Số: `05b/LL-TP`
 | **Ngày tháng năm sinh** | 20/09/1991|
 | **Giới tính** | Nam |
 | **Số CMND** | `001091005812` |
-| **Nơi ĐKHKTT** | Số 45, Đường Đoàn Kết, Phường Phân Khu Cảng, TP. Hà Nội |
-| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Phân Khu Cảng, TP. Hà Nội |
+| **Nơi ĐKHKTT** | Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội |
+| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nghề nghiệp** | Kỹ sư điện dân dụng |
 | **Số điện thoại liên lạc** | `0988.20.09.91` |
 | **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Nguyễn Ngọc Mai, sinh năm 1992) |

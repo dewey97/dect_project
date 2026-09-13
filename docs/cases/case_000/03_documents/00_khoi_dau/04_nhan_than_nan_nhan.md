@@ -23,7 +23,7 @@ Số: `04/BC-XMNT`
 * **Tình trạng gia đình:**
   - Bố mẹ đẻ mất sớm do tai nạn giao thông năm 2010.
   - Sống cùng ông nội (ông Nguyễn Văn Thọ) tại số 14 Đường Bờ Sông. Ông Thọ vừa qua đời cách đây 3 tháng.
-  - Họ hàng gần nhất: Gia đình chú ruột (bố của Nguyễn Ngọc Mai) cư ngụ tại phường Phân Khu Cảng.
+  - Họ hàng gần nhất: Gia đình chú ruột (bố của Nguyễn Ngọc Mai) cư ngụ tại Phường Phân khu Cảng.
 
 ---
 

@@ -24,8 +24,8 @@ Số: `05c/LL-TP`
 | **Ngày tháng năm sinh** | 22/09/1990 |
 | **Giới tính** | Nữ |
 | **Số CMND** | `001190008271` |
-| **Nơi ĐKHKTT** | Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân Khu Cảng, TP. Hà Nội |
-| **Nơi ở hiện nay** | Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân Khu Cảng, TP. Hà Nội |
+| **Nơi ĐKHKTT** | Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, TP. Hà Nội |
+| **Nơi ở hiện nay** | Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nghề nghiệp** | Kế toán tổng hợp (Công ty TNHH Vận tải Sông Hồng) |
 | **Số điện thoại chính chủ** | `0984.112.568` |
 | **Tình trạng hôn nhân** | Độc thân |
