@@ -15,7 +15,7 @@ Số: `05a/LL-TP`
 
 ---
 
-### I. THÔNG TIN NHÂN THÂN & CĂN CƯỚC
+### I. THÔNG TIN LÝ LỊCH
 
 | Mục | Nội dung chi tiết |
 | :--- | :--- |
@@ -23,12 +23,12 @@ Số: `05a/LL-TP`
 | **Tên thường gọi** | Mai |
 | **Ngày tháng năm sinh** | 15/05/1992 |
 | **Giới tính** | Nữ |
-| **Số CMND** | `001192004523` |
+| **Số CMND** | `275190483` |
 | **Nơi ĐKHKTT** | Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội |
-| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội (cách nhà Khang ~4km) |
+| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội (cách nhà nạn nhân 4km) |
 | **Nghề nghiệp** | Chuyên viên Hành chính — Nhân sự (Công ty CP May Mặc) |
 | **Số điện thoại chính chủ** | `0912.456.789` |
-| **Tình trạng hôn nhân** | Đã kết hôn (Chồng: Lê Quang Vũ, sinh năm 1991) |
+| **Tình trạng hôn nhân** | Đã kết hôn |
 | **Tiền án, tiền sự** | Không |
 | **Mối quan hệ với nạn nhân** | Em họ (con chú ruột của nạn nhân Nguyễn Văn Khang) |
 

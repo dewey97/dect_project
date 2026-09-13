@@ -11,7 +11,7 @@ Số: `02/BB-LK`
 ---
 
 # BIÊN BẢN LẤY LỜI KHAI
-*(Đối tượng: Nguyễn Thanh Tùng — Triệu tập sau khi tra cứu ra SĐT `0984.180.357`)*
+*(Đối tượng: Nguyễn Thanh Tùng)*
 
 ---
 

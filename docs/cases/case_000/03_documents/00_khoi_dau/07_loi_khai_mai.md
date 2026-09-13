@@ -22,7 +22,7 @@ Vào hồi 14 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 
 **Tiến hành lấy lời khai người liên quan:**
 * **Họ và tên:** **NGUYỄN NGỌC MAI** | **Giới tính:** Nữ | **Sinh ngày:** 15/05/1992 (24 tuổi).
-* **CCCD số:** `001192004523` cấp ngày 10/08/2012 tại Cục CSQLHC về TTXH.
+* **CCCD số:** 275190483.
 * **Nơi ĐKHKTT:** Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Chuyên viên Hành chính — Nhân sự. 
 * **Mối quan hệ với nạn nhân:** Em họ (con chú ruột của nạn nhân Nguyễn Văn Khang).
@@ -47,7 +47,7 @@ Vào hồi 14 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 * **Đáp (Nguyễn Ngọc Mai):** Ngày 15/07/2016, bố tôi cùng bác trưởng họ đã sang nhà số 14 Đường Bờ Sông để hòa giải nội bộ. Gia đình đề nghị anh Khang bán bớt 50m² đất để gom tiền trả nợ Ngân hàng, giải chấp rút Sổ đỏ về rồi chia đều phần đất còn lại. Nhưng anh Khang chỉ trỏ vào mặt bố tôi, thách thức: *"Đất này đứng tên tao trên Sổ đỏ rồi, ông nội cho tao riêng. Mấy người không có quyền gì hết, giỏi thì đâm đơn ra Tòa!"* rồi đuổi bố tôi ra khỏi nhà. Do anh Khang quá ngang ngược và ngoan cố nên tôi mới phải thuê Văn phòng luật sư làm Đơn đòi đất và Cam kết tự nguyện trả lại đất. Nếu anh Khang vẫn nhất quyết không ký giấy trả lại đất thì chúng tôi sẽ khởi kiện.
 
 * **Hỏi (ĐTV Lê Minh):** Khi đến nhà Khang lúc 18:30 chiều 24/07, chị đã mang theo những hồ sơ gì và phản ứng của nạn nhân lúc đó ra sao?
-* **Đáp (Nguyễn Ngọc Mai):** Tôi mang theo 02 bộ hồ sơ gồm: Đơn đòi đất, Cam kết tự nguyện trả lại đất và photocopy Giấy báo nợ của Ngân hàng. Tôi ép anh Khang ký vào bản Cam kết tự nguyện trả lại đất. Nhưng anh Khang cười cợt, bảo đất này ông nội đã cho riêng anh ấy, rồi vứt bản thỏa thuận vào mặt tôi. Tôi quá uất ức nên ném tung toàn bộ xấp hồ sơ xuống sàn nhà phòng khách. Anh Vũ bảo tôi cứ đi xe máy về trước, còn anh ấy bận đi nhậu với bạn nên ở lại ra sau.
+* **Đáp (Nguyễn Ngọc Mai):** Tôi mang theo 02 bộ hồ sơ gồm: Đơn đòi đất, Cam kết tự nguyện trả lại đất và photocopy Giấy báo nợ của Ngân hàng. Tôi ép anh Khang ký vào bản Cam kết tự nguyện trả lại đất. Nhưng anh Khang cười cợt, bảo đất này ông nội đã cho riêng anh ấy, rồi vứt tài liệu vào mặt tôi. Tôi quá uất ức nên ném tung toàn bộ xấp hồ sơ xuống sàn nhà phòng khách. Anh Vũ bảo tôi cứ đi xe máy về trước, còn anh ấy bận đi nhậu với bạn nên ở lại ra sau.
 
 * **Hỏi (ĐTV Lê Minh):** Chị rời nhà nạn nhân lúc mấy giờ? Sau đó chị đi đâu, làm gì?
 * **Đáp (Nguyễn Ngọc Mai):** Tôi nổ máy xe phóng thẳng một mạch về nhà ở số 45 Phố Đoàn Kết, về đến nhà là khoảng 19:30. Tôi tắm rửa rồi bật tivi lên xem, đang xem thì nhớ tầm khoảng 20h00 - 20h15 tivi bị mất tín hiệu cáp do sự cố đứt cáp ngoài đường. Tôi bực mình tắt tivi vào phòng nằm nghỉ suốt đêm!

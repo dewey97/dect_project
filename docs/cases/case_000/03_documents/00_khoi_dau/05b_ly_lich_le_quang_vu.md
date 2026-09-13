@@ -23,7 +23,7 @@ Số: `05b/LL-TP`
 | **Tên thường gọi** | Vũ |
 | **Ngày tháng năm sinh** | 20/09/1991|
 | **Giới tính** | Nam |
-| **Số CMND** | `001091005812` |
+| **Số CMND** | `381762904` |
 | **Nơi ĐKHKTT** | Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nghề nghiệp** | Kỹ sư điện dân dụng |
