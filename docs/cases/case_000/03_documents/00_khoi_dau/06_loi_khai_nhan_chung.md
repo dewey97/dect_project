@@ -21,10 +21,18 @@ Cán bộ điều tra: Trung úy Nguyễn Văn Hoàng tiến hành lấy lời k
 ---
 
 ### I. LỜI KHAI BÀ NGUYỄN THỊ LỤA (SỐ 12 ĐƯỜNG BỜ SÔNG)
-* **Về tình hình phức tạp quanh nhà Khang:** Nhà thằng Khang này phức tạp lắm các chú công an ơi! Nó làm nghề cho vay bốc họ nên người lạ, con nợ rồi đầu gấu tìm đến nhà nó suốt ngày. Con bé Hà con nhà ông Hải đầu ngõ nhìn hiền lành, yêu thằng Khang lắm, trước hay sang dọn dẹp cơm nước, cơ mà độ một tuần nay tôi chẳng mấy khi thấy con bé nó sang chơi như trước nữa... Mà lạ lắm nhé, dạo gần đây, có hôm nửa đêm tôi dậy đi vệ sinh ngó qua cửa sổ, **còn thấy có cái bóng người cứ đứng lù lù dưới gốc cây xoan ngó chằm chằm vào nhà thằng Khang cả đêm cơ đấy**, trông rợn hết cả người! Tôi tưởng trộm hay con nợ nào rình rập nên sợ chẳng dám ho he gì...
-* **18:30 — 19:00 (Tối 24/07):** Chiều tối 24/07, có hai người đi chung xe máy sang nhà Khang (sau này biết là Mai và Vũ). Đến **đúng lúc nhạc hiệu Thời sự 19h00 VTV1 vang lên**, tôi nghe thấy tiếng xe máy nổ máy rồ ga phóng vụt ra khỏi ngõ.
-* **20:00 — Hơn 20:00:** Tối thứ Sáu tôi ngồi ăn cơm xem chương trình Gameshow ca nhạc trên VTV3, nghe bên nhà Khang có tiếng đàn ông to tiếng cãi cọ xô đẩy nhau. Đến tầm hơn 20h00 bỗng nghe **"XOẢNG!"** một cái thật to — tiếng bình trà thủy tinh đập vỡ vụn dưới nền gạch. Tôi sợ xảy ra đâm chém nhau vì chuyện nợ nần nên vội tắt bớt đèn phòng ngoài rồi chốt chặt cửa đi ngủ, không dám ngó sang nữa nên không rõ người đàn ông kia rời đi lúc nào.
-* **06:30 — 06:45 ngày 25/07 (Phát hiện thi thể & Báo án):** Sáng sớm ra quét ngõ, thấy cổng sắt và cửa nhà Khang vẫn mở toang từ đêm qua, đèn phòng khách bật sáng trưng. Tôi sang gọi thì bàng hoàng phát hiện Khang nằm gục trên vũng máu bên cạnh bình trà vỡ, toàn thân co cứng. Tôi hoảng hốt tri hô và gọi Công an Phường lúc 06:45.
+* **Hỏi:** Bà có quan hệ như thế nào với nạn nhân Nguyễn Văn Khang?
+* **Đáp:** Tôi là hàng xóm sống sát vách nhà cậu Khang. Tôi sống ở đây mấy chục năm rồi nên biết Khang từ nhỏ.
+
+* **Hỏi:** Bà có biết về hoàn cảnh hiện tại của nạn nhân không?
+* **Đáp:** Nhà thằng Khang này phức tạp lắm các chú công an ơi! Nó làm nghề cho vay nặng lãi, suốt ngày toàn thấy qua lại với mấy đứa xăm trổ. Bố mẹ nó mất sớm, nó sống với ông nội nhưng ông nó cũng mới mất 3 tháng trước. Đời nó kể ra cũng khổ, may mà vẫn còn con bé người yêu nó chăm sóc cho từng li từng tí. Hình như chúng tính cuối năm nay cưới nhau rồi đấy. Thế mà chuyện lại thành ra như vậy.
+
+* **Hỏi:** Thời gian gần đây, bà có thấy nạn nhân xảy ra xô xát hay mâu thuẫn với ai không?
+* **Đáp:** Gần đây thì tôi không thấy có cãi vã xô xát gì. Nhưng mà lạ lắm nhé, dạo gần đây, có hôm nửa đêm tôi dậy đi vệ sinh ngó qua cửa sổ, thỉnh thoảng lại thấy bóng người cứ đứng lù lù dưới gốc cây xoan ngó chằm chằm vào nhà thằng Khang! Tôi tưởng trộm hay con nợ nào rình rập nên sợ chẳng dám ho he gì...
+
+* **Hỏi:** Vào buổi tối ngày xảy ra vụ án, bà có phát hiện người lạ hoặc phương tiện lạ nào xuất hiện quanh khu vực nhà nạn nhân không?
+* **Đáp:** Chiều tối 24/07, tôi thấy có hai người đi chung xe máy sang nhà Khang. Lúc tôi bắt đầu xem chương trình thời sự tối thì nghe thấy tiếng xe máy ra khỏi ngõ. Sau đó chắc tầm hơn 8 giờ, lúc tôi đang xem chương trình thì nghe thấy tiếng đàn ông cãi cọ rồi tiếng đồ bị vỡ. Kể từ đó đến sáng hôm sau thì không nghe thấy động tĩnh gì nữa.
+Đến sáng mai tôi ra quét đường thì thấy cổng sắt và cửa nhà Khang vẫn mở toang từ đêm qua, đèn phòng khách bật sáng trưng. Tôi sang gọi thì phát hiện Khang nằm gục trên vũng máu. Tôi hoảng hốt tri hô và gọi Công an Phường lúc 06:45.
 
 ---
 
