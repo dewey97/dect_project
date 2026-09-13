@@ -24,7 +24,8 @@ Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 * **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991 (25 tuổi).
 * **CMND số:** `001091005812`.
 * **Nơi ĐKHKTT:** Số 45, Đường Đoàn Kết, Phường Phân Khu Cảng, TP. Hà Nội.
-* **Nghề nghiệp:** Kỹ sư Điện tự do. Mối quan hệ với nạn nhân: Em rể họ (Chồng của Nguyễn Ngọc Mai).
+* **Nghề nghiệp:** Kỹ sư điện dân dụng. 
+* **Mối quan hệ với nạn nhân:** Em rể (Chồng của Nguyễn Ngọc Mai).
 
 ---
 

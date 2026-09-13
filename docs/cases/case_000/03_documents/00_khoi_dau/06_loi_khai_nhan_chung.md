@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `06/BBLLK`  
+Số: `06/BB-LK`  
 *Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
