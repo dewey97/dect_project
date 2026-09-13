@@ -22,11 +22,16 @@ Tại: Phòng trọ tại số 08, ngõ 12, đường Bờ Kè, Phường Phân 
 * Cán bộ ghi biên bản: **Nguyễn Văn Hoàng**. Chức vụ: Trung úy, Điều tra viên Phòng PC02.
 
 **Thành phần tham gia và chứng kiến khám xét gồm:**
-1. Người có chỗ ở bị khám xét:
 
+**1. Người có chỗ ở bị khám xét:**
+   
    Đối tượng TRẦN THỊ HÀ.    Sinh năm: 1990.     Nơi ở: Phòng trọ nêu trên.
-2. Đại diện chính quyền địa phương: Ông Nguyễn Văn Bình      Chức vụ: Công an Phường Phân khu Cảng, Quận Sông Hồng.
-3. Người chứng kiến:
+
+**2. Đại diện chính quyền địa phương:**
+   
+   Ông Nguyễn Văn Bình      Chức vụ: Công an Phường Phân khu Cảng, Quận Sông Hồng.
+
+**3. Người chứng kiến:**
 * Ông: Đỗ Văn Vinh     Sinh năm: 1968.     Trú tại: Số 10 ngõ 12, đường Bờ Kè, Phường Phân khu Cảng, Quận Sông Hồng.
 * Bà: Lê Thị Thảo      Sinh năm: 1975.     Trú tại: Số 14 ngõ 12, đường Bờ Kè, Phường Phân khu Cảng, Quận Sông Hồng.
 
@@ -36,7 +41,7 @@ Tại: Phòng trọ tại số 08, ngõ 12, đường Bờ Kè, Phường Phân 
 
 Tiến hành khám xét toàn bộ diện tích phòng trọ và tư trang của đối tượng Trần Thị Hà. Cơ quan điều tra phát hiện và thu giữ các đồ vật, tài liệu sau:
 
-1. **01 lọn tóc nam giới:** Dài khoảng 4,2cm, chân tóc dính vết chất màu nâu khô. Lọn tóc được chứa trong 01 túi ni lông nhỏ trong suốt (túi zip), cất giấu bên trong ví tiền của chị Trần Thị Hà. *(Đã tiến hành thu giữ và niêm phong trong phong bì ký hiệu M1)*.
+1. **01 lọn tóc nam giới:** Dài khoảng 4,2cm, chân tóc dính vết chất màu nâu khô. Lọn tóc được chứa trong 01 túi ni lông nhỏ trong suốt (túi zip), cất giấu bên trong ví tiền của đối tượng Trần Thị Hà. *(Đã tiến hành thu giữ và niêm phong trong phong bì ký hiệu M1)*.
 2. **01 chiếc áo gió nam có mũ trùm đầu:** Màu xám đen, vải dù. Áo nằm trong tủ quần áo của đối phượng. Quan sát bề mặt áo phát hiện dính bẩn phấn hoa*(Đã tiến hành thu giữ và niêm phong trong túi ký hiệu M2)*.
 3. **01 chiếc kéo bấm kim loại nhỏ:** Dạng kéo cắt chỉ thêu len, dài khoảng 10cm, để trên bàn làm việc cạnh cuộn len. Tại phần lưỡi kéo phát hiện có vệt chất màu nâu khô và sợi tóc bám dính. *(Đã tiến hành thu giữ và niêm phong trong hộp ký hiệu M3)*.
 
