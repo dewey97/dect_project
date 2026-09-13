@@ -96,7 +96,7 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 
 ### 2. Tuyến A — Nhánh Mai & Vũ (`01_nhanh_mai_vu/`):
 - `06_so_thu_chi_quan_bia.md` (Sổ thu chi Quán Bia 88: bàn B7 1 khách lẻ chuyển khoản 195k lúc 20:45)
-- `07_loi_khai_lan_2_vu.md` (Lời khai Vũ lần 2 thừa nhận nán lại 30p xin nợ, gọi 1 đĩa nem + nửa thùng bia, thấy bóng người áo gió cây xoan 19:25)
+- `07_loi_khai_lan_2_vu.md` (Lời khai Vũ lần 2 thừa nhận nán lại 30p xin nợ, gọi 1 đĩa nem + 5 lon bia, thấy bóng người áo gió cây xoan 19:25)
 
 ### 3. Tuyến B — Nhánh Nguyễn Thanh Tùng (`02_nhanh_tung/`):
 - `01_tu_thu_xo_xat_tung.md` (Biên bản tự thú xô xát của Tùng lúc 20:00 và bỏ chạy lúc 20:15)

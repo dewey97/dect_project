@@ -99,7 +99,7 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 * **18:30 – 19:00:** Vũ ngồi im trong khi Mai cãi nhau đòi đất với Khang. Đúng 19:00 Mai phóng xe về trước.
 * **19:00 – 19:25:** Vũ quỳ lạy xin hoãn món nợ 300 triệu. Khang chửi bới, rút cuốn sổ da đen đập mạnh vào ngực Vũ và đe dọa in 100 tờ rơi rải khắp phố Đoàn Kết. Vũ suy sụp, hoảng sợ vội vàng tháo chạy ra khỏi cửa chính, chạy một mạch ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25:40.
 * **19:25:** Đứng ở đầu ngõ đợi xe, Vũ nhìn thấy bóng một người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
-* **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 đĩa nem + nửa thùng bia ngồi giải sầu.
+* **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 đĩa nem + 5 lon bia ngồi giải sầu.
 * **20:45:** Vũ thanh toán chuyển khoản **195.000đ** (Bàn số 7).
 * **21:30:** Vũ đi xe ôm về đến nhà tại số 45 Phố Đoàn Kết đi ngủ.
 
@@ -113,7 +113,7 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 
 ### 2. Cơ chế 2: Câu đố Sổ thu chi Quán Bia 88 (`06_so_thu_chi_quan_bia.md`)
 * **Dữ liệu đối chiếu:**
-  * Vũ khai tại Lời khai lần 2 (`07`): Ngồi uống bia một mình tại bàn ven sông, gọi **1 đĩa nem + nửa thùng bia**.
+  * Vũ khai tại Lời khai lần 2 (`07`): Ngồi uống bia một mình tại bàn ven sông, gọi **1 đĩa nem + 5 lon bia**.
   * Quét sổ thu chi Quán 88 (`06`): Duy nhất dòng **Bàn 7 (1 khách)** có hóa đơn thanh toán chuyển khoản đúng số tiền: `B7 (1 khách): -> 195k (CK 20:45)`.
 * **Ý nghĩa phá án:** Lúc **20:45**, Vũ đang chuyển khoản tại Quán Bia 88 cách hiện trường **3.8 km** $\rightarrow$ Không thể có mặt tại nhà Khang lúc 20:45 (thời điểm hung thủ đứng rình) và 21:00 (lúc nạn nhân bị sát hại) $\rightarrow$ **MINH OAN TUYỆT ĐỐI CHO VŨ!**
 

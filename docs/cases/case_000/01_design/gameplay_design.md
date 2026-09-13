@@ -50,7 +50,7 @@
 
 - **Vị trí:** Nút hội tụ chuyển từ Phase 1 ➔ Phase 2.
 - **Kích hoạt:** $\text{PermitActivation} = \text{isTuyenACompleted} \land \text{isTuyenBCompleted}$
-  - `isTuyenACompleted`: Minh oan Vũ (Quán Bia 88 lúc 20:45).
+  - `isTuyenACompleted`: Minh oan Vũ (Quán Bia 88 lúc 21:15).
   - `isTuyenBCompleted`: Bóc trần Tùng (Vân tay tách trà + Tự thú xô xát).
 - **Thông báo hệ thống:**
   - 🛑 *Chưa đủ:* Yêu cầu hoàn thành điều tra Mai, Vũ, Tùng trước.
@@ -112,9 +112,9 @@
 | **Ảnh chân dung Lê Quang Vũ** (`p6`) | Ảnh chân dung Vũ (hiển thị đặc điểm mắt lác nhẹ) | Manh mối nhận diện biệt danh "Lệch Pha" | Hồ sơ điều tra ban đầu |
 
   - **Suy luận đối chiếu:**
-    - ➔ Lời khai bà Lụa (`11`) (Mai đi 19:00) vs Screenshot App đặt xe (`p10`) (Vũ đặt xe 19:30): Bắt thóp Vũ nói dối mốc giờ rời đi, chứng minh Vũ nán lại hiện trường 30 phút (19:00 – 19:30).
+    - ➔ Lời khai bà Lụa (`11`) (Mai đi 19:00) vs Screenshot App đặt xe (`p10`) (Vũ đặt xe 19:30): Bắt thóp Vũ nói dối mốc giờ rời đi, chứng minh Vũ nán lại hiện trường khoảng 30 phút.
     - ➔ Đối chiếu Ảnh chân dung Vũ (`p6`) (kỹ sư điện + mắt lác), SĐT đặt xe & SMS đòi nợ (trên điện thoại dev-00) đe dọa *"ném giấy nợ cho bố vợ"* với Sổ nợ (`05`): Bóc trần con nợ quá hạn 300M biệt danh *"Lệch Pha"* chính là Lê Quang Vũ!
-    - ➔ Xác định động cơ thực sự khiến Vũ nán lại 30 phút là do khoản nợ 300M.
+    - ➔ Xác định động cơ thực sự khiến Vũ nán lại khoảng 30 phút là do khoản nợ 300M.
 
 ---
 
@@ -131,13 +131,13 @@
 
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
-| **Lời khai Vũ (lần 2)** (`07`) | Thừa nhận nán lại 30p xin hoãn nợ 300M; Khai gọi 1 đĩa nem + uống đúng nửa thùng bia; Khai thấy bóng người áo gió rình dưới gốc cây xoan lúc 19:25 | Tháo gỡ 30p ẩn số; Cung cấp manh mối đồ gọi (1 đĩa nem + nửa thùng bia) để khớp Sổ thu chi & bóng người cây xoan | Công an tiến hành hỏi cung động cơ gây án |
-| **Sổ thu chi Quán Bia 88** (`06`) | Danh sách bàn thanh toán trong ngày | Manh mối tra cứu mốc giờ thanh toán của Vũ (B7: 195k lúc 20:45) | Công an đến Quán Bia 88 xác minh theo Lời khai 2; chủ quán xuất trình sổ |
+| **Lời khai Vũ (lần 2)** (`07`) | Thừa nhận nán lại khoảng 30p xin hoãn nợ 300M; Khai gọi 1 đĩa nem + uống đúng 5 lon bia; Khai thấy bóng người áo gió rình dưới gốc cây xoan | Tháo gỡ khoảng 30p ẩn số; Cung cấp manh mối đồ gọi (1 đĩa nem + 5 lon bia) để khớp Sổ thu chi & bóng người cây xoan | Công an tiến hành hỏi cung động cơ gây án |
+| **Sổ thu chi Quán Bia 88** (`06`) | Danh sách bàn thanh toán trong ngày | Manh mối tra cứu mốc giờ thanh toán của Vũ (B7: 195k lúc 21:15) | Công an đến Quán Bia 88 xác minh theo Lời khai 2; chủ quán xuất trình sổ |
 
   - **Suy luận đối chiếu & Minh oan:**
-    - ➔ Lời khai lần 2 (`07`): Vũ thừa nhận nán lại 30 phút (19:00 – 19:30) van xin hoãn nợ 300M, đồng thời khai báo nhìn thấy một bóng người mặc áo gió xám rình rập dưới gốc cây xoan lúc 19:25 trước khi đón xe đi Quán Bia 88.
-    - ➔ Khớp nối Lời khai (`07`) với Sổ thu chi Quán Bia 88 (`06`): Từ chi tiết Vũ khai gọi *1 đĩa nem + nửa thùng bia* (1 khách), suy ra dòng **B7 (1 khách): Nem chua + nửa thùng bia -> 195k (CK 20:45)** chính là bàn của Vũ, xác định mốc giờ thanh toán ra về là **20:45**.
-    - ➔ Xác nhận Vũ ở Quán Bia 88 (cách 3.8km) từ 19:40 đến 20:45 ➔ Vũ không thể có mặt gây án tại nhà Khang lúc ~21:00.
+    - ➔ Lời khai lần 2 (`07`): Vũ thừa nhận nán lại khoảng 30 phút van xin hoãn nợ 300M, đồng thời khai báo nhìn thấy một bóng người mặc áo gió xám rình rập dưới gốc cây xoan trước khi đón xe đi Quán Bia 88.
+    - ➔ Khớp nối Lời khai (`07`) với Sổ thu chi Quán Bia 88 (`06`): Từ chi tiết Vũ khai gọi *1 đĩa nem + 5 lon bia* (1 khách), suy ra dòng **B7 (1 khách): Nem chua + 5 lon bia -> 195k (CK 21:15)** chính là bàn của Vũ, xác định mốc giờ thanh toán ra về là **21:15**.
+    - ➔ Xác nhận Vũ ở Quán Bia 88 (cách 3.8km) từ 19:49 đến 21:15 ➔ Vũ không thể có mặt gây án tại nhà Khang lúc ~21:00.
     - ➔ Minh oan cho Vũ (`isTuyenACompleted = true`).
 
 * 👉 **Kết luận Tập hồ sơ Tuyến A:** Mai và Vũ đều được minh oan (`isTuyenACompleted = true`).
