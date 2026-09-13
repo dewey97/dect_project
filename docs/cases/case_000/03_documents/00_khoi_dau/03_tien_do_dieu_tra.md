@@ -37,7 +37,7 @@ Lãnh đạo Phòng Cảnh sát Hình sự (PC02) đã khẩn cấp điều đ�
    - Mảnh vỡ bình trà thủy tinh dính máu (nghi hung khí gây án) (`p3`).
    - Khung ảnh kỷ niệm hè 1996 bị rơi vỡ mặt kính (`p4`).
    - Các mảnh báo cũ năm 1996 bị xé vụn rơi dưới sàn (`p5`).
-   - Cuốn sổ tay bìa da màu đen ghi nợ bốc họ và lãi ngày (`05`).
+   - Cuốn sổ tay bìa da màu đen ghi nợ bốc họ và lãi ngày (`10`).
    - Hũ trà hoa cúc đặt trên bàn kèm mẩu giấy nhắn (`17`).
    - Điện thoại di động iPhone 8 Plus của nạn nhân (`dev-00`).
 

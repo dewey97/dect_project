@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `06a/LL-TP`  
+Số: `05a/LL-TP`  
 *Hà Nội, ngày 25 tháng 07 năm 2016*
 
 ---
