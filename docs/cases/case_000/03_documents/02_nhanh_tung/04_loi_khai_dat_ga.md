@@ -20,7 +20,7 @@ Cán bộ điều tra: Đại úy Hoàng Tuấn Dũng tiến hành lấy lời k
 
 * **Họ và tên:** **TRẦN VĂN ĐẠT** (Đạt Gà).
 * **Sinh năm:** 1988 (28 tuổi). Giới tính: Nam.
-* **Nơi cư trú:** Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội.
+* **Nơi cư trú:** Số 52, Đường Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Buôn bán gia cầm tại Chợ Cảng.
 * **Số điện thoại:** `0912.331.888`.
 
@@ -29,7 +29,7 @@ Cán bộ điều tra: Đại úy Hoàng Tuấn Dũng tiến hành lấy lời k
 ### NỘI DUNG LỜI KHAI
 
 * **Hỏi:** Chiều tối 24/07 lúc 18:45, anh gọi điện thoại cho nạn nhân Nguyễn Văn Khang với nội dung gì?
-* **Đáp:** Tôi có nợ thằng Khang 80 triệu tiền bốc họ, đến hạn trả ngày 28/07 nhưng dạo này buôn bán ế ẩm quá nên lúc 18h45 tôi gọi điện xin nó cho khất thêm một tuần. Thằng Khang nó hách dịch, chửi bới tôi thậm tệ trong điện thoại, dọa cho đàn em xuống dẹp sạp gà của tôi. Tôi cay cú quá nên có chửi nhau gay gắt tay đôi với nó qua điện thoại rồi cúp máy! Tôi bực mình nên có chửi thề vài câu bảo *"Mày ép người quá đáng có ngày chết không kịp ngáp"*, nhưng đó chỉ là lời nói lúc nóng giận thôi. Tối qua từ chiều đến tận đêm tôi ngồi giao gà ở chợ Cảng suốt, không hề rời sạp lấy một bước. Các tiểu thương bên cạnh và bác bảo vệ chợ đều nhìn thấy tôi cả đêm!
+* **Đáp:** Tôi có nợ thằng Khang 80 triệu, đến hạn trả ngày 28/07 nhưng dạo này buôn bán ế ẩm quá nên lúc 18h45 tôi gọi điện xin nó cho khất thêm một tuần. Thằng Khang nó hách dịch, chửi bới tôi thậm tệ trong điện thoại, dọa cho đàn em xuống dẹp sạp gà của tôi. Tôi cay cú quá nên có chửi nhau gay gắt tay đôi với nó qua điện thoại rồi cúp máy! Tôi bực mình nên có chửi thề vài câu bảo *"Mày ép người quá đáng có ngày chết không kịp ngáp"*, nhưng đó chỉ là lời nói lúc nóng giận thôi. Tối qua từ chiều đến tận đêm tôi ngồi giao gà ở chợ Cảng suốt, không hề rời sạp lấy một bước. Các tiểu thương bên cạnh đều nhìn thấy tôi cả đêm!
 
 ---
 
