@@ -72,10 +72,10 @@
 └──────────────────────┴──────────────────────────────────────────────────────┘
 ```
 
-1. **Alibi VTV3 giả mạo (`15` vs `06_lich_phat_song_vtv3`):** Hà khai ở phòng trọ xem phim bộ VTV3 từ 20h00 đến 21h30. Tuy nhiên lịch phát sóng tối thứ Sáu 24/07 chỉ chiếu Gameshow thực tế "Hành trình rực rỡ" $\rightarrow$ Bóc trần ngoại phạm bịa đặt!
-2. **Còi tàu trong Voicemail 20:32 (`16` vs `02_giam_dinh_am_thanh_coi_tau`):** Tin nhắn thoại gửi lúc 20:32:15 lọt tiếng còi tàu diesel và chuông gác chắn đường sắt (chỉ có tại đầu ngõ nhà Khang lúc đoàn tàu hàng chạy qua 20:30–20:35, phòng trọ của Hà cách 1.2km không thể thu được) $\rightarrow$ Chứng minh Hà đang đứng ngay trước cổng nhà Khang lúc 20:32!
+1. **Alibi VTV3 giả mạo (`15` vs `02_lich_phat_song_vtv3`):** Hà khai ở phòng trọ xem phim bộ VTV3 từ 20h00 đến 21h30. Tuy nhiên lịch phát sóng tối thứ Sáu 24/07 chỉ chiếu Gameshow thực tế "Hành trình rực rỡ" $\rightarrow$ Bóc trần ngoại phạm bịa đặt!
+2. **Còi tàu trong Voicemail 20:32 (`01` / `01_giam_dinh_am_thanh_coi_tau`):** Tin nhắn thoại gửi lúc 20:32:15 lọt tiếng còi tàu diesel và chuông gác chắn đường sắt (chỉ có tại đầu ngõ nhà Khang lúc đoàn tàu hàng chạy qua 20:30–20:35, phòng trọ của Hà cách 1.2km không thể thu được) $\rightarrow$ Chứng minh Hà đang đứng ngay trước cổng nhà Khang lúc 20:32!
 3. **Áo gió dính phấn hoa cây xoan (`03_kham_xet_phong_ha`):** Khám xét phòng trọ thu giữ áo gió màu xám đen dính phấn hoa xoan $\rightarrow$ Khớp nhân dạng kẻ rình rập lúc 19:25 (lời khai Vũ `07`) và 20:45 (lời khai bà Lụa `11`).
-4. **Lọn tóc dính máu (`04_giam_dinh_adn_lon_toc` / `EV-HAIR-DNA`):** Thu giữ trong áo ngực Hà, kết quả giám định 16 locus STR trùng khớp 100% ADN Khang (khớp với mảng tóc mai bị cắt cụt sát da đầu trong khám nghiệm tử thi `04`).
+4. **Lọn tóc dính máu (`04_giam_dinh_adn_lon_toc` / `EV-HAIR-DNA`):** Thu giữ trong áo ngực Hà, kết quả giám định 16 locus STR trùng khớp 100% ADN Khang (khớp với mảng tóc mai bị cắt cụt sát da đầu trong Báo cáo tiến độ điều tra `06`).
 
 ---
 
@@ -112,8 +112,8 @@
 
 | Mã Tài Liệu | Tên Bằng Chứng | Nội Dung Cốt Lõi | Ý Nghĩa Điều Tra |
 | :--- | :--- | :--- | :--- |
-| **`16` & `02`** | File ghi âm Voicemail 20:32 | Lọt tiếng còi tàu diesel & chuông rào chắn đường sắt | Bẻ gãy alibi, chứng minh Hà có mặt trước cổng nhà Khang lúc 20:32 |
-| **`06`** | Lịch phát sóng VTV3 tối 24/07 | Gameshow thực tế 20:00–21:30 (không có phim bộ) | Chứng minh lời khai xem phim bộ của Hà là hoàn toàn bịa đặt |
+| **`01`** | Voice tin nhắn thoại 20:32 | Lọt tiếng còi tàu diesel & chuông rào chắn đường sắt | Bẻ gãy alibi, chứng minh Hà có mặt trước cổng nhà Khang lúc 20:32 |
+| **`02`** | Lịch phát sóng VTV3 tối 24/07 | Gameshow thực tế 20:00–21:30 (không có phim bộ) | Chứng minh lời khai xem phim bộ của Hà là hoàn toàn bịa đặt |
 | **`p3`** | Mảnh thủy tinh dính máu | Mảnh vỡ bình trà dài 8.2cm dính máu Khang | Hung khí trực tiếp gây đứt động mạch cảnh |
 | **`04` / `EV-HAIR-DNA`** | Lọn tóc mai dính máu | Thu trong áo ngực Hà, khớp 100% ADN Khang | Chứng cứ sinh học chí mạng định tội |
 
@@ -147,7 +147,7 @@
                      │      [TRẦN THỊ HÀ]                           │
                      │                                              │
                      │   ┌───────────────┐   [HŨ TRÀ HOA CÚC        │
-                     │   │   Bàn trà gỗ  │    DÁN NOTE VÀNG]        │
+                     │   │   Bàn trà gỗ  │    TRÊN BÀN TRÀ]         │
                      │   └───────────────┘                          │
                      │                                              │
                      │               Cửa chính                      │

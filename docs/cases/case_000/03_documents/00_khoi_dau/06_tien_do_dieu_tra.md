@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `03/BC-CASC`  
+Số: `06/BC-CASC`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
@@ -25,21 +25,23 @@ Ban Chỉ huy Phòng Cảnh sát Hình sự (PC02) đã khẩn cấp điều đ�
 ---
 
 ### II. KẾT QUẢ ĐIỀU TRA BƯỚC ĐẦU
-1. **Về dấu hiệu tội phạm:**
-   - Nạn nhân tử vong do vết đâm sâu đứt động mạch cảnh cổ trái, hung khí là mảnh vỡ bình trà dính máu thu giữ tại hiện trường (`p3`). Vụ việc có dấu hiệu rõ rệt của tội phạm *"Giết người"* theo Điều 123 Bộ luật Hình sự.
-   - Thời gian tử vong ước tính: **21:00 đến 21:30 đêm 24/07/2026**.
-2. **Về các mâu thuẫn nổi cộm thu thập tại hiện trường:**
-   - **Mâu thuẫn 1 (Đất đai di sản):** Xấp hồ sơ mang tên **Trần Ngọc Mai** (em họ nạn nhân) yêu cầu hủy giấy ủy quyền đất 200m² thế chấp ngân hàng.
-   - **Mâu thuẫn 2 (Khoản nợ bốc họ):** Cuốn sổ nợ tín dụng đen `10a` ghi chép các khoản nợ quá hạn $\rightarrow$ Nghi vấn có đối tượng giằng co đòi/trốn nợ.
-   - **Mâu thuẫn 3 (Ân oán 30 năm trước):** Khung ảnh kỷ niệm tuổi thơ vỡ kính `p4`, mẩu báo cũ năm 1996 `p5` và tin nhắn SMS ẩn danh lúc 15:30 nhắc ngày giỗ bé Huy trong điện thoại Khang.
-   - **Mâu thuẫn 4 (Quan hệ tình ái):** Hũ trà hoa cúc dán note dặn dò của bạn gái **Trần Thị Hà** + Tin nhắn kiểm soát thể xác kỳ quái.
+1. **Về khám nghiệm tử thi & Pháp y:**
+   - Tử thi có vết rách da đụng dập chẩm gáy phải ($6.0\text{cm} \times 4.2\text{cm}$) do va đập vào cạnh bàn/tủ khi ngã, gây chấn thương sọ não kín và bất tỉnh tạm thời vào khoảng **~20:00**.
+   - Vết thương chí mạng tại tam giác cảnh cổ trái cắt đứt hoàn toàn động mạch cảnh chung, hung khí là mảnh vỡ bình trà thủy tinh dính máu thu giữ tại hiện trường (`p3`).
+   - Thời gian tử vong xác định: **Khoảng 20:45 – 21:15 đêm 24/07/2026 (trọng tâm ~21:00)**.
+   - Dấu vết bất thường: Một mảng tóc mai bên trái sát vết đâm cổ bị cắt phẳng sát da đầu bằng vật sắc nhọn (như kéo nhỏ), lọn tóc bị hung thủ mang đi.
+2. **Về các mâu thuẫn nổi cộm & Vật chứng thu thập tại hiện trường:**
+   - **Mâu thuẫn 1 (Tranh chấp đất đai):** Xấp Đơn đòi đất 200m² mang tên **Trần Ngọc Mai** (em họ nạn nhân) rơi vãi dưới sàn (`p2`).
+   - **Mâu thuẫn 2 (Khoản nợ bốc họ):** Cuốn sổ nợ tín dụng đen (`05`) thu giữ cạnh chân tủ gỗ, ghi chép các khoản nợ quá hạn (trong đó có con nợ biệt danh "Thằng Lệch Pha" nợ 300M).
+   - **Mâu thuẫn 3 (Ân oán 30 năm trước):** Dấu vân tay lạ trên tách trà (`p1`), khung ảnh kỷ niệm vỡ kính hè 1996 (`p4`), mẩu báo cũ 1996 xé vụn (`p5`), và cuộc gọi đến lúc 19:55 từ số lạ ẩn danh `0984.180.357`.
+   - **Mâu thuẫn 4 (Quan hệ tình ái):** Hũ trà hoa cúc trên bàn phòng khách cùng các tin nhắn kiểm soát, ghen tuông của bạn gái **Trần Thị Hà**.
 
 ---
 
 ### III. KẾ HOẠCH ĐIỀU TRA TIẾP THEO
-1. Phát lệnh triệu tập khẩn cấp 04 đối tượng có liên quan trực tiếp: Trần Ngọc Mai, Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà.
-2. Trưng cầu giám định kỹ thuật hình sự: Giám định chữ ký đất đai, vết hằn sổ nợ, vân tay trên hung khí, giải mã dữ liệu viễn thông.
-3. Tiếp tục lấy lời khai mở rộng các hộ dân xung quanh đường Bờ Sông.
+1. Phát lệnh triệu tập và lấy lời khai 03 đối tượng có liên quan trực tiếp ban đầu: Trần Ngọc Mai, Lê Quang Vũ, Trần Thị Hà.
+2. Trưng cầu giám định kỹ thuật hình sự: Giám định dấu vân tay trên tách trà (`p1`), phân tích dữ liệu điện thoại (`dev-00`) và tra cứu các số thuê bao lạ trong nhật ký cuộc gọi.
+3. Tiếp tục lấy lời khai nhân chứng xung quanh khu vực Đường Bờ Sông.
 
 ---
 

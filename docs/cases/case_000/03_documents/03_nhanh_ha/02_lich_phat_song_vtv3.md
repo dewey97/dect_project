@@ -4,7 +4,7 @@
 ---
 
 # LỊCH PHÁT SÓNG KÊNH VTV3 — THỨ SÁU, NGÀY 24/07/2026
-*(Tài liệu tra cứu nghiệp vụ — Bác bỏ lời khai ngoại phạm của nghi phạm Trần Thị Hà)*
+*(Tài liệu tra cứu nghiệp vụ Mã: `02` — Bác bỏ lời khai ngoại phạm của nghi phạm Trần Thị Hà)*
 
 ---
 

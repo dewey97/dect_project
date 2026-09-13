@@ -107,15 +107,15 @@ Mai về đúng 19:00   đầu ngõ bắt xe ôm   bà Lụa chốt cửa ngủ 
   │                     │                   │                    │                     │
   ├─────────────────────┼───────────────────┼────────────────────┼─────────────────────┤
 Bà Lụa quét ngõ,      Bà Lụa gọi 113 /    Công an Phường &     Khám nghiệm sơ bộ:    Triệu tập khẩn cấp
-thấy cửa mở toang,    báo Công an Phường  Đội Trọng án PC02    Thu giữ Đơn tố cáo    Trần Ngọc Mai & 
-phát hiện thi thể     báo tin khẩn cấp    phong tỏa hiện trường ghi tên Trần Ngọc Mai Lê Quang Vũ
+thấy cửa mở toang,    báo Công an Phường  Đội Trọng án PC02    Thu giữ Đơn đòi đất   Trần Ngọc Mai & 
+phát hiện thi thể     báo tin khẩn cấp    phong tỏa hiện trường 200m² tên Mai (p2)   Lê Quang Vũ
 ```
 
 1. **Đêm 24/07 (Sau 20:15):** Thấy bên nhà Khang im ắng, bà Lụa khóa cửa nhà mình đi ngủ.
 2. **06:30 (Sáng 25/07) – Phát hiện hiện trường:** Sáng sớm, bà Lụa ra quét ngõ thì ngạc nhiên thấy cổng sắt và cửa nhà Khang vẫn mở toang từ đêm qua, đèn tuýp phòng khách sáng trưng. Thấy lạ, bà bước sang ngó vào và gọi: *"Khang ơi, dậy đóng cửa tắt đèn đi chứ mày!"* Không ai đáp, bà bước vào thì kinh hoàng phát hiện Khang đang nằm gục sấp dưới sàn nhà, toàn thân co cứng trên vũng máu đen sẫm cạnh bộ bình trà vỡ vụn.
 3. **06:45 – Báo án khẩn cấp:** Quá hoảng hốt, bà Lụa chạy thét ra đầu ngõ tri hô dân phố và bấm điện thoại gọi báo Công an Phường Phân khu Cảng.
 4. **07:15 – Lực lượng chức năng tiếp cận:** Công an Phường, Đội Trọng án PC02 và Phòng Kỹ thuật Hình sự (PC09) có mặt, giăng dây phong tỏa hiện trường, tiến hành khám nghiệm tử thi và thu giữ dấu vết sinh học.
-5. **07:45 – Thu thập manh mối khẩn cấp:** Trong quá trình khám nghiệm hiện trường, điều tra viên phát hiện tập tài liệu `Đơn tố cáo lừa đảo chiếm đoạt tài sản` văng vãi dưới sàn, trên đó ghi rõ họ tên, số điện thoại và địa chỉ thường trú của **Trần Ngọc Mai** (Phố Đoàn Kết).
+5. **07:45 – Thu thập manh mối khẩn cấp:** Trong quá trình khám nghiệm hiện trường, điều tra viên phát hiện tập tài liệu `Đơn đòi đất 200m² di sản thừa kế` (`p2`) văng vãi dưới sàn, trên đó ghi rõ họ tên, số điện thoại và địa chỉ thường trú của **Trần Ngọc Mai** (Phố Đoàn Kết).
 6. **08:30 – Triệu tập Mai & Vũ:** Cơ quan Cảnh sát điều tra phát lệnh triệu tập khẩn cấp đối với Trần Ngọc Mai và Lê Quang Vũ lên trụ sở Công an để lấy lời khai đầu tiên.
 
 ---

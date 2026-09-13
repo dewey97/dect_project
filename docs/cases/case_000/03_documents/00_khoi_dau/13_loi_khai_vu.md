@@ -34,7 +34,7 @@ Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 * **Đáp (Lê Quang Vũ):** Khoảng 18h30 hai vợ chồng tôi đi chung xe máy sang nhà anh Khang. Nói chuyện một lúc thì vợ tôi bực tức ném giấy tờ rồi nổ máy xe phóng về trước. Lúc vợ tôi dắt xe ra thì tôi cũng đi bộ theo ra cổng cùng lúc với vợ tôi, rồi tôi đi bộ ra đầu ngõ mở app đặt xe ôm công nghệ đi nhậu giải sầu chứ không ở lại trong nhà làm gì. Vợ tôi vừa phóng xe đi là tôi cũng bắt xe đi luôn! Đây này, các anh xem ảnh chụp màn hình app xe của tôi đây!
 
 * **Hỏi (ĐTV Lê Minh):** Anh khai bắt xe đi nhậu, vậy cụ thể anh uống ở quán nào, ngồi với ai? Có ai làm chứng cho anh không?
-* **Đáp (Lê Quang Vũ):** Tôi bắt xe ra Quán Bia 88 ven sông Khu Cầu Cảng... Tôi buồn chuyện gia đình nên ngồi một mình ở bàn số 7 sát bờ sông gọi 1 Set Nhắm Bình Dân với 3 chai bia Hà Nội ngồi uống giải sầu suốt từ lúc gần 20h đến hơn 21h, không ngồi với ai và cũng chẳng nói chuyện với ai cả.
+* **Đáp (Lê Quang Vũ):** Tôi bắt xe ra Quán Bia 88 ven sông Khu Cầu Cảng... Tôi buồn chuyện gia đình nên ngồi một mình ở bàn số 7 sát bờ sông gọi 1 đĩa nem với nửa thùng bia ngồi uống giải sầu suốt từ lúc gần 20h đến hơn 21h, không ngồi với ai và cũng chẳng nói chuyện với ai cả.
 
 * **Hỏi (ĐTV Lê Minh):** Sau khi uống bia xong ở Quán Bia 88, anh về nhà bằng phương tiện gì?
 

@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `10b/BB-HC`  
+Số: `07/BB-HC`  
 *Hà Nội, ngày 26 tháng 07 năm 2026*
 
 ---

@@ -5,7 +5,7 @@
 
 **VIỆN KHOA HỌC HÌNH SỰ — BỘ CÔNG AN**  
 **PHÒNG GIÁM ĐỊNH SINH HỌC PHÁP Y (C09)**  
-Số: `14b/KL-GDADN`  
+Số: `04/KL-GDADN`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---

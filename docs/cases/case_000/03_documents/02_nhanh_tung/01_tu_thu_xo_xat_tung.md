@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `11/BB-HC`  
+Số: `01/BB-HC`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
@@ -24,13 +24,13 @@ Sau khi điều tra viên đưa ra các chứng cứ: Vết bầm tím gò má v
 
 > *"Thưa cán bộ, tôi xin khai hết sự thật! Suốt 30 năm qua, gia đình tôi chưa bao giờ nguôi ngoai nỗi đau mất thằng Huy, còn thằng Khang thì chưa từng một lần cúi đầu nhận lỗi hay thắp cho em tôi một nén nhang.
 >
-> Chiều 24/07 đúng ngày giỗ tròn 30 năm của em tôi, sau khi nhắn tin hỏi nó có gì muốn nói với thằng Huy không nhưng không thấy nó trả lời, đến 20h00 tôi cầm mẩu báo năm xưa sang nhà thằng Khang để bắt nó phải cùng tôi ra nghĩa trang tạ tội trước bia mộ thằng Huy. Nhưng thằng Khang trơ tráo, buông lời cười cợt, nhạo báng thách thức.
+> Chiều tối 24/07 đúng ngày giỗ tròn 30 năm của em tôi, sau khi gọi điện thoại lúc 19h55 bảo muốn sang gặp nói chuyện nhưng nó tỏ thái độ gạt đi, đến 20h00 tôi quyết định cầm mẩu báo năm xưa sang tận nhà thằng Khang để bắt nó phải cùng tôi ra nghĩa trang tạ tội trước bia mộ thằng Huy. Tôi ngồi uống trà với nó, nhưng thằng Khang trơ tráo, buông lời cười cợt, nhạo báng thách thức.
 >
-> Cơn uất hận bùng lên, tôi lao vào giằng co, xô mạnh thằng Khang ngã đập đầu vào cạnh bàn trà làm rơi mẩu báo, đổ vỡ toang bộ bình trà thủy tinh và làm rơi vỡ cái khung ảnh kỷ niệm xóm hồi nhỏ trên kệ xuống sàn. Khang đấm trúng má tôi một cái trước khi ngã vật ra sàn rồi nằm im bất động, mắt nhắm nghiền.
+> Cơn uất hận bùng lên, tôi xé nát mẩu báo ném xuống sàn rồi lao vào giằng co, xô mạnh thằng Khang ngã đập đầu vào cạnh bàn trà làm đổ vỡ toang bộ bình trà thủy tinh và làm rơi vỡ cái khung ảnh kỷ niệm xóm hồi nhỏ trên kệ xuống sàn. Khang đấm trúng má tôi một cái trước khi ngã vật ra sàn rồi nằm im bất động, mắt nhắm nghiền.
 >
-> Đến khoảng 20:15, tôi mở cửa nách sau nhà luồn ra đầu ngõ bắt xe ôm về phòng trọ công nhân ở Cầu Bươu. Lúc chạy qua đoạn giao cắt đường sắt đầu ngõ, tôi thấy nhân viên gác chắn đang chuẩn bị ca trực và loa phát thanh phường thông báo kết thúc giờ gom rác ngõ Bờ Sông trước khi đóng chắn đón chuyến tàu hàng qua lúc 20:30.
+> Đến khoảng 20:15, tôi quá hoảng sợ nên mở cửa nách sau nhà luồn ra đầu ngõ bắt xe ôm về phòng trọ công nhân ở Cầu Bươu. Lúc chạy qua đoạn giao cắt đường sắt đầu ngõ, tôi thấy nhân viên gác chắn đang chuẩn bị ca trực và loa phát thanh phường thông báo kết thúc giờ gom rác ngõ Bờ Sông trước khi đóng chắn đón chuyến tàu hàng qua lúc 20:30.
 >
-> Tôi căm thù nó thật, nhưng lúc tôi đi lúc 20:15 nó vẫn còn sống sờ sờ và thở đều! Tôi cứ tưởng cùng lắm nó chỉ nằm mê man một lúc rồi tự tỉnh dậy, ai ngờ sáng hôm sau nghe tin nó bị ai đó đâm chết! Cán bộ ơi, tôi chỉ xô ngã nó thôi chứ tôi thề có vong linh em tôi là tôi không hề giết nó!"*
+> Tôi căm thù nó thật, nhưng lúc tôi hoảng sợ bỏ chạy lúc 20:15 nó vẫn còn sống và thở đều! Tôi cứ tưởng nó chỉ ngất mê man một lúc rồi tự tỉnh lại, ai ngờ sáng hôm sau nghe tin nó bị ai đó đâm chết! Cán bộ ơi, tôi chỉ xô ngã nó thôi chứ tôi thề có vong linh em tôi là tôi không hề giết nó!"*
 
 ---
 

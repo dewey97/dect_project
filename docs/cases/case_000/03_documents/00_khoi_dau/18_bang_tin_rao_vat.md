@@ -1,6 +1,6 @@
 # BẢNG ẢNH KHÁM NGHIỆM NGOẠI CẢNH — BỜ TƯỜNG & BẢNG TIN TRƯỚC CỔNG
 **Địa điểm: Trước cổng nhà số 14, Đường Bờ Sông, Phường Phân khu Cảng**
-*(Mã tài liệu hiện trường: `p9` — Đơn vị thực hiện: Đội Kỹ thuật hình sự PC09)*
+*(Mã tài liệu hiện trường: `18` — Đơn vị thực hiện: Đội Kỹ thuật hình sự PC09)*
 
 ---
 
@@ -32,7 +32,7 @@
 │   │ XÂY TRÁT ỐP LÁT, SỬA ĐIỆN NƯỚC — VIỆC GÌ CŨNG LÀM                   │   │
 │   │                                                                     │   │
 │   │ Thợ nề tự do, nhận làm công nhật hoặc khoán gọn, giá bình dân.      │   │
-│   │ Liên hệ trực tiếp: 0913.882.901                                     │   │
+│   │ Liên hệ trực tiếp: 0984.180.357                                     │   │
 │   │ (Bác nào cần sửa chữa lặt vặt cứ gọi trực tiếp cho em Tùng nhé).    │   │
 │   └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
@@ -67,6 +67,6 @@
 
 ### III. Ý NGHĨA NGHIỆP VỤ & PHỤC VỤ ĐIỀU TRA
 1. **Rà soát diện mâu thuẫn bên ngoài:** Các vết sơn đỏ chứng minh nạn nhân có rất nhiều kẻ thù và con nợ căm ghét.
-2. **Xác minh số máy lạ (`0913.882.901`):** Đối chiếu với số gửi SMS ẩn danh 15:30 trong máy Khang (`16`) $\rightarrow$ Xác định số điện thoại trên là của thợ nề **Nguyễn Thanh Tùng** (mở khóa Tuyến Điều Tra B).
+2. **Xác minh số máy lạ (`0984.180.357`):** Đối chiếu với số gọi đến lúc 19:55 trong Nhật ký cuộc gọi máy Khang (trên điện thoại dev-00) $\rightarrow$ Xác định số điện thoại trên là của thợ nề **Nguyễn Thanh Tùng** (mở khóa Tuyến Điều Tra B).
 3. **Khớp nối xác thực lời khai của Mai (`12`):** Mai khai về nhà lúc 19:45, đến hơn 20h đang xem tivi thì bị mất sóng cáp $\rightarrow$ Mẩu thông báo của Tổ dân phố là chi tiết khách quan xác nhận tính trung thực trong lời khai sinh hoạt buổi tối của Mai.
-4. **Cơ sở dữ liệu giờ tàu chạy qua ngõ (`20h30`):** Mẩu thông báo thu gom rác cung cấp mốc giờ cố định của chuyến tàu hàng Bắc – Nam qua ngõ Bờ Sông lúc **20:30**, làm căn cứ đối chiếu bóc trần âm thanh còi tàu trong Voicemail 20:32 của Trần Thị Hà (`16`).
+4. **Cơ sở dữ liệu giờ tàu chạy qua ngõ (`20h30`):** Mẩu thông báo thu gom rác cung cấp mốc giờ cố định của chuyến tàu hàng Bắc – Nam qua ngõ Bờ Sông lúc **20:30**, làm căn cứ đối chiếu bóc trần âm thanh còi tàu trong Voicemail 20:32 của Trần Thị Hà (trên điện thoại dev-00 và Báo cáo giám định 01).

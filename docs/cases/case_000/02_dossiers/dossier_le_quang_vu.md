@@ -99,7 +99,7 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 * **18:30 – 19:00:** Vũ ngồi im trong khi Mai cãi nhau đòi đất với Khang. Đúng 19:00 Mai phóng xe về trước.
 * **19:00 – 19:25:** Vũ quỳ lạy xin hoãn món nợ 300 triệu. Khang chửi bới, rút cuốn sổ da đen đập mạnh vào ngực Vũ và đe dọa in 100 tờ rơi rải khắp phố Đoàn Kết. Vũ suy sụp, hoảng sợ vùng chạy thoát ra cửa sau luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25:40.
 * **19:25:** Đứng ở đầu ngõ đợi xe, Vũ nhìn thấy bóng một người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
-* **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 Set Nhắm Bình Dân + 3 chai bia Hà Nội.
+* **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 đĩa nem + nửa thùng bia ngồi giải sầu.
 * **20:45:** Vũ thanh toán chuyển khoản **195.000đ** (Bàn số 7).
 * **21:30:** Vũ đi xe ôm về đến nhà tại số 45 Phố Đoàn Kết đi ngủ.
 
@@ -107,17 +107,14 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 
 ## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
 
-### 1. Cơ chế 1: Đối chiếu Sổ nợ `10a` & Biệt danh "Thằng Lệch Pha"
-* **Vật chứng:** Cuốn sổ ghi nợ tín dụng đen `10a` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.91 — Hạn: 20/07 — Ghi chú: ~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Phải mách nhà nó...*.
-* **Khớp nối suy luận:** Nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08` + địa chỉ 45 Đoàn Kết + SĐT `0988.20.09.91` $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ!
+### 1. Cơ chế 1: Đối chiếu Sổ nợ `05` & Biệt danh "Thằng Lệch Pha"
+* **Vật chứng:** Cuốn sổ ghi nợ tín dụng đen `05` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.91 — Hạn: 20/07 — Ghi chú: ~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Phải mách nhà nó...*.
+* **Khớp nối suy luận:** Nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08b` + địa chỉ 45 Đoàn Kết + SĐT `0988.20.09.91` $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ!
 
 ### 2. Cơ chế 2: Câu đố Sổ thu chi Quán Bia 88 (`06_so_thu_chi_quan_bia.md`)
 * **Dữ liệu đối chiếu:**
-  * Vũ khai gọi: **1 Set Nhắm Bình Dân + 3 chai bia Hà Nội**.
-  * Bàn 1: 4 bia Hà Nội = 100.000đ $\rightarrow$ 1 chai = **25.000đ** (3 chai = **75.000đ**).
-  * Bàn 4: 1 Set Nhắm Bình Dân = **120.000đ**.
-  * Tổng số tiền: $75.000\text{đ} + 120.000\text{đ} = \mathbf{195.000\text{đ}}$.
-* **Kết quả quét sổ:** Dòng Bàn 7: *Bàn 7 (Khách lẻ): 195.000đ ➔ CK (20h45)*.
+  * Vũ khai tại Lời khai lần 2 (`07`): Ngồi uống bia một mình tại bàn ven sông, gọi **1 đĩa nem + nửa thùng bia**.
+  * Quét sổ thu chi Quán 88 (`06`): Duy nhất dòng **Bàn 7 (1 khách)** có hóa đơn thanh toán chuyển khoản đúng số tiền: `B7 (1 khách): -> 195k (CK 20:45)`.
 * **Ý nghĩa phá án:** Lúc **20:45**, Vũ đang chuyển khoản tại Quán Bia 88 cách hiện trường **3.8 km** $\rightarrow$ Không thể có mặt tại nhà Khang lúc 20:45 (thời điểm hung thủ đứng rình) và 21:00 (lúc nạn nhân bị sát hại) $\rightarrow$ **MINH OAN TUYỆT ĐỐI CHO VŨ!**
 
 ---

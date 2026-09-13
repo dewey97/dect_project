@@ -5,13 +5,13 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `10a/BB-TS`  
+Số: `05/BB-TS`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
 
 # BÁO CÁO TRÍCH SAO SỔ GHI NỢ TÍN DỤNG ĐEN
-*(Vật chứng thu giữ tại hiện trường: Cuốn sổ tay bìa da đen `10a`)*
+*(Vật chứng thu giữ tại hiện trường: Cuốn sổ tay bìa da đen `05`)*
 
 ---
 
@@ -32,7 +32,7 @@ Số: `10a/BB-TS`
 │ 01    │ Tùng Xăm                     │  50.000.000 đ  │ 0904.112.345   │ 15/07  │ Đã nộp đủ họ tháng 6. │
 │ 02    │ Hải Lác Bến Phà              │ 120.000.000 đ  │ 0918.776.543   │ 20/07  │ Trốn khỏi nơi cư trú. │
 │ 03    │ Chị Lan Quán Nước            │  30.000.000 đ  │ 0932.889.102   │ 25/07  │ Đóng lãi ngày đủ.     │
-│ 04    │ Đạt Gà Chợ Cảng              │  80.000.000 đ  │ 0984.331.098   │ 28/07  │ Xin khất thêm 1 tuần. │
+│ 04    │ Đạt Gà Chợ Cảng              │  80.000.000 đ  │ 0912.331.888   │ 28/07  │ Xin khất thêm 1 tuần. │
 │ 05    │ Thằng Lệch Pha               │ 300.000.000 đ  │ 0988.20.09.91  │ 20/07  │ ~~Hẹn trả ở 45 Đoàn Kết~~│
 │       │                              │                │                │        │ Bùng hẹn! Phải mách nhà nó...│
 │ 06    │ Cường Mũi Két                │ 150.000.000 đ  │ 0973.665.412   │ 05/08  │ Giữ giấy tờ xe Wave.  │
@@ -46,8 +46,8 @@ Số: `10a/BB-TS`
 ### III. KẾT QUẢ RÀ SOÁT & ĐỐI CHIẾU
 1. **Dòng 05 — Thằng Lệch Pha (300.000.000 đ — SĐT: `0988.20.09.91`):**
    - Ban đầu có dòng ghi chú viết tay *"Hẹn trả ở 45 Đoàn Kết"* nhưng đã bị Khang dùng bút bi gạch xóa ngang (dấu hiệu con nợ trốn tránh, bùng hẹn trả tiền).
-   - Tiếp đó, Khang gửi tin nhắn SMS đe dọa lúc 14:22 ngày 23/07 (`16`): *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"*.
-   - Đối chiếu hồ sơ lý lịch (`08`): **Lê Quang Vũ** sinh ngày **20/09/1991**, làm nghề **kỹ sư điện** có tật **mắt trái lác nhẹ** (biệt danh kép "Lệch Pha"), ở rể tại **Số 45 Phố Đoàn Kết**.
+   - Tiếp đó, Khang gửi tin nhắn SMS đe dọa lúc 14:22 ngày 23/07 (trên điện thoại dev-00): *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"*.
+   - Đối chiếu hồ sơ lý lịch (`08b`): **Lê Quang Vũ** sinh ngày **20/09/1991**, làm nghề **kỹ sư điện** có tật **mắt trái lác nhẹ** (biệt danh kép "Lệch Pha"), ở rể tại **Số 45 Phố Đoàn Kết**.
 2. $\rightarrow$ **Căn cứ xác lập Lê Quang Vũ chính là con nợ 300M bùng hẹn và đang bị siết nợ gắt gao.**
 
 ---

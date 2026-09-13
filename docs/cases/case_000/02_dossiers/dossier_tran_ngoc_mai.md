@@ -10,7 +10,7 @@
 
 ---
 
-```
+```text
                        ┌──────────────────────────────────────┐
                        │  ẢNH HỒ SƠ CĂN CƯỚC ĐIỀU TRA (ID)    │
                        │  MÃ SỐ ĐỐI TƯỢNG: 000-SP-MAI-1992    │
@@ -26,10 +26,10 @@
 2. [II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI BAN ĐẦU](#ii-dấu-hiệu-cài-cắm-sớm--hành-vi-ban-đầu)
 3. [III. BẢN CHẤT XUNG ĐỘT & ĐỘNG CƠ TRANH CHẤP ĐẤT ĐAI](#iii-bản-chất-xung-đột--động-cơ-tranh-chấp-đất-đai)
 4. [IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT](#iv-mối-quan-hệ-đan-xen-với-các-nhân-vật)
-5. [V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2026 - ĐÊM MƯA LỚN)](#v-dòng-thời-gian-hành-động-đêm-án-mạng-24072026---đêm-mưa-lớn)
+5. [V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2026)](#v-dòng-thời-gian-hành-động-đêm-án-mạng-24072026)
 6. [VI. HỆ THỐNG VẬT CHỨNG & TÀI LIỆU LIÊN QUAN ĐẾN MAI](#vi-hệ-thống-vật-chứng--tài-liệu-liên-quan-đến-mai)
 7. [VII. SƠ HỞ LỜI KHAI, RED HERRING & BẰNG CHỨNG NGOẠI PHẠM](#vii-sơ-hở-lời-khai-red-herring--bằng-chứng-ngoại-phạm)
-8. [VIII. KÝ SỰ HẬU ÁN: BẢN DI CHÚC CỦA ÔNG NỘI & LỜI TẠ TỘI MUỘN MÀNG](#viii-ký-sự-hậu-án-bản-di-chúc-của-ông-nội--lời-tạ-tội-muộn-màng)
+8. [VIII. KÝ SỰ HẬU ÁN: BẢN DI CHÚC CỦA ÔNG NỘI & SỰ HÀN GẮN](#viii-ký-sự-hậu-án-bản-di-chúc-của-ông-nội--sự-hàn-gắn)
 
 ---
 
@@ -52,9 +52,9 @@
 
 ## II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI BAN ĐẦU
 
-1. **Xấp tài liệu ném tại hiện trường:** Đơn tố cáo và thỏa thuận hủy ủy quyền mang tên Mai rơi vãi dưới sàn phòng khách (`p2`).
-2. **Dấu vết máu `M1` trên mép bàn:** Vết máu khô nhỏ giọt từ ngón tay bị xước của Mai trong lúc giằng co ném đơn.
-3. **Lời khai về sự cố mất tín hiệu truyền hình:** Mai khai về nhà lúc 19:45, đang xem tivi đến 20:10 thì mất sóng cáp do sự cố đứt cáp quang $\rightarrow$ Khớp nối với thông báo của Tổ dân phố trên Bảng tin `18`.
+1. **Xấp tài liệu ném tại hiện trường (`p2`):** Đơn đòi đất 200m² và hồ sơ pháp lý mang tên Mai rơi vãi dưới sàn phòng khách.
+2. **Thời điểm rời hiện trường:** Mai khai cãi nhau xong nổ máy xe phóng về nhà lúc ~19:00. Khớp nối chính xác với tiếng xe máy nổ lúc nhạc Thời sự 19h00 VTV1 trong Lời khai nhân chứng bà Lụa (`11`).
+3. **Lời khai về sự cố mất tín hiệu truyền hình:** Mai khai về đến nhà lúc 19:45, đang xem tivi đến 20:10 thì mất sóng cáp do sự cố đứt cáp quang $\rightarrow$ Khớp nối với thông báo trên Bảng tin khu phố Đoàn Kết (`18`).
 
 ---
 
@@ -66,26 +66,23 @@
          ┌─────────────────────────────────┴─────────────────────────────────┐
          ▼                                                                   ▼
 [NGUYỄN VĂN KHANG]                                                   [TRẦN NGỌC MAI]
-- Lén đồ nét chữ ký Mai (`Tracing Fraud`)                            - Phát hiện bị lừa qua người quen phòng TN&MT.
-- Làm Giấy ủy quyền giả mạo                                          - Soạn Đơn tố cáo lừa đảo & Thỏa thuận trả đất.
-- Đứng tên Sổ đỏ 1 mình & Cầm cố Ngân hàng                            - Tuyên bố: "Nếu không ký, tao sẽ đưa mày ra tòa tù mọt gông!"
+- Gian dối chiếm đoạt quyền đứng tên Sổ đỏ                           - Phát hiện bị lừa qua phòng TN&MT.
+- Đem thế chấp ngân hàng lấy vốn bốc họ                               - Thuê luật sư soạn Đơn đòi lại đất 200m².
+- Thách thức kiện cáo ra tòa                                         - Tuyên bố: "Tao sẽ lấy lại đất bằng pháp luật!"
 ```
 
-1. **Nguồn gốc tài sản:** Ông nội mất để lại mảnh đất 200m² tại số 14 Đường Bờ Sông. Di nguyện của ông là chia đều cho 2 nhánh con cháu (Biên bản họp gia đình năm 2024).
-2. **Hành vi gian dối của Khang:** Khang lợi dụng lúc giữ giấy tờ gốc đã dùng kỹ thuật **đồ nét (tracing)** chữ ký của Mai từ Biên bản họp gia đình sang Giấy ủy quyền toàn quyền, đứng tên Sổ đỏ rồi thế chấp ngân hàng lấy tiền bốc họ.
-3. **Sự bùng nổ của Mai:** Mai phát hiện và thuê luật sư soạn sẵn:
-   - `Giấy ủy quyền` (`EV-SIGN-01` — Bản giả mạo do Khang làm).
-   - `Biên bản họp gia đình` (`EV-SIGN-02` — Bản gốc chữ ký thật 2024).
-   - `Đơn tố cáo lừa đảo` (`EV-SIGN-03` — Chữ ký tươi mới nhất 2026).
+1. **Nguồn gốc tài sản:** Mảnh đất 200m² tại số 14 Đường Bờ Sông là di sản của ông nội để lại.
+2. **Hành vi của Khang:** Khang lợi dụng việc giữ giấy tờ đã gian dối đứng tên một mình rồi đem thế chấp ngân hàng.
+3. **Phản ứng của Mai:** Mai thuê luật sư làm đơn đòi đất và mang trực tiếp sang nhà Khang lúc 18:30 ngày 24/07 ép Khang ký thỏa thuận trả đất. Khi Khang thách thức, Mai bực tức ném xấp đơn xuống sàn rồi bỏ về.
 
 ---
 
 ## IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT
 
-* **Với Nạn nhân Nguyễn Văn Khang (Anh họ):** Từng chơi chung xóm thuở nhỏ, nhưng ghê tởm thói ăn chơi, cho vay nặng lãi và việc Khang cướp trắng mảnh đất hương hỏa.
-* **Với Lê Quang Vũ (Chồng):** Yêu thương chồng nhưng nghiêm khắc, không hề biết Vũ đang giấu mình nợ Khang 300 triệu tiền họ.
+* **Với Nạn nhân Nguyễn Văn Khang (Anh họ):** Từng chơi chung xóm thuở nhỏ, nhưng ghê tởm thói ăn chơi, cho vay nặng lãi và việc Khang chiếm đoạt mảnh đất hương hỏa.
+* **Với Lê Quang Vũ (Chồng):** Yêu thương chồng nhưng nghiêm khắc, không hề biết Vũ đang giấu mình nợ Khang 300 triệu tiền bốc họ.
 * **Với Nguyễn Thanh Tùng (Bạn cũ thuở nhỏ):** Nhớ Tùng là người anh cả thời thơ ấu trong biến cố bé Gia Huy năm 1996.
-* **Với Trần Thị Hà:** Coi Hà là kẻ cuồng yêu mù quáng khi bám theo Khang dù liên tục bị bạo hành, lừa dối.
+* **Với Trần Thị Hà:** Coi Hà là kẻ mù quáng khi bám theo Khang dù liên tục bị đối xử tệ bạc.
 
 ---
 
@@ -100,10 +97,10 @@ Chở Vũ sang          Ném hồ sơ xuống sàn,  Về đến nhà số 45   
 ```
 
 * **18:30:** Mai đi xe máy chở Vũ đến nhà Khang tại số 14 Đường Bờ Sông, xông vào đập bàn đòi Khang ký trả đất.
-* **19:00:** Khang thách thức kiện cáo. Mai phẫn nộ ném toàn bộ hồ sơ và Đơn tố cáo xuống sàn nhà, nổ máy xe máy phóng vụt về nhà một mình (khớp với tiếng xe máy lúc nhạc Thời sự 19h00 VTV1 trong lời khai bà Lụa `11`).
+* **19:00:** Khang thách thức kiện cáo. Mai phẫn nộ ném toàn bộ hồ sơ và Đơn đòi đất xuống sàn nhà, nổ máy xe máy phóng vụt về nhà một mình (khớp với tiếng xe máy lúc nhạc Thời sự 19h00 VTV1 trong lời khai bà Lụa `11`).
 * **19:45:** Mai về đến nhà tại số 45 Phố Đoàn Kết (cách hiện trường 4km), tắm rửa rồi bật tivi xem.
 * **20:10:** Tín hiệu truyền hình cáp bị mất do sự cố đứt cáp quang. Mai tắt tivi vào phòng ngủ nghỉ ngơi suốt đêm.
-* **08:30 (Sáng 25/07):** Công an triệu tập Mai lên làm việc sau khi phát hiện Đơn tố cáo rơi tại hiện trường.
+* **08:30 (Sáng 25/07):** Công an triệu tập Mai lên làm việc sau khi phát hiện Đơn đòi đất rơi tại hiện trường (`p2`).
 
 ---
 
@@ -111,30 +108,32 @@ Chở Vũ sang          Ném hồ sơ xuống sàn,  Về đến nhà số 45   
 
 | Mã Vật Chứng | Tên Tài Liệu / Vật Phẩm | Mô Tả & Ý Nghĩa Nghiệp Vụ |
 | :--- | :--- | :--- |
-| `EV-SIGN-01` | **Giấy ủy quyền đất** | Chữ ký mang tên Mai bị đồ nét tracing từ bản gốc 2024. |
-| `EV-SIGN-02` | **Biên bản họp gia đình 2024 (Gốc)** | Chữ ký thật của Mai nhiều năm trước. |
-| `EV-SIGN-03` | **Đơn tố cáo lừa đảo chiếm đoạt tài sản** | Chữ ký tươi mới nhất kèm dấu luật sư và vết máu xước tay `M1`. |
+| **`p2`** | **Ảnh Đơn đòi đất rơi vãi dưới sàn** | Xấp hồ sơ đòi đất 200m² tại hiện trường $\rightarrow$ Xác định động cơ mâu thuẫn tranh chấp đất. |
+| **`12`** | **Lời khai Trần Ngọc Mai** | Khai ném hồ sơ rồi phóng xe về nhà (~19:45), xem TV đến 20:10 thì mất sóng cáp. |
+| **`11`** | **Lời khai bà Lụa** | Xác nhận tiếng xe máy phóng đi đúng lúc nhạc Thời sự VTV1 cất lên (19:00). |
+| **`18`** | **Bảng tin rao vặt khu phố Đoàn Kết** | Thông báo sự cố đứt cáp quang lúc 20:10 ở Phố Đoàn Kết $\rightarrow$ Xác thực ngoại phạm ở nhà. |
 
 ---
 
 ## VII. SƠ HỞ LỜI KHAI, RED HERRING & BẰNG CHỨNG NGOẠI PHẠM
 
-### 1. Cơ chế Phá án: Kỹ thuật Đồ nét chữ ký (Signature Tracing Fraud)
-* **Thao tác:** Đặt chồng khít mẫu chữ ký `EV-SIGN-01` và `EV-SIGN-02` dưới ánh sáng.
-* **Kết quả:** Trùng khớp 100% từng nét uốn, góc nghiêng và điểm dừng nét $\rightarrow$ Khẳng định Khang dùng kỹ thuật tracing làm giả, minh oan cho Mai về cáo buộc đồng thuận bán đất rồi giết người diệt khẩu.
+### 1. Bẫy Nghi Vấn Ban Đầu (Red Herring)
+* Đơn đòi đất `p2` rơi vãi ngay tại hiện trường án mạng khiến Mai trở thành nghi phạm số 1 về động cơ tranh chấp tài sản.
 
-### 2. Bằng chứng Ngoại phạm Vững chắc
-* Mai rời hiện trường lúc **19:00**, về đến nhà Phố Đoàn Kết lúc **19:45** (cách 4km).
-* Lời khai sinh hoạt buổi tối khớp nối với sự cố mất cáp tivi lúc 20:10 trên Bảng tin khu phố `18`.
+### 2. Bằng chứng Ngoại phạm Vững chắc Được Xác Thực
+* **Mốc giờ rời hiện trường:** Mai rời đi lúc **19:00** (khớp nhạc Thời sự 19:00 VTV1 trong lời khai bà Lụa `11`).
+* **Mốc giờ về đến nhà:** Mai về đến nhà Phố Đoàn Kết lúc **19:45** (cách hiện trường 4km).
+* **Chứng cứ khách quan độc lập:** Sự cố đứt cáp quang lúc **20:10** trên Bảng tin khu phố `18` khớp hoàn hảo với lời khai sinh hoạt buổi tối của Mai.
 * $\rightarrow$ **MINH OAN TOÀN DIỆN CHO MAI VÔ TỘI.**
 
 ---
 
-## VIII. KÝ SỰ HẬU ÁN: BẢN DI CHÚC CỦA ÔNG NỘI & LỜI TẠ TỘI MUỘN MÀNG
+## VIII. KÝ SỰ HẬU ÁN: BẢN DI CHÚC CỦA ÔNG NỘI & SỰ HÀN GẮN
 
-Khi cơ quan điều tra trao trả lại các giấy tờ di sản cho Mai, hủy bỏ Giấy ủy quyền giả mạo và trao trả 50% quyền sở hữu mảnh đất 200m² hương hỏa, Mai đã cùng Vũ bán bớt một phần đất để trả dứt điểm khoản nợ tín dụng đen 300 triệu, hàn gắn lại gia đình.
+Sau khi vụ án khép lại, cơ quan chức năng hủy bỏ các thủ tục chuyển nhượng sai trái, trao trả quyền sở hữu hợp pháp mảnh đất cho Mai. Mai đã cùng Vũ bán bớt một phần đất để trả dứt điểm khoản nợ tín dụng đen 300 triệu của Vũ, hàn gắn lại gia đình và khép lại bi kịch tranh chấp đất đai.
 
 ---
+
 **NGƯỜI LẬP HỒ SƠ**  
 *Đại úy Lê Minh — Cán bộ Điều tra Đội Trọng án*  
 *(Đã ký và đóng dấu)*

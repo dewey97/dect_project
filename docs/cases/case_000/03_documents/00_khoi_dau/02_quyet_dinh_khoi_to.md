@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **CƠ QUAN CẢNH SÁT ĐIỀU TRA (PC02)**  
-Số: `01/QĐ-KTVA`  
+Số: `02/QĐ-KTVA`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
@@ -25,7 +25,7 @@ Số: `01/QĐ-KTVA`
 
 ### QUYẾT ĐỊNH:
 
-1. **Điều 1:** Khởi tố vụ án hình sự: **"GIẾT NGƯỜI"** xảy ra vào đêm ngày 24/07/2026 tại số 14 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội. Nạn nhân bị sát hại: **Nguyễn Văn Khang (SN 1993)**.
+1. **Điều 1:** Khởi tố vụ án hình sự: **"GIẾT NGƯỜI"** xảy ra vào đêm ngày 24/07/2026 tại số 14 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội. Nạn nhân bị sát hại: **Nguyễn Văn Khang (SN 1988)**.
 2. **Điều 2:** Giao hồ sơ vụ án cho Đội Điều tra Trọng án (Đội 2) thuộc Phòng Cảnh sát Hình sự (PC02) tiến hành điều tra theo thẩm quyền tố tụng.
 3. **Điều 3:** Quyết định này được gửi đến Viện Kiểm sát nhân dân TP. Hà Nội để kiểm sát việc khởi tố theo quy định của pháp luật.
 
