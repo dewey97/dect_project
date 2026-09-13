@@ -107,11 +107,8 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 - `16b_bien_ban_binh_coi.md` (Biên bản thông tin Bình Còi - cuộc gọi 18:00 - Nhiễu)
 
 ### 4. Tuyến C — Nhánh Trần Thị Hà (`03_nhanh_ha/`):
-- `01_giam_dinh_am_thanh_coi_tau.md` (Báo cáo thực nghiệm âm thanh còi tàu & chuông gác chắn lúc 20:30)
-- `02_lich_phat_song_vtv3.md` (Trích xuất lịch phát sóng VTV3 tối thứ Sáu: Gameshow, không có phim bộ)
-- `03_kham_xet_phong_ha.md` (Biên bản khám xét phòng Hà: thu giữ áo gió dính phấn hoa xoan & lọn tóc mai dính máu giấu trong áo ngực)
-- `04_giam_dinh_adn_lon_toc.md` (Báo cáo giám định ADN: lọn tóc mai dính máu `EV-HAIR-DNA` trùng 100% ADN Khang)
-- `05_hoi_cung_tran_thi_ha.md` (Biên bản hỏi cung & Lời nhận tội toàn bộ của Trần Thị Hà)
+- `01_loi_khai_lan_2_tran_thi_ha.md` (Biên bản lấy lời khai lần 2 Trần Thị Hà: đối chất bằng chứng giám định âm thanh còi tàu 20:32 trong voicemail & lịch phát sóng VTV3 → Hà dần mất bình tĩnh, lúng túng tự mâu thuẫn, kích động từ chối hợp tác → kiến nghị lệnh khám xét khẩn cấp).
+- `03_kham_xet_phong_ha.md` (Biên bản khám xét phòng Hà: thu giữ áo gió dính phấn hoa xoan & lọn tóc mai dính máu giấu trong ví tiền).
 
 ### 5. Hồ sơ Tổng kết:
 - `04_ban_cao_trang_dinh_toi.md` (Bản cáo trạng định tội của Viện Kiểm Sát)
