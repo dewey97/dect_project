@@ -15,10 +15,9 @@ Số: `02/QĐ-KTVA`
 
 ---
 
-* Căn cứ Điều 36, Điều 143, Điều 153 và Điều 154 Bộ luật Tố tụng hình sự nước CHXHCN Việt Nam năm 2015;
-* Căn cứ vào báo cáo số 03/BC-CASC ngày 25/07/2016;
-* Xác định có dấu hiệu tội phạm đặc biệt nghiêm trọng quy định tại Khoản 1 Điều 123 Bộ luật Hình sự năm 2015;
-
+* _Căn cứ Điều 36, Điều 143, Điều 153 và Điều 154 Bộ luật Tố tụng hình sự nước CHXHCN Việt Nam năm 2015;_
+* _Căn cứ vào báo cáo số 03/BC-CASC ngày 25/07/2016;_
+* _Xác định có dấu hiệu tội phạm đặc biệt nghiêm trọng quy định tại Khoản 1 Điều 123 Bộ luật Hình sự năm 2015;_
 ---
 
 ### QUYẾT ĐỊNH:
