@@ -10,8 +10,8 @@ Số: `01/BB-HC`
 
 ---
 
-# BIÊN BẢN HỎI CUNG BỊ CAN / LỜI TỰ THÚ
-*(Nghi phạm: Nguyễn Thanh Tùng — Thừa nhận xô xát lúc 20:00)*
+# BIÊN BẢN LẤY LỜI KHAI
+*(Nghi phạm: Nguyễn Thanh Tùng — lấy lời khai lần 02)*
 
 ---
 
