@@ -11,11 +11,11 @@ Số: `12/BB-XMNKCG`
 ---
 
 # BIÊN BẢN XÁC MINH NHẬT KÝ CUỘC GỌI
-*(Trích xuất từ điện thoại di động iPhone 8 Plus của nạn nhân Nguyễn Văn Khang — Mã thiết bị: `dev-00`)*
+*(Trích xuất từ điện thoại di động iPhone 8 Plus của nạn nhân Nguyễn Văn Khang)*
 
 ---
 
-### I. BẢNG TRÍCH XUẤT NHẬT KÝ CUỘC GỌI & CHI TIẾT HỎI ĐÁP LỜI KHAI (CHIỀU TỐI NGÀY 24/07/2016)
+### I. BẢNG TRÍCH XUẤT NHẬT KÝ CUỘC GỌI & CHI TIẾT HỎI ĐÁP LỜI KHAI
 
 | STT | Khung Giờ | Số Điện Thoại | Danh Bạ / Tên Xác Minh | Loại Cuộc Gọi & Thời Lượng | Nội Dung Hỏi & Đáp / Trích Xuất Lời Khai Chi Tiết |
 | :---: | :---: | :---: | :--- | :---: | :--- |
