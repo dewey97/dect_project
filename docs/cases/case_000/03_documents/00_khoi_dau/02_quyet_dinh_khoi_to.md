@@ -11,14 +11,12 @@ Số: `02/QĐ-KTVA`
 ---
 
 # QUYẾT ĐỊNH KHỞI TỐ VỤ ÁN HÌNH SỰ
-*(Vụ án: Giết người xảy ra ngày 24/07/2016 tại số 12 Đường Bờ Sông, Phường Phân khu Cảng)*
+*(Vụ án: Giết người xảy ra ngày 24/07/2016 tại số 14 Đường Bờ Sông, Phường Phân khu Cảng)*
 
 ---
 
-### THỦ TRƯỞNG CƠ QUAN CẢNH SÁT ĐIỀU TRA CÔNG AN TP. HÀ NỘI
-
 * Căn cứ Điều 36, Điều 143, Điều 153 và Điều 154 Bộ luật Tố tụng hình sự nước CHXHCN Việt Nam năm 2015;
-* Căn cứ Biên bản khám nghiệm hiện trường số `02/BB-KNHT` và Báo cáo khám nghiệm tử thi số `01/BC-KNTT` ngày 25/07/2016;
+* Căn cứ vào báo cáo số 03/BC-CASC ngày 25/07/2016;
 * Xác định có dấu hiệu tội phạm đặc biệt nghiêm trọng quy định tại Khoản 1 Điều 123 Bộ luật Hình sự năm 2015;
 
 ---

@@ -20,7 +20,7 @@ Số: `05a/LL-TP`
 | Mục | Nội dung chi tiết |
 | :--- | :--- |
 | **Họ và tên khai sinh** | **NGUYỄN NGỌC MAI** |
-| **Tên thường gọi** | Mai / Cô Mai |
+| **Tên thường gọi** | Mai |
 | **Ngày tháng năm sinh** | 15/05/1992 (24 tuổi) |
 | **Giới tính** | Nữ |
 | **Số CMND** | `001192004523` |

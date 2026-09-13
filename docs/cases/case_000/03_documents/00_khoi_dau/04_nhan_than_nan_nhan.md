@@ -23,23 +23,19 @@ Số: `04/BC-XMNT`
 * **Tình trạng gia đình:**
   - Bố mẹ đẻ mất sớm do tai nạn giao thông năm 2010.
   - Sống cùng ông nội (ông Nguyễn Văn Thọ) tại số 14 Đường Bờ Sông. Ông Thọ vừa qua đời cách đây 3 tháng.
-  - Họ hàng gần nhất: Gia đình chú ruột (bố của Nguyễn Ngọc Mai) cư ngụ tại phố Đoàn Kết.
+  - Họ hàng gần nhất: Gia đình chú ruột (bố của Nguyễn Ngọc Mai) cư ngụ tại phường Phân Khu Cảng.
 
 ---
 
 ### II. HOẠT ĐỘNG KINH TẾ & QUAN HỆ XÃ HỘI
-1. **Nghề nghiệp chính:** Không có công ăn việc làm ổn định. Mở dịch vụ "Tài chính tiêu dùng cá nhân" (thực chất là cho vay bốc họ, tín dụng đen lãi suất cao từ $3.000\text{đ} - 5.000\text{đ}/\text{triệu/ngày}$).
+1. **Nghề nghiệp chính:** Không có công ăn việc làm ổn định. Mở dịch vụ "Tài chính tiêu dùng cá nhân" (thực chất là cho vay nặng lãi).
 2. **Tiền án, tiền sự:** 
    - 01 tiền sự năm 2012 về hành vi *"Gây rối trật tự công cộng"* (đánh nhau tại quán bia).
-   - Đang trong diện theo dõi của Công an Phường về hoạt động đòi nợ thuê.
-3. **Lối sống & Quan hệ tình cảm:**
-   - Tính cách bốc đồng, ngỗ ngược, thích phô trương, có thói quen ăn chơi trăng hoa.
-   - Đang có quan hệ tình cảm khoảng 3 năm với **Trần Thị Hà** (kế toán). Tuy nhiên gần đây Khang có dấu hiệu chán nản, mắng chửi xúc phạm Hà và lén lút qua lại với các phụ nữ khác.
 
 ---
 
 ### III. ĐÁNH GIÁ NGUY CƠ MÂU THUẪN
-Do đặc thù nghề nghiệp cho vay nặng lãi và tính nết ngang tàng, nạn nhân có mạng lưới quan hệ xã hội phức tạp, nhiều đối tượng có hiềm khích nợ nần hoặc tranh chấp tài sản cá nhân.
+Do đặc thù nghề nghiệp cho vay nặng lãi, nạn nhân có quan hệ xã hội phức tạp, nhiều đối tượng có hiềm khích nợ nần hoặc tranh chấp tài sản.
 
 ---
 
