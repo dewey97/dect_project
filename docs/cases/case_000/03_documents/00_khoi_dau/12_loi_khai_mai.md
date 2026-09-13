@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `07a/BB-LK`  
+Số: `12/BB-LK`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---

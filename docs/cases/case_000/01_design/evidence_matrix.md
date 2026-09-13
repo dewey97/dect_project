@@ -32,7 +32,7 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 | Ứng Dụng (App) | Nội Dung Dữ Liệu | Mục Đích Điều Tra Trong Game |
 | :--- | :--- | :--- |
 | 💬 **Tin nhắn (Messages)** | • **23/07 14:22:** Khang ➔ Vũ (`0988.20.09.91`): Đe dọa đòi nợ 300M bốc họ quá hạn.<br>• **24/07 17:30 – 17:55:** Khang ↔ Bé Vy ❤️: Hẹn gom tiền trốn bay 06:15 đi Đà Lạt, chửi Hà phiền phức.<br>• **24/07 19:15:** Hà Kế Toán ➔ Khang (🔕): Báo mang hũ trà hoa cúc mới sao sang. | Bộc lộ động cơ nợ nần của Vũ và kích nổ cơn ghen cuồng loạn của Hà lúc 20:45 khi xem trộm điện thoại. |
-| 📞 **Nhật ký cuộc gọi (Call Log)** | • **17:30:** Chị Lan Quán Nước (`0932.889.102` — Đã nghe 42s — Nhiễu)<br>• **18:00:** Bình Còi (`0915.223.789` — Đã nghe 1m15s — Nhiễu)<br>• **18:15:** `0988.20.09.91` (Đã nghe 28s ➔ Lê Quang Vũ)<br>• **18:45:** `0912.331.888` (Đã nghe 1m40s ➔ Đạt Gà Chợ Cảng)<br>• **19:55:** `0984.180.357` (Đã nghe 35s ➔ Nguyễn Thanh Tùng)<br>• **20:31:** Trần Thị Hà (`0984.112.568` — Cuộc gọi nhỡ 45s) | Khởi động giải đố Tuyến B: Tra cứu 3 SĐT ẩn danh để tìm ra danh tính Vũ, Đạt Gà và Nguyễn Thanh Tùng. |
+| 📞 **Nhật ký cuộc gọi (Call Log)** | • **17:30:** Chị Lan Quán Nước (`0932.889.102` — Đã nghe 42s — Nhiễu)<br>• **18:00:** Bình Còi (`0915.223.789` — Đã nghe 1m15s — Nhiễu)<br>• **18:15:** `0988.20.09.91` (Đã nghe 28s ➔ Lê Quang Vũ)<br>• **18:45:** `0912.331.888` (Đã nghe 1m40s ➔ Đạt Gà Chợ Cảng)<br>• **19:55:** `0984.180.357` (Đã nghe 35s ➔ Nguyễn Thanh Tùng)<br>• **20:31:** Hà Kế Toán (`0984.112.568` — Cuộc gọi nhỡ 45s) | Khởi động giải đố Tuyến B: Tra cứu 3 SĐT ẩn danh để tìm ra danh tính Vũ, Đạt Gà và Nguyễn Thanh Tùng. |
 | 🎙️ **Hộp thư thoại (Voicemail)** | • **20:32:15:** File ghi âm 18 giây từ Trần Thị Hà (`0984.112.568`): Thì thầm nhớ nhung, lọt rõ **tiếng còi tàu hỏa diesel D19E & tiếng chuông cảnh báo rào chắn đường sắt 20:30**. | Manh mối cốt lõi bẻ gãy alibi phòng trọ của Hà, chứng minh Hà đứng trước cổng nhà Khang lúc 20:32. |
 | 👤 **Danh bạ (Contacts)** | • Lưu sẵn: *Chị Lan Quán Nước*, *Bình Còi*, *Bé Vy ❤️*, *Hà Kế Toán*. | Phân loại số có tên sẵn (Nhiễu) vs số lạ không lưu danh bạ. |
 
@@ -81,7 +81,7 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 ### 1. Giai đoạn 0 — Hồ sơ Khởi đầu (`00_khoi_dau/`):
 - `01_tiep_nhan_tin_bao.md` (Phiếu tiếp nhận tin báo từ bà Lụa lúc 06:45 sáng 25/07)
 - `02_quyet_dinh_khoi_to.md` (Quyết định khởi tố vụ án hình sự)
-- `05_trich_sao_so_ghi_no.md` (Trích sao sổ nợ tín dụng đen thu tại hiện trường: Vũ 300M "Lệch Pha", Đạt Gà 80M — dùng chung Tuyến A & B)
+- `05_trich_sao_so_ghi_no.md` (Sổ tay ghi nợ cá nhân của Khang thu tại hiện trường: theo dõi bốc bát họ, nợ nần "Thằng Lệch Pha" 300M, Đạt Gà 80M — dùng chung Tuyến A & B)
 - `06_tien_do_dieu_tra.md` (Báo cáo tiến độ ban đầu kèm kết quả pháp y tử thi ~21:00 và tóm tắt vật chứng hiện trường)
 - `07_nhan_than_nan_nhan.md` (Lý lịch nạn nhân Nguyễn Văn Khang)
 - `08a_ly_lich_tran_ngoc_mai.md` (Lý lịch tư pháp nghi phạm Trần Ngọc Mai)
@@ -92,7 +92,7 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 - `12_loi_khai_mai.md` (Lời khai Trần Ngọc Mai lần 1: về nhà 19:45, xem TV 20:10 mất cáp)
 - `13_loi_khai_vu.md` (Lời khai Lê Quang Vũ lần 1: khai đi ngay cùng vợ lúc 19:00)
 - `15_loi_khai_ha.md` (Lời khai Trần Thị Hà lần 1: khai ở phòng trọ xem phim bộ VTV3 cả tối)
-- `18_bang_tin_rao_vat.md` (Biên bản ghi nhận bảng tin khu phố Đoàn Kết: thông báo đứt cáp 20:10 & tin rao VLXD chứa SĐT Tùng `0984.180.357`)
+- `18_bang_tin_rao_vat.md` (Bảng ảnh khám nghiệm ngoại cảnh — bờ tường & bảng tin trước cổng số 14 Đường Bờ Sông: mẩu thông báo đứt cáp nhánh Bờ Sông – Đoàn Kết lúc 20:10 & tin rao VLXD chứa SĐT Tùng `0984.180.357`)
 
 ### 2. Tuyến A — Nhánh Mai & Vũ (`01_nhanh_mai_vu/`):
 - `06_so_thu_chi_quan_bia.md` (Sổ thu chi Quán Bia 88: bàn B7 1 khách lẻ chuyển khoản 195k lúc 20:45)
@@ -110,7 +110,7 @@ Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn V�
 ### 4. Tuyến C — Nhánh Trần Thị Hà (`03_nhanh_ha/`):
 - `01_giam_dinh_am_thanh_coi_tau.md` (Báo cáo thực nghiệm âm thanh còi tàu & chuông gác chắn lúc 20:30)
 - `02_lich_phat_song_vtv3.md` (Trích xuất lịch phát sóng VTV3 tối thứ Sáu: Gameshow, không có phim bộ)
-- `03_kham_xet_phong_ha.md` (Biên bản khám xét phòng Hà: thu giữ áo gió dính phấn hoa `03` & lọn tóc mai dính máu giấu trong áo ngực `04`)
+- `03_kham_xet_phong_ha.md` (Biên bản khám xét phòng Hà: thu giữ áo gió dính phấn hoa xoan & lọn tóc mai dính máu giấu trong áo ngực)
 - `04_giam_dinh_adn_lon_toc.md` (Báo cáo giám định ADN: lọn tóc mai dính máu `EV-HAIR-DNA` trùng 100% ADN Khang)
 - `05_hoi_cung_tran_thi_ha.md` (Biên bản hỏi cung & Lời nhận tội toàn bộ của Trần Thị Hà)
 

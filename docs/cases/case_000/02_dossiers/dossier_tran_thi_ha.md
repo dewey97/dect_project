@@ -25,8 +25,8 @@
 1. [I. HỒ SƠ LÝ LỊCH CÁ NHÂN & NHÂN THÂN](#i-hồ-sơ-lý-lịch-cá-nhân--nhân-thân)
 2. [II. HỆ THỐNG MANH MỐI & DẤU HIỆU CÀI CẮM SỚM](#ii-hệ-thống-manh-mối--dấu-hiệu-cài-cắm-sớm)
 3. [III. CHÂN DUNG TÂM LÝ BIẾN THÁI TRONG TÌNH YÊU](#iii-chân-dung-tâm-lý-biến-thái-trong-tình-yêu)
-4. [IV. MỐI QUAN HỆ ĐAN XEN VỚI NẠN NHÂN & CÁC NGHI PHẠM KHÁC](#iv-mối-quan-hệ-đan-xen-với-nạn-nhân--các-nghi-phạm-khác)
-5. [V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG](#v-dòng-thời-gian-hành-động-đêm-án-mạng)
+4. [IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT](#iv-mối-quan-hệ-đan-xen-với-các-nhân-vật)
+5. [V. DÒNG THỜI GIAN HÀNH ĐỘNG ĐÊM ÁN MẠNG (24/07/2026)](#v-dòng-thời-gian-hành-động-đêm-án-mạng-24072026)
 6. [VI. HỆ THỐNG VẬT CHỨNG & TÀI LIỆU LIÊN QUAN ĐẾN HÀ](#vi-hệ-thống-vật-chứng--tài-liệu-liên-quan-đến-hà)
 7. [VII. TÁI HIỆN HIỆN TRƯỜNG KHOẢNH KHẮC GÂY ÁN (20:45 – 21:00)](#vii-tái-hiện-hiện-trường-khoảnh-khắc-gây-án-2045--2100)
 8. [VIII. SƠ HỞ CHÍ MẠNG & TRẬN ĐỐI CHẤT BẺ GÃY LỜI KHAI](#viii-sơ-hở-chí-mạng--trận-đối-chất-bẻ-gãy-lời-khai)
@@ -74,7 +74,7 @@
 
 1. **Alibi VTV3 giả mạo (`15` vs `02_lich_phat_song_vtv3`):** Hà khai ở phòng trọ xem phim bộ VTV3 từ 20h00 đến 21h30. Tuy nhiên lịch phát sóng tối thứ Sáu 24/07 chỉ chiếu Gameshow thực tế "Hành trình rực rỡ" $\rightarrow$ Bóc trần ngoại phạm bịa đặt!
 2. **Còi tàu trong Voicemail 20:32 (`01` / `01_giam_dinh_am_thanh_coi_tau`):** Tin nhắn thoại gửi lúc 20:32:15 lọt tiếng còi tàu diesel và chuông gác chắn đường sắt (chỉ có tại đầu ngõ nhà Khang lúc đoàn tàu hàng chạy qua 20:30–20:35, phòng trọ của Hà cách 1.2km không thể thu được) $\rightarrow$ Chứng minh Hà đang đứng ngay trước cổng nhà Khang lúc 20:32!
-3. **Áo gió dính phấn hoa cây xoan (`03_kham_xet_phong_ha`):** Khám xét phòng trọ thu giữ áo gió màu xám đen dính phấn hoa xoan $\rightarrow$ Khớp nhân dạng kẻ rình rập lúc 19:25 (lời khai Vũ `07`) và 20:45 (lời khai bà Lụa `11`).
+3. **Áo gió dính phấn hoa cây xoan (`03_kham_xet_phong_ha`):** Khám xét phòng trọ thu giữ áo gió màu xám đen dính phấn hoa xoan $\rightarrow$ Khớp đặc điểm bóng người rình rập dưới gốc cây xoan trước cổng nhà Khang lúc 19:25 (lời khai Vũ `07`) và những đêm gần đây (lời khai nhân chứng bà Lụa `11`).
 4. **Lọn tóc dính máu (`04_giam_dinh_adn_lon_toc` / `EV-HAIR-DNA`):** Thu giữ trong áo ngực Hà, kết quả giám định 16 locus STR trùng khớp 100% ADN Khang (khớp với mảng tóc mai bị cắt cụt sát da đầu trong Báo cáo tiến độ điều tra `06`).
 
 ---
@@ -90,7 +90,7 @@
 ## IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT
 
 * **Với Nạn nhân Nguyễn Văn Khang:** Quan hệ tình cảm 3 năm, yêu cuồng dại nhưng bị ruồng rẫy, bạo hành tinh thần.
-* **Với Nguyễn Thanh Tùng:** Bạn cùng xóm thời thơ ấu trong biến cố 1996, Hà đã cố tình đổ tội cho Tùng trong lời khai đầu tiên để đánh lạc hướng cơ quan điều tra.
+* **Với Nguyễn Thanh Tùng:** Bạn cùng xóm thời thơ ấu trong biến cố 1996. Hà biết giữa Tùng và Khang có ân oán cũ, và khi tận mắt thấy Tùng xô xát làm vỡ bình trà rồi hớt hải bỏ chạy lúc 20:15, Hà đã nắm lấy cơ hội hiện trường hỗn loạn để lẻn vào ra tay kết liễu Khang lúc 21:00.
 * **Với Mai & Vũ:** Hà biết mâu thuẫn đất đai và nợ nần giữa họ với Khang.
 
 ---
@@ -132,7 +132,7 @@
                      │             │ Tủ âm tường  │ (Nơi Tùng xô    │
                      │             └──────────────┘  Khang đập đầu) │
                      │                                              │
-                     │    [Mảnh bình trà vỡ p1]                     │
+                     │    [Mảnh bình trà vỡ p3]                     │
                      │    [Khung ảnh vỡ p4]                         │
                      │    [Mẩu báo cũ 1996 p5]                      │
                      │            ▲                                 │

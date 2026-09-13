@@ -6,7 +6,7 @@
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
 Số: `07/BB-HC`  
-*Hà Nội, ngày 26 tháng 07 năm 2026*
+*Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
 
@@ -15,7 +15,7 @@ Số: `07/BB-HC`
 
 ---
 
-Vào hồi 09 giờ 00 phút, ngày 26 tháng 07 năm 2026, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.  
+Vào hồi 17 giờ 45 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.  
 **Chúng tôi gồm:**
 1. Điều tra viên: Đại úy Lê Minh — Đội Điều tra Trọng án.
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
@@ -40,17 +40,17 @@ Vào hồi 09 giờ 00 phút, ngày 26 tháng 07 năm 2026, tại Phòng Cảnh 
 
 * **Đáp (Lê Quang Vũ):** Lúc vợ tôi tức giận ném giấy đòi đất rồi nổ máy xe về lúc 19:00, tôi cố tình nói dối Mai là đi nhậu với bạn để Mai về trước. Sau khi tiếng xe máy của Mai vừa khuất, tôi vội đóng cửa bước vào phòng khách quỳ lạy xin anh Khang cho tôi hoãn nợ. Nhưng anh Khang cười khẩy, rút cuốn sổ da đen đập mạnh vào ngực tôi chửi: *"Mày bùng hẹn ngày 20 rồi, hạn chót ngày mai không nôn đủ 300 củ tao in 100 tờ rơi rải khắp phố Đoàn Kết cho bố vợ mày nhục mặt!"*. 
 
-Tôi van xin không được, sợ hãi cùng quẫn nên vùng chạy thoát ra khỏi cửa nách sau nhà, luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25. 
+Tôi van xin không được, sợ hãi cùng quẫn nên vội vàng chạy tháo thân ra khỏi cửa chính, chạy một mạch ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25. 
 
 Lúc đứng ở đầu ngõ đợi xe, tôi có nhìn thấy một bóng người mặc áo gió màu xám đen trùm mũ kín mít đang đứng nép dưới gốc cây xoan ngó chằm chằm vào nhà anh Khang. Lúc đó tôi đang quá hoảng loạn chỉ lo trốn nợ nên không dám lại gần... Đến 19:30 xe ôm đến đón tôi chạy thẳng ra Quán Bia 88 ở Khu Cầu Cảng ngồi uống bia một mình. Tôi gọi 1 đĩa nem với uống đúng nửa thùng bia ngồi giải sầu một mình ở mép sông đến khi thanh toán ra về...
 
 * **Hỏi (ĐTV Lê Minh):** Lúc anh rời khỏi nhà lúc 19:25, tình trạng nạn nhân Khang thế nào? Anh có dùng vật nhọn đâm nạn nhân không?
 
-* **Đáp (Lê Quang Vũ):** Tôi thề có trời đất chứng giám, tôi chỉ hoảng sợ vùng chạy thoát thân ra ngoài! Lúc tôi chạy ra khỏi cửa sau, anh Khang vẫn còn đứng sừng sững ở giữa phòng khách chửi bới ầm ĩ và đá cái ghế gỗ. Bộ bình trà trên bàn lúc đó vẫn còn nguyên vẹn chưa hề vỡ! Tôi không hề giết anh Khang, tôi chỉ là kẻ hèn nhát quỵt nợ thôi cán bộ ơi!
+* **Đáp (Lê Quang Vũ):** Tôi thề có trời đất chứng giám, tôi chỉ hoảng sợ vùng chạy thoát thân ra ngoài! Lúc tôi chạy ra khỏi cửa chính, anh Khang vẫn còn đứng sừng sững ở giữa phòng khách chửi bới ầm ĩ và đá cái ghế gỗ. Bộ bình trà trên bàn lúc đó vẫn còn nguyên vẹn chưa hề vỡ! Tôi không hề giết anh Khang, tôi chỉ là kẻ hèn nhát quỵt nợ thôi cán bộ ơi!
 
 ---
 
-Biên bản hỏi cung kết thúc vào hồi 10 giờ 30 phút cùng ngày. Biên bản đã được đọc lại cho Lê Quang Vũ nghe, công nhận đúng sự thật và cùng ký tên.
+Biên bản hỏi cung kết thúc vào hồi 18 giờ 30 phút cùng ngày. Biên bản đã được đọc lại cho Lê Quang Vũ nghe, công nhận đúng sự thật và cùng ký tên.
 
 **ĐIỀU TRA VIÊN**  
 *(Ký tên)*  

@@ -13,28 +13,29 @@
 
 ## 🧭 MỤC LỤC DANH MỤC HÌNH ẢNH
 
-1. [I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (9 AVATARS)](#i-danh-mục-ảnh-chân-dung-nhân-vật-portrait-avatars)
-   - [`avatar_khang` — Nạn nhân Nguyễn Văn Khang (38 tuổi)](#1-avatar_khang--nguyễn-văn-khang-nạn-nhân-38-tuổi)
-   - [`avatar_mai` — Nghi phạm Trần Ngọc Mai (34 tuổi)](#2-avatar_mai--trần-ngọc-mai-nghi-phạm-1-34-tuổi)
-   - [`avatar_vu` (`p6`) — Nghi phạm Lê Quang Vũ (Mắt trái lác nhẹ)](#3-avatar_vu-p6--lê-quang-vũ-nghi-phạm-2-35-tuổi--mắt-trái-lác-nhẹ)
-   - [`avatar_tung` — Nghi phạm Nguyễn Thanh Tùng (Sẹo chữ V mày trái)](#4-avatar_tung--nguyễn-thanh-tùng-nghi-phạm-3-40-tuổi--sẹo-chữ-v)
-   - [`avatar_ha` — Thủ phạm Trần Thị Hà (Cuồng yêu ám ảnh)](#5-avatar_ha--trần-thị-hà-thủ-phạm-chính-36-tuổi--cuồng-yêu-ám-ảnh)
-   - [`avatar_lua` — Nhân chứng Bà Nguyễn Thị Lụa (60 tuổi)](#6-avatar_lua--bà-nguyễn-thị-lụa-nhân-chứng-hàng-xóm-60-tuổi)
-   - [`avatar_dat` — Đối tượng Trần Văn Đạt (Đạt Gà Chợ Cảng)](#7-avatar_dat--trần-văn-đạt-đạt-gà-chợ-cảng-38-tuổi)
-   - [`avatar_vy` — Nhân tình Thảo Vy (Bé Vy ❤️)](#8-avatar_vy--thảo-vy-bé-vy-❤️-nhân-tình-nạn-nhân-24-tuổi)
-   - [`avatar_huy` — Bé Nguyễn Gia Huy (Hè 1996 — Còi đồng cam)](#9-avatar_huy--bé-nguyễn-gia-huy-em-trai-tùng-7-tuổi-hè-1996)
-2. [II. DANH MỤC ẢNH HIỆN TRƯỜNG & TƯ LIỆU VẬT CHỨNG (5 PHOTOS: `p1` – `p5`)](#ii-danh-mục-ảnh-hiện-trường--tư-liệu-vật-chứng-p1--p5)
-   - [`p1` — Hiện trường & Dấu vân tay tách trà](#1-p1--hiện-trường--dấu-vân-tay-tách-trà-photo-crime-scene-overviewjpg)
-   - [`p2` — Đơn đòi đất 200m² rơi vãi dưới sàn](#2-p2--đơn-đòi-đất-200m²-rơi-vãi-dưới-sàn-photo-scattered-documentsjpg)
-   - [`p3` — Mảnh bình trà vỡ dính máu — Hung khí](#3-p3--mảnh-bình-trà-vỡ-dính-máu--hung-khí-photo-glass-shard-detailjpg)
-   - [`p4` — Ảnh kỷ niệm xóm Bờ Sông hè 1996 (Khung nứt vỡ)](#4-p4--ảnh-kỷ-niệm-xóm-bờ-sông-hè-1996-photo-childhood-groupjpg)
-   - [`p5` — Mảnh báo cũ 1996 xé vụn ghép lại](#5-p5--mảnh-báo-cũ-1996-xé-vụn-ghép-lại-photo-old-newspaperjpg)
-3. [III. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (`p10`)](#iii-danh-mục-ảnh-chụp-màn-hình-thiết-bị-device-screenshots)
-   - [`p10` — Screenshot App đặt xe của Lê Quang Vũ](#1-p10--screenshot-lịch-sử-app-đặt-xe-của-lê-quang-vũ)
+1. [I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)](#i-danh-mục-ảnh-chân-dung-nhân-vật-portrait-avatars)
+   - [`avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 38 TUỔI)](#1-avatar_khang-nguyễn-văn-khang-nạn-nhân-38-tuổi)
+   - [`avatar_mai` — TRẦN NGỌC MAI (NGHI PHẠM 1 — 34 TUỔI)](#2-avatar_mai-trần-ngọc-mai-nghi-phạm-1-34-tuổi)
+   - [`avatar_vu` (`p6`) — LÊ QUANG VŨ (NGHI PHẠM 2 — 35 TUỔI — MẮT TRÁI LÁC NHẸ)](#3-avatar_vu-p6-lê-quang-vũ-nghi-phạm-2-35-tuổi-mắt-trái-lác-nhẹ)
+   - [`avatar_tung` — NGUYỄN THANH TÙNG (NGHI PHẠM 3 — 40 TUỔI — SẸO CHỮ V)](#4-avatar_tung-nguyễn-thanh-tùng-nghi-phạm-3-40-tuổi-sẹo-chữ-v)
+   - [`avatar_ha` — TRẦN THỊ HÀ (THỦ PHẠM CHÍNH — 36 TUỔI — CUỒNG YÊU ÁM ẢNH)](#5-avatar_ha-trần-thị-hà-thủ-phạm-chính-36-tuổi-cuồng-yêu-ám-ảnh)
+   - [`avatar_lua` — BÀ NGUYỄN THỊ LỤA (NHÂN CHỨNG HÀNG XÓM — 60 TUỔI)](#6-avatar_lua-bà-nguyễn-thị-lụa-nhân-chứng-hàng-xóm-60-tuổi)
+   - [`avatar_dat` — TRẦN VĂN ĐẠT / ĐẠT GÀ (CHỢ CẢNG — 38 TUỔI)](#7-avatar_dat-trần-văn-đạt-đạt-gà-chợ-cảng-38-tuổi)
+   - [`avatar_vy` — THẢO VY / BÉ VY ❤️ (NHÂN TÌNH NẠN NHÂN — 24 TUỔI)](#8-avatar_vy-thảo-vy-bé-vy-nhân-tình-nạn-nhân-24-tuổi)
+   - [`avatar_huy` — BÉ NGUYỄN GIA HUY (EM TRAI TÙNG — 7 TUỔI, HÈ 1996)](#9-avatar_huy-bé-nguyễn-gia-huy-em-trai-tùng-7-tuổi-hè-1996)
+2. [II. DANH MỤC ẢNH HIỆN TRƯỜNG & TƯ LIỆU VẬT CHỨNG (`p1` – `p5`)](#ii-danh-mục-ảnh-hiện-trường-tư-liệu-vật-chứng-p1-p5)
+   - [`p1` — HIỆN TRƯỜNG & TÁCH TRÀ PHÒNG KHÁCH (`photo-crime-scene-overview.jpg`)](#1-p1-hiện-trường-tách-trà-phòng-khách-photo-crime-scene-overviewjpg)
+   - [`p2` — ĐƠN ĐÒI ĐẤT 200M² RƠI VÃI DƯỚI SÀN (`photo-scattered-documents.jpg`)](#2-p2-đơn-đòi-đất-200m²-rơi-vãi-dưới-sàn-photo-scattered-documentsjpg)
+   - [`p3` — MẢNH BÌNH TRÀ VỠ DÍNH MÁU — HUNG KHÍ (`photo-glass-shard-detail.jpg`)](#3-p3-mảnh-bình-trà-vỡ-dính-máu-hung-khí-photo-glass-shard-detailjpg)
+   - [`p4` — ẢNH KỶ NIỆM XÓM BỜ SÔNG HÈ 1996 (`photo-childhood-group.jpg`)](#4-p4-ảnh-kỷ-niệm-xóm-bờ-sông-hè-1996-photo-childhood-groupjpg)
+   - [`p5` — MẢNH BÁO CŨ 1996 XÉ VỤN GHÉP LẠI (`photo-old-newspaper.jpg`)](#5-p5-mảnh-báo-cũ-1996-xé-vụn-ghép-lại-photo-old-newspaperjpg)
+3. [III. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (DEVICE SCREENSHOTS)](#iii-danh-mục-ảnh-chụp-màn-hình-thiết-bị-device-screenshots)
+   - [`p10` — SCREENSHOT LỊCH SỬ APP ĐẶT XE CỦA LÊ QUANG VŨ (`screenshot-ride-app-vu.png`)](#1-p10-screenshot-lịch-sử-app-đặt-xe-của-lê-quang-vũ-screenshot-ride-app-vupng)
+4. [IV. HƯỚNG DẪN TẠO ẢNH CHỐNG LỖI (ANTI-FAIL WORKFLOW)](#iv-hướng-dẫn-tạo-ảnh-chống-lỗi-anti-fail-workflow)
 
 ---
 
-## 👤 I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)
+## I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)
 
 ---
 
@@ -251,28 +252,26 @@ missing whistle, modern whistle, silver whistle, plastic whistle, missing orange
 
 ---
 
-## 📸 II. DANH MỤC ẢNH HIỆN TRƯỜNG & TƯ LIỆU VẬT CHỨNG (`p1` – `p5`)
+## II. DANH MỤC ẢNH HIỆN TRƯỜNG & TƯ LIỆU VẬT CHỨNG (`p1` – `p5`)
 
 ---
 
-### 1. `p1` — HIỆN TRƯỜNG & DẤU VÂN TAY TÁCH TRÀ (`photo-crime-scene-overview.jpg`)
+### 1. `p1` — HIỆN TRƯỜNG & TÁCH TRÀ PHÒNG KHÁCH (`photo-crime-scene-overview.jpg`)
 * **Mã vật chứng:** `p1`
-* **Ý nghĩa phá án:** Dấu vân tay trên tách trà phòng khách trùng 100% Tùng $\rightarrow$ Bóc trần lời khai Tùng nói dối "chỉ gọi điện thoại không hề gặp mặt Khang".
+* **Ý nghĩa phá án:** Tách trà dính vết mồ hôi/vân tay của Tùng $\rightarrow$ Bóc trần lời khai Tùng nói dối "chỉ gọi điện thoại không hề gặp mặt Khang".
 * **Mô tả hiện trường & góc máy kỹ thuật:**
   - Góc chụp xiên 30 độ cận cảnh mặt bàn trà gỗ lim tối màu đã lên nước bóng trong phòng khách nhà nạn nhân.
-  - Trên bàn có một bộ ấm chén gốm men lam truyền thống. **Một tách trà sứ men trắng ngà còn đọng cặn nước trà xanh vàng nhạt ở đáy**.
-  - **CHI TIẾT GIÁM ĐỊNH:** Một chiếc kính lúp cán kim loại đặt nghiêng ngay cạnh tách trà; dưới thấu kính lúp hiển thị phóng đại **MỘT DẤU VÂN TAY NGÓN TAY CÁI HOÀN CHỈNH (Latent thumbprint)** in hằn bằng chất nhờn mồ hôi và bụi mịn trên thành tách trà bóng loáng.
-  - Bên cạnh tách trà đặt một chiếc **thước tỉ lệ hình sự chữ L màu vàng vạch đen (Forensic scale ruler)** và một **hũ thủy tinh đựng trà hoa cúc khô nắp gỗ**.
-  - Đèn pin cực tím UV chiếu xiên tạo ánh sáng huỳnh quang làm nổi bật từng đường vân xoáy của dấu vân tay.
+  - Trên bàn có một bộ ấm chén gốm men lam truyền thống Việt Nam. **Một tách trà sứ men trắng đọng cặn nước trà xanh vàng nhạt ở đáy**.
+  - **LƯU Ý TRÁNH LỖI AI:** Không dùng từ khóa "fingerprint" trực tiếp trong prompt tổng thể vì AI sẽ vẽ một dấu vân tay khổng lồ như tem dán lên thành chén. Thay vào đó, miêu tả vết nhờn mờ tự nhiên (faint oily smudge mark) hoặc tập trung vào ảnh hiện trường thực tế.
 
-> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
+> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO / GEMINI IMAGEN 3):**
 ```text
-Forensic crime scene investigation photography of evidence p1 inside a dim Vietnamese residential living room. Close-up high-angle shot focusing on an old dark polished wooden tea table. In sharp forensic focus is a traditional Vietnamese off-white porcelain teacup with dried yellow tea dregs. A professional metal-handled magnifying glass rests tilted beside the cup, optically magnifying a PERFECT LATENT SWEAT-AND-OIL THUMBPRINT clearly visible on the glossy glazed porcelain surface. Next to the cup lies an official yellow-and-black L-shaped police forensic metric scale ruler and a transparent glass jar filled with dried yellow chamomile tea flowers with a wooden lid. Angled ultraviolet forensic light beam illuminating the ridges of the fingerprint, dust particles floating in air, Hasselblad H6D-100c with 50mm f/4 macro lens, razor-sharp textures of porcelain glaze, wood grain, authentic gritty crime scene realism, 8k resolution. --ar 16:9 --style raw --s 75 --v 6.0
+Authentic gritty crime scene documentary photograph of evidence p1 inside a dimly lit traditional Hanoi residential living room. High-angle close-up focusing on an old dark polished wooden tea table with subtle scratches. In sharp focus is an unwashed traditional Vietnamese white porcelain teacup with delicate blue floral patterns, containing dried yellow tea dregs at the bottom and faint natural grease finger smudges near the rim. A yellow plastic police evidence marker card with "P1" printed on it stands beside the cup. Atmospheric dim room lighting, moody shadows, shot on Hasselblad H6D-100c with 50mm f/4 lens, tactile wood grain texture, raw realistic documentary journalism, 8k resolution. --ar 16:9 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-missing fingerprint, blurred smudge instead of fingerprint, broken cup, chipped porcelain, coffee mug, plastic cup, modern stainless steel table, bright sunny day, outdoor, cartoon, 3d render, cgi, anime, low quality, oversaturated, clean cup with no fingerprint.
+giant fingerprint decal, printed fingerprint artwork, magnifying glass, floating magnifying glass, plastic scale ruler, 3d render, cartoon, anime, bright sunny room, modern stainless steel table, oversaturated.
 ```
 
 ---
@@ -281,19 +280,18 @@ missing fingerprint, blurred smudge instead of fingerprint, broken cup, chipped 
 * **Mã vật chứng:** `p2`
 * **Ý nghĩa phá án:** Khởi động Tuyến A; xác định động cơ tranh chấp di sản thừa kế 200m² của Trần Ngọc Mai; Mai ném đơn xuống sàn lúc 19:00.
 * **Mô tả hiện trường & góc máy kỹ thuật:**
-  - Góc chụp từ trên cao chếch 45 độ xuống sàn nhà phòng khách ngay cạnh bậu cửa chính ra vào.
-  - Sàn nhà lát loại **gạch hoa xi măng cổ điển họa tiết hình học màu vàng hoàng yến và xanh rêu** đặc trưng của nhà phố Hà Nội những năm 1990.
-  - Một xấp tài liệu giấy A4 bị vò nhàu văng vãi tung tóe trên sàn. Tờ giấy trên cùng hiển thị rõ dòng tiêu đề văn bản tiếng Việt in hoa đậm nét: **"CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM — ĐƠN ĐỀ NGHỊ GIẢI QUYẾT TRANH CHẤP ĐẤT ĐAI (200m² đất thừa kế số 14 Bờ Sông)"**, ở góc dưới có chữ ký bằng mực bút bi xanh ghi rõ họ tên **Trần Ngọc Mai**.
-  - Một góc tờ giấy có vết bụi đất in hình vân đế giày da nam dẫm lên. Cạnh tập tài liệu là **thẻ số đánh dấu hiện trường cảnh sát hình sự hình tam giác màu vàng chữ "02"**.
+  - Góc chụp 45 độ từ trên xuống sàn phòng khách cạnh bậu cửa gỗ.
+  - Sàn nhà lát **gạch hoa xi măng cổ điển họa tiết hình học màu vàng hoàng yến và xanh rêu** đặc trưng nhà phố Hà Nội cũ.
+  - Xấp giấy A4 nhăn nheo rơi vãi. Tờ giấy trên cùng lộ rõ dòng tiêu đề: **"CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM — ĐƠN ĐỀ NGHỊ GIẢI QUYẾT TRANH CHẤP ĐẤT ĐAI (200m² đất thừa kế)"** với chữ ký mực xanh **Trần Ngọc Mai**. Góc giấy có vệt bụi đế giày dẫm qua.
 
-> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
+> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO / GEMINI IMAGEN 3):**
 ```text
-Authentic forensic crime scene documentary photograph of legal documents scattered across a floor, evidence p2. Overhead 45-degree angle shot of vintage Vietnamese patterned cement floor tiles with yellow and olive-green geometric floral patterns. Disheveled, crumpled official Vietnamese legal papers strewn near an open wooden doorway. The topmost legal document clearly displays crisp printed formal Vietnamese typography: "CONG HOA XA HOI CHU NGHIA VIET NAM - DON DE NGHI GIAI QUYET TRANH CHAP DAT DAI (200m2)", with a bold blue-ink handwritten signature "Tran Ngoc Mai" at the bottom right. A faint dusty shoe tread footprint is pressed across the edge of the paper. Next to the documents stands a bright yellow triangular plastic police evidence marker with black numeral "02". Low ambient evening room lighting with a beam from a police flashlight cutting across the scene, Nikon Z8, 35mm f/2.8 lens, ultra-sharp paper texture and authentic tiled floor realism, 8k resolution. --ar 16:9 --style raw --v 6.0
+Authentic forensic crime scene photograph of legal documents scattered across a floor, evidence p2. High-angle 45-degree view of vintage Northern Vietnamese patterned cement floor tiles with yellow and olive-green geometric patterns. Disheveled, crumpled official A4 paper legal documents strewn near an aged wooden door frame. The topmost paper clearly displays printed formal Vietnamese headline text: "CONG HOA XA HOI CHU NGHIA VIET NAM - DON DE NGHI GIAI QUYET TRANH CHAP DAT DAI", with a bold blue ink signature "Tran Ngoc Mai" at the bottom right. A faint dusty shoe tread smudge marks the edge of the paper. Realistic low ambient evening flashlight beam, shot on Nikon Z8, 35mm f/2.8 lens, ultra-sharp paper fiber texture and authentic tiled floor, raw documentary realism, 8k resolution. --ar 16:9 --style raw --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-illegible scribbles, alien text, gibberish runes, wooden floor, carpet, blank white paper, modern office carpet, pristine tidy documents, clean folded paper, colorful brochures, anime, 3d render, cartoon, blurry text, missing evidence marker.
+yellow plastic markers, bright yellow rulers, cartoon, 3d render, wooden floor, office carpet, blank white paper, pristine tidy documents, colorful brochures, anime, blurry text, oversaturated.
 ```
 
 ---
@@ -302,20 +300,17 @@ illegible scribbles, alien text, gibberish runes, wooden floor, carpet, blank wh
 * **Mã vật chứng:** `p3`
 * **Ý nghĩa phá án:** Hung khí trực tiếp gây án của Trần Thị Hà lúc 21:00; vết đâm cứa đứt động mạch cảnh cổ trái.
 * **Mô tả hiện trường & góc máy kỹ thuật:**
-  - Chụp macro cực cận siêu nét (1:1 Extreme Macro). Một mảnh vỡ thủy tinh dày trong suốt, dài đúng 8.2 cm, hình tam giác nhọn hoắt từ chiếc bình pha trà chịu nhiệt bị đập vỡ.
-  - **MŨI NHỌN VÀ CẠNH SẮC:** Đầu mũi nhọn và cạnh sắc bén dính vệt máu người đặc quánh màu đỏ thẫm sẫm đen, vài giọt máu nhỏ li ti đã đông khô bám cứng dọc theo lưỡi kính.
-  - Mảnh thủy tinh nằm trên nền gạch men bông loang lổ vũng máu sẫm màu đã bắt đầu đông đặc.
-  - Đặt sát cạnh mảnh kính là **thước kẹp cơ khí kim loại (stainless steel vernier caliper)** đang kẹp đo đúng kích thước **82 mm**, cùng một **thẻ số hiện trường màu vàng in chữ "03"**.
-  - Ánh đèn LED kỹ thuật hình sự chiếu góc thấp làm lóe lên cạnh sắc lạnh lùng đầy chết chóc.
+  - Macro cận cảnh mảnh vỡ thủy tinh/gốm dày hình tam giác sắc nhọn từ chiếc bình pha trà bị đập vỡ.
+  - Mũi nhọn và cạnh sắc dính vệt máu người đặc quánh màu đỏ thẫm đẫm khô. Mảnh kính nằm trên nền gạch men bên vũng máu sẫm màu đông đặc. Ánh đèn pin hình sự chiếu góc thấp phản chiếu cạnh sắc lạnh lùng.
 
-> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
+> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO / GEMINI IMAGEN 3):**
 ```text
-Extreme macro forensic evidence photograph of the fatal murder weapon, evidence p3. Direct close-up focus on a heavy 8.2cm triangular shard of thick fractured borosilicate glass from a broken teapot. The sharp pointed tip and jagged slicing edge are heavily coated with thick coagulated dark crimson human blood and dried blood spatters. The glass shard lies flat on an old patterned tiled floor surrounded by pooled dark blood stains. Adjacent to the sharp glass shard is an official bright yellow triangular police evidence marker with bold black number "03" and a precision stainless-steel vernier caliper measuring the 82mm length. Cold high-intensity directional forensic LED flashlight reflecting off the razor-sharp crystal glass facets, grim noir atmosphere, Sony A7R V with 90mm f/2.8 Macro lens, focus stacked for edge-to-edge extreme sharpness, morbid visceral forensic realism, 8k resolution. --ar 16:9 --style raw --s 75 --v 6.0
+Extreme macro forensic photograph of the fatal murder weapon shard, evidence p3. Direct close-up focus on a heavy 8cm triangular shard of thick fractured transparent glass from a broken teapot lying on an old patterned tiled floor. The razor-sharp tip and jagged edge are stained with thick coagulated dark crimson blood and dried blood spatters. Surrounding floor tiles show dark blood pooling. Cold high-intensity directional forensic flashlight beam hitting the razor-sharp crystal glass facet, dramatic shadows, shot on Sony A7R V with 90mm f/2.8 Macro lens, edge-to-edge extreme sharpness, visceral realistic noir documentary photo, 8k resolution. --ar 16:9 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-kitchen knife, dagger, sword, metal blade, firearm, gun, unbroken glass, drinking tumbler, clean glass, plastic ruler, digital caliper, bright cheerful lighting, cartoon, 3d render, cgi, blurry, out of focus.
+vernier caliper, metal measuring tool, yellow plastic marker, kitchen knife, firearm, unbroken glass, clean glass, digital tools, bright happy lighting, cartoon, 3d render, cgi, blurry.
 ```
 
 ---
@@ -323,25 +318,18 @@ kitchen knife, dagger, sword, metal blade, firearm, gun, unbroken glass, drinkin
 ### 4. `p4` — ẢNH KỶ NIỆM XÓM BỜ SÔNG HÈ 1996 (`photo-childhood-group.jpg`)
 * **Mã vật chứng:** `p4`
 * **Ý nghĩa phá án:** Khóa danh tính Tùng là anh trai bé Huy; Tùng có sẹo chữ V ở mày trái; khung ảnh vỡ khi Tùng xô ngã Khang lúc 20:00.
-* **Mô tả hiện trường & góc máy kỹ thuật (Chống lỗi phân rã nhân vật AI):**
-  - Khung ảnh gỗ để bàn kích thước $15\text{cm} \times 20\text{cm}$ bị rơi xuống sàn gạch, **mặt kính bảo vệ nứt vỡ rạn chân chim chằng chịt hình mạng nhện**.
-  - Bên trong mặt kính vỡ là bức ảnh màu chụp mùa hè năm 1996 dưới rặng cây xóm Bờ Sông (nước ảnh Kodak ố vàng, hạt film hoài niệm thập niên 90).
-  - **BỐ CỤC KHÔNG GIAN 5 ĐỨA TRẺ (SPATIAL COMPOSITION ANCHORS):**
-    1. **Bên trái khung hình:** Cậu bé Khang (8 tuổi) ngỗ ngược, mặt béo tròn đứng chu mỏ cười trêu ngươi.
-    2. **Chính giữa phía sau:** Bé gái Hà (6 tuổi) mặc váy hoa nhí e ấp nép sau gốc cây bàng.
-    3. **Chính giữa phía trước:** Bé gái Mai (4 tuổi) nhỏ nhắn ngồi ngoan trên chiếc ghế mây con.
-    4. **Bên phải (TIÊU ĐIỂM NGHIỆP VỤ 1):** Cậu thiếu niên Nguyễn Thanh Tùng (10 tuổi, **ĐUÔI LÔNG MÀY TRÁI CÓ VẾT SẸO CHỮ V RÕ NÉT**) đang vòng tay ôm bảo vệ đứa em trai nhỏ sau lưng.
-    5. **Cạnh Tùng (TIÊU ĐIỂM NGHIỆP VỤ 2):** Bé Nguyễn Gia Huy (7 tuổi, gầy gò nhỏ thó, **TRƯỚC NGỰC ĐEO CHIẾC CÒI ĐỒNG BUỘC DÂY DÙ MÀU CAM NỔI BẬT**).
-  - Vết nứt kính cắt ngang qua bức ảnh tạo nên cảm giác định mệnh đầy bi kịch.
+* **Mô tả hiện trường & góc máy kỹ thuật:**
+  - Khung ảnh gỗ để bàn 15x20cm rơi trên sàn, mặt kính vỡ rạn chân chim hình mạng nhện.
+  - Bên trong là bức ảnh màu chụp hè năm 1996 rặng cây xóm Bờ Sông (nước ảnh Kodak ố vàng). Ảnh chụp nhóm 5 đứa trẻ Việt Nam, trong đó nổi bật thiếu niên 10 tuổi (Tùng) có vết sẹo chữ V ở mày trái ôm em trai 7 tuổi (Huy) đeo chiếc còi đồng dây dù màu cam trước ngực.
 
-> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
+> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO / GEMINI IMAGEN 3):**
 ```text
-Forensic still-life photograph of evidence p4: an antique dark brown wooden desk photo frame (15x20cm) lying flat on an aged floor, its protective glass cover heavily shattered with intricate spiderweb fracture cracks. Beneath the cracked glass is a nostalgic 1996 summer color photograph of 5 Vietnamese neighborhood children along a Hanoi riverbank lane. SPATIAL GROUP COMPOSITION: On the left, an arrogant chubby 8-year-old boy (young Khang) smirking; in the center, a tiny 4-year-old girl (young Mai) sitting on a small stool and a shy 6-year-old girl in a floral dress (young Ha) standing near a tree; on the right (PRIMARY FORENSIC FOCUS), a protective 10-year-old boy (young Tung) WITH A CLEAR NOTICABLE PALE V-SHAPED SCAR ON HIS LEFT EYEBROW holding his frail 7-year-old mute little brother (Gia Huy) WHO WEARS A DISTINCT BRIGHT ORANGE BRAIDED CORD WITH A SMALL VINTAGE BRASS WHISTLE CLEARLY RESTING ON HIS CHEST. Authentic 1990s Kodak Gold 200 35mm film grain, warm nostalgic faded yellow tones, dusty glass shards resting on the surface. Shot on Canon EOS R5 with 50mm f/2.8 lens, poignant poetic storytelling composition, haunting contrast between innocent past and tragic murder, 8k resolution. --ar 16:9 --style raw --s 75 --v 6.0
+Forensic still-life photograph of evidence p4: an antique dark brown wooden desk photo frame lying flat on an aged floor, its glass cover heavily shattered with spiderweb fracture cracks. Beneath the cracked glass is a nostalgic 1996 summer color photograph of 5 Vietnamese neighborhood children along a Hanoi riverbank lane. On the right side of the photo, a protective 10-year-old boy (young Tung) with a distinct pale V-shaped scar on his left eyebrow holds his frail 7-year-old mute brother (Gia Huy) who wears a bright orange braided cord carrying a small brass whistle on his chest. Authentic 1990s Kodak Gold 200 film grain, warm faded yellow tones, dusty glass shards. Shot on Canon EOS R5 with 50mm f/2.8 lens, poignant poetic storytelling, raw photography, 8k resolution. --ar 16:9 --style raw --s 75 --v 6.0
 ```
 
-> 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus — CHẶN LỖI BIẾN DẠNG 5 NGƯỜI):**
+> 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-(extra limbs:1.4), (deformed hands:1.4), (merged faces:1.4), (mutated fingers:1.4), missing scar, scar on right eyebrow, missing brass whistle, modern clothes, modern hairstyles, (caucasian children:1.3), neon clothing, smiling at camera, plastic frame, intact glass, uncracked glass, 3d render, anime, cgi, blurry, lowres, extra children, deformed eyes.
+extra limbs, deformed hands, merged faces, missing scar, scar on right eyebrow, missing brass whistle, modern clothes, caucasian children, intact glass, 3d render, anime, cgi, blurry.
 ```
 
 ---
@@ -350,25 +338,22 @@ Forensic still-life photograph of evidence p4: an antique dark brown wooden desk
 * **Mã vật chứng:** `p5`
 * **Ý nghĩa phá án:** Bài báo ngày 26/07/1996 về vụ bé Huy chết ngạt trong tủ gỗ; Tùng mang sang đối chất rồi xé vụn lúc 20:00.
 * **Mô tả hiện trường & góc máy kỹ thuật:**
-  - Ảnh tài liệu giám định văn bản hình sự chụp từ trên cao (Top-down Flat Lay).
-  - Trên mặt bàn làm việc màu xám của phòng Kỹ thuật Hình sự, các mảnh giấy báo cũ kỹ ố vàng ngả nâu đã bị xé vụn thành hơn 10 mảnh đang được các giám định viên dùng kẹp nhíp ghép nối tỉ mỉ lại trên tấm thảm cắt cao su (green grid cutting mat).
-  - Bài báo thuộc chuyên mục An ninh - Xã hội Báo Hà Nội Mới, đề ngày **"Thứ Sáu, ngày 26 tháng 07 năm 1996"**.
-  - **TIÊU ĐỀ BÀI BÁO LỘ RÕ TỪ CÁC MẢNH GHÉP:** Chữ in hoa đậm nét: **"BI KỊCH TỪ TRÒ TRỐN TÌM: MỘT CHÁU BÉ TỬ VONG DO NGẠT KHÍ TRONG TỦ GỖ TẠI BÃI HOANG ĐƯỜNG BỜ SÔNG"**, nội dung còn sót lại nhắc đến *"cháu N.G.H 7 tuổi, câm bẩm sinh"*.
-  - Cạnh các mảnh báo có đặt một cây nhíp phẫu thuật inox và một chiếc thước kính định vị giám định.
+  - Ảnh giám định văn bản hình sự chụp từ trên xuống (Top-down Flat Lay).
+  - Các mảnh báo cũ ố vàng 1996 bị xé vụn được ghép tỉ mỉ lại trên tấm thảm cắt màu xám. Tiêu đề bài báo in rõ chữ tiếng Việt: **"BI KỊCH TỪ TRÒ TRỐN TÌM: MỘT CHÁU BÉ TỬ VONG TRONG TỦ GỖ"**.
 
-> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO):**
+> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO / GEMINI IMAGEN 3):**
 ```text
-Forensic document reconstruction flat-lay photography of evidence p5 inside a police forensics lab. An aged, yellowed Vietnamese newspaper clipping from July 1996, torn into multiple jagged pieces and meticulously reassembled like a jigsaw puzzle on a neutral grey cutting mat. The fragile brittle newsprint with faded paper fibers displays bold printed Vietnamese headline typography across the pieces: "BI KICH TRO CHOI TRON TIM: MOT CHAU BE TU VONG TRONG TU GO BAI HOANG", with visible subtext mentioning "chau N.G.H 7 tuoi". Stainless steel precision forensic tweezers and a transparent acrylic measuring ruler lie beside the reconstructed paper clipping. Overhead uniform laboratory inspection lighting, high contrast, razor-sharp paper fiber edges, authentic vintage Vietnamese newsprint texture, forensic analysis realism, 8k resolution. --ar 16:9 --style raw --s 75 --v 6.0
+Forensic document reconstruction flat-lay photograph of evidence p5 inside a police lab. An aged yellowed Vietnamese newspaper clipping from July 1996, torn into jagged pieces and reassembled like a puzzle on a neutral grey mat. Fragile newsprint paper displays bold printed Vietnamese headline text across the torn pieces: "BI KICH TRO CHOI TRON TIM: MOT CHAU BE TU VONG TRONG TU GO", with subtext mentioning "N.G.H 7 tuoi". Overhead uniform laboratory inspection lighting, high contrast, sharp paper fiber edges, authentic vintage newsprint texture, forensic analysis realism, 8k resolution. --ar 16:9 --style raw --s 75 --v 6.0
 ```
 
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
-un-torn newspaper, intact newspaper, clean smooth paper, modern glossy magazine, colorful photos, English newspaper, computer screen, wooden table, anime, 3d render, blurry text, missing tears, pristine paper.
+untorn newspaper, pristine paper, modern glossy magazine, English newspaper, computer screen, wooden table, anime, 3d render, blurry text.
 ```
 
 ---
 
-## 📱 III. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (DEVICE SCREENSHOTS)
+## III. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (DEVICE SCREENSHOTS)
 
 ---
 
@@ -399,7 +384,7 @@ english text, chinese characters, car icon instead of bike, broken UI layout, de
 
 ---
 
-## 🛠️ HƯỚNG DẪN TẠO ẢNH CHỐNG LỖI (ANTI-FAIL WORKFLOW)
+## IV. HƯỚNG DẪN TẠO ẢNH CHỐNG LỖI (ANTI-FAIL WORKFLOW)
 
 1. **Với Midjourney v6:**
    - Sao chép nguyên văn đoạn trong ô code `📝 BULLETPROOF PROMPT`.

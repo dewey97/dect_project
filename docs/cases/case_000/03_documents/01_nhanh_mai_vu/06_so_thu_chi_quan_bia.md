@@ -15,7 +15,7 @@
 - B8 (1 khách): 1 bia + đĩa lạc -> 35k (Tiền mặt 19:40)
 - B13 (2 khách): -> 90k (Tiền mặt 20:10)
 - Mang về (1 khách): 2 chai bia + đĩa lạc -> 55k (Tiền mặt 20:50)
-- **B7 (1 khách): -> 195k (CK 20:45)**
+- **B7 (1 khách): Nem chua + nửa thùng bia -> 195k (CK 20:45)**
 - B9 (1 khách): -> 50k (Tiền mặt 21:05)
 - B11 (2 khách): Lòng xào dưa + 4 bia -> 130k (Tiền mặt 21:15)
 - B10 (3 khách): -> 120k (Tiền mặt 21:25)

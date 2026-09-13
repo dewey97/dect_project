@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `07d/BB-LK`  
+Số: `15/BB-LK`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
@@ -24,7 +24,7 @@ Vào hồi 19 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 * **Họ và tên:** **TRẦN THỊ HÀ** | **Giới tính:** Nữ | **Sinh ngày:** 22/09/1990 (36 tuổi).
 * **CCCD số:** `001190008271` cấp ngày 14/03/2021 tại Cục CSQLHC về TTXH.
 * **Nơi ĐKHKTT:** Số 8, Ngõ 12 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
-* **Nghề nghiệp:** Kế toán tổng hợp (Công ty Vận tải Sông Hồng — Bạn gái nạn nhân).
+* **Nghề nghiệp:** Kế toán tổng hợp (Công ty TNHH Vận tải Sông Hồng). Mối quan hệ với nạn nhân: Bạn gái.
 
 ---
 
@@ -34,7 +34,7 @@ Vào hồi 19 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 * **Đáp (Trần Thị Hà):** *(Khóc sụt sùi, giọng nhỏ nhẹ yếu ớt)* Em và anh Khang yêu nhau được hơn 3 năm rồi thưa cán bộ... Dạo này anh Khang hay mệt mỏi nên em có tự tay sao một hũ trà hoa cúc mang sang dặn anh ấy uống an thần nghỉ sớm. Tối qua sau khi ăn cơm xong, từ 20h00 đến 21h30 em ở một mình trong phòng trọ xem phim bộ trên VTV3 cho đỡ buồn. Tập phim hôm qua đau lòng lắm, kể về một người đàn ông phản bội người con gái đã hy sinh cả tuổi thanh xuân cho anh ta... Xem xong em khóc ướt cả gối rồi mới tắt tivi đi ngủ. Em ở phòng trọ cả tối không hề bước chân ra ngoài!
 
 * **Hỏi (ĐTV Lê Minh):** Chị có biết ai có thù oán hay mâu thuẫn gì với anh Khang gần đây không?
-* **Đáp (Trần Thị Hà):** Em thấy dạo gần đây có anh Tùng thợ xây hay lảng vảng qua ngõ với vẻ mặt hằn học lắm... Em nghe anh Khang kể loáng thoáng giữa hai người có xích mích gì đó từ xưa. Anh Tùng tính tình cục cằn, hung hăng lắm, chắc chắn anh ta sang gây sự rồi làm hại anh Khang! Cán bộ phải điều tra anh Tùng để đòi lại công bằng cho anh Khang!
+* **Đáp (Trần Thị Hà):** *(Lấy khăn tay chấm nước mắt, giọng run run)* Anh Khang làm nghề cho vay bốc họ phức tạp lắm cán bộ ơi... Nhiều con nợ giang hồ bặm trợn bị anh ấy siết nợ cay cú hay gọi điện nhắn tin chửi bới đe dọa anh ấy lắm. Mấy hôm trước ngoài bờ tường gạch trước cổng còn bị người ta xịt sơn đỏ chửi bới đòi mạng nữa cơ... Em sợ xảy ra chuyện nên khuyên anh ấy bỏ nghề mãi mà anh ấy không chịu nghe... Em nghi là mấy con nợ giang hồ hung tợn đến trả thù anh ấy!
 
 ---
 

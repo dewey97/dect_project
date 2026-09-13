@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `06/BB-HX`  
+Số: `11/BB-HX`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
@@ -28,10 +28,10 @@ Cán bộ điều tra: Trung úy Nguyễn Văn Hoàng tiến hành lấy lời k
 
 ---
 
-### II. LỜI KHAI ÔNG BÀ NGUYỄN VĂN TIẾN (BỐ MẸ TÙNG — SỐ 10 BỜ SÔNG)
-* **Quan hệ thời thơ ấu:** Ngày xưa thằng Khang hay chơi cùng hai đứa con trai nhà ông bà (Tùng và bé Gia Huy), đám trẻ thân nhau lắm. Từ sau biến cố đau lòng năm 1996 khi thằng út (Gia Huy) qua đời do ngạt khí trong tủ gỗ âm tường ngoài bãi đất hoang thì bọn trẻ không còn qua lại với nhau nữa.
-* **Tính cách nạn nhân:** Khang từ nhỏ tính nết ngỗ ngược, hay bắt nạt bạn bè, lớn lên mở quán cho vay nên gia đình ông bà không còn giao thiệp.
-* **Tình tiết gần đây:** Mấy hôm trước, gia đình có bảo con trai lớn (Tùng) tiện đường ghé qua nhà Khang gửi lời mời sang ăn đám giỗ em trai, nhưng không thấy Khang sang. Tùng hiện đi làm thợ xây dựng công trình, thỉnh thoảng mới về quê.
+### II. LỜI KHAI ÔNG BÀ NGUYỄN VĂN TIẾN (CƯ DÂN CAO TUỔI — SỐ 10 ĐƯỜNG BỜ SÔNG)
+* **Về tình hình xóm ngõ xưa và nay:** Vợ chồng tôi già rồi, ở cái xóm Bờ Sông này từ thời thanh niên. Ngày xưa xóm này đông vui, lũ trẻ con trạc tuổi nhau hay tụ tập chơi đùa ngoài bãi đất ven sông. Thằng Khang hồi nhỏ tính nết ngỗ ngược, nghịch ngợm có tiếng. Nhưng từ sau mùa hè năm 1996, cũng vì cái thói nghịch ngợm tai ác của thằng Khang mà đứa con trai út tội nghiệp của chúng tôi phải chịu một biến cố đau lòng rồi mất sớm... Từ độ ấy, gia đình tôi đoạn tuyệt không bao giờ qua lại với nó nữa, lũ trẻ trong xóm cũng tản mát dần chẳng còn tụ tập chơi chung với thằng Khang nữa.
+* **Về quan hệ với nạn nhân:** Lớn lên thằng Khang mở bốc họ, tính tình dữ dằn nên bà con lối xóm ai cũng ngại tiếp xúc, nhà tôi lại càng không thèm nhìn mặt. Gia đình tôi giờ chỉ còn người con trai lớn đi làm thợ xây dựng công trình tự do nay đây mai đó quanh Hà Nội, thỉnh thoảng mới tạt về thăm nhà chốc lát rồi lại đi.
+* **Tối ngày 24/07:** Hai thân già chúng tôi lãng tai, tối ăn cơm xong là đóng cửa uống nước chè rồi đi ngủ sớm từ 20h, ngoài trời lại mưa rào nên không nghe ngóng được động tĩnh gì bên nhà thằng Khang cả.
 
 ---
 

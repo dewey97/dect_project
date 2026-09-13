@@ -28,7 +28,7 @@
 | **Họ và tên khai sinh** | **NGUYỄN VĂN KHANG** |
 | **Tên thường gọi** | Khang "Bờ Sông" / Khang "Bốc Họ" |
 | **Ngày tháng năm sinh** | 10/11/1988 (38 tuổi tại thời điểm tử vong) |
-| **Số CCCD** | `001088002145`, cấp ngày 15/01/2021 tại Cục CSQLHC về TTXH |
+| **Số CCCD** | `001088006721`, cấp ngày 15/01/2021 tại Cục CSQLHC về TTXH |
 | **Số điện thoại chính chủ** | `0904.888.666` (Thiết bị iPhone 8 Plus `dev-00`) |
 | **Quê quán** | Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi cư trú hiện tại** | Số 14, Đường Bờ Sông, Phường Phân khu Cảng (Nhà riêng hiện trường) |

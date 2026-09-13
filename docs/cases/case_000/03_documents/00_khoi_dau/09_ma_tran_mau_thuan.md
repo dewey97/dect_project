@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `05/BC-MTQH`  
+Số: `09/BC-MTQH`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
@@ -21,7 +21,7 @@ Số: `05/BC-MTQH`
 | :---: | :--- | :--- | :--- | :--- | :---: |
 | **1** | **TRẦN NGỌC MAI**<br>(SN 1992, Phố Đoàn Kết) | Em họ (con cô ruột) | Tranh chấp đất đai 200m² của ông nội. Mai phát hiện Khang gian dối đứng tên Sổ đỏ thế chấp ngân hàng. | Xấp Đơn đòi đất và Dự thảo thỏa thuận văng vãi dưới sàn (`p2`). | **RẤT CAO**<br>*(Động cơ tài sản lớn)* |
 | **2** | **LÊ QUANG VŨ**<br>(SN 1991, Chồng của Mai) | Em rể họ | Nợ nần tiền bạc giấu vợ. Bị Khang uy hiếp tính lãi cắt cổ và đe dọa báo gia đình vợ. | Cuốn sổ nợ tín dụng đen (`05`), mâu thuẫn giờ giấc cuốc xe ôm (`p10`). | **CAO**<br>*(Động cơ cùng quẫn)* |
-| **3** | **NGUYỄN THANH TÙNG**<br>(SN 1986, Thợ xây dựng) | Bạn thời thơ ấu xóm Bờ Sông | Anh trai của bé Gia Huy (chết ngạt trong tủ gỗ âm tường năm 1996 khi chơi trốn tìm với Khang). | Vết bầm gò má, mẩu báo cũ 1996 (`p5`), khung ảnh vỡ `p4`, cuộc gọi ẩn danh 19:55. | **CAO**<br>*(Động cơ thù hận quá khứ)* |
+| **3** | **ĐỐI TƯỢNG ẨN DANH (SĐT 19:55)**<br>*(Chưa rõ danh tính / Cần tra cứu)* | Nghi vấn người quen thời thơ ấu xóm Bờ Sông | Mâu thuẫn ân oán quá khứ liên quan bi kịch hè 1996. | Mẩu báo cũ 1996 xé vụn (`p5`), khung ảnh vỡ `p4`, dấu vân tay lạ trên tách trà (`p1`), cuộc gọi đến lúc 19:55 (`0984.180.357`). | **CAO**<br>*(Động cơ ân oán cá nhân)* |
 | **4** | **TRẦN THỊ HÀ**<br>(SN 1990, Kế toán) | Bạn gái sống gần nhà | Tình cảm rạn nứt, bị Khang ruồng rẫy, bạo hành lời nói và lén lút quen nhân tình mới. | Hũ trà hoa cúc trên bàn phòng khách, vết thương chí mạng do mảnh bình trà vỡ (`p3`). | **ĐẶC BIỆT**<br>*(Cuồng yêu, ghen tuông bệnh hoạn)* |
 
 ---

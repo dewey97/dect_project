@@ -5,7 +5,7 @@
 
 **CÔNG AN THÀNH PHỐ HÀ NỘI**  
 **PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `07b/BB-LK`  
+Số: `13/BB-LK`  
 *Hà Nội, ngày 25 tháng 07 năm 2026*
 
 ---
@@ -24,7 +24,7 @@ Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 * **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991 (35 tuổi).
 * **CCCD số:** `001091005812` cấp ngày 12/04/2021 tại Cục CSQLHC về TTXH.
 * **Nơi ĐKHKTT:** Số 45, Phố Đoàn Kết, Phường Trung Tâm, TP. Hà Nội.
-* **Nghề nghiệp:** Kỹ sư Điện tự do (Chồng của Trần Ngọc Mai).
+* **Nghề nghiệp:** Kỹ sư Điện tự do. Mối quan hệ với nạn nhân: Em rể họ (Chồng của Trần Ngọc Mai).
 
 ---
 
@@ -33,12 +33,11 @@ Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 * **Hỏi (ĐTV Lê Minh):** Tối ngày 24/07/2026, anh cùng vợ (Trần Ngọc Mai) đến nhà nạn nhân Khang lúc mấy giờ và rời đi khi nào?
 * **Đáp (Lê Quang Vũ):** Khoảng 18h30 hai vợ chồng tôi đi chung xe máy sang nhà anh Khang. Nói chuyện một lúc thì vợ tôi bực tức ném giấy tờ rồi nổ máy xe phóng về trước. Lúc vợ tôi dắt xe ra thì tôi cũng đi bộ theo ra cổng cùng lúc với vợ tôi, rồi tôi đi bộ ra đầu ngõ mở app đặt xe ôm công nghệ đi nhậu giải sầu chứ không ở lại trong nhà làm gì. Vợ tôi vừa phóng xe đi là tôi cũng bắt xe đi luôn! Đây này, các anh xem ảnh chụp màn hình app xe của tôi đây!
 
-* **Hỏi (ĐTV Lê Minh):** Anh khai bắt xe đi nhậu, vậy cụ thể anh uống ở quán nào, ngồi với ai? Có ai làm chứng cho anh không?
-* **Đáp (Lê Quang Vũ):** Tôi bắt xe ra Quán Bia 88 ven sông Khu Cầu Cảng... Tôi buồn chuyện gia đình nên ngồi một mình ở bàn số 7 sát bờ sông gọi 1 đĩa nem với nửa thùng bia ngồi uống giải sầu suốt từ lúc gần 20h đến hơn 21h, không ngồi với ai và cũng chẳng nói chuyện với ai cả.
+* **Hỏi (ĐTV Lê Minh):** Anh khai bắt xe đi nhậu, vậy cụ thể anh uống ở đâu, ngồi với ai? Có ai làm chứng cho anh không?
+* **Đáp (Lê Quang Vũ):** Tôi buồn chuyện gia đình nên bắt xe ôm chạy ra mấy quán bia hơi vỉa hè ven sông Khu Cầu Cảng ngồi uống giải sầu một mình. Quán đông đúc ồn ào, tôi ngồi một mình trong góc tối chẳng quen ai và cũng chẳng để ý ai cả.
 
-* **Hỏi (ĐTV Lê Minh):** Sau khi uống bia xong ở Quán Bia 88, anh về nhà bằng phương tiện gì?
-
-* **Đáp (Lê Quang Vũ):** *(Gãi đầu phân trần)* Dạ thưa cán bộ... lúc uống xong hơn 21h người tôi mệt mỏi, tôi bước ra cửa quán thấy có một bác chạy xe ôm truyền thống đang đứng chờ khách ngay trước quán, tôi liền vẫy tay bảo chở về ngõ Đoàn Kết rồi đưa tiền mặt cho tiện... Vì thế trên app chỉ lưu cuốc đi lúc 19:30 thôi ạ!
+* **Hỏi (ĐTV Lê Minh):** Sau khi uống bia xong, anh về nhà bằng phương tiện gì?
+* **Đáp (Lê Quang Vũ):** Lúc uống xong đến tầm gần 21h (khoảng 20h45) người tôi mệt mỏi, tôi bước ra đường thấy có một bác chạy xe ôm truyền thống đang đứng chờ khách, tôi liền vẫy tay bảo chở về ngõ Đoàn Kết rồi đưa tiền mặt cho tiện... Vì thế trên app điện thoại tôi chỉ xuất trình được cuốc xe lúc rời khỏi ngõ thôi ạ!
 
 * **Hỏi (ĐTV Lê Minh):** Ngoài vợ anh, nạn nhân Khang có mâu thuẫn hay qua lại thân thiết với ai khác không?
 * **Đáp (Lê Quang Vũ):** Anh Khang sống một mình, tính cộc cằn lắm, chỉ có con Hà người yêu là hay qua lại thôi. Con bé đấy nó yêu thằng Khang đến phát điên, ngày nào cũng trà đóm cơm bưng nước rót chăm sóc từng tí một... Nhiều lúc nghĩ mà ước gì vợ tôi được như con Hà.

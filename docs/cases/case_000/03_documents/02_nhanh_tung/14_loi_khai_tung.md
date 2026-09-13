@@ -15,7 +15,7 @@ Số: `14/BB-LK1`
 
 ---
 
-Vào hồi 16 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.  
+Vào hồi 19 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.  
 **Chúng tôi gồm:**
 1. Điều tra viên: Đại úy Lê Minh — Đội Điều tra Trọng án.
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
@@ -33,14 +33,14 @@ Vào hồi 16 giờ 30 phút, ngày 25 tháng 07 năm 2026, tại Phòng Cảnh 
 ### NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)
 
 * **Hỏi (ĐTV Lê Minh):** Nhật ký viễn thông cho thấy anh đã gọi vào số máy nạn nhân Nguyễn Văn Khang lúc 19:55 tối 24/07. Cuộc gọi này có nội dung gì? Sau cuộc gọi anh ở đâu và làm gì?
-* **Đáp (Nguyễn Thanh Tùng):** *(Sắc mặt căng thẳng, hai tay bấu chặt gấu quần)* Dạ thưa cán bộ... Tối qua lúc 19h55 tôi có gọi điện cho Khang định hỏi hẹn gặp xem nó có tiền cho tôi vay tạm ít triệu mua vật liệu sửa nhà và báo nó tiện thì sang ăn giỗ 30 năm thằng em út tôi... Nhưng nó bảo đang bận việc rồi tắt máy. **Tôi khẳng định tối qua TÔI CHỈ GỌI ĐIỆN THOẠI CHỨ TUYỆT ĐỐI KHÔNG HỀ ĐẾN GẶP MẶT Khang!** Sau đó tôi bắt xe ôm về thẳng phòng trọ ở Cầu Bươu ngủ suốt đêm đến sáng!
+* **Đáp (Nguyễn Thanh Tùng):** *(Sắc mặt căng thẳng, hai tay bấu chặt gấu quần)* Dạ thưa cán bộ... Tối qua lúc 19h55 tôi có gọi điện cho Khang định hỏi hẹn gặp xem bên mấy chỗ công trình nó quen có việc sửa chữa, đục trát gì không để tôi nhận làm công nhật, tiện thể hỏi xem nó có tiền cho tôi vay tạm ít triệu mua vật liệu đồ nghề... Nhưng nó gạt đi bảo đang bận việc rồi tắt máy. **Tôi khẳng định tối qua TÔI CHỈ GỌI ĐIỆN THOẠI CHỨ TUYỆT ĐỐI KHÔNG HỀ ĐẾN GẶP MẶT Khang!** Sau đó tôi bắt xe ôm về thẳng phòng trọ ở Cầu Bươu ngủ suốt đêm đến sáng!
 
 * **Hỏi (ĐTV Lê Minh):** Anh có từng bước chân vào phòng khách nhà Khang ngồi uống trà vào tối 24/07 không?
 * **Đáp (Nguyễn Thanh Tùng):** Dạ không hề có chuyện đó thưa cán bộ! Tôi chỉ gọi điện thoại rồi đi về phòng trọ ngủ, làm sao mà có chuyện tôi ngồi uống trà trong nhà nó được!
 
 ---
 
-Biên bản lấy lời khai kết thúc vào hồi 17 giờ 30 phút cùng ngày. Biên bản đã được đọc lại cho người khai nghe, công nhận đúng và cùng ký tên.
+Biên bản lấy lời khai kết thúc vào hồi 20 giờ 15 phút cùng ngày. Biên bản đã được đọc lại cho người khai nghe, công nhận đúng và cùng ký tên.
 
 **ĐIỀU TRA VIÊN**  
 *(Ký tên)*  

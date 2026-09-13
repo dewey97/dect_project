@@ -1,57 +1,33 @@
-# CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
-**Độc lập – Tự do – Hạnh phúc**
+*(Vật chứng thu giữ tại hiện trường: Cuốn sổ tay bìa da màu đen kích thước 12cm x 18cm, nhãn hiệu Moleskine, rơi tại chân tủ gỗ phòng khách nhà nạn nhân Nguyễn Văn Khang. Toàn bộ nội dung bên dưới là bút tích viết tay bằng mực bút bi xanh của Khang).*
 
 ---
 
-**CÔNG AN THÀNH PHỐ HÀ NỘI**  
-**PHÒNG CẢNH SÁT HÌNH SỰ (PC02)**  
-Số: `05/BB-TS`  
-*Hà Nội, ngày 25 tháng 07 năm 2026*
+# 📓 SỔ GHI TIỀN HỌ & LÃI NGÀY — NĂM 2026
+### (Sổ tay cá nhân của Nguyễn Văn Khang)
 
 ---
 
-# BÁO CÁO TRÍCH SAO SỔ GHI NỢ TÍN DỤNG ĐEN
-*(Vật chứng thu giữ tại hiện trường: Cuốn sổ tay bìa da đen `05`)*
+### TRANG 12: THEO DÕI BỐC BÁT HỌ & LÃI NGÀY (THÁNG 07/2026)
+
+| STT | Khách Vay / Biệt Danh | Tiền Vay / Bát Họ | Số Điện Thoại | Hạn Trả | Ghi Chú & Tình Trạng Đòi Nợ (Bút Tích Của Khang) |
+| :---: | :--- | :---: | :---: | :---: | :--- |
+| **01** | **Tùng Xăm** | 50.000.000 đ | `0904.112.345` | 15/07 | Đã tất toán đủ bát họ 50 ngày. Đang hỏi bốc thêm bát mới 80 triệu. |
+| **02** | **Hải Lác Bến Phà** | 120.000.000 đ | `0918.776.543` | 20/07 | Khóa máy trốn nợ. Cho người canh bến phà, tóm được thì giữ xe. |
+| **03** | **Chị Lan Quán Nước** | 30.000.000 đ | `0932.889.102` | 25/07 | Đóng họ đều. Tiền lãi ngày cấn trừ vào tiền nước chè, thuốc lá hàng tuần. |
+| **04** | **Đạt Gà Chợ Cảng** | 80.000.000 đ | `0912.331.888` | 28/07 | 18:45 (24/7) gọi xin khất 1 tuần -> Không cho. Đến 28/7 ko trả: cho người xuống dẹp sạp gà. |
+| **05** | **Thằng Lệch Pha** | 300.000.000 đ | `0988.20.09.91` | 20/07 | ~~Hẹn 20/7 trả ở 45 Đoàn Kết~~ *(bút bi gạch xóa)*<br>Bùng hẹn, tắt máy. Hạn chót 25/7: rải tờ rơi + ném giấy nợ vào nhà bố vợ ở 45 Đoàn Kết! |
+| **06** | **Cường Mũi Két** | 150.000.000 đ | `0973.665.412` | 05/08 | Cầm cavet xe Wave Alpha đỏ + CCCD gốc. Đóng họ đúng hẹn. |
+| **07** | **Bình Còi** | 40.000.000 đ | `0915.223.789` | 10/08 | Bát 10 ăn 8, thu 50 ngày (đã thu 15 ngày). 18:00 gọi rủ bi-a -> Đã từ chối vì bận việc. |
+| **08** | **Tuấn Béo Xưởng Mộc** | 200.000.000 đ | `0902.998.114` | 15/08 | Chây ì quá hạn. Khất lần nữa thì cho người qua khóa xưởng mộc, siết máy móc. |
 
 ---
 
-### I. ĐẶC ĐIỂM VẬT CHỨNG THU GIỮ
-* **Vật phẩm:** 01 Cuốn sổ tay bìa da màu đen kích thước 12cm x 18cm thu giữ tại phòng khách nhà nạn nhân Nguyễn Văn Khang.
-* **Nội dung:** Ghi chép danh sách các khoản vay lãi ngày, bốc bát họ và các con nợ cá nhân của nạn nhân Khang.
-
----
-
-### II. BẢNG TRÍCH SAO DANH SÁCH CON NỢ TRỌNG ĐIỂM
+### GHI CHÉP GÓC DƯỚI TRANG SỔ (BÚT BI XANH VIẾT VỘI):
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                          SỔ THEO DÕI CHO VAY NẶNG LÃI & BỐC BÁT HỌ                                     │
-├───────┬──────────────────────────────┬────────────────┬────────────────┬────────┬───────────────────────┤
-│ DÒNG  │ TÊN / BIỆT DANH CON NỢ       │ SỐ TIỀN VAY    │ SỐ ĐIỆN THOẠI  │ HẠN TRẢ│ GHI CHÚ ĐÒI NỢ        │
-├───────┼──────────────────────────────┼────────────────┼────────────────┼────────┼───────────────────────┤
-│ 01    │ Tùng Xăm                     │  50.000.000 đ  │ 0904.112.345   │ 15/07  │ Đã nộp đủ họ tháng 6. │
-│ 02    │ Hải Lác Bến Phà              │ 120.000.000 đ  │ 0918.776.543   │ 20/07  │ Trốn khỏi nơi cư trú. │
-│ 03    │ Chị Lan Quán Nước            │  30.000.000 đ  │ 0932.889.102   │ 25/07  │ Đóng lãi ngày đủ.     │
-│ 04    │ Đạt Gà Chợ Cảng              │  80.000.000 đ  │ 0912.331.888   │ 28/07  │ Xin khất thêm 1 tuần. │
-│ 05    │ Thằng Lệch Pha               │ 300.000.000 đ  │ 0988.20.09.91  │ 20/07  │ ~~Hẹn trả ở 45 Đoàn Kết~~│
-│       │                              │                │                │        │ Bùng hẹn! Phải mách nhà nó...│
-│ 06    │ Cường Mũi Két                │ 150.000.000 đ  │ 0973.665.412   │ 05/08  │ Giữ giấy tờ xe Wave.  │
-│ 07    │ Bình Còi                     │  40.000.000 đ  │ 0915.223.789   │ 10/08  │ Bốc bát 10 ăn 8.      │
-│ 08    │ Tuấn Béo Xưởng Mộc           │ 200.000.000 đ  │ 0902.998.114   │ 15/08  │ Nợ xấu, chuẩn bị xiết.│
-└───────┴──────────────────────────────┴────────────────┴────────────────┴────────┴───────────────────────┘
+- Gom nốt các món họ đến hạn trước 25/7.
+- Tiền mặt két sắt phòng ngủ: ~850 triệu.
+- Rút sổ tiết kiệm: 1,2 tỷ.
+=> Tổng gom hơn 2 tỷ mang theo.
+- Vé máy bay sáng 25/7 (chuyến 06:15) vào trong đó với Bé Vy ❤️.
 ```
-
----
-
-### III. KẾT QUẢ RÀ SOÁT & ĐỐI CHIẾU
-1. **Dòng 05 — Thằng Lệch Pha (300.000.000 đ — SĐT: `0988.20.09.91`):**
-   - Ban đầu có dòng ghi chú viết tay *"Hẹn trả ở 45 Đoàn Kết"* nhưng đã bị Khang dùng bút bi gạch xóa ngang (dấu hiệu con nợ trốn tránh, bùng hẹn trả tiền).
-   - Tiếp đó, Khang gửi tin nhắn SMS đe dọa lúc 14:22 ngày 23/07 (trên điện thoại dev-00): *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"*.
-   - Đối chiếu hồ sơ lý lịch (`08b`): **Lê Quang Vũ** sinh ngày **20/09/1991**, làm nghề **kỹ sư điện** có tật **mắt trái lác nhẹ** (biệt danh kép "Lệch Pha"), ở rể tại **Số 45 Phố Đoàn Kết**.
-2. $\rightarrow$ **Căn cứ xác lập Lê Quang Vũ chính là con nợ 300M bùng hẹn và đang bị siết nợ gắt gao.**
-
----
-
-**ĐIỀU TRA VIÊN LẬP BÁO CÁO**  
-*(Ký, ghi rõ họ tên)*  
-**Đại úy Hoàng Tuấn Dũng**

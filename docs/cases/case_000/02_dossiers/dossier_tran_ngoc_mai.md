@@ -54,7 +54,7 @@
 
 1. **Xấp tài liệu ném tại hiện trường (`p2`):** Đơn đòi đất 200m² và hồ sơ pháp lý mang tên Mai rơi vãi dưới sàn phòng khách.
 2. **Thời điểm rời hiện trường:** Mai khai cãi nhau xong nổ máy xe phóng về nhà lúc ~19:00. Khớp nối chính xác với tiếng xe máy nổ lúc nhạc Thời sự 19h00 VTV1 trong Lời khai nhân chứng bà Lụa (`11`).
-3. **Lời khai về sự cố mất tín hiệu truyền hình:** Mai khai về đến nhà lúc 19:45, đang xem tivi đến 20:10 thì mất sóng cáp do sự cố đứt cáp quang $\rightarrow$ Khớp nối với thông báo trên Bảng tin khu phố Đoàn Kết (`18`).
+3. **Lời khai về sự cố mất tín hiệu truyền hình:** Mai khai về đến nhà lúc 19:45, đang xem tivi đến 20:10 thì mất sóng cáp do sự cố đứt cáp quang $\rightarrow$ Khớp nối với thông báo sự cố đứt cáp nhánh Bờ Sông – Đoàn Kết trên Bảng tin trước cổng số 14 Bờ Sông (`18`).
 
 ---
 
@@ -111,7 +111,7 @@ Chở Vũ sang          Ném hồ sơ xuống sàn,  Về đến nhà số 45   
 | **`p2`** | **Ảnh Đơn đòi đất rơi vãi dưới sàn** | Xấp hồ sơ đòi đất 200m² tại hiện trường $\rightarrow$ Xác định động cơ mâu thuẫn tranh chấp đất. |
 | **`12`** | **Lời khai Trần Ngọc Mai** | Khai ném hồ sơ rồi phóng xe về nhà (~19:45), xem TV đến 20:10 thì mất sóng cáp. |
 | **`11`** | **Lời khai bà Lụa** | Xác nhận tiếng xe máy phóng đi đúng lúc nhạc Thời sự VTV1 cất lên (19:00). |
-| **`18`** | **Bảng tin rao vặt khu phố Đoàn Kết** | Thông báo sự cố đứt cáp quang lúc 20:10 ở Phố Đoàn Kết $\rightarrow$ Xác thực ngoại phạm ở nhà. |
+| **`18`** | **Bảng tin trước cổng số 14 Bờ Sông** | Mẩu thông báo đứt cáp quang nhánh Bờ Sông – Đoàn Kết lúc 20:10 $\rightarrow$ Xác thực ngoại phạm ở nhà của Mai. |
 
 ---
 

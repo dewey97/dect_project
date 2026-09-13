@@ -26,7 +26,7 @@
 2. [II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI KHAI GIAN BAN ĐẦU](#ii-dấu-hiệu-cài-cắm-sớm--hành-vi-khai-gian-ban-đầu)
 3. [III. NGUỒN CƠN MÓN NỢ 300 TRIỆU & NỖI SỢ BỊ BẠCH HÓA GIA ĐÌNH](#iii-nguồn-cơn-món-nợ-300-triệu--nỗi-sợ-bị-bạch-hóa-gia-đình)
 4. [IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT](#iv-mối-quan-hệ-đan-xen-với-các-nhân-vật)
-5. [V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2026 - ĐÊM MƯA LỚN)](#v-dòng-thời-gian-đêm-án-mạng-24072026---đêm-mưa-lớn)
+5. [V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2026)](#v-dòng-thời-gian-đêm-án-mạng-24072026)
 6. [VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)](#vi-hệ-thống-vật-chứng--cơ-chế-giải-mã-phá-án-puzzle-mechanics)
 7. [VII. SƠ HỞ LỜI KHAI, RED HERRING & BẰNG CHỨNG NGOẠI PHẠM](#vii-sơ-hở-lời-khai-red-herring--bằng-chứng-ngoại-phạm)
 8. [VIII. KÝ SỰ HẬU ÁN: GÁNH NẶNG GÁ NGHĨA & NỖI SỢ CỦA KẺ CÙNG ĐƯỜNG](#viii-ký-sự-hậu-án-gánh-nặng-gá-nghĩa--nỗi-sợ-của-kẻ-cùng-đường)
@@ -97,7 +97,7 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 ```
 
 * **18:30 – 19:00:** Vũ ngồi im trong khi Mai cãi nhau đòi đất với Khang. Đúng 19:00 Mai phóng xe về trước.
-* **19:00 – 19:25:** Vũ quỳ lạy xin hoãn món nợ 300 triệu. Khang chửi bới, rút cuốn sổ da đen đập mạnh vào ngực Vũ và đe dọa in 100 tờ rơi rải khắp phố Đoàn Kết. Vũ suy sụp, hoảng sợ vùng chạy thoát ra cửa sau luồn ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25:40.
+* **19:00 – 19:25:** Vũ quỳ lạy xin hoãn món nợ 300 triệu. Khang chửi bới, rút cuốn sổ da đen đập mạnh vào ngực Vũ và đe dọa in 100 tờ rơi rải khắp phố Đoàn Kết. Vũ suy sụp, hoảng sợ vội vàng tháo chạy ra khỏi cửa chính, chạy một mạch ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25:40.
 * **19:25:** Đứng ở đầu ngõ đợi xe, Vũ nhìn thấy bóng một người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
 * **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 đĩa nem + nửa thùng bia ngồi giải sầu.
 * **20:45:** Vũ thanh toán chuyển khoản **195.000đ** (Bàn số 7).
@@ -108,7 +108,7 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 ## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
 
 ### 1. Cơ chế 1: Đối chiếu Sổ nợ `05` & Biệt danh "Thằng Lệch Pha"
-* **Vật chứng:** Cuốn sổ ghi nợ tín dụng đen `05` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.91 — Hạn: 20/07 — Ghi chú: ~~Hẹn trả ở 45 Đoàn Kết~~ Bùng hẹn! Phải mách nhà nó...*.
+* **Vật chứng:** Cuốn sổ nợ `05` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.91 — Hạn: 20/07 — Ghi chú: ~~Hẹn 20/7 trả ở 45 Đoàn Kết~~ Bùng hẹn, tắt máy. Hạn chót 25/7: rải tờ rơi + ném giấy nợ vào nhà bố vợ ở 45 Đoàn Kết!*.
 * **Khớp nối suy luận:** Nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08b` + địa chỉ 45 Đoàn Kết + SĐT `0988.20.09.91` $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ!
 
 ### 2. Cơ chế 2: Câu đố Sổ thu chi Quán Bia 88 (`06_so_thu_chi_quan_bia.md`)
