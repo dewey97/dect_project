@@ -4,67 +4,60 @@
 ---
 
 # ĐƠN KHỞI KIỆN
-### (V/v: Tranh chấp di sản thừa kế & Yêu cầu tuyên vô hiệu văn bản ủy quyền thế chấp QSDĐ)
+*(V/v: Tranh chấp tài sản thừa kế và yêu cầu tuyên bố hợp đồng thế chấp quyền sử dụng đất vô hiệu)*
 
-*Hà Nội, ngày 22 tháng 07 năm 2016*
+**Kính gửi:** **TÒA ÁN NHÂN DÂN QUẬN SÔNG HỒNG, TP. HÀ NỘI**
 
----
+**Người khởi kiện:** **NGUYỄN VĂN THÀNH** — Sinh năm: 1960
+* CMND số: **524193786** 
+* Địa chỉ thường trú: Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.
+* Chỗ ở hiện tại: Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.
+* Số điện thoại liên hệ: **0912.456.789**
 
-### KÍNH GỬI:
-* **Tòa án Nhân dân TP. Hà Nội**
-* **Đồng kính gửi:** Ông **NGUYỄN VĂN KHANG** (Số 14 Đường Bờ Sông, Phường Phân khu Cảng)
+**Người bị kiện:** **NGUYỄN VĂN KHANG** — Sinh năm: 1988
+* CMND số: **830514692**.
+* Địa chỉ thường trú: Số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
+* Chỗ ở hiện tại: Số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
+* Số điện thoại liên hệ: **0935.112.233**
 
----
-
-### I. NGUYÊN ĐƠN (NGƯỜI KHỞI KIỆN):
-1. **Ông NGUYỄN VĂN THÀNH** — Sinh năm: 1960. Dân tộc: Kinh. Quốc tịch: Việt Nam.  
-   * CCCD số: `001060002145` cấp ngày 12/04/2010 tại CA TP. Hà Nội.  
-   * Nơi ĐKHKTT: Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.  
-   * Chỗ ở hiện tại: Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.  
-   * Nghề nghiệp: Hưu trí.  
-   * SĐT: `0912.456.789`.  
-
-   **Người đại diện theo ủy quyền của nguyên đơn:**  
-2. **Bà NGUYỄN NGỌC MAI** — Sinh ngày: 15/05/1992. Dân tộc: Kinh. Quốc tịch: Việt Nam.  
-   * CCCD số: `001192004523` cấp ngày 10/08/2012 tại Cục CS QLHC về TTXH.  
-   * Nơi ĐKHKTT: Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.  
-   * Chỗ ở hiện tại: Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.  
-   * Nghề nghiệp: Nhân viên văn phòng.  
-   * SĐT: `0978.321.654`.  
-   * Quan hệ với nguyên đơn: Con gái ông Nguyễn Văn Thành.  
-   * Căn cứ đại diện: Giấy ủy quyền lập ngày 20/07/2016 (có công chứng tại VP Công chứng Phân khu Cảng).  
-
-### II. BỊ ĐƠN (NGƯỜI BỊ KIỆN):
-* **Ông NGUYỄN VĂN KHANG** — Sinh ngày: 10/11/1988. Dân tộc: Kinh. Quốc tịch: Việt Nam.  
-* CCCD số: `001088003412` cấp ngày 05/03/2011 tại CA TP. Hà Nội.  
-* Nơi ĐKHKTT: Số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.  
-* Chỗ ở hiện tại: Số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.  
-* Nghề nghiệp: Kinh doanh tự do.  
-* SĐT: `0935.112.233`.  
+**Người có quyền lợi, nghĩa vụ liên quan:** **NGÂN HÀNG TMCP ĐẦU TƯ VÀ NÔNG NGHIỆP XANH VIỆT NAM**
+* Trụ sở chính: *Số 88, đường Chiến Thắng, Phường Bạch Đằng, Quận Sông Hồng, TP. Hà Nội*
 
 ---
 
-### III. NỘI DUNG VỤ VIỆC VÀ YÊU CẦU GIẢI QUYẾT:
+### NỘI DUNG VỤ VIỆC:
 
-1. **Nguồn gốc tài sản di sản:**  
-   Thửa đất diện tích **200m²** (tờ bản đồ số 04, thửa đất số 18) tại địa chỉ số 14 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội là tài sản di sản hương hỏa của cố ông **NGUYỄN VĂN THỌ** (sinh năm 1930, mất ngày 18/04/2016). Khi còn sống, ông Thọ chưa lập văn bản di chúc hợp pháp phân chia di sản này cho bất kỳ ai.
+1. **Về nguồn gốc đất và di sản thừa kế:**
+Thửa đất diện tích **200m²** (Tờ bản đồ số 04, Thửa đất số 18) tại địa chỉ: Số 14 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội là tài sản thuộc quyền sử dụng hợp pháp của ông **NGUYỄN VĂN THỌ** (sinh năm 1930, mất ngày 18/04/2016). Ngày 18/04/2016, ông Nguyễn Văn Thọ qua đời, không để lại di chúc. Căn cứ quy định của pháp luật về thừa kế, toàn bộ diện tích 200m² đất nêu trên là di sản thừa kế thuộc quyền hưởng thừa kế theo pháp luật của các thừa kế hàng thứ nhất.
 
-2. **Hành vi vi phạm pháp luật của bị đơn:**  
-   Vào tháng 04/2016, trong thời gian ông Nguyễn Văn Thọ bị tai biến nặng nằm điều trị tại Bệnh viện Đa khoa quận, bị đơn Nguyễn Văn Khang đã lén lút giả mạo văn bản ủy quyền, tự ý làm thủ tục biến sang tên cá nhân trên Giấy chứng nhận QSDĐ (Sổ đỏ).  
-   Sau đó, Nguyễn Văn Khang mang toàn bộ Sổ đỏ 200m² đất đi thế chấp Ngân hàng TMCP Nông Nghiệp để vay khoản tiền **1.200.000.000 VNĐ** (Một tỷ hai trăm triệu đồng) phục vụ mục đích cá nhân mà không được sự đồng ý của nguyên đơn.
+2. **Về hành vi vi phạm của Người bị kiện:**
+Vào tháng 04/2016, lợi dụng thời điểm ông Nguyễn Văn Thọ đang điều trị bệnh nặng tại Bệnh viện, ông Nguyễn Văn Khang đã tự ý lập/giả mạo văn bản ủy quyền và thực hiện thủ tục đăng ký biến động sang tên cá nhân đối với Giấy chứng nhận quyền sử dụng đất nêu trên mà không có sự đồng ý của tôi cũng như các đồng thừa kế khác.
 
-3. **Yêu cầu khởi kiện & Thỏa thuận bắt buộc:**  
-   * Yêu cầu Tòa án tuyên hủy bỏ Hợp đồng thế chấp QSDĐ giữa bị đơn và Ngân hàng thương mại do văn bản ủy quyền vô hiệu.  
-   * Yêu cầu ông Nguyễn Văn Khang nộp tiền giải chấp rút Giấy chứng nhận QSDĐ tại Ngân hàng về trước ngày 30/08/2016.  
-   * Tiến hành thủ tục đo đạc, phân chia và sang tên trả lại **50% diện tích đất (100m²)** cho nguyên đơn (nhánh gia đình ông Nguyễn Văn Thành).
+Tiếp đó, ông Nguyễn Văn Khang đã dùng Giấy chứng nhận quyền sử dụng đất này để ký kết Hợp đồng thế chấp với Ngân hàng TMCP Đầu tư & Nông nghiệp Xanh Việt Nam nhằm vay số tiền **1.200.000.000 VNĐ** (Một tỷ hai trăm triệu đồng) phục vụ mục đích cá nhân. Hành vi này xâm phạm nghiêm trọng đến quyền và lợi ích hợp pháp về tài sản thừa kế của tôi.
 
 ---
 
-**NGƯỜI ĐỨNG ĐƠN KHỞI KIỆN**  
-*(Ký và ghi rõ họ tên)*  
+### YÊU CẦU TÒA ÁN GIẢI QUYẾT NHỮNG VẤN ĐỀ SAU:
 
-*(Đã ký)*  
-**Nguyễn Văn Thành**  
+1. Tuyên bố Hợp đồng thế chấp quyền sử dụng đất được ký kết giữa ông **Nguyễn Văn Khang** và **Ngân hàng TMCP TMCP Đầu tư & Nông nghiệp Xanh Việt Nam** đối với thửa đất số 18, tờ bản đồ số 04 (diện tích 200m² tại địa chỉ số 14 Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội) là **vô hiệu**.
+2. Buộc ông Nguyễn Văn Khang và Ngân hàng hoàn trả lại Giấy chứng nhận quyền sử dụng đất đối với thửa đất nêu trên để giải quyết chia thừa kế.
+3. Chia tài sản thừa kế của ông Nguyễn Văn Thọ là thửa đất 200m² nêu trên theo quy định của pháp luật; xác định và công nhận phần di sản thừa kế của tôi theo đúng quy định.
 
-*(Đã ký)*  
-**Nguyễn Ngọc Mai**
+---
+
+### DANH MỤC TÀI LIỆU, CHỨNG CỨ KÈM THEO ĐƠN:
+* Bản sao Chứng minh nhân dân của người khởi kiện.
+* Bản sao Trích lục khai tử/Giấy chứng tử của ông Nguyễn Văn Thọ.
+* Giấy tờ chứng minh quan hệ thừa kế (Giấy khai sinh của người khởi kiện...).
+* Bản sao Giấy chứng nhận quyền sử dụng đất đối với thửa đất số 18, tờ bản đồ số 04 (nếu có).
+* Các tài liệu, văn bản liên quan đến việc thế chấp tài sản tại Ngân hàng (nếu có).
+
+---
+
+*Hà Nội, ngày 23 tháng 07 năm 2016*
+
+**NGƯỜI KHỞI KIỆN**
+*(Ký và ghi rõ họ tên)*
+
+*(Đã ký)*
+**Nguyễn Văn Thành**
