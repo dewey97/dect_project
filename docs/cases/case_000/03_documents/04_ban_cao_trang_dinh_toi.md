@@ -14,7 +14,7 @@ Số: **86/CT-VKS-P3**
 
 ### VIỆN TRƯỞNG VIỆN KIỂM SÁT NHÂN DÂN THÀNH PHỐ HÀ NỘI
 
-Căn cứ Bản kết luận điều tra số **112/KLĐTT-PC02** ngày 25 tháng 07 năm 2016 của Cơ quan Cảnh sát điều tra — Công an TP. Hà Nội đối với vụ án "Giết người" xảy ra tại số 14 Đường Bờ Sông, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội.
+Căn cứ Bản kết luận điều tra số **112/KLĐTT-PC02** ngày 25 tháng 07 năm 2016 của Cơ quan Cảnh sát điều tra — Công an TP. Hà Nội đối với vụ án "Giết người" xảy ra tại số 14 Đường Bờ Sông, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội.
 
 Căn cứ kết quả điều tra đã xác định được diễn biến vụ án như sau:
 
@@ -54,7 +54,7 @@ Căn cứ các quy định nêu trên, Viện kiểm sát nhân dân TP. Hà N�
 Truy tố ra trước Tòa án nhân dân TP. Hà Nội để xét xử đối với bị can:
 
 **TRẦN THỊ HÀ** — Sinh ngày 22/09/1990 tại Hà Nội.
-* Nơi ĐKHKTT và chỗ ở: Số 8, Ngõ 12, Đường Bờ Kè, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội.
+* Nơi ĐKHKTT và chỗ ở: Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội.
 * Quốc tịch: Việt Nam | Dân tộc: Kinh.
 
 Về tội: **"Giết người"** theo quy định tại Khoản 1 Điều 93 Bộ luật Hình sự nước Cộng hòa xã hội chủ nghĩa Việt Nam năm 1999 (sửa đổi, bổ sung năm 2009).

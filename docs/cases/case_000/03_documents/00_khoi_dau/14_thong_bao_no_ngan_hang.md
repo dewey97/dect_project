@@ -17,14 +17,14 @@ Số: **108/TB-GREENAGRI-SH**
 
 **Kính gửi:**
 * Ông: **NGUYỄN VĂN KHANG** (Bên vay vốn / Bên thế chấp)
-* Địa chỉ thường trú: Số 14 Đường Bờ Sông, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội.
-* Đồng kính gửi: Các cá nhân có quyền lợi, nghĩa vụ liên quan đến di sản thừa kế của cố ông **NGUYỄN VĂN THỌ** (Địa chỉ: Số 45 Đường Đoàn Kết, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội).
+* Địa chỉ thường trú: Số 14 Đường Bờ Sông, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội.
+* Đồng kính gửi: Các cá nhân có quyền lợi, nghĩa vụ liên quan đến di sản thừa kế của cố ông **NGUYỄN VĂN THỌ** (Địa chỉ: Số 45 Đường Đoàn Kết, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội).
 
 ---
 
 ### I. CĂN CỨ VĂN BẢN VÀ KHOẢN VAY:
 * Căn cứ Hợp đồng tín dụng số **HDTD/2016-0412** ký ngày 15/04/2016 giữa Ngân hàng TMCP Đầu tư và Nông nghiệp Xanh Việt Nam — Chi nhánh Quận Sông Hồng và ông Nguyễn Văn Khang.
-* Căn cứ Hợp đồng thế chấp quyền sử dụng đất số **HDTC/2016-0412** ký ngày 15/04/2016 đối với thửa đất diện tích **200m²** (Thửa đất số 18, Tờ bản đồ số 04) tại địa chỉ: Số 14 Đường Bờ Sông, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội theo Giấy chứng nhận quyền sử dụng đất số **CH-009812** đứng tên ông Nguyễn Văn Khang.
+* Căn cứ Hợp đồng thế chấp quyền sử dụng đất số **HDTC/2016-0412** ký ngày 15/04/2016 đối với thửa đất diện tích **200m²** (Thửa đất số 18, Tờ bản đồ số 04) tại địa chỉ: Số 14 Đường Bờ Sông, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội theo Giấy chứng nhận quyền sử dụng đất số **CH-009812** đứng tên ông Nguyễn Văn Khang.
 
 ---
 
@@ -49,7 +49,7 @@ Chi tiết dư nợ tính đến ngày 18/07/2016 như sau:
 
 1. Ngân hàng yêu cầu ông Nguyễn Văn Khang có trách nhiệm thanh toán toàn bộ số tiền nợ gốc, lãi và lãi phạt nêu trên (tổng cộng **1.234.650.000 VNĐ**) vào tài khoản của Ngân hàng chậm nhất trước **17 giờ 00 phút ngày 30 tháng 08 năm 2016**.
 
-2. Quá thời hạn nêu trên, nếu ông Nguyễn Văn Khang không thực hiện hoặc thực hiện không đầy đủ nghĩa vụ thanh toán, Ngân hàng sẽ tiến hành xử lý tài sản bảo đảm là QSDĐ diện tích **200m²** tại địa chỉ số 14 Đường Bờ Sông, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội theo quy định tại Hợp đồng thế chấp và quy định của pháp luật.
+2. Quá thời hạn nêu trên, nếu ông Nguyễn Văn Khang không thực hiện hoặc thực hiện không đầy đủ nghĩa vụ thanh toán, Ngân hàng sẽ tiến hành xử lý tài sản bảo đảm là QSDĐ diện tích **200m²** tại địa chỉ số 14 Đường Bờ Sông, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội theo quy định tại Hợp đồng thế chấp và quy định của pháp luật.
 
 3. Trong trường hợp có tranh chấp phát sinh liên quan đến nguồn gốc tài sản thế chấp hoặc các bên không tự nguyện bàn giao tài sản, Ngân hàng sẽ khởi kiện vụ án tại **Tòa án nhân dân có thẩm quyền** để yêu cầu giải quyết và đề nghị cơ quan Thi hành án dân sự xử lý phát mại tài sản thu hồi nợ theo đúng quy định pháp luật.
 

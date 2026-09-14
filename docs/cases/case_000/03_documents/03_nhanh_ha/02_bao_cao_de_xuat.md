@@ -24,7 +24,7 @@ Tổ điều tra thuộc Đội 5 (Đội Điều tra Trọng án) xin báo cáo
 
 ### I. KẾT QUẢ ĐIỀU TRA, XÁC MINH LIÊN QUAN ĐẾN ĐỐI TƯỢNG TRẦN THỊ HÀ
 
-Chị **TRẦN THỊ HÀ** (Sinh ngày: 22/09/1990; Nơi ĐKHKTT và chỗ ở hiện tại: Số 8, Ngõ 12, Đường Bờ Kè, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội) là bạn gái của nạn nhân Nguyễn Văn Khang.
+Chị **TRẦN THỊ HÀ** (Sinh ngày: 22/09/1990; Nơi ĐKHKTT và chỗ ở hiện tại: Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội) là bạn gái của nạn nhân Nguyễn Văn Khang.
 
 Quá trình làm việc và đấu tranh lấy lời khai (lần 02 vào sáng ngày 26/07/2016), Tổ điều tra phát hiện nhiều điểm mâu thuẫn đặc biệt nghiêm trọng giữa lời khai của đối tượng và các chứng cứ kỹ thuật hình sự đã thu thập:
 
@@ -43,8 +43,8 @@ Từ những tài liệu thu thập được, Tổ điều tra nhận định: C
 
 Để tránh việc đối tượng tẩu tán, tiêu hủy chứng cứ vụ án, căn cứ Điều 140 và Điều 141 Bộ luật Tố tụng Hình sự, Đội 5 kính đề xuất Đồng chí Thủ trưởng Cơ quan CSĐT:
 
-1. Ký ban hành **Lệnh khám xét khẩn cấp chỗ ở** đối với chị **TRẦN THỊ HÀ** tại địa chỉ: Phòng trọ số 08, ngõ 12, đường Bờ Kè, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội.
-2. Cho phép Tổ công tác phối hợp với Công an Phường Giang Biên và Viện Kiểm sát nhân dân TP. Hà Nội tiến hành khám xét ngay trong ngày 26/07/2016.
+1. Ký ban hành **Lệnh khám xét khẩn cấp chỗ ở** đối với chị **TRẦN THỊ HÀ** tại địa chỉ: Phòng trọ số 08, ngõ 12, đường Bờ Kè, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội.
+2. Cho phép Tổ công tác phối hợp với Công an Phường Phân khu Cảng và Viện Kiểm sát nhân dân TP. Hà Nội tiến hành khám xét ngay trong ngày 26/07/2016.
 
 Kính trình Đồng chí Thủ trưởng xem xét, quyết định./.
 

@@ -23,8 +23,8 @@ Tại: Phòng Cảnh sát Hình sự — Công an TP. Hà Nội.
 * Sinh ngày: 22/09/1990 tại Hà Nội.
 * Quốc tịch: Việt Nam | Dân tộc: Kinh | Tôn giáo: Không.
 * CMND số: **0906438125** do CA TP. Hà Nội cấp ngày 10/05/2006.
-* Nơi ĐKHKTT: Số 8, Ngõ 12, Đường Bờ Kè, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội.
-* Chỗ ở hiện tại: Số 8, Ngõ 12, Đường Bờ Kè, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội.
+* Nơi ĐKHKTT: Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội.
+* Chỗ ở hiện tại: Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội.
 * Nghề nghiệp: Kế toán tổng hợp (Công ty TNHH Vận tải Sông Hồng).
 * Mối quan hệ với bị hại: Bạn gái của bị hại (Nguyễn Văn Khang).
 
