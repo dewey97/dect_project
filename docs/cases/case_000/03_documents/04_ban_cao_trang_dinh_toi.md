@@ -1,45 +1,70 @@
 # VIỆN KIỂM SÁT NHÂN DÂN THÀNH PHỐ HÀ NỘI
-**CƠ QUAN TIẾN HÀNH TỐ TỤNG HÌNH SỰ**
+Số: **86/CT-VKS-P3**
 
 ---
 
-# BẢN CÁO TRẠNG KẾT LUẬN ĐIỀU TRA ĐỊNH TỘI
-*(Vụ án mạng số 14 Đường Bờ Sông — Biểu mẫu kết án chính thức)*
+# CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM
+**Độc lập – Tự do – Hạnh phúc**
 
 ---
 
-### I. THÔNG TIN ĐIỀU TRA VIÊN CHỦ TRÌ
-* **Họ và tên Điều tra viên:** [ Người chơi / Thám tử thụ lý ]
-* **Đơn vị công tác:** Đội Điều tra Trọng án — PC02 Công an TP. Hà Nội.
-* **Thời gian hoàn thành kết luận điều tra:** Ngày 26 tháng 07 năm 2016.
+*Hà Nội, ngày 26 tháng 07 năm 2016*
+
+# BẢN CÁO TRẠNG
+
+### VIỆN TRƯỞNG VIỆN KIỂM SÁT NHÂN DÂN THÀNH PHỐ HÀ NỘI
+
+Căn cứ Bản kết luận điều tra số **112/KLĐTT-PC02** ngày 25 tháng 07 năm 2016 của Cơ quan Cảnh sát điều tra — Công an TP. Hà Nội đối với vụ án "Giết người" xảy ra tại số 14 Đường Bờ Sông, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội.
+
+Căn cứ kết quả điều tra đã xác định được diễn biến vụ án như sau:
 
 ---
 
-### II. NỘI DUNG ĐỊNH TỘI CHÍNH THỨC (BẢNG TRẢ LỜI PHÁ ÁN)
+### I. NỘI DUNG VỤ ÁN VÀ HÀNH VI PHẠM TỘI CỦA BỊ CAN
 
-#### 1. Chỉ danh Thủ phạm trực tiếp gây ra cái chết của nạn nhân:
-* **Họ và tên Thủ phạm:** **TRẦN THỊ HÀ** (Mã đối tượng: `ha`)
-* **Tội danh truy tố:** Tội *"Giết người"* theo quy định tại Điểm n, Khoản 1, Điều 123 Bộ luật Hình sự.
+Khoảng 20 giờ 45 phút ngày 24/07/2016, bị can **TRẦN THỊ HÀ** (bạn gái của nạn nhân Nguyễn Văn Khang) lén lút đột nhập vào nhà ông Khang tại địa chỉ số 14 Đường Bờ Sông. Thấy ông Khang đang nằm mê man trên sàn nhà (do bị ngất sau cuộc xô xát trước đó với ông Nguyễn Thanh Tùng), Hà tiến lại gần nạn nhân với mục đích ban đầu là kiểm tra tình trạng nạn nhân. Vô tình, đối tượng nhìn thấy tin nhắn nhân tình của nạn nhân gửi đến. 
 
-#### 2. Xác định Động cơ gây án cốt lõi:
-* **Động cơ:** **Cơn ghen tuông cuồng loạn và tâm lý cuồng sở hữu độc hại (Obsessive Passion)**.
-* **Tình tiết bùng nổ:** Hà lẻn vào lúc 20:45, thấy Khang nằm mê man, liền cầm chiếc iPhone 6s Plus lấy ngón tay Khang áp vào nút Home mở khóa Touch ID và phát hiện chuỗi tin nhắn Khang hẹn bay chuyến 06:15 sáng mai đi xa sống với nhân tình Thảo Vy và gọi Hà là 'con bám đuôi phiền phức' $\rightarrow$ Nhận ra mình bị ruồng bỏ và phản bội tàn nhẫn nên cơn ghen bùng nổ, vơ mảnh bình trà vỡ đâm cổ Khang lúc 21:00 để *"nếu tao không có được anh thì không ai được phép có!"*.
+Sau khi đọc được chuỗi tin nhắn thể hiện việc ông Khang đã đặt vé máy bay chuyến 06 giờ 15 phút sáng hôm sau để bỏ trốn cùng nhân tình, xuất phát từ tâm lý ghen tuông cuồng loạn, bị can Trần Thị Hà đã nảy sinh ý định sát hại nạn nhân. 
 
-#### 3. Cặp Chứng cứ Mâu thuẫn mốc giờ & Bóc trần ngoại phạm then chốt:
-* **Chứng cứ 1:** Báo cáo điều tra & Kết luận pháp y tử thi (`03_tien_do_dieu_tra`) xác định nạn nhân bị đâm tử vong vào khoảng **20:45 – 21:15 (ước tính ~21:00)** do đứt động mạch cảnh.
-* **Chứng cứ 2:** Móc xích tiếng còi tàu 20:32 trong hộp thư thoại (`01_giam_dinh_am_thanh_coi_tau`) trùng khớp với giờ đoàn tàu hàng chạy qua trước nhà Khang lúc 20:30 + Lịch phát sóng VTV3 tối Thứ Sáu (`02_lich_phat_song_vtv3`) bóc trần toàn bộ lời khai ngoại phạm của Hà.
-* **Vật chứng sinh học không thể chối cãi:** Lọn tóc mai dính máu nạn nhân giấu trong áo ngực của Hà (`04_giam_dinh_adn_lon_toc` / `EV-HAIR-DNA`) khớp 100% ADN của Khang + Áo gió dính phấn hoa xoan (`03_kham_xet_phong_ha`).
+Vào khoảng 21 giờ 00 phút cùng ngày, bị can vơ mảnh gốm của bình trà bị vỡ trên sàn đâm trực tiếp vào vùng cổ bên trái ông Khang làm đứt động mạch cảnh. Vết thương khiến nạn nhân sốc mất máu cấp và tử vong tại chỗ. Sau khi gây án, bị can cắt một lọn tóc mai dính máu của nạn nhân cất giấu vào ví tiền rồi trốn khỏi hiện trường.
 
 ---
 
-### III. PHÂN HÓA TRÁCH NHIỆM CÁC ĐỐI TƯỢNG LIÊN QUAN
+### II. CÁC TÀI LIỆU, CHỨNG CỨ CHỨNG MINH HÀNH VI PHẠM TỘI
 
-1. **Nguyễn Ngọc Mai:** Không liên quan đến án mạng. Hành vi sang nhà Khang lúc 18:30 nhằm đòi lại quyền thừa kế 200m² đất sau khi phát hiện Khang gian dối chiếm đoạt đất đai; Mai rời đi lúc 19:00 và về đến nhà lúc 19:45 (cách hiện trường 4km). Lời khai sinh hoạt ở nhà xem tivi buổi tối được xác thực khách quan bởi Thông báo sự cố mất sóng cáp quang lúc 20h10 trên Bảng tin khu phố (`11`).
-2. **Lê Quang Vũ:** Loại trừ khỏi diện nghi phạm trực tiếp thực hiện hành vi giết người. Khoản nợ bốc họ 300M xuất phát từ việc đầu tư làm ăn thua lỗ giấu vợ; sau khi bị Khang chửi bới, đe dọa lúc 19:00 – 19:25, Vũ đã vùng chạy ra khỏi nhà Khang lúc 19:25 và bắt xe ôm công nghệ ra Quán Bia 88 lúc 19:30, có bằng chứng thanh toán chuyển khoản lúc 20:45 tại địa điểm cách hiện trường 3.8km (thời điểm hung thủ bắt đầu rình rập gây án).
-3. **Nguyễn Thanh Tùng:** Không phạm tội giết người. Cú xô ngã lúc 20:00 do uất hận bi kịch năm 1996 chỉ làm nạn nhân choáng ngất (tổn thương giai đoạn 1). Tùng đã rời hiện trường lúc 20:15 (trước khung giờ nạn nhân bị sát hại trong khoảng 20:45 – 21:15 bởi Trần Thị Hà).
+Hành vi phạm tội của bị can **Trần Thị Hà** được chứng minh bằng các tài liệu, vật chứng thu thập hợp pháp trong hồ sơ vụ án:
+1. **Kết luận pháp y tử thi:** Xác định thời điểm nạn nhân tử vong trong khoảng từ 20 giờ 45 phút đến 21 giờ 15 phút ngày 24/07/2016 do đứt động mạch cảnh trái.
+2. **Kết luận giám định âm thanh và lịch trình VTV3:** Phổ âm thanh tiếng còi tàu hỏa (68 dB) thu được trong hộp thư thoại lúc 20 giờ 32 phút gửi từ máy bị can khẳng định bị can có mặt trước cổng nhà nạn nhân; đối chiếu lịch phát sóng VTV3 bác bỏ hoàn toàn lời khai ngoại phạm ban đầu của bị can.
+3. **Biên bản khám xét và Kết luận giám định ADN:** Thu giữ 01 lọn tóc dính máu giấu trong ví tiềncủa bị can Hà có kết quả giám định ADN trùng khớp 100% với ADN của nạn nhân Nguyễn Văn Khang; 01 áo gió màu xám đen thu tại phòng trọ bị can dính phấn hoa xoan trùng khớp với cây xoan trước cửa nhà nạn nhân.
 
 ---
 
-**VIỆN TRƯỞNG VKSND TP. HÀ NỘI**  
-*(Ký, phê chuẩn cáo trạng)*  
-*(Đã phê chuẩn chuyển Tòa án xét xử)*
+### III. VIỆC XỬ LÝ ĐỐI VỚI CÁC ĐỐI TƯỢNG LIÊN QUAN
+
+1. **Bà Nguyễn Ngọc Mai:** Mục đích sang nhà ông Khang lúc 18 giờ 30 phút để đòi quyền thừa kế đất đai; rời đi lúc 19 giờ 00 phút và về nhà lúc 19 giờ 45 phút. Xác minh mất sóng cáp quang khu phố lúc 20 giờ 10 phút phù hợp với chứng cứ ngoại phạm. Không liên quan đến hành vi giết người.
+2. **Ông Lê Quang Vũ:** Do mâu thuẫn nợ nần 300.000.000 đồng đã nảy sinh tranh cãi nhưng đã bỏ chạy rời khỏi nhà ông Khang lúc 19 giờ 25 phút, đến Quán Bia 88 lúc 19 giờ 30 phút và có chứng từ thanh toán lúc 20 giờ 45 phút (cách hiện trường 3,8 km). Loại trừ trách nhiệm hình sự về hành vi giết người.
+3. **Ông Nguyễn Thanh Tùng:** Do phẫn uất sự việc quá khứ nên xô ngã ông Khang lúc 20 giờ 00 phút khiến nạn nhân bị choáng ngất nhẹ, sau đó ông Tùng đã rời hiện trường lúc 20 giờ 15 phút (trước thời điểm vụ sát hại xảy ra). Hành vi không trực tiếp dẫn đến cái chết của nạn nhân.
+
+---
+
+### IV. KẾT LUẬN
+
+Căn cứ các quy định nêu trên, Viện kiểm sát nhân dân TP. Hà Nội quyết định:
+
+Truy tố ra trước Tòa án nhân dân TP. Hà Nội để xét xử đối với bị can:
+
+**TRẦN THỊ HÀ** — Sinh ngày 22/09/1990 tại Hà Nội.
+* Nơi ĐKHKTT và chỗ ở: Số 8, Ngõ 12, Đường Bờ Kè, Phường Giang Biên, Quận Sông Hồng, TP. Hà Nội.
+* Quốc tịch: Việt Nam | Dân tộc: Kinh.
+
+Về tội: **"Giết người"** theo quy định tại Khoản 1 Điều 93 Bộ luật Hình sự nước Cộng hòa xã hội chủ nghĩa Việt Nam năm 1999 (sửa đổi, bổ sung năm 2009).
+
+*Bản Cáo trạng này được gửi đến: Tòa án nhân dân TP. Hà Nội, Bị can Trần Thị Hà, Cơ quan CSĐT Công an TP. Hà Nội.*
+
+**VIỆN TRƯỞNG VIỆN KIỂM SÁT NHÂN DÂN TP. HÀ NỘI**
+  
+  *(Ký, đóng dấu)*
+
+**Phạm Văn Nam**
+
+*(Đã ký & Đóng dấu)*
