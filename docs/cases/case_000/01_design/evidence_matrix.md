@@ -26,7 +26,7 @@
 
 ## 📱 II. DANH MỤC TRÊN ĐIỆN THOẠI GIẢ LẬP (VIRTUAL PHONE CONTENT)
 
-Thiết bị: **iPhone 8 Plus màu đen (Touch ID) của nạn nhân Nguyễn Văn Khang** (`dev-00`).  
+Thiết bị: **iPhone 6s Plus màu đen (Touch ID) của nạn nhân Nguyễn Văn Khang** (`dev-00`).  
 *(Hiển thị tương tác trực tiếp trên màn hình giả lập trong Web App, không dùng file văn bản giấy).*
 
 | Ứng Dụng (App) | Nội Dung Dữ Liệu | Mục Đích Điều Tra Trong Game |

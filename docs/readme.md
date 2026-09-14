@@ -31,3 +31,5 @@ Tài liệu về cốt truyện vụ án, cơ chế game trinh thám, lời khai
 | **Ontology & Philosophy** | Triết lý điều tra & mô hình bản thể học chứng cứ | [`investigation_design/01_ontology_and_philosophy.md`](investigation_design/01_ontology_and_philosophy.md) |
 | **Authoring Templates** | Bản mẫu tạo hồ sơ vụ án mới | [`investigation_design/06_authoring_templates.md`](investigation_design/06_authoring_templates.md) |
 | **Admin Studio Guide** | Hướng dẫn quản trị và biên soạn vụ án trong studio | [`core_specs/09_admin_studio_guide.md`](core_specs/09_admin_studio_guide.md) |
+| **Case #000 Player Journey & Test Cases** | Sơ đồ luồng người chơi thấy/ấn & kịch bản hybrid vật lý + web cho Vụ án #000 | [`cases/case_000/01_design/player_journey_and_cases.md`](cases/case_000/01_design/player_journey_and_cases.md) |
+

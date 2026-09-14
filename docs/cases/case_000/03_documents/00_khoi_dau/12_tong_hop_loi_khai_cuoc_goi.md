@@ -11,7 +11,7 @@ Số: `12/BB-XMNKCG`
 ---
 
 # BIÊN BẢN XÁC MINH NHẬT KÝ CUỘC GỌI
-*(Trích xuất từ điện thoại di động iPhone 8 Plus của nạn nhân Nguyễn Văn Khang)*
+*(Trích xuất từ điện thoại di động iPhone 6s Plus của nạn nhân Nguyễn Văn Khang)*
 
 ---
 
