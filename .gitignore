@@ -25,6 +25,8 @@ build_log.txt
 *.tsbuildinfo
 .next_dev/
 .claude/
+.playwright-cli/
+test-results/
 
 # Temporary audio/video scratch files in root
 /*.wav
