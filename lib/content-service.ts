@@ -46,6 +46,25 @@ import { timelineEvents000, conclusionOptions000, evaluation000 } from '../conte
 import { rewards000 } from '../content/cases/case-000/rewards'
 import { checkpoints000 } from '../content/cases/case-000/checkpoints'
 
+export {
+  case000,
+  victim000,
+  suspects000,
+  devices000,
+  conversations000,
+  emails000,
+  photos000,
+  browserHistory000,
+  files000,
+  documents000,
+  assistant000,
+  timelineEvents000,
+  conclusionOptions000,
+  evaluation000,
+  rewards000,
+  checkpoints000
+}
+
 // Registry of cases
 const CASES_REGISTRY: Record<string, Case> = {
   'case-001': case001,

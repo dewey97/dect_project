@@ -1,6 +1,5 @@
 export interface PhaseNarrator {
   phase: number
-  title: string
   subtitle: string
   date: string
   monologue: string
@@ -9,7 +8,6 @@ export interface PhaseNarrator {
 export const CASE_000_NARRATOR: Record<number, PhaseNarrator> = {
   0: {
     phase: 0,
-    title: 'GIAI ĐOẠN 0: MÀN SƯƠNG HIỆN TRƯỜNG & BIÊN BẢN TỬ THI',
     subtitle: 'Đêm 24/07/2016',
     date: 'Đêm 24/07/2016',
     monologue:
@@ -17,26 +15,23 @@ export const CASE_000_NARRATOR: Record<number, PhaseNarrator> = {
   },
   1: {
     phase: 1,
-    title: 'GIAI ĐOẠN 1: GIẢ MẠO CHỮ KÝ ĐẤT ĐAI & MÓN NỢ 300 TRIỆU',
     subtitle: 'Sáng 25/07/2016',
     date: 'Sáng 25/07/2016',
     monologue:
-      'Lòng tham và quyền thừa kế thửa đất 200m² đã làm mờ mắt con người.\n\nChữ ký trên Giấy ủy quyền bị sao chép tinh vi bằng kỹ thuật đồ nét (tracing) hòng chiếm trọn tài sản của gia tộc.\n\nNhưng liệu mâu thuẫn đất đai có phải là ngọn nguồn thực sự dẫn đến vụ án mạng đẫm máu đêm mưa?'
+      'Manh mối thu thập từ điện thoại nạn nhân đã mở ra những dấu vết đầu tiên.\n\nTừ những khoản nợ mờ ám cho đến mối ân oán kéo dài nhiều năm, các đối tượng liên quan dần lộ diện với những lời khai đầy mâu thuẫn.\n\nĐã đến lúc tiến hành thẩm tra trực diện các đối tượng tình nghi để bóc tách mâu thuẫn ngoại phạm và tìm ra ngọn nguồn sự thật...'
   },
   2: {
     phase: 2,
-    title: 'GIAI ĐOẠN 2: BI KỊCH TRỐN TÌM 1996 & NGÀY GIỖ 20 NĂM',
     subtitle: 'Chiều 25/07/2016',
     date: 'Chiều 25/07/2016',
     monologue:
-      'Trò chơi trốn tìm 20 năm trước tưởng chừng đã ngủ yên dưới lớp bụi thời gian...\n\nMột mẩu báo cũ ố vàng 1996, khung ảnh kỷ niệm vỡ kính và tiếng cãi vã lúc 20:00 trong đêm tối.\n\nSự căm hận tích tụ suốt hai mươi năm qua... liệu có phải là nhát đao cuối cùng lấy đi mạng sống của Khang?'
+      'Cả 3 nghi phạm ban đầu đều có căn cứ loại trừ khỏi thời điểm gây án chí mạng lúc ~21:00. Vụ án tưởng chừng đi vào ngõ tàng, nhưng hiện trường vẫn còn những vật chứng bị bỏ sót.\n\nLệnh khám xét bổ sung đã được phê duyệt. Những chi tiết kỹ thuật từ âm thanh thu âm cho đến mốc thời gian sinh hoạt sẽ là chìa khóa bóc trần vỏ bọc ngoại phạm thực sự...'
   },
   3: {
     phase: 3,
-    title: 'GIAI ĐOẠN 3: PHÁN QUYẾT CUỐI CÙNG & SỰ THẬT CƠN CUỒNG GHEN',
     subtitle: 'Đêm 25/07/2016',
     date: 'Đêm 25/07/2016',
     monologue:
-      'Màn đêm bao phủ căn nhà số 14 Đường Bờ Sông khi các báo cáo giám định cuối cùng được giải mã...\n\nMọi lời khai ngoại phạm bắt đầu sụp đổ trước âm thanh còi tàu và lịch phát sóng truyền hình.\n\nĐã đến lúc bóc tách lớp mặt nạ cuối cùng, vạch trần kẻ cuồng yêu đã ra tay hạ sát nạn nhân đêm đó!'
+      'Mọi lời khai giả mạo đã sụp đổ trước dữ liệu giám định thực tế. Mối quan hệ phức tạp và động cơ ẩn giấu đằng sau vụ án mạng đêm mưa giờ đây đã hoàn toàn phát lộ.\n\nĐã đến lúc lập Bản Cáo Trạng Định Tội chính thức, chỉ danh thủ phạm và khép lại hồ sơ chuyên án...'
   }
 }

@@ -15,7 +15,7 @@ export const assistant000: AssistantConversation = {
       { label: '19:30', value: 'Vũ rời đi ra Quán Bia 88 uống đến 20:45' },
       { label: '20:00', value: 'Tùng xô ngã Khang & vỡ bình trà (ngày giỗ 30 năm)' },
       { label: '20:15', value: 'Tùng tháo chạy khỏi hiện trường về Cầu Bươu' },
-      { label: '20:45', value: 'Hà lén chui vào nhà, mở khóa iPhone 8 Plus' },
+      { label: '20:45', value: 'Hà lén chui vào nhà, mở khóa iPhone 6s Plus' },
       { label: '21:00', value: 'Nạn nhân bị đâm tử vong (Hung thủ: Hà)' }
     ]
   },

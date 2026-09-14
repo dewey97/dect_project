@@ -5,7 +5,7 @@ export const timelineEvents000: TimelineEvent[] = [
   { id: 't2', text: '19:00 — Lê Quang Vũ ở lại xin hoãn nợ 300M, bị Khang đe dọa rồi chạy ra Quán Bia 88 lúc 19:30' },
   { id: 't3', text: '20:00 — Nguyễn Thanh Tùng đến đối chất ngày giỗ 30 năm, xô Khang ngã đập đầu vỡ bình trà' },
   { id: 't4', text: '20:15 — Tùng rời hiện trường về phòng trọ Cầu Bươu khi Khang vẫn còn thở đều' },
-  { id: 't5', text: '20:45 — Trần Thị Hà lẻn vào nhà, mở khóa iPhone 8 Plus phát hiện tin nhắn Khang hẹn trốn cùng Thảo Vy' },
+  { id: 't5', text: '20:45 — Trần Thị Hà lẻn vào nhà, mở khóa iPhone 6s Plus phát hiện tin nhắn Khang hẹn trốn cùng Thảo Vy' },
   { id: 't6', text: '21:00 — Trần Thị Hà vơ mảnh bình trà vỡ đâm đứt động mạch cảnh Khang và cắt lọn tóc mai dính máu' }
 ]
 
