@@ -1,19 +1,22 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
   ArrowRight,
-  HelpCircle,
   Lightbulb,
-  Sparkles,
   Search,
   FileQuestion,
-  Flame,
-  Check
+  Check,
+  UserCheck,
+  FileText,
+  Lock,
+  QrCode,
+  ShieldAlert,
+  Flame
 } from 'lucide-react'
 import type { Checkpoint } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -42,31 +45,41 @@ interface PhaseVisualClue {
 const PHASE_VISUAL_CLUES: Record<string, PhaseVisualClue> = {
   'cp-000-0': {
     imageUrl: '/photo_scene_overview.jpg',
-    tag: 'HIỆN TRƯỜNG PHÒNG KHÁCH // 20:00 PM',
-    subtitle: 'Nạn nhân ngã gục cạnh bàn trà, bộ bình gốm sứ vỡ vụn và hồ sơ rơi vãi khắp sàn.',
+    tag: 'GIAI ĐOẠN 0 // TRUY TÌM 3 SĐT ẨN DANH',
+    subtitle: 'Nhật ký cuộc gọi dev-00 ghi nhận 3 cuộc gọi lạ từ Vũ, Tùng và Đạt Gà Chợ Cảng.',
     badgeColor: 'border-amber-700/80 bg-amber-950/90 text-amber-300'
   },
-  'cp-000-1': {
+  'cp-000-1a': {
     imageUrl: '/photo_scattered_docs.jpg',
-    tag: 'GIẢ MẠO CHỮ KÝ ỦY QUYỀN ĐẤT 200M²',
-    subtitle: 'Chữ ký đồ nét tracing trên Giấy ủy quyền đất và món nợ 300 triệu bốc họ.',
+    tag: 'PHASE 1A // THẨM TRA LÊ QUANG VŨ',
+    subtitle: 'Món nợ 300M biệt danh Lệch Pha và sơ hở app đặt xe p10 nán lại hiện trường 30 phút.',
     badgeColor: 'border-orange-700/80 bg-orange-950/90 text-orange-300'
   },
-  'cp-000-2': {
+  'cp-000-1b': {
     imageUrl: '/photo_old_newspaper.jpg',
-    tag: 'TÀI LIỆU QUÁ KHỨ 1996 // NGÀY GIỖ 30 NĂM',
-    subtitle: 'Trang nhật báo cũ 1996 về tai nạn ngạt khí tủ gỗ của bé Gia Huy & khung ảnh kỷ niệm bị vỡ.',
+    tag: 'PHASE 1B // THẨM TRA NGUYỄN THANH TÙNG',
+    subtitle: 'Vết vân tay ngón trỏ trên khung ảnh p4 và mẩu báo cũ 1996 về bi kịch tủ gỗ.',
     badgeColor: 'border-sky-700/80 bg-sky-950/90 text-sky-300'
   },
-  'cp-000-3': {
+  'cp-000-convergence': {
+    imageUrl: '/photo_childhood_group.jpg',
+    tag: 'NÚT HỘI TỤ // LOẠI TRỪ 3 NGHI PHẠM BAN ĐẦU',
+    subtitle: 'Mai có ngoại phạm TV đứt cáp, Vũ ở Quán Bia 88, Tùng tự thú bỏ đi lúc 20:15.',
+    badgeColor: 'border-emerald-700/80 bg-emerald-950/90 text-emerald-300'
+  },
+  'cp-000-2a': {
     imageUrl: '/photo_glass_shard.jpg',
-    tag: 'VẬT CHỨNG QUYẾT ĐỊNH // 21:00 PM',
-    subtitle: 'Mảnh bình trà 8.2cm dính máu khô, còi tàu 20:32 & lọn tóc ADN trong áo ngực của Hà.',
+    tag: 'PHASE 2A // BÓC TRẦN TRẦN THỊ HÀ',
+    subtitle: 'Tạp âm còi tàu 20:32 lọt vào voice note và lịch phát sóng VTV3 chỉ chiếu Gameshow.',
+    badgeColor: 'border-rose-700/80 bg-rose-950/90 text-rose-300'
+  },
+  'cp-000-2b': {
+    imageUrl: '/photo_glass_shard.jpg',
+    tag: 'PHASE 2B // CÁO TRẠNG ĐỊNH TỘI CHÍ MẠNG',
+    subtitle: 'Lọn tóc mai dính máu ADN Khang và áo gió dính phấn hoa xoan thu tại phòng Hà.',
     badgeColor: 'border-red-700/80 bg-red-950/90 text-red-300'
   }
 }
-
-const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E']
 
 export function CaseCheckpointsSection({
   checkpoints,
@@ -84,6 +97,14 @@ export function CaseCheckpointsSection({
   const currentCp = activeCpIndex !== -1 ? checkpoints[activeCpIndex] : null
   const currentIdx = activeCpIndex !== -1 ? activeCpIndex : checkpoints.length - 1
 
+  // Local state for dynamic question forms
+  const [textMatchValues, setTextMatchValues] = useState<Record<string, string>>({})
+  const [suspectInput, setSuspectInput] = useState<string>('')
+  const [mismatchTypeSelect, setMismatchTypeSelect] = useState<string>('')
+  const [motiveSelect, setMotiveSelect] = useState<string>('')
+  const [selectedEvidenceIds, setSelectedEvidenceIds] = useState<string[]>([])
+  const [convergenceSelections, setConvergenceSelections] = useState<Record<string, string>>({})
+
   const resetProgress = () => {
     try {
       localStorage.removeItem('veritas_completed_checkpoints')
@@ -91,14 +112,80 @@ export function CaseCheckpointsSection({
     } catch {}
   }
 
-  const handleSelectOption = (cpId: string, opt: string) => {
-    detectiveAudio.playPaperRustle()
-    onAnswerSelect(cpId, opt)
-  }
-
   const handleHintClick = (cpId: string, maxHints: number) => {
     detectiveAudio.playTypewriterClick()
     onUnlockNextHint(cpId, maxHints)
+  }
+
+  const toggleEvidenceSelect = (id: string) => {
+    detectiveAudio.playPaperRustle()
+    setSelectedEvidenceIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((item) => item !== id)
+      } else {
+        return [...prev, id]
+      }
+    })
+  }
+
+  // Validate form submission based on checkpoint type
+  const checkCurrentValidity = (cp: Checkpoint): boolean => {
+    if (cp.type === 'text_match_3') {
+      const inputs = cp.textMatchConfig?.inputs || []
+      return inputs.every((inp) => {
+        const val = (textMatchValues[inp.id] || '').trim().toLowerCase()
+        return inp.validAnswers.some((ans) => ans.toLowerCase() === val || val.includes(ans.toLowerCase()))
+      })
+    }
+
+    if (cp.type === 'evidence_picker') {
+      const validSuspects = cp.pickerConfig?.validSuspects || []
+      const suspectValid = suspectInput.trim() !== '' && (validSuspects.length === 0 || validSuspects.some((s) => suspectInput.trim().toLowerCase().includes(s.toLowerCase())))
+      
+      const reqEvs = cp.pickerConfig?.requiredEvidenceIds || []
+      const evsValid = reqEvs.length === 0 || (reqEvs.every((req) => selectedEvidenceIds.includes(req)) && selectedEvidenceIds.length === reqEvs.length)
+
+      const reqMismatch = cp.pickerConfig?.validMismatchTypes || []
+      const mismatchValid = reqMismatch.length === 0 || reqMismatch.includes(mismatchTypeSelect)
+
+      return suspectValid && evsValid && mismatchValid
+    }
+
+    if (cp.type === 'convergence') {
+      const suspects = cp.convergenceConfig?.suspects || []
+      return suspects.every((s) => {
+        const selected = convergenceSelections[s.id]
+        return s.validReasons.includes(selected)
+      })
+    }
+
+    if (cp.type === 'accusation') {
+      const validSuspects = cp.pickerConfig?.validSuspects || []
+      const suspectValid = suspectInput.trim() !== '' && validSuspects.some((s) => suspectInput.trim().toLowerCase().includes(s.toLowerCase()))
+
+      const validMotives = cp.pickerConfig?.validMotives || []
+      const motiveValid = validMotives.length === 0 || validMotives.includes(motiveSelect)
+
+      const reqEvs = cp.pickerConfig?.requiredEvidenceIds || []
+      const evsValid = reqEvs.length === 0 || (reqEvs.every((req) => selectedEvidenceIds.includes(req)) && selectedEvidenceIds.length === reqEvs.length)
+
+      return suspectValid && motiveValid && evsValid
+    }
+
+    // Default MCQ fallback
+    return !!selectedAnswers[cp.id]
+  }
+
+  const handleCustomSubmit = (cp: Checkpoint) => {
+    const isValid = checkCurrentValidity(cp)
+    if (isValid) {
+      onAnswerSelect(cp.id, 'VALID_ANSWER')
+      onSubmitAnswer(cp)
+    } else {
+      detectiveAudio.playPaperRustle()
+      onAnswerSelect(cp.id, 'INVALID_ANSWER')
+      onSubmitAnswer(cp)
+    }
   }
 
   return (
@@ -110,7 +197,7 @@ export function CaseCheckpointsSection({
             <ShieldCheck className="size-4" />
           </div>
           <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#e6d3c1] flex items-center gap-2">
-            <span>BẢN KẾT LUẬN THẨM TRA</span>
+            <span>BẢN KẾT LUẬN THẨM TRA COMPANION</span>
             {!isAllCompleted && (
               <span className="text-[0.65rem] font-normal text-[#ad9885] bg-[#221810] px-2 py-0.5 border border-[#3e2c1e]">
                 GIAI ĐOẠN {currentIdx + 1}/{checkpoints.length}
@@ -134,15 +221,15 @@ export function CaseCheckpointsSection({
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 bg-[#16100b] border-2 border-[#b87333] shadow-2xl space-y-5 relative overflow-hidden"
+          className="p-6 bg-[#16100b] border-2 border-[#b87333] shadow-2xl space-y-5 relative overflow-hidden rounded-2xl"
         >
           <div className="flex items-center gap-2.5 text-amber-400 font-mono text-sm font-bold uppercase tracking-wider border-b border-[#382618] pb-3">
             <CheckCircle2 className="size-5 text-emerald-400" />
-            <span>HỒ SƠ KHÓA ÁN // ĐÃ GIẢI MÃ TOÀN BỘ CHUYÊN ÁN</span>
+            <span>HỒ SƠ KHÓA ÁN // ĐÃ GIẢI MÃ TOÀN BỘ CHUYÊN ÁN #000</span>
           </div>
 
           <p className="text-xs sm:text-sm text-[#dfd0bf] font-serif leading-relaxed">
-            Toàn bộ mâu thuẫn mốc giờ, động cơ trục lợi và vật chứng cốt lõi của vụ án <strong className="text-amber-300">TRỐN TÌM</strong> đã được bóc tách chuẩn xác. Bạn đã vạch trần kẻ thủ ác thực sự và giải mã bi kịch quá khứ.
+            Toàn bộ mâu thuẫn mốc giờ, động cơ trục lợi và bộ vật chứng buộc tội chí mạng của chuyên án <strong className="text-amber-300">TRỐN TÌM</strong> đã được bóc tách chuẩn xác. Bạn đã bóc trần ngoại phạm giả mạo VTV3, còi tàu 20:32 và lọn tóc mai dính máu ADN của bị can <strong className="text-red-400">Trần Thị Hà</strong>.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -152,14 +239,14 @@ export function CaseCheckpointsSection({
                   window.dispatchEvent(new CustomEvent('open-epilogue-modal'))
                 } catch {}
               }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-xs font-bold transition-all cursor-pointer shadow-lg active:scale-95"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-xs font-bold transition-all cursor-pointer shadow-lg active:scale-95 rounded-xl"
             >
               <span>📖 ĐỌC KÝ SỰ HẬU ÁN (EPILOGUE)</span>
             </button>
 
             <button
               onClick={resetProgress}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#261d15] hover:bg-[#382b1f] text-[#d9a066] border border-[#4a3a2c] font-mono text-xs font-bold transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#261d15] hover:bg-[#382b1f] text-[#d9a066] border border-[#4a3a2c] font-mono text-xs font-bold transition-all cursor-pointer rounded-xl"
             >
               <span>🔄 PHÁ ÁN LẠI (RESET)</span>
             </button>
@@ -169,11 +256,10 @@ export function CaseCheckpointsSection({
         (() => {
           const cp = currentCp
           const idx = currentIdx
-          const selectedOpt = selectedAnswers[cp.id]
           const hasError = checkpointErrors[cp.id]
           const hasSuccess = checkpointSuccesses[cp.id]
 
-          const hints = HINTS_MAP[cp.id] || (cp.hint ? [cp.hint] : [])
+          const hints = cp.hintsList || (cp.hint ? [cp.hint] : HINTS_MAP[cp.id] || [])
           const hintLevel = unlockedHintLevel[cp.id] || 0
           const visualClue = PHASE_VISUAL_CLUES[cp.id] || PHASE_VISUAL_CLUES['cp-000-0']
 
@@ -193,7 +279,7 @@ export function CaseCheckpointsSection({
                 )}
               >
                 {/* HERO VISUAL CLUE BANNER */}
-                <div className="relative h-48 sm:h-56 w-full overflow-hidden border-b border-[#3e2b1b] group bg-black rounded-t-2xl">
+                <div className="relative h-44 sm:h-52 w-full overflow-hidden border-b border-[#3e2b1b] group bg-black rounded-t-2xl">
                   <img
                     src={visualClue.imageUrl}
                     alt={visualClue.tag}
@@ -224,9 +310,6 @@ export function CaseCheckpointsSection({
                     <p className="font-sans text-xs sm:text-sm text-[#fef5ec] italic drop-shadow-md line-clamp-2 leading-relaxed font-medium">
                       "{visualClue.subtitle}"
                     </p>
-                    <span className="font-mono text-[0.6rem] text-[#ad9885] bg-black/80 px-2.5 py-1 border border-[#3e2c1e] rounded-md shrink-0 hidden sm:inline">
-                      MANH MỐI #{idx + 1}
-                    </span>
                   </div>
 
                   {/* RED APPROVAL STAMP (WHEN SUCCESSFUL) */}
@@ -247,74 +330,215 @@ export function CaseCheckpointsSection({
                   </AnimatePresence>
                 </div>
 
-                {/* QUESTION BODY & OPTIONS */}
+                {/* QUESTION BODY & DYNAMIC FORM */}
                 <div className="p-5 sm:p-7 space-y-6">
-                  {/* Question Text */}
+                  {/* Question Title & Prompt */}
                   <div className="space-y-2">
                     <span className="font-mono text-[0.65rem] text-[#d9a066] font-bold uppercase tracking-widest flex items-center gap-1.5">
                       <FileQuestion className="size-3.5 text-[#d9a066]" />
-                      CÂU HỎI KẾT LUẬN THẨM TRA:
+                      {cp.title}
                     </span>
                     <h3 className="font-sans text-sm sm:text-base font-bold text-[#fef5ec] leading-relaxed">
                       {cp.question}
                     </h3>
                   </div>
 
-                  {/* Hypothesis Option Cards (A, B, C, D) */}
-                  <div className="space-y-3 pt-2 border-t border-[#382619]">
-                    <span className="font-mono text-[0.625rem] text-[#a89583] uppercase font-bold tracking-wider block">
-                      CHỌN LẬP LUẬN PHÁ ÁN PHÙ HỢP:
-                    </span>
+                  {/* FORM TYPE 1: TEXT MATCH 3 (CP-000-0) */}
+                  {cp.type === 'text_match_3' && (
+                    <div className="space-y-4 pt-2 border-t border-[#382619]">
+                      <span className="font-mono text-[0.625rem] text-[#a89583] uppercase font-bold tracking-wider block">
+                        NHẬP DANH TÍNH 3 NGHI PHẠM CHỦ SỞ HỮU SĐT:
+                      </span>
 
-                    <div className="flex flex-col gap-2.5">
-                      {cp.options.map((opt, optIdx) => {
-                        const isSelected = selectedOpt === opt
-                        const letter = OPTION_LETTERS[optIdx] || String(optIdx + 1)
-
-                        return (
-                          <button
-                            key={opt}
-                            disabled={hasSuccess}
-                            onClick={() => handleSelectOption(cp.id, opt)}
-                            className={cn(
-                              'w-full text-left p-4 rounded-xl border transition-all flex items-start gap-3.5 cursor-pointer relative group shadow-sm',
-                              isSelected
-                                ? 'border-[#d9a066] bg-[#2d1c10] text-[#fef5ec] font-semibold shadow-[0_4px_20px_rgba(217,160,102,0.2)] ring-1 ring-[#d9a066]/60 -translate-y-0.5'
-                                : 'border-[#382618] bg-[#17100a] hover:border-[#634329] hover:bg-[#20150d] text-[#dcd0c2] hover:-translate-y-0.5'
-                            )}
-                          >
-                            {/* Letter Badge */}
-                            <span
-                              className={cn(
-                                'font-mono text-xs font-bold px-2.5 py-1 shrink-0 border rounded-lg transition-colors mt-0.5',
-                                isSelected
-                                  ? 'bg-amber-950 border-amber-600 text-amber-300'
-                                  : 'bg-[#22170e] border-[#443021] text-[#ad9885] group-hover:text-[#d9a066]'
-                              )}
-                            >
-                              [{letter}]
-                            </span>
-
-                            {/* Option text */}
-                            <span className="text-xs sm:text-sm font-sans leading-relaxed flex-1 pt-0.5">
-                              {opt}
-                            </span>
-
-                            {/* Right selection indicator */}
-                            <div className="shrink-0 pt-1">
-                              {isSelected ? (
-                                <div className="size-5 rounded-full bg-amber-500 text-black flex items-center justify-center shadow-md">
-                                  <Check className="size-3.5 stroke-[3]" />
-                                </div>
-                              ) : (
-                                <div className="size-5 rounded-full border border-[#443021] group-hover:border-[#6e4e35]" />
-                              )}
-                            </div>
-                          </button>
-                        )
-                      })}
+                      <div className="space-y-3">
+                        {cp.textMatchConfig?.inputs.map((inp) => (
+                          <div key={inp.id} className="space-y-1">
+                            <label className="text-xs font-mono font-bold text-[#d9a066] block">
+                              {inp.label}
+                            </label>
+                            <input
+                              type="text"
+                              disabled={hasSuccess}
+                              value={textMatchValues[inp.id] || ''}
+                              onChange={(e) => setTextMatchValues({ ...textMatchValues, [inp.id]: e.target.value })}
+                              placeholder={inp.placeholder}
+                              className="w-full bg-[#1c120a] border border-[#4d3522] focus:border-[#d9a066] rounded-xl px-4 py-2.5 text-xs text-[#fef5ec] font-sans placeholder-[#6e5a48] focus:outline-none transition-colors"
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* FORM TYPE 2 & 4: EVIDENCE PICKER & ACCUSATION */}
+                  {(cp.type === 'evidence_picker' || cp.type === 'accusation') && (
+                    <div className="space-y-5 pt-2 border-t border-[#382619]">
+                      {/* Step 1: Suspect Input */}
+                      {cp.pickerConfig?.suspectLabel && (
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-mono font-bold text-[#d9a066] block uppercase tracking-wider">
+                            {cp.pickerConfig.suspectLabel}
+                          </label>
+                          <input
+                            type="text"
+                            disabled={hasSuccess}
+                            value={suspectInput}
+                            onChange={(e) => setSuspectInput(e.target.value)}
+                            placeholder="Nhập tên đối tượng nghi vấn (VD: Lê Quang Vũ, Nguyễn Thanh Tùng, Trần Thị Hà)..."
+                            className="w-full bg-[#1c120a] border border-[#4d3522] focus:border-[#d9a066] rounded-xl px-4 py-2.5 text-xs text-[#fef5ec] font-sans placeholder-[#6e5a48] focus:outline-none transition-colors"
+                          />
+                        </div>
+                      )}
+
+                      {/* Step 2 (if applicable): Mismatch type / Motive selection */}
+                      {cp.pickerConfig?.mismatchTypeLabel && cp.pickerConfig.mismatchTypeOptions && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-mono font-bold text-[#d9a066] block uppercase tracking-wider">
+                            {cp.pickerConfig.mismatchTypeLabel}
+                          </label>
+                          <div className="space-y-2">
+                            {cp.pickerConfig.mismatchTypeOptions.map((opt, oIdx) => {
+                              const isSel = mismatchTypeSelect === (oIdx === 0 ? 'mismatch_location' : `mismatch_${oIdx}`)
+                              const valKey = oIdx === 0 ? 'mismatch_location' : `mismatch_${oIdx}`
+                              return (
+                                <button
+                                  key={opt}
+                                  type="button"
+                                  disabled={hasSuccess}
+                                  onClick={() => setMismatchTypeSelect(valKey)}
+                                  className={cn(
+                                    'w-full text-left p-3 rounded-xl border text-xs font-sans transition-all flex items-center justify-between cursor-pointer',
+                                    isSel
+                                      ? 'bg-[#2d1c10] border-[#d9a066] text-[#fef5ec] font-bold ring-1 ring-[#d9a066]/50'
+                                      : 'bg-[#18110a] border-[#382618] text-[#c9bba9] hover:bg-[#22170f]'
+                                  )}
+                                >
+                                  <span>{opt}</span>
+                                  {isSel && <Check className="size-4 text-[#d9a066]" />}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {cp.pickerConfig?.motiveLabel && cp.pickerConfig.mismatchTypeOptions && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-mono font-bold text-[#d9a066] block uppercase tracking-wider">
+                            {cp.pickerConfig.motiveLabel}
+                          </label>
+                          <div className="space-y-2">
+                            {cp.pickerConfig.mismatchTypeOptions.map((opt, oIdx) => {
+                              const isSel = motiveSelect === (oIdx === 0 ? 'motive_jealousy' : `motive_${oIdx}`)
+                              const valKey = oIdx === 0 ? 'motive_jealousy' : `motive_${oIdx}`
+                              return (
+                                <button
+                                  key={opt}
+                                  type="button"
+                                  disabled={hasSuccess}
+                                  onClick={() => setMotiveSelect(valKey)}
+                                  className={cn(
+                                    'w-full text-left p-3 rounded-xl border text-xs font-sans transition-all flex items-center justify-between cursor-pointer',
+                                    isSel
+                                      ? 'bg-[#2d1c10] border-[#d9a066] text-[#fef5ec] font-bold ring-1 ring-[#d9a066]/50'
+                                      : 'bg-[#18110a] border-[#382618] text-[#c9bba9] hover:bg-[#22170f]'
+                                  )}
+                                >
+                                  <span>{opt}</span>
+                                  {isSel && <Check className="size-4 text-[#d9a066]" />}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 3: Evidence Selection Grid */}
+                      {cp.pickerConfig?.availableEvidences && (
+                        <div className="space-y-2.5">
+                          <label className="text-xs font-mono font-bold text-[#d9a066] block uppercase tracking-wider">
+                            {cp.pickerConfig.evidenceStepLabel || 'Chọn các tài liệu & vật chứng liên quan:'}
+                          </label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {cp.pickerConfig.availableEvidences.map((ev) => {
+                              const isChecked = selectedEvidenceIds.includes(ev.id)
+                              return (
+                                <button
+                                  key={ev.id}
+                                  type="button"
+                                  disabled={hasSuccess}
+                                  onClick={() => toggleEvidenceSelect(ev.id)}
+                                  className={cn(
+                                    'text-left p-3 rounded-xl border transition-all flex flex-col justify-between gap-1.5 cursor-pointer relative',
+                                    isChecked
+                                      ? 'bg-[#2d1c10] border-[#d9a066] text-[#fef5ec] shadow-md ring-1 ring-[#d9a066]/50'
+                                      : 'bg-[#17100a] border-[#382618] text-[#ad9885] hover:bg-[#22160e]'
+                                  )}
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="font-mono text-[0.625rem] text-[#d9a066] font-bold uppercase border border-[#523d2b] px-1.5 py-0.5 rounded bg-[#130b06]">
+                                      {ev.code}
+                                    </span>
+                                    <div className={cn('size-4 rounded border flex items-center justify-center transition-colors', isChecked ? 'bg-[#d9a066] border-[#d9a066] text-black' : 'border-[#4e3827]')}>
+                                      {isChecked && <Check className="size-3 stroke-[3]" />}
+                                    </div>
+                                  </div>
+                                  <span className="text-xs font-sans font-bold text-[#fef5ec] leading-snug">
+                                    {ev.label}
+                                  </span>
+                                  <span className="text-[0.65rem] text-[#a18c7a] line-clamp-1 font-sans">
+                                    {ev.description}
+                                  </span>
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* FORM TYPE 3: CONVERGENCE NODE */}
+                  {cp.type === 'convergence' && (
+                    <div className="space-y-4 pt-2 border-t border-[#382619]">
+                      <span className="font-mono text-[0.625rem] text-[#a89583] uppercase font-bold tracking-wider block">
+                        CHỌN BẰNG CHỨNG / LÝ DO LOẠI TRỪ TỪNG NGHI PHẠM LÚC ~21:00:
+                      </span>
+
+                      <div className="space-y-4">
+                        {cp.convergenceConfig?.suspects.map((s) => (
+                          <div key={s.id} className="p-3.5 rounded-xl border border-[#3e2b1c] bg-[#1a110a] space-y-2">
+                            <span className="font-mono text-xs font-bold text-[#d9a066] block">
+                              {s.name}
+                            </span>
+                            <div className="space-y-1.5">
+                              {s.reasonOptions.map((opt, rIdx) => {
+                                const valKey = rIdx === 0 ? s.validReasons[0] : `reason_${rIdx}`
+                                const isSel = convergenceSelections[s.id] === valKey
+                                return (
+                                  <button
+                                    key={opt}
+                                    type="button"
+                                    disabled={hasSuccess}
+                                    onClick={() => setConvergenceSelections({ ...convergenceSelections, [s.id]: valKey })}
+                                    className={cn(
+                                      'w-full text-left p-2.5 rounded-lg border text-xs font-sans transition-all flex items-center justify-between cursor-pointer',
+                                      isSel
+                                        ? 'bg-[#2d1c10] border-[#d9a066] text-[#fef5ec] font-bold'
+                                        : 'bg-[#120b06] border-[#302114] text-[#ad9885] hover:bg-[#1c120a]'
+                                    )}
+                                  >
+                                    <span>{opt}</span>
+                                    {isSel && <Check className="size-3.5 text-[#d9a066]" />}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* ERROR FEEDBACK BANNER */}
                   {hasError && (
@@ -324,7 +548,7 @@ export function CaseCheckpointsSection({
                       className="p-4 rounded-xl bg-red-950/70 border border-red-700/80 text-red-200 font-mono text-xs flex items-center gap-3 shadow-md"
                     >
                       <AlertCircle className="size-4 text-red-400 shrink-0" />
-                      <span>⚠️ LẬP LUẬN BỊ BÁC BỎ: Mâu thuẫn với lời khai và mốc thời gian. Hãy đối chiếu lại vật chứng hoặc mở gợi ý!</span>
+                      <span>⚠️ LẬP LUẬN HOẶC DỮ LIỆU BỊ BÁC BỎ: Kết quả chưa khớp với bằng chứng và hồ sơ nghiệp vụ. Hãy kiểm tra lại hoặc mở gợi ý!</span>
                     </motion.div>
                   )}
 
@@ -379,11 +603,11 @@ export function CaseCheckpointsSection({
 
                     {/* Right Submit Button */}
                     <button
-                      disabled={!selectedOpt || hasSuccess}
-                      onClick={() => onSubmitAnswer(cp)}
+                      disabled={hasSuccess || !checkCurrentValidity(cp)}
+                      onClick={() => handleCustomSubmit(cp)}
                       className={cn(
                         'font-mono text-xs uppercase tracking-wider px-6 py-3 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 border shadow-lg',
-                        selectedOpt && !hasSuccess
+                        checkCurrentValidity(cp) && !hasSuccess
                           ? 'bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] border-[#d9a066] shadow-[0_0_20px_rgba(217,160,102,0.35)] active:scale-95 hover:scale-[1.02]'
                           : 'bg-[#1c140e] text-[#6e5a48] border-[#332417] opacity-60 pointer-events-none'
                       )}

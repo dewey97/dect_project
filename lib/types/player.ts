@@ -295,15 +295,52 @@ export interface DetectiveProfile {
   averageRating: DifficultyRating
 }
 
+export interface CheckpointOptionItem {
+  id: string
+  label: string
+  code?: string
+  description?: string
+}
+
 export interface Checkpoint {
   id: string
   caseId: string
   title: string
   question: string
   hint: string
-  options: string[]
-  correctAnswer: string
-  unlockedEvidenceId?: string // e.g. 'dev-02'
+  options?: string[]
+  correctAnswer?: string
+  unlockedEvidenceId?: string
   status: 'locked' | 'active' | 'completed'
+  type?: 'mcq' | 'text_match_3' | 'evidence_picker' | 'convergence' | 'accusation'
+  hintsList?: string[]
+  textMatchConfig?: {
+    inputs: {
+      id: string
+      label: string
+      placeholder: string
+      validAnswers: string[]
+    }[]
+  }
+  pickerConfig?: {
+    suspectLabel?: string
+    validSuspects?: string[]
+    evidenceStepLabel?: string
+    motiveLabel?: string
+    validMotives?: string[]
+    availableEvidences?: CheckpointOptionItem[]
+    requiredEvidenceIds?: string[]
+    mismatchTypeLabel?: string
+    validMismatchTypes?: string[]
+    mismatchTypeOptions?: string[]
+  }
+  convergenceConfig?: {
+    suspects: {
+      id: string
+      name: string
+      validReasons: string[]
+      reasonOptions: string[]
+    }[]
+  }
 }
 
