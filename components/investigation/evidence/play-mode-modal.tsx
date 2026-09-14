@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Globe, Box, Check, ShieldAlert, Sparkles } from 'lucide-react'
+import { Globe, Box, Check, Sparkles } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
 export type PlayExperience = 'web' | 'boardgame'
@@ -27,19 +27,6 @@ export function PlayModeModal({ isOpen, currentMode, onSelectMode, onClose }: Pl
         {/* LEATHER BORDER STITCHING EFFECT */}
         <div className="absolute inset-1.5 border border-dashed border-[#8c6239]/40 pointer-events-none" />
 
-        {/* HEADER */}
-        <div className="text-center space-y-2 relative z-10 border-b border-[#4d3623] pb-4">
-          <div className="inline-flex items-center gap-2 bg-[#2a1b10] px-3 py-1 border border-[#523c28] text-xs text-[#d9a066]">
-            <ShieldAlert className="size-4 text-[#d9a066]" />
-            <span className="font-bold uppercase tracking-wider">THIẾT LẬP PHÒNG CHUYÊN ÁN #000</span>
-          </div>
-          <h2 className="text-lg sm:text-xl font-bold uppercase tracking-wide text-[#f4e8d8]">
-            CHỌN HÌNH THỨC TRẢI NGHIỆM
-          </h2>
-          <p className="text-xs font-sans text-[#a38f7e]">
-            Bạn đang phá án trực tiếp trên thiết bị hay đang ngồi cùng đồng đội trước bàn cờ vật lý?
-          </p>
-        </div>
 
         {/* MODE OPTIONS GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
@@ -109,9 +96,8 @@ export function PlayModeModal({ isOpen, currentMode, onSelectMode, onClose }: Pl
         </div>
 
         {/* FOOTER NOTE */}
-        <div className="flex items-center justify-between text-[0.625rem] font-mono text-[#8c7866] relative z-10 pt-2 border-t border-[#3b2a1e]">
-          <span className="italic">* Bạn có thể chuyển đổi linh hoạt chế độ này bất cứ lúc nào ở góc trên màn hình.</span>
-          {onClose && (
+        {onClose && (
+          <div className="flex items-center justify-end text-[0.625rem] font-mono text-[#8c7866] relative z-10 pt-2 border-t border-[#3b2a1e]">
             <button
               type="button"
               onClick={onClose}
@@ -119,8 +105,8 @@ export function PlayModeModal({ isOpen, currentMode, onSelectMode, onClose }: Pl
             >
               [ ĐÓNG ]
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )

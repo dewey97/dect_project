@@ -60,8 +60,8 @@ export function CheckpointsProvider({ children }: { children: React.ReactNode })
   // Conclusion unlocking rules based on checkpoints
   const isConclusionUnlocked = (caseId: string) => {
     if (caseId === 'case-000') {
-      // Case 000 requires cp-000-2 completed to conclude
-      return isCheckpointCompleted('cp-000-2')
+      // Case 000 requires cp-000-2b or cp-000-2 completed to conclude
+      return isCheckpointCompleted('cp-000-2b') || isCheckpointCompleted('cp-000-2')
     }
     // Case 001 does not strictly lock conclusion, or we can check if needed
     return true

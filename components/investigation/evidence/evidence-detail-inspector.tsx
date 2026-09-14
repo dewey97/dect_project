@@ -10,9 +10,9 @@ interface EvidenceDetailInspectorProps {
 
 export function EvidenceDetailInspector({ selectedView }: EvidenceDetailInspectorProps) {
   return (
-    <div className="w-full lg:w-[52%] xl:w-[54%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col h-full">
+    <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex-col h-full">
       {/* Header Info Bar */}
-      <div className="border-b border-[#3d2c1e] p-4 bg-[#241a12] flex items-center justify-between">
+      <div className="shrink-0 border-b border-[#3d2c1e] p-4 bg-[#241a12] flex items-center justify-between">
         <div className="flex items-center gap-2 overflow-hidden">
           {selectedView.type === 'pdf' ? (
             <FileText className="size-4 text-[#d9a066] shrink-0" />
@@ -29,7 +29,7 @@ export function EvidenceDetailInspector({ selectedView }: EvidenceDetailInspecto
       </div>
 
       {/* Main View Container */}
-      <div className={`flex-1 custom-scrollbar bg-[#120d09] ${selectedView.type === 'pdf' ? 'p-0 overflow-hidden' : 'p-4 sm:p-6 overflow-y-auto'}`}>
+      <div className={`flex-1 min-h-0 min-w-0 custom-scrollbar overscroll-contain bg-[#120d09] ${selectedView.type === 'pdf' ? 'p-0 overflow-hidden' : 'p-4 sm:p-6 overflow-y-auto'}`}>
         {selectedView.type === 'pdf' ? (
           <iframe
             src={`${selectedView.data.url}#toolbar=0&navpanes=0`}

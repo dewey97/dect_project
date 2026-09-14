@@ -100,19 +100,18 @@ export function IPhoneFrame({
 
   return (
     <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center select-none overflow-hidden py-0 sm:py-0.5">
-      {/* Top Quick Control Bar (Desktop controls, Home button on mobile when app active) */}
+      {/* Top Quick Control Bar (Desktop controls only) */}
       <div
         className={cn(
-          "items-center justify-between w-full max-w-[395px] px-2 text-[11px] font-mono shrink-0",
-          activeApp ? "flex mb-1 sm:mb-1.5" : "hidden sm:flex mb-1 sm:mb-1.5"
+          "items-center justify-between w-full max-w-[440px] px-2 text-[11px] font-mono shrink-0 hidden sm:flex mb-1 sm:mb-1.5"
         )}
       >
-        <div className="hidden sm:flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5">
           {/* Lock / Unlock Screen */}
           <button
             onClick={() => setIsLocked(!isLocked)}
             className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
+              "flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
               isLocked
                 ? "bg-[#30D158]/15 text-[#30D158] border-[#30D158]/40 font-semibold hover:bg-[#30D158]/25"
                 : "bg-[#1C1C1E] text-zinc-300 hover:text-white border-white/10 hover:border-white/20"
@@ -127,7 +126,7 @@ export function IPhoneFrame({
           <button
             onClick={() => setShowAssistiveTouch(!showAssistiveTouch)}
             className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
+              "flex items-center gap-1 px-2 py-1 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
               showAssistiveTouch
                 ? "bg-[#0A84FF]/15 text-[#0A84FF] border-[#0A84FF]/40 font-medium hover:bg-[#0A84FF]/25"
                 : "bg-[#1C1C1E] text-zinc-400 hover:text-zinc-200 border-white/10 hover:border-white/20"
@@ -135,14 +134,14 @@ export function IPhoneFrame({
             title={showAssistiveTouch ? "Ẩn nút Home ảo (AssistiveTouch)" : "Hiện nút Home ảo (AssistiveTouch)"}
           >
             {showAssistiveTouch ? <EyeOff className="size-3 text-[#0A84FF]" /> : <Eye className="size-3 text-zinc-400" />}
-            <span>{showAssistiveTouch ? 'Ẩn Home ảo' : 'Bật Home ảo'}</span>
+            <span>{showAssistiveTouch ? 'Home ảo' : 'Bật Home'}</span>
           </button>
 
           {/* Frameless vs Framed Toggle */}
           <button
             onClick={() => setFrameless(!frameless)}
             className={cn(
-              "flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
+              "flex items-center gap-1 px-2 py-1 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
               frameless
                 ? "bg-[#AF52DE]/15 text-[#AF52DE] border-[#AF52DE]/40 font-medium hover:bg-[#AF52DE]/25"
                 : "bg-[#1C1C1E] text-zinc-400 hover:text-zinc-200 border-white/10 hover:border-white/20"
@@ -150,14 +149,14 @@ export function IPhoneFrame({
             title="Chuyển đổi giữa Chế độ Tràn viền và Khung máy cổ điển"
           >
             <Smartphone className="size-3 text-[#AF52DE]" />
-            <span>{frameless ? 'Tràn viền' : 'Có khung'}</span>
+            <span>{frameless ? 'Tràn viền' : 'Khung'}</span>
           </button>
         </div>
 
         {activeApp && (
           <button
             onClick={() => setActiveApp(null)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#0A84FF]/40 bg-[#0A84FF]/15 text-[#0A84FF] hover:bg-[#0A84FF]/25 active:scale-95 font-semibold transition-all shadow-sm cursor-pointer ml-auto"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#0A84FF]/40 bg-[#0A84FF]/15 text-[#0A84FF] hover:bg-[#0A84FF]/25 active:scale-95 font-semibold transition-all shadow-sm cursor-pointer ml-auto"
             title="Thoát ứng dụng về Màn hình chính"
           >
             <Home className="size-3" />
@@ -166,14 +165,13 @@ export function IPhoneFrame({
         )}
       </div>
 
-      {/* PHONE CONTAINER: Fixed Aspect Ratio 9:19.5, Scales Uniformly without distorting! */}
+      {/* PHONE CONTAINER: Full Screen on Mobile, Spacious 440px Framed Container on Desktop */}
       <div
-        style={{ aspectRatio: '9 / 19.5' }}
         className={cn(
-          "relative flex-1 min-h-0 max-h-full w-auto max-w-[min(395px,100%)] transition-all flex flex-col justify-between overflow-hidden",
+          "relative flex-1 min-h-0 w-full h-full sm:h-[98%] sm:max-h-[820px] sm:w-full sm:max-w-[440px] transition-all flex flex-col justify-between overflow-hidden shadow-2xl",
           frameless
-            ? "bg-[#000000] rounded-none sm:rounded-[36px] border-0 sm:border sm:border-white/15 shadow-2xl"
-            : "bg-[#121214] rounded-[44px] sm:rounded-[52px] p-2 sm:p-3 shadow-2xl border-[6px] sm:border-[8px] border-[#2C2C30] ring-1 ring-white/10"
+            ? "bg-[#000000] rounded-none sm:rounded-[36px] border-0 sm:border sm:border-white/15"
+            : "bg-[#121214] rounded-none sm:rounded-[48px] p-0 sm:p-2.5 border-0 sm:border-[8px] border-[#2C2C30] ring-1 ring-white/10"
         )}
       >
         {!frameless && (
@@ -325,7 +323,7 @@ export function IPhoneFrame({
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Kiểu máy:</span>
-                        <span className="font-semibold">iPhone 8 Plus (64GB, Space Gray)</span>
+                        <span className="font-semibold">iPhone 6s Plus (64GB, Space Gray)</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Số thuê bao:</span>
@@ -537,17 +535,6 @@ export function IPhoneFrame({
                         >
                           <MessageSquare className="size-5 text-[#30D158]" />
                           <span className="text-[9.5px]">Tin nhắn</span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            if (onSwitchToForensics) onSwitchToForensics()
-                            setAssistiveMenuOpen(false)
-                          }}
-                          className="p-3 rounded-2xl bg-[#2C2C2E] hover:bg-[#3A3A3C] flex flex-col items-center gap-1.5 text-white transition-colors"
-                        >
-                          <Terminal className="size-5 text-[#AF52DE]" />
-                          <span className="text-[9.5px]">Bảng Pháp y</span>
                         </button>
 
                         {/* Hide AssistiveTouch Button right inside Menu */}

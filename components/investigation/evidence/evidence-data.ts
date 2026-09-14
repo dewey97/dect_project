@@ -258,7 +258,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     caseId: 'case-000',
     kind: 'photo',
     title: 'p6. Ảnh chuỗi chat Khang & Thảo Vy hẹn trốn đi Đà Lạt',
-    preview: 'Chuỗi tin nhắn trích xuất từ iPhone 8 Plus: Thảo Vy hẹn vé 06:15 sáng mai, Khang gom hơn 2 tỷ tiền mặt bỏ trốn và ruồng rẫy Hà.',
+    preview: 'Chuỗi tin nhắn trích xuất từ iPhone 6s Plus: Thảo Vy hẹn vé 06:15 sáng mai, Khang gom hơn 2 tỷ tiền mặt bỏ trốn và ruồng rẫy Hà.',
     timestamp: '17:55',
     evidenceId: 'EV-CHEATING-SMS',
     recoveredBy: 'ĐIỀU TRA VIÊN',

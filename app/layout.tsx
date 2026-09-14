@@ -73,7 +73,7 @@ export default function RootLayout({
       className={`dark ${geistSans.variable} ${geistMono.variable} ${handwritingFont.variable}`}
       suppressHydrationWarning
     >
-      <body suppressHydrationWarning className="min-h-dvh bg-background font-sans text-foreground antialiased">
+      <body suppressHydrationWarning className="h-full h-dvh w-full overflow-hidden fixed inset-0 bg-background font-sans text-foreground antialiased">
         {children}
         <FeedbackModal />
         {process.env.NODE_ENV === 'production' && <Analytics />}

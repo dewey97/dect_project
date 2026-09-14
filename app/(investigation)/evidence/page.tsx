@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FileText, Search, Paperclip, ImageIcon, Volume2, VolumeX, Box } from 'lucide-react'
+import { FileText, Search, Paperclip, ImageIcon, Volume2, VolumeX, Box, X } from 'lucide-react'
 import { PDFViewerModal } from '@/components/investigation/pdf-viewer-modal'
 import { useCheckpoints } from '@/components/investigation/checkpoints-context'
 import { CASES } from '@/lib/mock-data'
@@ -23,10 +23,28 @@ import { EpilogueModal } from '@/components/investigation/epilogue-modal'
 import { JumpscareEndgame } from '@/components/investigation/jumpscare-endgame'
 import { PlayModeModal, PlayExperience } from '@/components/investigation/evidence/play-mode-modal'
 import { BoardGameCompanionView } from '@/components/investigation/evidence/board-game-companion-view'
+import { QuickActionFab } from '@/components/investigation/evidence/quick-action-fab'
+import { PhoneModal } from '@/components/investigation/evidence/phone-modal'
+import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
+import { PhoneSimulator } from '@/components/investigation/phone-simulator'
+import {
+  devices000,
+  conversations000,
+  photos000,
+  emails000,
+  documents000,
+  browserHistory000,
+  files000
+} from '@/lib/content-service'
+import type { Device } from '@/lib/types'
 
 export default function EvidencePage() {
   const activeCase = CASES.find((c) => c.id === 'case-000')
   const { completedCheckpointIds, completeCheckpoint } = useCheckpoints()
+
+  // Phone Modal state
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false)
+  const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] = useState(false)
   
   // Play Experience State ('web' | 'boardgame') - Always prompt user on case entry
   const [playExperience, setPlayExperience] = useState<PlayExperience>('web')
@@ -144,14 +162,15 @@ export default function EvidencePage() {
   const isPhaseUnlocked = (phase: number) => {
     if (phase === 0) return true
     if (phase === 1) return completedCheckpointIds.includes('cp-000-0')
-    if (phase === 2) return completedCheckpointIds.includes('cp-000-1')
-    if (phase === 3) return completedCheckpointIds.includes('cp-000-2')
+    if (phase === 2) return completedCheckpointIds.includes('cp-000-convergence') || completedCheckpointIds.includes('cp-000-1b') || completedCheckpointIds.includes('cp-000-1')
+    if (phase === 3) return completedCheckpointIds.includes('cp-000-2a') || completedCheckpointIds.includes('cp-000-2b') || completedCheckpointIds.includes('cp-000-2')
     return false
   }
 
   const handleSelectPdf = (doc: PDFDocument) => {
     if (!isPhaseUnlocked(doc.phase)) return
     detectiveAudio.playTypewriterClick()
+    setIsPhoneModalOpen(false)
     setSelectedView({ type: 'pdf', data: doc })
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setIsMobilePdfOpen(true)
@@ -161,9 +180,10 @@ export default function EvidencePage() {
   const handleSelectEvidence = (item: PhysicalEvidence) => {
     if (!isPhaseUnlocked(item.phase)) return
     detectiveAudio.playGlassSound()
+    setIsPhoneModalOpen(false)
     setSelectedView({ type: 'evidence', data: item })
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      setIsMobilePdfOpen(false)
+      setIsMobilePdfOpen(true)
     }
   }
 
@@ -227,6 +247,25 @@ export default function EvidencePage() {
     setCheckpointErrors((prev) => ({ ...prev, [cpId]: false }))
   }
 
+  const handleProceedNextPhase = (cpId: string) => {
+    const nextPhase = cpId === 'cp-000-0' ? 1 : cpId === 'cp-000-convergence' ? 2 : cpId === 'cp-000-2a' ? 3 : null
+
+    completeCheckpoint(cpId)
+    if (nextPhase !== null) {
+      detectiveAudio.playHeartbeat()
+      const newPdfs = CASE_000_PDFS.filter((d) => d.phase === nextPhase)
+      const newEvidence = CASE_000_EVIDENCE.filter((e) => e.phase === nextPhase)
+      setUnlockedModalData({
+        unlockedPhase: nextPhase,
+        newPdfs,
+        newEvidence
+      })
+    } else if (cpId === 'cp-000-2b' || cpId === 'cp-000-3') {
+      // Final checkpoint completed! Trigger jumpscare sequence before Epilogue
+      setIsJumpscareActive(true)
+    }
+  }
+
   const handleSubmitAnswer = (cp: (typeof checkpoints000)[0]) => {
     const userAnswer = selectedAnswers[cp.id]
     if (!userAnswer) return
@@ -234,28 +273,11 @@ export default function EvidencePage() {
     // Hide narrator monologue box when entering active checkpoint solving / submitting
     setShowMainNarrator(false)
 
-    if (userAnswer === cp.correctAnswer) {
+    if (userAnswer === 'VALID_ANSWER' || (cp.correctAnswer && userAnswer === cp.correctAnswer)) {
       detectiveAudio.playStampSound()
       detectiveAudio.playUnlockJingle()
       setCheckpointSuccesses((prev) => ({ ...prev, [cp.id]: true }))
-      const nextPhase = cp.id === 'cp-000-0' ? 1 : cp.id === 'cp-000-1' ? 2 : cp.id === 'cp-000-2' ? 3 : null
-
-      setTimeout(() => {
-        completeCheckpoint(cp.id)
-        if (nextPhase !== null) {
-          detectiveAudio.playHeartbeat()
-          const newPdfs = CASE_000_PDFS.filter((d) => d.phase === nextPhase)
-          const newEvidence = CASE_000_EVIDENCE.filter((e) => e.phase === nextPhase)
-          setUnlockedModalData({
-            unlockedPhase: nextPhase,
-            newPdfs,
-            newEvidence
-          })
-        } else if (cp.id === 'cp-000-3') {
-          // Final checkpoint cp-000-3 completed! Trigger jumpscare sequence before Epilogue
-          setIsJumpscareActive(true)
-        }
-      }, 1000)
+      setCheckpointErrors((prev) => ({ ...prev, [cp.id]: false }))
     } else {
       detectiveAudio.playGlassSound()
       setCheckpointErrors((prev) => ({ ...prev, [cp.id]: true }))
@@ -293,7 +315,7 @@ export default function EvidencePage() {
 
   if (playExperience === 'boardgame') {
     return (
-      <div className="h-full w-full bg-[#0b0704] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-y-auto custom-scrollbar flex flex-col justify-start items-center p-4 sm:p-8 relative">
+      <div suppressHydrationWarning className="h-full w-full bg-[#0b0704] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col justify-start items-center p-3 sm:p-6 relative box-border">
         {/* AMBIENT NOIR BANKERS SPOTLIGHT */}
         <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[900px] max-w-full h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(217,160,102,0.13),transparent_75%)] z-0" />
         <div className="noir-scanlines pointer-events-none fixed inset-0 opacity-15 z-0" />
@@ -310,6 +332,7 @@ export default function EvidencePage() {
           onUnlockNextHint={unlockNextHint}
           onOpenEpilogue={() => setIsEpilogueOpen(true)}
           onSwitchToWebMode={() => handleSelectPlayExperience('web')}
+          onProceedNextPhase={handleProceedNextPhase}
         />
 
         {/* PHASE UNLOCKED CINEMATIC STORY MODAL (BOARD GAME MODE WITH PHYSICAL DIRECTIVES) */}
@@ -338,18 +361,37 @@ export default function EvidencePage() {
           isOpen={isEpilogueOpen}
           onClose={() => setIsEpilogueOpen(false)}
         />
+
+        {/* QUICK ACTION FAB MENU */}
+        <QuickActionFab
+          onOpenPhone={() => setIsPhoneModalOpen(true)}
+          onReinvestigate={() => setIsReinvestigateModalOpen(true)}
+          onResetCase={resetFindingsProgress}
+        />
+
+        {/* VICTIM PHONE SIMULATOR MODAL */}
+        <PhoneModal
+          isOpen={isPhoneModalOpen}
+          onClose={() => setIsPhoneModalOpen(false)}
+        />
+
+        {/* RE-INVESTIGATION CRIME SCENE MODAL */}
+        <ReinvestigationModal
+          isOpen={isReinvestigateModalOpen}
+          onClose={() => setIsReinvestigateModalOpen(false)}
+        />
       </div>
     )
   }
 
   return (
-    <div className="h-screen w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-4">
-      <div className="w-full max-w-[1700px] h-full flex flex-col lg:flex-row gap-5 items-stretch justify-center">
+    <div suppressHydrationWarning className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-4 box-border min-h-0 min-w-0">
+      <div className="w-full max-w-[1700px] h-full flex flex-col lg:flex-row gap-5 items-stretch justify-center overflow-hidden min-h-0 min-w-0">
         
         {/* LEFT COLUMN: UNIFIED VINTAGE DOSSIER INDEX & ACTIVE QUESTION */}
-        <div className="w-full lg:w-[48%] xl:w-[46%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-y-auto h-full flex flex-col custom-scrollbar">
-          {/* STICKY HEADER */}
-          <header className="sticky top-0 z-20 border-b border-[#3d2c1e] p-5 sm:p-6 bg-[#241a12] shadow-md">
+        <div className="w-full lg:w-[45%] xl:w-[42%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex flex-col min-h-0">
+          {/* STICKY / FIXED HEADER */}
+          <header className="shrink-0 border-b border-[#3d2c1e] p-5 sm:p-6 bg-[#241a12] shadow-md">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex flex-col">
                 <span className="font-mono text-[0.6rem] uppercase tracking-[0.25em] text-[#d4a373] font-bold block mb-1">
@@ -366,25 +408,6 @@ export default function EvidencePage() {
               <div className="flex items-center gap-2 sm:self-start flex-wrap">
                 <button
                   type="button"
-                  onClick={() => handleSelectPlayExperience('boardgame')}
-                  className="px-2.5 py-1 bg-[#18261b] hover:bg-[#253d2c] border border-emerald-700/80 text-[0.6rem] font-mono font-bold text-emerald-300 hover:text-emerald-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
-                  title="Chuyển sang Chế độ đồng hành cùng Board Game vật lý (tắt xem tài liệu trên app)"
-                >
-                  <Box className="size-3 text-emerald-400" />
-                  <span>CHƠI BÀN CỜ</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsPlayModalOpen(true)}
-                  className="px-2 py-1 bg-[#18120c] hover:bg-[#342417] border border-[#3e2e20] text-[0.6rem] font-mono font-bold text-[#d9a066] transition-colors cursor-pointer flex items-center gap-1"
-                  title="Đổi hình thức trải nghiệm Web / Board Game"
-                >
-                  <span>CHẾ ĐỘ</span>
-                </button>
-
-                <button
-                  type="button"
                   onClick={() => setIsAudioMuted(detectiveAudio.toggleMute())}
                   className="p-1.5 bg-[#18120c] hover:bg-[#342417] border border-[#3e2e20] text-[#d9a066] transition-colors cursor-pointer"
                   title={isAudioMuted ? 'Bật âm thanh trinh thám' : 'Tắt âm thanh trinh thám'}
@@ -399,7 +422,7 @@ export default function EvidencePage() {
             </p>
           </header>
 
-          <div className="p-4 sm:p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto custom-scrollbar overscroll-contain min-h-0 p-4 sm:p-6 space-y-6">
             {/* DOSSIER INDEX WITH PHASE UNLOCK FILTERS */}
             <section className="space-y-3">
               <div className="flex flex-col gap-3 border-b border-[#3d2c1e] pb-3">
@@ -601,13 +624,45 @@ export default function EvidencePage() {
                 onAnswerSelect={handleAnswerSelect}
                 onSubmitAnswer={handleSubmitAnswer}
                 onUnlockNextHint={unlockNextHint}
+                onProceedNextPhase={handleProceedNextPhase}
               />
             )}
           </div>
         </div>
 
-        {/* RIGHT COLUMN: EVIDENCE DETAIL INSPECTOR */}
-        <EvidenceDetailInspector selectedView={selectedView} />
+        {/* RIGHT COLUMN: EVIDENCE DETAIL INSPECTOR OR INLINE DESKTOP IPHONE SIMULATOR */}
+        {isPhoneModalOpen ? (
+          <div className="hidden lg:flex flex-1 bg-[#120c08] border-2 border-[#543b27] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex-col relative items-center justify-center p-2 min-h-0">
+            <button
+              onClick={() => setIsPhoneModalOpen(false)}
+              className="absolute top-3 right-3 z-50 p-2 text-[#ad9885] hover:text-[#fef5ec] bg-[#24170e]/90 hover:bg-[#382618] rounded-full transition-colors cursor-pointer border border-[#443021] shadow-lg"
+              title="Đóng điện thoại"
+            >
+              <X className="size-5" />
+            </button>
+
+            <div className="flex-1 w-full min-h-0 flex items-center justify-center p-1 overflow-hidden">
+              <PhoneSimulator
+                device={{
+                  ...devices000[0],
+                  locked: false,
+                  status: 'unlocked',
+                  recoveryLevel: 100,
+                  lastUpdated: '24/07/2016 // 17:55',
+                  description: devices000[0].description || 'Điện thoại cá nhân của nạn nhân Khang'
+                }}
+                threads={conversations000[devices000[0].id] || []}
+                photos={photos000[devices000[0].id] || []}
+                emails={emails000[devices000[0].id] || []}
+                notes={documents000[devices000[0].id] || []}
+                history={browserHistory000[devices000[0].id] || []}
+                files={files000[devices000[0].id] || []}
+              />
+            </div>
+          </div>
+        ) : (
+          <EvidenceDetailInspector selectedView={selectedView} />
+        )}
       </div>
 
       {/* HARDCORE MODE: FLOATING DETECTIVE LEATHER JOURNAL DRAWER */}
@@ -627,11 +682,12 @@ export default function EvidencePage() {
         onSelectMode={handleSelectMode}
       />
 
-      {/* MOBILE FULL SCREEN PDF MODAL */}
+      {/* MOBILE FULL SCREEN MODAL */}
       <PDFViewerModal
         isOpen={isMobilePdfOpen}
+        selectedView={selectedView}
         pdfUrl={selectedView.type === 'pdf' ? selectedView.data.url : null}
-        title={selectedView.type === 'pdf' ? selectedView.data.title : null}
+        title={selectedView.type === 'pdf' ? selectedView.data.title : selectedView.data.title}
         onClose={() => setIsMobilePdfOpen(false)}
       />
 
@@ -670,6 +726,26 @@ export default function EvidencePage() {
         onSelectMode={handleSelectPlayExperience}
         onClose={hasChosenExperience ? () => setIsPlayModalOpen(false) : undefined}
       />
+
+      {/* QUICK ACTION FAB MENU */}
+      <QuickActionFab
+        onOpenHint={() => {
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('open-hint-modal'))
+          }
+        }}
+        onOpenPhone={() => setIsPhoneModalOpen(true)}
+        onReinvestigate={resetFindingsProgress}
+        onResetCase={resetFindingsProgress}
+      />
+
+      {/* VICTIM PHONE SIMULATOR MODAL (For mobile viewports in Web mode) */}
+      <div className="lg:hidden">
+        <PhoneModal
+          isOpen={isPhoneModalOpen}
+          onClose={() => setIsPhoneModalOpen(false)}
+        />
+      </div>
     </div>
   )
 }

@@ -32,13 +32,16 @@ export function PhaseUnlockedModal({
   playExperience = 'web',
 }: PhaseUnlockedModalProps) {
   const [isStoryStarted, setIsStoryStarted] = React.useState(false)
+  const [isNarrativeComplete, setIsNarrativeComplete] = React.useState(false)
 
   React.useEffect(() => {
     setIsStoryStarted(false)
+    setIsNarrativeComplete(false)
   }, [unlockedModalData])
 
   const handleStartStory = () => {
     setIsStoryStarted(true)
+    setIsNarrativeComplete(false)
     if (unlockedModalData && unlockedModalData.unlockedPhase === 0) {
       setTimeout(() => {
         detectiveAudio.playCeramicShatterSound()
@@ -49,26 +52,68 @@ export function PhaseUnlockedModal({
   return (
     <AnimatePresence>
       {unlockedModalData && (
-        <div className="fixed inset-0 z-50 w-screen h-screen bg-[#0c0805] text-[#e5d8cb] overflow-hidden flex flex-col font-sans select-none">
+        <div className="fixed inset-0 z-50 w-full h-[100dvh] max-h-[100dvh] bg-[#0c0805] text-[#e5d8cb] overflow-hidden flex flex-col font-sans select-none">
           {/* CRT Background scanlines */}
           <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-10" />
 
           {/* Main Fullscreen Content Area */}
           {playExperience === 'boardgame' ? (
             /* BOARD GAME MODE: PURE IMMERSIVE CINEMATIC STORYTELLING (NO RIGHT DIRECTIVE COLUMN) */
-            <div className="relative z-20 flex-1 flex flex-col justify-between items-center p-6 sm:p-12 max-w-3xl mx-auto w-full overflow-y-auto custom-scrollbar">
+            <div className="relative z-20 flex-1 h-full flex flex-col justify-between items-center p-4 sm:p-8 max-w-3xl mx-auto w-full overflow-hidden">
               {CASE_000_NARRATOR[unlockedModalData.unlockedPhase] && (
-                <div className="space-y-6 w-full flex flex-col items-start my-auto py-8">
-                  <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between">
-                    <span>{CASE_000_NARRATOR[unlockedModalData.unlockedPhase].date}</span>
-                    <span className="text-[0.65rem] text-[#8f7a68] font-semibold">
-                      {CASE_000_NARRATOR[unlockedModalData.unlockedPhase].title}
-                    </span>
-                  </div>
+                <div className="space-y-6 w-full flex-1 flex flex-col items-start my-auto py-4 overflow-y-auto custom-scrollbar pr-1">
+                  {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
+                    <div className="py-16 flex flex-col items-center justify-center w-full my-auto">
+                      <button
+                        onClick={handleStartStory}
+                        className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
+                      >
+                        [ TRỐN TÌM ]
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between shrink-0">
+                        <span>{CASE_000_NARRATOR[unlockedModalData.unlockedPhase].date}</span>
+                      </div>
 
-                  <div className="pt-2 w-full">
+                      <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
+                        <TypewriterNarrator
+                          text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
+                          speed={12}
+                          onComplete={() => setIsNarrativeComplete(true)}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Clean Bottom Button - ONLY VISIBLE AFTER NARRATION COMPLETES */}
+              {isNarrativeComplete && (
+                <div className="w-full pt-4 pb-2 shrink-0 max-w-md mx-auto">
+                  <button
+                    onClick={() => {
+                      onSetPhaseFilter(unlockedModalData.unlockedPhase)
+                      onClose()
+                    }}
+                    className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] animate-fade-in"
+                  >
+                    <Search className="size-4.5" />
+                    <span>ĐIỀU TRA</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* WEB DIGITAL MODE: SPLIT VIEW (LEFT: STORY, RIGHT: DIGITAL ARCHIVES) */
+            <div className="relative z-20 flex-1 h-full flex flex-col lg:grid lg:grid-cols-12 gap-0 overflow-hidden">
+              {/* Left Column (60% width): Clean Pure Storytelling Screen */}
+              <div className="h-[45vh] lg:h-full lg:col-span-7 border-b lg:border-b-0 lg:border-r border-[#261b12] p-4 lg:p-10 flex flex-col justify-start items-center bg-black overflow-y-auto custom-scrollbar shrink-0">
+                {CASE_000_NARRATOR[unlockedModalData.unlockedPhase] && (
+                  <div className="space-y-6 max-w-xl mx-auto w-full flex flex-col items-start py-4 sm:py-6">
                     {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
-                      <div className="py-16 flex flex-col items-center justify-center w-full">
+                      <div className="py-12 flex flex-col items-center justify-center w-full my-auto">
                         <button
                           onClick={handleStartStory}
                           className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
@@ -77,63 +122,26 @@ export function PhaseUnlockedModal({
                         </button>
                       </div>
                     ) : (
-                      <TypewriterNarrator
-                        text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
-                        speed={12}
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Clean Bottom Button */}
-              <div className="w-full pt-6 pb-2 shrink-0 max-w-md mx-auto">
-                <button
-                  onClick={() => {
-                    onSetPhaseFilter(unlockedModalData.unlockedPhase)
-                    onClose()
-                  }}
-                  className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99]"
-                >
-                  <Search className="size-4.5" />
-                  <span>BẮT ĐẦU THẨM TRA</span>
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* WEB DIGITAL MODE: SPLIT VIEW (LEFT: STORY, RIGHT: DIGITAL ARCHIVES) */
-            <div className="relative z-20 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden">
-              {/* Left Column (60% width): Clean Pure Storytelling Screen */}
-              <div className="lg:col-span-7 border-b lg:border-b-0 lg:border-r border-[#261b12] p-6 lg:p-12 flex flex-col justify-start items-center bg-black overflow-y-auto custom-scrollbar">
-                {CASE_000_NARRATOR[unlockedModalData.unlockedPhase] && (
-                  <div className="space-y-6 max-w-xl mx-auto w-full flex flex-col items-start py-6 sm:py-10">
-                    <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between">
-                      <span>{CASE_000_NARRATOR[unlockedModalData.unlockedPhase].date}</span>
-                    </div>
-
-                    <div className="pt-2 w-full">
-                      {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
-                        <div className="py-12 flex flex-col items-center justify-center w-full">
-                          <button
-                            onClick={handleStartStory}
-                            className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
-                          >
-                            [ TRỐN TÌM ]
-                          </button>
+                      <>
+                        <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between">
+                          <span>{CASE_000_NARRATOR[unlockedModalData.unlockedPhase].date}</span>
                         </div>
-                      ) : (
-                        <TypewriterNarrator
-                          text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
-                          speed={12}
-                        />
-                      )}
-                    </div>
+
+                        <div className="pt-2 w-full">
+                          <TypewriterNarrator
+                            text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
+                            speed={12}
+                            onComplete={() => setIsNarrativeComplete(true)}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
 
               {/* Right Column (40% width): Unlocked Archives */}
-              <div className="lg:col-span-5 p-6 lg:p-10 bg-[#160f0a] flex flex-col justify-between overflow-hidden">
+              <div className="flex-1 lg:col-span-5 p-4 lg:p-8 bg-[#160f0a] flex flex-col justify-between overflow-hidden min-h-0">
                 <div className="flex flex-col h-full overflow-hidden">
                   <div className="flex items-center justify-between border-b border-[#3d2a1b] pb-3 mb-4">
                     <span className="font-mono text-xs text-[#d9a066] uppercase font-bold tracking-wider flex items-center gap-2">
@@ -196,24 +204,26 @@ export function PhaseUnlockedModal({
                     ))}
                   </div>
 
-                  {/* Bottom Action Section */}
-                  <div className="pt-4 border-t border-[#3d2a1b] mt-4">
-                    <button
-                      onClick={() => {
-                        if (unlockedModalData.newPdfs.length > 0) {
-                          onSelectPdf(unlockedModalData.newPdfs[0])
-                        } else if (unlockedModalData.newEvidence.length > 0) {
-                          onSelectEvidence(unlockedModalData.newEvidence[0])
-                        }
-                        onSetPhaseFilter(unlockedModalData.unlockedPhase)
-                        onClose()
-                      }}
-                      className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99]"
-                    >
-                      <Search className="size-4.5" />
-                      <span>PHÁ ÁN</span>
-                    </button>
-                  </div>
+                  {/* Bottom Action Section - ONLY VISIBLE AFTER NARRATION COMPLETES */}
+                  {isNarrativeComplete && (
+                    <div className="pt-4 border-t border-[#3d2a1b] mt-4">
+                      <button
+                        onClick={() => {
+                          if (unlockedModalData.newPdfs.length > 0) {
+                            onSelectPdf(unlockedModalData.newPdfs[0])
+                          } else if (unlockedModalData.newEvidence.length > 0) {
+                            onSelectEvidence(unlockedModalData.newEvidence[0])
+                          }
+                          onSetPhaseFilter(unlockedModalData.unlockedPhase)
+                          onClose()
+                        }}
+                        className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] animate-fade-in"
+                      >
+                        <Search className="size-4.5" />
+                        <span>ĐIỀU TRA</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

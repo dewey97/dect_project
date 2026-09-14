@@ -19,13 +19,10 @@ export function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
   const isEvidenceSimulator = pathname.startsWith('/evidence/')
 
   return (
-    <div suppressHydrationWarning className="flex h-dvh w-full justify-center items-center overflow-hidden bg-[#0d0c0a]">
+    <div suppressHydrationWarning className="flex h-dvh w-full justify-center items-center overflow-hidden bg-[#0d0c0a] fixed inset-0 min-h-0 min-w-0">
       <main
         suppressHydrationWarning
-        className={cn(
-          "w-full h-full flex flex-col",
-          isEvidenceSimulator ? "overflow-hidden" : "overflow-y-auto"
-        )}
+        className="w-full h-full flex flex-col overflow-hidden min-h-0 min-w-0"
       >
         <PageTransition>{children}</PageTransition>
       </main>

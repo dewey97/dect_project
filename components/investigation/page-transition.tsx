@@ -10,7 +10,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
     <div
       key={pathname}
       suppressHydrationWarning
-      className="animate-fade-slide-up w-full h-full"
+      className="animate-fade-slide-up w-full h-full overflow-hidden min-h-0 min-w-0"
     >
       {children}
     </div>
