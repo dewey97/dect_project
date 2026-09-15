@@ -1,7 +1,7 @@
 Sau khi cảnh sát đưa ra những bằng chứng không thể chối cãi, Hà đã nhận tội. 
 
 Đêm hôm đó, Hà đã rình rập ngoài nhà Khang vì cô biết anh ta đang lén lút với ả nhân tình nào đó. Hà muốn phải bắt tận tay để Khang hết đường chối cãi.
-Nhưng khi vô tình thấy Tùng hốt hoảng chạy ra từ nhà Khang, Hà định vào hỏi có chuyện gì thì hấy Khang đã nằm gục trên sàn nhà.
+Nhưng khi vô tình thấy Tùng hốt hoảng chạy ra từ nhà Khang, Hà định vào hỏi có chuyện gì thì thấy Khang đã nằm gục trên sàn nhà.
 
 Sợ có chuyện không hay, Hà có lại gần để kiểm tra tình hình của Khang. Đúng lúc đó, tin nhắn của ả nhân tình gửi đến, Hà mới biết Khang đã lên kế hoạch bỏ rơi mình để bắt đầu cuộc sống mới với người đàn bà khác. Trong cơn phẫn hận, Hà đã vơ ngay mảnh sứ đâm vào cổ Khang. 
 
