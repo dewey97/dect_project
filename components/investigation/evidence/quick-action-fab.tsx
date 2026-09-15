@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Lightbulb, Smartphone, Search, RefreshCw, X, ShieldAlert, Menu } from 'lucide-react'
+import { Lightbulb, Smartphone, Search, RefreshCw, X, ShieldAlert, Menu, UserCheck } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
 interface QuickActionFabProps {
@@ -10,9 +10,10 @@ interface QuickActionFabProps {
   onReinvestigate: () => void
   onResetCase: () => void
   onOpenHint?: () => void
+  onOpenSuspects?: () => void
 }
 
-export function QuickActionFab({ onOpenPhone, onReinvestigate, onResetCase, onOpenHint }: QuickActionFabProps) {
+export function QuickActionFab({ onOpenPhone, onReinvestigate, onResetCase, onOpenHint, onOpenSuspects }: QuickActionFabProps) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -75,6 +76,24 @@ export function QuickActionFab({ onOpenPhone, onReinvestigate, onResetCase, onOp
                 <Lightbulb className="size-4" />
               </div>
               <span className="group-hover:text-amber-300 transition-colors">Gợi ý phá án</span>
+            </button>
+
+            {/* OPTION: SUSPECTS */}
+            <button
+              type="button"
+              onClick={() => handleAction(() => {
+                if (onOpenSuspects) {
+                  onOpenSuspects()
+                } else if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('open-suspects-modal'))
+                }
+              })}
+              className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#2e1d11] border border-transparent hover:border-[#6e492e] transition-all cursor-pointer flex items-center gap-2.5 text-xs font-bold text-[#fef5ec] group"
+            >
+              <div className="p-1.5 bg-[#291b10] border border-[#523c28] text-[#d9a066] rounded-lg group-hover:bg-[#d9a066] group-hover:text-black transition-colors">
+                <UserCheck className="size-4" />
+              </div>
+              <span className="group-hover:text-[#d9a066] transition-colors">Thẩm tra tình nghi</span>
             </button>
 
             {/* OPTION 1: OPEN PHONE */}

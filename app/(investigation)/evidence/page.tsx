@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FileText, Search, Paperclip, ImageIcon, Volume2, VolumeX, Box, X } from 'lucide-react'
+import { FileText, Search, Paperclip, ImageIcon, Volume2, VolumeX, Box, X, UserCheck } from 'lucide-react'
 import { PDFViewerModal } from '@/components/investigation/pdf-viewer-modal'
 import { useCheckpoints } from '@/components/investigation/checkpoints-context'
 import { CASES } from '@/lib/mock-data'
@@ -26,6 +26,7 @@ import { BoardGameCompanionView } from '@/components/investigation/evidence/boar
 import { QuickActionFab } from '@/components/investigation/evidence/quick-action-fab'
 import { PhoneModal } from '@/components/investigation/evidence/phone-modal'
 import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
+import { SuspectInvestigationModal } from '@/components/investigation/evidence/suspect-investigation-modal'
 import { PhoneSimulator } from '@/components/investigation/phone-simulator'
 import {
   devices000,
@@ -42,9 +43,10 @@ export default function EvidencePage() {
   const activeCase = CASES.find((c) => c.id === 'case-000')
   const { completedCheckpointIds, completeCheckpoint } = useCheckpoints()
 
-  // Phone Modal state
+  // Phone & Suspect Modal state
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false)
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] = useState(false)
+  const [isSuspectsModalOpen, setIsSuspectsModalOpen] = useState(false)
   
   // Play Experience State ('web' | 'boardgame') - Always prompt user on case entry
   const [playExperience, setPlayExperience] = useState<PlayExperience>('web')
@@ -84,8 +86,18 @@ export default function EvidencePage() {
     }
 
     const handleOpenEpilogue = () => setIsEpilogueOpen(true)
+    const handleOpenPhone = () => setIsPhoneModalOpen(true)
+    const handleOpenSuspects = () => setIsSuspectsModalOpen(true)
+
     window.addEventListener('open-epilogue-modal', handleOpenEpilogue)
-    return () => window.removeEventListener('open-epilogue-modal', handleOpenEpilogue)
+    window.addEventListener('open-phone-modal', handleOpenPhone)
+    window.addEventListener('open-suspects-modal', handleOpenSuspects)
+
+    return () => {
+      window.removeEventListener('open-epilogue-modal', handleOpenEpilogue)
+      window.removeEventListener('open-phone-modal', handleOpenPhone)
+      window.removeEventListener('open-suspects-modal', handleOpenSuspects)
+    }
   }, [])
 
   const handleSelectPlayExperience = (mode: PlayExperience) => {
@@ -365,8 +377,15 @@ export default function EvidencePage() {
         {/* QUICK ACTION FAB MENU */}
         <QuickActionFab
           onOpenPhone={() => setIsPhoneModalOpen(true)}
+          onOpenSuspects={() => setIsSuspectsModalOpen(true)}
           onReinvestigate={() => setIsReinvestigateModalOpen(true)}
           onResetCase={resetFindingsProgress}
+        />
+
+        {/* SUSPECT INVESTIGATION MODAL */}
+        <SuspectInvestigationModal
+          isOpen={isSuspectsModalOpen}
+          onClose={() => setIsSuspectsModalOpen(false)}
         />
 
         {/* VICTIM PHONE SIMULATOR MODAL */}
@@ -406,6 +425,19 @@ export default function EvidencePage() {
               </div>
 
               <div className="flex items-center gap-2 sm:self-start flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    detectiveAudio.playPaperRustle()
+                    setIsSuspectsModalOpen(true)
+                  }}
+                  className="px-2.5 py-1.5 bg-[#2c1d12] hover:bg-[#3d281a] border border-[#593b25] text-[#d9a066] font-mono text-[0.7rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
+                  title="Mở hồ sơ & Thẩm tra nghi phạm tự do"
+                >
+                  <UserCheck className="size-3.5" />
+                  <span>THẨM TRA NGHI PHẠM</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setIsAudioMuted(detectiveAudio.toggleMute())}
@@ -735,8 +767,15 @@ export default function EvidencePage() {
           }
         }}
         onOpenPhone={() => setIsPhoneModalOpen(true)}
+        onOpenSuspects={() => setIsSuspectsModalOpen(true)}
         onReinvestigate={resetFindingsProgress}
         onResetCase={resetFindingsProgress}
+      />
+
+      {/* SUSPECT INVESTIGATION MODAL */}
+      <SuspectInvestigationModal
+        isOpen={isSuspectsModalOpen}
+        onClose={() => setIsSuspectsModalOpen(false)}
       />
 
       {/* VICTIM PHONE SIMULATOR MODAL (For mobile viewports in Web mode) */}

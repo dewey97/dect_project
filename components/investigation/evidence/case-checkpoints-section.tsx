@@ -18,6 +18,7 @@ import {
   QrCode,
   ShieldAlert,
   Flame,
+  Smartphone,
   X
 } from 'lucide-react'
 import type { Checkpoint } from '@/lib/types'
@@ -242,6 +243,31 @@ export function CaseCheckpointsSection({
                 {/* FORM TYPE 1: TEXT MATCH 3 (CP-000-0) */}
                 {cp.type === 'text_match_3' && (
                   <div className="space-y-4 pt-1">
+                    {/* ONBOARDING INITIAL EVIDENCE CALLOUT FOR CP-000-0 */}
+                    {cp.id === 'cp-000-0' && (
+                      <div className="p-3.5 bg-[#ebdcc4] border-2 border-[#a88c6f] rounded-none text-xs text-[#3b2b1a] space-y-2.5 shadow-sm">
+                        <div className="flex items-center gap-2 font-bold font-mono text-[#5c4026] uppercase tracking-wider border-b border-[#a88c6f]/40 pb-1.5">
+                          <Smartphone className="size-4 text-[#8c592b]" />
+                          <span>HƯỚNG DẪN BẮT ĐẦU ĐIỀU TRA:</span>
+                        </div>
+                        <p className="text-xs leading-relaxed">
+                          Trước tiên, bạn hãy đối chiếu dữ liệu giữa <strong>Hồ sơ tài liệu</strong> (Sổ nợ <code className="bg-[#dfccb0] px-1 py-0.5 rounded font-mono text-[#1a0f07]">10</code>, Bảng tin rao vặt <code className="bg-[#dfccb0] px-1 py-0.5 rounded font-mono text-[#1a0f07]">11</code>) và <strong>Điện thoại nạn nhân Khang</strong> (Call Log <code className="bg-[#dfccb0] px-1 py-0.5 rounded font-mono text-[#1a0f07]">dev-00</code>) để tìm ra danh tính 3 SĐT ẩn danh.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            try {
+                              window.dispatchEvent(new CustomEvent('open-phone-modal'))
+                            } catch {}
+                          }}
+                          className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#2c1d12] hover:bg-[#3d291a] text-[#f4e8d8] font-mono text-xs font-bold transition-all cursor-pointer rounded-none shadow border border-[#523924]"
+                        >
+                          <Smartphone className="size-3.5 text-amber-400" />
+                          <span>📱 MỞ ĐIỆN THOẠI NẠN NHÂN KHANG</span>
+                        </button>
+                      </div>
+                    )}
+
                     <span className="font-mono text-xs text-[#4a3520] uppercase font-bold tracking-wider block">
                       ĐIỀN DANH TÍNH CHỦ THỂ THỤ LÝ SĐT VÀO Ô:
                     </span>
