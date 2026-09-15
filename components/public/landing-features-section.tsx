@@ -111,7 +111,7 @@ export function LandingFeaturesSection() {
 
             <div className="w-full aspect-[4/3] overflow-hidden border border-black/10 rounded-sm bg-zinc-100 shadow-inner relative">
               <img
-                src="/choi.jpg"
+                src="/images/cases/case_000/choi.jpg"
                 alt="Group investigation session"
                 className="w-full h-full object-cover"
               />

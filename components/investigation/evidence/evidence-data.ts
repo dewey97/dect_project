@@ -204,7 +204,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
-    thumbnail: '/trontim.jpg',
+    thumbnail: '/images/cases/case_000/trontim.jpg',
     phase: 0,
     order: 23
   },
@@ -219,7 +219,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
-    thumbnail: '/cuong_ve_xe_tung.png',
+    thumbnail: '/images/cases/case_000/cuong_ve_xe_tung.png',
     phase: 0,
     order: 24
   },
@@ -264,7 +264,7 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
     recoveredBy: 'ĐIỀU TRA VIÊN',
     integrityStatus: 'secured',
     chainOfCustody: 'VERIFIED',
-    thumbnail: '/photo_cheating_sms.jpg',
+    thumbnail: '/images/cases/case_000/photo_cheating_sms.jpg',
     phase: 3,
     order: 161
   }
