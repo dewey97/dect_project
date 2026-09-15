@@ -25,7 +25,7 @@ Anh ta gửi thư đến Hà, chỉ có vài dòng ngắn gọn.
 
 _"Hãy để tôi được chuộc lại tội lỗi của mình. Nếu không vì hành động đêm đó đã đẩy Khang đến nguy hiểm, thì đứa bé đã không phải rơi vào cảnh mồ côi. Mọi ân oán lẽ ra nên để lại trong quá khứ. Vì mọi sinh linh bé nhỏ đều là vô tội, 20 năm trước hay bây giờ cũng như vậy"_
 
-Cầm bức thư trên tay, ánh mắt điên dại của Hà chợt khựng lại. Lần đầu tiên, cô ta thấy mình tỉnh táo đến vậy. Quá khứ như thước phim hiện lên trong tâm trí Hà. Có lẽ những ngày đầu tiên, cô đã thật lòng yêu thương Khang và anh ta cũng vậy. Thế mà bao cám dỗ và vòng xoáy của cuộc đời đã đẩy cả hai đến bước đường cùng không thể quay đầu lại.
+Cầm bức thư trên tay, ánh mắt điên dại của Hà chợt khựng lại. Lần đầu tiên, Hà thấy mình tỉnh táo đến vậy. Quá khứ như thước phim hiện lên trong tâm trí Hà. Có lẽ những ngày đầu tiên, cô đã thật lòng yêu thương Khang và anh ta cũng vậy. Thế mà bao cám dỗ và vòng xoáy của cuộc đời đã đẩy cả hai đến bước đường cùng không thể quay đầu lại.
 
 Nhưng ngày tháng vẫn còn ở phía trước, và đứa trẻ xứng đáng thuộc về một tương lai tươi sáng, không còn hận thù bủa vây. 
 
