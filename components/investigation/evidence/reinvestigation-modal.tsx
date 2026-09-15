@@ -18,9 +18,11 @@ interface Hotspot {
 }
 
 const HOTSPOTS: Hotspot[] = [
-  { id: 'spot-1', x: 72, y: 35, zoomScale: 2.2 },
-  { id: 'spot-2', x: 28, y: 65, zoomScale: 2 },
-  { id: 'spot-3', x: 48, y: 50, zoomScale: 1.8 }
+  { id: 'spot-1', x: 74, y: 25, zoomScale: 2.2 }, // Cửa sổ nhìn ra đèn ray tàu
+  { id: 'spot-2', x: 20, y: 35, zoomScale: 2.0 }, // Cửa chính mở hé nhìn ra sân mưa & gốc xoan
+  { id: 'spot-3', x: 58, y: 55, zoomScale: 1.8 }, // Bàn trà & ấm chén vỡ
+  { id: 'spot-4', x: 90, y: 48, zoomScale: 1.8 }, // Chiếc tủ gỗ lim cổ điển
+  { id: 'spot-5', x: 36, y: 62, zoomScale: 2.0 }  // Giỏ rác nhựa cạnh cửa
 ]
 
 export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalProps) {
@@ -76,15 +78,14 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
             }}
             transition={{ type: 'spring', stiffness: 250, damping: 25 }}
           >
-            {/* SCENE DIAGRAM / IMAGE PLACEHOLDER */}
-            <div className="relative w-[90%] h-[85%] bg-[#1a130d] rounded-lg border border-[#3b281c] flex flex-col items-center justify-center shadow-inner overflow-hidden">
-              {/* GRID DECORATION */}
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,#3d271920_1px,transparent_1px),linear-gradient(to_bottom,#3d271920_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-
-              <MapPin className="size-16 text-[#d9a066]/30 mb-2" />
-              <p className="text-xs uppercase tracking-widest text-[#d9a066]/40 font-bold">
-                SƠ ĐỒ HIỆN TRƯỜNG KHÁM XẾT LẠI
-              </p>
+            {/* REALISTIC SCENE PHOTO CONTAINER */}
+            <div className="relative w-[92%] h-[88%] bg-[#1a130d] rounded-lg border border-[#3b281c] flex items-center justify-center shadow-2xl overflow-hidden">
+              {/* PHOTOREALISTIC CRIME SCENE IMAGE */}
+              <img
+                src="/images/cases/case_000/photo-reinvestigation-room-realistic.jpg"
+                alt="Ảnh hiện trường phòng khách khám xét lại"
+                className="w-full h-full object-cover select-none pointer-events-none"
+              />
 
               {/* RED DOT HOTSPOTS */}
               {HOTSPOTS.map((spot) => {

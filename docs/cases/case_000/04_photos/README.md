@@ -2,35 +2,34 @@
 ## CHUYÊN ÁN #000: TRỐN TÌM (CASE #000: HIDE-AND-SEEK)
 
 > **Mục đích tài liệu:** Quản lý toàn bộ hệ thống hình ảnh vật chứng hiện trường, ảnh chụp màn hình thiết bị và ảnh chân dung nhân vật trong Chuyên án #000.  
+> **Vị trí lưu trữ tập trung:** Toàn bộ ảnh gốc vụ án bắt buộc phải đặt tập trung tại `docs/cases/case_000/04_photos/` và đồng bộ sang `public/images/cases/case_000/` cho Web Application.  
 > **Đồng bộ tuyệt đối:** Đồng bộ 100% với [`docs/cases/case_000/01_design/evidence_matrix.md`](file:///d:/code_world/dect_project/docs/cases/case_000/01_design/evidence_matrix.md) và [`docs/cases/case_000/01_design/gameplay_design.md`](file:///d:/code_world/dect_project/docs/cases/case_000/01_design/gameplay_design.md).  
-> **Hệ Thống Prompt "Bulletproof" Chống Lỗi Tuyệt Đối:** Được thiết kế chuyên biệt cho **Midjourney v6**, **Flux.1 Pro**, **Stable Diffusion 3**, **DALL-E 3** với cấu trúc đa tầng:
-> 1. Neo nhân trắc học & sắc tộc thuần Việt (Kinh Vietnamese Ethnicity Anchor).
-> 2. Phân lập giải phẫu chi tiết (tách biệt mắt trái/phải, vị trí sẹo, mật độ nếp nhăn, góc lệch con ngươi).
-> 3. Kiểm soát quang học & góc chụp (Lens focal length, aperture f/2.8 tránh out-net dị tật, lighting ratio, shadow falloff).
-> 4. Bộ Negative Prompt chuyên sâu chặn đứng hiện tượng "AI hallucination" (chặn lác cả 2 mắt, chặn sẹo lệch chỗ, chặn mặt Tây hóa).
+
+---
+
+## 🚨 QUY TẮC MỸ THUẬT & HÌNH ẢNH BẮT BUỘC (MASTER PHOTO RULES)
+
+1. **100% REALISTIC PHOTOGRAPHY (Ảnh chụp hiện thực / Tài liệu hình sự):**
+   * **NGHIÊM CẤM TUYỆT ĐỐI:** Tranh vẽ hoạt hình 2D, anime, digital art cách điệu, tranh minh họa phẳng, hay 3D CGI bóng bẩy.
+   * **PHONG CÁCH BẮT BUỘC:** Ảnh chụp hiện trường / tư liệu trinh sát thực tế (RAW 35mm documentary photography, forensic flashlight, camera grain tự nhiên, màu sắc và bối cảnh chân thực của nhà phố Việt Nam năm 2016).
+2. **QUY CHUẨN ĐỒNG NHẤT ẢNH CHÂN DUNG:**
+   * Tất cả ảnh nhân vật là **Ảnh thẻ căn cước / Hồ sơ điều tra phông xanh dương (Solid Royal Blue ID Backdrop)**, góc chụp chính diện thẳng (frontal headshot), bố cục từ ngực trở lên, đặc tả chuẩn xác nhân trắc học thuần Việt (Kinh Vietnamese).
+3. **LƯU TRỮ TẬP TRUNG & TỰ ĐỘNG ĐỒNG BỘ:**
+   * Mọi file ảnh sinh ra đều phải được đặt tên theo quy chuẩn mã vật chứng (`photo-*.jpg`, `avatar_*.jpg`) và lưu trực tiếp trong `docs/cases/case_000/04_photos/`.
 
 ---
 
 ## 🧭 MỤC LỤC DANH MỤC HÌNH ẢNH
 
 1. [I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)](#i-danh-mục-ảnh-chân-dung-nhân-vật-portrait-avatars)
-   - [`avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 28 TUỔI)](#1-avatar_khang-nguyễn-văn-khang-nạn-nhân-28-tuổi)
-   - [`avatar_mai` — NGUYỄN NGỌC MAI (NGHI PHẠM 1 — 24 TUỔI)](#2-avatar_mai-nguyễn-ngọc-mai-nghi-phạm-1-24-tuổi)
-   - [`avatar_vu` (`p6`) — LÊ QUANG VŨ (NGHI PHẠM 2 — 25 TUỔI — MẮT TRÁI LÁC NHẸ)](#3-avatar_vu-p6-lê-quang-vũ-nghi-phạm-2-25-tuổi-mắt-trái-lác-nhẹ)
-   - [`avatar_tung` — NGUYỄN THANH TÙNG (NGHI PHẠM 3 — 28 TUỔI — SẸO CHỮ V)](#4-avatar_tung-nguyễn-thanh-tùng-nghi-phạm-3-28-tuổi-sẹo-chữ-v)
-   - [`avatar_ha` — TRẦN THỊ HÀ (THỦ PHẠM CHÍNH — 26 TUỔI — CUỒNG YÊU ÁM ẢNH)](#5-avatar_ha-trần-thị-hà-thủ-phạm-chính-26-tuổi-cuồng-yêu-ám-ảnh)
-   - [`avatar_lua` — BÀ NGUYỄN THỊ LỤA (NHÂN CHỨNG HÀNG XÓM — 60 TUỔI)](#6-avatar_lua-bà-nguyễn-thị-lụa-nhân-chứng-hàng-xóm-60-tuổi)
-   - [`avatar_dat` — TRẦN VĂN ĐẠT / ĐẠT GÀ (CHỢ CẢNG — 28 TUỔI)](#7-avatar_dat-trần-văn-đạt-đạt-gà-chợ-cảng-28-tuổi)
-   - [`avatar_vy` — THẢO VY / BÉ VY ❤️ (NHÂN TÌNH NẠN NHÂN — 24 TUỔI)](#8-avatar_vy-thảo-vy-bé-vy-nhân-tình-nạn-nhân-24-tuổi)
-   - [`avatar_huy` — BÉ NGUYỄN GIA HUY (EM TRAI TÙNG — 7 TUỔI, HÈ 1996)](#9-avatar_huy-bé-nguyễn-gia-huy-em-trai-tùng-7-tuổi-hè-1996)
-2. [II. DANH MỤC ẢNH HIỆN TRƯỜNG & TƯ LIỆU VẬT CHỨNG (`p1` – `p5`)](#ii-danh-mục-ảnh-hiện-trường-tư-liệu-vật-chứng-p1-p5)
+2. [II. DANH MỤC ẢNH HIỆN TRƯỜNG & TƯ LIỆU VẬT CHỨNG (`p1` – `p5`, `p11`)](#ii-danh-mục-ảnh-hiện-trường-tư-liệu-vật-chứng-p1-p5-p11)
    - [`p1` — HIỆN TRƯỜNG & TÁCH TRÀ PHÒNG KHÁCH (`photo-crime-scene-overview.jpg`)](#1-p1-hiện-trường-tách-trà-phòng-khách-photo-crime-scene-overviewjpg)
    - [`p2` — ĐƠN ĐÒI ĐẤT 200M² RƠI VÃI DƯỚI SÀN (`photo-scattered-documents.jpg`)](#2-p2-đơn-đòi-đất-200m²-rơi-vãi-dưới-sàn-photo-scattered-documentsjpg)
    - [`p3` — MẢNH BÌNH TRÀ VỠ DÍNH MÁU — HUNG KHÍ (`photo-glass-shard-detail.jpg`)](#3-p3-mảnh-bình-trà-vỡ-dính-máu-hung-khí-photo-glass-shard-detailjpg)
    - [`p4` — ẢNH KỶ NIỆM XÓM BỜ SÔNG HÈ 1996 (`photo-childhood-group.jpg`)](#4-p4-ảnh-kỷ-niệm-xóm-bờ-sông-hè-1996-photo-childhood-groupjpg)
    - [`p5` — MẢNH BÁO CŨ 1996 XÉ VỤN GHÉP LẠI (`photo-old-newspaper.jpg`)](#5-p5-mảnh-báo-cũ-1996-xé-vụn-ghép-lại-photo-old-newspaperjpg)
+   - [`p11` — TOÀN CẢNH PHÒNG KHÁCH TÁI KHÁM XÉT HIỆN TRƯỜNG (`photo-reinvestigation-room-realistic.jpg`)](#6-p11-toàn-cảnh-phòng-khách-tái-khám-xét-hiện-trường-photo-reinvestigation-room-realisticjpg)
 3. [III. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (DEVICE SCREENSHOTS)](#iii-danh-mục-ảnh-chụp-màn-hình-thiết-bị-device-screenshots)
-   - [`p10` — SCREENSHOT LỊCH SỬ APP ĐẶT XE CỦA LÊ QUANG VŨ (`screenshot-ride-app-vu.png`)](#1-p10-screenshot-lịch-sử-app-đặt-xe-của-lê-quang-vũ-screenshot-ride-app-vupng)
 4. [IV. HƯỚNG DẪN TẠO ẢNH CHỐNG LỖI (ANTI-FAIL WORKFLOW)](#iv-hướng-dẫn-tạo-ảnh-chống-lỗi-anti-fail-workflow)
 
 ---
@@ -349,6 +348,28 @@ Forensic document reconstruction flat-lay photograph of evidence p5 inside a pol
 > 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
 ```text
 untorn newspaper, pristine paper, modern glossy magazine, English newspaper, computer screen, wooden table, anime, 3d render, blurry text.
+```
+
+---
+
+### 6. `p11` — TOÀN CẢNH PHÒNG KHÁCH TÁI KHÁM XÉT HIỆN TRƯỜNG (`photo-reinvestigation-room-realistic.jpg`)
+* **Mã vật chứng:** `p11` / `reinvestigation_room_realistic`
+* **Ý nghĩa phá án:** Nền tảng giao diện khám xét lại (Point-and-Click Reinvestigation Hotspots); chứa 5 điểm dấu vết vi mô kết nối sự thật vụ án.
+* **Mô tả hiện trường & góc máy kỹ thuật:**
+  * Ảnh chụp góc rộng ngang tầm mắt (Eye-level Wide-angle 16:9) toàn cảnh phòng khách nhà số 14 Đường Bờ Sông ban đêm.
+  * Nền gạch bông cổ điển thập niên 90. Bàn trà gỗ giữa phòng có ấm chén vỡ, nước trà loang và khung ảnh nứt kính dưới chân bàn.
+  * Bên trái: Cửa chính mở hé nhìn ra sân mưa ẩm ướt và tán cây xoan; sọt rác nhựa ở góc tường cạnh cửa ngách.
+  * Bên phải: Cửa sổ mở hé nhìn ra cột đèn tín hiệu đường sắt; chiếc tủ gỗ lim 2 cánh thời bao cấp ở góc trong.
+  * Ánh sáng đèn sợi đốt ấm áp hòa cùng ánh đèn pin hình sự và bóng tối ẩm ướt ngoài hiên, chất ảnh 35mm giàu chi tiết hạt phim.
+
+> 📝 **BULLETPROOF PROMPT (MIDJOURNEY v6 / FLUX.1 PRO / GEMINI IMAGEN 3):**
+```text
+A realistic crime scene photograph of a messy, gloomy living room in an authentic Vietnamese suburban house at night, taken in 2016. RAW documentary photo, 35mm photography, forensic investigation wide-angle shot, 16:9 aspect ratio. CENTER: An old varnished wooden tea table with a shattered ceramic teapot and broken porcelain cups on vintage 1990s floral ceramic floor tiles. A cracked glass picture frame lying on the floor. Signs of physical struggle with minor scratches on the wooden table edge. LEFT: The wooden entrance door is slightly open, showing the wet dark outdoor courtyard with a chinaberry tree illuminated by an authentic yellow sodium street lamp in the rain. In the bottom-left corner near a small open side door sits a plastic wastebasket with crumpled tissue paper. RIGHT: An old wooden window is open 15cm, revealing dark outside air and distant railway signal lights. In the far right corner stands a rustic dark mahogany wooden cupboard from the 1990s with an old rusty iron latch and subtle dust on top. LIGHTING: Authentic indoor warm tungsten light mixed with subtle camera flash and dark ambient shadows, realistic raw textures, peeling wall paint, realistic grain, photorealistic police evidence photo, no humans in the scene. --ar 16:9 --style raw --s 75 --v 6.0
+```
+
+> 🚫 **NEGATIVE PROMPT (Dành cho Stable Diffusion 3 / WebUI / Fooocus):**
+```text
+drawing, painting, illustration, anime, cartoon, 3d render, cgi, flat art, modern luxury furniture, clean tidy room, smiling people, daytime, sunlight, oversaturated colors, blurry.
 ```
 
 ---
