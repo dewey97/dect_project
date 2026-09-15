@@ -37,6 +37,7 @@
 ### 1. `avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 28 TUỔI)
 * **Tệp tin lưu trữ:** `avatar_khang.jpg` / `profile-khang.png`
 * **Mục đích nghiệp vụ:** Ảnh căn cước / hồ sơ nhận diện nạn nhân chủ nợ tín dụng đen bị sát hại.
+* **Quy chuẩn hiển thị:** Ảnh thẻ căn cước chuẩn phông xanh dương (`Solid Royal Blue ID Backdrop`), tỷ lệ 1:1, góc chụp chính diện ngực trở lên.
 * **Mô tả nhân trắc học:** Nam 28 tuổi, người Kinh, tạng người to bè (endomorph), mặt vuông thô ráp, quai hàm bạnh, ngấn cằm dày. Lông mày rậm xếch, mắt mí lót nhìn thẳng trơ tráo, khóe miệng nhếch khinh khỉnh. Râu quai nón 2 ngày chưa cạo. Tay phải lộ hình xăm Rồng mực tàu xanh đen. Đeo dây chuyền bạc 925 to bản, áo polo dão màu xám đen.
 
 ---
