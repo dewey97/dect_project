@@ -2,7 +2,7 @@
 
 > **Mục đích:** Phân định rạch ròi 100% ranh giới giữa 3 hình thái hiển thị trong game:
 > 1. 📱 **Nội dung trên Điện thoại Giả lập (Virtual Phone UI / Mobile Interactive Screen)**.
-> 2. 🖼️ **Ảnh chụp hiện trường & Ảnh chụp màn hình (Visual Photos & Screenshots)** — Chi tiết prompt tạo ảnh tại [`docs/cases/case_000/04_photos/README.md`](file:///d:/code_world/dect_project/docs/cases/case_000/04_photos/README.md).
+> 2. 🖼️ **Ảnh chụp hiện trường & Ảnh chụp màn hình (Visual Photos & Screenshots)** — Chi tiết prompt tạo ảnh tại [`docs/cases/case_000/04_photos/photo_catalog.md`](file:///d:/code_world/dect_project/docs/cases/case_000/04_photos/photo_catalog.md).
 > 3. 📄 **Tài liệu văn bản / Hồ sơ tố tụng (Case Documents / Paper Files)**.
 
 ---
@@ -44,15 +44,15 @@ Thiết bị: **iPhone 6s Plus màu đen (Touch ID) của nạn nhân Nguyễn V
 
 | Mã Ảnh | Nhân Vật | Vai Trò | Đặc Điểm Nhận Dạng Cốt Lõi | Mục Đích Nghiệp Vụ |
 | :---: | :--- | :--- | :--- | :--- |
-| **`avatar_khang`** | **Nguyễn Văn Khang** | Nạn nhân | Nam, 38 tuổi, thể hình to bè, xăm trổ rồng tay phải, nét mặt hung dữ, bất hảo. | Hồ sơ nạn nhân / Nhận diện người bị hại. |
-| **`avatar_mai`** | **Nguyễn Ngọc Mai** | Nghi phạm 1 | Nữ, 34 tuổi, tóc buộc gọn, gương mặt cương trực, phong thái đĩnh đạc, trang phục công sở. | Hồ sơ nghi phạm tranh chấp đất đai. |
-| **`avatar_vu`** | **Lê Quang Vũ** (`p6`) | Nghi phạm 2 | Nam, 35 tuổi, đeo kính gọng đen, **mắt trái có tật lác nhẹ (lé nhẹ)**, vẻ mặt tự ti, sợ hãi. | Nhận diện con nợ biệt danh "Thằng Lệch Pha" nợ 300M. |
-| **`avatar_tung`** | **Nguyễn Thanh Tùng** | Nghi phạm 3 | Nam, 40 tuổi, da ngăm đen khắc khổ, **có sẹo chữ V ở đuôi lông mày trái**, vẻ mặt u uất. | Khớp nhận diện người anh trai trong Ảnh kỷ niệm 1996 (`p4`). |
-| **`avatar_ha`** | **Trần Thị Hà** | Thủ phạm | Nữ, 36 tuổi, vóc dáng gầy gò, mắt một mí to tròn u uất, ánh nhìn ám ảnh, bệnh hoạn. | Hồ sơ thủ phạm cuồng yêu ghen tuông. |
+| **`avatar_khang`** | **Nguyễn Văn Khang** | Nạn nhân | Nam, 28 tuổi (SN 1988), thể hình to bè, xăm trổ rồng tay phải, nét mặt hung dữ, bất hảo. | Hồ sơ nạn nhân / Nhận diện người bị hại. |
+| **`avatar_mai`** | **Nguyễn Ngọc Mai** | Nghi phạm 1 | Nữ, 24 tuổi (SN 1992), tóc buộc gọn, gương mặt cương trực, phong thái đĩnh đạc, trang phục công sở. | Hồ sơ nghi phạm tranh chấp đất đai. |
+| **`avatar_vu`** | **Lê Quang Vũ** (`p6`) | Nghi phạm 2 | Nam, 25 tuổi (SN 1991), đeo kính gọng đen, **mắt trái có tật lác nhẹ (lé nhẹ)**, vẻ mặt tự ti, sợ hãi. | Nhận diện con nợ biệt danh "Thằng Lệch Pha" nợ 300M. |
+| **`avatar_tung`** | **Nguyễn Thanh Tùng** | Nghi phạm 3 | Nam, 30 tuổi (SN 1986), da ngăm đen khắc khổ, **có sẹo chữ V ở đuôi lông mày trái**, vẻ mặt u uất. | Khớp nhận diện người anh trai trong Ảnh kỷ niệm 1996 (`p4`). |
+| **`avatar_ha`** | **Trần Thị Hà** | Thủ phạm | Nữ, 26 tuổi (SN 1990), vóc dáng gầy gò, mắt một mí to tròn u uất, ánh nhìn ám ảnh, bệnh hoạn. | Hồ sơ thủ phạm cuồng yêu ghen tuông. |
 | **`avatar_lua`** | **Bà Nguyễn Thị Lụa** | Nhân chứng | Nữ, 60 tuổi, tóc hoa râm búi cao, đeo kính lão, hiền từ, tinh tường xóm ngõ. | Hồ sơ nhân chứng mốc giờ then chốt. |
-| **`avatar_dat`** | **Đạt Gà Chợ Cảng** | Đối tượng liên quan | Nam, 38 tuổi, mặc tạp dề buôn bán gia cầm, nét mặt bặm trợn, cáu kỉnh. | Hồ sơ đối tượng nợ nần cãi nhau qua điện thoại (Nhiễu). |
-| **`avatar_vy`** | **Bé Thảo Vy (Bé Vy ❤️)** | Nhân tình nạn nhân | Nữ, 24 tuổi, phong cách trẻ trung, sành điệu, ảnh đại diện mạng xã hội. | Nhận diện nhân tình Khang hẹn bỏ trốn đi Đà Lạt. |
-| **`avatar_huy`** | **Bé Nguyễn Gia Huy (1996)** | Em trai đã khuất của Tùng | Bé trai 7 tuổi, nhỏ thó, **đeo chiếc còi đồng màu cam trước ngực**, nét mặt ngây thơ. | Xuất hiện trong Ảnh kỷ niệm hè 1996 (`p4`). |
+| **`avatar_dat`** | **Đạt Gà Chợ Cảng** | Đối tượng liên quan | Nam, 28 tuổi (SN 1988), mặc tạp dề buôn bán gia cầm, nét mặt bặm trợn, cáu kỉnh. | Hồ sơ đối tượng nợ nần cãi nhau qua điện thoại (Nhiễu). |
+| **`avatar_vy`** | **Bé Thảo Vy (Bé Vy ❤️)** | Nhân tình nạn nhân | Nữ, 24 tuổi (SN 1992), phong cách trẻ trung, sành điệu, ảnh đại diện mạng xã hội. | Nhận diện nhân tình Khang hẹn bỏ trốn đi Đà Lạt. |
+| **`avatar_huy`** | **Bé Nguyễn Gia Huy (1996)** | Em trai đã khuất của Tùng | Bé trai 7 tuổi (SN 1989), nhỏ thó, **đeo chiếc còi đồng màu cam trước ngực**, nét mặt ngây thơ. | Xuất hiện trong Ảnh kỷ niệm hè 1996 (`p4`). |
 
 ---
 

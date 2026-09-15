@@ -10,16 +10,19 @@
 
 ```text
  ┌────────────────────────────────────────────────────────────────────────┐
- │ 🖼️ BỨC ẢNH 2D PHỐI CẢNH PHÒNG KHÁCH (GÓC NHÌN NGANG RỘNG)             │
+ │ 🖼️ BỨC ẢNH 2D PHỐI CẢNH PHÒNG KHÁCH & PHÒNG NGỦ (GÓC NHÌN NGANG RỘNG)  │
  │                                                                        │
  │ [🚪 Cửa chính / Nhìn ra gốc xoan]          [🪟 Cửa sổ nhìn ra ray tàu] │
  │  (🔴 Spot #2)                              (🔴 Spot #1)                │
  │                                                                        │
- │          [🛋️ Bàn trà & Bình vỡ]                                        │
- │           (🔴 Spot #3)                                                 │
+ │          [🛋️ Bàn trà, Khung ảnh & Ghe sofa (Thỏi son)]                 │
+ │           (🔴 Spot #3 & 🔴 Spot #6: Khe ghế sofa)                     │
  │                                                                        │
- │ [🗑️ Thùng rác & Cửa ngách sau]             [📦 Chiếc tủ gỗ cũ 1996]   │
- │  (🔴 Spot #5)                              (🔴 Spot #4)                │
+ │ [🗑️ Thùng rác & Cửa ngách sau]   [📦 Tủ gỗ 1996 & Kẹp sách (Chia đất)]│
+ │  (🔴 Spot #5)                    (🔴 Spot #4 & 🔴 Spot #7)            │
+ │                                                                        │
+ │                   [🛏️ Giường ngủ & Gối nằm (Bùa yêu)]                  │
+ │                    (🔴 Spot #8)                                        │
  └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -93,6 +96,47 @@
 
 ---
 
+### 🔴 Spot #6: Khe ghế sofa phòng khách (Thỏi son rơi & Sợi tóc vàng)
+* **Vị trí tọa độ sơ đồ:** `(x: 52%, y: 56%)` — Nằm rớt trong khe đệm ghế sofa gỗ/da phòng khách.
+* **Hành động Zoom:** Camera phóng to cận cảnh 2.5x rọi sâu vào khe giữa 2 đệm ghế sofa.
+* **Vật thể quan sát được (Ảnh/Sơ đồ zoom):**
+  * 💄 01 Thỏi son trang điểm nắp mạ vàng bị đánh rơi mắc kẹt trong rãnh đệm.
+  * Dính chặt trên thân thỏi son là **01 sợi tóc dài uốn nhuộm màu vàng kim (blonde hair)**.
+* **Âm thanh kích hoạt (SFX):**
+  * 🔍 **Tiếng lách tách kim loại nhẹ & tiếng sột soạt kiểm tra vật chứng**.
+* **Ghi chú quan sát & Ẩn ý bối cảnh:**
+  * Khang có lối sống ăn chơi phóng túng, thường xuyên đưa nhiều phụ nữ khác nhau về nhà qua đêm (sợi tóc vàng không phải của Hà — tóc đen ngang vai, cũng không phải của Mai — tóc đen buộc đuôi ngựa).
+
+---
+
+### 🔴 Spot #7: Cuốn sổ gia xóm / Khe bàn làm việc (Di thư chia đất 50:50 của Ông Nội)
+* **Vị trí tọa độ sơ đồ:** `(x: 85%, y: 55%)` — Kẹp giữa khe bàn gỗ / cuốn sổ cũ gần tủ gỗ.
+* **Hành động Zoom:** Camera phóng to cận cảnh 2.2x vào tờ giấy dó cổ kẹp trong cuốn sổ tay cũ.
+* **Vật thể quan sát được (Ảnh/Sơ đồ zoom):**
+  * 📄 01 Tờ di thư/chép tay bằng mực tàu đã ố vàng của Ông Nội để lại.
+  * **Nội dung trích đoạn ghi rõ:** Nguồn gốc di sản nhà đất 200m² được chia **50:50 đồng đều cho 2 cháu (Nguyễn Văn Khang và Nguyễn Ngọc Mai)**, bác bỏ toàn bộ giấy tờ đứng tên chính chủ một mình Khang.
+* **Âm thanh kích hoạt (SFX):**
+  * 📜 **Tiếng giở trang giấy dó cũ & tiếng bút lông mực tàu sột soạt**.
+* **Ghi chú quan sát & Ẩn ý bối cảnh:**
+  * Vật chứng mang tính pháp lý cốt lõi chứng minh Mai hoàn toàn có cơ sở đòi lại 100m² quyền lợi chính đáng; đồng thời vạch trần hành vi gian dối, giấu giếm di thư của Khang nhằm chiếm đoạt toàn bộ tài sản.
+
+---
+
+### 🔴 Spot #8: Ruột gối nằm phòng ngủ nạn nhân (Lá Bùa Yêu Yếm Chỉ Đỏ)
+* **Vị trí tọa độ sơ đồ:** `(x: 40%, y: 80%)` — Phòng ngủ gian sau, rọi sâu vào ruột gối bông.
+* **Hành động Zoom:** Camera phóng to cận cảnh 2.5x khi mổ khóa kéo ruột gối nằm của Khang.
+* **Vật thể quan sát được (Ảnh/Sơ đồ zoom):**
+  * 🔮 01 Lá bùa yếm được gấp thành hình tam giác nhỏ bằng vải đỏ/giấy dó yếm bùa.
+  * **Bên trong lá bùa chứa:**
+    - Dòng chữ viết tay bằng mực son ghi họ tên, ngày tháng năm sinh của Nguyễn Văn Khang & Trần Thị Hà.
+    - 01 lọn tóc nhỏ của Hà được quấn buộc chặt bằng sợi chỉ đỏ tươi.
+* **Âm thanh kích hoạt (SFX):**
+  * 🕯️ **Tiếng thì thầm thần chú ma mị u uất & tiếng xé vải/chỉ đỏ nhẹ**.
+* **Ghi chú quan sát & Ẩn ý bối cảnh:**
+  * Minh chứng cho sự cuồng yêu ám ảnh bệnh hoạn và mụ mị của Trần Thị Hà. Hà đã lén nhét bùa yêu vào gối nằm của Khang với mong muốn trói buộc tâm trí Khang vĩnh viễn không thể rời xa mình.
+
+---
+
 ## ⚙️ BẢNG TỔNG HỢP HIỆU ỨNG TƯƠNG TÁC (INTERACTION MATRIX)
 
 | Mã Spot | Tên vị trí | Tỷ lệ Zoom | Tọa độ (x, y) | Hình ảnh trực quan cận cảnh | Hiệu ứng âm thanh (SFX) | Ẩn ý gợi mở điều tra |
@@ -102,14 +146,18 @@
 | **Spot #3** | 🛋️ Bàn trà & mảnh vỡ | **1.8x** | `(48%, 50%)` | Mảnh bình trà vỡ, vết xước gờ bàn xô xát | 💥 Thủy tinh va chạm & tiếng ngất | Tái hiện hiện trường cuộc xô xát bột phát giữa hai người |
 | **Spot #4** | 📦 Chiếc tủ gỗ 1996 | **1.8x** | `(82%, 68%)` | Then sắt rỉ sét, bụi nóc tủ in vết tay giận dữ | 🚪 Then sắt cài sập & tiếng đập tay | Gợi nhắc nỗi đau uất ức về một ký ức bị niêm phong 20 năm |
 | **Spot #5** | 🗑️ Thùng rác & Cửa hậu | **2.0x** | `(18%, 40%)` | Khăn giấy dính son & phấn xoan, chốt cửa mở hé | 📄 Vò giấy & tiếng then cửa tẩu thoát | Gợi ý dấu vết một bóng người vội vã rút lui theo lối ngõ sau |
+| **Spot #6** | 💄 Khe ghế sofa | **2.5x** | `(52%, 56%)` | Thỏi son rơi, sợi tóc uốn nhuộm vàng kim dính trên son | 🔍 Tiếng lách tách kim loại & sột soạt | Thể hiện lối sống phóng túng của Khang, thường đưa gái lạ về |
+| **Spot #7** | 📜 Di thư chi tiết đất | **2.2x** | `(85%, 55%)` | Di thư chép tay ông nội chia đất 50:50 cho Khang & Mai | 📜 Giấy dó sột soạt & tiếng bút mực | Chứng minh quyền lợi chính đáng của Mai & Khang gian dối giấu bài |
+| **Spot #8** | 🔮 Bùa yêu trong gối | **2.5x** | `(40%, 80%)` | Bùa vải đỏ, viết tên Khang-Hà bằng mực son, lọn tóc buộc chỉ đỏ | 🕯️ Tiếng thì thầm thần chú ma mị | Thể hiện sự cuồng yêu ghen tuông bệnh hoạn, mù quáng của Hà |
 
 ---
 
 ## 🎯 QUY TRÌNH TRẢI NGHIỆM CỦA NGƯỜI CHƠI (USER FLOW)
 
 1. **Người chơi mở menu FAB góc phải** ➔ Bấm chọn nút **"Khám xét lại"**.
-2. **Màn hình hiện sơ đồ toàn cảnh** với 5 chấm đỏ nhấp nháy (`🔴 Spot #1` đến `🔴 Spot #5`).
+2. **Màn hình hiện sơ đồ toàn cảnh** với 8 chấm đỏ nhấp nháy (`🔴 Spot #1` đến `🔴 Spot #8`).
 3. **Người chơi nhấp vào từng chấm đỏ**:
    * Camera mượt mà zoom cận cảnh vào đúng tọa độ của điểm đó.
-   * Âm thanh đặc trưng của vị trí đó vang lên (VD: Tiếng còi tàu hỏa vang lên khi nhấp vào cửa sổ, tiếng then sắt khi nhấp vào tủ gỗ).
+   * Âm thanh đặc trưng của vị trí đó vang lên (VD: Tiếng còi tàu hỏa vang lên khi nhấp vào cửa sổ, tiếng thì thầm ma mị khi nhấp vào bùa yêu).
 4. **Nhấp lại lần nữa hoặc nhấp ra khoảng trống**: Camera tự động zoom out trở lại sơ đồ toàn cảnh.
+
