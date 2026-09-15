@@ -23,8 +23,9 @@
 
 1. [I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)](#i-danh-mục-ảnh-chân-dung-nhân-vật-portrait-avatars)
 2. [II. DANH MỤC ẢNH HIỆN TRƯỜNG & TƯ LIỆU VẬT CHỨNG (`p1` – `p5`, `p11`)](#ii-danh-mục-ảnh-hiện-trường-tư-liệu-vật-chứng-p1--p5-p11)
-3. [III. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (DEVICE SCREENSHOTS)](#iii-danh-mục-ảnh-chụp-màn-hình-thiết-bị-device-screenshots)
-4. [IV. NGUYÊN TẮC KIỂM TRA ĐẶC ĐIỂM NHẬN DẠNG](#iv-nguyên-tắc-kiểm-tra-đặc-điểm-nhận-dạng)
+3. [III. DANH MỤC ẢNH CẬN CẢNH ĐIỂM KHÁM XẾT LẠI (RE-INVESTIGATION HOTSPOT PHOTOS)](#iii-danh-mục-ảnh-cận-cảnh-điểm-khám-xét-lại-re-investigation-hotspot-photos)
+4. [IV. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (DEVICE SCREENSHOTS)](#iv-danh-mục-ảnh-chụp-màn-hình-thiết-bị-device-screenshots)
+5. [V. NGUYÊN TẮC KIỂM TRA ĐẶC ĐIỂM NHẬN DẠNG](#v-nguyên-tắc-kiểm-tra-đặc-điểm-nhận-dạng)
 
 ---
 
@@ -137,7 +138,52 @@
 
 ---
 
-## III. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (DEVICE SCREENSHOTS)
+## III. DANH MỤC ẢNH CẬN CẢNH ĐIỂM KHÁM XẾT LẠI (RE-INVESTIGATION HOTSPOT PHOTOS)
+> **Quy chuẩn Hotspot:** Tỷ lệ **1:1** hoặc **4:3**, chụp cận cảnh macro / zoom chi tiết vị trí tương tác khi nhấp vào chấm đỏ.
+
+---
+
+### 1. `hotspot_window` — SPOT #1: KHUNG CỬA SỔ HƯỚNG ĐƯỜNG SẮT
+* **Mô tả kỹ thuật:** Cận cảnh khung cửa sổ gỗ cũ mở hé 15cm ban đêm. Gờ gỗ bám lớp bụi phấn hoa xoan màu vàng nhạt. Phía xa ngoài ô cửa là ánh đèn tín hiệu đường sắt đỏ nhòe trong mưa.
+
+---
+
+### 2. `hotspot_chinaberry_tree` — SPOT #2: GỐC CÂY XOAN NGOẢI CỔNG
+* **Mô tả kỹ thuật:** Cận cảnh nền đất ẩm dưới gốc cây xoan trước cổng. Đất bị dẫm lõm sâu bởi vết đế giày nữ nhỏ (size 37), xung quanh rải rác chùm hoa xoan rụng lả tả.
+
+---
+
+### 3. `hotspot_tea_table` — SPOT #3: GÓC BÀN TRÀ & KHUNG ẢNH VỠ
+* **Mô tả kỹ thuật:** Cận cảnh gờ bàn trà gỗ bị tróc sơn mới. Nền nhà bên dưới là các mảnh gốm sứ vỡ và khung ảnh gỗ 1996 bị nứt mạng nhện kính.
+
+---
+
+### 4. `hotspot_wooden_cupboard` — SPOT #4: CHIẾC TỦ GỖ CỦ 1996
+* **Mô tả kỹ thuật:** Cận cảnh then cài sắt gỉ sét của chiếc tủ gỗ lim cổ. Trên nóc tủ phủ lớp bụi dầy hằn rõ vết đập cả bàn tay kích động.
+
+---
+
+### 5. `hotspot_trash_backdoor` — SPOT #5: THÙNG RÁC & LỐI CỬA HẬU
+* **Mô tả kỹ thuật:** Cận cảnh thùng rác nhựa chứa mẩu khăn giấy ướt vò nhăn dính vệt son dưỡng và phấn xoan; phía sau là chốt then cửa hậu đang mở hé.
+
+---
+
+### 6. `hotspot_sofa_lipstick` — SPOT #6: THỎI SON & SỢI TÓC VÀNG KHE SOFA
+* **Mô tả kỹ thuật:** Cận cảnh góc đệm ghế sofa gỗ/da. Giữa rãnh khe ghế mắc kẹt 01 thỏi son trang điểm nắp mạ vàng, trên thân son dính **01 sợi tóc uốn nhuộm màu vàng kim (blonde hair)**.
+
+---
+
+### 7. `hotspot_land_deed_paper` — SPOT #7: DI THƯ CHIA ĐẤT 50:50 CỦA ÔNG NỘI
+* **Mô tả kỹ thuật:** Cận cảnh tờ giấy dó cổ chép tay bằng mực tàu ố vàng kẹp trong cuốn sổ tay cũ. Dòng chữ viết tay ghi rõ chia đều di sản đất 200m² cho Khang và Mai mỗi người 50%.
+
+---
+
+### 8. `hotspot_love_spell_pillow` — SPOT #8: LÁ BÙA YÊU TRONG RUỘT GỐI NẰM
+* **Mô tả kỹ thuật:** Cận cảnh ruột gối bông phòng ngủ nạn nhân bị xẻ khóa kéo. Bên trong giấu 01 lá bùa gấp hình tam giác bằng vải đỏ, bên trong ghi tên Khang & Hà bằng mực son và 01 lọn tóc buộc chỉ đỏ tươi.
+
+---
+
+## IV. DANH MỤC ẢNH CHỤP MÀN HÌNH THIẾT BỊ (DEVICE SCREENSHOTS)
 > **Quy chuẩn thiết bị:** Tỷ lệ **9:16**, giao diện ứng dụng di động hiển thị pixel-perfect trên màn hình smartphone.
 
 ---
@@ -152,10 +198,11 @@
 
 ---
 
-## IV. NGUYÊN TẮC KIỂM TRA ĐẶC ĐIỂM NHẬN DẠNG
+## V. NGUYÊN TẮC KIỂM TRA ĐẶC ĐIỂM NHẬN DẠNG
 
 Khi sinh ảnh hoặc kiểm tra ảnh đã tạo, bắt buộc đối soát các dấu hiệu vật chứng cốt lõi sau:
 1. **`avatar_vu` (Lê Quang Vũ):** Mắt trái bị lác ngoài nhẹ (khoảng 12 độ về phía thái dương).
 2. **`avatar_tung` (Nguyễn Thanh Tùng):** Vết sẹo cũ hình chữ "V" màu trắng ngà làm đứt đuôi lông mày trái; vết bầm tím mới trên gò má phải.
 3. **`avatar_huy` (Bé Gia Huy):** Đeo dây dù màu cam có chiếc còi đồng thau nhỏ trước ngực.
 4. **`avatar_ha` (Trần Thị Hà):** Ánh mắt một mí nhìn chằm chằm cuồng ám, vành mắt đỏ tấy do thức trắng đêm.
+
