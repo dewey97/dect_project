@@ -1,25 +1,31 @@
-# KÝ SỰ HẬU ÁN: 3 MẢNH GHÉP SỐ PHẬN SAU VỤ ÁN
-*(Tài liệu mở khóa sau khi Phá Án Thành Công Vụ Án #000)*
+Sau khi cảnh sát đưa ra những bằng chứng không thể chối cãi, Hà đã nhận tội. 
 
----
+Đêm hôm đó, Hà đã rình rập ngoài nhà Khang vì cô biết anh ta đang lén lút với ả nhân tình nào đó. Hà muốn phải bắt tận tay để Khang hết đường chối cãi.
+Nhưng khi vô tình thấy Tùng hốt hoảng chạy ra từ nhà Khang, Hà định vào hỏi có chuyện gì thì vô tình thấy Khang đã nằm gục trên sàn nhà.
 
-### KÝ SỰ 1: BẢN DI CHÚC CỦA ÔNG NỘI & LỜI TẠ TỘI CỦA VŨ (NHÁNH MAI & VŨ)
-Hai tuần sau ngày Khang bị sát hại, Cơ quan Thi hành án dân sự đã chính thức hủy bỏ Giấy ủy quyền giả mạo và trao trả 50% quyền sở hữu mảnh đất 200m² hương hỏa cho Nguyễn Ngọc Mai.
+Sợ có chuyện không hay, Hà có lại gần để kiểm tra tình hình của Khang. Đúng lúc đó, tin nhắn của ả nhân tình gửi đến, Hà mới biết Khang đã lên kế hoạch bỏ rơi mình để bắt đầu cuộc sống mới với người đàn bà khác. Trong cơn phẫn hận, Hà đã vơ ngay mảnh sứ đâm vào cổ Khang. 
 
-Tại phòng khách gia đình ở Phố Đoàn Kết, Lê Quang Vũ quỳ sụp dưới chân vợ, bật khóc nức nở thú nhận toàn bộ khoản nợ 300 triệu đồng bốc họ do đầu tư thua lỗ. Mai nhìn chồng với đôi mắt ngấn lệ. Chị không ly hôn, nhưng nghiêm giọng yêu cầu Vũ cùng mình bán bớt một phần đất để trả dứt điểm khoản nợ tín dụng đen, chấm dứt chuỗi ngày sống trong dối trá và sợ hãi.
+_"Chính tôi là người đã ở bên anh Khang bao nhiêu năm qua, chịu đựng mọi điều phỉ nhổ khi qua lại với một kẻ giang hồ. Nếu không có tôi, còn ai chấp nhận một người như thế. Tôi cứ tưởng rằng chỉ cần mình hy sinh tất thảy, anh ta sẽ thay đổi bản tính để tu chí làm ăn, xây dựng gia đình. Thanh xuân của tôi đã trao hết cho thằng khốn đó, làm sao tôi có thể giương mắt nhìn anh ta lấy đi tất cả để ở bên một người khác."_
 
----
+Tại phiên tòa xét xử, Hà bình thản nghe tuyên án. Khi được nói lời cuối cùng, Hà không xin giảm án, không tỏ ra hối hận mà chỉ mỉm cười nói: _"Em không hối hận. Nếu em không giữ được anh, thì không ai trên đời này được phép có anh."_
 
-### KÝ SỰ 2: TIẾNG CÒI ĐỒNG TUỔI THƠ DƯỚI BIA MỘ (NHÁNH TÙNG & GIA HUY)
-Được viện kiểm sát đình chỉ điều tra tội giết người, Nguyễn Thanh Tùng trở về căn nhà cũ ở Xóm Bờ Sông.
+------
 
-Vào một buổi chiều thu lặng gió, Tùng một mình mang theo bó hoa cúc trắng và nén hương thơm ra nghĩa trang thăm mộ em trai Gia Huy. Đứng trước bia mộ đứa em câm đoản mệnh đã khuất 20 năm, Tùng cúi đầu tạ lỗi trong làn khói hương nghi ngút:
-> *"Huy ơi... anh đã tìm lại được sự thật cho em rồi. Kẻ nhốt em năm xưa đã phải trả giá... Em yên nghỉ nhé, từ nay anh sẽ không dằn vặt bản thân nữa."*
+Nhưng chỉ vài ngày sau, Hà phát hiện mình có những dấu hiệu bất thường. 
 
----
+Cô đã có thai hai tháng, đứa con là của Khang. 
 
-### KÝ SỰ 3: ÁNH MẮT VÔ HỒN TRONG PHÒNG BIỆT GIAM PHÁP Y (NHÁNH TRẦN THỊ HÀ)
-Trần Thị Hà bị truy tố tội Giết người và được đưa vào diện theo dõi điều trị tâm thần pháp y đặc biệt do hội chứng ái kỷ ám ảnh cưỡng chế phân liệt.
+Từ ngày biết mình mang cốt nhục của người đàn ông do chính tay mình giết chết, Hà trở nên điên loạn. Lúc thì cô gào khóc than trách ông trời vì sao lại sắp đặt 1 bi kịch nghiệt ngã đến vậy, lúc lại tủm tỉm vuốt ve bụng và thì thầm như thể đang kể Khang nghe về đứa con của hai người.
 
-Trong căn phòng giam kín có song sắt, Hà ngồi lặng lẽ bên mép giường, hai bàn tay đan chặt vào nhau rồi nhẹ nhàng vuốt ve khoảng không trước ngực như thể đang nâng niu lọn tóc của người tình. Đôi mắt Hà mở to vô hồn nhìn qua ô cửa nhỏ, miệng mấp máy lẩm bẩm bài hát thiếu nhi năm nào:
-> *"Năm... mười... mười lăm... hai mươi... Anh Khang trốn kỹ chưa? Em tìm thấy anh rồi... Anh mãi mãi là của em..."*
+Vì tinh thần người mẹ không ổn định, trại giam liên hệ với nhân thân còn sót lại của Khang - Mai và Vũ, đề nghị họ nhận nuôi đứa trẻ. Nhưng ám ảnh về cái chết của Khang, Mai và Vũ từ chối. Họ đề nghị gửi đứa bé cho Trung tâm bảo trợ xã hội, nếu cần hai vợ chồng sẽ chu cấp thêm chi phí nuôi dưỡng.
+
+Ngay khi tất cả đều nghĩ rằng đứa trẻ sẽ không còn nơi nương tựa, trại giam bất ngờ nhận được đề nghị nhận nuôi từ một người đàn ông.
+
+Anh ta gửi thư đến Hà, chỉ có vài dòng ngắn gọn.
+
+_"Hãy để tôi được chuộc lại tội lỗi của mình. Nếu không vì hành động đêm đó đã đẩy Khang đến nguy hiểm, thì đứa bé đã không phải rơi vào cảnh mồ côi. Mọi ân oán lẽ ra nên để lại trong quá khứ. Vì mọi sinh linh bé nhỏ đều là vô tội, 20 năm trước hay bây giờ cũng như vậy"_
+
+Cầm bức thư trên tay, ánh mắt điên dại của Hà chợt khựng lại. Lần đầu tiên, cô ta thấy mình tỉnh táo đến vậy. Quá khứ như thước phim hiện lên trong tâm trí Hà. Có lẽ những ngày đầu tiên, cô đã thật lòng yêu thương Khang và anh ta cũng vậy. Thế mà bao cám dỗ và vòng xoáy của cuộc đời đã đẩy cả hai đến bước đường cùng không thể quay đầu lại.
+
+Nhưng ngày tháng vẫn còn ở phía trước, và đứa trẻ xứng đáng thuộc về một tương lai tươi sáng, không còn hận thù bủa vây. 
+
