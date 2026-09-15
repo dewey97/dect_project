@@ -13,7 +13,7 @@
    * **Nghiêm cấm tuyệt đối:** Tranh vẽ 2D, anime, digital art cách điệu, tranh minh họa phẳng, hay 3D CGI bóng bẩy.
    * **Phong cách bắt buộc:** Ảnh chụp hiện trường / tư liệu trinh sát thực tế (RAW 35mm documentary photography, forensic flashlight, camera grain tự nhiên, màu sắc chân thực của nhà phố Việt Nam năm 2016).
 2. **QUY CHUẨN ĐỒNG NHẤT ẢNH CHÂN DUNG:**
-   * Tất cả ảnh nhân vật là **Ảnh thẻ căn cước / Hồ sơ điều tra phông xanh dương (`Solid Royal Blue ID Backdrop`)**, góc chụp chính diện thẳng (frontal headshot), bố cục từ ngực trở lên, đặc tả chuẩn xác nhân trắc học thuần Việt (Kinh Vietnamese).
+   * Tất cả ảnh nhân vật là **Ảnh thẻ căn cước / Hồ sơ điều tra phông xanh dương (`Solid Royal Blue ID Backdrop`)**, tỷ lệ chuẩn **3:4** (ảnh thẻ 3x4cm / 4x6cm hành chính), góc chụp chính diện thẳng (frontal headshot), bố cục từ ngực trở lên, đặc tả chuẩn xác nhân trắc học thuần Việt (Kinh Vietnamese).
 3. **LƯU TRỮ TẬP TRUNG DUY NHẤT:**
    * Mọi file ảnh sinh ra đều phải được đặt tên theo quy chuẩn mã vật chứng (`photo-*.jpg`, `avatar_*.jpg`, `screenshot-*.png`) và lưu tập trung duy nhất tại `docs/cases/case_000/04_photos/`.
 
@@ -30,14 +30,14 @@
 ---
 
 ## I. DANH MỤC ẢNH CHÂN DUNG NHÂN VẬT (PORTRAIT AVATARS)
-> **Quy chuẩn chân dung:** Ảnh thẻ căn cước phông xanh dương (`Solid Royal Blue ID Backdrop`), tỷ lệ **1:1**, chính diện từ ngực trở lên, thể hiện sắc nét các đặc điểm nhân trắc học và dấu hiệu nhận dạng cốt lõi.
+> **Quy chuẩn chân dung:** Ảnh thẻ căn cước phông xanh dương (`Solid Royal Blue ID Backdrop`), tỷ lệ **3:4** (Chuẩn khổ ảnh thẻ 3x4cm), chính diện từ ngực trở lên, thể hiện sắc nét các đặc điểm nhân trắc học và dấu hiệu nhận dạng cốt lõi.
 
 ---
 
 ### 1. `avatar_khang` — NGUYỄN VĂN KHANG (NẠN NHÂN — 28 TUỔI)
 * **Tệp tin lưu trữ:** `avatar_khang.jpg` / `profile-khang.png`
 * **Mục đích nghiệp vụ:** Ảnh căn cước / hồ sơ nhận diện nạn nhân chủ nợ tín dụng đen bị sát hại.
-* **Quy chuẩn hiển thị:** Ảnh thẻ căn cước chuẩn phông xanh dương (`Solid Royal Blue ID Backdrop`), tỷ lệ 1:1, góc chụp chính diện ngực trở lên.
+* **Quy chuẩn hiển thị:** Ảnh thẻ căn cước chuẩn phông xanh dương (`Solid Royal Blue ID Backdrop`), tỷ lệ đứng **3:4**, góc chụp chính diện ngực trở lên.
 * **Mô tả nhân trắc học:** Nam 28 tuổi, người Kinh, tạng người to bè (endomorph), mặt vuông thô ráp, quai hàm bạnh, ngấn cằm dày. Lông mày rậm xếch, mắt mí lót nhìn thẳng trơ tráo, khóe miệng nhếch khinh khỉnh. Râu quai nón 2 ngày chưa cạo. Tay phải lộ hình xăm Rồng mực tàu xanh đen. Đeo dây chuyền bạc 925 to bản, áo polo dão màu xám đen.
 
 ---
