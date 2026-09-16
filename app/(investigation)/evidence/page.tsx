@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { FileText, Search, Paperclip, ImageIcon, Volume2, VolumeX, Box, X, UserCheck } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { FileText, Search, Paperclip, ImageIcon, Volume2, VolumeX, Box, X } from 'lucide-react'
 import { PDFViewerModal } from '@/components/investigation/pdf-viewer-modal'
 import { useCheckpoints } from '@/components/investigation/checkpoints-context'
 import { CASES } from '@/lib/mock-data'
@@ -26,7 +27,6 @@ import { BoardGameCompanionView } from '@/components/investigation/evidence/boar
 import { QuickActionFab } from '@/components/investigation/evidence/quick-action-fab'
 import { PhoneModal } from '@/components/investigation/evidence/phone-modal'
 import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
-import { SuspectInvestigationModal } from '@/components/investigation/evidence/suspect-investigation-modal'
 import { PhoneSimulator } from '@/components/investigation/phone-simulator'
 import {
   devices000,
@@ -40,18 +40,18 @@ import {
 import type { Device } from '@/lib/types'
 
 export default function EvidencePage() {
+  const router = useRouter()
   const activeCase = CASES.find((c) => c.id === 'case-000')
   const { completedCheckpointIds, completeCheckpoint } = useCheckpoints()
 
-  // Phone & Suspect Modal state
+  // Phone Modal state
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false)
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] = useState(false)
-  const [isSuspectsModalOpen, setIsSuspectsModalOpen] = useState(false)
   
-  // Play Experience State ('web' | 'boardgame') - Always prompt user on case entry
+  // Play Experience State ('web' | 'boardgame') - Web by default on /evidence
   const [playExperience, setPlayExperience] = useState<PlayExperience>('web')
-  const [isPlayModalOpen, setIsPlayModalOpen] = useState(true)
-  const [hasChosenExperience, setHasChosenExperience] = useState(false)
+  const [isPlayModalOpen, setIsPlayModalOpen] = useState(false)
+  const [hasChosenExperience, setHasChosenExperience] = useState(true)
 
   // Audio Mute State
   const [isAudioMuted, setIsAudioMuted] = useState(detectiveAudio.isMuted)
@@ -66,11 +66,10 @@ export default function EvidencePage() {
   useEffect(() => {
     try {
       const savedExp = localStorage.getItem('veritas_play_experience') as PlayExperience | null
-      if (savedExp) {
-        setPlayExperience(savedExp)
+      if (savedExp === 'boardgame') {
+        router.push('/evidence/boardgame')
+        return
       }
-      // Always prompt user to choose between Board Game or Web on entering case
-      setIsPlayModalOpen(true)
 
       const saved = localStorage.getItem('veritas_discovered_findings')
       if (saved) {
@@ -81,24 +80,19 @@ export default function EvidencePage() {
       if (savedMode) {
         setInvestigationMode(savedMode)
       }
-    } catch {
-      setIsPlayModalOpen(true)
-    }
+    } catch {}
 
     const handleOpenEpilogue = () => setIsEpilogueOpen(true)
     const handleOpenPhone = () => setIsPhoneModalOpen(true)
-    const handleOpenSuspects = () => setIsSuspectsModalOpen(true)
 
     window.addEventListener('open-epilogue-modal', handleOpenEpilogue)
     window.addEventListener('open-phone-modal', handleOpenPhone)
-    window.addEventListener('open-suspects-modal', handleOpenSuspects)
 
     return () => {
       window.removeEventListener('open-epilogue-modal', handleOpenEpilogue)
       window.removeEventListener('open-phone-modal', handleOpenPhone)
-      window.removeEventListener('open-suspects-modal', handleOpenSuspects)
     }
-  }, [])
+  }, [router])
 
   const handleSelectPlayExperience = (mode: PlayExperience) => {
     setPlayExperience(mode)
@@ -107,6 +101,11 @@ export default function EvidencePage() {
     try {
       localStorage.setItem('veritas_play_experience', mode)
     } catch {}
+
+    if (mode === 'boardgame') {
+      router.push('/evidence/boardgame')
+      return
+    }
 
     // When player selects their play mode, launch Phase 0 storytelling if starting case
     if (completedCheckpointIds.length === 0) {
@@ -377,15 +376,7 @@ export default function EvidencePage() {
         {/* QUICK ACTION FAB MENU */}
         <QuickActionFab
           onOpenPhone={() => setIsPhoneModalOpen(true)}
-          onOpenSuspects={() => setIsSuspectsModalOpen(true)}
-          onReinvestigate={() => setIsReinvestigateModalOpen(true)}
           onResetCase={resetFindingsProgress}
-        />
-
-        {/* SUSPECT INVESTIGATION MODAL */}
-        <SuspectInvestigationModal
-          isOpen={isSuspectsModalOpen}
-          onClose={() => setIsSuspectsModalOpen(false)}
         />
 
         {/* VICTIM PHONE SIMULATOR MODAL */}
@@ -429,13 +420,13 @@ export default function EvidencePage() {
                   type="button"
                   onClick={() => {
                     detectiveAudio.playPaperRustle()
-                    setIsSuspectsModalOpen(true)
+                    router.push('/evidence/boardgame')
                   }}
-                  className="px-2.5 py-1.5 bg-[#2c1d12] hover:bg-[#3d281a] border border-[#593b25] text-[#d9a066] font-mono text-[0.7rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
-                  title="Mở hồ sơ & Thẩm tra nghi phạm tự do"
+                  className="px-2.5 py-1.5 bg-[#1b261d] hover:bg-[#253628] border border-[#3b5941] text-emerald-400 font-mono text-[0.7rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
+                  title="Chuyển sang chế độ Đồng hành cùng Board Game"
                 >
-                  <UserCheck className="size-3.5" />
-                  <span>THẨM TRA NGHI PHẠM</span>
+                  <Box className="size-3.5" />
+                  <span>CHẾ ĐỘ BOARD GAME</span>
                 </button>
 
                 <button
@@ -662,18 +653,23 @@ export default function EvidencePage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: EVIDENCE DETAIL INSPECTOR OR INLINE DESKTOP IPHONE SIMULATOR */}
         {isPhoneModalOpen ? (
-          <div className="hidden lg:flex flex-1 bg-[#120c08] border-2 border-[#543b27] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex-col relative items-center justify-center p-2 min-h-0">
-            <button
-              onClick={() => setIsPhoneModalOpen(false)}
-              className="absolute top-3 right-3 z-50 p-2 text-[#ad9885] hover:text-[#fef5ec] bg-[#24170e]/90 hover:bg-[#382618] rounded-full transition-colors cursor-pointer border border-[#443021] shadow-lg"
-              title="Đóng điện thoại"
-            >
-              <X className="size-5" />
-            </button>
+          <div className="hidden lg:flex flex-1 bg-[#120c08] border-2 border-[#543b27] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex-col relative items-center justify-between p-3 min-h-0">
+            {/* Top Bar for Desktop Panel */}
+            <div className="w-full flex items-center justify-between pb-2 shrink-0 border-b border-[#382618] z-50">
+              <span className="font-mono text-xs text-[#d9a066] font-bold flex items-center gap-1.5">
+                <span>📱</span> ĐIỆN THOẠI NẠN NHÂN KHANG
+              </span>
+              <button
+                onClick={() => setIsPhoneModalOpen(false)}
+                className="p-1.5 rounded-full text-[#ad9885] hover:text-[#fef5ec] bg-[#24170e]/95 hover:bg-[#382618] transition-colors cursor-pointer border border-[#543b27] shadow-lg flex items-center justify-center active:scale-95"
+                title="Đóng điện thoại"
+              >
+                <X className="size-5 text-[#d9a066]" />
+              </button>
+            </div>
 
-            <div className="flex-1 w-full min-h-0 flex items-center justify-center p-1 overflow-hidden">
+            <div className="flex-1 w-full min-h-0 flex items-center justify-center p-1 overflow-hidden my-auto">
               <PhoneSimulator
                 device={{
                   ...devices000[0],
@@ -767,15 +763,7 @@ export default function EvidencePage() {
           }
         }}
         onOpenPhone={() => setIsPhoneModalOpen(true)}
-        onOpenSuspects={() => setIsSuspectsModalOpen(true)}
-        onReinvestigate={resetFindingsProgress}
         onResetCase={resetFindingsProgress}
-      />
-
-      {/* SUSPECT INVESTIGATION MODAL */}
-      <SuspectInvestigationModal
-        isOpen={isSuspectsModalOpen}
-        onClose={() => setIsSuspectsModalOpen(false)}
       />
 
       {/* VICTIM PHONE SIMULATOR MODAL (For mobile viewports in Web mode) */}

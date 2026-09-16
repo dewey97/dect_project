@@ -1,25 +1,45 @@
 'use client'
 
 import { useState } from 'react'
-import { Image as ImageIcon, ArrowLeft, MapPin, HardDrive, Info, Share, Trash2, Heart } from 'lucide-react'
+import { Image as ImageIcon, ArrowLeft, ChevronLeft, MapPin, HardDrive, Info, Share, Trash2, Heart, Folder } from 'lucide-react'
 import type { Photo } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 interface PhotosAppProps {
   photos: Photo[]
+  onBackToHome?: () => void
 }
 
-export function PhotosApp({ photos }: PhotosAppProps) {
+export function PhotosApp({ photos, onBackToHome }: PhotosAppProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
+  const [showExifInfo, setShowExifInfo] = useState(false)
+  const [activeTab, setActiveTab] = useState<'all' | 'deleted'>('all')
+
+  const deletedPhotos: Photo[] = [
+    {
+      id: 'p-deleted-01',
+      filename: 'trich_do_dat_14_bo_song_sua.jpg',
+      caption: 'Ảnh trích đo thửa đất 14 Bờ Sông (Đã chỉnh sửa diện tích lên 120m2)',
+      timestamp: '23/07/2016 17:45',
+      size: '3.8 MB',
+      location: 'Ban QLDA Quy Hoạch Đống Đa',
+      status: 'recovered'
+    }
+  ]
+
+  const currentPhotos = activeTab === 'all' ? photos : deletedPhotos
 
   return (
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans">
       {selectedPhoto ? (
         /* PHOTO DETAIL VIEW */
-        <div className="flex flex-col h-full animate-in fade-in-50 duration-200">
+        <div className="flex flex-col h-full animate-in fade-in-50 duration-200 relative">
           <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-[#161618] border-b border-[#2C2C2E] shrink-0">
             <button
-              onClick={() => setSelectedPhoto(null)}
+              onClick={() => {
+                setSelectedPhoto(null)
+                setShowExifInfo(false)
+              }}
               className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium active:opacity-60"
             >
               <ArrowLeft className="size-4" />
@@ -27,10 +47,14 @@ export function PhotosApp({ photos }: PhotosAppProps) {
             </button>
             <div className="text-center">
               <div className="text-[11px] font-semibold text-white">Ảnh vật chứng</div>
-              <div className="text-[9px] text-[#8E8E93]">Hôm nay • 20:40</div>
+              <div className="text-[9px] text-[#8E8E93]">{selectedPhoto.timestamp}</div>
             </div>
-            <button className="text-[#0A84FF] p-1">
-              <Heart className="size-4" />
+            <button
+              onClick={() => setShowExifInfo(!showExifInfo)}
+              className={cn('p-1 transition-colors', showExifInfo ? 'text-[#0A84FF]' : 'text-[#8E8E93]')}
+              title="Xem thông số EXIF"
+            >
+              <Info className="size-4" />
             </button>
           </div>
 
@@ -42,7 +66,6 @@ export function PhotosApp({ photos }: PhotosAppProps) {
                 alt={selectedPhoto.filename}
                 className="w-full h-full object-contain max-h-[220px]"
                 onError={(e) => {
-                  // Fallback if image not directly in public/photos/
                   ;(e.target as HTMLElement).style.display = 'none'
                 }}
               />
@@ -71,11 +94,42 @@ export function PhotosApp({ photos }: PhotosAppProps) {
             </div>
           </div>
 
+          {/* EXIF Metadata Drawer Modal */}
+          {showExifInfo && (
+            <div className="absolute inset-x-0 bottom-11 bg-[#1C1C1E]/95 backdrop-blur-md border-t border-[#2C2C2E] p-3.5 space-y-2.5 animate-in slide-in-from-bottom-4 shadow-2xl z-30">
+              <div className="flex items-center justify-between text-[11px] font-mono font-bold text-[#0A84FF]">
+                <span>THÔNG SỐ CAMERA EXIF</span>
+                <button onClick={() => setShowExifInfo(false)} className="text-[#8E8E93] hover:text-white">✕</button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-[10.5px] font-mono text-[#D1D1D6]">
+                <div className="p-2 rounded bg-black/40 border border-white/5">
+                  <span className="text-[#8E8E93] block text-[9px]">THIẾT BỊ</span>
+                  <span className="font-bold text-white">Apple iPhone 5s</span>
+                </div>
+                <div className="p-2 rounded bg-black/40 border border-white/5">
+                  <span className="text-[#8E8E93] block text-[9px]">CẢM BIẾN</span>
+                  <span className="font-bold text-white">8MP iSight (1.5µm)</span>
+                </div>
+                <div className="p-2 rounded bg-black/40 border border-white/5">
+                  <span className="text-[#8E8E93] block text-[9px]">KHẨU ĐỘ / TIÊU CỰ</span>
+                  <span className="font-bold text-white">f/2.2 • 29mm</span>
+                </div>
+                <div className="p-2 rounded bg-black/40 border border-white/5">
+                  <span className="text-[#8E8E93] block text-[9px]">TỐC ĐỘ / ISO</span>
+                  <span className="font-bold text-white">1/30s • ISO 64</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Bottom Bar */}
           <div className="h-11 bg-[#161618] border-t border-[#2C2C2E] flex items-center justify-between px-6 shrink-0 text-[#0A84FF]">
             <Share className="size-4" />
             <Heart className="size-4" />
-            <Info className="size-4" />
+            <button onClick={() => setShowExifInfo(!showExifInfo)} className={cn(showExifInfo && 'text-white')}>
+              <Info className="size-4" />
+            </button>
             <Trash2 className="size-4 text-[#FF453A]" />
           </div>
         </div>
@@ -83,13 +137,53 @@ export function PhotosApp({ photos }: PhotosAppProps) {
         /* PHOTO GRID VIEW */
         <div className="flex flex-col h-full">
           <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
-            <span className="text-[20px] font-bold tracking-tight text-white">Thư viện ảnh</span>
-            <div className="text-[11px] text-[#8E8E93] mt-0.5">{photos.length} ảnh đã trích xuất</div>
+            <div className="flex items-center justify-between mb-1">
+              {onBackToHome ? (
+                <button
+                  onClick={onBackToHome}
+                  className="flex items-center gap-0.5 text-[#0A84FF] text-[12.5px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
+                  title="Thoát ứng dụng về Màn hình chính"
+                >
+                  <ChevronLeft className="size-4" />
+                  <span>Trang chính</span>
+                </button>
+              ) : (
+                <span className="w-12" />
+              )}
+              <span className="text-[17px] font-bold tracking-tight text-white">Thư viện ảnh</span>
+              <span className="w-12" />
+            </div>
+
+            {/* Album selector tabs */}
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={cn(
+                  'px-3 py-1 rounded-full text-[10.5px] font-semibold transition-all cursor-pointer',
+                  activeTab === 'all'
+                    ? 'bg-[#0A84FF] text-white shadow'
+                    : 'bg-[#1C1C1E] text-[#8E8E93] hover:text-white'
+                )}
+              >
+                Tất cả ảnh ({photos.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('deleted')}
+                className={cn(
+                  'px-3 py-1 rounded-full text-[10.5px] font-semibold transition-all cursor-pointer flex items-center gap-1',
+                  activeTab === 'deleted'
+                    ? 'bg-[#FF453A] text-white shadow'
+                    : 'bg-[#1C1C1E] text-[#8E8E93] hover:text-white'
+                )}
+              >
+                <Trash2 className="size-3" /> Đã xóa gần đây ({deletedPhotos.length})
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-2 pb-10">
             <div className="grid grid-cols-3 gap-1.5">
-              {photos.map((photo) => (
+              {currentPhotos.map((photo) => (
                 <div
                   key={photo.id}
                   onClick={() => setSelectedPhoto(photo)}
@@ -107,6 +201,11 @@ export function PhotosApp({ photos }: PhotosAppProps) {
                   <span className="text-[8px] font-mono text-[#8E8E93] truncate w-full text-center mt-1">
                     {photo.size}
                   </span>
+                  {activeTab === 'deleted' && (
+                    <span className="absolute top-1 right-1 text-[8px] font-mono bg-[#FF453A] text-white px-1 rounded font-bold">
+                      29 ngày
+                    </span>
+                  )}
                 </div>
               ))}
             </div>

@@ -11,12 +11,19 @@ import {
   Clock,
   Car,
   Footprints,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export function MapsApp() {
+interface MapsAppProps {
+  onBackToHome?: () => void
+}
+
+export function MapsApp({ onBackToHome }: MapsAppProps) {
   const [selectedPin, setSelectedPin] = useState<any | null>(null)
+  const [showGpsTrace, setShowGpsTrace] = useState(true)
+  const [isSatelliteMode, setIsSatelliteMode] = useState(false)
 
   const locations = [
     {
@@ -54,48 +61,101 @@ export function MapsApp() {
       timeCar: '15 phút',
       type: 'poi',
       geoNote: 'Chứng cứ ngoại phạm loại trừ Tùng khỏi khung giờ tử vong 21:00.'
+    },
+    {
+      id: 'loc-05',
+      title: 'Sân bay Quốc tế Nội Bài (T1)',
+      desc: 'Điểm hẹn 06:30 sáng 25/07 với Bé Vy đi chuyến bay VN1577 Hà Nội - Đà Lạt.',
+      distance: '28 km',
+      timeCar: '35 phút',
+      type: 'poi',
+      geoNote: '✈️ Khang đã mua 2 vé máy bay & cọc resort 12 triệu sẵn sàng trốn đi cùng người yêu mới.'
     }
   ]
 
   return (
     <div className="flex flex-col h-full bg-[#1C1C1E] text-white select-none overflow-hidden font-sans relative">
       {/* Top Search Bar */}
-      <div className="absolute top-2 left-3 right-3 z-20">
-        <div className="h-9 rounded-xl bg-[#2C2C2E]/90 backdrop-blur-md border border-white/10 px-3 flex items-center justify-between text-[#8E8E93] shadow-lg">
-          <div className="flex items-center gap-2">
-            <Search className="size-4 text-[#8E8E93]" />
-            <span className="text-[12px] text-white font-medium">Bản đồ điều tra địa bàn</span>
+      <div className="absolute top-2 left-3 right-3 z-20 space-y-1.5">
+        <div className="h-9 rounded-xl bg-[#2C2C2E]/90 backdrop-blur-md border border-white/10 px-2 flex items-center justify-between text-[#8E8E93] shadow-lg">
+          {onBackToHome && (
+            <button
+              onClick={onBackToHome}
+              className="flex items-center gap-0.5 text-[#0A84FF] text-[11.5px] font-semibold hover:underline cursor-pointer mr-1 shrink-0"
+              title="Thoát ứng dụng về Màn hình chính"
+            >
+              <ChevronLeft className="size-4 text-[#0A84FF]" />
+              <span>Home</span>
+            </button>
+          )}
+          <div className="flex items-center gap-1.5 truncate flex-1 min-w-0">
+            <Search className="size-3.5 text-[#8E8E93] shrink-0" />
+            <span className="text-[11.5px] text-white font-medium truncate">Bản đồ điều tra GPS</span>
           </div>
-          <Compass className="size-4 text-[#0A84FF]" />
+          <button
+            onClick={() => setIsSatelliteMode(!isSatelliteMode)}
+            className={cn('p-1 rounded transition-colors', isSatelliteMode ? 'text-[#30D158]' : 'text-[#0A84FF]')}
+            title="Đổi chế độ Vệ tinh / Bản đồ"
+          >
+            <Layers className="size-4" />
+          </button>
+        </div>
+
+        {/* GPS Trace Bar */}
+        <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/10 text-[9.5px] font-mono">
+          <span className="text-white font-semibold flex items-center gap-1">
+            <Navigation className="size-3 text-[#30D158]" /> GPS Timeline 24/07
+          </span>
+          <button
+            onClick={() => setShowGpsTrace(!showGpsTrace)}
+            className={cn(
+              'px-2 py-0.5 rounded font-bold transition-all cursor-pointer',
+              showGpsTrace ? 'bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40' : 'bg-white/10 text-[#8E8E93]'
+            )}
+          >
+            {showGpsTrace ? 'Bật Vết GPS' : 'Tắt Vết GPS'}
+          </button>
         </div>
       </div>
 
       {/* Interactive Map Visual Area */}
-      <div className="flex-1 bg-[#10141C] relative overflow-hidden flex items-center justify-center p-4">
+      <div className={cn('flex-1 relative overflow-hidden flex items-center justify-center p-4 transition-colors', isSatelliteMode ? 'bg-[#09131D]' : 'bg-[#10141C]')}>
         {/* Stylized Grid & Map Roads */}
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#0A84FF_1px,transparent_1px)] [background-size:16px_16px]" />
 
         {/* Road & River lines */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-40">
+        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-50">
           <path d="M 30,300 Q 150,200 300,100" stroke="#0A84FF" strokeWidth="6" fill="none" />
           <path d="M 0,200 L 340,250" stroke="#8E8E93" strokeWidth="2" strokeDasharray="4 4" fill="none" />
           <path d="M 120,0 L 140,400" stroke="#636366" strokeWidth="3" fill="none" />
+
+          {/* Glowing Green GPS Movement Path Timeline 24/07 */}
+          {showGpsTrace && (
+            <path
+              d="M 40,320 L 140,180 L 260,90"
+              stroke="#30D158"
+              strokeWidth="3.5"
+              strokeDasharray="6 4"
+              fill="none"
+              className="animate-pulse"
+            />
+          )}
         </svg>
 
         {/* Train Track Line label */}
-        <div className="absolute top-[215px] left-4 text-[8.5px] font-mono text-[#8E8E93] bg-black/60 px-1.5 py-0.5 rounded border border-white/10">
-          🚂 Tuyến đường sắt Bắc Nam
+        <div className="absolute top-[225px] left-4 text-[8.5px] font-mono text-[#8E8E93] bg-black/80 px-1.5 py-0.5 rounded border border-white/10">
+          🚂 Tuyến đường sắt Bắc Nam (Cách 30m)
         </div>
 
         {/* Pin 1: Nhà Khang */}
         <button
           onClick={() => setSelectedPin(locations[0])}
-          className="absolute top-[180px] left-[130px] flex flex-col items-center group active:scale-95 transition-transform"
+          className="absolute top-[170px] left-[130px] flex flex-col items-center group active:scale-95 transition-transform"
         >
           <div className="size-8 rounded-full bg-[#FF453A] text-white flex items-center justify-center shadow-lg ring-4 ring-[#FF453A]/30 animate-bounce">
             <MapPin className="size-4 fill-white" />
           </div>
-          <span className="text-[9px] font-bold bg-black/80 text-white px-1.5 py-0.5 rounded mt-1 shadow border border-white/10 whitespace-nowrap">
+          <span className="text-[9px] font-bold bg-black/90 text-white px-1.5 py-0.5 rounded mt-1 shadow border border-white/10 whitespace-nowrap">
             Số 14 Bờ Sông (Hiện trường)
           </span>
         </button>
@@ -108,7 +168,7 @@ export function MapsApp() {
           <div className="size-7 rounded-full bg-[#FF9F0A] text-white flex items-center justify-center shadow-lg ring-2 ring-white/20">
             <MapPin className="size-3.5 fill-white" />
           </div>
-          <span className="text-[8.5px] font-medium bg-black/80 text-[#FF9F0A] px-1.5 py-0.5 rounded mt-1 whitespace-nowrap border border-white/10">
+          <span className="text-[8.5px] font-medium bg-black/90 text-[#FF9F0A] px-1.5 py-0.5 rounded mt-1 whitespace-nowrap border border-white/10">
             Trọ Hà (1.2km)
           </span>
         </button>
@@ -121,7 +181,7 @@ export function MapsApp() {
           <div className="size-6 rounded-full bg-[#30D158] text-white flex items-center justify-center shadow">
             <MapPin className="size-3 fill-white" />
           </div>
-          <span className="text-[8px] font-medium bg-black/80 text-white/90 px-1 rounded mt-0.5 whitespace-nowrap">
+          <span className="text-[8px] font-medium bg-black/90 text-white/90 px-1 rounded mt-0.5 whitespace-nowrap">
             Quán Bia Phố Cổ
           </span>
         </button>

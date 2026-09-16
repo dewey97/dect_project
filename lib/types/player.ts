@@ -156,6 +156,8 @@ export interface Photo {
   size: string
   location: string
   status: 'recovered' | 'corrupted' | 'encrypted'
+  caption?: string
+  timestamp?: string
 }
 
 /** Voice Recording audio details */

@@ -13,12 +13,17 @@ import {
   Volume2,
   Trash2,
   PhoneCall,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
-export function VoicemailApp() {
+interface VoicemailAppProps {
+  onBackToHome?: () => void
+}
+
+export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
   const [activeTab, setActiveTab] = useState<'voicemail' | 'recents' | 'keypad'>('voicemail')
   const [isPlaying, setIsPlaying] = useState(false)
   const [playbackProgress, setPlaybackProgress] = useState(0)
@@ -93,7 +98,19 @@ export function VoicemailApp() {
       {/* Top Header */}
       <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
         <div className="flex items-center justify-between">
-          <span className="text-[20px] font-bold tracking-tight text-white">
+          {onBackToHome ? (
+            <button
+              onClick={onBackToHome}
+              className="flex items-center gap-0.5 text-[#0A84FF] text-[12.5px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
+              title="Thoát ứng dụng về Màn hình chính"
+            >
+              <ChevronLeft className="size-4" />
+              <span>Trang chính</span>
+            </button>
+          ) : (
+            <span className="w-12" />
+          )}
+          <span className="text-[17px] font-bold tracking-tight text-white">
             {activeTab === 'voicemail' && 'Thư thoại'}
             {activeTab === 'recents' && 'Gần đây'}
             {activeTab === 'keypad' && 'Bàn phím'}

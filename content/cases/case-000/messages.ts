@@ -5,7 +5,7 @@ export const conversations000: Record<string, Conversation[]> = {
     {
       id: 'conv-05',
       name: 'Bé Vy ❤️',
-      phoneNumber: '0978.552.xxx',
+      phoneNumber: '0978.552.109',
       avatarColor: 'from-[#FF2D55] to-[#FF375F]',
       timestamp: '17:55',
       previewText: 'Nhớ lời anh đó nha! Em chuẩn bị xong hết vali rồi, sáng mai em đợi anh ở sân bay Nội Bài đấy! ✈️❤️',
@@ -158,7 +158,7 @@ export const conversations000: Record<string, Conversation[]> = {
     {
       id: 'conv-01',
       name: 'Nguyễn Ngọc Mai (Em họ)',
-      phoneNumber: '0912.456.789',
+      phoneNumber: '0984.661.302',
       avatarColor: 'from-[#30D158] to-[#0A84FF]',
       timestamp: '24/07 • 18:50',
       previewText: 'Có ngon thì cứ qua. Đừng có giở trò với tôi!',

@@ -44,15 +44,16 @@ interface BoardBounds {
   height: number;
 }
 
-interface PinPoint {
+export interface PinPoint {
   id: string;
   x: number;
   y: number;
   label: string;
   detail: string;
+  color?: "red" | "yellow" | "blue" | "green";
 }
 
-interface CaseConnection {
+export interface CaseConnection {
   id: string;
   fromPinId: string;
   toPinId: string;
@@ -90,6 +91,54 @@ interface CaseData {
 const BOARD_FRAME_SRC = "/evidence-board-frame.png";
 
 const CASES_LIST: CaseData[] = [
+  {
+    id: "case-000",
+    title: "TRỐN TÌM (1996)",
+    description: "Chuyên án 000 — Bi kịch trốn tìm 20 năm trước tại xóm Bờ Sông",
+    status: "active",
+    bgImage: "/images/crime_scene_outline_bg.jpg",
+    pins: [
+      {
+        id: "c0-pin-suspects",
+        x: 0.22,
+        y: 0.26,
+        label: "XÁC ĐỊNH NGHI PHẠM",
+        detail: "Tập hợp danh tính & thẩm tra nghi phạm (Tùng, Hà, Mai...)",
+      },
+      {
+        id: "c0-pin-evidence",
+        x: 0.50,
+        y: 0.22,
+        label: "BỔ SUNG CHỨNG CỨ",
+        detail: "Bóc tách vật chứng hiện trường & tài liệu điều tra",
+      },
+      {
+        id: "c0-pin-indictment",
+        x: 0.78,
+        y: 0.26,
+        label: "ĐỀ NGHỊ TRUY TỐ",
+        detail: "Mở bản cáo trạng buộc tội thủ phạm vụ án",
+      },
+      {
+        id: "c0-pin-phone",
+        x: 0.38,
+        y: 0.68,
+        label: "THU THẬP THÊM THÔNG TIN",
+        detail: "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
+      },
+      {
+        id: "c0-pin-reinvestigate",
+        x: 0.62,
+        y: 0.68,
+        label: "KHÁM XÉT LẠI",
+        detail: "Khám xét lại hiện trường để rà soát manh mối bổ sung",
+      },
+    ],
+    connections: [
+      { id: "c0-conn-1", fromPinId: "c0-pin-evidence", toPinId: "c0-pin-phone" },
+      { id: "c0-conn-2", fromPinId: "c0-pin-evidence", toPinId: "c0-pin-reinvestigate" },
+    ],
+  },
   {
     id: "case-01",
     title: "VẬN ĐƠN BẤT THƯỜNG",
@@ -274,11 +323,11 @@ const FRAME_INNER_TOP = 0.2079;
 const FRAME_INNER_WIDTH = 0.5284;
 const FRAME_INNER_HEIGHT = 0.5461;
 
-const PIN_HIT_RADIUS = 24;
-const PIN_GLOW_RADIUS = 40;
+const PIN_HIT_RADIUS = 38;
+const PIN_GLOW_RADIUS = 50;
 
-const FLASHLIGHT_RADIUS = 140;
-const CENTER_LIGHT_RADIUS_RATIO = 0.35;
+const FLASHLIGHT_RADIUS = 260;
+const CENTER_LIGHT_RADIUS_RATIO = 0.75;
 
 const DRAG_THRESHOLD = 5;
 const MAX_PAN_RATIO = 0.45;
@@ -305,6 +354,33 @@ function distance(x1: number, y1: number, x2: number, y2: number): number {
   return Math.hypot(x2 - x1, y2 - y1);
 }
 
+function isPinHit(
+  worldPointer: Point,
+  pinPosition: Point,
+  label: string,
+  transform: ViewTransform,
+): boolean {
+  // Hit radius for pinhead (28px radius = 56px diameter touch target)
+  const headHitRadius = 28 / transform.scale;
+  if (distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y) <= headHitRadius) {
+    return true;
+  }
+
+  // Hit area for rectangular label tag underneath pinhead
+  const approxTagWidth = Math.max(70, label.length * 9 + 16) / transform.scale;
+  const tagTop = pinPosition.y - 4 / transform.scale;
+  const tagBottom = pinPosition.y + 28 / transform.scale;
+  const tagLeft = pinPosition.x - approxTagWidth / 2;
+  const tagRight = pinPosition.x + approxTagWidth / 2;
+
+  return (
+    worldPointer.x >= tagLeft &&
+    worldPointer.x <= tagRight &&
+    worldPointer.y >= tagTop &&
+    worldPointer.y <= tagBottom
+  );
+}
+
 /**
  * Calculate the board bounds (the inner transparent region of the frame)
  * in screen-space coordinates. This must be used consistently by both
@@ -315,6 +391,17 @@ function getInnerBoardBounds(
   containerHeight: number,
   frameImg: HTMLImageElement | null,
 ): BoardBounds {
+  const isPortrait = containerWidth < containerHeight || containerWidth < 768;
+
+  if (isPortrait) {
+    return {
+      x: 0,
+      y: 0,
+      width: containerWidth,
+      height: containerHeight,
+    };
+  }
+
   let frameDx = 0,
     frameDy = 0,
     frameDw = containerWidth,
@@ -399,12 +486,35 @@ interface TooltipState {
   y: number;
 }
 
-interface HeroInteractiveProps {
+export interface HeroInteractiveProps {
   className?: string;
   controlledCaseId?: string;
+  customPins?: PinPoint[];
+  customConnections?: CaseConnection[];
+  customBgImage?: string;
+  onPinClick?: (pinId: string, pin?: PinPoint) => void;
 }
 
-export function HeroInteractive({ className, controlledCaseId }: HeroInteractiveProps) {
+export function HeroInteractive({
+  className,
+  controlledCaseId,
+  customPins,
+  customConnections,
+  customBgImage,
+  onPinClick,
+}: HeroInteractiveProps) {
+  const customPinsRef = useRef<PinPoint[] | undefined>(customPins);
+  const customConnectionsRef = useRef<CaseConnection[] | undefined>(customConnections);
+
+  useEffect(() => {
+    customPinsRef.current = customPins;
+    if (requestRenderRef.current) requestRenderRef.current();
+  }, [customPins]);
+
+  useEffect(() => {
+    customConnectionsRef.current = customConnections;
+    if (requestRenderRef.current) requestRenderRef.current();
+  }, [customConnections]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -534,114 +644,8 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
   // Tooltip and hover
   // ────────────────────────────────────────
 
-  const updateHoveredPin = useCallback((screenX: number, screenY: number) => {
-    const { width, height } = containerSizeRef.current;
-
-    if (width <= 0 || height <= 0) {
-      return;
-    }
-
-    const bounds = getInnerBoardBounds(width, height, boardFrameRef.current);
-
-    const transform = getViewTransform(zoomRef.current, panRef.current);
-
-    const worldPointer = screenToWorld(
-      {
-        x: screenX,
-        y: screenY,
-      },
-      transform,
-    );
-
-    const worldHitRadius = PIN_HIT_RADIUS / transform.scale;
-
-    let foundPinIndex: number | null = null;
-    let foundIsUserPin = false;
-    let foundPinId: string | null = null;
-
-    // 1. Check system pins first
-    const sysPins = activeCaseRef.current.pins;
-    for (let index = 0; index < sysPins.length; index += 1) {
-      const pinPosition = getPinWorldPosition(sysPins[index], bounds);
-
-      if (
-        distance(
-          worldPointer.x,
-          worldPointer.y,
-          pinPosition.x,
-          pinPosition.y,
-        ) <= worldHitRadius
-      ) {
-        foundPinIndex = index;
-        foundIsUserPin = false;
-        foundPinId = sysPins[index].id;
-        break;
-      }
-    }
-
-    // 2. If not found, check user pins
-    if (foundPinIndex === null) {
-      const uPins = userPinsRef.current;
-      for (let index = 0; index < uPins.length; index += 1) {
-        const pinPosition = {
-          x: bounds.x + uPins[index].x * bounds.width,
-          y: bounds.y + uPins[index].y * bounds.height,
-        };
-
-        if (
-          distance(
-            worldPointer.x,
-            worldPointer.y,
-            pinPosition.x,
-            pinPosition.y,
-          ) <= worldHitRadius
-        ) {
-          foundPinIndex = index;
-          foundIsUserPin = true;
-          foundPinId = uPins[index].id;
-          break;
-        }
-      }
-    }
-
-    if (hoveredPinRef.current !== foundPinId) {
-      hoveredPinRef.current = foundPinId;
-    }
-
-    if (foundPinIndex === null || foundPinId === null) {
-      setTooltip(null);
-      requestRenderRef.current();
-      return;
-    }
-
-    const pinWorldPosition = foundIsUserPin
-      ? {
-          x: bounds.x + userPinsRef.current[foundPinIndex].x * bounds.width,
-          y: bounds.y + userPinsRef.current[foundPinIndex].y * bounds.height,
-        }
-      : getPinWorldPosition(activeCaseRef.current.pins[foundPinIndex], bounds);
-
-    const pinScreenPosition = worldToScreen(pinWorldPosition, transform);
-
-    setTooltip((current) => {
-      if (
-        current?.pinIndex === foundPinIndex &&
-        current?.isUserPin === foundIsUserPin &&
-        Math.abs(current.x - pinScreenPosition.x) < 0.5 &&
-        Math.abs(current.y - pinScreenPosition.y) < 0.5
-      ) {
-        return current;
-      }
-
-      return {
-        pinIndex: foundPinIndex,
-        isUserPin: foundIsUserPin,
-        x: pinScreenPosition.x,
-        y: pinScreenPosition.y,
-      };
-    });
-
-    requestRenderRef.current();
+  const updateHoveredPin = useCallback((_screenX: number, _screenY: number) => {
+    // Hover disabled by design - pins stay completely static
   }, []);
 
   // ────────────────────────────────────────
@@ -854,196 +858,29 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
         );
 
         const transform = getViewTransform(zoomRef.current, panRef.current);
-
         const worldPointer = screenToWorld({ x, y }, transform);
 
-        if (boardMode === "zoom") {
-          toggleZoomAt(x, y);
-        } else if (boardMode === "pin") {
-          const worldHitRadius = PIN_HIT_RADIUS / transform.scale;
+        const worldHitRadius = PIN_HIT_RADIUS / transform.scale;
+        const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
+        let bestHitPin: PinPoint | null = null;
+        let minDistance = Infinity;
 
+        // Check all system/custom pins and pick the closest one to pointer location
+        for (let index = 0; index < caseSysPins.length; index += 1) {
+          const pin = caseSysPins[index];
+          const pinPosition = getPinWorldPosition(pin, bounds);
 
-
-          // 2. Identify if clicked on any ghim (system or user)
-          let clickedPinIndex: number | null = null;
-          let clickedIsUserPin = false;
-
-          // Check system pins first
-          const caseSysPins = activeCaseRef.current.pins;
-          for (let index = 0; index < caseSysPins.length; index += 1) {
-            const pinPosition = getPinWorldPosition(caseSysPins[index], bounds);
-
-            if (
-              distance(
-                worldPointer.x,
-                worldPointer.y,
-                pinPosition.x,
-                pinPosition.y,
-              ) <= worldHitRadius
-            ) {
-              clickedPinIndex = index;
-              clickedIsUserPin = false;
-              break;
+          if (isPinHit(worldPointer, pinPosition, pin.label, transform)) {
+            const dist = distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y);
+            if (dist < minDistance) {
+              minDistance = dist;
+              bestHitPin = pin;
             }
           }
+        }
 
-          // Check user pins
-          if (clickedPinIndex === null) {
-            const uPins = userPinsRef.current;
-            for (let index = 0; index < uPins.length; index += 1) {
-              const pinPosition = {
-                x: bounds.x + uPins[index].x * bounds.width,
-                y: bounds.y + uPins[index].y * bounds.height,
-              };
-
-              if (
-                distance(
-                  worldPointer.x,
-                  worldPointer.y,
-                  pinPosition.x,
-                  pinPosition.y,
-                ) <= worldHitRadius
-              ) {
-                clickedPinIndex = index;
-                clickedIsUserPin = true;
-                break;
-              }
-            }
-          }
-
-          const hasClickedPin = clickedPinIndex !== null;
-
-          if (hasClickedPin && clickedPinIndex !== null) {
-            // Clicked a pin
-            const clickedPinId = clickedIsUserPin
-              ? userPinsRef.current[clickedPinIndex].id
-              : activeCaseRef.current.pins[clickedPinIndex].id;
-
-            if (connectionStartIdRef.current === null) {
-              // Click ghim A -> Chọn ghim A làm nguồn nối dây
-              updateConnectionStartId(clickedPinId);
-            } else {
-              const activeConnStart = connectionStartIdRef.current;
-              if (activeConnStart === clickedPinId) {
-                // Click lại ghim A → nếu là ghim user thì xóa, system thì bỏ chọn
-                if (clickedIsUserPin) {
-                  updateUserPins((prev) =>
-                    prev.filter((p) => p.id !== clickedPinId),
-                  );
-                  updateUserConnections((prev) =>
-                    prev.filter(
-                      (c) =>
-                        c.fromPinId !== clickedPinId &&
-                        c.toPinId !== clickedPinId,
-                    ),
-                  );
-                  hoveredPinRef.current = null;
-                  setTooltip(null);
-                }
-                updateConnectionStartId(null);
-              } else {
-                // Click ghim B -> Nối/tháo dây A—B
-                const alreadyConnected = userConnectionsRef.current.some(
-                  (c) =>
-                    (c.fromPinId === activeConnStart &&
-                      c.toPinId === clickedPinId) ||
-                    (c.fromPinId === clickedPinId &&
-                      c.toPinId === activeConnStart),
-                );
-
-                if (alreadyConnected) {
-                  // Tháo dây
-                  updateUserConnections((prev) =>
-                    prev.filter(
-                      (c) =>
-                        !(
-                          (c.fromPinId === activeConnStart &&
-                            c.toPinId === clickedPinId) ||
-                          (c.fromPinId === clickedPinId &&
-                            c.toPinId === activeConnStart)
-                        ),
-                    ),
-                  );
-                } else {
-                  // Tạo dây
-                  const newConn: UserConnection = {
-                    id: crypto.randomUUID(),
-                    fromPinId: activeConnStart,
-                    toPinId: clickedPinId,
-                  };
-                  updateUserConnections((prev) => [...prev, newConn]);
-                }
-                updateConnectionStartId(null);
-              }
-            }
-          } else {
-            // Clicked empty background
-            if (connectionStartIdRef.current !== null) {
-              // Nếu đang chọn ghim A: click vùng trống -> Bỏ chọn, không tạo ghim mới
-              updateConnectionStartId(null);
-            } else {
-              // Nếu không chọn ghim nào: click vùng trống -> thêm ghim mới
-              const imageX = (worldPointer.x - bounds.x) / bounds.width;
-              const imageY = (worldPointer.y - bounds.y) / bounds.height;
-
-              if (imageX >= 0 && imageX <= 1 && imageY >= 0 && imageY <= 1) {
-                // Check minimum distance
-                let isTooClose = false;
-                const checkRadius = PIN_HIT_RADIUS / transform.scale;
-
-                // Check against system pins
-                for (let i = 0; i < caseSysPins.length; i++) {
-                  const sysPos = getPinWorldPosition(caseSysPins[i], bounds);
-                  if (
-                    distance(
-                      worldPointer.x,
-                      worldPointer.y,
-                      sysPos.x,
-                      sysPos.y,
-                    ) < checkRadius
-                  ) {
-                    isTooClose = true;
-                    break;
-                  }
-                }
-
-                // Check against user pins
-                if (!isTooClose) {
-                  const uPins = userPinsRef.current;
-                  for (let i = 0; i < uPins.length; i++) {
-                    const userPos = {
-                      x: bounds.x + uPins[i].x * bounds.width,
-                      y: bounds.y + uPins[i].y * bounds.height,
-                    };
-                    if (
-                      distance(
-                        worldPointer.x,
-                        worldPointer.y,
-                        userPos.x,
-                        userPos.y,
-                      ) < checkRadius
-                    ) {
-                      isTooClose = true;
-                      break;
-                    }
-                  }
-                }
-
-                if (!isTooClose) {
-                  const pinNumber = nextUserPinNumberRef.current;
-                  nextUserPinNumberRef.current += 1;
-                  const newPinLabel = `GHIM ${pinNumber.toString().padStart(2, "0")}`;
-                  const newPin: UserPin = {
-                    id: crypto.randomUUID(),
-                    x: imageX,
-                    y: imageY,
-                    label: newPinLabel,
-                  };
-                  updateUserPins((prev) => [...prev, newPin]);
-                }
-              }
-            }
-          }
+        if (bestHitPin && onPinClick) {
+          onPinClick(bestHitPin.id, bestHitPin);
         }
       } else {
         updateHoveredPin(x, y);
@@ -1245,8 +1082,10 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
       // 1. Draw the wooden frame in screen space (unaffected by zoom/pan)
       // Uses "cover" fit — aspect ratio preserved, no stretching
       // ──────────────────────────────────
+      const isPortrait = width < height || width < 768;
+
       context.save();
-      if (frameImg) {
+      if (!isPortrait && frameImg) {
         context.drawImage(
           frameImg,
           0,
@@ -1258,11 +1097,6 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
           frameDw,
           frameDh,
         );
-      } else {
-        // Fallback wooden border CSS style representation
-        context.strokeStyle = "#1c120c";
-        context.lineWidth = Math.min(width * 0.05, height * 0.05) * 2;
-        context.strokeRect(0, 0, width, height);
       }
       context.restore();
 
@@ -1312,7 +1146,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
       }
 
       // Build unified list of pins for mapping coordinates
-      const casePins = activeCaseRef.current.pins;
+      const casePins = customPinsRef.current ?? activeCaseRef.current.pins;
       const uPins = userPinsRef.current;
       const allPinsUnified = [
         ...casePins.map((p) => ({
@@ -1320,6 +1154,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
           x: p.x,
           y: p.y,
           label: p.label,
+          color: (p as any).color,
           isUser: false,
         })),
         ...uPins.map((p) => ({
@@ -1327,6 +1162,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
           x: p.x,
           y: p.y,
           label: p.label,
+          color: "yellow" as const,
           isUser: true,
         })),
       ];
@@ -1343,7 +1179,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
       // 2. Draw evidence strings (system)
       // ──────────────────────────────────
 
-      const caseConns = activeCaseRef.current.connections;
+      const caseConns = customConnectionsRef.current ?? activeCaseRef.current.connections;
       caseConns.forEach((conn) => {
         const start = pinPositionsMap.get(conn.fromPinId);
         const end = pinPositionsMap.get(conn.toPinId);
@@ -1437,30 +1273,18 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
         const pinPosition = pinPositionsMap.get(pin.id);
         if (!pinPosition) return;
 
-        const distanceToPointer = pointer.active
-          ? distance(
-              worldPointer.x,
-              worldPointer.y,
-              pinPosition.x,
-              pinPosition.y,
-            )
-          : Number.POSITIVE_INFINITY;
-
-        const worldGlowRadius = PIN_GLOW_RADIUS / transform.scale;
-        const isNear = distanceToPointer < worldGlowRadius;
-        const intensity = isNear ? 1 - distanceToPointer / worldGlowRadius : 0;
-
-        const baseRadius = (isNear ? 7 : 5.5) / transform.scale;
-
-        // Check if this pin is currently hovered by checking if pin.id matches hoveredPinRef
-        const isCurrentlyHovered =
-          hoveredPinRef.current !== null && hoveredPinRef.current === pin.id;
+        const baseRadius = 6.0 / transform.scale;
 
         // Determine pin base/highlight colors
-        let color = PIN_COLORS[allPinsUnified.indexOf(pin) % PIN_COLORS.length];
-        if (pin.isUser) {
-          // Default user pin color: orange/golden copper
-          color = { base: "#cc2222", highlight: "#ff4444" };
+        let color = { base: "#dc2626", highlight: "#f87171" }; // Default Red pin
+        const pinColor = (pin as any).color || (pin.id.includes("phone") || pin.id.includes("reinvestigate") || pin.id.includes("suspect-") ? "yellow" : "red");
+
+        if (pinColor === "yellow") {
+          color = { base: "#d97706", highlight: "#fde047" };
+        } else if (pinColor === "blue") {
+          color = { base: "#2563eb", highlight: "#60a5fa" };
+        } else if (pinColor === "green") {
+          color = { base: "#16a34a", highlight: "#4ade80" };
         }
 
         // Active connection indicator ring
@@ -1515,32 +1339,44 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
         context.fill();
         context.restore();
 
-        // Glow ring or Active selection ring
-        if (isNear || isActiveConnStart) {
-          const motionPulse = reducedMotionRef.current
-            ? 0
-            : Math.sin(timestamp * 0.004) * 0.12;
+        // Paper tag label card under pin
+        context.save();
+        const fontSize = 10;
+        context.font = `bold ${fontSize / transform.scale}px monospace, sans-serif`;
+        const textMetrics = context.measureText(pin.label);
+        const tagPaddingX = 6 / transform.scale;
+        const tagHeight = (fontSize + 6) / transform.scale;
+        const tagWidth = textMetrics.width + tagPaddingX * 2;
+        const tagX = pinPosition.x - tagWidth / 2;
+        const tagY = pinPosition.y + baseRadius + 4 / transform.scale;
 
-          const ringRadius = baseRadius + (7 + intensity * 4) / transform.scale;
+        const isYellowTag = pinColor === "yellow";
+        context.fillStyle = isYellowTag ? "rgba(24, 18, 10, 0.92)" : "rgba(35, 12, 12, 0.92)";
+        context.strokeStyle = isYellowTag ? "rgba(217, 119, 6, 0.85)" : "rgba(220, 38, 38, 0.85)";
+        context.lineWidth = 1.2 / transform.scale;
 
-          context.save();
-          if (isActiveConnStart) {
-            context.strokeStyle = `rgba(255, 235, 80, ${0.7 + Math.sin(timestamp * 0.008) * 0.15})`; // pulsed gold ring
-            context.lineWidth = 2.0 / transform.scale;
-          } else {
-            context.strokeStyle = `rgba(255,255,200,${0.25 + motionPulse})`;
-            context.lineWidth = 1.5 / transform.scale;
-          }
-          context.setLineDash([3 / transform.scale, 3 / transform.scale]);
-          context.lineDashOffset = reducedMotionRef.current
-            ? 0
-            : (-timestamp * 0.02) / transform.scale;
+        const r = 3 / transform.scale;
+        context.beginPath();
+        context.moveTo(tagX + r, tagY);
+        context.lineTo(tagX + tagWidth - r, tagY);
+        context.quadraticCurveTo(tagX + tagWidth, tagY, tagX + tagWidth, tagY + r);
+        context.lineTo(tagX + tagWidth, tagY + tagHeight - r);
+        context.quadraticCurveTo(tagX + tagWidth, tagY + tagHeight, tagX + tagWidth - r, tagY + tagHeight);
+        context.lineTo(tagX + r, tagY + tagHeight);
+        context.quadraticCurveTo(tagX, tagY + tagHeight, tagX, tagY + tagHeight - r);
+        context.lineTo(tagX, tagY + r);
+        context.quadraticCurveTo(tagX, tagY, tagX + r, tagY);
+        context.closePath();
+        context.fill();
+        context.stroke();
 
-          context.beginPath();
-          context.arc(pinPosition.x, pinPosition.y, ringRadius, 0, Math.PI * 2);
-          context.stroke();
-          context.restore();
-        }
+        context.fillStyle = isYellowTag ? "#fef08a" : "#fee2e2";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText(pin.label, pinPosition.x, tagY + tagHeight / 2 + 0.5 / transform.scale);
+        context.restore();
+
+
 
 
       });
@@ -1569,7 +1405,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
 
         maskContext.globalCompositeOperation = "source-over";
 
-        maskContext.fillStyle = "rgba(0, 0, 0, 0.70)";
+        maskContext.fillStyle = "rgba(0, 0, 0, 0.22)";
 
         maskContext.fillRect(0, 0, width, height);
 
@@ -1583,7 +1419,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
         const boardCenterScreen = worldToScreen(boardCenterWorld, transform);
 
         const centerRadius =
-          Math.min(width, height) * CENTER_LIGHT_RADIUS_RATIO;
+          Math.max(width, height) * CENTER_LIGHT_RADIUS_RATIO;
 
         const centerGradient = maskContext.createRadialGradient(
           boardCenterScreen.x,
@@ -1594,9 +1430,9 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
           centerRadius,
         );
 
-        centerGradient.addColorStop(0, "rgba(0, 0, 0, 0.55)");
+        centerGradient.addColorStop(0, "rgba(0, 0, 0, 0.85)");
 
-        centerGradient.addColorStop(0.6, "rgba(0, 0, 0, 0.35)");
+        centerGradient.addColorStop(0.6, "rgba(0, 0, 0, 0.45)");
 
         centerGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
 
@@ -1793,6 +1629,8 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
     };
   }, []);
 
+  const bgImageToUse = customBgImage ?? activeCase.bgImage;
+
   // Effect 3: Load active case background map with cancellation support to avoid race conditions
   useEffect(() => {
     let cancelled = false;
@@ -1801,7 +1639,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
     requestRenderRef.current();
 
     const boardImage = new Image();
-    boardImage.src = activeCase.bgImage;
+    boardImage.src = bgImageToUse;
     boardImage.onload = () => {
       if (cancelled) return;
       boardImageRef.current = boardImage;
@@ -1809,7 +1647,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
     };
     boardImage.onerror = () => {
       if (cancelled) return;
-      console.error(`Không thể tải ảnh bản đồ vụ án: ${activeCase.bgImage}`);
+      console.error(`Không thể tải ảnh bản đồ vụ án: ${bgImageToUse}`);
       boardImageRef.current = null;
       requestRenderRef.current();
     };
@@ -1817,7 +1655,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
     return () => {
       cancelled = true;
     };
-  }, [activeCase.bgImage]);
+  }, [bgImageToUse]);
 
   // ────────────────────────────────────────
   // Tooltip style
@@ -1859,7 +1697,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
         onPointerLeave={handlePointerLeave}
         className={cn(
           "relative flex-1 min-h-0 w-full overflow-hidden",
-          "cursor-crosshair select-none touch-none",
+          "cursor-default select-none touch-none",
           "focus-visible:outline-none",
           "focus-visible:ring-2 focus-visible:ring-primary/70",
           "focus-visible:ring-offset-2 focus-visible:ring-offset-background",
@@ -1872,125 +1710,7 @@ export function HeroInteractive({ className, controlledCaseId }: HeroInteractive
           className="absolute inset-0 h-full w-full"
         />
 
-        {/* Floating toolbar — center-top of the inner evidence board */}
-        {innerRect && (
-        <div
-          data-board-ui
-          style={{
-            position: "absolute",
-            top: innerRect.y - 12,
-            left: innerRect.x + innerRect.width / 2,
-            transform: "translate(-50%, -50%)",
-          }}
-          className={cn(
-            "z-20",
-            "flex items-center gap-2",
-            "px-2.5 py-1.5",
-          )}
-        >
-          {/* Mode Toggle */}
-          <button
-            type="button"
-            data-board-ui
-            aria-label={boardMode === "zoom" ? "Chuyển sang chế độ Ghim" : "Chuyển sang chế độ Zoom"}
-            title={boardMode === "zoom" ? "Chuyển sang chế độ Ghim" : "Chuyển sang chế độ Zoom"}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (boardMode === "zoom") {
-                switchToPinMode();
-              } else {
-                updateConnectionStartId(null);
-                setBoardMode("zoom");
-              }
-            }}
-            className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-full text-[0.85rem] transition-all duration-300",
-              boardMode === "pin"
-                ? "text-primary"
-                : "text-amber-200/80",
-            )}
-          >
-            {boardMode === "zoom" ? "🔍" : "📌"}
-          </button>
 
-
-          {/* Case title label */}
-          <span className="font-mono text-[0.5rem] font-bold uppercase tracking-wider text-amber-200/80 min-w-[80px] text-center select-none">
-            {activeCase.title}
-          </span>
-        </div>
-        )}
-        {tooltip && tooltipStyle && (
-          <div style={tooltipStyle} className="z-20 animate-fade-slide-up">
-            <div
-              className={cn(
-                "max-w-[220px] rounded-lg",
-                "border border-primary/40",
-                "bg-card/95 px-3 py-2",
-                "shadow-[0_4px_20px_rgba(0,0,0,0.5)]",
-                "backdrop-blur-md",
-              )}
-            >
-              <div
-                className={cn(
-                  "font-mono text-[0.55rem] font-bold",
-                  "uppercase tracking-widest text-primary",
-                )}
-              >
-                {tooltip.isUserPin
-                  ? userPins[tooltip.pinIndex]?.label
-                  : activeCase.pins[tooltip.pinIndex]?.label}
-              </div>
-
-              <div
-                className={cn(
-                  "mt-1 font-mono text-[0.6rem]",
-                  "leading-relaxed text-muted-foreground",
-                )}
-              >
-                {tooltip.isUserPin
-                  ? "Ghim của điều tra viên"
-                  : activeCase.pins[tooltip.pinIndex]?.detail}
-              </div>
-            </div>
-
-            <div className="flex justify-center">
-              <div
-                className={cn(
-                  "h-0 w-0",
-                  "border-l-[5px] border-l-transparent",
-                  "border-r-[5px] border-r-transparent",
-                  "border-t-[5px] border-t-primary/40",
-                )}
-              />
-            </div>
-          </div>
-        )}
-
-
-
-        {/* Zoom indicator */}
-        {zoomActive && boardMode === "zoom" && (
-          <div
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute right-3 top-3 z-10",
-              "flex items-center gap-1.5 rounded",
-              "border border-primary/20",
-              "bg-card/80 px-2 py-1 backdrop-blur-sm",
-              "font-mono text-[0.55rem]",
-              "uppercase tracking-widest text-primary/70",
-            )}
-          >
-            <span
-              className={cn(
-                "inline-block h-1.5 w-1.5 rounded-full",
-                "bg-primary motion-safe:animate-pulse",
-              )}
-            />
-            ĐANG PHÓNG TO — NHẤP ĐỂ THU NHỎ
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,16 +1,17 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Playpen_Sans } from 'next/font/google'
+import { Inter, Roboto_Mono, Playpen_Sans } from 'next/font/google'
 import { FeedbackModal } from '@/components/investigation/feedback-modal'
 import './globals.css'
 
-const geistSans = Geist({
-  subsets: ['latin'],
+const fontSans = Inter({
+  subsets: ['vietnamese', 'latin'],
   variable: '--font-geist-sans',
 })
 
-const geistMono = Geist_Mono({
-  subsets: ['latin'],
+const fontMono = Roboto_Mono({
+  subsets: ['vietnamese', 'latin'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-geist-mono',
 })
 
@@ -69,8 +70,8 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${handwritingFont.variable}`}
+      lang="vi"
+      className={`dark ${fontSans.variable} ${fontMono.variable} ${handwritingFont.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning className="h-full h-dvh w-full overflow-hidden fixed inset-0 bg-background font-sans text-foreground antialiased">

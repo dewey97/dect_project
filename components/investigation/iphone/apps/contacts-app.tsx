@@ -9,12 +9,17 @@ import {
   Video,
   Mail,
   ArrowLeft,
+  ChevronLeft,
   Star,
   UserPlus
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export function ContactsApp() {
+interface ContactsAppProps {
+  onBackToHome?: () => void
+}
+
+export function ContactsApp({ onBackToHome }: ContactsAppProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedContact, setSelectedContact] = useState<any | null>(null)
 
@@ -22,56 +27,74 @@ export function ContactsApp() {
     {
       id: 'c-01',
       name: 'Trần Thị Hà',
-      phone: '0912.481.xxx',
+      phone: '0984.112.568',
       relationship: 'Bạn gái / Thợ may',
       note: 'Rất hay ghen, giám sát từng li từng tí. Tự ý mang trà với đồ ăn sang.',
-      address: 'Số 8 Ngõ 12 Đường Bờ Sông',
+      address: 'Số 8 Ngõ 12 Đường Bờ Sông, Q. Đống Đa',
       avatarColor: 'from-[#FF2D55] to-[#AF52DE]'
     },
     {
       id: 'c-02',
-      name: 'Yến Nhi',
-      phone: '0978.552.xxx',
+      name: 'Bé Vy ❤️ (Yến Nhi)',
+      phone: '0978.552.109',
       relationship: 'Người yêu mới ❤️',
-      note: 'Hẹn đi du lịch Đà Lạt 25/7, đã chuyển cọc tour 12 triệu.',
-      address: 'Phố Huế, Hai Bà Trưng',
+      note: 'Hẹn đi du lịch Đà Lạt 25/7, đã chuyển cọc tour 12 triệu. Sáng mai 06:30 hẹn đón ở sân bay Nội Bài.',
+      address: 'Phố Huế, Hai Bà Trưng, Hà Nội',
       avatarColor: 'from-[#FF9500] to-[#FF2D55]'
     },
     {
       id: 'c-03',
       name: 'Lê Quang Vũ',
-      phone: '0903.114.xxx',
+      phone: '0988.200.991',
       relationship: 'Cán bộ đo đạc địa chính',
-      note: 'Còn nợ 350 triệu tiền bốc họ. Đang ép vẽ khống trích đo lên 120m2.',
-      address: 'Tập thể Địa chính Hà Nội',
+      note: 'Còn nợ 350 triệu tiền bốc họ. Đang ép vẽ khống trích đo lên 120m2. Đã gọi nợ gắt tối 24/7.',
+      address: 'Phòng 302 Tập thể Địa chính Hà Nội',
       avatarColor: 'from-[#0A84FF] to-[#5856D6]'
     },
     {
       id: 'c-04',
-      name: 'Nguyễn Ngọc Mai (Em họ)',
-      phone: '0984.661.xxx',
+      name: 'Nguyễn Ngọc Mai',
+      phone: '0984.661.302',
       relationship: 'Em họ con chú',
-      note: 'Nhăm nhe đòi chia tiền đền bù căn nhà số 14. Đang nghi ngờ di chúc bị sửa.',
-      address: 'Ngõ 20 Tây Sơn, Đống Đa',
+      note: 'Nhăm nhe đòi chia tiền đền bù căn nhà số 14 Bờ Sông. Đang nghi ngờ di chúc bị sửa.',
+      address: 'Số 20 Ngõ 45 Tây Sơn, Đống Đa',
       avatarColor: 'from-[#30D158] to-[#0A84FF]'
     },
     {
       id: 'c-05',
       name: 'Nguyễn Thanh Tùng',
-      phone: '0919.332.xxx',
+      phone: '0919.332.884',
       relationship: 'Bạn nối khố thuở nhỏ',
       note: 'Vừa về Hà Nội giải quyết việc riêng, hẹn chia tay đi Hải Phòng tối 24/7.',
-      address: 'Quê gốc Đường Bờ Sông',
+      address: 'Tổ 5 Phường Thượng Lý, Hải Phòng',
       avatarColor: 'from-[#8E8E93] to-[#636366]'
     },
     {
       id: 'c-06',
-      name: 'Tuấn "Bia"',
-      phone: '0936.888.xxx',
+      name: 'Tuấn "Bia 88"',
+      phone: '0936.888.712',
       relationship: 'Hội bạn nhậu',
-      note: 'Chủ quán bia phố cổ, hay gọi đi giao lưu.',
-      address: 'Phố Cổ, Hoàn Kiếm',
+      note: 'Chủ quán bia phố cổ, hay gọi đi giao lưu tối muộn.',
+      address: 'Số 18 Phố Tạ Hiện, Hoàn Kiếm',
       avatarColor: 'from-[#FFD60A] to-[#FF9500]'
+    },
+    {
+      id: 'c-07',
+      name: 'Luật sư Nam',
+      phone: '0903.441.229',
+      relationship: 'Văn phòng Luật Nam & Cộng sự',
+      note: 'Tư vấn hợp đồng thế chấp di chúc & thủ tục thừa kế nhà 14 Bờ Sông.',
+      address: 'Tầng 4 Tòa nhà HUD, Thanh Xuân, Hà Nội',
+      avatarColor: 'from-[#AF52DE] to-[#5856D6]'
+    },
+    {
+      id: 'c-08',
+      name: 'F88 Tín Dụng Nhanh',
+      phone: '1800.6388',
+      relationship: 'Hỗ trợ tài chính',
+      note: 'Gói vay tín chấp thế chấp đăng ký xe 80 triệu.',
+      address: 'P. Xã Đàn, Đống Đa, Hà Nội',
+      avatarColor: 'from-[#30D158] to-[#FF3B30]'
     }
   ]
 
@@ -159,7 +182,19 @@ export function ContactsApp() {
         <div className="flex flex-col h-full">
           <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[20px] font-bold tracking-tight text-white">Danh bạ</span>
+              {onBackToHome ? (
+                <button
+                  onClick={onBackToHome}
+                  className="flex items-center gap-0.5 text-[#0A84FF] text-[12.5px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
+                  title="Thoát ứng dụng về Màn hình chính"
+                >
+                  <ChevronLeft className="size-4" />
+                  <span>Trang chính</span>
+                </button>
+              ) : (
+                <span className="w-12" />
+              )}
+              <span className="text-[17px] font-bold tracking-tight text-white">Danh bạ</span>
               <UserPlus className="size-4 text-[#0A84FF]" />
             </div>
 
@@ -175,29 +210,52 @@ export function ContactsApp() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-2 pb-10 divide-y divide-[#1C1C1E]">
-            {filteredContacts.map((contact) => (
-              <div
-                key={contact.id}
-                onClick={() => setSelectedContact(contact)}
-                className="py-2.5 px-2 flex items-center gap-3 hover:bg-[#1C1C1E]/50 active:bg-[#2C2C2E]/60 rounded-xl cursor-pointer transition-colors"
-              >
-                <div
-                  className={cn(
-                    'size-9 rounded-full bg-gradient-to-tr text-white flex items-center justify-center font-bold text-xs shadow border border-white/10 shrink-0',
-                    contact.avatarColor
-                  )}
-                >
-                  {contact.name.slice(0, 1)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-semibold text-white truncate">
-                    {contact.name}
+          {/* CONTACTS LIST VIEW WITH A-Z INDEX */}
+          <div className="flex-1 overflow-y-auto relative flex pb-10">
+            {/* Main Contacts List */}
+            <div className="flex-1 px-2 divide-y divide-[#1C1C1E]">
+              {filteredContacts.map((contact, idx) => {
+                const firstLetter = contact.name.slice(0, 1).toUpperCase()
+                const prevFirstLetter = idx > 0 ? filteredContacts[idx - 1].name.slice(0, 1).toUpperCase() : null
+                const isNewSection = firstLetter !== prevFirstLetter
+
+                return (
+                  <div key={contact.id}>
+                    {isNewSection && (
+                      <div className="bg-[#1C1C1E]/80 backdrop-blur-sm px-2 py-0.5 text-[10px] font-bold text-[#8E8E93] font-mono sticky top-0 z-10 my-1 rounded">
+                        {firstLetter}
+                      </div>
+                    )}
+                    <div
+                      onClick={() => setSelectedContact(contact)}
+                      className="py-2.5 px-2 flex items-center gap-3 hover:bg-[#1C1C1E]/50 active:bg-[#2C2C2E]/60 rounded-xl cursor-pointer transition-colors"
+                    >
+                      <div
+                        className={cn(
+                          'size-9 rounded-full bg-gradient-to-tr text-white flex items-center justify-center font-bold text-xs shadow border border-white/10 shrink-0',
+                          contact.avatarColor
+                        )}
+                      >
+                        {contact.name.slice(0, 1)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-semibold text-white truncate">
+                          {contact.name}
+                        </div>
+                        <div className="text-[10px] text-[#8E8E93] truncate">{contact.relationship}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-[10px] text-[#8E8E93] truncate">{contact.relationship}</div>
-                </div>
-              </div>
-            ))}
+                )
+              })}
+            </div>
+
+            {/* iOS A-Z Alphabet Right Bar */}
+            <div className="w-4 py-2 flex flex-col items-center justify-between text-[8px] font-bold text-[#0A84FF] font-mono select-none shrink-0 pr-1 opacity-80">
+              {['#', 'A', 'B', 'C', 'F', 'H', 'L', 'M', 'N', 'T', 'V', 'Y'].map((char) => (
+                <span key={char} className="hover:text-white cursor-pointer">{char}</span>
+              ))}
+            </div>
           </div>
         </div>
       )}

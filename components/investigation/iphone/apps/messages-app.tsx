@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import {
   ArrowLeft,
+  ChevronLeft,
+  Home,
   Search,
   ChevronRight,
   Camera,
@@ -31,7 +33,7 @@ import { detectiveAudio } from '@/lib/investigation-audio'
 
 interface MessagesAppProps {
   threads: Conversation[]
-  onBackToHome: () => void
+  onBackToHome?: () => void
 }
 
 export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
@@ -410,7 +412,19 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
           {/* Header */}
           <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[20px] font-bold tracking-tight text-white">Tin nhắn</span>
+              {onBackToHome ? (
+                <button
+                  onClick={onBackToHome}
+                  className="flex items-center gap-0.5 text-[#0A84FF] text-[12.5px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
+                  title="Thoát ứng dụng về Màn hình chính"
+                >
+                  <ChevronLeft className="size-4" />
+                  <span>Trang chính</span>
+                </button>
+              ) : (
+                <span className="w-12" />
+              )}
+              <span className="text-[17px] font-bold tracking-tight text-white">Tin nhắn</span>
               <button
                 onClick={() => {
                   setIsEditMode(!isEditMode)

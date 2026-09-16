@@ -8,6 +8,7 @@ import {
   Share,
   Layers,
   ArrowLeft,
+  ChevronLeft,
   ArrowRight,
   RotateCw,
   Clock,
@@ -19,23 +20,34 @@ import { cn } from '@/lib/utils'
 
 interface SafariAppProps {
   history: BrowserHistory[]
+  onBackToHome?: () => void
 }
 
-export function SafariApp({ history }: SafariAppProps) {
+export function SafariApp({ history, onBackToHome }: SafariAppProps) {
   const [selectedSearch, setSelectedSearch] = useState<BrowserHistory | null>(null)
 
   return (
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans">
       {/* Top URL Bar */}
       <div className="px-3 pt-3 pb-2 bg-[#161618] border-b border-[#2C2C2E] shrink-0">
-        <div className="h-8 rounded-xl bg-[#2C2C2E] border border-[#3A3A3C] px-3 flex items-center justify-between text-[#8E8E93] text-[12px]">
-          <div className="flex items-center gap-1.5 truncate">
-            <ShieldCheck className="size-3.5 text-[#30D158]" />
+        <div className="h-8 rounded-xl bg-[#2C2C2E] border border-[#3A3A3C] px-2 flex items-center justify-between text-[#8E8E93] text-[12px]">
+          {onBackToHome && (
+            <button
+              onClick={onBackToHome}
+              className="flex items-center gap-0.5 text-[#0A84FF] text-[11px] font-semibold hover:underline cursor-pointer mr-1 shrink-0"
+              title="Thoát ứng dụng về Màn hình chính"
+            >
+              <ChevronLeft className="size-3.5 text-[#0A84FF]" />
+              <span>Home</span>
+            </button>
+          )}
+          <div className="flex items-center gap-1.5 truncate flex-1 justify-center">
+            <ShieldCheck className="size-3.5 text-[#30D158] shrink-0" />
             <span className="text-white font-medium text-[11px] truncate">
               {selectedSearch ? 'google.com/search' : 'safari://history'}
             </span>
           </div>
-          <RotateCw className="size-3 text-[#8E8E93]" />
+          <RotateCw className="size-3 text-[#8E8E93] shrink-0" />
         </div>
       </div>
 

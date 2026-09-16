@@ -66,7 +66,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         {/* IMAGE / DIAGRAM CANVAS AREA */}
         <div 
           onClick={handleResetZoom}
-          className="relative w-full h-full bg-[#0f0b07] overflow-hidden flex items-center justify-center cursor-crosshair select-none"
+          className="relative w-full h-full bg-[#0f0b07] overflow-hidden flex items-center justify-center cursor-default select-none"
         >
           {/* ZOOMABLE CONTAINER */}
           <motion.div
