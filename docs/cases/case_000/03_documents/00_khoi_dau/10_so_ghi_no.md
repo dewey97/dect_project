@@ -1,33 +1,522 @@
-*(Vật chứng thu giữ tại hiện trường: Cuốn sổ tay bìa da màu đen kích thước 12cm x 18cm, nhãn hiệu Moleskine, rơi tại chân tủ gỗ phòng khách nhà nạn nhân Nguyễn Văn Khang. Toàn bộ nội dung bên dưới là bút tích viết tay bằng mực bút bi xanh của Khang).*
+*(Vật chứng thu giữ tại hiện trường: Cuốn sổ tay bìa da màu đen kích thước 12cm × 18cm, nhãn hiệu Moleskine, rơi tại chân tủ gỗ phòng khách nhà nạn nhân Nguyễn Văn Khang. Toàn bộ nội dung bên dưới là bút tích viết tay bằng mực bút bi xanh của Khang, trừ một số dòng ghi chú riêng được chú thích rõ).*
 
 ---
 
-# 📓 SỔ GHI TIỀN HỌ & LÃI NGÀY — NĂM 2016
+# 📓 SỔ GHI NỢ & THU LÃI NGÀY — NĂM 2016
 ### (Sổ tay cá nhân của Nguyễn Văn Khang)
 
 ---
 
-### TRANG 12: THEO DÕI BỐC BÁT HỌ & LÃI NGÀY (THÁNG 07/2016)
+## ═══════════════════════════════════════
+## TRANG 3 — BÉO XƯỞNG MỘC
+## ═══════════════════════════════════════
 
-| STT | Khách Vay / Biệt Danh | Tiền Vay / Bát Họ | Số Điện Thoại | Hạn Trả | Ghi Chú & Tình Trạng Đòi Nợ (Bút Tích Của Khang) |
-| :---: | :--- | :---: | :---: | :---: | :--- |
-| **01** | **Tùng Xăm** | 50.000.000 đ | `0904.112.345` | 15/07 | Đã tất toán đủ bát họ 50 ngày. Đang hỏi bốc thêm bát mới 80 triệu. |
-| **02** | **Hải Lác Bến Phà** | 120.000.000 đ | `0918.776.543` | 20/07 | Khóa máy trốn nợ. Cho người canh bến phà, tóm được thì giữ xe. |
-| **03** | **Chị Lan Quán Nước** | 30.000.000 đ | `0932.889.102` | 25/07 | Đóng họ đều. Tiền lãi ngày cấn trừ vào tiền nước chè, thuốc lá hàng tuần. |
-| **04** | **Đạt Gà Chợ Cảng** | 80.000.000 đ | `0912.331.888` | 28/07 | 20:09 (24/7) gọi xin khất 1 tuần -> Không cho. Đến 28/7 ko trả: cho người xuống dẹp sạp gà. |
-| **05** | **Thằng Lệch Pha** | 300.000.000 đ | `0988.20.09.91` | 20/07 | ~~Hẹn 20/7 trả ở 45 Đoàn Kết~~ *(bút bi gạch xóa)*<br>Bùng hẹn, tắt máy. Hạn chót 25/7: rải tờ rơi + ném giấy nợ vào nhà bố vợ ở 45 Đoàn Kết! |
-| **06** | **Cường Mũi Két** | 150.000.000 đ | `0973.665.412` | 05/08 | Cầm cavet xe Wave Alpha đỏ + CCCD gốc. Đóng họ đúng hẹn. |
-| **07** | **Bình Còi** | 40.000.000 đ | `0915.223.789` | 10/08 | Bát 10 ăn 8, thu 50 ngày (đã thu 15 ngày). 18:00 gọi rủ bi-a -> Đã từ chối vì bận việc. |
-| **08** | **Tuấn Béo Xưởng Mộc** | 200.000.000 đ | `0902.998.114` | 15/08 | Chây ì quá hạn. Khất lần nữa thì cho người qua khóa xưởng mộc, siết máy móc. |
+```text
+BÉO XƯỞNG MỘC
+SĐT: 0902.998.114
+Nghề: Chủ xưởng mộc đồ gỗ
+──────────────────────────────────────
+
+THÁNG 03/2016:
+• 08/03 — Cho vay 200.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 160 triệu, giữ lại 40tr phí.
+          Lãi ngày: 800.000đ/ngày.
+
+• 15/03 — Thu lãi ngày 1→7: 5.600.000đ. Đóng đủ, ko nợ.
+• 22/03 — Thu lãi ngày 8→14: 5.600.000đ. Đóng đủ.
+• 29/03 — Thu lãi ngày 15→21: 5.600.000đ. Đóng đúng hẹn.
+
+THÁNG 04/2016:
+• 05/04 — Thu lãi ngày 22→28: 5.600.000đ. Đóng đủ.
+• 12/04 — Thu lãi ngày 29→35: 5.600.000đ. Đóng đủ.
+• 19/04 — Thu lãi ngày 36→42: 5.600.000đ. Trễ 2 ngày.
+          --> Gọi nhắc, hắn nói xưởng đang kẹt hàng. Cho qua.
+• 26/04 — Thu lãi ngày 43→49: 5.600.000đ. Trả thiếu 2 triệu.
+          --> Nói cuối tuần trả nốt. KHÔNG ĐƯỢC QUÊN ĐÒI!
+• 30/04 — Ngày 50: TẤT TOÁN NỢ GỐC 200 TRIỆU.
+          Trả đủ gốc 200tr + 2tr thiếu lãi kỳ trước.
+          --> Xong khoản 1.
+
+THÁNG 05/2016:
+• 05/05 — Cho vay lần 2: 350.000.000đ (kỳ hạn 60 ngày).
+          Thực nhận 280 triệu.
+          Lãi ngày: 1.100.000đ/ngày.
+          * Hắn nói cần tiền mua máy cưa CNC nhập từ Đài Loan.
+            Tao biết thừa là để trả nợ đáo hạn ngân hàng.
+            Kệ! Lãi to thì cho vay.
+
+• 12/05 — Thu lãi kỳ 1 (ngày 1→7): 7.700.000đ. Đóng đủ.
+• 19/05 — Thu lãi kỳ 2 (ngày 8→14): 7.700.000đ. Đóng đủ.
+• 26/05 — Thu lãi kỳ 3 (ngày 15→21): 7.700.000đ. Đóng đủ.
+
+THÁNG 06/2016:
+• 02/06 — Thu lãi kỳ 4 (ngày 22→28): 7.700.000đ. Đóng đủ.
+• 09/06 — Thu lãi kỳ 5 (ngày 29→35): 7.700.000đ. THIẾU 3 triệu.
+          --> 21:30 gọi đòi, hắn nói máy cưa chưa về.
+              "Mày khất hoài thì tao cho người xuống
+               KHÓA CỬA XƯỞNG, SIẾT MÁY MÓC!"
+• 16/06 — Thu lãi kỳ 6 (ngày 36→42): 7.700.000đ + 3tr thiếu kỳ trước.
+          --> Hắn mang tiền mặt đến tận nhà, mặt tái mét.
+              Tốt! Biết sợ thì mới trả đúng hạn.
+• 23/06 — Thu lãi kỳ 7 (ngày 43→49): 7.700.000đ. Đóng đủ.
+• 30/06 — Thu lãi kỳ 8 (ngày 50→56): 7.700.000đ. Đóng đủ.
+
+THÁNG 07/2016:
+• 04/07 — Thu lãi kỳ 9 (ngày 57→60 cuối): 4.400.000đ.
+          --> TẤT TOÁN NỢ GỐC 350 TRIỆU: CHƯA TRẢ.
+              Hắn xin gia hạn thêm 15 ngày. Nợ gốc đẩy lên
+              thành 370 triệu (phạt 20tr phí gia hạn).
+              Hạn chót: 20/07.
+• 20/07 — ĐẾN HẠN: CHÂY Ì KHÔNG TRẢ. GỌI KHÔNG NGHE MÁY.
+          --> "Thằng này chây ì quá đáng. Khất lần nữa thì
+               CHO NGƯỜI QUA KHÓA XƯỞNG MỘC, SIẾT TOÀN BỘ
+               MÁY MÓC ĐỒ GỖ VỀ BÁN THANH LÝ TRỪ NỢ!"
+          HẠN CHÓT TUYỆT ĐỐI: 15/08/2016.
+          Nếu 15/08 không tất toán 370 triệu --> DẸP XƯỞNG.
+
+TỔNG NỢ CÒN LẠI TÍNH ĐẾN 24/07: 370.000.000đ ★
+──────────────────────────────────────
+Chữ ký con nợ:
+
+________________
+(Trần Văn Tuấn)
+```
 
 ---
 
-### GHI CHÉP GÓC DƯỚI TRANG SỔ (BÚT BI XANH VIẾT VỘI):
+## ═══════════════════════════════════════
+## TRANG 5 — LỆCH PHA
+## ═══════════════════════════════════════
 
 ```text
-- Gom nốt các món họ đến hạn trước 25/7.
+LỆCH PHA
+SĐT: 0967.452.183
+Nghề: Kỹ sư điện, lắp đặt tự do
+──────────────────────────────────────
+
+THÁNG 02/2016:
+• 18/02 — Cho vay 150.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 120 triệu.
+          Lãi ngày: 600.000đ/ngày.
+          * Thằng này mắt lác, nhìn qua biết loại sĩ diện
+            hão. Ở rể nhà vợ mà đi vay nóng, không dám
+            cho vợ biết. Dễ xiết!
+
+• 25/02 — Thu lãi kỳ 1 (ngày 1→7): 4.200.000đ. Đóng đủ.
+• 03/03 — Thu lãi kỳ 2 (ngày 8→14): 4.200.000đ. Đóng đủ.
+• 10/03 — Thu lãi kỳ 3 (ngày 15→21): 4.200.000đ. Trễ 1 ngày.
+          --> Nhắn SMS nhắc. Hắn xin lỗi, chuyển khoản ngay.
+
+THÁNG 03/2016:
+• 17/03 — Thu lãi kỳ 4 (ngày 22→28): 4.200.000đ. Đóng đủ.
+• 24/03 — Thu lãi kỳ 5 (ngày 29→35): 4.200.000đ. Đóng đủ.
+• 31/03 — Thu lãi kỳ 6 (ngày 36→42): 4.200.000đ. Đóng đủ.
+
+THÁNG 04/2016:
+• 07/04 — Thu lãi kỳ 7 (ngày 43→49): 4.200.000đ. Đóng đủ.
+• 09/04 — Ngày 50: TẤT TOÁN NỢ GỐC 150 TRIỆU. Trả đủ.
+          --> Xong khoản 1.
+
+• 15/04 — Cho vay lần 2: 300.000.000đ (kỳ hạn 60 ngày).
+          Thực nhận 240 triệu.
+          Lãi ngày: 900.000đ/ngày.
+          * "Mày vay lần này to gấp đôi, tao giữ luôn
+             giấy vay nợ có vân tay. Bùng thì tao
+             NÉM GIẤY NỢ VÀO NHÀ BỐ VỢ Ở 45 ĐOÀN KẾT
+             cho cả nhà mày biết mặt thằng rể quý!"
+
+• 22/04 — Thu lãi kỳ 1 (ngày 1→7): 6.300.000đ. Đóng đủ.
+• 29/04 — Thu lãi kỳ 2 (ngày 8→14): 6.300.000đ. Đóng đủ.
+
+THÁNG 05/2016:
+• 06/05 — Thu lãi kỳ 3 (ngày 15→21): 6.300.000đ. Đóng đủ.
+• 13/05 — Thu lãi kỳ 4 (ngày 22→28): 6.300.000đ. Đóng đủ.
+• 20/05 — Thu lãi kỳ 5 (ngày 29→35): 6.300.000đ. THIẾU 2tr.
+          --> 22:00 gọi đòi: "Thiếu 2 triệu cũng dám khất?
+              Mày tưởng tao không dám gửi tờ rơi cho
+              bố vợ mày à?"
+              Hắn sợ run, hứa mai mang nốt.
+• 21/05 — Nhận bù 2tr thiếu. Được rồi, cho qua lần này.
+• 27/05 — Thu lãi kỳ 6 (ngày 36→42): 6.300.000đ. Đóng đủ.
+
+THÁNG 06/2016:
+• 03/06 — Thu lãi kỳ 7 (ngày 43→49): 6.300.000đ. THIẾU 4tr.
+          --> "Lần này thiếu gấp đôi lần trước! Khoan,
+               để tao IN 100 TỜ RƠI NỢ 300 TRIỆU DÁN
+               KHẮP PHỐ ĐOÀN KẾT cho bố vợ mày nhục mặt!"
+          --> Hắn quỳ lạy khóc xin. Thôi, cho khất 3 ngày.
+• 06/06 — Nhận bù 4tr. Mặt hắn tái nhợt như ma.
+• 10/06 — Thu lãi kỳ 8 (ngày 50→56): 6.300.000đ. Đóng đủ.
+
+THÁNG 07/2016:
+• 14/07 — Ngày 60 — ĐẾN HẠN TẤT TOÁN NỢ GỐC 300 TRIỆU.
+          --> KHÔNG TRẢ. XIN GIA HẠN.
+              Cho gia hạn → giữ nguyên gốc 300 triệu
+              (ko tính phạt vì cần hắn ngăn con Mai
+              đòi đất nhà tao).
+              Hạn mới: 20/07.
+• 20/07 — ĐẾN HẠN LẦN 2: BÙNG HẸN, TẮT MÁY TRỐN.
+          ~~Hẹn 20/7 trả ở 45 Đoàn Kết~~ *(gạch xóa)*
+          --> "BÙNG HẸN, TẮT MÁY!
+               HẠN CHÓT 25/7: RẢI TỜ RƠI + NÉM GIẤY NỢ
+               VÀO NHÀ BỐ VỢ Ở 45 ĐOÀN KẾT!
+               Không trả thì tao BẠCH HÓA CẢ GIA ĐÌNH!"
+• 23/07 — (14:22) Nhắn SMS: "300 triệu tiền nợ quá hạn
+          từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì
+          đừng trách tao ném giấy nợ cho bố vợ mày xem mặt
+          thằng rể quý!"
+• 24/07 — (18:15) Gọi 28 giây, nói ngắn gọn:
+          "Chiều nay con Mai sang đòi đất, mày cũng sang.
+           Nói cho mày biết trước: KHÔNG TRẢ THÌ XONG!"
+          --> Chiều tối 24/07: Vợ chồng hắn sang nhà tao.
+              Con Mai cãi nhau đòi đất xong bỏ về.
+              Thằng Lệch Pha ở lại quỳ lạy xin hoãn nợ.
+              TÁT CHO 1 CÁI SƯNG MÁ rồi đuổi đi.
+
+TỔNG NỢ CÒN LẠI TÍNH ĐẾN 24/07: 300.000.000đ ★★
+──────────────────────────────────────
+Chữ ký con nợ:
+
+________________
+(Lê Quang Vũ)
+```
+
+---
+
+## ═══════════════════════════════════════
+## TRANG 7 — KÉT ĐỒNG NÁT
+## ═══════════════════════════════════════
+
+```text
+KÉT ĐỒNG NÁT
+SĐT: 0973.665.412
+Nghề: Buôn phế liệu, thu mua đồng nát
+──────────────────────────────────────
+
+THÁNG 04/2016:
+• 10/04 — Cho vay 150.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 120 triệu.
+          Lãi ngày: 600.000đ/ngày.
+          * Thằng này mũi to như mỏ két, dân phế liệu
+            quen biết bến phà. Tính tình xuề xòa nhưng
+            tiền bạc sòng phẳng. Khách ngon.
+
+• 17/04 — Thu lãi kỳ 1 (ngày 1→7): 4.200.000đ. Đóng đủ, đúng hẹn.
+• 24/04 — Thu lãi kỳ 2 (ngày 8→14): 4.200.000đ. Đóng đủ.
+
+THÁNG 05/2016:
+• 01/05 — Thu lãi kỳ 3 (ngày 15→21): 4.200.000đ. Đóng đủ.
+• 08/05 — Thu lãi kỳ 4 (ngày 22→28): 4.200.000đ. Đóng đủ.
+• 15/05 — Thu lãi kỳ 5 (ngày 29→35): 4.200.000đ. Đóng đủ.
+• 22/05 — Thu lãi kỳ 6 (ngày 36→42): 4.200.000đ. Đóng đủ.
+• 29/05 — Thu lãi kỳ 7 (ngày 43→49): 4.200.000đ. Đóng đủ.
+• 30/05 — Ngày 50: TẤT TOÁN NỢ GỐC 150 TRIỆU.
+          Trả đủ gốc 150tr.
+          --> "Cường trả sòng phẳng, khách tốt.
+               Hỏi vay thêm khoản mới."
+
+THÁNG 06/2016:
+• 05/06 — Cho vay lần 2: 200.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 160 triệu.
+          Lãi ngày: 750.000đ/ngày.
+
+• 12/06 — Thu lãi kỳ 1 (ngày 1→7): 5.250.000đ. Đóng đủ.
+• 19/06 — Thu lãi kỳ 2 (ngày 8→14): 5.250.000đ. Đóng đủ.
+• 26/06 — Thu lãi kỳ 3 (ngày 15→21): 5.250.000đ. Đóng đủ.
+
+THÁNG 07/2016:
+• 03/07 — Thu lãi kỳ 4 (ngày 22→28): 5.250.000đ. Đóng đủ.
+• 10/07 — Thu lãi kỳ 5 (ngày 29→35): 5.250.000đ. Đóng đủ.
+• 17/07 — Thu lãi kỳ 6 (ngày 36→42): 5.250.000đ. Đóng đủ.
+          --> Hẹn 05/08 tất toán. Cường đóng đều, không lo.
+
+TỔNG NỢ CÒN LẠI TÍNH ĐẾN 24/07: 200.000.000đ
+(Hạn tất toán gốc: 05/08 — Đang đóng đều, chưa quá hạn)
+──────────────────────────────────────
+Chữ ký con nợ:
+
+________________
+(Nguyễn Văn Cường)
+```
+
+---
+
+## ═══════════════════════════════════════
+## TRANG 9 — LÁC BẾN PHÀ
+## ═══════════════════════════════════════
+
+```text
+LÁC BẾN PHÀ
+SĐT: 0918.776.543
+Nghề: Xe ôm + bốc vác thuê bến phà
+──────────────────────────────────────
+
+THÁNG 03/2016:
+• 20/03 — Cho vay 80.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 64 triệu.
+          Lãi ngày: 400.000đ/ngày.
+          * Thằng này lác mắt nặng, chạy xe ôm bến phà.
+            Vay tiền đánh đề. Loại này hay bùng!
+
+• 27/03 — Thu lãi kỳ 1 (ngày 1→7): 2.800.000đ. Đóng đủ.
+• 03/04 — Thu lãi kỳ 2 (ngày 8→14): 2.800.000đ. Đóng đủ.
+• 10/04 — Thu lãi kỳ 3 (ngày 15→21): 2.800.000đ. THIẾU 1tr.
+          --> "Nó nói bến phà ế khách. Kệ, cho khất 2 ngày."
+• 12/04 — Nhận bù 1tr.
+
+THÁNG 04/2016:
+• 17/04 — Thu lãi kỳ 4 (ngày 22→28): 2.800.000đ. Đóng đủ.
+• 24/04 — Thu lãi kỳ 5 (ngày 29→35): 2.800.000đ. THIẾU 2tr.
+          --> Hắn nói bị ốm nằm nhà. Gọi 3 lần mới nghe máy.
+              "Ốm cũng phải trả! Mày mà bùng thì tao
+               BÁN LUÔN XE DREAM CỦA MÀY TRỪ NỢ!"
+• 01/05 — Thu lãi kỳ 6 (ngày 36→42): 2.800.000đ + bù 2tr.
+          --> Tổng thu 4.800.000đ. Chấp nhận.
+• 08/05 — Thu lãi kỳ 7 (ngày 43→49): 2.800.000đ. Đóng đủ.
+• 09/05 — Ngày 50: TẤT TOÁN NỢ GỐC 80 TRIỆU. KHÔNG TRẢ.
+          --> KHÓA MÁY, TRỐN NỢ. GỌI HOÀI KHÔNG NGHE.
+              Cho người canh bến phà, tóm được thì lôi về.
+
+THÁNG 05/2016:
+• 15/05 — Tay chân đi canh bến phà 3 ngày, BẮT ĐƯỢC.
+          Hắn năn nỉ xin trả góp mỗi tuần 5 triệu.
+          --> "Trốn nợ tao hả? ĐÁNH CHO MỘT TRẬN rồi
+               cho trả góp. Thiếu 1 tuần nữa thì bán xe
+               + ĐĂNG ẢNH LÊN FACEBOOK CHO CẢ BẾN PHÀ BIẾT!"
+          Phạt trốn nợ: Nợ gốc đẩy lên 120.000.000đ
+          (phạt 40tr do trốn nợ).
+
+THÁNG 06/2016:
+• 22/05 → 03/07 — Trả góp 5 triệu/tuần, 7 kỳ:
+          Đã thu 35.000.000đ. Còn thiếu 85.000.000đ.
+• 10/07 — Trả thêm 5 triệu. Còn 80.000.000đ.
+• 17/07 — Trả thêm 5 triệu. Còn 75.000.000đ.
+
+THÁNG 07/2016:
+• 20/07 — KHÓA MÁY LẦN 2! TẮT ĐIỆN THOẠI TRỐN NỢ LẦN 2!
+          --> "THẰNG NÀY LIỀU THẬT! TRỐN LẦN NỮA THÌ
+               CHO NGƯỜI XUỐNG BẾN PHÀ ĐẬP XE, NÉM XUỐNG
+               SÔNG CHO RỒI! KHÔNG THA!"
+          --> Cho 2 thằng đệ canh cổng bến phà, thấy mặt
+              thì lôi đến nhà tao.
+
+TỔNG NỢ CÒN LẠI TÍNH ĐẾN 24/07: 75.000.000đ
+(Trốn nợ 2 lần, ĐANG BỊ TRUY TÌM)
+──────────────────────────────────────
+Chữ ký con nợ:
+
+________________
+(Trần Văn Hải)
+```
+
+---
+
+## ═══════════════════════════════════════
+## TRANG 12 — GÀ CHỢ CẢNG
+## ═══════════════════════════════════════
+
+```text
+GÀ CHỢ CẢNG
+SĐT: 0912.331.888
+Nghề: Buôn gà sống, gà thịt bán sỉ chợ đầu mối
+──────────────────────────────────────
+
+THÁNG 05/2016:
+• 10/05 — Cho vay 80.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 64 triệu.
+          Lãi ngày: 350.000đ/ngày.
+          * Thằng này bặm trợn, bán gà chợ đầu mối.
+            Tính nóng như lửa, nhưng buôn bán đều tay
+            nên thu lãi ko lo lắm.
+
+• 17/05 — Thu lãi kỳ 1 (ngày 1→7): 2.450.000đ. Đóng đủ.
+• 24/05 — Thu lãi kỳ 2 (ngày 8→14): 2.450.000đ. Đóng đủ.
+• 31/05 — Thu lãi kỳ 3 (ngày 15→21): 2.450.000đ. Đóng đủ.
+
+THÁNG 06/2016:
+• 07/06 — Thu lãi kỳ 4 (ngày 22→28): 2.450.000đ. Đóng đủ.
+• 14/06 — Thu lãi kỳ 5 (ngày 29→35): 2.450.000đ. Đóng đủ.
+• 21/06 — Thu lãi kỳ 6 (ngày 36→42): 2.450.000đ. Trễ 3 ngày.
+          --> Hắn nói lô gà bị dịch chết hết một xe.
+              "Gà chết mặc gà, nợ tao thì phải trả!
+               Trễ lần nữa tao XUỐNG DẸP SẠP GÀ!"
+• 28/06 — Thu lãi kỳ 7 (ngày 43→49): 2.450.000đ. Đóng đủ.
+• 29/06 — Ngày 50: TẤT TOÁN NỢ GỐC 80 TRIỆU.
+          --> KHÔNG TRẢ. XIN KHẤT 1 THÁNG.
+              "Khất 1 tháng?? Phạt gia hạn 10 triệu.
+               Gốc đẩy lên 90 triệu. Hạn: 28/07."
+
+THÁNG 07/2016:
+• 06/07 — Hắn mang đến 20 triệu trả trước. Còn 70 triệu.
+• 13/07 — Mang thêm 10 triệu. Còn 60 triệu.
+• 20/07 — Mang thêm 10 triệu. Còn 50 triệu.
+• 24/07 — (18:45) Gọi điện 1 phút 40 giây:
+          Hắn xin khất, nói cuối tháng bán xong lô gà mới
+          mới có tiền trả nốt. Cãi nhau qua điện thoại.
+          --> "20:09 (24/7) gọi lại xin khất thêm 1 tuần.
+               KHÔNG CHO! Đến 28/7 không trả:
+               CHO NGƯỜI XUỐNG DẸP SẠP GÀ, SIẾT ĐỒ!"
+
+TỔNG NỢ CÒN LẠI TÍNH ĐẾN 24/07: 50.000.000đ
+(Hạn chót 28/07 — ĐANG BỊ DỌA DẸP SẠP)
+──────────────────────────────────────
+Chữ ký con nợ:
+
+________________
+(Nguyễn Văn Đạt)
+```
+
+---
+
+## ═══════════════════════════════════════
+## TRANG 15 — LAN NƯỚC CHÈ
+## ═══════════════════════════════════════
+
+```text
+LAN NƯỚC CHÈ
+SĐT: 0932.889.102
+Nghề: Bán nước chè, thuốc lá lẻ, tạp hóa nhỏ
+──────────────────────────────────────
+
+THÁNG 01/2016:
+• 05/01 — Cho vay 30.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 24 triệu.
+          Lãi ngày: 150.000đ/ngày.
+          * Chị Lan bán quán nước ngay trước cổng nhà tao.
+            Vay ít, lãi nhỏ, đóng đều. Tiền lãi cấn trừ
+            vào tiền nước chè + thuốc lá tao mua hàng tuần.
+
+• 12/01 — Thu lãi kỳ 1 (ngày 1→7): 1.050.000đ.
+          Cấn trừ: tao mua 2 cây thuốc Jet 520k + nước chè
+          cả tuần 200k = 720k → chị trả thêm 330k tiền mặt.
+• 19/01 — Thu lãi kỳ 2 (ngày 8→14): 1.050.000đ.
+          Cấn trừ tương tự. Đóng đều.
+• 26/01 — Thu lãi kỳ 3 (ngày 15→21): 1.050.000đ. Cấn trừ đều.
+
+THÁNG 02/2016:
+• 02/02 → 22/02 — Kỳ 4→6 (ngày 22→42): mỗi kỳ 1.050.000đ.
+          Đóng đều đặn, cấn trừ tiền nước chè + thuốc lá.
+          --> Chị Lan đóng sòng phẳng nhất trong sổ.
+              Không bao giờ phải nhắc. Khách VIP.
+
+THÁNG 03/2016:
+• 01/03 — Thu lãi kỳ 7 (ngày 43→49): 1.050.000đ. Cấn trừ đều.
+• 05/03 — Ngày 50: TẤT TOÁN NỢ GỐC 30 TRIỆU. TRẢ ĐỦ.
+          --> Xong khoản 1. Chị xin vay thêm khoản mới.
+
+• 10/03 — Cho vay lần 2: 40.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 32 triệu.
+          Lãi ngày: 180.000đ/ngày.
+
+• 17/03 → 28/04 — Kỳ 1→7 (ngày 1→49): mỗi kỳ 1.260.000đ.
+          Đóng đều, cấn trừ nước chè thuốc lá hàng tuần.
+          Không trễ ngày nào.
+
+THÁNG 04/2016:
+• 29/04 — Ngày 50: TẤT TOÁN NỢ GỐC 40 TRIỆU. TRẢ ĐỦ.
+          --> Xong khoản 2. Hỏi vay khoản 3.
+
+THÁNG 05/2016:
+• 05/05 — Cho vay lần 3: 50.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 40 triệu.
+          Lãi ngày: 200.000đ/ngày.
+          Cấn trừ tiền quán như cũ.
+
+• 12/05 → 23/06 — Kỳ 1→7: đóng đều, cấn trừ đều đặn.
+          --> "Chị Lan là con nợ duy nhất chưa bao giờ
+               phải gọi điện đòi. Ước gì thằng nào cũng
+               như chị Lan thì đỡ mệt."
+• 24/06 — Ngày 50: TẤT TOÁN NỢ GỐC 50 TRIỆU. TRẢ ĐỦ.
+
+THÁNG 07/2016:
+• 01/07 — Cho vay lần 4: 50.000.000đ (kỳ hạn 50 ngày).
+          Lãi ngày 200.000đ. Cấn trừ như cũ.
+          Đang thu lãi kỳ 1→3, đóng đều.
+• 24/07 — (17:30) Gọi 42 giây: chị hỏi tao có cần mua thêm
+          cây thuốc không. Bảo để mai tao qua lấy.
+          --> Cuộc gọi bình thường, không liên quan nợ.
+
+TỔNG NỢ CÒN LẠI TÍNH ĐẾN 24/07: 50.000.000đ
+(Đang đóng đều, KHÔNG CÓ VẤN ĐỀ)
+──────────────────────────────────────
+Chữ ký con nợ:
+
+________________
+(Nguyễn Thị Lan)
+```
+
+---
+
+## ═══════════════════════════════════════
+## TRANG 18 — CÒI BA GÁC
+## ═══════════════════════════════════════
+
+```text
+CÒI BA GÁC
+SĐT: 0915.223.789
+Nghề: Lái xe ba gác, bốc dỡ hàng thuê
+──────────────────────────────────────
+
+THÁNG 06/2016:
+• 15/06 — Cho vay 40.000.000đ (kỳ hạn 50 ngày).
+          Thực nhận 32 triệu.
+          Lãi ngày: 200.000đ/ngày.
+          * Bình Còi, thằng này hay rủ tao đi đánh bi-a.
+            Vay 40 triệu nói mua thêm xe ba gác chạy hàng.
+            Hàng xóm Bờ Sông, quen từ nhỏ.
+
+• 22/06 — Thu lãi kỳ 1 (ngày 1→7): 1.400.000đ. Đóng đủ.
+• 29/06 — Thu lãi kỳ 2 (ngày 8→14): 1.400.000đ. Đóng đủ.
+
+THÁNG 07/2016:
+• 06/07 — Thu lãi kỳ 3 (ngày 15→21): 1.400.000đ. Trễ 1 ngày.
+          --> Gọi nhắc. Hắn nói kẹt xe ba gác bị hỏng.
+              Cho qua.
+• 13/07 — Thu lãi kỳ 4 (ngày 22→28): 1.400.000đ. Đóng đủ.
+• 20/07 — Thu lãi kỳ 5 (ngày 29→35): 1.400.000đ. Đóng đủ.
+          --> Đã thu được 15 ngày lãi. Còn 35 ngày nữa.
+              Thằng này đóng đều, ko đáng lo.
+• 24/07 — (18:00) Gọi 1 phút 15 giây: rủ tao đi đánh bi-a
+          tối nay. Tao bảo BẬN, TỪ CHỐI. (Tối nay có việc
+          với vợ chồng con Mai sang đòi đất + thằng Lệch Pha
+          nợ chưa trả).
+          --> Cuộc gọi bình thường, không liên quan nợ.
+
+TỔNG NỢ CÒN LẠI TÍNH ĐẾN 24/07: 40.000.000đ
+(Đang trong kỳ, đóng đều, hạn tất toán 10/08)
+──────────────────────────────────────
+Chữ ký con nợ:
+
+________________
+(Phạm Văn Bình)
+```
+
+---
+
+## ═══════════════════════════════════════
+## GHI CHÉP GÓC DƯỚI TRANG CUỐI SỔ
+## (BÚT BI XANH, NÉT VIẾT VỘI VÃ, NGHIÊNG VỀ BÊN PHẢI)
+## ═══════════════════════════════════════
+
+```text
+TỔNG KẾT NỢ ĐANG THU TÍNH ĐẾN 24/07/2016:
+────────────────────────────────────────
+1. Tuấn Béo Xưởng Mộc    370 triệu  ← NỢ LỚN NHẤT, chây ì
+2. Thằng Lệch Pha (Vũ)   300 triệu  ← BÙNG HẸN, sắp rải tờ rơi
+3. Cường Mũi Két          200 triệu  ← đóng đều, ko lo
+4. Hải Lác Bến Phà         75 triệu  ← TRỐN NỢ 2 LẦN, đang truy
+5. Đạt Gà Chợ Cảng         50 triệu  ← chây ì, dọa dẹp sạp
+6. Chị Lan Quán Nước        50 triệu  ← đóng đều, VIP
+7. Bình Còi                 40 triệu  ← đóng đều, ko lo
+────────────────────────────────────────
+TỔNG NỢ PHẢI THU:       ~1.085 triệu
+
+- Gom nốt các khoản nợ đến hạn trước 25/7.
 - Tiền mặt két sắt phòng ngủ: ~850 triệu.
 - Rút sổ tiết kiệm: 1,2 tỷ.
 => Tổng gom hơn 2 tỷ mang theo.
 - Vé máy bay sáng 25/7 (chuyến 06:15) vào trong đó với Bé Vy ❤️.
+- Dặn Cường trả nốt gốc qua TK Vietcombank.
+- Thằng Hải Lác + Đạt Gà: KỆ MẸ CHÚNG NÓ.
+  Bùng thì bùng, tao đi rồi ai đòi!
 ```

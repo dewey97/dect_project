@@ -65,13 +65,13 @@
                                           │
         ┌────────────────────────────────┴────────────────────────────────┐
         ▼                                                                 ▼
-[MÓN NỢ BỐC HỌ 300 TRIỆU]                                         [NỖI SỢ BỊ GIA ĐÌNH VỢ KHINH BỈ]
+[MÓN NỢ 300 TRIỆU TÍN DỤNG ĐEN]                                    [NỖI SỢ BỊ GIA ĐÌNH VỢ KHINH BỈ]
 - Nhận thầu công trình điện bị đọng vốn.                           - Ở rể, tự ti trước sự giỏi giang của Mai.
 - Vay nặng lãi của Khang (hạn trả 20/07).                          - Khang dọa: "Tao in 100 tờ rơi rải khắp phố
 - Khang liên tục đe dọa ném giấy nợ về nhà bố vợ.                    Đoàn Kết cho bố vợ mày nhục mặt!"
 ```
 
-1. **Sai lầm tài chính:** Đầu năm 2016, Vũ nhận thầu phụ lắp đặt điện nhưng bị đọng vốn. Sợ gia đình vợ coi thường, Vũ tìm đến Khang bốc bát họ **300 triệu đồng**.
+1. **Sai lầm tài chính:** Đầu năm 2016, Vũ nhận thầu phụ lắp đặt điện nhưng bị đọng vốn. Sợ gia đình vợ coi thường, Vũ tìm đến Khang vay nặng lãi **300 triệu đồng**. Vũ sử dụng số điện thoại thứ hai (`0967.452.183`) để liên lạc vay nợ nhằm giấu vợ.
 2. **Bùng hẹn ngày 20/07:** Đến hạn ngày 20/07 Vũ không xoay được tiền nên bùng hẹn gặp tại số 45 Đoàn Kết. Khang nhắn SMS đe dọa lúc 14:22 ngày 23/07: *"300 triệu tiền họ quá hạn từ ngày 20 rồi, mày bùng hẹn ở 45 Đoàn Kết thì đừng trách tao ném giấy nợ cho bố vợ mày xem mặt thằng rể quý!"*.
 3. **Thế cùng lực kiệt:** Khi thấy Mai sang đòi đất, Vũ nán lại quỳ lạy xin Khang hoãn nợ nhưng bị Khang tát sưng má và đe dọa rải tờ rơi khắp ngõ.
 
@@ -117,9 +117,9 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 
 ## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
 
-### 1. Cơ chế 1: Đối chiếu Sổ nợ `05` & Biệt danh "Thằng Lệch Pha"
-* **Vật chứng:** Cuốn sổ nợ `05` dòng 05: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0988.20.09.91 — Hạn: 20/07 — Ghi chú: ~~Hẹn 20/7 trả ở 45 Đoàn Kết~~ Bùng hẹn, tắt máy. Hạn chót 25/7: rải tờ rơi + ném giấy nợ vào nhà bố vợ ở 45 Đoàn Kết!*.
-* **Khớp nối suy luận:** Nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08b` + địa chỉ 45 Đoàn Kết + SĐT `0988.20.09.91` $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ!
+### 1. Cơ chế 1: Đối chiếu Sổ nợ `10` & Biệt danh "Thằng Lệch Pha"
+* **Vật chứng:** Cuốn sổ nợ `10` trang 5: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0967.452.183 — Chữ ký con nợ: Lê Quang Vũ — Ghi chú: ~~Hẹn 20/7 trả ở 45 Đoàn Kết~~ Bùng hẹn, tắt máy. Hạn chót 25/7: rải tờ rơi + ném giấy nợ vào nhà bố vợ ở 45 Đoàn Kết!*.
+* **Khớp nối suy luận:** Biệt danh "Lệch Pha" trong sổ nợ trùng với biệt danh Khang gọi con nợ trong SMS thread `0988.20.09.91` + chữ ký "Lê Quang Vũ" trong sổ nợ + nghề kỹ sư điện + mắt trái lác nhẹ trong ảnh lý lịch `08b` + nhắc đến 45 Đoàn Kết (nhà bố vợ) $\rightarrow$ Bóc trần Vũ chính là con nợ 300M đang bị siết nợ! (SĐT `0967.452.183` là số thứ 2 Vũ dùng riêng để vay nợ giấu vợ, số chính `0988.20.09.91` khớp ngày sinh 20/09/91).
 
 ### 2. Cơ chế 2: Câu đố Sổ thu chi Quán Bia 88 (`06_so_thu_chi_quan_bia.md`)
 * **Dữ liệu đối chiếu:**

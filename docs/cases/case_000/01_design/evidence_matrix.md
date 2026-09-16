@@ -31,8 +31,8 @@ Thiết bị: **iPhone 6s Plus màu đen (Touch ID) của nạn nhân Nguyễn V
 
 | Ứng Dụng (App) | Nội Dung Dữ Liệu | Mục Đích Điều Tra Trong Game |
 | :--- | :--- | :--- |
-| 💬 **Tin nhắn (Messages)** | • **23/07 14:22:** Khang ➔ Vũ (`0988.20.09.91`): Đe dọa đòi nợ 300M bốc họ quá hạn.<br>• **24/07 17:30 – 17:55:** Khang ↔ Bé Vy ❤️: Hẹn gom tiền trốn bay 06:15 đi Đà Lạt, chửi Hà phiền phức.<br>• **24/07 19:15:** Hà Kế Toán ➔ Khang (🔕): Báo mang hũ trà hoa cúc mới sao sang. | Bộc lộ động cơ nợ nần của Vũ và kích nổ cơn ghen cuồng loạn của Hà lúc 20:45 khi xem trộm điện thoại. |
-| 📞 **Nhật ký cuộc gọi (Call Log)** | • **17:30:** Chị Lan Quán Nước (`0932.889.102` — Đã nghe 42s — Nhiễu)<br>• **18:00:** Bình Còi (`0915.223.789` — Đã nghe 1m15s — Nhiễu)<br>• **18:15:** `0988.20.09.91` (Đã nghe 28s ➔ Lê Quang Vũ)<br>• **18:45:** `0912.331.888` (Đã nghe 1m40s ➔ Đạt Gà Chợ Cảng)<br>• **19:55:** `0984.180.357` (Đã nghe 35s ➔ Nguyễn Thanh Tùng)<br>• **20:31:** Hà Kế Toán (`0984.112.568` — Cuộc gọi nhỡ 45s) | Khởi động giải đố Tuyến B: Tra cứu 3 SĐT ẩn danh để tìm ra danh tính Vũ, Đạt Gà và Nguyễn Thanh Tùng. |
+| 💬 **Tin nhắn (Messages)** | *(Nội dung chi tiết: [`dev00_tin_nhan_sms.md`](file:///c:/Users/Admin/dect_prj/docs/cases/case_000/03_documents/00_khoi_dau/dev00_tin_nhan_sms.md))*<br>• **Thread 1 — `0967.452.183` (4 tin, 21–24/07):** Khang đòi nợ 300M leo thang từ nhắc nhở → đe dọa rải tờ rơi → hạn chót ném giấy nợ vào cơ quan vợ. Gọi con nợ là *"Lệch Pha"*.<br>• **Thread 2 — `Bé Vy ❤️` (8 tin, chiều 24/07):** Khang hẹn bay VietJet 06:15 đi Đà Lạt, gọi Hà là *"con phiền phức bám đuôi, lì như đỉa"*.<br>• **Thread 3 — `Hà Kế Toán` (5 tin, 22–24/07):** Hà nhắn yêu thương ân cần một chiều. Khang chỉ đáp 1 lần: *"Đừng có sang. Bận."*. Tin cuối 19:15 về hũ trà hoa cúc. | Bộc lộ động cơ nợ nần của Vũ; thể hiện tính cách hung hãn/sở khanh/tàn nhẫn của Khang; kích nổ cơn ghen cuồng loạn của Hà lúc 20:45 khi xem trộm điện thoại thấy thread Bé Vy ❤️. |
+| 📞 **Nhật ký cuộc gọi (Call Log)** | • **17:30:** Chị Lan Quán Nước (`0932.889.102` — Đã nghe 42s — Nhiễu)<br>• **18:00:** Bình Còi (`0915.223.789` — Đã nghe 1m15s — Nhiễu)<br>• **18:15:** `0967.452.183` (Đã nghe 28s ➔ Lê Quang Vũ)<br>• **18:45:** `0912.331.888` (Đã nghe 1m40s ➔ Đạt Gà Chợ Cảng)<br>• **19:55:** `0984.180.357` (Đã nghe 35s ➔ Nguyễn Thanh Tùng)<br>• **20:31:** Hà Kế Toán (`0984.112.568` — Cuộc gọi nhỡ 45s) | Khởi động giải đố Tuyến B: Tra cứu 3 SĐT ẩn danh để tìm ra danh tính Vũ, Đạt Gà và Nguyễn Thanh Tùng. |
 | 🎙️ **Hộp thư thoại (Voicemail)** | • **20:32:15:** File ghi âm 18 giây từ Trần Thị Hà (`0984.112.568`): Thì thầm nhớ nhung, lọt rõ **tiếng còi tàu hỏa diesel D19E & tiếng chuông cảnh báo rào chắn đường sắt 20:30**. | Manh mối cốt lõi bẻ gãy alibi phòng trọ của Hà, chứng minh Hà đứng trước cổng nhà Khang lúc 20:32. |
 | 👤 **Danh bạ (Contacts)** | • Lưu sẵn: *Chị Lan Quán Nước*, *Bình Còi*, *Bé Vy ❤️*, *Hà Kế Toán*. | Phân loại số có tên sẵn (Nhiễu) vs số lạ không lưu danh bạ. |
 
@@ -81,7 +81,7 @@ Thiết bị: **iPhone 6s Plus màu đen (Touch ID) của nạn nhân Nguyễn V
 ### 1. Giai đoạn 0 — Hồ sơ Khởi đầu (`00_khoi_dau/`):
 - `01_tiep_nhan_tin_bao.md` (Phiếu tiếp nhận tin báo từ bà Lụa lúc 06:45 sáng 25/07)
 - `02_quyet_dinh_khoi_to.md` (Quyết định khởi tố vụ án hình sự)
-- `so_ghi_no_05.md` (Sổ tay ghi nợ cá nhân của Khang thu tại hiện trường: theo dõi bốc bát họ, nợ nần "Thằng Lệch Pha" 300M, Đạt Gà 80M — dùng chung Tuyến A & B)
+- `so_ghi_no_05.md` (Sổ tay ghi nợ cá nhân của Khang thu tại hiện trường: theo dõi cho vay nặng lãi, nợ nần "Thằng Lệch Pha" 300M (SĐT `0967.452.183`, chữ ký `Lê Quang Vũ`), Đạt Gà 50M — dùng chung Tuyến A & B)
 - `06_tien_do_dieu_tra.md` (Báo cáo tiến độ ban đầu kèm kết quả pháp y tử thi ~21:00 và tóm tắt vật chứng hiện trường)
 - `07_nhan_than_nan_nhan.md` (Lý lịch nạn nhân Nguyễn Văn Khang)
 - `08a_ly_lich_tran_ngoc_mai.md` (Lý lịch tư pháp nghi phạm Nguyễn Ngọc Mai)
