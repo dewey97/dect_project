@@ -91,7 +91,7 @@ export function DossierResultModal({
                   }}
                   className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer border-2 border-amber-400 shadow-md"
                 >
-                  ⚡ TIẾP TỤC: MỞ CÂU HỎI 1
+                  ⚡ TIẾP TỤC: MỞ CÂU HỎI
                 </button>
               ) : <div />}
 

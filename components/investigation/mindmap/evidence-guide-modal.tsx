@@ -83,7 +83,7 @@ export function EvidenceGuideModal({
                   : 'border-[#b89569] bg-[#fbf8f1]'
               )}
             >
-              <div className="flex items-center justify-between gap-2 border-b border-[#2b1f14]/15 pb-2">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <div className="size-7 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-xs">
                     1
@@ -113,7 +113,7 @@ export function EvidenceGuideModal({
                   <strong>Nhiệm vụ:</strong> Đòi hỏi truy vết các số điện thoại lạ trong đêm 24/07 và bóc tách các mối liên hệ phức tạp của nạn nhân Khang (khoản nợ cá độ, mối làm ăn vật liệu xây dựng, ân oán quá khứ).
                 </p>
                 <p className="text-[12px] text-[#5c4026] bg-[#eedfc8] p-2 border border-[#d2bf9f] font-mono">
-                  💡 <strong>Cách thực hiện:</strong> Đối chiếu dữ liệu giữa <strong>Hồ sơ tài liệu</strong> (Sổ nợ <code className="bg-[#dfccb0] px-1 py-0.2">10</code>, Bảng tin rao vặt <code className="bg-[#dfccb0] px-1 py-0.2">11</code>) và <strong>Điện thoại nạn nhân Khang</strong> (Call Log <code className="bg-[#dfccb0] px-1 py-0.2">dev-00</code>) để xác định danh tính 3 chủ thuê bao.
+                  💡 <strong>Cách thực hiện:</strong> Đối chiếu dữ liệu giữa <strong>Hồ sơ tài liệu</strong> và <strong>Điện thoại nạn nhân Khang</strong> để xác định danh tính 3 chủ thuê bao.
                 </p>
               </div>
 
@@ -139,11 +139,11 @@ export function EvidenceGuideModal({
               className={cn(
                 'p-4 border-2 transition-all space-y-3 relative',
                 isReinvestigateUnlocked
-                  ? 'border-emerald-800/60 bg-[#edf7ee]'
+                  ? 'border-amber-700/60 bg-[#fdf9f0]'
                   : 'border-zinc-400 bg-[#ebe7df] opacity-85'
               )}
             >
-              <div className="flex items-center justify-between gap-2 border-b border-[#2b1f14]/15 pb-2">
+              <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <div className="size-7 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-xs">
                     2
@@ -157,8 +157,8 @@ export function EvidenceGuideModal({
                 </div>
 
                 {isReinvestigateUnlocked ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-800 text-emerald-100 font-mono text-[10px] font-bold uppercase tracking-wider">
-                    <Unlock className="size-3 text-emerald-300" />
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-800 text-amber-100 font-mono text-[10px] font-bold uppercase tracking-wider">
+                    <Unlock className="size-3 text-amber-300" />
                     ĐÃ MỞ KHÓA
                   </span>
                 ) : (
@@ -176,12 +176,11 @@ export function EvidenceGuideModal({
                 <div className="text-[12px] p-2 bg-[#dfd6c8] border border-[#c5b7a3] font-mono space-y-1">
                   <div className="font-bold text-[#6b1e1e] flex items-center gap-1">
                     <AlertCircle className="size-3.5 text-[#8c1d1d]" />
-                    ĐIỀU KIỆN MỞ KHÓA (CẦN ĐẠT 1 TRONG 2):
+                    ĐIỀU KIỆN MỞ KHÓA:
                   </div>
-                  <ul className="list-disc pl-5 space-y-0.5 text-[#3b2b1a]">
-                    <li>Xác định & lưu trữ từ <strong>2 nghi phạm trở lên</strong> trên Bảng điều tra.</li>
-                    <li>Hoặc: Đã <strong>nộp kết quả tra cứu danh tính 3 SĐT</strong> ở nhánh Mở rộng điều tra.</li>
-                  </ul>
+                  <p className="text-[#3b2b1a] pl-1">
+                    Hoàn thành trả lời các câu hỏi suy luận đối với cả 2 đối tượng <strong>Lê Quang Vũ</strong> và <strong>Nguyễn Thanh Tùng</strong>.
+                  </p>
                 </div>
               </div>
 
@@ -194,15 +193,15 @@ export function EvidenceGuideModal({
                       onClose()
                       onOpenReinvestigation()
                     }}
-                    className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-900 hover:bg-emerald-950 text-white font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow active:scale-95"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 bg-[#d97706] hover:bg-[#b45309] text-black font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow active:scale-95 border border-[#b45309]"
                   >
-                    <Search className="size-3.5 text-emerald-300" />
+                    <Search className="size-3.5 text-black" />
                     <span>MỞ BIÊN BẢN KHÁM XÉT LẠI</span>
                     <ArrowRight className="size-3.5" />
                   </button>
                 ) : (
                   <div className="text-[11px] font-mono text-zinc-600 italic">
-                    🔒 Chưa đủ điều kiện mở khóa — Hãy hoàn thành 1 trong 2 điều kiện trên
+                    🔒 Chưa đủ điều kiện mở khóa — Cần trả lời xong câu hỏi của Vũ & Tùng
                   </div>
                 )}
               </div>

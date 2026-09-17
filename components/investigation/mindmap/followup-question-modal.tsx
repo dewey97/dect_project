@@ -11,6 +11,7 @@ interface FollowupQuestionModalProps {
   culprit: 'vu' | 'tung' | null
   onClose: () => void
   onOpenDossier?: (dossierType: 'A' | 'B') => void
+  onSuccess?: (culprit: 'vu' | 'tung') => void
 }
 
 const MOCK_OPTIONS_VU = [
@@ -31,16 +32,31 @@ export function FollowupQuestionModal({
   isOpen,
   culprit,
   onClose,
-  onOpenDossier
+  onOpenDossier,
+  onSuccess
 }: FollowupQuestionModalProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
+  React.useEffect(() => {
+    if (!culprit || !isOpen) return
+    try {
+      const saved = localStorage.getItem(`veritas_followup_${culprit}`)
+      if (saved) {
+        setSelectedOption(saved)
+        setIsSubmitted(true)
+      } else {
+        setSelectedOption(null)
+        setIsSubmitted(false)
+      }
+    } catch {}
+  }, [culprit, isOpen])
+
   if (!isOpen || !culprit) return null
 
   const isVu = culprit === 'vu'
-  const title = isVu ? 'CÂU HỎI 1 — TRUY VẤN ĐỐI TƯỢNG LÊ QUANG VŨ' : 'CÂU HỎI 1 — TRUY VẤN ĐỐI TƯỢNG NGUYỄN THANH TÙNG'
+  const title = isVu ? 'CÂU HỎI — TRUY VẤN ĐỐI TƯỢNG LÊ QUANG VŨ' : 'CÂU HỎI — TRUY VẤN ĐỐI TƯỢNG NGUYỄN THANH TÙNG'
   const questionText = isVu
     ? 'Hành vi và động cơ mấu chốt nào dẫn tới sự hiện diện của Lê Quang Vũ tại hiện trường vào đêm xảy ra án mạng 24/07?'
     : 'Yếu tố tâm lý và xung đột cốt lõi nào đã kích hoạt cơn thịnh nộ của Nguyễn Thanh Tùng trước khi án mạng xảy ra?'
@@ -57,6 +73,12 @@ export function FollowupQuestionModal({
     detectiveAudio.playStampSound()
     setIsSubmitted(true)
     setErrorMsg('')
+    try {
+      localStorage.setItem(`veritas_followup_${culprit}`, selectedOption)
+    } catch {}
+    if (onSuccess) {
+      onSuccess(culprit)
+    }
   }
 
   return (
@@ -112,7 +134,7 @@ export function FollowupQuestionModal({
 
             {/* HƯỚNG DẪN MỞ TÚI HỒ SƠ */}
             <div className="p-4 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none space-y-2.5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-[#a88c6f]/40 pb-1.5">
+              <div className="flex items-center justify-between">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider block">
                   📂 HƯỚNG DẪN MỞ TÚI HỒ SƠ {isVu ? 'A' : 'B'}
                 </span>
@@ -137,7 +159,7 @@ export function FollowupQuestionModal({
             {/* QUESTION BOX */}
             <div className="p-4 bg-[#f4ebd9] border-2 border-[#a88c6f] rounded-none">
               <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
-                CÂU HỎI 1:
+                CÂU HỎI:
               </span>
               <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
                 {questionText}
@@ -186,7 +208,7 @@ export function FollowupQuestionModal({
             </div>
 
             {/* FOOTER */}
-            <div className="pt-3 border-t-2 border-[#2b1f14]/20 flex items-center justify-between">
+            <div className="pt-2 flex items-center justify-between">
               <button
                 type="button"
                 onClick={onClose}

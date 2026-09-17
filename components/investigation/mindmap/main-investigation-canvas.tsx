@@ -46,6 +46,7 @@ export function MainInvestigationCanvas({
   const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false)
 
   const [investigatedSuspects, setInvestigatedSuspects] = useState<('vu' | 'tung')[]>([])
+  const [solvedFollowupQuestions, setSolvedFollowupQuestions] = useState<('vu' | 'tung')[]>([])
   const [activeFollowupCulprit, setActiveFollowupCulprit] = useState<'vu' | 'tung' | null>(null)
   const [narrativeCulprit, setNarrativeCulprit] = useState<'vu' | 'tung' | null>(null)
 
@@ -55,17 +56,72 @@ export function MainInvestigationCanvas({
   const [isPhoneLookupOpen, setIsPhoneLookupOpen] = useState(false)
   const [isIndictmentOpen, setIsIndictmentOpen] = useState(false)
 
+  // Helper to resolve canonical suspect key, name, and static slot
+  const getCanonicalSuspectKey = (suspect: { id?: string; name: string }) => {
+    const lower = (suspect.name || '').trim().toLowerCase()
+    const idLower = (suspect.id || '').toLowerCase()
+
+    if (idLower.includes('vu') || lower.includes('vũ') || lower.includes('vu')) {
+      return { canonicalId: 'vu', slotIndex: 0, canonicalName: 'Lê Quang Vũ' }
+    }
+    if (idLower.includes('tung') || lower.includes('tùng') || lower.includes('tung')) {
+      return { canonicalId: 'tung', slotIndex: 1, canonicalName: 'Nguyễn Thanh Tùng' }
+    }
+    if (idLower.includes('ha') || lower.includes('hà') || lower.includes('ha')) {
+      return { canonicalId: 'ha', slotIndex: 2, canonicalName: 'Trần Thị Hà' }
+    }
+    if (idLower.includes('mai') || lower.includes('mai')) {
+      return { canonicalId: 'mai', slotIndex: 3, canonicalName: 'Nguyễn Ngọc Mai' }
+    }
+    if (idLower.includes('dat') || lower.includes('đạt') || lower.includes('dat')) {
+      return { canonicalId: 'dat', slotIndex: 4, canonicalName: 'Trần Văn Đạt (Đạt Gà)' }
+    }
+    if (idLower.includes('lua') || lower.includes('lụa') || lower.includes('lua')) {
+      return { canonicalId: 'lua', slotIndex: 5, canonicalName: 'Nguyễn Thị Lụa' }
+    }
+    if (idLower.includes('khang') || lower.includes('khang')) {
+      return { canonicalId: 'khang', slotIndex: 6, canonicalName: 'Nguyễn Văn Khang' }
+    }
+    return {
+      canonicalId: suspect.id || `suspect-${lower.replace(/\s+/g, '-')}`,
+      slotIndex: 4,
+      canonicalName: suspect.name,
+    }
+  }
+
+  const sanitizeSuspectsList = (items: SuspectItem[]): SuspectItem[] => {
+    const map = new Map<string, SuspectItem>()
+    for (const s of items) {
+      if (!s || !s.name) continue
+      const { canonicalId, canonicalName } = getCanonicalSuspectKey(s)
+      map.set(canonicalId, {
+        ...s,
+        id: canonicalId,
+        name: canonicalName || s.name,
+      })
+    }
+    return Array.from(map.values())
+  }
+
   // Restore saved state from localStorage if available
   useEffect(() => {
     try {
       const savedSuspects = localStorage.getItem('veritas_canvas_suspects')
       if (savedSuspects) {
         const parsed = JSON.parse(savedSuspects)
-        setSuspects(parsed.filter((s: any) => s.id !== 'suspect-default-1'))
+        const validList = parsed.filter((s: any) => s.id !== 'suspect-default-1')
+        const sanitized = sanitizeSuspectsList(validList)
+        setSuspects(sanitized)
       }
-      const savedUnlocked = localStorage.getItem('veritas_reinvestigate_unlocked')
-      if (savedUnlocked === 'true') {
-        setIsReinvestigateUnlocked(true)
+      const savedSolvedFollowups = localStorage.getItem('veritas_solved_followups')
+      if (savedSolvedFollowups) {
+        try {
+          const parsed = JSON.parse(savedSolvedFollowups)
+          setSolvedFollowupQuestions(parsed)
+          if (parsed.includes('vu') && parsed.includes('tung')) {
+            setIsReinvestigateUnlocked(true)
+          }
+        } catch {}
       }
       const savedPhone = localStorage.getItem('veritas_phone_inputs')
       if (savedPhone) {
@@ -92,34 +148,49 @@ export function MainInvestigationCanvas({
   }, [])
 
   const saveSuspectsState = (newSuspects: SuspectItem[]) => {
-    setSuspects(newSuspects)
+    const sanitized = sanitizeSuspectsList(newSuspects)
+    setSuspects(sanitized)
     try {
-      localStorage.setItem('veritas_canvas_suspects', JSON.stringify(newSuspects))
+      localStorage.setItem('veritas_canvas_suspects', JSON.stringify(sanitized))
     } catch {}
   }
 
   const handleSaveSuspect = (savedSuspect: SuspectItem) => {
-    const existingIndex = suspects.findIndex((s) => s.id === savedSuspect.id)
-    let updated: SuspectItem[]
-    if (existingIndex >= 0) {
-      updated = [...suspects]
-      updated[existingIndex] = savedSuspect
-    } else {
-      updated = [...suspects, savedSuspect]
+    const { canonicalId, canonicalName } = getCanonicalSuspectKey(savedSuspect)
+    const normalizedItem: SuspectItem = {
+      ...savedSuspect,
+      id: canonicalId,
+      name: canonicalName || savedSuspect.name,
     }
-    saveSuspectsState(updated)
 
-    if (updated.length >= 2 || phoneLookupSuccess) {
-      setIsReinvestigateUnlocked(true)
+    setSuspects((prev) => {
+      const existingIndex = prev.findIndex((s) => {
+        const sKey = getCanonicalSuspectKey(s)
+        return sKey.canonicalId === canonicalId || s.id === canonicalId
+      })
+      let updated: SuspectItem[]
+      if (existingIndex >= 0) {
+        updated = [...prev]
+        updated[existingIndex] = normalizedItem
+      } else {
+        updated = [...prev, normalizedItem]
+      }
+      const sanitized = sanitizeSuspectsList(updated)
       try {
-        localStorage.setItem('veritas_reinvestigate_unlocked', 'true')
+        localStorage.setItem('veritas_canvas_suspects', JSON.stringify(sanitized))
       } catch {}
-    }
+      return sanitized
+    })
   }
 
   const handleDeleteSuspect = (id: string) => {
-    const suspectToDelete = suspects.find((s) => s.id === id)
-    const updated = suspects.filter((s) => s.id !== id)
+    const { canonicalId } = getCanonicalSuspectKey({ id, name: id })
+    const suspectToDelete = suspects.find(
+      (s) => s.id === id || getCanonicalSuspectKey(s).canonicalId === canonicalId
+    )
+    const updated = suspects.filter(
+      (s) => s.id !== id && getCanonicalSuspectKey(s).canonicalId !== canonicalId
+    )
     saveSuspectsState(updated)
 
     if (suspectToDelete) {
@@ -161,11 +232,23 @@ export function MainInvestigationCanvas({
 
   const handlePhoneLookupSuccess = (phone: string, info: string) => {
     setPhoneLookupSuccess(true)
-    setIsReinvestigateUnlocked(true)
+    setIsPhoneLookupOpen(false)
     setIsPhoneNarrativeOpen(true)
+  }
+
+  const handleFollowupSuccess = (culprit: 'vu' | 'tung') => {
+    const updated = Array.from(new Set([...solvedFollowupQuestions, culprit]))
+    setSolvedFollowupQuestions(updated)
     try {
-      localStorage.setItem('veritas_reinvestigate_unlocked', 'true')
+      localStorage.setItem('veritas_solved_followups', JSON.stringify(updated))
     } catch {}
+
+    if (updated.includes('vu') && updated.includes('tung')) {
+      setIsReinvestigateUnlocked(true)
+      try {
+        localStorage.setItem('veritas_reinvestigate_unlocked', 'true')
+      } catch {}
+    }
   }
 
   const handleSubmitIndictment = (data: {
@@ -177,11 +260,9 @@ export function MainInvestigationCanvas({
   }) => {
     setIsIndictmentSolved(true)
     setSolvedCulprit(data.culprit)
-    setIsReinvestigateUnlocked(true)
     try {
       localStorage.setItem('veritas_indictment_solved', 'true')
       localStorage.setItem('veritas_indictment_culprit', data.culprit)
-      localStorage.setItem('veritas_reinvestigate_unlocked', 'true')
     } catch {}
     setIsEpilogueOpen(true)
   }
@@ -196,6 +277,7 @@ export function MainInvestigationCanvas({
     setSuspects([])
     setPhoneLookupSuccess(false)
     setInvestigatedSuspects([])
+    setSolvedFollowupQuestions([])
     setActiveFollowupCulprit(null)
     setIsIndictmentSolved(false)
     setSolvedCulprit(null)
@@ -207,6 +289,9 @@ export function MainInvestigationCanvas({
     try {
       localStorage.removeItem('veritas_canvas_suspects')
       localStorage.removeItem('veritas_investigated_suspects')
+      localStorage.removeItem('veritas_solved_followups')
+      localStorage.removeItem('veritas_followup_vu')
+      localStorage.removeItem('veritas_followup_tung')
       localStorage.removeItem('veritas_indictment_solved')
       localStorage.removeItem('veritas_indictment_culprit')
       localStorage.removeItem('veritas_reinvestigate_unlocked')
@@ -254,9 +339,15 @@ export function MainInvestigationCanvas({
       setIsFollowupQuestionOpen(true)
     } else if (pinId.startsWith('node-suspect-')) {
       const targetId = pinId.replace('node-suspect-', '')
-      const foundSuspect = suspects.find(
-        (s) => s.id === targetId || s.id === pinId || pinId.endsWith(s.id)
-      )
+      const foundSuspect = suspects.find((s) => {
+        const key = getCanonicalSuspectKey(s)
+        return (
+          s.id === targetId ||
+          key.canonicalId === targetId ||
+          pinId.endsWith(s.id) ||
+          pinId.endsWith(key.canonicalId)
+        )
+      })
       if (foundSuspect) {
         setEditingSuspect(foundSuspect)
         setIsAddSuspectOpen(true)
@@ -275,82 +366,50 @@ export function MainInvestigationCanvas({
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // CỐ ĐỊNH CÁC VỊ TRÍ SLOT NGHI PHẠM (Đồng bán kính, cân đối và thẩm mỹ)
+  // CỐ ĐỊNH CÁC VỊ TRÍ SLOT NGHI PHẠM (Đồng bán kính, cân đối và thẩm mỹ tuyệt đối)
   const DESKTOP_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.10, y: 0.36 }, // Slot 1: Góc trái trên (Lê Quang Vũ)
-    { x: 0.26, y: 0.36 }, // Slot 2: Góc phải trên (Nguyễn Thanh Tùng)
-    { x: 0.26, y: 0.68 }, // Slot 3: Góc phải dưới (Trần Thị Hà)
-    { x: 0.10, y: 0.68 }, // Slot 4: Góc trái dưới (Nguyễn Ngọc Mai)
-    { x: 0.18, y: 0.52 }, // Slot 5: Dự phòng trung tâm
+    { x: 0.10, y: 0.36 }, // Slot 0: Lê Quang Vũ (Góc trái trên)
+    { x: 0.26, y: 0.36 }, // Slot 1: Nguyễn Thanh Tùng (Góc phải trên)
+    { x: 0.26, y: 0.68 }, // Slot 2: Trần Thị Hà (Góc phải dưới)
+    { x: 0.10, y: 0.68 }, // Slot 3: Nguyễn Ngọc Mai (Góc trái dưới)
+    { x: 0.18, y: 0.52 }, // Slot 4: Trần Văn Đạt (Đạt Gà) (Trung tâm)
+    { x: 0.34, y: 0.52 }, // Slot 5: Nguyễn Thị Lụa (Phải giữa)
+    { x: 0.02, y: 0.52 }, // Slot 6: Nguyễn Văn Khang (Trái giữa)
   ], [])
 
   const MOBILE_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.15, y: 0.48 }, // Slot 1: Lê Quang Vũ (Cùng bán kính y=0.48)
-    { x: 0.40, y: 0.48 }, // Slot 2: Nguyễn Thanh Tùng (Cùng bán kính y=0.48)
-    { x: 0.65, y: 0.48 }, // Slot 3: Trần Thị Hà (Cùng bán kính y=0.48)
-    { x: 0.86, y: 0.48 }, // Slot 4: Nguyễn Ngọc Mai (Cùng bán kính y=0.48)
-    { x: 0.52, y: 0.64 }, // Slot 5: Dự phòng
+    { x: 0.15, y: 0.48 }, // Slot 0: Lê Quang Vũ
+    { x: 0.40, y: 0.48 }, // Slot 1: Nguyễn Thanh Tùng
+    { x: 0.65, y: 0.48 }, // Slot 2: Trần Thị Hà
+    { x: 0.86, y: 0.48 }, // Slot 3: Nguyễn Ngọc Mai
+    { x: 0.28, y: 0.64 }, // Slot 4: Trần Văn Đạt (Đạt Gà)
+    { x: 0.72, y: 0.64 }, // Slot 5: Nguyễn Thị Lụa
+    { x: 0.50, y: 0.64 }, // Slot 6: Nguyễn Văn Khang
   ], [])
 
-  // Gán slot cố định bất biến cho từng nghi phạm
-  const suspectSlotMap = React.useMemo(() => {
-    const map = new Map<string, number>()
-    const usedSlots = new Set<number>()
-
-    // Giai đoạn 1: Ưu tiên gán slot theo tên nhân vật chuẩn
-    suspects.forEach((suspect) => {
-      const lower = suspect.name.toLowerCase()
-      let targetSlot = -1
-      if (lower.includes('vũ') || lower.includes('vu')) targetSlot = 0
-      else if (lower.includes('tùng') || lower.includes('tung')) targetSlot = 1
-      else if (lower.includes('hà') || lower.includes('ha')) targetSlot = 2
-      else if (lower.includes('mai')) targetSlot = 3
-
-      if (targetSlot !== -1 && !usedSlots.has(targetSlot)) {
-        map.set(suspect.id, targetSlot)
-        usedSlots.add(targetSlot)
-      }
-    })
-
-    // Giai đoạn 2: Gán slot còn trống cho các đối tượng khác
-    suspects.forEach((suspect) => {
-      if (!map.has(suspect.id)) {
-        for (let i = 0; i < DESKTOP_SUSPECT_SLOTS.length; i++) {
-          if (!usedSlots.has(i)) {
-            map.set(suspect.id, i)
-            usedSlots.add(i)
-            break
-          }
-        }
-      }
-    })
-
-    return map
-  }, [suspects, DESKTOP_SUSPECT_SLOTS.length])
-
-  // Construct dynamic suspect pins
-  const mobileSuspectPins: PinPoint[] = suspects.map((suspect, idx) => {
-    const slotIdx = suspectSlotMap.get(suspect.id) ?? (idx % MOBILE_SUSPECT_SLOTS.length)
-    const slot = MOBILE_SUSPECT_SLOTS[slotIdx] || MOBILE_SUSPECT_SLOTS[0]
+  // Construct dynamic suspect pins with 100% deterministic, stationary slots
+  const mobileSuspectPins: PinPoint[] = suspects.map((suspect) => {
+    const { canonicalId, slotIndex, canonicalName } = getCanonicalSuspectKey(suspect)
+    const slot = MOBILE_SUSPECT_SLOTS[slotIndex] || MOBILE_SUSPECT_SLOTS[0]
     return {
-      id: `node-suspect-${suspect.id}`,
+      id: `node-suspect-${canonicalId}`,
       x: slot.x,
       y: slot.y,
-      label: suspect.name.toUpperCase(),
-      detail: `Nghi phạm: ${suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
+      label: canonicalName || suspect.name,
+      detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
       color: 'yellow' as const,
     }
   })
 
-  const desktopSuspectPins: PinPoint[] = suspects.map((suspect, idx) => {
-    const slotIdx = suspectSlotMap.get(suspect.id) ?? (idx % DESKTOP_SUSPECT_SLOTS.length)
-    const slot = DESKTOP_SUSPECT_SLOTS[slotIdx] || DESKTOP_SUSPECT_SLOTS[0]
+  const desktopSuspectPins: PinPoint[] = suspects.map((suspect) => {
+    const { canonicalId, slotIndex, canonicalName } = getCanonicalSuspectKey(suspect)
+    const slot = DESKTOP_SUSPECT_SLOTS[slotIndex] || DESKTOP_SUSPECT_SLOTS[0]
     return {
-      id: `node-suspect-${suspect.id}`,
+      id: `node-suspect-${canonicalId}`,
       x: slot.x,
       y: slot.y,
-      label: suspect.name.toUpperCase(),
-      detail: `Nghi phạm: ${suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
+      label: canonicalName || suspect.name,
+      detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
       color: 'yellow' as const,
     }
   })
@@ -374,7 +433,7 @@ export function MainInvestigationCanvas({
             id: 'c0-pin-followup-vu',
             x: 0.15,
             y: 0.64,
-            label: 'CÂU HỎI 1',
+            label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Lê Quang Vũ',
             color: 'yellow' as const,
           },
@@ -386,7 +445,7 @@ export function MainInvestigationCanvas({
             id: 'c0-pin-followup-tung',
             x: 0.40,
             y: 0.64,
-            label: 'CÂU HỎI 1',
+            label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
             color: 'yellow' as const,
           },
@@ -401,7 +460,7 @@ export function MainInvestigationCanvas({
             id: 'c0-pin-followup-vu',
             x: 0.10,
             y: 0.50,
-            label: 'CÂU HỎI 1',
+            label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Lê Quang Vũ',
             color: 'yellow' as const,
           },
@@ -413,7 +472,7 @@ export function MainInvestigationCanvas({
             id: 'c0-pin-followup-tung',
             x: 0.26,
             y: 0.50,
-            label: 'CÂU HỎI 1',
+            label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
             color: 'yellow' as const,
           },
@@ -428,7 +487,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-suspects',
           x: 0.36,
           y: 0.32,
-          label: 'XÁC ĐỊNH NGHI PHẠM',
+          label: 'Nghi phạm',
           detail: 'Thêm & xem danh sách nghi phạm vụ án',
           color: 'red' as const,
         },
@@ -436,7 +495,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-evidence',
           x: 0.78,
           y: 0.32,
-          label: 'BỔ SUNG CHỨNG CỨ',
+          label: 'Bổ sung chứng cứ',
           detail: 'Chỉ dẫn nghiệp vụ & hướng dẫn mở khóa 2 nhánh chứng cứ',
           color: 'red' as const,
         },
@@ -444,7 +503,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-phone',
           x: 0.30,
           y: 0.16,
-          label: 'MỞ RỘNG ĐIỀU TRA',
+          label: 'Mở rộng điều tra',
           detail: phoneLookupSuccess
             ? 'Đã xác minh danh tính SĐT thành công'
             : 'Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang',
@@ -454,17 +513,17 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-reinvestigate',
           x: 0.76,
           y: 0.16,
-          label: isReinvestigateUnlocked ? 'KHÁM XÉT LẠI' : 'KHÁM XÉT LẠI 🔒',
+          label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại 🔒',
           detail: isReinvestigateUnlocked
             ? 'Mở biên bản tái khám xét hiện trường'
-            : 'Khám xét lại hiện trường [Khóa — Cần bổ sung nghi phạm hoặc tra cứu SĐT]',
+            : 'Khám xét lại hiện trường [Khóa — Cần trả lời xong câu hỏi của Vũ & Tùng]',
           color: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
         },
         {
           id: 'c0-pin-indictment',
           x: 0.74,
           y: 0.82,
-          label: 'ĐỀ NGHỊ TRUY TỐ',
+          label: 'Đề nghị truy tố',
           detail: isIndictmentSolved
             ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
             : 'Lập bản cáo trạng gửi Viện Kiểm sát',
@@ -478,7 +537,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-suspects',
           x: 0.18,
           y: 0.20,
-          label: 'XÁC ĐỊNH NGHI PHẠM',
+          label: 'Nghi phạm',
           detail: 'Thêm & xem danh sách nghi phạm vụ án',
           color: 'red' as const,
         },
@@ -486,7 +545,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-evidence',
           x: 0.50,
           y: 0.20,
-          label: 'BỔ SUNG CHỨNG CỨ',
+          label: 'Bổ sung chứng cứ',
           detail: 'Chỉ dẫn nghiệp vụ & hướng dẫn mở khóa 2 nhánh chứng cứ',
           color: 'red' as const,
         },
@@ -494,7 +553,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-indictment',
           x: 0.82,
           y: 0.20,
-          label: 'ĐỀ NGHỊ TRUY TỐ',
+          label: 'Đề nghị truy tố',
           detail: isIndictmentSolved
             ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
             : 'Lập bản cáo trạng gửi Viện Kiểm sát',
@@ -505,7 +564,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-phone',
           x: 0.48,
           y: 0.70,
-          label: 'MỞ RỘNG ĐIỀU TRA',
+          label: 'Mở rộng điều tra',
           detail: phoneLookupSuccess
             ? 'Đã xác minh danh tính SĐT thành công'
             : 'Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang',
@@ -515,10 +574,10 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-reinvestigate',
           x: 0.76,
           y: 0.70,
-          label: isReinvestigateUnlocked ? 'KHÁM XÉT LẠI' : 'KHÁM XÉT LẠI 🔒',
+          label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại 🔒',
           detail: isReinvestigateUnlocked
             ? 'Mở biên bản tái khám xét hiện trường'
-            : 'Khám xét lại hiện trường [Khóa — Cần bổ sung nghi phạm hoặc tra cứu SĐT]',
+            : 'Khám xét lại hiện trường [Khóa — Cần trả lời xong câu hỏi của Vũ & Tùng]',
           color: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
         },
         ...desktopSuspectPins,
@@ -531,7 +590,7 @@ export function MainInvestigationCanvas({
       ? [
           {
             id: 'c0-conn-followup-vu',
-            fromPinId: `node-suspect-${vuSuspect.id}`,
+            fromPinId: `node-suspect-${getCanonicalSuspectKey(vuSuspect).canonicalId}`,
             toPinId: 'c0-pin-followup-vu',
           },
         ]
@@ -540,16 +599,19 @@ export function MainInvestigationCanvas({
       ? [
           {
             id: 'c0-conn-followup-tung',
-            fromPinId: `node-suspect-${tungSuspect.id}`,
+            fromPinId: `node-suspect-${getCanonicalSuspectKey(tungSuspect).canonicalId}`,
             toPinId: 'c0-pin-followup-tung',
           },
         ]
       : []),
-    ...suspects.map((suspect) => ({
-      id: `c0-conn-suspect-${suspect.id}`,
-      fromPinId: 'c0-pin-suspects',
-      toPinId: `node-suspect-${suspect.id}`,
-    })),
+    ...suspects.map((suspect) => {
+      const { canonicalId } = getCanonicalSuspectKey(suspect)
+      return {
+        id: `c0-conn-suspect-${canonicalId}`,
+        fromPinId: 'c0-pin-suspects',
+        toPinId: `node-suspect-${canonicalId}`,
+      }
+    }),
   ]
 
   return (
@@ -658,6 +720,7 @@ export function MainInvestigationCanvas({
         culprit={activeFollowupCulprit || solvedCulprit || 'vu'}
         onClose={() => setIsFollowupQuestionOpen(false)}
         onOpenDossier={handleOpenDossier}
+        onSuccess={handleFollowupSuccess}
       />
     </div>
   )

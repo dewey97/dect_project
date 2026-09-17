@@ -134,7 +134,7 @@ export function IndictmentModal({
             )}
 
             {/* 1. SUSPECT NAME */}
-            <div className="space-y-1.5 border-b border-[#2b1f14]/20 pb-4">
+            <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
                 1. TÊN THỦ PHẠM BỊ TRUY TỐ: <span className="text-red-700">*</span>
               </label>
@@ -151,7 +151,7 @@ export function IndictmentModal({
             </div>
 
             {/* 2. MOTIVE */}
-            <div className="space-y-1.5 border-b border-[#2b1f14]/20 pb-4">
+            <div className="space-y-1.5">
               <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
                 2. ĐỘNG CƠ GÂY ÁN: <span className="text-red-700">*</span>
               </label>
@@ -225,7 +225,7 @@ export function IndictmentModal({
             </div>
 
             {/* FOOTER */}
-            <div className="pt-4 border-t-2 border-[#2b1f14]/20 flex items-center justify-end gap-3">
+            <div className="pt-2 flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}

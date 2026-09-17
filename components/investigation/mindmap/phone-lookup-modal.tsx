@@ -59,6 +59,7 @@ export function PhoneLookupModal({
     } catch {}
 
     onSuccess('0988200991', 'Đã xác minh danh tính SĐT thành công.')
+    onClose()
   }
 
   return (
@@ -74,10 +75,10 @@ export function PhoneLookupModal({
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
             <div>
               <span className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#6b4e2e] block">
-                TRUY VẾT LIÊN LẠC
+                MỞ RỘNG ĐIỀU TRA
               </span>
               <h3 className="font-serif font-bold text-base sm:text-lg text-[#1a120b] uppercase tracking-wide">
-                Truy Tìm Danh Tính 3 Số Điện Thoại Ẩn Danh
+                Truy Vết Liên Lạc
               </h3>
             </div>
 
@@ -92,20 +93,20 @@ export function PhoneLookupModal({
           {/* FORM BODY (Y HỆT BẢN CŨ CỦA CHECKPOINT 0) */}
           <form onSubmit={handleSubmit} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
             {/* QUESTION TEXT */}
-            <div className="space-y-1.5 border-b border-[#2b1f14]/20 pb-3">
+            <div className="space-y-1.5">
               <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
-                Hãy đọc các tài liệu Hồ sơ (Sổ nợ 10, Bảng tin 11) và tra cứu Điện thoại nạn nhân Khang (Call Log dev-00) để xác định danh tính 3 nghi phạm liên quan đến 3 SĐT lạ gọi tới trong đêm 24/07:
+                Hãy đọc các tài liệu Hồ sơ và tra cứu Điện thoại nạn nhân Khang để xác định danh tính 3 đối tượng liên quan đến 3 SĐT lạ gọi tới trong đêm 24/07:
               </p>
             </div>
 
             {/* ONBOARDING INITIAL EVIDENCE CALLOUT */}
             <div className="p-3.5 bg-[#ebdcc4] border-2 border-[#a88c6f] rounded-none text-xs text-[#3b2b1a] space-y-2.5 shadow-sm">
-              <div className="flex items-center gap-2 font-bold font-mono text-[#5c4026] uppercase tracking-wider border-b border-[#a88c6f]/40 pb-1.5">
+              <div className="flex items-center gap-2 font-bold font-mono text-[#5c4026] uppercase tracking-wider">
                 <Smartphone className="size-4 text-[#8c592b]" />
                 <span>HƯỚNG DẪN BẮT ĐẦU ĐIỀU TRA:</span>
               </div>
               <p className="text-xs leading-relaxed">
-                Trước tiên, bạn hãy đối chiếu dữ liệu giữa <strong>Hồ sơ tài liệu</strong> (Sổ nợ <code className="bg-[#dfccb0] px-1 py-0.5 rounded font-mono text-[#1a0f07]">10</code>, Bảng tin rao vặt <code className="bg-[#dfccb0] px-1 py-0.5 rounded font-mono text-[#1a0f07]">11</code>) và <strong>Điện thoại nạn nhân Khang</strong> (Call Log <code className="bg-[#dfccb0] px-1 py-0.5 rounded font-mono text-[#1a0f07]">dev-00</code>) để tìm ra danh tính 3 SĐT ẩn danh.
+                Trước tiên, bạn hãy đối chiếu dữ liệu giữa <strong>Hồ sơ tài liệu</strong> và <strong>Điện thoại nạn nhân Khang</strong> để tìm ra danh tính 3 SĐT ẩn danh.
               </p>
               {onOpenPhoneSimulator && (
                 <button
@@ -182,7 +183,7 @@ export function PhoneLookupModal({
             )}
 
             {/* ACTION FOOTER */}
-            <div className="pt-3 border-t-2 border-[#2b1f14]/20 flex items-center justify-end">
+            <div className="pt-2 flex items-center justify-end">
               <button
                 type="submit"
                 className={cn(
@@ -192,7 +193,7 @@ export function PhoneLookupModal({
                     : 'bg-emerald-900 hover:bg-emerald-950 text-white border-emerald-950'
                 )}
               >
-                <span>{isApproved ? 'ĐÃ NỘP (CẬP NHẬT)' : 'NỘP KẾT LUẬN'}</span>
+                <span>LIÊN LẠC LẤY THÔNG TIN</span>
                 <ArrowRight className="size-3.5" />
               </button>
             </div>

@@ -354,6 +354,41 @@ function distance(x1: number, y1: number, x2: number, y2: number): number {
   return Math.hypot(x2 - x1, y2 - y1);
 }
 
+function wrapText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  maxLines: number = 3
+): string[] {
+  const words = text.trim().split(/\s+/);
+  if (words.length <= 1) return [text];
+
+  const lines: string[] = [];
+  let currentLine = "";
+
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testWidth = context.measureText(testLine).width;
+
+    if (testWidth > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+      if (lines.length === maxLines - 1) {
+        const remaining = words.slice(i).join(" ");
+        lines.push(remaining);
+        return lines;
+      }
+    } else {
+      currentLine = testLine;
+    }
+  }
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  return lines;
+}
+
 function isPinHit(
   worldPointer: Point,
   pinPosition: Point,
@@ -366,18 +401,18 @@ function isPinHit(
     return true;
   }
 
-  // Hit area for rectangular label tag underneath pinhead
-  const approxTagWidth = Math.max(70, label.length * 9 + 16) / transform.scale;
-  const tagTop = pinPosition.y - 4 / transform.scale;
-  const tagBottom = pinPosition.y + 28 / transform.scale;
-  const tagLeft = pinPosition.x - approxTagWidth / 2;
-  const tagRight = pinPosition.x + approxTagWidth / 2;
+  // Hit area for sticky note or Polaroid photo card underneath pinhead
+  const cardHalfWidth = 38 / transform.scale;
+  const cardTop = pinPosition.y - 8 / transform.scale;
+  const cardBottom = pinPosition.y + 80 / transform.scale;
+  const cardLeft = pinPosition.x - cardHalfWidth;
+  const cardRight = pinPosition.x + cardHalfWidth;
 
   return (
-    worldPointer.x >= tagLeft &&
-    worldPointer.x <= tagRight &&
-    worldPointer.y >= tagTop &&
-    worldPointer.y <= tagBottom
+    worldPointer.x >= cardLeft &&
+    worldPointer.x <= cardRight &&
+    worldPointer.y >= cardTop &&
+    worldPointer.y <= cardBottom
   );
 }
 
@@ -970,6 +1005,15 @@ export function HeroInteractive({
     };
     mediaQuery.addEventListener("change", handleMotionChange);
 
+    // Re-render when web fonts (Caveat, Playpen Sans) finish loading
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(() => {
+        if (requestRenderRef.current) {
+          requestRenderRef.current();
+        }
+      });
+    }
+
     const maskCanvas = document.createElement("canvas");
 
     const maskContext = maskCanvas.getContext("2d");
@@ -1181,9 +1225,292 @@ export function HeroInteractive({
       });
 
       // ──────────────────────────────────
-      // 2. Draw evidence strings (system)
+      // 2. Layer 1: Draw Paper Cards & Polaroid Photos (Bottom Layer)
       // ──────────────────────────────────
+      allPinsUnified.forEach((pin) => {
+        const pinPosition = pinPositionsMap.get(pin.id);
+        if (!pinPosition) return;
 
+        // All notes share the authentic 3M Canary yellow paper styling
+        const paperTheme = {
+          paperBgTop: "#fae67a",
+          paperBgMid: "#f6dc68",
+          paperBgBottom: "#eed056",
+          paperBorder: "rgba(180, 140, 40, 0.35)",
+          textColor: "#1a1208",
+          inkBleed: "rgba(26, 18, 8, 0.15)",
+        };
+
+        // Calculate a deterministic varied rotation angle and organic size variation for each item
+        const charSum = pin.id.split("").reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 3), 0);
+        const tiltRaw = ((charSum % 13) - 6);
+        const tiltDeg = (tiltRaw === 0 ? 3.2 : tiltRaw) * 0.85; // -5.1° to +5.1°
+        const tiltAngle = tiltDeg * (Math.PI / 180);
+
+        // Organic size variation (-8% to +9%)
+        const sizeVariant = ((charSum % 7) - 3) * 0.028;
+        const scaleMod = 1.0 + sizeVariant;
+
+        const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-");
+
+        context.save();
+        context.translate(pinPosition.x, pinPosition.y);
+        context.rotate(tiltAngle);
+
+        if (isSuspectPin) {
+          // ── POLAROID INSTANT PHOTO CARD RENDERING ──
+          const polaroidWidth = (64 * scaleMod) / transform.scale;
+          const photoPadding = 4.2 / transform.scale;
+          const photoWidth = polaroidWidth - (photoPadding * 2);
+          const photoHeight = (43 * scaleMod) / transform.scale;
+
+          // Auto-fitting font size so long suspect names fit 100% inside bottom chin
+          let fontSize = 11.0;
+          context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+          let lines = wrapText(context, pin.label, photoWidth + 2 / transform.scale, 2);
+
+          while (
+            fontSize > 8.5 &&
+            lines.some((l) => context.measureText(l).width > photoWidth + 2 / transform.scale)
+          ) {
+            fontSize -= 0.5;
+            context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+            lines = wrapText(context, pin.label, photoWidth + 2 / transform.scale, 2);
+          }
+
+          const lineHeight = (fontSize + 1.2) / transform.scale;
+          const textBlockHeight = lines.length * lineHeight;
+          const bottomChin = Math.max(22 / transform.scale, textBlockHeight + 8 / transform.scale);
+          const polaroidHeight = photoPadding + 3.2 / transform.scale + photoHeight + bottomChin;
+          const tagX = -polaroidWidth / 2;
+          const tagY = -4.5 / transform.scale; // Pin pierces top white margin
+          const r = 2.0 / transform.scale;
+
+          // Layer 1: Polaroid Card Drop Shadow
+          context.save();
+          context.shadowColor = "rgba(0, 0, 0, 0.40)";
+          context.shadowBlur = 8 / transform.scale;
+          context.shadowOffsetX = 2.2 / transform.scale;
+          context.shadowOffsetY = 4.8 / transform.scale;
+
+          // Outer Polaroid Card Body (White/Cream Vintage Photo Paper)
+          context.beginPath();
+          context.moveTo(tagX + r, tagY);
+          context.lineTo(tagX + polaroidWidth - r, tagY);
+          context.quadraticCurveTo(tagX + polaroidWidth, tagY, tagX + polaroidWidth, tagY + r);
+          context.lineTo(tagX + polaroidWidth, tagY + polaroidHeight - r);
+          context.quadraticCurveTo(tagX + polaroidWidth, tagY + polaroidHeight, tagX + polaroidWidth - r, tagY + polaroidHeight);
+          context.lineTo(tagX + r, tagY + polaroidHeight);
+          context.quadraticCurveTo(tagX, tagY + polaroidHeight, tagX, tagY + polaroidHeight - r);
+          context.lineTo(tagX, tagY + r);
+          context.quadraticCurveTo(tagX, tagY, tagX + r, tagY);
+          context.closePath();
+
+          const cardGradient = context.createLinearGradient(0, tagY, 0, tagY + polaroidHeight);
+          cardGradient.addColorStop(0, "#faf7f2");
+          cardGradient.addColorStop(0.7, "#f2ebe0");
+          cardGradient.addColorStop(1, "#eae0cf");
+          context.fillStyle = cardGradient;
+          context.fill();
+
+          // Subtle photo border outline
+          context.strokeStyle = "rgba(120, 105, 85, 0.35)";
+          context.lineWidth = 0.8 / transform.scale;
+          context.stroke();
+          context.restore(); // restore shadow
+
+          // Layer 2: Inner Photo Area (Dark Noir Frame)
+          const photoX = tagX + photoPadding;
+          const photoY = tagY + photoPadding + 3.0 / transform.scale;
+
+          context.save();
+          context.beginPath();
+          context.rect(photoX, photoY, photoWidth, photoHeight);
+          context.clip();
+
+          // Background of photo (Deep noir gradient)
+          const photoBg = context.createLinearGradient(0, photoY, 0, photoY + photoHeight);
+          photoBg.addColorStop(0, "#221e24");
+          photoBg.addColorStop(0.4, "#161318");
+          photoBg.addColorStop(1, "#0a080c");
+          context.fillStyle = photoBg;
+          context.fillRect(photoX, photoY, photoWidth, photoHeight);
+
+          // Atmospheric noir backlighting behind mystery silhouette
+          const spotGlow = context.createRadialGradient(
+            0,
+            photoY + photoHeight * 0.40,
+            2 / transform.scale,
+            0,
+            photoY + photoHeight * 0.40,
+            photoWidth * 0.55
+          );
+          spotGlow.addColorStop(0, "rgba(95, 80, 90, 0.45)");
+          spotGlow.addColorStop(0.5, "rgba(45, 38, 48, 0.25)");
+          spotGlow.addColorStop(1, "rgba(10, 8, 12, 0)");
+          context.fillStyle = spotGlow;
+          context.fillRect(photoX, photoY, photoWidth, photoHeight);
+
+          // Mysterious Noir Black Silhouette Portrait ("người mặt đen thui")
+          const headCenterX = 0;
+          const headCenterY = photoY + photoHeight * 0.38;
+          const headRadiusX = 8.5 / transform.scale;
+          const headRadiusY = 10.5 / transform.scale;
+
+          const shoulderTopY = photoY + photoHeight * 0.63;
+          const shoulderBottomY = photoY + photoHeight + 3 / transform.scale;
+          const shoulderHalfW = photoWidth * 0.45;
+
+          // Torso & Shoulders Silhouette
+          context.fillStyle = "#080608";
+          context.beginPath();
+          context.moveTo(headCenterX - shoulderHalfW, shoulderBottomY);
+          context.quadraticCurveTo(
+            headCenterX - shoulderHalfW * 0.55,
+            shoulderTopY,
+            headCenterX - 3.2 / transform.scale,
+            shoulderTopY - 1 / transform.scale
+          );
+          context.lineTo(headCenterX + 3.2 / transform.scale, shoulderTopY - 1 / transform.scale);
+          context.quadraticCurveTo(
+            headCenterX + shoulderHalfW * 0.55,
+            shoulderTopY,
+            headCenterX + shoulderHalfW,
+            shoulderBottomY
+          );
+          context.closePath();
+          context.fill();
+
+          // Head Silhouette
+          context.beginPath();
+          context.ellipse(headCenterX, headCenterY, headRadiusX, headRadiusY, 0, 0, Math.PI * 2);
+          context.fill();
+
+          // Subtle mysterious rim light highlight on left curve of head/shoulder
+          context.save();
+          context.strokeStyle = "rgba(180, 170, 190, 0.28)";
+          context.lineWidth = 0.9 / transform.scale;
+          context.beginPath();
+          context.arc(headCenterX, headCenterY, headRadiusX, Math.PI * 0.75, Math.PI * 1.35);
+          context.stroke();
+          context.restore();
+
+          // Vintage photo subtle border
+          context.strokeStyle = "rgba(0, 0, 0, 0.65)";
+          context.lineWidth = 1.0 / transform.scale;
+          context.strokeRect(photoX, photoY, photoWidth, photoHeight);
+
+          context.restore(); // end photo clip
+
+          // Layer 3: Handwritten Suspect Name on Bottom White Chin (100% fits inside)
+          context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+          context.fillStyle = "#160f08";
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+
+          const nameAreaTop = photoY + photoHeight;
+          const nameAreaBottom = tagY + polaroidHeight;
+          const nameStartY = nameAreaTop + (nameAreaBottom - nameAreaTop - textBlockHeight) / 2 + lineHeight / 2 + 0.5 / transform.scale;
+
+          lines.forEach((line, idx) => {
+            context.fillText(line, 0, nameStartY + idx * lineHeight);
+          });
+        } else {
+          // ── YELLOW STICKY NOTE (CATEGORY / ACTION / CLUE NODES) ──
+          const noteWidth = (62 * scaleMod) / transform.scale;
+          const maxTextWidth = noteWidth - 8 / transform.scale;
+
+          let fontSize = 11.5;
+          context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+          let lines = wrapText(context, pin.label, maxTextWidth, 3);
+
+          while (
+            fontSize > 9.0 &&
+            lines.some((l) => context.measureText(l).width > maxTextWidth)
+          ) {
+            fontSize -= 0.5;
+            context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+            lines = wrapText(context, pin.label, maxTextWidth, 3);
+          }
+
+          const lineHeight = (fontSize + 1.6) / transform.scale;
+          const textBlockHeight = lines.length * lineHeight;
+          const noteHeight = Math.max(54 / transform.scale, textBlockHeight + 22 / transform.scale);
+          const tagX = -noteWidth / 2;
+          const tagY = -4.5 / transform.scale; // Pin pierces near top edge
+          const r = 2.0 / transform.scale;
+
+          // Layer 1: Soft Ambient Paper Lift Shadow (diffused towards bottom-right)
+          context.save();
+          context.shadowColor = "rgba(0, 0, 0, 0.28)";
+          context.shadowBlur = 7 / transform.scale;
+          context.shadowOffsetX = 1.8 / transform.scale;
+          context.shadowOffsetY = 4.0 / transform.scale;
+
+          // Layer 2: Subtle paper curl path (curls up slightly at bottom right corner)
+          context.beginPath();
+          context.moveTo(tagX + r, tagY);
+          context.lineTo(tagX + noteWidth - r, tagY);
+          context.quadraticCurveTo(tagX + noteWidth, tagY, tagX + noteWidth, tagY + r);
+          context.lineTo(tagX + noteWidth, tagY + noteHeight - 2.5 / transform.scale);
+          // Bottom edge with subtle organic paper wave
+          context.quadraticCurveTo(
+            tagX + noteWidth * 0.6,
+            tagY + noteHeight + 0.8 / transform.scale,
+            tagX + noteWidth * 0.2,
+            tagY + noteHeight - 0.5 / transform.scale
+          );
+          context.lineTo(tagX + r, tagY + noteHeight - 1.0 / transform.scale);
+          context.quadraticCurveTo(tagX, tagY + noteHeight - 1.0 / transform.scale, tagX, tagY + noteHeight - 1.0 / transform.scale - r);
+          context.lineTo(tagX, tagY + r);
+          context.quadraticCurveTo(tagX, tagY, tagX + r, tagY);
+          context.closePath();
+
+          // Matte paper gradient (pure warm paper texture, no glossy white shine)
+          const paperGradient = context.createLinearGradient(0, tagY, 0, tagY + noteHeight);
+          paperGradient.addColorStop(0, paperTheme.paperBgTop);
+          paperGradient.addColorStop(0.55, paperTheme.paperBgMid);
+          paperGradient.addColorStop(1, paperTheme.paperBgBottom);
+          context.fillStyle = paperGradient;
+          context.fill();
+
+          // Fine matte paper border
+          context.strokeStyle = paperTheme.paperBorder;
+          context.lineWidth = 0.75 / transform.scale;
+          context.stroke();
+          context.restore(); // restore ambient shadow
+
+          // Multi-line Handwritten label text with realistic ink bleed
+          context.save();
+          context.fillStyle = paperTheme.textColor;
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.shadowColor = paperTheme.inkBleed;
+          context.shadowBlur = 0.5 / transform.scale;
+
+          const availableHeight = noteHeight - 11 / transform.scale;
+          const textStartY = tagY + 11 / transform.scale + (availableHeight - textBlockHeight) / 2 + lineHeight / 2;
+
+          lines.forEach((line, lineIdx) => {
+            context.fillText(line, 0, textStartY + lineIdx * lineHeight);
+          });
+          context.restore();
+        }
+
+        context.restore(); // restore paper / polaroid transform
+
+        // Pinhole puncture
+        context.save();
+        context.fillStyle = "rgba(35, 20, 10, 0.85)";
+        context.beginPath();
+        context.arc(pinPosition.x, pinPosition.y, 1.6 / transform.scale, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+      });
+
+      // ──────────────────────────────────
+      // 3. Layer 2: Draw Evidence Strings & Connecting Lines (ON TOP OF CARDS)
+      // ──────────────────────────────────
       const caseConns = customConnectionsRef.current ?? activeCaseRef.current.connections;
       caseConns.forEach((conn) => {
         const start = pinPositionsMap.get(conn.fromPinId);
@@ -1198,20 +1525,22 @@ export function HeroInteractive({
         const middleX = (start.x + end.x) / 2;
         const middleY = (start.y + end.y) / 2 + sag;
 
+        // Subtle thin string shadow onto cards/board
         context.save();
-        context.strokeStyle = "rgba(200, 35, 35, 0.7)";
-        context.lineWidth = 1.5 / transform.scale;
-        context.shadowColor = "rgba(200, 35, 35, 0.25)";
-        context.shadowBlur = 3 / transform.scale;
+        context.strokeStyle = "rgba(0, 0, 0, 0.20)";
+        context.lineWidth = 1.0 / transform.scale;
+        context.shadowColor = "rgba(0, 0, 0, 0.25)";
+        context.shadowBlur = 2.5 / transform.scale;
         context.beginPath();
-        context.moveTo(start.x, start.y);
-        context.quadraticCurveTo(middleX, middleY, end.x, end.y);
+        context.moveTo(start.x + 0.8 / transform.scale, start.y + 1.2 / transform.scale);
+        context.quadraticCurveTo(middleX + 0.8 / transform.scale, middleY + 1.2 / transform.scale, end.x + 0.8 / transform.scale, end.y + 1.2 / transform.scale);
         context.stroke();
         context.restore();
 
+        // Fine Crimson Yarn thread (thin & elegant)
         context.save();
-        context.strokeStyle = "rgba(200, 35, 35, 0.08)";
-        context.lineWidth = 5 / transform.scale;
+        context.strokeStyle = "rgba(200, 35, 35, 0.82)";
+        context.lineWidth = 1.1 / transform.scale;
         context.beginPath();
         context.moveTo(start.x, start.y);
         context.quadraticCurveTo(middleX, middleY, end.x, end.y);
@@ -1219,9 +1548,7 @@ export function HeroInteractive({
         context.restore();
       });
 
-      // ──────────────────────────────────
-      // 2.1. Draw user custom connections
-      // ──────────────────────────────────
+      // User custom connections
       const uConns = userConnectionsRef.current;
       uConns.forEach((conn) => {
         const start = pinPositionsMap.get(conn.fromPinId);
@@ -1236,21 +1563,20 @@ export function HeroInteractive({
         const middleX = (start.x + end.x) / 2;
         const middleY = (start.y + end.y) / 2 + sag;
 
-        // Draw custom user connection (slightly different color or style, e.g. bright crimson)
+        // Custom string shadow
         context.save();
-        context.strokeStyle = "rgba(235, 50, 50, 0.85)";
-        context.lineWidth = 1.5 / transform.scale;
-        context.shadowColor = "rgba(235, 50, 50, 0.4)";
-        context.shadowBlur = 4 / transform.scale;
+        context.strokeStyle = "rgba(0, 0, 0, 0.22)";
+        context.lineWidth = 1.0 / transform.scale;
         context.beginPath();
-        context.moveTo(start.x, start.y);
-        context.quadraticCurveTo(middleX, middleY, end.x, end.y);
+        context.moveTo(start.x + 0.8 / transform.scale, start.y + 1.2 / transform.scale);
+        context.quadraticCurveTo(middleX + 0.8 / transform.scale, middleY + 1.2 / transform.scale, end.x + 0.8 / transform.scale, end.y + 1.2 / transform.scale);
         context.stroke();
         context.restore();
 
+        // Custom user connection fine crimson thread
         context.save();
-        context.strokeStyle = "rgba(235, 50, 50, 0.12)";
-        context.lineWidth = 6 / transform.scale;
+        context.strokeStyle = "rgba(225, 45, 45, 0.85)";
+        context.lineWidth = 1.1 / transform.scale;
         context.beginPath();
         context.moveTo(start.x, start.y);
         context.quadraticCurveTo(middleX, middleY, end.x, end.y);
@@ -1258,9 +1584,7 @@ export function HeroInteractive({
         context.restore();
       });
 
-      // ──────────────────────────────────
-      // 2.2. Draw active connector wire
-      // ──────────────────────────────────
+      // Active connector wire while dragging
       if (connectionStartIdRef.current && pointer.active) {
         const start = pinPositionsMap.get(connectionStartIdRef.current);
         if (start) {
@@ -1269,8 +1593,8 @@ export function HeroInteractive({
             transform,
           );
           context.save();
-          context.strokeStyle = "rgba(255, 235, 80, 0.65)"; // gold dashed line for active connection
-          context.lineWidth = 1.5 / transform.scale;
+          context.strokeStyle = "rgba(255, 235, 80, 0.85)"; // gold dashed line for active connection
+          context.lineWidth = 2.0 / transform.scale;
           context.setLineDash([4 / transform.scale, 4 / transform.scale]);
           context.beginPath();
           context.moveTo(start.x, start.y);
@@ -1281,40 +1605,62 @@ export function HeroInteractive({
       }
 
       // ──────────────────────────────────
-      // 3. Draw push pins (system & user)
+      // 4. Layer 3: Draw 3D Push Pin Heads (ON TOP OF STRINGS & CARDS)
       // ──────────────────────────────────
       allPinsUnified.forEach((pin) => {
         const pinPosition = pinPositionsMap.get(pin.id);
         if (!pinPosition) return;
 
-        const baseRadius = 6.0 / transform.scale;
-
-        // Determine pin base/highlight colors
-        let color = { base: "#dc2626", highlight: "#f87171" }; // Default Red pin
+        const baseRadius = 6.2 / transform.scale;
         const pinColor = (pin as any).color || (pin.id.includes("phone") || pin.id.includes("reinvestigate") || pin.id.includes("suspect-") ? "yellow" : "red");
 
+        // Pin head colors by type
+        let headTheme = {
+          headBase: "#dc2626",
+          headMid: "#b91c1c",
+          headHighlight: "#fca5a5",
+          headRim: "#7f1d1d",
+        };
+
         if (pinColor === "yellow") {
-          color = { base: "#d97706", highlight: "#fde047" };
+          headTheme = {
+            headBase: "#d97706",
+            headMid: "#b45309",
+            headHighlight: "#fde047",
+            headRim: "#78350f",
+          };
         } else if (pinColor === "blue") {
-          color = { base: "#0284c7", highlight: "#38bdf8" };
+          headTheme = {
+            headBase: "#0284c7",
+            headMid: "#0369a1",
+            headHighlight: "#7dd3fc",
+            headRim: "#0c4a6e",
+          };
         } else if (pinColor === "green") {
-          color = { base: "#16a34a", highlight: "#4ade80" };
+          headTheme = {
+            headBase: "#16a34a",
+            headMid: "#15803d",
+            headHighlight: "#86efac",
+            headRim: "#14532d",
+          };
         } else if (pinColor === "black") {
-          color = { base: "#27272a", highlight: "#71717a" };
+          headTheme = {
+            headBase: "#27272a",
+            headMid: "#18181b",
+            headHighlight: "#a1a1aa",
+            headRim: "#09090b",
+          };
         }
 
-        // Active connection indicator ring
-        const isActiveConnStart = connectionStartIdRef.current === pin.id;
-
-        // Pin shadow
+        // Realistic directional cast shadow of the pin head onto string and card
         context.save();
-        context.fillStyle = "rgba(0,0,0,0.35)";
+        context.fillStyle = "rgba(0, 0, 0, 0.45)";
         context.beginPath();
         context.ellipse(
-          pinPosition.x + 2 / transform.scale,
-          pinPosition.y + 3 / transform.scale,
-          5.5 / transform.scale,
-          3.5 / transform.scale,
+          pinPosition.x + 1.8 / transform.scale,
+          pinPosition.y + 2.5 / transform.scale,
+          5.6 / transform.scale,
+          3.4 / transform.scale,
           0,
           0,
           Math.PI * 2,
@@ -1322,105 +1668,53 @@ export function HeroInteractive({
         context.fill();
         context.restore();
 
-        // Pin dome
+        // Pin 3D Spherical/Dome Body (multi-stop radial gradient)
         context.save();
         const pinGradient = context.createRadialGradient(
-          pinPosition.x - baseRadius * 0.3,
-          pinPosition.y - baseRadius * 0.3,
-          0,
+          pinPosition.x - baseRadius * 0.32,
+          pinPosition.y - baseRadius * 0.32,
+          baseRadius * 0.05,
           pinPosition.x,
           pinPosition.y,
           baseRadius,
         );
-        pinGradient.addColorStop(0, color.highlight);
-        pinGradient.addColorStop(0.7, color.base);
-        pinGradient.addColorStop(1, "rgba(0,0,0,0.3)");
+        pinGradient.addColorStop(0, headTheme.headHighlight);
+        pinGradient.addColorStop(0.35, headTheme.headBase);
+        pinGradient.addColorStop(0.75, headTheme.headMid);
+        pinGradient.addColorStop(1, headTheme.headRim);
         context.fillStyle = pinGradient;
         context.beginPath();
         context.arc(pinPosition.x, pinPosition.y, baseRadius, 0, Math.PI * 2);
         context.fill();
 
-        // Specular highlight
-        context.fillStyle = "rgba(255,255,255,0.4)";
+        // Metallic/Glass Specular Glint
+        context.fillStyle = "rgba(255, 255, 255, 0.85)";
         context.beginPath();
         context.ellipse(
-          pinPosition.x - baseRadius * 0.25,
-          pinPosition.y - baseRadius * 0.25,
-          baseRadius * 0.32,
+          pinPosition.x - baseRadius * 0.3,
+          pinPosition.y - baseRadius * 0.3,
+          baseRadius * 0.36,
           baseRadius * 0.22,
           -Math.PI / 4,
           0,
           Math.PI * 2,
         );
         context.fill();
-        context.restore();
 
-        // Paper tag label card under pin
-        context.save();
-        const fontSize = 10;
-        context.font = `bold ${fontSize / transform.scale}px monospace, sans-serif`;
-        const textMetrics = context.measureText(pin.label);
-        const tagPaddingX = 6 / transform.scale;
-        const tagHeight = (fontSize + 6) / transform.scale;
-        const tagWidth = textMetrics.width + tagPaddingX * 2;
-        const tagX = pinPosition.x - tagWidth / 2;
-        const tagY = pinPosition.y + baseRadius + 4 / transform.scale;
-
-        const isYellowTag = pinColor === "yellow";
-        const isBlueTag = pinColor === "blue";
-        const isGreenTag = pinColor === "green";
-        const isBlackTag = pinColor === "black";
-
-        if (isBlackTag) {
-          context.fillStyle = "rgba(20, 20, 22, 0.94)";
-          context.strokeStyle = "rgba(82, 82, 91, 0.85)";
-        } else if (isGreenTag) {
-          context.fillStyle = "rgba(6, 30, 16, 0.92)";
-          context.strokeStyle = "rgba(34, 197, 94, 0.85)";
-        } else if (isBlueTag) {
-          context.fillStyle = "rgba(7, 26, 44, 0.94)";
-          context.strokeStyle = "rgba(14, 165, 233, 0.85)";
-        } else if (isYellowTag) {
-          context.fillStyle = "rgba(24, 18, 10, 0.92)";
-          context.strokeStyle = "rgba(217, 119, 6, 0.85)";
-        } else {
-          context.fillStyle = "rgba(35, 12, 12, 0.92)";
-          context.strokeStyle = "rgba(220, 38, 38, 0.85)";
-        }
-        context.lineWidth = 1.2 / transform.scale;
-
-        const r = 3 / transform.scale;
+        // Subtle bottom counter-reflection on the pinhead
+        context.fillStyle = "rgba(255, 255, 255, 0.22)";
         context.beginPath();
-        context.moveTo(tagX + r, tagY);
-        context.lineTo(tagX + tagWidth - r, tagY);
-        context.quadraticCurveTo(tagX + tagWidth, tagY, tagX + tagWidth, tagY + r);
-        context.lineTo(tagX + tagWidth, tagY + tagHeight - r);
-        context.quadraticCurveTo(tagX + tagWidth, tagY + tagHeight, tagX + tagWidth - r, tagY + tagHeight);
-        context.lineTo(tagX + r, tagY + tagHeight);
-        context.quadraticCurveTo(tagX, tagY + tagHeight, tagX, tagY + tagHeight - r);
-        context.lineTo(tagX, tagY + r);
-        context.quadraticCurveTo(tagX, tagY, tagX + r, tagY);
-        context.closePath();
+        context.ellipse(
+          pinPosition.x + baseRadius * 0.25,
+          pinPosition.y + baseRadius * 0.25,
+          baseRadius * 0.24,
+          baseRadius * 0.14,
+          -Math.PI / 4,
+          0,
+          Math.PI * 2,
+        );
         context.fill();
-        context.stroke();
-
-        context.fillStyle = isBlackTag
-          ? "#a1a1aa"
-          : isGreenTag
-          ? "#bbf7d0"
-          : isBlueTag
-          ? "#7dd3fc"
-          : isYellowTag
-          ? "#fef08a"
-          : "#fee2e2";
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        context.fillText(pin.label, pinPosition.x, tagY + tagHeight / 2 + 0.5 / transform.scale);
         context.restore();
-
-
-
-
       });
 
       context.restore();
