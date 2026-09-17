@@ -11,11 +11,33 @@ interface IndictmentModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmitIndictment: (data: {
+    culprit: 'vu' | 'tung'
     suspectName: string
     motive: string
     selectedClueIds: string[]
     reasoning: string
   }) => void
+}
+
+function normalizeName(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]/g, '')
+    .trim()
+}
+
+export function isCulpritValid(inputName: string): 'vu' | 'tung' | false {
+  const norm = normalizeName(inputName)
+  if (norm.includes('vu') || norm.includes('lequangvu')) {
+    return 'vu'
+  }
+  if (norm.includes('tung') || norm.includes('nguyenthanhtung')) {
+    return 'tung'
+  }
+  return false
 }
 
 export function IndictmentModal({
@@ -45,23 +67,32 @@ export function IndictmentModal({
       detectiveAudio.playGlassSound()
       return
     }
-    if (!motive.trim()) {
-      setErrorMsg('Vui lòng điền Động cơ gây án!')
+
+    const culprit = isCulpritValid(suspectName)
+    if (!culprit) {
+      setErrorMsg('Kết luận không chính xác! Viện Kiểm sát đã bác bỏ bản cáo trạng này. Đối tượng phải là Lê Quang Vũ hoặc Nguyễn Thanh Tùng.')
       detectiveAudio.playGlassSound()
       return
     }
+
     if (selectedClueIds.length === 0) {
-      setErrorMsg('Vui lòng chọn ít nhất 1 manh mối chốt hạ để buộc tội!')
+      setErrorMsg('Vui lòng tích chọn ít nhất 1 manh mối/chứng cứ!')
       detectiveAudio.playGlassSound()
       return
     }
 
     detectiveAudio.playStampSound()
+    try {
+      localStorage.setItem('veritas_indictment_solved', 'true')
+      localStorage.setItem('veritas_indictment_culprit', culprit)
+    } catch {}
+
     onSubmitIndictment({
+      culprit,
       suspectName: suspectName.trim(),
-      motive: motive.trim(),
+      motive: motive.trim() || 'Động cơ điều tra trọng điểm',
       selectedClueIds,
-      reasoning: reasoning.trim()
+      reasoning: reasoning.trim() || 'Căn cứ theo toàn bộ manh mối đã thu thập.'
     })
     onClose()
   }
@@ -194,7 +225,7 @@ export function IndictmentModal({
             </div>
 
             {/* FOOTER */}
-            <div className="pt-4 border-t-2 border-[#2b1f14]/20 flex items-center justify-between">
+            <div className="pt-4 border-t-2 border-[#2b1f14]/20 flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
@@ -207,7 +238,7 @@ export function IndictmentModal({
                 className="px-6 py-2.5 bg-red-800 hover:bg-red-900 text-[#fff5f5] font-mono font-black text-xs tracking-wider rounded-none transition-all flex items-center gap-2 shadow-lg active:scale-98 cursor-pointer uppercase border-2 border-[#450a0a]"
               >
                 <Gavel className="size-4" />
-                <span>★ GỬI CÁO TRẠNG TRUY TỐ ★</span>
+                <span>★ GỬI CÁO TRẠNG ★</span>
               </button>
             </div>
           </form>

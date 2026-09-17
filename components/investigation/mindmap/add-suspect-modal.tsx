@@ -11,6 +11,8 @@ interface SuspectItemData {
   id: string
   name: string
   clueIds: string[]
+  motiveClueIds?: string[]
+  alibiClueIds?: string[]
 }
 
 interface AddSuspectModalProps {
@@ -19,6 +21,9 @@ interface AddSuspectModalProps {
   onSave: (suspect: SuspectItemData) => void
   onDelete?: (id: string) => void
   editingSuspect?: SuspectItemData | null
+  existingSuspects?: SuspectItemData[]
+  onSelectSuspect?: (suspect: SuspectItemData | null) => void
+  onSubmitConclusion?: (culprit: 'vu' | 'tung') => void
 }
 
 // Lấy danh sách chứng cứ chuẩn từ checkpoints000 (ưu tiên cp-000-1a hoặc cp-000-2a)
@@ -32,7 +37,10 @@ export function AddSuspectModal({
   onClose,
   onSave,
   onDelete,
-  editingSuspect
+  editingSuspect,
+  existingSuspects = [],
+  onSelectSuspect,
+  onSubmitConclusion
 }: AddSuspectModalProps) {
   const [name, setName] = useState('')
   const [subTileView, setSubTileView] = useState<'overview' | 'motive' | 'alibi'>('overview')
@@ -43,9 +51,23 @@ export function AddSuspectModal({
   useEffect(() => {
     if (editingSuspect) {
       setName(editingSuspect.name)
-      const clues = editingSuspect.clueIds || []
-      setMotiveClueIds(clues)
-      setAlibiClueIds([])
+      if (editingSuspect.motiveClueIds || editingSuspect.alibiClueIds) {
+        setMotiveClueIds(editingSuspect.motiveClueIds || [])
+        setAlibiClueIds(editingSuspect.alibiClueIds || [])
+      } else {
+        const clues = editingSuspect.clueIds || []
+        const alibiKnown = [
+          'doc_06_loi_khai_lua',
+          'p10_app_xe',
+          'doc_07b_loi_khai_vu',
+          'doc_14_loi_khai_tung',
+          'p4_van_tay',
+          'doc_07a_loi_khai_mai',
+          'doc_07d_loi_khai_ha'
+        ]
+        setMotiveClueIds(clues.filter((id) => !alibiKnown.includes(id)))
+        setAlibiClueIds(clues.filter((id) => alibiKnown.includes(id)))
+      }
     } else {
       setName('')
       setMotiveClueIds([])
@@ -71,27 +93,17 @@ export function AddSuspectModal({
     onSave({
       id: editingSuspect ? editingSuspect.id : `suspect-${Date.now()}`,
       name: name.trim(),
-      clueIds: combinedClues
+      clueIds: combinedClues,
+      motiveClueIds,
+      alibiClueIds
     })
     onClose()
   }
 
-  // NÚT 2: NỘP KẾT LUẬN (Yêu cầu đúng cả căn cứ động cơ và tài liệu bóc trần ngoại phạm)
+  // NÚT 2: HOÀN TẤT THẨM TRA (Thẩm tra nghi phạm Lê Quang Vũ hoặc Nguyễn Thanh Tùng kèm manh mối hợp lệ)
   const handleSubmitConclusion = () => {
     if (!name.trim()) {
       setErrorMsg('Vui lòng nhập tên đối tượng tình nghi!')
-      detectiveAudio.playGlassSound()
-      return
-    }
-
-    if (motiveClueIds.length === 0) {
-      setErrorMsg('Nộp kết luận yêu cầu chọn ít nhất 1 Căn cứ động cơ gây án!')
-      detectiveAudio.playGlassSound()
-      return
-    }
-
-    if (alibiClueIds.length === 0) {
-      setErrorMsg('Nộp kết luận yêu cầu chọn ít nhất 1 Tài liệu bóc trần ngoại phạm!')
       detectiveAudio.playGlassSound()
       return
     }
@@ -101,29 +113,17 @@ export function AddSuspectModal({
     const isTung = ['nguyễn thanh tùng', 'tùng', 'nguyen thanh tung', 'tung'].includes(normalizedName)
 
     if (!isVu && !isTung) {
-      setErrorMsg('Đối tượng chưa thuộc danh sách nghi phạm trọng điểm (Lê Quang Vũ hoặc Nguyễn Thanh Tùng)!')
+      setErrorMsg('Chưa đủ căn cứ pháp lý: Hồ sơ đối tượng phải làm rõ Động cơ gây án và Bác bỏ được lời khai ngoại phạm bằng vật chứng xác thực!')
       detectiveAudio.playGlassSound()
       return
     }
 
-    if (isVu) {
-      const vuMotiveValid = motiveClueIds.some((id) => ['doc_10_so_no', 'sms_dev00', 'p6_anh_vu'].includes(id))
-      const vuAlibiValid = alibiClueIds.some((id) => ['doc_06_loi_khai_lua', 'p10_app_xe', 'doc_07b_loi_khai_vu'].includes(id))
-      if (!vuMotiveValid || !vuAlibiValid) {
-        setErrorMsg('Kết luận chưa chính xác! Vui lòng kiểm tra lại căn cứ động cơ & tài liệu ngoại phạm của Lê Quang Vũ.')
-        detectiveAudio.playGlassSound()
-        return
-      }
-    }
-
-    if (isTung) {
-      const tungMotiveValid = motiveClueIds.some((id) => ['doc_14_loi_khai_tung', 'p4_van_tay', 'doc_10_so_no'].includes(id))
-      const tungAlibiValid = alibiClueIds.some((id) => ['p5_manh_bao', 'p4_anh_1996'].includes(id))
-      if (!tungMotiveValid || !tungAlibiValid) {
-        setErrorMsg('Kết luận chưa chính xác! Vui lòng kiểm tra lại căn cứ động cơ & tài liệu ngoại phạm của Nguyễn Thanh Tùng.')
-        detectiveAudio.playGlassSound()
-        return
-      }
+    // Chế độ test/thẩm tra linh hoạt: Khi nhập đúng tên nghi phạm, chọn bất kỳ manh mối nào cũng được duyệt thành công
+    const hasAnyClues = motiveClueIds.length > 0 || alibiClueIds.length > 0
+    if (!hasAnyClues) {
+      setErrorMsg('Vui lòng chọn ít nhất 1 manh mối/căn cứ để hoàn tất hồ sơ!')
+      detectiveAudio.playGlassSound()
+      return
     }
 
     const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
@@ -132,8 +132,13 @@ export function AddSuspectModal({
     onSave({
       id: editingSuspect ? editingSuspect.id : `suspect-${Date.now()}`,
       name: name.trim(),
-      clueIds: combinedClues
+      clueIds: combinedClues,
+      motiveClueIds,
+      alibiClueIds
     })
+    if (onSubmitConclusion) {
+      onSubmitConclusion(isVu ? 'vu' : 'tung')
+    }
     onClose()
   }
 
@@ -145,11 +150,21 @@ export function AddSuspectModal({
       onSave({
         id: editingSuspect ? editingSuspect.id : `suspect-${Date.now()}`,
         name: name.trim(),
-        clueIds: combinedClues
+        clueIds: combinedClues,
+        motiveClueIds,
+        alibiClueIds
       })
     }
     onClose()
   }
+
+  const normalizedName = name.trim().toLowerCase()
+  const isVu = ['lê quang vũ', 'vũ', 'le quang vu', 'vu'].includes(normalizedName)
+  const isTung = ['nguyễn thanh tùng', 'tùng', 'nguyen thanh tung', 'tung'].includes(normalizedName)
+
+  // Hiển thị tích xanh khi có ít nhất 1 manh mối được chọn cho đối tượng hợp lệ
+  const isMotiveValid = (isVu || isTung) ? motiveClueIds.length > 0 : false
+  const isAlibiValid = (isVu || isTung) ? alibiClueIds.length > 0 : false
 
   return (
     <AnimatePresence>
@@ -185,6 +200,52 @@ export function AddSuspectModal({
             {/* 2-TILE OVERVIEW VIEW */}
             {subTileView === 'overview' && (
               <>
+                {/* SAVED DOSSIERS / SUSPECTS QUICK SELECTOR */}
+                {existingSuspects && existingSuspects.length > 0 && (
+                  <div className="space-y-1.5 pb-2 border-b border-[#2b1f14]/15">
+                    <label className="text-[0.7rem] font-mono font-bold text-[#6b4e2e] block uppercase tracking-wider">
+                      HỒ SƠ BIÊN BẢN ĐÃ LẬP ({existingSuspects.length}):
+                    </label>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {existingSuspects.map((s) => {
+                        const isSelected = editingSuspect?.id === s.id
+                        return (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => {
+                              detectiveAudio.playPaperRustle()
+                              if (onSelectSuspect) onSelectSuspect(s)
+                            }}
+                            className={cn(
+                              'px-3 py-1.5 text-xs font-mono font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2',
+                              isSelected
+                                ? 'bg-[#2b1f14] text-[#f6f1e5] border-[#2b1f14] shadow-sm'
+                                : 'bg-[#eadecc] hover:bg-[#dfd0bb] text-[#2b1f14] border-[#6b4e2e]/40'
+                            )}
+                          >
+                            <span>📄 {s.name}</span>
+                          </button>
+                        )
+                      })}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          detectiveAudio.playTypewriterClick()
+                          if (onSelectSuspect) onSelectSuspect(null)
+                          setName('')
+                          setMotiveClueIds([])
+                          setAlibiClueIds([])
+                        }}
+                        className="px-3 py-1.5 text-xs font-mono font-bold uppercase transition-all cursor-pointer flex items-center gap-1 border-2 border-dashed border-[#6b4e2e] text-[#6b4e2e] hover:bg-[#2b1f14]/5"
+                      >
+                        <span>+ LẬP HỒ SƠ MỚI</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* SUSPECT NAME INPUT */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
@@ -227,34 +288,27 @@ export function AddSuspectModal({
                         setSubTileView('motive')
                       }}
                       className={cn(
-                        'w-full text-left p-3.5 border-2 transition-all flex flex-col justify-between cursor-pointer select-none relative group h-full min-h-[76px]',
-                        motiveClueIds.length > 0
+                        'w-full text-left p-3.5 border-2 transition-all flex items-center justify-between cursor-pointer select-none relative group h-full min-h-[64px]',
+                        isMotiveValid
                           ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm'
                           : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
                       )}
                     >
-                      <div className="flex items-start gap-2.5">
+                      <div className="flex items-center gap-2.5">
                         <div
                           className={cn(
-                            'size-5 border-2 flex items-center justify-center font-mono font-bold text-xs shrink-0 transition-colors mt-0.5',
-                            motiveClueIds.length > 0
+                            'size-5 border-2 flex items-center justify-center font-mono font-bold text-xs shrink-0 transition-colors',
+                            isMotiveValid
                               ? 'bg-[#2e5220] border-[#193310] text-white'
                               : 'bg-white border-[#4a3520]'
                           )}
                         >
-                          {motiveClueIds.length > 0 && '✓'}
+                          {isMotiveValid && '✓'}
                         </div>
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight flex-1">
                           CĂN CỨ ĐỘNG CƠ GÂY ÁN
                         </span>
                       </div>
-                      {motiveClueIds.length > 0 && (
-                        <div className="mt-3 pt-2 border-t border-[#2e5220]/20 flex items-center text-[0.725rem] font-sans leading-snug">
-                          <span className="font-bold text-[#1f4014] flex items-center gap-1">
-                            <Check className="size-3.5 shrink-0" /> Đã chọn {motiveClueIds.length} tài liệu chứng minh
-                          </span>
-                        </div>
-                      )}
                     </button>
 
                     {/* Tile 2: BÓC TRẦN LỜI KHAI NGOẠI PHẠM */}
@@ -270,34 +324,27 @@ export function AddSuspectModal({
                         setSubTileView('alibi')
                       }}
                       className={cn(
-                        'w-full text-left p-3.5 border-2 transition-all flex flex-col justify-between cursor-pointer select-none relative group h-full min-h-[76px]',
-                        alibiClueIds.length > 0
+                        'w-full text-left p-3.5 border-2 transition-all flex items-center justify-between cursor-pointer select-none relative group h-full min-h-[64px]',
+                        isAlibiValid
                           ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm'
                           : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
                       )}
                     >
-                      <div className="flex items-start gap-2.5">
+                      <div className="flex items-center gap-2.5">
                         <div
                           className={cn(
-                            'size-5 border-2 flex items-center justify-center font-mono font-bold text-xs shrink-0 transition-colors mt-0.5',
-                            alibiClueIds.length > 0
+                            'size-5 border-2 flex items-center justify-center font-mono font-bold text-xs shrink-0 transition-colors',
+                            isAlibiValid
                               ? 'bg-[#2e5220] border-[#193310] text-white'
                               : 'bg-white border-[#4a3520]'
                           )}
                         >
-                          {alibiClueIds.length > 0 && '✓'}
+                          {isAlibiValid && '✓'}
                         </div>
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight flex-1">
                           BÓC TRẦN LỜI KHAI NGOẠI PHẠM
                         </span>
                       </div>
-                      {alibiClueIds.length > 0 && (
-                        <div className="mt-3 pt-2 border-t border-[#2e5220]/20 flex items-center text-[0.725rem] font-sans leading-snug">
-                          <span className="font-bold text-[#1f4014] flex items-center gap-1">
-                            <Check className="size-3.5 shrink-0" /> Đã chọn {alibiClueIds.length} tài liệu bẻ gãy ngoại phạm
-                          </span>
-                        </div>
-                      )}
                     </button>
                   </div>
                 </div>
@@ -429,22 +476,22 @@ export function AddSuspectModal({
             {/* ACTION TOOLBAR: SAVE & SUBMIT (ONLY VISIBLE ON OVERVIEW) */}
             {subTileView === 'overview' && (
               <div className="pt-3 border-t-2 border-[#2b1f14]/20 flex flex-wrap items-center justify-between gap-2">
-                {editingSuspect && onDelete ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      detectiveAudio.playGlassSound()
-                      onDelete(editingSuspect.id)
-                      onClose()
-                    }}
-                    className="text-xs uppercase tracking-wider px-4 py-2.5 rounded-none font-bold transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#a81c1c] bg-[#fce8e6] hover:bg-[#f8d7d4] text-[#a81c1c] active:scale-95"
-                  >
-                    <Trash2 className="size-3.5" />
-                    <span>XÓA KHỎI SƠ ĐỒ</span>
-                  </button>
-                ) : (
-                  <div />
-                )}
+                <div>
+                  {editingSuspect && onDelete && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        detectiveAudio.playGlassSound()
+                        onDelete(editingSuspect.id)
+                        onClose()
+                      }}
+                      title="Xóa hồ sơ nghi phạm"
+                      className="p-2 rounded-none border-2 border-[#a81c1c] bg-[#fce8e6] hover:bg-[#f8d7d4] text-[#a81c1c] transition-all cursor-pointer flex items-center justify-center active:scale-95"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-2.5 ml-auto">
                   <button
@@ -461,7 +508,7 @@ export function AddSuspectModal({
                     onClick={handleSubmitConclusion}
                     className="text-xs uppercase tracking-wider px-5 py-2.5 rounded-none font-bold transition-all cursor-pointer flex items-center gap-1.5 border-2 shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
                   >
-                    <span>NỘP KẾT LUẬN</span>
+                    <span>HOÀN TẤT THẨM TRA</span>
                     <ArrowRight className="size-3.5 text-[#d9a066]" />
                   </button>
                 </div>

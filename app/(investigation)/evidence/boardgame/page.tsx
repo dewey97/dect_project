@@ -132,6 +132,14 @@ export default function BoardGameCompanionPage() {
     try {
       localStorage.removeItem('veritas_discovered_findings')
       localStorage.removeItem('veritas_completed_checkpoints')
+      localStorage.removeItem('veritas_canvas_suspects')
+      localStorage.removeItem('veritas_investigated_suspects')
+      localStorage.removeItem('veritas_reinvestigate_unlocked')
+      localStorage.removeItem('veritas_indictment_solved')
+      localStorage.removeItem('veritas_indictment_culprit')
+      localStorage.removeItem('veritas_phone_inputs')
+      localStorage.removeItem('khang_phone_pinned_clues')
+      localStorage.removeItem('veritas_custom_notes')
       window.location.reload()
     } catch {}
   }

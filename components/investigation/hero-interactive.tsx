@@ -50,7 +50,7 @@ export interface PinPoint {
   y: number;
   label: string;
   detail: string;
-  color?: "red" | "yellow" | "blue" | "green";
+  color?: "red" | "yellow" | "blue" | "green" | "black";
 }
 
 export interface CaseConnection {
@@ -110,7 +110,7 @@ const CASES_LIST: CaseData[] = [
         x: 0.50,
         y: 0.22,
         label: "BỔ SUNG CHỨNG CỨ",
-        detail: "Bóc tách vật chứng hiện trường & tài liệu điều tra",
+        detail: "Chỉ dẫn nghiệp vụ & hướng dẫn mở khóa 2 nhánh chứng cứ",
       },
       {
         id: "c0-pin-indictment",
@@ -123,7 +123,7 @@ const CASES_LIST: CaseData[] = [
         id: "c0-pin-phone",
         x: 0.38,
         y: 0.68,
-        label: "THU THẬP THÊM THÔNG TIN",
+        label: "MỞ RỘNG ĐIỀU TRA",
         detail: "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
       },
       {
@@ -505,6 +505,11 @@ export function HeroInteractive({
 }: HeroInteractiveProps) {
   const customPinsRef = useRef<PinPoint[] | undefined>(customPins);
   const customConnectionsRef = useRef<CaseConnection[] | undefined>(customConnections);
+  const onPinClickRef = useRef(onPinClick);
+
+  useEffect(() => {
+    onPinClickRef.current = onPinClick;
+  }, [onPinClick]);
 
   useEffect(() => {
     customPinsRef.current = customPins;
@@ -879,8 +884,8 @@ export function HeroInteractive({
           }
         }
 
-        if (bestHitPin && onPinClick) {
-          onPinClick(bestHitPin.id, bestHitPin);
+        if (bestHitPin && onPinClickRef.current) {
+          onPinClickRef.current(bestHitPin.id, bestHitPin);
         }
       } else {
         updateHoveredPin(x, y);
@@ -1185,8 +1190,13 @@ export function HeroInteractive({
         const end = pinPositionsMap.get(conn.toPinId);
         if (!start || !end) return;
 
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const dist = Math.hypot(dx, dy);
+        const sag = Math.max(8, Math.min(26, dist * 0.045));
+
         const middleX = (start.x + end.x) / 2;
-        const middleY = (start.y + end.y) / 2 + 12;
+        const middleY = (start.y + end.y) / 2 + sag;
 
         context.save();
         context.strokeStyle = "rgba(200, 35, 35, 0.7)";
@@ -1218,9 +1228,13 @@ export function HeroInteractive({
         const end = pinPositionsMap.get(conn.toPinId);
         if (!start || !end) return;
 
-        // User strings sag slightly more or less depending on distance
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const dist = Math.hypot(dx, dy);
+        const sag = Math.max(10, Math.min(28, dist * 0.05));
+
         const middleX = (start.x + end.x) / 2;
-        const middleY = (start.y + end.y) / 2 + 15;
+        const middleY = (start.y + end.y) / 2 + sag;
 
         // Draw custom user connection (slightly different color or style, e.g. bright crimson)
         context.save();
@@ -1282,9 +1296,11 @@ export function HeroInteractive({
         if (pinColor === "yellow") {
           color = { base: "#d97706", highlight: "#fde047" };
         } else if (pinColor === "blue") {
-          color = { base: "#2563eb", highlight: "#60a5fa" };
+          color = { base: "#0284c7", highlight: "#38bdf8" };
         } else if (pinColor === "green") {
           color = { base: "#16a34a", highlight: "#4ade80" };
+        } else if (pinColor === "black") {
+          color = { base: "#27272a", highlight: "#71717a" };
         }
 
         // Active connection indicator ring
@@ -1351,8 +1367,26 @@ export function HeroInteractive({
         const tagY = pinPosition.y + baseRadius + 4 / transform.scale;
 
         const isYellowTag = pinColor === "yellow";
-        context.fillStyle = isYellowTag ? "rgba(24, 18, 10, 0.92)" : "rgba(35, 12, 12, 0.92)";
-        context.strokeStyle = isYellowTag ? "rgba(217, 119, 6, 0.85)" : "rgba(220, 38, 38, 0.85)";
+        const isBlueTag = pinColor === "blue";
+        const isGreenTag = pinColor === "green";
+        const isBlackTag = pinColor === "black";
+
+        if (isBlackTag) {
+          context.fillStyle = "rgba(20, 20, 22, 0.94)";
+          context.strokeStyle = "rgba(82, 82, 91, 0.85)";
+        } else if (isGreenTag) {
+          context.fillStyle = "rgba(6, 30, 16, 0.92)";
+          context.strokeStyle = "rgba(34, 197, 94, 0.85)";
+        } else if (isBlueTag) {
+          context.fillStyle = "rgba(7, 26, 44, 0.94)";
+          context.strokeStyle = "rgba(14, 165, 233, 0.85)";
+        } else if (isYellowTag) {
+          context.fillStyle = "rgba(24, 18, 10, 0.92)";
+          context.strokeStyle = "rgba(217, 119, 6, 0.85)";
+        } else {
+          context.fillStyle = "rgba(35, 12, 12, 0.92)";
+          context.strokeStyle = "rgba(220, 38, 38, 0.85)";
+        }
         context.lineWidth = 1.2 / transform.scale;
 
         const r = 3 / transform.scale;
@@ -1370,7 +1404,15 @@ export function HeroInteractive({
         context.fill();
         context.stroke();
 
-        context.fillStyle = isYellowTag ? "#fef08a" : "#fee2e2";
+        context.fillStyle = isBlackTag
+          ? "#a1a1aa"
+          : isGreenTag
+          ? "#bbf7d0"
+          : isBlueTag
+          ? "#7dd3fc"
+          : isYellowTag
+          ? "#fef08a"
+          : "#fee2e2";
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.fillText(pin.label, pinPosition.x, tagY + tagHeight / 2 + 0.5 / transform.scale);
