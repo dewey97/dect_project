@@ -36,7 +36,7 @@ Số: `03/LL-TP`
 
 1. **Đặc điểm ngoại hình:** Nam, cao 1m72, có vết sẹo ở lông mày trái.
 2. **Căn cứ xác minh:**
-   - Có cuộc gọi đến cho nạn nhân lúc 19:00, thời lượng cuộc gọi 2 phút 03 giây.
+   - Có cuộc gọi đến cho nạn nhân lúc 19:03, thời lượng cuộc gọi  phút 03 giây.
 ---
 
 **ĐIỀU TRA VIÊN TRÍCH LỤC HỒ SƠ**  
