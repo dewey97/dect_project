@@ -62,12 +62,12 @@ Căn cứ Điều 150 Bộ luật Tố tụng hình sự nước Cộng hòa xã
 
 Quá trình khám nghiệm đã phát hiện, đánh số ký hiệu và tiến hành thu giữ các đồ vật, dấu vết sau:
 
-* **Ký hiệu (p1):** Dấu vết đường vân tay chưa rõ danh tính, được trích thu bằng bột kỹ thuật trên bề mặt khung ảnh phòng khách.
-* **Ký hiệu (p2):** Tập tài liệu, đơn khởi kiện liên quan đến vụ án tranh chấp đất đai, thu giữ trên mặt bàn phòng khách.
-* **Ký hiệu (p3):** Các mảnh vỡ bình trà bằng gốm; trong đó có 01 mảnh thủy tinh nhọn dài dính nhiều máu nằm trên sàn nhà nghi là hung khí gây thương tích vùng cổ.
-* **Ký hiệu (p4):** 01 khung ảnh để bàn bị rơi xuống sàn, mặt kính vỡ rạn và nứt vỡ nhiều mảnh.
-* **Ký hiệu (p5):** Nhiều mảnh giấy báo bị xé vụn nằm vương vãi trên nền nhà phía chân bàn.
-* **Ký hiệu (10):** 01 cuốn sổ tay kích thước nhỏ, bên trong ghi chép các khoản nợ tiền.
+* **Ký hiệu (41):** Dấu vết đường vân tay chưa rõ danh tính, được trích thu bằng bột kỹ thuật trên bề mặt khung ảnh phòng khách.
+* **Ký hiệu (16):** Tập tài liệu, đơn khởi kiện liên quan đến vụ án tranh chấp đất đai, thu giữ trên mặt bàn phòng khách.
+* **Ký hiệu (39):** Các mảnh vỡ bình trà bằng gốm; trong đó có 01 mảnh thủy tinh nhọn dài dính nhiều máu nằm trên sàn nhà nghi là hung khí gây thương tích vùng cổ.
+* **Ký hiệu (40):** 01 khung ảnh để bàn bị rơi xuống sàn, mặt kính vỡ rạn và nứt vỡ nhiều mảnh.
+* **Ký hiệu (18):** Nhiều mảnh giấy báo bị xé vụn nằm vương vãi trên nền nhà phía chân bàn.
+* **Ký hiệu (13):** 01 cuốn sổ tay kích thước nhỏ, bên trong ghi chép các khoản nợ tiền.
 * **Ký hiệu (dev-00):** 01 điện thoại di động nhãn hiệu Apple iPhone 6s Plus của nạn nhân, thu giữ cạnh vị trí cánh tay nạn nhân.
 
 Toàn bộ đồ vật, dấu vết nêu trên đã được mô tả vào sơ đồ, chụp ảnh hiện trường và niêm phong theo đúng quy chuẩn.
