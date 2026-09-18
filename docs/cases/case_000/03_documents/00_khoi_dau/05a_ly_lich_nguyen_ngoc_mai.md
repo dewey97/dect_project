@@ -25,7 +25,7 @@ Số: `05a/LL-TP`
 | **Giới tính** | Nữ |
 | **Số CMND** | `275190483` |
 | **Nơi ĐKHKTT** | Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội |
-| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội (cách nhà nạn nhân 3.2 km) |
+| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội |
 | **Nghề nghiệp** | Chuyên viên Hành chính — Nhân sự (Công ty CP May Mặc) |
 | **Số điện thoại chính chủ** | `0912.456.789` |
 | **Tình trạng hôn nhân** | Đã kết hôn |
