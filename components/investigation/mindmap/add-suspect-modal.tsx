@@ -24,6 +24,7 @@ interface AddSuspectModalProps {
   existingSuspects?: SuspectItemData[]
   onSelectSuspect?: (suspect: SuspectItemData | null) => void
   onSubmitConclusion?: (culprit: 'vu' | 'tung' | 'ha') => void
+  isPhoneSolved?: boolean
 }
 
 interface EvaluationModalState {
@@ -42,6 +43,17 @@ const AVAILABLE_EVIDENCES =
   checkpoints000.find((cp) => cp.id === 'cp-000-1a')?.pickerConfig?.availableEvidences ||
   checkpoints000.find((cp) => cp.id === 'cp-000-2a')?.pickerConfig?.availableEvidences ||
   []
+
+export const PHONE_LOOKUP_EVIDENCE_IDS = [
+  'sms_dev00',
+  'doc_07b_loi_khai_vu',
+  'doc_14_loi_khai_tung',
+  'p6_anh_vu',
+  'p10_app_xe',
+  'p4_anh_1996',
+  'p4_van_tay',
+  'p5_manh_bao',
+]
 
 // Danh sách nhân vật hợp lệ trong hồ sơ Vụ án #000
 export const VALID_CASE_CHARACTERS = [
@@ -100,6 +112,66 @@ export function findValidCaseCharacter(input: string) {
   })
 }
 
+export function checkMotiveValid(characterId: string, selectedIds: string[]): boolean {
+  if (!characterId || selectedIds.length === 0) return false
+
+  if (characterId === 'vu') {
+    // Vũ: Sổ tay ghi nợ (doc_10_so_no) và Tin nhắn trên điện thoại Khang (sms_dev00)
+    const hasSoNo = selectedIds.includes('doc_10_so_no')
+    const hasSms = selectedIds.includes('sms_dev00')
+    return hasSoNo && hasSms
+  }
+
+  if (characterId === 'tung') {
+    // Tùng: Các mảnh báo cũ (p5_manh_bao) và Khung ảnh vỡ (p4_anh_1996)
+    const hasManhBao = selectedIds.includes('p5_manh_bao')
+    const hasAnh1996 = selectedIds.includes('p4_anh_1996')
+    return hasManhBao && hasAnh1996
+  }
+
+  if (characterId === 'ha') {
+    // Hà: Tin nhắn điện thoại (sms_dev00) hoặc sổ nợ (doc_10_so_no)
+    const hasSms = selectedIds.includes('sms_dev00') || selectedIds.includes('doc_10_so_no')
+    return hasSms
+  }
+
+  return false
+}
+
+export function checkAlibiValid(characterId: string, selectedIds: string[]): boolean {
+  if (!characterId || selectedIds.length === 0) return false
+
+  if (characterId === 'vu') {
+    // Vũ: App đặt xe (p10_app_xe), Lời khai Lụa (doc_06_loi_khai_lua), Lời khai Vũ (doc_07b_loi_khai_vu)
+    // Optional: Lời khai Mai (doc_07a_loi_khai_mai) - chọn hay không đều đúng
+    const hasApp = selectedIds.includes('p10_app_xe')
+    const hasLua = selectedIds.includes('doc_06_loi_khai_lua')
+    const hasVu = selectedIds.includes('doc_07b_loi_khai_vu')
+    return hasApp && hasLua && hasVu
+  }
+
+  if (characterId === 'tung') {
+    // Tùng: Dấu vân tay (p4_van_tay), Lời khai Tùng (doc_14_loi_khai_tung)
+    const hasVanTay = selectedIds.includes('p4_van_tay')
+    const hasTung = selectedIds.includes('doc_14_loi_khai_tung')
+    return hasVanTay && hasTung
+  }
+
+  if (characterId === 'ha') {
+    // Hà: Lời khai Hà (doc_07d_loi_khai_ha) và (Voice còi tàu / Lịch VTV3 / Tin nhắn)
+    // Optional: Lời khai Vũ (doc_07b_loi_khai_vu), Lời khai Lụa (doc_06_loi_khai_lua)
+    const hasHa = selectedIds.includes('doc_07d_loi_khai_ha')
+    const hasVoiceOrVtv3 =
+      selectedIds.includes('doc_voice_coi_tau') ||
+      selectedIds.includes('doc_lich_vtv3') ||
+      selectedIds.includes('sms_dev00') ||
+      selectedIds.includes('p10_app_xe')
+    return hasHa && hasVoiceOrVtv3
+  }
+
+  return false
+}
+
 export function AddSuspectModal({
   isOpen,
   onClose,
@@ -108,45 +180,32 @@ export function AddSuspectModal({
   editingSuspect,
   existingSuspects = [],
   onSelectSuspect,
-  onSubmitConclusion
+  onSubmitConclusion,
+  isPhoneSolved = false
 }: AddSuspectModalProps) {
   const [name, setName] = useState(() => editingSuspect?.name || '')
   const [subTileView, setSubTileView] = useState<'overview' | 'motive' | 'alibi'>('overview')
   const [motiveClueIds, setMotiveClueIds] = useState<string[]>(() => {
     if (editingSuspect?.motiveClueIds) return editingSuspect.motiveClueIds
-    if (editingSuspect?.clueIds) {
-      const alibiKnown = [
-        'doc_06_loi_khai_lua',
-        'p10_app_xe',
-        'doc_07b_loi_khai_vu',
-        'doc_14_loi_khai_tung',
-        'p4_van_tay',
-        'doc_07a_loi_khai_mai',
-        'doc_07d_loi_khai_ha'
-      ]
-      return editingSuspect.clueIds.filter((id) => !alibiKnown.includes(id))
-    }
     return []
   })
   const [alibiClueIds, setAlibiClueIds] = useState<string[]>(() => {
     if (editingSuspect?.alibiClueIds) return editingSuspect.alibiClueIds
-    if (editingSuspect?.clueIds) {
-      const alibiKnown = [
-        'doc_06_loi_khai_lua',
-        'p10_app_xe',
-        'doc_07b_loi_khai_vu',
-        'doc_14_loi_khai_tung',
-        'p4_van_tay',
-        'doc_07a_loi_khai_mai',
-        'doc_07d_loi_khai_ha'
-      ]
-      return editingSuspect.clueIds.filter((id) => alibiKnown.includes(id))
-    }
     return []
   })
   const [errorMsg, setErrorMsg] = useState('')
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null)
+
+  const hasPhoneSolvedState = isPhoneSolved || (typeof window !== 'undefined' && localStorage.getItem('veritas_phone_solved') === 'true')
+
+  const filteredEvidences = AVAILABLE_EVIDENCES.filter((ev) => {
+    if (PHONE_LOOKUP_EVIDENCE_IDS.includes(ev.id)) {
+      const isAlreadySelected = motiveClueIds.includes(ev.id) || alibiClueIds.includes(ev.id)
+      return hasPhoneSolvedState || isAlreadySelected
+    }
+    return true
+  })
 
   useEffect(() => {
     if (editingSuspect) {
@@ -154,19 +213,6 @@ export function AddSuspectModal({
       if (editingSuspect.motiveClueIds || editingSuspect.alibiClueIds) {
         setMotiveClueIds(editingSuspect.motiveClueIds || [])
         setAlibiClueIds(editingSuspect.alibiClueIds || [])
-      } else {
-        const clues = editingSuspect.clueIds || []
-        const alibiKnown = [
-          'doc_06_loi_khai_lua',
-          'p10_app_xe',
-          'doc_07b_loi_khai_vu',
-          'doc_14_loi_khai_tung',
-          'p4_van_tay',
-          'doc_07a_loi_khai_mai',
-          'doc_07d_loi_khai_ha'
-        ]
-        setMotiveClueIds(clues.filter((id) => !alibiKnown.includes(id)))
-        setAlibiClueIds(clues.filter((id) => alibiKnown.includes(id)))
       }
     } else {
       setName('')
@@ -186,8 +232,9 @@ export function AddSuspectModal({
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
     const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
+    const isValid = matched ? checkMotiveValid(matched.id, motiveClueIds) : false
 
-    if (!isCore) {
+    if (!isCore || !isValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
@@ -198,21 +245,6 @@ export function AddSuspectModal({
         subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
         suspectName: suspectDisplayName,
         selectedCount: motiveClueIds.length,
-      })
-      return
-    }
-
-    if (motiveClueIds.length === 0) {
-      detectiveAudio.playGlassSound()
-      setEvalModal({
-        isOpen: true,
-        isSuccess: false,
-        title: 'THÔNG BÁO',
-        heading: '',
-        message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
-        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
-        suspectName: suspectDisplayName,
-        selectedCount: 0,
       })
       return
     }
@@ -234,33 +266,19 @@ export function AddSuspectModal({
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
     const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
+    const isValid = matched ? checkAlibiValid(matched.id, alibiClueIds) : false
 
-    if (!isCore) {
+    if (!isCore || !isValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
         isSuccess: false,
         title: 'THÔNG BÁO',
         heading: '',
-        message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
+        message: 'Bằng chứng chứng minh mâu thuẫn ngoại phạm chưa chính xác.',
         subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
         suspectName: suspectDisplayName,
         selectedCount: alibiClueIds.length,
-      })
-      return
-    }
-
-    if (alibiClueIds.length === 0) {
-      detectiveAudio.playGlassSound()
-      setEvalModal({
-        isOpen: true,
-        isSuccess: false,
-        title: 'THÔNG BÁO',
-        heading: '',
-        message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
-        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
-        suspectName: suspectDisplayName,
-        selectedCount: 0,
       })
       return
     }
@@ -323,7 +341,17 @@ export function AddSuspectModal({
       return
     }
 
-    const suspectId = isVu ? 'vu' : isTung ? 'tung' : 'ha'
+    const charId = (isVu ? 'vu' : isTung ? 'tung' : 'ha') as 'vu' | 'tung' | 'ha'
+    const isMotiveOk = checkMotiveValid(charId, motiveClueIds)
+    const isAlibiOk = checkAlibiValid(charId, alibiClueIds)
+
+    if (!isMotiveOk || !isAlibiOk) {
+      setErrorMsg('Bằng chứng động cơ hoặc mâu thuẫn ngoại phạm chưa chính xác. Vui lòng rà soát lại đúng cả 2 mục trước khi tiến hành điều tra!')
+      detectiveAudio.playGlassSound()
+      return
+    }
+
+    const suspectId = charId
     const suspectName = matchedChar?.canonicalName || (isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà')
 
     const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
@@ -337,7 +365,7 @@ export function AddSuspectModal({
       alibiClueIds
     })
     if (onSubmitConclusion) {
-      onSubmitConclusion(isVu ? 'vu' : isTung ? 'tung' : 'ha')
+      onSubmitConclusion(charId)
     }
     onClose()
   }
@@ -366,9 +394,9 @@ export function AddSuspectModal({
   const isTung = matchedChar?.id === 'tung'
   const isHa = matchedChar?.id === 'ha'
 
-  // Hiển thị tích xanh khi có ít nhất 1 manh mối được chọn cho đối tượng hợp lệ
-  const isMotiveValid = (isVu || isTung || isHa) ? motiveClueIds.length > 0 : false
-  const isAlibiValid = (isVu || isTung || isHa) ? alibiClueIds.length > 0 : false
+  // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
+  const isMotiveValid = matchedChar ? checkMotiveValid(matchedChar.id, motiveClueIds) : false
+  const isAlibiValid = matchedChar ? checkAlibiValid(matchedChar.id, alibiClueIds) : false
 
   return (
     <AnimatePresence>
@@ -545,10 +573,15 @@ export function AddSuspectModal({
                   <p className="text-xs text-[#6b4e2e] italic font-sans leading-relaxed">
                     Hãy chọn các bằng chứng chứng minh đối tượng có mâu thuẫn hoặc có lý do để ra tay với nạn nhân
                   </p>
+                  {!hasPhoneSolvedState && (
+                    <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 font-mono text-[11px] font-medium mt-1">
+                      🔒 Giải mã câu hỏi Tra cứu SĐT trên bản đồ để mở khóa thêm 8 tài liệu/chứng cứ liên quan.
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
-                  {AVAILABLE_EVIDENCES.map((ev) => {
+                  {filteredEvidences.map((ev) => {
                     const isChecked = motiveClueIds.includes(ev.id)
                     return (
                       <button
@@ -614,10 +647,15 @@ export function AddSuspectModal({
                   <p className="text-xs text-[#6b4e2e] italic font-sans leading-relaxed">
                     Hãy chọn các bằng chứng chỉ ra điểm bất hợp lý trong ngoại phạm của đối tượng
                   </p>
+                  {!hasPhoneSolvedState && (
+                    <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 font-mono text-[11px] font-medium mt-1">
+                      🔒 Giải mã câu hỏi Tra cứu SĐT trên bản đồ để mở khóa thêm 8 tài liệu/chứng cứ liên quan.
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
-                  {AVAILABLE_EVIDENCES.map((ev) => {
+                  {filteredEvidences.map((ev) => {
                     const isChecked = alibiClueIds.includes(ev.id)
                     return (
                       <button

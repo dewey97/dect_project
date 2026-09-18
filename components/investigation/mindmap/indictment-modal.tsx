@@ -7,6 +7,8 @@ import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 
+import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
+
 interface IndictmentModalProps {
   isOpen: boolean
   onClose: () => void
@@ -17,6 +19,7 @@ interface IndictmentModalProps {
     selectedClueIds: string[]
     reasoning: string
   }) => void
+  isPhoneSolved?: boolean
 }
 
 const AVAILABLE_EVIDENCES =
@@ -59,14 +62,41 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
 
 function EvidenceGrid({
   selectedIds,
-  onToggle
+  onToggle,
+  isPhoneSolved
 }: {
   selectedIds: string[]
   onToggle: (id: string) => void
+  isPhoneSolved?: boolean
 }) {
+  const [hasPhoneSolvedState, setHasPhoneSolvedState] = useState(false)
+
+  React.useEffect(() => {
+    if (isPhoneSolved) {
+      setHasPhoneSolvedState(true)
+    } else {
+      try {
+        const savedPhone = localStorage.getItem('veritas_phone_inputs')
+        if (savedPhone) {
+          const parsed = JSON.parse(savedPhone)
+          if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
+            setHasPhoneSolvedState(true)
+          }
+        }
+      } catch {}
+    }
+  }, [isPhoneSolved])
+
+  const displayedEvidences = AVAILABLE_EVIDENCES.filter((ev) => {
+    if (PHONE_LOOKUP_EVIDENCE_IDS.includes(ev.id)) {
+      return hasPhoneSolvedState || selectedIds.includes(ev.id)
+    }
+    return true
+  })
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-1">
-      {AVAILABLE_EVIDENCES.map((evidence) => {
+      {displayedEvidences.map((evidence) => {
         const isChecked = selectedIds.includes(evidence.id)
         return (
           <button
@@ -99,7 +129,8 @@ function EvidenceGrid({
 export function IndictmentModal({
   isOpen,
   onClose,
-  onSubmitIndictment
+  onSubmitIndictment,
+  isPhoneSolved
 }: IndictmentModalProps) {
   const [suspectName, setSuspectName] = useState('')
   const [selectedMotiveOption, setSelectedMotiveOption] = useState<string>('')
@@ -302,6 +333,7 @@ export function IndictmentModal({
                       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
                     )
                   }}
+                  isPhoneSolved={isPhoneSolved}
                 />
               </div>
 
@@ -318,6 +350,7 @@ export function IndictmentModal({
                       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
                     )
                   }}
+                  isPhoneSolved={isPhoneSolved}
                 />
               </div>
 
@@ -334,6 +367,7 @@ export function IndictmentModal({
                       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
                     )
                   }}
+                  isPhoneSolved={isPhoneSolved}
                 />
               </div>
             </div>

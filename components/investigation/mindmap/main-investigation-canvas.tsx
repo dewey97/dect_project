@@ -420,8 +420,8 @@ export function MainInvestigationCanvas({
     { x: 0.48, y: 0.520 }, // Slot 0: Lê Quang Vũ
     { x: 0.65, y: 0.485 }, // Slot 1: Nguyễn Thanh Tùng (Lệch lên)
     { x: 0.82, y: 0.535 }, // Slot 2: Trần Thị Hà (Lệch xuống)
-    { x: 0.15, y: 0.725 }, // Slot 3: Nguyễn Ngọc Mai
-    { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt (Đạt Gà) — Nằm bên trái Lê Quang Vũ (Lệch lên)
+    { x: 0.78, y: 0.360 }, // Slot 3: Nguyễn Ngọc Mai — Bên phải note nghi phạm (x: 0.65, y: 0.30), thấp hơn một chút
+    { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt — Nằm bên trái Lê Quang Vũ (Lệch lên)
     { x: 0.16, y: 0.535 }, // Slot 5: Nguyễn Thị Lụa — Nằm bên trái Trần Văn Đạt (Lệch xuống)
     { x: 0.94, y: 0.480 }, // Slot 6: Nguyễn Văn Khang (Mé phải viền bảng)
   ], [])
@@ -430,8 +430,8 @@ export function MainInvestigationCanvas({
     { x: 0.48, y: 0.520 }, // Slot 0: Lê Quang Vũ
     { x: 0.65, y: 0.485 }, // Slot 1: Nguyễn Thanh Tùng
     { x: 0.82, y: 0.535 }, // Slot 2: Trần Thị Hà
-    { x: 0.15, y: 0.725 }, // Slot 3: Nguyễn Ngọc Mai
-    { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt (Đạt Gà) — Nằm bên trái Lê Quang Vũ
+    { x: 0.78, y: 0.360 }, // Slot 3: Nguyễn Ngọc Mai — Bên phải note nghi phạm, thấp hơn một chút
+    { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt — Nằm bên trái Lê Quang Vũ
     { x: 0.16, y: 0.535 }, // Slot 5: Nguyễn Thị Lụa — Nằm bên trái Trần Văn Đạt
     { x: 0.94, y: 0.480 }, // Slot 6: Nguyễn Văn Khang
   ], [])
@@ -740,6 +740,7 @@ export function MainInvestigationCanvas({
         editingSuspect={editingSuspect}
         existingSuspects={suspects}
         onSelectSuspect={(s) => setEditingSuspect(s)}
+        isPhoneSolved={phoneLookupSuccess}
         onSubmitConclusion={(culprit) => {
           detectiveAudio.playStampSound()
           detectiveAudio.playUnlockJingle()
@@ -787,6 +788,7 @@ export function MainInvestigationCanvas({
         isOpen={isIndictmentOpen}
         onClose={() => setIsIndictmentOpen(false)}
         onSubmitIndictment={handleSubmitIndictment}
+        isPhoneSolved={phoneLookupSuccess}
       />
 
       <CulpritEpilogueModal
@@ -821,6 +823,7 @@ export function MainInvestigationCanvas({
         onClose={() => setIsFollowupQuestionOpen(false)}
         onSuccess={handleFollowupSuccess}
         onOpenDossier={handleOpenDossier}
+        isPhoneSolved={phoneLookupSuccess}
       />
     </div>
   )

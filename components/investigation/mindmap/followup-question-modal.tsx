@@ -7,12 +7,15 @@ import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 
+import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
+
 interface FollowupQuestionModalProps {
   isOpen: boolean
   culprit: 'vu' | 'tung' | 'ha' | null
   onClose: () => void
   onSuccess?: (culprit: 'vu' | 'tung' | 'ha', choice?: string) => void
   onOpenDossier?: (dossierType: 'A' | 'B' | 'C') => void
+  isPhoneSolved?: boolean
 }
 
 const MOCK_OPTIONS_TUNG = [
@@ -62,7 +65,8 @@ export function FollowupQuestionModal({
   culprit,
   onClose,
   onSuccess,
-  onOpenDossier
+  onOpenDossier,
+  isPhoneSolved
 }: FollowupQuestionModalProps) {
   // State for Vu time input
   const [vuTimeInput, setVuTimeInput] = useState<string>('')
@@ -79,6 +83,31 @@ export function FollowupQuestionModal({
   })
 
   const [errorMsg, setErrorMsg] = useState('')
+  const [hasPhoneSolvedState, setHasPhoneSolvedState] = useState(false)
+
+  useEffect(() => {
+    if (isPhoneSolved) {
+      setHasPhoneSolvedState(true)
+    } else {
+      try {
+        const savedPhone = localStorage.getItem('veritas_phone_inputs')
+        if (savedPhone) {
+          const parsed = JSON.parse(savedPhone)
+          if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
+            setHasPhoneSolvedState(true)
+          }
+        }
+      } catch {}
+    }
+  }, [isPhoneSolved, isOpen])
+
+  const displayedEvidences = AVAILABLE_EVIDENCES.filter((ev) => {
+    if (PHONE_LOOKUP_EVIDENCE_IDS.includes(ev.id)) {
+      const allHaSelected = Object.values(haTileSelections).flat()
+      return hasPhoneSolvedState || allHaSelected.includes(ev.id)
+    }
+    return true
+  })
 
   useEffect(() => {
     if (!culprit || !isOpen) return
@@ -448,7 +477,7 @@ export function FollowupQuestionModal({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
-                  {AVAILABLE_EVIDENCES.map((ev) => {
+                  {displayedEvidences.map((ev) => {
                     const currentSelected = haTileSelections[activeHaTileId] || []
                     const isChecked = currentSelected.includes(ev.id)
 
