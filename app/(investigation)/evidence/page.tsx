@@ -84,13 +84,16 @@ export default function EvidencePage() {
 
     const handleOpenEpilogue = () => setIsEpilogueOpen(true)
     const handleOpenPhone = () => setIsPhoneModalOpen(true)
+    const handleOpenReinvestigation = () => setIsReinvestigateModalOpen(true)
 
     window.addEventListener('open-epilogue-modal', handleOpenEpilogue)
     window.addEventListener('open-phone-modal', handleOpenPhone)
+    window.addEventListener('open-reinvestigation-modal', handleOpenReinvestigation)
 
     return () => {
       window.removeEventListener('open-epilogue-modal', handleOpenEpilogue)
       window.removeEventListener('open-phone-modal', handleOpenPhone)
+      window.removeEventListener('open-reinvestigation-modal', handleOpenReinvestigation)
     }
   }, [router])
 
@@ -770,8 +773,15 @@ export default function EvidencePage() {
             window.dispatchEvent(new CustomEvent('open-hint-modal'))
           }
         }}
+        onOpenReinvestigation={() => setIsReinvestigateModalOpen(true)}
         onOpenPhone={() => setIsPhoneModalOpen(true)}
         onResetCase={resetFindingsProgress}
+      />
+
+      {/* REINVESTIGATION 3D ROOM MODAL */}
+      <ReinvestigationModal
+        isOpen={isReinvestigateModalOpen}
+        onClose={() => setIsReinvestigateModalOpen(false)}
       />
 
       {/* VICTIM PHONE SIMULATOR MODAL (For mobile viewports in Web mode) */}

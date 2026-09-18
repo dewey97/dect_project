@@ -45,7 +45,7 @@ export const CRIME_SCENE_HOTSPOTS: RoomHotspot[] = [
     title: 'BÀN TRÀ PHÒNG KHÁCH — PHÍCH RẠNG ĐÔNG & CHÉN VỠ',
     caption: 'Ảnh hiện trường #01-KX: Ấm chén gốm vỡ trên sàn gạch và phích nước Rạng Đông',
     detail: 'Bộ ấm chén gốm vỡ trên sàn gạch bông, ghế đơn bị xô ngã lật nghiêng khoảng 40cm. Phích nước còn nóng chứng tỏ nạn nhân đã tiếp khách ít phút trước khi xảy ra vụ việc.',
-    imageUrl: '/images/cases/case_000/avatar_khang.jpg'
+    imageUrl: '/images/cases/case_000/photo-reinvestigation-room-realistic.jpg'
   },
   {
     id: 'spot-2',
@@ -669,7 +669,7 @@ function TurnedWoodenLeg({
           map={woodTexture}
           normalMap={woodNormalMap}
           roughnessMap={woodRoughnessMap}
-          roughness={0.4}
+          roughness={0.85}
         />
       </mesh>
       <mesh position={[0, height - 0.1, 0]} castShadow>
@@ -678,7 +678,7 @@ function TurnedWoodenLeg({
           map={woodTexture}
           normalMap={woodNormalMap}
           roughnessMap={woodRoughnessMap}
-          roughness={0.35}
+          roughness={0.85}
         />
       </mesh>
       <mesh position={[0, height - 0.16, 0]} castShadow>
@@ -687,7 +687,7 @@ function TurnedWoodenLeg({
           map={woodTexture}
           normalMap={woodNormalMap}
           roughnessMap={woodRoughnessMap}
-          roughness={0.35}
+          roughness={0.85}
         />
       </mesh>
       <mesh position={[0, height - 0.22, 0]} castShadow>
@@ -696,7 +696,7 @@ function TurnedWoodenLeg({
           map={woodTexture}
           normalMap={woodNormalMap}
           roughnessMap={woodRoughnessMap}
-          roughness={0.35}
+          roughness={0.85}
         />
       </mesh>
       <mesh position={[0, height - 0.31, 0]} castShadow>
@@ -705,7 +705,7 @@ function TurnedWoodenLeg({
           map={woodTexture}
           normalMap={woodNormalMap}
           roughnessMap={woodRoughnessMap}
-          roughness={0.4}
+          roughness={0.85}
         />
       </mesh>
       <mesh position={[0, 0.035, 0]} castShadow>
@@ -714,7 +714,7 @@ function TurnedWoodenLeg({
           map={woodTexture}
           normalMap={woodNormalMap}
           roughnessMap={woodRoughnessMap}
-          roughness={0.4}
+          roughness={0.85}
         />
       </mesh>
       <mesh position={[0, 0.005, 0]} castShadow>
@@ -723,7 +723,7 @@ function TurnedWoodenLeg({
           map={woodTexture}
           normalMap={woodNormalMap}
           roughnessMap={woodRoughnessMap}
-          roughness={0.45}
+          roughness={0.85}
         />
       </mesh>
     </group>
@@ -981,8 +981,8 @@ function VietnameseLivingRoomSet({
             normalMap={woodNormalMap}
             normalScale={new THREE.Vector2(0.6, 0.6)}
             roughnessMap={woodRoughnessMap}
-            roughness={0.24}
-            metalness={0.06}
+            roughness={0.75}
+            metalness={0.02}
           />
         </mesh>
         <mesh position={[0, 0.47, 0]} castShadow>
@@ -992,8 +992,8 @@ function VietnameseLivingRoomSet({
             normalMap={woodNormalMap}
             normalScale={new THREE.Vector2(0.5, 0.5)}
             roughnessMap={woodRoughnessMap}
-            roughness={0.34}
-            metalness={0.05}
+            roughness={0.8}
+            metalness={0.02}
           />
         </mesh>
 
@@ -1080,8 +1080,8 @@ function VietnameseLivingRoomSet({
             normalMap={woodNormalMap}
             normalScale={new THREE.Vector2(0.5, 0.5)}
             roughnessMap={woodRoughnessMap}
-            roughness={0.28}
-            metalness={0.05}
+            roughness={0.8}
+            metalness={0.02}
           />
         </mesh>
         {[
@@ -1107,7 +1107,8 @@ function VietnameseLivingRoomSet({
               map={woodTexture}
               normalMap={woodNormalMap}
               roughnessMap={woodRoughnessMap}
-              roughness={0.36}
+              roughness={0.85}
+              metalness={0.02}
             />
           </mesh>
           {[-0.62, 0, 0.62].map((bx, bi) => (
@@ -1117,7 +1118,8 @@ function VietnameseLivingRoomSet({
                 map={woodTexture}
                 normalMap={woodNormalMap}
                 roughnessMap={woodRoughnessMap}
-                roughness={0.42}
+                roughness={0.85}
+                metalness={0.02}
               />
             </mesh>
           ))}
@@ -1133,8 +1135,8 @@ function VietnameseLivingRoomSet({
             normalMap={woodNormalMap}
             normalScale={new THREE.Vector2(0.5, 0.5)}
             roughnessMap={woodRoughnessMap}
-            roughness={0.3}
-            metalness={0.05}
+            roughness={0.8}
+            metalness={0.02}
           />
         </mesh>
         {[
@@ -1159,7 +1161,8 @@ function VietnameseLivingRoomSet({
               map={woodTexture}
               normalMap={woodNormalMap}
               roughnessMap={woodRoughnessMap}
-              roughness={0.38}
+              roughness={0.85}
+              metalness={0.02}
             />
           </mesh>
           <mesh position={[0, 0.02, 0]} castShadow>
@@ -1168,7 +1171,8 @@ function VietnameseLivingRoomSet({
               map={woodTexture}
               normalMap={woodNormalMap}
               roughnessMap={woodRoughnessMap}
-              roughness={0.4}
+              roughness={0.85}
+              metalness={0.02}
             />
           </mesh>
         </group>
@@ -1183,8 +1187,8 @@ function VietnameseLivingRoomSet({
             normalMap={woodNormalMap}
             normalScale={new THREE.Vector2(0.5, 0.5)}
             roughnessMap={woodRoughnessMap}
-            roughness={0.3}
-            metalness={0.05}
+            roughness={0.8}
+            metalness={0.02}
           />
         </mesh>
         {[

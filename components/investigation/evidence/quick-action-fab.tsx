@@ -2,16 +2,17 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Lightbulb, Smartphone, RefreshCw, X } from 'lucide-react'
+import { Lightbulb, Smartphone, RefreshCw, X, Search } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
 interface QuickActionFabProps {
   onOpenPhone: () => void
   onResetCase: () => void
   onOpenHint?: () => void
+  onOpenReinvestigation?: () => void
 }
 
-export function QuickActionFab({ onOpenPhone, onResetCase, onOpenHint }: QuickActionFabProps) {
+export function QuickActionFab({ onOpenPhone, onResetCase, onOpenHint, onOpenReinvestigation }: QuickActionFabProps) {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -49,8 +50,26 @@ export function QuickActionFab({ onOpenPhone, onResetCase, onOpenHint }: QuickAc
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 10 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-2.5 w-52 bg-[#140d08]/95 border border-[#3d2b1d] shadow-[0_15px_40px_rgba(0,0,0,0.95),0_0_15px_rgba(217,160,102,0.06)] rounded-xl p-2 space-y-1.5 backdrop-blur-md text-[#fef5ec]"
+            className="mb-2.5 w-56 bg-[#140d08]/95 border border-[#3d2b1d] shadow-[0_15px_40px_rgba(0,0,0,0.95),0_0_15px_rgba(217,160,102,0.06)] rounded-xl p-2 space-y-1.5 backdrop-blur-md text-[#fef5ec]"
           >
+            {/* OPTION: REINVESTIGATION (KHÁM XÉT LẠI) */}
+            <button
+              type="button"
+              onClick={() =>
+                handleAction(() => {
+                  if (onOpenReinvestigation) {
+                    onOpenReinvestigation()
+                  } else if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('open-reinvestigation-modal'))
+                  }
+                })
+              }
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#e5d8cb] hover:text-amber-300 group"
+            >
+              <Search className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Khám xét lại hiện trường (3D)</span>
+            </button>
+
             {/* OPTION: HINT */}
             <button
               type="button"

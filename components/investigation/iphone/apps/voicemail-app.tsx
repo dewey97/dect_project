@@ -68,7 +68,7 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
       sender: 'Trần Thị Hà',
       phone: '0984.112.568',
       time: '20:32 (24/07)',
-      duration: '0:11',
+      duration: '0:08',
       transcript:
         '"Anh Khang à, sao em gọi mãi anh không nghe máy thế? Em đang ở phòng trọ xem phim một mình buồn quá... tí nữa em chạy qua với anh nhé..."',
       audioClue:
