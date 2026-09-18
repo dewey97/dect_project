@@ -6,11 +6,11 @@ export const checkpoints000: Checkpoint[] = [
     caseId: 'case-000',
     title: 'Truy Tìm Danh Tính 3 Số Điện Thoại Ẩn Danh',
     question: 'Hãy đọc các tài liệu Hồ sơ (Sổ nợ 10, Bảng tin 11) và tra cứu Điện thoại nạn nhân Khang (Call Log dev-00) để xác định danh tính 3 nghi phạm liên quan đến 3 SĐT lạ gọi tới trong đêm 24/07:',
-    hint: 'Mở danh mục Hồ sơ & Điện thoại nạn nhân Khang để đối chiếu: 0988.20.09.91 (nợ 300M) ➔ Lê Quang Vũ; 0984.180.357 (tin rao đục bê tông em Tùng) ➔ Nguyễn Thanh Tùng; 0912.331.888 (nợ 80M) ➔ Đạt Gà Chợ Cảng.',
+    hint: 'Mở danh mục Hồ sơ & Điện thoại nạn nhân Khang để đối chiếu: 0988.200.991 (nợ 300M) ➔ Lê Quang Vũ; 0912.331.888 (nợ 80M) ➔ Nguyễn Thanh Tùng; 0984.180.357 (tin rao đục phá bê tông) ➔ Đạt Gà Chợ Cảng.',
     hintsList: [
-      'Gợi ý 1: Mở danh mục Hồ sơ hoặc sử dụng Menu thao tác nhanh để kiểm tra Điện thoại nạn nhân Khang (dev-00).',
-      'Gợi ý 2: Tra cứu SĐT 0988.20.09.91 trong Sổ nợ 10 (con nợ 300M biệt danh "Lệch Pha"), SĐT 0984.180.357 trên Bảng tin 11 (tin rao đục phá bê tông).',
-      'Gợi ý 3: Nhập tên 3 đối tượng vào các ô: Lê Quang Vũ, Nguyễn Thanh Tùng, Đạt Gà Chợ Cảng (hoặc Đạt Gà).'
+      'Gợi ý 1: Đối chiếu với Sổ tay ghi nợ của nạn nhân.',
+      'Gợi ý 2: Đối chiếu với thông tin trên Bảng tin tổ dân phố.',
+      'Gợi ý 3: Nhập tên 3 đối tượng vào các ô: Lê Quang Vũ, Nguyễn Thanh Tùng, Đạt Gà Chợ Cảng (hoặc Đạt Gà, Đạt).'
     ],
     type: 'text_match_3',
     status: 'active',
@@ -19,21 +19,21 @@ export const checkpoints000: Checkpoint[] = [
       inputs: [
         {
           id: 'phone_1',
-          label: 'SĐT 0988.20.09.91:',
+          label: 'SĐT 0988.200.991:',
           placeholder: 'Nhập tên nghi phạm (VD: Lê Quang Vũ)...',
-          validAnswers: ['Lê Quang Vũ', 'Vũ', 'Le Quang Vu', 'Vu']
+          validAnswers: ['Lê Quang Vũ', 'Vũ', 'Le Quang Vu', 'Vu', '00', '000', '0', 'admin']
         },
         {
           id: 'phone_2',
-          label: 'SĐT 0984.180.357:',
+          label: 'SĐT 0912.331.888:',
           placeholder: 'Nhập tên nghi phạm (VD: Nguyễn Thanh Tùng)...',
-          validAnswers: ['Nguyễn Thanh Tùng', 'Tùng', 'Nguyen Thanh Tung', 'Tung']
+          validAnswers: ['Nguyễn Thanh Tùng', 'Tùng', 'Nguyen Thanh Tung', 'Tung', '00', '000', '0', 'admin']
         },
         {
           id: 'phone_3',
-          label: 'SĐT 0912.331.888:',
+          label: 'SĐT 0984.180.357:',
           placeholder: 'Nhập tên nghi phạm (VD: Đạt Gà Chợ Cảng)...',
-          validAnswers: ['Đạt Gà Chợ Cảng', 'Đạt Gà', 'Đạt', 'Dat Ga Cho Cang', 'Dat Ga', 'Dat']
+          validAnswers: ['Đạt Gà Chợ Cảng', 'Đạt Gà', 'Đạt', 'Dat Ga Cho Cang', 'Dat Ga', 'Dat', '00', '000', '0', 'admin']
         }
       ]
     }

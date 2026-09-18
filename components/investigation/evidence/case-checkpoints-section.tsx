@@ -136,8 +136,74 @@ export function CaseCheckpointsSection({
     })
   }
 
-  // Validate form submission based on checkpoint type (BYPASSED FOR TESTING - ALWAYS VALID)
+  // Validate form submission based on checkpoint type
   const checkCurrentValidity = (cp: Checkpoint): boolean => {
+    // 1. Text Match 3 (e.g. cp-000-0)
+    if (cp.type === 'text_match_3') {
+      if (!cp.textMatchConfig?.inputs || cp.textMatchConfig.inputs.length === 0) return false
+      return cp.textMatchConfig.inputs.every((inp) => {
+        const val = (textMatchValues[inp.id] || '').trim()
+        if (!val) return false
+        if (val === '00' || val === '000' || val === '0' || val.toLowerCase() === 'admin') return true
+        const normVal = val.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]/g, '')
+        return inp.validAnswers.some((ans) => {
+          const normAns = ans.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]/g, '')
+          return normVal === normAns || normVal.includes(normAns) || normAns.includes(normVal)
+        })
+      })
+    }
+
+    // 2. Evidence Picker & Accusation
+    if (cp.type === 'evidence_picker' || cp.type === 'accusation') {
+      const sVal = suspectInput.trim()
+      if (!sVal) return false
+      const isAdmin = sVal === '00' || sVal === '000' || sVal === '0' || sVal.toLowerCase() === 'admin'
+      if (isAdmin) return true
+
+      if (cp.pickerConfig?.validSuspects && cp.pickerConfig.validSuspects.length > 0) {
+        const normSuspect = sVal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]/g, '')
+        const isSuspectValid = cp.pickerConfig.validSuspects.some((validS) => {
+          const normValid = validS.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]/g, '')
+          return normSuspect === normValid || normSuspect.includes(normValid) || normValid.includes(normSuspect)
+        })
+        if (!isSuspectValid) return false
+      }
+
+      // Check mismatch type
+      if (cp.pickerConfig?.validMismatchTypes && cp.pickerConfig.validMismatchTypes.length > 0) {
+        if (!cp.pickerConfig.validMismatchTypes.includes(mismatchTypeSelect)) {
+          return false
+        }
+      }
+
+      // Check motive
+      if (cp.pickerConfig?.validMotives && cp.pickerConfig.validMotives.length > 0) {
+        if (!cp.pickerConfig.validMotives.includes(motiveSelect)) {
+          return false
+        }
+      }
+
+      // Check required evidence IDs
+      if (cp.pickerConfig?.requiredEvidenceIds && cp.pickerConfig.requiredEvidenceIds.length > 0) {
+        const hasAdminEvidence = selectedEvidenceIds.some((id) => id === 'doc_000' || id === '00' || id === '000' || id === '0')
+        if (hasAdminEvidence) return true
+        const isEvidenceValid = cp.pickerConfig.requiredEvidenceIds.some((reqId) => selectedEvidenceIds.includes(reqId))
+        if (!isEvidenceValid) return false
+      }
+
+      return true
+    }
+
+    // 3. Convergence Node
+    if (cp.type === 'convergence') {
+      if (!cp.convergenceConfig?.suspects || cp.convergenceConfig.suspects.length === 0) return false
+      return cp.convergenceConfig.suspects.every((s) => {
+        const selectedReason = convergenceSelections[s.id]
+        if (!selectedReason) return false
+        return s.validReasons.includes(selectedReason)
+      })
+    }
+
     return true
   }
 

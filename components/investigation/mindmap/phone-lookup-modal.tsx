@@ -5,6 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Smartphone, ArrowRight, CheckCircle2, ArrowLeft } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
+import { isAdminBypassCode } from '@/lib/cases/admin-bypass'
+
+function isPhoneMatch(val: string, validKeywords: string[]): boolean {
+  if (isAdminBypassCode(val)) return true
+  const norm = val.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]/g, '')
+  return validKeywords.some((kw) => {
+    const kwNorm = kw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]/g, '')
+    return norm.includes(kwNorm) || kwNorm.includes(norm)
+  })
+}
 
 interface PhoneLookupModalProps {
   isOpen: boolean
@@ -41,12 +51,22 @@ export function PhoneLookupModal({
     } catch {}
   }, [isOpen])
 
-  if (!isOpen) return null
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!phone1.trim() && !phone2.trim() && !phone3.trim()) {
       setErrorMsg('Vui lòng điền danh tính chủ thể cho ít nhất 1 số điện thoại!')
+      detectiveAudio.playGlassSound()
+      return
+    }
+
+    const hasBypass = isAdminBypassCode(phone1) || isAdminBypassCode(phone2) || isAdminBypassCode(phone3)
+
+    const isP1Valid = !phone1.trim() || isPhoneMatch(phone1, ['vu', 'le quang vu', 'vũ', 'lê quang vũ'])
+    const isP2Valid = !phone2.trim() || isPhoneMatch(phone2, ['tung', 'nguyen thanh tung', 'tùng', 'nguyễn thanh tùng'])
+    const isP3Valid = !phone3.trim() || isPhoneMatch(phone3, ['dat', 'dat ga', 'tran van dat', 'đạt', 'đạt gà', 'trần văn đạt'])
+
+    if (!hasBypass && (!isP1Valid || !isP2Valid || !isP3Valid)) {
+      setErrorMsg('Danh tính chủ thể chưa chính xác. Vui lòng đối chiếu kỹ lại Sổ nợ và Bảng tin!')
       detectiveAudio.playGlassSound()
       return
     }
@@ -131,10 +151,11 @@ export function PhoneLookupModal({
             <div className="space-y-3">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-[#2b1f14] block font-mono">
-                  SĐT 0988.20.09.91:
+                  SĐT 0988.200.991:
                 </label>
                 <input
                   type="text"
+                  placeholder="Nhập tên nghi phạm (VD: Lê Quang Vũ)..."
                   value={phone1}
                   onChange={(e) => {
                     setPhone1(e.target.value)
@@ -147,10 +168,11 @@ export function PhoneLookupModal({
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-[#2b1f14] block font-mono">
-                  SĐT 0984.180.357:
+                  SĐT 0912.331.888:
                 </label>
                 <input
                   type="text"
+                  placeholder="Nhập tên nghi phạm (VD: Nguyễn Thanh Tùng)..."
                   value={phone2}
                   onChange={(e) => {
                     setPhone2(e.target.value)
@@ -162,10 +184,11 @@ export function PhoneLookupModal({
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-[#2b1f14] block font-mono">
-                  SĐT 0912.331.888:
+                  SĐT 0984.180.357:
                 </label>
                 <input
                   type="text"
+                  placeholder="Nhập tên nghi phạm (VD: Đạt Gà Chợ Cảng)..."
                   value={phone3}
                   onChange={(e) => {
                     setPhone3(e.target.value)

@@ -86,26 +86,26 @@ export function checkMotiveValid(characterId: string, selectedIds: string[]): bo
   if (hasAdminBypassInArray(selectedIds)) return true
 
   if (characterId === 'vu') {
-    // Vũ: Sổ tay ghi nợ (doc_10_so_no / doc_13_don_dat / 10 / 13) và Tin nhắn trên máy Khang (sms_dev00 / 11 / sms_phone_0988200991 / p6_anh_vu)
+    // Vũ: Sổ tay ghi nợ (13 / doc_13 / doc_10 / 10 / doc_10_so_no / doc_13_don_dat) HOẶC Tin nhắn SĐT 0988.200.991
     const hasSoNo = selectedIds.some((id) => ['doc_10_so_no', 'doc_13_don_dat', 'doc_10', 'doc_13', '10', '13'].includes(id))
-    const hasSms = selectedIds.some((id) => ['sms_dev00', 'p6_anh_vu', '11', '19'].includes(id) || id.includes('0988200991') || id.includes('0988.200.991') || id.includes('sms_phone_'))
-    return hasSoNo || hasSms || selectedIds.length >= 2
+    const hasSms = selectedIds.some((id) => ['sms_dev00', 'p6_anh_vu', '11', '19'].includes(id) || id.includes('0988200991') || id.includes('0988.200.991') || (id.startsWith('sms_phone_') && id.includes('0988')))
+    return hasSoNo || hasSms
   }
 
   if (characterId === 'tung') {
-    // Tùng: Các mảnh báo cũ (p5_manh_bao / 18), Khung ảnh vỡ (p4_anh_1996 / 16 / 40), hoặc SMS 0912331888
-    const hasManhBao = selectedIds.some((id) => ['p5_manh_bao', 'p4_anh_1996', '18', '16', '40'].includes(id))
-    const hasSms = selectedIds.some((id) => id.includes('0912331888') || id.includes('0912.331.888') || id.includes('sms_phone_') || id === 'sms_dev00')
-    return hasManhBao || hasSms || selectedIds.length >= 2
+    // Tùng: Các mảnh báo cũ (18 / doc_18 / p5_manh_bao), Khung ảnh 1996 (40 / doc_40 / p4_anh_1996 / 16), hoặc Tin nhắn SĐT 0912.331.888
+    const hasManhBao = selectedIds.some((id) => ['p5_manh_bao', 'p4_anh_1996', 'doc_18', 'doc_40', '18', '16', '40'].includes(id))
+    const hasSms = selectedIds.some((id) => id.includes('0912331888') || id.includes('0912.331.888') || (id.startsWith('sms_phone_') && id.includes('0912')))
+    return hasManhBao || hasSms
   }
 
   if (characterId === 'ha') {
-    // Hà: Tin nhắn SĐT Vy (0978552109), SMS trên máy Khang, hoặc sổ nợ
-    const hasSms = selectedIds.some((id) => id.includes('0978552109') || id.includes('0978.552.109') || id.includes('sms_phone_') || id === 'sms_dev00' || id === 'doc_10_so_no')
-    return hasSms || selectedIds.length >= 1
+    // Hà: Tin nhắn SĐT Vy (0978.552.109 / doc_53 / doc_48 / 53 / 48) hoặc SĐT Hà (0984.112.568)
+    const hasSms = selectedIds.some((id) => ['doc_53', 'doc_48', '53', '48'].includes(id) || id.includes('0978552109') || id.includes('0978.552.109') || id.includes('0984112568') || id.includes('0984.112.568') || (id.startsWith('sms_phone_') && (id.includes('0978') || id.includes('0984'))))
+    return hasSms
   }
 
-  return selectedIds.length > 0
+  return false
 }
 
 export function checkAlibiValid(characterId: string, selectedIds: string[]): boolean {
@@ -114,24 +114,24 @@ export function checkAlibiValid(characterId: string, selectedIds: string[]): boo
   if (hasAdminBypassInArray(selectedIds)) return true
 
   if (characterId === 'vu') {
-    // Vũ: App đặt xe (p10_app_xe / 12 / 42), Lời khai Lụa (doc_06_loi_khai_lua / 06 / 10), Lời khai Vũ (doc_07b_loi_khai_vu / 07b / 08)
-    const hasApp = selectedIds.some((id) => ['p10_app_xe', 'doc_06_loi_khai_lua', 'doc_07b_loi_khai_vu', '12', '06', '07b', '10', '42'].includes(id))
-    return hasApp || selectedIds.length >= 2
+    // Vũ: 10, 42 (App xe p10_app_xe / doc_42 / doc_10 / 12 / 42 / 10), Optional: 6, 8 (doc_06_loi_khai_lua / doc_07b_loi_khai_vu / 06 / 08 / 6 / 8)
+    const hasAppOrTime = selectedIds.some((id) => ['p10_app_xe', 'doc_06_loi_khai_lua', 'doc_07b_loi_khai_vu', 'doc_10', 'doc_42', 'doc_06', 'doc_08', 'doc_8', 'doc_6', '12', '06', '07b', '08', '10', '42', '6', '8'].includes(id))
+    return hasAppOrTime
   }
 
   if (characterId === 'tung') {
-    // Tùng: Dấu vân tay (p4_van_tay / 17 / 20 / 41), Lời khai Tùng (doc_14_loi_khai_tung / 14)
-    const hasVanTay = selectedIds.some((id) => ['p4_van_tay', 'doc_14_loi_khai_tung', '17', '14', '20', '41'].includes(id))
-    return hasVanTay || selectedIds.length >= 2
+    // Tùng: 20, 41 (doc_20 / doc_41 / p4_van_tay / doc_14_loi_khai_tung / 17 / 14 / 20 / 41)
+    const hasVanTay = selectedIds.some((id) => ['p4_van_tay', 'doc_14_loi_khai_tung', 'doc_20', 'doc_41', 'doc_14', 'doc_17', '17', '14', '20', '41'].includes(id))
+    return hasVanTay
   }
 
   if (characterId === 'ha') {
-    // Hà: Lời khai Hà (doc_07d_loi_khai_ha / 07d / 12 / 44) và (Voice còi tàu 0984112568 / Lịch VTV3 / Tin nhắn)
-    const hasHa = selectedIds.some((id) => ['doc_07d_loi_khai_ha', 'doc_voice_coi_tau', 'doc_lich_vtv3', '07d', '20', '21', '12', '44'].includes(id) || id.includes('voice_phone_') || id.includes('0984112568'))
-    return hasHa || selectedIds.length >= 2
+    // Hà: Voice 0984.112.568, 12, 44 (doc_12 / doc_44 / doc_07d_loi_khai_ha / doc_voice_coi_tau / doc_lich_vtv3 / 07d / 20 / 21 / 12 / 44), Optional: 9, 7, 45 (doc_09 / doc_07 / doc_45 / 9 / 7 / 45)
+    const hasVoiceOrAlibi = selectedIds.some((id) => ['doc_07d_loi_khai_ha', 'doc_voice_coi_tau', 'doc_lich_vtv3', 'doc_12', 'doc_44', 'doc_09', 'doc_07', 'doc_45', 'doc_9', 'doc_7', '07d', '20', '21', '12', '44', '9', '7', '45'].includes(id) || id.includes('voice_phone_') || id.includes('0984112568') || id.includes('0984.112.568'))
+    return hasVoiceOrAlibi
   }
 
-  return selectedIds.length > 0
+  return false
 }
 
 export function resolveEvidenceCode(rawInput: string): { id: string; label: string; code: string } | null {

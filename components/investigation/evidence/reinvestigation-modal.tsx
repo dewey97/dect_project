@@ -7,7 +7,6 @@ import {
   Volume2
 } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
-import { CrimeSceneRoom3D, RoomHotspot } from './crime-scene-room-3d'
 
 interface ReinvestigationModalProps {
   isOpen: boolean
@@ -16,68 +15,72 @@ interface ReinvestigationModalProps {
 
 export interface ReinvestigationHotspot2D {
   id: string
+  num: number
   photoNumber: '9' | '11' | '15' | '17' | '18'
-  x: number // percentage 0-100
-  y: number // percentage 0-100
+  x: number // percentage 0-100 for 2D flat view
+  y: number // percentage 0-100 for 2D flat view
   imageUrl: string
   soundFile: string
   soundCaption: string
 }
 
-// 5 ĐIỂM KHÁM XÉT CHI TIẾT TƯƠNG ỨNG 5 ẢNH VÀ SFX
+// 5 ĐIỂM KHÁM XÉT CHI TIẾT TRÊN TOÀN CẢNH NỐI LIỀN 14 & 16
 export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
   {
     id: 'spot-15',
+    num: 1,
     photoNumber: '15',
-    x: 74,
+    x: 20.2,
     y: 34,
     imageUrl: '/images/cases/case_000/15.png',
     soundFile: 'train sound.mp3',
-    soundCaption: 'Âm thanh: train sound.mp3'
+    soundCaption: '*Tu tu... Xình xịch...*'
   },
   {
     id: 'spot-17',
+    num: 2,
     photoNumber: '17',
-    x: 84,
+    x: 58.5,
     y: 56,
     imageUrl: '/images/cases/case_000/17.png',
     soundFile: 'Sound tủ.mp3',
-    soundCaption: 'Âm thanh: Sound tủ.mp3'
+    soundCaption: '*Két... Cạch...*'
   },
   {
     id: 'spot-9',
+    num: 3,
     photoNumber: '9',
-    x: 24,
+    x: 6.4,
     y: 62,
     imageUrl: '/images/cases/case_000/9.png',
     soundFile: 'breaking.mp3',
-    soundCaption: 'Âm thanh: breaking.mp3'
+    soundCaption: '*Choang! Xoảng...*'
   },
   {
     id: 'spot-18',
+    num: 4,
     photoNumber: '18',
-    x: 58,
+    x: 15.4,
     y: 62,
     imageUrl: '/images/cases/case_000/18.png',
     soundFile: 'Clack.mp3',
-    soundCaption: 'Âm thanh: Clack.mp3'
+    soundCaption: '*Cạch... cạch...*'
   },
   {
     id: 'spot-11',
+    num: 5,
     photoNumber: '11',
-    x: 36,
+    x: 9.6,
     y: 78,
     imageUrl: '/images/cases/case_000/11.png',
     soundFile: 'sột soạt.mp3',
-    soundCaption: 'Âm thanh: sột soạt.mp3'
+    soundCaption: '*Sột soạt... sột soạt...*'
   }
 ]
 
 export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalProps) {
-  const [viewMode, setViewMode] = useState<'flat2d' | 'room3d'>('flat2d')
   const [selectedSpot, setSelectedSpot] = useState<ReinvestigationHotspot2D | null>(null)
   const [activeAudioToast, setActiveAudioToast] = useState<string | null>(null)
-  const scale = 1.0
   const [isDragging, setIsDragging] = useState(false)
   const dragDistanceRef = useRef(0)
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -112,7 +115,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
   }
 
   const handleSpotClick = (spot: ReinvestigationHotspot2D) => {
-    // If user was dragging across the scene, prevent opening modal
+    // If user was dragging across the scene in 2D, prevent opening modal
     if (dragDistanceRef.current > 6) return
 
     playCustomSfx(spot.soundFile)
@@ -127,22 +130,11 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
     }, 4500)
   }
 
-  const handle3DSpotClick = (spot: RoomHotspot) => {
-    // Map to matching 2D spot if available
-    const match = HOTSPOTS_2D_LIST.find((h) => h.id.includes(String(spot.num)) || h.photoNumber === String(spot.num))
-    if (match) {
-      handleSpotClick(match)
-    } else if (HOTSPOTS_2D_LIST.length > 0) {
-      handleSpotClick(HOTSPOTS_2D_LIST[0])
-    }
-  }
-
-  // Calculate dynamic drag bounds based on container dimensions
-  const imageAspect = 16 / 9
-  const renderedWidth = Math.max(containerSize.width * scale, containerSize.height * imageAspect * scale)
-  const renderedHeight = renderedWidth / imageAspect
+  // Calculate dynamic drag bounds based on container dimensions for connected panorama
+  const imageAspect = 7230 / 1080
+  const renderedHeight = containerSize.height || 800
+  const renderedWidth = renderedHeight * imageAspect
   const maxDragX = Math.max(0, (renderedWidth - containerSize.width) / 2)
-  const maxDragY = Math.max(0, (renderedHeight - containerSize.height) / 2)
 
   return (
     <div className="fixed inset-0 bg-[#080503] z-50 flex flex-col font-mono text-[#f4e8d8] select-none overflow-hidden w-screen h-[100dvh]">
@@ -159,43 +151,8 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
               </span>
             </div>
             <p className="text-[11px] text-[#9e7a56] hidden sm:block">
-              {viewMode === 'flat2d'
-                ? 'Giữ và kéo ảnh sang trái/phải để lia góc nhìn • Bấm vào các chấm đỏ để soi chi tiết'
-                : 'Xoay và tương tác với các vật thể trong không gian 3D'}
+              Kéo ảnh sang trái/phải để lia toàn cảnh nối liền giữa 2 góc phòng • Bấm vào các điểm đỏ để soi chi tiết
             </p>
-          </div>
-
-          {/* VIEW MODE TOGGLE SWITCHER (2D VÀ 3D) */}
-          <div className="flex items-center bg-[#0d0805] border border-[#59341c] rounded p-0.5 ml-1 sm:ml-2">
-            <button
-              type="button"
-              onClick={() => {
-                detectiveAudio.playPaperRustle()
-                setViewMode('flat2d')
-              }}
-              className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold transition-all cursor-pointer ${
-                viewMode === 'flat2d'
-                  ? 'bg-[#5c371d] text-amber-300 shadow border border-amber-600/40'
-                  : 'text-[#8c6a48] hover:text-[#d9a066]'
-              }`}
-            >
-              2D
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                detectiveAudio.playPaperRustle()
-                setViewMode('room3d')
-              }}
-              className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold transition-all cursor-pointer ${
-                viewMode === 'room3d'
-                  ? 'bg-[#5c371d] text-amber-300 shadow border border-amber-600/40'
-                  : 'text-[#8c6a48] hover:text-[#d9a066]'
-              }`}
-            >
-              3D
-            </button>
           </div>
         </div>
 
@@ -215,88 +172,83 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         </div>
       </div>
 
-      {/* MAIN VIEW AREA: 3D OR 2D */}
-      {viewMode === 'room3d' ? (
-        <div className="relative flex-1 w-full h-full overflow-hidden bg-black">
-          <CrimeSceneRoom3D onSelectSpot={handle3DSpotClick} />
-        </div>
-      ) : (
-        <div
-          ref={containerRef}
-          className="relative flex-1 w-full h-full overflow-hidden bg-[#060402] flex items-center justify-center cursor-grab active:cursor-grabbing"
-        >
-          {/* DRAGGABLE 2D PANORAMIC CANVAS AREA */}
-          <motion.div
-            drag
-            dragMomentum={true}
-            dragElastic={0.08}
-            dragConstraints={{
-              left: -maxDragX,
-              right: maxDragX,
-              top: -maxDragY,
-              bottom: maxDragY
-            }}
-            onDragStart={() => {
-              setIsDragging(true)
+      {/* MAIN VIEW AREA: 2D TOÀN CẢNH NỐI LIỀN */}
+      <div
+        ref={containerRef}
+        className="relative flex-1 w-full h-full overflow-hidden bg-[#060402] flex items-center justify-center cursor-grab active:cursor-grabbing"
+      >
+        {/* DRAGGABLE 2D PANORAMIC CANVAS AREA */}
+        <motion.div
+          drag="x"
+          dragMomentum={true}
+          dragElastic={0.08}
+          dragConstraints={{
+            left: -maxDragX,
+            right: maxDragX
+          }}
+          onDragStart={() => {
+            setIsDragging(true)
+            dragDistanceRef.current = 0
+          }}
+          onDrag={(_, info) => {
+            dragDistanceRef.current += Math.abs(info.delta.x) + Math.abs(info.delta.y)
+          }}
+          onDragEnd={() => {
+            setTimeout(() => {
+              setIsDragging(false)
               dragDistanceRef.current = 0
-            }}
-            onDrag={(_, info) => {
-              dragDistanceRef.current += Math.abs(info.delta.x) + Math.abs(info.delta.y)
-            }}
-            onDragEnd={() => {
-              setTimeout(() => {
-                setIsDragging(false)
-                dragDistanceRef.current = 0
-              }, 50)
-            }}
-            style={{
-              width: renderedWidth,
-              height: renderedHeight
-            }}
-            className="relative shrink-0 select-none touch-none flex items-center justify-center"
-          >
-            {/* CRIME SCENE REALISTIC ROOM 2D IMAGE */}
-            <img
-              src="/images/cases/case_000/photo-reinvestigation-room-realistic.jpg"
-              alt="Toàn cảnh phòng khách hiện trường khám xét lại 2D"
-              draggable={false}
-              className="w-full h-full object-cover pointer-events-none rounded-none shadow-2xl border border-[#26150b]"
-            />
+            }, 50)
+          }}
+          style={{
+            width: renderedWidth,
+            height: renderedHeight
+          }}
+          className="relative shrink-0 select-none touch-none flex items-center justify-center"
+        >
+          {/* CRIME SCENE REALISTIC ROOM 2D IMAGE (NỐI LIỀN 14 VÀ 16 QUA 2 GÓC TƯỜNG) */}
+          <img
+            src="/images/cases/case_000/panorama_2d_connected_14_16.jpg"
+            alt="Toàn cảnh phòng khách hiện trường nối liền ảnh 14 và 16"
+            draggable={false}
+            className="w-full h-full object-cover pointer-events-none rounded-none shadow-2xl border border-[#26150b]"
+          />
 
-            {/* HOTSPOT PINS OVERLAY (CHẤM ĐỎ ĐƠN GIẢN THUẦN TÚY) */}
-            {HOTSPOTS_2D_LIST.map((spot) => {
-              const isSelected = selectedSpot?.id === spot.id
-              return (
-                <div
-                  key={spot.id}
-                  style={{
-                    left: `${spot.x}%`,
-                    top: `${spot.y}%`
-                  }}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
+          {/* HOTSPOT PINS OVERLAY (CHẤM ĐỎ ĐÁNH SỐ THỨ TỰ) */}
+          {HOTSPOTS_2D_LIST.map((spot) => {
+            const isSelected = selectedSpot?.id === spot.id
+            return (
+              <div
+                key={spot.id}
+                style={{
+                  left: `${spot.x}%`,
+                  top: `${spot.y}%`
+                }}
+                className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
+              >
+                <button
+                  type="button"
+                  onClick={() => handleSpotClick(spot)}
+                  className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2"
+                  aria-label={`Điểm khám xét #${spot.num}`}
                 >
-                  <button
-                    type="button"
-                    onClick={() => handleSpotClick(spot)}
-                    className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2.5"
+                  {/* Numbered Solid Red Pin */}
+                  <div
+                    className={`size-6 sm:size-7 rounded-full text-white font-bold text-xs sm:text-[13px] font-mono flex items-center justify-center shadow-lg transition-transform duration-150 group-hover:scale-125 border ${
+                      isSelected
+                        ? 'bg-amber-500 border-amber-200 text-neutral-950 ring-2 ring-amber-400/80 scale-125'
+                        : 'bg-[#cc1818] group-hover:bg-[#ee2222] border-[#ffe4e4]/80'
+                    }`}
                   >
-                    {/* Clean Solid Red Dot */}
-                    <div
-                      className={`size-3.5 sm:size-4 rounded-full border border-[#ffe4e4]/70 shadow-sm transition-transform duration-150 group-hover:scale-125 ${
-                        isSelected
-                          ? 'bg-amber-400 border-amber-200 ring-2 ring-amber-400/60 scale-125'
-                          : 'bg-[#cc1818] group-hover:bg-[#ee2222]'
-                      }`}
-                    />
-                  </button>
-                </div>
-              )
-            })}
-          </motion.div>
-        </div>
-      )}
+                    {spot.num}
+                  </div>
+                </button>
+              </div>
+            )
+          })}
+        </motion.div>
+      </div>
 
-      {/* LIGHTBOX PHOTO ZOOM MODAL (KHÔNG CÓ TEXT HAY MÔ TẢ) */}
+      {/* LIGHTBOX PHOTO ZOOM MODAL */}
       <AnimatePresence>
         {selectedSpot && (
           <div
@@ -332,24 +284,27 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         )}
       </AnimatePresence>
 
-      {/* AUDIO CAPTION TOAST AT BOTTOM LEFT */}
+      {/* AUDIO SUBTITLE TOAST AT BOTTOM LEFT (DÙNG CHUNG CHO CẢ 2D, 3D VÀ 360) */}
       <AnimatePresence>
         {activeAudioToast && (
           <motion.div
             initial={{ opacity: 0, y: 15, x: -10 }}
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: 15 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-4 left-4 z-50 bg-[#140c06]/95 border-2 border-[#59341c] text-[#f4e8d8] px-3.5 py-2.5 rounded-none shadow-2xl backdrop-blur-md flex items-center gap-2.5 max-w-sm pointer-events-none"
+            transition={{ duration: 0.25 }}
+            className="fixed bottom-6 left-6 z-50 bg-[#120a05]/95 border border-[#59341c] text-[#f4e8d8] px-4 py-2.5 rounded shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-sm pointer-events-none"
           >
-            <Volume2 className="size-4 text-amber-400 shrink-0 animate-pulse" />
-            <span className="font-mono text-xs text-[#ebd8c3] font-bold tracking-wide">
+            <Volume2 className="size-4 text-amber-400 shrink-0" />
+            <motion.span
+              animate={{ opacity: [0.15, 1, 0.15] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="font-mono text-sm text-[#f5ebd9] italic font-semibold tracking-wider"
+            >
               {activeAudioToast}
-            </span>
+            </motion.span>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   )
 }
-

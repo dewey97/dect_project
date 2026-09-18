@@ -2,25 +2,33 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
-import { Compass, ZoomIn, ZoomOut, RotateCcw, Crosshair } from 'lucide-react'
+import { ZoomIn, ZoomOut, RotateCcw, Play, Pause } from 'lucide-react'
 
-export interface Hotspot3D {
+export interface Hotspot360 {
   id: string
+  num: number
+  photoNumber: '9' | '11' | '15' | '17' | '18'
   yaw: number // degrees (-180 to 180)
   pitch: number // degrees (-85 to 85)
-  title: string
-  caption: string
-  detail: string
   imageUrl: string
+  soundFile: string
+  soundCaption: string
+  title?: string
 }
 
 interface Scene360ViewerProps {
-  imageUrl: string
-  hotspots: Hotspot3D[]
-  onSelectSpot: (spot: Hotspot3D) => void
+  imageUrl?: string
+  hotspots: Hotspot360[]
+  onSelectSpot: (spot: Hotspot360) => void
+  selectedSpotId?: string | null
 }
 
-export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360ViewerProps) {
+export function Scene360Viewer({
+  imageUrl = '/images/cases/case_000/room_360_equirectangular.jpg',
+  hotspots,
+  onSelectSpot,
+  selectedSpotId
+}: Scene360ViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -31,14 +39,14 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
       x: number
       y: number
       visible: boolean
-      spot: Hotspot3D
+      spot: Hotspot360
     }>
   >([])
 
   const [fov, setFov] = useState(70)
   const [heading, setHeading] = useState(0) // 0 - 360 for compass
   const [isLoading, setIsLoading] = useState(true)
-  const [hoveredSpot, setHoveredSpot] = useState<Hotspot3D | null>(null)
+  const [autoRotate, setAutoRotate] = useState(false)
 
   // References for Three.js state
   const stateRef = useRef({
@@ -77,7 +85,7 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
     const width = container.clientWidth || 800
     const height = container.clientHeight || 500
 
-    // 1. SCENE & CAMERA
+    // 1. SCENE & CAMERA (Rectilinear Perspective keeps lines straight without fish-eye bending)
     const scene = new THREE.Scene()
     state.scene = scene
 
@@ -118,42 +126,31 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
       },
       undefined,
       (err) => {
-        console.warn('Fallback generating procedural grid for 360 viewer:', err)
-        const canvasGen = document.createElement('canvas')
-        canvasGen.width = 1024
-        canvasGen.height = 512
-        const ctx = canvasGen.getContext('2d')
-        if (ctx) {
-          ctx.fillStyle = '#140c06'
-          ctx.fillRect(0, 0, 1024, 512)
-          ctx.strokeStyle = '#593c26'
-          ctx.lineWidth = 2
-          for (let i = 0; i < 1024; i += 64) {
-            ctx.beginPath()
-            ctx.moveTo(i, 0)
-            ctx.lineTo(i, 512)
-            ctx.stroke()
+        console.warn('Fallback loading panorama texture:', err)
+        // Fallback to cylindrical panorama
+        textureLoader.load(
+          '/images/cases/case_000/room_360_panorama.jpg',
+          (altTex) => {
+            altTex.colorSpace = THREE.SRGBColorSpace
+            const material = new THREE.MeshBasicMaterial({ map: altTex })
+            const mesh = new THREE.Mesh(geometry, material)
+            scene.add(mesh)
+            setIsLoading(false)
+          },
+          undefined,
+          () => {
+            setIsLoading(false)
           }
-          for (let j = 0; j < 512; j += 64) {
-            ctx.beginPath()
-            ctx.moveTo(0, j)
-            ctx.lineTo(1024, j)
-            ctx.stroke()
-          }
-          ctx.fillStyle = '#e8c89b'
-          ctx.font = '24px monospace'
-          ctx.fillText('HIỆN TRƯỜNG PHÒNG KHÁCH 360° — TEST GRID', 240, 256)
-        }
-        const fallbackTex = new THREE.CanvasTexture(canvasGen)
-        const material = new THREE.MeshBasicMaterial({ map: fallbackTex })
-        const mesh = new THREE.Mesh(geometry, material)
-        scene.add(mesh)
-        setIsLoading(false)
+        )
       }
     )
 
     // 4. ANIMATION LOOP & HOTSPOT PROJECTION
     const renderLoop = () => {
+      if (autoRotate && !state.isUserInteracting) {
+        state.targetLon += 0.08
+      }
+
       state.lat = THREE.MathUtils.lerp(state.lat, state.targetLat, 0.15)
       state.lon = THREE.MathUtils.lerp(state.lon, state.targetLon, 0.15)
 
@@ -170,7 +167,7 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
       renderer.render(scene, camera)
 
       // Calculate heading for compass (0 to 360 deg)
-      const curHeading = (Math.round((state.lon % 360) + 360) % 360)
+      const curHeading = Math.round(((state.lon % 360) + 360) % 360)
       setHeading(curHeading)
 
       // Project 3D Hotspots to 2D Screen Coordinates
@@ -179,11 +176,11 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
         const cHeight = container.clientHeight
         const projected = hotspots.map((spot) => {
           const vec = getVectorFromYawPitch(spot.yaw, spot.pitch, 450)
-          
+
           const camDir = new THREE.Vector3()
           camera.getWorldDirection(camDir)
           const dot = vec.clone().normalize().dot(camDir)
-          const isVisible = dot > 0.2
+          const isVisible = dot > 0.15
 
           vec.project(camera)
 
@@ -194,7 +191,7 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
             id: spot.id,
             x: screenX,
             y: screenY,
-            visible: isVisible && screenX >= 0 && screenX <= cWidth && screenY >= 0 && screenY <= cHeight,
+            visible: isVisible && screenX >= -20 && screenX <= cWidth + 20 && screenY >= -20 && screenY <= cHeight + 20,
             spot
           }
         })
@@ -223,7 +220,7 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
       renderer.dispose()
       geometry.dispose()
     }
-  }, [imageUrl, hotspots, getVectorFromYawPitch])
+  }, [imageUrl, hotspots, getVectorFromYawPitch, autoRotate])
 
   // MOUSE & TOUCH EVENT HANDLERS
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -239,7 +236,7 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
     const state = stateRef.current
     if (!state.isUserInteracting) return
 
-    const factor = (state.camera?.fov || 70) / 70 * 0.18
+    const factor = ((state.camera?.fov || 70) / 70) * 0.18
     state.targetLon = (e.clientX - state.onPointerDownPointerX) * factor + state.onPointerDownLon
     state.targetLat = (state.onPointerDownPointerY - e.clientY) * factor + state.onPointerDownLat
   }
@@ -285,6 +282,12 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
     }
   }
 
+  // Compass cardinal text
+  let dirName = 'BẮC'
+  if (heading >= 45 && heading < 135) dirName = 'ĐÔNG'
+  else if (heading >= 135 && heading < 225) dirName = 'NAM'
+  else if (heading >= 225 && heading < 315) dirName = 'TÂY'
+
   return (
     <div
       ref={containerRef}
@@ -303,16 +306,15 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
         <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center gap-3 z-30 pointer-events-none">
           <div className="size-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
           <span className="text-xs font-mono text-[#d9a066] tracking-widest uppercase">
-            Đang giải mã không gian hiện trường 360°...
+            Đang tải không gian hiện trường 360°...
           </span>
         </div>
       )}
 
-      {/* 3D PROJECTED HOTSPOTS */}
+      {/* 3D PROJECTED HOTSPOTS (CHUNG MẪU PIN ĐỎ ĐÁNH SỐ NHƯ 2D) */}
       {screenHotspots.map(({ id, x, y, visible, spot }) => {
         if (!visible) return null
-
-        const isHovered = hoveredSpot?.id === spot.id
+        const isSelected = selectedSpotId === spot.id
 
         return (
           <div
@@ -324,76 +326,77 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
             }}
             className="absolute -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto"
           >
-            {/* HOTSPOT BUTTON */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation()
                 onSelectSpot(spot)
               }}
-              onMouseEnter={() => setHoveredSpot(spot)}
-              onMouseLeave={() => setHoveredSpot(null)}
-              className="relative group p-2 cursor-pointer focus:outline-none"
-              aria-label={spot.title}
+              className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2"
+              aria-label={`Điểm khám xét #${spot.num}`}
             >
-              {/* RADAR TARGETING RETICLE */}
-              <div className="relative flex items-center justify-center">
-                <div className="absolute size-7 sm:size-8 rounded-full border border-red-500/60 animate-ping pointer-events-none" />
-                <div className="size-6 sm:size-7 rounded-full border border-amber-400/80 bg-black/60 backdrop-blur-sm flex items-center justify-center transition-transform group-hover:scale-125 group-hover:border-red-400">
-                  <div className="size-2 rounded-full bg-red-600 group-hover:bg-red-400 animate-pulse shadow-[0_0_8px_#ef4444]" />
-                </div>
-              </div>
+              {/* Radar pulse effect behind pin */}
+              <div className="absolute size-7 sm:size-8 rounded-full border border-red-500/60 animate-ping pointer-events-none" />
 
-              {/* TOOLTIP LABEL ON HOVER */}
-              {isHovered && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 sm:w-56 bg-[#160e09]/95 border border-[#8c5e35] p-2 rounded shadow-2xl text-left pointer-events-none z-30 backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
-                  <div className="flex items-center gap-1 text-[10px] text-amber-400 font-bold uppercase tracking-wider">
-                    <Crosshair className="size-3" />
-                    <span>Vật chứng phát hiện</span>
-                  </div>
-                  <div className="text-[11px] text-[#f5ebd7] font-semibold mt-0.5 line-clamp-2">
-                    {spot.title}
-                  </div>
-                  <div className="text-[9px] text-[#a37e58] mt-1 font-mono">
-                    [Nhấp để kiểm tra hiện vật]
-                  </div>
-                </div>
-              )}
+              {/* Numbered Solid Red Pin (Exact match with 2D Pin style) */}
+              <div
+                className={`size-6 sm:size-7 rounded-full text-white font-bold text-xs sm:text-[13px] font-mono flex items-center justify-center shadow-lg transition-transform duration-150 group-hover:scale-125 border ${
+                  isSelected
+                    ? 'bg-amber-500 border-amber-200 text-neutral-950 ring-2 ring-amber-400/80 scale-125'
+                    : 'bg-[#cc1818] group-hover:bg-[#ee2222] border-[#ffe4e4]/80'
+                }`}
+              >
+                {spot.num}
+              </div>
             </button>
           </div>
         )
       })}
 
-      {/* TOP-LEFT MINIMAL FLOATING NEEDLE COMPASS */}
-      <div
-        className="absolute top-3 left-3 z-20 pointer-events-none size-10 sm:size-11 rounded-full bg-black/60 border border-[#8c5e35]/40 backdrop-blur-md shadow-lg flex items-center justify-center select-none"
-        title={`Hướng la bàn: ${Math.round((heading % 360) + 360) % 360}°`}
-      >
-        <span className="absolute top-1 text-[8px] font-mono font-black text-red-500/90 leading-none">
-          N
-        </span>
+      {/* TOP-LEFT COMPASS & HEADING DISPLAY */}
+      <div className="absolute top-3 left-3 z-20 pointer-events-none flex items-center gap-2 bg-black/70 border border-[#8c5e35]/50 px-3 py-1.5 rounded backdrop-blur-md shadow-lg select-none">
         <div
-          className="relative size-7 flex items-center justify-center transition-transform duration-75 ease-out"
+          className="relative size-6 flex items-center justify-center transition-transform duration-75 ease-out"
           style={{ transform: `rotate(${-heading}deg)` }}
         >
-          <div className="absolute -top-0.5 w-0 h-0 border-x-[3px] border-x-transparent border-b-[13px] border-b-[#ef4444] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />
-          <div className="absolute -bottom-0.5 w-0 h-0 border-x-[3px] border-x-transparent border-t-[13px] border-t-[#cbd5e1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />
-          <div className="relative size-1.5 rounded-full bg-white border border-gray-900 shadow-sm" />
+          <div className="absolute -top-0.5 w-0 h-0 border-x-[3px] border-x-transparent border-b-[10px] border-b-[#ef4444]" />
+          <div className="absolute -bottom-0.5 w-0 h-0 border-x-[3px] border-x-transparent border-t-[10px] border-t-[#cbd5e1]" />
+          <div className="relative size-1 rounded-full bg-white" />
+        </div>
+        <div className="font-mono text-[11px] text-[#e5c07b] font-bold">
+          HƯỚNG: {dirName} ({heading}°)
         </div>
       </div>
 
       {/* BOTTOM-RIGHT FLOATING CONTROLS */}
-      <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 bg-black/80 border border-[#593c26] p-1.5 rounded-xl backdrop-blur-sm shadow-xl">
+      <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 bg-black/85 border border-[#593c26] p-1.5 rounded-lg backdrop-blur-sm shadow-xl pointer-events-auto">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            setAutoRotate((prev) => !prev)
+          }}
+          className={`p-1.5 rounded transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-mono ${
+            autoRotate
+              ? 'bg-amber-600/80 text-white'
+              : 'text-[#d9a066] hover:text-white hover:bg-[#382314]'
+          }`}
+          title={autoRotate ? 'Dừng tự động xoay' : 'Bật tự động xoay 360°'}
+        >
+          {autoRotate ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
+          <span className="hidden sm:inline">Tự xoay</span>
+        </button>
+        <div className="w-px h-4 bg-[#593c26]" />
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation()
             handleZoom(-10)
           }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded-lg transition-colors cursor-pointer"
+          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
           title="Phóng to góc nhìn"
         >
-          <ZoomIn className="size-4" />
+          <ZoomIn className="size-3.5" />
         </button>
         <button
           type="button"
@@ -401,10 +404,10 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
             e.stopPropagation()
             handleZoom(10)
           }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded-lg transition-colors cursor-pointer"
+          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
           title="Thu nhỏ góc nhìn"
         >
-          <ZoomOut className="size-4" />
+          <ZoomOut className="size-3.5" />
         </button>
         <div className="w-px h-4 bg-[#593c26]" />
         <button
@@ -413,10 +416,10 @@ export function Scene360Viewer({ imageUrl, hotspots, onSelectSpot }: Scene360Vie
             e.stopPropagation()
             handleResetView()
           }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded-lg transition-colors cursor-pointer"
+          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
           title="Đặt lại hướng nhìn ban đầu"
         >
-          <RotateCcw className="size-4" />
+          <RotateCcw className="size-3.5" />
         </button>
       </div>
     </div>
