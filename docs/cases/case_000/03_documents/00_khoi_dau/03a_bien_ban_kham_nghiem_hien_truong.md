@@ -1,7 +1,7 @@
 CÔNG AN THÀNH PHỐ HÀ NỘI
 CƠ QUAN CẢNH SÁT ĐIỀU TRA (PC02)
 
-Số: 14/BB-KNHTh
+Số: 14/BB-KNHT
 
 ---
 
@@ -74,7 +74,7 @@ Toàn bộ đồ vật, dấu vết nêu trên đã được mô tả vào sơ �
 
 ---
 
-Biên bản khám nghiệm kết thúc hồi 19 giờ 30 phút cùng ngày, đã được đọc lại cho mọi người có tên trên cùng nghe, công nhận đúng và ký tên dưới đây.
+Biên bản khám nghiệm kết thúc hồi 08 giờ 30 phút cùng ngày, đã được đọc lại cho mọi người có tên trên cùng nghe, công nhận đúng và ký tên dưới đây.
 
 ---
 
