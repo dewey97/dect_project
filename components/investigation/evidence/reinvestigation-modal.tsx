@@ -4,8 +4,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
-  Volume2,
-  Eye
+  Volume2
 } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { CrimeSceneRoom3D, RoomHotspot } from './crime-scene-room-3d'
@@ -17,123 +16,71 @@ interface ReinvestigationModalProps {
 
 export interface ReinvestigationHotspot2D {
   id: string
-  num: number
+  photoNumber: '9' | '11' | '15' | '17' | '18'
   x: number // percentage 0-100
   y: number // percentage 0-100
-  shortName: string
-  title: string
-  caption: string
-  detail: string
-  imageUrl?: string
-  soundType?: 'train' | 'shatter' | 'paper' | 'default'
+  imageUrl: string
+  soundFile: string
+  soundCaption: string
 }
 
-// 8 ĐIỂM KHÁM XÉT CHI TIẾT TRÊN ẢNH 2D PHÒNG KHÁCH
+// 5 ĐIỂM KHÁM XÉT CHI TIẾT TƯƠNG ỨNG 5 ẢNH VÀ SFX
 export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
   {
-    id: 'spot-1',
-    num: 1,
+    id: 'spot-15',
+    photoNumber: '15',
     x: 74,
     y: 34,
-    shortName: 'Cửa sổ ray tàu',
-    title: 'GÓC CỬA SỔ PHÍA ĐÔNG — HƯỚNG ĐƯỜNG RAY TÀU',
-    caption: 'Ảnh hiện trường #01-KX: Góc nhìn trực diện ra cột đèn tín hiệu đường sắt',
-    detail: 'Từ cửa sổ phòng khách nhìn thẳng ra cột đèn ray tàu cách 150m. Thời điểm 20:30 đêm xảy ra vụ án, tiếng còi tàu hỏa rúc lớn trùng khớp với bản thu âm trong máy tính của Khang.',
-    imageUrl: '/images/cases/case_000/trontim.jpg',
-    soundType: 'train'
+    imageUrl: '/images/cases/case_000/15.png',
+    soundFile: 'train sound.mp3',
+    soundCaption: 'Âm thanh: train sound.mp3'
   },
   {
-    id: 'spot-2',
-    num: 2,
-    x: 24,
-    y: 60,
-    shortName: 'Cửa chính & Gốc xoan',
-    title: 'CỬA CHÍNH NAM — BẬC THỀM & HƯỚNG GỐC XOAN',
-    caption: 'Ảnh hiện trường #02-KX: Dấu vết phấn hoa xoan và vệt nước mưa trên thềm gạch',
-    detail: 'Cửa chính hé mở. Bậc thềm còn lưu lại vệt nước mưa và bột phấn hoa xoan bám dính — đặc điểm trùng khớp với chiếc áo gió màu xám đen thu giữ. Dưới gốc xoan có dấu chân đế giày nữ size 37.',
-    imageUrl: '/images/cases/case_000/photo_cheating_sms.jpg',
-    soundType: 'paper'
-  },
-  {
-    id: 'spot-3',
-    num: 3,
-    x: 49,
-    y: 68,
-    shortName: 'Bàn trà & Chén vỡ',
-    title: 'BÀN TRÀ PHÒNG KHÁCH — MẢNH ẤM CHÉN VỠ & XÔ XÁT',
-    caption: 'Ảnh hiện trường #03-KX: Bộ ấm chén gốm vỡ trên sàn gạch và ghế bị xô lệch',
-    detail: 'Bộ ấm chén gốm vỡ trên sàn gạch bông, ghế đơn bị xô lệch khoảng 40cm. Cặn ấm trà hoa cúc còn lưu vết thuốc an thần Diazepam. Nạn nhân đã xảy ra xô xát giằng co dữ dội trước lúc tử vong.',
-    imageUrl: '/images/cases/case_000/avatar_khang.jpg',
-    soundType: 'shatter'
-  },
-  {
-    id: 'spot-4',
-    num: 4,
+    id: 'spot-17',
+    photoNumber: '17',
     x: 84,
     y: 56,
-    shortName: 'Tủ gỗ lim 1996',
-    title: 'KHE TỦ GỖ LIM GÓC PHÒNG — VỤ ÁN TRỐN TÌM 1996',
-    caption: 'Ảnh hiện trường #04-KX: Khe tủ hé mở có dấu vết người ẩn nấp quan sát',
-    detail: 'Khe tủ gỗ lim hé mở khoảng 5cm, then cài sắt đã hoen gỉ. Bên trong phát hiện dấu vải cọ xát và dấu vân tay mờ — có người đã nấp bên trong quan sát toàn bộ diễn biến. Trên nóc tủ hằn vết đập bàn tay kích động.',
-    imageUrl: '/images/cases/case_000/wardrobe_eyes.jpg',
-    soundType: 'paper'
+    imageUrl: '/images/cases/case_000/17.png',
+    soundFile: 'Sound tủ.mp3',
+    soundCaption: 'Âm thanh: Sound tủ.mp3'
   },
   {
-    id: 'spot-5',
-    num: 5,
-    x: 13,
-    y: 72,
-    shortName: 'Giỏ rác cửa sau',
-    title: 'GIỎ RÁC CẠNH CỬA RA VÀO — CUỐNG VÉ XE KHÁCH',
-    caption: 'Ảnh hiện trường #05-KX: Cuống vé xe khách liên tỉnh bị vò nát dưới đáy giỏ',
-    detail: 'Dưới đáy giỏ rác thu giữ 01 cuống vé xe khách liên tỉnh tuyến Hà Nội — Nam Định có ghi thời gian xuất bến lúc 20:15, cùng mẩu khăn giấy dính son dưỡng và phấn hoa xoan.',
-    imageUrl: '/images/cases/case_000/cuong_ve_xe_tung.png',
-    soundType: 'paper'
+    id: 'spot-9',
+    photoNumber: '9',
+    x: 24,
+    y: 62,
+    imageUrl: '/images/cases/case_000/9.png',
+    soundFile: 'breaking.mp3',
+    soundCaption: 'Âm thanh: breaking.mp3'
   },
   {
-    id: 'spot-6',
-    num: 6,
+    id: 'spot-18',
+    photoNumber: '18',
     x: 58,
     y: 62,
-    shortName: 'Khe ghế sofa',
-    title: 'KHE ĐỆM GHẾ SOFA — THỎI SON & SỢI TÓC VÀNG',
-    caption: 'Ảnh hiện trường #06-KX: Thỏi son mạ vàng rơi kẹt dính sợi tóc uốn nhuộm',
-    detail: '01 Thỏi son trang điểm nắp mạ vàng bị đánh rơi mắc kẹt trong rãnh đệm ghế sofa. Dính chặt trên thân thỏi son là 01 sợi tóc dài nhuộm vàng kim — phơi bày mối quan hệ tình cảm mờ ám ngoài luồng.',
-    imageUrl: '/images/cases/case_000/photo-reinvestigation-room-realistic.jpg',
-    soundType: 'default'
+    imageUrl: '/images/cases/case_000/18.png',
+    soundFile: 'Clack.mp3',
+    soundCaption: 'Âm thanh: Clack.mp3'
   },
   {
-    id: 'spot-7',
-    num: 7,
-    x: 89,
-    y: 45,
-    shortName: 'Di thư chia đất',
-    title: 'KHE BÀN LÀM VIỆC — TỜ DI THƯ CHIA ĐẤT 50:50',
-    caption: 'Ảnh hiện trường #07-KX: Tờ giấy dó chép tay di thư di sản của Ông Nội',
-    detail: 'Tờ di thư chép tay bằng mực tàu đã ố vàng của Ông Nội kẹp trong cuốn sổ cũ, phân chia 200m² đất đồng đều cho 2 cháu Khang và Mai (50:50), vạch trần việc Khang giấu giếm chiếm đoạt tài sản.',
-    imageUrl: '/images/cases/case_000/photo-reinvestigation-room-realistic.jpg',
-    soundType: 'paper'
-  },
-  {
-    id: 'spot-8',
-    num: 8,
+    id: 'spot-11',
+    photoNumber: '11',
     x: 36,
     y: 78,
-    shortName: 'Gối nằm & Bùa yêu',
-    title: 'RUỘT GỐI NẰM PHÒNG NGỦ — LÁ BÙA YÊU YẾM CHỈ ĐỎ',
-    caption: 'Ảnh hiện trường #08-KX: Ruột gối bị rạch khóa giấu bùa vải đỏ buộc lọn tóc',
-    detail: 'Trong ruột gối bông phát hiện 01 lá bùa vải đỏ gấp tam giác ghi họ tên Khang & Hà bằng mực son, quấn chặt 01 lọn tóc bằng chỉ đỏ — minh chứng sự cuồng yêu mù quáng và ám ảnh tâm lý của Trần Thị Hà.',
-    imageUrl: '/images/cases/case_000/avatar_ha.png',
-    soundType: 'default'
+    imageUrl: '/images/cases/case_000/11.png',
+    soundFile: 'sột soạt.mp3',
+    soundCaption: 'Âm thanh: sột soạt.mp3'
   }
 ]
 
 export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalProps) {
   const [viewMode, setViewMode] = useState<'flat2d' | 'room3d'>('flat2d')
   const [selectedSpot, setSelectedSpot] = useState<ReinvestigationHotspot2D | null>(null)
-  const [scale, setScale] = useState<number>(1.0) // Default 100%
+  const [activeAudioToast, setActiveAudioToast] = useState<string | null>(null)
+  const scale = 1.0
   const [isDragging, setIsDragging] = useState(false)
   const dragDistanceRef = useRef(0)
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerSize, setContainerSize] = useState({ width: 1200, height: 800 })
@@ -156,67 +103,41 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
 
   if (!isOpen) return null
 
+  const playCustomSfx = (filename: string) => {
+    try {
+      const audio = new Audio(`/audio/sfx/${encodeURIComponent(filename)}`)
+      audio.volume = 0.9
+      audio.play().catch(() => {})
+    } catch {}
+  }
+
   const handleSpotClick = (spot: ReinvestigationHotspot2D) => {
     // If user was dragging across the scene, prevent opening modal
     if (dragDistanceRef.current > 6) return
 
-    if (spot.soundType === 'train') {
-      detectiveAudio.playTrainHornAndBellSound()
-    } else if (spot.soundType === 'shatter') {
-      detectiveAudio.playCeramicShatterSound()
-    } else {
-      detectiveAudio.playPaperRustle()
-    }
-
+    playCustomSfx(spot.soundFile)
+    setActiveAudioToast(spot.soundCaption)
     setSelectedSpot(spot)
+
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current)
+    }
+    toastTimeoutRef.current = setTimeout(() => {
+      setActiveAudioToast(null)
+    }, 4500)
   }
 
   const handle3DSpotClick = (spot: RoomHotspot) => {
-    const match = HOTSPOTS_2D_LIST.find((h) => h.id === spot.id || h.num === spot.num)
+    // Map to matching 2D spot if available
+    const match = HOTSPOTS_2D_LIST.find((h) => h.id.includes(String(spot.num)) || h.photoNumber === String(spot.num))
     if (match) {
       handleSpotClick(match)
-    } else {
-      setSelectedSpot({
-        id: spot.id,
-        num: spot.num,
-        x: 50,
-        y: 50,
-        shortName: spot.shortName,
-        title: spot.title,
-        caption: spot.caption,
-        detail: spot.detail,
-        imageUrl: spot.imageUrl,
-        soundType: 'default'
-      })
+    } else if (HOTSPOTS_2D_LIST.length > 0) {
+      handleSpotClick(HOTSPOTS_2D_LIST[0])
     }
   }
 
-  const handleZoomIn = () => {
-    setScale((prev) => Math.min(2.4, Number((prev + 0.25).toFixed(2))))
-    detectiveAudio.playPaperRustle()
-  }
-
-  const handleZoomOut = () => {
-    setScale((prev) => Math.max(1.0, Number((prev - 0.25).toFixed(2))))
-    detectiveAudio.playPaperRustle()
-  }
-
-  const handleResetZoom = () => {
-    setScale(1.0)
-    detectiveAudio.playPaperRustle()
-  }
-
-  const playSpotSound = (spot: ReinvestigationHotspot2D) => {
-    if (spot.soundType === 'train') {
-      detectiveAudio.playTrainHornAndBellSound()
-    } else if (spot.soundType === 'shatter') {
-      detectiveAudio.playCeramicShatterSound()
-    } else {
-      detectiveAudio.playPaperRustle()
-    }
-  }
-
-  // Calculate dynamic drag bounds based on scale & container dimensions
+  // Calculate dynamic drag bounds based on container dimensions
   const imageAspect = 16 / 9
   const renderedWidth = Math.max(containerSize.width * scale, containerSize.height * imageAspect * scale)
   const renderedHeight = renderedWidth / imageAspect
@@ -342,7 +263,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
               className="w-full h-full object-cover pointer-events-none rounded-none shadow-2xl border border-[#26150b]"
             />
 
-            {/* HOTSPOT PINS OVERLAY (CHẤM ĐỎ ĐƠN GIẢN KHÔNG HIỆU ỨNG, KHÔNG MÀU TRẮNG) */}
+            {/* HOTSPOT PINS OVERLAY (CHẤM ĐỎ ĐƠN GIẢN THUẦN TÚY) */}
             {HOTSPOTS_2D_LIST.map((spot) => {
               const isSelected = selectedSpot?.id === spot.id
               return (
@@ -357,10 +278,9 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
                   <button
                     type="button"
                     onClick={() => handleSpotClick(spot)}
-                    className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2"
-                    title={spot.title}
+                    className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2.5"
                   >
-                    {/* Clean Solid Red Dot (No animations, No white core) */}
+                    {/* Clean Solid Red Dot */}
                     <div
                       className={`size-3.5 sm:size-4 rounded-full border border-[#ffe4e4]/70 shadow-sm transition-transform duration-150 group-hover:scale-125 ${
                         isSelected
@@ -368,11 +288,6 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
                           : 'bg-[#cc1818] group-hover:bg-[#ee2222]'
                       }`}
                     />
-
-                    {/* Hotspot Floating Pill Label on Hover */}
-                    <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#120a05]/95 text-amber-200 border border-[#59341c] px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                      {spot.shortName}
-                    </div>
                   </button>
                 </div>
               )
@@ -381,96 +296,57 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         </div>
       )}
 
-      {/* SPOT DETAIL INSPECTION MODAL */}
+      {/* LIGHTBOX PHOTO ZOOM MODAL (KHÔNG CÓ TEXT HAY MÔ TẢ) */}
       <AnimatePresence>
         {selectedSpot && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 select-none font-sans">
+          <div
+            onClick={() => setSelectedSpot(null)}
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-8 cursor-zoom-out select-none"
+          >
             <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 15 }}
-              className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden flex flex-col max-h-[90vh]"
+              initial={{ scale: 0.75, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.75, opacity: 0 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-[92vw] max-h-[88vh] flex items-center justify-center"
             >
-              {/* MODAL HEADER */}
-              <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-3.5 rounded-full bg-[#8c1d1d] shrink-0 shadow-sm ring-2 ring-red-400/40" />
-                  <div>
-                    <h3 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider">
-                      {selectedSpot.title}
-                    </h3>
-                    <span className="font-mono text-[11px] text-[#6b4e2e] block">
-                      HỒ SƠ KHÁM XÉT HIỆN TRƯỜNG
-                    </span>
-                  </div>
-                </div>
+              {/* CLOSE BUTTON */}
+              <button
+                type="button"
+                onClick={() => setSelectedSpot(null)}
+                className="absolute -top-3 -right-3 z-30 p-2 bg-[#1a0f08] hover:bg-[#331c0e] border-2 border-[#59341c] text-[#f4e8d8] rounded-full shadow-2xl transition-all cursor-pointer"
+                title="Đóng ảnh"
+              >
+                <X className="size-5" />
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => setSelectedSpot(null)}
-                  className="p-1.5 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026]"
-                >
-                  <X className="size-5" />
-                </button>
-              </div>
-
-              {/* MODAL BODY */}
-              <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5]">
-                {/* PHOTO CONTAINER (IF AVAILABLE) */}
-                {selectedSpot.imageUrl && (
-                  <div className="relative w-full max-h-[260px] bg-[#1a1008] border-2 border-[#2b1f14] rounded-none overflow-hidden flex items-center justify-center">
-                    <img
-                      src={selectedSpot.imageUrl}
-                      alt={selectedSpot.title}
-                      className="w-full h-full object-contain max-h-[250px]"
-                    />
-                    <div className="absolute bottom-2 right-2 bg-black/80 text-[#f5ebd9] font-mono text-[10px] px-2 py-0.5 border border-[#4a2a15]">
-                      CHỨNG CỨ ẢNH #{selectedSpot.num}
-                    </div>
-                  </div>
-                )}
-
-                {/* CAPTION */}
-                <div className="p-3 bg-[#ebdcc4] border-l-4 border-[#8c1d1d] text-xs font-mono font-bold text-[#4a2f18]">
-                  📸 {selectedSpot.caption}
-                </div>
-
-                {/* DETAILED OBSERVATION */}
-                <div className="p-4 bg-[#fdfcf9] border-2 border-[#d4c5b0] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider flex items-center gap-1.5">
-                      <Eye className="size-3.5" />
-                      KẾT QUẢ QUAN SÁT & ĐỐI SOÁT:
-                    </span>
-                    {selectedSpot.soundType && selectedSpot.soundType !== 'default' && (
-                      <button
-                        type="button"
-                        onClick={() => playSpotSound(selectedSpot)}
-                        className="px-2 py-1 bg-[#2b1f14] hover:bg-[#452e1d] text-[#f5ebd9] font-mono text-[10px] font-bold rounded flex items-center gap-1 cursor-pointer transition-colors"
-                      >
-                        <Volume2 className="size-3 text-amber-400" />
-                        <span>Phát âm thanh hiện trường</span>
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs sm:text-sm text-[#2b1f14] leading-relaxed font-serif">
-                    {selectedSpot.detail}
-                  </p>
-                </div>
-              </div>
-
-              {/* MODAL FOOTER */}
-              <div className="p-3 bg-[#ede3d1] border-t-2 border-[#2b1f14] flex items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => setSelectedSpot(null)}
-                  className="px-5 py-2 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all border-2 border-[#2b1f14] shadow-md cursor-pointer"
-                >
-                  ĐÃ RÕ // TIẾP TỤC QUAN SÁT
-                </button>
-              </div>
+              {/* HIGH-RES EVIDENCE PHOTO */}
+              <img
+                src={selectedSpot.imageUrl}
+                alt={`Vật chứng ảnh #${selectedSpot.photoNumber}`}
+                className="max-w-[92vw] max-h-[88vh] object-contain shadow-[0_30px_90px_rgba(0,0,0,0.98)] border-2 border-[#3d2412] rounded-none bg-[#0a0604]"
+              />
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* AUDIO CAPTION TOAST AT BOTTOM LEFT */}
+      <AnimatePresence>
+        {activeAudioToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 15, x: -10 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: 15 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-4 left-4 z-50 bg-[#140c06]/95 border-2 border-[#59341c] text-[#f4e8d8] px-3.5 py-2.5 rounded-none shadow-2xl backdrop-blur-md flex items-center gap-2.5 max-w-sm pointer-events-none"
+          >
+            <Volume2 className="size-4 text-amber-400 shrink-0 animate-pulse" />
+            <span className="font-mono text-xs text-[#ebd8c3] font-bold tracking-wide">
+              {activeAudioToast}
+            </span>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
