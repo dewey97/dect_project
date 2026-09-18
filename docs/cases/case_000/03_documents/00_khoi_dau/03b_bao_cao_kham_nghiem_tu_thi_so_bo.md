@@ -52,13 +52,13 @@ Hồi 07 giờ 30 phút ngày 25 tháng 07 năm 2016, Phòng Kỹ thuật Hình 
 
 * **Nhận định hung khí gây thương tích:**
   * Cơ chế vết rách đứt mạch máu vùng cổ trái phù hợp với tác động cứa/đâm bởi vật sắc nhọn, bằng chất liệu cứng.
-  * Khớp nối thương tích trực tiếp với vật chứng thu giữ tại hiện trường: Mảnh vỡ bình trà bằng gốm dính máu *(ký hiệu p3)*.
+  * Khớp nối thương tích trực tiếp với vật chứng thu giữ tại hiện trường: Mảnh vỡ bình trà bằng gốm dính máu *(ký hiệu 39)*.
 
 ---
 
 ### IV. KIẾN NGHỊ NGHIỆP VỤ ĐIỀU TRA
 
-* Chuyển giao ngay mẫu máu tử thi và mảnh vỡ bình trà *(p3)* để giám định gen (ADN) nhằm xác thực cơ chế hình thành dấu vết máu.
+* Chuyển giao ngay mẫu máu tử thi và mảnh vỡ bình trà *(39)* để giám định gen (ADN) nhằm xác thực cơ chế hình thành dấu vết máu.
 
 ---
 
