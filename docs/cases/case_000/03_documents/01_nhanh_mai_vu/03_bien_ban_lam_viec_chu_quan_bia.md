@@ -15,7 +15,7 @@ Số: `03/BB-LKNC`
 
 ---
 
-Vào hồi 14 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Quán Bia 88 (Khu Cầu Cảng, Phường Phân Khu Cảng, TP. Hà Nội).  
+Vào hồi 14 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Quán Bia 88 (Số 88 Đường Vĩnh Hà, Phường Cảng Đông, TP. Hà Nội).  
 **Chúng tôi gồm:**
 1. Điều tra viên: Đại úy Lê Minh — Đội Điều tra Trọng án.
 2. Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
@@ -23,7 +23,7 @@ Vào hồi 14 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Quán Bia 88 (
 **Tiến hành lấy lời khai nhân chứng:**
 * **Họ và tên:** **NGUYỄN VĂN HÙNG** | **Giới tính:** Nam | **Sinh ngày:** 14/05/1968 (48 tuổi).
 * **CMND số:** `001068002914`.
-* **Nơi ĐKHKTT:** Số 88, Đường Cầu Cảng, Phường Phân Khu Cảng, TP. Hà Nội.
+* **Nơi ĐKHKTT:** Số 88, Đường Vĩnh Hà, Phường Cảng Đông, TP. Hà Nội.
 * **Nghề nghiệp:** Chủ cơ sở kinh doanh Quán Bia 88.
 
 ---

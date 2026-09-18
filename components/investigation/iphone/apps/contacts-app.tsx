@@ -26,84 +26,354 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
   const contacts = [
     {
       id: 'c-01',
-      name: 'Trần Thị Hà',
-      phone: '0984.112.568',
-      relationship: 'Bạn gái / Thợ may',
-      note: 'Rất hay ghen, giám sát từng li từng tí. Tự ý mang trà với đồ ăn sang.',
-      address: 'Số 8 Ngõ 12 Đường Bờ Sông, Q. Đống Đa',
-      avatarColor: 'from-[#FF2D55] to-[#AF52DE]'
-    },
-    {
-      id: 'c-02',
-      name: 'Bé Vy ❤️ (Yến Nhi)',
-      phone: '0978.552.109',
-      relationship: 'Người yêu mới ❤️',
-      note: 'Hẹn đi du lịch Đà Lạt 25/7, đã chuyển cọc tour 12 triệu. Sáng mai 06:30 hẹn đón ở sân bay Nội Bài.',
-      address: 'Phố Huế, Hai Bà Trưng, Hà Nội',
-      avatarColor: 'from-[#FF9500] to-[#FF2D55]'
-    },
-    {
-      id: 'c-03',
-      name: 'Lê Quang Vũ',
-      phone: '0988.20.09.91',
-      relationship: 'Cán bộ đo đạc địa chính',
-      note: 'Còn nợ 300 triệu tiền bốc họ. Đang ép vẽ khống trích đo lên 120m2. SĐT nợ riêng giấu vợ: 0967.452.183 (chưa lưu danh bạ).',
-      address: 'Phòng 302 Tập thể Địa chính Hà Nội',
-      avatarColor: 'from-[#0A84FF] to-[#5856D6]'
-    },
-    {
-      id: 'c-04',
-      name: 'Nguyễn Ngọc Mai',
-      phone: '0984.661.302',
-      relationship: 'Em họ con chú',
-      note: 'Nhăm nhe đòi chia tiền đền bù căn nhà số 14 Bờ Sông. Đang nghi ngờ di chúc bị sửa.',
-      address: 'Số 20 Ngõ 45 Tây Sơn, Đống Đa',
-      avatarColor: 'from-[#30D158] to-[#0A84FF]'
-    },
-    {
-      id: 'c-05',
-      name: 'Tuấn "Bia 88"',
-      phone: '0936.888.712',
-      relationship: 'Hội bạn nhậu',
-      note: 'Chủ quán bia phố cổ, hay gọi đi giao lưu tối muộn.',
-      address: 'Số 18 Phố Tạ Hiện, Hoàn Kiếm',
-      avatarColor: 'from-[#FFD60A] to-[#FF9500]'
-    },
-    {
-      id: 'c-06',
-      name: 'Chị Lan Quán Nước',
-      phone: '0932.889.102',
-      relationship: 'Hàng xóm đầu ngõ',
-      note: 'Quán nước đầu ngõ 14 Bờ Sông, hay buôn chuyện xóm làng.',
-      address: 'Đầu ngõ 14 Đường Bờ Sông, Đống Đa',
-      avatarColor: 'from-[#AF52DE] to-[#5856D6]'
-    },
-    {
-      id: 'c-07',
-      name: 'Bình Còi',
-      phone: '0915.223.789',
-      relationship: 'Bạn xã hội',
-      note: 'Nhóm bạn thu nợ, giao dịch cho vay.',
-      address: 'Quận Đống Đa, Hà Nội',
+      name: 'Anh Dũng Cầu Cảng',
+      phone: '0903.445.112',
+      relationship: 'Anh em bến bãi',
+      note: 'Mối bốc vác hàng hóa khu cảng sông.',
+      address: 'Phố Cầu Cảng, TP. Hà Nội',
       avatarColor: 'from-[#8E8E93] to-[#636366]'
     },
     {
+      id: 'c-02',
+      name: 'Anh Hùng Sửa Nước',
+      phone: '0988.665.123',
+      relationship: 'Thợ điện nước',
+      note: 'Thợ sửa ống nước dân dụng quanh xóm.',
+      address: 'Ngõ 14 Đường Bờ Sông, TP. Hà Nội',
+      avatarColor: 'from-[#636366] to-[#48484A]'
+    },
+    {
+      id: 'c-03',
+      name: 'Bác Bảy',
+      phone: '0908.441.229',
+      relationship: 'Hàng xóm Bờ Sông',
+      note: 'Hàng xóm lớn tuổi gần nhà.',
+      address: 'Số 10 Đường Bờ Sông, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-04',
+      name: 'Bà Hai',
+      phone: '0913.552.771',
+      relationship: 'Hàng xóm xóm Cảng',
+      note: 'Bà con lối xóm.',
+      address: 'Xóm Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-05',
+      name: 'Bảo Xăm Hình',
+      phone: '0934.112.887',
+      relationship: 'Tiệm Tattoo',
+      note: 'Tiệm xăm hình nghệ thuật.',
+      address: 'Phố Vọng, TP. Hà Nội',
+      avatarColor: 'from-[#5856D6] to-[#AF52DE]'
+    },
+    {
+      id: 'c-06',
+      name: 'Bé My',
+      phone: '0971.223.445',
+      relationship: 'Bạn bè xã hội',
+      note: 'Bạn quen ngoài quán nước.',
+      address: 'TP. Hà Nội',
+      avatarColor: 'from-[#FF2D55] to-[#FF375F]'
+    },
+    {
+      id: 'c-07',
+      name: 'Bình Còi Ba Gác',
+      phone: '0915.223.789',
+      relationship: 'Lái xe ba gác / Thu nợ',
+      note: 'Chạy xe ba gác chở đồ, hay đi cùng đợt đòi nợ họ.',
+      address: 'Phường Phân khu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#0A84FF] to-[#5856D6]'
+    },
+    {
       id: 'c-08',
-      name: 'Luật sư Nam',
-      phone: '0903.441.229',
-      relationship: 'Văn phòng Luật Nam & Cộng sự',
-      note: 'Tư vấn hợp đồng thế chấp di chúc & thủ tục thừa kế nhà 14 Bờ Sông.',
-      address: 'Tầng 4 Tòa nhà HUD, Thanh Xuân, Hà Nội',
+      name: 'Chị Hạnh Giặt Là',
+      phone: '0914.556.789',
+      relationship: 'Tiệm giặt là Khâm Thiên',
+      note: 'Tiệm giặt khô là hơi, đang gửi áo da với chăn bông.',
+      address: 'Số 42 Phố Khâm Thiên, Quận Sông Hồng',
       avatarColor: 'from-[#AF52DE] to-[#5856D6]'
     },
     {
       id: 'c-09',
-      name: 'F88 Tín Dụng Nhanh',
-      phone: '1800.6388',
-      relationship: 'Hỗ trợ tài chính',
-      note: 'Gói vay tín chấp thế chấp đăng ký xe 80 triệu.',
-      address: 'P. Xã Đàn, Đống Đa, Hà Nội',
-      avatarColor: 'from-[#30D158] to-[#FF3B30]'
+      name: 'Chị Lan Quán Nước',
+      phone: '0932.889.102',
+      relationship: 'Hàng xóm đầu ngõ 14',
+      note: 'Quán nước chè đầu ngõ 14 Bờ Sông.',
+      address: 'Đầu ngõ 14 Đường Bờ Sông, TP. Hà Nội',
+      avatarColor: 'from-[#30D158] to-[#0A84FF]'
+    },
+    {
+      id: 'c-10',
+      name: 'Chú Sáu Xe Ôm',
+      phone: '0913.667.228',
+      relationship: 'Tài xế xe ôm',
+      note: 'Chạy xe ôm quen ở đầu ngã tư Cầu Cảng.',
+      address: 'Ngã tư Cầu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-11',
+      name: 'Cô Mai Thuốc Tây',
+      phone: '0962.771.889',
+      relationship: 'Hiệu thuốc dân sinh',
+      note: 'Nhà thuốc tân dược gần chợ.',
+      address: 'Chợ Cầu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#30D158] to-[#34C759]'
+    },
+    {
+      id: 'c-12',
+      name: 'Cô Sáu',
+      phone: '0972.334.881',
+      relationship: 'Người quen xóm',
+      note: 'Bà con trong phường.',
+      address: 'Phường Phân khu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-13',
+      name: 'Cơm Chị Ba',
+      phone: '0908.334.991',
+      relationship: 'Quán cơm bình dân',
+      note: 'Quán cơm hay gọi ship cơm trưa sang nhà.',
+      address: 'Số 18 Phố Cầu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#FF9500] to-[#FFD60A]'
+    },
+    {
+      id: 'c-14',
+      name: 'Cường Mũi Két',
+      phone: '0973.665.412',
+      relationship: 'Bạn xã hội',
+      note: 'Anh em quen ngoài bến xe.',
+      address: 'Bến xe Hoàng Long, TP. Hà Nội',
+      avatarColor: 'from-[#636366] to-[#48484A]'
+    },
+    {
+      id: 'c-15',
+      name: 'Dũng Lò Mổ',
+      phone: '0904.778.221',
+      relationship: 'Giao thịt tươi',
+      note: 'Mối cung cấp thịt lợn thịt bò.',
+      address: 'Chợ Cầu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#FF453A] to-[#FF9F0A]'
+    },
+    {
+      id: 'c-16',
+      name: 'Duy Bida 88',
+      phone: '0916.334.556',
+      relationship: 'Chủ bàn Bida',
+      note: 'CLB Billiards X-Club, hay đánh độ bida lỗ.',
+      address: 'Số 29 Phố Vọng, TP. Hà Nội',
+      avatarColor: 'from-[#0A84FF] to-[#64D2FF]'
+    },
+    {
+      id: 'c-17',
+      name: 'Đức Cầm Đồ',
+      phone: '0909.882.114',
+      relationship: 'Hiệu cầm đồ',
+      note: 'Nhận cắm giấy tờ xe, điện thoại, máy tính.',
+      address: 'Đường Chiến Thắng, TP. Hà Nội',
+      avatarColor: 'from-[#FF9F0A] to-[#FF453A]'
+    },
+    {
+      id: 'c-18',
+      name: 'Giang Bến Xe',
+      phone: '0938.221.776',
+      relationship: 'Phụ xe khách',
+      note: 'Chạy tuyến xe khách Hải Phòng - Hà Nội.',
+      address: 'Bến xe khách Hoàng Long, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-19',
+      name: 'Hà',
+      phone: '0984.112.568',
+      relationship: 'Bạn gái / Thợ may',
+      note: 'Bạn gái cũ, thợ may đồ tại phòng trọ Bờ Kè. Tự ý nấu nướng mang sang, kiểm soát khó chịu.',
+      address: 'Số 8 Ngõ 12 Đường Bờ Kè, Phường Phân khu Cảng',
+      avatarColor: 'from-[#FF2D55] to-[#AF52DE]'
+    },
+    {
+      id: 'c-20',
+      name: 'Hải Lác Bến Phà',
+      phone: '0918.776.543',
+      relationship: 'Con nợ bến phà',
+      note: 'Nợ 75 triệu tiền bốc họ, đang trốn không chịu trả.',
+      address: 'Khu vực Bến phà Sông Hồng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-21',
+      name: 'Hoàng Cắt Tóc',
+      phone: '0948.332.115',
+      relationship: 'Tiệm tóc nam',
+      note: 'Cắt tóc gội đầu gần ngã ba.',
+      address: 'Phố Cầu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-22',
+      name: 'Hùng Đen Cửu Vạn',
+      phone: '0936.445.882',
+      relationship: 'Cửu vạn bến sông',
+      note: 'Đội bốc xếp hàng hóa kho bãi.',
+      address: 'Đường Ven Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#636366] to-[#48484A]'
+    },
+    {
+      id: 'c-23',
+      name: 'Khánh Rồng',
+      phone: '0905.112.334',
+      relationship: 'Bạn xã hội',
+      note: 'Quen biết giới cầm đồ cho vay.',
+      address: 'TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-24',
+      name: 'Linh Nail',
+      phone: '0975.667.889',
+      relationship: 'Tiệm làm móng',
+      note: 'Tiệm làm nail gần chợ.',
+      address: 'Chợ Cầu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#FF375F] to-[#FF9F0A]'
+    },
+    {
+      id: 'c-25',
+      name: 'Long Sẹo',
+      phone: '0979.441.223',
+      relationship: 'Đàn em thu họ',
+      note: 'Đàn em chuyên đi dán thông báo nợ và lùng bắt xe con nợ.',
+      address: 'Xóm Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#636366] to-[#3A3A3C]'
+    },
+    {
+      id: 'c-26',
+      name: 'Minh Béo',
+      phone: '0917.443.221',
+      relationship: 'Bạn nhậu',
+      note: 'Hay nhậu đêm.',
+      address: 'TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-27',
+      name: 'Nam Thợ Nề',
+      phone: '0906.887.332',
+      relationship: 'Cai thầu xây dựng',
+      note: 'Thợ xây công trình nhỏ quanh khu.',
+      address: 'Phường Phân khu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-28',
+      name: 'Ngọc Mai',
+      phone: '0912.456.789',
+      relationship: 'Em họ (Vợ Lê Quang Vũ)',
+      note: 'Em họ con chú, đang đòi chia suất đất đền bù di chúc nhà 14 Bờ Sông.',
+      address: 'Số 45 Đường Đoàn Kết, Phường Cảng Đông',
+      avatarColor: 'from-[#30D158] to-[#0A84FF]'
+    },
+    {
+      id: 'c-29',
+      name: 'Phương Đồ Gỗ',
+      phone: '0933.556.112',
+      relationship: 'Xưởng mộc đồ gỗ',
+      note: 'Xưởng mộc gia công bàn ghế tủ kệ.',
+      address: 'Đường Ven Đê, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-30',
+      name: 'Quân Lô Đề',
+      phone: '0982.441.667',
+      relationship: 'Chủ bảng đề',
+      note: 'Ghi bảng lô đề, thanh toán qua tài khoản Vietcombank.',
+      address: 'Ngõ 45 Đường Đoàn Kết, TP. Hà Nội',
+      avatarColor: 'from-[#30D158] to-[#0A84FF]'
+    },
+    {
+      id: 'c-31',
+      name: 'Thảo Vy',
+      phone: '0978.552.109',
+      relationship: 'Người tình / Khách nợ',
+      note: 'Người tình trẻ, đã hẹn gom tiền cùng bay trốn vào Sài Gòn sáng 25/7.',
+      address: 'Phường Phân khu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#FF9500] to-[#FF2D55]'
+    },
+    {
+      id: 'c-32',
+      name: 'Thắng Sửa Xe',
+      phone: '0977.112.445',
+      relationship: 'Tiệm sửa xe máy',
+      note: 'Sửa xe SH, thay dầu và làm lại côn nồi phanh.',
+      address: 'Đường Chiến Thắng, TP. Hà Nội',
+      avatarColor: 'from-[#636366] to-[#48484A]'
+    },
+    {
+      id: 'c-33',
+      name: 'Thím Tư',
+      phone: '0964.881.332',
+      relationship: 'Họ hàng ở quê',
+      note: 'Thím ở quê hay gửi quà cáp chuối ngự lên.',
+      address: 'Hà Nam',
+      avatarColor: 'from-[#AF52DE] to-[#5856D6]'
+    },
+    {
+      id: 'c-34',
+      name: 'Tiến Bến Cảng',
+      phone: '0919.223.554',
+      relationship: 'Anh em xã hội',
+      note: 'Khu vực bến tàu.',
+      address: 'Cảng Sông Hồng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-35',
+      name: 'Tuấn Béo Xưởng Mộc',
+      phone: '0902.998.114',
+      relationship: 'Xưởng gỗ mộc',
+      note: 'Thợ đóng đồ mộc dân dụng.',
+      address: 'Phố Cầu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-36',
+      name: 'Tuấn Bia 88',
+      phone: '0945.888.188',
+      relationship: 'Chủ Quán Bia 88',
+      note: 'Chủ Quán Bia 88 đường Vĩnh Hà, hay rủ xem đá bóng uống bia.',
+      address: 'Số 88 Đường Vĩnh Hà, Phường Cảng Đông',
+      avatarColor: 'from-[#FFD60A] to-[#FF9500]'
+    },
+    {
+      id: 'c-37',
+      name: 'Vinh Quán Nhậu',
+      phone: '0907.334.221',
+      relationship: 'Chủ quán nhậu',
+      note: 'Quán nhậu đêm đồ nướng lẩu.',
+      address: 'Phố Vọng, TP. Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-38',
+      name: 'Vũ',
+      phone: '0967.452.183',
+      relationship: 'Cán bộ địa chính (Em rể họ)',
+      note: 'Chồng con Mai, đang nợ 300 triệu tiền bốc họ. Đang ép vẽ khống trích đo lên 120m2.',
+      address: 'Số 45 Đường Đoàn Kết, Phường Cảng Đông',
+      avatarColor: 'from-[#0A84FF] to-[#5856D6]'
+    },
+    {
+      id: 'c-39',
+      name: 'Yến Bún Đậu',
+      phone: '0985.221.998',
+      relationship: 'Quán ăn sáng',
+      note: 'Quán bún đậu mắm tôm gần cổng chợ.',
+      address: 'Chợ Cầu Cảng, TP. Hà Nội',
+      avatarColor: 'from-[#FF9F0A] to-[#30D158]'
     }
   ]
 
@@ -261,7 +531,7 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
 
             {/* iOS A-Z Alphabet Right Bar */}
             <div className="w-4 py-2 flex flex-col items-center justify-between text-[8px] font-bold text-[#0A84FF] font-mono select-none shrink-0 pr-1 opacity-80">
-              {['#', 'A', 'B', 'C', 'F', 'H', 'L', 'M', 'N', 'T', 'V', 'Y'].map((char) => (
+              {['#', 'A', 'B', 'C', 'D', 'Đ', 'G', 'H', 'K', 'L', 'M', 'N', 'P', 'Q', 'T', 'V', 'Y'].map((char) => (
                 <span key={char} className="hover:text-white cursor-pointer">{char}</span>
               ))}
             </div>

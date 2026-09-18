@@ -40,7 +40,7 @@ export function PhoneModal({ isOpen, onClose }: PhoneModalProps) {
         <div className="w-full max-w-[430px] flex items-center justify-between py-1.5 px-2 mb-1 shrink-0 z-50 border-b border-[#543b27]/40">
           <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#d9a066]">
             <span>📱</span>
-            <span>HỒ SƠ ĐIỆN THOẠI NẠN NHÂN</span>
+            <span>ĐIỆN THOẠI NẠN NHÂN KHANG</span>
           </div>
           <button
             onClick={onClose}

@@ -18,7 +18,7 @@ Số: **108/TB-GREENAGRI-SH**
 **Kính gửi:**
 * Ông: **NGUYỄN VĂN KHANG** (Bên vay vốn / Bên thế chấp)
 * Địa chỉ thường trú: Số 14 Đường Bờ Sông, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội.
-* Đồng kính gửi: Các cá nhân có quyền lợi, nghĩa vụ liên quan đến di sản thừa kế của cố ông **NGUYỄN VĂN THỌ** (Địa chỉ: Số 45 Đường Đoàn Kết, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội).
+* Đồng kính gửi: Các cá nhân có quyền lợi, nghĩa vụ liên quan đến di sản thừa kế của cố ông **NGUYỄN VĂN THỌ** (Địa chỉ: Số 45 Đường Đoàn Kết, Phường Cảng Đông, Quận Sông Hồng, TP. Hà Nội).
 
 ---
 

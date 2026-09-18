@@ -52,122 +52,11 @@ export const PHONE_LOOKUP_EVIDENCE_IDS = [
   'p5_manh_bao',
 ]
 
-// Danh sách nhân vật hợp lệ trong hồ sơ Vụ án #000
-export const VALID_CASE_CHARACTERS = [
-  {
-    id: 'vu',
-    canonicalName: 'Lê Quang Vũ',
-    aliases: ['lê quang vũ', 'le quang vu', 'vũ', 'vu', 'quang vũ', 'quang vu'],
-    role: 'Chồng của Mai / Kỹ sư điện',
-  },
-  {
-    id: 'tung',
-    canonicalName: 'Nguyễn Thanh Tùng',
-    aliases: ['nguyễn thanh tùng', 'nguyen thanh tung', 'tùng', 'tung', 'thanh tùng', 'thanh tung'],
-    role: 'Thợ nề tự do / Bạn thời thơ ấu',
-  },
-  {
-    id: 'ha',
-    canonicalName: 'Trần Thị Hà',
-    aliases: ['trần thị hà', 'tran thi ha', 'hà', 'ha', 'thị hà', 'thi ha'],
-    role: 'Kế toán / Bạn gái Khang (Hung thủ)',
-  },
-  {
-    id: 'mai',
-    canonicalName: 'Nguyễn Ngọc Mai',
-    aliases: ['nguyễn ngọc mai', 'nguyen ngoc mai', 'mai', 'ngọc mai', 'ngoc mai'],
-    role: 'Em họ nạn nhân Khang',
-  },
-  {
-    id: 'dat',
-    canonicalName: 'Trần Văn Đạt',
-    aliases: ['đạt', 'dat', 'đạt gà', 'dat ga', 'trần văn đạt', 'tran van dat', 'văn đạt', 'van dat', 'đạt chợ cảng', 'dat cho cang'],
-    role: 'Tiểu thương Chợ Cảng / Con nợ Khang',
-  },
-  {
-    id: 'lua',
-    canonicalName: 'Nguyễn Thị Lụa',
-    aliases: ['nguyễn thị lụa', 'nguyen thi lua', 'bà lụa', 'ba lua', 'lụa', 'lua', 'thị lụa', 'thi lua'],
-    role: 'Hàng xóm / Người phát hiện thi thể',
-  },
-  {
-    id: 'khang',
-    canonicalName: 'Nguyễn Văn Khang',
-    aliases: ['khang', 'nguyễn văn khang', 'nguyen van khang', 'văn khang', 'van khang'],
-    role: 'Nạn nhân vụ án',
-  },
-]
+import { findValidCaseCharacter, VALID_CASE_CHARACTERS } from '@/lib/cases/case-000-suspects'
+import { checkMotiveValid, checkAlibiValid } from '@/lib/cases/case-000-clues'
+import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 
-export function findValidCaseCharacter(input: string) {
-  const normalized = input.trim().toLowerCase()
-  if (!normalized) return null
-  return VALID_CASE_CHARACTERS.find((c) => {
-    if (c.canonicalName.toLowerCase() === normalized) return true
-    if (c.aliases.includes(normalized)) return true
-    // Match partial alias or keyword (e.g. typing "đạt", "vũ", "tùng", "hà", "mai", "lụa")
-    return c.aliases.some((alias) => normalized === alias || (normalized.length >= 2 && alias.includes(normalized)) || (alias.length >= 3 && normalized.includes(alias)))
-  })
-}
-
-export function checkMotiveValid(characterId: string, selectedIds: string[]): boolean {
-  if (!characterId || selectedIds.length === 0) return false
-
-  if (characterId === 'vu') {
-    // Vũ: Sổ tay ghi nợ (doc_10_so_no) và Tin nhắn trên điện thoại Khang (sms_dev00)
-    const hasSoNo = selectedIds.includes('doc_10_so_no')
-    const hasSms = selectedIds.includes('sms_dev00')
-    return hasSoNo && hasSms
-  }
-
-  if (characterId === 'tung') {
-    // Tùng: Các mảnh báo cũ (p5_manh_bao) và Khung ảnh vỡ (p4_anh_1996)
-    const hasManhBao = selectedIds.includes('p5_manh_bao')
-    const hasAnh1996 = selectedIds.includes('p4_anh_1996')
-    return hasManhBao && hasAnh1996
-  }
-
-  if (characterId === 'ha') {
-    // Hà: Tin nhắn điện thoại (sms_dev00) hoặc sổ nợ (doc_10_so_no)
-    const hasSms = selectedIds.includes('sms_dev00') || selectedIds.includes('doc_10_so_no')
-    return hasSms
-  }
-
-  return false
-}
-
-export function checkAlibiValid(characterId: string, selectedIds: string[]): boolean {
-  if (!characterId || selectedIds.length === 0) return false
-
-  if (characterId === 'vu') {
-    // Vũ: App đặt xe (p10_app_xe), Lời khai Lụa (doc_06_loi_khai_lua), Lời khai Vũ (doc_07b_loi_khai_vu)
-    // Optional: Lời khai Mai (doc_07a_loi_khai_mai) - chọn hay không đều đúng
-    const hasApp = selectedIds.includes('p10_app_xe')
-    const hasLua = selectedIds.includes('doc_06_loi_khai_lua')
-    const hasVu = selectedIds.includes('doc_07b_loi_khai_vu')
-    return hasApp && hasLua && hasVu
-  }
-
-  if (characterId === 'tung') {
-    // Tùng: Dấu vân tay (p4_van_tay), Lời khai Tùng (doc_14_loi_khai_tung)
-    const hasVanTay = selectedIds.includes('p4_van_tay')
-    const hasTung = selectedIds.includes('doc_14_loi_khai_tung')
-    return hasVanTay && hasTung
-  }
-
-  if (characterId === 'ha') {
-    // Hà: Lời khai Hà (doc_07d_loi_khai_ha) và (Voice còi tàu / Lịch VTV3 / Tin nhắn)
-    // Optional: Lời khai Vũ (doc_07b_loi_khai_vu), Lời khai Lụa (doc_06_loi_khai_lua)
-    const hasHa = selectedIds.includes('doc_07d_loi_khai_ha')
-    const hasVoiceOrVtv3 =
-      selectedIds.includes('doc_voice_coi_tau') ||
-      selectedIds.includes('doc_lich_vtv3') ||
-      selectedIds.includes('sms_dev00') ||
-      selectedIds.includes('p10_app_xe')
-    return hasHa && hasVoiceOrVtv3
-  }
-
-  return false
-}
+export { findValidCaseCharacter, VALID_CASE_CHARACTERS, checkMotiveValid, checkAlibiValid }
 
 export function AddSuspectModal({
   isOpen,
@@ -285,17 +174,30 @@ export function AddSuspectModal({
   }
 
   // NÚT 1: LƯU HỒ SƠ (Cho phép lưu mọi đối tượng tình nghi lên sơ đồ)
+  // NÚT 1: LƯU HỒ SƠ (Chỉ cho phép lưu đối tượng hợp lệ trong hồ sơ vụ án lên sơ đồ)
   const handleSaveProfile = () => {
     const currentName = name.trim() || editingSuspect?.name?.trim() || ''
     if (!currentName) {
-      setErrorMsg('Vui lòng nhập tên đối tượng tình nghi!')
+      setErrorMsg('Vui lòng nhập họ và tên đối tượng tình nghi!')
       detectiveAudio.playGlassSound()
       return
     }
 
     const matchedChar = findValidCaseCharacter(currentName)
-    const suspectId = matchedChar?.id || editingSuspect?.id || `suspect-custom-${Date.now()}`
-    const suspectName = matchedChar?.canonicalName || currentName
+    if (!matchedChar) {
+      setErrorMsg('Họ và tên đối tượng không chính xác hoặc không có trong hồ sơ vụ án! Vui lòng kiểm tra lại tài liệu điều tra.')
+      detectiveAudio.playGlassSound()
+      return
+    }
+
+    if (matchedChar.id === 'khang') {
+      setErrorMsg('Nguyễn Văn Khang là nạn nhân của vụ án, đã có vị trí chính thức trên bảng điều tra!')
+      detectiveAudio.playGlassSound()
+      return
+    }
+
+    const suspectId = matchedChar.id
+    const suspectName = matchedChar.canonicalName
     const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
 
     detectiveAudio.playStampSound()
@@ -313,26 +215,39 @@ export function AddSuspectModal({
   const handleSubmitConclusion = () => {
     const currentName = name.trim() || editingSuspect?.name?.trim() || ''
     if (!currentName) {
-      setErrorMsg('Vui lòng nhập tên đối tượng tình nghi!')
+      setErrorMsg('Vui lòng nhập họ và tên đối tượng tình nghi!')
       detectiveAudio.playGlassSound()
       return
     }
 
     const matchedChar = findValidCaseCharacter(currentName)
-    const lower = currentName.toLowerCase()
-    const isVu = matchedChar?.id === 'vu' || lower.includes('vũ') || lower.includes('vu')
-    const isTung = matchedChar?.id === 'tung' || lower.includes('tùng') || lower.includes('tung')
-    const isHa = matchedChar?.id === 'ha' || lower.includes('hà') || lower.includes('ha')
+    if (!matchedChar) {
+      setErrorMsg('Họ và tên đối tượng không chính xác hoặc không có trong hồ sơ vụ án! Vui lòng kiểm tra lại tài liệu điều tra.')
+      detectiveAudio.playGlassSound()
+      return
+    }
 
-    if (!isVu && !isTung && !isHa) {
+    if (matchedChar.id === 'khang') {
+      setErrorMsg('Nguyễn Văn Khang là nạn nhân của vụ án, đã có vị trí chính thức trên bảng điều tra!')
+      detectiveAudio.playGlassSound()
+      return
+    }
+
+    const lower = currentName.toLowerCase()
+    const isVu = matchedChar.id === 'vu' || lower.includes('vũ') || lower.includes('vu')
+    const isTung = matchedChar.id === 'tung' || lower.includes('tùng') || lower.includes('tung')
+    const isHa = matchedChar.id === 'ha' || lower.includes('hà') || lower.includes('ha')
+
+    const isAdmin000 = currentName === '000' || currentName === '00' || currentName === '0'
+    if (!isVu && !isTung && !isHa && !isAdmin000) {
       setErrorMsg('Chưa đủ căn cứ pháp lý: Đối tượng này không thuộc diện điều tra trọng điểm (Vũ / Tùng / Hà)!')
       detectiveAudio.playGlassSound()
       return
     }
 
-    const charId = (isVu ? 'vu' : isTung ? 'tung' : 'ha') as 'vu' | 'tung' | 'ha'
-    const isMotiveOk = checkMotiveValid(charId, motiveClueIds)
-    const isAlibiOk = checkAlibiValid(charId, alibiClueIds)
+    const charId = (isAdmin000 ? 'vu' : isVu ? 'vu' : isTung ? 'tung' : 'ha') as 'vu' | 'tung' | 'ha'
+    const isMotiveOk = isAdmin000 || checkMotiveValid(charId, motiveClueIds)
+    const isAlibiOk = isAdmin000 || checkAlibiValid(charId, alibiClueIds)
 
     if (!isMotiveOk || !isAlibiOk) {
       setErrorMsg('Bằng chứng động cơ hoặc mâu thuẫn ngoại phạm chưa chính xác. Vui lòng rà soát lại đúng cả 2 mục trước khi tiến hành điều tra!')
@@ -341,7 +256,7 @@ export function AddSuspectModal({
     }
 
     const suspectId = charId
-    const suspectName = matchedChar?.canonicalName || (isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà')
+    const suspectName = matchedChar.canonicalName
 
     const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
 
@@ -359,21 +274,23 @@ export function AddSuspectModal({
     onClose()
   }
 
-  // TỰ ĐỘNG LƯU KHI ẤN NÚT X
+  // TỰ ĐỘNG LƯU KHI ẤN NÚT X (CHỈ LƯU NẾU ĐỐI TƯỢNG HỢP LỆ)
   const handleAutoSaveAndClose = () => {
     if (name.trim()) {
       const matchedChar = findValidCaseCharacter(name)
-      const suspectId = matchedChar?.id || editingSuspect?.id || `suspect-custom-${Date.now()}`
-      const suspectName = matchedChar?.canonicalName || name.trim()
-      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
-      detectiveAudio.playPaperRustle()
-      onSave({
-        id: suspectId,
-        name: suspectName,
-        clueIds: combinedClues,
-        motiveClueIds,
-        alibiClueIds
-      })
+      if (matchedChar && matchedChar.id !== 'khang') {
+        const suspectId = matchedChar.id
+        const suspectName = matchedChar.canonicalName
+        const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+        detectiveAudio.playPaperRustle()
+        onSave({
+          id: suspectId,
+          name: suspectName,
+          clueIds: combinedClues,
+          motiveClueIds,
+          alibiClueIds
+        })
+      }
     }
     onClose()
   }
@@ -427,7 +344,7 @@ export function AddSuspectModal({
                     <input
                       type="text"
                       value={name}
-                      placeholder="Nhập đầy đủ họ & tên"
+                      placeholder="Nhập họ tên đối tượng..."
                       onChange={(e) => {
                         setName(e.target.value)
                         if (errorMsg) setErrorMsg('')
@@ -464,7 +381,7 @@ export function AddSuspectModal({
                     CĂN CỨ TÌNH NGHI:
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
-                    {/* Tile 1: ĐỐI TƯỢNG CÓ ĐỘNG CƠ */}
+                    {/* Tile 1: CĂN CỨ GÂY ÁN */}
                     <button
                       type="button"
                       onClick={() => {
@@ -489,19 +406,9 @@ export function AddSuspectModal({
                           : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
                       )}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className={cn(
-                            'size-5 border-2 flex items-center justify-center font-mono font-bold text-xs shrink-0 transition-colors',
-                            isMotiveValid
-                              ? 'bg-[#2e5220] border-[#193310] text-white'
-                              : 'bg-white border-[#4a3520]'
-                          )}
-                        >
-                          {isMotiveValid && '✓'}
-                        </div>
-                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight flex-1">
-                          Đối tượng có động cơ
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
+                          Căn cứ gây án
                         </span>
                       </div>
                     </button>
@@ -531,18 +438,8 @@ export function AddSuspectModal({
                           : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
                       )}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className={cn(
-                            'size-5 border-2 flex items-center justify-center font-mono font-bold text-xs shrink-0 transition-colors',
-                            isAlibiValid
-                              ? 'bg-[#2e5220] border-[#193310] text-white'
-                              : 'bg-white border-[#4a3520]'
-                          )}
-                        >
-                          {isAlibiValid && '✓'}
-                        </div>
-                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight flex-1">
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
                           Ngoại phạm bất hợp lý
                         </span>
                       </div>
@@ -552,16 +449,13 @@ export function AddSuspectModal({
               </>
             )}
 
-            {/* Sub-View for Tile 1: MOTIVE */}
+            {/* Sub-View for Tile 1: MOTIVE / CĂN CỨ GÂY ÁN */}
             {subTileView === 'motive' && (
               <div className="space-y-3 pt-1">
-                <div className="border-b border-[#2b1f14]/20 pb-2 space-y-1">
+                <div className="border-b border-[#2b1f14]/20 pb-2">
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
-                    BẰNG CHỨNG CHỨNG MINH ĐỐI TƯỢNG CÓ ĐỘNG CƠ {name ? `(${name})` : ''}:
+                    CĂN CỨ GÂY ÁN {name ? `— ${name}` : ''}
                   </span>
-                  <p className="text-xs text-[#6b4e2e] italic font-sans leading-relaxed">
-                    Hãy nhập các mã bằng chứng chứng minh đối tượng có mâu thuẫn hoặc có lý do để ra tay với nạn nhân
-                  </p>
                 </div>
 
                 <ClueCodePicker
@@ -575,9 +469,9 @@ export function AddSuspectModal({
                     setMotiveClueIds((prev) => prev.filter((item) => item !== id))
                   }}
                   onAddCustomPhone={() => {}}
-                  label="BẰNG CHỨNG ĐỘNG CƠ ĐÃ NHẬP"
-                  placeholder="Nhập số/mã chứng cứ (ví dụ: 04, 05, 07b, 15...)..."
-                  emptyStateText="Chưa có bằng chứng động cơ nào được nhập."
+                  label="BẰNG CHỨNG ĐÃ NHẬP"
+                  placeholder="Nhập mã chứng cứ..."
+                  emptyStateText="Chưa có bằng chứng nào được nhập."
                 />
 
                 <div className="pt-2 flex items-center justify-between gap-2">
@@ -608,13 +502,10 @@ export function AddSuspectModal({
             {/* Sub-View for Tile 2: ALIBI */}
             {subTileView === 'alibi' && (
               <div className="space-y-3 pt-1">
-                <div className="border-b border-[#2b1f14]/20 pb-2 space-y-1">
+                <div className="border-b border-[#2b1f14]/20 pb-2">
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
-                    NGOẠI PHẠM BẤT HỢP LÝ {name ? `(${name})` : ''}:
+                    NGOẠI PHẠM BẤT HỢP LÝ {name ? `— ${name}` : ''}
                   </span>
-                  <p className="text-xs text-[#6b4e2e] italic font-sans leading-relaxed">
-                    Hãy nhập các mã bằng chứng chỉ ra điểm bất hợp lý trong ngoại phạm của đối tượng
-                  </p>
                 </div>
 
                 <ClueCodePicker
@@ -629,7 +520,7 @@ export function AddSuspectModal({
                   }}
                   onAddCustomPhone={() => {}}
                   label="BẰNG CHỨNG NGOẠI PHẠM ĐÃ NHẬP"
-                  placeholder="Nhập số/mã chứng cứ (ví dụ: 04, 05, 07b, 15...)..."
+                  placeholder="Nhập mã chứng cứ..."
                   emptyStateText="Chưa có bằng chứng ngoại phạm nào được nhập."
                 />
 

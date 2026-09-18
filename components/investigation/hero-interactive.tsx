@@ -50,9 +50,9 @@ export interface PinPoint {
   y: number;
   label: string;
   detail: string;
-  color?: "red" | "yellow" | "blue" | "green" | "black";
+  color?: "red" | "yellow" | "blue" | "green" | "black" | "purple" | "orange" | "cyan" | "brass" | "silver" | "dark";
   noteColor?: "yellow" | "black" | "white" | "red" | "blue";
-  pinColor?: "red" | "yellow" | "blue" | "green" | "black";
+  pinColor?: "red" | "yellow" | "blue" | "green" | "black" | "purple" | "orange" | "cyan" | "brass" | "silver" | "dark";
   pulseBorder?: boolean;
   photoUrl?: string;
 }
@@ -114,8 +114,8 @@ const CASES_LIST: CaseData[] = [
         id: "c0-pin-question",
         x: 0.42,
         y: 0.18,
-        label: "CÂU HỎI ĐIỀU TRA",
-        detail: "Danh sách câu hỏi điều tra & nghi vấn cần làm rõ",
+        label: "NGHI VẤN",
+        detail: "Danh sách các nghi vấn & câu hỏi điều tra cần làm rõ",
         noteColor: "yellow",
       },
       {
@@ -128,8 +128,8 @@ const CASES_LIST: CaseData[] = [
       },
       {
         id: "c0-pin-phone",
-        x: 0.62,
-        y: 0.18,
+        x: 0.42,
+        y: 0.27,
         label: "MỞ RỘNG ĐIỀU TRA",
         detail: "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
         noteColor: "white",
@@ -138,17 +138,18 @@ const CASES_LIST: CaseData[] = [
         id: "c0-pin-reinvestigate",
         x: 0.22,
         y: 0.35,
-        label: "BIÊN BẢN XIN KHÁM NGHIỆM HIỆN TRƯỜNG",
+        label: "BIÊN BẢN XIN KHÁM XÉT LẠI",
         detail: "Khám xét lại hiện trường để rà soát manh mối bổ sung",
         noteColor: "white",
       },
       {
         id: "c0-pin-indictment",
-        x: 0.25,
-        y: 0.68,
+        x: 0.22,
+        y: 0.80,
         label: "BẢN KẾT LUẬN ĐIỀU TRA",
         detail: "Bản kết luận điều tra và buộc tội thủ phạm vụ án",
         noteColor: "white",
+        pinColor: "red",
       },
     ],
     connections: [
@@ -380,6 +381,21 @@ function wrapText(
   const words = text.trim().split(/\s+/);
   if (words.length <= 1) return [text];
 
+  // If the whole text fits on one line, return immediately
+  if (context.measureText(text).width <= maxWidth) {
+    return [text];
+  }
+
+  // If text has 3 to 6 words, try 2 balanced lines first (e.g. "Bản kết luận" / "điều tra")
+  if (words.length >= 3 && words.length <= 6 && maxLines >= 2) {
+    const splitIndex = Math.ceil(words.length / 2);
+    const line1 = words.slice(0, splitIndex).join(" ");
+    const line2 = words.slice(splitIndex).join(" ");
+    if (context.measureText(line1).width <= maxWidth && context.measureText(line2).width <= maxWidth) {
+      return [line1, line2];
+    }
+  }
+
   const lines: string[] = [];
   let currentLine = "";
 
@@ -403,6 +419,18 @@ function wrapText(
   if (currentLine) {
     lines.push(currentLine);
   }
+
+  // Avoid orphan last word if 2 lines
+  if (lines.length === 2 && lines[1].split(/\s+/).length === 1 && lines[0].split(/\s+/).length > 2) {
+    const allWords = text.trim().split(/\s+/);
+    const mid = Math.ceil(allWords.length / 2);
+    const l1 = allWords.slice(0, mid).join(" ");
+    const l2 = allWords.slice(mid).join(" ");
+    if (context.measureText(l1).width <= maxWidth && context.measureText(l2).width <= maxWidth) {
+      return [l1, l2];
+    }
+  }
+
   return lines;
 }
 
@@ -421,10 +449,10 @@ function isPinHit(
   const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-");
 
   if (isSuspectPin) {
-    // Hit area for Polaroid photo card underneath pinhead (matches ~98px width x 124px height)
-    const cardHalfWidth = 52 / transform.scale;
-    const cardTop = pinPosition.y - 14 / transform.scale;
-    const cardBottom = pinPosition.y + 120 / transform.scale;
+    // Hit area for Polaroid photo card underneath pinhead (matches ~112px width x 142px height)
+    const cardHalfWidth = 60 / transform.scale;
+    const cardTop = pinPosition.y - 16 / transform.scale;
+    const cardBottom = pinPosition.y + 135 / transform.scale;
     const cardLeft = pinPosition.x - cardHalfWidth;
     const cardRight = pinPosition.x + cardHalfWidth;
 
@@ -436,10 +464,19 @@ function isPinHit(
     );
   }
 
-  // Hit area for sticky note underneath pinhead (matches ~68px width x 72px height)
-  const cardHalfWidth = 36 / transform.scale;
-  const cardTop = pinPosition.y - 8 / transform.scale;
-  const cardBottom = pinPosition.y + 66 / transform.scale;
+  const upperLabel = (pin.label || '').toUpperCase();
+  const isWhiteNote = (pin as any).noteColor === 'white' || 
+    upperLabel.includes('MỞ RỘNG') || 
+    upperLabel.includes('KHÁM XÉT') || 
+    upperLabel.includes('KHÁM NGHIỆM') || 
+    upperLabel.includes('KẾT LUẬN') ||
+    upperLabel.includes('BIÊN BẢN') ||
+    upperLabel.includes('TRUY TỐ');
+
+  // Hit area for white note (~108x124) vs sticky note (~84x90) underneath pinhead
+  const cardHalfWidth = (isWhiteNote ? 56 : 44) / transform.scale;
+  const cardTop = pinPosition.y - (isWhiteNote ? 18 : 12) / transform.scale;
+  const cardBottom = pinPosition.y + (isWhiteNote ? 112 : 80) / transform.scale;
   const cardLeft = pinPosition.x - cardHalfWidth;
   const cardRight = pinPosition.x + cardHalfWidth;
 
@@ -572,6 +609,9 @@ export function HeroInteractive({
   const resolveSuspectPhotoUrl = (pin: { id: string; label: string; photoUrl?: string }): string | undefined => {
     if (pin.photoUrl) return pin.photoUrl;
     const lower = `${pin.id} ${pin.label}`.toLowerCase();
+    if (lower.includes('thi-the') || lower.includes('thi the') || lower.includes('hiện trường') || lower.includes('crime-scene') || lower.includes('crime_scene')) {
+      return '/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png';
+    }
     if (lower.includes('vu') || lower.includes('vũ')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vu.png';
     if (lower.includes('tung') || lower.includes('tùng')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_tung.png';
     if (lower.includes('ha') || lower.includes('hà')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ha.png';
@@ -1179,11 +1219,11 @@ export function HeroInteractive({
       context.translate(transform.translateX, transform.translateY);
       context.scale(transform.scale, transform.scale);
 
-      // 2.1 Draw case evidence map with ~140% zoom focus on inner corkboard surface
+      // 2.1 Draw case evidence map with refined focus on corkboard surface
       if (image) {
-        // Crop 14% margin of dark outer wall to zoom deeply into the corkboard surface
-        const cropMarginX = image.width * 0.14;
-        const cropMarginY = image.height * 0.13;
+        // Crop ~11.5-12% margin for subtle reduction vs original
+        const cropMarginX = image.width * 0.12;
+        const cropMarginY = image.height * 0.11;
         const sx = cropMarginX;
         const sy = cropMarginY;
         const sw = image.width - cropMarginX * 2;
@@ -1292,21 +1332,15 @@ export function HeroInteractive({
           };
         }
 
-        // Calculate a deterministic varied rotation angle and organic size variation for each item
+        // Calculate a subtle organic size variation for each item
         const charSum = pin.id.split("").reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 3), 0);
-        const tiltRaw = ((charSum % 13) - 6);
-        const tiltDeg = (tiltRaw === 0 ? 3.2 : tiltRaw) * 0.85; // -5.1° to +5.1°
-        const tiltAngle = tiltDeg * (Math.PI / 180);
-
-        // Organic size variation (-8% to +9%)
-        const sizeVariant = ((charSum % 7) - 3) * 0.028;
+        const sizeVariant = ((charSum % 7) - 3) * 0.024;
         const scaleMod = 1.0 + sizeVariant;
 
-        const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-");
+        const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-") || !!(pin as any).photoUrl || pin.id.includes("thi-the") || pin.id.includes("crime-scene");
 
         context.save();
         context.translate(pinPosition.x, pinPosition.y);
-        context.rotate(tiltAngle);
 
         if (isSuspectPin) {
           // ── REALISTIC PINNED SUSPECT PHOTO CARD ASSET (WITH BEIGE TAPE & NAME) ──
@@ -1316,87 +1350,151 @@ export function HeroInteractive({
           if (loadedSuspectImg) {
             const imgW = loadedSuspectImg.naturalWidth || loadedSuspectImg.width || 300;
             const imgH = loadedSuspectImg.naturalHeight || loadedSuspectImg.height || 380;
-            const cardWidth = (98 * scaleMod) / transform.scale;
+            const isKhang = pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang'));
+            const isCrimeScene = pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể'));
+            const baseCardWidth = isKhang ? 146 : isCrimeScene ? 134 : 108;
+            const cardWidth = (baseCardWidth * scaleMod) / transform.scale;
             const cardHeight = (cardWidth * imgH) / imgW;
 
             const tagX = -cardWidth / 2;
-            const tagY = -cardHeight * 0.10;
+            const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.10;
 
             // Render complete pre-rendered photo card (includes photo, beige tape + name, yellow pin, drop shadow)
             context.drawImage(loadedSuspectImg, tagX, tagY, cardWidth, cardHeight);
           } else {
             // Lightweight fallback while image is loading
-            const cardWidth = (84 * scaleMod) / transform.scale;
-            const cardHeight = (105 * scaleMod) / transform.scale;
+            const isKhang = pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang'));
+            const isCrimeScene = pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể'));
+            const baseCardWidth = isKhang ? 126 : isCrimeScene ? 114 : 92;
+            const baseCardHeight = isKhang ? 162 : isCrimeScene ? 144 : 118;
+            const cardWidth = (baseCardWidth * scaleMod) / transform.scale;
+            const cardHeight = (baseCardHeight * scaleMod) / transform.scale;
             context.fillStyle = "#f5f2eb";
             context.fillRect(-cardWidth / 2, 0, cardWidth, cardHeight);
           }
         } else {
           // ── DISTINGUISH WHITE PINNED NOTES vs YELLOW STICKY NOTES ──
-          const isWhiteNote = pin.noteColor === 'white' || 
-            pin.label.includes('MỞ RỘNG') || 
-            pin.label.includes('KHÁM NGHIỆM') || 
-            pin.label.includes('KẾT LUẬN') ||
-            pin.label.includes('TRUY TỐ');
+          const upperLabel = (pin.label || '').toUpperCase();
+          const isWhiteNote = (pin as any).noteColor === 'white' || 
+            upperLabel.includes('MỞ RỘNG') || 
+            upperLabel.includes('KHÁM XÉT') || 
+            upperLabel.includes('KHÁM NGHIỆM') || 
+            upperLabel.includes('KẾT LUẬN') ||
+            upperLabel.includes('BIÊN BẢN') ||
+            upperLabel.includes('TRUY TỐ');
 
           let noteUrl = '';
-          if (pin.id === 'c0-pin-evidence' || pin.label.includes('CHỨNG CỨ')) {
-            noteUrl = '/images/cases/case_000/clue_notes/sticky_yellow_tilt_left.png';
-          } else if (pin.id === 'c0-pin-suspects' || pin.label.includes('NGHI PHẠM')) {
-            noteUrl = '/images/cases/case_000/clue_notes/sticky_kraft_beige.png';
-          } else if (pin.id === 'c0-pin-question' || pin.label.includes('CÂU HỎI')) {
-            noteUrl = '/images/cases/case_000/clue_notes/sticky_yellow_tilt_right.png';
-          } else if (pin.id === 'c0-pin-phone' || pin.label.includes('MỞ RỘNG')) {
-            noteUrl = '/images/cases/case_000/clue_notes/note_white_large.png';
-          } else if (pin.id === 'c0-pin-reinvestigate' || pin.label.includes('KHÁM NGHIỆM')) {
-            noteUrl = '/images/cases/case_000/clue_notes/note_white_square.png';
-          } else if (pin.id === 'c0-pin-indictment' || pin.label.includes('KẾT LUẬN') || pin.label.includes('TRUY TỐ')) {
-            noteUrl = '/images/cases/case_000/clue_notes/note_white_tilt_left.png';
+          let isPreRendered = false;
+
+          if (pin.id === 'c0-pin-evidence' || upperLabel.includes('CHỨNG CỨ')) {
+            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_bo_sung_chung_cu.png';
+            isPreRendered = true;
+          } else if (pin.id === 'c0-pin-suspects' || upperLabel.includes('NGHI PHẠM')) {
+            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_nghi_pham.png';
+            isPreRendered = true;
+          } else if (
+            pin.id === 'c0-pin-followup-vu' ||
+            pin.id === 'c0-pin-followup-tung' ||
+            pin.id === 'c0-pin-followup-ha' ||
+            pin.id === 'c0-pin-question' ||
+            pin.id.startsWith('c0-pin-followup') ||
+            upperLabel.includes('NGHI VẤN') ||
+            upperLabel.includes('CÂU HỎI')
+          ) {
+            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_nghi_van.png';
+            isPreRendered = true;
+          } else if (pin.id === 'c0-pin-phone' || upperLabel.includes('MỞ RỘNG')) {
+            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_mo_rong_dieu_tra.png';
+            isPreRendered = true;
+          } else if (pin.id === 'c0-pin-reinvestigate' || upperLabel.includes('KHÁM XÉT') || upperLabel.includes('KHÁM NGHIỆM')) {
+            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_kham_xet_lai.png';
+            isPreRendered = true;
+          } else if (pin.id === 'c0-pin-indictment' || upperLabel.includes('KẾT LUẬN') || upperLabel.includes('TRUY TỐ')) {
+            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_ket_luan_dieu_tra.png';
+            isPreRendered = true;
           } else if (isWhiteNote) {
             const whiteVariants = [
-              '/images/cases/case_000/clue_notes/note_white_large.png',
-              '/images/cases/case_000/clue_notes/note_white_square.png',
-              '/images/cases/case_000/clue_notes/note_white_tilt_left.png',
-              '/images/cases/case_000/clue_notes/note_white_tilt_right.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_1.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_2.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_3.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_4.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_5.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_6.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_7.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_8.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_9.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_10.png',
+              '/images/cases/case_000/clue_notes/clean_note_white_11.png',
             ];
             const hash = (pin.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-            noteUrl = whiteVariants[hash % whiteVariants.length];
+            noteUrl = whiteVariants[Math.abs(hash) % whiteVariants.length];
           } else {
             const yellowVariants = [
-              '/images/cases/case_000/clue_notes/sticky_yellow_tilt_left.png',
-              '/images/cases/case_000/clue_notes/sticky_kraft_beige.png',
-              '/images/cases/case_000/clue_notes/sticky_yellow_tilt_right.png',
-              '/images/cases/case_000/clue_notes/sticky_yellow_flat.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_1.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_2.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_3.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_4.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_5.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_6.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_7.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_8.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_9.png',
+              '/images/cases/case_000/clue_notes/clean_sticky_yellow_10.png',
             ];
             const hash = (pin.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-            noteUrl = yellowVariants[hash % yellowVariants.length];
+            noteUrl = yellowVariants[Math.abs(hash) % yellowVariants.length];
           }
 
           const loadedNoteImg = getLoadedImage(noteUrl);
 
-          const noteWidth = (isWhiteNote ? 78 : 68) * scaleMod / transform.scale;
-          const noteHeight = (isWhiteNote ? 86 : 72) * scaleMod / transform.scale;
-          const maxTextWidth = noteWidth - 14 / transform.scale;
+          const isIndictment = pin.id === 'c0-pin-indictment' || upperLabel.includes('KẾT LUẬN');
+          const sizeMultiplier = 1.0; // Same size across all white notes
 
-          let fontSize = 11.5;
-          context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
-          let lines = wrapText(context, pin.label, maxTextWidth, 3);
+          // Note size: preserve aspect ratio cleanly without distortion
+          const baseCardWidth = isWhiteNote ? 104 : 84;
+          const noteWidth = (baseCardWidth * scaleMod * sizeMultiplier) / transform.scale;
 
-          while (
-            fontSize > 8.0 &&
-            lines.some((l) => context.measureText(l).width > maxTextWidth)
-          ) {
-            fontSize -= 0.5;
-            context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
-            lines = wrapText(context, pin.label, maxTextWidth, 3);
+          let noteHeight = noteWidth;
+          if (loadedNoteImg && loadedNoteImg.naturalWidth && loadedNoteImg.naturalHeight) {
+            noteHeight = (noteWidth * loadedNoteImg.naturalHeight) / loadedNoteImg.naturalWidth;
+          } else {
+            noteHeight = noteWidth * (isWhiteNote ? 1.18 : 1.0);
           }
 
-          const lineHeight = (fontSize + 1.6) / transform.scale;
-          const textBlockHeight = lines.length * lineHeight;
-          const tagX = -noteWidth / 2;
-          const tagY = (isWhiteNote ? -10.0 : -8.0) / transform.scale;
+          let pinAnchorX = 0.50;
+          let pinAnchorY = 0.08;
 
-          // Draw the realistic note PNG asset if loaded
+          if (pin.id === 'c0-pin-evidence' || upperLabel.includes('CHỨNG CỨ')) {
+            pinAnchorX = 0.50;
+            pinAnchorY = 0.080;
+          } else if (pin.id === 'c0-pin-suspects' || upperLabel.includes('NGHI PHẠM')) {
+            pinAnchorX = 0.50;
+            pinAnchorY = 0.080;
+          } else if (
+            pin.id === 'c0-pin-followup-vu' ||
+            pin.id === 'c0-pin-followup-tung' ||
+            pin.id === 'c0-pin-followup-ha' ||
+            pin.id === 'c0-pin-question' ||
+            upperLabel.includes('NGHI VẤN') ||
+            upperLabel.includes('CÂU HỎI')
+          ) {
+            pinAnchorX = 0.50;
+            pinAnchorY = 0.080;
+          } else if (pin.id === 'c0-pin-phone' || upperLabel.includes('MỞ RỘNG')) {
+            pinAnchorX = 0.50;
+            pinAnchorY = 0.075;
+          } else if (pin.id === 'c0-pin-reinvestigate' || upperLabel.includes('KHÁM XÉT') || upperLabel.includes('KHÁM NGHIỆM')) {
+            pinAnchorX = 0.50;
+            pinAnchorY = 0.075;
+          } else if (pin.id === 'c0-pin-indictment' || upperLabel.includes('KẾT LUẬN')) {
+            pinAnchorX = 0.50;
+            pinAnchorY = 0.075;
+          }
+
+          const tagX = -noteWidth * pinAnchorX;
+          const tagY = -noteHeight * pinAnchorY;
+
+          // Draw the realistic Ultra HD note PNG asset (preserving rich wrinkles, natural edges, and texture)
           if (loadedNoteImg) {
             context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
           } else {
@@ -1417,19 +1515,42 @@ export function HeroInteractive({
             context.restore();
           }
 
-          // Multi-line Handwritten label text over note image
-          context.save();
-          context.fillStyle = "#1e1b18";
-          context.textAlign = "center";
-          context.textBaseline = "middle";
+          // Render handwritten text (only if not using pre-rendered note asset or while loading)
+          if (!isPreRendered || !loadedNoteImg) {
+            const paperFaceCenterX = tagX + noteWidth / 2;
+            const paperFaceCenterY = tagY + noteHeight * 0.52;
+            const maxTextWidth = noteWidth * (isWhiteNote ? 0.65 : 0.72);
+            const availableHeight = noteHeight * (isWhiteNote ? 0.55 : 0.60);
 
-          const availableHeight = noteHeight - 16 / transform.scale;
-          const textStartY = tagY + 13 / transform.scale + (availableHeight - textBlockHeight) / 2 + lineHeight / 2;
+            let fontSize = isIndictment ? 12.0 : isWhiteNote ? 11.0 : 10.5;
+            context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+            let lines = wrapText(context, pin.label, maxTextWidth, 3);
 
-          lines.forEach((line, lineIdx) => {
-            context.fillText(line, 0, textStartY + lineIdx * lineHeight);
-          });
-          context.restore();
+            while (
+              fontSize > 7.0 &&
+              (lines.some((l) => context.measureText(l).width > maxTextWidth) ||
+               lines.length * ((fontSize + 1.5) / transform.scale) > availableHeight)
+            ) {
+              fontSize -= 0.5;
+              context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+              lines = wrapText(context, pin.label, maxTextWidth, 3);
+            }
+
+            const lineHeight = (fontSize + 1.5) / transform.scale;
+            const textBlockHeight = lines.length * lineHeight;
+
+            context.save();
+            context.translate(paperFaceCenterX, paperFaceCenterY);
+            context.fillStyle = "#1e1b18";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+
+            const textStartY = -textBlockHeight / 2 + lineHeight / 2;
+            lines.forEach((line, lineIdx) => {
+              context.fillText(line, 0, textStartY + lineIdx * lineHeight);
+            });
+            context.restore();
+          }
         }
 
         context.restore(); // restore paper / polaroid transform
@@ -1455,12 +1576,19 @@ export function HeroInteractive({
         const dx = end.x - start.x;
         const dy = end.y - start.y;
         const dist = Math.hypot(dx, dy);
-        const charSum = (conn.id || "").split("").reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 1), 0);
-        const sagVar = ((charSum % 9) - 4) * 2;
-        const sag = Math.max(16, Math.min(48, dist * 0.085 + sagVar));
 
-        const middleX = (start.x + end.x) / 2;
-        const middleY = (start.y + end.y) / 2 + sag;
+        // Organic curve matching orientation (gravity sag for horizontal, natural curve for vertical)
+        const isMostlyVertical = Math.abs(dy) > Math.abs(dx) * 1.4;
+        let middleX = (start.x + end.x) / 2;
+        let middleY = (start.y + end.y) / 2;
+
+        if (isMostlyVertical) {
+          const bow = (dx >= 0 ? -1 : 1) * Math.min(10 / transform.scale, dist * 0.04);
+          middleX += bow;
+        } else {
+          const sag = Math.max(8 / transform.scale, Math.min(30 / transform.scale, dist * 0.08));
+          middleY += sag;
+        }
 
         // Subtle thin string shadow onto cards/board
         context.save();
@@ -1476,8 +1604,8 @@ export function HeroInteractive({
 
         // Fine Crimson Yarn thread (thin & elegant)
         context.save();
-        context.strokeStyle = "rgba(200, 35, 35, 0.82)";
-        context.lineWidth = 1.1 / transform.scale;
+        context.strokeStyle = "rgba(200, 35, 35, 0.85)";
+        context.lineWidth = 1.15 / transform.scale;
         context.beginPath();
         context.moveTo(start.x, start.y);
         context.quadraticCurveTo(middleX, middleY, end.x, end.y);
@@ -1542,301 +1670,118 @@ export function HeroInteractive({
       }
 
       // ──────────────────────────────────
-      // 4. Layer 3: Draw 3D Push Pin Heads (ON TOP OF STRINGS & CARDS)
+      // 4. Layer 3: Draw Realistic 3D Pushpins (ON TOP OF STRINGS & CARDS)
       // ──────────────────────────────────
       allPinsUnified.forEach((pin) => {
         const pinPosition = pinPositionsMap.get(pin.id);
         if (!pinPosition) return;
 
-        const pinColor =
+        const isEvidencePin =
+          pin.id === "c0-pin-evidence" ||
+          (pin.label && pin.label.toLowerCase().includes("bổ sung chứng cứ"));
+        const isSuspectPin =
+          pin.id === "c0-pin-suspects" ||
+          pin.id.includes("suspect") ||
+          (pin.label && pin.label.toLowerCase().includes("nghi phạm"));
+        const isIndictmentPin =
+          pin.id === "c0-pin-indictment" ||
+          (pin.label && pin.label.toLowerCase().includes("kết luận"));
+
+        const rawColor =
           pin.pinColor ||
-          (pin.id.includes("phone") ||
-          pin.id.includes("reinvestigate") ||
-          pin.id.includes("suspect-")
-            ? "yellow"
-            : pin.color && pin.color !== "black"
-            ? pin.color
-            : "red");
+          (isEvidencePin || isSuspectPin || isIndictmentPin ? "red" : "yellow");
 
-        // Red main category pins are slightly larger than yellow/sub action pins
-        const isRedPin = pinColor === "red";
-        const baseRadius = (isRedPin ? 8.2 : 6.0) / transform.scale;
+        const isRedPin = rawColor === "red";
+        const colorKey = rawColor === "black" ? "dark" : rawColor;
 
-        // Pin head colors by type
-        let headTheme = {
-          headBase: "#dc2626",
-          headMid: "#b91c1c",
-          headHighlight: "#fca5a5",
-          headRim: "#7f1d1d",
-        };
+        // Strict orientation: Inverted according to user preference
+        const boardCenterX = bounds.x + bounds.width / 2;
+        const isLeftHalf = pin.x !== undefined ? pin.x < 0.5 : pinPosition.x < boardCenterX;
+        const isFlipped = isLeftHalf;
 
-        if (pinColor === "yellow") {
-          headTheme = {
-            headBase: "#d97706",
-            headMid: "#b45309",
-            headHighlight: "#fde047",
-            headRim: "#78350f",
+        const pinUrl = isFlipped
+          ? `/images/pins/pin-${colorKey}-flipped.png`
+          : `/images/pins/pin-${colorKey}.png`;
+        const pinImg = getLoadedImage(pinUrl) || getLoadedImage(`/images/pins/pin-${colorKey}.png`);
+
+        if (pinImg && pinImg.complete && pinImg.naturalWidth > 0) {
+          // Uniform size for all pins (26px scaled = 2px smaller than original 28px yellow pin)
+          const pinDisplayWidth = 26 / transform.scale;
+          const pinDisplayHeight = pinDisplayWidth * (pinImg.naturalHeight / pinImg.naturalWidth);
+
+          // Align the needle piercing point with pinPosition (piercing tip enters board at pinPosition)
+          const drawX = pinPosition.x - pinDisplayWidth * (isFlipped ? 0.49 : 0.51);
+          const drawY = pinPosition.y - pinDisplayHeight * 0.70;
+
+          context.save();
+          if (isRedPin && (pin.pulseBorder ?? true)) {
+            // Subtle glowing aura for main investigation target
+            context.shadowColor = "rgba(239, 68, 68, 0.75)";
+            context.shadowBlur = 10 / transform.scale;
+          }
+          context.drawImage(pinImg, drawX, drawY, pinDisplayWidth, pinDisplayHeight);
+          context.restore();
+        } else {
+          // Fallback procedural canvas render while asset loads
+          const baseRadius = 5.5 / transform.scale;
+          let headTheme = {
+            headBase: "#dc2626",
+            headMid: "#b91c1c",
+            headHighlight: "#fca5a5",
+            headRim: "#7f1d1d",
           };
-        } else if (pinColor === "blue") {
-          headTheme = {
-            headBase: "#0284c7",
-            headMid: "#0369a1",
-            headHighlight: "#7dd3fc",
-            headRim: "#0c4a6e",
-          };
-        } else if (pinColor === "green") {
-          headTheme = {
-            headBase: "#16a34a",
-            headMid: "#15803d",
-            headHighlight: "#86efac",
-            headRim: "#14532d",
-          };
-        } else if (pinColor === "black") {
-          headTheme = {
-            headBase: "#27272a",
-            headMid: "#18181b",
-            headHighlight: "#a1a1aa",
-            headRim: "#09090b",
-          };
+
+          if (colorKey === "yellow" || colorKey === "brass") {
+            headTheme = { headBase: "#d97706", headMid: "#b45309", headHighlight: "#fde047", headRim: "#78350f" };
+          } else if (colorKey === "blue" || colorKey === "cyan") {
+            headTheme = { headBase: "#0284c7", headMid: "#0369a1", headHighlight: "#7dd3fc", headRim: "#0c4a6e" };
+          } else if (colorKey === "green") {
+            headTheme = { headBase: "#16a34a", headMid: "#15803d", headHighlight: "#86efac", headRim: "#14532d" };
+          } else if (colorKey === "dark") {
+            headTheme = { headBase: "#27272a", headMid: "#18181b", headHighlight: "#a1a1aa", headRim: "#09090b" };
+          }
+
+          context.save();
+          context.fillStyle = "rgba(0, 0, 0, 0.45)";
+          context.beginPath();
+          context.ellipse(
+            pinPosition.x + (isRedPin ? 2.2 : 1.8) / transform.scale,
+            pinPosition.y + (isRedPin ? 3.0 : 2.5) / transform.scale,
+            baseRadius * 0.9,
+            baseRadius * 0.55,
+            0,
+            0,
+            Math.PI * 2,
+          );
+          context.fill();
+          context.restore();
+
+          context.save();
+          const pinGradient = context.createRadialGradient(
+            pinPosition.x - baseRadius * 0.32,
+            pinPosition.y - baseRadius * 0.32,
+            baseRadius * 0.05,
+            pinPosition.x,
+            pinPosition.y,
+            baseRadius,
+          );
+          pinGradient.addColorStop(0, headTheme.headHighlight);
+          pinGradient.addColorStop(0.35, headTheme.headBase);
+          pinGradient.addColorStop(0.75, headTheme.headMid);
+          pinGradient.addColorStop(1, headTheme.headRim);
+          context.fillStyle = pinGradient;
+          context.beginPath();
+          context.arc(pinPosition.x, pinPosition.y, baseRadius, 0, Math.PI * 2);
+          context.fill();
+          context.restore();
         }
-
-        // Realistic directional cast shadow of the pin head onto string and card
-        context.save();
-        context.fillStyle = "rgba(0, 0, 0, 0.45)";
-        context.beginPath();
-        context.ellipse(
-          pinPosition.x + (isRedPin ? 2.2 : 1.8) / transform.scale,
-          pinPosition.y + (isRedPin ? 3.0 : 2.5) / transform.scale,
-          baseRadius * 0.9,
-          baseRadius * 0.55,
-          0,
-          0,
-          Math.PI * 2,
-        );
-        context.fill();
-        context.restore();
-
-        // Pin 3D Spherical/Dome Body (multi-stop radial gradient)
-        context.save();
-        const pinGradient = context.createRadialGradient(
-          pinPosition.x - baseRadius * 0.32,
-          pinPosition.y - baseRadius * 0.32,
-          baseRadius * 0.05,
-          pinPosition.x,
-          pinPosition.y,
-          baseRadius,
-        );
-        pinGradient.addColorStop(0, headTheme.headHighlight);
-        pinGradient.addColorStop(0.35, headTheme.headBase);
-        pinGradient.addColorStop(0.75, headTheme.headMid);
-        pinGradient.addColorStop(1, headTheme.headRim);
-        context.fillStyle = pinGradient;
-        context.beginPath();
-        context.arc(pinPosition.x, pinPosition.y, baseRadius, 0, Math.PI * 2);
-        context.fill();
-
-        // Metallic/Glass Specular Glint
-        context.fillStyle = "rgba(255, 255, 255, 0.85)";
-        context.beginPath();
-        context.ellipse(
-          pinPosition.x - baseRadius * 0.3,
-          pinPosition.y - baseRadius * 0.3,
-          baseRadius * 0.36,
-          baseRadius * 0.22,
-          -Math.PI / 4,
-          0,
-          Math.PI * 2,
-        );
-        context.fill();
-
-        // Subtle bottom counter-reflection on the pinhead
-        context.fillStyle = "rgba(255, 255, 255, 0.22)";
-        context.beginPath();
-        context.ellipse(
-          pinPosition.x + baseRadius * 0.25,
-          pinPosition.y + baseRadius * 0.25,
-          baseRadius * 0.24,
-          baseRadius * 0.14,
-          -Math.PI / 4,
-          0,
-          Math.PI * 2,
-        );
-        context.fill();
-        context.restore();
       });
 
       context.restore();
 
       // ──────────────────────────────────
-      // 4. Draw dark mask in screen space
+      // 4. Dark mask & vignette removed for full natural clarity
       // ──────────────────────────────────
-
-      if (maskContext) {
-        maskContext.setTransform(1, 0, 0, 1, 0, 0);
-
-        maskContext.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-
-        maskContext.setTransform(
-          devicePixelRatio,
-          0,
-          0,
-          devicePixelRatio,
-          0,
-          0,
-        );
-
-        maskContext.save();
-
-        maskContext.globalCompositeOperation = "source-over";
-
-        maskContext.fillStyle = "rgba(0, 0, 0, 0.22)";
-
-        maskContext.fillRect(0, 0, width, height);
-
-        maskContext.globalCompositeOperation = "destination-out";
-
-        const boardCenterWorld = {
-          x: bounds.x + bounds.width / 2,
-          y: bounds.y + bounds.height / 2,
-        };
-
-        const boardCenterScreen = worldToScreen(boardCenterWorld, transform);
-
-        const centerRadius =
-          Math.max(width, height) * CENTER_LIGHT_RADIUS_RATIO;
-
-        const centerGradient = maskContext.createRadialGradient(
-          boardCenterScreen.x,
-          boardCenterScreen.y,
-          0,
-          boardCenterScreen.x,
-          boardCenterScreen.y,
-          centerRadius,
-        );
-
-        centerGradient.addColorStop(0, "rgba(0, 0, 0, 0.85)");
-
-        centerGradient.addColorStop(0.6, "rgba(0, 0, 0, 0.45)");
-
-        centerGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
-
-        maskContext.fillStyle = centerGradient;
-
-        maskContext.beginPath();
-
-        maskContext.arc(
-          boardCenterScreen.x,
-          boardCenterScreen.y,
-          centerRadius,
-          0,
-          Math.PI * 2,
-        );
-
-        maskContext.fill();
-
-        if (pointer.active) {
-          const flashlightGradient = maskContext.createRadialGradient(
-            pointer.x,
-            pointer.y,
-            0,
-            pointer.x,
-            pointer.y,
-            FLASHLIGHT_RADIUS,
-          );
-
-          flashlightGradient.addColorStop(0, "rgba(0, 0, 0, 0.75)");
-
-          flashlightGradient.addColorStop(0.6, "rgba(0, 0, 0, 0.45)");
-
-          flashlightGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
-
-          maskContext.fillStyle = flashlightGradient;
-
-          maskContext.beginPath();
-
-          maskContext.arc(
-            pointer.x,
-            pointer.y,
-            FLASHLIGHT_RADIUS,
-            0,
-            Math.PI * 2,
-          );
-
-          maskContext.fill();
-        }
-
-        maskContext.restore();
-
-        context.drawImage(
-          maskCanvas,
-          0,
-          0,
-          maskCanvas.width,
-          maskCanvas.height,
-          0,
-          0,
-          width,
-          height,
-        );
-      }
-
-      // ──────────────────────────────────
-      // 5. Flashlight glow
-      // ──────────────────────────────────
-
-      if (pointer.active) {
-        context.save();
-
-        context.globalCompositeOperation = "screen";
-
-        const glowGradient = context.createRadialGradient(
-          pointer.x,
-          pointer.y,
-          0,
-          pointer.x,
-          pointer.y,
-          FLASHLIGHT_RADIUS,
-        );
-
-        glowGradient.addColorStop(0, "rgba(255, 245, 225, 0.08)");
-
-        glowGradient.addColorStop(0.6, "rgba(255, 245, 225, 0.02)");
-
-        glowGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
-
-        context.fillStyle = glowGradient;
-
-        context.beginPath();
-
-        context.arc(pointer.x, pointer.y, FLASHLIGHT_RADIUS, 0, Math.PI * 2);
-
-        context.fill();
-        context.restore();
-      }
-
-      // ──────────────────────────────────
-      // 6. Screen vignette
-      // ──────────────────────────────────
-
-      context.save();
-
-      const vignette = context.createRadialGradient(
-        width / 2,
-        height / 2,
-        width * 0.25,
-        width / 2,
-        height / 2,
-        width * 0.75,
-      );
-
-      vignette.addColorStop(0, "transparent");
-
-      vignette.addColorStop(1, "rgba(0, 0, 0, 0.45)");
-
-      context.fillStyle = vignette;
-      context.fillRect(0, 0, width, height);
-
-      context.restore();
     };
 
     renderSceneRef.current = renderScene;

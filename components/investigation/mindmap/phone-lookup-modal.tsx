@@ -55,7 +55,7 @@ export function PhoneLookupModal({
     setIsApproved(true)
     try {
       localStorage.setItem('veritas_phone_inputs', JSON.stringify({ phone1, phone2, phone3 }))
-      localStorage.setItem('veritas_reinvestigate_unlocked', 'true')
+      localStorage.setItem('veritas_phone_solved', 'true')
     } catch {}
 
     onSuccess('0988200991', 'Đã xác minh danh tính SĐT thành công.')

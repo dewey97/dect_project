@@ -40,7 +40,10 @@ function normalizeName(str: string): string {
     .trim()
 }
 
+import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
+
 export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false {
+  if (isAdminBypassCode(inputName)) return 'ha'
   const norm = normalizeName(inputName)
   if (norm.includes('vu') || norm.includes('lequangvu')) {
     return 'vu'
@@ -75,7 +78,12 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
       return
     }
 
-    const isAdmin000 = suspectName.trim() === '000' || suspectName.trim() === '0' || suspectName.trim() === '00'
+    const isAdmin000 =
+      isAdminBypassCode(suspectName) ||
+      isAdminBypassCode(cluesMotiveInput) ||
+      isAdminBypassCode(cluesOpportunityInput) ||
+      isAdminBypassCode(cluesPhysicalTracesInput)
+
     const culprit = isAdmin000 ? 'ha' : isCulpritValid(suspectName)
     if (!culprit || (culprit !== 'ha' && !isAdmin000)) {
       setErrorMsg('Kết luận chưa chính xác. Vui lòng thực hiện lại công tác điều tra.')
@@ -171,7 +179,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
                       setSuspectName(e.target.value)
                       if (errorMsg) setErrorMsg('')
                     }}
-                    placeholder="Nhập tên bị can (VD: Lê Quang Vũ)..."
+                    placeholder="Nhập tên bị can..."
                     className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-sm sm:text-base text-[#0e2b5c] font-sans font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                     autoFocus
                   />
@@ -258,7 +266,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
                     setCluesMotiveInput(e.target.value)
                     if (errorMsg) setErrorMsg('')
                   }}
-                  placeholder="Nhập số / mã chứng cứ (Ví dụ: 01, 04)..."
+                  placeholder="Nhập mã chứng cứ..."
                   className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>
@@ -275,7 +283,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
                     setCluesOpportunityInput(e.target.value)
                     if (errorMsg) setErrorMsg('')
                   }}
-                  placeholder="Nhập số / mã chứng cứ (Ví dụ: 01, 02)..."
+                  placeholder="Nhập mã chứng cứ..."
                   className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>
@@ -292,7 +300,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
                     setCluesPhysicalTracesInput(e.target.value)
                     if (errorMsg) setErrorMsg('')
                   }}
-                  placeholder="Nhập số / mã chứng cứ (Ví dụ: 03, 04)..."
+                  placeholder="Nhập mã chứng cứ..."
                   className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>

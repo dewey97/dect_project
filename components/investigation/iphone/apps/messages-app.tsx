@@ -61,7 +61,19 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
     } catch {}
   }, [])
 
-  // Audio playback ticker
+  // Audio countdown calculator helper
+  const formatCountdown = (durationStr?: string, progress: number = 0, isPlaying: boolean = false): string => {
+    if (!durationStr) return '0:08'
+    const parts = durationStr.split(':')
+    const totalSeconds = parts.length === 2 ? parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10) : 8
+    if (!isPlaying || progress === 0) return durationStr
+    const remaining = Math.max(0, Math.ceil(totalSeconds * (1 - progress / 100)))
+    const m = Math.floor(remaining / 60)
+    const s = remaining % 60
+    return `${m}:${s < 10 ? '0' : ''}${s}`
+  }
+
+  // Audio playback ticker (10 updates per second for smooth countdown)
   useEffect(() => {
     let timer: NodeJS.Timeout
     if (playingAudioId) {
@@ -71,9 +83,9 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
             setPlayingAudioId(null)
             return 0
           }
-          return prev + 6
+          return prev + 3
         })
-      }, 500)
+      }, 250)
     }
     return () => clearInterval(timer)
   }, [playingAudioId])
@@ -84,9 +96,11 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
     } else {
       setPlayingAudioId(msg.id)
       setPlaybackProgress(0)
-      // Synthesize realistic acoustic train sound if this is the train clue
-      if (msg.attachment?.audioClue?.includes('còi tàu')) {
-        detectiveAudio.playTrainHornAndBellSound()
+      // Play voice audio or realistic acoustic sound clue
+      if (msg.attachment?.audioClue?.includes('còi tàu') || msg.id.includes('m2-voice') || msg.id.includes('ha-voice')) {
+        detectiveAudio.playHaVoicemail()
+      } else {
+        detectiveAudio.playRadioBeep()
       }
     }
   }
@@ -186,7 +200,7 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
                   </span>
                 )}
               </div>
-              {selectedThread.phoneNumber && (
+              {selectedThread.phoneNumber && selectedThread.phoneNumber !== selectedThread.name && (
                 <span className="text-[8.5px] text-[#8E8E93] font-mono leading-none">
                   {selectedThread.phoneNumber}
                 </span>
@@ -288,63 +302,75 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
                         </div>
                       )}
 
-                      {/* Audio Voice Note Bubble */}
+                      {/* Audio Voice Note Bubble (Messenger/iMessage Style) */}
                       {msg.attachment?.type === 'audio' && (
-                        <div className="mb-2 p-2.5 rounded-xl bg-black/40 border border-white/10 space-y-2">
-                          <div className="flex items-center gap-2.5">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                togglePlayAudio(msg)
-                              }}
-                              className={cn(
-                                'size-8 rounded-full flex items-center justify-center transition-all shadow active:scale-90',
-                                isPlayingThis
-                                  ? 'bg-[#FF453A] text-white ring-2 ring-[#FF453A]/40 animate-pulse'
+                        <div className="flex items-center gap-2.5 py-1 min-w-[170px]">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              togglePlayAudio(msg)
+                            }}
+                            className={cn(
+                              'size-8 rounded-full flex items-center justify-center transition-all shadow-sm active:scale-90 shrink-0 cursor-pointer',
+                              isMe
+                                ? 'bg-white text-[#0A84FF]'
+                                : isPlayingThis
+                                  ? 'bg-[#30D158] text-white animate-pulse'
                                   : 'bg-[#30D158] text-black'
-                              )}
-                            >
-                              {isPlayingThis ? (
-                                <Pause className="size-4 fill-white" />
-                              ) : (
-                                <Play className="size-4 fill-black ml-0.5" />
-                              )}
-                            </button>
+                            )}
+                            title={isPlayingThis ? 'Tạm dừng' : 'Phát tin nhắn thoại'}
+                          >
+                            {isPlayingThis ? (
+                              <Pause className="size-4 fill-current" />
+                            ) : (
+                              <Play className="size-4 fill-current ml-0.5" />
+                            )}
+                          </button>
 
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between text-[10.5px]">
-                                <span className="font-semibold text-white flex items-center gap-1">
-                                  <Volume2 className="size-3 text-[#30D158]" /> Ghi âm thoại
-                                </span>
-                                <span className="font-mono text-[9.5px] text-[#8E8E93]">
-                                  {msg.attachment.duration || '0:18'}
-                                </span>
-                              </div>
-
-                              {/* Simulated Audio Waveform Bar */}
-                              <div className="flex items-center gap-0.5 mt-1.5 h-4">
-                                {[35, 60, 85, 45, 95, 75, 40, 80, 65, 30, 90, 50, 70, 85, 40, 60, 30].map(
-                                  (h, i) => (
-                                    <div
+                          <div className="flex-1 min-w-0">
+                            {/* Waveform with progress fill */}
+                            <div className="flex items-center gap-[2.5px] h-4 relative">
+                              {[40, 75, 95, 50, 100, 80, 45, 90, 65, 35, 95, 55, 75, 90, 45, 65, 80, 40].map(
+                                (h, i) => {
+                                  const barPercent = (i / 18) * 100
+                                  const isFilled = isPlayingThis && playbackProgress >= barPercent
+                                  return (
+                                    <span
                                       key={i}
                                       style={{ height: `${h}%` }}
                                       className={cn(
-                                        'w-1 rounded-full transition-all duration-300',
-                                        isPlayingThis
-                                          ? 'bg-[#30D158] animate-pulse'
-                                          : 'bg-white/30'
+                                        'w-[2.5px] rounded-full transition-colors duration-150',
+                                        isFilled
+                                          ? isMe
+                                            ? 'bg-white'
+                                            : 'bg-[#30D158]'
+                                          : isMe
+                                            ? 'bg-white/40'
+                                            : 'bg-white/30'
                                       )}
                                     />
                                   )
-                                )}
-                              </div>
+                                }
+                              )}
+                            </div>
+
+                            {/* Countdown Timer (starts at duration and counts down to 0:00 when playing) */}
+                            <div className="flex items-center justify-between text-[10px] font-mono mt-1 opacity-90">
+                              <span className={cn('font-semibold', isPlayingThis ? (isMe ? 'text-white' : 'text-[#30D158]') : '')}>
+                                {formatCountdown(msg.attachment.duration, playbackProgress, isPlayingThis)}
+                              </span>
+                              {isPlayingThis && (
+                                <span className="text-[8.5px] tracking-wider animate-pulse flex items-center gap-0.5 font-sans">
+                                  <Volume2 className="size-2.5" /> Đang phát
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
                       )}
 
-                      {/* Main Message Text */}
-                      <p className="text-[12px]">{msg.text}</p>
+                      {/* Main Message Text (only rendered if text is non-empty) */}
+                      {msg.text ? <p className="text-[12px]">{msg.text}</p> : null}
                     </div>
 
                     {/* Detailed Metadata / Status sub-bar */}

@@ -113,10 +113,10 @@
 ### 1. `p10` — SCREENSHOT LỊCH SỬ APP ĐẶT XE CỦA LÊ QUANG VŨ (`screenshot-ride-app-vu.png`)
 * **Tỷ lệ:** `9:16`
 * **Mô tả gen ảnh:** Ảnh chụp màn hình biên lai cuốc xe *"Chi tiết chuyến đi"* ngày **24/07/2016** trên app đặt xe tiếng Việt:
-  - **Thời gian:** Đặt xe 19:25:40 — Đón 19:30:15 — Hoàn thành 19:42.
+  - **Thời gian:** Đặt xe 19:25:40 — Đón 19:30:15 — Hoàn thành 19:45.
   - **Điểm đón:** *Dau Ngo 14, Duong Bo Song*.
-  - **Điểm trả:** *Quan Bia 88 - Ven Song Cau Cang (3.8 km)*.
-  - **Cước phí & Xe:** `32.000 d` (Tiền mặt), Tài xế Honda Wave Alpha đỏ (`29X1-582.44`).
+  - **Điểm trả:** *Quan Bia 88 - 88 Duong Vinh Ha, P. Cang Dong (4.5 km)*.
+  - **Cước phí & Xe:** `38.000 d` (Tiền mặt), Tài xế Honda Wave Alpha đỏ (`29X1-582.44`).
 
 ---
 

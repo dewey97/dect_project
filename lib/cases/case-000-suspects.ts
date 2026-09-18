@@ -74,9 +74,14 @@ export const VALID_CASE_CHARACTERS: SuspectCharacter[] = [
   },
 ]
 
+import { isAdminBypassCode } from './admin-bypass'
+
 export function findValidCaseCharacter(input: string): SuspectCharacter | null {
   const normalized = input.trim().toLowerCase()
   if (!normalized) return null
+  if (isAdminBypassCode(normalized)) {
+    return VALID_CASE_CHARACTERS[0]
+  }
   return VALID_CASE_CHARACTERS.find((c) => {
     if (c.canonicalName.toLowerCase() === normalized) return true
     if (c.aliases.includes(normalized)) return true

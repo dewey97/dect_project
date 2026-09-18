@@ -8,24 +8,26 @@ import { resolveEvidenceCode, getSortedClues } from '@/lib/cases/case-000-clues'
 
 interface ClueCodePickerProps {
   selectedClueIds: string[]
-  customPhoneEvidences: Array<{ id: string; label: string }>
+  customPhoneEvidences?: Array<{ id: string; label: string }>
   onAddClueId: (id: string) => void
   onRemoveClueId: (id: string) => void
-  onAddCustomPhone: (phoneEvidence: { id: string; label: string }) => void
+  onAddCustomPhone?: (phoneEvidence: { id: string; label: string }) => void
   label?: string
   placeholder?: string
   emptyStateText?: string
+  hidePhoneInputs?: boolean
 }
 
 export function ClueCodePicker({
   selectedClueIds,
-  customPhoneEvidences,
+  customPhoneEvidences = [],
   onAddClueId,
   onRemoveClueId,
   onAddCustomPhone,
   label = 'BẰNG CHỨNG ĐÃ CHỌN',
-  placeholder = 'Nhập số/mã chứng cứ (ví dụ: 04, 05, 07b, 15...)...',
-  emptyStateText = 'Chưa có bằng chứng nào được chọn.'
+  placeholder = 'Nhập mã chứng cứ...',
+  emptyStateText = 'Chưa có bằng chứng nào được chọn.',
+  hidePhoneInputs = false,
 }: ClueCodePickerProps) {
   const [codeInput, setCodeInput] = useState('')
   const [showTextPhoneInput, setShowTextPhoneInput] = useState(false)
@@ -48,7 +50,9 @@ export function ClueCodePicker({
     if (digits.length < 3) return
     const id = `sms_phone_${digits}`
     const labelStr = `Tin nhắn văn bản với SĐT: ${raw}`
-    onAddCustomPhone({ id, label: labelStr })
+    if (onAddCustomPhone) {
+      onAddCustomPhone({ id, label: labelStr })
+    }
     detectiveAudio.playTypewriterClick()
     onAddClueId(id)
     setTextPhoneInputValue('')
@@ -62,7 +66,9 @@ export function ClueCodePicker({
     if (digits.length < 3) return
     const id = `voice_phone_${digits}`
     const labelStr = `Tin nhắn thoại với SĐT: ${raw}`
-    onAddCustomPhone({ id, label: labelStr })
+    if (onAddCustomPhone) {
+      onAddCustomPhone({ id, label: labelStr })
+    }
     detectiveAudio.playTypewriterClick()
     onAddClueId(id)
     setVoicePhoneInputValue('')
@@ -101,134 +107,136 @@ export function ClueCodePicker({
         </div>
       </div>
 
-      {/* 2. KHU VỰC NHẬP SĐT LIÊN QUAN CHUYÊN DỤNG */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {/* CARD 1: TIN NHẮN VĂN BẢN VỚI SĐT */}
-        <div
-          className={cn(
-            'p-2.5 border-2 transition-all flex flex-col justify-start gap-1.5 select-none',
-            showTextPhoneInput
-              ? 'bg-[#eae0cd] border-[#2b1f14] shadow-xs'
-              : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520]'
-          )}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              detectiveAudio.playPaperRustle()
-              setShowTextPhoneInput((prev) => {
-                if (prev) setTextPhoneInputValue('')
-                return !prev
-              })
-            }}
-            className="w-full flex items-center justify-between gap-2 text-left cursor-pointer focus:outline-none"
+      {/* 2. KHU VỰC NHẬP SĐT LIÊN QUAN CHUYÊN DỤNG (CHỈ HIỂN THỊ KHI CẦN) */}
+      {!hidePhoneInputs && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {/* CARD 1: TIN NHẮN VĂN BẢN VỚI SĐT */}
+          <div
+            className={cn(
+              'p-2.5 border-2 transition-all flex flex-col justify-start gap-1.5 select-none',
+              showTextPhoneInput
+                ? 'bg-[#eae0cd] border-[#2b1f14] shadow-xs'
+                : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520]'
+            )}
           >
-            <span className="text-xs font-mono font-bold text-[#1a120b] flex items-center gap-1.5">
-              📱 Tin nhắn văn bản với SĐT
-            </span>
-            <span
-              className={cn(
-                'text-[11px] font-mono font-bold',
-                showTextPhoneInput ? 'text-[#8b3a3a] hover:text-[#a81c1c]' : 'text-[#6b4e2e]'
-              )}
+            <button
+              type="button"
+              onClick={() => {
+                detectiveAudio.playPaperRustle()
+                setShowTextPhoneInput((prev) => {
+                  if (prev) setTextPhoneInputValue('')
+                  return !prev
+                })
+              }}
+              className="w-full flex items-center justify-between gap-2 text-left cursor-pointer focus:outline-none"
             >
-              {showTextPhoneInput ? 'Hủy' : '+ Nhập SĐT'}
-            </span>
-          </button>
-
-          {showTextPhoneInput && (
-            <div className="flex gap-1.5 items-center pt-1" onClick={(e) => e.stopPropagation()}>
-              <input
-                type="tel"
-                value={textPhoneInputValue}
-                onChange={(e) => setTextPhoneInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddTextPhoneNumber()
-                  } else if (e.key === 'Escape') {
-                    setShowTextPhoneInput(false)
-                    setTextPhoneInputValue('')
-                  }
-                }}
-                placeholder="Nhập SĐT..."
-                className="flex-1 min-w-0 px-2 py-1 bg-white border border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none"
-                autoFocus
-              />
-              <button
-                type="button"
-                onClick={handleAddTextPhoneNumber}
-                className="px-3 py-1 bg-[#2b1f14] text-[#f6f1e5] font-mono text-xs font-bold uppercase cursor-pointer hover:bg-[#140d08] shrink-0 active:scale-95"
+              <span className="text-xs font-mono font-bold text-[#1a120b] flex items-center gap-1.5">
+                📱 Tin nhắn văn bản với SĐT
+              </span>
+              <span
+                className={cn(
+                  'text-[11px] font-mono font-bold',
+                  showTextPhoneInput ? 'text-[#8b3a3a] hover:text-[#a81c1c]' : 'text-[#6b4e2e]'
+                )}
               >
-                Thêm
-              </button>
-            </div>
-          )}
-        </div>
+                {showTextPhoneInput ? 'Hủy' : '+ Nhập SĐT'}
+              </span>
+            </button>
 
-        {/* CARD 2: TIN NHẮN THOẠI VỚI SĐT */}
-        <div
-          className={cn(
-            'p-2.5 border-2 transition-all flex flex-col justify-start gap-1.5 select-none',
-            showVoicePhoneInput
-              ? 'bg-[#eae0cd] border-[#2b1f14] shadow-xs'
-              : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520]'
-          )}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              detectiveAudio.playPaperRustle()
-              setShowVoicePhoneInput((prev) => {
-                if (prev) setVoicePhoneInputValue('')
-                return !prev
-              })
-            }}
-            className="w-full flex items-center justify-between gap-2 text-left cursor-pointer focus:outline-none"
+            {showTextPhoneInput && (
+              <div className="flex gap-1.5 items-center pt-1" onClick={(e) => e.stopPropagation()}>
+                <input
+                  type="tel"
+                  value={textPhoneInputValue}
+                  onChange={(e) => setTextPhoneInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleAddTextPhoneNumber()
+                    } else if (e.key === 'Escape') {
+                      setShowTextPhoneInput(false)
+                      setTextPhoneInputValue('')
+                    }
+                  }}
+                  placeholder="Nhập SĐT..."
+                  className="flex-1 min-w-0 px-2 py-1 bg-white border border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={handleAddTextPhoneNumber}
+                  className="px-3 py-1 bg-[#2b1f14] text-[#f6f1e5] font-mono text-xs font-bold uppercase cursor-pointer hover:bg-[#140d08] shrink-0 active:scale-95"
+                >
+                  Thêm
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* CARD 2: TIN NHẮN THOẠI VỚI SĐT */}
+          <div
+            className={cn(
+              'p-2.5 border-2 transition-all flex flex-col justify-start gap-1.5 select-none',
+              showVoicePhoneInput
+                ? 'bg-[#eae0cd] border-[#2b1f14] shadow-xs'
+                : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520]'
+            )}
           >
-            <span className="text-xs font-mono font-bold text-[#1a120b] flex items-center gap-1.5">
-              🎙️ Tin nhắn thoại với SĐT
-            </span>
-            <span
-              className={cn(
-                'text-[11px] font-mono font-bold',
-                showVoicePhoneInput ? 'text-[#8b3a3a] hover:text-[#a81c1c]' : 'text-[#6b4e2e]'
-              )}
+            <button
+              type="button"
+              onClick={() => {
+                detectiveAudio.playPaperRustle()
+                setShowVoicePhoneInput((prev) => {
+                  if (prev) setVoicePhoneInputValue('')
+                  return !prev
+                })
+              }}
+              className="w-full flex items-center justify-between gap-2 text-left cursor-pointer focus:outline-none"
             >
-              {showVoicePhoneInput ? 'Hủy' : '+ Nhập SĐT'}
-            </span>
-          </button>
-
-          {showVoicePhoneInput && (
-            <div className="flex gap-1.5 items-center pt-1" onClick={(e) => e.stopPropagation()}>
-              <input
-                type="tel"
-                value={voicePhoneInputValue}
-                onChange={(e) => setVoicePhoneInputValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddVoicePhoneNumber()
-                  } else if (e.key === 'Escape') {
-                    setShowVoicePhoneInput(false)
-                    setVoicePhoneInputValue('')
-                  }
-                }}
-                placeholder="Nhập SĐT..."
-                className="flex-1 min-w-0 px-2 py-1 bg-white border border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none"
-                autoFocus
-              />
-              <button
-                type="button"
-                onClick={handleAddVoicePhoneNumber}
-                className="px-3 py-1 bg-[#2b1f14] text-[#f6f1e5] font-mono text-xs font-bold uppercase cursor-pointer hover:bg-[#140d08] shrink-0 active:scale-95"
+              <span className="text-xs font-mono font-bold text-[#1a120b] flex items-center gap-1.5">
+                🎙️ Tin nhắn thoại với SĐT
+              </span>
+              <span
+                className={cn(
+                  'text-[11px] font-mono font-bold',
+                  showVoicePhoneInput ? 'text-[#8b3a3a] hover:text-[#a81c1c]' : 'text-[#6b4e2e]'
+                )}
               >
-                Thêm
-              </button>
-            </div>
-          )}
+                {showVoicePhoneInput ? 'Hủy' : '+ Nhập SĐT'}
+              </span>
+            </button>
+
+            {showVoicePhoneInput && (
+              <div className="flex gap-1.5 items-center pt-1" onClick={(e) => e.stopPropagation()}>
+                <input
+                  type="tel"
+                  value={voicePhoneInputValue}
+                  onChange={(e) => setVoicePhoneInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleAddVoicePhoneNumber()
+                    } else if (e.key === 'Escape') {
+                      setShowVoicePhoneInput(false)
+                      setVoicePhoneInputValue('')
+                    }
+                  }}
+                  placeholder="Nhập SĐT..."
+                  className="flex-1 min-w-0 px-2 py-1 bg-white border border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={handleAddVoicePhoneNumber}
+                  className="px-3 py-1 bg-[#2b1f14] text-[#f6f1e5] font-mono text-xs font-bold uppercase cursor-pointer hover:bg-[#140d08] shrink-0 active:scale-95"
+                >
+                  Thêm
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 3. DANH SÁCH BẰNG CHỨNG ĐÃ CHỌN (BADGES CONTAINER) */}
       <div className="space-y-1.5">

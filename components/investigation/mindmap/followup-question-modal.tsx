@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils'
 import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 
 import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
+import { ClueCodePicker } from './clue-code-picker'
+import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 
 interface FollowupQuestionModalProps {
   isOpen: boolean
@@ -19,8 +21,8 @@ interface FollowupQuestionModalProps {
 }
 
 const MOCK_OPTIONS_TUNG = [
-  { id: 'tin', label: 'TIN' },
-  { id: 'khong_tin', label: 'KHÔNG TIN' }
+  { id: 'tin', label: 'CÓ' },
+  { id: 'khong_tin', label: 'KHÔNG' }
 ]
 
 // 3 TILES MANH MỐI THU ĐƯỢC TẠI NHÀ VÀ THÂN THỂ TRẦN THỊ HÀ
@@ -28,7 +30,7 @@ export const HA_CLUE_TILES = [
   {
     id: 'tile_ao_gio',
     number: '01',
-    title: 'ÁO GIÓ DÍNH BỤI CÂY XOAN',
+    title: 'Áo khoác gió',
     subtitle: 'Thu giữ sau cánh cửa phòng trọ',
     description: 'Áo khoác gió xám đen dính bụi mùn đất đặc trưng quanh gốc cây xoan trước ngõ nhà Khang.',
     validDocIds: ['doc_07b_loi_khai_vu', 'doc_06_loi_khai_lua'],
@@ -37,7 +39,7 @@ export const HA_CLUE_TILES = [
   {
     id: 'tile_lon_toc',
     number: '02',
-    title: 'LỌN TÓC MAI DÍNH MÁU (ADN 100%)',
+    title: 'Nhúm tóc',
     subtitle: 'Thu giữ giấu trong áo ngực',
     description: 'Lọn tóc mai dính máu cắt bằng kéo, kết quả giám định sinh học trùng khớp 100% mẫu ADN của Khang.',
     validDocIds: ['doc_04_tu_thi'],
@@ -46,7 +48,7 @@ export const HA_CLUE_TILES = [
   {
     id: 'tile_thuoc_an_than',
     number: '03',
-    title: 'VỈ THUỐC DIAZEPAM & VẾT RÁCH TAY',
+    title: 'Bùa đỏ',
     subtitle: 'Thu giữ tại phòng & thân thể',
     description: 'Vỉ thuốc an thần Diazepam 5mg bóc dở 4 viên & vết rách sâu 2.5cm ở lòng bàn tay phải của Hà.',
     validDocIds: ['doc_05_kham_nghiem', 'p3_hung_khi'],
@@ -81,6 +83,7 @@ export function FollowupQuestionModal({
     tile_lon_toc: [],
     tile_thuoc_an_than: [],
   })
+  const [customPhoneEvidences, setCustomPhoneEvidences] = useState<Array<{ id: string; label: string }>>([])
 
   const [errorMsg, setErrorMsg] = useState('')
   const [hasPhoneSolvedState, setHasPhoneSolvedState] = useState(false)
@@ -147,6 +150,7 @@ export function FollowupQuestionModal({
     const tile = HA_CLUE_TILES.find((t) => t.id === tileId)
     if (!tile) return false
     const selected = haTileSelections[tileId] || []
+    if (hasAdminBypassInArray(selected)) return true
     return tile.validDocIds.some((validId) => selected.includes(validId))
   }
 
@@ -205,7 +209,9 @@ export function FollowupQuestionModal({
       return
     }
 
-    if (normalized === '21:15' || normalized === '21h15') {
+    const is000 = normalized === '000' || normalized === '00' || normalized === '0'
+
+    if (normalized === '21:15' || normalized === '21h15' || is000) {
       detectiveAudio.playStampSound()
       setErrorMsg('')
       try {
@@ -242,18 +248,16 @@ export function FollowupQuestionModal({
 
   const handleSubmitHa = (e: React.FormEvent) => {
     e.preventDefault()
-    const finalSelections = allHaTilesMatched
-      ? haTileSelections
-      : {
-          tile_ao_gio: ['doc_07b_loi_khai_vu'],
-          tile_lon_toc: ['doc_04_tu_thi'],
-          tile_thuoc_an_than: ['doc_05_kham_nghiem'],
-        }
+    if (!allHaTilesMatched) {
+      setErrorMsg('Vui lòng nhập đúng chứng cứ đối soát cho cả 3 manh mối!')
+      detectiveAudio.playGlassSound()
+      return
+    }
 
     detectiveAudio.playStampSound()
     setErrorMsg('')
     try {
-      localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(finalSelections))
+      localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(haTileSelections))
       localStorage.setItem('veritas_followup_ha', 'matched_3_tiles')
     } catch {}
     if (onSuccess) {
@@ -348,7 +352,7 @@ export function FollowupQuestionModal({
                     setVuTimeInput(e.target.value)
                     setErrorMsg('')
                   }}
-                  placeholder="Ví dụ: 12:00, 13:30,..."
+                  placeholder="Nhập giờ:phút..."
                   className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-base font-bold placeholder-[#a88c6f]/60 focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
                 />
               </div>
@@ -418,7 +422,7 @@ export function FollowupQuestionModal({
                           setErrorMsg('')
                         }}
                         className={cn(
-                          'text-left p-2 sm:p-2.5 rounded-none border-2 transition-all cursor-pointer relative select-none flex flex-col justify-between min-h-[64px] sm:min-h-[70px]',
+                          'text-center p-2.5 sm:p-3 rounded-none border-2 transition-all cursor-pointer relative select-none flex items-center justify-center min-h-[48px] sm:min-h-[52px]',
                           isSelected
                             ? 'bg-[#eae0cd] border-[#2b1f14] shadow-md ring-2 ring-[#2b1f14]/40'
                             : isMatched
@@ -426,31 +430,25 @@ export function FollowupQuestionModal({
                             : 'bg-[#fdfcf9] border-[#d4c5b0] hover:bg-[#f4ebd9]'
                         )}
                       >
-                        <div className="flex items-center justify-between gap-1 mb-1">
-                          <span className="font-mono text-[9px] sm:text-[10px] font-bold px-1 py-0.5 bg-[#2b1f14]/10 text-[#2b1f14] uppercase shrink-0">
-                            MANH MỐI {tile.number}
-                          </span>
-                          {isMatched && (
-                            <span className="text-[#2e5220] font-bold text-xs shrink-0 flex items-center gap-0.5 font-mono">
-                              <Check className="size-3 text-[#2e5220]" />
-                            </span>
-                          )}
-                        </div>
-
-                        <h4 className="text-[10.5px] sm:text-xs font-mono font-bold text-[#1a120b] leading-tight">
+                        <span className="text-xs sm:text-sm font-mono font-bold text-[#1a120b] leading-tight">
                           {tile.title}
-                        </h4>
+                        </span>
+                        {isMatched && (
+                          <span className="absolute top-1.5 right-1.5 text-[#2e5220] font-bold text-xs flex items-center">
+                            <Check className="size-3.5 text-[#2e5220]" />
+                          </span>
+                        )}
                       </button>
                     )
                   })}
                 </div>
               </div>
 
-              {/* TÀI LIỆU BAN ĐẦU ĐỐI ỨNG (TICK CHỌN BÊN DƯỚI) */}
+              {/* KHU VỰC NHẬP MÃ & SĐT CHỨNG CỨ KHỚP NỐI */}
               <div className="space-y-2 pt-2 border-t-2 border-[#2b1f14]/20">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
-                    2. TICK CHỌN TÀI LIỆU BAN ĐẦU KHỚP VỚI [
+                    2. CHỨNG CỨ KHỚP NỐI VỚI [
                     <span className="text-[#8c1d1d]">
                       {HA_CLUE_TILES.find((t) => t.id === activeHaTileId)?.title}
                     </span>
@@ -458,40 +456,42 @@ export function FollowupQuestionModal({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
-                  {displayedEvidences.map((ev) => {
-                    const currentSelected = haTileSelections[activeHaTileId] || []
-                    const isChecked = currentSelected.includes(ev.id)
-
-                    return (
-                      <button
-                        key={ev.id}
-                        type="button"
-                        onClick={() => handleToggleHaEvidence(ev.id)}
-                        className={cn(
-                          'text-left p-2.5 rounded-none border-2 transition-all flex items-center gap-2.5 cursor-pointer relative select-none',
-                          isChecked
-                            ? 'bg-[#eae0cd] border-[#2b1f14] text-[#1a120b] font-bold shadow-sm'
-                            : 'bg-[#f4ebd9] border-[#d4c5b0] text-[#3d2f22] hover:bg-[#ede3cf]'
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            'size-4 rounded-none border-2 flex items-center justify-center shrink-0 transition-all bg-white',
-                            isChecked ? 'border-[#2b1f14] text-[#0e2b5c]' : 'border-[#4a3520]'
-                          )}
-                        >
-                          {isChecked && (
-                            <span className="font-[family-name:var(--font-handwriting)] text-sm font-black leading-none">
-                              ✓
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs leading-snug flex-1">{ev.label}</span>
-                      </button>
-                    )
-                  })}
-                </div>
+                <ClueCodePicker
+                  selectedClueIds={haTileSelections[activeHaTileId] || []}
+                  hidePhoneInputs={true}
+                  onAddClueId={(id) => {
+                    setHaTileSelections((prev) => {
+                      const current = prev[activeHaTileId] || []
+                      if (current.includes(id)) return prev
+                      const nextList = [...current, id]
+                      const updated = { ...prev, [activeHaTileId]: nextList }
+                      try {
+                        localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(updated))
+                      } catch {}
+                      const tile = HA_CLUE_TILES.find((t) => t.id === activeHaTileId)
+                      const isMaster = id === 'doc_000' || id === '000' || id === '0000' || id.includes('000') || id.includes('0000')
+                      if (tile && (isMaster || tile.validDocIds.includes(id))) {
+                        detectiveAudio.playStampSound()
+                      }
+                      return updated
+                    })
+                    if (errorMsg) setErrorMsg('')
+                  }}
+                  onRemoveClueId={(id) => {
+                    setHaTileSelections((prev) => {
+                      const current = prev[activeHaTileId] || []
+                      const nextList = current.filter((item) => item !== id)
+                      const updated = { ...prev, [activeHaTileId]: nextList }
+                      try {
+                        localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(updated))
+                      } catch {}
+                      return updated
+                    })
+                  }}
+                  label="MÃ CHỨNG CỨ ĐÃ NHẬP"
+                  placeholder="Nhập mã chứng cứ..."
+                  emptyStateText="Chưa có mã chứng cứ nào được nhập."
+                />
               </div>
 
               {/* FOOTER */}

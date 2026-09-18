@@ -22,7 +22,6 @@ import { VoicemailApp } from './apps/voicemail-app'
 import { SafariApp } from './apps/safari-app'
 import { NotesApp } from './apps/notes-app'
 import { PhotosApp } from './apps/photos-app'
-import { BankingApp } from './apps/banking-app'
 import { MapsApp } from './apps/maps-app'
 import { ContactsApp } from './apps/contacts-app'
 
@@ -42,7 +41,6 @@ type IPhoneApp =
   | 'safari'
   | 'notes'
   | 'photos'
-  | 'banking'
   | 'maps'
   | 'contacts'
   | 'settings'
@@ -187,29 +185,29 @@ export function IPhoneFrame({
         >
           {/* iOS TOP STATUS BAR (Exact 20pt Status Bar Height) */}
           <div className="relative z-30 h-6 px-3 flex items-center justify-between text-white text-[11px] font-sans tracking-tight shrink-0 bg-transparent select-none pt-1">
-            {/* Left: 5 Signal Dots & Carrier */}
-            <div className="flex items-center gap-1.5">
-              <div className="flex items-center gap-[2.5px]" title="Sóng di động">
-                <span className="size-1.5 rounded-full bg-white inline-block shadow-sm" />
-                <span className="size-1.5 rounded-full bg-white inline-block shadow-sm" />
-                <span className="size-1.5 rounded-full bg-white inline-block shadow-sm" />
-                <span className="size-1.5 rounded-full border border-white inline-block" />
-                <span className="size-1.5 rounded-full border border-white inline-block" />
+            {/* Left: No Service (0 Signal Dots / Offline) */}
+            <div className="flex items-center gap-1.5" title="Trạng thái mạng: Không có dịch vụ">
+              <div className="flex items-center gap-[2.5px]">
+                <span className="size-1.5 rounded-full border border-white/60 inline-block" />
+                <span className="size-1.5 rounded-full border border-white/60 inline-block" />
+                <span className="size-1.5 rounded-full border border-white/60 inline-block" />
+                <span className="size-1.5 rounded-full border border-white/60 inline-block" />
+                <span className="size-1.5 rounded-full border border-white/60 inline-block" />
               </div>
-              <span className="font-semibold text-[11px] text-white ml-0.5">3</span>
-              <span className="font-bold text-[9.5px] text-white tracking-wider">4G</span>
+              <span className="font-medium text-[10px] text-white/90 ml-0.5">Không có dịch vụ</span>
             </div>
 
-            {/* Center: Clock 16:11 */}
+            {/* Center: Clock 20:45 */}
             <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[11.5px] text-white tracking-tight">
-              16:11
+              20:45
             </div>
 
-            {/* Right: Solid White Battery Icon */}
+            {/* Right: Solid White Battery Icon (18% Low Battery) */}
             <div className="flex items-center gap-1 text-white font-semibold">
-              <div className="w-5 h-2.5 rounded-[3px] border border-white p-[1px] relative flex items-center shadow-sm">
-                <div className="h-full w-[85%] bg-white rounded-[1px]" />
-                <div className="absolute -right-[3px] top-[2px] w-[2px] h-[4px] bg-white rounded-r-[1px]" />
+              <span className="text-[9px] font-mono text-[#FF453A] font-bold">18%</span>
+              <div className="w-5 h-2.5 rounded-[3px] border border-[#FF453A] p-[1px] relative flex items-center shadow-sm">
+                <div className="h-full w-[18%] bg-[#FF453A] rounded-[1px]" />
+                <div className="absolute -right-[3px] top-[2px] w-[2px] h-[4px] bg-[#FF453A] rounded-r-[1px]" />
               </div>
             </div>
           </div>
@@ -243,24 +241,24 @@ export function IPhoneFrame({
                   <div className="p-2.5 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/15 shadow-xl">
                     <div className="flex items-center justify-between text-[10.5px] text-white/70 mb-0.5">
                       <span className="font-semibold flex items-center gap-1 text-[#FF453A]">
-                        <Phone className="size-3 text-[#FF453A]" /> Cuộc gọi nhỡ (1) • Hà Kế Toán
+                        <Phone className="size-3 text-[#FF453A]" /> Cuộc gọi nhỡ (1) • Hà
                       </span>
                       <span className="font-mono text-[9px]">20:31</span>
                     </div>
                     <p className="text-[11px] text-white/95">
-                      Hà Kế Toán đã để lại 1 thư thoại (0:18)
+                      Hà đã để lại 1 thư thoại (0:08)
                     </p>
                   </div>
 
                   <div className="p-2.5 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/15 shadow-xl">
                     <div className="flex items-center justify-between text-[10.5px] text-white/70 mb-0.5">
                       <span className="font-semibold flex items-center gap-1 text-white">
-                        <MessageSquare className="size-3 text-[#30D158]" /> Tin nhắn • Bé Vy ❤️
+                        <MessageSquare className="size-3 text-[#30D158]" /> Tin nhắn • Thảo Vy
                       </span>
-                      <span className="font-mono text-[9px]">20:35</span>
+                      <span className="font-mono text-[9px]">20:40</span>
                     </div>
                     <p className="text-[11px] text-white/95 line-clamp-2 leading-relaxed">
-                      Dạaaa, vậy sáng mai anh qua đón e nhé 😘😘
+                      Ok, vậy hẹn anh 9h tối ở địa chỉ cũ.
                     </p>
                   </div>
                 </div>
@@ -286,7 +284,6 @@ export function IPhoneFrame({
                 {activeApp === 'safari' && <SafariApp history={history} onBackToHome={() => setActiveApp(null)} />}
                 {activeApp === 'notes' && <NotesApp notes={notes} onBackToHome={() => setActiveApp(null)} />}
                 {activeApp === 'photos' && <PhotosApp photos={photos} onBackToHome={() => setActiveApp(null)} />}
-                {activeApp === 'banking' && <BankingApp onBackToHome={() => setActiveApp(null)} />}
                 {activeApp === 'maps' && <MapsApp onBackToHome={() => setActiveApp(null)} />}
                 {activeApp === 'contacts' && <ContactsApp onBackToHome={() => setActiveApp(null)} />}
                 {activeApp === 'settings' && (
@@ -314,7 +311,11 @@ export function IPhoneFrame({
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Số thuê bao:</span>
-                        <span className="font-mono text-[#0A84FF]">0904.888.666</span>
+                        <span className="font-mono text-[#0A84FF]">0904.888.666 (Viettel)</span>
+                      </div>
+                      <div className="flex justify-between border-b border-white/5 pb-2">
+                        <span className="text-[#8E8E93]">Trạng thái mạng:</span>
+                        <span className="text-[#FF453A] font-semibold">Không có dịch vụ (No Service)</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Số IMEI:</span>
@@ -379,22 +380,6 @@ export function IPhoneFrame({
                     </span>
                   </button>
 
-                  {/* Row 1, Icon 3: Banking */}
-                  <button
-                    onClick={() => setActiveApp('banking')}
-                    className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                  >
-                    <div className="w-full aspect-square rounded-[22.5%] bg-gradient-to-b from-[#30D158] via-[#FF9F0A] to-[#0A84FF] flex items-center justify-center text-white shadow-[0_4px_10px_rgba(0,0,0,0.35)] border border-white/30 relative overflow-hidden">
-                      <div className="flex flex-col gap-1 w-full px-2">
-                        <div className="h-2.5 bg-[#0A84FF] rounded-t flex items-center px-1 text-[5px]">💳</div>
-                        <div className="h-2.5 bg-[#30D158] flex items-center px-1 text-[5px]">🏦</div>
-                        <div className="h-2.5 bg-[#FF9F0A] rounded-b flex items-center px-1 text-[5px]">💵</div>
-                      </div>
-                    </div>
-                    <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                      Banking
-                    </span>
-                  </button>
 
                   {/* Row 1, Icon 4: Notes */}
                   <button

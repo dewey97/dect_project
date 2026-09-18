@@ -24,77 +24,60 @@ interface VoicemailAppProps {
 }
 
 export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
-  const [activeTab, setActiveTab] = useState<'voicemail' | 'recents' | 'keypad'>('voicemail')
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [playbackProgress, setPlaybackProgress] = useState(0)
-  const [expandedId, setExpandedId] = useState<string | null>('vm-01')
+  const [activeTab, setActiveTab] = useState<'recents' | 'keypad'>('recents')
   const [keypadInput, setKeypadInput] = useState('')
 
-  // Simulated playback timer
-  useEffect(() => {
-    let timer: NodeJS.Timeout
-    if (isPlaying) {
-      timer = setInterval(() => {
-        setPlaybackProgress((prev) => {
-          if (prev >= 100) {
-            setIsPlaying(false)
-            return 0
-          }
-          return prev + 6
-        })
-      }, 600)
-    }
-    return () => clearInterval(timer)
-  }, [isPlaying])
-
-  const togglePlay = () => {
-    if (!isPlaying) {
-      if (playbackProgress >= 100) {
-        setPlaybackProgress(0)
-      }
-      setIsPlaying(true)
-      // Play realistic voicemail of Ha with background train horn
-      if (expandedId === 'vm-01') {
-        detectiveAudio.playHaVoicemail()
-      }
-    } else {
-      setIsPlaying(false)
-    }
+  interface RecentCall {
+    name: string
+    phone: string
+    type: string
+    time: string
+    isMissed: boolean
+    count?: number
+    duration?: string
   }
 
-  const voicemails = [
-    {
-      id: 'vm-01',
-      sender: 'Trần Thị Hà',
-      phone: '0984.112.568',
-      time: '20:32 (24/07)',
-      duration: '0:08',
-      transcript:
-        '"Anh Khang à, sao em gọi mãi anh không nghe máy thế? Em đang ở phòng trọ xem phim một mình buồn quá... tí nữa em chạy qua với anh nhé..."',
-      audioClue:
-        '⚠️ Tạp âm nền lọt tiếng còi tàu hỏa diesel hú 2 hồi dài và tiếng chuông rào chắn đường sắt leng keng (Khoảng cách < 30m) chứng minh Hà đứng sát nhà Khang tại ngõ Bờ Sông!'
-    },
-    {
-      id: 'vm-02',
-      sender: 'Lê Quang Vũ',
-      phone: '0988.20.09.91',
-      time: '19:20 (24/07)',
-      duration: '0:08',
-      transcript:
-        '"Khang, nghe máy đi! Đừng có ép tôi vào đường cùng như thế!"',
-      audioClue: 'Tạp âm tiếng xe cộ đường phố đông đúc lúc Vũ vừa chạy ra đầu ngõ đặt xe ôm.'
-    }
-  ]
+  const recents: RecentCall[] = [
+    // 1. Ngày 24/07/2016 (Ngày Xảy Ra Vụ Án)
+    { name: 'Hà', phone: '0984.112.568', type: '↙ Gọi đến (Nhỡ)', time: '20:31', isMissed: true },
+    { name: '0984.180.357', phone: '0984.180.357', type: '↙ Gọi đến', time: '20:09', isMissed: false },
+    { name: '0912.331.888', phone: '0912.331.888', type: '↙ Gọi đến', time: '19:03', isMissed: false },
+    { name: '0988.200.991', phone: '0988.200.991', type: '↗ Gọi đi', time: '18:15', isMissed: false },
+    { name: 'Bình Còi Ba Gác', phone: '0915.223.789', type: '↙ Gọi đến', time: '18:00', isMissed: false },
+    { name: 'Chị Lan Quán Nước', phone: '0932.889.102', type: '↙ Gọi đến', time: '17:30', isMissed: false },
+    { name: 'Bác Bảy', phone: '0908.441.229', type: '↙ Gọi đến', time: '16:20', isMissed: false },
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↙ Gọi đến', time: '14:05', isMissed: false },
+    { name: 'Cơm Chị Ba', phone: '0908.334.991', type: '↗ Gọi đi', time: '11:30', isMissed: false },
+    { name: 'Chú Sáu Xe Ôm', phone: '0913.667.228', type: '↗ Gọi đi', time: '10:15', isMissed: false },
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↗ Gọi đi', time: '08:45', isMissed: false },
 
-  const recents = [
-    { name: 'Hà Kế Toán', phone: '0984.112.568', type: 'Cuộc gọi nhỡ', time: '20:31', count: 1, isMissed: true },
-    { name: '0984.180.357', phone: '0984.180.357', type: 'Cuộc gọi đến', time: '19:55', duration: '0:35', isMissed: false },
-    { name: '0912.331.888', phone: '0912.331.888', type: 'Cuộc gọi đến', time: '18:45', duration: '1:40', isMissed: false },
-    { name: 'Nguyễn Ngọc Mai', phone: '0984.661.302', type: 'Cuộc gọi đến', time: '18:30', duration: '1:45', isMissed: false },
-    { name: '0967.452.183', phone: '0967.452.183', type: 'Cuộc gọi đến', time: '18:15', duration: '0:28', isMissed: false },
-    { name: 'Bình Còi', phone: '0915.223.789', type: 'Cuộc gọi đến', time: '18:00', duration: '1:15', isMissed: false },
-    { name: 'Chị Lan Quán Nước', phone: '0932.889.102', type: 'Cuộc gọi đến', time: '17:30', duration: '0:42', isMissed: false },
-    { name: 'Tuấn "Bia 88"', phone: '0936.888.712', type: 'Cuộc gọi đi', time: '17:15', duration: '0:32', isMissed: false },
+    // 2. Ngày 23/07/2016 (Ngày N-1)
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↙ Gọi đến', time: '23/07 — 21:40', isMissed: false },
+    { name: 'Long Sẹo', phone: '0979.441.223', type: '↗ Gọi đi', time: '23/07 — 18:10', isMissed: false },
+    { name: 'Cô Sáu', phone: '0972.334.881', type: '↙ Gọi đến', time: '23/07 — 15:40', isMissed: false },
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↗ Gọi đi', time: '23/07 — 12:15', isMissed: false },
+    { name: 'Dũng Lò Mổ', phone: '0904.778.221', type: '↗ Gọi đi', time: '23/07 — 09:20', isMissed: false },
+
+    // 3. Ngày 22/07/2016 Trở Về Trước
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↙ Gọi đến', time: '22/07 — 22:20', isMissed: false },
+    { name: 'Hà', phone: '0984.112.568', type: '↙ Gọi đến', time: '22/07 — 20:30', isMissed: false },
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↙ Gọi đến (Nhỡ)', time: '22/07 — 17:45', isMissed: true },
+    { name: 'Cường Mũi Két', phone: '0973.665.412', type: '↙ Gọi đến', time: '22/07 — 16:30', isMissed: false },
+    { name: 'Thím Tư', phone: '0964.881.332', type: '↙ Gọi đến', time: '22/07 — 11:45', isMissed: false },
+    { name: 'Bà Hai', phone: '0913.552.771', type: '↙ Gọi đến', time: '22/07 — 08:30', isMissed: false },
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↗ Gọi đi', time: '21/07 — 21:15', isMissed: false },
+    { name: 'Tuấn Bia 88', phone: '0945.888.188', type: '↗ Gọi đi', time: '21/07 — 19:15', isMissed: false },
+    { name: 'Chị Hạnh Giặt Là', phone: '0914.556.789', type: '↙ Gọi đến', time: '21/07 — 14:00', isMissed: false },
+    { name: 'Tuấn Béo Xưởng Mộc', phone: '0902.998.114', type: '↗ Gọi đi', time: '21/07 — 10:15', isMissed: false },
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↙ Gọi đến', time: '20/07 — 22:50', isMissed: false },
+    { name: 'Hoàng Cắt Tóc', phone: '0948.332.115', type: '↗ Gọi đi', time: '20/07 — 15:30', isMissed: false },
+    { name: 'Hải Lác Bến Phà', phone: '0918.776.543', type: '↗ Gọi đi (Không được)', time: '20/07 — 09:00', isMissed: true },
+    { name: 'Hùng Đen Cửu Vạn', phone: '0936.445.882', type: '↗ Gọi đi', time: '19/07 — 17:00', isMissed: false },
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↗ Gọi đi', time: '19/07 — 11:30', isMissed: false },
+    { name: 'Anh Hùng Sửa Nước', phone: '0988.665.123', type: '↙ Gọi đến', time: '19/07 — 10:10', isMissed: false },
+    { name: 'Cô Mai Thuốc Tây', phone: '0962.771.889', type: '↗ Gọi đi', time: '18/07 — 21:00', isMissed: false },
+    { name: 'Thảo Vy', phone: '0978.552.109', type: '↙ Gọi đến', time: '18/07 — 20:45', isMissed: false },
+    { name: 'Thắng Sửa Xe', phone: '0977.112.445', type: '↙ Gọi đến', time: '18/07 — 14:20', isMissed: false }
   ]
 
   return (
@@ -115,9 +98,7 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
             <span className="w-12" />
           )}
           <span className="text-[17px] font-bold tracking-tight text-white">
-            {activeTab === 'voicemail' && 'Thư thoại'}
-            {activeTab === 'recents' && 'Gần đây'}
-            {activeTab === 'keypad' && 'Bàn phím'}
+            {activeTab === 'recents' ? 'Gần đây' : 'Bàn phím'}
           </span>
           <span className="text-[12px] font-medium text-[#0A84FF]">Sửa</span>
         </div>
@@ -125,93 +106,6 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto px-3 py-2 pb-14">
-        {/* VOICEMAIL TAB */}
-        {activeTab === 'voicemail' && (
-          <div className="space-y-3">
-            {voicemails.map((vm) => {
-              const isExpanded = expandedId === vm.id
-              return (
-                <div
-                  key={vm.id}
-                  className="rounded-xl border border-[#2C2C2E] bg-[#1C1C1E]/80 overflow-hidden transition-all"
-                >
-                  {/* Item Header */}
-                  <div
-                    onClick={() => setExpandedId(isExpanded ? null : vm.id)}
-                    className="p-3 cursor-pointer hover:bg-[#2C2C2E]/50 flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="size-8 rounded-full bg-[#0A84FF]/20 text-[#0A84FF] flex items-center justify-center">
-                        <Mic className="size-4" />
-                      </div>
-                      <div>
-                        <div className="text-[13px] font-semibold text-white">{vm.sender}</div>
-                        <div className="text-[10px] text-[#8E8E93]">{vm.time}</div>
-                      </div>
-                    </div>
-                    <span className="text-[11px] font-mono text-[#8E8E93]">{vm.duration}</span>
-                  </div>
-
-                  {/* Expanded Player */}
-                  {isExpanded && (
-                    <div className="px-3 pb-3 pt-1 border-t border-[#2C2C2E]/60 bg-[#161618] space-y-3">
-                      {/* Transcript */}
-                      <div className="p-2.5 rounded-lg bg-[#000000]/60 border border-[#2C2C2E] text-[11.5px] leading-relaxed text-[#D1D1D6] italic">
-                        {vm.transcript}
-                      </div>
-
-                      {/* Waveform / Progress Bar */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={togglePlay}
-                            className="size-8 rounded-full bg-[#0A84FF] text-white flex items-center justify-center active:scale-95 transition-transform shrink-0 shadow-md"
-                          >
-                            {isPlaying ? <Pause className="size-4" /> : <Play className="size-4 ml-0.5" />}
-                          </button>
-
-                          {/* Waveform animation */}
-                          <div className="flex-1 h-7 rounded-md bg-[#2C2C2E]/60 px-2 flex items-center gap-1 overflow-hidden relative">
-                            <div
-                              className="absolute left-0 top-0 bottom-0 bg-[#0A84FF]/20 border-r border-[#0A84FF] transition-all duration-300"
-                              style={{ width: `${playbackProgress}%` }}
-                            />
-                            {[40, 70, 90, 30, 80, 100, 50, 85, 60, 45, 95, 75, 50, 80, 60, 30, 90, 100, 70, 40].map(
-                              (h, i) => (
-                                <span
-                                  key={i}
-                                  className={cn(
-                                    'w-1 rounded-full bg-[#8E8E93] transition-all',
-                                    isPlaying && 'animate-pulse bg-[#0A84FF]'
-                                  )}
-                                  style={{ height: `${h * 0.2}px` }}
-                                />
-                              )
-                            )}
-                          </div>
-
-                          <Volume2 className="size-4 text-[#8E8E93] shrink-0" />
-                        </div>
-
-                        <div className="flex justify-between text-[9px] font-mono text-[#8E8E93] px-1">
-                          <span>0:0{Math.floor((playbackProgress / 100) * 14)}</span>
-                          <span>{vm.duration}</span>
-                        </div>
-                      </div>
-
-                      {/* Forensic Audio Note */}
-                      <div className="p-2 rounded bg-[#FF453A]/10 border border-[#FF453A]/30 text-[10.5px] text-[#FF453A] leading-normal flex items-start gap-1.5">
-                        <AlertCircle className="size-3.5 shrink-0 mt-0.5" />
-                        <span>{vm.audioClue}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-
         {/* RECENTS TAB */}
         {activeTab === 'recents' && (
           <div className="divide-y divide-[#1C1C1E]">
@@ -241,7 +135,7 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
                 <button
                   key={k}
                   onClick={() => setKeypadInput((p) => (p.length < 11 ? p + k : p))}
-                  className="size-14 rounded-full bg-[#2C2C2E] hover:bg-[#3A3A3C] active:bg-[#545458] text-white text-[20px] font-medium flex items-center justify-center transition-colors shadow"
+                  className="size-14 rounded-full bg-[#2C2C2E] hover:bg-[#3A3A3C] active:bg-[#545458] text-white text-[20px] font-medium flex items-center justify-center transition-colors shadow cursor-pointer"
                 >
                   {k}
                 </button>
@@ -250,7 +144,7 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
             {keypadInput && (
               <button
                 onClick={() => setKeypadInput('')}
-                className="text-[11px] text-[#0A84FF] font-medium pt-1"
+                className="text-[11px] text-[#0A84FF] font-medium pt-1 cursor-pointer"
               >
                 Xóa
               </button>
@@ -260,28 +154,20 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
       </div>
 
       {/* Bottom Phone Tabs */}
-      <div className="h-12 bg-[#161618]/90 backdrop-blur-md border-t border-[#2C2C2E] grid grid-cols-3 items-center px-4 shrink-0 text-[#8E8E93]">
+      <div className="h-12 bg-[#161618]/90 backdrop-blur-md border-t border-[#2C2C2E] grid grid-cols-2 items-center px-8 shrink-0 text-[#8E8E93]">
         <button
           onClick={() => setActiveTab('recents')}
-          className={cn('flex flex-col items-center gap-0.5', activeTab === 'recents' && 'text-[#0A84FF]')}
+          className={cn('flex flex-col items-center gap-0.5 cursor-pointer', activeTab === 'recents' && 'text-[#0A84FF]')}
         >
           <Clock className="size-4" />
           <span className="text-[9px]">Gần đây</span>
         </button>
         <button
           onClick={() => setActiveTab('keypad')}
-          className={cn('flex flex-col items-center gap-0.5', activeTab === 'keypad' && 'text-[#0A84FF]')}
+          className={cn('flex flex-col items-center gap-0.5 cursor-pointer', activeTab === 'keypad' && 'text-[#0A84FF]')}
         >
           <Grid3X3 className="size-4" />
           <span className="text-[9px]">Bàn phím</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('voicemail')}
-          className={cn('flex flex-col items-center gap-0.5 relative', activeTab === 'voicemail' && 'text-[#0A84FF]')}
-        >
-          <Mic className="size-4" />
-          <span className="text-[9px]">Thư thoại</span>
-          <span className="absolute -top-1 right-5 size-2 bg-[#FF453A] rounded-full" />
         </button>
       </div>
     </div>

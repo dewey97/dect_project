@@ -150,7 +150,7 @@ export function CulpritEpilogueModal({
                 }}
                 className="py-3.5 bg-[#2e5220] hover:bg-[#203a16] text-[#f6f1e5] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 border-2 border-[#193310] active:scale-[0.99]"
               >
-                <span>TIN</span>
+                <span>CÓ</span>
               </button>
 
               <button
@@ -161,7 +161,7 @@ export function CulpritEpilogueModal({
                 }}
                 className="py-3.5 bg-[#8c1d1d] hover:bg-[#a82424] text-[#fff5f5] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 border-2 border-[#5c1313] active:scale-[0.99]"
               >
-                <span>KHÔNG TIN</span>
+                <span>KHÔNG</span>
               </button>
             </div>
           ) : (

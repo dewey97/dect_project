@@ -24,37 +24,7 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
   const [pinError, setPinError] = useState(false)
   const [unlockedNoteIds, setUnlockedNoteIds] = useState<string[]>([])
 
-  const defaultNotes: RichNote[] = [
-    {
-      id: 'n-01',
-      title: 'Sổ nợ bốc họ & Lãi ngoài tháng 7/2016',
-      content: '1. Lê Quang Vũ (Đo đạc): 350.000.000đ — Lãi tính 3.000đ/triệu/ngày. Đã hẹn tối 24/7 sang chốt dứt điểm.\n2. Nam "Còi": 80.000.000đ — Quá hạn 2 tháng.\n3. Hưng đồ gỗ: 120.000.000đ.',
-      meta: '24/07/2016',
-      timestamp: '24/07/2016',
-      folder: 'Tài chính & Nợ'
-    },
-    {
-      id: 'n-02',
-      title: 'Kế hoạch đền bù đất Bờ Sông (Thửa 2021-BS14)',
-      content: 'Diện tích gốc: 75m2.\nBắt thằng Vũ vẽ lại trích đo lên 120m2 để ăn tiền đền bù đợt 1 Ban QLDA.\nTờ di chúc ông nội đã sửa xong ngày, con Mai không có cửa tranh.',
-      meta: '22/07/2016',
-      timestamp: '22/07/2016',
-      folder: 'Công việc Bờ Sông'
-    },
-    {
-      id: 'n-03',
-      title: '🔒 MẬT KHẨU TÀI KHOẢN & VÉ MÁY BAY CHẠY TRỐN',
-      content: '1. Mã cọc Tour Đà Lạt (25/7): VNB-98102 (Đón Nội Bài 06:30 sáng).\n2. Mật khẩu két sắt nhà trọ: 1988 (Năm sinh Vy).\n3. Tài khoản Vietcombank phụ: 00110029104 (Đã gửi 150tr cho Vy giữ trước).\n4. Nếu Vũ không nhượng bộ trích đo: Tung chứng cứ bốc họ lên công an huyện.',
-      meta: '24/07/2016',
-      timestamp: '24/07/2016 18:10',
-      isLocked: true,
-      pinCode: '2407',
-      hint: 'Mật khẩu là Ngày/Tháng định mệnh (4 chữ số: DDMM)',
-      folder: 'Bảo mật'
-    }
-  ]
-
-  const allNotes: RichNote[] = notes.length > 0 ? (notes as RichNote[]) : defaultNotes
+  const allNotes: RichNote[] = (notes as RichNote[]) || []
 
   const filteredNotes = allNotes.filter(
     (n) =>
@@ -181,38 +151,46 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
               <Folder className="size-3 text-[#FFD60A]" /> iCloud • Thư mục Ghi chú
             </div>
 
-            <div className="divide-y divide-[#2C2C2E] rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] overflow-hidden">
-              {filteredNotes.map((note) => {
-                const isLocked = note.isLocked && !unlockedNoteIds.includes(note.id)
-                return (
-                  <div
-                    key={note.id}
-                    onClick={() => setSelectedNote(note)}
-                    className="p-3 hover:bg-[#2C2C2E]/60 active:bg-[#3A3A3C] cursor-pointer transition-colors"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-[13px] font-bold text-white truncate flex items-center gap-1.5">
-                        {note.isLocked && (
-                          <Lock className={cn('size-3.5 shrink-0', isLocked ? 'text-[#FFD60A]' : 'text-[#30D158]')} />
+            {filteredNotes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-2">
+                <FileText className="size-10 text-[#8E8E93]/40" />
+                <span className="text-[14px] text-[#8E8E93] font-medium">Không có ghi chú nào</span>
+                <span className="text-[11px] text-[#8E8E93]/60">0 Ghi chú</span>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#2C2C2E] rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] overflow-hidden">
+                {filteredNotes.map((note) => {
+                  const isLocked = note.isLocked && !unlockedNoteIds.includes(note.id)
+                  return (
+                    <div
+                      key={note.id}
+                      onClick={() => setSelectedNote(note)}
+                      className="p-3 hover:bg-[#2C2C2E]/60 active:bg-[#3A3A3C] cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-[13px] font-bold text-white truncate flex items-center gap-1.5">
+                          {note.isLocked && (
+                            <Lock className={cn('size-3.5 shrink-0', isLocked ? 'text-[#FFD60A]' : 'text-[#30D158]')} />
+                          )}
+                          <span className="truncate">{note.title}</span>
+                        </div>
+                        {note.folder && (
+                          <span className="text-[8.5px] font-mono px-1.5 py-0.5 rounded bg-[#FFD60A]/10 text-[#FFD60A] border border-[#FFD60A]/20 shrink-0">
+                            {note.folder}
+                          </span>
                         )}
-                        <span className="truncate">{note.title}</span>
                       </div>
-                      {note.folder && (
-                        <span className="text-[8.5px] font-mono px-1.5 py-0.5 rounded bg-[#FFD60A]/10 text-[#FFD60A] border border-[#FFD60A]/20 shrink-0">
-                          {note.folder}
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] text-[#8E8E93] font-mono shrink-0">{note.timestamp || note.meta}</span>
+                        <span className="text-[11px] text-[#A1A1A6] truncate">
+                          {isLocked ? '•••••••• (Ghi chú bị khóa bằng mật khẩu)' : note.content.replace(/\n/g, ' ')}
                         </span>
-                      )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] text-[#8E8E93] font-mono shrink-0">{note.timestamp || note.meta}</span>
-                      <span className="text-[11px] text-[#A1A1A6] truncate">
-                        {isLocked ? '•••••••• (Ghi chú bị khóa bằng mật khẩu)' : note.content.replace(/\n/g, ' ')}
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

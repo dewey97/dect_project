@@ -10,8 +10,8 @@
 
 **Người khởi kiện:** **NGUYỄN VĂN THÀNH** — Sinh năm: 1960
 * CMND số: **524193786** 
-* Địa chỉ thường trú: Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.
-* Chỗ ở hiện tại: Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.
+* Địa chỉ thường trú: Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội.
+* Chỗ ở hiện tại: Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội.
 * Số điện thoại liên hệ: **0912.456.789**
 
 **Người bị kiện:** **NGUYỄN VĂN KHANG** — Sinh năm: 1988

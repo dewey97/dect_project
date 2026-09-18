@@ -23,7 +23,7 @@ Vào hồi 16 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 **Tiến hành lấy lời khai người liên quan:**
 * **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991 (25 tuổi).
 * **CMND số:** `381762904`.
-* **Nơi ĐKHKTT:** Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.
+* **Nơi ĐKHKTT:** Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội.
 * **Nghề nghiệp:** Kỹ sư điện dân dụng. 
 * **Mối quan hệ với nạn nhân:** Em rể (Chồng của Nguyễn Ngọc Mai).
 

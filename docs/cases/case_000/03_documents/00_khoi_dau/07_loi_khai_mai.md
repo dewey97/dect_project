@@ -23,7 +23,7 @@ Vào hồi 14 giờ 00 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 **Tiến hành lấy lời khai người liên quan:**
 * **Họ và tên:** **NGUYỄN NGỌC MAI** | **Giới tính:** Nữ | **Sinh ngày:** 15/05/1992 (24 tuổi).
 * **CCCD số:** 275190483.
-* **Nơi ĐKHKTT:** Số 45, Đường Đoàn Kết, Phường Phân khu Cảng, TP. Hà Nội.
+* **Nơi ĐKHKTT:** Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội.
 * **Nghề nghiệp:** Chuyên viên Hành chính — Nhân sự. 
 * **Mối quan hệ với nạn nhân:** Em họ (con chú ruột của nạn nhân Nguyễn Văn Khang).
 

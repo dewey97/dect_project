@@ -11,7 +11,7 @@ import { CulpritEpilogueModal } from './culprit-epilogue-modal'
 import { DossierResultModal } from './dossier-result-modal'
 import { FollowupQuestionModal } from './followup-question-modal'
 import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
-import { getCanonicalSuspectKey } from '@/lib/cases/case-000-suspects'
+import { getCanonicalSuspectKey, findValidCaseCharacter } from '@/lib/cases/case-000-suspects'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
 interface SuspectItem {
@@ -64,6 +64,8 @@ export function MainInvestigationCanvas({
     const map = new Map<string, SuspectItem>()
     for (const s of items) {
       if (!s || !s.name) continue
+      const matchedChar = findValidCaseCharacter(s.name || s.id)
+      if (!matchedChar || matchedChar.id === 'khang') continue
       const { canonicalId, canonicalName } = getCanonicalSuspectKey(s)
       map.set(canonicalId, {
         ...s,
@@ -135,6 +137,9 @@ export function MainInvestigationCanvas({
   }
 
   const handleSaveSuspect = (savedSuspect: SuspectItem) => {
+    const matchedChar = findValidCaseCharacter(savedSuspect.name || savedSuspect.id)
+    if (!matchedChar || matchedChar.id === 'khang') return
+
     const { canonicalId, canonicalName } = getCanonicalSuspectKey(savedSuspect)
     const normalizedItem: SuspectItem = {
       ...savedSuspect,
@@ -326,6 +331,13 @@ export function MainInvestigationCanvas({
       setIsEvidenceGuideOpen(true)
     } else if (pinId === 'c0-pin-phone') {
       setIsPhoneLookupOpen(true)
+    } else if (pinId === 'c0-pin-crime-scene') {
+      if (isReinvestigateUnlocked) {
+        detectiveAudio.playGlassSound()
+        handleOpenReinvestigation()
+      } else {
+        setIsEvidenceGuideOpen(true)
+      }
     } else if (pinId === 'c0-pin-reinvestigate') {
       if (isReinvestigateUnlocked) {
         detectiveAudio.playGlassSound()
@@ -381,28 +393,27 @@ export function MainInvestigationCanvas({
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // CỐ ĐỊNH CÁC VỊ TRÍ SLOT NGHI PHẠM (Đồng bán kính, cân đối và thẩm mỹ tuyệt đối)
-  // CỐ ĐỊNH CÁC VỊ TRÍ SLOT NGHI PHẠM (Xếp hàng ngang tự nhiên với độ cao lệch nhẹ)
+  // CỐ ĐỊNH CÁC VỊ TRÍ SLOT NGHI PHẠM (Được căn lề chuẩn theo phác thảo sketch, an toàn bên trong khung gỗ)
   const DESKTOP_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.48, y: 0.520 }, // Slot 0: Lê Quang Vũ
-    { x: 0.65, y: 0.485 }, // Slot 1: Nguyễn Thanh Tùng (Lệch lên)
-    { x: 0.82, y: 0.535 }, // Slot 2: Trần Thị Hà (Lệch xuống)
-    { x: 0.74, y: 0.350 }, // Slot 3: Nguyễn Ngọc Mai — Bên phải note nghi phạm
-    { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt — Nằm bên trái Lê Quang Vũ (Lệch lên)
-    { x: 0.16, y: 0.535 }, // Slot 5: Nguyễn Thị Lụa — Nằm bên trái Trần Văn Đạt (Lệch xuống)
-    { x: 0.94, y: 0.480 }, // Slot 6: Nguyễn Văn Khang (Mé phải viền bảng)
-    { x: 0.83, y: 0.330 }, // Slot 7: Thảo Vy — Nằm phía trên Trần Thị Hà
+    { x: 0.44, y: 0.62 }, // Slot 0: Lê Quang Vũ
+    { x: 0.60, y: 0.58 }, // Slot 1: Nguyễn Thanh Tùng
+    { x: 0.76, y: 0.65 }, // Slot 2: Trần Thị Hà
+    { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
+    { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt — Nằm dưới Bà Lụa
+    { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
+    { x: 0.64, y: 0.24 }, // Slot 6: Nguyễn Văn Khang (Nạn nhân)
+    { x: 0.76, y: 0.44 }, // Slot 7: Thảo Vy
   ], [])
 
   const MOBILE_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.48, y: 0.520 }, // Slot 0: Lê Quang Vũ
-    { x: 0.65, y: 0.485 }, // Slot 1: Nguyễn Thanh Tùng
-    { x: 0.82, y: 0.535 }, // Slot 2: Trần Thị Hà
-    { x: 0.74, y: 0.350 }, // Slot 3: Nguyễn Ngọc Mai
-    { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt
-    { x: 0.16, y: 0.535 }, // Slot 5: Nguyễn Thị Lụa
-    { x: 0.94, y: 0.480 }, // Slot 6: Nguyễn Văn Khang
-    { x: 0.83, y: 0.330 }, // Slot 7: Thảo Vy — Nằm phía trên Trần Thị Hà
+    { x: 0.44, y: 0.62 }, // Slot 0: Lê Quang Vũ
+    { x: 0.60, y: 0.58 }, // Slot 1: Nguyễn Thanh Tùng
+    { x: 0.76, y: 0.65 }, // Slot 2: Trần Thị Hà
+    { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
+    { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt
+    { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
+    { x: 0.64, y: 0.24 }, // Slot 6: Nguyễn Văn Khang
+    { x: 0.76, y: 0.44 }, // Slot 7: Thảo Vy
   ], [])
 
   // Construct dynamic suspect pins with 100% deterministic, stationary slots
@@ -415,7 +426,7 @@ export function MainInvestigationCanvas({
       y: slot.y,
       label: canonicalName || suspect.name,
       detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
-      color: 'yellow' as const,
+      color: 'blue' as const,
     }
   })
 
@@ -428,7 +439,7 @@ export function MainInvestigationCanvas({
       y: slot.y,
       label: canonicalName || suspect.name,
       detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
-      color: 'yellow' as const,
+      color: 'blue' as const,
     }
   })
 
@@ -443,7 +454,7 @@ export function MainInvestigationCanvas({
     (s) => s.name.toLowerCase().includes('hà') || s.name.toLowerCase().includes('ha')
   )
 
-  // Dynamic Followup Pins cho Vũ, Tùng và Hà (Chỉ hiển thị khi có suspect tương ứng và ĐÃ THẨM TRA)
+  // Dynamic Followup Pins cho Vũ, Tùng và Hà (Kéo xuống vùng dưới đáy bảng)
   const hasVuFollowup = !!vuSuspect && investigatedSuspects.includes('vu')
   const hasTungFollowup = !!tungSuspect && investigatedSuspects.includes('tung')
   const hasHaFollowup = !!haSuspect && investigatedSuspects.includes('ha')
@@ -453,11 +464,12 @@ export function MainInvestigationCanvas({
       ? [
           {
             id: 'c0-pin-followup-vu',
-            x: 0.48,
-            y: 0.770,
-            label: 'Câu hỏi',
-            detail: 'Câu hỏi suy luận mở rộng đối tượng Lê Quang Vũ',
-            color: 'yellow' as const,
+            x: 0.44,
+            y: 0.80,
+            label: 'Nghi vấn',
+            detail: 'Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ',
+            color: 'purple' as const,
+            noteColor: 'yellow' as const,
           },
         ]
       : []),
@@ -465,11 +477,12 @@ export function MainInvestigationCanvas({
       ? [
           {
             id: 'c0-pin-followup-tung',
-            x: 0.65,
-            y: 0.740,
-            label: 'Câu hỏi',
-            detail: 'Câu hỏi suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
-            color: 'yellow' as const,
+            x: 0.60,
+            y: 0.78,
+            label: 'Nghi vấn',
+            detail: 'Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
+            color: 'purple' as const,
+            noteColor: 'yellow' as const,
           },
         ]
       : []),
@@ -477,11 +490,12 @@ export function MainInvestigationCanvas({
       ? [
           {
             id: 'c0-pin-followup-ha',
-            x: 0.82,
-            y: 0.785,
-            label: 'Câu hỏi',
+            x: 0.76,
+            y: 0.80,
+            label: 'Nghi vấn',
             detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
-            color: 'yellow' as const,
+            color: 'purple' as const,
+            noteColor: 'yellow' as const,
           },
         ]
       : []),
@@ -492,11 +506,12 @@ export function MainInvestigationCanvas({
       ? [
           {
             id: 'c0-pin-followup-vu',
-            x: 0.48,
-            y: 0.770,
-            label: 'Câu hỏi',
-            detail: 'Câu hỏi suy luận mở rộng đối tượng Lê Quang Vũ',
-            color: 'yellow' as const,
+            x: 0.44,
+            y: 0.80,
+            label: 'Nghi vấn',
+            detail: 'Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ',
+            color: 'purple' as const,
+            noteColor: 'yellow' as const,
           },
         ]
       : []),
@@ -504,11 +519,12 @@ export function MainInvestigationCanvas({
       ? [
           {
             id: 'c0-pin-followup-tung',
-            x: 0.65,
-            y: 0.740,
-            label: 'Câu hỏi',
-            detail: 'Câu hỏi suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
-            color: 'yellow' as const,
+            x: 0.60,
+            y: 0.78,
+            label: 'Nghi vấn',
+            detail: 'Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
+            color: 'purple' as const,
+            noteColor: 'yellow' as const,
           },
         ]
       : []),
@@ -516,11 +532,12 @@ export function MainInvestigationCanvas({
       ? [
           {
             id: 'c0-pin-followup-ha',
-            x: 0.82,
-            y: 0.785,
-            label: 'Câu hỏi',
+            x: 0.76,
+            y: 0.80,
+            label: 'Nghi vấn',
             detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
-            color: 'yellow' as const,
+            color: 'purple' as const,
+            noteColor: 'yellow' as const,
           },
         ]
       : []),
@@ -533,52 +550,76 @@ export function MainInvestigationCanvas({
     ? [
         {
           id: 'c0-pin-evidence',
-          x: 0.25,
+          x: 0.20,
           y: 0.18,
           label: 'Bổ sung chứng cứ',
           detail: 'Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra',
           color: 'red' as const,
-        },
-        {
-          id: 'c0-pin-suspects',
-          x: 0.65,
-          y: 0.30,
-          label: 'Nghi phạm',
-          detail: 'Thêm & xem danh sách nghi phạm vụ án',
-          color: 'red' as const,
+          noteColor: 'yellow' as const,
         },
         {
           id: 'c0-pin-phone',
-          x: 0.58,
-          y: 0.18,
+          x: 0.42,
+          y: 0.27,
           label: 'Mở rộng điều tra',
           detail: phoneLookupSuccess
             ? 'Đã xác minh danh tính SĐT thành công'
             : 'Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang',
-          color: phoneLookupSuccess ? ('blue' as const) : ('yellow' as const),
+          color: phoneLookupSuccess ? ('cyan' as const) : ('yellow' as const),
+          noteColor: 'white' as const,
+        },
+        {
+          id: 'c0-pin-victim-khang',
+          x: 0.55,
+          y: 0.12,
+          label: 'Nạn nhân Nguyễn Văn Khang',
+          detail: 'Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài',
+          color: 'red' as const,
+          photoUrl: '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png',
+        },
+        {
+          id: 'c0-pin-crime-scene',
+          x: 0.73,
+          y: 0.21,
+          label: 'Hiện trường thi thể',
+          detail: 'Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn',
+          color: 'orange' as const,
+          photoUrl: '/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png',
         },
         {
           id: 'c0-pin-reinvestigate',
-          x: 0.25,
-          y: 0.32,
+          x: 0.20,
+          y: 0.35,
           label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại 🔒',
           detail: isReinvestigateUnlocked
             ? 'Mở biên bản tái khám xét hiện trường'
             : 'Khám xét lại hiện trường [Khóa — Cần trả lời xong câu hỏi của Vũ & Tùng]',
-          color: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
-          noteColor: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
-          pinColor: 'yellow' as const,
+          color: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
+          noteColor: 'white' as const,
+          pinColor: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
           pulseBorder: isReinvestigateBlinking,
         },
         {
+          id: 'c0-pin-suspects',
+          x: 0.58,
+          y: 0.38,
+          label: 'Nghi phạm',
+          detail: 'Thêm & xem danh sách nghi phạm vụ án',
+          color: 'red' as const,
+          pinColor: 'red' as const,
+          noteColor: 'yellow' as const,
+        },
+        {
           id: 'c0-pin-indictment',
-          x: 0.25,
-          y: 0.68,
+          x: 0.22,
+          y: 0.80,
           label: 'Bản kết luận điều tra',
           detail: isIndictmentSolved
             ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
             : 'Lập bản cáo trạng gửi Viện Kiểm sát',
-          color: isIndictmentSolved ? ('blue' as const) : ('red' as const),
+          color: 'red' as const,
+          pinColor: 'red' as const,
+          noteColor: 'white' as const,
         },
         ...followupPinsMobile,
         ...mobileSuspectPins,
@@ -586,54 +627,82 @@ export function MainInvestigationCanvas({
     : [
         {
           id: 'c0-pin-evidence',
-          x: 0.25,
+          x: 0.20,
           y: 0.18,
           label: 'Bổ sung chứng cứ',
           detail: 'Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra',
           color: 'red' as const,
+          pinColor: 'red' as const,
+          noteColor: 'yellow' as const,
         },
-        {
-          id: 'c0-pin-suspects',
-          x: 0.65,
-          y: 0.30,
-          label: 'Nghi phạm',
-          detail: 'Thêm & xem danh sách nghi phạm vụ án',
-          color: 'red' as const,
-        },
-        {
-          id: 'c0-pin-indictment',
-          x: 0.25,
-          y: 0.68,
-          label: 'Bản kết luận điều tra',
-          detail: isIndictmentSolved
-            ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
-            : 'Lập bản cáo trạng gửi Viện Kiểm sát',
-          color: isIndictmentSolved ? ('blue' as const) : ('red' as const),
-        },
-        ...followupPinsDesktop,
         {
           id: 'c0-pin-phone',
-          x: 0.58,
-          y: 0.18,
+          x: 0.42,
+          y: 0.27,
           label: 'Mở rộng điều tra',
           detail: phoneLookupSuccess
             ? 'Đã xác minh danh tính SĐT thành công'
             : 'Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang',
-          color: phoneLookupSuccess ? ('blue' as const) : ('yellow' as const),
+          color: 'yellow' as const,
+          pinColor: 'yellow' as const,
+          noteColor: 'white' as const,
+        },
+        {
+          id: 'c0-pin-victim-khang',
+          x: 0.55,
+          y: 0.12,
+          label: 'Nạn nhân Nguyễn Văn Khang',
+          detail: 'Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài',
+          color: 'yellow' as const,
+          pinColor: 'yellow' as const,
+          photoUrl: '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png',
+        },
+        {
+          id: 'c0-pin-crime-scene',
+          x: 0.73,
+          y: 0.21,
+          label: 'Hiện trường thi thể',
+          detail: 'Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn',
+          color: 'yellow' as const,
+          pinColor: 'yellow' as const,
+          photoUrl: '/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png',
         },
         {
           id: 'c0-pin-reinvestigate',
-          x: 0.25,
-          y: 0.32,
+          x: 0.20,
+          y: 0.35,
           label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại 🔒',
           detail: isReinvestigateUnlocked
             ? 'Mở biên bản tái khám xét hiện trường'
             : 'Khám xét lại hiện trường [Khóa — Cần trả lời xong câu hỏi của Vũ & Tùng]',
-          color: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
-          noteColor: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
+          color: 'yellow' as const,
+          noteColor: 'white' as const,
           pinColor: 'yellow' as const,
           pulseBorder: isReinvestigateBlinking,
         },
+        {
+          id: 'c0-pin-suspects',
+          x: 0.58,
+          y: 0.38,
+          label: 'Nghi phạm',
+          detail: 'Thêm & xem danh sách nghi phạm vụ án',
+          color: 'red' as const,
+          pinColor: 'red' as const,
+          noteColor: 'yellow' as const,
+        },
+        {
+          id: 'c0-pin-indictment',
+          x: 0.22,
+          y: 0.80,
+          label: 'Bản kết luận điều tra',
+          detail: isIndictmentSolved
+            ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
+            : 'Lập bản cáo trạng gửi Viện Kiểm sát',
+          color: 'red' as const,
+          pinColor: 'red' as const,
+          noteColor: 'white' as const,
+        },
+        ...followupPinsDesktop,
         ...desktopSuspectPins,
       ]
 
@@ -683,7 +752,7 @@ export function MainInvestigationCanvas({
       <div className="absolute top-3 left-4 z-20 flex items-center pointer-events-none">
         <div className="flex items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto">
           <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-          <span className="font-bold tracking-wide">CASE 000 — BẢNG ĐIỀU TRA MANH MỐI</span>
+          <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
         </div>
       </div>
 
@@ -713,7 +782,6 @@ export function MainInvestigationCanvas({
         onSubmitConclusion={(culprit) => {
           detectiveAudio.playStampSound()
           detectiveAudio.playUnlockJingle()
-          setIsReinvestigateUnlocked(true)
           setInvestigatedSuspects((prev) => {
             const next = Array.from(new Set([...prev, culprit])) as ('vu' | 'tung' | 'ha')[]
             try {
@@ -721,10 +789,8 @@ export function MainInvestigationCanvas({
             } catch {}
             return next
           })
-          try {
-            localStorage.setItem('veritas_reinvestigate_unlocked', 'true')
-          } catch {}
           setNarrativeCulprit(culprit)
+          setActiveFollowupCulprit(culprit)
           setIsEpilogueOpen(true)
         }}
       />
@@ -770,7 +836,12 @@ export function MainInvestigationCanvas({
           setNarrativeChoice(null)
         }}
         onOpenDossier={handleOpenDossier}
-        onOpenFollowupQuestion={() => setIsFollowupQuestionOpen(true)}
+        onOpenFollowupQuestion={() => {
+          if (narrativeCulprit) {
+            setActiveFollowupCulprit(narrativeCulprit)
+          }
+          setIsFollowupQuestionOpen(true)
+        }}
         onOpenIndictment={() => {
           setIsEpilogueOpen(false)
           setNarrativeCulprit(null)
@@ -788,7 +859,7 @@ export function MainInvestigationCanvas({
 
       <FollowupQuestionModal
         isOpen={isFollowupQuestionOpen}
-        culprit={activeFollowupCulprit || solvedCulprit || 'vu'}
+        culprit={activeFollowupCulprit || narrativeCulprit || solvedCulprit || 'vu'}
         onClose={() => setIsFollowupQuestionOpen(false)}
         onSuccess={handleFollowupSuccess}
         onOpenDossier={handleOpenDossier}

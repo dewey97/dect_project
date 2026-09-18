@@ -89,13 +89,21 @@
 - Khang liên tục đe dọa ném giấy nợ về nhà bố vợ.                    Đoàn Kết cho bố vợ mày nhục mặt!"
 ```
 
-* **Với Nạn nhân Nguyễn Văn Khang (Chủ nợ hung hãn):** Vũ căm ghét và sợ hãi Khang vì Khang liên tục sỉ nhục, dọa nạt báo gia đình vợ.
-* **Với Nguyễn Ngọc Mai (Vợ):** Vũ vừa yêu thương vừa kính sợ Mai, tự ti vì ở rể nên không dám thú nhận nợ nần.
-* **Với Trần Thị Hà (Bạn gái Khang):** Vũ biết Hà yêu Khang điên dại, hay cơm bưng nước rót và lén lút rình rập ngoài ngõ.
+## II. MA TRẬN MÂU THUẪN & CÁC MỐI QUAN HỆ TRỌNG YẾU
+
+```text
+                        LÊ QUANG VŨ (NGHI PHẠM 2)
+                                   │
+         ┌─────────────────────────┼─────────────────────────┐
+         ▼                         ▼                         ▼
+[NGUYỄN NGỌC MAI (VỢ)]    [NGUYỄN VĂN KHANG]        [QUÁN BIA 88]
+Giấu vợ vay nặng lãi      Chủ nợ siết 300M, đe      Nơi ngồi uống bia giải sầu
+300M; sợ lộ bị coi thường dọa rải tờ rơi bôi nhọ    từ 19:49 đến 21:15 (4.5 km)
+```
 
 ---
 
-## V. DÒNG THỜI GIAN ĐÊM ÁN MẠNG (24/07/2016)
+## III. BẰNG CHỨNG NGOẠI PHẠM & DÒNG THỜI GIAN THỰC TẾ (ALIBI TIMELINE)
 
 ```text
 18:30            19:00           19:00 - 19:25         19:30             20:45           21:30
@@ -103,19 +111,27 @@
   ├────────────────┼───────────────────┼─────────────────┼─────────────────┼───────────────┤
 Sang cùng Mai    Mai bỏ về,      Van xin hoãn nợ,      Xe ôm đón         Thanh toán CK   Về đến nhà
 ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88    195k Bàn 7      Phố Đoàn Kết
-đòi đất          xin nợ          tháo chạy ra ngõ      (cách 3.8 km)     Quán Bia 88     ngủ bình thường
+đòi đất          xin nợ          tháo chạy ra ngõ      (cách 4.5 km)     Quán Bia 88     ngủ bình thường
 ```
 
 * **18:30 – 19:00:** Vũ ngồi im trong khi Mai cãi nhau đòi đất với Khang. Đúng 19:00 Mai phóng xe về trước.
 * **19:00 – 19:25:** Vũ quỳ lạy xin hoãn món nợ 300 triệu. Khang chửi bới, rút cuốn sổ da đen đập mạnh vào ngực Vũ và đe dọa in 100 tờ rơi rải khắp phố Đoàn Kết. Vũ suy sụp, hoảng sợ vội vàng tháo chạy ra khỏi cửa chính, chạy một mạch ra đầu ngõ rút điện thoại bấm đặt app xe ôm lúc 19:25:40.
 * **19:25:** Đứng ở đầu ngõ đợi xe, Vũ nhìn thấy bóng một người mặc áo gió trùm đầu đứng nép dưới gốc cây xoan ngó vào nhà Khang.
-* **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Khu Cầu Cảng (cách 3.8 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 đĩa nem + 5 lon bia ngồi giải sầu.
+* **19:30:** Xe ôm đón Vũ chạy ra Quán Bia 88 ở Đường Vĩnh Hà, Phường Cảng Đông (cách 4.5 km). Vũ ngồi uống bia một mình sát bờ sông: gọi 1 đĩa nem + 5 lon bia ngồi giải sầu.
 * **20:45:** Vũ thanh toán chuyển khoản **195.000đ** (Bàn số 7).
 * **21:30:** Vũ đi xe ôm về đến nhà tại số 45 Phố Đoàn Kết đi ngủ.
 
 ---
 
-## VI. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
+## IV. MỐI QUAN HỆ ĐAN XEN VỚI CÁC NHÂN VẬT
+
+* **Với Nạn nhân Nguyễn Văn Khang (Chủ nợ hung hãn):** Vũ căm ghét và sợ hãi Khang vì Khang liên tục sỉ nhục, dọa nạt báo gia đình vợ.
+* **Với Nguyễn Ngọc Mai (Vợ):** Vũ vừa yêu thương vừa kính sợ Mai, tự ti vì ở rể nên không dám thú nhận nợ nần.
+* **Với Trần Thị Hà (Bạn gái Khang):** Vũ biết Hà yêu Khang điên dại, hay cơm bưng nước rót và lén lút rình rập ngoài ngõ.
+
+---
+
+## V. HỆ THỐNG VẬT CHỨNG & CƠ CHẾ GIẢI MÃ PHÁ ÁN (PUZZLE MECHANICS)
 
 ### 1. Cơ chế 1: Đối chiếu Sổ nợ `10` & Biệt danh "Thằng Lệch Pha"
 * **Vật chứng:** Cuốn sổ nợ `10` trang 5: *Thằng Lệch Pha — 300.000.000 đ — SĐT: 0967.452.183 — Chữ ký con nợ: Lê Quang Vũ — Ghi chú: ~~Hẹn 20/7 trả ở 45 Đoàn Kết~~ Bùng hẹn, tắt máy. Hạn chót 25/7: rải tờ rơi + ném giấy nợ vào nhà bố vợ ở 45 Đoàn Kết!*.
@@ -125,11 +141,11 @@ ngồi im nghe     Vũ nán lại      bị Khang tát,         ra Quán Bia 88 
 * **Dữ liệu đối chiếu:**
   * Vũ khai tại Lời khai lần 2 (`07`): Ngồi uống bia một mình tại bàn ven sông, gọi **1 đĩa nem + 5 lon bia**.
   * Quét sổ thu chi Quán 88 (`06`): Bàn **B7 (1 khách)** thanh toán tiền mặt đúng số tiền: `B7 (1 khách): 195k (Tiền mặt 21:15)` (được tính từ 1 đĩa nem chua 95k + 5 lon bia 100k) và Vũ chứng kiến vụ xô xát giữa B4 & B5 lúc 21:15.
-* **Ý nghĩa phá án:** Lúc **21:15**, Vũ mới thanh toán rời Quán Bia 88 cách hiện trường **3.8 km** $\rightarrow$ Không thể có mặt tại nhà Khang lúc 20:45 (thời điểm hung thủ đứng rình) và 21:00 (lúc nạn nhân bị sát hại) $\rightarrow$ **MINH OAN TUYỆT ĐỐI CHO VŨ!**
+* **Ý nghĩa phá án:** Lúc **21:15**, Vũ mới thanh toán rời Quán Bia 88 cách hiện trường **4.5 km** $\rightarrow$ Không thể có mặt tại nhà Khang lúc 20:45 (thời điểm hung thủ đứng rình) và 21:00 (lúc nạn nhân bị sát hại) $\rightarrow$ **MINH OAN TUYỆT ĐỐI CHO VŨ!**
 
 ---
 
-## VII. SƠ HỞ LỜI KHAI, RED HERRING & BẰNG CHỨNG NGOẠI PHẠM
+## VI. SƠ HỞ LỜI KHAI, RED HERRING & BẰNG CHỨNG NGOẠI PHẠM
 
 | Yếu Tố Bẫy (Red Herring) | Suy Đoán Ban Đầu (Nghi Vấn) | Sự Thật Khách Quan Được Minh Oan |
 | :--- | :--- | :--- |

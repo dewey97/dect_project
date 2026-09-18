@@ -41,6 +41,7 @@ import {
   calculateRoute,
   RouteResult
 } from '@/lib/case-locations-data'
+import { VectorMapCanvas } from './vector-map-canvas'
 
 interface MapsAppProps {
   onBackToHome?: () => void
@@ -48,7 +49,7 @@ interface MapsAppProps {
 
 export function MapsApp({ onBackToHome }: MapsAppProps) {
   // Navigation & UI States
-  const [activeTab, setActiveTab] = useState<'explore' | 'directions'>('directions')
+  const [activeTab, setActiveTab] = useState<'explore' | 'directions'>('explore')
   const [transportMode, setTransportMode] = useState<TransportMode>('motorbike')
 
   // Location selections (Default: 14 Bờ Sông -> Số 8 Ngõ 12 Đường Bờ Kè)
@@ -215,11 +216,15 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
 
   // Filter locations for picker modal
   const filteredPickerLocations = useMemo(() => {
+    const q = selectorSearch.toLowerCase().trim()
     return CASE_LOCATIONS.filter((loc) => {
       const matchSearch =
-        loc.name.toLowerCase().includes(selectorSearch.toLowerCase()) ||
-        loc.address.toLowerCase().includes(selectorSearch.toLowerCase()) ||
-        loc.shortName.toLowerCase().includes(selectorSearch.toLowerCase())
+        !q ||
+        loc.name.toLowerCase().includes(q) ||
+        loc.address.toLowerCase().includes(q) ||
+        loc.shortName.toLowerCase().includes(q) ||
+        loc.description.toLowerCase().includes(q) ||
+        (loc.plusCode && loc.plusCode.toLowerCase().includes(q))
       const matchCat =
         selectorCategory === 'all' || loc.category === selectorCategory
       return matchSearch && matchCat
@@ -230,12 +235,12 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   const handleSelectPickedLocation = (loc: CaseLocation) => {
     if (pickingTarget === 'origin') {
       setOriginId(loc.id)
-    } else if (pickingTarget === 'destination') {
+    } else {
       setDestinationId(loc.id)
+      setSelectedPlace(loc)
     }
     setPickingTarget(null)
     setSelectorSearch('')
-    setSelectedPlace(null)
     setDroppedPin(null)
 
     // Center camera smoothly on chosen location
@@ -358,10 +363,9 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
                   </div>
                   <input
                     type="text"
-                    placeholder="Tìm kiếm địa điểm trong vụ án..."
+                    placeholder="Tìm kiếm (29 Vĩnh Thụy, Đạt Phú...)"
                     onClick={() => {
                       setPickingTarget('destination')
-                      setActiveTab('directions')
                     }}
                     readOnly
                     className="w-full text-[13px] font-normal text-gray-800 placeholder-gray-500 bg-transparent outline-none cursor-pointer"
@@ -483,12 +487,10 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
                 </button>
               </div>
 
-              {/* Transport Mode Tabs (Motorbike, Car, Bus/Train, Walk) */}
-              <div className="grid grid-cols-4 gap-1 pt-1 border-t border-gray-100">
+              {/* Transport Mode Tabs (Motorbike, Walk) */}
+              <div className="grid grid-cols-2 gap-1.5 pt-1 border-t border-gray-100">
                 {[
                   { mode: 'motorbike' as TransportMode, icon: Car, label: 'Xe máy' },
-                  { mode: 'car' as TransportMode, icon: Car, label: 'Ô tô' },
-                  { mode: 'transit' as TransportMode, icon: Train, label: 'Xe buýt' },
                   { mode: 'walk' as TransportMode, icon: Footprints, label: 'Đi bộ' }
                 ].map((item) => (
                   <button
@@ -554,620 +556,42 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
       )}
 
       {/* ========================================================================= */}
-      {/* 2. THE GOOGLE MAPS INTERACTIVE VECTOR CANVAS (100% CLEAN NO REAL NAMES)   */}
+      {/* 2. THE GOOGLE MAPS INTERACTIVE VECTOR CANVAS (STANDALONE COMPONENT)       */}
       {/* ========================================================================= */}
-      <div
-        ref={mapContainerRef}
-        onClick={handleMapClick}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onTouchStart={handleMouseDown}
-        onTouchMove={handleMouseMove}
-        onTouchEnd={handleMouseUp}
-        className={cn(
-          'w-full h-full relative overflow-hidden transition-colors cursor-grab active:cursor-grabbing',
-          mapLayer === 'satellite' ? 'bg-[#18232c]' : 'bg-[#E5E3DF]'
-        )}
-      >
-        {/* World Layer Transformed by Pan & Zoom & 3D Tilt in Navigation mode */}
-        <div
-          className="absolute inset-0 origin-top-left pointer-events-none transition-transform duration-300"
-          style={{
-            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) ${is3DView ? 'perspective(700px) rotateX(28deg)' : ''}`,
-            width: '2400px',
-            height: '2000px'
-          }}
-        >
-          {/* Base SVG Map Graphics */}
-          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 2400 2000">
-            <defs>
-              {/* Railroad track pattern */}
-              <pattern id="railPattern" width="14" height="14" patternUnits="userSpaceOnUse">
-                <path d="M 0,7 L 14,7" stroke="#4B5563" strokeWidth="2.5" />
-                <path d="M 3,0 L 3,14 M 10,0 L 10,14" stroke="#1F2937" strokeWidth="2.5" />
-              </pattern>
-
-              {/* Water Wave Gradient */}
-              <linearGradient id="riverGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor={mapLayer === 'satellite' ? '#143147' : '#A5D6F7'} />
-                <stop offset="50%" stopColor={mapLayer === 'satellite' ? '#0f2638' : '#90cdf4'} />
-                <stop offset="100%" stopColor={mapLayer === 'satellite' ? '#0b2030' : '#7cbdf0'} />
-              </linearGradient>
-
-              {/* Route Glow Effect */}
-              <filter id="routeGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#1A73E8" floodOpacity="0.45" />
-              </filter>
-            </defs>
-
-            {/* Land cover background */}
-            <rect width="2400" height="2000" fill={mapLayer === 'satellite' ? '#15212B' : '#F1EFE8'} />
-
-            {/* ================================================================= */}
-            {/* GREEN PARKS & ECOLOGICAL RESERVES                                 */}
-            {/* ================================================================= */}
-            <g fill={mapLayer === 'satellite' ? '#1E392A' : '#CEEAD6'} opacity="0.85">
-              <path d="M 1150,1620 C 1220,1580 1340,1610 1370,1720 C 1320,1810 1190,1800 1140,1730 Z" />
-              <path d="M 940,990 C 1000,970 1080,980 1070,1110 C 1030,1140 960,1140 930,1080 Z" />
-              <path d="M 880,660 C 940,640 980,680 970,740 C 920,770 870,740 880,660 Z" />
-              <path d="M 1240,680 C 1270,620 1290,720 1280,840 C 1260,930 1230,870 1240,680 Z" fill={mapLayer === 'satellite' ? '#2A4332' : '#D5E8D4'} />
-              <path d="M 1320,1260 C 1360,1210 1380,1290 1370,1380 C 1340,1420 1310,1360 1320,1260 Z" fill={mapLayer === 'satellite' ? '#2A4332' : '#D5E8D4'} />
-              <path d="M 900,20 C 1100,0 1400,20 1500,80 C 1450,140 1000,120 900,20 Z" />
-            </g>
-
-            {/* ================================================================= */}
-            {/* LAKES (Hồ Phân Khu Vụ Án)                                         */}
-            {/* ================================================================= */}
-            <g fill="url(#riverGrad)" stroke="#64B5F6" strokeWidth="1.2">
-              <path d="M 820,400 C 960,380 1030,450 1000,560 C 970,650 860,680 780,630 C 710,570 720,430 820,400 Z" />
-              <path d="M 1020,490 C 1055,485 1070,520 1060,555 C 1040,575 1015,560 1020,490 Z" />
-              <path d="M 1040,820 C 1065,820 1075,860 1065,890 C 1050,910 1030,890 1030,860 C 1030,835 1035,820 1040,820 Z" />
-              <path d="M 980,1030 C 1020,1020 1045,1050 1035,1090 C 1015,1110 975,1095 980,1030 Z" />
-              <path d="M 780,1540 C 850,1520 890,1570 880,1630 C 840,1670 760,1650 760,1590 Z" />
-              <path d="M 870,1420 C 905,1410 920,1445 910,1470 C 885,1485 865,1465 870,1420 Z" />
-            </g>
-
-            {/* Sông Hồng (Red River Curve) */}
-            <path
-              d="M 1320,0 
-                 C 1260,180 1190,320 1190,440 
-                 C 1190,560 1260,700 1270,850 
-                 C 1280,980 1310,1080 1325,1180 
-                 C 1345,1300 1440,1450 1470,1600 
-                 C 1510,1780 1620,1920 1740,2000 
-                 L 1940,2000 
-                 C 1820,1920 1710,1780 1670,1600 
-                 C 1640,1450 1545,1300 1525,1180 
-                 C 1510,1080 1480,980 1470,850 
-                 C 1460,700 1390,560 1390,440 
-                 C 1390,320 1460,180 1520,0 Z"
-              fill="url(#riverGrad)"
-              stroke="#64B5F6"
-              strokeWidth="2"
-            />
-
-            <text
-              x="1320"
-              y="320"
-              fill={mapLayer === 'satellite' ? '#7BBCE6' : '#2563EB'}
-              fontSize="16"
-              fontWeight="bold"
-              letterSpacing="6"
-              opacity="0.6"
-              transform="rotate(65 1320 320)"
-            >
-              SÔNG HỒNG
-            </text>
-
-            {/* ================================================================= */}
-            {/* NỘI BÀI AIRPORT COMPLEX (Top Canvas)                              */}
-            {/* ================================================================= */}
-            <g>
-              <rect x="940" y="30" width="560" height="110" rx="8" fill={mapLayer === 'satellite' ? '#1c2730' : '#E5E3DB'} stroke="#D1D5DB" strokeWidth="1" />
-              <rect x="980" y="48" width="480" height="12" fill="#374151" rx="2" />
-              <rect x="980" y="86" width="480" height="12" fill="#374151" rx="2" />
-              <line x1="990" y1="54" x2="1450" y2="54" stroke="#FFFFFF" strokeWidth="1.5" strokeDasharray="8 6" />
-              <line x1="990" y1="92" x2="1450" y2="92" stroke="#FFFFFF" strokeWidth="1.5" strokeDasharray="8 6" />
-              <path d="M 1120,70 L 1240,70 L 1260,82 L 1220,82 L 1220,95 L 1140,95 L 1140,82 L 1100,82 Z" fill="#6B7280" />
-              <text x="1180" y="65" fill="#4B5563" fontSize="11" fontWeight="bold" textAnchor="middle" style={{ paintOrder: 'stroke fill', stroke: '#FFFFFF', strokeWidth: 3 }}>
-                CẢNG HÀNG KHÔNG QUỐC TẾ NỘI BÀI (HAN)
-              </text>
-            </g>
-
-            {/* ================================================================= */}
-            {/* URBAN BUILDING FOOTPRINTS                                         */}
-            {/* ================================================================= */}
-            <g fill={mapLayer === 'satellite' ? '#1f2d3a' : '#E8E5DF'} stroke={mapLayer === 'satellite' ? '#273847' : '#DAD7D1'} strokeWidth="1">
-              <rect x="1170" y="1050" width="60" height="40" rx="2" />
-              <rect x="1180" y="1105" width="40" height="30" rx="2" />
-              <rect x="1160" y="1150" width="45" height="35" rx="2" />
-              <rect x="1090" y="1120" width="45" height="35" rx="2" />
-              <rect x="1030" y="1060" width="55" height="35" rx="2" />
-              <rect x="1080" y="1210" width="60" height="40" rx="2" />
-              <rect x="1150" y="1210" width="50" height="40" rx="2" />
-
-              <rect x="1340" y="1010" width="50" height="30" rx="2" />
-              <rect x="1350" y="1070" width="60" height="35" rx="2" />
-              <rect x="1370" y="930" width="55" height="45" rx="2" />
-
-              <rect x="1010" y="780" width="50" height="30" rx="2" />
-              <rect x="1080" y="780" width="45" height="30" rx="2" />
-              <rect x="1090" y="830" width="60" height="40" rx="2" />
-              <rect x="1010" y="910" width="55" height="35" rx="2" />
-              <rect x="1080" y="910" width="50" height="35" rx="2" />
-
-              <rect x="1045" y="1380" width="55" height="35" rx="2" />
-              <rect x="980" y="1450" width="50" height="35" rx="2" />
-              <rect x="1050" y="1450" width="60" height="40" rx="2" />
-
-              <rect x="800" y="1650" width="50" height="30" rx="2" />
-              <rect x="760" y="1710" width="55" height="35" rx="2" />
-            </g>
-
-            {/* Industrial Container Infrastructure */}
-            <g>
-              <rect x="1360" y="970" width="30" height="12" fill="#DC2626" rx="1" />
-              <rect x="1360" y="985" width="30" height="12" fill="#2563EB" rx="1" />
-              <rect x="1395" y="970" width="30" height="12" fill="#F59E0B" rx="1" />
-              <rect x="1395" y="985" width="30" height="12" fill="#10B981" rx="1" />
-              <line x1="1410" y1="960" x2="1425" y2="925" stroke="#4B5563" strokeWidth="3" />
-              <line x1="1410" y1="925" x2="1440" y2="925" stroke="#4B5563" strokeWidth="2" />
-            </g>
-
-            {/* ================================================================= */}
-            {/* SECONDARY STREETS (Pure White with subtle border)                 */}
-            {/* ================================================================= */}
-            <g stroke={mapLayer === 'satellite' ? '#374151' : '#FFFFFF'} strokeWidth="7" fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M 1215,1180 L 1240,1120 L 1245,1100 L 1255,1040" />
-              <path d="M 1215,1180 L 1270,1250" />
-              <path d="M 1245,1100 L 1150,1100 L 1070,1080" />
-              <path d="M 1150,1100 L 1120,1160 L 1060,1210 L 1020,1260 L 1020,1420" />
-              <path d="M 1255,1040 L 1320,1040 L 1370,1060" />
-              <path d="M 1320,1040 L 1390,960" />
-              <path d="M 1245,1100 L 1330,1200 L 1420,1270" />
-              <path d="M 1330,1200 L 1380,1370" />
-              <path d="M 1020,1420 L 920,1560 L 820,1680 L 750,1750" />
-              <path d="M 980,800 L 1180,800 L 1200,800" />
-              <path d="M 980,850 L 1180,850 L 1220,840" />
-              <path d="M 980,900 L 1180,900" />
-              <path d="M 1050,750 L 1050,960" />
-              <path d="M 1110,750 L 1110,960" />
-              <path d="M 1180,880 L 1120,640" />
-            </g>
-
-            {/* ================================================================= */}
-            {/* PRIMARY ARTERIAL HIGHWAYS (Google Maps Gold #FBBC04)              */}
-            {/* ================================================================= */}
-            <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <path
-                d="M 1180,100 L 1200,200 L 1220,320 L 1140,440 L 1120,640 L 1080,750"
-                stroke={mapLayer === 'satellite' ? '#B45309' : '#F9AB00'}
-                strokeWidth="12"
-              />
-              <path
-                d="M 1180,100 L 1200,200 L 1220,320 L 1140,440 L 1120,640 L 1080,750"
-                stroke={mapLayer === 'satellite' ? '#F59E0B' : '#FEEA8C'}
-                strokeWidth="8"
-              />
-
-              <path
-                d="M 1120,640 L 1180,880 L 1255,1040 L 1330,1200 L 1480,1110 L 1650,1100"
-                stroke={mapLayer === 'satellite' ? '#B45309' : '#F9AB00'}
-                strokeWidth="11"
-              />
-              <path
-                d="M 1120,640 L 1180,880 L 1255,1040 L 1330,1200 L 1480,1110 L 1650,1100"
-                stroke={mapLayer === 'satellite' ? '#F59E0B' : '#FEEA8C'}
-                strokeWidth="7"
-              />
-
-              <path
-                d="M 700,1100 L 780,1350 L 920,1560 L 1150,1550 L 1380,1480 L 1650,1420 L 1850,1400"
-                stroke={mapLayer === 'satellite' ? '#B45309' : '#F9AB00'}
-                strokeWidth="12"
-              />
-              <path
-                d="M 700,1100 L 780,1350 L 920,1560 L 1150,1550 L 1380,1480 L 1650,1420 L 1850,1400"
-                stroke={mapLayer === 'satellite' ? '#F59E0B' : '#FEEA8C'}
-                strokeWidth="8"
-              />
-
-              <path
-                d="M 1050,960 L 1020,1420 L 920,1560 L 820,1680 L 750,1750 L 720,1950"
-                stroke={mapLayer === 'satellite' ? '#B45309' : '#F9AB00'}
-                strokeWidth="10"
-              />
-              <path
-                d="M 1050,960 L 1020,1420 L 920,1560 L 820,1680 L 750,1750 L 720,1950"
-                stroke={mapLayer === 'satellite' ? '#F59E0B' : '#FEEA8C'}
-                strokeWidth="6.5"
-              />
-
-              <path
-                d="M 1180,850 L 1220,840 L 1370,810 L 1550,800 L 1800,820"
-                stroke={mapLayer === 'satellite' ? '#B45309' : '#F9AB00'}
-                strokeWidth="10"
-              />
-              <path
-                d="M 1180,850 L 1220,840 L 1370,810 L 1550,800 L 1800,820"
-                stroke={mapLayer === 'satellite' ? '#F59E0B' : '#FEEA8C'}
-                strokeWidth="6.5"
-              />
-            </g>
-
-            {/* ================================================================= */}
-            {/* 5 BRIDGES ACROSS RED RIVER                                        */}
-            {/* ================================================================= */}
-            <g>
-              <line x1="1140" y1="440" x2="1220" y2="320" stroke="#DC2626" strokeWidth="4" />
-              {[0.15, 0.32, 0.5, 0.68, 0.85].map((t, idx) => {
-                const px = 1140 + (1220 - 1140) * t
-                const py = 440 + (320 - 440) * t
-                return (
-                  <g key={idx}>
-                    <line x1={px - 8} y1={py + 5} x2={px + 8} y2={py - 5} stroke="#FFFFFF" strokeWidth="2.5" />
-                    <circle cx={px} cy={py} r="3" fill="#DC2626" stroke="#FFFFFF" strokeWidth="1" />
-                  </g>
-                )
-              })}
-            </g>
-            <line x1="1200" y1="800" x2="1330" y2="770" stroke="#78350F" strokeWidth="6" />
-            <line x1="1220" y1="840" x2="1370" y2="810" stroke="#4B5563" strokeWidth="5" />
-            <line x1="1280" y1="1150" x2="1480" y2="1110" stroke="#4B5563" strokeWidth="7" />
-            <line x1="1380" y1="1480" x2="1650" y2="1420" stroke="#4B5563" strokeWidth="8" />
-
-            {/* ================================================================= */}
-            {/* RAILROAD TRACK                                                    */}
-            {/* ================================================================= */}
-            <g fill="none">
-              <path
-                d="M 1330,770 L 1200,800 L 1030,930 L 1025,1080 L 1245,1100 L 1020,1420 L 920,1560 L 820,1680 L 750,1750 L 720,1950"
-                stroke="#1F2937"
-                strokeWidth="6"
-              />
-              <path
-                d="M 1330,770 L 1200,800 L 1030,930 L 1025,1080 L 1245,1100 L 1020,1420 L 920,1560 L 820,1680 L 750,1750 L 720,1950"
-                stroke="url(#railPattern)"
-                strokeWidth="8"
-              />
-            </g>
-
-            {/* Railway Crossing Sign */}
-            <g transform="translate(1245, 1100)">
-              <circle cx="0" cy="0" r="10" fill="#EF4444" stroke="#FFFFFF" strokeWidth="2" />
-              <text x="0" y="3.5" fill="#FFFFFF" fontSize="9" fontWeight="bold" textAnchor="middle">✕</text>
-            </g>
-
-            {/* ================================================================= */}
-            {/* LIVE TRAFFIC OVERLAY                                              */}
-            {/* ================================================================= */}
-            {showTrafficLayer && (
-              <g fill="none" strokeLinecap="round" opacity="0.85">
-                <path d="M 1180,100 L 1200,200 L 1220,320 L 1140,440" stroke="#0F9D58" strokeWidth="3" />
-                <path d="M 1120,640 L 1180,880" stroke="#0F9D58" strokeWidth="3" />
-                <path d="M 700,1100 L 780,1350 L 920,1560" stroke="#0F9D58" strokeWidth="3" />
-                <path d="M 1380,1480 L 1650,1420" stroke="#0F9D58" strokeWidth="3" />
-                <path d="M 1140,440 L 1120,640" stroke="#F4B400" strokeWidth="3" />
-                <path d="M 1255,1040 L 1330,1200" stroke="#F4B400" strokeWidth="3" />
-                <path d="M 1020,1420 L 920,1560" stroke="#0F9D58" strokeWidth="2.5" />
-              </g>
-            )}
-
-            {/* ================================================================= */}
-            {/* CASE-SPECIFIC STREET LABELS ONLY (Zero real street name leaks)    */}
-            {/* ================================================================= */}
-            <g style={{ paintOrder: 'stroke fill' }} stroke="#FFFFFF" strokeWidth="3.5" fill="#4B5563" fontSize="10.5" fontWeight="600" fontFamily="sans-serif">
-              <text x="1235" y="1080">ĐƯỜNG BỜ SÔNG</text>
-              <text x="1335" y="1030">ĐƯỜNG BỜ KÈ</text>
-              <text x="1090" y="1075">ĐƯỜNG ĐOÀN KẾT</text>
-              <text x="1070" y="1170">PHỐ CẦU CẢNG</text>
-              <text x="1340" y="1250">ĐƯỜNG CHIẾN THẮNG</text>
-              <text x="1025" y="1410">PHỐ VỌNG</text>
-              <text x="760" y="1740">PHỐ CẦU BƯƠU</text>
-              <text x="1150" y="270">TRỤC CAO TỐC PHÍA BẮC</text>
-            </g>
-
-            {/* Area Label */}
-            <g fill="#70757A" fontSize="13" fontWeight="800" letterSpacing="3" fontFamily="sans-serif" opacity="0.65">
-              <text x="1160" y="1170">PHÂN KHU CẢNG</text>
-            </g>
-
-            {/* ================================================================= */}
-            {/* NAVIGATION ROUTE POLYLINES                                        */}
-            {/* ================================================================= */}
-            {/* 1. Alternative Route (Gray Line) */}
-            {baseRoute.alternativePoints && baseRoute.alternativePoints.length > 1 && (
-              <g
-                className="cursor-pointer pointer-events-auto"
-                onClick={() => setUseAlternativeRoute(!useAlternativeRoute)}
-              >
-                <path
-                  d={baseRoute.alternativePoints.reduce(
-                    (acc, pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `${acc} L ${pt.x},${pt.y}`),
-                    ''
-                  )}
-                  stroke={useAlternativeRoute ? '#1A73E8' : '#9AA0A6'}
-                  strokeWidth={useAlternativeRoute ? 7 : 5.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                  opacity={useAlternativeRoute ? 1 : 0.75}
-                />
-              </g>
-            )}
-
-            {/* 2. Primary Route (Google Maps Blue Polyline with White Casing) */}
-            {baseRoute.points.length > 1 && (
-              <g
-                filter="url(#routeGlow)"
-                className="cursor-pointer pointer-events-auto"
-                onClick={() => setUseAlternativeRoute(false)}
-              >
-                <path
-                  d={baseRoute.points.reduce(
-                    (acc, pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `${acc} L ${pt.x},${pt.y}`),
-                    ''
-                  )}
-                  stroke="#FFFFFF"
-                  strokeWidth={useAlternativeRoute ? 7 : 9}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-                <path
-                  d={baseRoute.points.reduce(
-                    (acc, pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `${acc} L ${pt.x},${pt.y}`),
-                    ''
-                  )}
-                  stroke={useAlternativeRoute ? '#9AA0A6' : '#1A73E8'}
-                  strokeWidth={useAlternativeRoute ? 5 : 7}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-              </g>
-            )}
-
-            {/* REAL-TIME MOVING VEHICLE / NAVIGATION PUCK */}
-            {isNavigating && (
-              <g
-                transform={`translate(${vehiclePos.x}, ${vehiclePos.y})`}
-                className="transition-transform duration-700 pointer-events-none"
-              >
-                <path
-                  d="M 0,-6 L -20,-45 L 20,-45 Z"
-                  fill="url(#riverGrad)"
-                  opacity="0.35"
-                />
-                <circle cx="0" cy="0" r="10" fill="#1A73E8" stroke="#FFFFFF" strokeWidth="3" className="shadow-2xl" />
-                <path d="M 0,-4 L 3.5,4 L 0,2 L -3.5,4 Z" fill="#FFFFFF" />
-              </g>
-            )}
-          </svg>
-
-          {/* =================================================================== */}
-          {/* FLOATING ROUTE TIME BUBBLE                                          */}
-          {/* =================================================================== */}
-          {activeRoute.points.length > 1 && !isNavigating && (
-            <div
-              className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-1/2 shadow-xl rounded-full px-2.5 py-1 bg-[#1A73E8] text-white flex items-center gap-1 text-[10.5px] font-bold border-2 border-white animate-in zoom-in-75 cursor-pointer"
-              style={{
-                left: routeMidpoint.x,
-                top: routeMidpoint.y - 16
-              }}
-              onClick={() => setUseAlternativeRoute(false)}
-            >
-              <Car className="size-3" />
-              <span>{activeRoute.durationText}</span>
-              <span className="opacity-80">({activeRoute.distanceText})</span>
-            </div>
-          )}
-
-          {/* Alternative Route Pill */}
-          {baseRoute.alternativePoints && !useAlternativeRoute && !isNavigating && (
-            <div
-              className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-1/2 shadow-md rounded-full px-2 py-0.5 bg-white text-gray-700 flex items-center gap-1 text-[9.5px] font-semibold border border-gray-300 cursor-pointer hover:bg-gray-50"
-              style={{
-                left: routeMidpoint.x + 40,
-                top: routeMidpoint.y + 20
-              }}
-              onClick={() => setUseAlternativeRoute(true)}
-              title="Nhấn để chọn tuyến đường thay thế này"
-            >
-              <span>{baseRoute.alternativeDurationText}</span>
-            </div>
-          )}
-
-          {/* =================================================================== */}
-          {/* DROPPED PIN                                                         */}
-          {/* =================================================================== */}
-          {droppedPin && (
-            <div
-              className="absolute pointer-events-auto -translate-x-1/2 -translate-y-full cursor-pointer z-40 animate-in zoom-in-50"
-              style={{ left: droppedPin.x, top: droppedPin.y }}
-            >
-              <div className="relative flex flex-col items-center">
-                <MapPin className="size-9 text-[#EA4335] fill-[#EA4335] drop-shadow-lg animate-bounce" />
-                <span className="px-2 py-0.5 rounded-full bg-black/90 text-white text-[9px] font-bold shadow-md whitespace-nowrap -mt-1 border border-white/20">
-                  Ghim đã thả
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* =================================================================== */}
-          {/* AUTHENTIC GOOGLE MAPS POI PINS                                      */}
-          {/* =================================================================== */}
-          {CASE_LOCATIONS.map((loc) => {
-            const isOrigin = loc.id === origin.id
-            const isDestination = loc.id === destination.id
-
-            const getPoiIcon = () => {
-              switch (loc.category) {
-                case 'food':
-                  return <Utensils className="size-2.5" />
-                case 'shopping':
-                  return <ShoppingBag className="size-2.5" />
-                case 'transit':
-                  return loc.id === 'loc-18' ? <Plane className="size-2.5" /> : <Bus className="size-2.5" />
-                case 'finance':
-                  return <Landmark className="size-2.5" />
-                case 'public':
-                  return <Building className="size-2.5" />
-                case 'residential':
-                default:
-                  return <MapPin className="size-2.5 fill-white" />
-              }
-            }
-
-            return (
-              <div
-                key={loc.id}
-                className="map-pin-btn absolute pointer-events-auto -translate-x-1/2 -translate-y-full cursor-pointer group"
-                style={{ left: loc.x, top: loc.y }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handlePinClick(loc)
-                }}
-              >
-                {/* 1. Origin Pin A: Google Maps Blue Radar Puck */}
-                {isOrigin ? (
-                  <div className="flex flex-col items-center">
-                    <div className="size-7 rounded-full bg-[#1A73E8] text-white flex items-center justify-center shadow-lg border-2 border-white ring-4 ring-blue-400/40 animate-pulse">
-                      <Circle className="size-2.5 fill-white text-white" />
-                    </div>
-                    <span className="mt-1 px-2 py-0.5 rounded-full bg-[#1A73E8] text-white text-[9.5px] font-bold shadow-md whitespace-nowrap border border-white">
-                      A: {loc.name}
-                    </span>
-                  </div>
-                ) : isDestination ? (
-                  /* 2. Destination Pin B: Google Maps Teardrop Red Pin */
-                  <div className="flex flex-col items-center">
-                    <div className="relative">
-                      <MapPin className="size-9 text-[#EA4335] fill-[#EA4335] drop-shadow-md" />
-                      <div className="absolute top-2 left-1/2 -translate-x-1/2 size-2.5 rounded-full bg-white shadow-inner" />
-                    </div>
-                    <span className="px-2 py-0.5 rounded-full bg-[#EA4335] text-white text-[9.5px] font-bold shadow-md whitespace-nowrap border border-white -mt-1">
-                      B: {loc.name}
-                    </span>
-                  </div>
-                ) : (
-                  /* 3. Regular Google Maps POI Badge */
-                  <div className="flex flex-col items-center transition-transform hover:scale-110">
-                    <div
-                      className={cn(
-                        'size-5 rounded-full flex items-center justify-center shadow-sm border border-white text-white transition-all',
-                        loc.category === 'residential'
-                          ? 'bg-slate-600'
-                          : loc.category === 'food'
-                          ? 'bg-orange-600'
-                          : loc.category === 'shopping'
-                          ? 'bg-blue-600'
-                          : loc.category === 'transit'
-                          ? 'bg-cyan-700'
-                          : loc.category === 'finance'
-                          ? 'bg-emerald-600'
-                          : 'bg-gray-600',
-                        'hover:ring-2 hover:ring-blue-500'
-                      )}
-                    >
-                      {getPoiIcon()}
-                    </div>
-                    <span
-                      style={{ paintOrder: 'stroke fill' }}
-                      className="mt-0.5 text-[9px] font-semibold text-gray-800 whitespace-nowrap select-none drop-shadow-xs stroke-white stroke-[2.5px]"
-                    >
-                      {loc.shortName}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-
-        {/* ======================================================================= */}
-        {/* MAP FLOATING CONTROLS                                                   */}
-        {/* ======================================================================= */}
-        <div className="absolute bottom-4 left-3 z-20 pointer-events-none flex flex-col items-start gap-0.5">
-          <div className="h-1 w-12 border-b-2 border-l-2 border-r-2 border-gray-700 bg-black/10" />
-          <span className="text-[9px] font-mono font-bold text-gray-700 drop-shadow-xs bg-white/70 px-1 rounded">
-            {scaleMeters} m
-          </span>
-        </div>
-
-        <div className="absolute right-3 bottom-24 z-20 flex flex-col gap-2 pointer-events-auto">
-          <button
-            onClick={() => {
-              setPan({ x: -750, y: -520 })
-              setZoom(0.75)
-              setIs3DView(false)
-            }}
-            className="size-9 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center cursor-pointer transition-all active:scale-95"
-            title="Đặt lại góc nhìn La bàn (Bắc)"
-          >
-            <Compass className="size-5 text-red-500" />
-          </button>
-
-          <button
-            onClick={() => setIs3DView(!is3DView)}
-            className={cn(
-              'size-9 rounded-full shadow-md border flex items-center justify-center cursor-pointer transition-all active:scale-95 text-[11px] font-bold font-mono',
-              is3DView
-                ? 'bg-[#1A73E8] text-white border-blue-600'
-                : 'bg-white text-gray-700 hover:text-[#1A73E8] border-gray-200'
-            )}
-            title="Góc nhìn 3D nghiêng"
-          >
-            3D
-          </button>
-
-          <button
-            onClick={() => setShowLayersSheet(true)}
-            className="size-9 rounded-full bg-white shadow-md border border-gray-200 text-gray-700 hover:text-[#1A73E8] flex items-center justify-center cursor-pointer transition-all active:scale-95"
-            title="Lớp bản đồ"
-          >
-            <Layers className="size-4" />
-          </button>
-
-          <button
-            onClick={handleCenterMyLocation}
-            className={cn(
-              'size-9 rounded-full shadow-md border flex items-center justify-center cursor-pointer transition-all active:scale-95',
-              isCentered
-                ? 'bg-[#1A73E8] text-white border-blue-600'
-                : 'bg-white text-gray-600 hover:text-[#1A73E8] border-gray-200'
-            )}
-            title="Định vị về Vị trí của bạn"
-          >
-            <Crosshair className="size-4" />
-          </button>
-
-          <div className="flex flex-col bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-            <button
-              onClick={() => {
-                setZoom((z) => Math.min(2.5, z + 0.25))
-                setIsCentered(false)
-              }}
-              className="size-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 border-b border-gray-100 font-bold text-sm cursor-pointer"
-              title="Phóng to"
-            >
-              +
-            </button>
-            <button
-              onClick={() => {
-                setZoom((z) => Math.max(0.35, z - 0.25))
-                setIsCentered(false)
-              }}
-              className="size-8 flex items-center justify-center text-gray-700 hover:bg-gray-100 font-bold text-sm cursor-pointer"
-              title="Thu nhỏ"
-            >
-              −
-            </button>
-          </div>
-        </div>
-      </div>
+      <VectorMapCanvas
+        pan={pan}
+        zoom={zoom}
+        is3DView={is3DView}
+        mapLayer={mapLayer}
+        showTrafficLayer={showTrafficLayer}
+        origin={origin}
+        destination={destination}
+        activeRoute={activeRoute}
+        baseRoute={baseRoute}
+        useAlternativeRoute={useAlternativeRoute}
+        setUseAlternativeRoute={setUseAlternativeRoute}
+        isNavigating={isNavigating}
+        vehiclePos={vehiclePos}
+        droppedPin={droppedPin}
+        caseLocations={CASE_LOCATIONS}
+        selectedPlace={selectedPlace}
+        handlePinClick={handlePinClick}
+        handleMapClick={handleMapClick}
+        handleMouseDown={handleMouseDown}
+        handleMouseMove={handleMouseMove}
+        handleMouseUp={handleMouseUp}
+        mapContainerRef={mapContainerRef}
+        scaleMeters={scaleMeters}
+        setPan={setPan}
+        setZoom={setZoom}
+        setIs3DView={setIs3DView}
+        setShowLayersSheet={setShowLayersSheet}
+        handleCenterMyLocation={handleCenterMyLocation}
+        isCentered={isCentered}
+        setIsCentered={setIsCentered}
+        routeMidpoint={routeMidpoint}
+        showRoutePolyline={activeTab === 'directions' || isNavigating}
+      />
 
       {/* ========================================================================= */}
       {/* 3. GOOGLE MAPS BOTTOM SHEET & PLACE DETAILS / ROUTE SUMMARY               */}

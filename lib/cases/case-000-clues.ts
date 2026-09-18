@@ -13,7 +13,10 @@ export const DOCUMENT_EVIDENCE_MAP: Record<string, { id: string; label: string; 
   '0': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
   '00': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
   '000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
+  '0000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
+  '00000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
   'doc_000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
+  'doc_0000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
   '1': { id: 'doc_01_phieu_tn', label: 'Phiếu tiếp nhận tin báo từ bà Lụa (06:45)', code: '01' },
   '01': { id: 'doc_01_phieu_tn', label: 'Phiếu tiếp nhận tin báo từ bà Lụa (06:45)', code: '01' },
   '2': { id: 'doc_02_hien_truong', label: 'Biên bản khám nghiệm hiện trường', code: '02' },
@@ -63,62 +66,80 @@ export const DOCUMENT_EVIDENCE_MAP: Record<string, { id: string; label: string; 
   'dev-00': { id: 'sms_dev00', label: 'Tin nhắn trên điện thoại Khang', code: '11' },
 }
 
+import {
+  isAdminBypassCode,
+  hasAdminBypassInArray,
+  ADMIN_MASTER_EVIDENCE,
+  ADMIN_MASTER_EVIDENCE_ID,
+} from './admin-bypass'
+
+export {
+  isAdminBypassCode,
+  hasAdminBypassInArray,
+  ADMIN_MASTER_EVIDENCE,
+  ADMIN_MASTER_EVIDENCE_ID,
+}
+
 export function checkMotiveValid(characterId: string, selectedIds: string[]): boolean {
   if (!characterId || selectedIds.length === 0) return false
 
-  const has000 =
-    selectedIds.includes('doc_000') ||
-    selectedIds.includes('000') ||
-    selectedIds.includes('0') ||
-    selectedIds.some((id) => id.includes('000') || id === 'doc_000')
+  if (hasAdminBypassInArray(selectedIds)) return true
 
-  if (has000) return true
-
-  const hasDoc1 = selectedIds.includes('doc_01_phieu_tn') || selectedIds.includes('doc_01') || selectedIds.includes('doc_1')
-  const hasDoc2 = selectedIds.includes('doc_02_hien_truong') || selectedIds.includes('doc_02') || selectedIds.includes('doc_2')
-  const hasDoc3 = selectedIds.includes('doc_03_so_do') || selectedIds.includes('doc_03') || selectedIds.includes('doc_3')
-  const hasSms123 = selectedIds.some(
-    (id) => id.startsWith('sms_phone_') && id.replace(/\D/g, '').includes('123')
-  )
-
-  if (characterId === 'vu' || characterId === 'tung' || characterId === 'ha') {
-    return hasDoc1 && hasDoc2 && hasDoc3 && hasSms123
+  if (characterId === 'vu') {
+    // Vũ: Sổ tay ghi nợ (doc_10_so_no / doc_13_don_dat / 10 / 13) và Tin nhắn trên máy Khang (sms_dev00 / 11 / sms_phone_0988200991 / p6_anh_vu)
+    const hasSoNo = selectedIds.some((id) => ['doc_10_so_no', 'doc_13_don_dat', 'doc_10', 'doc_13', '10', '13'].includes(id))
+    const hasSms = selectedIds.some((id) => ['sms_dev00', 'p6_anh_vu', '11', '19'].includes(id) || id.includes('0988200991') || id.includes('0988.200.991') || id.includes('sms_phone_'))
+    return hasSoNo || hasSms || selectedIds.length >= 2
   }
 
-  return false
+  if (characterId === 'tung') {
+    // Tùng: Các mảnh báo cũ (p5_manh_bao / 18), Khung ảnh vỡ (p4_anh_1996 / 16 / 40), hoặc SMS 0912331888
+    const hasManhBao = selectedIds.some((id) => ['p5_manh_bao', 'p4_anh_1996', '18', '16', '40'].includes(id))
+    const hasSms = selectedIds.some((id) => id.includes('0912331888') || id.includes('0912.331.888') || id.includes('sms_phone_') || id === 'sms_dev00')
+    return hasManhBao || hasSms || selectedIds.length >= 2
+  }
+
+  if (characterId === 'ha') {
+    // Hà: Tin nhắn SĐT Vy (0978552109), SMS trên máy Khang, hoặc sổ nợ
+    const hasSms = selectedIds.some((id) => id.includes('0978552109') || id.includes('0978.552.109') || id.includes('sms_phone_') || id === 'sms_dev00' || id === 'doc_10_so_no')
+    return hasSms || selectedIds.length >= 1
+  }
+
+  return selectedIds.length > 0
 }
 
 export function checkAlibiValid(characterId: string, selectedIds: string[]): boolean {
   if (!characterId || selectedIds.length === 0) return false
 
-  const has000 =
-    selectedIds.includes('doc_000') ||
-    selectedIds.includes('000') ||
-    selectedIds.includes('0') ||
-    selectedIds.some((id) => id.includes('000') || id === 'doc_000')
+  if (hasAdminBypassInArray(selectedIds)) return true
 
-  if (has000) return true
-
-  const hasDoc4 = selectedIds.includes('doc_04_tu_thi') || selectedIds.includes('doc_04') || selectedIds.includes('doc_4')
-  const hasDoc5 = selectedIds.includes('doc_05_kham_nghiem') || selectedIds.includes('doc_05') || selectedIds.includes('doc_5')
-  const hasDoc6 = selectedIds.includes('doc_06_loi_khai_lua') || selectedIds.includes('doc_06') || selectedIds.includes('doc_6')
-  const hasVoice456 = selectedIds.some(
-    (id) => id.startsWith('voice_phone_') && id.replace(/\D/g, '').includes('456')
-  )
-
-  if (characterId === 'vu' || characterId === 'tung' || characterId === 'ha') {
-    return hasDoc4 && hasDoc5 && hasDoc6 && hasVoice456
+  if (characterId === 'vu') {
+    // Vũ: App đặt xe (p10_app_xe / 12 / 42), Lời khai Lụa (doc_06_loi_khai_lua / 06 / 10), Lời khai Vũ (doc_07b_loi_khai_vu / 07b / 08)
+    const hasApp = selectedIds.some((id) => ['p10_app_xe', 'doc_06_loi_khai_lua', 'doc_07b_loi_khai_vu', '12', '06', '07b', '10', '42'].includes(id))
+    return hasApp || selectedIds.length >= 2
   }
 
-  return false
+  if (characterId === 'tung') {
+    // Tùng: Dấu vân tay (p4_van_tay / 17 / 20 / 41), Lời khai Tùng (doc_14_loi_khai_tung / 14)
+    const hasVanTay = selectedIds.some((id) => ['p4_van_tay', 'doc_14_loi_khai_tung', '17', '14', '20', '41'].includes(id))
+    return hasVanTay || selectedIds.length >= 2
+  }
+
+  if (characterId === 'ha') {
+    // Hà: Lời khai Hà (doc_07d_loi_khai_ha / 07d / 12 / 44) và (Voice còi tàu 0984112568 / Lịch VTV3 / Tin nhắn)
+    const hasHa = selectedIds.some((id) => ['doc_07d_loi_khai_ha', 'doc_voice_coi_tau', 'doc_lich_vtv3', '07d', '20', '21', '12', '44'].includes(id) || id.includes('voice_phone_') || id.includes('0984112568'))
+    return hasHa || selectedIds.length >= 2
+  }
+
+  return selectedIds.length > 0
 }
 
 export function resolveEvidenceCode(rawInput: string): { id: string; label: string; code: string } | null {
   const trimmed = rawInput.trim()
   if (!trimmed) return null
 
-  if (trimmed === '000' || trimmed === '00' || trimmed === '0' || trimmed.toLowerCase() === 'doc_000') {
-    return { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' }
+  if (isAdminBypassCode(trimmed)) {
+    return ADMIN_MASTER_EVIDENCE
   }
 
   const digitsOnly = trimmed.replace(/\D/g, '')

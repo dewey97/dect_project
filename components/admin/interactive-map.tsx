@@ -287,8 +287,12 @@ export function InteractiveMap({ nodes, onNodesChange, selectedNodeId, onSelectN
               <div className={`px-2 py-1 mb-1 rounded-md text-[10px] font-medium shadow-xl whitespace-nowrap transition-colors ${selectedNodeId === node.id ? 'bg-primary text-primary-foreground' : 'bg-zinc-900 border border-white/10 text-zinc-300 group-hover:bg-zinc-800'}`}>
                 {node.title}
               </div>
-              <div className={`size-4 rounded-full border-2 shadow-lg ${selectedNodeId === node.id ? 'bg-primary border-primary-foreground animate-pulse' : 'bg-zinc-400 border-zinc-900 group-hover:bg-zinc-200'}`} />
-              <div className="w-0.5 h-4 bg-gradient-to-b from-white/50 to-transparent" />
+              <img
+                src={selectedNodeId === node.id ? "/images/pins/pin-red.png" : "/images/pins/pin-yellow.png"}
+                alt="3D Pin"
+                className="w-[26px] h-[26px] object-contain drop-shadow-md select-none pointer-events-none -mb-1 group-hover:scale-110 transition-transform"
+                draggable={false}
+              />
             </button>
           ))}
         </div>

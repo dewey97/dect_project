@@ -44,59 +44,29 @@ export const DotNode = memo(({ data }: NodeProps) => {
         )}
 
         {isLocked ? (
-          /* Locked Gray Pinhead */
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] opacity-70">
-            <defs>
-              <radialGradient id="grayPinGrad" cx="35%" cy="35%" r="65%">
-                <stop offset="0%" stopColor="#d4d4d8" />
-                <stop offset="60%" stopColor="#71717a" />
-                <stop offset="100%" stopColor="#27272a" />
-              </radialGradient>
-            </defs>
-            <ellipse cx="14" cy="15" rx="7" ry="4" fill="rgba(0,0,0,0.4)" />
-            <circle cx="12" cy="12" r="9" fill="url(#grayPinGrad)" stroke="#3f3f46" strokeWidth="1.2" />
-            <ellipse cx="9.5" cy="9.5" rx="3" ry="1.8" fill="rgba(255,255,255,0.6)" transform="rotate(-30 9.5 9.5)" />
-          </svg>
+          /* Locked Dark Slate Pin */
+          <img
+            src="/images/pins/pin-dark.png"
+            alt="Locked Pin"
+            className="w-[30px] h-[30px] object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] opacity-80 pointer-events-none select-none"
+            draggable={false}
+          />
         ) : isMain ? (
-          /* Red Main Map Pinhead (Exact HeroInteractive Landing Page Style) */
-          <svg width="28" height="28" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_4px_10px_rgba(239,68,68,0.7)] group-hover:drop-shadow-[0_4px_16px_rgba(239,68,68,1)] transition-all">
-            <defs>
-              <radialGradient id="redMainPinGrad" cx="35%" cy="35%" r="65%">
-                <stop offset="0%" stopColor="#ff7777" />
-                <stop offset="50%" stopColor="#cc2222" />
-                <stop offset="85%" stopColor="#880000" />
-                <stop offset="100%" stopColor="#440000" />
-              </radialGradient>
-            </defs>
-            {/* Ground Shadow */}
-            <ellipse cx="15" cy="16" rx="9" ry="5" fill="rgba(0,0,0,0.55)" />
-            {/* Outer Ring */}
-            <circle cx="13" cy="13" r="11" fill="rgba(200, 35, 35, 0.25)" stroke="rgba(255, 100, 100, 0.4)" strokeWidth="1" />
-            {/* 3D Sphere Pin Dome */}
-            <circle cx="13" cy="13" r="9" fill="url(#redMainPinGrad)" stroke="#660000" strokeWidth="1.5" />
-            {/* Specular White Highlight */}
-            <ellipse cx="10" cy="9.5" rx="3.5" ry="2" fill="rgba(255,255,255,0.85)" transform="rotate(-30 10 9.5)" />
-          </svg>
+          /* Red Main 3D Pushpin */
+          <img
+            src="/images/pins/pin-red.png"
+            alt="Main Target Pin"
+            className="w-[30px] h-[30px] object-contain drop-shadow-[0_3px_10px_rgba(239,68,68,0.6)] group-hover:drop-shadow-[0_5px_14px_rgba(239,68,68,0.85)] group-hover:scale-110 transition-all duration-200 pointer-events-none select-none"
+            draggable={false}
+          />
         ) : (
-          /* Yellow Sub Map Pinhead (Exact HeroInteractive Landing Page Style) */
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_3px_6px_rgba(245,158,11,0.6)] group-hover:drop-shadow-[0_3px_10px_rgba(245,158,11,0.95)] transition-all">
-            <defs>
-              <radialGradient id="yellowSubPinGrad" cx="35%" cy="35%" r="65%">
-                <stop offset="0%" stopColor="#ffdd66" />
-                <stop offset="50%" stopColor="#ccaa22" />
-                <stop offset="85%" stopColor="#886600" />
-                <stop offset="100%" stopColor="#443300" />
-              </radialGradient>
-            </defs>
-            {/* Ground Shadow */}
-            <ellipse cx="14" cy="15" rx="7.5" ry="4" fill="rgba(0,0,0,0.45)" />
-            {/* Outer Ring */}
-            <circle cx="12" cy="12" r="9" fill="rgba(204, 170, 34, 0.2)" stroke="rgba(255, 221, 102, 0.4)" strokeWidth="1" />
-            {/* 3D Sphere Pin Dome */}
-            <circle cx="12" cy="12" r="7.5" fill="url(#yellowSubPinGrad)" stroke="#554400" strokeWidth="1.2" />
-            {/* Specular White Highlight */}
-            <ellipse cx="9.5" cy="9" rx="3" ry="1.6" fill="rgba(255,255,255,0.85)" transform="rotate(-30 9.5 9)" />
-          </svg>
+          /* Yellow/Amber 3D Pushpin */
+          <img
+            src="/images/pins/pin-yellow.png"
+            alt="Clue Pin"
+            className="w-[30px] h-[30px] object-contain drop-shadow-[0_3px_8px_rgba(245,158,11,0.45)] group-hover:drop-shadow-[0_4px_12px_rgba(245,158,11,0.8)] group-hover:scale-110 transition-all duration-200 pointer-events-none select-none"
+            draggable={false}
+          />
         )}
       </div>
 
