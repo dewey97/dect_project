@@ -10,7 +10,7 @@ Số: `04/BC-XMNT`
 
 ---
 
-# BÁO CÁO XÁC MINH NHÂN THÂN NẠN NHÂN
+# BÁO CÁO XÁC MINH NHÂN THÂN, LAI LỊCH CỦA NẠN NHÂN
 *(Nạn nhân: Nguyễn Văn Khang — Vụ án mạng số 14 Đường Bờ Sông)*
 
 ---
