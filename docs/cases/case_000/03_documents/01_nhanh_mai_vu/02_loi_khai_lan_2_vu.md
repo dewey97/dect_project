@@ -22,7 +22,7 @@ Vào hồi 17 giờ 45 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 
 **Tiến hành lấy lời khai lần 02 đối tượng:**
 * **Họ và tên:** **LÊ QUANG VŨ** | **Giới tính:** Nam | **Sinh ngày:** 20/09/1991.
-* **Nơi ở hiện nay:** Số 45, Đường Đoàn Kết, Phường Phân Khu Cảng, TP. Hà Nội.
+* **Nơi ở hiện nay:** Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội.
 
 ---
 
