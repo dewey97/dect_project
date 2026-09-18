@@ -106,9 +106,14 @@ Dưới đây là danh sách **100% toàn bộ các đoạn văn bản dẫn tru
 ### 1. Văn bản Dẫn truyện các Giai đoạn
 
 #### 🎙️ Giai đoạn 0 — Đêm 24/07/2016:
-> *"Căn nhà cũ số 14 Đường Bờ Sông chìm trong bóng tối tịch mịch.*  
-> *Mùi trà hoa cúc quyện lẫn vị máu tanh nồng bốc lên từ bộ bình thủy tinh vỡ vụn dưới sàn phòng khách...*  
-> *Tiếng bước chân lẩn khuất ngoài ngõ vắng vừa biến mất. Nạn nhân Khang gục xuống, nhưng sự thật dường như vẫn còn bị phong ấn..."*
+> *"Căn nhà cũ số 14 Đường Bờ Sông chìm trong bóng tối...*  
+> *Chỉ có mùi máu bốc lên và ấm trà vỡ vụn dưới sàn phòng khách...*  
+>  
+> *Nạn nhân Khang đã gục xuống. Tiếng bước chân lẩn khuất ngoài ngõ vắng vừa biến mất.*  
+>  
+> *Hung thủ đã kịp trốn vào màn đêm. Tội ác giờ đây đang bị ẩn giấu đằng sau những manh mối ngổn ngang.*  
+>  
+> *Trò chơi trốn tìm sinh tử chính thức bắt đầu - và bạn chính là người đi tìm sự thật."*
 
 #### 🎙️ Giai đoạn 1 — Sáng 25/07/2016:
 > *"Manh mối thu thập từ điện thoại nạn nhân đã mở ra những dấu vết đầu tiên.*  

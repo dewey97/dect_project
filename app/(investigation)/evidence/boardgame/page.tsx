@@ -125,7 +125,7 @@ export default function BoardGameCompanionPage() {
     try {
       localStorage.setItem('veritas_play_experience', 'web')
     } catch {}
-    router.push('/evidence')
+    router.push('/evidence/web')
   }
 
   const resetFindingsProgress = () => {

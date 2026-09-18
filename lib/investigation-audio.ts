@@ -96,7 +96,7 @@ class DetectiveAudioSystem {
 
   /** Trần Thị Hà voicemail lúc 20:32 (lẫn tiếng còi tàu 68dB vạch trần hiện trường) */
   public playHaVoicemail(): void {
-    this.play('ha_voicemail_2032.mp3', 0.9)
+    this.play('ha_voicemail_2032_v3.mp3', 0.95)
   }
 
   /** Trần Thị Hà lời khai thẩm vấn 2016 bị dồn ép */

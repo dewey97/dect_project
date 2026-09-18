@@ -12,14 +12,8 @@ interface FollowupQuestionModalProps {
   culprit: 'vu' | 'tung' | 'ha' | null
   onClose: () => void
   onSuccess?: (culprit: 'vu' | 'tung' | 'ha', choice?: string) => void
+  onOpenDossier?: (dossierType: 'A' | 'B' | 'C') => void
 }
-
-const MOCK_OPTIONS_VU = [
-  { id: 'opt-1', label: 'Phương án A: Khai man diện tích đất từ 75m2 thành 120m2 để trục lợi đền bù.' },
-  { id: 'opt-2', label: 'Phương án B: Lén đột nhập vào nhà Khang qua cửa sau để tiêu hủy giấy vay nợ 350 triệu.' },
-  { id: 'opt-3', label: 'Phương án C: Tống tiền nạn nhân Khang bằng các bằng chứng gian lận địa chính.' },
-  { id: 'opt-4', label: 'Phương án D: Cả phương án A và B đều đúng.' }
-]
 
 const MOCK_OPTIONS_TUNG = [
   { id: 'tin', label: 'TIN' },
@@ -67,9 +61,13 @@ export function FollowupQuestionModal({
   isOpen,
   culprit,
   onClose,
-  onSuccess
+  onSuccess,
+  onOpenDossier
 }: FollowupQuestionModalProps) {
-  // State for Vu / Tung
+  // State for Vu time input
+  const [vuTimeInput, setVuTimeInput] = useState<string>('')
+
+  // State for Tung
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   
   // State for Ha 3-Tile Matching
@@ -90,6 +88,13 @@ export function FollowupQuestionModal({
         const savedHa = localStorage.getItem('veritas_followup_ha_matches')
         if (savedHa) {
           setHaTileSelections(JSON.parse(savedHa))
+        }
+      } else if (culprit === 'vu') {
+        const savedVu = localStorage.getItem('veritas_followup_vu')
+        if (savedVu) {
+          setVuTimeInput(savedVu)
+        } else {
+          setVuTimeInput('')
         }
       } else {
         const saved = localStorage.getItem(`veritas_followup_${culprit}`)
@@ -162,7 +167,32 @@ export function FollowupQuestionModal({
     } catch {}
   }
 
-  const handleSubmitVuTung = (e: React.FormEvent) => {
+  const handleSubmitVu = (e: React.FormEvent) => {
+    e.preventDefault()
+    const normalized = vuTimeInput.trim().toLowerCase().replace(/\s+/g, '')
+    if (!normalized) {
+      setErrorMsg('Vui lòng nhập mốc thời gian!')
+      detectiveAudio.playGlassSound()
+      return
+    }
+
+    if (normalized === '21:15' || normalized === '21h15') {
+      detectiveAudio.playStampSound()
+      setErrorMsg('')
+      try {
+        localStorage.setItem('veritas_followup_vu', '21:15')
+      } catch {}
+      if (onSuccess) {
+        onSuccess('vu', '21:15')
+      }
+      onClose()
+    } else {
+      detectiveAudio.playGlassSound()
+      setErrorMsg('⚠️ Đáp án chưa chính xác. Vui lòng kiểm tra lại mốc thời gian trong Hồ sơ A!')
+    }
+  }
+
+  const handleSubmitTung = (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedOption) {
       setErrorMsg('Vui lòng tích chọn một phương án trả lời!')
@@ -173,17 +203,16 @@ export function FollowupQuestionModal({
     detectiveAudio.playStampSound()
     setErrorMsg('')
     try {
-      localStorage.setItem(`veritas_followup_${culprit}`, selectedOption)
+      localStorage.setItem('veritas_followup_tung', selectedOption)
     } catch {}
     if (onSuccess) {
-      onSuccess(culprit, selectedOption)
+      onSuccess('tung', selectedOption)
     }
     onClose()
   }
 
   const handleSubmitHa = (e: React.FormEvent) => {
     e.preventDefault()
-    // Auto-fill bypass if not all matched yet
     const finalSelections = allHaTilesMatched
       ? haTileSelections
       : {
@@ -204,13 +233,7 @@ export function FollowupQuestionModal({
     onClose()
   }
 
-  const questionText = isVu
-    ? 'Hành vi và động cơ mấu chốt nào dẫn tới sự hiện diện của Lê Quang Vũ tại hiện trường vào đêm xảy ra án mạng 24/07?'
-    : isTung
-    ? 'Bạn có tin Tùng thực sự vô tội không?'
-    : 'Khớp nối các vật chứng quan trọng thu giữ tại phòng trọ và thân thể Trần Thị Hà với các tài liệu, dấu vết ban đầu tại hiện trường:'
-
-  const options = isVu ? MOCK_OPTIONS_VU : MOCK_OPTIONS_TUNG
+  const questionTextTung = 'Toàn bộ hành tung của Nguyễn Thanh Tùng trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?'
 
   return (
     <AnimatePresence>
@@ -225,11 +248,25 @@ export function FollowupQuestionModal({
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <HelpCircle className="size-5 text-amber-800" />
-              <h3 className="font-mono font-bold text-xs sm:text-sm md:text-base text-[#1a120b] uppercase tracking-wider">
-                {isHa
-                  ? 'HỒ SƠ MỞ RỘNG // ĐỐI SOÁT CHỨNG CỨ KHÁM XÉT TRẦN THỊ HÀ'
-                  : 'HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN'}
-              </h3>
+              <div>
+                <h3 className="font-mono font-bold text-xs sm:text-sm md:text-base text-[#1a120b] uppercase tracking-wider">
+                  {isHa
+                    ? 'HỒ SƠ MỞ RỘNG // ĐỐI SOÁT CHỨNG CỨ KHÁM XÉT TRẦN THỊ HÀ'
+                    : isVu
+                    ? 'CÂU HỎI ĐIỀU TRA'
+                    : 'HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN'}
+                </h3>
+                {isVu && (
+                  <span className="font-mono text-xs font-bold text-[#8c1d1d] block mt-0.5">
+                    Đối tượng: Lê Quang Vũ
+                  </span>
+                )}
+                {isTung && (
+                  <span className="font-mono text-xs font-bold text-[#8c1d1d] block mt-0.5">
+                    Đối tượng: Nguyễn Thanh Tùng
+                  </span>
+                )}
+              </div>
             </div>
 
             <button
@@ -241,8 +278,81 @@ export function FollowupQuestionModal({
             </button>
           </div>
 
-          {/* FORM BODY FOR HA */}
-          {isHa ? (
+          {/* FORM BODY FOR VU */}
+          {isVu ? (
+            <form onSubmit={handleSubmitVu} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
+              {errorMsg && (
+                <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
+                  {errorMsg}
+                </div>
+              )}
+
+              {/* MỞ TÚI HỒ SƠ A INSTRUCTION */}
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between gap-2">
+                <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
+                  📂 Vui lòng mở túi hồ sơ A hoặc xem hồ sơ A trên web.
+                </span>
+                {onOpenDossier && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenDossier('A')}
+                    className="px-3 py-1 bg-[#8c1d1d] hover:bg-[#6e1616] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-colors cursor-pointer shrink-0"
+                  >
+                    Xem Hồ Sơ A
+                  </button>
+                )}
+              </div>
+
+              {/* QUESTION BOX */}
+              <div className="p-4 bg-[#f4ebd9] border-2 border-[#a88c6f] rounded-none">
+                <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
+                  CÂU HỎI:
+                </span>
+                <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
+                  Xác định mốc thời gian Vũ rời khỏi Quán Bia 88
+                </p>
+              </div>
+
+              {/* ANSWER INPUT */}
+              <div className="space-y-2">
+                <label className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
+                  Cách trả lời: Nhập text format &quot;hh:mm&quot; (giờ:phút)
+                </label>
+                <p className="text-xs text-[#6b4e2e] font-mono italic">
+                  Ví dụ: 12:00, 13:30,...
+                </p>
+                <input
+                  type="text"
+                  value={vuTimeInput}
+                  onChange={(e) => {
+                    setVuTimeInput(e.target.value)
+                    setErrorMsg('')
+                  }}
+                  placeholder="Ví dụ: 12:00, 13:30,..."
+                  className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-base font-bold placeholder-[#a88c6f]/60 focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
+                />
+              </div>
+
+              {/* FOOTER */}
+              <div className="pt-2 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
+                >
+                  ĐÓNG
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all flex items-center gap-2 border-2 border-[#2b1f14] shadow-md cursor-pointer active:scale-95"
+                >
+                  <span>CẬP NHẬT KẾT LUẬN</span>
+                  <ArrowRight className="size-3.5" />
+                </button>
+              </div>
+            </form>
+          ) : isHa ? (
+            /* FORM BODY FOR HA */
             <form onSubmit={handleSubmitHa} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5]">
               {errorMsg && (
                 <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
@@ -255,6 +365,15 @@ export function FollowupQuestionModal({
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
                   📂 MỞ TÚI HỒ SƠ C (TRẦN THỊ HÀ)
                 </span>
+                {onOpenDossier && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenDossier('C')}
+                    className="px-3 py-1 bg-[#8c1d1d] hover:bg-[#6e1616] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-colors cursor-pointer shrink-0"
+                  >
+                    Xem Hồ Sơ C
+                  </button>
+                )}
               </div>
 
               {/* QUESTION BOX */}
@@ -263,7 +382,7 @@ export function FollowupQuestionModal({
                   YÊU CẦU ĐIỀU TRA:
                 </span>
                 <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
-                  {questionText}
+                  Khớp nối các vật chứng quan trọng thu giữ tại phòng trọ và thân thể Trần Thị Hà với các tài liệu, dấu vết ban đầu tại hiện trường:
                 </p>
               </div>
 
@@ -384,19 +503,28 @@ export function FollowupQuestionModal({
               </div>
             </form>
           ) : (
-            /* FORM FOR VU / TUNG */
-            <form onSubmit={handleSubmitVuTung} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
+            /* FORM FOR TUNG */
+            <form onSubmit={handleSubmitTung} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
               {errorMsg && (
                 <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
                   ⚠️ {errorMsg}
                 </div>
               )}
 
-              {/* MỞ TÚI HỒ SƠ */}
-              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center gap-2">
+              {/* MỞ TÚI HỒ SƠ B */}
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between gap-2">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-                  📂 MỞ TÚI HỒ SƠ {isVu ? 'A' : 'B'}
+                  📂 MỞ TÚI HỒ SƠ B (NGUYỄN THANH TÙNG)
                 </span>
+                {onOpenDossier && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenDossier('B')}
+                    className="px-3 py-1 bg-[#8c1d1d] hover:bg-[#6e1616] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-colors cursor-pointer shrink-0"
+                  >
+                    Xem Hồ Sơ B
+                  </button>
+                )}
               </div>
 
               {/* QUESTION BOX */}
@@ -404,8 +532,8 @@ export function FollowupQuestionModal({
                 <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
                   CÂU HỎI:
                 </span>
-                <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
-                  {questionText}
+                <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed whitespace-pre-line">
+                  {questionTextTung}
                 </p>
               </div>
 
@@ -415,7 +543,7 @@ export function FollowupQuestionModal({
                   TÍCH CHỌN PHƯƠNG ÁN ĐÚNG:
                 </span>
 
-                {options.map((opt) => {
+                {MOCK_OPTIONS_TUNG.map((opt) => {
                   const isSelected = selectedOption === opt.id
                   return (
                     <button
@@ -463,7 +591,7 @@ export function FollowupQuestionModal({
                   type="submit"
                   className="px-6 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all flex items-center gap-2 border-2 border-[#2b1f14] shadow-md cursor-pointer"
                 >
-                  <span>NỘP KẾT LUẬN</span>
+                  <span>CẬP NHẬT KẾT LUẬN</span>
                   <ArrowRight className="size-3.5" />
                 </button>
               </div>

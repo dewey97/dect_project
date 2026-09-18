@@ -32,6 +32,7 @@ interface EvaluationModalState {
   title: string
   heading: string
   message: string
+  subMessage?: string
   suspectName: string
   selectedCount: number
 }
@@ -70,7 +71,7 @@ export const VALID_CASE_CHARACTERS = [
   },
   {
     id: 'dat',
-    canonicalName: 'Trần Văn Đạt (Đạt Gà)',
+    canonicalName: 'Trần Văn Đạt',
     aliases: ['đạt', 'dat', 'đạt gà', 'dat ga', 'trần văn đạt', 'tran van dat', 'văn đạt', 'van dat', 'đạt chợ cảng', 'dat cho cang'],
     role: 'Tiểu thương Chợ Cảng / Con nợ Khang',
   },
@@ -191,9 +192,10 @@ export function AddSuspectModal({
       setEvalModal({
         isOpen: true,
         isSuccess: false,
-        title: 'CĂN CỨ ĐỘNG CƠ GÂY ÁN',
-        heading: 'Phản hồi: Không đủ chứng cứ điều tra',
-        message: `Đối tượng "${suspectDisplayName}" không thuộc diện nghi can có động cơ gây án trọng điểm trong giai đoạn này. Chưa đủ căn cứ chứng cứ để xác lập.`,
+        title: 'THÔNG BÁO',
+        heading: '',
+        message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
+        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
         suspectName: suspectDisplayName,
         selectedCount: motiveClueIds.length,
       })
@@ -205,9 +207,10 @@ export function AddSuspectModal({
       setEvalModal({
         isOpen: true,
         isSuccess: false,
-        title: 'CĂN CỨ ĐỘNG CƠ GÂY ÁN',
-        heading: 'Phản hồi: Không đủ chứng cứ điều tra',
-        message: `Chưa có tài liệu xác thực động cơ gây án đối với đối tượng "${suspectDisplayName}". Vui lòng rà soát lại danh mục chứng cứ hiện trường.`,
+        title: 'THÔNG BÁO',
+        heading: '',
+        message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
+        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
         suspectName: suspectDisplayName,
         selectedCount: 0,
       })
@@ -218,9 +221,9 @@ export function AddSuspectModal({
     setEvalModal({
       isOpen: true,
       isSuccess: true,
-      title: 'CĂN CỨ ĐỘNG CƠ GÂY ÁN',
-      heading: 'Phản hồi: Đủ chứng cứ điều tra',
-      message: `Đã xác lập ${motiveClueIds.length} tài liệu chứng minh động cơ của đối tượng "${suspectDisplayName}". Căn cứ điều tra đã được ghi nhận vào hồ sơ.`,
+      title: 'THÔNG BÁO',
+      heading: '',
+      message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
       suspectName: suspectDisplayName,
       selectedCount: motiveClueIds.length,
     })
@@ -237,9 +240,10 @@ export function AddSuspectModal({
       setEvalModal({
         isOpen: true,
         isSuccess: false,
-        title: 'ĐỐI CHẤT LỜI KHAI NGOẠI PHẠM',
-        heading: 'Phản hồi: Không đủ chứng cứ điều tra',
-        message: `Lời khai và chứng cứ ngoại phạm của đối tượng "${suspectDisplayName}" không cấu thành dấu hiệu phạm tội trọng điểm ở giai đoạn này. Chưa đủ căn cứ điều tra.`,
+        title: 'THÔNG BÁO',
+        heading: '',
+        message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
+        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
         suspectName: suspectDisplayName,
         selectedCount: alibiClueIds.length,
       })
@@ -251,9 +255,10 @@ export function AddSuspectModal({
       setEvalModal({
         isOpen: true,
         isSuccess: false,
-        title: 'ĐỐI CHẤT LỜI KHAI NGOẠI PHẠM',
-        heading: 'Phản hồi: Không đủ chứng cứ điều tra',
-        message: `Chưa có tài liệu đối chất bác bỏ lời khai ngoại phạm của đối tượng "${suspectDisplayName}". Vui lòng đối chiếu thời gian & chứng cứ hiện trường.`,
+        title: 'THÔNG BÁO',
+        heading: '',
+        message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
+        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
         suspectName: suspectDisplayName,
         selectedCount: 0,
       })
@@ -264,9 +269,9 @@ export function AddSuspectModal({
     setEvalModal({
       isOpen: true,
       isSuccess: true,
-      title: 'ĐỐI CHẤT LỜI KHAI NGOẠI PHẠM',
-      heading: 'Phản hồi: Đủ chứng cứ điều tra',
-      message: `Đã xác lập ${alibiClueIds.length} tài liệu đối chất bóc trần lời khai ngoại phạm của đối tượng "${suspectDisplayName}". Căn cứ điều tra đã được ghi nhận vào hồ sơ.`,
+      title: 'THÔNG BÁO',
+      heading: '',
+      message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
       suspectName: suspectDisplayName,
       selectedCount: alibiClueIds.length,
     })
@@ -387,11 +392,8 @@ export function AddSuspectModal({
           {/* DOCUMENT HEADER & QUESTION */}
           <div className="space-y-1.5 pr-8">
             <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#6b4e2e] block">
-              Biên Bản Xác Định Đối Tượng Tình Nghi
+              Xác Định Đối Tượng Tình Nghi
             </span>
-            <h3 className="text-sm sm:text-base font-bold text-[#1a120b] leading-relaxed">
-              Điền danh tính đối tượng tình nghi và bóc tách các căn cứ động cơ, ngoại phạm:
-            </h3>
           </div>
 
           {/* FORM BODY */}
@@ -408,7 +410,7 @@ export function AddSuspectModal({
                     <input
                       type="text"
                       value={name}
-                      placeholder="Nhập tên đối tượng tình nghi..."
+                      placeholder="Nhập đầy đủ họ & tên"
                       onChange={(e) => {
                         setName(e.target.value)
                         if (errorMsg) setErrorMsg('')
@@ -442,10 +444,10 @@ export function AddSuspectModal({
 
                 <div className="space-y-3 pt-1">
                   <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                    DANH MỤC ĐIỀU TRA & BÓC TÁCH MANH MỐI:
+                    CĂN CỨ TÌNH NGHI:
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
-                    {/* Tile 1: CĂN CỨ ĐỘNG CƠ GÂY ÁN */}
+                    {/* Tile 1: ĐỐI TƯỢNG CÓ ĐỘNG CƠ */}
                     <button
                       type="button"
                       onClick={() => {
@@ -482,12 +484,12 @@ export function AddSuspectModal({
                           {isMotiveValid && '✓'}
                         </div>
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight flex-1">
-                          CĂN CỨ ĐỘNG CƠ GÂY ÁN
+                          Đối tượng có động cơ
                         </span>
                       </div>
                     </button>
 
-                    {/* Tile 2: BÓC TRẦN LỜI KHAI NGOẠI PHẠM */}
+                    {/* Tile 2: NGOẠI PHẠM BẤT HỢP LÝ */}
                     <button
                       type="button"
                       onClick={() => {
@@ -524,7 +526,7 @@ export function AddSuspectModal({
                           {isAlibiValid && '✓'}
                         </div>
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight flex-1">
-                          BÓC TRẦN LỜI KHAI NGOẠI PHẠM
+                          Ngoại phạm bất hợp lý
                         </span>
                       </div>
                     </button>
@@ -536,10 +538,13 @@ export function AddSuspectModal({
             {/* Sub-View for Tile 1: MOTIVE */}
             {subTileView === 'motive' && (
               <div className="space-y-3 pt-1">
-                <div className="flex items-center justify-between border-b border-[#2b1f14]/20 pb-2">
+                <div className="border-b border-[#2b1f14]/20 pb-2 space-y-1">
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
-                    TÀI LIỆU: CĂN CỨ ĐỘNG CƠ GÂY ÁN ({name})
+                    BẰNG CHỨNG CHỨNG MINH ĐỐI TƯỢNG CÓ ĐỘNG CƠ {name ? `(${name})` : ''}:
                   </span>
+                  <p className="text-xs text-[#6b4e2e] italic font-sans leading-relaxed">
+                    Hãy chọn các bằng chứng chứng minh đối tượng có mâu thuẫn hoặc có lý do để ra tay với nạn nhân
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
@@ -602,10 +607,13 @@ export function AddSuspectModal({
             {/* Sub-View for Tile 2: ALIBI */}
             {subTileView === 'alibi' && (
               <div className="space-y-3 pt-1">
-                <div className="flex items-center justify-between border-b border-[#2b1f14]/20 pb-2">
+                <div className="border-b border-[#2b1f14]/20 pb-2 space-y-1">
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
-                    TÀI LIỆU: BÓC TRẦN LỜI KHAI NGOẠI PHẠM ({name})
+                    NGOẠI PHẠM BẤT HỢP LÝ {name ? `(${name})` : ''}:
                   </span>
+                  <p className="text-xs text-[#6b4e2e] italic font-sans leading-relaxed">
+                    Hãy chọn các bằng chứng chỉ ra điểm bất hợp lý trong ngoại phạm của đối tượng
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
@@ -724,8 +732,8 @@ export function AddSuspectModal({
                     : 'bg-[#fcf3f2] border-[#a81c1c]'
                 )}
               >
-                {/* Header Seal / Badge */}
-                <div className="flex items-start gap-3.5 border-b pb-4 border-[#2b1f14]/15">
+                {/* Icon & Message side-by-side (No separate header or 'THÔNG BÁO' text) */}
+                <div className="flex items-start gap-3.5 pb-4">
                   <div
                     className={cn(
                       'p-2.5 rounded-none border-2 flex items-center justify-center shrink-0',
@@ -740,24 +748,21 @@ export function AddSuspectModal({
                       <AlertTriangle className="size-6" />
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-[10px] font-mono tracking-widest uppercase block font-bold text-[#6b5847]">
-                      {evalModal.title}
-                    </span>
-                    <h3
+                  <div className="flex-1 min-w-0 font-sans space-y-1.5 pt-0.5">
+                    <p
                       className={cn(
-                        'text-base sm:text-lg font-bold uppercase tracking-tight mt-0.5 leading-snug',
+                        'font-bold leading-snug text-sm sm:text-base',
                         evalModal.isSuccess ? 'text-[#193310]' : 'text-[#a81c1c]'
                       )}
                     >
-                      {evalModal.heading}
-                    </h3>
+                      {evalModal.message}
+                    </p>
+                    {evalModal.subMessage && (
+                      <p className="text-xs text-[#6b5847] leading-relaxed">
+                        {evalModal.subMessage}
+                      </p>
+                    )}
                   </div>
-                </div>
-
-                {/* Content / Detail message */}
-                <div className="py-4 text-xs sm:text-sm text-[#2b1f14] leading-relaxed font-sans">
-                  <p>{evalModal.message}</p>
                 </div>
 
                 {/* Action Button */}

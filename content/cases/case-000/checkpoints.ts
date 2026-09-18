@@ -59,24 +59,23 @@ export const checkpoints000: Checkpoint[] = [
       requiredEvidenceIds: ['doc_10_so_no', 'sms_dev00', 'p6_anh_vu', 'doc_06_loi_khai_lua', 'p10_app_xe'],
       availableEvidences: [
         { id: 'doc_01_phieu_tn', label: 'Phiếu tiếp nhận tin báo từ bà Lụa (06:45)', code: '01', description: 'Tin báo vụ án mạng lúc 06:45 sáng' },
-        { id: 'doc_03_so_do', label: 'Sơ đồ mặt bằng hiện trường phòng khách', code: '03', description: 'Sơ đồ bố trí vật dụng và vị trí nạn nhân' },
+        { id: 'doc_03_so_do', label: 'Ảnh chụp hiện trường', code: '03', description: 'Sơ đồ bố trí vật dụng và vị trí nạn nhân' },
         { id: 'doc_04_tu_thi', label: 'Báo cáo khám nghiệm tử thi sơ bộ', code: '04', description: 'Tổn thương chẩm gáy 20:00 & vết đâm cổ 21:00' },
         { id: 'doc_05_kham_nghiem', label: 'Biên bản khám nghiệm hiện trường vụ án', code: '05', description: 'Ghi nhận bình trà vỡ và các mẩu máu khô' },
-        { id: 'doc_06_loi_khai_lua', label: 'Lời khai bà Lụa (06/11)', code: '06 / 11', description: 'Mai nổ máy xe phóng đi đúng 19:00' },
+        { id: 'doc_06_loi_khai_lua', label: 'Biên bản lấy lời khai bà Lụa', code: '06 / 11', description: 'Mai nổ máy xe phóng đi đúng 19:00' },
         { id: 'doc_07a_loi_khai_mai', label: 'Biên bản lấy lời khai Nguyễn Ngọc Mai', code: '07a', description: 'Khai rời đi lúc 19:00 về nhà xem TV' },
         { id: 'doc_07b_loi_khai_vu', label: 'Biên bản lấy lời khai Lê Quang Vũ', code: '07b', description: 'Khai rời đi cùng Mai lúc 19:00' },
-        { id: 'doc_14_loi_khai_tung', label: 'Lời khai Nguyễn Thanh Tùng lần 1', code: '14', description: 'Khai chỉ gọi điện 19:55, không sang gặp Khang' },
+        { id: 'doc_14_loi_khai_tung', label: 'Biên bản lấy lời khai Nguyễn Thanh Tùng', code: '14', description: 'Khai chỉ gọi điện 19:55, không sang gặp Khang' },
         { id: 'doc_07d_loi_khai_ha', label: 'Biên bản lấy lời khai Trần Thị Hà', code: '07d', description: 'Khai ở phòng trọ xem phim VTV3 cả tối' },
         { id: 'doc_10_so_no', label: 'Sổ tay ghi nợ của Khang', code: '10 / 05', description: 'Khoản nợ 300M biệt danh Lệch Pha' },
-        { id: 'sms_dev00', label: 'SMS đòi nợ trên điện thoại Khang', code: 'dev-00', description: 'SMS đe dọa báo gia đình vợ Vũ' },
+        { id: 'sms_dev00', label: 'Tin nhắn trên điện thoại Khang', code: 'dev-00', description: 'SMS đe dọa báo gia đình vợ Vũ' },
         { id: 'doc_13_don_dat', label: 'Đơn khởi kiện tranh chấp đất đai', code: '13 / p2', description: 'Đơn đòi đất 200m² của Mai' },
-        { id: 'p1_anh_hien_truong', label: 'Ảnh hiện trường phòng khách & bình trà vỡ', code: 'p1', description: 'Hiện trường xáo trộn, bình trà vỡ trên sàn' },
-        { id: 'p3_hung_khi', label: 'Mảnh thủy tinh 8.2cm dính máu (Hung khí)', code: 'p3', description: 'Hung khí đâm đứt động mạch cảnh' },
-        { id: 'p4_anh_1996', label: 'Ảnh kỷ niệm hè 1996', code: 'p4', description: 'Tùng bế em trai Gia Huy, sẹo mày chữ V' },
+        { id: 'p3_hung_khi', label: 'Mảnh vỡ từ ấm trà (hung khí)', code: 'p3', description: 'Hung khí đâm đứt động mạch cảnh' },
+        { id: 'p4_anh_1996', label: 'Khung ảnh vỡ', code: 'p4', description: 'Tùng bế em trai Gia Huy, sẹo mày chữ V' },
         { id: 'p4_van_tay', label: 'Dấu vân tay trên khung bức ảnh vỡ', code: 'p4', description: 'Dấu vân tay ngón trỏ miết trùng 100% với Tùng' },
-        { id: 'p5_manh_bao', label: 'Mảnh báo cũ 1996 xé vụn ghép lại', code: 'p5', description: 'Vụ tai nạn ngạt khí tử vong bé N.G.H trong tủ gỗ' },
+        { id: 'p5_manh_bao', label: 'Các mảnh báo cũ', code: 'p5', description: 'Vụ tai nạn ngạt khí tử vong bé N.G.H trong tủ gỗ' },
         { id: 'p6_anh_vu', label: 'Ảnh chân dung Lê Quang Vũ', code: 'p6', description: 'Kỹ sư điện, mắt trái lác nhẹ' },
-        { id: 'p10_app_xe', label: 'Screenshot App đặt xe của Vũ', code: 'p10', description: 'Đặt xe lúc 19:25:40, tài xế đón 19:30:15' }
+        { id: 'p10_app_xe', label: 'ảnh chụp màn hình ứng dụng đặt xe', code: 'p10', description: 'Đặt xe lúc 19:25:40, tài xế đón 19:30:15' }
       ]
     }
   },
@@ -101,24 +100,23 @@ export const checkpoints000: Checkpoint[] = [
       requiredEvidenceIds: ['doc_14_loi_khai_tung', 'p4_van_tay', 'p5_manh_bao', 'p4_anh_1996'],
       availableEvidences: [
         { id: 'doc_01_phieu_tn', label: 'Phiếu tiếp nhận tin báo từ bà Lụa (06:45)', code: '01', description: 'Tin báo vụ án mạng lúc 06:45 sáng' },
-        { id: 'doc_03_so_do', label: 'Sơ đồ mặt bằng hiện trường phòng khách', code: '03', description: 'Sơ đồ bố trí vật dụng và vị trí nạn nhân' },
+        { id: 'doc_03_so_do', label: 'Ảnh chụp hiện trường', code: '03', description: 'Sơ đồ bố trí vật dụng và vị trí nạn nhân' },
         { id: 'doc_04_tu_thi', label: 'Báo cáo khám nghiệm tử thi sơ bộ', code: '04', description: 'Tổn thương chẩm gáy 20:00 & vết đâm cổ 21:00' },
         { id: 'doc_05_kham_nghiem', label: 'Biên bản khám nghiệm hiện trường vụ án', code: '05', description: 'Ghi nhận bình trà vỡ và các mẩu máu khô' },
-        { id: 'doc_06_loi_khai_lua', label: 'Lời khai bà Lụa (06/11)', code: '06 / 11', description: 'Mai nổ máy xe phóng đi đúng 19:00' },
+        { id: 'doc_06_loi_khai_lua', label: 'Biên bản lấy lời khai bà Lụa', code: '06 / 11', description: 'Mai nổ máy xe phóng đi đúng 19:00' },
         { id: 'doc_07a_loi_khai_mai', label: 'Biên bản lấy lời khai Nguyễn Ngọc Mai', code: '07a', description: 'Khai rời đi lúc 19:00 về nhà xem TV' },
         { id: 'doc_07b_loi_khai_vu', label: 'Biên bản lấy lời khai Lê Quang Vũ', code: '07b', description: 'Khai rời đi cùng Mai lúc 19:00' },
-        { id: 'doc_14_loi_khai_tung', label: 'Lời khai Nguyễn Thanh Tùng lần 1', code: '14', description: 'Khai chỉ gọi điện 19:55, không sang gặp Khang' },
+        { id: 'doc_14_loi_khai_tung', label: 'Biên bản lấy lời khai Nguyễn Thanh Tùng', code: '14', description: 'Khai chỉ gọi điện 19:55, không sang gặp Khang' },
         { id: 'doc_07d_loi_khai_ha', label: 'Biên bản lấy lời khai Trần Thị Hà', code: '07d', description: 'Khai ở phòng trọ xem phim VTV3 cả tối' },
         { id: 'doc_10_so_no', label: 'Sổ tay ghi nợ của Khang', code: '10 / 05', description: 'Khoản nợ 300M biệt danh Lệch Pha' },
-        { id: 'sms_dev00', label: 'SMS đòi nợ trên điện thoại Khang', code: 'dev-00', description: 'SMS đe dọa báo gia đình vợ Vũ' },
+        { id: 'sms_dev00', label: 'Tin nhắn trên điện thoại Khang', code: 'dev-00', description: 'SMS đe dọa báo gia đình vợ Vũ' },
         { id: 'doc_13_don_dat', label: 'Đơn khởi kiện tranh chấp đất đai', code: '13 / p2', description: 'Đơn đòi đất 200m² của Mai' },
-        { id: 'p1_anh_hien_truong', label: 'Ảnh hiện trường phòng khách & bình trà vỡ', code: 'p1', description: 'Hiện trường xáo trộn, bình trà vỡ trên sàn' },
-        { id: 'p3_hung_khi', label: 'Mảnh thủy tinh 8.2cm dính máu (Hung khí)', code: 'p3', description: 'Hung khí đâm đứt động mạch cảnh' },
-        { id: 'p4_anh_1996', label: 'Ảnh kỷ niệm hè 1996', code: 'p4', description: 'Tùng bế em trai Gia Huy, sẹo mày chữ V' },
+        { id: 'p3_hung_khi', label: 'Mảnh vỡ từ ấm trà (hung khí)', code: 'p3', description: 'Hung khí đâm đứt động mạch cảnh' },
+        { id: 'p4_anh_1996', label: 'Khung ảnh vỡ', code: 'p4', description: 'Tùng bế em trai Gia Huy, sẹo mày chữ V' },
         { id: 'p4_van_tay', label: 'Dấu vân tay trên khung bức ảnh vỡ', code: 'p4', description: 'Dấu vân tay ngón trỏ miết trùng 100% với Tùng' },
-        { id: 'p5_manh_bao', label: 'Mảnh báo cũ 1996 xé vụn ghép lại', code: 'p5', description: 'Vụ tai nạn ngạt khí tử vong bé N.G.H trong tủ gỗ' },
+        { id: 'p5_manh_bao', label: 'Các mảnh báo cũ', code: 'p5', description: 'Vụ tai nạn ngạt khí tử vong bé N.G.H trong tủ gỗ' },
         { id: 'p6_anh_vu', label: 'Ảnh chân dung Lê Quang Vũ', code: 'p6', description: 'Kỹ sư điện, mắt trái lác nhẹ' },
-        { id: 'p10_app_xe', label: 'Screenshot App đặt xe của Vũ', code: 'p10', description: 'Đặt xe lúc 19:25:40, tài xế đón 19:30:15' }
+        { id: 'p10_app_xe', label: 'ảnh chụp màn hình ứng dụng đặt xe', code: 'p10', description: 'Đặt xe lúc 19:25:40, tài xế đón 19:30:15' }
       ]
     }
   },
@@ -208,14 +206,13 @@ export const checkpoints000: Checkpoint[] = [
         { id: 'doc_voice_coi_tau', label: 'Voice tin nhắn thoại của Hà (20:32)', code: '01', description: 'Lọt tạp âm còi tàu gác chắn HBN-203 cường độ 68 dB' },
         { id: 'doc_lich_vtv3', label: 'Lịch phát sóng VTV3 tối Thứ Sáu', code: '02', description: 'VTV3 chỉ phát Gameshow Trò chơi truyền hình, không chiếu phim bộ' },
         { id: 'doc_10_so_no', label: 'Sổ tay ghi nợ của Khang', code: '10', description: 'Danh sách nợ bốc họ' },
-        { id: 'sms_dev00', label: 'SMS đòi nợ trên điện thoại Khang', code: 'dev-00', description: 'SMS đe dọa đòi nợ' },
+        { id: 'sms_dev00', label: 'Tin nhắn trên điện thoại Khang', code: 'dev-00', description: 'SMS đe dọa đòi nợ' },
         { id: 'doc_13_don_dat', label: 'Đơn khởi kiện tranh chấp đất đai', code: '13', description: 'Tranh chấp đất đai của Mai' },
-        { id: 'p1_anh_hien_truong', label: 'Ảnh hiện trường phòng khách', code: 'p1', description: 'Hiện trường xáo trộn' },
-        { id: 'p3_hung_khi', label: 'Mảnh thủy tinh 8.2cm dính máu', code: 'p3', description: 'Hung khí sắc nhọn dính máu' },
+        { id: 'p3_hung_khi', label: 'Mảnh vỡ từ ấm trà (hung khí)', code: 'p3', description: 'Hung khí sắc nhọn dính máu' },
         { id: 'p4_van_tay', label: 'Dấu vân tay trên khung ảnh vỡ', code: 'p4', description: 'Dấu vân tay ngón trỏ của Tùng' },
-        { id: 'p5_manh_bao', label: 'Mẩu báo cũ 1996 về vụ tủ gỗ', code: 'p5', description: 'Vụ án ngạt khí năm 1996' },
+        { id: 'p5_manh_bao', label: 'Các mảnh báo cũ', code: 'p5', description: 'Vụ án ngạt khí năm 1996' },
         { id: 'p6_anh_vu', label: 'Ảnh chân dung Lê Quang Vũ', code: 'p6', description: 'Kỹ sư điện' },
-        { id: 'p10_app_xe', label: 'Screenshot App đặt xe', code: 'p10', description: 'Lịch sử chuyến xe của Vũ' }
+        { id: 'p10_app_xe', label: 'ảnh chụp màn hình ứng dụng đặt xe', code: 'p10', description: 'Lịch sử chuyến xe của Vũ' }
       ]
     }
   },
@@ -259,14 +256,13 @@ export const checkpoints000: Checkpoint[] = [
         { id: 'ev_hair_dna', label: 'Lọn tóc mai dính máu thu tại phòng Hà', code: '04 / EV-HAIR-DNA', description: 'Kết quả giám định khớp 100% ADN của Khang' },
         { id: 'ev_ao_gio_xoan', label: 'Áo gió xám đen dính phấn hoa xoan', code: '03', description: 'Thu giữ tại phòng Hà, khớp nhân dạng rình rập trước cổng' },
         { id: 'doc_10_so_no', label: 'Sổ tay ghi nợ của Khang', code: '10', description: 'Danh sách nợ bốc họ' },
-        { id: 'sms_dev00', label: 'SMS đòi nợ trên điện thoại Khang', code: 'dev-00', description: 'SMS đe dọa nợ nần' },
+        { id: 'sms_dev00', label: 'Tin nhắn trên điện thoại Khang', code: 'dev-00', description: 'SMS đe dọa nợ nần' },
         { id: 'doc_13_don_dat', label: 'Đơn khởi kiện đòi đất', code: '13', description: 'Tranh chấp đất đai của Mai' },
-        { id: 'p1_anh_hien_truong', label: 'Ảnh hiện trường phòng khách', code: 'p1', description: 'Hiện trường phòng khách' },
-        { id: 'p3_hung_khi', label: 'Mảnh thủy tinh 8.2cm dính máu (Hung khí)', code: 'p3', description: 'Mảnh thủy tinh đâm cổ' },
+        { id: 'p3_hung_khi', label: 'Mảnh vỡ từ ấm trà (hung khí)', code: 'p3', description: 'Mảnh thủy tinh đâm cổ' },
         { id: 'p4_van_tay', label: 'Dấu vân tay trên khung bức ảnh vỡ', code: 'p4', description: 'Vân tay của Tùng' },
-        { id: 'p5_manh_bao', label: 'Mẩu báo cũ 1996 về vụ tủ gỗ', code: 'p5', description: 'Vụ án 1996' },
+        { id: 'p5_manh_bao', label: 'Các mảnh báo cũ', code: 'p5', description: 'Vụ án 1996' },
         { id: 'p6_anh_vu', label: 'Ảnh chân dung Lê Quang Vũ', code: 'p6', description: 'Kỹ sư điện' },
-        { id: 'p10_app_xe', label: 'Screenshot App đặt xe của Vũ', code: 'p10', description: 'Lịch sử chuyến xe của Vũ' }
+        { id: 'p10_app_xe', label: 'ảnh chụp màn hình ứng dụng đặt xe', code: 'p10', description: 'Lịch sử chuyến xe của Vũ' }
       ]
     }
   }

@@ -11,7 +11,7 @@ export const CASE_000_NARRATOR: Record<number, PhaseNarrator> = {
     subtitle: 'Đêm 24/07/2016',
     date: 'Đêm 24/07/2016',
     monologue:
-      'Căn nhà cũ số 14 Đường Bờ Sông chìm trong bóng tối tịch mịch.\n\nMùi trà hoa cúc quyện lẫn vị máu tanh nồng bốc lên từ bộ bình thủy tinh vỡ vụn dưới sàn phòng khách...\n\nTiếng bước chân lẩn khuất ngoài ngõ vắng vừa biến mất. Nạn nhân Khang gục xuống, nhưng sự thật dường như vẫn còn bị phong ấn...'
+      'Căn nhà cũ số 14 Đường Bờ Sông chìm trong bóng tối...\nChỉ có mùi máu bốc lên và ấm trà vỡ vụn dưới sàn phòng khách...\n\nNạn nhân Khang đã gục xuống. Tiếng bước chân lẩn khuất ngoài ngõ vắng vừa biến mất.\n\nHung thủ đã kịp trốn vào màn đêm. Tội ác giờ đây đang bị ẩn giấu đằng sau những manh mối ngổn ngang.\n\nTrò chơi trốn tìm sinh tử chính thức bắt đầu - và bạn chính là người đi tìm sự thật.'
   },
   1: {
     phase: 1,

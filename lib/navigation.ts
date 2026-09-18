@@ -12,7 +12,7 @@ export interface NavItem {
   icon: LucideIcon
 }
 export const NAV_ITEMS: NavItem[] = [
-  { href: '/evidence', label: 'Tài liệu & Vật chứng', code: 'DOCS', icon: FolderSearch },
+  { href: '/evidence/web', label: 'Tài liệu & Vật chứng', code: 'DOCS', icon: FolderSearch },
   { href: '/board', label: 'Dẫn dắt & Gợi ý', code: 'HINT', icon: HelpCircle },
   { href: '/checkpoints', label: 'Mục tiêu & Kết luận', code: 'GOAL', icon: ShieldCheck },
 ]

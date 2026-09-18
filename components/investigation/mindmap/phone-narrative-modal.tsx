@@ -23,8 +23,9 @@ export function PhoneNarrativeModal({
 
   if (!isOpen) return null
 
-  const dateLabel = 'DẪN TRUYỆN — TRUY VẾT 3 SỐ ĐIỆN THOẠI (25/07/2016)'
-  const storyText = 'Dẫn truyện 3 số điện thoại - tôi thay vào sau'
+  const dateLabel = 'Thành công xác minh danh tính các thuê bao.'
+  const storyText =
+    'Chúc mừng các thám tử đã thành công truy vết chủ sở hữu 3 số thuê bao trong nhật ký điện thoại.\n\nTiếp theo, hãy tiến hành triệu tập và ghi lời khai đối với từng trường hợp để làm rõ mục đích liên lạc.'
 
   return (
     <AnimatePresence>
@@ -51,7 +52,7 @@ export function PhoneNarrativeModal({
             </div>
           </div>
 
-          {/* Clean Bottom Action Button: TIẾP TỤC ĐIỀU TRA */}
+          {/* Clean Bottom Action Button: LẤY LỜI KHAI */}
           <div className="w-full pt-4 pb-2 shrink-0 max-w-md mx-auto">
             <button
               type="button"
@@ -62,7 +63,7 @@ export function PhoneNarrativeModal({
               className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] animate-fade-in"
             >
               <Search className="size-4.5" />
-              <span>TIẾP TỤC ĐIỀU TRA</span>
+              <span>LẤY LỜI KHAI</span>
             </button>
           </div>
         </div>

@@ -79,6 +79,7 @@ export function PhaseUnlockedModal({
 
                       <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
                         <TypewriterNarrator
+                          key={`bg-${unlockedModalData.unlockedPhase}-${CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}`}
                           text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
                           speed={12}
                           onComplete={() => setIsNarrativeComplete(true)}
@@ -129,6 +130,7 @@ export function PhaseUnlockedModal({
 
                         <div className="pt-2 w-full">
                           <TypewriterNarrator
+                            key={`web-${unlockedModalData.unlockedPhase}-${CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}`}
                             text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
                             speed={12}
                             onComplete={() => setIsNarrativeComplete(true)}

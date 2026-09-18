@@ -47,7 +47,7 @@ export function EvidenceGuideModal({
                 CHỈ DẪN NGHIỆP VỤ // CASE 000
               </span>
               <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
-                Hướng Dẫn Bổ Sung & Bóc Tách Chứng Cứ
+                Hướng Dẫn Các Thao Tác Mở Rộng Điều Tra
               </h3>
             </div>
 
@@ -62,14 +62,7 @@ export function EvidenceGuideModal({
 
           {/* BODY */}
           <div className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
-            {/* OVERVIEW INTRO */}
-            <div className="p-3.5 bg-[#ebdcc4] border border-[#a88c6f] text-xs text-[#2b1f14] leading-relaxed space-y-1 shadow-sm">
-              <p className="font-sans text-xs sm:text-[13px] font-medium text-[#1a120b]">
-                Từ các vật chứng và tài liệu sơ bộ ban đầu, điều tra viên cần tiến hành bóc tách thông qua <strong>2 nhánh nghiệp vụ bổ trợ</strong> bên dưới để thu thập bằng chứng quyết định:
-              </p>
-            </div>
-
-            {/* BRANCH 1: MỞ RỘNG ĐIỀU TRA */}
+            {/* BRANCH 1: BỔ SUNG CHỨNG CỨ */}
             <div
               className={cn(
                 'p-4 border-2 transition-all space-y-3 relative',
@@ -78,7 +71,7 @@ export function EvidenceGuideModal({
                   : 'border-[#b89569] bg-[#fbf8f1]'
               )}
             >
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2 border-b border-[#2b1f14]/15 pb-2.5">
                 <div className="flex items-center gap-2">
                   <div className="size-7 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-xs">
                     1
@@ -86,7 +79,7 @@ export function EvidenceGuideModal({
                   <div>
                     <h4 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider flex items-center gap-1.5">
                       <Smartphone className="size-4 text-[#8c592b]" />
-                      MỞ RỘNG ĐIỀU TRA (TRUY VẾT SĐT)
+                      1. BỔ SUNG CHỨNG CỨ
                     </h4>
                   </div>
                 </div>
@@ -103,14 +96,17 @@ export function EvidenceGuideModal({
                 )}
               </div>
 
-              <div className="text-xs sm:text-[13px] text-[#2b1f14] leading-relaxed space-y-2">
+              <div className="text-xs sm:text-[13px] text-[#2b1f14] leading-relaxed space-y-2 font-sans">
                 <p>
-                  <strong>Nhiệm vụ:</strong> Đòi hỏi truy vết các số điện thoại lạ trong đêm 24/07 và bóc tách các mối liên hệ phức tạp của nạn nhân Khang (khoản nợ cá độ, mối làm ăn vật liệu xây dựng, ân oán quá khứ).
+                  <strong className="text-[#8c1d1d] font-mono uppercase text-[11px]">Thao tác cụ thể:</strong> Truy vết liên lạc
+                </p>
+                <p className="text-[#1a120b]">
+                  Tổ chức rà soát, tra cứu dữ liệu viễn thông nhằm xác minh, làm rõ thông tin lai lịch của các đầu số không lưu tên trong nhật ký cuộc gọi
                 </p>
               </div>
             </div>
 
-            {/* BRANCH 2: KHÁM XÉT LẠI */}
+            {/* BRANCH 2: KHÁM XÉT LẠI HIỆN TRƯỜNG */}
             <div
               className={cn(
                 'p-4 border-2 transition-all space-y-3 relative',
@@ -119,7 +115,7 @@ export function EvidenceGuideModal({
                   : 'border-zinc-400 bg-[#ebe7df] opacity-85'
               )}
             >
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2 border-b border-[#2b1f14]/15 pb-2.5">
                 <div className="flex items-center gap-2">
                   <div className="size-7 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-xs">
                     2
@@ -127,7 +123,7 @@ export function EvidenceGuideModal({
                   <div>
                     <h4 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider flex items-center gap-1.5">
                       <Search className="size-4 text-[#2b1f14]" />
-                      KHÁM XÉT LẠI HIỆN TRƯỜNG
+                      2. KHÁM XÉT LẠI HIỆN TRƯỜNG
                     </h4>
                   </div>
                 </div>
@@ -145,10 +141,20 @@ export function EvidenceGuideModal({
                 )}
               </div>
 
-              <div className="text-xs sm:text-[13px] text-[#2b1f14] leading-relaxed space-y-2">
-                <p>
-                  <strong>Nhiệm vụ:</strong> Rà soát lại hiện trường vụ án để tìm kiếm các dấu vết vi mô và vật chứng bị bỏ sót sau lời khai mâu thuẫn của các đối tượng.
+              <div className="text-xs sm:text-[13px] text-[#2b1f14] leading-relaxed space-y-2.5 font-sans">
+                <p className="text-[#1a120b]">
+                  Là thao tác tiến hành xem xét, đo đạc, thu thập lại dấu vết tại nơi xảy ra vụ án khi lần khám nghiệm trước đó có thiếu sót, chưa đầy đủ hoặc phát sinh tình tiết mới cần làm rõ.
                 </p>
+                <div className="pt-1 space-y-1.5">
+                  <p>
+                    <strong className="text-[#8c1d1d] font-mono uppercase text-[11px] block">Điều kiện kích hoạt:</strong>
+                    Hoàn thành toàn bộ câu hỏi suy luận hoặc khai thác hết tài liệu, chứng cứ hiện có nhưng chưa đủ căn cứ xác định thủ phạm.
+                  </p>
+                  <p>
+                    <strong className="text-[#8c1d1d] font-mono uppercase text-[11px] block">Cơ chế:</strong>
+                    Lệnh tự động khả dụng (sáng lên) khi thỏa mãn các điều kiện trên.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

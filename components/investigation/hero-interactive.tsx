@@ -102,37 +102,37 @@ const CASES_LIST: CaseData[] = [
     bgImage: "/images/crime_scene_outline_bg.jpg",
     pins: [
       {
+        id: "c0-pin-evidence",
+        x: 0.25,
+        y: 0.18,
+        label: "BỔ SUNG CHỨNG CỨ",
+        detail: "Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra",
+      },
+      {
         id: "c0-pin-suspects",
-        x: 0.22,
-        y: 0.26,
+        x: 0.65,
+        y: 0.30,
         label: "XÁC ĐỊNH NGHI PHẠM",
         detail: "Tập hợp danh tính & thẩm tra nghi phạm (Tùng, Hà, Mai...)",
       },
       {
-        id: "c0-pin-evidence",
-        x: 0.50,
-        y: 0.22,
-        label: "BỔ SUNG CHỨNG CỨ",
-        detail: "Chỉ dẫn nghiệp vụ & hướng dẫn mở khóa 2 nhánh chứng cứ",
-      },
-      {
         id: "c0-pin-indictment",
-        x: 0.78,
-        y: 0.26,
+        x: 0.25,
+        y: 0.68,
         label: "ĐỀ NGHỊ TRUY TỐ",
         detail: "Mở bản cáo trạng buộc tội thủ phạm vụ án",
       },
       {
         id: "c0-pin-phone",
-        x: 0.38,
-        y: 0.68,
+        x: 0.58,
+        y: 0.18,
         label: "MỞ RỘNG ĐIỀU TRA",
         detail: "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
       },
       {
         id: "c0-pin-reinvestigate",
-        x: 0.62,
-        y: 0.68,
+        x: 0.25,
+        y: 0.32,
         label: "KHÁM XÉT LẠI",
         detail: "Khám xét lại hiện trường để rà soát manh mối bổ sung",
       },
@@ -1555,7 +1555,9 @@ export function HeroInteractive({
         const dx = end.x - start.x;
         const dy = end.y - start.y;
         const dist = Math.hypot(dx, dy);
-        const sag = Math.max(8, Math.min(26, dist * 0.045));
+        const charSum = (conn.id || "").split("").reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 1), 0);
+        const sagVar = ((charSum % 9) - 4) * 2;
+        const sag = Math.max(16, Math.min(48, dist * 0.085 + sagVar));
 
         const middleX = (start.x + end.x) / 2;
         const middleY = (start.y + end.y) / 2 + sag;
@@ -1593,7 +1595,7 @@ export function HeroInteractive({
         const dx = end.x - start.x;
         const dy = end.y - start.y;
         const dist = Math.hypot(dx, dy);
-        const sag = Math.max(10, Math.min(28, dist * 0.05));
+        const sag = Math.max(18, Math.min(50, dist * 0.09));
 
         const middleX = (start.x + end.x) / 2;
         const middleY = (start.y + end.y) / 2 + sag;
@@ -1646,7 +1648,6 @@ export function HeroInteractive({
         const pinPosition = pinPositionsMap.get(pin.id);
         if (!pinPosition) return;
 
-        const baseRadius = 6.2 / transform.scale;
         const pinColor =
           pin.pinColor ||
           (pin.id.includes("phone") ||
@@ -1656,6 +1657,10 @@ export function HeroInteractive({
             : pin.color && pin.color !== "black"
             ? pin.color
             : "red");
+
+        // Red main category pins are slightly larger than yellow/sub action pins
+        const isRedPin = pinColor === "red";
+        const baseRadius = (isRedPin ? 8.2 : 6.0) / transform.scale;
 
         // Pin head colors by type
         let headTheme = {
@@ -1700,10 +1705,10 @@ export function HeroInteractive({
         context.fillStyle = "rgba(0, 0, 0, 0.45)";
         context.beginPath();
         context.ellipse(
-          pinPosition.x + 1.8 / transform.scale,
-          pinPosition.y + 2.5 / transform.scale,
-          5.6 / transform.scale,
-          3.4 / transform.scale,
+          pinPosition.x + (isRedPin ? 2.2 : 1.8) / transform.scale,
+          pinPosition.y + (isRedPin ? 3.0 : 2.5) / transform.scale,
+          baseRadius * 0.9,
+          baseRadius * 0.55,
           0,
           0,
           Math.PI * 2,

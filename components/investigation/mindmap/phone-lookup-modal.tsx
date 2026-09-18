@@ -90,12 +90,12 @@ export function PhoneLookupModal({
             </button>
           </div>
 
-          {/* FORM BODY (Y HỆT BẢN CŨ CỦA CHECKPOINT 0) */}
+          {/* FORM BODY */}
           <form onSubmit={handleSubmit} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
-            {/* QUESTION TEXT */}
+            {/* DESCRIPTION TEXT */}
             <div className="space-y-1.5">
-              <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
-                Hãy đọc các tài liệu Hồ sơ và tra cứu Điện thoại nạn nhân Khang để xác định danh tính 3 đối tượng liên quan đến 3 SĐT lạ gọi tới trong đêm 24/07:
+              <p className="text-xs sm:text-sm text-[#1a120b] leading-relaxed font-sans">
+                Tổ chức rà soát, tra cứu dữ liệu viễn thông nhằm xác minh, làm rõ thông tin lai lịch & lý do liên hệ của 03 đối tượng sử dụng các số điện thoại có lịch sử liên lạc trong thời hạn 12 giờ trước thời điểm xảy ra vụ án.
               </p>
             </div>
 
@@ -124,7 +124,7 @@ export function PhoneLookupModal({
             </div>
 
             <span className="font-mono text-xs text-[#4a3520] uppercase font-bold tracking-wider block">
-              ĐIỀN DANH TÍNH CHỦ THỂ THỤ LÝ SĐT VÀO Ô:
+              Điền danh tính chủ sở hữu 3 SDT sau:
             </span>
 
             {/* 3 PHONE INPUT FIELDS */}

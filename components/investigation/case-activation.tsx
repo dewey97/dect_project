@@ -250,7 +250,7 @@ export function CaseActivation() {
 
       // Step 5: Navigate to Evidence Page
       setTimeout(() => {
-        router.push('/evidence')
+        router.push('/evidence/web')
       }, 1800)
     } else {
       setCodeError(true)
