@@ -1,5 +1,6 @@
 CÔNG AN THÀNH PHỐ HÀ NỘI
 CƠ QUAN CẢNH SÁT ĐIỀU TRA (PC02)
+
 Số: 14/BB-KNHTh
 
 ---
