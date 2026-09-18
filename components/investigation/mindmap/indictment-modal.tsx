@@ -11,7 +11,7 @@ interface IndictmentModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmitIndictment: (data: {
-    culprit: 'vu' | 'tung'
+    culprit: 'vu' | 'tung' | 'ha'
     suspectName: string
     motive: string
     selectedClueIds: string[]
@@ -29,13 +29,16 @@ function normalizeName(str: string): string {
     .trim()
 }
 
-export function isCulpritValid(inputName: string): 'vu' | 'tung' | false {
+export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false {
   const norm = normalizeName(inputName)
   if (norm.includes('vu') || norm.includes('lequangvu')) {
     return 'vu'
   }
   if (norm.includes('tung') || norm.includes('nguyenthanhtung')) {
     return 'tung'
+  }
+  if (norm.includes('ha') || norm.includes('tranthiha')) {
+    return 'ha'
   }
   return false
 }
@@ -70,7 +73,7 @@ export function IndictmentModal({
 
     const culprit = isCulpritValid(suspectName)
     if (!culprit) {
-      setErrorMsg('Kết luận không chính xác! Viện Kiểm sát đã bác bỏ bản cáo trạng này. Đối tượng phải là Lê Quang Vũ hoặc Nguyễn Thanh Tùng.')
+      setErrorMsg('Kết luận không chính xác! Viện Kiểm sát đã bác bỏ bản cáo trạng này. Đối tượng phải là Lê Quang Vũ, Nguyễn Thanh Tùng hoặc Trần Thị Hà.')
       detectiveAudio.playGlassSound()
       return
     }
@@ -112,7 +115,7 @@ export function IndictmentModal({
               <span className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#7f1d1d] block">
                 VIỆN KIỂM SÁT // CÁO TRẠNG TRUY TỐ
               </span>
-              <h3 className="font-serif font-bold text-base sm:text-lg text-[#1a120b] uppercase tracking-wide">
+              <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
                 BẢN ĐỀ NGHỊ TRUY TỐ THỦ PHẠM
               </h3>
             </div>

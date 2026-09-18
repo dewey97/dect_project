@@ -161,6 +161,7 @@ export default function BoardGameCompanionPage() {
         onSubmitAnswer={handleSubmitAnswer}
         onUnlockNextHint={unlockNextHint}
         onOpenEpilogue={() => setIsEpilogueOpen(true)}
+        onOpenReinvestigation={() => setIsReinvestigateModalOpen(true)}
         onSwitchToWebMode={handleSwitchToWebMode}
         onProceedNextPhase={handleProceedNextPhase}
       />

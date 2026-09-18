@@ -94,6 +94,16 @@ class DetectiveAudioSystem {
     this.play('train_horn.mp3', 0.6)
   }
 
+  /** Trần Thị Hà voicemail lúc 20:32 (lẫn tiếng còi tàu 68dB vạch trần hiện trường) */
+  public playHaVoicemail(): void {
+    this.play('ha_voicemail_2032.mp3', 0.9)
+  }
+
+  /** Trần Thị Hà lời khai thẩm vấn 2016 bị dồn ép */
+  public playHaInterrogation(): void {
+    this.play('ha_interrogation_breakdown.mp3', 0.9)
+  }
+
   // === UTILITY: Droplet sound (kept as no-op for compatibility) ===
   public playSingleDroplet(): void { /* removed */ }
 

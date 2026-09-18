@@ -349,6 +349,7 @@ export default function EvidencePage() {
           onSubmitAnswer={handleSubmitAnswer}
           onUnlockNextHint={unlockNextHint}
           onOpenEpilogue={() => setIsEpilogueOpen(true)}
+          onOpenReinvestigation={() => setIsReinvestigateModalOpen(true)}
           onSwitchToWebMode={() => handleSelectPlayExperience('web')}
           onProceedNextPhase={handleProceedNextPhase}
         />

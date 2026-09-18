@@ -51,6 +51,9 @@ export interface PinPoint {
   label: string;
   detail: string;
   color?: "red" | "yellow" | "blue" | "green" | "black";
+  noteColor?: "yellow" | "black" | "white" | "red" | "blue";
+  pinColor?: "red" | "yellow" | "blue" | "green" | "black";
+  pulseBorder?: boolean;
 }
 
 export interface CaseConnection {
@@ -1204,6 +1207,9 @@ export function HeroInteractive({
           y: p.y,
           label: p.label,
           color: (p as any).color,
+          noteColor: (p as any).noteColor,
+          pinColor: (p as any).pinColor,
+          pulseBorder: (p as any).pulseBorder,
           isUser: false,
         })),
         ...uPins.map((p) => ({
@@ -1212,6 +1218,9 @@ export function HeroInteractive({
           y: p.y,
           label: p.label,
           color: "yellow" as const,
+          noteColor: "yellow" as const,
+          pinColor: "yellow" as const,
+          pulseBorder: false,
           isUser: true,
         })),
       ];
@@ -1231,8 +1240,12 @@ export function HeroInteractive({
         const pinPosition = pinPositionsMap.get(pin.id);
         if (!pinPosition) return;
 
-        // All notes share the authentic 3M Canary yellow paper styling
-        const paperTheme = {
+        // Note styling: defaults to 3M Canary yellow paper styling, or dark charcoal if black
+        const noteThemeType =
+          pin.noteColor ||
+          (pin.color === "black" ? "black" : "yellow");
+
+        let paperTheme = {
           paperBgTop: "#fae67a",
           paperBgMid: "#f6dc68",
           paperBgBottom: "#eed056",
@@ -1240,6 +1253,17 @@ export function HeroInteractive({
           textColor: "#1a1208",
           inkBleed: "rgba(26, 18, 8, 0.15)",
         };
+
+        if (noteThemeType === "black") {
+          paperTheme = {
+            paperBgTop: "#282522",
+            paperBgMid: "#1c1917",
+            paperBgBottom: "#12100e",
+            paperBorder: "rgba(255, 255, 255, 0.22)",
+            textColor: "#f5eee4",
+            inkBleed: "rgba(255, 255, 255, 0.12)",
+          };
+        }
 
         // Calculate a deterministic varied rotation angle and organic size variation for each item
         const charSum = pin.id.split("").reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 3), 0);
@@ -1474,10 +1498,21 @@ export function HeroInteractive({
           context.fillStyle = paperGradient;
           context.fill();
 
-          // Fine matte paper border
-          context.strokeStyle = paperTheme.paperBorder;
-          context.lineWidth = 0.75 / transform.scale;
-          context.stroke();
+          // Fine matte paper border (pulsing glowing yellow border if pulseBorder is active)
+          if ((pin as any).pulseBorder) {
+            const pulseGlow = (Math.sin(timestamp / 220) + 1) / 2; // 0..1 smooth pulsing
+            context.save();
+            context.shadowColor = `rgba(245, 158, 11, ${0.45 + pulseGlow * 0.55})`;
+            context.shadowBlur = (8 + pulseGlow * 12) / transform.scale;
+            context.strokeStyle = `rgba(253, 224, 71, ${0.75 + pulseGlow * 0.25})`;
+            context.lineWidth = (2.2 + pulseGlow * 1.5) / transform.scale;
+            context.stroke();
+            context.restore();
+          } else {
+            context.strokeStyle = paperTheme.paperBorder;
+            context.lineWidth = 0.75 / transform.scale;
+            context.stroke();
+          }
           context.restore(); // restore ambient shadow
 
           // Multi-line Handwritten label text with realistic ink bleed
@@ -1612,7 +1647,15 @@ export function HeroInteractive({
         if (!pinPosition) return;
 
         const baseRadius = 6.2 / transform.scale;
-        const pinColor = (pin as any).color || (pin.id.includes("phone") || pin.id.includes("reinvestigate") || pin.id.includes("suspect-") ? "yellow" : "red");
+        const pinColor =
+          pin.pinColor ||
+          (pin.id.includes("phone") ||
+          pin.id.includes("reinvestigate") ||
+          pin.id.includes("suspect-")
+            ? "yellow"
+            : pin.color && pin.color !== "black"
+            ? pin.color
+            : "red");
 
         // Pin head colors by type
         let headTheme = {
@@ -1903,10 +1946,15 @@ export function HeroInteractive({
         function renderFrame(timestamp) {
           animationFrameRef.current = null;
 
+          const hasPulsingPins = (customPinsRef.current ?? activeCaseRef.current.pins).some(
+            (p) => (p as any).pulseBorder
+          );
+
           const shouldContinueAnimating =
             !reducedMotionRef.current &&
             (hoveredPinRef.current !== null ||
-              connectionStartIdRef.current !== null);
+              connectionStartIdRef.current !== null ||
+              hasPulsingPins);
 
           if (timestamp - lastRenderTime >= 33) {
             renderSceneRef.current?.(timestamp);

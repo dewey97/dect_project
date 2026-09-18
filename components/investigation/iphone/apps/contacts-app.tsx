@@ -45,9 +45,9 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
     {
       id: 'c-03',
       name: 'Lê Quang Vũ',
-      phone: '0988.200.991',
+      phone: '0988.20.09.91',
       relationship: 'Cán bộ đo đạc địa chính',
-      note: 'Còn nợ 350 triệu tiền bốc họ. Đang ép vẽ khống trích đo lên 120m2. Đã gọi nợ gắt tối 24/7.',
+      note: 'Còn nợ 300 triệu tiền bốc họ. Đang ép vẽ khống trích đo lên 120m2. SĐT nợ riêng giấu vợ: 0967.452.183 (chưa lưu danh bạ).',
       address: 'Phòng 302 Tập thể Địa chính Hà Nội',
       avatarColor: 'from-[#0A84FF] to-[#5856D6]'
     },
@@ -62,15 +62,6 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
     },
     {
       id: 'c-05',
-      name: 'Nguyễn Thanh Tùng',
-      phone: '0919.332.884',
-      relationship: 'Bạn nối khố thuở nhỏ',
-      note: 'Vừa về Hà Nội giải quyết việc riêng, hẹn chia tay đi Hải Phòng tối 24/7.',
-      address: 'Tổ 5 Phường Thượng Lý, Hải Phòng',
-      avatarColor: 'from-[#8E8E93] to-[#636366]'
-    },
-    {
-      id: 'c-06',
       name: 'Tuấn "Bia 88"',
       phone: '0936.888.712',
       relationship: 'Hội bạn nhậu',
@@ -79,7 +70,25 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
       avatarColor: 'from-[#FFD60A] to-[#FF9500]'
     },
     {
+      id: 'c-06',
+      name: 'Chị Lan Quán Nước',
+      phone: '0932.889.102',
+      relationship: 'Hàng xóm đầu ngõ',
+      note: 'Quán nước đầu ngõ 14 Bờ Sông, hay buôn chuyện xóm làng.',
+      address: 'Đầu ngõ 14 Đường Bờ Sông, Đống Đa',
+      avatarColor: 'from-[#AF52DE] to-[#5856D6]'
+    },
+    {
       id: 'c-07',
+      name: 'Bình Còi',
+      phone: '0915.223.789',
+      relationship: 'Bạn xã hội',
+      note: 'Nhóm bạn thu nợ, giao dịch cho vay.',
+      address: 'Quận Đống Đa, Hà Nội',
+      avatarColor: 'from-[#8E8E93] to-[#636366]'
+    },
+    {
+      id: 'c-08',
       name: 'Luật sư Nam',
       phone: '0903.441.229',
       relationship: 'Văn phòng Luật Nam & Cộng sự',
@@ -88,7 +97,7 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
       avatarColor: 'from-[#AF52DE] to-[#5856D6]'
     },
     {
-      id: 'c-08',
+      id: 'c-09',
       name: 'F88 Tín Dụng Nhanh',
       phone: '1800.6388',
       relationship: 'Hỗ trợ tài chính',

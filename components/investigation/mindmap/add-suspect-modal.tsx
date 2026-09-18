@@ -23,7 +23,7 @@ interface AddSuspectModalProps {
   editingSuspect?: SuspectItemData | null
   existingSuspects?: SuspectItemData[]
   onSelectSuspect?: (suspect: SuspectItemData | null) => void
-  onSubmitConclusion?: (culprit: 'vu' | 'tung') => void
+  onSubmitConclusion?: (culprit: 'vu' | 'tung' | 'ha') => void
 }
 
 interface EvaluationModalState {
@@ -184,7 +184,7 @@ export function AddSuspectModal({
   const handleConfirmMotiveClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
-    const isCore = matched?.id === 'vu' || matched?.id === 'tung'
+    const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
 
     if (!isCore) {
       detectiveAudio.playGlassSound()
@@ -230,7 +230,7 @@ export function AddSuspectModal({
   const handleConfirmAlibiClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
-    const isCore = matched?.id === 'vu' || matched?.id === 'tung'
+    const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
 
     if (!isCore) {
       detectiveAudio.playGlassSound()
@@ -297,7 +297,7 @@ export function AddSuspectModal({
     onClose()
   }
 
-  // NÚT 2: ĐIỀU TRA (Thẩm tra / điều tra nghi phạm Lê Quang Vũ hoặc Nguyễn Thanh Tùng)
+  // NÚT 2: ĐIỀU TRA (Thẩm tra / điều tra nghi phạm Lê Quang Vũ, Nguyễn Thanh Tùng hoặc Trần Thị Hà)
   const handleSubmitConclusion = () => {
     const currentName = name.trim() || editingSuspect?.name?.trim() || ''
     if (!currentName) {
@@ -310,15 +310,16 @@ export function AddSuspectModal({
     const lower = currentName.toLowerCase()
     const isVu = matchedChar?.id === 'vu' || lower.includes('vũ') || lower.includes('vu')
     const isTung = matchedChar?.id === 'tung' || lower.includes('tùng') || lower.includes('tung')
+    const isHa = matchedChar?.id === 'ha' || lower.includes('hà') || lower.includes('ha')
 
-    if (!isVu && !isTung) {
-      setErrorMsg('Chưa đủ căn cứ pháp lý: Đối tượng này không thuộc diện điều tra trọng điểm giai đoạn hiện tại (Vũ / Tùng)!')
+    if (!isVu && !isTung && !isHa) {
+      setErrorMsg('Chưa đủ căn cứ pháp lý: Đối tượng này không thuộc diện điều tra trọng điểm (Vũ / Tùng / Hà)!')
       detectiveAudio.playGlassSound()
       return
     }
 
-    const suspectId = isVu ? 'vu' : 'tung'
-    const suspectName = matchedChar?.canonicalName || (isVu ? 'Lê Quang Vũ' : 'Nguyễn Thanh Tùng')
+    const suspectId = isVu ? 'vu' : isTung ? 'tung' : 'ha'
+    const suspectName = matchedChar?.canonicalName || (isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà')
 
     const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
 
@@ -331,7 +332,7 @@ export function AddSuspectModal({
       alibiClueIds
     })
     if (onSubmitConclusion) {
-      onSubmitConclusion(isVu ? 'vu' : 'tung')
+      onSubmitConclusion(isVu ? 'vu' : isTung ? 'tung' : 'ha')
     }
     onClose()
   }
@@ -358,10 +359,11 @@ export function AddSuspectModal({
   const matchedChar = findValidCaseCharacter(name)
   const isVu = matchedChar?.id === 'vu'
   const isTung = matchedChar?.id === 'tung'
+  const isHa = matchedChar?.id === 'ha'
 
   // Hiển thị tích xanh khi có ít nhất 1 manh mối được chọn cho đối tượng hợp lệ
-  const isMotiveValid = (isVu || isTung) ? motiveClueIds.length > 0 : false
-  const isAlibiValid = (isVu || isTung) ? alibiClueIds.length > 0 : false
+  const isMotiveValid = (isVu || isTung || isHa) ? motiveClueIds.length > 0 : false
+  const isAlibiValid = (isVu || isTung || isHa) ? alibiClueIds.length > 0 : false
 
   return (
     <AnimatePresence>

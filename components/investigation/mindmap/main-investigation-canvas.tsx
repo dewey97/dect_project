@@ -10,6 +10,7 @@ import { IndictmentModal } from './indictment-modal'
 import { CulpritEpilogueModal } from './culprit-epilogue-modal'
 import { DossierResultModal } from './dossier-result-modal'
 import { FollowupQuestionModal } from './followup-question-modal'
+import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
 interface SuspectItem {
@@ -33,11 +34,13 @@ export function MainInvestigationCanvas({
 }: MainInvestigationCanvasProps) {
   const [suspects, setSuspects] = useState<SuspectItem[]>([])
   const [isReinvestigateUnlocked, setIsReinvestigateUnlocked] = useState(false)
+  const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] = useState(false)
+  const [hasOpenedReinvestigation, setHasOpenedReinvestigation] = useState(false)
   const [phoneLookupSuccess, setPhoneLookupSuccess] = useState(false)
 
   // Indictment & Epilogue state
   const [isIndictmentSolved, setIsIndictmentSolved] = useState(false)
-  const [solvedCulprit, setSolvedCulprit] = useState<'vu' | 'tung' | null>(null)
+  const [solvedCulprit, setSolvedCulprit] = useState<'vu' | 'tung' | 'ha' | null>(null)
   const [isEpilogueOpen, setIsEpilogueOpen] = useState(false)
   const [isDossierOpen, setIsDossierOpen] = useState(false)
   const [activeDossierType, setActiveDossierType] = useState<'A' | 'B' | null>(null)
@@ -45,10 +48,11 @@ export function MainInvestigationCanvas({
   const [isEvidenceGuideOpen, setIsEvidenceGuideOpen] = useState(false)
   const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false)
 
-  const [investigatedSuspects, setInvestigatedSuspects] = useState<('vu' | 'tung')[]>([])
-  const [solvedFollowupQuestions, setSolvedFollowupQuestions] = useState<('vu' | 'tung')[]>([])
-  const [activeFollowupCulprit, setActiveFollowupCulprit] = useState<'vu' | 'tung' | null>(null)
-  const [narrativeCulprit, setNarrativeCulprit] = useState<'vu' | 'tung' | null>(null)
+  const [investigatedSuspects, setInvestigatedSuspects] = useState<('vu' | 'tung' | 'ha')[]>([])
+  const [solvedFollowupQuestions, setSolvedFollowupQuestions] = useState<('vu' | 'tung' | 'ha')[]>([])
+  const [activeFollowupCulprit, setActiveFollowupCulprit] = useState<'vu' | 'tung' | 'ha' | null>(null)
+  const [narrativeCulprit, setNarrativeCulprit] = useState<'vu' | 'tung' | 'ha' | null>(null)
+  const [narrativeChoice, setNarrativeChoice] = useState<string | null>(null)
 
   // Modals state
   const [isAddSuspectOpen, setIsAddSuspectOpen] = useState(false)
@@ -123,6 +127,14 @@ export function MainInvestigationCanvas({
           }
         } catch {}
       }
+      const savedReinvestigateUnlocked = localStorage.getItem('veritas_reinvestigate_unlocked')
+      if (savedReinvestigateUnlocked === 'true') {
+        setIsReinvestigateUnlocked(true)
+      }
+      const savedReinvestigateOpened = localStorage.getItem('veritas_reinvestigate_opened')
+      if (savedReinvestigateOpened === 'true') {
+        setHasOpenedReinvestigation(true)
+      }
       const savedPhone = localStorage.getItem('veritas_phone_inputs')
       if (savedPhone) {
         try {
@@ -139,7 +151,7 @@ export function MainInvestigationCanvas({
         setInvestigatedSuspects(JSON.parse(savedInvestigated))
       }
       const savedSolved = localStorage.getItem('veritas_indictment_solved')
-      const savedCulprit = localStorage.getItem('veritas_indictment_culprit') as 'vu' | 'tung' | null
+      const savedCulprit = localStorage.getItem('veritas_indictment_culprit') as 'vu' | 'tung' | 'ha' | null
       if (savedSolved === 'true' && savedCulprit) {
         setIsIndictmentSolved(true)
         setSolvedCulprit(savedCulprit)
@@ -195,11 +207,13 @@ export function MainInvestigationCanvas({
 
     if (suspectToDelete) {
       const lower = suspectToDelete.name.toLowerCase()
-      const culpritType: 'vu' | 'tung' | null =
+      const culpritType: 'vu' | 'tung' | 'ha' | null =
         lower.includes('vũ') || lower.includes('vu')
           ? 'vu'
           : lower.includes('tùng') || lower.includes('tung')
           ? 'tung'
+          : lower.includes('hà') || lower.includes('ha')
+          ? 'ha'
           : null
 
       if (culpritType) {
@@ -207,7 +221,9 @@ export function MainInvestigationCanvas({
           const l = s.name.toLowerCase()
           return culpritType === 'vu'
             ? l.includes('vũ') || l.includes('vu')
-            : l.includes('tùng') || l.includes('tung')
+            : culpritType === 'tung'
+            ? l.includes('tùng') || l.includes('tung')
+            : l.includes('hà') || l.includes('ha')
         })
         if (!remainingHasCulprit) {
           setInvestigatedSuspects((prev) => {
@@ -236,11 +252,14 @@ export function MainInvestigationCanvas({
     setIsPhoneNarrativeOpen(true)
   }
 
-  const handleFollowupSuccess = (culprit: 'vu' | 'tung') => {
+  const handleFollowupSuccess = (culprit: 'vu' | 'tung' | 'ha', choice?: string) => {
     const updated = Array.from(new Set([...solvedFollowupQuestions, culprit]))
     setSolvedFollowupQuestions(updated)
     try {
       localStorage.setItem('veritas_solved_followups', JSON.stringify(updated))
+      if (choice) {
+        localStorage.setItem(`veritas_followup_${culprit}_choice`, choice)
+      }
     } catch {}
 
     if (updated.includes('vu') && updated.includes('tung')) {
@@ -249,10 +268,16 @@ export function MainInvestigationCanvas({
         localStorage.setItem('veritas_reinvestigate_unlocked', 'true')
       } catch {}
     }
+
+    // Đóng câu hỏi và mở DẪN TRUYỆN toàn màn hình của đối tượng
+    setIsFollowupQuestionOpen(false)
+    setNarrativeCulprit(culprit)
+    setNarrativeChoice(choice || null)
+    setIsEpilogueOpen(true)
   }
 
   const handleSubmitIndictment = (data: {
-    culprit: 'vu' | 'tung'
+    culprit: 'vu' | 'tung' | 'ha'
     suspectName: string
     motive: string
     selectedClueIds: string[]
@@ -279,9 +304,12 @@ export function MainInvestigationCanvas({
     setInvestigatedSuspects([])
     setSolvedFollowupQuestions([])
     setActiveFollowupCulprit(null)
+    setNarrativeChoice(null)
     setIsIndictmentSolved(false)
     setSolvedCulprit(null)
     setIsReinvestigateUnlocked(false)
+    setIsReinvestigateModalOpen(false)
+    setHasOpenedReinvestigation(false)
     setIsEpilogueOpen(false)
     setIsDossierOpen(false)
     setIsFollowupQuestionOpen(false)
@@ -292,9 +320,15 @@ export function MainInvestigationCanvas({
       localStorage.removeItem('veritas_solved_followups')
       localStorage.removeItem('veritas_followup_vu')
       localStorage.removeItem('veritas_followup_tung')
+      localStorage.removeItem('veritas_followup_ha')
+      localStorage.removeItem('veritas_followup_ha_matches')
+      localStorage.removeItem('veritas_followup_tung_choice')
+      localStorage.removeItem('veritas_followup_vu_choice')
+      localStorage.removeItem('veritas_followup_ha_choice')
       localStorage.removeItem('veritas_indictment_solved')
       localStorage.removeItem('veritas_indictment_culprit')
       localStorage.removeItem('veritas_reinvestigate_unlocked')
+      localStorage.removeItem('veritas_reinvestigate_opened')
       localStorage.removeItem('veritas_phone_inputs')
       localStorage.removeItem('khang_phone_pinned_clues')
       localStorage.removeItem('veritas_custom_notes')
@@ -302,6 +336,17 @@ export function MainInvestigationCanvas({
       localStorage.removeItem('veritas_completed_checkpoints')
     } catch {}
   }
+
+  const handleOpenReinvestigation = useCallback(() => {
+    setIsReinvestigateModalOpen(true)
+    setHasOpenedReinvestigation(true)
+    try {
+      localStorage.setItem('veritas_reinvestigate_opened', 'true')
+    } catch {}
+    if (onOpenReinvestigation) {
+      onOpenReinvestigation()
+    }
+  }, [onOpenReinvestigation])
 
   // Handle pin clicks directly on HeroInteractive canvas
   const handlePinClick = useCallback((pinId: string) => {
@@ -315,9 +360,9 @@ export function MainInvestigationCanvas({
     } else if (pinId === 'c0-pin-phone') {
       setIsPhoneLookupOpen(true)
     } else if (pinId === 'c0-pin-reinvestigate') {
-      if (isReinvestigateUnlocked && onOpenReinvestigation) {
+      if (isReinvestigateUnlocked) {
         detectiveAudio.playGlassSound()
-        onOpenReinvestigation()
+        handleOpenReinvestigation()
       } else {
         detectiveAudio.playGlassSound()
       }
@@ -333,8 +378,11 @@ export function MainInvestigationCanvas({
     } else if (pinId === 'c0-pin-followup-tung') {
       setActiveFollowupCulprit('tung')
       setIsFollowupQuestionOpen(true)
+    } else if (pinId === 'c0-pin-followup-ha') {
+      setActiveFollowupCulprit('ha')
+      setIsFollowupQuestionOpen(true)
     } else if (pinId.startsWith('c0-pin-followup')) {
-      const c = pinId.includes('tung') ? 'tung' : 'vu'
+      const c = pinId.includes('ha') ? 'ha' : pinId.includes('tung') ? 'tung' : 'vu'
       setActiveFollowupCulprit(c)
       setIsFollowupQuestionOpen(true)
     } else if (pinId.startsWith('node-suspect-')) {
@@ -370,10 +418,10 @@ export function MainInvestigationCanvas({
   const DESKTOP_SUSPECT_SLOTS = React.useMemo(() => [
     { x: 0.10, y: 0.36 }, // Slot 0: Lê Quang Vũ (Góc trái trên)
     { x: 0.26, y: 0.36 }, // Slot 1: Nguyễn Thanh Tùng (Góc phải trên)
-    { x: 0.26, y: 0.68 }, // Slot 2: Trần Thị Hà (Góc phải dưới)
+    { x: 0.42, y: 0.36 }, // Slot 2: Trần Thị Hà (Góc phải trên cùng hàng)
     { x: 0.10, y: 0.68 }, // Slot 3: Nguyễn Ngọc Mai (Góc trái dưới)
-    { x: 0.18, y: 0.52 }, // Slot 4: Trần Văn Đạt (Đạt Gà) (Trung tâm)
-    { x: 0.34, y: 0.52 }, // Slot 5: Nguyễn Thị Lụa (Phải giữa)
+    { x: 0.26, y: 0.68 }, // Slot 4: Trần Văn Đạt (Đạt Gà) (Góc giữa dưới)
+    { x: 0.38, y: 0.68 }, // Slot 5: Nguyễn Thị Lụa (Góc phải dưới)
     { x: 0.02, y: 0.52 }, // Slot 6: Nguyễn Văn Khang (Trái giữa)
   ], [])
 
@@ -381,10 +429,10 @@ export function MainInvestigationCanvas({
     { x: 0.15, y: 0.48 }, // Slot 0: Lê Quang Vũ
     { x: 0.40, y: 0.48 }, // Slot 1: Nguyễn Thanh Tùng
     { x: 0.65, y: 0.48 }, // Slot 2: Trần Thị Hà
-    { x: 0.86, y: 0.48 }, // Slot 3: Nguyễn Ngọc Mai
-    { x: 0.28, y: 0.64 }, // Slot 4: Trần Văn Đạt (Đạt Gà)
-    { x: 0.72, y: 0.64 }, // Slot 5: Nguyễn Thị Lụa
-    { x: 0.50, y: 0.64 }, // Slot 6: Nguyễn Văn Khang
+    { x: 0.88, y: 0.48 }, // Slot 3: Nguyễn Ngọc Mai
+    { x: 0.28, y: 0.78 }, // Slot 4: Trần Văn Đạt (Đạt Gà)
+    { x: 0.72, y: 0.78 }, // Slot 5: Nguyễn Thị Lụa
+    { x: 0.50, y: 0.78 }, // Slot 6: Nguyễn Văn Khang
   ], [])
 
   // Construct dynamic suspect pins with 100% deterministic, stationary slots
@@ -414,17 +462,21 @@ export function MainInvestigationCanvas({
     }
   })
 
-  // Tìm node suspect của Vũ và Tùng để nối dây
+  // Tìm node suspect của Vũ, Tùng và Hà để nối dây
   const vuSuspect = suspects.find(
     (s) => s.name.toLowerCase().includes('vũ') || s.name.toLowerCase().includes('vu')
   )
   const tungSuspect = suspects.find(
     (s) => s.name.toLowerCase().includes('tùng') || s.name.toLowerCase().includes('tung')
   )
+  const haSuspect = suspects.find(
+    (s) => s.name.toLowerCase().includes('hà') || s.name.toLowerCase().includes('ha')
+  )
 
-  // Dynamic Followup Pins cho Vũ và Tùng (Chỉ hiển thị khi có suspect tương ứng và ĐÃ THẨM TRA)
+  // Dynamic Followup Pins cho Vũ, Tùng và Hà (Chỉ hiển thị khi có suspect tương ứng và ĐÃ THẨM TRA)
   const hasVuFollowup = !!vuSuspect && investigatedSuspects.includes('vu')
   const hasTungFollowup = !!tungSuspect && investigatedSuspects.includes('tung')
+  const hasHaFollowup = !!haSuspect && investigatedSuspects.includes('ha')
 
   const followupPinsMobile: PinPoint[] = [
     ...(hasVuFollowup
@@ -447,6 +499,18 @@ export function MainInvestigationCanvas({
             y: 0.64,
             label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
+            color: 'yellow' as const,
+          },
+        ]
+      : []),
+    ...(hasHaFollowup
+      ? [
+          {
+            id: 'c0-pin-followup-ha',
+            x: 0.65,
+            y: 0.64,
+            label: 'Câu hỏi',
+            detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
             color: 'yellow' as const,
           },
         ]
@@ -478,9 +542,23 @@ export function MainInvestigationCanvas({
           },
         ]
       : []),
+    ...(hasHaFollowup
+      ? [
+          {
+            id: 'c0-pin-followup-ha',
+            x: 0.42,
+            y: 0.50,
+            label: 'Câu hỏi',
+            detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
+            color: 'yellow' as const,
+          },
+        ]
+      : []),
   ]
 
   // Construct dynamic pins and connections combining main category pins, sub action pins, and suspect pins
+  const isReinvestigateBlinking = isReinvestigateUnlocked && !hasOpenedReinvestigation
+
   const customPins: PinPoint[] = isMobile
     ? [
         {
@@ -518,6 +596,9 @@ export function MainInvestigationCanvas({
             ? 'Mở biên bản tái khám xét hiện trường'
             : 'Khám xét lại hiện trường [Khóa — Cần trả lời xong câu hỏi của Vũ & Tùng]',
           color: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
+          noteColor: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
+          pinColor: 'yellow' as const,
+          pulseBorder: isReinvestigateBlinking,
         },
         {
           id: 'c0-pin-indictment',
@@ -579,6 +660,9 @@ export function MainInvestigationCanvas({
             ? 'Mở biên bản tái khám xét hiện trường'
             : 'Khám xét lại hiện trường [Khóa — Cần trả lời xong câu hỏi của Vũ & Tùng]',
           color: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
+          noteColor: isReinvestigateUnlocked ? ('yellow' as const) : ('black' as const),
+          pinColor: 'yellow' as const,
+          pulseBorder: isReinvestigateBlinking,
         },
         ...desktopSuspectPins,
       ]
@@ -604,10 +688,19 @@ export function MainInvestigationCanvas({
           },
         ]
       : []),
+    ...(hasHaFollowup && haSuspect
+      ? [
+          {
+            id: 'c0-conn-followup-ha',
+            fromPinId: `node-suspect-${getCanonicalSuspectKey(haSuspect).canonicalId}`,
+            toPinId: 'c0-pin-followup-ha',
+          },
+        ]
+      : []),
     ...suspects.map((suspect) => {
       const { canonicalId } = getCanonicalSuspectKey(suspect)
       return {
-        id: `c0-conn-suspect-${canonicalId}`,
+        id: `c0-conn-${canonicalId}`,
         fromPinId: 'c0-pin-suspects',
         toPinId: `node-suspect-${canonicalId}`,
       }
@@ -615,30 +708,25 @@ export function MainInvestigationCanvas({
   ]
 
   return (
-    <div className="w-full h-full min-h-[580px] relative rounded-xl border border-[#523924] overflow-hidden flex flex-col font-sans select-none shadow-[0_20px_60px_rgba(0,0,0,0.95)] bg-[#0f0b08]">
-      {/* TOP ATMOSPHERIC HEADER */}
-      <div className="relative z-20 bg-[#140e09]/95 backdrop-blur-md px-4 py-2.5 border-b border-[#3b2616] flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="size-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] animate-pulse" />
-          <h2 className="font-sans font-bold text-xs text-[#fef5ec] tracking-wider uppercase">
-            BẢNG CHỨNG CỨ VỤ ÁN // HERO INTERACTIVE BOARD (CASE #000)
-          </h2>
+    <div className="relative w-full h-full flex flex-col items-center justify-center select-none">
+      {/* Top Banner Toolbar */}
+      <div className="absolute top-3 left-4 z-20 flex items-center pointer-events-none">
+        <div className="flex items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto">
+          <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+          <span className="font-bold tracking-wide">CASE 000 — BẢNG ĐIỀU TRA MANH MỐI</span>
         </div>
       </div>
 
-      {/* 100% AUTHENTIC HEROINTERACTIVE LANDING PAGE CANVAS ENGINE */}
-      <div className="flex-1 w-full h-full relative z-10 overflow-hidden">
-        <HeroInteractive
-          className="w-full h-full rounded-none border-none"
-          controlledCaseId="case-000"
-          customBgImage="/images/crime_scene_outline_bg.jpg"
-          customPins={customPins}
-          customConnections={customConnections}
-          onPinClick={handlePinClick}
-        />
-      </div>
+      {/* Main Interactive Pinboard Canvas */}
+      <HeroInteractive
+        className="w-full h-full"
+        controlledCaseId="case-00"
+        customPins={customPins}
+        customConnections={customConnections}
+        onPinClick={handlePinClick}
+      />
 
-      {/* MODALS INTEGRATION */}
+      {/* Modals & Narrative Layers */}
       <AddSuspectModal
         key={isAddSuspectOpen ? (editingSuspect ? editingSuspect.id : 'new-suspect-form') : 'closed'}
         isOpen={isAddSuspectOpen}
@@ -656,7 +744,7 @@ export function MainInvestigationCanvas({
           detectiveAudio.playUnlockJingle()
           setIsReinvestigateUnlocked(true)
           setInvestigatedSuspects((prev) => {
-            const next = Array.from(new Set([...prev, culprit]))
+            const next = Array.from(new Set([...prev, culprit])) as ('vu' | 'tung' | 'ha')[]
             try {
               localStorage.setItem('veritas_investigated_suspects', JSON.stringify(next))
             } catch {}
@@ -687,8 +775,11 @@ export function MainInvestigationCanvas({
         onClose={() => setIsEvidenceGuideOpen(false)}
         isPhoneSolved={phoneLookupSuccess}
         isReinvestigateUnlocked={isReinvestigateUnlocked}
-        onOpenPhoneLookup={() => setIsPhoneLookupOpen(true)}
-        onOpenReinvestigation={onOpenReinvestigation}
+      />
+
+      <ReinvestigationModal
+        isOpen={isReinvestigateModalOpen}
+        onClose={() => setIsReinvestigateModalOpen(false)}
       />
 
       <IndictmentModal
@@ -700,12 +791,20 @@ export function MainInvestigationCanvas({
       <CulpritEpilogueModal
         isOpen={isEpilogueOpen}
         culprit={narrativeCulprit || activeFollowupCulprit || solvedCulprit}
+        choice={narrativeChoice}
         onClose={() => {
           setIsEpilogueOpen(false)
           setNarrativeCulprit(null)
+          setNarrativeChoice(null)
         }}
         onOpenDossier={handleOpenDossier}
         onOpenFollowupQuestion={() => setIsFollowupQuestionOpen(true)}
+        onOpenIndictment={() => {
+          setIsEpilogueOpen(false)
+          setNarrativeCulprit(null)
+          setNarrativeChoice(null)
+          setIsIndictmentOpen(true)
+        }}
       />
 
       <DossierResultModal
@@ -719,7 +818,6 @@ export function MainInvestigationCanvas({
         isOpen={isFollowupQuestionOpen}
         culprit={activeFollowupCulprit || solvedCulprit || 'vu'}
         onClose={() => setIsFollowupQuestionOpen(false)}
-        onOpenDossier={handleOpenDossier}
         onSuccess={handleFollowupSuccess}
       />
     </div>

@@ -77,7 +77,7 @@ export function PhoneLookupModal({
               <span className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#6b4e2e] block">
                 MỞ RỘNG ĐIỀU TRA
               </span>
-              <h3 className="font-serif font-bold text-base sm:text-lg text-[#1a120b] uppercase tracking-wide">
+              <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
                 Truy Vết Liên Lạc
               </h3>
             </div>

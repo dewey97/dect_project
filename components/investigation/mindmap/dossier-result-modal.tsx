@@ -41,7 +41,7 @@ export function DossierResultModal({
               <span className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1d1d] block">
                 🔴 HỒ SƠ TÀI LIỆU MẬT // {code}
               </span>
-              <h3 className="font-serif font-bold text-base sm:text-lg text-[#1a120b] uppercase tracking-wide">
+              <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
                 {title}
               </h3>
             </div>

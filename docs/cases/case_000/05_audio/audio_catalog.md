@@ -69,6 +69,8 @@ Các file âm thanh trực tiếp kết nối với giao diện người dùng v
 * **`unlock_jingle.mp3`**: Tiếng nhạc jingle âm vang khi hoàn thành giải đố thành công.
 * **`glass_break.mp3`**: Tiếng thủy tinh rạn nứt / cảnh báo khi chọn sai lập luận.
 * **`paper_rustle.mp3`**: Tiếng sột soạt lật hồ sơ, tài liệu, biên bản khai nại.
+* **`ha_voicemail_2032.mp3`**: Lời nhắn hộp thư thoại 20:32 của Trần Thị Hà gửi nạn nhân Khang (chứa âm thanh đầu mối: còi tàu hỏa 68dB vạch trần cô ta đang đứng ngay trước cổng nhà nạn nhân).
+* **`ha_interrogation_breakdown.mp3`**: Băng ghi âm thẩm vấn năm 2016 (lời khai gay gắt, dồn ép và vỡ vụn tâm lý của Trần Thị Hà khi bị chất vấn về việc nhầm lịch phát sóng VTV3).
 
 ### 2. Nhạc nền cao trào (`public/audio/`)
 
@@ -93,3 +95,16 @@ detectiveAudio.playTrainHornAndBellSound()
 // Tiếng đóng dấu khi vượt qua checkpoint suy luận
 detectiveAudio.playStampSound()
 ```
+
+---
+
+## IV. DETECTIVE AUDIO MCP SERVER (`scripts/audio_mcp_server.py`)
+
+Hệ thống đã tích hợp **MCP Server cục bộ (`detective_audio`)** được khai báo tại `C:\Users\Dell\.gemini\config\mcp_config.json`.
+
+### Các công cụ (Tools) tích hợp:
+1. `generate_investigation_voice`: Sinh giọng thoại nhân chứng / nghi phạm / trẻ em tiếng Việt có áp dụng bộ lọc vật lý (điện thoại 113, băng cassette thẩm vấn, bộ đàm cảnh sát, buồng tủ gỗ).
+2. `apply_acoustic_filter`: Áp dụng giả lập âm học căn phòng / thiết bị lên file âm thanh sẵn có.
+3. `mix_scene_soundscape`: Hòa trộn hành động (thoại / SFX) với nhạc nền drone u ám (`atmosphere_drone.wav`).
+4. `list_case_audio_assets`: Kiểm kê tự động toàn bộ file audio ở cả runtime và source archive kèm thời lượng, dung lượng.
+

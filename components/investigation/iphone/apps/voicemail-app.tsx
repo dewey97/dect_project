@@ -53,9 +53,9 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
         setPlaybackProgress(0)
       }
       setIsPlaying(true)
-      // Play realistic synthesized train horn & crossing bell sound
+      // Play realistic voicemail of Ha with background train horn
       if (expandedId === 'vm-01') {
-        detectiveAudio.playTrainHornAndBellSound()
+        detectiveAudio.playHaVoicemail()
       }
     } else {
       setIsPlaying(false)
@@ -68,7 +68,7 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
       sender: 'Trần Thị Hà',
       phone: '0984.112.568',
       time: '20:32 (24/07)',
-      duration: '0:18',
+      duration: '0:11',
       transcript:
         '"Anh Khang à, sao em gọi mãi anh không nghe máy thế? Em đang ở phòng trọ xem phim một mình buồn quá... tí nữa em chạy qua với anh nhé..."',
       audioClue:
@@ -87,10 +87,14 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
   ]
 
   const recents = [
-    { name: 'Trần Thị Hà', phone: '0984.112.568', type: 'Nhỡ', time: '20:31', count: 1, isMissed: true },
-    { name: 'Lê Quang Vũ', phone: '0988.20.09.91', type: 'Nhỡ', time: '19:20', count: 1, isMissed: true },
-    { name: 'Nguyễn Ngọc Mai', phone: '0912.456.789', type: 'Cuộc gọi đến', time: '18:30', duration: '1:45', isMissed: false },
-    { name: 'Tuấn "Bia 88"', phone: '0904.112.xxx', type: 'Cuộc gọi đi', time: '17:15', duration: '0:32', isMissed: false },
+    { name: 'Hà Kế Toán', phone: '0984.112.568', type: 'Cuộc gọi nhỡ', time: '20:31', count: 1, isMissed: true },
+    { name: '0984.180.357', phone: '0984.180.357', type: 'Cuộc gọi đến', time: '19:55', duration: '0:35', isMissed: false },
+    { name: '0912.331.888', phone: '0912.331.888', type: 'Cuộc gọi đến', time: '18:45', duration: '1:40', isMissed: false },
+    { name: 'Nguyễn Ngọc Mai', phone: '0984.661.302', type: 'Cuộc gọi đến', time: '18:30', duration: '1:45', isMissed: false },
+    { name: '0967.452.183', phone: '0967.452.183', type: 'Cuộc gọi đến', time: '18:15', duration: '0:28', isMissed: false },
+    { name: 'Bình Còi', phone: '0915.223.789', type: 'Cuộc gọi đến', time: '18:00', duration: '1:15', isMissed: false },
+    { name: 'Chị Lan Quán Nước', phone: '0932.889.102', type: 'Cuộc gọi đến', time: '17:30', duration: '0:42', isMissed: false },
+    { name: 'Tuấn "Bia 88"', phone: '0936.888.712', type: 'Cuộc gọi đi', time: '17:15', duration: '0:32', isMissed: false },
   ]
 
   return (

@@ -211,7 +211,7 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
           <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 flex flex-col justify-start pb-10">
             <div className="text-center my-1.5">
               <span className="text-[9px] text-[#8E8E93] bg-[#1C1C1E]/80 px-2.5 py-1 rounded-full border border-white/5 font-mono">
-                Bản trích xuất iMessage & SMS // UFED Cellebrite
+                Tin nhắn SMS
               </span>
             </div>
 
@@ -340,54 +340,17 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
                               </div>
                             </div>
                           </div>
-
-                          {/* Audio Clue Callout Banner */}
-                          {msg.attachment.audioClue && (
-                            <div className="p-2 rounded-lg bg-[#FF9F0A]/10 border border-[#FF9F0A]/30 text-[10px] text-[#FFD60A] leading-relaxed">
-                              {msg.attachment.audioClue}
-                            </div>
-                          )}
                         </div>
                       )}
 
                       {/* Main Message Text */}
                       <p className="text-[12px]">{msg.text}</p>
-
-                      {/* Forensic Clue Trigger Badge */}
-                      {msg.isClue && (
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setInspectingClue(msg)
-                          }}
-                          className="mt-2 pt-1.5 border-t border-white/10 flex items-center justify-between gap-1 text-[10px] text-[#FFD60A] font-medium hover:underline cursor-pointer"
-                        >
-                          <span className="flex items-center gap-1 font-bold">
-                            <Sparkles className="size-3 text-[#FFD60A] animate-pulse" />
-                            {msg.clueTitle || 'Manh mối quan trọng'}
-                          </span>
-                          <span className="text-[9px] text-[#FFD60A]/80 font-mono">Soi hồ sơ →</span>
-                        </div>
-                      )}
                     </div>
 
                     {/* Detailed Metadata / Status sub-bar */}
                     <div className="flex items-center gap-1.5 text-[8.5px] text-[#8E8E93] mt-0.5 px-1 font-mono">
                       <span>{msg.timestamp}</span>
                       {msg.status && <span>• {msg.status}</span>}
-                      {msg.isClue && (
-                        <button
-                          onClick={() => togglePinClue(msg.id, msg.clueTitle)}
-                          className="hover:text-[#30D158] transition-colors ml-1"
-                          title="Ghim manh mối"
-                        >
-                          {isPinned ? (
-                            <BookmarkCheck className="size-3 text-[#30D158]" />
-                          ) : (
-                            <Bookmark className="size-3 text-[#8E8E93]" />
-                          )}
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>

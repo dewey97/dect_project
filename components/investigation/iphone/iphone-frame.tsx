@@ -234,7 +234,7 @@ export function IPhoneFrame({
                     20:45
                   </span>
                   <span className="text-[9.5px] text-[#FF453A] font-mono bg-[#FF453A]/25 px-2.5 py-0.5 rounded-full border border-[#FF453A]/40 font-bold backdrop-blur-md shadow">
-                    PIN YẾU (18%) // THU GIỮ TẠI HIỆN TRƯỜNG
+                    PIN YẾU (18%)
                   </span>
                 </div>
 
@@ -243,12 +243,12 @@ export function IPhoneFrame({
                   <div className="p-2.5 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/15 shadow-xl">
                     <div className="flex items-center justify-between text-[10.5px] text-white/70 mb-0.5">
                       <span className="font-semibold flex items-center gap-1 text-[#FF453A]">
-                        <Phone className="size-3 text-[#FF453A]" /> Cuộc gọi nhỡ (1) • Trần Thị Hà
+                        <Phone className="size-3 text-[#FF453A]" /> Cuộc gọi nhỡ (1) • Hà Kế Toán
                       </span>
                       <span className="font-mono text-[9px]">20:31</span>
                     </div>
                     <p className="text-[11px] text-white/95">
-                      Trần Thị Hà đã để lại 1 thư thoại (0:18)
+                      Hà Kế Toán đã để lại 1 thư thoại (0:18)
                     </p>
                   </div>
 
@@ -257,10 +257,10 @@ export function IPhoneFrame({
                       <span className="font-semibold flex items-center gap-1 text-white">
                         <MessageSquare className="size-3 text-[#30D158]" /> Tin nhắn • Bé Vy ❤️
                       </span>
-                      <span className="font-mono text-[9px]">17:55</span>
+                      <span className="font-mono text-[9px]">20:35</span>
                     </div>
                     <p className="text-[11px] text-white/95 line-clamp-2 leading-relaxed">
-                      Nhớ lời anh đó nha! Em chuẩn bị xong hết vali rồi, sáng mai em đợi anh ở sân bay Nội Bài đấy! ✈️❤️
+                      Dạaaa, vậy sáng mai anh qua đón e nhé 😘😘
                     </p>
                   </div>
                 </div>
@@ -310,11 +310,11 @@ export function IPhoneFrame({
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Kiểu máy:</span>
-                        <span className="font-semibold">iPhone 5s (64GB, Space Gray)</span>
+                        <span className="font-semibold">iPhone 6s Plus (64GB, Space Gray)</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Số thuê bao:</span>
-                        <span className="font-mono text-[#0A84FF]">0983.291.802</span>
+                        <span className="font-mono text-[#0A84FF]">0904.888.666</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Số IMEI:</span>
@@ -322,16 +322,16 @@ export function IPhoneFrame({
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Tình trạng pin:</span>
-                        <span className="text-[#FF453A] font-bold">18% (Rơi úp mặt sàn phòng khách)</span>
+                        <span className="text-[#FF453A] font-bold">18%</span>
                       </div>
                       <div className="flex justify-between border-b border-white/5 pb-2">
                         <span className="text-[#8E8E93]">Cảm biến bảo mật:</span>
-                        <span className="text-white">Touch ID (Nút Home cơ học)</span>
+                        <span className="text-white">Touch ID</span>
                       </div>
                       <div className="flex justify-between pt-1">
                         <span className="text-[#8E8E93]">Trích xuất pháp y:</span>
                         <span className="text-[#30D158] font-bold flex items-center gap-1">
-                          <ShieldCheck className="size-3.5" /> UFED Cellebrite 100%
+                          <ShieldCheck className="size-3.5" /> Đã trích xuất dữ liệu
                         </span>
                       </div>
                     </div>
@@ -441,19 +441,18 @@ export function IPhoneFrame({
                     onClick={() => setActiveApp('maps')}
                     className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                   >
-                    <div className="w-full aspect-square rounded-[22.5%] bg-[#34C759] flex items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.35)] border border-white/30 relative overflow-hidden">
-                      <svg className="size-full" viewBox="0 0 54 54">
-                        <rect width="54" height="54" fill="#8CE071" />
-                        <path d="M0 27h54M27 0v54" stroke="#FFF" strokeWidth="6" />
-                        <path d="M0 27h54" stroke="#FFCC00" strokeWidth="3" />
-                        <path d="M12 0l30 54" stroke="#007AFF" strokeWidth="4" />
-                        <rect x="20" y="8" width="14" height="12" rx="3" fill="#007AFF" />
-                        <text x="27" y="16" fontSize="7" fill="white" fontWeight="bold" textAnchor="middle">280</text>
-                        <circle cx="34" cy="38" r="4" fill="#FF3B30" stroke="white" strokeWidth="1.5" />
+                    <div className="w-full aspect-square rounded-[22.5%] bg-white flex items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.35)] border border-white/40 relative overflow-hidden p-1.5">
+                      {/* Authentic Google Maps Pin Icon */}
+                      <svg className="w-full h-full" viewBox="0 0 48 48">
+                        <path d="M24 4C14.06 4 6 12.06 6 22c0 13.5 18 22 18 22s18-8.5 18-22c0-9.94-8.06-18-18-18z" fill="#EA4335" />
+                        <path d="M24 4C14.06 4 6 12.06 6 22c0 4.8 1.9 9.17 5 12.35l13-12.35V4z" fill="#4285F4" />
+                        <path d="M24 22l13-12.35C33.9 6.47 29.2 4 24 4v18z" fill="#FBBC04" />
+                        <path d="M24 22v22s18-8.5 18-22c0-4.8-1.9-9.17-5-12.35L24 22z" fill="#34A853" />
+                        <circle cx="24" cy="19" r="6" fill="#FFFFFF" />
                       </svg>
                     </div>
                     <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
-                      Maps
+                      Google Maps
                     </span>
                   </button>
 

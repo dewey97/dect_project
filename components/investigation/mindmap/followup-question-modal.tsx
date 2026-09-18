@@ -1,17 +1,17 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, HelpCircle, CheckCircle2, ArrowRight } from 'lucide-react'
+import { X, HelpCircle, CheckCircle2, ArrowRight, ShieldCheck, Check, Sparkles } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
+import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 
 interface FollowupQuestionModalProps {
   isOpen: boolean
-  culprit: 'vu' | 'tung' | null
+  culprit: 'vu' | 'tung' | 'ha' | null
   onClose: () => void
-  onOpenDossier?: (dossierType: 'A' | 'B') => void
-  onSuccess?: (culprit: 'vu' | 'tung') => void
+  onSuccess?: (culprit: 'vu' | 'tung' | 'ha', choice?: string) => void
 }
 
 const MOCK_OPTIONS_VU = [
@@ -22,33 +22,82 @@ const MOCK_OPTIONS_VU = [
 ]
 
 const MOCK_OPTIONS_TUNG = [
-  { id: 'opt-1', label: 'Phương án A: Trả thù cho em trai Gia Huy bị Khang nhốt tủ tử vong năm 1998.' },
-  { id: 'opt-2', label: 'Phương án B: Mâu thuẫn tranh chấp số tiền cờ bạc nợ nần tại quán nhậu.' },
-  { id: 'opt-3', label: 'Phương án C: Giằng co xô xát sau khi Khang xé nát bài báo và bức ảnh kỷ niệm.' },
-  { id: 'opt-4', label: 'Phương án D: Cả phương án A và C đều đúng.' }
+  { id: 'tin', label: 'TIN' },
+  { id: 'khong_tin', label: 'KHÔNG TIN' }
 ]
+
+// 3 TILES MANH MỐI THU ĐƯỢC TẠI NHÀ VÀ THÂN THỂ TRẦN THỊ HÀ
+export const HA_CLUE_TILES = [
+  {
+    id: 'tile_ao_gio',
+    number: '01',
+    title: 'ÁO GIÓ DÍNH BỤI CÂY XOAN',
+    subtitle: 'Thu giữ sau cánh cửa phòng trọ',
+    description: 'Áo khoác gió xám đen dính bụi mùn đất đặc trưng quanh gốc cây xoan trước ngõ nhà Khang.',
+    validDocIds: ['doc_07b_loi_khai_vu', 'doc_06_loi_khai_lua'],
+    matchHint: 'Khớp nối lời khai Lê Quang Vũ / bà Lụa: bóng người mặc áo gió trùm đầu rình rập dưới gốc cây xoan trước cổng.',
+  },
+  {
+    id: 'tile_lon_toc',
+    number: '02',
+    title: 'LỌN TÓC MAI DÍNH MÁU (ADN 100%)',
+    subtitle: 'Thu giữ giấu trong áo ngực',
+    description: 'Lọn tóc mai dính máu cắt bằng kéo, kết quả giám định sinh học trùng khớp 100% mẫu ADN của Khang.',
+    validDocIds: ['doc_04_tu_thi'],
+    matchHint: 'Khớp nối Khám nghiệm tử thi: mảng tóc mai bên trái bị cắt tỉa sát da đầu & vết đâm cổ lúc 21:00.',
+  },
+  {
+    id: 'tile_thuoc_an_than',
+    number: '03',
+    title: 'VỈ THUỐC DIAZEPAM & VẾT RÁCH TAY',
+    subtitle: 'Thu giữ tại phòng & thân thể',
+    description: 'Vỉ thuốc an thần Diazepam 5mg bóc dở 4 viên & vết rách sâu 2.5cm ở lòng bàn tay phải của Hà.',
+    validDocIds: ['doc_05_kham_nghiem', 'p3_hung_khi'],
+    matchHint: 'Khớp nối Khám nghiệm hiện trường: cặn ấm trà hoa cúc chứa hoạt chất Diazepam & mảnh thủy tinh bình trà vỡ.',
+  },
+]
+
+// Lấy danh sách chứng cứ ban đầu chuẩn từ checkpoints000
+const AVAILABLE_EVIDENCES =
+  checkpoints000.find((cp) => cp.id === 'cp-000-1a')?.pickerConfig?.availableEvidences ||
+  checkpoints000.find((cp) => cp.id === 'cp-000-2a')?.pickerConfig?.availableEvidences ||
+  []
 
 export function FollowupQuestionModal({
   isOpen,
   culprit,
   onClose,
-  onOpenDossier,
   onSuccess
 }: FollowupQuestionModalProps) {
+  // State for Vu / Tung
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  
+  // State for Ha 3-Tile Matching
+  const [activeHaTileId, setActiveHaTileId] = useState<string>('tile_ao_gio')
+  const [haTileSelections, setHaTileSelections] = useState<Record<string, string[]>>({
+    tile_ao_gio: [],
+    tile_lon_toc: [],
+    tile_thuoc_an_than: [],
+  })
+
   const [errorMsg, setErrorMsg] = useState('')
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!culprit || !isOpen) return
+    setErrorMsg('')
     try {
-      const saved = localStorage.getItem(`veritas_followup_${culprit}`)
-      if (saved) {
-        setSelectedOption(saved)
-        setIsSubmitted(true)
+      if (culprit === 'ha') {
+        const savedHa = localStorage.getItem('veritas_followup_ha_matches')
+        if (savedHa) {
+          setHaTileSelections(JSON.parse(savedHa))
+        }
       } else {
-        setSelectedOption(null)
-        setIsSubmitted(false)
+        const saved = localStorage.getItem(`veritas_followup_${culprit}`)
+        if (saved) {
+          setSelectedOption(saved)
+        } else {
+          setSelectedOption(null)
+        }
       }
     } catch {}
   }, [culprit, isOpen])
@@ -56,13 +105,64 @@ export function FollowupQuestionModal({
   if (!isOpen || !culprit) return null
 
   const isVu = culprit === 'vu'
-  const title = isVu ? 'CÂU HỎI — TRUY VẤN ĐỐI TƯỢNG LÊ QUANG VŨ' : 'CÂU HỎI — TRUY VẤN ĐỐI TƯỢNG NGUYỄN THANH TÙNG'
-  const questionText = isVu
-    ? 'Hành vi và động cơ mấu chốt nào dẫn tới sự hiện diện của Lê Quang Vũ tại hiện trường vào đêm xảy ra án mạng 24/07?'
-    : 'Yếu tố tâm lý và xung đột cốt lõi nào đã kích hoạt cơn thịnh nộ của Nguyễn Thanh Tùng trước khi án mạng xảy ra?'
-  const options = isVu ? MOCK_OPTIONS_VU : MOCK_OPTIONS_TUNG
+  const isTung = culprit === 'tung'
+  const isHa = culprit === 'ha'
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Helper check if tile is matched correctly
+  const isTileMatched = (tileId: string): boolean => {
+    const tile = HA_CLUE_TILES.find((t) => t.id === tileId)
+    if (!tile) return false
+    const selected = haTileSelections[tileId] || []
+    return tile.validDocIds.some((validId) => selected.includes(validId))
+  }
+
+  const allHaTilesMatched = HA_CLUE_TILES.every((tile) => isTileMatched(tile.id))
+
+  const handleToggleHaEvidence = (evidenceId: string) => {
+    detectiveAudio.playPaperRustle()
+    setErrorMsg('')
+    const tile = HA_CLUE_TILES.find((t) => t.id === activeHaTileId)
+    if (!tile) return
+
+    setHaTileSelections((prev) => {
+      const current = prev[activeHaTileId] || []
+      const nextList = current.includes(evidenceId)
+        ? current.filter((id) => id !== evidenceId)
+        : [...current, evidenceId]
+
+      const updated = {
+        ...prev,
+        [activeHaTileId]: nextList,
+      }
+
+      try {
+        localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(updated))
+      } catch {}
+
+      // Play success audio if just matched
+      const nowMatched = tile.validDocIds.some((validId) => nextList.includes(validId))
+      if (nowMatched && !tile.validDocIds.some((validId) => current.includes(validId))) {
+        detectiveAudio.playStampSound()
+      }
+
+      return updated
+    })
+  }
+
+  const handleBypassAll = () => {
+    detectiveAudio.playStampSound()
+    const bypassedMatches: Record<string, string[]> = {
+      tile_ao_gio: ['doc_07b_loi_khai_vu'],
+      tile_lon_toc: ['doc_04_tu_thi'],
+      tile_thuoc_an_than: ['doc_05_kham_nghiem'],
+    }
+    setHaTileSelections(bypassedMatches)
+    try {
+      localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(bypassedMatches))
+    } catch {}
+  }
+
+  const handleSubmitVuTung = (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedOption) {
       setErrorMsg('Vui lòng tích chọn một phương án trả lời!')
@@ -71,15 +171,46 @@ export function FollowupQuestionModal({
     }
 
     detectiveAudio.playStampSound()
-    setIsSubmitted(true)
     setErrorMsg('')
     try {
       localStorage.setItem(`veritas_followup_${culprit}`, selectedOption)
     } catch {}
     if (onSuccess) {
-      onSuccess(culprit)
+      onSuccess(culprit, selectedOption)
     }
+    onClose()
   }
+
+  const handleSubmitHa = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Auto-fill bypass if not all matched yet
+    const finalSelections = allHaTilesMatched
+      ? haTileSelections
+      : {
+          tile_ao_gio: ['doc_07b_loi_khai_vu'],
+          tile_lon_toc: ['doc_04_tu_thi'],
+          tile_thuoc_an_than: ['doc_05_kham_nghiem'],
+        }
+
+    detectiveAudio.playStampSound()
+    setErrorMsg('')
+    try {
+      localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(finalSelections))
+      localStorage.setItem('veritas_followup_ha', 'matched_3_tiles')
+    } catch {}
+    if (onSuccess) {
+      onSuccess('ha', 'matched_3_tiles')
+    }
+    onClose()
+  }
+
+  const questionText = isVu
+    ? 'Hành vi và động cơ mấu chốt nào dẫn tới sự hiện diện của Lê Quang Vũ tại hiện trường vào đêm xảy ra án mạng 24/07?'
+    : isTung
+    ? 'Bạn có tin Tùng thực sự vô tội không?'
+    : 'Khớp nối các vật chứng quan trọng thu giữ tại phòng trọ và thân thể Trần Thị Hà với các tài liệu, dấu vết ban đầu tại hiện trường:'
+
+  const options = isVu ? MOCK_OPTIONS_VU : MOCK_OPTIONS_TUNG
 
   return (
     <AnimatePresence>
@@ -88,20 +219,17 @@ export function FollowupQuestionModal({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden flex flex-col max-h-[92vh]"
+          className="relative w-full max-w-3xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden flex flex-col max-h-[92vh]"
         >
           {/* HEADER */}
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <HelpCircle className="size-5 text-amber-800" />
-              <div>
-                <span className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#7f1d1d] block">
-                  HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN
-                </span>
-                <h3 className="font-serif font-bold text-base sm:text-lg text-[#1a120b] uppercase tracking-wide">
-                  {title}
-                </h3>
-              </div>
+              <h3 className="font-mono font-bold text-xs sm:text-sm md:text-base text-[#1a120b] uppercase tracking-wider">
+                {isHa
+                  ? 'HỒ SƠ MỞ RỘNG // ĐỐI SOÁT CHỨNG CỨ KHÁM XÉT TRẦN THỊ HÀ'
+                  : 'HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN'}
+              </h3>
             </div>
 
             <button
@@ -113,120 +241,237 @@ export function FollowupQuestionModal({
             </button>
           </div>
 
-          {/* FORM */}
-          <form onSubmit={handleSubmit} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
-            {isSubmitted ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-emerald-950/15 border-2 border-emerald-800 text-emerald-900 font-mono text-xs sm:text-sm font-bold flex items-center gap-2.5"
-              >
-                <CheckCircle2 className="size-5 text-emerald-700 shrink-0" />
-                <span>ĐÃ GHI NHẬN KẾT LUẬN CÂU HỎI THÀNH CÔNG!</span>
-              </motion.div>
-            ) : null}
+          {/* FORM BODY FOR HA */}
+          {isHa ? (
+            <form onSubmit={handleSubmitHa} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5]">
+              {errorMsg && (
+                <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
+                  ⚠️ {errorMsg}
+                </div>
+              )}
 
-            {errorMsg && (
-              <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
-                ⚠️ {errorMsg}
-              </div>
-            )}
-
-            {/* HƯỚNG DẪN MỞ TÚI HỒ SƠ */}
-            <div className="p-4 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none space-y-2.5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider block">
-                  📂 HƯỚNG DẪN MỞ TÚI HỒ SƠ {isVu ? 'A' : 'B'}
-                </span>
-                <span className="px-2 py-0.5 bg-red-900/10 border border-[#8c1d1d] text-[#8c1d1d] font-mono text-[10px] font-bold uppercase">
-                  VẬT PHẨM MỚI
+              {/* TÚI HỒ SƠ C */}
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
+                  📂 MỞ TÚI HỒ SƠ C (TRẦN THỊ HÀ)
                 </span>
               </div>
-              <p className="text-xs text-[#2b1f14] leading-relaxed">
-                Vui lòng mở <strong>Túi {isVu ? 'Hồ sơ A (Đối tượng Lê Quang Vũ)' : 'Hồ sơ B (Đối tượng Nguyễn Thanh Tùng)'}</strong> trong bộ Kit trò chơi để đọc các biên bản lời khai & tài liệu giám định mới trước khi trả lời câu hỏi dưới đây.
-              </p>
-              {onOpenDossier && (
+
+              {/* QUESTION BOX */}
+              <div className="p-3.5 bg-[#f4ebd9] border-2 border-[#a88c6f] rounded-none">
+                <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
+                  YÊU CẦU ĐIỀU TRA:
+                </span>
+                <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
+                  {questionText}
+                </p>
+              </div>
+
+              {/* 3 TILES MANH MỐI NẰM NGANG (100% CÙNG 1 HÀNG) */}
+              <div className="space-y-2">
+                <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
+                  1. CHỌN MANH MỐI CẦN KHỚP NỐI:
+                </span>
+
+                <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
+                  {HA_CLUE_TILES.map((tile) => {
+                    const isSelected = activeHaTileId === tile.id
+                    const isMatched = isTileMatched(tile.id)
+
+                    return (
+                      <button
+                        key={tile.id}
+                        type="button"
+                        onClick={() => {
+                          detectiveAudio.playTypewriterClick()
+                          setActiveHaTileId(tile.id)
+                          setErrorMsg('')
+                        }}
+                        className={cn(
+                          'text-left p-2 sm:p-2.5 rounded-none border-2 transition-all cursor-pointer relative select-none flex flex-col justify-between min-h-[64px] sm:min-h-[70px]',
+                          isSelected
+                            ? 'bg-[#eae0cd] border-[#2b1f14] shadow-md ring-2 ring-[#2b1f14]/40'
+                            : isMatched
+                            ? 'bg-[#e7f0dc] border-[#2e5220] hover:bg-[#dcedcf]'
+                            : 'bg-[#fdfcf9] border-[#d4c5b0] hover:bg-[#f4ebd9]'
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <span className="font-mono text-[9px] sm:text-[10px] font-bold px-1 py-0.5 bg-[#2b1f14]/10 text-[#2b1f14] uppercase shrink-0">
+                            MANH MỐI {tile.number}
+                          </span>
+                          {isMatched && (
+                            <span className="text-[#2e5220] font-bold text-xs shrink-0 flex items-center gap-0.5 font-mono">
+                              <Check className="size-3 text-[#2e5220]" />
+                            </span>
+                          )}
+                        </div>
+
+                        <h4 className="text-[10.5px] sm:text-xs font-mono font-bold text-[#1a120b] leading-tight">
+                          {tile.title}
+                        </h4>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* TÀI LIỆU BAN ĐẦU ĐỐI ỨNG (TICK CHỌN BÊN DƯỚI) */}
+              <div className="space-y-2 pt-2 border-t-2 border-[#2b1f14]/20">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
+                    2. TICK CHỌN TÀI LIỆU BAN ĐẦU KHỚP VỚI [
+                    <span className="text-[#8c1d1d]">
+                      {HA_CLUE_TILES.find((t) => t.id === activeHaTileId)?.title}
+                    </span>
+                    ]:
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                  {AVAILABLE_EVIDENCES.map((ev) => {
+                    const currentSelected = haTileSelections[activeHaTileId] || []
+                    const isChecked = currentSelected.includes(ev.id)
+
+                    return (
+                      <button
+                        key={ev.id}
+                        type="button"
+                        onClick={() => handleToggleHaEvidence(ev.id)}
+                        className={cn(
+                          'text-left p-2.5 rounded-none border-2 transition-all flex items-center gap-2.5 cursor-pointer relative select-none',
+                          isChecked
+                            ? 'bg-[#eae0cd] border-[#2b1f14] text-[#1a120b] font-bold shadow-sm'
+                            : 'bg-[#f4ebd9] border-[#d4c5b0] text-[#3d2f22] hover:bg-[#ede3cf]'
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'size-4 rounded-none border-2 flex items-center justify-center shrink-0 transition-all bg-white',
+                            isChecked ? 'border-[#2b1f14] text-[#0e2b5c]' : 'border-[#4a3520]'
+                          )}
+                        >
+                          {isChecked && (
+                            <span className="font-[family-name:var(--font-handwriting)] text-sm font-black leading-none">
+                              ✓
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs leading-snug flex-1">{ev.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* FOOTER */}
+              <div className="pt-2 flex items-center justify-between border-t border-[#2b1f14]/20">
                 <button
                   type="button"
-                  onClick={() => onOpenDossier(isVu ? 'A' : 'B')}
-                  className="mt-1 px-3.5 py-1.5 bg-[#8c1d1d] hover:bg-[#a82424] text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow border border-[#5c1313]"
+                  onClick={onClose}
+                  className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
                 >
-                  <span>📄 XEM HỒ SƠ {isVu ? 'A' : 'B'} TRÊN WEB</span>
+                  ĐÓNG
                 </button>
+
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all flex items-center gap-2 border-2 shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] cursor-pointer active:scale-95"
+                >
+                  <span>HOÀN TẤT ĐỐI SOÁT CHỨNG CỨ</span>
+                  <ArrowRight className="size-3.5" />
+                </button>
+              </div>
+            </form>
+          ) : (
+            /* FORM FOR VU / TUNG */
+            <form onSubmit={handleSubmitVuTung} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
+              {errorMsg && (
+                <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
+                  ⚠️ {errorMsg}
+                </div>
               )}
-            </div>
 
-            {/* QUESTION BOX */}
-            <div className="p-4 bg-[#f4ebd9] border-2 border-[#a88c6f] rounded-none">
-              <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
-                CÂU HỎI:
-              </span>
-              <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
-                {questionText}
-              </p>
-            </div>
+              {/* MỞ TÚI HỒ SƠ */}
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
+                  📂 MỞ TÚI HỒ SƠ {isVu ? 'A' : 'B'}
+                </span>
+              </div>
 
-            {/* OPTIONS (TICK CHỌN) */}
-            <div className="space-y-2.5">
-              <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
-                TÍCH CHỌN PHƯƠNG ÁN ĐÚNG:
-              </span>
+              {/* QUESTION BOX */}
+              <div className="p-4 bg-[#f4ebd9] border-2 border-[#a88c6f] rounded-none">
+                <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
+                  CÂU HỎI:
+                </span>
+                <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
+                  {questionText}
+                </p>
+              </div>
 
-              {options.map((opt) => {
-                const isSelected = selectedOption === opt.id
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => {
-                      detectiveAudio.playPaperRustle()
-                      setSelectedOption(opt.id)
-                      setErrorMsg('')
-                    }}
-                    className={cn(
-                      'w-full text-left p-3.5 rounded-none border-2 transition-all flex items-start gap-3 cursor-pointer select-none',
-                      isSelected
-                        ? 'bg-[#eae0cd] border-[#2b1f14] text-[#1a120b] shadow-sm'
-                        : 'bg-[#fdfcf9] border-[#d4c5b0] text-[#3d2f22] hover:bg-[#f4ebd9]'
-                    )}
-                  >
-                    <div
+              {/* OPTIONS (TICK CHỌN) */}
+              <div className="space-y-2.5">
+                <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
+                  TÍCH CHỌN PHƯƠNG ÁN ĐÚNG:
+                </span>
+
+                {options.map((opt) => {
+                  const isSelected = selectedOption === opt.id
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        detectiveAudio.playPaperRustle()
+                        setSelectedOption(opt.id)
+                        setErrorMsg('')
+                      }}
                       className={cn(
-                        'size-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all bg-white',
-                        isSelected ? 'border-[#2b1f14] bg-[#2b1f14]' : 'border-[#4a3520]'
+                        'w-full text-left p-3.5 rounded-none border-2 transition-all flex items-start gap-3 cursor-pointer select-none',
+                        isSelected
+                          ? 'bg-[#eae0cd] border-[#2b1f14] text-[#1a120b] shadow-sm'
+                          : 'bg-[#fdfcf9] border-[#d4c5b0] text-[#3d2f22] hover:bg-[#f4ebd9]'
                       )}
                     >
-                      {isSelected && <div className="size-2 rounded-full bg-white" />}
-                    </div>
+                      <div
+                        className={cn(
+                          'size-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all bg-white',
+                          isSelected ? 'border-[#2b1f14] bg-[#2b1f14]' : 'border-[#4a3520]'
+                        )}
+                      >
+                        {isSelected && <div className="size-2 rounded-full bg-white" />}
+                      </div>
 
-                    <span className="text-xs sm:text-sm font-medium leading-snug">
-                      {opt.label}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
+                      <span className="text-xs sm:text-sm font-medium leading-snug">
+                        {opt.label}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
 
-            {/* FOOTER */}
-            <div className="pt-2 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
-              >
-                ĐÓNG
-              </button>
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all flex items-center gap-2 border-2 border-[#2b1f14] shadow-md cursor-pointer"
-              >
-                <span>{isSubmitted ? 'CẬP NHẬT KẾT LUẬN' : 'NỘP KẾT LUẬN'}</span>
-                <ArrowRight className="size-3.5" />
-              </button>
-            </div>
-          </form>
+              {/* FOOTER */}
+              <div className="pt-2 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
+                >
+                  ĐÓNG
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all flex items-center gap-2 border-2 border-[#2b1f14] shadow-md cursor-pointer"
+                >
+                  <span>NỘP KẾT LUẬN</span>
+                  <ArrowRight className="size-3.5" />
+                </button>
+              </div>
+            </form>
+          )}
         </motion.div>
       </div>
     </AnimatePresence>
   )
 }
+
