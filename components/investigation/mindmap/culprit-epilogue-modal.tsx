@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { TypewriterNarrator } from '@/components/investigation/evidence/typewriter-narrator'
 import { detectiveAudio } from '@/lib/investigation-audio'
+import { SUSPECT_NARRATIVES } from '@/content/cases/case-000/narrator'
 
 interface CulpritEpilogueModalProps {
   isOpen: boolean
@@ -29,9 +30,11 @@ export function CulpritEpilogueModal({
   const [internalChoice, setInternalChoice] = useState<'tin' | 'khong_tin' | null>(
     (choice === 'tin' || choice === 'khong_tin') ? choice : null
   )
+  const [haWarrantStep, setHaWarrantStep] = useState(false)
 
   React.useEffect(() => {
     setIsNarrativeComplete(false)
+    setHaWarrantStep(false)
     if (choice === 'tin' || choice === 'khong_tin') {
       setInternalChoice(choice)
     } else {
@@ -44,38 +47,37 @@ export function CulpritEpilogueModal({
   const isVu = culprit === 'vu'
   const isTung = culprit === 'tung'
   const isHa = culprit === 'ha'
-  const isHaMatchedAll = isHa && choice === 'matched_3_tiles'
+  const isHaMatchedAll = isHa && choice === 'matched_3_tiles_indictment'
+  const isQuestionSolved = choice === '21:15' || choice === 'matched_3_tiles' || choice === 'question_solved'
+  const showTwoChoiceButtons = isQuestionSolved && !internalChoice
   const suspectName = isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà'
 
   let dateLabel = isVu
-    ? 'QUYẾT ĐỊNH ĐIỀU TRA ĐỐI TƯỢNG LÊ QUANG VŨ'
+    ? 'THÔNG BÁO ĐIỀU TRA — LÊ QUANG VŨ'
     : isTung
-    ? 'QUYẾT ĐỊNH ĐIỀU TRA ĐỐI TƯỢNG NGUYỄN THANH TÙNG'
+    ? 'THÔNG BÁO ĐIỀU TRA — NGUYỄN THANH TÙNG'
     : isHaMatchedAll
     ? 'DẪN TRUYỆN BUỘC TỘI — TRẦN THỊ HÀ (25/07/2016)'
+    : haWarrantStep
+    ? 'ĐỀ XUẤT LỆNH KHÁM XẾT CHỖ Ở — TRẦN THỊ HÀ'
     : 'QUYẾT ĐỊNH ĐIỀU TRA ĐỐI TƯỢNG TRẦN THỊ HÀ'
 
   let storyText = ''
 
-  if (internalChoice === 'tin') {
-    storyText = `Bạn lựa chọn tạm thời tin tưởng ${suspectName}.\n\nHãy chuyển hướng điều tra vụ án.\nTuy nhiên, xin các thám tử nhớ rằng: Một người chỉ được kết luận vô tội khi bạn tìm ra được hung thủ thực sự.`
+  if (showTwoChoiceButtons) {
+    storyText = SUSPECT_NARRATIVES.questionPrompt(suspectName)
+  } else if (internalChoice === 'tin') {
+    storyText = SUSPECT_NARRATIVES.choiceTin(suspectName)
   } else if (internalChoice === 'khong_tin') {
-    storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`
+    if (isHa && haWarrantStep) {
+      storyText = SUSPECT_NARRATIVES.haWarrantProposal
+    } else {
+      storyText = SUSPECT_NARRATIVES.choiceKhongTin(suspectName)
+    }
   } else if (isHaMatchedAll) {
-    storyText =
-      'Chiếc áo gió màu xám đen dính bụi đất cây xoan khớp chính xác nhân dạng kẻ rình rập trước cổng nhà Khang lúc 19:25. Vỉ thuốc an thần Diazepam bóc dở 4 viên trùng khớp hoạt chất trong cặn ấm trà hoa cúc và dịch dạ dày nạn nhân. Và trên hết, lọn tóc mai dính máu giấu trong áo ngực có kết quả giám định sinh học trùng khớp 100% mẫu ADN của nạn nhân Nguyễn Văn Khang.\n\nTrước chuỗi chứng cứ đanh thép không thể chối cãi, bức tường ngoại phạm của Trần Thị Hà hoàn toàn sụp đổ. Cơn cuồng ghen bệnh hoạn khi phát hiện Khang chuẩn bị tiền bỏ trốn cùng nhân tình mới đã biến tình yêu mù quáng thành tội ác giết người man rợ lúc 21:00.\n\nToàn bộ sự thật đã được phơi bày ra ánh sáng. Đã đủ căn cứ pháp lý để lập hồ sơ đề nghị Viện Kiểm sát truy tố thủ phạm trước pháp luật.'
-  } else if (isVu) {
-    storyText =
-      'Vỏ bọc vô can của Lê Quang Vũ đã chính thức sụp đổ.\n\nNhững mối thù hằn âm ỉ với nạn nhân bị phơi bày, cùng lời khai gian dối về bằng chứng ngoại phạm đã biến Vũ trở thành đối tượng tình nghi trọng điểm.\n\nHãy mở ngay Hồ sơ A để nắm bắt toàn bộ tiến trình điều tra tiếp theo.'
-  } else if (isTung) {
-    storyText =
-      'Vỏ bọc vô can của Nguyễn Thanh Tùng đã chính thức sụp đổ.\n\nNhững mối thù hằn âm ỉ với nạn nhân bị phơi bày, cùng lời khai gian dối về bằng chứng ngoại phạm đã biến Tùng trở thành đối tượng tình nghi trọng điểm.\n\nHãy mở ngay Hồ sơ B để thực hiện thẩm vấn đối tượng.'
-  } else if (isHa) {
-    storyText =
-      'Vỏ bọc vô can của Trần Thị Hà đã chính thức sụp đổ.\n\nNhững mối thù hằn âm ỉ với nạn nhân bị phơi bày, cùng lời khai gian dối về bằng chứng ngoại phạm đã biến Hà trở thành đối tượng tình nghi trọng điểm.\n\nHãy mở ngay Hồ sơ C để nắm bắt toàn bộ tiến trình điều tra tiếp theo.'
+    storyText = SUSPECT_NARRATIVES.haFinalConclusion
   } else {
-    storyText =
-      'Biên bản lấy lời khai ban đầu cho thấy Trần Thị Hà khẳng định mình ở phòng trọ xem phim bộ VTV3 suốt buổi tối định mệnh.\n\nThế nhưng những mâu thuẫn bất thường bắt đầu lộ diện: lịch phát sóng tối thứ Sáu của VTV3 chỉ phát Gameshow truyền hình chứ không có bất kỳ bộ phim nào. Cùng lúc đó, tin nhắn thoại gửi lúc 20:32 lọt rõ tiếng còi tàu hỏa và chuông cảnh báo rào chắn — âm thanh chỉ xuất hiện ngay trước ngõ nhà Khang.\n\nCần tiến hành đối soát và khớp nối toàn bộ vật chứng thu giữ tại nơi ở của đối tượng để bóc trần sự thật.'
+    storyText = SUSPECT_NARRATIVES.suspectBreakdown(suspectName)
   }
 
   let ctaButtonText = 'TIẾP TỤC ĐIỀU TRA'
@@ -84,26 +86,33 @@ export function CulpritEpilogueModal({
   } else if (internalChoice === 'tin') {
     ctaButtonText = 'Chuyển hướng điều tra'
   } else if (internalChoice === 'khong_tin') {
-    ctaButtonText = 'Mở rộng điều tra'
+    if (isHa) {
+      ctaButtonText = haWarrantStep ? 'Tiến hành khám xét' : 'Mở rộng điều tra'
+    } else {
+      ctaButtonText = 'Mở rộng điều tra'
+    }
   } else if (isHaMatchedAll) {
     ctaButtonText = 'Đề nghị truy tố'
   }
 
   const handleCtaClick = () => {
     detectiveAudio.playStampSound()
-    onClose()
-    if (!choice && !internalChoice && onOpenDossier) {
-      if (isVu) onOpenDossier('A')
-      else if (isTung) onOpenDossier('B')
-      else if (isHa) onOpenDossier('C')
-    } else if (isHa && internalChoice === 'khong_tin' && onOpenFollowupQuestion) {
-      onOpenFollowupQuestion()
-    } else if (isHaMatchedAll && onOpenIndictment) {
-      onOpenIndictment()
+    if (!choice && !internalChoice) {
+      onClose()
+      if (onOpenFollowupQuestion) {
+        onOpenFollowupQuestion()
+      }
+    } else if (isHa && internalChoice === 'khong_tin') {
+      onClose()
+    } else if (isHaMatchedAll) {
+      onClose()
+      if (onOpenIndictment) {
+        onOpenIndictment()
+      }
+    } else {
+      onClose()
     }
   }
-
-  const showTwoChoiceButtons = (isVu || isTung) && !internalChoice
 
   return (
     <AnimatePresence>
@@ -122,7 +131,7 @@ export function CulpritEpilogueModal({
             {/* Typewriter Monologue */}
             <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
               <TypewriterNarrator
-                key={`${culprit}-${internalChoice || 'default'}`}
+                key={`${culprit}-${internalChoice || (showTwoChoiceButtons ? 'choice' : 'default')}-${haWarrantStep}`}
                 text={storyText}
                 speed={12}
                 onComplete={() => setIsNarrativeComplete(true)}

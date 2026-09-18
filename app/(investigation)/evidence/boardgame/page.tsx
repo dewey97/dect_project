@@ -145,7 +145,7 @@ export default function BoardGameCompanionPage() {
   }
 
   return (
-    <div suppressHydrationWarning className="h-full w-full bg-[#0b0704] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col justify-start items-center p-3 sm:p-6 relative box-border min-h-dvh">
+    <div suppressHydrationWarning className="h-full w-full bg-[#0b0704] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col justify-start items-center p-0 sm:p-4 relative box-border min-h-dvh">
       {/* AMBIENT NOIR BANKERS SPOTLIGHT */}
       <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[900px] max-w-full h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(217,160,102,0.13),transparent_75%)] z-0" />
       <div className="noir-scanlines pointer-events-none fixed inset-0 opacity-15 z-0" />

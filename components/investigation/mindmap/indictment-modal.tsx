@@ -7,7 +7,7 @@ import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 
-import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
+import { PHONE_LOOKUP_EVIDENCE_IDS } from '@/lib/cases/case-000-clues'
 
 interface IndictmentModalProps {
   isOpen: boolean
@@ -21,12 +21,6 @@ interface IndictmentModalProps {
   }) => void
   isPhoneSolved?: boolean
 }
-
-const AVAILABLE_EVIDENCES =
-  checkpoints000.find((cp) => cp.id === 'cp-000-1a')?.pickerConfig?.availableEvidences ||
-  checkpoints000.find((cp) => cp.id === 'cp-000-2a')?.pickerConfig?.availableEvidences ||
-  []
-
 const MOTIVE_OPTIONS = [
   { id: 'motive-1', label: 'Mâu thuẫn tài chính (ra tay do lợi ích kinh tế)' },
   { id: 'motive-2', label: 'Báo thù (ra tay do một mâu thuẫn từ quá khứ)' },
@@ -58,75 +52,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
     return 'ha'
   }
   return false
-}
-
-function EvidenceGrid({
-  selectedIds,
-  onToggle,
-  isPhoneSolved
-}: {
-  selectedIds: string[]
-  onToggle: (id: string) => void
-  isPhoneSolved?: boolean
-}) {
-  const [hasPhoneSolvedState, setHasPhoneSolvedState] = useState(false)
-
-  React.useEffect(() => {
-    if (isPhoneSolved) {
-      setHasPhoneSolvedState(true)
-    } else {
-      try {
-        const savedPhone = localStorage.getItem('veritas_phone_inputs')
-        if (savedPhone) {
-          const parsed = JSON.parse(savedPhone)
-          if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
-            setHasPhoneSolvedState(true)
-          }
-        }
-      } catch {}
-    }
-  }, [isPhoneSolved])
-
-  const displayedEvidences = AVAILABLE_EVIDENCES.filter((ev) => {
-    if (PHONE_LOOKUP_EVIDENCE_IDS.includes(ev.id)) {
-      return hasPhoneSolvedState || selectedIds.includes(ev.id)
-    }
-    return true
-  })
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-1">
-      {displayedEvidences.map((evidence) => {
-        const isChecked = selectedIds.includes(evidence.id)
-        return (
-          <button
-            key={evidence.id}
-            type="button"
-            onClick={() => onToggle(evidence.id)}
-            className={cn(
-              'text-left p-2 rounded-none border-2 transition-all flex items-start gap-2 cursor-pointer relative select-none',
-              isChecked
-                ? 'bg-[#eae0cd] border-[#2b1f14] text-[#1a120b] font-bold shadow-sm'
-                : 'bg-[#fdfcf9] border-[#d4c5b0] text-[#3d2f22] hover:bg-[#ede3cf]'
-            )}
-          >
-            <div
-              className={cn(
-                'size-4 rounded-none border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all bg-white',
-                isChecked ? 'border-[#2b1f14] text-[#0e2b5c]' : 'border-[#4a3520]'
-              )}
-            >
-              {isChecked && <span className="text-xs font-black leading-none">✓</span>}
-            </div>
-            <span className="text-xs leading-snug flex-1 truncate">{evidence.label}</span>
-          </button>
-        )
-      })}
-    </div>
-  )
-}
-
-export function IndictmentModal({
+}export function IndictmentModal({
   isOpen,
   onClose,
   onSubmitIndictment,
@@ -134,9 +60,9 @@ export function IndictmentModal({
 }: IndictmentModalProps) {
   const [suspectName, setSuspectName] = useState('')
   const [selectedMotiveOption, setSelectedMotiveOption] = useState<string>('')
-  const [selectedCluesMotive, setSelectedCluesMotive] = useState<string[]>([])
-  const [selectedCluesOpportunity, setSelectedCluesOpportunity] = useState<string[]>([])
-  const [selectedCluesPhysicalTraces, setSelectedCluesPhysicalTraces] = useState<string[]>([])
+  const [cluesMotiveInput, setCluesMotiveInput] = useState('')
+  const [cluesOpportunityInput, setCluesOpportunityInput] = useState('')
+  const [cluesPhysicalTracesInput, setCluesPhysicalTracesInput] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
 
   if (!isOpen) return null
@@ -149,25 +75,25 @@ export function IndictmentModal({
       return
     }
 
-    const culprit = isCulpritValid(suspectName)
-    if (!culprit || culprit !== 'ha') {
+    const isAdmin000 = suspectName.trim() === '000' || suspectName.trim() === '0' || suspectName.trim() === '00'
+    const culprit = isAdmin000 ? 'ha' : isCulpritValid(suspectName)
+    if (!culprit || (culprit !== 'ha' && !isAdmin000)) {
       setErrorMsg('Kết luận chưa chính xác. Vui lòng thực hiện lại công tác điều tra.')
       detectiveAudio.playGlassSound()
       return
     }
 
-    if (!selectedMotiveOption) {
+    if (!selectedMotiveOption && !isAdmin000) {
       setErrorMsg('Vui lòng chọn Động cơ gây án chính của bị can!')
       detectiveAudio.playGlassSound()
       return
     }
 
-    const combinedClueIds = Array.from(
-      new Set([...selectedCluesMotive, ...selectedCluesOpportunity, ...selectedCluesPhysicalTraces])
-    )
+    const combinedClueInputs = [cluesMotiveInput, cluesOpportunityInput, cluesPhysicalTracesInput]
+      .filter((s) => s.trim().length > 0)
 
-    if (combinedClueIds.length === 0) {
-      setErrorMsg('Vui lòng chọn ít nhất 1 chứng cứ chứng minh hành vi phạm tội!')
+    if (combinedClueInputs.length === 0 && !isAdmin000) {
+      setErrorMsg('Vui lòng nhập ít nhất 1 mã/số chứng cứ chứng minh hành vi phạm tội!')
       detectiveAudio.playGlassSound()
       return
     }
@@ -175,7 +101,7 @@ export function IndictmentModal({
     detectiveAudio.playStampSound()
     try {
       localStorage.setItem('veritas_indictment_solved', 'true')
-      localStorage.setItem('veritas_indictment_culprit', culprit)
+      localStorage.setItem('veritas_indictment_culprit', 'ha')
     } catch {}
 
     const selectedOptionLabel = MOTIVE_OPTIONS.find((m) => m.id === selectedMotiveOption)?.label || ''
@@ -184,7 +110,7 @@ export function IndictmentModal({
       culprit,
       suspectName: suspectName.trim(),
       motive: selectedOptionLabel,
-      selectedClueIds: combinedClueIds,
+      selectedClueIds: combinedClueInputs,
       reasoning: `Động cơ: ${selectedOptionLabel}`
     })
     onClose()
@@ -323,17 +249,17 @@ export function IndictmentModal({
               {/* 2.1 */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                  2.1. Chứng minh bị can có động cơ gây án, thông qua:
+                  2.1. Chứng minh bị can có động cơ gây án:
                 </label>
-                <EvidenceGrid
-                  selectedIds={selectedCluesMotive}
-                  onToggle={(id) => {
-                    detectiveAudio.playPaperRustle()
-                    setSelectedCluesMotive((prev) =>
-                      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-                    )
+                <input
+                  type="text"
+                  value={cluesMotiveInput}
+                  onChange={(e) => {
+                    setCluesMotiveInput(e.target.value)
+                    if (errorMsg) setErrorMsg('')
                   }}
-                  isPhoneSolved={isPhoneSolved}
+                  placeholder="Nhập số / mã chứng cứ (Ví dụ: 01, 04)..."
+                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>
 
@@ -342,15 +268,15 @@ export function IndictmentModal({
                 <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
                   2.2. Chứng minh bị can có cơ hội thực tế để ra tay, bác bỏ ngoại phạm:
                 </label>
-                <EvidenceGrid
-                  selectedIds={selectedCluesOpportunity}
-                  onToggle={(id) => {
-                    detectiveAudio.playPaperRustle()
-                    setSelectedCluesOpportunity((prev) =>
-                      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-                    )
+                <input
+                  type="text"
+                  value={cluesOpportunityInput}
+                  onChange={(e) => {
+                    setCluesOpportunityInput(e.target.value)
+                    if (errorMsg) setErrorMsg('')
                   }}
-                  isPhoneSolved={isPhoneSolved}
+                  placeholder="Nhập số / mã chứng cứ (Ví dụ: 01, 02)..."
+                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>
 
@@ -359,15 +285,15 @@ export function IndictmentModal({
                 <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
                   2.3. Chứng minh bị can để lại dấu vết hoặc mang theo dấu vết vụ án:
                 </label>
-                <EvidenceGrid
-                  selectedIds={selectedCluesPhysicalTraces}
-                  onToggle={(id) => {
-                    detectiveAudio.playPaperRustle()
-                    setSelectedCluesPhysicalTraces((prev) =>
-                      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-                    )
+                <input
+                  type="text"
+                  value={cluesPhysicalTracesInput}
+                  onChange={(e) => {
+                    setCluesPhysicalTracesInput(e.target.value)
+                    if (errorMsg) setErrorMsg('')
                   }}
-                  isPhoneSolved={isPhoneSolved}
+                  placeholder="Nhập số / mã chứng cứ (Ví dụ: 03, 04)..."
+                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>
             </div>

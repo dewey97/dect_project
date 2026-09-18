@@ -404,16 +404,9 @@ export function OutdoorCourtyardGarden({
         <pointLight
           position={[0, -0.1, 0.05]}
           color="#f59e0b"
-          intensity={3.0}
-          distance={7.0}
+          intensity={2.8}
+          distance={6.0}
           decay={2}
-          castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-          shadow-camera-near={0.2}
-          shadow-camera-far={8}
-          shadow-bias={-0.0002}
-          shadow-radius={1.5}
         />
       </group>
 
@@ -422,25 +415,25 @@ export function OutdoorCourtyardGarden({
         position={[-1.8, 8.0, 8.5]}
         target-position={[-1.8, 0, 5.5]}
         color="#c8d6e5"
-        intensity={1.4}
+        intensity={1.2}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-near={0.5}
-        shadow-camera-far={20}
-        shadow-camera-left={-8}
-        shadow-camera-right={8}
-        shadow-camera-top={8}
-        shadow-camera-bottom={-8}
+        shadow-mapSize-width={512}
+        shadow-mapSize-height={512}
+        shadow-camera-near={1.0}
+        shadow-camera-far={18}
+        shadow-camera-left={-6}
+        shadow-camera-right={6}
+        shadow-camera-top={6}
+        shadow-camera-bottom={-6}
         shadow-bias={-0.0001}
-        shadow-radius={2}
+        shadow-radius={1.5}
       />
       {/* Soft diffuse outdoor ambient fill */}
       <pointLight
         position={[-1.8, 3.5, 6.2]}
         color="#a4b0be"
-        intensity={1.0}
-        distance={12}
+        intensity={0.8}
+        distance={10}
         decay={2}
       />
     </group>

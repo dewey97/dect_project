@@ -2,9 +2,9 @@
 
 import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Search, ZoomIn, Eye, MoveHorizontal, Compass, Layers, Box } from 'lucide-react'
+import { X, Layers, Box } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
-import { Scene360Viewer, Hotspot3D } from './scene-360-viewer'
+import { Hotspot3D } from './scene-360-viewer'
 import { CrimeSceneRoom3D, RoomHotspot } from './crime-scene-room-3d'
 
 interface ReinvestigationModalProps {
@@ -62,7 +62,7 @@ const HOTSPOTS_3D: Hotspot3D[] = [
 
 export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalProps) {
   const [selectedSpot, setSelectedSpot] = useState<Hotspot3D | RoomHotspot | null>(null)
-  const [viewMode, setViewMode] = useState<'room3d' | 'sphere360' | 'flat2d'>('room3d')
+  const [viewMode, setViewMode] = useState<'room3d' | 'flat2d'>('room3d')
   const container2DRef = useRef<HTMLDivElement>(null)
 
   if (!isOpen) return null
@@ -83,7 +83,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         {/* TOP STATUS BAR */}
         <div className="relative z-30 bg-[#1e130a]/95 border-b border-[#3d2716] px-3 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {/* VIEW MODE 3-WAY TOGGLE */}
+            {/* VIEW MODE TOGGLE */}
             <div className="flex items-center bg-[#0d0906] border border-[#593c26] rounded-lg p-0.5">
               <button
                 type="button"
@@ -96,18 +96,6 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
               >
                 <Box className="size-3.5" />
                 <span>Phòng 3D</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('sphere360')}
-                className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  viewMode === 'sphere360'
-                    ? 'bg-[#5c371d] text-amber-300 shadow border border-amber-600/40'
-                    : 'text-[#8c6a48] hover:text-[#d9a066]'
-                }`}
-              >
-                <Compass className="size-3.5" />
-                <span>Panorama 360°</span>
               </button>
               <button
                 type="button"
@@ -142,14 +130,6 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         <div className="relative flex-1 w-full h-full overflow-hidden bg-black">
           {viewMode === 'room3d' && (
             <CrimeSceneRoom3D onSelectSpot={handleSpotClick} />
-          )}
-
-          {viewMode === 'sphere360' && (
-            <Scene360Viewer
-              imageUrl="/images/cases/case_000/photo-reinvestigation-room-realistic.jpg"
-              hotspots={HOTSPOTS_3D}
-              onSelectSpot={handleSpotClick}
-            />
           )}
 
           {viewMode === 'flat2d' && (

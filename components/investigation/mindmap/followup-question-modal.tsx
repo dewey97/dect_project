@@ -280,7 +280,7 @@ export function FollowupQuestionModal({
               <div>
                 <h3 className="font-mono font-bold text-xs sm:text-sm md:text-base text-[#1a120b] uppercase tracking-wider">
                   {isHa
-                    ? 'HỒ SƠ MỞ RỘNG // ĐỐI SOÁT CHỨNG CỨ KHÁM XÉT TRẦN THỊ HÀ'
+                    ? 'HỒ SƠ MỞ RỘNG // ĐỐI SOÁT CHỨNG CỨ KHÁM XÉT'
                     : isVu
                     ? 'CÂU HỎI ĐIỀU TRA'
                     : 'HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN'}
@@ -317,19 +317,10 @@ export function FollowupQuestionModal({
               )}
 
               {/* MỞ TÚI HỒ SƠ A INSTRUCTION */}
-              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between gap-2">
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-                  📂 Vui lòng mở túi hồ sơ A hoặc xem hồ sơ A trên web.
+                  📂 MỞ TÚI HỒ SƠ A
                 </span>
-                {onOpenDossier && (
-                  <button
-                    type="button"
-                    onClick={() => onOpenDossier('A')}
-                    className="px-3 py-1 bg-[#8c1d1d] hover:bg-[#6e1616] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-colors cursor-pointer shrink-0"
-                  >
-                    Xem Hồ Sơ A
-                  </button>
-                )}
               </div>
 
               {/* QUESTION BOX */}
@@ -390,19 +381,10 @@ export function FollowupQuestionModal({
               )}
 
               {/* TÚI HỒ SƠ C */}
-              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between">
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-                  📂 MỞ TÚI HỒ SƠ C (TRẦN THỊ HÀ)
+                  📂 MỞ TÚI HỒ SƠ C
                 </span>
-                {onOpenDossier && (
-                  <button
-                    type="button"
-                    onClick={() => onOpenDossier('C')}
-                    className="px-3 py-1 bg-[#8c1d1d] hover:bg-[#6e1616] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-colors cursor-pointer shrink-0"
-                  >
-                    Xem Hồ Sơ C
-                  </button>
-                )}
               </div>
 
               {/* QUESTION BOX */}
@@ -541,19 +523,10 @@ export function FollowupQuestionModal({
               )}
 
               {/* MỞ TÚI HỒ SƠ B */}
-              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between gap-2">
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-                  📂 MỞ TÚI HỒ SƠ B (NGUYỄN THANH TÙNG)
+                  📂 MỞ TÚI HỒ SƠ B
                 </span>
-                {onOpenDossier && (
-                  <button
-                    type="button"
-                    onClick={() => onOpenDossier('B')}
-                    className="px-3 py-1 bg-[#8c1d1d] hover:bg-[#6e1616] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-colors cursor-pointer shrink-0"
-                  >
-                    Xem Hồ Sơ B
-                  </button>
-                )}
               </div>
 
               {/* QUESTION BOX */}

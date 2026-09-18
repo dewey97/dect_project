@@ -26,7 +26,7 @@ export function BoardGameCompanionView({
   onOpenEpilogue
 }: BoardGameCompanionViewProps) {
   return (
-    <div className="w-full max-w-6xl mx-auto h-full flex flex-col relative z-10 overflow-hidden pb-4">
+    <div className="w-full max-w-none sm:max-w-6xl mx-auto h-full flex flex-col relative z-10 overflow-hidden p-0 pb-0 sm:pb-4">
       <MainInvestigationCanvas
         onOpenPhoneSimulator={onOpenPhoneSimulator}
         onOpenReinvestigation={onOpenReinvestigation}

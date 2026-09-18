@@ -11,6 +11,7 @@ import { CulpritEpilogueModal } from './culprit-epilogue-modal'
 import { DossierResultModal } from './dossier-result-modal'
 import { FollowupQuestionModal } from './followup-question-modal'
 import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
+import { getCanonicalSuspectKey } from '@/lib/cases/case-000-suspects'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
 interface SuspectItem {
@@ -59,40 +60,6 @@ export function MainInvestigationCanvas({
   const [editingSuspect, setEditingSuspect] = useState<SuspectItem | null>(null)
   const [isPhoneLookupOpen, setIsPhoneLookupOpen] = useState(false)
   const [isIndictmentOpen, setIsIndictmentOpen] = useState(false)
-
-  // Helper to resolve canonical suspect key, name, and static slot
-  const getCanonicalSuspectKey = (suspect: { id?: string; name: string }) => {
-    const lower = (suspect.name || '').trim().toLowerCase()
-    const idLower = (suspect.id || '').toLowerCase()
-
-    if (idLower.includes('vu') || lower.includes('vũ') || lower.includes('vu')) {
-      return { canonicalId: 'vu', slotIndex: 0, canonicalName: 'Lê Quang Vũ' }
-    }
-    if (idLower.includes('tung') || lower.includes('tùng') || lower.includes('tung')) {
-      return { canonicalId: 'tung', slotIndex: 1, canonicalName: 'Nguyễn Thanh Tùng' }
-    }
-    if (idLower.includes('ha') || lower.includes('hà') || lower.includes('ha')) {
-      return { canonicalId: 'ha', slotIndex: 2, canonicalName: 'Trần Thị Hà' }
-    }
-    if (idLower.includes('mai') || lower.includes('mai')) {
-      return { canonicalId: 'mai', slotIndex: 3, canonicalName: 'Nguyễn Ngọc Mai' }
-    }
-    if (idLower.includes('dat') || lower.includes('đạt') || lower.includes('dat')) {
-      return { canonicalId: 'dat', slotIndex: 4, canonicalName: 'Trần Văn Đạt' }
-    }
-    if (idLower.includes('lua') || lower.includes('lụa') || lower.includes('lua')) {
-      return { canonicalId: 'lua', slotIndex: 5, canonicalName: 'Nguyễn Thị Lụa' }
-    }
-    if (idLower.includes('khang') || lower.includes('khang')) {
-      return { canonicalId: 'khang', slotIndex: 6, canonicalName: 'Nguyễn Văn Khang' }
-    }
-    return {
-      canonicalId: suspect.id || `suspect-${lower.replace(/\s+/g, '-')}`,
-      slotIndex: 4,
-      canonicalName: suspect.name,
-    }
-  }
-
   const sanitizeSuspectsList = (items: SuspectItem[]): SuspectItem[] => {
     const map = new Map<string, SuspectItem>()
     for (const s of items) {
@@ -420,20 +387,22 @@ export function MainInvestigationCanvas({
     { x: 0.48, y: 0.520 }, // Slot 0: Lê Quang Vũ
     { x: 0.65, y: 0.485 }, // Slot 1: Nguyễn Thanh Tùng (Lệch lên)
     { x: 0.82, y: 0.535 }, // Slot 2: Trần Thị Hà (Lệch xuống)
-    { x: 0.78, y: 0.360 }, // Slot 3: Nguyễn Ngọc Mai — Bên phải note nghi phạm (x: 0.65, y: 0.30), thấp hơn một chút
+    { x: 0.74, y: 0.350 }, // Slot 3: Nguyễn Ngọc Mai — Bên phải note nghi phạm
     { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt — Nằm bên trái Lê Quang Vũ (Lệch lên)
     { x: 0.16, y: 0.535 }, // Slot 5: Nguyễn Thị Lụa — Nằm bên trái Trần Văn Đạt (Lệch xuống)
     { x: 0.94, y: 0.480 }, // Slot 6: Nguyễn Văn Khang (Mé phải viền bảng)
+    { x: 0.83, y: 0.330 }, // Slot 7: Thảo Vy — Nằm phía trên Trần Thị Hà
   ], [])
 
   const MOBILE_SUSPECT_SLOTS = React.useMemo(() => [
     { x: 0.48, y: 0.520 }, // Slot 0: Lê Quang Vũ
     { x: 0.65, y: 0.485 }, // Slot 1: Nguyễn Thanh Tùng
     { x: 0.82, y: 0.535 }, // Slot 2: Trần Thị Hà
-    { x: 0.78, y: 0.360 }, // Slot 3: Nguyễn Ngọc Mai — Bên phải note nghi phạm, thấp hơn một chút
-    { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt — Nằm bên trái Lê Quang Vũ
-    { x: 0.16, y: 0.535 }, // Slot 5: Nguyễn Thị Lụa — Nằm bên trái Trần Văn Đạt
+    { x: 0.74, y: 0.350 }, // Slot 3: Nguyễn Ngọc Mai
+    { x: 0.31, y: 0.495 }, // Slot 4: Trần Văn Đạt
+    { x: 0.16, y: 0.535 }, // Slot 5: Nguyễn Thị Lụa
     { x: 0.94, y: 0.480 }, // Slot 6: Nguyễn Văn Khang
+    { x: 0.83, y: 0.330 }, // Slot 7: Thảo Vy — Nằm phía trên Trần Thị Hà
   ], [])
 
   // Construct dynamic suspect pins with 100% deterministic, stationary slots
@@ -485,7 +454,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-vu',
             x: 0.48,
-            y: 0.710,
+            y: 0.770,
             label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Lê Quang Vũ',
             color: 'yellow' as const,
@@ -497,7 +466,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-tung',
             x: 0.65,
-            y: 0.670,
+            y: 0.740,
             label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
             color: 'yellow' as const,
@@ -509,7 +478,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-ha',
             x: 0.82,
-            y: 0.730,
+            y: 0.785,
             label: 'Câu hỏi',
             detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
             color: 'yellow' as const,
@@ -524,7 +493,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-vu',
             x: 0.48,
-            y: 0.710,
+            y: 0.770,
             label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Lê Quang Vũ',
             color: 'yellow' as const,
@@ -536,7 +505,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-tung',
             x: 0.65,
-            y: 0.670,
+            y: 0.740,
             label: 'Câu hỏi',
             detail: 'Câu hỏi suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
             color: 'yellow' as const,
@@ -548,7 +517,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-ha',
             x: 0.82,
-            y: 0.730,
+            y: 0.785,
             label: 'Câu hỏi',
             detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
             color: 'yellow' as const,
@@ -605,7 +574,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-indictment',
           x: 0.25,
           y: 0.68,
-          label: 'Đề nghị truy tố',
+          label: 'Bản kết luận điều tra',
           detail: isIndictmentSolved
             ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
             : 'Lập bản cáo trạng gửi Viện Kiểm sát',
@@ -635,7 +604,7 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-indictment',
           x: 0.25,
           y: 0.68,
-          label: 'Đề nghị truy tố',
+          label: 'Bản kết luận điều tra',
           detail: isIndictmentSolved
             ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
             : 'Lập bản cáo trạng gửi Viện Kiểm sát',

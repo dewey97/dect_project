@@ -54,6 +54,7 @@ export interface PinPoint {
   noteColor?: "yellow" | "black" | "white" | "red" | "blue";
   pinColor?: "red" | "yellow" | "blue" | "green" | "black";
   pulseBorder?: boolean;
+  photoUrl?: string;
 }
 
 export interface CaseConnection {
@@ -99,42 +100,55 @@ const CASES_LIST: CaseData[] = [
     title: "TRỐN TÌM (1996)",
     description: "Chuyên án 000 — Bi kịch trốn tìm 20 năm trước tại xóm Bờ Sông",
     status: "active",
-    bgImage: "/images/crime_scene_outline_bg.jpg",
+    bgImage: "/images/corkboard_vertical_empty.jpg",
     pins: [
       {
         id: "c0-pin-evidence",
-        x: 0.25,
+        x: 0.22,
         y: 0.18,
         label: "BỔ SUNG CHỨNG CỨ",
         detail: "Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra",
+        noteColor: "yellow",
+      },
+      {
+        id: "c0-pin-question",
+        x: 0.42,
+        y: 0.18,
+        label: "CÂU HỎI ĐIỀU TRA",
+        detail: "Danh sách câu hỏi điều tra & nghi vấn cần làm rõ",
+        noteColor: "yellow",
       },
       {
         id: "c0-pin-suspects",
-        x: 0.65,
-        y: 0.30,
-        label: "XÁC ĐỊNH NGHI PHẠM",
+        x: 0.68,
+        y: 0.32,
+        label: "NGHI PHẠM",
         detail: "Tập hợp danh tính & thẩm tra nghi phạm (Tùng, Hà, Mai...)",
+        noteColor: "yellow",
+      },
+      {
+        id: "c0-pin-phone",
+        x: 0.62,
+        y: 0.18,
+        label: "MỞ RỘNG ĐIỀU TRA",
+        detail: "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
+        noteColor: "white",
+      },
+      {
+        id: "c0-pin-reinvestigate",
+        x: 0.22,
+        y: 0.35,
+        label: "BIÊN BẢN XIN KHÁM NGHIỆM HIỆN TRƯỜNG",
+        detail: "Khám xét lại hiện trường để rà soát manh mối bổ sung",
+        noteColor: "white",
       },
       {
         id: "c0-pin-indictment",
         x: 0.25,
         y: 0.68,
-        label: "ĐỀ NGHỊ TRUY TỐ",
-        detail: "Mở bản cáo trạng buộc tội thủ phạm vụ án",
-      },
-      {
-        id: "c0-pin-phone",
-        x: 0.58,
-        y: 0.18,
-        label: "MỞ RỘNG ĐIỀU TRA",
-        detail: "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
-      },
-      {
-        id: "c0-pin-reinvestigate",
-        x: 0.25,
-        y: 0.32,
-        label: "KHÁM XÉT LẠI",
-        detail: "Khám xét lại hiện trường để rà soát manh mối bổ sung",
+        label: "BẢN KẾT LUẬN ĐIỀU TRA",
+        detail: "Bản kết luận điều tra và buộc tội thủ phạm vụ án",
+        noteColor: "white",
       },
     ],
     connections: [
@@ -395,7 +409,7 @@ function wrapText(
 function isPinHit(
   worldPointer: Point,
   pinPosition: Point,
-  label: string,
+  pin: PinPoint | { id: string; label: string },
   transform: ViewTransform,
 ): boolean {
   // Hit radius for pinhead (28px radius = 56px diameter touch target)
@@ -404,10 +418,28 @@ function isPinHit(
     return true;
   }
 
-  // Hit area for sticky note or Polaroid photo card underneath pinhead
-  const cardHalfWidth = 38 / transform.scale;
+  const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-");
+
+  if (isSuspectPin) {
+    // Hit area for Polaroid photo card underneath pinhead (matches ~98px width x 124px height)
+    const cardHalfWidth = 52 / transform.scale;
+    const cardTop = pinPosition.y - 14 / transform.scale;
+    const cardBottom = pinPosition.y + 120 / transform.scale;
+    const cardLeft = pinPosition.x - cardHalfWidth;
+    const cardRight = pinPosition.x + cardHalfWidth;
+
+    return (
+      worldPointer.x >= cardLeft &&
+      worldPointer.x <= cardRight &&
+      worldPointer.y >= cardTop &&
+      worldPointer.y <= cardBottom
+    );
+  }
+
+  // Hit area for sticky note underneath pinhead (matches ~68px width x 72px height)
+  const cardHalfWidth = 36 / transform.scale;
   const cardTop = pinPosition.y - 8 / transform.scale;
-  const cardBottom = pinPosition.y + 80 / transform.scale;
+  const cardBottom = pinPosition.y + 66 / transform.scale;
   const cardLeft = pinPosition.x - cardHalfWidth;
   const cardRight = pinPosition.x + cardHalfWidth;
 
@@ -427,45 +459,13 @@ function isPinHit(
 function getInnerBoardBounds(
   containerWidth: number,
   containerHeight: number,
-  frameImg: HTMLImageElement | null,
+  _frameImg?: HTMLImageElement | null,
 ): BoardBounds {
-  const isPortrait = containerWidth < containerHeight || containerWidth < 768;
-
-  if (isPortrait) {
-    return {
-      x: 0,
-      y: 0,
-      width: containerWidth,
-      height: containerHeight,
-    };
-  }
-
-  let frameDx = 0,
-    frameDy = 0,
-    frameDw = containerWidth,
-    frameDh = containerHeight;
-
-  if (frameImg && frameImg.width > 0 && frameImg.height > 0) {
-    const frameAspect = frameImg.width / frameImg.height;
-    const canvasAspect = containerWidth / containerHeight;
-    if (canvasAspect > frameAspect) {
-      frameDw = containerWidth;
-      frameDh = containerWidth / frameAspect;
-      frameDx = 0;
-      frameDy = (containerHeight - frameDh) / 2;
-    } else {
-      frameDh = containerHeight;
-      frameDw = containerHeight * frameAspect;
-      frameDx = (containerWidth - frameDw) / 2;
-      frameDy = 0;
-    }
-  }
-
   return {
-    x: frameDx + FRAME_INNER_LEFT * frameDw,
-    y: frameDy + FRAME_INNER_TOP * frameDh,
-    width: FRAME_INNER_WIDTH * frameDw,
-    height: FRAME_INNER_HEIGHT * frameDh,
+    x: 0,
+    y: 0,
+    width: containerWidth,
+    height: containerHeight,
   };
 }
 
@@ -566,6 +566,37 @@ export function HeroInteractive({
 
   const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const maskContextRef = useRef<CanvasRenderingContext2D | null>(null);
+
+  const suspectImageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
+
+  const resolveSuspectPhotoUrl = (pin: { id: string; label: string; photoUrl?: string }): string | undefined => {
+    if (pin.photoUrl) return pin.photoUrl;
+    const lower = `${pin.id} ${pin.label}`.toLowerCase();
+    if (lower.includes('vu') || lower.includes('vũ')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vu.png';
+    if (lower.includes('tung') || lower.includes('tùng')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_tung.png';
+    if (lower.includes('ha') || lower.includes('hà')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ha.png';
+    if (lower.includes('mai')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_mai.png';
+    if (lower.includes('dat') || lower.includes('đạt')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_dat_ga.png';
+    if (lower.includes('lua') || lower.includes('lụa')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ba_lua.png';
+    if (lower.includes('khang')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png';
+    if (lower.includes('vy')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vy.png';
+    return undefined;
+  };
+
+  const getLoadedImage = (url: string): HTMLImageElement | null => {
+    if (!url) return null;
+    let img = suspectImageCacheRef.current.get(url);
+    if (!img) {
+      img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = url;
+      img.onload = () => {
+        if (requestRenderRef.current) requestRenderRef.current();
+      };
+      suspectImageCacheRef.current.set(url, img);
+    }
+    return img.complete && img.naturalWidth > 0 ? img : null;
+  };
 
   const containerSizeRef = useRef<Size>({
     width: 0,
@@ -908,14 +939,22 @@ export function HeroInteractive({
         let bestHitPin: PinPoint | null = null;
         let minDistance = Infinity;
 
-        // Check all system/custom pins and pick the closest one to pointer location
+        // Check all system/custom pins and pick the closest one to pointer location, prioritizing suspect photos
         for (let index = 0; index < caseSysPins.length; index += 1) {
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
 
-          if (isPinHit(worldPointer, pinPosition, pin.label, transform)) {
+          if (isPinHit(worldPointer, pinPosition, pin, transform)) {
             const dist = distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y);
-            if (dist < minDistance) {
+            const isSuspect = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-");
+
+            if (!bestHitPin) {
+              minDistance = dist;
+              bestHitPin = pin;
+            } else if (isSuspect && !bestHitPin.id.startsWith("node-suspect-") && !bestHitPin.id.startsWith("suspect-")) {
+              minDistance = dist;
+              bestHitPin = pin;
+            } else if (dist < minDistance && !(bestHitPin.id.startsWith("node-suspect-") && !isSuspect)) {
               minDistance = dist;
               bestHitPin = pin;
             }
@@ -1131,29 +1170,7 @@ export function HeroInteractive({
       );
 
       // ──────────────────────────────────
-      // 1. Draw the wooden frame in screen space (unaffected by zoom/pan)
-      // Uses "cover" fit — aspect ratio preserved, no stretching
-      // ──────────────────────────────────
-      const isPortrait = width < height || width < 768;
-
-      context.save();
-      if (!isPortrait && frameImg) {
-        context.drawImage(
-          frameImg,
-          0,
-          0,
-          frameImg.width,
-          frameImg.height,
-          frameDx,
-          frameDy,
-          frameDw,
-          frameDh,
-        );
-      }
-      context.restore();
-
-      // ──────────────────────────────────
-      // 2. Draw transformed board scene (Inner Map content)
+      // 1. Draw transformed board scene (Full-bleed Map content)
       // ──────────────────────────────────
 
       context.save();
@@ -1162,14 +1179,22 @@ export function HeroInteractive({
       context.translate(transform.translateX, transform.translateY);
       context.scale(transform.scale, transform.scale);
 
-      // 2.1 Draw case evidence map inside the inner bounds
+      // 2.1 Draw case evidence map with ~140% zoom focus on inner corkboard surface
       if (image) {
+        // Crop 14% margin of dark outer wall to zoom deeply into the corkboard surface
+        const cropMarginX = image.width * 0.14;
+        const cropMarginY = image.height * 0.13;
+        const sx = cropMarginX;
+        const sy = cropMarginY;
+        const sw = image.width - cropMarginX * 2;
+        const sh = image.height - cropMarginY * 2;
+
         context.drawImage(
           image,
-          0,
-          0,
-          image.width,
-          image.height,
+          sx,
+          sy,
+          sw,
+          sh,
           bounds.x,
           bounds.y,
           bounds.width,
@@ -1210,6 +1235,7 @@ export function HeroInteractive({
           noteColor: (p as any).noteColor,
           pinColor: (p as any).pinColor,
           pulseBorder: (p as any).pulseBorder,
+          photoUrl: (p as any).photoUrl,
           isUser: false,
         })),
         ...uPins.map((p) => ({
@@ -1221,6 +1247,7 @@ export function HeroInteractive({
           noteColor: "yellow" as const,
           pinColor: "yellow" as const,
           pulseBorder: false,
+          photoUrl: undefined,
           isUser: true,
         })),
       ];
@@ -1282,174 +1309,81 @@ export function HeroInteractive({
         context.rotate(tiltAngle);
 
         if (isSuspectPin) {
-          // ── POLAROID INSTANT PHOTO CARD RENDERING ──
-          const polaroidWidth = (64 * scaleMod) / transform.scale;
-          const photoPadding = 4.2 / transform.scale;
-          const photoWidth = polaroidWidth - (photoPadding * 2);
-          const photoHeight = (43 * scaleMod) / transform.scale;
+          // ── REALISTIC PINNED SUSPECT PHOTO CARD ASSET (WITH BEIGE TAPE & NAME) ──
+          const suspectPhotoUrl = resolveSuspectPhotoUrl(pin);
+          const loadedSuspectImg = suspectPhotoUrl ? getLoadedImage(suspectPhotoUrl) : null;
 
-          // Auto-fitting font size so long suspect names fit 100% inside bottom chin
-          let fontSize = 11.0;
-          context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
-          let lines = wrapText(context, pin.label, photoWidth + 2 / transform.scale, 2);
+          if (loadedSuspectImg) {
+            const imgW = loadedSuspectImg.naturalWidth || loadedSuspectImg.width || 300;
+            const imgH = loadedSuspectImg.naturalHeight || loadedSuspectImg.height || 380;
+            const cardWidth = (98 * scaleMod) / transform.scale;
+            const cardHeight = (cardWidth * imgH) / imgW;
 
-          while (
-            fontSize > 8.5 &&
-            lines.some((l) => context.measureText(l).width > photoWidth + 2 / transform.scale)
-          ) {
-            fontSize -= 0.5;
-            context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
-            lines = wrapText(context, pin.label, photoWidth + 2 / transform.scale, 2);
+            const tagX = -cardWidth / 2;
+            const tagY = -cardHeight * 0.10;
+
+            // Render complete pre-rendered photo card (includes photo, beige tape + name, yellow pin, drop shadow)
+            context.drawImage(loadedSuspectImg, tagX, tagY, cardWidth, cardHeight);
+          } else {
+            // Lightweight fallback while image is loading
+            const cardWidth = (84 * scaleMod) / transform.scale;
+            const cardHeight = (105 * scaleMod) / transform.scale;
+            context.fillStyle = "#f5f2eb";
+            context.fillRect(-cardWidth / 2, 0, cardWidth, cardHeight);
+          }
+        } else {
+          // ── DISTINGUISH WHITE PINNED NOTES vs YELLOW STICKY NOTES ──
+          const isWhiteNote = pin.noteColor === 'white' || 
+            pin.label.includes('MỞ RỘNG') || 
+            pin.label.includes('KHÁM NGHIỆM') || 
+            pin.label.includes('KẾT LUẬN') ||
+            pin.label.includes('TRUY TỐ');
+
+          let noteUrl = '';
+          if (pin.id === 'c0-pin-evidence' || pin.label.includes('CHỨNG CỨ')) {
+            noteUrl = '/images/cases/case_000/clue_notes/sticky_yellow_tilt_left.png';
+          } else if (pin.id === 'c0-pin-suspects' || pin.label.includes('NGHI PHẠM')) {
+            noteUrl = '/images/cases/case_000/clue_notes/sticky_kraft_beige.png';
+          } else if (pin.id === 'c0-pin-question' || pin.label.includes('CÂU HỎI')) {
+            noteUrl = '/images/cases/case_000/clue_notes/sticky_yellow_tilt_right.png';
+          } else if (pin.id === 'c0-pin-phone' || pin.label.includes('MỞ RỘNG')) {
+            noteUrl = '/images/cases/case_000/clue_notes/note_white_large.png';
+          } else if (pin.id === 'c0-pin-reinvestigate' || pin.label.includes('KHÁM NGHIỆM')) {
+            noteUrl = '/images/cases/case_000/clue_notes/note_white_square.png';
+          } else if (pin.id === 'c0-pin-indictment' || pin.label.includes('KẾT LUẬN') || pin.label.includes('TRUY TỐ')) {
+            noteUrl = '/images/cases/case_000/clue_notes/note_white_tilt_left.png';
+          } else if (isWhiteNote) {
+            const whiteVariants = [
+              '/images/cases/case_000/clue_notes/note_white_large.png',
+              '/images/cases/case_000/clue_notes/note_white_square.png',
+              '/images/cases/case_000/clue_notes/note_white_tilt_left.png',
+              '/images/cases/case_000/clue_notes/note_white_tilt_right.png',
+            ];
+            const hash = (pin.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            noteUrl = whiteVariants[hash % whiteVariants.length];
+          } else {
+            const yellowVariants = [
+              '/images/cases/case_000/clue_notes/sticky_yellow_tilt_left.png',
+              '/images/cases/case_000/clue_notes/sticky_kraft_beige.png',
+              '/images/cases/case_000/clue_notes/sticky_yellow_tilt_right.png',
+              '/images/cases/case_000/clue_notes/sticky_yellow_flat.png',
+            ];
+            const hash = (pin.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            noteUrl = yellowVariants[hash % yellowVariants.length];
           }
 
-          const lineHeight = (fontSize + 1.2) / transform.scale;
-          const textBlockHeight = lines.length * lineHeight;
-          const bottomChin = Math.max(22 / transform.scale, textBlockHeight + 8 / transform.scale);
-          const polaroidHeight = photoPadding + 3.2 / transform.scale + photoHeight + bottomChin;
-          const tagX = -polaroidWidth / 2;
-          const tagY = -4.5 / transform.scale; // Pin pierces top white margin
-          const r = 2.0 / transform.scale;
+          const loadedNoteImg = getLoadedImage(noteUrl);
 
-          // Layer 1: Polaroid Card Drop Shadow
-          context.save();
-          context.shadowColor = "rgba(0, 0, 0, 0.40)";
-          context.shadowBlur = 8 / transform.scale;
-          context.shadowOffsetX = 2.2 / transform.scale;
-          context.shadowOffsetY = 4.8 / transform.scale;
-
-          // Outer Polaroid Card Body (White/Cream Vintage Photo Paper)
-          context.beginPath();
-          context.moveTo(tagX + r, tagY);
-          context.lineTo(tagX + polaroidWidth - r, tagY);
-          context.quadraticCurveTo(tagX + polaroidWidth, tagY, tagX + polaroidWidth, tagY + r);
-          context.lineTo(tagX + polaroidWidth, tagY + polaroidHeight - r);
-          context.quadraticCurveTo(tagX + polaroidWidth, tagY + polaroidHeight, tagX + polaroidWidth - r, tagY + polaroidHeight);
-          context.lineTo(tagX + r, tagY + polaroidHeight);
-          context.quadraticCurveTo(tagX, tagY + polaroidHeight, tagX, tagY + polaroidHeight - r);
-          context.lineTo(tagX, tagY + r);
-          context.quadraticCurveTo(tagX, tagY, tagX + r, tagY);
-          context.closePath();
-
-          const cardGradient = context.createLinearGradient(0, tagY, 0, tagY + polaroidHeight);
-          cardGradient.addColorStop(0, "#faf7f2");
-          cardGradient.addColorStop(0.7, "#f2ebe0");
-          cardGradient.addColorStop(1, "#eae0cf");
-          context.fillStyle = cardGradient;
-          context.fill();
-
-          // Subtle photo border outline
-          context.strokeStyle = "rgba(120, 105, 85, 0.35)";
-          context.lineWidth = 0.8 / transform.scale;
-          context.stroke();
-          context.restore(); // restore shadow
-
-          // Layer 2: Inner Photo Area (Dark Noir Frame)
-          const photoX = tagX + photoPadding;
-          const photoY = tagY + photoPadding + 3.0 / transform.scale;
-
-          context.save();
-          context.beginPath();
-          context.rect(photoX, photoY, photoWidth, photoHeight);
-          context.clip();
-
-          // Background of photo (Deep noir gradient)
-          const photoBg = context.createLinearGradient(0, photoY, 0, photoY + photoHeight);
-          photoBg.addColorStop(0, "#221e24");
-          photoBg.addColorStop(0.4, "#161318");
-          photoBg.addColorStop(1, "#0a080c");
-          context.fillStyle = photoBg;
-          context.fillRect(photoX, photoY, photoWidth, photoHeight);
-
-          // Atmospheric noir backlighting behind mystery silhouette
-          const spotGlow = context.createRadialGradient(
-            0,
-            photoY + photoHeight * 0.40,
-            2 / transform.scale,
-            0,
-            photoY + photoHeight * 0.40,
-            photoWidth * 0.55
-          );
-          spotGlow.addColorStop(0, "rgba(95, 80, 90, 0.45)");
-          spotGlow.addColorStop(0.5, "rgba(45, 38, 48, 0.25)");
-          spotGlow.addColorStop(1, "rgba(10, 8, 12, 0)");
-          context.fillStyle = spotGlow;
-          context.fillRect(photoX, photoY, photoWidth, photoHeight);
-
-          // Mysterious Noir Black Silhouette Portrait ("người mặt đen thui")
-          const headCenterX = 0;
-          const headCenterY = photoY + photoHeight * 0.38;
-          const headRadiusX = 8.5 / transform.scale;
-          const headRadiusY = 10.5 / transform.scale;
-
-          const shoulderTopY = photoY + photoHeight * 0.63;
-          const shoulderBottomY = photoY + photoHeight + 3 / transform.scale;
-          const shoulderHalfW = photoWidth * 0.45;
-
-          // Torso & Shoulders Silhouette
-          context.fillStyle = "#080608";
-          context.beginPath();
-          context.moveTo(headCenterX - shoulderHalfW, shoulderBottomY);
-          context.quadraticCurveTo(
-            headCenterX - shoulderHalfW * 0.55,
-            shoulderTopY,
-            headCenterX - 3.2 / transform.scale,
-            shoulderTopY - 1 / transform.scale
-          );
-          context.lineTo(headCenterX + 3.2 / transform.scale, shoulderTopY - 1 / transform.scale);
-          context.quadraticCurveTo(
-            headCenterX + shoulderHalfW * 0.55,
-            shoulderTopY,
-            headCenterX + shoulderHalfW,
-            shoulderBottomY
-          );
-          context.closePath();
-          context.fill();
-
-          // Head Silhouette
-          context.beginPath();
-          context.ellipse(headCenterX, headCenterY, headRadiusX, headRadiusY, 0, 0, Math.PI * 2);
-          context.fill();
-
-          // Subtle mysterious rim light highlight on left curve of head/shoulder
-          context.save();
-          context.strokeStyle = "rgba(180, 170, 190, 0.28)";
-          context.lineWidth = 0.9 / transform.scale;
-          context.beginPath();
-          context.arc(headCenterX, headCenterY, headRadiusX, Math.PI * 0.75, Math.PI * 1.35);
-          context.stroke();
-          context.restore();
-
-          // Vintage photo subtle border
-          context.strokeStyle = "rgba(0, 0, 0, 0.65)";
-          context.lineWidth = 1.0 / transform.scale;
-          context.strokeRect(photoX, photoY, photoWidth, photoHeight);
-
-          context.restore(); // end photo clip
-
-          // Layer 3: Handwritten Suspect Name on Bottom White Chin (100% fits inside)
-          context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
-          context.fillStyle = "#160f08";
-          context.textAlign = "center";
-          context.textBaseline = "middle";
-
-          const nameAreaTop = photoY + photoHeight;
-          const nameAreaBottom = tagY + polaroidHeight;
-          const nameStartY = nameAreaTop + (nameAreaBottom - nameAreaTop - textBlockHeight) / 2 + lineHeight / 2 + 0.5 / transform.scale;
-
-          lines.forEach((line, idx) => {
-            context.fillText(line, 0, nameStartY + idx * lineHeight);
-          });
-        } else {
-          // ── YELLOW STICKY NOTE (CATEGORY / ACTION / CLUE NODES) ──
-          const noteWidth = (62 * scaleMod) / transform.scale;
-          const maxTextWidth = noteWidth - 8 / transform.scale;
+          const noteWidth = (isWhiteNote ? 78 : 68) * scaleMod / transform.scale;
+          const noteHeight = (isWhiteNote ? 86 : 72) * scaleMod / transform.scale;
+          const maxTextWidth = noteWidth - 14 / transform.scale;
 
           let fontSize = 11.5;
           context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
           let lines = wrapText(context, pin.label, maxTextWidth, 3);
 
           while (
-            fontSize > 9.0 &&
+            fontSize > 8.0 &&
             lines.some((l) => context.measureText(l).width > maxTextWidth)
           ) {
             fontSize -= 0.5;
@@ -1459,72 +1393,38 @@ export function HeroInteractive({
 
           const lineHeight = (fontSize + 1.6) / transform.scale;
           const textBlockHeight = lines.length * lineHeight;
-          const noteHeight = Math.max(54 / transform.scale, textBlockHeight + 22 / transform.scale);
           const tagX = -noteWidth / 2;
-          const tagY = -4.5 / transform.scale; // Pin pierces near top edge
-          const r = 2.0 / transform.scale;
+          const tagY = (isWhiteNote ? -10.0 : -8.0) / transform.scale;
 
-          // Layer 1: Soft Ambient Paper Lift Shadow (diffused towards bottom-right)
-          context.save();
-          context.shadowColor = "rgba(0, 0, 0, 0.28)";
-          context.shadowBlur = 7 / transform.scale;
-          context.shadowOffsetX = 1.8 / transform.scale;
-          context.shadowOffsetY = 4.0 / transform.scale;
+          // Draw the realistic note PNG asset if loaded
+          if (loadedNoteImg) {
+            context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
+          } else {
+            // Fallback fill
+            context.fillStyle = isWhiteNote ? "#faf8f2" : "#fde047";
+            context.fillRect(tagX, tagY, noteWidth, noteHeight);
+          }
 
-          // Layer 2: Subtle paper curl path (curls up slightly at bottom right corner)
-          context.beginPath();
-          context.moveTo(tagX + r, tagY);
-          context.lineTo(tagX + noteWidth - r, tagY);
-          context.quadraticCurveTo(tagX + noteWidth, tagY, tagX + noteWidth, tagY + r);
-          context.lineTo(tagX + noteWidth, tagY + noteHeight - 2.5 / transform.scale);
-          // Bottom edge with subtle organic paper wave
-          context.quadraticCurveTo(
-            tagX + noteWidth * 0.6,
-            tagY + noteHeight + 0.8 / transform.scale,
-            tagX + noteWidth * 0.2,
-            tagY + noteHeight - 0.5 / transform.scale
-          );
-          context.lineTo(tagX + r, tagY + noteHeight - 1.0 / transform.scale);
-          context.quadraticCurveTo(tagX, tagY + noteHeight - 1.0 / transform.scale, tagX, tagY + noteHeight - 1.0 / transform.scale - r);
-          context.lineTo(tagX, tagY + r);
-          context.quadraticCurveTo(tagX, tagY, tagX + r, tagY);
-          context.closePath();
-
-          // Matte paper gradient (pure warm paper texture, no glossy white shine)
-          const paperGradient = context.createLinearGradient(0, tagY, 0, tagY + noteHeight);
-          paperGradient.addColorStop(0, paperTheme.paperBgTop);
-          paperGradient.addColorStop(0.55, paperTheme.paperBgMid);
-          paperGradient.addColorStop(1, paperTheme.paperBgBottom);
-          context.fillStyle = paperGradient;
-          context.fill();
-
-          // Fine matte paper border (pulsing glowing yellow border if pulseBorder is active)
+          // Pulsing border highlight if active
           if ((pin as any).pulseBorder) {
-            const pulseGlow = (Math.sin(timestamp / 220) + 1) / 2; // 0..1 smooth pulsing
+            const pulseGlow = (Math.sin(timestamp / 220) + 1) / 2;
             context.save();
             context.shadowColor = `rgba(245, 158, 11, ${0.45 + pulseGlow * 0.55})`;
             context.shadowBlur = (8 + pulseGlow * 12) / transform.scale;
             context.strokeStyle = `rgba(253, 224, 71, ${0.75 + pulseGlow * 0.25})`;
             context.lineWidth = (2.2 + pulseGlow * 1.5) / transform.scale;
-            context.stroke();
+            context.strokeRect(tagX, tagY, noteWidth, noteHeight);
             context.restore();
-          } else {
-            context.strokeStyle = paperTheme.paperBorder;
-            context.lineWidth = 0.75 / transform.scale;
-            context.stroke();
           }
-          context.restore(); // restore ambient shadow
 
-          // Multi-line Handwritten label text with realistic ink bleed
+          // Multi-line Handwritten label text over note image
           context.save();
-          context.fillStyle = paperTheme.textColor;
+          context.fillStyle = "#1e1b18";
           context.textAlign = "center";
           context.textBaseline = "middle";
-          context.shadowColor = paperTheme.inkBleed;
-          context.shadowBlur = 0.5 / transform.scale;
 
-          const availableHeight = noteHeight - 11 / transform.scale;
-          const textStartY = tagY + 11 / transform.scale + (availableHeight - textBlockHeight) / 2 + lineHeight / 2;
+          const availableHeight = noteHeight - 16 / transform.scale;
+          const textStartY = tagY + 13 / transform.scale + (availableHeight - textBlockHeight) / 2 + lineHeight / 2;
 
           lines.forEach((line, lineIdx) => {
             context.fillText(line, 0, textStartY + lineIdx * lineHeight);
@@ -2063,7 +1963,7 @@ export function HeroInteractive({
   return (
     <div
       className={cn(
-        "flex h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-[#0a0705]",
+        "flex h-full w-full flex-col overflow-hidden rounded-none border-0 bg-[#0a0705]",
         className,
       )}
     >

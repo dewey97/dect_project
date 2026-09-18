@@ -150,75 +150,12 @@ export function useProceduralTextures() {
     beamWood.needsUpdate = true
 
     // ----------------------------------------------------
-    // 4. OVERCAST GLOOMY SKY WINDOW TEXTURE (TRỜI ÂM U - 512x512)
+    // 4. PHOTOREALISTIC HANOI 1996 RAILWAY TRAIN & COURTYARD GARDEN WINDOW VIEW
     // ----------------------------------------------------
-    const windowCanvas = document.createElement('canvas')
-    windowCanvas.width = 512
-    windowCanvas.height = 512
-    const winCtx = windowCanvas.getContext('2d')
-    if (winCtx) {
-      // Gloomy overcast sky gradient (không tối om, sắc trời xám chì âm u)
-      const winGrad = winCtx.createLinearGradient(0, 0, 0, 512)
-      winGrad.addColorStop(0, '#384353') // Xám chì âm u tầng cao
-      winGrad.addColorStop(0.35, '#4f5d73') // Xám xanh mây mù
-      winGrad.addColorStop(0.70, '#6b7a91') // Sáng dịu gần đường chân trời
-      winGrad.addColorStop(0.82, '#8291a5') // Dải sương mờ trên nóc rặng cây
-      winGrad.addColorStop(1, '#2c3542') // Mặt đất/đường ray sẫm màu
-      winCtx.fillStyle = winGrad
-      winCtx.fillRect(0, 0, 512, 512)
-
-      // Dải mây mù âm u trôi ngang (Overcast cloud layers)
-      for (let c = 0; c < 8; c++) {
-        const cy = 40 + c * 38
-        const ch = 45 + Math.sin(c) * 15
-        const cGrad = winCtx.createLinearGradient(0, cy, 0, cy + ch)
-        cGrad.addColorStop(0, 'rgba(40, 50, 65, 0.25)')
-        cGrad.addColorStop(0.5, 'rgba(120, 135, 155, 0.20)')
-        cGrad.addColorStop(1, 'rgba(40, 50, 65, 0)')
-        winCtx.fillStyle = cGrad
-        winCtx.fillRect(0, cy, 512, ch)
-      }
-
-      // Rặng cây và bụi cây xa xa mọc ven đường ray (Silhouette rực nét trên nền trời âm u)
-      winCtx.fillStyle = '#1e2631'
-      winCtx.beginPath()
-      winCtx.moveTo(0, 420)
-      for (let x = 0; x <= 512; x += 16) {
-        const treeH = 390 + Math.sin(x * 0.05) * 12 + Math.cos(x * 0.12) * 8
-        winCtx.lineTo(x, treeH)
-      }
-      winCtx.lineTo(512, 512)
-      winCtx.lineTo(0, 512)
-      winCtx.closePath()
-      winCtx.fill()
-
-      // Red Railway Signal Light (150m away, rực sáng rõ nét trong không gian âm u)
-      winCtx.fillStyle = '#ef4444'
-      winCtx.shadowColor = '#ef4444'
-      winCtx.shadowBlur = 28
-      winCtx.beginPath()
-      winCtx.arc(360, 260, 12, 0, Math.PI * 2)
-      winCtx.fill()
-      winCtx.shadowBlur = 0
-
-      // Silhouette railway mast & signal arm (Cột đèn tín hiệu)
-      winCtx.fillStyle = '#111827'
-      winCtx.fillRect(356, 260, 8, 252)
-      winCtx.fillRect(328, 272, 64, 6)
-
-      // Cột điện & đường dây điện chạy ngang tạo chiều sâu
-      winCtx.strokeStyle = 'rgba(25, 33, 44, 0.45)'
-      winCtx.lineWidth = 1.2
-      winCtx.beginPath()
-      winCtx.moveTo(0, 310)
-      winCtx.bezierCurveTo(180, 335, 360, 275, 512, 320)
-      winCtx.stroke()
-
-      // Nền đất đường ray tàu hỏa
-      winCtx.fillStyle = '#141c24'
-      winCtx.fillRect(0, 455, 512, 57)
-    }
-    const nightWindowTexture = new THREE.CanvasTexture(windowCanvas)
+    const nightWindowTexture = texLoader.load('/images/cases/case_000/window_railway_train_view.jpg')
+    nightWindowTexture.colorSpace = THREE.SRGBColorSpace
+    nightWindowTexture.generateMipmaps = true
+    nightWindowTexture.minFilter = THREE.LinearMipmapLinearFilter
 
     // ----------------------------------------------------
     // 5. AUTHENTIC VIETNAMESE BAT TRANG COURTYARD TILE

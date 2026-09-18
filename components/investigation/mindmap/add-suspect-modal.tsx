@@ -6,6 +6,7 @@ import { X, ArrowRight, ArrowLeft, Trash2, Check, Save, AlertTriangle, CheckCirc
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
+import { ClueCodePicker } from './clue-code-picker'
 
 interface SuspectItemData {
   id: string
@@ -38,11 +39,7 @@ interface EvaluationModalState {
   selectedCount: number
 }
 
-// Lấy danh sách chứng cứ chuẩn từ checkpoints000 (ưu tiên cp-000-1a hoặc cp-000-2a)
-const AVAILABLE_EVIDENCES =
-  checkpoints000.find((cp) => cp.id === 'cp-000-1a')?.pickerConfig?.availableEvidences ||
-  checkpoints000.find((cp) => cp.id === 'cp-000-2a')?.pickerConfig?.availableEvidences ||
-  []
+
 
 export const PHONE_LOOKUP_EVIDENCE_IDS = [
   'sms_dev00',
@@ -197,15 +194,7 @@ export function AddSuspectModal({
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null)
 
-  const hasPhoneSolvedState = isPhoneSolved || (typeof window !== 'undefined' && localStorage.getItem('veritas_phone_solved') === 'true')
 
-  const filteredEvidences = AVAILABLE_EVIDENCES.filter((ev) => {
-    if (PHONE_LOOKUP_EVIDENCE_IDS.includes(ev.id)) {
-      const isAlreadySelected = motiveClueIds.includes(ev.id) || alibiClueIds.includes(ev.id)
-      return hasPhoneSolvedState || isAlreadySelected
-    }
-    return true
-  })
 
   useEffect(() => {
     if (editingSuspect) {
@@ -571,46 +560,25 @@ export function AddSuspectModal({
                     BẰNG CHỨNG CHỨNG MINH ĐỐI TƯỢNG CÓ ĐỘNG CƠ {name ? `(${name})` : ''}:
                   </span>
                   <p className="text-xs text-[#6b4e2e] italic font-sans leading-relaxed">
-                    Hãy chọn các bằng chứng chứng minh đối tượng có mâu thuẫn hoặc có lý do để ra tay với nạn nhân
+                    Hãy nhập các mã bằng chứng chứng minh đối tượng có mâu thuẫn hoặc có lý do để ra tay với nạn nhân
                   </p>
-                  {!hasPhoneSolvedState && (
-                    <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 font-mono text-[11px] font-medium mt-1">
-                      🔒 Giải mã câu hỏi Tra cứu SĐT trên bản đồ để mở khóa thêm 8 tài liệu/chứng cứ liên quan.
-                    </div>
-                  )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
-                  {filteredEvidences.map((ev) => {
-                    const isChecked = motiveClueIds.includes(ev.id)
-                    return (
-                      <button
-                        key={ev.id}
-                        type="button"
-                        onClick={() => {
-                          detectiveAudio.playPaperRustle()
-                          setMotiveClueIds((prev) =>
-                            prev.includes(ev.id) ? prev.filter((id) => id !== ev.id) : [...prev, ev.id]
-                          )
-                        }}
-                        className={cn(
-                          'text-left p-2.5 rounded-none border-2 transition-all flex items-center gap-2.5 cursor-pointer relative select-none',
-                          isChecked
-                            ? 'bg-[#eae0cd] border-[#2b1f14] text-[#1a120b] font-bold shadow-sm'
-                            : 'bg-[#f4ebd9] border-[#d4c5b0] text-[#3d2f22] hover:bg-[#ede3cf]'
-                        )}
-                      >
-                        <div className={cn(
-                          'size-4 rounded-none border-2 flex items-center justify-center shrink-0 transition-all bg-white',
-                          isChecked ? 'border-[#2b1f14] text-[#0e2b5c]' : 'border-[#4a3520]'
-                        )}>
-                          {isChecked && <span className="font-[family-name:var(--font-handwriting)] text-sm font-black leading-none">✓</span>}
-                        </div>
-                        <span className="text-xs leading-snug flex-1">{ev.label}</span>
-                      </button>
-                    )
-                  })}
-                </div>
+                <ClueCodePicker
+                  selectedClueIds={motiveClueIds}
+                  customPhoneEvidences={[]}
+                  onAddClueId={(id) => {
+                    setMotiveClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+                    if (errorMsg) setErrorMsg('')
+                  }}
+                  onRemoveClueId={(id) => {
+                    setMotiveClueIds((prev) => prev.filter((item) => item !== id))
+                  }}
+                  onAddCustomPhone={() => {}}
+                  label="BẰNG CHỨNG ĐỘNG CƠ ĐÃ NHẬP"
+                  placeholder="Nhập số/mã chứng cứ (ví dụ: 04, 05, 07b, 15...)..."
+                  emptyStateText="Chưa có bằng chứng động cơ nào được nhập."
+                />
 
                 <div className="pt-2 flex items-center justify-between gap-2">
                   <button
@@ -645,46 +613,25 @@ export function AddSuspectModal({
                     NGOẠI PHẠM BẤT HỢP LÝ {name ? `(${name})` : ''}:
                   </span>
                   <p className="text-xs text-[#6b4e2e] italic font-sans leading-relaxed">
-                    Hãy chọn các bằng chứng chỉ ra điểm bất hợp lý trong ngoại phạm của đối tượng
+                    Hãy nhập các mã bằng chứng chỉ ra điểm bất hợp lý trong ngoại phạm của đối tượng
                   </p>
-                  {!hasPhoneSolvedState && (
-                    <div className="p-2 bg-amber-50 border border-amber-300 text-amber-900 font-mono text-[11px] font-medium mt-1">
-                      🔒 Giải mã câu hỏi Tra cứu SĐT trên bản đồ để mở khóa thêm 8 tài liệu/chứng cứ liên quan.
-                    </div>
-                  )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
-                  {filteredEvidences.map((ev) => {
-                    const isChecked = alibiClueIds.includes(ev.id)
-                    return (
-                      <button
-                        key={ev.id}
-                        type="button"
-                        onClick={() => {
-                          detectiveAudio.playPaperRustle()
-                          setAlibiClueIds((prev) =>
-                            prev.includes(ev.id) ? prev.filter((id) => id !== ev.id) : [...prev, ev.id]
-                          )
-                        }}
-                        className={cn(
-                          'text-left p-2.5 rounded-none border-2 transition-all flex items-center gap-2.5 cursor-pointer relative select-none',
-                          isChecked
-                            ? 'bg-[#eae0cd] border-[#2b1f14] text-[#1a120b] font-bold shadow-sm'
-                            : 'bg-[#f4ebd9] border-[#d4c5b0] text-[#3d2f22] hover:bg-[#ede3cf]'
-                        )}
-                      >
-                        <div className={cn(
-                          'size-4 rounded-none border-2 flex items-center justify-center shrink-0 transition-all bg-white',
-                          isChecked ? 'border-[#2b1f14] text-[#0e2b5c]' : 'border-[#4a3520]'
-                        )}>
-                          {isChecked && <span className="font-[family-name:var(--font-handwriting)] text-sm font-black leading-none">✓</span>}
-                        </div>
-                        <span className="text-xs leading-snug flex-1">{ev.label}</span>
-                      </button>
-                    )
-                  })}
-                </div>
+                <ClueCodePicker
+                  selectedClueIds={alibiClueIds}
+                  customPhoneEvidences={[]}
+                  onAddClueId={(id) => {
+                    setAlibiClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+                    if (errorMsg) setErrorMsg('')
+                  }}
+                  onRemoveClueId={(id) => {
+                    setAlibiClueIds((prev) => prev.filter((item) => item !== id))
+                  }}
+                  onAddCustomPhone={() => {}}
+                  label="BẰNG CHỨNG NGOẠI PHẠM ĐÃ NHẬP"
+                  placeholder="Nhập số/mã chứng cứ (ví dụ: 04, 05, 07b, 15...)..."
+                  emptyStateText="Chưa có bằng chứng ngoại phạm nào được nhập."
+                />
 
                 <div className="pt-2 flex items-center justify-between gap-2">
                   <button

@@ -212,11 +212,29 @@ export function CrimeSceneGeometry({
           </mesh>
         </group>
 
-        {/* Khung cảnh trời đêm tĩnh mịch ngoài cửa sổ (KHÔNG MƯA, rọi đèn tín hiệu ray tàu) */}
-        <mesh rotation={[0, -Math.PI / 2, 0]} position={[0.35, 0, 0]}>
-          <planeGeometry args={[2.8, 2.4]} />
+        {/* Khung cảnh vườn & đường sắt tàu hỏa chạy qua đêm ngoài cửa sổ (16:9 chuẩn nét) */}
+        <mesh rotation={[0, -Math.PI / 2, 0]} position={[0.42, 0.02, 0]}>
+          <planeGeometry args={[3.2, 1.80]} />
           <meshBasicMaterial map={nightWindowTexture} toneMapped={false} />
         </mesh>
+
+        {/* Ánh sáng vàng rực từ đèn pha tàu hỏa vừa ló ra ở góc phải rọi vào phòng */}
+        <pointLight
+          position={[0.38, 0.20, 0.45]}
+          color="#fde047"
+          intensity={1.6}
+          distance={4.0}
+          decay={2}
+        />
+
+        {/* Ánh sáng đỏ từ cột đèn tín hiệu đường sắt Ga Giáp Bát ở góc trái */}
+        <pointLight
+          position={[0.38, 0.40, -0.65]}
+          color="#ef4444"
+          intensity={0.8}
+          distance={2.5}
+          decay={2}
+        />
       </group>
 
       {/* Ánh sáng trời âm u rọi xiên qua cửa sổ Đông vào phòng */}
@@ -226,16 +244,16 @@ export function CrimeSceneGeometry({
         color="#94a3b8"
         intensity={0.65}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={512}
+        shadow-mapSize-height={512}
         shadow-camera-near={0.5}
-        shadow-camera-far={12}
-        shadow-camera-left={-3.5}
-        shadow-camera-right={3.5}
-        shadow-camera-top={3.5}
-        shadow-camera-bottom={-3.5}
+        shadow-camera-far={10}
+        shadow-camera-left={-3.0}
+        shadow-camera-right={3.0}
+        shadow-camera-top={3.0}
+        shadow-camera-bottom={-3.0}
         shadow-bias={-0.0001}
-        shadow-radius={2}
+        shadow-radius={1.5}
       />
 
       {/* 5E. VINTAGE GLASS DISPLAY CABINET ALONG EAST WALL NORTH OF WINDOW (TỦ BÚP-PHÊ KÍNH) */}

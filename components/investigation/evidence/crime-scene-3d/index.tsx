@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
-import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { RoomHotspot, CrimeSceneRoom3DProps, ControllerState } from './types'
 import { CeilingProps, DustParticles } from './subcomponents/ceiling-props'
 import { CrimeSceneGeometry } from './crime-scene-geometry'
@@ -105,9 +105,12 @@ export function CrimeSceneRoom3D({ onSelectSpot }: CrimeSceneRoom3DProps) {
         shadows={{
           type: THREE.PCFSoftShadowMap
         }}
+        dpr={[1, 1.5]}
         gl={{
           antialias: true,
-          powerPreference: 'high-performance'
+          powerPreference: 'high-performance',
+          stencil: false,
+          depth: true
         }}
         camera={{ position: [0, 1.62, 0.5], fov: 65 }}
         className="w-full h-full block"
@@ -179,44 +182,6 @@ export function CrimeSceneRoom3D({ onSelectSpot }: CrimeSceneRoom3DProps) {
           </button>
         </div>
       )}
-
-      {/* BOTTOM-RIGHT FLOATING ZOOM & RESET CONTROLS */}
-      <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1 bg-black/85 border border-[#593c26] p-1.5 rounded-xl backdrop-blur-md shadow-2xl">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleZoom(-8)
-          }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded-lg transition-colors cursor-pointer"
-          title="Phóng to (Zoom In)"
-        >
-          <ZoomIn className="size-4" />
-        </button>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleZoom(8)
-          }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded-lg transition-colors cursor-pointer"
-          title="Thu nhỏ (Zoom Out)"
-        >
-          <ZoomOut className="size-4" />
-        </button>
-        <div className="w-px h-4 bg-[#593c26]" />
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleResetView()
-          }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded-lg transition-colors cursor-pointer"
-          title="Đặt lại toàn cảnh (Reset)"
-        >
-          <RotateCcw className="size-4" />
-        </button>
-      </div>
     </div>
   )
 }
