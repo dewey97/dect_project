@@ -41,9 +41,10 @@ Tại: Phòng trọ tại số 08, ngõ 12, đường Bờ Kè, Phường Phân 
 
 Tiến hành khám xét toàn bộ diện tích phòng trọ và tư trang của đối tượng Trần Thị Hà. Cơ quan điều tra phát hiện và thu giữ các đồ vật, tài liệu sau:
 
-1. **01 lọn tóc nam giới:** Dài khoảng 4,2cm, chân tóc dính vết chất màu nâu khô. Lọn tóc được chứa trong 01 túi ni lông nhỏ trong suốt (túi zip), cất giấu bên trong ví tiền của đối tượng Trần Thị Hà. *(Đã tiến hành thu giữ và niêm phong trong phong bì ký hiệu M1)*.
-2. **01 chiếc áo gió nam có mũ trùm đầu:** Màu xám đen, vải dù. Áo nằm trong tủ quần áo của đối phượng. Quan sát bề mặt áo phát hiện dính bẩn phấn hoa*(Đã tiến hành thu giữ và niêm phong trong túi ký hiệu M2)*.
-3. **01 chiếc kéo bấm kim loại nhỏ:** Dạng kéo cắt chỉ thêu len, dài khoảng 10cm, để trên bàn làm việc cạnh cuộn len. Tại phần lưỡi kéo phát hiện có vệt chất màu nâu khô và sợi tóc bám dính. *(Đã tiến hành thu giữ và niêm phong trong hộp ký hiệu M3)*.
+1. **01 lọn tóc nam giới:** Dài khoảng 4,2cm, chân tóc dính vết chất màu nâu khô. Lọn tóc được chứa trong 01 túi ni lông nhỏ trong suốt (túi zip), cất giấu bên trong ví tiền của đối tượng Trần Thị Hà.
+2. **01 chiếc áo gió nam có mũ trùm đầu:** Màu xám đen, vải dù. Áo nằm trong tủ quần áo của đối phượng. Quan sát bề mặt áo phát hiện dính bẩn phấn hoa.
+3. **01 chiếc kéo bấm kim loại nhỏ:** Dạng kéo cắt chỉ thêu len, dài khoảng 10cm, để trên bàn làm việc cạnh cuộn len. Tại phần lưỡi kéo phát hiện có vệt chất màu nâu khô và sợi tóc bám dính.
+4. **01 lá bùa:** Có kích thước, chất liệu tương đồng với lá bùa đã tìm thấy tại nhà riêng nạn nhân.
 
 Ngoài các đồ vật nêu trên, Cơ quan điều tra không thu giữ thêm tài liệu, đồ vật nào khác. Toàn bộ các đồ vật thu giữ đã được kiểm tra, niêm phong tại chỗ trước sự chứng kiến của đối tượng Trần Thị Hà, đại diện chính quyền địa phương và những người chứng kiến.
 
