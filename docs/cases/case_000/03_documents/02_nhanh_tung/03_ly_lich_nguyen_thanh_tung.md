@@ -11,7 +11,7 @@ Số: `03/LL-TP`
 ---
 
 # BẢN TRÍCH LỤC LÝ LỊCH TƯ PHÁP 
-*(Tra cứu theo SĐT `0984.180.357`)*
+*(Tra cứu theo SĐT `0912.331.888`)*
 
 ---
 ### I. THÔNG TIN LÝ LỊCH
@@ -25,7 +25,7 @@ Số: `03/LL-TP`
 | **Nơi ĐKHKTT** | Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi ở hiện nay** | Phòng trọ công nhân số 18, Phố Cầu Bươu, TP. Hà Nội |
 | **Nghề nghiệp** | Thợ nề |
-| **Số điện thoại chính chủ** | 0984.180.357 |
+| **Số điện thoại chính chủ** | 0912.331.888 |
 | **Tình trạng hôn nhân** | Độc thân |
 | **Tiền án, tiền sự** | Không |
 | **Mối quan hệ với nạn nhân** | Bạn thuở nhỏ |
@@ -34,9 +34,9 @@ Số: `03/LL-TP`
 
 ### II. ĐẶC ĐIỂM NHẬN DẠNG & CĂN CỨ XÁC MINH BAN ĐẦU
 
-1. **Đặc điểm ngoại hình:** Nam, cao 1m72, có vết sẹo ở lông mày trái.
+1. **Đặc điểm ngoại hình:** Nam, cao 1m72, có vết sẹo ở lông mày phải.
 2. **Căn cứ xác minh:**
-   - Có cuộc gọi đến cho nạn nhân lúc 19:03, thời lượng cuộc gọi  phút 03 giây.
+   - Có cuộc gọi đến cho nạn nhân lúc 19:03, thời lượng cuộc gọi 1 phút 03 giây.
 ---
 
 **ĐIỀU TRA VIÊN TRÍCH LỤC HỒ SƠ**  
