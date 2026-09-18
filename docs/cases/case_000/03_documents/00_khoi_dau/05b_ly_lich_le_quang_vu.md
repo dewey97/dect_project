@@ -25,9 +25,9 @@ Số: `05b/LL-TP`
 | **Giới tính** | Nam |
 | **Số CMND** | `381762904` |
 | **Nơi ĐKHKTT** | Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội |
-| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội (cách nhà nạn nhân 3.2 km) |
+| **Nơi ở hiện nay** | Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội |
 | **Nghề nghiệp** | Kỹ sư điện dân dụng |
-| **Số điện thoại liên lạc** | `0988.20.09.91` |
+| **Số điện thoại liên lạc** | `0967.452.183` |
 | **Tình trạng hôn nhân** | Đã kết hôn (Vợ: Nguyễn Ngọc Mai, sinh năm 1992) |
 | **Tiền án, tiền sự** | Không |
 | **Mối quan hệ với nạn nhân** | Em rể (Chồng của Nguyễn Ngọc Mai) |
