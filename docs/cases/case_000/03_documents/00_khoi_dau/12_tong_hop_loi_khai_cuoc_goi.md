@@ -19,18 +19,18 @@ Số: `12/BB-XMNKCG`
 
 | STT | Khung Giờ | Số Điện Thoại | Danh Bạ / Tên Xác Minh | Loại Cuộc Gọi & Thời Lượng | Nội Dung Hỏi & Đáp / Trích Xuất Lời Khai Chi Tiết |
 | :---: | :---: | :---: | :--- | :---: | :--- |
-| **01** | `17:30` | `0932.889.102` | **Chị Lan Quán Nước**<br>*(Nguyễn Thị Lan)* | Cuộc gọi đến<br>(42s) | **Hỏi:** Chiều tối ngày 24/07 lúc 17:30, chị gọi điện cho nạn nhân Nguyễn Văn Khang với nội dung và mục đích gì?<br>**Đáp:** Tôi bán nước chè ở đầu đường Bờ Sông. Thằng Khang hay uống nước và nợ tôi tiền nước chè, thuốc lá. Chiều qua lúc 17:30 tôi gọi giục nó trả nốt 50.000đ. Khang hẹn tối tiện đi qua sẽ gửi. Suốt từ chiều đến 21:30 tối qua tôi ngồi bán hàng liên tục ở quán đầu đường, có nhiều khách hàng xóm ngồi uống nước làm chứng. Đến 21:30 tôi dọn hàng cùng chồng rồi về nhà đóng cửa đi ngủ, tuyệt đối không vào nhà Khang. |
-| **02** | `18:00` | `0915.223.789` | **Bình Còi**<br>*(Trịnh Thanh Bình)* | Cuộc gọi đến<br>(1m15s) | **Hỏi:** Tối ngày 24/07 lúc 18:00, anh gọi điện cho nạn nhân Nguyễn Văn Khang với nội dung và mục đích gì?<br>**Đáp:** Tôi với anh Khang quen nhau qua mấy sới bi-a ở Khu Cầu Cảng. Tầm 18h00, tôi gọi điện rủ anh Khang tối rảnh qua CLB Bi-a 88 làm vài séc. Anh Khang bảo bận giải quyết việc cá nhân, hẹn hôm khác. Tối qua từ 19:00 - 23:30 tôi chơi bi-a ở CLB Bi-a 88 có gần chục người làm chứng. |
-| **03** | `18:15` | `0967.452.183` | *Chưa lưu danh bạ* | Cuộc gọi đi<br>(1m40s) | **Chưa liên hệ được** |
-| **04** | `19:00` | `0912.331.888` | *Chưa lưu danh bạ* | Cuộc gọi đến<br>(28s) | **Chưa liên hệ được** |
-| **05** | `20:09` | `0984.180.357` | *Chưa lưu danh bạ* | Cuộc gọi đến<br>(35s) | **Chưa liên hệ được** |
-
+| **01** | `14:05` | `0978.552.109` | **Thảo Vy**<br>*(Lê Thảo Vy)* | Cuộc gọi đến<br>(48s) | **Hỏi:** Chiều ngày 24/07 lúc 14:05, chị gọi điện cho nạn nhân Nguyễn Văn Khang với nội dung và mục đích gì?<br>**Đáp:** Tôi có thường xuyên vay nợ anh Khang, nhưng tôi trả nợ đúng hạn, nên không có mâu thuẫn gì với anh Khang hết. Chiều hôm đó tôi gọi điện chỉ để hẹn đưa nốt tiền trả nợ tháng này, nhưng anh ấy gắt gỏng bảo đang bận việc giấy tờ nên hoãn lại. Tôi cúp máy ngay và ở nhà suốt buổi tối, tuyệt đối không gặp lại hay liên quan gì đến chuyện xảy ra với anh Khang sau đó. |
+| **02** | `17:30` | `0932.889.102` | **Chị Lan Quán Nước**<br>*(Nguyễn Thị Lan)* | Cuộc gọi đến<br>(42s) | **Hỏi:** Chiều tối ngày 24/07 lúc 17:30, chị gọi điện cho nạn nhân Nguyễn Văn Khang với nội dung và mục đích gì?<br>**Đáp:** Tôi bán nước chè ở đầu đường Bờ Sông. Thằng Khang hay uống nước và nợ tôi tiền nước chè, thuốc lá. Chiều qua lúc 17:30 tôi gọi giục nó trả nốt 50.000đ. Khang hẹn tối tiện đi qua sẽ gửi. Suốt từ chiều đến 21:30 tối qua tôi ngồi bán hàng liên tục ở quán đầu đường, có nhiều khách hàng xóm ngồi uống nước làm chứng. Đến 21:30 tôi dọn hàng cùng chồng rồi về nhà đóng cửa đi ngủ, tuyệt đối không vào nhà Khang. |
+| **03** | `18:00` | `0915.223.789` | **Bình Còi**<br>*(Trịnh Thanh Bình)* | Cuộc gọi đến<br>(1m15s) | **Hỏi:** Tối ngày 24/07 lúc 18:00, anh gọi điện cho nạn nhân Nguyễn Văn Khang với nội dung và mục đích gì?<br>**Đáp:** Tôi với anh Khang quen nhau qua mấy sới bi-a ở Khu Cầu Cảng. Tầm 18h00, tôi gọi điện rủ anh Khang tối rảnh qua CLB Bi-a 88 làm vài séc. Anh Khang bảo bận giải quyết việc cá nhân, hẹn hôm khác. Tối qua từ 19:00 - 23:30 tôi chơi bi-a ở CLB Bi-a 88 có gần chục người làm chứng. |
+| **04** | `18:15` | `0967.452.183` | *Chưa lưu danh bạ* | Cuộc gọi đi<br>(1m40s) | **Chưa liên hệ được** |
+| **05** | `19:00` | `0912.331.888` | *Chưa lưu danh bạ* | Cuộc gọi đến<br>(28s) | **Chưa liên hệ được** |
+| **06** | `20:09` | `0984.180.357` | *Chưa lưu danh bạ* | Cuộc gọi đến<br>(35s) | **Chưa liên hệ được** |
 ---
 
 ### II. ĐÁNH GIÁ KẾT LUẬN & HƯỚNG XỬ LÝ TIẾP THEO
 
 1. **Kết luận:**
-   - Các số điện thoại đã liên hệ làm việc được (`0932.889.102` — Chị Lan Quán Nước và `0915.223.789` — Bình Còi) đều có bằng chứng ngoại phạm khách quan xác thực, không liên quan đến vụ án mạng.
+   - Các số điện thoại đã liên hệ làm việc được đều có bằng chứng ngoại phạm khách quan xác thực, không liên quan đến vụ án mạng.
 2. **Hướng xử lý tiếp theo:**
    - Khẩn trương tra cứu, rà soát đối chiếu thông tin nhằm xác minh chính xác danh tính chủ sở hữu 03 số điện thoại ẩn danh trên để đưa vào diện đối tượng triệu tập đấu tranh. Sau khi xác minh, lập biên bản làm việc và trích xuất lời khai để phục vụ công tác điều tra.
 
