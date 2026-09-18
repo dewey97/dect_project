@@ -4,15 +4,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  MoveHorizontal,
   Volume2,
-  FileSearch,
-  Eye,
-  Box,
-  Layers
+  Eye
 } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { CrimeSceneRoom3D, RoomHotspot } from './crime-scene-room-3d'
@@ -138,7 +131,7 @@ export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
 export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalProps) {
   const [viewMode, setViewMode] = useState<'flat2d' | 'room3d'>('flat2d')
   const [selectedSpot, setSelectedSpot] = useState<ReinvestigationHotspot2D | null>(null)
-  const [scale, setScale] = useState<number>(1.55) // Default zoom in for panoramic dragging
+  const [scale, setScale] = useState<number>(1.0) // Default 100%
   const [isDragging, setIsDragging] = useState(false)
   const dragDistanceRef = useRef(0)
 
@@ -209,7 +202,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
   }
 
   const handleResetZoom = () => {
-    setScale(1.55)
+    setScale(1.0)
     detectiveAudio.playPaperRustle()
   }
 
@@ -238,23 +231,20 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
       {/* TOP HEADER / STATUS BAR */}
       <div className="relative z-30 bg-[#160d07] border-b-2 border-[#3d2412] px-3 sm:px-5 py-2.5 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-2.5 sm:gap-4">
-          <div className="size-8 rounded bg-[#2b170c] border border-[#693e1e] flex items-center justify-center text-amber-400 shrink-0 shadow-sm">
-            <FileSearch className="size-4.5" />
-          </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-xs sm:text-sm text-[#f5ebd9] tracking-wider uppercase">
-                TÁI KHÁM XÉT HIỆN TRƯỜNG // SỐ 14 ĐƯỜNG BỜ SÔNG
+                KHÁM XÉT LẠI HIỆN TRƯỜNG
               </span>
             </div>
             <p className="text-[11px] text-[#9e7a56] hidden sm:block">
               {viewMode === 'flat2d'
-                ? 'Giữ và kéo ảnh sang trái/phải để lia góc nhìn • Bấm vào các điểm [🔴 1-8] để soi chi tiết'
+                ? 'Giữ và kéo ảnh sang trái/phải để lia góc nhìn • Bấm vào các chấm đỏ để soi chi tiết'
                 : 'Xoay và tương tác với các vật thể trong không gian 3D'}
             </p>
           </div>
 
-          {/* VIEW MODE TOGGLE SWITCHER (2D MẶC ĐỊNH & 3D) */}
+          {/* VIEW MODE TOGGLE SWITCHER (2D VÀ 3D) */}
           <div className="flex items-center bg-[#0d0805] border border-[#59341c] rounded p-0.5 ml-1 sm:ml-2">
             <button
               type="button"
@@ -262,14 +252,13 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
                 detectiveAudio.playPaperRustle()
                 setViewMode('flat2d')
               }}
-              className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold transition-all cursor-pointer ${
                 viewMode === 'flat2d'
                   ? 'bg-[#5c371d] text-amber-300 shadow border border-amber-600/40'
                   : 'text-[#8c6a48] hover:text-[#d9a066]'
               }`}
             >
-              <Layers className="size-3.5" />
-              <span>Ảnh 2D</span>
+              2D
             </button>
 
             <button
@@ -278,57 +267,19 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
                 detectiveAudio.playPaperRustle()
                 setViewMode('room3d')
               }}
-              className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold transition-all cursor-pointer ${
                 viewMode === 'room3d'
                   ? 'bg-[#5c371d] text-amber-300 shadow border border-amber-600/40'
                   : 'text-[#8c6a48] hover:text-[#d9a066]'
               }`}
             >
-              <Box className="size-3.5" />
-              <span>Phòng 3D</span>
+              3D
             </button>
           </div>
         </div>
 
-        {/* ZOOM CONTROLS (IF 2D) & CLOSE */}
+        {/* CLOSE BUTTON */}
         <div className="flex items-center gap-2">
-          {/* Zoom buttons for 2D mode */}
-          {viewMode === 'flat2d' && (
-            <div className="flex items-center bg-[#0d0805] border border-[#4a2b15] rounded-none p-0.5 text-xs">
-              <button
-                type="button"
-                onClick={handleZoomOut}
-                disabled={scale <= 1.0}
-                className="p-1.5 text-[#a8825c] hover:text-amber-300 disabled:opacity-30 transition-colors cursor-pointer"
-                title="Thu nhỏ"
-              >
-                <ZoomOut className="size-4" />
-              </button>
-              <span className="px-2 font-mono text-[11px] text-amber-200 min-w-[44px] text-center font-bold">
-                {Math.round(scale * 100)}%
-              </span>
-              <button
-                type="button"
-                onClick={handleZoomIn}
-                disabled={scale >= 2.4}
-                className="p-1.5 text-[#a8825c] hover:text-amber-300 disabled:opacity-30 transition-colors cursor-pointer"
-                title="Phóng to"
-              >
-                <ZoomIn className="size-4" />
-              </button>
-              <button
-                type="button"
-                onClick={handleResetZoom}
-                className="px-2 py-1 text-[11px] text-[#a8825c] hover:text-amber-300 border-l border-[#4a2b15] transition-colors cursor-pointer hidden sm:flex items-center gap-1"
-                title="Đặt lại mức chuẩn"
-              >
-                <RotateCcw className="size-3" />
-                <span>Chuẩn</span>
-              </button>
-            </div>
-          )}
-
-          {/* Close button */}
           <button
             type="button"
             onClick={() => {
@@ -355,124 +306,80 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         >
           {/* DRAGGABLE 2D PANORAMIC CANVAS AREA */}
           <motion.div
-          drag
-          dragMomentum={true}
-          dragElastic={0.08}
-          dragConstraints={{
-            left: -maxDragX,
-            right: maxDragX,
-            top: -maxDragY,
-            bottom: maxDragY
-          }}
-          onDragStart={() => {
-            setIsDragging(true)
-            dragDistanceRef.current = 0
-          }}
-          onDrag={(_, info) => {
-            dragDistanceRef.current += Math.abs(info.delta.x) + Math.abs(info.delta.y)
-          }}
-          onDragEnd={() => {
-            setTimeout(() => {
-              setIsDragging(false)
+            drag
+            dragMomentum={true}
+            dragElastic={0.08}
+            dragConstraints={{
+              left: -maxDragX,
+              right: maxDragX,
+              top: -maxDragY,
+              bottom: maxDragY
+            }}
+            onDragStart={() => {
+              setIsDragging(true)
               dragDistanceRef.current = 0
-            }, 50)
-          }}
-          style={{
-            width: renderedWidth,
-            height: renderedHeight
-          }}
-          className="relative shrink-0 select-none touch-none flex items-center justify-center"
-        >
-          {/* CRIME SCENE REALISTIC ROOM 2D IMAGE */}
-          <img
-            src="/images/cases/case_000/photo-reinvestigation-room-realistic.jpg"
-            alt="Toàn cảnh phòng khách hiện trường khám xét lại 2D"
-            draggable={false}
-            className="w-full h-full object-cover pointer-events-none rounded-none shadow-2xl border border-[#26150b]"
-          />
+            }}
+            onDrag={(_, info) => {
+              dragDistanceRef.current += Math.abs(info.delta.x) + Math.abs(info.delta.y)
+            }}
+            onDragEnd={() => {
+              setTimeout(() => {
+                setIsDragging(false)
+                dragDistanceRef.current = 0
+              }, 50)
+            }}
+            style={{
+              width: renderedWidth,
+              height: renderedHeight
+            }}
+            className="relative shrink-0 select-none touch-none flex items-center justify-center"
+          >
+            {/* CRIME SCENE REALISTIC ROOM 2D IMAGE */}
+            <img
+              src="/images/cases/case_000/photo-reinvestigation-room-realistic.jpg"
+              alt="Toàn cảnh phòng khách hiện trường khám xét lại 2D"
+              draggable={false}
+              className="w-full h-full object-cover pointer-events-none rounded-none shadow-2xl border border-[#26150b]"
+            />
 
-          {/* HOTSPOT PINS OVERLAY */}
-          {HOTSPOTS_2D_LIST.map((spot) => {
-            const isSelected = selectedSpot?.id === spot.id
-            return (
-              <div
-                key={spot.id}
-                style={{
-                  left: `${spot.x}%`,
-                  top: `${spot.y}%`
-                }}
-                className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
-              >
-                <button
-                  type="button"
-                  onClick={() => handleSpotClick(spot)}
-                  className="group relative flex items-center justify-center cursor-pointer focus:outline-none"
-                  title={`[#${spot.num}] ${spot.title}`}
-                >
-                  {/* Outer Pulsing Ping Ring */}
-                  <span className="absolute -inset-2 rounded-full bg-red-600/40 animate-ping pointer-events-none" />
-
-                  {/* Red Badge Marker */}
-                  <div
-                    className={`relative flex items-center justify-center size-8 sm:size-9 rounded-full border-2 transition-transform duration-200 group-hover:scale-125 shadow-lg ${
-                      isSelected
-                        ? 'bg-amber-400 border-amber-200 text-black ring-4 ring-amber-400/50 scale-125'
-                        : 'bg-[#991b1b] border-[#fecaca] text-[#fef2f2] group-hover:bg-[#dc2626]'
-                    }`}
-                  >
-                    <span className="font-mono text-xs sm:text-sm font-black leading-none drop-shadow">
-                      {spot.num}
-                    </span>
-                  </div>
-
-                  {/* Hotspot Floating Pill Label */}
-                  <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#120a05]/95 text-amber-200 border border-[#59341c] px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded shadow-md pointer-events-none opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all">
-                    {spot.shortName}
-                  </div>
-                </button>
-              </div>
-            )
-          })}
-        </motion.div>
-
-        {/* BOTTOM DRAG INSTRUCTION BAR & HOTSPOT QUICK SELECTOR */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 w-[94%] max-w-4xl bg-[#140c06]/95 border-2 border-[#3d2412] p-2 sm:p-2.5 flex flex-col sm:flex-row items-center justify-between gap-2 shadow-2xl backdrop-blur-md">
-          {/* Guidance text */}
-          <div className="flex items-center gap-2 text-xs text-[#d4b08c]">
-            <MoveHorizontal className="size-4 text-amber-400 shrink-0 animate-pulse" />
-            <span className="font-mono text-[11px] sm:text-xs">
-              Kéo chuột/vuốt ngón tay để lia phòng • Chọn điểm nghi vấn:
-            </span>
-          </div>
-
-          {/* Quick Pill Strip */}
-          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0 custom-scrollbar">
+            {/* HOTSPOT PINS OVERLAY (CHẤM ĐỎ ĐƠN GIẢN KHÔNG HIỆU ỨNG, KHÔNG MÀU TRẮNG) */}
             {HOTSPOTS_2D_LIST.map((spot) => {
               const isSelected = selectedSpot?.id === spot.id
               return (
-                <button
+                <div
                   key={spot.id}
-                  type="button"
-                  onClick={() => {
-                    handleSpotClick(spot)
+                  style={{
+                    left: `${spot.x}%`,
+                    top: `${spot.y}%`
                   }}
-                  className={`px-2 py-1 rounded text-[11px] font-mono font-bold whitespace-nowrap border transition-all cursor-pointer flex items-center gap-1 shrink-0 ${
-                    isSelected
-                      ? 'bg-amber-400 text-black border-amber-300 shadow'
-                      : 'bg-[#241309] text-[#e0caa7] border-[#4a2a15] hover:bg-[#3d200e] hover:text-amber-200'
-                  }`}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
                 >
-                  <span className="size-3.5 rounded-full bg-red-800 text-white text-[9px] flex items-center justify-center font-black">
-                    {spot.num}
-                  </span>
-                  <span>{spot.shortName}</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSpotClick(spot)}
+                    className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2"
+                    title={spot.title}
+                  >
+                    {/* Clean Solid Red Dot (No animations, No white core) */}
+                    <div
+                      className={`size-3.5 sm:size-4 rounded-full border border-[#ffe4e4]/70 shadow-sm transition-transform duration-150 group-hover:scale-125 ${
+                        isSelected
+                          ? 'bg-amber-400 border-amber-200 ring-2 ring-amber-400/60 scale-125'
+                          : 'bg-[#cc1818] group-hover:bg-[#ee2222]'
+                      }`}
+                    />
+
+                    {/* Hotspot Floating Pill Label on Hover */}
+                    <div className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#120a05]/95 text-amber-200 border border-[#59341c] px-2 py-0.5 text-[10px] sm:text-[11px] font-bold rounded shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                      {spot.shortName}
+                    </div>
+                  </button>
+                </div>
               )
             })}
-          </div>
+          </motion.div>
         </div>
-      </div>
-    )}
+      )}
 
       {/* SPOT DETAIL INSPECTION MODAL */}
       <AnimatePresence>
@@ -487,15 +394,13 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
               {/* MODAL HEADER */}
               <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="size-7 rounded bg-[#8c1d1d] text-white font-mono font-black text-sm flex items-center justify-center shrink-0 shadow-sm">
-                    {selectedSpot.num}
-                  </div>
+                  <div className="size-3.5 rounded-full bg-[#8c1d1d] shrink-0 shadow-sm ring-2 ring-red-400/40" />
                   <div>
                     <h3 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider">
                       {selectedSpot.title}
                     </h3>
                     <span className="font-mono text-[11px] text-[#6b4e2e] block">
-                      HỒ SƠ KHÁM XÉT HIỆN TRƯỜNG // VẬT CHỨNG #{selectedSpot.num}
+                      HỒ SƠ KHÁM XÉT HIỆN TRƯỜNG
                     </span>
                   </div>
                 </div>

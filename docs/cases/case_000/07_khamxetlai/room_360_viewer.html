@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ Sơ Vụ Án - Hiện Trường 360° (Khám Xét Lại)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body {
+            background-color: #0b0c10;
+            color: #c5a059;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: grab;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: linear-gradient(180deg, rgba(10,12,16,0.85) 0%, rgba(10,12,16,0) 100%);
+            padding: 16px 20px;
+            border-left: 3px solid #c5a059;
+        }
+        .case-title {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #e5c07b;
+            text-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
+        }
+        .case-sub {
+            font-size: 12px;
+            color: #8c8273;
+            margin-top: 4px;
+        }
+        .compass-box {
+            background: rgba(18, 20, 26, 0.8);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .compass-needle {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #d9534f;
+            box-shadow: 0 0 8px #d9534f;
+        }
+        .controls-bar {
+            pointer-events: auto;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(15, 17, 23, 0.85);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(197, 160, 89, 0.25);
+            align-self: center;
+            backdrop-filter: blur(8px);
+            margin-bottom: 12px;
+        }
+        .btn-ctrl {
+            background: rgba(30, 34, 45, 0.8);
+            color: #e0d0b0;
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            padding: 8px 16px;
+            font-size: 12px;
+            font-family: inherit;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-ctrl:hover {
+            background: #c5a059;
+            color: #0b0c10;
+            box-shadow: 0 0 12px rgba(197, 160, 89, 0.5);
+        }
+        .hotspot-card {
+            position: absolute;
+            background: rgba(15, 18, 24, 0.95);
+            border: 1px solid #c5a059;
+            border-radius: 6px;
+            padding: 16px;
+            width: 320px;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+            pointer-events: auto;
+            z-index: 100;
+        }
+        .hotspot-card h4 {
+            color: #e5c07b;
+            font-size: 14px;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed rgba(197, 160, 89, 0.4);
+            padding-bottom: 4px;
+        }
+        .hotspot-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(197, 160, 89, 0.2);
+        }
+        .hotspot-card p {
+            font-size: 12px;
+            line-height: 1.4;
+            color: #bbb;
+        }
+        .hotspot-card .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            cursor: pointer;
+            color: #888;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .hotspot-card .close-btn:hover { color: #fff; }
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0.3;
+        }
+        .crosshair::before, .crosshair::after {
+            content: '';
+            position: absolute;
+            background: #c5a059;
+        }
+        .crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
+        .crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div class="hud-overlay">
+        <div class="header">
+            <div>
+                <div class="case-title">HỒ SƠ KHÁM XÉT HIỆN TRƯỜNG 360°</div>
+                <div class="case-sub">VỤ ÁN 000 | PHÒNG TRỌ ĐƯỜNG TÀU - GÓC NHÌN 360° THẲNG KHÔNG MÉO HÌNH</div>
+            </div>
+            <div class="compass-box">
+                <span class="compass-needle"></span>
+                <span id="heading-text">HƯỚNG: BẮC (0°)</span>
+            </div>
+        </div>
+
+        <div class="crosshair"></div>
+
+        <div class="controls-bar">
+            <button class="btn-ctrl" id="btn-rotate-auto">🔄 Tự Động Xoay</button>
+            <button class="btn-ctrl" id="btn-zoom-in">➕ Phóng To</button>
+            <button class="btn-ctrl" id="btn-zoom-out">➖ Thu Nhỏ</button>
+            <button class="btn-ctrl" id="btn-reset-view">🎯 Về Góc Chuẩn</button>
+            <button class="btn-ctrl" id="btn-audio">🔊 Âm Thanh Hiện Trường</button>
+        </div>
+    </div>
+
+    <!-- Hotspot modal popup -->
+    <div id="hotspot-modal" class="hotspot-card">
+        <span class="close-btn" id="modal-close-btn">&times;</span>
+        <h4 id="modal-title">Vật chứng</h4>
+        <img id="modal-img" src="" alt="Clue">
+        <p id="modal-desc"></p>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="snd-train" loop src="train sound.mp3"></audio>
+    <audio id="snd-drawer" src="Sound tủ.mp3"></audio>
+    <audio id="snd-clack" src="Clack.mp3"></audio>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        
+        // Rectilinear perspective camera: standard 70 deg field-of-view keeps architectural straight lines perfectly straight
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 0.1);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Cylinder Projection Geometry (50 radius, 48 height, 64 segments)
+        const geometry = new THREE.CylinderGeometry(50, 50, 48, 64, 32, true);
+        geometry.scale(-1, 1, 1);
+
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('room_360_panorama.jpg', () => {
+            renderer.render(scene, camera);
+        });
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.repeat.x = 1;
+
+        const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // Clue Hotspots
+        const hotspots = [
+            {
+                name: 'Tủ Quần Áo Gỗ (Ảnh 17)',
+                desc: 'Tủ gỗ 3 cánh đã cũ khóa móc hai ổ. Phía trên có cất giấy tờ và áo vải xanh.',
+                img: '17.png',
+                angle: 1.0,
+                y: 0,
+                snd: 'snd-drawer'
+            },
+            {
+                name: 'Cửa Sổ Đường Tàu (Ảnh 15)',
+                desc: 'Khung cửa sổ nhìn thẳng ra đường ray ga xe lửa về đêm. Đoàn tàu chạy vụt qua tạo âm thanh chát chúa.',
+                img: '15.png',
+                angle: 0.15,
+                y: 5,
+                snd: 'snd-train'
+            },
+            {
+                name: 'Bàn Đầu Giường & Lược Gãy (Ảnh 18)',
+                desc: 'Bàn gỗ đặt đèn ngủ cổ, gạt tàn đầy tàn thuốc và chiếc lược màu hổ phách dính sợi tóc vàng.',
+                img: '18.png',
+                angle: 2.6,
+                y: -6,
+                snd: 'snd-clack'
+            },
+            {
+                name: 'Gối Ngủ & Vật Giấu Kín (Ảnh 11)',
+                desc: 'Dưới góc gối hoa văn cũ kỹ phát hiện túi bùa đỏ thêu chỉ vàng cùng nhiều sợi tóc rơi rụng.',
+                img: '11.png',
+                angle: 3.3,
+                y: -5,
+                snd: 'snd-clack'
+            },
+            {
+                name: 'Sàn Nhà & Hoa Lài Rơi (Ảnh 9)',
+                desc: 'Nền gạch bông cổ điển hoa văn xưa. Rải rác vài bông hoa lài tươi rơi trên các mối ghép gạch.',
+                img: '9.png',
+                angle: 4.8,
+                y: -14,
+                snd: 'snd-clack'
+            }
+        ];
+
+        const createMarkerCanvas = () => {
+            const c = document.createElement('canvas');
+            c.width = 128; c.height = 128;
+            const ctx = c.getContext('2d');
+            ctx.beginPath();
+            ctx.arc(64, 64, 40, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(197, 160, 89, 0.4)';
+            ctx.fill();
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#e5c07b';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(64, 64, 18, 0, 2 * Math.PI);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            return c;
+        };
+
+        const markerTex = new THREE.CanvasTexture(createMarkerCanvas());
+        const markerMat = new THREE.SpriteMaterial({ map: markerTex, depthTest: false });
+
+        const markerObjects = [];
+        hotspots.forEach(h => {
+            const sprite = new THREE.Sprite(markerMat.clone());
+            const radius = 42;
+            sprite.position.x = radius * Math.sin(h.angle);
+            sprite.position.z = radius * Math.cos(h.angle);
+            sprite.position.y = h.y;
+            sprite.scale.set(4, 4, 1);
+            sprite.userData = { hotspot: h };
+            scene.add(sprite);
+            markerObjects.push(sprite);
+        });
+
+        let isUserInteracting = false;
+        let onPointerDownMouseX = 0, onPointerDownMouseY = 0;
+        let lon = 0, onPointerDownLon = 0;
+        let lat = 0, onPointerDownLat = 0;
+        let phi = 0, theta = 0;
+        let autoRotate = false;
+        let fov = 70;
+
+        container.addEventListener('pointerdown', (e) => {
+            isUserInteracting = true;
+            onPointerDownMouseX = e.clientX;
+            onPointerDownMouseY = e.clientY;
+            onPointerDownLon = lon;
+            onPointerDownLat = lat;
+        });
+
+        document.addEventListener('pointermove', (e) => {
+            if (isUserInteracting) {
+                lon = (onPointerDownMouseX - e.clientX) * 0.1 + onPointerDownLon;
+                lat = (e.clientY - onPointerDownMouseY) * 0.1 + onPointerDownLat;
+            }
+        });
+
+        document.addEventListener('pointerup', () => {
+            isUserInteracting = false;
+        });
+
+        container.addEventListener('wheel', (e) => {
+            fov = Math.max(35, Math.min(85, fov + e.deltaY * 0.05));
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+        });
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        container.addEventListener('click', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(markerObjects);
+            if (intersects.length > 0) {
+                const h = intersects[0].object.userData.hotspot;
+                openModal(h, e.clientX, e.clientY);
+            }
+        });
+
+        function openModal(h, x, y) {
+            const m = document.getElementById('hotspot-modal');
+            document.getElementById('modal-title').innerText = h.name;
+            document.getElementById('modal-desc').innerText = h.desc;
+            document.getElementById('modal-img').src = h.img;
+            
+            const posX = Math.min(window.innerWidth - 340, Math.max(20, x - 160));
+            const posY = Math.min(window.innerHeight - 320, Math.max(20, y - 100));
+            m.style.left = posX + 'px';
+            m.style.top = posY + 'px';
+            m.style.display = 'block';
+
+            if (h.snd) {
+                const s = document.getElementById(h.snd);
+                if (s) { s.currentTime = 0; s.play().catch(()=>{}); }
+            }
+        }
+
+        document.getElementById('modal-close-btn').addEventListener('click', () => {
+            document.getElementById('hotspot-modal').style.display = 'none';
+        });
+
+        document.getElementById('btn-rotate-auto').addEventListener('click', () => {
+            autoRotate = !autoRotate;
+            document.getElementById('btn-rotate-auto').style.background = autoRotate ? '#c5a059' : '';
+            document.getElementById('btn-rotate-auto').style.color = autoRotate ? '#0b0c10' : '';
+        });
+
+        document.getElementById('btn-zoom-in').addEventListener('click', () => {
+            fov = Math.max(35, fov - 10);
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+        });
+
+        document.getElementById('btn-zoom-out').addEventListener('click', () => {
+            fov = Math.min(85, fov + 10);
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+        });
+
+        document.getElementById('btn-reset-view').addEventListener('click', () => {
+            lon = 0; lat = 0; fov = 70;
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+        });
+
+        let audioEnabled = false;
+        document.getElementById('btn-audio').addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            const trainSnd = document.getElementById('snd-train');
+            if (audioEnabled) {
+                trainSnd.volume = 0.35;
+                trainSnd.play().catch(()=>{});
+                document.getElementById('btn-audio').innerText = '🔇 Tắt Âm Thanh';
+            } else {
+                trainSnd.pause();
+                document.getElementById('btn-audio').innerText = '🔊 Âm Thanh Hiện Trường';
+            }
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (autoRotate && !isUserInteracting) {
+                lon += 0.12;
+            }
+
+            lat = Math.max(-80, Math.min(80, lat));
+            phi = THREE.MathUtils.degToRad(90 - lat);
+            theta = THREE.MathUtils.degToRad(lon);
+
+            camera.target = new THREE.Vector3();
+            camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
+            camera.target.y = 500 * Math.cos(phi);
+            camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
+            camera.lookAt(camera.target);
+
+            const time = Date.now() * 0.003;
+            markerObjects.forEach(m => {
+                const s = 3.8 + Math.sin(time) * 0.4;
+                m.scale.set(s, s, 1);
+            });
+
+            let normalizedLon = ((lon % 360) + 360) % 360;
+            let dir = 'BẮC';
+            if (normalizedLon >= 45 && normalizedLon < 135) dir = 'ĐÔNG';
+            else if (normalizedLon >= 135 && normalizedLon < 225) dir = 'NAM';
+            else if (normalizedLon >= 225 && normalizedLon < 315) dir = 'TÂY';
+            document.getElementById('heading-text').innerText = 'HƯỚNG: ' + dir + ' (' + Math.round(normalizedLon) + '°)';
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
