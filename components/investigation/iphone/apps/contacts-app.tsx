@@ -412,7 +412,6 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
               <h2 className="text-[17px] font-bold text-white text-center mt-2">
                 {selectedContact.name}
               </h2>
-              <span className="text-[11px] text-[#8E8E93]">{selectedContact.relationship}</span>
             </div>
 
             {/* Quick Action Buttons */}
@@ -521,7 +520,6 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
                         <div className="text-[13px] font-semibold text-white truncate">
                           {contact.name}
                         </div>
-                        <div className="text-[10px] text-[#8E8E93] truncate">{contact.relationship}</div>
                       </div>
                     </div>
                   </div>

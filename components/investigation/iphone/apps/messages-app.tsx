@@ -508,7 +508,7 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
                       </span>
                     </div>
 
-                    {thread.phoneNumber && (
+                    {thread.phoneNumber && thread.phoneNumber !== thread.name && (
                       <span className="text-[9.5px] text-[#636366] font-mono block">
                         {thread.phoneNumber}
                       </span>

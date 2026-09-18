@@ -57,42 +57,18 @@ class DetectiveAudioSystem {
   // Kept as no-op for backward compatibility
   public playTypewriterClick(): void { /* removed */ }
 
-  // === REAL SOUND EFFECTS ===
+  // === UI BUTTON CLICK SFX: DISABLED PER USER REQUEST ===
+  // Only voicemail and reinvestigation audio remain active.
+  public playHeartbeat(): void { /* disabled */ }
+  public playStampSound(): void { /* disabled */ }
+  public playUnlockJingle(): void { /* disabled */ }
+  public playGlassSound(): void { /* disabled */ }
+  public playPaperRustle(): void { /* disabled */ }
+  public playCeramicShatterSound(): void { /* disabled */ }
+  public playTrainHornAndBellSound(): void { /* disabled */ }
+  public playRadioBeep(): void { /* disabled */ }
 
-  /** Deep heartbeat — plays when unlocking a new investigation phase */
-  public playHeartbeat(): void {
-    this.play('heartbeat.mp3', 0.7)
-  }
-
-  /** Rubber stamp impact — plays when answering checkpoint correctly */
-  public playStampSound(): void {
-    this.play('stamp.mp3', 0.8)
-  }
-
-  /** Achievement jingle — plays on successful checkpoint unlock */
-  public playUnlockJingle(): void {
-    this.play('unlock_jingle.mp3', 0.5)
-  }
-
-  /** Glass break shimmer — plays on wrong answer / error feedback */
-  public playGlassSound(): void {
-    this.play('glass_break.mp3', 0.5)
-  }
-
-  /** Paper page flip — plays when opening documents, switching tabs */
-  public playPaperRustle(): void {
-    this.play('paper_rustle.mp3', 0.4)
-  }
-
-  /** Ceramic/pottery shattering — bình trà vỡ xoảng */
-  public playCeramicShatterSound(): void {
-    this.play('ceramic_shatter.mp3', 0.8)
-  }
-
-  /** Train horn & crossing bell — còi tàu diesel & chuông gác chắn */
-  public playTrainHornAndBellSound(): void {
-    this.play('train_horn.mp3', 0.6)
-  }
+  // === VOICEMAIL & NARRATIVE AUDIO (ACTIVE) ===
 
   /** Trần Thị Hà voicemail lúc 20:32 (lẫn tiếng còi tàu 68dB vạch trần hiện trường) */
   public playHaVoicemail(): void {
@@ -104,44 +80,16 @@ class DetectiveAudioSystem {
     this.play('ha_interrogation_breakdown.mp3', 0.9)
   }
 
-  /** Radio beep / voice note click feedback */
-  public playRadioBeep(): void {
-    if (this.isMuted) return
-    if (typeof window === 'undefined') return
-    try {
-      const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.type = 'sine'
-      osc.frequency.setValueAtTime(587.33, ctx.currentTime) // D5
-      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08) // A5
-      gain.gain.setValueAtTime(0.08, ctx.currentTime)
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12)
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.start()
-      osc.stop(ctx.currentTime + 0.12)
-    } catch {
-      // AudioContext fallback ignored
-    }
-  }
-
   // === UTILITY: Droplet sound (kept as no-op for compatibility) ===
   public playSingleDroplet(): void { /* removed */ }
 
   /**
-   * Preload all audio files for instant playback.
-   * Call this once on user interaction to warm up the cache.
+   * Preload audio files.
    */
   public preloadAll(): void {
     const files = [
-      'heartbeat.mp3',
-      'stamp.mp3',
-      'unlock_jingle.mp3',
-      'glass_break.mp3',
-      'paper_rustle.mp3',
-      'ceramic_shatter.mp3',
-      'train_horn.mp3',
+      'ha_voicemail_2032_v3.mp3',
+      'ha_interrogation_breakdown.mp3'
     ]
     files.forEach(f => this.getAudio(f))
   }

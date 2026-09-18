@@ -599,7 +599,7 @@ export const conversations000: Record<string, Conversation[]> = {
       messages: [
         // 08/06/2016
         {
-          id: 'm9a-1',
+          id: 'm9-1',
           sender: 'Khang',
           role: 'sent',
           text: 'Tuấn, tiền gỗ đợt trước 45 triệu đến hạn rồi. Chiều tao cho người qua lấy.',
@@ -607,7 +607,7 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 09:00'
         },
         {
-          id: 'm9a-2',
+          id: 'm9-2',
           sender: 'Tuấn Béo Xưởng Mộc',
           role: 'received',
           text: 'Anh Khang ơi đợt này bên chủ nhà họ chậm thanh toán quá, anh thư thư cho em mấy hôm với ạ.',
@@ -615,7 +615,7 @@ export const conversations000: Record<string, Conversation[]> = {
         },
         // 25/06/2016
         {
-          id: 'm9a-3',
+          id: 'm9-3',
           sender: 'Khang',
           role: 'sent',
           text: 'Mấy hôm của mày là nửa tháng rồi đấy à? Đừng để tao phải mang mấy anh em xuống tận xưởng mộc bốc máy cưa máy bào đi.',
@@ -623,7 +623,7 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 14:30'
         },
         {
-          id: 'm9a-4',
+          id: 'm9-4',
           sender: 'Tuấn Béo Xưởng Mộc',
           role: 'received',
           text: 'Em lạy anh, anh cho em xin đến đầu tháng 7 công trình xong em thanh toán đủ cả gốc lẫn lãi cho anh!',
@@ -631,7 +631,7 @@ export const conversations000: Record<string, Conversation[]> = {
         },
         // 10/07/2016
         {
-          id: 'm9a-5',
+          id: 'm9-5',
           sender: 'Khang',
           role: 'sent',
           text: 'Mày trốn tao à? Gọi điện không nghe máy là muốn xưởng đỏ lửa đúng không?',
@@ -639,7 +639,7 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 11:00'
         },
         {
-          id: 'm9a-6',
+          id: 'm9-6',
           sender: 'Tuấn Béo Xưởng Mộc',
           role: 'received',
           text: 'Dạ không em vừa bận giao hàng trên phố không cầm máy. Anh cho em gom nốt tuần này em trả anh trước một nửa!',
@@ -647,7 +647,7 @@ export const conversations000: Record<string, Conversation[]> = {
         },
         // 21/07/2016
         {
-          id: 'm9a-7',
+          id: 'm9-7',
           sender: 'Tuấn Béo Xưởng Mộc',
           role: 'received',
           text: '',
@@ -658,7 +658,7 @@ export const conversations000: Record<string, Conversation[]> = {
           }
         },
         {
-          id: 'm9a-8',
+          id: 'm9-8',
           sender: 'Khang',
           role: 'sent',
           text: 'Biết điều đấy, trước 30/7 nốt 25 triệu còn lại không thì đừng trách tao.',
@@ -682,14 +682,14 @@ export const conversations000: Record<string, Conversation[]> = {
       unread: false,
       messages: [
         {
-          id: 'm9-1',
+          id: 'm10-1',
           sender: 'VNPT_Notice',
           role: 'received',
           text: '[Thong bao] Cuoc Internet FiberVNN thang 06/2016 cua thue bao 0904888666 la 220.000d. Han thanh toan: 20/07/2016.',
           timestamp: '10/07 • 08:30'
         },
         {
-          id: 'm9-2',
+          id: 'm10-2',
           sender: 'VNPT_Notice',
           role: 'received',
           text: '[Thong bao] Thue bao 0904888666 da thanh toan cuoc Internet FiberVNN thang 06/2016 so tien 220.000d qua ViettinBank. Cam on Quy khach.',
@@ -699,10 +699,10 @@ export const conversations000: Record<string, Conversation[]> = {
     },
 
     // -------------------------------------------------------------------------
-    // THREAD 10: Tuấn Bia 88 (Đã lưu danh bạ — Tin cuối: 20/07 lúc 18:45)
+    // THREAD 11: Tuấn Bia 88 (Đã lưu danh bạ — Tin cuối: 20/07 lúc 18:45)
     // -------------------------------------------------------------------------
     {
-      id: 'conv-10',
+      id: 'conv-11',
       name: 'Tuấn Bia 88',
       phoneNumber: '0945.888.188',
       avatarColor: 'from-[#FFD60A] to-[#FF9500]',
@@ -712,14 +712,14 @@ export const conversations000: Record<string, Conversation[]> = {
       unread: false,
       messages: [
         {
-          id: 'm10-1',
+          id: 'm11-1',
           sender: 'Tuấn Bia 88',
           role: 'received',
           text: 'Tối nay chung kết Euro Pháp - Bồ Đào Nha ra quán làm nồi lẩu xem bóng đá không Khang ơi? Có mấy anh em xóm Cảng nữa.',
           timestamp: '10/07 • 17:40'
         },
         {
-          id: 'm10-2',
+          id: 'm11-2',
           sender: 'Khang',
           role: 'sent',
           text: 'Bận rồi, tối phải đi chốt mấy khoản họ.',
@@ -727,7 +727,7 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 18:15'
         },
         {
-          id: 'm10-3',
+          id: 'm11-3',
           sender: 'Khang',
           role: 'sent',
           text: 'Trưa nay quán có lòng non với cháo lòng không ông?',
@@ -735,21 +735,21 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 11:20'
         },
         {
-          id: 'm10-4',
+          id: 'm11-4',
           sender: 'Tuấn Bia 88',
           role: 'received',
           text: 'Có luôn ông ơi, vừa mổ lòng tươi rói. Ra nhanh kẻo hết.',
           timestamp: '15/07 • 11:22'
         },
         {
-          id: 'm10-5',
+          id: 'm11-5',
           sender: 'Tuấn Bia 88',
           role: 'received',
           text: 'Khang ơi, tối nay rảnh ra làm vài cốc bia hơi phố cổ không ông? Lô bia hơi Hà Nội mới về mát lịm.',
           timestamp: '20/07 • 18:30'
         },
         {
-          id: 'm10-6',
+          id: 'm11-6',
           sender: 'Khang',
           role: 'sent',
           text: 'Tối bận đi thu nợ rồi ông. Để bữa khác.',
@@ -760,10 +760,10 @@ export const conversations000: Record<string, Conversation[]> = {
     },
 
     // -------------------------------------------------------------------------
-    // THREAD 11: Duy Bida 88 (Đã lưu danh bạ — Tin cuối: 20/07 lúc 11:00)
+    // THREAD 12: Duy Bida 88 (Đã lưu danh bạ — Tin cuối: 20/07 lúc 11:00)
     // -------------------------------------------------------------------------
     {
-      id: 'conv-11',
+      id: 'conv-12',
       name: 'Duy Bida 88',
       phoneNumber: '0916.334.556',
       avatarColor: 'from-[#0A84FF] to-[#64D2FF]',
@@ -773,14 +773,14 @@ export const conversations000: Record<string, Conversation[]> = {
       unread: false,
       messages: [
         {
-          id: 'm11-1',
+          id: 'm12-1',
           sender: 'Duy Bida 88',
           role: 'received',
           text: 'Chiều nay rảnh qua CLB làm độ bida lỗ 500k/ván với thằng Nam không anh Khang?',
           timestamp: '05/07 • 14:30'
         },
         {
-          id: 'm11-2',
+          id: 'm12-2',
           sender: 'Khang',
           role: 'sent',
           text: 'Chiều bận, tối 8h tao qua.',
@@ -788,14 +788,14 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 14:45'
         },
         {
-          id: 'm11-3',
+          id: 'm12-3',
           sender: 'Duy Bida 88',
           role: 'received',
           text: 'Bàn số 1 vừa thay nỉ nhập khẩu mới mượt lắm anh ơi, tối rảnh qua test bàn.',
           timestamp: '18/07 • 19:20'
         },
         {
-          id: 'm11-4',
+          id: 'm12-4',
           sender: 'Khang',
           role: 'sent',
           text: 'Dạo này đang bận mấy vụ gom tiền, để cuối tuần.',
@@ -806,10 +806,10 @@ export const conversations000: Record<string, Conversation[]> = {
     },
 
     // -------------------------------------------------------------------------
-    // THREAD 12: 195 (Tổng Đài Nạp Tiền — Tin cuối: 20/07 lúc 09:15)
+    // THREAD 13: 195 (Tổng Đài Nạp Tiền — Tin cuối: 20/07 lúc 09:15)
     // -------------------------------------------------------------------------
     {
-      id: 'conv-12',
+      id: 'conv-13',
       name: '195',
       phoneNumber: '195',
       avatarColor: 'from-[#FF9500] to-[#FF2D55]',
@@ -819,7 +819,7 @@ export const conversations000: Record<string, Conversation[]> = {
       unread: false,
       messages: [
         {
-          id: 'm12-1',
+          id: 'm13-1',
           sender: '195',
           role: 'received',
           text: 'Tai khoan cua Quy khach da duoc cong 500.000d tu the cao nap ngay 20/07/2016. So du hien tai: 584.250d. Thoi han su dung den 30/12/2016.',
@@ -829,10 +829,10 @@ export const conversations000: Record<string, Conversation[]> = {
     },
 
     // -------------------------------------------------------------------------
-    // THREAD 13: Thắng Sửa Xe (Đã lưu danh bạ — Tin cuối: 18/07 lúc 14:00)
+    // THREAD 14: Thắng Sửa Xe (Đã lưu danh bạ — Tin cuối: 18/07 lúc 14:00)
     // -------------------------------------------------------------------------
     {
-      id: 'conv-13',
+      id: 'conv-14',
       name: 'Thắng Sửa Xe',
       phoneNumber: '0977.112.445',
       avatarColor: 'from-[#636366] to-[#48484A]',
@@ -842,7 +842,7 @@ export const conversations000: Record<string, Conversation[]> = {
       unread: false,
       messages: [
         {
-          id: 'm13-1',
+          id: 'm14-1',
           sender: 'Khang',
           role: 'sent',
           text: 'Con SH của anh dạo này đi nồi kêu rè rè với phanh trước bị bó, chiều anh vứt qua xưởng chú coi hộ.',
@@ -850,21 +850,21 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 10:00'
         },
         {
-          id: 'm13-2',
+          id: 'm14-2',
           sender: 'Thắng Sửa Xe',
           role: 'received',
           text: 'Vâng anh cứ vứt qua xưởng để em kiểm tra kỹ cho.',
           timestamp: '14/07 • 10:15'
         },
         {
-          id: 'm13-3',
+          id: 'm14-3',
           sender: 'Thắng Sửa Xe',
           role: 'received',
           text: 'Anh Khang ơi tháo ra thấy mòn hết bố ba càng với bi nồi rồi, em thay luôn bộ mới xịn của Honda nhé? Tổng tầm hơn triệu.',
           timestamp: '16/07 • 15:30'
         },
         {
-          id: 'm13-4',
+          id: 'm14-4',
           sender: 'Khang',
           role: 'sent',
           text: 'Ừ thay luôn đồ ngon cho anh.',
@@ -872,7 +872,7 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 09:10'
         },
         {
-          id: 'm13-5',
+          id: 'm14-5',
           sender: 'Thắng Sửa Xe',
           role: 'received',
           text: 'Xe SH của anh thay dầu với làm nồi xong rồi nhé, tổng hết 850k anh nhé. Chiều rảnh ghé lấy.',
@@ -882,10 +882,10 @@ export const conversations000: Record<string, Conversation[]> = {
     },
 
     // -------------------------------------------------------------------------
-    // THREAD 14: Quân Lô Đề (Đã lưu danh bạ — Tin cuối: 17/07 lúc 10:45)
+    // THREAD 15: Quân Lô Đề (Đã lưu danh bạ — Tin cuối: 17/07 lúc 10:45)
     // -------------------------------------------------------------------------
     {
-      id: 'conv-14',
+      id: 'conv-15',
       name: 'Quân Lô Đề',
       phoneNumber: '0982.441.667',
       avatarColor: 'from-[#30D158] to-[#0A84FF]',
@@ -895,7 +895,7 @@ export const conversations000: Record<string, Conversation[]> = {
       unread: false,
       messages: [
         {
-          id: 'm14-1',
+          id: 'm15-1',
           sender: 'Khang',
           role: 'sent',
           text: 'Vào cho tao cặp 68 - 86 mỗi con 500 điểm lô, đề đít 8 năm trăm nghìn.',
@@ -903,21 +903,21 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 16:45'
         },
         {
-          id: 'm14-2',
+          id: 'm15-2',
           sender: 'Quân Lô Đề',
           role: 'received',
           text: 'Đã nhận đủ bảng của anh Khang nhé. Chúc anh rực rỡ!',
           timestamp: '16/07 • 17:00'
         },
         {
-          id: 'm14-3',
+          id: 'm15-3',
           sender: 'Quân Lô Đề',
           role: 'received',
           text: 'Nổ 68 hai nháy anh ơiii!! Tổng ăn 80 củ, trừ gốc còn lời 62 củ. Mai anh lấy tiền mặt hay bắn tài khoản?',
           timestamp: '16/07 • 18:35'
         },
         {
-          id: 'm14-4',
+          id: 'm15-4',
           sender: 'Khang',
           role: 'sent',
           text: 'Chuyển thẳng vào thẻ Vietcombank cho tao.',
@@ -925,7 +925,7 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 10:20'
         },
         {
-          id: 'm14-5',
+          id: 'm15-5',
           sender: 'Quân Lô Đề',
           role: 'received',
           text: 'Em vừa chuyển rồi đó anh, check tk hộ em nhé.',
@@ -935,10 +935,10 @@ export const conversations000: Record<string, Conversation[]> = {
     },
 
     // -------------------------------------------------------------------------
-    // THREAD 15: Thím Tư (Đã lưu danh bạ — Tin cuối: 15/07 lúc 16:20)
+    // THREAD 16: Thím Tư (Đã lưu danh bạ — Tin cuối: 15/07 lúc 16:20)
     // -------------------------------------------------------------------------
     {
-      id: 'conv-15',
+      id: 'conv-16',
       name: 'Thím Tư',
       phoneNumber: '0964.881.332',
       avatarColor: 'from-[#AF52DE] to-[#5856D6]',
@@ -948,14 +948,14 @@ export const conversations000: Record<string, Conversation[]> = {
       unread: false,
       messages: [
         {
-          id: 'm15-1',
+          id: 'm16-1',
           sender: 'Thím Tư',
           role: 'received',
           text: 'Khang ơi ở quê chú thím vừa gửi buồng chuối ngự với bao gạo nếp lên xe khách Mỹ Đình, trưa cháu ra bến đón lấy nhé.',
           timestamp: '02/07 • 08:30'
         },
         {
-          id: 'm15-2',
+          id: 'm16-2',
           sender: 'Khang',
           role: 'sent',
           text: 'Cháu bận không đi được đâu, thím bảo phụ xe gọi xe ôm ship tận nhà cho cháu, cháu trả tiền ship.',
@@ -963,7 +963,7 @@ export const conversations000: Record<string, Conversation[]> = {
           status: 'Đã gửi • 09:15'
         },
         {
-          id: 'm15-3',
+          id: 'm16-3',
           sender: 'Thím Tư',
           role: 'received',
           text: 'Cuối tháng giỗ ông nội ở quê cháu có sắp xếp về được không Khang? Cả họ ai cũng hỏi thăm.',
