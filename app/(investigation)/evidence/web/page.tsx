@@ -27,6 +27,7 @@ import { QuickActionFab } from '@/components/investigation/evidence/quick-action
 import { PhoneModal } from '@/components/investigation/evidence/phone-modal'
 import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
 import { PhoneSimulator } from '@/components/investigation/phone-simulator'
+import { HintModal } from '@/components/investigation/hint-modal'
 import {
   devices000,
   conversations000,
@@ -46,6 +47,7 @@ export default function WebEvidencePage() {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false)
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] = useState(false)
   const [isSuspectsModalOpen, setIsSuspectsModalOpen] = useState(false)
+  const [isHintModalOpen, setIsHintModalOpen] = useState(false)
   
   // Play Experience State ('web' | 'boardgame') - Web mode by default on /evidence/web
   const [playExperience, setPlayExperience] = useState<PlayExperience>('web')
@@ -89,15 +91,18 @@ export default function WebEvidencePage() {
     const handleOpenEpilogue = () => setIsEpilogueOpen(true)
     const handleOpenPhone = () => setIsPhoneModalOpen(true)
     const handleOpenSuspects = () => setIsSuspectsModalOpen(true)
+    const handleOpenHint = () => setIsHintModalOpen(true)
 
     window.addEventListener('open-epilogue-modal', handleOpenEpilogue)
     window.addEventListener('open-phone-modal', handleOpenPhone)
     window.addEventListener('open-suspects-modal', handleOpenSuspects)
+    window.addEventListener('open-hint-modal', handleOpenHint)
 
     return () => {
       window.removeEventListener('open-epilogue-modal', handleOpenEpilogue)
       window.removeEventListener('open-phone-modal', handleOpenPhone)
       window.removeEventListener('open-suspects-modal', handleOpenSuspects)
+      window.removeEventListener('open-hint-modal', handleOpenHint)
     }
   }, [])
 
@@ -742,6 +747,12 @@ export default function WebEvidencePage() {
           onClose={() => setIsPhoneModalOpen(false)}
         />
       </div>
+
+      {/* GLOBAL CASE HINT MODAL */}
+      <HintModal
+        isOpen={isHintModalOpen}
+        onClose={() => setIsHintModalOpen(false)}
+      />
     </div>
   )
 }

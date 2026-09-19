@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ArrowRight, ArrowLeft, Trash2, Check, Save, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
@@ -83,6 +83,13 @@ export function AddSuspectModal({
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null)
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
+  const openTimeRef = useRef(0)
+
+  useEffect(() => {
+    if (isOpen) {
+      openTimeRef.current = Date.now()
+    }
+  }, [isOpen])
 
   useEffect(() => {
     if (editingSuspect) {
@@ -105,7 +112,7 @@ export function AddSuspectModal({
 
   if (!isOpen) return null
 
-  // XÁC NHẬN MANH MỐI ĐỘNG CƠ (LƯU & QUAY VỀ MÀN HÌNH NHẬP TÊN)
+  // XÁC NHẬN MANH MỐI ĐỘNG CƠ (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
   const handleConfirmMotiveClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
@@ -138,11 +145,19 @@ export function AddSuspectModal({
         alibiClueIds
       })
     }
-    setSubTileView('overview')
+    setEvalModal({
+      isOpen: true,
+      isSuccess: true,
+      title: 'THÔNG BÁO',
+      heading: '',
+      message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
+      suspectName: suspectDisplayName,
+      selectedCount: motiveClueIds.length,
+    })
     setErrorMsg('')
   }
 
-  // XÁC NHẬN MANH MỐI BÁC BỎ NGOẠI PHẠM (LƯU & QUAY VỀ MÀN HÌNH NHẬP TÊN)
+  // XÁC NHẬN MANH MỐI BÁC BỎ NGOẠI PHẠM (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
   const handleConfirmAlibiClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
@@ -175,7 +190,15 @@ export function AddSuspectModal({
         alibiClueIds
       })
     }
-    setSubTileView('overview')
+    setEvalModal({
+      isOpen: true,
+      isSuccess: true,
+      title: 'THÔNG BÁO',
+      heading: '',
+      message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
+      suspectName: suspectDisplayName,
+      selectedCount: alibiClueIds.length,
+    })
     setErrorMsg('')
   }
 
@@ -242,10 +265,9 @@ export function AddSuspectModal({
       return
     }
 
-    const lower = currentName.toLowerCase()
-    const isVu = matchedChar.id === 'vu' || lower.includes('vũ') || lower.includes('vu')
-    const isTung = matchedChar.id === 'tung' || lower.includes('tùng') || lower.includes('tung')
-    const isHa = matchedChar.id === 'ha' || lower.includes('hà') || lower.includes('ha')
+    const isVu = matchedChar.id === 'vu'
+    const isTung = matchedChar.id === 'tung'
+    const isHa = matchedChar.id === 'ha'
 
     const isAdmin000 = currentName === '000' || currentName === '00' || currentName === '0'
     if (!isVu && !isTung && !isHa && !isAdmin000) {
@@ -315,7 +337,30 @@ export function AddSuspectModal({
   }
 
   // XỬ LÝ KHI ẤN DẤU X HOẶC CLICK RA NGOÀI OVERLAY
-  const handleAttemptClose = () => {
+  const handleAttemptClose = (e?: React.MouseEvent) => {
+    if (e && e.target !== e.currentTarget) return
+    if (Date.now() - openTimeRef.current < 350) return
+
+    // Nếu đã trả lời đúng 1 trong 2 căn cứ chính (động cơ hoặc ngoại phạm), tự động lưu không hỏi
+    if (isMotiveValid || isAlibiValid) {
+      const currentName = name.trim() || editingSuspect?.name?.trim() || ''
+      const matched = findValidCaseCharacter(currentName)
+      if (matched && matched.id !== 'khang') {
+        const suspectId = matched.id
+        const suspectName = matched.canonicalName
+        const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+        onSave({
+          id: suspectId,
+          name: suspectName,
+          clueIds: combinedClues,
+          motiveClueIds,
+          alibiClueIds,
+        })
+      }
+      onClose()
+      return
+    }
+
     if (hasUnsavedChanges()) {
       setShowExitConfirmModal(true)
     } else {
@@ -436,7 +481,9 @@ export function AddSuspectModal({
                     {/* Tile 1: ĐỘNG CƠ GÂY ÁN */}
                     <button
                       type="button"
+                      disabled={isMotiveValid}
                       onClick={() => {
+                        if (isMotiveValid) return
                         const currentName = name.trim() || editingSuspect?.name?.trim() || ''
                         if (!currentName) {
                           setErrorMsg('Vui lòng nhập tên đối tượng tình nghi trước!')
@@ -452,23 +499,28 @@ export function AddSuspectModal({
                         setSubTileView('motive')
                       }}
                       className={cn(
-                        'w-full text-left p-3.5 border-2 transition-all flex items-center justify-between cursor-pointer select-none relative group h-full min-h-[64px]',
+                        'w-full text-left p-3.5 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]',
                         isMotiveValid
-                          ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm'
-                          : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
+                          ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95'
+                          : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer'
                       )}
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
                           Động cơ gây án
                         </span>
+                        {isMotiveValid && (
+                          <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
+                        )}
                       </div>
                     </button>
 
                     {/* Tile 2: NGOẠI PHẠM BẤT HỢP LÝ */}
                     <button
                       type="button"
+                      disabled={isAlibiValid}
                       onClick={() => {
+                        if (isAlibiValid) return
                         const currentName = name.trim() || editingSuspect?.name?.trim() || ''
                         if (!currentName) {
                           setErrorMsg('Vui lòng nhập tên đối tượng tình nghi trước!')
@@ -484,16 +536,19 @@ export function AddSuspectModal({
                         setSubTileView('alibi')
                       }}
                       className={cn(
-                        'w-full text-left p-3.5 border-2 transition-all flex items-center justify-between cursor-pointer select-none relative group h-full min-h-[64px]',
+                        'w-full text-left p-3.5 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]',
                         isAlibiValid
-                          ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm'
-                          : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
+                          ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95'
+                          : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer'
                       )}
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
                           Ngoại phạm bất hợp lý
                         </span>
+                        {isAlibiValid && (
+                          <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
+                        )}
                       </div>
                     </button>
                   </div>
@@ -655,8 +710,12 @@ export function AddSuspectModal({
         {/* MODAL PHẢN HỒI KẾT QUẢ XÁC NHẬN MANH MỐI */}
         <AnimatePresence>
           {evalModal && evalModal.isOpen && (
-            <div className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            >
               <motion.div
+                onClick={(e) => e.stopPropagation()}
                 initial={{ opacity: 0, scale: 0.92, y: 12 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.92, y: 12 }}
@@ -705,7 +764,8 @@ export function AddSuspectModal({
                   {evalModal.isSuccess ? (
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         detectiveAudio.playPaperRustle()
                         setEvalModal(null)
                         setSubTileView('overview')
@@ -718,7 +778,8 @@ export function AddSuspectModal({
                   ) : (
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         detectiveAudio.playPaperRustle()
                         setEvalModal(null)
                       }}

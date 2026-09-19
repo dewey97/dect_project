@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Home, ArrowLeft } from 'lucide-react'
+import { Home, ArrowLeft, Lightbulb } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HeroInteractive, type PinPoint, type CaseConnection } from '@/components/investigation/hero-interactive'
 import { AddSuspectModal } from './add-suspect-modal'
@@ -221,25 +221,16 @@ export function MainInvestigationCanvas({
     saveSuspectsState(updated)
 
     if (suspectToDelete) {
-      const lower = suspectToDelete.name.toLowerCase()
+      const { canonicalId } = getCanonicalSuspectKey(suspectToDelete)
       const culpritType: 'vu' | 'tung' | 'ha' | null =
-        lower.includes('vũ') || lower.includes('vu')
-          ? 'vu'
-          : lower.includes('tùng') || lower.includes('tung')
-          ? 'tung'
-          : lower.includes('hà') || lower.includes('ha')
-          ? 'ha'
+        canonicalId === 'vu' || canonicalId === 'tung' || canonicalId === 'ha'
+          ? (canonicalId as 'vu' | 'tung' | 'ha')
           : null
 
       if (culpritType) {
-        const remainingHasCulprit = updated.some((s) => {
-          const l = s.name.toLowerCase()
-          return culpritType === 'vu'
-            ? l.includes('vũ') || l.includes('vu')
-            : culpritType === 'tung'
-            ? l.includes('tùng') || l.includes('tung')
-            : l.includes('hà') || l.includes('ha')
-        })
+        const remainingHasCulprit = updated.some(
+          (s) => getCanonicalSuspectKey(s).canonicalId === culpritType
+        )
         if (!remainingHasCulprit) {
           setInvestigatedSuspects((prev) => {
             const next = prev.filter((c) => c !== culpritType)
@@ -377,52 +368,70 @@ export function MainInvestigationCanvas({
   // Handle pin clicks directly on HeroInteractive canvas
   const handlePinClick = useCallback((pinId: string, pin?: PinPoint, coords?: { clientX: number; clientY: number }) => {
     detectiveAudio.playPaperRustle()
+    const id = pinId || pin?.id || ''
+    const label = (pin?.label || '').toLowerCase()
+    const detail = (pin?.detail || '').toLowerCase()
 
-    if (pinId === 'c0-pin-suspects') {
+    if (id === 'c0-pin-suspects') {
       setEditingSuspect(null)
       setIsAddSuspectOpen(true)
-    } else if (pinId === 'c0-pin-evidence') {
+    } else if (id === 'c0-pin-evidence') {
       setIsEvidenceGuideOpen(true)
-    } else if (pinId === 'c0-pin-phone') {
+    } else if (id === 'c0-pin-phone') {
       if (phoneLookupSuccess) {
         setIsDossierEOpen(true)
       } else {
         setIsPhoneLookupOpen(true)
       }
-    } else if (pinId === 'c0-pin-crime-scene' || pinId.includes('crime-scene') || pinId.includes('thi-the')) {
+    } else if (id === 'c0-pin-crime-scene' || id.includes('crime-scene') || id.includes('thi-the')) {
       handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png', coords)
-    } else if (pinId === 'c0-pin-victim-khang' || pinId.includes('khang')) {
+    } else if (id === 'c0-pin-victim-khang' || id === 'khang') {
       handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png', coords)
-    } else if (pinId === 'c0-pin-reinvestigate') {
+    } else if (id === 'c0-pin-reinvestigate') {
       if (isReinvestigateUnlocked) {
         detectiveAudio.playGlassSound()
         handleOpenReinvestigation()
       } else {
         detectiveAudio.playGlassSound()
       }
-    } else if (pinId === 'c0-pin-indictment') {
+    } else if (id === 'c0-pin-indictment') {
       if (isIndictmentSolved) {
         setIsFinalEpilogueOpen(true)
         if (onOpenEpilogue) onOpenEpilogue()
       } else {
         setIsIndictmentOpen(true)
       }
-    } else if (pinId === 'c0-pin-followup-vu') {
+    } else if (
+      id === 'c0-pin-followup-vu' ||
+      id === 'followup-vu' ||
+      id === 'c0-pin-question-vu' ||
+      (id.startsWith('c0-pin-followup') && (id.includes('vu') || detail.includes('vũ') || detail.includes('vu')))
+    ) {
       setActiveFollowupCulprit('vu')
       setIsFollowupQuestionOpen(true)
-    } else if (pinId === 'c0-pin-followup-tung') {
+    } else if (
+      id === 'c0-pin-followup-tung' ||
+      id === 'followup-tung' ||
+      id === 'c0-pin-question-tung' ||
+      (id.startsWith('c0-pin-followup') && (id.includes('tung') || detail.includes('tùng') || detail.includes('tung')))
+    ) {
       setActiveFollowupCulprit('tung')
       setIsFollowupQuestionOpen(true)
-    } else if (pinId === 'c0-pin-followup-ha') {
+    } else if (
+      id === 'c0-pin-followup-ha' ||
+      id === 'followup-ha' ||
+      id === 'c0-pin-question-ha' ||
+      (id.startsWith('c0-pin-followup') && (id.includes('ha') || detail.includes('hà') || detail.includes('ha')))
+    ) {
       setActiveFollowupCulprit('ha')
       setIsFollowupQuestionOpen(true)
-    } else if (pinId.includes('followup') || pinId.includes('question')) {
-      const c = pinId.includes('ha') ? 'ha' : pinId.includes('tung') ? 'tung' : (activeFollowupCulprit || 'vu')
+    } else if (id.startsWith('c0-pin-followup') || id.startsWith('followup-') || id.startsWith('c0-pin-question') || label.includes('nghi vấn')) {
+      const c = (id.includes('ha') || detail.includes('hà')) ? 'ha' : (id.includes('tung') || detail.includes('tùng')) ? 'tung' : 'vu'
       setActiveFollowupCulprit(c)
       setIsFollowupQuestionOpen(true)
-    } else if (pinId.startsWith('node-suspect-')) {
-      const targetId = pinId.replace('node-suspect-', '')
-      if (targetId === 'suspect-khang' || targetId === 'khang' || pinId.includes('khang')) {
+    } else if (id.startsWith('node-suspect-') || id.startsWith('suspect-')) {
+      const targetId = id.replace('node-suspect-', '').replace('suspect-', '')
+      if (targetId === 'suspect-khang' || targetId === 'khang' || id.includes('khang')) {
         handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png', coords)
         return
       }
@@ -431,8 +440,7 @@ export function MainInvestigationCanvas({
         return (
           s.id === targetId ||
           key.canonicalId === targetId ||
-          pinId.endsWith(s.id) ||
-          pinId.endsWith(key.canonicalId)
+          s.id === `node-suspect-${targetId}`
         )
       })
       if (foundSuspect) {
@@ -455,9 +463,9 @@ export function MainInvestigationCanvas({
 
   // CỐ ĐỊNH CÁC VỊ TRÍ SLOT NGHI PHẠM (Được căn lề chuẩn theo phác thảo sketch, an toàn bên trong khung gỗ)
   const DESKTOP_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.44, y: 0.62 }, // Slot 0: Lê Quang Vũ
-    { x: 0.60, y: 0.58 }, // Slot 1: Nguyễn Thanh Tùng
-    { x: 0.76, y: 0.65 }, // Slot 2: Trần Thị Hà
+    { x: 0.44, y: 0.54 }, // Slot 0: Lê Quang Vũ
+    { x: 0.60, y: 0.54 }, // Slot 1: Nguyễn Thanh Tùng
+    { x: 0.76, y: 0.54 }, // Slot 2: Trần Thị Hà
     { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
     { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt — Nằm dưới Bà Lụa
     { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
@@ -466,9 +474,9 @@ export function MainInvestigationCanvas({
   ], [])
 
   const MOBILE_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.44, y: 0.62 }, // Slot 0: Lê Quang Vũ
-    { x: 0.60, y: 0.58 }, // Slot 1: Nguyễn Thanh Tùng
-    { x: 0.76, y: 0.65 }, // Slot 2: Trần Thị Hà
+    { x: 0.44, y: 0.54 }, // Slot 0: Lê Quang Vũ
+    { x: 0.60, y: 0.54 }, // Slot 1: Nguyễn Thanh Tùng
+    { x: 0.76, y: 0.54 }, // Slot 2: Trần Thị Hà
     { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
     { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt
     { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
@@ -505,19 +513,19 @@ export function MainInvestigationCanvas({
 
   // Tìm node suspect của Vũ, Tùng và Hà để nối dây
   const vuSuspect = suspects.find(
-    (s) => s.name.toLowerCase().includes('vũ') || s.name.toLowerCase().includes('vu')
+    (s) => getCanonicalSuspectKey(s).canonicalId === 'vu'
   )
   const tungSuspect = suspects.find(
-    (s) => s.name.toLowerCase().includes('tùng') || s.name.toLowerCase().includes('tung')
+    (s) => getCanonicalSuspectKey(s).canonicalId === 'tung'
   )
   const haSuspect = suspects.find(
-    (s) => s.name.toLowerCase().includes('hà') || s.name.toLowerCase().includes('ha')
+    (s) => getCanonicalSuspectKey(s).canonicalId === 'ha'
   )
 
   // Dynamic Followup Pins cho Vũ, Tùng và Hà (Kéo xuống vùng dưới đáy bảng)
-  const hasVuFollowup = !!vuSuspect && investigatedSuspects.includes('vu')
-  const hasTungFollowup = !!tungSuspect && investigatedSuspects.includes('tung')
-  const hasHaFollowup = !!haSuspect && investigatedSuspects.includes('ha')
+  const hasVuFollowup = !!vuSuspect || investigatedSuspects.includes('vu') || suspects.some((s) => findValidCaseCharacter(s.name || s.id)?.id === 'vu')
+  const hasTungFollowup = !!tungSuspect || investigatedSuspects.includes('tung') || suspects.some((s) => findValidCaseCharacter(s.name || s.id)?.id === 'tung')
+  const hasHaFollowup = !!haSuspect || investigatedSuspects.includes('ha') || suspects.some((s) => findValidCaseCharacter(s.name || s.id)?.id === 'ha')
 
   const followupPinsMobile: PinPoint[] = [
     ...(hasVuFollowup
@@ -525,7 +533,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-vu',
             x: 0.44,
-            y: 0.80,
+            y: 0.82,
             label: 'Nghi vấn',
             detail: 'Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ',
             color: 'purple' as const,
@@ -538,7 +546,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-tung',
             x: 0.60,
-            y: 0.78,
+            y: 0.82,
             label: 'Nghi vấn',
             detail: 'Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
             color: 'purple' as const,
@@ -551,7 +559,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-ha',
             x: 0.76,
-            y: 0.80,
+            y: 0.82,
             label: 'Nghi vấn',
             detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
             color: 'purple' as const,
@@ -567,7 +575,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-vu',
             x: 0.44,
-            y: 0.80,
+            y: 0.82,
             label: 'Nghi vấn',
             detail: 'Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ',
             color: 'purple' as const,
@@ -580,7 +588,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-tung',
             x: 0.60,
-            y: 0.78,
+            y: 0.82,
             label: 'Nghi vấn',
             detail: 'Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
             color: 'purple' as const,
@@ -593,7 +601,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-ha',
             x: 0.76,
-            y: 0.80,
+            y: 0.82,
             label: 'Nghi vấn',
             detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
             color: 'purple' as const,
@@ -831,7 +839,7 @@ export function MainInvestigationCanvas({
 
       {/* Modals & Narrative Layers */}
       <AddSuspectModal
-        key={isAddSuspectOpen ? (editingSuspect ? editingSuspect.id : 'new-suspect-form') : 'closed'}
+        key={isAddSuspectOpen ? (editingSuspect ? `suspect-${editingSuspect.id}` : 'new-suspect-form') : 'suspect-modal-closed'}
         isOpen={isAddSuspectOpen}
         onClose={() => {
           setIsAddSuspectOpen(false)
@@ -906,10 +914,12 @@ export function MainInvestigationCanvas({
           setNarrativeChoice(null)
         }}
         onOpenDossier={handleOpenDossier}
-        onOpenFollowupQuestion={() => {
-          if (narrativeCulprit) {
-            setActiveFollowupCulprit(narrativeCulprit)
-          }
+        onOpenFollowupQuestion={(targetCulprit) => {
+          const c = targetCulprit || narrativeCulprit || activeFollowupCulprit || solvedCulprit || 'vu'
+          setActiveFollowupCulprit(c)
+          setIsEpilogueOpen(false)
+          setNarrativeCulprit(null)
+          setNarrativeChoice(null)
           setIsFollowupQuestionOpen(true)
         }}
         onOpenIndictment={() => {
@@ -924,13 +934,22 @@ export function MainInvestigationCanvas({
         isOpen={isDossierOpen}
         dossierType={activeDossierType}
         onClose={() => setIsDossierOpen(false)}
-        onOpenFollowupQuestion={() => setIsFollowupQuestionOpen(true)}
+        onOpenFollowupQuestion={() => {
+          setIsDossierOpen(false)
+          const c = activeDossierType === 'A' ? 'vu' : activeDossierType === 'B' ? 'tung' : 'ha'
+          setActiveFollowupCulprit(c)
+          setIsFollowupQuestionOpen(true)
+        }}
       />
 
       <FollowupQuestionModal
+        key={isFollowupQuestionOpen ? `followup-${activeFollowupCulprit || narrativeCulprit || solvedCulprit || 'vu'}` : 'followup-modal-closed'}
         isOpen={isFollowupQuestionOpen}
         culprit={activeFollowupCulprit || narrativeCulprit || solvedCulprit || 'vu'}
-        onClose={() => setIsFollowupQuestionOpen(false)}
+        onClose={() => {
+          setIsFollowupQuestionOpen(false)
+          setActiveFollowupCulprit(null)
+        }}
         onSuccess={handleFollowupSuccess}
         onOpenDossier={handleOpenDossier}
         isPhoneSolved={phoneLookupSuccess}

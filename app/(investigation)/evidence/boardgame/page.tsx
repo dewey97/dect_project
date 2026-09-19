@@ -13,15 +13,17 @@ import { JumpscareEndgame } from '@/components/investigation/jumpscare-endgame'
 import { QuickActionFab } from '@/components/investigation/evidence/quick-action-fab'
 import { PhoneModal } from '@/components/investigation/evidence/phone-modal'
 import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
+import { HintModal } from '@/components/investigation/hint-modal'
 
 export default function BoardGameCompanionPage() {
   const router = useRouter()
   const { completedCheckpointIds, completeCheckpoint } = useCheckpoints()
 
-  // Phone and Reinvestigation modals
+  // Phone, Reinvestigation, Epilogue and Hint modals
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false)
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] = useState(false)
   const [isEpilogueOpen, setIsEpilogueOpen] = useState(false)
+  const [isHintModalOpen, setIsHintModalOpen] = useState(false)
   const [isJumpscareActive, setIsJumpscareActive] = useState(false)
 
   // Checkpoint questions state
@@ -51,9 +53,11 @@ export default function BoardGameCompanionPage() {
 
     const handleOpenEpilogue = () => setIsEpilogueOpen(true)
     const handleOpenPhone = () => setIsPhoneModalOpen(true)
+    const handleOpenHint = () => setIsHintModalOpen(true)
 
     window.addEventListener('open-epilogue-modal', handleOpenEpilogue)
     window.addEventListener('open-phone-modal', handleOpenPhone)
+    window.addEventListener('open-hint-modal', handleOpenHint)
 
     const handleFirstUserInteraction = () => {
       detectiveAudio.startRainSound()
@@ -64,6 +68,7 @@ export default function BoardGameCompanionPage() {
     return () => {
       window.removeEventListener('open-epilogue-modal', handleOpenEpilogue)
       window.removeEventListener('open-phone-modal', handleOpenPhone)
+      window.removeEventListener('open-hint-modal', handleOpenHint)
       window.removeEventListener('click', handleFirstUserInteraction)
       detectiveAudio.stopRainSound()
     }
@@ -205,8 +210,15 @@ export default function BoardGameCompanionPage() {
 
       {/* QUICK ACTION FAB MENU */}
       <QuickActionFab
+        onOpenHint={() => setIsHintModalOpen(true)}
         onOpenPhone={() => setIsPhoneModalOpen(true)}
         onResetCase={resetFindingsProgress}
+      />
+
+      {/* HINT SYSTEM MODAL */}
+      <HintModal
+        isOpen={isHintModalOpen}
+        onClose={() => setIsHintModalOpen(false)}
       />
 
       {/* VICTIM PHONE SIMULATOR MODAL */}

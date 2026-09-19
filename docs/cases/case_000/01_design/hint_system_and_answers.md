@@ -29,7 +29,7 @@ Hệ thống cung cấp gợi ý thông minh đa tầng dựa trên vị trí th
 | | | **Thẩm tra bước 1: Mâu thuẫn ngoại phạm** | • **Tin nhắn thoại với SĐT `0984.112.568`**<br>• **12, 44**<br>*(Optional: 9, 7, 45)* | • **Gợi ý 1:** Âm thanh trong tin nhắn thoại của Hà.<br>• **Gợi ý 2:** Xem lịch phát sóng VTV3 ngày hôm đó. |
 | | | **Giai đoạn sau: Khớp nối dấu vết / vật chứng** | 1. **Áo gió:** `45`, `10`, `6`<br>2. **Kéo và lọn tóc:** `4`<br>3. **Bùa yêu:** `49` | • **Gợi ý:** Đối chiếu 3 vật phẩm thu tại phòng Hà với hiện trường và biên bản khám nghiệm. |
 | **5** | **Truy Tố & Kết Án**<br>*(Bản Cáo Trạng)* | **Chỉ danh Thủ phạm & Động cơ** | • **Thủ phạm:** Trần Thị Hà<br>• **Động cơ:** Mâu thuẫn tình cảm | • **Gợi ý:** Tìm đối tượng có mâu thuẫn tình cảm và phản ứng ghen tuông cực đoan. |
-| | | **Chứng minh Bị can mang theo / để lại dấu vết vụ án** | • **2.1 (Áo gió):** **`52`**<br>• **2.2 (Kéo và lọn tóc mai):** **`50, 51`**<br>• **2.3 (Bùa yêu):** **`53`** | • **Gợi ý:** Chọn các mã vật chứng thu được tại phòng Hà tương ứng với từng dấu vết. |
+| | | **Chứng minh Bị can mang theo / để lại dấu vết vụ án** | • **2.1:** **`52`**<br>• **2.2:** **`50, 51`** *(hoặc `50` / `51`)*<br>• **2.3:** **`53`** | • **Gợi ý:** Nhập đúng mã vật chứng thu được tại phòng Hà tương ứng từng mục (2.1: 52; 2.2: 50 hoặc 51; 2.3: 53). Không dùng mã mở rộng. |
 
 ---
 

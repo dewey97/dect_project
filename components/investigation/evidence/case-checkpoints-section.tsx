@@ -320,13 +320,26 @@ export function CaseCheckpointsSection({
               <div className="space-y-5 relative z-10">
                 
                 {/* Document Header & Question */}
-                <div className="space-y-1.5 border-b border-[#2b1f14]/20 pb-3">
-                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#6b4e2e] block">
-                    {cp.title}
-                  </span>
-                  <h3 className="text-sm sm:text-base font-bold text-[#1a120b] leading-relaxed">
-                    {cp.question}
-                  </h3>
+                <div className="border-b border-[#2b1f14]/20 pb-3 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <div className="space-y-1.5 flex-1">
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#6b4e2e] block">
+                      {cp.title}
+                    </span>
+                    <h3 className="text-sm sm:text-base font-bold text-[#1a120b] leading-relaxed">
+                      {cp.question}
+                    </h3>
+                  </div>
+                  {hints.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => handleHintClick(cp.id, hints.length)}
+                      className="self-start shrink-0 px-3 py-1.5 bg-[#ede3d1] hover:bg-[#dfd3bd] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                      title="Mở gợi ý phá án cho câu hỏi này"
+                    >
+                      <Lightbulb className="size-3.5 text-[#8c1d1d]" />
+                      <span>GỢI Ý {hintLevel > 0 ? `(${hintLevel}/${hints.length})` : ''}</span>
+                    </button>
+                  )}
                 </div>
 
                 {/* FORM TYPE 1: TEXT MATCH 3 (CP-000-0) */}

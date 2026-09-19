@@ -13,7 +13,7 @@ interface CulpritEpilogueModalProps {
   choice?: string | null
   onClose: () => void
   onOpenDossier?: (dossierType: 'A' | 'B' | 'C') => void
-  onOpenFollowupQuestion?: () => void
+  onOpenFollowupQuestion?: (targetCulprit?: 'vu' | 'tung' | 'ha') => void
   onOpenIndictment?: () => void
 }
 
@@ -47,9 +47,9 @@ export function CulpritEpilogueModal({
   const isVu = culprit === 'vu'
   const isTung = culprit === 'tung'
   const isHa = culprit === 'ha'
-  const isHaMatchedAll = isHa && choice === 'matched_3_tiles_indictment'
-  const isQuestionSolved = choice === '21:15' || choice === 'matched_3_tiles' || choice === 'question_solved'
-  const showTwoChoiceButtons = isQuestionSolved && !internalChoice
+  const isHaMatchedAll = isHa && (choice === 'matched_3_tiles' || choice === 'matched_3_tiles_indictment')
+  const isQuestionSolved = (choice === '21:15' || choice === 'question_solved') && !isHa
+  const showTwoChoiceButtons = (isVu || isTung) && isQuestionSolved && !internalChoice
   const suspectName = isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà'
 
   let dateLabel = isVu
@@ -100,7 +100,7 @@ export function CulpritEpilogueModal({
     if (!choice && !internalChoice) {
       onClose()
       if (onOpenFollowupQuestion) {
-        onOpenFollowupQuestion()
+        onOpenFollowupQuestion(culprit || undefined)
       }
     } else if (isHa && internalChoice === 'khong_tin') {
       onClose()

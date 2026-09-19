@@ -1,3 +1,5 @@
+import { isAdminBypassCode } from './admin-bypass'
+
 export interface SuspectCharacter {
   id: string
   canonicalName: string
@@ -74,43 +76,78 @@ export const VALID_CASE_CHARACTERS: SuspectCharacter[] = [
   },
 ]
 
-import { isAdminBypassCode } from './admin-bypass'
-
-export function findValidCaseCharacter(input: string): SuspectCharacter | null {
-  const normalized = input.trim().toLowerCase()
-  if (!normalized) return null
-  if (isAdminBypassCode(normalized)) {
-    return VALID_CASE_CHARACTERS[0]
-  }
-  return VALID_CASE_CHARACTERS.find((c) => {
-    if (c.canonicalName.toLowerCase() === normalized) return true
-    if (c.aliases.includes(normalized)) return true
-    return c.aliases.some(
-      (alias) =>
-        normalized === alias ||
-        (normalized.length >= 2 && alias.includes(normalized)) ||
-        (alias.length >= 3 && normalized.includes(alias))
-    )
-  }) || null
+export function removeDiacritics(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .trim()
 }
 
-export function getCanonicalSuspectKey(suspect: { id?: string; name: string }) {
-  const lower = (suspect.name || '').trim().toLowerCase()
-  const idLower = (suspect.id || '').toLowerCase()
+export function findValidCaseCharacter(input: string): SuspectCharacter | null {
+  const raw = (input || '').trim().toLowerCase()
+  if (!raw) return null
+  if (isAdminBypassCode(raw)) {
+    return VALID_CASE_CHARACTERS[0]
+  }
+  const cleanRaw = removeDiacritics(raw)
+  const rawWords = cleanRaw.split(/\s+/).filter(Boolean)
 
-  const match = VALID_CASE_CHARACTERS.find(
-    (c) => idLower.includes(c.id) || lower.includes(c.id) || c.aliases.some((alias) => lower.includes(alias))
-  )
+  // 1. Exact match on id, canonicalName, or any alias (with/without diacritics)
+  for (const c of VALID_CASE_CHARACTERS) {
+    if (c.id === raw || c.id === cleanRaw) return c
+    if (c.canonicalName.toLowerCase() === raw || removeDiacritics(c.canonicalName) === cleanRaw) return c
+    if (c.aliases.some((a) => a === raw || removeDiacritics(a) === cleanRaw)) return c
+  }
 
-  if (match) {
-    return {
-      canonicalId: match.id,
-      slotIndex: match.slotIndex,
-      canonicalName: match.canonicalName,
-      photoUrl: match.avatarUrl,
+  // 2. Word boundary / exact token match for aliases
+  for (const c of VALID_CASE_CHARACTERS) {
+    for (const alias of c.aliases) {
+      const cleanAlias = removeDiacritics(alias)
+      const aliasWords = cleanAlias.split(/\s+/).filter(Boolean)
+      if (aliasWords.length === 1) {
+        if (rawWords.includes(aliasWords[0])) {
+          return c
+        }
+      } else {
+        if (cleanRaw.includes(cleanAlias)) {
+          return c
+        }
+      }
     }
   }
 
+  return null
+}
+
+export function getCanonicalSuspectKey(suspect: { id?: string; name: string }) {
+  // 1. Exact ID match first (handling prefixes like node-suspect- or suspect-)
+  const rawId = (suspect.id || '').toLowerCase()
+  const cleanId = rawId.replace(/^(node-)?suspect-/, '')
+  const exactIdChar = VALID_CASE_CHARACTERS.find((c) => c.id === cleanId)
+  if (exactIdChar) {
+    return {
+      canonicalId: exactIdChar.id,
+      slotIndex: exactIdChar.slotIndex,
+      canonicalName: exactIdChar.canonicalName,
+      photoUrl: exactIdChar.avatarUrl,
+    }
+  }
+
+  // 2. Strict character matching by name or id
+  const char = findValidCaseCharacter(suspect.name || '') || findValidCaseCharacter(suspect.id || '')
+  if (char) {
+    return {
+      canonicalId: char.id,
+      slotIndex: char.slotIndex,
+      canonicalName: char.canonicalName,
+      photoUrl: char.avatarUrl,
+    }
+  }
+
+  const lower = (suspect.name || '').trim().toLowerCase()
   return {
     canonicalId: suspect.id || `suspect-${lower.replace(/\s+/g, '-')}`,
     slotIndex: 4,

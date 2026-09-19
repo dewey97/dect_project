@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, HelpCircle, CheckCircle2, ArrowRight, ShieldCheck, Check, Sparkles } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
@@ -88,6 +88,13 @@ export function FollowupQuestionModal({
 
   const [errorMsg, setErrorMsg] = useState('')
   const [hasPhoneSolvedState, setHasPhoneSolvedState] = useState(false)
+  const openTimeRef = useRef(0)
+
+  useEffect(() => {
+    if (isOpen) {
+      openTimeRef.current = Date.now()
+    }
+  }, [isOpen])
 
   useEffect(() => {
     if (isPhoneSolved) {
@@ -278,10 +285,16 @@ export function FollowupQuestionModal({
 
   const questionTextTung = 'Toàn bộ hành tung của Nguyễn Thanh Tùng trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?'
 
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return
+    if (Date.now() - openTimeRef.current < 350) return
+    onClose()
+  }
+
   return (
     <AnimatePresence>
       <div
-        onClick={onClose}
+        onClick={handleBackdropClick}
         className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
       >
         <motion.div
@@ -318,7 +331,11 @@ export function FollowupQuestionModal({
 
             <button
               type="button"
-              onClick={onClose}
+              onClick={(e) => {
+                e.stopPropagation()
+                detectiveAudio.playPaperRustle()
+                onClose()
+              }}
               className="p-1.5 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026]"
             >
               <X className="size-5" />
@@ -375,7 +392,11 @@ export function FollowupQuestionModal({
               <div className="pt-2 flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    detectiveAudio.playPaperRustle()
+                    onClose()
+                  }}
                   className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
                 >
                   ĐÓNG
@@ -512,7 +533,11 @@ export function FollowupQuestionModal({
               <div className="pt-2 flex items-center justify-between border-t border-[#2b1f14]/20">
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    detectiveAudio.playPaperRustle()
+                    onClose()
+                  }}
                   className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
                 >
                   ĐÓNG
@@ -553,52 +578,52 @@ export function FollowupQuestionModal({
                 </p>
               </div>
 
-              {/* OPTIONS (TICK CHỌN) */}
-              <div className="space-y-2.5">
+              {/* OPTIONS LIST */}
+              <div className="space-y-3">
                 <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
-                  TÍCH CHỌN PHƯƠNG ÁN ĐÚNG:
+                  LỰA CHỌN KẾT LUẬN CỦA ĐIỀU TRA VIÊN:
                 </span>
 
-                {MOCK_OPTIONS_TUNG.map((opt) => {
-                  const isSelected = selectedOption === opt.id
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => {
-                        detectiveAudio.playPaperRustle()
-                        setSelectedOption(opt.id)
-                        setErrorMsg('')
-                      }}
-                      className={cn(
-                        'w-full text-left p-3.5 rounded-none border-2 transition-all flex items-start gap-3 cursor-pointer select-none',
-                        isSelected
-                          ? 'bg-[#eae0cd] border-[#2b1f14] text-[#1a120b] shadow-sm'
-                          : 'bg-[#fdfcf9] border-[#d4c5b0] text-[#3d2f22] hover:bg-[#f4ebd9]'
-                      )}
-                    >
-                      <div
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {MOCK_OPTIONS_TUNG.map((opt) => {
+                    const isSelected = selectedOption === opt.id
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          detectiveAudio.playTypewriterClick()
+                          setSelectedOption(opt.id)
+                          setErrorMsg('')
+                        }}
                         className={cn(
-                          'size-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all bg-white',
-                          isSelected ? 'border-[#2b1f14] bg-[#2b1f14]' : 'border-[#4a3520]'
+                          'p-4 text-left border-2 transition-all cursor-pointer select-none rounded-none relative flex items-center justify-between',
+                          isSelected
+                            ? 'bg-[#e7f0dc] border-[#2e5220] shadow-sm text-[#193310]'
+                            : 'bg-[#fdfcf9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
                         )}
                       >
-                        {isSelected && <div className="size-2 rounded-full bg-white" />}
-                      </div>
-
-                      <span className="text-xs sm:text-sm font-medium leading-snug">
-                        {opt.label}
-                      </span>
-                    </button>
-                  )
-                })}
+                        <span className="font-mono text-xs sm:text-sm font-bold">
+                          {opt.label}
+                        </span>
+                        {isSelected && (
+                          <Check className="size-4 text-[#2e5220] stroke-[2.5]" />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
               {/* FOOTER */}
               <div className="pt-2 flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={onClose}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    detectiveAudio.playPaperRustle()
+                    onClose()
+                  }}
                   className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
                 >
                   ĐÓNG

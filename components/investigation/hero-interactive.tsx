@@ -10,6 +10,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { cn } from "@/lib/utils";
+import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
 
 // ────────────────────────────────────────
 // Types
@@ -442,27 +443,28 @@ function isPinHit(
   pin: PinPoint | { id: string; label: string },
   transform: ViewTransform,
 ): boolean {
-  // Hit radius for pinhead (32px radius touch target)
-  const headHitRadius = 32 / transform.scale;
+  // Hit radius for pinhead (40px radius touch target)
+  const headHitRadius = 40 / transform.scale;
   if (distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y) <= headHitRadius) {
     return true;
   }
 
-  const isKhang = pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang'));
-  const isCrimeScene = pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể'));
-  const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-") || !!(pin as any).photoUrl || isKhang || isCrimeScene;
+  const isFollowup = pin.id.startsWith('c0-pin-followup') || pin.id.startsWith('c0-pin-question') || pin.id.startsWith('followup-');
+  const isKhang = !isFollowup && (pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang')));
+  const isCrimeScene = !isFollowup && (pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể')));
+  const isSuspectPin = !isFollowup && (pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-") || !!(pin as any).photoUrl || isKhang || isCrimeScene);
 
   if (isSuspectPin) {
     // Exact dimensions matching drawing in renderScene:
     const baseCardWidth = isKhang ? 150 : isCrimeScene ? 140 : 110;
-    const cardWidth = baseCardWidth / transform.scale;
+    const cardWidth = (baseCardWidth + 24) / transform.scale;
     const cardHeight = isCrimeScene ? (cardWidth * 420) / 560 : (cardWidth * 380) / 300;
     const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.10;
 
-    const cardLeft = pinPosition.x - cardWidth / 2 - 12 / transform.scale;
-    const cardRight = pinPosition.x + cardWidth / 2 + 12 / transform.scale;
-    const cardTop = pinPosition.y + tagY - 12 / transform.scale;
-    const cardBottom = pinPosition.y + tagY + cardHeight + 12 / transform.scale;
+    const cardLeft = pinPosition.x - cardWidth / 2;
+    const cardRight = pinPosition.x + cardWidth / 2;
+    const cardTop = pinPosition.y + tagY - 6 / transform.scale;
+    const cardBottom = pinPosition.y + tagY + cardHeight + 4 / transform.scale;
 
     return (
       worldPointer.x >= cardLeft &&
@@ -481,10 +483,10 @@ function isPinHit(
     upperLabel.includes('BIÊN BẢN') ||
     upperLabel.includes('TRUY TỐ');
 
-  // Hit area for white note (~108x124) vs sticky note (~84x90) underneath pinhead
-  const cardHalfWidth = (isWhiteNote ? 60 : 50) / transform.scale;
-  const cardTop = pinPosition.y - (isWhiteNote ? 25 : 20) / transform.scale;
-  const cardBottom = pinPosition.y + (isWhiteNote ? 125 : 95) / transform.scale;
+  // Hit area for white note (~108x124) vs sticky note (~84x90) vs followup note (~90x100) with generous touch padding
+  const cardHalfWidth = (isFollowup ? 70 : isWhiteNote ? 65 : 55) / transform.scale;
+  const cardTop = pinPosition.y - (isFollowup ? 30 : isWhiteNote ? 30 : 25) / transform.scale;
+  const cardBottom = pinPosition.y + (isFollowup ? 130 : isWhiteNote ? 130 : 100) / transform.scale;
   const cardLeft = pinPosition.x - cardHalfWidth;
   const cardRight = pinPosition.x + cardHalfWidth;
 
@@ -590,19 +592,14 @@ export function HeroInteractive({
   const customConnectionsRef = useRef<CaseConnection[] | undefined>(customConnections);
   const onPinClickRef = useRef(onPinClick);
 
-  useEffect(() => {
-    onPinClickRef.current = onPinClick;
-  }, [onPinClick]);
+  // Synchronously update refs on every render to eliminate any stale closures
+  customPinsRef.current = customPins;
+  customConnectionsRef.current = customConnections;
+  onPinClickRef.current = onPinClick;
 
   useEffect(() => {
-    customPinsRef.current = customPins;
     if (requestRenderRef.current) requestRenderRef.current();
-  }, [customPins]);
-
-  useEffect(() => {
-    customConnectionsRef.current = customConnections;
-    if (requestRenderRef.current) requestRenderRef.current();
-  }, [customConnections]);
+  }, [customPins, customConnections, onPinClick]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -616,18 +613,24 @@ export function HeroInteractive({
 
   const resolveSuspectPhotoUrl = (pin: { id: string; label: string; photoUrl?: string }): string | undefined => {
     if (pin.photoUrl) return pin.photoUrl;
+    if (
+      pin.id.startsWith('c0-pin-followup') ||
+      pin.id.startsWith('c0-pin-question') ||
+      pin.id.startsWith('c0-pin-clue') ||
+      pin.id.startsWith('c0-pin-evidence') ||
+      pin.id.startsWith('c0-pin-phone') ||
+      pin.id.startsWith('c0-pin-reinvestigate') ||
+      pin.id.startsWith('c0-pin-indictment') ||
+      pin.id === 'c0-pin-suspects'
+    ) {
+      return undefined;
+    }
     const lower = `${pin.id} ${pin.label}`.toLowerCase();
     if (lower.includes('thi-the') || lower.includes('thi the') || lower.includes('hiện trường') || lower.includes('crime-scene') || lower.includes('crime_scene')) {
       return '/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png';
     }
-    if (lower.includes('vu') || lower.includes('vũ')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vu.png';
-    if (lower.includes('tung') || lower.includes('tùng')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_tung.png';
-    if (lower.includes('ha') || lower.includes('hà')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ha.png';
-    if (lower.includes('mai')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_mai.png';
-    if (lower.includes('dat') || lower.includes('đạt')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_dat_ga.png';
-    if (lower.includes('lua') || lower.includes('lụa')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ba_lua.png';
-    if (lower.includes('khang')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png';
-    if (lower.includes('vy')) return '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vy.png';
+    const char = findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
+    if (char && char.avatarUrl) return char.avatarUrl;
     return undefined;
   };
 
@@ -852,13 +855,6 @@ export function HeroInteractive({
         return;
       }
 
-      if (
-        activePointerIdRef.current !== null &&
-        activePointerIdRef.current !== event.pointerId
-      ) {
-        return;
-      }
-
       const rect = containerRef.current?.getBoundingClientRect();
 
       if (!rect) {
@@ -883,7 +879,9 @@ export function HeroInteractive({
         active: true,
       };
 
-      event.currentTarget.setPointerCapture(event.pointerId);
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch {}
 
       updateHoveredPin(x, y);
     },
@@ -907,7 +905,7 @@ export function HeroInteractive({
         active: true,
       };
 
-      const isActivePointer = activePointerIdRef.current === event.pointerId;
+      const isActivePointer = activePointerIdRef.current === event.pointerId || activePointerIdRef.current === null;
 
       if (
         isPointerDownRef.current &&
@@ -949,13 +947,11 @@ export function HeroInteractive({
         return;
       }
 
-      if (activePointerIdRef.current !== event.pointerId) {
-        return;
-      }
-
       const rect = containerRef.current?.getBoundingClientRect();
 
       if (!rect) {
+        isPointerDownRef.current = false;
+        activePointerIdRef.current = null;
         return;
       }
 
@@ -965,12 +961,15 @@ export function HeroInteractive({
       isPointerDownRef.current = false;
       activePointerIdRef.current = null;
 
-      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-        event.currentTarget.releasePointerCapture(event.pointerId);
-      }
+      try {
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+      } catch {}
 
       // Check if user actually dragged/panned
       const isDrag = hasDraggedRef.current;
+      hasDraggedRef.current = false;
 
       if (allowInteraction && !isDrag) {
         const bounds = getInnerBoardBounds(
@@ -982,22 +981,17 @@ export function HeroInteractive({
         const transform = getViewTransform(zoomRef.current, panRef.current);
         const worldPointer = screenToWorld({ x, y }, transform);
 
-        const worldHitRadius = PIN_HIT_RADIUS / transform.scale;
         const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
         let bestHitPin: PinPoint | null = null;
         let minDistance = Infinity;
 
-        // Check all system/custom pins and pick the closest one to pointer location, prioritizing suspect photos
+        // Check all system/custom pins and pick the closest hit target
         for (let index = 0; index < caseSysPins.length; index += 1) {
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
 
           if (isPinHit(worldPointer, pinPosition, pin, transform)) {
-            const isKhang = pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang'));
-            const isCrimeScene = pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể'));
-            const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-") || !!(pin as any).photoUrl || isKhang || isCrimeScene;
-            const centerY = isSuspectPin ? pinPosition.y + 60 / transform.scale : pinPosition.y + 40 / transform.scale;
-            const dist = distance(worldPointer.x, worldPointer.y, pinPosition.x, centerY);
+            const dist = distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y);
             if (dist < minDistance) {
               minDistance = dist;
               bestHitPin = pin;
@@ -1006,6 +1000,10 @@ export function HeroInteractive({
         }
 
         if (bestHitPin && onPinClickRef.current) {
+          try {
+            event.preventDefault();
+            event.stopPropagation();
+          } catch {}
           onPinClickRef.current(bestHitPin.id, bestHitPin, { clientX: event.clientX, clientY: event.clientY });
         }
       } else {

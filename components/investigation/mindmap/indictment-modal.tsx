@@ -104,20 +104,20 @@ export function IndictmentModal({
       return
     }
 
-    // Strict validation of 2.1 (Motive: 53, 49), 2.2 (Opportunity/Alibi: 52, 45), 2.3 (Physical traces: 50, 51, 4)
+    // Strict validation of 2.1 (52), 2.2 (50 hoặc 51), 2.3 (53) - No extensions
     if (!isAdmin000) {
-      if (!checkIndictmentEvidenceMatch(cluesMotiveInput, ['53', '49', '48'])) {
-        setErrorMsg('Mã chứng cứ mục 2.1 (Động cơ gây án) chưa chính xác!')
+      if (!checkIndictmentEvidenceMatch(cluesMotiveInput, ['52'])) {
+        setErrorMsg('Mã chứng cứ mục 2.1 chưa chính xác!')
         detectiveAudio.playGlassSound()
         return
       }
-      if (!checkIndictmentEvidenceMatch(cluesOpportunityInput, ['52', '45', '1', '01', '2', '02'])) {
-        setErrorMsg('Mã chứng cứ mục 2.2 (Cơ hội thực tế / Bác bỏ ngoại phạm) chưa chính xác!')
+      if (!checkIndictmentEvidenceMatch(cluesOpportunityInput, ['50', '51'])) {
+        setErrorMsg('Mã chứng cứ mục 2.2 chưa chính xác!')
         detectiveAudio.playGlassSound()
         return
       }
-      if (!checkIndictmentEvidenceMatch(cluesPhysicalTracesInput, ['50', '51', '4', '04'])) {
-        setErrorMsg('Mã chứng cứ mục 2.3 (Dấu vết vụ án) chưa chính xác!')
+      if (!checkIndictmentEvidenceMatch(cluesPhysicalTracesInput, ['53'])) {
+        setErrorMsg('Mã chứng cứ mục 2.3 chưa chính xác!')
         detectiveAudio.playGlassSound()
         return
       }
