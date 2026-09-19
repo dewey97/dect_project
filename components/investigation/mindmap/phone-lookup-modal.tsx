@@ -69,7 +69,7 @@ export function PhoneLookupModal({
     const isP3Valid = isPhoneMatch(phone3, ['dat', 'dat ga', 'tran van dat', 'đạt', 'đạt gà', 'trần văn đạt'])
 
     if (!hasBypass && (!isP1Valid || !isP2Valid || !isP3Valid)) {
-      setErrorMsg('Danh tính chủ thể chưa chính xác. Vui lòng đối chiếu kỹ lại Sổ nợ và Bảng tin!')
+      setErrorMsg('Danh tính chủ thể chưa chính xác.')
       detectiveAudio.playGlassSound()
       return
     }
@@ -121,10 +121,16 @@ export function PhoneLookupModal({
             </div>
 
             <button
-              onClick={onClose}
-              className="p-1.5 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                detectiveAudio.playPaperRustle()
+                onClose()
+              }}
+              className="p-2 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer pointer-events-auto"
+              title="Đóng"
             >
-              <X className="size-5" />
+              <X className="size-5 pointer-events-none" />
             </button>
           </div>
 
@@ -139,10 +145,6 @@ export function PhoneLookupModal({
 
             {/* ONBOARDING INITIAL EVIDENCE CALLOUT */}
             <div className="p-3.5 bg-[#ebdcc4] border-2 border-[#a88c6f] rounded-none text-xs text-[#3b2b1a] space-y-2.5 shadow-sm">
-              <div className="flex items-center gap-2 font-bold font-mono text-[#5c4026] uppercase tracking-wider">
-                <Smartphone className="size-4 text-[#8c592b]" />
-                <span>HƯỚNG DẪN BẮT ĐẦU ĐIỀU TRA:</span>
-              </div>
               <p className="text-xs leading-relaxed">
                 Trước tiên, bạn hãy đối chiếu dữ liệu giữa <strong>Hồ sơ tài liệu</strong> và <strong>Điện thoại nạn nhân Khang</strong> để tìm ra danh tính 3 SĐT ẩn danh.
               </p>

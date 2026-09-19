@@ -75,26 +75,35 @@ export function checkMotiveValid(characterId: string, selectedIds: string[]): bo
   if (hasAdminBypassInArray(selectedIds)) return true
 
   if (characterId === 'vu') {
-    // Vũ: 13 (Sổ ghi nợ) hoặc SĐT 0988.200.991 (Optional: 10)
-    const validCodes = ['13', '10', '0988.200.991', '0988200991', 'sms_phone_0988200991']
-    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
+    // Vũ: Bắt buộc CẢ HAI: Mã 13 (Sổ ghi nợ) VÀ Tin nhắn văn bản SĐT 0988.200.991
+    const hasDoc13 = selectedIds.some((id) => isEvidenceMatching(id, ['13', '10']))
+    const hasPhoneSms = selectedIds.some((id) =>
+      isEvidenceMatching(id, ['0988.200.991', '0988200991', 'sms_phone_0988200991'])
+    )
+    return hasDoc13 && hasPhoneSms
   }
 
   if (characterId === 'tung') {
-    // Tùng: 18, 40 hoặc SĐT 0912.331.888
-    const validCodes = ['18', '40', '0912.331.888', '0912331888', 'sms_phone_0912331888']
-    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
+    // Tùng: Bắt buộc CẢ HAI: Tài liệu 1996 (18 hoặc 40) VÀ Tin nhắn văn bản SĐT 0912.331.888
+    const hasDoc1996 = selectedIds.some((id) => isEvidenceMatching(id, ['18', '40']))
+    const hasPhoneSms = selectedIds.some((id) =>
+      isEvidenceMatching(id, ['0912.331.888', '0912331888', 'sms_phone_0912331888'])
+    )
+    return hasDoc1996 && hasPhoneSms
   }
 
   if (characterId === 'ha') {
-    // Hà: SĐT 0978.552.109 (Optional: 0984.112.568, 53, 48)
+    // Hà: (văn bản 0978.552.109 hoặc thoại 0978.552.109)
+    // Optional: (văn bản 0984.112.568 hoặc thoại 0984.112.568), 53, 48
     const validCodes = [
       '0978.552.109',
       '0978552109',
       'sms_phone_0978552109',
+      'voice_phone_0978552109',
       '0984.112.568',
       '0984112568',
       'sms_phone_0984112568',
+      'voice_phone_0984112568',
       '53',
       '48',
     ]
@@ -112,30 +121,28 @@ export function checkAlibiValid(characterId: string, selectedIds: string[]): boo
   if (hasAdminBypassInArray(selectedIds)) return true
 
   if (characterId === 'vu') {
-    // Vũ: 10, 42 (Optional: 6, 8)
-    const validCodes = ['10', '42', '6', '8']
-    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
+    // Vũ: 10, 42 (Optional: 6, 8) -> Bắt buộc CẢ HAI: (10 hoặc optional 6) VÀ (42 hoặc optional 8)
+    const hasPart1 = selectedIds.some((id) => isEvidenceMatching(id, ['10', '6']))
+    const hasPart2 = selectedIds.some((id) => isEvidenceMatching(id, ['42', '8']))
+    return hasPart1 && hasPart2
   }
 
   if (characterId === 'tung') {
-    // Tùng: 20, 41
-    const validCodes = ['20', '41']
-    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
+    // Tùng: Bắt buộc CẢ HAI: 20 VÀ 41
+    const hasDoc20 = selectedIds.some((id) => isEvidenceMatching(id, ['20']))
+    const hasDoc41 = selectedIds.some((id) => isEvidenceMatching(id, ['41']))
+    return hasDoc20 && hasDoc41
   }
 
   if (characterId === 'ha') {
-    // Hà: Tin nhắn thoại 0984.112.568, 12, 44 (Optional: 9, 7, 45)
-    const validCodes = [
-      'voice_phone_0984112568',
-      '0984.112.568',
-      '0984112568',
-      '12',
-      '44',
-      '9',
-      '7',
-      '45',
-    ]
-    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
+    // Hà: Bắt buộc CẢ HAI: Tin nhắn thoại 0984.112.568 VÀ Lịch VTV3 (12, 44 hoặc optional 9, 7, 45)
+    const hasVoice = selectedIds.some((id) =>
+      isEvidenceMatching(id, ['voice_phone_0984112568', '0984.112.568', '0984112568'])
+    )
+    const hasDocVtv3 = selectedIds.some((id) =>
+      isEvidenceMatching(id, ['12', '44', '9', '7', '45'])
+    )
+    return hasVoice && hasDocVtv3
   }
 
   return false

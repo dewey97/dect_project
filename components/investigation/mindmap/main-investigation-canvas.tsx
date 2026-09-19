@@ -522,10 +522,10 @@ export function MainInvestigationCanvas({
     (s) => getCanonicalSuspectKey(s).canonicalId === 'ha'
   )
 
-  // Dynamic Followup Pins cho Vũ, Tùng và Hà (Kéo xuống vùng dưới đáy bảng)
-  const hasVuFollowup = !!vuSuspect || investigatedSuspects.includes('vu') || suspects.some((s) => findValidCaseCharacter(s.name || s.id)?.id === 'vu')
-  const hasTungFollowup = !!tungSuspect || investigatedSuspects.includes('tung') || suspects.some((s) => findValidCaseCharacter(s.name || s.id)?.id === 'tung')
-  const hasHaFollowup = !!haSuspect || investigatedSuspects.includes('ha') || suspects.some((s) => findValidCaseCharacter(s.name || s.id)?.id === 'ha')
+  // Dynamic Followup Pins cho Vũ, Tùng và Hà (Kéo xuống vùng dưới đáy bảng): CHỈ hiển thị sau khi đã bấm "ĐIỀU TRA"
+  const hasVuFollowup = investigatedSuspects.includes('vu')
+  const hasTungFollowup = investigatedSuspects.includes('tung')
+  const hasHaFollowup = investigatedSuspects.includes('ha')
 
   const followupPinsMobile: PinPoint[] = [
     ...(hasVuFollowup

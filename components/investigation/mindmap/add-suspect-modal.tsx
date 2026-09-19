@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ArrowRight, ArrowLeft, Trash2, Check, Save, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { X, ArrowRight, ArrowLeft, Trash2, Check, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
@@ -80,7 +80,6 @@ export function AddSuspectModal({
     return []
   })
   const [errorMsg, setErrorMsg] = useState('')
-  const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null)
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
   const openTimeRef = useRef(0)
@@ -105,7 +104,6 @@ export function AddSuspectModal({
     }
     setSubTileView('overview')
     setErrorMsg('')
-    setFeedbackMsg(null)
     setEvalModal(null)
     setShowExitConfirmModal(false)
   }, [editingSuspect, isOpen])
@@ -202,48 +200,7 @@ export function AddSuspectModal({
     setErrorMsg('')
   }
 
-  // NÚT 1: LƯU HỒ SƠ (Lưu hồ sơ đối tượng hợp lệ và thông báo thành công)
-  const handleSaveProfile = () => {
-    const currentName = name.trim() || editingSuspect?.name?.trim() || ''
-    if (!currentName) {
-      setErrorMsg('Vui lòng nhập họ và tên đối tượng tình nghi!')
-      detectiveAudio.playGlassSound()
-      return
-    }
-
-    const matchedChar = findValidCaseCharacter(currentName)
-    if (!matchedChar) {
-      setErrorMsg('Họ và tên đối tượng không chính xác hoặc không có trong hồ sơ vụ án! Vui lòng kiểm tra lại tài liệu điều tra.')
-      detectiveAudio.playGlassSound()
-      return
-    }
-
-    if (matchedChar.id === 'khang') {
-      setErrorMsg('Nguyễn Văn Khang là nạn nhân của vụ án, đã có vị trí chính thức trên bảng điều tra!')
-      detectiveAudio.playGlassSound()
-      return
-    }
-
-    const suspectId = matchedChar.id
-    const suspectName = matchedChar.canonicalName
-    const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
-
-    detectiveAudio.playStampSound()
-    onSave({
-      id: suspectId,
-      name: suspectName,
-      clueIds: combinedClues,
-      motiveClueIds,
-      alibiClueIds
-    })
-    setFeedbackMsg({
-      type: 'success',
-      text: `Đã lưu hồ sơ đối tượng ${suspectName} lên sơ đồ điều tra thành công!`
-    })
-    setErrorMsg('')
-  }
-
-  // NÚT 2: ĐIỀU TRA (Thẩm tra / điều tra nghi phạm Lê Quang Vũ, Nguyễn Thanh Tùng hoặc Trần Thị Hà)
+  // NÚT: ĐIỀU TRA (Thẩm tra / điều tra nghi phạm Lê Quang Vũ, Nguyễn Thanh Tùng hoặc Trần Thị Hà)
   const handleSubmitConclusion = () => {
     const currentName = name.trim() || editingSuspect?.name?.trim() || ''
     if (!currentName) {
@@ -336,10 +293,12 @@ export function AddSuspectModal({
     return nameChanged || motiveChanged || alibiChanged
   }
 
-  // XỬ LÝ KHI ẤN DẤU X HOẶC CLICK RA NGOÀI OVERLAY
-  const handleAttemptClose = (e?: React.MouseEvent) => {
-    if (e && e.target !== e.currentTarget) return
-    if (Date.now() - openTimeRef.current < 350) return
+  // XỬ LÝ KHI ẤN DẤU X ĐÓNG TRỰC TIẾP
+  const handleDirectClose = (e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation()
+    }
+    detectiveAudio.playPaperRustle()
 
     // Nếu đã trả lời đúng 1 trong 2 căn cứ chính (động cơ hoặc ngoại phạm), tự động lưu không hỏi
     if (isMotiveValid || isAlibiValid) {
@@ -366,6 +325,13 @@ export function AddSuspectModal({
     } else {
       onClose()
     }
+  }
+
+  // XỬ LÝ KHI CLICK RA NGOÀI VÙNG BACKDROP
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return
+    if (Date.now() - openTimeRef.current < 350) return
+    handleDirectClose()
   }
 
   // XÁC NHẬN "CÓ": LƯU HỒ SƠ ĐỐI TƯỢNG VÀ ĐÓNG
@@ -401,7 +367,7 @@ export function AddSuspectModal({
   return (
     <AnimatePresence>
       <div
-        onClick={handleAttemptClose}
+        onClick={handleBackdropClick}
         className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
       >
         <motion.div
@@ -414,11 +380,11 @@ export function AddSuspectModal({
           {/* TOP RIGHT X CLOSE */}
           <button
             type="button"
-            onClick={handleAttemptClose}
-            className="absolute top-4 right-4 p-1 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer z-20"
+            onClick={handleDirectClose}
+            className="absolute top-4 right-4 p-2 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer z-20 pointer-events-auto"
             title="Đóng"
           >
-            <X className="size-5" />
+            <X className="size-5 pointer-events-none" />
           </button>
 
           {/* DOCUMENT HEADER & QUESTION */}
@@ -429,7 +395,7 @@ export function AddSuspectModal({
           </div>
 
           {/* FORM BODY */}
-          <form onSubmit={(e) => { e.preventDefault(); handleSaveProfile(); }} className="space-y-4 pt-2">
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-4 pt-2">
             {/* 2-TILE OVERVIEW VIEW */}
             {subTileView === 'overview' && (
               <>
@@ -458,21 +424,6 @@ export function AddSuspectModal({
                   )}
                 </div>
 
-                {/* FEEDBACK STATUS BANNER */}
-                {feedbackMsg && (
-                  <div
-                    className={cn(
-                      'p-2.5 rounded-none font-mono text-xs font-bold flex items-center gap-2 border-2 transition-all',
-                      feedbackMsg.type === 'success'
-                        ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310]'
-                        : 'bg-[#fce8e6] border-[#a81c1c] text-[#a81c1c]'
-                    )}
-                  >
-                    <span>{feedbackMsg.type === 'success' ? '✅' : '⚠️'}</span>
-                    <span className="flex-1">{feedbackMsg.text}</span>
-                  </div>
-                )}
-
                 <div className="space-y-3 pt-1">
                   <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
                     CĂN CỨ TÌNH NGHI:
@@ -495,7 +446,6 @@ export function AddSuspectModal({
                         }
                         detectiveAudio.playTypewriterClick()
                         setErrorMsg('')
-                        setFeedbackMsg(null)
                         setSubTileView('motive')
                       }}
                       className={cn(
@@ -532,7 +482,6 @@ export function AddSuspectModal({
                         }
                         detectiveAudio.playTypewriterClick()
                         setErrorMsg('')
-                        setFeedbackMsg(null)
                         setSubTileView('alibi')
                       }}
                       className={cn(
@@ -677,17 +626,6 @@ export function AddSuspectModal({
                 </div>
 
                 <div className="flex items-center gap-2.5 ml-auto">
-                  {isValidName && (
-                    <button
-                      type="button"
-                      onClick={handleSaveProfile}
-                      className="text-xs uppercase tracking-wider px-4 py-2.5 rounded-none font-bold transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14]"
-                    >
-                      <Save className="size-3.5 text-[#4a3520]" />
-                      <span>LƯU HỒ SƠ</span>
-                    </button>
-                  )}
-
                   <button
                     type="button"
                     disabled={!isBothValid}

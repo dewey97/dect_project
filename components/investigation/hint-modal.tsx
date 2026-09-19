@@ -198,14 +198,15 @@ export function HintModal({ isOpen, onClose }: HintModalProps) {
 
             <button
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 detectiveAudio.playPaperRustle()
                 onClose()
               }}
-              className="p-1.5 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026]/40"
+              className="p-2 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026]/40 pointer-events-auto"
               title="Đóng"
             >
-              <X className="size-5" />
+              <X className="size-5 pointer-events-none" />
             </button>
           </div>
 

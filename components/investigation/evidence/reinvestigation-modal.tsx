@@ -160,14 +160,15 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation()
               detectiveAudio.playPaperRustle()
               onClose()
             }}
-            className="p-1.5 bg-[#2b170c] hover:bg-[#422413] border border-[#59341c] text-[#d9a066] hover:text-white rounded-none transition-colors cursor-pointer ml-1"
+            className="p-2 bg-[#2b170c] hover:bg-[#422413] border border-[#59341c] text-[#d9a066] hover:text-white rounded-none transition-colors cursor-pointer ml-1 pointer-events-auto"
             title="Đóng bảng khám xét"
           >
-            <X className="size-5" />
+            <X className="size-5 pointer-events-none" />
           </button>
         </div>
       </div>
