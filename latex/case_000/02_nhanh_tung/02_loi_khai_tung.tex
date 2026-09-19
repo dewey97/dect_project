@@ -1,19 +1,25 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- HEADER 2 CỘT CHUẨN NGHỊ ĐỊNH 30/2020/NĐ-CP ---
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}[t]{0.46\textwidth}
     \begin{center}
         \fontsize{11pt}{13pt}\selectfont
         CÔNG AN THÀNH PHỐ HÀ NỘI\\
@@ -33,30 +39,28 @@
     \end{center}
 \end{minipage}
 
-\vspace{0.6cm}
+\vspace{0.5cm}
 
 \begin{center}
     \textbf{\Large BIÊN BẢN LẤY LỜI KHAI}\\[0.15cm]
-    \textit{}
+    \textit{(Đối tượng: Nguyễn Thanh Tùng)}
 \end{center}
 
-\vspace{0.4cm}
-\textit{(Đối tượng: Nguyễn Thanh Tùng)}
-
+\vspace{0.3cm}
 
 
 Vào hồi 19 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh sát Hình sự Công an TP. Hà Nội.
 
 \textbf{Chúng tôi gồm:}
 
-\begin{enumerate}[label=\arabic*., leftmargin=1.2cm, itemsep=2pt]
+\begin{enumerate}[label=\arabic*., leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item Điều tra viên: Đại úy Lê Minh — Đội Điều tra Trọng án.
   \item Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 \end{enumerate}
 \textbf{Tiến hành lấy lời khai người liên quan:}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{Họ và tên:} \textbf{NGUYỄN THANH TÙNG} | \textbf{Giới tính:} Nam | \textbf{Sinh ngày:} 18/03/1988 (28 tuổi).
   \item \textbf{CMND số:} \texttt{001086003412}.
   \item \textbf{Nơi ĐKHKTT:} Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
@@ -67,7 +71,7 @@ Vào hồi 19 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 
 \end{itemize}
 
-\subsection*{NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)}
+\vspace{0.3cm}\noindent\textbf{\large NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)}\\[0.15cm]
 
 
 \noindent\textbf{Hỏi (ĐTV Lê Minh):} \textit{Nhật ký cuộc gọi của nạn nhân cho thấy anh đã gọi cho anh Khang lúc 19:00 tối 24/07. Cuộc gọi này có nội dung gì? Sau cuộc gọi anh ở đâu và làm gì?}\\[0.15cm]
@@ -75,18 +79,21 @@ Vào hồi 19 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 
 Biên bản lấy lời khai kết thúc vào hồi 19 giờ 45 phút cùng ngày. Biên bản đã được đọc lại cho người khai nghe, công nhận đúng và cùng ký tên.
 
-
-\textbf{ĐIỀU TRA VIÊN}
-
-\textit{(Ký tên)}
-
-\textbf{Đại úy Lê Minh}
-
-
-\textbf{NGƯỜI KHAI BÁO}
-
-\textit{(Ký, ghi rõ họ tên)}
-
-\textbf{Nguyễn Thanh Tùng}
-
+\vspace{0.8cm}
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{ĐIỀU TRA VIÊN}\\[0.1cm]
+        \textit{(Ký tên)}\\[1.6cm]
+        \textbf{Đại úy Lê Minh}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{NGƯỜI KHAI BÁO}\\[0.1cm]
+        \textit{(Ký, ghi rõ họ tên)}\\[1.6cm]
+        \textbf{Nguyễn Thanh Tùng}
+    \end{center}
+\end{minipage}
 \end{document}

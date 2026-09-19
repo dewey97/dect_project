@@ -98,12 +98,21 @@ function compileAndCleanLatex() {
 
     console.log(`⏳ Compiling ${relPath}...`);
 
+    const tempPdfDir = path.join(rootDir, '.vscode', 'temp_pdf');
+    if (!fs.existsSync(tempPdfDir)) {
+      fs.mkdirSync(tempPdfDir, { recursive: true });
+    }
+
     try {
       if (engine.type === 'tectonic') {
-        execSync(`"${engine.bin}" "${texPath}" --outdir "${outPdfDir}"`, {
+        execSync(`"${engine.bin}" "${texPath}" --outdir "${tempPdfDir}"`, {
           cwd: path.dirname(texPath),
           stdio: 'pipe'
         });
+        const generatedPdf = path.join(tempPdfDir, `${baseName}.pdf`);
+        if (fs.existsSync(generatedPdf)) {
+          safeCopyAndUnlink(generatedPdf, destPdf);
+        }
       } else {
         execSync(`"${engine.bin}" -interaction=nonstopmode "${path.basename(texPath)}"`, {
           cwd: path.dirname(texPath),
@@ -111,8 +120,7 @@ function compileAndCleanLatex() {
         });
         const generatedPdf = path.join(path.dirname(texPath), `${baseName}.pdf`);
         if (fs.existsSync(generatedPdf)) {
-          fs.copyFileSync(generatedPdf, destPdf);
-          fs.unlinkSync(generatedPdf);
+          safeCopyAndUnlink(generatedPdf, destPdf);
         }
       }
 

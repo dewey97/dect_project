@@ -1,19 +1,25 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- HEADER 2 CỘT CHUẨN NGHỊ ĐỊNH 30/2020/NĐ-CP ---
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}[t]{0.46\textwidth}
     \begin{center}
         \fontsize{11pt}{13pt}\selectfont
         CÔNG AN THÀNH PHỐ HÀ NỘI\\
@@ -33,16 +39,14 @@
     \end{center}
 \end{minipage}
 
-\vspace{0.6cm}
+\vspace{0.5cm}
 
 \begin{center}
     \textbf{\Large BIÊN BẢN LẤY LỜI KHAI NGƯỜI LIÊN QUAN}\\[0.15cm]
-    \textit{}
+    \textit{(Đối tượng: Trần Văn Đạt)}
 \end{center}
 
-\vspace{0.4cm}
-\textit{(Đối tượng: Trần Văn Đạt)}
-
+\vspace{0.3cm}
 
 
 Vào hồi 15 giờ 15 phút, ngày 25 tháng 07 năm 2016, tại Trụ sở Công an Phường Phân khu Cảng.
@@ -50,7 +54,7 @@ Vào hồi 15 giờ 15 phút, ngày 25 tháng 07 năm 2016, tại Trụ sở Cô
 Cán bộ điều tra: Đại úy Hoàng Tuấn Dũng tiến hành lấy lời khai:
 
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{Họ và tên:} \textbf{TRẦN VĂN ĐẠT} (Đạt Gà).
   \item \textbf{Sinh năm:} 1988 (28 tuổi). Giới tính: Nam.
   \item \textbf{Nơi cư trú:} Số 52, Đường Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội.
@@ -60,24 +64,26 @@ Cán bộ điều tra: Đại úy Hoàng Tuấn Dũng tiến hành lấy lời k
 
 \end{itemize}
 
-\subsection*{NỘI DUNG LỜI KHAI}
+\vspace{0.3cm}\noindent\textbf{\large NỘI DUNG LỜI KHAI}\\[0.15cm]
 
 
 \noindent\textbf{Hỏi:} \textit{Chiều tối 24/07 lúc 19:45, anh gọi điện thoại cho nạn nhân Nguyễn Văn Khang với nội dung gì?}\\[0.15cm]
 \noindent\textbf{Đáp:} Tôi có nợ thằng Khang 80 triệu, đến hạn trả ngày 28/07 nhưng dạo này buôn bán ế ẩm quá nên lúc 19h45 tôi gọi điện xin nó cho khất thêm một tuần. Thằng Khang nó hách dịch, chửi bới tôi thậm tệ trong điện thoại, dọa cho đàn em xuống dẹp sạp gà của tôi. Tôi cay cú quá nên có chửi nhau gay gắt tay đôi với nó qua điện thoại rồi cúp máy! Tôi bực mình nên có chửi thề vài câu bảo \textit{"Mày ép người quá đáng có ngày chết không kịp ngáp"}, nhưng đó chỉ là lời nói lúc nóng giận thôi. Tối qua từ chiều đến tận đêm tôi ngồi giao gà ở chợ Cảng suốt, không hề rời sạp lấy một bước. Các tiểu thương bên cạnh đều nhìn thấy tôi cả đêm!\\[0.35cm]
-
-
-\textbf{CÁN BỘ LẤY LỜI KHAI}
-
-\textit{(Ký tên)}
-
-\textbf{Đại úy Hoàng Tuấn Dũng}
-
-
-\textbf{NGƯỜI KHAI BÁO}
-
-\textit{(Ký, ghi rõ họ tên)}
-
-\textbf{Trần Văn Đạt}
-
+\vspace{0.8cm}
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{CÁN BỘ LẤY LỜI KHAI}\\[0.1cm]
+        \textit{(Ký tên)}\\[1.6cm]
+        \textbf{Đại úy Hoàng Tuấn Dũng}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{NGƯỜI KHAI BÁO}\\[0.1cm]
+        \textit{(Ký, ghi rõ họ tên)}\\[1.6cm]
+        \textbf{Trần Văn Đạt}
+    \end{center}
+\end{minipage}
 \end{document}

@@ -1,19 +1,25 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- HEADER 2 CỘT CHUẨN NGHỊ ĐỊNH 30/2020/NĐ-CP ---
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}[t]{0.46\textwidth}
     \begin{center}
         \fontsize{11pt}{13pt}\selectfont
         CÔNG AN THÀNH PHỐ HÀ NỘI\\
@@ -33,16 +39,14 @@
     \end{center}
 \end{minipage}
 
-\vspace{0.6cm}
+\vspace{0.5cm}
 
 \begin{center}
     \textbf{\Large BIÊN BẢN LẤY LỜI KHAI}\\[0.15cm]
-    \textit{}
+    \textit{(Lần thứ 02)}
 \end{center}
 
-\vspace{0.4cm}
-\textit{(Lần thứ 02)}
-
+\vspace{0.3cm}
 
 Vào hồi 09 giờ 00 phút, ngày 26 tháng 07 năm 2016.
 
@@ -51,14 +55,14 @@ Tại: Phòng Cảnh sát Hình sự — Công an TP. Hà Nội.
 
 \textbf{Chúng tôi gồm:}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item Điều tra viên: \textbf{Lê Minh} — Chức vụ: Đại úy, Điều tra viên Đội 5 (Đội Điều tra Trọng án).
   \item Cán bộ ghi biên bản: \textbf{Nguyễn Văn Hoàng} — Chức vụ: Trung úy, Cán bộ Đội 5.
 
 \end{itemize}
 \textbf{Tiến hành lấy lời khai của người có quyền lợi, nghĩa vụ liên quan:}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item Họ và tên: \textbf{TRẦN THỊ HÀ} | Giới tính: Nữ
   \item Sinh ngày: 22/09/1990 tại Hà Nội.
   \item Quốc tịch: Việt Nam | Dân tộc: Kinh | Tôn giáo: Không.
@@ -71,7 +75,7 @@ Tại: Phòng Cảnh sát Hình sự — Công an TP. Hà Nội.
 
 \end{itemize}
 
-\subsection*{NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)}
+\vspace{0.3cm}\noindent\textbf{\large NỘI DUNG LỜI KHAI (HỎI VÀ ĐÁP)}\\[0.15cm]
 
 
 \noindent\textbf{Hỏi (ĐTV Lê Minh):} \textit{Chị Hà, trong lần khai báo đầu tiên, chị khẳng định tối 24/07 chị ở trong phòng trọ xem phim bộ trên VTV3 rồi đi ngủ. Chị có muốn bổ sung hay thay đổi nội dung lời khai nào không?}\\[0.15cm]
@@ -132,26 +136,21 @@ Chị Trần Thị Hà từ chối ký tên vào biên bản với lý do: \text
 
 \textit{(Cán bộ trực ban Trụ sở)}
 
-
-\textbf{CÁN BỘ GHI BIÊN BẢN}
-
-\textit{(Ký, ghi rõ họ tên)}
-
-
-
-\textit{(Đã ký)}
-
-\textbf{Nguyễn Văn Hoàng}
-
-
-\textbf{ĐIỀU TRA VIÊN}
-
-\textit{(Ký, ghi rõ họ tên)}
-
-
-
-\textit{(Đã ký)}
-
-\textbf{Lê Minh}
-
+\vspace{0.8cm}
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{CÁN BỘ GHI BIÊN BẢN}\\[0.1cm]
+        \textit{(Ký, ghi rõ họ tên)}\\[1.6cm]
+        \textbf{Nguyễn Văn Hoàng}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{ĐIỀU TRA VIÊN}\\[0.1cm]
+        \textit{(Ký, ghi rõ họ tên)}\\[1.6cm]
+        \textbf{Lê Minh}
+    \end{center}
+\end{minipage}
 \end{document}

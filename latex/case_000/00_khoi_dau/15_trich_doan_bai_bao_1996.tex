@@ -1,14 +1,20 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- TÀI LIỆU VẬT CHỨNG HIỆN TRƯỜNG ---
@@ -19,9 +25,9 @@
     \textbf{\Large  VẬT CHỨNG: TRÍCH ĐOẠN BÁO CŨ NĂM 1996 THU THẬP TẠI HIỆN TRƯỜNG}\\[0.15cm]
     \textit{}
 \end{center}
-\vspace{0.4cm}
+\vspace{0.3cm}
 
-\subsection*{VỤ ÁN: CHUYÊN ÁN \#000 — TRỐN TÌM}
+\vspace{0.35cm}\noindent\textbf{\large VỤ ÁN: CHUYÊN ÁN \#000 — TRỐN TÌM}\\[0.15cm]
 
 
 > \textbf{Ký hiệu vật chứng hiện trường:} Cọc tiêu số \texttt{05} (Thu giữ tại nền nhà phòng khách, quanh chân nạn nhân Nguyễn Văn Khang).
@@ -43,11 +49,11 @@
 
 
 
-\subsection*{CHUYÊN MỤC: AN NINH \& ĐỜI SỐNG DÂN SINH}
+\vspace{0.3cm}\noindent\textbf{\large CHUYÊN MỤC: AN NINH \& ĐỜI SỐNG DÂN SINH}\\[0.15cm]
 
 
 
-\subsection*{\textbf{BI KỊCH TỪ TRÒ CHƠI TRỐN TÌM: MỘT CHÁU BÉ TỬ VONG TRONG TỦ GỖ}}
+\vspace{0.35cm}\noindent\textbf{\large \textbf{BI KỊCH TỪ TRÒ CHƠI TRỐN TÌM: MỘT CHÁU BÉ TỬ VONG TRONG TỦ GỖ}}\\[0.15cm]
 
 
 \textbf{HÀ NỘI (PV) — Chiều ngày 24 tháng 07 năm 1996, một vụ tai nạn thương tâm bắt nguồn từ trò chơi con trẻ đã cướp đi sinh mạng của một cháu bé 7 tuổi tại khu dân cư ven Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.}
@@ -76,15 +82,19 @@ Sự việc đau lòng trên là hồi chuông cảnh tỉnh sâu sắc gửi t�
 
 
 
-\subsection*{ DẤU VẾT THU NHẬN KHI GIÁM ĐỊNH MẢNH BÁO TẠI HIỆN TRƯỜNG:}
+\vspace{0.3cm}\noindent\textbf{\large  DẤU VẾT THU NHẬN KHI GIÁM ĐỊNH MẢNH BÁO TẠI HIỆN TRƯỜNG:}\\[0.15cm]
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{Vết dính sinh học \& vật lý:}
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item Tại góc mép rách của mảnh báo số 3 có dính một vệt máu khô nhỏ (nhóm máu O, trùng với nhóm máu của nạn nhân Nguyễn Văn Khang).
   \item Bề mặt các mảnh giấy báo có bám dính nhiều bụi bột vôi vữa xi măng trắng xám (đặc trưng của thợ xây/thợ nề Nguyễn Thanh Tùng).
+\end{itemize}
   \item \textbf{Mối liên hệ nhân vật:}
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item Cháu bé tử vong \textbf{N.G.H} (7 tuổi): Nguyễn Gia Huy (em trai của thợ nề Nguyễn Thanh Tùng).
   \item Cháu bé vô tình gài then \textbf{N.V.K} (8 tuổi): Nạn nhân Nguyễn Văn Khang lúc nhỏ.
   \item Người anh trai phát hiện thi thể \textbf{N.T.T} (10 tuổi): Nghi phạm Nguyễn Thanh Tùng (người mang bài báo đến đối chất với Khang đúng ngày giỗ 20 năm 24/07/2016 rồi xé vụn).
+\end{itemize}
 \end{itemize}
 \end{document}

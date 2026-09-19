@@ -75,6 +75,15 @@ export default function WebEvidencePage() {
       if (savedMode) {
         setInvestigationMode(savedMode)
       }
+
+      const isIntroSeen = localStorage.getItem('veritas_intro_seen')
+      if (isIntroSeen !== 'true') {
+        setUnlockedModalData({
+          unlockedPhase: 0,
+          newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
+          newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0)
+        })
+      }
     } catch {}
 
     const handleOpenEpilogue = () => setIsEpilogueOpen(true)
@@ -229,6 +238,7 @@ export default function WebEvidencePage() {
 
   const resetFindingsProgress = () => {
     try {
+      localStorage.removeItem('veritas_intro_seen')
       localStorage.removeItem('veritas_discovered_findings')
       localStorage.removeItem('veritas_completed_checkpoints')
       localStorage.removeItem('veritas_canvas_suspects')

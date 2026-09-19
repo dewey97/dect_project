@@ -1,28 +1,52 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
-% --- BẢN TỰ KHAI ---
-\begin{center}
-    \fontsize{12pt}{14pt}\selectfont
-    \textbf{CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM}\\
-    \textbf{Độc lập - Tự do - Hạnh phúc}\\[-0.2em]
-    \rule{4cm}{0.6pt}\\[0.6cm]
-    \textbf{\Large BIÊN BẢN LẤY LỜI KHAI}\\[0.15cm]
-    \textit{}
-\end{center}
-\vspace{0.4cm}
-\textit{(Lần 2 đối với đối tượng Lê Quang Vũ)}
+% --- HEADER 2 CỘT CHUẨN NGHỊ ĐỊNH 30/2020/NĐ-CP ---
+\noindent
+\begin{minipage}[t]{0.46\textwidth}
+    \begin{center}
+        \fontsize{11pt}{13pt}\selectfont
+        CÔNG AN THÀNH PHỐ HÀ NỘI\\
+        \textbf{PHÒNG CẢNH SÁT HÌNH SỰ (PC02)}\\[-0.2em]
+        \rule{3.2cm}{0.6pt}\\[0.25cm]
+        \fontsize{11pt}{13pt}\selectfont Số: \textbf{11/BB-LK}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.52\textwidth}
+    \begin{center}
+        \fontsize{11pt}{13pt}\selectfont
+        \textbf{CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM}\\
+        \textbf{Độc lập - Tự do - Hạnh phúc}\\[-0.2em]
+        \rule{3.6cm}{0.6pt}\\[0.25cm]
+        \textit{Hà Nội, ngày 25 tháng 07 năm 2016}
+    \end{center}
+\end{minipage}
 
+\vspace{0.5cm}
+
+\begin{center}
+    \textbf{\Large BIÊN BẢN LẤY LỜI KHAI}\\[0.15cm]
+    \textit{(Lần 2 đối với đối tượng Lê Quang Vũ)}
+\end{center}
+
+\vspace{0.3cm}
 
 
 Vào hồi 20 giờ 30 phút, ngày 25 tháng 07 năm 2016.
@@ -43,30 +67,21 @@ Cơn giận bùng lên, tôi lao vào giằng co, xô mạnh thằng Khang ngã 
 
 Nhưng tôi không phải là kẻ đã đâm vào cổ Khang! Tôi cứ tưởng nó chỉ ngất mê man một lúc rồi tự tỉnh lại, ai ngờ sáng hôm sau nghe tin nó bị ai đó đâm chết! Cán bộ ơi, tôi chỉ xô ngã nó thôi chứ tôi thề có vong linh em tôi là tôi không hề giết nó!
 
-
-
-\textbf{ĐIỀU TRA VIÊN CHỦ TRÌ}
-
-\textit{(Ký tên)}
-
-\textbf{Đại úy Lê Minh}
-
-
-\textbf{NGƯỜI TỰ THÚ}
-
-\textit{(Ký, ghi rõ họ tên)}
-
-\textbf{Nguyễn Thanh Tùng}
 \vspace{0.8cm}
 \noindent
-\hfill
-\begin{minipage}[t]{0.50\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
     \begin{center}
-        \textit{Hà Nội, ngày 26 tháng 07 năm 2016}\\[0.1cm]
-        \textbf{NGƯỜI TỰ KHAI}\\[0.1cm]
-        \textit{(Ký và ghi rõ họ tên)}\\[1.6cm]
+        \textbf{ĐIỀU TRA VIÊN CHỦ TRÌ}\\[0.1cm]
+        \textit{(Ký tên)}\\[1.6cm]
+        \textbf{Đại úy Lê Minh}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{NGƯỜI TỰ THÚ}\\[0.1cm]
+        \textit{(Ký, ghi rõ họ tên)}\\[1.6cm]
         \textbf{Nguyễn Thanh Tùng}
     \end{center}
 \end{minipage}
-
 \end{document}

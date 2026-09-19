@@ -1,19 +1,25 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- HEADER 2 CỘT CHUẨN NGHỊ ĐỊNH 30/2020/NĐ-CP ---
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}[t]{0.46\textwidth}
     \begin{center}
         \fontsize{11pt}{13pt}\selectfont
         CÔNG AN THÀNH PHỐ HÀ NỘI\\
@@ -33,16 +39,14 @@
     \end{center}
 \end{minipage}
 
-\vspace{0.6cm}
+\vspace{0.5cm}
 
 \begin{center}
     \textbf{\Large BIÊN BẢN LẤY LỜI KHAI}\\[0.15cm]
-    \textit{}
+    \textit{(Ghi nhận lời khai của các hộ dân lân cận số 14 Đường Bờ Sông)}
 \end{center}
 
-\vspace{0.4cm}
-\textit{(Ghi nhận lời khai của các hộ dân lân cận số 14 Đường Bờ Sông)}
-
+\vspace{0.3cm}
 
 
 Vào hồi 09 giờ 00 phút đến 10 giờ 00 phút, ngày 25 tháng 07 năm 2016.
@@ -52,7 +56,7 @@ Cán bộ điều tra: Trung úy Nguyễn Văn Hoàng tiến hành lấy lời k
 
 
 
-\subsection*{I. LỜI KHAI BÀ NGUYỄN THỊ LỤA (SỐ 12 ĐƯỜNG BỜ SÔNG)}
+\vspace{0.3cm}\noindent\textbf{\large I. LỜI KHAI BÀ NGUYỄN THỊ LỤA (SỐ 12 ĐƯỜNG BỜ SÔNG)}\\[0.15cm]
 
 \noindent\textbf{Hỏi:} \textit{Bà có quan hệ như thế nào với nạn nhân Nguyễn Văn Khang?}\\[0.15cm]
 \noindent\textbf{Đáp:} Tôi là hàng xóm sống sát vách nhà cậu Khang. Tôi sống ở đây mấy chục năm rồi nên biết Khang từ nhỏ.\\[0.35cm]
@@ -70,7 +74,7 @@ Cán bộ điều tra: Trung úy Nguyễn Văn Hoàng tiến hành lấy lời k
 
 
 
-\subsection*{II. LỜI KHAI ÔNG NGUYỄN THANH TIẾN (HỘ DÂN CƯ SỐ 10 ĐƯỜNG BỜ SÔNG)}
+\vspace{0.3cm}\noindent\textbf{\large II. LỜI KHAI ÔNG NGUYỄN THANH TIẾN (HỘ DÂN CƯ SỐ 10 ĐƯỜNG BỜ SÔNG)}\\[0.15cm]
 
 \noindent\textbf{Hỏi:} \textit{Ông có quan hệ như thế nào với nạn nhân Nguyễn Văn Khang?}\\[0.15cm]
 \noindent\textbf{Đáp:} Tôi là hàng xóm nhà thằng Khang. Nhà tôi cũng chỉ có hai vợ chồng già, chẳng mấy khi qua lại với Khang. Hồi xưa thì hai đứa con nhà tôi còn chơi với thằng Khang và mấy đứa trong xóm. Nhưng kể từ lúc thằng con trai út nhà tôi mất, mấy đứa nó cũng chẳng còn chơi với nhau nữa. Thằng Khang hồi nhỏ tính nết ngỗ ngược, nghịch ngợm có tiếng.  Lớn lên thằng Khang lại đi cho vay nặng lãi, tính tình dữ dằn nên bà con lối xóm ai cũng ngại tiếp xúc\\[0.35cm]
@@ -78,12 +82,14 @@ Cán bộ điều tra: Trung úy Nguyễn Văn Hoàng tiến hành lấy lời k
 \noindent\textbf{Đáp:} Tôi cũng không để ý mấy nên cái này tôi không biết.\\[0.35cm]
 \noindent\textbf{Hỏi:} \textit{Vào buổi tối ngày xảy ra vụ án, ông có phát hiện người lạ hoặc phương tiện lạ nào xuất hiện quanh khu vực nhà nạn nhân không?}\\[0.15cm]
 \noindent\textbf{Đáp:} Tôi thân già lãng tai, tối ăn cơm xong là đóng cửa uống nước chè rồi đi ngủ sớm từ 20h30 nên không biết gì bên nhà thằng Khang cả.\\[0.35cm]
-
-
-\textbf{CÁN BỘ LẤY LỜI KHAI}
-
-\textit{(Ký, ghi rõ họ tên)}
-
-\textbf{Trung úy Nguyễn Văn Hoàng}
-
+\vspace{0.8cm}
+\noindent
+\hfill
+\begin{minipage}[t]{0.50\textwidth}
+    \begin{center}
+        \textbf{CÁN BỘ LẤY LỜI KHAI}\\[0.1cm]
+        \textit{(Ký, ghi rõ họ tên)}\\[1.6cm]
+        \textbf{Trung úy Nguyễn Văn Hoàng}
+    \end{center}
+\end{minipage}
 \end{document}

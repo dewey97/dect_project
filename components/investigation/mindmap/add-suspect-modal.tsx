@@ -105,7 +105,7 @@ export function AddSuspectModal({
 
   if (!isOpen) return null
 
-  // XÁC NHẬN MANH MỐI ĐỘNG CƠ (HIỂN THỊ MODAL PHẢN HỒI ĐÚNG / SAI)
+  // XÁC NHẬN MANH MỐI ĐỘNG CƠ (LƯU & QUAY VỀ MÀN HÌNH NHẬP TÊN)
   const handleConfirmMotiveClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
@@ -128,18 +128,21 @@ export function AddSuspectModal({
     }
 
     detectiveAudio.playStampSound()
-    setEvalModal({
-      isOpen: true,
-      isSuccess: true,
-      title: 'THÔNG BÁO',
-      heading: '',
-      message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
-      suspectName: suspectDisplayName,
-      selectedCount: motiveClueIds.length,
-    })
+    if (matched) {
+      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+      onSave({
+        id: matched.id,
+        name: matched.canonicalName,
+        clueIds: combinedClues,
+        motiveClueIds,
+        alibiClueIds
+      })
+    }
+    setSubTileView('overview')
+    setErrorMsg('')
   }
 
-  // XÁC NHẬN MANH MỐI BÁC BỎ NGOẠI PHẠM (HIỂN THỊ MODAL PHẢN HỒI ĐÚNG / SAI)
+  // XÁC NHẬN MANH MỐI BÁC BỎ NGOẠI PHẠM (LƯU & QUAY VỀ MÀN HÌNH NHẬP TÊN)
   const handleConfirmAlibiClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
@@ -162,19 +165,21 @@ export function AddSuspectModal({
     }
 
     detectiveAudio.playStampSound()
-    setEvalModal({
-      isOpen: true,
-      isSuccess: true,
-      title: 'THÔNG BÁO',
-      heading: '',
-      message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
-      suspectName: suspectDisplayName,
-      selectedCount: alibiClueIds.length,
-    })
+    if (matched) {
+      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+      onSave({
+        id: matched.id,
+        name: matched.canonicalName,
+        clueIds: combinedClues,
+        motiveClueIds,
+        alibiClueIds
+      })
+    }
+    setSubTileView('overview')
+    setErrorMsg('')
   }
 
-  // NÚT 1: LƯU HỒ SƠ (Cho phép lưu mọi đối tượng tình nghi lên sơ đồ)
-  // NÚT 1: LƯU HỒ SƠ (Chỉ cho phép lưu đối tượng hợp lệ trong hồ sơ vụ án lên sơ đồ)
+  // NÚT 1: LƯU HỒ SƠ (Lưu hồ sơ đối tượng hợp lệ và thông báo thành công)
   const handleSaveProfile = () => {
     const currentName = name.trim() || editingSuspect?.name?.trim() || ''
     if (!currentName) {
@@ -208,7 +213,11 @@ export function AddSuspectModal({
       motiveClueIds,
       alibiClueIds
     })
-    onClose()
+    setFeedbackMsg({
+      type: 'success',
+      text: `Đã lưu hồ sơ đối tượng ${suspectName} lên sơ đồ điều tra thành công!`
+    })
+    setErrorMsg('')
   }
 
   // NÚT 2: ĐIỀU TRA (Thẩm tra / điều tra nghi phạm Lê Quang Vũ, Nguyễn Thanh Tùng hoặc Trần Thị Hà)
@@ -388,12 +397,11 @@ export function AddSuspectModal({
                     <input
                       type="text"
                       value={name}
-                      placeholder="Nhập họ tên đối tượng..."
                       onChange={(e) => {
                         setName(e.target.value)
                         if (errorMsg) setErrorMsg('')
                       }}
-                      className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-4 py-2.5 text-base sm:text-lg text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner placeholder:font-sans placeholder:text-xs placeholder:text-[#8c7355]/60 placeholder:font-normal"
+                      className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-4 py-2.5 text-base sm:text-lg text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                       autoFocus
                     />
                   </div>

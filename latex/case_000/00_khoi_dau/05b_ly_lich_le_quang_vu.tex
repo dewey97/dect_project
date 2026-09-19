@@ -1,19 +1,25 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- HEADER 2 CỘT CHUẨN NGHỊ ĐỊNH 30/2020/NĐ-CP ---
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}[t]{0.46\textwidth}
     \begin{center}
         \fontsize{11pt}{13pt}\selectfont
         CÔNG AN THÀNH PHỐ HÀ NỘI\\
@@ -33,59 +39,70 @@
     \end{center}
 \end{minipage}
 
-\vspace{0.6cm}
+\vspace{0.5cm}
 
 \begin{center}
     \textbf{\Large BẢNG TRÍCH LỤC LÝ LỊCH TƯ PHÁP: LÊ QUANG VŨ}\\[0.15cm]
-    \textit{}
+    \textit{(Vụ án mạng tại số 14 Đường Bờ Sông)}
 \end{center}
 
-\vspace{0.4cm}
-\textit{(Vụ án mạng tại số 14 Đường Bờ Sông)}
+\vspace{0.3cm}
 
 
 
-
-\subsection*{I. THÔNG TIN NHÂN THÂN \& CĂN CƯỚC}
-
+\vspace{0.3cm}\noindent\textbf{\large I. THÔNG TIN NHÂN THÂN \& CĂN CƯỚC}\\[0.15cm]
 
 
-\begin{tabularx}{\textwidth}{p{4cm} X}
+
+\vspace{0.2cm}
+\begingroup
+\begin{xltabular}{\textwidth}{>{\hsize=0.45\hsize\bfseries}X >{\hsize=1.55\hsize}X}
 \toprule
-Mục & Nội dung chi tiết \\
+\textbf{Mục} & \textbf{Nội dung chi tiết} \\
 \midrule
-\textbf{Họ và tên khai sinh} & \textbf{LÊ QUANG VŨ} \\
-\textbf{Tên thường gọi} & Vũ \\
-\textbf{Ngày tháng năm sinh} & 20/09/1991 \\
-\textbf{Giới tính} & Nam \\
-\textbf{Số CMND} & \texttt{381762904} \\
-\textbf{Nơi ĐKHKTT} & Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội \\
-\textbf{Nơi ở hiện nay} & Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội \\
-\textbf{Nghề nghiệp} & Kỹ sư điện dân dụng \\
-\textbf{Số điện thoại liên lạc} & \texttt{0967.452.183} \\
-\textbf{Tình trạng hôn nhân} & Đã kết hôn (Vợ: Nguyễn Ngọc Mai, sinh năm 1992) \\
-\textbf{Tiền án, tiền sự} & Không \\
-\textbf{Mối quan hệ với nạn nhân} & Em rể (Chồng của Nguyễn Ngọc Mai) \\
+\endfirsthead
+\toprule
+\textbf{Mục} & \textbf{Nội dung chi tiết} \\
+\midrule
+\endhead
 \bottomrule
-\end{tabularx}
+\endfoot
+\textbf{Họ và tên khai sinh} & \textbf{LÊ QUANG VŨ} \\ \addlinespace[4pt]
+\textbf{Tên thường gọi} & Vũ \\ \addlinespace[4pt]
+\textbf{Ngày tháng năm sinh} & 20/09/1991 \\ \addlinespace[4pt]
+\textbf{Giới tính} & Nam \\ \addlinespace[4pt]
+\textbf{Số CMND} & \texttt{381762904} \\ \addlinespace[4pt]
+\textbf{Nơi ĐKHKTT} & Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội \\ \addlinespace[4pt]
+\textbf{Nơi ở hiện nay} & Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội \\ \addlinespace[4pt]
+\textbf{Nghề nghiệp} & Kỹ sư điện dân dụng \\ \addlinespace[4pt]
+\textbf{Số điện thoại liên lạc} & \texttt{0967.452.183} \\ \addlinespace[4pt]
+\textbf{Tình trạng hôn nhân} & Đã kết hôn (Vợ: Nguyễn Ngọc Mai, sinh năm 1992) \\ \addlinespace[4pt]
+\textbf{Tiền án, tiền sự} & Không \\ \addlinespace[4pt]
+\textbf{Mối quan hệ với nạn nhân} & Em rể (Chồng của Nguyễn Ngọc Mai) \\ \addlinespace[4pt]
+\end{xltabular}
+\endgroup
+
+\vspace{0.2cm}
 
 
 
-\subsection*{II. ĐẶC ĐIỂM NHẬN DẠNG \& CĂN CỨ XÁC MINH BAN ĐẦU}
+\vspace{0.3cm}\noindent\textbf{\large II. ĐẶC ĐIỂM NHẬN DẠNG \& CĂN CỨ XÁC MINH BAN ĐẦU}\\[0.15cm]
 
 
-\begin{enumerate}[label=\arabic*., leftmargin=1.2cm, itemsep=2pt]
+\begin{enumerate}[label=\arabic*., leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{Đặc điểm ngoại hình:} Nam, cao 1m70, dáng người hơi gầy.
   \item \textbf{Căn cứ xác minh:}
 \end{enumerate}
 Có mặt tại nhà nạn nhân vào chiều tối xảy ra án mạng (24/07/2016) cùng vợ là Nguyễn Ngọc Mai.
 
-
-
-\textbf{ĐIỀU TRA VIÊN LẬP TRÍCH LỤC}
-
-\textit{(Ký, ghi rõ họ tên)}
-
-\textbf{Đại úy Lê Minh}
-
+\vspace{0.8cm}
+\noindent
+\hfill
+\begin{minipage}[t]{0.50\textwidth}
+    \begin{center}
+        \textbf{ĐIỀU TRA VIÊN LẬP TRÍCH LỤC}\\[0.1cm]
+        \textit{(Ký, ghi rõ họ tên)}\\[1.6cm]
+        \textbf{Đại úy Lê Minh}
+    \end{center}
+\end{minipage}
 \end{document}

@@ -65,17 +65,6 @@ export function PhaseUnlockedModal({
           {/* CRT Background scanlines */}
           <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-10" />
 
-          {/* Top Exit Close Button */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-4 right-4 z-40 p-2 bg-[#1b140e]/90 hover:bg-[#331c0e] border border-[#593c26] text-[#d9a066] hover:text-white rounded transition-colors cursor-pointer shadow-xl flex items-center gap-1.5 font-mono text-xs"
-            title="Đóng / Bỏ qua mở đầu"
-          >
-            <span>BỎ QUA</span>
-            <X className="size-4" />
-          </button>
-
           {/* Main Fullscreen Content Area */}
           {playExperience === 'boardgame' ? (
             /* BOARD GAME MODE: PURE IMMERSIVE CINEMATIC STORYTELLING (NO RIGHT DIRECTIVE COLUMN) */
@@ -115,6 +104,9 @@ export function PhaseUnlockedModal({
                 <div className="w-full pt-4 pb-2 shrink-0 max-w-md mx-auto">
                   <button
                     onClick={() => {
+                      if (unlockedModalData.unlockedPhase === 0) {
+                        try { localStorage.setItem('veritas_intro_seen', 'true') } catch {}
+                      }
                       onSetPhaseFilter(unlockedModalData.unlockedPhase)
                       onClose()
                     }}

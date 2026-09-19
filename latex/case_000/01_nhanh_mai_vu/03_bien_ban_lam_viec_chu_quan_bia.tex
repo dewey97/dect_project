@@ -1,19 +1,25 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- HEADER 2 CỘT CHUẨN NGHỊ ĐỊNH 30/2020/NĐ-CP ---
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}[t]{0.46\textwidth}
     \begin{center}
         \fontsize{11pt}{13pt}\selectfont
         CÔNG AN THÀNH PHỐ HÀ NỘI\\
@@ -33,30 +39,28 @@
     \end{center}
 \end{minipage}
 
-\vspace{0.6cm}
+\vspace{0.5cm}
 
 \begin{center}
     \textbf{\Large BIÊN BẢN LẤY LỜI KHAI NHÂN CHỨNG}\\[0.15cm]
-    \textit{}
+    \textit{(V/v làm việc với chủ Quán Bia 88 — Chuyên án số 14 Đường Bờ Sông)}
 \end{center}
 
-\vspace{0.4cm}
-\textit{(V/v làm việc với chủ Quán Bia 88 — Chuyên án số 14 Đường Bờ Sông)}
-
+\vspace{0.3cm}
 
 
 Vào hồi 14 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Quán Bia 88 (Số 88 Đường Vĩnh Hà, Phường Cảng Đông, TP. Hà Nội).
 
 \textbf{Chúng tôi gồm:}
 
-\begin{enumerate}[label=\arabic*., leftmargin=1.2cm, itemsep=2pt]
+\begin{enumerate}[label=\arabic*., leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item Điều tra viên: Đại úy Lê Minh — Đội Điều tra Trọng án.
   \item Cán bộ ghi biên bản: Trung úy Nguyễn Văn Hoàng — Cán bộ Đội Án mạng.
 
 \end{enumerate}
 \textbf{Tiến hành lấy lời khai nhân chứng:}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{Họ và tên:} \textbf{NGUYỄN VĂN HÙNG} | \textbf{Giới tính:} Nam | \textbf{Sinh ngày:} 14/05/1968 (48 tuổi).
   \item \textbf{CMND số:} \texttt{001068002914}.
   \item \textbf{Nơi ĐKHKTT:} Số 88, Đường Vĩnh Hà, Phường Cảng Đông, TP. Hà Nội.
@@ -65,7 +69,7 @@ Vào hồi 14 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Quán Bia 88 (
 
 \end{itemize}
 
-\subsection*{NỘI DUNG LỜI KHAI TỰ THUẬT}
+\vspace{0.3cm}\noindent\textbf{\large NỘI DUNG LỜI KHAI TỰ THUẬT}\\[0.15cm]
 
 
 Tôi xin tự trình bày sự việc liên quan tối ngày 24/07/2016 tại Quán Bia 88 như sau:
@@ -86,18 +90,21 @@ Lời khai trên do tôi tự nguyện trình bày, hoàn toàn đúng sự th�
 
 Biên bản lấy lời khai kết thúc vào hồi 15 giờ 15 phút cùng ngày. Biên bản đã được đọc lại cho ông Nguyễn Văn Hùng nghe, công nhận đúng sự thật và cùng ký tên.
 
-
-\textbf{ĐIỀU TRA VIÊN}
-
-\textit{(Ký tên)}
-
-\textbf{Đại úy Lê Minh}
-
-
-\textbf{NHÂN CHỨNG}
-
-\textit{(Ký, ghi rõ họ tên)}
-
-\textbf{Nguyễn Văn Hùng}
-
+\vspace{0.8cm}
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{ĐIỀU TRA VIÊN}\\[0.1cm]
+        \textit{(Ký tên)}\\[1.6cm]
+        \textbf{Đại úy Lê Minh}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+    \begin{center}
+        \textbf{NHÂN CHỨNG}\\[0.1cm]
+        \textit{(Ký, ghi rõ họ tên)}\\[1.6cm]
+        \textbf{Nguyễn Văn Hùng}
+    \end{center}
+\end{minipage}
 \end{document}

@@ -15,6 +15,7 @@ import { CulpritEpilogueModal } from './culprit-epilogue-modal'
 import { DossierResultModal } from './dossier-result-modal'
 import { FollowupQuestionModal } from './followup-question-modal'
 import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
+import { EpilogueModal } from '@/components/investigation/epilogue-modal'
 import { getCanonicalSuspectKey, findValidCaseCharacter } from '@/lib/cases/case-000-suspects'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
@@ -48,6 +49,7 @@ export function MainInvestigationCanvas({
   const [isIndictmentSolved, setIsIndictmentSolved] = useState(false)
   const [solvedCulprit, setSolvedCulprit] = useState<'vu' | 'tung' | 'ha' | null>(null)
   const [isEpilogueOpen, setIsEpilogueOpen] = useState(false)
+  const [isFinalEpilogueOpen, setIsFinalEpilogueOpen] = useState(false)
   const [isDossierOpen, setIsDossierOpen] = useState(false)
   const [activeDossierType, setActiveDossierType] = useState<'A' | 'B' | 'C' | null>(null)
   const [isFollowupQuestionOpen, setIsFollowupQuestionOpen] = useState(false)
@@ -55,10 +57,19 @@ export function MainInvestigationCanvas({
   const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false)
   const [isDossierEOpen, setIsDossierEOpen] = useState(false)
   const [zoomedPhotoUrl, setZoomedPhotoUrl] = useState<string | null>(null)
+  const [zoomOrigin, setZoomOrigin] = useState<{ x: number; y: number } | null>(null)
   const zoomOpenTimeRef = React.useRef<number>(0)
 
-  const handleOpenPhotoZoom = useCallback((url: string) => {
+  const handleOpenPhotoZoom = useCallback((url: string, coords?: { clientX: number; clientY: number }) => {
     zoomOpenTimeRef.current = Date.now()
+    if (coords && typeof window !== 'undefined') {
+      setZoomOrigin({
+        x: coords.clientX - window.innerWidth / 2,
+        y: coords.clientY - window.innerHeight / 2,
+      })
+    } else {
+      setZoomOrigin(null)
+    }
     setZoomedPhotoUrl(url)
   }, [])
 
@@ -252,6 +263,9 @@ export function MainInvestigationCanvas({
 
   const handlePhoneLookupSuccess = (phone: string, info: string) => {
     setPhoneLookupSuccess(true)
+    try {
+      localStorage.setItem('veritas_phone_solved', 'true')
+    } catch {}
     setIsPhoneLookupOpen(false)
     setIsPhoneNarrativeOpen(true)
   }
@@ -289,11 +303,18 @@ export function MainInvestigationCanvas({
   }) => {
     setIsIndictmentSolved(true)
     setSolvedCulprit(data.culprit)
+    setIsIndictmentOpen(false)
     try {
       localStorage.setItem('veritas_indictment_solved', 'true')
       localStorage.setItem('veritas_indictment_culprit', data.culprit)
     } catch {}
-    setIsEpilogueOpen(true)
+    setIsFinalEpilogueOpen(true)
+    if (onOpenEpilogue) {
+      onOpenEpilogue()
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('open-epilogue-modal'))
+    }
   }
 
   const handleOpenDossier = (dossierType: 'A' | 'B' | 'C') => {
@@ -315,6 +336,7 @@ export function MainInvestigationCanvas({
     setIsReinvestigateModalOpen(false)
     setHasOpenedReinvestigation(false)
     setIsEpilogueOpen(false)
+    setIsFinalEpilogueOpen(false)
     setIsDossierOpen(false)
     setIsFollowupQuestionOpen(false)
     setIsPhoneNarrativeOpen(false)
@@ -353,7 +375,7 @@ export function MainInvestigationCanvas({
   }, [onOpenReinvestigation])
 
   // Handle pin clicks directly on HeroInteractive canvas
-  const handlePinClick = useCallback((pinId: string, pin?: PinPoint) => {
+  const handlePinClick = useCallback((pinId: string, pin?: PinPoint, coords?: { clientX: number; clientY: number }) => {
     detectiveAudio.playPaperRustle()
 
     if (pinId === 'c0-pin-suspects') {
@@ -368,20 +390,20 @@ export function MainInvestigationCanvas({
         setIsPhoneLookupOpen(true)
       }
     } else if (pinId === 'c0-pin-crime-scene' || pinId.includes('crime-scene') || pinId.includes('thi-the')) {
-      handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_straight.png')
+      handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png', coords)
     } else if (pinId === 'c0-pin-victim-khang' || pinId.includes('khang')) {
-      handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang_straight.png')
+      handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png', coords)
     } else if (pinId === 'c0-pin-reinvestigate') {
       if (isReinvestigateUnlocked) {
         detectiveAudio.playGlassSound()
         handleOpenReinvestigation()
       } else {
         detectiveAudio.playGlassSound()
-        setIsEvidenceGuideOpen(true)
       }
     } else if (pinId === 'c0-pin-indictment') {
-      if (isIndictmentSolved && solvedCulprit) {
-        setIsEpilogueOpen(true)
+      if (isIndictmentSolved) {
+        setIsFinalEpilogueOpen(true)
+        if (onOpenEpilogue) onOpenEpilogue()
       } else {
         setIsIndictmentOpen(true)
       }
@@ -401,7 +423,7 @@ export function MainInvestigationCanvas({
     } else if (pinId.startsWith('node-suspect-')) {
       const targetId = pinId.replace('node-suspect-', '')
       if (targetId === 'suspect-khang' || targetId === 'khang' || pinId.includes('khang')) {
-        handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang_straight.png')
+        handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png', coords)
         return
       }
       const foundSuspect = suspects.find((s) => {
@@ -914,7 +936,13 @@ export function MainInvestigationCanvas({
         isPhoneSolved={phoneLookupSuccess}
       />
 
-      {/* Zoomed Photo Lightbox Modal */}
+      {/* Full-Screen Final Epilogue Narrative Modal */}
+      <EpilogueModal
+        isOpen={isFinalEpilogueOpen}
+        onClose={() => setIsFinalEpilogueOpen(false)}
+      />
+
+      {/* Zoomed Photo Lightbox Modal with Morph Effect */}
       <AnimatePresence>
         {zoomedPhotoUrl && (
           <motion.div
@@ -924,25 +952,45 @@ export function MainInvestigationCanvas({
             transition={{ duration: 0.18 }}
             onClick={(e) => {
               e.stopPropagation()
-              if (Date.now() - zoomOpenTimeRef.current < 250) {
+              if (Date.now() - zoomOpenTimeRef.current < 120) {
                 return
               }
               detectiveAudio.playPaperRustle()
               setZoomedPhotoUrl(null)
             }}
-            className="fixed inset-0 z-[1000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 cursor-pointer select-none"
+            className="fixed inset-0 z-[1000] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 cursor-pointer select-none"
           >
             <motion.div
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.7, opacity: 0 }}
-              transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+              initial={{
+                scale: 0.2,
+                opacity: 0.2,
+                x: zoomOrigin?.x ?? 0,
+                y: zoomOrigin?.y ?? 0,
+              }}
+              animate={{
+                scale: 1,
+                opacity: 1,
+                x: 0,
+                y: 0,
+              }}
+              exit={{
+                scale: 0.2,
+                opacity: 0,
+                x: zoomOrigin?.x ?? 0,
+                y: zoomOrigin?.y ?? 0,
+              }}
+              transition={{
+                type: 'spring',
+                damping: 25,
+                stiffness: 320,
+                mass: 0.8,
+              }}
               className="relative max-w-[92vw] max-h-[90vh] flex items-center justify-center"
             >
               <img
                 src={zoomedPhotoUrl}
                 alt="Ảnh tư liệu phóng to"
-                className="max-h-[85vh] max-w-[85vw] object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)] pointer-events-none"
+                className="max-h-[85vh] max-w-[85vw] object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)] pointer-events-none select-none"
               />
             </motion.div>
           </motion.div>

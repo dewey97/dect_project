@@ -189,7 +189,6 @@ export function PhoneLookupModal({
                 </label>
                 <input
                   type="text"
-                  placeholder="Nhập tên nghi phạm (VD: Nguyễn Thanh Tùng)..."
                   value={phone2}
                   onChange={(e) => {
                     setPhone2(e.target.value)
@@ -205,7 +204,6 @@ export function PhoneLookupModal({
                 </label>
                 <input
                   type="text"
-                  placeholder="Nhập tên nghi phạm (VD: Đạt Gà Chợ Cảng)..."
                   value={phone3}
                   onChange={(e) => {
                     setPhone3(e.target.value)

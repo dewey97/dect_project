@@ -1,19 +1,25 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- HEADER 2 CỘT CHUẨN NGHỊ ĐỊNH 30/2020/NĐ-CP ---
 \noindent
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}[t]{0.46\textwidth}
     \begin{center}
         \fontsize{11pt}{13pt}\selectfont
         CÔNG AN THÀNH PHỐ HÀ NỘI\\
@@ -33,57 +39,69 @@
     \end{center}
 \end{minipage}
 
-\vspace{0.6cm}
+\vspace{0.5cm}
 
 \begin{center}
     \textbf{\Large BẢN TRÍCH LỤC LÝ LỊCH TƯ PHÁP}\\[0.15cm]
-    \textit{}
+    \textit{(Tra cứu theo SĐT \texttt{0912.331.888})}
 \end{center}
 
-\vspace{0.4cm}
-\textit{(Tra cứu theo SĐT \texttt{0912.331.888})}
+\vspace{0.3cm}
 
 
+\vspace{0.3cm}\noindent\textbf{\large I. THÔNG TIN LÝ LỊCH}\\[0.15cm]
 
-\subsection*{I. THÔNG TIN LÝ LỊCH}
 
-
-\begin{tabularx}{\textwidth}{p{4cm} X}
+\vspace{0.2cm}
+\begingroup
+\begin{xltabular}{\textwidth}{>{\hsize=0.45\hsize\bfseries}X >{\hsize=1.55\hsize}X}
 \toprule
-Mục & Nội dung chi tiết \\
+\textbf{Mục} & \textbf{Nội dung chi tiết} \\
 \midrule
-\textbf{Họ và tên khai sinh} & \textbf{NGUYỄN THANH TÙNG} \\
-\textbf{Tên thường gọi} & Tùng \\
-\textbf{Ngày tháng năm sinh} & 18/03/1988 \\
-\textbf{Giới tính} & Nam \\
-\textbf{Số CMND} & \texttt{412879360} \\
-\textbf{Nơi ĐKHKTT} & Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội \\
-\textbf{Nơi ở hiện nay} & Phòng trọ công nhân số 18, Phố Cầu Bươu, TP. Hà Nội \\
-\textbf{Nghề nghiệp} & Thợ nề \\
-\textbf{Số điện thoại chính chủ} & 0912.331.888 \\
-\textbf{Tình trạng hôn nhân} & Độc thân \\
-\textbf{Tiền án, tiền sự} & Không \\
-\textbf{Mối quan hệ với nạn nhân} & Bạn thuở nhỏ \\
+\endfirsthead
+\toprule
+\textbf{Mục} & \textbf{Nội dung chi tiết} \\
+\midrule
+\endhead
 \bottomrule
-\end{tabularx}
+\endfoot
+\textbf{Họ và tên khai sinh} & \textbf{NGUYỄN THANH TÙNG} \\ \addlinespace[4pt]
+\textbf{Tên thường gọi} & Tùng \\ \addlinespace[4pt]
+\textbf{Ngày tháng năm sinh} & 18/03/1988 \\ \addlinespace[4pt]
+\textbf{Giới tính} & Nam \\ \addlinespace[4pt]
+\textbf{Số CMND} & \texttt{412879360} \\ \addlinespace[4pt]
+\textbf{Nơi ĐKHKTT} & Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội \\ \addlinespace[4pt]
+\textbf{Nơi ở hiện nay} & Phòng trọ công nhân số 18, Phố Cầu Bươu, TP. Hà Nội \\ \addlinespace[4pt]
+\textbf{Nghề nghiệp} & Thợ nề \\ \addlinespace[4pt]
+\textbf{Số điện thoại chính chủ} & 0912.331.888 \\ \addlinespace[4pt]
+\textbf{Tình trạng hôn nhân} & Độc thân \\ \addlinespace[4pt]
+\textbf{Tiền án, tiền sự} & Không \\ \addlinespace[4pt]
+\textbf{Mối quan hệ với nạn nhân} & Bạn thuở nhỏ \\ \addlinespace[4pt]
+\end{xltabular}
+\endgroup
+
+\vspace{0.2cm}
 
 
 
-\subsection*{II. ĐẶC ĐIỂM NHẬN DẠNG \& CĂN CỨ XÁC MINH BAN ĐẦU}
+\vspace{0.3cm}\noindent\textbf{\large II. ĐẶC ĐIỂM NHẬN DẠNG \& CĂN CỨ XÁC MINH BAN ĐẦU}\\[0.15cm]
 
 
-\begin{enumerate}[label=\arabic*., leftmargin=1.2cm, itemsep=2pt]
+\begin{enumerate}[label=\arabic*., leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{Đặc điểm ngoại hình:} Nam, cao 1m72, có vết sẹo ở lông mày phải.
   \item \textbf{Căn cứ xác minh:}
-\end{enumerate}
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item Có cuộc gọi đến cho nạn nhân lúc 19:03, thời lượng cuộc gọi 1 phút 03 giây.
-
 \end{itemize}
-\textbf{ĐIỀU TRA VIÊN TRÍCH LỤC HỒ SƠ}
-
-\textit{(Ký tên)}
-
-\textbf{Đại úy Lê Minh}
-
+\end{enumerate}
+\vspace{0.8cm}
+\noindent
+\hfill
+\begin{minipage}[t]{0.50\textwidth}
+    \begin{center}
+        \textbf{ĐIỀU TRA VIÊN TRÍCH LỤC HỒ SƠ}\\[0.1cm]
+        \textit{(Ký tên)}\\[1.6cm]
+        \textbf{Đại úy Lê Minh}
+    \end{center}
+\end{minipage}
 \end{document}

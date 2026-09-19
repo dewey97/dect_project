@@ -1,14 +1,20 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- TÀI LIỆU VẬT CHỨNG HIỆN TRƯỜNG ---
@@ -19,12 +25,12 @@
     \textbf{\Large SỔ BÁN HÀNG — QUÁN 88}\\[0.15cm]
     \textit{}
 \end{center}
-\vspace{0.4cm}
+\vspace{0.3cm}
 
 \textbf{T6 (24/7)}
 
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item B1 (2 khách): 60k (Tiền mặt 18:40)
   \item B2 (3 khách): lẩu riêu + 8 bia $\rightarrow$ 450k (Nợ - Anh Tuấn)
   \item B3 (1 khách): 1 mực nướng + 1 nem chua + 2 bia $\rightarrow$ 210k (Nợ - Anh Bình)

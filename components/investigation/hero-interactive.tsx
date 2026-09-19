@@ -575,7 +575,7 @@ export interface HeroInteractiveProps {
   customPins?: PinPoint[];
   customConnections?: CaseConnection[];
   customBgImage?: string;
-  onPinClick?: (pinId: string, pin?: PinPoint) => void;
+  onPinClick?: (pinId: string, pin?: PinPoint, coords?: { clientX: number; clientY: number }) => void;
 }
 
 export function HeroInteractive({
@@ -1006,7 +1006,7 @@ export function HeroInteractive({
         }
 
         if (bestHitPin && onPinClickRef.current) {
-          onPinClickRef.current(bestHitPin.id, bestHitPin);
+          onPinClickRef.current(bestHitPin.id, bestHitPin, { clientX: event.clientX, clientY: event.clientY });
         }
       } else {
         updateHoveredPin(x, y);
@@ -1579,40 +1579,26 @@ export function HeroInteractive({
             context.restore();
           }
 
-          // Dấu tick '✓' hiển thị trên node khi đã giải xong
-          if (pin.isSolved) {
+          // Dấu tick '✓' kiểu font chữ viết tay, chỉ hiển thị duy nhất trên node 'Mở rộng điều tra' khi đã giải xong
+          const isPhoneNode = pin.id === 'c0-pin-phone' || (pin.label || '').toUpperCase().includes('MỞ RỘNG');
+          if (pin.isSolved && isPhoneNode) {
             context.save();
-            const badgeRadius = 10 / transform.scale;
-            const badgeX = tagX + noteWidth - badgeRadius - 4 / transform.scale;
-            const badgeY = tagY + badgeRadius + 4 / transform.scale;
+            const centerX = tagX + noteWidth / 2;
+            const centerY = tagY + noteHeight * 0.62;
+            const tickFontSize = (noteHeight * 0.32) / transform.scale;
 
-            // Shadow
-            context.shadowColor = "rgba(0, 0, 0, 0.45)";
-            context.shadowBlur = 4 / transform.scale;
-            context.shadowOffsetY = 1.5 / transform.scale;
+            context.font = `900 ${tickFontSize}px 'Playpen Sans', 'Caveat', 'Segoe Print', 'Patrick Hand', cursive, sans-serif`;
+            context.fillStyle = "#1a120b";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
 
-            // Green badge circle
-            context.fillStyle = "#15803d";
-            context.beginPath();
-            context.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
-            context.fill();
+            // Subtle handwriting ink shadow
+            context.shadowColor = "rgba(0, 0, 0, 0.22)";
+            context.shadowBlur = 1.5 / transform.scale;
+            context.shadowOffsetX = 0.6 / transform.scale;
+            context.shadowOffsetY = 0.6 / transform.scale;
 
-            // White border
-            context.strokeStyle = "#ffffff";
-            context.lineWidth = 1.8 / transform.scale;
-            context.stroke();
-
-            // White checkmark tick
-            context.strokeStyle = "#ffffff";
-            context.lineWidth = 2.2 / transform.scale;
-            context.lineCap = "round";
-            context.lineJoin = "round";
-            context.beginPath();
-            context.moveTo(badgeX - badgeRadius * 0.45, badgeY - badgeRadius * 0.05);
-            context.lineTo(badgeX - badgeRadius * 0.1, badgeY + badgeRadius * 0.35);
-            context.lineTo(badgeX + badgeRadius * 0.45, badgeY - badgeRadius * 0.35);
-            context.stroke();
-
+            context.fillText("✓", centerX, centerY);
             context.restore();
           }
         }

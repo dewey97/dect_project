@@ -1,14 +1,20 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[top=2cm,bottom=2cm,left=2.5cm,right=2cm]{geometry}
+\usepackage[top=2.0cm,bottom=2.0cm,left=2.5cm,right=2.0cm]{geometry}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{xltabular}
 \usepackage{booktabs}
 \usepackage{array}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
 \pagestyle{plain}
 \linespread{1.15}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\sloppy
 
 \begin{document}
 % --- TÀI LIỆU VẬT CHỨNG HIỆN TRƯỜNG ---
@@ -19,16 +25,16 @@
     \textbf{\Large  HỒ SƠ TRÍCH XUẤT THIẾT BỊ ĐIỆN TỬ: \texttt{dev-00}}\\[0.15cm]
     \textit{}
 \end{center}
-\vspace{0.4cm}
+\vspace{0.3cm}
 
-\subsection*{(iPhone 6s Plus — Nạn nhân Nguyễn Văn Khang)}
-
-
+\vspace{0.3cm}\noindent\textbf{\large (iPhone 6s Plus — Nạn nhân Nguyễn Văn Khang)}\\[0.15cm]
 
 
-\subsection*{ QUY TẮC KỸ THUẬT \& CODE NOTE (DEV IMPLEMENTATION RULES)}
 
-\begin{enumerate}[label=\arabic*., leftmargin=1.2cm, itemsep=2pt]
+
+\vspace{0.35cm}\noindent\textbf{\large  QUY TẮC KỸ THUẬT \& CODE NOTE (DEV IMPLEMENTATION RULES)}\\[0.15cm]
+
+\begin{enumerate}[label=\arabic*., leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{Danh bạ (Contacts App):} Sắp xếp danh sách liên hệ theo thứ tự bảng chữ cái \textbf{A $\rightarrow$ Z}.
   \item \textbf{Nhật ký cuộc gọi (Call Log / Recents):} Sắp xếp theo \textbf{thời gian giảm dần} (cuộc gọi gần nhất trên cùng). Tên màu đỏ nếu cuộc gọi không thành công.
   \item \textbf{Tin nhắn (Messages App):} Danh sách các hội thoại (Threads) phải được sắp xếp theo \textbf{thời gian của tin nhắn cuối cùng (gần nhất) giảm dần} (hội thoại có tin nhắn mới nhất nằm trên cùng).
@@ -38,90 +44,112 @@
   \item \textbf{Ứng dụng Trình duyệt Web (Safari / Browser App):} Lịch sử duyệt web (Web History) hoàn toàn \textbf{ĐỂ TRỐNG (Empty)}. Khi truy cập màn hình báo lỗi offline: \textit{"Safari không thể mở trang vì không có kết nối Internet"}.
   \item \textbf{Ứng dụng Ghi chú (Notes App):} Hoàn toàn \textbf{ĐỂ TRỐNG (Empty - Không có ghi chú nào)}.
   \item \textbf{Phân loại đầu mối:}
-\end{enumerate}
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item : Nhân vật then chốt/nghi phạm/đầu mối trực tiếp của vụ án.
   \item \textbf{Nhiễu}: Số điện thoại sinh hoạt đời thường, anh em xã hội, nhà mạng, hàng quán làm dày thế giới game.
 
 
 \end{itemize}
+\end{enumerate}
 
-\subsection*{ PHẦN I: DANH BẠ ĐIỆN THOẠI (CONTACTS APP)}
-
-
-
-\subsection*{1. Danh Bạ Đã Lưu Tên (Sắp Xếp Theo Bảng Chữ Cái A — Z)}
+\vspace{0.35cm}\noindent\textbf{\large  PHẦN I: DANH BẠ ĐIỆN THOẠI (CONTACTS APP)}\\[0.15cm]
 
 
 
-\begin{tabularx}{\textwidth}{p{1.5cm} p{3.5cm} p{4cm} X}
+\vspace{0.3cm}\noindent\textbf{\large 1. Danh Bạ Đã Lưu Tên (Sắp Xếp Theo Bảng Chữ Cái A — Z)}\\[0.15cm]
+
+
+
+\vspace{0.2cm}
+\begingroup
+\begin{xltabular}{\textwidth}{>{\hsize=0.2\hsize}X >{\hsize=0.45\hsize}X >{\hsize=0.45\hsize}X >{\hsize=0.9\hsize}X}
 \toprule
-Ký Tự & Tên Lưu Trong Danh Bạ & Số Điện Thoại & Phân Loại \\
+\textbf{Ký Tự} & \textbf{Tên Lưu Trong Danh Bạ} & \textbf{Số Điện Thoại} & \textbf{Phân Loại} \\
 \midrule
-\textbf{A} & \textbf{Anh Dũng Cầu Cảng} & \texttt{0903.445.112} & Nhiễu \\
- & \textbf{Anh Hùng Sửa Nước} & \texttt{0988.665.123} & Nhiễu \\
-\textbf{B} & \textbf{Bác Bảy} & \texttt{0908.441.229} & Nhiễu \\
- & \textbf{Bà Hai} & \texttt{0913.552.771} & Nhiễu \\
- & \textbf{Bảo Xăm Hình} & \texttt{0934.112.887} & Nhiễu \\
- & \textbf{Bé My} & \texttt{0971.223.445} & Nhiễu \\
- & \textbf{Bình Còi Ba Gác} & \texttt{0915.223.789} &  \\
-\textbf{C} & \textbf{Chị Hạnh Giặt Là} & \texttt{0914.556.789} & Nhiễu \\
- & \textbf{Chị Lan Quán Nước} & \texttt{0932.889.102} &  \\
- & \textbf{Chú Sáu Xe Ôm} & \texttt{0913.667.228} & Nhiễu \\
- & \textbf{Cô Mai Thuốc Tây} & \texttt{0962.771.889} & Nhiễu \\
- & \textbf{Cô Sáu} & \texttt{0972.334.881} & Nhiễu \\
- & \textbf{Cơm Chị Ba} & \texttt{0908.334.991} & Nhiễu \\
- & \textbf{Cường Mũi Két} & \texttt{0973.665.412} & Nhiễu \\
-\textbf{D} & \textbf{Dũng Lò Mổ} & \texttt{0904.778.221} & Nhiễu \\
- & \textbf{Duy Bida 88} & \texttt{0916.334.556} & Nhiễu \\
-\textbf{Đ} & \textbf{Đức Cầm Đồ} & \texttt{0909.882.114} & Nhiễu \\
-\textbf{G} & \textbf{Giang Bến Xe} & \texttt{0938.221.776} & Nhiễu \\
-\textbf{H} & \textbf{Hà} & \texttt{0984.112.568} &  \\
- & \textbf{Hải Lác Bến Phà} & \texttt{0918.776.543} & Nhiễu \\
- & \textbf{Hoàng Cắt Tóc} & \texttt{0948.332.115} & Nhiễu \\
- & \textbf{Hùng Đen Cửu Vạn} & \texttt{0936.445.882} & Nhiễu \\
-\textbf{K} & \textbf{Khánh Rồng} & \texttt{0905.112.334} & Nhiễu \\
-\textbf{L} & \textbf{Linh Nail} & \texttt{0975.667.889} & Nhiễu \\
- & \textbf{Long Sẹo} & \texttt{0979.441.223} & Nhiễu \\
-\textbf{M} & \textbf{Minh Béo} & \texttt{0917.443.221} & Nhiễu \\
-\textbf{N} & \textbf{Nam Thợ Nề} & \texttt{0906.887.332} & Nhiễu \\
- & \textbf{Ngọc Mai} & \texttt{0912.456.789} &  \\
-\textbf{P} & \textbf{Phương Đồ Gỗ} & \texttt{0933.556.112} & Nhiễu \\
-\textbf{Q} & \textbf{Quân Lô Đề} & \texttt{0982.441.667} & Nhiễu \\
-\textbf{T} & \textbf{Thảo Vy} & \texttt{0978.552.109} &  \\
- & \textbf{Thắng Sửa Xe} & \texttt{0977.112.445} & Nhiễu \\
- & \textbf{Thím Tư} & \texttt{0964.881.332} & Nhiễu \\
- & \textbf{Tiến Bến Cảng} & \texttt{0919.223.554} & Nhiễu \\
- & \textbf{Tuấn Béo Xưởng Mộc} & \texttt{0902.998.114} & Nhiễu \\
- & \textbf{Tuấn Bia 88} & \texttt{0945.888.188} &  \\
-\textbf{V} & \textbf{Vinh Quán Nhậu} & \texttt{0907.334.221} & Nhiễu \\
- & \textbf{Vũ} & \texttt{0967.452.183} &  \\
-\textbf{Y} & \textbf{Yến Bún Đậu} & \texttt{0985.221.998} & Nhiễu \\
+\endfirsthead
+\toprule
+\textbf{Ký Tự} & \textbf{Tên Lưu Trong Danh Bạ} & \textbf{Số Điện Thoại} & \textbf{Phân Loại} \\
+\midrule
+\endhead
 \bottomrule
-\end{tabularx}
+\endfoot
+\textbf{A} & \textbf{Anh Dũng Cầu Cảng} & \texttt{0903.445.112} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Anh Hùng Sửa Nước} & \texttt{0988.665.123} & Nhiễu \\ \addlinespace[4pt]
+\textbf{B} & \textbf{Bác Bảy} & \texttt{0908.441.229} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Bà Hai} & \texttt{0913.552.771} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Bảo Xăm Hình} & \texttt{0934.112.887} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Bé My} & \texttt{0971.223.445} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Bình Còi Ba Gác} & \texttt{0915.223.789} &  \\ \addlinespace[4pt]
+\textbf{C} & \textbf{Chị Hạnh Giặt Là} & \texttt{0914.556.789} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Chị Lan Quán Nước} & \texttt{0932.889.102} &  \\ \addlinespace[4pt]
+ & \textbf{Chú Sáu Xe Ôm} & \texttt{0913.667.228} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Cô Mai Thuốc Tây} & \texttt{0962.771.889} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Cô Sáu} & \texttt{0972.334.881} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Cơm Chị Ba} & \texttt{0908.334.991} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Cường Mũi Két} & \texttt{0973.665.412} & Nhiễu \\ \addlinespace[4pt]
+\textbf{D} & \textbf{Dũng Lò Mổ} & \texttt{0904.778.221} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Duy Bida 88} & \texttt{0916.334.556} & Nhiễu \\ \addlinespace[4pt]
+\textbf{Đ} & \textbf{Đức Cầm Đồ} & \texttt{0909.882.114} & Nhiễu \\ \addlinespace[4pt]
+\textbf{G} & \textbf{Giang Bến Xe} & \texttt{0938.221.776} & Nhiễu \\ \addlinespace[4pt]
+\textbf{H} & \textbf{Hà} & \texttt{0984.112.568} &  \\ \addlinespace[4pt]
+ & \textbf{Hải Lác Bến Phà} & \texttt{0918.776.543} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Hoàng Cắt Tóc} & \texttt{0948.332.115} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Hùng Đen Cửu Vạn} & \texttt{0936.445.882} & Nhiễu \\ \addlinespace[4pt]
+\textbf{K} & \textbf{Khánh Rồng} & \texttt{0905.112.334} & Nhiễu \\ \addlinespace[4pt]
+\textbf{L} & \textbf{Linh Nail} & \texttt{0975.667.889} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Long Sẹo} & \texttt{0979.441.223} & Nhiễu \\ \addlinespace[4pt]
+\textbf{M} & \textbf{Minh Béo} & \texttt{0917.443.221} & Nhiễu \\ \addlinespace[4pt]
+\textbf{N} & \textbf{Nam Thợ Nề} & \texttt{0906.887.332} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Ngọc Mai} & \texttt{0912.456.789} &  \\ \addlinespace[4pt]
+\textbf{P} & \textbf{Phương Đồ Gỗ} & \texttt{0933.556.112} & Nhiễu \\ \addlinespace[4pt]
+\textbf{Q} & \textbf{Quân Lô Đề} & \texttt{0982.441.667} & Nhiễu \\ \addlinespace[4pt]
+\textbf{T} & \textbf{Thảo Vy} & \texttt{0978.552.109} &  \\ \addlinespace[4pt]
+ & \textbf{Thắng Sửa Xe} & \texttt{0977.112.445} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Thím Tư} & \texttt{0964.881.332} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Tiến Bến Cảng} & \texttt{0919.223.554} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Tuấn Béo Xưởng Mộc} & \texttt{0902.998.114} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Tuấn Bia 88} & \texttt{0945.888.188} &  \\ \addlinespace[4pt]
+\textbf{V} & \textbf{Vinh Quán Nhậu} & \texttt{0907.334.221} & Nhiễu \\ \addlinespace[4pt]
+ & \textbf{Vũ} & \texttt{0967.452.183} &  \\ \addlinespace[4pt]
+\textbf{Y} & \textbf{Yến Bún Đậu} & \texttt{0985.221.998} & Nhiễu \\ \addlinespace[4pt]
+\end{xltabular}
+\endgroup
+
+\vspace{0.2cm}
 
 
 
-\subsection*{2. Danh Sách Số Điện Thoại KHÔNG Lưu Danh Bạ (Hiển Thị Số Lạ)}
+\vspace{0.3cm}\noindent\textbf{\large 2. Danh Sách Số Điện Thoại KHÔNG Lưu Danh Bạ (Hiển Thị Số Lạ)}\\[0.15cm]
 
 
 \textit{(Các số này \textbf{không có} trong ứng dụng Danh bạ. Khi hiển thị trên điện thoại chỉ hiện chuỗi số).}
 
 
 
-\begin{tabularx}{\textwidth}{p{1.5cm} p{3.5cm} p{4cm} X}
+\vspace{0.2cm}
+\begingroup
+\begin{xltabular}{\textwidth}{>{\hsize=0.2\hsize}X >{\hsize=0.45\hsize}X >{\hsize=0.45\hsize}X >{\hsize=0.9\hsize}X}
 \toprule
-STT & Số Điện Thoại Lạ & Chủ Sở Hữu Thực Tế (Dành cho Dev \& Đối Chiếu Phá Án) & Phân Loại \\
+\textbf{STT} & \textbf{Số Điện Thoại Lạ} & \textbf{Chủ Sở Hữu Thực Tế (Dành cho Dev \newline \& Đối Chiếu Phá Án)} & \textbf{Phân Loại} \\
 \midrule
-\textbf{01} & \texttt{0988.200.991} & \textbf{Lê Quang Vũ} (Số phụ dùng sim rác) &  \\
-\textbf{02} & \texttt{0912.331.888} & \textbf{Nguyễn Thanh Tùng} (Tùng thợ nề) &  \\
-\textbf{03} & \texttt{0984.180.357} & \textbf{Trần Văn Đạt} (Đạt Gà Chợ Cảng) &  \\
+\endfirsthead
+\toprule
+\textbf{STT} & \textbf{Số Điện Thoại Lạ} & \textbf{Chủ Sở Hữu Thực Tế (Dành cho Dev \newline \& Đối Chiếu Phá Án)} & \textbf{Phân Loại} \\
+\midrule
+\endhead
 \bottomrule
-\end{tabularx}
+\endfoot
+\textbf{01} & \texttt{0988.200.991} & \textbf{Lê Quang Vũ} (Số phụ dùng sim rác) &  \\ \addlinespace[4pt]
+\textbf{02} & \texttt{0912.331.888} & \textbf{Nguyễn Thanh Tùng} (Tùng thợ nề) &  \\ \addlinespace[4pt]
+\textbf{03} & \texttt{0984.180.357} & \textbf{Trần Văn Đạt} (Đạt Gà Chợ Cảng) &  \\ \addlinespace[4pt]
+\end{xltabular}
+\endgroup
+
+\vspace{0.2cm}
 
 
 
-\subsection*{ PHẦN II: NHẬT KÝ CUỘC GỌI (CALL LOG / RECENTS APP)}
+\vspace{0.35cm}\noindent\textbf{\large  PHẦN II: NHẬT KÝ CUỘC GỌI (CALL LOG / RECENTS APP)}\\[0.15cm]
 
 
 >  \textbf{Quy chuẩn hiển thị UI:}
@@ -132,91 +160,127 @@ STT & Số Điện Thoại Lạ & Chủ Sở Hữu Thực Tế (Dành cho Dev \&
 
 
 
-\subsection*{1. Ngày 24/07/2016 (Ngày Xảy Ra Vụ Án)}
+\vspace{0.3cm}\noindent\textbf{\large 1. Ngày 24/07/2016 (Ngày Xảy Ra Vụ Án)}\\[0.15cm]
 
 
 
-\begin{tabularx}{\textwidth}{l l l l X}
+\vspace{0.2cm}
+\begingroup
+\small
+\begin{xltabular}{\textwidth}{>{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X}
 \toprule
-STT & Khung Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọi & Phân Loại \\
+\textbf{STT} & \textbf{Khung Giờ} & \textbf{Tên Hiển Thị (Trên màn hình)} & \textbf{Loại Cuộc Gọi} & \textbf{Phân Loại} \\
 \midrule
-\textbf{01} & \texttt{20:31} &  \textbf{[ĐỎ] Hà} & \texttt{↙ Gọi đến (Nhỡ)} &  \\
-\textbf{02} & \texttt{19:46} & \texttt{0984.180.357} & \texttt{↙ Gọi đến} &  \\
-\textbf{03} & \texttt{19:03} & \texttt{0912.331.888} & \texttt{↙ Gọi đến} &  \\
-\textbf{04} & \texttt{18:15} & \texttt{0988.200.991} & \texttt{↗ Gọi đi} &  \\
-\textbf{05} & \texttt{18:00} & \textbf{Bình Còi Ba Gác} & \texttt{↙ Gọi đến} &  \\
-\textbf{06} & \texttt{17:30} & \textbf{Chị Lan Quán Nước} & \texttt{↙ Gọi đến} &  \\
-\textbf{07} & \texttt{16:20} & \textbf{Bác Bảy} & \texttt{↙ Gọi đến} & Nhiễu \\
-\textbf{08} & \texttt{14:05} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\
-\textbf{09} & \texttt{11:30} & \textbf{Cơm Chị Ba} & \texttt{↗ Gọi đi} & Nhiễu \\
-\textbf{10} & \texttt{10:15} & \textbf{Chú Sáu Xe Ôm} & \texttt{↗ Gọi đi} & Nhiễu \\
-\textbf{11} & \texttt{08:45} & \textbf{Thảo Vy} & \texttt{↗ Gọi đi} &  \\
-\bottomrule
-\end{tabularx}
-
-
-\subsection*{2. Ngày 23/07/2016 (Ngày N-1)}
-
-
-
-\begin{tabularx}{\textwidth}{l l l l X}
+\endfirsthead
 \toprule
-STT & Khung Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọi & Phân Loại \\
+\textbf{STT} & \textbf{Khung Giờ} & \textbf{Tên Hiển Thị (Trên màn hình)} & \textbf{Loại Cuộc Gọi} & \textbf{Phân Loại} \\
 \midrule
-\textbf{12} & \texttt{21:40} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\
-\textbf{13} & \texttt{18:10} & \textbf{Long Sẹo} & \texttt{↗ Gọi đi} & Nhiễu \\
-\textbf{14} & \texttt{15:40} & \textbf{Cô Sáu} & \texttt{↙ Gọi đến} & Nhiễu \\
-\textbf{15} & \texttt{12:15} & \textbf{Thảo Vy} & \texttt{↗ Gọi đi} &  \\
-\textbf{16} & \texttt{09:20} & \textbf{Dũng Lò Mổ} & \texttt{↗ Gọi đi} & Nhiễu \\
+\endhead
 \bottomrule
-\end{tabularx}
+\endfoot
+\textbf{01} & \texttt{20:31} &  \textbf{[ĐỎ] Hà} & \texttt{↙ Gọi đến (Nhỡ)} &  \\ \addlinespace[4pt]
+\textbf{02} & \texttt{19:46} & \texttt{0984.180.357} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{03} & \texttt{19:03} & \texttt{0912.331.888} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{04} & \texttt{18:15} & \texttt{0988.200.991} & \texttt{↗ Gọi đi} &  \\ \addlinespace[4pt]
+\textbf{05} & \texttt{18:00} & \textbf{Bình Còi Ba Gác} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{06} & \texttt{17:30} & \textbf{Chị Lan Quán Nước} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{07} & \texttt{16:20} & \textbf{Bác Bảy} & \texttt{↙ Gọi đến} & Nhiễu \\ \addlinespace[4pt]
+\textbf{08} & \texttt{14:05} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{09} & \texttt{11:30} & \textbf{Cơm Chị Ba} & \texttt{↗ Gọi đi} & Nhiễu \\ \addlinespace[4pt]
+\textbf{10} & \texttt{10:15} & \textbf{Chú Sáu Xe Ôm} & \texttt{↗ Gọi đi} & Nhiễu \\ \addlinespace[4pt]
+\textbf{11} & \texttt{08:45} & \textbf{Thảo Vy} & \texttt{↗ Gọi đi} &  \\ \addlinespace[4pt]
+\end{xltabular}
+\endgroup
+
+\vspace{0.2cm}
 
 
-\subsection*{3. Ngày 22/07/2016 Trở Về Trước (Sinh Hoạt Thường Ngày \& Đòi Nợ)}
+\vspace{0.3cm}\noindent\textbf{\large 2. Ngày 23/07/2016 (Ngày N-1)}\\[0.15cm]
 
 
 
-\begin{tabularx}{\textwidth}{l l l l X}
+\vspace{0.2cm}
+\begingroup
+\small
+\begin{xltabular}{\textwidth}{>{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X}
 \toprule
-STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọi & Phân Loại \\
+\textbf{STT} & \textbf{Khung Giờ} & \textbf{Tên Hiển Thị (Trên màn hình)} & \textbf{Loại Cuộc Gọi} & \textbf{Phân Loại} \\
 \midrule
-\textbf{17} & \texttt{22/07 — 22:20} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\
-\textbf{18} & \texttt{22/07 — 20:30} & \textbf{Hà} & \texttt{↙ Gọi đến} &  \\
-\textbf{19} & \texttt{22/07 — 17:45} &  \textbf{[ĐỎ] Thảo Vy} & \texttt{↙ Gọi đến (Nhỡ)} &  \\
-\textbf{20} & \texttt{22/07 — 16:30} & \textbf{Cường Mũi Két} & \texttt{↙ Gọi đến} & Nhiễu \\
-\textbf{21} & \texttt{22/07 — 11:45} & \textbf{Thím Tư} & \texttt{↙ Gọi đến} & Nhiễu \\
-\textbf{22} & \texttt{22/07 — 08:30} & \textbf{Bà Hai} & \texttt{↙ Gọi đến} & Nhiễu \\
-\textbf{23} & \texttt{21/07 — 21:15} & \textbf{Thảo Vy} & \texttt{↗ Gọi đi} &  \\
-\textbf{24} & \texttt{21/07 — 19:15} & \textbf{Tuấn Bia 88} & \texttt{↗ Gọi đi} &  \\
-\textbf{25} & \texttt{21/07 — 14:00} & \textbf{Chị Hạnh Giặt Là} & \texttt{↙ Gọi đến} & Nhiễu \\
-\textbf{26} & \texttt{21/07 — 10:15} & \textbf{Tuấn Béo Xưởng Mộc} & \texttt{↗ Gọi đi} & Nhiễu \\
-\textbf{27} & \texttt{20/07 — 22:50} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\
-\textbf{28} & \texttt{20/07 — 15:30} & \textbf{Hoàng Cắt Tóc} & \texttt{↗ Gọi đi} & Nhiễu \\
-\textbf{29} & \texttt{20/07 — 09:00} &  \textbf{[ĐỎ] Hải Lác Bến Phà} & \texttt{↗ Gọi đi (Không được)} & Nhiễu \\
-\textbf{30} & \texttt{19/07 — 17:00} & \textbf{Hùng Đen Cửu Vạn} & \texttt{↗ Gọi đi} & Nhiễu \\
-\textbf{31} & \texttt{19/07 — 11:30} & \textbf{Thảo Vy} & \texttt{↗ Gọi đi} &  \\
-\textbf{32} & \texttt{19/07 — 10:10} & \textbf{Anh Hùng Sửa Nước} & \texttt{↙ Gọi đến} & Nhiễu \\
-\textbf{33} & \texttt{18/07 — 21:00} & \textbf{Cô Mai Thuốc Tây} & \texttt{↗ Gọi đi} & Nhiễu \\
-\textbf{34} & \texttt{18/07 — 20:45} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\
-\textbf{35} & \texttt{18/07 — 14:20} & \textbf{Thắng Sửa Xe} & \texttt{↙ Gọi đến} & Nhiễu \\
+\endfirsthead
+\toprule
+\textbf{STT} & \textbf{Khung Giờ} & \textbf{Tên Hiển Thị (Trên màn hình)} & \textbf{Loại Cuộc Gọi} & \textbf{Phân Loại} \\
+\midrule
+\endhead
 \bottomrule
-\end{tabularx}
+\endfoot
+\textbf{12} & \texttt{21:40} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{13} & \texttt{18:10} & \textbf{Long Sẹo} & \texttt{↗ Gọi đi} & Nhiễu \\ \addlinespace[4pt]
+\textbf{14} & \texttt{15:40} & \textbf{Cô Sáu} & \texttt{↙ Gọi đến} & Nhiễu \\ \addlinespace[4pt]
+\textbf{15} & \texttt{12:15} & \textbf{Thảo Vy} & \texttt{↗ Gọi đi} &  \\ \addlinespace[4pt]
+\textbf{16} & \texttt{09:20} & \textbf{Dũng Lò Mổ} & \texttt{↗ Gọi đi} & Nhiễu \\ \addlinespace[4pt]
+\end{xltabular}
+\endgroup
+
+\vspace{0.2cm}
+
+
+\vspace{0.3cm}\noindent\textbf{\large 3. Ngày 22/07/2016 Trở Về Trước (Sinh Hoạt Thường Ngày \& Đòi Nợ)}\\[0.15cm]
 
 
 
-\subsection*{ PHẦN III: NỘI DUNG ỨNG DỤNG TIN NHẮN (MESSAGES APP)}
+\vspace{0.2cm}
+\begingroup
+\small
+\begin{xltabular}{\textwidth}{>{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X >{\hsize=1.0\hsize}X}
+\toprule
+\textbf{STT} & \textbf{Ngày \newline \& Giờ} & \textbf{Tên Hiển Thị (Trên màn hình)} & \textbf{Loại Cuộc Gọi} & \textbf{Phân Loại} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{STT} & \textbf{Ngày \newline \& Giờ} & \textbf{Tên Hiển Thị (Trên màn hình)} & \textbf{Loại Cuộc Gọi} & \textbf{Phân Loại} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\textbf{17} & \texttt{22/07 — 22:20} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{18} & \texttt{22/07 — 20:30} & \textbf{Hà} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{19} & \texttt{22/07 — 17:45} &  \textbf{[ĐỎ] Thảo Vy} & \texttt{↙ Gọi đến (Nhỡ)} &  \\ \addlinespace[4pt]
+\textbf{20} & \texttt{22/07 — 16:30} & \textbf{Cường Mũi Két} & \texttt{↙ Gọi đến} & Nhiễu \\ \addlinespace[4pt]
+\textbf{21} & \texttt{22/07 — 11:45} & \textbf{Thím Tư} & \texttt{↙ Gọi đến} & Nhiễu \\ \addlinespace[4pt]
+\textbf{22} & \texttt{22/07 — 08:30} & \textbf{Bà Hai} & \texttt{↙ Gọi đến} & Nhiễu \\ \addlinespace[4pt]
+\textbf{23} & \texttt{21/07 — 21:15} & \textbf{Thảo Vy} & \texttt{↗ Gọi đi} &  \\ \addlinespace[4pt]
+\textbf{24} & \texttt{21/07 — 19:15} & \textbf{Tuấn Bia 88} & \texttt{↗ Gọi đi} &  \\ \addlinespace[4pt]
+\textbf{25} & \texttt{21/07 — 14:00} & \textbf{Chị Hạnh Giặt Là} & \texttt{↙ Gọi đến} & Nhiễu \\ \addlinespace[4pt]
+\textbf{26} & \texttt{21/07 — 10:15} & \textbf{Tuấn Béo Xưởng Mộc} & \texttt{↗ Gọi đi} & Nhiễu \\ \addlinespace[4pt]
+\textbf{27} & \texttt{20/07 — 22:50} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{28} & \texttt{20/07 — 15:30} & \textbf{Hoàng Cắt Tóc} & \texttt{↗ Gọi đi} & Nhiễu \\ \addlinespace[4pt]
+\textbf{29} & \texttt{20/07 — 09:00} &  \textbf{[ĐỎ] Hải Lác Bến Phà} & \texttt{↗ Gọi đi (Không được)} & Nhiễu \\ \addlinespace[4pt]
+\textbf{30} & \texttt{19/07 — 17:00} & \textbf{Hùng Đen Cửu Vạn} & \texttt{↗ Gọi đi} & Nhiễu \\ \addlinespace[4pt]
+\textbf{31} & \texttt{19/07 — 11:30} & \textbf{Thảo Vy} & \texttt{↗ Gọi đi} &  \\ \addlinespace[4pt]
+\textbf{32} & \texttt{19/07 — 10:10} & \textbf{Anh Hùng Sửa Nước} & \texttt{↙ Gọi đến} & Nhiễu \\ \addlinespace[4pt]
+\textbf{33} & \texttt{18/07 — 21:00} & \textbf{Cô Mai Thuốc Tây} & \texttt{↗ Gọi đi} & Nhiễu \\ \addlinespace[4pt]
+\textbf{34} & \texttt{18/07 — 20:45} & \textbf{Thảo Vy} & \texttt{↙ Gọi đến} &  \\ \addlinespace[4pt]
+\textbf{35} & \texttt{18/07 — 14:20} & \textbf{Thắng Sửa Xe} & \texttt{↙ Gọi đến} & Nhiễu \\ \addlinespace[4pt]
+\end{xltabular}
+\endgroup
+
+\vspace{0.2cm}
+
+
+
+\vspace{0.35cm}\noindent\textbf{\large  PHẦN III: NỘI DUNG ỨNG DỤNG TIN NHẮN (MESSAGES APP)}\\[0.15cm]
 
 \textit{(Các Thread được sắp xếp theo thời gian của \textbf{tin nhắn cuối cùng giảm dần} — mới nhất ở trên cùng)}
 
 
 
 
-\subsection*{ THREAD 1: \texttt{Thảo Vy} \textit{(Đã lưu danh bạ — Tin cuối: 24/07 lúc 20:40)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 1: \texttt{Thảo Vy} \textit{(Đã lưu danh bạ — Tin cuối: 24/07 lúc 20:40)}}\\[0.15cm]
 
 
 \textbf{04/05/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{14:15} | \textbf{Thảo Vy:} Khoản đợt một em chuẩn bị xong tiền mặt rồi nhé. Tối mai tầm mấy giờ anh tiện nhận tiền?
   \item \texttt{14:32} | \textbf{Khang:} Tối mai 21h qua số X đường ABC. Giờ đấy anh mới xong việc ở chỗ công trình. Nhớ mang đủ giấy tờ.
   \item \texttt{14:35} | \textbf{Thảo Vy:} Oke anh
@@ -224,7 +288,7 @@ STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọ
 \end{itemize}
 \textbf{22/05/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{10:20} | \textbf{Thảo Vy:} Khoản nợ mới lúc nào anh chuyển nốt em phần còn lại được? Em đang kẹt quá
   \item \texttt{11:05} | \textbf{Khang:} Cuối tuần này chuyển tiếp phần còn lại nhé.
   \item \texttt{11:06} | \textbf{Khang:} Cứ tối ra đúng địa chỉ cũ tôi đưa tiền, đừng chuyển khoản lằng nhằng mất công đối soát.
@@ -232,7 +296,7 @@ STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọ
 \end{itemize}
 \textbf{25/05/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{16:48} | \textbf{Thảo Vy:} Tối nay vẫn số X đường ABC anh nhỉ?
   \item \texttt{16:49} | \textbf{Khang:} Ừ cứ chỗ cũ mà quất thôi
   \item \texttt{17:00} | \textbf{Thảo Vy:} Anh nhẹ nhàng với em thôi, không phải là chủ nợ mà mún làm gì thì làm đâu
@@ -240,7 +304,7 @@ STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọ
 \end{itemize}
 \textbf{12/06/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{16:40} | \textbf{Thảo Vy:} Hôm nay em gửi lãi tháng 6 được không?
   \item \texttt{17:15} | \textbf{Khang:} Tầm 9 giờ tối đi, giờ đấy vắng người dễ làm việc. Mà hôm nay đừng có lề mề như lần trước.
   \item \texttt{17:18} | \textbf{Thảo Vy:} Lần trước do kẹt xe thôi. Anh khó tính vừa thôi chứ.
@@ -251,7 +315,7 @@ STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọ
 \end{itemize}
 \textbf{03/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{22:01} | \textbf{Khang:} Anh mới kiểm tra lại sổ
   \item \texttt{22:01} | \textbf{Khang:} Nhớ ngày mai trả lãi tháng 7 đấy
   \item \texttt{22:01} | \textbf{Khang:} Em nhớ trả anh đúng hạn. Không liệu hồn
@@ -263,7 +327,7 @@ STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọ
 \end{itemize}
 \textbf{24/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{19:05} | \textbf{Thảo Vy:} Đợt cuối cùng gom xong rồi. Tối nay hẹn ở đâu để tất toán dứt điểm đây?
   \item \texttt{19:20} | \textbf{Khang:} Cứ hẹn buổi tối ở địa chỉ cũ như mọi khi thôi.
   \item \texttt{20:38} | \textbf{Thảo Vy:} ️ \textit{[Tin nhắn thoại — 0:06]}
@@ -272,104 +336,104 @@ STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọ
 
 \end{itemize}
 
-\subsection*{ THREAD 2: \texttt{Hà} \textit{(Đã lưu danh bạ — Tin cuối: 24/07 lúc 20:32)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 2: \texttt{Hà} \textit{(Đã lưu danh bạ — Tin cuối: 24/07 lúc 20:32)}}\\[0.15cm]
 
 
 \textbf{22/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{21:17} | \textbf{Hà:} Anh Khang ơi, hôm nay em nấu canh cua với rau đay, anh thích món đó mà. Để em mang sang cho anh nhé? Em biết anh hay quên ăn tối...
   \item \texttt{22:03} | \textbf{Hà:} Anh không trả lời à... Không sao, em để phần anh trong hộp cơm ở trước cửa nhé. Anh nhớ lấy vào ăn kẻo nguội. \textit{(Đã xem • Không trả lời)}
 
 \end{itemize}
 \textbf{23/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{12:44} | \textbf{Hà:} Em thấy hộp cơm hôm qua anh đã lấy vào rồi  Vậy là anh có ăn phải không? Chiều nay em nghỉ sớm, hay để em ghé qua dọn nhà cho anh nh?
   \item \texttt{14:51} | \textbf{Khang:} Đừng có sang. Bận.
 
 \end{itemize}
 \textbf{24/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{19:00} | \textbf{Hà:}  Anh ơi, em vừa sao xong mẻ trà hoa cúc mới, thơm lắm anh. Lát anh có ở nhà không, em mang qua cho anh nhé? \textit{( Đã gửi • Đã tắt thông báo)}
   \item \texttt{20:32} | \textbf{Hà:} ️ \textit{[Tin nhắn thoại — 0:08]} ⚠️ \textbf{[MANH MỐI QUAN TRỌNG]} \textit{(Tạp âm nền lọt tiếng còi tàu hỏa diesel hú 2 hồi dài và tiếng chuông rào chắn đường sắt leng keng < 30m, chứng minh Hà đang đứng sát nhà Khang tại ngõ Bờ Sông chứ không phải ở trọ xem phim như lời khai).}
 
 
 \end{itemize}
 
-\subsection*{ THREAD 3: \texttt{0988.200.991} \textit{(Chưa lưu danh bạ — Sim rác Lê Quang Vũ — Tin cuối: 24/07 lúc 18:12)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 3: \texttt{0988.200.991} \textit{(Chưa lưu danh bạ — Sim rác Lê Quang Vũ — Tin cuối: 24/07 lúc 18:12)}}\\[0.15cm]
 
 
 \textbf{21/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{09:14} | \textbf{Khang:} Hạn 20 rồi mày không thấy lịch à. 300 triệu không phải 300 nghìn. Tắt máy trốn thì tao tìm đến tận nhà mày.
 
 \end{itemize}
 \textbf{22/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{20:31} | \textbf{Khang:} Mày nghĩ tắt máy là xong à?
   \item \texttt{20:31} | \textbf{Khang:} Ngày mai không gọi lại tao thì tao cho rải giấy nợ để cả phố biết mặt thằng rể quý nhà họ Nguyễn.
 
 \end{itemize}
 \textbf{24/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{18:12} | \textbf{Khang:} T cho m cơ hội cuối. Tối nay qua nhà tao nói chuyện cho đàng hoàng. Không thì ngày mai tao ghé nhà máy thăm bố vợ mày luôn thể.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 4: \texttt{VIETTEL\_KM} \textit{(Brandname Nhà Mạng — Tin cuối: 23/07 lúc 10:00)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 4: \texttt{VIETTEL\_KM} \textit{(Brandname Nhà Mạng — Tin cuối: 23/07 lúc 10:00)}}\\[0.15cm]
 
 
 \textbf{05/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{08:00} | \textbf{VIETTEL\_KM:} [QC] Duy nhat ngay 05/07/2016, Viettel KM 50\% gia tri the nap cho thue bao tra truoc. Chi tiet lien he 198 (0d).
 
 \end{itemize}
 \textbf{20/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{08:30} | \textbf{VIETTEL\_KM:} [QC] Tu 00h-24h ngay 20/07/2016, Viettel KM 50\% gia tri the nap cho thue bao tra truoc (25\% cong vao TK KM, 25\% cong vao TK KM2). Chi tiet LH 198 (0d).
 
 \end{itemize}
 \textbf{23/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{10:00} | \textbf{VIETTEL\_KM:} [QC] Dang ky goi cuoc 3G Mimax chi voi 70.000d/thang co ngay 600MB toc do cao, het luu luong truy cap mien phi. Soan MIMAX gui 191.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 5: \texttt{0912.331.888} \textit{(Chưa lưu danh bạ — Nguyễn Thanh Tùng — Tin cuối: 22/07 lúc 20:20)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 5: \texttt{0912.331.888} \textit{(Chưa lưu danh bạ — Nguyễn Thanh Tùng — Tin cuối: 22/07 lúc 20:20)}}\\[0.15cm]
 
 
 \textbf{22/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{20:15} | \textbf{0912.331.888:} 20 năm qua mày sống tốt nhỉ
   \item \texttt{20:20} | \textbf{Khang:} Thằng nào đấy?
 
 
 \end{itemize}
 
-\subsection*{ THREAD 6: \texttt{Cơm Chị Ba} \textit{(Đã lưu danh bạ — Tin cuối: 22/07 lúc 11:33)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 6: \texttt{Cơm Chị Ba} \textit{(Đã lưu danh bạ — Tin cuối: 22/07 lúc 11:33)}}\\[0.15cm]
 
 
 \textbf{18/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{11:20} | \textbf{Khang:} Cho em 2 suất sườn bì chả nhiều ớt cay qua 14 Bờ Sông chị nhé.
   \item \texttt{11:25} | \textbf{Cơm Chị Ba:} Có ngay em ơi, 15 phút nữa chú xe ôm mang qua nhé.
 
 \end{itemize}
 \textbf{22/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{11:30} | \textbf{Khang:} Trưa nay có cá kho tộ với canh chua không chị?
   \item \texttt{11:32} | \textbf{Cơm Chị Ba:} Có cá hú kho tộ ngon lắm em, lấy thêm chén canh chua nha?
   \item \texttt{11:33} | \textbf{Khang:} Vâng cho 1 phần cơm cá kho + canh chua.
@@ -377,199 +441,199 @@ STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọ
 
 \end{itemize}
 
-\subsection*{ THREAD 7: \texttt{Chị Hạnh Giặt Là} \textit{(Đã lưu danh bạ — Tin cuối: 21/07 lúc 15:35)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 7: \texttt{Chị Hạnh Giặt Là} \textit{(Đã lưu danh bạ — Tin cuối: 21/07 lúc 15:35)}}\\[0.15cm]
 
 
 \textbf{12/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{16:00} | \textbf{Khang:} Chị Hạnh ơi em gửi thằng đệ mang 1 cái áo khoác da với 2 chăn lông qua giặt khô, làm cẩn thận hộ em.
   \item \texttt{16:10} | \textbf{Chị Hạnh Giặt Là:} Rồi chị nhận được rồi, giặt hấp da mất 2-3 hôm em nhé.
 
 \end{itemize}
 \textbf{15/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{17:00} | \textbf{Chị Hạnh Giặt Là:} Đồ giặt xong rồi em ơi, tiện ghé lấy nhé.
 
 \end{itemize}
 \textbf{21/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{15:20} | \textbf{Chị Hạnh Giặt Là:} Khang ơi áo da với chăn của em giặt xong cả tuần rồi để chật tiệm quá, chiều tiện ghé 42 Khâm Thiên lấy hộ chị.
   \item \texttt{15:35} | \textbf{Khang:} Vâng chiều em cho thằng Long qua vác về.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 8: \texttt{Long Sẹo} \textit{(Đã lưu danh bạ — Tin cuối: 21/07 lúc 11:16)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 8: \texttt{Long Sẹo} \textit{(Đã lưu danh bạ — Tin cuối: 21/07 lúc 11:16)}}\\[0.15cm]
 
 
 \textbf{08/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{09:10} | \textbf{Long Sẹo:} Anh Khang ơi em dán xong 50 tờ thông báo nợ quanh khu chợ đầu mối rồi nhé.
   \item \texttt{09:30} | \textbf{Khang:} Tốt, tối lượn qua bến phà ngó xem có động tĩnh gì không.
 
 \end{itemize}
 \textbf{19/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{14:00} | \textbf{Khang:} Mày thấy thằng Hải Lác chạy xe ở bến chưa?
   \item \texttt{16:45} | \textbf{Long Sẹo:} Em đảo qua 2 vòng mà bọn xe ôm bảo nó nghỉ ốm mấy hôm nay rồi anh ạ.
 
 \end{itemize}
 \textbf{21/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{11:15} | \textbf{Long Sẹo:} Anh ơi em vừa tóm được quả xe Dream của nó dựng ở quán nước đầu bến!
   \item \texttt{11:16} | \textbf{Khang:} Giữ luôn chìa khóa xe nó, bảo khi nào mang đủ 75 triệu đến nhà tao thì trả xe.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 9: \texttt{Tuấn Béo Xưởng Mộc} \textit{(Đã lưu danh bạ — Con nợ — Tin cuối: 21/07 lúc 10:25)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 9: \texttt{Tuấn Béo Xưởng Mộc} \textit{(Đã lưu danh bạ — Con nợ — Tin cuối: 21/07 lúc 10:25)}}\\[0.15cm]
 
 
 \textbf{08/06/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{09:00} | \textbf{Khang:} Tuấn, tiền gỗ đợt trước 45 triệu đến hạn rồi. Chiều tao cho người qua lấy.
   \item \texttt{09:15} | \textbf{Tuấn Béo Xưởng Mộc:} Anh Khang ơi đợt này bên chủ nhà họ chậm thanh toán quá, anh thư thư cho em mấy hôm với ạ.
 
 \end{itemize}
 \textbf{25/06/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{14:30} | \textbf{Khang:} Mấy hôm của mày là nửa tháng rồi đấy à? Đừng để tao phải mang mấy anh em xuống tận xưởng mộc bốc máy cưa máy bào đi.
   \item \texttt{14:45} | \textbf{Tuấn Béo Xưởng Mộc:} Em lạy anh, anh cho em xin đến đầu tháng 7 công trình xong em thanh toán đủ cả gốc lẫn lãi cho anh!
 
 \end{itemize}
 \textbf{10/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{11:00} | \textbf{Khang:} Mày trốn tao à? Gọi điện không nghe máy là muốn xưởng đỏ lửa đúng không?
   \item \texttt{11:20} | \textbf{Tuấn Béo Xưởng Mộc:} Dạ không em vừa bận giao hàng trên phố không cầm máy. Anh cho em gom nốt tuần này em trả anh trước một nửa!
 
 \end{itemize}
 \textbf{21/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{10:20} | \textbf{Tuấn Béo Xưởng Mộc:} ️ \textit{[Tin nhắn thoại — 0:12]}
   \item \texttt{10:25} | \textbf{Khang:} Biết điều đấy, trước 30/7 nốt 25 triệu còn lại không thì đừng trách tao.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 10: \texttt{VNPT\_Notice} \textit{(Brandname Dịch Vụ — Tin cuối: 21/07 lúc 08:00)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 10: \texttt{VNPT\_Notice} \textit{(Brandname Dịch Vụ — Tin cuối: 21/07 lúc 08:00)}}\\[0.15cm]
 
 
 \textbf{10/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{08:30} | \textbf{VNPT\_Notice:} [Thong bao] Cuoc Internet FiberVNN thang 06/2016 cua thue bao 0904888666 la 220.000d. Han thanh toan: 20/07/2016.
 
 \end{itemize}
 \textbf{21/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{08:00} | \textbf{VNPT\_Notice:} [Thong bao] Thue bao 0904888666 da thanh toan cuoc Internet FiberVNN thang 06/2016 so tien 220.000d qua ViettinBank. Cam on Quy khach.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 11: \texttt{Tuấn Bia 88} \textit{(Đã lưu danh bạ — Tin cuối: 20/07 lúc 18:45)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 11: \texttt{Tuấn Bia 88} \textit{(Đã lưu danh bạ — Tin cuối: 20/07 lúc 18:45)}}\\[0.15cm]
 
 
 \textbf{10/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{17:40} | \textbf{Tuấn Bia 88:} Tối nay chung kết Euro Pháp - Bồ Đào Nha ra quán làm nồi lẩu xem bóng đá không Khang ơi? Có mấy anh em xóm Cảng nữa.
   \item \texttt{18:15} | \textbf{Khang:} Bận rồi, tối phải đi chốt mấy khoản họ.
 
 \end{itemize}
 \textbf{15/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{11:20} | \textbf{Khang:} Trưa nay quán có lòng non với cháo lòng không ông?
   \item \texttt{11:22} | \textbf{Tuấn Bia 88:} Có luôn ông ơi, vừa mổ lòng tươi rói. Ra nhanh kẻo hết.
 
 \end{itemize}
 \textbf{20/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{18:30} | \textbf{Tuấn Bia 88:} Khang ơi, tối nay rảnh ra làm vài cốc bia hơi phố cổ không ông? Lô bia hơi Hà Nội mới về mát lịm.
   \item \texttt{18:45} | \textbf{Khang:} Tối bận đi thu nợ rồi ông. Để bữa khác.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 12: \texttt{Duy Bida 88} \textit{(Đã lưu danh bạ — Tin cuối: 20/07 lúc 11:00)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 12: \texttt{Duy Bida 88} \textit{(Đã lưu danh bạ — Tin cuối: 20/07 lúc 11:00)}}\\[0.15cm]
 
 
 \textbf{05/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{14:30} | \textbf{Duy Bida 88:} Chiều nay rảnh qua CLB làm độ bida lỗ 500k/ván với thằng Nam không anh Khang?
   \item \texttt{14:45} | \textbf{Khang:} Chiều bận, tối 8h tao qua.
 
 \end{itemize}
 \textbf{18/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{19:20} | \textbf{Duy Bida 88:} Bàn số 1 vừa thay nỉ nhập khẩu mới mượt lắm anh ơi, tối rảnh qua test bàn.
 
 \end{itemize}
 \textbf{20/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{11:00} | \textbf{Khang:} Dạo này đang bận mấy vụ gom tiền, để cuối tuần.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 13: \texttt{195} \textit{(Tổng Đài Nạp Tiền — Tin cuối: 20/07 lúc 09:15)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 13: \texttt{195} \textit{(Tổng Đài Nạp Tiền — Tin cuối: 20/07 lúc 09:15)}}\\[0.15cm]
 
 
 \textbf{20/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{09:15} | \textbf{195:} Tai khoan cua Quy khach da duoc cong 500.000d tu the cao nap ngay 20/07/2016. So du hien tai: 584.250d. Thoi han su dung den 30/12/2016.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 14: \texttt{Thắng Sửa Xe} \textit{(Đã lưu danh bạ — Tin cuối: 18/07 lúc 14:00)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 14: \texttt{Thắng Sửa Xe} \textit{(Đã lưu danh bạ — Tin cuối: 18/07 lúc 14:00)}}\\[0.15cm]
 
 
 \textbf{14/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{10:00} | \textbf{Khang:} Con SH của anh dạo này đi nồi kêu rè rè với phanh trước bị bó, chiều anh vứt qua xưởng chú coi hộ.
   \item \texttt{10:15} | \textbf{Thắng Sửa Xe:} Vâng anh cứ vứt qua xưởng để em kiểm tra kỹ cho.
 
 \end{itemize}
 \textbf{16/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{15:30} | \textbf{Thắng Sửa Xe:} Anh Khang ơi tháo ra thấy mòn hết bố ba càng với bi nồi rồi, em thay luôn bộ mới xịn của Honda nhé? Tổng tầm hơn triệu.
 
 \end{itemize}
 \textbf{18/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{09:10} | \textbf{Khang:} Ừ thay luôn đồ ngon cho anh.
   \item \texttt{14:00} | \textbf{Thắng Sửa Xe:} Xe SH của anh thay dầu với làm nồi xong rồi nhé, tổng hết 850k anh nhé. Chiều rảnh ghé lấy.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 15: \texttt{Quân Lô Đề} \textit{(Đã lưu danh bạ — Tin cuối: 17/07 lúc 10:45)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 15: \texttt{Quân Lô Đề} \textit{(Đã lưu danh bạ — Tin cuối: 17/07 lúc 10:45)}}\\[0.15cm]
 
 
 \textbf{16/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{16:45} | \textbf{Khang:} Vào cho tao cặp 68 - 86 mỗi con 500 điểm lô, đề đít 8 năm trăm nghìn.
   \item \texttt{17:00} | \textbf{Quân Lô Đề:} Đã nhận đủ bảng của anh Khang nhé. Chúc anh rực rỡ!
   \item \texttt{18:35} | \textbf{Quân Lô Đề:} Nổ 68 hai nháy anh ơiii!! Tổng ăn 80 củ, trừ gốc còn lời 62 củ. Mai anh lấy tiền mặt hay bắn tài khoản?
@@ -577,80 +641,92 @@ STT & Ngày \& Giờ & Tên Hiển Thị (Trên màn hình) & Loại Cuộc Gọ
 \end{itemize}
 \textbf{17/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{10:20} | \textbf{Khang:} Chuyển thẳng vào thẻ Vietcombank cho tao.
   \item \texttt{10:45} | \textbf{Quân Lô Đề:} Em vừa chuyển rồi đó anh, check tk hộ em nhé.
 
 
 \end{itemize}
 
-\subsection*{ THREAD 16: \texttt{Thím Tư} \textit{(Đã lưu danh bạ — Tin cuối: 15/07 lúc 16:20)}}
+\vspace{0.3cm}\noindent\textbf{\large  THREAD 16: \texttt{Thím Tư} \textit{(Đã lưu danh bạ — Tin cuối: 15/07 lúc 16:20)}}\\[0.15cm]
 
 
 \textbf{02/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{08:30} | \textbf{Thím Tư:} Khang ơi ở quê chú thím vừa gửi buồng chuối ngự với bao gạo nếp lên xe khách Mỹ Đình, trưa cháu ra bến đón lấy nhé.
 
 \end{itemize}
 \textbf{03/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{09:15} | \textbf{Khang:} Cháu bận không đi được đâu, thím bảo phụ xe gọi xe ôm ship tận nhà cho cháu, cháu trả tiền ship.
 
 \end{itemize}
 \textbf{15/07/2016}
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \texttt{16:20} | \textbf{Thím Tư:} Cuối tháng giỗ ông nội ở quê cháu có sắp xếp về được không Khang? Cả họ ai cũng hỏi thăm.
 
 
 \end{itemize}
 
-\subsection*{️ PHẦN IV: ỨNG DỤNG BẢN ĐỒ \& ĐỊA DANH MASTER (MAPS APP)}
+\vspace{0.35cm}\noindent\textbf{\large ️ PHẦN IV: ỨNG DỤNG BẢN ĐỒ \& ĐỊA DANH MASTER (MAPS APP)}\\[0.15cm]
 
 
 >  \textbf{Gốc tọa độ trọng tâm (Origin / Zero Point):} \textbf{Số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội} (\texttt{loc-01}) — Hiện trường chính của vụ án (Nhà riêng nạn nhân Nguyễn Văn Khang). Mọi phép đo khoảng cách và thời gian di chuyển đều lấy mốc từ điểm này.
 
 
 
-\subsection*{1. Bảng Danh Mục Địa Điểm Tích Hợp Trên Maps App}
+\vspace{0.3cm}\noindent\textbf{\large 1. Bảng Danh Mục Địa Điểm Tích Hợp Trên Maps App}\\[0.15cm]
 
 
 
-\begin{tabularx}{\textwidth}{l l l l l l X}
+\vspace{0.2cm}
+\begingroup
+\footnotesize
+\begin{xltabular}{\textwidth}{C{0.6cm} C{1.1cm} L{2.2cm} L{2.8cm} L{2.0cm} C{1.8cm} >{\raggedright\arraybackslash}X}
 \toprule
-STT & Mã ID & Tên Hiển Thị Trên Map & Địa Chỉ Chi Tiết & Danh Mục (Category) & Khoảng Cách Đến 14 Bờ Sông & Thời Gian Di Chuyển (Xe Máy / Đi Bộ / Ô Tô) \\
+\textbf{STT} & \textbf{Mã ID} & \textbf{Tên Hiển Thị Trên Map} & \textbf{Địa Chỉ Chi Tiết} & \textbf{Danh Mục (Category)} & \textbf{Khoảng Cách Đến 14 Bờ Sông} & \textbf{Thời Gian Di Chuyển (Xe Máy / Đi Bộ / Ô Tô)} \\
 \midrule
-\textbf{01} & \texttt{loc-01} & \textbf{Số 14 Đường Bờ Sông} & Số 14, Đường Bờ Sông, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{0 m (Gốc tọa độ)} & \texttt{0 phút} \\
-\textbf{02} & \texttt{loc-02} & \textbf{Số 12 Đường Bờ Sông} & Số 12, Đường Bờ Sông, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{40 m} & \texttt{Đi bộ: ~30 giây} \\
-\textbf{03} & \texttt{loc-03} & \textbf{Số 10 Đường Bờ Sông} & Số 10, Đường Bờ Sông, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{85 m} & \texttt{Đi bộ: ~1 phút} \\
-\textbf{04} & \texttt{loc-04} & \textbf{Bãi đất ven sông} & Khu bãi ven sông cũ, Phường Phân khu Cảng, Hà Nội & \texttt{public} (Khu tự nhiên) & \textbf{250 m} & \texttt{Đi bộ: ~3 phút} \\
-\textbf{05} & \texttt{loc-05} & \textbf{Số 45 Đường Đoàn Kết} & Số 45, Đường Đoàn Kết, Phường Cảng Đông, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{3.2 km} & \texttt{Xe máy: ~7-8 phút}<br>\texttt{Đi bộ: ~38 phút} \\
-\textbf{06} & \texttt{loc-06} & \textbf{Số 8 Ngõ 12 Đường Bờ Kè} & Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu nhà trọ) & \textbf{1.2 km} & \texttt{Xe máy: ~3-4 phút}<br>\texttt{Đi bộ: ~15 phút} \\
-\textbf{07} & \texttt{loc-07} & \textbf{Số 10 Ngõ 12 Đường Bờ Kè} & Số 10, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{1.25 km} & \texttt{Xe máy: ~4 phút}<br>\texttt{Đi bộ: ~16 phút} \\
-\textbf{08} & \texttt{loc-08} & \textbf{Quán Bia 88} & Số 88, Đường Vĩnh Hà, Phường Cảng Đông, Hà Nội & \texttt{food} (Quán bia / Ẩm thực) & \textbf{4.5 km} & \texttt{Xe máy: ~10-12 phút}<br>\texttt{Ô tô: ~12 phút}<br>\texttt{Đi bộ: ~55 phút} \\
-\textbf{09} & \texttt{loc-09} & \textbf{Số 52 Phố Cầu Cảng} & Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Nhà ở \& KD) & \textbf{0.8 km} & \texttt{Xe máy: ~2 phút}<br>\texttt{Đi bộ: ~10 phút} \\
-\textbf{10} & \texttt{loc-10} & \textbf{Chợ Cầu Cảng} & Khu B, Chợ Dân sinh Cầu Cảng, Hà Nội & \texttt{shopping} (Chợ dân sinh) & \textbf{1.1 km} & \texttt{Xe máy: ~3 phút}<br>\texttt{Đi bộ: ~14 phút} \\
-\textbf{11} & \texttt{loc-11} & \textbf{Bến xe khách Hoàng Long} & Bến xe khách liên tỉnh, Phường Phân khu Cảng, Hà Nội & \texttt{transit} (Bến xe liên tỉnh) & \textbf{2.1 km} & \texttt{Xe máy: ~5-6 phút}<br>\texttt{Ô tô: ~6 phút} \\
-\textbf{12} & \texttt{loc-12} & \textbf{ATM Ngân hàng TMCP Việt Á} & Số 104, Đường Chiến Thắng, Phường Phân khu Cảng, Hà Nội & \texttt{finance} (Cây ATM 24/7) & \textbf{1.4 km} & \texttt{Xe máy: ~4 phút}<br>\texttt{Đi bộ: ~17 phút} \\
-\textbf{13} & \texttt{loc-13} & \textbf{Nhà nghỉ Hoàng Gia} & Số 15, Ngõ 45 Đường Đoàn Kết, Hà Nội & \texttt{residential} (Nhà nghỉ lưu trú) & \textbf{3.3 km} & \texttt{Xe máy: ~8 phút}<br>\texttt{Đi bộ: ~40 phút} \\
-\textbf{14} & \texttt{loc-14} & \textbf{Số 18 Phố Cầu Bươu} & Số 18, Phố Cầu Bươu, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Dân cư ngoại thành) & \textbf{9.5 km} & \texttt{Xe máy: ~20-25 phút}<br>\texttt{Ô tô: ~22 phút} \\
-\textbf{15} & \texttt{loc-15} & \textbf{Cty TNHH Vận tải Sông Hồng} & Số 102, Đường Ven Cảng, Phường Phân khu Cảng, Hà Nội & \texttt{public} (Doanh nghiệp vận tải) & \textbf{1.5 km} & \texttt{Xe máy: ~4-5 phút}<br>\texttt{Đi bộ: ~19 phút} \\
-\textbf{16} & \texttt{loc-16} & \textbf{CLB Billiards X-Club} & Số 29, Phố Vọng, Phường Phân khu Cảng, Hà Nội & \texttt{food} (Thể thao giải trí) & \textbf{3.2 km} & \texttt{Xe máy: ~8 phút}<br>\texttt{Ô tô: ~9 phút} \\
-\textbf{17} & \texttt{loc-17} & \textbf{Công an Phường Phân khu Cảng} & Số 02, Phố Cầu Cảng, Phường Phân khu Cảng, Hà Nội & \texttt{public} (Cơ quan nhà nước) & \textbf{0.7 km} & \texttt{Xe máy: ~2 phút}<br>\texttt{Đi bộ: ~9 phút} \\
-\textbf{18} & \texttt{loc-18} & \textbf{Sân bay Quốc tế Nội Bài (T1)} & Nhà ga T1, Cảng HKQT Nội Bài, Hà Nội & \texttt{transit} (Cảng hàng không QT) & \textbf{28.5 km} & \texttt{Ô tô/Taxi: ~35-40 phút}<br>\texttt{Xe máy: ~50 phút} \\
-\textbf{19} & \texttt{loc-19} & \textbf{Nhà nghỉ Đạt Phú} & Số 29, Đường Vĩnh Thái, Phường Cảng Tây, Hà Nội & \texttt{residential} (Nhà nghỉ lưu trú) & \textbf{2.5 km} & \texttt{Xe máy: ~6-7 phút}<br>\texttt{Đi bộ: ~30 phút} \\
-\textbf{20} & \texttt{loc-20} & \textbf{Quán Cơm Chị Ba} & Số 18, Phố Cầu Cảng, Phường Phân khu Cảng, Hà Nội & \texttt{food} (Quán cơm bình dân) & \textbf{0.6 km} & \texttt{Xe máy: ~1-2 phút}<br>\texttt{Đi bộ: ~7 phút} \\
-\textbf{21} & \texttt{loc-21} & \textbf{Tiệm Giặt Là Chị Hạnh} & Số 42, Phố Khâm Thiên, Quận Sông Hồng, Hà Nội & \texttt{shopping} (Dịch vụ giặt là) & \textbf{4.5 km} & \texttt{Xe máy: ~12-14 phút}<br>\texttt{Ô tô: ~15 phút} \\
-\textbf{22} & \texttt{loc-22} & \textbf{Bến phà Phân khu Cảng} & Khu vực Bến phà Cảng Sông Hồng, Hà Nội & \texttt{transit} (Bến phà bến đò) & \textbf{1.8 km} & \texttt{Xe máy: ~5 phút}<br>\texttt{Đi bộ: ~22 phút} \\
-\textbf{23} & \texttt{loc-23} & \textbf{Điểm hẹn giao dịch số X đường ABC} & Kho bãi Ven Cảng số 68, Phân khu Cảng, Hà Nội & \texttt{public} (Khu vắng vẻ) & \textbf{1.6 km} & \texttt{Xe máy: ~4-5 phút} \\
+\endfirsthead
+\toprule
+\textbf{STT} & \textbf{Mã ID} & \textbf{Tên Hiển Thị Trên Map} & \textbf{Địa Chỉ Chi Tiết} & \textbf{Danh Mục (Category)} & \textbf{Khoảng Cách Đến 14 Bờ Sông} & \textbf{Thời Gian Di Chuyển (Xe Máy / Đi Bộ / Ô Tô)} \\
+\midrule
+\endhead
 \bottomrule
-\end{tabularx}
+\endfoot
+\textbf{01} & \texttt{loc-01} & \textbf{Số 14 Đường Bờ Sông} & Số 14, Đường Bờ Sông, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{0 m (Gốc tọa độ)} & \texttt{0 phút} \\ \addlinespace[4pt]
+\textbf{02} & \texttt{loc-02} & \textbf{Số 12 Đường Bờ Sông} & Số 12, Đường Bờ Sông, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{40 m} & \texttt{Đi bộ: ~30 giây} \\ \addlinespace[4pt]
+\textbf{03} & \texttt{loc-03} & \textbf{Số 10 Đường Bờ Sông} & Số 10, Đường Bờ Sông, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{85 m} & \texttt{Đi bộ: ~1 phút} \\ \addlinespace[4pt]
+\textbf{04} & \texttt{loc-04} & \textbf{Bãi đất ven sông} & Khu bãi ven sông cũ, Phường Phân khu Cảng, Hà Nội & \texttt{public} (Khu tự nhiên) & \textbf{250 m} & \texttt{Đi bộ: ~3 phút} \\ \addlinespace[4pt]
+\textbf{05} & \texttt{loc-05} & \textbf{Số 45 Đường Đoàn Kết} & Số 45, Đường Đoàn Kết, Phường Cảng Đông, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{3.2 km} & \texttt{Xe máy: ~7-8 phút}\newline \texttt{Đi bộ: ~38 phút} \\ \addlinespace[4pt]
+\textbf{06} & \texttt{loc-06} & \textbf{Số 8 Ngõ 12 Đường Bờ Kè} & Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu nhà trọ) & \textbf{1.2 km} & \texttt{Xe máy: ~3-4 phút}\newline \texttt{Đi bộ: ~15 phút} \\ \addlinespace[4pt]
+\textbf{07} & \texttt{loc-07} & \textbf{Số 10 Ngõ 12 Đường Bờ Kè} & Số 10, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Khu dân cư) & \textbf{1.25 km} & \texttt{Xe máy: ~4 phút}\newline \texttt{Đi bộ: ~16 phút} \\ \addlinespace[4pt]
+\textbf{08} & \texttt{loc-08} & \textbf{Quán Bia 88} & Số 88, Đường Vĩnh Hà, Phường Cảng Đông, Hà Nội & \texttt{food} (Quán bia / Ẩm thực) & \textbf{4.5 km} & \texttt{Xe máy: ~10-12 phút}\newline \texttt{Ô tô: ~12 phút}\newline \texttt{Đi bộ: ~55 phút} \\ \addlinespace[4pt]
+\textbf{09} & \texttt{loc-09} & \textbf{Số 52 Phố Cầu Cảng} & Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Nhà ở \& KD) & \textbf{0.8 km} & \texttt{Xe máy: ~2 phút}\newline \texttt{Đi bộ: ~10 phút} \\ \addlinespace[4pt]
+\textbf{10} & \texttt{loc-10} & \textbf{Chợ Cầu Cảng} & Khu B, Chợ Dân sinh Cầu Cảng, Hà Nội & \texttt{shopping} (Chợ dân sinh) & \textbf{1.1 km} & \texttt{Xe máy: ~3 phút}\newline \texttt{Đi bộ: ~14 phút} \\ \addlinespace[4pt]
+\textbf{11} & \texttt{loc-11} & \textbf{Bến xe khách Hoàng Long} & Bến xe khách liên tỉnh, Phường Phân khu Cảng, Hà Nội & \texttt{transit} (Bến xe liên tỉnh) & \textbf{2.1 km} & \texttt{Xe máy: ~5-6 phút}\newline \texttt{Ô tô: ~6 phút} \\ \addlinespace[4pt]
+\textbf{12} & \texttt{loc-12} & \textbf{ATM Ngân hàng TMCP Việt Á} & Số 104, Đường Chiến Thắng, Phường Phân khu Cảng, Hà Nội & \texttt{finance} (Cây ATM 24/7) & \textbf{1.4 km} & \texttt{Xe máy: ~4 phút}\newline \texttt{Đi bộ: ~17 phút} \\ \addlinespace[4pt]
+\textbf{13} & \texttt{loc-13} & \textbf{Nhà nghỉ Hoàng Gia} & Số 15, Ngõ 45 Đường Đoàn Kết, Hà Nội & \texttt{residential} (Nhà nghỉ lưu trú) & \textbf{3.3 km} & \texttt{Xe máy: ~8 phút}\newline \texttt{Đi bộ: ~40 phút} \\ \addlinespace[4pt]
+\textbf{14} & \texttt{loc-14} & \textbf{Số 18 Phố Cầu Bươu} & Số 18, Phố Cầu Bươu, Phường Phân khu Cảng, Hà Nội & \texttt{residential} (Dân cư ngoại thành) & \textbf{9.5 km} & \texttt{Xe máy: ~20-25 phút}\newline \texttt{Ô tô: ~22 phút} \\ \addlinespace[4pt]
+\textbf{15} & \texttt{loc-15} & \textbf{Cty TNHH Vận tải Sông Hồng} & Số 102, Đường Ven Cảng, Phường Phân khu Cảng, Hà Nội & \texttt{public} (Doanh nghiệp vận tải) & \textbf{1.5 km} & \texttt{Xe máy: ~4-5 phút}\newline \texttt{Đi bộ: ~19 phút} \\ \addlinespace[4pt]
+\textbf{16} & \texttt{loc-16} & \textbf{CLB Billiards X-Club} & Số 29, Phố Vọng, Phường Phân khu Cảng, Hà Nội & \texttt{food} (Thể thao giải trí) & \textbf{3.2 km} & \texttt{Xe máy: ~8 phút}\newline \texttt{Ô tô: ~9 phút} \\ \addlinespace[4pt]
+\textbf{17} & \texttt{loc-17} & \textbf{Công an Phường Phân khu Cảng} & Số 02, Phố Cầu Cảng, Phường Phân khu Cảng, Hà Nội & \texttt{public} (Cơ quan nhà nước) & \textbf{0.7 km} & \texttt{Xe máy: ~2 phút}\newline \texttt{Đi bộ: ~9 phút} \\ \addlinespace[4pt]
+\textbf{18} & \texttt{loc-18} & \textbf{Sân bay Quốc tế Nội Bài (T1)} & Nhà ga T1, Cảng HKQT Nội Bài, Hà Nội & \texttt{transit} (Cảng hàng không QT) & \textbf{28.5 km} & \texttt{Ô tô/Taxi: ~35-40 phút}\newline \texttt{Xe máy: ~50 phút} \\ \addlinespace[4pt]
+\textbf{19} & \texttt{loc-19} & \textbf{Nhà nghỉ Đạt Phú} & Số 29, Đường Vĩnh Thái, Phường Cảng Tây, Hà Nội & \texttt{residential} (Nhà nghỉ lưu trú) & \textbf{2.5 km} & \texttt{Xe máy: ~6-7 phút}\newline \texttt{Đi bộ: ~30 phút} \\ \addlinespace[4pt]
+\textbf{20} & \texttt{loc-20} & \textbf{Quán Cơm Chị Ba} & Số 18, Phố Cầu Cảng, Phường Phân khu Cảng, Hà Nội & \texttt{food} (Quán cơm bình dân) & \textbf{0.6 km} & \texttt{Xe máy: ~1-2 phút}\newline \texttt{Đi bộ: ~7 phút} \\ \addlinespace[4pt]
+\textbf{21} & \texttt{loc-21} & \textbf{Tiệm Giặt Là Chị Hạnh} & Số 42, Phố Khâm Thiên, Quận Sông Hồng, Hà Nội & \texttt{shopping} (Dịch vụ giặt là) & \textbf{4.5 km} & \texttt{Xe máy: ~12-14 phút}\newline \texttt{Ô tô: ~15 phút} \\ \addlinespace[4pt]
+\textbf{22} & \texttt{loc-22} & \textbf{Bến phà Phân khu Cảng} & Khu vực Bến phà Cảng Sông Hồng, Hà Nội & \texttt{transit} (Bến phà bến đò) & \textbf{1.8 km} & \texttt{Xe máy: ~5 phút}\newline \texttt{Đi bộ: ~22 phút} \\ \addlinespace[4pt]
+\textbf{23} & \texttt{loc-23} & \textbf{Điểm hẹn giao dịch số X đường ABC} & Kho bãi Ven Cảng số 68, Phân khu Cảng, Hà Nội & \texttt{public} (Khu vắng vẻ) & \textbf{1.6 km} & \texttt{Xe máy: ~4-5 phút} \\ \addlinespace[4pt]
+\end{xltabular}
+\endgroup
+
+\vspace{0.2cm}
 
 
 
-\subsection*{2. Ma Trận Đối Chiếu Ngoại Phạm \& Lộ Trình Di Chuyển}
+\vspace{0.3cm}\noindent\textbf{\large 2. Ma Trận Đối Chiếu Ngoại Phạm \& Lộ Trình Di Chuyển}\\[0.15cm]
 
 
 
@@ -668,7 +744,7 @@ STT & Mã ID & Tên Hiển Thị Trên Map & Địa Chỉ Chi Tiết & Danh Mụ
 \end{quote}
 
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{Trần Thị Hà (Thủ phạm):} Cùng thuộc \textbf{Phường Phân khu Cảng}, từ phòng trọ ngõ 12 Bờ Kè (\texttt{loc-06}) đến nhà Khang (\texttt{loc-01}) chỉ \textbf{1.2 km} (xe máy 3–4 phút). Hà đi từ 19:15, phục trước ngõ 14 từ \textbf{19:25}, gửi voicemail lọt còi tàu lúc \textbf{20:32} ngay trước cổng $\rightarrow$ Đột nhập gây án lúc ~21:00 và tẩu thoát lúc 21:08 hoàn toàn phù hợp.
   \item \textbf{Lê Quang Vũ (Nghi phạm 2):} Rời cổng nhà Khang lúc 19:30, đi xe ôm \textbf{4.5 km} ra Quán Bia 88 (\texttt{loc-08} — Đường Vĩnh Hà, Phường Cảng Đông) mất 12–15 phút, đến nơi lúc \textbf{19:45 – 19:49} và thanh toán chuyển khoản lúc 20:45 $\rightarrow$ Minh oan ngoại phạm.
   \item \textbf{Nguyễn Ngọc Mai (Nghi phạm 1):} Rời nhà Khang lúc 19:00, đi xe máy \textbf{3.2 km} về nhà tại Số 45 Đường Đoàn Kết, Phường Cảng Đông mất ~8 phút, về đến nhà trước 19:15 tắm rửa và xem tivi đến 20:10 thì đứt cáp quang.
@@ -677,10 +753,10 @@ STT & Mã ID & Tên Hiển Thị Trên Map & Địa Chỉ Chi Tiết & Danh Mụ
 
 \end{itemize}
 
-\subsection*{ PHẦN V: TRẠNG THÁI HỆ THỐNG \& CÁC ỨNG DỤNG KHÁC}
+\vspace{0.35cm}\noindent\textbf{\large  PHẦN V: TRẠNG THÁI HỆ THỐNG \& CÁC ỨNG DỤNG KHÁC}\\[0.15cm]
 
 
-\begin{itemize}[leftmargin=1.2cm, itemsep=2pt]
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt, parsep=0pt]
   \item \textbf{ Cột sóng \& Mạng (Status Bar):} \textbf{Không có dịch vụ (\texttt{No Service} — 0 vạch sóng)}. Dữ liệu 3G \& Wi-Fi: \textbf{Tắt / Mất kết nối}.
   \item \textbf{ Trình duyệt Safari (Browser App):} Lịch sử duyệt web \& Bookmarks: \textbf{TRỐNG (Empty)}. Khi mở báo lỗi offline: \textit{"Safari không thể mở trang vì không có kết nối Internet"}.
   \item \textbf{ Ứng dụng Ghi chú (Notes App):} Dữ liệu: \textbf{TRỐNG (Empty — Không có ghi chú nào)}.
