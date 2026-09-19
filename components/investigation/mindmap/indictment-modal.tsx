@@ -55,7 +55,14 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
     return 'ha'
   }
   return false
-}export function IndictmentModal({
+}function checkIndictmentEvidenceMatch(val: string, targetNumbers: string[]): boolean {
+  if (isAdminBypassCode(val)) return true
+  const nums = val.match(/\d+/g)
+  if (!nums || nums.length === 0) return false
+  return targetNumbers.some((t) => nums.includes(t))
+}
+
+export function IndictmentModal({
   isOpen,
   onClose,
   onSubmitIndictment,
@@ -86,7 +93,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
 
     const culprit = isAdmin000 ? 'ha' : isCulpritValid(suspectName)
     if (!culprit || (culprit !== 'ha' && !isAdmin000)) {
-      setErrorMsg('Kết luận chưa chính xác. Vui lòng thực hiện lại công tác điều tra.')
+      setErrorMsg('Kết luận chưa chính xác. Vui lòng đối chiếu lại toàn bộ chứng cứ.')
       detectiveAudio.playGlassSound()
       return
     }
@@ -97,14 +104,27 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
       return
     }
 
+    // Strict validation of 2.1 (Motive: 53, 49), 2.2 (Opportunity/Alibi: 52, 45), 2.3 (Physical traces: 50, 51, 4)
+    if (!isAdmin000) {
+      if (!checkIndictmentEvidenceMatch(cluesMotiveInput, ['53', '49', '48'])) {
+        setErrorMsg('Mã chứng cứ mục 2.1 (Động cơ gây án) chưa chính xác!')
+        detectiveAudio.playGlassSound()
+        return
+      }
+      if (!checkIndictmentEvidenceMatch(cluesOpportunityInput, ['52', '45', '1', '01', '2', '02'])) {
+        setErrorMsg('Mã chứng cứ mục 2.2 (Cơ hội thực tế / Bác bỏ ngoại phạm) chưa chính xác!')
+        detectiveAudio.playGlassSound()
+        return
+      }
+      if (!checkIndictmentEvidenceMatch(cluesPhysicalTracesInput, ['50', '51', '4', '04'])) {
+        setErrorMsg('Mã chứng cứ mục 2.3 (Dấu vết vụ án) chưa chính xác!')
+        detectiveAudio.playGlassSound()
+        return
+      }
+    }
+
     const combinedClueInputs = [cluesMotiveInput, cluesOpportunityInput, cluesPhysicalTracesInput]
       .filter((s) => s.trim().length > 0)
-
-    if (combinedClueInputs.length === 0 && !isAdmin000) {
-      setErrorMsg('Vui lòng nhập ít nhất 1 mã/số chứng cứ chứng minh hành vi phạm tội!')
-      detectiveAudio.playGlassSound()
-      return
-    }
 
     detectiveAudio.playStampSound()
     try {
@@ -257,7 +277,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
               {/* 2.1 */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                  2.1. Chứng minh bị can có động cơ gây án:
+                  2.1. Chứng minh bị can có động cơ gây án, thông qua:
                 </label>
                 <input
                   type="text"
@@ -266,7 +286,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
                     setCluesMotiveInput(e.target.value)
                     if (errorMsg) setErrorMsg('')
                   }}
-                  placeholder="Nhập mã chứng cứ..."
+                  placeholder="Nhập mã chứng cứ (ví dụ: 1, 2, 3)..."
                   className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>
@@ -283,7 +303,7 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
                     setCluesOpportunityInput(e.target.value)
                     if (errorMsg) setErrorMsg('')
                   }}
-                  placeholder="Nhập mã chứng cứ..."
+                  placeholder="Nhập mã chứng cứ (ví dụ: 1, 2, 3)..."
                   className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>
@@ -300,24 +320,17 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
                     setCluesPhysicalTracesInput(e.target.value)
                     if (errorMsg) setErrorMsg('')
                   }}
-                  placeholder="Nhập mã chứng cứ..."
+                  placeholder="Nhập mã chứng cứ (ví dụ: 1, 2, 3)..."
                   className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>
             </div>
 
             {/* FOOTER / CTA */}
-            <div className="pt-3 flex items-center justify-between gap-3 border-t-2 border-[#2b1f14]/15">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
-              >
-                HỦY
-              </button>
+            <div className="pt-3 flex items-center justify-end border-t-2 border-[#2b1f14]/15">
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-red-800 hover:bg-red-900 text-[#fff5f5] font-mono font-black text-xs tracking-wider rounded-none transition-all flex items-center gap-2 shadow-lg active:scale-98 cursor-pointer uppercase border-2 border-[#450a0a]"
+                className="w-full sm:w-auto px-6 py-2.5 bg-red-800 hover:bg-red-900 text-[#fff5f5] font-mono font-black text-xs tracking-wider rounded-none transition-all flex items-center justify-center gap-2 shadow-lg active:scale-98 cursor-pointer uppercase border-2 border-[#450a0a]"
               >
                 <Gavel className="size-4" />
                 <span>ĐỀ NGHỊ TRUY TỐ</span>

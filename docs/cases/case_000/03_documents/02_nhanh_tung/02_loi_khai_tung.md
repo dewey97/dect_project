@@ -26,7 +26,7 @@ Vào hồi 19 giờ 30 phút, ngày 25 tháng 07 năm 2016, tại Phòng Cảnh 
 * **Nơi ĐKHKTT:** Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội.
 * **Chỗ ở hiện nay:** Phòng trọ công nhân số 18, Phố Cầu Bươu, TP. Hà Nội.
 * **Nghề nghiệp:** Lao động tự do (Thợ nề).
-* **Số điện thoại:** `0984.180.357`.
+* **Số điện thoại:** `0912.331.888`.
 
 ---
 

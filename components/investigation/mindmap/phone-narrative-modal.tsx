@@ -9,11 +9,13 @@ import { detectiveAudio } from '@/lib/investigation-audio'
 interface PhoneNarrativeModalProps {
   isOpen: boolean
   onClose: () => void
+  onTakeTestimony?: () => void
 }
 
 export function PhoneNarrativeModal({
   isOpen,
-  onClose
+  onClose,
+  onTakeTestimony
 }: PhoneNarrativeModalProps) {
   const [isNarrativeComplete, setIsNarrativeComplete] = useState(false)
 
@@ -59,6 +61,9 @@ export function PhoneNarrativeModal({
               onClick={() => {
                 detectiveAudio.playStampSound()
                 onClose()
+                if (onTakeTestimony) {
+                  onTakeTestimony()
+                }
               }}
               className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] animate-fade-in"
             >

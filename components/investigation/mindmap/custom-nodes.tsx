@@ -89,7 +89,7 @@ export const DotNode = memo(({ data }: NodeProps) => {
           )}
         >
           {nodeData.label}
-          {isLocked && ' 🔒'}
+          {isLocked && ' (Chưa mở)'}
         </span>
       </div>
     </div>

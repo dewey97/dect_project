@@ -208,7 +208,7 @@ export const conversations000: Record<string, Conversation[]> = {
           timestamp: '24/07 • 20:38',
           attachment: {
             type: 'audio',
-            duration: '0:06'
+            duration: '0:04'
           }
         },
         {
@@ -648,13 +648,14 @@ export const conversations000: Record<string, Conversation[]> = {
         // 21/07/2016
         {
           id: 'm9-7',
-          sender: 'Tuấn Béo Xưởng Mộc',
-          role: 'received',
+          sender: 'Khang',
+          role: 'sent',
           text: '',
           timestamp: '21/07 • 10:20',
+          status: 'Đã gửi • 10:20',
           attachment: {
             type: 'audio',
-            duration: '0:12'
+            duration: '0:06'
           }
         },
         {

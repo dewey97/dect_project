@@ -6,7 +6,7 @@ export const checkpoints000: Checkpoint[] = [
     caseId: 'case-000',
     title: 'Truy Tìm Danh Tính 3 Số Điện Thoại Ẩn Danh',
     question: 'Hãy đọc các tài liệu Hồ sơ (Sổ nợ 10, Bảng tin 11) và tra cứu Điện thoại nạn nhân Khang (Call Log dev-00) để xác định danh tính 3 nghi phạm liên quan đến 3 SĐT lạ gọi tới trong đêm 24/07:',
-    hint: 'Mở danh mục Hồ sơ & Điện thoại nạn nhân Khang để đối chiếu: 0988.200.991 (nợ 300M) ➔ Lê Quang Vũ; 0912.331.888 (nợ 80M) ➔ Nguyễn Thanh Tùng; 0984.180.357 (tin rao đục phá bê tông) ➔ Đạt Gà Chợ Cảng.',
+    hint: 'Mở danh mục Hồ sơ & Điện thoại nạn nhân Khang để đối chiếu: 0988.200.991 (nợ 300M) ➔ Lê Quang Vũ; 0912.331.888 (tin rao đục phá bê tông) ➔ Nguyễn Thanh Tùng; 0984.180.357 (nợ 80M) ➔ Đạt Gà Chợ Cảng.',
     hintsList: [
       'Gợi ý 1: Đối chiếu với Sổ tay ghi nợ của nạn nhân.',
       'Gợi ý 2: Đối chiếu với thông tin trên Bảng tin tổ dân phố.',
@@ -33,7 +33,7 @@ export const checkpoints000: Checkpoint[] = [
           id: 'phone_3',
           label: 'SĐT 0984.180.357:',
           placeholder: 'Nhập tên nghi phạm (VD: Đạt Gà Chợ Cảng)...',
-          validAnswers: ['Đạt Gà Chợ Cảng', 'Đạt Gà', 'Đạt', 'Dat Ga Cho Cang', 'Dat Ga', 'Dat', '00', '000', '0', 'admin']
+          validAnswers: ['Đạt Gà Chợ Cảng', 'Đạt Gà', 'Đạt', 'Trần Văn Đạt', 'Tran Van Dat', 'Dat Ga Cho Cang', 'Dat Ga', 'Dat', '00', '000', '0', 'admin']
         }
       ]
     }

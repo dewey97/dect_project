@@ -1,71 +1,3 @@
-export const PHONE_LOOKUP_EVIDENCE_IDS = [
-  'sms_dev00',
-  'doc_07b_loi_khai_vu',
-  'doc_14_loi_khai_tung',
-  'p6_anh_vu',
-  'p10_app_xe',
-  'p4_anh_1996',
-  'p4_van_tay',
-  'p5_manh_bao',
-]
-
-export const DOCUMENT_EVIDENCE_MAP: Record<string, { id: string; label: string; code: string }> = {
-  '0': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
-  '00': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
-  '000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
-  '0000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
-  '00000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
-  'doc_000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
-  'doc_0000': { id: 'doc_000', label: 'Tài liệu số 000 (Admin Master Key)', code: '000' },
-  '1': { id: 'doc_01_phieu_tn', label: 'Phiếu tiếp nhận tin báo từ bà Lụa (06:45)', code: '01' },
-  '01': { id: 'doc_01_phieu_tn', label: 'Phiếu tiếp nhận tin báo từ bà Lụa (06:45)', code: '01' },
-  '2': { id: 'doc_02_hien_truong', label: 'Biên bản khám nghiệm hiện trường', code: '02' },
-  '02': { id: 'doc_02_hien_truong', label: 'Biên bản khám nghiệm hiện trường', code: '02' },
-  '3': { id: 'doc_03_so_do', label: 'Ảnh chụp hiện trường', code: '03' },
-  '03': { id: 'doc_03_so_do', label: 'Ảnh chụp hiện trường', code: '03' },
-  '4': { id: 'doc_04_tu_thi', label: 'Báo cáo khám nghiệm tử thi sơ bộ', code: '04' },
-  '04': { id: 'doc_04_tu_thi', label: 'Báo cáo khám nghiệm tử thi sơ bộ', code: '04' },
-  '5': { id: 'doc_05_kham_nghiem', label: 'Biên bản khám nghiệm hiện trường vụ án', code: '05' },
-  '05': { id: 'doc_05_kham_nghiem', label: 'Biên bản khám nghiệm hiện trường vụ án', code: '05' },
-  '6': { id: 'doc_06_loi_khai_lua', label: 'Biên bản lấy lời khai bà Lụa', code: '06' },
-  '06': { id: 'doc_06_loi_khai_lua', label: 'Biên bản lấy lời khai bà Lụa', code: '06' },
-  '7': { id: 'doc_07a_loi_khai_mai', label: 'Biên bản lấy lời khai Nguyễn Ngọc Mai', code: '07a' },
-  '07': { id: 'doc_07a_loi_khai_mai', label: 'Biên bản lấy lời khai Nguyễn Ngọc Mai', code: '07a' },
-  '7a': { id: 'doc_07a_loi_khai_mai', label: 'Biên bản lấy lời khai Nguyễn Ngọc Mai', code: '07a' },
-  '07a': { id: 'doc_07a_loi_khai_mai', label: 'Biên bản lấy lời khai Nguyễn Ngọc Mai', code: '07a' },
-  '7b': { id: 'doc_07b_loi_khai_vu', label: 'Biên bản lấy lời khai Lê Quang Vũ', code: '07b' },
-  '07b': { id: 'doc_07b_loi_khai_vu', label: 'Biên bản lấy lời khai Lê Quang Vũ', code: '07b' },
-  '7c': { id: 'doc_14_loi_khai_tung', label: 'Biên bản lấy lời khai Nguyễn Thanh Tùng', code: '14' },
-  '07c': { id: 'doc_14_loi_khai_tung', label: 'Biên bản lấy lời khai Nguyễn Thanh Tùng', code: '14' },
-  '7d': { id: 'doc_07d_loi_khai_ha', label: 'Biên bản lấy lời khai Trần Thị Hà', code: '07d' },
-  '07d': { id: 'doc_07d_loi_khai_ha', label: 'Biên bản lấy lời khai Trần Thị Hà', code: '07d' },
-  '8': { id: 'doc_07b_loi_khai_vu', label: 'Biên bản lấy lời khai Lê Quang Vũ', code: '07b' },
-  '08': { id: 'doc_07b_loi_khai_vu', label: 'Biên bản lấy lời khai Lê Quang Vũ', code: '07b' },
-  '9': { id: 'doc_07d_loi_khai_ha', label: 'Biên bản lấy lời khai Trần Thị Hà', code: '07d' },
-  '09': { id: 'doc_07d_loi_khai_ha', label: 'Biên bản lấy lời khai Trần Thị Hà', code: '07d' },
-  '10': { id: 'doc_10_so_no', label: 'Sổ tay ghi nợ của Khang', code: '10' },
-  '11': { id: 'sms_dev00', label: 'Tin nhắn trên điện thoại Khang', code: '11' },
-  '12': { id: 'p10_app_xe', label: 'Ảnh chụp màn hình ứng dụng đặt xe', code: '12' },
-  '13': { id: 'doc_13_don_dat', label: 'Đơn khởi kiện tranh chấp đất đai', code: '13' },
-  '14': { id: 'doc_14_loi_khai_tung', label: 'Biên bản lấy lời khai Nguyễn Thanh Tùng', code: '14' },
-  '15': { id: 'p3_hung_khi', label: 'Mảnh vỡ từ ấm trà (hung khí)', code: '15' },
-  '16': { id: 'p4_anh_1996', label: 'Khung ảnh vỡ', code: '16' },
-  '17': { id: 'p4_van_tay', label: 'Dấu vân tay trên khung bức ảnh vỡ', code: '17' },
-  '18': { id: 'p5_manh_bao', label: 'Các mảnh báo cũ', code: '18' },
-  '19': { id: 'p6_anh_vu', label: 'Ảnh chân dung Lê Quang Vũ', code: '19' },
-  '20': { id: 'doc_voice_coi_tau', label: 'Voice tin nhắn thoại của Hà (20:32)', code: '20' },
-  '21': { id: 'doc_lich_vtv3', label: 'Lịch phát sóng VTV3 tối Thứ Sáu', code: '21' },
-  '22': { id: 'ev_hair_dna', label: 'Lọn tóc mai dính máu thu tại phòng Hà', code: '22' },
-  '23': { id: 'ev_ao_gio_xoan', label: 'Áo gió xám đen dính phấn hoa xoan', code: '23' },
-  'p3': { id: 'p3_hung_khi', label: 'Mảnh vỡ từ ấm trà (hung khí)', code: '15' },
-  'p4': { id: 'p4_van_tay', label: 'Dấu vân tay trên khung bức ảnh vỡ', code: '17' },
-  'p5': { id: 'p5_manh_bao', label: 'Các mảnh báo cũ', code: '18' },
-  'p6': { id: 'p6_anh_vu', label: 'Ảnh chân dung Lê Quang Vũ', code: '19' },
-  'p10': { id: 'p10_app_xe', label: 'Ảnh chụp màn hình ứng dụng đặt xe', code: '12' },
-  'dev00': { id: 'sms_dev00', label: 'Tin nhắn trên điện thoại Khang', code: '11' },
-  'dev-00': { id: 'sms_dev00', label: 'Tin nhắn trên điện thoại Khang', code: '11' },
-}
-
 import {
   isAdminBypassCode,
   hasAdminBypassInArray,
@@ -80,60 +12,139 @@ export {
   ADMIN_MASTER_EVIDENCE_ID,
 }
 
+export const PHONE_LOOKUP_EVIDENCE_IDS = [
+  'sms_phone_0988200991',
+  'sms_phone_0912331888',
+  'sms_phone_0984180357',
+]
+
+/**
+ * Checks if a clue identifier matches any of the allowed target codes/numbers.
+ * Normalizes integers ('8' === '08' === 'doc_08') and phone digits ('0988.200.991' === 'sms_phone_0988200991').
+ */
+export function isEvidenceMatching(clueId: string, targetCodes: string[]): boolean {
+  if (!clueId) return false
+  if (isAdminBypassCode(clueId)) return true
+
+  const cleanClue = clueId
+    .toLowerCase()
+    .replace(/^(doc_|custom_code_|ev_)/i, '')
+    .replace(/^#/, '')
+    .trim()
+
+  const clueDigits = clueId.replace(/\D/g, '')
+  const clueNum = parseInt(cleanClue, 10)
+  const isClueNumeric = !isNaN(clueNum) && cleanClue === String(clueNum).padStart(cleanClue.length, '0')
+
+  return targetCodes.some((target) => {
+    if (isAdminBypassCode(target)) return true
+
+    const cleanTarget = target
+      .toLowerCase()
+      .replace(/^(doc_|custom_code_|ev_)/i, '')
+      .replace(/^#/, '')
+      .trim()
+
+    // 1. Exact string match (e.g. "45" === "45" or "07b" === "07b")
+    if (cleanClue === cleanTarget) return true
+
+    // 2. Numeric match (e.g. "8" === "08")
+    if (isClueNumeric) {
+      const targetNum = parseInt(cleanTarget, 10)
+      if (!isNaN(targetNum) && clueNum === targetNum) return true
+    }
+
+    // 3. Exact phone digits match (e.g. "0988200991" === "0988200991")
+    const targetDigits = target.replace(/\D/g, '')
+    if (targetDigits.length >= 9 && clueDigits === targetDigits) {
+      if (target.toLowerCase().includes('voice') || target.toLowerCase().includes('thoai')) {
+        return clueId.toLowerCase().includes('voice')
+      }
+      return true
+    }
+
+    return false
+  })
+}
+
+/**
+ * Validates motive evidence selection based on the master answer table.
+ */
 export function checkMotiveValid(characterId: string, selectedIds: string[]): boolean {
   if (!characterId || selectedIds.length === 0) return false
-
   if (hasAdminBypassInArray(selectedIds)) return true
 
   if (characterId === 'vu') {
-    // Vũ: Sổ tay ghi nợ (13 / doc_13 / doc_10 / 10 / doc_10_so_no / doc_13_don_dat) HOẶC Tin nhắn SĐT 0988.200.991
-    const hasSoNo = selectedIds.some((id) => ['doc_10_so_no', 'doc_13_don_dat', 'doc_10', 'doc_13', '10', '13'].includes(id))
-    const hasSms = selectedIds.some((id) => ['sms_dev00', 'p6_anh_vu', '11', '19'].includes(id) || id.includes('0988200991') || id.includes('0988.200.991') || (id.startsWith('sms_phone_') && id.includes('0988')))
-    return hasSoNo || hasSms
+    // Vũ: 13 (Sổ ghi nợ) hoặc SĐT 0988.200.991 (Optional: 10)
+    const validCodes = ['13', '10', '0988.200.991', '0988200991', 'sms_phone_0988200991']
+    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
   }
 
   if (characterId === 'tung') {
-    // Tùng: Các mảnh báo cũ (18 / doc_18 / p5_manh_bao), Khung ảnh 1996 (40 / doc_40 / p4_anh_1996 / 16), hoặc Tin nhắn SĐT 0912.331.888
-    const hasManhBao = selectedIds.some((id) => ['p5_manh_bao', 'p4_anh_1996', 'doc_18', 'doc_40', '18', '16', '40'].includes(id))
-    const hasSms = selectedIds.some((id) => id.includes('0912331888') || id.includes('0912.331.888') || (id.startsWith('sms_phone_') && id.includes('0912')))
-    return hasManhBao || hasSms
+    // Tùng: 18, 40 hoặc SĐT 0912.331.888
+    const validCodes = ['18', '40', '0912.331.888', '0912331888', 'sms_phone_0912331888']
+    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
   }
 
   if (characterId === 'ha') {
-    // Hà: Tin nhắn SĐT Vy (0978.552.109 / doc_53 / doc_48 / 53 / 48) hoặc SĐT Hà (0984.112.568)
-    const hasSms = selectedIds.some((id) => ['doc_53', 'doc_48', '53', '48'].includes(id) || id.includes('0978552109') || id.includes('0978.552.109') || id.includes('0984112568') || id.includes('0984.112.568') || (id.startsWith('sms_phone_') && (id.includes('0978') || id.includes('0984'))))
-    return hasSms
+    // Hà: SĐT 0978.552.109 (Optional: 0984.112.568, 53, 48)
+    const validCodes = [
+      '0978.552.109',
+      '0978552109',
+      'sms_phone_0978552109',
+      '0984.112.568',
+      '0984112568',
+      'sms_phone_0984112568',
+      '53',
+      '48',
+    ]
+    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
   }
 
   return false
 }
 
+/**
+ * Validates alibi evidence selection based on the master answer table.
+ */
 export function checkAlibiValid(characterId: string, selectedIds: string[]): boolean {
   if (!characterId || selectedIds.length === 0) return false
-
   if (hasAdminBypassInArray(selectedIds)) return true
 
   if (characterId === 'vu') {
-    // Vũ: 10, 42 (App xe p10_app_xe / doc_42 / doc_10 / 12 / 42 / 10), Optional: 6, 8 (doc_06_loi_khai_lua / doc_07b_loi_khai_vu / 06 / 08 / 6 / 8)
-    const hasAppOrTime = selectedIds.some((id) => ['p10_app_xe', 'doc_06_loi_khai_lua', 'doc_07b_loi_khai_vu', 'doc_10', 'doc_42', 'doc_06', 'doc_08', 'doc_8', 'doc_6', '12', '06', '07b', '08', '10', '42', '6', '8'].includes(id))
-    return hasAppOrTime
+    // Vũ: 10, 42 (Optional: 6, 8)
+    const validCodes = ['10', '42', '6', '8']
+    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
   }
 
   if (characterId === 'tung') {
-    // Tùng: 20, 41 (doc_20 / doc_41 / p4_van_tay / doc_14_loi_khai_tung / 17 / 14 / 20 / 41)
-    const hasVanTay = selectedIds.some((id) => ['p4_van_tay', 'doc_14_loi_khai_tung', 'doc_20', 'doc_41', 'doc_14', 'doc_17', '17', '14', '20', '41'].includes(id))
-    return hasVanTay
+    // Tùng: 20, 41
+    const validCodes = ['20', '41']
+    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
   }
 
   if (characterId === 'ha') {
-    // Hà: Voice 0984.112.568, 12, 44 (doc_12 / doc_44 / doc_07d_loi_khai_ha / doc_voice_coi_tau / doc_lich_vtv3 / 07d / 20 / 21 / 12 / 44), Optional: 9, 7, 45 (doc_09 / doc_07 / doc_45 / 9 / 7 / 45)
-    const hasVoiceOrAlibi = selectedIds.some((id) => ['doc_07d_loi_khai_ha', 'doc_voice_coi_tau', 'doc_lich_vtv3', 'doc_12', 'doc_44', 'doc_09', 'doc_07', 'doc_45', 'doc_9', 'doc_7', '07d', '20', '21', '12', '44', '9', '7', '45'].includes(id) || id.includes('voice_phone_') || id.includes('0984112568') || id.includes('0984.112.568'))
-    return hasVoiceOrAlibi
+    // Hà: Tin nhắn thoại 0984.112.568, 12, 44 (Optional: 9, 7, 45)
+    const validCodes = [
+      'voice_phone_0984112568',
+      '0984.112.568',
+      '0984112568',
+      '12',
+      '44',
+      '9',
+      '7',
+      '45',
+    ]
+    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
   }
 
   return false
 }
 
+/**
+ * Resolves user text input into a structured evidence object.
+ * Retains exact document numbers/codes without rewriting or mutating them.
+ */
 export function resolveEvidenceCode(rawInput: string): { id: string; label: string; code: string } | null {
   const trimmed = rawInput.trim()
   if (!trimmed) return null
@@ -142,63 +153,61 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
     return ADMIN_MASTER_EVIDENCE
   }
 
+  // 1. Phone number (Text SMS)
   const digitsOnly = trimmed.replace(/\D/g, '')
   if (trimmed.startsWith('0') && digitsOnly.length >= 9) {
-    const id = `sms_phone_${digitsOnly}`
+    const formatted = digitsOnly.length === 10
+      ? `${digitsOnly.slice(0, 4)}.${digitsOnly.slice(4, 7)}.${digitsOnly.slice(7)}`
+      : trimmed
     return {
-      id,
-      label: `Tin nhắn văn bản với SĐT: ${trimmed}`,
-      code: trimmed
+      id: `sms_phone_${digitsOnly}`,
+      label: `Tin nhắn văn bản với SĐT: ${formatted}`,
+      code: formatted,
     }
   }
 
+  // 2. Voice message with phone number
   if (trimmed.toLowerCase().startsWith('voice:') || trimmed.toLowerCase().startsWith('thoai:')) {
     const num = trimmed.replace(/^(voice|thoai):/i, '').trim()
     const digits = num.replace(/\D/g, '')
-    const id = `voice_phone_${digits}`
+    const formatted = digits.length === 10
+      ? `${digits.slice(0, 4)}.${digits.slice(4, 7)}.${digits.slice(7)}`
+      : num
     return {
-      id,
-      label: `Tin nhắn thoại với SĐT: ${num}`,
-      code: num
+      id: `voice_phone_${digits}`,
+      label: `Tin nhắn thoại với SĐT: ${formatted}`,
+      code: formatted,
     }
   }
 
+  // 3. Document or Code
   const normalized = trimmed
-    .toLowerCase()
-    .replace(/^doc_/, '')
+    .replace(/^#/, '')
+    .replace(/^doc_/i, '')
     .replace(/^mã\s*/i, '')
     .replace(/^ma\s*/i, '')
-    .replace(/^#/, '')
     .trim()
 
-  if (DOCUMENT_EVIDENCE_MAP[normalized]) {
-    return DOCUMENT_EVIDENCE_MAP[normalized]
-  }
-
-  const numVal = parseInt(normalized, 10)
-  if (!isNaN(numVal) && numVal >= 1 && numVal <= 99) {
-    const padded = numVal < 10 ? `0${numVal}` : `${numVal}`
-    if (DOCUMENT_EVIDENCE_MAP[padded]) {
-      return DOCUMENT_EVIDENCE_MAP[padded]
-    }
-    return {
-      id: `doc_${padded}`,
-      label: `Tài liệu số ${padded}`,
-      code: padded
-    }
-  }
+  if (!normalized) return null
 
   return {
-    id: `custom_code_${normalized.replace(/[^a-zA-Z0-9_]/g, '')}`,
-    label: `Mã chứng cứ #${trimmed}`,
-    code: trimmed
+    id: normalized,
+    label: `Tài liệu #${normalized}`,
+    code: normalized,
   }
 }
 
+/**
+ * Returns badge rendering information for a clue id.
+ */
 export function getClueBadgeInfo(
   id: string,
   customPhoneList?: Array<{ id: string; label: string }>
 ): { code: string; label: string; displayCode: string; isPhone: boolean } {
+  if (isAdminBypassCode(id)) {
+    return { code: '00', label: 'Tài liệu số 00 (Admin Master Key)', displayCode: '00', isPhone: false }
+  }
+
   if (customPhoneList) {
     const custom = customPhoneList.find((p) => p.id === id)
     if (custom) {
@@ -206,56 +215,23 @@ export function getClueBadgeInfo(
       return { code: isVoice ? 'VOICE' : 'SĐT', label: custom.label, displayCode: custom.label, isPhone: true }
     }
   }
+
   if (id.startsWith('sms_phone_')) {
     const raw = id.replace('sms_phone_', '')
-    let formatted = raw
-    if (raw.length === 10) {
-      formatted = `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}`
-    }
+    const formatted = raw.length === 10 ? `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}` : raw
     const label = `Tin nhắn văn bản với SĐT: ${formatted}`
     return { code: 'SĐT', label, displayCode: label, isPhone: true }
   }
+
   if (id.startsWith('voice_phone_')) {
     const raw = id.replace('voice_phone_', '')
-    let formatted = raw
-    if (raw.length === 10) {
-      formatted = `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}`
-    }
+    const formatted = raw.length === 10 ? `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}` : raw
     const label = `Tin nhắn thoại với SĐT: ${formatted}`
     return { code: 'VOICE', label, displayCode: label, isPhone: true }
   }
 
-  if (id === 'doc_01_phieu_tn') return { code: '01', label: 'Phiếu tiếp nhận tin báo', displayCode: '01', isPhone: false }
-  if (id === 'doc_02_hien_truong') return { code: '02', label: 'Biên bản khám nghiệm hiện trường', displayCode: '02', isPhone: false }
-  if (id === 'doc_03_so_do') return { code: '03', label: 'Ảnh chụp hiện trường', displayCode: '03', isPhone: false }
-  if (id === 'doc_04_tu_thi') return { code: '04', label: 'Khám nghiệm tử thi', displayCode: '04', isPhone: false }
-  if (id === 'doc_05_kham_nghiem') return { code: '05', label: 'Biên bản khám nghiệm', displayCode: '05', isPhone: false }
-  if (id === 'doc_06_loi_khai_lua') return { code: '06', label: 'Lời khai bà Lụa', displayCode: '06', isPhone: false }
-  if (id === 'doc_07a_loi_khai_mai') return { code: '07a', label: 'Lời khai Mai', displayCode: '07a', isPhone: false }
-  if (id === 'doc_07b_loi_khai_vu') return { code: '07b', label: 'Lời khai Vũ', displayCode: '07b', isPhone: false }
-  if (id === 'doc_07d_loi_khai_ha') return { code: '07d', label: 'Lời khai Hà', displayCode: '07d', isPhone: false }
-  if (id === 'doc_10_so_no') return { code: '10', label: 'Sổ ghi nợ', displayCode: '10', isPhone: false }
-  if (id === 'sms_dev00') return { code: '11', label: 'Tin nhắn trên máy Khang', displayCode: '11', isPhone: false }
-  if (id === 'p10_app_xe') return { code: '12', label: 'Ảnh chụp màn hình ứng dụng đặt xe', displayCode: '12', isPhone: false }
-  if (id === 'doc_13_don_dat') return { code: '13', label: 'Đơn đòi đất', displayCode: '13', isPhone: false }
-  if (id === 'doc_14_loi_khai_tung') return { code: '14', label: 'Lời khai Tùng', displayCode: '14', isPhone: false }
-  if (id === 'p3_hung_khi') return { code: '15', label: 'Mảnh vỡ ấm trà', displayCode: '15', isPhone: false }
-  if (id === 'p4_anh_1996') return { code: '16', label: 'Khung ảnh vỡ 1996', displayCode: '16', isPhone: false }
-  if (id === 'p4_van_tay') return { code: '17', label: 'Dấu vân tay trên khung ảnh', displayCode: '17', isPhone: false }
-  if (id === 'p5_manh_bao') return { code: '18', label: 'Các mảnh báo cũ', displayCode: '18', isPhone: false }
-  if (id === 'p6_anh_vu') return { code: '19', label: 'Ảnh chân dung Lê Quang Vũ', displayCode: '19', isPhone: false }
-  if (id === 'doc_voice_coi_tau') return { code: '20', label: 'Voice tin nhắn thoại của Hà', displayCode: '20', isPhone: false }
-  if (id === 'doc_lich_vtv3') return { code: '21', label: 'Lịch phát sóng VTV3', displayCode: '21', isPhone: false }
-  if (id === 'ev_hair_dna') return { code: '22', label: 'Lọn tóc mai dính máu', displayCode: '22', isPhone: false }
-  if (id === 'ev_ao_gio_xoan') return { code: '23', label: 'Áo gió xám đen dính phấn hoa', displayCode: '23', isPhone: false }
-  if (id === 'doc_000') return { code: '000', label: 'Tài liệu số 000 (Admin)', displayCode: '000', isPhone: false }
-
-  const resolved = resolveEvidenceCode(id)
-  if (resolved) {
-    return { code: resolved.code, label: resolved.label, displayCode: resolved.code, isPhone: false }
-  }
-
-  return { code: id, label: id, displayCode: id, isPhone: false }
+  const code = id.replace(/^(doc_|custom_code_|ev_)/i, '').replace(/^#/, '').trim()
+  return { code, label: `Tài liệu #${code}`, displayCode: code, isPhone: false }
 }
 
 export function getSortedClues(

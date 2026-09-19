@@ -1,10 +1,14 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { Home, ArrowLeft } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { HeroInteractive, type PinPoint, type CaseConnection } from '@/components/investigation/hero-interactive'
 import { AddSuspectModal } from './add-suspect-modal'
 import { PhoneLookupModal } from './phone-lookup-modal'
 import { PhoneNarrativeModal } from './phone-narrative-modal'
+import { DossierEModal } from './dossier-e-modal'
 import { EvidenceGuideModal } from './evidence-guide-modal'
 import { IndictmentModal } from './indictment-modal'
 import { CulpritEpilogueModal } from './culprit-epilogue-modal'
@@ -33,6 +37,7 @@ export function MainInvestigationCanvas({
   onOpenReinvestigation,
   onOpenEpilogue
 }: MainInvestigationCanvasProps) {
+  const router = useRouter()
   const [suspects, setSuspects] = useState<SuspectItem[]>([])
   const [isReinvestigateUnlocked, setIsReinvestigateUnlocked] = useState(false)
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] = useState(false)
@@ -48,6 +53,26 @@ export function MainInvestigationCanvas({
   const [isFollowupQuestionOpen, setIsFollowupQuestionOpen] = useState(false)
   const [isEvidenceGuideOpen, setIsEvidenceGuideOpen] = useState(false)
   const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false)
+  const [isDossierEOpen, setIsDossierEOpen] = useState(false)
+  const [zoomedPhotoUrl, setZoomedPhotoUrl] = useState<string | null>(null)
+  const zoomOpenTimeRef = React.useRef<number>(0)
+
+  const handleOpenPhotoZoom = useCallback((url: string) => {
+    zoomOpenTimeRef.current = Date.now()
+    setZoomedPhotoUrl(url)
+  }, [])
+
+  useEffect(() => {
+    if (!zoomedPhotoUrl) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        detectiveAudio.playPaperRustle()
+        setZoomedPhotoUrl(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [zoomedPhotoUrl])
 
   const [investigatedSuspects, setInvestigatedSuspects] = useState<('vu' | 'tung' | 'ha')[]>([])
   const [solvedFollowupQuestions, setSolvedFollowupQuestions] = useState<('vu' | 'tung' | 'ha')[]>([])
@@ -105,10 +130,17 @@ export function MainInvestigationCanvas({
         setHasOpenedReinvestigation(true)
       }
       const savedPhone = localStorage.getItem('veritas_phone_inputs')
-      if (savedPhone) {
+      const isPhoneSolved = localStorage.getItem('veritas_phone_solved') === 'true'
+      if (savedPhone || isPhoneSolved) {
         try {
-          const parsed = JSON.parse(savedPhone)
-          if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
+          if (savedPhone) {
+            const parsed = JSON.parse(savedPhone)
+            if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
+              setPhoneLookupSuccess(true)
+            } else if (isPhoneSolved) {
+              setPhoneLookupSuccess(true)
+            }
+          } else if (isPhoneSolved) {
             setPhoneLookupSuccess(true)
           }
         } catch {
@@ -321,7 +353,7 @@ export function MainInvestigationCanvas({
   }, [onOpenReinvestigation])
 
   // Handle pin clicks directly on HeroInteractive canvas
-  const handlePinClick = useCallback((pinId: string) => {
+  const handlePinClick = useCallback((pinId: string, pin?: PinPoint) => {
     detectiveAudio.playPaperRustle()
 
     if (pinId === 'c0-pin-suspects') {
@@ -330,20 +362,22 @@ export function MainInvestigationCanvas({
     } else if (pinId === 'c0-pin-evidence') {
       setIsEvidenceGuideOpen(true)
     } else if (pinId === 'c0-pin-phone') {
-      setIsPhoneLookupOpen(true)
-    } else if (pinId === 'c0-pin-crime-scene') {
-      if (isReinvestigateUnlocked) {
-        detectiveAudio.playGlassSound()
-        handleOpenReinvestigation()
+      if (phoneLookupSuccess) {
+        setIsDossierEOpen(true)
       } else {
-        setIsEvidenceGuideOpen(true)
+        setIsPhoneLookupOpen(true)
       }
+    } else if (pinId === 'c0-pin-crime-scene' || pinId.includes('crime-scene') || pinId.includes('thi-the')) {
+      handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_straight.png')
+    } else if (pinId === 'c0-pin-victim-khang' || pinId.includes('khang')) {
+      handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang_straight.png')
     } else if (pinId === 'c0-pin-reinvestigate') {
       if (isReinvestigateUnlocked) {
         detectiveAudio.playGlassSound()
         handleOpenReinvestigation()
       } else {
         detectiveAudio.playGlassSound()
+        setIsEvidenceGuideOpen(true)
       }
     } else if (pinId === 'c0-pin-indictment') {
       if (isIndictmentSolved && solvedCulprit) {
@@ -360,12 +394,16 @@ export function MainInvestigationCanvas({
     } else if (pinId === 'c0-pin-followup-ha') {
       setActiveFollowupCulprit('ha')
       setIsFollowupQuestionOpen(true)
-    } else if (pinId.startsWith('c0-pin-followup')) {
-      const c = pinId.includes('ha') ? 'ha' : pinId.includes('tung') ? 'tung' : 'vu'
+    } else if (pinId.includes('followup') || pinId.includes('question')) {
+      const c = pinId.includes('ha') ? 'ha' : pinId.includes('tung') ? 'tung' : (activeFollowupCulprit || 'vu')
       setActiveFollowupCulprit(c)
       setIsFollowupQuestionOpen(true)
     } else if (pinId.startsWith('node-suspect-')) {
       const targetId = pinId.replace('node-suspect-', '')
+      if (targetId === 'suspect-khang' || targetId === 'khang' || pinId.includes('khang')) {
+        handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang_straight.png')
+        return
+      }
       const foundSuspect = suspects.find((s) => {
         const key = getCanonicalSuspectKey(s)
         return (
@@ -380,7 +418,7 @@ export function MainInvestigationCanvas({
         setIsAddSuspectOpen(true)
       }
     }
-  }, [suspects, isReinvestigateUnlocked, onOpenReinvestigation, isIndictmentSolved, solvedCulprit])
+  }, [suspects, isReinvestigateUnlocked, handleOpenReinvestigation, isIndictmentSolved, solvedCulprit, phoneLookupSuccess, activeFollowupCulprit])
 
   const [isMobile, setIsMobile] = useState(false)
 
@@ -567,6 +605,7 @@ export function MainInvestigationCanvas({
             : 'Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang',
           color: phoneLookupSuccess ? ('cyan' as const) : ('yellow' as const),
           noteColor: 'white' as const,
+          isSolved: phoneLookupSuccess,
         },
         {
           id: 'c0-pin-victim-khang',
@@ -590,14 +629,15 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-reinvestigate',
           x: 0.20,
           y: 0.35,
-          label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại 🔒',
+          label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại (Chờ phê duyệt)',
           detail: isReinvestigateUnlocked
             ? 'Mở biên bản tái khám xét hiện trường'
-            : 'Khám xét lại hiện trường [Khóa — Cần trả lời xong câu hỏi của Vũ & Tùng]',
+            : 'Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]',
           color: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
           noteColor: 'white' as const,
           pinColor: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
           pulseBorder: isReinvestigateBlinking,
+          isLocked: !isReinvestigateUnlocked,
         },
         {
           id: 'c0-pin-suspects',
@@ -646,6 +686,7 @@ export function MainInvestigationCanvas({
           color: 'yellow' as const,
           pinColor: 'yellow' as const,
           noteColor: 'white' as const,
+          isSolved: phoneLookupSuccess,
         },
         {
           id: 'c0-pin-victim-khang',
@@ -671,14 +712,15 @@ export function MainInvestigationCanvas({
           id: 'c0-pin-reinvestigate',
           x: 0.20,
           y: 0.35,
-          label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại 🔒',
+          label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại (Chờ phê duyệt)',
           detail: isReinvestigateUnlocked
             ? 'Mở biên bản tái khám xét hiện trường'
-            : 'Khám xét lại hiện trường [Khóa — Cần trả lời xong câu hỏi của Vũ & Tùng]',
-          color: 'yellow' as const,
+            : 'Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]',
+          color: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
           noteColor: 'white' as const,
-          pinColor: 'yellow' as const,
+          pinColor: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
           pulseBorder: isReinvestigateBlinking,
+          isLocked: !isReinvestigateUnlocked,
         },
         {
           id: 'c0-pin-suspects',
@@ -686,8 +728,8 @@ export function MainInvestigationCanvas({
           y: 0.38,
           label: 'Nghi phạm',
           detail: 'Thêm & xem danh sách nghi phạm vụ án',
-          color: 'red' as const,
-          pinColor: 'red' as const,
+          color: 'yellow' as const,
+          pinColor: 'yellow' as const,
           noteColor: 'yellow' as const,
         },
         {
@@ -747,9 +789,9 @@ export function MainInvestigationCanvas({
   ]
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center select-none">
+    <div suppressHydrationWarning className="relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none">
       {/* Top Banner Toolbar */}
-      <div className="absolute top-3 left-4 z-20 flex items-center pointer-events-none">
+      <div className="absolute top-3 left-4 z-20 flex items-center gap-2 pointer-events-none">
         <div className="flex items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto">
           <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
@@ -758,8 +800,8 @@ export function MainInvestigationCanvas({
 
       {/* Main Interactive Pinboard Canvas */}
       <HeroInteractive
-        className="w-full h-full"
-        controlledCaseId="case-00"
+        className="w-full h-full flex-1 min-h-0"
+        controlledCaseId="case-000"
         customPins={customPins}
         customConnections={customConnections}
         onPinClick={handlePinClick}
@@ -805,6 +847,12 @@ export function MainInvestigationCanvas({
       <PhoneNarrativeModal
         isOpen={isPhoneNarrativeOpen}
         onClose={() => setIsPhoneNarrativeOpen(false)}
+        onTakeTestimony={() => setIsDossierEOpen(true)}
+      />
+
+      <DossierEModal
+        isOpen={isDossierEOpen}
+        onClose={() => setIsDossierEOpen(false)}
       />
 
       <EvidenceGuideModal
@@ -865,6 +913,41 @@ export function MainInvestigationCanvas({
         onOpenDossier={handleOpenDossier}
         isPhoneSolved={phoneLookupSuccess}
       />
+
+      {/* Zoomed Photo Lightbox Modal */}
+      <AnimatePresence>
+        {zoomedPhotoUrl && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (Date.now() - zoomOpenTimeRef.current < 250) {
+                return
+              }
+              detectiveAudio.playPaperRustle()
+              setZoomedPhotoUrl(null)
+            }}
+            className="fixed inset-0 z-[1000] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 cursor-pointer select-none"
+          >
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.7, opacity: 0 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+              className="relative max-w-[92vw] max-h-[90vh] flex items-center justify-center"
+            >
+              <img
+                src={zoomedPhotoUrl}
+                alt="Ảnh tư liệu phóng to"
+                className="max-h-[85vh] max-w-[85vw] object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)] pointer-events-none"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

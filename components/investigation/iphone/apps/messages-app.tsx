@@ -97,7 +97,11 @@ export function MessagesApp({ threads, onBackToHome }: MessagesAppProps) {
       setPlayingAudioId(msg.id)
       setPlaybackProgress(0)
       // Play voice audio or realistic acoustic sound clue
-      if (msg.attachment?.audioClue?.includes('còi tàu') || msg.id.includes('m2-voice') || msg.id.includes('ha-voice')) {
+      if (msg.id === 'm1-25') {
+        detectiveAudio.playVoiceVy()
+      } else if (msg.id === 'm9-7') {
+        detectiveAudio.playVoiceKhang()
+      } else if (msg.attachment?.audioClue?.includes('còi tàu') || msg.id.includes('m2-voice') || msg.id.includes('ha-voice')) {
         detectiveAudio.playHaVoicemail()
       } else {
         detectiveAudio.playRadioBeep()

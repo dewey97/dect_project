@@ -10,6 +10,7 @@ import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
 import { ClueCodePicker } from './clue-code-picker'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
+import { isEvidenceMatching } from '@/lib/cases/case-000-clues'
 
 interface FollowupQuestionModalProps {
   isOpen: boolean
@@ -33,8 +34,8 @@ export const HA_CLUE_TILES = [
     title: 'Áo khoác gió',
     subtitle: 'Thu giữ sau cánh cửa phòng trọ',
     description: 'Áo khoác gió xám đen dính bụi mùn đất đặc trưng quanh gốc cây xoan trước ngõ nhà Khang.',
-    validDocIds: ['doc_45', 'doc_10', 'doc_06', 'doc_06_loi_khai_lua', 'doc_07b_loi_khai_vu', 'doc_52', '45', '10', '6', '52'],
-    matchHint: 'Khớp nối lời khai Lê Quang Vũ / bà Lụa: bóng người mặc áo gió trùm đầu rình rập dưới gốc cây xoan trước cổng.',
+    validDocIds: ['45', '10', '6'],
+    matchHint: 'Khớp nối lời khai: bóng người mặc áo gió trùm đầu rình rập dưới gốc cây xoan trước cổng (45, 10, 6).',
   },
   {
     id: 'tile_lon_toc',
@@ -42,8 +43,8 @@ export const HA_CLUE_TILES = [
     title: 'Kéo và nhúm tóc',
     subtitle: 'Thu giữ giấu trong áo ngực',
     description: 'Lọn tóc mai dính máu cắt bằng kéo, kết quả giám định sinh học trùng khớp 100% mẫu ADN của Khang.',
-    validDocIds: ['doc_04_tu_thi', 'doc_04', 'doc_4', '4', 'doc_50', 'doc_51', '50', '51', 'ev_hair_dna'],
-    matchHint: 'Khớp nối Khám nghiệm tử thi: mảng tóc mai bên trái bị cắt tỉa sát da đầu & vết đâm cổ lúc 21:00.',
+    validDocIds: ['4'],
+    matchHint: 'Khớp nối Khám nghiệm tử thi: mảng tóc mai bên trái bị cắt tỉa sát da đầu & vết đâm cổ lúc 21:00 (4).',
   },
   {
     id: 'tile_thuoc_an_than',
@@ -51,8 +52,8 @@ export const HA_CLUE_TILES = [
     title: 'Bùa yêu',
     subtitle: 'Thu giữ tại phòng & thân thể',
     description: 'Lá bùa yêu nhuộm đỏ cùng các vật phẩm mê tín được chuẩn bị từ trước.',
-    validDocIds: ['doc_49', '49', 'doc_53', '53', 'doc_05_kham_nghiem', 'p3_hung_khi'],
-    matchHint: 'Khớp nối vật chứng bùa yêu thu được.',
+    validDocIds: ['49'],
+    matchHint: 'Khớp nối vật chứng bùa yêu thu được (49).',
   },
 ]
 
@@ -139,6 +140,15 @@ export function FollowupQuestionModal({
     } catch {}
   }, [culprit, isOpen])
 
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
   if (!isOpen || !culprit) return null
 
   const isVu = culprit === 'vu'
@@ -151,7 +161,7 @@ export function FollowupQuestionModal({
     if (!tile) return false
     const selected = haTileSelections[tileId] || []
     if (hasAdminBypassInArray(selected)) return true
-    return tile.validDocIds.some((validId) => selected.includes(validId))
+    return selected.some((id) => isEvidenceMatching(id, tile.validDocIds))
   }
 
   const allHaTilesMatched = HA_CLUE_TILES.every((tile) => isTileMatched(tile.id))
@@ -178,8 +188,8 @@ export function FollowupQuestionModal({
       } catch {}
 
       // Play success audio if just matched
-      const nowMatched = tile.validDocIds.some((validId) => nextList.includes(validId))
-      if (nowMatched && !tile.validDocIds.some((validId) => current.includes(validId))) {
+      const nowMatched = nextList.some((id) => isEvidenceMatching(id, tile.validDocIds))
+      if (nowMatched && !current.some((id) => isEvidenceMatching(id, tile.validDocIds))) {
         detectiveAudio.playStampSound()
       }
 
@@ -190,9 +200,9 @@ export function FollowupQuestionModal({
   const handleBypassAll = () => {
     detectiveAudio.playStampSound()
     const bypassedMatches: Record<string, string[]> = {
-      tile_ao_gio: ['doc_07b_loi_khai_vu'],
-      tile_lon_toc: ['doc_04_tu_thi'],
-      tile_thuoc_an_than: ['doc_05_kham_nghiem'],
+      tile_ao_gio: ['45'],
+      tile_lon_toc: ['4'],
+      tile_thuoc_an_than: ['49'],
     }
     setHaTileSelections(bypassedMatches)
     try {
@@ -270,12 +280,16 @@ export function FollowupQuestionModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto">
+      <div
+        onClick={onClose}
+        className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
+      >
         <motion.div
+          onClick={(e) => e.stopPropagation()}
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-3xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden flex flex-col max-h-[92vh]"
+          className="relative w-full max-w-3xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden flex flex-col max-h-[92vh] cursor-default"
         >
           {/* HEADER */}
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">

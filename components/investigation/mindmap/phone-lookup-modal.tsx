@@ -53,17 +53,20 @@ export function PhoneLookupModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!phone1.trim() && !phone2.trim() && !phone3.trim()) {
-      setErrorMsg('Vui lòng điền danh tính chủ thể cho ít nhất 1 số điện thoại!')
-      detectiveAudio.playGlassSound()
-      return
+    if (!phone1.trim() || !phone2.trim() || !phone3.trim()) {
+      const hasBypass = isAdminBypassCode(phone1) || isAdminBypassCode(phone2) || isAdminBypassCode(phone3)
+      if (!hasBypass) {
+        setErrorMsg('Vui lòng điền đầy đủ danh tính chủ thể cho cả 3 số điện thoại!')
+        detectiveAudio.playGlassSound()
+        return
+      }
     }
 
     const hasBypass = isAdminBypassCode(phone1) || isAdminBypassCode(phone2) || isAdminBypassCode(phone3)
 
-    const isP1Valid = !phone1.trim() || isPhoneMatch(phone1, ['vu', 'le quang vu', 'vũ', 'lê quang vũ'])
-    const isP2Valid = !phone2.trim() || isPhoneMatch(phone2, ['tung', 'nguyen thanh tung', 'tùng', 'nguyễn thanh tùng'])
-    const isP3Valid = !phone3.trim() || isPhoneMatch(phone3, ['dat', 'dat ga', 'tran van dat', 'đạt', 'đạt gà', 'trần văn đạt'])
+    const isP1Valid = isPhoneMatch(phone1, ['vu', 'le quang vu', 'vũ', 'lê quang vũ'])
+    const isP2Valid = isPhoneMatch(phone2, ['tung', 'nguyen thanh tung', 'tùng', 'nguyễn thanh tùng'])
+    const isP3Valid = isPhoneMatch(phone3, ['dat', 'dat ga', 'tran van dat', 'đạt', 'đạt gà', 'trần văn đạt'])
 
     if (!hasBypass && (!isP1Valid || !isP2Valid || !isP3Valid)) {
       setErrorMsg('Danh tính chủ thể chưa chính xác. Vui lòng đối chiếu kỹ lại Sổ nợ và Bảng tin!')
@@ -82,14 +85,29 @@ export function PhoneLookupModal({
     onClose()
   }
 
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null
+
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto">
+      <div
+        onClick={onClose}
+        className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
+      >
         <motion.div
+          onClick={(e) => e.stopPropagation()}
           initial={{ opacity: 0, scale: 0.96, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 12 }}
-          className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] rounded-none overflow-hidden flex flex-col max-h-[90vh]"
+          className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] rounded-none overflow-hidden flex flex-col max-h-[90vh] cursor-default"
         >
           {/* HEADER BAR */}
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
@@ -155,7 +173,6 @@ export function PhoneLookupModal({
                 </label>
                 <input
                   type="text"
-                  placeholder="Nhập tên nghi phạm (VD: Lê Quang Vũ)..."
                   value={phone1}
                   onChange={(e) => {
                     setPhone1(e.target.value)

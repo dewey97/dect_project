@@ -41,7 +41,7 @@
 | **Tên thường gọi** | Tùng / Thợ Tùng |
 | **Ngày tháng năm sinh** | 18/03/1986 (30 tuổi tính đến thời điểm xảy ra vụ án) |
 | **Số CCCD** | `001086003412`, cấp ngày 14/05/2011 |
-| **Số điện thoại** | `0984.180.357` |
+| **Số điện thoại** | `0912.331.888` |
 | **Quê quán** | Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi ĐKHKTT** | Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi ở hiện nay** | Phòng trọ công nhân số 18, Phố Cầu Bươu, TP. Hà Nội |
@@ -56,8 +56,8 @@
 
 ## II. DẤU HIỆU CÀI CẮM SỚM & HÀNH VI CHỐI TỘI BAN ĐẦU
 
-1. **Cuộc gọi ẩn danh 19:00 (`dev-00`):** Trong Nhật ký cuộc gọi trên điện thoại Khang ghi nhận cuộc gọi đến lúc 19:00 từ số lạ `0984.180.357` đàm thoại 35 giây trước khi Tùng tìm sang nhà Khang.
-2. **Mẩu tin rao vặt trên Bảng tin trước cổng (`18`):** Đối chiếu mẩu giấy viết tay dán góc Bảng tin trước cổng số 14 Bờ Sông: *"Nhận sửa nhà dân dụng, đục phá bê tông... LH: 0984.180.357 (em Tùng)"* $\rightarrow$ Tra cứu ra danh tính thợ nề Nguyễn Thanh Tùng.
+1. **Cuộc gọi ẩn danh 19:00 (`dev-00`):** Trong Nhật ký cuộc gọi trên điện thoại Khang ghi nhận cuộc gọi đến lúc 19:00 từ số lạ `0912.331.888` đàm thoại 35 giây trước khi Tùng tìm sang nhà Khang.
+2. **Mẩu tin rao vặt trên Bảng tin trước cổng (`18`):** Đối chiếu mẩu giấy viết tay dán góc Bảng tin trước cổng số 14 Bờ Sông: *"Nhận sửa nhà dân dụng, đục phá bê tông... LH: 0912.331.888 (em Tùng)"* $\rightarrow$ Tra cứu ra danh tính thợ nề Nguyễn Thanh Tùng.
 3. **Lời khai chối tội ban đầu (`14`):** Khi bị triệu tập lần 1, Tùng ra sức chối cãi: Khai chỉ gọi điện thoại 19:00 hỏi xem có việc thợ nề nhận làm và vay tiền mua vật liệu rồi ở phòng trọ Cầu Bươu ngủ suốt đêm, **khẳng định tuyệt đối không đến gặp mặt Khang và không bước chân vào phòng khách nhà Khang**.
 
 ---

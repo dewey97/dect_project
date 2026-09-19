@@ -33,3 +33,6 @@ test-results/
 /*.ogg
 /*.mp3
 /*.mp4
+
+# Binaries
+scripts/bin/

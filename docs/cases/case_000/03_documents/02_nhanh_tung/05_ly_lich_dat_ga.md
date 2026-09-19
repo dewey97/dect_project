@@ -18,14 +18,14 @@ Số: `06/LL-TP`
 | Mục | Nội dung chi tiết |
 | :--- | :--- |
 | **Họ và tên khai sinh** | **TRẦN VĂN ĐẠT** |
-| **Tên thường gọi** | Tùng |
+| **Tên thường gọi** | Đạt Gà |
 | **Ngày tháng năm sinh** | 05/11/1988 |
 | **Giới tính** | Nam |
 | **Số CMND** | `659041837` |
 | **Nơi ĐKHKTT** | Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nơi ở hiện nay** | Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nghề nghiệp** | Tiểu thương kinh doanh gia cầm tại Khu Chợ Cảng |
-| **Số điện thoại chính chủ** | 0984.180.357  |
+| **Số điện thoại chính chủ** | 0984.180.357 |
 | **Tình trạng hôn nhân** | Đã kết hôn |
 | **Tiền án, tiền sự** | 01 tiền sự về hành vi gây rối trật tự công cộng (2012) |
 | **Mối quan hệ với nạn nhân** | Con nợ của Khang (khoản nợ 80.000.000 VND) |

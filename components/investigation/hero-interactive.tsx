@@ -55,6 +55,8 @@ export interface PinPoint {
   pinColor?: "red" | "yellow" | "blue" | "green" | "black" | "purple" | "orange" | "cyan" | "brass" | "silver" | "dark";
   pulseBorder?: boolean;
   photoUrl?: string;
+  isLocked?: boolean;
+  isSolved?: boolean;
 }
 
 export interface CaseConnection {
@@ -440,21 +442,27 @@ function isPinHit(
   pin: PinPoint | { id: string; label: string },
   transform: ViewTransform,
 ): boolean {
-  // Hit radius for pinhead (28px radius = 56px diameter touch target)
-  const headHitRadius = 28 / transform.scale;
+  // Hit radius for pinhead (32px radius touch target)
+  const headHitRadius = 32 / transform.scale;
   if (distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y) <= headHitRadius) {
     return true;
   }
 
-  const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-");
+  const isKhang = pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang'));
+  const isCrimeScene = pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể'));
+  const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-") || !!(pin as any).photoUrl || isKhang || isCrimeScene;
 
   if (isSuspectPin) {
-    // Hit area for Polaroid photo card underneath pinhead (matches ~112px width x 142px height)
-    const cardHalfWidth = 60 / transform.scale;
-    const cardTop = pinPosition.y - 16 / transform.scale;
-    const cardBottom = pinPosition.y + 135 / transform.scale;
-    const cardLeft = pinPosition.x - cardHalfWidth;
-    const cardRight = pinPosition.x + cardHalfWidth;
+    // Exact dimensions matching drawing in renderScene:
+    const baseCardWidth = isKhang ? 150 : isCrimeScene ? 140 : 110;
+    const cardWidth = baseCardWidth / transform.scale;
+    const cardHeight = isCrimeScene ? (cardWidth * 420) / 560 : (cardWidth * 380) / 300;
+    const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.10;
+
+    const cardLeft = pinPosition.x - cardWidth / 2 - 12 / transform.scale;
+    const cardRight = pinPosition.x + cardWidth / 2 + 12 / transform.scale;
+    const cardTop = pinPosition.y + tagY - 12 / transform.scale;
+    const cardBottom = pinPosition.y + tagY + cardHeight + 12 / transform.scale;
 
     return (
       worldPointer.x >= cardLeft &&
@@ -474,9 +482,9 @@ function isPinHit(
     upperLabel.includes('TRUY TỐ');
 
   // Hit area for white note (~108x124) vs sticky note (~84x90) underneath pinhead
-  const cardHalfWidth = (isWhiteNote ? 56 : 44) / transform.scale;
-  const cardTop = pinPosition.y - (isWhiteNote ? 18 : 12) / transform.scale;
-  const cardBottom = pinPosition.y + (isWhiteNote ? 112 : 80) / transform.scale;
+  const cardHalfWidth = (isWhiteNote ? 60 : 50) / transform.scale;
+  const cardTop = pinPosition.y - (isWhiteNote ? 25 : 20) / transform.scale;
+  const cardBottom = pinPosition.y + (isWhiteNote ? 125 : 95) / transform.scale;
   const cardLeft = pinPosition.x - cardHalfWidth;
   const cardRight = pinPosition.x + cardHalfWidth;
 
@@ -985,16 +993,12 @@ export function HeroInteractive({
           const pinPosition = getPinWorldPosition(pin, bounds);
 
           if (isPinHit(worldPointer, pinPosition, pin, transform)) {
-            const dist = distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y);
-            const isSuspect = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-");
-
-            if (!bestHitPin) {
-              minDistance = dist;
-              bestHitPin = pin;
-            } else if (isSuspect && !bestHitPin.id.startsWith("node-suspect-") && !bestHitPin.id.startsWith("suspect-")) {
-              minDistance = dist;
-              bestHitPin = pin;
-            } else if (dist < minDistance && !(bestHitPin.id.startsWith("node-suspect-") && !isSuspect)) {
+            const isKhang = pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang'));
+            const isCrimeScene = pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể'));
+            const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-") || !!(pin as any).photoUrl || isKhang || isCrimeScene;
+            const centerY = isSuspectPin ? pinPosition.y + 60 / transform.scale : pinPosition.y + 40 / transform.scale;
+            const dist = distance(worldPointer.x, worldPointer.y, pinPosition.x, centerY);
+            if (dist < minDistance) {
               minDistance = dist;
               bestHitPin = pin;
             }
@@ -1276,6 +1280,8 @@ export function HeroInteractive({
           pinColor: (p as any).pinColor,
           pulseBorder: (p as any).pulseBorder,
           photoUrl: (p as any).photoUrl,
+          isLocked: (p as any).isLocked,
+          isSolved: (p as any).isSolved,
           isUser: false,
         })),
         ...uPins.map((p) => ({
@@ -1288,6 +1294,8 @@ export function HeroInteractive({
           pinColor: "yellow" as const,
           pulseBorder: false,
           photoUrl: undefined,
+          isLocked: false,
+          isSolved: false,
           isUser: true,
         })),
       ];
@@ -1551,6 +1559,62 @@ export function HeroInteractive({
             });
             context.restore();
           }
+
+          // Lock overlay and text if pin is locked
+          if (pin.isLocked) {
+            context.save();
+            context.fillStyle = "rgba(15, 10, 8, 0.68)";
+            context.fillRect(tagX, tagY, noteWidth, noteHeight);
+
+            // Plain white text, larger, centered
+            context.font = `900 ${11.5 / transform.scale}px 'Courier New', monospace, sans-serif`;
+            context.fillStyle = "#ffffff";
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.shadowColor = "rgba(0, 0, 0, 0.95)";
+            context.shadowBlur = 4 / transform.scale;
+            context.shadowOffsetX = 0;
+            context.shadowOffsetY = 1 / transform.scale;
+            context.fillText("CHỜ PHÊ DUYỆT", tagX + noteWidth / 2, tagY + noteHeight * 0.62);
+            context.restore();
+          }
+
+          // Dấu tick '✓' hiển thị trên node khi đã giải xong
+          if (pin.isSolved) {
+            context.save();
+            const badgeRadius = 10 / transform.scale;
+            const badgeX = tagX + noteWidth - badgeRadius - 4 / transform.scale;
+            const badgeY = tagY + badgeRadius + 4 / transform.scale;
+
+            // Shadow
+            context.shadowColor = "rgba(0, 0, 0, 0.45)";
+            context.shadowBlur = 4 / transform.scale;
+            context.shadowOffsetY = 1.5 / transform.scale;
+
+            // Green badge circle
+            context.fillStyle = "#15803d";
+            context.beginPath();
+            context.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
+            context.fill();
+
+            // White border
+            context.strokeStyle = "#ffffff";
+            context.lineWidth = 1.8 / transform.scale;
+            context.stroke();
+
+            // White checkmark tick
+            context.strokeStyle = "#ffffff";
+            context.lineWidth = 2.2 / transform.scale;
+            context.lineCap = "round";
+            context.lineJoin = "round";
+            context.beginPath();
+            context.moveTo(badgeX - badgeRadius * 0.45, badgeY - badgeRadius * 0.05);
+            context.lineTo(badgeX - badgeRadius * 0.1, badgeY + badgeRadius * 0.35);
+            context.lineTo(badgeX + badgeRadius * 0.45, badgeY - badgeRadius * 0.35);
+            context.stroke();
+
+            context.restore();
+          }
         }
 
         context.restore(); // restore paper / polaroid transform
@@ -1806,7 +1870,7 @@ export function HeroInteractive({
               connectionStartIdRef.current !== null ||
               hasPulsingPins);
 
-          if (timestamp - lastRenderTime >= 33) {
+          if (!shouldContinueAnimating || timestamp - lastRenderTime >= 33) {
             renderSceneRef.current?.(timestamp);
             lastRenderTime = timestamp;
           } else if (shouldContinueAnimating) {
@@ -1908,7 +1972,7 @@ export function HeroInteractive({
   return (
     <div
       className={cn(
-        "flex h-full w-full flex-col overflow-hidden rounded-none border-0 bg-[#0a0705]",
+        "flex h-full w-full flex-1 min-h-0 flex-col overflow-hidden rounded-none border-0 bg-[#0a0705]",
         className,
       )}
     >

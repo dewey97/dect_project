@@ -29,7 +29,7 @@
 | **Tên thường gọi** | Đạt Gà / Đạt Chợ Cảng |
 | **Ngày tháng năm sinh** | 05/11/1988 (28 tuổi) |
 | **Số CCCD** | `001088009123`, cấp ngày 20/06/2011 |
-| **Số điện thoại liên lạc** | `0912.331.888` (Khớp dòng 04 Sổ ghi nợ `05` và cuộc gọi 20:09 trên `dev-00`) |
+| **Số điện thoại liên lạc** | `0984.180.357` (Khớp dòng 04 Sổ ghi nợ `05` và cuộc gọi 20:09 trên `dev-00`) |
 | **Nơi cư trú** | Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội |
 | **Nghề nghiệp** | Tiểu thương bán gia cầm (gà sống) tại Khu Chợ Cảng |
 | **Tiền án, tiền sự** | 01 tiền sự gây rối trật tự công cộng |

@@ -72,12 +72,22 @@ class DetectiveAudioSystem {
 
   /** Trần Thị Hà voicemail lúc 20:32 (lẫn tiếng còi tàu 68dB vạch trần hiện trường) */
   public playHaVoicemail(): void {
-    this.play('ha_voicemail_2032_v3.mp3', 0.95)
+    this.play('ha_voicemail_2032_v4.mp3', 0.95)
   }
 
   /** Trần Thị Hà lời khai thẩm vấn 2016 bị dồn ép */
   public playHaInterrogation(): void {
     this.play('ha_interrogation_breakdown.mp3', 0.9)
+  }
+
+  /** Thảo Vy voice message lúc 20:38 */
+  public playVoiceVy(): void {
+    this.play('voice_vy.mp3', 0.95)
+  }
+
+  /** Đặng Hoàng Khang voice message gửi Tuấn Béo lúc 10:20 */
+  public playVoiceKhang(): void {
+    this.play('voice_khang.mp3', 0.95)
   }
 
   // === UTILITY: Droplet sound (kept as no-op for compatibility) ===
@@ -88,8 +98,10 @@ class DetectiveAudioSystem {
    */
   public preloadAll(): void {
     const files = [
-      'ha_voicemail_2032_v3.mp3',
-      'ha_interrogation_breakdown.mp3'
+      'ha_voicemail_2032_v4.mp3',
+      'ha_interrogation_breakdown.mp3',
+      'voice_vy.mp3',
+      'voice_khang.mp3'
     ]
     files.forEach(f => this.getAudio(f))
   }

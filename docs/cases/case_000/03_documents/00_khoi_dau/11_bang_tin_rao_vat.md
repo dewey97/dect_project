@@ -19,7 +19,7 @@
 │ [2. TIN RAO VẶT VẬT LIỆU XÂY DỰNG]                                          │
 │ Bán lại vật liệu xây nhà của dự án Đô thị ABC (do lỗi nhỏ, đã được cấp     │
 │ phép rao bán cho người dân mua lại với giá ưu đãi).                         │
-│ Liên hệ trực tiếp: 0984.180.357 (em Tùng thợ nề).                           │
+│ Liên hệ trực tiếp: 0912.331.888 (em Tùng thợ nề).                           │
 │                                                                             │
 │ ─────────────────────────────────────────────────────────────────────────── │
 │                                                                             │
@@ -42,6 +42,6 @@
 ---
 
 ### Ý NGHĨA NGHIỆP VỤ & PHỤC VỤ ĐIỀU TRA
-1. **Xác minh số máy lạ (`0984.180.357`):** SĐT trong tin rao vặt vật liệu xây dựng dự án Đô thị ABC chính là của thợ nề **Nguyễn Thanh Tùng**.
+1. **Xác minh số máy lạ (`0912.331.888`):** SĐT trong tin rao vặt vật liệu xây dựng dự án Đô thị ABC chính là của thợ nề **Nguyễn Thanh Tùng**.
 2. **Xác thực ngoại phạm của Mai (`08`):** Thông báo sự cố truyền hình từ 20:00 - 20:15 khớp nối với lời khai Mai đang xem TV ở nhà thì bị mất sóng.
 3. **Cảnh báo tín dụng đen:** Gợi mở mâu thuẫn xã hội liên quan đến hoạt động tín dụng đen của nạn nhân Khang.

@@ -1,164 +1,260 @@
 import { PDFDocument, PhysicalEvidence } from './evidence-types'
 
 export const CASE_000_PDFS: PDFDocument[] = [
-  // Phase 0: Initial
+  // Phase 0: Initial Investigation (00_khoi_dau)
+  {
+    id: 'pdf-00-hd',
+    title: '00. Cẩm nang hướng dẫn điều tra ban đầu',
+    code: '00-HD',
+    url: '/documents/case_000/00_khoi_dau/00_huong_dan_ban_dau.pdf',
+    phase: 0,
+    order: 5
+  },
   {
     id: 'pdf-01',
-    title: '01. Báo cáo khám nghiệm tử thi sơ bộ',
-    code: 'f1-1',
-    url: '/documents/case_000/phase_0_initial/01_bao_cao_kham_nghiem_tu_thi.pdf',
+    title: '01. Phiếu tiếp nhận nguồn tin về tội phạm (06:45)',
+    code: '01-TB',
+    url: '/documents/case_000/00_khoi_dau/01_tiep_nhan_tin_bao.pdf',
     phase: 0,
     order: 10
   },
   {
     id: 'pdf-02',
-    title: '02. Biên bản khám nghiệm hiện trường vụ án',
-    code: 'f1-2',
-    url: '/documents/case_000/phase_0_initial/02_bien_ban_kham_nghiem_hien_truong.pdf',
+    title: '02. Quyết định khởi tố vụ án hình sự',
+    code: '02-KT',
+    url: '/documents/case_000/00_khoi_dau/02_quyet_dinh_khoi_to.pdf',
     phase: 0,
     order: 20
   },
   {
-    id: 'pdf-04a',
-    title: '03. Bản trích yếu lý lịch và nhân thân nạn nhân Khang',
-    code: 'f1-4a',
-    url: '/documents/case_000/phase_0_initial/04_bao_cao_xac_minh_nhan_than_khang.pdf',
+    id: 'pdf-03a',
+    title: '03a. Biên bản khám nghiệm hiện trường vụ án',
+    code: '03a-HT',
+    url: '/documents/case_000/00_khoi_dau/03a_bien_ban_kham_nghiem_hien_truong.pdf',
     phase: 0,
     order: 30
   },
   {
-    id: 'pdf-04b',
-    title: '04. Báo cáo rà soát sơ yếu lý lịch người liên quan',
-    code: 'f1-4b',
-    url: '/documents/case_000/phase_0_initial/04b_bao_cao_ra_soat_ly_lich_nghi_pham.pdf',
+    id: 'pdf-03b',
+    title: '03b. Báo cáo khám nghiệm tử thi sơ bộ',
+    code: '03b-TT',
+    url: '/documents/case_000/00_khoi_dau/03b_bao_cao_kham_nghiem_tu_thi_so_bo.pdf',
     phase: 0,
     order: 35
   },
   {
-    id: 'pdf-08-tx',
-    title: '05. Báo cáo trích xuất tin nhắn điện thoại Khang',
-    code: '08-tx',
-    url: '/documents/case_000/phase_0_initial/08_trich_xuat_tin_nhan_dieu_tra_ban_dau.pdf',
+    id: 'pdf-04',
+    title: '04. Lý lịch & Nhân thân nạn nhân Khang',
+    code: '04-NN',
+    url: '/documents/case_000/00_khoi_dau/04_nhan_than_nan_nhan.pdf',
     phase: 0,
     order: 40
   },
   {
-    id: 'pdf-06',
-    title: '05. Biên bản lấy lời khai: Nguyễn Thị Lụa',
-    code: 'f1-6',
-    url: '/documents/case_000/phase_0_initial/06_bien_ban_lay_loi_khai_hang_xom.pdf',
+    id: 'pdf-05a',
+    title: '05a. Lý lịch tư pháp: Nguyễn Ngọc Mai',
+    code: '05a-LL',
+    url: '/documents/case_000/00_khoi_dau/05a_ly_lich_nguyen_ngoc_mai.pdf',
+    phase: 0,
+    order: 45
+  },
+  {
+    id: 'pdf-05b',
+    title: '05b. Lý lịch tư pháp: Lê Quang Vũ',
+    code: '05b-LL',
+    url: '/documents/case_000/00_khoi_dau/05b_ly_lich_le_quang_vu.pdf',
     phase: 0,
     order: 50
   },
   {
-    id: 'pdf-07d',
-    title: '06. Biên bản lấy lời khai: Trần Thị Hà',
-    code: '07d',
-    url: '/documents/case_000/phase_0_initial/07d_bien_ban_loi_khai_tran_thi_ha.pdf',
+    id: 'pdf-05c',
+    title: '05c. Lý lịch tư pháp: Trần Thị Hà',
+    code: '05c-LL',
+    url: '/documents/case_000/00_khoi_dau/05c_ly_lich_tran_thi_ha.pdf',
+    phase: 0,
+    order: 55
+  },
+  {
+    id: 'pdf-06',
+    title: '06. Lời khai nhân chứng: Nguyễn Thị Lụa',
+    code: '06-LK',
+    url: '/documents/case_000/00_khoi_dau/06_loi_khai_nhan_chung.pdf',
     phase: 0,
     order: 60
   },
   {
-    id: 'pdf-07a',
-    title: '07. Biên bản lấy lời khai: Nguyễn Ngọc Mai',
-    code: '07a',
-    url: '/documents/case_000/phase_0_initial/07a_bien_ban_loi_khai_tran_ngoc_mai.pdf',
+    id: 'pdf-07',
+    title: '07. Lời khai: Nguyễn Ngọc Mai (Lần 1)',
+    code: '07-LK',
+    url: '/documents/case_000/00_khoi_dau/07_loi_khai_mai.pdf',
     phase: 0,
     order: 70
   },
   {
-    id: 'pdf-07b',
-    title: '08. Biên bản lấy lời khai: Lê Quang Vũ',
-    code: '07b',
-    url: '/documents/case_000/phase_0_initial/07b_bien_ban_loi_khai_le_quang_vu.pdf',
+    id: 'pdf-08',
+    title: '08. Lời khai: Lê Quang Vũ (Lần 1)',
+    code: '08-LK',
+    url: '/documents/case_000/00_khoi_dau/08_loi_khai_vu.pdf',
     phase: 0,
     order: 80
   },
   {
-    id: 'pdf-07c',
-    title: '09. Biên bản lấy lời khai: Nguyễn Thanh Tùng',
-    code: '07c',
-    url: '/documents/case_000/phase_0_initial/07c_bien_ban_loi_khai_tung.pdf',
+    id: 'pdf-09',
+    title: '09. Lời khai: Trần Thị Hà (Lần 1)',
+    code: '09-LK',
+    url: '/documents/case_000/00_khoi_dau/09_loi_khai_ha.pdf',
     phase: 0,
     order: 90
   },
   {
-    id: 'pdf-03',
-    title: '10. Báo cáo tổng hợp tiến độ điều tra ban đầu',
-    code: 'f1-3',
-    url: '/documents/case_000/phase_0_initial/03_bao_cao_tien_do_dieu_tra.pdf',
+    id: 'pdf-10',
+    title: '10. Sổ ghi nợ cá nhân của Khang',
+    code: '10-SN',
+    url: '/documents/case_000/00_khoi_dau/10_so_ghi_no.pdf',
     phase: 0,
     order: 100
   },
   {
-    id: 'pdf-05',
-    title: '11. Báo cáo chuyên đề mâu thuẫn & mối quan hệ',
-    code: 'f1-5',
-    url: '/documents/case_000/phase_0_initial/05_bao_cao_chuyen_de_mau_thuan_va_quan_he.pdf',
+    id: 'pdf-11',
+    title: '11. Bảng tin dân cư rao vặt',
+    code: '11-BT',
+    url: '/documents/case_000/00_khoi_dau/11_bang_tin_rao_vat.pdf',
+    phase: 0,
+    order: 105
+  },
+  {
+    id: 'pdf-12',
+    title: '12. Biên bản xác minh nhật ký cuộc gọi',
+    code: '12-CG',
+    url: '/documents/case_000/00_khoi_dau/12_tong_hop_loi_khai_cuoc_goi.pdf',
     phase: 0,
     order: 110
   },
-
-  // Phase 1: Inheritance & Land Dispute
   {
-    id: 'pdf-08',
-    title: '08. Tờ di chúc ông nội bị tẩy xóa làm giả',
-    code: 'f2-1',
-    url: '/documents/case_000/phase_1_inheritance/08_di_chuc_ong_noi_gia_mao.pdf',
-    phase: 1,
-    order: 110
+    id: 'pdf-13',
+    title: '13. Đơn khởi kiện tranh chấp đất đai',
+    code: '13-ĐK',
+    url: '/documents/case_000/00_khoi_dau/13_don_khoi_kien_tranh_chap.pdf',
+    phase: 0,
+    order: 115
   },
   {
-    id: 'pdf-09',
-    title: '09. Kết quả giám định tuổi mực & vết tẩy xóa (Viện KHHS)',
-    code: 'f2-2',
-    url: '/documents/case_000/phase_1_inheritance/09_ket_qua_giam_dinh_chu_ky.pdf',
-    phase: 1,
+    id: 'pdf-14',
+    title: '14. Thông báo quá hạn nợ ngân hàng',
+    code: '14-NH',
+    url: '/documents/case_000/00_khoi_dau/14_thong_bao_no_ngan_hang.pdf',
+    phase: 0,
     order: 120
   },
   {
-    id: 'pdf-10a',
-    title: '10a. Trích lục bản đồ địa chính & Sổ đỏ gốc (75.0m2)',
-    code: 'f2-3a',
-    url: '/documents/case_000/phase_1_inheritance/10a_trich_luc_ban_do_dia_chinh_goc_75m2.pdf',
+    id: 'pdf-15',
+    title: '15. Trích đoạn bài báo cũ năm 1996',
+    code: '15-BC',
+    url: '/documents/case_000/00_khoi_dau/15_trich_doan_bai_bao_1996.pdf',
+    phase: 0,
+    order: 125
+  },
+
+  // Phase 1: Branch Mai & Vu (01_nhanh_mai_vu)
+  {
+    id: 'pdf-a01',
+    title: '01. Sổ bán hàng & Thu chi Quán Bia 88',
+    code: 'A-01',
+    url: '/documents/case_000/01_nhanh_mai_vu/01_so_thu_chi_quan_bia.pdf',
     phase: 1,
     order: 130
   },
   {
-    id: 'pdf-10b',
-    title: '10b. Bản trích đo kỹ thuật đền bù giải tỏa đợt 1 (120.0m2)',
-    code: 'f2-3b',
-    url: '/documents/case_000/phase_1_inheritance/10b_ban_trich_do_ky_thuat_den_bu_120m2.pdf',
+    id: 'pdf-a02',
+    title: '02. Lời khai lần 2: Lê Quang Vũ',
+    code: 'A-02',
+    url: '/documents/case_000/01_nhanh_mai_vu/02_loi_khai_lan_2_vu.pdf',
     phase: 1,
-    order: 131
+    order: 135
   },
-
-  // Phase 2: Past Secret & Hide-and-Seek
   {
-    id: 'pdf-11',
-    title: '11. Biên bản camera & Bi kịch trốn tìm 1996',
-    code: 'f3-1',
-    url: '/documents/case_000/phase_2_altercation/11_bien_ban_trich_xuat_camera_va_tro_tron_tim.pdf',
-    phase: 2,
+    id: 'pdf-a03',
+    title: '03. Biên bản làm việc chủ Quán Bia 88',
+    code: 'A-03',
+    url: '/documents/case_000/01_nhanh_mai_vu/03_bien_ban_lam_viec_chu_quan_bia.pdf',
+    phase: 1,
     order: 140
   },
 
-  // Phase 3: Conclusion & Forensic Breakthrough
+  // Phase 2: Branch Nguyen Thanh Tung (02_nhanh_tung)
   {
-    id: 'pdf-12',
-    title: '12. Báo cáo pháp y bổ sung giờ tử vong 21:00',
-    code: 'f4-1',
-    url: '/documents/case_000/phase_3_conclusion/12_bao_cao_phap_y_bo_sung_va_loi_khai_ha_lo_loi.pdf',
-    phase: 3,
+    id: 'pdf-b01',
+    title: '01. Biên bản tự thú xô xát: Nguyễn Thanh Tùng',
+    code: 'B-01',
+    url: '/documents/case_000/02_nhanh_tung/01_tu_thu_xo_xat_tung.pdf',
+    phase: 2,
     order: 150
   },
   {
-    id: 'pdf-13',
-    title: '13. Tổng hợp SMS, Email & Tin nhắn tình nhân 20:40',
-    code: 'f4-3',
-    url: '/documents/case_000/phase_3_conclusion/13_tong_hop_tin_nhan_sms_va_email.pdf',
-    phase: 3,
+    id: 'pdf-b02',
+    title: '02. Lời khai: Nguyễn Thanh Tùng (Lần 1)',
+    code: 'B-02',
+    url: '/documents/case_000/02_nhanh_tung/02_loi_khai_tung.pdf',
+    phase: 2,
+    order: 155
+  },
+  {
+    id: 'pdf-b03',
+    title: '03. Lý lịch tư pháp: Nguyễn Thanh Tùng',
+    code: 'B-03',
+    url: '/documents/case_000/02_nhanh_tung/03_ly_lich_nguyen_thanh_tung.pdf',
+    phase: 2,
     order: 160
+  },
+  {
+    id: 'pdf-b04',
+    title: '04. Lời khai: Đạt Gà Chợ Cảng',
+    code: 'B-04',
+    url: '/documents/case_000/02_nhanh_tung/04_loi_khai_dat_ga.pdf',
+    phase: 2,
+    order: 165
+  },
+  {
+    id: 'pdf-b05',
+    title: '05. Lý lịch tư pháp: Đạt Gà Chợ Cảng',
+    code: 'B-05',
+    url: '/documents/case_000/02_nhanh_tung/05_ly_lich_dat_ga.pdf',
+    phase: 2,
+    order: 170
+  },
+
+  // Phase 3: Branch Tran Thi Ha & Conclusion (03_nhanh_ha & 04_ket_luan)
+  {
+    id: 'pdf-c01',
+    title: '01. Lời khai lần 2: Trần Thị Hà',
+    code: 'C-01',
+    url: '/documents/case_000/03_nhanh_ha/01_loi_khai_lan_2_tran_thi_ha.pdf',
+    phase: 3,
+    order: 180
+  },
+  {
+    id: 'pdf-c03',
+    title: '03. Biên bản khám xét khẩn cấp phòng trọ Hà',
+    code: 'C-03',
+    url: '/documents/case_000/03_nhanh_ha/03_kham_xet_phong_ha.pdf',
+    phase: 3,
+    order: 185
+  },
+  {
+    id: 'pdf-d01',
+    title: '04. Bản kết luận điều tra & Đề nghị truy tố',
+    code: 'D-01',
+    url: '/documents/case_000/04_ket_luan/de_nghi_truy_to.pdf',
+    phase: 3,
+    order: 190
+  },
+  {
+    id: 'pdf-d02',
+    title: '05. Ký sự hậu án & Lời thú tội',
+    code: 'D-02',
+    url: '/documents/case_000/04_ket_luan/05_ky_su_hau_an.pdf',
+    phase: 3,
+    order: 195
   }
 ]
 

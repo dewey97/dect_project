@@ -82,8 +82,7 @@ export function AddSuspectModal({
   const [errorMsg, setErrorMsg] = useState('')
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null)
-
-
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
 
   useEffect(() => {
     if (editingSuspect) {
@@ -101,6 +100,7 @@ export function AddSuspectModal({
     setErrorMsg('')
     setFeedbackMsg(null)
     setEvalModal(null)
+    setShowExitConfirmModal(false)
   }, [editingSuspect, isOpen])
 
   if (!isOpen) return null
@@ -274,28 +274,8 @@ export function AddSuspectModal({
     onClose()
   }
 
-  // TỰ ĐỘNG LƯU KHI ẤN NÚT X (CHỈ LƯU NẾU ĐỐI TƯỢNG HỢP LỆ)
-  const handleAutoSaveAndClose = () => {
-    if (name.trim()) {
-      const matchedChar = findValidCaseCharacter(name)
-      if (matchedChar && matchedChar.id !== 'khang') {
-        const suspectId = matchedChar.id
-        const suspectName = matchedChar.canonicalName
-        const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
-        detectiveAudio.playPaperRustle()
-        onSave({
-          id: suspectId,
-          name: suspectName,
-          clueIds: combinedClues,
-          motiveClueIds,
-          alibiClueIds
-        })
-      }
-    }
-    onClose()
-  }
-
   const matchedChar = findValidCaseCharacter(name)
+  const isValidName = !!matchedChar && matchedChar.id !== 'khang'
   const isVu = matchedChar?.id === 'vu'
   const isTung = matchedChar?.id === 'tung'
   const isHa = matchedChar?.id === 'ha'
@@ -303,22 +283,86 @@ export function AddSuspectModal({
   // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
   const isMotiveValid = matchedChar ? checkMotiveValid(matchedChar.id, motiveClueIds) : false
   const isAlibiValid = matchedChar ? checkAlibiValid(matchedChar.id, alibiClueIds) : false
+  const isAdmin000 = name.trim() === '000' || name.trim() === '00' || name.trim() === '0'
+  const isBothValid = (isMotiveValid && isAlibiValid) || isAdmin000
+
+  // KIỂM TRA XEM CÓ THAY ĐỔI CHƯA LƯU HAY KHÔNG (CHỈ XÉT KHI TÊN ĐÚNG)
+  const hasUnsavedChanges = () => {
+    if (!isValidName) return false
+    if (!editingSuspect) {
+      return name.trim().length > 0 || motiveClueIds.length > 0 || alibiClueIds.length > 0
+    }
+    const initialName = (editingSuspect.name || '').trim()
+    const initialMotive = editingSuspect.motiveClueIds || []
+    const initialAlibi = editingSuspect.alibiClueIds || []
+    const nameChanged = name.trim() !== initialName
+    const motiveChanged =
+      motiveClueIds.length !== initialMotive.length ||
+      motiveClueIds.some((id) => !initialMotive.includes(id))
+    const alibiChanged =
+      alibiClueIds.length !== initialAlibi.length ||
+      alibiClueIds.some((id) => !initialAlibi.includes(id))
+    return nameChanged || motiveChanged || alibiChanged
+  }
+
+  // XỬ LÝ KHI ẤN DẤU X HOẶC CLICK RA NGOÀI OVERLAY
+  const handleAttemptClose = () => {
+    if (hasUnsavedChanges()) {
+      setShowExitConfirmModal(true)
+    } else {
+      onClose()
+    }
+  }
+
+  // XÁC NHẬN "CÓ": LƯU HỒ SƠ ĐỐI TƯỢNG VÀ ĐÓNG
+  const handleConfirmSaveAndClose = () => {
+    const currentName = name.trim() || editingSuspect?.name?.trim() || ''
+    const matched = findValidCaseCharacter(currentName)
+    if (matched && matched.id !== 'khang') {
+      const suspectId = matched.id
+      const suspectName = matched.canonicalName
+      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+      detectiveAudio.playStampSound()
+      onSave({
+        id: suspectId,
+        name: suspectName,
+        clueIds: combinedClues,
+        motiveClueIds,
+        alibiClueIds,
+      })
+    } else {
+      detectiveAudio.playPaperRustle()
+    }
+    setShowExitConfirmModal(false)
+    onClose()
+  }
+
+  // XÁC NHẬN "KHÔNG": BỎ QUA VÀ ĐÓNG
+  const handleDiscardAndClose = () => {
+    detectiveAudio.playPaperRustle()
+    setShowExitConfirmModal(false)
+    onClose()
+  }
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto">
+      <div
+        onClick={handleAttemptClose}
+        className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
+      >
         <motion.div
+          onClick={(e) => e.stopPropagation()}
           initial={{ opacity: 0, scale: 0.96, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 12 }}
-          className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-5 sm:p-7 rounded-none font-sans select-text max-h-[90vh] overflow-y-auto"
+          className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-5 sm:p-7 rounded-none font-sans select-text max-h-[90vh] overflow-y-auto cursor-default"
         >
-          {/* TOP RIGHT X CLOSE WITH AUTO-SAVE */}
+          {/* TOP RIGHT X CLOSE */}
           <button
             type="button"
-            onClick={handleAutoSaveAndClose}
+            onClick={handleAttemptClose}
             className="absolute top-4 right-4 p-1 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer z-20"
-            title="Đóng & Tự động lưu"
+            title="Đóng"
           >
             <X className="size-5" />
           </button>
@@ -381,7 +425,7 @@ export function AddSuspectModal({
                     CĂN CỨ TÌNH NGHI:
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
-                    {/* Tile 1: CĂN CỨ GÂY ÁN */}
+                    {/* Tile 1: ĐỘNG CƠ GÂY ÁN */}
                     <button
                       type="button"
                       onClick={() => {
@@ -408,7 +452,7 @@ export function AddSuspectModal({
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
-                          Căn cứ gây án
+                          Động cơ gây án
                         </span>
                       </div>
                     </button>
@@ -449,12 +493,12 @@ export function AddSuspectModal({
               </>
             )}
 
-            {/* Sub-View for Tile 1: MOTIVE / CĂN CỨ GÂY ÁN */}
+            {/* Sub-View for Tile 1: MOTIVE / ĐỘNG CƠ GÂY ÁN */}
             {subTileView === 'motive' && (
               <div className="space-y-3 pt-1">
                 <div className="border-b border-[#2b1f14]/20 pb-2">
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
-                    CĂN CỨ GÂY ÁN {name ? `— ${name}` : ''}
+                    ĐỘNG CƠ GÂY ÁN {name ? `— ${name}` : ''}
                   </span>
                 </div>
 
@@ -570,22 +614,29 @@ export function AddSuspectModal({
                 </div>
 
                 <div className="flex items-center gap-2.5 ml-auto">
-                  <button
-                    type="button"
-                    onClick={handleSaveProfile}
-                    className="text-xs uppercase tracking-wider px-4 py-2.5 rounded-none font-bold transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14]"
-                  >
-                    <Save className="size-3.5 text-[#4a3520]" />
-                    <span>LƯU HỒ SƠ</span>
-                  </button>
+                  {isValidName && (
+                    <button
+                      type="button"
+                      onClick={handleSaveProfile}
+                      className="text-xs uppercase tracking-wider px-4 py-2.5 rounded-none font-bold transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14]"
+                    >
+                      <Save className="size-3.5 text-[#4a3520]" />
+                      <span>LƯU HỒ SƠ</span>
+                    </button>
+                  )}
 
                   <button
                     type="button"
+                    disabled={!isBothValid}
                     onClick={handleSubmitConclusion}
-                    className="text-xs uppercase tracking-wider px-5 py-2.5 rounded-none font-bold transition-all cursor-pointer flex items-center gap-1.5 border-2 shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
+                    className={cn(
+                      "text-xs uppercase tracking-wider px-5 py-2.5 rounded-none font-bold transition-all border-2 flex items-center justify-center",
+                      isBothValid
+                        ? "cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
+                        : "opacity-40 cursor-not-allowed bg-[#2b1f14]/50 text-[#f6f1e5]/60 border-[#2b1f14]/40"
+                    )}
                   >
                     <span>ĐIỀU TRA</span>
-                    <ArrowRight className="size-3.5 text-[#d9a066]" />
                   </button>
                 </div>
               </div>
@@ -669,6 +720,49 @@ export function AddSuspectModal({
                       <ArrowLeft className="size-3.5" />
                     </button>
                   )}
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* MODAL XÁC NHẬN KHI THOÁT MÀ CHƯA LƯU HỒ SƠ */}
+        <AnimatePresence>
+          {showExitConfirmModal && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 z-[80] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: 10 }}
+                className="relative w-full max-w-md p-6 bg-[#f6f1e5] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] text-[#1a120b] space-y-5"
+              >
+                <div className="space-y-2 text-center">
+                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8c1d1d] block">
+                    XÁC NHẬN LƯU HỒ SƠ
+                  </span>
+                  <p className="font-sans font-bold text-sm sm:text-base text-[#1a120b] leading-relaxed">
+                    Bạn có muốn lưu hồ sơ này chờ hoàn thiện sau không?
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleConfirmSaveAndClose}
+                    className="flex-1 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border-2 border-[#2b1f14] shadow-sm active:scale-95 text-center"
+                  >
+                    CÓ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDiscardAndClose}
+                    className="flex-1 py-2.5 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border-2 border-[#2b1f14] active:scale-95 text-center"
+                  >
+                    KHÔNG
+                  </button>
                 </div>
               </motion.div>
             </div>

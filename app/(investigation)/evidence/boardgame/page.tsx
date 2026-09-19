@@ -41,14 +41,6 @@ export default function BoardGameCompanionPage() {
       localStorage.setItem('veritas_play_experience', 'boardgame')
     } catch {}
 
-    if (completedCheckpointIds.length === 0) {
-      setUnlockedModalData({
-        unlockedPhase: 0,
-        newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-        newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
-      })
-    }
-
     const handleOpenEpilogue = () => setIsEpilogueOpen(true)
     const handleOpenPhone = () => setIsPhoneModalOpen(true)
 
@@ -134,10 +126,20 @@ export default function BoardGameCompanionPage() {
       localStorage.removeItem('veritas_completed_checkpoints')
       localStorage.removeItem('veritas_canvas_suspects')
       localStorage.removeItem('veritas_investigated_suspects')
+      localStorage.removeItem('veritas_solved_followups')
+      localStorage.removeItem('veritas_followup_vu')
+      localStorage.removeItem('veritas_followup_tung')
+      localStorage.removeItem('veritas_followup_ha')
+      localStorage.removeItem('veritas_followup_ha_matches')
+      localStorage.removeItem('veritas_followup_tung_choice')
+      localStorage.removeItem('veritas_followup_vu_choice')
+      localStorage.removeItem('veritas_followup_ha_choice')
       localStorage.removeItem('veritas_reinvestigate_unlocked')
+      localStorage.removeItem('veritas_reinvestigate_opened')
       localStorage.removeItem('veritas_indictment_solved')
       localStorage.removeItem('veritas_indictment_culprit')
       localStorage.removeItem('veritas_phone_inputs')
+      localStorage.removeItem('veritas_phone_solved')
       localStorage.removeItem('khang_phone_pinned_clues')
       localStorage.removeItem('veritas_custom_notes')
       window.location.reload()
@@ -145,7 +147,7 @@ export default function BoardGameCompanionPage() {
   }
 
   return (
-    <div suppressHydrationWarning className="h-full w-full bg-[#0b0704] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col justify-start items-center p-0 sm:p-4 relative box-border min-h-dvh">
+    <div suppressHydrationWarning className="h-full w-full bg-[#0b0704] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col justify-start items-center p-0 sm:p-2 relative box-border flex-1 min-h-0">
       {/* AMBIENT NOIR BANKERS SPOTLIGHT */}
       <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[900px] max-w-full h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(217,160,102,0.13),transparent_75%)] z-0" />
       <div className="noir-scanlines pointer-events-none fixed inset-0 opacity-15 z-0" />
@@ -161,6 +163,7 @@ export default function BoardGameCompanionPage() {
         onSubmitAnswer={handleSubmitAnswer}
         onUnlockNextHint={unlockNextHint}
         onOpenEpilogue={() => setIsEpilogueOpen(true)}
+        onOpenPhoneSimulator={() => setIsPhoneModalOpen(true)}
         onOpenReinvestigation={() => setIsReinvestigateModalOpen(true)}
         onSwitchToWebMode={handleSwitchToWebMode}
         onProceedNextPhase={handleProceedNextPhase}

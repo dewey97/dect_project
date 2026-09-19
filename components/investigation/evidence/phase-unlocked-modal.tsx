@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FileText, ImageIcon, Search } from 'lucide-react'
+import { FileText, ImageIcon, Search, X } from 'lucide-react'
 import { PDFDocument, PhysicalEvidence } from './evidence-types'
 import { CASE_000_NARRATOR } from '@/content/cases/case-000/narrator'
 import { TypewriterNarrator } from './typewriter-narrator'
@@ -39,6 +39,15 @@ export function PhaseUnlockedModal({
     setIsNarrativeComplete(false)
   }, [unlockedModalData])
 
+  React.useEffect(() => {
+    if (!unlockedModalData) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [unlockedModalData, onClose])
+
   const handleStartStory = () => {
     setIsStoryStarted(true)
     setIsNarrativeComplete(false)
@@ -55,6 +64,17 @@ export function PhaseUnlockedModal({
         <div className="fixed inset-0 z-50 w-full h-[100dvh] max-h-[100dvh] bg-[#0c0805] text-[#e5d8cb] overflow-hidden flex flex-col font-sans select-none">
           {/* CRT Background scanlines */}
           <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-10" />
+
+          {/* Top Exit Close Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-4 right-4 z-40 p-2 bg-[#1b140e]/90 hover:bg-[#331c0e] border border-[#593c26] text-[#d9a066] hover:text-white rounded transition-colors cursor-pointer shadow-xl flex items-center gap-1.5 font-mono text-xs"
+            title="Đóng / Bỏ qua mở đầu"
+          >
+            <span>BỎ QUA</span>
+            <X className="size-4" />
+          </button>
 
           {/* Main Fullscreen Content Area */}
           {playExperience === 'boardgame' ? (

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { FileText, Search, Paperclip, ImageIcon, Volume2, VolumeX, Box, X, UserCheck } from 'lucide-react'
+import { FileText, Search, Paperclip, ImageIcon, Volume2, VolumeX, Box, X, UserCheck, Home } from 'lucide-react'
 import { PDFViewerModal } from '@/components/investigation/pdf-viewer-modal'
 import { useCheckpoints } from '@/components/investigation/checkpoints-context'
 import { CASES } from '@/lib/mock-data'
@@ -231,6 +231,24 @@ export default function WebEvidencePage() {
     try {
       localStorage.removeItem('veritas_discovered_findings')
       localStorage.removeItem('veritas_completed_checkpoints')
+      localStorage.removeItem('veritas_canvas_suspects')
+      localStorage.removeItem('veritas_investigated_suspects')
+      localStorage.removeItem('veritas_solved_followups')
+      localStorage.removeItem('veritas_followup_vu')
+      localStorage.removeItem('veritas_followup_tung')
+      localStorage.removeItem('veritas_followup_ha')
+      localStorage.removeItem('veritas_followup_ha_matches')
+      localStorage.removeItem('veritas_followup_tung_choice')
+      localStorage.removeItem('veritas_followup_vu_choice')
+      localStorage.removeItem('veritas_followup_ha_choice')
+      localStorage.removeItem('veritas_reinvestigate_unlocked')
+      localStorage.removeItem('veritas_reinvestigate_opened')
+      localStorage.removeItem('veritas_indictment_solved')
+      localStorage.removeItem('veritas_indictment_culprit')
+      localStorage.removeItem('veritas_phone_inputs')
+      localStorage.removeItem('veritas_phone_solved')
+      localStorage.removeItem('khang_phone_pinned_clues')
+      localStorage.removeItem('veritas_custom_notes')
       window.location.reload()
     } catch {}
   }
@@ -334,6 +352,19 @@ export default function WebEvidencePage() {
               </div>
 
               <div className="flex items-center gap-2 sm:self-start flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    detectiveAudio.playPaperRustle()
+                    router.push('/')
+                  }}
+                  className="px-2.5 py-1.5 bg-[#1b140e] hover:bg-[#2d1b10] border border-[#593c26] text-[#e5d8cb] hover:text-amber-300 font-mono text-[0.7rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
+                  title="Thoát về Màn hình chính"
+                >
+                  <Home className="size-3.5 text-amber-400" />
+                  <span>TRANG CHÍNH</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {

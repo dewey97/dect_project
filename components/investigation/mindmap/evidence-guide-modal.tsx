@@ -5,10 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
   FolderSearch,
-  Smartphone,
-  Search,
-  Lock,
-  Unlock,
   CheckCircle2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -72,16 +68,13 @@ export function EvidenceGuideModal({
               )}
             >
               <div className="flex items-center justify-between gap-2 border-b border-[#2b1f14]/15 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="size-7 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-7 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-xs shrink-0">
                     1
                   </div>
-                  <div>
-                    <h4 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider flex items-center gap-1.5">
-                      <Smartphone className="size-4 text-[#8c592b]" />
-                      1. BỔ SUNG CHỨNG CỨ
-                    </h4>
-                  </div>
+                  <h4 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider">
+                    BỔ SUNG CHỨNG CỨ
+                  </h4>
                 </div>
 
                 {isPhoneSolved ? (
@@ -116,27 +109,23 @@ export function EvidenceGuideModal({
               )}
             >
               <div className="flex items-center justify-between gap-2 border-b border-[#2b1f14]/15 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="size-7 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="size-7 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-xs shrink-0">
                     2
                   </div>
-                  <div>
-                    <h4 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider flex items-center gap-1.5">
-                      <Search className="size-4 text-[#2b1f14]" />
-                      2. KHÁM XÉT LẠI HIỆN TRƯỜNG
-                    </h4>
-                  </div>
+                  <h4 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider">
+                    KHÁM XÉT LẠI HIỆN TRƯỜNG
+                  </h4>
                 </div>
 
                 {isReinvestigateUnlocked ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-800 text-amber-100 font-mono text-[10px] font-bold uppercase tracking-wider">
-                    <Unlock className="size-3 text-amber-300" />
-                    ĐÃ MỞ KHÓA
+                    <CheckCircle2 className="size-3 text-amber-300" />
+                    ĐÃ PHÊ DUYỆT
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-zinc-700 text-zinc-200 font-mono text-[10px] font-bold uppercase tracking-wider">
-                    <Lock className="size-3 text-zinc-400" />
-                    ĐANG KHÓA
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#d8c7b0] text-[#4a3520] border border-[#a88c6f] font-mono text-[10px] font-bold uppercase tracking-wider">
+                    CHỜ PHÊ DUYỆT
                   </span>
                 )}
               </div>
@@ -157,17 +146,6 @@ export function EvidenceGuideModal({
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* FOOTER */}
-          <div className="p-4 bg-[#ede3d1] border-t-2 border-[#2b1f14] flex items-center justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border border-[#2b1f14]"
-            >
-              ĐÓNG HƯỚNG DẪN
-            </button>
           </div>
         </motion.div>
       </div>

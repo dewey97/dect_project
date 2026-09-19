@@ -61,21 +61,21 @@
 #### 🔍 1. Phân tích thông tin nền & Nhật ký cuộc gọi
 - **Bối cảnh:** Người tiếp cận hồ sơ ban đầu thu thập được `Nhật ký cuộc gọi` trên điện thoại của Khang (`dev-00`) gồm 6 cuộc gọi:
   - 📞 **3 SĐT đã lưu tên:** `Chị Lan Quán Nước` (17:30) & `Bình Còi` (18:00) (Nhiễu); `Hà Kế Toán` (20:31 - Cuộc gọi nhỡ ➔ Mở đầu Tuyến C).
-  - ❓ **3 SĐT ẩn danh cần tra cứu:** `0967.452.183` (18:15), `0984.180.357` (19:00), và `0912.331.888` (20:09).
+  - ❓ **3 SĐT ẩn danh cần tra cứu:** `0967.452.183` / `0988.200.991` (18:15), `0912.331.888` (19:00), và `0984.180.357` (20:09).
 
 #### 📄 Danh mục tài liệu tiếp cận ban đầu:
 
 | Tên tài liệu / Mã | Nội dung | Mục đích | Cách xuất hiện |
 | :--- | :--- | :--- | :--- |
 | **Nhật ký cuộc gọi** (`dev-00`) | Trích xuất các cuộc gọi trên máy nạn nhân | Manh mối tra cứu danh tính các nghi phạm | Điện thoại giả lập của Khang (`dev-00`) |
-| **Sổ ghi nợ** (`10`) | Biệt danh `Lệch Pha` (300M, SĐT `0967.452.183`, chữ ký `Lê Quang Vũ`) khớp SMS thread `0988.20.09.91`; SĐT `0912.331.888` (50M) | Tra cứu danh tính Vũ & Đạt Gà | Thu thập tại hiện trường |
-| **Bảng tin rao vặt** (`11`) | Tin rao VLXD chứa SĐT `0984.180.357` | Tra cứu danh tính Nguyễn Thanh Tùng | Thu thập tại Bảng tin trước cổng |
+| **Sổ ghi nợ** (`10`) | Biệt danh `Lệch Pha` (300M, SĐT `0967.452.183`, chữ ký `Lê Quang Vũ`) khớp SMS thread `0988.20.09.91`; SĐT `0984.180.357` (50M) | Tra cứu danh tính Vũ & Đạt Gà | Thu thập tại hiện trường |
+| **Bảng tin rao vặt** (`11`) | Tin rao VLXD chứa SĐT `0912.331.888` | Tra cứu danh tính Nguyễn Thanh Tùng | Thu thập tại Bảng tin trước cổng |
 | **Lời khai bà Lụa** (`06`) | Nhắc đến 2 con trai nhà bà xóm bên | Manh mối nền về mối quan hệ Tùng & Huy | Hồ sơ điều tra ban đầu |
 
 #### 💡 Suy luận đối chiếu danh tính:
-- ➤ `0967.452.183` (18:15) đối chiếu SMS thread "Lệch Pha" + Sổ nợ (`10`) biệt danh + chữ ký ➤ **Lê Quang Vũ** (Chồng Mai).
-- ➔ `0984.180.357` (19:00) đối chiếu Bảng tin (`11`) ➔ **Nguyễn Thanh Tùng** (Thợ nề).
-- ➔ `0912.331.888` (20:09) đối chiếu Sổ nợ (`10`) ➔ **Đạt Gà Chợ Cảng**.
+- ➤ `0967.452.183` / `0988.200.991` (18:15) đối chiếu SMS thread "Lệch Pha" + Sổ nợ (`10`) biệt danh + chữ ký ➤ **Lê Quang Vũ** (Chồng Mai).
+- ➔ `0912.331.888` (19:00) đối chiếu Bảng tin (`11`) ➔ **Nguyễn Thanh Tùng** (Thợ nề).
+- ➔ `0984.180.357` (20:09) đối chiếu Sổ nợ (`10`) ➔ **Đạt Gà Chợ Cảng**.
 
 ---
 

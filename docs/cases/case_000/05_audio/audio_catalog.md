@@ -53,6 +53,8 @@ Dưới đây là bảng tổng hợp các file âm thanh gốc đã được d�
 | `slam_preview2.wav` | WAV | 350 KB | File nghe thử hiệu ứng va đập 2. |
 | `part_0_6.wav` | WAV | 1.05 MB | Trích đoạn âm thanh thành phần 0_6. |
 | `test_ssml.mp3` | MP3 | 0 KB | File test cấu hình SSML giọng đọc. |
+| `Voice Vy.mp3` | MP3 | 60 KB | Ghi âm tin nhắn thoại Thảo Vy gửi Khang lúc 20:38 ngày 24/07 (thời lượng 0:04). |
+| `Voice Khang.mp3` | MP3 | 93 KB | Ghi âm tin nhắn thoại Đặng Hoàng Khang đe dọa đòi nợ gửi Tuấn Béo lúc 10:20 ngày 21/07 (thời lượng 0:06). |
 
 ---
 
@@ -69,8 +71,10 @@ Các file âm thanh trực tiếp kết nối với giao diện người dùng v
 * **`unlock_jingle.mp3`**: Tiếng nhạc jingle âm vang khi hoàn thành giải đố thành công.
 * **`glass_break.mp3`**: Tiếng thủy tinh rạn nứt / cảnh báo khi chọn sai lập luận.
 * **`paper_rustle.mp3`**: Tiếng sột soạt lật hồ sơ, tài liệu, biên bản khai nại.
-* **`ha_voicemail_2032.mp3`**: Lời nhắn hộp thư thoại 20:32 của Trần Thị Hà gửi nạn nhân Khang (chứa âm thanh đầu mối: còi tàu hỏa 68dB vạch trần cô ta đang đứng ngay trước cổng nhà nạn nhân).
+* **`ha_voicemail_2032_v4.mp3`**: Lời nhắn hộp thư thoại 20:32 của Trần Thị Hà gửi nạn nhân Khang (chứa âm thanh đầu mối: còi tàu hỏa 68dB vạch trần cô ta đang đứng ngay trước cổng nhà nạn nhân).
 * **`ha_interrogation_breakdown.mp3`**: Băng ghi âm thẩm vấn năm 2016 (lời khai gay gắt, dồn ép và vỡ vụn tâm lý của Trần Thị Hà khi bị chất vấn về việc nhầm lịch phát sóng VTV3).
+* **`voice_vy.mp3`**: Tin nhắn thoại Thảo Vy gửi Khang trong luồng chat iPhone (`m1-25`, thời lượng 0:04).
+* **`voice_khang.mp3`**: Tin nhắn thoại Khang gửi Tuấn Béo Xưởng Mộc trong luồng chat iPhone (`m9-7`, thời lượng 0:06).
 
 ### 2. Nhạc nền cao trào (`public/audio/`)
 

@@ -15,16 +15,24 @@ function safeCopyAndUnlink(src, dest, retries = 5) {
   }
 }
 
-function resolvePdflatexPath() {
+function resolveEngine() {
+  const localTectonic = path.join(__dirname, 'bin', 'tectonic.exe');
+  if (fs.existsSync(localTectonic)) {
+    return { type: 'tectonic', bin: localTectonic };
+  }
+  try {
+    execSync('tectonic --version', { stdio: 'ignore' });
+    return { type: 'tectonic', bin: 'tectonic' };
+  } catch (e) {}
+
   if (process.env.PDFLATEX_PATH && fs.existsSync(process.env.PDFLATEX_PATH)) {
-    return process.env.PDFLATEX_PATH;
+    return { type: 'pdflatex', bin: process.env.PDFLATEX_PATH };
   }
   try {
     execSync('pdflatex --version', { stdio: 'ignore' });
-    return 'pdflatex';
-  } catch (e) {
-    // pdflatex not found in PATH
-  }
+    return { type: 'pdflatex', bin: 'pdflatex' };
+  } catch (e) {}
+
   const candidatePaths = [
     process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, 'Programs', 'MiKTeX', 'miktex', 'bin', 'x64', 'pdflatex.exe') : null,
     'C:\\Program Files\\MiKTeX\\miktex\\bin\\x64\\pdflatex.exe',
@@ -33,13 +41,29 @@ function resolvePdflatexPath() {
   ].filter(Boolean);
 
   for (const p of candidatePaths) {
-    if (fs.existsSync(p)) return p;
+    if (fs.existsSync(p)) return { type: 'pdflatex', bin: p };
   }
-  return 'pdflatex';
+  return { type: 'tectonic', bin: localTectonic };
+}
+
+function getAllFiles(dir, ext) {
+  let results = [];
+  if (!fs.existsSync(dir)) return results;
+  const list = fs.readdirSync(dir);
+  for (const file of list) {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
+    if (stat && stat.isDirectory()) {
+      results = results.concat(getAllFiles(fullPath, ext));
+    } else if (file.endsWith(ext)) {
+      results.push(fullPath);
+    }
+  }
+  return results;
 }
 
 function compileAndCleanLatex() {
-  const targetFilter = process.argv[2] ? process.argv[2].toLowerCase() : null;
+  const targetFilter = process.argv[2] && process.argv[2] !== 'all' ? process.argv[2].toLowerCase() : null;
   const rootDir = path.join(__dirname, '..');
   const latexBaseDir = path.join(rootDir, 'latex', 'case_000');
   const publicPdfBaseDir = path.join(rootDir, 'public', 'documents', 'case_000');
@@ -49,73 +73,72 @@ function compileAndCleanLatex() {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
-  const pdflatexPath = resolvePdflatexPath();
-  const phases = ['phase_0_initial', 'phase_1_inheritance', 'phase_2_altercation', 'phase_3_conclusion'];
+  const engine = resolveEngine();
+  console.log(`Using LaTeX engine: [${engine.type}] at ${engine.bin}`);
+
+  const texFiles = getAllFiles(latexBaseDir, '.tex').filter(filePath => {
+    if (!targetFilter) return true;
+    const base = path.basename(filePath, '.tex').toLowerCase();
+    const rel = path.relative(latexBaseDir, filePath).toLowerCase();
+    return base.includes(targetFilter) || rel.includes(targetFilter);
+  });
 
   let successCount = 0;
 
-  for (const phase of phases) {
-    const phaseLatexDir = path.join(latexBaseDir, phase);
-    const phasePdfDir = path.join(publicPdfBaseDir, phase);
+  for (const texPath of texFiles) {
+    const relPath = path.relative(latexBaseDir, texPath);
+    const relDir = path.dirname(relPath);
+    const baseName = path.basename(texPath, '.tex');
+    const outPdfDir = path.join(publicPdfBaseDir, relDir);
+    const destPdf = path.join(outPdfDir, `${baseName}.pdf`);
 
-    if (!fs.existsSync(phaseLatexDir)) continue;
+    if (!fs.existsSync(outPdfDir)) {
+      fs.mkdirSync(outPdfDir, { recursive: true });
+    }
 
-    const texFiles = fs.readdirSync(phaseLatexDir).filter(f => {
-      if (!f.endsWith('.tex')) return false;
-      if (targetFilter) {
-        return f.toLowerCase().includes(targetFilter) || path.basename(f, '.tex').toLowerCase().includes(targetFilter);
-      }
-      return true;
-    });
+    console.log(`⏳ Compiling ${relPath}...`);
 
-    for (const texFile of texFiles) {
-      const texPath = path.join(phaseLatexDir, texFile);
-      const baseName = path.basename(texFile, '.tex');
-      
-      console.log(`⏳ Compiling ${phase}/${texFile}...`);
-
-      try {
-        // Run pdflatex directly in the phase folder
-        execSync(`"${pdflatexPath}" -interaction=nonstopmode "${texFile}"`, {
-          cwd: phaseLatexDir,
+    try {
+      if (engine.type === 'tectonic') {
+        execSync(`"${engine.bin}" "${texPath}" --outdir "${outPdfDir}"`, {
+          cwd: path.dirname(texPath),
           stdio: 'pipe'
         });
-      } catch (err) {
-        console.warn(`⚠️ Warning: pdflatex returned non-zero for ${texFile}, checking if output PDF exists...`);
+      } else {
+        execSync(`"${engine.bin}" -interaction=nonstopmode "${path.basename(texPath)}"`, {
+          cwd: path.dirname(texPath),
+          stdio: 'pipe'
+        });
+        const generatedPdf = path.join(path.dirname(texPath), `${baseName}.pdf`);
+        if (fs.existsSync(generatedPdf)) {
+          fs.copyFileSync(generatedPdf, destPdf);
+          fs.unlinkSync(generatedPdf);
+        }
       }
 
-      const generatedPdf = path.join(phaseLatexDir, `${baseName}.pdf`);
-      const destPdfPublic = path.join(publicPdfBaseDir, phase, `${baseName}.pdf`);
-
-      if (fs.existsSync(generatedPdf)) {
-        const publicDir = path.dirname(destPdfPublic);
-
-        if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
-
-        // Copy to public directory, then clean up temp pdf
-        fs.copyFileSync(generatedPdf, destPdfPublic);
-        fs.unlinkSync(generatedPdf);
-        console.log(`✓ Updated PDF: public for ${phase}/${baseName}.pdf`);
+      if (fs.existsSync(destPdf)) {
+        console.log(`✓ Updated PDF: ${path.relative(rootDir, destPdf)}`);
         successCount++;
       } else {
-        console.error(`❌ Failed to produce PDF for ${texFile}`);
+        console.error(`❌ Failed to produce PDF for ${relPath}`);
       }
+    } catch (err) {
+      console.warn(`⚠️ Error compiling ${relPath}: ${err.message}`);
+    }
 
-      // Move log file to .vscode/latex_logs/
-      const generatedLog = path.join(phaseLatexDir, `${baseName}.log`);
-      if (fs.existsSync(generatedLog)) {
-        const destLog = path.join(logDir, `${baseName}.log`);
-        safeCopyAndUnlink(generatedLog, destLog);
-        console.log(`📋 Log saved: .vscode/latex_logs/${baseName}.log`);
-      }
+    // Move log file if generated
+    const localLog = path.join(path.dirname(texPath), `${baseName}.log`);
+    if (fs.existsSync(localLog)) {
+      const destLog = path.join(logDir, `${baseName}.log`);
+      safeCopyAndUnlink(localLog, destLog);
+    }
 
-      // Clean up auxiliary temporary files
-      const auxExtensions = ['.aux', '.out', '.fls', '.fdb_latexmk', '.synctex.gz'];
-      for (const ext of auxExtensions) {
-        const tempFile = path.join(phaseLatexDir, `${baseName}${ext}`);
-        if (fs.existsSync(tempFile)) {
-          fs.unlinkSync(tempFile);
-        }
+    // Clean up aux
+    const auxExtensions = ['.aux', '.out', '.fls', '.fdb_latexmk', '.synctex.gz'];
+    for (const ext of auxExtensions) {
+      const tempFile = path.join(path.dirname(texPath), `${baseName}${ext}`);
+      if (fs.existsSync(tempFile)) {
+        fs.unlinkSync(tempFile);
       }
     }
   }
@@ -124,3 +147,4 @@ function compileAndCleanLatex() {
 }
 
 compileAndCleanLatex();
+

@@ -22,7 +22,7 @@ Cán bộ điều tra: Đại úy Hoàng Tuấn Dũng tiến hành lấy lời k
 * **Sinh năm:** 1988 (28 tuổi). Giới tính: Nam.
 * **Nơi cư trú:** Số 52, Đường Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội.
 * **Nghề nghiệp:** Buôn bán gia cầm tại Chợ Cảng.
-* **Số điện thoại:** `0912.331.888`.
+* **Số điện thoại:** `0984.180.357`.
 
 ---
 
