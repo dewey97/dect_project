@@ -48,19 +48,15 @@ export function CulpritEpilogueModal({
   const isTung = culprit === 'tung'
   const isHa = culprit === 'ha'
   const isHaMatchedAll = isHa && (choice === 'matched_3_tiles' || choice === 'matched_3_tiles_indictment')
-  const isQuestionSolved = (choice === '21:15' || choice === 'question_solved') && !isHa
-  const showTwoChoiceButtons = (isVu || isTung) && isQuestionSolved && !internalChoice
+  const isQuestionSolved = choice === '21:15' || choice === 'question_solved' || isHaMatchedAll || choice === 'tin' || choice === 'khong_tin'
+  const showTwoChoiceButtons = (isVu || isTung || isHa) && isQuestionSolved && !internalChoice
   const suspectName = isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà'
 
   let dateLabel = isVu
     ? 'THÔNG BÁO ĐIỀU TRA — LÊ QUANG VŨ'
     : isTung
     ? 'THÔNG BÁO ĐIỀU TRA — NGUYỄN THANH TÙNG'
-    : isHaMatchedAll
-    ? 'DẪN TRUYỆN BUỘC TỘI — TRẦN THỊ HÀ (25/07/2016)'
-    : haWarrantStep
-    ? 'ĐỀ XUẤT LỆNH KHÁM XẾT CHỖ Ở — TRẦN THỊ HÀ'
-    : 'QUYẾT ĐỊNH ĐIỀU TRA ĐỐI TƯỢNG TRẦN THỊ HÀ'
+    : 'THÔNG BÁO ĐIỀU TRA — TRẦN THỊ HÀ'
 
   let storyText = ''
 
@@ -91,8 +87,6 @@ export function CulpritEpilogueModal({
     } else {
       ctaButtonText = 'Mở rộng điều tra'
     }
-  } else if (isHaMatchedAll) {
-    ctaButtonText = 'Đề nghị truy tố'
   }
 
   const handleCtaClick = () => {
@@ -101,13 +95,6 @@ export function CulpritEpilogueModal({
       onClose()
       if (onOpenFollowupQuestion) {
         onOpenFollowupQuestion(culprit || undefined)
-      }
-    } else if (isHa && internalChoice === 'khong_tin') {
-      onClose()
-    } else if (isHaMatchedAll) {
-      onClose()
-      if (onOpenIndictment) {
-        onOpenIndictment()
       }
     } else {
       onClose()

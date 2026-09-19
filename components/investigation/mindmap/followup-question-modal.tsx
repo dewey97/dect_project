@@ -384,7 +384,6 @@ export function FollowupQuestionModal({
                     setVuTimeInput(e.target.value)
                     setErrorMsg('')
                   }}
-                  placeholder="Nhập giờ:phút..."
                   className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-base font-bold placeholder-[#a88c6f]/60 focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
                 />
               </div>

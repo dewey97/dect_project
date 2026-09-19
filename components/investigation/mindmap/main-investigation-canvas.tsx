@@ -463,9 +463,9 @@ export function MainInvestigationCanvas({
 
   // CỐ ĐỊNH CÁC VỊ TRÍ SLOT NGHI PHẠM (Được căn lề chuẩn theo phác thảo sketch, an toàn bên trong khung gỗ)
   const DESKTOP_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.44, y: 0.54 }, // Slot 0: Lê Quang Vũ
+    { x: 0.44, y: 0.58 }, // Slot 0: Lê Quang Vũ
     { x: 0.60, y: 0.54 }, // Slot 1: Nguyễn Thanh Tùng
-    { x: 0.76, y: 0.54 }, // Slot 2: Trần Thị Hà
+    { x: 0.76, y: 0.62 }, // Slot 2: Trần Thị Hà (đẩy xuống 0.62)
     { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
     { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt — Nằm dưới Bà Lụa
     { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
@@ -474,9 +474,9 @@ export function MainInvestigationCanvas({
   ], [])
 
   const MOBILE_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.44, y: 0.54 }, // Slot 0: Lê Quang Vũ
+    { x: 0.44, y: 0.58 }, // Slot 0: Lê Quang Vũ
     { x: 0.60, y: 0.54 }, // Slot 1: Nguyễn Thanh Tùng
-    { x: 0.76, y: 0.54 }, // Slot 2: Trần Thị Hà
+    { x: 0.76, y: 0.62 }, // Slot 2: Trần Thị Hà (đẩy xuống 0.62)
     { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
     { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt
     { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
@@ -546,7 +546,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-tung',
             x: 0.60,
-            y: 0.82,
+            y: 0.75,
             label: 'Nghi vấn',
             detail: 'Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
             color: 'purple' as const,
@@ -559,7 +559,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-ha',
             x: 0.76,
-            y: 0.82,
+            y: 0.77,
             label: 'Nghi vấn',
             detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
             color: 'purple' as const,
@@ -588,7 +588,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-tung',
             x: 0.60,
-            y: 0.82,
+            y: 0.75,
             label: 'Nghi vấn',
             detail: 'Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
             color: 'purple' as const,
@@ -601,7 +601,7 @@ export function MainInvestigationCanvas({
           {
             id: 'c0-pin-followup-ha',
             x: 0.76,
-            y: 0.82,
+            y: 0.77,
             label: 'Nghi vấn',
             detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
             color: 'purple' as const,
