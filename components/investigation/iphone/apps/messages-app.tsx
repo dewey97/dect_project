@@ -49,15 +49,63 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   // Fetch conversations live from Google Sheets
   const { data: rawMessagesData, loading, error } = usePhoneData('messages')
 
-  // Map 1-row-per-person schema into conversation threads
+  // Map 1-row-per-person human-readable schema into conversation threads
   const threads = rawMessagesData.map((item: any, idx: number) => {
     let parsedMessages: any[] = []
+
+    // 1. Support legacy JSON if present
     if (item.messages_json) {
       try {
         parsedMessages = typeof item.messages_json === 'string' ? JSON.parse(item.messages_json) : item.messages_json
-      } catch (e) {
-        console.error('Failed to parse messages_json for', item.contact_name, e)
-      }
+      } catch {}
+    }
+
+    // 2. Support Clean Multiline Text Format: "Tên (Thời gian) [CLUE: Tiêu đề | Phân tích]: Nội dung"
+    if (parsedMessages.length === 0 && item.messages_text) {
+      const lines = String(item.messages_text).split('\n').map((l) => l.trim()).filter(Boolean)
+      parsedMessages = lines.map((line, mIdx) => {
+        // Match regex: Sender (Timestamp) [CLUE: Title | Analysis]: Text
+        const clueMatch = line.match(/^([^(]+)\s*\(([^)]+)\)\s*\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]:\s*(.*)$/i)
+        if (clueMatch) {
+          const [, sender, timestamp, clueTitle, clueAnalysis, text] = clueMatch
+          const cleanSender = sender.trim()
+          return {
+            id: `msg-${idx}-${mIdx}`,
+            sender: cleanSender,
+            role: cleanSender === 'Khang' ? 'sent' : 'received',
+            text: text.trim(),
+            timestamp: timestamp.trim(),
+            isClue: true,
+            clueTitle: clueTitle.trim(),
+            clueAnalysis: clueAnalysis.trim()
+          }
+        }
+
+        // Match normal line regex: Sender (Timestamp): Text
+        const normalMatch = line.match(/^([^(]+)\s*\(([^)]+)\):\s*(.*)$/)
+        if (normalMatch) {
+          const [, sender, timestamp, text] = normalMatch
+          const cleanSender = sender.trim()
+          return {
+            id: `msg-${idx}-${mIdx}`,
+            sender: cleanSender,
+            role: cleanSender === 'Khang' ? 'sent' : 'received',
+            text: text.trim(),
+            timestamp: timestamp.trim(),
+            isClue: false
+          }
+        }
+
+        // Fallback for unstructured plain text lines
+        return {
+          id: `msg-${idx}-${mIdx}`,
+          sender: item.contact_name || 'Khác',
+          role: 'received',
+          text: line,
+          timestamp: item.timestamp || '',
+          isClue: false
+        }
+      })
     }
 
     return {
