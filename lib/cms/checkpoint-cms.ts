@@ -1,5 +1,9 @@
 import type { Checkpoint } from "@/lib/types";
 
+/**
+ * Interface đại diện cho một dòng bất kỳ trong tab 'checkpoints' trên Google Sheet.
+ * Hỗ trợ động vô hạn cột gợi ý dạng `level_N_hint` (hoặc `hint_N`, `level_N_answer`, `hints_list`).
+ */
 export interface SheetCheckpointRow {
   case_id?: string;
   checkpoint_id?: string;
@@ -13,55 +17,104 @@ export interface SheetCheckpointRow {
   valid_suspects?: string;
   required_evidences?: string;
   unlocked_evidence_id?: string;
-  level_1_hint?: string;
-  level_2_hint?: string;
-  level_3_hint?: string;
   hints_list?: string;
+  [key: string]: any;
+}
+
+/**
+ * Trích xuất toàn bộ danh sách gợi ý từ một dòng Sheet:
+ * 1. Tự động quét và sắp xếp mọi cột `level_1_hint`, `level_2_hint`, ..., `level_N_hint` (hoặc `hint_1`, `hint_2`, `hint_N`).
+ * 2. Hỗ trợ ô text đa dòng `hints_list` (mỗi dòng 1 gợi ý phân tách bởi Alt+Enter).
+ * 3. Hỗ trợ format JSON mảng `["Gợi ý 1", "Gợi ý 2", ...]`.
+ */
+export function getCheckpointHints(row?: SheetCheckpointRow): string[] {
+  if (!row || typeof row !== "object") return [];
+
+  const indexedHints: { level: number; text: string }[] = [];
+
+  // 1. Quét tất cả các cột có tên dạng level_N_hint, level_N, hint_N, level_N_answer
+  Object.keys(row).forEach((key) => {
+    const val = String(row[key] || "").trim();
+    if (!val) return;
+
+    const match = key.match(
+      /^(?:level_?(\d+)(?:_hint|_answer)?|hint_?(\d+))$/i,
+    );
+    if (match) {
+      const level = parseInt(match[1] || match[2], 10);
+      if (!isNaN(level) && level > 0) {
+        indexedHints.push({ level, text: val });
+      }
+    }
+  });
+
+  // Sắp xếp theo thứ tự level tăng dần (1, 2, 3, 4, ...)
+  if (indexedHints.length > 0) {
+    indexedHints.sort((a, b) => a.level - b.level);
+    return indexedHints.map((h) => h.text);
+  }
+
+  // 2. Nếu không có cột đánh số, đọc từ ô `hints_list` (hỗ trợ xuống dòng Alt+Enter hoặc JSON)
+  if (row.hints_list && typeof row.hints_list === "string") {
+    const raw = row.hints_list.trim();
+    if (raw.startsWith("[") && raw.endsWith("]")) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed))
+          return parsed.map((x) => String(x).trim()).filter(Boolean);
+      } catch {}
+    }
+    return raw
+      .split(/\r?\n/)
+      .map((h) => h.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+/**
+ * Lấy gợi ý ở cấp độ cụ thể (1-indexed). Trả về rỗng nếu cấp độ vượt quá số lượng trên Sheet.
+ */
+export function getSheetHintLevel(hints: string[], level: number): string {
+  if (!hints || hints.length === 0 || level < 1) return "";
+  return hints[level - 1] || "";
+}
+
+/**
+ * Trích xuất các phương án trắc nghiệm từ cột `options` trên Sheet (hỗ trợ phân dòng Alt+Enter).
+ */
+export function getCheckpointOptions(row?: SheetCheckpointRow): string[] {
+  if (!row?.options) return [];
+  return String(row.options)
+    .split(/\r?\n/)
+    .map((o) => o.trim())
+    .filter(Boolean);
 }
 
 /**
  * Transforms a raw row from the unified 'checkpoints' Google Sheet tab into a Checkpoint object.
- * Extracts level_1_hint, level_2_hint, level_3_hint into structured hintsList.
+ * Extracts unlimited level_N_hints into structured hintsList.
  */
 export function transformSheetCheckpoint(
   row: SheetCheckpointRow,
   fallback?: Checkpoint,
 ): Checkpoint {
-  const options = row.options
-    ? row.options
-        .split(/\r?\n/)
-        .map((o) => o.trim())
-        .filter(Boolean)
-    : fallback?.options;
-
-  // Build 3-level hints array
-  const dynamicHints: string[] = [];
-  if (row.level_1_hint && row.level_1_hint.trim())
-    dynamicHints.push(row.level_1_hint.trim());
-  if (row.level_2_hint && row.level_2_hint.trim())
-    dynamicHints.push(row.level_2_hint.trim());
-  if (row.level_3_hint && row.level_3_hint.trim())
-    dynamicHints.push(row.level_3_hint.trim());
+  const options = getCheckpointOptions(row);
+  const dynamicHints = getCheckpointHints(row);
 
   const hintsList =
-    dynamicHints.length > 0
-      ? dynamicHints
-      : row.hints_list
-        ? row.hints_list
-            .split(/\r?\n/)
-            .map((h) => h.trim())
-            .filter(Boolean)
-        : fallback?.hintsList;
+    dynamicHints.length > 0 ? dynamicHints : fallback?.hintsList;
 
   const validSuspects = row.valid_suspects
-    ? row.valid_suspects
+    ? String(row.valid_suspects)
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean)
     : fallback?.pickerConfig?.validSuspects;
 
   const requiredEvidenceIds = row.required_evidences
-    ? row.required_evidences
+    ? String(row.required_evidences)
         .split(",")
         .map((e) => e.trim())
         .filter(Boolean)
@@ -77,7 +130,7 @@ export function transformSheetCheckpoint(
     question: row.question || fallback?.question || "",
     hint:
       hintsList && hintsList.length > 0 ? hintsList[0] : fallback?.hint || "",
-    options: options && options.length > 0 ? options : fallback?.options,
+    options: options.length > 0 ? options : fallback?.options,
     correctAnswer: row.correct_answer || fallback?.correctAnswer,
     unlockedEvidenceId:
       row.unlocked_evidence_id || fallback?.unlockedEvidenceId,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ScreenHeader } from "@/components/investigation/screen-header";
 import {
@@ -16,8 +16,11 @@ import {
 import { getAssistantConversation } from "@/lib/content-service";
 import { getActiveCase } from "@/lib/mock-data";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import {
+  getCheckpointHints,
+  type SheetCheckpointRow,
+} from "@/lib/cms/checkpoint-cms";
 import type { AssistantConversation } from "@/lib/types";
-import { Shield, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MessageLog {
@@ -30,7 +33,7 @@ interface MessageLog {
     | "reference"
     | "warning"
     | "info";
-  level?: 1 | 2 | 3;
+  level?: number;
   text?: string;
   title?: string;
   rows?: { label: string; value: string }[];
@@ -50,9 +53,18 @@ export function AssistantPanel({
   const router = useRouter();
   const [intel, setIntel] = useState<AssistantConversation | null>(null);
 
-  // Connect to Google Sheets Live CMS for dynamic hints and timeline sync
-  const { data: sheetCheckpoints } = usePhoneData("checkpoints");
+  // Dynamic Google Sheets Live CMS data
+  const { data: sheetCheckpoints } =
+    usePhoneData<SheetCheckpointRow>("checkpoints");
   const { data: sheetTimeline } = usePhoneData("timeline");
+
+  // Extract all dynamic hints directly from Google Sheet (unlimited levels)
+  const activeHints = useMemo(() => {
+    const firstCp = sheetCheckpoints[0];
+    const extracted = getCheckpointHints(firstCp);
+    if (extracted.length > 0) return extracted;
+    return intel?.hints.map((h) => h.text) || [];
+  }, [sheetCheckpoints, intel]);
 
   const [messages, setMessages] = useState<MessageLog[]>([
     {
@@ -63,8 +75,9 @@ export function AssistantPanel({
   ]);
 
   const [isTyping, setIsTyping] = useState(false);
+  const [currentHintLevel, setCurrentHintLevel] = useState<number>(0);
   const [currentBranch, setCurrentBranch] = useState<
-    "root" | "hint1" | "hint2" | "hint3" | "timeline" | "messages" | "trace"
+    "root" | "hint" | "timeline" | "messages" | "trace"
   >("root");
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -92,18 +105,16 @@ export function AssistantPanel({
     loadIntel();
   }, []);
 
-  // Auto scroll to bottom when messages or typing state changes
+  // Auto scroll to bottom
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  // Triggers simulated typing and replies
   function triggerReply(
     detectiveInput: string,
     newBranch: typeof currentBranch,
     replies: Omit<MessageLog, "id">[],
   ) {
-    // 1. Add Detective's command
     setMessages((prev) => [
       ...prev,
       { id: `det-${Date.now()}`, type: "detective", text: detectiveInput },
@@ -111,7 +122,6 @@ export function AssistantPanel({
 
     setIsTyping(true);
 
-    // 2. Simulate Operator decoding delay
     setTimeout(() => {
       setIsTyping(false);
       setMessages((prev) => [
@@ -125,27 +135,34 @@ export function AssistantPanel({
     }, 1000);
   }
 
-  // Handle chip actions
+  // Handle requesting hint level N (1-indexed)
+  function handleRequestHintLevel(targetLevel: number) {
+    if (isTyping || activeHints.length === 0) return;
+
+    const hintText = activeHints[targetLevel - 1] || "";
+    const isFinalHint = targetLevel === activeHints.length;
+
+    const replies: Omit<MessageLog, "id">[] = [];
+    if (isFinalHint && targetLevel >= 3) {
+      replies.push({
+        type: "warning",
+        text: "ĐÃ BẺ KHÓA THÀNH CÔNG CHỈ DẪN TRỰC TIẾP",
+      });
+    }
+
+    replies.push({
+      type: "hint",
+      level: targetLevel,
+      text: hintText,
+    });
+
+    setCurrentHintLevel(targetLevel);
+    triggerReply(`Yêu cầu gợi ý // Cấp độ ${targetLevel}`, "hint", replies);
+  }
+
   function handleChipAction(action: string) {
     if (isTyping || !intel) return;
 
-    // Derive hints from Google Sheets live checkpoints CMS with fallback to intel
-    const firstCp = sheetCheckpoints[0] || {};
-    const hint1Text =
-      firstCp.level_1_hint ||
-      intel.hints.find((h) => h.level === 1)?.text ||
-      "";
-    const hint2Text =
-      firstCp.level_2_hint ||
-      intel.hints.find((h) => h.level === 2)?.text ||
-      "";
-    const hint3Text =
-      firstCp.level_3_hint ||
-      firstCp.level_3_answer ||
-      intel.hints.find((h) => h.level === 3)?.text ||
-      "";
-
-    // Derive timeline rows from Google Sheets live CMS with fallback
     const timelineRows =
       sheetTimeline.length > 0
         ? sheetTimeline.map((item: any) => ({
@@ -189,37 +206,8 @@ export function AssistantPanel({
         break;
 
       case "root_hint1":
-        triggerReply("Yêu cầu gợi ý // Cấp độ 1", "hint1", [
-          {
-            type: "hint",
-            level: 1,
-            text: hint1Text,
-          },
-        ]);
-        break;
-
-      case "need_hint2":
-        triggerReply("Yêu cầu gợi ý // Cấp độ 2", "hint2", [
-          {
-            type: "hint",
-            level: 2,
-            text: hint2Text,
-          },
-        ]);
-        break;
-
-      case "need_hint3":
-        triggerReply("Yêu cầu gợi ý // Cấp độ 3", "hint3", [
-          {
-            type: "warning",
-            text: "ĐÃ BẺ KHÓA THÀNH CÔNG CHỈ DẪN TRỰC TIẾP",
-          },
-          {
-            type: "hint",
-            level: 3,
-            text: hint3Text,
-          },
-        ]);
+      case "root_hint":
+        handleRequestHintLevel(1);
         break;
 
       case "root_trace":
@@ -232,6 +220,7 @@ export function AssistantPanel({
         break;
 
       case "reset_root":
+        setCurrentHintLevel(0);
         triggerReply("Quay lại menu chính", "root", [
           {
             type: "assistant",
@@ -265,7 +254,7 @@ export function AssistantPanel({
             return (
               <HintCard
                 key={msg.id}
-                level={msg.level || 1}
+                level={(msg.level as 1 | 2 | 3) || 1}
                 hint={msg.text || ""}
               />
             );
@@ -291,7 +280,6 @@ export function AssistantPanel({
           return <AssistantMessage key={msg.id}>{msg.text}</AssistantMessage>;
         })}
 
-        {/* Typing Loader Indicator */}
         {isTyping && (
           <div className="flex items-center gap-1 max-w-[85%] self-start bg-muted/90 p-3 px-4 rounded-2xl rounded-tl-sm shadow-sm">
             <div className="flex gap-1">
@@ -305,7 +293,7 @@ export function AssistantPanel({
         <div ref={bottomRef} className="h-4" />
       </div>
 
-      {/* Bottom Suggestion Action Chips Panel */}
+      {/* Dynamic Action Chips */}
       <div className="border-t border-border bg-background/95 p-3.5 flex flex-col gap-2 mt-auto">
         {currentBranch === "root" && intel && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -320,38 +308,16 @@ export function AssistantPanel({
           </div>
         )}
 
-        {currentBranch === "hint1" && (
+        {/* Multi-level hints navigation: dynamically offer next level if exists in Sheet */}
+        {currentBranch === "hint" && (
           <div className="flex flex-col gap-2">
-            <SuggestionChip
-              label="Need Level 2 Hint"
-              onClick={() => handleChipAction("need_hint2")}
-              disabled={isTyping}
-            />
-            <SuggestionChip
-              label="Back to Main Protocols"
-              onClick={() => handleChipAction("reset_root")}
-              disabled={isTyping}
-            />
-          </div>
-        )}
-
-        {currentBranch === "hint2" && (
-          <div className="flex flex-col gap-2">
-            <SuggestionChip
-              label="Need Level 3 Hint"
-              onClick={() => handleChipAction("need_hint3")}
-              disabled={isTyping}
-            />
-            <SuggestionChip
-              label="Back to Main Protocols"
-              onClick={() => handleChipAction("reset_root")}
-              disabled={isTyping}
-            />
-          </div>
-        )}
-
-        {currentBranch === "hint3" && (
-          <div className="flex flex-col gap-2">
+            {currentHintLevel < activeHints.length && (
+              <SuggestionChip
+                label={`Need Level ${currentHintLevel + 1} Hint (${currentHintLevel + 1}/${activeHints.length})`}
+                onClick={() => handleRequestHintLevel(currentHintLevel + 1)}
+                disabled={isTyping}
+              />
+            )}
             <SuggestionChip
               label="Back to Main Protocols"
               onClick={() => handleChipAction("reset_root")}
