@@ -705,7 +705,7 @@ export function HeroInteractive({
   const [innerRect, setInnerRect] = useState<BoardBounds | null>(null);
 
   // ── Case and mode states ──
-  const [internalCaseId, setInternalCaseId] = useState<string>("case-01");
+  const [internalCaseId, setInternalCaseId] = useState<string>("case-000");
   const currentCaseId = controlledCaseId ?? internalCaseId;
   const [boardMode, setBoardMode] = useState<BoardMode>("zoom");
 
@@ -1221,7 +1221,11 @@ export function HeroInteractive({
       context.translate(transform.translateX, transform.translateY);
       context.scale(transform.scale, transform.scale);
 
-      // 2.1 Draw case evidence map with refined focus on corkboard surface
+      // 2.1 Fill solid dark corkboard texture background as instant fallback
+      context.fillStyle = "#1e140c";
+      context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+      // Draw case evidence map with refined focus on corkboard surface
       if (image) {
         // Crop ~11.5-12% margin for subtle reduction vs original
         const cropMarginX = image.width * 0.12;
