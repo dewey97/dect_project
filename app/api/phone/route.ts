@@ -2,6 +2,9 @@ import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 import path from 'path';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -46,13 +49,15 @@ export async function GET(request: Request) {
       return true;
     });
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       success: true,
       caseId: caseIdFilter,
       tab,
       totalCount: filteredData.length,
       data: filteredData,
     });
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    return res;
   } catch (error: any) {
     console.error('Error fetching Google Sheets API:', error);
     return NextResponse.json(

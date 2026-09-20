@@ -21,7 +21,9 @@ export function usePhoneData<T = any>(tab: string): PhoneDataState<T> {
     let isMounted = true
     setLoading(true)
 
-    fetch(`/api/phone?tab=${encodeURIComponent(tab)}`)
+    fetch(`/api/phone?tab=${encodeURIComponent(tab)}&_t=${Date.now()}`, {
+      cache: 'no-store',
+    })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error ${res.status}`)
         return res.json()
