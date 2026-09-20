@@ -13,12 +13,15 @@ export interface SheetCheckpointRow {
   valid_suspects?: string;
   required_evidences?: string;
   unlocked_evidence_id?: string;
+  level_1_hint?: string;
+  level_2_hint?: string;
+  level_3_hint?: string;
   hints_list?: string;
 }
 
 /**
- * Transforms a raw row from the 'checkpoints' Google Sheet tab into a Checkpoint object.
- * Merges with existing static fallback for rich configs (pickerConfig, textMatchConfig, convergenceConfig).
+ * Transforms a raw row from the unified 'checkpoints' Google Sheet tab into a Checkpoint object.
+ * Extracts level_1_hint, level_2_hint, level_3_hint into structured hintsList.
  */
 export function transformSheetCheckpoint(
   row: SheetCheckpointRow,
@@ -31,12 +34,24 @@ export function transformSheetCheckpoint(
         .filter(Boolean)
     : fallback?.options;
 
-  const hintsList = row.hints_list
-    ? row.hints_list
-        .split(/\r?\n/)
-        .map((h) => h.trim())
-        .filter(Boolean)
-    : fallback?.hintsList;
+  // Build 3-level hints array
+  const dynamicHints: string[] = [];
+  if (row.level_1_hint && row.level_1_hint.trim())
+    dynamicHints.push(row.level_1_hint.trim());
+  if (row.level_2_hint && row.level_2_hint.trim())
+    dynamicHints.push(row.level_2_hint.trim());
+  if (row.level_3_hint && row.level_3_hint.trim())
+    dynamicHints.push(row.level_3_hint.trim());
+
+  const hintsList =
+    dynamicHints.length > 0
+      ? dynamicHints
+      : row.hints_list
+        ? row.hints_list
+            .split(/\r?\n/)
+            .map((h) => h.trim())
+            .filter(Boolean)
+        : fallback?.hintsList;
 
   const validSuspects = row.valid_suspects
     ? row.valid_suspects
@@ -97,7 +112,6 @@ export function transformSheetCheckpoints(
     return fallbackCheckpoints;
   }
 
-  // Map each fallback checkpoint by ID
   const fallbackMap = new Map<string, Checkpoint>();
   fallbackCheckpoints.forEach((cp) => fallbackMap.set(cp.id, cp));
 

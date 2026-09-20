@@ -51,7 +51,7 @@ export function AssistantPanel({
   const [intel, setIntel] = useState<AssistantConversation | null>(null);
 
   // Connect to Google Sheets Live CMS for dynamic hints and timeline sync
-  const { data: sheetHints } = usePhoneData("hints");
+  const { data: sheetCheckpoints } = usePhoneData("checkpoints");
   const { data: sheetTimeline } = usePhoneData("timeline");
 
   const [messages, setMessages] = useState<MessageLog[]>([
@@ -129,17 +129,19 @@ export function AssistantPanel({
   function handleChipAction(action: string) {
     if (isTyping || !intel) return;
 
-    // Derive hints from Google Sheets live CMS with fallback to intel
+    // Derive hints from Google Sheets live checkpoints CMS with fallback to intel
+    const firstCp = sheetCheckpoints[0] || {};
     const hint1Text =
-      sheetHints.find((h: any) => Number(h.level) === 1)?.hint_text ||
+      firstCp.level_1_hint ||
       intel.hints.find((h) => h.level === 1)?.text ||
       "";
     const hint2Text =
-      sheetHints.find((h: any) => Number(h.level) === 2)?.hint_text ||
+      firstCp.level_2_hint ||
       intel.hints.find((h) => h.level === 2)?.text ||
       "";
     const hint3Text =
-      sheetHints.find((h: any) => Number(h.level) === 3)?.hint_text ||
+      firstCp.level_3_hint ||
+      firstCp.level_3_answer ||
       intel.hints.find((h) => h.level === 3)?.text ||
       "";
 
