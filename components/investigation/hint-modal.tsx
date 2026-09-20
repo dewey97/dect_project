@@ -2,7 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lightbulb, X, Unlock, Lock, Compass } from "lucide-react";
+import {
+  Lightbulb,
+  X,
+  Unlock,
+  Lock,
+  Compass,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
@@ -184,6 +192,7 @@ export function HintModal({ isOpen, onClose }: HintModalProps) {
     {},
   );
   const [activeStage, setActiveStage] = useState<ActiveHintGroup | null>(null);
+  const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -194,25 +203,31 @@ export function HintModal({ isOpen, onClose }: HintModalProps) {
         }
       } catch {}
       const rawStage = getContextAwareHintStage();
-      setActiveStage(applySheetHints(rawStage, sheetCheckpoints));
+      const stage = applySheetHints(rawStage, sheetCheckpoints);
+      setActiveStage(stage);
+      setActiveHintIdx(0);
     }
   }, [isOpen, sheetCheckpoints]);
 
   if (!isOpen || !activeStage) return null;
 
-  const currentUnlockedCount = unlockedLevels[activeStage.id] || 1;
+  const totalHints = activeStage.hints.length;
+  const unlockedCount = Math.min(
+    unlockedLevels[activeStage.id] || 1,
+    totalHints,
+  );
+  // Chỉ cho phép xem trong phạm vi các mức đã mở khóa.
+  const viewIdx = Math.min(activeHintIdx, Math.max(unlockedCount - 1, 0));
 
   const handleUnlockNext = () => {
     detectiveAudio.playTypewriterClick();
-    const nextCount = Math.min(
-      currentUnlockedCount + 1,
-      activeStage.hints.length,
-    );
+    const nextCount = Math.min(unlockedCount + 1, totalHints);
     const updated = {
       ...unlockedLevels,
       [activeStage.id]: nextCount,
     };
     setUnlockedLevels(updated);
+    setActiveHintIdx(nextCount - 1);
     try {
       localStorage.setItem(
         "veritas_hint_unlocked_levels",
@@ -271,74 +286,112 @@ export function HintModal({ isOpen, onClose }: HintModalProps) {
               </div>
             </div>
 
-            {/* HINTS LIST */}
-            <div className="space-y-3 pt-1">
-              {activeStage.hints.map((hintText, hIdx) => {
-                const isUnlocked = hIdx < currentUnlockedCount;
-                return (
-                  <div
-                    key={hIdx}
-                    className={cn(
-                      "p-3.5 border-2 transition-all rounded-none relative font-sans text-xs sm:text-[13px] leading-relaxed",
-                      isUnlocked
-                        ? "bg-[#fdfbf7] border-[#2b1f14] text-[#1a120b] shadow-sm"
-                        : "bg-[#ede3d1]/50 border-dashed border-[#a69177] text-[#7a6b5c] select-none",
-                    )}
-                  >
-                    <div className="flex items-center gap-2 border-b border-[#2b1f14]/15 pb-1.5 mb-2 font-mono text-[10px] sm:text-[11px] font-bold uppercase">
-                      <span className="flex items-center gap-1.5 text-[#8c1d1d]">
-                        {isUnlocked ? (
-                          <Unlock className="size-3.5" />
-                        ) : (
-                          <Lock className="size-3.5" />
-                        )}
-                        Gợi ý mức {hIdx + 1}
-                      </span>
-                    </div>
+            {/* HINT CARD — chỉ hiển thị MỘT gợi ý tại một thời điểm */}
+            <div className="pt-1">
+              <div className="p-4 border-2 border-[#2b1f14] bg-[#fdfbf7] text-[#1a120b] shadow-sm rounded-none font-sans text-xs sm:text-[13px] leading-relaxed">
+                <div className="flex items-center gap-2 border-b border-[#2b1f14]/15 pb-1.5 mb-2.5 font-mono text-[10px] sm:text-[11px] font-bold uppercase">
+                  <span className="flex items-center gap-1.5 text-[#8c1d1d]">
+                    <Unlock className="size-3.5" />
+                    Gợi ý mức {viewIdx + 1}/{totalHints}
+                  </span>
+                </div>
 
-                    {isUnlocked ? (
-                      <p className="text-[#1a120b]">{hintText}</p>
-                    ) : (
-                      <p className="italic text-[#7a6b5c]">
-                        Manh mối này đang bị ẩn. Nhấn nút mở gợi ý tiếp theo bên
-                        dưới nếu bạn gặp bế tắc.
-                      </p>
+                {/*
+                  Chiều cao cố định: mọi gợi ý xếp chồng trong CÙNG một ô lưới
+                  (col-start-1 row-start-1). Ô lưới cao bằng gợi ý dài nhất nên
+                  modal không co giãn khi chuyển mức. Gợi ý khác ẩn bằng opacity.
+                */}
+                <div className="grid">
+                  {activeStage.hints.map((hintText, hIdx) => (
+                    <p
+                      key={hIdx}
+                      aria-hidden={hIdx !== viewIdx}
+                      className={cn(
+                        "col-start-1 row-start-1 text-[#1a120b] transition-opacity duration-200 ease-out",
+                        hIdx === viewIdx
+                          ? "opacity-100"
+                          : "opacity-0 pointer-events-none select-none",
+                      )}
+                    >
+                      {hintText}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tiến độ mở khóa các mức gợi ý */}
+              <div className="flex items-center gap-1.5 pt-3">
+                {activeStage.hints.map((_, hIdx) => (
+                  <button
+                    key={hIdx}
+                    type="button"
+                    disabled={hIdx >= unlockedCount}
+                    onClick={() => {
+                      if (hIdx >= unlockedCount) return;
+                      detectiveAudio.playTypewriterClick();
+                      setActiveHintIdx(hIdx);
+                    }}
+                    title={
+                      hIdx < unlockedCount
+                        ? `Xem gợi ý mức ${hIdx + 1}`
+                        : `Gợi ý mức ${hIdx + 1} chưa mở khóa`
+                    }
+                    className={cn(
+                      "h-2 flex-1 rounded-none transition-colors",
+                      hIdx === viewIdx
+                        ? "bg-[#8c1d1d]"
+                        : hIdx < unlockedCount
+                          ? "bg-[#8c1d1d]/40 hover:bg-[#8c1d1d]/60 cursor-pointer"
+                          : "bg-[#2b1f14]/15 cursor-not-allowed",
                     )}
-                  </div>
-                );
-              })}
+                  />
+                ))}
+              </div>
             </div>
 
-            {/* UNLOCK NEXT HINT BUTTON */}
-            {currentUnlockedCount < activeStage.hints.length && (
-              <div className="pt-2 flex justify-center">
+            {/* ĐIỀU HƯỚNG LÙI / TIẾN GIỮA CÁC MỨC GỢI Ý */}
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#2b1f14]/20">
+              {viewIdx > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    detectiveAudio.playTypewriterClick();
+                    setActiveHintIdx((prev) => Math.max(prev - 1, 0));
+                  }}
+                  className="px-4 py-2 bg-[#eae0cd] hover:bg-[#dfd4be] text-[#2b1f14] border-2 border-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 rounded-none active:scale-95"
+                >
+                  <ArrowLeft className="size-3.5" />
+                  <span>GỢI Ý TRƯỚC</span>
+                </button>
+              ) : (
+                <div />
+              )}
+
+              {viewIdx < unlockedCount - 1 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    detectiveAudio.playTypewriterClick();
+                    setActiveHintIdx((prev) => prev + 1);
+                  }}
+                  className="px-4 py-2 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-2 border-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 rounded-none active:scale-95 ml-auto"
+                >
+                  <span>GỢI Ý SAU</span>
+                  <ArrowRight className="size-3.5" />
+                </button>
+              ) : unlockedCount < totalHints ? (
                 <button
                   type="button"
                   onClick={handleUnlockNext}
-                  className="px-5 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 border-2 border-[#2b1f14] shadow-md active:scale-95 rounded-none"
+                  className="px-4 py-2 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-2 border-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 rounded-none active:scale-95 ml-auto"
                 >
                   <Unlock className="size-3.5 text-[#d9a066]" />
                   <span>
-                    MỞ GỢI Ý TIẾP THEO ({currentUnlockedCount + 1}/
-                    {activeStage.hints.length})
+                    MỞ GỢI Ý MỚI ({unlockedCount + 1}/{totalHints})
                   </span>
                 </button>
-              </div>
-            )}
-          </div>
-
-          {/* FOOTER */}
-          <div className="bg-[#ede3d1] px-4 py-3 border-t-2 border-[#2b1f14] flex items-center justify-end text-xs font-mono text-[#5c4026]">
-            <button
-              type="button"
-              onClick={() => {
-                detectiveAudio.playPaperRustle();
-                onClose();
-              }}
-              className="px-5 py-1.5 bg-[#2b1f14] text-[#f6f1e5] font-bold uppercase cursor-pointer rounded-none hover:bg-[#140d08]"
-            >
-              ĐÓNG
-            </button>
+              ) : null}
+            </div>
           </div>
         </motion.div>
       </div>

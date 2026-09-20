@@ -27,6 +27,15 @@ import { HINTS_MAP } from "./evidence-data";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useActiveCheckpointHints } from "@/lib/hooks/use-active-checkpoint-hints";
 
+/** Chuẩn hóa mã vật chứng để so khớp chính xác không phân biệt hoa thường hay tiền tố */
+function normalizeEvidenceCode(code: string): string {
+  return (code || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^doc_|^ev_|^p_/, "")
+    .replace(/_/g, "-");
+}
+
 interface CaseCheckpointsSectionProps {
   checkpoints: Checkpoint[];
   completedCheckpointIds: string[];
@@ -262,19 +271,18 @@ export function CaseCheckpointsSection({
         }
       }
 
-      // Check required evidence IDs
+      // Check required evidence IDs — so khớp mã vật chứng giữa checkpoint và tab `evidences`
       if (
         cp.pickerConfig?.requiredEvidenceIds &&
         cp.pickerConfig.requiredEvidenceIds.length > 0
       ) {
-        const hasAdminEvidence = selectedEvidenceIds.some(
-          (id) => id === "doc_000" || id === "00" || id === "000" || id === "0",
+        const selectedCodes = new Set(
+          selectedEvidenceIds.map((id) => normalizeEvidenceCode(id)),
         );
-        if (hasAdminEvidence) return true;
-        const isEvidenceValid = cp.pickerConfig.requiredEvidenceIds.some(
-          (reqId) => selectedEvidenceIds.includes(reqId),
+        const missingEvidence = cp.pickerConfig.requiredEvidenceIds.filter(
+          (reqId) => !selectedCodes.has(normalizeEvidenceCode(reqId)),
         );
-        if (!isEvidenceValid) return false;
+        if (missingEvidence.length > 0) return false;
       }
 
       return true;
@@ -812,9 +820,21 @@ export function CaseCheckpointsSection({
                                           </span>
                                         )}
                                       </div>
-                                      <span className="text-xs leading-snug flex-1">
-                                        {ev.label}
-                                      </span>
+                                      <div className="flex-1 min-w-0 space-y-0.5">
+                                        {ev.code && (
+                                          <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-1 py-px bg-[#2e5220] text-white inline-block">
+                                            {ev.code}
+                                          </span>
+                                        )}
+                                        <span className="text-xs leading-snug block font-bold">
+                                          {ev.label}
+                                        </span>
+                                        {ev.description && (
+                                          <span className="text-[0.7rem] opacity-75 leading-snug block">
+                                            {ev.description}
+                                          </span>
+                                        )}
+                                      </div>
                                     </button>
                                   );
                                 },
@@ -899,9 +919,21 @@ export function CaseCheckpointsSection({
                                           </span>
                                         )}
                                       </div>
-                                      <span className="text-xs leading-snug flex-1">
-                                        {ev.label}
-                                      </span>
+                                      <div className="flex-1 min-w-0 space-y-0.5">
+                                        {ev.code && (
+                                          <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-1 py-px bg-[#2e5220] text-white inline-block">
+                                            {ev.code}
+                                          </span>
+                                        )}
+                                        <span className="text-xs leading-snug block font-bold">
+                                          {ev.label}
+                                        </span>
+                                        {ev.description && (
+                                          <span className="text-[0.7rem] opacity-75 leading-snug block">
+                                            {ev.description}
+                                          </span>
+                                        )}
+                                      </div>
                                     </button>
                                   );
                                 },
@@ -962,10 +994,20 @@ export function CaseCheckpointsSection({
                                     )}
                                   </div>
 
-                                  <div className="flex-1">
+                                  <div className="flex-1 min-w-0 space-y-0.5">
+                                    {ev.code && (
+                                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider px-1.5 py-px bg-[#2b1f14] text-[#f4e8d8] inline-block">
+                                        {ev.code}
+                                      </span>
+                                    )}
                                     <span className="text-xs font-bold text-[#1a120b] leading-snug block">
                                       {ev.label}
                                     </span>
+                                    {ev.description && (
+                                      <span className="text-[0.7rem] text-[#5c4026] leading-snug block">
+                                        {ev.description}
+                                      </span>
+                                    )}
                                   </div>
                                 </button>
                               );

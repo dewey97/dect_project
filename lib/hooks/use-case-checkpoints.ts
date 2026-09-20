@@ -6,7 +6,7 @@ import {
   transformSheetCheckpoints,
   type SheetCheckpointRow,
 } from "@/lib/cms/checkpoint-cms";
-import type { Checkpoint } from "@/lib/types";
+import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
 
 export interface CaseCheckpointsState {
   checkpoints: Checkpoint[];
@@ -15,36 +15,124 @@ export interface CaseCheckpointsState {
   refetch: () => void;
 }
 
+export interface SheetEvidenceRow {
+  case_id?: string;
+  code?: string;
+  label?: string;
+  type?: string;
+  category?: string;
+  description?: string;
+  unlocked_by_phase?: string;
+  position_x?: string | number;
+  position_y?: string | number;
+  logic_data?: string;
+  [key: string]: any;
+}
+
 function normalizeCaseId(caseId: string): string {
   return (caseId || "").trim().replace(/-/g, "_").toLowerCase();
 }
 
 /**
- * Hook kết nối trực tiếp tab `checkpoints` từ Google Sheets Live CMS,
+ * Bổ sung label & description từ danh mục `evidences` vào các chip vật chứng trong `availableEvidences`
+ * khi GM chỉ nhập danh sách mã code ngắn trên Google Sheet.
+ */
+function enrichCheckpointsWithEvidences(
+  checkpoints: Checkpoint[],
+  evidenceRows: SheetEvidenceRow[],
+): Checkpoint[] {
+  if (!evidenceRows || evidenceRows.length === 0) return checkpoints;
+
+  const evidenceMap = new Map<string, SheetEvidenceRow>();
+  evidenceRows.forEach((ev) => {
+    const code = (ev.code || "").trim();
+    if (code) {
+      evidenceMap.set(code.toLowerCase(), ev);
+    }
+  });
+
+  return checkpoints.map((cp) => {
+    if (!cp.pickerConfig?.availableEvidences) return cp;
+
+    const enrichedAvailable: CheckpointOptionItem[] =
+      cp.pickerConfig.availableEvidences.map((item) => {
+        const key = (item.code || item.id || "").trim().toLowerCase();
+        const meta = evidenceMap.get(key);
+        if (meta) {
+          return {
+            ...item,
+            id: item.id || meta.code || key,
+            code: meta.code || item.code,
+            label:
+              item.label && item.label !== item.id
+                ? item.label
+                : meta.label || item.id,
+            description: item.description || meta.description,
+          };
+        }
+        return item;
+      });
+
+    return {
+      ...cp,
+      pickerConfig: {
+        ...cp.pickerConfig,
+        availableEvidences: enrichedAvailable,
+      },
+    };
+  });
+}
+
+/**
+ * Hook kết nối trực tiếp tab `checkpoints` & `evidences` từ Google Sheets Live CMS,
  * tự động đồng bộ danh sách câu hỏi, đáp án, gợi ý và fallback an toàn về danh sách tĩnh.
  */
 export function useCaseCheckpoints(
   caseId: string,
   fallback: Checkpoint[] = [],
 ): CaseCheckpointsState {
-  const { data, loading, refetch } =
-    usePhoneData<SheetCheckpointRow>("checkpoints");
+  const {
+    data: checkpointRows,
+    loading: cpLoading,
+    refetch: refetchCp,
+  } = usePhoneData<SheetCheckpointRow>("checkpoints");
+
+  const {
+    data: evidenceRows,
+    loading: evLoading,
+    refetch: refetchEv,
+  } = usePhoneData<SheetEvidenceRow>("evidences");
+
+  const refetch = () => {
+    refetchCp();
+    refetchEv();
+  };
 
   const { checkpoints, source } = useMemo(() => {
     const targetId = normalizeCaseId(caseId);
-    const matchingRows = data.filter(
+    const matchingRows = checkpointRows.filter(
       (row) => normalizeCaseId(row.case_id || "") === targetId,
     );
 
     if (matchingRows.length > 0) {
+      const transformed = transformSheetCheckpoints(matchingRows, fallback);
+      const enriched = enrichCheckpointsWithEvidences(
+        transformed,
+        evidenceRows,
+      );
       return {
-        checkpoints: transformSheetCheckpoints(matchingRows, fallback),
+        checkpoints: enriched,
         source: "sheet" as const,
       };
     }
 
     return { checkpoints: fallback, source: "local" as const };
-  }, [data, caseId, fallback]);
+  }, [checkpointRows, evidenceRows, caseId, fallback]);
 
-  return { checkpoints, loading, source, refetch };
+  return {
+    checkpoints,
+    loading: cpLoading || evLoading,
+    source,
+    refetch,
+  };
 }
