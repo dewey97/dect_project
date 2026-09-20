@@ -1,21 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { Image as ImageIcon, ArrowLeft, ChevronLeft, MapPin, HardDrive, Info, Share, Trash2, Heart, Folder, CloudOff } from 'lucide-react'
-import type { Photo } from '@/lib/types'
+import { Image as ImageIcon, ArrowLeft, ChevronLeft, Info, Trash2, CloudOff, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { usePhoneData } from '@/lib/hooks/use-phone-data'
 
 interface PhotosAppProps {
-  photos: Photo[]
+  photos?: any[]
   onBackToHome?: () => void
 }
 
-export function PhotosApp({ photos = [], onBackToHome }: PhotosAppProps) {
-  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
+export function PhotosApp({ onBackToHome }: PhotosAppProps) {
+  const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null)
   const [showExifInfo, setShowExifInfo] = useState(false)
-  const [activeTab, setActiveTab] = useState<'all' | 'deleted'>('all')
 
-  const currentPhotos = photos
+  const { data: sheetPhotos, loading, error } = usePhoneData('photos')
+
+  const photos = sheetPhotos.map((item: any, idx: number) => ({
+    id: item.photo_id || `photo-${idx + 1}`,
+    filename: item.filename || item.photo_id || `IMG_${idx + 1000}.png`,
+    driveUrl: item.drive_url || item.url || '',
+    timestamp: item.timestamp || item.created_at || '24/07/2016 18:30',
+    location: item.location || 'Khu vực Bờ Sông',
+    description: item.description || item.note || '',
+    size: item.size || '2.4 MB'
+  }))
 
   return (
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans">
@@ -49,80 +58,48 @@ export function PhotosApp({ photos = [], onBackToHome }: PhotosAppProps) {
           {/* Photo Display */}
           <div className="flex-1 bg-[#09090B] flex flex-col items-center justify-center p-3 overflow-hidden">
             <div className="relative w-full max-h-[220px] rounded-xl overflow-hidden border border-[#2C2C2E] bg-[#18181B] flex flex-col items-center justify-center shadow-lg">
-              <img
-                src={`/photos/${selectedPhoto.filename.replace(/\.jpg$/, '.png')}`}
-                alt={selectedPhoto.filename}
-                className="w-full h-full object-contain max-h-[220px]"
-                onError={(e) => {
-                  ;(e.target as HTMLElement).style.display = 'none'
-                }}
-              />
-              <div className="p-4 text-center">
-                <ImageIcon className="size-8 text-[#8E8E93] mx-auto mb-1.5 opacity-60" />
-                <span className="text-[11px] font-mono text-[#D1D1D6]">{selectedPhoto.filename}</span>
-              </div>
+              {selectedPhoto.driveUrl ? (
+                <img
+                  src={selectedPhoto.driveUrl}
+                  alt={selectedPhoto.filename}
+                  className="w-full h-full object-contain max-h-[220px]"
+                />
+              ) : (
+                <div className="p-4 text-center">
+                  <ImageIcon className="size-10 text-[#8E8E93] mx-auto mb-2 opacity-50" />
+                  <span className="text-[11px] text-[#8E8E93] font-mono block">
+                    {selectedPhoto.filename}
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* EXIF Metadata Card */}
-            <div className="w-full mt-3 p-3 rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] space-y-2">
-              <div className="flex items-center justify-between text-[11px] border-b border-[#2C2C2E] pb-1.5 font-mono">
-                <span className="text-[#8E8E93] flex items-center gap-1.5">
-                  <HardDrive className="size-3.5 text-[#0A84FF]" /> Dung lượng
-                </span>
-                <span className="text-white font-semibold">{selectedPhoto.size}</span>
-              </div>
-              <div className="flex items-center justify-between text-[11px] pt-0.5 font-mono">
-                <span className="text-[#8E8E93] flex items-center gap-1.5">
-                  <MapPin className="size-3.5 text-[#FF453A]" /> Vị trí chụp
-                </span>
-                <span className="text-white font-semibold text-right max-w-[150px] truncate">
-                  {selectedPhoto.location}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* EXIF Metadata Drawer Modal */}
-          {showExifInfo && (
-            <div className="absolute inset-x-0 bottom-11 bg-[#1C1C1E]/95 backdrop-blur-md border-t border-[#2C2C2E] p-3.5 space-y-2.5 animate-in slide-in-from-bottom-4 shadow-2xl z-30">
-              <div className="flex items-center justify-between text-[11px] font-mono font-bold text-[#0A84FF]">
-                <span>THÔNG SỐ CAMERA EXIF</span>
-                <button onClick={() => setShowExifInfo(false)} className="text-[#8E8E93] hover:text-white">✕</button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-[10.5px] font-mono text-[#D1D1D6]">
-                <div className="p-2 rounded bg-black/40 border border-white/5">
-                  <span className="text-[#8E8E93] block text-[9px]">THIẾT BỊ</span>
-                  <span className="font-bold text-white">Apple iPhone 5s</span>
+            {/* EXIF Metadata Box */}
+            {showExifInfo && (
+              <div className="w-full mt-3 p-3 rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] space-y-1.5 text-[11px] font-mono text-[#8E8E93]">
+                <div className="flex justify-between">
+                  <span>Tên file:</span>
+                  <span className="text-white">{selectedPhoto.filename}</span>
                 </div>
-                <div className="p-2 rounded bg-black/40 border border-white/5">
-                  <span className="text-[#8E8E93] block text-[9px]">CẢM BIẾN</span>
-                  <span className="font-bold text-white">8MP iSight (1.5µm)</span>
+                <div className="flex justify-between">
+                  <span>Thời gian:</span>
+                  <span className="text-white">{selectedPhoto.timestamp}</span>
                 </div>
-                <div className="p-2 rounded bg-black/40 border border-white/5">
-                  <span className="text-[#8E8E93] block text-[9px]">KHẨU ĐỘ / TIÊU CỰ</span>
-                  <span className="font-bold text-white">f/2.2 • 29mm</span>
+                <div className="flex justify-between">
+                  <span>Vị trí:</span>
+                  <span className="text-white">{selectedPhoto.location}</span>
                 </div>
-                <div className="p-2 rounded bg-black/40 border border-white/5">
-                  <span className="text-[#8E8E93] block text-[9px]">TỐC ĐỘ / ISO</span>
-                  <span className="font-bold text-white">1/30s • ISO 64</span>
-                </div>
+                {selectedPhoto.description && (
+                  <div className="border-t border-[#2C2C2E] pt-1 mt-1 text-white italic">
+                    "{selectedPhoto.description}"
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-
-          {/* Bottom Bar */}
-          <div className="h-11 bg-[#161618] border-t border-[#2C2C2E] flex items-center justify-between px-6 shrink-0 text-[#0A84FF]">
-            <Share className="size-4" />
-            <Heart className="size-4" />
-            <button onClick={() => setShowExifInfo(!showExifInfo)} className={cn(showExifInfo && 'text-white')}>
-              <Info className="size-4" />
-            </button>
-            <Trash2 className="size-4 text-[#FF453A]" />
+            )}
           </div>
         </div>
       ) : (
-        /* PHOTO GRID VIEW OR EMPTY OFFLINE VIEW */
+        /* PHOTO GRID VIEW */
         <div className="flex flex-col h-full">
           <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
             <div className="flex items-center justify-between mb-1">
@@ -143,47 +120,46 @@ export function PhotosApp({ photos = [], onBackToHome }: PhotosAppProps) {
             </div>
           </div>
 
-          {currentPhotos.length === 0 ? (
-            /* OFFLINE / FAILED TO LOAD PHOTOS VIEW */
+          {loading ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-4 text-[#8E8E93]">
+              <Loader2 className="size-6 animate-spin mb-2 text-[#0A84FF]" />
+              <span className="text-xs">Đang tải thư viện ảnh từ Google Sheets...</span>
+            </div>
+          ) : error ? (
+            <div className="flex-1 p-4 text-center text-xs text-red-400">Lỗi: {error}</div>
+          ) : photos.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 pb-14">
               <div className="size-16 rounded-full bg-[#1C1C1E] border border-white/10 flex items-center justify-center text-[#8E8E93]">
                 <CloudOff className="size-8 stroke-[1.5]" />
               </div>
-
               <div className="space-y-1.5 max-w-[260px]">
-                <h2 className="text-[16px] font-bold text-white tracking-tight">
-                  Không thể tải ảnh
-                </h2>
-                <p className="text-[12px] text-[#8E8E93] leading-relaxed">
-                  Thư viện ảnh iCloud không thể tải dữ liệu vì không có kết nối Internet.
-                </p>
-              </div>
-
-              <div className="p-3 rounded-xl bg-[#1C1C1E]/80 border border-white/5 text-[11px] text-[#636366] max-w-[260px] font-mono leading-normal">
-                Trạng thái: Thiết bị mất sóng (No Service) • 0 Ảnh
+                <h2 className="text-[16px] font-bold text-white tracking-tight">Thư viện trống</h2>
+                <p className="text-[12px] text-[#8E8E93]">Không có ảnh nào trong thư viện Google Sheets.</p>
               </div>
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto p-2 pb-10">
               <div className="grid grid-cols-3 gap-1.5">
-                {currentPhotos.map((photo) => (
+                {photos.map((photo) => (
                   <div
                     key={photo.id}
                     onClick={() => setSelectedPhoto(photo)}
                     className="aspect-square rounded-lg bg-[#1C1C1E] border border-[#2C2C2E] overflow-hidden hover:opacity-80 active:scale-95 cursor-pointer flex flex-col items-center justify-center p-1 relative group"
                   >
-                    <img
-                      src={`/photos/${photo.filename.replace(/\.jpg$/, '.png')}`}
-                      alt={photo.filename}
-                      className="w-full h-full object-cover rounded"
-                      onError={(e) => {
-                        ;(e.target as HTMLElement).style.display = 'none'
-                      }}
-                    />
-                    <ImageIcon className="size-5 text-[#8E8E93] opacity-40 group-hover:text-[#0A84FF] transition-colors" />
-                    <span className="text-[8px] font-mono text-[#8E8E93] truncate w-full text-center mt-1">
-                      {photo.size}
-                    </span>
+                    {photo.driveUrl ? (
+                      <img
+                        src={photo.driveUrl}
+                        alt={photo.filename}
+                        className="w-full h-full object-cover rounded"
+                      />
+                    ) : (
+                      <>
+                        <ImageIcon className="size-5 text-[#8E8E93] opacity-40 group-hover:text-[#0A84FF] transition-colors" />
+                        <span className="text-[8px] font-mono text-[#8E8E93] truncate w-full text-center mt-1">
+                          {photo.filename}
+                        </span>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
