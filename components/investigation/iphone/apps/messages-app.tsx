@@ -46,42 +46,40 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   const [pinnedClueIds, setPinnedClueIds] = useState<string[]>([])
   const [pinnedNotification, setPinnedNotification] = useState<string | null>(null)
 
-  // Fetch messages live from Google Sheets
-  const { data: messagesData, loading, error } = usePhoneData('messages')
+  // Fetch conversations live from Google Sheets
+  const { data: rawMessagesData, loading, error } = usePhoneData('messages')
 
-  // Group linear messages into conversation threads by contact_name / phone_number
-  const threadMap = new Map<string, any>()
-  messagesData.forEach((item: any, idx: number) => {
-    const threadKey = item.contact_name || item.phone_number || 'Khác'
-    if (!threadMap.has(threadKey)) {
-      threadMap.set(threadKey, {
-        id: `thread-${threadKey}`,
-        name: threadKey,
-        phoneNumber: item.phone_number || '',
-        avatarColor: 'from-[#3A3A3C] to-[#636366]',
-        unread: item.is_read === 'FALSE',
-        timestamp: item.timestamp || '',
-        previewText: item.content || item.message_text || '',
-        messages: []
-      })
+  // Map 1-row-per-person schema into conversation threads
+  const threads = rawMessagesData.map((item: any, idx: number) => {
+    let parsedMessages: any[] = []
+    if (item.messages_json) {
+      try {
+        parsedMessages = typeof item.messages_json === 'string' ? JSON.parse(item.messages_json) : item.messages_json
+      } catch (e) {
+        console.error('Failed to parse messages_json for', item.contact_name, e)
+      }
     }
-    const thread = threadMap.get(threadKey)
-    thread.previewText = item.content || item.message_text || thread.previewText
-    thread.timestamp = item.timestamp || thread.timestamp
-    thread.messages.push({
-      id: item.message_id || `msg-${idx + 1}`,
-      sender: item.sender || (item.direction === 'SENT' ? 'Khang' : threadKey),
-      role: item.direction === 'SENT' ? 'sent' : 'received',
-      text: item.content || item.message_text || '',
-      timestamp: item.timestamp || '',
-      type: item.message_type || 'text',
-      isClue: item.is_clue === 'TRUE' || item.is_clue === true,
-      clueTitle: item.clue_title || '',
-      clueAnalysis: item.clue_analysis || ''
-    })
-  })
 
-  const threads = Array.from(threadMap.values())
+    return {
+      id: item.message_id || `conv-${idx + 1}`,
+      name: item.contact_name || item.name || 'Không tên',
+      phoneNumber: item.phone_number || '',
+      avatarColor: item.avatar_color || 'from-[#3A3A3C] to-[#636366]',
+      unread: item.unread === 'TRUE' || item.unread === true,
+      timestamp: item.timestamp || '',
+      previewText: item.preview_text || (parsedMessages.length > 0 ? parsedMessages[parsedMessages.length - 1].text : ''),
+      messages: parsedMessages.map((m: any, mIdx: number) => ({
+        id: m.id || `msg-${idx}-${mIdx}`,
+        sender: m.sender || m.role || item.contact_name,
+        role: m.role || (m.sender === 'Khang' ? 'sent' : 'received'),
+        text: m.text || m.content || '',
+        timestamp: m.timestamp || '',
+        isClue: m.isClue || m.is_clue === 'TRUE' || m.is_clue === true,
+        clueTitle: m.clueTitle || m.clue_title || '',
+        clueAnalysis: m.clueAnalysis || m.clue_analysis || ''
+      }))
+    }
+  })
 
   // Load pinned clues from localStorage
   useEffect(() => {
