@@ -26,4 +26,5 @@ Tài liệu này mô tả kiến trúc kết nối trực tiếp đến **Google
 | **`relations`** | Mạng lưới Quan hệ | `case_id`, `relation_id`, `from_character`, `to_character`, `relation_type`, `description` | Mối quan hệ giữa các đối tượng để dựng sơ đồ tư duy (Mindmap). |
 | **`evidences`** | Danh mục Vật chứng | `case_id`, `evidence_id`, `title`, `category`, `found_at_location`, `description`, `dossier_code` | Danh mục tài liệu hồ sơ LaTeX, biên bản khám xét và vật chứng vụ án. |
 | **`timeline`** | Dòng thời gian vụ án | `case_id`, `event_id`, `time`, `character`, `action`, `location`, `is_key_event` | Mốc sự kiện phục vụ tính năng Alibi Clash và đối chiếu lời khai. |
+| **`notes_and_browser`** | Safari & Ghi chú (`SafariApp`, `NotesApp`) | `case_id`, `type`, `title_or_domain`, `content_or_url`, `timestamp`, `category`, `clue_tag` | Quản lý tập trung cả Lịch sử duyệt web Safari (`type=SAFARI`) và Ghi chú cá nhân (`type=NOTE`). |
 | **`hints`** | Hệ thống Gợi ý (Hint System) | `case_id`, `hint_id`, `checkpoint_id`, `level`, `hint_text`, `cost_penalty` | Các cấp độ gợi ý giải đố hỗ trợ người chơi khi bị tắc suy luận. |

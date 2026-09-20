@@ -1,5 +1,5 @@
 # Detective Case System (dect_project) — Documentation Map
-test
+
 > **Chỉ mục tài liệu dự án được chuẩn hóa theo 2 tầng: Kỹ thuật (Technical) & Nghiệp vụ (Domain).**
 
 ---
@@ -11,7 +11,8 @@ Tài liệu về kiến trúc hệ thống, cơ sở dữ liệu, API, và quy t
 | :--- | :--- | :--- |
 | **System Specifications** | Đặc tả kỹ thuật hệ thống, luồng dữ liệu & kiến trúc tổng thể | [`core_specs/04_system_specifications.md`](core_specs/04_system_specifications.md) |
 | **Technical Guide** | Hướng dẫn setup, cấu trúc code, quy trình build LaTeX | [`core_specs/07_technical_guide.md`](core_specs/07_technical_guide.md) |
-| **Database Schema** | Cấu trúc dữ liệu, bảng điều tra, manh mối & quan hệ | [`core_specs/08_database_schema.md`](core_specs/08_database_schema.md) |
+| **Database Schema** | Cấu trúc dữ liệu PostgreSQL / Supabase, bảng điều tra & tiến trình | [`core_specs/08_database_schema.md`](core_specs/08_database_schema.md) |
+| **Google Sheets Live CMS** | Đặc tả hệ thống Google Sheets CMS live realtime & danh mục 11 tab | [`core_specs/10_google_sheets_cms.md`](core_specs/10_google_sheets_cms.md) |
 | **Design System & UI/UX** | Hệ thống màu sắc, typography phong cách trinh thám, component specs | [`core_specs/06_ux_ui_design_system.md`](core_specs/06_ux_ui_design_system.md) |
 | **Investigation Engine** | Kiến trúc engine điều tra và xử lý logic phá án | [`investigation_design/02_architecture_and_engine.md`](investigation_design/02_architecture_and_engine.md) |
 | **Validation & Pitfalls** | Các lỗi kỹ thuật cần tránh khi xây dựng engine | [`investigation_design/05_validation_and_pitfalls.md`](investigation_design/05_validation_and_pitfalls.md) |

@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { FileText, ArrowLeft, ChevronLeft, Search, Lock, Unlock, Folder } from 'lucide-react'
 import type { Document } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { usePhoneData } from '@/lib/hooks/use-phone-data'
 
 interface NotesAppProps {
-  notes: Document[]
+  notes?: Document[]
   onBackToHome?: () => void
 }
 
@@ -24,7 +25,23 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
   const [pinError, setPinError] = useState(false)
   const [unlockedNoteIds, setUnlockedNoteIds] = useState<string[]>([])
 
-  const allNotes: RichNote[] = (notes as RichNote[]) || []
+  // Fetch notes from Google Sheets live CMS (tab: notes_and_browser)
+  const { data: rawData, loading } = usePhoneData('notes_and_browser')
+
+  // Filter items where type == 'NOTE'
+  const sheetNotes: RichNote[] = rawData
+    .filter((item: any) => String(item.type).toUpperCase() === 'NOTE')
+    .map((item: any, idx: number) => ({
+      id: `sheet-note-${idx}`,
+      title: item.title_or_domain || 'Ghi chú không tên',
+      content: item.content_or_url || '',
+      timestamp: item.timestamp || '',
+      meta: item.timestamp || '',
+      folder: item.category || 'iCloud',
+      isLocked: false
+    }))
+
+  const allNotes: RichNote[] = sheetNotes.length > 0 ? sheetNotes : ((notes as RichNote[]) || [])
 
   const filteredNotes = allNotes.filter(
     (n) =>

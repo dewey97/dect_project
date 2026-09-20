@@ -60,50 +60,47 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
       } catch {}
     }
 
-    // 2. Support Clean Multiline Text Format: "Tên (Thời gian) [CLUE: Tiêu đề | Phân tích]: Nội dung"
+    // 2. Support Proposal 1 Multiline Text Format: "> (Timestamp) Text [CLUE: Title | Analysis]" or "(Timestamp) Text"
     if (parsedMessages.length === 0 && item.messages_text) {
       const lines = String(item.messages_text).split('\n').map((l) => l.trim()).filter(Boolean)
       parsedMessages = lines.map((line, mIdx) => {
-        // Match regex: Sender (Timestamp) [CLUE: Title | Analysis]: Text
-        const clueMatch = line.match(/^([^(]+)\s*\(([^)]+)\)\s*\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]:\s*(.*)$/i)
+        let isSent = line.startsWith('>')
+        let cleanLine = isSent ? line.substring(1).trim() : line
+
+        // Extract clue if present at end of line: [CLUE: Title | Analysis]
+        let clueTitle = ''
+        let clueAnalysis = ''
+        let isClue = false
+
+        const clueMatch = cleanLine.match(/\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i)
         if (clueMatch) {
-          const [, sender, timestamp, clueTitle, clueAnalysis, text] = clueMatch
-          const cleanSender = sender.trim()
-          return {
-            id: `msg-${idx}-${mIdx}`,
-            sender: cleanSender,
-            role: cleanSender === 'Khang' ? 'sent' : 'received',
-            text: text.trim(),
-            timestamp: timestamp.trim(),
-            isClue: true,
-            clueTitle: clueTitle.trim(),
-            clueAnalysis: clueAnalysis.trim()
-          }
+          isClue = true
+          clueTitle = clueMatch[1].trim()
+          clueAnalysis = clueMatch[2].trim()
+          cleanLine = cleanLine.replace(/\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i, '').trim()
         }
 
-        // Match normal line regex: Sender (Timestamp): Text
-        const normalMatch = line.match(/^([^(]+)\s*\(([^)]+)\):\s*(.*)$/)
-        if (normalMatch) {
-          const [, sender, timestamp, text] = normalMatch
-          const cleanSender = sender.trim()
-          return {
-            id: `msg-${idx}-${mIdx}`,
-            sender: cleanSender,
-            role: cleanSender === 'Khang' ? 'sent' : 'received',
-            text: text.trim(),
-            timestamp: timestamp.trim(),
-            isClue: false
-          }
+        // Extract timestamp in parentheses at start: (04/05 • 14:15) or (14:15)
+        let timestamp = ''
+        const tsMatch = cleanLine.match(/^\(([^)]+)\)\s*(.*)$/)
+        let text = cleanLine
+
+        if (tsMatch) {
+          timestamp = tsMatch[1].trim()
+          text = tsMatch[2].trim()
         }
 
-        // Fallback for unstructured plain text lines
+        const sender = isSent ? 'Khang' : (item.contact_name || 'Khác')
+
         return {
           id: `msg-${idx}-${mIdx}`,
-          sender: item.contact_name || 'Khác',
-          role: 'received',
-          text: line,
-          timestamp: item.timestamp || '',
-          isClue: false
+          sender,
+          role: isSent ? 'sent' : 'received',
+          text,
+          timestamp,
+          isClue,
+          clueTitle,
+          clueAnalysis
         }
       })
     }
@@ -241,15 +238,11 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
               return (
                 <div key={msg.id} className={cn('flex flex-col', isMe ? 'items-end' : 'items-start')}>
                   <div
-                    onClick={() => {
-                      if (msg.isClue) setInspectingClue(msg)
-                    }}
                     className={cn(
                       'max-w-[80%] rounded-2xl px-3.5 py-2 text-[12.5px] leading-relaxed shadow-sm relative group transition-all',
                       isMe
                         ? 'bg-[#0A84FF] text-white rounded-br-sm'
-                        : 'bg-[#2C2C2E] text-white rounded-bl-sm',
-                      msg.isClue && 'ring-1 ring-[#FFD60A]/60 shadow-[0_0_8px_rgba(255,214,10,0.2)]'
+                        : 'bg-[#2C2C2E] text-white rounded-bl-sm'
                     )}
                   >
                     <p className="whitespace-pre-wrap break-words">{msg.text}</p>
