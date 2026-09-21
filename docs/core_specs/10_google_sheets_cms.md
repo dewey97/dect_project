@@ -59,87 +59,39 @@ Tab `checkpoints` điều khiển toàn bộ tiến trình giải đố. Code Ne
 
 ---
 
-### 3.2. Cú Pháp Cột `answers` (Đáp Án Hợp Nhất)
+### 3.2. Cấu Trúc Tab `checkpoints` (9 Cột Tinh Gọn Thuần Việt)
 
-**Nguyên tắc chung**:
+Tab `checkpoints` quản lý toàn bộ mốc giải đố, mở khóa hồ sơ và kết án. Tab chỉ gồm **9 cột thiết yếu**:
 
-- Mỗi dòng là một cặp `khóa: giá trị`. Xuống dòng trong ô bằng `Alt+Enter`.
-- Dấu `:` đầu tiên trên dòng phân tách khóa và giá trị. Giá trị được giữ nguyên văn (kể cả khi chứa dấu `:`).
-- Các khóa `option`, `mismatch_option`, `motive_option`, `branch`, `input` được phép **lặp lại nhiều dòng** để tạo danh sách.
-- Khóa không nhận diện được sẽ bị **bỏ qua** kèm cảnh báo `console.warn` trong DevTools — dùng để phát hiện lỗi gõ chính tả.
-- Chấp nhận bí danh tiếng Việt không dấu: `phuong_an` = `option`, `dap_an` = `correct`, `nghi_pham` = `suspect`, `bat_buoc` = `require`, `hien_thi` = `show`, `dong_co` = `motive`, `mau_thuan` = `mismatch`, `nhanh` = `branch`, `o_nhap` = `input`.
+| Tên cột                | Mô tả                                                                      | Loại dữ liệu   | Bắt buộc       |
+| :--------------------- | :------------------------------------------------------------------------- | :------------- | :------------- |
+| `case_id`              | Mã vụ án (`case_000`, `case_001`)                                          | String         | 🔴 Có          |
+| `checkpoint_id`        | Mã checkpoint duy nhất (`cp-000-0`, `cp-000-1a`...)                        | String         | 🔴 Có          |
+| `dossier`              | Nhãn Bộ hồ sơ con (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`)                      | String         | 🟡 Khuyên dùng |
+| `title`                | Tiêu đề checkpoint                                                         | String         | 🟡 Khuyên dùng |
+| `question`             | Nội dung câu hỏi / Hướng dẫn vụ án                                         | String         | 🟡 Khuyên dùng |
+| `type`                 | Loại dạng câu hỏi (`text_match_3`, `evidence_picker`, `accusation`, `mcq`) | String         | 🔴 Có          |
+| `unlocked_evidence_id` | Mã folder/vật chứng được mở khóa                                           | String         | 🔴 Có          |
+| `answers`              | **Cột đáp án hợp nhất** (gõ cú pháp `khóa: giá trị`)                       | Text (đa dòng) | 🔴 Có          |
+| `hints`                | Danh sách gợi ý 3 cấp (mỗi cấp một dòng Alt+Enter)                         | Text (đa dòng) | 🟡 Khuyên dùng |
 
-**Bảng khóa hợp lệ**:
+#### Từ khóa cú pháp tiếng Việt trong cột `answers`:
 
-| Khóa              | Dùng cho `type`                       | Định dạng giá trị                                                         | Lặp lại |
-| :---------------- | :------------------------------------ | :------------------------------------------------------------------------ | :-----: |
-| `option`          | `mcq`                                 | Nội dung 1 phương án trả lời                                              |   Có    |
-| `correct`         | `mcq`                                 | Nội dung đáp án đúng — phải khớp **nguyên văn** với 1 dòng `option`       |  Không  |
-| `input`           | `text_match_3`                        | `id \| Nhãn ô \| Placeholder \| đáp_án_1, đáp_án_2`                       |   Có    |
-| `suspect`         | `evidence_picker`, `accusation`       | Danh sách từ khóa tên nghi phạm chấp nhận, cách nhau dấu `,`              |  Không  |
-| `require`         | `evidence_picker`, `accusation`       | Danh sách mã vật chứng **bắt buộc** phải chọn đúng, cách nhau dấu `,`     |  Không  |
-| `show`            | `evidence_picker`, `accusation`       | Danh sách mã vật chứng **hiển thị** trong bảng chọn, cách nhau dấu `,`    |  Không  |
-| `mismatch`        | `evidence_picker` (bẻ gãy ngoại phạm) | Danh sách mã loại mâu thuẫn đúng (`mismatch_location`), cách nhau dấu `,` |  Không  |
-| `mismatch_option` | `evidence_picker`                     | Nhãn hiển thị của 1 nút chọn mâu thuẫn                                    |   Có    |
-| `branch`          | `convergence`                         | `id \| Tên hiển thị \| id_lý_do_đúng \| Lý do 1 /// Lý do 2 /// Lý do 3`  |   Có    |
-| `motive`          | `accusation`                          | Danh sách mã động cơ đúng (`motive_jealousy`), cách nhau dấu `,`          |  Không  |
-| `motive_option`   | `accusation`                          | Nhãn hiển thị của 1 nút chọn động cơ                                      |   Có    |
+| Khóa tiếng Việt (Khuyên dùng) | Khóa tương đương tiếng Anh | Dành cho `type`                 | Ý nghĩa & Ví dụ                                           |
+| :---------------------------- | :------------------------- | :------------------------------ | :-------------------------------------------------------- |
+| `nghi_pham:`                  | `suspect:`                 | `evidence_picker`, `accusation` | `nghi_pham: Lê Quang Vũ`                                  |
+| `ma_chung_cu:`                | `require:`                 | `evidence_picker`, `accusation` | `ma_chung_cu: 10, dev-00, p6, 06, p10`                    |
+| `mau_thuan:`                  | `mismatch:`                | `evidence_picker`               | `mau_thuan: Mâu thuẫn Địa điểm`                           |
+| `dong_co:`                    | `motive:`                  | `accusation`                    | `dong_co: Cuồng yêu ghen tuông`                           |
+| `o_nhap:`                     | `input:`                   | `text_match_3`                  | `o_nhap: phone_1 \| SĐT 0988.200.991: \| \| Lê Quang Vũ`  |
+| `option:`                     | `phuong_an:`               | `mcq`                           | `option: 1. Gửi tin nhắn cho đối tượng liên lạc mờ ám...` |
+| `correct:`                    | `dap_an:`                  | `mcq`                           | `correct: 1. Gửi tin nhắn cho đối tượng...`               |
 
-**Ví dụ mẫu theo từng `type`**:
-
-`type=mcq`:
-
-```
-option: 1. Gửi tin nhắn cho đối tượng liên lạc mờ ám hẹn gặp lúc 9 giờ.
-option: 2. Gửi tin nhắn cho cảnh sát đường sông.
-option: 3. Không gửi cho ai.
-correct: 1. Gửi tin nhắn cho đối tượng liên lạc mờ ám hẹn gặp lúc 9 giờ.
-```
-
-`type=text_match_3`:
-
-```
-input: phone_1 | SĐT 0988.200.991: | Nhập tên nghi phạm (VD: Lê Quang Vũ)... | Lê Quang Vũ, Vũ, Le Quang Vu
-input: phone_2 | SĐT 0912.331.888: | Nhập tên nghi phạm (VD: Nguyễn Thanh Tùng)... | Nguyễn Thanh Tùng, Tùng
-```
-
-`type=evidence_picker` (có kèm bẻ gãy mâu thuẫn):
-
-```
-suspect: Trần Thị Hà, Hà, Tran Thi Ha
-require: 01_voicemail, 02_vtv3
-show: 03a, 04, 06, 10, dev-00, p4, 01_voicemail, 02_vtv3
-mismatch: mismatch_location
-mismatch_option: 📍 Mâu thuẫn Địa điểm (Khai ở phòng trọ nhưng thực chất có mặt trước cổng nhà Khang)
-mismatch_option: 🕒 Mâu thuẫn Nhân dạng (Khai mặc áo dài nhưng mặc áo bảo hộ)
-```
-
-`type=convergence`:
-
-```
-branch: mai | 1. Nguyễn Ngọc Mai | mai_alibi_tv | Ngoại phạm xem TV tại nhà lúc 20:10 /// Không có động cơ tranh chấp đất đai
-branch: vu | 2. Lê Quang Vũ | vu_alibi_pub | Thanh toán 195k tại Quán Bia 88 lúc 21:15 /// Không có mâu thuẫn tiền bạc
-```
-
-`type=accusation`:
-
-```
-suspect: Trần Thị Hà, Hà, Tran Thi Ha
-require: 04_lon_toc, 03_ao_gio
-show: 01, 03_ao_gio, 04_lon_toc, 08_ve_may_bay, dev-00
-motive: motive_jealousy
-motive_option: Cuồng yêu, ghen tuông bệnh hoạn khi phát hiện Khang định bỏ trốn với bồ mới
-motive_option: Tranh chấp quyền thừa kế mảnh đất 200m² của gia đình
-```
-
-> ⚠️ **Đánh đổi cần biết**: Gộp 10 cột vào 1 cột `answers` giúp Sheet gọn (22 → 13 cột) nhưng **mất tính năng Data Validation / dropdown gợi ý giá trị** của Google Sheets trên từng cột riêng. Bù lại, code in cảnh báo `console.warn` khi gặp khóa sai chính tả.
-
-**Quy ước nhập đáp án tên người / cụm từ** (khóa `suspect`, `correct`, `input`):
-
-- **Chỉ cần nhập MỘT dạng có dấu.** Code tự chuẩn hoá cả hai phía (bỏ dấu, thường hoá, bỏ ký tự đặc biệt) qua `normalizeVietnameseText`, nên `Lê Quang Vũ` tự khớp `Le Quang Vu`, `le quang vu`, `LÊ QUANG VŨ`.
-- **Không cần liệt kê biến thể không dấu** — chúng là dữ liệu dư.
-- **Không cần nhập mã bypass.** `00`, `000`, `0`, `admin` đã được code hard-code sẵn cho mọi ô nhập tên.
-- **Khớp theo ranh giới từ**, không khớp chuỗi con: gõ `Vũ` đúng cho đáp án `Lê Quang Vũ`, nhưng `Khang` **không** lọt vào đáp án `Hà` và `Vương` **không** lọt vào `Vũ`. Logic nằm ở `isVietnameseTextMatch` trong [`lib/finding-matcher.ts`](file:///d:/code_world/dect_project/lib/finding-matcher.ts), có unit test tại [`scripts/test-fuzzy-matcher.ts`](file:///d:/code_world/dect_project/scripts/test-fuzzy-matcher.ts) (chạy `npx tsx scripts/test-fuzzy-matcher.ts`).
+> 💡 **Quy ước nhập tên nghi phạm & mã chứng cứ**:
+>
+> - **Tên người**: Chỉ cần nhập dạng chuẩn có dấu (`Lê Quang Vũ`). Code tự so khớp có/không dấu/tên tắt qua `isVietnameseTextMatch`.
+> - **Mã chứng cứ**: Nhập đúng mã in trên thẻ tài liệu/vật chứng (`10`, `dev-00`, `p6`, `06`, `p10`, `14`, `p4`, `p5`, `01`, `02`...).
+> - **Bỏ hoàn toàn dòng `show:`**: Bảng ghim Web & Boardgame tự động nhận mã ghim/nhập trực tiếp.
 
 ---
 

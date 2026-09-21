@@ -10,8 +10,11 @@ import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
 export interface SheetCheckpointRow {
   case_id?: string;
   checkpoint_id?: string;
-  /** Nhãn ghi chú cho biên kịch — code không đọc cột này. */
-  phase?: string | number;
+  /**
+   * Bộ hồ sơ con chứa checkpoint: `Ban Đầu` | `Bộ A` | `Bộ B` | `Bộ C`.
+   * Là nhãn nghiệp vụ cho biên kịch — code không đọc cột này.
+   */
+  dossier?: string;
   title?: string;
   question?: string;
   type?:
@@ -19,10 +22,6 @@ export interface SheetCheckpointRow {
   unlocked_evidence_id?: string;
   /** Cột đáp án hợp nhất — mỗi dòng `khóa: giá trị` (Alt+Enter để xuống dòng). */
   answers?: string;
-  suspect_label?: string;
-  evidence_step_label?: string;
-  motive_label?: string;
-  mismatch_label?: string;
   /** Danh sách gợi ý đa cấp — mỗi dòng (Alt+Enter) là một cấp độ gợi ý (1, 2, 3...). */
   hints?: string;
   [key: string]: any;
@@ -66,6 +65,9 @@ const ANSWER_KEYS: Record<string, string> = {
   required: "require",
   required_evidences: "require",
   bat_buoc: "require",
+  ma_chung_cu: "require",
+  vat_chung: "require",
+  chung_cu: "require",
   show: "show",
   available: "show",
   available_evidences: "show",
@@ -78,6 +80,7 @@ const ANSWER_KEYS: Record<string, string> = {
   mismatch: "mismatch",
   mismatches: "mismatch",
   mau_thuan: "mismatch",
+  loai_mau_thuan: "mismatch",
   mismatch_option: "mismatch_option",
   mismatch_options: "mismatch_option",
   mau_thuan_option: "mismatch_option",
