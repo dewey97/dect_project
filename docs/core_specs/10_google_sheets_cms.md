@@ -38,6 +38,8 @@ Tài liệu này mô tả kiến trúc kết nối trực tiếp đến **Google
 | **`checkpoints`**       | Câu Hỏi, Đáp Án & Hệ Thống Gợi Ý           | [`use-case-checkpoints.ts`](lib/hooks/use-case-checkpoints.ts), [`hint-modal.tsx`](...)         |     🟢 **Live**     | `🔑 case_id`, `🔑 checkpoint_id`, `📝 dossier`, `⚡ title`, `⚡ question`, `🔑 type`, `⚡ unlocked_evidence_id`, `⚡ answers`, `⚡ hints`                            |
 | **`narratives`**        | Dẫn truyện Cinematic                       | [`use-case-narratives.ts`](lib/hooks/use-case-narratives.ts)                                    |     🟢 **Live**     | `🔑 case_id`, `🔑 phase`, `📝 dossier`, `⚡ date`, `⚡ monologue`                                                                                                    |
 | **`evidences`**         | Danh mục Vật chứng Master                  | [`use-case-checkpoints.ts`](lib/hooks/use-case-checkpoints.ts)                                  |     🟢 **Live**     | `🔑 case_id`, `🔑 code`, `⚡ label`, `⚡ type`, `⚡ category`, `⚡ description`, `📝 unlocked_by_phase`, `📝 position_x`, `📝 position_y`, `📝 logic_data`           |
+| **`motive_ideas`**      | Kho Ý Tưởng Động Cơ Gây Án                 | _(Phụ trợ Game Designer / GM sáng tạo kịch bản)_                                                |     ⚪ _Static_     | `🔑 id`, `⚡ category`, `⚡ title`, `⚡ summary`, `⚡ psychological_trigger`, `⚡ victim_relation`, `⚡ evidence_signatures`                                         |
+| **`method_ideas`**      | Kho Ý Tưởng Cách Thức Gây Án               | _(Phụ trợ Game Designer / GM sáng tạo kịch bản)_                                                |     ⚪ _Static_     | `🔑 id`, `⚡ category`, `⚡ title`, `⚡ summary`, `⚡ required_tools`, `⚡ forensic_traces`, `⚡ alibi_trick`, `⚡ flaw_counter`                                     |
 | **`characters`**        | Hồ sơ Nhân vật & Nghi phạm                 | _(Chưa nối — đang dùng `content/cases/` local)_                                                 |     ⚪ _Static_     | `🔑 case_id`, `🔑 character_id`, `⚡ name`, `⚡ gender`, `⚡ age`, `⚡ weight_kg`, `⚡ role`, `⚡ occupation`, `⚡ relation_to_victim`, `⚡ alibi`, `⚡ motive`      |
 | **`locations`**         | Bản đồ Hiện trường                         | _(Chưa nối — đang dùng `content/cases/` local)_                                                 |     ⚪ _Static_     | `🔑 case_id`, `🔑 location_id`, `⚡ name`, `⚡ address`, `⚡ description`, `⚡ position_x`, `⚡ position_y`, `⚡ source_type`                                        |
 | **`relations`**         | Mạng lưới Quan hệ                          | _(Chưa nối — đang dùng `content/cases/` local)_                                                 |     ⚪ _Static_     | `🔑 case_id`, `🔑 relation_id`, `⚡ from_character`, `⚡ to_character`, `⚡ relation_type`, `⚡ description`                                                         |
@@ -101,3 +103,12 @@ Tab `narratives` quản lý toàn bộ nội dung độc thoại/dẫn truyện 
    - Ô `⚡ Live` để trống trên Sheet sẽ tự động lấy giá trị từ checkpoint/narrative **cùng ID/phase** trong file local `content/cases/<caseId>/`.
 2. **Tầng 2 — Fallback theo cả tab (Row-level)**:
    - Nếu tab trên Sheet bị xóa hoặc rỗng, hook tự động trả về toàn bộ mảng dữ liệu local (`source = 'local'`), ứng dụng không bao giờ bị gián đoạn hay crash.
+
+---
+
+## 💡 6. Kho Ý Tưởng Sáng Tạo Kịch Bản (`motive_ideas` & `method_ideas`)
+
+Hai tab phụ trợ độc lập trên Google Sheet giúp GM / Biên kịch tra cứu và lắp ghép kịch bản vụ án:
+
+- **`motive_ideas`**: 12 mẫu động cơ kinh điển (Tài chính, Tình cảm, Thù hận, Che đậy, Bệnh lý, Danh dự) kèm ngòi nổ tâm lý (`psychological_trigger`), quan hệ nạn nhân (`victim_relation`) và dấu vết nhận diện (`evidence_signatures`).
+- **`method_ideas`**: 12 thủ đoạn gây án & tạo chứng cứ ngoại phạm (Độc chất, Tai nạn dàn dựng, Bẫy cơ học, Ngoại phạm Alibi, Vũ khí tự hủy) kèm cơ chế pháp y (`forensic_traces`), mẹo alibi (`alibi_trick`) và lỗ hổng điều tra (`flaw_counter`).
