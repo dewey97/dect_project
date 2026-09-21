@@ -119,7 +119,6 @@ function getContextAwareHintStage(): ActiveHintGroup {
   if (
     investigatedSuspects.includes("ha") ||
     isReinvestigateUnlocked ||
-    completedCheckpoints.includes("cp-000-convergence") ||
     completedCheckpoints.includes("cp-000-1b")
   ) {
     return {
@@ -144,7 +143,7 @@ function getContextAwareHintStage(): ActiveHintGroup {
   ) {
     return {
       id: "stage-reinvestigate",
-      checkpointId: "cp-000-convergence",
+      checkpointId: "cp-000-1b",
       title: "Bóc Tách Mâu Thuẫn Vũ & Tùng",
       statusText: "Đang xác định mốc giờ rời đi và biến cố năm 1996",
       hints: [

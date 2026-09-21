@@ -188,14 +188,13 @@ Trước khi tra bảng cột, cần nắm rõ **fallback 2 tầng** mà code Ne
 
 Bảng dưới liệt kê **giá trị cụ thể** mà code sẽ dùng khi ô tương ứng trên Sheet để trống.
 
-| `checkpoint_id`      | `type`            | `title` (fallback)                                         | `unlocked_evidence_id` (fallback) | `hints` (fallback) | `require` (fallback)                                                                 |
-| :------------------- | :---------------- | :--------------------------------------------------------- | :-------------------------------- | :----------------- | :----------------------------------------------------------------------------------- |
-| `cp-000-0`           | `text_match_3`    | Truy Tìm Danh Tính 3 Số Điện Thoại Ẩn Danh                 | `f1-all-dossiers`                 | 3 cấp              | Không dùng (dùng khóa `input` với 3 ô `phone_1`, `phone_2`, `phone_3`)               |
-| `cp-000-1a`          | `evidence_picker` | _(rỗng — UI hiển thị tiêu đề trống)_                       | `f2-loi-khai-2-vu`                | 3 cấp              | `doc_10_so_no`, `sms_dev00`, `p6_anh_vu`, `doc_06_loi_khai_lua`, `p10_app_xe` (5 mã) |
-| `cp-000-1b`          | `evidence_picker` | _(rỗng — UI hiển thị tiêu đề trống)_                       | `f2-tu-thu-tung`                  | 3 cấp              | `doc_14_loi_khai_tung`, `p4_van_tay`, `p5_manh_bao`, `p4_anh_1996` (4 mã)            |
-| `cp-000-convergence` | `convergence`     | 🔑 Nút Hội Tụ: Loại Trừ 3 Nghi Phạm Ban Đầu & Khám Xét Lại | `f3-lenh-kham-xet`                | 3 cấp              | Không dùng (dùng khóa `branch` với 3 nhánh `mai`, `vu`, `tung`)                      |
-| `cp-000-2a`          | `evidence_picker` | Bóc Trần Ngoại Phạm Trần Thị Hà                            | `f4-kham-xet-phong-ha`            | 3 cấp              | `doc_voice_coi_tau`, `doc_lich_vtv3` (2 mã)                                          |
-| `cp-000-2b`          | `accusation`      | Phase 2 — Bản Cáo Trạng Định Tội & Bắt Giữ Thủ Phạm        | `rewards-case-000`                | 3 cấp              | `ev_hair_dna`, `ev_ao_gio_xoan` (2 mã)                                               |
+| `checkpoint_id` | `type`            | `title` (fallback)                                  | `unlocked_evidence_id` (fallback) | `hints` (fallback) | `require` (fallback)                                                                 |
+| :-------------- | :---------------- | :-------------------------------------------------- | :-------------------------------- | :----------------- | :----------------------------------------------------------------------------------- |
+| `cp-000-0`      | `text_match_3`    | Truy Tìm Danh Tính 3 Số Điện Thoại Ẩn Danh          | `f1-all-dossiers`                 | 3 cấp              | Không dùng (dùng khóa `input` với 3 ô `phone_1`, `phone_2`, `phone_3`)               |
+| `cp-000-1a`     | `evidence_picker` | _(rỗng — UI hiển thị tiêu đề trống)_                | `f2-loi-khai-2-vu`                | 3 cấp              | `doc_10_so_no`, `sms_dev00`, `p6_anh_vu`, `doc_06_loi_khai_lua`, `p10_app_xe` (5 mã) |
+| `cp-000-1b`     | `evidence_picker` | _(rỗng — UI hiển thị tiêu đề trống)_                | `f2-tu-thu-tung`                  | 3 cấp              | `doc_14_loi_khai_tung`, `p4_van_tay`, `p5_manh_bao`, `p4_anh_1996` (4 mã)            |
+| `cp-000-2a`     | `evidence_picker` | Bóc Trần Ngoại Phạm Trần Thị Hà                     | `f4-kham-xet-phong-ha`            | 3 cấp              | `doc_voice_coi_tau`, `doc_lich_vtv3` (2 mã)                                          |
+| `cp-000-2b`     | `accusation`      | Phase 2 — Bản Cáo Trạng Định Tội & Bắt Giữ Thủ Phạm | `rewards-case-000`                | 3 cấp              | `ev_hair_dna`, `ev_ao_gio_xoan` (2 mã)                                               |
 
 **Nhãn UI fallback tương ứng** (khi các cột `*_label` để trống):
 
