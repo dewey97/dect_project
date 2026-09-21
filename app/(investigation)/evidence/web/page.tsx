@@ -347,17 +347,17 @@ export default function WebEvidencePage() {
               </div>
             </div>
 
-            {/* PHASE FILTER PILLS */}
+            {/* DOSSIER PACKET FILTER PILLS */}
             <div className="shrink-0 px-3 py-1.5 border-b border-[#3d2c1e]/60 bg-[#1a1410] flex items-center gap-1.5 overflow-x-auto text-[0.62rem] font-mono">
               <span className="text-[#8c735d] uppercase tracking-wider pr-1">
-                GIAI ĐOẠN:
+                HỒ SƠ:
               </span>
               {[
                 { label: "TẤT CẢ", val: "all" as const },
-                { label: "GĐ 0", val: 0 },
-                { label: "GĐ 1", val: 1 },
-                { label: "GĐ 2", val: 2 },
-                { label: "GĐ 3", val: 3 },
+                { label: "BAN ĐẦU", val: 0 },
+                { label: "BỘ A", val: 1 },
+                { label: "BỘ B", val: 2 },
+                { label: "BỘ C", val: 3 },
               ].map((p) => {
                 const isLocked =
                   typeof p.val === "number" && !isPhaseUnlocked(p.val);
@@ -394,6 +394,14 @@ export default function WebEvidencePage() {
                     selectedView.type === item.type &&
                     selectedView.data.id === item.data.id;
                   const isPdf = item.type === "pdf";
+                  const dossierName =
+                    item.phase === 0
+                      ? "Ban Đầu"
+                      : item.phase === 1
+                        ? "Bộ A"
+                        : item.phase === 2
+                          ? "Bộ B"
+                          : "Bộ C";
 
                   return (
                     <button
@@ -431,7 +439,7 @@ export default function WebEvidencePage() {
                             {item.data.title}
                           </p>
                           <span className="font-mono text-[0.6rem] text-[#8c735d] block">
-                            {item.data.id} // GĐ {item.phase}
+                            {item.data.id} // {dossierName}
                           </span>
                         </div>
                       </div>

@@ -212,10 +212,17 @@ Bảng dưới liệt kê **giá trị cụ thể** mà code sẽ dùng khi ô t
 
 ## 4. Kiến Trúc Đồng Bộ Giao Diện Web Mode & Boardgame Mode
 
-- **Boardgame Mode (`/evidence/boardgame`)**: Sử dụng toàn màn hình làm bảng điều tra ghim gỗ tương tác (`MainInvestigationCanvas`). Người chơi dùng tài liệu giấy thật bên ngoài, chỉ nhập mã chứng cứ vào bảng ghim trực quan.
-- **Web Mode (`/evidence/web`)**: Đồng bộ hoàn toàn cơ chế bảng ghim ghim dây đỏ giống Boardgame Mode, chia layout 2 cột:
+- **Quy ước Bộ Hồ Sơ Con (Thay thế khái niệm Phase)**: Game phân chia tài liệu theo các phong bì/tập hồ sơ thực tế:
+  - **Hồ Sơ Ban Đầu (Gốc)**: Tài liệu khám nghiệm sơ bộ, cẩm nang, lý lịch nạn nhân và nghi phạm ban đầu.
+  - **Bộ Hồ Sơ A**: Lời khai nhân chứng bổ sung, sao kê nợ, tài liệu đối chất Vũ và Tùng.
+  - **Bộ Hồ Sơ B**: Lệnh tái khám xét, kết quả khám nghiệm mở rộng hiện trường.
+  - **Bộ Hồ Sơ C**: Bằng chứng phòng trọ Hà, định tội và bản cáo trạng bắt giữ thủ phạm.
+- **Tối ưu Checkpoints & Cột `answers`**:
+  - Web Mode và Boardgame Mode đồng bộ 100% cơ chế Bảng ghim + Nhập mã chứng cứ trực tiếp, **không còn lưới chọn picker cũ**.
+  - **Bỏ hoàn toàn dòng `show:`** trong cột `answers` trên Google Sheet (tiết kiệm 80% dung lượng ô, chỉ giữ `suspect:`, `require:`, `mismatch:`, `motive:`, `branch:`, `input:`).
+- **Cơ chế đối soát tiếng Việt không dấu (`isVietnameseTextMatch`)**: Người tạo nội dung trên Google Sheets chỉ cần nhập dạng có dấu chuẩn, hệ thống tự chuẩn hóa NFD, đối soát ranh giới từ (word token matching), chấp nhận tên tắt hoặc họ tên đầy đủ, ngăn chặn triệt để lọt chuỗi con.
+- **Cấu trúc 2 cột Web Mode (`/evidence/web`)**:
   - **Cột Trái (`lg:w-[58%] xl:w-[60%]` - Bảng Điều Tra Tương Tác)**: Nhúng nguyên bản `MainInvestigationCanvas` tương tác toàn phần (nhập SĐT, bóc trần nghi phạm Vũ/Tùng/Hà, tái khám xét, cáo trạng).
   - **Cột Phải (`flex-1 min-w-0` - Hồ Sơ & Preview Tài Liệu)**:
-    - _Nửa trên (`h-[38%]`)_: Danh mục hồ sơ & tang vật lọc theo loại (`all` / `pdf` / `evidence`) và giai đoạn (`GĐ 0, 1, 2, 3`).
+    - _Nửa trên (`h-[38%]`)_: Danh mục hồ sơ & tang vật lọc theo loại (`all` / `pdf` / `evidence`) và bộ hồ sơ (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`).
     - _Nửa dưới (`flex-1`)_: Khung xem trước tài liệu trực tiếp `EvidenceDetailInspector` (PDF iframe toolbar-less, ảnh vật chứng kèm chuỗi bảo quản) hoặc `PhoneSimulator` tương tác điện thoại nạn nhân.
-- **Cơ chế đối soát tiếng Việt không dấu (`isVietnameseTextMatch`)**: Người tạo nội dung trên Google Sheets chỉ cần nhập dạng có dấu chuẩn, hệ thống tự chuẩn hóa NFD, đối soát ranh giới từ (word token matching), chấp nhận tên tắt hoặc họ tên đầy đủ, ngăn chặn triệt để lọt chuỗi con.

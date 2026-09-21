@@ -67,11 +67,23 @@ function cleanInputLine(value) {
   return [...parts.slice(0, 3), " " + kept.join(", ")].join("|");
 }
 
-/** Dọn cột `answers` của một dòng: chỉ tác động dòng `suspect:` và `input:`. */
+/** Dọn cột `answers` của một dòng: bỏ dòng `show:`, chuẩn hoá `suspect:` và `input:`. */
 function cleanAnswersCell(cell) {
   if (!cell) return cell;
   return cell
     .split("\n")
+    .filter((line) => {
+      const separator = line.indexOf(":");
+      if (separator === -1) return true;
+      const key = line.slice(0, separator).trim().toLowerCase();
+      // Bỏ hoàn toàn dòng `show:` / `available:` vì Web Mode và Boardgame Mode đã dùng chung Bảng ghim + Nhập mã
+      if (
+        ["show", "available", "available_evidences", "hien_thi"].includes(key)
+      ) {
+        return false;
+      }
+      return true;
+    })
     .map((line) => {
       const separator = line.indexOf(":");
       if (separator === -1) return line;
@@ -123,8 +135,8 @@ function cleanAnswersCell(cell) {
       before.split("\n").forEach((line, li) => {
         const afterLine = after.split("\n")[li];
         if (line !== afterLine) {
-          console.log(`    - ${line.trim()}`);
-          console.log(`    + ${afterLine.trim()}`);
+          console.log(`    - ${line ? line.trim() : ""}`);
+          if (afterLine) console.log(`    + ${afterLine.trim()}`);
         }
       });
     }
