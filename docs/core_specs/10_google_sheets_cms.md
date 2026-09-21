@@ -134,6 +134,13 @@ motive_option: Tranh chấp quyền thừa kế mảnh đất 200m² của gia �
 
 > ⚠️ **Đánh đổi cần biết**: Gộp 10 cột vào 1 cột `answers` giúp Sheet gọn (22 → 13 cột) nhưng **mất tính năng Data Validation / dropdown gợi ý giá trị** của Google Sheets trên từng cột riêng. Bù lại, code in cảnh báo `console.warn` khi gặp khóa sai chính tả.
 
+**Quy ước nhập đáp án tên người / cụm từ** (khóa `suspect`, `correct`, `input`):
+
+- **Chỉ cần nhập MỘT dạng có dấu.** Code tự chuẩn hoá cả hai phía (bỏ dấu, thường hoá, bỏ ký tự đặc biệt) qua `normalizeVietnameseText`, nên `Lê Quang Vũ` tự khớp `Le Quang Vu`, `le quang vu`, `LÊ QUANG VŨ`.
+- **Không cần liệt kê biến thể không dấu** — chúng là dữ liệu dư.
+- **Không cần nhập mã bypass.** `00`, `000`, `0`, `admin` đã được code hard-code sẵn cho mọi ô nhập tên.
+- **Khớp theo ranh giới từ**, không khớp chuỗi con: gõ `Vũ` đúng cho đáp án `Lê Quang Vũ`, nhưng `Khang` **không** lọt vào đáp án `Hà` và `Vương` **không** lọt vào `Vũ`. Logic nằm ở `isVietnameseTextMatch` trong [`lib/finding-matcher.ts`](file:///d:/code_world/dect_project/lib/finding-matcher.ts), có unit test tại [`scripts/test-fuzzy-matcher.ts`](file:///d:/code_world/dect_project/scripts/test-fuzzy-matcher.ts) (chạy `npx tsx scripts/test-fuzzy-matcher.ts`).
+
 ---
 
 ### 3.3. Cơ Chế Fallback Của Code (2 Tầng)
@@ -200,3 +207,15 @@ Bảng dưới liệt kê **giá trị cụ thể** mà code sẽ dùng khi ô t
 | `cp-000-2b`     | Chỉ danh thủ phạm chính: | Chọn tài liệu & vật chứng buộc tội:                                  | `motive_label`: Xác định động cơ gây án thực sự:      |
 
 > **`case-001`** hiện chỉ có 1 checkpoint local là `cp-001-0` (type `mcq`, `unlockedEvidenceId: 'dev-02'`). Mọi checkpoint khác của vụ này nếu tạo trên Sheet sẽ **không có fallback** — phải nhập đầy đủ cột 🔴 và 🟡.
+
+---
+
+## 4. Kiến Trúc Đồng Bộ Giao Diện Web Mode & Boardgame Mode
+
+- **Boardgame Mode (`/evidence/boardgame`)**: Sử dụng toàn màn hình làm bảng điều tra ghim gỗ tương tác (`MainInvestigationCanvas`). Người chơi dùng tài liệu giấy thật bên ngoài, chỉ nhập mã chứng cứ vào bảng ghim trực quan.
+- **Web Mode (`/evidence/web`)**: Đồng bộ hoàn toàn cơ chế bảng ghim ghim dây đỏ giống Boardgame Mode, chia layout 2 cột:
+  - **Cột Trái (`lg:w-[58%] xl:w-[60%]` - Bảng Điều Tra Tương Tác)**: Nhúng nguyên bản `MainInvestigationCanvas` tương tác toàn phần (nhập SĐT, bóc trần nghi phạm Vũ/Tùng/Hà, tái khám xét, cáo trạng).
+  - **Cột Phải (`flex-1 min-w-0` - Hồ Sơ & Preview Tài Liệu)**:
+    - _Nửa trên (`h-[38%]`)_: Danh mục hồ sơ & tang vật lọc theo loại (`all` / `pdf` / `evidence`) và giai đoạn (`GĐ 0, 1, 2, 3`).
+    - _Nửa dưới (`flex-1`)_: Khung xem trước tài liệu trực tiếp `EvidenceDetailInspector` (PDF iframe toolbar-less, ảnh vật chứng kèm chuỗi bảo quản) hoặc `PhoneSimulator` tương tác điện thoại nạn nhân.
+- **Cơ chế đối soát tiếng Việt không dấu (`isVietnameseTextMatch`)**: Người tạo nội dung trên Google Sheets chỉ cần nhập dạng có dấu chuẩn, hệ thống tự chuẩn hóa NFD, đối soát ranh giới từ (word token matching), chấp nhận tên tắt hoặc họ tên đầy đủ, ngăn chặn triệt để lọt chuỗi con.

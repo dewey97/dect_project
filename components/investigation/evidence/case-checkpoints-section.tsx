@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import type { Checkpoint } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { isVietnameseTextMatch } from "@/lib/finding-matcher";
 import { HINTS_MAP } from "./evidence-data";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useActiveCheckpointHints } from "@/lib/hooks/use-active-checkpoint-hints";
@@ -192,25 +193,7 @@ export function CaseCheckpointsSection({
           val.toLowerCase() === "admin"
         )
           return true;
-        const normVal = val
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/đ/g, "d")
-          .replace(/[^a-z0-9]/g, "");
-        return inp.validAnswers.some((ans) => {
-          const normAns = ans
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d")
-            .replace(/[^a-z0-9]/g, "");
-          return (
-            normVal === normAns ||
-            normVal.includes(normAns) ||
-            normAns.includes(normVal)
-          );
-        });
+        return inp.validAnswers.some((ans) => isVietnameseTextMatch(val, ans));
       });
     }
 
@@ -229,25 +212,9 @@ export function CaseCheckpointsSection({
         cp.pickerConfig?.validSuspects &&
         cp.pickerConfig.validSuspects.length > 0
       ) {
-        const normSuspect = sVal
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/đ/g, "d")
-          .replace(/[^a-z0-9]/g, "");
-        const isSuspectValid = cp.pickerConfig.validSuspects.some((validS) => {
-          const normValid = validS
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d")
-            .replace(/[^a-z0-9]/g, "");
-          return (
-            normSuspect === normValid ||
-            normSuspect.includes(normValid) ||
-            normValid.includes(normSuspect)
-          );
-        });
+        const isSuspectValid = cp.pickerConfig.validSuspects.some((validS) =>
+          isVietnameseTextMatch(sVal, validS),
+        );
         if (!isSuspectValid) return false;
       }
 

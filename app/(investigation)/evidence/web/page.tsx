@@ -1,24 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   FileText,
-  Search,
   Paperclip,
   ImageIcon,
   Volume2,
   VolumeX,
   Box,
   X,
-  UserCheck,
   Home,
 } from "lucide-react";
 import { PDFViewerModal } from "@/components/investigation/pdf-viewer-modal";
-import { useCheckpoints } from "@/components/investigation/checkpoints-context";
 import { CASES } from "@/lib/mock-data";
-import { checkpoints000 } from "@/content/cases/case-000/checkpoints";
-import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
 
@@ -32,31 +27,19 @@ import {
   CASE_000_PDFS,
   CASE_000_EVIDENCE,
 } from "@/components/investigation/evidence/evidence-data";
-import { CASE_000_NARRATOR } from "@/content/cases/case-000/narrator";
-import { CASE_000_FINDINGS, Finding } from "@/content/cases/case-000/findings";
-import { TypewriterNarrator } from "@/components/investigation/evidence/typewriter-narrator";
 import {
   PhaseUnlockedModal,
   UnlockedModalData,
 } from "@/components/investigation/evidence/phase-unlocked-modal";
-import { DetectiveJournalDrawer } from "@/components/investigation/evidence/detective-journal-drawer";
-import { CaseCheckpointsSection } from "@/components/investigation/evidence/case-checkpoints-section";
-import {
-  InvestigationModeModal,
-  InvestigationMode,
-} from "@/components/investigation/evidence/investigation-mode-modal";
 import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
-import {
-  PlayModeModal,
-  PlayExperience,
-} from "@/components/investigation/evidence/play-mode-modal";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
 import { PhoneSimulator } from "@/components/investigation/phone-simulator";
 import { HintModal } from "@/components/investigation/hint-modal";
+import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
 import {
   devices000,
   conversations000,
@@ -70,123 +53,20 @@ import {
 export default function WebEvidencePage() {
   const router = useRouter();
   const activeCase = CASES.find((c) => c.id === "case-000");
-  const { completedCheckpointIds, completeCheckpoint } = useCheckpoints();
 
-  // Phone & Suspect Modal state
+  // Modals & Audio
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] =
     useState(false);
-  const [isSuspectsModalOpen, setIsSuspectsModalOpen] = useState(false);
+  const [isEpilogueOpen, setIsEpilogueOpen] = useState(false);
   const [isHintModalOpen, setIsHintModalOpen] = useState(false);
-
-  // Play Experience State ('web' | 'boardgame') - Web mode by default on /evidence/web
-  const [playExperience, setPlayExperience] = useState<PlayExperience>("web");
-  const [isPlayModalOpen, setIsPlayModalOpen] = useState(false);
-  const [hasChosenExperience, setHasChosenExperience] = useState(true);
-
-  // Audio Mute State
+  const [isJumpscareActive, setIsJumpscareActive] = useState(false);
   const [isAudioMuted, setIsAudioMuted] = useState(detectiveAudio.isMuted);
 
-  // Discovered Findings State
-  const [discoveredFindingIds, setDiscoveredFindingIds] = useState<string[]>(
-    [],
-  );
-
-  // Investigation Game Mode State ('casual' | 'hardcore')
-  const [investigationMode, setInvestigationMode] =
-    useState<InvestigationMode>("casual");
-  const [isModeModalOpen, setIsModeModalOpen] = useState(false);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("veritas_play_experience", "web");
-
-      const saved = localStorage.getItem("veritas_discovered_findings");
-      if (saved) {
-        setDiscoveredFindingIds(JSON.parse(saved));
-      }
-
-      const savedMode = localStorage.getItem(
-        "veritas_investigation_mode",
-      ) as InvestigationMode | null;
-      if (savedMode) {
-        setInvestigationMode(savedMode);
-      }
-
-      const isIntroSeen = localStorage.getItem("veritas_intro_seen");
-      if (isIntroSeen !== "true") {
-        setUnlockedModalData({
-          unlockedPhase: 0,
-          newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-          newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
-        });
-      }
-    } catch {}
-
-    const handleOpenEpilogue = () => setIsEpilogueOpen(true);
-    const handleOpenPhone = () => setIsPhoneModalOpen(true);
-    const handleOpenSuspects = () => setIsSuspectsModalOpen(true);
-    const handleOpenHint = () => setIsHintModalOpen(true);
-
-    window.addEventListener("open-epilogue-modal", handleOpenEpilogue);
-    window.addEventListener("open-phone-modal", handleOpenPhone);
-    window.addEventListener("open-suspects-modal", handleOpenSuspects);
-    window.addEventListener("open-hint-modal", handleOpenHint);
-
-    return () => {
-      window.removeEventListener("open-epilogue-modal", handleOpenEpilogue);
-      window.removeEventListener("open-phone-modal", handleOpenPhone);
-      window.removeEventListener("open-suspects-modal", handleOpenSuspects);
-      window.removeEventListener("open-hint-modal", handleOpenHint);
-    };
-  }, []);
-
-  const handleSelectPlayExperience = (mode: PlayExperience) => {
-    setPlayExperience(mode);
-    setIsPlayModalOpen(false);
-    setHasChosenExperience(true);
-    try {
-      localStorage.setItem("veritas_play_experience", mode);
-    } catch {}
-
-    if (mode === "boardgame") {
-      router.push("/evidence/boardgame");
-      return;
-    }
-
-    if (completedCheckpointIds.length === 0) {
-      setUnlockedModalData({
-        unlockedPhase: 0,
-        newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-        newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
-      });
-    }
-  };
-
-  const handleSelectMode = (mode: InvestigationMode) => {
-    setInvestigationMode(mode);
-    setIsModeModalOpen(false);
-    try {
-      localStorage.setItem("veritas_investigation_mode", mode);
-    } catch {}
-  };
-
-  // Checkpoint questions — nạp từ Google Sheets Live CMS (tab `checkpoints`), fallback về dữ liệu tĩnh
-  const { checkpoints } = useCaseCheckpoints("case-000", checkpoints000);
-  const [selectedAnswers, setSelectedAnswers] = useState<
-    Record<string, string>
-  >({});
-  const [checkpointErrors, setCheckpointErrors] = useState<
-    Record<string, boolean>
-  >({});
-  const [checkpointSuccesses, setCheckpointSuccesses] = useState<
-    Record<string, boolean>
-  >({});
-
-  // Hint system state
-  const [unlockedHintLevel, setUnlockedHintLevel] = useState<
-    Record<string, number>
-  >({});
+  // Unlocked phase tracking (read from localStorage / boardgame progress)
+  const [unlockedPhase, setUnlockedPhase] = useState<number>(0);
+  const [unlockedModalData, setUnlockedModalData] =
+    useState<UnlockedModalData | null>(null);
 
   // Right column selection state (Default: First PDF)
   const [selectedView, setSelectedView] = useState<SelectedView>({
@@ -205,11 +85,46 @@ export default function WebEvidencePage() {
     "all" | number
   >("all");
 
-  // Unlocked Modal state
-  const [unlockedModalData, setUnlockedModalData] =
-    useState<UnlockedModalData | null>(null);
-
   useEffect(() => {
+    try {
+      localStorage.setItem("veritas_play_experience", "web");
+
+      const isIntroSeen = localStorage.getItem("veritas_intro_seen");
+      if (isIntroSeen !== "true") {
+        setUnlockedModalData({
+          unlockedPhase: 0,
+          newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
+          newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
+        });
+      }
+
+      // Check current unlocked phase from boardgame progress
+      const solvedFollowups = localStorage.getItem("veritas_solved_followups");
+      const isReinvestigateUnlocked =
+        localStorage.getItem("veritas_reinvestigate_unlocked") === "true";
+      const isIndictmentSolved =
+        localStorage.getItem("veritas_indictment_solved") === "true";
+
+      if (isIndictmentSolved) {
+        setUnlockedPhase(3);
+      } else if (
+        isReinvestigateUnlocked ||
+        (solvedFollowups && JSON.parse(solvedFollowups || "[]").length >= 2)
+      ) {
+        setUnlockedPhase(2);
+      } else {
+        setUnlockedPhase(1);
+      }
+    } catch {}
+
+    const handleOpenEpilogue = () => setIsEpilogueOpen(true);
+    const handleOpenPhone = () => setIsPhoneModalOpen(true);
+    const handleOpenHint = () => setIsHintModalOpen(true);
+
+    window.addEventListener("open-epilogue-modal", handleOpenEpilogue);
+    window.addEventListener("open-phone-modal", handleOpenPhone);
+    window.addEventListener("open-hint-modal", handleOpenHint);
+
     const handleFirstUserInteraction = () => {
       detectiveAudio.startRainSound();
       window.removeEventListener("click", handleFirstUserInteraction);
@@ -217,29 +132,21 @@ export default function WebEvidencePage() {
     window.addEventListener("click", handleFirstUserInteraction);
 
     return () => {
+      window.removeEventListener("open-epilogue-modal", handleOpenEpilogue);
+      window.removeEventListener("open-phone-modal", handleOpenPhone);
+      window.removeEventListener("open-hint-modal", handleOpenHint);
       window.removeEventListener("click", handleFirstUserInteraction);
       detectiveAudio.stopRainSound();
     };
   }, []);
 
-  // Helper check if phase is unlocked
-  const isPhaseUnlocked = (phase: number) => {
-    if (phase === 0) return true;
-    if (phase === 1) return completedCheckpointIds.includes("cp-000-0");
-    if (phase === 2)
-      return (
-        completedCheckpointIds.includes("cp-000-convergence") ||
-        completedCheckpointIds.includes("cp-000-1b") ||
-        completedCheckpointIds.includes("cp-000-1")
-      );
-    if (phase === 3)
-      return (
-        completedCheckpointIds.includes("cp-000-2a") ||
-        completedCheckpointIds.includes("cp-000-2b") ||
-        completedCheckpointIds.includes("cp-000-2")
-      );
-    return false;
-  };
+  const isPhaseUnlocked = useCallback(
+    (phase: number) => {
+      if (phase === 0) return true;
+      return phase <= unlockedPhase;
+    },
+    [unlockedPhase],
+  );
 
   const handleSelectPdf = (doc: PDFDocument) => {
     if (!isPhaseUnlocked(doc.phase)) return;
@@ -261,44 +168,7 @@ export default function WebEvidencePage() {
     }
   };
 
-  const currentPhaseIndex = completedCheckpointIds.length; // 0, 1, 2, 3
-
-  const handleFindingDiscovered = (finding: Finding) => {
-    setDiscoveredFindingIds((prev) => {
-      if (prev.includes(finding.id)) return prev;
-      const next = [...prev, finding.id];
-      try {
-        localStorage.setItem(
-          "veritas_discovered_findings",
-          JSON.stringify(next),
-        );
-      } catch {}
-
-      if (finding.isKeyFinding && finding.phase === currentPhaseIndex) {
-        const cpId = `cp-000-${finding.phase}`;
-        completeCheckpoint(cpId);
-
-        const nextPhase = finding.phase + 1;
-        if (nextPhase <= 3) {
-          setTimeout(() => {
-            const newPdfs = CASE_000_PDFS.filter((d) => d.phase === nextPhase);
-            const newEvidence = CASE_000_EVIDENCE.filter(
-              (e) => e.phase === nextPhase,
-            );
-            setUnlockedModalData({
-              unlockedPhase: nextPhase,
-              newPdfs,
-              newEvidence,
-            });
-          }, 800);
-        }
-      }
-
-      return next;
-    });
-  };
-
-  const resetFindingsProgress = () => {
+  const resetAllProgress = () => {
     try {
       localStorage.removeItem("veritas_intro_seen");
       localStorage.removeItem("veritas_discovered_findings");
@@ -324,76 +194,6 @@ export default function WebEvidencePage() {
       window.location.reload();
     } catch {}
   };
-
-  const unlockNextHint = (cpId: string, maxHints: number) => {
-    if (maxHints <= 0) return;
-    detectiveAudio.playTypewriterClick();
-    setUnlockedHintLevel((prev) => {
-      const current = prev[cpId] || 0;
-      const next = current >= maxHints ? 1 : current + 1;
-      return {
-        ...prev,
-        [cpId]: next,
-      };
-    });
-  };
-
-  const handleAnswerSelect = (cpId: string, option: string) => {
-    detectiveAudio.playTypewriterClick();
-    setSelectedAnswers((prev) => ({ ...prev, [cpId]: option }));
-    setCheckpointErrors((prev) => ({ ...prev, [cpId]: false }));
-  };
-
-  const handleProceedNextPhase = (cpId: string) => {
-    const nextPhase =
-      cpId === "cp-000-0"
-        ? 1
-        : cpId === "cp-000-convergence"
-          ? 2
-          : cpId === "cp-000-2a"
-            ? 3
-            : null;
-
-    completeCheckpoint(cpId);
-    if (nextPhase !== null) {
-      detectiveAudio.playHeartbeat();
-      const newPdfs = CASE_000_PDFS.filter((d) => d.phase === nextPhase);
-      const newEvidence = CASE_000_EVIDENCE.filter(
-        (e) => e.phase === nextPhase,
-      );
-      setUnlockedModalData({
-        unlockedPhase: nextPhase,
-        newPdfs,
-        newEvidence,
-      });
-    } else if (cpId === "cp-000-2b" || cpId === "cp-000-3") {
-      setIsJumpscareActive(true);
-    }
-  };
-
-  const handleSubmitAnswer = (cp: (typeof checkpoints000)[0]) => {
-    const userAnswer = selectedAnswers[cp.id];
-    if (!userAnswer) return;
-
-    setShowMainNarrator(false);
-
-    if (
-      userAnswer === "VALID_ANSWER" ||
-      (cp.correctAnswer && userAnswer === cp.correctAnswer)
-    ) {
-      detectiveAudio.playStampSound();
-      detectiveAudio.playUnlockJingle();
-      setCheckpointSuccesses((prev) => ({ ...prev, [cp.id]: true }));
-      setCheckpointErrors((prev) => ({ ...prev, [cp.id]: false }));
-    } else {
-      detectiveAudio.playGlassSound();
-      setCheckpointErrors((prev) => ({ ...prev, [cp.id]: true }));
-    }
-  };
-
-  const [isEpilogueOpen, setIsEpilogueOpen] = useState(false);
-  const [isJumpscareActive, setIsJumpscareActive] = useState(false);
-  const [showMainNarrator, setShowMainNarrator] = useState(true);
 
   const filteredPdfs = CASE_000_PDFS.filter((doc) => {
     if (!isPhaseUnlocked(doc.phase)) return false;
@@ -429,405 +229,271 @@ export default function WebEvidencePage() {
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-4 box-border min-h-0 min-w-0"
+      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-3 box-border min-h-0 min-w-0"
     >
-      <div className="w-full max-w-[1700px] h-full flex flex-col lg:flex-row gap-5 items-stretch justify-center overflow-hidden min-h-0 min-w-0">
-        {/* LEFT COLUMN: UNIFIED VINTAGE DOSSIER INDEX & ACTIVE QUESTION */}
-        <div className="w-full lg:w-[45%] xl:w-[42%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex flex-col min-h-0">
-          {/* STICKY / FIXED HEADER */}
-          <header className="shrink-0 border-b border-[#3d2c1e] p-5 sm:p-6 bg-[#241a12] shadow-md">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex flex-col">
-                <span className="font-mono text-[0.6rem] uppercase tracking-[0.25em] text-[#d4a373] font-bold block mb-1">
-                  HỒ SƠ ĐIỀU TRA CHUYÊN ÁN MẬT // CASE #000
-                </span>
-
-                <div className="inline-block mt-0.5">
-                  <span className="font-[family-name:var(--font-handwriting)] text-2xl sm:text-3xl font-bold text-[#1a0f07] tracking-wide leading-none bg-[#f4e8d8] px-3.5 py-1 rounded border border-[#2b1b0e]/20 inline-block rotate-[-1deg]">
-                    {activeCase?.title || "Trốn Tìm"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 sm:self-start flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => {
-                    detectiveAudio.playPaperRustle();
-                    router.push("/");
-                  }}
-                  className="px-2.5 py-1.5 bg-[#1b140e] hover:bg-[#2d1b10] border border-[#593c26] text-[#e5d8cb] hover:text-amber-300 font-mono text-[0.7rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
-                  title="Thoát về Màn hình chính"
-                >
-                  <Home className="size-3.5 text-amber-400" />
-                  <span>TRANG CHÍNH</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    detectiveAudio.playPaperRustle();
-                    router.push("/evidence/boardgame");
-                  }}
-                  className="px-2.5 py-1.5 bg-[#1b261d] hover:bg-[#253628] border border-[#3b5941] text-emerald-400 font-mono text-[0.7rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
-                  title="Chuyển sang chế độ Đồng hành cùng Board Game"
-                >
-                  <Box className="size-3.5" />
-                  <span>CHẾ ĐỘ BOARD GAME</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    detectiveAudio.playPaperRustle();
-                    setIsSuspectsModalOpen(true);
-                  }}
-                  className="px-2.5 py-1.5 bg-[#2c1d12] hover:bg-[#3d281a] border border-[#593b25] text-[#d9a066] font-mono text-[0.7rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
-                  title="Mở hồ sơ & Thẩm tra nghi phạm tự do"
-                >
-                  <UserCheck className="size-3.5" />
-                  <span>THẨM TRA NGHI PHẠM</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsAudioMuted(detectiveAudio.toggleMute())}
-                  className="p-1.5 bg-[#18120c] hover:bg-[#342417] border border-[#3e2e20] text-[#d9a066] transition-colors cursor-pointer"
-                  title={
-                    isAudioMuted
-                      ? "Bật âm thanh trinh thám"
-                      : "Tắt âm thanh trinh thám"
-                  }
-                >
-                  {isAudioMuted ? (
-                    <VolumeX className="size-4" />
-                  ) : (
-                    <Volume2 className="size-4" />
-                  )}
-                </button>
-              </div>
+      <div className="w-full max-w-[1900px] h-full flex flex-col lg:flex-row gap-3 xl:gap-4 items-stretch justify-center overflow-hidden min-h-0 min-w-0">
+        {/* LEFT COLUMN: FULL BOARDGAME INVESTIGATION CANVAS */}
+        <div className="w-full lg:w-[58%] xl:w-[60%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex flex-col min-h-0 relative">
+          {/* TOP BAR WITH TITLE & CONTROLS */}
+          <div className="shrink-0 border-b border-[#3d2c1e] px-4 py-2.5 bg-[#241a12] flex items-center justify-between gap-2 z-20">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[#d4a373] font-bold">
+                BẢNG ĐIỀU TRA // CASE #000: {activeCase?.title || "Trốn Tìm"}
+              </span>
             </div>
 
-            <p className="mt-3 text-xs text-[#ad9885] leading-relaxed font-sans border-t border-[#3b2b1e] pt-2.5">
-              {activeCase?.briefing ||
-                "Hồ sơ lưu trữ các biên bản khám nghiệm, tài liệu lời khai và chứng cứ liên quan đến vụ tử vong nghi vấn của Nguyễn Văn Khang."}
-            </p>
-          </header>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  detectiveAudio.playPaperRustle();
+                  router.push("/");
+                }}
+                className="px-2.5 py-1 bg-[#1b140e] hover:bg-[#2d1b10] border border-[#593c26] text-[#e5d8cb] hover:text-amber-300 font-mono text-[0.68rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
+                title="Thoát về Màn hình chính"
+              >
+                <Home className="size-3 text-amber-400" />
+                <span>TRANG CHÍNH</span>
+              </button>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar overscroll-contain min-h-0 p-4 sm:p-6 space-y-6">
-            {/* DOSSIER INDEX WITH PHASE UNLOCK FILTERS */}
-            <section className="space-y-3">
-              <div className="flex flex-col gap-3 border-b border-[#3d2c1e] pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Paperclip className="size-4 text-[#d9a066]" />
-                    <h2 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#e6d3c1]">
-                      DANH MỤC HỒ SƠ & TANG CHỨNG
-                    </h2>
-                  </div>
+              <button
+                type="button"
+                onClick={() => {
+                  detectiveAudio.playPaperRustle();
+                  router.push("/evidence/boardgame");
+                }}
+                className="px-2.5 py-1 bg-[#1b261d] hover:bg-[#253628] border border-[#3b5941] text-emerald-400 font-mono text-[0.68rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
+                title="Chuyển sang chế độ Đồng hành cùng Board Game (toàn màn hình)"
+              >
+                <Box className="size-3" />
+                <span>CHẾ ĐỘ BOARD GAME</span>
+              </button>
 
-                  <div className="flex items-center gap-1 font-mono text-[0.6rem]">
-                    <button
-                      onClick={() => setFilterTab("all")}
-                      className={cn(
-                        "px-2 py-0.5 font-bold transition-all cursor-pointer border",
-                        filterTab === "all"
-                          ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                          : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
-                      )}
-                    >
-                      TẤT CẢ
-                    </button>
-                    <button
-                      onClick={() => setFilterTab("pdf")}
-                      className={cn(
-                        "px-2 py-0.5 font-bold transition-all cursor-pointer border",
-                        filterTab === "pdf"
-                          ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                          : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
-                      )}
-                    >
-                      📄 VĂN BẢN
-                    </button>
-                    <button
-                      onClick={() => setFilterTab("evidence")}
-                      className={cn(
-                        "px-2 py-0.5 font-bold transition-all cursor-pointer border",
-                        filterTab === "evidence"
-                          ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                          : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
-                      )}
-                    >
-                      📸 TANG VẬT
-                    </button>
-                  </div>
-                </div>
+              <button
+                type="button"
+                onClick={() => setIsAudioMuted(detectiveAudio.toggleMute())}
+                className="p-1.5 bg-[#18120c] hover:bg-[#342417] border border-[#3e2e20] text-[#d9a066] transition-colors cursor-pointer rounded"
+                title={
+                  isAudioMuted
+                    ? "Bật âm thanh trinh thám"
+                    : "Tắt âm thanh trinh thám"
+                }
+              >
+                {isAudioMuted ? (
+                  <VolumeX className="size-3.5" />
+                ) : (
+                  <Volume2 className="size-3.5" />
+                )}
+              </button>
+            </div>
+          </div>
 
-                <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1 font-mono text-[0.625rem]">
-                  <button
-                    onClick={() => setSelectedPhaseFilter("all")}
-                    className={cn(
-                      "px-2.5 py-1 font-bold transition-all cursor-pointer shrink-0 border",
-                      selectedPhaseFilter === "all"
-                        ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                        : "bg-[#1e1711] text-[#ad9885] hover:text-[#e6d3c1] border-[#3d2c1e]",
-                    )}
-                  >
-                    TẤT CẢ GIAI ĐOẠN
-                  </button>
-
-                  {[0, 1, 2, 3]
-                    .filter((p) => isPhaseUnlocked(p))
-                    .map((p) => {
-                      const isSelected = selectedPhaseFilter === p;
-                      return (
-                        <button
-                          key={p}
-                          onClick={() => setSelectedPhaseFilter(p)}
-                          className={cn(
-                            "px-2.5 py-1 font-bold transition-all cursor-pointer shrink-0 border flex items-center gap-1",
-                            isSelected
-                              ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                              : "bg-[#1e1711] text-[#e6d3c1] hover:bg-[#2e2319] border-[#4a3625]",
-                          )}
-                        >
-                          <span>GIAI ĐOẠN {p}</span>
-                        </button>
-                      );
-                    })}
-                </div>
-              </div>
-
-              {/* Combined Items List */}
-              <div className="grid grid-cols-1 gap-2">
-                {combinedItems.map((item) => {
-                  if (item.type === "pdf") {
-                    const doc = item.data;
-                    const isSelected =
-                      selectedView.type === "pdf" &&
-                      selectedView.data.id === doc.id;
-
-                    return (
-                      <div
-                        key={doc.id}
-                        onClick={() => handleSelectPdf(doc)}
-                        className={cn(
-                          "group flex items-center justify-between p-3 rounded-none border transition-all shadow-sm cursor-pointer",
-                          isSelected
-                            ? "bg-[#38271a] border-[#6b4b32] text-amber-200"
-                            : "bg-[#241b13] hover:bg-[#2d2218] border-[#3e2e20] text-[#e5d8cb]",
-                        )}
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <div
-                            className={cn(
-                              "size-8 rounded-none flex items-center justify-center font-bold text-xs shrink-0 transition-colors",
-                              isSelected
-                                ? "bg-[#d9a066] text-[#1a0f07]"
-                                : "bg-[#18120c] text-[#d9a066] border border-[#3e2e20]",
-                            )}
-                          >
-                            <FileText className="size-4" />
-                          </div>
-                          <div className="flex flex-col overflow-hidden">
-                            <span
-                              className={cn(
-                                "font-sans font-semibold text-xs truncate transition-colors",
-                                isSelected
-                                  ? "text-[#f4e8d8] font-bold"
-                                  : "text-[#e5d8cb] group-hover:text-[#d9a066]",
-                              )}
-                            >
-                              {doc.title}
-                            </span>
-                            <span className="font-mono text-[0.6rem] text-[#ad9885] flex items-center gap-1.5">
-                              <span className="text-[#d9a066] font-bold">
-                                [GIAI ĐOẠN {doc.phase}]
-                              </span>
-                              <span>📄 HỒ SƠ // {doc.code}</span>
-                            </span>
-                          </div>
-                        </div>
-
-                        <span
-                          className={cn(
-                            "flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded-none transition-all shrink-0 border",
-                            isSelected
-                              ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                              : "text-[#d9a066] bg-[#18120c] border-[#3e2e20] group-hover:bg-[#d9a066] group-hover:text-[#1a0f07]",
-                          )}
-                        >
-                          <Search className="size-3" />
-                          <span>{isSelected ? "ĐANG XEM" : "CHI TIẾT"}</span>
-                        </span>
-                      </div>
-                    );
-                  } else {
-                    const ev = item.data;
-                    const isSelected =
-                      selectedView.type === "evidence" &&
-                      selectedView.data.id === ev.id;
-
-                    return (
-                      <div
-                        key={ev.id}
-                        onClick={() => handleSelectEvidence(ev)}
-                        className={cn(
-                          "group flex items-center justify-between p-3 rounded-none border transition-all shadow-sm cursor-pointer",
-                          isSelected
-                            ? "bg-[#38271a] border-[#6b4b32] text-amber-200"
-                            : "bg-[#241b13] hover:bg-[#2d2218] border-[#3e2e20] text-[#e5d8cb]",
-                        )}
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <div
-                            className={cn(
-                              "size-8 rounded-none flex items-center justify-center font-bold text-xs shrink-0 transition-colors",
-                              isSelected
-                                ? "bg-[#d9a066] text-[#1a0f07]"
-                                : "bg-[#18120c] text-[#d9a066] border border-[#3e2e20]",
-                            )}
-                          >
-                            <ImageIcon className="size-4" />
-                          </div>
-                          <div className="flex flex-col overflow-hidden">
-                            <span
-                              className={cn(
-                                "font-sans font-semibold text-xs truncate transition-colors",
-                                isSelected
-                                  ? "text-[#f4e8d8] font-bold"
-                                  : "text-[#e5d8cb] group-hover:text-[#d9a066]",
-                              )}
-                            >
-                              {ev.title}
-                            </span>
-                            <span className="font-mono text-[0.6rem] text-[#ad9885] flex items-center gap-1.5">
-                              <span className="text-[#d9a066] font-bold">
-                                [GIAI ĐOẠN {ev.phase}]
-                              </span>
-                              <span>📸 TANG CHỨNG // {ev.evidenceId}</span>
-                            </span>
-                          </div>
-                        </div>
-
-                        <span
-                          className={cn(
-                            "flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold font-mono rounded-none transition-all shrink-0 border",
-                            isSelected
-                              ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                              : "text-[#d9a066] bg-[#18120c] border-[#3e2e20] group-hover:bg-[#d9a066] group-hover:text-[#1a0f07]",
-                          )}
-                        >
-                          <Search className="size-3" />
-                          <span>{isSelected ? "ĐANG XEM" : "CHI TIẾT"}</span>
-                        </span>
-                      </div>
-                    );
-                  }
-                })}
-              </div>
-            </section>
-
-            {/* CASUAL MODE: INLINE CHECKPOINT QUESTIONS */}
-            {investigationMode === "casual" && (
-              <CaseCheckpointsSection
-                checkpoints={checkpoints}
-                completedCheckpointIds={completedCheckpointIds}
-                selectedAnswers={selectedAnswers}
-                checkpointErrors={checkpointErrors}
-                checkpointSuccesses={checkpointSuccesses}
-                unlockedHintLevel={unlockedHintLevel}
-                onAnswerSelect={handleAnswerSelect}
-                onSubmitAnswer={handleSubmitAnswer}
-                onUnlockNextHint={unlockNextHint}
-                onProceedNextPhase={handleProceedNextPhase}
-              />
-            )}
+          {/* MAIN CANVAS */}
+          <div className="flex-1 min-h-0 relative overflow-hidden">
+            <MainInvestigationCanvas
+              onOpenPhoneSimulator={() => setIsPhoneModalOpen(true)}
+              onOpenReinvestigation={() => setIsReinvestigateModalOpen(true)}
+              onOpenEpilogue={() => setIsEpilogueOpen(true)}
+            />
           </div>
         </div>
 
-        {/* RIGHT COLUMN: EVIDENCE DETAIL INSPECTOR OR INLINE DESKTOP IPHONE SIMULATOR */}
-        {isPhoneModalOpen ? (
-          <div className="hidden lg:flex flex-1 bg-[#120c08] border-2 border-[#543b27] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex-col relative items-center justify-center p-2 pt-12 min-h-0">
-            <button
-              onClick={() => setIsPhoneModalOpen(false)}
-              className="absolute top-2.5 right-2.5 z-50 p-2 px-3 text-[#ad9885] hover:text-[#fef5ec] bg-[#24170e]/95 hover:bg-[#382618] rounded-full transition-colors cursor-pointer border border-[#543b27] shadow-lg flex items-center gap-1.5 text-xs font-mono font-bold"
-              title="Đóng điện thoại"
-            >
-              <X className="size-4 text-[#d9a066]" />
-              <span>ĐÓNG PHONE</span>
-            </button>
+        {/* RIGHT COLUMN: DOSSIER LIST (TOP) + DOCUMENT PREVIEW / INSPECTOR (BOTTOM) */}
+        <div className="flex-1 min-w-0 h-full flex flex-col gap-3 min-h-0 overflow-hidden">
+          {/* TOP SECTION: DOSSIER INDEX WITH FILTER TABS */}
+          <div className="h-[38%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-lg overflow-hidden flex flex-col min-h-0">
+            <div className="shrink-0 border-b border-[#3d2c1e] px-4 py-2.5 bg-[#241a12] flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Paperclip className="size-3.5 text-[#d9a066]" />
+                <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#e6d3c1]">
+                  DANH MỤC HỒ SƠ & TANG CHỨNG
+                </h2>
+              </div>
 
-            <div className="flex-1 w-full min-h-0 flex items-center justify-center p-1 overflow-hidden">
-              <PhoneSimulator
-                device={{
-                  ...devices000[0],
-                  locked: false,
-                  status: "unlocked",
-                  recoveryLevel: 100,
-                  lastUpdated: "24/07/2016 // 17:55",
-                  description:
-                    devices000[0].description ||
-                    "Điện thoại cá nhân của nạn nhân Khang",
-                }}
-                threads={conversations000[devices000[0].id] || []}
-                photos={photos000[devices000[0].id] || []}
-                emails={emails000[devices000[0].id] || []}
-                notes={documents000[devices000[0].id] || []}
-                history={browserHistory000[devices000[0].id] || []}
-                files={files000[devices000[0].id] || []}
-              />
+              <div className="flex items-center gap-1 font-mono text-[0.6rem]">
+                <button
+                  onClick={() => setFilterTab("all")}
+                  className={cn(
+                    "px-2 py-0.5 font-bold transition-all cursor-pointer border rounded-xs",
+                    filterTab === "all"
+                      ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
+                      : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
+                  )}
+                >
+                  TẤT CẢ
+                </button>
+                <button
+                  onClick={() => setFilterTab("pdf")}
+                  className={cn(
+                    "px-2 py-0.5 font-bold transition-all cursor-pointer border rounded-xs",
+                    filterTab === "pdf"
+                      ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
+                      : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
+                  )}
+                >
+                  HỒ SƠ
+                </button>
+                <button
+                  onClick={() => setFilterTab("evidence")}
+                  className={cn(
+                    "px-2 py-0.5 font-bold transition-all cursor-pointer border rounded-xs",
+                    filterTab === "evidence"
+                      ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
+                      : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
+                  )}
+                >
+                  VẬT CHỨNG
+                </button>
+              </div>
+            </div>
+
+            {/* PHASE FILTER PILLS */}
+            <div className="shrink-0 px-3 py-1.5 border-b border-[#3d2c1e]/60 bg-[#1a1410] flex items-center gap-1.5 overflow-x-auto text-[0.62rem] font-mono">
+              <span className="text-[#8c735d] uppercase tracking-wider pr-1">
+                GIAI ĐOẠN:
+              </span>
+              {[
+                { label: "TẤT CẢ", val: "all" as const },
+                { label: "GĐ 0", val: 0 },
+                { label: "GĐ 1", val: 1 },
+                { label: "GĐ 2", val: 2 },
+                { label: "GĐ 3", val: 3 },
+              ].map((p) => {
+                const isLocked =
+                  typeof p.val === "number" && !isPhaseUnlocked(p.val);
+                const isSelected = selectedPhaseFilter === p.val;
+                return (
+                  <button
+                    key={p.label}
+                    disabled={isLocked}
+                    onClick={() => setSelectedPhaseFilter(p.val)}
+                    className={cn(
+                      "px-2 py-0.5 rounded transition-all whitespace-nowrap",
+                      isLocked
+                        ? "opacity-35 cursor-not-allowed text-[#6b5847]"
+                        : isSelected
+                          ? "bg-[#d9a066] text-[#1a0f07] font-bold"
+                          : "bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#342417] cursor-pointer",
+                    )}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* SCROLLABLE LIST */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1 min-h-0">
+              {combinedItems.length === 0 ? (
+                <div className="p-4 text-center text-xs font-mono text-[#8c735d]">
+                  Không có tài liệu nào phù hợp với bộ lọc.
+                </div>
+              ) : (
+                combinedItems.map((item) => {
+                  const isSelected =
+                    selectedView.type === item.type &&
+                    selectedView.data.id === item.data.id;
+                  const isPdf = item.type === "pdf";
+
+                  return (
+                    <button
+                      key={`${item.type}-${item.data.id}`}
+                      onClick={() =>
+                        isPdf
+                          ? handleSelectPdf(item.data as PDFDocument)
+                          : handleSelectEvidence(item.data as PhysicalEvidence)
+                      }
+                      className={cn(
+                        "w-full text-left p-2 rounded border transition-all cursor-pointer flex items-center justify-between gap-2 text-xs",
+                        isSelected
+                          ? "bg-[#2e2014] border-[#d9a066] text-[#fef5ec] shadow-sm"
+                          : "bg-[#1c1611] hover:bg-[#251d16] border-[#3d2c1e] text-[#ad9885] hover:text-[#e6d3c1]",
+                      )}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        {isPdf ? (
+                          <FileText
+                            className={cn(
+                              "size-3.5 shrink-0",
+                              isSelected ? "text-[#d9a066]" : "text-[#8c735d]",
+                            )}
+                          />
+                        ) : (
+                          <ImageIcon
+                            className={cn(
+                              "size-3.5 shrink-0",
+                              isSelected ? "text-[#d9a066]" : "text-[#8c735d]",
+                            )}
+                          />
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-bold truncate leading-tight">
+                            {item.data.title}
+                          </p>
+                          <span className="font-mono text-[0.6rem] text-[#8c735d] block">
+                            {item.data.id} // GĐ {item.phase}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
-        ) : (
-          <EvidenceDetailInspector selectedView={selectedView} />
-        )}
+
+          {/* BOTTOM SECTION: DOCUMENT PREVIEW OR INLINE PHONE SIMULATOR */}
+          <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+            {isPhoneModalOpen ? (
+              <div className="flex-1 bg-[#120c08] border-2 border-[#543b27] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex flex-col relative items-center justify-center p-2 pt-10 min-h-0">
+                <button
+                  onClick={() => setIsPhoneModalOpen(false)}
+                  className="absolute top-2 right-2 z-50 p-1.5 px-2.5 text-[#ad9885] hover:text-[#fef5ec] bg-[#24170e]/95 hover:bg-[#382618] rounded-full transition-colors cursor-pointer border border-[#543b27] shadow-lg flex items-center gap-1 text-[0.65rem] font-mono font-bold"
+                  title="Đóng điện thoại"
+                >
+                  <X className="size-3 text-[#d9a066]" />
+                  <span>ĐÓNG PHONE</span>
+                </button>
+
+                <div className="flex-1 w-full min-h-0 flex items-center justify-center p-1 overflow-hidden">
+                  <PhoneSimulator
+                    device={{
+                      ...devices000[0],
+                      locked: false,
+                      status: "unlocked",
+                      recoveryLevel: 100,
+                      lastUpdated: "24/07/2016 // 17:55",
+                      description:
+                        devices000[0].description ||
+                        "Điện thoại cá nhân của nạn nhân Khang",
+                    }}
+                    threads={conversations000[devices000[0].id] || []}
+                    photos={photos000[devices000[0].id] || []}
+                    emails={emails000[devices000[0].id] || []}
+                    notes={documents000[devices000[0].id] || []}
+                    history={browserHistory000[devices000[0].id] || []}
+                    files={files000[devices000[0].id] || []}
+                  />
+                </div>
+              </div>
+            ) : (
+              <EvidenceDetailInspector selectedView={selectedView} />
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* HARDCORE MODE: FLOATING DETECTIVE LEATHER JOURNAL DRAWER */}
-      {investigationMode === "hardcore" && (
-        <DetectiveJournalDrawer
-          currentPhase={currentPhaseIndex > 3 ? 3 : currentPhaseIndex}
-          allFindings={CASE_000_FINDINGS}
-          discoveredFindingIds={discoveredFindingIds}
-          onFindingDiscovered={handleFindingDiscovered}
-          onResetProgress={resetFindingsProgress}
-        />
-      )}
-
-      {/* INITIAL INVESTIGATION MODE SELECTION MODAL */}
-      <InvestigationModeModal
-        isOpen={isModeModalOpen}
-        onSelectMode={handleSelectMode}
-      />
-
-      {/* MOBILE FULL SCREEN MODAL */}
-      <PDFViewerModal
-        isOpen={isMobilePdfOpen}
-        selectedView={selectedView}
-        pdfUrl={selectedView.type === "pdf" ? selectedView.data.url : null}
-        title={
-          selectedView.type === "pdf"
-            ? selectedView.data.title
-            : selectedView.data.title
-        }
-        onClose={() => setIsMobilePdfOpen(false)}
-      />
-
-      {/* PHASE UNLOCKED CELEBRATION MODAL */}
+      {/* PHASE UNLOCKED CINEMATIC STORY MODAL */}
       <PhaseUnlockedModal
         unlockedModalData={unlockedModalData}
         playExperience="web"
-        onClose={() => {
-          setUnlockedModalData(null);
-          setShowMainNarrator(true);
-        }}
+        onClose={() => setUnlockedModalData(null)}
         onSelectPdf={handleSelectPdf}
         onSelectEvidence={handleSelectEvidence}
         onSetPhaseFilter={(phase) => setSelectedPhaseFilter(phase)}
       />
 
-      {/* JUMPSCARE ENDGAME SEQUENCE — plays before epilogue */}
+      {/* JUMPSCARE ENDGAME SEQUENCE */}
       <JumpscareEndgame
         isActive={isJumpscareActive}
         onComplete={() => {
@@ -842,40 +508,38 @@ export default function WebEvidencePage() {
         onClose={() => setIsEpilogueOpen(false)}
       />
 
-      {/* PLAY EXPERIENCE SELECTION MODAL */}
-      <PlayModeModal
-        isOpen={isPlayModalOpen}
-        currentMode={playExperience}
-        onSelectMode={handleSelectPlayExperience}
-        onClose={
-          hasChosenExperience ? () => setIsPlayModalOpen(false) : undefined
-        }
-      />
-
       {/* QUICK ACTION FAB MENU */}
       <QuickActionFab
-        onOpenHint={() => {
-          if (typeof window !== "undefined") {
-            window.dispatchEvent(new CustomEvent("open-hint-modal"));
-          }
-        }}
+        onOpenHint={() => setIsHintModalOpen(true)}
         onOpenPhone={() => setIsPhoneModalOpen(true)}
-        onReinvestigate={resetFindingsProgress}
-        onResetCase={resetFindingsProgress}
+        onResetCase={resetAllProgress}
       />
 
-      {/* VICTIM PHONE SIMULATOR MODAL (For mobile viewports in Web mode) */}
-      <div className="lg:hidden">
-        <PhoneModal
-          isOpen={isPhoneModalOpen}
-          onClose={() => setIsPhoneModalOpen(false)}
-        />
-      </div>
-
-      {/* GLOBAL CASE HINT MODAL */}
+      {/* HINT SYSTEM MODAL */}
       <HintModal
         isOpen={isHintModalOpen}
         onClose={() => setIsHintModalOpen(false)}
+      />
+
+      {/* VICTIM PHONE SIMULATOR MODAL */}
+      <PhoneModal
+        isOpen={isPhoneModalOpen}
+        onClose={() => setIsPhoneModalOpen(false)}
+      />
+
+      {/* RE-INVESTIGATION CRIME SCENE MODAL */}
+      <ReinvestigationModal
+        isOpen={isReinvestigateModalOpen}
+        onClose={() => setIsReinvestigateModalOpen(false)}
+      />
+
+      {/* MOBILE FULL SCREEN MODAL */}
+      <PDFViewerModal
+        isOpen={isMobilePdfOpen}
+        selectedView={selectedView}
+        pdfUrl={selectedView.type === "pdf" ? selectedView.data.url : null}
+        title={selectedView.data.title}
+        onClose={() => setIsMobilePdfOpen(false)}
       />
     </div>
   );
