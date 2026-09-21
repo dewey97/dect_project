@@ -168,6 +168,14 @@ export interface Checkpoint {
   type?:
     "mcq" | "text_match_3" | "evidence_picker" | "convergence" | "accusation";
   hintsList?: string[];
+  storyConfig?: {
+    /** Mốc thời gian in trên header, ví dụ `Đêm 24/07/2016`. */
+    date?: string;
+    /** Dòng phụ đề ngắn (mặc định dùng chung `date` nếu bỏ trống). */
+    subtitle?: string;
+    /** Đoạn độc thoại dẫn truyện (xuống dòng bằng Alt+Enter trên Sheet). */
+    monologue: string;
+  };
   textMatchConfig?: {
     inputs: {
       id: string;
@@ -196,4 +204,19 @@ export interface Checkpoint {
       reasonOptions: string[];
     }[];
   };
+}
+
+/**
+ * Dẫn truyện cinematic của một chặng điều tra (tab `narratives` trên Google Sheet).
+ * `phase`: 0 = Ban Đầu, 1 = Bộ A, 2 = Bộ B, 3 = Bộ C.
+ */
+export interface PhaseNarrative {
+  caseId: string;
+  phase: number;
+  /** Nhãn bộ hồ sơ cho biên kịch: `Ban Đầu` | `Bộ A` | `Bộ B` | `Bộ C`. */
+  dossier?: string;
+  /** Mốc thời gian in trên header, ví dụ `Đêm 24/07/2016`. */
+  date?: string;
+  /** Đoạn độc thoại dẫn truyện (xuống dòng đôi = ngắt đoạn). */
+  monologue: string;
 }

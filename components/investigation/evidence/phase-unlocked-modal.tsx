@@ -1,26 +1,26 @@
-'use client'
+"use client";
 
-import React, { useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { FileText, ImageIcon, Search, X } from 'lucide-react'
-import { PDFDocument, PhysicalEvidence } from './evidence-types'
-import { CASE_000_NARRATOR } from '@/content/cases/case-000/narrator'
-import { TypewriterNarrator } from './typewriter-narrator'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import React, { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, ImageIcon, Search, X } from "lucide-react";
+import { PDFDocument, PhysicalEvidence } from "./evidence-types";
+import { TypewriterNarrator } from "./typewriter-narrator";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { useCaseNarratives } from "@/lib/hooks/use-case-narratives";
 
 export interface UnlockedModalData {
-  unlockedPhase: number
-  newPdfs: PDFDocument[]
-  newEvidence: PhysicalEvidence[]
+  unlockedPhase: number;
+  newPdfs: PDFDocument[];
+  newEvidence: PhysicalEvidence[];
 }
 
 interface PhaseUnlockedModalProps {
-  unlockedModalData: UnlockedModalData | null
-  onClose: () => void
-  onSelectPdf: (pdf: PDFDocument) => void
-  onSelectEvidence: (item: PhysicalEvidence) => void
-  onSetPhaseFilter: (phase: number) => void
-  playExperience?: 'web' | 'boardgame'
+  unlockedModalData: UnlockedModalData | null;
+  onClose: () => void;
+  onSelectPdf: (pdf: PDFDocument) => void;
+  onSelectEvidence: (item: PhysicalEvidence) => void;
+  onSetPhaseFilter: (phase: number) => void;
+  playExperience?: "web" | "boardgame";
 }
 
 export function PhaseUnlockedModal({
@@ -29,34 +29,42 @@ export function PhaseUnlockedModal({
   onSelectPdf,
   onSelectEvidence,
   onSetPhaseFilter,
-  playExperience = 'web',
+  playExperience = "web",
 }: PhaseUnlockedModalProps) {
-  const [isStoryStarted, setIsStoryStarted] = React.useState(false)
-  const [isNarrativeComplete, setIsNarrativeComplete] = React.useState(false)
+  const [isStoryStarted, setIsStoryStarted] = React.useState(false);
+  const [isNarrativeComplete, setIsNarrativeComplete] = React.useState(false);
+
+  // Đọc danh sách dẫn truyện cinematic trực tiếp từ tab `narratives` trên Google Sheet Live CMS
+  const { getPhaseNarrative } = useCaseNarratives("case-000");
+
+  const currentNarrative = React.useMemo(() => {
+    if (!unlockedModalData) return null;
+    return getPhaseNarrative(unlockedModalData.unlockedPhase);
+  }, [unlockedModalData, getPhaseNarrative]);
 
   React.useEffect(() => {
-    setIsStoryStarted(false)
-    setIsNarrativeComplete(false)
-  }, [unlockedModalData])
+    setIsStoryStarted(false);
+    setIsNarrativeComplete(false);
+  }, [unlockedModalData]);
 
   React.useEffect(() => {
-    if (!unlockedModalData) return
+    if (!unlockedModalData) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [unlockedModalData, onClose])
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [unlockedModalData, onClose]);
 
   const handleStartStory = () => {
-    setIsStoryStarted(true)
-    setIsNarrativeComplete(false)
+    setIsStoryStarted(true);
+    setIsNarrativeComplete(false);
     if (unlockedModalData && unlockedModalData.unlockedPhase === 0) {
       setTimeout(() => {
-        detectiveAudio.playCeramicShatterSound()
-      }, 3000)
+        detectiveAudio.playCeramicShatterSound();
+      }, 3000);
     }
-  }
+  };
 
   return (
     <AnimatePresence>
@@ -66,10 +74,10 @@ export function PhaseUnlockedModal({
           <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-10" />
 
           {/* Main Fullscreen Content Area */}
-          {playExperience === 'boardgame' ? (
+          {playExperience === "boardgame" ? (
             /* BOARD GAME MODE: PURE IMMERSIVE CINEMATIC STORYTELLING (NO RIGHT DIRECTIVE COLUMN) */
             <div className="relative z-20 flex-1 h-full flex flex-col justify-between items-center p-4 sm:p-8 max-w-3xl mx-auto w-full overflow-hidden">
-              {CASE_000_NARRATOR[unlockedModalData.unlockedPhase] && (
+              {currentNarrative && (
                 <div className="space-y-6 w-full flex-1 flex flex-col items-start my-auto py-4 overflow-y-auto custom-scrollbar pr-1">
                   {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
                     <div className="py-16 flex flex-col items-center justify-center w-full my-auto">
@@ -83,13 +91,13 @@ export function PhaseUnlockedModal({
                   ) : (
                     <>
                       <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between shrink-0">
-                        <span>{CASE_000_NARRATOR[unlockedModalData.unlockedPhase].date}</span>
+                        <span>{currentNarrative.date}</span>
                       </div>
 
                       <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
                         <TypewriterNarrator
-                          key={`bg-${unlockedModalData.unlockedPhase}-${CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}`}
-                          text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
+                          key={`bg-${unlockedModalData.unlockedPhase}-${currentNarrative.monologue}`}
+                          text={currentNarrative.monologue}
                           speed={12}
                           onComplete={() => setIsNarrativeComplete(true)}
                         />
@@ -105,10 +113,12 @@ export function PhaseUnlockedModal({
                   <button
                     onClick={() => {
                       if (unlockedModalData.unlockedPhase === 0) {
-                        try { localStorage.setItem('veritas_intro_seen', 'true') } catch {}
+                        try {
+                          localStorage.setItem("veritas_intro_seen", "true");
+                        } catch {}
                       }
-                      onSetPhaseFilter(unlockedModalData.unlockedPhase)
-                      onClose()
+                      onSetPhaseFilter(unlockedModalData.unlockedPhase);
+                      onClose();
                     }}
                     className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] animate-fade-in"
                   >
@@ -123,9 +133,10 @@ export function PhaseUnlockedModal({
             <div className="relative z-20 flex-1 h-full flex flex-col lg:grid lg:grid-cols-12 gap-0 overflow-hidden">
               {/* Left Column (60% width): Clean Pure Storytelling Screen */}
               <div className="h-[45vh] lg:h-full lg:col-span-7 border-b lg:border-b-0 lg:border-r border-[#261b12] p-4 lg:p-10 flex flex-col justify-start items-center bg-black overflow-y-auto custom-scrollbar shrink-0">
-                {CASE_000_NARRATOR[unlockedModalData.unlockedPhase] && (
+                {currentNarrative && (
                   <div className="space-y-6 max-w-xl mx-auto w-full flex flex-col items-start py-4 sm:py-6">
-                    {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
+                    {unlockedModalData.unlockedPhase === 0 &&
+                    !isStoryStarted ? (
                       <div className="py-12 flex flex-col items-center justify-center w-full my-auto">
                         <button
                           onClick={handleStartStory}
@@ -137,13 +148,13 @@ export function PhaseUnlockedModal({
                     ) : (
                       <>
                         <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between">
-                          <span>{CASE_000_NARRATOR[unlockedModalData.unlockedPhase].date}</span>
+                          <span>{currentNarrative.date}</span>
                         </div>
 
                         <div className="pt-2 w-full">
                           <TypewriterNarrator
-                            key={`web-${unlockedModalData.unlockedPhase}-${CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}`}
-                            text={CASE_000_NARRATOR[unlockedModalData.unlockedPhase].monologue}
+                            key={`web-${unlockedModalData.unlockedPhase}-${currentNarrative.monologue}`}
+                            text={currentNarrative.monologue}
                             speed={12}
                             onComplete={() => setIsNarrativeComplete(true)}
                           />
@@ -163,7 +174,9 @@ export function PhaseUnlockedModal({
                       TÀI LIỆU & TANG VẬT MỚI
                     </span>
                     <span className="font-mono text-xs text-[#ad9885] bg-[#221810] px-2 py-0.5 border border-[#3e2c1e]">
-                      {unlockedModalData.newPdfs.length + unlockedModalData.newEvidence.length} VẬT PHẨM
+                      {unlockedModalData.newPdfs.length +
+                        unlockedModalData.newEvidence.length}{" "}
+                      VẬT PHẨM
                     </span>
                   </div>
 
@@ -224,12 +237,12 @@ export function PhaseUnlockedModal({
                       <button
                         onClick={() => {
                           if (unlockedModalData.newPdfs.length > 0) {
-                            onSelectPdf(unlockedModalData.newPdfs[0])
+                            onSelectPdf(unlockedModalData.newPdfs[0]);
                           } else if (unlockedModalData.newEvidence.length > 0) {
-                            onSelectEvidence(unlockedModalData.newEvidence[0])
+                            onSelectEvidence(unlockedModalData.newEvidence[0]);
                           }
-                          onSetPhaseFilter(unlockedModalData.unlockedPhase)
-                          onClose()
+                          onSetPhaseFilter(unlockedModalData.unlockedPhase);
+                          onClose();
                         }}
                         className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] animate-fade-in"
                       >
@@ -245,6 +258,5 @@ export function PhaseUnlockedModal({
         </div>
       )}
     </AnimatePresence>
-  )
+  );
 }
-
