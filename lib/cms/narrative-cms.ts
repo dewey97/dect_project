@@ -16,7 +16,7 @@ export interface SheetNarrativeRow {
   date?: string;
   /** Đoạn độc thoại dẫn truyện (Alt+Enter ngắt dòng, dòng đôi ngắt đoạn). */
   monologue?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /** Chuẩn hoá `case_id` để so khớp giữa Sheet (`case_000`) và code (`case-000`). */

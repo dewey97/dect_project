@@ -24,7 +24,11 @@ export interface SheetCheckpointRow {
   answers?: string;
   /** Danh sách gợi ý đa cấp — mỗi dòng (Alt+Enter) là một cấp độ gợi ý (1, 2, 3...). */
   hints?: string;
-  [key: string]: any;
+  suspect_label?: string;
+  evidence_step_label?: string;
+  motive_label?: string;
+  mismatch_label?: string;
+  [key: string]: unknown;
 }
 
 /** Kết quả bóc tách cột `answers` — chỉ chứa các khóa thực sự xuất hiện trên Sheet. */

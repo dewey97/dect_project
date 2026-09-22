@@ -1,15 +1,21 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
+import path from "path";
 
-test('Test Desktop Phone Layout', async ({ page }) => {
+const testResultsDir = path.resolve(process.cwd(), "test-results");
+
+test("Test Desktop Phone Layout", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
 
   await page.addInitScript(() => {
-    localStorage.setItem('veritas_play_experience', 'web');
-    localStorage.setItem('veritas_investigation_mode', 'casual');
-    localStorage.setItem('veritas_completed_checkpoints', JSON.stringify(['cp-01-01']));
+    localStorage.setItem("veritas_play_experience", "web");
+    localStorage.setItem("veritas_investigation_mode", "casual");
+    localStorage.setItem(
+      "veritas_completed_checkpoints",
+      JSON.stringify(["cp-01-01"]),
+    );
   });
 
-  await page.goto('http://localhost:3000/evidence');
+  await page.goto("http://localhost:3000/evidence");
   await page.waitForTimeout(1000);
 
   // Click on "CHƠI HOÀN TOÀN TRÊN WEB" if PlayModeModal is open
@@ -20,7 +26,9 @@ test('Test Desktop Phone Layout', async ({ page }) => {
   }
 
   // Close PhaseUnlockedModal if open
-  const closePhaseBtn = page.locator('button:has-text("BẮT ĐẦU ĐIỀU TRA GIAI ĐOẠN 0")');
+  const closePhaseBtn = page.locator(
+    'button:has-text("BẮT ĐẦU ĐIỀU TRA GIAI ĐOẠN 0")',
+  );
   if (await closePhaseBtn.isVisible()) {
     await closePhaseBtn.click();
     await page.waitForTimeout(500);
@@ -28,25 +36,30 @@ test('Test Desktop Phone Layout', async ({ page }) => {
 
   // Directly trigger open-phone-modal event
   await page.evaluate(() => {
-    window.dispatchEvent(new CustomEvent('open-phone-modal'));
+    window.dispatchEvent(new CustomEvent("open-phone-modal"));
   });
 
   await page.waitForTimeout(1500);
 
-  // Take screenshot of desktop phone modal
-  await page.screenshot({ path: 'C:/Users/Dell/.gemini/antigravity/brain/75d6fffb-071e-4090-bbe3-cbf5c0166526/desktop_layout.png' });
+  // Take screenshot of desktop phone modal into local test-results
+  await page.screenshot({
+    path: path.join(testResultsDir, "desktop_layout.png"),
+  });
 });
 
-test('Test Mobile Phone Layout', async ({ page }) => {
+test("Test Mobile Phone Layout", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
 
   await page.addInitScript(() => {
-    localStorage.setItem('veritas_play_experience', 'web');
-    localStorage.setItem('veritas_investigation_mode', 'casual');
-    localStorage.setItem('veritas_completed_checkpoints', JSON.stringify(['cp-01-01']));
+    localStorage.setItem("veritas_play_experience", "web");
+    localStorage.setItem("veritas_investigation_mode", "casual");
+    localStorage.setItem(
+      "veritas_completed_checkpoints",
+      JSON.stringify(["cp-01-01"]),
+    );
   });
 
-  await page.goto('http://localhost:3000/evidence');
+  await page.goto("http://localhost:3000/evidence");
   await page.waitForTimeout(1000);
 
   // Click on "CHƠI HOÀN TOÀN TRÊN WEB" if PlayModeModal is open
@@ -57,7 +70,9 @@ test('Test Mobile Phone Layout', async ({ page }) => {
   }
 
   // Close PhaseUnlockedModal if open
-  const closePhaseBtn = page.locator('button:has-text("BẮT ĐẦU ĐIỀU TRA GIAI ĐOẠN 0")');
+  const closePhaseBtn = page.locator(
+    'button:has-text("BẮT ĐẦU ĐIỀU TRA GIAI ĐOẠN 0")',
+  );
   if (await closePhaseBtn.isVisible()) {
     await closePhaseBtn.click();
     await page.waitForTimeout(500);
@@ -65,12 +80,13 @@ test('Test Mobile Phone Layout', async ({ page }) => {
 
   // Directly trigger open-phone-modal event
   await page.evaluate(() => {
-    window.dispatchEvent(new CustomEvent('open-phone-modal'));
+    window.dispatchEvent(new CustomEvent("open-phone-modal"));
   });
 
   await page.waitForTimeout(1500);
 
-  // Take screenshot of mobile phone layout
-  await page.screenshot({ path: 'C:/Users/Dell/.gemini/antigravity/brain/75d6fffb-071e-4090-bbe3-cbf5c0166526/mobile_layout.png' });
+  // Take screenshot of mobile phone layout into local test-results
+  await page.screenshot({
+    path: path.join(testResultsDir, "mobile_layout.png"),
+  });
 });
-
