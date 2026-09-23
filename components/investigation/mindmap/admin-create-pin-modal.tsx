@@ -567,59 +567,8 @@ export function AdminCreatePinModal({
               </div>
             </div>
 
-            {/* Transform Sliders */}
-            <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/5">
-              <div>
-                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 mb-0.5">
-                  <span>Xoay: {rotation}°</span>
-                  {rotation !== 0 && (
-                    <button
-                      type="button"
-                      onClick={() => setRotation(0)}
-                      className="text-[10px] text-amber-400 hover:underline"
-                    >
-                      Reset
-                    </button>
-                  )}
-                </div>
-                <input
-                  type="range"
-                  min={-30}
-                  max={30}
-                  step={1}
-                  value={rotation}
-                  onChange={(e) => setRotation(Number(e.target.value))}
-                  className="w-full accent-amber-500 bg-zinc-900 cursor-pointer h-1 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 mb-0.5">
-                  <span>Kích thước: {Math.round(scale * 100)}%</span>
-                  {scale !== 1 && (
-                    <button
-                      type="button"
-                      onClick={() => setScale(1)}
-                      className="text-[10px] text-amber-400 hover:underline"
-                    >
-                      Reset
-                    </button>
-                  )}
-                </div>
-                <input
-                  type="range"
-                  min={0.7}
-                  max={1.5}
-                  step={0.05}
-                  value={scale}
-                  onChange={(e) => setScale(Number(e.target.value))}
-                  className="w-full accent-amber-500 bg-zinc-900 cursor-pointer h-1 rounded-lg"
-                />
-              </div>
-            </div>
-
             {/* Title & Detail */}
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2 pt-1 border-t border-white/5">
               <div>
                 <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
                   Tiêu đề <span className="text-red-400">*</span>

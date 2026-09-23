@@ -669,6 +669,8 @@ export interface HeroInteractiveProps {
   customPins?: PinPoint[];
   customConnections?: CaseConnection[];
   customBgImage?: string;
+  selectedPinId?: string | null;
+  onSelectPin?: (pinId: string | null) => void;
   onPinClick?: (
     pinId: string,
     pin?: PinPoint,
@@ -684,6 +686,8 @@ export function HeroInteractive({
   customPins,
   customConnections,
   customBgImage,
+  selectedPinId,
+  onSelectPin,
   onPinClick,
   isEditMode = false,
   onPinPositionChange,
@@ -692,6 +696,8 @@ export function HeroInteractive({
   const customConnectionsRef = useRef<CaseConnection[] | undefined>(
     customConnections,
   );
+  const selectedPinIdRef = useRef<string | null | undefined>(selectedPinId);
+  const onSelectPinRef = useRef(onSelectPin);
   const onPinClickRef = useRef(onPinClick);
   const isEditModeRef = useRef(isEditMode);
   const onPinPositionChangeRef = useRef(onPinPositionChange);
@@ -701,13 +707,15 @@ export function HeroInteractive({
   // Synchronously update refs on every render to eliminate any stale closures
   customPinsRef.current = customPins;
   customConnectionsRef.current = customConnections;
+  selectedPinIdRef.current = selectedPinId;
+  onSelectPinRef.current = onSelectPin;
   onPinClickRef.current = onPinClick;
   isEditModeRef.current = isEditMode;
   onPinPositionChangeRef.current = onPinPositionChange;
 
   useEffect(() => {
     if (requestRenderRef.current) requestRenderRef.current();
-  }, [customPins, customConnections, onPinClick]);
+  }, [customPins, customConnections, selectedPinId, onPinClick]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -888,8 +896,33 @@ export function HeroInteractive({
   // Tooltip and hover
   // ────────────────────────────────────────
 
-  const updateHoveredPin = useCallback((_screenX: number, _screenY: number) => {
-    // Hover disabled by design - pins stay completely static
+  const updateHoveredPin = useCallback((screenX: number, screenY: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const bounds = getInnerBoardBounds(
+      rect.width,
+      rect.height,
+      boardFrameRef.current,
+    );
+    const transform = getViewTransform(zoomRef.current, panRef.current);
+    const worldPointer = screenToWorld({ x: screenX, y: screenY }, transform);
+
+    const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
+    let hitId: string | null = null;
+
+    for (let index = 0; index < caseSysPins.length; index += 1) {
+      const pin = caseSysPins[index];
+      const pinPosition = getPinWorldPosition(pin, bounds);
+      if (isPinHit(worldPointer, pinPosition, pin, transform)) {
+        hitId = pin.id;
+        break;
+      }
+    }
+
+    if (hoveredPinRef.current !== hitId) {
+      hoveredPinRef.current = hitId;
+      requestRenderRef.current();
+    }
   }, []);
 
   // ────────────────────────────────────────
@@ -1215,15 +1248,22 @@ export function HeroInteractive({
           }
         }
 
-        if (bestHitPin && onPinClickRef.current) {
-          try {
-            event.preventDefault();
-            event.stopPropagation();
-          } catch {}
-          onPinClickRef.current(bestHitPin.id, bestHitPin, {
-            clientX: event.clientX,
-            clientY: event.clientY,
-          });
+        if (bestHitPin) {
+          if (isEditModeRef.current && onSelectPinRef.current) {
+            onSelectPinRef.current(bestHitPin.id);
+          }
+          if (onPinClickRef.current) {
+            try {
+              event.preventDefault();
+              event.stopPropagation();
+            } catch {}
+            onPinClickRef.current(bestHitPin.id, bestHitPin, {
+              clientX: event.clientX,
+              clientY: event.clientY,
+            });
+          }
+        } else if (isEditModeRef.current && onSelectPinRef.current) {
+          onSelectPinRef.current(null);
         }
       } else {
         updateHoveredPin(x, y);
@@ -1498,20 +1538,26 @@ export function HeroInteractive({
       const uPins = userPinsRef.current;
       const allPinsUnified = [
         ...casePins.map((p) => ({
+          ...p,
           id: p.id,
           x: p.x,
           y: p.y,
           label: p.label,
+          detail: (p as any).detail,
           color: (p as any).color,
           noteColor: (p as any).noteColor,
           pinColor: (p as any).pinColor,
           pulseBorder: (p as any).pulseBorder,
           photoUrl: (p as any).photoUrl,
+          noteTextureUrl: (p as any).noteTextureUrl,
+          rotation: (p as any).rotation,
+          scale: (p as any).scale,
           isLocked: (p as any).isLocked,
           isSolved: (p as any).isSolved,
           isUser: false,
         })),
         ...uPins.map((p) => ({
+          ...p,
           id: p.id,
           x: p.x,
           y: p.y,
@@ -1579,10 +1625,7 @@ export function HeroInteractive({
         const scaleMod = (1.0 + sizeVariant) * userScale;
 
         const isCustomPin =
-          pin.id.startsWith("admin-pin-") ||
-          rawPin.noteTextureUrl !== undefined ||
-          rawPin.noteColor !== undefined ||
-          rawPin.photoUrl !== undefined;
+          pin.id.startsWith("admin-pin-") || pin.id.startsWith("custom-pin-");
 
         const isSuspectPin = isCustomPin
           ? !!rawPin.photoUrl
@@ -1650,6 +1693,71 @@ export function HeroInteractive({
             const cardHeight = (baseCardHeight * scaleMod) / transform.scale;
             context.fillStyle = "#f5f2eb";
             context.fillRect(-cardWidth / 2, 0, cardWidth, cardHeight);
+          }
+
+          // Hover / Selected border & glow highlight on photo card
+          const isPhotoHovered = hoveredPinRef.current === pin.id;
+          const isPhotoSelected = selectedPinIdRef.current === pin.id;
+          if (isPhotoHovered || isPhotoSelected) {
+            const isKhang =
+              pin.id.includes("khang") ||
+              (pin.label && pin.label.toLowerCase().includes("khang"));
+            const isCrimeScene =
+              pin.id.includes("crime-scene") ||
+              pin.id.includes("thi-the") ||
+              (pin.label && pin.label.toLowerCase().includes("thi thể"));
+            const baseCardWidth = isKhang ? 146 : isCrimeScene ? 134 : 108;
+            const cardWidth = (baseCardWidth * scaleMod) / transform.scale;
+            const cardHeight = loadedSuspectImg
+              ? (cardWidth * (loadedSuspectImg.naturalHeight || 380)) /
+                (loadedSuspectImg.naturalWidth || 300)
+              : cardWidth * 1.3;
+            const tagX = -cardWidth / 2;
+            const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
+
+            context.save();
+            if (isPhotoSelected) {
+              context.shadowColor = "rgba(245, 158, 11, 0.95)";
+              context.shadowBlur = 18 / transform.scale;
+              context.strokeStyle = "#f59e0b";
+              context.lineWidth = 2.8 / transform.scale;
+            } else {
+              context.shadowColor = "rgba(251, 191, 36, 0.8)";
+              context.shadowBlur = 12 / transform.scale;
+              context.strokeStyle = "#fbbf24";
+              context.lineWidth = 2 / transform.scale;
+            }
+            context.strokeRect(tagX, tagY, cardWidth, cardHeight);
+
+            if (isEditModeRef.current) {
+              const handleSize = 6 / transform.scale;
+              context.fillStyle = isPhotoSelected ? "#f59e0b" : "#fbbf24";
+              context.fillRect(
+                tagX - handleSize / 2,
+                tagY - handleSize / 2,
+                handleSize,
+                handleSize,
+              );
+              context.fillRect(
+                tagX + cardWidth - handleSize / 2,
+                tagY - handleSize / 2,
+                handleSize,
+                handleSize,
+              );
+              context.fillRect(
+                tagX - handleSize / 2,
+                tagY + cardHeight - handleSize / 2,
+                handleSize,
+                handleSize,
+              );
+              context.fillRect(
+                tagX + cardWidth - handleSize / 2,
+                tagY + cardHeight - handleSize / 2,
+                handleSize,
+                handleSize,
+              );
+            }
+            context.restore();
           }
         } else {
           // ── DISTINGUISH WHITE PINNED NOTES vs YELLOW STICKY NOTES ──
@@ -1890,6 +1998,65 @@ export function HeroInteractive({
             context.strokeStyle = `rgba(253, 224, 71, ${0.75 + pulseGlow * 0.25})`;
             context.lineWidth = (2.2 + pulseGlow * 1.5) / transform.scale;
             context.strokeRect(tagX, tagY, noteWidth, noteHeight);
+            context.restore();
+          }
+
+          // Amber dashed border highlight when hovered (admin edit mode)
+          const isNoteHovered = hoveredPinRef.current === pin.id;
+          const isNoteSelected = selectedPinIdRef.current === pin.id;
+
+          if (isNoteHovered || isNoteSelected) {
+            context.save();
+            const pad = 3 / transform.scale;
+            const bx = tagX - pad;
+            const by = tagY - pad;
+            const bw = noteWidth + pad * 2;
+            const bh = noteHeight + pad * 2;
+
+            if (isNoteSelected) {
+              context.shadowColor = "rgba(245, 158, 11, 0.95)";
+              context.shadowBlur = 18 / transform.scale;
+              context.strokeStyle = "#f59e0b";
+              context.lineWidth = 2.8 / transform.scale;
+            } else {
+              context.shadowColor = "rgba(251, 191, 36, 0.85)";
+              context.shadowBlur = 12 / transform.scale;
+              context.strokeStyle = "#fbbf24";
+              context.lineWidth = 2 / transform.scale;
+            }
+
+            context.setLineDash([6 / transform.scale, 4 / transform.scale]);
+            context.strokeRect(bx, by, bw, bh);
+            context.setLineDash([]);
+
+            if (isEditModeRef.current) {
+              const handleSize = 6 / transform.scale;
+              context.fillStyle = isNoteSelected ? "#f59e0b" : "#fbbf24";
+              context.fillRect(
+                bx - handleSize / 2,
+                by - handleSize / 2,
+                handleSize,
+                handleSize,
+              );
+              context.fillRect(
+                bx + bw - handleSize / 2,
+                by - handleSize / 2,
+                handleSize,
+                handleSize,
+              );
+              context.fillRect(
+                bx - handleSize / 2,
+                by + bh - handleSize / 2,
+                handleSize,
+                handleSize,
+              );
+              context.fillRect(
+                bx + bw - handleSize / 2,
+                by + bh - handleSize / 2,
+                handleSize,
+                handleSize,
+              );
+            }
             context.restore();
           }
 

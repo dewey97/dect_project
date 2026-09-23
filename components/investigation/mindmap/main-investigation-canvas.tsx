@@ -14,6 +14,10 @@ import {
   Plus,
   StickyNote,
   RotateCcw,
+  RotateCw,
+  Minus,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -161,12 +165,28 @@ export function MainInvestigationCanvas({
   const [activeCustomPinModal, setActiveCustomPinModal] =
     useState<PinPoint | null>(null);
 
+  // Ghim đang được chọn trên bảng (chế độ Setup) + tâm điều khiển nhanh
+  const [pinTransforms, setPinTransforms] = useState<
+    Record<string, { rotation: number; scale: number }>
+  >({});
+  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
+  const [selectionAnchor, setSelectionAnchor] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const canvasWrapperRef = useRef<HTMLDivElement>(null);
+
   // ---- Undo / Redo history (Ctrl+Z / Ctrl+Shift+Z) ----
   type LayoutSnapshot = {
     posMap: Record<string, { x: number; y: number }>;
     adminPins: PinPoint[];
+    transforms: Record<string, { rotation: number; scale: number }>;
   };
-  const layoutRef = useRef<LayoutSnapshot>({ posMap: {}, adminPins: [] });
+  const layoutRef = useRef<LayoutSnapshot>({
+    posMap: {},
+    adminPins: [],
+    transforms: {},
+  });
   const historyRef = useRef<{
     past: LayoutSnapshot[];
     future: LayoutSnapshot[];
@@ -185,16 +205,22 @@ export function MainInvestigationCanvas({
     layoutRef.current.adminPins = adminCustomPins;
   }, [adminCustomPins]);
 
+  useEffect(() => {
+    layoutRef.current.transforms = pinTransforms;
+  }, [pinTransforms]);
+
   const cloneLayout = (
     src: LayoutSnapshot = layoutRef.current,
   ): LayoutSnapshot => ({
     posMap: { ...src.posMap },
     adminPins: src.adminPins.map((p) => ({ ...p })),
+    transforms: { ...src.transforms },
   });
 
   const applyLayout = useCallback((snapshot: LayoutSnapshot) => {
     setCustomPinPositions(snapshot.posMap);
     setAdminCustomPins(snapshot.adminPins);
+    setPinTransforms(snapshot.transforms);
     setHasUnsavedChanges(true);
   }, []);
 
@@ -322,6 +348,15 @@ export function MainInvestigationCanvas({
             setAdminCustomPins(parsed);
           }
         }
+        const localTransforms = localStorage.getItem(
+          "veritas_boardgame_transforms_case-000",
+        );
+        if (localTransforms) {
+          const parsed = JSON.parse(localTransforms);
+          if (parsed && typeof parsed === "object") {
+            setPinTransforms(parsed);
+          }
+        }
       } catch {}
 
       // 2. Tải đồng bộ từ Supabase Database nếu có
@@ -379,7 +414,11 @@ export function MainInvestigationCanvas({
             JSON.stringify(nextAdminPins),
           );
         } catch {}
-        return { posMap: nextPosMap, adminPins: nextAdminPins };
+        return {
+          posMap: nextPosMap,
+          adminPins: nextAdminPins,
+          transforms: draft.transforms,
+        };
       }, `save-pin-${pin.id}`);
       toast.success("Đã thêm ghim vào bảng!");
     },
@@ -391,16 +430,64 @@ export function MainInvestigationCanvas({
       commitLayout((draft) => {
         const nextAdminPins = draft.adminPins.filter((p) => p.id !== pinId);
         const nextPosMap = { ...draft.posMap };
+        const nextTransforms = { ...draft.transforms };
         delete nextPosMap[pinId];
+        delete nextTransforms[pinId];
         try {
           localStorage.setItem(
             "veritas_admin_custom_pins_case-000",
             JSON.stringify(nextAdminPins),
           );
+          localStorage.setItem(
+            "veritas_boardgame_transforms_case-000",
+            JSON.stringify(nextTransforms),
+          );
         } catch {}
-        return { posMap: nextPosMap, adminPins: nextAdminPins };
+        return {
+          posMap: nextPosMap,
+          adminPins: nextAdminPins,
+          transforms: nextTransforms,
+        };
       }, `delete-pin-${pinId}`);
       toast.info("Đã xoá ghim khỏi bảng!");
+    },
+    [commitLayout],
+  );
+
+  /** Xoay / phóng to thu nhỏ node đang chọn ngay trên bảng (không cần mở modal) */
+  const handleAdjustNodeTransform = useCallback(
+    (pinId: string, deltaRot: number, deltaScale: number) => {
+      detectiveAudio.playTypewriterClick();
+      commitLayout((draft) => {
+        const adminPin = draft.adminPins.find((p) => p.id === pinId);
+        const current = draft.transforms[pinId];
+        const curRot = current?.rotation ?? adminPin?.rotation ?? 0;
+        const curScale = current?.scale ?? adminPin?.scale ?? 1.0;
+
+        const nextTransforms = {
+          ...draft.transforms,
+          [pinId]: {
+            rotation: Math.round(curRot + deltaRot),
+            scale: Math.max(
+              0.3,
+              Math.min(2.5, Math.round((curScale + deltaScale) * 10) / 10),
+            ),
+          },
+        };
+
+        try {
+          localStorage.setItem(
+            "veritas_boardgame_transforms_case-000",
+            JSON.stringify(nextTransforms),
+          );
+        } catch {}
+
+        return {
+          posMap: draft.posMap,
+          adminPins: draft.adminPins,
+          transforms: nextTransforms,
+        };
+      }, `transform-${pinId}`);
     },
     [commitLayout],
   );
@@ -766,17 +853,24 @@ export function MainInvestigationCanvas({
       const label = (pin?.label || "").toLowerCase();
       const detail = (pin?.detail || "").toLowerCase();
 
+      // Chế độ Setup: chọn node để hiển thị thanh điều chỉnh nhanh (xoay, resize, sửa, xoá)
+      if (isEditMode) {
+        setSelectedPinId(id);
+        if (coords) {
+          const rect = canvasWrapperRef.current?.getBoundingClientRect();
+          setSelectionAnchor(
+            rect
+              ? { x: coords.clientX - rect.left, y: coords.clientY - rect.top }
+              : null,
+          );
+        }
+        return;
+      }
+
       // Check if clicked pin is an Admin custom pin (Sticky Note, A4 Dossier, Photo)
       if (id.startsWith("admin-pin-") || id.startsWith("custom-pin-")) {
         const targetPin =
           pin || adminCustomPins.find((p) => p.id === id) || null;
-
-        // Chế độ Setup: mở bảng chỉnh sửa
-        if (isEditMode) {
-          setEditingCustomPin(targetPin);
-          setIsCreatePinModalOpen(true);
-          return;
-        }
 
         if (!targetPin) return;
 
@@ -1274,12 +1368,19 @@ export function MainInvestigationCanvas({
         ...desktopSuspectPins,
       ];
 
-  // Apply admin-saved positions from Supabase over the built-in defaults
+  // Apply admin-saved positions & transforms over the built-in defaults
   const allPins: PinPoint[] = [...customPins, ...adminCustomPins];
   const displayPins: PinPoint[] = allPins.map((pin) => {
     const override = customPinPositions[pin.id];
-    return override ? { ...pin, x: override.x, y: override.y } : pin;
+    const tf = pinTransforms[pin.id];
+    return {
+      ...pin,
+      ...(override ? { x: override.x, y: override.y } : {}),
+      rotation: tf?.rotation !== undefined ? tf.rotation : pin.rotation,
+      scale: tf?.scale !== undefined ? tf.scale : pin.scale,
+    };
   });
+  const selectedPin = displayPins.find((p) => p.id === selectedPinId) || null;
 
   // Tất cả các ghim (bao gồm ghim hệ thống, ảnh nghi phạm node-suspect-* và nghi vấn mở rộng) đều được lưu vị trí
   const persistablePins = displayPins;
@@ -1334,6 +1435,7 @@ export function MainInvestigationCanvas({
 
   return (
     <div
+      ref={canvasWrapperRef}
       suppressHydrationWarning
       className={`relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none transition-all duration-300 ${
         isEditMode
@@ -1420,12 +1522,118 @@ export function MainInvestigationCanvas({
         )}
       </div>
 
+      {/* On-Canvas Floating Quick Node Adjustment Toolbar (Edit Mode) */}
+      <AnimatePresence>
+        {isEditMode && selectedPin && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 p-1.5 bg-[#1b140e]/95 backdrop-blur-md rounded-xl border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
+          >
+            {/* Tilt Left (-5 deg) */}
+            <button
+              type="button"
+              onClick={() => handleAdjustNodeTransform(selectedPin.id, -5, 0)}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
+              title="Xoay nghiêng trái -5°"
+            >
+              <RotateCcw className="size-3.5" />
+              <span className="text-[10px] font-bold">-5°</span>
+            </button>
+
+            {/* Tilt Right (+5 deg) */}
+            <button
+              type="button"
+              onClick={() => handleAdjustNodeTransform(selectedPin.id, 5, 0)}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
+              title="Xoay nghiêng phải +5°"
+            >
+              <RotateCw className="size-3.5" />
+              <span className="text-[10px] font-bold">+5°</span>
+            </button>
+
+            <div className="h-4 w-px bg-white/15 mx-0.5" />
+
+            {/* Zoom Out (-10%) */}
+            <button
+              type="button"
+              onClick={() => handleAdjustNodeTransform(selectedPin.id, 0, -0.1)}
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
+              title="Thu nhỏ kích thước (-10%)"
+            >
+              <Minus className="size-3.5" />
+            </button>
+
+            {/* Scale % display */}
+            <span className="text-[10px] font-bold text-zinc-400 px-1 font-mono">
+              {Math.round((selectedPin.scale ?? 1.0) * 100)}%
+            </span>
+
+            {/* Zoom In (+10%) */}
+            <button
+              type="button"
+              onClick={() => handleAdjustNodeTransform(selectedPin.id, 0, 0.1)}
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
+              title="Phóng to kích thước (+10%)"
+            >
+              <Plus className="size-3.5" />
+            </button>
+
+            <div className="h-4 w-px bg-white/15 mx-0.5" />
+
+            {/* Edit Node Modal trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                detectiveAudio.playTypewriterClick();
+                setEditingCustomPin(selectedPin);
+                setIsCreatePinModalOpen(true);
+              }}
+              className="p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 transition-colors"
+              title="Chỉnh sửa chi tiết nội dung node"
+            >
+              <Pencil className="size-3.5" />
+            </button>
+
+            {/* Delete custom node */}
+            {(selectedPin.id.startsWith("admin-pin-") ||
+              selectedPin.id.startsWith("custom-pin-")) && (
+              <button
+                type="button"
+                onClick={() => {
+                  handleDeleteAdminPin(selectedPin.id);
+                  setSelectedPinId(null);
+                }}
+                className="p-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-500/30 transition-colors"
+                title="Xóa node khỏi bảng"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
+            )}
+
+            {/* Close / Deselect */}
+            <button
+              type="button"
+              onClick={() => setSelectedPinId(null)}
+              className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white transition-colors ml-0.5"
+              title="Bỏ chọn node"
+            >
+              <X className="size-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Main Interactive Pinboard Canvas */}
       <HeroInteractive
         className="w-full h-full flex-1 min-h-0"
         controlledCaseId="case-000"
         customPins={displayPins}
         customConnections={customConnections}
+        selectedPinId={selectedPinId}
+        onSelectPin={setSelectedPinId}
         onPinClick={handlePinClick}
         isEditMode={isEditMode}
         onPinPositionChange={handlePinPositionChange}
