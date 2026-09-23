@@ -1,21 +1,37 @@
 # CẨM NANG HỆ THỐNG ADMIN STUDIO: ĐẶC TẢ TÍNH NĂNG & GIAO DIỆN UI/UX
-**(CASE & UNIVERSE CREATOR WORKSPACE)**
-*Phiên bản 2.0 — Standardized Creator Workflow*
+
+**(ADMIN OPERATIONS & GOOGLE SHEETS LIVE CMS HUB)**
+_Phiên bản 3.0 — Unified Live CMS Hub_
+
+---
+
+> ⚡ **Thông Báo Quy Hoạch Hệ Thống**:
+>
+> - Toàn bộ việc biên tập kịch bản vụ án lẻ, nhân vật, mốc thời gian timeline, vật chứng, bản đồ và đáp án checkpoints đã được **chuyển 100% về Google Sheets Live CMS** (Xem chi tiết tại [`10_google_sheets_cms.md`](10_google_sheets_cms.md)).
+> - Giao diện Web **Admin Studio (`/studio`)** được tinh gọn thành **Operations & Analytics Hub**:
+>   1. **Analytics Dashboard (`/studio`)**: Theo dõi DAU người chơi, trạng thái hệ thống và widget truy cập nhanh 15 tab Google Sheet Live CMS.
+>   2. **Danh sách Vụ án (`/studio/cases`)**: Xem nhanh metadata vụ án, phím tắt Playtest trực tiếp hoặc mở Google Sheet.
+>   3. **Quản lý Người chơi (`/studio/players`)**: Quản lý tài khoản và tiến độ điều tra.
+>   4. **Góp ý & Báo lỗi (`/studio/feedbacks`)**: Xem phản hồi, đánh giá từ người chơi.
+>   5. **Cài đặt Hệ thống (`/studio/settings`)**: Cấu hình kết nối và quyền hạn.
 
 ---
 
 ## I. TỔNG QUAN HỆ THỐNG & NGUYÊN TẮC THIẾT KẾ
 
 ### 1. Tư tưởng Cốt lõi (Story-Driven Creator Workflow)
+
 Admin Studio là công cụ biên tập dữ liệu chuyên biệt dành cho Admin/Tác giả để sáng tác, cấu trúc hóa, liên kết và kiểm thử các kịch bản trinh thám tương tác.
 Hệ thống hoạt động như một **Động cơ Dữ liệu Cấu trúc (Structured Data Engine)** tích hợp thuật toán kiểm toán logic thời gian thực và đếm chỉ số cân bằng trò chơi.
 
 **Workflow 3 Giai đoạn của Tác giả:**
+
 1. **Giai đoạn 1 (Story & Truth):** Nhào nặn Ý tưởng, Nạn nhân, Hung thủ, Sự thật kịch bản và Ma trận Nhân vật.
 2. **Giai đoạn 2 (Interactive Game Design):** Đắp thêm Manh mối, Hiện trường, Khung tiến trình gameplay và Bằng chứng.
 3. **Giai đoạn 3 (Meta-Universe & QA):** Kết nối vụ án lẻ vào Vũ Trụ Truyện Mở và Playtest Sandbox.
 
 ### 2. Nguyên tắc Thiết kế UX (Power-User Tool)
+
 - **Information Density (Mật độ thông tin cao):** Sử dụng các bảng Grid, Split-pane (chia màn hình) cho phép nhìn toàn cảnh vụ án.
 - **Visual Mapping (Sơ đồ hóa trực quan):** Giao diện kéo thả (Drag & Drop), Node-based và Timeline trực quan.
 - **Real-time Audit Feedback:** Phát hiện mâu thuẫn thời gian/không gian trong 0.001s và cảnh báo ngay lập tức.
@@ -63,7 +79,7 @@ Giao diện Admin Studio tuân theo chuẩn **Desktop-First**, kiến trúc **Si
   - Breadcrumb kịch bản.
   - Trạng thái vòng đời: `Draft` ➔ `In Review` ➔ `Published`.
   - Nút nổi bật: **[ ⏵ PLAYTEST ]**.
-  - Cảnh báo Logic thời gian thực (vd: 🔴 *2 Lỗi Logic đang tồn tại*).
+  - Cảnh báo Logic thời gian thực (vd: 🔴 _2 Lỗi Logic đang tồn tại_).
 - **Main Workspace (Center):** Vùng làm việc chính dạng Split-pane hoặc Node-board.
 - **Right Panel (Contextual Inspector):** Mở ra cấu hình chi tiết khi chọn một Nhân vật hoặc Node trên sơ đồ.
 

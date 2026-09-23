@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Home,
@@ -11,6 +11,9 @@ import {
   Move,
   Check,
   X,
+  Plus,
+  StickyNote,
+  RotateCcw,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -27,6 +30,8 @@ import { IndictmentModal } from "./indictment-modal";
 import { CulpritEpilogueModal } from "./culprit-epilogue-modal";
 import { DossierResultModal } from "./dossier-result-modal";
 import { FollowupQuestionModal } from "./followup-question-modal";
+import { AdminCreatePinModal } from "./admin-create-pin-modal";
+import { CustomPinModal } from "./custom-pin-modal";
 import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import {
@@ -147,6 +152,131 @@ export function MainInvestigationCanvas({
     Record<string, { x: number; y: number }>
   >({});
 
+  // Admin-created custom pins (sticky notes, blank A4 dossiers, pinned photos)
+  const [adminCustomPins, setAdminCustomPins] = useState<PinPoint[]>([]);
+  const [isCreatePinModalOpen, setIsCreatePinModalOpen] = useState(false);
+  const [editingCustomPin, setEditingCustomPin] = useState<PinPoint | null>(
+    null,
+  );
+  const [activeCustomPinModal, setActiveCustomPinModal] =
+    useState<PinPoint | null>(null);
+
+  // ---- Undo / Redo history (Ctrl+Z / Ctrl+Shift+Z) ----
+  type LayoutSnapshot = {
+    posMap: Record<string, { x: number; y: number }>;
+    adminPins: PinPoint[];
+  };
+  const layoutRef = useRef<LayoutSnapshot>({ posMap: {}, adminPins: [] });
+  const historyRef = useRef<{
+    past: LayoutSnapshot[];
+    future: LayoutSnapshot[];
+  }>({ past: [], future: [] });
+  // Gom nhóm thao tác kéo thả liên tục của cùng một ghim thành 1 bước hoàn tác
+  const lastGestureRef = useRef<{ key: string; time: number }>({
+    key: "",
+    time: 0,
+  });
+
+  useEffect(() => {
+    layoutRef.current.posMap = customPinPositions;
+  }, [customPinPositions]);
+
+  useEffect(() => {
+    layoutRef.current.adminPins = adminCustomPins;
+  }, [adminCustomPins]);
+
+  const cloneLayout = (
+    src: LayoutSnapshot = layoutRef.current,
+  ): LayoutSnapshot => ({
+    posMap: { ...src.posMap },
+    adminPins: src.adminPins.map((p) => ({ ...p })),
+  });
+
+  const applyLayout = useCallback((snapshot: LayoutSnapshot) => {
+    setCustomPinPositions(snapshot.posMap);
+    setAdminCustomPins(snapshot.adminPins);
+    setHasUnsavedChanges(true);
+  }, []);
+
+  /** Ghi 1 bước vào lịch sử. gestureKey dùng để gộp thao tác kéo thả liên tục. */
+  const commitLayout = useCallback(
+    (mutate: (draft: LayoutSnapshot) => LayoutSnapshot, gestureKey: string) => {
+      const before = cloneLayout();
+      const after = mutate(cloneLayout());
+
+      const now = Date.now();
+      const sameGesture =
+        gestureKey !== "" &&
+        lastGestureRef.current.key === gestureKey &&
+        now - lastGestureRef.current.time < 800;
+      lastGestureRef.current = { key: gestureKey, time: now };
+
+      if (!sameGesture) {
+        historyRef.current.past.push(before);
+        if (historyRef.current.past.length > 100) {
+          historyRef.current.past.shift();
+        }
+        historyRef.current.future = [];
+      }
+
+      layoutRef.current = after;
+      applyLayout(after);
+    },
+    [applyLayout],
+  );
+
+  const handleUndo = useCallback(() => {
+    const h = historyRef.current;
+    if (h.past.length === 0) return;
+    const previous = h.past.pop()!;
+    h.future.push(cloneLayout());
+    lastGestureRef.current = { key: "", time: 0 };
+    layoutRef.current = previous;
+    detectiveAudio.playPaperRustle();
+    applyLayout(previous);
+    toast.info("Đã hoàn tác (Ctrl+Z)");
+  }, [applyLayout]);
+
+  const handleRedo = useCallback(() => {
+    const h = historyRef.current;
+    if (h.future.length === 0) return;
+    const next = h.future.pop()!;
+    h.past.push(cloneLayout());
+    lastGestureRef.current = { key: "", time: 0 };
+    layoutRef.current = next;
+    detectiveAudio.playTypewriterClick();
+    applyLayout(next);
+    toast.info("Đã làm lại (Ctrl+Shift+Z)");
+  }, [applyLayout]);
+
+  // Phím tắt Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y khi đang ở chế độ Setup
+  useEffect(() => {
+    if (!isAdmin || !isEditMode) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) {
+        return;
+      }
+
+      const isMod = e.ctrlKey || e.metaKey;
+      if (!isMod) return;
+
+      const key = e.key.toLowerCase();
+      if (key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      } else if ((key === "z" && e.shiftKey) || key === "y") {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isAdmin, isEditMode, handleUndo, handleRedo]);
+
   // Check admin role and load custom pin layout from DB on mount
   useEffect(() => {
     async function initAdminAndLayout() {
@@ -183,6 +313,15 @@ export function MainInvestigationCanvas({
             setCustomPinPositions(parsed);
           }
         }
+        const localCustomPins = localStorage.getItem(
+          "veritas_admin_custom_pins_case-000",
+        );
+        if (localCustomPins) {
+          const parsed = JSON.parse(localCustomPins);
+          if (Array.isArray(parsed)) {
+            setAdminCustomPins(parsed);
+          }
+        }
       } catch {}
 
       // 2. Tải đồng bộ từ Supabase Database nếu có
@@ -190,15 +329,31 @@ export function MainInvestigationCanvas({
         const res = await getBoardgamePinPositions("case-000");
         if (res.success && res.pins.length > 0) {
           const posMap: Record<string, { x: number; y: number }> = {};
+          const dbCustomPins: PinPoint[] = [];
           res.pins.forEach((p) => {
             posMap[p.id] = { x: p.x, y: p.y };
+            if (
+              p.id.startsWith("admin-pin-") ||
+              p.id.startsWith("custom-pin-")
+            ) {
+              dbCustomPins.push(p);
+            }
           });
           setCustomPinPositions(posMap);
+          if (dbCustomPins.length > 0) {
+            setAdminCustomPins(dbCustomPins);
+          }
           try {
             localStorage.setItem(
               "veritas_boardgame_pins_case-000",
               JSON.stringify(posMap),
             );
+            if (dbCustomPins.length > 0) {
+              localStorage.setItem(
+                "veritas_admin_custom_pins_case-000",
+                JSON.stringify(dbCustomPins),
+              );
+            }
           } catch {}
         }
       } catch {}
@@ -207,15 +362,62 @@ export function MainInvestigationCanvas({
     initAdminAndLayout();
   }, []);
 
+  const handleSaveAdminPin = useCallback(
+    (pin: PinPoint) => {
+      commitLayout((draft) => {
+        const exists = draft.adminPins.some((p) => p.id === pin.id);
+        const nextAdminPins = exists
+          ? draft.adminPins.map((p) => (p.id === pin.id ? pin : p))
+          : [...draft.adminPins, pin];
+        const nextPosMap = {
+          ...draft.posMap,
+          [pin.id]: { x: pin.x, y: pin.y },
+        };
+        try {
+          localStorage.setItem(
+            "veritas_admin_custom_pins_case-000",
+            JSON.stringify(nextAdminPins),
+          );
+        } catch {}
+        return { posMap: nextPosMap, adminPins: nextAdminPins };
+      }, `save-pin-${pin.id}`);
+      toast.success("Đã thêm ghim vào bảng!");
+    },
+    [commitLayout],
+  );
+
+  const handleDeleteAdminPin = useCallback(
+    (pinId: string) => {
+      commitLayout((draft) => {
+        const nextAdminPins = draft.adminPins.filter((p) => p.id !== pinId);
+        const nextPosMap = { ...draft.posMap };
+        delete nextPosMap[pinId];
+        try {
+          localStorage.setItem(
+            "veritas_admin_custom_pins_case-000",
+            JSON.stringify(nextAdminPins),
+          );
+        } catch {}
+        return { posMap: nextPosMap, adminPins: nextAdminPins };
+      }, `delete-pin-${pinId}`);
+      toast.info("Đã xoá ghim khỏi bảng!");
+    },
+    [commitLayout],
+  );
+
   const handlePinPositionChange = useCallback(
     (pinId: string, newX: number, newY: number) => {
-      setCustomPinPositions((prev) => ({
-        ...prev,
-        [pinId]: { x: newX, y: newY },
-      }));
-      setHasUnsavedChanges(true);
+      commitLayout((draft) => {
+        return {
+          ...draft,
+          posMap: {
+            ...draft.posMap,
+            [pinId]: { x: newX, y: newY },
+          },
+        };
+      }, `drag-${pinId}`);
     },
-    [],
+    [commitLayout],
   );
 
   const handleSavePinLayout = async (pinsToSave: PinPoint[]) => {
@@ -563,6 +765,37 @@ export function MainInvestigationCanvas({
       const id = pinId || pin?.id || "";
       const label = (pin?.label || "").toLowerCase();
       const detail = (pin?.detail || "").toLowerCase();
+
+      // Check if clicked pin is an Admin custom pin (Sticky Note, A4 Dossier, Photo)
+      if (id.startsWith("admin-pin-") || id.startsWith("custom-pin-")) {
+        const targetPin =
+          pin || adminCustomPins.find((p) => p.id === id) || null;
+
+        // Chế độ Setup: mở bảng chỉnh sửa
+        if (isEditMode) {
+          setEditingCustomPin(targetPin);
+          setIsCreatePinModalOpen(true);
+          return;
+        }
+
+        if (!targetPin) return;
+
+        // Ghim có câu hỏi tự soạn: mở modal giải đố
+        if (targetPin.actionType === "custom_question") {
+          setActiveCustomPinModal(targetPin);
+          return;
+        }
+
+        // Ghim ảnh thuần: mở lightbox phóng to ảnh
+        if (targetPin.photoUrl && targetPin.actionType !== "sheet_checkpoint") {
+          handleOpenPhotoZoom(targetPin.photoUrl, coords);
+          return;
+        }
+
+        // Mặc định: mở hồ sơ đọc thông tin
+        setActiveCustomPinModal(targetPin);
+        return;
+      }
 
       if (id === "c0-pin-suspects") {
         setEditingSuspect(null);
@@ -1042,7 +1275,8 @@ export function MainInvestigationCanvas({
       ];
 
   // Apply admin-saved positions from Supabase over the built-in defaults
-  const displayPins: PinPoint[] = customPins.map((pin) => {
+  const allPins: PinPoint[] = [...customPins, ...adminCustomPins];
+  const displayPins: PinPoint[] = allPins.map((pin) => {
     const override = customPinPositions[pin.id];
     return override ? { ...pin, x: override.x, y: override.y } : pin;
   });
@@ -1101,7 +1335,11 @@ export function MainInvestigationCanvas({
   return (
     <div
       suppressHydrationWarning
-      className="relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none"
+      className={`relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none transition-all duration-300 ${
+        isEditMode
+          ? "ring-4 ring-amber-500/80 ring-inset shadow-[inset_0_0_90px_rgba(245,158,11,0.22)]"
+          : ""
+      }`}
     >
       {/* Top Banner Toolbar */}
       <div className="absolute top-3 left-4 z-20 flex items-center gap-2 pointer-events-none">
@@ -1113,38 +1351,56 @@ export function MainInvestigationCanvas({
         {/* Admin Setup Controls */}
         {isAdmin && (
           <div className="flex items-center gap-1.5 bg-[#141419]/90 backdrop-blur-md p-1 rounded-lg border border-amber-500/40 text-xs shadow-xl pointer-events-auto">
+            {/* Mode Setup Button (Icon only) */}
             <button
               onClick={() => {
                 detectiveAudio.playTypewriterClick();
-                setIsEditMode(!isEditMode);
+                setIsEditMode(true);
+                setEditingCustomPin(null);
+                setIsCreatePinModalOpen(true);
               }}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-medium transition-colors ${
+              className={`p-1.5 rounded-lg border transition-all ${
                 isEditMode
-                  ? "bg-amber-500 text-black shadow-sm font-bold"
-                  : "text-zinc-300 hover:text-white hover:bg-zinc-800/60"
+                  ? "bg-amber-500/30 border-amber-400 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.55)] ring-1 ring-amber-400/60"
+                  : "bg-black/40 border-white/10 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
               }`}
-              title="Bật/Tắt chế độ kéo thả ghim hệ thống"
+              title="Mở bảng thiết lập & thêm ghim điều tra"
             >
-              <Move className="size-3.5" />
-              <span>{isEditMode ? "ĐANG CHỈNH VỊ TRÍ" : "CHẾ ĐỘ SETUP"}</span>
+              <Move className="size-4" />
             </button>
 
             {isEditMode && (
               <>
+                {/* Add Pin Button (Icon only) */}
+                <button
+                  onClick={() => {
+                    detectiveAudio.playTypewriterClick();
+                    setEditingCustomPin(null);
+                    setIsCreatePinModalOpen(true);
+                  }}
+                  className="p-1.5 rounded-lg border border-amber-500/50 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shadow-sm"
+                  title="Thêm ghi chú dính, giấy trắng A4 hoặc ảnh Polaroid"
+                >
+                  <Plus className="size-4" />
+                </button>
+
+                {/* Save Pin Layout Button (Icon only) */}
                 <button
                   disabled={isSavingLayout}
                   onClick={() => handleSavePinLayout(persistablePins)}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                  className={`p-1.5 rounded-lg border transition-all ${
                     hasUnsavedChanges
-                      ? "bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm animate-pulse"
-                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                      ? "bg-emerald-600/80 border-emerald-400 text-white hover:bg-emerald-500 shadow-sm animate-pulse"
+                      : "bg-black/40 border-white/10 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
                   }`}
-                  title="Lưu toàn bộ tọa độ ghim vào Supabase Database"
+                  title={
+                    isSavingLayout ? "Đang lưu vị trí..." : "Lưu vị trí ghim"
+                  }
                 >
-                  <Save className="size-3.5" />
-                  <span>{isSavingLayout ? "Đang lưu..." : "LƯU VỊ TRÍ"}</span>
+                  <Save className="size-4" />
                 </button>
 
+                {/* Undo Unsaved Changes Button (Icon only) */}
                 {hasUnsavedChanges && (
                   <button
                     onClick={() => {
@@ -1152,10 +1408,10 @@ export function MainInvestigationCanvas({
                       setCustomPinPositions({});
                       setHasUnsavedChanges(false);
                     }}
-                    className="flex items-center gap-1 px-2 py-1 rounded text-xs text-zinc-400 hover:text-red-400 hover:bg-red-950/40 transition-colors"
-                    title="Hoàn tác các vị trí chưa lưu"
+                    className="p-1.5 rounded-lg border border-red-500/30 bg-red-950/40 text-red-400 hover:bg-red-900/60 hover:text-red-200 transition-colors"
+                    title="Hoàn tác (hủy các vị trí vừa kéo thả chưa lưu)"
                   >
-                    <X className="size-3.5" />
+                    <RotateCcw className="size-4" />
                   </button>
                 )}
               </>
@@ -1324,6 +1580,28 @@ export function MainInvestigationCanvas({
       <EpilogueModal
         isOpen={isFinalEpilogueOpen}
         onClose={() => setIsFinalEpilogueOpen(false)}
+      />
+
+      {/* Admin Custom Pin / Note / Dossier / Photo Creation Modal */}
+      <AdminCreatePinModal
+        isOpen={isCreatePinModalOpen}
+        onClose={() => {
+          setIsCreatePinModalOpen(false);
+          setEditingCustomPin(null);
+        }}
+        onSavePin={handleSaveAdminPin}
+        onDeletePin={handleDeleteAdminPin}
+        initialPin={editingCustomPin}
+      />
+
+      {/* Interactive Custom Pin Solving / Info Modal */}
+      <CustomPinModal
+        isOpen={activeCustomPinModal !== null}
+        onClose={() => setActiveCustomPinModal(null)}
+        pin={activeCustomPinModal}
+        onSolve={(pinId) => {
+          toast.success("Đã hoàn thành câu hỏi ghim!");
+        }}
       />
 
       {/* Zoomed Photo Lightbox Modal with Morph Effect */}

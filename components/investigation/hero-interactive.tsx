@@ -79,8 +79,22 @@ export interface PinPoint {
     | "dark";
   pulseBorder?: boolean;
   photoUrl?: string;
+  noteTextureUrl?: string;
   isLocked?: boolean;
   isSolved?: boolean;
+
+  // Interactive Question / Checkpoint metadata
+  actionType?: "info" | "sheet_checkpoint" | "custom_question";
+  checkpointId?: string;
+  questionType?: "text_match_3" | "evidence_picker" | "mcq" | "accusation";
+  question?: string;
+  answers?: string;
+  hints?: string;
+  unlockedEvidenceId?: string;
+
+  // Visual transform overrides
+  rotation?: number; // degrees (-45 to 45)
+  scale?: number; // multiplier (0.5 to 2.0)
 }
 
 export interface CaseConnection {
@@ -494,6 +508,18 @@ function isPinHit(
     return true;
   }
 
+  const rawPin = pin as any;
+  const userScale =
+    typeof rawPin.scale === "number" && rawPin.scale > 0 ? rawPin.scale : 1.0;
+  const userRot = typeof rawPin.rotation === "number" ? rawPin.rotation : 0;
+
+  // Un-rotate and un-scale worldPointer around pinPosition into pin local space
+  const dx = worldPointer.x - pinPosition.x;
+  const dy = worldPointer.y - pinPosition.y;
+  const rad = (-userRot * Math.PI) / 180;
+  const localX = (dx * Math.cos(rad) - dy * Math.sin(rad)) / userScale;
+  const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / userScale;
+
   const isFollowup =
     pin.id.startsWith("c0-pin-followup") ||
     pin.id.startsWith("c0-pin-question") ||
@@ -524,16 +550,16 @@ function isPinHit(
       : (cardWidth * 380) / 300;
     const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
 
-    const cardLeft = pinPosition.x - cardWidth / 2;
-    const cardRight = pinPosition.x + cardWidth / 2;
-    const cardTop = pinPosition.y + tagY - 6 / transform.scale;
-    const cardBottom = pinPosition.y + tagY + cardHeight + 4 / transform.scale;
+    const cardLeft = -cardWidth / 2;
+    const cardRight = cardWidth / 2;
+    const cardTop = tagY - 6 / transform.scale;
+    const cardBottom = tagY + cardHeight + 4 / transform.scale;
 
     return (
-      worldPointer.x >= cardLeft &&
-      worldPointer.x <= cardRight &&
-      worldPointer.y >= cardTop &&
-      worldPointer.y <= cardBottom
+      localX >= cardLeft &&
+      localX <= cardRight &&
+      localY >= cardTop &&
+      localY <= cardBottom
     );
   }
 
@@ -550,19 +576,17 @@ function isPinHit(
   // Hit area for white note (~108x124) vs sticky note (~84x90) vs followup note (~90x100) with generous touch padding
   const cardHalfWidth =
     (isFollowup ? 70 : isWhiteNote ? 65 : 55) / transform.scale;
-  const cardTop =
-    pinPosition.y - (isFollowup ? 30 : isWhiteNote ? 30 : 25) / transform.scale;
+  const cardTop = -(isFollowup ? 30 : isWhiteNote ? 30 : 25) / transform.scale;
   const cardBottom =
-    pinPosition.y +
     (isFollowup ? 130 : isWhiteNote ? 130 : 100) / transform.scale;
-  const cardLeft = pinPosition.x - cardHalfWidth;
-  const cardRight = pinPosition.x + cardHalfWidth;
+  const cardLeft = -cardHalfWidth;
+  const cardRight = cardHalfWidth;
 
   return (
-    worldPointer.x >= cardLeft &&
-    worldPointer.x <= cardRight &&
-    worldPointer.y >= cardTop &&
-    worldPointer.y <= cardBottom
+    localX >= cardLeft &&
+    localX <= cardRight &&
+    localY >= cardTop &&
+    localY <= cardBottom
   );
 }
 
@@ -1149,7 +1173,8 @@ export function HeroInteractive({
       const isDrag = hasDraggedRef.current;
       hasDraggedRef.current = false;
 
-      if (wasDraggingPin) {
+      // Ghim bị kéo thật sự thì coi như thao tác di chuyển, không mở hộp thoại
+      if (wasDraggingPin && isDrag) {
         try {
           event.preventDefault();
           event.stopPropagation();
@@ -1541,26 +1566,44 @@ export function HeroInteractive({
           };
         }
 
-        // Calculate a subtle organic size variation for each item
+        // Calculate a subtle organic size variation for each item + user custom scale
         const charSum = pin.id
           .split("")
           .reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 3), 0);
         const sizeVariant = ((charSum % 7) - 3) * 0.024;
-        const scaleMod = 1.0 + sizeVariant;
+        const rawPin = pin as any;
+        const userScale =
+          typeof rawPin.scale === "number" && rawPin.scale > 0
+            ? rawPin.scale
+            : 1.0;
+        const scaleMod = (1.0 + sizeVariant) * userScale;
 
-        const isSuspectPin =
-          pin.id.startsWith("node-suspect-") ||
-          pin.id.startsWith("suspect-") ||
-          !!(pin as any).photoUrl ||
-          pin.id.includes("thi-the") ||
-          pin.id.includes("crime-scene");
+        const isCustomPin =
+          pin.id.startsWith("admin-pin-") ||
+          rawPin.noteTextureUrl !== undefined ||
+          rawPin.noteColor !== undefined ||
+          rawPin.photoUrl !== undefined;
+
+        const isSuspectPin = isCustomPin
+          ? !!rawPin.photoUrl
+          : pin.id.startsWith("node-suspect-") ||
+            pin.id.startsWith("suspect-") ||
+            !!rawPin.photoUrl ||
+            pin.id.includes("thi-the") ||
+            pin.id.includes("crime-scene");
 
         context.save();
         context.translate(pinPosition.x, pinPosition.y);
 
+        // Apply custom rotation angle if specified
+        if (typeof rawPin.rotation === "number") {
+          context.rotate((rawPin.rotation * Math.PI) / 180);
+        }
+
         if (isSuspectPin) {
           // ── REALISTIC PINNED SUSPECT PHOTO CARD ASSET (WITH BEIGE TAPE & NAME) ──
-          const suspectPhotoUrl = resolveSuspectPhotoUrl(pin);
+          const suspectPhotoUrl =
+            rawPin.photoUrl || resolveSuspectPhotoUrl(pin);
           const loadedSuspectImg = suspectPhotoUrl
             ? getLoadedImage(suspectPhotoUrl)
             : null;
@@ -1623,7 +1666,60 @@ export function HeroInteractive({
           let noteUrl = "";
           let isPreRendered = false;
 
-          if (pin.id === "c0-pin-evidence" || upperLabel.includes("CHỨNG CỨ")) {
+          const customTextureUrl = (pin as any).noteTextureUrl as
+            string | undefined;
+
+          if (isCustomPin) {
+            if (customTextureUrl) {
+              noteUrl = customTextureUrl;
+              isPreRendered = customTextureUrl.includes("rendered_notes/");
+            } else if (isWhiteNote) {
+              const whiteVariants = [
+                "/images/cases/case_000/clue_notes/clean_note_white_1.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_2.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_3.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_4.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_5.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_6.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_7.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_8.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_9.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_10.png",
+                "/images/cases/case_000/clue_notes/clean_note_white_11.png",
+              ];
+              const hash = (pin.id || "")
+                .split("")
+                .reduce((acc, c) => acc + c.charCodeAt(0), 0);
+              noteUrl = whiteVariants[Math.abs(hash) % whiteVariants.length];
+              isPreRendered = false;
+            } else {
+              const yellowVariants = [
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_1.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_2.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_3.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_4.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_5.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_6.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_7.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_8.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_9.png",
+                "/images/cases/case_000/clue_notes/clean_sticky_yellow_10.png",
+              ];
+              const hash = (pin.id || "")
+                .split("")
+                .reduce((acc, c) => acc + c.charCodeAt(0), 0);
+              noteUrl = yellowVariants[Math.abs(hash) % yellowVariants.length];
+              isPreRendered = false;
+            }
+          } else if (customTextureUrl) {
+            // Admin-made pin reuses the exact same temple/paper assets as the
+            // built-in board notes so it looks identical to a fixed pin.
+            noteUrl = customTextureUrl;
+            isPreRendered = customTextureUrl.includes("rendered_notes/");
+          } else if (
+            pin.id === "c0-pin-evidence" ||
+            upperLabel.includes("CHỨNG CỨ")
+          ) {
             noteUrl =
               "/images/cases/case_000/clue_notes/rendered_notes/note_bo_sung_chung_cu.png";
             isPreRendered = true;
@@ -2320,7 +2416,8 @@ export function HeroInteractive({
         onPointerLeave={handlePointerLeave}
         className={cn(
           "relative flex-1 min-h-0 w-full overflow-hidden",
-          "cursor-default select-none touch-none",
+          "select-none touch-none",
+          isEditMode ? "cursor-grab active:cursor-grabbing" : "cursor-default",
           "focus-visible:outline-none",
           "focus-visible:ring-2 focus-visible:ring-primary/70",
           "focus-visible:ring-offset-2 focus-visible:ring-offset-background",

@@ -57,11 +57,15 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: true, tab, data: [] });
     }
 
-    const headers = rows[0];
+    const headers = rows[0].map((h: string) =>
+      typeof h === "string" ? h.replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim() : h,
+    );
     const rawData = rows.slice(1).map((row) => {
       const obj: Record<string, any> = {};
       headers.forEach((header, index) => {
-        obj[header] = row[index] !== undefined ? row[index] : "";
+        if (header) {
+          obj[header] = row[index] !== undefined ? row[index] : "";
+        }
       });
       return obj;
     });
