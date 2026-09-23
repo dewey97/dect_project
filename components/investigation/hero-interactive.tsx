@@ -11,6 +11,7 @@ import {
 } from "react";
 import { cn } from "@/lib/utils";
 import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
+import { detectiveAudio } from "@/lib/investigation-audio";
 
 // ────────────────────────────────────────
 // Types
@@ -51,9 +52,31 @@ export interface PinPoint {
   y: number;
   label: string;
   detail: string;
-  color?: "red" | "yellow" | "blue" | "green" | "black" | "purple" | "orange" | "cyan" | "brass" | "silver" | "dark";
+  color?:
+    | "red"
+    | "yellow"
+    | "blue"
+    | "green"
+    | "black"
+    | "purple"
+    | "orange"
+    | "cyan"
+    | "brass"
+    | "silver"
+    | "dark";
   noteColor?: "yellow" | "black" | "white" | "red" | "blue";
-  pinColor?: "red" | "yellow" | "blue" | "green" | "black" | "purple" | "orange" | "cyan" | "brass" | "silver" | "dark";
+  pinColor?:
+    | "red"
+    | "yellow"
+    | "blue"
+    | "green"
+    | "black"
+    | "purple"
+    | "orange"
+    | "cyan"
+    | "brass"
+    | "silver"
+    | "dark";
   pulseBorder?: boolean;
   photoUrl?: string;
   isLocked?: boolean;
@@ -101,7 +124,8 @@ const CASES_LIST: CaseData[] = [
   {
     id: "case-000",
     title: "TRỐN TÌM (1996)",
-    description: "Chuyên án 000 — Bi kịch trốn tìm 20 năm trước tại xóm Bờ Sông",
+    description:
+      "Chuyên án 000 — Bi kịch trốn tìm 20 năm trước tại xóm Bờ Sông",
     status: "active",
     bgImage: "/images/corkboard_vertical_empty.jpg",
     pins: [
@@ -148,7 +172,7 @@ const CASES_LIST: CaseData[] = [
       {
         id: "c0-pin-indictment",
         x: 0.22,
-        y: 0.80,
+        y: 0.8,
         label: "BẢN KẾT LUẬN ĐIỀU TRA",
         detail: "Bản kết luận điều tra và buộc tội thủ phạm vụ án",
         noteColor: "white",
@@ -156,8 +180,16 @@ const CASES_LIST: CaseData[] = [
       },
     ],
     connections: [
-      { id: "c0-conn-1", fromPinId: "c0-pin-evidence", toPinId: "c0-pin-phone" },
-      { id: "c0-conn-2", fromPinId: "c0-pin-evidence", toPinId: "c0-pin-reinvestigate" },
+      {
+        id: "c0-conn-1",
+        fromPinId: "c0-pin-evidence",
+        toPinId: "c0-pin-phone",
+      },
+      {
+        id: "c0-conn-2",
+        fromPinId: "c0-pin-evidence",
+        toPinId: "c0-pin-reinvestigate",
+      },
     ],
   },
   {
@@ -379,7 +411,7 @@ function wrapText(
   context: CanvasRenderingContext2D,
   text: string,
   maxWidth: number,
-  maxLines: number = 3
+  maxLines: number = 3,
 ): string[] {
   const words = text.trim().split(/\s+/);
   if (words.length <= 1) return [text];
@@ -394,7 +426,10 @@ function wrapText(
     const splitIndex = Math.ceil(words.length / 2);
     const line1 = words.slice(0, splitIndex).join(" ");
     const line2 = words.slice(splitIndex).join(" ");
-    if (context.measureText(line1).width <= maxWidth && context.measureText(line2).width <= maxWidth) {
+    if (
+      context.measureText(line1).width <= maxWidth &&
+      context.measureText(line2).width <= maxWidth
+    ) {
       return [line1, line2];
     }
   }
@@ -424,12 +459,19 @@ function wrapText(
   }
 
   // Avoid orphan last word if 2 lines
-  if (lines.length === 2 && lines[1].split(/\s+/).length === 1 && lines[0].split(/\s+/).length > 2) {
+  if (
+    lines.length === 2 &&
+    lines[1].split(/\s+/).length === 1 &&
+    lines[0].split(/\s+/).length > 2
+  ) {
     const allWords = text.trim().split(/\s+/);
     const mid = Math.ceil(allWords.length / 2);
     const l1 = allWords.slice(0, mid).join(" ");
     const l2 = allWords.slice(mid).join(" ");
-    if (context.measureText(l1).width <= maxWidth && context.measureText(l2).width <= maxWidth) {
+    if (
+      context.measureText(l1).width <= maxWidth &&
+      context.measureText(l2).width <= maxWidth
+    ) {
       return [l1, l2];
     }
   }
@@ -445,21 +487,42 @@ function isPinHit(
 ): boolean {
   // Hit radius for pinhead (40px radius touch target)
   const headHitRadius = 40 / transform.scale;
-  if (distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y) <= headHitRadius) {
+  if (
+    distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y) <=
+    headHitRadius
+  ) {
     return true;
   }
 
-  const isFollowup = pin.id.startsWith('c0-pin-followup') || pin.id.startsWith('c0-pin-question') || pin.id.startsWith('followup-');
-  const isKhang = !isFollowup && (pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang')));
-  const isCrimeScene = !isFollowup && (pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể')));
-  const isSuspectPin = !isFollowup && (pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-") || !!(pin as any).photoUrl || isKhang || isCrimeScene);
+  const isFollowup =
+    pin.id.startsWith("c0-pin-followup") ||
+    pin.id.startsWith("c0-pin-question") ||
+    pin.id.startsWith("followup-");
+  const isKhang =
+    !isFollowup &&
+    (pin.id.includes("khang") ||
+      (pin.label && pin.label.toLowerCase().includes("khang")));
+  const isCrimeScene =
+    !isFollowup &&
+    (pin.id.includes("crime-scene") ||
+      pin.id.includes("thi-the") ||
+      (pin.label && pin.label.toLowerCase().includes("thi thể")));
+  const isSuspectPin =
+    !isFollowup &&
+    (pin.id.startsWith("node-suspect-") ||
+      pin.id.startsWith("suspect-") ||
+      !!(pin as any).photoUrl ||
+      isKhang ||
+      isCrimeScene);
 
   if (isSuspectPin) {
     // Exact dimensions matching drawing in renderScene:
     const baseCardWidth = isKhang ? 150 : isCrimeScene ? 140 : 110;
     const cardWidth = (baseCardWidth + 24) / transform.scale;
-    const cardHeight = isCrimeScene ? (cardWidth * 420) / 560 : (cardWidth * 380) / 300;
-    const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.10;
+    const cardHeight = isCrimeScene
+      ? (cardWidth * 420) / 560
+      : (cardWidth * 380) / 300;
+    const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
 
     const cardLeft = pinPosition.x - cardWidth / 2;
     const cardRight = pinPosition.x + cardWidth / 2;
@@ -474,19 +537,24 @@ function isPinHit(
     );
   }
 
-  const upperLabel = (pin.label || '').toUpperCase();
-  const isWhiteNote = (pin as any).noteColor === 'white' || 
-    upperLabel.includes('MỞ RỘNG') || 
-    upperLabel.includes('KHÁM XÉT') || 
-    upperLabel.includes('KHÁM NGHIỆM') || 
-    upperLabel.includes('KẾT LUẬN') ||
-    upperLabel.includes('BIÊN BẢN') ||
-    upperLabel.includes('TRUY TỐ');
+  const upperLabel = (pin.label || "").toUpperCase();
+  const isWhiteNote =
+    (pin as any).noteColor === "white" ||
+    upperLabel.includes("MỞ RỘNG") ||
+    upperLabel.includes("KHÁM XÉT") ||
+    upperLabel.includes("KHÁM NGHIỆM") ||
+    upperLabel.includes("KẾT LUẬN") ||
+    upperLabel.includes("BIÊN BẢN") ||
+    upperLabel.includes("TRUY TỐ");
 
   // Hit area for white note (~108x124) vs sticky note (~84x90) vs followup note (~90x100) with generous touch padding
-  const cardHalfWidth = (isFollowup ? 70 : isWhiteNote ? 65 : 55) / transform.scale;
-  const cardTop = pinPosition.y - (isFollowup ? 30 : isWhiteNote ? 30 : 25) / transform.scale;
-  const cardBottom = pinPosition.y + (isFollowup ? 130 : isWhiteNote ? 130 : 100) / transform.scale;
+  const cardHalfWidth =
+    (isFollowup ? 70 : isWhiteNote ? 65 : 55) / transform.scale;
+  const cardTop =
+    pinPosition.y - (isFollowup ? 30 : isWhiteNote ? 30 : 25) / transform.scale;
+  const cardBottom =
+    pinPosition.y +
+    (isFollowup ? 130 : isWhiteNote ? 130 : 100) / transform.scale;
   const cardLeft = pinPosition.x - cardHalfWidth;
   const cardRight = pinPosition.x + cardHalfWidth;
 
@@ -577,7 +645,13 @@ export interface HeroInteractiveProps {
   customPins?: PinPoint[];
   customConnections?: CaseConnection[];
   customBgImage?: string;
-  onPinClick?: (pinId: string, pin?: PinPoint, coords?: { clientX: number; clientY: number }) => void;
+  onPinClick?: (
+    pinId: string,
+    pin?: PinPoint,
+    coords?: { clientX: number; clientY: number },
+  ) => void;
+  isEditMode?: boolean;
+  onPinPositionChange?: (pinId: string, newX: number, newY: number) => void;
 }
 
 export function HeroInteractive({
@@ -587,15 +661,25 @@ export function HeroInteractive({
   customConnections,
   customBgImage,
   onPinClick,
+  isEditMode = false,
+  onPinPositionChange,
 }: HeroInteractiveProps) {
   const customPinsRef = useRef<PinPoint[] | undefined>(customPins);
-  const customConnectionsRef = useRef<CaseConnection[] | undefined>(customConnections);
+  const customConnectionsRef = useRef<CaseConnection[] | undefined>(
+    customConnections,
+  );
   const onPinClickRef = useRef(onPinClick);
+  const isEditModeRef = useRef(isEditMode);
+  const onPinPositionChangeRef = useRef(onPinPositionChange);
+
+  const draggingPinIdRef = useRef<string | null>(null);
 
   // Synchronously update refs on every render to eliminate any stale closures
   customPinsRef.current = customPins;
   customConnectionsRef.current = customConnections;
   onPinClickRef.current = onPinClick;
+  isEditModeRef.current = isEditMode;
+  onPinPositionChangeRef.current = onPinPositionChange;
 
   useEffect(() => {
     if (requestRenderRef.current) requestRenderRef.current();
@@ -611,25 +695,36 @@ export function HeroInteractive({
 
   const suspectImageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
 
-  const resolveSuspectPhotoUrl = (pin: { id: string; label: string; photoUrl?: string }): string | undefined => {
+  const resolveSuspectPhotoUrl = (pin: {
+    id: string;
+    label: string;
+    photoUrl?: string;
+  }): string | undefined => {
     if (pin.photoUrl) return pin.photoUrl;
     if (
-      pin.id.startsWith('c0-pin-followup') ||
-      pin.id.startsWith('c0-pin-question') ||
-      pin.id.startsWith('c0-pin-clue') ||
-      pin.id.startsWith('c0-pin-evidence') ||
-      pin.id.startsWith('c0-pin-phone') ||
-      pin.id.startsWith('c0-pin-reinvestigate') ||
-      pin.id.startsWith('c0-pin-indictment') ||
-      pin.id === 'c0-pin-suspects'
+      pin.id.startsWith("c0-pin-followup") ||
+      pin.id.startsWith("c0-pin-question") ||
+      pin.id.startsWith("c0-pin-clue") ||
+      pin.id.startsWith("c0-pin-evidence") ||
+      pin.id.startsWith("c0-pin-phone") ||
+      pin.id.startsWith("c0-pin-reinvestigate") ||
+      pin.id.startsWith("c0-pin-indictment") ||
+      pin.id === "c0-pin-suspects"
     ) {
       return undefined;
     }
     const lower = `${pin.id} ${pin.label}`.toLowerCase();
-    if (lower.includes('thi-the') || lower.includes('thi the') || lower.includes('hiện trường') || lower.includes('crime-scene') || lower.includes('crime_scene')) {
-      return '/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png';
+    if (
+      lower.includes("thi-the") ||
+      lower.includes("thi the") ||
+      lower.includes("hiện trường") ||
+      lower.includes("crime-scene") ||
+      lower.includes("crime_scene")
+    ) {
+      return "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png";
     }
-    const char = findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
+    const char =
+      findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
     if (char && char.avatarUrl) return char.avatarUrl;
     return undefined;
   };
@@ -847,6 +942,8 @@ export function HeroInteractive({
   // Pointer events
   // ────────────────────────────────────────
 
+  const dragOffsetRef = useRef<Point>({ x: 0, y: 0 });
+
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       // Avoid interactions bubble triggered from UI elements
@@ -883,6 +980,39 @@ export function HeroInteractive({
         event.currentTarget.setPointerCapture(event.pointerId);
       } catch {}
 
+      const bounds = getInnerBoardBounds(
+        rect.width,
+        rect.height,
+        boardFrameRef.current,
+      );
+
+      const transform = getViewTransform(zoomRef.current, panRef.current);
+      const worldPointer = screenToWorld({ x, y }, transform);
+
+      // Check if clicking on a system pin in edit mode
+      if (isEditModeRef.current) {
+        const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
+        for (let index = 0; index < caseSysPins.length; index += 1) {
+          const pin = caseSysPins[index];
+          const pinPosition = getPinWorldPosition(pin, bounds);
+
+          if (isPinHit(worldPointer, pinPosition, pin, transform)) {
+            draggingPinIdRef.current = pin.id;
+            dragOffsetRef.current = {
+              x: worldPointer.x - pinPosition.x,
+              y: worldPointer.y - pinPosition.y,
+            };
+            detectiveAudio.playPaperRustle();
+            requestRenderRef.current();
+            try {
+              event.preventDefault();
+              event.stopPropagation();
+            } catch {}
+            return;
+          }
+        }
+      }
+
       updateHoveredPin(x, y);
     },
     [updateHoveredPin],
@@ -905,9 +1035,52 @@ export function HeroInteractive({
         active: true,
       };
 
-      const isActivePointer = activePointerIdRef.current === event.pointerId || activePointerIdRef.current === null;
+      const isActivePointer =
+        activePointerIdRef.current === event.pointerId ||
+        activePointerIdRef.current === null;
 
       if (
+        isPointerDownRef.current &&
+        isActivePointer &&
+        draggingPinIdRef.current &&
+        isEditModeRef.current &&
+        onPinPositionChangeRef.current
+      ) {
+        hasDraggedRef.current = true;
+        const bounds = getInnerBoardBounds(
+          rect.width,
+          rect.height,
+          boardFrameRef.current,
+        );
+        const transform = getViewTransform(zoomRef.current, panRef.current);
+        const worldPointer = screenToWorld({ x, y }, transform);
+
+        const targetWorldX = worldPointer.x - dragOffsetRef.current.x;
+        const targetWorldY = worldPointer.y - dragOffsetRef.current.y;
+
+        const normalizedX = clamp(
+          (targetWorldX - bounds.x) / bounds.width,
+          0,
+          1,
+        );
+        const normalizedY = clamp(
+          (targetWorldY - bounds.y) / bounds.height,
+          0,
+          1,
+        );
+
+        onPinPositionChangeRef.current(
+          draggingPinIdRef.current,
+          normalizedX,
+          normalizedY,
+        );
+        requestRenderRef.current();
+        try {
+          event.preventDefault();
+          event.stopPropagation();
+        } catch {}
+        return;
+      } else if (
         isPointerDownRef.current &&
         isActivePointer &&
         zoomRef.current.active
@@ -944,6 +1117,7 @@ export function HeroInteractive({
       if (target.closest("[data-board-ui]")) {
         isPointerDownRef.current = false;
         activePointerIdRef.current = null;
+        draggingPinIdRef.current = null;
         return;
       }
 
@@ -952,6 +1126,7 @@ export function HeroInteractive({
       if (!rect) {
         isPointerDownRef.current = false;
         activePointerIdRef.current = null;
+        draggingPinIdRef.current = null;
         return;
       }
 
@@ -967,9 +1142,20 @@ export function HeroInteractive({
         }
       } catch {}
 
+      const wasDraggingPin = draggingPinIdRef.current !== null;
+      draggingPinIdRef.current = null;
+
       // Check if user actually dragged/panned
       const isDrag = hasDraggedRef.current;
       hasDraggedRef.current = false;
+
+      if (wasDraggingPin) {
+        try {
+          event.preventDefault();
+          event.stopPropagation();
+        } catch {}
+        return;
+      }
 
       if (allowInteraction && !isDrag) {
         const bounds = getInnerBoardBounds(
@@ -991,7 +1177,12 @@ export function HeroInteractive({
           const pinPosition = getPinWorldPosition(pin, bounds);
 
           if (isPinHit(worldPointer, pinPosition, pin, transform)) {
-            const dist = distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y);
+            const dist = distance(
+              worldPointer.x,
+              worldPointer.y,
+              pinPosition.x,
+              pinPosition.y,
+            );
             if (dist < minDistance) {
               minDistance = dist;
               bestHitPin = pin;
@@ -1004,7 +1195,10 @@ export function HeroInteractive({
             event.preventDefault();
             event.stopPropagation();
           } catch {}
-          onPinClickRef.current(bestHitPin.id, bestHitPin, { clientX: event.clientX, clientY: event.clientY });
+          onPinClickRef.current(bestHitPin.id, bestHitPin, {
+            clientX: event.clientX,
+            clientY: event.clientY,
+          });
         }
       } else {
         updateHoveredPin(x, y);
@@ -1063,7 +1257,13 @@ export function HeroInteractive({
       hoveredPinRef.current = null;
       setTooltip(null);
     }
-  }, [controlledCaseId, internalCaseId, updateUserPins, updateUserConnections, updateConnectionStartId]);
+  }, [
+    controlledCaseId,
+    internalCaseId,
+    updateUserPins,
+    updateUserConnections,
+    updateConnectionStartId,
+  ]);
 
   // ────────────────────────────────────────
   // Animation & Setup
@@ -1319,8 +1519,7 @@ export function HeroInteractive({
 
         // Note styling: defaults to 3M Canary yellow paper styling, or dark charcoal if black
         const noteThemeType =
-          pin.noteColor ||
-          (pin.color === "black" ? "black" : "yellow");
+          pin.noteColor || (pin.color === "black" ? "black" : "yellow");
 
         let paperTheme = {
           paperBgTop: "#fae67a",
@@ -1343,11 +1542,18 @@ export function HeroInteractive({
         }
 
         // Calculate a subtle organic size variation for each item
-        const charSum = pin.id.split("").reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 3), 0);
+        const charSum = pin.id
+          .split("")
+          .reduce((acc, c, idx) => acc + c.charCodeAt(0) * (idx + 3), 0);
         const sizeVariant = ((charSum % 7) - 3) * 0.024;
         const scaleMod = 1.0 + sizeVariant;
 
-        const isSuspectPin = pin.id.startsWith("node-suspect-") || pin.id.startsWith("suspect-") || !!(pin as any).photoUrl || pin.id.includes("thi-the") || pin.id.includes("crime-scene");
+        const isSuspectPin =
+          pin.id.startsWith("node-suspect-") ||
+          pin.id.startsWith("suspect-") ||
+          !!(pin as any).photoUrl ||
+          pin.id.includes("thi-the") ||
+          pin.id.includes("crime-scene");
 
         context.save();
         context.translate(pinPosition.x, pinPosition.y);
@@ -1355,26 +1561,46 @@ export function HeroInteractive({
         if (isSuspectPin) {
           // ── REALISTIC PINNED SUSPECT PHOTO CARD ASSET (WITH BEIGE TAPE & NAME) ──
           const suspectPhotoUrl = resolveSuspectPhotoUrl(pin);
-          const loadedSuspectImg = suspectPhotoUrl ? getLoadedImage(suspectPhotoUrl) : null;
+          const loadedSuspectImg = suspectPhotoUrl
+            ? getLoadedImage(suspectPhotoUrl)
+            : null;
 
           if (loadedSuspectImg) {
-            const imgW = loadedSuspectImg.naturalWidth || loadedSuspectImg.width || 300;
-            const imgH = loadedSuspectImg.naturalHeight || loadedSuspectImg.height || 380;
-            const isKhang = pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang'));
-            const isCrimeScene = pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể'));
+            const imgW =
+              loadedSuspectImg.naturalWidth || loadedSuspectImg.width || 300;
+            const imgH =
+              loadedSuspectImg.naturalHeight || loadedSuspectImg.height || 380;
+            const isKhang =
+              pin.id.includes("khang") ||
+              (pin.label && pin.label.toLowerCase().includes("khang"));
+            const isCrimeScene =
+              pin.id.includes("crime-scene") ||
+              pin.id.includes("thi-the") ||
+              (pin.label && pin.label.toLowerCase().includes("thi thể"));
             const baseCardWidth = isKhang ? 146 : isCrimeScene ? 134 : 108;
             const cardWidth = (baseCardWidth * scaleMod) / transform.scale;
             const cardHeight = (cardWidth * imgH) / imgW;
 
             const tagX = -cardWidth / 2;
-            const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.10;
+            const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
 
             // Render complete pre-rendered photo card (includes photo, beige tape + name, yellow pin, drop shadow)
-            context.drawImage(loadedSuspectImg, tagX, tagY, cardWidth, cardHeight);
+            context.drawImage(
+              loadedSuspectImg,
+              tagX,
+              tagY,
+              cardWidth,
+              cardHeight,
+            );
           } else {
             // Lightweight fallback while image is loading
-            const isKhang = pin.id.includes('khang') || (pin.label && pin.label.toLowerCase().includes('khang'));
-            const isCrimeScene = pin.id.includes('crime-scene') || pin.id.includes('thi-the') || (pin.label && pin.label.toLowerCase().includes('thi thể'));
+            const isKhang =
+              pin.id.includes("khang") ||
+              (pin.label && pin.label.toLowerCase().includes("khang"));
+            const isCrimeScene =
+              pin.id.includes("crime-scene") ||
+              pin.id.includes("thi-the") ||
+              (pin.label && pin.label.toLowerCase().includes("thi thể"));
             const baseCardWidth = isKhang ? 126 : isCrimeScene ? 114 : 92;
             const baseCardHeight = isKhang ? 162 : isCrimeScene ? 144 : 118;
             const cardWidth = (baseCardWidth * scaleMod) / transform.scale;
@@ -1384,120 +1610,166 @@ export function HeroInteractive({
           }
         } else {
           // ── DISTINGUISH WHITE PINNED NOTES vs YELLOW STICKY NOTES ──
-          const upperLabel = (pin.label || '').toUpperCase();
-          const isWhiteNote = (pin as any).noteColor === 'white' || 
-            upperLabel.includes('MỞ RỘNG') || 
-            upperLabel.includes('KHÁM XÉT') || 
-            upperLabel.includes('KHÁM NGHIỆM') || 
-            upperLabel.includes('KẾT LUẬN') ||
-            upperLabel.includes('BIÊN BẢN') ||
-            upperLabel.includes('TRUY TỐ');
+          const upperLabel = (pin.label || "").toUpperCase();
+          const isWhiteNote =
+            (pin as any).noteColor === "white" ||
+            upperLabel.includes("MỞ RỘNG") ||
+            upperLabel.includes("KHÁM XÉT") ||
+            upperLabel.includes("KHÁM NGHIỆM") ||
+            upperLabel.includes("KẾT LUẬN") ||
+            upperLabel.includes("BIÊN BẢN") ||
+            upperLabel.includes("TRUY TỐ");
 
-          let noteUrl = '';
+          let noteUrl = "";
           let isPreRendered = false;
 
-          if (pin.id === 'c0-pin-evidence' || upperLabel.includes('CHỨNG CỨ')) {
-            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_bo_sung_chung_cu.png';
-            isPreRendered = true;
-          } else if (pin.id === 'c0-pin-suspects' || upperLabel.includes('NGHI PHẠM')) {
-            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_nghi_pham.png';
+          if (pin.id === "c0-pin-evidence" || upperLabel.includes("CHỨNG CỨ")) {
+            noteUrl =
+              "/images/cases/case_000/clue_notes/rendered_notes/note_bo_sung_chung_cu.png";
             isPreRendered = true;
           } else if (
-            pin.id === 'c0-pin-followup-vu' ||
-            pin.id === 'c0-pin-followup-tung' ||
-            pin.id === 'c0-pin-followup-ha' ||
-            pin.id === 'c0-pin-question' ||
-            pin.id.startsWith('c0-pin-followup') ||
-            upperLabel.includes('NGHI VẤN') ||
-            upperLabel.includes('CÂU HỎI')
+            pin.id === "c0-pin-suspects" ||
+            upperLabel.includes("NGHI PHẠM")
           ) {
-            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_nghi_van.png';
+            noteUrl =
+              "/images/cases/case_000/clue_notes/rendered_notes/note_nghi_pham.png";
             isPreRendered = true;
-          } else if (pin.id === 'c0-pin-phone' || upperLabel.includes('MỞ RỘNG')) {
-            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_mo_rong_dieu_tra.png';
+          } else if (
+            pin.id === "c0-pin-followup-vu" ||
+            pin.id === "c0-pin-followup-tung" ||
+            pin.id === "c0-pin-followup-ha" ||
+            pin.id === "c0-pin-question" ||
+            pin.id.startsWith("c0-pin-followup") ||
+            upperLabel.includes("NGHI VẤN") ||
+            upperLabel.includes("CÂU HỎI")
+          ) {
+            noteUrl =
+              "/images/cases/case_000/clue_notes/rendered_notes/note_nghi_van.png";
             isPreRendered = true;
-          } else if (pin.id === 'c0-pin-reinvestigate' || upperLabel.includes('KHÁM XÉT') || upperLabel.includes('KHÁM NGHIỆM')) {
-            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_kham_xet_lai.png';
+          } else if (
+            pin.id === "c0-pin-phone" ||
+            upperLabel.includes("MỞ RỘNG")
+          ) {
+            noteUrl =
+              "/images/cases/case_000/clue_notes/rendered_notes/note_mo_rong_dieu_tra.png";
             isPreRendered = true;
-          } else if (pin.id === 'c0-pin-indictment' || upperLabel.includes('KẾT LUẬN') || upperLabel.includes('TRUY TỐ')) {
-            noteUrl = '/images/cases/case_000/clue_notes/rendered_notes/note_ket_luan_dieu_tra.png';
+          } else if (
+            pin.id === "c0-pin-reinvestigate" ||
+            upperLabel.includes("KHÁM XÉT") ||
+            upperLabel.includes("KHÁM NGHIỆM")
+          ) {
+            noteUrl =
+              "/images/cases/case_000/clue_notes/rendered_notes/note_kham_xet_lai.png";
+            isPreRendered = true;
+          } else if (
+            pin.id === "c0-pin-indictment" ||
+            upperLabel.includes("KẾT LUẬN") ||
+            upperLabel.includes("TRUY TỐ")
+          ) {
+            noteUrl =
+              "/images/cases/case_000/clue_notes/rendered_notes/note_ket_luan_dieu_tra.png";
             isPreRendered = true;
           } else if (isWhiteNote) {
             const whiteVariants = [
-              '/images/cases/case_000/clue_notes/clean_note_white_1.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_2.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_3.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_4.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_5.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_6.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_7.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_8.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_9.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_10.png',
-              '/images/cases/case_000/clue_notes/clean_note_white_11.png',
+              "/images/cases/case_000/clue_notes/clean_note_white_1.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_2.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_3.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_4.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_5.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_6.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_7.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_8.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_9.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_10.png",
+              "/images/cases/case_000/clue_notes/clean_note_white_11.png",
             ];
-            const hash = (pin.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            const hash = (pin.id || "")
+              .split("")
+              .reduce((acc, c) => acc + c.charCodeAt(0), 0);
             noteUrl = whiteVariants[Math.abs(hash) % whiteVariants.length];
           } else {
             const yellowVariants = [
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_1.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_2.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_3.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_4.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_5.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_6.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_7.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_8.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_9.png',
-              '/images/cases/case_000/clue_notes/clean_sticky_yellow_10.png',
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_1.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_2.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_3.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_4.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_5.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_6.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_7.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_8.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_9.png",
+              "/images/cases/case_000/clue_notes/clean_sticky_yellow_10.png",
             ];
-            const hash = (pin.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            const hash = (pin.id || "")
+              .split("")
+              .reduce((acc, c) => acc + c.charCodeAt(0), 0);
             noteUrl = yellowVariants[Math.abs(hash) % yellowVariants.length];
           }
 
           const loadedNoteImg = getLoadedImage(noteUrl);
 
-          const isIndictment = pin.id === 'c0-pin-indictment' || upperLabel.includes('KẾT LUẬN');
+          const isIndictment =
+            pin.id === "c0-pin-indictment" || upperLabel.includes("KẾT LUẬN");
           const sizeMultiplier = 1.0; // Same size across all white notes
 
           // Note size: preserve aspect ratio cleanly without distortion
           const baseCardWidth = isWhiteNote ? 104 : 84;
-          const noteWidth = (baseCardWidth * scaleMod * sizeMultiplier) / transform.scale;
+          const noteWidth =
+            (baseCardWidth * scaleMod * sizeMultiplier) / transform.scale;
 
           let noteHeight = noteWidth;
-          if (loadedNoteImg && loadedNoteImg.naturalWidth && loadedNoteImg.naturalHeight) {
-            noteHeight = (noteWidth * loadedNoteImg.naturalHeight) / loadedNoteImg.naturalWidth;
+          if (
+            loadedNoteImg &&
+            loadedNoteImg.naturalWidth &&
+            loadedNoteImg.naturalHeight
+          ) {
+            noteHeight =
+              (noteWidth * loadedNoteImg.naturalHeight) /
+              loadedNoteImg.naturalWidth;
           } else {
             noteHeight = noteWidth * (isWhiteNote ? 1.18 : 1.0);
           }
 
-          let pinAnchorX = 0.50;
+          let pinAnchorX = 0.5;
           let pinAnchorY = 0.08;
 
-          if (pin.id === 'c0-pin-evidence' || upperLabel.includes('CHỨNG CỨ')) {
-            pinAnchorX = 0.50;
-            pinAnchorY = 0.080;
-          } else if (pin.id === 'c0-pin-suspects' || upperLabel.includes('NGHI PHẠM')) {
-            pinAnchorX = 0.50;
-            pinAnchorY = 0.080;
+          if (pin.id === "c0-pin-evidence" || upperLabel.includes("CHỨNG CỨ")) {
+            pinAnchorX = 0.5;
+            pinAnchorY = 0.08;
           } else if (
-            pin.id === 'c0-pin-followup-vu' ||
-            pin.id === 'c0-pin-followup-tung' ||
-            pin.id === 'c0-pin-followup-ha' ||
-            pin.id === 'c0-pin-question' ||
-            upperLabel.includes('NGHI VẤN') ||
-            upperLabel.includes('CÂU HỎI')
+            pin.id === "c0-pin-suspects" ||
+            upperLabel.includes("NGHI PHẠM")
           ) {
-            pinAnchorX = 0.50;
-            pinAnchorY = 0.080;
-          } else if (pin.id === 'c0-pin-phone' || upperLabel.includes('MỞ RỘNG')) {
-            pinAnchorX = 0.50;
+            pinAnchorX = 0.5;
+            pinAnchorY = 0.08;
+          } else if (
+            pin.id === "c0-pin-followup-vu" ||
+            pin.id === "c0-pin-followup-tung" ||
+            pin.id === "c0-pin-followup-ha" ||
+            pin.id === "c0-pin-question" ||
+            upperLabel.includes("NGHI VẤN") ||
+            upperLabel.includes("CÂU HỎI")
+          ) {
+            pinAnchorX = 0.5;
+            pinAnchorY = 0.08;
+          } else if (
+            pin.id === "c0-pin-phone" ||
+            upperLabel.includes("MỞ RỘNG")
+          ) {
+            pinAnchorX = 0.5;
             pinAnchorY = 0.075;
-          } else if (pin.id === 'c0-pin-reinvestigate' || upperLabel.includes('KHÁM XÉT') || upperLabel.includes('KHÁM NGHIỆM')) {
-            pinAnchorX = 0.50;
+          } else if (
+            pin.id === "c0-pin-reinvestigate" ||
+            upperLabel.includes("KHÁM XÉT") ||
+            upperLabel.includes("KHÁM NGHIỆM")
+          ) {
+            pinAnchorX = 0.5;
             pinAnchorY = 0.075;
-          } else if (pin.id === 'c0-pin-indictment' || upperLabel.includes('KẾT LUẬN')) {
-            pinAnchorX = 0.50;
+          } else if (
+            pin.id === "c0-pin-indictment" ||
+            upperLabel.includes("KẾT LUẬN")
+          ) {
+            pinAnchorX = 0.5;
             pinAnchorY = 0.075;
           }
 
@@ -1530,7 +1802,7 @@ export function HeroInteractive({
             const paperFaceCenterX = tagX + noteWidth / 2;
             const paperFaceCenterY = tagY + noteHeight * 0.52;
             const maxTextWidth = noteWidth * (isWhiteNote ? 0.65 : 0.72);
-            const availableHeight = noteHeight * (isWhiteNote ? 0.55 : 0.60);
+            const availableHeight = noteHeight * (isWhiteNote ? 0.55 : 0.6);
 
             let fontSize = isIndictment ? 12.0 : isWhiteNote ? 11.0 : 10.5;
             context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
@@ -1539,7 +1811,8 @@ export function HeroInteractive({
             while (
               fontSize > 7.0 &&
               (lines.some((l) => context.measureText(l).width > maxTextWidth) ||
-               lines.length * ((fontSize + 1.5) / transform.scale) > availableHeight)
+                lines.length * ((fontSize + 1.5) / transform.scale) >
+                  availableHeight)
             ) {
               fontSize -= 0.5;
               context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
@@ -1577,12 +1850,18 @@ export function HeroInteractive({
             context.shadowBlur = 4 / transform.scale;
             context.shadowOffsetX = 0;
             context.shadowOffsetY = 1 / transform.scale;
-            context.fillText("CHỜ PHÊ DUYỆT", tagX + noteWidth / 2, tagY + noteHeight * 0.62);
+            context.fillText(
+              "CHỜ PHÊ DUYỆT",
+              tagX + noteWidth / 2,
+              tagY + noteHeight * 0.62,
+            );
             context.restore();
           }
 
           // Dấu tick '✓' kiểu font chữ viết tay, chỉ hiển thị duy nhất trên node 'Mở rộng điều tra' khi đã giải xong
-          const isPhoneNode = pin.id === 'c0-pin-phone' || (pin.label || '').toUpperCase().includes('MỞ RỘNG');
+          const isPhoneNode =
+            pin.id === "c0-pin-phone" ||
+            (pin.label || "").toUpperCase().includes("MỞ RỘNG");
           if (pin.isSolved && isPhoneNode) {
             context.save();
             const centerX = tagX + noteWidth / 2;
@@ -1611,7 +1890,13 @@ export function HeroInteractive({
         context.save();
         context.fillStyle = "rgba(35, 20, 10, 0.85)";
         context.beginPath();
-        context.arc(pinPosition.x, pinPosition.y, 1.6 / transform.scale, 0, Math.PI * 2);
+        context.arc(
+          pinPosition.x,
+          pinPosition.y,
+          1.6 / transform.scale,
+          0,
+          Math.PI * 2,
+        );
         context.fill();
         context.restore();
       });
@@ -1619,7 +1904,8 @@ export function HeroInteractive({
       // ──────────────────────────────────
       // 3. Layer 2: Draw Evidence Strings & Connecting Lines (ON TOP OF CARDS)
       // ──────────────────────────────────
-      const caseConns = customConnectionsRef.current ?? activeCaseRef.current.connections;
+      const caseConns =
+        customConnectionsRef.current ?? activeCaseRef.current.connections;
       caseConns.forEach((conn) => {
         const start = pinPositionsMap.get(conn.fromPinId);
         const end = pinPositionsMap.get(conn.toPinId);
@@ -1635,10 +1921,14 @@ export function HeroInteractive({
         let middleY = (start.y + end.y) / 2;
 
         if (isMostlyVertical) {
-          const bow = (dx >= 0 ? -1 : 1) * Math.min(10 / transform.scale, dist * 0.04);
+          const bow =
+            (dx >= 0 ? -1 : 1) * Math.min(10 / transform.scale, dist * 0.04);
           middleX += bow;
         } else {
-          const sag = Math.max(8 / transform.scale, Math.min(30 / transform.scale, dist * 0.08));
+          const sag = Math.max(
+            8 / transform.scale,
+            Math.min(30 / transform.scale, dist * 0.08),
+          );
           middleY += sag;
         }
 
@@ -1649,8 +1939,16 @@ export function HeroInteractive({
         context.shadowColor = "rgba(0, 0, 0, 0.25)";
         context.shadowBlur = 2.5 / transform.scale;
         context.beginPath();
-        context.moveTo(start.x + 0.8 / transform.scale, start.y + 1.2 / transform.scale);
-        context.quadraticCurveTo(middleX + 0.8 / transform.scale, middleY + 1.2 / transform.scale, end.x + 0.8 / transform.scale, end.y + 1.2 / transform.scale);
+        context.moveTo(
+          start.x + 0.8 / transform.scale,
+          start.y + 1.2 / transform.scale,
+        );
+        context.quadraticCurveTo(
+          middleX + 0.8 / transform.scale,
+          middleY + 1.2 / transform.scale,
+          end.x + 0.8 / transform.scale,
+          end.y + 1.2 / transform.scale,
+        );
         context.stroke();
         context.restore();
 
@@ -1685,8 +1983,16 @@ export function HeroInteractive({
         context.strokeStyle = "rgba(0, 0, 0, 0.22)";
         context.lineWidth = 1.0 / transform.scale;
         context.beginPath();
-        context.moveTo(start.x + 0.8 / transform.scale, start.y + 1.2 / transform.scale);
-        context.quadraticCurveTo(middleX + 0.8 / transform.scale, middleY + 1.2 / transform.scale, end.x + 0.8 / transform.scale, end.y + 1.2 / transform.scale);
+        context.moveTo(
+          start.x + 0.8 / transform.scale,
+          start.y + 1.2 / transform.scale,
+        );
+        context.quadraticCurveTo(
+          middleX + 0.8 / transform.scale,
+          middleY + 1.2 / transform.scale,
+          end.x + 0.8 / transform.scale,
+          end.y + 1.2 / transform.scale,
+        );
         context.stroke();
         context.restore();
 
@@ -1748,22 +2054,27 @@ export function HeroInteractive({
 
         // Strict orientation: Inverted according to user preference
         const boardCenterX = bounds.x + bounds.width / 2;
-        const isLeftHalf = pin.x !== undefined ? pin.x < 0.5 : pinPosition.x < boardCenterX;
+        const isLeftHalf =
+          pin.x !== undefined ? pin.x < 0.5 : pinPosition.x < boardCenterX;
         const isFlipped = isLeftHalf;
 
         const pinUrl = isFlipped
           ? `/images/pins/pin-${colorKey}-flipped.png`
           : `/images/pins/pin-${colorKey}.png`;
-        const pinImg = getLoadedImage(pinUrl) || getLoadedImage(`/images/pins/pin-${colorKey}.png`);
+        const pinImg =
+          getLoadedImage(pinUrl) ||
+          getLoadedImage(`/images/pins/pin-${colorKey}.png`);
 
         if (pinImg && pinImg.complete && pinImg.naturalWidth > 0) {
           // Uniform size for all pins (26px scaled = 2px smaller than original 28px yellow pin)
           const pinDisplayWidth = 26 / transform.scale;
-          const pinDisplayHeight = pinDisplayWidth * (pinImg.naturalHeight / pinImg.naturalWidth);
+          const pinDisplayHeight =
+            pinDisplayWidth * (pinImg.naturalHeight / pinImg.naturalWidth);
 
           // Align the needle piercing point with pinPosition (piercing tip enters board at pinPosition)
-          const drawX = pinPosition.x - pinDisplayWidth * (isFlipped ? 0.49 : 0.51);
-          const drawY = pinPosition.y - pinDisplayHeight * 0.70;
+          const drawX =
+            pinPosition.x - pinDisplayWidth * (isFlipped ? 0.49 : 0.51);
+          const drawY = pinPosition.y - pinDisplayHeight * 0.7;
 
           context.save();
           if (isRedPin && (pin.pulseBorder ?? true)) {
@@ -1771,7 +2082,13 @@ export function HeroInteractive({
             context.shadowColor = "rgba(239, 68, 68, 0.75)";
             context.shadowBlur = 10 / transform.scale;
           }
-          context.drawImage(pinImg, drawX, drawY, pinDisplayWidth, pinDisplayHeight);
+          context.drawImage(
+            pinImg,
+            drawX,
+            drawY,
+            pinDisplayWidth,
+            pinDisplayHeight,
+          );
           context.restore();
         } else {
           // Fallback procedural canvas render while asset loads
@@ -1784,13 +2101,33 @@ export function HeroInteractive({
           };
 
           if (colorKey === "yellow" || colorKey === "brass") {
-            headTheme = { headBase: "#d97706", headMid: "#b45309", headHighlight: "#fde047", headRim: "#78350f" };
+            headTheme = {
+              headBase: "#d97706",
+              headMid: "#b45309",
+              headHighlight: "#fde047",
+              headRim: "#78350f",
+            };
           } else if (colorKey === "blue" || colorKey === "cyan") {
-            headTheme = { headBase: "#0284c7", headMid: "#0369a1", headHighlight: "#7dd3fc", headRim: "#0c4a6e" };
+            headTheme = {
+              headBase: "#0284c7",
+              headMid: "#0369a1",
+              headHighlight: "#7dd3fc",
+              headRim: "#0c4a6e",
+            };
           } else if (colorKey === "green") {
-            headTheme = { headBase: "#16a34a", headMid: "#15803d", headHighlight: "#86efac", headRim: "#14532d" };
+            headTheme = {
+              headBase: "#16a34a",
+              headMid: "#15803d",
+              headHighlight: "#86efac",
+              headRim: "#14532d",
+            };
           } else if (colorKey === "dark") {
-            headTheme = { headBase: "#27272a", headMid: "#18181b", headHighlight: "#a1a1aa", headRim: "#09090b" };
+            headTheme = {
+              headBase: "#27272a",
+              headMid: "#18181b",
+              headHighlight: "#a1a1aa",
+              headRim: "#09090b",
+            };
           }
 
           context.save();
@@ -1848,9 +2185,9 @@ export function HeroInteractive({
         function renderFrame(timestamp) {
           animationFrameRef.current = null;
 
-          const hasPulsingPins = (customPinsRef.current ?? activeCaseRef.current.pins).some(
-            (p) => (p as any).pulseBorder
-          );
+          const hasPulsingPins = (
+            customPinsRef.current ?? activeCaseRef.current.pins
+          ).some((p) => (p as any).pulseBorder);
 
           const shouldContinueAnimating =
             !reducedMotionRef.current &&
@@ -1995,8 +2332,6 @@ export function HeroInteractive({
           aria-hidden="true"
           className="absolute inset-0 h-full w-full"
         />
-
-
       </div>
     </div>
   );

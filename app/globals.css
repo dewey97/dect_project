@@ -1,16 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Special+Elite&family=Caveat:wght@400;700&display=swap');
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Special+Elite&family=Caveat:wght@400;700&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
 /* @import 'shadcn/tailwind.css'; */
-
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-typewriter: 'Special Elite', 'Courier Prime', Courier, monospace;
-  --font-handwriting: var(--font-handwriting), 'Playpen Sans', ui-sans-serif, sans-serif;
+  --font-typewriter: "Special Elite", "Courier Prime", Courier, monospace;
+  --font-handwriting:
+    var(--font-handwriting), "Playpen Sans", ui-sans-serif, sans-serif;
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -70,7 +70,9 @@
 .dark {
   color-scheme: dark;
 
-  --background: oklch(0.12 0.005 265); /* Darker black-gray for better visual depth */
+  --background: oklch(
+    0.12 0.005 265
+  ); /* Darker black-gray for better visual depth */
   --foreground: oklch(0.92 0.008 90); /* Brighter bone white */
 
   --card: oklch(0.18 0.008 265); /* High-contrast card base */
@@ -123,31 +125,20 @@
     box-sizing: border-box;
   }
   html {
-    height: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    overflow: hidden !important;
-    overscroll-behavior: none !important;
+    min-height: 100%;
+    overflow-x: hidden;
   }
   body {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    min-height: 100dvh;
     width: 100%;
-    height: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    overflow: hidden !important;
-    overscroll-behavior: none !important;
+    overflow-x: hidden;
     touch-action: pan-x pan-y;
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
   }
 
-  *[class*='overflow-y-auto'],
-  *[class*='overflow-auto'],
+  *[class*="overflow-y-auto"],
+  *[class*="overflow-auto"],
   .custom-scrollbar {
     overscroll-behavior: contain !important;
     overscroll-behavior-y: contain !important;
@@ -183,11 +174,13 @@
   .paper-texture {
     background-color: oklch(0.95 0.02 80);
     color: oklch(0.15 0.01 80);
-    background-image: 
-      radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0),
-      radial-gradient(rgba(0,0,0,0.02) 1px, transparent 0);
+    background-image:
+      radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 0),
+      radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 0);
     background-size: 8px 8px;
-    background-position: 0 0, 4px 4px;
+    background-position:
+      0 0,
+      4px 4px;
     position: relative;
   }
 
@@ -195,10 +188,10 @@
   .polaroid-frame {
     background: #fbfaf6;
     padding: 8px 8px 32px 8px;
-    border: 1px solid rgba(0,0,0,0.12);
-    box-shadow: 
-      0 10px 20px rgba(0,0,0,0.4),
-      inset 0 0 12px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    box-shadow:
+      0 10px 20px rgba(0, 0, 0, 0.4),
+      inset 0 0 12px rgba(0, 0, 0, 0.03);
     border-radius: 2px;
   }
 
@@ -267,7 +260,8 @@
 
   /* Slow breathing/pulse for OS status lights */
   @keyframes pulse-slow {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -324,14 +318,30 @@
 
   /* CRT Terminal boot-up flicker */
   @keyframes crt-flicker {
-    0% { opacity: 0.27; }
-    5% { opacity: 0.85; }
-    10% { opacity: 0.34; }
-    15% { opacity: 0.95; }
-    20% { opacity: 0.52; }
-    25% { opacity: 0.88; }
-    30% { opacity: 0.99; }
-    100% { opacity: 1; }
+    0% {
+      opacity: 0.27;
+    }
+    5% {
+      opacity: 0.85;
+    }
+    10% {
+      opacity: 0.34;
+    }
+    15% {
+      opacity: 0.95;
+    }
+    20% {
+      opacity: 0.52;
+    }
+    25% {
+      opacity: 0.88;
+    }
+    30% {
+      opacity: 0.99;
+    }
+    100% {
+      opacity: 1;
+    }
   }
 
   .animate-crt-flicker {
@@ -342,7 +352,7 @@
   .bg-aged-paper {
     background-color: oklch(0.92 0.05 85);
     color: oklch(0.18 0.01 85);
-    background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 0);
+    background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 0);
     background-size: 8px 8px;
   }
 
@@ -494,6 +504,3 @@
   --input: rgba(225, 29, 72, 0.22);
   --ring: rgba(225, 29, 72, 0.55);
 }
-
-
-

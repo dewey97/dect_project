@@ -37,6 +37,7 @@ test-results/
 # Service account key
 google-service-account.json
 *.json.key
+.mcp.json
 
 # Binaries
 scripts/bin/

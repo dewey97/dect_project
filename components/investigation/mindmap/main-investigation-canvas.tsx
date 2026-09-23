@@ -1,849 +1,1193 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { Home, ArrowLeft, Lightbulb } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { HeroInteractive, type PinPoint, type CaseConnection } from '@/components/investigation/hero-interactive'
-import { AddSuspectModal } from './add-suspect-modal'
-import { PhoneLookupModal } from './phone-lookup-modal'
-import { PhoneNarrativeModal } from './phone-narrative-modal'
-import { DossierEModal } from './dossier-e-modal'
-import { EvidenceGuideModal } from './evidence-guide-modal'
-import { IndictmentModal } from './indictment-modal'
-import { CulpritEpilogueModal } from './culprit-epilogue-modal'
-import { DossierResultModal } from './dossier-result-modal'
-import { FollowupQuestionModal } from './followup-question-modal'
-import { ReinvestigationModal } from '@/components/investigation/evidence/reinvestigation-modal'
-import { EpilogueModal } from '@/components/investigation/epilogue-modal'
-import { getCanonicalSuspectKey, findValidCaseCharacter } from '@/lib/cases/case-000-suspects'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import React, { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Home,
+  ArrowLeft,
+  Lightbulb,
+  Settings,
+  Save,
+  Move,
+  Check,
+  X,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  HeroInteractive,
+  type PinPoint,
+  type CaseConnection,
+} from "@/components/investigation/hero-interactive";
+import { AddSuspectModal } from "./add-suspect-modal";
+import { PhoneLookupModal } from "./phone-lookup-modal";
+import { PhoneNarrativeModal } from "./phone-narrative-modal";
+import { DossierEModal } from "./dossier-e-modal";
+import { EvidenceGuideModal } from "./evidence-guide-modal";
+import { IndictmentModal } from "./indictment-modal";
+import { CulpritEpilogueModal } from "./culprit-epilogue-modal";
+import { DossierResultModal } from "./dossier-result-modal";
+import { FollowupQuestionModal } from "./followup-question-modal";
+import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
+import { EpilogueModal } from "@/components/investigation/epilogue-modal";
+import {
+  getCanonicalSuspectKey,
+  findValidCaseCharacter,
+} from "@/lib/cases/case-000-suspects";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { createClient } from "@/lib/supabase/client";
+import {
+  getBoardgamePinPositions,
+  saveBoardgamePinPositions,
+} from "@/lib/actions/board-actions";
+import { toast } from "@/components/ui/toast";
 
 interface SuspectItem {
-  id: string
-  name: string
-  clueIds: string[]
-  motiveClueIds?: string[]
-  alibiClueIds?: string[]
+  id: string;
+  name: string;
+  clueIds: string[];
+  motiveClueIds?: string[];
+  alibiClueIds?: string[];
 }
 
 interface MainInvestigationCanvasProps {
-  onOpenPhoneSimulator?: () => void
-  onOpenReinvestigation?: () => void
-  onOpenEpilogue?: () => void
+  onOpenPhoneSimulator?: () => void;
+  onOpenReinvestigation?: () => void;
+  onOpenEpilogue?: () => void;
 }
 
 export function MainInvestigationCanvas({
   onOpenPhoneSimulator,
   onOpenReinvestigation,
-  onOpenEpilogue
+  onOpenEpilogue,
 }: MainInvestigationCanvasProps) {
-  const router = useRouter()
-  const [suspects, setSuspects] = useState<SuspectItem[]>([])
-  const [isReinvestigateUnlocked, setIsReinvestigateUnlocked] = useState(false)
-  const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] = useState(false)
-  const [hasOpenedReinvestigation, setHasOpenedReinvestigation] = useState(false)
-  const [phoneLookupSuccess, setPhoneLookupSuccess] = useState(false)
+  const router = useRouter();
+  const [suspects, setSuspects] = useState<SuspectItem[]>([]);
+  const [isReinvestigateUnlocked, setIsReinvestigateUnlocked] = useState(false);
+  const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] =
+    useState(false);
+  const [hasOpenedReinvestigation, setHasOpenedReinvestigation] =
+    useState(false);
+  const [phoneLookupSuccess, setPhoneLookupSuccess] = useState(false);
 
   // Indictment & Epilogue state
-  const [isIndictmentSolved, setIsIndictmentSolved] = useState(false)
-  const [solvedCulprit, setSolvedCulprit] = useState<'vu' | 'tung' | 'ha' | null>(null)
-  const [isEpilogueOpen, setIsEpilogueOpen] = useState(false)
-  const [isFinalEpilogueOpen, setIsFinalEpilogueOpen] = useState(false)
-  const [isDossierOpen, setIsDossierOpen] = useState(false)
-  const [activeDossierType, setActiveDossierType] = useState<'A' | 'B' | 'C' | null>(null)
-  const [isFollowupQuestionOpen, setIsFollowupQuestionOpen] = useState(false)
-  const [isEvidenceGuideOpen, setIsEvidenceGuideOpen] = useState(false)
-  const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false)
-  const [isDossierEOpen, setIsDossierEOpen] = useState(false)
-  const [zoomedPhotoUrl, setZoomedPhotoUrl] = useState<string | null>(null)
-  const [zoomOrigin, setZoomOrigin] = useState<{ x: number; y: number } | null>(null)
-  const zoomOpenTimeRef = React.useRef<number>(0)
+  const [isIndictmentSolved, setIsIndictmentSolved] = useState(false);
+  const [solvedCulprit, setSolvedCulprit] = useState<
+    "vu" | "tung" | "ha" | null
+  >(null);
+  const [isEpilogueOpen, setIsEpilogueOpen] = useState(false);
+  const [isFinalEpilogueOpen, setIsFinalEpilogueOpen] = useState(false);
+  const [isDossierOpen, setIsDossierOpen] = useState(false);
+  const [activeDossierType, setActiveDossierType] = useState<
+    "A" | "B" | "C" | null
+  >(null);
+  const [isFollowupQuestionOpen, setIsFollowupQuestionOpen] = useState(false);
+  const [isEvidenceGuideOpen, setIsEvidenceGuideOpen] = useState(false);
+  const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false);
+  const [isDossierEOpen, setIsDossierEOpen] = useState(false);
+  const [zoomedPhotoUrl, setZoomedPhotoUrl] = useState<string | null>(null);
+  const [zoomOrigin, setZoomOrigin] = useState<{ x: number; y: number } | null>(
+    null,
+  );
+  const zoomOpenTimeRef = React.useRef<number>(0);
 
-  const handleOpenPhotoZoom = useCallback((url: string, coords?: { clientX: number; clientY: number }) => {
-    zoomOpenTimeRef.current = Date.now()
-    if (coords && typeof window !== 'undefined') {
-      setZoomOrigin({
-        x: coords.clientX - window.innerWidth / 2,
-        y: coords.clientY - window.innerHeight / 2,
-      })
-    } else {
-      setZoomOrigin(null)
-    }
-    setZoomedPhotoUrl(url)
-  }, [])
+  const handleOpenPhotoZoom = useCallback(
+    (url: string, coords?: { clientX: number; clientY: number }) => {
+      zoomOpenTimeRef.current = Date.now();
+      if (coords && typeof window !== "undefined") {
+        setZoomOrigin({
+          x: coords.clientX - window.innerWidth / 2,
+          y: coords.clientY - window.innerHeight / 2,
+        });
+      } else {
+        setZoomOrigin(null);
+      }
+      setZoomedPhotoUrl(url);
+    },
+    [],
+  );
 
   useEffect(() => {
-    if (!zoomedPhotoUrl) return
+    if (!zoomedPhotoUrl) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        detectiveAudio.playPaperRustle()
-        setZoomedPhotoUrl(null)
+      if (e.key === "Escape") {
+        detectiveAudio.playPaperRustle();
+        setZoomedPhotoUrl(null);
       }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [zoomedPhotoUrl])
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [zoomedPhotoUrl]);
 
-  const [investigatedSuspects, setInvestigatedSuspects] = useState<('vu' | 'tung' | 'ha')[]>([])
-  const [solvedFollowupQuestions, setSolvedFollowupQuestions] = useState<('vu' | 'tung' | 'ha')[]>([])
-  const [activeFollowupCulprit, setActiveFollowupCulprit] = useState<'vu' | 'tung' | 'ha' | null>(null)
-  const [narrativeCulprit, setNarrativeCulprit] = useState<'vu' | 'tung' | 'ha' | null>(null)
-  const [narrativeChoice, setNarrativeChoice] = useState<string | null>(null)
+  const [investigatedSuspects, setInvestigatedSuspects] = useState<
+    ("vu" | "tung" | "ha")[]
+  >([]);
+  const [solvedFollowupQuestions, setSolvedFollowupQuestions] = useState<
+    ("vu" | "tung" | "ha")[]
+  >([]);
+  const [activeFollowupCulprit, setActiveFollowupCulprit] = useState<
+    "vu" | "tung" | "ha" | null
+  >(null);
+  const [narrativeCulprit, setNarrativeCulprit] = useState<
+    "vu" | "tung" | "ha" | null
+  >(null);
+  const [narrativeChoice, setNarrativeChoice] = useState<string | null>(null);
 
   // Modals state
-  const [isAddSuspectOpen, setIsAddSuspectOpen] = useState(false)
-  const [editingSuspect, setEditingSuspect] = useState<SuspectItem | null>(null)
-  const [isPhoneLookupOpen, setIsPhoneLookupOpen] = useState(false)
-  const [isIndictmentOpen, setIsIndictmentOpen] = useState(false)
+  const [isAddSuspectOpen, setIsAddSuspectOpen] = useState(false);
+  const [editingSuspect, setEditingSuspect] = useState<SuspectItem | null>(
+    null,
+  );
+  const [isPhoneLookupOpen, setIsPhoneLookupOpen] = useState(false);
+  const [isIndictmentOpen, setIsIndictmentOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isSavingLayout, setIsSavingLayout] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [customPinPositions, setCustomPinPositions] = useState<
+    Record<string, { x: number; y: number }>
+  >({});
+
+  // Check admin role and load custom pin layout from DB on mount
+  useEffect(() => {
+    async function initAdminAndLayout() {
+      // Tự động bật quyền Admin trên Môi trường Local Dev để dễ setup
+      if (process.env.NODE_ENV === "development") {
+        setIsAdmin(true);
+      } else {
+        try {
+          const supabase = createClient();
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (user) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("role")
+              .eq("id", user.id)
+              .single();
+            if (profile && profile.role === "admin") {
+              setIsAdmin(true);
+            }
+          }
+        } catch {}
+      }
+
+      // 1. Tải cache cục bộ từ localStorage trước (đáp ứng ngay lập tức)
+      try {
+        const localSaved = localStorage.getItem(
+          "veritas_boardgame_pins_case-000",
+        );
+        if (localSaved) {
+          const parsed = JSON.parse(localSaved);
+          if (parsed && typeof parsed === "object") {
+            setCustomPinPositions(parsed);
+          }
+        }
+      } catch {}
+
+      // 2. Tải đồng bộ từ Supabase Database nếu có
+      try {
+        const res = await getBoardgamePinPositions("case-000");
+        if (res.success && res.pins.length > 0) {
+          const posMap: Record<string, { x: number; y: number }> = {};
+          res.pins.forEach((p) => {
+            posMap[p.id] = { x: p.x, y: p.y };
+          });
+          setCustomPinPositions(posMap);
+          try {
+            localStorage.setItem(
+              "veritas_boardgame_pins_case-000",
+              JSON.stringify(posMap),
+            );
+          } catch {}
+        }
+      } catch {}
+    }
+
+    initAdminAndLayout();
+  }, []);
+
+  const handlePinPositionChange = useCallback(
+    (pinId: string, newX: number, newY: number) => {
+      setCustomPinPositions((prev) => ({
+        ...prev,
+        [pinId]: { x: newX, y: newY },
+      }));
+      setHasUnsavedChanges(true);
+    },
+    [],
+  );
+
+  const handleSavePinLayout = async (pinsToSave: PinPoint[]) => {
+    setIsSavingLayout(true);
+    // 1. Luôn lưu ngay vào localStorage làm cache trình duyệt
+    try {
+      const posMap: Record<string, { x: number; y: number }> = {};
+      pinsToSave.forEach((p) => {
+        posMap[p.id] = { x: p.x, y: p.y };
+      });
+      localStorage.setItem(
+        "veritas_boardgame_pins_case-000",
+        JSON.stringify(posMap),
+      );
+      setCustomPinPositions(posMap);
+    } catch {}
+
+    // 2. Đồng bộ lên Supabase Database
+    try {
+      const res = await saveBoardgamePinPositions("case-000", pinsToSave);
+      if (res.success) {
+        toast.success("Đã lưu vị trí ghim lên Supabase DB & Cục bộ!");
+        setHasUnsavedChanges(false);
+      } else {
+        toast.error(
+          "Đã lưu cục bộ! (Supabase lỗi: " +
+            (res.error || "Chưa tạo bảng boardgame_pins") +
+            ")",
+        );
+        setHasUnsavedChanges(false);
+      }
+    } catch (err: any) {
+      toast.error("Đã lưu cục bộ! (Supabase lỗi: " + err.message + ")");
+      setHasUnsavedChanges(false);
+    } finally {
+      setIsSavingLayout(false);
+    }
+  };
   const sanitizeSuspectsList = (items: SuspectItem[]): SuspectItem[] => {
-    const map = new Map<string, SuspectItem>()
+    const map = new Map<string, SuspectItem>();
     for (const s of items) {
-      if (!s || !s.name) continue
-      const matchedChar = findValidCaseCharacter(s.name || s.id)
-      if (!matchedChar || matchedChar.id === 'khang') continue
-      const { canonicalId, canonicalName } = getCanonicalSuspectKey(s)
+      if (!s || !s.name) continue;
+      const matchedChar = findValidCaseCharacter(s.name || s.id);
+      if (!matchedChar || matchedChar.id === "khang") continue;
+      const { canonicalId, canonicalName } = getCanonicalSuspectKey(s);
       map.set(canonicalId, {
         ...s,
         id: canonicalId,
         name: canonicalName || s.name,
-      })
+      });
     }
-    return Array.from(map.values())
-  }
+    return Array.from(map.values());
+  };
 
   // Restore saved state from localStorage if available
   useEffect(() => {
     try {
-      const savedSuspects = localStorage.getItem('veritas_canvas_suspects')
+      const savedSuspects = localStorage.getItem("veritas_canvas_suspects");
       if (savedSuspects) {
-        const parsed = JSON.parse(savedSuspects)
-        const validList = parsed.filter((s: any) => s.id !== 'suspect-default-1')
-        const sanitized = sanitizeSuspectsList(validList)
-        setSuspects(sanitized)
+        const parsed = JSON.parse(savedSuspects);
+        const validList = parsed.filter(
+          (s: any) => s.id !== "suspect-default-1",
+        );
+        const sanitized = sanitizeSuspectsList(validList);
+        setSuspects(sanitized);
       }
-      const savedSolvedFollowups = localStorage.getItem('veritas_solved_followups')
+      const savedSolvedFollowups = localStorage.getItem(
+        "veritas_solved_followups",
+      );
       if (savedSolvedFollowups) {
         try {
-          const parsed = JSON.parse(savedSolvedFollowups)
-          setSolvedFollowupQuestions(parsed)
-          if (parsed.includes('vu') && parsed.includes('tung')) {
-            setIsReinvestigateUnlocked(true)
+          const parsed = JSON.parse(savedSolvedFollowups);
+          setSolvedFollowupQuestions(parsed);
+          if (parsed.includes("vu") && parsed.includes("tung")) {
+            setIsReinvestigateUnlocked(true);
           }
         } catch {}
       }
-      const savedReinvestigateUnlocked = localStorage.getItem('veritas_reinvestigate_unlocked')
-      if (savedReinvestigateUnlocked === 'true') {
-        setIsReinvestigateUnlocked(true)
+      const savedReinvestigateUnlocked = localStorage.getItem(
+        "veritas_reinvestigate_unlocked",
+      );
+      if (savedReinvestigateUnlocked === "true") {
+        setIsReinvestigateUnlocked(true);
       }
-      const savedReinvestigateOpened = localStorage.getItem('veritas_reinvestigate_opened')
-      if (savedReinvestigateOpened === 'true') {
-        setHasOpenedReinvestigation(true)
+      const savedReinvestigateOpened = localStorage.getItem(
+        "veritas_reinvestigate_opened",
+      );
+      if (savedReinvestigateOpened === "true") {
+        setHasOpenedReinvestigation(true);
       }
-      const savedPhone = localStorage.getItem('veritas_phone_inputs')
-      const isPhoneSolved = localStorage.getItem('veritas_phone_solved') === 'true'
+      const savedPhone = localStorage.getItem("veritas_phone_inputs");
+      const isPhoneSolved =
+        localStorage.getItem("veritas_phone_solved") === "true";
       if (savedPhone || isPhoneSolved) {
         try {
           if (savedPhone) {
-            const parsed = JSON.parse(savedPhone)
+            const parsed = JSON.parse(savedPhone);
             if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
-              setPhoneLookupSuccess(true)
+              setPhoneLookupSuccess(true);
             } else if (isPhoneSolved) {
-              setPhoneLookupSuccess(true)
+              setPhoneLookupSuccess(true);
             }
           } else if (isPhoneSolved) {
-            setPhoneLookupSuccess(true)
+            setPhoneLookupSuccess(true);
           }
         } catch {
-          setPhoneLookupSuccess(true)
+          setPhoneLookupSuccess(true);
         }
       }
-      const savedInvestigated = localStorage.getItem('veritas_investigated_suspects')
+      const savedInvestigated = localStorage.getItem(
+        "veritas_investigated_suspects",
+      );
       if (savedInvestigated) {
-        setInvestigatedSuspects(JSON.parse(savedInvestigated))
+        setInvestigatedSuspects(JSON.parse(savedInvestigated));
       }
-      const savedSolved = localStorage.getItem('veritas_indictment_solved')
-      const savedCulprit = localStorage.getItem('veritas_indictment_culprit') as 'vu' | 'tung' | 'ha' | null
-      if (savedSolved === 'true' && savedCulprit) {
-        setIsIndictmentSolved(true)
-        setSolvedCulprit(savedCulprit)
+      const savedSolved = localStorage.getItem("veritas_indictment_solved");
+      const savedCulprit = localStorage.getItem(
+        "veritas_indictment_culprit",
+      ) as "vu" | "tung" | "ha" | null;
+      if (savedSolved === "true" && savedCulprit) {
+        setIsIndictmentSolved(true);
+        setSolvedCulprit(savedCulprit);
       }
     } catch {}
-  }, [])
+  }, []);
 
   const saveSuspectsState = (newSuspects: SuspectItem[]) => {
-    const sanitized = sanitizeSuspectsList(newSuspects)
-    setSuspects(sanitized)
+    const sanitized = sanitizeSuspectsList(newSuspects);
+    setSuspects(sanitized);
     try {
-      localStorage.setItem('veritas_canvas_suspects', JSON.stringify(sanitized))
+      localStorage.setItem(
+        "veritas_canvas_suspects",
+        JSON.stringify(sanitized),
+      );
     } catch {}
-  }
+  };
 
   const handleSaveSuspect = (savedSuspect: SuspectItem) => {
-    const matchedChar = findValidCaseCharacter(savedSuspect.name || savedSuspect.id)
-    if (!matchedChar || matchedChar.id === 'khang') return
+    const matchedChar = findValidCaseCharacter(
+      savedSuspect.name || savedSuspect.id,
+    );
+    if (!matchedChar || matchedChar.id === "khang") return;
 
-    const { canonicalId, canonicalName } = getCanonicalSuspectKey(savedSuspect)
+    const { canonicalId, canonicalName } = getCanonicalSuspectKey(savedSuspect);
     const normalizedItem: SuspectItem = {
       ...savedSuspect,
       id: canonicalId,
       name: canonicalName || savedSuspect.name,
-    }
+    };
 
     setSuspects((prev) => {
       const existingIndex = prev.findIndex((s) => {
-        const sKey = getCanonicalSuspectKey(s)
-        return sKey.canonicalId === canonicalId || s.id === canonicalId
-      })
-      let updated: SuspectItem[]
+        const sKey = getCanonicalSuspectKey(s);
+        return sKey.canonicalId === canonicalId || s.id === canonicalId;
+      });
+      let updated: SuspectItem[];
       if (existingIndex >= 0) {
-        updated = [...prev]
-        updated[existingIndex] = normalizedItem
+        updated = [...prev];
+        updated[existingIndex] = normalizedItem;
       } else {
-        updated = [...prev, normalizedItem]
+        updated = [...prev, normalizedItem];
       }
-      const sanitized = sanitizeSuspectsList(updated)
+      const sanitized = sanitizeSuspectsList(updated);
       try {
-        localStorage.setItem('veritas_canvas_suspects', JSON.stringify(sanitized))
+        localStorage.setItem(
+          "veritas_canvas_suspects",
+          JSON.stringify(sanitized),
+        );
       } catch {}
-      return sanitized
-    })
-  }
+      return sanitized;
+    });
+  };
 
   const handleDeleteSuspect = (id: string) => {
-    const { canonicalId } = getCanonicalSuspectKey({ id, name: id })
+    const { canonicalId } = getCanonicalSuspectKey({ id, name: id });
     const suspectToDelete = suspects.find(
-      (s) => s.id === id || getCanonicalSuspectKey(s).canonicalId === canonicalId
-    )
+      (s) =>
+        s.id === id || getCanonicalSuspectKey(s).canonicalId === canonicalId,
+    );
     const updated = suspects.filter(
-      (s) => s.id !== id && getCanonicalSuspectKey(s).canonicalId !== canonicalId
-    )
-    saveSuspectsState(updated)
+      (s) =>
+        s.id !== id && getCanonicalSuspectKey(s).canonicalId !== canonicalId,
+    );
+    saveSuspectsState(updated);
 
     if (suspectToDelete) {
-      const { canonicalId } = getCanonicalSuspectKey(suspectToDelete)
-      const culpritType: 'vu' | 'tung' | 'ha' | null =
-        canonicalId === 'vu' || canonicalId === 'tung' || canonicalId === 'ha'
-          ? (canonicalId as 'vu' | 'tung' | 'ha')
-          : null
+      const { canonicalId } = getCanonicalSuspectKey(suspectToDelete);
+      const culpritType: "vu" | "tung" | "ha" | null =
+        canonicalId === "vu" || canonicalId === "tung" || canonicalId === "ha"
+          ? (canonicalId as "vu" | "tung" | "ha")
+          : null;
 
       if (culpritType) {
         const remainingHasCulprit = updated.some(
-          (s) => getCanonicalSuspectKey(s).canonicalId === culpritType
-        )
+          (s) => getCanonicalSuspectKey(s).canonicalId === culpritType,
+        );
         if (!remainingHasCulprit) {
           setInvestigatedSuspects((prev) => {
-            const next = prev.filter((c) => c !== culpritType)
+            const next = prev.filter((c) => c !== culpritType);
             try {
-              localStorage.setItem('veritas_investigated_suspects', JSON.stringify(next))
+              localStorage.setItem(
+                "veritas_investigated_suspects",
+                JSON.stringify(next),
+              );
             } catch {}
-            return next
-          })
+            return next;
+          });
           if (solvedCulprit === culpritType) {
-            setSolvedCulprit(null)
-            setIsIndictmentSolved(false)
+            setSolvedCulprit(null);
+            setIsIndictmentSolved(false);
             try {
-              localStorage.removeItem('veritas_indictment_solved')
-              localStorage.removeItem('veritas_indictment_culprit')
+              localStorage.removeItem("veritas_indictment_solved");
+              localStorage.removeItem("veritas_indictment_culprit");
             } catch {}
           }
         }
       }
     }
-  }
+  };
 
   const handlePhoneLookupSuccess = (phone: string, info: string) => {
-    setPhoneLookupSuccess(true)
+    setPhoneLookupSuccess(true);
     try {
-      localStorage.setItem('veritas_phone_solved', 'true')
+      localStorage.setItem("veritas_phone_solved", "true");
     } catch {}
-    setIsPhoneLookupOpen(false)
-    setIsPhoneNarrativeOpen(true)
-  }
+    setIsPhoneLookupOpen(false);
+    setIsPhoneNarrativeOpen(true);
+  };
 
-  const handleFollowupSuccess = (culprit: 'vu' | 'tung' | 'ha', choice?: string) => {
-    const updated = Array.from(new Set([...solvedFollowupQuestions, culprit]))
-    setSolvedFollowupQuestions(updated)
+  const handleFollowupSuccess = (
+    culprit: "vu" | "tung" | "ha",
+    choice?: string,
+  ) => {
+    const updated = Array.from(new Set([...solvedFollowupQuestions, culprit]));
+    setSolvedFollowupQuestions(updated);
     try {
-      localStorage.setItem('veritas_solved_followups', JSON.stringify(updated))
+      localStorage.setItem("veritas_solved_followups", JSON.stringify(updated));
       if (choice) {
-        localStorage.setItem(`veritas_followup_${culprit}_choice`, choice)
+        localStorage.setItem(`veritas_followup_${culprit}_choice`, choice);
       }
     } catch {}
 
-    if (updated.includes('vu') && updated.includes('tung')) {
-      setIsReinvestigateUnlocked(true)
+    if (updated.includes("vu") && updated.includes("tung")) {
+      setIsReinvestigateUnlocked(true);
       try {
-        localStorage.setItem('veritas_reinvestigate_unlocked', 'true')
+        localStorage.setItem("veritas_reinvestigate_unlocked", "true");
       } catch {}
     }
 
     // Đóng câu hỏi và mở DẪN TRUYỆN toàn màn hình của đối tượng
-    setIsFollowupQuestionOpen(false)
-    setNarrativeCulprit(culprit)
-    setNarrativeChoice(choice || null)
-    setIsEpilogueOpen(true)
-  }
+    setIsFollowupQuestionOpen(false);
+    setNarrativeCulprit(culprit);
+    setNarrativeChoice(choice || null);
+    setIsEpilogueOpen(true);
+  };
 
   const handleSubmitIndictment = (data: {
-    culprit: 'vu' | 'tung' | 'ha'
-    suspectName: string
-    motive: string
-    selectedClueIds: string[]
-    reasoning: string
+    culprit: "vu" | "tung" | "ha";
+    suspectName: string;
+    motive: string;
+    selectedClueIds: string[];
+    reasoning: string;
   }) => {
-    setIsIndictmentSolved(true)
-    setSolvedCulprit(data.culprit)
-    setIsIndictmentOpen(false)
+    setIsIndictmentSolved(true);
+    setSolvedCulprit(data.culprit);
+    setIsIndictmentOpen(false);
     try {
-      localStorage.setItem('veritas_indictment_solved', 'true')
-      localStorage.setItem('veritas_indictment_culprit', data.culprit)
+      localStorage.setItem("veritas_indictment_solved", "true");
+      localStorage.setItem("veritas_indictment_culprit", data.culprit);
     } catch {}
-    setIsFinalEpilogueOpen(true)
+    setIsFinalEpilogueOpen(true);
     if (onOpenEpilogue) {
-      onOpenEpilogue()
+      onOpenEpilogue();
     }
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('open-epilogue-modal'))
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("open-epilogue-modal"));
     }
-  }
+  };
 
-  const handleOpenDossier = (dossierType: 'A' | 'B' | 'C') => {
-    setActiveDossierType(dossierType)
-    setIsDossierOpen(true)
-  }
+  const handleOpenDossier = (dossierType: "A" | "B" | "C") => {
+    setActiveDossierType(dossierType);
+    setIsDossierOpen(true);
+  };
 
   const handleResetAll = () => {
-    detectiveAudio.playGlassSound()
-    setSuspects([])
-    setPhoneLookupSuccess(false)
-    setInvestigatedSuspects([])
-    setSolvedFollowupQuestions([])
-    setActiveFollowupCulprit(null)
-    setNarrativeChoice(null)
-    setIsIndictmentSolved(false)
-    setSolvedCulprit(null)
-    setIsReinvestigateUnlocked(false)
-    setIsReinvestigateModalOpen(false)
-    setHasOpenedReinvestigation(false)
-    setIsEpilogueOpen(false)
-    setIsFinalEpilogueOpen(false)
-    setIsDossierOpen(false)
-    setIsFollowupQuestionOpen(false)
-    setIsPhoneNarrativeOpen(false)
+    detectiveAudio.playGlassSound();
+    setSuspects([]);
+    setPhoneLookupSuccess(false);
+    setInvestigatedSuspects([]);
+    setSolvedFollowupQuestions([]);
+    setActiveFollowupCulprit(null);
+    setNarrativeChoice(null);
+    setIsIndictmentSolved(false);
+    setSolvedCulprit(null);
+    setIsReinvestigateUnlocked(false);
+    setIsReinvestigateModalOpen(false);
+    setHasOpenedReinvestigation(false);
+    setIsEpilogueOpen(false);
+    setIsFinalEpilogueOpen(false);
+    setIsDossierOpen(false);
+    setIsFollowupQuestionOpen(false);
+    setIsPhoneNarrativeOpen(false);
     try {
-      localStorage.removeItem('veritas_canvas_suspects')
-      localStorage.removeItem('veritas_investigated_suspects')
-      localStorage.removeItem('veritas_solved_followups')
-      localStorage.removeItem('veritas_followup_vu')
-      localStorage.removeItem('veritas_followup_tung')
-      localStorage.removeItem('veritas_followup_ha')
-      localStorage.removeItem('veritas_followup_ha_matches')
-      localStorage.removeItem('veritas_followup_tung_choice')
-      localStorage.removeItem('veritas_followup_vu_choice')
-      localStorage.removeItem('veritas_followup_ha_choice')
-      localStorage.removeItem('veritas_indictment_solved')
-      localStorage.removeItem('veritas_indictment_culprit')
-      localStorage.removeItem('veritas_reinvestigate_unlocked')
-      localStorage.removeItem('veritas_reinvestigate_opened')
-      localStorage.removeItem('veritas_phone_inputs')
-      localStorage.removeItem('khang_phone_pinned_clues')
-      localStorage.removeItem('veritas_custom_notes')
-      localStorage.removeItem('veritas_discovered_findings')
-      localStorage.removeItem('veritas_completed_checkpoints')
+      localStorage.removeItem("veritas_canvas_suspects");
+      localStorage.removeItem("veritas_investigated_suspects");
+      localStorage.removeItem("veritas_solved_followups");
+      localStorage.removeItem("veritas_followup_vu");
+      localStorage.removeItem("veritas_followup_tung");
+      localStorage.removeItem("veritas_followup_ha");
+      localStorage.removeItem("veritas_followup_ha_matches");
+      localStorage.removeItem("veritas_followup_tung_choice");
+      localStorage.removeItem("veritas_followup_vu_choice");
+      localStorage.removeItem("veritas_followup_ha_choice");
+      localStorage.removeItem("veritas_indictment_solved");
+      localStorage.removeItem("veritas_indictment_culprit");
+      localStorage.removeItem("veritas_reinvestigate_unlocked");
+      localStorage.removeItem("veritas_reinvestigate_opened");
+      localStorage.removeItem("veritas_phone_inputs");
+      localStorage.removeItem("khang_phone_pinned_clues");
+      localStorage.removeItem("veritas_custom_notes");
+      localStorage.removeItem("veritas_discovered_findings");
+      localStorage.removeItem("veritas_completed_checkpoints");
     } catch {}
-  }
+  };
 
   const handleOpenReinvestigation = useCallback(() => {
-    setIsReinvestigateModalOpen(true)
-    setHasOpenedReinvestigation(true)
+    setIsReinvestigateModalOpen(true);
+    setHasOpenedReinvestigation(true);
     try {
-      localStorage.setItem('veritas_reinvestigate_opened', 'true')
+      localStorage.setItem("veritas_reinvestigate_opened", "true");
     } catch {}
     if (onOpenReinvestigation) {
-      onOpenReinvestigation()
+      onOpenReinvestigation();
     }
-  }, [onOpenReinvestigation])
+  }, [onOpenReinvestigation]);
 
   // Handle pin clicks directly on HeroInteractive canvas
-  const handlePinClick = useCallback((pinId: string, pin?: PinPoint, coords?: { clientX: number; clientY: number }) => {
-    detectiveAudio.playPaperRustle()
-    const id = pinId || pin?.id || ''
-    const label = (pin?.label || '').toLowerCase()
-    const detail = (pin?.detail || '').toLowerCase()
+  const handlePinClick = useCallback(
+    (
+      pinId: string,
+      pin?: PinPoint,
+      coords?: { clientX: number; clientY: number },
+    ) => {
+      detectiveAudio.playPaperRustle();
+      const id = pinId || pin?.id || "";
+      const label = (pin?.label || "").toLowerCase();
+      const detail = (pin?.detail || "").toLowerCase();
 
-    if (id === 'c0-pin-suspects') {
-      setEditingSuspect(null)
-      setIsAddSuspectOpen(true)
-    } else if (id === 'c0-pin-evidence') {
-      setIsEvidenceGuideOpen(true)
-    } else if (id === 'c0-pin-phone') {
-      if (phoneLookupSuccess) {
-        setIsDossierEOpen(true)
-      } else {
-        setIsPhoneLookupOpen(true)
+      if (id === "c0-pin-suspects") {
+        setEditingSuspect(null);
+        setIsAddSuspectOpen(true);
+      } else if (id === "c0-pin-evidence") {
+        setIsEvidenceGuideOpen(true);
+      } else if (id === "c0-pin-phone") {
+        if (phoneLookupSuccess) {
+          setIsDossierEOpen(true);
+        } else {
+          setIsPhoneLookupOpen(true);
+        }
+      } else if (
+        id === "c0-pin-crime-scene" ||
+        id.includes("crime-scene") ||
+        id.includes("thi-the")
+      ) {
+        handleOpenPhotoZoom(
+          "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
+          coords,
+        );
+      } else if (id === "c0-pin-victim-khang" || id === "khang") {
+        handleOpenPhotoZoom(
+          "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
+          coords,
+        );
+      } else if (id === "c0-pin-reinvestigate") {
+        if (isReinvestigateUnlocked) {
+          detectiveAudio.playGlassSound();
+          handleOpenReinvestigation();
+        } else {
+          detectiveAudio.playGlassSound();
+        }
+      } else if (id === "c0-pin-indictment") {
+        if (isIndictmentSolved) {
+          setIsFinalEpilogueOpen(true);
+          if (onOpenEpilogue) onOpenEpilogue();
+        } else {
+          setIsIndictmentOpen(true);
+        }
+      } else if (
+        id === "c0-pin-followup-vu" ||
+        id === "followup-vu" ||
+        id === "c0-pin-question-vu" ||
+        (id.startsWith("c0-pin-followup") &&
+          (id.includes("vu") || detail.includes("vũ") || detail.includes("vu")))
+      ) {
+        setActiveFollowupCulprit("vu");
+        setIsFollowupQuestionOpen(true);
+      } else if (
+        id === "c0-pin-followup-tung" ||
+        id === "followup-tung" ||
+        id === "c0-pin-question-tung" ||
+        (id.startsWith("c0-pin-followup") &&
+          (id.includes("tung") ||
+            detail.includes("tùng") ||
+            detail.includes("tung")))
+      ) {
+        setActiveFollowupCulprit("tung");
+        setIsFollowupQuestionOpen(true);
+      } else if (
+        id === "c0-pin-followup-ha" ||
+        id === "followup-ha" ||
+        id === "c0-pin-question-ha" ||
+        (id.startsWith("c0-pin-followup") &&
+          (id.includes("ha") || detail.includes("hà") || detail.includes("ha")))
+      ) {
+        setActiveFollowupCulprit("ha");
+        setIsFollowupQuestionOpen(true);
+      } else if (
+        id.startsWith("c0-pin-followup") ||
+        id.startsWith("followup-") ||
+        id.startsWith("c0-pin-question") ||
+        label.includes("nghi vấn")
+      ) {
+        const c =
+          id.includes("ha") || detail.includes("hà")
+            ? "ha"
+            : id.includes("tung") || detail.includes("tùng")
+              ? "tung"
+              : "vu";
+        setActiveFollowupCulprit(c);
+        setIsFollowupQuestionOpen(true);
+      } else if (id.startsWith("node-suspect-") || id.startsWith("suspect-")) {
+        const targetId = id
+          .replace("node-suspect-", "")
+          .replace("suspect-", "");
+        if (
+          targetId === "suspect-khang" ||
+          targetId === "khang" ||
+          id.includes("khang")
+        ) {
+          handleOpenPhotoZoom(
+            "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
+            coords,
+          );
+          return;
+        }
+        const foundSuspect = suspects.find((s) => {
+          const key = getCanonicalSuspectKey(s);
+          return (
+            s.id === targetId ||
+            key.canonicalId === targetId ||
+            s.id === `node-suspect-${targetId}`
+          );
+        });
+        if (foundSuspect) {
+          setEditingSuspect(foundSuspect);
+          setIsAddSuspectOpen(true);
+        }
       }
-    } else if (id === 'c0-pin-crime-scene' || id.includes('crime-scene') || id.includes('thi-the')) {
-      handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png', coords)
-    } else if (id === 'c0-pin-victim-khang' || id === 'khang') {
-      handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png', coords)
-    } else if (id === 'c0-pin-reinvestigate') {
-      if (isReinvestigateUnlocked) {
-        detectiveAudio.playGlassSound()
-        handleOpenReinvestigation()
-      } else {
-        detectiveAudio.playGlassSound()
-      }
-    } else if (id === 'c0-pin-indictment') {
-      if (isIndictmentSolved) {
-        setIsFinalEpilogueOpen(true)
-        if (onOpenEpilogue) onOpenEpilogue()
-      } else {
-        setIsIndictmentOpen(true)
-      }
-    } else if (
-      id === 'c0-pin-followup-vu' ||
-      id === 'followup-vu' ||
-      id === 'c0-pin-question-vu' ||
-      (id.startsWith('c0-pin-followup') && (id.includes('vu') || detail.includes('vũ') || detail.includes('vu')))
-    ) {
-      setActiveFollowupCulprit('vu')
-      setIsFollowupQuestionOpen(true)
-    } else if (
-      id === 'c0-pin-followup-tung' ||
-      id === 'followup-tung' ||
-      id === 'c0-pin-question-tung' ||
-      (id.startsWith('c0-pin-followup') && (id.includes('tung') || detail.includes('tùng') || detail.includes('tung')))
-    ) {
-      setActiveFollowupCulprit('tung')
-      setIsFollowupQuestionOpen(true)
-    } else if (
-      id === 'c0-pin-followup-ha' ||
-      id === 'followup-ha' ||
-      id === 'c0-pin-question-ha' ||
-      (id.startsWith('c0-pin-followup') && (id.includes('ha') || detail.includes('hà') || detail.includes('ha')))
-    ) {
-      setActiveFollowupCulprit('ha')
-      setIsFollowupQuestionOpen(true)
-    } else if (id.startsWith('c0-pin-followup') || id.startsWith('followup-') || id.startsWith('c0-pin-question') || label.includes('nghi vấn')) {
-      const c = (id.includes('ha') || detail.includes('hà')) ? 'ha' : (id.includes('tung') || detail.includes('tùng')) ? 'tung' : 'vu'
-      setActiveFollowupCulprit(c)
-      setIsFollowupQuestionOpen(true)
-    } else if (id.startsWith('node-suspect-') || id.startsWith('suspect-')) {
-      const targetId = id.replace('node-suspect-', '').replace('suspect-', '')
-      if (targetId === 'suspect-khang' || targetId === 'khang' || id.includes('khang')) {
-        handleOpenPhotoZoom('/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png', coords)
-        return
-      }
-      const foundSuspect = suspects.find((s) => {
-        const key = getCanonicalSuspectKey(s)
-        return (
-          s.id === targetId ||
-          key.canonicalId === targetId ||
-          s.id === `node-suspect-${targetId}`
-        )
-      })
-      if (foundSuspect) {
-        setEditingSuspect(foundSuspect)
-        setIsAddSuspectOpen(true)
-      }
-    }
-  }, [suspects, isReinvestigateUnlocked, handleOpenReinvestigation, isIndictmentSolved, solvedCulprit, phoneLookupSuccess, activeFollowupCulprit])
+    },
+    [
+      suspects,
+      isReinvestigateUnlocked,
+      handleOpenReinvestigation,
+      isIndictmentSolved,
+      solvedCulprit,
+      phoneLookupSuccess,
+      activeFollowupCulprit,
+    ],
+  );
 
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // CỐ ĐỊNH CÁC VỊ TRÍ SLOT NGHI PHẠM (Được căn lề chuẩn theo phác thảo sketch, an toàn bên trong khung gỗ)
-  const DESKTOP_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.44, y: 0.58 }, // Slot 0: Lê Quang Vũ
-    { x: 0.60, y: 0.54 }, // Slot 1: Nguyễn Thanh Tùng
-    { x: 0.76, y: 0.62 }, // Slot 2: Trần Thị Hà (đẩy xuống 0.62)
-    { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
-    { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt — Nằm dưới Bà Lụa
-    { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
-    { x: 0.64, y: 0.24 }, // Slot 6: Nguyễn Văn Khang (Nạn nhân)
-    { x: 0.76, y: 0.44 }, // Slot 7: Thảo Vy
-  ], [])
+  const DESKTOP_SUSPECT_SLOTS = React.useMemo(
+    () => [
+      { x: 0.44, y: 0.58 }, // Slot 0: Lê Quang Vũ
+      { x: 0.6, y: 0.54 }, // Slot 1: Nguyễn Thanh Tùng
+      { x: 0.76, y: 0.62 }, // Slot 2: Trần Thị Hà (đẩy xuống 0.62)
+      { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
+      { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt — Nằm dưới Bà Lụa
+      { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
+      { x: 0.64, y: 0.24 }, // Slot 6: Nguyễn Văn Khang (Nạn nhân)
+      { x: 0.76, y: 0.44 }, // Slot 7: Thảo Vy
+    ],
+    [],
+  );
 
-  const MOBILE_SUSPECT_SLOTS = React.useMemo(() => [
-    { x: 0.44, y: 0.58 }, // Slot 0: Lê Quang Vũ
-    { x: 0.60, y: 0.54 }, // Slot 1: Nguyễn Thanh Tùng
-    { x: 0.76, y: 0.62 }, // Slot 2: Trần Thị Hà (đẩy xuống 0.62)
-    { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
-    { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt
-    { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
-    { x: 0.64, y: 0.24 }, // Slot 6: Nguyễn Văn Khang
-    { x: 0.76, y: 0.44 }, // Slot 7: Thảo Vy
-  ], [])
+  const MOBILE_SUSPECT_SLOTS = React.useMemo(
+    () => [
+      { x: 0.44, y: 0.58 }, // Slot 0: Lê Quang Vũ
+      { x: 0.6, y: 0.54 }, // Slot 1: Nguyễn Thanh Tùng
+      { x: 0.76, y: 0.62 }, // Slot 2: Trần Thị Hà (đẩy xuống 0.62)
+      { x: 0.76, y: 0.44 }, // Slot 3: Nguyễn Ngọc Mai
+      { x: 0.23, y: 0.62 }, // Slot 4: Trần Văn Đạt
+      { x: 0.26, y: 0.48 }, // Slot 5: Nguyễn Thị Lụa
+      { x: 0.64, y: 0.24 }, // Slot 6: Nguyễn Văn Khang
+      { x: 0.76, y: 0.44 }, // Slot 7: Thảo Vy
+    ],
+    [],
+  );
 
   // Construct dynamic suspect pins with 100% deterministic, stationary slots
   const mobileSuspectPins: PinPoint[] = suspects.map((suspect) => {
-    const { canonicalId, slotIndex, canonicalName } = getCanonicalSuspectKey(suspect)
-    const slot = MOBILE_SUSPECT_SLOTS[slotIndex] || MOBILE_SUSPECT_SLOTS[0]
+    const { canonicalId, slotIndex, canonicalName } =
+      getCanonicalSuspectKey(suspect);
+    const slot = MOBILE_SUSPECT_SLOTS[slotIndex] || MOBILE_SUSPECT_SLOTS[0];
     return {
       id: `node-suspect-${canonicalId}`,
       x: slot.x,
       y: slot.y,
       label: canonicalName || suspect.name,
       detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
-      color: 'blue' as const,
-    }
-  })
+      color: "blue" as const,
+    };
+  });
 
   const desktopSuspectPins: PinPoint[] = suspects.map((suspect) => {
-    const { canonicalId, slotIndex, canonicalName } = getCanonicalSuspectKey(suspect)
-    const slot = DESKTOP_SUSPECT_SLOTS[slotIndex] || DESKTOP_SUSPECT_SLOTS[0]
+    const { canonicalId, slotIndex, canonicalName } =
+      getCanonicalSuspectKey(suspect);
+    const slot = DESKTOP_SUSPECT_SLOTS[slotIndex] || DESKTOP_SUSPECT_SLOTS[0];
     return {
       id: `node-suspect-${canonicalId}`,
       x: slot.x,
       y: slot.y,
       label: canonicalName || suspect.name,
       detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
-      color: 'blue' as const,
-    }
-  })
+      color: "blue" as const,
+    };
+  });
 
   // Tìm node suspect của Vũ, Tùng và Hà để nối dây
   const vuSuspect = suspects.find(
-    (s) => getCanonicalSuspectKey(s).canonicalId === 'vu'
-  )
+    (s) => getCanonicalSuspectKey(s).canonicalId === "vu",
+  );
   const tungSuspect = suspects.find(
-    (s) => getCanonicalSuspectKey(s).canonicalId === 'tung'
-  )
+    (s) => getCanonicalSuspectKey(s).canonicalId === "tung",
+  );
   const haSuspect = suspects.find(
-    (s) => getCanonicalSuspectKey(s).canonicalId === 'ha'
-  )
+    (s) => getCanonicalSuspectKey(s).canonicalId === "ha",
+  );
 
   // Dynamic Followup Pins cho Vũ, Tùng và Hà (Kéo xuống vùng dưới đáy bảng): CHỈ hiển thị sau khi đã bấm "ĐIỀU TRA"
-  const hasVuFollowup = investigatedSuspects.includes('vu')
-  const hasTungFollowup = investigatedSuspects.includes('tung')
-  const hasHaFollowup = investigatedSuspects.includes('ha')
+  const hasVuFollowup = investigatedSuspects.includes("vu");
+  const hasTungFollowup = investigatedSuspects.includes("tung");
+  const hasHaFollowup = investigatedSuspects.includes("ha");
 
   const followupPinsMobile: PinPoint[] = [
     ...(hasVuFollowup
       ? [
           {
-            id: 'c0-pin-followup-vu',
+            id: "c0-pin-followup-vu",
             x: 0.44,
             y: 0.82,
-            label: 'Nghi vấn',
-            detail: 'Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ',
-            color: 'purple' as const,
-            noteColor: 'yellow' as const,
+            label: "Nghi vấn",
+            detail: "Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ",
+            color: "purple" as const,
+            noteColor: "yellow" as const,
           },
         ]
       : []),
     ...(hasTungFollowup
       ? [
           {
-            id: 'c0-pin-followup-tung',
-            x: 0.60,
+            id: "c0-pin-followup-tung",
+            x: 0.6,
             y: 0.75,
-            label: 'Nghi vấn',
-            detail: 'Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
-            color: 'purple' as const,
-            noteColor: 'yellow' as const,
+            label: "Nghi vấn",
+            detail: "Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng",
+            color: "purple" as const,
+            noteColor: "yellow" as const,
           },
         ]
       : []),
     ...(hasHaFollowup
       ? [
           {
-            id: 'c0-pin-followup-ha',
+            id: "c0-pin-followup-ha",
             x: 0.76,
             y: 0.77,
-            label: 'Nghi vấn',
-            detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
-            color: 'purple' as const,
-            noteColor: 'yellow' as const,
+            label: "Nghi vấn",
+            detail: "Khớp nối chứng cứ đối tượng Trần Thị Hà",
+            color: "purple" as const,
+            noteColor: "yellow" as const,
           },
         ]
       : []),
-  ]
+  ];
 
   const followupPinsDesktop: PinPoint[] = [
     ...(hasVuFollowup
       ? [
           {
-            id: 'c0-pin-followup-vu',
+            id: "c0-pin-followup-vu",
             x: 0.44,
             y: 0.82,
-            label: 'Nghi vấn',
-            detail: 'Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ',
-            color: 'purple' as const,
-            noteColor: 'yellow' as const,
+            label: "Nghi vấn",
+            detail: "Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ",
+            color: "purple" as const,
+            noteColor: "yellow" as const,
           },
         ]
       : []),
     ...(hasTungFollowup
       ? [
           {
-            id: 'c0-pin-followup-tung',
-            x: 0.60,
+            id: "c0-pin-followup-tung",
+            x: 0.6,
             y: 0.75,
-            label: 'Nghi vấn',
-            detail: 'Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng',
-            color: 'purple' as const,
-            noteColor: 'yellow' as const,
+            label: "Nghi vấn",
+            detail: "Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng",
+            color: "purple" as const,
+            noteColor: "yellow" as const,
           },
         ]
       : []),
     ...(hasHaFollowup
       ? [
           {
-            id: 'c0-pin-followup-ha',
+            id: "c0-pin-followup-ha",
             x: 0.76,
             y: 0.77,
-            label: 'Nghi vấn',
-            detail: 'Khớp nối chứng cứ đối tượng Trần Thị Hà',
-            color: 'purple' as const,
-            noteColor: 'yellow' as const,
+            label: "Nghi vấn",
+            detail: "Khớp nối chứng cứ đối tượng Trần Thị Hà",
+            color: "purple" as const,
+            noteColor: "yellow" as const,
           },
         ]
       : []),
-  ]
+  ];
 
   // Construct dynamic pins and connections combining main category pins, sub action pins, and suspect pins
-  const isReinvestigateBlinking = isReinvestigateUnlocked && !hasOpenedReinvestigation
+  const isReinvestigateBlinking =
+    isReinvestigateUnlocked && !hasOpenedReinvestigation;
 
   const customPins: PinPoint[] = isMobile
     ? [
         {
-          id: 'c0-pin-evidence',
-          x: 0.20,
+          id: "c0-pin-evidence",
+          x: 0.2,
           y: 0.18,
-          label: 'Bổ sung chứng cứ',
-          detail: 'Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra',
-          color: 'red' as const,
-          noteColor: 'yellow' as const,
+          label: "Bổ sung chứng cứ",
+          detail: "Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra",
+          color: "red" as const,
+          noteColor: "yellow" as const,
         },
         {
-          id: 'c0-pin-phone',
+          id: "c0-pin-phone",
           x: 0.42,
           y: 0.27,
-          label: 'Mở rộng điều tra',
+          label: "Mở rộng điều tra",
           detail: phoneLookupSuccess
-            ? 'Đã xác minh danh tính SĐT thành công'
-            : 'Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang',
-          color: phoneLookupSuccess ? ('cyan' as const) : ('yellow' as const),
-          noteColor: 'white' as const,
+            ? "Đã xác minh danh tính SĐT thành công"
+            : "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
+          color: phoneLookupSuccess ? ("cyan" as const) : ("yellow" as const),
+          noteColor: "white" as const,
           isSolved: phoneLookupSuccess,
         },
         {
-          id: 'c0-pin-victim-khang',
+          id: "c0-pin-victim-khang",
           x: 0.55,
           y: 0.12,
-          label: 'Nạn nhân Nguyễn Văn Khang',
-          detail: 'Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài',
-          color: 'red' as const,
-          photoUrl: '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png',
+          label: "Nạn nhân Nguyễn Văn Khang",
+          detail:
+            "Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài",
+          color: "red" as const,
+          photoUrl:
+            "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
         },
         {
-          id: 'c0-pin-crime-scene',
+          id: "c0-pin-crime-scene",
           x: 0.73,
           y: 0.21,
-          label: 'Hiện trường thi thể',
-          detail: 'Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn',
-          color: 'orange' as const,
-          photoUrl: '/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png',
+          label: "Hiện trường thi thể",
+          detail: "Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn",
+          color: "orange" as const,
+          photoUrl:
+            "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
         },
         {
-          id: 'c0-pin-reinvestigate',
-          x: 0.20,
+          id: "c0-pin-reinvestigate",
+          x: 0.2,
           y: 0.35,
-          label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại (Chờ phê duyệt)',
+          label: isReinvestigateUnlocked
+            ? "Khám xét lại"
+            : "Khám xét lại (Chờ phê duyệt)",
           detail: isReinvestigateUnlocked
-            ? 'Mở biên bản tái khám xét hiện trường'
-            : 'Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]',
-          color: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
-          noteColor: 'white' as const,
-          pinColor: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
+            ? "Mở biên bản tái khám xét hiện trường"
+            : "Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]",
+          color: isReinvestigateUnlocked
+            ? ("yellow" as const)
+            : ("dark" as const),
+          noteColor: "white" as const,
+          pinColor: isReinvestigateUnlocked
+            ? ("yellow" as const)
+            : ("dark" as const),
           pulseBorder: isReinvestigateBlinking,
           isLocked: !isReinvestigateUnlocked,
         },
         {
-          id: 'c0-pin-suspects',
+          id: "c0-pin-suspects",
           x: 0.58,
           y: 0.38,
-          label: 'Nghi phạm',
-          detail: 'Thêm & xem danh sách nghi phạm vụ án',
-          color: 'red' as const,
-          pinColor: 'red' as const,
-          noteColor: 'yellow' as const,
+          label: "Nghi phạm",
+          detail: "Thêm & xem danh sách nghi phạm vụ án",
+          color: "red" as const,
+          pinColor: "red" as const,
+          noteColor: "yellow" as const,
         },
         {
-          id: 'c0-pin-indictment',
+          id: "c0-pin-indictment",
           x: 0.22,
-          y: 0.80,
-          label: 'Bản kết luận điều tra',
+          y: 0.8,
+          label: "Bản kết luận điều tra",
           detail: isIndictmentSolved
-            ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
-            : 'Lập bản cáo trạng gửi Viện Kiểm sát',
-          color: 'red' as const,
-          pinColor: 'red' as const,
-          noteColor: 'white' as const,
+            ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
+            : "Lập bản cáo trạng gửi Viện Kiểm sát",
+          color: "red" as const,
+          pinColor: "red" as const,
+          noteColor: "white" as const,
         },
         ...followupPinsMobile,
         ...mobileSuspectPins,
       ]
     : [
         {
-          id: 'c0-pin-evidence',
-          x: 0.20,
+          id: "c0-pin-evidence",
+          x: 0.2,
           y: 0.18,
-          label: 'Bổ sung chứng cứ',
-          detail: 'Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra',
-          color: 'red' as const,
-          pinColor: 'red' as const,
-          noteColor: 'yellow' as const,
+          label: "Bổ sung chứng cứ",
+          detail: "Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra",
+          color: "red" as const,
+          pinColor: "red" as const,
+          noteColor: "yellow" as const,
         },
         {
-          id: 'c0-pin-phone',
+          id: "c0-pin-phone",
           x: 0.42,
           y: 0.27,
-          label: 'Mở rộng điều tra',
+          label: "Mở rộng điều tra",
           detail: phoneLookupSuccess
-            ? 'Đã xác minh danh tính SĐT thành công'
-            : 'Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang',
-          color: 'yellow' as const,
-          pinColor: 'yellow' as const,
-          noteColor: 'white' as const,
+            ? "Đã xác minh danh tính SĐT thành công"
+            : "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
+          color: "yellow" as const,
+          pinColor: "yellow" as const,
+          noteColor: "white" as const,
           isSolved: phoneLookupSuccess,
         },
         {
-          id: 'c0-pin-victim-khang',
+          id: "c0-pin-victim-khang",
           x: 0.55,
           y: 0.12,
-          label: 'Nạn nhân Nguyễn Văn Khang',
-          detail: 'Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài',
-          color: 'yellow' as const,
-          pinColor: 'yellow' as const,
-          photoUrl: '/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png',
+          label: "Nạn nhân Nguyễn Văn Khang",
+          detail:
+            "Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài",
+          color: "yellow" as const,
+          pinColor: "yellow" as const,
+          photoUrl:
+            "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
         },
         {
-          id: 'c0-pin-crime-scene',
+          id: "c0-pin-crime-scene",
           x: 0.73,
           y: 0.21,
-          label: 'Hiện trường thi thể',
-          detail: 'Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn',
-          color: 'yellow' as const,
-          pinColor: 'yellow' as const,
-          photoUrl: '/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png',
+          label: "Hiện trường thi thể",
+          detail: "Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn",
+          color: "yellow" as const,
+          pinColor: "yellow" as const,
+          photoUrl:
+            "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
         },
         {
-          id: 'c0-pin-reinvestigate',
-          x: 0.20,
+          id: "c0-pin-reinvestigate",
+          x: 0.2,
           y: 0.35,
-          label: isReinvestigateUnlocked ? 'Khám xét lại' : 'Khám xét lại (Chờ phê duyệt)',
+          label: isReinvestigateUnlocked
+            ? "Khám xét lại"
+            : "Khám xét lại (Chờ phê duyệt)",
           detail: isReinvestigateUnlocked
-            ? 'Mở biên bản tái khám xét hiện trường'
-            : 'Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]',
-          color: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
-          noteColor: 'white' as const,
-          pinColor: isReinvestigateUnlocked ? ('yellow' as const) : ('dark' as const),
+            ? "Mở biên bản tái khám xét hiện trường"
+            : "Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]",
+          color: isReinvestigateUnlocked
+            ? ("yellow" as const)
+            : ("dark" as const),
+          noteColor: "white" as const,
+          pinColor: isReinvestigateUnlocked
+            ? ("yellow" as const)
+            : ("dark" as const),
           pulseBorder: isReinvestigateBlinking,
           isLocked: !isReinvestigateUnlocked,
         },
         {
-          id: 'c0-pin-suspects',
+          id: "c0-pin-suspects",
           x: 0.58,
           y: 0.38,
-          label: 'Nghi phạm',
-          detail: 'Thêm & xem danh sách nghi phạm vụ án',
-          color: 'yellow' as const,
-          pinColor: 'yellow' as const,
-          noteColor: 'yellow' as const,
+          label: "Nghi phạm",
+          detail: "Thêm & xem danh sách nghi phạm vụ án",
+          color: "yellow" as const,
+          pinColor: "yellow" as const,
+          noteColor: "yellow" as const,
         },
         {
-          id: 'c0-pin-indictment',
+          id: "c0-pin-indictment",
           x: 0.22,
-          y: 0.80,
-          label: 'Bản kết luận điều tra',
+          y: 0.8,
+          label: "Bản kết luận điều tra",
           detail: isIndictmentSolved
-            ? 'Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!'
-            : 'Lập bản cáo trạng gửi Viện Kiểm sát',
-          color: 'red' as const,
-          pinColor: 'red' as const,
-          noteColor: 'white' as const,
+            ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
+            : "Lập bản cáo trạng gửi Viện Kiểm sát",
+          color: "red" as const,
+          pinColor: "red" as const,
+          noteColor: "white" as const,
         },
         ...followupPinsDesktop,
         ...desktopSuspectPins,
-      ]
+      ];
+
+  // Apply admin-saved positions from Supabase over the built-in defaults
+  const displayPins: PinPoint[] = customPins.map((pin) => {
+    const override = customPinPositions[pin.id];
+    return override ? { ...pin, x: override.x, y: override.y } : pin;
+  });
+
+  // Tất cả các ghim (bao gồm ghim hệ thống, ảnh nghi phạm node-suspect-* và nghi vấn mở rộng) đều được lưu vị trí
+  const persistablePins = displayPins;
 
   const customConnections: CaseConnection[] = [
-    { id: 'c0-conn-phone', fromPinId: 'c0-pin-evidence', toPinId: 'c0-pin-phone' },
-    { id: 'c0-conn-reinvestigate', fromPinId: 'c0-pin-evidence', toPinId: 'c0-pin-reinvestigate' },
+    {
+      id: "c0-conn-phone",
+      fromPinId: "c0-pin-evidence",
+      toPinId: "c0-pin-phone",
+    },
+    {
+      id: "c0-conn-reinvestigate",
+      fromPinId: "c0-pin-evidence",
+      toPinId: "c0-pin-reinvestigate",
+    },
     ...(hasVuFollowup && vuSuspect
       ? [
           {
-            id: 'c0-conn-followup-vu',
+            id: "c0-conn-followup-vu",
             fromPinId: `node-suspect-${getCanonicalSuspectKey(vuSuspect).canonicalId}`,
-            toPinId: 'c0-pin-followup-vu',
+            toPinId: "c0-pin-followup-vu",
           },
         ]
       : []),
     ...(hasTungFollowup && tungSuspect
       ? [
           {
-            id: 'c0-conn-followup-tung',
+            id: "c0-conn-followup-tung",
             fromPinId: `node-suspect-${getCanonicalSuspectKey(tungSuspect).canonicalId}`,
-            toPinId: 'c0-pin-followup-tung',
+            toPinId: "c0-pin-followup-tung",
           },
         ]
       : []),
     ...(hasHaFollowup && haSuspect
       ? [
           {
-            id: 'c0-conn-followup-ha',
+            id: "c0-conn-followup-ha",
             fromPinId: `node-suspect-${getCanonicalSuspectKey(haSuspect).canonicalId}`,
-            toPinId: 'c0-pin-followup-ha',
+            toPinId: "c0-pin-followup-ha",
           },
         ]
       : []),
     ...suspects.map((suspect) => {
-      const { canonicalId } = getCanonicalSuspectKey(suspect)
+      const { canonicalId } = getCanonicalSuspectKey(suspect);
       return {
         id: `c0-conn-${canonicalId}`,
-        fromPinId: 'c0-pin-suspects',
+        fromPinId: "c0-pin-suspects",
         toPinId: `node-suspect-${canonicalId}`,
-      }
+      };
     }),
-  ]
+  ];
 
   return (
-    <div suppressHydrationWarning className="relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none">
+    <div
+      suppressHydrationWarning
+      className="relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none"
+    >
       {/* Top Banner Toolbar */}
       <div className="absolute top-3 left-4 z-20 flex items-center gap-2 pointer-events-none">
         <div className="flex items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto">
           <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
         </div>
+
+        {/* Admin Setup Controls */}
+        {isAdmin && (
+          <div className="flex items-center gap-1.5 bg-[#141419]/90 backdrop-blur-md p-1 rounded-lg border border-amber-500/40 text-xs shadow-xl pointer-events-auto">
+            <button
+              onClick={() => {
+                detectiveAudio.playTypewriterClick();
+                setIsEditMode(!isEditMode);
+              }}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-medium transition-colors ${
+                isEditMode
+                  ? "bg-amber-500 text-black shadow-sm font-bold"
+                  : "text-zinc-300 hover:text-white hover:bg-zinc-800/60"
+              }`}
+              title="Bật/Tắt chế độ kéo thả ghim hệ thống"
+            >
+              <Move className="size-3.5" />
+              <span>{isEditMode ? "ĐANG CHỈNH VỊ TRÍ" : "CHẾ ĐỘ SETUP"}</span>
+            </button>
+
+            {isEditMode && (
+              <>
+                <button
+                  disabled={isSavingLayout}
+                  onClick={() => handleSavePinLayout(persistablePins)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                    hasUnsavedChanges
+                      ? "bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm animate-pulse"
+                      : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  }`}
+                  title="Lưu toàn bộ tọa độ ghim vào Supabase Database"
+                >
+                  <Save className="size-3.5" />
+                  <span>{isSavingLayout ? "Đang lưu..." : "LƯU VỊ TRÍ"}</span>
+                </button>
+
+                {hasUnsavedChanges && (
+                  <button
+                    onClick={() => {
+                      detectiveAudio.playPaperRustle();
+                      setCustomPinPositions({});
+                      setHasUnsavedChanges(false);
+                    }}
+                    className="flex items-center gap-1 px-2 py-1 rounded text-xs text-zinc-400 hover:text-red-400 hover:bg-red-950/40 transition-colors"
+                    title="Hoàn tác các vị trí chưa lưu"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Main Interactive Pinboard Canvas */}
       <HeroInteractive
         className="w-full h-full flex-1 min-h-0"
         controlledCaseId="case-000"
-        customPins={customPins}
+        customPins={displayPins}
         customConnections={customConnections}
         onPinClick={handlePinClick}
+        isEditMode={isEditMode}
+        onPinPositionChange={handlePinPositionChange}
       />
 
       {/* Modals & Narrative Layers */}
       <AddSuspectModal
-        key={isAddSuspectOpen ? (editingSuspect ? `suspect-${editingSuspect.id}` : 'new-suspect-form') : 'suspect-modal-closed'}
+        key={
+          isAddSuspectOpen
+            ? editingSuspect
+              ? `suspect-${editingSuspect.id}`
+              : "new-suspect-form"
+            : "suspect-modal-closed"
+        }
         isOpen={isAddSuspectOpen}
         onClose={() => {
-          setIsAddSuspectOpen(false)
-          setEditingSuspect(null)
+          setIsAddSuspectOpen(false);
+          setEditingSuspect(null);
         }}
         onSave={handleSaveSuspect}
         onDelete={handleDeleteSuspect}
@@ -852,18 +1196,23 @@ export function MainInvestigationCanvas({
         onSelectSuspect={(s) => setEditingSuspect(s)}
         isPhoneSolved={phoneLookupSuccess}
         onSubmitConclusion={(culprit) => {
-          detectiveAudio.playStampSound()
-          detectiveAudio.playUnlockJingle()
+          detectiveAudio.playStampSound();
+          detectiveAudio.playUnlockJingle();
           setInvestigatedSuspects((prev) => {
-            const next = Array.from(new Set([...prev, culprit])) as ('vu' | 'tung' | 'ha')[]
+            const next = Array.from(new Set([...prev, culprit])) as (
+              "vu" | "tung" | "ha"
+            )[];
             try {
-              localStorage.setItem('veritas_investigated_suspects', JSON.stringify(next))
+              localStorage.setItem(
+                "veritas_investigated_suspects",
+                JSON.stringify(next),
+              );
             } catch {}
-            return next
-          })
-          setNarrativeCulprit(culprit)
-          setActiveFollowupCulprit(culprit)
-          setIsEpilogueOpen(true)
+            return next;
+          });
+          setNarrativeCulprit(culprit);
+          setActiveFollowupCulprit(culprit);
+          setIsEpilogueOpen(true);
         }}
       />
 
@@ -909,24 +1258,29 @@ export function MainInvestigationCanvas({
         culprit={narrativeCulprit || activeFollowupCulprit || solvedCulprit}
         choice={narrativeChoice}
         onClose={() => {
-          setIsEpilogueOpen(false)
-          setNarrativeCulprit(null)
-          setNarrativeChoice(null)
+          setIsEpilogueOpen(false);
+          setNarrativeCulprit(null);
+          setNarrativeChoice(null);
         }}
         onOpenDossier={handleOpenDossier}
         onOpenFollowupQuestion={(targetCulprit) => {
-          const c = targetCulprit || narrativeCulprit || activeFollowupCulprit || solvedCulprit || 'vu'
-          setActiveFollowupCulprit(c)
-          setIsEpilogueOpen(false)
-          setNarrativeCulprit(null)
-          setNarrativeChoice(null)
-          setIsFollowupQuestionOpen(true)
+          const c =
+            targetCulprit ||
+            narrativeCulprit ||
+            activeFollowupCulprit ||
+            solvedCulprit ||
+            "vu";
+          setActiveFollowupCulprit(c);
+          setIsEpilogueOpen(false);
+          setNarrativeCulprit(null);
+          setNarrativeChoice(null);
+          setIsFollowupQuestionOpen(true);
         }}
         onOpenIndictment={() => {
-          setIsEpilogueOpen(false)
-          setNarrativeCulprit(null)
-          setNarrativeChoice(null)
-          setIsIndictmentOpen(true)
+          setIsEpilogueOpen(false);
+          setNarrativeCulprit(null);
+          setNarrativeChoice(null);
+          setIsIndictmentOpen(true);
         }}
       />
 
@@ -935,20 +1289,31 @@ export function MainInvestigationCanvas({
         dossierType={activeDossierType}
         onClose={() => setIsDossierOpen(false)}
         onOpenFollowupQuestion={() => {
-          setIsDossierOpen(false)
-          const c = activeDossierType === 'A' ? 'vu' : activeDossierType === 'B' ? 'tung' : 'ha'
-          setActiveFollowupCulprit(c)
-          setIsFollowupQuestionOpen(true)
+          setIsDossierOpen(false);
+          const c =
+            activeDossierType === "A"
+              ? "vu"
+              : activeDossierType === "B"
+                ? "tung"
+                : "ha";
+          setActiveFollowupCulprit(c);
+          setIsFollowupQuestionOpen(true);
         }}
       />
 
       <FollowupQuestionModal
-        key={isFollowupQuestionOpen ? `followup-${activeFollowupCulprit || narrativeCulprit || solvedCulprit || 'vu'}` : 'followup-modal-closed'}
+        key={
+          isFollowupQuestionOpen
+            ? `followup-${activeFollowupCulprit || narrativeCulprit || solvedCulprit || "vu"}`
+            : "followup-modal-closed"
+        }
         isOpen={isFollowupQuestionOpen}
-        culprit={activeFollowupCulprit || narrativeCulprit || solvedCulprit || 'vu'}
+        culprit={
+          activeFollowupCulprit || narrativeCulprit || solvedCulprit || "vu"
+        }
         onClose={() => {
-          setIsFollowupQuestionOpen(false)
-          setActiveFollowupCulprit(null)
+          setIsFollowupQuestionOpen(false);
+          setActiveFollowupCulprit(null);
         }}
         onSuccess={handleFollowupSuccess}
         onOpenDossier={handleOpenDossier}
@@ -970,12 +1335,12 @@ export function MainInvestigationCanvas({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             onClick={(e) => {
-              e.stopPropagation()
+              e.stopPropagation();
               if (Date.now() - zoomOpenTimeRef.current < 120) {
-                return
+                return;
               }
-              detectiveAudio.playPaperRustle()
-              setZoomedPhotoUrl(null)
+              detectiveAudio.playPaperRustle();
+              setZoomedPhotoUrl(null);
             }}
             className="fixed inset-0 z-[1000] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 cursor-pointer select-none"
           >
@@ -999,7 +1364,7 @@ export function MainInvestigationCanvas({
                 y: zoomOrigin?.y ?? 0,
               }}
               transition={{
-                type: 'spring',
+                type: "spring",
                 damping: 25,
                 stiffness: 320,
                 mass: 0.8,
@@ -1016,5 +1381,5 @@ export function MainInvestigationCanvas({
         )}
       </AnimatePresence>
     </div>
-  )
+  );
 }
