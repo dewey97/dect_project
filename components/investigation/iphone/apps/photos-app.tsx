@@ -1,30 +1,40 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Image as ImageIcon, ArrowLeft, ChevronLeft, Info, Trash2, CloudOff, Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { usePhoneData } from '@/lib/hooks/use-phone-data'
+import { useState } from "react";
+import {
+  Image as ImageIcon,
+  ArrowLeft,
+  ChevronLeft,
+  Info,
+  Trash2,
+  CloudOff,
+  Loader2,
+} from "lucide-react";
+import { cn, normalizeImageUrl } from "@/lib/utils";
+import { usePhoneData } from "@/lib/hooks/use-phone-data";
 
 interface PhotosAppProps {
-  photos?: any[]
-  onBackToHome?: () => void
+  photos?: any[];
+  onBackToHome?: () => void;
 }
 
 export function PhotosApp({ onBackToHome }: PhotosAppProps) {
-  const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null)
-  const [showExifInfo, setShowExifInfo] = useState(false)
+  const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null);
+  const [showExifInfo, setShowExifInfo] = useState(false);
 
-  const { data: sheetPhotos, loading, error } = usePhoneData('photos')
+  const { data: sheetPhotos, loading, error } = usePhoneData("photos");
 
   const photos = sheetPhotos.map((item: any, idx: number) => ({
     id: item.photo_id || `photo-${idx + 1}`,
     filename: item.filename || item.photo_id || `IMG_${idx + 1000}.png`,
-    driveUrl: item.drive_url || item.url || '',
-    timestamp: item.timestamp || item.created_at || '24/07/2016 18:30',
-    location: item.location || 'Khu vực Bờ Sông',
-    description: item.description || item.note || '',
-    size: item.size || '2.4 MB'
-  }))
+    driveUrl: normalizeImageUrl(
+      item.drive_url || item.url || item.photo_url || "",
+    ),
+    timestamp: item.timestamp || item.created_at || "24/07/2016 18:30",
+    location: item.location || "Khu vực Bờ Sông",
+    description: item.description || item.note || "",
+    size: item.size || "2.4 MB",
+  }));
 
   return (
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans">
@@ -34,8 +44,8 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
           <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-[#161618] border-b border-[#2C2C2E] shrink-0">
             <button
               onClick={() => {
-                setSelectedPhoto(null)
-                setShowExifInfo(false)
+                setSelectedPhoto(null);
+                setShowExifInfo(false);
               }}
               className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium active:opacity-60"
             >
@@ -43,12 +53,19 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
               <span>Thư viện</span>
             </button>
             <div className="text-center">
-              <div className="text-[11px] font-semibold text-white">Ảnh vật chứng</div>
-              <div className="text-[9px] text-[#8E8E93]">{selectedPhoto.timestamp}</div>
+              <div className="text-[11px] font-semibold text-white">
+                Ảnh vật chứng
+              </div>
+              <div className="text-[9px] text-[#8E8E93]">
+                {selectedPhoto.timestamp}
+              </div>
             </div>
             <button
               onClick={() => setShowExifInfo(!showExifInfo)}
-              className={cn('p-1 transition-colors', showExifInfo ? 'text-[#0A84FF]' : 'text-[#8E8E93]')}
+              className={cn(
+                "p-1 transition-colors",
+                showExifInfo ? "text-[#0A84FF]" : "text-[#8E8E93]",
+              )}
               title="Xem thông số EXIF"
             >
               <Info className="size-4" />
@@ -115,7 +132,9 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
               ) : (
                 <span className="w-12" />
               )}
-              <span className="text-[17px] font-bold tracking-tight text-white">Thư viện ảnh</span>
+              <span className="text-[17px] font-bold tracking-tight text-white">
+                Thư viện ảnh
+              </span>
               <span className="w-12" />
             </div>
           </div>
@@ -123,18 +142,26 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
           {loading ? (
             <div className="flex-1 flex flex-col items-center justify-center p-4 text-[#8E8E93]">
               <Loader2 className="size-6 animate-spin mb-2 text-[#0A84FF]" />
-              <span className="text-xs">Đang tải thư viện ảnh từ Google Sheets...</span>
+              <span className="text-xs">
+                Đang tải thư viện ảnh từ Google Sheets...
+              </span>
             </div>
           ) : error ? (
-            <div className="flex-1 p-4 text-center text-xs text-red-400">Lỗi: {error}</div>
+            <div className="flex-1 p-4 text-center text-xs text-red-400">
+              Lỗi: {error}
+            </div>
           ) : photos.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 pb-14">
               <div className="size-16 rounded-full bg-[#1C1C1E] border border-white/10 flex items-center justify-center text-[#8E8E93]">
                 <CloudOff className="size-8 stroke-[1.5]" />
               </div>
               <div className="space-y-1.5 max-w-[260px]">
-                <h2 className="text-[16px] font-bold text-white tracking-tight">Thư viện trống</h2>
-                <p className="text-[12px] text-[#8E8E93]">Không có ảnh nào trong thư viện Google Sheets.</p>
+                <h2 className="text-[16px] font-bold text-white tracking-tight">
+                  Thư viện trống
+                </h2>
+                <p className="text-[12px] text-[#8E8E93]">
+                  Không có ảnh nào trong thư viện Google Sheets.
+                </p>
               </div>
             </div>
           ) : (
@@ -168,5 +195,5 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
+import { normalizeImageUrl } from "@/lib/utils";
+import { usePhoneData } from "@/lib/hooks/use-phone-data";
 
 interface AdminCreatePinModalProps {
   isOpen: boolean;
@@ -178,6 +180,34 @@ export function AdminCreatePinModal({
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+  // Fetch live photos from Google Sheets
+  const { data: sheetPhotos } = usePhoneData("photos");
+
+  const combinedPhotos = React.useMemo(() => {
+    const list = [...PRESET_CASE_PHOTOS];
+    if (Array.isArray(sheetPhotos)) {
+      sheetPhotos.forEach((item: any, idx: number) => {
+        const rawUrl = item.drive_url || item.url || item.photo_url;
+        if (rawUrl) {
+          const normUrl = normalizeImageUrl(rawUrl);
+          const label =
+            item.filename ||
+            item.description ||
+            item.note ||
+            item.photo_id ||
+            `Ảnh Sheet #${idx + 1}`;
+          if (!list.some((p) => p.url === normUrl || p.url === rawUrl)) {
+            list.push({
+              label: `[Sheet] ${label}`,
+              url: normUrl,
+            });
+          }
+        }
+      });
+    }
+    return list;
+  }, [sheetPhotos]);
+
   useEffect(() => {
     if (initialPin) {
       setLabel(initialPin.label || "");
@@ -252,9 +282,14 @@ export function AdminCreatePinModal({
           : pinType === "photo"
             ? undefined
             : noteColor,
-      photoUrl: pinType === "photo" ? photoUrl.trim() || undefined : undefined,
+      photoUrl:
+        pinType === "photo"
+          ? normalizeImageUrl(photoUrl) || undefined
+          : undefined,
       noteTextureUrl:
-        pinType !== "photo" ? noteTextureUrl.trim() || undefined : undefined,
+        pinType !== "photo"
+          ? normalizeImageUrl(noteTextureUrl) || undefined
+          : undefined,
 
       actionType,
       checkpointId:
@@ -460,16 +495,42 @@ export function AdminCreatePinModal({
 
             {pinType === "photo" && (
               <div className="space-y-1.5 pt-1.5 border-t border-white/5">
-                <input
-                  type="text"
-                  value={photoUrl}
-                  onChange={(e) => setPhotoUrl(e.target.value)}
-                  placeholder="URL ảnh hoặc chọn bên dưới..."
-                  className="w-full px-2.5 py-1 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-                />
-                <div className="grid grid-cols-2 gap-1 max-h-32 overflow-y-auto custom-scrollbar pr-1">
-                  {PRESET_CASE_PHOTOS.map((p, idx) => {
-                    const isSelected = photoUrl === p.url;
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    value={photoUrl}
+                    onChange={(e) =>
+                      setPhotoUrl(normalizeImageUrl(e.target.value))
+                    }
+                    placeholder="Dán link Drive / Web URL hoặc chọn bên dưới..."
+                    className="w-full px-2.5 py-1 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
+                  />
+                  {photoUrl && (
+                    <div className="size-7 rounded border border-white/10 overflow-hidden shrink-0 bg-black flex items-center justify-center">
+                      <img
+                        src={normalizeImageUrl(photoUrl)}
+                        alt="preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="text-[10px] font-mono text-zinc-400 flex items-center justify-between">
+                  <span>
+                    Danh sách ảnh ({combinedPhotos.length} mẫu & Sheets):
+                  </span>
+                  {photoUrl.includes("lh3.googleusercontent.com") && (
+                    <span className="text-emerald-400">✓ Google Drive CDN</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-1 max-h-36 overflow-y-auto custom-scrollbar pr-1">
+                  {combinedPhotos.map((p, idx) => {
+                    const isSelected =
+                      photoUrl === p.url ||
+                      normalizeImageUrl(photoUrl) === p.url;
                     return (
                       <button
                         key={idx}
@@ -477,16 +538,25 @@ export function AdminCreatePinModal({
                         onClick={() => {
                           detectiveAudio.playTypewriterClick();
                           setPhotoUrl(p.url);
-                          if (p.label) setLabel(p.label);
+                          if (p.label) {
+                            const cleanLabel = p.label.replace(
+                              /^\[Sheet\]\s*/,
+                              "",
+                            );
+                            setLabel(cleanLabel);
+                          }
                         }}
-                        className={`text-left px-2 py-1 rounded border text-[11px] font-mono truncate transition-all ${
+                        className={`text-left px-2 py-1 rounded border text-[11px] font-mono truncate transition-all flex items-center gap-1.5 ${
                           isSelected
                             ? "bg-amber-500/25 border-amber-400 text-amber-200 font-bold"
                             : "bg-zinc-900/60 border-white/5 text-zinc-400 hover:text-zinc-200"
                         }`}
+                        title={p.url}
                       >
-                        {isSelected ? "✓ " : ""}
-                        {p.label}
+                        <span className="truncate flex-1">
+                          {isSelected ? "✓ " : ""}
+                          {p.label}
+                        </span>
                       </button>
                     );
                   })}

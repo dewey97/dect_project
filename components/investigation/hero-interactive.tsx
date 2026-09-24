@@ -9,7 +9,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import { cn } from "@/lib/utils";
+import { cn, normalizeImageUrl } from "@/lib/utils";
 import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
 import { detectiveAudio } from "@/lib/investigation-audio";
 
@@ -731,7 +731,7 @@ export function HeroInteractive({
     label: string;
     photoUrl?: string;
   }): string | undefined => {
-    if (pin.photoUrl) return pin.photoUrl;
+    if (pin.photoUrl) return normalizeImageUrl(pin.photoUrl);
     if (
       pin.id.startsWith("c0-pin-followup") ||
       pin.id.startsWith("c0-pin-question") ||
@@ -760,8 +760,9 @@ export function HeroInteractive({
     return undefined;
   };
 
-  const getLoadedImage = (url: string): HTMLImageElement | null => {
-    if (!url) return null;
+  const getLoadedImage = (rawUrl: string): HTMLImageElement | null => {
+    if (!rawUrl) return null;
+    const url = normalizeImageUrl(rawUrl);
     let img = suspectImageCacheRef.current.get(url);
     if (!img) {
       img = new Image();

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
+import { normalizeImageUrl } from "@/lib/utils";
 
 interface CustomPinModalProps {
   isOpen: boolean;
@@ -102,7 +103,7 @@ export function CustomPinModal({
           {pin.photoUrl && (
             <div className="relative rounded border-2 border-[#2b1f14] overflow-hidden bg-black/10 max-h-60 flex items-center justify-center">
               <img
-                src={pin.photoUrl}
+                src={normalizeImageUrl(pin.photoUrl)}
                 alt={pin.label}
                 className="max-h-56 object-contain"
               />

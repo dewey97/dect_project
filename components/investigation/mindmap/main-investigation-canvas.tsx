@@ -51,6 +51,7 @@ import {
   saveBoardgamePinPositions,
 } from "@/lib/actions/board-actions";
 import { toast } from "@/components/ui/toast";
+import { normalizeImageUrl } from "@/lib/utils";
 
 interface SuspectItem {
   id: string;
@@ -112,7 +113,7 @@ export function MainInvestigationCanvas({
       } else {
         setZoomOrigin(null);
       }
-      setZoomedPhotoUrl(url);
+      setZoomedPhotoUrl(normalizeImageUrl(url));
     },
     [],
   );
@@ -1559,16 +1560,22 @@ export function MainInvestigationCanvas({
             <button
               onClick={() => {
                 detectiveAudio.playTypewriterClick();
-                setIsEditMode(true);
-                setEditingCustomPin(null);
-                setIsCreatePinModalOpen(true);
+                setIsEditMode((prev) => {
+                  const next = !prev;
+                  if (!next) setSelectedPinId(null);
+                  return next;
+                });
               }}
               className={`p-1.5 rounded-lg border transition-all ${
                 isEditMode
                   ? "bg-amber-500/30 border-amber-400 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.55)] ring-1 ring-amber-400/60"
                   : "bg-black/40 border-white/10 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
               }`}
-              title="Mở bảng thiết lập & thêm ghim điều tra"
+              title={
+                isEditMode
+                  ? "Thoát chế độ di chuyển & setup"
+                  : "Bật chế độ di chuyển & setup node"
+              }
             >
               <Move className="size-4" />
             </button>
