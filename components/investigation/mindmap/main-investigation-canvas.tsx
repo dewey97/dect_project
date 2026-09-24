@@ -1641,22 +1641,22 @@ export function MainInvestigationCanvas({
             transition={{ duration: 0.15 }}
             className="absolute top-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-0.5 p-0.5 bg-[#1b140e]/95 backdrop-blur-md rounded-lg border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
           >
-            {/* Tilt Left (-5 deg) */}
+            {/* Tilt Left (-1 deg) */}
             <button
               type="button"
-              onClick={() => handleAdjustNodeTransform(selectedPin.id, -5, 0)}
+              onClick={() => handleAdjustNodeTransform(selectedPin.id, -1, 0)}
               className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Xoay nghiêng trái (-5°)"
+              title="Xoay nghiêng trái (-1°)"
             >
               <RotateCcw className="size-3.5" />
             </button>
 
-            {/* Tilt Right (+5 deg) */}
+            {/* Tilt Right (+1 deg) */}
             <button
               type="button"
-              onClick={() => handleAdjustNodeTransform(selectedPin.id, 5, 0)}
+              onClick={() => handleAdjustNodeTransform(selectedPin.id, 1, 0)}
               className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Xoay nghiêng phải (+5°)"
+              title="Xoay nghiêng phải (+1°)"
             >
               <RotateCw className="size-3.5" />
             </button>
