@@ -187,14 +187,33 @@ export function AdminCreatePinModal({
     const list = [...PRESET_CASE_PHOTOS];
     if (Array.isArray(sheetPhotos)) {
       sheetPhotos.forEach((item: any, idx: number) => {
-        const rawUrl = item.drive_url || item.url || item.photo_url;
+        const rawUrl =
+          item.drive_url ||
+          item.url ||
+          item.link ||
+          item.link_anh ||
+          item.photo_url ||
+          item.image_url ||
+          item.duong_dan ||
+          item.link_drive ||
+          item.url_drive;
         if (rawUrl) {
           const normUrl = normalizeImageUrl(rawUrl);
           const label =
+            item.ten_anh ||
+            item["tên ảnh"] ||
+            item["tên_ảnh"] ||
+            item["tên"] ||
+            item.ten ||
+            item.title ||
+            item.name ||
+            item.caption ||
             item.filename ||
             item.description ||
+            item.mo_ta ||
             item.note ||
             item.photo_id ||
+            item.id ||
             `Ảnh Sheet #${idx + 1}`;
           if (!list.some((p) => p.url === normUrl || p.url === rawUrl)) {
             list.push({
@@ -264,7 +283,10 @@ export function AdminCreatePinModal({
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!label.trim()) return;
+    // Ảnh không cần tiêu đề: ảnh render trực tiếp trên bảng, không hiện chữ nào.
+    const isPhotoPin = pinType === "photo";
+    if (!isPhotoPin && !label.trim()) return;
+    if (isPhotoPin && !photoUrl.trim()) return;
 
     detectiveAudio.playTypewriterClick();
 
@@ -273,7 +295,7 @@ export function AdminCreatePinModal({
       x: initialPin?.x ?? 0.5,
       y: initialPin?.y ?? 0.5,
       label: label.trim(),
-      detail: detail.trim(),
+      detail: isPhotoPin ? "" : detail.trim(),
       color: pinColor,
       pinColor: pinColor,
       noteColor:
@@ -494,39 +516,18 @@ export function AdminCreatePinModal({
             )}
 
             {pinType === "photo" && (
-              <div className="space-y-1.5 pt-1.5 border-t border-white/5">
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="text"
-                    value={photoUrl}
-                    onChange={(e) =>
-                      setPhotoUrl(normalizeImageUrl(e.target.value))
-                    }
-                    placeholder="Dán link Drive / Web URL hoặc chọn bên dưới..."
-                    className="w-full px-2.5 py-1 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-                  />
-                  {photoUrl && (
-                    <div className="size-7 rounded border border-white/10 overflow-hidden shrink-0 bg-black flex items-center justify-center">
-                      <img
-                        src={normalizeImageUrl(photoUrl)}
-                        alt="preview"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = "none";
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="text-[10px] font-mono text-zinc-400 flex items-center justify-between">
+              <div className="space-y-2 pt-1.5 border-t border-white/5">
+                <div className="text-[11px] font-mono text-zinc-400 flex items-center justify-between">
                   <span>
-                    Danh sách ảnh ({combinedPhotos.length} mẫu & Sheets):
+                    Chọn ảnh hồ sơ ({combinedPhotos.length} mẫu & Sheets):
                   </span>
-                  {photoUrl.includes("lh3.googleusercontent.com") && (
-                    <span className="text-emerald-400">✓ Google Drive CDN</span>
+                  {photoUrl && (
+                    <span className="text-emerald-400 font-bold">
+                      ✓ Đã chọn ảnh
+                    </span>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-1 max-h-36 overflow-y-auto custom-scrollbar pr-1">
+                <div className="grid grid-cols-2 gap-1 max-h-48 overflow-y-auto custom-scrollbar pr-1">
                   {combinedPhotos.map((p, idx) => {
                     const isSelected =
                       photoUrl === p.url ||
@@ -546,12 +547,12 @@ export function AdminCreatePinModal({
                             setLabel(cleanLabel);
                           }
                         }}
-                        className={`text-left px-2 py-1 rounded border text-[11px] font-mono truncate transition-all flex items-center gap-1.5 ${
+                        className={`text-left px-2 py-1.5 rounded border text-[11px] font-mono truncate transition-all flex items-center gap-2 ${
                           isSelected
-                            ? "bg-amber-500/25 border-amber-400 text-amber-200 font-bold"
+                            ? "bg-emerald-500/25 border-emerald-400 text-emerald-200 font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]"
                             : "bg-zinc-900/60 border-white/5 text-zinc-400 hover:text-zinc-200"
                         }`}
-                        title={p.url}
+                        title={p.label}
                       >
                         <span className="truncate flex-1">
                           {isSelected ? "✓ " : ""}
@@ -637,35 +638,37 @@ export function AdminCreatePinModal({
               </div>
             </div>
 
-            {/* Title & Detail */}
-            <div className="space-y-2 pt-1 border-t border-white/5">
-              <div>
-                <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
-                  Tiêu đề <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={label}
-                  onChange={(e) => setLabel(e.target.value)}
-                  placeholder="Tiêu đề hiển thị..."
-                  className="w-full px-2.5 py-1.5 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-                />
-              </div>
+            {/* Title & Detail (Only for sticky note & dossier, hidden for photo cards) */}
+            {pinType !== "photo" && (
+              <div className="space-y-2 pt-1 border-t border-white/5">
+                <div>
+                  <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
+                    Tiêu đề <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={label}
+                    onChange={(e) => setLabel(e.target.value)}
+                    placeholder="Tiêu đề hiển thị..."
+                    className="w-full px-2.5 py-1.5 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
-                  Nội dung chi tiết
-                </label>
-                <textarea
-                  rows={NOTE_TEXTAREA_ROWS}
-                  value={detail}
-                  onChange={(e) => setDetail(e.target.value)}
-                  placeholder="Nội dung ghi chú..."
-                  className="w-full px-2.5 py-1.5 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-                />
+                <div>
+                  <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
+                    Nội dung chi tiết
+                  </label>
+                  <textarea
+                    rows={NOTE_TEXTAREA_ROWS}
+                    value={detail}
+                    onChange={(e) => setDetail(e.target.value)}
+                    placeholder="Nội dung ghi chú..."
+                    className="w-full px-2.5 py-1.5 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* SECTION 2: HÀNH ĐỘNG CLICK */}
