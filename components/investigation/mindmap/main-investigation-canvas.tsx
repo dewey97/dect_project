@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   Home,
@@ -52,6 +58,7 @@ import {
 } from "@/lib/actions/board-actions";
 import { toast } from "@/components/ui/toast";
 import { normalizeImageUrl } from "@/lib/utils";
+import { usePhoneData } from "@/lib/hooks/use-phone-data";
 
 interface SuspectItem {
   id: string;
@@ -171,6 +178,48 @@ export function MainInvestigationCanvas({
   );
   const [activeCustomPinModal, setActiveCustomPinModal] =
     useState<PinPoint | null>(null);
+
+  // Synchronize photos directly from Google Sheets Live CMS
+  const { data: sheetPhotos } = usePhoneData("photos");
+
+  const sheetPhotoMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    if (Array.isArray(sheetPhotos)) {
+      sheetPhotos.forEach((item: any) => {
+        const rawUrl =
+          item.drive_url ||
+          item.url ||
+          item.photo_url ||
+          item.direct_cdn_url ||
+          "";
+        const normUrl = normalizeImageUrl(rawUrl);
+        const code = (
+          item.photo_code ||
+          item.code ||
+          item.title ||
+          item.filename ||
+          ""
+        ).toLowerCase();
+        if (normUrl) {
+          if (code.includes("vu") || code.includes("vũ")) map.vu = normUrl;
+          if (code.includes("tung") || code.includes("tùng"))
+            map.tung = normUrl;
+          if (code.includes("ha") || code.includes("hà")) map.ha = normUrl;
+          if (code.includes("mai")) map.mai = normUrl;
+          if (code.includes("khang")) map.khang = normUrl;
+          if (code.includes("dat") || code.includes("đạt")) map.dat = normUrl;
+          if (code.includes("lua") || code.includes("lụa")) map.lua = normUrl;
+          if (
+            code.includes("crime") ||
+            code.includes("thi_the") ||
+            code.includes("hien_truong")
+          )
+            map.crime_scene = normUrl;
+        }
+      });
+    }
+    return map;
+  }, [sheetPhotos]);
 
   // Ghim đang được chọn trên bảng (chế độ Setup) + tâm điều khiển nhanh
   const [pinTransforms, setPinTransforms] = useState<
@@ -529,24 +578,36 @@ export function MainInvestigationCanvas({
   const handleConnectPins = useCallback(
     (fromPinId: string, toPinId: string) => {
       if (fromPinId === toPinId) return;
-      const connId = `admin-conn-${fromPinId}-${toPinId}`;
+      const connId1 = `admin-conn-${fromPinId}-${toPinId}`;
+      const connId2 = `admin-conn-${toPinId}-${fromPinId}`;
       commitLayout((draft) => {
-        const exists = draft.connections.some((c) => c.id === connId);
+        const existingIndex = draft.connections.findIndex(
+          (c) =>
+            c.id === connId1 ||
+            c.id === connId2 ||
+            (c.fromPinId === fromPinId && c.toPinId === toPinId) ||
+            (c.fromPinId === toPinId && c.toPinId === fromPinId),
+        );
+        const exists = existingIndex !== -1;
         const nextConns = exists
-          ? draft.connections
-          : [...draft.connections, { id: connId, fromPinId, toPinId }];
+          ? draft.connections.filter((_, idx) => idx !== existingIndex)
+          : [...draft.connections, { id: connId1, fromPinId, toPinId }];
         try {
           localStorage.setItem(
             "veritas_admin_connections_case-000",
             JSON.stringify(nextConns),
           );
         } catch {}
+        if (exists) {
+          toast.info("Đã tháo dây chỉ đỏ giữa 2 node!");
+        } else {
+          toast.success("Đã nối dây chỉ đỏ giữa 2 node!");
+        }
         return {
           ...draft,
           connections: nextConns,
         };
-      }, `connect-${connId}`);
-      toast.success("Đã nối dây chỉ đỏ giữa 2 node!");
+      }, `toggle-connect-${fromPinId}-${toPinId}`);
     },
     [commitLayout],
   );
@@ -987,12 +1048,14 @@ export function MainInvestigationCanvas({
         id.includes("thi-the")
       ) {
         handleOpenPhotoZoom(
-          "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
+          sheetPhotoMap.crime_scene ||
+            "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
           coords,
         );
       } else if (id === "c0-pin-victim-khang" || id === "khang") {
         handleOpenPhotoZoom(
-          "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
+          sheetPhotoMap.khang ||
+            "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
           coords,
         );
       } else if (id === "c0-pin-reinvestigate") {
@@ -1062,7 +1125,8 @@ export function MainInvestigationCanvas({
           id.includes("khang")
         ) {
           handleOpenPhotoZoom(
-            "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
+            sheetPhotoMap.khang ||
+              "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
             coords,
           );
           return;
@@ -1137,10 +1201,28 @@ export function MainInvestigationCanvas({
   );
 
   // Construct dynamic suspect pins with 100% deterministic, stationary slots
+  const SUSPECT_PHOTO_MAP: Record<string, string> = {
+    vu: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vu.png",
+    tung: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_tung.png",
+    ha: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ha.png",
+    mai: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_mai.png",
+    khang:
+      "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
+    dat: "/images/cases/case_000/photo-dat-ga.png",
+    lua: "/images/cases/case_000/photo-lua.png",
+  };
+
+  const SUSPECT_CHECKPOINT_MAP: Record<string, string> = {
+    vu: "cp-000-1a",
+    tung: "cp-000-1b",
+    ha: "cp-000-1c",
+  };
+
   const mobileSuspectPins: PinPoint[] = suspects.map((suspect) => {
     const { canonicalId, slotIndex, canonicalName } =
       getCanonicalSuspectKey(suspect);
     const slot = MOBILE_SUSPECT_SLOTS[slotIndex] || MOBILE_SUSPECT_SLOTS[0];
+    const cpId = SUSPECT_CHECKPOINT_MAP[canonicalId];
     return {
       id: `node-suspect-${canonicalId}`,
       x: slot.x,
@@ -1148,6 +1230,12 @@ export function MainInvestigationCanvas({
       label: canonicalName || suspect.name,
       detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
       color: "blue" as const,
+      photoUrl:
+        sheetPhotoMap[canonicalId] ||
+        SUSPECT_PHOTO_MAP[canonicalId] ||
+        undefined,
+      actionType: cpId ? ("sheet_checkpoint" as const) : ("info" as const),
+      checkpointId: cpId || undefined,
     };
   });
 
@@ -1155,6 +1243,7 @@ export function MainInvestigationCanvas({
     const { canonicalId, slotIndex, canonicalName } =
       getCanonicalSuspectKey(suspect);
     const slot = DESKTOP_SUSPECT_SLOTS[slotIndex] || DESKTOP_SUSPECT_SLOTS[0];
+    const cpId = SUSPECT_CHECKPOINT_MAP[canonicalId];
     return {
       id: `node-suspect-${canonicalId}`,
       x: slot.x,
@@ -1162,6 +1251,12 @@ export function MainInvestigationCanvas({
       label: canonicalName || suspect.name,
       detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
       color: "blue" as const,
+      photoUrl:
+        sheetPhotoMap[canonicalId] ||
+        SUSPECT_PHOTO_MAP[canonicalId] ||
+        undefined,
+      actionType: cpId ? ("sheet_checkpoint" as const) : ("info" as const),
+      checkpointId: cpId || undefined,
     };
   });
 
@@ -1192,6 +1287,8 @@ export function MainInvestigationCanvas({
             detail: "Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ",
             color: "purple" as const,
             noteColor: "yellow" as const,
+            actionType: "sheet_checkpoint" as const,
+            checkpointId: "cp-000-1a",
           },
         ]
       : []),
@@ -1205,6 +1302,8 @@ export function MainInvestigationCanvas({
             detail: "Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng",
             color: "purple" as const,
             noteColor: "yellow" as const,
+            actionType: "sheet_checkpoint" as const,
+            checkpointId: "cp-000-1b",
           },
         ]
       : []),
@@ -1218,6 +1317,8 @@ export function MainInvestigationCanvas({
             detail: "Khớp nối chứng cứ đối tượng Trần Thị Hà",
             color: "purple" as const,
             noteColor: "yellow" as const,
+            actionType: "sheet_checkpoint" as const,
+            checkpointId: "cp-000-1c",
           },
         ]
       : []),
@@ -1234,6 +1335,8 @@ export function MainInvestigationCanvas({
             detail: "Nghi vấn suy luận mở rộng đối tượng Lê Quang Vũ",
             color: "purple" as const,
             noteColor: "yellow" as const,
+            actionType: "sheet_checkpoint" as const,
+            checkpointId: "cp-000-1a",
           },
         ]
       : []),
@@ -1247,6 +1350,8 @@ export function MainInvestigationCanvas({
             detail: "Nghi vấn suy luận mở rộng đối tượng Nguyễn Thanh Tùng",
             color: "purple" as const,
             noteColor: "yellow" as const,
+            actionType: "sheet_checkpoint" as const,
+            checkpointId: "cp-000-1b",
           },
         ]
       : []),
@@ -1260,6 +1365,8 @@ export function MainInvestigationCanvas({
             detail: "Khớp nối chứng cứ đối tượng Trần Thị Hà",
             color: "purple" as const,
             noteColor: "yellow" as const,
+            actionType: "sheet_checkpoint" as const,
+            checkpointId: "cp-000-1c",
           },
         ]
       : []),
@@ -1301,6 +1408,7 @@ export function MainInvestigationCanvas({
             "Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài",
           color: "red" as const,
           photoUrl:
+            sheetPhotoMap.khang ||
             "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
         },
         {
@@ -1311,6 +1419,7 @@ export function MainInvestigationCanvas({
           detail: "Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn",
           color: "orange" as const,
           photoUrl:
+            sheetPhotoMap.crime_scene ||
             "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
         },
         {
@@ -1392,6 +1501,7 @@ export function MainInvestigationCanvas({
           color: "yellow" as const,
           pinColor: "yellow" as const,
           photoUrl:
+            sheetPhotoMap.khang ||
             "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
         },
         {
@@ -1403,6 +1513,7 @@ export function MainInvestigationCanvas({
           color: "yellow" as const,
           pinColor: "yellow" as const,
           photoUrl:
+            sheetPhotoMap.crime_scene ||
             "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
         },
         {
@@ -1697,32 +1808,6 @@ export function MainInvestigationCanvas({
               title="Chỉnh sửa chi tiết nội dung node"
             >
               <Pencil className="size-3.5" />
-            </button>
-
-            {/* Delete custom node */}
-            {(selectedPin.id.startsWith("admin-pin-") ||
-              selectedPin.id.startsWith("custom-pin-")) && (
-              <button
-                type="button"
-                onClick={() => {
-                  handleDeleteAdminPin(selectedPin.id);
-                  setSelectedPinId(null);
-                }}
-                className="p-1 rounded-md bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-500/30 transition-colors"
-                title="Xóa node khỏi bảng"
-              >
-                <Trash2 className="size-3.5" />
-              </button>
-            )}
-
-            {/* Close / Deselect */}
-            <button
-              type="button"
-              onClick={() => setSelectedPinId(null)}
-              className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-white transition-colors ml-0.5"
-              title="Bỏ chọn node"
-            >
-              <X className="size-3.5" />
             </button>
           </motion.div>
         )}

@@ -49,39 +49,38 @@ Tài liệu này mô tả kiến trúc kết nối trực tiếp đến **Google
 
 ---
 
-## 🎯 3. Đặc Tả Chi Tiết Tab `checkpoints` (9 Cột Tinh Gọn)
+## 🎯 3. Đặc Tả Chi Tiết Tab `checkpoints` (Cấu Trúc Tinh Gọn)
 
-Tab `checkpoints` quản lý toàn bộ mốc giải đố, mở khóa hồ sơ và kết án. Tab chỉ gồm **9 cột thiết yếu**:
+Tab `checkpoints` quản lý toàn bộ mốc giải đố và mở khóa hồ sơ vụ án. Hỗ trợ liên kết trực tiếp `node_id` trên Canvas:
 
-| STT | Cột                    | Tên tiếng Việt trên Sheet |  Nhóm   | Kiểu dữ liệu | Mô tả & Vai trò                                                                          |
-| :-- | :--------------------- | :------------------------ | :-----: | :----------- | :--------------------------------------------------------------------------------------- |
-| 1   | `case_id`              | Mã vụ án                  | 🔴 `🔑` | TEXT         | ID vụ án (`case_000`, `case_001`) để lọc dữ liệu.                                        |
-| 2   | `checkpoint_id`        | Mã Checkpoint             | 🔴 `🔑` | TEXT         | Khóa chính duy nhất (`cp-000-0`, `cp-000-1a`, `cp-000-1b`, `cp-000-2a`, `cp-000-2b`).    |
-| 3   | `dossier`              | Bộ hồ sơ con              | ⚪ `📝` | TEXT         | Nhãn phân nhóm nghiệp vụ (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`). Code không đọc.            |
-| 4   | `title`                | Tiêu đề                   | 🟢 `⚡` | TEXT         | Tiêu đề hiển thị của câu hỏi/checkpoint trên UI.                                         |
-| 5   | `question`             | Nội dung yêu cầu          | 🟢 `⚡` | TEXT         | Lời dẫn yêu cầu điều tra.                                                                |
-| 6   | `type`                 | Loại dạng bài             | 🔴 `🔑` | ENUM         | Router component: `text_match_3`, `evidence_picker`, `mcq`, `accusation`, `convergence`. |
-| 7   | `unlocked_evidence_id` | Mã mở khóa                | 🟢 `⚡` | TEXT         | ID phần thưởng/bộ hồ sơ tiếp theo được mở khóa sau khi giải đúng.                        |
-| 8   | `answers`              | Cột đáp án hợp nhất       | 🟢 `⚡` | MULTILINE    | Chứa toàn bộ đáp án theo cú pháp `khóa: giá trị` (Alt+Enter xuống dòng).                 |
-| 9   | `hints`                | Gợi ý đa cấp              | 🟢 `⚡` | MULTILINE    | Danh sách gợi ý các cấp (mỗi dòng Alt+Enter = 1 cấp gợi ý).                              |
+| STT | Cột                    | Tên tiếng Việt trên Sheet |  Nhóm   | Kiểu dữ liệu | Mô tả & Vai trò                                                                       |
+| :-- | :--------------------- | :------------------------ | :-----: | :----------- | :------------------------------------------------------------------------------------ |
+| 1   | `case_id`              | Mã vụ án                  | 🔴 `🔑` | TEXT         | ID vụ án (`case_000`, `case_001`) để lọc dữ liệu.                                     |
+| 2   | `checkpoint_id`        | Mã Checkpoint             | 🔴 `🔑` | TEXT         | Khóa chính duy nhất (`cp-000-0`, `cp-000-1a`, `cp-000-1b`, `cp-000-2a`, `cp-000-2b`). |
+| 3   | `node_id`              | Mã Node Canvas            | 🔴 `🔑` | TEXT         | Mã node trên Canvas (`c0-pin-followup-vu`, `node-suspect-vu`, `c0-pin-phone`...).     |
+| 4   | `dossier`              | Bộ hồ sơ con              | ⚪ `📝` | TEXT         | Nhãn phân nhóm nghiệp vụ (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`). Code không đọc.         |
+| 5   | `title`                | Tiêu đề                   | 🟢 `⚡` | TEXT         | Tiêu đề hiển thị của câu hỏi/checkpoint trên UI.                                      |
+| 6   | `question`             | Nội dung yêu cầu          | 🟢 `⚡` | TEXT         | Lời dẫn yêu cầu điều tra.                                                             |
+| 7   | `type`                 | Loại dạng bài             | 🔴 `🔑` | ENUM         | Form UI: `text_match_3`, `evidence_picker`, `mcq`, `text`.                            |
+| 8   | `unlocked_evidence_id` | Mã mở khóa                | 🟢 `⚡` | TEXT         | ID phần thưởng/bộ hồ sơ tiếp theo được mở khóa sau khi giải đúng.                     |
+| 9   | `answers`              | Cột đáp án hợp nhất       | 🟢 `⚡` | MULTILINE    | Chứa toàn bộ đáp án theo cú pháp `khóa: giá trị` (Alt+Enter xuống dòng).              |
+| 10  | `hints`                | Gợi ý đa cấp              | 🟢 `⚡` | MULTILINE    | Danh sách gợi ý các cấp (mỗi dòng Alt+Enter = 1 cấp gợi ý).                           |
 
 #### Từ khóa cú pháp tiếng Việt trong cột `answers`:
 
-| Khóa tiếng Việt (Khuyên dùng) | Khóa tương đương tiếng Anh | Dành cho `type`                 | Ý nghĩa & Ví dụ                                           |
-| :---------------------------- | :------------------------- | :------------------------------ | :-------------------------------------------------------- |
-| `nghi_pham:`                  | `suspect:`                 | `evidence_picker`, `accusation` | `nghi_pham: Lê Quang Vũ`                                  |
-| `ma_chung_cu:`                | `require:`                 | `evidence_picker`, `accusation` | `ma_chung_cu: 10, dev-00, p6, 06, p10`                    |
-| `mau_thuan:`                  | `mismatch:`                | `evidence_picker`               | `mau_thuan: Mâu thuẫn Địa điểm`                           |
-| `dong_co:`                    | `motive:`                  | `accusation`                    | `dong_co: Cuồng yêu ghen tuông`                           |
-| `o_nhap:`                     | `input:`                   | `text_match_3`                  | `o_nhap: phone_1 \| SĐT 0988.200.991: \| \| Lê Quang Vũ`  |
-| `option:`                     | `phuong_an:`               | `mcq`                           | `option: 1. Gửi tin nhắn cho đối tượng liên lạc mờ ám...` |
-| `correct:`                    | `dap_an:`                  | `mcq`                           | `correct: 1. Gửi tin nhắn cho đối tượng...`               |
+| Khóa tiếng Việt | Khóa tiếng Anh | Dành cho `type`   | Ý nghĩa & Ví dụ                                          |
+| :-------------- | :------------- | :---------------- | :------------------------------------------------------- |
+| `nghi_pham:`    | `suspect:`     | `evidence_picker` | `nghi_pham: Lê Quang Vũ`                                 |
+| `ma_chung_cu:`  | `require:`     | `evidence_picker` | `ma_chung_cu: 10, dev-00, p6, 06, p10`                   |
+| `o_nhap:`       | `input:`       | `text_match_3`    | `o_nhap: phone_1 \| SĐT 0988.200.991: \| \| Lê Quang Vũ` |
+| `phuong_an:`    | `option:`      | `mcq`             | `option: 1. Gửi tin nhắn cho đối tượng...`               |
+| `dap_an:`       | `correct:`     | `mcq`, `text`     | `dap_an: Lê Quang Vũ` (hoặc nhập text trực tiếp)         |
 
 > 💡 **Quy ước nhập tên nghi phạm & mã chứng cứ**:
 >
-> - **Tên người**: Chỉ cần nhập dạng chuẩn có dấu (`Lê Quang Vũ`). Code tự so khớp có/không dấu/tên tắt qua `isVietnameseTextMatch`.
-> - **Mã chứng cứ**: Nhập đúng mã in trên thẻ tài liệu/vật chứng (`10`, `dev-00`, `p6`, `06`, `p10`, `14`, `p4`, `p5`, `01`, `02`...).
-> - **Bỏ hoàn toàn dòng `show:`**: Bảng ghim Web & Boardgame tự động nhận mã ghim/nhập trực tiếp.
+> - **Tên người**: Nhập tên chuẩn có dấu (`Lê Quang Vũ`, `Nguyễn Thanh Tùng`). Code tự so khớp không phân biệt hoa thường/tên ngắn.
+> - **Mã chứng cứ**: Nhập các mã in trên thẻ chứng cứ cách nhau bằng dấu phẩy (`10, dev-00, p6, 06, p10`).
+> - **Đáp án text đơn**: Nhập thẳng nội dung đáp án vào cột `answers` mà không cần thêm bất kỳ từ khóa nào.
 
 ---
 

@@ -26,7 +26,12 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
 
   const photos = sheetPhotos.map((item: any, idx: number) => ({
     id: item.photo_id || `photo-${idx + 1}`,
-    filename: item.filename || item.photo_id || `IMG_${idx + 1000}.png`,
+    filename:
+      item.title ||
+      item.Title ||
+      item.filename ||
+      item.photo_id ||
+      `IMG_${idx + 1000}.png`,
     driveUrl: normalizeImageUrl(
       item.drive_url || item.url || item.photo_url || "",
     ),

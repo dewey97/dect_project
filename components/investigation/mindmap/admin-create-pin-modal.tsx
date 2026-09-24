@@ -13,11 +13,13 @@ import {
   Info,
   Layers,
   Eye,
+  ChevronDown,
 } from "lucide-react";
 import { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
 
 interface AdminCreatePinModalProps {
   isOpen: boolean;
@@ -27,7 +29,11 @@ interface AdminCreatePinModalProps {
   initialPin?: PinPoint | null;
 }
 
-const PRESET_CASE_PHOTOS = [
+const PRESET_CASE_PHOTOS: Array<{
+  label: string;
+  url: string;
+  defaultCheckpointId?: string;
+}> = [
   {
     label: "Nạn nhân Khang",
     url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
@@ -39,14 +45,17 @@ const PRESET_CASE_PHOTOS = [
   {
     label: "Trần Thị Hà",
     url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ha.png",
+    defaultCheckpointId: "cp-000-2a",
   },
   {
     label: "Lê Quang Vũ",
     url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vu.png",
+    defaultCheckpointId: "cp-000-1a",
   },
   {
     label: "Nguyễn Thanh Tùng",
     url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_tung.png",
+    defaultCheckpointId: "cp-000-1b",
   },
   {
     label: "Nguyễn Ngọc Mai",
@@ -61,10 +70,18 @@ const PRESET_CASE_PHOTOS = [
   {
     label: "Phòng tái khám xét",
     url: "/images/cases/case_000/photo-reinvestigation-room-realistic.jpg",
+    defaultCheckpointId: "cp-000-convergence",
   },
 ];
 
-const PRESET_STICKY_TEMPLATES = [
+interface NoteTemplate {
+  label: string;
+  url: string;
+  defaultLabel?: string;
+  defaultCheckpointId?: string;
+}
+
+const PRESET_STICKY_TEMPLATES: NoteTemplate[] = [
   { label: "Note vàng trơn", url: "" },
   {
     label: "Bổ sung chứng cứ",
@@ -75,6 +92,7 @@ const PRESET_STICKY_TEMPLATES = [
     label: "Nghi vấn vụ án",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_nghi_van.png",
     defaultLabel: "NGHI VẤN VỤ ÁN",
+    defaultCheckpointId: "cp-000-0",
   },
   {
     label: "Danh sách nghi phạm",
@@ -85,42 +103,48 @@ const PRESET_STICKY_TEMPLATES = [
     label: "Đối chất Vũ",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_vu.png",
     defaultLabel: "ĐỐI CHẤT LÊ QUANG VŨ",
+    defaultCheckpointId: "cp-000-1a",
   },
   {
     label: "Đối chất Tùng",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_tung.png",
     defaultLabel: "ĐỐI CHẤT NGUYỄN THANH TÙNG",
+    defaultCheckpointId: "cp-000-1b",
   },
   {
     label: "Đối chất Hà",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_ha.png",
     defaultLabel: "ĐỐI CHẤT TRẦN THỊ HÀ",
+    defaultCheckpointId: "cp-000-1c",
   },
 ];
 
-const PRESET_DOSSIER_TEMPLATES = [
+const PRESET_DOSSIER_TEMPLATES: NoteTemplate[] = [
   { label: "Giấy A4 trơn", url: "" },
   {
     label: "Mở rộng điều tra",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_mo_rong_dieu_tra.png",
     defaultLabel: "MỞ RỘNG ĐIỀU TRA",
+    defaultCheckpointId: "cp-000-0",
   },
   {
     label: "Biên bản khám xét",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_kham_xet_lai.png",
     defaultLabel: "BIÊN BẢN KHÁM XÉT HIỆN TRƯỜNG",
+    defaultCheckpointId: "cp-000-convergence",
   },
   {
     label: "Kết luận điều tra",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_ket_luan_dieu_tra.png",
     defaultLabel: "BẢN KẾT LUẬN ĐIỀU TRA",
+    defaultCheckpointId: "cp-000-2b",
   },
 ];
 
 const PRESET_SHEET_CHECKPOINTS = [
   {
     id: "cp-000-0",
-    label: "CP-000-0 // Tra cứu SĐT kẻ đe dọa",
+    label: "CP-000-0 // Tra cứu 3 SĐT ẩn danh (Ban Đầu)",
   },
   {
     id: "cp-000-1a",
@@ -131,12 +155,16 @@ const PRESET_SHEET_CHECKPOINTS = [
     label: "CP-000-1b // Đối chất Hồ sơ B — Nguyễn Thanh Tùng",
   },
   {
+    id: "cp-000-convergence",
+    label: "CP-000-convergence // Nút hội tụ — Khám xét lại hiện trường",
+  },
+  {
     id: "cp-000-2a",
     label: "CP-000-2a // Khám xét Hồ sơ C — Trần Thị Hà",
   },
   {
     id: "cp-000-2b",
-    label: "CP-000-2b // Cáo trạng kết án Hung thủ",
+    label: "CP-000-2b // Cáo trạng kết án Hung thủ (Hồ sơ C)",
   },
 ];
 
@@ -179,9 +207,28 @@ export function AdminCreatePinModal({
   const [scale, setScale] = useState(1);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isNoteColorOpen, setIsNoteColorOpen] = useState(false);
+  const [isPinColorOpen, setIsPinColorOpen] = useState(false);
 
-  // Fetch live photos from Google Sheets
+  // Fetch live photos & checkpoints from Google Sheets
   const { data: sheetPhotos } = usePhoneData("photos");
+  const { data: sheetCheckpoints } = usePhoneData("checkpoints");
+
+  const combinedCheckpoints = React.useMemo(() => {
+    const list = [...PRESET_SHEET_CHECKPOINTS];
+    if (Array.isArray(sheetCheckpoints)) {
+      sheetCheckpoints.forEach((cp: any) => {
+        const cpId = cp.checkpoint_id || cp.id;
+        if (cpId && !list.some((item) => item.id === cpId)) {
+          list.push({
+            id: cpId,
+            label: `${cpId} // ${cp.title || cp.question || cp.label || "Checkpoint"}`,
+          });
+        }
+      });
+    }
+    return list;
+  }, [sheetCheckpoints]);
 
   const combinedPhotos = React.useMemo(() => {
     const list = [...PRESET_CASE_PHOTOS];
@@ -200,20 +247,13 @@ export function AdminCreatePinModal({
         if (rawUrl) {
           const normUrl = normalizeImageUrl(rawUrl);
           const label =
+            item.title ||
+            item.Title ||
             item.ten_anh ||
             item["tên ảnh"] ||
-            item["tên_ảnh"] ||
-            item["tên"] ||
-            item.ten ||
-            item.title ||
             item.name ||
-            item.caption ||
             item.filename ||
-            item.description ||
-            item.mo_ta ||
-            item.note ||
             item.photo_id ||
-            item.id ||
             `Ảnh Sheet #${idx + 1}`;
           if (!list.some((p) => p.url === normUrl || p.url === rawUrl)) {
             list.push({
@@ -229,27 +269,93 @@ export function AdminCreatePinModal({
 
   useEffect(() => {
     if (initialPin) {
-      setLabel(initialPin.label || "");
+      const char =
+        findValidCaseCharacter(initialPin.label) ||
+        findValidCaseCharacter(initialPin.id);
+      const isCrimeScene =
+        initialPin.id.includes("crime-scene") ||
+        initialPin.id.includes("thi-the") ||
+        (initialPin.label &&
+          initialPin.label.toLowerCase().includes("hiện trường"));
+      const isSuspectPhoto = Boolean(
+        initialPin.photoUrl ||
+        char?.avatarUrl ||
+        isCrimeScene ||
+        initialPin.id.startsWith("node-suspect-") ||
+        initialPin.id.startsWith("photo-") ||
+        initialPin.id.includes("victim") ||
+        initialPin.id.includes("khang"),
+      );
+      const resolvedPhoto =
+        initialPin.photoUrl ||
+        char?.avatarUrl ||
+        (isCrimeScene
+          ? "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png"
+          : "");
+
+      const labelLower = (initialPin.label || "").toLowerCase();
+      const idLower = (initialPin.id || "").toLowerCase();
+      const detailLower = (initialPin.detail || "").toLowerCase();
+
+      const detectedCp =
+        initialPin.checkpointId ||
+        (char?.id === "vu" ||
+        idLower.includes("vu") ||
+        labelLower.includes("vũ") ||
+        detailLower.includes("vũ")
+          ? "cp-000-1a"
+          : char?.id === "tung" ||
+              idLower.includes("tung") ||
+              labelLower.includes("tùng") ||
+              detailLower.includes("tùng")
+            ? "cp-000-1b"
+            : char?.id === "ha" ||
+                idLower.includes("ha") ||
+                labelLower.includes("hà") ||
+                detailLower.includes("hà")
+              ? "cp-000-1c"
+              : labelLower.includes("sđt") ||
+                  labelLower.includes("nghi vấn") ||
+                  idLower.includes("phone")
+                ? "cp-000-0"
+                : labelLower.includes("khám xét") ||
+                    idLower.includes("reinvestigate")
+                  ? "cp-000-convergence"
+                  : labelLower.includes("cáo trạng") ||
+                      labelLower.includes("kết luận") ||
+                      idLower.includes("indictment")
+                    ? "cp-000-2b"
+                    : undefined);
+
+      setLabel(initialPin.label || (char ? char.canonicalName : ""));
       setDetail(initialPin.detail || "");
       setNoteColor(initialPin.noteColor || "yellow");
       setPinColor((initialPin.color as any) || "red");
-      setPhotoUrl(initialPin.photoUrl || "");
+      setPhotoUrl(resolvedPhoto);
       setNoteTextureUrl(initialPin.noteTextureUrl || "");
 
-      if (initialPin.photoUrl) {
+      if (isSuspectPhoto) {
         setPinType("photo");
       } else if (
         initialPin.noteColor === "white" ||
         (initialPin.noteTextureUrl &&
-          initialPin.noteTextureUrl.includes("white"))
+          initialPin.noteTextureUrl.includes("white")) ||
+        idLower.includes("dossier")
       ) {
         setPinType("dossier");
       } else {
         setPinType("sticky");
       }
 
-      setActionType(initialPin.actionType || "info");
-      setCheckpointId(initialPin.checkpointId || "cp-000-0");
+      const resolvedAction =
+        initialPin.actionType === "custom_question"
+          ? "sheet_checkpoint"
+          : detectedCp
+            ? "sheet_checkpoint"
+            : initialPin.actionType || "info";
+
+      setActionType(resolvedAction);
+      setCheckpointId(detectedCp || initialPin.checkpointId || "cp-000-0");
       setQuestionType(initialPin.questionType || "text_match_3");
       setQuestion(initialPin.question || "");
       setAnswers(initialPin.answers || "");
@@ -467,6 +573,10 @@ export function AdminCreatePinModal({
                           detectiveAudio.playTypewriterClick();
                           setNoteTextureUrl(t.url);
                           if (t.defaultLabel) setLabel(t.defaultLabel);
+                          if (t.defaultCheckpointId) {
+                            setActionType("sheet_checkpoint");
+                            setCheckpointId(t.defaultCheckpointId);
+                          }
                         }}
                         className={`text-left px-2 py-1 rounded border text-[11px] font-mono truncate transition-all ${
                           isSelected
@@ -499,6 +609,10 @@ export function AdminCreatePinModal({
                           detectiveAudio.playTypewriterClick();
                           setNoteTextureUrl(t.url);
                           if (t.defaultLabel) setLabel(t.defaultLabel);
+                          if (t.defaultCheckpointId) {
+                            setActionType("sheet_checkpoint");
+                            setCheckpointId(t.defaultCheckpointId);
+                          }
                         }}
                         className={`text-left px-2 py-1 rounded border text-[11px] font-mono truncate transition-all ${
                           isSelected
@@ -545,6 +659,19 @@ export function AdminCreatePinModal({
                               "",
                             );
                             setLabel(cleanLabel);
+                            const cp =
+                              (p as any).defaultCheckpointId ||
+                              (cleanLabel.toLowerCase().includes("vũ")
+                                ? "cp-000-1a"
+                                : cleanLabel.toLowerCase().includes("tùng")
+                                  ? "cp-000-1b"
+                                  : cleanLabel.toLowerCase().includes("hà")
+                                    ? "cp-000-2a"
+                                    : undefined);
+                            if (cp) {
+                              setActionType("sheet_checkpoint");
+                              setCheckpointId(cp);
+                            }
                           }
                         }}
                         className={`text-left px-2 py-1.5 rounded border text-[11px] font-mono truncate transition-all flex items-center gap-2 ${
@@ -565,76 +692,178 @@ export function AdminCreatePinModal({
               </div>
             )}
 
-            {/* Colors Pickers */}
-            <div className="flex items-center justify-between gap-4 pt-1 border-t border-white/5">
+            {/* Colors Pickers: Dropdown Popover */}
+            <div className="flex items-center justify-between gap-4 pt-1 border-t border-white/5 relative">
               {pinType === "sticky" && (
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-zinc-400">
-                    Màu:
-                  </span>
+                <div className="relative">
                   <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-mono text-zinc-400">
+                      Màu note:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        detectiveAudio.playTypewriterClick();
+                        setIsNoteColorOpen((prev) => !prev);
+                        setIsPinColorOpen(false);
+                      }}
+                      className="flex items-center gap-1.5 px-2 py-1 rounded bg-zinc-900 border border-white/10 hover:border-amber-500/40 text-[11px] font-mono text-zinc-200 transition-colors"
+                    >
+                      <span
+                        className={`size-3 rounded-full ${
+                          noteColor === "yellow"
+                            ? "bg-amber-300"
+                            : noteColor === "red"
+                              ? "bg-red-400"
+                              : noteColor === "blue"
+                                ? "bg-sky-300"
+                                : noteColor === "white"
+                                  ? "bg-zinc-100"
+                                  : "bg-zinc-800 border border-white/30"
+                        }`}
+                      />
+                      <span className="capitalize">
+                        {noteColor === "yellow"
+                          ? "Vàng"
+                          : noteColor === "red"
+                            ? "Đỏ"
+                            : noteColor === "blue"
+                              ? "Xanh"
+                              : noteColor === "white"
+                                ? "Trắng"
+                                : "Đen"}
+                      </span>
+                      <ChevronDown className="size-3 text-zinc-400" />
+                    </button>
+                  </div>
+
+                  {isNoteColorOpen && (
+                    <div className="absolute top-full left-0 mt-1 z-30 w-36 bg-[#16161c] border border-amber-500/40 rounded-lg p-1 shadow-2xl space-y-0.5 animate-in fade-in zoom-in-95 duration-150">
+                      {[
+                        { id: "yellow", name: "Vàng", bg: "bg-amber-300" },
+                        { id: "red", name: "Đỏ", bg: "bg-red-400" },
+                        { id: "blue", name: "Xanh", bg: "bg-sky-300" },
+                        { id: "white", name: "Trắng", bg: "bg-zinc-100" },
+                        {
+                          id: "black",
+                          name: "Đen",
+                          bg: "bg-zinc-800 border border-white/30",
+                        },
+                      ].map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => {
+                            detectiveAudio.playTypewriterClick();
+                            setNoteColor(c.id as any);
+                            setIsNoteColorOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-2 py-1.5 rounded text-[11px] font-mono transition-colors ${
+                            noteColor === c.id
+                              ? "bg-amber-500/20 text-amber-200 font-bold"
+                              : "text-zinc-300 hover:bg-white/10"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className={`size-3 rounded-full ${c.bg}`} />
+                            <span>{c.name}</span>
+                          </div>
+                          {noteColor === c.id && (
+                            <Check className="size-3 text-amber-400" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="relative">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] font-mono text-zinc-400">
+                    Đinh ghim:
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      detectiveAudio.playTypewriterClick();
+                      setIsPinColorOpen((prev) => !prev);
+                      setIsNoteColorOpen(false);
+                    }}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded bg-zinc-900 border border-white/10 hover:border-amber-500/40 text-[11px] font-mono text-zinc-200 transition-colors"
+                  >
+                    <span
+                      className={`size-3 rounded-full ${
+                        pinColor === "red"
+                          ? "bg-red-500"
+                          : pinColor === "yellow"
+                            ? "bg-amber-400"
+                            : pinColor === "blue"
+                              ? "bg-blue-500"
+                              : pinColor === "green"
+                                ? "bg-emerald-500"
+                                : "bg-zinc-700"
+                      }`}
+                    />
+                    <span className="capitalize">
+                      {pinColor === "red"
+                        ? "Đỏ"
+                        : pinColor === "yellow"
+                          ? "Vàng"
+                          : pinColor === "blue"
+                            ? "Xanh"
+                            : pinColor === "green"
+                              ? "Lục"
+                              : "Đồng"}
+                    </span>
+                    <ChevronDown className="size-3 text-zinc-400" />
+                  </button>
+                </div>
+
+                {isPinColorOpen && (
+                  <div className="absolute top-full right-0 mt-1 z-30 w-36 bg-[#16161c] border border-amber-500/40 rounded-lg p-1 shadow-2xl space-y-0.5 animate-in fade-in zoom-in-95 duration-150">
                     {[
-                      { id: "yellow", name: "Vàng", bg: "bg-amber-300" },
-                      { id: "red", name: "Đỏ", bg: "bg-red-400" },
-                      { id: "blue", name: "Xanh", bg: "bg-sky-300" },
-                      { id: "white", name: "Trắng", bg: "bg-zinc-100" },
+                      { id: "red", name: "Đỏ", colorClass: "bg-red-500" },
                       {
-                        id: "black",
-                        name: "Đen",
-                        bg: "bg-zinc-800 border border-white/30",
+                        id: "yellow",
+                        name: "Vàng",
+                        colorClass: "bg-amber-400",
                       },
-                    ].map((c) => (
+                      { id: "blue", name: "Xanh", colorClass: "bg-blue-500" },
+                      {
+                        id: "green",
+                        name: "Lục",
+                        colorClass: "bg-emerald-500",
+                      },
+                      { id: "dark", name: "Đồng", colorClass: "bg-zinc-700" },
+                    ].map((p) => (
                       <button
-                        key={c.id}
+                        key={p.id}
                         type="button"
-                        title={c.name}
-                        onClick={() => setNoteColor(c.id as any)}
-                        className={`size-5 rounded-full flex items-center justify-center transition-all ${c.bg} ${
-                          noteColor === c.id
-                            ? "ring-2 ring-amber-400 scale-110"
-                            : "opacity-70 hover:opacity-100"
+                        onClick={() => {
+                          detectiveAudio.playTypewriterClick();
+                          setPinColor(p.id as any);
+                          setIsPinColorOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-2 py-1.5 rounded text-[11px] font-mono transition-colors ${
+                          pinColor === p.id
+                            ? "bg-amber-500/20 text-amber-200 font-bold"
+                            : "text-zinc-300 hover:bg-white/10"
                         }`}
                       >
-                        {noteColor === c.id && (
-                          <Check
-                            className={`size-3 ${c.id === "black" ? "text-white" : "text-black"}`}
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`size-3 rounded-full ${p.colorClass}`}
                           />
+                          <span>{p.name}</span>
+                        </div>
+                        {pinColor === p.id && (
+                          <Check className="size-3 text-amber-400" />
                         )}
                       </button>
                     ))}
                   </div>
-                </div>
-              )}
-
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-zinc-400">
-                  Đinh ghim:
-                </span>
-                <div className="flex items-center gap-1.5">
-                  {[
-                    { id: "red", name: "Đỏ", colorClass: "bg-red-500" },
-                    { id: "yellow", name: "Vàng", colorClass: "bg-amber-400" },
-                    { id: "blue", name: "Xanh", colorClass: "bg-blue-500" },
-                    { id: "green", name: "Lục", colorClass: "bg-emerald-500" },
-                    { id: "dark", name: "Đồng", colorClass: "bg-zinc-700" },
-                  ].map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      title={p.name}
-                      onClick={() => setPinColor(p.id as any)}
-                      className={`size-5 rounded-full flex items-center justify-center transition-all ${p.colorClass} ${
-                        pinColor === p.id
-                          ? "ring-2 ring-amber-400 scale-110"
-                          : "opacity-70 hover:opacity-100"
-                      }`}
-                    >
-                      {pinColor === p.id && (
-                        <Check className="size-3 text-white" />
-                      )}
-                    </button>
-                  ))}
-                </div>
+                )}
               </div>
             </div>
 
@@ -675,11 +904,11 @@ export function AdminCreatePinModal({
           <div className="space-y-2.5 bg-[#181820] p-3 rounded-lg border border-white/5">
             <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-amber-400">
               <HelpCircle className="size-3.5" />
-              <span>2. HÀNH ĐỘNG CLICK</span>
+              <span>2. HÀNH ĐỘNG KHI CLICK VÀO GHIM</span>
             </div>
 
-            {/* Action Type Selector */}
-            <div className="grid grid-cols-3 gap-2">
+            {/* Action Type Selector: 2 options only */}
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -693,7 +922,7 @@ export function AdminCreatePinModal({
                 }`}
               >
                 <Info className="size-3.5 text-amber-400" />
-                <span>Chỉ xem</span>
+                <span>Chỉ xem thông tin</span>
               </button>
 
               <button
@@ -709,132 +938,36 @@ export function AdminCreatePinModal({
                 }`}
               >
                 <Link2 className="size-3.5 text-blue-400" />
-                <span>Sheet CMS</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  detectiveAudio.playTypewriterClick();
-                  setActionType("custom_question");
-                }}
-                className={`py-1.5 px-2 rounded-lg border text-xs font-mono flex items-center justify-center gap-1.5 transition-all ${
-                  actionType === "custom_question"
-                    ? "bg-emerald-500/15 border-emerald-500 text-emerald-300 font-bold"
-                    : "border-white/5 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200"
-                }`}
-              >
-                <HelpCircle className="size-3.5 text-emerald-400" />
-                <span>Câu hỏi</span>
+                <span>Mở Checkpoint (Sheet CMS)</span>
               </button>
             </div>
 
-            {/* ACTION: SHEET CHECKPOINT */}
+            {/* ACTION: SHEET CHECKPOINT SELECTOR */}
             {actionType === "sheet_checkpoint" && (
-              <div className="space-y-1 pt-1.5 border-t border-white/5">
-                <label className="block text-[11px] font-mono text-zinc-300">
-                  Chọn Checkpoint CMS:
-                </label>
+              <div className="space-y-1.5 pt-1.5 border-t border-white/5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[11px] font-mono text-zinc-300">
+                    Chọn Checkpoint CMS từ Google Sheet:
+                  </label>
+                  <span className="text-[10px] font-mono text-emerald-400">
+                    ✓ Quản lý câu hỏi trên Sheet
+                  </span>
+                </div>
                 <select
                   value={checkpointId}
                   onChange={(e) => setCheckpointId(e.target.value)}
-                  className="w-full px-2.5 py-1.5 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 focus:outline-none focus:border-amber-500"
+                  className="w-full px-2.5 py-2 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 focus:outline-none focus:border-amber-500"
                 >
-                  {PRESET_SHEET_CHECKPOINTS.map((cp) => (
+                  {combinedCheckpoints.map((cp) => (
                     <option key={cp.id} value={cp.id}>
                       {cp.label}
                     </option>
                   ))}
                 </select>
-              </div>
-            )}
-
-            {/* ACTION: CUSTOM QUESTION */}
-            {actionType === "custom_question" && (
-              <div className="space-y-2 pt-1.5 border-t border-white/5">
-                <div className="grid grid-cols-3 gap-1.5">
-                  {[
-                    { id: "text_match_3", label: "Nhập text/SĐT" },
-                    { id: "evidence_picker", label: "Mã chứng cứ" },
-                    { id: "mcq", label: "Trắc nghiệm" },
-                  ].map((q) => (
-                    <button
-                      key={q.id}
-                      type="button"
-                      onClick={() => {
-                        detectiveAudio.playTypewriterClick();
-                        setQuestionType(q.id as any);
-                      }}
-                      className={`py-1 px-1.5 rounded border text-center text-[11px] font-mono transition-all ${
-                        questionType === q.id
-                          ? "bg-amber-500/20 border-amber-500 text-amber-300 font-bold"
-                          : "bg-zinc-900 border-white/5 text-zinc-400 hover:text-zinc-200"
-                      }`}
-                    >
-                      {q.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
-                    Câu hỏi:
-                  </label>
-                  <textarea
-                    rows={NOTE_TEXTAREA_ROWS}
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    placeholder="Nội dung câu hỏi..."
-                    className="w-full px-2.5 py-1 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
-                    Đáp án đúng:
-                  </label>
-                  <input
-                    type="text"
-                    value={answers}
-                    onChange={(e) => setAnswers(e.target.value)}
-                    placeholder={
-                      questionType === "evidence_picker"
-                        ? "VD: 10, dev-00..."
-                        : questionType === "mcq"
-                          ? "VD: 1. Gửi tin nhắn..."
-                          : "VD: 0988200991..."
-                    }
-                    className="w-full px-2.5 py-1 bg-zinc-900 border border-white/10 rounded text-xs font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
-                      Gợi ý:
-                    </label>
-                    <input
-                      type="text"
-                      value={hints}
-                      onChange={(e) => setHints(e.target.value)}
-                      placeholder="Gợi ý..."
-                      className="w-full px-2 py-1 bg-zinc-900 border border-white/10 rounded text-[11px] font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-mono text-zinc-300 mb-0.5">
-                      Mã mở khóa:
-                    </label>
-                    <input
-                      type="text"
-                      value={unlockedEvidenceId}
-                      onChange={(e) => setUnlockedEvidenceId(e.target.value)}
-                      placeholder="VD: dev-05..."
-                      className="w-full px-2 py-1 bg-zinc-900 border border-white/10 rounded text-[11px] font-mono text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-                    />
-                  </div>
-                </div>
+                <p className="text-[10px] font-mono text-zinc-400 italic">
+                  💡 Câu hỏi, đáp án đúng và gợi ý được đồng bộ realtime 100% từ
+                  tab "checkpoints" trên Google Sheet.
+                </p>
               </div>
             )}
           </div>

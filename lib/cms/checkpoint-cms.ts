@@ -1,70 +1,55 @@
 import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
 
 /**
- * Interface đại diện cho một dòng bất kỳ trong tab 'checkpoints' trên Google Sheet.
+ * Interface đại diện cho một dòng trong tab 'checkpoints' trên Google Sheet.
  *
- * Toàn bộ dữ liệu đáp án / cấu hình form nằm gọn trong cột `answers`
- * theo định dạng `khóa: giá trị` (mỗi dòng một khóa).
- * Gợi ý nhiều cấp nằm trong cột `hints` (mỗi dòng là một cấp độ).
+ * Toàn bộ đáp án / cấu hình form nằm gọn trong cột `answers` theo định dạng `khóa: giá trị`.
+ * Gợi ý nhiều cấp nằm trong cột `hints` (mỗi dòng Alt+Enter là một cấp độ).
  */
 export interface SheetCheckpointRow {
   case_id?: string;
   checkpoint_id?: string;
-  /**
-   * Bộ hồ sơ con chứa checkpoint: `Ban Đầu` | `Bộ A` | `Bộ B` | `Bộ C`.
-   * Là nhãn nghiệp vụ cho biên kịch — code không đọc cột này.
-   */
+  node_id?: string;
   dossier?: string;
   title?: string;
   question?: string;
-  type?:
-    "mcq" | "text_match_3" | "evidence_picker" | "convergence" | "accusation";
+  type?: "text_match_3" | "evidence_picker" | "mcq" | "text";
   unlocked_evidence_id?: string;
-  /** Cột đáp án hợp nhất — mỗi dòng `khóa: giá trị` (Alt+Enter để xuống dòng). */
   answers?: string;
-  /** Danh sách gợi ý đa cấp — mỗi dòng (Alt+Enter) là một cấp độ gợi ý (1, 2, 3...). */
   hints?: string;
   suspect_label?: string;
   evidence_step_label?: string;
-  motive_label?: string;
-  mismatch_label?: string;
   [key: string]: unknown;
 }
 
-/** Kết quả bóc tách cột `answers` — chỉ chứa các khóa thực sự xuất hiện trên Sheet. */
+/** Kết quả bóc tách cột `answers` */
 export interface ParsedAnswers {
   options?: string[];
   correctAnswer?: string;
   validSuspects?: string[];
   requiredEvidenceIds?: string[];
   availableEvidences?: CheckpointOptionItem[];
-  validMotives?: string[];
-  validMismatchTypes?: string[];
-  mismatchTypeOptions?: string[];
-  convergenceSuspects?: NonNullable<
-    Checkpoint["convergenceConfig"]
-  >["suspects"];
   textMatchInputs?: NonNullable<Checkpoint["textMatchConfig"]>["inputs"];
 }
 
 /**
  * Từ điển khóa hợp lệ trong cột `answers`.
- * Hỗ trợ cả tiếng Anh lẫn tiếng Việt không dấu để biên kịch dễ nhập.
  */
 const ANSWER_KEYS: Record<string, string> = {
-  // type=mcq
+  // Trắc nghiệm & text đơn
   option: "option",
-  options: "option",
   phuong_an: "option",
   lua_chon: "option",
   correct: "correct",
   correct_answer: "correct",
   dap_an: "correct",
+
   // Nhập tên nghi phạm
   suspect: "suspect",
   suspects: "suspect",
   nghi_pham: "suspect",
-  // Vật chứng
+
+  // Mã chứng cứ
   require: "require",
   required: "require",
   required_evidences: "require",
@@ -74,29 +59,9 @@ const ANSWER_KEYS: Record<string, string> = {
   chung_cu: "require",
   show: "show",
   available: "show",
-  available_evidences: "show",
   hien_thi: "show",
-  // Động cơ
-  motive: "motive",
-  motives: "motive",
-  dong_co: "motive",
-  // Mâu thuẫn
-  mismatch: "mismatch",
-  mismatches: "mismatch",
-  mau_thuan: "mismatch",
-  loai_mau_thuan: "mismatch",
-  mismatch_option: "mismatch_option",
-  mismatch_options: "mismatch_option",
-  mau_thuan_option: "mismatch_option",
-  // Danh mục động cơ dùng chung mảng nhãn nút với mâu thuẫn (UI đọc mismatchTypeOptions)
-  motive_option: "mismatch_option",
-  motive_options: "mismatch_option",
-  dong_co_option: "mismatch_option",
-  // Nút hội tụ
-  branch: "branch",
-  branches: "branch",
-  nhanh: "branch",
-  // Ô nhập văn bản
+
+  // Ô nhập văn bản (3 SĐT)
   input: "input",
   inputs: "input",
   o_nhap: "input",
@@ -128,23 +93,6 @@ function normalizeKey(key: string): string {
     .replace(/[\s-]+/g, "_");
 }
 
-/** Bóc một dòng `id | name | valid_ids | Lý do 1 /// Lý do 2` của nút hội tụ. */
-function parseBranchLine(
-  value: string,
-): NonNullable<Checkpoint["convergenceConfig"]>["suspects"][number] | null {
-  const [id, name, validIds, reasons] = value.split("|").map((p) => p.trim());
-  if (!id) return null;
-  return {
-    id,
-    name: name || id,
-    validReasons: splitCommas(validIds),
-    reasonOptions: (reasons || "")
-      .split("///")
-      .map((r) => r.trim())
-      .filter(Boolean),
-  };
-}
-
 /** Bóc một dòng `id | Nhãn ô | Placeholder | đáp_án_1, đáp_án_2` của ô nhập văn bản. */
 function parseInputLine(
   value: string,
@@ -162,20 +110,26 @@ function parseInputLine(
 }
 
 /**
- * Bóc cột `answers` hợp nhất thành object cấu hình.
- *
- * Định dạng: mỗi dòng một cặp `khóa: giá trị`. Khóa `option`, `mismatch_option`,
- * `branch`, `input` được phép lặp lại để tạo danh sách.
- * Khóa không nhận diện được sẽ bị bỏ qua kèm cảnh báo `console.warn` để phát hiện lỗi gõ.
+ * Bóc cột `answers` hợp nhất thành object cấu hình UI.
  */
 export function parseAnswersColumn(raw?: string): ParsedAnswers {
   const parsed: ParsedAnswers = {};
-  const unknownKeys = new Set<string>();
+  if (!raw || typeof raw !== "string") return parsed;
 
-  splitLines(raw).forEach((line) => {
+  const lines = splitLines(raw);
+
+  // Nếu chỉ có 1 dòng và không có dấu ':' -> xem toàn bộ là đáp án text
+  if (lines.length === 1 && !lines[0].includes(":")) {
+    parsed.correctAnswer = lines[0].trim();
+    return parsed;
+  }
+
+  lines.forEach((line) => {
     const separatorIndex = line.indexOf(":");
     if (separatorIndex === -1) {
-      unknownKeys.add(line);
+      if (!parsed.correctAnswer) {
+        parsed.correctAnswer = line.trim();
+      }
       return;
     }
 
@@ -183,10 +137,7 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
     const value = line.slice(separatorIndex + 1).trim();
     const key = ANSWER_KEYS[normalizeKey(rawKey)];
 
-    if (!key || !value) {
-      if (!key) unknownKeys.add(rawKey.trim());
-      return;
-    }
+    if (!key || !value) return;
 
     switch (key) {
       case "option":
@@ -208,20 +159,6 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
           label: code,
         }));
         break;
-      case "motive":
-        parsed.validMotives = splitCommas(value);
-        break;
-      case "mismatch":
-        parsed.validMismatchTypes = splitCommas(value);
-        break;
-      case "mismatch_option":
-        (parsed.mismatchTypeOptions ??= []).push(value);
-        break;
-      case "branch": {
-        const branch = parseBranchLine(value);
-        if (branch) (parsed.convergenceSuspects ??= []).push(branch);
-        break;
-      }
       case "input": {
         const input = parseInputLine(value);
         if (input) (parsed.textMatchInputs ??= []).push(input);
@@ -230,18 +167,11 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
     }
   });
 
-  if (unknownKeys.size > 0) {
-    console.warn(
-      `[checkpoint-cms] Cột 'answers' chứa khóa không hợp lệ, đã bỏ qua: ${[...unknownKeys].join(", ")}`,
-    );
-  }
-
   return parsed;
 }
 
 /**
  * Trích xuất danh sách gợi ý từ ô `hints` đa dòng (Alt+Enter) trên Sheet.
- * Mỗi dòng tương ứng một cấp độ gợi ý (1, 2, 3...).
  */
 export function getCheckpointHints(row?: SheetCheckpointRow): string[] {
   if (!row || typeof row !== "object") return [];
@@ -264,7 +194,7 @@ export function getCheckpointHints(row?: SheetCheckpointRow): string[] {
 }
 
 /**
- * Lấy gợi ý ở cấp độ cụ thể (1-indexed). Trả về rỗng nếu cấp độ vượt quá số lượng trên Sheet.
+ * Lấy gợi ý ở cấp độ cụ thể (1-indexed).
  */
 export function getSheetHintLevel(hints: string[], level: number): string {
   if (!hints || hints.length === 0 || level < 1) return "";
@@ -278,7 +208,6 @@ export function getCheckpointOptions(row?: SheetCheckpointRow): string[] {
 
 /**
  * Chuyển một dòng thô từ tab 'checkpoints' thành object Checkpoint.
- * Cột `answers` là nguồn chính; ô nào trống sẽ lấy từ checkpoint local cùng `checkpoint_id`.
  */
 export function transformSheetCheckpoint(
   row: SheetCheckpointRow,
@@ -305,38 +234,17 @@ export function transformSheetCheckpoint(
     ? answers.availableEvidences
     : fallback?.pickerConfig?.availableEvidences;
 
-  const validMotives = answers.validMotives?.length
-    ? answers.validMotives
-    : fallback?.pickerConfig?.validMotives;
-
-  const validMismatchTypes = answers.validMismatchTypes?.length
-    ? answers.validMismatchTypes
-    : fallback?.pickerConfig?.validMismatchTypes;
-
-  const mismatchTypeOptions = answers.mismatchTypeOptions?.length
-    ? answers.mismatchTypeOptions
-    : fallback?.pickerConfig?.mismatchTypeOptions;
-
-  const convergenceSuspects = answers.convergenceSuspects?.length
-    ? answers.convergenceSuspects
-    : fallback?.convergenceConfig?.suspects;
-
   const textMatchInputs = answers.textMatchInputs?.length
     ? answers.textMatchInputs
     : fallback?.textMatchConfig?.inputs;
 
-  // Picker config object: ưu tiên Sheet, fallback về code local
   const hasPickerConfig =
     fallback?.pickerConfig ||
     validSuspects ||
     requiredEvidenceIds ||
     availableEvidences ||
-    validMotives ||
-    validMismatchTypes ||
     row.suspect_label ||
-    row.evidence_step_label ||
-    row.motive_label ||
-    row.mismatch_label;
+    row.evidence_step_label;
 
   const pickerConfig = hasPickerConfig
     ? {
@@ -348,25 +256,12 @@ export function transformSheetCheckpoint(
         ...(availableEvidences && availableEvidences.length > 0
           ? { availableEvidences }
           : {}),
-        ...(validMotives && validMotives.length > 0 ? { validMotives } : {}),
-        ...(validMismatchTypes && validMismatchTypes.length > 0
-          ? { validMismatchTypes }
-          : {}),
-        ...(mismatchTypeOptions && mismatchTypeOptions.length > 0
-          ? { mismatchTypeOptions }
-          : {}),
         ...(row.suspect_label !== undefined && row.suspect_label !== ""
           ? { suspectLabel: row.suspect_label }
           : {}),
         ...(row.evidence_step_label !== undefined &&
         row.evidence_step_label !== ""
           ? { evidenceStepLabel: row.evidence_step_label }
-          : {}),
-        ...(row.motive_label !== undefined && row.motive_label !== ""
-          ? { motiveLabel: row.motive_label }
-          : {}),
-        ...(row.mismatch_label !== undefined && row.mismatch_label !== ""
-          ? { mismatchTypeLabel: row.mismatch_label }
           : {}),
       }
     : undefined;
@@ -375,11 +270,6 @@ export function transformSheetCheckpoint(
     textMatchInputs && textMatchInputs.length > 0
       ? { inputs: textMatchInputs }
       : fallback?.textMatchConfig;
-
-  const convergenceConfig =
-    convergenceSuspects && convergenceSuspects.length > 0
-      ? { suspects: convergenceSuspects }
-      : fallback?.convergenceConfig;
 
   return {
     id: row.checkpoint_id || fallback?.id || "cp-dynamic",
@@ -396,13 +286,14 @@ export function transformSheetCheckpoint(
     unlockedEvidenceId:
       row.unlocked_evidence_id || fallback?.unlockedEvidenceId,
     status: fallback?.status || "locked",
-    type: (row.type as Checkpoint["type"]) || fallback?.type || "mcq",
+    type:
+      (row.type as Checkpoint["type"]) || fallback?.type || "evidence_picker",
     hintsList:
       hintsList && hintsList.length > 0 ? hintsList : fallback?.hintsList,
     textMatchConfig,
     pickerConfig,
-    convergenceConfig,
-  };
+    ...(row.node_id ? { nodeId: row.node_id } : {}),
+  } as Checkpoint;
 }
 
 /**
