@@ -1785,13 +1785,27 @@ export function HeroInteractive({
             const tagX = -cardWidth / 2;
             const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
 
-            // Contact + ambient drop shadow cast onto the corkboard surface
+            // Pass 1 — wide ambient occlusion: soft halo lifting the card off the corkboard
             context.save();
-            context.shadowColor = "rgba(12, 7, 3, 0.42)";
-            context.shadowBlur =
-              (loadedSuspectImg.width > 0 ? 9 : 9) / transform.scale;
-            context.shadowOffsetX = 2.5 / transform.scale;
-            context.shadowOffsetY = 5.5 / transform.scale;
+            context.shadowColor = "rgba(10, 5, 2, 0.34)";
+            context.shadowBlur = 22 / transform.scale;
+            context.shadowOffsetX = 1.5 / transform.scale;
+            context.shadowOffsetY = 9 / transform.scale;
+            context.drawImage(
+              loadedSuspectImg,
+              tagX,
+              tagY,
+              cardWidth,
+              cardHeight,
+            );
+            context.restore();
+
+            // Pass 2 — tight contact shadow: crisp dark edge right under the paper
+            context.save();
+            context.shadowColor = "rgba(10, 5, 2, 0.58)";
+            context.shadowBlur = 7 / transform.scale;
+            context.shadowOffsetX = 2.6 / transform.scale;
+            context.shadowOffsetY = 5.2 / transform.scale;
 
             // Render complete pre-rendered photo card (includes photo, beige tape + name, yellow pin)
             context.drawImage(
@@ -2104,22 +2118,32 @@ export function HeroInteractive({
           const tagX = -noteWidth * pinAnchorX;
           const tagY = -noteHeight * pinAnchorY;
 
-          // Draw the realistic Ultra HD note PNG asset with tactile drop shadow onto corkboard
+          // Draw the realistic Ultra HD note PNG asset with tactile 2-pass drop shadow onto corkboard
           if (loadedNoteImg) {
+            // Pass 1 — ambient occlusion lift
             context.save();
-            context.shadowColor = "rgba(12, 7, 3, 0.38)";
-            context.shadowBlur = 8.5 / transform.scale;
-            context.shadowOffsetX = 2.2 / transform.scale;
-            context.shadowOffsetY = 4.8 / transform.scale;
+            context.shadowColor = "rgba(10, 5, 2, 0.30)";
+            context.shadowBlur = 18 / transform.scale;
+            context.shadowOffsetX = 1.2 / transform.scale;
+            context.shadowOffsetY = 8 / transform.scale;
+            context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
+            context.restore();
+
+            // Pass 2 — crisp contact edge
+            context.save();
+            context.shadowColor = "rgba(10, 5, 2, 0.52)";
+            context.shadowBlur = 6.5 / transform.scale;
+            context.shadowOffsetX = 2.4 / transform.scale;
+            context.shadowOffsetY = 4.6 / transform.scale;
             context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
             context.restore();
           } else {
             // Fallback fill
             context.save();
-            context.shadowColor = "rgba(12, 7, 3, 0.38)";
-            context.shadowBlur = 8.5 / transform.scale;
+            context.shadowColor = "rgba(10, 5, 2, 0.48)";
+            context.shadowBlur = 12 / transform.scale;
             context.shadowOffsetX = 2.2 / transform.scale;
-            context.shadowOffsetY = 4.8 / transform.scale;
+            context.shadowOffsetY = 6 / transform.scale;
             context.fillStyle = isWhiteNote ? "#faf8f2" : "#fde047";
             context.fillRect(tagX, tagY, noteWidth, noteHeight);
             context.restore();
