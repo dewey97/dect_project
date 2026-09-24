@@ -234,60 +234,6 @@ export default function WebEvidencePage() {
       <div className="w-full max-w-[1900px] h-full flex flex-col lg:flex-row gap-3 xl:gap-4 items-stretch justify-center overflow-hidden min-h-0 min-w-0">
         {/* LEFT COLUMN: FULL BOARDGAME INVESTIGATION CANVAS */}
         <div className="w-full lg:w-[58%] xl:w-[60%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex flex-col min-h-0 relative">
-          {/* TOP BAR WITH TITLE & CONTROLS */}
-          <div className="shrink-0 border-b border-[#3d2c1e] px-4 py-2.5 bg-[#241a12] flex items-center justify-between gap-2 z-20">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-[#d4a373] font-bold">
-                BẢNG ĐIỀU TRA // CASE #000: {activeCase?.title || "Trốn Tìm"}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  detectiveAudio.playPaperRustle();
-                  router.push("/");
-                }}
-                className="px-2.5 py-1 bg-[#1b140e] hover:bg-[#2d1b10] border border-[#593c26] text-[#e5d8cb] hover:text-amber-300 font-mono text-[0.68rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
-                title="Thoát về Màn hình chính"
-              >
-                <Home className="size-3 text-amber-400" />
-                <span>TRANG CHÍNH</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  detectiveAudio.playPaperRustle();
-                  router.push("/evidence/boardgame");
-                }}
-                className="px-2.5 py-1 bg-[#1b261d] hover:bg-[#253628] border border-[#3b5941] text-emerald-400 font-mono text-[0.68rem] font-bold transition-all cursor-pointer rounded flex items-center gap-1.5 shadow-sm"
-                title="Chuyển sang chế độ Đồng hành cùng Board Game (toàn màn hình)"
-              >
-                <Box className="size-3" />
-                <span>CHẾ ĐỘ BOARD GAME</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsAudioMuted(detectiveAudio.toggleMute())}
-                className="p-1.5 bg-[#18120c] hover:bg-[#342417] border border-[#3e2e20] text-[#d9a066] transition-colors cursor-pointer rounded"
-                title={
-                  isAudioMuted
-                    ? "Bật âm thanh trinh thám"
-                    : "Tắt âm thanh trinh thám"
-                }
-              >
-                {isAudioMuted ? (
-                  <VolumeX className="size-3.5" />
-                ) : (
-                  <Volume2 className="size-3.5" />
-                )}
-              </button>
-            </div>
-          </div>
-
           {/* MAIN CANVAS */}
           <div className="flex-1 min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
@@ -520,6 +466,10 @@ export default function WebEvidencePage() {
       <QuickActionFab
         onOpenHint={() => setIsHintModalOpen(true)}
         onOpenPhone={() => setIsPhoneModalOpen(true)}
+        onOpenBoardGame={() => {
+          detectiveAudio.playPaperRustle();
+          router.push("/evidence/boardgame");
+        }}
         onResetCase={resetAllProgress}
       />
 

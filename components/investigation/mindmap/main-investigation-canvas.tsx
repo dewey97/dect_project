@@ -18,6 +18,8 @@ import {
   Minus,
   Pencil,
   Trash2,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -158,6 +160,10 @@ export function MainInvestigationCanvas({
 
   // Admin-created custom pins (sticky notes, blank A4 dossiers, pinned photos)
   const [adminCustomPins, setAdminCustomPins] = useState<PinPoint[]>([]);
+  const [adminConnections, setAdminConnections] = useState<CaseConnection[]>(
+    [],
+  );
+  const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isCreatePinModalOpen, setIsCreatePinModalOpen] = useState(false);
   const [editingCustomPin, setEditingCustomPin] = useState<PinPoint | null>(
     null,
@@ -181,11 +187,13 @@ export function MainInvestigationCanvas({
     posMap: Record<string, { x: number; y: number }>;
     adminPins: PinPoint[];
     transforms: Record<string, { rotation: number; scale: number }>;
+    connections: CaseConnection[];
   };
   const layoutRef = useRef<LayoutSnapshot>({
     posMap: {},
     adminPins: [],
     transforms: {},
+    connections: [],
   });
   const historyRef = useRef<{
     past: LayoutSnapshot[];
@@ -209,18 +217,24 @@ export function MainInvestigationCanvas({
     layoutRef.current.transforms = pinTransforms;
   }, [pinTransforms]);
 
+  useEffect(() => {
+    layoutRef.current.connections = adminConnections;
+  }, [adminConnections]);
+
   const cloneLayout = (
     src: LayoutSnapshot = layoutRef.current,
   ): LayoutSnapshot => ({
     posMap: { ...src.posMap },
     adminPins: src.adminPins.map((p) => ({ ...p })),
     transforms: { ...src.transforms },
+    connections: [...src.connections],
   });
 
   const applyLayout = useCallback((snapshot: LayoutSnapshot) => {
     setCustomPinPositions(snapshot.posMap);
     setAdminCustomPins(snapshot.adminPins);
     setPinTransforms(snapshot.transforms);
+    setAdminConnections(snapshot.connections);
     setHasUnsavedChanges(true);
   }, []);
 
@@ -357,6 +371,15 @@ export function MainInvestigationCanvas({
             setPinTransforms(parsed);
           }
         }
+        const localConnections = localStorage.getItem(
+          "veritas_admin_connections_case-000",
+        );
+        if (localConnections) {
+          const parsed = JSON.parse(localConnections);
+          if (Array.isArray(parsed)) {
+            setAdminConnections(parsed);
+          }
+        }
       } catch {}
 
       // 2. Tải đồng bộ từ Supabase Database nếu có
@@ -418,6 +441,7 @@ export function MainInvestigationCanvas({
           posMap: nextPosMap,
           adminPins: nextAdminPins,
           transforms: draft.transforms,
+          connections: draft.connections,
         };
       }, `save-pin-${pin.id}`);
       toast.success("Đã thêm ghim vào bảng!");
@@ -433,6 +457,9 @@ export function MainInvestigationCanvas({
         const nextTransforms = { ...draft.transforms };
         delete nextPosMap[pinId];
         delete nextTransforms[pinId];
+        const nextConns = draft.connections.filter(
+          (c) => c.fromPinId !== pinId && c.toPinId !== pinId,
+        );
         try {
           localStorage.setItem(
             "veritas_admin_custom_pins_case-000",
@@ -442,11 +469,16 @@ export function MainInvestigationCanvas({
             "veritas_boardgame_transforms_case-000",
             JSON.stringify(nextTransforms),
           );
+          localStorage.setItem(
+            "veritas_admin_connections_case-000",
+            JSON.stringify(nextConns),
+          );
         } catch {}
         return {
           posMap: nextPosMap,
           adminPins: nextAdminPins,
           transforms: nextTransforms,
+          connections: nextConns,
         };
       }, `delete-pin-${pinId}`);
       toast.info("Đã xoá ghim khỏi bảng!");
@@ -486,8 +518,54 @@ export function MainInvestigationCanvas({
           posMap: draft.posMap,
           adminPins: draft.adminPins,
           transforms: nextTransforms,
+          connections: draft.connections,
         };
       }, `transform-${pinId}`);
+    },
+    [commitLayout],
+  );
+
+  const handleConnectPins = useCallback(
+    (fromPinId: string, toPinId: string) => {
+      if (fromPinId === toPinId) return;
+      const connId = `admin-conn-${fromPinId}-${toPinId}`;
+      commitLayout((draft) => {
+        const exists = draft.connections.some((c) => c.id === connId);
+        const nextConns = exists
+          ? draft.connections
+          : [...draft.connections, { id: connId, fromPinId, toPinId }];
+        try {
+          localStorage.setItem(
+            "veritas_admin_connections_case-000",
+            JSON.stringify(nextConns),
+          );
+        } catch {}
+        return {
+          ...draft,
+          connections: nextConns,
+        };
+      }, `connect-${connId}`);
+      toast.success("Đã nối dây chỉ đỏ giữa 2 node!");
+    },
+    [commitLayout],
+  );
+
+  const handleDeleteConnection = useCallback(
+    (connId: string) => {
+      commitLayout((draft) => {
+        const nextConns = draft.connections.filter((c) => c.id !== connId);
+        try {
+          localStorage.setItem(
+            "veritas_admin_connections_case-000",
+            JSON.stringify(nextConns),
+          );
+        } catch {}
+        return {
+          ...draft,
+          connections: nextConns,
+        };
+      }, `delete-conn-${connId}`);
+      toast.info("Đã tháo dây chỉ đỏ!");
     },
     [commitLayout],
   );
@@ -891,7 +969,7 @@ export function MainInvestigationCanvas({
         return;
       }
 
-      if (id === "c0-pin-suspects") {
+      if (id === "c0-pin-suspects" || id === "c0-pin-question") {
         setEditingSuspect(null);
         setIsAddSuspectOpen(true);
       } else if (id === "c0-pin-evidence") {
@@ -1010,6 +1088,10 @@ export function MainInvestigationCanvas({
       solvedCulprit,
       phoneLookupSuccess,
       activeFollowupCulprit,
+      isEditMode,
+      adminCustomPins,
+      handleOpenPhotoZoom,
+      onOpenEpilogue,
     ],
   );
 
@@ -1431,6 +1513,7 @@ export function MainInvestigationCanvas({
         toPinId: `node-suspect-${canonicalId}`,
       };
     }),
+    ...adminConnections,
   ];
 
   return (
@@ -1449,6 +1532,25 @@ export function MainInvestigationCanvas({
           <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
         </div>
+
+        {/* Sound Toggle Icon Button next to BẢNG ĐIỀU TRA badge */}
+        <button
+          type="button"
+          onClick={() => {
+            const next = detectiveAudio.toggleMute();
+            setIsAudioMuted(next);
+          }}
+          className="p-1.5 bg-[#1b140e]/85 hover:bg-[#342417] backdrop-blur-md border border-[#593c26]/60 text-[#d9a066] transition-colors cursor-pointer rounded-lg shadow-lg pointer-events-auto flex items-center justify-center"
+          title={
+            isAudioMuted ? "Bật âm thanh trinh thám" : "Tắt âm thanh trinh thám"
+          }
+        >
+          {isAudioMuted ? (
+            <VolumeX className="size-4 text-amber-500/60" />
+          ) : (
+            <Volume2 className="size-4 text-amber-400" />
+          )}
+        </button>
 
         {/* Admin Setup Controls */}
         {isAdmin && (
@@ -1530,58 +1632,51 @@ export function MainInvestigationCanvas({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 p-1.5 bg-[#1b140e]/95 backdrop-blur-md rounded-xl border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
+            className="absolute top-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-0.5 p-0.5 bg-[#1b140e]/95 backdrop-blur-md rounded-lg border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
           >
             {/* Tilt Left (-5 deg) */}
             <button
               type="button"
               onClick={() => handleAdjustNodeTransform(selectedPin.id, -5, 0)}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Xoay nghiêng trái -5°"
+              className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
+              title="Xoay nghiêng trái (-5°)"
             >
               <RotateCcw className="size-3.5" />
-              <span className="text-[10px] font-bold">-5°</span>
             </button>
 
             {/* Tilt Right (+5 deg) */}
             <button
               type="button"
               onClick={() => handleAdjustNodeTransform(selectedPin.id, 5, 0)}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Xoay nghiêng phải +5°"
+              className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
+              title="Xoay nghiêng phải (+5°)"
             >
               <RotateCw className="size-3.5" />
-              <span className="text-[10px] font-bold">+5°</span>
             </button>
 
-            <div className="h-4 w-px bg-white/15 mx-0.5" />
+            <div className="h-3.5 w-px bg-white/15" />
 
             {/* Zoom Out (-10%) */}
             <button
               type="button"
               onClick={() => handleAdjustNodeTransform(selectedPin.id, 0, -0.1)}
-              className="p-1.5 rounded-lg bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Thu nhỏ kích thước (-10%)"
+              className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
+              title="Thu nhỏ kích thước"
             >
               <Minus className="size-3.5" />
             </button>
-
-            {/* Scale % display */}
-            <span className="text-[10px] font-bold text-zinc-400 px-1 font-mono">
-              {Math.round((selectedPin.scale ?? 1.0) * 100)}%
-            </span>
 
             {/* Zoom In (+10%) */}
             <button
               type="button"
               onClick={() => handleAdjustNodeTransform(selectedPin.id, 0, 0.1)}
-              className="p-1.5 rounded-lg bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Phóng to kích thước (+10%)"
+              className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
+              title="Phóng to kích thước"
             >
               <Plus className="size-3.5" />
             </button>
 
-            <div className="h-4 w-px bg-white/15 mx-0.5" />
+            <div className="h-3.5 w-px bg-white/15" />
 
             {/* Edit Node Modal trigger */}
             <button
@@ -1591,7 +1686,7 @@ export function MainInvestigationCanvas({
                 setEditingCustomPin(selectedPin);
                 setIsCreatePinModalOpen(true);
               }}
-              className="p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 transition-colors"
+              className="p-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 transition-colors"
               title="Chỉnh sửa chi tiết nội dung node"
             >
               <Pencil className="size-3.5" />
@@ -1606,7 +1701,7 @@ export function MainInvestigationCanvas({
                   handleDeleteAdminPin(selectedPin.id);
                   setSelectedPinId(null);
                 }}
-                className="p-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-500/30 transition-colors"
+                className="p-1 rounded-md bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-500/30 transition-colors"
                 title="Xóa node khỏi bảng"
               >
                 <Trash2 className="size-3.5" />
@@ -1634,6 +1729,8 @@ export function MainInvestigationCanvas({
         customConnections={customConnections}
         selectedPinId={selectedPinId}
         onSelectPin={setSelectedPinId}
+        onConnectPins={handleConnectPins}
+        onDeleteConnection={handleDeleteConnection}
         onPinClick={handlePinClick}
         isEditMode={isEditMode}
         onPinPositionChange={handlePinPositionChange}

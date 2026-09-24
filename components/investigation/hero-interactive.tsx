@@ -499,8 +499,13 @@ function isPinHit(
   pin: PinPoint | { id: string; label: string },
   transform: ViewTransform,
 ): boolean {
-  // Hit radius for pinhead (40px radius touch target)
-  const headHitRadius = 40 / transform.scale;
+  const rawPin = pin as any;
+  const userScale =
+    typeof rawPin.scale === "number" && rawPin.scale > 0 ? rawPin.scale : 1.0;
+  const userRot = typeof rawPin.rotation === "number" ? rawPin.rotation : 0;
+
+  // Hit radius for pinhead (16px radius in screen pixels)
+  const headHitRadius = 16 / transform.scale;
   if (
     distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y) <=
     headHitRadius
@@ -508,22 +513,15 @@ function isPinHit(
     return true;
   }
 
-  const rawPin = pin as any;
-  const userScale =
-    typeof rawPin.scale === "number" && rawPin.scale > 0 ? rawPin.scale : 1.0;
-  const userRot = typeof rawPin.rotation === "number" ? rawPin.rotation : 0;
-
-  // Un-rotate and un-scale worldPointer around pinPosition into pin local space
+  // Un-rotate worldPointer relative to pinPosition into card local coordinate frame
   const dx = worldPointer.x - pinPosition.x;
   const dy = worldPointer.y - pinPosition.y;
   const rad = (-userRot * Math.PI) / 180;
-  const localX = (dx * Math.cos(rad) - dy * Math.sin(rad)) / userScale;
-  const localY = (dx * Math.sin(rad) + dy * Math.cos(rad)) / userScale;
+  const unrotX = dx * Math.cos(rad) - dy * Math.sin(rad);
+  const unrotY = dx * Math.sin(rad) + dy * Math.cos(rad);
 
   const isFollowup =
-    pin.id.startsWith("c0-pin-followup") ||
-    pin.id.startsWith("c0-pin-question") ||
-    pin.id.startsWith("followup-");
+    pin.id.startsWith("c0-pin-followup") || pin.id.startsWith("followup-");
   const isKhang =
     !isFollowup &&
     (pin.id.includes("khang") ||
@@ -541,52 +539,44 @@ function isPinHit(
       isKhang ||
       isCrimeScene);
 
+  let baseCardWidth = 104;
+  let baseCardHeight = 122;
+  let tagYRatio = -0.08;
+
   if (isSuspectPin) {
-    // Exact dimensions matching drawing in renderScene:
-    const baseCardWidth = isKhang ? 150 : isCrimeScene ? 140 : 110;
-    const cardWidth = (baseCardWidth + 24) / transform.scale;
-    const cardHeight = isCrimeScene
-      ? (cardWidth * 420) / 560
-      : (cardWidth * 380) / 300;
-    const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
+    baseCardWidth = isKhang ? 146 : isCrimeScene ? 134 : 108;
+    baseCardHeight = isCrimeScene
+      ? (baseCardWidth * 420) / 560
+      : (baseCardWidth * 380) / 300;
+    tagYRatio = isCrimeScene ? -0.05 : -0.1;
+  } else {
+    const upperLabel = (pin.label || "").toUpperCase();
+    const isWhiteNote =
+      (pin as any).noteColor === "white" ||
+      upperLabel.includes("MỞ RỘNG") ||
+      upperLabel.includes("KHÁM XÉT") ||
+      upperLabel.includes("KHÁM NGHIỆM") ||
+      upperLabel.includes("KẾT LUẬN") ||
+      upperLabel.includes("BIÊN BẢN") ||
+      upperLabel.includes("TRUY TỐ");
 
-    const cardLeft = -cardWidth / 2;
-    const cardRight = cardWidth / 2;
-    const cardTop = tagY - 6 / transform.scale;
-    const cardBottom = tagY + cardHeight + 4 / transform.scale;
-
-    return (
-      localX >= cardLeft &&
-      localX <= cardRight &&
-      localY >= cardTop &&
-      localY <= cardBottom
-    );
+    baseCardWidth = isFollowup ? 120 : isWhiteNote ? 104 : 84;
+    baseCardHeight = isFollowup ? 110 : isWhiteNote ? 122 : 84;
   }
 
-  const upperLabel = (pin.label || "").toUpperCase();
-  const isWhiteNote =
-    (pin as any).noteColor === "white" ||
-    upperLabel.includes("MỞ RỘNG") ||
-    upperLabel.includes("KHÁM XÉT") ||
-    upperLabel.includes("KHÁM NGHIỆM") ||
-    upperLabel.includes("KẾT LUẬN") ||
-    upperLabel.includes("BIÊN BẢN") ||
-    upperLabel.includes("TRUY TỐ");
+  // Width & height in world space (matching scaled canvas render)
+  const cardW = (baseCardWidth * userScale) / transform.scale;
+  const cardH = (baseCardHeight * userScale) / transform.scale;
+  const tagX = -cardW * 0.5;
+  const tagY = tagYRatio * cardH;
 
-  // Hit area for white note (~108x124) vs sticky note (~84x90) vs followup note (~90x100) with generous touch padding
-  const cardHalfWidth =
-    (isFollowup ? 70 : isWhiteNote ? 65 : 55) / transform.scale;
-  const cardTop = -(isFollowup ? 30 : isWhiteNote ? 30 : 25) / transform.scale;
-  const cardBottom =
-    (isFollowup ? 130 : isWhiteNote ? 130 : 100) / transform.scale;
-  const cardLeft = -cardHalfWidth;
-  const cardRight = cardHalfWidth;
+  const pad = 2 / transform.scale; // Accurate bounding box
 
   return (
-    localX >= cardLeft &&
-    localX <= cardRight &&
-    localY >= cardTop &&
-    localY <= cardBottom
+    unrotX >= tagX - pad &&
+    unrotX <= tagX + cardW + pad &&
+    unrotY >= tagY - pad &&
+    unrotY <= tagY + cardH + pad
   );
 }
 
@@ -671,6 +661,8 @@ export interface HeroInteractiveProps {
   customBgImage?: string;
   selectedPinId?: string | null;
   onSelectPin?: (pinId: string | null) => void;
+  onConnectPins?: (fromPinId: string, toPinId: string) => void;
+  onDeleteConnection?: (connId: string) => void;
   onPinClick?: (
     pinId: string,
     pin?: PinPoint,
@@ -688,6 +680,8 @@ export function HeroInteractive({
   customBgImage,
   selectedPinId,
   onSelectPin,
+  onConnectPins,
+  onDeleteConnection,
   onPinClick,
   isEditMode = false,
   onPinPositionChange,
@@ -698,17 +692,22 @@ export function HeroInteractive({
   );
   const selectedPinIdRef = useRef<string | null | undefined>(selectedPinId);
   const onSelectPinRef = useRef(onSelectPin);
+  const onConnectPinsRef = useRef(onConnectPins);
+  const onDeleteConnectionRef = useRef(onDeleteConnection);
   const onPinClickRef = useRef(onPinClick);
   const isEditModeRef = useRef(isEditMode);
   const onPinPositionChangeRef = useRef(onPinPositionChange);
 
   const draggingPinIdRef = useRef<string | null>(null);
+  const isDraggingConnectionRef = useRef<boolean>(false);
 
   // Synchronously update refs on every render to eliminate any stale closures
   customPinsRef.current = customPins;
   customConnectionsRef.current = customConnections;
   selectedPinIdRef.current = selectedPinId;
   onSelectPinRef.current = onSelectPin;
+  onConnectPinsRef.current = onConnectPins;
+  onDeleteConnectionRef.current = onDeleteConnection;
   onPinClickRef.current = onPinClick;
   isEditModeRef.current = isEditMode;
   onPinPositionChangeRef.current = onPinPositionChange;
@@ -856,6 +855,7 @@ export function HeroInteractive({
   const userPinsRef = useRef<UserPin[]>([]);
   const userConnectionsRef = useRef<UserConnection[]>([]);
   const connectionStartIdRef = useRef<string | null>(null);
+  const connectionCandidateRef = useRef(false);
 
   // Pin counter sequence ref
   const nextUserPinNumberRef = useRef(1);
@@ -910,7 +910,8 @@ export function HeroInteractive({
     const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
     let hitId: string | null = null;
 
-    for (let index = 0; index < caseSysPins.length; index += 1) {
+    // Iterate backwards so topmost visual pin is hit first
+    for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
       const pin = caseSysPins[index];
       const pinPosition = getPinWorldPosition(pin, bounds);
       if (isPinHit(worldPointer, pinPosition, pin, transform)) {
@@ -922,6 +923,20 @@ export function HeroInteractive({
     if (hoveredPinRef.current !== hitId) {
       hoveredPinRef.current = hitId;
       requestRenderRef.current();
+    }
+
+    if (containerRef.current) {
+      if (isDraggingConnectionRef.current) {
+        containerRef.current.style.cursor = "crosshair";
+      } else if (draggingPinIdRef.current) {
+        containerRef.current.style.cursor = "grabbing";
+      } else if (hitId) {
+        containerRef.current.style.cursor = "pointer";
+      } else if (isEditModeRef.current) {
+        containerRef.current.style.cursor = "grab";
+      } else {
+        containerRef.current.style.cursor = "default";
+      }
     }
   }, []);
 
@@ -1049,7 +1064,40 @@ export function HeroInteractive({
       // Check if clicking on a system pin in edit mode
       if (isEditModeRef.current) {
         const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
-        for (let index = 0; index < caseSysPins.length; index += 1) {
+
+        // Ưu tiên 1: nắm đinh ghim (đầu ghim) để kéo dây chỉ đỏ nối 2 node
+        // Duyệt ngược để bắt đúng node nằm trên cùng (khớp với hover & render)
+        const headRadius = 16 / transform.scale;
+        for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
+          const pin = caseSysPins[index];
+          const pinPosition = getPinWorldPosition(pin, bounds);
+
+          if (
+            distance(
+              worldPointer.x,
+              worldPointer.y,
+              pinPosition.x,
+              pinPosition.y,
+            ) <= headRadius
+          ) {
+            // Chưa bật kéo dây ngay: chờ xem người dùng có di chuột hay chỉ
+            // bấm (click) vào đầu ghim. Phân biệt ở handlePointerMove.
+            connectionStartIdRef.current = pin.id;
+            connectionCandidateRef.current = true;
+            try {
+              event.currentTarget.setPointerCapture(event.pointerId);
+            } catch {}
+            requestRenderRef.current();
+            try {
+              event.preventDefault();
+              event.stopPropagation();
+            } catch {}
+            return;
+          }
+        }
+
+        // Ưu tiên 2: thân ghim → kéo di chuyển node
+        for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
 
@@ -1072,7 +1120,7 @@ export function HeroInteractive({
 
       updateHoveredPin(x, y);
     },
-    [updateHoveredPin],
+    [updateHoveredPin, updateConnectionStartId],
   );
 
   const handlePointerMove = useCallback(
@@ -1095,6 +1143,28 @@ export function HeroInteractive({
       const isActivePointer =
         activePointerIdRef.current === event.pointerId ||
         activePointerIdRef.current === null;
+
+      if (
+        isPointerDownRef.current &&
+        isActivePointer &&
+        connectionCandidateRef.current
+      ) {
+        const deltaX = x - pointerDownRef.current.x;
+        const deltaY = y - pointerDownRef.current.y;
+        const dragDistance = Math.hypot(deltaX, deltaY);
+
+        if (dragDistance > DRAG_THRESHOLD) {
+          hasDraggedRef.current = true;
+          if (
+            !isDraggingConnectionRef.current &&
+            connectionStartIdRef.current
+          ) {
+            isDraggingConnectionRef.current = true;
+            updateConnectionStartId(connectionStartIdRef.current);
+            detectiveAudio.playTypewriterClick();
+          }
+        }
+      }
 
       if (
         isPointerDownRef.current &&
@@ -1202,9 +1272,62 @@ export function HeroInteractive({
       const wasDraggingPin = draggingPinIdRef.current !== null;
       draggingPinIdRef.current = null;
 
+      const wasDraggingConn = isDraggingConnectionRef.current;
+      const fromConnPinId = connectionStartIdRef.current;
+      connectionCandidateRef.current = false;
+      isDraggingConnectionRef.current = false;
+      updateConnectionStartId(null);
+
       // Check if user actually dragged/panned
       const isDrag = hasDraggedRef.current;
       hasDraggedRef.current = false;
+
+      // Xử lý kết nối dây chỉ đỏ khi thả chuột (chỉ khi ĐÃ KÉO THẢ THẬT SỰ)
+      if (wasDraggingConn && fromConnPinId && isDrag) {
+        const bounds = getInnerBoardBounds(
+          rect.width,
+          rect.height,
+          boardFrameRef.current,
+        );
+        const transform = getViewTransform(zoomRef.current, panRef.current);
+        const worldPointer = screenToWorld({ x, y }, transform);
+        const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
+
+        let targetPin: PinPoint | null = null;
+        let minD = Infinity;
+        for (let index = 0; index < caseSysPins.length; index += 1) {
+          const pin = caseSysPins[index];
+          const pinPosition = getPinWorldPosition(pin, bounds);
+          if (isPinHit(worldPointer, pinPosition, pin, transform)) {
+            const d = distance(
+              worldPointer.x,
+              worldPointer.y,
+              pinPosition.x,
+              pinPosition.y,
+            );
+            if (d < minD) {
+              minD = d;
+              targetPin = pin;
+            }
+          }
+        }
+
+        if (
+          targetPin &&
+          targetPin.id !== fromConnPinId &&
+          onConnectPinsRef.current
+        ) {
+          onConnectPinsRef.current(fromConnPinId, targetPin.id);
+          detectiveAudio.playTypewriterClick();
+        }
+
+        requestRenderRef.current();
+        try {
+          event.preventDefault();
+          event.stopPropagation();
+        } catch {}
+        return;
+      }
 
       // Ghim bị kéo thật sự thì coi như thao tác di chuyển, không mở hộp thoại
       if (wasDraggingPin && isDrag) {
@@ -1227,24 +1350,15 @@ export function HeroInteractive({
 
         const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
         let bestHitPin: PinPoint | null = null;
-        let minDistance = Infinity;
 
-        // Check all system/custom pins and pick the closest hit target
-        for (let index = 0; index < caseSysPins.length; index += 1) {
+        // Check all system/custom pins in reverse order (topmost z-index visual element hits first)
+        for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
 
           if (isPinHit(worldPointer, pinPosition, pin, transform)) {
-            const dist = distance(
-              worldPointer.x,
-              worldPointer.y,
-              pinPosition.x,
-              pinPosition.y,
-            );
-            if (dist < minDistance) {
-              minDistance = dist;
-              bestHitPin = pin;
-            }
+            bestHitPin = pin;
+            break;
           }
         }
 
@@ -1670,7 +1784,15 @@ export function HeroInteractive({
             const tagX = -cardWidth / 2;
             const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
 
-            // Render complete pre-rendered photo card (includes photo, beige tape + name, yellow pin, drop shadow)
+            // Contact + ambient drop shadow cast onto the corkboard surface
+            context.save();
+            context.shadowColor = "rgba(12, 7, 3, 0.42)";
+            context.shadowBlur =
+              (loadedSuspectImg.width > 0 ? 9 : 9) / transform.scale;
+            context.shadowOffsetX = 2.5 / transform.scale;
+            context.shadowOffsetY = 5.5 / transform.scale;
+
+            // Render complete pre-rendered photo card (includes photo, beige tape + name, yellow pin)
             context.drawImage(
               loadedSuspectImg,
               tagX,
@@ -1678,6 +1800,7 @@ export function HeroInteractive({
               cardWidth,
               cardHeight,
             );
+            context.restore();
           } else {
             // Lightweight fallback while image is loading
             const isKhang =
@@ -1980,13 +2103,25 @@ export function HeroInteractive({
           const tagX = -noteWidth * pinAnchorX;
           const tagY = -noteHeight * pinAnchorY;
 
-          // Draw the realistic Ultra HD note PNG asset (preserving rich wrinkles, natural edges, and texture)
+          // Draw the realistic Ultra HD note PNG asset with tactile drop shadow onto corkboard
           if (loadedNoteImg) {
+            context.save();
+            context.shadowColor = "rgba(12, 7, 3, 0.38)";
+            context.shadowBlur = 8.5 / transform.scale;
+            context.shadowOffsetX = 2.2 / transform.scale;
+            context.shadowOffsetY = 4.8 / transform.scale;
             context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
+            context.restore();
           } else {
             // Fallback fill
+            context.save();
+            context.shadowColor = "rgba(12, 7, 3, 0.38)";
+            context.shadowBlur = 8.5 / transform.scale;
+            context.shadowOffsetX = 2.2 / transform.scale;
+            context.shadowOffsetY = 4.8 / transform.scale;
             context.fillStyle = isWhiteNote ? "#faf8f2" : "#fde047";
             context.fillRect(tagX, tagY, noteWidth, noteHeight);
+            context.restore();
           }
 
           // Pulsing border highlight if active
@@ -2270,7 +2405,7 @@ export function HeroInteractive({
         context.restore();
       });
 
-      // Active connector wire while dragging
+      // Active connector wire while dragging (Glowing Crimson Yarn Thread)
       if (connectionStartIdRef.current && pointer.active) {
         const start = pinPositionsMap.get(connectionStartIdRef.current);
         if (start) {
@@ -2279,9 +2414,11 @@ export function HeroInteractive({
             transform,
           );
           context.save();
-          context.strokeStyle = "rgba(255, 235, 80, 0.85)"; // gold dashed line for active connection
+          context.shadowColor = "rgba(220, 38, 38, 0.9)";
+          context.shadowBlur = 8 / transform.scale;
+          context.strokeStyle = "rgba(239, 68, 68, 0.95)";
           context.lineWidth = 2.0 / transform.scale;
-          context.setLineDash([4 / transform.scale, 4 / transform.scale]);
+          context.setLineDash([5 / transform.scale, 3 / transform.scale]);
           context.beginPath();
           context.moveTo(start.x, start.y);
           context.lineTo(pointerWorld.x, pointerWorld.y);

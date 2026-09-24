@@ -1,56 +1,61 @@
-'use client'
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Lightbulb, Smartphone, RefreshCw, X, Search } from 'lucide-react'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Lightbulb, Smartphone, RefreshCw, X, Search, Box } from "lucide-react";
+import { detectiveAudio } from "@/lib/investigation-audio";
 
 interface QuickActionFabProps {
-  onOpenPhone: () => void
-  onResetCase: () => void
-  onOpenHint?: () => void
-  onOpenReinvestigation?: () => void
-  onOpenSuspects?: () => void
-  onReinvestigate?: () => void
+  onOpenPhone: () => void;
+  onResetCase: () => void;
+  onOpenBoardGame?: () => void;
+  onOpenHint?: () => void;
+  onOpenReinvestigation?: () => void;
+  onOpenSuspects?: () => void;
+  onReinvestigate?: () => void;
 }
 
 export function QuickActionFab({
   onOpenPhone,
   onResetCase,
+  onOpenBoardGame,
   onOpenHint,
   onOpenReinvestigation,
   onOpenSuspects,
   onReinvestigate,
 }: QuickActionFabProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => {
-    detectiveAudio.playPaperRustle()
-    setIsOpen((prev) => !prev)
-  }
+    detectiveAudio.playPaperRustle();
+    setIsOpen((prev) => !prev);
+  };
 
   // Close menu on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [isOpen])
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
 
   const handleAction = (action: () => void) => {
-    detectiveAudio.playTypewriterClick()
-    setIsOpen(false)
-    action()
-  }
+    detectiveAudio.playTypewriterClick();
+    setIsOpen(false);
+    action();
+  };
 
   return (
-    <div ref={menuRef} className="fixed bottom-5 right-5 z-40 flex flex-col items-end">
+    <div
+      ref={menuRef}
+      className="fixed bottom-5 right-5 z-40 flex flex-col items-end"
+    >
       {/* POPUP OPTIONS MENU */}
       <AnimatePresence>
         {isOpen && (
@@ -67,9 +72,9 @@ export function QuickActionFab({
               onClick={() =>
                 handleAction(() => {
                   if (onOpenHint) {
-                    onOpenHint()
-                  } else if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('open-hint-modal'))
+                    onOpenHint();
+                  } else if (typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent("open-hint-modal"));
                   }
                 })
               }
@@ -78,6 +83,18 @@ export function QuickActionFab({
               <Lightbulb className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Gợi ý phá án</span>
             </button>
+
+            {/* OPTION: BOARD GAME MODE */}
+            {onOpenBoardGame && (
+              <button
+                type="button"
+                onClick={() => handleAction(onOpenBoardGame)}
+                className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1b2b20] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-emerald-300 hover:text-emerald-200 group"
+              >
+                <Box className="size-4 text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
+                <span>Chế độ Board Game</span>
+              </button>
+            )}
 
             {/* OPTION: OPEN PHONE */}
             <button
@@ -126,5 +143,5 @@ export function QuickActionFab({
         </motion.div>
       </button>
     </div>
-  )
+  );
 }
