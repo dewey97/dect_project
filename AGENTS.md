@@ -10,17 +10,15 @@
 Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
 
 - **⚙️ Technical Docs (Kỹ thuật hệ thống)**:
-  - Kiến trúc & Đặc tả: [`docs/core_specs/04_system_specifications.md`](docs/core_specs/04_system_specifications.md)
-  - Kỹ thuật & Setup: [`docs/core_specs/07_technical_guide.md`](docs/core_specs/07_technical_guide.md)
-  - Cơ sở dữ liệu: [`docs/core_specs/08_database_schema.md`](docs/core_specs/08_database_schema.md)
   - Google Sheets Live CMS: [`docs/core_specs/10_google_sheets_cms.md`](docs/core_specs/10_google_sheets_cms.md)
-  - Design System: [`docs/core_specs/06_ux_ui_design_system.md`](docs/core_specs/06_ux_ui_design_system.md)
-- **🧠 Domain Docs (Nghiệp vụ trinh thám)**:
-  - Game Design: [`docs/core_specs/03_game_design.md`](docs/core_specs/03_game_design.md)
-  - Quy tắc manh mối: [`docs/investigation_design/04_clues_and_narrative_rules.md`](docs/investigation_design/04_clues_and_narrative_rules.md)
+  - Kỹ thuật & Setup LaTeX: [`docs/core_specs/07_technical_guide.md`](docs/core_specs/07_technical_guide.md)
+  - Cơ sở dữ liệu: [`docs/core_specs/08_database_schema.md`](docs/core_specs/08_database_schema.md)
+  - Design System & UI/UX: [`docs/core_specs/06_ux_ui_design_system.md`](docs/core_specs/06_ux_ui_design_system.md)
+- **🧠 Domain & Case Docs (Nghiệp vụ & Hồ sơ vụ án)**:
   - Bối cảnh thế giới: [`docs/core_specs/02_world_building.md`](docs/core_specs/02_world_building.md)
-  - Văn phong tài liệu: [`docs/core_specs/05_content_and_writing_guidelines.md`](docs/core_specs/05_content_and_writing_guidelines.md)
-  - Playtest & Business: [`docs/core_specs/11_playtest_and_business.md`](docs/core_specs/11_playtest_and_business.md)
+  - Hành trình người chơi & Kịch bản Case #000: [`docs/cases/case_000/01_design/player_journey_and_cases.md`](docs/cases/case_000/01_design/player_journey_and_cases.md)
+  - Kịch bản & Timeline Case #000: [`docs/cases/case_000/02_story/`](docs/cases/case_000/02_story/)
+  - Danh mục manh mối & Vật chứng Case #000: [`docs/cases/case_000/03_clues/`](docs/cases/case_000/03_clues/)
 
 ---
 

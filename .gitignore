@@ -26,6 +26,7 @@ build_log.txt
 .next_dev/
 .claude/
 .playwright-cli/
+.playwright-mcp/
 test-results/
 
 # Temporary audio/video scratch files in root

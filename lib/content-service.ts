@@ -16,21 +16,6 @@ import {
   Checkpoint
 } from './types'
 
-// Import Case 001 files
-import { case001 } from '../content/cases/case-001/case'
-import { victim001 } from '../content/cases/case-001/victim'
-import { suspects001 } from '../content/cases/case-001/suspects'
-import { devices001 } from '../content/cases/case-001/devices'
-import { conversations001 } from '../content/cases/case-001/messages'
-import { emails001 } from '../content/cases/case-001/emails'
-import { photos001 } from '../content/cases/case-001/photos'
-import { browserHistory001 } from '../content/cases/case-001/browser-history'
-import { files001, documents001 } from '../content/cases/case-001/files'
-import { assistant001 } from '../content/cases/case-001/assistant'
-import { timelineEvents001, conclusionOptions001, evaluation001 } from '../content/cases/case-001/evaluation'
-import { rewards001 } from '../content/cases/case-001/rewards'
-import { checkpoints001 } from '../content/cases/case-001/checkpoints'
-
 // Import Case 000 files (TEST-99)
 import { case000 } from '../content/cases/case-000/case'
 import { victim000 } from '../content/cases/case-000/victim'
@@ -67,82 +52,66 @@ export {
 
 // Registry of cases
 const CASES_REGISTRY: Record<string, Case> = {
-  'case-001': case001,
   'case-000': case000
 }
 
 const VICTIMS_REGISTRY: Record<string, Victim> = {
-  'case-001': victim001,
   'case-000': victim000
 }
 
 const SUSPECTS_REGISTRY: Record<string, Suspect[]> = {
-  'case-001': suspects001,
   'case-000': suspects000
 }
 
 const DEVICES_REGISTRY: Record<string, EvidenceDevice[]> = {
-  'case-001': devices001,
   'case-000': devices000
 }
 
 const CONVERSATIONS_REGISTRY: Record<string, Record<string, Conversation[]>> = {
-  'case-001': conversations001,
   'case-000': conversations000
 }
 
 const EMAILS_REGISTRY: Record<string, Record<string, Email[]>> = {
-  'case-001': emails001,
   'case-000': emails000
 }
 
 const PHOTOS_REGISTRY: Record<string, Record<string, Photo[]>> = {
-  'case-001': photos001,
   'case-000': photos000
 }
 
 const BROWSER_HISTORY_REGISTRY: Record<string, Record<string, BrowserHistory[]>> = {
-  'case-001': browserHistory001,
   'case-000': browserHistory000
 }
 
 const FILES_REGISTRY: Record<string, Record<string, RecoveredFile[]>> = {
-  'case-001': files001,
   'case-000': files000
 }
 
 const DOCUMENTS_REGISTRY: Record<string, Record<string, Document[]>> = {
-  'case-001': documents001,
   'case-000': documents000
 }
 
 const ASSISTANT_REGISTRY: Record<string, AssistantConversation> = {
-  'case-001': assistant001,
   'case-000': assistant000
 }
 
 const TIMELINE_EVENTS_REGISTRY: Record<string, TimelineEvent[]> = {
-  'case-001': timelineEvents001,
   'case-000': timelineEvents000
 }
 
-const CONCLUSION_OPTIONS_REGISTRY: Record<string, typeof conclusionOptions001 | typeof conclusionOptions000> = {
-  'case-001': conclusionOptions001,
+const CONCLUSION_OPTIONS_REGISTRY: Record<string, typeof conclusionOptions000> = {
   'case-000': conclusionOptions000
 }
 
 const EVALUATION_REGISTRY: Record<string, Evaluation> = {
-  'case-001': evaluation001,
   'case-000': evaluation000
 }
 
 const REWARDS_REGISTRY: Record<string, Reward> = {
-  'case-001': rewards001,
   'case-000': rewards000
 }
 
 const CHECKPOINTS_REGISTRY: Record<string, Checkpoint[]> = {
-  'case-001': checkpoints001,
   'case-000': checkpoints000
 }
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lightbulb, Smartphone, RefreshCw, X, Search, Box } from "lucide-react";
+import { Lightbulb, Smartphone, RefreshCw, X, Search, Box, BookOpen } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 
 interface QuickActionFabProps {
@@ -10,6 +10,7 @@ interface QuickActionFabProps {
   onResetCase: () => void;
   onOpenBoardGame?: () => void;
   onOpenHint?: () => void;
+  onOpenGuide?: () => void;
   onOpenReinvestigation?: () => void;
   onOpenSuspects?: () => void;
   onReinvestigate?: () => void;
@@ -20,6 +21,7 @@ export function QuickActionFab({
   onResetCase,
   onOpenBoardGame,
   onOpenHint,
+  onOpenGuide,
   onOpenReinvestigation,
   onOpenSuspects,
   onReinvestigate,
@@ -54,6 +56,7 @@ export function QuickActionFab({
   return (
     <div
       ref={menuRef}
+      data-tour="fab-menu"
       className="fixed bottom-5 right-5 z-40 flex flex-col items-end"
     >
       {/* POPUP OPTIONS MENU */}
@@ -66,6 +69,24 @@ export function QuickActionFab({
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className="mb-2.5 w-56 bg-[#140d08]/95 border border-[#3d2b1d] shadow-[0_15px_40px_rgba(0,0,0,0.95),0_0_15px_rgba(217,160,102,0.06)] rounded-xl p-2 space-y-1.5 backdrop-blur-md text-[#fef5ec]"
           >
+            {/* OPTION: GAMEPLAY GUIDE */}
+            <button
+              type="button"
+              onClick={() =>
+                handleAction(() => {
+                  if (onOpenGuide) {
+                    onOpenGuide();
+                  } else if (typeof window !== "undefined") {
+                    window.dispatchEvent(new CustomEvent("open-gameplay-guide-modal"));
+                  }
+                })
+              }
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#f3e8dc] hover:text-amber-300 group"
+            >
+              <BookOpen className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Sổ tay hướng dẫn</span>
+            </button>
+
             {/* OPTION: HINT */}
             <button
               type="button"

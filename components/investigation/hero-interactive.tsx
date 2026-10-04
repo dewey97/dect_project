@@ -493,19 +493,26 @@ function wrapText(
   return lines;
 }
 
+const BOARD_BASE_WIDTH = 896;
+const BOARD_BASE_HEIGHT = 1200;
+const BOARD_ASPECT = BOARD_BASE_WIDTH / BOARD_BASE_HEIGHT;
+
 function isPinHit(
   worldPointer: Point,
   pinPosition: Point,
   pin: PinPoint | { id: string; label: string },
   transform: ViewTransform,
+  bounds?: BoardBounds,
 ): boolean {
+  const scaleFactor =
+    bounds && bounds.width > 0 ? bounds.width / BOARD_BASE_WIDTH : 1.0;
   const rawPin = pin as any;
   const userScale =
     typeof rawPin.scale === "number" && rawPin.scale > 0 ? rawPin.scale : 1.0;
   const userRot = typeof rawPin.rotation === "number" ? rawPin.rotation : 0;
 
-  // Hit radius for pinhead (16px radius in screen pixels)
-  const headHitRadius = 16 / transform.scale;
+  // Hit radius for pinhead (18px scaled by scaleFactor)
+  const headHitRadius = (18 * scaleFactor) / transform.scale;
   if (
     distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y) <=
     headHitRadius
@@ -539,12 +546,12 @@ function isPinHit(
       isKhang ||
       isCrimeScene);
 
-  let baseCardWidth = 104;
-  let baseCardHeight = 122;
+  let baseCardWidth = 142;
+  let baseCardHeight = 167;
   let tagYRatio = -0.08;
 
   if (isSuspectPin) {
-    baseCardWidth = isKhang ? 146 : isCrimeScene ? 134 : 108;
+    baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
     baseCardHeight = isCrimeScene
       ? (baseCardWidth * 420) / 560
       : (baseCardWidth * 380) / 300;
@@ -560,13 +567,13 @@ function isPinHit(
       upperLabel.includes("BIÊN BẢN") ||
       upperLabel.includes("TRUY TỐ");
 
-    baseCardWidth = isFollowup ? 120 : isWhiteNote ? 104 : 84;
-    baseCardHeight = isFollowup ? 110 : isWhiteNote ? 122 : 84;
+    baseCardWidth = isFollowup ? 144 : isWhiteNote ? 142 : 115;
+    baseCardHeight = isFollowup ? 132 : isWhiteNote ? 167 : 115;
   }
 
-  // Width & height in world space (matching scaled canvas render)
-  const cardW = (baseCardWidth * userScale) / transform.scale;
-  const cardH = (baseCardHeight * userScale) / transform.scale;
+  // Width & height in world space (matching canvas render)
+  const cardW = (baseCardWidth * scaleFactor * userScale) / transform.scale;
+  const cardH = (baseCardHeight * scaleFactor * userScale) / transform.scale;
   const tagX = -cardW * 0.5;
   const tagY = tagYRatio * cardH;
 
@@ -581,20 +588,44 @@ function isPinHit(
 }
 
 /**
- * Calculate the board bounds (the inner transparent region of the frame)
- * in screen-space coordinates. This must be used consistently by both
- * the render loop and the pointer event handlers.
+ * Calculate the board bounds in screen-space coordinates.
+ * Preserves the exact aspect ratio of the corkboard (896:1200)
+ * fitting completely within the container on both Desktop and Mobile.
  */
 function getInnerBoardBounds(
   containerWidth: number,
   containerHeight: number,
   _frameImg?: HTMLImageElement | null,
 ): BoardBounds {
+  if (containerWidth <= 0 || containerHeight <= 0) {
+    return { x: 0, y: 0, width: BOARD_BASE_WIDTH, height: BOARD_BASE_HEIGHT };
+  }
+
+  const containerAspect = containerWidth / containerHeight;
+  let width = containerWidth;
+  let height = containerHeight;
+  let x = 0;
+  let y = 0;
+
+  if (containerAspect > BOARD_ASPECT) {
+    // Container is wider than the standard board -> fit height, center horizontally
+    height = containerHeight;
+    width = height * BOARD_ASPECT;
+    x = (containerWidth - width) / 2;
+    y = 0;
+  } else {
+    // Container is taller/narrower (like mobile screen) -> fit width, center vertically
+    width = containerWidth;
+    height = width / BOARD_ASPECT;
+    x = 0;
+    y = (containerHeight - height) / 2;
+  }
+
   return {
-    x: 0,
-    y: 0,
-    width: containerWidth,
-    height: containerHeight,
+    x,
+    y,
+    width,
+    height,
   };
 }
 
@@ -915,7 +946,7 @@ export function HeroInteractive({
     for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
       const pin = caseSysPins[index];
       const pinPosition = getPinWorldPosition(pin, bounds);
-      if (isPinHit(worldPointer, pinPosition, pin, transform)) {
+      if (isPinHit(worldPointer, pinPosition, pin, transform, bounds)) {
         hitId = pin.id;
         break;
       }
@@ -1061,6 +1092,7 @@ export function HeroInteractive({
 
       const transform = getViewTransform(zoomRef.current, panRef.current);
       const worldPointer = screenToWorld({ x, y }, transform);
+      const scaleFactor = bounds.width / BOARD_BASE_WIDTH;
 
       // Check if clicking on a system pin in edit mode
       if (isEditModeRef.current) {
@@ -1068,7 +1100,7 @@ export function HeroInteractive({
 
         // Ưu tiên 1: nắm đinh ghim (đầu ghim) để kéo dây chỉ đỏ nối 2 node
         // Duyệt ngược để bắt đúng node nằm trên cùng (khớp với hover & render)
-        const headRadius = 16 / transform.scale;
+        const headRadius = (18 * scaleFactor) / transform.scale;
         for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
@@ -1102,7 +1134,7 @@ export function HeroInteractive({
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
 
-          if (isPinHit(worldPointer, pinPosition, pin, transform)) {
+          if (isPinHit(worldPointer, pinPosition, pin, transform, bounds)) {
             draggingPinIdRef.current = pin.id;
             dragOffsetRef.current = {
               x: worldPointer.x - pinPosition.x,
@@ -1299,7 +1331,7 @@ export function HeroInteractive({
         for (let index = 0; index < caseSysPins.length; index += 1) {
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
-          if (isPinHit(worldPointer, pinPosition, pin, transform)) {
+          if (isPinHit(worldPointer, pinPosition, pin, transform, bounds)) {
             const d = distance(
               worldPointer.x,
               worldPointer.y,
@@ -1357,7 +1389,7 @@ export function HeroInteractive({
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
 
-          if (isPinHit(worldPointer, pinPosition, pin, transform)) {
+          if (isPinHit(worldPointer, pinPosition, pin, transform, bounds)) {
             bestHitPin = pin;
             break;
           }
@@ -1595,15 +1627,27 @@ export function HeroInteractive({
       // 1. Draw transformed board scene (Full-bleed Map content)
       // ──────────────────────────────────
 
+      // 1.1 Fill desk background behind corkboard
+      context.fillStyle = "#0c0805";
+      context.fillRect(0, 0, width, height);
+
       context.save();
 
       // Apply zoom & pan transform ONLY for the inner map contents
       context.translate(transform.translateX, transform.translateY);
       context.scale(transform.scale, transform.scale);
 
-      // 2.1 Fill solid dark corkboard texture background as instant fallback
+      const scaleFactor = bounds.width / BOARD_BASE_WIDTH;
+
+      // 1.2 Draw tactile drop shadow under the corkboard
+      context.save();
+      context.shadowColor = "rgba(0, 0, 0, 0.75)";
+      context.shadowBlur = 24 * scaleFactor;
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 10 * scaleFactor;
       context.fillStyle = "#1e140c";
       context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+      context.restore();
 
       // Draw case evidence map with refined focus on corkboard surface
       if (image) {
@@ -1778,8 +1822,8 @@ export function HeroInteractive({
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 146 : isCrimeScene ? 134 : 108;
-            const cardWidth = (baseCardWidth * scaleMod) / transform.scale;
+            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
+            const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = (cardWidth * imgH) / imgW;
 
             const tagX = -cardWidth / 2;
@@ -1788,9 +1832,9 @@ export function HeroInteractive({
             // Pass 1 — wide ambient occlusion: soft halo lifting the card off the corkboard
             context.save();
             context.shadowColor = "rgba(10, 5, 2, 0.34)";
-            context.shadowBlur = 22 / transform.scale;
-            context.shadowOffsetX = 1.5 / transform.scale;
-            context.shadowOffsetY = 9 / transform.scale;
+            context.shadowBlur = (22 * scaleFactor) / transform.scale;
+            context.shadowOffsetX = (1.5 * scaleFactor) / transform.scale;
+            context.shadowOffsetY = (9 * scaleFactor) / transform.scale;
             context.drawImage(
               loadedSuspectImg,
               tagX,
@@ -1803,9 +1847,9 @@ export function HeroInteractive({
             // Pass 2 — tight contact shadow: crisp dark edge right under the paper
             context.save();
             context.shadowColor = "rgba(10, 5, 2, 0.58)";
-            context.shadowBlur = 7 / transform.scale;
-            context.shadowOffsetX = 2.6 / transform.scale;
-            context.shadowOffsetY = 5.2 / transform.scale;
+            context.shadowBlur = (7 * scaleFactor) / transform.scale;
+            context.shadowOffsetX = (2.6 * scaleFactor) / transform.scale;
+            context.shadowOffsetY = (5.2 * scaleFactor) / transform.scale;
 
             // Render complete pre-rendered photo card (includes photo, beige tape + name, yellow pin)
             context.drawImage(
@@ -1825,10 +1869,12 @@ export function HeroInteractive({
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 126 : isCrimeScene ? 114 : 92;
-            const baseCardHeight = isKhang ? 162 : isCrimeScene ? 144 : 118;
-            const cardWidth = (baseCardWidth * scaleMod) / transform.scale;
-            const cardHeight = (baseCardHeight * scaleMod) / transform.scale;
+            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
+            const baseCardHeight = isCrimeScene
+              ? (baseCardWidth * 420) / 560
+              : (baseCardWidth * 380) / 300;
+            const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
+            const cardHeight = (baseCardHeight * scaleFactor * scaleMod) / transform.scale;
             context.fillStyle = "#f5f2eb";
             context.fillRect(-cardWidth / 2, 0, cardWidth, cardHeight);
           }
@@ -1844,8 +1890,8 @@ export function HeroInteractive({
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 146 : isCrimeScene ? 134 : 108;
-            const cardWidth = (baseCardWidth * scaleMod) / transform.scale;
+            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
+            const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = loadedSuspectImg
               ? (cardWidth * (loadedSuspectImg.naturalHeight || 380)) /
                 (loadedSuspectImg.naturalWidth || 300)
@@ -1856,19 +1902,19 @@ export function HeroInteractive({
             context.save();
             if (isPhotoSelected) {
               context.shadowColor = "rgba(245, 158, 11, 0.95)";
-              context.shadowBlur = 18 / transform.scale;
+              context.shadowBlur = (18 * scaleFactor) / transform.scale;
               context.strokeStyle = "#f59e0b";
-              context.lineWidth = 2.8 / transform.scale;
+              context.lineWidth = (2.8 * scaleFactor) / transform.scale;
             } else {
               context.shadowColor = "rgba(251, 191, 36, 0.8)";
-              context.shadowBlur = 12 / transform.scale;
+              context.shadowBlur = (12 * scaleFactor) / transform.scale;
               context.strokeStyle = "#fbbf24";
-              context.lineWidth = 2 / transform.scale;
+              context.lineWidth = (2 * scaleFactor) / transform.scale;
             }
             context.strokeRect(tagX, tagY, cardWidth, cardHeight);
 
             if (isEditModeRef.current) {
-              const handleSize = 6 / transform.scale;
+              const handleSize = (6 * scaleFactor) / transform.scale;
               context.fillStyle = isPhotoSelected ? "#f59e0b" : "#fbbf24";
               context.fillRect(
                 tagX - handleSize / 2,
@@ -1958,8 +2004,6 @@ export function HeroInteractive({
               isPreRendered = false;
             }
           } else if (customTextureUrl) {
-            // Admin-made pin reuses the exact same temple/paper assets as the
-            // built-in board notes so it looks identical to a fixed pin.
             noteUrl = customTextureUrl;
             isPreRendered = customTextureUrl.includes("rendered_notes/");
           } else if (
@@ -2052,12 +2096,14 @@ export function HeroInteractive({
 
           const isIndictment =
             pin.id === "c0-pin-indictment" || upperLabel.includes("KẾT LUẬN");
-          const sizeMultiplier = 1.0; // Same size across all white notes
+          const isFollowup =
+            pin.id.startsWith("c0-pin-followup") || pin.id.startsWith("followup-");
+          const sizeMultiplier = 1.0;
 
           // Note size: preserve aspect ratio cleanly without distortion
-          const baseCardWidth = isWhiteNote ? 104 : 84;
+          const baseCardWidth = isFollowup ? 144 : isWhiteNote ? 142 : 115;
           const noteWidth =
-            (baseCardWidth * scaleMod * sizeMultiplier) / transform.scale;
+            (baseCardWidth * scaleFactor * scaleMod * sizeMultiplier) / transform.scale;
 
           let noteHeight = noteWidth;
           if (
@@ -2069,7 +2115,7 @@ export function HeroInteractive({
               (noteWidth * loadedNoteImg.naturalHeight) /
               loadedNoteImg.naturalWidth;
           } else {
-            noteHeight = noteWidth * (isWhiteNote ? 1.18 : 1.0);
+            noteHeight = noteWidth * (isFollowup ? 0.92 : isWhiteNote ? 1.18 : 1.0);
           }
 
           let pinAnchorX = 0.5;
@@ -2123,27 +2169,27 @@ export function HeroInteractive({
             // Pass 1 — ambient occlusion lift
             context.save();
             context.shadowColor = "rgba(10, 5, 2, 0.30)";
-            context.shadowBlur = 18 / transform.scale;
-            context.shadowOffsetX = 1.2 / transform.scale;
-            context.shadowOffsetY = 8 / transform.scale;
+            context.shadowBlur = (18 * scaleFactor) / transform.scale;
+            context.shadowOffsetX = (1.2 * scaleFactor) / transform.scale;
+            context.shadowOffsetY = (8 * scaleFactor) / transform.scale;
             context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
             context.restore();
 
             // Pass 2 — crisp contact edge
             context.save();
             context.shadowColor = "rgba(10, 5, 2, 0.52)";
-            context.shadowBlur = 6.5 / transform.scale;
-            context.shadowOffsetX = 2.4 / transform.scale;
-            context.shadowOffsetY = 4.6 / transform.scale;
+            context.shadowBlur = (6.5 * scaleFactor) / transform.scale;
+            context.shadowOffsetX = (2.4 * scaleFactor) / transform.scale;
+            context.shadowOffsetY = (4.6 * scaleFactor) / transform.scale;
             context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
             context.restore();
           } else {
             // Fallback fill
             context.save();
             context.shadowColor = "rgba(10, 5, 2, 0.48)";
-            context.shadowBlur = 12 / transform.scale;
-            context.shadowOffsetX = 2.2 / transform.scale;
-            context.shadowOffsetY = 6 / transform.scale;
+            context.shadowBlur = (12 * scaleFactor) / transform.scale;
+            context.shadowOffsetX = (2.2 * scaleFactor) / transform.scale;
+            context.shadowOffsetY = (6 * scaleFactor) / transform.scale;
             context.fillStyle = isWhiteNote ? "#faf8f2" : "#fde047";
             context.fillRect(tagX, tagY, noteWidth, noteHeight);
             context.restore();
@@ -2154,9 +2200,9 @@ export function HeroInteractive({
             const pulseGlow = (Math.sin(timestamp / 220) + 1) / 2;
             context.save();
             context.shadowColor = `rgba(245, 158, 11, ${0.45 + pulseGlow * 0.55})`;
-            context.shadowBlur = (8 + pulseGlow * 12) / transform.scale;
+            context.shadowBlur = ((8 + pulseGlow * 12) * scaleFactor) / transform.scale;
             context.strokeStyle = `rgba(253, 224, 71, ${0.75 + pulseGlow * 0.25})`;
-            context.lineWidth = (2.2 + pulseGlow * 1.5) / transform.scale;
+            context.lineWidth = ((2.2 + pulseGlow * 1.5) * scaleFactor) / transform.scale;
             context.strokeRect(tagX, tagY, noteWidth, noteHeight);
             context.restore();
           }
@@ -2167,7 +2213,7 @@ export function HeroInteractive({
 
           if (isNoteHovered || isNoteSelected) {
             context.save();
-            const pad = 3 / transform.scale;
+            const pad = (3 * scaleFactor) / transform.scale;
             const bx = tagX - pad;
             const by = tagY - pad;
             const bw = noteWidth + pad * 2;
@@ -2175,22 +2221,22 @@ export function HeroInteractive({
 
             if (isNoteSelected) {
               context.shadowColor = "rgba(245, 158, 11, 0.95)";
-              context.shadowBlur = 18 / transform.scale;
+              context.shadowBlur = (18 * scaleFactor) / transform.scale;
               context.strokeStyle = "#f59e0b";
-              context.lineWidth = 2.8 / transform.scale;
+              context.lineWidth = (2.8 * scaleFactor) / transform.scale;
             } else {
               context.shadowColor = "rgba(251, 191, 36, 0.85)";
-              context.shadowBlur = 12 / transform.scale;
+              context.shadowBlur = (12 * scaleFactor) / transform.scale;
               context.strokeStyle = "#fbbf24";
-              context.lineWidth = 2 / transform.scale;
+              context.lineWidth = (2 * scaleFactor) / transform.scale;
             }
 
-            context.setLineDash([6 / transform.scale, 4 / transform.scale]);
+            context.setLineDash([(6 * scaleFactor) / transform.scale, (4 * scaleFactor) / transform.scale]);
             context.strokeRect(bx, by, bw, bh);
             context.setLineDash([]);
 
             if (isEditModeRef.current) {
-              const handleSize = 6 / transform.scale;
+              const handleSize = (6 * scaleFactor) / transform.scale;
               context.fillStyle = isNoteSelected ? "#f59e0b" : "#fbbf24";
               context.fillRect(
                 bx - handleSize / 2,
@@ -2227,22 +2273,22 @@ export function HeroInteractive({
             const maxTextWidth = noteWidth * (isWhiteNote ? 0.65 : 0.72);
             const availableHeight = noteHeight * (isWhiteNote ? 0.55 : 0.6);
 
-            let fontSize = isIndictment ? 12.0 : isWhiteNote ? 11.0 : 10.5;
+            let fontSize = (isIndictment ? 15.5 : isWhiteNote ? 14.5 : 14.0) * scaleFactor;
             context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
             let lines = wrapText(context, pin.label, maxTextWidth, 3);
 
             while (
-              fontSize > 7.0 &&
+              fontSize > 9.0 * scaleFactor &&
               (lines.some((l) => context.measureText(l).width > maxTextWidth) ||
-                lines.length * ((fontSize + 1.5) / transform.scale) >
+                lines.length * ((fontSize + 1.5 * scaleFactor) / transform.scale) >
                   availableHeight)
             ) {
-              fontSize -= 0.5;
+              fontSize -= 0.5 * scaleFactor;
               context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
               lines = wrapText(context, pin.label, maxTextWidth, 3);
             }
 
-            const lineHeight = (fontSize + 1.5) / transform.scale;
+            const lineHeight = (fontSize + 1.5 * scaleFactor) / transform.scale;
             const textBlockHeight = lines.length * lineHeight;
 
             context.save();
@@ -2265,14 +2311,14 @@ export function HeroInteractive({
             context.fillRect(tagX, tagY, noteWidth, noteHeight);
 
             // Plain white text, larger, centered
-            context.font = `900 ${11.5 / transform.scale}px 'Courier New', monospace, sans-serif`;
+            context.font = `900 ${(15.0 * scaleFactor) / transform.scale}px 'Courier New', monospace, sans-serif`;
             context.fillStyle = "#ffffff";
             context.textAlign = "center";
             context.textBaseline = "middle";
             context.shadowColor = "rgba(0, 0, 0, 0.95)";
-            context.shadowBlur = 4 / transform.scale;
+            context.shadowBlur = (4 * scaleFactor) / transform.scale;
             context.shadowOffsetX = 0;
-            context.shadowOffsetY = 1 / transform.scale;
+            context.shadowOffsetY = (1 * scaleFactor) / transform.scale;
             context.fillText(
               "CHỜ PHÊ DUYỆT",
               tagX + noteWidth / 2,
@@ -2298,9 +2344,9 @@ export function HeroInteractive({
 
             // Subtle handwriting ink shadow
             context.shadowColor = "rgba(0, 0, 0, 0.22)";
-            context.shadowBlur = 1.5 / transform.scale;
-            context.shadowOffsetX = 0.6 / transform.scale;
-            context.shadowOffsetY = 0.6 / transform.scale;
+            context.shadowBlur = (1.5 * scaleFactor) / transform.scale;
+            context.shadowOffsetX = (0.6 * scaleFactor) / transform.scale;
+            context.shadowOffsetY = (0.6 * scaleFactor) / transform.scale;
 
             context.fillText("✓", centerX, centerY);
             context.restore();
@@ -2316,7 +2362,7 @@ export function HeroInteractive({
         context.arc(
           pinPosition.x,
           pinPosition.y,
-          1.6 / transform.scale,
+          (1.6 * scaleFactor) / transform.scale,
           0,
           Math.PI * 2,
         );
@@ -2345,12 +2391,12 @@ export function HeroInteractive({
 
         if (isMostlyVertical) {
           const bow =
-            (dx >= 0 ? -1 : 1) * Math.min(10 / transform.scale, dist * 0.04);
+            (dx >= 0 ? -1 : 1) * Math.min((10 * scaleFactor) / transform.scale, dist * 0.04);
           middleX += bow;
         } else {
           const sag = Math.max(
-            8 / transform.scale,
-            Math.min(30 / transform.scale, dist * 0.08),
+            (8 * scaleFactor) / transform.scale,
+            Math.min((30 * scaleFactor) / transform.scale, dist * 0.08),
           );
           middleY += sag;
         }
@@ -2358,19 +2404,19 @@ export function HeroInteractive({
         // Subtle thin string shadow onto cards/board
         context.save();
         context.strokeStyle = "rgba(0, 0, 0, 0.20)";
-        context.lineWidth = 1.0 / transform.scale;
+        context.lineWidth = (1.0 * scaleFactor) / transform.scale;
         context.shadowColor = "rgba(0, 0, 0, 0.25)";
-        context.shadowBlur = 2.5 / transform.scale;
+        context.shadowBlur = (2.5 * scaleFactor) / transform.scale;
         context.beginPath();
         context.moveTo(
-          start.x + 0.8 / transform.scale,
-          start.y + 1.2 / transform.scale,
+          start.x + (0.8 * scaleFactor) / transform.scale,
+          start.y + (1.2 * scaleFactor) / transform.scale,
         );
         context.quadraticCurveTo(
-          middleX + 0.8 / transform.scale,
-          middleY + 1.2 / transform.scale,
-          end.x + 0.8 / transform.scale,
-          end.y + 1.2 / transform.scale,
+          middleX + (0.8 * scaleFactor) / transform.scale,
+          middleY + (1.2 * scaleFactor) / transform.scale,
+          end.x + (0.8 * scaleFactor) / transform.scale,
+          end.y + (1.2 * scaleFactor) / transform.scale,
         );
         context.stroke();
         context.restore();
@@ -2378,7 +2424,7 @@ export function HeroInteractive({
         // Fine Crimson Yarn thread (thin & elegant)
         context.save();
         context.strokeStyle = "rgba(200, 35, 35, 0.85)";
-        context.lineWidth = 1.15 / transform.scale;
+        context.lineWidth = (1.15 * scaleFactor) / transform.scale;
         context.beginPath();
         context.moveTo(start.x, start.y);
         context.quadraticCurveTo(middleX, middleY, end.x, end.y);
@@ -2396,7 +2442,7 @@ export function HeroInteractive({
         const dx = end.x - start.x;
         const dy = end.y - start.y;
         const dist = Math.hypot(dx, dy);
-        const sag = Math.max(18, Math.min(50, dist * 0.09));
+        const sag = Math.max(18 * scaleFactor, Math.min(50 * scaleFactor, dist * 0.09));
 
         const middleX = (start.x + end.x) / 2;
         const middleY = (start.y + end.y) / 2 + sag;
@@ -2404,17 +2450,17 @@ export function HeroInteractive({
         // Custom string shadow
         context.save();
         context.strokeStyle = "rgba(0, 0, 0, 0.22)";
-        context.lineWidth = 1.0 / transform.scale;
+        context.lineWidth = (1.0 * scaleFactor) / transform.scale;
         context.beginPath();
         context.moveTo(
-          start.x + 0.8 / transform.scale,
-          start.y + 1.2 / transform.scale,
+          start.x + (0.8 * scaleFactor) / transform.scale,
+          start.y + (1.2 * scaleFactor) / transform.scale,
         );
         context.quadraticCurveTo(
-          middleX + 0.8 / transform.scale,
-          middleY + 1.2 / transform.scale,
-          end.x + 0.8 / transform.scale,
-          end.y + 1.2 / transform.scale,
+          middleX + (0.8 * scaleFactor) / transform.scale,
+          middleY + (1.2 * scaleFactor) / transform.scale,
+          end.x + (0.8 * scaleFactor) / transform.scale,
+          end.y + (1.2 * scaleFactor) / transform.scale,
         );
         context.stroke();
         context.restore();
@@ -2422,7 +2468,7 @@ export function HeroInteractive({
         // Custom user connection fine crimson thread
         context.save();
         context.strokeStyle = "rgba(225, 45, 45, 0.85)";
-        context.lineWidth = 1.1 / transform.scale;
+        context.lineWidth = (1.1 * scaleFactor) / transform.scale;
         context.beginPath();
         context.moveTo(start.x, start.y);
         context.quadraticCurveTo(middleX, middleY, end.x, end.y);
@@ -2440,10 +2486,10 @@ export function HeroInteractive({
           );
           context.save();
           context.shadowColor = "rgba(220, 38, 38, 0.9)";
-          context.shadowBlur = 8 / transform.scale;
+          context.shadowBlur = (8 * scaleFactor) / transform.scale;
           context.strokeStyle = "rgba(239, 68, 68, 0.95)";
-          context.lineWidth = 2.0 / transform.scale;
-          context.setLineDash([5 / transform.scale, 3 / transform.scale]);
+          context.lineWidth = (2.0 * scaleFactor) / transform.scale;
+          context.setLineDash([(5 * scaleFactor) / transform.scale, (3 * scaleFactor) / transform.scale]);
           context.beginPath();
           context.moveTo(start.x, start.y);
           context.lineTo(pointerWorld.x, pointerWorld.y);
@@ -2491,8 +2537,8 @@ export function HeroInteractive({
           getLoadedImage(`/images/pins/pin-${colorKey}.png`);
 
         if (pinImg && pinImg.complete && pinImg.naturalWidth > 0) {
-          // Uniform size for all pins (26px scaled = 2px smaller than original 28px yellow pin)
-          const pinDisplayWidth = 26 / transform.scale;
+          // Uniform size for all pins
+          const pinDisplayWidth = (32 * scaleFactor) / transform.scale;
           const pinDisplayHeight =
             pinDisplayWidth * (pinImg.naturalHeight / pinImg.naturalWidth);
 
@@ -2505,7 +2551,7 @@ export function HeroInteractive({
           if (isRedPin && (pin.pulseBorder ?? true)) {
             // Subtle glowing aura for main investigation target
             context.shadowColor = "rgba(239, 68, 68, 0.75)";
-            context.shadowBlur = 10 / transform.scale;
+            context.shadowBlur = (10 * scaleFactor) / transform.scale;
           }
           context.drawImage(
             pinImg,
@@ -2517,7 +2563,7 @@ export function HeroInteractive({
           context.restore();
         } else {
           // Fallback procedural canvas render while asset loads
-          const baseRadius = 5.5 / transform.scale;
+          const baseRadius = (6.8 * scaleFactor) / transform.scale;
           let headTheme = {
             headBase: "#dc2626",
             headMid: "#b91c1c",
@@ -2559,8 +2605,8 @@ export function HeroInteractive({
           context.fillStyle = "rgba(0, 0, 0, 0.45)";
           context.beginPath();
           context.ellipse(
-            pinPosition.x + (isRedPin ? 2.2 : 1.8) / transform.scale,
-            pinPosition.y + (isRedPin ? 3.0 : 2.5) / transform.scale,
+            pinPosition.x + ((isRedPin ? 2.2 : 1.8) * scaleFactor) / transform.scale,
+            pinPosition.y + ((isRedPin ? 3.0 : 2.5) * scaleFactor) / transform.scale,
             baseRadius * 0.9,
             baseRadius * 0.55,
             0,

@@ -1,0 +1,209 @@
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  BookOpen,
+  LayoutDashboard,
+  Users,
+  Smartphone,
+  Scale,
+  Lightbulb,
+  Compass
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { detectiveAudio } from '@/lib/investigation-audio'
+import {
+  GAMEPLAY_GUIDE_CONFIG,
+  GuideSection
+} from '@/lib/guides/gameplay-guide-data'
+
+interface GameplayGuideModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onStartWalkthrough?: () => void
+  initialSectionId?: string
+}
+
+const SECTION_ICONS = {
+  canvas: LayoutDashboard,
+  suspects: Users,
+  phone: Smartphone,
+  indictment: Scale
+}
+
+export function GameplayGuideModal({
+  isOpen,
+  onClose,
+  onStartWalkthrough,
+  initialSectionId = 'canvas'
+}: GameplayGuideModalProps) {
+  const [activeTabId, setActiveTabId] = useState<string>(initialSectionId)
+
+  // Sync initial tab when opening
+  useEffect(() => {
+    if (isOpen && initialSectionId) {
+      setActiveTabId(initialSectionId)
+    }
+  }, [isOpen, initialSectionId])
+
+  // ESC key to close
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        detectiveAudio.playPaperRustle()
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null
+
+  const activeSection =
+    GAMEPLAY_GUIDE_CONFIG.sections.find((s) => s.id === activeTabId) ||
+    GAMEPLAY_GUIDE_CONFIG.sections[0]
+
+  const handleTabChange = (sectionId: string) => {
+    detectiveAudio.playPaperRustle()
+    setActiveTabId(sectionId)
+  }
+
+  const handleLaunchWalkthrough = () => {
+    detectiveAudio.playTypewriterClick()
+    onClose()
+    if (onStartWalkthrough) {
+      onStartWalkthrough()
+    } else if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('open-interactive-walkthrough'))
+    }
+  }
+
+  return (
+    <AnimatePresence>
+      <div
+        className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 font-sans select-none overflow-y-auto"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            detectiveAudio.playPaperRustle()
+            onClose()
+          }
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 12 }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full max-w-3xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95),0_0_30px_rgba(217,160,102,0.15)] rounded-none overflow-hidden flex flex-col max-h-[88vh]"
+        >
+          {/* TOP HEADER BAR */}
+          <div className="bg-[#ede3d1] px-4 py-3 sm:px-5 sm:py-3.5 border-b-2 border-[#2b1f14] flex items-center shrink-0">
+            <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-widest text-[#8c1d1d] flex items-center gap-2">
+              <BookOpen className="size-4 text-[#8c1d1d]" />
+              {GAMEPLAY_GUIDE_CONFIG.manualTitle}
+            </span>
+          </div>
+
+          {/* TAB NAVIGATION BAR */}
+          <div className="bg-[#e4d7c0] px-3 sm:px-5 py-2 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar shrink-0">
+            {GAMEPLAY_GUIDE_CONFIG.sections.map((section) => {
+              const Icon = SECTION_ICONS[section.iconName] || LayoutDashboard
+              const isActive = section.id === activeTabId
+
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  onClick={() => handleTabChange(section.id)}
+                  className={cn(
+                    'px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all whitespace-nowrap cursor-pointer rounded-none border',
+                    isActive
+                      ? 'bg-[#2b1f14] text-[#f6f1e5] border-[#2b1f14] shadow-xs'
+                      : 'bg-transparent text-[#5c4026] hover:text-[#1a120b] hover:bg-[#d8c8ad] border-transparent'
+                  )}
+                >
+                  <Icon className={cn('size-3.5', isActive ? 'text-amber-400' : 'text-[#7a5736]')} />
+                  <span>{section.tabLabel}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* MAIN BODY CONTENT AREA */}
+          <div className="p-4 sm:p-5 flex-1 overflow-y-auto space-y-3.5 bg-[#f6f1e5]">
+            {/* SECTION TITLE */}
+            <div>
+              <h2 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wide">
+                {activeSection.title}
+              </h2>
+            </div>
+
+            {/* STEPS LIST */}
+            <div className="space-y-2.5">
+              {activeSection.steps.map((step, idx) => (
+                <div
+                  key={idx}
+                  className="p-3 sm:p-3.5 border border-[#b89569]/80 bg-[#fbf8f1] shadow-2xs space-y-1 relative"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="size-5 bg-[#2b1f14] text-[#f6f1e5] flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                      {idx + 1}
+                    </div>
+                    <h4 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wider">
+                      {step.title}
+                    </h4>
+                  </div>
+
+                  <p className="text-xs sm:text-[13px] text-[#2b1f14] leading-relaxed font-sans pl-7">
+                    {step.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* PRO TIP CALLOUT */}
+            {activeSection.proTip && (
+              <div className="p-3 bg-[#fef3c7] border border-[#d97706]/40 text-[#78350f] text-xs leading-relaxed flex items-start gap-2.5 shadow-2xs">
+                <Lightbulb className="size-4 text-[#b45309] shrink-0 mt-0.5" />
+                <div>
+                  <strong className="font-mono uppercase font-bold text-[11px] block tracking-wide text-[#92400e] mb-0.5">
+                    Mẹo Trinh Thám:
+                  </strong>
+                  <span>{activeSection.proTip}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* FOOTER BAR */}
+          <div className="bg-[#ede3d1] px-4 py-3 sm:px-5 sm:py-3 border-t-2 border-[#2b1f14] flex items-center justify-between shrink-0 gap-3">
+            {/* START TOUR BUTTON IN FOOTER */}
+            <button
+              type="button"
+              onClick={handleLaunchWalkthrough}
+              className="px-3.5 py-1.5 bg-[#8c1d1d] hover:bg-[#a32222] text-[#fbf8f1] font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer border border-[#501010] shadow-sm flex items-center gap-1.5"
+            >
+              <Compass className="size-3.5 text-amber-300" />
+              <span>Tour từng bước</span>
+            </button>
+
+            {/* RETURN / CLOSE BUTTON */}
+            <button
+              type="button"
+              onClick={() => {
+                detectiveAudio.playTypewriterClick()
+                onClose()
+              }}
+              className="px-4 py-1.5 bg-[#2b1f14] text-[#f6f1e5] hover:bg-[#433020] font-mono text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer border border-[#140d08] shadow-sm"
+            >
+              Trở về
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  )
+}

@@ -38,6 +38,8 @@ import { PhoneLookupModal } from "./phone-lookup-modal";
 import { PhoneNarrativeModal } from "./phone-narrative-modal";
 import { DossierEModal } from "./dossier-e-modal";
 import { EvidenceGuideModal } from "./evidence-guide-modal";
+import { GameplayGuideModal } from "./gameplay-guide-modal";
+import { InteractiveWalkthrough } from "./interactive-walkthrough";
 import { IndictmentModal } from "./indictment-modal";
 import { CulpritEpilogueModal } from "./culprit-epilogue-modal";
 import { DossierResultModal } from "./dossier-result-modal";
@@ -101,6 +103,8 @@ export function MainInvestigationCanvas({
   >(null);
   const [isFollowupQuestionOpen, setIsFollowupQuestionOpen] = useState(false);
   const [isEvidenceGuideOpen, setIsEvidenceGuideOpen] = useState(false);
+  const [isGameplayGuideOpen, setIsGameplayGuideOpen] = useState(false);
+  const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
   const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false);
   const [isDossierEOpen, setIsDossierEOpen] = useState(false);
   const [zoomedPhotoUrl, setZoomedPhotoUrl] = useState<string | null>(null);
@@ -108,6 +112,24 @@ export function MainInvestigationCanvas({
     null,
   );
   const zoomOpenTimeRef = React.useRef<number>(0);
+
+  // Listen for open-gameplay-guide-modal and open-interactive-walkthrough custom events
+  useEffect(() => {
+    const handleOpenGuide = () => {
+      detectiveAudio.playPaperRustle();
+      setIsGameplayGuideOpen(true);
+    };
+    const handleOpenWalkthrough = () => {
+      detectiveAudio.playPaperRustle();
+      setIsWalkthroughOpen(true);
+    };
+    window.addEventListener("open-gameplay-guide-modal", handleOpenGuide);
+    window.addEventListener("open-interactive-walkthrough", handleOpenWalkthrough);
+    return () => {
+      window.removeEventListener("open-gameplay-guide-modal", handleOpenGuide);
+      window.removeEventListener("open-interactive-walkthrough", handleOpenWalkthrough);
+    };
+  }, []);
 
   const handleOpenPhotoZoom = useCallback(
     (url: string, coords?: { clientX: number; clientY: number }) => {
@@ -136,6 +158,24 @@ export function MainInvestigationCanvas({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [zoomedPhotoUrl]);
+
+  // Global shortcut '?' or 'H' to toggle gameplay guide
+  useEffect(() => {
+    const handleGuideShortcut = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) {
+        return;
+      }
+      if (e.key === "?" || (e.key.toLowerCase() === "h" && !e.ctrlKey && !e.metaKey && !e.altKey)) {
+        e.preventDefault();
+        detectiveAudio.playPaperRustle();
+        setIsGameplayGuideOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleGuideShortcut);
+    return () => window.removeEventListener("keydown", handleGuideShortcut);
+  }, []);
 
   const [investigatedSuspects, setInvestigatedSuspects] = useState<
     ("vu" | "tung" | "ha")[]
@@ -1999,6 +2039,24 @@ export function MainInvestigationCanvas({
         onSolve={(pinId) => {
           toast.success("Đã hoàn thành câu hỏi ghim!");
         }}
+      />
+
+      {/* Sổ tay Nghiệp vụ & Thao tác điều tra (Universal Field Manual) */}
+      <GameplayGuideModal
+        isOpen={isGameplayGuideOpen}
+        onClose={() => setIsGameplayGuideOpen(false)}
+        onStartWalkthrough={() => {
+          setIsGameplayGuideOpen(false);
+          setIsWalkthroughOpen(true);
+        }}
+      />
+
+      {/* Chế độ Hướng dẫn từng bước (Interactive Walkthrough Spotlight Tour) */}
+      <InteractiveWalkthrough
+        isOpen={isWalkthroughOpen}
+        onClose={() => setIsWalkthroughOpen(false)}
+        pins={displayPins}
+        canvasWrapperRef={canvasWrapperRef}
       />
 
       {/* Zoomed Photo Lightbox Modal with Morph Effect */}
