@@ -1,115 +1,301 @@
-# Google Sheets Live CMS (Đặc Tả Hệ Thống Live CMS)
+# 🕵️ Quy Trình Thiết Kế Game & Đặc Tả Google Sheets Live CMS
 
-Tài liệu này mô tả kiến trúc kết nối trực tiếp đến **Google Sheets API v4 (Live CMS)** của dự án Detective Game, cho phép biên tập kịch bản vụ án, danh bạ, cuộc gọi, tin nhắn, hình ảnh, gợi ý và **bảng đáp án phá án** theo thời gian thực mà không cần rebuild code hay redeploy app.
-
-> 💡 **Quy hoạch Admin Studio Hub**: Toàn bộ dữ liệu kịch bản vụ án, nghi phạm, địa điểm, timeline và vật chứng đã được hợp nhất 100% quản lý trực tiếp trên Google Sheets. Hệ thống Admin Studio (`/studio`) chỉ đóng vai trò Operations Hub để theo dõi Analytics, Quản lý Người chơi, Feedbacks và mở nhanh Google Sheet CMS.
-
----
-
-## 🏷️ Quy Ước Ký Hiệu Phân Loại Cột (Column Status Legend)
-
-Để Biên kịch, Game Designer và Kỹ sư nắm rõ vai trò từng cột khi mở Google Sheet hoặc tài liệu:
-
-|   Ký hiệu   | Tên nhóm            | Ý nghĩa đối với Hệ thống Next.js                                         | Hành vi khi sửa trên Sheet                                            |
-| :---------: | :------------------ | :----------------------------------------------------------------------- | :-------------------------------------------------------------------- |
-| 🔴 **`🔑`** | **Core Identifier** | Khóa router / Logic ID bắt buộc (`case_id`, `checkpoint_id`, `type`...). | ⚠️ Không sửa bừa, code dùng để định tuyến dữ liệu & LocalStorage.     |
-| 🟢 **`⚡`** | **Live Reactive**   | Nội dung hiển thị & logic chấm điểm fetch trực tiếp runtime qua API.     | ✅ Sửa trên Sheet là giao diện/đáp án web đổi tức thì (bypass cache). |
-| ⚪ **`📝`** | **Editorial Note**  | Ghi chú nghiệp vụ phân loại dành riêng cho Biên kịch/GM.                 | ℹ️ Code bỏ qua hoàn toàn, không ảnh hưởng logic game.                 |
-
----
-
-## 📜 1. Google Sheet ID & Authentication
-
-- **Google Sheet ID**: `1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q`
-- **Xác thực**: Google Service Account (`google-service-account.json` & `GOOGLE_SERVICE_ACCOUNT_KEY_PATH`)
-- **API Route xử lý**: [`/api/phone/route.ts`](file:///d:/code_world/dect_project/app/api/phone/route.ts)
-- **Custom Hook UI**: [`usePhoneData`](file:///d:/code_world/dect_project/lib/hooks/use-phone-data.ts) (Tự động bypass cache HTTP và Next.js Data Cache với header `no-store` & tham số `_t=timestamp`).
-
----
-
-## 📑 2. Danh Mục Tab Trong Google Sheet & Trạng Thái Live CMS
-
-| Tên Tab Sheet           | Đối Tượng / Ứng Dụng UI                    | File Code Đang Đọc                                                                              | Trạng Thái Live CMS | Danh Sách Cột Phân Loại me                                                                                                                                                                                                                                                                                                                                                                                     |
-| ----------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------- | :-----------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`contacts`**          | Ứng dụng Danh Bạ (`ContactsApp`)           | [`contacts-app.tsx`](components/investigation/iphone/apps/contacts-app.tsx)                     |     🟢 **Live**     | `🔑 case_id`, `🔑 contact_id`, `⚡ name`, `⚡ phone_number`, `⚡ category`, `⚡ note`                                                                                                                                                                                                                                                                                                                          |
-| **`calls`**             | Ứng dụng Nhật Ký Cuộc Gọi (`VoicemailApp`) | [`voicemail-app.tsx`](components/investigation/iphone/apps/voicemail-app.tsx)                   |     🟢 **Live**     | `🔑 case_id`, `🔑 call_id`, `⚡ date_str`, `⚡ time_str`, `⚡ display_name`, `⚡ phone_number`, `⚡ call_type`, `⚡ is_missed`, `⚡ is_key_clue`                                                                                                                                                                                                                                                               |
-| **`messages`**          | Ứng dụng Tin Nhắn (`MessagesApp`)          | [`messages-app.tsx`](components/investigation/iphone/apps/messages-app.tsx)                     |     🟢 **Live**     | `🔑 case_id`, `🔑 contact_name`, `⚡ phone_number`, `⚡ avatar_color`, `⚡ unread`, `⚡ timestamp`, `⚡ preview_text`, `⚡ messages_text`                                                                                                                                                                                                                                                                      |
-| **`photos`**            | Ứng dụng Thư Viện Ảnh (`PhotosApp`)        | [`photos-app.tsx`](components/investigation/iphone/apps/photos-app.tsx)                         |     🟢 **Live**     | `🔑 case_id`, `🔑 photo_code`, `⚡ title`, `⚡ category`, `⚡ file_name`, `⚡ drive_url`, `⚡ direct_cdn_url`, `⚡ description_prompt`, `⚡ is_key_asset`                                                                                                                                                                                                                                                      |
-| **`banking`**           | Ứng dụng Ngân Hàng (`BankingApp`)          | [`banking-app.tsx`](components/investigation/iphone/apps/banking-app.tsx)                       |     🟢 **Live**     | `🔑 case_id`, `🔑 tx_id`, `⚡ ref_id`, `⚡ title`, `⚡ receiver`, `⚡ account_no`, `⚡ amount`, `⚡ timestamp`, `⚡ category`, `⚡ is_evidence`                                                                                                                                                                                                                                                                |
-| **`notes_and_browser`** | Safari & Ghi chú (`SafariApp`, `NotesApp`) | [`safari-app.tsx`](components/investigation/iphone/apps/safari-app.tsx), [`notes-app.tsx`](...) |     🟢 **Live**     | `🔑 case_id`, `🔑 type`, `⚡ title_or_domain`, `⚡ content_or_url`, `⚡ timestamp`, `⚡ category`, `⚡ clue_tag`                                                                                                                                                                                                                                                                                               |
-| **`checkpoints`**       | Câu Hỏi, Đáp Án & Hệ Thống Gợi Ý           | [`use-case-checkpoints.ts`](lib/hooks/use-case-checkpoints.ts), [`hint-modal.tsx`](...)         |     🟢 **Live**     | `🔑 case_id`, `🔑 checkpoint_id`, `📝 dossier`, `⚡ title`, `⚡ question`, `🔑 type`, `⚡ unlocked_evidence_id`, `⚡ answers`, `⚡ hints`                                                                                                                                                                                                                                                                      |
-| **`narratives`**        | Dẫn truyện Cinematic                       | [`use-case-narratives.ts`](lib/hooks/use-case-narratives.ts)                                    |     🟢 **Live**     | `🔑 case_id`, `🔑 phase`, `📝 dossier`, `⚡ date`, `⚡ monologue`                                                                                                                                                                                                                                                                                                                                              |
-| **`evidences`**         | Danh mục Vật chứng Master                  | [`use-case-checkpoints.ts`](lib/hooks/use-case-checkpoints.ts)                                  |     🟢 **Live**     | `🔑 case_id`, `🔑 code`, `⚡ label`, `⚡ type`, `⚡ category`, `⚡ description`, `📝 unlocked_by_phase`                                                                                                                                                                                                                                                                                                        |
-| **`motive_ideas`**      | Kho Ý Tưởng Động Cơ Gây Án                 | _(Phụ trợ Game Designer / GM sáng tạo kịch bản)_                                                |     ⚪ _Static_     | `🔑 id`, `⚡ category`, `⚡ title`, `⚡ summary`, `⚡ psychological_trigger`, `⚡ victim_relation`, `⚡ evidence_signatures`                                                                                                                                                                                                                                                                                   |
-| **`method_ideas`**      | Kho Ý Tưởng Cách Thức Gây Án               | _(Phụ trợ Game Designer / GM sáng tạo kịch bản)_                                                |     ⚪ _Static_     | `🔑 id`, `⚡ category`, `⚡ title`, `⚡ summary`, `⚡ required_tools`, `⚡ forensic_traces`, `⚡ alibi_trick`, `⚡ flaw_counter`                                                                                                                                                                                                                                                                               |
-| **`characters`**        | Hồ sơ Nhân vật & Nghi phạm                 | _(Chưa nối — đang dùng `content/cases/` local)_                                                 |     ⚪ _Static_     | `🔑 case_id`, `🔑 code`, `⚡ role`, `⚡ full_name`, `⚡ alias`, `⚡ gender`, `⚡ dob`, `⚡ id_card_no`, `⚡ phone_number`, `⚡ occupation`, `⚡ current_address`, `⚡ height_cm`, `⚡ weight_kg`, `⚡ physical_build`, `⚡ distinguishing_features`, `⚡ psych_classification`, `⚡ motive_type`, `⚡ motive_description`, `⚡ alibi_statement`, `⚡ is_alibi_fake`, `⚡ flaw_in_alibi`, `⚡ key_evidence_ids` |
-| **`locations`**         | Bản đồ Hiện trường                         | _(Chưa nối — đang dùng `content/cases/` local)_                                                 |     ⚪ _Static_     | `🔑 case_id`, `🔑 code`, `⚡ title`, `⚡ source_type`, `⚡ category`, `⚡ address`, `⚡ details`, `⚡ distance_from_scene`, `⚡ travel_time_motorbike`, `⚡ travel_time_walk`, `⚡ travel_time_car`, `⚡ position_x`, `⚡ position_y`, `⚡ is_key_location`                                                                                                                                                    |
-| **`relations`**         | Mạng lưới Quan hệ                          | _(Chưa nối — đang dùng `content/cases/` local)_                                                 |     ⚪ _Static_     | `🔑 case_id`, `🔑 source_code`, `🔑 target_code`, `⚡ relation_type`, `⚡ description`, `⚡ unlocked_by_evidence`                                                                                                                                                                                                                                                                                              |
-| **`timeline`**          | Dòng thời gian vụ án                       | _(Chưa nối — đang dùng `content/cases/` local)_                                                 |     ⚪ _Static_     | `🔑 case_id`, `🔑 time_str`, `⚡ character_name`, `⚡ event_title`, `⚡ location`, `⚡ is_truth`, `⚡ is_fatal`, `⚡ description`                                                                                                                                                                                                                                                                              |
-
----
-
-## 🎯 3. Đặc Tả Chi Tiết Tab `checkpoints` (Cấu Trúc Tinh Gọn)
-
-Tab `checkpoints` quản lý toàn bộ mốc giải đố và mở khóa hồ sơ vụ án. Hỗ trợ liên kết trực tiếp `node_id` trên Canvas:
-
-| STT | Cột                    | Tên tiếng Việt trên Sheet |  Nhóm   | Kiểu dữ liệu | Mô tả & Vai trò                                                                       |
-| :-- | :--------------------- | :------------------------ | :-----: | :----------- | :------------------------------------------------------------------------------------ |
-| 1   | `case_id`              | Mã vụ án                  | 🔴 `🔑` | TEXT         | ID vụ án (`case_000`, `case_001`) để lọc dữ liệu.                                     |
-| 2   | `checkpoint_id`        | Mã Checkpoint             | 🔴 `🔑` | TEXT         | Khóa chính duy nhất (`cp-000-0`, `cp-000-1a`, `cp-000-1b`, `cp-000-2a`, `cp-000-2b`). |
-| 3   | `node_id`              | Mã Node Canvas            | 🔴 `🔑` | TEXT         | Mã node trên Canvas (`c0-pin-followup-vu`, `node-suspect-vu`, `c0-pin-phone`...).     |
-| 4   | `dossier`              | Bộ hồ sơ con              | ⚪ `📝` | TEXT         | Nhãn phân nhóm nghiệp vụ (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`). Code không đọc.         |
-| 5   | `title`                | Tiêu đề                   | 🟢 `⚡` | TEXT         | Tiêu đề hiển thị của câu hỏi/checkpoint trên UI.                                      |
-| 6   | `question`             | Nội dung yêu cầu          | 🟢 `⚡` | TEXT         | Lời dẫn yêu cầu điều tra.                                                             |
-| 7   | `type`                 | Loại dạng bài             | 🔴 `🔑` | ENUM         | Form UI: `text_match_3`, `evidence_picker`, `mcq`, `text`.                            |
-| 8   | `unlocked_evidence_id` | Mã mở khóa                | 🟢 `⚡` | TEXT         | ID phần thưởng/bộ hồ sơ tiếp theo được mở khóa sau khi giải đúng.                     |
-| 9   | `answers`              | Cột đáp án hợp nhất       | 🟢 `⚡` | MULTILINE    | Chứa toàn bộ đáp án theo cú pháp `khóa: giá trị` (Alt+Enter xuống dòng).              |
-| 10  | `hints`                | Gợi ý đa cấp              | 🟢 `⚡` | MULTILINE    | Danh sách gợi ý các cấp (mỗi dòng Alt+Enter = 1 cấp gợi ý).                           |
-
-#### Từ khóa cú pháp tiếng Việt trong cột `answers`:
-
-| Khóa tiếng Việt | Khóa tiếng Anh | Dành cho `type`   | Ý nghĩa & Ví dụ                                          |
-| :-------------- | :------------- | :---------------- | :------------------------------------------------------- |
-| `nghi_pham:`    | `suspect:`     | `evidence_picker` | `nghi_pham: Lê Quang Vũ`                                 |
-| `ma_chung_cu:`  | `require:`     | `evidence_picker` | `ma_chung_cu: 10, dev-00, p6, 06, p10`                   |
-| `o_nhap:`       | `input:`       | `text_match_3`    | `o_nhap: phone_1 \| SĐT 0988.200.991: \| \| Lê Quang Vũ` |
-| `phuong_an:`    | `option:`      | `mcq`             | `option: 1. Gửi tin nhắn cho đối tượng...`               |
-| `dap_an:`       | `correct:`     | `mcq`, `text`     | `dap_an: Lê Quang Vũ` (hoặc nhập text trực tiếp)         |
-
-> 💡 **Quy ước nhập tên nghi phạm & mã chứng cứ**:
+> **Tài liệu chuẩn hóa**: Quy trình sáng tác kịch bản, thiết kế vụ án, điều tra vật chứng, nhật ký điện thoại và cơ chế Live CMS thời gian thực cho dự án **Detective Case System (dect_project)**.
 >
-> - **Tên người**: Nhập tên chuẩn có dấu (`Lê Quang Vũ`, `Nguyễn Thanh Tùng`). Code tự so khớp không phân biệt hoa thường/tên ngắn.
-> - **Mã chứng cứ**: Nhập các mã in trên thẻ chứng cứ cách nhau bằng dấu phẩy (`10, dev-00, p6, 06, p10`).
-> - **Đáp án text đơn**: Nhập thẳng nội dung đáp án vào cột `answers` mà không cần thêm bất kỳ từ khóa nào.
+> 📌 **Google Sheet Master ID**: [`1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q`](https://docs.google.com/spreadsheets/d/1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q/edit)  
+> 📄 **Master Google Docs (Tập Hồ Sơ Lời Khai)**: [`[Case 000] Hồ Sơ Lời Khai Master`](https://docs.google.com/document/d/1pJxlZpfCfIbnQ0YGx3mvCUmYTRng7zLyDxJ2EggJkgc/edit)  
+> 📁 **Google Drive Folder**: [`DECT_CASE_000_DOCS`](https://drive.google.com/drive/folders/169qDUO29Us_LOcPGo1eEU-DV9nliTAfw)
 
 ---
 
-## 🎬 4. Đặc Tả Tab `narratives` (Dẫn Truyện Cinematic)
+## 🗺️ PHẦN I: KIẾN TRÚC TỔNG THỂ HỆ THỐNG VỤ ÁN (ARCHITECTURE MAP)
 
-Tab `narratives` quản lý toàn bộ nội dung độc thoại/dẫn truyện mở đầu và khi mở khóa từng bộ hồ sơ:
+Hệ thống được thiết kế theo mô hình **Tam Giác Đồng Bộ (Headless Case Architecture)** giúp Game Designer, Biên kịch và Kỹ sư làm việc độc lập mà không bao giờ bị lệch dữ liệu:
 
-| STT | Cột         | Tên tiếng Việt trên Sheet |  Nhóm   | Kiểu dữ liệu | Mô tả & Vai trò                                                                     |
-| :-- | :---------- | :------------------------ | :-----: | :----------- | :---------------------------------------------------------------------------------- |
-| 1   | `case_id`   | Mã vụ án                  | 🔴 `🔑` | TEXT         | ID vụ án (`case_000`, `case_001`).                                                  |
-| 2   | `phase`     | Thứ tự chặng              | 🔴 `🔑` | NUMBER       | `0` = Mở đầu Ban Đầu, `1` = Mở khóa Bộ A, `2` = Mở khóa Bộ B, `3` = Mở khóa Bộ C.   |
-| 3   | `dossier`   | Bộ hồ sơ con              | ⚪ `📝` | TEXT         | Nhãn bộ hồ sơ (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`). Code không đọc.                  |
-| 4   | `date`      | Mốc thời gian             | 🟢 `⚡` | TEXT         | Tiêu đề in trên header modal (VD: `Đêm 24/07/2016`, `Sáng 25/07/2016`...).          |
-| 5   | `monologue` | Độc thoại dẫn truyện      | 🟢 `⚡` | MULTILINE    | Nội dung máy đánh chữ chạy chữ cinematic (Alt+Enter ngắt dòng, dòng đôi ngắt đoạn). |
+```mermaid
+flowchart TD
+    subgraph S1 ["1. SÁNG TÁC & THIẾT KẾ VỤ ÁN (Editorial Hub)"]
+        GS["📊 Google Sheets Master<br/>• Quản lý Logic, Checkpoints, Đáp án<br/>• Quản lý Điện thoại (Calls, SMS, Photos)<br/>• Kho Ý tưởng Động cơ & Thủ đoạn"]
+        GDOCS["📄 Google Docs Master<br/>• Văn bản Lời khai & Biên bản nghiệp vụ<br/>• Format in ấn chuẩn Công an (Nghị định 30)<br/>• Bản in hồ sơ giấy thực tế cho người chơi"]
+    end
+
+    subgraph S2 ["2. ENGINE ĐỒNG BỘ (Automated Sync Engine)"]
+        SYNC_CLI["⚡ npm run sync:testimonies / npm run sync:docs-to-sheet<br/>(Đồng bộ 2 chiều tức thì)"]
+    end
+
+    subgraph S3 ["3. GAME RUNTIME & TRẢI NGHIỆM NGƯỜI CHƠI"]
+        APP_PHONE["📱 Ứng dụng Điện thoại iPhone (Live CMS API)<br/>• Danh bạ, Cuộc gọi ghi âm, Tin nhắn SMS, Safari, Ngân hàng"]
+        APP_BOARD["📌 Bảng Điều Tra & Canvas Suy Luận<br/>• Vật chứng Master, Hồ sơ nhân vật, Checkpoints mở khóa"]
+        APP_CINEMATIC["🎬 Dẫn Truyện Cinematic Typewriter<br/>• Độc thoại chuyển giao từng chặng vụ án"]
+    end
+
+    GS <-->|Bi-directional Sync| GDOCS
+    GS -->|API Runtime /api/phone| APP_PHONE
+    GS -->|API Runtime /api/checkpoints| APP_BOARD
+    GS -->|API Runtime /api/narratives| APP_CINEMATIC
+    GS -->|Sync CLI| SYNC_CLI
+```
 
 ---
 
-## ⚙️ 5. Cơ Chế Fallback 2 Tầng Của Code
+## 🔄 PHẦN II: QUY TRÌNH 5 BƯỚC SÁNG TÁC VÀ THIẾT KẾ VỤ ÁN (GAME DESIGN WORKFLOW)
 
-1. **Tầng 1 — Fallback theo từng ô (Cell-level)**:
-   - Ô `⚡ Live` để trống trên Sheet sẽ tự động lấy giá trị từ checkpoint/narrative **cùng ID/phase** trong file local `content/cases/<caseId>/`.
-2. **Tầng 2 — Fallback theo cả tab (Row-level)**:
-   - Nếu tab trên Sheet bị xóa hoặc rỗng, hook tự động trả về toàn bộ mảng dữ liệu local (`source = 'local'`), ứng dụng không bao giờ bị gián đoạn hay crash.
+Khi xây dựng một vụ án mới (Case #000, Case #001...), Game Designer tuân theo 5 bước tuần tự:
+
+```mermaid
+flowchart LR
+    B1["Bước 1:<br/>Ý Tưởng & Động Cơ<br/>(motive/method)"]
+    --> B2["Bước 2:<br/>Dòng Thời Gian & Nghi Phạm<br/>(timeline/characters)"]
+    --> B3["Bước 3:<br/>Hồ Sơ Lời Khai<br/>(testimonies/Google Docs)"]
+    --> B4["Bước 4:<br/>Tái Hiện Điện Thoại<br/>(calls/messages/photos)"]
+    --> B5["Bước 5:<br/>Thiết Kế Mốc Phá Án<br/>(checkpoints/narratives)"]
+```
 
 ---
 
-## 💡 6. Kho Ý Tưởng Sáng Tạo Kịch Bản (`motive_ideas` & `method_ideas`)
+### 🟢 Bước 1: Khởi Tạo Ý Tưởng, Động Cơ & Thủ Đoạn Gây Án
+- **Mục tiêu**: Xác định bản chất vụ án (Án mạng trả thù, siết nợ, chiếm đoạt tài sản, hay án mạng liên hoàn).
+- **Tab thực hiện trên Sheet**:
+  - `motive_ideas`: Chọn mẫu động cơ tâm lý (Tài chính, Tình ái, Uất ức thù hằn, Che giấu tội ác quá khứ).
+  - `method_ideas`: Chọn thủ đoạn gây án, cơ chế pháp y tử thi, thủ thuật tạo chứng cứ ngoại phạm và lỗ hổng điều tra.
 
-Hai tab phụ trợ độc lập trên Google Sheet giúp GM / Biên kịch tra cứu và lắp ghép kịch bản vụ án:
+---
 
-- **`motive_ideas`**: 12 mẫu động cơ kinh điển (Tài chính, Tình cảm, Thù hận, Che đậy, Bệnh lý, Danh dự) kèm ngòi nổ tâm lý (`psychological_trigger`), quan hệ nạn nhân (`victim_relation`) và dấu vết nhận diện (`evidence_signatures`).
-- **`method_ideas`**: 12 thủ đoạn gây án & tạo chứng cứ ngoại phạm (Độc chất, Tai nạn dàn dựng, Bẫy cơ học, Ngoại phạm Alibi, Vũ khí tự hủy) kèm cơ chế pháp y (`forensic_traces`), mẹo alibi (`alibi_trick`) và lỗ hổng điều tra (`flaw_counter`).
+### 🟢 Bước 2: Xây Dựng Dòng Thời Gian Vụ Án & Mạng Lưới Nhân Vật
+- **Mục tiêu**: Lập bảng thời gian thực (Truth Timeline) đối chiếu với bảng thời gian gian dối (Fake Timeline).
+- **Tab thực hiện trên Sheet**:
+  - `characters`: Tạo danh sách nghi phạm, nhân chứng, mối quan hệ, đặc điểm nhận dạng.
+  - `timeline`: Nhập từng mốc sự kiện theo phút (18:30, 19:45, 20h00, 20h45, 21h00, 21h15...). Đánh dấu sự kiện chí mạng (`is_fatal = TRUE`).
+  - `relations`: Định nghĩa mối quan hệ dây mơ rễ má giữa các nhân vật.
+
+---
+
+### 🟢 Bước 3: Biên Soạn Hồ Sơ Lời Khai & Biên Bản Thẩm Vấn (Google Docs)
+- **Mục tiêu**: Tạo ra các biên bản hỏi cung, lấy lời khai nhân chứng có mâu thuẫn để người chơi phát hiện lỗ hổng.
+- **Cách thực hiện**:
+  1. Nhập danh mục văn bản vào tab `testimonies` trên Sheet (Mã văn bản `06`, `07`, `08`, Họ tên, Mốc giờ, Cán bộ, Tóm tắt ngoại phạm).
+  2. Mở file **Master Google Docs** để biên soạn câu chữ đối thoại, câu hỏi và câu trả lời.
+  3. Khi cần cập nhật đồng bộ giữa Docs và Sheet: Chạy lệnh `npm run sync:docs-to-sheet` hoặc `npm run format:gdocs`.
+
+---
+
+### 🟢 Bước 4: Tái Hiện Hiện Trường Điện Thoại Nạn Nhân / Nghi Phạm
+- **Mục tiêu**: Người chơi mở chiếc điện thoại thu giữ được tại hiện trường để bắt đầu bóc tách manh mối.
+- **Tab thực hiện trên Sheet**:
+  - `contacts`: Danh bạ điện thoại của nạn nhân (bao gồm các số nghi vấn, tên lưu ẩn dụ).
+  - `calls`: Lịch sử cuộc gọi đến/đi/nhỡ, các cuộc gọi có đoạn ghi âm giọng nói / tiếng động hiện trường (`is_key_clue = TRUE`).
+  - `messages`: Lịch sử nhắn tin SMS/Zalo, các tin nhắn đe dọa đòi nợ, nhắn tin hẹn gặp.
+  - `photos`: Thư viện ảnh hiện trường, giấy tờ vay nợ, ảnh chụp ngoại phạm, ảnh căn cước.
+  - `banking`: Lịch sử chuyển tiền ngân hàng, các giao dịch bất thường trước giờ nạn nhân tử vong.
+  - `notes_and_browser`: Ghi chú cá nhân, nhật ký chi tiêu và lịch sử duyệt web của nạn nhân.
+
+---
+
+### 🟢 Bước 5: Thiết Kế Mốc Phá Án, Hệ Thống Gợi Ý & Dẫn Truyện Cinematic
+- **Mục tiêu**: Định tuyến trải nghiệm phá án qua từng chặng (Phases: Mở đầu ➔ Bộ A ➔ Bộ B ➔ Bộ C ➔ Bản Cáo Trạng Định Tội).
+- **Tab thực hiện trên Sheet**:
+  - `checkpoints`: Tạo các câu hỏi suy luận, chọn nghi phạm, chọn mã vật chứng kết hợp, nhập đáp án (`answers`) và gợi ý đa cấp (`hints`).
+  - `narratives`: Viết đoạn độc thoại cinematic máy đánh chữ khi người chơi mở khóa từng chặng.
+  - `evidences`: Định danh toàn bộ thẻ vật chứng in trên bàn điều tra (`dev-00`, `06`, `10`, `p6`...).
+
+---
+
+## 📑 PHẦN III: ĐẶC TẢ CHI TIẾT TẤT CẢ CÁC TAB TRÊN GOOGLE SHEET MASTER
+
+### 🏷️ Quy Ước Ký Hiệu Phân Loại Cột:
+- 🔴 **`🔑 Core Identifier`**: Khóa ID kỹ thuật bắt buộc code dùng để map dữ liệu và định tuyến logic.
+- 🟢 **`⚡ Live Reactive`**: Dữ liệu đọc trực tiếp runtime qua API (Sửa trên Sheet là web đổi ngay tức thì).
+- ⚪ **`📝 Editorial Note`**: Ghi chú nghiệp vụ phân loại cho Game Designer/Biên kịch (Code bỏ qua).
+
+---
+
+### 1. Tab `testimonies` — Hồ Sơ Lời Khai & Biên Bản Thẩm Vấn (Google Docs)
+
+| Cột | Tên trường | Loại | Ý nghĩa & Quy ước |
+| :---: | :--- | :---: | :--- |
+| 1 | `case_id` | 🔴 `🔑` | ID vụ án (`case_000`, `case_001`). |
+| 2 | `doc_code` | 🔴 `🔑` | Mã số văn bản (`06`, `07`, `08`, `09`, `12`, `A02`, `B01`...). |
+| 3 | `phase` | 🔴 `🔑` | Phân chặng (`00_khoi_dau`, `01_nhanh_mai_vu`, `02_nhanh_tung`, `03_nhanh_ha`). |
+| 4 | `person_name` | 🟢 `⚡` | Họ tên người khai báo (`Nguyễn Ngọc Mai`, `Lê Quang Vũ`...). |
+| 5 | `role` | 🟢 `⚡` | Tư cách tham gia tố tụng (Nhân chứng, Nghi phạm, Bị can). |
+| 6 | `doc_title` | 🟢 `⚡` | Tiêu đề văn bản (`BIÊN BẢN LẤY LỜI KHAI`, `BẢN TỰ THÚ`...). |
+| 7 | `doc_number` | 🟢 `⚡` | Số công văn lưu trữ (`07/BB-LK`). |
+| 8 | `time_taken` | 🟢 `⚡` | Thời gian lập biên bản (`14h00 ngày 25/07/2016`). |
+| 10 | `location` | 🟢 `⚡` | Địa điểm lập biên bản. |
+| 11 | `officer` | 🟢 `⚡` | Cán bộ điều tra phụ trách (`Đại úy Lê Minh`). |
+| 12 | `participants` | 🟢 `⚡` | Thành phần tham gia. |
+| 13 | `core_content` | 🟢 `⚡` | Tóm tắt các ý chính / key clues của lời khai. |
+| 14 | `alibi_claim` | 🟢 `⚡` | Tóm tắt luận điểm ngoại phạm đối tượng khai. |
+| 15 | `clue_flaw` | 🟢 `⚡` | Lỗ hổng / mâu thuẫn để người chơi bóc trần. |
+| 16 | `gdoc_tab_title` | 🟢 `⚡` | Tên Document Tab trên Master Google Doc. |
+| 17 | `gdoc_url` | 🟢 `⚡` | Link trực tiếp tới Master Google Doc. |
+
+---
+
+### 1b. Tab `profiles` — Lý Lịch & Nhân Thân Nhân Vật
+
+| Cột | Tên trường | Loại | Ý nghĩa & Quy ước |
+| :---: | :--- | :--- :--- | :--- |
+| 1 | `case_id` | 🔴 `🔑` | ID vụ án (`case_000`). |
+| 2 | `doc_code` | 🔴 `🔑` | Mã số văn bản (`04`, `05a`, `05b`, `05c`, `03`, `05`). |
+| 3 | `phase` | 🔴 `🔑` | Phân chặng. |
+| 4 | `person_name` | 🟢 `⚡` | Họ tên đối tượng được lập lý lịch. |
+| 5 | `role` | 🟢 `⚡` | Vai trò trong vụ án (Nạn nhân, Nghi phạm, Nhân chứng). |
+| 6 | `doc_title` | 🟢 `⚡` | Tiêu đề tài liệu (`BẢN TRÍCH LỤC LÝ LỊCH VÀ MỐI QUAN HỆ`...). |
+| 7 | `doc_number` | 🟢 `⚡` | Số hiệu lưu trữ. |
+| 8 | `time_taken` | 🟢 `⚡` | Thời điểm lập hồ sơ. |
+| 9 | `location` | 🟢 `⚡` | Đơn vị / địa điểm thụ lý. |
+| 10 | `officer` | 🟢 `⚡` | Cán bộ lập hồ sơ. |
+| 11 | `participants` | 🟢 `⚡` | Người phối hợp cung cấp thông tin. |
+| 12 | `core_content` | 🟢 `⚡` | Tóm tắt nhân thân, gia cảnh, nghề nghiệp. |
+| 13 | `background_motive`| 🟢 `⚡` | Động cơ ngầm / quan hệ tiền bạc, tình cảm. |
+| 14 | `criminal_history` | 🟢 `⚡` | Tiền án, tiền sự hoặc biểu hiện bất minh. |
+| 15 | `gdoc_tab_title` | 🟢 `⚡` | Tên Document Tab trên Master Google Doc. |
+| 16 | `gdoc_url` | 🟢 `⚡` | Link trực tiếp tới Master Google Doc. |
+
+---
+
+### 1c. Tab `reports` — Biên Bản Hiện Trường, Khám Nghiệm & Khám Xét
+
+| Cột | Tên trường | Loại | Ý nghĩa & Quy ước |
+| :---: | :--- | :--- :--- | :--- |
+| 1 | `case_id` | 🔴 `🔑` | ID vụ án (`case_000`). |
+| 2 | `doc_code` | 🔴 `🔑` | Mã văn bản (`01`, `03a`, `03b`, `03`). |
+| 3 | `phase` | 🔴 `🔑` | Phân chặng. |
+| 4 | `subject_name` | 🟢 `⚡` | Đối tượng / Hiện trường khám xét. |
+| 5 | `report_type` | 🟢 `⚡` | Loại biên bản (Tin báo, Hiện trường, Khám nghiệm tử thi, Khám xét). |
+| 6 | `doc_title` | 🟢 `⚡` | Tiêu đề văn bản. |
+| 7 | `doc_number` | 🟢 `⚡` | Số công văn lưu trữ. |
+| 8 | `time_taken` | 🟢 `⚡` | Thời gian lập biên bản. |
+| 9 | `location` | 🟢 `⚡` | Địa điểm tiến hành nghiệp vụ. |
+| 10 | `officer` | 🟢 `⚡` | Cán bộ chủ trì. |
+| 11 | `participants` | 🟢 `⚡` | Thành phần tham gia, kiểm sát viên, chứng kiến. |
+| 12 | `core_content` | 🟢 `⚡` | Tóm tắt diễn biến tiếp nhận / khám nghiệm. |
+| 13 | `key_findings` | 🟢 `⚡` | Dấu vết, vật chứng, tổn thương quan trọng thu thập được. |
+| 14 | `gdoc_tab_title` | 🟢 `⚡` | Tên Document Tab trên Master Google Doc. |
+| 15 | `gdoc_url` | 🟢 `⚡` | Link trực tiếp tới Master Google Doc. |
+
+---
+
+### 2. Tab `contacts` — Danh Bạ Điện Thoại Nạn Nhân
+
+| Cột | Tên trường | Loại | Ý nghĩa |
+| :---: | :--- | :---: | :--- |
+| 1 | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`). |
+| 2 | `contact_id` | 🔴 `🔑` | ID danh bạ (`c-mai`, `c-vu`, `c-ha`, `c-tung`...). |
+| 3 | `name` | 🟢 `⚡` | Tên hiển thị trong danh bạ (`Mai Em Họ`, `Vũ Rể`, `Hà Vợ Iu`...). |
+| 4 | `phone_number`| 🟢 `⚡` | Số điện thoại (`0988.200.991`, `0912.345.678`...). |
+| 5 | `category` | 🟢 `⚡` | Nhóm (`Gia đình`, `Công việc`, `Nợ nần`, `Dịch vụ`). |
+| 6 | `note` | 🟢 `⚡` | Ghi chú trong danh bạ điện thoại. |
+
+---
+
+### 3. Tab `calls` — Lịch Sử Cuộc Gọi & Hộp Thư Thoại Ghi Âm
+
+| Cột | Tên trường | Loại | Ý nghĩa |
+| :---: | :--- | :---: | :--- |
+| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
+| 2 | `call_id` | 🔴 `🔑` | Khóa cuộc gọi (`call-01`, `call-ha-voicemail`...). |
+| 3 | `date_str` | 🟢 `⚡` | Ngày gọi (`24/07/2016`). |
+| 4 | `time_str` | 🟢 `⚡` | Giờ gọi (`21:12`, `20:45`...). |
+| 5 | `display_name`| 🟢 `⚡` | Tên người gọi / người nhận. |
+| 6 | `phone_number`| 🟢 `⚡` | Số điện thoại. |
+| 7 | `call_type` | 🟢 `⚡` | `incoming` (đến), `outgoing` (đi), `missed` (nhỡ). |
+| 8 | `is_missed` | 🟢 `⚡` | `TRUE` nếu là cuộc gọi nhỡ. |
+| 9 | `is_key_clue` | 🟢 `⚡` | `TRUE` nếu có đoạn ghi âm âm thanh manh mối quan trọng. |
+
+---
+
+### 4. Tab `messages` — Tin Nhắn SMS / Trao Đổi Bí Mật
+
+| Cột | Tên trường | Loại | Ý nghĩa |
+| :---: | :--- | :---: | :--- |
+| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
+| 2 | `contact_name`| 🔴 `🔑` | Tên người nhắn trong hội thoại. |
+| 3 | `phone_number`| 🟢 `⚡` | Số điện thoại đối phương. |
+| 4 | `avatar_color`| 🟢 `⚡` | Màu avatar đại diện (`blue`, `emerald`, `amber`, `rose`). |
+| 5 | `unread` | 🟢 `⚡` | Số tin nhắn chưa đọc (`0`, `1`, `2`...). |
+| 6 | `timestamp` | 🟢 `⚡` | Thời gian gửi tin nhắn cuối cùng (`24/07 20:55`). |
+| 7 | `preview_text`| 🟢 `⚡` | Đoạn xem trước tin nhắn ở danh sách. |
+| 8 | `messages_text`| 🟢 `⚡` | Toàn bộ các dòng chat (Cú pháp: `incoming: nội dung` hoặc `outgoing: nội dung`). |
+
+---
+
+### 5. Tab `photos` — Thư Viện Ảnh Bằng Chứng & Manh Mối
+
+| Cột | Tên trường | Loại | Ý nghĩa |
+| :---: | :--- | :---: | :--- |
+| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
+| 2 | `photo_code` | 🔴 `🔑` | Mã ảnh (`p01`, `p02`, `p-ring`, `p-alibi-beer`...). |
+| 3 | `title` | 🟢 `⚡` | Tiêu đề ảnh. |
+| 4 | `category` | 🟢 `⚡` | Phân loại (`Hiện trường`, `Vật chứng`, `Ngoại phạm`, `Tử thi`). |
+| 5 | `file_name` | 🟢 `⚡` | Tên file ảnh trong thư mục `public/photos/`. |
+| 6 | `direct_cdn_url` | 🟢 `⚡` | Đường dẫn ảnh CDN hoặc Drive URL trực tiếp. |
+| 7 | `description_prompt` | 🟢 `⚡` | Mô tả chi tiết vật chứng thấy được trong ảnh. |
+| 8 | `is_key_asset`| 🟢 `⚡` | `TRUE` nếu là ảnh vật chứng bắt buộc để giải đố. |
+
+---
+
+### 6. Tab `banking` — Lịch Sử Giao Dịch Ngân Hàng
+
+| Cột | Tên trường | Loại | Ý nghĩa |
+| :---: | :--- | :---: | :--- |
+| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
+| 2 | `tx_id` | 🔴 `🔑` | Mã giao dịch (`tx-01`, `tx-02`...). |
+| 3 | `ref_id` | 🟢 `⚡` | Mã tham chiếu ngân hàng (`FT1620589231`). |
+| 4 | `title` | 🟢 `⚡` | Nội dung chuyển khoản. |
+| 5 | `receiver` | 🟢 `⚡` | Tên người nhận / người gửi. |
+| 6 | `account_no` | 🟢 `⚡` | Số tài khoản ngân hàng. |
+| 7 | `amount` | 🟢 `⚡` | Số tiền giao dịch (`-50,000,000 VND`, `+200,000,000 VND`). |
+| 8 | `timestamp` | 🟢 `⚡` | Thời gian thực hiện giao dịch. |
+| 9 | `category` | 🟢 `⚡` | `income` (tiền vào) hoặc `expense` (tiền ra). |
+| 10 | `is_evidence` | 🟢 `⚡` | `TRUE` nếu là giao dịch chứng minh động cơ phạm tội. |
+
+---
+
+### 7. Tab `checkpoints` — Hệ Thống Câu Hỏi, Đáp Án & Mở Khóa Chặng
+
+| Cột | Tên trường | Loại | Mô tả & Quy ước |
+| :---: | :--- | :---: | :--- |
+| 1 | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`). |
+| 2 | `checkpoint_id`| 🔴 `🔑` | Khóa chính duy nhất (`cp-000-0`, `cp-000-1a`, `cp-000-2a`...). |
+| 3 | `node_id` | 🔴 `🔑` | Mã pin tương ứng trên Canvas điều tra. |
+| 4 | `dossier` | ⚪ `📝` | Nhãn bộ hồ sơ (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`). |
+| 5 | `title` | 🟢 `⚡` | Tiêu đề câu hỏi / thử thách. |
+| 6 | `question` | 🟢 `⚡` | Lời dẫn yêu cầu điều tra chi tiết. |
+| 7 | `type` | 🔴 `🔑` | `evidence_picker` (chọn vật chứng + người), `text_match_3` (điền 3 ô), `mcq` (trắc nghiệm), `text` (nhập tự do). |
+| 8 | `unlocked_evidence_id` | 🟢 `⚡` | ID phần thưởng/bộ hồ sơ tiếp theo được mở khóa sau khi giải đúng. |
+| 9 | `answers` | 🟢 `⚡` | **Đáp án hợp nhất**: Dùng cú pháp `nghi_pham:`, `ma_chung_cu:`, `o_nhap:`, `dap_an:` (Alt+Enter xuống dòng). |
+| 10 | `hints` | 🟢 `⚡` | **Gợi ý đa cấp**: Mỗi dòng Alt+Enter là 1 cấp độ gợi ý (Cấp 1 ➔ Cấp 2 ➔ Đáp án gợi mở). |
+
+---
+
+### 8. Tab `narratives` — Dẫn Truyện Cinematic Typewriter
+
+| Cột | Tên trường | Loại | Mô tả |
+| :---: | :--- | :---: | :--- |
+| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
+| 2 | `phase` | 🔴 `🔑` | `0` = Ban Đầu, `1` = Mở Bộ A, `2` = Mở Bộ B, `3` = Mở Bộ C. |
+| 3 | `dossier` | ⚪ `📝` | Tên chặng. |
+| 4 | `date` | 🟢 `⚡` | Mốc thời gian hiển thị trên header modal (`Đêm 24/07/2016`). |
+| 5 | `monologue` | 🟢 `⚡` | Nội dung lời dẫn chạy chữ máy đánh chữ cinematic (Alt+Enter ngắt đoạn). |
+
+---
+
+## 🛠️ PHẦN IV: CẨM NANG THAO TÁC LỆNH 1-CHẠM (CLI TOOLBOX)
+
+| Lệnh Dòng Lệnh | Chức Năng | Khi Nào Sử Dụng? |
+| :--- | :--- | :--- |
+| `npm run export:docs-pdf` | Xuất bản toàn bộ 21 Document Tabs từ Master Google Docs thành PDF | Khi cần cập nhật các file PDF hồ sơ hiển thị trên web app. |
+| `npm run build:master-doc` | Khởi tạo / dựng lại toàn bộ 21 Document Tabs trên Master Google Docs & Sheet | Khi khởi tạo hoặc reset lại cấu trúc tài liệu Master. |
+| `npm run sync:docs-to-sheet` | Đọc toàn bộ nội dung từ Google Docs và lưu ngược vào Sheet | Khi bạn vừa viết hoặc sửa văn phong trực tiếp trong file Google Docs. |
+| `npm run sync:testimonies` | Kéo toàn bộ dữ liệu từ Sheet về file Markdown local trong repo | Khi chuẩn bị commit Git hoặc kiểm tra tài liệu local. |
+
+---
+
+## 🛡️ PHẦN V: CƠ CHẾ FALLBACK 2 TẦNG BẢO VỆ GAME
+
+1. **Tầng 1 — Fallback từng ô (Cell-Level Fallback)**:
+   - Nếu Game Designer để trống một ô bất kỳ trên Google Sheet, app tự động lấy giá trị mặc định từ file local cùng ID mà không bị lỗi giao diện.
+2. **Tầng 2 — Fallback toàn bộ Tab (Table-Level Fallback)**:
+   - Nếu mất mạng, mạng yếu hoặc Google API gặp sự cố, hệ thống tự động chuyển sang đọc file JSON local tĩnh (`content/cases/`), đảm bảo game chạy liên tục 100% không bao giờ crash.

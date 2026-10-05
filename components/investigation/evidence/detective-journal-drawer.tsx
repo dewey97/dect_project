@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Search, CheckCircle2, BookOpen, Bookmark, FileText, Trash2, Edit3, X, ChevronRight } from 'lucide-react'
-import { Finding } from '@/content/cases/case-000/findings'
+import type { Finding } from '@/lib/types'
 import { findMatchingFinding } from '@/lib/finding-matcher'
 import { detectiveAudio } from '@/lib/investigation-audio'
 

@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0 --webpack",
     "build": "next build",
-    "build:latex": "node scripts/build_latex.js",
+    "export:docs-pdf": "node scripts/export-docs-to-pdf.js",
+    "build:master-doc": "node scripts/build-all-documents-gdoc-and-sheet.js",
+    "sync:docs-to-sheet": "node scripts/sync-docs-to-sheet.js",
+    "sync:gdocs": "node scripts/sync-testimonies-gdocs.js",
+    "sync:testimonies": "node scripts/sync-testimonies-from-sheet.js",
     "start": "next start",
     "lint": "tsc --noEmit"
   },

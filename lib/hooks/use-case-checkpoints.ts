@@ -11,7 +11,6 @@ import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
 export interface CaseCheckpointsState {
   checkpoints: Checkpoint[];
   loading: boolean;
-  source: "sheet" | "local";
   refetch: () => void;
 }
 
@@ -84,13 +83,10 @@ function enrichCheckpointsWithEvidences(
 }
 
 /**
- * Hook kết nối trực tiếp tab `checkpoints` & `evidences` từ Google Sheets Live CMS,
- * tự động đồng bộ danh sách câu hỏi, đáp án, gợi ý và fallback an toàn về danh sách tĩnh.
+ * Hook kết nối trực tiếp tab `checkpoints` & `evidences` từ Google Sheets Live CMS 100%,
+ * tự động đồng bộ danh sách câu hỏi, đáp án, gợi ý.
  */
-export function useCaseCheckpoints(
-  caseId: string,
-  fallback: Checkpoint[] = [],
-): CaseCheckpointsState {
+export function useCaseCheckpoints(caseId: string = "case-000"): CaseCheckpointsState {
   const {
     data: checkpointRows,
     loading: cpLoading,
@@ -108,31 +104,24 @@ export function useCaseCheckpoints(
     refetchEv();
   };
 
-  const { checkpoints, source } = useMemo(() => {
+  const checkpoints = useMemo(() => {
     const targetId = normalizeCaseId(caseId);
     const matchingRows = checkpointRows.filter(
       (row) => normalizeCaseId(row.case_id || "") === targetId,
     );
 
     if (matchingRows.length > 0) {
-      const transformed = transformSheetCheckpoints(matchingRows, fallback);
-      const enriched = enrichCheckpointsWithEvidences(
-        transformed,
-        evidenceRows,
-      );
-      return {
-        checkpoints: enriched,
-        source: "sheet" as const,
-      };
+      const transformed = transformSheetCheckpoints(matchingRows);
+      return enrichCheckpointsWithEvidences(transformed, evidenceRows);
     }
 
-    return { checkpoints: fallback, source: "local" as const };
-  }, [checkpointRows, evidenceRows, caseId, fallback]);
+    return [];
+  }, [checkpointRows, evidenceRows, caseId]);
 
   return {
     checkpoints,
     loading: cpLoading || evLoading,
-    source,
     refetch,
   };
 }
+

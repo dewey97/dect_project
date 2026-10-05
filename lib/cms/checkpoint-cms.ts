@@ -17,6 +17,7 @@ export interface SheetCheckpointRow {
   unlocked_evidence_id?: string;
   answers?: string;
   hints?: string;
+  narrative?: string;
   suspect_label?: string;
   evidence_step_label?: string;
   [key: string]: unknown;
@@ -27,7 +28,14 @@ export interface ParsedAnswers {
   options?: string[];
   correctAnswer?: string;
   validSuspects?: string[];
+  validMotives?: string[];
   requiredEvidenceIds?: string[];
+  optionalEvidenceIds?: string[];
+  motiveEvidenceIds?: string[];
+  optionalMotiveIds?: string[];
+  alibiEvidenceIds?: string[];
+  optionalAlibiIds?: string[];
+  clueRules?: Record<string, string[]>;
   availableEvidences?: CheckpointOptionItem[];
   textMatchInputs?: NonNullable<Checkpoint["textMatchConfig"]>["inputs"];
 }
@@ -43,13 +51,33 @@ const ANSWER_KEYS: Record<string, string> = {
   correct: "correct",
   correct_answer: "correct",
   dap_an: "correct",
+  gio_roi_quan: "correct",
 
   // Nhập tên nghi phạm
   suspect: "suspect",
   suspects: "suspect",
   nghi_pham: "suspect",
 
-  // Mã chứng cứ
+  // Động cơ & Tùy chọn Động cơ
+  motive: "motive",
+  motives: "motive",
+  dong_co: "motive",
+  chung_cu_dong_co: "motive",
+  optional_motive: "optional_motive",
+  tuy_chon_dong_co: "optional_motive",
+
+  // Ngoại phạm & Tùy chọn Ngoại phạm
+  alibi: "alibi",
+  ngoai_pham: "alibi",
+  chung_cu_ngoai_pham: "alibi",
+  optional_alibi: "optional_alibi",
+  tuy_chon_ngoai_pham: "optional_alibi",
+
+  // Tùy chọn chung (Optional clues)
+  optional: "optional",
+  tuy_chon: "optional",
+
+  // Mã chứng cứ bắt buộc
   require: "require",
   required: "require",
   required_evidences: "require",
@@ -135,35 +163,57 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
 
     const rawKey = line.slice(0, separatorIndex);
     const value = line.slice(separatorIndex + 1).trim();
-    const key = ANSWER_KEYS[normalizeKey(rawKey)];
+    const normalizedKey = normalizeKey(rawKey);
+    const key = ANSWER_KEYS[normalizedKey];
 
-    if (!key || !value) return;
+    if (!value) return;
 
-    switch (key) {
-      case "option":
-        (parsed.options ??= []).push(value);
-        break;
-      case "correct":
-        parsed.correctAnswer = value;
-        break;
-      case "suspect":
-        parsed.validSuspects = splitCommas(value);
-        break;
-      case "require":
-        parsed.requiredEvidenceIds = splitCommas(value);
-        break;
-      case "show":
-        parsed.availableEvidences = splitCommas(value).map((code) => ({
-          id: code,
-          code,
-          label: code,
-        }));
-        break;
-      case "input": {
-        const input = parseInputLine(value);
-        if (input) (parsed.textMatchInputs ??= []).push(input);
-        break;
+    if (key) {
+      switch (key) {
+        case "option":
+          (parsed.options ??= []).push(value);
+          break;
+        case "correct":
+          parsed.correctAnswer = value;
+          break;
+        case "suspect":
+          parsed.validSuspects = splitCommas(value);
+          break;
+        case "motive":
+          parsed.validMotives = splitCommas(value);
+          parsed.motiveEvidenceIds = splitCommas(value);
+          break;
+        case "optional_motive":
+          parsed.optionalMotiveIds = splitCommas(value);
+          break;
+        case "alibi":
+          parsed.alibiEvidenceIds = splitCommas(value);
+          break;
+        case "optional_alibi":
+          parsed.optionalAlibiIds = splitCommas(value);
+          break;
+        case "optional":
+          parsed.optionalEvidenceIds = splitCommas(value);
+          break;
+        case "require":
+          parsed.requiredEvidenceIds = splitCommas(value);
+          break;
+        case "show":
+          parsed.availableEvidences = splitCommas(value).map((code) => ({
+            id: code,
+            code,
+            label: code,
+          }));
+          break;
+        case "input": {
+          const input = parseInputLine(value);
+          if (input) (parsed.textMatchInputs ??= []).push(input);
+          break;
+        }
       }
+    } else {
+      // Lưu các khóa quy tắc mở rộng (tile_ao_gio, chung_cu_2_1, ...)
+      (parsed.clueRules ??= {})[normalizedKey] = splitCommas(value);
     }
   });
 
@@ -207,54 +257,35 @@ export function getCheckpointOptions(row?: SheetCheckpointRow): string[] {
 }
 
 /**
- * Chuyển một dòng thô từ tab 'checkpoints' thành object Checkpoint.
+ * Chuyển một dòng thô từ tab 'checkpoints' trên Google Sheet thành object Checkpoint 100% trực tiếp từ dữ liệu Sheet,
+ * không sử dụng bất kỳ static fallback nào.
  */
 export function transformSheetCheckpoint(
   row: SheetCheckpointRow,
-  fallback?: Checkpoint,
 ): Checkpoint {
   const answers = parseAnswersColumn(row.answers);
   const dynamicHints = getCheckpointHints(row);
 
-  const hintsList =
-    dynamicHints.length > 0 ? dynamicHints : fallback?.hintsList;
-
-  const options = answers.options?.length ? answers.options : fallback?.options;
-  const correctAnswer = answers.correctAnswer ?? fallback?.correctAnswer;
-
-  const validSuspects = answers.validSuspects?.length
-    ? answers.validSuspects
-    : fallback?.pickerConfig?.validSuspects;
-
-  const requiredEvidenceIds = answers.requiredEvidenceIds?.length
-    ? answers.requiredEvidenceIds
-    : fallback?.pickerConfig?.requiredEvidenceIds;
-
-  const availableEvidences = answers.availableEvidences?.length
-    ? answers.availableEvidences
-    : fallback?.pickerConfig?.availableEvidences;
-
-  const textMatchInputs = answers.textMatchInputs?.length
-    ? answers.textMatchInputs
-    : fallback?.textMatchConfig?.inputs;
-
   const hasPickerConfig =
-    fallback?.pickerConfig ||
-    validSuspects ||
-    requiredEvidenceIds ||
-    availableEvidences ||
-    row.suspect_label ||
-    row.evidence_step_label;
+    (answers.validSuspects && answers.validSuspects.length > 0) ||
+    (answers.requiredEvidenceIds && answers.requiredEvidenceIds.length > 0) ||
+    (answers.availableEvidences && answers.availableEvidences.length > 0) ||
+    (row.suspect_label !== undefined && row.suspect_label !== "") ||
+    (row.evidence_step_label !== undefined && row.evidence_step_label !== "");
 
   const pickerConfig = hasPickerConfig
     ? {
-        ...fallback?.pickerConfig,
-        ...(validSuspects && validSuspects.length > 0 ? { validSuspects } : {}),
-        ...(requiredEvidenceIds && requiredEvidenceIds.length > 0
-          ? { requiredEvidenceIds }
+        ...(answers.validSuspects && answers.validSuspects.length > 0
+          ? { validSuspects: answers.validSuspects }
           : {}),
-        ...(availableEvidences && availableEvidences.length > 0
-          ? { availableEvidences }
+        ...(answers.validMotives && answers.validMotives.length > 0
+          ? { validMotives: answers.validMotives }
+          : {}),
+        ...(answers.requiredEvidenceIds && answers.requiredEvidenceIds.length > 0
+          ? { requiredEvidenceIds: answers.requiredEvidenceIds }
+          : {}),
+        ...(answers.availableEvidences && answers.availableEvidences.length > 0
+          ? { availableEvidences: answers.availableEvidences }
           : {}),
         ...(row.suspect_label !== undefined && row.suspect_label !== ""
           ? { suspectLabel: row.suspect_label }
@@ -267,52 +298,45 @@ export function transformSheetCheckpoint(
     : undefined;
 
   const textMatchConfig =
-    textMatchInputs && textMatchInputs.length > 0
-      ? { inputs: textMatchInputs }
-      : fallback?.textMatchConfig;
+    answers.textMatchInputs && answers.textMatchInputs.length > 0
+      ? { inputs: answers.textMatchInputs }
+      : undefined;
+
+  const storyConfig = row.narrative
+    ? {
+        monologue: row.narrative,
+        date: row.dossier || "",
+        subtitle: row.title || "",
+      }
+    : undefined;
 
   return {
-    id: row.checkpoint_id || fallback?.id || "cp-dynamic",
-    caseId: row.case_id || fallback?.caseId || "case-000",
-    title:
-      row.title !== undefined && row.title !== ""
-        ? row.title
-        : fallback?.title || "",
-    question: row.question || fallback?.question || "",
-    hint:
-      hintsList && hintsList.length > 0 ? hintsList[0] : fallback?.hint || "",
-    options,
-    correctAnswer,
-    unlockedEvidenceId:
-      row.unlocked_evidence_id || fallback?.unlockedEvidenceId,
-    status: fallback?.status || "locked",
-    type:
-      (row.type as Checkpoint["type"]) || fallback?.type || "evidence_picker",
-    hintsList:
-      hintsList && hintsList.length > 0 ? hintsList : fallback?.hintsList,
+    id: row.checkpoint_id || "cp-dynamic",
+    caseId: row.case_id || "case-000",
+    title: row.title || "",
+    question: row.question || "",
+    hint: dynamicHints[0] || "",
+    hintsList: dynamicHints,
+    options: answers.options,
+    correctAnswer: answers.correctAnswer,
+    unlockedEvidenceId: row.unlocked_evidence_id || undefined,
+    status: "locked",
+    type: (row.type as Checkpoint["type"]) || "evidence_picker",
     textMatchConfig,
     pickerConfig,
+    storyConfig,
     ...(row.node_id ? { nodeId: row.node_id } : {}),
   } as Checkpoint;
 }
 
 /**
- * Chuyển danh sách dòng Sheet, tra cứu fallback local theo `checkpoint_id`.
+ * Chuyển danh sách dòng Sheet thành mảng Checkpoint 100% từ Google Sheets Live CMS.
  */
 export function transformSheetCheckpoints(
   rows: SheetCheckpointRow[],
-  fallbackCheckpoints: Checkpoint[] = [],
 ): Checkpoint[] {
   if (!rows || rows.length === 0) {
-    return fallbackCheckpoints;
+    return [];
   }
-
-  const fallbackMap = new Map<string, Checkpoint>();
-  fallbackCheckpoints.forEach((cp) => fallbackMap.set(cp.id, cp));
-
-  return rows.map((row) => {
-    const cpId = row.checkpoint_id || "";
-    const fallback = fallbackMap.get(cpId);
-    return transformSheetCheckpoint(row, fallback);
-  });
+  return rows.map((row) => transformSheetCheckpoint(row));
 }

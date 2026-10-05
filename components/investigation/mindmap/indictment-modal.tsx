@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Gavel, AlertTriangle } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
-import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 
 import { PHONE_LOOKUP_EVIDENCE_IDS } from '@/lib/cases/case-000-clues'
 

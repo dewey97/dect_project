@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCheckpoints } from "@/components/investigation/checkpoints-context";
-import { checkpoints000 } from "@/content/cases/case-000/checkpoints";
+import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
+import type { Checkpoint } from "@/lib/types";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import {
   CASE_000_PDFS,
@@ -24,6 +25,7 @@ import { HintModal } from "@/components/investigation/hint-modal";
 export default function BoardGameCompanionPage() {
   const router = useRouter();
   const { completedCheckpointIds, completeCheckpoint } = useCheckpoints();
+  const { checkpoints } = useCaseCheckpoints("case-000");
 
   // Phone, Reinvestigation, Epilogue and Hint modals
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
@@ -34,7 +36,6 @@ export default function BoardGameCompanionPage() {
   const [isJumpscareActive, setIsJumpscareActive] = useState(false);
 
   // Checkpoint questions state
-  const [checkpoints, setCheckpoints] = useState(checkpoints000);
   const [selectedAnswers, setSelectedAnswers] = useState<
     Record<string, string>
   >({});
@@ -96,7 +97,7 @@ export default function BoardGameCompanionPage() {
     setCheckpointErrors((prev) => ({ ...prev, [cpId]: false }));
   };
 
-  const handleSubmitAnswer = (cp: (typeof checkpoints000)[0]) => {
+  const handleSubmitAnswer = (cp: Checkpoint) => {
     const userAnswer = selectedAnswers[cp.id];
     if (!userAnswer) return;
 

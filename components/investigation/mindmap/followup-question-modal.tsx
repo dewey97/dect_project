@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, HelpCircle, CheckCircle2, ArrowRight, ShieldCheck, Check, Sparkles } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
-import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 
 import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
 import { ClueCodePicker } from './clue-code-picker'
@@ -57,11 +56,7 @@ export const HA_CLUE_TILES = [
   },
 ]
 
-// Lấy danh sách chứng cứ ban đầu chuẩn từ checkpoints000
-const AVAILABLE_EVIDENCES =
-  checkpoints000.find((cp) => cp.id === 'cp-000-1a')?.pickerConfig?.availableEvidences ||
-  checkpoints000.find((cp) => cp.id === 'cp-000-2a')?.pickerConfig?.availableEvidences ||
-  []
+import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 export function FollowupQuestionModal({
   isOpen,
@@ -71,6 +66,15 @@ export function FollowupQuestionModal({
   onOpenDossier,
   isPhoneSolved
 }: FollowupQuestionModalProps) {
+  const { checkpoints } = useCaseCheckpoints('case-000')
+
+  const availableEvidences = useMemo(() => {
+    return (
+      checkpoints.find((cp) => cp.id === 'cp-000-1a')?.pickerConfig?.availableEvidences ||
+      checkpoints.find((cp) => cp.id === 'cp-000-2a')?.pickerConfig?.availableEvidences ||
+      []
+    )
+  }, [checkpoints])
   // State for Vu time input
   const [vuTimeInput, setVuTimeInput] = useState<string>('')
 
@@ -112,7 +116,7 @@ export function FollowupQuestionModal({
     }
   }, [isPhoneSolved, isOpen])
 
-  const displayedEvidences = AVAILABLE_EVIDENCES.filter((ev) => {
+  const displayedEvidences = availableEvidences.filter((ev) => {
     if (PHONE_LOOKUP_EVIDENCE_IDS.includes(ev.id)) {
       const allHaSelected = Object.values(haTileSelections).flat()
       return hasPhoneSolvedState || allHaSelected.includes(ev.id)

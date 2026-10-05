@@ -173,9 +173,12 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
     }
   }
 
-  // 2. Voice message with phone number
-  if (trimmed.toLowerCase().startsWith('voice:') || trimmed.toLowerCase().startsWith('thoai:')) {
-    const num = trimmed.replace(/^(voice|thoai):/i, '').trim()
+  // 2. Voice message with phone number (chuẩn voice_)
+  if (
+    trimmed.toLowerCase().startsWith('voice_') ||
+    trimmed.toLowerCase().startsWith('voice:')
+  ) {
+    const num = trimmed.replace(/^voice[_:]/i, '').trim()
     const digits = num.replace(/\D/g, '')
     const formatted = digits.length === 10
       ? `${digits.slice(0, 4)}.${digits.slice(4, 7)}.${digits.slice(7)}`
@@ -183,7 +186,7 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
     return {
       id: `voice_phone_${digits}`,
       label: `Tin nhắn thoại với SĐT: ${formatted}`,
-      code: formatted,
+      code: `voice_${formatted}`,
     }
   }
 

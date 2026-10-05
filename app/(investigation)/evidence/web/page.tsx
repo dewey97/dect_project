@@ -40,15 +40,6 @@ import { ReinvestigationModal } from "@/components/investigation/evidence/reinve
 import { PhoneSimulator } from "@/components/investigation/phone-simulator";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
-import {
-  devices000,
-  conversations000,
-  photos000,
-  emails000,
-  documents000,
-  browserHistory000,
-  files000,
-} from "@/lib/content-service";
 
 export default function WebEvidencePage() {
   const router = useRouter();
@@ -410,24 +401,7 @@ export default function WebEvidencePage() {
                 </button>
 
                 <div className="flex-1 w-full min-h-0 flex items-center justify-center p-1 overflow-hidden">
-                  <PhoneSimulator
-                    device={{
-                      ...devices000[0],
-                      locked: false,
-                      status: "unlocked",
-                      recoveryLevel: 100,
-                      lastUpdated: "24/07/2016 // 17:55",
-                      description:
-                        devices000[0].description ||
-                        "Điện thoại cá nhân của nạn nhân Khang",
-                    }}
-                    threads={conversations000[devices000[0].id] || []}
-                    photos={photos000[devices000[0].id] || []}
-                    emails={emails000[devices000[0].id] || []}
-                    notes={documents000[devices000[0].id] || []}
-                    history={browserHistory000[devices000[0].id] || []}
-                    files={files000[devices000[0].id] || []}
-                  />
+                  <PhoneSimulator />
                 </div>
               </div>
             ) : (

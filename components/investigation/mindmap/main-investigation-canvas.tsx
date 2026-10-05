@@ -26,6 +26,8 @@ import {
   Trash2,
   Volume2,
   VolumeX,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -70,6 +72,15 @@ interface SuspectItem {
   alibiClueIds?: string[];
 }
 
+const ALL_CASE_000_SUSPECTS: SuspectItem[] = [
+  { id: "suspect-vu", name: "Lê Quang Vũ", clueIds: ["c0-clue-01", "c0-clue-02"] },
+  { id: "suspect-tung", name: "Nguyễn Thanh Tùng", clueIds: ["c0-clue-03"] },
+  { id: "suspect-ha", name: "Trần Thị Hà", clueIds: ["c0-clue-04"] },
+  { id: "suspect-mai", name: "Nguyễn Ngọc Mai", clueIds: [] },
+  { id: "suspect-dat", name: "Trần Văn Đạt", clueIds: [] },
+  { id: "suspect-lua", name: "Nguyễn Thị Lụa", clueIds: [] },
+];
+
 interface MainInvestigationCanvasProps {
   onOpenPhoneSimulator?: () => void;
   onOpenReinvestigation?: () => void;
@@ -89,6 +100,7 @@ export function MainInvestigationCanvas({
   const [hasOpenedReinvestigation, setHasOpenedReinvestigation] =
     useState(false);
   const [phoneLookupSuccess, setPhoneLookupSuccess] = useState(false);
+  const [isShowAllPinsPreview, setIsShowAllPinsPreview] = useState(false);
 
   // Indictment & Epilogue state
   const [isIndictmentSolved, setIsIndictmentSolved] = useState(false);
@@ -1258,7 +1270,10 @@ export function MainInvestigationCanvas({
     ha: "cp-000-1c",
   };
 
-  const mobileSuspectPins: PinPoint[] = suspects.map((suspect) => {
+  const effectiveSuspects =
+    isAdmin && isShowAllPinsPreview ? ALL_CASE_000_SUSPECTS : suspects;
+
+  const mobileSuspectPins: PinPoint[] = effectiveSuspects.map((suspect) => {
     const { canonicalId, slotIndex, canonicalName } =
       getCanonicalSuspectKey(suspect);
     const slot = MOBILE_SUSPECT_SLOTS[slotIndex] || MOBILE_SUSPECT_SLOTS[0];
@@ -1279,7 +1294,7 @@ export function MainInvestigationCanvas({
     };
   });
 
-  const desktopSuspectPins: PinPoint[] = suspects.map((suspect) => {
+  const desktopSuspectPins: PinPoint[] = effectiveSuspects.map((suspect) => {
     const { canonicalId, slotIndex, canonicalName } =
       getCanonicalSuspectKey(suspect);
     const slot = DESKTOP_SUSPECT_SLOTS[slotIndex] || DESKTOP_SUSPECT_SLOTS[0];
@@ -1301,20 +1316,20 @@ export function MainInvestigationCanvas({
   });
 
   // Tìm node suspect của Vũ, Tùng và Hà để nối dây
-  const vuSuspect = suspects.find(
+  const vuSuspect = effectiveSuspects.find(
     (s) => getCanonicalSuspectKey(s).canonicalId === "vu",
   );
-  const tungSuspect = suspects.find(
+  const tungSuspect = effectiveSuspects.find(
     (s) => getCanonicalSuspectKey(s).canonicalId === "tung",
   );
-  const haSuspect = suspects.find(
+  const haSuspect = effectiveSuspects.find(
     (s) => getCanonicalSuspectKey(s).canonicalId === "ha",
   );
 
-  // Dynamic Followup Pins cho Vũ, Tùng và Hà (Kéo xuống vùng dưới đáy bảng): CHỈ hiển thị sau khi đã bấm "ĐIỀU TRA"
-  const hasVuFollowup = investigatedSuspects.includes("vu");
-  const hasTungFollowup = investigatedSuspects.includes("tung");
-  const hasHaFollowup = investigatedSuspects.includes("ha");
+  // Dynamic Followup Pins cho Vũ, Tùng và Hà (Kéo xuống vùng dưới đáy bảng): CHỈ hiển thị sau khi đã bấm "ĐIỀU TRA" (hoặc Admin Preview)
+  const hasVuFollowup = isShowAllPinsPreview || investigatedSuspects.includes("vu");
+  const hasTungFollowup = isShowAllPinsPreview || investigatedSuspects.includes("tung");
+  const hasHaFollowup = isShowAllPinsPreview || investigatedSuspects.includes("ha");
 
   const followupPinsMobile: PinPoint[] = [
     ...(hasVuFollowup
@@ -1413,8 +1428,13 @@ export function MainInvestigationCanvas({
   ];
 
   // Construct dynamic pins and connections combining main category pins, sub action pins, and suspect pins
+  const effectiveReinvestigateUnlocked =
+    isShowAllPinsPreview || isReinvestigateUnlocked;
+  const effectivePhoneSolved = isShowAllPinsPreview || phoneLookupSuccess;
+  const effectiveIndictmentSolved = isShowAllPinsPreview || isIndictmentSolved;
+
   const isReinvestigateBlinking =
-    isReinvestigateUnlocked && !hasOpenedReinvestigation;
+    effectiveReinvestigateUnlocked && !hasOpenedReinvestigation;
 
   const customPins: PinPoint[] = isMobile
     ? [
@@ -1432,12 +1452,12 @@ export function MainInvestigationCanvas({
           x: 0.42,
           y: 0.27,
           label: "Mở rộng điều tra",
-          detail: phoneLookupSuccess
+          detail: effectivePhoneSolved
             ? "Đã xác minh danh tính SĐT thành công"
             : "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
-          color: phoneLookupSuccess ? ("cyan" as const) : ("yellow" as const),
+          color: effectivePhoneSolved ? ("cyan" as const) : ("yellow" as const),
           noteColor: "white" as const,
-          isSolved: phoneLookupSuccess,
+          isSolved: effectivePhoneSolved,
         },
         {
           id: "c0-pin-victim-khang",
@@ -1466,21 +1486,21 @@ export function MainInvestigationCanvas({
           id: "c0-pin-reinvestigate",
           x: 0.2,
           y: 0.35,
-          label: isReinvestigateUnlocked
+          label: effectiveReinvestigateUnlocked
             ? "Khám xét lại"
             : "Khám xét lại (Chờ phê duyệt)",
-          detail: isReinvestigateUnlocked
+          detail: effectiveReinvestigateUnlocked
             ? "Mở biên bản tái khám xét hiện trường"
             : "Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]",
-          color: isReinvestigateUnlocked
+          color: effectiveReinvestigateUnlocked
             ? ("yellow" as const)
             : ("dark" as const),
           noteColor: "white" as const,
-          pinColor: isReinvestigateUnlocked
+          pinColor: effectiveReinvestigateUnlocked
             ? ("yellow" as const)
             : ("dark" as const),
           pulseBorder: isReinvestigateBlinking,
-          isLocked: !isReinvestigateUnlocked,
+          isLocked: !effectiveReinvestigateUnlocked,
         },
         {
           id: "c0-pin-suspects",
@@ -1497,7 +1517,7 @@ export function MainInvestigationCanvas({
           x: 0.22,
           y: 0.8,
           label: "Bản kết luận điều tra",
-          detail: isIndictmentSolved
+          detail: effectiveIndictmentSolved
             ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
             : "Lập bản cáo trạng gửi Viện Kiểm sát",
           color: "red" as const,
@@ -1523,13 +1543,13 @@ export function MainInvestigationCanvas({
           x: 0.42,
           y: 0.27,
           label: "Mở rộng điều tra",
-          detail: phoneLookupSuccess
+          detail: effectivePhoneSolved
             ? "Đã xác minh danh tính SĐT thành công"
             : "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
           color: "yellow" as const,
           pinColor: "yellow" as const,
           noteColor: "white" as const,
-          isSolved: phoneLookupSuccess,
+          isSolved: effectivePhoneSolved,
         },
         {
           id: "c0-pin-victim-khang",
@@ -1560,21 +1580,21 @@ export function MainInvestigationCanvas({
           id: "c0-pin-reinvestigate",
           x: 0.2,
           y: 0.35,
-          label: isReinvestigateUnlocked
+          label: effectiveReinvestigateUnlocked
             ? "Khám xét lại"
             : "Khám xét lại (Chờ phê duyệt)",
-          detail: isReinvestigateUnlocked
+          detail: effectiveReinvestigateUnlocked
             ? "Mở biên bản tái khám xét hiện trường"
             : "Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]",
-          color: isReinvestigateUnlocked
+          color: effectiveReinvestigateUnlocked
             ? ("yellow" as const)
             : ("dark" as const),
           noteColor: "white" as const,
-          pinColor: isReinvestigateUnlocked
+          pinColor: effectiveReinvestigateUnlocked
             ? ("yellow" as const)
             : ("dark" as const),
           pulseBorder: isReinvestigateBlinking,
-          isLocked: !isReinvestigateUnlocked,
+          isLocked: !effectiveReinvestigateUnlocked,
         },
         {
           id: "c0-pin-suspects",
@@ -1591,7 +1611,7 @@ export function MainInvestigationCanvas({
           x: 0.22,
           y: 0.8,
           label: "Bản kết luận điều tra",
-          detail: isIndictmentSolved
+          detail: effectiveIndictmentSolved
             ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
             : "Lập bản cáo trạng gửi Viện Kiểm sát",
           color: "red" as const,
@@ -1657,7 +1677,7 @@ export function MainInvestigationCanvas({
           },
         ]
       : []),
-    ...suspects.map((suspect) => {
+    ...effectiveSuspects.map((suspect) => {
       const { canonicalId } = getCanonicalSuspectKey(suspect);
       return {
         id: `c0-conn-${canonicalId}`,
@@ -1729,6 +1749,39 @@ export function MainInvestigationCanvas({
               }
             >
               <Move className="size-4" />
+            </button>
+
+            {/* Toggle Show All Case Pins Button (Always visible for Admin) */}
+            <button
+              type="button"
+              onClick={() => {
+                detectiveAudio.playTypewriterClick();
+                setIsShowAllPinsPreview((prev) => {
+                  const next = !prev;
+                  toast.info(
+                    next
+                      ? "Đã hiển thị toàn bộ node vụ án (Preview Setup)"
+                      : "Đã trở về chế độ hiển thị theo tiến trình cốt truyện",
+                  );
+                  return next;
+                });
+              }}
+              className={`p-1.5 rounded-lg border transition-all ${
+                isShowAllPinsPreview
+                  ? "bg-amber-500/30 border-amber-400 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.55)] ring-1 ring-amber-400/60"
+                  : "bg-black/40 border-white/10 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
+              }`}
+              title={
+                isShowAllPinsPreview
+                  ? "Tắt hiển thị tất cả node (về theo cốt truyện)"
+                  : "Hiển thị tất cả node ghim (phục vụ căn chỉnh setup)"
+              }
+            >
+              {isShowAllPinsPreview ? (
+                <EyeOff className="size-4 text-amber-300" />
+              ) : (
+                <Eye className="size-4 text-zinc-400 hover:text-zinc-200" />
+              )}
             </button>
 
             {isEditMode && (

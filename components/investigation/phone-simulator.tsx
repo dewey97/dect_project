@@ -33,40 +33,46 @@ import { RecoveryStatusPanel } from './viewers/recovery-status-panel'
 import { IntegrityIndicator } from './viewers/integrity-indicator'
 
 interface PhoneSimulatorProps {
-  device: Device
-  threads: Conversation[]
-  photos: Photo[]
-  emails: Email[]
-  notes: Document[]
-  history: BrowserHistory[]
-  files: RecoveredFile[]
+  device?: Partial<Device>
+  threads?: Conversation[]
+  photos?: Photo[]
+  emails?: Email[]
+  notes?: Document[]
+  history?: BrowserHistory[]
+  files?: RecoveredFile[]
 }
 
-type ActiveApp =
-  | 'messages'
-  | 'calls'
-  | 'contacts'
-  | 'photos'
-  | 'emails'
-  | 'notes'
-  | 'voicemails'
-  | 'files'
-  | 'calendar'
-  | 'browser'
-  | null
+const DEFAULT_VICTIM_DEVICE: Device = {
+  id: 'dev-000-1',
+  caseId: 'case-000',
+  evidenceId: 'DEV-000-1',
+  label: 'iPhone 6s Plus (Vàng Hồng)',
+  kind: 'phone',
+  owner: 'Nguyễn Văn Khang',
+  locked: false,
+  status: 'unlocked',
+  recoveryLevel: 100,
+  lastUpdated: '24/07/2016 // 17:55',
+  description: 'Điện thoại cá nhân của nạn nhân Khang'
+}
 
 export function PhoneSimulator({
-  device,
-  threads,
-  photos,
-  notes,
-  history,
-  files
+  device = DEFAULT_VICTIM_DEVICE,
+  threads = [],
+  photos = [],
+  notes = [],
+  history = [],
+  files = []
 }: PhoneSimulatorProps) {
+  const activeDevice: Device = {
+    ...DEFAULT_VICTIM_DEVICE,
+    ...device
+  }
+
   return (
     <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center overflow-hidden p-0">
       <IPhoneFrame
-        device={device}
+        device={activeDevice}
         threads={threads}
         photos={photos}
         notes={notes}
@@ -76,3 +82,4 @@ export function PhoneSimulator({
     </div>
   )
 }
+

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { CASE_000_MASTER_STORYLINE } from '@/content/cases/case-000/storyline-data'
+import { CASE_000_MASTER_STORYLINE } from '@/lib/ai/storyline-context'
 
 export async function POST(req: Request) {
   try {

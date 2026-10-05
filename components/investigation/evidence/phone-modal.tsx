@@ -4,16 +4,6 @@ import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { PhoneSimulator } from '../phone-simulator'
-import {
-  devices000,
-  conversations000,
-  photos000,
-  emails000,
-  documents000,
-  browserHistory000,
-  files000
-} from '@/lib/content-service'
-import type { Device } from '@/lib/types'
 
 interface PhoneModalProps {
   isOpen: boolean
@@ -22,16 +12,6 @@ interface PhoneModalProps {
 
 export function PhoneModal({ isOpen, onClose }: PhoneModalProps) {
   if (!isOpen) return null
-
-  // Ensure device matches Device interface expected by PhoneSimulator
-  const victimDevice: Device = {
-    ...devices000[0],
-    locked: false,
-    status: 'unlocked',
-    recoveryLevel: 100,
-    lastUpdated: '24/07/2016 // 17:55',
-    description: devices000[0].description || 'Điện thoại cá nhân của nạn nhân Khang'
-  }
 
   return (
     <AnimatePresence>
@@ -59,18 +39,11 @@ export function PhoneModal({ isOpen, onClose }: PhoneModalProps) {
           className="w-full flex-1 min-h-0 max-w-[430px] flex flex-col items-center justify-center relative p-0 my-auto overflow-hidden"
         >
           <div className="w-full h-full overflow-hidden flex items-center justify-center p-0">
-            <PhoneSimulator
-              device={victimDevice}
-              threads={conversations000[victimDevice.id] || []}
-              photos={photos000[victimDevice.id] || []}
-              emails={emails000[victimDevice.id] || []}
-              notes={documents000[victimDevice.id] || []}
-              history={browserHistory000[victimDevice.id] || []}
-              files={files000[victimDevice.id] || []}
-            />
+            <PhoneSimulator />
           </div>
         </motion.div>
       </div>
     </AnimatePresence>
   )
 }
+

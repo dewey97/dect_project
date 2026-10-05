@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { TypewriterNarrator } from '@/components/investigation/evidence/typewriter-narrator'
 import { detectiveAudio } from '@/lib/investigation-audio'
-import { SUSPECT_NARRATIVES } from '@/content/cases/case-000/narrator'
+import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 interface CulpritEpilogueModalProps {
   isOpen: boolean
@@ -26,6 +26,7 @@ export function CulpritEpilogueModal({
   onOpenFollowupQuestion,
   onOpenIndictment
 }: CulpritEpilogueModalProps) {
+  const { checkpoints } = useCaseCheckpoints("case-000")
   const [isNarrativeComplete, setIsNarrativeComplete] = useState(false)
   const [internalChoice, setInternalChoice] = useState<'tin' | 'khong_tin' | null>(
     (choice === 'tin' || choice === 'khong_tin') ? choice : null
@@ -52,6 +53,11 @@ export function CulpritEpilogueModal({
   const showTwoChoiceButtons = (isVu || isTung || isHa) && isQuestionSolved && !internalChoice
   const suspectName = isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà'
 
+  const getCheckpointMonologue = (cpId: string) => {
+    const cp = checkpoints.find((c) => c.id === cpId);
+    return cp?.storyConfig?.monologue || "";
+  }
+
   let dateLabel = isVu
     ? 'THÔNG BÁO ĐIỀU TRA — LÊ QUANG VŨ'
     : isTung
@@ -61,19 +67,20 @@ export function CulpritEpilogueModal({
   let storyText = ''
 
   if (showTwoChoiceButtons) {
-    storyText = SUSPECT_NARRATIVES.questionPrompt(suspectName)
+    storyText = `Toàn bộ hành tung của ${suspectName} trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?`
   } else if (internalChoice === 'tin') {
-    storyText = SUSPECT_NARRATIVES.choiceTin(suspectName)
+    storyText = `Bạn lựa chọn tạm thời tin tưởng ${suspectName}.\n\nHãy chuyển hướng điều tra vụ án.\nTuy nhiên, xin các thám tử nhớ rằng: Một người chỉ được kết luận vô tội khi bạn tìm ra được hung thủ thực sự.`
   } else if (internalChoice === 'khong_tin') {
     if (isHa && haWarrantStep) {
-      storyText = SUSPECT_NARRATIVES.haWarrantProposal
+      storyText = getCheckpointMonologue('cp-000-2b')
     } else {
-      storyText = SUSPECT_NARRATIVES.choiceKhongTin(suspectName)
+      storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`
     }
   } else if (isHaMatchedAll) {
-    storyText = SUSPECT_NARRATIVES.haFinalConclusion
+    storyText = getCheckpointMonologue('cp-epilogue-ha')
   } else {
-    storyText = SUSPECT_NARRATIVES.suspectBreakdown(suspectName)
+    const epilogueCpId = isVu ? 'cp-epilogue-mai-vu' : isTung ? 'cp-epilogue-tung' : 'cp-epilogue-ha'
+    storyText = getCheckpointMonologue(epilogueCpId)
   }
 
   let ctaButtonText = 'TIẾP TỤC ĐIỀU TRA'

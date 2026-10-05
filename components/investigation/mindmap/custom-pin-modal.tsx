@@ -15,7 +15,6 @@ import { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
-import { checkpoints000 } from "@/content/cases/case-000/checkpoints";
 import { parseAnswersColumn } from "@/lib/cms/checkpoint-cms";
 
 interface CustomPinModalProps {
@@ -49,8 +48,8 @@ export function CustomPinModal({
   } | null>(null);
   const [isSolved, setIsSolved] = useState(false);
 
-  // Fetch live checkpoints with 100% full local fallback
-  const { checkpoints } = useCaseCheckpoints("case-000", checkpoints000);
+  // Fetch live checkpoints from Google Sheets Live CMS
+  const { checkpoints } = useCaseCheckpoints("case-000");
 
   // Auto-detect target checkpoint ID with smart fallback for suspect names & node IDs
   const targetCpId = useMemo(() => {

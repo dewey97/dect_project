@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ArrowRight, ArrowLeft, Trash2, Check, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
-import { checkpoints000 } from '@/content/cases/case-000/checkpoints'
 import { ClueCodePicker } from './clue-code-picker'
 
 interface SuspectItemData {

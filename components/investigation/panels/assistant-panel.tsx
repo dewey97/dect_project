@@ -13,7 +13,6 @@ import {
   RecoveredInformation,
   SystemAlert,
 } from "@/components/investigation/assistant-console-components";
-import { getAssistantConversation } from "@/lib/content-service";
 import { getActiveCase } from "@/lib/mock-data";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import {
@@ -81,29 +80,6 @@ export function AssistantPanel({
   >("root");
 
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  // Load dynamic content from Content Engine Layer
-  useEffect(() => {
-    async function loadIntel() {
-      const activeCase = await getActiveCase();
-      const queryId =
-        activeCase?.id === "case-01"
-          ? "case-001"
-          : activeCase?.id || "case-001";
-      const data = await getAssistantConversation(queryId);
-      if (data) {
-        setIntel(data);
-        setMessages([
-          {
-            id: "init-asst",
-            type: "assistant",
-            text: data.welcomeMessage,
-          },
-        ]);
-      }
-    }
-    loadIntel();
-  }, []);
 
   // Auto scroll to bottom
   useEffect(() => {

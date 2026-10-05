@@ -220,3 +220,18 @@ export interface PhaseNarrative {
   /** Đoạn độc thoại dẫn truyện (xuống dòng đôi = ngắt đoạn). */
   monologue: string;
 }
+
+/** Phát hiện điều tra trong sổ tay ghi chép */
+export interface Finding {
+  id: string;
+  phase: number;
+  title: string;
+  description: string;
+  evidenceRef: string;
+  // Mảng các nhóm từ khóa bắt buộc — người chơi phải nhập khớp ít nhất 1 từ đồng nghĩa ở MỖI nhóm
+  keywordGroups: string[][];
+  hint: string;
+  // Key Finding kích hoạt mở khóa chặng tiếp theo
+  isKeyFinding?: boolean;
+}
+

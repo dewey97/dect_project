@@ -1,4 +1,4 @@
-import { Finding } from "@/content/cases/case-000/findings";
+import type { Finding } from "@/lib/types";
 
 /**
  * Removes Vietnamese diacritics / accents and converts string to lowercase for fuzzy matching

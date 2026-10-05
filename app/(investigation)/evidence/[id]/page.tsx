@@ -1,17 +1,20 @@
-import {
-  getDevice,
-  getDeviceConversations,
-  getDevicePhotos,
-  getDeviceEmails,
-  getDeviceDocuments,
-  getDeviceBrowserHistory,
-  getDeviceFiles
-} from '@/lib/content-service'
 import { getActiveCase } from '@/lib/mock-data'
 import { DeviceSimulatorClient } from '@/components/investigation/device-simulator-client'
-import { EmptyState } from '@/components/investigation/empty-state'
-import { ArrowLeft, ShieldAlert } from 'lucide-react'
-import Link from 'next/link'
+import type { Device } from '@/lib/types'
+
+const DEFAULT_VICTIM_DEVICE: Device = {
+  id: 'dev-000-1',
+  caseId: 'case-000',
+  evidenceId: 'EV-PHONE-KHANG',
+  label: 'iPhone 6s Plus (Vàng Hồng)',
+  kind: 'phone',
+  owner: 'Nguyễn Văn Khang',
+  locked: false,
+  status: 'unlocked',
+  recoveryLevel: 100,
+  lastUpdated: '24/07/2016 // 17:55',
+  description: 'Điện thoại cá nhân của nạn nhân Khang'
+}
 
 export default async function DeviceSimulatorPage({
   params
@@ -19,52 +22,24 @@ export default async function DeviceSimulatorPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const activeCase = await getActiveCase()
 
-  const [activeCase, device] = await Promise.all([
-    getActiveCase(),
-    getDevice(id)
-  ])
-
-  if (!device) {
-    return (
-      <div suppressHydrationWarning className="pb-6 px-4">
-        <div className="pt-4">
-          <Link
-            href="/evidence"
-            className="flex items-center gap-1.5 font-sans text-[0.65rem] text-primary uppercase tracking-wider hover:-translate-x-0.5 active:scale-95 transition-all w-fit"
-          >
-            <ArrowLeft className="size-3.5" />
-            Quay lại Kho Vật chứng
-          </Link>
-        </div>
-        <EmptyState
-          icon={ShieldAlert}
-          title="Không tìm thấy vật chứng"
-          description="Vật chứng yêu cầu không tồn tại trong sổ đăng ký tiếp nhận."
-        />
-      </div>
-    )
+  const device: Device = {
+    ...DEFAULT_VICTIM_DEVICE,
+    id
   }
-
-  const [threads, photos, emails, notes, history, files] = await Promise.all([
-    getDeviceConversations(id),
-    getDevicePhotos(id),
-    getDeviceEmails(id),
-    getDeviceDocuments(id),
-    getDeviceBrowserHistory(id),
-    getDeviceFiles(id)
-  ])
 
   return (
     <DeviceSimulatorClient
       activeCase={activeCase}
       device={device}
-      threads={threads}
-      photos={photos}
-      emails={emails}
-      notes={notes}
-      history={history}
-      files={files}
+      threads={[]}
+      photos={[]}
+      emails={[]}
+      notes={[]}
+      history={[]}
+      files={[]}
     />
   )
 }
+
