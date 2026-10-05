@@ -123,14 +123,25 @@ async function main() {
     includeTabsContent: true,
   });
 
-  const docTabs = docInfo.data.tabs || [];
-  console.log(`📋 Tìm thấy ${docTabs.length} tabs trong Master Google Doc.`);
+  function getAllTabs(tabsList) {
+    let result = [];
+    for (const t of tabsList) {
+      result.push(t);
+      if (t.childTabs && t.childTabs.length > 0) {
+        result = result.concat(getAllTabs(t.childTabs));
+      }
+    }
+    return result;
+  }
+
+  const allFlattenedTabs = getAllTabs(docInfo.data.tabs || []);
+  console.log(`📋 Tìm thấy tổng cộng ${allFlattenedTabs.length} tabs (gồm cả tab phân cấp) trong Master Google Doc.`);
 
   let successCount = 0;
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  for (let i = 0; i < docTabs.length; i++) {
-    const tab = docTabs[i];
+  for (let i = 0; i < allFlattenedTabs.length; i++) {
+    const tab = allFlattenedTabs[i];
     const title = tab.tabProperties?.title;
     const tabId = tab.tabProperties?.tabId;
 
