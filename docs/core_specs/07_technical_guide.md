@@ -327,6 +327,11 @@ CREATE TABLE user_progress (
 * Mã hóa đáp án chuẩn: Tập đáp án `solution.json` chỉ nằm ở Serverless API Routes.
 * Client chỉ nhận phản hồi `VALIDATED` hoặc `REJECTED` từ Server.
 
+## 03. Nguyên Tắc Cổng Giao Diện & Dự Phòng Bất Đồng Bộ (Zero-Gate Async Blocking & Fallback Protocol)
+* **Tuyệt đối không bọc nút tương tác khởi đầu (UI Gate) vào điều kiện async chưa tải xong**: Các nút bắt đầu dẫn truyện (như `[ TRỐN TÌM ]`), nút vào game hoặc các trigger ban đầu của người chơi mới PHẢI luôn được render ngay lập tức mà không phụ thuộc vào trạng thái `loading` hay kết quả trả về của API/Google Sheets.
+* **Luôn có Static Fallback cho dẫn truyện & State cốt lõi**: Mọi hook dữ liệu động (như `useCaseNarratives`) phải có sẵn từ điển dữ liệu dự phòng `DEFAULT_NARRATIVES` để khi mạng chậm, offline hoặc Google Sheets đang query thì màn hình không bao giờ bị trả về `null` gây đen màn hình hay treo giao diện.
+* **Xử lý lưu trữ an toàn đa môi trường**: Mọi thao tác truy xuất `localStorage`/cookie phải đi qua bộ chuyển tiếp an toàn `lib/storage.ts` để không bao giờ quăng lỗi (throw exception) trong môi trường ẩn danh (Incognito), Safari ITP hoặc sandbox.
+
 ---
 
 <!-- END OF MERGED FILE: {src} -->
