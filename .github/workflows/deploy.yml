@@ -80,22 +80,13 @@ jobs:
             echo "🧹 Dọn dẹp images cũ..."
             docker image prune -f
 
-            echo "🌐 [4/4] Cấu hình Reverse Proxy & SSL cho xplore.vn..."
-            # 1. Tìm và cập nhật Caddyfile nếu có Caddy
-            CADDY_FILES=$(find /etc /var /opt /root -name "Caddyfile" 2>/dev/null || true)
-            for cfile in $CADDY_FILES; do
-              echo "Tìm thấy Caddyfile tại: $cfile"
-              if ! grep -q "xplore.vn" "$cfile"; then
-                echo -e "\nxplore.vn, www.xplore.vn {\n    reverse_proxy 127.0.0.1:3000\n}" >> "$cfile"
-                echo "Đã thêm xplore.vn vào $cfile"
-              fi
-            done
-            if systemctl is-active --quiet caddy; then
-              systemctl reload caddy || systemctl restart caddy || true
+            echo "🌐 [4/4] Cấu hình Nginx & SSL cho xplore.vn..."
+            if ! command -v nginx &> /dev/null; then
+              echo "Đang cài đặt Nginx & Certbot..."
+              apt-get update -y && apt-get install -y nginx certbot python3-certbot-nginx
             fi
-            # 2. Cấu hình Nginx nếu có
-            if command -v nginx &> /dev/null || systemctl is-active --quiet nginx; then
-              cat << 'EOF' > /etc/nginx/sites-available/xplore.vn
+
+            cat << 'EOF' > /etc/nginx/sites-available/xplore.vn
 server {
     listen 80;
     server_name xplore.vn www.xplore.vn;
@@ -113,13 +104,13 @@ server {
     }
 }
 EOF
-              mkdir -p /etc/nginx/sites-enabled
-              ln -sf /etc/nginx/sites-available/xplore.vn /etc/nginx/sites-enabled/
-              nginx -t && (systemctl reload nginx || nginx -s reload) || true
-              if command -v certbot &> /dev/null; then
-                certbot --nginx -d xplore.vn -d www.xplore.vn --non-interactive --agree-tos --register-unsafely-without-email || true
-              fi
-            fi
+            mkdir -p /etc/nginx/sites-enabled
+            ln -sf /etc/nginx/sites-available/xplore.vn /etc/nginx/sites-enabled/xplore.vn
+            rm -f /etc/nginx/sites-enabled/default || true
+            nginx -t && systemctl restart nginx || service nginx restart || true
+
+            echo "🔒 Đang xin chứng chỉ SSL Let's Encrypt cho xplore.vn..."
+            certbot --nginx -d xplore.vn -d www.xplore.vn --non-interactive --agree-tos --register-unsafely-without-email --redirect || true
 
             echo "✅ Triển khai hoàn tất! Kiểm tra container:"
             docker compose ps
