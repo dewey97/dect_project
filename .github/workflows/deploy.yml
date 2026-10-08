@@ -75,7 +75,7 @@ jobs:
             docker pull ghcr.io/dewey97/dect_project:latest
 
             echo "⚡ [3/3] Khởi chạy container..."
-            docker compose up -d --remove-orphans
+            docker compose up -d --force-recreate --remove-orphans
 
             echo "🧹 Dọn dẹp images cũ..."
             docker image prune -f
