@@ -78,35 +78,33 @@ export function PhaseUnlockedModal({
           {playExperience === "boardgame" ? (
             /* BOARD GAME MODE: PURE IMMERSIVE CINEMATIC STORYTELLING (NO RIGHT DIRECTIVE COLUMN) */
             <div className="relative z-20 flex-1 h-full flex flex-col justify-between items-center p-4 sm:p-8 max-w-3xl mx-auto w-full overflow-hidden">
-              {currentNarrative && (
-                <div className="space-y-6 w-full flex-1 flex flex-col items-start my-auto py-4 overflow-y-auto custom-scrollbar pr-1">
-                  {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
-                    <div className="py-16 flex flex-col items-center justify-center w-full my-auto">
-                      <button
-                        onClick={handleStartStory}
-                        className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
-                      >
-                        [ TRỐN TÌM ]
-                      </button>
+              <div className="space-y-6 w-full flex-1 flex flex-col items-start my-auto py-4 overflow-y-auto custom-scrollbar pr-1">
+                {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
+                  <div className="py-16 flex flex-col items-center justify-center w-full my-auto">
+                    <button
+                      onClick={handleStartStory}
+                      className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
+                    >
+                      [ TRỐN TÌM ]
+                    </button>
+                  </div>
+                ) : currentNarrative ? (
+                  <>
+                    <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between shrink-0">
+                      <span>{currentNarrative.date}</span>
                     </div>
-                  ) : (
-                    <>
-                      <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between shrink-0">
-                        <span>{currentNarrative.date}</span>
-                      </div>
 
-                      <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
-                        <TypewriterNarrator
-                          key={`bg-${unlockedModalData.unlockedPhase}-${currentNarrative.monologue}`}
-                          text={currentNarrative.monologue}
-                          speed={12}
-                          onComplete={() => setIsNarrativeComplete(true)}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
+                    <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
+                      <TypewriterNarrator
+                        key={`bg-${unlockedModalData.unlockedPhase}-${currentNarrative.monologue}`}
+                        text={currentNarrative.monologue}
+                        speed={12}
+                        onComplete={() => setIsNarrativeComplete(true)}
+                      />
+                    </div>
+                  </>
+                ) : null}
+              </div>
 
               {/* Clean Bottom Button - ONLY VISIBLE AFTER NARRATION COMPLETES */}
               {isNarrativeComplete && (
@@ -132,35 +130,33 @@ export function PhaseUnlockedModal({
             <div className="relative z-20 flex-1 h-full flex flex-col lg:grid lg:grid-cols-12 gap-0 overflow-hidden">
               {/* Left Column (60% width): Clean Pure Storytelling Screen */}
               <div className="h-[45vh] lg:h-full lg:col-span-7 border-b lg:border-b-0 lg:border-r border-[#261b12] p-4 lg:p-10 flex flex-col justify-start items-center bg-black overflow-y-auto custom-scrollbar shrink-0">
-                {currentNarrative && (
-                  <div className="space-y-6 max-w-xl mx-auto w-full flex flex-col items-start py-4 sm:py-6">
-                    {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
-                      <div className="py-12 flex flex-col items-center justify-center w-full my-auto">
-                        <button
-                          onClick={handleStartStory}
-                          className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
-                        >
-                          [ TRỐN TÌM ]
-                        </button>
+                <div className="space-y-6 max-w-xl mx-auto w-full flex flex-col items-start py-4 sm:py-6">
+                  {unlockedModalData.unlockedPhase === 0 && !isStoryStarted ? (
+                    <div className="py-12 flex flex-col items-center justify-center w-full my-auto">
+                      <button
+                        onClick={handleStartStory}
+                        className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
+                      >
+                        [ TRỐN TÌM ]
+                      </button>
+                    </div>
+                  ) : currentNarrative ? (
+                    <>
+                      <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between">
+                        <span>{currentNarrative.date}</span>
                       </div>
-                    ) : (
-                      <>
-                        <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between">
-                          <span>{currentNarrative.date}</span>
-                        </div>
 
-                        <div className="pt-2 w-full">
-                          <TypewriterNarrator
-                            key={`web-${unlockedModalData.unlockedPhase}-${currentNarrative.monologue}`}
-                            text={currentNarrative.monologue}
-                            speed={12}
-                            onComplete={() => setIsNarrativeComplete(true)}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
+                      <div className="pt-2 w-full">
+                        <TypewriterNarrator
+                          key={`web-${unlockedModalData.unlockedPhase}-${currentNarrative.monologue}`}
+                          text={currentNarrative.monologue}
+                          speed={12}
+                          onComplete={() => setIsNarrativeComplete(true)}
+                        />
+                      </div>
+                    </>
+                  ) : null}
+                </div>
               </div>
 
               {/* Right Column (40% width): Unlocked Archives */}
