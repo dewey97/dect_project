@@ -10,6 +10,7 @@
 Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
 
 - **⚙️ Technical Docs (Kỹ thuật hệ thống)**:
+  - CI/CD & VPS Deployment: [`docs/core_specs/12_cicd_deployment_guide.md`](docs/core_specs/12_cicd_deployment_guide.md)
   - Google Sheets Live CMS: [`docs/core_specs/10_google_sheets_cms.md`](docs/core_specs/10_google_sheets_cms.md)
   - Hướng dẫn kỹ thuật hệ thống: [`docs/core_specs/07_technical_guide.md`](docs/core_specs/07_technical_guide.md)
   - Cơ sở dữ liệu: [`docs/core_specs/08_database_schema.md`](docs/core_specs/08_database_schema.md)
