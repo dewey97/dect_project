@@ -11,6 +11,7 @@ Tài liệu về kiến trúc kỹ thuật, cơ sở dữ liệu, quy trình xu�
 | Tài Liệu | Nội Dung / Phạm Vi | Đường Dẫn |
 | :--- | :--- | :--- |
 | **Google Sheets Live CMS** | Đặc tả hệ thống Google Sheets CMS realtime, cấu trúc bảng và cú pháp đáp án | [`core_specs/10_google_sheets_cms.md`](core_specs/10_google_sheets_cms.md) |
+| **Analytics & Tracking Spec** | Đặc tả hệ thống đo lường Firebase Analytics/GA4, danh mục sự kiện và KPI game | [`core_specs/11_analytics_tracking_spec.md`](core_specs/11_analytics_tracking_spec.md) |
 | **Technical Guide** | Hướng dẫn setup, cấu trúc mã nguồn, quy trình engine và cơ sở dữ liệu | [`core_specs/07_technical_guide.md`](core_specs/07_technical_guide.md) |
 | **Database Schema** | Cấu trúc dữ liệu PostgreSQL / Supabase, bảng tiến trình điều tra | [`core_specs/08_database_schema.md`](core_specs/08_database_schema.md) |
 | **Design System & UI/UX** | Hệ thống màu sắc, typography trinh thám, tiêu chuẩn giao diện | [`core_specs/06_ux_ui_design_system.md`](core_specs/06_ux_ui_design_system.md) |

@@ -2,7 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { trackEvent } from '@/lib/analytics'
 import { LandingHero } from '@/components/public/landing-hero'
 import { CaseCarouselSection } from '@/components/public/case-carousel-section'
 import { WorldArchiveSection } from '@/components/public/world-archive-section'
@@ -13,6 +14,13 @@ import { LandingFooter } from '@/components/public/landing-footer'
 
 export default function MarketingLandingPage() {
   const [activePoster, setActivePoster] = useState<number>(0)
+
+  useEffect(() => {
+    trackEvent('landing_page_view', {
+      source: 'web_client',
+      timestamp: new Date().toISOString()
+    })
+  }, [])
 
   return (
     <main suppressHydrationWarning className="noir-spotlight relative flex flex-col min-h-dvh w-full items-center overflow-x-clip bg-background text-foreground font-sans">
