@@ -37,14 +37,14 @@ export function PhoneLookupModal({
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('veritas_phone_inputs')
+      const saved = localStorage.getItem('xplore_phone_inputs') ?? localStorage.getItem('veritas_phone_inputs')
       if (saved) {
         const data = JSON.parse(saved)
         setPhone1(data.phone1 || '')
         setPhone2(data.phone2 || '')
         setPhone3(data.phone3 || '')
       }
-      const approved = localStorage.getItem('veritas_reinvestigate_unlocked')
+      const approved = localStorage.getItem('xplore_reinvestigate_unlocked') ?? localStorage.getItem('veritas_reinvestigate_unlocked')
       if (approved === 'true') {
         setIsApproved(true)
       }
@@ -77,8 +77,8 @@ export function PhoneLookupModal({
     detectiveAudio.playStampSound()
     setIsApproved(true)
     try {
-      localStorage.setItem('veritas_phone_inputs', JSON.stringify({ phone1, phone2, phone3 }))
-      localStorage.setItem('veritas_phone_solved', 'true')
+      localStorage.setItem('xplore_phone_inputs', JSON.stringify({ phone1, phone2, phone3 }))
+      localStorage.setItem('xplore_phone_solved', 'true')
     } catch {}
 
     onSuccess('0988200991', 'Đã xác minh danh tính SĐT thành công.')

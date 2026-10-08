@@ -17,11 +17,11 @@ export function LeftActivityBar() {
       {/* Top Section: Brand Emblem */}
       <Link href="/" className="flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity group">
         <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-[inset_0_0_10px_rgba(199,145,55,0.1)] relative group-hover:border-primary/45 transition-colors">
-          <span className="font-serif text-lg font-black tracking-tighter">N</span>
+          <span className="font-serif text-lg font-black tracking-tighter">X</span>
           <span className="absolute bottom-1 right-1 size-1.5 rounded-full bg-primary" />
         </div>
         <span className="font-sans text-[0.5rem] font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors">
-          Nocturne
+          X-PLORE
         </span>
       </Link>
 

@@ -18,7 +18,7 @@ export function CheckpointsProvider({ children }: { children: React.ReactNode })
   // Load from localStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('veritas_completed_checkpoints')
+      const saved = localStorage.getItem('xplore_completed_checkpoints') ?? localStorage.getItem('veritas_completed_checkpoints')
       if (saved) {
         setCompletedCheckpointIds(JSON.parse(saved))
       }
@@ -32,7 +32,7 @@ export function CheckpointsProvider({ children }: { children: React.ReactNode })
       if (prev.includes(id)) return prev
       const next = [...prev, id]
       try {
-        localStorage.setItem('veritas_completed_checkpoints', JSON.stringify(next))
+        localStorage.setItem('xplore_completed_checkpoints', JSON.stringify(next))
       } catch {}
       return next
     })

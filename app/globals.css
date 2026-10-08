@@ -205,7 +205,7 @@
     @apply font-mono text-[0.65rem] uppercase tracking-[0.15em];
   }
 
-  /* The NOCTURNE wordmark. */
+  /* The X-PLORE wordmark. */
   .label-brand {
     @apply font-mono text-xs font-semibold uppercase tracking-[0.3em];
   }

@@ -422,7 +422,7 @@ export function CaseActivation() {
                     <div className="mt-auto pt-8 flex items-center justify-between border-t border-[#2b1b0e]/20 opacity-75 font-mono text-[0.65rem] relative z-10">
                       <div className="flex items-center gap-2">
                         <FileCheck2 className="size-3.5 text-[#2b1b0e]" />
-                        <span className="font-bold">MÃ LƯU TRỮ VỤ ÁN: VERITAS-{cItem.code.replace(' ', '')}-99</span>
+                        <span className="font-bold">MÃ LƯU TRỮ VỤ ÁN: XPLORE-{cItem.code.replace(' ', '')}-99</span>
                       </div>
                       <span className="font-bold uppercase tracking-wider">BAN ĐIỀU TRẠ HỒ SƠ MẬT</span>
                     </div>

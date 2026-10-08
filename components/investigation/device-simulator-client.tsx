@@ -137,7 +137,7 @@ export function DeviceSimulatorClient({
 
       {/* 5. Chain of Custody / Integrity Indicator */}
       <IntegrityIndicator
-        recoveredBy="ĐTV. NOCTURNE"
+        recoveredBy="ĐTV. X-PLORE"
         timestamp={device.lastUpdated}
         integrityStatus={device.recoveryLevel === 100 ? 'secured' : 'analyzing'}
         chainOfCustody="BIÊN BẢN HỢP LỆ"

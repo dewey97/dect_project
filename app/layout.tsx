@@ -28,11 +28,11 @@ export const metadata: Metadata = {
   description:
     'This is my website.',
   generator: 'v0.app',
-  applicationName: 'NOCTURNE',
+  applicationName: 'X-PLORE',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'NOCTURNE',
+    title: 'X-PLORE',
   },
   icons: {
     icon: [

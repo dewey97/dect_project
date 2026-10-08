@@ -76,7 +76,7 @@ export function LandingFooter() {
       </div>
 
       <div className="w-full max-w-6xl mx-auto px-6 border-t border-border/10 pt-6 text-center text-xs text-muted-foreground/60">
-        <span>© 2026 Nocturne Inc. Bảo lưu mọi quyền truy cập hệ thống.</span>
+        <span>© 2026 X-PLORE Inc. Bảo lưu mọi quyền truy cập hệ thống.</span>
       </div>
     </footer>
   )

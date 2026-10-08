@@ -21,8 +21,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   // Load defaults from localStorage if available
   useEffect(() => {
     try {
-      const savedLeft = localStorage.getItem('nocturne_leftSidebar')
-      const savedRight = localStorage.getItem('nocturne_rightSidebar')
+      const savedLeft = localStorage.getItem('xplore_leftSidebar') ?? localStorage.getItem('nocturne_leftSidebar')
+      const savedRight = localStorage.getItem('xplore_rightSidebar') ?? localStorage.getItem('nocturne_rightSidebar')
 
       if (savedLeft !== null) setLeftSidebarOpen(savedLeft === 'true')
       if (savedRight !== null) setRightSidebarOpen(savedRight === 'true')
@@ -33,17 +33,17 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const handleSetLeft = (val: boolean) => {
     setLeftSidebarOpen(val)
-    try { localStorage.setItem('nocturne_leftSidebar', String(val)) } catch {}
+    try { localStorage.setItem('xplore_leftSidebar', String(val)) } catch {}
   }
 
   const handleSetRight = (val: boolean) => {
     setRightSidebarOpen(val)
-    try { localStorage.setItem('nocturne_rightSidebar', String(val)) } catch {}
+    try { localStorage.setItem('xplore_rightSidebar', String(val)) } catch {}
   }
 
   const handleSetTech = (val: boolean) => {
     setShowTechDetails(val)
-    try { localStorage.setItem('nocturne_techDetails', String(val)) } catch {}
+    try { localStorage.setItem('xplore_techDetails', String(val)) } catch {}
   }
 
   return (

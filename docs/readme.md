@@ -10,6 +10,7 @@ Tài liệu về kiến trúc kỹ thuật, cơ sở dữ liệu, quy trình xu�
 
 | Tài Liệu | Nội Dung / Phạm Vi | Đường Dẫn |
 | :--- | :--- | :--- |
+| **CI/CD & VPS Deployment** | Hướng dẫn kiến trúc CI/CD tự động hóa qua GitHub Actions, GHCR và Docker VPS | [`core_specs/12_cicd_deployment_guide.md`](core_specs/12_cicd_deployment_guide.md) |
 | **Google Sheets Live CMS** | Đặc tả hệ thống Google Sheets CMS realtime, cấu trúc bảng và cú pháp đáp án | [`core_specs/10_google_sheets_cms.md`](core_specs/10_google_sheets_cms.md) |
 | **Analytics & Tracking Spec** | Đặc tả hệ thống đo lường Firebase Analytics/GA4, danh mục sự kiện và KPI game | [`core_specs/11_analytics_tracking_spec.md`](core_specs/11_analytics_tracking_spec.md) |
 | **Technical Guide** | Hướng dẫn setup, cấu trúc mã nguồn, quy trình engine và cơ sở dữ liệu | [`core_specs/07_technical_guide.md`](core_specs/07_technical_guide.md) |

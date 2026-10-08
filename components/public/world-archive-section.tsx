@@ -14,7 +14,7 @@ export function WorldArchiveSection() {
       </div>
 
       <div className="hidden lg:block absolute top-[28%] left-0 w-36 shadow-lg rotate-[7deg] hover:rotate-[3deg] hover:scale-105 hover:z-35 transition-all duration-300 select-none cursor-pointer overflow-hidden z-10">
-        <img src="/nocturne_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
+        <img src="/xplore_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
       </div>
 
       <div className="hidden lg:block absolute top-[55%] left-14 w-32 shadow-md rotate-[-5deg] hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-300 select-none cursor-pointer overflow-hidden">
@@ -22,7 +22,7 @@ export function WorldArchiveSection() {
       </div>
 
       <div className="hidden lg:block absolute bottom-16 left-4 w-40 shadow-lg rotate-[9deg] hover:rotate-[4deg] hover:scale-105 hover:z-35 transition-all duration-300 select-none cursor-pointer overflow-hidden z-10">
-        <img src="/nocturne_case_north.png" alt="" className="w-full h-full object-cover filter sepia-[0.15] brightness-88" />
+        <img src="/xplore_case_north.png" alt="" className="w-full h-full object-cover filter sepia-[0.15] brightness-88" />
       </div>
 
       {/* 2 PHOTOS ON TOP OF FOLDER STACK — right side */}
@@ -99,7 +99,7 @@ export function WorldArchiveSection() {
             <img src="/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.2] brightness-90" />
           </div>
           <div className="overflow-hidden shadow-md rotate-[3deg]">
-            <img src="/nocturne_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
+            <img src="/xplore_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
           </div>
         </div>
       </div>

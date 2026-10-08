@@ -147,7 +147,7 @@ export function InteractiveFileFolder3D({
       ctx.fillStyle = '#2b1b0e'
       ctx.font = 'bold 16px monospace'
       ctx.textAlign = 'left'
-      ctx.fillText(`MÃ CHUYÊN ÁN: VERITAS-${file.code.replace(' ', '')}`, 24, 352)
+      ctx.fillText(`MÃ CHUYÊN ÁN: XPLORE-${file.code.replace(' ', '')}`, 24, 352)
     }
     const texture = new THREE.CanvasTexture(canvas)
     return texture

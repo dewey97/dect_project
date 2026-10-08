@@ -34,8 +34,8 @@ export function LandingFeaturesSection() {
 
             <div className="w-full md:w-72 shrink-0 relative aspect-[4/3] rounded border border-border/40 overflow-hidden bg-accent/10 shadow-lg">
               <img
-                src="/nocturne_game_box.png"
-                alt="Nocturne Case Files Box"
+                src="/xplore_game_box.png"
+                alt="X-PLORE Case Files Box"
                 className="w-full h-full object-cover filter brightness-[0.85] sepia-[0.1]"
               />
             </div>
@@ -47,7 +47,7 @@ export function LandingFeaturesSection() {
       <section id="loiich" className="w-full max-w-6xl px-6 py-16 z-10 border-t border-border/20 bg-card/5">
         <div className="text-center max-w-2xl mx-auto mb-12 flex flex-col items-center">
           <h2 className="text-2xl lg:text-3xl font-black mt-2 uppercase">
-            Tại Sao Nên Chọn Nocturne?
+            Tại Sao Nên Chọn X-PLORE?
           </h2>
         </div>
 
@@ -95,7 +95,7 @@ export function LandingFeaturesSection() {
                 TIN KHẨN: MỞ HỘP LÀ PHÁ ÁN NGAY
               </h3>
               <p className="font-sans text-xs leading-relaxed text-zinc-700">
-                Hãy quên đi những cuốn luật chơi dày cộp tẻ nhạt. Với Nocturne, bạn chỉ cần xé bao bì niêm phong tang vật, mở cuốn thư từ ngỏ và bắt đầu cuộc truy vết lập tức. Bản tin ghi nhận: Trải nghiệm nhập vai tức thì đang gây nghiện diện rộng.
+                Hãy quên đi những cuốn luật chơi dày cộp tẻ nhạt. Với X-PLORE, bạn chỉ cần xé bao bì niêm phong tang vật, mở cuốn thư từ ngỏ và bắt đầu cuộc truy vết lập tức. Bản tin ghi nhận: Trải nghiệm nhập vai tức thì đang gây nghiện diện rộng.
               </p>
             </div>
 
@@ -164,7 +164,7 @@ export function LandingFeaturesSection() {
               <span className="font-mono text-[0.55rem] text-muted-foreground uppercase font-bold tracking-widest block mb-2">HỖ TRỢ TRỰC TUYẾN // HINTS</span>
               <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Góc Trợ Giúp & Két Bằng Chứng</h3>
               <p className="text-xs text-muted-foreground mt-3 leading-relaxed font-sans">
-                Hệ thống hỗ trợ gợi ý bảo mật từng bước của Nocturne sẽ giúp bạn khai mở manh mối mà không làm mất đi niềm vui tự mình khám phá. Hoặc truy cập Két Bằng Chứng trực tuyến để xem các bản vá dữ liệu.
+                Hệ thống hỗ trợ gợi ý bảo mật từng bước của X-PLORE sẽ giúp bạn khai mở manh mối mà không làm mất đi niềm vui tự mình khám phá. Hoặc truy cập Két Bằng Chứng trực tuyến để xem các bản vá dữ liệu.
               </p>
             </div>
 
