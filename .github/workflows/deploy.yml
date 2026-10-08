@@ -80,5 +80,41 @@ jobs:
             echo "🧹 Dọn dẹp images cũ..."
             docker image prune -f
 
+            echo "🌐 [4/4] Cấu hình Reverse Proxy & SSL cho xplore.vn..."
+            if command -v caddy &> /dev/null || systemctl is-active --quiet caddy; then
+              echo "Phát hiện Caddy, cập nhật cấu hình xplore.vn..."
+              if [ -f /etc/caddy/Caddyfile ]; then
+                if ! grep -q "xplore.vn" /etc/caddy/Caddyfile; then
+                  echo -e "\nxplore.vn, www.xplore.vn {\n    reverse_proxy 127.0.0.1:3000\n}" >> /etc/caddy/Caddyfile
+                  systemctl reload caddy || caddy reload --config /etc/caddy/Caddyfile || true
+                fi
+              fi
+            elif command -v nginx &> /dev/null || systemctl is-active --quiet nginx; then
+              echo "Phát hiện Nginx, cập nhật cấu hình xplore.vn..."
+              cat << 'EOF' > /etc/nginx/sites-available/xplore.vn
+server {
+    listen 80;
+    server_name xplore.vn www.xplore.vn;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+EOF
+              ln -sf /etc/nginx/sites-available/xplore.vn /etc/nginx/sites-enabled/
+              nginx -t && systemctl reload nginx || true
+              if command -v certbot &> /dev/null; then
+                certbot --nginx -d xplore.vn -d www.xplore.vn --non-interactive --agree-tos --register-unsafely-without-email || true
+              fi
+            fi
+
             echo "✅ Triển khai hoàn tất! Kiểm tra container:"
             docker compose ps
