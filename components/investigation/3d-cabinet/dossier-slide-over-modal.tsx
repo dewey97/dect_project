@@ -96,7 +96,6 @@ export function DossierSlideOverModal({
 
                   <input
                     type="text"
-                    autoFocus
                     spellCheck={false}
                     placeholder="NX-4471"
                     value={inputCode}

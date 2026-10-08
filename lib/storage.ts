@@ -30,6 +30,22 @@ export function setStorageItem(key: string, value: string): void {
   } catch {}
 }
 
+export function getStorageJson<T>(key: string, defaultValue: T): T {
+  const item = getStorageItem(key)
+  if (item === null || item === undefined || item === '') return defaultValue
+  try {
+    return JSON.parse(item) as T
+  } catch {
+    return defaultValue
+  }
+}
+
+export function setStorageJson<T>(key: string, value: T): void {
+  try {
+    setStorageItem(key, JSON.stringify(value))
+  } catch {}
+}
+
 export function removeStorageItem(key: string): void {
   if (typeof window === 'undefined') return
   try {

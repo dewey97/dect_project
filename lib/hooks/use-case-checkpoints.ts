@@ -91,13 +91,13 @@ export function useCaseCheckpoints(caseId: string = "case-000"): CaseCheckpoints
     data: checkpointRows,
     loading: cpLoading,
     refetch: refetchCp,
-  } = usePhoneData<SheetCheckpointRow>("checkpoints");
+  } = usePhoneData<SheetCheckpointRow>("checkpoints", caseId);
 
   const {
     data: evidenceRows,
     loading: evLoading,
     refetch: refetchEv,
-  } = usePhoneData<SheetEvidenceRow>("evidences");
+  } = usePhoneData<SheetEvidenceRow>("evidences", caseId);
 
   const refetch = () => {
     refetchCp();

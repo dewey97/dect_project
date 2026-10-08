@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, Smartphone, RefreshCw, X, Search, Box, BookOpen } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
+import { emitInvestigationEvent } from "@/lib/investigation-events";
 
 interface QuickActionFabProps {
   onOpenPhone: () => void;
@@ -76,8 +77,8 @@ export function QuickActionFab({
                 handleAction(() => {
                   if (onOpenGuide) {
                     onOpenGuide();
-                  } else if (typeof window !== "undefined") {
-                    window.dispatchEvent(new CustomEvent("open-gameplay-guide-modal"));
+                  } else {
+                    emitInvestigationEvent("OPEN_GUIDE");
                   }
                 })
               }
@@ -94,8 +95,8 @@ export function QuickActionFab({
                 handleAction(() => {
                   if (onOpenHint) {
                     onOpenHint();
-                  } else if (typeof window !== "undefined") {
-                    window.dispatchEvent(new CustomEvent("open-hint-modal"));
+                  } else {
+                    emitInvestigationEvent("OPEN_HINT");
                   }
                 })
               }

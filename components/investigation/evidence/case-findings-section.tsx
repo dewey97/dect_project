@@ -5,7 +5,7 @@ import { Search, CheckCircle2, BookOpen, Bookmark, FileText, Trash2, Edit3 } fro
 import type { Finding } from '@/lib/types'
 import { findMatchingFinding } from '@/lib/finding-matcher'
 import { detectiveAudio } from '@/lib/investigation-audio'
-import { getStorageItem, setStorageItem, removeStorageItem } from '@/lib/storage'
+import { getStorageItem, setStorageItem, removeStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
 
 export interface CustomNote {
   id: string
@@ -37,12 +37,7 @@ export function CaseFindingsSection({
   const [customNotes, setCustomNotes] = useState<CustomNote[]>([])
 
   useEffect(() => {
-    try {
-      const saved = getStorageItem('custom_notes')
-      if (saved) {
-        setCustomNotes(JSON.parse(saved))
-      }
-    } catch {}
+    setCustomNotes(getStorageJson<CustomNote[]>('custom_notes', []))
   }, [])
 
   const saveCustomNote = (text: string) => {
@@ -53,14 +48,14 @@ export function CaseFindingsSection({
     }
     const updated = [newNote, ...customNotes]
     setCustomNotes(updated)
-    setStorageItem('custom_notes', JSON.stringify(updated))
+    setStorageJson('custom_notes', updated)
   }
 
   const deleteCustomNote = (id: string) => {
     detectiveAudio.playPaperRustle()
     const updated = customNotes.filter((n) => n.id !== id)
     setCustomNotes(updated)
-    setStorageItem('custom_notes', JSON.stringify(updated))
+    setStorageJson('custom_notes', updated)
   }
 
   const phaseFindings = allFindings.filter((f) => f.phase === currentPhase)

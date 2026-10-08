@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import { getStorageItem, setStorageItem } from '@/lib/storage'
+import { getStorageJson, setStorageJson } from '@/lib/storage'
 
 interface CheckpointsContextType {
   completedCheckpointIds: string[]
@@ -18,19 +18,14 @@ export function CheckpointsProvider({ children }: { children: React.ReactNode })
 
   // Load from storage
   useEffect(() => {
-    const saved = getStorageItem('completed_checkpoints')
-    if (saved) {
-      try {
-        setCompletedCheckpointIds(JSON.parse(saved))
-      } catch {}
-    }
+    setCompletedCheckpointIds(getStorageJson<string[]>('completed_checkpoints', []))
   }, [])
 
   const completeCheckpoint = (id: string) => {
     setCompletedCheckpointIds((prev) => {
       if (prev.includes(id)) return prev
       const next = [...prev, id]
-      setStorageItem('completed_checkpoints', JSON.stringify(next))
+      setStorageJson('completed_checkpoints', next)
       return next
     })
   }

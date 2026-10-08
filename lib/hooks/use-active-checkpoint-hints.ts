@@ -27,8 +27,9 @@ export interface ActiveCheckpointHints {
 export function useActiveCheckpointHints(
   checkpointId: string,
   fallbackHints: string[] = [],
+  caseId: string = "case-000",
 ): ActiveCheckpointHints {
-  const { data, loading } = usePhoneData<SheetCheckpointRow>("checkpoints");
+  const { data, loading } = usePhoneData<SheetCheckpointRow>("checkpoints", caseId);
 
   return useMemo(() => {
     const row = data.find(
@@ -56,7 +57,8 @@ export function useActiveCheckpointHint(
   checkpointId: string,
   level: number,
   fallbackHints: string[] = [],
+  caseId: string = "case-000",
 ): { hint: string; total: number } {
-  const { hints } = useActiveCheckpointHints(checkpointId, fallbackHints);
+  const { hints } = useActiveCheckpointHints(checkpointId, fallbackHints, caseId);
   return { hint: getSheetHintLevel(hints, level), total: hints.length };
 }

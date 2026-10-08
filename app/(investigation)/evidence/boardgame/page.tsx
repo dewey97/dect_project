@@ -26,18 +26,17 @@ import {
   setStorageItem,
   clearInvestigationStorage,
 } from "@/lib/storage";
+import { useInvestigationEvent } from "@/lib/investigation-events";
+
+type ActiveModal = "phone" | "reinvestigate" | "epilogue" | "hint" | null;
 
 export default function BoardGameCompanionPage() {
   const router = useRouter();
   const { completedCheckpointIds, completeCheckpoint } = useCheckpoints();
   const { checkpoints } = useCaseCheckpoints("case-000");
 
-  // Phone, Reinvestigation, Epilogue and Hint modals
-  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-  const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] =
-    useState(false);
-  const [isEpilogueOpen, setIsEpilogueOpen] = useState(false);
-  const [isHintModalOpen, setIsHintModalOpen] = useState(false);
+  // Single modal state
+  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [isJumpscareActive, setIsJumpscareActive] = useState(false);
 
   // Checkpoint questions state
@@ -60,6 +59,12 @@ export default function BoardGameCompanionPage() {
   const [unlockedModalData, setUnlockedModalData] =
     useState<UnlockedModalData | null>(null);
 
+  // Event bus listeners
+  useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
+  useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
+  useInvestigationEvent("OPEN_HINT", () => setActiveModal("hint"));
+  useInvestigationEvent("OPEN_REINVESTIGATE", () => setActiveModal("reinvestigate"));
+
   useEffect(() => {
     setStorageItem("play_experience", "boardgame");
     const isIntroSeen = getStorageItem("intro_seen");
@@ -70,28 +75,6 @@ export default function BoardGameCompanionPage() {
         newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
       });
     }
-
-    const handleOpenEpilogue = () => setIsEpilogueOpen(true);
-    const handleOpenPhone = () => setIsPhoneModalOpen(true);
-    const handleOpenHint = () => setIsHintModalOpen(true);
-
-    window.addEventListener("open-epilogue-modal", handleOpenEpilogue);
-    window.addEventListener("open-phone-modal", handleOpenPhone);
-    window.addEventListener("open-hint-modal", handleOpenHint);
-
-    const handleFirstUserInteraction = () => {
-      detectiveAudio.startRainSound();
-      window.removeEventListener("click", handleFirstUserInteraction);
-    };
-    window.addEventListener("click", handleFirstUserInteraction);
-
-    return () => {
-      window.removeEventListener("open-epilogue-modal", handleOpenEpilogue);
-      window.removeEventListener("open-phone-modal", handleOpenPhone);
-      window.removeEventListener("open-hint-modal", handleOpenHint);
-      window.removeEventListener("click", handleFirstUserInteraction);
-      detectiveAudio.stopRainSound();
-    };
   }, [completedCheckpointIds.length]);
 
   const handleAnswerSelect = (cpId: string, option: string) => {
@@ -187,9 +170,9 @@ export default function BoardGameCompanionPage() {
         onAnswerSelect={handleAnswerSelect}
         onSubmitAnswer={handleSubmitAnswer}
         onUnlockNextHint={unlockNextHint}
-        onOpenEpilogue={() => setIsEpilogueOpen(true)}
-        onOpenPhoneSimulator={() => setIsPhoneModalOpen(true)}
-        onOpenReinvestigation={() => setIsReinvestigateModalOpen(true)}
+        onOpenEpilogue={() => setActiveModal("epilogue")}
+        onOpenPhoneSimulator={() => setActiveModal("phone")}
+        onOpenReinvestigation={() => setActiveModal("reinvestigate")}
         onSwitchToWebMode={handleSwitchToWebMode}
         onProceedNextPhase={handleProceedNextPhase}
       />
@@ -209,39 +192,39 @@ export default function BoardGameCompanionPage() {
         isActive={isJumpscareActive}
         onComplete={() => {
           setIsJumpscareActive(false);
-          setIsEpilogueOpen(true);
+          setActiveModal("epilogue");
         }}
       />
 
       {/* POST-CASE EPILOGUE STORIES MODAL */}
       <EpilogueModal
-        isOpen={isEpilogueOpen}
-        onClose={() => setIsEpilogueOpen(false)}
+        isOpen={activeModal === "epilogue"}
+        onClose={() => setActiveModal(null)}
       />
 
       {/* QUICK ACTION FAB MENU */}
       <QuickActionFab
-        onOpenHint={() => setIsHintModalOpen(true)}
-        onOpenPhone={() => setIsPhoneModalOpen(true)}
+        onOpenHint={() => setActiveModal("hint")}
+        onOpenPhone={() => setActiveModal("phone")}
         onResetCase={resetFindingsProgress}
       />
 
       {/* HINT SYSTEM MODAL */}
       <HintModal
-        isOpen={isHintModalOpen}
-        onClose={() => setIsHintModalOpen(false)}
+        isOpen={activeModal === "hint"}
+        onClose={() => setActiveModal(null)}
       />
 
       {/* VICTIM PHONE SIMULATOR MODAL */}
       <PhoneModal
-        isOpen={isPhoneModalOpen}
-        onClose={() => setIsPhoneModalOpen(false)}
+        isOpen={activeModal === "phone"}
+        onClose={() => setActiveModal(null)}
       />
 
       {/* RE-INVESTIGATION CRIME SCENE MODAL */}
       <ReinvestigationModal
-        isOpen={isReinvestigateModalOpen}
-        onClose={() => setIsReinvestigateModalOpen(false)}
+        isOpen={activeModal === "reinvestigate"}
+        onClose={() => setActiveModal(null)}
       />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { getCanonicalSuspectKey } from '@/lib/cases/case-000-suspects'
-import { getStorageItem, setStorageItem } from '@/lib/storage'
+import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
 
 export interface SuspectItem {
   id: string
@@ -41,60 +41,36 @@ export function useBoardGameProgress() {
 
   // Load initial state from localStorage
   useEffect(() => {
-    try {
-      const savedSuspects = getStorageItem('canvas_suspects')
-      if (savedSuspects) {
-        const parsed = JSON.parse(savedSuspects)
-        const validList = parsed.filter((s: any) => s.id !== 'suspect-default-1')
-        const sanitized = sanitizeSuspectsList(validList)
-        setSuspects(sanitized)
-      }
+    const rawSuspects = getStorageJson<any[]>('canvas_suspects', [])
+    const validList = rawSuspects.filter((s) => s?.id !== 'suspect-default-1')
+    setSuspects(sanitizeSuspectsList(validList))
 
-      const savedSolvedFollowups = getStorageItem('solved_followups')
-      if (savedSolvedFollowups) {
-        try {
-          const parsed = JSON.parse(savedSolvedFollowups)
-          setSolvedFollowupQuestions(parsed)
-          if (parsed.includes('vu') && parsed.includes('tung')) {
-            setIsReinvestigateUnlocked(true)
-          }
-        } catch {}
-      }
+    const solvedFollowups = getStorageJson<('vu' | 'tung' | 'ha')[]>('solved_followups', [])
+    setSolvedFollowupQuestions(solvedFollowups)
+    if (
+      (solvedFollowups.includes('vu') && solvedFollowups.includes('tung')) ||
+      getStorageItem('reinvestigate_unlocked') === 'true'
+    ) {
+      setIsReinvestigateUnlocked(true)
+    }
 
-      if (getStorageItem('reinvestigate_unlocked') === 'true') {
-        setIsReinvestigateUnlocked(true)
-      }
-      if (getStorageItem('reinvestigate_opened') === 'true') {
-        setHasOpenedReinvestigation(true)
-      }
+    if (getStorageItem('reinvestigate_opened') === 'true') {
+      setHasOpenedReinvestigation(true)
+    }
 
-      const savedPhone = getStorageItem('phone_inputs')
-      if (savedPhone) {
-        try {
-          const parsed = JSON.parse(savedPhone)
-          if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
-            setPhoneLookupSuccess(true)
-          }
-        } catch {}
-      }
+    const phoneInputs = getStorageJson<Record<string, string>>('phone_inputs', {})
+    if (phoneInputs.phone1 || phoneInputs.phone2 || phoneInputs.phone3) {
+      setPhoneLookupSuccess(true)
+    }
 
-      const savedInvestigated = getStorageItem('investigated_suspects')
-      if (savedInvestigated) {
-        try {
-          const parsed = JSON.parse(savedInvestigated)
-          setInvestigatedSuspects(parsed)
-        } catch {}
-      }
+    setInvestigatedSuspects(getStorageJson<('vu' | 'tung' | 'ha')[]>('investigated_suspects', []))
 
-      if (getStorageItem('indictment_solved') === 'true') {
-        setIsIndictmentSolved(true)
-      }
-      const savedCulprit = getStorageItem('indictment_culprit') as 'vu' | 'tung' | 'ha' | null
-      if (savedCulprit) {
-        setSolvedCulprit(savedCulprit)
-      }
-    } catch (e) {
-      console.error('Failed to load boardgame progress from storage:', e)
+    if (getStorageItem('indictment_solved') === 'true') {
+      setIsIndictmentSolved(true)
+    }
+    const savedCulprit = getStorageItem('indictment_culprit') as 'vu' | 'tung' | 'ha' | null
+    if (savedCulprit) {
+      setSolvedCulprit(savedCulprit)
     }
   }, [sanitizeSuspectsList])
 
@@ -103,7 +79,7 @@ export function useBoardGameProgress() {
     setSuspects((prev) => {
       const nextList = typeof newSuspects === 'function' ? newSuspects(prev) : newSuspects
       const sanitized = sanitizeSuspectsList(nextList)
-      setStorageItem('canvas_suspects', JSON.stringify(sanitized))
+      setStorageJson('canvas_suspects', sanitized)
       return sanitized
     })
   }, [sanitizeSuspectsList])
@@ -126,7 +102,7 @@ export function useBoardGameProgress() {
     setInvestigatedSuspects((prev) => {
       if (prev.includes(culprit)) return prev
       const next = [...prev, culprit]
-      setStorageItem('investigated_suspects', JSON.stringify(next))
+      setStorageJson('investigated_suspects', next)
       return next
     })
   }, [])
@@ -135,7 +111,7 @@ export function useBoardGameProgress() {
     setSolvedFollowupQuestions((prev) => {
       if (prev.includes(culprit)) return prev
       const next = [...prev, culprit]
-      setStorageItem('solved_followups', JSON.stringify(next))
+      setStorageJson('solved_followups', next)
       if (next.includes('vu') && next.includes('tung')) {
         markReinvestigateUnlocked()
       }

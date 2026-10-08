@@ -18,7 +18,7 @@ import {
   getCheckpointHints,
   type SheetCheckpointRow,
 } from "@/lib/cms/checkpoint-cms";
-import { getStorageItem, setStorageItem } from "@/lib/storage";
+import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from "@/lib/storage";
 
 interface HintModalProps {
   isOpen: boolean;
@@ -53,31 +53,14 @@ function applySheetHints(
 }
 
 function getContextAwareHintStage(): ActiveHintGroup {
-  let isIndictmentSolved = false;
-  let isPhoneSolved = false;
-  let isReinvestigateUnlocked = false;
-  let investigatedSuspects: string[] = [];
-  let solvedFollowups: string[] = [];
-  let completedCheckpoints: string[] = [];
-
-  try {
-    isIndictmentSolved =
-      getStorageItem("indictment_solved") === "true";
-    isPhoneSolved =
-      getStorageItem("phone_solved") === "true" ||
-      !!getStorageItem("phone_inputs");
-    isReinvestigateUnlocked =
-      getStorageItem("reinvestigate_unlocked") === "true";
-
-    const inv = getStorageItem("investigated_suspects");
-    if (inv) investigatedSuspects = JSON.parse(inv);
-
-    const fol = getStorageItem("solved_followups");
-    if (fol) solvedFollowups = JSON.parse(fol);
-
-    const cp = getStorageItem("completed_checkpoints");
-    if (cp) completedCheckpoints = JSON.parse(cp);
-  } catch {}
+  const isIndictmentSolved = getStorageItem("indictment_solved") === "true";
+  const isPhoneSolved =
+    getStorageItem("phone_solved") === "true" ||
+    !!getStorageItem("phone_inputs");
+  const isReinvestigateUnlocked = getStorageItem("reinvestigate_unlocked") === "true";
+  const investigatedSuspects = getStorageJson<string[]>("investigated_suspects", []);
+  const solvedFollowups = getStorageJson<string[]>("solved_followups", []);
+  const completedCheckpoints = getStorageJson<string[]>("completed_checkpoints", []);
 
   // 1. CHUYÊN ÁN ĐÃ HOÀN TẤT
   if (
@@ -196,12 +179,9 @@ export function HintModal({ isOpen, onClose }: HintModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      try {
-        const saved = getStorageItem("hint_unlocked_levels");
-        if (saved) {
-          setUnlockedLevels(JSON.parse(saved));
-        }
-      } catch {}
+      setUnlockedLevels(
+        getStorageJson<Record<string, number>>("hint_unlocked_levels", {}),
+      );
       const rawStage = getContextAwareHintStage();
       const stage = applySheetHints(rawStage, sheetCheckpoints);
       setActiveStage(stage);
@@ -228,10 +208,7 @@ export function HintModal({ isOpen, onClose }: HintModalProps) {
     };
     setUnlockedLevels(updated);
     setActiveHintIdx(nextCount - 1);
-    setStorageItem(
-      "hint_unlocked_levels",
-      JSON.stringify(updated),
-    );
+    setStorageJson("hint_unlocked_levels", updated);
   };
 
   return (

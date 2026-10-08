@@ -56,6 +56,7 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
 
 - Giao diện phong cách hồ sơ trinh thám cổ điển/tối giản: Sử dụng typography sắc nét, màu sắc tài liệu cũ/chính luận.
 - Áp dụng nguyên tắc **`/taste`**: Không lạm dụng hiệu ứng neon sặc sỡ, đảm bảo trải nghiệm đọc hồ sơ chân thực trên cả Mobile và Desktop.
+- **Quy tắc Bàn phím & Focus Modal (Mobile UX Rule)**: Tuyệt đối **CẤM** sử dụng thuộc tính `autoFocus` hoặc gọi lệnh `.focus()` tự động khi mở bất kỳ Modal, Dialog, Popup hay Slide-over nào. Bàn phím ảo trên di động chỉ được phép bật lên khi người chơi chủ động chạm ngón tay vào ô nhập liệu (`<input>`, `<textarea>`), tránh che khuất nội dung và giật lag giao diện.
 
 ---
 

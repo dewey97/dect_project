@@ -44,22 +44,28 @@ import {
   getStorageItem,
   setStorageItem,
   clearInvestigationStorage,
+  getStorageJson,
 } from "@/lib/storage";
+import { useInvestigationEvent } from "@/lib/investigation-events";
+
+type ActiveModal =
+  | "phone"
+  | "reinvestigate"
+  | "epilogue"
+  | "hint"
+  | "mobile_pdf"
+  | null;
 
 export default function WebEvidencePage() {
   const router = useRouter();
   const activeCase = CASES.find((c) => c.id === "case-000");
 
-  // Modals & Audio
-  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
-  const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] =
-    useState(false);
-  const [isEpilogueOpen, setIsEpilogueOpen] = useState(false);
-  const [isHintModalOpen, setIsHintModalOpen] = useState(false);
+  // Single modal registry
+  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [isJumpscareActive, setIsJumpscareActive] = useState(false);
   const [isAudioMuted, setIsAudioMuted] = useState(detectiveAudio.isMuted);
 
-  // Unlocked phase tracking (read from localStorage / boardgame progress)
+  // Unlocked phase tracking (read from storage / boardgame progress)
   const [unlockedPhase, setUnlockedPhase] = useState<number>(0);
   const [unlockedModalData, setUnlockedModalData] =
     useState<UnlockedModalData | null>(null);
@@ -70,9 +76,6 @@ export default function WebEvidencePage() {
     data: CASE_000_PDFS[0],
   });
 
-  // Mobile PDF modal state
-  const [isMobilePdfOpen, setIsMobilePdfOpen] = useState(false);
-
   // Category filter: 'all' | 'pdf' | 'evidence'
   const [filterTab, setFilterTab] = useState<"all" | "pdf" | "evidence">("all");
 
@@ -80,6 +83,12 @@ export default function WebEvidencePage() {
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<
     "all" | number
   >("all");
+
+  // Event bus listeners
+  useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
+  useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
+  useInvestigationEvent("OPEN_HINT", () => setActiveModal("hint"));
+  useInvestigationEvent("OPEN_REINVESTIGATE", () => setActiveModal("reinvestigate"));
 
   useEffect(() => {
     setStorageItem("play_experience", "web");
@@ -94,7 +103,7 @@ export default function WebEvidencePage() {
     }
 
     // Check current unlocked phase from boardgame progress
-    const solvedFollowups = getStorageItem("solved_followups");
+    const solvedFollowups = getStorageJson<string[]>("solved_followups", []);
     const isReinvestigateUnlocked =
       getStorageItem("reinvestigate_unlocked") === "true";
     const isIndictmentSolved =
@@ -102,36 +111,11 @@ export default function WebEvidencePage() {
 
     if (isIndictmentSolved) {
       setUnlockedPhase(3);
-    } else if (
-      isReinvestigateUnlocked ||
-      (solvedFollowups && JSON.parse(solvedFollowups || "[]").length >= 2)
-    ) {
+    } else if (isReinvestigateUnlocked || solvedFollowups.length >= 2) {
       setUnlockedPhase(2);
     } else {
       setUnlockedPhase(1);
     }
-
-    const handleOpenEpilogue = () => setIsEpilogueOpen(true);
-    const handleOpenPhone = () => setIsPhoneModalOpen(true);
-    const handleOpenHint = () => setIsHintModalOpen(true);
-
-    window.addEventListener("open-epilogue-modal", handleOpenEpilogue);
-    window.addEventListener("open-phone-modal", handleOpenPhone);
-    window.addEventListener("open-hint-modal", handleOpenHint);
-
-    const handleFirstUserInteraction = () => {
-      detectiveAudio.startRainSound();
-      window.removeEventListener("click", handleFirstUserInteraction);
-    };
-    window.addEventListener("click", handleFirstUserInteraction);
-
-    return () => {
-      window.removeEventListener("open-epilogue-modal", handleOpenEpilogue);
-      window.removeEventListener("open-phone-modal", handleOpenPhone);
-      window.removeEventListener("open-hint-modal", handleOpenHint);
-      window.removeEventListener("click", handleFirstUserInteraction);
-      detectiveAudio.stopRainSound();
-    };
   }, []);
 
   const isPhaseUnlocked = useCallback(
@@ -145,20 +129,22 @@ export default function WebEvidencePage() {
   const handleSelectPdf = (doc: PDFDocument) => {
     if (!isPhaseUnlocked(doc.phase)) return;
     detectiveAudio.playTypewriterClick();
-    setIsPhoneModalOpen(false);
     setSelectedView({ type: "pdf", data: doc });
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      setIsMobilePdfOpen(true);
+      setActiveModal("mobile_pdf");
+    } else if (activeModal === "phone") {
+      setActiveModal(null);
     }
   };
 
   const handleSelectEvidence = (item: PhysicalEvidence) => {
     if (!isPhaseUnlocked(item.phase)) return;
     detectiveAudio.playGlassSound();
-    setIsPhoneModalOpen(false);
     setSelectedView({ type: "evidence", data: item });
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      setIsMobilePdfOpen(true);
+      setActiveModal("mobile_pdf");
+    } else if (activeModal === "phone") {
+      setActiveModal(null);
     }
   };
 
@@ -209,9 +195,9 @@ export default function WebEvidencePage() {
           {/* MAIN CANVAS */}
           <div className="flex-1 min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
-              onOpenPhoneSimulator={() => setIsPhoneModalOpen(true)}
-              onOpenReinvestigation={() => setIsReinvestigateModalOpen(true)}
-              onOpenEpilogue={() => setIsEpilogueOpen(true)}
+              onOpenPhoneSimulator={() => setActiveModal("phone")}
+              onOpenReinvestigation={() => setActiveModal("reinvestigate")}
+              onOpenEpilogue={() => setActiveModal("epilogue")}
             />
           </div>
         </div>
@@ -370,10 +356,10 @@ export default function WebEvidencePage() {
 
           {/* BOTTOM SECTION: DOCUMENT PREVIEW OR INLINE PHONE SIMULATOR */}
           <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-            {isPhoneModalOpen ? (
+            {activeModal === "phone" ? (
               <div className="flex-1 bg-[#120c08] border-2 border-[#543b27] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex flex-col relative items-center justify-center p-2 pt-10 min-h-0">
                 <button
-                  onClick={() => setIsPhoneModalOpen(false)}
+                  onClick={() => setActiveModal(null)}
                   className="absolute top-2 right-2 z-50 p-1.5 px-2.5 text-[#ad9885] hover:text-[#fef5ec] bg-[#24170e]/95 hover:bg-[#382618] rounded-full transition-colors cursor-pointer border border-[#543b27] shadow-lg flex items-center gap-1 text-[0.65rem] font-mono font-bold"
                   title="Đóng điện thoại"
                 >
@@ -407,20 +393,20 @@ export default function WebEvidencePage() {
         isActive={isJumpscareActive}
         onComplete={() => {
           setIsJumpscareActive(false);
-          setIsEpilogueOpen(true);
+          setActiveModal("epilogue");
         }}
       />
 
       {/* POST-CASE EPILOGUE STORIES MODAL */}
       <EpilogueModal
-        isOpen={isEpilogueOpen}
-        onClose={() => setIsEpilogueOpen(false)}
+        isOpen={activeModal === "epilogue"}
+        onClose={() => setActiveModal(null)}
       />
 
       {/* QUICK ACTION FAB MENU */}
       <QuickActionFab
-        onOpenHint={() => setIsHintModalOpen(true)}
-        onOpenPhone={() => setIsPhoneModalOpen(true)}
+        onOpenHint={() => setActiveModal("hint")}
+        onOpenPhone={() => setActiveModal("phone")}
         onOpenBoardGame={() => {
           detectiveAudio.playPaperRustle();
           router.push("/evidence/boardgame");
@@ -430,29 +416,29 @@ export default function WebEvidencePage() {
 
       {/* HINT SYSTEM MODAL */}
       <HintModal
-        isOpen={isHintModalOpen}
-        onClose={() => setIsHintModalOpen(false)}
+        isOpen={activeModal === "hint"}
+        onClose={() => setActiveModal(null)}
       />
 
       {/* VICTIM PHONE SIMULATOR MODAL */}
       <PhoneModal
-        isOpen={isPhoneModalOpen}
-        onClose={() => setIsPhoneModalOpen(false)}
+        isOpen={activeModal === "phone"}
+        onClose={() => setActiveModal(null)}
       />
 
       {/* RE-INVESTIGATION CRIME SCENE MODAL */}
       <ReinvestigationModal
-        isOpen={isReinvestigateModalOpen}
-        onClose={() => setIsReinvestigateModalOpen(false)}
+        isOpen={activeModal === "reinvestigate"}
+        onClose={() => setActiveModal(null)}
       />
 
       {/* MOBILE FULL SCREEN MODAL */}
       <PDFViewerModal
-        isOpen={isMobilePdfOpen}
+        isOpen={activeModal === "mobile_pdf"}
         selectedView={selectedView}
         pdfUrl={selectedView.type === "pdf" ? selectedView.data.url : null}
         title={selectedView.data.title}
-        onClose={() => setIsMobilePdfOpen(false)}
+        onClose={() => setActiveModal(null)}
       />
     </div>
   );

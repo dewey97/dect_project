@@ -881,7 +881,6 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
               <Search className="size-4 text-gray-400 shrink-0" />
               <input
                 type="text"
-                autoFocus
                 value={selectorSearch}
                 onChange={(e) => setSelectorSearch(e.target.value)}
                 placeholder={`Chọn ${pickingTarget === 'origin' ? 'Điểm bắt đầu (A)' : 'Điểm đến (B)'}...`}

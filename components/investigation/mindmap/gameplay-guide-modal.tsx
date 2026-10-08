@@ -17,6 +17,7 @@ import {
   GAMEPLAY_GUIDE_CONFIG,
   GuideSection
 } from '@/lib/guides/gameplay-guide-data'
+import { emitInvestigationEvent } from '@/lib/investigation-events'
 
 interface GameplayGuideModalProps {
   isOpen: boolean
@@ -76,8 +77,8 @@ export function GameplayGuideModal({
     onClose()
     if (onStartWalkthrough) {
       onStartWalkthrough()
-    } else if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('open-interactive-walkthrough'))
+    } else {
+      emitInvestigationEvent('OPEN_WALKTHROUGH')
     }
   }
 

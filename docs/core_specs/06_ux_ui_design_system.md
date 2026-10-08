@@ -12,6 +12,7 @@
 4. **Không ngõ cụt (No dead ends):** Mọi trạng thái trống hoặc bị khóa đều chỉ dẫn bước tiếp theo để tiến bộ.
 5. **Văn phong Diegetic (Trong thế giới game):** Sử dụng thuật ngữ nghiệp vụ: _hồ sơ vụ án, thiết bị thu giữ, vật chứng phục hồi, cấp độ bảo mật, thẻ ngành_ (không dùng _trang, điểm số, item_).
 6. **Tiến trình bất biến:** Không giả lập thao tác phá hủy; các nút phụ thuộc backend có trạng thái disabled kèm lý do rõ ràng.
+7. **Cấm Auto-Focus trên Modal (No Auto Virtual Keyboard):** Tuyệt đối không gắn `autoFocus` hoặc `.focus()` tự động khi modal vừa mở. Bàn phím ảo trên điện thoại chỉ được kích hoạt khi người dùng chủ động chạm tay vào ô nhập liệu, bảo toàn 100% tầm nhìn và bố cục tài liệu.
 
 ---
 

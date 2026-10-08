@@ -203,7 +203,6 @@ export function IndictmentModal({
                       if (errorMsg) setErrorMsg('')
                     }}
                     className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-sm sm:text-base text-[#0e2b5c] font-sans font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                    autoFocus
                   />
                 </div>
 

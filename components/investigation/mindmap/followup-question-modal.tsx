@@ -10,7 +10,7 @@ import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
 import { ClueCodePicker } from './clue-code-picker'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { isEvidenceMatching } from '@/lib/cases/case-000-clues'
-import { getStorageItem, setStorageItem } from '@/lib/storage'
+import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
 
 interface FollowupQuestionModalProps {
   isOpen: boolean
@@ -105,15 +105,10 @@ export function FollowupQuestionModal({
     if (isPhoneSolved) {
       setHasPhoneSolvedState(true)
     } else {
-      try {
-        const savedPhone = getStorageItem('phone_inputs')
-        if (savedPhone) {
-          const parsed = JSON.parse(savedPhone)
-          if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
-            setHasPhoneSolvedState(true)
-          }
-        }
-      } catch {}
+      const parsed = getStorageJson<Record<string, string>>('phone_inputs', {})
+      if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
+        setHasPhoneSolvedState(true)
+      }
     }
   }, [isPhoneSolved, isOpen])
 
@@ -128,28 +123,29 @@ export function FollowupQuestionModal({
   useEffect(() => {
     if (!culprit || !isOpen) return
     setErrorMsg('')
-    try {
-      if (culprit === 'ha') {
-        const savedHa = getStorageItem('followup_ha_matches')
-        if (savedHa) {
-          setHaTileSelections(JSON.parse(savedHa))
-        }
-      } else if (culprit === 'vu') {
-        const savedVu = getStorageItem('followup_vu')
-        if (savedVu) {
-          setVuTimeInput(savedVu)
-        } else {
-          setVuTimeInput('')
-        }
+    if (culprit === 'ha') {
+      setHaTileSelections(
+        getStorageJson<Record<string, string[]>>('followup_ha_matches', {
+          tile_ao_gio: [],
+          tile_lon_toc: [],
+          tile_thuoc_an_than: [],
+        }),
+      )
+    } else if (culprit === 'vu') {
+      const savedVu = getStorageItem('followup_vu')
+      if (savedVu) {
+        setVuTimeInput(savedVu)
       } else {
-        const saved = getStorageItem(`followup_${culprit}`)
-        if (saved) {
-          setSelectedOption(saved)
-        } else {
-          setSelectedOption(null)
-        }
+        setVuTimeInput('')
       }
-    } catch {}
+    } else {
+      const saved = getStorageItem(`followup_${culprit}`)
+      if (saved) {
+        setSelectedOption(saved)
+      } else {
+        setSelectedOption(null)
+      }
+    }
   }, [culprit, isOpen])
 
   useEffect(() => {
@@ -195,7 +191,7 @@ export function FollowupQuestionModal({
         [activeHaTileId]: nextList,
       }
 
-      setStorageItem('followup_ha_matches', JSON.stringify(updated))
+      setStorageJson('followup_ha_matches', updated)
 
       // Play success audio if just matched
       const nowMatched = nextList.some((id) => isEvidenceMatching(id, tile.validDocIds))
@@ -215,7 +211,7 @@ export function FollowupQuestionModal({
       tile_thuoc_an_than: ['49'],
     }
     setHaTileSelections(bypassedMatches)
-    setStorageItem('followup_ha_matches', JSON.stringify(bypassedMatches))
+    setStorageJson('followup_ha_matches', bypassedMatches)
   }
 
   const handleSubmitVu = (e: React.FormEvent) => {

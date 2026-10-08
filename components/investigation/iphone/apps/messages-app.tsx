@@ -24,6 +24,7 @@ import type { Conversation, Message } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
+import { getStorageJson, setStorageJson } from '@/lib/storage'
 
 interface MessagesAppProps {
   threads?: Conversation[]
@@ -126,12 +127,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     }
   })
 
-  // Load pinned clues from localStorage
+  // Load pinned clues from storage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('khang_phone_pinned_clues')
-      if (saved) setPinnedClueIds(JSON.parse(saved))
-    } catch {}
+    setPinnedClueIds(getStorageJson<string[]>('khang_phone_pinned_clues', []))
   }, [])
 
   // Audio playback ticker
@@ -164,9 +162,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   const togglePinClue = (clueId: string, title?: string) => {
     setPinnedClueIds((prev) => {
       const next = prev.includes(clueId) ? prev.filter((id) => id !== clueId) : [...prev, clueId]
-      try {
-        localStorage.setItem('khang_phone_pinned_clues', JSON.stringify(next))
-      } catch {}
+      setStorageJson('khang_phone_pinned_clues', next)
       return next
     })
     setPinnedNotification(pinnedClueIds.includes(clueId) ? 'Đã gỡ manh mối' : `Đã ghim: ${title || 'Manh mối'}`)

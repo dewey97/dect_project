@@ -412,7 +412,6 @@ export function AddSuspectModal({
                         if (errorMsg) setErrorMsg('')
                       }}
                       className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-4 py-2.5 text-base sm:text-lg text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                      autoFocus
                     />
                   </div>
 

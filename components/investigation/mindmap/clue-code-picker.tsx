@@ -160,7 +160,6 @@ export function ClueCodePicker({
                   }}
                   placeholder="Nhập SĐT..."
                   className="flex-1 min-w-0 px-2 py-1 bg-white border border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none"
-                  autoFocus
                 />
                 <button
                   type="button"
@@ -223,7 +222,6 @@ export function ClueCodePicker({
                   }}
                   placeholder="Nhập SĐT..."
                   className="flex-1 min-w-0 px-2 py-1 bg-white border border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none"
-                  autoFocus
                 />
                 <button
                   type="button"

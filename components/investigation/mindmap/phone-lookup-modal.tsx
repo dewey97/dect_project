@@ -6,7 +6,7 @@ import { X, Smartphone, ArrowRight, CheckCircle2, ArrowLeft } from 'lucide-react
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { isAdminBypassCode } from '@/lib/cases/admin-bypass'
-import { getStorageItem, setStorageItem } from '@/lib/storage'
+import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
 
 function isPhoneMatch(val: string, validKeywords: string[]): boolean {
   if (isAdminBypassCode(val)) return true
@@ -37,19 +37,15 @@ export function PhoneLookupModal({
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
-    try {
-      const saved = getStorageItem('phone_inputs')
-      if (saved) {
-        const data = JSON.parse(saved)
-        setPhone1(data.phone1 || '')
-        setPhone2(data.phone2 || '')
-        setPhone3(data.phone3 || '')
-      }
-      const approved = getStorageItem('reinvestigate_unlocked')
-      if (approved === 'true') {
-        setIsApproved(true)
-      }
-    } catch {}
+    const data = getStorageJson<Record<string, string>>('phone_inputs', {})
+    setPhone1(data.phone1 || '')
+    setPhone2(data.phone2 || '')
+    setPhone3(data.phone3 || '')
+
+    const approved = getStorageItem('reinvestigate_unlocked')
+    if (approved === 'true') {
+      setIsApproved(true)
+    }
   }, [isOpen])
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -77,7 +73,7 @@ export function PhoneLookupModal({
 
     detectiveAudio.playStampSound()
     setIsApproved(true)
-    setStorageItem('phone_inputs', JSON.stringify({ phone1, phone2, phone3 }))
+    setStorageJson('phone_inputs', { phone1, phone2, phone3 })
     setStorageItem('phone_solved', 'true')
 
     onSuccess('0988200991', 'Đã xác minh danh tính SĐT thành công.')
@@ -180,7 +176,6 @@ export function PhoneLookupModal({
                     if (errorMsg) setErrorMsg('')
                   }}
                   className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-base text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                  autoFocus
                 />
               </div>
 

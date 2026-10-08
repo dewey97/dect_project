@@ -68,7 +68,10 @@ import {
   setStorageItem,
   removeStorageItem,
   clearInvestigationStorage,
+  getStorageJson,
+  setStorageJson,
 } from "@/lib/storage";
+import { useInvestigationEvent, emitInvestigationEvent } from "@/lib/investigation-events";
 
 interface SuspectItem {
   id: string;
@@ -132,22 +135,15 @@ export function MainInvestigationCanvas({
   const zoomOpenTimeRef = React.useRef<number>(0);
 
   // Listen for open-gameplay-guide-modal and open-interactive-walkthrough custom events
-  useEffect(() => {
-    const handleOpenGuide = () => {
-      detectiveAudio.playPaperRustle();
-      setIsGameplayGuideOpen(true);
-    };
-    const handleOpenWalkthrough = () => {
-      detectiveAudio.playPaperRustle();
-      setIsWalkthroughOpen(true);
-    };
-    window.addEventListener("open-gameplay-guide-modal", handleOpenGuide);
-    window.addEventListener("open-interactive-walkthrough", handleOpenWalkthrough);
-    return () => {
-      window.removeEventListener("open-gameplay-guide-modal", handleOpenGuide);
-      window.removeEventListener("open-interactive-walkthrough", handleOpenWalkthrough);
-    };
-  }, []);
+  useInvestigationEvent("OPEN_GUIDE", () => {
+    detectiveAudio.playPaperRustle();
+    setIsGameplayGuideOpen(true);
+  });
+
+  useInvestigationEvent("OPEN_WALKTHROUGH", () => {
+    detectiveAudio.playPaperRustle();
+    setIsWalkthroughOpen(true);
+  });
 
   const handleOpenPhotoZoom = useCallback(
     (url: string, coords?: { clientX: number; clientY: number }) => {
@@ -451,36 +447,24 @@ export function MainInvestigationCanvas({
       }
 
       // 1. Tải cache cục bộ từ storage trước (đáp ứng ngay lập tức)
-      try {
-        const localSaved = getStorageItem("boardgame_pins_case-000");
-        if (localSaved) {
-          const parsed = JSON.parse(localSaved);
-          if (parsed && typeof parsed === "object") {
-            setCustomPinPositions(parsed);
-          }
-        }
-        const localCustomPins = getStorageItem("admin_custom_pins_case-000");
-        if (localCustomPins) {
-          const parsed = JSON.parse(localCustomPins);
-          if (Array.isArray(parsed)) {
-            setAdminCustomPins(parsed);
-          }
-        }
-        const localTransforms = getStorageItem("boardgame_transforms_case-000");
-        if (localTransforms) {
-          const parsed = JSON.parse(localTransforms);
-          if (parsed && typeof parsed === "object") {
-            setPinTransforms(parsed);
-          }
-        }
-        const localConnections = getStorageItem("admin_connections_case-000");
-        if (localConnections) {
-          const parsed = JSON.parse(localConnections);
-          if (Array.isArray(parsed)) {
-            setAdminConnections(parsed);
-          }
-        }
-      } catch {}
+      setCustomPinPositions(
+        getStorageJson<Record<string, { x: number; y: number }>>(
+          "boardgame_pins_case-000",
+          {},
+        ),
+      );
+      setAdminCustomPins(
+        getStorageJson<PinPoint[]>("admin_custom_pins_case-000", []),
+      );
+      setPinTransforms(
+        getStorageJson<Record<string, { rotation: number; scale: number }>>(
+          "boardgame_transforms_case-000",
+          {},
+        ),
+      );
+      setAdminConnections(
+        getStorageJson<CaseConnection[]>("admin_connections_case-000", []),
+      );
 
       // 2. Tải đồng bộ từ Supabase Database nếu có
       try {
@@ -501,9 +485,9 @@ export function MainInvestigationCanvas({
           if (dbCustomPins.length > 0) {
             setAdminCustomPins(dbCustomPins);
           }
-          setStorageItem("boardgame_pins_case-000", JSON.stringify(posMap));
+          setStorageJson("boardgame_pins_case-000", posMap);
           if (dbCustomPins.length > 0) {
-            setStorageItem("admin_custom_pins_case-000", JSON.stringify(dbCustomPins));
+            setStorageJson("admin_custom_pins_case-000", dbCustomPins);
           }
         }
       } catch {}
@@ -523,9 +507,9 @@ export function MainInvestigationCanvas({
           ...draft.posMap,
           [pin.id]: { x: pin.x, y: pin.y },
         };
-        setStorageItem(
+        setStorageJson(
           "admin_custom_pins_case-000",
-          JSON.stringify(nextAdminPins),
+          nextAdminPins,
         );
         return {
           posMap: nextPosMap,
@@ -550,17 +534,17 @@ export function MainInvestigationCanvas({
         const nextConns = draft.connections.filter(
           (c) => c.fromPinId !== pinId && c.toPinId !== pinId,
         );
-        setStorageItem(
+        setStorageJson(
           "admin_custom_pins_case-000",
-          JSON.stringify(nextAdminPins),
+          nextAdminPins,
         );
-        setStorageItem(
+        setStorageJson(
           "boardgame_transforms_case-000",
-          JSON.stringify(nextTransforms),
+          nextTransforms,
         );
-        setStorageItem(
+        setStorageJson(
           "admin_connections_case-000",
-          JSON.stringify(nextConns),
+          nextConns,
         );
         return {
           posMap: nextPosMap,
@@ -595,9 +579,9 @@ export function MainInvestigationCanvas({
           },
         };
 
-        setStorageItem(
+        setStorageJson(
           "boardgame_transforms_case-000",
-          JSON.stringify(nextTransforms),
+          nextTransforms,
         );
 
         return {
@@ -628,9 +612,9 @@ export function MainInvestigationCanvas({
         const nextConns = exists
           ? draft.connections.filter((_, idx) => idx !== existingIndex)
           : [...draft.connections, { id: connId1, fromPinId, toPinId }];
-        setStorageItem(
+        setStorageJson(
           "admin_connections_case-000",
-          JSON.stringify(nextConns),
+          nextConns,
         );
         if (exists) {
           toast.info("Đã tháo dây chỉ đỏ giữa 2 node!");
@@ -650,9 +634,9 @@ export function MainInvestigationCanvas({
     (connId: string) => {
       commitLayout((draft) => {
         const nextConns = draft.connections.filter((c) => c.id !== connId);
-        setStorageItem(
+        setStorageJson(
           "admin_connections_case-000",
-          JSON.stringify(nextConns),
+          nextConns,
         );
         return {
           ...draft,
@@ -733,76 +717,63 @@ export function MainInvestigationCanvas({
 
   // Restore saved state from storage if available
   useEffect(() => {
-    try {
-      const savedSuspects = getStorageItem("canvas_suspects");
-      if (savedSuspects) {
-        const parsed = JSON.parse(savedSuspects);
-        const validList = parsed.filter(
-          (s: any) => s.id !== "suspect-default-1",
-        );
-        const sanitized = sanitizeSuspectsList(validList);
-        setSuspects(sanitized);
-      }
-      const savedSolvedFollowups = getStorageItem("solved_followups");
-      if (savedSolvedFollowups) {
-        try {
-          const parsed = JSON.parse(savedSolvedFollowups);
-          setSolvedFollowupQuestions(parsed);
-          if (parsed.includes("vu") && parsed.includes("tung")) {
-            setIsReinvestigateUnlocked(true);
-          }
-        } catch {}
-      }
-      const savedReinvestigateUnlocked = getStorageItem("reinvestigate_unlocked");
-      if (savedReinvestigateUnlocked === "true") {
-        setIsReinvestigateUnlocked(true);
-      }
-      const savedReinvestigateOpened = getStorageItem("reinvestigate_opened");
-      if (savedReinvestigateOpened === "true") {
-        setHasOpenedReinvestigation(true);
-      }
-      const savedPhone = getStorageItem("phone_inputs");
-      const isPhoneSolved = getStorageItem("phone_solved") === "true";
-      if (savedPhone || isPhoneSolved) {
-        try {
-          if (savedPhone) {
-            const parsed = JSON.parse(savedPhone);
-            if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
-              setPhoneLookupSuccess(true);
-            } else if (isPhoneSolved) {
-              setPhoneLookupSuccess(true);
-            }
-          } else if (isPhoneSolved) {
-            setPhoneLookupSuccess(true);
-          }
-        } catch {
-          setPhoneLookupSuccess(true);
-        }
-      }
-      const savedInvestigated = getStorageItem("investigated_suspects");
-      if (savedInvestigated) {
-        setInvestigatedSuspects(JSON.parse(savedInvestigated));
-      }
-      const savedSolved = getStorageItem("indictment_solved");
+    const rawSuspects = getStorageJson<any[]>("canvas_suspects", []);
+    const validList = rawSuspects.filter(
+      (s) => s?.id !== "suspect-default-1",
+    );
+    setSuspects(sanitizeSuspectsList(validList));
+
+    const solvedFollowups = getStorageJson<("vu" | "tung" | "ha")[]>(
+      "solved_followups",
+      [],
+    );
+    setSolvedFollowupQuestions(solvedFollowups);
+    if (
+      (solvedFollowups.includes("vu") && solvedFollowups.includes("tung")) ||
+      getStorageItem("reinvestigate_unlocked") === "true"
+    ) {
+      setIsReinvestigateUnlocked(true);
+    }
+
+    if (getStorageItem("reinvestigate_opened") === "true") {
+      setHasOpenedReinvestigation(true);
+    }
+
+    const phoneInputs = getStorageJson<Record<string, string>>(
+      "phone_inputs",
+      {},
+    );
+    const isPhoneSolved = getStorageItem("phone_solved") === "true";
+    if (
+      phoneInputs.phone1 ||
+      phoneInputs.phone2 ||
+      phoneInputs.phone3 ||
+      isPhoneSolved
+    ) {
+      setPhoneLookupSuccess(true);
+    }
+
+    setInvestigatedSuspects(
+      getStorageJson<("vu" | "tung" | "ha")[]>("investigated_suspects", []),
+    );
+
+    if (getStorageItem("indictment_solved") === "true") {
       const savedCulprit = getStorageItem("indictment_culprit") as
         | "vu"
         | "tung"
         | "ha"
         | null;
-      if (savedSolved === "true" && savedCulprit) {
+      if (savedCulprit) {
         setIsIndictmentSolved(true);
         setSolvedCulprit(savedCulprit);
       }
-    } catch {}
+    }
   }, []);
 
   const saveSuspectsState = (newSuspects: SuspectItem[]) => {
     const sanitized = sanitizeSuspectsList(newSuspects);
     setSuspects(sanitized);
-    setStorageItem(
-      "canvas_suspects",
-      JSON.stringify(sanitized),
-    );
+    setStorageJson("canvas_suspects", sanitized);
   };
 
   const handleSaveSuspect = (savedSuspect: SuspectItem) => {
@@ -921,9 +892,8 @@ export function MainInvestigationCanvas({
     setIsFinalEpilogueOpen(true);
     if (onOpenEpilogue) {
       onOpenEpilogue();
-    }
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("open-epilogue-modal"));
+    } else {
+      emitInvestigationEvent("OPEN_EPILOGUE");
     }
   };
 
