@@ -20,4 +20,17 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dect-http.rule=Host(`xplore.vn`) || Host(`www.xplore.vn`)"
+      - "traefik.http.routers.dect-http.entrypoints=http"
+      - "traefik.http.routers.dect-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.dect-https.rule=Host(`xplore.vn`) || Host(`www.xplore.vn`)"
+      - "traefik.http.routers.dect-https.entrypoints=https"
+      - "traefik.http.routers.dect-https.tls=true"
+      - "traefik.http.routers.dect-https.tls.certresolver=letsencrypt"
+      - "traefik.http.services.dect-app.loadbalancer.server.port=3000"
+
+
 

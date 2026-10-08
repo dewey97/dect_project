@@ -77,6 +77,14 @@ jobs:
             echo "⚡ [3/3] Khởi chạy container..."
             docker compose up -d --force-recreate --remove-orphans
 
+            for net in traefik coolify dokploy caddy web gateway; do
+              if docker network ls --format '{{.Name}}' | grep -qw "$net"; then
+                echo "Kết nối container vào network $net..."
+                docker network connect "$net" dect_project_app 2>/dev/null || true
+              fi
+            done
+
+
             echo "🧹 Dọn dẹp images cũ..."
             docker image prune -f
 
