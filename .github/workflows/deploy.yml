@@ -63,22 +63,22 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
+          port: 22
+          script_stop: true
           script: |
-            set -e
-            echo "🚀 [1/3] Đang cập nhật repository tại /var/www/dect_project..."
+            echo "🚀 [1/3] Cập nhật repository tại /var/www/dect_project..."
             cd /var/www/dect_project
             git fetch origin main
             git reset --hard origin/main
 
-            echo "📦 [2/3] Đang kéo image mới nhất từ GHCR (${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest)..."
-            docker compose pull app
+            echo "📦 [2/3] Kéo Docker image mới nhất từ GHCR..."
+            docker pull ghcr.io/dewey97/dect_project:latest
 
-            echo "⚡ [3/3] Khởi chạy container với bản build mới..."
+            echo "⚡ [3/3] Khởi chạy container..."
             docker compose up -d --remove-orphans
 
-            echo "🧹 Dọn dẹp Docker images cũ..."
+            echo "🧹 Dọn dẹp images cũ..."
             docker image prune -f
 
-            echo "✅ Triển khai hoàn tất! Kiểm tra dịch vụ:"
+            echo "✅ Triển khai hoàn tất! Kiểm tra container:"
             docker compose ps
