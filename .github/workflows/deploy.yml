@@ -81,16 +81,20 @@ jobs:
             docker image prune -f
 
             echo "🌐 [4/4] Cấu hình Reverse Proxy & SSL cho xplore.vn..."
-            if command -v caddy &> /dev/null || systemctl is-active --quiet caddy; then
-              echo "Phát hiện Caddy, cập nhật cấu hình xplore.vn..."
-              if [ -f /etc/caddy/Caddyfile ]; then
-                if ! grep -q "xplore.vn" /etc/caddy/Caddyfile; then
-                  echo -e "\nxplore.vn, www.xplore.vn {\n    reverse_proxy 127.0.0.1:3000\n}" >> /etc/caddy/Caddyfile
-                  systemctl reload caddy || caddy reload --config /etc/caddy/Caddyfile || true
-                fi
+            # 1. Tìm và cập nhật Caddyfile nếu có Caddy
+            CADDY_FILES=$(find /etc /var /opt /root -name "Caddyfile" 2>/dev/null || true)
+            for cfile in $CADDY_FILES; do
+              echo "Tìm thấy Caddyfile tại: $cfile"
+              if ! grep -q "xplore.vn" "$cfile"; then
+                echo -e "\nxplore.vn, www.xplore.vn {\n    reverse_proxy 127.0.0.1:3000\n}" >> "$cfile"
+                echo "Đã thêm xplore.vn vào $cfile"
               fi
-            elif command -v nginx &> /dev/null || systemctl is-active --quiet nginx; then
-              echo "Phát hiện Nginx, cập nhật cấu hình xplore.vn..."
+            done
+            if systemctl is-active --quiet caddy; then
+              systemctl reload caddy || systemctl restart caddy || true
+            fi
+            # 2. Cấu hình Nginx nếu có
+            if command -v nginx &> /dev/null || systemctl is-active --quiet nginx; then
               cat << 'EOF' > /etc/nginx/sites-available/xplore.vn
 server {
     listen 80;
@@ -109,8 +113,9 @@ server {
     }
 }
 EOF
+              mkdir -p /etc/nginx/sites-enabled
               ln -sf /etc/nginx/sites-available/xplore.vn /etc/nginx/sites-enabled/
-              nginx -t && systemctl reload nginx || true
+              nginx -t && (systemctl reload nginx || nginx -s reload) || true
               if command -v certbot &> /dev/null; then
                 certbot --nginx -d xplore.vn -d www.xplore.vn --non-interactive --agree-tos --register-unsafely-without-email || true
               fi
