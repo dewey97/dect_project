@@ -55,3 +55,14 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
 
 - Giao diện phong cách hồ sơ trinh thám cổ điển/tối giản: Sử dụng typography sắc nét, màu sắc tài liệu cũ/chính luận.
 - Áp dụng nguyên tắc **`/taste`**: Không lạm dụng hiệu ứng neon sặc sỡ, đảm bảo trải nghiệm đọc hồ sơ chân thực trên cả Mobile và Desktop.
+
+---
+
+## 🚀 4. Kiến trúc Triển khai & CI/CD (VPS Docker & GitHub Actions)
+
+- **Môi trường Production duy nhất**: Máy chủ VPS (`72.62.199.110`) chạy Docker container `dect_project_app`.
+- **Ngắt liên kết Vercel (Vercel Disconnected / Paused)**: Dự án **KHÔNG** sử dụng hoặc hậu kiểm Vercel. Sau khi `git push origin main`, Agent không kích hoạt Vercel build inspection mà theo dõi tiến trình GitHub Actions và container trên VPS.
+- **Quy trình CI/CD tự động 100%**:
+  - `git push origin main` ➔ GitHub Actions build Docker image và đẩy lên GHCR (`ghcr.io/dewey97/dect_project:latest`).
+  - GitHub Actions SSH vào VPS, pull image mới và restart container trong vòng ~10 giây.
+
