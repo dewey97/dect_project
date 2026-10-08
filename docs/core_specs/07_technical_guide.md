@@ -2,7 +2,7 @@
 <!-- START OF MERGED FILE: 07_TECH/07_technical_guide.md -->
 
 ---
-# CẤU TRÚC MÃ NGUỒN DỰ ÁN (NEXT.JS PROJECT STRUCTURE) — VERITAS
+# CẤU TRÚC MÃ NGUỒN DỰ ÁN (NEXT.JS PROJECT STRUCTURE) — X-PLORE
 
 > **Cấu trúc Thư mục:** Xây dựng trên nền tảng Next.js 16 (App Router), tuân thủ nguyên tắc thiết kế mã nguồn mô-đun hóa cao.
 
@@ -42,7 +42,7 @@ d:\code_world\dect_project/
 ---
 # Hướng Dẫn Phát Triển & Bản Địa Hóa (Development & Localization)
 
-Tài liệu này hướng dẫn cách vận hành cục bộ, biên dịch vụ án mới, và quy ước dịch tiếng Việt thống nhất cho dự án VERITAS OS.
+Tài liệu này hướng dẫn cách vận hành cục bộ, biên dịch vụ án mới, và quy ước dịch tiếng Việt thống nhất cho dự án X-PLORE.
 
 ---
 
@@ -130,9 +130,9 @@ Dữ liệu kịch bản vụ án được lưu trữ tách biệt trong thư m�
 <!-- START OF MERGED FILE: 07_TECH/07_technical_guide.md -->
 
 ---
-# ĐẶC TẢ BỘ BA ENGINE CỐT LÕI (ENGINES ARCHITECTURE) — VERITAS
+# ĐẶC TẢ BỘ BA ENGINE CỐT LÕI (ENGINES ARCHITECTURE) — X-PLORE
 
-> **Nhiệm vụ Kiến trúc:** Bộ ba Engine vận hành lõi của hệ thống VERITAS, chịu trách nhiệm quản lý state local, parse & validate vụ án, và chấm điểm đồ thị suy luận khi kết án.
+> **Nhiệm vụ Kiến trúc:** Bộ ba Engine vận hành lõi của hệ thống X-PLORE, chịu trách nhiệm quản lý state local, parse & validate vụ án, và chấm điểm đồ thị suy luận khi kết án.
 
 ```
 ┌─────────────────────────┐      ┌─────────────────────────┐      ┌─────────────────────────┐
@@ -233,9 +233,9 @@ export interface VerificationResult {
 <!-- START OF MERGED FILE: 07_TECH/07_technical_guide.md -->
 
 ---
-# ĐẶC TẢ CƠ SỞ DỮ LIỆU (DATABASE SCHEMA) — VERITAS
+# ĐẶC TẢ CƠ SỞ DỮ LIỆU (DATABASE SCHEMA) — X-PLORE
 
-> **Nhiệm vụ Kiến trúc:** Đặc tả mô hình lưu trữ 2 lớp của VERITAS: Client Local Database (Dexie.js / IndexedDB) cho trải nghiệm Offline-first và Cloud Sync Database (Supabase PostgreSQL + RLS).
+> **Nhiệm vụ Kiến trúc:** Đặc tả mô hình lưu trữ 2 lớp của X-PLORE: Client Local Database (Dexie.js / IndexedDB) cho trải nghiệm Offline-first và Cloud Sync Database (Supabase PostgreSQL + RLS).
 
 ---
 
@@ -265,12 +265,12 @@ export interface LocalCaseProgress {
   lastSavedAt: string;
 }
 
-export class VeritasLocalDB extends Dexie {
+export class XploreLocalDB extends Dexie {
   evidence!: Table<LocalEvidence>;
   progress!: Table<LocalCaseProgress>;
 
   constructor() {
-    super('VeritasLocalDB');
+    super('XploreLocalDB');
     this.version(1).stores({
       evidence: 'id, caseId, type, pinned',
       progress: 'caseId, lastSavedAt'
@@ -278,7 +278,7 @@ export class VeritasLocalDB extends Dexie {
   }
 }
 
-export const db = new VeritasLocalDB();
+export const db = new XploreLocalDB();
 ```
 
 ---
@@ -315,7 +315,7 @@ CREATE TABLE user_progress (
 <!-- START OF MERGED FILE: 07_TECH/07_technical_guide.md -->
 
 ---
-# HẠ TẦNG, HỆ THỐNG API & BẢO MẬT (INFRASTRUCTURE & SECURITY) — VERITAS
+# HẠ TẦNG, HỆ THỐNG API & BẢO MẬT (INFRASTRUCTURE & SECURITY) — X-PLORE
 
 ---
 

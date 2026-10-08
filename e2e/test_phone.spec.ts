@@ -7,10 +7,10 @@ test("Test Desktop Phone Layout", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
 
   await page.addInitScript(() => {
-    localStorage.setItem("veritas_play_experience", "web");
-    localStorage.setItem("veritas_investigation_mode", "casual");
+    localStorage.setItem("play_experience", "web");
+    localStorage.setItem("investigation_mode", "casual");
     localStorage.setItem(
-      "veritas_completed_checkpoints",
+      "completed_checkpoints",
       JSON.stringify(["cp-01-01"]),
     );
   });
@@ -51,10 +51,10 @@ test("Test Mobile Phone Layout", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
 
   await page.addInitScript(() => {
-    localStorage.setItem("veritas_play_experience", "web");
-    localStorage.setItem("veritas_investigation_mode", "casual");
+    localStorage.setItem("play_experience", "web");
+    localStorage.setItem("investigation_mode", "casual");
     localStorage.setItem(
-      "veritas_completed_checkpoints",
+      "completed_checkpoints",
       JSON.stringify(["cp-01-01"]),
     );
   });

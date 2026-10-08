@@ -27,6 +27,7 @@ import { isVietnameseTextMatch } from "@/lib/finding-matcher";
 import { HINTS_MAP } from "./evidence-data";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useActiveCheckpointHints } from "@/lib/hooks/use-active-checkpoint-hints";
+import { clearInvestigationStorage } from "@/lib/storage";
 
 /** Chuẩn hóa mã vật chứng để so khớp chính xác không phân biệt hoa thường hay tiền tố */
 function normalizeEvidenceCode(code: string): string {
@@ -128,30 +129,8 @@ export function CaseCheckpointsSection({
   }, [currentCp, unlockedHintLevel, onUnlockNextHint, sheetHints]);
 
   const resetProgress = () => {
-    try {
-      localStorage.removeItem("veritas_intro_seen");
-      localStorage.removeItem("veritas_discovered_findings");
-      localStorage.removeItem("veritas_completed_checkpoints");
-      localStorage.removeItem("veritas_canvas_suspects");
-      localStorage.removeItem("veritas_investigated_suspects");
-      localStorage.removeItem("veritas_solved_followups");
-      localStorage.removeItem("veritas_followup_vu");
-      localStorage.removeItem("veritas_followup_tung");
-      localStorage.removeItem("veritas_followup_ha");
-      localStorage.removeItem("veritas_followup_ha_matches");
-      localStorage.removeItem("veritas_followup_tung_choice");
-      localStorage.removeItem("veritas_followup_vu_choice");
-      localStorage.removeItem("veritas_followup_ha_choice");
-      localStorage.removeItem("veritas_reinvestigate_unlocked");
-      localStorage.removeItem("veritas_reinvestigate_opened");
-      localStorage.removeItem("veritas_indictment_solved");
-      localStorage.removeItem("veritas_indictment_culprit");
-      localStorage.removeItem("veritas_phone_inputs");
-      localStorage.removeItem("veritas_phone_solved");
-      localStorage.removeItem("khang_phone_pinned_clues");
-      localStorage.removeItem("veritas_custom_notes");
-      window.location.reload();
-    } catch {}
+    clearInvestigationStorage();
+    window.location.reload();
   };
 
   const handleHintClick = (cpId: string, maxHints: number) => {

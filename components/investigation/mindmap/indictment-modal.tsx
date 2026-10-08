@@ -7,6 +7,7 @@ import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 
 import { PHONE_LOOKUP_EVIDENCE_IDS } from '@/lib/cases/case-000-clues'
+import { setStorageItem } from '@/lib/storage'
 
 interface IndictmentModalProps {
   isOpen: boolean
@@ -126,10 +127,8 @@ export function IndictmentModal({
       .filter((s) => s.trim().length > 0)
 
     detectiveAudio.playStampSound()
-    try {
-      localStorage.setItem('veritas_indictment_solved', 'true')
-      localStorage.setItem('veritas_indictment_culprit', 'ha')
-    } catch {}
+    setStorageItem('indictment_solved', 'true')
+    setStorageItem('indictment_culprit', 'ha')
 
     const selectedOptionLabel = MOTIVE_OPTIONS.find((m) => m.id === selectedMotiveOption)?.label || ''
 

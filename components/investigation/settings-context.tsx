@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
+import { getStorageItem, setStorageItem } from '@/lib/storage'
+
 interface SettingsContextType {
   leftSidebarOpen: boolean
   rightSidebarOpen: boolean
@@ -20,30 +22,26 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   // Load defaults from localStorage if available
   useEffect(() => {
-    try {
-      const savedLeft = localStorage.getItem('xplore_leftSidebar') ?? localStorage.getItem('nocturne_leftSidebar')
-      const savedRight = localStorage.getItem('xplore_rightSidebar') ?? localStorage.getItem('nocturne_rightSidebar')
+    const savedLeft = getStorageItem('left_sidebar_open') ?? getStorageItem('leftSidebar')
+    const savedRight = getStorageItem('right_sidebar_open') ?? getStorageItem('rightSidebar')
 
-      if (savedLeft !== null) setLeftSidebarOpen(savedLeft === 'true')
-      if (savedRight !== null) setRightSidebarOpen(savedRight === 'true')
-    } catch {
-      // localStorage not available (SSR)
-    }
+    if (savedLeft !== null) setLeftSidebarOpen(savedLeft === 'true')
+    if (savedRight !== null) setRightSidebarOpen(savedRight === 'true')
   }, [])
 
   const handleSetLeft = (val: boolean) => {
     setLeftSidebarOpen(val)
-    try { localStorage.setItem('xplore_leftSidebar', String(val)) } catch {}
+    setStorageItem('left_sidebar_open', String(val))
   }
 
   const handleSetRight = (val: boolean) => {
     setRightSidebarOpen(val)
-    try { localStorage.setItem('xplore_rightSidebar', String(val)) } catch {}
+    setStorageItem('right_sidebar_open', String(val))
   }
 
   const handleSetTech = (val: boolean) => {
     setShowTechDetails(val)
-    try { localStorage.setItem('xplore_techDetails', String(val)) } catch {}
+    setStorageItem('tech_details_open', String(val))
   }
 
   return (

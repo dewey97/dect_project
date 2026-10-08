@@ -21,6 +21,11 @@ import { QuickActionFab } from "@/components/investigation/evidence/quick-action
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
 import { HintModal } from "@/components/investigation/hint-modal";
+import {
+  getStorageItem,
+  setStorageItem,
+  clearInvestigationStorage,
+} from "@/lib/storage";
 
 export default function BoardGameCompanionPage() {
   const router = useRouter();
@@ -56,17 +61,15 @@ export default function BoardGameCompanionPage() {
     useState<UnlockedModalData | null>(null);
 
   useEffect(() => {
-    try {
-      localStorage.setItem("veritas_play_experience", "boardgame");
-      const isIntroSeen = localStorage.getItem("veritas_intro_seen");
-      if (isIntroSeen !== "true") {
-        setUnlockedModalData({
-          unlockedPhase: 0,
-          newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-          newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
-        });
-      }
-    } catch {}
+    setStorageItem("play_experience", "boardgame");
+    const isIntroSeen = getStorageItem("intro_seen");
+    if (isIntroSeen !== "true") {
+      setUnlockedModalData({
+        unlockedPhase: 0,
+        newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
+        newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
+      });
+    }
 
     const handleOpenEpilogue = () => setIsEpilogueOpen(true);
     const handleOpenPhone = () => setIsPhoneModalOpen(true);
@@ -156,37 +159,13 @@ export default function BoardGameCompanionPage() {
   };
 
   const handleSwitchToWebMode = () => {
-    try {
-      localStorage.setItem("veritas_play_experience", "web");
-    } catch {}
+    setStorageItem("play_experience", "web");
     router.push("/evidence/web");
   };
 
   const resetFindingsProgress = () => {
-    try {
-      localStorage.removeItem("veritas_intro_seen");
-      localStorage.removeItem("veritas_discovered_findings");
-      localStorage.removeItem("veritas_completed_checkpoints");
-      localStorage.removeItem("veritas_canvas_suspects");
-      localStorage.removeItem("veritas_investigated_suspects");
-      localStorage.removeItem("veritas_solved_followups");
-      localStorage.removeItem("veritas_followup_vu");
-      localStorage.removeItem("veritas_followup_tung");
-      localStorage.removeItem("veritas_followup_ha");
-      localStorage.removeItem("veritas_followup_ha_matches");
-      localStorage.removeItem("veritas_followup_tung_choice");
-      localStorage.removeItem("veritas_followup_vu_choice");
-      localStorage.removeItem("veritas_followup_ha_choice");
-      localStorage.removeItem("veritas_reinvestigate_unlocked");
-      localStorage.removeItem("veritas_reinvestigate_opened");
-      localStorage.removeItem("veritas_indictment_solved");
-      localStorage.removeItem("veritas_indictment_culprit");
-      localStorage.removeItem("veritas_phone_inputs");
-      localStorage.removeItem("veritas_phone_solved");
-      localStorage.removeItem("khang_phone_pinned_clues");
-      localStorage.removeItem("veritas_custom_notes");
-      window.location.reload();
-    } catch {}
+    clearInvestigationStorage();
+    window.location.reload();
   };
 
   return (

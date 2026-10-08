@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { getStorageItem, setStorageItem } from '@/lib/storage'
 
 interface CheckpointsContextType {
   completedCheckpointIds: string[]
@@ -15,15 +16,13 @@ const CheckpointsContext = createContext<CheckpointsContextType | undefined>(und
 export function CheckpointsProvider({ children }: { children: React.ReactNode }) {
   const [completedCheckpointIds, setCompletedCheckpointIds] = useState<string[]>([])
 
-  // Load from localStorage
+  // Load from storage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('xplore_completed_checkpoints') ?? localStorage.getItem('veritas_completed_checkpoints')
-      if (saved) {
+    const saved = getStorageItem('completed_checkpoints')
+    if (saved) {
+      try {
         setCompletedCheckpointIds(JSON.parse(saved))
-      }
-    } catch {
-      // SSR
+      } catch {}
     }
   }, [])
 
@@ -31,9 +30,7 @@ export function CheckpointsProvider({ children }: { children: React.ReactNode })
     setCompletedCheckpointIds((prev) => {
       if (prev.includes(id)) return prev
       const next = [...prev, id]
-      try {
-        localStorage.setItem('xplore_completed_checkpoints', JSON.stringify(next))
-      } catch {}
+      setStorageItem('completed_checkpoints', JSON.stringify(next))
       return next
     })
   }

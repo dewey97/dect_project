@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { detectiveAudio } from '@/lib/investigation-audio'
+import { setStorageItem } from '@/lib/storage'
 import {
   WALKTHROUGH_STEPS,
   WalkthroughStep
@@ -156,9 +157,7 @@ export function InteractiveWalkthrough({
   const handleNext = () => {
     detectiveAudio.playTypewriterClick()
     if (isLastStep) {
-      try {
-        localStorage.setItem('veritas_walkthrough_completed', 'true')
-      } catch {}
+      setStorageItem('walkthrough_completed', 'true')
       onClose()
     } else {
       setCurrentStepIndex((prev) => prev + 1)
@@ -173,9 +172,7 @@ export function InteractiveWalkthrough({
 
   const handleSkip = () => {
     detectiveAudio.playPaperRustle()
-    try {
-      localStorage.setItem('veritas_walkthrough_completed', 'true')
-    } catch {}
+    setStorageItem('walkthrough_completed', 'true')
     onClose()
   }
 

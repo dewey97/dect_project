@@ -40,6 +40,11 @@ import { ReinvestigationModal } from "@/components/investigation/evidence/reinve
 import { PhoneSimulator } from "@/components/investigation/phone-simulator";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
+import {
+  getStorageItem,
+  setStorageItem,
+  clearInvestigationStorage,
+} from "@/lib/storage";
 
 export default function WebEvidencePage() {
   const router = useRouter();
@@ -77,36 +82,34 @@ export default function WebEvidencePage() {
   >("all");
 
   useEffect(() => {
-    try {
-      localStorage.setItem("veritas_play_experience", "web");
+    setStorageItem("play_experience", "web");
 
-      const isIntroSeen = localStorage.getItem("veritas_intro_seen");
-      if (isIntroSeen !== "true") {
-        setUnlockedModalData({
-          unlockedPhase: 0,
-          newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-          newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
-        });
-      }
+    const isIntroSeen = getStorageItem("intro_seen");
+    if (isIntroSeen !== "true") {
+      setUnlockedModalData({
+        unlockedPhase: 0,
+        newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
+        newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
+      });
+    }
 
-      // Check current unlocked phase from boardgame progress
-      const solvedFollowups = localStorage.getItem("veritas_solved_followups");
-      const isReinvestigateUnlocked =
-        localStorage.getItem("veritas_reinvestigate_unlocked") === "true";
-      const isIndictmentSolved =
-        localStorage.getItem("veritas_indictment_solved") === "true";
+    // Check current unlocked phase from boardgame progress
+    const solvedFollowups = getStorageItem("solved_followups");
+    const isReinvestigateUnlocked =
+      getStorageItem("reinvestigate_unlocked") === "true";
+    const isIndictmentSolved =
+      getStorageItem("indictment_solved") === "true";
 
-      if (isIndictmentSolved) {
-        setUnlockedPhase(3);
-      } else if (
-        isReinvestigateUnlocked ||
-        (solvedFollowups && JSON.parse(solvedFollowups || "[]").length >= 2)
-      ) {
-        setUnlockedPhase(2);
-      } else {
-        setUnlockedPhase(1);
-      }
-    } catch {}
+    if (isIndictmentSolved) {
+      setUnlockedPhase(3);
+    } else if (
+      isReinvestigateUnlocked ||
+      (solvedFollowups && JSON.parse(solvedFollowups || "[]").length >= 2)
+    ) {
+      setUnlockedPhase(2);
+    } else {
+      setUnlockedPhase(1);
+    }
 
     const handleOpenEpilogue = () => setIsEpilogueOpen(true);
     const handleOpenPhone = () => setIsPhoneModalOpen(true);
@@ -160,30 +163,8 @@ export default function WebEvidencePage() {
   };
 
   const resetAllProgress = () => {
-    try {
-      localStorage.removeItem("veritas_intro_seen");
-      localStorage.removeItem("veritas_discovered_findings");
-      localStorage.removeItem("veritas_completed_checkpoints");
-      localStorage.removeItem("veritas_canvas_suspects");
-      localStorage.removeItem("veritas_investigated_suspects");
-      localStorage.removeItem("veritas_solved_followups");
-      localStorage.removeItem("veritas_followup_vu");
-      localStorage.removeItem("veritas_followup_tung");
-      localStorage.removeItem("veritas_followup_ha");
-      localStorage.removeItem("veritas_followup_ha_matches");
-      localStorage.removeItem("veritas_followup_tung_choice");
-      localStorage.removeItem("veritas_followup_vu_choice");
-      localStorage.removeItem("veritas_followup_ha_choice");
-      localStorage.removeItem("veritas_reinvestigate_unlocked");
-      localStorage.removeItem("veritas_reinvestigate_opened");
-      localStorage.removeItem("veritas_indictment_solved");
-      localStorage.removeItem("veritas_indictment_culprit");
-      localStorage.removeItem("veritas_phone_inputs");
-      localStorage.removeItem("veritas_phone_solved");
-      localStorage.removeItem("khang_phone_pinned_clues");
-      localStorage.removeItem("veritas_custom_notes");
-      window.location.reload();
-    } catch {}
+    clearInvestigationStorage();
+    window.location.reload();
   };
 
   const filteredPdfs = CASE_000_PDFS.filter((doc) => {

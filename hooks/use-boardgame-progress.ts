@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { getCanonicalSuspectKey } from '@/lib/cases/case-000-suspects'
+import { getStorageItem, setStorageItem } from '@/lib/storage'
 
 export interface SuspectItem {
   id: string
@@ -41,7 +42,7 @@ export function useBoardGameProgress() {
   // Load initial state from localStorage
   useEffect(() => {
     try {
-      const savedSuspects = localStorage.getItem('xplore_canvas_suspects') ?? localStorage.getItem('veritas_canvas_suspects')
+      const savedSuspects = getStorageItem('canvas_suspects')
       if (savedSuspects) {
         const parsed = JSON.parse(savedSuspects)
         const validList = parsed.filter((s: any) => s.id !== 'suspect-default-1')
@@ -49,7 +50,7 @@ export function useBoardGameProgress() {
         setSuspects(sanitized)
       }
 
-      const savedSolvedFollowups = localStorage.getItem('xplore_solved_followups') ?? localStorage.getItem('veritas_solved_followups')
+      const savedSolvedFollowups = getStorageItem('solved_followups')
       if (savedSolvedFollowups) {
         try {
           const parsed = JSON.parse(savedSolvedFollowups)
@@ -60,14 +61,14 @@ export function useBoardGameProgress() {
         } catch {}
       }
 
-      if ((localStorage.getItem('xplore_reinvestigate_unlocked') ?? localStorage.getItem('veritas_reinvestigate_unlocked')) === 'true') {
+      if (getStorageItem('reinvestigate_unlocked') === 'true') {
         setIsReinvestigateUnlocked(true)
       }
-      if ((localStorage.getItem('xplore_reinvestigate_opened') ?? localStorage.getItem('veritas_reinvestigate_opened')) === 'true') {
+      if (getStorageItem('reinvestigate_opened') === 'true') {
         setHasOpenedReinvestigation(true)
       }
 
-      const savedPhone = localStorage.getItem('xplore_phone_inputs') ?? localStorage.getItem('veritas_phone_inputs')
+      const savedPhone = getStorageItem('phone_inputs')
       if (savedPhone) {
         try {
           const parsed = JSON.parse(savedPhone)
@@ -77,7 +78,7 @@ export function useBoardGameProgress() {
         } catch {}
       }
 
-      const savedInvestigated = localStorage.getItem('xplore_investigated_suspects') ?? localStorage.getItem('veritas_investigated_suspects')
+      const savedInvestigated = getStorageItem('investigated_suspects')
       if (savedInvestigated) {
         try {
           const parsed = JSON.parse(savedInvestigated)
@@ -85,15 +86,15 @@ export function useBoardGameProgress() {
         } catch {}
       }
 
-      if ((localStorage.getItem('xplore_indictment_solved') ?? localStorage.getItem('veritas_indictment_solved')) === 'true') {
+      if (getStorageItem('indictment_solved') === 'true') {
         setIsIndictmentSolved(true)
       }
-      const savedCulprit = (localStorage.getItem('xplore_indictment_culprit') ?? localStorage.getItem('veritas_indictment_culprit')) as 'vu' | 'tung' | 'ha' | null
+      const savedCulprit = getStorageItem('indictment_culprit') as 'vu' | 'tung' | 'ha' | null
       if (savedCulprit) {
         setSolvedCulprit(savedCulprit)
       }
     } catch (e) {
-      console.error('Failed to load boardgame progress from localStorage:', e)
+      console.error('Failed to load boardgame progress from storage:', e)
     }
   }, [sanitizeSuspectsList])
 
@@ -102,25 +103,19 @@ export function useBoardGameProgress() {
     setSuspects((prev) => {
       const nextList = typeof newSuspects === 'function' ? newSuspects(prev) : newSuspects
       const sanitized = sanitizeSuspectsList(nextList)
-      try {
-        localStorage.setItem('xplore_canvas_suspects', JSON.stringify(sanitized))
-      } catch {}
+      setStorageItem('canvas_suspects', JSON.stringify(sanitized))
       return sanitized
     })
   }, [sanitizeSuspectsList])
 
   const markReinvestigateUnlocked = useCallback(() => {
     setIsReinvestigateUnlocked(true)
-    try {
-      localStorage.setItem('xplore_reinvestigate_unlocked', 'true')
-    } catch {}
+    setStorageItem('reinvestigate_unlocked', 'true')
   }, [])
 
   const markReinvestigateOpened = useCallback(() => {
     setHasOpenedReinvestigation(true)
-    try {
-      localStorage.setItem('xplore_reinvestigate_opened', 'true')
-    } catch {}
+    setStorageItem('reinvestigate_opened', 'true')
   }, [])
 
   const markPhoneLookupSuccess = useCallback(() => {
@@ -131,9 +126,7 @@ export function useBoardGameProgress() {
     setInvestigatedSuspects((prev) => {
       if (prev.includes(culprit)) return prev
       const next = [...prev, culprit]
-      try {
-        localStorage.setItem('xplore_investigated_suspects', JSON.stringify(next))
-      } catch {}
+      setStorageItem('investigated_suspects', JSON.stringify(next))
       return next
     })
   }, [])
@@ -142,9 +135,7 @@ export function useBoardGameProgress() {
     setSolvedFollowupQuestions((prev) => {
       if (prev.includes(culprit)) return prev
       const next = [...prev, culprit]
-      try {
-        localStorage.setItem('xplore_solved_followups', JSON.stringify(next))
-      } catch {}
+      setStorageItem('solved_followups', JSON.stringify(next))
       if (next.includes('vu') && next.includes('tung')) {
         markReinvestigateUnlocked()
       }
@@ -155,10 +146,8 @@ export function useBoardGameProgress() {
   const completeIndictment = useCallback((culprit: 'vu' | 'tung' | 'ha') => {
     setIsIndictmentSolved(true)
     setSolvedCulprit(culprit)
-    try {
-      localStorage.setItem('xplore_indictment_solved', 'true')
-      localStorage.setItem('xplore_indictment_culprit', culprit)
-    } catch {}
+    setStorageItem('indictment_solved', 'true')
+    setStorageItem('indictment_culprit', culprit)
   }, [])
 
   return {

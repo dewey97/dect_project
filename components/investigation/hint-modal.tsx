@@ -18,6 +18,7 @@ import {
   getCheckpointHints,
   type SheetCheckpointRow,
 } from "@/lib/cms/checkpoint-cms";
+import { getStorageItem, setStorageItem } from "@/lib/storage";
 
 interface HintModalProps {
   isOpen: boolean;
@@ -61,20 +62,20 @@ function getContextAwareHintStage(): ActiveHintGroup {
 
   try {
     isIndictmentSolved =
-      localStorage.getItem("veritas_indictment_solved") === "true";
+      getStorageItem("indictment_solved") === "true";
     isPhoneSolved =
-      localStorage.getItem("veritas_phone_solved") === "true" ||
-      !!localStorage.getItem("veritas_phone_inputs");
+      getStorageItem("phone_solved") === "true" ||
+      !!getStorageItem("phone_inputs");
     isReinvestigateUnlocked =
-      localStorage.getItem("veritas_reinvestigate_unlocked") === "true";
+      getStorageItem("reinvestigate_unlocked") === "true";
 
-    const inv = localStorage.getItem("veritas_investigated_suspects");
+    const inv = getStorageItem("investigated_suspects");
     if (inv) investigatedSuspects = JSON.parse(inv);
 
-    const fol = localStorage.getItem("veritas_solved_followups");
+    const fol = getStorageItem("solved_followups");
     if (fol) solvedFollowups = JSON.parse(fol);
 
-    const cp = localStorage.getItem("veritas_completed_checkpoints");
+    const cp = getStorageItem("completed_checkpoints");
     if (cp) completedCheckpoints = JSON.parse(cp);
   } catch {}
 
@@ -196,7 +197,7 @@ export function HintModal({ isOpen, onClose }: HintModalProps) {
   useEffect(() => {
     if (isOpen) {
       try {
-        const saved = localStorage.getItem("veritas_hint_unlocked_levels");
+        const saved = getStorageItem("hint_unlocked_levels");
         if (saved) {
           setUnlockedLevels(JSON.parse(saved));
         }
@@ -227,12 +228,10 @@ export function HintModal({ isOpen, onClose }: HintModalProps) {
     };
     setUnlockedLevels(updated);
     setActiveHintIdx(nextCount - 1);
-    try {
-      localStorage.setItem(
-        "veritas_hint_unlocked_levels",
-        JSON.stringify(updated),
-      );
-    } catch {}
+    setStorageItem(
+      "hint_unlocked_levels",
+      JSON.stringify(updated),
+    );
   };
 
   return (

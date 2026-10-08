@@ -7,6 +7,7 @@ import { PDFDocument, PhysicalEvidence } from "./evidence-types";
 import { TypewriterNarrator } from "./typewriter-narrator";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useCaseNarratives } from "@/lib/hooks/use-case-narratives";
+import { setStorageItem } from "@/lib/storage";
 
 export interface UnlockedModalData {
   unlockedPhase: number;
@@ -113,9 +114,7 @@ export function PhaseUnlockedModal({
                   <button
                     onClick={() => {
                       if (unlockedModalData.unlockedPhase === 0) {
-                        try {
-                          localStorage.setItem("veritas_intro_seen", "true");
-                        } catch {}
+                        setStorageItem("intro_seen", "true");
                       }
                       onSetPhaseFilter(unlockedModalData.unlockedPhase);
                       onClose();

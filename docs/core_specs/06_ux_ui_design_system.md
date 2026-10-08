@@ -1,4 +1,4 @@
-# HỆ THỐNG THIẾT KẾ GIAO DIỆN (NOCTURNE UX/UI DESIGN SYSTEM)
+# HỆ THỐNG THIẾT KẾ GIAO DIỆN (X-PLORE UX/UI DESIGN SYSTEM)
 
 > **Aesthetic Cốt lõi:** Neo-noir · Crime Investigation · Secret Intelligence · Detective Workstation · Premium Board Game Companion.
 
@@ -43,7 +43,7 @@ Sử dụng 2 họ font chính:
 
 - `.label-system`: Mono uppercase, chữ nhỏ `0.65rem`, `tracking-[0.2em]`, màu `muted-foreground`.
 - `.label-tag`: Pill trạng thái (LOCKED, OPEN, CLUE, FLAG).
-- `.label-brand`: Wordmark thương hiệu NOCTURNE / VERITAS.
+- `.label-brand`: Wordmark thương hiệu X-PLORE.
 
 ---
 

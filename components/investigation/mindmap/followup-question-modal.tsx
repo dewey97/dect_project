@@ -10,6 +10,7 @@ import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
 import { ClueCodePicker } from './clue-code-picker'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { isEvidenceMatching } from '@/lib/cases/case-000-clues'
+import { getStorageItem, setStorageItem } from '@/lib/storage'
 
 interface FollowupQuestionModalProps {
   isOpen: boolean
@@ -105,7 +106,7 @@ export function FollowupQuestionModal({
       setHasPhoneSolvedState(true)
     } else {
       try {
-        const savedPhone = localStorage.getItem('veritas_phone_inputs')
+        const savedPhone = getStorageItem('phone_inputs')
         if (savedPhone) {
           const parsed = JSON.parse(savedPhone)
           if (parsed.phone1 || parsed.phone2 || parsed.phone3) {
@@ -129,19 +130,19 @@ export function FollowupQuestionModal({
     setErrorMsg('')
     try {
       if (culprit === 'ha') {
-        const savedHa = localStorage.getItem('veritas_followup_ha_matches')
+        const savedHa = getStorageItem('followup_ha_matches')
         if (savedHa) {
           setHaTileSelections(JSON.parse(savedHa))
         }
       } else if (culprit === 'vu') {
-        const savedVu = localStorage.getItem('veritas_followup_vu')
+        const savedVu = getStorageItem('followup_vu')
         if (savedVu) {
           setVuTimeInput(savedVu)
         } else {
           setVuTimeInput('')
         }
       } else {
-        const saved = localStorage.getItem(`veritas_followup_${culprit}`)
+        const saved = getStorageItem(`followup_${culprit}`)
         if (saved) {
           setSelectedOption(saved)
         } else {
@@ -194,9 +195,7 @@ export function FollowupQuestionModal({
         [activeHaTileId]: nextList,
       }
 
-      try {
-        localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(updated))
-      } catch {}
+      setStorageItem('followup_ha_matches', JSON.stringify(updated))
 
       // Play success audio if just matched
       const nowMatched = nextList.some((id) => isEvidenceMatching(id, tile.validDocIds))
@@ -216,9 +215,7 @@ export function FollowupQuestionModal({
       tile_thuoc_an_than: ['49'],
     }
     setHaTileSelections(bypassedMatches)
-    try {
-      localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(bypassedMatches))
-    } catch {}
+    setStorageItem('followup_ha_matches', JSON.stringify(bypassedMatches))
   }
 
   const handleSubmitVu = (e: React.FormEvent) => {
@@ -235,9 +232,7 @@ export function FollowupQuestionModal({
     if (normalized === '21:15' || normalized === '21h15' || is000) {
       detectiveAudio.playStampSound()
       setErrorMsg('')
-      try {
-        localStorage.setItem('veritas_followup_vu', '21:15')
-      } catch {}
+      setStorageItem('followup_vu', '21:15')
       if (onSuccess) {
         onSuccess('vu', '21:15')
       }
@@ -258,9 +253,7 @@ export function FollowupQuestionModal({
 
     detectiveAudio.playStampSound()
     setErrorMsg('')
-    try {
-      localStorage.setItem('veritas_followup_tung', selectedOption)
-    } catch {}
+    setStorageItem('followup_tung', selectedOption)
     if (onSuccess) {
       onSuccess('tung', selectedOption)
     }
@@ -277,10 +270,8 @@ export function FollowupQuestionModal({
 
     detectiveAudio.playStampSound()
     setErrorMsg('')
-    try {
-      localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(haTileSelections))
-      localStorage.setItem('veritas_followup_ha', 'matched_3_tiles')
-    } catch {}
+    setStorageItem('followup_ha_matches', JSON.stringify(haTileSelections))
+    setStorageItem('followup_ha', 'matched_3_tiles')
     if (onSuccess) {
       onSuccess('ha', 'matched_3_tiles')
     }
@@ -504,9 +495,7 @@ export function FollowupQuestionModal({
                       if (current.includes(id)) return prev
                       const nextList = [...current, id]
                       const updated = { ...prev, [activeHaTileId]: nextList }
-                      try {
-                        localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(updated))
-                      } catch {}
+                      setStorageItem('followup_ha_matches', JSON.stringify(updated))
                       const tile = HA_CLUE_TILES.find((t) => t.id === activeHaTileId)
                       const isMaster = id === 'doc_000' || id === '000' || id === '0000' || id.includes('000') || id.includes('0000')
                       if (tile && (isMaster || tile.validDocIds.includes(id))) {
@@ -521,9 +510,7 @@ export function FollowupQuestionModal({
                       const current = prev[activeHaTileId] || []
                       const nextList = current.filter((item) => item !== id)
                       const updated = { ...prev, [activeHaTileId]: nextList }
-                      try {
-                        localStorage.setItem('veritas_followup_ha_matches', JSON.stringify(updated))
-                      } catch {}
+                      setStorageItem('followup_ha_matches', JSON.stringify(updated))
                       return updated
                     })
                   }}

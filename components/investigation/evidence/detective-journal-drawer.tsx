@@ -5,6 +5,7 @@ import { Search, CheckCircle2, BookOpen, Bookmark, FileText, Trash2, Edit3, X, C
 import type { Finding } from '@/lib/types'
 import { findMatchingFinding } from '@/lib/finding-matcher'
 import { detectiveAudio } from '@/lib/investigation-audio'
+import { getStorageItem, setStorageItem, removeStorageItem } from '@/lib/storage'
 
 export interface CustomNote {
   id: string
@@ -38,7 +39,7 @@ export function DetectiveJournalDrawer({
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('veritas_custom_notes')
+      const saved = getStorageItem('custom_notes')
       if (saved) {
         setCustomNotes(JSON.parse(saved))
       }
@@ -58,18 +59,14 @@ export function DetectiveJournalDrawer({
     }
     const updated = [newNote, ...customNotes]
     setCustomNotes(updated)
-    try {
-      localStorage.setItem('veritas_custom_notes', JSON.stringify(updated))
-    } catch {}
+    setStorageItem('custom_notes', JSON.stringify(updated))
   }
 
   const deleteCustomNote = (id: string) => {
     detectiveAudio.playPaperRustle()
     const updated = customNotes.filter((n) => n.id !== id)
     setCustomNotes(updated)
-    try {
-      localStorage.setItem('veritas_custom_notes', JSON.stringify(updated))
-    } catch {}
+    setStorageItem('custom_notes', JSON.stringify(updated))
   }
 
   const phaseFindings = allFindings.filter((f) => f.phase === currentPhase)
@@ -248,9 +245,7 @@ export function DetectiveJournalDrawer({
               type="button"
               onClick={() => {
                 detectiveAudio.playPaperRustle()
-                try {
-                  localStorage.removeItem('veritas_custom_notes')
-                } catch {}
+                removeStorageItem('custom_notes')
                 onResetProgress()
               }}
               className="text-[0.65rem] font-mono font-bold text-[#b5a08d] hover:text-[#d9a066] transition-colors cursor-pointer"
