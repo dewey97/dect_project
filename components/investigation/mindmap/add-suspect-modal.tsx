@@ -1,11 +1,13 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ArrowRight, ArrowLeft, Trash2, Check, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { X, ArrowRight, ArrowLeft, Trash2, Check, AlertTriangle, CheckCircle2, Lightbulb } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { ClueCodePicker } from './clue-code-picker'
+import { emitInvestigationEvent } from '@/lib/investigation-events'
+import { setStorageItem } from '@/lib/storage'
 
 interface SuspectItemData {
   id: string
@@ -88,6 +90,27 @@ export function AddSuspectModal({
       openTimeRef.current = Date.now()
     }
   }, [isOpen])
+
+  const suspectCpId = useMemo(() => {
+    const norm = (name || editingSuspect?.name || editingSuspect?.id || '').toLowerCase()
+    if (norm.includes('vũ') || norm.includes('vu')) return 'cp-000-1a'
+    if (norm.includes('tùng') || norm.includes('tung')) return 'cp-000-1b'
+    if (norm.includes('hà') || norm.includes('ha')) return 'cp-000-1c'
+    return 'cp-000-1a'
+  }, [name, editingSuspect])
+
+  useEffect(() => {
+    if (isOpen) {
+      if (typeof window !== 'undefined') {
+        (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = suspectCpId
+      }
+      setStorageItem('active_investigation_checkpoint', suspectCpId)
+      setStorageItem('last_interacted_checkpoint', suspectCpId)
+      if (suspectCpId === 'cp-000-1a') setStorageItem('last_viewed_suspect', 'vu')
+      else if (suspectCpId === 'cp-000-1b') setStorageItem('last_viewed_suspect', 'tung')
+      else if (suspectCpId === 'cp-000-1c') setStorageItem('last_viewed_suspect', 'ha')
+    }
+  }, [isOpen, suspectCpId])
 
   useEffect(() => {
     if (editingSuspect) {
@@ -376,15 +399,31 @@ export function AddSuspectModal({
           exit={{ opacity: 0, scale: 0.96, y: 12 }}
           className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_20px_60px_rgba(0,0,0,0.85)] p-5 sm:p-7 rounded-none font-sans select-text max-h-[90vh] overflow-y-auto cursor-default"
         >
-          {/* TOP RIGHT X CLOSE */}
-          <button
-            type="button"
-            onClick={handleDirectClose}
-            className="absolute top-4 right-4 p-2 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer z-20 pointer-events-auto"
-            title="Đóng"
-          >
-            <X className="size-5 pointer-events-none" />
-          </button>
+          {/* TOP RIGHT ACTIONS */}
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-20 pointer-events-auto">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                detectiveAudio.playTypewriterClick()
+                emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId })
+              }}
+              className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+              title="Xem gợi ý phá án cho đối tượng này"
+            >
+              <Lightbulb className="size-3.5 text-[#8c1d1d]" />
+              <span className="hidden sm:inline">GỢI Ý</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDirectClose}
+              className="p-1.5 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer border border-[#5c4026]/40"
+              title="Đóng"
+            >
+              <X className="size-5 pointer-events-none" />
+            </button>
+          </div>
 
           {/* DOCUMENT HEADER & QUESTION */}
           <div className="space-y-1.5 pr-8">

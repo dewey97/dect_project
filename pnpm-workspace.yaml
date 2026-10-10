@@ -1,3 +1,4 @@
 allowBuilds:
+  '@firebase/util': set this to true or false
   msw: true
   sharp: true

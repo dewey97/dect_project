@@ -111,7 +111,7 @@ export function CulpritEpilogueModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 w-full h-[100dvh] max-h-[100dvh] bg-[#0c0805] text-[#e5d8cb] overflow-hidden flex flex-col font-sans select-none">
+      <div className="fixed inset-0 z-50 w-full h-[100dvh] max-h-[100dvh] bg-[#0c0805] text-[#e5d8cb] overflow-hidden flex flex-col font-sans select-none pt-safe">
         {/* CRT Scanlines effect */}
         <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-10" />
 

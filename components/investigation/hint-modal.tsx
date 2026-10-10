@@ -36,7 +36,7 @@ interface CheckpointGroupData {
 /**
  * Chuẩn hóa checkpointId sang mã chuẩn vụ án Case #000.
  */
-function normalizeCheckpointId(id?: string): string {
+export function normalizeCheckpointId(id?: string): string {
   if (!id) return "";
   const clean = id.trim().toLowerCase();
   if (clean === "phone" || clean.includes("phone") || clean === "cp-000-0")
@@ -58,14 +58,30 @@ function normalizeCheckpointId(id?: string): string {
 }
 
 /**
- * Tự động nhận diện checkpoint đang điều tra dở theo tiến trình thực tế của người chơi.
+ * Tự động nhận diện checkpoint đang điều tra dở theo tương tác gần nhất và tiến trình thực tế.
  */
-function getLatestActiveCheckpointId(): string {
+export function getLatestActiveCheckpointId(): string {
   if (typeof window !== "undefined") {
     const winCp = (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__;
     if (winCp) return normalizeCheckpointId(winCp);
   }
 
+  // 1. Kiểm tra checkpoint người chơi vừa tương tác gần nhất
+  const activeCp = getStorageItem("active_investigation_checkpoint");
+  if (activeCp) return normalizeCheckpointId(activeCp);
+
+  const lastInteracted = getStorageItem("last_interacted_checkpoint");
+  if (lastInteracted) return normalizeCheckpointId(lastInteracted);
+
+  const lastSuspect = getStorageItem("last_viewed_suspect");
+  if (lastSuspect) {
+    const normSuspect = lastSuspect.toLowerCase().trim();
+    if (normSuspect === "vu" || normSuspect.includes("vũ")) return "cp-000-1a";
+    if (normSuspect === "tung" || normSuspect.includes("tùng")) return "cp-000-1b";
+    if (normSuspect === "ha" || normSuspect.includes("hà")) return "cp-000-1c";
+  }
+
+  // 2. Kiểm tra tiến trình giải đố thực tế trong storage
   const isPhoneSolved = getStorageItem("phone_solved") === "true";
   if (!isPhoneSolved) return "cp-000-0";
 
@@ -155,43 +171,42 @@ export function HintModal({
   const { data: sheetCheckpoints } =
     usePhoneData<SheetCheckpointRow>("checkpoints");
 
-  const [activeCpId, setActiveCpId] = useState<string>("cp-000-0");
-  const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
-  const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
-
   // Xây dựng map gợi ý gom từ Google Sheet
   const groupedMap = useMemo(() => {
     return buildGroupedCheckpointsMap(sheetCheckpoints);
   }, [sheetCheckpoints]);
 
-  // Tự động nhận diện đúng checkpoint khi mở modal
+  // Nhận diện đồng bộ checkpoint ID ngay lập tức (không trễ nhịp useState)
+  const effectiveCpId = useMemo(() => {
+    if (checkpointId) return normalizeCheckpointId(checkpointId);
+    return getLatestActiveCheckpointId() || "cp-000-0";
+  }, [checkpointId, isOpen]);
+
+  const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
+  const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
+
+  // Đồng bộ cấp độ mở khóa khi modal mở
   useEffect(() => {
     if (isOpen) {
       setUnlockedLevels(
         getStorageJson<Record<string, number>>("hint_unlocked_levels", {}),
       );
-
-      const resolvedId = checkpointId
-        ? normalizeCheckpointId(checkpointId)
-        : getLatestActiveCheckpointId();
-
-      setActiveCpId(resolvedId || "cp-000-0");
       setActiveHintIdx(0);
     }
-  }, [isOpen, checkpointId]);
+  }, [isOpen, effectiveCpId]);
 
   if (!isOpen) return null;
 
-  const currentGroup = groupedMap.get(activeCpId) || {
-    checkpointId: activeCpId,
-    title: `CÂU HỎI CHECKPOINT // ${activeCpId.toUpperCase()}`,
+  const currentGroup = groupedMap.get(effectiveCpId) || {
+    checkpointId: effectiveCpId,
+    title: `CÂU HỎI CHECKPOINT // ${effectiveCpId.toUpperCase()}`,
     dossier: "Hồ sơ chuyên án",
     hints: [],
   };
 
   const totalHints = currentGroup.hints.length;
   const unlockedCount = Math.min(
-    unlockedLevels[activeCpId] || 1,
+    unlockedLevels[effectiveCpId] || 1,
     Math.max(totalHints, 1),
   );
   const viewIdx = Math.min(activeHintIdx, Math.max(unlockedCount - 1, 0));
@@ -202,7 +217,7 @@ export function HintModal({
     const nextCount = Math.min(unlockedCount + 1, totalHints);
     const updated = {
       ...unlockedLevels,
-      [activeCpId]: nextCount,
+      [effectiveCpId]: nextCount,
     };
     setUnlockedLevels(updated);
     setActiveHintIdx(nextCount - 1);

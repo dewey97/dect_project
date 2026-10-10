@@ -137,7 +137,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
   const maxDragX = Math.max(0, (renderedWidth - containerSize.width) / 2)
 
   return (
-    <div className="fixed inset-0 bg-[#080503] z-50 flex flex-col font-mono text-[#f4e8d8] select-none overflow-hidden w-screen h-[100dvh]">
+    <div className="fixed inset-0 bg-[#080503] z-50 flex flex-col font-mono text-[#f4e8d8] select-none overflow-hidden w-screen h-[100dvh] pt-safe">
       {/* SCANLINES EFFECT */}
       <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-15 z-10" />
 

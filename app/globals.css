@@ -242,6 +242,16 @@
     padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
   }
 
+  /* Safe-area aware top padding — tránh bị che bởi status bar khi viewportFit=cover */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Safe-area top offset for absolute/fixed positioned elements */
+  .top-safe {
+    top: env(safe-area-inset-top, 0px);
+  }
+
   /* Page transition animation */
   @keyframes fade-slide-up {
     from {

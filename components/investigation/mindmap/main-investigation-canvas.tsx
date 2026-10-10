@@ -243,18 +243,33 @@ export function MainInvestigationCanvas({
       currentCp = "cp-000-0";
     } else if (isIndictmentOpen) {
       currentCp = "cp-000-2b";
+    } else if (isAddSuspectOpen || editingSuspect) {
+      const sName = (editingSuspect?.name || "").toLowerCase();
+      const sId = (editingSuspect?.id || "").toLowerCase();
+      if (sName.includes("vũ") || sName.includes("vu") || sId === "vu") currentCp = "cp-000-1a";
+      else if (sName.includes("tùng") || sName.includes("tung") || sId === "tung") currentCp = "cp-000-1b";
+      else if (sName.includes("hà") || sName.includes("ha") || sId === "ha") currentCp = "cp-000-1c";
     } else if (activeCustomPinModal) {
       const pinId = (activeCustomPinModal.id || "").toLowerCase();
       const label = (activeCustomPinModal.label || "").toLowerCase();
-      if (pinId.includes("phone") || label.includes("điện thoại")) currentCp = "cp-000-0";
-      else if (pinId.includes("vu") || label.includes("vũ")) currentCp = "cp-000-1a";
-      else if (pinId.includes("tung") || label.includes("tùng")) currentCp = "cp-000-1b";
-      else if (pinId.includes("ha") || label.includes("hà")) currentCp = "cp-000-1c";
-      else if (pinId.includes("indictment") || pinId.includes("accusation") || label.includes("cáo trạng")) currentCp = "cp-000-2b";
+      const detail = (activeCustomPinModal.detail || "").toLowerCase();
+      const pText = `${pinId} ${label} ${detail}`;
+      if (pText.includes("vu") || pText.includes("vũ")) currentCp = "cp-000-1a";
+      else if (pText.includes("tung") || pText.includes("tùng")) currentCp = "cp-000-1b";
+      else if (pText.includes("ha") || pText.includes("hà")) currentCp = "cp-000-1c";
+      else if (pText.includes("phone") || pText.includes("điện thoại") || pText.includes("sđt")) currentCp = "cp-000-0";
+      else if (pText.includes("indictment") || pText.includes("accusation") || pText.includes("cáo trạng")) currentCp = "cp-000-2b";
     }
 
-    if (typeof window !== "undefined") {
-      (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = currentCp;
+    if (currentCp) {
+      if (typeof window !== "undefined") {
+        (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = currentCp;
+      }
+      setStorageItem("active_investigation_checkpoint", currentCp);
+      setStorageItem("last_interacted_checkpoint", currentCp);
+      if (currentCp === "cp-000-1a") setStorageItem("last_viewed_suspect", "vu");
+      else if (currentCp === "cp-000-1b") setStorageItem("last_viewed_suspect", "tung");
+      else if (currentCp === "cp-000-1c") setStorageItem("last_viewed_suspect", "ha");
     }
   }, [
     isFollowupQuestionOpen,
@@ -264,6 +279,8 @@ export function MainInvestigationCanvas({
     isPhoneLookupOpen,
     isIndictmentOpen,
     activeCustomPinModal,
+    isAddSuspectOpen,
+    editingSuspect,
   ]);
 
   // Synchronize photos directly from Google Sheets Live CMS
@@ -995,6 +1012,27 @@ export function MainInvestigationCanvas({
       const label = (pin?.label || "").toLowerCase();
       const detail = (pin?.detail || "").toLowerCase();
 
+      // Nhận diện tức thì Checkpoint gắn liền với ghim vừa bấm
+      const pText = `${id} ${label} ${detail}`;
+      let clickedCp: string | null = pin?.checkpointId || null;
+      if (!clickedCp) {
+        if (pText.includes("vu") || pText.includes("vũ")) clickedCp = "cp-000-1a";
+        else if (pText.includes("tung") || pText.includes("tùng")) clickedCp = "cp-000-1b";
+        else if (pText.includes("ha") || pText.includes("hà")) clickedCp = "cp-000-1c";
+        else if (pText.includes("phone") || pText.includes("điện thoại") || pText.includes("sđt")) clickedCp = "cp-000-0";
+        else if (pText.includes("indictment") || pText.includes("cáo trạng")) clickedCp = "cp-000-2b";
+      }
+      if (clickedCp) {
+        if (typeof window !== "undefined") {
+          (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = clickedCp;
+        }
+        setStorageItem("active_investigation_checkpoint", clickedCp);
+        setStorageItem("last_interacted_checkpoint", clickedCp);
+        if (clickedCp === "cp-000-1a") setStorageItem("last_viewed_suspect", "vu");
+        else if (clickedCp === "cp-000-1b") setStorageItem("last_viewed_suspect", "tung");
+        else if (clickedCp === "cp-000-1c") setStorageItem("last_viewed_suspect", "ha");
+      }
+
       // Chế độ Setup: chọn node để hiển thị thanh điều chỉnh nhanh (xoay, resize, sửa, xoá)
       if (isEditMode) {
         setSelectedPinId(id);
@@ -1649,8 +1687,8 @@ export function MainInvestigationCanvas({
           : ""
       }`}
     >
-      {/* Top Banner Toolbar */}
-      <div className="absolute top-3 left-4 z-20 flex items-center gap-2 pointer-events-none">
+      {/* Top Banner Toolbar — offset bằng safe-area-inset-top để không bị che bởi status bar iOS/Android */}
+      <div className="absolute left-4 z-20 flex items-center gap-2 pointer-events-none" style={{ top: 'max(12px, env(safe-area-inset-top, 12px))' }}>
         <div className="flex items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto">
           <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
@@ -1794,7 +1832,8 @@ export function MainInvestigationCanvas({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-14 left-1/2 -translate-x-1/2 z-30 flex items-center gap-0.5 p-0.5 bg-[#1b140e]/95 backdrop-blur-md rounded-lg border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
+            className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center gap-0.5 p-0.5 bg-[#1b140e]/95 backdrop-blur-md rounded-lg border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
+            style={{ top: 'calc(max(12px, env(safe-area-inset-top, 12px)) + 44px)' }}
           >
             {/* Tilt Left (-1 deg) */}
             <button
