@@ -88,37 +88,6 @@ jobs:
             echo "🧹 Dọn dẹp images cũ..."
             docker image prune -f
 
-            echo "🌐 [4/4] Cấu hình Nginx & SSL cho xplore.vn..."
-            if ! command -v nginx &> /dev/null; then
-              echo "Đang cài đặt Nginx & Certbot..."
-              apt-get update -y && apt-get install -y nginx certbot python3-certbot-nginx
-            fi
-
-            cat << 'EOF' > /etc/nginx/sites-available/xplore.vn
-server {
-    listen 80;
-    server_name xplore.vn www.xplore.vn;
-
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-EOF
-            mkdir -p /etc/nginx/sites-enabled
-            ln -sf /etc/nginx/sites-available/xplore.vn /etc/nginx/sites-enabled/xplore.vn
-            rm -f /etc/nginx/sites-enabled/default || true
-            nginx -t && systemctl restart nginx || service nginx restart || true
-
-            echo "🔒 Đang xin chứng chỉ SSL Let's Encrypt cho xplore.vn..."
-            certbot --nginx -d xplore.vn -d www.xplore.vn --non-interactive --agree-tos --register-unsafely-without-email --redirect || true
-
             echo "✅ Triển khai hoàn tất! Kiểm tra container:"
             docker compose ps
+

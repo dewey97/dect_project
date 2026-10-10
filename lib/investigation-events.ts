@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useEffectEvent } from "react";
+import { useEffect, useRef } from "react";
 
 export const INVESTIGATION_EVENTS = {
   OPEN_PHONE: "open-phone-modal",
@@ -45,17 +43,24 @@ export function useInvestigationEvent(
   callback: (e: CustomEvent) => void,
 ): void {
   const eventName = resolveEventName(event);
+  const callbackRef = useRef(callback);
+
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const handler = (e: Event) => {
-      callback(e as CustomEvent);
+      if (callbackRef.current) {
+        callbackRef.current(e as CustomEvent);
+      }
     };
 
     window.addEventListener(eventName, handler);
     return () => {
       window.removeEventListener(eventName, handler);
     };
-  }, [eventName, callback]);
+  }, [eventName]);
 }

@@ -280,12 +280,13 @@ flowchart LR
 | 4 | `title` | 🟢 `⚡` | Tiêu đề câu hỏi / thử thách. |
 | 5 | `question` | 🟢 `⚡` | Lời dẫn yêu cầu điều tra chi tiết. |
 | 6 | `type` | 🔴 `🔑` | `evidence_picker` (chọn vật chứng + người), `text_match_3` (điền 3 ô), `mcq` (trắc nghiệm), `text` (nhập tự do). |
-| 7 | `answers` | 🟢 `⚡` | **Đáp án hợp nhất**: Dùng cú pháp `nghi_pham:`, `ma_chung_cu:`, `o_nhap:`, `dap_an:` (Alt+Enter xuống dòng). |
+| 7 | `answers` | 🟢 `⚡` | **Đáp án hợp nhất**: Dùng cú pháp tối giản trực tiếp (Alt+Enter xuống dòng). Tự động so khớp tiếng Việt không dấu/có dấu.<br>• *3 SĐT (`text_match_3`)*: Viết thẳng từng dòng `0988.200.991: Vũ, Lê Quang Vũ` hoặc `SĐT 0988.200.991: Vũ`.<br>• *Trắc nghiệm / Text*: `dap_an: 21:15` hoặc `phuong_an: A, B, C`.<br>• *Bắt buộc vật chứng*: `ma_chung_cu: 52, 53` hoặc `bat_buoc: 52`. |
 | 8 | `hints` | 🟢 `⚡` | **Gợi ý đa cấp**: Mỗi dòng Alt+Enter là 1 cấp độ gợi ý (Cấp 1 ➔ Cấp 2 ➔ Đáp án gợi mở). |
 
 > 📌 **Ghi chú Tinh gọn Schema**:
-> - Đã gộp `node_id` vào `checkpoint_id` (dùng chung 1 mã khóa duy nhất).
-> - Đã loại bỏ cột `unlocked_evidence_id` dư thừa vì tiến trình mở khóa hồ sơ được tự động quản lý theo Phase và logic nghiệp vụ.
+> - **Gộp `node_id` vào `checkpoint_id`**: Dùng chung 1 mã khóa duy nhất (`cp-000-0`, `cp-000-1a`...).
+> - **Loại bỏ `unlocked_evidence_id`**: Tiến trình mở khóa tự động quản lý theo Phase và sự kiện kịch bản.
+> - **Tối giản cú pháp `answers`**: Hệ thống tích hợp sẵn thuật toán `isVietnameseTextMatch` tự động chuẩn hóa dấu tiếng Việt (không cần viết thêm bản không dấu như `Vu, Dat, Tung` trên Sheet). Cú pháp 3 ô SĐT cho phép viết gọn: `<số_điện_thoại>: <tên_nghi_phạm>`.
 
 
 ---
