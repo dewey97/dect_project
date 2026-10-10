@@ -3,14 +3,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireAdminAuth } from "./auth-guard";
-import { PinPoint } from "@/components/investigation/hero-interactive";
+import {
+  PinPoint,
+  CaseConnection,
+} from "@/components/investigation/hero-interactive";
 
 // Supabase DB Actions
 
-// Save positions of default (system) pins on the boardgame
+// Save positions of default (system) pins + admin custom pins + connections
 export async function saveBoardgamePinPositions(
   caseId: string,
   pins: PinPoint[],
+  connections: CaseConnection[] = [],
 ) {
   try {
     if (process.env.NODE_ENV !== "development") {
@@ -34,27 +38,62 @@ export async function saveBoardgamePinPositions(
       is_locked: p.isLocked || false,
       is_solved: p.isSolved || false,
       pulse_border: p.pulseBorder || false,
+      rotation: typeof p.rotation === "number" ? p.rotation : 0,
+      scale: typeof p.scale === "number" && p.scale > 0 ? p.scale : 1.0,
+      updated_at: new Date().toISOString(),
+    }));
+
+    const formattedConns = (connections || []).map((c) => ({
+      id: c.id,
+      case_id: caseId,
+      from_pin_id: c.fromPinId,
+      to_pin_id: c.toPinId,
+      updated_at: new Date().toISOString(),
     }));
 
     const pinIds = formattedPins.map((p) => p.id);
 
-    // 2. Xóa các pins không còn tồn tại
+    // 2. Xóa các pins không còn tồn tại (id TEXT nên phải quote từng giá trị
+    //    trong filter `in`, nếu không PostgREST parse sai id có dấu gạch ngang)
+    const quotedPinIds = pinIds.map((id) => `"${id}"`).join(",");
     if (pinIds.length > 0) {
       await supabase
         .from("boardgame_pins")
         .delete()
         .eq("case_id", caseId)
-        .not("id", "in", `(${pinIds.join(",")})`);
+        .not("id", "in", `(${quotedPinIds})`);
     } else {
       await supabase.from("boardgame_pins").delete().eq("case_id", caseId);
     }
 
-    // 3. Upsert Pins
+    // 3. Upsert Pins (bao rotation/scale, id TEXT cho phép c0-pin-...)
     if (formattedPins.length > 0) {
       const { error: pinError } = await supabase
         .from("boardgame_pins")
         .upsert(formattedPins, { onConflict: "id" });
       if (pinError) throw pinError;
+    }
+
+    // 4. Đồng bộ connections dây đỏ admin (quote id TEXT như trên)
+    const connIds = formattedConns.map((c) => c.id);
+    const quotedConnIds = connIds.map((id) => `"${id}"`).join(",");
+    if (connIds.length > 0) {
+      const { error: delConnError } = await supabase
+        .from("boardgame_connections")
+        .delete()
+        .eq("case_id", caseId)
+        .not("id", "in", `(${quotedConnIds})`);
+      if (delConnError) throw delConnError;
+      const { error: connError } = await supabase
+        .from("boardgame_connections")
+        .upsert(formattedConns, { onConflict: "id" });
+      if (connError) throw connError;
+    } else {
+      const { error: delAllError } = await supabase
+        .from("boardgame_connections")
+        .delete()
+        .eq("case_id", caseId);
+      if (delAllError) throw delAllError;
     }
 
     revalidatePath(`/cases/${caseId}/evidence/boardgame`);
@@ -65,10 +104,13 @@ export async function saveBoardgamePinPositions(
   }
 }
 
-// Get positions of default (system) pins for the boardgame
-export async function getBoardgamePinPositions(
-  caseId: string,
-): Promise<{ success: boolean; pins: PinPoint[]; error?: string }> {
+// Get layout chuẩn: pins (bao rotation/scale) + connections dây đỏ admin
+export async function getBoardgamePinPositions(caseId: string): Promise<{
+  success: boolean;
+  pins: PinPoint[];
+  connections: CaseConnection[];
+  error?: string;
+}> {
   try {
     const supabase = await createClient();
 
@@ -78,6 +120,13 @@ export async function getBoardgamePinPositions(
       .eq("case_id", caseId);
 
     if (pinError) throw pinError;
+
+    const { data: connsData, error: connError } = await supabase
+      .from("boardgame_connections")
+      .select("*")
+      .eq("case_id", caseId);
+
+    if (connError) throw connError;
 
     const pins: PinPoint[] = (pinsData || []).map((p) => ({
       id: p.id,
@@ -92,12 +141,20 @@ export async function getBoardgamePinPositions(
       isLocked: p.is_locked || undefined,
       isSolved: p.is_solved || undefined,
       pulseBorder: p.pulse_border || undefined,
+      rotation: typeof p.rotation === "number" ? p.rotation : undefined,
+      scale: typeof p.scale === "number" && p.scale > 0 ? p.scale : undefined,
     }));
 
-    return { success: true, pins };
+    const connections: CaseConnection[] = (connsData || []).map((c) => ({
+      id: c.id,
+      fromPinId: c.from_pin_id,
+      toPinId: c.to_pin_id,
+    }));
+
+    return { success: true, pins, connections };
   } catch (error: any) {
     console.error("Error fetching boardgame pin positions:", error);
-    return { success: false, error: error.message, pins: [] };
+    return { success: false, error: error.message, pins: [], connections: [] };
   }
 }
 

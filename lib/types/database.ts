@@ -48,6 +48,35 @@ export interface DbFeedback {
   resolved_at?: string;
 }
 
+/** Bảng boardgame_pins: Layout ghim bảng điều tra do admin setup (id TEXT: c0-*, admin-*, custom-*) */
+export interface DbBoardgamePin {
+  id: string;
+  case_id: string;
+  position_x: number;
+  position_y: number;
+  label: string | null;
+  detail: string | null;
+  color: string | null;
+  note_color: string | null;
+  pin_color: string | null;
+  photo_url: string | null;
+  is_locked: boolean;
+  is_solved: boolean;
+  pulse_border: boolean;
+  rotation: number;
+  scale: number;
+  updated_at: string;
+}
+
+/** Bảng boardgame_connections: Dây chỉ đỏ admin nối giữa các ghim */
+export interface DbBoardgameConnection {
+  id: string;
+  case_id: string;
+  from_pin_id: string;
+  to_pin_id: string;
+  updated_at: string;
+}
+
 /** Bảng app_settings: Cấu hình thông báo toàn cục & trạng thái hệ thống */
 export interface DbAppSettings {
   id: number;

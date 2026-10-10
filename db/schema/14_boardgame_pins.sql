@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS public.boardgame_pins (
   is_locked BOOLEAN DEFAULT FALSE,
   is_solved BOOLEAN DEFAULT FALSE,
   pulse_border BOOLEAN DEFAULT FALSE,
+  rotation FLOAT8 DEFAULT 0,
+  scale FLOAT8 DEFAULT 1.0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -32,7 +34,19 @@ DROP POLICY IF EXISTS "Allow public read access for boardgame_pins" ON public.bo
 CREATE POLICY "Allow public read access for boardgame_pins" ON public.boardgame_pins
   FOR SELECT USING (true);
 
--- 2. Cho phép insert / update / delete cho admin
+-- 2. Cho phép insert / update / delete cho admin (service_role + profiles.role = 'admin')
 DROP POLICY IF EXISTS "Allow write access for boardgame_pins" ON public.boardgame_pins;
 CREATE POLICY "Allow write access for boardgame_pins" ON public.boardgame_pins
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL USING (
+    auth.role() = 'service_role' OR
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+    )
+  ) WITH CHECK (
+    auth.role() = 'service_role' OR
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+    )
+  );

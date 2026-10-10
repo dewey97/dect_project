@@ -74,7 +74,10 @@ import {
   getStorageJson,
   setStorageJson,
 } from "@/lib/storage";
-import { useInvestigationEvent, emitInvestigationEvent } from "@/lib/investigation-events";
+import {
+  useInvestigationEvent,
+  emitInvestigationEvent,
+} from "@/lib/investigation-events";
 
 interface SuspectItem {
   id: string;
@@ -84,8 +87,14 @@ interface SuspectItem {
   alibiClueIds?: string[];
 }
 
+const CURRENT_BOARD_LAYOUT_VERSION = "2026.10.10_v8_db_sync";
+
 const ALL_CASE_000_SUSPECTS: SuspectItem[] = [
-  { id: "suspect-vu", name: "Lê Quang Vũ", clueIds: ["c0-clue-01", "c0-clue-02"] },
+  {
+    id: "suspect-vu",
+    name: "Lê Quang Vũ",
+    clueIds: ["c0-clue-01", "c0-clue-02"],
+  },
   { id: "suspect-tung", name: "Nguyễn Thanh Tùng", clueIds: ["c0-clue-03"] },
   { id: "suspect-ha", name: "Trần Thị Hà", clueIds: ["c0-clue-04"] },
   { id: "suspect-mai", name: "Nguyễn Ngọc Mai", clueIds: [] },
@@ -185,7 +194,10 @@ export function MainInvestigationCanvas({
       if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) {
         return;
       }
-      if (e.key === "?" || (e.key.toLowerCase() === "h" && !e.ctrlKey && !e.metaKey && !e.altKey)) {
+      if (
+        e.key === "?" ||
+        (e.key.toLowerCase() === "h" && !e.ctrlKey && !e.metaKey && !e.altKey)
+      ) {
         e.preventDefault();
         detectiveAudio.playPaperRustle();
         setIsGameplayGuideOpen((prev) => !prev);
@@ -241,8 +253,10 @@ export function MainInvestigationCanvas({
   useEffect(() => {
     let currentCp: string | null = null;
     if (isFollowupQuestionOpen) {
-      const c = activeFollowupCulprit || narrativeCulprit || solvedCulprit || "vu";
-      currentCp = c === "vu" ? "cp-000-1a" : c === "tung" ? "cp-000-1b" : "cp-000-1c";
+      const c =
+        activeFollowupCulprit || narrativeCulprit || solvedCulprit || "vu";
+      currentCp =
+        c === "vu" ? "cp-000-1a" : c === "tung" ? "cp-000-1b" : "cp-000-1c";
     } else if (isPhoneLookupOpen) {
       currentCp = "cp-000-0";
     } else if (isIndictmentOpen) {
@@ -250,19 +264,38 @@ export function MainInvestigationCanvas({
     } else if (isAddSuspectOpen || editingSuspect) {
       const sName = (editingSuspect?.name || "").toLowerCase();
       const sId = (editingSuspect?.id || "").toLowerCase();
-      if (sName.includes("vũ") || sName.includes("vu") || sId === "vu") currentCp = "cp-000-1a";
-      else if (sName.includes("tùng") || sName.includes("tung") || sId === "tung") currentCp = "cp-000-1b";
-      else if (sName.includes("hà") || sName.includes("ha") || sId === "ha") currentCp = "cp-000-1c";
+      if (sName.includes("vũ") || sName.includes("vu") || sId === "vu")
+        currentCp = "cp-000-1a";
+      else if (
+        sName.includes("tùng") ||
+        sName.includes("tung") ||
+        sId === "tung"
+      )
+        currentCp = "cp-000-1b";
+      else if (sName.includes("hà") || sName.includes("ha") || sId === "ha")
+        currentCp = "cp-000-1c";
     } else if (activeCustomPinModal) {
       const pinId = (activeCustomPinModal.id || "").toLowerCase();
       const label = (activeCustomPinModal.label || "").toLowerCase();
       const detail = (activeCustomPinModal.detail || "").toLowerCase();
       const pText = `${pinId} ${label} ${detail}`;
       if (pText.includes("vu") || pText.includes("vũ")) currentCp = "cp-000-1a";
-      else if (pText.includes("tung") || pText.includes("tùng")) currentCp = "cp-000-1b";
-      else if (pText.includes("ha") || pText.includes("hà")) currentCp = "cp-000-1c";
-      else if (pText.includes("phone") || pText.includes("điện thoại") || pText.includes("sđt")) currentCp = "cp-000-0";
-      else if (pText.includes("indictment") || pText.includes("accusation") || pText.includes("cáo trạng")) currentCp = "cp-000-2b";
+      else if (pText.includes("tung") || pText.includes("tùng"))
+        currentCp = "cp-000-1b";
+      else if (pText.includes("ha") || pText.includes("hà"))
+        currentCp = "cp-000-1c";
+      else if (
+        pText.includes("phone") ||
+        pText.includes("điện thoại") ||
+        pText.includes("sđt")
+      )
+        currentCp = "cp-000-0";
+      else if (
+        pText.includes("indictment") ||
+        pText.includes("accusation") ||
+        pText.includes("cáo trạng")
+      )
+        currentCp = "cp-000-2b";
     }
 
     if (currentCp) {
@@ -271,9 +304,12 @@ export function MainInvestigationCanvas({
       }
       setStorageItem("active_investigation_checkpoint", currentCp);
       setStorageItem("last_interacted_checkpoint", currentCp);
-      if (currentCp === "cp-000-1a") setStorageItem("last_viewed_suspect", "vu");
-      else if (currentCp === "cp-000-1b") setStorageItem("last_viewed_suspect", "tung");
-      else if (currentCp === "cp-000-1c") setStorageItem("last_viewed_suspect", "ha");
+      if (currentCp === "cp-000-1a")
+        setStorageItem("last_viewed_suspect", "vu");
+      else if (currentCp === "cp-000-1b")
+        setStorageItem("last_viewed_suspect", "tung");
+      else if (currentCp === "cp-000-1c")
+        setStorageItem("last_viewed_suspect", "ha");
     }
   }, [
     isFollowupQuestionOpen,
@@ -310,23 +346,46 @@ export function MainInvestigationCanvas({
         ).toLowerCase();
         if (normUrl) {
           const rawCode = (item.photo_code || "").toLowerCase().trim();
-          if (rawCode === "avatar_vu" || code.includes("vu") || code.includes("vũ"))
+          if (
+            rawCode === "avatar_vu" ||
+            code.includes("vu") ||
+            code.includes("vũ")
+          )
             map.vu = normUrl;
-          if (rawCode === "avatar_tung" || code.includes("tung") || code.includes("tùng"))
+          if (
+            rawCode === "avatar_tung" ||
+            code.includes("tung") ||
+            code.includes("tùng")
+          )
             map.tung = normUrl;
-          if (rawCode === "avatar_ha" || code.includes("ha") || code.includes("hà"))
+          if (
+            rawCode === "avatar_ha" ||
+            code.includes("ha") ||
+            code.includes("hà")
+          )
             map.ha = normUrl;
           if (rawCode === "avatar_mai" || code.includes("mai"))
             map.mai = normUrl;
           if (rawCode === "avatar_khang" || code.includes("khang"))
             map.khang = normUrl;
-          if (rawCode === "avatar_dat" || code.includes("dat") || code.includes("đạt"))
+          if (
+            rawCode === "avatar_dat" ||
+            code.includes("dat") ||
+            code.includes("đạt")
+          )
             map.dat = normUrl;
-          if (rawCode === "avatar_lua" || code.includes("lua") || code.includes("lụa"))
+          if (
+            rawCode === "avatar_lua" ||
+            code.includes("lua") ||
+            code.includes("lụa")
+          )
             map.lua = normUrl;
-          if (rawCode === "avatar_vy" || code.includes("vy"))
-            map.vy = normUrl;
-          if (rawCode === "avatar_tien" || code.includes("tien") || code.includes("tiến"))
+          if (rawCode === "avatar_vy" || code.includes("vy")) map.vy = normUrl;
+          if (
+            rawCode === "avatar_tien" ||
+            code.includes("tien") ||
+            code.includes("tiến")
+          )
             map.tien = normUrl;
           if (rawCode === "avatar_huy" || code.includes("huy"))
             map.huy = normUrl;
@@ -338,7 +397,9 @@ export function MainInvestigationCanvas({
             code.includes("thi_the") ||
             code.includes("thi thể") ||
             (code.includes("crime") && !code.includes("room")) ||
-            (code.includes("hien_truong") && !code.includes("phong_khach") && !code.includes("phòng khách"))
+            (code.includes("hien_truong") &&
+              !code.includes("phong_khach") &&
+              !code.includes("phòng khách"))
           )
             map.crime_scene = normUrl;
         }
@@ -511,14 +572,13 @@ export function MainInvestigationCanvas({
       }
 
       // 0. Tự động ép cập nhật & xóa cache layout cũ nếu phiên bản không khớp
-      const CURRENT_LAYOUT_VERSION = "2026.10.10_v7_no_pin_string";
       const savedLayoutVersion = getStorageItem("board_layout_version");
-      if (savedLayoutVersion !== CURRENT_LAYOUT_VERSION) {
+      if (savedLayoutVersion !== CURRENT_BOARD_LAYOUT_VERSION) {
         removeStorageItem("boardgame_pins_case-000");
         removeStorageItem("admin_custom_pins_case-000");
         removeStorageItem("boardgame_transforms_case-000");
         removeStorageItem("admin_connections_case-000");
-        setStorageItem("board_layout_version", CURRENT_LAYOUT_VERSION);
+        setStorageItem("board_layout_version", CURRENT_BOARD_LAYOUT_VERSION);
       }
 
       // 1. Tải cache cục bộ từ storage (đã được dọn sạch nếu cũ)
@@ -541,14 +601,22 @@ export function MainInvestigationCanvas({
         getStorageJson<CaseConnection[]>("admin_connections_case-000", []),
       );
 
-      // 2. Tải đồng bộ từ Supabase Database nếu có
+      // 2. Tải đồng bộ từ Supabase Database nếu có (posMap + transforms
+      // + adminPins + connections dây đỏ). DB là source of truth.
       try {
         const res = await getBoardgamePinPositions("case-000");
         if (res.success && res.pins.length > 0) {
           const posMap: Record<string, { x: number; y: number }> = {};
+          const tfMap: Record<string, { rotation: number; scale: number }> = {};
           const dbCustomPins: PinPoint[] = [];
           res.pins.forEach((p) => {
             posMap[p.id] = { x: p.x, y: p.y };
+            if (typeof p.rotation === "number" || typeof p.scale === "number") {
+              tfMap[p.id] = {
+                rotation: p.rotation ?? 0,
+                scale: p.scale ?? 1.0,
+              };
+            }
             if (
               p.id.startsWith("admin-pin-") ||
               p.id.startsWith("custom-pin-")
@@ -557,12 +625,20 @@ export function MainInvestigationCanvas({
             }
           });
           setCustomPinPositions(posMap);
+          setPinTransforms(tfMap);
           if (dbCustomPins.length > 0) {
             setAdminCustomPins(dbCustomPins);
           }
+          if (res.connections && res.connections.length > 0) {
+            setAdminConnections(res.connections);
+          }
           setStorageJson("boardgame_pins_case-000", posMap);
+          setStorageJson("boardgame_transforms_case-000", tfMap);
           if (dbCustomPins.length > 0) {
             setStorageJson("admin_custom_pins_case-000", dbCustomPins);
+          }
+          if (res.connections && res.connections.length > 0) {
+            setStorageJson("admin_connections_case-000", res.connections);
           }
         }
       } catch {}
@@ -582,10 +658,7 @@ export function MainInvestigationCanvas({
           ...draft.posMap,
           [pin.id]: { x: pin.x, y: pin.y },
         };
-        setStorageJson(
-          "admin_custom_pins_case-000",
-          nextAdminPins,
-        );
+        setStorageJson("admin_custom_pins_case-000", nextAdminPins);
         return {
           posMap: nextPosMap,
           adminPins: nextAdminPins,
@@ -609,18 +682,9 @@ export function MainInvestigationCanvas({
         const nextConns = draft.connections.filter(
           (c) => c.fromPinId !== pinId && c.toPinId !== pinId,
         );
-        setStorageJson(
-          "admin_custom_pins_case-000",
-          nextAdminPins,
-        );
-        setStorageJson(
-          "boardgame_transforms_case-000",
-          nextTransforms,
-        );
-        setStorageJson(
-          "admin_connections_case-000",
-          nextConns,
-        );
+        setStorageJson("admin_custom_pins_case-000", nextAdminPins);
+        setStorageJson("boardgame_transforms_case-000", nextTransforms);
+        setStorageJson("admin_connections_case-000", nextConns);
         return {
           posMap: nextPosMap,
           adminPins: nextAdminPins,
@@ -654,10 +718,7 @@ export function MainInvestigationCanvas({
           },
         };
 
-        setStorageJson(
-          "boardgame_transforms_case-000",
-          nextTransforms,
-        );
+        setStorageJson("boardgame_transforms_case-000", nextTransforms);
 
         return {
           posMap: draft.posMap,
@@ -687,10 +748,7 @@ export function MainInvestigationCanvas({
         const nextConns = exists
           ? draft.connections.filter((_, idx) => idx !== existingIndex)
           : [...draft.connections, { id: connId1, fromPinId, toPinId }];
-        setStorageJson(
-          "admin_connections_case-000",
-          nextConns,
-        );
+        setStorageJson("admin_connections_case-000", nextConns);
         if (exists) {
           toast.info("Đã tháo dây chỉ đỏ giữa 2 node!");
         } else {
@@ -709,10 +767,7 @@ export function MainInvestigationCanvas({
     (connId: string) => {
       commitLayout((draft) => {
         const nextConns = draft.connections.filter((c) => c.id !== connId);
-        setStorageJson(
-          "admin_connections_case-000",
-          nextConns,
-        );
+        setStorageJson("admin_connections_case-000", nextConns);
         return {
           ...draft,
           connections: nextConns,
@@ -745,7 +800,7 @@ export function MainInvestigationCanvas({
     removeStorageItem("admin_custom_pins_case-000");
     removeStorageItem("boardgame_transforms_case-000");
     removeStorageItem("admin_connections_case-000");
-    setStorageItem("board_layout_version", "2026.10.10_v5_force_sync");
+    setStorageItem("board_layout_version", CURRENT_BOARD_LAYOUT_VERSION);
     setCustomPinPositions({});
     setAdminCustomPins([]);
     setPinTransforms({});
@@ -760,19 +815,33 @@ export function MainInvestigationCanvas({
     // 1. Luôn lưu ngay vào storage làm cache trình duyệt
     try {
       const posMap: Record<string, { x: number; y: number }> = {};
+      const tfMap: Record<string, { rotation: number; scale: number }> = {};
       pinsToSave.forEach((p) => {
         posMap[p.id] = { x: p.x, y: p.y };
+        if (typeof p.rotation === "number" || typeof p.scale === "number") {
+          tfMap[p.id] = {
+            rotation: p.rotation ?? 0,
+            scale: p.scale ?? 1.0,
+          };
+        }
       });
-      setStorageItem(
-        "boardgame_pins_case-000",
-        JSON.stringify(posMap),
-      );
+      setStorageJson("boardgame_pins_case-000", posMap);
+      setStorageJson("boardgame_transforms_case-000", {
+        ...pinTransforms,
+        ...tfMap,
+      });
       setCustomPinPositions(posMap);
+      setPinTransforms((prev) => ({ ...prev, ...tfMap }));
     } catch {}
 
-    // 2. Đồng bộ lên Supabase Database
+    // 2. Đồng bộ lên Supabase Database (pins + connections dây đỏ admin).
+    //    CHỈ clear hasUnsavedChanges khi DB success, để admin biết còn nợ lưu.
     try {
-      const res = await saveBoardgamePinPositions("case-000", pinsToSave);
+      const res = await saveBoardgamePinPositions(
+        "case-000",
+        pinsToSave,
+        adminConnections,
+      );
       if (res.success) {
         toast.success("Đã lưu vị trí ghim lên Supabase DB & Cục bộ!");
         setHasUnsavedChanges(false);
@@ -782,11 +851,9 @@ export function MainInvestigationCanvas({
             (res.error || "Chưa tạo bảng boardgame_pins") +
             ")",
         );
-        setHasUnsavedChanges(false);
       }
     } catch (err: any) {
       toast.error("Đã lưu cục bộ! (Supabase lỗi: " + err.message + ")");
-      setHasUnsavedChanges(false);
     } finally {
       setIsSavingLayout(false);
     }
@@ -810,9 +877,7 @@ export function MainInvestigationCanvas({
   // Restore saved state from storage if available
   useEffect(() => {
     const rawSuspects = getStorageJson<any[]>("canvas_suspects", []);
-    const validList = rawSuspects.filter(
-      (s) => s?.id !== "suspect-default-1",
-    );
+    const validList = rawSuspects.filter((s) => s?.id !== "suspect-default-1");
     setSuspects(sanitizeSuspectsList(validList));
 
     const solvedFollowups = getStorageJson<("vu" | "tung" | "ha")[]>(
@@ -851,10 +916,7 @@ export function MainInvestigationCanvas({
 
     if (getStorageItem("indictment_solved") === "true") {
       const savedCulprit = getStorageItem("indictment_culprit") as
-        | "vu"
-        | "tung"
-        | "ha"
-        | null;
+        "vu" | "tung" | "ha" | null;
       if (savedCulprit) {
         setIsIndictmentSolved(true);
         setSolvedCulprit(savedCulprit);
@@ -1040,11 +1102,20 @@ export function MainInvestigationCanvas({
       const pText = `${id} ${label} ${detail}`;
       let clickedCp: string | null = pin?.checkpointId || null;
       if (!clickedCp) {
-        if (pText.includes("vu") || pText.includes("vũ")) clickedCp = "cp-000-1a";
-        else if (pText.includes("tung") || pText.includes("tùng")) clickedCp = "cp-000-1b";
-        else if (pText.includes("ha") || pText.includes("hà")) clickedCp = "cp-000-1c";
-        else if (pText.includes("phone") || pText.includes("điện thoại") || pText.includes("sđt")) clickedCp = "cp-000-0";
-        else if (pText.includes("indictment") || pText.includes("cáo trạng")) clickedCp = "cp-000-2b";
+        if (pText.includes("vu") || pText.includes("vũ"))
+          clickedCp = "cp-000-1a";
+        else if (pText.includes("tung") || pText.includes("tùng"))
+          clickedCp = "cp-000-1b";
+        else if (pText.includes("ha") || pText.includes("hà"))
+          clickedCp = "cp-000-1c";
+        else if (
+          pText.includes("phone") ||
+          pText.includes("điện thoại") ||
+          pText.includes("sđt")
+        )
+          clickedCp = "cp-000-0";
+        else if (pText.includes("indictment") || pText.includes("cáo trạng"))
+          clickedCp = "cp-000-2b";
       }
       if (clickedCp) {
         if (typeof window !== "undefined") {
@@ -1052,9 +1123,12 @@ export function MainInvestigationCanvas({
         }
         setStorageItem("active_investigation_checkpoint", clickedCp);
         setStorageItem("last_interacted_checkpoint", clickedCp);
-        if (clickedCp === "cp-000-1a") setStorageItem("last_viewed_suspect", "vu");
-        else if (clickedCp === "cp-000-1b") setStorageItem("last_viewed_suspect", "tung");
-        else if (clickedCp === "cp-000-1c") setStorageItem("last_viewed_suspect", "ha");
+        if (clickedCp === "cp-000-1a")
+          setStorageItem("last_viewed_suspect", "vu");
+        else if (clickedCp === "cp-000-1b")
+          setStorageItem("last_viewed_suspect", "tung");
+        else if (clickedCp === "cp-000-1c")
+          setStorageItem("last_viewed_suspect", "ha");
       }
 
       // Chế độ Setup: chọn node để hiển thị thanh điều chỉnh nhanh (xoay, resize, sửa, xoá)
@@ -1351,9 +1425,12 @@ export function MainInvestigationCanvas({
   );
 
   // Dynamic Followup Pins cho Vũ, Tùng và Hà (Kéo xuống vùng dưới đáy bảng): CHỈ hiển thị sau khi đã bấm "ĐIỀU TRA" (hoặc Admin Preview)
-  const hasVuFollowup = isShowAllPinsPreview || investigatedSuspects.includes("vu");
-  const hasTungFollowup = isShowAllPinsPreview || investigatedSuspects.includes("tung");
-  const hasHaFollowup = isShowAllPinsPreview || investigatedSuspects.includes("ha");
+  const hasVuFollowup =
+    isShowAllPinsPreview || investigatedSuspects.includes("vu");
+  const hasTungFollowup =
+    isShowAllPinsPreview || investigatedSuspects.includes("tung");
+  const hasHaFollowup =
+    isShowAllPinsPreview || investigatedSuspects.includes("ha");
 
   const followupPinsMobile: PinPoint[] = [
     ...(hasVuFollowup
@@ -1500,7 +1577,8 @@ export function MainInvestigationCanvas({
           x: 0.38,
           y: 0.14,
           label: "Điện thoại nạn nhân",
-          detail: "Vật chứng: Điện thoại iPhone 6s Plus thu giữ của nạn nhân Nguyễn Văn Khang",
+          detail:
+            "Vật chứng: Điện thoại iPhone 6s Plus thu giữ của nạn nhân Nguyễn Văn Khang",
           color: "yellow" as const,
           photoUrl: "/phone.png",
           scale: 0.85,
@@ -1603,7 +1681,8 @@ export function MainInvestigationCanvas({
           x: 0.38,
           y: 0.14,
           label: "Điện thoại nạn nhân",
-          detail: "Vật chứng: Điện thoại iPhone 6s Plus thu giữ của nạn nhân Nguyễn Văn Khang",
+          detail:
+            "Vật chứng: Điện thoại iPhone 6s Plus thu giữ của nạn nhân Nguyễn Văn Khang",
           color: "yellow" as const,
           pinColor: "yellow" as const,
           photoUrl: "/phone.png",
@@ -1681,8 +1760,15 @@ export function MainInvestigationCanvas({
   });
   const selectedPin = displayPins.find((p) => p.id === selectedPinId) || null;
 
-  // Tất cả các ghim (bao gồm ghim hệ thống, ảnh nghi phạm node-suspect-* và nghi vấn mở rộng) đều được lưu vị trí
-  const persistablePins = displayPins;
+  // Chỉ lưu pin nghiệp vụ gốc (c0-*) + admin/custom. LOẠI pin động:
+  // node-suspect-* (sinh từ suspects state), c0-pin-followup-* (sinh từ
+  // investigatedSuspects). Pin động render lại mỗi mount, lưu DB gây rác.
+  const isPersistablePinId = (id: string) =>
+    !id.startsWith("node-suspect-") &&
+    !id.startsWith("suspect-") &&
+    !id.startsWith("c0-pin-followup") &&
+    !id.startsWith("followup-");
+  const persistablePins = displayPins.filter((p) => isPersistablePinId(p.id));
 
   const customConnections: CaseConnection[] = [
     {
@@ -1744,7 +1830,10 @@ export function MainInvestigationCanvas({
       }`}
     >
       {/* Top Banner Toolbar — offset bằng safe-area-inset-top để không bị che bởi status bar iOS/Android */}
-      <div className="absolute left-4 z-20 flex items-center gap-2 pointer-events-none" style={{ top: 'max(12px, env(safe-area-inset-top, 12px))' }}>
+      <div
+        className="absolute left-4 z-20 flex items-center gap-2 pointer-events-none"
+        style={{ top: "max(12px, env(safe-area-inset-top, 12px))" }}
+      >
         <div className="flex items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto">
           <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
@@ -1899,7 +1988,9 @@ export function MainInvestigationCanvas({
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.15 }}
             className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center gap-0.5 p-0.5 bg-[#1b140e]/95 backdrop-blur-md rounded-lg border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
-            style={{ top: 'calc(max(12px, env(safe-area-inset-top, 12px)) + 44px)' }}
+            style={{
+              top: "calc(max(12px, env(safe-area-inset-top, 12px)) + 44px)",
+            }}
           >
             {/* Tilt Left (-1 deg) */}
             <button
@@ -2004,10 +2095,7 @@ export function MainInvestigationCanvas({
             const next = Array.from(new Set([...prev, culprit])) as (
               "vu" | "tung" | "ha"
             )[];
-            setStorageItem(
-              "investigated_suspects",
-              JSON.stringify(next),
-            );
+            setStorageItem("investigated_suspects", JSON.stringify(next));
             return next;
           });
           setNarrativeCulprit(culprit);
@@ -2020,7 +2108,9 @@ export function MainInvestigationCanvas({
         isOpen={isPhoneLookupOpen}
         onClose={() => setIsPhoneLookupOpen(false)}
         onSuccess={handlePhoneLookupSuccess}
-        onOpenPhoneSimulator={onOpenPhoneSimulator || (() => setIsInternalPhoneOpen(true))}
+        onOpenPhoneSimulator={
+          onOpenPhoneSimulator || (() => setIsInternalPhoneOpen(true))
+        }
       />
 
       <PhoneNarrativeModal
