@@ -48,9 +48,9 @@ export function CulpritEpilogueModal({
   const isVu = culprit === 'vu'
   const isTung = culprit === 'tung'
   const isHa = culprit === 'ha'
-  const isHaMatchedAll = isHa && (choice === 'matched_3_tiles' || choice === 'matched_3_tiles_indictment')
-  const isQuestionSolved = choice === '21:15' || choice === 'question_solved' || isHaMatchedAll || choice === 'tin' || choice === 'khong_tin'
-  const showTwoChoiceButtons = (isVu || isTung || isHa) && isQuestionSolved && !internalChoice
+  const isHaBoxSolved = isHa && (choice === 'solved_box' || choice === 'solved' || choice === 'matched_3_tiles' || choice === 'matched_3_tiles_indictment')
+  const isQuestionSolved = (choice === '21:15' || choice === 'question_solved' || choice === 'tin' || choice === 'khong_tin') && !isHaBoxSolved
+  const showTwoChoiceButtons = (isVu || isTung) && isQuestionSolved && !internalChoice
   const suspectName = isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà'
 
   const getCheckpointMonologue = (cpId: string) => {
@@ -62,11 +62,19 @@ export function CulpritEpilogueModal({
     ? 'THÔNG BÁO ĐIỀU TRA — LÊ QUANG VŨ'
     : isTung
     ? 'THÔNG BÁO ĐIỀU TRA — NGUYỄN THANH TÙNG'
+    : isHaBoxSolved
+    ? 'BẢN KẾT LUẬN ĐIỀU TRA — KẾT ÁN THỦ PHẠM TRẦN THỊ HÀ'
     : 'THÔNG BÁO ĐIỀU TRA — TRẦN THỊ HÀ'
 
   let storyText = ''
 
-  if (showTwoChoiceButtons) {
+  if (isHaBoxSolved) {
+    // Narrative kết án trực tiếp từ checkpoint kết án cp-000-2b / cp-epilogue-ha
+    storyText =
+      getCheckpointMonologue('cp-000-2b') ||
+      getCheckpointMonologue('cp-epilogue-ha') ||
+      `Chiếc hộp thiếc bật mở cùng toàn bộ vật chứng chí mạng đã vạch trần tội ác!\n\nLá bùa yêu nhuộm đỏ, chiếc kéo dính máu và túi zip đựng lọn tóc mai cắt sát da đầu của nạn nhân Khang trùng khớp 100% mẫu ADN tại hiện trường.\n\nBức tường ngoại phạm của Trần Thị Hà hoàn toàn sụp đổ. Cơn cuồng ghen bệnh hoạn đã biến tình yêu mù quáng thành tội ác giết người lúc 21:00.\n\nĐã có đủ căn cứ pháp lý đanh thép để khởi tố và định tội hung thủ!`
+  } else if (showTwoChoiceButtons) {
     storyText = `Toàn bộ hành tung của ${suspectName} trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?`
   } else if (internalChoice === 'tin') {
     storyText = `Bạn lựa chọn tạm thời tin tưởng ${suspectName}.\n\nHãy chuyển hướng điều tra vụ án.\nTuy nhiên, xin các thám tử nhớ rằng: Một người chỉ được kết luận vô tội khi bạn tìm ra được hung thủ thực sự.`
@@ -76,8 +84,6 @@ export function CulpritEpilogueModal({
     } else {
       storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`
     }
-  } else if (isHaMatchedAll) {
-    storyText = getCheckpointMonologue('cp-epilogue-ha')
   } else {
     const suspectCpId = isVu ? 'cp-000-1a' : isTung ? 'cp-000-1b' : 'cp-000-1c'
     const epilogueCpId = isVu ? 'cp-epilogue-mai-vu' : isTung ? 'cp-epilogue-tung' : 'cp-epilogue-ha'
@@ -85,7 +91,9 @@ export function CulpritEpilogueModal({
   }
 
   let ctaButtonText = 'TIẾP TỤC ĐIỀU TRA'
-  if (!choice && !internalChoice) {
+  if (isHaBoxSolved) {
+    ctaButtonText = 'LẬP BẢN CÁO TRẠNG ĐỊNH TỘI'
+  } else if (!choice && !internalChoice) {
     ctaButtonText = 'Bắt đầu điều tra'
   } else if (internalChoice === 'tin') {
     ctaButtonText = 'Chuyển hướng điều tra'
@@ -99,6 +107,13 @@ export function CulpritEpilogueModal({
 
   const handleCtaClick = () => {
     detectiveAudio.playStampSound()
+    if (isHaBoxSolved) {
+      onClose()
+      if (onOpenIndictment) {
+        onOpenIndictment()
+      }
+      return
+    }
     if (!choice && !internalChoice) {
       onClose()
       if (onOpenFollowupQuestion) {

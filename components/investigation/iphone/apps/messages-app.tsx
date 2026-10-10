@@ -11,8 +11,14 @@ import {
   ShieldAlert,
   Loader2,
   SquarePen,
+  Play,
+  Pause,
+  Volume2,
+  Maximize2,
+  Film,
+  Image as ImageIcon,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, normalizeImageUrl, normalizeMediaUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { getStorageJson, setStorageJson } from "@/lib/storage";
 
@@ -29,8 +35,32 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     null,
   );
 
+  // Audio Playback State
+  const [activeAudioId, setActiveAudioId] = useState<string | null>(null);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const [audioDuration, setAudioDuration] = useState<number | null>(null);
+  const audioRef = useState<HTMLAudioElement | null>(null)[0];
+
+  // Media preview modal (Image lightbox or Video popup)
+  const [mediaPreview, setMediaPreview] = useState<{
+    type: "image" | "video";
+    url: string;
+    title?: string;
+  } | null>(null);
+
   // Fetch messages live from Google Sheets CMS
   const { data: rawMessagesData, loading, error } = usePhoneData("messages");
+
+  // Global audio element reference
+  useEffect(() => {
+    return () => {
+      // Cleanup audio playback on unmount
+      if (activeAudioId) {
+        setIsPlayingAudio(false);
+      }
+    };
+  }, [activeAudioId]);
 
   // Map CMS rows to thread objects
   const threads = rawMessagesData.map((item: any, idx: number) => {
@@ -59,6 +89,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
         let clueAnalysis = "";
         let isClue = false;
 
+        // 1. Parse [CLUE: title | analysis]
         const clueMatch = cleanLine.match(
           /\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i,
         );
@@ -71,6 +102,87 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             .trim();
         }
 
+        // 2. Parse attachments: [AUDIO: url | duration], [IMAGE: url], [VIDEO: url]
+        let attachment: any = null;
+
+        const audioMatch = cleanLine.match(
+          /\[AUDIO:\s*([^|\]]+)(?:\s*\|\s*([^\]]+))?\]/i,
+        );
+        if (audioMatch) {
+          const rawUrl = audioMatch[1].trim();
+          const duration = audioMatch[2]?.trim() || "0:08";
+          attachment = {
+            type: "audio",
+            url: normalizeMediaUrl(rawUrl),
+            duration,
+          };
+          cleanLine = cleanLine.replace(audioMatch[0], "").trim();
+        }
+
+        // Support Vietnamese tag with or without link:
+        // Cú pháp 1: 🎙️ [Tin nhắn thoại 0:08 | https://drive.google.com/...]
+        // Cú pháp 2: 🎙️ [Tin nhắn thoại | https://drive.google.com/... | 0:08]
+        // Cú pháp 3: 🎙️ [Tin nhắn thoại 0:08] (không link -> dùng mặc định)
+        if (!attachment) {
+          const vnAudioWithLinkMatch = cleanLine.match(
+            /(?:🎙️\s*)?\[(?:Tin nhắn thoại|Thư thoại|Voice|Audio)\s*(?:([0-9:]+)\s*\|\s*([^\]|]+)|([^\]|]+)\s*\|\s*([0-9:]+)|([^\]|]+))\]/i,
+          );
+          if (vnAudioWithLinkMatch) {
+            let duration = "0:08";
+            let rawUrl = "";
+
+            if (vnAudioWithLinkMatch[1] && vnAudioWithLinkMatch[2]) {
+              duration = vnAudioWithLinkMatch[1].trim();
+              rawUrl = vnAudioWithLinkMatch[2].trim();
+            } else if (vnAudioWithLinkMatch[3] && vnAudioWithLinkMatch[4]) {
+              rawUrl = vnAudioWithLinkMatch[3].trim();
+              duration = vnAudioWithLinkMatch[4].trim();
+            } else if (vnAudioWithLinkMatch[5]) {
+              const part = vnAudioWithLinkMatch[5].trim();
+              if (/^[0-9:]+$/.test(part)) {
+                duration = part;
+              } else if (part.includes("http") || part.includes("/") || part.includes("drive")) {
+                rawUrl = part;
+              }
+            }
+
+            if (!rawUrl) {
+              rawUrl =
+                item.contact_name === "Hà"
+                  ? "/audio/ha_voicemail_2032.mp3"
+                  : "/audio/voice_khang.mp3";
+            }
+
+            attachment = {
+              type: "audio",
+              url: normalizeMediaUrl(rawUrl),
+              duration,
+            };
+            cleanLine = cleanLine.replace(vnAudioWithLinkMatch[0], "").trim();
+          }
+        }
+
+        const imageMatch = cleanLine.match(/\[IMAGE:\s*([^\]]+)\]/i);
+        if (imageMatch) {
+          const rawUrl = imageMatch[1].trim();
+          attachment = {
+            type: "image",
+            url: normalizeImageUrl(rawUrl),
+          };
+          cleanLine = cleanLine.replace(imageMatch[0], "").trim();
+        }
+
+        const videoMatch = cleanLine.match(/\[VIDEO:\s*([^\]]+)\]/i);
+        if (videoMatch) {
+          const rawUrl = videoMatch[1].trim();
+          attachment = {
+            type: "video",
+            url: normalizeMediaUrl(rawUrl),
+          };
+          cleanLine = cleanLine.replace(videoMatch[0], "").trim();
+        }
+
+        // 3. Parse Timestamp: (24/07 • 20:32) or (20:32)
         let timestamp = "";
         const tsMatch = cleanLine.match(/^\(([^)]+)\)\s*(.*)$/);
         let text = cleanLine;
@@ -86,6 +198,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           role: isSent ? "sent" : "received",
           text,
           timestamp,
+          attachment,
           isClue,
           clueTitle,
           clueAnalysis,
@@ -104,7 +217,13 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
       previewText:
         item.preview_text ||
         (parsedMessages.length > 0
-          ? parsedMessages[parsedMessages.length - 1].text
+          ? parsedMessages[parsedMessages.length - 1].attachment?.type === "audio"
+            ? "🎙️ Tin nhắn thoại"
+            : parsedMessages[parsedMessages.length - 1].attachment?.type === "image"
+            ? "📷 Hình ảnh"
+            : parsedMessages[parsedMessages.length - 1].attachment?.type === "video"
+            ? "📹 Video"
+            : parsedMessages[parsedMessages.length - 1].text
           : ""),
       messages: parsedMessages.map((m: any, mIdx: number) => ({
         id: m.id || `msg-${idx}-${mIdx}`,
@@ -112,6 +231,11 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
         role: m.role || (m.sender === "Khang" ? "sent" : "received"),
         text: m.text || m.content || "",
         timestamp: m.timestamp || "",
+        attachment: m.attachment || (m.media_url ? {
+          type: m.media_type || "image",
+          url: m.media_type === "audio" || m.media_type === "video" ? normalizeMediaUrl(m.media_url) : normalizeImageUrl(m.media_url),
+          duration: m.duration
+        } : undefined),
         isClue: m.isClue || m.is_clue === "TRUE" || m.is_clue === true,
         clueTitle: m.clueTitle || m.clue_title || "",
         clueAnalysis: m.clueAnalysis || m.clue_analysis || "",
@@ -139,6 +263,52 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     setTimeout(() => setPinnedNotification(null), 2500);
   };
 
+  // Play audio toggle
+  const togglePlayAudio = (msgId: string, audioUrl: string) => {
+    const existingAudio = document.getElementById(
+      "msg-active-audio",
+    ) as HTMLAudioElement;
+
+    if (activeAudioId === msgId && isPlayingAudio) {
+      if (existingAudio) existingAudio.pause();
+      setIsPlayingAudio(false);
+      return;
+    }
+
+    if (existingAudio) {
+      existingAudio.pause();
+      existingAudio.remove();
+    }
+
+    const audio = new Audio(audioUrl);
+    audio.id = "msg-active-audio";
+    setActiveAudioId(msgId);
+    setIsPlayingAudio(true);
+    setAudioProgress(0);
+
+    audio.ontimeupdate = () => {
+      if (audio.duration) {
+        setAudioProgress((audio.currentTime / audio.duration) * 100);
+      }
+    };
+
+    audio.onended = () => {
+      setIsPlayingAudio(false);
+      setAudioProgress(0);
+      setActiveAudioId(null);
+    };
+
+    audio.onerror = () => {
+      setIsPlayingAudio(false);
+      setActiveAudioId(null);
+    };
+
+    audio.play().catch((err) => {
+      console.warn("Could not play audio message:", err);
+      setIsPlayingAudio(false);
+    });
+  };
+
   const filteredThreads = threads.filter(
     (t: any) =>
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -163,7 +333,18 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           {/* Light Header per Figma Specs */}
           <div className="flex items-center justify-between px-3 h-[44px] bg-[#FFFFFF] border-b border-[#E3E2E7] shrink-0 z-10">
             <button
-              onClick={() => setSelectedThread(null)}
+              onClick={() => {
+                const existingAudio = document.getElementById(
+                  "msg-active-audio",
+                ) as HTMLAudioElement;
+                if (existingAudio) {
+                  existingAudio.pause();
+                  existingAudio.remove();
+                }
+                setIsPlayingAudio(false);
+                setActiveAudioId(null);
+                setSelectedThread(null);
+              }}
               className="flex items-center gap-0.5 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
             >
               <ChevronLeft className="size-5" />
@@ -199,32 +380,182 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             {selectedThread.messages.map((msg: any) => {
               const isMe = msg.role === "sent";
               const isPinned = pinnedClueIds.includes(msg.id);
+              const attachment = msg.attachment;
 
               return (
                 <div
                   key={msg.id}
                   className={cn(
-                    "flex flex-col max-w-[82%]",
+                    "flex flex-col max-w-[85%]",
                     isMe ? "self-end items-end" : "self-start items-start",
                   )}
                 >
-                  <div
-                    className={cn(
-                      "rounded-[18px] px-3.5 py-2 text-[15px] leading-relaxed shadow-xs relative transition-all font-normal",
-                      isMe
-                        ? "bg-[#0058BC] text-white rounded-br-[4px]"
-                        : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
-                    )}
-                  >
-                    <p className="whitespace-pre-wrap break-words">
-                      {msg.text}
-                    </p>
-                    {isPinned && (
-                      <span className="absolute -top-1 -right-1 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
-                        ★
+                  {/* ATTACHMENT: AUDIO / VOICE MESSAGE */}
+                  {attachment?.type === "audio" && (
+                    <div
+                      className={cn(
+                        "rounded-[20px] p-2.5 px-3.5 mb-1 shadow-xs relative transition-all flex items-center gap-3 min-w-[210px]",
+                        isMe
+                          ? "bg-[#0058BC] text-white rounded-br-[4px]"
+                          : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
+                      )}
+                    >
+                      <button
+                        onClick={() => togglePlayAudio(msg.id, attachment.url)}
+                        className={cn(
+                          "size-8 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 cursor-pointer shadow-xs",
+                          isMe
+                            ? "bg-white text-[#0058BC] hover:bg-slate-100"
+                            : "bg-[#0058BC] text-white hover:bg-[#004899]",
+                        )}
+                        title="Nghe tin nhắn thoại"
+                      >
+                        {activeAudioId === msg.id && isPlayingAudio ? (
+                          <Pause className="size-4 fill-current" />
+                        ) : (
+                          <Play className="size-4 fill-current ml-0.5" />
+                        )}
+                      </button>
+
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span
+                            className={cn(
+                              "text-[11px] font-semibold tracking-wide uppercase flex items-center gap-1",
+                              isMe ? "text-white/80" : "text-[#717786]",
+                            )}
+                          >
+                            <Volume2 className="size-3" /> Tin nhắn thoại
+                          </span>
+                          <span
+                            className={cn(
+                              "text-[11px] font-mono",
+                              isMe ? "text-white/90" : "text-[#414755]",
+                            )}
+                          >
+                            {attachment.duration || "0:08"}
+                          </span>
+                        </div>
+
+                        {/* Audio Waveform visualization */}
+                        <div className="h-3 flex items-center gap-[3px] w-full">
+                          {[30, 70, 45, 90, 60, 100, 40, 80, 50, 85, 30, 95, 60, 40, 70].map(
+                            (heightPercent, barIdx) => {
+                              const barThreshold = (barIdx / 15) * 100;
+                              const isPast =
+                                activeAudioId === msg.id &&
+                                audioProgress >= barThreshold;
+                              return (
+                                <div
+                                  key={barIdx}
+                                  className={cn(
+                                    "flex-1 rounded-full transition-colors",
+                                    isMe
+                                      ? isPast
+                                        ? "bg-white"
+                                        : "bg-white/40"
+                                      : isPast
+                                      ? "bg-[#0058BC]"
+                                      : "bg-[#C1C6D7]",
+                                  )}
+                                  style={{ height: `${heightPercent}%` }}
+                                />
+                              );
+                            },
+                          )}
+                        </div>
+                      </div>
+
+                      {isPinned && (
+                        <span className="absolute -top-1 -right-1 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
+                          ★
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ATTACHMENT: IMAGE */}
+                  {attachment?.type === "image" && (
+                    <div
+                      onClick={() =>
+                        setMediaPreview({
+                          type: "image",
+                          url: attachment.url,
+                          title: msg.text || "Ảnh đính kèm",
+                        })
+                      }
+                      className={cn(
+                        "rounded-[16px] overflow-hidden mb-1 shadow-xs border border-[#E3E2E7] cursor-pointer hover:opacity-95 transition-opacity max-w-[240px] relative group",
+                        isMe ? "rounded-br-[4px]" : "rounded-bl-[4px]",
+                      )}
+                    >
+                      <img
+                        src={attachment.url}
+                        alt="Đính kèm"
+                        className="w-full max-h-[220px] object-cover bg-black/5"
+                        loading="lazy"
+                      />
+                      <div className="absolute bottom-1.5 right-1.5 bg-black/60 backdrop-blur-xs text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Maximize2 className="size-3.5" />
+                      </div>
+                      {isPinned && (
+                        <span className="absolute top-1.5 right-1.5 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
+                          ★
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ATTACHMENT: VIDEO */}
+                  {attachment?.type === "video" && (
+                    <div
+                      onClick={() =>
+                        setMediaPreview({
+                          type: "video",
+                          url: attachment.url,
+                          title: msg.text || "Video đính kèm",
+                        })
+                      }
+                      className={cn(
+                        "rounded-[16px] overflow-hidden mb-1 shadow-xs border border-[#E3E2E7] cursor-pointer hover:opacity-95 transition-opacity max-w-[240px] relative bg-black aspect-video flex items-center justify-center group",
+                        isMe ? "rounded-br-[4px]" : "rounded-bl-[4px]",
+                      )}
+                    >
+                      <div className="size-10 rounded-full bg-white/80 group-hover:bg-white text-[#1A1B1F] flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                        <Play className="size-5 fill-current ml-0.5" />
+                      </div>
+                      <span className="absolute bottom-1.5 left-2 text-[10px] text-white/90 font-medium flex items-center gap-1 bg-black/40 px-1.5 py-0.5 rounded">
+                        <Film className="size-3" /> Video
                       </span>
-                    )}
-                  </div>
+                      {isPinned && (
+                        <span className="absolute top-1.5 right-1.5 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
+                          ★
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* REGULAR TEXT BUBBLE (If text exists) */}
+                  {Boolean(msg.text) && (
+                    <div
+                      className={cn(
+                        "rounded-[18px] px-3.5 py-2 text-[15px] leading-relaxed shadow-xs relative transition-all font-normal",
+                        isMe
+                          ? "bg-[#0058BC] text-white rounded-br-[4px]"
+                          : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
+                      )}
+                    >
+                      <p className="whitespace-pre-wrap break-words">
+                        {msg.text}
+                      </p>
+                      {isPinned && !attachment && (
+                        <span className="absolute -top-1 -right-1 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
+                          ★
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {msg.timestamp && (
                     <span className="text-[11px] text-[#717786] font-normal mt-0.5 px-1">
                       {msg.timestamp}
@@ -383,6 +714,41 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                   ? "Đã ghim vào sổ tay"
                   : "Ghim vào sổ tay"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Media Preview Modal (Image Lightbox / Video Player) */}
+      {mediaPreview && (
+        <div className="absolute inset-0 z-50 bg-black/90 backdrop-blur-sm p-4 flex flex-col justify-center items-center animate-in fade-in-50">
+          <div className="w-full max-w-[340px] flex flex-col items-center">
+            <div className="w-full flex items-center justify-between pb-2 text-white/80">
+              <span className="text-[12px] font-medium truncate max-w-[240px]">
+                {mediaPreview.title || (mediaPreview.type === "image" ? "Xem hình ảnh" : "Phát video")}
+              </span>
+              <button
+                onClick={() => setMediaPreview(null)}
+                className="p-1 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="w-full rounded-xl overflow-hidden bg-black/40 border border-white/10 shadow-2xl flex items-center justify-center max-h-[460px]">
+              {mediaPreview.type === "image" ? (
+                <img
+                  src={mediaPreview.url}
+                  alt="Xem chi tiết"
+                  className="w-full max-h-[460px] object-contain"
+                />
+              ) : (
+                <video
+                  src={mediaPreview.url}
+                  controls
+                  autoPlay
+                  className="w-full max-h-[460px] object-contain"
+                />
+              )}
             </div>
           </div>
         </div>

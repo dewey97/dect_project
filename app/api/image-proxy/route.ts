@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+// In-memory binary cache cho Next.js server để phục vụ ảnh tức thì (0ms) sau lần tải đầu
+const imageMemoryCache = new Map<string, { buffer: ArrayBuffer; contentType: string; timestamp: number }>();
+const MAX_CACHE_AGE_MS = 1000 * 60 * 60 * 12; // 12 hours
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const rawUrl = searchParams.get("url");
@@ -21,6 +25,19 @@ export async function GET(request: NextRequest) {
 
   if (!targetUrl) {
     return new NextResponse("Missing url or id parameter", { status: 400 });
+  }
+
+  const cacheKey = driveId || targetUrl;
+  const cached = imageMemoryCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < MAX_CACHE_AGE_MS) {
+    return new NextResponse(cached.buffer, {
+      headers: {
+        "Content-Type": cached.contentType,
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "Access-Control-Allow-Origin": "*",
+        "X-Cache": "HIT",
+      },
+    });
   }
 
   try {
@@ -43,12 +60,20 @@ export async function GET(request: NextRequest) {
     const contentType = res.headers.get("content-type") || "image/png";
     const buffer = await res.arrayBuffer();
 
+    // Lưu vào bộ nhớ đệm máy chủ
+    imageMemoryCache.set(cacheKey, {
+      buffer,
+      contentType,
+      timestamp: Date.now(),
+    });
+
     return new NextResponse(buffer, {
       headers: {
         "Content-Type": contentType,
         "Cache-Control":
-          "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
+          "public, max-age=31536000, immutable",
         "Access-Control-Allow-Origin": "*",
+        "X-Cache": "MISS",
       },
     });
   } catch (error: any) {

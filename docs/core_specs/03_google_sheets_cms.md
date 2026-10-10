@@ -217,7 +217,22 @@ flowchart LR
 | 5 | `unread` | 🟢 `⚡` | Số tin nhắn chưa đọc (`0`, `1`, `2`...). |
 | 6 | `timestamp` | 🟢 `⚡` | Thời gian gửi tin nhắn cuối cùng (`24/07 20:55`). |
 | 7 | `preview_text`| 🟢 `⚡` | Đoạn xem trước tin nhắn ở danh sách. |
-| 8 | `messages_text`| 🟢 `⚡` | Toàn bộ các dòng chat (Cú pháp: `incoming: nội dung` hoặc `outgoing: nội dung`). |
+| 8 | `messages_text`| 🟢 `⚡` | Toàn bộ các dòng chat từ trên xuống dưới (hỗ trợ xuống dòng). |
+
+#### 📱 Cú pháp biên soạn tin nhắn đa phương tiện (`messages_text`):
+- **Phía gửi/nhận**:
+  - Không có `>` ở đầu dòng: **Tin nhắn người kia gửi đến** (bong bóng xám bên trái).
+  - Có dấu `>` ở đầu dòng: **Nạn nhân Khang gửi đi** (bong bóng xanh bên phải).
+- **Mốc giờ**: `(24/07 • 20:32) Nội dung...`
+- **Tin nhắn thoại (Audio)**:
+  - `(24/07 • 20:32) [AUDIO: https://drive.google.com/file/d/.../view | 0:08]`
+  - Hoặc dạng nhận diện tự động: `(24/07 • 20:32) 🎙️ [Tin nhắn thoại 0:08]` *(tự động phát audio tương ứng của nhân vật)*.
+- **Tin nhắn hình ảnh (Image)**:
+  - `(20:15) Xem ảnh này đi [IMAGE: https://drive.google.com/file/d/.../view]` *(Bấm vào ảnh bung popup phóng to)*.
+- **Tin nhắn Video (Video)**:
+  - `(20:16) [VIDEO: https://drive.google.com/file/d/.../view]` *(Bấm vào mở trình phát video trực tiếp)*.
+- **Gắn thẻ manh mối nghiệp vụ**:
+  - `[CLUE: Tiêu đề manh mối | Phân tích nghiệp vụ suy luận]` ở cuối dòng.
 
 ---
 

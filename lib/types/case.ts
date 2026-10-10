@@ -185,6 +185,7 @@ export interface Checkpoint {
       validAnswers: string[];
     }[];
   };
+  photoCodes?: string[];
   pickerConfig?: {
     suspectLabel?: string;
     validSuspects?: string[];

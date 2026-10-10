@@ -38,6 +38,7 @@ export interface ParsedAnswers {
   clueRules?: Record<string, string[]>;
   availableEvidences?: CheckpointOptionItem[];
   textMatchInputs?: NonNullable<Checkpoint["textMatchConfig"]>["inputs"];
+  photoCodes?: string[];
 }
 
 /**
@@ -88,6 +89,12 @@ const ANSWER_KEYS: Record<string, string> = {
   show: "show",
   available: "show",
   hien_thi: "show",
+
+  // Ảnh đính kèm kết quả (Photos)
+  photo: "photo",
+  photos: "photo",
+  anh: "photo",
+  vat_pham_anh: "photo",
 
   // Ô nhập văn bản (3 SĐT)
   input: "input",
@@ -241,6 +248,9 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
             code,
             label: code,
           }));
+          break;
+        case "photo":
+          parsed.photoCodes = splitCommas(value);
           break;
         case "input": {
           const input = parseInputLine(value);
@@ -463,6 +473,7 @@ export function transformSheetCheckpoint(
     unlockedEvidenceId: row.unlocked_evidence_id || undefined,
     status: "locked",
     type: (row.type as Checkpoint["type"]) || "evidence_picker",
+    photoCodes: answers.photoCodes,
     textMatchConfig,
     pickerConfig,
     storyConfig,

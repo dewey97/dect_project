@@ -12,7 +12,7 @@ export interface Message {
   timestamp: string;
   status?: string; // e.g. 'Đã xem 17:56', 'Chưa đọc', 'Đã gửi'
   attachment?: {
-    type: "image" | "audio" | "location";
+    type: "image" | "audio" | "video" | "location";
     title?: string;
     thumbnail?: string;
     url?: string;

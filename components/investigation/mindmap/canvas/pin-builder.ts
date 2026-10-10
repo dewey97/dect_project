@@ -116,7 +116,7 @@ function buildFollowupPins(
             x: 0.76,
             y: 0.77,
             label: "Nghi vấn",
-            detail: "Khớp nối chứng cứ đối tượng Trần Thị Hà",
+            detail: "Xác định khoá mật khẩu hộp thiếc đáng ngờ",
             color: "purple" as const,
             noteColor: "yellow" as const,
             actionType: "sheet_checkpoint" as const,

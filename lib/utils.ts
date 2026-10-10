@@ -42,3 +42,33 @@ export function normalizeImageUrl(url: string | undefined | null): string {
 
   return trimmed;
 }
+
+/**
+ * Normalizes audio/video media URLs from Google Drive or local/public sources.
+ * If given a Google Drive link, converts to direct streaming URL or fallback.
+ */
+export function normalizeMediaUrl(url: string | undefined | null): string {
+  if (!url) return "";
+  const trimmed = url.trim();
+
+  // Local static file or direct http/https stream
+  if (trimmed.startsWith("/") || trimmed.startsWith("blob:") || trimmed.startsWith("data:")) {
+    return trimmed;
+  }
+
+  // Google Drive /file/d/{id}/view, /file/d/{id}
+  const driveFileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://docs.google.com/uc?export=download&id=${driveFileMatch[1]}`;
+  }
+
+  // Google Drive id query parameter: ?id={id} or &id={id}
+  if (trimmed.includes("drive.google.com")) {
+    const driveIdMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (driveIdMatch && driveIdMatch[1]) {
+      return `https://docs.google.com/uc?export=download&id=${driveIdMatch[1]}`;
+    }
+  }
+
+  return trimmed;
+}

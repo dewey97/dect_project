@@ -413,14 +413,16 @@ export default function WebEvidencePage() {
       />
 
       {/* QUICK ACTION FAB MENU */}
-      <QuickActionFab
-        onOpenBoardGame={() => {
-          detectiveAudio.playPaperRustle();
-          router.push("/evidence/boardgame");
-        }}
-        onResetCase={resetAllProgress}
-        onGoHome={() => router.push("/")}
-      />
+      {activeModal !== "reinvestigate" && (
+        <QuickActionFab
+          onOpenBoardGame={() => {
+            detectiveAudio.playPaperRustle();
+            router.push("/evidence/boardgame");
+          }}
+          onResetCase={resetAllProgress}
+          onGoHome={() => router.push("/")}
+        />
+      )}
 
       {/* HINT SYSTEM MODAL */}
       <HintModal

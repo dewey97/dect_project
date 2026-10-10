@@ -2,7 +2,6 @@
 
 import React from 'react'
 import {
-  Car,
   MapPin,
   Utensils,
   ShoppingBag,
@@ -32,7 +31,7 @@ export interface VectorMapCanvasProps {
   setUseAlternativeRoute: (val: boolean) => void
   isNavigating: boolean
   vehiclePos: { x: number; y: number }
-  droppedPin: { x: number; y: number; title: string } | null
+  droppedPin?: { x: number; y: number; title: string } | null
   caseLocations: CaseLocation[]
   selectedPlace: CaseLocation | null
   handlePinClick: (loc: CaseLocation) => void
@@ -67,7 +66,6 @@ export function VectorMapCanvas({
   setUseAlternativeRoute,
   isNavigating,
   vehiclePos,
-  droppedPin,
   caseLocations,
   selectedPlace,
   handlePinClick,
@@ -152,62 +150,34 @@ export function VectorMapCanvas({
             </g>
           )}
 
-          {/* 13. Navigation Route Polylines (Rendered when in Directions or Navigation mode) */}
-          {showRoutePolyline && (
-            <>
-              {/* Alternative Route (Gray Line) */}
-              {baseRoute.alternativePoints && baseRoute.alternativePoints.length > 1 && (
-                <g
-                  className="cursor-pointer pointer-events-auto"
-                  onClick={() => setUseAlternativeRoute(!useAlternativeRoute)}
-                >
-                  <path
-                    d={baseRoute.alternativePoints.reduce(
-                      (acc, pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `${acc} L ${pt.x},${pt.y}`),
-                      ''
-                    )}
-                    stroke={useAlternativeRoute ? '#1A73E8' : '#9AA0A6'}
-                    strokeWidth={useAlternativeRoute ? 7 : 5.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    opacity={useAlternativeRoute ? 1 : 0.75}
-                  />
-                </g>
-              )}
-
-              {/* Primary Route (Google Maps Blue Polyline with White Casing) */}
-              {baseRoute.points.length > 1 && (
-                <g
-                  filter="url(#routeGlow)"
-                  className="cursor-pointer pointer-events-auto"
-                  onClick={() => setUseAlternativeRoute(false)}
-                >
-                  <path
-                    d={baseRoute.points.reduce(
-                      (acc, pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `${acc} L ${pt.x},${pt.y}`),
-                      ''
-                    )}
-                    stroke="#FFFFFF"
-                    strokeWidth={useAlternativeRoute ? 7 : 9}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                  <path
-                    d={baseRoute.points.reduce(
-                      (acc, pt, i) => (i === 0 ? `M ${pt.x},${pt.y}` : `${acc} L ${pt.x},${pt.y}`),
-                      ''
-                    )}
-                    stroke={useAlternativeRoute ? '#9AA0A6' : '#1A73E8'}
-                    strokeWidth={useAlternativeRoute ? 5 : 7}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                </g>
-              )}
-            </>
+          {/* 13. Point-to-Point Distance Connection Line */}
+          {showRoutePolyline && origin && destination && origin.id !== destination.id && (
+            <g className="pointer-events-none">
+              {/* High-visibility white casing */}
+              <line
+                x1={origin.x}
+                y1={origin.y}
+                x2={destination.x}
+                y2={destination.y}
+                stroke="#FFFFFF"
+                strokeWidth={7}
+                strokeLinecap="round"
+              />
+              {/* Vibrant dashed connection line */}
+              <line
+                x1={origin.x}
+                y1={origin.y}
+                x2={destination.x}
+                y2={destination.y}
+                stroke="#1A73E8"
+                strokeWidth={4.5}
+                strokeDasharray="8 6"
+                strokeLinecap="round"
+              />
+              {/* Endpoint anchors */}
+              <circle cx={origin.x} cy={origin.y} r={6} fill="#1A73E8" stroke="#FFFFFF" strokeWidth={2.5} />
+              <circle cx={destination.x} cy={destination.y} r={6} fill="#EA4335" stroke="#FFFFFF" strokeWidth={2.5} />
+            </g>
           )}
 
           {/* Real-Time Moving Vehicle / Navigation Puck */}
@@ -228,52 +198,18 @@ export function VectorMapCanvas({
         </svg>
 
         {/* =================================================================== */}
-        {/* FLOATING ROUTE TIME BUBBLE                                          */}
+        {/* FLOATING POINT-TO-POINT DISTANCE BUBBLE                             */}
         {/* =================================================================== */}
-        {showRoutePolyline && activeRoute.points.length > 1 && !isNavigating && (
+        {showRoutePolyline && origin && destination && origin.id !== destination.id && (
           <div
-            className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-1/2 shadow-xl rounded-full px-2.5 py-1 bg-[#1A73E8] text-white flex items-center gap-1 text-[10.5px] font-bold border-2 border-white animate-in zoom-in-75 cursor-pointer"
+            className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-1/2 shadow-xl rounded-full px-3 py-1 bg-[#1A73E8] text-white flex items-center gap-1.5 text-[11px] font-bold border-2 border-white animate-in zoom-in-75 cursor-default select-none z-20"
             style={{
-              left: routeMidpoint.x,
-              top: routeMidpoint.y - 16
+              left: (origin.x + destination.x) / 2,
+              top: (origin.y + destination.y) / 2 - 14
             }}
-            onClick={() => setUseAlternativeRoute(false)}
           >
-            <Car className="size-3" />
-            <span>{activeRoute.durationText}</span>
-            <span className="opacity-80">({activeRoute.distanceText})</span>
-          </div>
-        )}
-
-        {/* Alternative Route Pill */}
-        {showRoutePolyline && baseRoute.alternativePoints && !useAlternativeRoute && !isNavigating && (
-          <div
-            className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-1/2 shadow-md rounded-full px-2 py-0.5 bg-white text-gray-700 flex items-center gap-1 text-[9.5px] font-semibold border border-gray-300 cursor-pointer hover:bg-gray-50"
-            style={{
-              left: routeMidpoint.x + 40,
-              top: routeMidpoint.y + 20
-            }}
-            onClick={() => setUseAlternativeRoute(true)}
-            title="Nhấn để chọn tuyến đường thay thế này"
-          >
-            <span>{baseRoute.alternativeDurationText}</span>
-          </div>
-        )}
-
-        {/* =================================================================== */}
-        {/* DROPPED PIN                                                         */}
-        {/* =================================================================== */}
-        {droppedPin && (
-          <div
-            className="absolute pointer-events-auto -translate-x-1/2 -translate-y-full cursor-pointer z-40 animate-in zoom-in-50"
-            style={{ left: droppedPin.x, top: droppedPin.y }}
-          >
-            <div className="relative flex flex-col items-center">
-              <MapPin className="size-9 text-[#EA4335] fill-[#EA4335] drop-shadow-lg animate-bounce" />
-              <span className="px-2 py-0.5 rounded-full bg-black/90 text-white text-[9px] font-bold shadow-md whitespace-nowrap -mt-1 border border-white/20">
-                Ghim đã thả
-              </span>
-            </div>
+            <Compass className="size-3 text-white" />
+            <span>{activeRoute.distanceText}</span>
           </div>
         )}
 

@@ -307,3 +307,92 @@ export async function getEvidenceBoard(caseId: string) {
     return { success: false, error: error.message, nodes: [], edges: [] };
   }
 }
+
+export interface ReinvestigateHotspotConfig {
+  id: string;
+  num: number;
+  photoNumber?: string;
+  title?: string;
+  x: number;
+  y: number;
+  imageUrl: string;
+  soundFile: string;
+  soundCaption: string;
+}
+
+export async function saveReinvestigationHotspots(
+  caseId: string,
+  hotspots: ReinvestigateHotspotConfig[]
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    if (process.env.NODE_ENV !== "development") {
+      await requireAdminAuth();
+    }
+    const supabase = await createClient();
+    const formatted = hotspots.map((s) => ({
+      id: `reinvestigate-${caseId}-${s.num}`,
+      case_id: caseId,
+      position_x: s.x,
+      position_y: s.y,
+      label: s.title || `Điểm #${s.num}`,
+      detail: s.soundCaption || "",
+      photo_url: s.imageUrl || "",
+      color: s.soundFile || "sat_soat.mp3",
+      updated_at: new Date().toISOString(),
+    }));
+
+    if (formatted.length > 0) {
+      const { error } = await supabase
+        .from("boardgame_pins")
+        .upsert(formatted, { onConflict: "id" });
+      if (error) throw error;
+    }
+
+    revalidatePath(`/evidence/boardgame`);
+    revalidatePath(`/evidence/web`);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error saving reinvestigation hotspots:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getReinvestigationHotspots(
+  caseId: string
+): Promise<{ success: boolean; hotspots: ReinvestigateHotspotConfig[]; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("boardgame_pins")
+      .select("*")
+      .eq("case_id", caseId)
+      .like("id", `reinvestigate-${caseId}-%`);
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      return { success: true, hotspots: [] };
+    }
+
+    const hotspots: ReinvestigateHotspotConfig[] = data
+      .map((row) => {
+        const numPart =
+          parseInt(row.id.replace(`reinvestigate-${caseId}-`, ""), 10) || 1;
+        return {
+          id: row.id,
+          num: numPart,
+          title: row.label || `Điểm #${numPart}`,
+          x: row.position_x,
+          y: row.position_y,
+          imageUrl: row.photo_url || "",
+          soundFile: row.color || "sat_soat.mp3",
+          soundCaption: row.detail || "",
+        };
+      })
+      .sort((a, b) => a.num - b.num);
+
+    return { success: true, hotspots };
+  } catch (error: any) {
+    console.error("Error fetching reinvestigation hotspots:", error);
+    return { success: false, hotspots: [], error: error.message };
+  }
+}

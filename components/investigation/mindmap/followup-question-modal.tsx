@@ -12,6 +12,8 @@ import { ClueCodePicker } from './clue-code-picker'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { isEvidenceMatching } from '@/lib/cases/case-000-clues'
 import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
+import { normalizeImageUrl } from '@/lib/utils'
+import { usePhoneData } from '@/lib/hooks/use-phone-data'
 
 interface FollowupQuestionModalProps {
   isOpen: boolean
@@ -83,14 +85,82 @@ export function FollowupQuestionModal({
   // State for Tung
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   
-  // State for Ha 3-Tile Matching
-  const [activeHaTileId, setActiveHaTileId] = useState<string>('tile_ao_gio')
-  const [haTileSelections, setHaTileSelections] = useState<Record<string, string[]>>({
-    tile_ao_gio: [],
-    tile_lon_toc: [],
-    tile_thuoc_an_than: [],
-  })
-  const [customPhoneEvidences, setCustomPhoneEvidences] = useState<Array<{ id: string; label: string }>>([])
+  // State for Ha Password & Photo Popup (Live CMS)
+  const [haPasswordInput, setHaPasswordInput] = useState<string>('')
+  const [showHaPhotoPopup, setShowHaPhotoPopup] = useState<boolean>(false)
+  
+  // Fetch photos dynamically from Google Sheets Live CMS ('photos' tab)
+  const { data: rawSheetPhotos } = usePhoneData('photos')
+
+  // Live Checkpoint metadata for Ha followup (cp-000-1c-followup or cp-000-2a or cp-000-1c)
+  const haCheckpoint = useMemo(() => {
+    return (
+      checkpoints.find((cp) => cp.id === 'cp-000-1c-followup') ||
+      checkpoints.find((cp) => cp.id === 'cp-000-2a') ||
+      checkpoints.find((cp) => cp.id === 'cp-000-1c')
+    )
+  }, [checkpoints])
+
+  // Lấy 3 ảnh từ sheet photos cho popup kết quả (100% Live CMS)
+  const haDiscoveredPhotos = useMemo(() => {
+    if (!rawSheetPhotos || rawSheetPhotos.length === 0) return []
+
+    // Chuẩn hóa danh sách ảnh từ sheet photos
+    const mappedPhotos = rawSheetPhotos
+      .filter((p: any) => Boolean(p.drive_url || p.direct_cdn_url || p.url || p.local_file_path))
+      .map((p: any, idx: number) => ({
+        id: (p.photo_code || p.code || `photo-ha-${idx}`).trim(),
+        title: (p.title || p.file_name || `Vật chứng #${idx + 1}`).trim(),
+        url: normalizeImageUrl(p.direct_cdn_url || p.drive_url || p.url || p.local_file_path || ''),
+      }))
+
+    // 1. Nếu trên checkpoint có cấu hình danh sách photoCodes (ví dụ photos: photo_bua_yeu, photo_keo_toc, photo_tui_toc_mai)
+    if (haCheckpoint?.photoCodes && haCheckpoint.photoCodes.length > 0) {
+      const explicitPhotos: Array<{ id: string; title: string; url: string }> = []
+      for (const code of haCheckpoint.photoCodes) {
+        const found = mappedPhotos.find(
+          (p) => p.id.toLowerCase() === code.toLowerCase() || p.title.toLowerCase().includes(code.toLowerCase())
+        )
+        if (found) {
+          explicitPhotos.push(found)
+        }
+      }
+      if (explicitPhotos.length > 0) {
+        return explicitPhotos.slice(0, 3)
+      }
+    }
+
+    // 2. Ưu tiên 3 vật chứng thu giữ bên trong hộp thiếc nhà Hà: Bùa yêu, Kéo cắt tóc, Túi zip đựng tóc
+    const targetKeywords = ['bùa yêu', 'kéo', 'tóc']
+    const matchedByKeywords: Array<{ id: string; title: string; url: string }> = []
+
+    targetKeywords.forEach((kw) => {
+      const found = mappedPhotos.find(
+        (p) =>
+          (p.title.toLowerCase().includes(kw) || p.id.toLowerCase().includes(kw)) &&
+          !matchedByKeywords.some((item) => item.id === p.id)
+      )
+      if (found) matchedByKeywords.push(found)
+    })
+
+    if (matchedByKeywords.length >= 3) {
+      return matchedByKeywords.slice(0, 3)
+    }
+
+    // 3. Nếu chưa đủ 3, lấy các ảnh có link hợp lệ trong danh mục vật chứng mới của Hà
+    const combined = [...matchedByKeywords]
+    for (const p of mappedPhotos) {
+      const t = p.title.toLowerCase()
+      // Bỏ qua avatar nhân vật để tránh hiển thị nhầm ảnh chân dung Khang/Mai/Vũ
+      if (t.includes('chân dung') || p.id.startsWith('avatar_')) continue
+      if (!combined.some((item) => item.id === p.id)) {
+        combined.push(p)
+      }
+      if (combined.length >= 3) break
+    }
+
+    return combined.slice(0, 3)
+  }, [rawSheetPhotos, haCheckpoint])
 
   const [errorMsg, setErrorMsg] = useState('')
   const [hasPhoneSolvedState, setHasPhoneSolvedState] = useState(false)
@@ -113,25 +183,29 @@ export function FollowupQuestionModal({
     }
   }, [isPhoneSolved, isOpen])
 
-  const displayedEvidences = availableEvidences.filter((ev) => {
-    if (PHONE_LOOKUP_EVIDENCE_IDS.includes(ev.id)) {
-      const allHaSelected = Object.values(haTileSelections).flat()
-      return hasPhoneSolvedState || allHaSelected.includes(ev.id)
-    }
-    return true
-  })
+  useEffect(() => {
+    if (!isOpen || culprit !== 'ha' || haDiscoveredPhotos.length === 0) return
+    // Tự động Preload trước 3 ảnh vào browser cache ngay khi mở modal câu hỏi
+    // Giúp khi nhập xong mật khẩu, ảnh đã nằm sẵn trong bộ nhớ đệm và hiển thị tức thì (0ms trễ)
+    haDiscoveredPhotos.forEach((photo) => {
+      if (photo.url) {
+        const img = new Image()
+        img.src = photo.url
+      }
+    })
+  }, [isOpen, culprit, haDiscoveredPhotos])
 
   useEffect(() => {
     if (!culprit || !isOpen) return
     setErrorMsg('')
     if (culprit === 'ha') {
-      setHaTileSelections(
-        getStorageJson<Record<string, string[]>>('followup_ha_matches', {
-          tile_ao_gio: [],
-          tile_lon_toc: [],
-          tile_thuoc_an_than: [],
-        }),
-      )
+      const savedHa = getStorageItem('followup_ha_password')
+      if (savedHa) {
+        setHaPasswordInput(savedHa)
+      } else {
+        setHaPasswordInput('')
+      }
+      setShowHaPhotoPopup(false)
     } else if (culprit === 'vu') {
       const savedVu = getStorageItem('followup_vu')
       if (savedVu) {
@@ -163,57 +237,6 @@ export function FollowupQuestionModal({
   const isVu = culprit === 'vu'
   const isTung = culprit === 'tung'
   const isHa = culprit === 'ha'
-
-  // Helper check if tile is matched correctly
-  const isTileMatched = (tileId: string): boolean => {
-    const tile = HA_CLUE_TILES.find((t) => t.id === tileId)
-    if (!tile) return false
-    const selected = haTileSelections[tileId] || []
-    if (hasAdminBypassInArray(selected)) return true
-    return selected.some((id) => isEvidenceMatching(id, tile.validDocIds))
-  }
-
-  const allHaTilesMatched = HA_CLUE_TILES.every((tile) => isTileMatched(tile.id))
-
-  const handleToggleHaEvidence = (evidenceId: string) => {
-    detectiveAudio.playPaperRustle()
-    setErrorMsg('')
-    const tile = HA_CLUE_TILES.find((t) => t.id === activeHaTileId)
-    if (!tile) return
-
-    setHaTileSelections((prev) => {
-      const current = prev[activeHaTileId] || []
-      const nextList = current.includes(evidenceId)
-        ? current.filter((id) => id !== evidenceId)
-        : [...current, evidenceId]
-
-      const updated = {
-        ...prev,
-        [activeHaTileId]: nextList,
-      }
-
-      setStorageJson('followup_ha_matches', updated)
-
-      // Play success audio if just matched
-      const nowMatched = nextList.some((id) => isEvidenceMatching(id, tile.validDocIds))
-      if (nowMatched && !current.some((id) => isEvidenceMatching(id, tile.validDocIds))) {
-        detectiveAudio.playStampSound()
-      }
-
-      return updated
-    })
-  }
-
-  const handleBypassAll = () => {
-    detectiveAudio.playStampSound()
-    const bypassedMatches: Record<string, string[]> = {
-      tile_ao_gio: ['45'],
-      tile_lon_toc: ['4'],
-      tile_thuoc_an_than: ['49'],
-    }
-    setHaTileSelections(bypassedMatches)
-    setStorageJson('followup_ha_matches', bypassedMatches)
-  }
 
   const handleSubmitVu = (e: React.FormEvent) => {
     e.preventDefault()
@@ -259,18 +282,40 @@ export function FollowupQuestionModal({
 
   const handleSubmitHa = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!allHaTilesMatched) {
-      setErrorMsg('Vui lòng nhập đúng chứng cứ đối soát cho cả 3 manh mối!')
+    const rawVal = haPasswordInput.trim().toLowerCase().replace(/\s+/g, '')
+    if (!rawVal) {
+      setErrorMsg('Vui lòng nhập mật mã hộp thiếc!')
       detectiveAudio.playGlassSound()
       return
     }
 
+    // Lấy đáp án chuẩn từ Live CMS (checkpoints)
+    const expectedFromSheet = (haCheckpoint?.correctAnswer || '18100909')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '')
+
+    const isMasterBypass = rawVal === '000' || rawVal === '0000' || rawVal === 'admin'
+    const isCorrect = isMasterBypass || rawVal === expectedFromSheet || (expectedFromSheet.includes(rawVal) && rawVal.length >= 6)
+
+    if (isCorrect) {
+      detectiveAudio.playStampSound()
+      setErrorMsg('')
+      setStorageItem('followup_ha_password', rawVal)
+      setStorageItem('followup_ha', 'solved')
+      // Mở popup 3 ảnh lộn xộn
+      setShowHaPhotoPopup(true)
+    } else {
+      detectiveAudio.playGlassSound()
+      setErrorMsg('⚠️ Mật khẩu chưa chính xác. Hãy rà soát lại các manh mối và ghi chú liên quan!')
+    }
+  }
+
+  const handleFinishHaAfterPopup = () => {
     detectiveAudio.playStampSound()
-    setErrorMsg('')
-    setStorageItem('followup_ha_matches', JSON.stringify(haTileSelections))
-    setStorageItem('followup_ha', 'matched_3_tiles')
+    setShowHaPhotoPopup(false)
     if (onSuccess) {
-      onSuccess('ha', 'matched_3_tiles')
+      onSuccess('ha', 'solved_box')
     }
     onClose()
   }
@@ -303,7 +348,7 @@ export function FollowupQuestionModal({
               <div>
                 <h3 className="font-mono font-bold text-xs sm:text-sm md:text-base text-[#1a120b] uppercase tracking-wider">
                   {isHa
-                    ? 'HỒ SƠ MỞ RỘNG // ĐỐI SOÁT CHỨNG CỨ KHÁM XÉT'
+                    ? (haCheckpoint?.title || 'HỒ SƠ MỞ RỘNG // HỘP THIẾC ĐÁNG NGỜ')
                     : isVu
                     ? 'CÂU HỎI ĐIỀU TRA'
                     : 'HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN'}
@@ -316,6 +361,11 @@ export function FollowupQuestionModal({
                 {isTung && (
                   <span className="font-mono text-xs font-bold text-[#8c1d1d] block mt-0.5">
                     Đối tượng: Nguyễn Thanh Tùng
+                  </span>
+                )}
+                {isHa && (
+                  <span className="font-mono text-xs font-bold text-[#8c1d1d] block mt-0.5">
+                    Đối tượng: Trần Thị Hà
                   </span>
                 )}
               </div>
@@ -420,7 +470,7 @@ export function FollowupQuestionModal({
               </div>
             </form>
           ) : isHa ? (
-            /* FORM BODY FOR HA */
+            /* FORM BODY FOR HA - LIVE CMS PASSWORD INPUT */
             <form onSubmit={handleSubmitHa} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5]">
               {errorMsg && (
                 <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
@@ -429,113 +479,47 @@ export function FollowupQuestionModal({
               )}
 
               {/* TÚI HỒ SƠ C */}
-              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm">
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-                  📂 MỞ TÚI HỒ SƠ C
+                  📂 MỞ TÚI HỒ SƠ C // VẬT CHỨNG KHÁM XÉT
+                </span>
+                <span className="font-mono text-[11px] font-bold text-[#6b4e2e]">
+                  VẬT PHẨM: HỘP THIẾC KHÓA MÃ
                 </span>
               </div>
 
-              {/* QUESTION BOX */}
+              {/* QUESTION BOX (LIVE CMS) */}
               <div className="p-3.5 bg-[#f4ebd9] border-2 border-[#a88c6f] rounded-none">
                 <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
                   YÊU CẦU ĐIỀU TRA:
                 </span>
                 <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
-                  Khớp nối các vật chứng quan trọng thu giữ tại phòng trọ và thân thể Trần Thị Hà với các tài liệu, dấu vết ban đầu tại hiện trường:
+                  {haCheckpoint?.question || 'Xác định khoá mật khẩu hộp thiếc đáng ngờ thu giữ trong phòng trọ của Trần Thị Hà.'}
                 </p>
               </div>
 
-              {/* 3 TILES MANH MỐI NẰM NGANG (100% CÙNG 1 HÀNG) */}
-              <div className="space-y-2">
-                <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
-                  1. CHỌN MANH MỐI CẦN KHỚP NỐI:
-                </span>
-
-                <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
-                  {HA_CLUE_TILES.map((tile) => {
-                    const isSelected = activeHaTileId === tile.id
-                    const isMatched = isTileMatched(tile.id)
-
-                    return (
-                      <button
-                        key={tile.id}
-                        type="button"
-                        onClick={() => {
-                          detectiveAudio.playTypewriterClick()
-                          setActiveHaTileId(tile.id)
-                          setErrorMsg('')
-                        }}
-                        className={cn(
-                          'text-center p-2.5 sm:p-3 rounded-none border-2 transition-all cursor-pointer relative select-none flex items-center justify-center min-h-[48px] sm:min-h-[52px]',
-                          isSelected
-                            ? 'bg-[#eae0cd] border-[#2b1f14] shadow-md ring-2 ring-[#2b1f14]/40'
-                            : isMatched
-                            ? 'bg-[#e7f0dc] border-[#2e5220] hover:bg-[#dcedcf]'
-                            : 'bg-[#fdfcf9] border-[#d4c5b0] hover:bg-[#f4ebd9]'
-                        )}
-                      >
-                        <span className="text-xs sm:text-sm font-mono font-bold text-[#1a120b] leading-tight">
-                          {tile.title}
-                        </span>
-                        {isMatched && (
-                          <span className="absolute top-1.5 right-1.5 text-[#2e5220] font-bold text-xs flex items-center">
-                            <Check className="size-3.5 text-[#2e5220]" />
-                          </span>
-                        )}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* KHU VỰC NHẬP MÃ & SĐT CHỨNG CỨ KHỚP NỐI */}
-              <div className="space-y-2 pt-2 border-t-2 border-[#2b1f14]/20">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
-                    2. CHỨNG CỨ KHỚP NỐI VỚI [
-                    <span className="text-[#8c1d1d]">
-                      {HA_CLUE_TILES.find((t) => t.id === activeHaTileId)?.title}
-                    </span>
-                    ]:
-                  </span>
-                </div>
-
-                <ClueCodePicker
-                  selectedClueIds={haTileSelections[activeHaTileId] || []}
-                  hidePhoneInputs={true}
-                  onAddClueId={(id) => {
-                    setHaTileSelections((prev) => {
-                      const current = prev[activeHaTileId] || []
-                      if (current.includes(id)) return prev
-                      const nextList = [...current, id]
-                      const updated = { ...prev, [activeHaTileId]: nextList }
-                      setStorageItem('followup_ha_matches', JSON.stringify(updated))
-                      const tile = HA_CLUE_TILES.find((t) => t.id === activeHaTileId)
-                      const isMaster = id === 'doc_000' || id === '000' || id === '0000' || id.includes('000') || id.includes('0000')
-                      if (tile && (isMaster || tile.validDocIds.includes(id))) {
-                        detectiveAudio.playStampSound()
-                      }
-                      return updated
-                    })
-                    if (errorMsg) setErrorMsg('')
+              {/* PASSWORD INPUT BOX */}
+              <div className="space-y-2 pt-1">
+                <label className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
+                  MẬT KHẨU MỞ KHÓA HỘP THIẾC:
+                </label>
+                <input
+                  type="text"
+                  value={haPasswordInput}
+                  onChange={(e) => {
+                    setHaPasswordInput(e.target.value)
+                    setErrorMsg('')
                   }}
-                  onRemoveClueId={(id) => {
-                    setHaTileSelections((prev) => {
-                      const current = prev[activeHaTileId] || []
-                      const nextList = current.filter((item) => item !== id)
-                      const updated = { ...prev, [activeHaTileId]: nextList }
-                      setStorageItem('followup_ha_matches', JSON.stringify(updated))
-                      return updated
-                    })
-                  }}
-                  label="MÃ CHỨNG CỨ ĐÃ NHẬP"
-                  placeholder="Nhập mã chứng cứ..."
-                  emptyStateText="Chưa có mã chứng cứ nào được nhập."
+                  placeholder="Nhập mật khẩu..."
+                  className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-base font-bold placeholder-[#a88c6f]/60 tracking-wider focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
                 />
+                <p className="text-[11px] text-[#6b4e2e] font-mono italic">
+                  💡 Gợi ý: Tra cứu thông tin, ghi chú hoặc ngày kỷ niệm bí mật của đối tượng.
+                </p>
               </div>
 
               {/* FOOTER */}
-              <div className="pt-2 flex items-center justify-between border-t border-[#2b1f14]/20">
+              <div className="pt-3 flex items-center justify-between border-t border-[#2b1f14]/20">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -552,7 +536,8 @@ export function FollowupQuestionModal({
                   type="submit"
                   className="px-6 py-2.5 font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all flex items-center gap-2 border-2 shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] cursor-pointer active:scale-95"
                 >
-                  <span>HOÀN TẤT ĐỐI SOÁT CHỨNG CỨ</span>
+                  <Sparkles className="size-3.5 text-amber-400" />
+                  <span>XÁC NHẬN MẬT KHẨU</span>
                   <ArrowRight className="size-3.5" />
                 </button>
               </div>
@@ -643,8 +628,122 @@ export function FollowupQuestionModal({
               </div>
             </form>
           )}
+
         </motion.div>
       </div>
+
+      {/* POPUP 3 ẢNH TOÀN MÀN HÌNH (KHÔNG BỊ BỌC TRONG KHUNG MODAL, ZERO-SCROLL OVERLAY) */}
+      <AnimatePresence>
+        {showHaPhotoPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex flex-col justify-between p-4 sm:p-8 select-none"
+          >
+            {/* Header: Bỏ dấu X theo yêu cầu */}
+            <div className="flex items-center justify-between border-b border-[#a88c6f]/30 pb-3 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="size-5 text-amber-400" />
+                <div>
+                  <h4 className="font-mono font-bold text-sm sm:text-base text-amber-300 uppercase tracking-wider">
+                    KHÓA HỘP THIẾC ĐÃ ĐƯỢC MỞ
+                  </h4>
+                  <p className="text-xs font-mono text-[#a88c6f]">
+                    3 vật chứng giấu kín thu giữ bên trong hộp
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* VÙNG CHÍNH GIỮA: 3 ẢNH LỘN XỘN XẾP CHỒNG + 3 GẠCH ĐẦU DÒNG GÓC DƯỚI TRÁI */}
+            <div className="my-auto flex flex-col items-center justify-center w-full py-2">
+              <div className="relative w-full max-w-[540px] aspect-[1/1] sm:h-[460px] flex items-center justify-center">
+                {/* Ảnh 1: Phía trên bên phải (rotate-6) */}
+                {haDiscoveredPhotos[0] && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 6 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute top-0 right-2 sm:right-4 w-[56%] sm:w-[54%] aspect-[4/3] z-10 shadow-[0_15px_40px_rgba(0,0,0,0.95)] hover:z-30 hover:scale-105 transition-transform cursor-pointer overflow-hidden rounded-none"
+                  >
+                    <img
+                      src={haDiscoveredPhotos[0].url}
+                      alt={haDiscoveredPhotos[0].title}
+                      className="w-full h-full object-cover block"
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_ha.png'
+                      }}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Ảnh 2: Phía giữa chếch bên trái (-rotate-2) */}
+                {haDiscoveredPhotos[1] && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
+                    animate={{ opacity: 1, scale: 1, rotate: -2 }}
+                    transition={{ delay: 0.15, duration: 0.4 }}
+                    className="absolute top-[28%] left-0 sm:left-2 w-[56%] sm:w-[54%] aspect-[4/3] z-20 shadow-[0_18px_45px_rgba(0,0,0,0.98)] hover:z-30 hover:scale-105 transition-transform cursor-pointer overflow-hidden rounded-none"
+                  >
+                    <img
+                      src={haDiscoveredPhotos[1].url}
+                      alt={haDiscoveredPhotos[1].title}
+                      className="w-full h-full object-cover block"
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_ha.png'
+                      }}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Ảnh 3: Phía dưới chếch bên phải (rotate-2) */}
+                {haDiscoveredPhotos[2] && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 2 }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
+                    className="absolute bottom-4 right-0 sm:right-4 w-[58%] sm:w-[56%] aspect-[4/3] z-25 shadow-[0_20px_50px_rgba(0,0,0,0.98)] hover:z-30 hover:scale-105 transition-transform cursor-pointer overflow-hidden rounded-none"
+                  >
+                    <img
+                      src={haDiscoveredPhotos[2].url}
+                      alt={haDiscoveredPhotos[2].title}
+                      className="w-full h-full object-cover block"
+                      onError={(e) => {
+                        e.currentTarget.src = '/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_ha.png'
+                      }}
+                    />
+                  </motion.div>
+                )}
+
+                {/* 3 GẠCH ĐẦU DÒNG NẰM GÓC DƯỚI BÊN TRÁI ĐÚNG THEO ẢNH PHÁC THẢO */}
+                <div className="absolute bottom-2 left-2 sm:left-4 z-30 max-w-[42%] text-left space-y-1.5">
+                  {haDiscoveredPhotos.map((photo, idx) => (
+                    <div key={`bullet-${photo.id || idx}`} className="flex items-start gap-1.5 leading-snug">
+                      <span className="text-amber-400 font-mono text-xs select-none">•</span>
+                      <span className="font-mono text-xs text-[#f6f1e5] font-medium tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+                        {photo.title}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* FOOTER CTA TIẾP TỤC */}
+            <div className="shrink-0 flex items-center justify-end pt-3 border-t border-[#a88c6f]/30">
+              <button
+                type="button"
+                onClick={handleFinishHaAfterPopup}
+                className="w-full sm:w-auto px-7 py-3 bg-[#8c1d1d] hover:bg-[#6e1515] text-[#f6f1e5] font-mono font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-2 border-2 border-[#4a0e0e] shadow-lg active:scale-95 cursor-pointer"
+              >
+                <span>TIẾP TỤC</span>
+                <ArrowRight className="size-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AnimatePresence>
   )
 }

@@ -212,10 +212,12 @@ export default function BoardGameCompanionPage() {
       />
 
       {/* QUICK ACTION FAB MENU */}
-      <QuickActionFab
-        onResetCase={resetFindingsProgress}
-        onGoHome={() => router.push("/")}
-      />
+      {activeModal !== "reinvestigate" && (
+        <QuickActionFab
+          onResetCase={resetFindingsProgress}
+          onGoHome={() => router.push("/")}
+        />
+      )}
 
       {/* HINT SYSTEM MODAL */}
       <HintModal

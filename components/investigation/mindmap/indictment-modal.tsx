@@ -55,11 +55,29 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
     return 'ha'
   }
   return false
-}function checkIndictmentEvidenceMatch(val: string, targetNumbers: string[]): boolean {
+}export function checkIndictmentEvidenceMatch(val: string, targetCodes: string[]): boolean {
   if (isAdminBypassCode(val)) return true
-  const nums = val.match(/\d+/g)
-  if (!nums || nums.length === 0) return false
-  return targetNumbers.some((t) => nums.includes(t))
+  const trimmed = val.trim().toLowerCase()
+  if (!trimmed) return false
+
+  // Tách các token do người dùng nhập (hỗ trợ phân tách bằng dấu phẩy, khoảng trắng, gạch nối)
+  const tokens = trimmed.split(/[\s,;]+/).map((t) => t.trim().toLowerCase()).filter(Boolean)
+  const nums: string[] = val.match(/\d+/g) || []
+
+  return targetCodes.some((tc) => {
+    const targetNorm = tc.trim().toLowerCase()
+    const targetClean = targetNorm.replace(/[^a-z0-9]/g, '')
+    // 1. Trùng chính xác mã (ví dụ: '53', 'c-02', 'd-04', 'd-05', 'd-02')
+    if (tokens.some((tok) => tok === targetNorm || tok.replace(/[^a-z0-9]/g, '') === targetClean)) {
+      return true
+    }
+    // 2. Trùng chuỗi số
+    const targetNum = targetNorm.match(/\d+/)?.[0]
+    if (targetNum && nums.includes(targetNum)) {
+      return true
+    }
+    return false
+  })
 }
 
 export function IndictmentModal({
@@ -70,9 +88,7 @@ export function IndictmentModal({
 }: IndictmentModalProps) {
   const [suspectName, setSuspectName] = useState('')
   const [selectedMotiveOption, setSelectedMotiveOption] = useState<string>('')
-  const [cluesMotiveInput, setCluesMotiveInput] = useState('')
-  const [cluesOpportunityInput, setCluesOpportunityInput] = useState('')
-  const [cluesPhysicalTracesInput, setCluesPhysicalTracesInput] = useState('')
+  const [cluesEvidenceInput, setCluesEvidenceInput] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
 
   if (!isOpen) return null
@@ -87,9 +103,7 @@ export function IndictmentModal({
 
     const isAdmin000 =
       isAdminBypassCode(suspectName) ||
-      isAdminBypassCode(cluesMotiveInput) ||
-      isAdminBypassCode(cluesOpportunityInput) ||
-      isAdminBypassCode(cluesPhysicalTracesInput)
+      isAdminBypassCode(cluesEvidenceInput)
 
     const culprit = isAdmin000 ? 'ha' : isCulpritValid(suspectName)
     if (!culprit || (culprit !== 'ha' && !isAdmin000)) {
@@ -104,26 +118,23 @@ export function IndictmentModal({
       return
     }
 
-    // Strict validation of 2.1 (52), 2.2 (50 hoặc 51), 2.3 (53) - No extensions
+    // Validation mục 2 (chứng minh dấu vết vụ án):
+    // Chấp nhận mã số 53 (tài liệu dấu vết cũ) hoặc các mã vật chứng C-02, D-04, D-05, D-02 (hoa xoan, lọn tóc, kéo, hộp sắt)
     if (!isAdmin000) {
-      if (!checkIndictmentEvidenceMatch(cluesMotiveInput, ['52'])) {
-        setErrorMsg('Mã chứng cứ mục 2.1 chưa chính xác!')
+      if (!cluesEvidenceInput.trim()) {
+        setErrorMsg('Vui lòng nhập Mã chứng cứ chứng minh dấu vết phạm tội!')
         detectiveAudio.playGlassSound()
         return
       }
-      if (!checkIndictmentEvidenceMatch(cluesOpportunityInput, ['50', '51'])) {
-        setErrorMsg('Mã chứng cứ mục 2.2 chưa chính xác!')
-        detectiveAudio.playGlassSound()
-        return
-      }
-      if (!checkIndictmentEvidenceMatch(cluesPhysicalTracesInput, ['53'])) {
-        setErrorMsg('Mã chứng cứ mục 2.3 chưa chính xác!')
+      const validEvidenceCodes = ['53', 'c-02', 'c02', 'c2', 'd-04', 'd04', 'd4', 'd-05', 'd05', 'd5', 'd-02', 'd02', 'd2']
+      if (!checkIndictmentEvidenceMatch(cluesEvidenceInput, validEvidenceCodes)) {
+        setErrorMsg('Mã chứng cứ mục 2 chưa chính xác!')
         detectiveAudio.playGlassSound()
         return
       }
     }
 
-    const combinedClueInputs = [cluesMotiveInput, cluesOpportunityInput, cluesPhysicalTracesInput]
+    const combinedClueInputs = [cluesEvidenceInput]
       .filter((s) => s.trim().length > 0)
 
     detectiveAudio.playStampSound()
@@ -201,8 +212,8 @@ export function IndictmentModal({
             )}
 
             {/* 1. THÔNG TIN VỤ ÁN */}
-            <div className="space-y-3 p-4 bg-[#ede3d1]/80 border-2 border-[#a88c6f] rounded-none shadow-sm">
-              <h4 className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider border-b border-[#a88c6f]/40 pb-1.5">
+            <div className="space-y-3 p-3 sm:p-4 bg-[#ede3d1]/50 rounded-none">
+              <h4 className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider border-b border-[#2b1f14]/20 pb-1.5">
                 1. THÔNG TIN VỤ ÁN:
               </h4>
               <div className="space-y-3 text-xs text-[#1a120b]">
@@ -224,24 +235,24 @@ export function IndictmentModal({
 
                 {/* 1.2 - 1.5 Static Case Details */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-sans pt-1">
-                  <div className="p-2 bg-[#f4ebd9] border border-[#d4c5b0]">
+                  <div className="p-2 bg-[#f4ebd9]/80 border-b border-[#d4c5b0]">
                     <span className="font-mono text-[11px] font-bold text-[#6b4e2e] block uppercase">Tội danh đề nghị truy tố:</span>
                     <span className="font-bold text-[#1a120b] text-xs">Giết người</span>
                   </div>
-                  <div className="p-2 bg-[#f4ebd9] border border-[#d4c5b0]">
+                  <div className="p-2 bg-[#f4ebd9]/80 border-b border-[#d4c5b0]">
                     <span className="font-mono text-[11px] font-bold text-[#6b4e2e] block uppercase">Thời gian xảy ra án mạng:</span>
                     <span className="font-bold text-[#1a120b] text-xs">20:45 - 21:15</span>
                   </div>
                 </div>
 
-                <div className="p-2 bg-[#f4ebd9] border border-[#d4c5b0]">
+                <div className="p-2 bg-[#f4ebd9]/80 border-b border-[#d4c5b0]">
                   <span className="font-mono text-[11px] font-bold text-[#6b4e2e] block uppercase">Địa điểm xảy ra án mạng:</span>
                   <span className="font-bold text-[#1a120b] text-xs leading-snug block">
                     Phòng khách tại nhà riêng, số 14, Đường Bờ Sông, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội
                   </span>
                 </div>
 
-                <div className="p-2 bg-[#f4ebd9] border border-[#d4c5b0]">
+                <div className="p-2 bg-[#f4ebd9]/80 border-b border-[#d4c5b0]">
                   <span className="font-mono text-[11px] font-bold text-[#6b4e2e] block uppercase">Phương tiện / Hung khí gây án:</span>
                   <span className="font-bold text-[#1a120b] text-xs">Mảnh gốm vỡ dài :8.2 cm</span>
                 </div>
@@ -286,58 +297,23 @@ export function IndictmentModal({
             </div>
 
             {/* 2. CĂN CỨ CHỨNG MINH HÀNH VI PHẠM TỘI */}
-            <div className="space-y-4 pt-1">
+            <div className="space-y-3 pt-1">
               <h4 className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider border-b border-[#2b1f14]/20 pb-1.5">
                 2. CĂN CỨ CHỨNG MINH HÀNH VI PHẠM TỘI:
               </h4>
 
-              {/* 2.1 */}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                  2.1. Chứng minh bị can có động cơ gây án, thông qua:
+                  • Chứng minh bị can để lại dấu vết hoặc mang theo dấu vết vụ án: <span className="text-red-700">*</span>
                 </label>
                 <input
                   type="text"
-                  value={cluesMotiveInput}
+                  value={cluesEvidenceInput}
                   onChange={(e) => {
-                    setCluesMotiveInput(e.target.value)
+                    setCluesEvidenceInput(e.target.value)
                     if (errorMsg) setErrorMsg('')
                   }}
-                  placeholder="Nhập mã chứng cứ (ví dụ: 1, 2, 3)..."
-                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                />
-              </div>
-
-              {/* 2.2 */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                  2.2. Chứng minh bị can có cơ hội thực tế để ra tay, bác bỏ ngoại phạm:
-                </label>
-                <input
-                  type="text"
-                  value={cluesOpportunityInput}
-                  onChange={(e) => {
-                    setCluesOpportunityInput(e.target.value)
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  placeholder="Nhập mã chứng cứ (ví dụ: 1, 2, 3)..."
-                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                />
-              </div>
-
-              {/* 2.3 */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                  2.3. Chứng minh bị can để lại dấu vết hoặc mang theo dấu vết vụ án:
-                </label>
-                <input
-                  type="text"
-                  value={cluesPhysicalTracesInput}
-                  onChange={(e) => {
-                    setCluesPhysicalTracesInput(e.target.value)
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  placeholder="Nhập mã chứng cứ (ví dụ: 1, 2, 3)..."
+                  placeholder="Nhập mã chứng cứ (ví dụ: C-02, D-04, D-05, D-02 hoặc 53)..."
                   className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                 />
               </div>

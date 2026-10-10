@@ -1,0 +1,50 @@
+[
+  {
+    "id": "spot-1",
+    "num": 1,
+    "photoId": "tu_go",
+    "title": "Tủ gỗ",
+    "x": 44.5,
+    "y": 51.1,
+    "imageUrl": "/api/image-proxy?id=1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR",
+    "soundFile": "train_sound.mp3",
+    "soundCaption": "*Tu tu... Xình xịch...*",
+    "driveUrl": "https://drive.google.com/file/d/1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR/view?usp=drive_link"
+  },
+  {
+    "id": "spot-2",
+    "num": 2,
+    "photoId": "bua_goi",
+    "title": "Bùa yêu dưới gối",
+    "x": 58.5,
+    "y": 56,
+    "imageUrl": "/api/image-proxy?id=11rPmlApf5TsTDguEOBKQBqL09SIks8eU",
+    "soundFile": "sound_tu.mp3",
+    "soundCaption": "*Két... Cạch...*",
+    "driveUrl": "https://drive.google.com/file/d/11rPmlApf5TsTDguEOBKQBqL09SIks8eU/view?usp=drive_link"
+  },
+  {
+    "id": "spot-3",
+    "num": 3,
+    "photoId": "luoc_dinh_toc",
+    "title": "Lược dính tóc",
+    "x": 52.7,
+    "y": 56.9,
+    "imageUrl": "/api/image-proxy?id=1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe",
+    "soundFile": "breaking.mp3",
+    "soundCaption": "*Choang! Xoảng...*",
+    "driveUrl": "https://drive.google.com/file/d/1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe/view?usp=drive_link"
+  },
+  {
+    "id": "spot-4",
+    "num": 4,
+    "photoId": "canh_hoa",
+    "title": "Cánh hoa xoan dưới sàn nhà",
+    "x": 11.2,
+    "y": 74,
+    "imageUrl": "/api/image-proxy?id=1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z",
+    "soundFile": "Clack.mp3",
+    "soundCaption": "*Cạch... cạch...*",
+    "driveUrl": "https://drive.google.com/file/d/1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z/view?usp=drive_link"
+  }
+]
