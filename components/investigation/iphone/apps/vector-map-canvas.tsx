@@ -107,8 +107,8 @@ export function VectorMapCanvas({
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) ${
             is3DView ? 'perspective(700px) rotateX(28deg)' : ''
           }`,
-          width: '2474px',
-          height: '1732px'
+          width: '1237px',
+          height: '866px'
         }}
       >
         {/* =================================================================== */}
@@ -127,7 +127,7 @@ export function VectorMapCanvas({
         {/* =================================================================== */}
         {/* 2. DYNAMIC INTERACTIVE OVERLAY CANVAS                               */}
         {/* =================================================================== */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 2474 1732">
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1237 866">
           <defs>
             <linearGradient id="riverGrad" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#55CBE8" />
@@ -143,10 +143,9 @@ export function VectorMapCanvas({
           {/* Live Traffic Overlay */}
           {showTrafficLayer && (
             <g fill="none" strokeLinecap="round" opacity="0.85">
-              <path d="M 180,40 C 520,180 820,320 1150,440" stroke="#0F9D58" strokeWidth="4" />
-              <path d="M 1150,440 C 1240,480 1280,580 1270,720" stroke="#F4B400" strokeWidth="4" />
-              <path d="M 1270,720 C 1250,880 1210,1050 1320,1280" stroke="#EA4335" strokeWidth="4" />
-              <path d="M 1320,1280 C 1420,1520 1520,1720 1680,2000" stroke="#0F9D58" strokeWidth="4" />
+              <path d="M 90,20 C 260,90 410,160 575,220" stroke="#0F9D58" strokeWidth="2.5" />
+              <path d="M 575,220 C 620,240 640,290 635,360" stroke="#F4B400" strokeWidth="2.5" />
+              <path d="M 635,360 C 625,440 605,525 660,640" stroke="#EA4335" strokeWidth="2.5" />
             </g>
           )}
 

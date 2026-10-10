@@ -43,8 +43,8 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   const [activeTab, setActiveTab] = useState<'explore' | 'directions'>('explore')
 
   // Location selections (Default: 14 Bờ Sông -> Số 8 Ngõ 12 Đường Bờ Kè)
-  const [originId, setOriginId] = useState<string>('loc-01')
-  const [destinationId, setDestinationId] = useState<string>('loc-06')
+  const [originId, setOriginId] = useState<string>('1')
+  const [destinationId, setDestinationId] = useState<string>('6')
   const [useAlternativeRoute, setUseAlternativeRoute] = useState<boolean>(false)
 
   // Selector dropdown modal state ('origin' | 'destination' | null)
@@ -62,9 +62,9 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   const [isPlaceSheetExpanded, setIsPlaceSheetExpanded] = useState<boolean>(false)
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false)
 
-  // Map Pan & Zoom state (Expanded canvas centered on Phân khu Cảng)
-  const [zoom, setZoom] = useState(0.75)
-  const [pan, setPan] = useState({ x: -750, y: -520 })
+  // Map Pan & Zoom state (Expanded canvas centered on Dot 1 - Phân khu Cảng)
+  const [zoom, setZoom] = useState(0.85)
+  const [pan, setPan] = useState({ x: -545, y: 130 })
   const [isDragging, setIsDragging] = useState(false)
   const [isCentered, setIsCentered] = useState(true)
   const dragStart = useRef({ x: 0, y: 0 })
@@ -73,11 +73,28 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
 
   // Current Origin and Destination objects
   const origin = useMemo(
-    () => caseLocations.find((l) => l.id === originId) || caseLocations[0] || DEFAULT_CASE_LOCATIONS[0],
+    () =>
+      caseLocations.find(
+        (l) =>
+          l.id === originId ||
+          l.id === originId.replace(/^loc-0?/, '') ||
+          `loc-${l.id.padStart?.(2, '0') || l.id}` === originId
+      ) ||
+      caseLocations[0] ||
+      DEFAULT_CASE_LOCATIONS[0],
     [caseLocations, originId]
   )
   const destination = useMemo(
-    () => caseLocations.find((l) => l.id === destinationId) || caseLocations[5] || caseLocations[1] || DEFAULT_CASE_LOCATIONS[1],
+    () =>
+      caseLocations.find(
+        (l) =>
+          l.id === destinationId ||
+          l.id === destinationId.replace(/^loc-0?/, '') ||
+          `loc-${l.id.padStart?.(2, '0') || l.id}` === destinationId
+      ) ||
+      caseLocations[5] ||
+      caseLocations[1] ||
+      DEFAULT_CASE_LOCATIONS[1],
     [caseLocations, destinationId]
   )
 

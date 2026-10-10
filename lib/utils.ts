@@ -73,8 +73,8 @@ export function normalizeMediaUrl(url: string | undefined | null): string {
     if (trimmed.toLowerCase().includes(".gif") || trimmed.toLowerCase().includes("video.gif")) {
       return `/api/image-proxy?id=${driveId}`;
     }
-    // File âm thanh mp3/wav/m4a trên Drive stream trực tiếp qua endpoint uc?export=download
-    return `https://docs.google.com/uc?export=download&id=${driveId}`;
+    // File âm thanh mp3/wav/m4a trên Drive stream mượt qua audio-proxy nội bộ (bỏ qua CORS & sandbox)
+    return `/api/audio-proxy?id=${driveId}`;
   }
 
   return trimmed;
