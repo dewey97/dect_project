@@ -190,37 +190,39 @@ export function IPhoneFrame({
           {/* Authentic iOS Vignette Gradient (Figma Node 14:39) */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/15 pointer-events-none z-0" />
 
-          {/* iOS TOP STATUS BAR (Exact 20pt Status Bar Height) */}
-          <div className="relative z-30 h-6 px-3 flex items-center justify-between text-white text-[11px] font-sans tracking-tight shrink-0 bg-transparent select-none pt-1">
-            {/* Left: 5 Signal Dots + Carrier + Wi-Fi */}
-            <div className="flex items-center gap-1.5" title="Trạng thái mạng: giffgaff">
-              <div className="flex items-center gap-[2.5px]">
-                <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
-                <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
-                <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
-                <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
-                <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
+          {/* iOS TOP STATUS BAR (Only shown when inside an app or on lockscreen) */}
+          {(activeApp !== null || isLocked) && (
+            <div className="relative z-30 h-6 px-3 flex items-center justify-between text-white text-[11px] font-sans tracking-tight shrink-0 bg-transparent select-none pt-1">
+              {/* Left: 5 Signal Dots + Carrier + Wi-Fi */}
+              <div className="flex items-center gap-1.5" title="Trạng thái mạng: giffgaff">
+                <div className="flex items-center gap-[2.5px]">
+                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
+                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
+                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
+                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
+                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
+                </div>
+                <span className="font-medium text-[10px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ml-0.5">giffgaff</span>
+                <svg className="size-3 text-white fill-current drop-shadow" viewBox="0 0 24 24">
+                  <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0012 4zm0 4.5c3.31 0 6.3 1.34 8.49 3.51L12 20.49 3.51 12.01A11.91 11.91 0 0112 8.5z" />
+                </svg>
               </div>
-              <span className="font-medium text-[10px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ml-0.5">giffgaff</span>
-              <svg className="size-3 text-white fill-current drop-shadow" viewBox="0 0 24 24">
-                <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0012 4zm0 4.5c3.31 0 6.3 1.34 8.49 3.51L12 20.49 3.51 12.01A11.91 11.91 0 0112 8.5z" />
-              </svg>
-            </div>
 
-            {/* Center: Clock 12:35 */}
-            <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[11.5px] text-white tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-sans">
-              12:35
-            </div>
+              {/* Center: Clock 12:35 */}
+              <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[11.5px] text-white tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-sans">
+                12:35
+              </div>
 
-            {/* Right: Bluetooth + 20% + Solid Battery */}
-            <div className="flex items-center gap-1 text-white font-semibold">
-              <span className="text-[9.5px] font-sans text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-medium">20%</span>
-              <div className="w-5 h-2.5 rounded-[3px] border border-white/90 p-[1px] relative flex items-center shadow-sm bg-black/20">
-                <div className="h-full w-[20%] bg-[#FF3B30] rounded-[1px]" />
-                <div className="absolute -right-[3px] top-[2px] w-[2px] h-[4px] bg-white/90 rounded-r-[1px]" />
+              {/* Right: Bluetooth + 20% + Solid Battery */}
+              <div className="flex items-center gap-1 text-white font-semibold">
+                <span className="text-[9.5px] font-sans text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-medium">20%</span>
+                <div className="w-5 h-2.5 rounded-[3px] border border-white/90 p-[1px] relative flex items-center shadow-sm bg-black/20">
+                  <div className="h-full w-[20%] bg-[#FF3B30] rounded-[1px]" />
+                  <div className="absolute -right-[3px] top-[2px] w-[2px] h-[4px] bg-white/90 rounded-r-[1px]" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* MAIN SCREEN AREA */}
           <div className="flex-1 min-h-0 relative overflow-hidden flex flex-col">
@@ -421,417 +423,84 @@ export function IPhoneFrame({
                 )}
               </div>
             ) : (
-              /* 3. EXACT PIXEL-PERFECT iOS 9 HOME SCREEN (Figma Spec: 375x667 Exact Proportions) */
-              <div className="flex-1 min-h-0 flex flex-col justify-between px-3 pt-1.5 pb-2 relative overflow-hidden select-none">
-                
-                {screenPage === 0 ? (
-                  /* PAGE 1: AUTHENTIC 4x4 SPRINGBOARD APPS (MATCHES FIGMA FRAME 14:31 / 92:300 EXACTLY) */
-                  <div className="grid grid-cols-4 gap-x-2 gap-y-3 pt-1.5 px-0.5 relative z-10 animate-in fade-in-50 duration-200">
-                    
-                    {/* Row 1, Icon 1: Messages (Tin nhắn) */}
-                    <button
-                      onClick={() => setActiveApp('messages')}
-                      className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    >
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/messages.png"
-                          alt="Messages"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Messages
-                      </span>
-                    </button>
+              /* 3. EXACT PIXEL-PERFECT iOS 9 HOME SCREEN (Figma Workflow 2: 100% Master Render + Interactive Hotspots) */
+              <div className="absolute inset-0 select-none overflow-hidden">
+                {/* 100% Pixel-Perfect Figma Master Render */}
+                <img
+                  src="/images/cases/case_000/phone/ios9_home_master_pixel_perfect.png"
+                  alt="iOS 9 Springboard"
+                  className="w-full h-full object-cover select-none pointer-events-none absolute inset-0 z-0"
+                />
 
-                    {/* Row 1, Icon 2: Calendar */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/calendar.png"
-                          alt="Calendar"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Calendar
-                      </span>
-                    </div>
-
-                    {/* Row 1, Icon 3: Photos */}
-                    <button
-                      onClick={() => setActiveApp('photos')}
-                      className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    >
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/photos.png"
-                          alt="Photos"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Photos
-                      </span>
-                    </button>
-
-                    {/* Row 1, Icon 4: Camera */}
-                    <button
-                      onClick={() => setActiveApp('photos')}
-                      className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    >
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/camera.png"
-                          alt="Camera"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Camera
-                      </span>
-                    </button>
-
-                    {/* Row 2, Icon 1: Weather */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/weather.png"
-                          alt="Weather"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Weather
-                      </span>
-                    </div>
-
-                    {/* Row 2, Icon 2: Clock */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/clock.png"
-                          alt="Clock"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Clock
-                      </span>
-                    </div>
-
-                    {/* Row 2, Icon 3: Maps */}
-                    <button
-                      onClick={() => setActiveApp('maps')}
-                      className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    >
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/maps.png"
-                          alt="Maps"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Maps
-                      </span>
-                    </button>
-
-                    {/* Row 2, Icon 4: Videos */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/videos.png"
-                          alt="Videos"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Videos
-                      </span>
-                    </div>
-
-                    {/* Row 3, Icon 1: Notes */}
-                    <button
-                      onClick={() => setActiveApp('notes')}
-                      className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    >
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/notes.png"
-                          alt="Notes"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Notes
-                      </span>
-                    </button>
-
-                    {/* Row 3, Icon 2: Reminders */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/reminders.png"
-                          alt="Reminders"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Reminders
-                      </span>
-                    </div>
-
-                    {/* Row 3, Icon 3: Stocks */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/stocks.png"
-                          alt="Stocks"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Stocks
-                      </span>
-                    </div>
-
-                    {/* Row 3, Icon 4: Wallet */}
-                    <button
-                      onClick={() => setActiveApp('banking')}
-                      className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    >
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/wallet.png"
-                          alt="Wallet"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Wallet
-                      </span>
-                    </button>
-
-                    {/* Row 4, Icon 1: iBooks */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/ibooks.png"
-                          alt="iBooks"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        iBooks
-                      </span>
-                    </div>
-
-                    {/* Row 4, Icon 2: iTunes Store */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/itunes.png"
-                          alt="iTunes Store"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        iTunes Store
-                      </span>
-                    </div>
-
-                    {/* Row 4, Icon 3: App Store */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/appstore.png"
-                          alt="App Store"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        App Store
-                      </span>
-                    </div>
-
-                    {/* Row 4, Icon 4: Health */}
-                    <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
-                        <img
-                          src="/images/cases/case_000/phone/icons/health.png"
-                          alt="Health"
-                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                        />
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
-                        Health
-                      </span>
-                    </div>
-
-                  </div>
-                ) : (
-                  /* PAGE 2: UTILITIES & FORENSIC APPS (SETTINGS, CONTACTS, ETC.) */
-                  <div className="grid grid-cols-4 gap-x-3.5 gap-y-3 pt-0.5 relative z-10 animate-in fade-in-50 duration-200">
-                    
-                    {/* Settings (Cài đặt) */}
-                    <button
-                      onClick={() => setActiveApp('settings')}
-                      className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    >
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#C0C5CA] to-[#7F8C8D] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30">
-                        <svg className="w-[60%] h-[60%] text-[#2C2C2E]" viewBox="0 0 32 32" fill="currentColor">
-                          <path d="M16 10a6 6 0 100 12 6 6 0 000-12zm0 10a4 4 0 110-8 4 4 0 010 8z" />
-                          <path d="M28.3 14.5l-2.4-.7c-.2-.7-.5-1.4-.9-2l1.3-2.1c.4-.6.3-1.4-.2-1.9l-1.9-1.9c-.5-.5-1.3-.6-1.9-.2l-2.1 1.3c-.6-.4-1.3-.7-2-.9l-.7-2.4C17.3 3.1 16.7 2.5 16 2.5s-1.3.6-1.5 1.2l-.7 2.4c-.7.2-1.4.5-2 .9L9.7 5.7c-.6-.4-1.4-.3-1.9.2L5.9 7.8c-.5.5-.6 1.3-.2 1.9l1.3 2.1c-.4.6-.7 1.3-.9 2l-2.4.7C3.1 14.7 2.5 15.3 2.5 16s.6 1.3 1.2 1.5l2.4.7c.2.7.5 1.4.9 2l-1.3 2.1c-.4.6-.3 1.4.2 1.9l1.9 1.9c.5.5 1.3.6 1.9.2l2.1-1.3c.6.4 1.3.7 2 .9l.7 2.4c.2.6.8 1.2 1.5 1.2s1.3-.6 1.5-1.2l.7-2.4c.7-.2 1.4-.5 2-.9l2.1 1.3c.6.4 1.4.3 1.9-.2l1.9-1.9c.5-.5.6-1.3.2-1.9l-1.3-2.1c.4-.6.7-1.3.9-2l2.4-.7c.6-.2 1.2-.8 1.2-1.5s-.6-1.3-1.2-1.5z" opacity="0.85" />
-                        </svg>
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
-                        Settings
-                      </span>
-                    </button>
-
-                    {/* Contacts (Danh bạ) */}
-                    <button
-                      onClick={() => setActiveApp('contacts')}
-                      className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    >
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#8E8E93] to-[#636366] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30">
-                        <svg className="w-[60%] h-[60%]" viewBox="0 0 32 32" fill="currentColor">
-                          <circle cx="16" cy="11" r="5" fill="white" />
-                          <path d="M6 26c0-5.5 4.5-8 10-8s10 2.5 10 8" fill="white" />
-                        </svg>
-                      </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
-                        Contacts
-                      </span>
-                    </button>
-
-                    {/* Forensic extraction indicator */}
-                    {onSwitchToForensics && (
-                      <button
-                        onClick={onSwitchToForensics}
-                        className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                        title="Chuyển sang chế độ Pháp y số"
-                      >
-                        <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#30D158] to-[#1C7E32] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30">
-                          <ShieldCheck className="size-7 text-white" />
-                        </div>
-                        <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
-                          Pháp Y
-                        </span>
-                      </button>
-                    )}
-
-                  </div>
-                )}
-
-                {/* Page Indicator Dots (Spotlight Search + Page 1 active + Page 2) */}
-                <div className="flex items-center justify-center gap-1.5 py-1 z-10">
-                  <button
-                    onClick={() => setScreenPage(0)}
-                    className="p-1 cursor-pointer transition-transform active:scale-75"
-                    title="Tìm kiếm Spotlight"
-                  >
-                    <svg className="size-2 text-white/70 drop-shadow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                      <circle cx="11" cy="11" r="8" />
-                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setScreenPage(0)}
-                    className={cn(
-                      "size-1.5 rounded-full transition-all cursor-pointer shadow-sm",
-                      screenPage === 0 ? "bg-white scale-110" : "bg-white/40 hover:bg-white/60"
-                    )}
-                    title="Trang 1: Ứng dụng chính"
-                  />
-                  <button
-                    onClick={() => setScreenPage(1)}
-                    className={cn(
-                      "size-1.5 rounded-full transition-all cursor-pointer shadow-sm",
-                      screenPage === 1 ? "bg-white scale-110" : "bg-white/40 hover:bg-white/60"
-                    )}
-                    title="Trang 2: Tiện ích & Cài đặt"
-                  />
-                </div>
-
-                {/* AUTHENTIC iOS 9 FROSTED GLASS DOCK (Figma Node 14:40 Spec: 4 Quick-Launch Apps with Text Labels) */}
-                <div className="w-[96%] mx-auto h-[92px] rounded-[32px] bg-white/30 backdrop-blur-[40px] border border-white/20 p-2 flex items-center justify-around px-2 shadow-[0_8px_32px_rgba(0,0,0,0.18)] relative overflow-hidden z-10 mt-auto mb-2">
-                  {/* Glossy top highlight reflection line */}
-                  <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none" />
-
-                  {/* Dock Item 1: Phone */}
-                  <button
-                    onClick={() => setActiveApp('phone')}
-                    className="w-[22%] flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    title="Điện thoại"
-                  >
-                    <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] flex items-center justify-center relative">
-                      <img
-                        src="/images/cases/case_000/phone/icons/phone.png"
-                        alt="Phone"
-                        className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                      />
-                    </div>
-                    <span className="text-[11px] font-normal text-white mt-0.5 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] select-none">
-                      Phone
-                    </span>
-                  </button>
-
-                  {/* Dock Item 2: Mail (Hộp thư 2,017) */}
+                {/* INTERACTIVE HOTSPOTS LAYER (Overlayed exactly on top of each Figma app icon) */}
+                <div className="absolute inset-0 z-10">
+                  {/* Row 1 */}
+                  {/* Messages */}
                   <button
                     onClick={() => setActiveApp('messages')}
-                    className="w-[22%] flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    title="Mail"
-                  >
-                    <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] flex items-center justify-center relative">
-                      <img
-                        src="/images/cases/case_000/phone/icons/mail.png"
-                        alt="Mail"
-                        className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                      />
-                    </div>
-                    <span className="text-[11px] font-normal text-white mt-0.5 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] select-none">
-                      Mail
-                    </span>
-                  </button>
-
-                  {/* Dock Item 3: Safari */}
+                    className="absolute left-[2.5%] top-[5.0%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Messages (Tin nhắn)"
+                  />
+                  {/* Photos */}
                   <button
-                    onClick={() => setActiveApp('safari')}
-                    className="w-[22%] flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    title="Safari"
-                  >
-                    <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] flex items-center justify-center relative">
-                      <img
-                        src="/images/cases/case_000/phone/icons/safari.png"
-                        alt="Safari"
-                        className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                      />
-                    </div>
-                    <span className="text-[11px] font-normal text-white mt-0.5 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] select-none">
-                      Safari
-                    </span>
-                  </button>
+                    onClick={() => setActiveApp('photos')}
+                    className="absolute left-[52.0%] top-[5.0%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Photos (Ảnh)"
+                  />
+                  {/* Camera */}
+                  <button
+                    onClick={() => setActiveApp('photos')}
+                    className="absolute left-[77.0%] top-[5.0%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Camera (Máy ảnh)"
+                  />
 
-                  {/* Dock Item 4: Music (Nhạc) */}
+                  {/* Row 2 */}
+                  {/* Maps */}
+                  <button
+                    onClick={() => setActiveApp('maps')}
+                    className="absolute left-[52.0%] top-[21.6%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Maps (Bản đồ)"
+                  />
+
+                  {/* Row 3 */}
+                  {/* Notes */}
+                  <button
+                    onClick={() => setActiveApp('notes')}
+                    className="absolute left-[2.5%] top-[38.2%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Notes (Ghi chú iCloud)"
+                  />
+                  {/* Wallet / Banking */}
+                  <button
+                    onClick={() => setActiveApp('banking')}
+                    className="absolute left-[77.0%] top-[38.2%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Wallet (Ví tiền / Ngân hàng)"
+                  />
+
+                  {/* Dock Items (4 Ứng dụng thanh Dock đáy) */}
+                  {/* Phone */}
                   <button
                     onClick={() => setActiveApp('phone')}
-                    className="w-[22%] flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
-                    title="Music"
-                  >
-                    <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] flex items-center justify-center relative">
-                      <img
-                        src="/images/cases/case_000/phone/icons/music.png"
-                        alt="Music"
-                        className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
-                      />
-                    </div>
-                    <span className="text-[11px] font-normal text-white mt-0.5 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] select-none">
-                      Music
-                    </span>
-                  </button>
+                    className="absolute left-[2.5%] bottom-[1.5%] w-[21.5%] h-[14.5%] rounded-3xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Phone (Điện thoại & Hộp thư thoại)"
+                  />
+                  {/* Mail */}
+                  <button
+                    onClick={() => setActiveApp('messages')}
+                    className="absolute left-[27.0%] bottom-[1.5%] w-[21.5%] h-[14.5%] rounded-3xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Mail (Hộp thư)"
+                  />
+                  {/* Safari */}
+                  <button
+                    onClick={() => setActiveApp('safari')}
+                    className="absolute left-[51.5%] bottom-[1.5%] w-[21.5%] h-[14.5%] rounded-3xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Safari (Trình duyệt)"
+                  />
+                  {/* Music */}
+                  <button
+                    onClick={() => setActiveApp('phone')}
+                    className="absolute left-[76.0%] bottom-[1.5%] w-[21.5%] h-[14.5%] rounded-3xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
+                    title="Music (Âm thanh)"
+                  />
                 </div>
               </div>
             )}
