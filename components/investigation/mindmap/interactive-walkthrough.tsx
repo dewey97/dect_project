@@ -28,13 +28,15 @@ interface InteractiveWalkthroughProps {
   onClose: () => void
   pins?: PinPoint[]
   canvasWrapperRef?: React.RefObject<HTMLDivElement | null>
+  onStepChange?: (targetPinId: string | null) => void
 }
 
 export function InteractiveWalkthrough({
   isOpen,
   onClose,
   pins = [],
-  canvasWrapperRef
+  canvasWrapperRef,
+  onStepChange
 }: InteractiveWalkthroughProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [spotlightRect, setSpotlightRect] = useState<{
@@ -61,6 +63,19 @@ export function InteractiveWalkthrough({
       emitInvestigationEvent('OPEN_WALKTHROUGH')
     }
   }, [isOpen])
+
+  // Notify parent of active target pin for live canvas highlighting
+  useEffect(() => {
+    if (!isOpen) {
+      onStepChange?.(null)
+      return
+    }
+    if (step.targetType === 'pin' && step.targetPinId) {
+      onStepChange?.(step.targetPinId)
+    } else {
+      onStepChange?.(null)
+    }
+  }, [isOpen, currentStepIndex, step, onStepChange])
 
   // Calculate spotlight location precisely based on actual live board geometry
   useEffect(() => {
@@ -231,11 +246,38 @@ export function InteractiveWalkthrough({
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[100] pointer-events-auto select-none overflow-hidden flex flex-col items-center justify-between p-3 sm:p-6">
-        {/* SEMI-TRANSPARENT NOIR SPOTLIGHT BACKDROP */}
-        <div className="absolute inset-0 bg-black/75 backdrop-blur-[2px] transition-all duration-300 pointer-events-none" />
+        {/* SVG CUTOUT SPOTLIGHT BACKDROP (UNCOVERS TARGET PIN 100% CRISP, SHARP & BRIGHT) */}
+        <svg className="fixed inset-0 w-full h-full pointer-events-none z-[100] transition-opacity duration-300">
+          <defs>
+            <mask id="walkthrough-spotlight-mask">
+              {/* White background: overlay is darkened everywhere */}
+              <rect x="0" y="0" width="100%" height="100%" fill="white" />
+              {/* Black rectangle cutout: punch hole directly over note -> 100% CLEAR, no darkness, no blur */}
+              {spotlightRect && step.targetType !== 'canvas-center' && (
+                <rect
+                  x={spotlightRect.x}
+                  y={spotlightRect.y}
+                  width={spotlightRect.width}
+                  height={spotlightRect.height}
+                  rx="14"
+                  ry="14"
+                  fill="black"
+                />
+              )}
+            </mask>
+          </defs>
+          <rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            fill="rgba(0, 0, 0, 0.78)"
+            mask="url(#walkthrough-spotlight-mask)"
+          />
+        </svg>
 
-        {/* ANIMATED SPOTLIGHT CUTOUT / HIGHLIGHT BOX */}
-        {spotlightRect && (
+        {/* ANIMATED SPOTLIGHT FRAME & ILLUMINATION OVER THE TARGET */}
+        {spotlightRect && step.targetType !== 'canvas-center' && (
           <motion.div
             initial={false}
             animate={{
@@ -245,16 +287,19 @@ export function InteractiveWalkthrough({
               height: spotlightRect.height
             }}
             transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-            className="absolute top-0 left-0 rounded-xl pointer-events-none border-2 border-amber-400/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.65),0_0_35px_rgba(245,158,11,0.6)] z-[101]"
+            className="fixed top-0 left-0 rounded-xl pointer-events-none border-2 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.65),inset_0_0_20px_rgba(245,158,11,0.15)] z-[101]"
           >
-            {/* Glowing Corner Accents */}
-            <div className="absolute -top-1.5 -left-1.5 size-3 border-t-2 border-l-2 border-amber-300" />
-            <div className="absolute -top-1.5 -right-1.5 size-3 border-t-2 border-r-2 border-amber-300" />
-            <div className="absolute -bottom-1.5 -left-1.5 size-3 border-b-2 border-l-2 border-amber-300" />
-            <div className="absolute -bottom-1.5 -right-1.5 size-3 border-b-2 border-r-2 border-amber-300" />
+            {/* Ambient gold illumination wash highlighting the paper note */}
+            <div className="absolute inset-0 rounded-xl bg-amber-400/10 pointer-events-none" />
 
-            {/* Pulsing Target Radar Ring */}
-            <span className="absolute inset-0 rounded-xl ring-2 ring-amber-400/70 animate-ping opacity-75" />
+            {/* Glowing Corner Accents */}
+            <div className="absolute -top-1.5 -left-1.5 size-3.5 border-t-2 border-l-2 border-amber-300" />
+            <div className="absolute -top-1.5 -right-1.5 size-3.5 border-t-2 border-r-2 border-amber-300" />
+            <div className="absolute -bottom-1.5 -left-1.5 size-3.5 border-b-2 border-l-2 border-amber-300" />
+            <div className="absolute -bottom-1.5 -right-1.5 size-3.5 border-b-2 border-r-2 border-amber-300" />
+
+            {/* Pulsing Target Radar Glow */}
+            <span className="absolute -inset-1 rounded-2xl ring-2 ring-amber-400/60 animate-pulse pointer-events-none" />
           </motion.div>
         )}
 

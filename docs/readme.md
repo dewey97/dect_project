@@ -32,12 +32,13 @@ Tài liệu về bối cảnh cốt truyện, ma trận giải đố, cơ chế 
 | **Case #000: Master Storyline** | Tổng quan thiết kế, bối cảnh thế giới, ma trận nghi phạm & logic cốt truyện Vụ án #000 | [`cases/case_000/01_design/case_design.md`](cases/case_000/01_design/case_design.md) |
 | **Case #000: Gameplay & Checkpoints** | Sơ đồ luồng điều tra, điều kiện mở khóa tuyến A/B/C và ma trận bằng chứng | [`cases/case_000/01_design/gameplay_design.md`](cases/case_000/01_design/gameplay_design.md) |
 | **Case #000: Re-investigation Hotspots** | Đặc tả 8 điểm tương tác khám xét lại (Point-and-Click 2D, hiệu ứng SFX & zoom) | [`cases/case_000/01_design/reinvestigation_hotspots.md`](cases/case_000/01_design/reinvestigation_hotspots.md) |
+| **Case #000: Figma Handover Spec** | Thông số AST, Node IDs (22:389, 22:453, 22:582, 22:755), màn hình iPhone tang vật & lộ trình bàn giao | [`cases/case_000/01_design/FIGMA_HANDOVER_SPEC.md`](cases/case_000/01_design/FIGMA_HANDOVER_SPEC.md) |
 
 ---
 
 ## 📁 3. Thư Mục Tài Nguyên Thiết Kế Vụ Án (`docs/cases/case_000/`)
 
-- `01_design/`: Tài liệu kịch bản, gameplay và tọa độ khám xét lại hiện trường.
+- `01_design/`: Tài liệu kịch bản, gameplay, tọa độ khám xét lại hiện trường và thông số bàn giao Figma (`FIGMA_HANDOVER_SPEC.md`, `figma_refs/`).
 - `02_photos/`: Ảnh nhân vật, sơ đồ phấn hiện trường, tài liệu đồ họa gốc và [**Danh mục quy hoạch tài nguyên hình ảnh (`ASSET_CATALOG.md`)**](cases/case_000/02_photos/ASSET_CATALOG.md).
 - `03_audio/`: File thoại nhân vật (Khang, Vy, Hà) và hiệu ứng âm thanh môi trường.
 - `04_3d/`: Mô hình 3D Glb đồ đạc hiện trường phòng khách/phòng ngủ.

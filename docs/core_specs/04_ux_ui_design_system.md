@@ -52,7 +52,8 @@ Sử dụng 2 họ font chính:
 
 ### Các Ứng Dụng Điện Thoại Mô Phỏng (`components/investigation/iphone/apps/`):
 
-- **`MessagesApp` (`messages-app.tsx`):** Danh sách hội thoại SMS, parse tin nhắn đa dòng kèm tag `[CLUE: Tiêu đề | Phân tích]`.
+- **`PhoneApp` (`phone-app.tsx`):** Nhật ký cuộc gọi (`Recents` - Frame `22:582`) với đánh dấu cuộc gọi nhỡ màu đỏ (`#BA1A1A`) & Bàn phím số bấm gọi (`Keypad` - Frame `22:453`) nút tròn 75px, âm phím DTMF & nút gọi xanh (`#34C759`).
+- **`MessagesApp` (`messages-app.tsx`):** Danh sách hội thoại SMS (Frame `22:755`), parse tin nhắn đa dòng kèm tag `[CLUE: Tiêu đề | Phân tích]`, avatar tròn kèm badge chưa đọc.
 - **`NotesApp` (`notes-app.tsx`):** Ghi chú cá nhân nạn nhân & nghi phạm, phân loại folder iCloud/Local.
 - **`SafariApp` (`safari-app.tsx`):** Lịch sử tìm kiếm & trang web đã truy cập (kết nối tab `notes_and_browser`).
 - **`PhotosApp` (`photos-app.tsx`):** Thư viện ảnh chụp hiện trường, ảnh chụp lén kèm metadata EXIF.

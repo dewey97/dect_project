@@ -24,6 +24,7 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
   - Bối cảnh & Cốt truyện Master Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)
   - Gameplay & Hành trình điều tra: [`docs/cases/case_000/01_design/gameplay_design.md`](docs/cases/case_000/01_design/gameplay_design.md)
   - Điểm khám xét lại hiện trường: [`docs/cases/case_000/01_design/reinvestigation_hotspots.md`](docs/cases/case_000/01_design/reinvestigation_hotspots.md)
+  - Hồ sơ bàn giao thiết kế Figma Case #000: [`docs/cases/case_000/01_design/FIGMA_HANDOVER_SPEC.md`](docs/cases/case_000/01_design/FIGMA_HANDOVER_SPEC.md)
 
 ---
 

@@ -26,15 +26,17 @@ Trong dự án **Detective Case System (`dect_project`)**, giao diện người 
 - **Figma Personal Access Token (PAT)**: `<YOUR_FIGMA_ACCESS_TOKEN>`
 
 ### 2.2. Danh Mục Các Page & Frame Trọng Tâm Hiện Tại
-
-| Phân Vùng | Page ID | Frame ID | Tên Node / Mục Đích | Kích Thước Viewport |
-| :--- | :--- | :--- | :--- | :--- |
-| **Phone Master** | `92:2` | `92:300` | iPhone Shell Container (Springboard iOS 9) | `375 x 667 pt` (Tỷ lệ 9:16) |
-| **Lock Screen** | `92:2` | `102:75` | Màn hình khóa (Lockscreen + Music Player) | `375 x 667 pt` |
-| **Notes App** | `92:2` | `92:550` | Giao diện ghi chú giấy vàng-kem iOS 9 | `375 x 667 pt` |
-| **Maps App** | `92:2` | `92:623` | Bản đồ điều tra hiện trường vụ án | `375 x 667 pt` |
-| **Hanoi Map Data** | `92:2` | `96:9215` | Vector / Graphic Bản đồ Hà Nội chi tiết | Scale canvas |
-| **Messages App** | `92:2` | `92:430` | Danh sách hội thoại & bubble chat | `375 x 667 pt` |
+ 
+| Phân Vùng | Page ID | Frame ID | Tên Node / Mục Đích | Kích Thước Viewport | Trạng Thái Codebase |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Phone Master** | `92:2` | `92:300` | iPhone Shell Container (Springboard iOS 9) | `375 x 667 pt` (Tỷ lệ 9:16) | ✅ Đã tích hợp (`iphone-frame.tsx`) |
+| **Lock Screen** | `22:389` | `22:389` / `22:393` | Màn hình khóa (Lockscreen + Music Player + Slide to unlock) | `375 x 667 pt` | ✅ Đã đồng bộ pixel-perfect (`iphone-frame.tsx`) |
+| **Phone Keypad** | `22:453` | `22:453` | Bàn phím quay số tròn 75px & Nút gọi xanh | `375 x 667 pt` | ✅ Đã triển khai (`phone-app.tsx`) |
+| **Recents** | `22:582` | `22:582` | Nhật ký cuộc gọi & Hộp thư thoại ghi âm | `375 x 667 pt` | ✅ Đã triển khai (`phone-app.tsx`) |
+| **Messages App** | `22:755` | `22:755` | Danh sách hội thoại SMS & tin nhắn chưa đọc | `375 x 667 pt` | ✅ Đã đồng bộ layout 86px (`messages-app.tsx`) |
+| **Notes App** | `92:2` | `92:550` | Giao diện ghi chú giấy vàng-kem iOS 9 | `375 x 667 pt` | ✅ Đã tích hợp (`notes-app.tsx`) |
+| **Maps App** | `92:2` | `92:623` | Bản đồ điều tra hiện trường vụ án | `375 x 667 pt` | ✅ Đã tích hợp (`maps-app.tsx`) |
+| **Hanoi Map Data** | `92:2` | `96:9215` | Vector / Graphic Bản đồ Hà Nội chi tiết | Scale canvas | ✅ Đã xuất bản (`hanoi_master_map.png`) |
 
 ---
 

@@ -187,6 +187,15 @@ const CASES_LIST: CaseData[] = [
         noteColor: "white",
       },
       {
+        id: "c0-pin-victim-phone",
+        x: 0.38,
+        y: 0.14,
+        label: "ĐIỆN THOẠI NẠN NHÂN",
+        detail: "Vật chứng: Điện thoại iPhone 6s Plus thu giữ của nạn nhân Nguyễn Văn Khang",
+        photoUrl: "/phone.png",
+        scale: 0.85,
+      },
+      {
         id: "c0-pin-indictment",
         x: 0.22,
         y: 0.8,
@@ -201,6 +210,11 @@ const CASES_LIST: CaseData[] = [
         id: "c0-conn-1",
         fromPinId: "c0-pin-evidence",
         toPinId: "c0-pin-phone",
+      },
+      {
+        id: "c0-conn-victim-phone",
+        fromPinId: "c0-pin-victim-khang",
+        toPinId: "c0-pin-victim-phone",
       },
       {
         id: "c0-conn-2",
@@ -532,8 +546,12 @@ function isPinHit(
 
   const isFollowup =
     pin.id.startsWith("c0-pin-followup") || pin.id.startsWith("followup-");
+  const isPhone =
+    pin.id.includes("phone") ||
+    (pin.label && pin.label.toLowerCase().includes("điện thoại"));
   const isKhang =
     !isFollowup &&
+    !isPhone &&
     (pin.id.includes("khang") ||
       (pin.label && pin.label.toLowerCase().includes("khang")));
   const isCrimeScene =
@@ -547,18 +565,21 @@ function isPinHit(
       pin.id.startsWith("suspect-") ||
       !!(pin as any).photoUrl ||
       isKhang ||
-      isCrimeScene);
+      isCrimeScene ||
+      isPhone);
 
   let baseCardWidth = 142;
   let baseCardHeight = 167;
   let tagYRatio = -0.08;
 
   if (isSuspectPin) {
-    baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
+    baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isPhone ? 135 : 158;
     baseCardHeight = isCrimeScene
       ? (baseCardWidth * 420) / 560
-      : (baseCardWidth * 380) / 300;
-    tagYRatio = isCrimeScene ? -0.05 : -0.1;
+      : isPhone
+        ? (baseCardWidth * 997) / 757
+        : (baseCardWidth * 380) / 300;
+    tagYRatio = isCrimeScene ? -0.05 : isPhone ? -0.04 : -0.1;
   } else {
     const upperLabel = (pin.label || "").toUpperCase();
     const isWhiteNote =
@@ -840,7 +861,9 @@ export function HeroInteractive({
     let img = suspectImageCacheRef.current.get(url);
     if (!img) {
       img = new Image();
-      img.crossOrigin = "anonymous";
+      if (url.startsWith("http://") || url.startsWith("https://")) {
+        img.crossOrigin = "anonymous";
+      }
       img.src = url;
       img.onload = () => {
         if (requestRenderRef.current) requestRenderRef.current();
@@ -2067,7 +2090,8 @@ export function HeroInteractive({
           isAvatarPin ||
           Boolean(rawPin.photoUrl) ||
           pin.id.includes("thi-the") ||
-          pin.id.includes("crime-scene");
+          pin.id.includes("crime-scene") ||
+          pin.id.includes("phone");
 
         context.save();
         context.translate(pinPosition.x, pinPosition.y);
@@ -2086,7 +2110,9 @@ export function HeroInteractive({
             pin.id.includes("thi-the") ||
             pin.id.includes("chalk")
               ? "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png"
-              : "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png");
+              : pin.id.includes("phone")
+                ? "/phone.png"
+                : "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png");
           const photoUrl =
             rawPin.photoUrl || resolveSuspectPhotoUrl(pin) || fallbackUrl;
 
@@ -2107,19 +2133,23 @@ export function HeroInteractive({
               (loadedSuspectImg as HTMLImageElement).naturalHeight ||
               (loadedSuspectImg as any).height ||
               380;
+            const isPhone =
+              pin.id.includes("phone") ||
+              (pin.label && pin.label.toLowerCase().includes("điện thoại"));
             const isKhang =
-              pin.id.includes("khang") ||
-              (pin.label && pin.label.toLowerCase().includes("khang"));
+              !isPhone &&
+              (pin.id.includes("khang") ||
+                (pin.label && pin.label.toLowerCase().includes("khang")));
             const isCrimeScene =
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
+            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isPhone ? 135 : 158;
             const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = (cardWidth * imgH) / imgW;
 
             const tagX = -cardWidth / 2;
-            const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
+            const tagY = isCrimeScene ? -cardHeight * 0.05 : isPhone ? -cardHeight * 0.04 : -cardHeight * 0.1;
 
             // Pass 1 — wide ambient occlusion: soft halo lifting the card off the corkboard
             context.save();
@@ -2175,14 +2205,18 @@ export function HeroInteractive({
           const isPhotoHovered = hoveredPinRef.current === pin.id;
           const isPhotoSelected = selectedPinIdRef.current === pin.id;
           if (isPhotoHovered || isPhotoSelected) {
+            const isPhone =
+              pin.id.includes("phone") ||
+              (pin.label && pin.label.toLowerCase().includes("điện thoại"));
             const isKhang =
-              pin.id.includes("khang") ||
-              (pin.label && pin.label.toLowerCase().includes("khang"));
+              !isPhone &&
+              (pin.id.includes("khang") ||
+                (pin.label && pin.label.toLowerCase().includes("khang")));
             const isCrimeScene =
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
+            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isPhone ? 135 : 158;
             const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = loadedSuspectImg
               ? (cardWidth *
@@ -2194,7 +2228,7 @@ export function HeroInteractive({
                   300)
               : cardWidth * 1.3;
             const tagX = -cardWidth / 2;
-            const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;
+            const tagY = isCrimeScene ? -cardHeight * 0.05 : isPhone ? -cardHeight * 0.04 : -cardHeight * 0.1;
 
             context.save();
             if (isPhotoSelected) {

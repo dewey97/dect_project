@@ -50,6 +50,7 @@ import { FollowupQuestionModal } from "./followup-question-modal";
 import { AdminCreatePinModal } from "./admin-create-pin-modal";
 import { CustomPinModal } from "./custom-pin-modal";
 import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
+import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import {
   getCanonicalSuspectKey,
@@ -130,6 +131,7 @@ export function MainInvestigationCanvas({
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
   const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false);
   const [isDossierEOpen, setIsDossierEOpen] = useState(false);
+  const [isInternalPhoneOpen, setIsInternalPhoneOpen] = useState(false);
   const [zoomedPhotoUrl, setZoomedPhotoUrl] = useState<string | null>(null);
   const [zoomOrigin, setZoomOrigin] = useState<{ x: number; y: number } | null>(
     null,
@@ -509,7 +511,7 @@ export function MainInvestigationCanvas({
       }
 
       // 0. Tự động ép cập nhật & xóa cache layout cũ nếu phiên bản không khớp
-      const CURRENT_LAYOUT_VERSION = "2026.10.10_v5_force_sync";
+      const CURRENT_LAYOUT_VERSION = "2026.10.10_v6_phone_node";
       const savedLayoutVersion = getStorageItem("board_layout_version");
       if (savedLayoutVersion !== CURRENT_LAYOUT_VERSION) {
         removeStorageItem("boardgame_pins_case-000");
@@ -1098,6 +1100,17 @@ export function MainInvestigationCanvas({
         setIsAddSuspectOpen(true);
       } else if (id === "c0-pin-evidence") {
         setIsEvidenceGuideOpen(true);
+      } else if (
+        id === "c0-pin-victim-phone" ||
+        id === "victim-phone" ||
+        (pin?.photoUrl && pin.photoUrl.includes("phone"))
+      ) {
+        detectiveAudio.playPaperRustle();
+        if (onOpenPhoneSimulator) {
+          onOpenPhoneSimulator();
+        } else {
+          setIsInternalPhoneOpen(true);
+        }
       } else if (id === "c0-pin-phone") {
         if (phoneLookupSuccess) {
           setIsDossierEOpen(true);
@@ -2012,13 +2025,18 @@ export function MainInvestigationCanvas({
         isOpen={isPhoneLookupOpen}
         onClose={() => setIsPhoneLookupOpen(false)}
         onSuccess={handlePhoneLookupSuccess}
-        onOpenPhoneSimulator={onOpenPhoneSimulator}
+        onOpenPhoneSimulator={onOpenPhoneSimulator || (() => setIsInternalPhoneOpen(true))}
       />
 
       <PhoneNarrativeModal
         isOpen={isPhoneNarrativeOpen}
         onClose={() => setIsPhoneNarrativeOpen(false)}
         onTakeTestimony={() => setIsDossierEOpen(true)}
+      />
+
+      <PhoneModal
+        isOpen={isInternalPhoneOpen}
+        onClose={() => setIsInternalPhoneOpen(false)}
       />
 
       <DossierEModal

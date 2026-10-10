@@ -1,8 +1,9 @@
 'use client'
-
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BrandMark } from '@/components/investigation/brand-mark'
 import { HeroInteractive } from '@/components/investigation/hero-interactive'
+import { PhoneModal } from '@/components/investigation/evidence/phone-modal'
 import { Button } from '@/components/ui/button'
 import { Search, ShoppingCart, Dices, ChevronRight } from 'lucide-react'
 import { UserNav } from '@/components/auth/user-nav'
@@ -14,6 +15,7 @@ interface LandingHeroProps {
 
 export function LandingHero({ activePoster }: LandingHeroProps) {
   const router = useRouter()
+  const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false)
 
   return (
     <>
@@ -66,7 +68,12 @@ export function LandingHero({ activePoster }: LandingHeroProps) {
         <div className="absolute inset-0 w-full h-full z-0">
           <HeroInteractive
             className="w-full h-full rounded-none border-none"
-            controlledCaseId={['case-01', 'case-02', 'case-03', 'case-02', 'case-01'][activePoster]}
+            controlledCaseId={['case-000', 'case-01', 'case-02', 'case-03', 'case-000'][activePoster]}
+            onPinClick={(pinId) => {
+              if (pinId.includes("phone")) {
+                setIsPhoneModalOpen(true);
+              }
+            }}
           />
         </div>
 
@@ -112,6 +119,11 @@ export function LandingHero({ activePoster }: LandingHeroProps) {
           </div>
         </div>
       </section>
+
+      <PhoneModal
+        isOpen={isPhoneModalOpen}
+        onClose={() => setIsPhoneModalOpen(false)}
+      />
     </>
   )
 }

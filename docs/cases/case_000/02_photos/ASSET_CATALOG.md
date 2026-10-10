@@ -125,7 +125,8 @@ Giấy note vàng/trắng viết tay đã kết xuất sẵn nét mực để c�
 - `choi.jpg`: Ảnh chụp buổi chơi nhóm phá án thực tế.
 - `9.png`, `11.png`, `15.png`, `17.png`, `18.png`: 5 ảnh phóng to cận cảnh các điểm khám xét lại (mảnh vỡ, còi tàu, then tủ, khăn giấy, di thư).
 
-### 7.4. Bản Đồ Thế Giới Master (`map/`)
+### 7.4. Ảnh Thiết Bị Tang Vật & Bản Đồ Master
+- `phone.png` / `victim_phone_node.png`: Ảnh kết xuất thiết bị iPhone tang vật kèm ghim đỏ cắm trên bảng điều tra Canvas (`HeroInteractive` & `MainInvestigationCanvas`). Cho phép click mở trực tiếp `PhoneModal` / trình giả lập iPhone.
 - `hanoi_master_map.png`: Bản đồ đồ họa toàn thành phố và phân khu cảng Hà Nội kết xuất độ phân giải cao (`2474 x 1732px`) từ Figma Frame `96:9215`. Dùng làm Single Source of Truth cho ứng dụng Maps trong điện thoại, radar theo dõi di chuyển và hệ tọa độ vụ án. Cập nhật tự động qua lệnh `npm run sync:map`.
 
 ---

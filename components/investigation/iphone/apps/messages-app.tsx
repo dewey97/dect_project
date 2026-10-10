@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from "react";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -19,162 +19,187 @@ import {
   X,
   ShieldAlert,
   Loader2,
-  SquarePen
-} from 'lucide-react'
-import type { Conversation, Message } from '@/lib/types'
-import { cn } from '@/lib/utils'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { usePhoneData } from '@/lib/hooks/use-phone-data'
-import { getStorageJson, setStorageJson } from '@/lib/storage'
+  SquarePen,
+} from "lucide-react";
+import type { Conversation, Message } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { getStorageJson, setStorageJson } from "@/lib/storage";
 
 interface MessagesAppProps {
-  threads?: Conversation[]
-  onBackToHome?: () => void
+  threads?: Conversation[];
+  onBackToHome?: () => void;
 }
 
 export function MessagesApp({ onBackToHome }: MessagesAppProps) {
-  const [selectedThread, setSelectedThread] = useState<any | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isEditMode, setIsEditMode] = useState(false)
-  const [selectedThreadIds, setSelectedThreadIds] = useState<string[]>([])
+  const [selectedThread, setSelectedThread] = useState<any | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedThreadIds, setSelectedThreadIds] = useState<string[]>([]);
 
   // Voice note interactive playback
-  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null)
-  const [playbackProgress, setPlaybackProgress] = useState(0)
+  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
+  const [playbackProgress, setPlaybackProgress] = useState(0);
 
   // Modals
-  const [inspectingClue, setInspectingClue] = useState<any | null>(null)
-  const [previewImage, setPreviewImage] = useState<{ url: string; title?: string } | null>(null)
-  const [pinnedClueIds, setPinnedClueIds] = useState<string[]>([])
-  const [pinnedNotification, setPinnedNotification] = useState<string | null>(null)
+  const [inspectingClue, setInspectingClue] = useState<any | null>(null);
+  const [previewImage, setPreviewImage] = useState<{
+    url: string;
+    title?: string;
+  } | null>(null);
+  const [pinnedClueIds, setPinnedClueIds] = useState<string[]>([]);
+  const [pinnedNotification, setPinnedNotification] = useState<string | null>(
+    null,
+  );
 
   // Fetch conversations live from Google Sheets
-  const { data: rawMessagesData, loading, error } = usePhoneData('messages')
+  const { data: rawMessagesData, loading, error } = usePhoneData("messages");
 
   // Map 1-row-per-person human-readable schema into conversation threads
   const threads = rawMessagesData.map((item: any, idx: number) => {
-    let parsedMessages: any[] = []
+    let parsedMessages: any[] = [];
 
     // 1. Support legacy JSON if present
     if (item.messages_json) {
       try {
-        parsedMessages = typeof item.messages_json === 'string' ? JSON.parse(item.messages_json) : item.messages_json
+        parsedMessages =
+          typeof item.messages_json === "string"
+            ? JSON.parse(item.messages_json)
+            : item.messages_json;
       } catch {}
     }
 
     // 2. Support Proposal 1 Multiline Text Format: "> (Timestamp) Text [CLUE: Title | Analysis]" or "(Timestamp) Text"
     if (parsedMessages.length === 0 && item.messages_text) {
-      const lines = String(item.messages_text).split('\n').map((l) => l.trim()).filter(Boolean)
+      const lines = String(item.messages_text)
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
       parsedMessages = lines.map((line, mIdx) => {
-        let isSent = line.startsWith('>')
-        let cleanLine = isSent ? line.substring(1).trim() : line
+        let isSent = line.startsWith(">");
+        let cleanLine = isSent ? line.substring(1).trim() : line;
 
         // Extract clue if present at end of line: [CLUE: Title | Analysis]
-        let clueTitle = ''
-        let clueAnalysis = ''
-        let isClue = false
+        let clueTitle = "";
+        let clueAnalysis = "";
+        let isClue = false;
 
-        const clueMatch = cleanLine.match(/\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i)
+        const clueMatch = cleanLine.match(
+          /\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i,
+        );
         if (clueMatch) {
-          isClue = true
-          clueTitle = clueMatch[1].trim()
-          clueAnalysis = clueMatch[2].trim()
-          cleanLine = cleanLine.replace(/\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i, '').trim()
+          isClue = true;
+          clueTitle = clueMatch[1].trim();
+          clueAnalysis = clueMatch[2].trim();
+          cleanLine = cleanLine
+            .replace(/\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i, "")
+            .trim();
         }
 
         // Extract timestamp in parentheses at start: (04/05 • 14:15) or (14:15)
-        let timestamp = ''
-        const tsMatch = cleanLine.match(/^\(([^)]+)\)\s*(.*)$/)
-        let text = cleanLine
+        let timestamp = "";
+        const tsMatch = cleanLine.match(/^\(([^)]+)\)\s*(.*)$/);
+        let text = cleanLine;
 
         if (tsMatch) {
-          timestamp = tsMatch[1].trim()
-          text = tsMatch[2].trim()
+          timestamp = tsMatch[1].trim();
+          text = tsMatch[2].trim();
         }
 
-        const sender = isSent ? 'Khang' : (item.contact_name || 'Khác')
+        const sender = isSent ? "Khang" : item.contact_name || "Khác";
 
         return {
           id: `msg-${idx}-${mIdx}`,
           sender,
-          role: isSent ? 'sent' : 'received',
+          role: isSent ? "sent" : "received",
           text,
           timestamp,
           isClue,
           clueTitle,
-          clueAnalysis
-        }
-      })
+          clueAnalysis,
+        };
+      });
     }
 
     return {
       id: item.message_id || `conv-${idx + 1}`,
-      name: item.contact_name || item.name || 'Không tên',
-      phoneNumber: item.phone_number || '',
-      avatarColor: item.avatar_color || 'from-[#3A3A3C] to-[#636366]',
-      unread: item.unread === 'TRUE' || item.unread === true,
-      timestamp: item.timestamp || '',
-      previewText: item.preview_text || (parsedMessages.length > 0 ? parsedMessages[parsedMessages.length - 1].text : ''),
+      name: item.contact_name || item.name || "Không tên",
+      phoneNumber: item.phone_number || "",
+      avatarColor: item.avatar_color || "from-[#3A3A3C] to-[#636366]",
+      unread: item.unread === "TRUE" || item.unread === true,
+      timestamp: item.timestamp || "",
+      previewText:
+        item.preview_text ||
+        (parsedMessages.length > 0
+          ? parsedMessages[parsedMessages.length - 1].text
+          : ""),
       messages: parsedMessages.map((m: any, mIdx: number) => ({
         id: m.id || `msg-${idx}-${mIdx}`,
         sender: m.sender || m.role || item.contact_name,
-        role: m.role || (m.sender === 'Khang' ? 'sent' : 'received'),
-        text: m.text || m.content || '',
-        timestamp: m.timestamp || '',
-        isClue: m.isClue || m.is_clue === 'TRUE' || m.is_clue === true,
-        clueTitle: m.clueTitle || m.clue_title || '',
-        clueAnalysis: m.clueAnalysis || m.clue_analysis || ''
-      }))
-    }
-  })
+        role: m.role || (m.sender === "Khang" ? "sent" : "received"),
+        text: m.text || m.content || "",
+        timestamp: m.timestamp || "",
+        isClue: m.isClue || m.is_clue === "TRUE" || m.is_clue === true,
+        clueTitle: m.clueTitle || m.clue_title || "",
+        clueAnalysis: m.clueAnalysis || m.clue_analysis || "",
+      })),
+    };
+  });
 
   // Load pinned clues from storage
   useEffect(() => {
-    setPinnedClueIds(getStorageJson<string[]>('khang_phone_pinned_clues', []))
-  }, [])
+    setPinnedClueIds(getStorageJson<string[]>("khang_phone_pinned_clues", []));
+  }, []);
 
   // Audio playback ticker
   useEffect(() => {
-    let timer: NodeJS.Timeout
+    let timer: NodeJS.Timeout;
     if (playingAudioId) {
       timer = setInterval(() => {
         setPlaybackProgress((prev) => {
           if (prev >= 100) {
-            setPlayingAudioId(null)
-            return 0
+            setPlayingAudioId(null);
+            return 0;
           }
-          return prev + 3
-        })
-      }, 250)
+          return prev + 3;
+        });
+      }, 250);
     }
-    return () => clearInterval(timer)
-  }, [playingAudioId])
+    return () => clearInterval(timer);
+  }, [playingAudioId]);
 
   const togglePlayAudio = (msg: any) => {
     if (playingAudioId === msg.id) {
-      setPlayingAudioId(null)
+      setPlayingAudioId(null);
     } else {
-      setPlayingAudioId(msg.id)
-      setPlaybackProgress(0)
-      detectiveAudio.playRadioBeep()
+      setPlayingAudioId(msg.id);
+      setPlaybackProgress(0);
+      detectiveAudio.playRadioBeep();
     }
-  }
+  };
 
   const togglePinClue = (clueId: string, title?: string) => {
     setPinnedClueIds((prev) => {
-      const next = prev.includes(clueId) ? prev.filter((id) => id !== clueId) : [...prev, clueId]
-      setStorageJson('khang_phone_pinned_clues', next)
-      return next
-    })
-    setPinnedNotification(pinnedClueIds.includes(clueId) ? 'Đã gỡ manh mối' : `Đã ghim: ${title || 'Manh mối'}`)
-    setTimeout(() => setPinnedNotification(null), 2500)
-  }
+      const next = prev.includes(clueId)
+        ? prev.filter((id) => id !== clueId)
+        : [...prev, clueId];
+      setStorageJson("khang_phone_pinned_clues", next);
+      return next;
+    });
+    setPinnedNotification(
+      pinnedClueIds.includes(clueId)
+        ? "Đã gỡ manh mối"
+        : `Đã ghim: ${title || "Manh mối"}`,
+    );
+    setTimeout(() => setPinnedNotification(null), 2500);
+  };
 
   const filteredThreads = threads.filter(
     (t: any) =>
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.previewText.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+      t.previewText.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans relative">
@@ -191,8 +216,8 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-[#161618]/95 backdrop-blur-md border-b border-[#2C2C2E] shrink-0 z-10">
             <button
               onClick={() => {
-                setSelectedThread(null)
-                setPlayingAudioId(null)
+                setSelectedThread(null);
+                setPlayingAudioId(null);
               }}
               className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium active:opacity-60 transition-opacity"
             >
@@ -211,8 +236,10 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
 
             <button
               onClick={() => {
-                const firstClue = selectedThread.messages.find((m: any) => m.isClue)
-                if (firstClue) setInspectingClue(firstClue)
+                const firstClue = selectedThread.messages.find(
+                  (m: any) => m.isClue,
+                );
+                if (firstClue) setInspectingClue(firstClue);
               }}
               className="text-[#0A84FF] active:opacity-60 p-1"
               title="Thông tin hội thoại"
@@ -229,20 +256,28 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             </div>
 
             {selectedThread.messages.map((msg: any) => {
-              const isMe = msg.role === 'sent'
-              const isPinned = pinnedClueIds.includes(msg.id)
+              const isMe = msg.role === "sent";
+              const isPinned = pinnedClueIds.includes(msg.id);
 
               return (
-                <div key={msg.id} className={cn('flex flex-col max-w-[85%]', isMe ? 'self-end items-end' : 'self-start items-start')}>
+                <div
+                  key={msg.id}
+                  className={cn(
+                    "flex flex-col max-w-[85%]",
+                    isMe ? "self-end items-end" : "self-start items-start",
+                  )}
+                >
                   <div
                     className={cn(
-                      'rounded-[18px] px-3.5 py-2 text-[13.5px] leading-relaxed shadow-sm relative group transition-all',
+                      "rounded-[18px] px-3.5 py-2 text-[13.5px] leading-relaxed shadow-sm relative group transition-all",
                       isMe
-                        ? 'bg-[#34C759] text-white rounded-br-[4px]'
-                        : 'bg-[#2C2C2E] text-white rounded-bl-[4px]'
+                        ? "bg-[#34C759] text-white rounded-br-[4px]"
+                        : "bg-[#2C2C2E] text-white rounded-bl-[4px]",
                     )}
                   >
-                    <p className="whitespace-pre-wrap break-words font-normal">{msg.text}</p>
+                    <p className="whitespace-pre-wrap break-words font-normal">
+                      {msg.text}
+                    </p>
                     {isPinned && (
                       <span className="absolute -top-1 -right-1 size-3.5 bg-[#FFD60A] rounded-full flex items-center justify-center text-[8px] font-bold text-black shadow">
                         ★
@@ -255,7 +290,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                     </span>
                   )}
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -274,9 +309,13 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                   <span>Trang chính</span>
                 </button>
               ) : (
-                <span className="text-[13px] text-[#0A84FF] font-medium">Sửa</span>
+                <span className="text-[13px] text-[#0A84FF] font-medium">
+                  Sửa
+                </span>
               )}
-              <span className="text-[17px] font-semibold tracking-tight text-white">Tin nhắn</span>
+              <span className="text-[17px] font-semibold tracking-tight text-white">
+                Tin nhắn
+              </span>
               <span className="w-12 text-right text-[#0A84FF] text-[13px] font-medium">
                 <SquarePen className="size-4 inline text-[#0A84FF]" />
               </span>
@@ -297,35 +336,39 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           {loading ? (
             <div className="flex-1 flex flex-col items-center justify-center p-4 text-[#8E8E93]">
               <Loader2 className="size-6 animate-spin mb-2 text-[#0A84FF]" />
-              <span className="text-xs">Đang tải tin nhắn từ Google Sheets...</span>
+              <span className="text-xs">
+                Đang tải tin nhắn từ Google Sheets...
+              </span>
             </div>
           ) : error ? (
-            <div className="flex-1 p-4 text-center text-xs text-red-400">Lỗi: {error}</div>
+            <div className="flex-1 p-4 text-center text-xs text-red-400">
+              Lỗi: {error}
+            </div>
           ) : (
-            <div className="flex-1 overflow-y-auto px-2 py-0.5 divide-y divide-[#1C1C1E] pb-10">
+            <div className="flex-1 overflow-y-auto divide-y divide-[#1C1C1E] pb-10">
               {filteredThreads.map((thread: any) => (
                 <div
                   key={thread.id}
                   onClick={() => setSelectedThread(thread)}
-                  className="flex items-center gap-3 py-2.5 px-2 hover:bg-[#1C1C1E]/50 active:bg-[#2C2C2E]/60 rounded-xl cursor-pointer transition-colors"
+                  className="flex items-center gap-3.5 h-[86px] py-[12px] pl-[24px] pr-[16px] hover:bg-[#1C1C1E]/50 active:bg-[#2C2C2E]/60 cursor-pointer transition-colors"
                 >
-                  <div className="size-11 rounded-full text-white flex items-center justify-center font-bold text-sm border border-white/10 shadow bg-gradient-to-tr from-[#3A3A3C] to-[#545458] shrink-0">
+                  <div className="size-[48px] rounded-full text-white flex items-center justify-center font-semibold text-[17px] border border-white/10 shadow bg-gradient-to-tr from-[#3A3A3C] to-[#545458] shrink-0">
                     {thread.name.slice(0, 1)}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <div className="flex items-center justify-between">
-                      <span className="text-[14px] font-semibold text-white truncate">
+                      <span className="text-[17px] font-semibold text-white truncate leading-tight">
                         {thread.name}
                       </span>
-                      <span className="text-[11px] text-[#8E8E93] font-sans shrink-0 ml-1">
+                      <span className="text-[13px] text-[#8E8E93] font-sans shrink-0 ml-2 font-normal">
                         {thread.timestamp}
                       </span>
                     </div>
-                    <p className="text-[12.5px] text-[#8E8E93] truncate mt-0.5 leading-snug">
+                    <p className="text-[15px] text-[#8E8E93] truncate mt-1 leading-snug font-normal">
                       {thread.previewText}
                     </p>
                   </div>
-                  <ChevronRight className="size-4 text-[#48484A] shrink-0" />
+                  <ChevronRight className="size-4 text-[#48484A] shrink-0 ml-1" />
                 </div>
               ))}
             </div>
@@ -339,15 +382,19 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           <div className="w-full max-w-[300px] rounded-2xl bg-[#1C1C1E] border border-[#FFD60A]/40 p-4 shadow-2xl space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <span className="text-[11.5px] font-bold text-[#FFD60A] flex items-center gap-1.5 uppercase tracking-wider">
-                <ShieldAlert className="size-4 text-[#FFD60A]" /> Báo Cáo Manh Mối
+                <ShieldAlert className="size-4 text-[#FFD60A]" /> Báo Cáo Manh
+                Mối
               </span>
-              <button onClick={() => setInspectingClue(null)} className="text-[#8E8E93] hover:text-white p-1">
+              <button
+                onClick={() => setInspectingClue(null)}
+                className="text-[#8E8E93] hover:text-white p-1"
+              >
                 <X className="size-4" />
               </button>
             </div>
             <div className="space-y-2 text-left">
               <div className="text-[12.5px] font-bold text-white">
-                {inspectingClue.clueTitle || 'Manh mối mấu chốt'}
+                {inspectingClue.clueTitle || "Manh mối mấu chốt"}
               </div>
               <div className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-[11px] text-white/90 italic">
                 "{inspectingClue.text}"
@@ -359,23 +406,25 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             <div className="pt-2 flex gap-2">
               <button
                 onClick={() => {
-                  togglePinClue(inspectingClue.id, inspectingClue.clueTitle)
-                  setInspectingClue(null)
+                  togglePinClue(inspectingClue.id, inspectingClue.clueTitle);
+                  setInspectingClue(null);
                 }}
                 className={cn(
-                  'flex-1 py-2 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5',
+                  "flex-1 py-2 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5",
                   pinnedClueIds.includes(inspectingClue.id)
-                    ? 'bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40'
-                    : 'bg-[#0A84FF] text-white hover:bg-[#0077ED]'
+                    ? "bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40"
+                    : "bg-[#0A84FF] text-white hover:bg-[#0077ED]",
                 )}
               >
                 <BookmarkCheck className="size-3.5" />
-                {pinnedClueIds.includes(inspectingClue.id) ? 'Đã ghim sổ tay' : 'Ghim vào sổ tay'}
+                {pinnedClueIds.includes(inspectingClue.id)
+                  ? "Đã ghim sổ tay"
+                  : "Ghim vào sổ tay"}
               </button>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }
