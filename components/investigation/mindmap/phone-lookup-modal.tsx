@@ -121,20 +121,6 @@ export function PhoneLookupModal({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
-                  detectiveAudio.playTypewriterClick()
-                  emitInvestigationEvent('OPEN_HINT', { checkpointId: 'cp-000-0' })
-                }}
-                className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                title="Xem gợi ý phá án cho câu hỏi này"
-              >
-                <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                <span className="hidden sm:inline">GỢI Ý</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
                   detectiveAudio.playPaperRustle()
                   onClose()
                 }}
@@ -234,7 +220,21 @@ export function PhoneLookupModal({
             )}
 
             {/* ACTION FOOTER */}
-            <div className="pt-2 flex items-center justify-end">
+            <div className="pt-2 flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  detectiveAudio.playTypewriterClick()
+                  emitInvestigationEvent('OPEN_HINT', { checkpointId: 'cp-000-0' })
+                }}
+                className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                title="Xem gợi ý phá án cho câu hỏi này"
+              >
+                <Lightbulb className="size-3.5 text-[#8c1d1d]" />
+                <span>GỢI Ý</span>
+              </button>
+
               <button
                 type="submit"
                 className={cn(

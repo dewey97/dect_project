@@ -10,23 +10,41 @@ export function UserNav() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      setUser(session?.user ?? null)
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+      if (currentUser) {
+        if (currentUser.app_metadata?.role === 'super_admin') {
+          setIsAdmin(true)
+        } else {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', currentUser.id)
+            .single()
+          setIsAdmin(profile?.role === 'admin' || !profile)
+        }
+      } else {
+        setIsAdmin(false)
+      }
       setLoading(false)
     }
     getUser()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+      if (!currentUser) setIsAdmin(false)
     })
 
     return () => subscription.unsubscribe()
-  }, [supabase.auth]) // <- fix dependency warning safely
+  }, [supabase])
 
   // Xử lý click ra ngoài để đóng menu
   useEffect(() => {

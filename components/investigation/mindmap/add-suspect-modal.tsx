@@ -409,40 +409,6 @@ export function AddSuspectModal({
           <div className="absolute top-4 right-4 flex items-center gap-2 z-20 pointer-events-auto">
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                detectiveAudio.playTypewriterClick()
-                const targetCat: 'motive' | 'alibi' =
-                  subTileView === 'motive'
-                    ? 'motive'
-                    : subTileView === 'alibi'
-                      ? 'alibi'
-                      : isMotiveValid
-                        ? 'alibi'
-                        : 'motive'
-                emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: targetCat })
-              }}
-              className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-              title={
-                subTileView === 'motive'
-                  ? 'Xem gợi ý động cơ gây án'
-                  : subTileView === 'alibi'
-                    ? 'Xem gợi ý mâu thuẫn ngoại phạm'
-                    : 'Xem gợi ý phá án'
-              }
-            >
-              <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-              <span className="hidden sm:inline">
-                {subTileView === 'motive'
-                  ? 'GỢI Ý ĐỘNG CƠ'
-                  : subTileView === 'alibi'
-                    ? 'GỢI Ý NGOẠI PHẠM'
-                    : 'GỢI Ý'}
-              </span>
-            </button>
-
-            <button
-              type="button"
               onClick={handleDirectClose}
               className="p-1.5 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer border border-[#5c4026]/40"
               title="Đóng"
@@ -575,19 +541,6 @@ export function AddSuspectModal({
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
                     ĐỘNG CƠ GÂY ÁN {name ? `— ${name}` : ''}
                   </span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      detectiveAudio.playTypewriterClick()
-                      emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'motive' })
-                    }}
-                    className="px-2 py-1 bg-[#ede3d1] hover:bg-[#dfd3bd] text-[#8c1d1d] border border-[#a88c6f] font-mono text-[10px] font-bold uppercase transition-all flex items-center gap-1 cursor-pointer"
-                    title="Xem gợi ý động cơ"
-                  >
-                    <Lightbulb className="size-3 text-[#8c1d1d]" />
-                    <span>GỢI Ý ĐỘNG CƠ</span>
-                  </button>
                 </div>
 
                 <ClueCodePicker
@@ -619,14 +572,30 @@ export function AddSuspectModal({
                     <span>QUAY LẠI</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={handleConfirmMotiveClues}
-                    className="px-5 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95"
-                  >
-                    <Check className="size-3.5 text-[#d9a066]" />
-                    <span>XÁC NHẬN MANH MỐI</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        detectiveAudio.playTypewriterClick()
+                        emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'motive' })
+                      }}
+                      className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                      title="Xem gợi ý động cơ gây án"
+                    >
+                      <Lightbulb className="size-3.5 text-[#8c1d1d]" />
+                      <span>GỢI Ý</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleConfirmMotiveClues}
+                      className="px-5 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95"
+                    >
+                      <Check className="size-3.5 text-[#d9a066]" />
+                      <span>XÁC NHẬN MANH MỐI</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -638,19 +607,6 @@ export function AddSuspectModal({
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
                     NGOẠI PHẠM BẤT HỢP LÝ {name ? `— ${name}` : ''}
                   </span>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      detectiveAudio.playTypewriterClick()
-                      emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'alibi' })
-                    }}
-                    className="px-2 py-1 bg-[#ede3d1] hover:bg-[#dfd3bd] text-[#8c1d1d] border border-[#a88c6f] font-mono text-[10px] font-bold uppercase transition-all flex items-center gap-1 cursor-pointer"
-                    title="Xem gợi ý ngoại phạm"
-                  >
-                    <Lightbulb className="size-3 text-[#8c1d1d]" />
-                    <span>GỢI Ý NGOẠI PHẠM</span>
-                  </button>
                 </div>
 
                 <ClueCodePicker
@@ -682,14 +638,30 @@ export function AddSuspectModal({
                     <span>QUAY LẠI</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={handleConfirmAlibiClues}
-                    className="px-5 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95"
-                  >
-                    <Check className="size-3.5 text-[#d9a066]" />
-                    <span>XÁC NHẬN MANH MỐI</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        detectiveAudio.playTypewriterClick()
+                        emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'alibi' })
+                      }}
+                      className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                      title="Xem gợi ý mâu thuẫn ngoại phạm"
+                    >
+                      <Lightbulb className="size-3.5 text-[#8c1d1d]" />
+                      <span>GỢI Ý</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleConfirmAlibiClues}
+                      className="px-5 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95"
+                    >
+                      <Check className="size-3.5 text-[#d9a066]" />
+                      <span>XÁC NHẬN MANH MỐI</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
