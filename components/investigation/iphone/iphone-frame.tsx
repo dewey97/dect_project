@@ -425,261 +425,247 @@ export function IPhoneFrame({
               <div className="flex-1 flex flex-col justify-between px-3.5 pt-2 pb-1 relative overflow-hidden select-none">
                 
                 {screenPage === 0 ? (
-                  /* PAGE 1: AUTHENTIC 4x4 SPRINGBOARD APPS (MATCHES FIGMA FRAME 92:300 EXACTLY) */
-                  <div className="grid grid-cols-4 gap-x-3.5 gap-y-3 pt-0.5 relative z-10 animate-in fade-in-50 duration-200">
+                  /* PAGE 1: AUTHENTIC 4x4 SPRINGBOARD APPS (MATCHES FIGMA FRAME 14:31 / 92:300 EXACTLY) */
+                  <div className="grid grid-cols-4 gap-x-2 gap-y-3 pt-1 px-1 relative z-10 animate-in fade-in-50 duration-200">
                     
                     {/* Row 1, Icon 1: Messages (Tin nhắn) */}
                     <button
                       onClick={() => setActiveApp('messages')}
                       className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     >
-                      <div className="relative w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#60E450] to-[#28CA36] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/20">
-                        <svg className="w-[58%] h-[58%] text-white fill-white" viewBox="0 0 32 32">
-                          <path d="M16 4C9.37 4 4 8.7 4 14.5c0 3.32 1.77 6.27 4.54 8.21L7 27.5l5.65-2.26c1.07.31 2.2.48 3.35.48 6.63 0 12-4.7 12-10.5S22.63 4 16 4z" />
-                        </svg>
-                        <span className="absolute -top-[4%] -right-[4%] size-[28%] rounded-full bg-[#FF3B30] text-white text-[9px] font-bold flex items-center justify-center border-[1.5px] border-white shadow font-sans">
-                          1
-                        </span>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/messages.png"
+                          alt="Messages"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Messages
                       </span>
                     </button>
 
-                    {/* Row 1, Icon 2: Calendar (Lịch Thứ Sáu 12 - Figma Spec) */}
+                    {/* Row 1, Icon 2: Calendar */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-white flex flex-col items-center justify-between overflow-hidden shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/40 pb-0.5">
-                        <div className="w-full bg-[#FF3B30] text-white text-[7.5px] font-bold tracking-wider uppercase py-0.5 text-center">
-                          FRIDAY
-                        </div>
-                        <div className="text-[26px] font-light text-[#1C1C1E] tracking-tighter leading-none -mt-1 font-sans">
-                          12
-                        </div>
-                        <div className="h-0.5" />
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/calendar.png"
+                          alt="Calendar"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Calendar
                       </span>
                     </div>
 
-                    {/* Row 1, Icon 3: Photos (Ảnh) */}
+                    {/* Row 1, Icon 3: Photos */}
                     <button
                       onClick={() => setActiveApp('photos')}
                       className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     >
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-white flex items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/40 relative">
-                        <svg className="w-[62%] h-[62%]" viewBox="0 0 32 32">
-                          <ellipse cx="16" cy="10" rx="3.5" ry="6" fill="#FF2D55" opacity="0.85" />
-                          <ellipse cx="20.2" cy="11.8" rx="3.5" ry="6" fill="#FF9F0A" opacity="0.85" transform="rotate(45 20.2 11.8)" />
-                          <ellipse cx="22" cy="16" rx="3.5" ry="6" fill="#FFD60A" opacity="0.85" transform="rotate(90 22 16)" />
-                          <ellipse cx="20.2" cy="20.2" rx="3.5" ry="6" fill="#30D158" opacity="0.85" transform="rotate(135 20.2 20.2)" />
-                          <ellipse cx="16" cy="22" rx="3.5" ry="6" fill="#64D2FF" opacity="0.85" transform="rotate(180 16 22)" />
-                          <ellipse cx="11.8" cy="20.2" rx="3.5" ry="6" fill="#0A84FF" opacity="0.85" transform="rotate(225 11.8 20.2)" />
-                          <ellipse cx="10" cy="16" rx="3.5" ry="6" fill="#5856D6" opacity="0.85" transform="rotate(270 10 16)" />
-                          <ellipse cx="11.8" cy="11.8" rx="3.5" ry="6" fill="#AF52DE" opacity="0.85" transform="rotate(315 11.8 11.8)" />
-                        </svg>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/photos.png"
+                          alt="Photos"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Photos
                       </span>
                     </button>
 
-                    {/* Row 1, Icon 4: Camera (Máy ảnh) */}
+                    {/* Row 1, Icon 4: Camera */}
                     <button
                       onClick={() => setActiveApp('photos')}
                       className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     >
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#C6C9CE] to-[#8E959E] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30">
-                        <svg className="w-[60%] h-[60%] text-[#2C2C2E]" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M4 4h3l2-2h6l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm8 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6z" />
-                        </svg>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/camera.png"
+                          alt="Camera"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Camera
                       </span>
                     </button>
 
-                    {/* Row 2, Icon 1: Weather (Thời tiết) */}
+                    {/* Row 2, Icon 1: Weather */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#54C5D8] to-[#0A84FF] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30 relative overflow-hidden">
-                        <div className="size-5 rounded-full bg-[#FFCC00] absolute top-2 right-2.5 shadow" />
-                        <div className="w-7 h-4 bg-white/90 rounded-full absolute bottom-2.5 left-2 shadow-sm" />
-                        <div className="size-4 bg-white/90 rounded-full absolute bottom-3.5 left-4" />
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/weather.png"
+                          alt="Weather"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Weather
                       </span>
                     </div>
 
-                    {/* Row 2, Icon 2: Clock (Đồng hồ mặt trắng iOS 9) */}
+                    {/* Row 2, Icon 2: Clock */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-white flex items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/60 relative">
-                        <div className="size-9 rounded-full border border-black/10 relative flex items-center justify-center bg-white">
-                          <div className="absolute top-0.5 text-[5.5px] text-black font-semibold font-sans">12</div>
-                          <div className="absolute right-0.5 text-[5.5px] text-black font-semibold font-sans">3</div>
-                          <div className="absolute bottom-0.5 text-[5.5px] text-black font-semibold font-sans">6</div>
-                          <div className="absolute left-0.5 text-[5.5px] text-black font-semibold font-sans">9</div>
-                          <div className="absolute w-[2px] h-2.5 bg-black origin-bottom rotate-[240deg] -translate-y-1 rounded-sm" />
-                          <div className="absolute w-[1.2px] h-3.5 bg-black origin-bottom rotate-[270deg] -translate-y-1.5 rounded-sm" />
-                          <div className="absolute w-[0.8px] h-4 bg-[#FF3B30] origin-bottom rotate-[45deg] -translate-y-1.5" />
-                          <div className="size-1 rounded-full bg-[#FF3B30] z-10" />
-                        </div>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/clock.png"
+                          alt="Clock"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Clock
                       </span>
                     </div>
 
-                    {/* Row 2, Icon 3: Maps (Bản đồ) */}
+                    {/* Row 2, Icon 3: Maps */}
                     <button
                       onClick={() => setActiveApp('maps')}
                       className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     >
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-white flex items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/40 relative overflow-hidden p-1.5">
-                        <svg className="w-full h-full" viewBox="0 0 48 48">
-                          <path d="M24 4C14.06 4 6 12.06 6 22c0 13.5 18 22 18 22s18-8.5 18-22c0-9.94-8.06-18-18-18z" fill="#EA4335" />
-                          <path d="M24 4C14.06 4 6 12.06 6 22c0 4.8 1.9 9.17 5 12.35l13-12.35V4z" fill="#4285F4" />
-                          <path d="M24 22l13-12.35C33.9 6.47 29.2 4 24 4v18z" fill="#FBBC04" />
-                          <path d="M24 22v22s18-8.5 18-22c0-4.8-1.9-9.17-5-12.35L24 22z" fill="#34A853" />
-                          <circle cx="24" cy="19" r="6" fill="#FFFFFF" />
-                        </svg>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/maps.png"
+                          alt="Maps"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Maps
                       </span>
                     </button>
 
-                    {/* Row 2, Icon 4: Videos (Video) */}
+                    {/* Row 2, Icon 4: Videos */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#54C5D8] to-[#40A8C4] flex flex-col justify-between overflow-hidden shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30">
-                        <div className="w-full h-4 bg-[#1C1C1E] flex items-center justify-around px-1">
-                          <span className="w-1.5 h-3 bg-white skew-x-[20deg]" />
-                          <span className="w-1.5 h-3 bg-white skew-x-[20deg]" />
-                          <span className="w-1.5 h-3 bg-white skew-x-[20deg]" />
-                        </div>
-                        <div className="flex-1 flex items-center justify-center text-white text-[10px] font-bold">
-                          ▶
-                        </div>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/videos.png"
+                          alt="Videos"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Videos
                       </span>
                     </div>
 
-                    {/* Row 3, Icon 1: Notes (Ghi chú iCloud) */}
+                    {/* Row 3, Icon 1: Notes */}
                     <button
                       onClick={() => setActiveApp('notes')}
                       className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     >
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-white flex flex-col justify-between overflow-hidden shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/40">
-                        <div className="w-full bg-[#FFD600] h-[24%] border-b border-dashed border-[#CCA800]" />
-                        <div className="flex-1 p-1 flex flex-col gap-1 justify-center">
-                          <div className="h-[1.5px] w-full bg-[#D1C485]" />
-                          <div className="h-[1.5px] w-4/5 bg-[#D1C485]" />
-                          <div className="h-[1.5px] w-3/4 bg-[#D1C485]" />
-                        </div>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/notes.png"
+                          alt="Notes"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Notes
                       </span>
                     </button>
 
-                    {/* Row 3, Icon 2: Reminders (Nhắc nhở) */}
+                    {/* Row 3, Icon 2: Reminders */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="relative w-full aspect-square max-w-[56px] rounded-[13.5px] bg-white flex flex-col justify-center p-2 shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/40 gap-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="size-2 rounded-full bg-[#FF9500]" />
-                          <span className="h-[2px] w-5 bg-[#D1D1D6] rounded" />
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="size-2 rounded-full bg-[#007AFF]" />
-                          <span className="h-[2px] w-6 bg-[#D1D1D6] rounded" />
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="size-2 rounded-full bg-[#34C759]" />
-                          <span className="h-[2px] w-4 bg-[#D1D1D6] rounded" />
-                        </div>
-                        <span className="absolute -top-[4%] -right-[4%] size-[28%] rounded-full bg-[#FF3B30] text-white text-[9px] font-bold flex items-center justify-center border-[1.5px] border-white shadow font-sans">
-                          1
-                        </span>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/reminders.png"
+                          alt="Reminders"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Reminders
                       </span>
                     </div>
 
-                    {/* Row 3, Icon 3: Stocks (Chứng khoán) */}
+                    {/* Row 3, Icon 3: Stocks */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-black flex flex-col justify-center items-center shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/20 p-1 relative overflow-hidden">
-                        <svg className="w-full h-7 text-[#0A84FF]" viewBox="0 0 32 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <path d="M2 14 L8 10 L14 12 L20 4 L26 8 L30 2" />
-                        </svg>
-                        <div className="size-1.5 rounded-full bg-[#64D2FF] shadow-[0_0_6px_#64D2FF] absolute top-2 right-2.5" />
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/stocks.png"
+                          alt="Stocks"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Stocks
                       </span>
                     </div>
 
-                    {/* Row 3, Icon 4: Wallet / Banking (Ví tiền & Ngân hàng) */}
+                    {/* Row 3, Icon 4: Wallet */}
                     <button
                       onClick={() => setActiveApp('banking')}
                       className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     >
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#1C1C1E] to-[#000000] flex flex-col items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/20 p-1.5">
-                        <div className="w-full h-2 rounded-t bg-[#30D158] opacity-90 mb-0.5" />
-                        <div className="w-full h-2 bg-[#FF9F0A] opacity-90 mb-0.5" />
-                        <div className="w-full h-2 rounded-b bg-[#0A84FF] opacity-90" />
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/wallet.png"
+                          alt="Wallet"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Wallet
                       </span>
                     </button>
 
                     {/* Row 4, Icon 1: iBooks */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#FF9500] to-[#FF5E3A] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30">
-                        <svg className="w-[60%] h-[60%] fill-white" viewBox="0 0 24 24">
-                          <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" />
-                        </svg>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/ibooks.png"
+                          alt="iBooks"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         iBooks
                       </span>
                     </div>
 
                     {/* Row 4, Icon 2: iTunes Store */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#FF2D55] to-[#AF52DE] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30">
-                        <div className="size-7 rounded-full border border-white flex items-center justify-center">
-                          <span className="text-white text-xs">♫</span>
-                        </div>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/itunes.png"
+                          alt="iTunes Store"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         iTunes Store
                       </span>
                     </div>
 
                     {/* Row 4, Icon 3: App Store */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-gradient-to-b from-[#33A2FF] to-[#007AFF] flex items-center justify-center text-white shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/30">
-                        <svg className="w-[60%] h-[60%]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <path d="M12 4v16m-7-6l14-4M5 14l14 4" />
-                        </svg>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/appstore.png"
+                          alt="App Store"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         App Store
                       </span>
                     </div>
 
-                    {/* Row 4, Icon 4: Health (Sức khỏe) */}
+                    {/* Row 4, Icon 4: Health */}
                     <div className="flex flex-col items-center group active:scale-90 transition-transform cursor-pointer">
-                      <div className="w-full aspect-square max-w-[56px] rounded-[13.5px] bg-white flex items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.3)] border border-white/40">
-                        <svg className="w-[55%] h-[55%] text-[#FF2D55] fill-[#FF2D55]" viewBox="0 0 24 24">
-                          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                        </svg>
+                      <div className="w-[56px] h-[56px] sm:w-[60px] sm:h-[60px] flex items-center justify-center relative">
+                        <img
+                          src="/images/cases/case_000/phone/icons/health.png"
+                          alt="Health"
+                          className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                        />
                       </div>
-                      <span className="text-[11px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate w-full">
+                      <span className="text-[11px] font-normal text-white mt-1 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] truncate w-full select-none">
                         Health
                       </span>
                     </div>
@@ -770,8 +756,8 @@ export function IPhoneFrame({
                   />
                 </div>
 
-                {/* AUTHENTIC iOS 9 FROSTED GLASS DOCK (4 Quick-Launch Apps with Text Labels) */}
-                <div className="w-[96%] mx-auto h-[84px] rounded-[24px] bg-white/30 backdrop-blur-2xl border border-white/40 p-2 flex items-center justify-around px-1 shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative overflow-hidden z-10 mt-auto mb-1">
+                {/* AUTHENTIC iOS 9 FROSTED GLASS DOCK (Figma Node 14:40 Spec: 4 Quick-Launch Apps with Text Labels) */}
+                <div className="w-[96%] mx-auto h-[90px] rounded-[26px] bg-white/30 backdrop-blur-[40px] border border-white/20 p-2 flex items-center justify-around px-2 shadow-[0_8px_32px_rgba(0,0,0,0.18)] relative overflow-hidden z-10 mt-auto mb-1">
                   {/* Glossy top highlight reflection line */}
                   <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none" />
 
@@ -781,15 +767,14 @@ export function IPhoneFrame({
                     className="w-[22%] flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     title="Điện thoại"
                   >
-                    <div className="relative w-full aspect-square max-w-[50px] rounded-[22.5%] bg-gradient-to-b from-[#60E450] to-[#28CA36] flex items-center justify-center text-white shadow-md border border-white/30">
-                      <svg className="w-[55%] h-[55%] text-white fill-white" viewBox="0 0 24 24">
-                        <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1.003 1.003 0 011.02-.24c1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
-                      </svg>
-                      <span className="absolute -top-[4%] -right-[4%] size-[32%] rounded-full bg-[#FF3B30] text-white text-[9px] font-bold flex items-center justify-center border-[1.5px] border-white shadow font-sans">
-                        3
-                      </span>
+                    <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] flex items-center justify-center relative">
+                      <img
+                        src="/images/cases/case_000/phone/icons/phone.png"
+                        alt="Phone"
+                        className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                      />
                     </div>
-                    <span className="text-[10.5px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                    <span className="text-[11px] font-normal text-white mt-0.5 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] select-none">
                       Phone
                     </span>
                   </button>
@@ -800,17 +785,14 @@ export function IPhoneFrame({
                     className="w-[22%] flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     title="Mail"
                   >
-                    <div className="relative w-full aspect-square max-w-[50px] rounded-[22.5%] bg-gradient-to-b from-[#33A2FF] to-[#0A84FF] flex items-center justify-center text-white shadow-md border border-white/30">
-                      <svg className="w-[60%] h-[60%]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="2" y="4" width="20" height="16" rx="2" />
-                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                      </svg>
-                      {/* Pill Badge for 2,017 */}
-                      <span className="absolute -top-[6%] -right-[12%] px-1.5 h-[16px] rounded-full bg-[#FF3B30] text-white text-[8.5px] font-bold flex items-center justify-center border-[1.5px] border-white shadow font-mono">
-                        2,017
-                      </span>
+                    <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] flex items-center justify-center relative">
+                      <img
+                        src="/images/cases/case_000/phone/icons/mail.png"
+                        alt="Mail"
+                        className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                      />
                     </div>
-                    <span className="text-[10.5px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                    <span className="text-[11px] font-normal text-white mt-0.5 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] select-none">
                       Mail
                     </span>
                   </button>
@@ -821,14 +803,14 @@ export function IPhoneFrame({
                     className="w-[22%] flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     title="Safari"
                   >
-                    <div className="w-full aspect-square max-w-[50px] rounded-[22.5%] bg-gradient-to-b from-[#54C5D8] to-[#0A84FF] flex items-center justify-center text-white shadow-md border border-white/30 relative overflow-hidden">
-                      <svg className="w-[65%] h-[65%]" viewBox="0 0 32 32">
-                        <circle cx="16" cy="16" r="11" stroke="white" strokeWidth="1" fill="none" />
-                        <polygon points="16,6 20,16 16,14 12,16" fill="#FF3B30" />
-                        <polygon points="16,26 20,16 16,18 12,16" fill="white" />
-                      </svg>
+                    <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] flex items-center justify-center relative">
+                      <img
+                        src="/images/cases/case_000/phone/icons/safari.png"
+                        alt="Safari"
+                        className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                      />
                     </div>
-                    <span className="text-[10.5px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                    <span className="text-[11px] font-normal text-white mt-0.5 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] select-none">
                       Safari
                     </span>
                   </button>
@@ -839,12 +821,14 @@ export function IPhoneFrame({
                     className="w-[22%] flex flex-col items-center group active:scale-90 transition-transform cursor-pointer"
                     title="Music"
                   >
-                    <div className="w-full aspect-square max-w-[50px] rounded-[22.5%] bg-gradient-to-b from-[#FF2D55] to-[#FA114F] flex items-center justify-center text-white shadow-md border border-white/30 relative">
-                      <svg className="w-[58%] h-[58%] fill-white" viewBox="0 0 24 24">
-                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                      </svg>
+                    <div className="w-[52px] h-[52px] sm:w-[56px] sm:h-[56px] flex items-center justify-center relative">
+                      <img
+                        src="/images/cases/case_000/phone/icons/music.png"
+                        alt="Music"
+                        className="w-full h-full object-contain filter drop-shadow-sm select-none pointer-events-none"
+                      />
                     </div>
-                    <span className="text-[10.5px] font-normal text-white mt-1 tracking-tight text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+                    <span className="text-[11px] font-normal text-white mt-0.5 tracking-[-0.2px] text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] select-none">
                       Music
                     </span>
                   </button>

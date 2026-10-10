@@ -10,12 +10,15 @@ import {
   ArrowLeft,
   ArrowRight,
   HelpCircle,
+  Target,
+  Clock,
 } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import {
   getCheckpointHints,
+  getCategorizedCheckpointHints,
   type SheetCheckpointRow,
 } from "@/lib/cms/checkpoint-cms";
 import { getStorageItem, getStorageJson, setStorageJson } from "@/lib/storage";
@@ -24,6 +27,7 @@ interface HintModalProps {
   isOpen: boolean;
   onClose: () => void;
   checkpointId?: string;
+  category?: "motive" | "alibi" | "all";
 }
 
 interface CheckpointGroupData {
@@ -31,6 +35,9 @@ interface CheckpointGroupData {
   title: string;
   dossier: string;
   hints: string[];
+  motiveHints: string[];
+  alibiHints: string[];
+  hasCategories: boolean;
 }
 
 /**
@@ -102,7 +109,7 @@ export function getLatestActiveCheckpointId(): string {
 
 /**
  * Gom nhóm hints từ tab 'checkpoints' trên Google Sheets theo checkpoint_id,
- * tự động kế thừa và gộp các dòng con (Động cơ + Ngoại phạm mâu thuẫn).
+ * tự động bóc tách 2 nhóm [ĐỘNG CƠ] và [NGOẠI PHẠM].
  */
 function buildGroupedCheckpointsMap(
   sheetCheckpoints: SheetCheckpointRow[],
@@ -135,6 +142,9 @@ function buildGroupedCheckpointsMap(
           title: row.title || id,
           dossier: row.dossier || "",
           hints: [],
+          motiveHints: [],
+          alibiHints: [],
+          hasCategories: false,
         });
       }
       const entry = map.get(id)!;
@@ -143,6 +153,18 @@ function buildGroupedCheckpointsMap(
       }
       if (row.dossier && !entry.dossier) {
         entry.dossier = row.dossier;
+      }
+
+      // Trích xuất phân nhóm Động cơ & Ngoại phạm
+      const categorized = getCategorizedCheckpointHints(row);
+      if (categorized.hasCategories) {
+        entry.hasCategories = true;
+        for (const h of categorized.motive) {
+          if (!entry.motiveHints.includes(h)) entry.motiveHints.push(h);
+        }
+        for (const h of categorized.alibi) {
+          if (!entry.alibiHints.includes(h)) entry.alibiHints.push(h);
+        }
       }
 
       const rowHints = getCheckpointHints(row);
@@ -167,6 +189,7 @@ export function HintModal({
   isOpen,
   onClose,
   checkpointId,
+  category,
 }: HintModalProps) {
   const { data: sheetCheckpoints } =
     usePhoneData<SheetCheckpointRow>("checkpoints");
@@ -176,40 +199,79 @@ export function HintModal({
     return buildGroupedCheckpointsMap(sheetCheckpoints);
   }, [sheetCheckpoints]);
 
-  // Nhận diện đồng bộ checkpoint ID ngay lập tức (không trễ nhịp useState)
+  // Nhận diện đồng bộ checkpoint ID ngay lập tức
   const effectiveCpId = useMemo(() => {
     if (checkpointId) return normalizeCheckpointId(checkpointId);
     return getLatestActiveCheckpointId() || "cp-000-0";
   }, [checkpointId, isOpen]);
 
+  const currentGroup = useMemo(() => {
+    return (
+      groupedMap.get(effectiveCpId) || {
+        checkpointId: effectiveCpId,
+        title: `CÂU HỎI CHECKPOINT // ${effectiveCpId.toUpperCase()}`,
+        dossier: "Hồ sơ chuyên án",
+        hints: [],
+        motiveHints: [],
+        alibiHints: [],
+        hasCategories: false,
+      }
+    );
+  }, [groupedMap, effectiveCpId]);
+
+  // State phân nhóm: 'motive' | 'alibi' | 'all'
+  const [selectedCategory, setSelectedCategory] = useState<"motive" | "alibi" | "all">("all");
   const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
   const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
 
-  // Đồng bộ cấp độ mở khóa khi modal mở
+  // Khởi tạo phân nhóm theo context truyền vào
   useEffect(() => {
     if (isOpen) {
       setUnlockedLevels(
         getStorageJson<Record<string, number>>("hint_unlocked_levels", {}),
       );
+
+      if (category === "motive" || category === "alibi") {
+        setSelectedCategory(category);
+      } else if (currentGroup.hasCategories) {
+        if (currentGroup.motiveHints.length > 0) setSelectedCategory("motive");
+        else if (currentGroup.alibiHints.length > 0) setSelectedCategory("alibi");
+        else setSelectedCategory("all");
+      } else {
+        setSelectedCategory("all");
+      }
+
       setActiveHintIdx(0);
     }
-  }, [isOpen, effectiveCpId]);
+  }, [isOpen, category, currentGroup]);
 
   if (!isOpen) return null;
 
-  const currentGroup = groupedMap.get(effectiveCpId) || {
-    checkpointId: effectiveCpId,
-    title: `CÂU HỎI CHECKPOINT // ${effectiveCpId.toUpperCase()}`,
-    dossier: "Hồ sơ chuyên án",
-    hints: [],
-  };
+  // Lấy danh sách gợi ý đang hiển thị theo nhóm
+  const displayHints =
+    selectedCategory === "motive" && currentGroup.motiveHints.length > 0
+      ? currentGroup.motiveHints
+      : selectedCategory === "alibi" && currentGroup.alibiHints.length > 0
+        ? currentGroup.alibiHints
+        : currentGroup.hints;
 
-  const totalHints = currentGroup.hints.length;
+  const storageKey =
+    currentGroup.hasCategories && selectedCategory !== "all"
+      ? `${effectiveCpId}_${selectedCategory}`
+      : effectiveCpId;
+
+  const totalHints = displayHints.length;
   const unlockedCount = Math.min(
-    unlockedLevels[effectiveCpId] || 1,
+    unlockedLevels[storageKey] || 1,
     Math.max(totalHints, 1),
   );
   const viewIdx = Math.min(activeHintIdx, Math.max(unlockedCount - 1, 0));
+
+  const handleSwitchCategory = (cat: "motive" | "alibi") => {
+    detectiveAudio.playTypewriterClick();
+    setSelectedCategory(cat);
+    setActiveHintIdx(0);
+  };
 
   const handleUnlockNext = () => {
     if (totalHints === 0) return;
@@ -217,7 +279,7 @@ export function HintModal({
     const nextCount = Math.min(unlockedCount + 1, totalHints);
     const updated = {
       ...unlockedLevels,
-      [effectiveCpId]: nextCount,
+      [storageKey]: nextCount,
     };
     setUnlockedLevels(updated);
     setActiveHintIdx(nextCount - 1);
@@ -280,6 +342,41 @@ export function HintModal({
               )}
             </div>
 
+            {/* SUB-CATEGORIES FOR SUSPECT INVESTIGATION (ĐỘNG CƠ / NGOẠI PHẠM) */}
+            {currentGroup.hasCategories && (
+              <div className="flex items-center gap-2 p-1.5 bg-[#ebdcc4] border border-[#a88c6f]/60 font-mono text-xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#6b4e2e] px-1.5 shrink-0">
+                  PHÂN LOẠI:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleSwitchCategory("motive")}
+                  className={cn(
+                    "flex-1 py-1.5 px-2.5 font-bold uppercase transition-all flex items-center justify-center gap-1.5 border cursor-pointer",
+                    selectedCategory === "motive"
+                      ? "bg-[#8c1d1d] text-white border-[#6b1414] shadow-sm"
+                      : "bg-[#f5ecdc] hover:bg-[#eae0ce] text-[#3d2b1a] border-[#b8a48c]",
+                  )}
+                >
+                  <Target className="size-3.5" />
+                  <span>ĐỘNG CƠ ({currentGroup.motiveHints.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSwitchCategory("alibi")}
+                  className={cn(
+                    "flex-1 py-1.5 px-2.5 font-bold uppercase transition-all flex items-center justify-center gap-1.5 border cursor-pointer",
+                    selectedCategory === "alibi"
+                      ? "bg-[#8c1d1d] text-white border-[#6b1414] shadow-sm"
+                      : "bg-[#f5ecdc] hover:bg-[#eae0ce] text-[#3d2b1a] border-[#b8a48c]",
+                  )}
+                >
+                  <Clock className="size-3.5" />
+                  <span>NGOẠI PHẠM ({currentGroup.alibiHints.length})</span>
+                </button>
+              </div>
+            )}
+
             {/* TRƯỜNG HỢP: CHƯA CÓ GỢI Ý HOẶC ĐANG TẢI */}
             {totalHints === 0 ? (
               <div className="p-5 border-2 border-[#2b1f14]/30 bg-[#fdfbf7] text-[#1a120b] rounded-none font-sans text-xs sm:text-[13px] leading-relaxed space-y-2">
@@ -296,15 +393,24 @@ export function HintModal({
               <>
                 <div className="pt-1">
                   <div className="p-4 border-2 border-[#2b1f14] bg-[#fdfbf7] text-[#1a120b] shadow-sm rounded-none font-sans text-xs sm:text-[13px] leading-relaxed">
-                    <div className="flex items-center gap-2 border-b border-[#2b1f14]/15 pb-1.5 mb-2.5 font-mono text-[10px] sm:text-[11px] font-bold uppercase">
+                    <div className="flex items-center justify-between border-b border-[#2b1f14]/15 pb-1.5 mb-2.5 font-mono text-[10px] sm:text-[11px] font-bold uppercase">
                       <span className="flex items-center gap-1.5 text-[#8c1d1d]">
                         <Unlock className="size-3.5" />
                         Gợi ý mức {viewIdx + 1}/{totalHints}
                       </span>
+                      {currentGroup.hasCategories && (
+                        <span className="text-[#6b4e2e] text-[10px]">
+                          [
+                          {selectedCategory === "motive"
+                            ? "ĐỘNG CƠ GÂY ÁN"
+                            : "MÂU THUẪN NGOẠI PHẠM"}
+                          ]
+                        </span>
+                      )}
                     </div>
 
                     <div className="grid">
-                      {currentGroup.hints.map((hintText, hIdx) => (
+                      {displayHints.map((hintText, hIdx) => (
                         <p
                           key={hIdx}
                           aria-hidden={hIdx !== viewIdx}
@@ -323,7 +429,7 @@ export function HintModal({
 
                   {/* Tiến độ mở khóa các mức gợi ý */}
                   <div className="flex items-center gap-1.5 pt-3">
-                    {currentGroup.hints.map((_, hIdx) => (
+                    {displayHints.map((_, hIdx) => (
                       <button
                         key={hIdx}
                         type="button"

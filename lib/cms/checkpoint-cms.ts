@@ -291,6 +291,76 @@ export function getCheckpointHints(row?: SheetCheckpointRow): string[] {
   return [];
 }
 
+export interface CategorizedHints {
+  all: string[];
+  motive: string[];
+  alibi: string[];
+  hasCategories: boolean;
+}
+
+/**
+ * Bóc tách gợi ý theo 2 nhóm [ĐỘNG CƠ] và [NGOẠI PHẠM] từ ô `hints` của Sheet.
+ */
+export function getCategorizedCheckpointHints(
+  row?: SheetCheckpointRow,
+): CategorizedHints {
+  const result: CategorizedHints = {
+    all: [],
+    motive: [],
+    alibi: [],
+    hasCategories: false,
+  };
+
+  if (!row || typeof row !== "object") return result;
+
+  const rawHints = row.hints;
+  if (!rawHints || typeof rawHints !== "string") return result;
+
+  const lines = splitLines(rawHints.trim());
+  let currentCategory: "motive" | "alibi" | "none" = "none";
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const lower = trimmed.toLowerCase();
+    if (
+      lower === "[động cơ]" ||
+      lower === "động cơ:" ||
+      lower === "[dong co]" ||
+      lower === "dong co:" ||
+      lower === "động cơ"
+    ) {
+      currentCategory = "motive";
+      result.hasCategories = true;
+      continue;
+    }
+
+    if (
+      lower === "[ngoại phạm]" ||
+      lower === "ngoại phạm:" ||
+      lower === "[ngoai pham]" ||
+      lower === "ngoai pham:" ||
+      lower === "ngoại phạm" ||
+      lower === "ngoại phạm mâu thuẫn" ||
+      lower === "[ngoại phạm mâu thuẫn]"
+    ) {
+      currentCategory = "alibi";
+      result.hasCategories = true;
+      continue;
+    }
+
+    result.all.push(trimmed);
+    if (currentCategory === "motive") {
+      result.motive.push(trimmed);
+    } else if (currentCategory === "alibi") {
+      result.alibi.push(trimmed);
+    }
+  }
+
+  return result;
+}
+
 /**
  * Lấy gợi ý ở cấp độ cụ thể (1-indexed).
  */
