@@ -38,6 +38,15 @@ export function PhoneLookupModal({
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
+    if (isOpen) {
+      if (typeof window !== 'undefined') {
+        (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = 'cp-000-0'
+      }
+      setStorageItem('active_investigation_checkpoint', 'cp-000-0')
+      setStorageItem('last_interacted_checkpoint', 'cp-000-0')
+      localStorage.removeItem('active_suspect_category')
+    }
+
     const data = getStorageJson<Record<string, string>>('phone_inputs', {})
     setPhone1(data.phone1 || '')
     setPhone2(data.phone2 || '')

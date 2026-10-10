@@ -221,6 +221,12 @@ export function HintModal({
 
   // Nhận diện phân nhóm độc lập (Motive vs Alibi vs All) mà KHÔNG dùng toggle
   const activeCategory = useMemo<"motive" | "alibi" | "all">(() => {
+    // Nếu checkpoint không hỗ trợ tách nhóm Động cơ & Ngoại phạm (ví dụ cp-000-0 3 SĐT)
+    // thì BẮT BUỘC là 'all', tuyệt đối không hiển thị nhãn Động cơ / Ngoại phạm
+    if (!currentGroup.hasCategories) {
+      return "all";
+    }
+
     if (category === "motive" || category === "alibi") return category;
 
     const rawId = (checkpointId || "").toLowerCase();
@@ -230,11 +236,7 @@ export function HintModal({
     const savedCat = getStorageItem("active_suspect_category");
     if (savedCat === "motive" || savedCat === "alibi") return savedCat;
 
-    if (currentGroup.hasCategories) {
-      return "motive";
-    }
-
-    return "all";
+    return "motive";
   }, [category, checkpointId, currentGroup.hasCategories]);
 
   const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
