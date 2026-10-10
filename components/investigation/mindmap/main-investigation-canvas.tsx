@@ -511,7 +511,7 @@ export function MainInvestigationCanvas({
       }
 
       // 0. Tự động ép cập nhật & xóa cache layout cũ nếu phiên bản không khớp
-      const CURRENT_LAYOUT_VERSION = "2026.10.10_v6_phone_node";
+      const CURRENT_LAYOUT_VERSION = "2026.10.10_v7_no_pin_string";
       const savedLayoutVersion = getStorageItem("board_layout_version");
       if (savedLayoutVersion !== CURRENT_LAYOUT_VERSION) {
         removeStorageItem("boardgame_pins_case-000");
@@ -1694,11 +1694,6 @@ export function MainInvestigationCanvas({
       id: "c0-conn-reinvestigate",
       fromPinId: "c0-pin-evidence",
       toPinId: "c0-pin-reinvestigate",
-    },
-    {
-      id: "c0-conn-victim-phone",
-      fromPinId: "c0-pin-victim-khang",
-      toPinId: "c0-pin-victim-phone",
     },
     ...(hasVuFollowup && vuSuspect
       ? [

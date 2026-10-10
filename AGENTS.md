@@ -111,4 +111,16 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
 - **Cấm tự ý kích hoạt hoặc can thiệp**: Agent tuyệt đối **KHÔNG ĐƯỢC PHÉP** tự ý import, render, chỉnh sửa, mở lại hoặc nhúng bất kỳ thành phần 3D nào ra giao diện người dùng.
 - **Điều kiện kích hoạt duy nhất**: Phân hệ này **CHỈ ĐƯỢC PHÉP MỞ LẠI HOẶC CHẠM VÀO KHI VÀ CHỈ KHI NGƯỜI DÙNG (USER) TRỰC TIẾP RA LỆNH NHẮC LẠI**.
 
+---
+
+## 🔒 9. Quy Tắc Cách Ly Bảng Landing Page (LDP) vs Bảng Điều Tra Game (Board Separation Rule)
+
+- **Bảng Landing Page (`landing-hero.tsx`) — Cố định & Độc lập**:
+  - Bảng ghim trên Landing Page là visual showcase trưng bày cố định (dùng demo các case `case-01`, `case-02`, `case-03` với `evidence-board-bg.png`... hoặc mock tĩnh).
+  - Bảng này **CÁCH LY HOÀN TOÀN** khỏi state, tiến trình phá án, modal nghiệp vụ và các node tương tác của gameplay thực tế (`MainInvestigationCanvas`).
+  - **Tuyệt đối CẤM** gán nhầm hoặc kết nối logic game, ghim node tang vật động của Case #000 vào bảng Landing Page.
+- **Bảng Điều Tra Trong Game (`MainInvestigationCanvas`)**:
+  - Là không gian phá án chính thức, nhận dữ liệu động từ Google Sheets Live CMS, local state và checkpoint gameplay.
+  - Tang vật thiết bị (như túi đựng điện thoại `victim-phone`) hiển thị dưới dạng vật chứng thực tế độc lập: **tuyệt đối KHÔNG ghim đè thêm ghim pushpin 3D hay nối sợi chỉ đỏ** vào thiết bị tang vật. Node `Mở rộng điều tra` (`c0-pin-phone`) là giấy note nghiệp vụ riêng biệt, không được gán nhầm ảnh túi điện thoại vào node này.
+
 

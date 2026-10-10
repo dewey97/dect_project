@@ -187,15 +187,6 @@ const CASES_LIST: CaseData[] = [
         noteColor: "white",
       },
       {
-        id: "c0-pin-victim-phone",
-        x: 0.38,
-        y: 0.14,
-        label: "ĐIỆN THOẠI NẠN NHÂN",
-        detail: "Vật chứng: Điện thoại iPhone 6s Plus thu giữ của nạn nhân Nguyễn Văn Khang",
-        photoUrl: "/phone.png",
-        scale: 0.85,
-      },
-      {
         id: "c0-pin-indictment",
         x: 0.22,
         y: 0.8,
@@ -210,11 +201,6 @@ const CASES_LIST: CaseData[] = [
         id: "c0-conn-1",
         fromPinId: "c0-pin-evidence",
         toPinId: "c0-pin-phone",
-      },
-      {
-        id: "c0-conn-victim-phone",
-        fromPinId: "c0-pin-victim-khang",
-        toPinId: "c0-pin-victim-phone",
       },
       {
         id: "c0-conn-2",
@@ -546,12 +532,12 @@ function isPinHit(
 
   const isFollowup =
     pin.id.startsWith("c0-pin-followup") || pin.id.startsWith("followup-");
-  const isPhone =
-    pin.id.includes("phone") ||
-    (pin.label && pin.label.toLowerCase().includes("điện thoại"));
+  const isVictimPhone =
+    pin.id === "c0-pin-victim-phone" ||
+    (pin.id.includes("phone") && pin.id !== "c0-pin-phone" && Boolean((pin as any).photoUrl));
   const isKhang =
     !isFollowup &&
-    !isPhone &&
+    !isVictimPhone &&
     (pin.id.includes("khang") ||
       (pin.label && pin.label.toLowerCase().includes("khang")));
   const isCrimeScene =
@@ -566,20 +552,20 @@ function isPinHit(
       !!(pin as any).photoUrl ||
       isKhang ||
       isCrimeScene ||
-      isPhone);
+      isVictimPhone);
 
   let baseCardWidth = 142;
   let baseCardHeight = 167;
   let tagYRatio = -0.08;
 
   if (isSuspectPin) {
-    baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isPhone ? 135 : 158;
+    baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isVictimPhone ? 135 : 158;
     baseCardHeight = isCrimeScene
       ? (baseCardWidth * 420) / 560
-      : isPhone
+      : isVictimPhone
         ? (baseCardWidth * 997) / 757
         : (baseCardWidth * 380) / 300;
-    tagYRatio = isCrimeScene ? -0.05 : isPhone ? -0.04 : -0.1;
+    tagYRatio = isCrimeScene ? -0.05 : isVictimPhone ? -0.04 : -0.1;
   } else {
     const upperLabel = (pin.label || "").toUpperCase();
     const isWhiteNote =
@@ -2091,7 +2077,7 @@ export function HeroInteractive({
           Boolean(rawPin.photoUrl) ||
           pin.id.includes("thi-the") ||
           pin.id.includes("crime-scene") ||
-          pin.id.includes("phone");
+          pin.id === "c0-pin-victim-phone";
 
         context.save();
         context.translate(pinPosition.x, pinPosition.y);
@@ -2133,23 +2119,23 @@ export function HeroInteractive({
               (loadedSuspectImg as HTMLImageElement).naturalHeight ||
               (loadedSuspectImg as any).height ||
               380;
-            const isPhone =
-              pin.id.includes("phone") ||
-              (pin.label && pin.label.toLowerCase().includes("điện thoại"));
+            const isVictimPhone =
+              pin.id === "c0-pin-victim-phone" ||
+              (pin.id.includes("phone") && pin.id !== "c0-pin-phone" && Boolean((pin as any).photoUrl));
             const isKhang =
-              !isPhone &&
+              !isVictimPhone &&
               (pin.id.includes("khang") ||
                 (pin.label && pin.label.toLowerCase().includes("khang")));
             const isCrimeScene =
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isPhone ? 135 : 158;
+            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isVictimPhone ? 135 : 158;
             const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = (cardWidth * imgH) / imgW;
 
             const tagX = -cardWidth / 2;
-            const tagY = isCrimeScene ? -cardHeight * 0.05 : isPhone ? -cardHeight * 0.04 : -cardHeight * 0.1;
+            const tagY = isCrimeScene ? -cardHeight * 0.05 : isVictimPhone ? -cardHeight * 0.04 : -cardHeight * 0.1;
 
             // Pass 1 — wide ambient occlusion: soft halo lifting the card off the corkboard
             context.save();
@@ -2205,18 +2191,18 @@ export function HeroInteractive({
           const isPhotoHovered = hoveredPinRef.current === pin.id;
           const isPhotoSelected = selectedPinIdRef.current === pin.id;
           if (isPhotoHovered || isPhotoSelected) {
-            const isPhone =
-              pin.id.includes("phone") ||
-              (pin.label && pin.label.toLowerCase().includes("điện thoại"));
+            const isVictimPhone =
+              pin.id === "c0-pin-victim-phone" ||
+              (pin.id.includes("phone") && pin.id !== "c0-pin-phone" && Boolean((pin as any).photoUrl));
             const isKhang =
-              !isPhone &&
+              !isVictimPhone &&
               (pin.id.includes("khang") ||
                 (pin.label && pin.label.toLowerCase().includes("khang")));
             const isCrimeScene =
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isPhone ? 135 : 158;
+            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isVictimPhone ? 135 : 158;
             const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = loadedSuspectImg
               ? (cardWidth *
@@ -2228,7 +2214,7 @@ export function HeroInteractive({
                   300)
               : cardWidth * 1.3;
             const tagX = -cardWidth / 2;
-            const tagY = isCrimeScene ? -cardHeight * 0.05 : isPhone ? -cardHeight * 0.04 : -cardHeight * 0.1;
+            const tagY = isCrimeScene ? -cardHeight * 0.05 : isVictimPhone ? -cardHeight * 0.04 : -cardHeight * 0.1;
 
             context.save();
             if (isPhotoSelected) {
@@ -2686,19 +2672,22 @@ export function HeroInteractive({
 
         context.restore(); // restore paper / polaroid transform
 
-        // Pinhole puncture
-        context.save();
-        context.fillStyle = "rgba(35, 20, 10, 0.85)";
-        context.beginPath();
-        context.arc(
-          pinPosition.x,
-          pinPosition.y,
-          (1.6 * scaleFactor) / transform.scale,
-          0,
-          Math.PI * 2,
-        );
-        context.fill();
-        context.restore();
+        // Pinhole puncture (Skip for victim phone evidence item which already has physical evidence bag pins)
+        const isVictimPhone = pin.id === "c0-pin-victim-phone";
+        if (!isVictimPhone) {
+          context.save();
+          context.fillStyle = "rgba(35, 20, 10, 0.85)";
+          context.beginPath();
+          context.arc(
+            pinPosition.x,
+            pinPosition.y,
+            (1.6 * scaleFactor) / transform.scale,
+            0,
+            Math.PI * 2,
+          );
+          context.fill();
+          context.restore();
+        }
       });
 
       // ──────────────────────────────────
@@ -2835,6 +2824,7 @@ export function HeroInteractive({
       allPinsUnified.forEach((pin) => {
         const pinPosition = pinPositionsMap.get(pin.id);
         if (!pinPosition) return;
+        if (pin.id === "c0-pin-victim-phone") return; // Evidence bag item already has self-contained pins, no overlay pushpin
 
         const isEvidencePin =
           pin.id === "c0-pin-evidence" ||
