@@ -794,13 +794,15 @@ export function HeroInteractive({
     const photosMap = sheetPhotosMapRef.current;
     if (photosMap) {
       if (lower.includes("khang")) {
-        const liveKhang = photosMap.get("avatar_khang");
+        const liveKhang =
+          photosMap.get("avatar_khang") || photosMap.get("khang");
         if (liveKhang) return liveKhang;
       }
       const char =
         findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
       if (char) {
-        const liveChar = photosMap.get(`avatar_${char.id}`);
+        const liveChar =
+          photosMap.get(`avatar_${char.id}`) || photosMap.get(char.id);
         if (liveChar) return liveChar;
         if (char.avatarUrl) return char.avatarUrl;
       }
@@ -1069,8 +1071,27 @@ export function HeroInteractive({
       const liveUrl = (item.direct_cdn_url || item.drive_url || "").trim();
       if (!liveUrl) continue;
       const normalized = normalizeImageUrl(liveUrl);
-      if (item.photo_code) map.set(item.photo_code.toLowerCase().trim(), normalized);
-      if (item.title) map.set(item.title.toLowerCase().trim(), normalized);
+      if (item.photo_code) {
+        const pc = item.photo_code.toLowerCase().trim();
+        map.set(pc, normalized);
+        if (pc.startsWith("avatar_")) {
+          map.set(pc.replace("avatar_", ""), normalized);
+        }
+      }
+      if (item.title) {
+        const titleLower = item.title.toLowerCase().trim();
+        map.set(titleLower, normalized);
+        // Also map clean name from title (e.g. "Ảnh chân dung Lê Quang Vũ" -> "vũ", "lê quang vũ")
+        if (titleLower.includes("khang")) map.set("khang", normalized);
+        if (titleLower.includes("vũ") || titleLower.includes("vu")) map.set("vu", normalized);
+        if (titleLower.includes("tùng") || titleLower.includes("tung")) map.set("tung", normalized);
+        if (titleLower.includes("hà") || titleLower.includes("ha")) map.set("ha", normalized);
+        if (titleLower.includes("mai")) map.set("mai", normalized);
+        if (titleLower.includes("đạt") || titleLower.includes("dat")) map.set("dat", normalized);
+        if (titleLower.includes("lụa") || titleLower.includes("lua")) map.set("lua", normalized);
+        if (titleLower.includes("vy")) map.set("vy", normalized);
+        if (titleLower.includes("tiến") || titleLower.includes("tien")) map.set("tien", normalized);
+      }
     }
     return map;
   }, [sheetPhotos]);

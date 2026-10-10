@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Lightbulb,
   X,
   Unlock,
-  Lock,
   Compass,
   ArrowLeft,
   ArrowRight,
+  HelpCircle,
 } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ import {
   getCheckpointHints,
   type SheetCheckpointRow,
 } from "@/lib/cms/checkpoint-cms";
-import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from "@/lib/storage";
+import { getStorageItem, getStorageJson, setStorageJson } from "@/lib/storage";
 
 interface HintModalProps {
   isOpen: boolean;
@@ -26,71 +26,134 @@ interface HintModalProps {
   checkpointId?: string;
 }
 
-interface ActiveHintGroup {
-  id: string;
+interface CheckpointGroupData {
+  checkpointId: string;
   title: string;
-  statusText: string;
+  dossier: string;
   hints: string[];
-  checkpointId?: string;
-  isGeneralBoard?: boolean;
+}
+
+const CASE_CHECKPOINT_TABS = [
+  { id: "cp-000-0", label: "3 SĐT Ẩn Danh", shortLabel: "3 SĐT" },
+  { id: "cp-000-1a", label: "Lê Quang Vũ", shortLabel: "Lê Quang Vũ" },
+  { id: "cp-000-1b", label: "Nguyễn Thanh Tùng", shortLabel: "Nguyễn Thanh Tùng" },
+  { id: "cp-000-1c", label: "Trần Thị Hà", shortLabel: "Trần Thị Hà" },
+  { id: "cp-000-2b", label: "Bản Cáo Trạng", shortLabel: "Bản Cáo Trạng" },
+];
+
+/**
+ * Chuẩn hóa checkpointId sang mã chuẩn vụ án Case #000.
+ */
+function normalizeCheckpointId(id?: string): string {
+  if (!id) return "";
+  const clean = id.trim().toLowerCase();
+  if (clean === "phone" || clean.includes("phone") || clean === "cp-000-0")
+    return "cp-000-0";
+  if (clean === "vu" || clean.includes("vu") || clean === "cp-000-1a")
+    return "cp-000-1a";
+  if (clean === "tung" || clean.includes("tung") || clean === "cp-000-1b")
+    return "cp-000-1b";
+  if (clean === "ha" || clean.includes("ha") || clean === "cp-000-1c")
+    return "cp-000-1c";
+  if (
+    clean === "indictment" ||
+    clean.includes("indictment") ||
+    clean.includes("cao-trang") ||
+    clean === "cp-000-2b"
+  )
+    return "cp-000-2b";
+  return clean;
 }
 
 /**
- * Trích xuất nhóm gợi ý tương ứng trực tiếp từ tab 'checkpoints' của Google Sheets.
- * Tuyệt đối không dùng mảng fallback tĩnh.
+ * Tự động tìm checkpoint đang làm dở khi người chơi mở Gợi ý từ Bảng điều tra.
  */
-function resolveDynamicHintStage(
-  checkpointId: string | undefined,
-  sheetCheckpoints: SheetCheckpointRow[],
-): ActiveHintGroup {
-  // 1. Khi đang ở bảng phá án tổng quan (không có checkpointId cụ thể)
-  if (!checkpointId) {
-    return {
-      id: "general-board",
-      title: "BẢNG ĐIỀU TRA CHUYÊN ÁN",
-      statusText: "Tổng quan tiến trình vụ án",
-      hints: [],
-      isGeneralBoard: true,
-    };
+function getLatestActiveCheckpointId(): string {
+  if (typeof window !== "undefined") {
+    const winCp = (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__;
+    if (winCp) return normalizeCheckpointId(winCp);
   }
 
-  // 2. Tìm dòng checkpoint trên Google Sheet (hỗ trợ checkpoint_id, node_id, hoặc từ khóa tiêu đề)
-  const cleanId = checkpointId.trim().toLowerCase();
-  const row = sheetCheckpoints.find((r) => {
-    const cpId = (r.checkpoint_id || "").trim().toLowerCase();
-    const nodeId = (r.node_id || "").trim().toLowerCase();
-    const title = (r.title || "").trim().toLowerCase();
-    if (cpId === cleanId || nodeId === cleanId) return true;
+  const isPhoneSolved = getStorageItem("phone_solved") === "true";
+  if (!isPhoneSolved) return "cp-000-0";
 
-    // Mapping linh hoạt theo ngữ cảnh câu hỏi
-    if (cleanId === "phone" || cleanId.includes("phone")) {
-      return cpId === "cp-000-0" || nodeId.includes("phone");
-    }
-    if (cleanId === "vu" || cleanId.includes("vu")) {
-      return cpId === "cp-000-1a" || title.includes("vũ") || nodeId.includes("vu");
-    }
-    if (cleanId === "tung" || cleanId.includes("tung")) {
-      return cpId === "cp-000-1b" || title.includes("tùng") || nodeId.includes("tung");
-    }
-    if (cleanId === "ha" || cleanId.includes("ha")) {
-      return cpId === "cp-000-1c" || title.includes("hà") || nodeId.includes("ha");
-    }
-    if (cleanId === "indictment" || cleanId.includes("indictment") || cleanId.includes("cao-trang")) {
-      return cpId === "cp-000-2b" || title.includes("cáo trạng") || nodeId.includes("accusation");
-    }
-    return false;
-  });
+  const isVuSolved = Boolean(getStorageItem("followup_vu"));
+  if (!isVuSolved) return "cp-000-1a";
 
-  const sheetHints = getCheckpointHints(row);
+  const isTungSolved = Boolean(getStorageItem("followup_tung"));
+  if (!isTungSolved) return "cp-000-1b";
 
-  return {
-    id: `cp-${cleanId}`,
-    checkpointId: row?.checkpoint_id || checkpointId,
-    title: row?.title || `CÂU HỎI CHECKPOINT // ${checkpointId.toUpperCase()}`,
-    statusText: row?.dossier ? `Hồ sơ ${row.dossier}` : "Câu hỏi điều tra",
-    hints: sheetHints,
-    isGeneralBoard: false,
-  };
+  const isHaSolved = Boolean(getStorageItem("followup_ha"));
+  if (!isHaSolved) return "cp-000-1c";
+
+  const isIndictmentSolved = getStorageItem("indictment_solved") === "true";
+  if (!isIndictmentSolved) return "cp-000-2b";
+
+  return "cp-000-2b";
+}
+
+/**
+ * Gom nhóm toàn bộ hints từ tab 'checkpoints' trên Google Sheets theo checkpoint_id,
+ * tự động kế thừa và gộp các dòng con (Động cơ + Ngoại phạm mâu thuẫn).
+ */
+function buildGroupedCheckpointsMap(
+  sheetCheckpoints: SheetCheckpointRow[],
+): Map<string, CheckpointGroupData> {
+  const map = new Map<string, CheckpointGroupData>();
+  let currentCpId = "";
+
+  for (const row of sheetCheckpoints) {
+    let id = normalizeCheckpointId(row.checkpoint_id);
+    const title = (row.title || "").trim().toLowerCase();
+
+    // Nhận diện theo ngữ cảnh nếu dòng con để trống checkpoint_id
+    if (!id) {
+      if (title.includes("hà") || title.includes("ha")) {
+        id = "cp-000-1c";
+      } else if (title.includes("tùng") || title.includes("tung")) {
+        id = "cp-000-1b";
+      } else if (title.includes("vũ") || title.includes("vu")) {
+        id = "cp-000-1a";
+      } else if (currentCpId) {
+        id = currentCpId;
+      }
+    }
+
+    if (id) {
+      currentCpId = id;
+      if (!map.has(id)) {
+        map.set(id, {
+          checkpointId: id,
+          title: row.title || id,
+          dossier: row.dossier || "",
+          hints: [],
+        });
+      }
+      const entry = map.get(id)!;
+      if (row.title && (!entry.title || entry.title === id)) {
+        entry.title = row.title;
+      }
+      if (row.dossier && !entry.dossier) {
+        entry.dossier = row.dossier;
+      }
+
+      const rowHints = getCheckpointHints(row);
+      for (const hint of rowHints) {
+        const trimmed = hint.trim();
+        // Bỏ qua dòng rỗng hoặc tiêu đề phân mục thuần túy
+        if (
+          trimmed &&
+          trimmed !== "Động cơ" &&
+          trimmed !== "Ngoại phạm mâu thuẫn" &&
+          !entry.hints.includes(trimmed)
+        ) {
+          entry.hints.push(trimmed);
+        }
+      }
+    }
+  }
+
+  return map;
 }
 
 export function HintModal({
@@ -101,32 +164,54 @@ export function HintModal({
   const { data: sheetCheckpoints } =
     usePhoneData<SheetCheckpointRow>("checkpoints");
 
-  const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>(
-    {},
-  );
-  const [activeStage, setActiveStage] = useState<ActiveHintGroup | null>(null);
+  const [selectedCpId, setSelectedCpId] = useState<string>("cp-000-0");
+  const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
   const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
 
+  // Xây dựng map gợi ý gom từ Google Sheet
+  const groupedMap = useMemo(() => {
+    return buildGroupedCheckpointsMap(sheetCheckpoints);
+  }, [sheetCheckpoints]);
+
+  // Đồng bộ tab checkpoint khi modal mở hoặc checkpointId thay đổi
   useEffect(() => {
     if (isOpen) {
       setUnlockedLevels(
         getStorageJson<Record<string, number>>("hint_unlocked_levels", {}),
       );
-      const stage = resolveDynamicHintStage(checkpointId, sheetCheckpoints);
-      setActiveStage(stage);
+
+      const targetId = checkpointId
+        ? normalizeCheckpointId(checkpointId)
+        : getLatestActiveCheckpointId();
+
+      setSelectedCpId(targetId || "cp-000-0");
       setActiveHintIdx(0);
     }
-  }, [isOpen, checkpointId, sheetCheckpoints]);
+  }, [isOpen, checkpointId]);
 
-  if (!isOpen || !activeStage) return null;
+  if (!isOpen) return null;
 
-  const totalHints = activeStage.hints.length;
+  const currentGroup = groupedMap.get(selectedCpId) || {
+    checkpointId: selectedCpId,
+    title:
+      CASE_CHECKPOINT_TABS.find((t) => t.id === selectedCpId)?.label ||
+      `CÂU HỎI CHECKPOINT // ${selectedCpId.toUpperCase()}`,
+    dossier: "Hồ sơ chuyên án",
+    hints: [],
+  };
+
+  const totalHints = currentGroup.hints.length;
   const unlockedCount = Math.min(
-    unlockedLevels[activeStage.id] || 1,
+    unlockedLevels[selectedCpId] || 1,
     Math.max(totalHints, 1),
   );
-  // Chỉ cho phép xem trong phạm vi các mức đã mở khóa.
   const viewIdx = Math.min(activeHintIdx, Math.max(unlockedCount - 1, 0));
+
+  const handleSelectTab = (cpId: string) => {
+    detectiveAudio.playTypewriterClick();
+    setSelectedCpId(cpId);
+    setActiveHintIdx(0);
+  };
 
   const handleUnlockNext = () => {
     if (totalHints === 0) return;
@@ -134,7 +219,7 @@ export function HintModal({
     const nextCount = Math.min(unlockedCount + 1, totalHints);
     const updated = {
       ...unlockedLevels,
-      [activeStage.id]: nextCount,
+      [selectedCpId]: nextCount,
     };
     setUnlockedLevels(updated);
     setActiveHintIdx(nextCount - 1);
@@ -148,7 +233,7 @@ export function HintModal({
           initial={{ opacity: 0, scale: 0.95, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}
-          className="relative w-full max-w-xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] rounded-none overflow-hidden flex flex-col max-h-[90vh]"
+          className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] rounded-none overflow-hidden flex flex-col max-h-[92vh]"
         >
           {/* HEADER */}
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
@@ -176,56 +261,77 @@ export function HintModal({
             </button>
           </div>
 
-          {/* ACTIVE STAGE CONTENT AREA */}
+          {/* CHECKPOINT TABS SELECTOR */}
+          <div className="bg-[#e4d7bf] px-3 sm:px-4 py-2 border-b-2 border-[#2b1f14]/30 flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
+            {CASE_CHECKPOINT_TABS.map((tab) => {
+              const isTabActive = selectedCpId === tab.id;
+              const tabData = groupedMap.get(tab.id);
+              const tabHintCount = tabData?.hints.length || 0;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleSelectTab(tab.id)}
+                  className={cn(
+                    "px-3 py-1.5 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap border rounded-none flex items-center gap-1.5 shrink-0",
+                    isTabActive
+                      ? "bg-[#8c1d1d] text-[#fdfbf7] border-[#6b1414] shadow-sm"
+                      : "bg-[#f5ecdc] hover:bg-[#eae0ce] text-[#3d2b1a] border-[#b8a48c]",
+                  )}
+                >
+                  <span>{tab.shortLabel}</span>
+                  {tabHintCount > 0 && (
+                    <span
+                      className={cn(
+                        "text-[9px] px-1 py-0.2 rounded-full font-mono",
+                        isTabActive
+                          ? "bg-white/20 text-white"
+                          : "bg-[#2b1f14]/10 text-[#5c4026]",
+                      )}
+                    >
+                      {tabHintCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ACTIVE CONTENT AREA */}
           <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] custom-scrollbar">
             {/* STAGE TITLE BAR */}
             <div className="border-b-2 border-[#2b1f14]/20 pb-3 flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-[#8c1d1d] font-mono text-[11px] font-bold uppercase tracking-wider">
                   <Compass className="size-3.5" />
-                  <span>TIẾN TRÌNH HIỆN TẠI</span>
+                  <span>CÂU HỎI CHECKPOINT</span>
                 </div>
                 <h4 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wide">
-                  {activeStage.title}
+                  {currentGroup.title}
                 </h4>
               </div>
+
+              {currentGroup.dossier && (
+                <span className="font-mono text-[10px] sm:text-[11px] font-bold bg-[#ebdcc4] text-[#6b4e2e] border border-[#a88c6f] px-2 py-0.5 whitespace-nowrap">
+                  {currentGroup.dossier}
+                </span>
+              )}
             </div>
 
-            {/* TRƯỜNG HỢP 1: Ở BẢNG PHÁ ÁN (KHÔNG CÓ GỢI Ý ĐỂ TRÁNH SPOILER) */}
-            {activeStage.isGeneralBoard ? (
-              <div className="p-5 border-2 border-dashed border-[#2b1f14]/40 bg-[#fdfbf7] text-[#1a120b] rounded-none font-sans text-xs sm:text-[13px] leading-relaxed space-y-3">
-                <div className="flex items-center gap-2 text-[#8c1d1d] font-mono font-bold uppercase text-xs">
-                  <Lock className="size-4" />
-                  <span>Chế độ quan sát bảng điều tra</span>
-                </div>
-                <p className="text-[#3d2c1e]">
-                  Bạn đang ở chế độ bao quát Bảng điều tra. Tại đây hệ thống không hiển thị gợi ý đáp án để đảm bảo tính suy luận khách quan của hồ sơ.
-                </p>
-                <div className="p-3 bg-[#ede3d1] border border-[#2b1f14]/20 font-mono text-[11px] text-[#4a3520] space-y-1">
-                  <p className="font-bold uppercase text-[#8c1d1d]">
-                    💡 Cách nhận gợi ý theo từng câu hỏi:
-                  </p>
-                  <p>
-                    1. Nhấp trực tiếp vào các ghim câu hỏi (màu cam/đỏ) trên bảng.
-                  </p>
-                  <p>
-                    2. Mỗi màn câu hỏi Checkpoint đều tích hợp sẵn gợi ý phân cấp trực tiếp từ tài liệu điều tra.
-                  </p>
-                </div>
-              </div>
-            ) : totalHints === 0 ? (
-              /* TRƯỜNG HỢP 2: CÂU HỎI CHƯA CÓ GỢI Ý TRÊN GOOGLE SHEETS */
+            {/* TRƯỜNG HỢP: CHƯA CÓ GỢI Ý HOẶC ĐANG TẢI */}
+            {totalHints === 0 ? (
               <div className="p-5 border-2 border-[#2b1f14]/30 bg-[#fdfbf7] text-[#1a120b] rounded-none font-sans text-xs sm:text-[13px] leading-relaxed space-y-2">
                 <div className="flex items-center gap-2 text-[#8c6b45] font-mono font-bold uppercase text-xs">
-                  <Lightbulb className="size-4" />
-                  <span>Chưa có gợi ý bổ sung</span>
+                  <HelpCircle className="size-4" />
+                  <span>Chưa có gợi ý bổ sung cho mục này</span>
                 </div>
                 <p className="text-[#3d2c1e]">
-                  Câu hỏi này yêu cầu điều tra viên tự đối soát tài liệu, biên bản và vật chứng đã thu thập. Không có gợi ý khả dụng trên hệ thống Live CMS.
+                  Vui lòng vận dụng các tài liệu hồ sơ, lời khai và chứng cứ đã thu thập để tiến hành suy luận phá án.
                 </p>
               </div>
             ) : (
-              /* TRƯỜNG HỢP 3: CÓ GỢI Ý THEO CHECKPOINT TỪ GOOGLE SHEETS */
+              /* TRƯỜNG HỢP: CÓ GỢI Ý TỪ GOOGLE SHEETS */
               <>
                 <div className="pt-1">
                   <div className="p-4 border-2 border-[#2b1f14] bg-[#fdfbf7] text-[#1a120b] shadow-sm rounded-none font-sans text-xs sm:text-[13px] leading-relaxed">
@@ -237,12 +343,12 @@ export function HintModal({
                     </div>
 
                     <div className="grid">
-                      {activeStage.hints.map((hintText, hIdx) => (
+                      {currentGroup.hints.map((hintText, hIdx) => (
                         <p
                           key={hIdx}
                           aria-hidden={hIdx !== viewIdx}
                           className={cn(
-                            "col-start-1 row-start-1 text-[#1a120b] transition-opacity duration-200 ease-out",
+                            "col-start-1 row-start-1 text-[#1a120b] whitespace-pre-line leading-relaxed transition-opacity duration-200 ease-out",
                             hIdx === viewIdx
                               ? "opacity-100"
                               : "opacity-0 pointer-events-none select-none",
@@ -256,7 +362,7 @@ export function HintModal({
 
                   {/* Tiến độ mở khóa các mức gợi ý */}
                   <div className="flex items-center gap-1.5 pt-3">
-                    {activeStage.hints.map((_, hIdx) => (
+                    {currentGroup.hints.map((_, hIdx) => (
                       <button
                         key={hIdx}
                         type="button"

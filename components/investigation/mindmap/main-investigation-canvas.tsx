@@ -288,14 +288,27 @@ export function MainInvestigationCanvas({
           ""
         ).toLowerCase();
         if (normUrl) {
-          if (code.includes("vu") || code.includes("vũ")) map.vu = normUrl;
-          if (code.includes("tung") || code.includes("tùng"))
+          const rawCode = (item.photo_code || "").toLowerCase().trim();
+          if (rawCode === "avatar_vu" || code.includes("vu") || code.includes("vũ"))
+            map.vu = normUrl;
+          if (rawCode === "avatar_tung" || code.includes("tung") || code.includes("tùng"))
             map.tung = normUrl;
-          if (code.includes("ha") || code.includes("hà")) map.ha = normUrl;
-          if (code.includes("mai")) map.mai = normUrl;
-          if (code.includes("khang")) map.khang = normUrl;
-          if (code.includes("dat") || code.includes("đạt")) map.dat = normUrl;
-          if (code.includes("lua") || code.includes("lụa")) map.lua = normUrl;
+          if (rawCode === "avatar_ha" || code.includes("ha") || code.includes("hà"))
+            map.ha = normUrl;
+          if (rawCode === "avatar_mai" || code.includes("mai"))
+            map.mai = normUrl;
+          if (rawCode === "avatar_khang" || code.includes("khang"))
+            map.khang = normUrl;
+          if (rawCode === "avatar_dat" || code.includes("dat") || code.includes("đạt"))
+            map.dat = normUrl;
+          if (rawCode === "avatar_lua" || code.includes("lua") || code.includes("lụa"))
+            map.lua = normUrl;
+          if (rawCode === "avatar_vy" || code.includes("vy"))
+            map.vy = normUrl;
+          if (rawCode === "avatar_tien" || code.includes("tien") || code.includes("tiến"))
+            map.tien = normUrl;
+          if (rawCode === "avatar_huy" || code.includes("huy"))
+            map.huy = normUrl;
           if (
             code.includes("crime") ||
             code.includes("thi_the") ||
@@ -1192,8 +1205,9 @@ export function MainInvestigationCanvas({
     mai: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_mai.png",
     khang:
       "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
-    dat: "/images/cases/case_000/photo-dat-ga.png",
-    lua: "/images/cases/case_000/photo-lua.png",
+    dat: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_dat_ga.png",
+    lua: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ba_lua.png",
+    vy: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vy.png",
   };
 
   const SUSPECT_CHECKPOINT_MAP: Record<string, string> = {

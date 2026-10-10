@@ -6,7 +6,7 @@ import { FileText, ImageIcon, Search, X } from "lucide-react";
 import { PDFDocument, PhysicalEvidence } from "./evidence-types";
 import { TypewriterNarrator } from "./typewriter-narrator";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import { useCaseNarratives } from "@/lib/hooks/use-case-narratives";
+import { useCaseNarratives, DEFAULT_NARRATIVES } from "@/lib/hooks/use-case-narratives";
 import { setStorageItem } from "@/lib/storage";
 
 export interface UnlockedModalData {
@@ -42,6 +42,13 @@ export function PhaseUnlockedModal({
     if (!unlockedModalData) return null;
     return getPhaseNarrative(unlockedModalData.unlockedPhase);
   }, [unlockedModalData, getPhaseNarrative]);
+
+  const fallbackNarrative = React.useMemo(() => {
+    const phase = unlockedModalData?.unlockedPhase ?? 0;
+    return DEFAULT_NARRATIVES[phase] || DEFAULT_NARRATIVES[0];
+  }, [unlockedModalData?.unlockedPhase]);
+
+  const activeNarrative = currentNarrative || fallbackNarrative;
 
   React.useEffect(() => {
     setIsStoryStarted(false);
@@ -88,22 +95,22 @@ export function PhaseUnlockedModal({
                       [ TRỐN TÌM ]
                     </button>
                   </div>
-                ) : currentNarrative ? (
+                ) : (
                   <>
                     <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between shrink-0">
-                      <span>{currentNarrative.date}</span>
+                      <span>{activeNarrative.date}</span>
                     </div>
 
                     <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
                       <TypewriterNarrator
-                        key={`bg-${unlockedModalData.unlockedPhase}-${currentNarrative.monologue}`}
-                        text={currentNarrative.monologue}
+                        key={`bg-${unlockedModalData.unlockedPhase}-${activeNarrative.monologue}`}
+                        text={activeNarrative.monologue}
                         speed={12}
                         onComplete={() => setIsNarrativeComplete(true)}
                       />
                     </div>
                   </>
-                ) : null}
+                )}
               </div>
 
               {/* Clean Bottom Button - ONLY VISIBLE AFTER NARRATION COMPLETES */}
@@ -140,22 +147,22 @@ export function PhaseUnlockedModal({
                         [ TRỐN TÌM ]
                       </button>
                     </div>
-                  ) : currentNarrative ? (
+                  ) : (
                     <>
                       <div className="font-mono text-xs sm:text-sm text-[#d9a066] font-bold tracking-widest uppercase border-b border-[#261b12] pb-3 w-full flex items-center justify-between">
-                        <span>{currentNarrative.date}</span>
+                        <span>{activeNarrative.date}</span>
                       </div>
 
                       <div className="pt-2 w-full">
                         <TypewriterNarrator
-                          key={`web-${unlockedModalData.unlockedPhase}-${currentNarrative.monologue}`}
-                          text={currentNarrative.monologue}
+                          key={`web-${unlockedModalData.unlockedPhase}-${activeNarrative.monologue}`}
+                          text={activeNarrative.monologue}
                           speed={12}
                           onComplete={() => setIsNarrativeComplete(true)}
                         />
                       </div>
                     </>
-                  ) : null}
+                  )}
                 </div>
               </div>
 
