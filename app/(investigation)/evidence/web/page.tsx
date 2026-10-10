@@ -420,6 +420,7 @@ export default function WebEvidencePage() {
           router.push("/evidence/boardgame");
         }}
         onResetCase={resetAllProgress}
+        onGoHome={() => router.push("/")}
       />
 
       {/* HINT SYSTEM MODAL */}

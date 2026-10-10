@@ -214,7 +214,12 @@ export default function BoardGameCompanionPage() {
       {/* QUICK ACTION FAB MENU */}
       <QuickActionFab
         onOpenPhone={() => setActiveModal("phone")}
+        onOpenWebMode={() => {
+          detectiveAudio.playPaperRustle();
+          router.push("/evidence/web");
+        }}
         onResetCase={resetFindingsProgress}
+        onGoHome={() => router.push("/")}
       />
 
       {/* HINT SYSTEM MODAL */}

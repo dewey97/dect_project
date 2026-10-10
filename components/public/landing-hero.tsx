@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { BrandMark } from '@/components/investigation/brand-mark'
 import { HeroInteractive } from '@/components/investigation/hero-interactive'
 import { Button } from '@/components/ui/button'
-import { Search, ShoppingCart } from 'lucide-react'
+import { Search, ShoppingCart, Dices, ChevronRight } from 'lucide-react'
 import { UserNav } from '@/components/auth/user-nav'
 import { LandingBanner } from '@/components/public/landing-banner'
 
@@ -80,22 +80,34 @@ export function LandingHero({ activePoster }: LandingHeroProps) {
               "Khi bạn đã loại bỏ tất cả những điều không thể, thì điều còn lại, dù vô lý đến đâu, cũng chính là sự thật."
               <span className="block mt-1 not-italic text-primary/60">— Sherlock Holmes</span>
             </p>
-            <div className="relative group inline-flex mt-2">
-              {/* Huy hiệu kính lúp ở góc trên cùng bên trái */}
-              <div
-                className="absolute -top-3 -left-3 z-20 size-8 rounded-full bg-zinc-950 border border-primary/60 text-primary flex items-center justify-center shadow-lg shadow-black/80 ring-2 ring-background group-hover:scale-110 group-hover:border-primary group-hover:rotate-12 transition-all duration-300 pointer-events-none"
-                aria-hidden="true"
-              >
-                <Search className="size-4" strokeWidth={2.5} />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-2 w-full">
+              <div className="relative group inline-flex">
+                {/* Huy hiệu kính lúp ở góc trên cùng bên trái */}
+                <div
+                  className="absolute -top-3 -left-3 z-20 size-8 rounded-full bg-zinc-950 border border-primary/60 text-primary flex items-center justify-center shadow-lg shadow-black/80 ring-2 ring-background group-hover:scale-110 group-hover:border-primary group-hover:rotate-12 transition-all duration-300 pointer-events-none"
+                  aria-hidden="true"
+                >
+                  <Search className="size-4" strokeWidth={2.5} />
+                </div>
+
+                <Button
+                  onClick={() => router.push('/evidence/boardgame')}
+                  size="lg"
+                  className="relative h-14 sm:h-16 px-8 sm:px-10 font-mono text-sm sm:text-base font-black uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_25px_rgba(217,119,6,0.35)] hover:shadow-[0_0_40px_rgba(217,119,6,0.55)] border border-amber-400/50 transition-all duration-300 active:scale-[0.98] cursor-pointer"
+                >
+                  Phá Án Online
+                </Button>
               </div>
 
-              <Button
-                onClick={() => router.push('/cabinet-demo')}
-                size="lg"
-                className="relative h-14 sm:h-16 px-8 sm:px-10 font-mono text-sm sm:text-base font-black uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_25px_rgba(217,119,6,0.35)] hover:shadow-[0_0_40px_rgba(217,119,6,0.55)] border border-amber-400/50 transition-all duration-300 active:scale-[0.98] cursor-pointer"
+              {/* Nút truy cập nhanh: Trốn Tìm (Bản Boardgame) */}
+              <button
+                onClick={() => router.push('/evidence/boardgame')}
+                className="group/btn flex items-center justify-center gap-2 h-14 sm:h-16 px-5 font-mono text-xs sm:text-sm font-bold uppercase tracking-wider rounded-md border border-amber-500/40 bg-zinc-950/80 hover:bg-amber-500/10 hover:border-amber-400/70 text-amber-400 transition-all duration-300 active:scale-[0.98] cursor-pointer shadow-md backdrop-blur-sm"
               >
-                Phá Án Online
-              </Button>
+                <Dices className="size-4.5 text-amber-400 group-hover/btn:rotate-12 transition-transform" />
+                <span>Trốn Tìm (Boardgame)</span>
+                <ChevronRight className="size-4 opacity-60 group-hover/btn:translate-x-0.5 transition-transform" />
+              </button>
             </div>
           </div>
         </div>
