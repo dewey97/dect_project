@@ -60,7 +60,7 @@ export function IPhoneFrame({
   const [frameless, setFrameless] = useState(true)
   const [isLocked, setIsLocked] = useState(false)
   const [activeApp, setActiveApp] = useState<IPhoneApp>(null)
-  const [showAssistiveTouch, setShowAssistiveTouch] = useState(true)
+  const [showAssistiveTouch, setShowAssistiveTouch] = useState(false)
   const [assistiveMenuOpen, setAssistiveMenuOpen] = useState(false)
   const [isPlayingMusic, setIsPlayingMusic] = useState(false)
   const [screenPage, setScreenPage] = useState<number>(0)
@@ -150,13 +150,13 @@ export function IPhoneFrame({
         )}
       </div>
 
-      {/* PHONE CONTAINER: Exact iPhone 6s Plus 16:9 Aspect Ratio */}
+      {/* PHONE CONTAINER: Exact iPhone 375x667 Canvas Aspect Ratio */}
       <div
         className={cn(
-          "relative w-full h-full max-h-[740px] sm:w-[380px] aspect-[9/16] transition-all flex flex-col justify-between overflow-hidden shadow-2xl shrink-0 my-auto",
+          "relative w-[375px] max-w-full h-[667px] max-h-full aspect-[375/667] transition-all flex flex-col overflow-hidden shadow-2xl shrink-0 my-auto",
           frameless
-            ? "bg-black rounded-none sm:rounded-[36px] border-0 sm:border sm:border-white/20"
-            : "bg-[#121214] rounded-none sm:rounded-[44px] p-0 sm:p-2.5 border-0 sm:border-[8px] border-[#2C2C30] ring-1 ring-white/10"
+            ? "bg-black rounded-[36px] border border-white/20"
+            : "bg-[#121214] rounded-[44px] p-2.5 border-[8px] border-[#2C2C30] ring-1 ring-white/10"
         )}
       >
         {!frameless && (
@@ -183,7 +183,7 @@ export function IPhoneFrame({
         {/* SCREEN CONTAINER (Uses Authentic Figma Beach Wallpaper & Vignette) */}
         <div
           className={cn(
-            "relative w-full h-full bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col justify-between",
+            "relative w-full h-full bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col",
             !frameless && "rounded-[34px] sm:rounded-[38px]"
           )}
         >
@@ -421,12 +421,12 @@ export function IPhoneFrame({
                 )}
               </div>
             ) : (
-              /* 3. EXACT PIXEL-PERFECT iOS 9 HOME SCREEN (Figma Spec: 4x4 Grid + Page Dots + Frosted Dock) */
-              <div className="flex-1 flex flex-col justify-between px-3.5 pt-2 pb-1 relative overflow-hidden select-none">
+              /* 3. EXACT PIXEL-PERFECT iOS 9 HOME SCREEN (Figma Spec: 375x667 Exact Proportions) */
+              <div className="flex-1 min-h-0 flex flex-col justify-between px-3 pt-1.5 pb-2 relative overflow-hidden select-none">
                 
                 {screenPage === 0 ? (
                   /* PAGE 1: AUTHENTIC 4x4 SPRINGBOARD APPS (MATCHES FIGMA FRAME 14:31 / 92:300 EXACTLY) */
-                  <div className="grid grid-cols-4 gap-x-2 gap-y-3 pt-1 px-1 relative z-10 animate-in fade-in-50 duration-200">
+                  <div className="grid grid-cols-4 gap-x-2 gap-y-3 pt-1.5 px-0.5 relative z-10 animate-in fade-in-50 duration-200">
                     
                     {/* Row 1, Icon 1: Messages (Tin nhắn) */}
                     <button
@@ -757,7 +757,7 @@ export function IPhoneFrame({
                 </div>
 
                 {/* AUTHENTIC iOS 9 FROSTED GLASS DOCK (Figma Node 14:40 Spec: 4 Quick-Launch Apps with Text Labels) */}
-                <div className="w-[96%] mx-auto h-[90px] rounded-[26px] bg-white/30 backdrop-blur-[40px] border border-white/20 p-2 flex items-center justify-around px-2 shadow-[0_8px_32px_rgba(0,0,0,0.18)] relative overflow-hidden z-10 mt-auto mb-1">
+                <div className="w-[96%] mx-auto h-[92px] rounded-[32px] bg-white/30 backdrop-blur-[40px] border border-white/20 p-2 flex items-center justify-around px-2 shadow-[0_8px_32px_rgba(0,0,0,0.18)] relative overflow-hidden z-10 mt-auto mb-2">
                   {/* Glossy top highlight reflection line */}
                   <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none" />
 
