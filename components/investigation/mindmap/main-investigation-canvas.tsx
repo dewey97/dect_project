@@ -15,7 +15,7 @@ import { getCanonicalSuspectKey } from "@/lib/cases/case-000-suspects";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
-import { setStorageItem } from "@/lib/storage";
+import { setStorageItem, getStorageItem } from "@/lib/storage";
 import { useInvestigationEvent } from "@/lib/investigation-events";
 
 import { useBoardLayout } from "./canvas/use-board-layout";
@@ -457,7 +457,28 @@ export function MainInvestigationCanvas({
       ) {
         const c = findFollowupCulprit(id, detail);
         state.setActiveFollowupCulprit(c);
-        state.setIsFollowupQuestionOpen(true);
+
+        // Kiểm tra xem câu hỏi mở rộng của đối tượng này đã được giải xong chưa
+        const isAlreadySolved =
+          state.solvedFollowupQuestions.includes(c) ||
+          getStorageItem(`followup_${c}`) === 'solved' ||
+          (c === 'ha' && !!getStorageItem('followup_ha_password')) ||
+          (c === 'vu' && !!getStorageItem('followup_vu'))
+
+        if (isAlreadySolved) {
+          if (c === 'ha') {
+            // Hà: Mở modal câu hỏi kèm kích hoạt ngay popup 3 vật chứng hộp thiếc
+            state.setIsFollowupQuestionOpen(true);
+          } else {
+            // Vũ / Tùng: Mở thẳng narrative lời khai sau khi giải xong
+            const savedChoice = getStorageItem(`followup_${c}_choice`) || (c === 'vu' ? '21:15' : 'question_solved');
+            state.setNarrativeCulprit(c);
+            state.setNarrativeChoice(savedChoice);
+            state.setIsEpilogueOpen(true);
+          }
+        } else {
+          state.setIsFollowupQuestionOpen(true);
+        }
       } else if (id.startsWith("node-suspect-") || id.startsWith("suspect-")) {
         const targetId = id
           .replace("node-suspect-", "")

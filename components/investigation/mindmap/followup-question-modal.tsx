@@ -202,10 +202,11 @@ export function FollowupQuestionModal({
       const savedHa = getStorageItem('followup_ha_password')
       if (savedHa) {
         setHaPasswordInput(savedHa)
+        setShowHaPhotoPopup(true)
       } else {
         setHaPasswordInput('')
+        setShowHaPhotoPopup(false)
       }
-      setShowHaPhotoPopup(false)
     } else if (culprit === 'vu') {
       const savedVu = getStorageItem('followup_vu')
       if (savedVu) {
