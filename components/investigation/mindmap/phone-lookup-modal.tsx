@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Smartphone, ArrowRight, CheckCircle2, ArrowLeft, Lightbulb } from 'lucide-react'
+import { X, ArrowRight, CheckCircle2, ArrowLeft, Lightbulb } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { emitInvestigationEvent } from '@/lib/investigation-events'
@@ -148,26 +148,6 @@ export function PhoneLookupModal({
               <p className="text-xs sm:text-sm text-[#1a120b] leading-relaxed font-sans">
                 Tổ chức rà soát, tra cứu dữ liệu viễn thông nhằm xác minh, làm rõ thông tin lai lịch & lý do liên hệ của 03 đối tượng sử dụng các số điện thoại có lịch sử liên lạc trong thời hạn 12 giờ trước thời điểm xảy ra vụ án.
               </p>
-            </div>
-
-            {/* ONBOARDING INITIAL EVIDENCE CALLOUT */}
-            <div className="p-3.5 bg-[#ebdcc4] border-2 border-[#a88c6f] rounded-none text-xs text-[#3b2b1a] space-y-2.5 shadow-sm">
-              <p className="text-xs leading-relaxed">
-                Trước tiên, bạn hãy đối chiếu dữ liệu giữa <strong>Hồ sơ tài liệu</strong> và <strong>Điện thoại nạn nhân Khang</strong> để tìm ra danh tính 3 SĐT ẩn danh.
-              </p>
-              {onOpenPhoneSimulator && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose()
-                    onOpenPhoneSimulator()
-                  }}
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#2c1d12] hover:bg-[#3d291a] text-[#f4e8d8] font-mono text-xs font-bold transition-all cursor-pointer rounded-none shadow border border-[#523924]"
-                >
-                  <Smartphone className="size-3.5 text-amber-400" />
-                  <span>📱 MỞ ĐIỆN THOẠI NẠN NHÂN KHANG</span>
-                </button>
-              )}
             </div>
 
             <span className="font-mono text-xs text-[#4a3520] uppercase font-bold tracking-wider block">

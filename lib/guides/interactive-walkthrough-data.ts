@@ -3,7 +3,7 @@ export interface WalkthroughStep {
   stepNumber: number
   totalSteps: number
   title: string
-  subtitle: string
+  subtitle?: string
   description: string
   actionHint?: string
   targetType: 'canvas-center' | 'pin' | 'dom-selector'
@@ -15,83 +15,59 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'step-overview',
     stepNumber: 1,
-    totalSteps: 7,
-    title: 'TỔNG QUAN BẢNG ĐIỀU TRA',
-    subtitle: 'Sơ đồ án mạng & Mắt xích vật chứng',
+    totalSteps: 6,
+    title: 'Tổng quan bảng điều tra',
     description:
-      'Đây là bảng điều tra vụ án. Nơi tập hợp mọi tài liệu, hình ảnh hiện trường, hồ sơ đối tượng và các mối liên kết phá án.',
-    actionHint: '💡 Bạn có thể nhấp vào bất kỳ ghim nào để kiểm tra chi tiết.',
+      'Hiển thị toàn bộ hồ sơ đối tượng, các liên kết và tiến trình phá án.',
     targetType: 'canvas-center'
   },
   {
-    id: 'step-evidence-photo',
-    stepNumber: 2,
-    totalSteps: 7,
-    title: 'VẬT CHỨNG & ẢNH HIỆN TRƯỜNG',
-    subtitle: 'Xem ảnh Polaroid & Biên bản pháp y',
-    description:
-      'Các bức ảnh hiện trường và nạn nhân được ghim trực tiếp trên bảng. Nhấp trực tiếp vào ảnh hoặc ghim tài liệu để phóng to xem chi tiết.',
-    actionHint: '💡 Nhấn phím Esc hoặc nhấp ra ngoài để đóng nhanh ảnh phóng to.',
-    targetType: 'pin',
-    targetPinId: 'c0-pin-victim-khang'
-  },
-  {
-    id: 'step-phone-forensics',
-    stepNumber: 3,
-    totalSteps: 7,
-    title: 'KHAI THÁC THIẾT BỊ SỐ & TRA CỨU SĐT',
-    subtitle: 'Điện thoại nạn nhân & Danh bạ nhà mạng',
-    description:
-      'Truy cập điện thoại của nạn nhân (Tin nhắn, Ghi chú, Ảnh, Sao kê ngân hàng, GPS) và tra cứu cơ sở dữ liệu số điện thoại lạ xuất hiện trong vụ án.',
-    actionHint: '💡 Mốc thời gian trong tin nhắn và cuộc gọi là chìa khóa dựng lại Timeline.',
-    targetType: 'pin',
-    targetPinId: 'c0-pin-phone'
-  },
-  {
     id: 'step-suspects',
-    stepNumber: 4,
-    totalSteps: 7,
-    title: 'QUẢN LÝ & GÁN MANH MỐI NGHI PHẠM',
-    subtitle: 'Theo dõi nhiều đối tượng, động cơ & bằng chứng ngoại phạm',
+    stepNumber: 2,
+    totalSteps: 6,
+    title: 'Hồ sơ nghi phạm',
     description:
-      'Lập hồ sơ theo dõi nhiều nghi phạm cùng lúc. Bạn có thể điều tra dở dang và đổi hướng sang đối tượng khác bất cứ lúc nào mà không mất tiến độ.',
-    actionHint: '💡 Đối tượng chỉ thành nghi phạm khi thỏa mãn cả Động cơ và Ngoại phạm bất hợp lý.',
+      'Nơi xác lập đối tượng tình nghi khi chứng minh được đối tượng có:\n• Động cơ gây án\n• Mâu thuẫn trong lời khai hoặc ngoại phạm',
     targetType: 'pin',
     targetPinId: 'c0-pin-suspects'
   },
   {
-    id: 'step-reinvestigate',
-    stepNumber: 5,
-    totalSteps: 7,
-    title: 'LỆNH TÁI KHÁM XÉT & CÂU HỎI NGHIỆP VỤ',
-    subtitle: 'Rà soát manh mối bỏ sót & Dấu vết hiện trường',
+    id: 'step-victim-phone',
+    stepNumber: 3,
+    totalSteps: 6,
+    title: 'Điện thoại nạn nhân',
     description:
-      'Khám xét lại hiện trường để thu thập thêm dấu vết vật lý và âm thanh môi trường. Lệnh chỉ tự động sáng lên khi bạn đạt đủ điều kiện kích hoạt trên hệ thống.',
-    actionHint: '💡 Cần hoàn thành thẩm vấn các nghi phạm trước để được phê duyệt lệnh.',
+      'Nơi lưu trữ các dấu vết số của nạn nhân. Bạn có thể tự thao tác trực tiếp trên điện thoại.',
     targetType: 'pin',
-    targetPinId: 'c0-pin-reinvestigate'
+    targetPinId: 'c0-pin-victim-phone'
+  },
+  {
+    id: 'step-evidence',
+    stepNumber: 4,
+    totalSteps: 6,
+    title: 'Bổ sung chứng cứ',
+    description:
+      'Thực hiện nghiệp vụ thu thập thêm chứng cứ:\n• 4.1. Truy vết liên lạc: Tra cứu danh tính chủ thuê bao ẩn danh để triệu tập và mở khóa lời khai mới.\n• 4.2. Khám xét lại hiện trường: Nhằm thu thập thêm chứng cứ khi chuỗi bằng chứng ban đầu chưa thể khép lại vụ án. Yêu cầu xác lập thành công tối thiểu 2 hồ sơ nghi phạm để mở khóa thao tác.',
+    targetType: 'pin',
+    targetPinId: 'c0-pin-evidence'
   },
   {
     id: 'step-indictment',
-    stepNumber: 6,
-    totalSteps: 7,
-    title: 'LẬP BẢN CÁO TRẠNG & ĐỀ NGHỊ TRUY TỐ',
-    subtitle: 'Kết luận điều tra & Bắt giữ hung thủ',
+    stepNumber: 5,
+    totalSteps: 6,
+    title: 'Kết luận điều tra',
     description:
-      'Khi đã đủ căn cứ, hoàn thiện 4 yếu tố: Thủ Phạm + Động Cơ + Phương Thức + Chứng Cứ Mấu Chốt. Bắt buộc tích chọn chứng cứ xác thực, không chấp nhận suy đoán thiếu căn cứ!',
-    actionHint: '💡 Bản cáo trạng chính xác 100% sẽ mở ra phần Hậu truyện (Epilogue).',
+      'Nơi đưa ra phán quyết cuối cùng về danh tính hung thủ. Tính năng luôn mở nhưng không cung cấp gợi ý, vì vậy hãy cân nhắc thật kỹ trước khi nộp kết luận.',
     targetType: 'pin',
     targetPinId: 'c0-pin-indictment'
   },
   {
     id: 'step-quick-menu',
-    stepNumber: 7,
-    totalSteps: 7,
-    title: 'MENU THAO TÁC NHANH & SỔ TAY',
-    subtitle: 'Gợi ý phá án & Xem lại sổ tay',
+    stepNumber: 6,
+    totalSteps: 6,
+    title: 'Menu thao tác nhanh',
     description:
-      'Tại góc dưới phải, nút Thao tác nhanh cho phép bạn xem Gợi ý phá án, mở Điện thoại và mở lại Sổ tay hướng dẫn này bất cứ lúc nào.',
-    actionHint: '💡 Chúc điều tra viên phá án thành công!',
+      'Bao gồm:\n• Gợi ý: Cung cấp manh mối định hướng khi bạn gặp bế tắc.\n• Sổ tay hướng dẫn: Tra cứu lại các chức năng điều tra.\n• Chơi lại từ đầu: Đặt lại toàn bộ tiến trình điều tra về trạng thái ban đầu.',
     targetType: 'dom-selector',
     domSelector: '[data-tour="fab-menu"]'
   }

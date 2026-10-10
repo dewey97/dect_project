@@ -30,8 +30,8 @@ import { SafariApp } from "./apps/safari-app";
 import { NotesApp } from "./apps/notes-app";
 import { PhotosApp } from "./apps/photos-app";
 import { MapsApp } from "./apps/maps-app";
-import { ContactsApp } from "./apps/contacts-app";
 import { BankingApp } from "./apps/banking-app";
+import { IPhoneHomeScreen } from "./iphone-home-screen";
 
 interface IPhoneFrameProps {
   device: Device;
@@ -181,8 +181,8 @@ export function IPhoneFrame({
         className={cn(
           "relative w-[375px] max-w-full h-[667px] max-h-full aspect-[375/667] transition-all flex flex-col overflow-hidden shadow-2xl shrink-0 my-auto",
           frameless
-            ? "bg-black rounded-[36px] border border-white/20"
-            : "bg-[#121214] rounded-[44px] p-2.5 border-[8px] border-[#2C2C30] ring-1 ring-white/10",
+            ? "bg-black rounded-lg border border-white/20"
+            : "bg-[#121214] rounded-xl p-2.5 border-[6px] border-[#2C2C30] ring-1 ring-white/10",
         )}
       >
         {!frameless && (
@@ -206,7 +206,7 @@ export function IPhoneFrame({
             <div className="absolute -left-[6px] sm:-left-[8px] top-42 w-1.5 sm:w-2 h-9 bg-[#3A3A3C] rounded-l-md border-y border-l border-white/20" />
 
             {/* Subtle Metallic Bezel Highlights */}
-            <div className="absolute inset-0 rounded-[38px] sm:rounded-[42px] pointer-events-none border border-white/10" />
+            <div className="absolute inset-0 rounded-lg pointer-events-none border border-white/10" />
           </>
         )}
 
@@ -214,17 +214,16 @@ export function IPhoneFrame({
         <div
           className={cn(
             "relative w-full h-full bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col",
-            !frameless && "rounded-[34px] sm:rounded-[38px]",
+            !frameless && "rounded-md",
           )}
         >
           {/* Authentic iOS Vignette Gradient (Figma Node 14:39) */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/15 pointer-events-none z-0" />
 
           {/* iOS TOP STATUS BAR (Figma spec: height 20px, pad [0,8px]) */}
-          {(activeApp !== null || isLocked) && (
-            <div
-              className={cn(
-                "relative z-30 h-[20px] px-2 flex items-center justify-between text-[11px] font-sans tracking-tight shrink-0 select-none",
+          <div
+            className={cn(
+              "relative z-30 h-[20px] px-2 flex items-center justify-between text-[11px] font-sans tracking-tight shrink-0 select-none",
                 isLightStatusBar
                   ? "bg-[#FFFFFF] text-black"
                   : "bg-transparent text-white",
@@ -334,7 +333,6 @@ export function IPhoneFrame({
                 </div>
               </div>
             </div>
-          )}
 
           {/* MAIN SCREEN AREA */}
           <div className="flex-1 min-h-0 relative overflow-hidden flex flex-col">
@@ -491,7 +489,10 @@ export function IPhoneFrame({
                   <MessagesApp onBackToHome={() => setActiveApp(null)} />
                 )}
                 {activeApp === "phone" && (
-                  <PhoneApp onBackToHome={() => setActiveApp(null)} />
+                  <PhoneApp
+                    initialTab="recents"
+                    onBackToHome={() => setActiveApp(null)}
+                  />
                 )}
                 {activeApp === "safari" && (
                   <SafariApp
@@ -515,7 +516,10 @@ export function IPhoneFrame({
                   <MapsApp onBackToHome={() => setActiveApp(null)} />
                 )}
                 {activeApp === "contacts" && (
-                  <ContactsApp onBackToHome={() => setActiveApp(null)} />
+                  <PhoneApp
+                    initialTab="contacts"
+                    onBackToHome={() => setActiveApp(null)}
+                  />
                 )}
                 {activeApp === "banking" && (
                   <BankingApp onBackToHome={() => setActiveApp(null)} />
@@ -589,86 +593,12 @@ export function IPhoneFrame({
                 )}
               </div>
             ) : (
-              /* 3. EXACT PIXEL-PERFECT iOS 9 HOME SCREEN (Figma Workflow 2: 100% Master Render + Interactive Hotspots) */
-              <div className="absolute inset-0 select-none overflow-hidden">
-                {/* 100% Pixel-Perfect Figma Master Render */}
-                <img
-                  src="/images/cases/case_000/phone/ios9_home_master_pixel_perfect.png"
-                  alt="iOS 9 Springboard"
-                  className="w-full h-full object-cover select-none pointer-events-none absolute inset-0 z-0"
-                />
-
-                {/* INTERACTIVE HOTSPOTS LAYER (Overlayed exactly on top of each Figma app icon) */}
-                <div className="absolute inset-0 z-10">
-                  {/* Row 1 */}
-                  {/* Messages */}
-                  <button
-                    onClick={() => setActiveApp("messages")}
-                    className="absolute left-[2.5%] top-[5.0%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Messages (Tin nhắn)"
-                  />
-                  {/* Photos */}
-                  <button
-                    onClick={() => setActiveApp("photos")}
-                    className="absolute left-[52.0%] top-[5.0%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Photos (Ảnh)"
-                  />
-                  {/* Camera */}
-                  <button
-                    onClick={() => setActiveApp("photos")}
-                    className="absolute left-[77.0%] top-[5.0%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Camera (Máy ảnh)"
-                  />
-
-                  {/* Row 2 */}
-                  {/* Maps */}
-                  <button
-                    onClick={() => setActiveApp("maps")}
-                    className="absolute left-[52.0%] top-[21.6%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Maps (Bản đồ)"
-                  />
-
-                  {/* Row 3 */}
-                  {/* Notes */}
-                  <button
-                    onClick={() => setActiveApp("notes")}
-                    className="absolute left-[2.5%] top-[38.2%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Notes (Ghi chú iCloud)"
-                  />
-                  {/* Wallet / Banking */}
-                  <button
-                    onClick={() => setActiveApp("banking")}
-                    className="absolute left-[77.0%] top-[38.2%] w-[20%] h-[13%] rounded-2xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Wallet (Ví tiền / Ngân hàng)"
-                  />
-
-                  {/* Dock Items (4 Ứng dụng thanh Dock đáy) */}
-                  {/* Phone */}
-                  <button
-                    onClick={() => setActiveApp("phone")}
-                    className="absolute left-[2.5%] bottom-[1.5%] w-[21.5%] h-[14.5%] rounded-3xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Phone (Điện thoại & Hộp thư thoại)"
-                  />
-                  {/* Mail */}
-                  <button
-                    onClick={() => setActiveApp("messages")}
-                    className="absolute left-[27.0%] bottom-[1.5%] w-[21.5%] h-[14.5%] rounded-3xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Mail (Hộp thư)"
-                  />
-                  {/* Safari */}
-                  <button
-                    onClick={() => setActiveApp("safari")}
-                    className="absolute left-[51.5%] bottom-[1.5%] w-[21.5%] h-[14.5%] rounded-3xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Safari (Trình duyệt)"
-                  />
-                  {/* Music */}
-                  <button
-                    onClick={() => setActiveApp("phone")}
-                    className="absolute left-[76.0%] bottom-[1.5%] w-[21.5%] h-[14.5%] rounded-3xl active:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                    title="Music (Âm thanh)"
-                  />
-                </div>
-              </div>
+              /* 3. 100% CODE DOM AUTHENTIC iOS 9 HOME SCREEN (Figma individual icons + Grid + Frosted Glass Dock) */
+              <IPhoneHomeScreen
+                onOpenApp={(app) => setActiveApp(app)}
+                unreadMessages={1}
+                missedCalls={1}
+              />
             )}
 
             {/* 4. FLOATING ASSISTIVETOUCH (Nút Home ảo) */}
@@ -750,15 +680,6 @@ export function IPhoneFrame({
                 )}
               </>
             )}
-          </div>
-
-          {/* HOME INDICATOR (Bottom Bar - Clickable Home Action) */}
-          <div
-            onClick={() => setActiveApp(null)}
-            className="h-4 w-full flex items-center justify-center shrink-0 bg-transparent hover:bg-white/10 active:bg-white/20 cursor-pointer transition-colors group"
-            title="Bấm để về Màn hình chính (Home)"
-          >
-            <div className="w-28 h-1 bg-white/40 group-hover:bg-white/80 rounded-full shadow-sm" />
           </div>
         </div>
       </div>

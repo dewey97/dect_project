@@ -443,8 +443,10 @@ export function useBoardLayout() {
       setPinTransforms((prev) => ({ ...prev, ...tfMap }));
     } catch {}
 
-    // 2. Đồng bộ lên Supabase Database (pins + connections dây đỏ admin).
-    //    CHỈ clear hasUnsavedChanges khi DB success, để admin biết còn nợ lưu.
+    // 2. Đã lưu thành công vào LocalStorage -> Đặt hasUnsavedChanges = false ngay
+    setHasUnsavedChanges(false);
+
+    // 3. Đồng bộ lên Supabase Database (pins + connections dây đỏ admin).
     try {
       const res = await saveBoardgamePinPositions(
         "case-000",
@@ -453,16 +455,15 @@ export function useBoardLayout() {
       );
       if (res.success) {
         toast.success("Đã lưu vị trí ghim lên Supabase DB & Cục bộ!");
-        setHasUnsavedChanges(false);
       } else {
-        toast.error(
-          "Đã lưu cục bộ! (Supabase lỗi: " +
-            (res.error || "Chưa tạo bảng boardgame_pins") +
+        toast.info(
+          "Đã lưu cục bộ trình duyệt! (Supabase sync: " +
+            (res.error || "Chưa có quyền ghi DB") +
             ")",
         );
       }
     } catch (err: any) {
-      toast.error("Đã lưu cục bộ! (Supabase lỗi: " + err.message + ")");
+      toast.info("Đã lưu cục bộ trình duyệt! (Supabase sync: " + err.message + ")");
     } finally {
       setIsSavingLayout(false);
     }

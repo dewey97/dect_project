@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
   ChevronRight,
   ChevronLeft,
-  CheckCircle2,
-  Compass
+  Check
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { detectiveAudio } from '@/lib/investigation-audio'
@@ -38,6 +38,7 @@ export function InteractiveWalkthrough({
   canvasWrapperRef,
   onStepChange
 }: InteractiveWalkthroughProps) {
+  const [mounted, setMounted] = useState(false)
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [spotlightRect, setSpotlightRect] = useState<{
     x: number
@@ -45,6 +46,10 @@ export function InteractiveWalkthrough({
     width: number
     height: number
   } | null>(null)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const step = WALKTHROUGH_STEPS[currentStepIndex] || WALKTHROUGH_STEPS[0]
   const isFirstStep = currentStepIndex === 0
@@ -66,10 +71,7 @@ export function InteractiveWalkthrough({
 
   // Notify parent of active target pin for live canvas highlighting
   useEffect(() => {
-    if (!isOpen) {
-      onStepChange?.(null)
-      return
-    }
+    if (!isOpen) return
     if (step.targetType === 'pin' && step.targetPinId) {
       onStepChange?.(step.targetPinId)
     } else {
@@ -104,9 +106,9 @@ export function InteractiveWalkthrough({
               p.id === step.targetPinId ||
               p.id.includes(step.targetPinId!) ||
               (step.targetPinId === 'c0-pin-victim-khang' && (p.id.includes('khang') || p.label?.toLowerCase().includes('khang'))) ||
-              (step.targetPinId === 'c0-pin-phone' && (p.id.includes('phone') || p.id.includes('dev-00') || p.label?.toLowerCase().includes('điện thoại') || p.label?.toLowerCase().includes('mở rộng'))) ||
+              ((step.targetPinId === 'c0-pin-phone' || step.targetPinId === 'c0-pin-victim-phone') && (p.id.includes('victim-phone') || p.id.includes('phone') || p.id.includes('dev-00') || p.label?.toLowerCase().includes('điện thoại') || p.label?.toLowerCase().includes('mở rộng'))) ||
               (step.targetPinId === 'c0-pin-suspects' && (p.id.includes('suspect') || p.label?.toLowerCase().includes('nghi phạm'))) ||
-              (step.targetPinId === 'c0-pin-reinvestigate' && (p.id.includes('reinvestigate') || p.label?.toLowerCase().includes('khám xét') || p.label?.toLowerCase().includes('khám nghiệm'))) ||
+              ((step.targetPinId === 'c0-pin-evidence' || step.targetPinId === 'c0-pin-reinvestigate') && (p.id.includes('evidence') || p.id.includes('reinvestigate') || p.label?.toLowerCase().includes('chứng cứ') || p.label?.toLowerCase().includes('khám xét') || p.label?.toLowerCase().includes('khám nghiệm'))) ||
               (step.targetPinId === 'c0-pin-indictment' && (p.id.includes('indictment') || p.label?.toLowerCase().includes('kết luận') || p.label?.toLowerCase().includes('truy tố')))
           )
         }
@@ -214,7 +216,7 @@ export function InteractiveWalkthrough({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, currentStepIndex, isLastStep, onClose])
 
-  if (!isOpen) return null
+  if (!isOpen || !mounted) return null
 
   const handleNext = () => {
     detectiveAudio.playTypewriterClick()
@@ -243,9 +245,9 @@ export function InteractiveWalkthrough({
     ? spotlightRect.y + spotlightRect.height / 2 < window.innerHeight * 0.48
     : false
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] pointer-events-auto select-none overflow-hidden flex flex-col items-center justify-between p-3 sm:p-6">
+      <div className="fixed inset-0 z-[100] pointer-events-auto select-none overflow-hidden flex flex-col items-center justify-between p-3 sm:p-6 pb-6 sm:pb-8">
         {/* SVG CUTOUT SPOTLIGHT BACKDROP (UNCOVERS TARGET PIN 100% CRISP, SHARP & BRIGHT) */}
         <svg className="fixed inset-0 w-full h-full pointer-events-none z-[100] transition-opacity duration-300">
           <defs>
@@ -271,7 +273,7 @@ export function InteractiveWalkthrough({
             y="0"
             width="100%"
             height="100%"
-            fill="rgba(0, 0, 0, 0.78)"
+            fill={step.targetType === 'canvas-center' ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.78)'}
             mask="url(#walkthrough-spotlight-mask)"
           />
         </svg>
@@ -303,56 +305,31 @@ export function InteractiveWalkthrough({
           </motion.div>
         )}
 
-        {/* TOP SPACER / TOP POSITION */}
-        <div className="w-full flex justify-center z-[102] pointer-events-none">
-          {!isTargetInUpperHalf && step.targetType !== 'canvas-center' && (
+        {/* TOP POSITION (For step 1 and when target is in lower half) */}
+        <div className="w-full flex justify-center z-[102] pointer-events-none pt-2 sm:pt-4">
+          {(!isTargetInUpperHalf || step.targetType === 'canvas-center') && (
             <motion.div
               key={`top-${step.id}`}
               initial={{ opacity: 0, y: -16, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -16, scale: 0.96 }}
               transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-lg bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95),0_0_30px_rgba(217,160,102,0.25)] rounded-none overflow-hidden flex flex-col pointer-events-auto"
+              className="w-full max-w-[430px] bg-[#f6f1e5] text-[#1a120b] border border-[#2b1f14]/40 shadow-[0_20px_45px_rgba(0,0,0,0.8)] rounded-none overflow-hidden flex flex-col pointer-events-auto p-3.5 sm:p-4 space-y-3"
             >
               <WalkthroughCardContent
                 step={step}
                 isFirstStep={isFirstStep}
                 isLastStep={isLastStep}
-                currentStepIndex={currentStepIndex}
                 onSkip={handleSkip}
                 onPrev={handlePrev}
                 onNext={handleNext}
-                onSelectStep={(idx) => setCurrentStepIndex(idx)}
               />
             </motion.div>
           )}
         </div>
 
-        {/* CENTER POSITION (For step 1) */}
-        {step.targetType === 'canvas-center' && (
-          <motion.div
-            key={`center-${step.id}`}
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.94 }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full max-w-lg bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95),0_0_30px_rgba(217,160,102,0.25)] rounded-none overflow-hidden flex flex-col z-[102] my-auto pointer-events-auto"
-          >
-            <WalkthroughCardContent
-              step={step}
-              isFirstStep={isFirstStep}
-              isLastStep={isLastStep}
-              currentStepIndex={currentStepIndex}
-              onSkip={handleSkip}
-              onPrev={handlePrev}
-              onNext={handleNext}
-              onSelectStep={(idx) => setCurrentStepIndex(idx)}
-            />
-          </motion.div>
-        )}
-
-        {/* BOTTOM POSITION (When target is in upper half) */}
-        <div className="w-full flex justify-center z-[102] pointer-events-none">
+        {/* BOTTOM POSITION (When target is in upper half) - Elevated with margin to completely clear corner buttons */}
+        <div className="w-full flex justify-center z-[102] pointer-events-none mb-16 sm:mb-20">
           {isTargetInUpperHalf && step.targetType !== 'canvas-center' && (
             <motion.div
               key={`bottom-${step.id}`}
@@ -360,23 +337,22 @@ export function InteractiveWalkthrough({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 16, scale: 0.96 }}
               transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-lg bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95),0_0_30px_rgba(217,160,102,0.25)] rounded-none overflow-hidden flex flex-col pointer-events-auto"
+              className="w-full max-w-[430px] bg-[#f6f1e5] text-[#1a120b] border border-[#2b1f14]/40 shadow-[0_20px_45px_rgba(0,0,0,0.8)] rounded-none overflow-hidden flex flex-col pointer-events-auto p-3.5 sm:p-4 space-y-3"
             >
               <WalkthroughCardContent
                 step={step}
                 isFirstStep={isFirstStep}
                 isLastStep={isLastStep}
-                currentStepIndex={currentStepIndex}
                 onSkip={handleSkip}
                 onPrev={handlePrev}
                 onNext={handleNext}
-                onSelectStep={(idx) => setCurrentStepIndex(idx)}
               />
             </motion.div>
           )}
         </div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
 
@@ -384,126 +360,74 @@ function WalkthroughCardContent({
   step,
   isFirstStep,
   isLastStep,
-  currentStepIndex,
   onSkip,
   onPrev,
-  onNext,
-  onSelectStep
+  onNext
 }: {
   step: WalkthroughStep
   isFirstStep: boolean
   isLastStep: boolean
-  currentStepIndex: number
   onSkip: () => void
   onPrev: () => void
   onNext: () => void
-  onSelectStep: (idx: number) => void
 }) {
   return (
     <>
-      {/* TOP CARD HEADER */}
-      <div className="bg-[#ede3d1] px-3.5 py-2.5 sm:px-4 sm:py-3 border-b-2 border-[#2b1f14] flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 bg-[#8c1d1d] text-[#fbf8f1] font-mono text-[10px] font-bold uppercase tracking-wider rounded-none">
-            Bước {step.stepNumber}/{step.totalSteps}
+      {/* TẦNG 1: HEADER (Badge + Tiêu đề + Nút đóng ✕) */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="px-1.5 py-0.5 bg-[#8c1d1d] text-[#fbf8f1] font-mono text-[10px] font-bold uppercase tracking-wider shrink-0">
+            {step.stepNumber}/{step.totalSteps}
           </span>
-          <span className="font-mono text-[10px] sm:text-[11px] font-bold text-[#5c4026] uppercase tracking-wider flex items-center gap-1">
-            <Compass className="size-3.5 text-[#8c1d1d]" />
-            HƯỚNG DẪN ĐIỀU TRA
-          </span>
+          <h3 className="font-mono text-xs sm:text-[13px] font-bold text-[#1a120b] uppercase tracking-wider truncate">
+            {step.title.replace(/^\d+\.\s*/, '')}
+          </h3>
         </div>
 
         <button
           type="button"
           onClick={onSkip}
-          className="p-1 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors border border-[#5c4026]/30 cursor-pointer"
-          title="Bỏ qua hướng dẫn [Esc]"
+          className="p-1 text-[#5c4026] hover:text-black hover:bg-[#2b1f14]/10 transition-colors cursor-pointer shrink-0"
+          title="Đóng [Esc]"
         >
-          <X className="size-3.5 sm:size-4" />
+          <X className="size-4" />
         </button>
       </div>
 
-      {/* CARD BODY */}
-      <div className="p-3.5 sm:p-5 space-y-2.5 sm:space-y-3 bg-[#f6f1e5]">
-        <div className="space-y-0.5">
-          <h3 className="font-mono font-bold text-xs sm:text-base text-[#1a120b] uppercase tracking-wide">
-            {step.title}
-          </h3>
-          <p className="font-mono text-[11px] sm:text-xs text-[#8c1d1d] font-semibold italic">
-            {step.subtitle}
-          </p>
-        </div>
-
-        <p className="text-xs sm:text-[13px] text-[#2b1f14] leading-relaxed font-sans">
+      {/* TẦNG 2: NỘI DUNG & CỤM NÚT ĐIỀU HƯỚNG ICON */}
+      <div className="space-y-3">
+        <p className="text-xs sm:text-[13px] text-[#2b1f14] leading-relaxed font-sans whitespace-pre-line">
           {step.description}
         </p>
 
-        {step.actionHint && (
-          <div className="p-2 sm:p-2.5 bg-[#fef3c7] border border-[#d97706]/50 text-[#78350f] text-[11px] sm:text-xs font-sans rounded-none shadow-xs">
-            <span>{step.actionHint}</span>
-          </div>
-        )}
-      </div>
-
-      {/* STEP INDICATOR DOTS */}
-      <div className="bg-[#e7dcce] px-3.5 py-1.5 sm:px-4 sm:py-2 border-t border-[#2b1f14]/20 flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          {WALKTHROUGH_STEPS.map((s, idx) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => {
-                detectiveAudio.playTypewriterClick()
-                onSelectStep(idx)
-              }}
-              className={cn(
-                'transition-all cursor-pointer rounded-none',
-                idx === currentStepIndex
-                  ? 'w-5 sm:w-6 h-2 bg-[#8c1d1d]'
-                  : 'w-2 h-2 bg-[#2b1f14]/30 hover:bg-[#2b1f14]/60'
-              )}
-              title={`Chuyển đến bước ${idx + 1}`}
-            />
-          ))}
-        </div>
-
-        <span className="font-mono text-[9px] sm:text-[10px] text-[#5c4026]">
-          Phím ◄ ► để đổi bước
-        </span>
-      </div>
-
-      {/* FOOTER ACTION BUTTONS */}
-      <div className="bg-[#ede3d1] p-2.5 sm:p-3 border-t-2 border-[#2b1f14] flex items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={onSkip}
-          className="px-2.5 sm:px-3 py-1 sm:py-1.5 text-[#5c4026] hover:text-[#1a120b] font-mono text-xs uppercase tracking-wider transition-colors cursor-pointer"
-        >
-          Bỏ qua
-        </button>
-
-        <div className="flex items-center gap-2">
+        {/* NÚT ĐIỀU HƯỚNG ICON THUẦN TÚY (GÓC DƯỚI PHẢI) */}
+        <div className="flex items-center justify-end gap-1.5 pt-0.5">
           {!isFirstStep && (
             <button
               type="button"
               onClick={onPrev}
-              className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-[#dfd3bd] hover:bg-[#d0c2a8] text-[#1a120b] font-mono text-xs font-bold uppercase tracking-wider border border-[#2b1f14]/40 flex items-center gap-1 transition-colors cursor-pointer"
+              className="size-7 bg-[#2b1f14]/10 hover:bg-[#2b1f14]/20 text-[#2b1f14] flex items-center justify-center transition-colors cursor-pointer"
+              title="Bước trước [◄]"
             >
-              <ChevronLeft className="size-3 sm:size-3.5" />
-              <span>Lùi lại</span>
+              <ChevronLeft className="size-4" />
             </button>
           )}
 
           <button
             type="button"
             onClick={onNext}
-            className="px-3 sm:px-4 py-1 sm:py-1.5 bg-[#2b1f14] hover:bg-[#433020] text-[#f6f1e5] font-mono text-xs font-bold uppercase tracking-wider border border-[#140d08] shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+            className={cn(
+              "size-7 flex items-center justify-center transition-colors cursor-pointer shadow-xs",
+              isLastStep
+                ? "bg-[#8c1d1d] hover:bg-[#a32222] text-[#fbf8f1]"
+                : "bg-[#2b1f14] hover:bg-[#433020] text-[#f6f1e5]"
+            )}
+            title={isLastStep ? "Bắt đầu điều tra" : "Bước tiếp [►]"}
           >
-            <span>{isLastStep ? 'Hoàn tất & Bắt đầu' : 'Tiếp theo'}</span>
             {isLastStep ? (
-              <CheckCircle2 className="size-3 sm:size-3.5 text-amber-400" />
+              <Check className="size-4 text-amber-300" />
             ) : (
-              <ChevronRight className="size-3 sm:size-3.5 text-amber-300" />
+              <ChevronRight className="size-4 text-amber-300" />
             )}
           </button>
         </div>

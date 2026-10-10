@@ -123,6 +123,7 @@ Hệ thống sử dụng cơ chế **Google Docs / Google Sheets Live CMS** đ�
 * **Static Fallback cho Dẫn truyện**: Mọi hook dữ liệu động (`useCaseNarratives`, Google Sheets) phải có sẵn `DEFAULT_NARRATIVES` dự phòng để tránh trắng/đen màn hình khi mất mạng hoặc API chậm.
 * **Safe LocalStorage Wrapper**: Mọi thao tác đọc/ghi Storage phải đi qua `lib/storage.ts` để tránh lỗi khi người chơi duyệt web ở chế độ ẩn danh (Incognito), Safari ITP hoặc Webview nhúng.
 * **Mobile Focus Rule**: Không sử dụng `autoFocus` hoặc `.focus()` tự động khi mở Modal/Dialog nhằm tránh bật bàn phím ảo che khuất nội dung trên di động.
+* **No Inactive Component State Pollution (Cô lập Side-Effect Modal Khi Đóng)**: Tuyệt đối CẤM các component Modal/Walkthrough/Overlay thực thi reset state toàn cục (như `onStepChange?.(null)`) bên trong `useEffect` khi component đang ở trạng thái đóng (`!isOpen`). Mọi callback giao tiếp giữa canvas và modal con bắt buộc phải ổn định tham chiếu (`useCallback`), tránh truyền inline arrow functions làm kích hoạt effect ma dập tắt state của người dùng.
 * **Asset Storage Boundary Rule**: Toàn bộ tư liệu gốc, ảnh tài liệu, moodboard, storyboard, test renders phải lưu tại `docs/cases/<case_id>/`. Thư mục `public/` chỉ chứa tài nguyên runtime production đang hoạt động trực tiếp trên web app. Chi tiết xem tại [`docs/cases/case_000/02_photos/ASSET_CATALOG.md`](../cases/case_000/02_photos/ASSET_CATALOG.md).
 
 ---

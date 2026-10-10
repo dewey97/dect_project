@@ -3,12 +3,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lightbulb, Smartphone, RefreshCw, X, Search, Box, BookOpen, Home } from "lucide-react";
+import { Lightbulb, RefreshCw, X, Box, BookOpen, Home } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 
 interface QuickActionFabProps {
-  onOpenPhone: () => void;
+  onOpenPhone?: () => void;
   onResetCase: () => void;
   onOpenBoardGame?: () => void;
   onOpenWebMode?: () => void;
@@ -128,28 +128,6 @@ export function QuickActionFab({
               </button>
             )}
 
-            {/* OPTION: WEB INTERACTIVE MODE */}
-            {onOpenWebMode && (
-              <button
-                type="button"
-                onClick={() => handleAction(onOpenWebMode)}
-                className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1c2331] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-blue-300 hover:text-blue-200 group"
-              >
-                <Box className="size-4 text-blue-400 shrink-0 group-hover:scale-110 transition-transform" />
-                <span>Bản Web Interactive</span>
-              </button>
-            )}
-
-            {/* OPTION: OPEN PHONE */}
-            <button
-              type="button"
-              onClick={() => handleAction(onOpenPhone)}
-              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#e5d8cb] hover:text-[#d9a066] group"
-            >
-              <Smartphone className="size-4 text-[#d9a066] shrink-0 group-hover:scale-110 transition-transform" />
-              <span>Điện thoại nạn nhân</span>
-            </button>
-
             {/* OPTION: GO HOME */}
             <button
               type="button"
@@ -178,7 +156,7 @@ export function QuickActionFab({
               className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#341713] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-red-300 hover:text-red-200 group"
             >
               <RefreshCw className="size-4 text-red-400 shrink-0 group-hover:rotate-180 transition-transform duration-300" />
-              <span>Làm lại từ đầu</span>
+              <span>Chơi lại từ đầu</span>
             </button>
           </motion.div>
         )}

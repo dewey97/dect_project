@@ -302,15 +302,8 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                 <div
                   key={thread.id}
                   onClick={() => setSelectedThread(thread)}
-                  className="flex items-center h-[86px] pl-[24px] pr-[16px] py-[12px] hover:bg-[#FFFFFF] active:bg-[#EEEFF1] cursor-pointer transition-colors bg-[#FAF9FE]"
+                  className="flex items-center h-[86px] px-4 py-[12px] hover:bg-[#FFFFFF] active:bg-[#EEEFF1] cursor-pointer transition-colors bg-[#FAF9FE]"
                 >
-                  {/* Unread Blue Dot (Figma Node 22:784: 10x10 blue dot #0058BC) */}
-                  <div className="w-[14px] flex items-center justify-start shrink-0 mr-1">
-                    {thread.unread && (
-                      <div className="size-[10px] rounded-full bg-[#0058BC]" />
-                    )}
-                  </div>
-
                   {/* Conversation Row Text Body */}
                   <div className="flex-1 min-w-0 flex flex-col justify-center pr-2">
                     {/* Header line: Sender Name + Timestamp */}

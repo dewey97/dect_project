@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Smartphone } from "lucide-react";
 import type { Checkpoint } from "@/lib/types";
 
 interface CheckpointTextMatchFormProps {
@@ -38,18 +37,6 @@ export function CheckpointTextMatchForm({
             </code>
             ) để tìm ra danh tính 3 SĐT ẩn danh.
           </p>
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                window.dispatchEvent(new CustomEvent("open-phone-modal"));
-              } catch {}
-            }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#2c1d12] hover:bg-[#3d291a] text-[#f4e8d8] font-mono text-xs font-bold transition-all cursor-pointer rounded-none shadow border border-[#523924]"
-          >
-            <Smartphone className="size-3.5 text-amber-400" />
-            <span>📱 MỞ ĐIỆN THOẠI NẠN NHÂN KHANG</span>
-          </button>
         </div>
       )}
 

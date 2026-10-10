@@ -109,6 +109,7 @@ export function HeroInteractive({
   const onPinPositionChangeRef = useRef(onPinPositionChange);
 
   const draggingPinIdRef = useRef<string | null>(null);
+  const clickedPinIdRef = useRef<string | null>(null);
   const isDraggingConnectionRef = useRef<boolean>(false);
 
   // Synchronously update refs on every render to eliminate any stale closures
@@ -512,6 +513,10 @@ export function HeroInteractive({
       activePointerIdRef.current = event.pointerId;
       isPointerDownRef.current = true;
       hasDraggedRef.current = false;
+      draggingPinIdRef.current = null;
+      clickedPinIdRef.current = null;
+      connectionStartIdRef.current = null;
+      connectionCandidateRef.current = false;
 
       pointerDownRef.current = { x, y };
       panAtPointerDownRef.current = {
@@ -542,13 +547,14 @@ export function HeroInteractive({
       if (isEditModeRef.current) {
         const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
 
-        // Ưu tiên 1: nắm đinh ghim (đầu ghim) để kéo dây chỉ đỏ nối 2 node
-        // Duyệt ngược để bắt đúng node nằm trên cùng (khớp với hover & render)
+        // Tìm pin được click: ưu tiên đầu ghim (kéo dây) rồi đến thân ghim (kéo node)
+        let clickedPin: PinPoint | null = null;
+
+        // Ưu tiên 1: đầu ghim (cho dây đỏ)
         const headRadius = (18 * scaleFactor) / transform.scale;
         for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
           const pin = caseSysPins[index];
           const pinPosition = getPinWorldPosition(pin, bounds);
-
           if (
             distance(
               worldPointer.x,
@@ -557,41 +563,41 @@ export function HeroInteractive({
               pinPosition.y,
             ) <= headRadius
           ) {
-            // Chưa bật kéo dây ngay: chờ xem người dùng có di chuột hay chỉ
-            // bấm (click) vào đầu ghim. Phân biệt ở handlePointerMove.
-            connectionStartIdRef.current = pin.id;
+            clickedPin = pin;
+            connectionStartIdRef.current = pin.id; // Có thể bắt đầu kéo dây
             connectionCandidateRef.current = true;
-            try {
-              event.currentTarget.setPointerCapture(event.pointerId);
-            } catch {}
-            requestRenderRef.current();
-            try {
-              event.preventDefault();
-              event.stopPropagation();
-            } catch {}
-            return;
+            break;
           }
         }
 
-        // Ưu tiên 2: thân ghim → kéo di chuyển node
-        for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
-          const pin = caseSysPins[index];
-          const pinPosition = getPinWorldPosition(pin, bounds);
-
-          if (isPinHit(worldPointer, pinPosition, pin, transform, bounds)) {
-            draggingPinIdRef.current = pin.id;
-            dragOffsetRef.current = {
-              x: worldPointer.x - pinPosition.x,
-              y: worldPointer.y - pinPosition.y,
-            };
-            detectiveAudio.playPaperRustle();
-            requestRenderRef.current();
-            try {
-              event.preventDefault();
-              event.stopPropagation();
-            } catch {}
-            return;
+        // Ưu tiên 2: thân ghim (cho kéo node) nếu chưa có pin nào ở đầu ghim
+        if (!clickedPin) {
+          for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
+            const pin = caseSysPins[index];
+            const pinPosition = getPinWorldPosition(pin, bounds);
+            if (isPinHit(worldPointer, pinPosition, pin, transform, bounds)) {
+              clickedPin = pin;
+              draggingPinIdRef.current = pin.id; // Có thể bắt đầu kéo node
+              dragOffsetRef.current = {
+                x: worldPointer.x - pinPosition.x,
+                y: worldPointer.y - pinPosition.y,
+              };
+              break;
+            }
           }
+        }
+
+        if (clickedPin) {
+          clickedPinIdRef.current = clickedPin.id; // Lưu pin được click để dùng trong finishPointerInteraction
+          try {
+            event.currentTarget.setPointerCapture(event.pointerId);
+          } catch {}
+          requestRenderRef.current();
+          try {
+            event.preventDefault();
+            event.stopPropagation();
+          } catch {}
+          return;
         }
       }
 
@@ -650,40 +656,48 @@ export function HeroInteractive({
         isEditModeRef.current &&
         onPinPositionChangeRef.current
       ) {
-        hasDraggedRef.current = true;
-        const bounds = getInnerBoardBounds(
-          rect.width,
-          rect.height,
-          boardFrameRef.current,
-        );
-        const transform = getViewTransform(zoomRef.current, panRef.current);
-        const worldPointer = screenToWorld({ x, y }, transform);
+        const deltaX = x - pointerDownRef.current.x;
+        const deltaY = y - pointerDownRef.current.y;
+        const dragDistance = Math.hypot(deltaX, deltaY);
 
-        const targetWorldX = worldPointer.x - dragOffsetRef.current.x;
-        const targetWorldY = worldPointer.y - dragOffsetRef.current.y;
+        // Chỉ khi di chuyển vượt ngưỡng mới tính là kéo thực sự và cập nhật vị trí
+        if (dragDistance > DRAG_THRESHOLD) {
+          hasDraggedRef.current = true;
 
-        const normalizedX = clamp(
-          (targetWorldX - bounds.x) / bounds.width,
-          0,
-          1,
-        );
-        const normalizedY = clamp(
-          (targetWorldY - bounds.y) / bounds.height,
-          0,
-          1,
-        );
+          const bounds = getInnerBoardBounds(
+            rect.width,
+            rect.height,
+            boardFrameRef.current,
+          );
+          const transform = getViewTransform(zoomRef.current, panRef.current);
+          const worldPointer = screenToWorld({ x, y }, transform);
 
-        onPinPositionChangeRef.current(
-          draggingPinIdRef.current,
-          normalizedX,
-          normalizedY,
-        );
-        requestRenderRef.current();
-        try {
-          event.preventDefault();
-          event.stopPropagation();
-        } catch {}
-        return;
+          const targetWorldX = worldPointer.x - dragOffsetRef.current.x;
+          const targetWorldY = worldPointer.y - dragOffsetRef.current.y;
+
+          const normalizedX = clamp(
+            (targetWorldX - bounds.x) / bounds.width,
+            0,
+            1,
+          );
+          const normalizedY = clamp(
+            (targetWorldY - bounds.y) / bounds.height,
+            0,
+            1,
+          );
+
+          onPinPositionChangeRef.current(
+            draggingPinIdRef.current,
+            normalizedX,
+            normalizedY,
+          );
+          requestRenderRef.current();
+          try {
+            event.preventDefault();
+            event.stopPropagation();
+          } catch {}
+          return;
+        }
       } else if (
         isPointerDownRef.current &&
         isActivePointer &&
@@ -722,6 +736,7 @@ export function HeroInteractive({
         isPointerDownRef.current = false;
         activePointerIdRef.current = null;
         draggingPinIdRef.current = null;
+        clickedPinIdRef.current = null;
         return;
       }
 
@@ -731,6 +746,7 @@ export function HeroInteractive({
         isPointerDownRef.current = false;
         activePointerIdRef.current = null;
         draggingPinIdRef.current = null;
+        clickedPinIdRef.current = null;
         return;
       }
 
@@ -754,6 +770,9 @@ export function HeroInteractive({
       connectionCandidateRef.current = false;
       isDraggingConnectionRef.current = false;
       updateConnectionStartId(null);
+
+      const initialClickedPinId = clickedPinIdRef.current;
+      clickedPinIdRef.current = null;
 
       // Check if user actually dragged/panned
       const isDrag = hasDraggedRef.current;
@@ -828,22 +847,31 @@ export function HeroInteractive({
         const caseSysPins = customPinsRef.current ?? activeCaseRef.current.pins;
         let bestHitPin: PinPoint | null = null;
 
-        // Check all system/custom pins in reverse order (topmost z-index visual element hits first)
-        for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
-          const pin = caseSysPins[index];
-          const pinPosition = getPinWorldPosition(pin, bounds);
+        // Nếu lúc pointerdown đã nhận diện trúng pin, dùng lại pin đó
+        if (initialClickedPinId) {
+          bestHitPin =
+            caseSysPins.find((p) => p.id === initialClickedPinId) || null;
+        }
 
-          if (isPinHit(worldPointer, pinPosition, pin, transform, bounds)) {
-            bestHitPin = pin;
-            break;
+        // Nếu chưa có, check tất cả system/custom pins in reverse order
+        if (!bestHitPin) {
+          for (let index = caseSysPins.length - 1; index >= 0; index -= 1) {
+            const pin = caseSysPins[index];
+            const pinPosition = getPinWorldPosition(pin, bounds);
+
+            if (isPinHit(worldPointer, pinPosition, pin, transform, bounds)) {
+              bestHitPin = pin;
+              break;
+            }
           }
         }
 
         if (bestHitPin) {
-          if (isEditModeRef.current && onSelectPinRef.current) {
-            onSelectPinRef.current(bestHitPin.id);
-          }
-          if (onPinClickRef.current) {
+          if (isEditModeRef.current) {
+            if (onSelectPinRef.current) {
+              onSelectPinRef.current(bestHitPin.id);
+            }
+          } else if (onPinClickRef.current) {
             try {
               event.preventDefault();
               event.stopPropagation();

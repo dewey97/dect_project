@@ -414,7 +414,6 @@ export default function WebEvidencePage() {
 
       {/* QUICK ACTION FAB MENU */}
       <QuickActionFab
-        onOpenPhone={() => setActiveModal("phone")}
         onOpenBoardGame={() => {
           detectiveAudio.playPaperRustle();
           router.push("/evidence/boardgame");

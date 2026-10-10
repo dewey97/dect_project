@@ -7,46 +7,12 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Move,
-  Plus,
-  Save,
-  RotateCcw,
-  RotateCw,
-  Minus,
-  Pencil,
-  Volume2,
-  VolumeX,
-  Eye,
-  EyeOff,
-  RefreshCw,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   HeroInteractive,
   type PinPoint,
-  type CaseConnection,
 } from "@/components/investigation/hero-interactive";
-import { AddSuspectModal } from "./add-suspect-modal";
-import { PhoneLookupModal } from "./phone-lookup-modal";
-import { PhoneNarrativeModal } from "./phone-narrative-modal";
-import { DossierEModal } from "./dossier-e-modal";
-import { EvidenceGuideModal } from "./evidence-guide-modal";
-import { GameplayGuideModal } from "./gameplay-guide-modal";
-import { InteractiveWalkthrough } from "./interactive-walkthrough";
-import { IndictmentModal } from "./indictment-modal";
-import { CulpritEpilogueModal } from "./culprit-epilogue-modal";
-import { DossierResultModal } from "./dossier-result-modal";
-import { FollowupQuestionModal } from "./followup-question-modal";
-import { AdminCreatePinModal } from "./admin-create-pin-modal";
-import { CustomPinModal } from "./custom-pin-modal";
-import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
-import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
-import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { getCanonicalSuspectKey } from "@/lib/cases/case-000-suspects";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import { toast } from "@/components/ui/toast";
 import { normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { setStorageItem } from "@/lib/storage";
@@ -56,7 +22,6 @@ import { useBoardLayout } from "./canvas/use-board-layout";
 import {
   useInvestigationState,
   ALL_CASE_000_SUSPECTS,
-  type CulpritKey,
 } from "./canvas/use-investigation-state";
 import {
   buildCustomPins,
@@ -65,6 +30,9 @@ import {
   findFollowupCulprit,
   detectCheckpointForPin,
 } from "./canvas/pin-builder";
+import { CanvasToolbar } from "./canvas/canvas-toolbar";
+import { CanvasModals } from "./canvas/canvas-modals";
+import { CanvasPhotoZoom } from "./canvas/canvas-photo-zoom";
 
 interface MainInvestigationCanvasProps {
   onOpenPhoneSimulator?: () => void;
@@ -77,8 +45,6 @@ export function MainInvestigationCanvas({
   onOpenReinvestigation,
   onOpenEpilogue,
 }: MainInvestigationCanvasProps) {
-  const router = useRouter();
-
   const layout = useBoardLayout();
   const state = useInvestigationState({
     onOpenReinvestigation,
@@ -124,18 +90,6 @@ export function MainInvestigationCanvas({
     },
     [],
   );
-
-  useEffect(() => {
-    if (!zoomedPhotoUrl) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        detectiveAudio.playPaperRustle();
-        setZoomedPhotoUrl(null);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [zoomedPhotoUrl]);
 
   useEffect(() => {
     const handleGuideShortcut = (e: KeyboardEvent) => {
@@ -554,225 +508,28 @@ export function MainInvestigationCanvas({
           : ""
       }`}
     >
-      <div
-        className="absolute left-4 z-20 flex items-center gap-2 pointer-events-none"
-        style={{ top: "max(12px, env(safe-area-inset-top, 12px))" }}
-      >
-        <div className="flex items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto">
-          <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-          <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
-        </div>
+      {/* 1. Header Toolbar & Floating Node Toolbar */}
+      <CanvasToolbar
+        layout={layout}
+        state={state}
+        isAudioMuted={isAudioMuted}
+        onToggleAudio={() => {
+          const next = detectiveAudio.toggleMute();
+          setIsAudioMuted(next);
+        }}
+        selectedPin={selectedPin}
+        displayPins={displayPins}
+        onOpenCreatePinModal={() => {
+          setEditingCustomPin(null);
+          setIsCreatePinModalOpen(true);
+        }}
+        onEditSelectedPin={(pin) => {
+          setEditingCustomPin(pin);
+          setIsCreatePinModalOpen(true);
+        }}
+      />
 
-        <button
-          type="button"
-          onClick={() => {
-            const next = detectiveAudio.toggleMute();
-            setIsAudioMuted(next);
-          }}
-          className="p-1.5 bg-[#1b140e]/85 hover:bg-[#342417] backdrop-blur-md border border-[#593c26]/60 text-[#d9a066] transition-colors cursor-pointer rounded-lg shadow-lg pointer-events-auto flex items-center justify-center"
-          title={
-            isAudioMuted ? "Bật âm thanh trinh thám" : "Tắt âm thanh trinh thám"
-          }
-        >
-          {isAudioMuted ? (
-            <VolumeX className="size-4 text-amber-500/60" />
-          ) : (
-            <Volume2 className="size-4 text-amber-400" />
-          )}
-        </button>
-
-        {layout.isAdmin && (
-          <div className="flex items-center gap-1.5 bg-[#141419]/90 backdrop-blur-md p-1 rounded-lg border border-amber-500/40 text-xs shadow-xl pointer-events-auto">
-            <button
-              onClick={() => {
-                detectiveAudio.playTypewriterClick();
-                layout.setIsEditMode((prev) => {
-                  const next = !prev;
-                  if (!next) layout.setSelectedPinId(null);
-                  return next;
-                });
-              }}
-              className={`p-1.5 rounded-lg border transition-all ${
-                layout.isEditMode
-                  ? "bg-amber-500/30 border-amber-400 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.55)] ring-1 ring-amber-400/60"
-                  : "bg-black/40 border-white/10 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
-              }`}
-              title={
-                layout.isEditMode
-                  ? "Thoát chế độ di chuyển & setup"
-                  : "Bật chế độ di chuyển & setup node"
-              }
-            >
-              <Move className="size-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                detectiveAudio.playTypewriterClick();
-                state.setIsShowAllPinsPreview((prev) => {
-                  const next = !prev;
-                  toast.info(
-                    next
-                      ? "Đã hiển thị toàn bộ node vụ án (Preview Setup)"
-                      : "Đã trở về chế độ hiển thị theo tiến trình cốt truyện",
-                  );
-                  return next;
-                });
-              }}
-              className={`p-1.5 rounded-lg border transition-all ${
-                state.isShowAllPinsPreview
-                  ? "bg-amber-500/30 border-amber-400 text-amber-200 shadow-[0_0_14px_rgba(245,158,11,0.55)] ring-1 ring-amber-400/60"
-                  : "bg-black/40 border-white/10 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
-              }`}
-              title={
-                state.isShowAllPinsPreview
-                  ? "Tắt hiển thị tất cả node (về theo cốt truyện)"
-                  : "Hiển thị tất cả node ghim (phục vụ căn chỉnh setup)"
-              }
-            >
-              {state.isShowAllPinsPreview ? (
-                <EyeOff className="size-4 text-amber-300" />
-              ) : (
-                <Eye className="size-4 text-zinc-400 hover:text-zinc-200" />
-              )}
-            </button>
-
-            {layout.isEditMode && (
-              <>
-                <button
-                  onClick={() => {
-                    detectiveAudio.playTypewriterClick();
-                    setEditingCustomPin(null);
-                    setIsCreatePinModalOpen(true);
-                  }}
-                  className="p-1.5 rounded-lg border border-amber-500/50 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors shadow-sm"
-                  title="Thêm ghi chú dính, giấy trắng A4 hoặc ảnh Polaroid"
-                >
-                  <Plus className="size-4" />
-                </button>
-
-                <button
-                  disabled={layout.isSavingLayout}
-                  onClick={() => layout.handleSavePinLayout(displayPins)}
-                  className={`p-1.5 rounded-lg border transition-all ${
-                    layout.hasUnsavedChanges
-                      ? "bg-emerald-600/80 border-emerald-400 text-white hover:bg-emerald-500 shadow-sm animate-pulse"
-                      : "bg-black/40 border-white/10 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
-                  }`}
-                  title={
-                    layout.isSavingLayout
-                      ? "Đang lưu vị trí..."
-                      : "Lưu vị trí ghim"
-                  }
-                >
-                  <Save className="size-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={layout.handleForceResetLayout}
-                  className="p-1.5 rounded-lg border border-white/10 bg-black/40 text-zinc-400 hover:text-amber-300 hover:border-amber-400/40 hover:bg-zinc-800 transition-colors"
-                  title="Ép cập nhật & Khôi phục layout mới nhất từ hệ thống (Xóa cache cục bộ)"
-                >
-                  <RefreshCw className="size-4" />
-                </button>
-
-                {layout.hasUnsavedChanges && (
-                  <button
-                    onClick={() => {
-                      detectiveAudio.playPaperRustle();
-                      layout.setCustomPinPositions({});
-                      layout.setHasUnsavedChanges(false);
-                    }}
-                    className="p-1.5 rounded-lg border border-red-500/30 bg-red-950/40 text-red-400 hover:bg-red-900/60 hover:text-red-200 transition-colors"
-                    title="Hoàn tác (hủy các vị trí vừa kéo thả chưa lưu)"
-                  >
-                    <RotateCcw className="size-4" />
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      <AnimatePresence>
-        {layout.isEditMode && selectedPin && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center gap-0.5 p-0.5 bg-[#1b140e]/95 backdrop-blur-md rounded-lg border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
-            style={{
-              top: "calc(max(12px, env(safe-area-inset-top, 12px)) + 44px)",
-            }}
-          >
-            <button
-              type="button"
-              onClick={() =>
-                layout.handleAdjustNodeTransform(selectedPin.id, -1, 0)
-              }
-              className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Xoay nghiêng trái (-1°)"
-            >
-              <RotateCcw className="size-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                layout.handleAdjustNodeTransform(selectedPin.id, 1, 0)
-              }
-              className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Xoay nghiêng phải (+1°)"
-            >
-              <RotateCw className="size-3.5" />
-            </button>
-
-            <div className="h-3.5 w-px bg-white/15" />
-
-            <button
-              type="button"
-              onClick={() =>
-                layout.handleAdjustNodeTransform(selectedPin.id, 0, -0.1)
-              }
-              className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Thu nhỏ kích thước"
-            >
-              <Minus className="size-3.5" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                layout.handleAdjustNodeTransform(selectedPin.id, 0, 0.1)
-              }
-              className="p-1 rounded-md bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 hover:border-amber-500/40 transition-colors"
-              title="Phóng to kích thước"
-            >
-              <Plus className="size-3.5" />
-            </button>
-
-            <div className="h-3.5 w-px bg-white/15" />
-
-            <button
-              type="button"
-              onClick={() => {
-                detectiveAudio.playTypewriterClick();
-                setEditingCustomPin(selectedPin);
-                setIsCreatePinModalOpen(true);
-              }}
-              className="p-1 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 transition-colors"
-              title="Chỉnh sửa chi tiết nội dung node"
-            >
-              <Pencil className="size-3.5" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      {/* 2. Interactive Pinboard Canvas */}
       <HeroInteractive
         className="w-full h-full flex-1 min-h-0"
         controlledCaseId="case-000"
@@ -787,257 +544,27 @@ export function MainInvestigationCanvas({
         onPinPositionChange={layout.handlePinPositionChange}
       />
 
-      <AddSuspectModal
-        key={
-          state.isAddSuspectOpen
-            ? state.editingSuspect
-              ? `suspect-${state.editingSuspect.id}`
-              : "new-suspect-form"
-            : "suspect-modal-closed"
-        }
-        isOpen={state.isAddSuspectOpen}
-        onClose={() => {
-          state.setIsAddSuspectOpen(false);
-          state.setEditingSuspect(null);
-        }}
-        onSave={state.handleSaveSuspect}
-        onDelete={state.handleDeleteSuspect}
-        editingSuspect={state.editingSuspect}
-        existingSuspects={state.suspects}
-        onSelectSuspect={(s) => state.setEditingSuspect(s)}
-        isPhoneSolved={state.phoneLookupSuccess}
-        onSubmitConclusion={(culprit) => {
-          detectiveAudio.playStampSound();
-          detectiveAudio.playUnlockJingle();
-          state.setInvestigatedSuspects((prev) => {
-            const next = Array.from(
-              new Set([...prev, culprit]),
-            ) as CulpritKey[];
-            setStorageItem("investigated_suspects", JSON.stringify(next));
-            return next;
-          });
-          state.setNarrativeCulprit(culprit);
-          state.setActiveFollowupCulprit(culprit);
-          state.setIsEpilogueOpen(true);
-        }}
+      {/* 3. Modals & Narrative Layers */}
+      <CanvasModals
+        layout={layout}
+        state={state}
+        displayPins={displayPins}
+        isCreatePinModalOpen={isCreatePinModalOpen}
+        setIsCreatePinModalOpen={setIsCreatePinModalOpen}
+        editingCustomPin={editingCustomPin}
+        setEditingCustomPin={setEditingCustomPin}
+        activeCustomPinModal={activeCustomPinModal}
+        setActiveCustomPinModal={setActiveCustomPinModal}
+        onOpenPhoneSimulator={onOpenPhoneSimulator}
       />
 
-      <PhoneLookupModal
-        isOpen={state.isPhoneLookupOpen}
-        onClose={() => state.setIsPhoneLookupOpen(false)}
-        onSuccess={state.handlePhoneLookupSuccess}
-        onOpenPhoneSimulator={
-          onOpenPhoneSimulator || (() => state.setIsInternalPhoneOpen(true))
-        }
+      {/* 4. Zoomed Photo Lightbox Modal */}
+      <CanvasPhotoZoom
+        zoomedPhotoUrl={zoomedPhotoUrl}
+        zoomOrigin={zoomOrigin}
+        zoomOpenTimeRef={zoomOpenTimeRef}
+        onClose={() => setZoomedPhotoUrl(null)}
       />
-
-      <PhoneNarrativeModal
-        isOpen={state.isPhoneNarrativeOpen}
-        onClose={() => state.setIsPhoneNarrativeOpen(false)}
-        onTakeTestimony={() => state.setIsDossierEOpen(true)}
-      />
-
-      <PhoneModal
-        isOpen={state.isInternalPhoneOpen}
-        onClose={() => state.setIsInternalPhoneOpen(false)}
-      />
-
-      <DossierEModal
-        isOpen={state.isDossierEOpen}
-        onClose={() => state.setIsDossierEOpen(false)}
-      />
-
-      <EvidenceGuideModal
-        isOpen={state.isEvidenceGuideOpen}
-        onClose={() => state.setIsEvidenceGuideOpen(false)}
-        isPhoneSolved={state.phoneLookupSuccess}
-        isReinvestigateUnlocked={state.isReinvestigateUnlocked}
-      />
-
-      <ReinvestigationModal
-        isOpen={state.isReinvestigateModalOpen}
-        onClose={() => state.setIsReinvestigateModalOpen(false)}
-      />
-
-      <IndictmentModal
-        isOpen={state.isIndictmentOpen}
-        onClose={() => state.setIsIndictmentOpen(false)}
-        onSubmitIndictment={state.handleSubmitIndictment}
-        isPhoneSolved={state.phoneLookupSuccess}
-      />
-
-      <CulpritEpilogueModal
-        isOpen={state.isEpilogueOpen}
-        culprit={
-          state.narrativeCulprit ||
-          state.activeFollowupCulprit ||
-          state.solvedCulprit
-        }
-        choice={state.narrativeChoice}
-        onClose={() => {
-          state.setIsEpilogueOpen(false);
-          state.setNarrativeCulprit(null);
-          state.setNarrativeChoice(null);
-        }}
-        onOpenDossier={state.handleOpenDossier}
-        onOpenFollowupQuestion={(targetCulprit) => {
-          const c =
-            targetCulprit ||
-            state.narrativeCulprit ||
-            state.activeFollowupCulprit ||
-            state.solvedCulprit ||
-            "vu";
-          state.setActiveFollowupCulprit(c);
-          state.setIsEpilogueOpen(false);
-          state.setNarrativeCulprit(null);
-          state.setNarrativeChoice(null);
-          state.setIsFollowupQuestionOpen(true);
-        }}
-        onOpenIndictment={() => {
-          state.setIsEpilogueOpen(false);
-          state.setNarrativeCulprit(null);
-          state.setNarrativeChoice(null);
-          state.setIsIndictmentOpen(true);
-        }}
-      />
-
-      <DossierResultModal
-        isOpen={state.isDossierOpen}
-        dossierType={state.activeDossierType}
-        onClose={() => state.setIsDossierOpen(false)}
-        onOpenFollowupQuestion={() => {
-          state.setIsDossierOpen(false);
-          const c =
-            state.activeDossierType === "A"
-              ? "vu"
-              : state.activeDossierType === "B"
-                ? "tung"
-                : "ha";
-          state.setActiveFollowupCulprit(c);
-          state.setIsFollowupQuestionOpen(true);
-        }}
-      />
-
-      <FollowupQuestionModal
-        key={
-          state.isFollowupQuestionOpen
-            ? `followup-${state.activeFollowupCulprit || state.narrativeCulprit || state.solvedCulprit || "vu"}`
-            : "followup-modal-closed"
-        }
-        isOpen={state.isFollowupQuestionOpen}
-        culprit={
-          state.activeFollowupCulprit ||
-          state.narrativeCulprit ||
-          state.solvedCulprit ||
-          "vu"
-        }
-        onClose={() => {
-          state.setIsFollowupQuestionOpen(false);
-          state.setActiveFollowupCulprit(null);
-        }}
-        onSuccess={state.handleFollowupSuccess}
-        onOpenDossier={state.handleOpenDossier}
-        isPhoneSolved={state.phoneLookupSuccess}
-      />
-
-      <EpilogueModal
-        isOpen={state.isFinalEpilogueOpen}
-        onClose={() => state.setIsFinalEpilogueOpen(false)}
-      />
-
-      <AdminCreatePinModal
-        isOpen={isCreatePinModalOpen}
-        onClose={() => {
-          setIsCreatePinModalOpen(false);
-          setEditingCustomPin(null);
-        }}
-        onSavePin={layout.handleSaveAdminPin}
-        onDeletePin={layout.handleDeleteAdminPin}
-        initialPin={editingCustomPin}
-      />
-
-      <CustomPinModal
-        isOpen={activeCustomPinModal !== null}
-        onClose={() => setActiveCustomPinModal(null)}
-        pin={activeCustomPinModal}
-        onSolve={(_pinId) => {
-          toast.success("Đã hoàn thành câu hỏi ghim!");
-        }}
-      />
-
-      <GameplayGuideModal
-        isOpen={state.isGameplayGuideOpen}
-        onClose={() => state.setIsGameplayGuideOpen(false)}
-        onStartWalkthrough={() => {
-          state.setIsGameplayGuideOpen(false);
-          state.setIsWalkthroughOpen(true);
-        }}
-      />
-
-      <InteractiveWalkthrough
-        isOpen={state.isWalkthroughOpen}
-        onClose={() => {
-          state.setIsWalkthroughOpen(false);
-          layout.setSelectedPinId(null);
-        }}
-        pins={displayPins}
-        canvasWrapperRef={layout.canvasWrapperRef}
-        onStepChange={(targetPinId) => {
-          layout.setSelectedPinId(targetPinId);
-        }}
-      />
-
-      <AnimatePresence>
-        {zoomedPhotoUrl && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (Date.now() - zoomOpenTimeRef.current < 120) return;
-              detectiveAudio.playPaperRustle();
-              setZoomedPhotoUrl(null);
-            }}
-            className="fixed inset-0 z-[1000] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 cursor-pointer select-none"
-          >
-            <motion.div
-              initial={{
-                scale: 0.2,
-                opacity: 0.2,
-                x: zoomOrigin?.x ?? 0,
-                y: zoomOrigin?.y ?? 0,
-              }}
-              animate={{
-                scale: 1,
-                opacity: 1,
-                x: 0,
-                y: 0,
-              }}
-              exit={{
-                scale: 0.2,
-                opacity: 0,
-                x: zoomOrigin?.x ?? 0,
-                y: zoomOrigin?.y ?? 0,
-              }}
-              transition={{
-                type: "spring",
-                damping: 25,
-                stiffness: 320,
-                mass: 0.8,
-              }}
-              className="relative max-w-[92vw] max-h-[90vh] flex items-center justify-center"
-            >
-              <img
-                src={zoomedPhotoUrl}
-                alt="Ảnh tư liệu phóng to"
-                className="max-h-[85vh] max-w-[85vw] object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)] pointer-events-none select-none"
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
