@@ -57,17 +57,20 @@ export function normalizeMediaUrl(url: string | undefined | null): string {
   }
 
   // Google Drive /file/d/{id}/view, /file/d/{id}
+  let driveId = "";
   const driveFileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (driveFileMatch && driveFileMatch[1]) {
-    return `https://docs.google.com/uc?export=download&id=${driveFileMatch[1]}`;
-  }
-
-  // Google Drive id query parameter: ?id={id} or &id={id}
-  if (trimmed.includes("drive.google.com")) {
+    driveId = driveFileMatch[1];
+  } else if (trimmed.includes("drive.google.com")) {
     const driveIdMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
     if (driveIdMatch && driveIdMatch[1]) {
-      return `https://docs.google.com/uc?export=download&id=${driveIdMatch[1]}`;
+      driveId = driveIdMatch[1];
     }
+  }
+
+  if (driveId) {
+    // Luôn ưu tiên dùng proxy nội bộ của Next.js để stream mượt, bypass sandbox và CORS của Drive
+    return `/api/image-proxy?id=${driveId}`;
   }
 
   return trimmed;

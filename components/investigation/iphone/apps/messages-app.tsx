@@ -528,7 +528,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                     </div>
                   )}
 
-                  {/* ATTACHMENT: VIDEO */}
+                  {/* ATTACHMENT: VIDEO / ANIMATED GIF */}
                   {attachment?.type === "video" && (
                     <div
                       onClick={() =>
@@ -543,10 +543,30 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                         isMe ? "rounded-br-[4px]" : "rounded-bl-[4px]",
                       )}
                     >
-                      <div className="size-10 rounded-full bg-white/80 group-hover:bg-white text-[#1A1B1F] flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                        <Play className="size-5 fill-current ml-0.5" />
+                      {/* If it's a GIF or image proxy, render the live animated preview */}
+                      {attachment.url.includes("lh3.googleusercontent.com") || attachment.url.includes("image-proxy") || attachment.url.endsWith(".gif") ? (
+                        <img
+                          src={attachment.url}
+                          alt="Video Preview"
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <video
+                          src={attachment.url}
+                          className="w-full h-full object-cover"
+                          muted
+                          playsInline
+                        />
+                      )}
+
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                        <div className="size-10 rounded-full bg-white/80 group-hover:bg-white text-[#1A1B1F] flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                          <Play className="size-5 fill-current ml-0.5" />
+                        </div>
                       </div>
-                      <span className="absolute bottom-1.5 left-2 text-[10px] text-white/90 font-medium flex items-center gap-1 bg-black/40 px-1.5 py-0.5 rounded">
+
+                      <span className="absolute bottom-1.5 left-2 text-[10px] text-white/90 font-medium flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded backdrop-blur-xs">
                         <Film className="size-3" /> Video
                       </span>
                       {isPinned && (
@@ -757,7 +777,10 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             </div>
 
             <div className="w-full rounded-xl overflow-hidden bg-black/40 border border-white/10 shadow-2xl flex items-center justify-center max-h-[460px]">
-              {mediaPreview.type === "image" ? (
+              {mediaPreview.type === "image" ||
+              mediaPreview.url.includes("lh3.googleusercontent.com") ||
+              mediaPreview.url.includes("image-proxy") ||
+              mediaPreview.url.endsWith(".gif") ? (
                 <img
                   src={mediaPreview.url}
                   alt="Xem chi tiết"
@@ -768,6 +791,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                   src={mediaPreview.url}
                   controls
                   autoPlay
+                  playsInline
                   className="w-full max-h-[460px] object-contain"
                 />
               )}

@@ -34,7 +34,7 @@ export function IPhoneHomeScreen({
   unreadMessages = 1,
   missedCalls = 0,
 }: IPhoneHomeScreenProps) {
-  // 16 Apps on Home Screen (Exact match with Figma Frame 14:31)
+  // Only apps with REAL investigation / gameplay functionality
   const gridApps: AppItem[] = [
     // Row 1
     {
@@ -43,12 +43,6 @@ export function IPhoneHomeScreen({
       icon: "/images/cases/case_000/phone/icons/messages.png",
       appTarget: "messages",
       badge: unreadMessages > 0 ? unreadMessages : undefined,
-    },
-    {
-      id: "calendar",
-      name: "Calendar",
-      icon: "/images/cases/case_000/phone/icons/calendar.png",
-      appTarget: null,
     },
     {
       id: "photos",
@@ -62,34 +56,14 @@ export function IPhoneHomeScreen({
       icon: "/images/cases/case_000/phone/icons/camera.png",
       appTarget: "photos",
     },
-
-    // Row 2
-    {
-      id: "weather",
-      name: "Weather",
-      icon: "/images/cases/case_000/phone/icons/weather.png",
-      appTarget: null,
-    },
-    {
-      id: "clock",
-      name: "Clock",
-      icon: "/images/cases/case_000/phone/icons/clock.png",
-      appTarget: null,
-    },
     {
       id: "maps",
       name: "Maps",
       icon: "/images/cases/case_000/phone/icons/maps.png",
       appTarget: "maps",
     },
-    {
-      id: "videos",
-      name: "Videos",
-      icon: "/images/cases/case_000/phone/icons/videos.png",
-      appTarget: null,
-    },
 
-    // Row 3
+    // Row 2
     {
       id: "notes",
       name: "Notes",
@@ -97,48 +71,16 @@ export function IPhoneHomeScreen({
       appTarget: "notes",
     },
     {
-      id: "reminders",
-      name: "Reminders",
-      icon: "/images/cases/case_000/phone/icons/reminders.png",
-      appTarget: "notes",
-    },
-    {
-      id: "stocks",
-      name: "Stocks",
-      icon: "/images/cases/case_000/phone/icons/stocks.png",
-      appTarget: null,
-    },
-    {
       id: "wallet",
       name: "Wallet",
       icon: "/images/cases/case_000/phone/icons/wallet.png",
       appTarget: "banking",
     },
-
-    // Row 4
     {
-      id: "ibooks",
-      name: "iBooks",
-      icon: "/images/cases/case_000/phone/icons/ibooks.png",
-      appTarget: null,
-    },
-    {
-      id: "itunes",
-      name: "iTunes Store",
-      icon: "/images/cases/case_000/phone/icons/itunes.png",
-      appTarget: null,
-    },
-    {
-      id: "appstore",
-      name: "App Store",
-      icon: "/images/cases/case_000/phone/icons/appstore.png",
-      appTarget: null,
-    },
-    {
-      id: "health",
-      name: "Health",
-      icon: "/images/cases/case_000/phone/icons/health.png",
-      appTarget: null,
+      id: "settings",
+      name: "Settings",
+      icon: "/images/cases/case_000/phone/icons/settings.png",
+      appTarget: "settings",
     },
   ];
 
