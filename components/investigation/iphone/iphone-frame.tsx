@@ -26,7 +26,6 @@ import type {
 // Apps
 import { MessagesApp } from "./apps/messages-app";
 import { PhoneApp } from "./apps/phone-app";
-import { VoicemailApp } from "./apps/voicemail-app";
 import { SafariApp } from "./apps/safari-app";
 import { NotesApp } from "./apps/notes-app";
 import { PhotosApp } from "./apps/photos-app";
@@ -91,6 +90,10 @@ export function IPhoneFrame({
     }
     lockDragStartY.current = null;
   };
+
+  // Light status bar (black text) on light-theme apps per Figma spec
+  const isLightStatusBar =
+    !isLocked && (activeApp === "phone" || activeApp === "messages");
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-hidden py-0 sm:py-1">
@@ -217,26 +220,68 @@ export function IPhoneFrame({
           {/* Authentic iOS Vignette Gradient (Figma Node 14:39) */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/15 pointer-events-none z-0" />
 
-          {/* iOS TOP STATUS BAR (Only shown when inside an app or on lockscreen) */}
+          {/* iOS TOP STATUS BAR (Figma spec: height 20px, pad [0,8px]) */}
           {(activeApp !== null || isLocked) && (
-            <div className="relative z-30 h-6 px-3 flex items-center justify-between text-white text-[11px] font-sans tracking-tight shrink-0 bg-transparent select-none pt-1">
+            <div
+              className={cn(
+                "relative z-30 h-[20px] px-2 flex items-center justify-between text-[11px] font-sans tracking-tight shrink-0 select-none",
+                isLightStatusBar
+                  ? "bg-[#FFFFFF] text-black"
+                  : "bg-transparent text-white",
+              )}
+            >
               {/* Left: 5 Signal Dots + Carrier + Wi-Fi */}
               <div
                 className="flex items-center gap-1.5"
                 title="Trạng thái mạng: giffgaff"
               >
                 <div className="flex items-center gap-[2.5px]">
-                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
-                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
-                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
-                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
-                  <span className="size-1.5 rounded-full bg-white shadow-sm inline-block" />
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full shadow-sm inline-block",
+                      isLightStatusBar ? "bg-black" : "bg-white",
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full shadow-sm inline-block",
+                      isLightStatusBar ? "bg-black" : "bg-white",
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full shadow-sm inline-block",
+                      isLightStatusBar ? "bg-black" : "bg-white",
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full shadow-sm inline-block",
+                      isLightStatusBar ? "bg-black" : "bg-white",
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full shadow-sm inline-block",
+                      isLightStatusBar ? "bg-black" : "bg-white",
+                    )}
+                  />
                 </div>
-                <span className="font-medium text-[10px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] ml-0.5">
+                <span
+                  className={cn(
+                    "font-medium text-[10px] ml-0.5",
+                    isLightStatusBar
+                      ? "text-black"
+                      : "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]",
+                  )}
+                >
                   giffgaff
                 </span>
                 <svg
-                  className="size-3 text-white fill-current drop-shadow"
+                  className={cn(
+                    "size-3 fill-current",
+                    isLightStatusBar ? "text-black" : "text-white drop-shadow",
+                  )}
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0012 4zm0 4.5c3.31 0 6.3 1.34 8.49 3.51L12 20.49 3.51 12.01A11.91 11.91 0 0112 8.5z" />
@@ -244,18 +289,48 @@ export function IPhoneFrame({
               </div>
 
               {/* Center: Clock 12:35 */}
-              <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[11.5px] text-white tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-sans">
+              <div
+                className={cn(
+                  "absolute left-1/2 -translate-x-1/2 font-semibold text-[11.5px] tracking-tight font-sans",
+                  isLightStatusBar
+                    ? "text-black"
+                    : "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]",
+                )}
+              >
                 12:35
               </div>
 
               {/* Right: Bluetooth + 20% + Solid Battery */}
-              <div className="flex items-center gap-1 text-white font-semibold">
-                <span className="text-[9.5px] font-sans text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] font-medium">
+              <div
+                className={cn(
+                  "flex items-center gap-1 font-semibold",
+                  isLightStatusBar ? "text-black" : "text-white",
+                )}
+              >
+                <span
+                  className={cn(
+                    "text-[9.5px] font-sans font-medium",
+                    !isLightStatusBar &&
+                      "drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]",
+                  )}
+                >
                   20%
                 </span>
-                <div className="w-5 h-2.5 rounded-[3px] border border-white/90 p-[1px] relative flex items-center shadow-sm bg-black/20">
+                <div
+                  className={cn(
+                    "w-5 h-2.5 rounded-[3px] p-[1px] relative flex items-center shadow-sm",
+                    isLightStatusBar
+                      ? "border border-black/80 bg-black/10"
+                      : "border border-white/90 bg-black/20",
+                  )}
+                >
                   <div className="h-full w-[20%] bg-[#FF3B30] rounded-[1px]" />
-                  <div className="absolute -right-[3px] top-[2px] w-[2px] h-[4px] bg-white/90 rounded-r-[1px]" />
+                  <div
+                    className={cn(
+                      "absolute -right-[3px] top-[2px] w-[2px] h-[4px] rounded-r-[1px]",
+                      isLightStatusBar ? "bg-black/80" : "bg-white/90",
+                    )}
+                  />
                 </div>
               </div>
             </div>
@@ -413,10 +488,7 @@ export function IPhoneFrame({
               /* 2. ACTIVE APP RUNNING */
               <div className="flex-1 min-h-0 flex flex-col h-full bg-black overflow-hidden">
                 {activeApp === "messages" && (
-                  <MessagesApp
-                    threads={threads}
-                    onBackToHome={() => setActiveApp(null)}
-                  />
+                  <MessagesApp onBackToHome={() => setActiveApp(null)} />
                 )}
                 {activeApp === "phone" && (
                   <PhoneApp onBackToHome={() => setActiveApp(null)} />

@@ -1,66 +1,41 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  ArrowLeft,
   ChevronLeft,
   Search,
   ChevronRight,
   Info,
-  CheckCircle2,
-  Circle,
-  Pin,
-  Trash2,
-  CheckCheck,
-  Play,
-  Pause,
-  BellOff,
   BookmarkCheck,
   X,
   ShieldAlert,
   Loader2,
   SquarePen,
 } from "lucide-react";
-import type { Conversation, Message } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { detectiveAudio } from "@/lib/investigation-audio";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { getStorageJson, setStorageJson } from "@/lib/storage";
 
 interface MessagesAppProps {
-  threads?: Conversation[];
   onBackToHome?: () => void;
 }
 
 export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   const [selectedThread, setSelectedThread] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [selectedThreadIds, setSelectedThreadIds] = useState<string[]>([]);
-
-  // Voice note interactive playback
-  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null);
-  const [playbackProgress, setPlaybackProgress] = useState(0);
-
-  // Modals
   const [inspectingClue, setInspectingClue] = useState<any | null>(null);
-  const [previewImage, setPreviewImage] = useState<{
-    url: string;
-    title?: string;
-  } | null>(null);
   const [pinnedClueIds, setPinnedClueIds] = useState<string[]>([]);
   const [pinnedNotification, setPinnedNotification] = useState<string | null>(
     null,
   );
 
-  // Fetch conversations live from Google Sheets
+  // Fetch messages live from Google Sheets CMS
   const { data: rawMessagesData, loading, error } = usePhoneData("messages");
 
-  // Map 1-row-per-person human-readable schema into conversation threads
+  // Map CMS rows to thread objects
   const threads = rawMessagesData.map((item: any, idx: number) => {
     let parsedMessages: any[] = [];
 
-    // 1. Support legacy JSON if present
     if (item.messages_json) {
       try {
         parsedMessages =
@@ -70,17 +45,16 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
       } catch {}
     }
 
-    // 2. Support Proposal 1 Multiline Text Format: "> (Timestamp) Text [CLUE: Title | Analysis]" or "(Timestamp) Text"
     if (parsedMessages.length === 0 && item.messages_text) {
       const lines = String(item.messages_text)
         .split("\n")
         .map((l) => l.trim())
         .filter(Boolean);
+
       parsedMessages = lines.map((line, mIdx) => {
-        let isSent = line.startsWith(">");
+        const isSent = line.startsWith(">");
         let cleanLine = isSent ? line.substring(1).trim() : line;
 
-        // Extract clue if present at end of line: [CLUE: Title | Analysis]
         let clueTitle = "";
         let clueAnalysis = "";
         let isClue = false;
@@ -97,7 +71,6 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             .trim();
         }
 
-        // Extract timestamp in parentheses at start: (04/05 • 14:15) or (14:15)
         let timestamp = "";
         const tsMatch = cleanLine.match(/^\(([^)]+)\)\s*(.*)$/);
         let text = cleanLine;
@@ -107,11 +80,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           text = tsMatch[2].trim();
         }
 
-        const sender = isSent ? "Khang" : item.contact_name || "Khác";
-
         return {
           id: `msg-${idx}-${mIdx}`,
-          sender,
+          sender: isSent ? "Khang" : item.contact_name || "Khác",
           role: isSent ? "sent" : "received",
           text,
           timestamp,
@@ -122,12 +93,13 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
       });
     }
 
+    const isUnread = item.unread === "TRUE" || item.unread === true;
+
     return {
       id: item.message_id || `conv-${idx + 1}`,
       name: item.contact_name || item.name || "Không tên",
       phoneNumber: item.phone_number || "",
-      avatarColor: item.avatar_color || "from-[#3A3A3C] to-[#636366]",
-      unread: item.unread === "TRUE" || item.unread === true,
+      unread: isUnread,
       timestamp: item.timestamp || "",
       previewText:
         item.preview_text ||
@@ -147,37 +119,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     };
   });
 
-  // Load pinned clues from storage
   useEffect(() => {
     setPinnedClueIds(getStorageJson<string[]>("khang_phone_pinned_clues", []));
   }, []);
-
-  // Audio playback ticker
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (playingAudioId) {
-      timer = setInterval(() => {
-        setPlaybackProgress((prev) => {
-          if (prev >= 100) {
-            setPlayingAudioId(null);
-            return 0;
-          }
-          return prev + 3;
-        });
-      }, 250);
-    }
-    return () => clearInterval(timer);
-  }, [playingAudioId]);
-
-  const togglePlayAudio = (msg: any) => {
-    if (playingAudioId === msg.id) {
-      setPlayingAudioId(null);
-    } else {
-      setPlayingAudioId(msg.id);
-      setPlaybackProgress(0);
-      detectiveAudio.playRadioBeep();
-    }
-  };
 
   const togglePinClue = (clueId: string, title?: string) => {
     setPinnedClueIds((prev) => {
@@ -202,37 +146,33 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   );
 
   return (
-    <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans relative">
+    <div className="flex flex-col h-full bg-[#FAF9FE] text-[#1A1B1F] select-none overflow-hidden font-sans relative">
+      {/* Pinned Clue Toast Notification */}
       {pinnedNotification && (
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-50 px-3 py-1.5 rounded-full bg-[#1C1C1E]/95 border border-[#30D158]/40 shadow-xl text-[11px] text-[#30D158] font-semibold flex items-center gap-1.5 animate-in fade-in slide-in-from-top-2">
-          <BookmarkCheck className="size-3.5 text-[#30D158]" />
+        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-50 px-3 py-1.5 rounded-full bg-[#FFFFFF]/95 border border-[#0058BC]/30 shadow-lg text-[11px] text-[#0058BC] font-semibold flex items-center gap-1.5 animate-in fade-in slide-in-from-top-2">
+          <BookmarkCheck className="size-3.5 text-[#0058BC]" />
           <span>{pinnedNotification}</span>
         </div>
       )}
 
-      {/* THREAD DETAIL VIEW */}
+      {/* ------------------------------------------------------------------ */}
+      {/* 1. THREAD DETAIL VIEW (Conversation Messages)                      */}
+      {/* ------------------------------------------------------------------ */}
       {selectedThread ? (
-        <div className="flex flex-col h-full animate-in slide-in-from-right-4 duration-200">
-          <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-[#161618]/95 backdrop-blur-md border-b border-[#2C2C2E] shrink-0 z-10">
+        <div className="flex flex-col h-full bg-[#FAF9FE] animate-in slide-in-from-right-4 duration-200">
+          {/* Light Header per Figma Specs */}
+          <div className="flex items-center justify-between px-3 h-[44px] bg-[#FFFFFF] border-b border-[#E3E2E7] shrink-0 z-10">
             <button
-              onClick={() => {
-                setSelectedThread(null);
-                setPlayingAudioId(null);
-              }}
-              className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium active:opacity-60 transition-opacity"
+              onClick={() => setSelectedThread(null)}
+              className="flex items-center gap-0.5 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
             >
-              <ArrowLeft className="size-4" />
+              <ChevronLeft className="size-5" />
               <span>Tin nhắn</span>
             </button>
 
-            <div className="flex flex-col items-center max-w-[170px]">
-              <div className="size-7 rounded-full text-white flex items-center justify-center font-bold text-[11px] border border-white/10 shadow-sm bg-gradient-to-tr from-[#3A3A3C] to-[#636366]">
-                {selectedThread.name.slice(0, 1)}
-              </div>
-              <span className="text-[12px] font-semibold text-white truncate mt-0.5">
-                {selectedThread.name}
-              </span>
-            </div>
+            <span className="text-[17px] font-semibold tracking-tight text-[#1A1B1F] truncate max-w-[160px]">
+              {selectedThread.name}
+            </span>
 
             <button
               onClick={() => {
@@ -241,17 +181,18 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                 );
                 if (firstClue) setInspectingClue(firstClue);
               }}
-              className="text-[#0A84FF] active:opacity-60 p-1"
-              title="Thông tin hội thoại"
+              className="text-[#0058BC] hover:opacity-80 active:opacity-60 p-1 cursor-pointer"
+              title="Chi tiết manh mối"
             >
-              <Info className="size-4" />
+              <Info className="size-5 stroke-[1.75]" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5 flex flex-col justify-start pb-10">
+          {/* Messages Bubble Stream */}
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 flex flex-col justify-start pb-10">
             <div className="text-center my-1">
-              <span className="text-[9.5px] text-[#8E8E93] bg-[#1C1C1E]/90 px-3 py-1 rounded-full border border-white/5 font-sans">
-                Tin nhắn văn bản • SMS
+              <span className="text-[11px] text-[#717786] bg-[#E9E7ED] px-3 py-1 rounded-full font-medium">
+                iMessage · iSMS
               </span>
             </div>
 
@@ -263,29 +204,29 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                 <div
                   key={msg.id}
                   className={cn(
-                    "flex flex-col max-w-[85%]",
+                    "flex flex-col max-w-[82%]",
                     isMe ? "self-end items-end" : "self-start items-start",
                   )}
                 >
                   <div
                     className={cn(
-                      "rounded-[18px] px-3.5 py-2 text-[13.5px] leading-relaxed shadow-sm relative group transition-all",
+                      "rounded-[18px] px-3.5 py-2 text-[15px] leading-relaxed shadow-xs relative transition-all font-normal",
                       isMe
-                        ? "bg-[#34C759] text-white rounded-br-[4px]"
-                        : "bg-[#2C2C2E] text-white rounded-bl-[4px]",
+                        ? "bg-[#0058BC] text-white rounded-br-[4px]"
+                        : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
                     )}
                   >
-                    <p className="whitespace-pre-wrap break-words font-normal">
+                    <p className="whitespace-pre-wrap break-words">
                       {msg.text}
                     </p>
                     {isPinned && (
-                      <span className="absolute -top-1 -right-1 size-3.5 bg-[#FFD60A] rounded-full flex items-center justify-center text-[8px] font-bold text-black shadow">
+                      <span className="absolute -top-1 -right-1 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
                         ★
                       </span>
                     )}
                   </div>
                   {msg.timestamp && (
-                    <span className="text-[9.5px] text-[#8E8E93] font-sans mt-0.5 px-1">
+                    <span className="text-[11px] text-[#717786] font-normal mt-0.5 px-1">
                       {msg.timestamp}
                     </span>
                   )}
@@ -295,80 +236,108 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           </div>
         </div>
       ) : (
-        /* THREADS LIST VIEW */
-        <div className="flex flex-col h-full">
-          <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
-            <div className="flex items-center justify-between mb-2">
+        /* ------------------------------------------------------------------ */
+        /* 2. CONVERSATION LIST VIEW (Figma Frame 22:755 - Light Theme 100%)  */
+        /* ------------------------------------------------------------------ */
+        <div className="flex flex-col h-full bg-[#FAF9FE]">
+          {/* Top Nav Header (Figma Node 22:820 - 375x68px, white bg) */}
+          <div className="px-4 pt-1 pb-2 bg-[#FFFFFF] border-b border-[#E3E2E7] shrink-0">
+            <div className="flex items-center justify-between h-[44px]">
               {onBackToHome ? (
                 <button
                   onClick={onBackToHome}
-                  className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
-                  title="Thoát ứng dụng về Màn hình chính"
+                  className="flex items-center gap-0.5 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
+                  title="Thoát về Trang chính"
                 >
-                  <ChevronLeft className="size-4" />
+                  <ChevronLeft className="size-5" />
                   <span>Trang chính</span>
                 </button>
               ) : (
-                <span className="text-[13px] text-[#0A84FF] font-medium">
+                <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
                   Sửa
-                </span>
+                </button>
               )}
-              <span className="text-[17px] font-semibold tracking-tight text-white">
+
+              {/* Title (Figma Node 22:843: 17px semi-bold #1A1B1F) */}
+              <span className="text-[17px] font-semibold tracking-tight text-[#1A1B1F]">
                 Tin nhắn
               </span>
-              <span className="w-12 text-right text-[#0A84FF] text-[13px] font-medium">
-                <SquarePen className="size-4 inline text-[#0A84FF]" />
-              </span>
+
+              {/* New Message Icon (Figma Node 22:847: 18x18 icon #0058BC) */}
+              <button
+                aria-label="Soạn tin nhắn mới"
+                className="text-[#0058BC] hover:opacity-80 active:opacity-60 p-1 cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
+              >
+                <SquarePen className="size-[18px] stroke-[1.75]" />
+              </button>
             </div>
 
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-[#8E8E93]" />
+            {/* iOS Search Bar (Figma Node 22:849: 343x36px, fill #EEEFF1, placeholder #717786) */}
+            <div className="relative mt-1 mb-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#717786]" />
               <input
                 type="text"
                 placeholder="Tìm kiếm"
+                aria-label="Tìm kiếm tin nhắn"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-7 rounded-lg bg-[#1C1C1E] pl-8 pr-3 text-[12px] text-white placeholder-[#8E8E93] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
+                className="w-full h-[36px] rounded-[10px] bg-[#EEEFF1] pl-9 pr-3 text-[15px] text-[#1A1B1F] placeholder-[#717786] focus:outline-none focus:ring-1 focus:ring-[#0058BC] transition-all"
               />
             </div>
           </div>
 
+          {/* List Content */}
           {loading ? (
-            <div className="flex-1 flex flex-col items-center justify-center p-4 text-[#8E8E93]">
-              <Loader2 className="size-6 animate-spin mb-2 text-[#0A84FF]" />
-              <span className="text-xs">
-                Đang tải tin nhắn từ Google Sheets...
-              </span>
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-[#717786]">
+              <Loader2 className="size-6 animate-spin mb-2 text-[#0058BC]" />
+              <span className="text-xs">Đang tải tin nhắn từ Live CMS...</span>
             </div>
           ) : error ? (
-            <div className="flex-1 p-4 text-center text-xs text-red-400">
+            <div className="flex-1 p-4 text-center text-xs text-[#FF3B30]">
               Lỗi: {error}
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto divide-y divide-[#1C1C1E] pb-10">
+            <div className="flex-1 overflow-y-auto divide-y divide-[#E3E2E7] bg-[#FAF9FE] pb-10">
               {filteredThreads.map((thread: any) => (
                 <div
                   key={thread.id}
                   onClick={() => setSelectedThread(thread)}
-                  className="flex items-center gap-3.5 h-[86px] py-[12px] pl-[24px] pr-[16px] hover:bg-[#1C1C1E]/50 active:bg-[#2C2C2E]/60 cursor-pointer transition-colors"
+                  className="flex items-center h-[86px] pl-[24px] pr-[16px] py-[12px] hover:bg-[#FFFFFF] active:bg-[#EEEFF1] cursor-pointer transition-colors bg-[#FAF9FE]"
                 >
-                  <div className="size-[48px] rounded-full text-white flex items-center justify-center font-semibold text-[17px] border border-white/10 shadow bg-gradient-to-tr from-[#3A3A3C] to-[#545458] shrink-0">
-                    {thread.name.slice(0, 1)}
+                  {/* Unread Blue Dot (Figma Node 22:784: 10x10 blue dot #0058BC) */}
+                  <div className="w-[14px] flex items-center justify-start shrink-0 mr-1">
+                    {thread.unread && (
+                      <div className="size-[10px] rounded-full bg-[#0058BC]" />
+                    )}
                   </div>
-                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+
+                  {/* Conversation Row Text Body */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center pr-2">
+                    {/* Header line: Sender Name + Timestamp */}
                     <div className="flex items-center justify-between">
-                      <span className="text-[17px] font-semibold text-white truncate leading-tight">
+                      <span className="text-[17px] font-semibold text-[#1A1B1F] truncate leading-tight">
                         {thread.name}
                       </span>
-                      <span className="text-[13px] text-[#8E8E93] font-sans shrink-0 ml-2 font-normal">
+                      <span
+                        className={cn(
+                          "text-[13px] font-normal shrink-0 ml-2",
+                          thread.unread
+                            ? "text-[#0058BC] font-medium"
+                            : "text-[#717786]",
+                        )}
+                      >
                         {thread.timestamp}
                       </span>
                     </div>
-                    <p className="text-[15px] text-[#8E8E93] truncate mt-1 leading-snug font-normal">
+
+                    {/* Preview Text Line (Figma Node 22:766: 15px #414755) */}
+                    <p className="text-[15px] font-normal text-[#414755] truncate mt-1 leading-snug">
                       {thread.previewText}
                     </p>
                   </div>
-                  <ChevronRight className="size-4 text-[#48484A] shrink-0 ml-1" />
+
+                  {/* Chevron Mũi Tên > (Figma Node 22:769: 6x10 chevron #C1C6D7) */}
+                  <ChevronRight className="w-[6px] h-[10px] text-[#C1C6D7] shrink-0 ml-1" />
                 </div>
               ))}
             </div>
@@ -376,49 +345,49 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
         </div>
       )}
 
-      {/* MODAL: Clue Inspector */}
+      {/* Clue Inspector Modal */}
       {inspectingClue && (
-        <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md p-4 flex flex-col justify-center items-center animate-in fade-in-50">
-          <div className="w-full max-w-[300px] rounded-2xl bg-[#1C1C1E] border border-[#FFD60A]/40 p-4 shadow-2xl space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <span className="text-[11.5px] font-bold text-[#FFD60A] flex items-center gap-1.5 uppercase tracking-wider">
-                <ShieldAlert className="size-4 text-[#FFD60A]" /> Báo Cáo Manh
-                Mối
+        <div className="absolute inset-0 z-50 bg-black/50 backdrop-blur-xs p-4 flex flex-col justify-center items-center animate-in fade-in-50">
+          <div className="w-full max-w-[300px] rounded-2xl bg-[#FFFFFF] border border-[#E3E2E7] p-4 shadow-2xl space-y-3 text-[#1A1B1F]">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E3E2E7]">
+              <span className="text-[12px] font-bold text-[#0058BC] flex items-center gap-1.5 uppercase tracking-wider">
+                <ShieldAlert className="size-4 text-[#0058BC]" /> Manh Mối Điều
+                Tra
               </span>
               <button
                 onClick={() => setInspectingClue(null)}
-                className="text-[#8E8E93] hover:text-white p-1"
+                className="text-[#717786] hover:text-[#1A1B1F] p-1 cursor-pointer"
               >
                 <X className="size-4" />
               </button>
             </div>
             <div className="space-y-2 text-left">
-              <div className="text-[12.5px] font-bold text-white">
+              <div className="text-[13px] font-bold text-[#1A1B1F]">
                 {inspectingClue.clueTitle || "Manh mối mấu chốt"}
               </div>
-              <div className="p-2.5 rounded-lg bg-black/50 border border-white/10 text-[11px] text-white/90 italic">
+              <div className="p-2.5 rounded-lg bg-[#FAF9FE] border border-[#E3E2E7] text-[12px] text-[#414755] italic">
                 "{inspectingClue.text}"
               </div>
-              <div className="text-[11px] text-[#A1A1A6] leading-relaxed">
+              <div className="text-[12px] text-[#717786] leading-relaxed">
                 {inspectingClue.clueAnalysis}
               </div>
             </div>
-            <div className="pt-2 flex gap-2">
+            <div className="pt-2">
               <button
                 onClick={() => {
                   togglePinClue(inspectingClue.id, inspectingClue.clueTitle);
                   setInspectingClue(null);
                 }}
                 className={cn(
-                  "flex-1 py-2 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5",
+                  "w-full py-2.5 rounded-xl text-[12px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer",
                   pinnedClueIds.includes(inspectingClue.id)
-                    ? "bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/40"
-                    : "bg-[#0A84FF] text-white hover:bg-[#0077ED]",
+                    ? "bg-[#E9E7ED] text-[#FF3B30] border border-[#FF3B30]/30"
+                    : "bg-[#0058BC] text-white hover:bg-[#004696]",
                 )}
               >
-                <BookmarkCheck className="size-3.5" />
+                <BookmarkCheck className="size-4" />
                 {pinnedClueIds.includes(inspectingClue.id)
-                  ? "Đã ghim sổ tay"
+                  ? "Đã ghim vào sổ tay"
                   : "Ghim vào sổ tay"}
               </button>
             </div>

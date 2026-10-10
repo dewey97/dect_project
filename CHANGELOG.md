@@ -29,3 +29,8 @@ All notable changes to the Detective Case System (dect_project) will be document
 - **Messages App (Figma Frame 22:755)**:
   - Updated conversation thread item list row height to exact 86px with padding `[12px, 16px, 12px, 24px]`.
   - Applied 17px semi-bold sender name typography and 15px subtext preview font size.
+- **Phone & Messages Light Theme (100% Figma Spec)**:
+  - Converted `PhoneApp` + `MessagesApp` + status bar to exact Light theme: bg `#FAF9FE`/`#FFFFFF`, divider `#E3E2E7`, keypad btn `#E9E7ED` (74px, gap row 14 / col 44), number font 34px light `#1A1B1F`, sub-letter 9px medium `#414755`, call btn `#4CD964`, missed-call red `#FF3B30`, info blue `#007AFF`, tab-active blue `#0058BC`, tab-inactive `#717786`, voicemail badge `#BA1A1A`.
+  - Status bar auto-switches to dark text on white bg inside Phone/Messages apps.
+  - Fixed 3 stray TS errors: missing `BOARD_FRAME_SRC` import, `threads` prop type on `MessagesApp`.
+  - Verified `npx tsc --noEmit` passes clean.
