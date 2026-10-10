@@ -102,3 +102,12 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
 - **Quy chuẩn tên thương hiệu**: Tên thương hiệu viết liền không bao giờ có dấu gạch nối: **XPLORE** (hoặc `xplore` khi viết thường). **TUYỆT ĐỐI CẤM** dùng `X-PLORE`.
 - **Hạn chế nhắc tên trong tài liệu**: Trong các tài liệu kỹ thuật, đặc tả nghiệp vụ (`docs/`), tập trung vào thông số kỹ thuật, logic hệ thống và cơ chế vụ án; không chèn tên thương hiệu tràn lan nếu không cần thiết. Chỉ giữ tên thương hiệu ở một số vị trí định danh cố định (như `AGENTS.md`, metadata layout, component `BrandMark`, bảng nhận diện thương hiệu).
 
+---
+
+## 🧊 8. Quy Tắc Đóng Băng & Lưu Trữ Phân Hệ 3D (3D Vault Freeze & Inactivity Rule)
+
+- **Trạng thái đóng băng toàn diện**: Toàn bộ hệ thống 3D Three.js WebGL (bao gồm hiện trường 3D `crime-scene-3d`, tủ hồ sơ 3D `3d-cabinet`, `file_cabinet_3d`, trình xem ảnh 360 `scene-360-viewer` và các model `.glb`) đã được cách ly, vô hiệu hóa và gom vào kho lưu trữ an toàn `components/investigation/archive_3d_vault/`.
+- **Cấm tự ý kích hoạt hoặc can thiệp**: Agent tuyệt đối **KHÔNG ĐƯỢC PHÉP** tự ý import, render, chỉnh sửa, mở lại hoặc nhúng bất kỳ thành phần 3D nào ra giao diện người dùng.
+- **Điều kiện kích hoạt duy nhất**: Phân hệ này **CHỈ ĐƯỢC PHÉP MỞ LẠI HOẶC CHẠM VÀO KHI VÀ CHỈ KHI NGƯỜI DÙNG (USER) TRỰC TIẾP RA LỆNH NHẮC LẠI**.
+
+

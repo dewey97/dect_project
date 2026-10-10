@@ -193,7 +193,7 @@ export default function WebEvidencePage() {
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 pt-safe sm:p-3 box-border min-h-0 min-w-0"
+      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-3 box-border min-h-0 min-w-0"
     >
       <div className="w-full max-w-[1900px] h-full flex flex-col lg:flex-row gap-3 xl:gap-4 items-stretch justify-center overflow-hidden min-h-0 min-w-0">
         {/* LEFT COLUMN: FULL BOARDGAME INVESTIGATION CANVAS */}

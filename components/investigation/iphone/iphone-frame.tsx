@@ -180,13 +180,16 @@ export function IPhoneFrame({
           </>
         )}
 
-        {/* SCREEN CONTAINER (Uses Authentic iOS 9 Wave Wallpaper) */}
+        {/* SCREEN CONTAINER (Uses Authentic Figma Beach Wallpaper & Vignette) */}
         <div
           className={cn(
-            "relative w-full h-full bg-[#0d2a45] bg-[url('/images/backgrounds/ios9_wave_wallpaper.jpg')] bg-cover bg-center overflow-hidden flex flex-col justify-between",
+            "relative w-full h-full bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col justify-between",
             !frameless && "rounded-[34px] sm:rounded-[38px]"
           )}
         >
+          {/* Authentic iOS Vignette Gradient (Figma Node 14:39) */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/15 pointer-events-none z-0" />
+
           {/* iOS TOP STATUS BAR (Exact 20pt Status Bar Height) */}
           <div className="relative z-30 h-6 px-3 flex items-center justify-between text-white text-[11px] font-sans tracking-tight shrink-0 bg-transparent select-none pt-1">
             {/* Left: 5 Signal Dots + Carrier + Wi-Fi */}

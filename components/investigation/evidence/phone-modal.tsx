@@ -15,7 +15,7 @@ export function PhoneModal({ isOpen, onClose }: PhoneModalProps) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md flex flex-col items-center justify-between p-2 sm:p-4 select-none overflow-hidden animate-in fade-in-50">
+      <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md flex flex-col items-center justify-between p-2 pt-safe sm:p-4 select-none overflow-hidden animate-in fade-in-50">
         {/* Modal Dedicated Top Header Bar */}
         <div className="w-full max-w-[430px] flex items-center justify-between py-1.5 px-2 mb-1 shrink-0 z-50 border-b border-[#543b27]/40">
           <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#d9a066]">

@@ -22,7 +22,7 @@ export function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
     <div suppressHydrationWarning className="flex h-dvh w-full justify-center items-center overflow-hidden bg-[#0d0c0a] fixed inset-0 min-h-0 min-w-0">
       <main
         suppressHydrationWarning
-        className="w-full h-full flex flex-col overflow-hidden min-h-0 min-w-0"
+        className="w-full h-full flex flex-col overflow-hidden min-h-0 min-w-0 pt-safe"
       >
         <PageTransition>{children}</PageTransition>
       </main>
