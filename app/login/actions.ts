@@ -11,15 +11,17 @@ export async function login(formData: FormData) {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
   }
+  const redirectTo = (formData.get('redirect') as string) || '/'
 
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/login?message=' + encodeURIComponent(error.message || 'Không thể đăng nhập. Vui lòng kiểm tra lại thông tin.'))
+    const errUrl = redirectTo !== '/' ? `/login?redirect=${encodeURIComponent(redirectTo)}&message=` : '/login?message='
+    redirect(errUrl + encodeURIComponent(error.message || 'Không thể đăng nhập. Vui lòng kiểm tra lại thông tin.'))
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect(redirectTo)
 }
 
 export async function signup(formData: FormData) {

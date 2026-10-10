@@ -90,7 +90,7 @@ export function UserNav() {
                 <p className="text-xs text-muted-foreground">Đã đăng nhập bằng</p>
                 <p className="text-sm font-medium truncate" title={user.email}>{user.email}</p>
               </div>
-              {isSuperAdmin && (
+              {isAdmin && (
                 <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-destructive text-destructive-foreground ml-2">
                   ADMIN
                 </span>
@@ -98,7 +98,7 @@ export function UserNav() {
             </div>
             
             <div className="p-1 flex flex-col gap-1">
-              {isSuperAdmin && (
+              {isAdmin && (
                 <button 
                   onClick={() => {
                     setIsOpen(false)

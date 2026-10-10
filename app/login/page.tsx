@@ -3,10 +3,11 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function LoginPage(props: {
-  searchParams: Promise<{ message?: string }>
+  searchParams: Promise<{ message?: string; redirect?: string }>
 }) {
   const searchParams = await props.searchParams
   const message = searchParams.message
+  const redirectUrl = searchParams.redirect
 
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2 mx-auto pt-20">
@@ -19,6 +20,9 @@ export default async function LoginPage(props: {
         </CardHeader>
         <CardContent>
           <form className="flex-1 flex flex-col w-full justify-center gap-2">
+            {redirectUrl && (
+              <input type="hidden" name="redirect" value={redirectUrl} />
+            )}
             <label className="text-sm font-medium" htmlFor="email">
               Email
             </label>
