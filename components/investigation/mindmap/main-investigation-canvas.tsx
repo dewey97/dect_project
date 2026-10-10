@@ -28,6 +28,7 @@ import {
   VolumeX,
   Eye,
   EyeOff,
+  RefreshCw,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -507,7 +508,18 @@ export function MainInvestigationCanvas({
         }
       }
 
-      // 1. Tải cache cục bộ từ storage trước (đáp ứng ngay lập tức)
+      // 0. Tự động ép cập nhật & xóa cache layout cũ nếu phiên bản không khớp
+      const CURRENT_LAYOUT_VERSION = "2026.10.10_v5_force_sync";
+      const savedLayoutVersion = getStorageItem("board_layout_version");
+      if (savedLayoutVersion !== CURRENT_LAYOUT_VERSION) {
+        removeStorageItem("boardgame_pins_case-000");
+        removeStorageItem("admin_custom_pins_case-000");
+        removeStorageItem("boardgame_transforms_case-000");
+        removeStorageItem("admin_connections_case-000");
+        setStorageItem("board_layout_version", CURRENT_LAYOUT_VERSION);
+      }
+
+      // 1. Tải cache cục bộ từ storage (đã được dọn sạch nếu cũ)
       setCustomPinPositions(
         getStorageJson<Record<string, { x: number; y: number }>>(
           "boardgame_pins_case-000",
@@ -723,6 +735,23 @@ export function MainInvestigationCanvas({
     },
     [commitLayout],
   );
+
+  /** Ép khôi phục & xóa toàn bộ cache cũ về layout mới nhất của hệ thống */
+  const handleForceResetLayout = useCallback(() => {
+    detectiveAudio.playPaperRustle();
+    removeStorageItem("boardgame_pins_case-000");
+    removeStorageItem("admin_custom_pins_case-000");
+    removeStorageItem("boardgame_transforms_case-000");
+    removeStorageItem("admin_connections_case-000");
+    setStorageItem("board_layout_version", "2026.10.10_v5_force_sync");
+    setCustomPinPositions({});
+    setAdminCustomPins([]);
+    setPinTransforms({});
+    setAdminConnections([]);
+    setSelectedPinId(null);
+    setHasUnsavedChanges(false);
+    toast.success("Đã ép cập nhật và nạp lại layout mới nhất từ hệ thống!");
+  }, []);
 
   const handleSavePinLayout = async (pinsToSave: PinPoint[]) => {
     setIsSavingLayout(true);
@@ -1454,6 +1483,16 @@ export function MainInvestigationCanvas({
             "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
         },
         {
+          id: "c0-pin-victim-phone",
+          x: 0.38,
+          y: 0.14,
+          label: "Điện thoại nạn nhân",
+          detail: "Vật chứng: Điện thoại iPhone 6s Plus thu giữ của nạn nhân Nguyễn Văn Khang",
+          color: "yellow" as const,
+          photoUrl: "/phone.png",
+          scale: 0.85,
+        },
+        {
           id: "c0-pin-crime-scene",
           x: 0.73,
           y: 0.21,
@@ -1547,6 +1586,17 @@ export function MainInvestigationCanvas({
             "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
         },
         {
+          id: "c0-pin-victim-phone",
+          x: 0.38,
+          y: 0.14,
+          label: "Điện thoại nạn nhân",
+          detail: "Vật chứng: Điện thoại iPhone 6s Plus thu giữ của nạn nhân Nguyễn Văn Khang",
+          color: "yellow" as const,
+          pinColor: "yellow" as const,
+          photoUrl: "/phone.png",
+          scale: 0.85,
+        },
+        {
           id: "c0-pin-crime-scene",
           x: 0.73,
           y: 0.21,
@@ -1631,6 +1681,11 @@ export function MainInvestigationCanvas({
       id: "c0-conn-reinvestigate",
       fromPinId: "c0-pin-evidence",
       toPinId: "c0-pin-reinvestigate",
+    },
+    {
+      id: "c0-conn-victim-phone",
+      fromPinId: "c0-pin-victim-khang",
+      toPinId: "c0-pin-victim-phone",
     },
     ...(hasVuFollowup && vuSuspect
       ? [
@@ -1795,6 +1850,16 @@ export function MainInvestigationCanvas({
                   }
                 >
                   <Save className="size-4" />
+                </button>
+
+                {/* Force Reset to System Layout Button (Icon only) */}
+                <button
+                  type="button"
+                  onClick={handleForceResetLayout}
+                  className="p-1.5 rounded-lg border border-white/10 bg-black/40 text-zinc-400 hover:text-amber-300 hover:border-amber-400/40 hover:bg-zinc-800 transition-colors"
+                  title="Ép cập nhật & Khôi phục layout mới nhất từ hệ thống (Xóa cache cục bộ)"
+                >
+                  <RefreshCw className="size-4" />
                 </button>
 
                 {/* Undo Unsaved Changes Button (Icon only) */}
@@ -2088,9 +2153,15 @@ export function MainInvestigationCanvas({
       {/* Chế độ Hướng dẫn từng bước (Interactive Walkthrough Spotlight Tour) */}
       <InteractiveWalkthrough
         isOpen={isWalkthroughOpen}
-        onClose={() => setIsWalkthroughOpen(false)}
+        onClose={() => {
+          setIsWalkthroughOpen(false);
+          setSelectedPinId(null);
+        }}
         pins={displayPins}
         canvasWrapperRef={canvasWrapperRef}
+        onStepChange={(targetPinId) => {
+          setSelectedPinId(targetPinId);
+        }}
       />
 
       {/* Zoomed Photo Lightbox Modal with Morph Effect */}

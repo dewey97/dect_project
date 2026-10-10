@@ -86,6 +86,7 @@ export const INVESTIGATION_STORAGE_KEYS = [
   'boardgame_transforms_case-000',
   'admin_connections_case-000',
   'khang_phone_pinned_clues',
+  'board_layout_version',
 ]
 
 export function clearInvestigationStorage(): void {
