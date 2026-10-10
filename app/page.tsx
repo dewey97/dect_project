@@ -1,29 +1,32 @@
-'use client'
+"use client";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from 'react'
-import { trackEvent } from '@/lib/analytics'
-import { LandingHero } from '@/components/public/landing-hero'
-import { CaseCarouselSection } from '@/components/public/case-carousel-section'
-import { WorldArchiveSection } from '@/components/public/world-archive-section'
-import { GameRulesShowcase } from '@/components/public/game-rules-showcase'
-import { LandingFeaturesSection } from '@/components/public/landing-features-section'
-import { ReviewsAndFaqSection } from '@/components/public/reviews-and-faq-section'
-import { LandingFooter } from '@/components/public/landing-footer'
+import { useState, useEffect } from "react";
+import { trackEvent } from "@/lib/analytics";
+import { LandingHero } from "@/components/public/landing-hero";
+import { CaseCarouselSection } from "@/components/public/case-carousel-section";
+import { WorldArchiveSection } from "@/components/public/world-archive-section";
+import { GameRulesShowcase } from "@/components/public/game-rules-showcase";
+import { LandingFeaturesSection } from "@/components/public/landing-features-section";
+import { ReviewsAndFaqSection } from "@/components/public/reviews-and-faq-section";
+import { LandingFooter } from "@/components/public/landing-footer";
 
 export default function MarketingLandingPage() {
-  const [activePoster, setActivePoster] = useState<number>(0)
+  const [activePoster, setActivePoster] = useState<number>(0);
 
   useEffect(() => {
-    trackEvent('landing_page_view', {
-      source: 'web_client',
-      timestamp: new Date().toISOString()
-    })
-  }, [])
+    trackEvent("landing_page_view", {
+      source: "web_client",
+      timestamp: new Date().toISOString(),
+    });
+  }, []);
 
   return (
-    <main suppressHydrationWarning className="noir-spotlight relative flex flex-col min-h-dvh w-full items-center overflow-x-clip bg-background text-foreground font-sans">
+    <main
+      suppressHydrationWarning
+      className="noir-spotlight relative flex flex-col min-h-dvh w-full items-center overflow-x-clip bg-background text-foreground font-sans"
+    >
       {/* CRT scanlines overlay */}
       <div
         aria-hidden="true"
@@ -31,10 +34,13 @@ export default function MarketingLandingPage() {
       />
 
       {/* Hero & Navigation */}
-      <LandingHero activePoster={activePoster} />
+      <LandingHero />
 
       {/* 3D Poster Carousel */}
-      <CaseCarouselSection activePoster={activePoster} setActivePoster={setActivePoster} />
+      <CaseCarouselSection
+        activePoster={activePoster}
+        setActivePoster={setActivePoster}
+      />
 
       {/* World Archive & Lore */}
       <WorldArchiveSection />
@@ -51,5 +57,5 @@ export default function MarketingLandingPage() {
       {/* Footer */}
       <LandingFooter />
     </main>
-  )
+  );
 }

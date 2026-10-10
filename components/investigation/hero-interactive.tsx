@@ -16,702 +16,71 @@ import { detectiveAudio } from "@/lib/investigation-audio";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { useInvestigationEvent } from "@/lib/investigation-events";
 
-// ────────────────────────────────────────
-// Types
-// ────────────────────────────────────────
+import type {
+  BoardBounds,
+  BoardMode,
+  CaseConnection,
+  CaseData,
+  HeroInteractiveProps,
+  PinPoint,
+  Point,
+  Size,
+  TooltipState,
+  UserConnection,
+  UserPin,
+  ViewTransform,
+  ZoomState,
+} from "./hero-interactive/types";
+import {
+  BOARD_ASPECT,
+  BOARD_BASE_HEIGHT,
+  BOARD_BASE_WIDTH,
+  BOARD_FRAME_SRC,
+  CASES_LIST,
+  CENTER_LIGHT_RADIUS_RATIO,
+  DRAG_THRESHOLD,
+  FLASHLIGHT_RADIUS,
+  FRAME_INNER_HEIGHT,
+  FRAME_INNER_LEFT,
+  FRAME_INNER_TOP,
+  FRAME_INNER_WIDTH,
+  MAX_DEVICE_PIXEL_RATIO,
+  MAX_PAN_RATIO,
+  PIN_COLORS,
+  PIN_GLOW_RADIUS,
+  PIN_HIT_RADIUS,
+  ZOOM_SCALE,
+} from "./hero-interactive/constants";
+import {
+  clamp,
+  distance,
+  getInnerBoardBounds,
+  getPinWorldPosition,
+  getViewTransform,
+  isPinHit,
+  screenToWorld,
+  worldToScreen,
+  wrapText,
+} from "./hero-interactive/utils";
+import {
+  getCompositeCard as getCompositeCardHelper,
+  getLoadedImage as getLoadedImageHelper,
+  resolveSuspectPhotoUrl as resolveSuspectPhotoUrlHelper,
+} from "./hero-interactive/card-composite";
+export type { HeroInteractiveProps } from "./hero-interactive/types";
+export type { PinPoint, CaseConnection, CaseData };
 
-interface Size {
-  width: number;
-  height: number;
-}
+/* Board dataset moved to ./hero-interactive/constants (CASES_LIST). */
 
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface ZoomState {
-  active: boolean;
-  originX: number;
-  originY: number;
-}
-
-interface ViewTransform {
-  scale: number;
-  translateX: number;
-  translateY: number;
-}
-
-interface BoardBounds {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export interface PinPoint {
-  id: string;
-  x: number;
-  y: number;
-  label: string;
-  detail: string;
-  color?:
-    | "red"
-    | "yellow"
-    | "blue"
-    | "green"
-    | "black"
-    | "purple"
-    | "orange"
-    | "cyan"
-    | "brass"
-    | "silver"
-    | "dark";
-  noteColor?: "yellow" | "black" | "white" | "red" | "blue";
-  pinColor?:
-    | "red"
-    | "yellow"
-    | "blue"
-    | "green"
-    | "black"
-    | "purple"
-    | "orange"
-    | "cyan"
-    | "brass"
-    | "silver"
-    | "dark";
-  pulseBorder?: boolean;
-  photoUrl?: string;
-  noteTextureUrl?: string;
-  isLocked?: boolean;
-  isSolved?: boolean;
-
-  // Interactive Question / Checkpoint metadata
-  actionType?: "info" | "sheet_checkpoint" | "custom_question";
-  checkpointId?: string;
-  questionType?: "text_match_3" | "evidence_picker" | "mcq" | "accusation";
-  question?: string;
-  answers?: string;
-  hints?: string;
-  unlockedEvidenceId?: string;
-
-  // Visual transform overrides
-  rotation?: number; // degrees (-45 to 45)
-  scale?: number; // multiplier (0.5 to 2.0)
-}
-
-export interface CaseConnection {
-  id: string;
-  fromPinId: string;
-  toPinId: string;
-}
-
-type BoardMode = "zoom" | "pin";
-
-interface UserPin {
-  id: string;
-  x: number; // Ratio 0-1 relative to case inner board bounds
-  y: number;
-  label: string;
-}
-
-interface UserConnection {
-  id: string;
-  fromPinId: string;
-  toPinId: string;
-}
-
-interface CaseData {
-  id: string;
-  title: string;
-  description: string;
-  status: "active" | "solved" | "locked";
-  bgImage: string; // Cases maps
-  pins: PinPoint[];
-  connections: CaseConnection[];
-}
-
-// ────────────────────────────────────────
-// Constants & Case Data
-// ────────────────────────────────────────
-
-const BOARD_FRAME_SRC = "/images/hero/evidence-board-frame.png";
-
-const CASES_LIST: CaseData[] = [
-  {
-    id: "case-000",
-    title: "TRỐN TÌM (1996)",
-    description:
-      "Chuyên án 000 — Bi kịch trốn tìm 20 năm trước tại xóm Bờ Sông",
-    status: "active",
-    bgImage: "/images/backgrounds/corkboard_vertical_empty.jpg",
-    pins: [
-      {
-        id: "c0-pin-evidence",
-        x: 0.22,
-        y: 0.18,
-        label: "BỔ SUNG CHỨNG CỨ",
-        detail: "Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra",
-        noteColor: "yellow",
-      },
-      {
-        id: "c0-pin-question",
-        x: 0.42,
-        y: 0.18,
-        label: "NGHI VẤN",
-        detail: "Danh sách các nghi vấn & câu hỏi điều tra cần làm rõ",
-        noteColor: "yellow",
-      },
-      {
-        id: "c0-pin-suspects",
-        x: 0.68,
-        y: 0.32,
-        label: "NGHI PHẠM",
-        detail: "Tập hợp danh tính & thẩm tra nghi phạm (Tùng, Hà, Mai...)",
-        noteColor: "yellow",
-      },
-      {
-        id: "c0-pin-phone",
-        x: 0.42,
-        y: 0.27,
-        label: "MỞ RỘNG ĐIỀU TRA",
-        detail: "Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân Khang",
-        noteColor: "white",
-      },
-      {
-        id: "c0-pin-reinvestigate",
-        x: 0.22,
-        y: 0.35,
-        label: "BIÊN BẢN XIN KHÁM XÉT LẠI",
-        detail: "Khám xét lại hiện trường để rà soát manh mối bổ sung",
-        noteColor: "white",
-      },
-      {
-        id: "c0-pin-indictment",
-        x: 0.22,
-        y: 0.8,
-        label: "BẢN KẾT LUẬN ĐIỀU TRA",
-        detail: "Bản kết luận điều tra và buộc tội thủ phạm vụ án",
-        noteColor: "white",
-        pinColor: "red",
-      },
-    ],
-    connections: [
-      {
-        id: "c0-conn-1",
-        fromPinId: "c0-pin-evidence",
-        toPinId: "c0-pin-phone",
-      },
-      {
-        id: "c0-conn-2",
-        fromPinId: "c0-pin-evidence",
-        toPinId: "c0-pin-reinvestigate",
-      },
-    ],
-  },
-  {
-    id: "case-01",
-    title: "VẬN ĐƠN BẤT THƯỜNG",
-    description: "Vụ mất tích bí ẩn tại Cầu cảng số 9",
-    status: "active",
-    bgImage: "/images/hero/evidence-board-bg.png",
-    pins: [
-      {
-        id: "c1-pin-0",
-        x: 0.22,
-        y: 0.24,
-        label: "NẠN NHÂN",
-        detail: "Nạn nhân chính của vụ án",
-      },
-      {
-        id: "c1-pin-1",
-        x: 0.5,
-        y: 0.18,
-        label: "VẬN ĐƠN",
-        detail: "Container #7722 — Trọng tải bất thường 24.5T",
-      },
-      {
-        id: "c1-pin-2",
-        x: 0.78,
-        y: 0.26,
-        label: "TANG VẬT",
-        detail: "Ứng dụng nhắn tin lưu payload mã hóa AES-256",
-      },
-      {
-        id: "c1-pin-3",
-        x: 0.5,
-        y: 0.5,
-        label: "HIỆN TRƯỜNG",
-        detail: "Cầu cảng #9 — Camera mất tín hiệu 15 phút",
-      },
-      {
-        id: "c1-pin-4",
-        x: 0.18,
-        y: 0.74,
-        label: "CHÌA KHÓA",
-        detail: "Chìa khóa đồng — mã số chìm: NX-4471",
-      },
-      {
-        id: "c1-pin-5",
-        x: 0.78,
-        y: 0.72,
-        label: "NGHI PHẠM",
-        detail: "[DỮ LIỆU BỊ KHÓA — CẦN MÃ KÍCH HOẠT]",
-      },
-      {
-        id: "c1-pin-6",
-        x: 0.36,
-        y: 0.78,
-        label: "SỔ TAY",
-        detail: "Ghi chép hàng hóa — phát hiện 02:14 AM",
-      },
-      {
-        id: "c1-pin-7",
-        x: 0.64,
-        y: 0.38,
-        label: "BẢN ĐỒ",
-        detail: "Phân khu bến tàu 12 — lối thoát hiểm B",
-      },
-    ],
-    connections: [
-      { id: "c1-conn-0", fromPinId: "c1-pin-0", toPinId: "c1-pin-3" },
-      { id: "c1-conn-1", fromPinId: "c1-pin-1", toPinId: "c1-pin-3" },
-      { id: "c1-conn-2", fromPinId: "c1-pin-2", toPinId: "c1-pin-3" },
-      { id: "c1-conn-3", fromPinId: "c1-pin-3", toPinId: "c1-pin-4" },
-      { id: "c1-conn-4", fromPinId: "c1-pin-3", toPinId: "c1-pin-5" },
-      { id: "c1-conn-5", fromPinId: "c1-pin-0", toPinId: "c1-pin-5" },
-      { id: "c1-conn-6", fromPinId: "c1-pin-2", toPinId: "c1-pin-5" },
-      { id: "c1-conn-7", fromPinId: "c1-pin-1", toPinId: "c1-pin-7" },
-      { id: "c1-conn-8", fromPinId: "c1-pin-4", toPinId: "c1-pin-6" },
-      { id: "c1-conn-9", fromPinId: "c1-pin-0", toPinId: "c1-pin-6" },
-      { id: "c1-conn-10", fromPinId: "c1-pin-7", toPinId: "c1-pin-3" },
-    ],
-  },
-  {
-    id: "case-02",
-    title: "BÓNG MA PHÒNG THÍ NGHIỆM",
-    description:
-      "Rò rỉ dữ liệu sinh học đột biến tại tổ hợp phân tích bio-tech",
-    status: "active",
-    bgImage: "/images/hero/evidence-board-bg2.jpg",
-    pins: [
-      {
-        id: "c2-pin-0",
-        x: 0.25,
-        y: 0.3,
-        label: "BẢN THIẾT KẾ",
-        detail: "Sơ đồ phòng Lab Bio-Safety Cấp 4",
-      },
-      {
-        id: "c2-pin-1",
-        x: 0.55,
-        y: 0.2,
-        label: "MẪU THỬ",
-        detail: "Ống nghiệm vỡ chứa hợp chất Fluoro-green",
-      },
-      {
-        id: "c2-pin-2",
-        x: 0.75,
-        y: 0.35,
-        label: "MÁY PHÂN TÍCH",
-        detail: "Hệ thống sắc ký khí ghi nhận sự biến dạng chuỗi",
-      },
-      {
-        id: "c2-pin-3",
-        x: 0.45,
-        y: 0.6,
-        label: "NHẬT KÝ CA",
-        detail: "Tiến sĩ K. Vy biến mất bất thường lúc 03:00 AM",
-      },
-      {
-        id: "c2-pin-4",
-        x: 0.8,
-        y: 0.75,
-        label: "BỒN CHỨA",
-        detail: "Hệ thống thông gió bị tắt thủ công từ phòng máy chủ",
-      },
-    ],
-    connections: [
-      { id: "c2-conn-0", fromPinId: "c2-pin-0", toPinId: "c2-pin-3" },
-      { id: "c2-conn-1", fromPinId: "c2-pin-1", toPinId: "c2-pin-3" },
-      { id: "c2-conn-2", fromPinId: "c2-pin-2", toPinId: "c2-pin-3" },
-      { id: "c2-conn-3", fromPinId: "c2-pin-3", toPinId: "c2-pin-4" },
-    ],
-  },
-  {
-    id: "case-03",
-    title: "DẤU VẾT KỸ THUẬT SỐ",
-    description:
-      "Vụ tấn công ransomware mã hóa toàn bộ dữ liệu máy chủ tài chính",
-    status: "active",
-    bgImage: "/images/hero/evidence-board-bg3.jpg",
-    pins: [
-      {
-        id: "c3-pin-0",
-        x: 0.2,
-        y: 0.2,
-        label: "CỔNG VÀO",
-        detail: "VPN Gateway bị dò thông tin xác thực từ 3 IP lạ",
-      },
-      {
-        id: "c3-pin-1",
-        x: 0.5,
-        y: 0.25,
-        label: "MÃ ĐỘC",
-        detail: "Biến thể WannaDie v3.1 tìm thấy trong bộ nhớ RAM",
-      },
-      {
-        id: "c3-pin-2",
-        x: 0.8,
-        y: 0.3,
-        label: "VÍ ĐIỆN TỬ",
-        detail: "Địa chỉ nhận tiền chuộc: 3AbCd...9FqP",
-      },
-      {
-        id: "c3-pin-3",
-        x: 0.5,
-        y: 0.65,
-        label: "MÁY CHỦ SỞ ĐỒNG",
-        detail: "Cơ sở dữ liệu giao dịch bị đổi đuôi sang .locked",
-      },
-    ],
-    connections: [
-      { id: "c3-conn-0", fromPinId: "c3-pin-0", toPinId: "c3-pin-1" },
-      { id: "c3-conn-1", fromPinId: "c3-pin-1", toPinId: "c3-pin-3" },
-      { id: "c3-conn-2", fromPinId: "c3-pin-2", toPinId: "c3-pin-3" },
-    ],
-  },
-];
-
-const ZOOM_SCALE = 2.2;
-const MAX_DEVICE_PIXEL_RATIO = 2;
-
-// Precise inner bounds of the transparent region in evidence-board-frame.png
-// (ratios 0-1 relative to the frame image dimensions, derived from alpha-channel analysis)
-const FRAME_INNER_LEFT = 0.3879;
-const FRAME_INNER_TOP = 0.2079;
-const FRAME_INNER_WIDTH = 0.5284;
-const FRAME_INNER_HEIGHT = 0.5461;
-
-const PIN_HIT_RADIUS = 38;
-const PIN_GLOW_RADIUS = 50;
-
-const FLASHLIGHT_RADIUS = 260;
-const CENTER_LIGHT_RADIUS_RATIO = 0.75;
-
-const DRAG_THRESHOLD = 5;
-const MAX_PAN_RATIO = 0.45;
-const PIN_COLORS = [
-  { base: "#cc2222", highlight: "#ff6666" },
-  { base: "#2255cc", highlight: "#6699ff" },
-  { base: "#cc2222", highlight: "#ff6666" },
-  { base: "#ccaa22", highlight: "#ffdd66" },
-  { base: "#2255cc", highlight: "#6699ff" },
-  { base: "#cc2222", highlight: "#ff6666" },
-  { base: "#22aa44", highlight: "#66dd88" },
-  { base: "#ccaa22", highlight: "#ffdd66" },
-];
+/* Board constants moved to ./hero-interactive/constants. */
 
 // ────────────────────────────────────────
 // Utility functions
-// ────────────────────────────────────────
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
-
-function distance(x1: number, y1: number, x2: number, y2: number): number {
-  return Math.hypot(x2 - x1, y2 - y1);
-}
-
-function wrapText(
-  context: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-  maxLines: number = 3,
-): string[] {
-  const words = text.trim().split(/\s+/);
-  if (words.length <= 1) return [text];
-
-  // If the whole text fits on one line, return immediately
-  if (context.measureText(text).width <= maxWidth) {
-    return [text];
-  }
-
-  // If text has 3 to 6 words, try 2 balanced lines first (e.g. "Bản kết luận" / "điều tra")
-  if (words.length >= 3 && words.length <= 6 && maxLines >= 2) {
-    const splitIndex = Math.ceil(words.length / 2);
-    const line1 = words.slice(0, splitIndex).join(" ");
-    const line2 = words.slice(splitIndex).join(" ");
-    if (
-      context.measureText(line1).width <= maxWidth &&
-      context.measureText(line2).width <= maxWidth
-    ) {
-      return [line1, line2];
-    }
-  }
-
-  const lines: string[] = [];
-  let currentLine = "";
-
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    const testWidth = context.measureText(testLine).width;
-
-    if (testWidth > maxWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-      if (lines.length === maxLines - 1) {
-        const remaining = words.slice(i).join(" ");
-        lines.push(remaining);
-        return lines;
-      }
-    } else {
-      currentLine = testLine;
-    }
-  }
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-
-  // Avoid orphan last word if 2 lines
-  if (
-    lines.length === 2 &&
-    lines[1].split(/\s+/).length === 1 &&
-    lines[0].split(/\s+/).length > 2
-  ) {
-    const allWords = text.trim().split(/\s+/);
-    const mid = Math.ceil(allWords.length / 2);
-    const l1 = allWords.slice(0, mid).join(" ");
-    const l2 = allWords.slice(mid).join(" ");
-    if (
-      context.measureText(l1).width <= maxWidth &&
-      context.measureText(l2).width <= maxWidth
-    ) {
-      return [l1, l2];
-    }
-  }
-
-  return lines;
-}
-
-const BOARD_BASE_WIDTH = 896;
-const BOARD_BASE_HEIGHT = 1200;
-const BOARD_ASPECT = BOARD_BASE_WIDTH / BOARD_BASE_HEIGHT;
-
-function isPinHit(
-  worldPointer: Point,
-  pinPosition: Point,
-  pin: PinPoint | { id: string; label: string },
-  transform: ViewTransform,
-  bounds?: BoardBounds,
-): boolean {
-  const scaleFactor =
-    bounds && bounds.width > 0 ? bounds.width / BOARD_BASE_WIDTH : 1.0;
-  const rawPin = pin as any;
-  const userScale =
-    typeof rawPin.scale === "number" && rawPin.scale > 0 ? rawPin.scale : 1.0;
-  const userRot = typeof rawPin.rotation === "number" ? rawPin.rotation : 0;
-
-  // Hit radius for pinhead (18px scaled by scaleFactor)
-  const headHitRadius = (18 * scaleFactor) / transform.scale;
-  if (
-    distance(worldPointer.x, worldPointer.y, pinPosition.x, pinPosition.y) <=
-    headHitRadius
-  ) {
-    return true;
-  }
-
-  // Un-rotate worldPointer relative to pinPosition into card local coordinate frame
-  const dx = worldPointer.x - pinPosition.x;
-  const dy = worldPointer.y - pinPosition.y;
-  const rad = (-userRot * Math.PI) / 180;
-  const unrotX = dx * Math.cos(rad) - dy * Math.sin(rad);
-  const unrotY = dx * Math.sin(rad) + dy * Math.cos(rad);
-
-  const isFollowup =
-    pin.id.startsWith("c0-pin-followup") || pin.id.startsWith("followup-");
-  const isVictimPhone =
-    pin.id === "c0-pin-victim-phone" ||
-    (pin.id.includes("phone") && pin.id !== "c0-pin-phone" && Boolean((pin as any).photoUrl));
-  const isKhang =
-    !isFollowup &&
-    !isVictimPhone &&
-    (pin.id.includes("khang") ||
-      (pin.label && pin.label.toLowerCase().includes("khang")));
-  const isCrimeScene =
-    !isFollowup &&
-    (pin.id.includes("crime-scene") ||
-      pin.id.includes("thi-the") ||
-      (pin.label && pin.label.toLowerCase().includes("thi thể")));
-  const isSuspectPin =
-    !isFollowup &&
-    (pin.id.startsWith("node-suspect-") ||
-      pin.id.startsWith("suspect-") ||
-      !!(pin as any).photoUrl ||
-      isKhang ||
-      isCrimeScene ||
-      isVictimPhone);
-
-  let baseCardWidth = 142;
-  let baseCardHeight = 167;
-  let tagYRatio = -0.08;
-
-  if (isSuspectPin) {
-    baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isVictimPhone ? 135 : 158;
-    baseCardHeight = isCrimeScene
-      ? (baseCardWidth * 420) / 560
-      : isVictimPhone
-        ? (baseCardWidth * 997) / 757
-        : (baseCardWidth * 380) / 300;
-    tagYRatio = isCrimeScene ? -0.05 : isVictimPhone ? -0.04 : -0.1;
-  } else {
-    const upperLabel = (pin.label || "").toUpperCase();
-    const isWhiteNote =
-      (pin as any).noteColor === "white" ||
-      upperLabel.includes("MỞ RỘNG") ||
-      upperLabel.includes("KHÁM XÉT") ||
-      upperLabel.includes("KHÁM NGHIỆM") ||
-      upperLabel.includes("KẾT LUẬN") ||
-      upperLabel.includes("BIÊN BẢN") ||
-      upperLabel.includes("TRUY TỐ");
-
-    baseCardWidth = isFollowup ? 144 : isWhiteNote ? 142 : 115;
-    baseCardHeight = isFollowup ? 132 : isWhiteNote ? 167 : 115;
-  }
-
-  // Width & height in world space (matching canvas render)
-  const cardW = (baseCardWidth * scaleFactor * userScale) / transform.scale;
-  const cardH = (baseCardHeight * scaleFactor * userScale) / transform.scale;
-  const tagX = -cardW * 0.5;
-  const tagY = tagYRatio * cardH;
-
-  const pad = 2 / transform.scale; // Accurate bounding box
-
-  return (
-    unrotX >= tagX - pad &&
-    unrotX <= tagX + cardW + pad &&
-    unrotY >= tagY - pad &&
-    unrotY <= tagY + cardH + pad
-  );
-}
-
-/**
- * Calculate the board bounds in screen-space coordinates.
- * Preserves the exact aspect ratio of the corkboard (896:1200)
- * fitting completely within the container on both Desktop and Mobile.
- */
-function getInnerBoardBounds(
-  containerWidth: number,
-  containerHeight: number,
-  _frameImg?: HTMLImageElement | null,
-): BoardBounds {
-  if (containerWidth <= 0 || containerHeight <= 0) {
-    return { x: 0, y: 0, width: BOARD_BASE_WIDTH, height: BOARD_BASE_HEIGHT };
-  }
-
-  const containerAspect = containerWidth / containerHeight;
-  let width = containerWidth;
-  let height = containerHeight;
-  let x = 0;
-  let y = 0;
-
-  if (containerAspect > BOARD_ASPECT) {
-    // Container is wider than the standard board -> fit height, center horizontally
-    height = containerHeight;
-    width = height * BOARD_ASPECT;
-    x = (containerWidth - width) / 2;
-    y = 0;
-  } else {
-    // Container is taller/narrower (like mobile screen) -> fit width, center vertically
-    width = containerWidth;
-    height = width / BOARD_ASPECT;
-    x = 0;
-    y = (containerHeight - height) / 2;
-  }
-
-  return {
-    x,
-    y,
-    width,
-    height,
-  };
-}
-
-function getViewTransform(zoom: ZoomState, pan: Point): ViewTransform {
-  if (!zoom.active) {
-    return {
-      scale: 1,
-      translateX: 0,
-      translateY: 0,
-    };
-  }
-
-  /*
-   * Công thức này giữ vị trí người dùng nhấp tại cùng một điểm
-   * trên màn hình sau khi phóng to:
-   *
-   * screenX = worldX * scale + translateX
-   * translateX = originX * (1 - scale)
-   */
-  return {
-    scale: ZOOM_SCALE,
-    translateX: zoom.originX * (1 - ZOOM_SCALE) + pan.x,
-    translateY: zoom.originY * (1 - ZOOM_SCALE) + pan.y,
-  };
-}
-
-function worldToScreen(worldPoint: Point, transform: ViewTransform): Point {
-  return {
-    x: worldPoint.x * transform.scale + transform.translateX,
-    y: worldPoint.y * transform.scale + transform.translateY,
-  };
-}
-
-function screenToWorld(screenPoint: Point, transform: ViewTransform): Point {
-  return {
-    x: (screenPoint.x - transform.translateX) / transform.scale,
-    y: (screenPoint.y - transform.translateY) / transform.scale,
-  };
-}
-
-function getPinWorldPosition(pin: PinPoint, bounds: BoardBounds): Point {
-  return {
-    x: bounds.x + pin.x * bounds.width,
-    y: bounds.y + pin.y * bounds.height,
-  };
-}
+/* Board math helpers moved to ./hero-interactive/utils. */
 
 // ────────────────────────────────────────
 // Component
 // ────────────────────────────────────────
-
-interface TooltipState {
-  pinIndex: number;
-  isUserPin: boolean;
-  x: number;
-  y: number;
-}
-
-export interface HeroInteractiveProps {
-  className?: string;
-  controlledCaseId?: string;
-  customPins?: PinPoint[];
-  customConnections?: CaseConnection[];
-  customBgImage?: string;
-  selectedPinId?: string | null;
-  onSelectPin?: (pinId: string | null) => void;
-  onConnectPins?: (fromPinId: string, toPinId: string) => void;
-  onDeleteConnection?: (connId: string) => void;
-  onPinClick?: (
-    pinId: string,
-    pin?: PinPoint,
-    coords?: { clientX: number; clientY: number },
-  ) => void;
-  isEditMode?: boolean;
-  onPinPositionChange?: (pinId: string, newX: number, newY: number) => void;
-}
 
 export function HeroInteractive({
   className,
@@ -767,260 +136,45 @@ export function HeroInteractive({
 
   const suspectImageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
   const sheetPhotosMapRef = useRef<Map<string, string>>(new Map());
-  const compositeCardCacheRef = useRef<Map<string, HTMLCanvasElement>>(new Map());
+  const compositeCardCacheRef = useRef<Map<string, HTMLCanvasElement>>(
+    new Map(),
+  );
 
   const resolveSuspectPhotoUrl = (pin: {
     id: string;
     label: string;
     photoUrl?: string;
-  }): string | undefined => {
-    if (pin.photoUrl) return normalizeImageUrl(pin.photoUrl);
-    if (
-      pin.id.startsWith("c0-pin-followup") ||
-      pin.id.startsWith("c0-pin-question") ||
-      pin.id.startsWith("c0-pin-clue") ||
-      pin.id.startsWith("c0-pin-evidence") ||
-      pin.id.startsWith("c0-pin-phone") ||
-      pin.id.startsWith("c0-pin-reinvestigate") ||
-      pin.id.startsWith("c0-pin-indictment") ||
-      pin.id === "c0-pin-suspects"
-    ) {
-      return undefined;
-    }
-    const lower = `${pin.id} ${pin.label}`.toLowerCase();
-    const isCrimeScenePin =
-      lower.includes("thi-the") ||
-      lower.includes("thi the") ||
-      lower.includes("hiện trường") ||
-      lower.includes("crime-scene") ||
-      lower.includes("crime_scene") ||
-      lower.includes("chalk");
-
-    // 1. Check live Google Sheets photos first (Live-First rule)
-    const photosMap = sheetPhotosMapRef.current;
-    if (photosMap) {
-      if (isCrimeScenePin) {
-        const liveCrime =
-          photosMap.get("crime_scene") ||
-          photosMap.get("chalk_outline") ||
-          photosMap.get("thi_the") ||
-          photosMap.get("c0-pin-crime-scene");
-        if (liveCrime) return liveCrime;
-      }
-      if (lower.includes("khang")) {
-        const liveKhang =
-          photosMap.get("avatar_khang") || photosMap.get("khang");
-        if (liveKhang) return liveKhang;
-      }
-      const char =
-        findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
-      if (char) {
-        const liveChar =
-          photosMap.get(`avatar_${char.id}`) || photosMap.get(char.id);
-        if (liveChar) return liveChar;
-        if (char.avatarUrl) return char.avatarUrl;
-      }
-      const directCode = photosMap.get(pin.id.toLowerCase().trim());
-      if (directCode) return directCode;
-    } else {
-      const char =
-        findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
-      if (char && char.avatarUrl) return char.avatarUrl;
-    }
-
-    // 2. Fallback to local asset if not found in live Google Sheets
-    if (isCrimeScenePin) {
-      return "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png";
-    }
-
-    return undefined;
-  };
+  }): string | undefined =>
+    resolveSuspectPhotoUrlHelper(pin, sheetPhotosMapRef.current);
 
   const getLoadedImage = (
     rawUrl: string,
     fallbackUrl?: string,
-  ): HTMLImageElement | null => {
-    if (!rawUrl) {
-      return fallbackUrl ? getLoadedImage(fallbackUrl) : null;
-    }
-    const url = normalizeImageUrl(rawUrl);
-    let img = suspectImageCacheRef.current.get(url);
-    if (!img) {
-      img = new Image();
-      if (url.startsWith("http://") || url.startsWith("https://")) {
-        img.crossOrigin = "anonymous";
-      }
-      img.src = url;
-      img.onload = () => {
+  ): HTMLImageElement | null =>
+    getLoadedImageHelper(
+      rawUrl,
+      suspectImageCacheRef.current,
+      fallbackUrl,
+      () => {
         if (requestRenderRef.current) requestRenderRef.current();
-      };
-      img.onerror = () => {
-        console.warn("Failed to load photo asset:", url);
-        if (fallbackUrl && fallbackUrl !== url) {
-          const fallbackNorm = normalizeImageUrl(fallbackUrl);
-          const fallbackImg = getLoadedImage(fallbackNorm);
-          if (fallbackImg) {
-            suspectImageCacheRef.current.set(url, fallbackImg);
-            if (requestRenderRef.current) requestRenderRef.current();
-          }
-        }
-      };
-      suspectImageCacheRef.current.set(url, img);
-    }
-    return img.complete && img.naturalWidth > 0 ? img : null;
-  };
+      },
+    );
 
   const getCompositeCard = (
     rawUrl: string,
     label: string,
     fallbackUrl?: string,
-  ): HTMLCanvasElement | HTMLImageElement | null => {
-    if (!rawUrl) {
-      return fallbackUrl ? getLoadedImage(fallbackUrl) : null;
-    }
-    const url = normalizeImageUrl(rawUrl);
-
-    // If already pre-rendered local asset with tape, return image directly
-    if (url.includes("pinned_photos_with_tape") || url.includes("pinned_tape_")) {
-      return getLoadedImage(url);
-    }
-
-    const rawLabel = (label || "NẠN NHÂN").trim();
-    let cleanLabel = rawLabel.replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim();
-    cleanLabel = cleanLabel
-      .replace(
-        /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
-        "",
-      )
-      .replace(/\s*\([^)]*\)/g, "")
-      .trim()
-      .toUpperCase();
-    if (!cleanLabel) cleanLabel = rawLabel.toUpperCase();
-
-    const cacheKey = `${url}::${cleanLabel}`;
-    const cached = compositeCardCacheRef.current.get(cacheKey);
-    if (cached) return cached;
-
-    const rawImg = getLoadedImage(url, fallbackUrl);
-    if (!rawImg) {
-      return fallbackUrl ? getLoadedImage(fallbackUrl) : null;
-    }
-
-    // Build procedural Polaroid card with masking tape and name tag
-    try {
-      const card = document.createElement("canvas");
-      // Exact 3:4 photo viewport (300x400)
-      const photoW = 300;
-      const photoH = 400;
-      const padSide = 16;
-      const padTop = 18;
-      const padBottom = 58;
-
-      const cardW = photoW + padSide * 2; // 332
-      const cardH = photoH + padTop + padBottom; // 476
-      card.width = cardW;
-      card.height = cardH;
-
-      const ctx = card.getContext("2d");
-      if (!ctx) return rawImg;
-
-      // 1. Off-white card stock
-      ctx.fillStyle = "#F8F7F3";
-      ctx.fillRect(0, 0, cardW, cardH);
-      ctx.strokeStyle = "#D2CDC3";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(0, 0, cardW, cardH);
-
-      // 2. Inner photo with cover crop at exact 3:4
-      const photoX = padSide;
-      const photoY = padTop;
-      const imgW = rawImg.naturalWidth || rawImg.width || 1;
-      const imgH = rawImg.naturalHeight || rawImg.height || 1;
-      const scale = Math.max(photoW / imgW, photoH / imgH);
-      const sw = photoW / scale;
-      const sh = photoH / scale;
-      const sx = (imgW - sw) / 2;
-      const sy = (imgH - sh) / 2;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(photoX, photoY, photoW, photoH);
-      ctx.clip();
-      ctx.drawImage(rawImg, sx, sy, sw, sh, photoX, photoY, photoW, photoH);
-      // Photo border
-      ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
-      ctx.strokeRect(photoX, photoY, photoW, photoH);
-      ctx.restore();
-
-      // 3. Torn beige masking tape across bottom of photo
-      const tapeY = photoY + photoH - 16;
-      const tapeH = 54;
-      const tapeX1 = 8;
-      const tapeX2 = cardW - 8;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(tapeX1, tapeY);
-      ctx.lineTo(tapeX2, tapeY);
-
-      // Right torn edge with jagged notches
-      const rightSteps = 8;
-      const rightOffsets = [3, -4, 4, -3, 5, -2, 4, -3];
-      for (let i = 0; i < rightSteps; i++) {
-        const y = tapeY + ((i + 1) / rightSteps) * tapeH;
-        const x = tapeX2 + rightOffsets[i % rightOffsets.length];
-        ctx.lineTo(x, y);
-      }
-
-      // Bottom edge
-      ctx.lineTo(tapeX1, tapeY + tapeH);
-
-      // Left torn edge with jagged notches
-      const leftOffsets = [-4, 3, -5, 4, -3, 4, -2, 3];
-      for (let i = rightSteps - 1; i >= 0; i--) {
-        const y = tapeY + (i / rightSteps) * tapeH;
-        const x = tapeX1 + leftOffsets[i % leftOffsets.length];
-        ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-
-      ctx.fillStyle = "rgba(235, 218, 185, 0.95)";
-      ctx.fill();
-      ctx.strokeStyle = "rgba(205, 188, 155, 0.85)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Masking tape paper texture fibers
-      ctx.strokeStyle = "rgba(180, 160, 130, 0.25)";
-      ctx.beginPath();
-      ctx.moveTo(tapeX1 + 10, tapeY + 12);
-      ctx.lineTo(tapeX2 - 10, tapeY + 12);
-      ctx.moveTo(tapeX1 + 15, tapeY + 38);
-      ctx.lineTo(tapeX2 - 15, tapeY + 38);
-      ctx.stroke();
-      ctx.restore();
-
-      // 4. Bold printed Name on tape (auto-scaled to fit prominently)
-      ctx.save();
-      ctx.fillStyle = "rgba(18, 20, 26, 0.96)";
-      let fontSize = 23;
-      ctx.font = `900 ${fontSize}px Arial, "SF Pro Display", -apple-system, sans-serif`;
-      while (ctx.measureText(cleanLabel).width > cardW - 36 && fontSize > 14) {
-        fontSize -= 1;
-        ctx.font = `900 ${fontSize}px Arial, "SF Pro Display", -apple-system, sans-serif`;
-      }
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(cleanLabel, cardW / 2, tapeY + tapeH / 2 + 1);
-      ctx.restore();
-
-      compositeCardCacheRef.current.set(cacheKey, card);
-      return card;
-    } catch (e) {
-      console.warn("Failed to generate dynamic composite card:", e);
-      return rawImg;
-    }
-  };
+  ): HTMLCanvasElement | HTMLImageElement | null =>
+    getCompositeCardHelper(
+      rawUrl,
+      label,
+      suspectImageCacheRef.current,
+      compositeCardCacheRef.current,
+      fallbackUrl,
+      () => {
+        if (requestRenderRef.current) requestRenderRef.current();
+      },
+    );
 
   const containerSizeRef = useRef<Size>({
     width: 0,
@@ -1083,7 +237,10 @@ export function HeroInteractive({
   const [boardMode, setBoardMode] = useState<BoardMode>("zoom");
 
   // ── Live Google Sheets Photos Integration ──
-  const { data: sheetPhotos } = usePhoneData("photos", currentCaseId || "case-000");
+  const { data: sheetPhotos } = usePhoneData(
+    "photos",
+    currentCaseId || "case-000",
+  );
 
   const sheetPhotosMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -1114,19 +271,26 @@ export function HeroInteractive({
         map.set(titleLower, normalized);
         // Also map clean name from title (e.g. "Ảnh chân dung Lê Quang Vũ" -> "vũ", "lê quang vũ")
         if (titleLower.includes("khang")) map.set("khang", normalized);
-        if (titleLower.includes("vũ") || titleLower.includes("vu")) map.set("vu", normalized);
-        if (titleLower.includes("tùng") || titleLower.includes("tung")) map.set("tung", normalized);
-        if (titleLower.includes("hà") || titleLower.includes("ha")) map.set("ha", normalized);
+        if (titleLower.includes("vũ") || titleLower.includes("vu"))
+          map.set("vu", normalized);
+        if (titleLower.includes("tùng") || titleLower.includes("tung"))
+          map.set("tung", normalized);
+        if (titleLower.includes("hà") || titleLower.includes("ha"))
+          map.set("ha", normalized);
         if (titleLower.includes("mai")) map.set("mai", normalized);
-        if (titleLower.includes("đạt") || titleLower.includes("dat")) map.set("dat", normalized);
-        if (titleLower.includes("lụa") || titleLower.includes("lua")) map.set("lua", normalized);
+        if (titleLower.includes("đạt") || titleLower.includes("dat"))
+          map.set("dat", normalized);
+        if (titleLower.includes("lụa") || titleLower.includes("lua"))
+          map.set("lua", normalized);
         if (titleLower.includes("vy")) map.set("vy", normalized);
-        if (titleLower.includes("tiến") || titleLower.includes("tien")) map.set("tien", normalized);
+        if (titleLower.includes("tiến") || titleLower.includes("tien"))
+          map.set("tien", normalized);
         if (
           titleLower.includes("thi thể") ||
           titleLower.includes("thi-the") ||
           titleLower.includes("chalk") ||
-          (titleLower.includes("hiện trường") && !titleLower.includes("phòng khách"))
+          (titleLower.includes("hiện trường") &&
+            !titleLower.includes("phòng khách"))
         ) {
           map.set("crime_scene", normalized);
           map.set("chalk_outline", normalized);
@@ -2070,7 +1234,9 @@ export function HeroInteractive({
           pin.id.startsWith("node-suspect-") ||
           pin.id.startsWith("suspect-") ||
           pin.id === "c0-pin-victim-khang" ||
-          Boolean(findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id));
+          Boolean(
+            findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id),
+          );
 
         const isPhotoPin =
           isAvatarPin ||
@@ -2121,7 +1287,9 @@ export function HeroInteractive({
               380;
             const isVictimPhone =
               pin.id === "c0-pin-victim-phone" ||
-              (pin.id.includes("phone") && pin.id !== "c0-pin-phone" && Boolean((pin as any).photoUrl));
+              (pin.id.includes("phone") &&
+                pin.id !== "c0-pin-phone" &&
+                Boolean((pin as any).photoUrl));
             const isKhang =
               !isVictimPhone &&
               (pin.id.includes("khang") ||
@@ -2130,12 +1298,23 @@ export function HeroInteractive({
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isVictimPhone ? 135 : 158;
-            const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
+            const baseCardWidth = isKhang
+              ? 204
+              : isCrimeScene
+                ? 186
+                : isVictimPhone
+                  ? 135
+                  : 158;
+            const cardWidth =
+              (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = (cardWidth * imgH) / imgW;
 
             const tagX = -cardWidth / 2;
-            const tagY = isCrimeScene ? -cardHeight * 0.05 : isVictimPhone ? -cardHeight * 0.04 : -cardHeight * 0.1;
+            const tagY = isCrimeScene
+              ? -cardHeight * 0.05
+              : isVictimPhone
+                ? -cardHeight * 0.04
+                : -cardHeight * 0.1;
 
             // Pass 1 — wide ambient occlusion: soft halo lifting the card off the corkboard
             context.save();
@@ -2181,8 +1360,10 @@ export function HeroInteractive({
             const baseCardHeight = isCrimeScene
               ? (baseCardWidth * 420) / 560
               : (baseCardWidth * 380) / 300;
-            const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
-            const cardHeight = (baseCardHeight * scaleFactor * scaleMod) / transform.scale;
+            const cardWidth =
+              (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
+            const cardHeight =
+              (baseCardHeight * scaleFactor * scaleMod) / transform.scale;
             context.fillStyle = "#f5f2eb";
             context.fillRect(-cardWidth / 2, 0, cardWidth, cardHeight);
           }
@@ -2193,7 +1374,9 @@ export function HeroInteractive({
           if (isPhotoHovered || isPhotoSelected) {
             const isVictimPhone =
               pin.id === "c0-pin-victim-phone" ||
-              (pin.id.includes("phone") && pin.id !== "c0-pin-phone" && Boolean((pin as any).photoUrl));
+              (pin.id.includes("phone") &&
+                pin.id !== "c0-pin-phone" &&
+                Boolean((pin as any).photoUrl));
             const isKhang =
               !isVictimPhone &&
               (pin.id.includes("khang") ||
@@ -2202,8 +1385,15 @@ export function HeroInteractive({
               pin.id.includes("crime-scene") ||
               pin.id.includes("thi-the") ||
               (pin.label && pin.label.toLowerCase().includes("thi thể"));
-            const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : isVictimPhone ? 135 : 158;
-            const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
+            const baseCardWidth = isKhang
+              ? 204
+              : isCrimeScene
+                ? 186
+                : isVictimPhone
+                  ? 135
+                  : 158;
+            const cardWidth =
+              (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = loadedSuspectImg
               ? (cardWidth *
                   ((loadedSuspectImg as HTMLImageElement).naturalHeight ||
@@ -2214,7 +1404,11 @@ export function HeroInteractive({
                   300)
               : cardWidth * 1.3;
             const tagX = -cardWidth / 2;
-            const tagY = isCrimeScene ? -cardHeight * 0.05 : isVictimPhone ? -cardHeight * 0.04 : -cardHeight * 0.1;
+            const tagY = isCrimeScene
+              ? -cardHeight * 0.05
+              : isVictimPhone
+                ? -cardHeight * 0.04
+                : -cardHeight * 0.1;
 
             context.save();
             if (isPhotoSelected) {
@@ -2414,13 +1608,15 @@ export function HeroInteractive({
           const isIndictment =
             pin.id === "c0-pin-indictment" || upperLabel.includes("KẾT LUẬN");
           const isFollowup =
-            pin.id.startsWith("c0-pin-followup") || pin.id.startsWith("followup-");
+            pin.id.startsWith("c0-pin-followup") ||
+            pin.id.startsWith("followup-");
           const sizeMultiplier = 1.0;
 
           // Note size: preserve aspect ratio cleanly without distortion
           const baseCardWidth = isFollowup ? 144 : isWhiteNote ? 142 : 115;
           const noteWidth =
-            (baseCardWidth * scaleFactor * scaleMod * sizeMultiplier) / transform.scale;
+            (baseCardWidth * scaleFactor * scaleMod * sizeMultiplier) /
+            transform.scale;
 
           let noteHeight = noteWidth;
           if (
@@ -2432,7 +1628,8 @@ export function HeroInteractive({
               (noteWidth * loadedNoteImg.naturalHeight) /
               loadedNoteImg.naturalWidth;
           } else {
-            noteHeight = noteWidth * (isFollowup ? 0.92 : isWhiteNote ? 1.18 : 1.0);
+            noteHeight =
+              noteWidth * (isFollowup ? 0.92 : isWhiteNote ? 1.18 : 1.0);
           }
 
           let pinAnchorX = 0.5;
@@ -2517,9 +1714,11 @@ export function HeroInteractive({
             const pulseGlow = (Math.sin(timestamp / 220) + 1) / 2;
             context.save();
             context.shadowColor = `rgba(245, 158, 11, ${0.45 + pulseGlow * 0.55})`;
-            context.shadowBlur = ((8 + pulseGlow * 12) * scaleFactor) / transform.scale;
+            context.shadowBlur =
+              ((8 + pulseGlow * 12) * scaleFactor) / transform.scale;
             context.strokeStyle = `rgba(253, 224, 71, ${0.75 + pulseGlow * 0.25})`;
-            context.lineWidth = ((2.2 + pulseGlow * 1.5) * scaleFactor) / transform.scale;
+            context.lineWidth =
+              ((2.2 + pulseGlow * 1.5) * scaleFactor) / transform.scale;
             context.strokeRect(tagX, tagY, noteWidth, noteHeight);
             context.restore();
           }
@@ -2548,7 +1747,10 @@ export function HeroInteractive({
               context.lineWidth = (2 * scaleFactor) / transform.scale;
             }
 
-            context.setLineDash([(6 * scaleFactor) / transform.scale, (4 * scaleFactor) / transform.scale]);
+            context.setLineDash([
+              (6 * scaleFactor) / transform.scale,
+              (4 * scaleFactor) / transform.scale,
+            ]);
             context.strokeRect(bx, by, bw, bh);
             context.setLineDash([]);
 
@@ -2590,14 +1792,16 @@ export function HeroInteractive({
             const maxTextWidth = noteWidth * (isWhiteNote ? 0.65 : 0.72);
             const availableHeight = noteHeight * (isWhiteNote ? 0.55 : 0.6);
 
-            let fontSize = (isIndictment ? 15.5 : isWhiteNote ? 14.5 : 14.0) * scaleFactor;
+            let fontSize =
+              (isIndictment ? 15.5 : isWhiteNote ? 14.5 : 14.0) * scaleFactor;
             context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
             let lines = wrapText(context, pin.label, maxTextWidth, 3);
 
             while (
               fontSize > 9.0 * scaleFactor &&
               (lines.some((l) => context.measureText(l).width > maxTextWidth) ||
-                lines.length * ((fontSize + 1.5 * scaleFactor) / transform.scale) >
+                lines.length *
+                  ((fontSize + 1.5 * scaleFactor) / transform.scale) >
                   availableHeight)
             ) {
               fontSize -= 0.5 * scaleFactor;
@@ -2711,7 +1915,8 @@ export function HeroInteractive({
 
         if (isMostlyVertical) {
           const bow =
-            (dx >= 0 ? -1 : 1) * Math.min((10 * scaleFactor) / transform.scale, dist * 0.04);
+            (dx >= 0 ? -1 : 1) *
+            Math.min((10 * scaleFactor) / transform.scale, dist * 0.04);
           middleX += bow;
         } else {
           const sag = Math.max(
@@ -2762,7 +1967,10 @@ export function HeroInteractive({
         const dx = end.x - start.x;
         const dy = end.y - start.y;
         const dist = Math.hypot(dx, dy);
-        const sag = Math.max(18 * scaleFactor, Math.min(50 * scaleFactor, dist * 0.09));
+        const sag = Math.max(
+          18 * scaleFactor,
+          Math.min(50 * scaleFactor, dist * 0.09),
+        );
 
         const middleX = (start.x + end.x) / 2;
         const middleY = (start.y + end.y) / 2 + sag;
@@ -2809,7 +2017,10 @@ export function HeroInteractive({
           context.shadowBlur = (8 * scaleFactor) / transform.scale;
           context.strokeStyle = "rgba(239, 68, 68, 0.95)";
           context.lineWidth = (2.0 * scaleFactor) / transform.scale;
-          context.setLineDash([(5 * scaleFactor) / transform.scale, (3 * scaleFactor) / transform.scale]);
+          context.setLineDash([
+            (5 * scaleFactor) / transform.scale,
+            (3 * scaleFactor) / transform.scale,
+          ]);
           context.beginPath();
           context.moveTo(start.x, start.y);
           context.lineTo(pointerWorld.x, pointerWorld.y);
@@ -2926,8 +2137,10 @@ export function HeroInteractive({
           context.fillStyle = "rgba(0, 0, 0, 0.45)";
           context.beginPath();
           context.ellipse(
-            pinPosition.x + ((isRedPin ? 2.2 : 1.8) * scaleFactor) / transform.scale,
-            pinPosition.y + ((isRedPin ? 3.0 : 2.5) * scaleFactor) / transform.scale,
+            pinPosition.x +
+              ((isRedPin ? 2.2 : 1.8) * scaleFactor) / transform.scale,
+            pinPosition.y +
+              ((isRedPin ? 3.0 : 2.5) * scaleFactor) / transform.scale,
             baseRadius * 0.9,
             baseRadius * 0.55,
             0,
