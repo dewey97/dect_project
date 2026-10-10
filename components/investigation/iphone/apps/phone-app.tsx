@@ -20,7 +20,7 @@ import { usePhoneData } from "@/lib/hooks/use-phone-data";
 
 interface PhoneAppProps {
   onBackToHome?: () => void;
-  initialTab?: "recents" | "keypad" | "contacts" | "voicemail";
+  initialTab?: "recents" | "keypad" | "contacts";
 }
 
 // Exact Figma Keypad spec (Frame 22:453)
@@ -44,7 +44,7 @@ export function PhoneApp({
   initialTab = "keypad",
 }: PhoneAppProps) {
   const [activeTab, setActiveTab] = useState<
-    "recents" | "contacts" | "keypad" | "voicemail"
+    "recents" | "contacts" | "keypad"
   >(initialTab);
   const [keypadInput, setKeypadInput] = useState("");
 
@@ -198,7 +198,6 @@ export function PhoneApp({
             {activeTab === "keypad" && ""}
             {activeTab === "contacts" &&
               (selectedContact ? "" : "Tất cả danh bạ")}
-            {activeTab === "voicemail" && "Hộp thư thoại"}
           </span>
         )}
 
@@ -594,17 +593,10 @@ export function PhoneApp({
             )}
           </div>
         )}
-
-        {/* VOICEMAIL PLACEHOLDER */}
-        {activeTab === "voicemail" && (
-          <div className="text-center py-16 text-[#717786] text-sm">
-            Không có thư thoại mới
-          </div>
-        )}
       </div>
 
-      {/* Bottom iOS Phone Tab Bar (Figma Node 22:558: height 49px, 4 Tabs) */}
-      <div className="h-[49px] bg-[#FFFFFF] border-t border-[#E3E2E7] grid grid-cols-4 items-center px-1 shrink-0">
+      {/* Bottom iOS Phone Tab Bar (3 Tabs: Gần đây, Danh bạ, Bàn phím) */}
+      <div className="h-[49px] bg-[#FFFFFF] border-t border-[#E3E2E7] grid grid-cols-3 items-center px-4 shrink-0">
         <button
           onClick={() => setActiveTab("recents")}
           aria-label="Thẻ Gần đây"
@@ -613,7 +605,7 @@ export function PhoneApp({
             activeTab === "recents" ? "text-[#0058BC]" : "text-[#717786]",
           )}
         >
-          <Clock className="size-[17px]" />
+          <Clock className="size-[18px]" />
           <span className="text-[10px] font-medium mt-[2px]">Gần đây</span>
         </button>
 
@@ -625,7 +617,7 @@ export function PhoneApp({
             activeTab === "contacts" ? "text-[#0058BC]" : "text-[#717786]",
           )}
         >
-          <User className="size-[18px]" />
+          <User className="size-[19px]" />
           <span className="text-[10px] font-medium mt-[2px]">Danh bạ</span>
         </button>
 
@@ -637,26 +629,8 @@ export function PhoneApp({
             activeTab === "keypad" ? "text-[#0058BC]" : "text-[#717786]",
           )}
         >
-          <Grid3X3 className="size-[18px]" />
+          <Grid3X3 className="size-[19px]" />
           <span className="text-[10px] font-medium mt-[2px]">Bàn phím</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("voicemail")}
-          aria-label="Thẻ Hộp thư thoại"
-          className={cn(
-            "flex flex-col items-center justify-center h-full cursor-pointer relative min-h-[44px]",
-            activeTab === "voicemail" ? "text-[#0058BC]" : "text-[#717786]",
-          )}
-        >
-          <Voicemail className="size-[18px]" />
-          <span className="text-[10px] font-medium mt-[2px]">
-            Hộp thư thoại
-          </span>
-          {/* Unread Voicemail Badge (Node 22:580: 16x16 red badge #BA1A1A) */}
-          <span className="absolute top-[3px] right-[18px] size-[16px] rounded-full bg-[#BA1A1A] text-white font-normal text-[10px] flex items-center justify-center shadow-xs">
-            1
-          </span>
         </button>
       </div>
     </div>

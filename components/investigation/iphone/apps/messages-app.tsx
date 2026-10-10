@@ -263,6 +263,17 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     setTimeout(() => setPinnedNotification(null), 2500);
   };
 
+  // Audio durations dynamically loaded from files (msgId -> mm:ss)
+  const [loadedDurations, setLoadedDurations] = useState<Record<string, string>>({});
+
+  // Helper format seconds to mm:ss
+  const formatTime = (seconds: number) => {
+    if (!seconds || isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
   // Play audio toggle
   const togglePlayAudio = (msgId: string, audioUrl: string) => {
     const existingAudio = document.getElementById(
@@ -285,6 +296,15 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     setActiveAudioId(msgId);
     setIsPlayingAudio(true);
     setAudioProgress(0);
+
+    audio.onloadedmetadata = () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        setLoadedDurations((prev) => ({
+          ...prev,
+          [msgId]: formatTime(audio.duration),
+        }));
+      }
+    };
 
     audio.ontimeupdate = () => {
       if (audio.duration) {
@@ -433,7 +453,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                               isMe ? "text-white/90" : "text-[#414755]",
                             )}
                           >
-                            {attachment.duration || "0:08"}
+                            {loadedDurations[msg.id] ||
+                              attachment.duration ||
+                              "0:08"}
                           </span>
                         </div>
 
