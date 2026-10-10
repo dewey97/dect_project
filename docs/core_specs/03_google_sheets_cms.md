@@ -280,12 +280,20 @@ flowchart LR
 | 4 | `title` | 🟢 `⚡` | Tiêu đề câu hỏi / thử thách. |
 | 5 | `question` | 🟢 `⚡` | Lời dẫn yêu cầu điều tra chi tiết. |
 | 6 | `type` | 🔴 `🔑` | `evidence_picker` (chọn vật chứng + người), `text_match_3` (điền 3 ô), `mcq` (trắc nghiệm), `text` (nhập tự do). |
-| 7 | `answers` | 🟢 `⚡` | **Đáp án hợp nhất**: Dùng cú pháp tối giản trực tiếp (Alt+Enter xuống dòng). Tự động so khớp tiếng Việt không dấu/có dấu.<br>• *3 SĐT (`text_match_3`)*: Viết thẳng từng dòng `0988.200.991: Vũ, Lê Quang Vũ` hoặc `SĐT 0988.200.991: Vũ`.<br>• *Trắc nghiệm / Text*: `dap_an: 21:15` hoặc `phuong_an: A, B, C`.<br>• *Bắt buộc vật chứng*: `ma_chung_cu: 52, 53` hoặc `bat_buoc: 52`. |
-| 8 | `hints` | 🟢 `⚡` | **Gợi ý đa cấp**: Mỗi dòng Alt+Enter là 1 cấp độ gợi ý (Cấp 1 ➔ Cấp 2 ➔ Đáp án gợi mở). |
+| 7 | `answers` | 🟢 `⚡` | **Đáp án hợp nhất**: Dùng cú pháp khóa/giá trị tối giản trực tiếp (Alt+Enter xuống dòng). Luôn sử dụng **mã số chứng cứ (evidence code)** hoặc số điện thoại, tuyệt đối không nhập văn bản mô tả tiếng Việt dài dòng.<br>• *3 SĐT (`text_match_3`)*: Viết từng dòng `<SĐT>: <Tên>`, ví dụ `0988.200.991: Vũ, Lê Quang Vũ`.<br>• *Thẩm tra nghi phạm (Động cơ & Ngoại phạm)*:<br>  `dong_co: 13, 0988.200.991`<br>  `tuy_chon_dong_co: 0984.112.568, 53`<br>  `ngoai_pham: 10, 42`<br>  `tuy_chon_ngoai_pham: 6, 8`<br>• *Trắc nghiệm / Text / Thời gian*: `dap_an: 21:15` hoặc `phuong_an: A, B, C`.<br>• *Bắt buộc vật chứng*: `bat_buoc: 52, 50, 51, 53`. |
+| 8 | `hints` | 🟢 `⚡` | **Gợi ý đa cấp**: Mỗi dòng Alt+Enter là 1 cấp độ gợi ý (Cấp 1 ➔ Cấp 2 ➔ Đáp án gợi mở). Hỗ trợ tách biệt gợi ý động cơ & ngoại phạm bằng tiền tố `dong_co: Gợi ý...` / `ngoai_pham: Gợi ý...`. |
 
-> 📌 **Ghi chú Tinh gọn Schema**:
+> 📌 **Ghi chú & Quy chuẩn Cột `answers` (Evidence Code Standard)**:
+> - **Chỉ dùng Mã số / Mã định danh (Evidence Codes & SĐT)**: Cột `answers` chỉ chứa mã số vật chứng (`13`, `10`, `42`, `52`...) hoặc mã file cuộc gọi (`voice_0984.112.568`, `0988.200.991`). **Tuyệt đối KHÔNG** nhập tên tiếng Việt văn xuôi (như `Sổ ghi nợ`, `Tin nhắn đe dọa`) vào các trường chứng cứ vì UI so khớp trực tiếp bằng ID chứng cứ.
+> - **Các từ khóa chuẩn hóa (Keys)**:
+>   - `dong_co`: Các mã chứng cứ bắt buộc chứng minh động cơ phạm tội.
+>   - `tuy_chon_dong_co`: Các mã chứng cứ bổ sung/tùy chọn cho động cơ (chọn thêm không bị phạt/vẫn hợp lệ).
+>   - `ngoai_pham`: Các mã chứng cứ bắt buộc chứng minh mâu thuẫn ngoại phạm.
+>   - `tuy_chon_ngoai_pham`: Các mã chứng cứ bổ sung/tùy chọn cho ngoại phạm.
+>   - `bat_buoc`: Danh sách mã chứng cứ bắt buộc phải chọn để giải quyết checkpoint.
+>   - `dap_an`: Giá trị đáp án dạng chuỗi (thời gian, con số, phương án).
+>   - `nghi_pham`: Tên nghi phạm mục tiêu của checkpoint (ví dụ `Trần Thị Hà`).
 > - **Gộp `node_id` vào `checkpoint_id`**: Dùng chung 1 mã khóa duy nhất (`cp-000-0`, `cp-000-1a`...).
-> - **Loại bỏ `unlocked_evidence_id`**: Tiến trình mở khóa tự động quản lý theo Phase và sự kiện kịch bản.
 > - **Tối giản cú pháp `answers`**: Hệ thống tích hợp sẵn thuật toán `isVietnameseTextMatch` tự động chuẩn hóa dấu tiếng Việt (không cần viết thêm bản không dấu như `Vu, Dat, Tung` trên Sheet). Cú pháp 3 ô SĐT cho phép viết gọn: `<số_điện_thoại>: <tên_nghi_phạm>`.
 
 
