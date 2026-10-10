@@ -331,24 +331,22 @@ export function HintModal({
           {/* ACTIVE CONTENT AREA */}
           <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] custom-scrollbar">
             {/* STAGE TITLE BAR */}
-            <div className="border-b-2 border-[#2b1f14]/20 pb-3 flex items-start justify-between gap-3">
+            <div className="border-b-2 border-[#2b1f14]/20 pb-3">
               <div className="space-y-1">
-                <div className="flex items-center gap-1.5 text-[#8c1d1d] font-mono text-[11px] font-bold uppercase tracking-wider">
-                  {isMotiveGroup ? (
-                    <Target className="size-3.5" />
-                  ) : isAlibiGroup ? (
-                    <Clock className="size-3.5" />
-                  ) : (
-                    <Compass className="size-3.5" />
-                  )}
-                  <span>
-                    {isMotiveGroup
-                      ? "MỤC TIÊU // BẰNG CHỨNG ĐỘNG CƠ"
-                      : isAlibiGroup
-                        ? "MỤC TIÊU // BẰNG CHỨNG NGOẠI PHẠM"
-                        : "TIẾN TRÌNH CÂU HỎI HIỆN TẠI"}
-                  </span>
-                </div>
+                {(isMotiveGroup || isAlibiGroup) && (
+                  <div className="flex items-center gap-1.5 text-[#8c1d1d] font-mono text-[11px] font-bold uppercase tracking-wider">
+                    {isMotiveGroup ? (
+                      <Target className="size-3.5" />
+                    ) : (
+                      <Clock className="size-3.5" />
+                    )}
+                    <span>
+                      {isMotiveGroup
+                        ? "MỤC TIÊU // BẰNG CHỨNG ĐỘNG CƠ"
+                        : "MỤC TIÊU // BẰNG CHỨNG NGOẠI PHẠM"}
+                    </span>
+                  </div>
+                )}
                 <h4 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wide">
                   {currentGroup.title}
                   {isMotiveGroup
@@ -358,12 +356,6 @@ export function HintModal({
                       : ""}
                 </h4>
               </div>
-
-              {currentGroup.dossier && (
-                <span className="font-mono text-[10px] sm:text-[11px] font-bold bg-[#ebdcc4] text-[#6b4e2e] border border-[#a88c6f] px-2 py-0.5 whitespace-nowrap">
-                  {currentGroup.dossier}
-                </span>
-              )}
             </div>
 
             {/* TRƯỜNG HỢP: CHƯA CÓ GỢI Ý HOẶC ĐANG TẢI */}
