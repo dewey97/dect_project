@@ -27,7 +27,7 @@ const MOTIVE_OPTIONS = [
   { id: 'motive-3', label: 'Mâu thuẫn tình cảm (thuần túy do cảm xúc)' },
   { id: 'motive-4', label: 'Diệt khẩu (ra tay do bí mật bị nắm giữ)' },
   { id: 'motive-5', label: 'Tự vệ (xuất phát từ sự sợ hãi & phản kháng)' },
-  { id: 'motive-6', label: 'Tâm thần/Biến thái (không có mâu thuẫn thực tế, xuất phát từ vấn đề tâm lý của hung thủ)' },
+  { id: 'motive-6', label: 'Tâm thần (xuất phát từ vấn đề tâm lý của hung thủ)' },
 ]
 
 function normalizeName(str: string): string {
@@ -212,7 +212,7 @@ export function IndictmentModal({
             )}
 
             {/* 1. THÔNG TIN VỤ ÁN */}
-            <div className="space-y-3 p-3 sm:p-4 bg-[#ede3d1]/50 rounded-none">
+            <div className="space-y-3">
               <h4 className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider border-b border-[#2b1f14]/20 pb-1.5">
                 1. THÔNG TIN VỤ ÁN:
               </h4>
@@ -234,31 +234,31 @@ export function IndictmentModal({
                 </div>
 
                 {/* 1.2 - 1.5 Static Case Details */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-sans pt-1">
-                  <div className="p-2 bg-[#f4ebd9]/80 border-b border-[#d4c5b0]">
-                    <span className="font-mono text-[11px] font-bold text-[#6b4e2e] block uppercase">Tội danh đề nghị truy tố:</span>
-                    <span className="font-bold text-[#1a120b] text-xs">Giết người</span>
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 font-sans text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase">Tội danh:</span>
+                    <span className="font-bold text-[#1a120b]">Giết người</span>
                   </div>
-                  <div className="p-2 bg-[#f4ebd9]/80 border-b border-[#d4c5b0]">
-                    <span className="font-mono text-[11px] font-bold text-[#6b4e2e] block uppercase">Thời gian xảy ra án mạng:</span>
-                    <span className="font-bold text-[#1a120b] text-xs">20:45 - 21:15</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase">Thời gian gây án:</span>
+                    <span className="font-bold text-[#8c1d1d] font-mono">20:45 - 21:15</span>
                   </div>
                 </div>
 
-                <div className="p-2 bg-[#f4ebd9]/80 border-b border-[#d4c5b0]">
-                  <span className="font-mono text-[11px] font-bold text-[#6b4e2e] block uppercase">Địa điểm xảy ra án mạng:</span>
-                  <span className="font-bold text-[#1a120b] text-xs leading-snug block">
+                <div className="flex flex-wrap items-baseline gap-1.5 font-sans text-xs">
+                  <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase shrink-0">Địa điểm:</span>
+                  <span className="font-bold text-[#1a120b] leading-tight">
                     Phòng khách tại nhà riêng, số 14, Đường Bờ Sông, Phường Phân khu Cảng, Quận Sông Hồng, TP. Hà Nội
                   </span>
                 </div>
 
-                <div className="p-2 bg-[#f4ebd9]/80 border-b border-[#d4c5b0]">
-                  <span className="font-mono text-[11px] font-bold text-[#6b4e2e] block uppercase">Phương tiện / Hung khí gây án:</span>
-                  <span className="font-bold text-[#1a120b] text-xs">Mảnh gốm vỡ dài :8.2 cm</span>
+                <div className="flex items-center gap-1.5 font-sans text-xs">
+                  <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase shrink-0">Hung khí:</span>
+                  <span className="font-bold text-[#1a120b]">Mảnh gốm vỡ dài :8.2 cm</span>
                 </div>
 
                 {/* 1.6 ĐỘNG CƠ GÂY ÁN CHÍNH */}
-                <div className="space-y-2 pt-1">
+                <div className="space-y-1.5 pt-1">
                   <label className="font-mono text-xs font-bold text-[#4a3520] block uppercase tracking-wider">
                     • Động cơ gây án chính: <span className="text-red-700">*</span>
                   </label>
@@ -297,26 +297,20 @@ export function IndictmentModal({
             </div>
 
             {/* 2. CĂN CỨ CHỨNG MINH HÀNH VI PHẠM TỘI */}
-            <div className="space-y-3 pt-1">
-              <h4 className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider border-b border-[#2b1f14]/20 pb-1.5">
-                2. CĂN CỨ CHỨNG MINH HÀNH VI PHẠM TỘI:
-              </h4>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                  • Chứng minh bị can để lại dấu vết hoặc mang theo dấu vết vụ án: <span className="text-red-700">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={cluesEvidenceInput}
-                  onChange={(e) => {
-                    setCluesEvidenceInput(e.target.value)
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  placeholder="Nhập mã chứng cứ (ví dụ: C-02, D-04, D-05, D-02 hoặc 53)..."
-                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                />
-              </div>
+            <div className="space-y-1.5 pt-1">
+              <label className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider block border-b border-[#2b1f14]/20 pb-1.5">
+                2. CĂN CỨ CHỨNG MINH BỊ CAN ĐỂ LẠI HOẶC MANG THEO DẤU VẾT VỤ ÁN: <span className="text-red-700">*</span>
+              </label>
+              <input
+                type="text"
+                value={cluesEvidenceInput}
+                onChange={(e) => {
+                  setCluesEvidenceInput(e.target.value)
+                  if (errorMsg) setErrorMsg('')
+                }}
+                placeholder="Nhập mã chứng cứ (ví dụ: C-02, D-04, D-05, D-02 hoặc 53)..."
+                className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
+              />
             </div>
 
             {/* FOOTER / CTA */}
