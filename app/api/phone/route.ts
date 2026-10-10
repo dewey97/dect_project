@@ -19,8 +19,9 @@ const CACHE_TTL_MS = 15_000; // 15 seconds
 
 /**
  * Dựng cấu hình xác thực Google Sheets an toàn từ Env hoặc Key File.
+ * Nếu không có credentials, trả về null để chuyển sang chế độ Public Export mà không gây lỗi.
  */
-function createGoogleAuth(): InstanceType<typeof google.auth.GoogleAuth> {
+function createGoogleAuth(): InstanceType<typeof google.auth.GoogleAuth> | null {
   const inlineCredentials = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
   if (inlineCredentials) {
     try {
@@ -45,10 +46,74 @@ function createGoogleAuth(): InstanceType<typeof google.auth.GoogleAuth> {
     });
   }
 
-  // Fallback to Application Default Credentials (ADC)
-  return new google.auth.GoogleAuth({
-    scopes: [SHEETS_SCOPE],
-  });
+  // Không cố gọi ADC khi môi trường container/server không có cấu hình để tránh văng lỗi
+  return null;
+}
+
+/**
+ * Trình bóc tách CSV chuẩn RFC 4180 cho dữ liệu xuất bản công khai từ Google Sheets
+ */
+function parseCsvRows(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let inQuotes = false;
+  let field = "";
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const next = text[i + 1];
+
+    if (inQuotes) {
+      if (c === '"' && next === '"') {
+        field += '"';
+        i++;
+      } else if (c === '"') {
+        inQuotes = false;
+      } else {
+        field += c;
+      }
+    } else {
+      if (c === '"') {
+        inQuotes = true;
+      } else if (c === ",") {
+        row.push(field);
+        field = "";
+      } else if (c === "\n" || (c === "\r" && next === "\n")) {
+        row.push(field);
+        field = "";
+        rows.push(row);
+        row = [];
+        if (c === "\r") i++;
+      } else if (c === "\r") {
+        row.push(field);
+        field = "";
+        rows.push(row);
+        row = [];
+      } else {
+        field += c;
+      }
+    }
+  }
+
+  if (field || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+/**
+ * Tải trực tiếp dữ liệu dạng CSV từ Google Sheets công khai khi không có Service Account.
+ */
+async function fetchPublicSheetRows(spreadsheetId: string, tab: string): Promise<string[][]> {
+  const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) {
+    throw new Error(`Google Sheets public export failed with HTTP ${res.status}`);
+  }
+  const text = await res.text();
+  return parseCsvRows(text);
 }
 
 export async function GET(request: Request) {
@@ -81,76 +146,87 @@ export async function GET(request: Request) {
     return res;
   }
 
+  const spreadsheetId =
+    process.env.GOOGLE_SHEETS_ID || DEFAULT_SPREADSHEET_ID;
+
+  let rawRows: any[][] = [];
+
   try {
-    const spreadsheetId =
-      process.env.GOOGLE_SHEETS_ID || DEFAULT_SPREADSHEET_ID;
     const auth = createGoogleAuth();
-
-    const sheets = google.sheets({ version: "v4", auth });
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `'${tab}'!A1:Z500`,
-    });
-
-    const rows = response.data.values || [];
-    if (rows.length === 0) {
-      serverCache[cacheKey] = { data: [], timestamp: now };
-      return NextResponse.json({ success: true, tab, data: [] });
-    }
-
-    const headers = rows[0].map((h: string) =>
-      typeof h === "string" ? h.replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim() : h,
-    );
-    const rawData = rows.slice(1).map((row) => {
-      const obj: Record<string, any> = {};
-      headers.forEach((header, index) => {
-        if (header) {
-          obj[header] = row[index] !== undefined ? row[index] : "";
-        }
+    if (auth) {
+      const sheets = google.sheets({ version: "v4", auth });
+      const response = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `'${tab}'!A1:Z500`,
       });
-      return obj;
-    });
-
-    // Case-insensitive & dash/underscore-agnostic filter by case_id
-    const filteredData = rawData.filter((item) => {
-      if (item.case_id) {
-        const itemCaseId = String(item.case_id)
-          .trim()
-          .toLowerCase()
-          .replace(/-/g, "_");
-        return itemCaseId === caseIdFilter;
-      }
-      return true;
-    });
-
-    // Save in server cache
-    serverCache[cacheKey] = {
-      data: filteredData,
-      timestamp: now,
-    };
-
-    const res = NextResponse.json({
-      success: true,
-      caseId: rawCaseId,
-      tab,
-      totalCount: filteredData.length,
-      data: filteredData,
-    });
-    res.headers.set(
-      "Cache-Control",
-      "no-store, no-cache, must-revalidate, proxy-revalidate",
-    );
-    return res;
-  } catch (error: any) {
-    console.error("Error fetching Google Sheets API:", error);
-    // Trả về dữ liệu rỗng an toàn thay vì HTTP 500 để không làm sập giao diện client
-    return NextResponse.json({
-      success: false,
-      caseId: rawCaseId,
-      tab,
-      totalCount: 0,
-      data: [],
-      error: error.message || "Failed to fetch data from Google Sheets",
-    });
+      rawRows = response.data.values || [];
+    } else {
+      // Chế độ Public Fetch mượt mà khi không có Service Account
+      rawRows = await fetchPublicSheetRows(spreadsheetId, tab);
+    }
+  } catch (primaryError: any) {
+    console.warn("Primary Google Sheets fetch failed, falling back to public export:", primaryError?.message);
+    try {
+      rawRows = await fetchPublicSheetRows(spreadsheetId, tab);
+    } catch (fallbackError: any) {
+      console.error("Both primary and public fetch failed:", fallbackError);
+      return NextResponse.json({
+        success: false,
+        caseId: rawCaseId,
+        tab,
+        totalCount: 0,
+        data: [],
+        error: fallbackError.message || primaryError?.message || "Failed to fetch data from Google Sheets",
+      });
+    }
   }
+
+  if (rawRows.length === 0) {
+    serverCache[cacheKey] = { data: [], timestamp: now };
+    return NextResponse.json({ success: true, tab, data: [] });
+  }
+
+  const headers = rawRows[0].map((h: string) =>
+    typeof h === "string" ? h.replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim() : h,
+  );
+  const rawData = rawRows.slice(1).map((row) => {
+    const obj: Record<string, any> = {};
+    headers.forEach((header, index) => {
+      if (header) {
+        obj[header] = row[index] !== undefined ? row[index] : "";
+      }
+    });
+    return obj;
+  });
+
+  // Case-insensitive & dash/underscore-agnostic filter by case_id
+  const filteredData = rawData.filter((item) => {
+    if (item.case_id) {
+      const itemCaseId = String(item.case_id)
+        .trim()
+        .toLowerCase()
+        .replace(/-/g, "_");
+      return itemCaseId === caseIdFilter;
+    }
+    return true;
+  });
+
+  // Save in server cache
+  serverCache[cacheKey] = {
+    data: filteredData,
+    timestamp: now,
+  };
+
+  const res = NextResponse.json({
+    success: true,
+    caseId: rawCaseId,
+    tab,
+    totalCount: filteredData.length,
+    data: filteredData,
+  });
+  res.headers.set(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate",
+  );
+  return res;
 }
