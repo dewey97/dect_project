@@ -300,19 +300,16 @@ export function HintModal({
         >
           {/* HEADER */}
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#8c1d1d] flex items-center gap-1.5">
-                <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                SỔ TAY GỢI Ý ĐIỀU TRA // CASE 000
-              </span>
-              <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
+            <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider flex items-center gap-2">
+              <Lightbulb className="size-4 text-[#8c1d1d]" />
+              <span>
                 {isMotiveGroup
                   ? "Gợi Ý Động Cơ Gây Án"
                   : isAlibiGroup
                     ? "Gợi Ý Mâu Thuẫn Ngoại Phạm"
                     : "Gợi Ý Manh Mối Checkpoint"}
-              </h3>
-            </div>
+              </span>
+            </h3>
 
             <button
               type="button"
@@ -331,7 +328,7 @@ export function HintModal({
           {/* ACTIVE CONTENT AREA */}
           <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] custom-scrollbar">
             {/* STAGE TITLE BAR */}
-            <div className="border-b-2 border-[#2b1f14]/20 pb-3">
+            <div>
               <div className="space-y-1">
                 {(isMotiveGroup || isAlibiGroup) && (
                   <div className="flex items-center gap-1.5 text-[#8c1d1d] font-mono text-[11px] font-bold uppercase tracking-wider">
@@ -374,7 +371,7 @@ export function HintModal({
               <>
                 <div className="pt-1">
                   <div className="p-4 border-2 border-[#2b1f14] bg-[#fdfbf7] text-[#1a120b] shadow-sm rounded-none font-sans text-xs sm:text-[13px] leading-relaxed">
-                    <div className="flex items-center justify-between border-b border-[#2b1f14]/15 pb-1.5 mb-2.5 font-mono text-[10px] sm:text-[11px] font-bold uppercase">
+                    <div className="flex items-center justify-between pb-2 mb-2 font-mono text-[10px] sm:text-[11px] font-bold uppercase">
                       <span className="flex items-center gap-1.5 text-[#8c1d1d]">
                         <Unlock className="size-3.5" />
                         Gợi ý mức {viewIdx + 1}/{totalHints}
