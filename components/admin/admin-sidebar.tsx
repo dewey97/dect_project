@@ -108,7 +108,7 @@ export function AdminSidebar() {
       <div className="p-4 border-t border-border/40 space-y-2">
         {/* Launch Game / Playtest */}
         <Link
-          href="/play/case_000"
+          href="/evidence/web"
           className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-primary text-primary-foreground font-bold rounded-md hover:bg-primary/90 shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all text-xs tracking-wider"
         >
           <Play className="size-4" fill="currentColor" />

@@ -5,12 +5,15 @@ import { notFound } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
-export default async function SettingsPage() {
-  const { data, success } = await getAppSettings()
-  
-  if (!success || !data) {
-    notFound()
-  }
+const defaultSettings = {
+  id: 1,
+  maintenance_mode: false,
+  banner_active: true,
+  banner_text: '🚀 Chào mừng đến với Dect Project - Studio đang trong giai đoạn Alpha Test!',
+  updated_at: new Date().toISOString()
+}
 
-  return <SettingsClient initialSettings={data} />
+export default async function SettingsPage() {
+  const { data } = await getAppSettings()
+  return <SettingsClient initialSettings={data || defaultSettings} />
 }

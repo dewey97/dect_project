@@ -124,7 +124,7 @@ export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
                     <Link
-                      href={`/play/${c.id}`}
+                      href={c.id === 'case_000' || c.title.toLowerCase().includes('trốn tìm') ? '/evidence/web' : `/evidence/web?case_id=${c.id}`}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/20 text-primary border border-primary/30 rounded text-xs font-medium hover:bg-primary/30 transition-colors"
                     >
                       Playtest
