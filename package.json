@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0 --webpack",
+    "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "export:docs-pdf": "node scripts/export-docs-to-pdf.js",
     "build:master-doc": "node scripts/build-all-documents-gdoc-and-sheet.js",
