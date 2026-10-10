@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { setStorageItem } from '@/lib/storage'
+import { emitInvestigationEvent } from '@/lib/investigation-events'
 import {
   WALKTHROUGH_STEPS,
   WalkthroughStep
@@ -20,6 +21,7 @@ import type { PinPoint } from '@/components/investigation/hero-interactive'
 
 const BOARD_BASE_WIDTH = 896
 const BOARD_BASE_HEIGHT = 1200
+const BOARD_ASPECT = BOARD_BASE_WIDTH / BOARD_BASE_HEIGHT
 
 interface InteractiveWalkthroughProps {
   isOpen: boolean
@@ -53,6 +55,13 @@ export function InteractiveWalkthrough({
     return map
   }, [pins])
 
+  // Emit event to reset canvas zoom whenever walkthrough opens
+  useEffect(() => {
+    if (isOpen) {
+      emitInvestigationEvent('OPEN_WALKTHROUGH')
+    }
+  }, [isOpen])
+
   // Calculate spotlight location precisely based on actual live board geometry
   useEffect(() => {
     if (!isOpen) return
@@ -77,31 +86,69 @@ export function InteractiveWalkthrough({
           // Fallback search by prefix/label
           targetPin = pins.find(
             (p) =>
+              p.id === step.targetPinId ||
               p.id.includes(step.targetPinId!) ||
-              (step.targetPinId === 'c0-pin-victim-khang' && p.id.includes('khang')) ||
-              (step.targetPinId === 'c0-pin-phone' && p.id.includes('phone')) ||
-              (step.targetPinId === 'c0-pin-suspects' && p.id.includes('suspect')) ||
-              (step.targetPinId === 'c0-pin-reinvestigate' && p.id.includes('reinvestigate')) ||
-              (step.targetPinId === 'c0-pin-indictment' && p.id.includes('indictment'))
+              (step.targetPinId === 'c0-pin-victim-khang' && (p.id.includes('khang') || p.label?.toLowerCase().includes('khang'))) ||
+              (step.targetPinId === 'c0-pin-phone' && (p.id.includes('phone') || p.id.includes('dev-00') || p.label?.toLowerCase().includes('điện thoại') || p.label?.toLowerCase().includes('mở rộng'))) ||
+              (step.targetPinId === 'c0-pin-suspects' && (p.id.includes('suspect') || p.label?.toLowerCase().includes('nghi phạm'))) ||
+              (step.targetPinId === 'c0-pin-reinvestigate' && (p.id.includes('reinvestigate') || p.label?.toLowerCase().includes('khám xét') || p.label?.toLowerCase().includes('khám nghiệm'))) ||
+              (step.targetPinId === 'c0-pin-indictment' && (p.id.includes('indictment') || p.label?.toLowerCase().includes('kết luận') || p.label?.toLowerCase().includes('truy tố')))
           )
         }
 
         if (targetPin) {
-          // Exact board bounds calculation matching HeroInteractive
-          const boardX = rect.left + (rect.width - BOARD_BASE_WIDTH) / 2
-          const boardY = rect.top + (rect.height - BOARD_BASE_HEIGHT) / 2
+          // Exact responsive board bounds matching HeroInteractive getBoardBounds
+          const containerWidth = rect.width
+          const containerHeight = rect.height
+          const containerAspect = containerWidth / containerHeight
 
-          const pinScreenX = boardX + targetPin.x * BOARD_BASE_WIDTH
-          const pinScreenY = boardY + targetPin.y * BOARD_BASE_HEIGHT
+          let boardWidth = containerWidth
+          let boardHeight = containerHeight
+          let boardX = 0
+          let boardY = 0
 
-          // Size of spotlight based on pin type
-          const isPhoto = !!targetPin.photoUrl
-          const spotWidth = isPhoto ? 160 : 130
-          const spotHeight = isPhoto ? 170 : 120
+          if (containerAspect > BOARD_ASPECT) {
+            // Screen is wider than board aspect ratio (desktop / laptop) -> fit height
+            boardHeight = containerHeight
+            boardWidth = boardHeight * BOARD_ASPECT
+            boardX = (containerWidth - boardWidth) / 2
+            boardY = 0
+          } else {
+            // Screen is taller/narrower (mobile / tablet portrait) -> fit width
+            boardWidth = containerWidth
+            boardHeight = boardWidth / BOARD_ASPECT
+            boardX = 0
+            boardY = (containerHeight - boardHeight) / 2
+          }
+
+          const pinScreenX = rect.left + boardX + targetPin.x * boardWidth
+          const pinScreenY = rect.top + boardY + targetPin.y * boardHeight
+
+          const scaleFactor = boardWidth / BOARD_BASE_WIDTH
+          const isPhoto =
+            !!targetPin.photoUrl ||
+            targetPin.id.includes('khang') ||
+            targetPin.id.includes('victim') ||
+            targetPin.id.includes('thi-the') ||
+            targetPin.id.includes('scene')
+
+          let spotWidth: number
+          let spotHeight: number
+          let spotYOffset: number
+
+          if (isPhoto) {
+            spotWidth = Math.max(140, Math.round(204 * scaleFactor))
+            spotHeight = Math.max(160, Math.round(255 * scaleFactor))
+            spotYOffset = spotHeight * 0.15
+          } else {
+            spotWidth = Math.max(130, Math.round(155 * scaleFactor))
+            spotHeight = Math.max(115, Math.round(140 * scaleFactor))
+            spotYOffset = spotHeight * 0.12
+          }
 
           setSpotlightRect({
             x: Math.max(8, pinScreenX - spotWidth / 2),
-            y: Math.max(8, pinScreenY - spotHeight / 2),
+            y: Math.max(8, pinScreenY - spotYOffset),
             width: spotWidth,
             height: spotHeight
           })
@@ -113,10 +160,10 @@ export function InteractiveWalkthrough({
         if (el) {
           const elRect = el.getBoundingClientRect()
           setSpotlightRect({
-            x: elRect.left - 10,
-            y: elRect.top - 10,
-            width: elRect.width + 20,
-            height: elRect.height + 20
+            x: elRect.left - 8,
+            y: elRect.top - 8,
+            width: elRect.width + 16,
+            height: elRect.height + 16
           })
         } else {
           setSpotlightRect(null)

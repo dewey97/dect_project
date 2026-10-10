@@ -42,12 +42,12 @@ export const GAMEPLAY_GUIDE_CONFIG: {
       iconName: 'suspects',
       steps: [
         {
-          title: 'Lập hồ sơ nghi phạm',
-          desc: 'Nhấp vào ghim "Nghi phạm" để thêm các đối tượng tình nghi vào danh sách điều tra.'
+          title: 'Theo dõi nhiều đối tượng & Đổi hướng bất kỳ lúc nào',
+          desc: 'Có thể lập hồ sơ theo dõi nhiều nghi phạm cùng lúc. Điều tra dở dang đối tượng này có thể chuyển sang đối tượng khác bất cứ lúc nào mà không mất tiến độ.'
         },
         {
-          title: 'Gán Động cơ & Bằng chứng ngoại phạm',
-          desc: 'Gán Động cơ (Motive) và Chứng cứ ngoại phạm (Alibi) của từng người dựa trên tài liệu thu thập được để tìm ra sơ hở trong lời khai.'
+          title: 'Điều kiện xác định nghi phạm',
+          desc: 'Đối tượng chỉ được coi là nghi phạm khi thỏa mãn đồng thời: Có động cơ (mâu thuẫn lợi ích/tình cảm) và Chứng cứ ngoại phạm bất hợp lý (lời khai mâu thuẫn dữ liệu).'
         }
       ],
       proTip: 'Khi nhận diện đúng đối tượng, ảnh nhận dạng và dây liên kết sẽ tự động xuất hiện trên bảng án.'

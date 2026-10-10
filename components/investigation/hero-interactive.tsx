@@ -14,6 +14,7 @@ import { cn, normalizeImageUrl } from "@/lib/utils";
 import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useInvestigationEvent } from "@/lib/investigation-events";
 
 // ────────────────────────────────────────
 // Types
@@ -1283,6 +1284,11 @@ export function HeroInteractive({
 
     requestRenderRef.current();
   }, [updateHoveredPin]);
+
+  // Reset zoom & pan automatically whenever the walkthrough tour opens
+  useInvestigationEvent("OPEN_WALKTHROUGH", () => {
+    resetZoom();
+  });
 
   const toggleZoomAt = useCallback(
     (screenX: number, screenY: number) => {

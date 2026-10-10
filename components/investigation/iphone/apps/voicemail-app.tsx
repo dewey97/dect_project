@@ -38,14 +38,23 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
 
   const { data: callsData, loading, error } = usePhoneData('calls')
 
-  const recents = callsData.map((item: any) => ({
-    name: item.contact_name || item.caller_name || item.phone_number || 'Không rõ',
-    phone: item.phone_number || '',
-    type: item.call_type === 'INCOMING_MISSED' ? 'Cuộc gọi nhỡ' : item.call_type === 'OUTGOING' ? 'Cuộc gọi đi' : 'Cuộc gọi đến',
-    time: item.timestamp || item.time || '',
-    isMissed: item.call_type === 'INCOMING_MISSED' || item.is_missed === 'TRUE' || item.is_missed === true,
-    duration: item.duration || ''
-  }))
+  const recents = callsData.map((item: any) => {
+    const rawName = item.display_name || item.contact_name || item.caller_name
+    const name = rawName || item.phone_number || 'Không rõ'
+    const phone = item.phone_number || ''
+    const timeFormatted = item.time_str
+      ? (item.date_str ? `${item.time_str} · ${item.date_str}` : item.time_str)
+      : (item.timestamp || item.time || '')
+
+    return {
+      name,
+      phone,
+      type: item.call_type === 'INCOMING_MISSED' ? 'Cuộc gọi nhỡ' : item.call_type === 'OUTGOING' ? 'Cuộc gọi đi' : 'Cuộc gọi đến',
+      time: timeFormatted,
+      isMissed: item.call_type === 'INCOMING_MISSED' || String(item.is_missed).toUpperCase() === 'TRUE' || item.is_missed === true,
+      duration: item.duration || ''
+    }
+  })
 
   return (
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans">
@@ -91,7 +100,12 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
                       <div className={cn('text-[14px] font-semibold', call.isMissed ? 'text-[#FF453A]' : 'text-white')}>
                         {call.name}
                       </div>
-                      <div className="text-[11px] text-[#8E8E93]">{call.type}</div>
+                      <div className="text-[11px] text-[#8E8E93] flex items-center gap-1.5">
+                        <span>{call.type}</span>
+                        {call.phone && call.name !== call.phone && (
+                          <span className="text-[#636366] font-mono text-[10.5px]">({call.phone})</span>
+                        )}
+                      </div>
                     </div>
                     <div className="text-right flex items-center gap-2">
                       <div>

@@ -52,10 +52,10 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     stepNumber: 4,
     totalSteps: 7,
     title: 'QUẢN LÝ & GÁN MANH MỐI NGHI PHẠM',
-    subtitle: 'Lập hồ sơ đối tượng, động cơ & bằng chứng ngoại phạm',
+    subtitle: 'Theo dõi nhiều đối tượng, động cơ & bằng chứng ngoại phạm',
     description:
-      'Mở danh mục Nghi phạm để thêm các đối tượng tình nghi. Gán Động cơ (Motive) và Chứng cứ ngoại phạm (Alibi) của từng người để đối chiếu lời khai.',
-    actionHint: '💡 Khi nhận diện đúng đối tượng, ảnh chân dung và dây liên kết sẽ tự động nối trên bảng án.',
+      'Lập hồ sơ theo dõi nhiều nghi phạm cùng lúc. Bạn có thể điều tra dở dang và đổi hướng sang đối tượng khác bất cứ lúc nào mà không mất tiến độ.',
+    actionHint: '💡 Đối tượng chỉ thành nghi phạm khi thỏa mãn cả Động cơ và Ngoại phạm bất hợp lý.',
     targetType: 'pin',
     targetPinId: 'c0-pin-suspects'
   },
@@ -64,10 +64,10 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     stepNumber: 5,
     totalSteps: 7,
     title: 'LỆNH TÁI KHÁM XÉT & CÂU HỎI NGHIỆP VỤ',
-    subtitle: 'Thẩm vấn mở rộng & Tìm kiếm vật chứng ẩn',
+    subtitle: 'Rà soát manh mối bỏ sót & Dấu vết hiện trường',
     description:
-      'Trả lời các câu hỏi thẩm vấn then chốt tại các ghim nghi vấn để được phê duyệt Lệnh khám xét lại hiện trường nhằm thu thập thêm chứng cứ mới.',
-    actionHint: '💡 Các ghim màu vàng/đỏ thể hiện các câu hỏi cần giải quyết tiếp theo.',
+      'Khám xét lại hiện trường để thu thập thêm dấu vết vật lý và âm thanh môi trường. Lệnh chỉ tự động sáng lên khi bạn đạt đủ điều kiện kích hoạt trên hệ thống.',
+    actionHint: '💡 Cần hoàn thành thẩm vấn các nghi phạm trước để được phê duyệt lệnh.',
     targetType: 'pin',
     targetPinId: 'c0-pin-reinvestigate'
   },
@@ -75,10 +75,10 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: 'step-indictment',
     stepNumber: 6,
     totalSteps: 7,
-    title: 'LẬP BẢN CÁO TRẠNG GỬI VIỆN KIỂM SÁT',
+    title: 'LẬP BẢN CÁO TRẠNG & ĐỀ NGHỊ TRUY TỐ',
     subtitle: 'Kết luận điều tra & Bắt giữ hung thủ',
     description:
-      'Khi đã đủ bằng chứng, nhấp vào đây để hoàn thiện 4 yếu tố: Hung Thủ + Động Cơ + Phương Thức Gây Án + Chứng Cứ Buộc Tội để phá án thành công!',
+      'Khi đã đủ căn cứ, hoàn thiện 4 yếu tố: Thủ Phạm + Động Cơ + Phương Thức + Chứng Cứ Mấu Chốt. Bắt buộc tích chọn chứng cứ xác thực, không chấp nhận suy đoán thiếu căn cứ!',
     actionHint: '💡 Bản cáo trạng chính xác 100% sẽ mở ra phần Hậu truyện (Epilogue).',
     targetType: 'pin',
     targetPinId: 'c0-pin-indictment'
