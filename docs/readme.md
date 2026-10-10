@@ -4,28 +4,41 @@
 
 ---
 
-## ⚙️ 1. Tầng Kỹ Thuật (Technical Docs)
+## ⚙️ 1. Tầng Kỹ Thuật (Technical Specs)
 
-Tài liệu về kiến trúc kỹ thuật, cơ sở dữ liệu, quy trình xuất bản PDF và hệ thống Live CMS:
+Tài liệu về kiến trúc kỹ thuật, cơ sở dữ liệu, quy trình xuất bản PDF, hệ thống Live CMS và triển khai:
 
 | Tài Liệu | Nội Dung / Phạm Vi | Đường Dẫn |
 | :--- | :--- | :--- |
-| **CI/CD & VPS Deployment** | Hướng dẫn kiến trúc CI/CD tự động hóa qua GitHub Actions, GHCR và Docker VPS | [`core_specs/12_cicd_deployment_guide.md`](core_specs/12_cicd_deployment_guide.md) |
-| **Google Sheets Live CMS** | Đặc tả hệ thống Google Sheets CMS realtime, cấu trúc bảng và cú pháp đáp án | [`core_specs/10_google_sheets_cms.md`](core_specs/10_google_sheets_cms.md) |
-| **Analytics & Tracking Spec** | Đặc tả hệ thống đo lường Firebase Analytics/GA4, danh mục sự kiện và KPI game | [`core_specs/11_analytics_tracking_spec.md`](core_specs/11_analytics_tracking_spec.md) |
-| **Technical Guide** | Hướng dẫn setup, cấu trúc mã nguồn, quy trình engine và cơ sở dữ liệu | [`core_specs/07_technical_guide.md`](core_specs/07_technical_guide.md) |
-| **Database Schema** | Cấu trúc dữ liệu PostgreSQL / Supabase, bảng tiến trình điều tra | [`core_specs/08_database_schema.md`](core_specs/08_database_schema.md) |
-| **Design System & UI/UX** | Hệ thống màu sắc, typography trinh thám, tiêu chuẩn giao diện | [`core_specs/06_ux_ui_design_system.md`](core_specs/06_ux_ui_design_system.md) |
+| **01. Technical Guide** | Hướng dẫn setup, cấu trúc mã nguồn Next.js 16, Zero-gate protocol và quy chuẩn bản địa hóa | [`core_specs/01_technical_guide.md`](core_specs/01_technical_guide.md) |
+| **02. Database Schema** | Cấu trúc dữ liệu PostgreSQL / Supabase, 14 bảng DDL và chính sách bảo mật RLS | [`core_specs/02_database_schema.md`](core_specs/02_database_schema.md) |
+| **03. Google Sheets Live CMS** | Đặc tả hệ thống Google Sheets CMS realtime, cấu trúc bảng và quy trình biên kịch | [`core_specs/03_google_sheets_cms.md`](core_specs/03_google_sheets_cms.md) |
+| **04. Design System & UI/UX** | Hệ thống màu sắc Neo-noir, typography, token và mobile-first focus guidelines | [`core_specs/04_ux_ui_design_system.md`](core_specs/04_ux_ui_design_system.md) |
+| **05. Analytics & Tracking Spec** | Đặc tả hệ thống đo lường Firebase Analytics/GA4, danh mục sự kiện và KPI game | [`core_specs/05_analytics_tracking_spec.md`](core_specs/05_analytics_tracking_spec.md) |
+| **06. CI/CD & VPS Deployment** | Hướng dẫn kiến trúc CI/CD tự động hóa qua GitHub Actions, GHCR và Docker VPS | [`core_specs/06_cicd_deployment_guide.md`](core_specs/06_cicd_deployment_guide.md) |
+| **07. License & Access Control** | Đặc tả nghiệp vụ mô hình cấp quyền Board Game / Online, chính sách bảo vệ tài liệu | [`core_specs/07_license_access_system.md`](core_specs/07_license_access_system.md) |
+| **08. License Technical Spec** | Đặc tả kỹ thuật mã hóa RSA JWT, keypair management và RLS policy cho License | [`core_specs/08_license_technical_spec.md`](core_specs/08_license_technical_spec.md) |
+| **09. Business, Financial & Founder Model** | Mô hình kinh doanh Boardgame / Online, bảng tính chi phí in ấn, điểm hòa vốn và thỏa thuận phân bổ 3 founder | [`core_specs/09_business_financial_model.md`](core_specs/09_business_financial_model.md) |
+| **10. Figma Design Workflow** | Quy trình kết nối Figma, cấu hình MCP, trích xuất asset @3x, interactive hotspots và thiết kế UI | [`core_specs/10_figma_design_workflow.md`](core_specs/10_figma_design_workflow.md) |
 
 ---
 
 ## 🧠 2. Tầng Nghiệp Vụ & Hồ Sơ Vụ Án (Domain & Case Docs)
 
-Tài liệu về bối cảnh thế giới, kịch bản điều tra và hành trình trải nghiệm Vụ án #000:
+Tài liệu về bối cảnh cốt truyện, ma trận giải đố, cơ chế điều tra và hành trình trải nghiệm Vụ án #000:
 
 | Tài Liệu | Nội Dung / Phạm Vi | Đường Dẫn |
 | :--- | :--- | :--- |
-| **World Building** | Bối cảnh thế giới, không gian và quy chuẩn xã hội | [`core_specs/02_world_building.md`](core_specs/02_world_building.md) |
-| **Case #000 Case Design** | Tổng quan thiết kế, ma trận nghi phạm & logic phá án Vụ án #000 | [`cases/case_000/01_design/case_design.md`](cases/case_000/01_design/case_design.md) |
-| **Case #000 Evidence Matrix** | Ma trận liên kết chứng cứ, các mốc mâu thuẫn & suy luận | [`cases/case_000/01_design/evidence_matrix.md`](cases/case_000/01_design/evidence_matrix.md) |
-| **Case #000 Gameplay Design** | Thiết kế cơ chế điều tra, giải đố và hành trình người chơi | [`cases/case_000/01_design/gameplay_design.md`](cases/case_000/01_design/gameplay_design.md) |
+| **Case #000: Master Storyline** | Tổng quan thiết kế, bối cảnh thế giới, ma trận nghi phạm & logic cốt truyện Vụ án #000 | [`cases/case_000/01_design/case_design.md`](cases/case_000/01_design/case_design.md) |
+| **Case #000: Gameplay & Checkpoints** | Sơ đồ luồng điều tra, điều kiện mở khóa tuyến A/B/C và ma trận bằng chứng | [`cases/case_000/01_design/gameplay_design.md`](cases/case_000/01_design/gameplay_design.md) |
+| **Case #000: Re-investigation Hotspots** | Đặc tả 8 điểm tương tác khám xét lại (Point-and-Click 2D, hiệu ứng SFX & zoom) | [`cases/case_000/01_design/reinvestigation_hotspots.md`](cases/case_000/01_design/reinvestigation_hotspots.md) |
+
+---
+
+## 📁 3. Thư Mục Tài Nguyên Thiết Kế Vụ Án (`docs/cases/case_000/`)
+
+- `01_design/`: Tài liệu kịch bản, gameplay và tọa độ khám xét lại hiện trường.
+- `02_photos/`: Ảnh nhân vật, sơ đồ phấn hiện trường, tài liệu đồ họa gốc và [**Danh mục quy hoạch tài nguyên hình ảnh (`ASSET_CATALOG.md`)**](cases/case_000/02_photos/ASSET_CATALOG.md).
+- `03_audio/`: File thoại nhân vật (Khang, Vy, Hà) và hiệu ứng âm thanh môi trường.
+- `04_3d/`: Mô hình 3D Glb đồ đạc hiện trường phòng khách/phòng ngủ.
+- `05_reinvestigation/`: Dữ liệu ảnh 360 panorama, âm thanh tương tác và video hiện trường.

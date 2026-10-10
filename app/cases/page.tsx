@@ -20,7 +20,7 @@ export default function CasesPage() {
         >
           <div className="w-full sm:w-28 h-36 sm:h-auto rounded overflow-hidden shrink-0 border border-border/30">
             <img
-              src="/xplore_case_9.png"
+              src="/images/landing/xplore_case_9.png"
               alt="Bóng Ma Cầu Cảng Số 9"
               className="w-full h-full object-cover filter brightness-90 group-hover:brightness-100 transition-all"
             />
@@ -53,7 +53,7 @@ export default function CasesPage() {
         >
           <div className="w-full sm:w-28 h-36 sm:h-auto rounded overflow-hidden shrink-0 border border-border/30">
             <img
-              src="/xplore_case_north.png"
+              src="/images/landing/xplore_case_north.png"
               alt="Mật Mã Cảng Bắc"
               className="w-full h-full object-cover filter brightness-90 group-hover:brightness-100 transition-all"
             />
@@ -86,7 +86,7 @@ export default function CasesPage() {
         >
           <div className="w-full sm:w-28 h-36 sm:h-auto rounded overflow-hidden shrink-0 border border-border/30">
             <img
-              src="/suspect_marsh.png"
+              src="/images/landing/suspect_marsh.png"
               alt="Bí Mật Xí Nghiệp Đường Sắt"
               className="w-full h-full object-cover filter brightness-90 group-hover:brightness-100 transition-all"
             />

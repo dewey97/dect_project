@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -12,6 +13,7 @@ import {
 import { cn, normalizeImageUrl } from "@/lib/utils";
 import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
 import { detectiveAudio } from "@/lib/investigation-audio";
+import { usePhoneData } from "@/lib/hooks/use-phone-data";
 
 // ────────────────────────────────────────
 // Types
@@ -132,7 +134,7 @@ interface CaseData {
 // Constants & Case Data
 // ────────────────────────────────────────
 
-const BOARD_FRAME_SRC = "/evidence-board-frame.png";
+const BOARD_FRAME_SRC = "/images/hero/evidence-board-frame.png";
 
 const CASES_LIST: CaseData[] = [
   {
@@ -141,7 +143,7 @@ const CASES_LIST: CaseData[] = [
     description:
       "Chuyên án 000 — Bi kịch trốn tìm 20 năm trước tại xóm Bờ Sông",
     status: "active",
-    bgImage: "/images/corkboard_vertical_empty.jpg",
+    bgImage: "/images/backgrounds/corkboard_vertical_empty.jpg",
     pins: [
       {
         id: "c0-pin-evidence",
@@ -211,7 +213,7 @@ const CASES_LIST: CaseData[] = [
     title: "VẬN ĐƠN BẤT THƯỜNG",
     description: "Vụ mất tích bí ẩn tại Cầu cảng số 9",
     status: "active",
-    bgImage: "/evidence-board-bg.png",
+    bgImage: "/images/hero/evidence-board-bg.png",
     pins: [
       {
         id: "c1-pin-0",
@@ -290,7 +292,7 @@ const CASES_LIST: CaseData[] = [
     description:
       "Rò rỉ dữ liệu sinh học đột biến tại tổ hợp phân tích bio-tech",
     status: "active",
-    bgImage: "/evidence-board-bg2.jpg",
+    bgImage: "/images/hero/evidence-board-bg2.jpg",
     pins: [
       {
         id: "c2-pin-0",
@@ -341,7 +343,7 @@ const CASES_LIST: CaseData[] = [
     description:
       "Vụ tấn công ransomware mã hóa toàn bộ dữ liệu máy chủ tài chính",
     status: "active",
-    bgImage: "/evidence-board-bg3.jpg",
+    bgImage: "/images/hero/evidence-board-bg3.jpg",
     pins: [
       {
         id: "c3-pin-0",
@@ -756,6 +758,8 @@ export function HeroInteractive({
   const maskContextRef = useRef<CanvasRenderingContext2D | null>(null);
 
   const suspectImageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
+  const sheetPhotosMapRef = useRef<Map<string, string>>(new Map());
+  const compositeCardCacheRef = useRef<Map<string, HTMLCanvasElement>>(new Map());
 
   const resolveSuspectPhotoUrl = (pin: {
     id: string;
@@ -785,14 +789,39 @@ export function HeroInteractive({
     ) {
       return "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png";
     }
-    const char =
-      findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
-    if (char && char.avatarUrl) return char.avatarUrl;
+
+    // 1. Check live Google Sheets photos first (Live-First rule)
+    const photosMap = sheetPhotosMapRef.current;
+    if (photosMap) {
+      if (lower.includes("khang")) {
+        const liveKhang = photosMap.get("avatar_khang");
+        if (liveKhang) return liveKhang;
+      }
+      const char =
+        findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
+      if (char) {
+        const liveChar = photosMap.get(`avatar_${char.id}`);
+        if (liveChar) return liveChar;
+        if (char.avatarUrl) return char.avatarUrl;
+      }
+      const directCode = photosMap.get(pin.id.toLowerCase().trim());
+      if (directCode) return directCode;
+    } else {
+      const char =
+        findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
+      if (char && char.avatarUrl) return char.avatarUrl;
+    }
+
     return undefined;
   };
 
-  const getLoadedImage = (rawUrl: string): HTMLImageElement | null => {
-    if (!rawUrl) return null;
+  const getLoadedImage = (
+    rawUrl: string,
+    fallbackUrl?: string,
+  ): HTMLImageElement | null => {
+    if (!rawUrl) {
+      return fallbackUrl ? getLoadedImage(fallbackUrl) : null;
+    }
     const url = normalizeImageUrl(rawUrl);
     let img = suspectImageCacheRef.current.get(url);
     if (!img) {
@@ -802,9 +831,172 @@ export function HeroInteractive({
       img.onload = () => {
         if (requestRenderRef.current) requestRenderRef.current();
       };
+      img.onerror = () => {
+        console.warn("Failed to load photo asset:", url);
+        if (fallbackUrl && fallbackUrl !== url) {
+          const fallbackNorm = normalizeImageUrl(fallbackUrl);
+          const fallbackImg = getLoadedImage(fallbackNorm);
+          if (fallbackImg) {
+            suspectImageCacheRef.current.set(url, fallbackImg);
+            if (requestRenderRef.current) requestRenderRef.current();
+          }
+        }
+      };
       suspectImageCacheRef.current.set(url, img);
     }
     return img.complete && img.naturalWidth > 0 ? img : null;
+  };
+
+  const getCompositeCard = (
+    rawUrl: string,
+    label: string,
+    fallbackUrl?: string,
+  ): HTMLCanvasElement | HTMLImageElement | null => {
+    if (!rawUrl) {
+      return fallbackUrl ? getLoadedImage(fallbackUrl) : null;
+    }
+    const url = normalizeImageUrl(rawUrl);
+
+    // If already pre-rendered local asset with tape, return image directly
+    if (url.includes("pinned_photos_with_tape") || url.includes("pinned_tape_")) {
+      return getLoadedImage(url);
+    }
+
+    const rawLabel = (label || "NẠN NHÂN").trim();
+    let cleanLabel = rawLabel.replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim();
+    cleanLabel = cleanLabel
+      .replace(
+        /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
+        "",
+      )
+      .replace(/\s*\([^)]*\)/g, "")
+      .trim()
+      .toUpperCase();
+    if (!cleanLabel) cleanLabel = rawLabel.toUpperCase();
+
+    const cacheKey = `${url}::${cleanLabel}`;
+    const cached = compositeCardCacheRef.current.get(cacheKey);
+    if (cached) return cached;
+
+    const rawImg = getLoadedImage(url, fallbackUrl);
+    if (!rawImg) {
+      return fallbackUrl ? getLoadedImage(fallbackUrl) : null;
+    }
+
+    // Build procedural Polaroid card with masking tape and name tag
+    try {
+      const card = document.createElement("canvas");
+      // Exact 3:4 photo viewport (300x400)
+      const photoW = 300;
+      const photoH = 400;
+      const padSide = 16;
+      const padTop = 18;
+      const padBottom = 58;
+
+      const cardW = photoW + padSide * 2; // 332
+      const cardH = photoH + padTop + padBottom; // 476
+      card.width = cardW;
+      card.height = cardH;
+
+      const ctx = card.getContext("2d");
+      if (!ctx) return rawImg;
+
+      // 1. Off-white card stock
+      ctx.fillStyle = "#F8F7F3";
+      ctx.fillRect(0, 0, cardW, cardH);
+      ctx.strokeStyle = "#D2CDC3";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, cardW, cardH);
+
+      // 2. Inner photo with cover crop at exact 3:4
+      const photoX = padSide;
+      const photoY = padTop;
+      const imgW = rawImg.naturalWidth || rawImg.width || 1;
+      const imgH = rawImg.naturalHeight || rawImg.height || 1;
+      const scale = Math.max(photoW / imgW, photoH / imgH);
+      const sw = photoW / scale;
+      const sh = photoH / scale;
+      const sx = (imgW - sw) / 2;
+      const sy = (imgH - sh) / 2;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(photoX, photoY, photoW, photoH);
+      ctx.clip();
+      ctx.drawImage(rawImg, sx, sy, sw, sh, photoX, photoY, photoW, photoH);
+      // Photo border
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.15)";
+      ctx.strokeRect(photoX, photoY, photoW, photoH);
+      ctx.restore();
+
+      // 3. Torn beige masking tape across bottom of photo
+      const tapeY = photoY + photoH - 16;
+      const tapeH = 54;
+      const tapeX1 = 8;
+      const tapeX2 = cardW - 8;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(tapeX1, tapeY);
+      ctx.lineTo(tapeX2, tapeY);
+
+      // Right torn edge with jagged notches
+      const rightSteps = 8;
+      const rightOffsets = [3, -4, 4, -3, 5, -2, 4, -3];
+      for (let i = 0; i < rightSteps; i++) {
+        const y = tapeY + ((i + 1) / rightSteps) * tapeH;
+        const x = tapeX2 + rightOffsets[i % rightOffsets.length];
+        ctx.lineTo(x, y);
+      }
+
+      // Bottom edge
+      ctx.lineTo(tapeX1, tapeY + tapeH);
+
+      // Left torn edge with jagged notches
+      const leftOffsets = [-4, 3, -5, 4, -3, 4, -2, 3];
+      for (let i = rightSteps - 1; i >= 0; i--) {
+        const y = tapeY + (i / rightSteps) * tapeH;
+        const x = tapeX1 + leftOffsets[i % leftOffsets.length];
+        ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+
+      ctx.fillStyle = "rgba(235, 218, 185, 0.95)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(205, 188, 155, 0.85)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Masking tape paper texture fibers
+      ctx.strokeStyle = "rgba(180, 160, 130, 0.25)";
+      ctx.beginPath();
+      ctx.moveTo(tapeX1 + 10, tapeY + 12);
+      ctx.lineTo(tapeX2 - 10, tapeY + 12);
+      ctx.moveTo(tapeX1 + 15, tapeY + 38);
+      ctx.lineTo(tapeX2 - 15, tapeY + 38);
+      ctx.stroke();
+      ctx.restore();
+
+      // 4. Bold printed Name on tape (auto-scaled to fit prominently)
+      ctx.save();
+      ctx.fillStyle = "rgba(18, 20, 26, 0.96)";
+      let fontSize = 23;
+      ctx.font = `900 ${fontSize}px Arial, "SF Pro Display", -apple-system, sans-serif`;
+      while (ctx.measureText(cleanLabel).width > cardW - 36 && fontSize > 14) {
+        fontSize -= 1;
+        ctx.font = `900 ${fontSize}px Arial, "SF Pro Display", -apple-system, sans-serif`;
+      }
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(cleanLabel, cardW / 2, tapeY + tapeH / 2 + 1);
+      ctx.restore();
+
+      compositeCardCacheRef.current.set(cacheKey, card);
+      return card;
+    } catch (e) {
+      console.warn("Failed to generate dynamic composite card:", e);
+      return rawImg;
+    }
   };
 
   const containerSizeRef = useRef<Size>({
@@ -866,6 +1058,27 @@ export function HeroInteractive({
   const [internalCaseId, setInternalCaseId] = useState<string>("case-000");
   const currentCaseId = controlledCaseId ?? internalCaseId;
   const [boardMode, setBoardMode] = useState<BoardMode>("zoom");
+
+  // ── Live Google Sheets Photos Integration ──
+  const { data: sheetPhotos } = usePhoneData("photos", currentCaseId || "case-000");
+
+  const sheetPhotosMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (!sheetPhotos || sheetPhotos.length === 0) return map;
+    for (const item of sheetPhotos) {
+      const liveUrl = (item.direct_cdn_url || item.drive_url || "").trim();
+      if (!liveUrl) continue;
+      const normalized = normalizeImageUrl(liveUrl);
+      if (item.photo_code) map.set(item.photo_code.toLowerCase().trim(), normalized);
+      if (item.title) map.set(item.title.toLowerCase().trim(), normalized);
+    }
+    return map;
+  }, [sheetPhotos]);
+
+  useEffect(() => {
+    sheetPhotosMapRef.current = sheetPhotosMap;
+    if (requestRenderRef.current) requestRenderRef.current();
+  }, [sheetPhotosMap]);
 
   const activeCase =
     CASES_LIST.find((c) => c.id === currentCaseId) || CASES_LIST[0];
@@ -1803,18 +2016,28 @@ export function HeroInteractive({
         }
 
         if (isSuspectPin) {
-          // ── REALISTIC PINNED SUSPECT PHOTO CARD ASSET (WITH BEIGE TAPE & NAME) ──
+          const char =
+            findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
+          const fallbackUrl =
+            char?.avatarUrl ||
+            (pin.id.includes("crime-scene") || pin.id.includes("thi-the")
+              ? "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png"
+              : "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png");
           const suspectPhotoUrl =
-            rawPin.photoUrl || resolveSuspectPhotoUrl(pin);
+            rawPin.photoUrl || resolveSuspectPhotoUrl(pin) || fallbackUrl;
           const loadedSuspectImg = suspectPhotoUrl
-            ? getLoadedImage(suspectPhotoUrl)
+            ? getCompositeCard(suspectPhotoUrl, pin.label || "NẠN NHÂN", fallbackUrl)
             : null;
 
           if (loadedSuspectImg) {
             const imgW =
-              loadedSuspectImg.naturalWidth || loadedSuspectImg.width || 300;
+              (loadedSuspectImg as HTMLImageElement).naturalWidth ||
+              (loadedSuspectImg as any).width ||
+              300;
             const imgH =
-              loadedSuspectImg.naturalHeight || loadedSuspectImg.height || 380;
+              (loadedSuspectImg as HTMLImageElement).naturalHeight ||
+              (loadedSuspectImg as any).height ||
+              380;
             const isKhang =
               pin.id.includes("khang") ||
               (pin.label && pin.label.toLowerCase().includes("khang"));
@@ -1893,8 +2116,13 @@ export function HeroInteractive({
             const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
             const cardWidth = (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = loadedSuspectImg
-              ? (cardWidth * (loadedSuspectImg.naturalHeight || 380)) /
-                (loadedSuspectImg.naturalWidth || 300)
+              ? (cardWidth *
+                  ((loadedSuspectImg as HTMLImageElement).naturalHeight ||
+                    (loadedSuspectImg as any).height ||
+                    380)) /
+                ((loadedSuspectImg as HTMLImageElement).naturalWidth ||
+                  (loadedSuspectImg as any).width ||
+                  300)
               : cardWidth * 1.3;
             const tagX = -cardWidth / 2;
             const tagY = isCrimeScene ? -cardHeight * 0.05 : -cardHeight * 0.1;

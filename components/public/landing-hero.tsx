@@ -23,7 +23,7 @@ export function LandingHero({ activePoster }: LandingHeroProps) {
       {/* STICKY HEADER NAV */}
       <header className="sticky top-0 w-full z-50 border-b border-border/10 bg-card/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <BrandMark className="scale-90 origin-left" />
+          <BrandMark href="/" />
 
           {/* Quick links navigation on the right side */}
           <nav className="hidden md:flex items-center gap-6 font-sans text-sm font-medium text-muted-foreground">

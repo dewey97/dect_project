@@ -66,7 +66,7 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
       {selectedNote ? (
         /* NOTE DETAIL VIEW */
         <div className="flex flex-col h-full animate-in slide-in-from-right-4 duration-200">
-          <div className="flex items-center justify-between px-3 pt-2 pb-2 bg-[#161618] border-b border-[#2C2C2E] shrink-0">
+          <div className="flex items-center justify-between px-3 pt-2.5 pb-2 bg-[#161618] border-b border-[#2C2C2E] shrink-0">
             <button
               onClick={() => {
                 setSelectedNote(null)
@@ -78,13 +78,13 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
               <ArrowLeft className="size-4" />
               <span>Ghi chú</span>
             </button>
-            <span className="text-[10px] text-[#8E8E93] font-mono">{selectedNote.timestamp || selectedNote.meta}</span>
+            <span className="text-[11px] text-[#8E8E93] font-sans">{selectedNote.timestamp || selectedNote.meta}</span>
           </div>
 
           {selectedNote.isLocked && !unlockedNoteIds.includes(selectedNote.id) ? (
             /* PIN UNLOCK CHALLENGE VIEW */
             <div className="flex-1 p-5 flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="size-14 rounded-full bg-[#FFD60A]/20 text-[#FFD60A] flex items-center justify-center border border-[#FFD60A]/40 shadow-lg animate-pulse">
+              <div className="size-14 rounded-full bg-[#FFD60A]/20 text-[#FFD60A] flex items-center justify-center border border-[#FFD60A]/40 shadow-lg">
                 <Lock className="size-7" />
               </div>
 
@@ -120,11 +120,11 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               <div className="flex items-center gap-1.5 text-[#FFD60A]">
                 {selectedNote.isLocked && <Unlock className="size-4 shrink-0 text-[#30D158]" />}
-                <h1 className="text-[17px] font-bold leading-snug">
+                <h1 className="text-[18px] font-bold leading-snug">
                   {selectedNote.title}
                 </h1>
               </div>
-              <div className="text-[12.5px] leading-relaxed text-[#E5E5EA] whitespace-pre-line font-sans p-3 rounded-xl bg-[#1C1C1E]/60 border border-white/5">
+              <div className="text-[13.5px] leading-relaxed text-[#E5E5EA] whitespace-pre-line font-sans p-3.5 rounded-xl bg-[#1C1C1E]/60 border border-white/5">
                 {selectedNote.content}
               </div>
             </div>
@@ -133,29 +133,29 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
       ) : (
         /* NOTE LIST VIEW */
         <div className="flex flex-col h-full">
-          <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0">
+          <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
             <div className="flex items-center justify-between mb-2">
               {onBackToHome ? (
                 <button
                   onClick={onBackToHome}
-                  className="flex items-center gap-0.5 text-[#FFD60A] text-[12.5px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
+                  className="flex items-center gap-0.5 text-[#FFD60A] text-[13px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
                   title="Thoát ứng dụng về Màn hình chính"
                 >
                   <ChevronLeft className="size-4" />
                   <span>Trang chính</span>
                 </button>
               ) : (
-                <span className="w-12" />
+                <span className="text-[13px] text-[#FFD60A] font-medium">Thư mục</span>
               )}
-              <span className="text-[17px] font-bold tracking-tight text-white">Ghi chú</span>
-              <span className="text-[12px] font-medium text-[#FFD60A]">Sửa</span>
+              <span className="text-[17px] font-semibold tracking-tight text-white">Ghi chú</span>
+              <span className="text-[13px] font-medium text-[#FFD60A]">Sửa</span>
             </div>
 
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-[#8E8E93]" />
               <input
                 type="text"
-                placeholder="Tìm kiếm ghi chú"
+                placeholder="Tìm kiếm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-7 rounded-lg bg-[#1C1C1E] pl-8 pr-3 text-[12px] text-white placeholder-[#8E8E93] focus:outline-none focus:ring-1 focus:ring-[#FFD60A]"
@@ -163,7 +163,7 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-2 pb-10 space-y-3">
+          <div className="flex-1 overflow-y-auto px-2 pb-10 space-y-3 pt-2">
             <div className="text-[11px] font-semibold text-[#8E8E93] px-2 uppercase tracking-wider flex items-center gap-1">
               <Folder className="size-3 text-[#FFD60A]" /> iCloud • Thư mục Ghi chú
             </div>
@@ -185,21 +185,21 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
                       className="p-3 hover:bg-[#2C2C2E]/60 active:bg-[#3A3A3C] cursor-pointer transition-colors"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <div className="text-[13px] font-bold text-white truncate flex items-center gap-1.5">
+                        <div className="text-[14px] font-semibold text-white truncate flex items-center gap-1.5">
                           {note.isLocked && (
                             <Lock className={cn('size-3.5 shrink-0', isLocked ? 'text-[#FFD60A]' : 'text-[#30D158]')} />
                           )}
                           <span className="truncate">{note.title}</span>
                         </div>
                         {note.folder && (
-                          <span className="text-[8.5px] font-mono px-1.5 py-0.5 rounded bg-[#FFD60A]/10 text-[#FFD60A] border border-[#FFD60A]/20 shrink-0">
+                          <span className="text-[9px] font-sans px-1.5 py-0.5 rounded bg-[#FFD60A]/10 text-[#FFD60A] border border-[#FFD60A]/20 shrink-0">
                             {note.folder}
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] text-[#8E8E93] font-mono shrink-0">{note.timestamp || note.meta}</span>
-                        <span className="text-[11px] text-[#A1A1A6] truncate">
+                        <span className="text-[11px] text-[#8E8E93] font-sans shrink-0">{note.timestamp || note.meta}</span>
+                        <span className="text-[12px] text-[#A1A1A6] truncate">
                           {isLocked ? '•••••••• (Ghi chú bị khóa bằng mật khẩu)' : note.content.replace(/\n/g, ' ')}
                         </span>
                       </div>

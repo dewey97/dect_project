@@ -56,7 +56,7 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
               <ArrowLeft className="size-4" />
               <span>Danh bạ</span>
             </button>
-            <span className="text-[12px] font-medium text-[#0A84FF]">Sửa</span>
+            <span className="text-[13px] font-medium text-[#0A84FF]">Sửa</span>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-12">
@@ -64,53 +64,54 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
             <div className="flex flex-col items-center pt-2 space-y-1">
               <div
                 className={cn(
-                  'size-16 rounded-full bg-gradient-to-tr text-white flex items-center justify-center text-xl font-bold shadow-lg border border-white/20',
+                  'size-18 rounded-full bg-gradient-to-tr text-white flex items-center justify-center text-2xl font-bold shadow-lg border border-white/20',
                   selectedContact.avatarColor
                 )}
               >
                 {selectedContact.name.slice(0, 1)}
               </div>
-              <h2 className="text-[17px] font-bold text-white text-center mt-2">
+              <h2 className="text-[18px] font-bold text-white text-center mt-2">
                 {selectedContact.name}
               </h2>
+              <span className="text-[11px] text-[#8E8E93]">{selectedContact.relationship}</span>
             </div>
 
             {/* Quick Action Buttons */}
             <div className="grid grid-cols-4 gap-2">
               <div className="p-2.5 rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] flex flex-col items-center gap-1 text-[#0A84FF]">
                 <MessageSquare className="size-4 fill-current" />
-                <span className="text-[9px] text-[#8E8E93]">Nhắn tin</span>
+                <span className="text-[9.5px] text-[#8E8E93]">Nhắn tin</span>
               </div>
               <div className="p-2.5 rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] flex flex-col items-center gap-1 text-[#0A84FF]">
                 <Phone className="size-4 fill-current" />
-                <span className="text-[9px] text-[#8E8E93]">Gọi</span>
+                <span className="text-[9.5px] text-[#8E8E93]">Gọi điện</span>
               </div>
               <div className="p-2.5 rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] flex flex-col items-center gap-1 text-[#0A84FF]">
                 <Video className="size-4 fill-current" />
-                <span className="text-[9px] text-[#8E8E93]">FaceTime</span>
+                <span className="text-[9.5px] text-[#8E8E93]">FaceTime</span>
               </div>
               <div className="p-2.5 rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] flex flex-col items-center gap-1 text-[#0A84FF]">
                 <Mail className="size-4" />
-                <span className="text-[9px] text-[#8E8E93]">Mail</span>
+                <span className="text-[9.5px] text-[#8E8E93]">Mail</span>
               </div>
             </div>
 
             {/* Details Box */}
             <div className="p-3.5 rounded-2xl bg-[#1C1C1E] border border-[#2C2C2E] space-y-3 text-[12px]">
               <div>
-                <div className="text-[10px] text-[#8E8E93]">Số điện thoại</div>
+                <div className="text-[10px] text-[#8E8E93] uppercase font-semibold tracking-wider">Số điện thoại di động</div>
                 <div className="text-[14px] font-mono text-[#0A84FF] font-semibold mt-0.5">
                   {selectedContact.phone}
                 </div>
               </div>
               <div className="border-t border-[#2C2C2E] pt-2">
-                <div className="text-[10px] text-[#8E8E93]">Phân loại</div>
-                <div className="text-white mt-0.5">{selectedContact.relationship}</div>
+                <div className="text-[10px] text-[#8E8E93] uppercase font-semibold tracking-wider">Mối quan hệ</div>
+                <div className="text-white font-medium mt-0.5">{selectedContact.relationship}</div>
               </div>
               <div className="border-t border-[#2C2C2E] pt-2">
-                <div className="text-[10px] text-[#FFD60A] font-semibold">Ghi chú cá nhân của Khang:</div>
-                <div className="text-[#D1D1D6] mt-0.5 italic leading-relaxed">
-                  "{selectedContact.note}"
+                <div className="text-[10px] text-[#FFD60A] font-semibold uppercase tracking-wider">Ghi chú cá nhân của Khang:</div>
+                <div className="text-[#D1D1D6] mt-0.5 italic leading-relaxed text-[12px]">
+                  "{selectedContact.note || 'Không có ghi chú thêm.'}"
                 </div>
               </div>
             </div>
@@ -119,21 +120,21 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
       ) : (
         /* CONTACTS LIST VIEW */
         <div className="flex flex-col h-full">
-          <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0">
+          <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
             <div className="flex items-center justify-between mb-2">
               {onBackToHome ? (
                 <button
                   onClick={onBackToHome}
-                  className="flex items-center gap-0.5 text-[#0A84FF] text-[12.5px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
+                  className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
                   title="Thoát ứng dụng về Màn hình chính"
                 >
                   <ChevronLeft className="size-4" />
                   <span>Trang chính</span>
                 </button>
               ) : (
-                <span className="w-12" />
+                <span className="text-[13px] text-[#0A84FF] font-medium">Nhóm</span>
               )}
-              <span className="text-[17px] font-bold tracking-tight text-white">Danh bạ</span>
+              <span className="text-[17px] font-semibold tracking-tight text-white">Danh bạ</span>
               <UserPlus className="size-4 text-[#0A84FF]" />
             </div>
 
@@ -141,7 +142,7 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-[#8E8E93]" />
               <input
                 type="text"
-                placeholder="Tìm kiếm danh bạ"
+                placeholder="Tìm kiếm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-7 rounded-lg bg-[#1C1C1E] pl-8 pr-3 text-[12px] text-white placeholder-[#8E8E93] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
@@ -169,7 +170,7 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
                   return (
                     <div key={contact.id}>
                       {isNewSection && (
-                        <div className="bg-[#1C1C1E]/80 backdrop-blur-sm px-2 py-0.5 text-[10px] font-bold text-[#8E8E93] font-mono sticky top-0 z-10 my-1 rounded">
+                        <div className="bg-[#1C1C1E]/90 backdrop-blur-sm px-2.5 py-0.5 text-[11px] font-bold text-[#8E8E93] sticky top-0 z-10 my-0.5 rounded">
                           {firstLetter}
                         </div>
                       )}
@@ -186,9 +187,14 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
                           {contact.name.slice(0, 1)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-[13px] font-semibold text-white truncate">
+                          <div className="text-[14px] font-semibold text-white truncate">
                             {contact.name}
                           </div>
+                          {contact.relationship && (
+                            <div className="text-[11px] text-[#8E8E93] truncate">
+                              {contact.relationship}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -198,7 +204,7 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
             )}
 
             {/* iOS A-Z Alphabet Right Bar */}
-            <div className="w-4 py-2 flex flex-col items-center justify-between text-[8px] font-bold text-[#0A84FF] font-mono select-none shrink-0 pr-1 opacity-80">
+            <div className="w-4 py-2 flex flex-col items-center justify-between text-[8px] font-bold text-[#0A84FF] font-sans select-none shrink-0 pr-1 opacity-80">
               {['#', 'A', 'B', 'C', 'D', 'Đ', 'G', 'H', 'K', 'L', 'M', 'N', 'P', 'Q', 'T', 'V', 'Y'].map((char) => (
                 <span key={char} className="hover:text-white cursor-pointer">{char}</span>
               ))}

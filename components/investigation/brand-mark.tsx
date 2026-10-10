@@ -1,15 +1,33 @@
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
 /**
- * The X-PLORE wordmark: an evidence-amber status dot beside the mono
- * wordmark. Shared so the brand reads identically everywhere (see
- * PROJECT_RULES.md §6 typography — `.label-brand`).
+ * The official XPLORE logo banner.
  */
-export function BrandMark({ className }: { className?: string }) {
-  return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <span className="size-2 rounded-full bg-primary" aria-hidden="true" />
-      <span className="label-brand text-foreground">X-PLORE</span>
+export function BrandMark({
+  className,
+  href,
+}: {
+  className?: string
+  href?: string
+}) {
+  const content = (
+    <div className={cn('inline-flex items-center', className)}>
+      <img
+        src="/brand/logo.png"
+        alt="XPLORE"
+        className="h-8 sm:h-9 w-auto object-contain"
+      />
     </div>
   )
+
+  if (href) {
+    return (
+      <Link href={href} className="inline-block hover:opacity-90 transition-opacity">
+        {content}
+      </Link>
+    )
+  }
+
+  return content
 }

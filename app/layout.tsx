@@ -22,34 +22,43 @@ const handwritingFont = Playpen_Sans({
 })
 
 export const metadata: Metadata = {
-
-
-  title: 'My website',
+  title: 'XPLORE',
   description:
-    'This is my website.',
-  generator: 'v0.app',
-  applicationName: 'X-PLORE',
+    'Hệ thống game trinh thám điều tra tương tác, tài liệu chứng cứ vụ án và hồ sơ Google Docs / Live CMS.',
+  applicationName: 'XPLORE',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'X-PLORE',
+    title: 'XPLORE',
   },
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: '/brand/icon-light-32x32.png',
+        sizes: '32x32',
+        type: 'image/png',
         media: '(prefers-color-scheme: light)',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: '/brand/icon-dark-32x32.png',
+        sizes: '32x32',
+        type: 'image/png',
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: '/brand/icon.png',
+        sizes: '512x512',
+        type: 'image/png',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: [
+      {
+        url: '/brand/apple-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+    shortcut: '/favicon.ico',
   },
 }
 

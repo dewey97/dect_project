@@ -93,10 +93,14 @@ export function QuickActionFab({
               type="button"
               onClick={() =>
                 handleAction(() => {
+                  const activeCp =
+                    typeof window !== "undefined"
+                      ? (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ || undefined
+                      : undefined;
                   if (onOpenHint) {
                     onOpenHint();
                   } else {
-                    emitInvestigationEvent("OPEN_HINT");
+                    emitInvestigationEvent("OPEN_HINT", { checkpointId: activeCp });
                   }
                 })
               }

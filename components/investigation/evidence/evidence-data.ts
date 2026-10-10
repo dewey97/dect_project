@@ -366,25 +366,6 @@ export const CASE_000_EVIDENCE: PhysicalEvidence[] = [
   }
 ]
 
-export const HINTS_MAP: Record<string, string[]> = {
-  'cp-000-0': [
-    'Báo cáo tử thi chỉ rõ 2 vùng tổn thương: Cú va đập chẩm gáy (20:00) gây ngất & Vết đâm đứt động mạch cảnh (21:00).',
-    'Ma trận mâu thuẫn khoanh vùng 4 đối tượng có động cơ: Mai, Vũ, Tùng và Hà.'
-  ],
-  'cp-000-1': [
-    'Đọc Báo cáo giám định chữ ký DOC-A1 để xem phân tích chữ ký đồ nét tracing trên Giấy ủy quyền đất 200m².',
-    'Mai có chứng cứ rời đi lúc 19:00, Vũ có hóa đơn chuyển khoản Quán Bia 88 lúc 20:45 cách hiện trường 3.8km.'
-  ],
-  'cp-000-2': [
-    'Kiểm tra mốc ngày giỗ tròn 20 năm của bé Gia Huy (24/07/1996 - 24/07/2016).',
-    'So sánh mốc thời gian Tùng rời đi lúc 20:15 trước khi chuyến tàu hàng 20:30 chạy qua.'
-  ],
-  'cp-000-3': [
-    'Đối chiếu âm thanh còi tàu 20:32 trong Voicemail và lịch phát sóng VTV3 thứ Sáu (chỉ chiếu Gameshow) với lời khai của Hà.',
-    'Lọn tóc dính máu trong áo ngực của Hà khớp 100% ADN Khang là chứng cứ định tội tuyệt đối.'
-  ]
-}
-
 export interface PhysicalDirective {
   envelopeName: string
   envelopeType: 'folder' | 'envelope'

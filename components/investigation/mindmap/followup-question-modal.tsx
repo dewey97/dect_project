@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, HelpCircle, CheckCircle2, ArrowRight, ShieldCheck, Check, Sparkles } from 'lucide-react'
+import { X, HelpCircle, CheckCircle2, ArrowRight, ShieldCheck, Check, Sparkles, Lightbulb } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
+import { emitInvestigationEvent } from '@/lib/investigation-events'
 
 import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
 import { ClueCodePicker } from './clue-code-picker'
@@ -320,18 +321,35 @@ export function FollowupQuestionModal({
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                detectiveAudio.playPaperRustle()
-                onClose()
-              }}
-              className="p-2 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026] pointer-events-auto"
-              title="Đóng"
-            >
-              <X className="size-5 pointer-events-none" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  detectiveAudio.playTypewriterClick()
+                  const cpId = isVu ? 'cp-000-1a' : isTung ? 'cp-000-1b' : 'cp-000-1c'
+                  emitInvestigationEvent('OPEN_HINT', { checkpointId: cpId })
+                }}
+                className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                title="Xem gợi ý phá án cho câu hỏi này"
+              >
+                <Lightbulb className="size-3.5 text-[#8c1d1d]" />
+                <span className="hidden sm:inline">GỢI Ý</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  detectiveAudio.playPaperRustle()
+                  onClose()
+                }}
+                className="p-2 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026] pointer-events-auto"
+                title="Đóng"
+              >
+                <X className="size-5 pointer-events-none" />
+              </button>
+            </div>
           </div>
 
           {/* FORM BODY FOR VU */}

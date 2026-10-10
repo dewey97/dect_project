@@ -79,8 +79,9 @@ export function CulpritEpilogueModal({
   } else if (isHaMatchedAll) {
     storyText = getCheckpointMonologue('cp-epilogue-ha')
   } else {
+    const suspectCpId = isVu ? 'cp-000-1a' : isTung ? 'cp-000-1b' : 'cp-000-1c'
     const epilogueCpId = isVu ? 'cp-epilogue-mai-vu' : isTung ? 'cp-epilogue-tung' : 'cp-epilogue-ha'
-    storyText = getCheckpointMonologue(epilogueCpId)
+    storyText = getCheckpointMonologue(suspectCpId) || getCheckpointMonologue(epilogueCpId)
   }
 
   let ctaButtonText = 'TIẾP TỤC ĐIỀU TRA'

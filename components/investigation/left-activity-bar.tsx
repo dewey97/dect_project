@@ -16,12 +16,12 @@ export function LeftActivityBar() {
     >
       {/* Top Section: Brand Emblem */}
       <Link href="/" className="flex flex-col items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity group">
-        <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-[inset_0_0_10px_rgba(199,145,55,0.1)] relative group-hover:border-primary/45 transition-colors">
-          <span className="font-serif text-lg font-black tracking-tighter">X</span>
+        <div className="size-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-[inset_0_0_10px_rgba(199,145,55,0.1)] relative group-hover:border-primary/45 transition-colors p-2">
+          <img src="/brand/icon-dark-32x32.png" alt="XPLORE" className="size-5 object-contain" />
           <span className="absolute bottom-1 right-1 size-1.5 rounded-full bg-primary" />
         </div>
         <span className="font-sans text-[0.5rem] font-black uppercase tracking-widest text-foreground group-hover:text-primary transition-colors">
-          X-PLORE
+          XPLORE
         </span>
       </Link>
 

@@ -10,27 +10,27 @@ export function WorldArchiveSection() {
 
       {/* 5 SCATTERED PHOTOS — left side */}
       <div className="hidden lg:block absolute top-20 left-2 w-44 shadow-xl rotate-[-13deg] hover:rotate-[-6deg] hover:scale-105 hover:z-30 transition-all duration-300 select-none cursor-pointer overflow-hidden">
-        <img src="/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.25] brightness-85" />
+        <img src="/images/landing/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.25] brightness-85" />
       </div>
 
       <div className="hidden lg:block absolute top-[28%] left-0 w-36 shadow-lg rotate-[7deg] hover:rotate-[3deg] hover:scale-105 hover:z-35 transition-all duration-300 select-none cursor-pointer overflow-hidden z-10">
-        <img src="/xplore_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
+        <img src="/images/landing/xplore_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
       </div>
 
       <div className="hidden lg:block absolute top-[55%] left-14 w-32 shadow-md rotate-[-5deg] hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-300 select-none cursor-pointer overflow-hidden">
-        <img src="/suspect_marsh.png" alt="" className="w-full aspect-square object-cover filter grayscale contrast-125" />
+        <img src="/images/landing/suspect_marsh.png" alt="" className="w-full aspect-square object-cover filter grayscale contrast-125" />
       </div>
 
       <div className="hidden lg:block absolute bottom-16 left-4 w-40 shadow-lg rotate-[9deg] hover:rotate-[4deg] hover:scale-105 hover:z-35 transition-all duration-300 select-none cursor-pointer overflow-hidden z-10">
-        <img src="/xplore_case_north.png" alt="" className="w-full h-full object-cover filter sepia-[0.15] brightness-88" />
+        <img src="/images/landing/xplore_case_north.png" alt="" className="w-full h-full object-cover filter sepia-[0.15] brightness-88" />
       </div>
 
       {/* 2 PHOTOS ON TOP OF FOLDER STACK — right side */}
       <div className="hidden lg:block absolute bottom-[420px] right-[80px] w-36 shadow-xl rotate-[-11deg] hover:rotate-[-5deg] hover:scale-105 hover:z-[60] transition-all duration-300 select-none cursor-pointer overflow-hidden z-[55]">
-        <img src="/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.2] brightness-88" />
+        <img src="/images/landing/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.2] brightness-88" />
       </div>
       <div className="hidden lg:block absolute bottom-[400px] right-[-10px] w-32 shadow-lg rotate-[8deg] hover:rotate-[3deg] hover:scale-105 hover:z-[60] transition-all duration-300 select-none cursor-pointer overflow-hidden z-[55]">
-        <img src="/opportunity_evidence.png" alt="" className="w-full aspect-square object-cover filter grayscale brightness-80 contrast-115" />
+        <img src="/images/landing/opportunity_evidence.png" alt="" className="w-full aspect-square object-cover filter grayscale brightness-80 contrast-115" />
       </div>
 
       {/* MANILA FOLDER STACK — right side */}
@@ -96,10 +96,10 @@ export function WorldArchiveSection() {
         {/* Mobile quick grid */}
         <div className="grid grid-cols-2 gap-3 mt-4 lg:hidden w-full max-w-md">
           <div className="overflow-hidden shadow-md rotate-[-2deg]">
-            <img src="/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.2] brightness-90" />
+            <img src="/images/landing/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.2] brightness-90" />
           </div>
           <div className="overflow-hidden shadow-md rotate-[3deg]">
-            <img src="/xplore_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
+            <img src="/images/landing/xplore_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
           </div>
         </div>
       </div>

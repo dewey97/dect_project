@@ -94,7 +94,7 @@ export function CaseCard({ caseFile, onSelect }: CaseCardProps) {
           <div className="absolute right-4 bottom-14 z-20 pointer-events-none select-none">
             <div className="animate-stamp flex flex-col items-center justify-center border-4 border-destructive/70 bg-background/80 px-4 py-1.5 text-destructive rounded font-mono font-black text-sm uppercase tracking-[0.25em] shadow-[0_0_15px_rgba(220,38,38,0.2)]">
               <span>ĐÃ PHÁ ÁN</span>
-              <span className="text-[0.5rem] font-semibold mt-0.5 opacity-80">CƠ QUAN ĐIỀU TRA X-PLORE</span>
+              <span className="text-[0.5rem] font-semibold mt-0.5 opacity-80">CƠ QUAN ĐIỀU TRA XPLORE</span>
             </div>
           </div>
         )}

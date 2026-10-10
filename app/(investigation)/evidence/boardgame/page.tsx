@@ -59,10 +59,16 @@ export default function BoardGameCompanionPage() {
   const [unlockedModalData, setUnlockedModalData] =
     useState<UnlockedModalData | null>(null);
 
+  const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<string | undefined>(undefined);
+
   // Event bus listeners
   useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
-  useInvestigationEvent("OPEN_HINT", () => setActiveModal("hint"));
+  useInvestigationEvent("OPEN_HINT", (e: any) => {
+    const cpId = e?.detail?.checkpointId || (typeof e?.detail === "string" ? e.detail : undefined);
+    setActiveHintCheckpointId(cpId);
+    setActiveModal("hint");
+  });
   useInvestigationEvent("OPEN_REINVESTIGATE", () => setActiveModal("reinvestigate"));
 
   useEffect(() => {
@@ -204,7 +210,6 @@ export default function BoardGameCompanionPage() {
 
       {/* QUICK ACTION FAB MENU */}
       <QuickActionFab
-        onOpenHint={() => setActiveModal("hint")}
         onOpenPhone={() => setActiveModal("phone")}
         onResetCase={resetFindingsProgress}
       />
@@ -212,7 +217,11 @@ export default function BoardGameCompanionPage() {
       {/* HINT SYSTEM MODAL */}
       <HintModal
         isOpen={activeModal === "hint"}
-        onClose={() => setActiveModal(null)}
+        checkpointId={activeHintCheckpointId}
+        onClose={() => {
+          setActiveModal(null);
+          setActiveHintCheckpointId(undefined);
+        }}
       />
 
       {/* VICTIM PHONE SIMULATOR MODAL */}

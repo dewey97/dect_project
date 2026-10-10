@@ -22,81 +22,6 @@ interface BankingAppProps {
   onBackToHome?: () => void;
 }
 
-const DEFAULT_TRANSACTIONS = [
-  {
-    id: "tx-01",
-    refId: "FT1620498102948",
-    title: "Chuyển tiền cọc Tour Đà Lạt (2 người)",
-    receiver: "CÔNG TY CP DU LỊCH VIỆT",
-    accountNo: "0181.000.492.812 (Vietcombank)",
-    amount: -12000000,
-    time: "15:30 (22/07/2016)",
-    category: "Du lịch & Giải trí",
-    note: "Khang CK coc tour Da Lat 25/7 - Yen Nhi",
-    isEvidence: true,
-  },
-  {
-    id: "tx-02",
-    refId: "FT1620119284019",
-    title: "Nhận tiền trả nợ lãi tháng 7",
-    receiver: "LE QUANG VU",
-    accountNo: "1902.948.102.391 (Techcombank)",
-    amount: 10500000,
-    time: "11:20 (19/07/2016)",
-    category: "Thu hồi nợ",
-    note: "Vu tra lai thang 7 khoan 350tr",
-    isEvidence: true,
-  },
-  {
-    id: "tx-03",
-    refId: "FT1619602910481",
-    title: "Nhận tiền cọc mua đất Bờ Sông đợt 1",
-    receiver: "NGUYEN HOANG HAI",
-    accountNo: "0071.000.918.231 (Vietcombank)",
-    amount: 200000000,
-    time: "09:15 (15/07/2016)",
-    category: "Bất động sản",
-    note: "Tien coc giay tay thua dat 14 bo song",
-    isEvidence: true,
-  },
-  {
-    id: "tx-04",
-    refId: "FT1619182391024",
-    title: "Thanh toán hóa đơn Tiệm vàng Kim Thành",
-    receiver: "TIEM VANG KIM THANH",
-    accountNo: "1020.192.839.102 (BIDV)",
-    amount: -18500000,
-    time: "16:45 (10/07/2016)",
-    category: "Mua sắm trang sức",
-    note: "Mua day chuyen vang trang tang Nhi",
-    isEvidence: false,
-  },
-  {
-    id: "tx-05",
-    refId: "FT1618691029481",
-    title: "Nhận tiền đền bù GPMB đợt 1 Ban QLDA Bờ Sông",
-    receiver: "KHO BAC NHA NUOC DONG DA",
-    accountNo: "0141.000.119.201 (Agribank)",
-    amount: 2100000000,
-    time: "14:00 (05/07/2016)",
-    category: "Đền bù nhà đất",
-    note: "Tien den bu dot 1 thua dat 14 bo song - Nguyen Van Khang",
-    isEvidence: true,
-  },
-  {
-    id: "tx-06",
-    refId: "FT1618301928410",
-    title: "Chuyển phí dịch vụ pháp lý thừa kế di chúc",
-    receiver: "VP LUAT SU NAM VAP CONG SU",
-    accountNo: "1903.291.049.102 (Techcombank)",
-    amount: -50000000,
-    time: "10:30 (02/07/2016)",
-    category: "Pháp lý",
-    note: "Thanh toan phi dich vu ho so thua ke & hop dong di chúc",
-    isEvidence: true,
-  },
-];
-
 export function BankingApp({ onBackToHome }: BankingAppProps) {
   const [showBalance, setShowBalance] = useState(true);
   const [selectedTx, setSelectedTx] = useState<any | null>(null);
@@ -104,23 +29,20 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
 
   const { data: sheetData, loading } = usePhoneData("banking");
 
-  const transactions =
-    sheetData.length > 0
-      ? sheetData.map((item: any, idx: number) => ({
-          id: item.tx_id || `tx-${idx + 1}`,
-          refId: item.ref_id || `FT${idx + 1000000}`,
-          title: item.title || "Giao dịch ngân hàng",
-          receiver: item.receiver || "Đối tác",
-          accountNo: item.account_no || "Chưa rõ STK",
-          amount: Number(item.amount) || 0,
-          time: item.timestamp || "",
-          category: item.category || "Chuyển khoản",
-          note: item.note || "",
-          isEvidence:
-            String(item.is_evidence).toLowerCase() === "true" ||
-            item.is_evidence === true,
-        }))
-      : DEFAULT_TRANSACTIONS;
+  const transactions = sheetData.map((item: any, idx: number) => ({
+    id: item.tx_id || `tx-${idx + 1}`,
+    refId: item.ref_id || `FT${idx + 1000000}`,
+    title: item.title || "Giao dịch ngân hàng",
+    receiver: item.receiver || "Đối tác",
+    accountNo: item.account_no || "Chưa rõ STK",
+    amount: Number(item.amount) || 0,
+    time: item.timestamp || "",
+    category: item.category || "Chuyển khoản",
+    note: item.note || "",
+    isEvidence:
+      String(item.is_evidence).toLowerCase() === "true" ||
+      item.is_evidence === true,
+  }));
 
   const filteredTransactions = transactions.filter((tx) => {
     if (filterType === "in") return tx.amount > 0;
@@ -130,7 +52,7 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
 
   // Calculate balance based on transactions
   const totalBalance = transactions.reduce((acc, curr) => acc + curr.amount, 0);
-  const displayBalance = totalBalance > 0 ? totalBalance : 540250000;
+  const displayBalance = totalBalance > 0 ? totalBalance : 0;
 
   return (
     <div className="flex flex-col h-full bg-[#0B0E14] text-white select-none overflow-hidden font-sans">
@@ -246,6 +168,13 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
             <Loader2 className="size-5 animate-spin text-[#0A84FF]" />
             <span className="text-[11px] font-mono">
               Đang tải lịch sử giao dịch...
+            </span>
+          </div>
+        ) : filteredTransactions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93] space-y-2">
+            <AlertCircle className="size-6 text-[#8E8E93]/60" />
+            <span className="text-[12px] font-sans text-[#8E8E93]">
+              Không tìm thấy giao dịch nào
             </span>
           </div>
         ) : (

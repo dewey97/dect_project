@@ -121,20 +121,57 @@ function normalizeKey(key: string): string {
     .replace(/[\s-]+/g, "_");
 }
 
-/** Bóc một dòng `id | Nhãn ô | Placeholder | đáp_án_1, đáp_án_2` của ô nhập văn bản. */
+/** 
+ * Bóc một dòng ô nhập văn bản:
+ * - Dạng tối giản: `0988.200.991: Vũ, Lê Quang Vũ` hoặc `SĐT 0988.200.991: Vũ`
+ * - Dạng đầy đủ: `phone_1 | SĐT 0988.200.991: | Nhập tên nghi phạm... | Lê Quang Vũ, Vũ`
+ */
 function parseInputLine(
   value: string,
+  rawKey?: string,
 ): NonNullable<Checkpoint["textMatchConfig"]>["inputs"][number] | null {
-  const [id, label, placeholder, answers] = value
-    .split("|")
-    .map((p) => p.trim());
-  if (!id) return null;
-  return {
-    id,
-    label: label || id,
-    placeholder: placeholder || "",
-    validAnswers: splitCommas(answers),
-  };
+  if (!value) return null;
+
+  // Dạng 1: Phân tách bằng dấu gạch đứng '|'
+  if (value.includes("|")) {
+    const [id, label, placeholder, answers] = value
+      .split("|")
+      .map((p) => p.trim());
+    if (!id) return null;
+    return {
+      id,
+      label: label || id,
+      placeholder: placeholder || "Nhập tên nghi phạm...",
+      validAnswers: splitCommas(answers),
+    };
+  }
+
+  // Dạng 2: Cú pháp tối giản gọn gàng: "0988.200.991: Vũ, Lê Quang Vũ" hoặc rawKey là số điện thoại
+  const colonIdx = value.indexOf(":");
+  if (colonIdx !== -1) {
+    const label = value.slice(0, colonIdx).trim();
+    const answers = value.slice(colonIdx + 1).trim();
+    const cleanId = label.toLowerCase().replace(/[^a-z0-9]/g, "_");
+    return {
+      id: cleanId || "input_field",
+      label: label.startsWith("SĐT") ? label : `SĐT ${label}:`,
+      placeholder: "Nhập tên nghi phạm...",
+      validAnswers: splitCommas(answers),
+    };
+  }
+
+  // Dạng 3: rawKey là nhãn, value là danh sách đáp án
+  if (rawKey && rawKey !== "input" && rawKey !== "o_nhap") {
+    const cleanId = rawKey.toLowerCase().replace(/[^a-z0-9]/g, "_");
+    return {
+      id: cleanId,
+      label: rawKey.startsWith("SĐT") ? rawKey : `SĐT ${rawKey}:`,
+      placeholder: "Nhập tên nghi phạm...",
+      validAnswers: splitCommas(value),
+    };
+  }
+
+  return null;
 }
 
 /**
@@ -211,6 +248,17 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
           break;
         }
       }
+    } else if (
+      normalizedKey.startsWith("09") ||
+      normalizedKey.startsWith("08") ||
+      normalizedKey.startsWith("07") ||
+      normalizedKey.startsWith("03") ||
+      normalizedKey.startsWith("phone_") ||
+      normalizedKey.startsWith("sdt_")
+    ) {
+      // Hỗ trợ viết thẳng: 0988.200.991: Vũ, Lê Quang Vũ
+      const input = parseInputLine(value, rawKey);
+      if (input) (parsed.textMatchInputs ??= []).push(input);
     } else {
       // Lưu các khóa quy tắc mở rộng (tile_ao_gio, chung_cu_2_1, ...)
       (parsed.clueRules ??= {})[normalizedKey] = splitCommas(value);
@@ -310,8 +358,15 @@ export function transformSheetCheckpoint(
       }
     : undefined;
 
+  const effectiveId =
+    row.checkpoint_id ||
+    row.node_id ||
+    (row as any).id ||
+    "cp-dynamic";
+
   return {
-    id: row.checkpoint_id || "cp-dynamic",
+    id: effectiveId,
+    nodeId: row.node_id || effectiveId,
     caseId: row.case_id || "case-000",
     title: row.title || "",
     question: row.question || "",
@@ -325,7 +380,6 @@ export function transformSheetCheckpoint(
     textMatchConfig,
     pickerConfig,
     storyConfig,
-    ...(row.node_id ? { nodeId: row.node_id } : {}),
   } as Checkpoint;
 }
 

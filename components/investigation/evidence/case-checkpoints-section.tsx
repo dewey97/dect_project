@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ArrowRight, Lightbulb } from "lucide-react";
 import type { Checkpoint } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { HINTS_MAP } from "./evidence-data";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useActiveCheckpointHints } from "@/lib/hooks/use-active-checkpoint-hints";
 import { clearInvestigationStorage } from "@/lib/storage";
@@ -55,7 +54,7 @@ export function CaseCheckpointsSection({
 
   const resolveHints = (cp: Checkpoint): string[] => {
     if (sheetHints.length > 0) return sheetHints;
-    return cp.hintsList || (cp.hint ? [cp.hint] : HINTS_MAP[cp.id] || []);
+    return cp.hintsList || (cp.hint ? [cp.hint] : []);
   };
 
   // Local state for dynamic question forms

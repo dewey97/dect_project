@@ -10,16 +10,20 @@
 Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
 
 - **⚙️ Technical Docs (Kỹ thuật hệ thống)**:
-  - CI/CD & VPS Deployment: [`docs/core_specs/12_cicd_deployment_guide.md`](docs/core_specs/12_cicd_deployment_guide.md)
-  - Google Sheets Live CMS: [`docs/core_specs/10_google_sheets_cms.md`](docs/core_specs/10_google_sheets_cms.md)
-  - Hướng dẫn kỹ thuật hệ thống: [`docs/core_specs/07_technical_guide.md`](docs/core_specs/07_technical_guide.md)
-  - Cơ sở dữ liệu: [`docs/core_specs/08_database_schema.md`](docs/core_specs/08_database_schema.md)
-  - Design System & UI/UX: [`docs/core_specs/06_ux_ui_design_system.md`](docs/core_specs/06_ux_ui_design_system.md)
+  - Hướng dẫn kỹ thuật hệ thống: [`docs/core_specs/01_technical_guide.md`](docs/core_specs/01_technical_guide.md)
+  - Cơ sở dữ liệu: [`docs/core_specs/02_database_schema.md`](docs/core_specs/02_database_schema.md)
+  - Google Sheets Live CMS: [`docs/core_specs/03_google_sheets_cms.md`](docs/core_specs/03_google_sheets_cms.md)
+  - Design System & UI/UX: [`docs/core_specs/04_ux_ui_design_system.md`](docs/core_specs/04_ux_ui_design_system.md)
+  - Analytics & Tracking: [`docs/core_specs/05_analytics_tracking_spec.md`](docs/core_specs/05_analytics_tracking_spec.md)
+  - CI/CD & VPS Deployment: [`docs/core_specs/06_cicd_deployment_guide.md`](docs/core_specs/06_cicd_deployment_guide.md)
+  - License & Access Control: [`docs/core_specs/07_license_access_system.md`](docs/core_specs/07_license_access_system.md)
+  - License Technical Spec: [`docs/core_specs/08_license_technical_spec.md`](docs/core_specs/08_license_technical_spec.md)
+  - Business, Financial & Founder Model: [`docs/core_specs/09_business_financial_model.md`](docs/core_specs/09_business_financial_model.md)
+  - Figma Design Workflow & Integration: [`docs/core_specs/10_figma_design_workflow.md`](docs/core_specs/10_figma_design_workflow.md)
 - **🧠 Domain & Case Docs (Nghiệp vụ & Hồ sơ vụ án)**:
-  - Bối cảnh thế giới: [`docs/core_specs/02_world_building.md`](docs/core_specs/02_world_building.md)
-  - Thiết kế & Ma trận Vụ án Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)
-  - Ma trận chứng cứ & Suy luận: [`docs/cases/case_000/01_design/evidence_matrix.md`](docs/cases/case_000/01_design/evidence_matrix.md)
-  - Gameplay & Hành trình người chơi: [`docs/cases/case_000/01_design/gameplay_design.md`](docs/cases/case_000/01_design/gameplay_design.md)
+  - Bối cảnh & Cốt truyện Master Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)
+  - Gameplay & Hành trình điều tra: [`docs/cases/case_000/01_design/gameplay_design.md`](docs/cases/case_000/01_design/gameplay_design.md)
+  - Điểm khám xét lại hiện trường: [`docs/cases/case_000/01_design/reinvestigation_hotspots.md`](docs/cases/case_000/01_design/reinvestigation_hotspots.md)
 
 ---
 
@@ -67,4 +71,30 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
 - **Quy trình CI/CD tự động 100%**:
   - `git push origin main` ➔ GitHub Actions build Docker image và đẩy lên GHCR (`ghcr.io/dewey97/dect_project:latest`).
   - GitHub Actions SSH vào VPS, pull image mới và restart container trong vòng ~10 giây.
+
+---
+
+## 📁 5. Quy Tắc Phân Định Ranh Giới Tài Nguyên: `docs/` vs. `public/` (Asset Storage Boundary Rule)
+
+- **`docs/cases/<case_id>/...` (Nơi lưu trữ tư liệu gốc & thiết kế vụ án)**:
+  - Toàn bộ ảnh tài liệu gốc, ảnh minh họa biên bản, storyboard, moodboard, ảnh tham khảo điều tra, file âm thanh gốc, bản nháp, test renders (ví dụ: `test_notes_archive/`) **BẮT BUỘC PHẢI ĐƯỢC LƯU TRONG `docs/cases/<case_id>/`**.
+  - **Tuyệt đối CẤM** đẩy các tài liệu nghiên cứu, file ảnh nháp hoặc asset thô chưa qua tối ưu vào `public/`.
+- **`public/` (Chỉ dành riêng cho Client Production Runtime)**:
+  - Thư mục `public/` chỉ chứa các file tĩnh được client app tải trực tiếp khi chạy game (đã tối ưu dung lượng, đặt đúng danh mục: `public/brand/`, `public/images/cases/<case_id>/`, `public/documents/<case_id>/`, `public/models/`, `public/audio/`).
+  - Mọi asset mới đưa vào `public/` phải có mục đích sử dụng cụ thể trong mã nguồn UI và được đăng ký trong [`docs/cases/case_000/02_photos/ASSET_CATALOG.md`](docs/cases/case_000/02_photos/ASSET_CATALOG.md).
+
+---
+
+## 🌐 6. Nguyên Tắc Trực Tuyến & Bộ Nhớ Đệm (Live-First & Cache Policy — No Static Hardcoded Fallback Rule)
+
+- **Mô hình Trực tuyến (Online-First)**: Hệ thống game hoạt động với giả định người chơi có kết nối internet để nạp vụ án và đồng bộ tiến độ.
+- **Tuyệt đối không nhồi nhét Mock/Hardcoded Fallback tĩnh**: Dữ liệu kịch bản, lời khai, dẫn truyện (narratives/epilogues), đáp án và sự kiện do Google Sheets Live CMS quản lý 100%. Không duy trì các mảng text cố định lỗi thời trong code vì sẽ gây lệch pha logic với kịch bản biên soạn của GM.
+- **Cơ chế Chống gián đoạn (In-memory & Client Cache)**: Khi đã fetch thành công một lần từ Live CMS, dữ liệu được giữ trong memory cache / client state. Trường hợp mạng chập chờn sau khi đã vào game, hệ thống tận dụng cache có sẵn. Nếu chưa có dữ liệu và lỗi mạng, hiển thị trạng thái đang đồng bộ/thử lại thay vì hiển thị kịch bản giả lập cũ.
+
+---
+
+## 🏷️ 7. Quy Chuẩn Tên Thương Hiệu & Quy Ước Tài Liệu (Brand Naming & Minimal Mention Rule)
+
+- **Quy chuẩn tên thương hiệu**: Tên thương hiệu viết liền không bao giờ có dấu gạch nối: **XPLORE** (hoặc `xplore` khi viết thường). **TUYỆT ĐỐI CẤM** dùng `X-PLORE`.
+- **Hạn chế nhắc tên trong tài liệu**: Trong các tài liệu kỹ thuật, đặc tả nghiệp vụ (`docs/`), tập trung vào thông số kỹ thuật, logic hệ thống và cơ chế vụ án; không chèn tên thương hiệu tràn lan nếu không cần thiết. Chỉ giữ tên thương hiệu ở một số vị trí định danh cố định (như `AGENTS.md`, metadata layout, component `BrandMark`, bảng nhận diện thương hiệu).
 

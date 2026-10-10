@@ -6,6 +6,8 @@ import { Search } from 'lucide-react'
 import { TypewriterNarrator } from '@/components/investigation/evidence/typewriter-narrator'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
+import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
+
 interface PhoneNarrativeModalProps {
   isOpen: boolean
   onClose: () => void
@@ -18,6 +20,7 @@ export function PhoneNarrativeModal({
   onTakeTestimony
 }: PhoneNarrativeModalProps) {
   const [isNarrativeComplete, setIsNarrativeComplete] = useState(false)
+  const { checkpoints } = useCaseCheckpoints('case-000')
 
   React.useEffect(() => {
     setIsNarrativeComplete(false)
@@ -25,8 +28,10 @@ export function PhoneNarrativeModal({
 
   if (!isOpen) return null
 
-  const dateLabel = 'Thành công xác minh danh tính các thuê bao.'
+  const cp0 = checkpoints.find((c) => c.id === 'cp-000-0')
+  const dateLabel = cp0?.title || 'Thành công xác minh danh tính các thuê bao.'
   const storyText =
+    cp0?.storyConfig?.monologue ||
     'Chúc mừng các thám tử đã thành công truy vết chủ sở hữu 3 số thuê bao trong nhật ký điện thoại.\n\nTiếp theo, hãy tiến hành triệu tập và ghi lời khai đối với từng trường hợp để làm rõ mục đích liên lạc.'
 
   return (

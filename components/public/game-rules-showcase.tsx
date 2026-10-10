@@ -91,7 +91,7 @@ export function GameRulesShowcase() {
               className="w-full aspect-[4/3] overflow-hidden border border-black/10 rounded-sm bg-zinc-150 shadow-inner relative cursor-pointer select-none group"
             >
               <img
-                src={activeRule === 'means' ? '/means_evidence.png' : activeRule === 'motive' ? '/motive_evidence.png' : '/opportunity_evidence.png'}
+                src={activeRule === 'means' ? '/images/landing/means_evidence.png' : activeRule === 'motive' ? '/images/landing/motive_evidence.png' : '/images/landing/opportunity_evidence.png'}
                 alt="Evidence Item"
                 className="w-full h-full object-cover grayscale brightness-95"
               />

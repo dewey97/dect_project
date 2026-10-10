@@ -29,7 +29,7 @@ export const FAQ_DATA = [
   },
   {
     q: 'Tôi có bắt buộc phải mua hộp game vật lý không?',
-    a: 'Có. Trình giả lập trực tuyến này là một phần của trải nghiệm X-PLORE. Bạn cần có các tài liệu giấy, mã số chìa khóa và mã kích hoạt in độc quyền trong hộp game vật lý để giải mã các câu đố trên Web.'
+    a: 'Có. Trình giả lập trực tuyến này là một phần của trải nghiệm XPLORE. Bạn cần có các tài liệu giấy, mã số chìa khóa và mã kích hoạt in độc quyền trong hộp game vật lý để giải mã các câu đố trên Web.'
   },
   {
     q: 'Thời gian chơi game trung bình là bao lâu?',
@@ -50,11 +50,11 @@ export const FAQ_DATA = [
 ]
 
 export const POSTER_ITEMS = [
-  { id: 0, img: '/xplore_case_9.png', title: 'Bóng Ma Cầu Cảng Số 9' },
-  { id: 1, img: '/xplore_case_north.png', title: 'Mật Mã Cảng Bắc' },
-  { id: 2, img: '/suspect_marsh.png', title: 'Bí Mật Xí Nghiệp Đường Sắt' },
-  { id: 3, img: '/newspaper_clipping.png', title: 'Vụ Án Tẩy Xóa Hồ Sơ' },
-  { id: 4, img: '/victim_thomas.png', title: 'Hồ Sơ Mất Tích Phân Khu 4' },
+  { id: 0, img: '/images/landing/xplore_case_9.png', title: 'Bóng Ma Cầu Cảng Số 9' },
+  { id: 1, img: '/images/landing/xplore_case_north.png', title: 'Mật Mã Cảng Bắc' },
+  { id: 2, img: '/images/landing/suspect_marsh.png', title: 'Bí Mật Xí Nghiệp Đường Sắt' },
+  { id: 3, img: '/images/landing/newspaper_clipping.png', title: 'Vụ Án Tẩy Xóa Hồ Sơ' },
+  { id: 4, img: '/images/landing/victim_thomas.png', title: 'Hồ Sơ Mất Tích Phân Khu 4' },
 ]
 
 export const CASE_FOLDERS = [

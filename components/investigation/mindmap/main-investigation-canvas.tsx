@@ -233,6 +233,39 @@ export function MainInvestigationCanvas({
   const [activeCustomPinModal, setActiveCustomPinModal] =
     useState<PinPoint | null>(null);
 
+  // Đồng bộ ID checkpoint đang hoạt động để nút Hint ngoài FAB / menu tự nhận diện đúng context
+  useEffect(() => {
+    let currentCp: string | null = null;
+    if (isFollowupQuestionOpen) {
+      const c = activeFollowupCulprit || narrativeCulprit || solvedCulprit || "vu";
+      currentCp = c === "vu" ? "cp-000-1a" : c === "tung" ? "cp-000-1b" : "cp-000-1c";
+    } else if (isPhoneLookupOpen) {
+      currentCp = "cp-000-0";
+    } else if (isIndictmentOpen) {
+      currentCp = "cp-000-2b";
+    } else if (activeCustomPinModal) {
+      const pinId = (activeCustomPinModal.id || "").toLowerCase();
+      const label = (activeCustomPinModal.label || "").toLowerCase();
+      if (pinId.includes("phone") || label.includes("điện thoại")) currentCp = "cp-000-0";
+      else if (pinId.includes("vu") || label.includes("vũ")) currentCp = "cp-000-1a";
+      else if (pinId.includes("tung") || label.includes("tùng")) currentCp = "cp-000-1b";
+      else if (pinId.includes("ha") || label.includes("hà")) currentCp = "cp-000-1c";
+      else if (pinId.includes("indictment") || pinId.includes("accusation") || label.includes("cáo trạng")) currentCp = "cp-000-2b";
+    }
+
+    if (typeof window !== "undefined") {
+      (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = currentCp;
+    }
+  }, [
+    isFollowupQuestionOpen,
+    activeFollowupCulprit,
+    narrativeCulprit,
+    solvedCulprit,
+    isPhoneLookupOpen,
+    isIndictmentOpen,
+    activeCustomPinModal,
+  ]);
+
   // Synchronize photos directly from Google Sheets Live CMS
   const { data: sheetPhotos } = usePhoneData("photos");
 

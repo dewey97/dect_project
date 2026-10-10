@@ -8,10 +8,7 @@ export function LandingFooter() {
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
         {/* Col 1: About */}
         <div className="flex flex-col gap-3">
-          <BrandMark className="scale-75 origin-left" />
-          <p className="text-xs text-muted-foreground leading-relaxed mt-2 max-w-[25ch]">
-            Hệ thống trò chơi điều tra lai độc đáo, kết hợp hiện vật hữu hình và không gian số để giải mã tội phạm.
-          </p>
+          <BrandMark href="/" />
         </div>
 
         {/* Col 2: Support menu */}
@@ -76,7 +73,7 @@ export function LandingFooter() {
       </div>
 
       <div className="w-full max-w-6xl mx-auto px-6 border-t border-border/10 pt-6 text-center text-xs text-muted-foreground/60">
-        <span>© 2026 X-PLORE Inc. Bảo lưu mọi quyền truy cập hệ thống.</span>
+        <span>© 2026 XPLORE Inc. Bảo lưu mọi quyền truy cập hệ thống.</span>
       </div>
     </footer>
   )

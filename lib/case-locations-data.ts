@@ -1,16 +1,29 @@
 /**
  * Master Dataset & Real-World GPS Routing Engine for Greater Hanoi Map
- * High-precision GPS coordinates, Road-snapped Navigation, Authentic Case Location Names
+ * Live CMS Synced with Google Sheets ('locations' tab)
+ * Visual coordinates mapped to Figma Master Map (2474 x 1732)
  */
+
+export type LocationCategory =
+  | 'residential'
+  | 'food'
+  | 'shopping'
+  | 'transit'
+  | 'finance'
+  | 'public'
+  | 'crime_scene'
+  | 'government'
+  | 'entertainment'
 
 export interface CaseLocation {
   id: string
   name: string
   shortName: string
   address: string
-  category: 'residential' | 'food' | 'shopping' | 'transit' | 'finance' | 'public'
-  x: number // Map coordinate X (0 - 2400) for vector fallback
-  y: number // Map coordinate Y (0 - 2000) for vector fallback
+  category: LocationCategory
+  categoryLabel?: string
+  x: number // Map coordinate X on Figma Canvas (0 - 2474)
+  y: number // Map coordinate Y on Figma Canvas (0 - 1732)
   lat: number // Real-world GPS Latitude
   lng: number // Real-world GPS Longitude
   description: string
@@ -19,8 +32,23 @@ export interface CaseLocation {
   openingHours?: string
   plusCode?: string
   phone?: string
-  categoryLabel?: string
   roadNodeId: string // Closest road network intersection node
+  distanceFromScene?: string
+  travelTime?: string
+}
+
+export interface SheetLocationRow {
+  case_id?: string
+  code?: string
+  title?: string
+  category?: string
+  address?: string
+  details?: string
+  distance_from_scene?: string
+  travel_time?: string
+  position_x?: string | number
+  position_y?: string | number
+  [key: string]: unknown
 }
 
 export type TransportMode = 'motorbike' | 'car' | 'walk' | 'transit'
@@ -43,9 +71,8 @@ export interface RouteResult {
   trafficStatus: 'good' | 'moderate' | 'slow'
   viaRoute: string
   points: { x: number; y: number }[]
-  latLngs: [number, number][] // Real-world coordinates [lat, lng] for Leaflet
+  latLngs: [number, number][]
   steps: RouteStep[]
-  // Alternative Route (Gray line in real Google Maps)
   alternativePoints?: { x: number; y: number }[]
   alternativeLatLngs?: [number, number][]
   alternativeDistanceText?: string
@@ -56,455 +83,7 @@ export interface RouteResult {
 }
 
 // ---------------------------------------------------------------------------
-// 1. CLEAN CASE & LANDMARK LOCATIONS (Zero Real Street/District Name Leaks)
-// ---------------------------------------------------------------------------
-export const CASE_LOCATIONS: CaseLocation[] = [
-  // --- Core Case Area: Phân khu Cảng ---
-  {
-    id: 'loc-01',
-    name: 'Số 14 Đường Bờ Sông',
-    shortName: '14 Bờ Sông',
-    address: 'Số 14, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Khu dân cư (Gốc tọa độ)',
-    x: 1240,
-    y: 1120,
-    lat: 21.0058,
-    lng: 105.8682,
-    description: 'Hiện trường chính vụ án: Nhà riêng nạn nhân Nguyễn Văn Khang, cách gác chắn đường sắt 30m.',
-    rating: 4.5,
-    reviewCount: 18,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P28+3M Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-bosong-14'
-  },
-  {
-    id: 'loc-02',
-    name: 'Số 12 Đường Bờ Sông',
-    shortName: '12 Bờ Sông',
-    address: 'Số 12, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Khu dân cư',
-    x: 1220,
-    y: 1145,
-    lat: 21.0053,
-    lng: 105.8686,
-    description: 'Nhà dân cư liền kề sát vách nhà Khang, Xóm Bờ Sông (cách 40m).',
-    rating: 4.8,
-    reviewCount: 9,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P28+2M Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-bosong-south'
-  },
-  {
-    id: 'loc-03',
-    name: 'Số 10 Đường Bờ Sông',
-    shortName: '10 Bờ Sông',
-    address: 'Số 10, Đường Bờ Sông, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Khu dân cư',
-    x: 1205,
-    y: 1170,
-    lat: 21.0048,
-    lng: 105.8690,
-    description: 'Nhà dân cư truyền thống, Xóm Bờ Sông (cách 85m).',
-    rating: 4.2,
-    reviewCount: 6,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P28+1M Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-bosong-south'
-  },
-  {
-    id: 'loc-04',
-    name: 'Bãi đất ven sông',
-    shortName: 'Bãi đất ven sông',
-    address: 'Khu bãi ven sông cũ, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'public',
-    categoryLabel: 'Khu vực tự nhiên',
-    x: 1285,
-    y: 1240,
-    lat: 21.0035,
-    lng: 105.8715,
-    description: 'Khu đất trống bồi ven bờ đê Sông Hồng (cách 250m).',
-    rating: 4.0,
-    reviewCount: 14,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P18+8K Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-desong-south'
-  },
-  {
-    id: 'loc-05',
-    name: 'Số 45 Đường Đoàn Kết',
-    shortName: '45 Đoàn Kết',
-    address: 'Số 45, Đường Đoàn Kết, Phường Cảng Đông, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Khu dân cư',
-    x: 1080,
-    y: 1070,
-    lat: 21.0085,
-    lng: 105.8640,
-    description: 'Nhà ở riêng của vợ chồng Nguyễn Ngọc Mai và Lê Quang Vũ tại Phường Cảng Đông (cách 3.2 km).',
-    rating: 4.4,
-    reviewCount: 22,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P37+4G Cảng Đông, Hà Nội',
-    roadNodeId: 'node-doanket-west'
-  },
-  {
-    id: 'loc-06',
-    name: 'Số 8 Ngõ 12 Đường Bờ Kè',
-    shortName: 'Số 8 Ngõ 12 Bờ Kè',
-    address: 'Số 8, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Khu nhà trọ',
-    x: 1370,
-    y: 1045,
-    lat: 21.0092,
-    lng: 105.8712,
-    description: 'Phòng trọ của Trần Thị Hà, sâu trong ngõ 12 Bờ Kè (cùng Phường Phân khu Cảng, cách nhà Khang 1.2 km).',
-    rating: 4.3,
-    reviewCount: 31,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P39+9H Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-boke-ngo12'
-  },
-  {
-    id: 'loc-07',
-    name: 'Số 10 Ngõ 12 Đường Bờ Kè',
-    shortName: 'Số 10 Ngõ 12 Bờ Kè',
-    address: 'Số 10, Ngõ 12, Đường Bờ Kè, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Khu dân cư',
-    x: 1390,
-    y: 1060,
-    lat: 21.0096,
-    lng: 105.8718,
-    description: 'Nhà dân cư liền kề ngõ 12 Đường Bờ Kè (cách 1.25 km).',
-    rating: 4.1,
-    reviewCount: 8,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P39+8J Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-boke-ngo12'
-  },
-  {
-    id: 'loc-08',
-    name: 'Quán Bia 88',
-    shortName: 'Quán Bia 88',
-    address: 'Số 88, Đường Vĩnh Hà, Phường Cảng Đông, TP. Hà Nội',
-    category: 'food',
-    categoryLabel: 'Quán bia & Ẩm thực bình dân',
-    x: 1020,
-    y: 1270,
-    lat: 21.0035,
-    lng: 105.8632,
-    description: 'Quán bia hơi nơi Lê Quang Vũ có mặt nhậu từ 19:49 đến 21:15 ngày 24/07 (cách nhà Khang 4.5 km).',
-    rating: 4.6,
-    reviewCount: 215,
-    openingHours: 'Đang mở cửa • 10:00 - 23:30',
-    phone: '024 3982 8888',
-    plusCode: '7P16+9X Cảng Đông, Hà Nội',
-    roadNodeId: 'node-caucang-88'
-  },
-  {
-    id: 'loc-09',
-    name: 'Số 52 Phố Cầu Cảng',
-    shortName: '52 Cầu Cảng',
-    address: 'Số 52, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Nhà ở kết hợp kinh doanh',
-    x: 1070,
-    y: 1225,
-    lat: 21.0048,
-    lng: 105.8645,
-    description: 'Nhà ở riêng lẻ mặt phố kinh doanh dịch vụ Cầu Cảng (cách 0.8 km).',
-    rating: 4.0,
-    reviewCount: 12,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P17+5P Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-caucang-main'
-  },
-  {
-    id: 'loc-10',
-    name: 'Chợ Cầu Cảng',
-    shortName: 'Chợ Cầu Cảng',
-    address: 'Khu B, Chợ Dân sinh Cầu Cảng, TP. Hà Nội',
-    category: 'shopping',
-    categoryLabel: 'Chợ dân sinh',
-    x: 1010,
-    y: 1210,
-    lat: 21.0051,
-    lng: 105.8628,
-    description: 'Chợ truyền thống bán buôn thực phẩm tươi sống, sạp hàng của Đạt Gà (cách 1.1 km).',
-    rating: 4.4,
-    reviewCount: 380,
-    openingHours: 'Đang mở cửa • 05:00 - 20:30',
-    plusCode: '7P26+7R Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-caucang-main'
-  },
-  {
-    id: 'loc-11',
-    name: 'Bến xe khách Hoàng Long',
-    shortName: 'Bến xe Hoàng Long',
-    address: 'Bến đỗ xe khách liên tỉnh, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'transit',
-    categoryLabel: 'Bến xe khách liên tỉnh',
-    x: 1380,
-    y: 1370,
-    lat: 20.9980,
-    lng: 105.8720,
-    description: 'Bến xe liên tỉnh kết nối các tuyến Hải Phòng, Quảng Ninh và miền Trung (cách 2.1 km).',
-    rating: 4.1,
-    reviewCount: 1420,
-    openingHours: 'Mở cửa cả ngày • Chuyến liên tục',
-    phone: '024 3928 2828',
-    plusCode: '7P19+6R Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-hoanglong-bus'
-  },
-  {
-    id: 'loc-12',
-    name: 'ATM Ngân hàng TMCP Việt Á',
-    shortName: 'ATM Việt Á',
-    address: 'Số 104, Đường Chiến Thắng, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'finance',
-    categoryLabel: 'Cây rút tiền tự động 24/7',
-    x: 1420,
-    y: 1270,
-    lat: 21.0020,
-    lng: 105.8680,
-    description: 'Cây ATM 24/7 có camera an ninh góc rộng ghi nhận biến động giao dịch (cách 1.4 km).',
-    rating: 4.2,
-    reviewCount: 19,
-    openingHours: 'Hoạt động 24/7',
-    plusCode: '7P18+R6 Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-chienthang-bank'
-  },
-  {
-    id: 'loc-13',
-    name: 'Nhà nghỉ Hoàng Gia',
-    shortName: 'Nhà nghỉ Hoàng Gia',
-    address: 'Số 15, Ngõ 45 Đường Đoàn Kết, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Nhà nghỉ lưu trú',
-    x: 1110,
-    y: 1090,
-    lat: 21.0070,
-    lng: 105.8660,
-    description: 'Cơ sở lưu trú tư nhân 4 tầng cho thuê theo giờ (cách 3.3 km).',
-    rating: 3.9,
-    reviewCount: 45,
-    openingHours: 'Mở cửa cả ngày • Lễ tân trực 24/24',
-    phone: '024 3862 9999',
-    plusCode: '7P38+RH Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-doanket-west'
-  },
-  {
-    id: 'loc-14',
-    name: 'Số 18 Phố Cầu Bươu',
-    shortName: '18 Cầu Bươu',
-    address: 'Số 18, Phố Cầu Bươu, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Khu dân cư ngoại thành',
-    x: 750,
-    y: 1750,
-    lat: 20.9554,
-    lng: 105.8152,
-    description: 'Phòng trọ của thợ nề Nguyễn Thanh Tùng tại khu vực Cầu Bươu (cách nhà Khang 9.5 km).',
-    rating: 4.0,
-    reviewCount: 15,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P05+53 Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-caubuou-terminal'
-  },
-  {
-    id: 'loc-15',
-    name: 'Cty TNHH Vận tải Sông Hồng',
-    shortName: 'Vận tải Sông Hồng',
-    address: 'Số 102, Đường Ven Cảng, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'public',
-    categoryLabel: 'Doanh nghiệp vận tải logistics',
-    x: 1400,
-    y: 950,
-    lat: 21.0115,
-    lng: 105.8725,
-    description: 'Văn phòng kinh doanh và điều vận sà lan hàng hóa đường thủy (cách 1.5 km).',
-    rating: 4.4,
-    reviewCount: 63,
-    openingHours: '07:30 - 18:00',
-    phone: '024 3829 5566',
-    plusCode: '7P49+J2 Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-vantaish'
-  },
-  {
-    id: 'loc-16',
-    name: 'CLB Billiards X-Club',
-    shortName: 'Billiards X-Club',
-    address: 'Số 29, Phố Vọng, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'food',
-    categoryLabel: 'Câu lạc bộ thể thao giải trí',
-    x: 1040,
-    y: 1430,
-    lat: 20.9982,
-    lng: 105.8451,
-    description: 'CLB bida giải trí, điểm hẹn của nhóm anh em xã hội (cách 3.2 km).',
-    rating: 4.8,
-    reviewCount: 160,
-    openingHours: 'Đang mở cửa • 09:00 - 02:00',
-    phone: '0988 123 456',
-    plusCode: '7P18+72 Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-phovong'
-  },
-  {
-    id: 'loc-17',
-    name: 'Công an Phường Phân khu Cảng',
-    shortName: 'Công an Phường',
-    address: 'Số 02, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'public',
-    categoryLabel: 'Cơ quan hành chính nhà nước',
-    x: 1140,
-    y: 1140,
-    lat: 21.0075,
-    lng: 105.8655,
-    description: 'Trụ sở công an phường thụ lý tin báo ban đầu của bà Lụa (cách 0.7 km).',
-    rating: 4.6,
-    reviewCount: 88,
-    openingHours: 'Trực ban hình sự 24/7',
-    phone: '024 3824 1133',
-    plusCode: '7P38+26 Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-doanket-east'
-  },
-  {
-    id: 'loc-18',
-    name: 'Sân bay Quốc tế Nội Bài (T1)',
-    shortName: 'Sân bay Nội Bài T1',
-    address: 'Nhà ga T1, Cảng HKQT Nội Bài, TP. Hà Nội',
-    category: 'transit',
-    categoryLabel: 'Cảng hàng không quốc tế',
-    x: 1180,
-    y: 90,
-    lat: 21.2212,
-    lng: 105.8072,
-    description: 'Nhà ga quốc nội T1, điểm hẹn bay trốn vào Sài Gòn sáng 25/7 của Khang và Vy (cách 28.5 km).',
-    rating: 4.5,
-    reviewCount: 8400,
-    openingHours: 'Hoạt động 24/7',
-    phone: '1900 636 535',
-    plusCode: '9PQG+7P Nội Bài, Hà Nội',
-    roadNodeId: 'node-noibai-airport'
-  },
-  {
-    id: 'loc-19',
-    name: 'Nhà nghỉ Đạt Phú',
-    shortName: 'Nhà nghỉ Đạt Phú',
-    address: 'Số 29, Đường Vĩnh Thái, Phường Cảng Tây, TP. Hà Nội',
-    category: 'residential',
-    categoryLabel: 'Nhà nghỉ lưu trú',
-    x: 1350,
-    y: 1100,
-    lat: 21.0080,
-    lng: 105.8700,
-    description: 'Nhà nghỉ Đạt Phú tại Phường Cảng Tây (cách nhà Khang 2.5 km).',
-    rating: 4.6,
-    reviewCount: 42,
-    openingHours: 'Mở cửa 24/24',
-    phone: '024 3869 2929',
-    plusCode: '7P38+5X Cảng Tây, Hà Nội',
-    roadNodeId: 'node-boke-ngo12'
-  },
-  {
-    id: 'loc-20',
-    name: 'Quán Cơm Chị Ba',
-    shortName: 'Cơm Chị Ba',
-    address: 'Số 18, Phố Cầu Cảng, Phường Phân khu Cảng, TP. Hà Nội',
-    category: 'food',
-    categoryLabel: 'Quán cơm bình dân',
-    x: 1110,
-    y: 1190,
-    lat: 21.0062,
-    lng: 105.8652,
-    description: 'Quán cơm bình dân Khang hay gọi ship cơm trưa (cách 0.6 km).',
-    rating: 4.3,
-    reviewCount: 74,
-    openingHours: '10:00 - 20:30',
-    phone: '0908 334 991',
-    plusCode: '7P28+4A Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-caucang-junction'
-  },
-  {
-    id: 'loc-21',
-    name: 'Tiệm Giặt Là Chị Hạnh',
-    shortName: 'Giặt Là Chị Hạnh',
-    address: 'Số 42, Phố Khâm Thiên, Quận Sông Hồng, TP. Hà Nội',
-    category: 'shopping',
-    categoryLabel: 'Dịch vụ giặt là hấp sấy',
-    x: 1150,
-    y: 980,
-    lat: 21.0180,
-    lng: 105.8520,
-    description: 'Tiệm giặt khô đồ da và chăn bông của Khang (cách 4.5 km).',
-    rating: 4.5,
-    reviewCount: 52,
-    openingHours: '08:00 - 21:00',
-    phone: '0914 556 789',
-    plusCode: '7P52+7M Sông Hồng, Hà Nội',
-    roadNodeId: 'node-city-center'
-  },
-  {
-    id: 'loc-22',
-    name: 'Bến phà Phân khu Cảng',
-    shortName: 'Bến phà Cảng',
-    address: 'Khu vực Bến phà Cảng Sông Hồng, TP. Hà Nội',
-    category: 'transit',
-    categoryLabel: 'Bến phà bến đò',
-    x: 1450,
-    y: 1020,
-    lat: 21.0100,
-    lng: 105.8760,
-    description: 'Bến phà ngang sông Hồng, điểm tụ tập của xe ôm và nhóm cửu vạn bến bãi (cách 1.8 km).',
-    rating: 4.0,
-    reviewCount: 88,
-    openingHours: '05:00 - 22:00',
-    plusCode: '7P4A+2B Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-vantaish'
-  },
-  {
-    id: 'loc-23',
-    name: 'Điểm hẹn giao dịch số X đường ABC',
-    shortName: 'Kho bãi Ven Cảng 68',
-    address: 'Kho bãi Ven Cảng số 68, Phân khu Cảng, TP. Hà Nội',
-    category: 'public',
-    categoryLabel: 'Khu vực kho bãi vắng vẻ',
-    x: 1330,
-    y: 1150,
-    lat: 21.0040,
-    lng: 105.8705,
-    description: 'Địa điểm kín đáo vắng người Khang hẹn giao nhận tiền mặt và giải quyết nợ ngoài (cách 1.6 km).',
-    rating: 3.8,
-    reviewCount: 5,
-    openingHours: 'Mở cửa cả ngày',
-    plusCode: '7P18+9W Phân khu Cảng, Hà Nội',
-    roadNodeId: 'node-vanhdai2-junction'
-  }
-]
-
-// ---------------------------------------------------------------------------
-// 2. HAVERSINE DISTANCE HELPER
-// ---------------------------------------------------------------------------
-export function haversineDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371 // Earth radius in km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180
-  const dLon = ((lon2 - lon1) * Math.PI) / 180
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  return R * c
-}
-
-// ---------------------------------------------------------------------------
-// 3. ROAD NETWORK GRAPH
+// 1. ROAD NETWORK NODES & SNAP REGISTRY
 // ---------------------------------------------------------------------------
 export interface RoadNode {
   id: string
@@ -523,44 +102,44 @@ export interface RoadEdge {
 }
 
 export const ROAD_NODES: Record<string, RoadNode> = {
-  // --- Core Case Area: Đường Bờ Sông & Cần Chắn ---
+  // Core Case Corridor: Đường Bờ Sông & Cần Chắn
   'node-bosong-14': { id: 'node-bosong-14', x: 1240, y: 1120, lat: 21.0058, lng: 105.8682, name: 'Ngõ 14 Bờ Sông' },
   'node-bosong-crossing': { id: 'node-bosong-crossing', x: 1245, y: 1100, lat: 21.0065, lng: 105.8678, name: 'Gác chắn đường sắt Bờ Sông' },
   'node-bosong-south': { id: 'node-bosong-south', x: 1215, y: 1180, lat: 21.0048, lng: 105.8690, name: 'Bờ Sông Nam' },
   'node-desong-south': { id: 'node-desong-south', x: 1270, y: 1250, lat: 21.0035, lng: 105.8715, name: 'Bãi đất Bờ Sông' },
   'node-bosong-north': { id: 'node-bosong-north', x: 1255, y: 1040, lat: 21.0080, lng: 105.8685, name: 'Bờ Sông Bắc' },
 
-  // --- Đường Đoàn Kết ---
+  // Đường Đoàn Kết
   'node-doanket-east': { id: 'node-doanket-east', x: 1150, y: 1100, lat: 21.0075, lng: 105.8655, name: 'Ngã ba Đoàn Kết - Bờ Sông' },
   'node-doanket-west': { id: 'node-doanket-west', x: 1070, y: 1080, lat: 21.0085, lng: 105.8640, name: 'Số 45 Đoàn Kết' },
 
-  // --- Phố Cầu Cảng ---
+  // Phố Cầu Cảng
   'node-caucang-junction': { id: 'node-caucang-junction', x: 1120, y: 1160, lat: 21.0060, lng: 105.8650, name: 'Ngã tư Cầu Cảng' },
   'node-caucang-main': { id: 'node-caucang-main', x: 1060, y: 1210, lat: 21.0048, lng: 105.8645, name: 'Chợ Cầu Cảng' },
-  'node-caucang-88': { id: 'node-caucang-88', x: 1020, y: 1260, lat: 21.0035, lng: 105.8632, name: 'Quán Bia 88 (Đường Vĩnh Hà)' },
+  'node-caucang-88': { id: 'node-caucang-88', x: 1020, y: 1260, lat: 21.0035, lng: 105.8632, name: 'Quán Bia 88' },
 
-  // --- Đường Bờ Kè & Ngõ 12 ---
+  // Đường Bờ Kè & Ngõ 12
   'node-boke-junction': { id: 'node-boke-junction', x: 1320, y: 1040, lat: 21.0088, lng: 105.8698, name: 'Ngã ba Bờ Kè' },
   'node-boke-ngo12': { id: 'node-boke-ngo12', x: 1370, y: 1060, lat: 21.0092, lng: 105.8712, name: 'Đầu Ngõ 12 Bờ Kè' },
   'node-vantaish': { id: 'node-vantaish', x: 1390, y: 960, lat: 21.0115, lng: 105.8725, name: 'Cảng Sông Hồng' },
 
-  // --- Tuyến Vành Đai Phân Khu Cảng ---
+  // Tuyến Vành Đai Phân Khu Cảng
   'node-vanhdai2-junction': { id: 'node-vanhdai2-junction', x: 1330, y: 1200, lat: 21.0015, lng: 105.8700, name: 'Nút giao Vành đai' },
   'node-chienthang-bank': { id: 'node-chienthang-bank', x: 1420, y: 1270, lat: 21.0020, lng: 105.8680, name: 'Đường Chiến Thắng' },
   'node-hoanglong-bus': { id: 'node-hoanglong-bus', x: 1380, y: 1370, lat: 20.9980, lng: 105.8720, name: 'Bến xe Hoàng Long' },
 
-  // --- Tuyến Tây Nam: Phố Vọng & Cầu Bươu ---
+  // Tuyến Tây Nam: Phố Vọng & Cầu Bươu
   'node-phovong': { id: 'node-phovong', x: 1020, y: 1420, lat: 20.9982, lng: 105.8451, name: 'Phố Vọng' },
   'node-giaiphong-south': { id: 'node-giaiphong-south', x: 920, y: 1560, lat: 20.9780, lng: 105.8390, name: 'Đường liên khu Nam' },
   'node-caubuou-junction': { id: 'node-caubuou-junction', x: 820, y: 1680, lat: 20.9620, lng: 105.8250, name: 'Ngã ba Cầu Bươu' },
   'node-caubuou-terminal': { id: 'node-caubuou-terminal', x: 750, y: 1750, lat: 20.9554, lng: 105.8152, name: 'Số 18 Cầu Bươu' },
 
-  // --- Tuyến Phía Bắc: Nội Bài Highway (28 km) ---
+  // Tuyến Phía Bắc: Trục Trung tâm & Nội Bài
   'node-city-center': { id: 'node-city-center', x: 1180, y: 880, lat: 21.0285, lng: 105.8542, name: 'Trục Trung tâm' },
   'node-westlake-east': { id: 'node-westlake-east', x: 1120, y: 640, lat: 21.0560, lng: 105.8280, name: 'Đường Ven Hồ' },
   'node-nhattan-bridge-south': { id: 'node-nhattan-bridge-south', x: 1140, y: 440, lat: 21.0850, lng: 105.8150, name: 'Đầu Cầu Phía Bắc' },
   'node-nhattan-bridge-north': { id: 'node-nhattan-bridge-north', x: 1220, y: 320, lat: 21.1180, lng: 105.8120, name: 'Cuối Cầu Phía Bắc' },
-  'node-vonguyengiap-hwy': { id: 'node-vonguyengiap-hwy', x: 1200, y: 200, lat: 21.1650, lng: 105.8100, name: 'Tuyến cao tốc đi Sân bay' },
+  'node-vonguyengiap-hwy': { id: 'node-vonguyengiap-hwy', x: 1200, y: 200, lat: 21.1650, lng: 105.8100, name: 'Cao tốc Sân bay' },
   'node-noibai-airport': { id: 'node-noibai-airport', x: 1180, y: 100, lat: 21.2212, lng: 105.8072, name: 'Sân bay Quốc tế Nội Bài T1' }
 }
 
@@ -589,7 +168,7 @@ export const ROAD_EDGES: RoadEdge[] = [
   // Bờ Sông to Vành đai
   { from: 'node-bosong-crossing', to: 'node-vanhdai2-junction', streetName: 'Đường nối Vành đai', distanceKm: 0.6 },
   { from: 'node-vanhdai2-junction', to: 'node-chienthang-bank', streetName: 'Đường Chiến Thắng', distanceKm: 0.5 },
-  { from: 'node-vanhdai2-junction', to: 'node-hoanglong-bus', streetName: 'Đường Vành đai Phân khu', distanceKm: 0.9 },
+  { from: 'node-vanhdai2-junction', to: 'node-hoanglong-bus', streetName: 'Đường Vành đai', distanceKm: 0.9 },
 
   // Cầu Bươu
   { from: 'node-phovong', to: 'node-giaiphong-south', streetName: 'Đại lộ Phía Nam', distanceKm: 3.2 },
@@ -601,12 +180,170 @@ export const ROAD_EDGES: RoadEdge[] = [
   { from: 'node-city-center', to: 'node-westlake-east', streetName: 'Đường Ven Hồ', distanceKm: 4.2 },
   { from: 'node-westlake-east', to: 'node-nhattan-bridge-south', streetName: 'Đường nối Cầu Phía Bắc', distanceKm: 3.8 },
   { from: 'node-nhattan-bridge-south', to: 'node-nhattan-bridge-north', streetName: 'Cầu Phía Bắc (3.75 km)', distanceKm: 3.8 },
-  { from: 'node-nhattan-bridge-north', to: 'node-vonguyengiap-hwy', streetName: 'Tuyến cao tốc liên tỉnh', distanceKm: 6.5 },
+  { from: 'node-nhattan-bridge-north', to: 'node-vonguyengiap-hwy', streetName: 'Cao tốc liên tỉnh', distanceKm: 6.5 },
   { from: 'node-vonguyengiap-hwy', to: 'node-noibai-airport', streetName: 'Đường vào Sân bay Nội Bài', distanceKm: 7.2 }
 ]
 
 // ---------------------------------------------------------------------------
-// 4. GRAPH PATHFINDING ALGORITHM (Dijkstra Shortest Path)
+// 2. LOCATION POSITION & ROAD SNAP CONFIG
+// ---------------------------------------------------------------------------
+interface LocationMeta {
+  roadNodeId: string
+  x: number
+  y: number
+  lat: number
+  lng: number
+  rating?: number
+  reviewCount?: number
+  openingHours?: string
+  phone?: string
+  plusCode?: string
+}
+
+const LOCATION_METAS: Record<string, LocationMeta> = {
+  'loc-01': { roadNodeId: 'node-bosong-14', x: 1240, y: 1120, lat: 21.0058, lng: 105.8682, rating: 4.5, reviewCount: 18, openingHours: 'Mở cửa cả ngày', plusCode: '7P28+3M Phân khu Cảng, Hà Nội' },
+  'loc-02': { roadNodeId: 'node-bosong-south', x: 1220, y: 1145, lat: 21.0053, lng: 105.8686, rating: 4.8, reviewCount: 9, openingHours: 'Mở cửa cả ngày', plusCode: '7P28+2M Phân khu Cảng, Hà Nội' },
+  'loc-03': { roadNodeId: 'node-bosong-south', x: 1205, y: 1170, lat: 21.0048, lng: 105.8690, rating: 4.2, reviewCount: 6, openingHours: 'Mở cửa cả ngày', plusCode: '7P28+1M Phân khu Cảng, Hà Nội' },
+  'loc-04': { roadNodeId: 'node-desong-south', x: 1285, y: 1240, lat: 21.0035, lng: 105.8715, rating: 4.0, reviewCount: 14, openingHours: 'Mở cửa cả ngày', plusCode: '7P18+8K Phân khu Cảng, Hà Nội' },
+  'loc-05': { roadNodeId: 'node-doanket-west', x: 1080, y: 1070, lat: 21.0085, lng: 105.8640, rating: 4.4, reviewCount: 22, openingHours: 'Mở cửa cả ngày', plusCode: '7P37+4G Cảng Đông, Hà Nội' },
+  'loc-06': { roadNodeId: 'node-boke-ngo12', x: 1370, y: 1045, lat: 21.0092, lng: 105.8712, rating: 4.3, reviewCount: 31, openingHours: 'Mở cửa cả ngày', plusCode: '7P39+9H Phân khu Cảng, Hà Nội' },
+  'loc-07': { roadNodeId: 'node-boke-ngo12', x: 1390, y: 1060, lat: 21.0096, lng: 105.8718, rating: 4.1, reviewCount: 8, openingHours: 'Mở cửa cả ngày', plusCode: '7P39+8J Phân khu Cảng, Hà Nội' },
+  'loc-08': { roadNodeId: 'node-caucang-88', x: 1020, y: 1270, lat: 21.0035, lng: 105.8632, rating: 4.6, reviewCount: 215, openingHours: '10:00 - 23:30', phone: '024 3982 8888', plusCode: '7P16+9X Cảng Đông, Hà Nội' },
+  'loc-09': { roadNodeId: 'node-caucang-main', x: 1070, y: 1225, lat: 21.0048, lng: 105.8645, rating: 4.0, reviewCount: 12, openingHours: 'Mở cửa cả ngày', plusCode: '7P17+5P Phân khu Cảng, Hà Nội' },
+  'loc-10': { roadNodeId: 'node-caucang-main', x: 1010, y: 1210, lat: 21.0051, lng: 105.8628, rating: 4.4, reviewCount: 380, openingHours: '05:00 - 20:30', plusCode: '7P26+7R Phân khu Cảng, Hà Nội' },
+  'loc-11': { roadNodeId: 'node-hoanglong-bus', x: 1380, y: 1370, lat: 20.9980, lng: 105.8720, rating: 4.1, reviewCount: 1420, openingHours: 'Chuyến liên tục 24/7', phone: '024 3928 2828', plusCode: '7P19+6R Phân khu Cảng, Hà Nội' },
+  'loc-12': { roadNodeId: 'node-chienthang-bank', x: 1420, y: 1270, lat: 21.0020, lng: 105.8680, rating: 4.2, reviewCount: 19, openingHours: 'Hoạt động 24/7', plusCode: '7P18+R6 Phân khu Cảng, Hà Nội' },
+  'loc-13': { roadNodeId: 'node-doanket-west', x: 1110, y: 1090, lat: 21.0070, lng: 105.8660, rating: 3.9, reviewCount: 45, openingHours: 'Mở cửa cả ngày', phone: '024 3862 9999', plusCode: '7P38+RH Phân khu Cảng, Hà Nội' },
+  'loc-14': { roadNodeId: 'node-caubuou-terminal', x: 750, y: 1750, lat: 20.9554, lng: 105.8152, rating: 4.0, reviewCount: 15, openingHours: 'Mở cửa cả ngày', plusCode: '7P05+53 Phân khu Cảng, Hà Nội' },
+  'loc-15': { roadNodeId: 'node-vantaish', x: 1400, y: 950, lat: 21.0115, lng: 105.8725, rating: 4.4, reviewCount: 63, openingHours: '07:30 - 18:00', phone: '024 3829 5566', plusCode: '7P49+J2 Phân khu Cảng, Hà Nội' },
+  'loc-16': { roadNodeId: 'node-phovong', x: 1040, y: 1430, lat: 20.9982, lng: 105.8451, rating: 4.8, reviewCount: 160, openingHours: '09:00 - 02:00', phone: '0988 123 456', plusCode: '7P18+72 Phân khu Cảng, Hà Nội' },
+  'loc-17': { roadNodeId: 'node-doanket-east', x: 1140, y: 1140, lat: 21.0075, lng: 105.8655, rating: 4.6, reviewCount: 88, openingHours: 'Trực ban 24/7', phone: '024 3824 1133', plusCode: '7P38+26 Phân khu Cảng, Hà Nội' },
+  'loc-18': { roadNodeId: 'node-noibai-airport', x: 1180, y: 90, lat: 21.2212, lng: 105.8072, rating: 4.5, reviewCount: 8400, openingHours: 'Hoạt động 24/7', phone: '1900 636 535', plusCode: '9PQG+7P Nội Bài, Hà Nội' },
+  'loc-19': { roadNodeId: 'node-boke-ngo12', x: 1350, y: 1100, lat: 21.0080, lng: 105.8700, rating: 4.6, reviewCount: 42, openingHours: 'Mở cửa 24/24', phone: '024 3869 2929', plusCode: '7P38+5X Cảng Tây, Hà Nội' },
+  'loc-20': { roadNodeId: 'node-caucang-junction', x: 1110, y: 1190, lat: 21.0062, lng: 105.8652, rating: 4.3, reviewCount: 74, openingHours: '10:00 - 20:30', phone: '0908 334 991', plusCode: '7P28+4A Phân khu Cảng, Hà Nội' },
+  'loc-21': { roadNodeId: 'node-city-center', x: 1150, y: 980, lat: 21.0180, lng: 105.8520, rating: 4.5, reviewCount: 52, openingHours: '08:00 - 21:00', phone: '0914 556 789', plusCode: '7P52+7M Sông Hồng, Hà Nội' },
+  'loc-22': { roadNodeId: 'node-vantaish', x: 1450, y: 1020, lat: 21.0100, lng: 105.8760, rating: 4.0, reviewCount: 88, openingHours: '05:00 - 22:00', plusCode: '7P4A+2B Phân khu Cảng, Hà Nội' },
+  'loc-23': { roadNodeId: 'node-vanhdai2-junction', x: 1330, y: 1150, lat: 21.0040, lng: 105.8705, rating: 3.8, reviewCount: 5, openingHours: 'Mở cửa cả ngày', plusCode: '7P18+9W Phân khu Cảng, Hà Nội' },
+  'loc-doc-02': { roadNodeId: 'node-city-center', x: 1190, y: 820, lat: 21.0250, lng: 105.8500, rating: 4.7, reviewCount: 95, openingHours: 'Giờ hành chính', plusCode: '7P53+2X Sông Hồng, Hà Nội' },
+  'loc-doc-03': { roadNodeId: 'node-city-center', x: 1210, y: 800, lat: 21.0280, lng: 105.8530, rating: 4.6, reviewCount: 42, openingHours: 'Giờ hành chính', plusCode: '7P54+4A Sông Hồng, Hà Nội' },
+  'loc-doc-04': { roadNodeId: 'node-doanket-east', x: 1160, y: 1080, lat: 21.0080, lng: 105.8660, rating: 4.5, reviewCount: 38, openingHours: 'Giờ hành chính', plusCode: '7P38+3C Phân khu Cảng, Hà Nội' },
+  'loc-doc-05': { roadNodeId: 'node-caucang-junction', x: 1130, y: 1150, lat: 21.0065, lng: 105.8655, rating: 4.3, reviewCount: 110, openingHours: '08:00 - 16:30', plusCode: '7P28+6D Phân khu Cảng, Hà Nội' },
+  'loc-doc-06': { roadNodeId: 'node-doanket-east', x: 1170, y: 1090, lat: 21.0078, lng: 105.8665, rating: 4.4, reviewCount: 26, openingHours: 'Giờ hành chính', plusCode: '7P38+5E Phân khu Cảng, Hà Nội' },
+  'loc-doc-07': { roadNodeId: 'node-city-center', x: 1185, y: 825, lat: 21.0245, lng: 105.8510, rating: 4.8, reviewCount: 65, openingHours: 'Trực 24/7', plusCode: '7P53+1M Sông Hồng, Hà Nội' }
+}
+
+export function parseCategory(rawCat?: string): { category: LocationCategory; categoryLabel: string } {
+  const norm = (rawCat || '').toUpperCase().trim()
+  switch (norm) {
+    case 'CRIME_SCENE':
+      return { category: 'crime_scene', categoryLabel: 'Hiện trường vụ án' }
+    case 'RESIDENCE':
+    case 'RESIDENTIAL':
+      return { category: 'residential', categoryLabel: 'Khu dân cư & Nhà ở' }
+    case 'BUSINESS':
+    case 'SHOPPING':
+      return { category: 'shopping', categoryLabel: 'Kinh doanh & Thương mại' }
+    case 'TRANSIT':
+      return { category: 'transit', categoryLabel: 'Giao thông & Bến bãi' }
+    case 'FOOD':
+      return { category: 'food', categoryLabel: 'Ẩm thực & Quán xá' }
+    case 'FINANCE':
+      return { category: 'finance', categoryLabel: 'Tài chính & Ngân hàng' }
+    case 'GOVERNMENT':
+      return { category: 'government', categoryLabel: 'Cơ quan nhà nước' }
+    case 'ENTERTAINMENT':
+      return { category: 'entertainment', categoryLabel: 'Thể thao & Giải trí' }
+    case 'PUBLIC':
+    default:
+      return { category: 'public', categoryLabel: 'Khu vực công cộng' }
+  }
+}
+
+/**
+ * Adapter chuyển đổi một dòng thô từ Google Sheets sang CaseLocation chuẩn
+ */
+export function transformSheetLocationToCaseLocation(row: SheetLocationRow): CaseLocation {
+  const id = String(row.code || row.id || '').trim() || 'loc-unknown'
+  const title = String(row.title || row.name || 'Địa điểm chưa đặt tên').trim()
+  const { category, categoryLabel } = parseCategory(String(row.category || ''))
+  const meta = LOCATION_METAS[id]
+
+  // Tọa độ ưu tiên từ metadata mapped sang Figma canvas (2474 x 1732),
+  // fallback từ tỉ lệ position_x / position_y nếu Sheet có nhập
+  let x = meta?.x ?? 1240
+  let y = meta?.y ?? 1120
+  if (row.position_x !== undefined && row.position_x !== '') {
+    const rawX = parseFloat(String(row.position_x))
+    if (!isNaN(rawX)) {
+      x = rawX > 1000 ? rawX : Math.round((rawX / 1000) * 2474)
+    }
+  }
+  if (row.position_y !== undefined && row.position_y !== '') {
+    const rawY = parseFloat(String(row.position_y))
+    if (!isNaN(rawY)) {
+      y = rawY > 1000 ? rawY : Math.round((rawY / 1000) * 1732)
+    }
+  }
+
+  const lat = meta?.lat ?? 21.0058
+  const lng = meta?.lng ?? 105.8682
+  const roadNodeId = meta?.roadNodeId ?? 'node-bosong-14'
+
+  return {
+    id,
+    name: title,
+    shortName: title.length > 20 ? title.substring(0, 18) + '...' : title,
+    address: String(row.address || 'Hà Nội').trim(),
+    category,
+    categoryLabel,
+    x,
+    y,
+    lat,
+    lng,
+    description: String(row.details || row.description || '').trim(),
+    rating: meta?.rating ?? 4.5,
+    reviewCount: meta?.reviewCount ?? 15,
+    openingHours: meta?.openingHours ?? 'Mở cửa cả ngày',
+    plusCode: meta?.plusCode ?? '7P28+3M Hà Nội',
+    phone: meta?.phone,
+    roadNodeId,
+    distanceFromScene: String(row.distance_from_scene || '').trim(),
+    travelTime: String(row.travel_time || '').trim()
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 3. SEED CASE LOCATIONS (Fallback Instant Init trước khi Fetch xong Sheet)
+// ---------------------------------------------------------------------------
+export const CASE_LOCATIONS: CaseLocation[] = Object.keys(LOCATION_METAS).map((key) => {
+  return transformSheetLocationToCaseLocation({
+    code: key,
+    title: key === 'loc-01' ? 'Số 14 Đường Bờ Sông' : `Địa điểm ${key}`,
+    category: key === 'loc-01' ? 'CRIME_SCENE' : 'RESIDENCE'
+  })
+})
+
+export const DEFAULT_CASE_LOCATIONS = CASE_LOCATIONS
+
+// ---------------------------------------------------------------------------
+// 4. HAVERSINE DISTANCE HELPER
+// ---------------------------------------------------------------------------
+export function haversineDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lon2 - lon1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return R * c
+}
+
+// ---------------------------------------------------------------------------
+// 5. GRAPH PATHFINDING ALGORITHM (Dijkstra Shortest Path)
 // ---------------------------------------------------------------------------
 function findShortestPath(startNodeId: string, endNodeId: string): string[] {
   if (startNodeId === endNodeId) return [startNodeId]
@@ -670,7 +407,7 @@ function findShortestPath(startNodeId: string, endNodeId: string): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// 5. CALCULATE ROUTE (Case-Consistent Route Engine)
+// 6. CALCULATE ROUTE (Case-Consistent Route Engine)
 // ---------------------------------------------------------------------------
 export function calculateRoute(
   origin: CaseLocation,
@@ -741,9 +478,8 @@ export function calculateRoute(
   const alternativeDistanceText = `${altDistanceKm.toFixed(1)} km`
   const alternativeDurationText = `+${Math.max(2, Math.round(durationMinutes * 0.2))} phút`
 
-  // Fictional / Case-consistent route descriptions (No real street name leaks)
   let viaRoute = 'Qua Đường Bờ Sông'
-  let alternativeViaRoute = 'Qua Tuyến Đường Vành Đai Phân Khu'
+  let alternativeViaRoute = 'Qua Tuyến Đường Vành Đai'
   if ((origin.id === 'loc-01' && destination.id === 'loc-06') || (origin.id === 'loc-06' && destination.id === 'loc-01')) {
     viaRoute = 'Qua Đường Bờ Kè & Ngõ 12'
     alternativeViaRoute = 'Qua Phố Cầu Cảng & Đường Ven Sông'

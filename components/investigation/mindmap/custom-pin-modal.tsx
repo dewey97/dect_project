@@ -10,12 +10,17 @@ import {
   Unlock,
   CheckSquare,
   Square,
+  Lightbulb,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { parseAnswersColumn } from "@/lib/cms/checkpoint-cms";
+import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { isVietnameseTextMatch } from "@/lib/finding-matcher";
 
 interface CustomPinModalProps {
   isOpen: boolean;
@@ -145,6 +150,7 @@ export function CustomPinModal({
     setSelectedEvidences([]);
     setFeedback(null);
     setIsSolved(Boolean(pin?.isSolved));
+    setActiveHintIdx(0);
   }, [pin, isOpen]);
 
   const isQuestionNode =
@@ -164,11 +170,21 @@ export function CustomPinModal({
       ? "Hãy suy luận và đưa ra câu trả lời dựa trên manh mối đã thu thập."
       : "");
 
-  const hintsText =
-    matchedCheckpoint?.hint ||
-    (matchedCheckpoint?.hintsList && matchedCheckpoint.hintsList.join(" | ")) ||
-    pin?.hints ||
-    "";
+  // Graded hints extracted strictly from live Sheet checkpoint (or pin.hints)
+  const hintsList = useMemo<string[]>(() => {
+    if (matchedCheckpoint?.hintsList && matchedCheckpoint.hintsList.length > 0) {
+      return matchedCheckpoint.hintsList;
+    }
+    if (matchedCheckpoint?.hint) {
+      return [matchedCheckpoint.hint];
+    }
+    if (pin?.hints) {
+      return [pin.hints];
+    }
+    return [];
+  }, [matchedCheckpoint, pin]);
+
+  const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
 
   const unlockedEvidence =
     matchedCheckpoint?.unlockedEvidenceId || pin?.unlockedEvidenceId || "";
@@ -228,13 +244,13 @@ export function CustomPinModal({
       const val3 = phoneInput3.trim().toLowerCase();
 
       const check1 = (inputsConfig[0]?.validAnswers || []).some(
-        (a) => a.toLowerCase() === val1 || val1.includes(a.toLowerCase()),
+        (a) => isVietnameseTextMatch(val1, a),
       );
       const check2 = (inputsConfig[1]?.validAnswers || []).some(
-        (a) => a.toLowerCase() === val2 || val2.includes(a.toLowerCase()),
+        (a) => isVietnameseTextMatch(val2, a),
       );
       const check3 = (inputsConfig[2]?.validAnswers || []).some(
-        (a) => a.toLowerCase() === val3 || val3.includes(a.toLowerCase()),
+        (a) => isVietnameseTextMatch(val3, a),
       );
 
       if (check1 && check2 && check3) {
@@ -302,16 +318,36 @@ export function CustomPinModal({
               HỒ SƠ TÀI LIỆU // {questionTitle}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              detectiveAudio.playPaperRustle();
-              onClose();
-            }}
-            className="p-1.5 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors border border-[#5c4026]"
-          >
-            <X className="size-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {isQuestionNode && (targetCpId || matchedCheckpoint?.id) && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  detectiveAudio.playTypewriterClick();
+                  emitInvestigationEvent("OPEN_HINT", {
+                    checkpointId: targetCpId || matchedCheckpoint?.id,
+                  });
+                }}
+                className="px-2 py-1 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1 shadow-sm active:scale-95"
+                title="Mở gợi ý phá án chuyên sâu"
+              >
+                <Lightbulb className="size-3 text-[#8c1d1d]" />
+                <span className="hidden sm:inline">GỢI Ý</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                detectiveAudio.playPaperRustle();
+                onClose();
+              }}
+              className="p-1.5 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors border border-[#5c4026]"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
         </div>
 
         {/* CONTENT BODY */}
@@ -471,10 +507,46 @@ export function CustomPinModal({
                     </div>
                   )}
 
-                  {/* Hints Display */}
-                  {hintsText && (
-                    <div className="text-[11px] font-mono text-[#7a5938] italic p-2 bg-[#ebdcc4]/60 border border-[#a88c6f]/40 rounded">
-                      💡 <strong>Gợi ý:</strong> {hintsText}
+                  {/* Hints Display — Multi-level from Google Sheets */}
+                  {hintsList.length > 0 && (
+                    <div className="p-2.5 bg-[#ebdcc4]/80 border-2 border-[#a88c6f]/60 rounded-none space-y-1.5 font-mono">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-[#8c1d1d] uppercase border-b border-[#a88c6f]/30 pb-1">
+                        <span className="flex items-center gap-1">
+                          <Lightbulb className="size-3 text-[#8c1d1d]" />
+                          GỢI Ý MỨC {activeHintIdx + 1}/{hintsList.length}
+                        </span>
+                        {hintsList.length > 1 && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              disabled={activeHintIdx === 0}
+                              onClick={() => {
+                                detectiveAudio.playTypewriterClick();
+                                setActiveHintIdx((prev) => Math.max(prev - 1, 0));
+                              }}
+                              className="p-0.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] disabled:opacity-30 disabled:cursor-not-allowed border border-[#4a3520] cursor-pointer"
+                              title="Gợi ý trước"
+                            >
+                              <ChevronLeft className="size-3" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={activeHintIdx >= hintsList.length - 1}
+                              onClick={() => {
+                                detectiveAudio.playTypewriterClick();
+                                setActiveHintIdx((prev) => Math.min(prev + 1, hintsList.length - 1));
+                              }}
+                              className="p-0.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] disabled:opacity-30 disabled:cursor-not-allowed border border-[#4a3520] cursor-pointer"
+                              title="Gợi ý sâu hơn"
+                            >
+                              <ChevronRight className="size-3" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-[#3d2c1e] italic leading-relaxed">
+                        {hintsList[activeHintIdx]}
+                      </p>
                     </div>
                   )}
 

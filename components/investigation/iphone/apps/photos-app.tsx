@@ -24,22 +24,27 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
 
   const { data: sheetPhotos, loading, error } = usePhoneData("photos");
 
-  const photos = sheetPhotos.map((item: any, idx: number) => ({
-    id: item.photo_id || `photo-${idx + 1}`,
-    filename:
-      item.title ||
-      item.Title ||
-      item.filename ||
-      item.photo_id ||
-      `IMG_${idx + 1000}.png`,
-    driveUrl: normalizeImageUrl(
-      item.drive_url || item.url || item.photo_url || "",
-    ),
-    timestamp: item.timestamp || item.created_at || "24/07/2016 18:30",
-    location: item.location || "Khu vực Bờ Sông",
-    description: item.description || item.note || "",
-    size: item.size || "2.4 MB",
-  }));
+  const photos = sheetPhotos
+    .filter(
+      (item: any) =>
+        Boolean(item.drive_url || item.direct_cdn_url || item.url || item.photo_url)
+    )
+    .map((item: any, idx: number) => ({
+      id: item.photo_code || item.photo_id || `photo-${idx + 1}`,
+      filename:
+        item.title ||
+        item.file_name ||
+        item.filename ||
+        item.photo_code ||
+        `IMG_${idx + 1000}.png`,
+      driveUrl: normalizeImageUrl(
+        item.direct_cdn_url || item.drive_url || item.url || item.photo_url || ""
+      ),
+      timestamp: item.timestamp || item.created_at || "24/07/2016 18:30",
+      location: item.location || "Khu vực Bờ Sông",
+      description: item.description_prompt || item.description || item.note || "",
+      size: item.size || "2.4 MB",
+    }));
 
   return (
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans">
@@ -123,24 +128,24 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
       ) : (
         /* PHOTO GRID VIEW */
         <div className="flex flex-col h-full">
-          <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
-            <div className="flex items-center justify-between mb-1">
+          <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
+            <div className="flex items-center justify-between">
               {onBackToHome ? (
                 <button
                   onClick={onBackToHome}
-                  className="flex items-center gap-0.5 text-[#0A84FF] text-[12.5px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
+                  className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
                   title="Thoát ứng dụng về Màn hình chính"
                 >
                   <ChevronLeft className="size-4" />
                   <span>Trang chính</span>
                 </button>
               ) : (
-                <span className="w-12" />
+                <span className="text-[13px] text-[#0A84FF] font-medium">Năm</span>
               )}
-              <span className="text-[17px] font-bold tracking-tight text-white">
-                Thư viện ảnh
+              <span className="text-[17px] font-semibold tracking-tight text-white">
+                Ảnh
               </span>
-              <span className="w-12" />
+              <span className="text-[13px] text-[#0A84FF] font-medium">Chọn</span>
             </div>
           </div>
 
@@ -170,30 +175,33 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
               </div>
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto p-2 pb-10">
-              <div className="grid grid-cols-3 gap-1.5">
+            <div className="flex-1 overflow-y-auto p-1 pb-10 flex flex-col justify-between">
+              <div className="grid grid-cols-3 gap-1">
                 {photos.map((photo) => (
                   <div
                     key={photo.id}
                     onClick={() => setSelectedPhoto(photo)}
-                    className="aspect-square rounded-lg bg-[#1C1C1E] border border-[#2C2C2E] overflow-hidden hover:opacity-80 active:scale-95 cursor-pointer flex flex-col items-center justify-center p-1 relative group"
+                    className="aspect-square bg-[#1C1C1E] border border-white/5 overflow-hidden hover:opacity-80 active:scale-95 cursor-pointer flex flex-col items-center justify-center relative group"
                   >
                     {photo.driveUrl ? (
                       <img
                         src={photo.driveUrl}
                         alt={photo.filename}
-                        className="w-full h-full object-cover rounded"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <>
                         <ImageIcon className="size-5 text-[#8E8E93] opacity-40 group-hover:text-[#0A84FF] transition-colors" />
-                        <span className="text-[8px] font-mono text-[#8E8E93] truncate w-full text-center mt-1">
+                        <span className="text-[8px] font-mono text-[#8E8E93] truncate w-full text-center mt-1 px-1">
                           {photo.filename}
                         </span>
                       </>
                     )}
                   </div>
                 ))}
+              </div>
+              <div className="py-4 text-center text-[11px] text-[#8E8E93] font-sans">
+                {photos.length} Ảnh
               </div>
             </div>
           )}

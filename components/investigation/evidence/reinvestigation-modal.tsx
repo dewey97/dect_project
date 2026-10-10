@@ -33,7 +33,7 @@ export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
     x: 20.2,
     y: 34,
     imageUrl: '/images/cases/case_000/15.png',
-    soundFile: 'train sound.mp3',
+    soundFile: 'train_sound.mp3',
     soundCaption: '*Tu tu... Xình xịch...*'
   },
   {
@@ -43,7 +43,7 @@ export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
     x: 58.5,
     y: 56,
     imageUrl: '/images/cases/case_000/17.png',
-    soundFile: 'Sound tủ.mp3',
+    soundFile: 'sound_tu.mp3',
     soundCaption: '*Két... Cạch...*'
   },
   {
@@ -73,7 +73,7 @@ export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
     x: 9.6,
     y: 78,
     imageUrl: '/images/cases/case_000/11.png',
-    soundFile: 'sột soạt.mp3',
+    soundFile: 'sat_soat.mp3',
     soundCaption: '*Sột soạt... sột soạt...*'
   }
 ]

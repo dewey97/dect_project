@@ -18,7 +18,8 @@ import {
   BookmarkCheck,
   X,
   ShieldAlert,
-  Loader2
+  Loader2,
+  SquarePen
 } from 'lucide-react'
 import type { Conversation, Message } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -203,7 +204,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
               <div className="size-7 rounded-full text-white flex items-center justify-center font-bold text-[11px] border border-white/10 shadow-sm bg-gradient-to-tr from-[#3A3A3C] to-[#636366]">
                 {selectedThread.name.slice(0, 1)}
               </div>
-              <span className="text-[11px] font-semibold text-white truncate mt-0.5">
+              <span className="text-[12px] font-semibold text-white truncate mt-0.5">
                 {selectedThread.name}
               </span>
             </div>
@@ -220,10 +221,10 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 flex flex-col justify-start pb-10">
-            <div className="text-center my-1.5">
-              <span className="text-[9px] text-[#8E8E93] bg-[#1C1C1E]/80 px-2.5 py-1 rounded-full border border-white/5 font-mono">
-                Tin nhắn SMS
+          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5 flex flex-col justify-start pb-10">
+            <div className="text-center my-1">
+              <span className="text-[9.5px] text-[#8E8E93] bg-[#1C1C1E]/90 px-3 py-1 rounded-full border border-white/5 font-sans">
+                Tin nhắn văn bản • SMS
               </span>
             </div>
 
@@ -232,25 +233,27 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
               const isPinned = pinnedClueIds.includes(msg.id)
 
               return (
-                <div key={msg.id} className={cn('flex flex-col', isMe ? 'items-end' : 'items-start')}>
+                <div key={msg.id} className={cn('flex flex-col max-w-[85%]', isMe ? 'self-end items-end' : 'self-start items-start')}>
                   <div
                     className={cn(
-                      'max-w-[80%] rounded-2xl px-3.5 py-2 text-[12.5px] leading-relaxed shadow-sm relative group transition-all',
+                      'rounded-[18px] px-3.5 py-2 text-[13.5px] leading-relaxed shadow-sm relative group transition-all',
                       isMe
-                        ? 'bg-[#0A84FF] text-white rounded-br-sm'
-                        : 'bg-[#2C2C2E] text-white rounded-bl-sm'
+                        ? 'bg-[#34C759] text-white rounded-br-[4px]'
+                        : 'bg-[#2C2C2E] text-white rounded-bl-[4px]'
                     )}
                   >
-                    <p className="whitespace-pre-wrap break-words">{msg.text}</p>
+                    <p className="whitespace-pre-wrap break-words font-normal">{msg.text}</p>
                     {isPinned && (
-                      <span className="absolute -top-1 -right-1 size-3 bg-[#30D158] rounded-full flex items-center justify-center text-[7px] font-bold text-black shadow">
-                        ✓
+                      <span className="absolute -top-1 -right-1 size-3.5 bg-[#FFD60A] rounded-full flex items-center justify-center text-[8px] font-bold text-black shadow">
+                        ★
                       </span>
                     )}
                   </div>
-                  <span className="text-[8.5px] text-[#8E8E93] font-mono mt-0.5 px-1">
-                    {msg.timestamp}
-                  </span>
+                  {msg.timestamp && (
+                    <span className="text-[9.5px] text-[#8E8E93] font-sans mt-0.5 px-1">
+                      {msg.timestamp}
+                    </span>
+                  )}
                 </div>
               )
             })}
@@ -259,29 +262,31 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
       ) : (
         /* THREADS LIST VIEW */
         <div className="flex flex-col h-full">
-          <div className="px-4 pt-3 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
+          <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
             <div className="flex items-center justify-between mb-2">
               {onBackToHome ? (
                 <button
                   onClick={onBackToHome}
-                  className="flex items-center gap-0.5 text-[#0A84FF] text-[12.5px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
+                  className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
                   title="Thoát ứng dụng về Màn hình chính"
                 >
                   <ChevronLeft className="size-4" />
                   <span>Trang chính</span>
                 </button>
               ) : (
-                <span className="w-12" />
+                <span className="text-[13px] text-[#0A84FF] font-medium">Sửa</span>
               )}
-              <span className="text-[17px] font-bold tracking-tight text-white">Tin nhắn</span>
-              <span className="w-12" />
+              <span className="text-[17px] font-semibold tracking-tight text-white">Tin nhắn</span>
+              <span className="w-12 text-right text-[#0A84FF] text-[13px] font-medium">
+                <SquarePen className="size-4 inline text-[#0A84FF]" />
+              </span>
             </div>
 
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-[#8E8E93]" />
               <input
                 type="text"
-                placeholder="Tìm kiếm tin nhắn"
+                placeholder="Tìm kiếm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-7 rounded-lg bg-[#1C1C1E] pl-8 pr-3 text-[12px] text-white placeholder-[#8E8E93] focus:outline-none focus:ring-1 focus:ring-[#0A84FF]"
@@ -297,30 +302,30 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           ) : error ? (
             <div className="flex-1 p-4 text-center text-xs text-red-400">Lỗi: {error}</div>
           ) : (
-            <div className="flex-1 overflow-y-auto px-2 py-1 divide-y divide-[#1C1C1E] pb-10">
+            <div className="flex-1 overflow-y-auto px-2 py-0.5 divide-y divide-[#1C1C1E] pb-10">
               {filteredThreads.map((thread: any) => (
                 <div
                   key={thread.id}
                   onClick={() => setSelectedThread(thread)}
                   className="flex items-center gap-3 py-2.5 px-2 hover:bg-[#1C1C1E]/50 active:bg-[#2C2C2E]/60 rounded-xl cursor-pointer transition-colors"
                 >
-                  <div className="size-10 rounded-full text-white flex items-center justify-center font-bold text-xs border border-white/10 shadow bg-gradient-to-tr from-[#3A3A3C] to-[#545458] shrink-0">
+                  <div className="size-11 rounded-full text-white flex items-center justify-center font-bold text-sm border border-white/10 shadow bg-gradient-to-tr from-[#3A3A3C] to-[#545458] shrink-0">
                     {thread.name.slice(0, 1)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-[13px] font-semibold text-white truncate">
+                      <span className="text-[14px] font-semibold text-white truncate">
                         {thread.name}
                       </span>
-                      <span className="text-[10px] text-[#8E8E93] font-mono shrink-0 ml-1">
+                      <span className="text-[11px] text-[#8E8E93] font-sans shrink-0 ml-1">
                         {thread.timestamp}
                       </span>
                     </div>
-                    <p className="text-[11.5px] text-[#8E8E93] truncate mt-0.5 leading-snug">
+                    <p className="text-[12.5px] text-[#8E8E93] truncate mt-0.5 leading-snug">
                       {thread.previewText}
                     </p>
                   </div>
-                  <ChevronRight className="size-3.5 text-[#48484A] shrink-0" />
+                  <ChevronRight className="size-4 text-[#48484A] shrink-0" />
                 </div>
               ))}
             </div>

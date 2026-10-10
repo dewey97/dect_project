@@ -34,12 +34,15 @@ import {
   Navigation2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { usePhoneData } from '@/lib/hooks/use-phone-data'
 import {
-  CASE_LOCATIONS,
   CaseLocation,
   TransportMode,
   calculateRoute,
-  RouteResult
+  RouteResult,
+  transformSheetLocationToCaseLocation,
+  DEFAULT_CASE_LOCATIONS,
+  SheetLocationRow
 } from '@/lib/case-locations-data'
 import { VectorMapCanvas } from './vector-map-canvas'
 
@@ -48,6 +51,16 @@ interface MapsAppProps {
 }
 
 export function MapsApp({ onBackToHome }: MapsAppProps) {
+  // Live CMS Integration: Fetch locations from Google Sheets tab 'locations'
+  const { data: rawSheetLocations } = usePhoneData<SheetLocationRow>('locations')
+
+  const caseLocations: CaseLocation[] = useMemo(() => {
+    if (!rawSheetLocations || rawSheetLocations.length === 0) {
+      return DEFAULT_CASE_LOCATIONS
+    }
+    return rawSheetLocations.map(transformSheetLocationToCaseLocation)
+  }, [rawSheetLocations])
+
   // Navigation & UI States
   const [activeTab, setActiveTab] = useState<'explore' | 'directions'>('explore')
   const [transportMode, setTransportMode] = useState<TransportMode>('motorbike')
@@ -84,7 +97,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   const [showStepsDrawer, setShowStepsDrawer] = useState(false)
   const [hasArrived, setHasArrived] = useState(false)
 
-  // Map Pan & Zoom state (Expanded 2400 x 2000 canvas centered on Phân khu Cảng)
+  // Map Pan & Zoom state (Expanded canvas centered on Phân khu Cảng)
   const [zoom, setZoom] = useState(0.75)
   const [pan, setPan] = useState({ x: -750, y: -520 })
   const [isDragging, setIsDragging] = useState(false)
@@ -95,12 +108,12 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
 
   // Current Origin and Destination objects
   const origin = useMemo(
-    () => CASE_LOCATIONS.find((l) => l.id === originId) || CASE_LOCATIONS[0],
-    [originId]
+    () => caseLocations.find((l) => l.id === originId) || caseLocations[0] || DEFAULT_CASE_LOCATIONS[0],
+    [caseLocations, originId]
   )
   const destination = useMemo(
-    () => CASE_LOCATIONS.find((l) => l.id === destinationId) || CASE_LOCATIONS[5],
-    [destinationId]
+    () => caseLocations.find((l) => l.id === destinationId) || caseLocations[5] || caseLocations[1] || DEFAULT_CASE_LOCATIONS[1],
+    [caseLocations, destinationId]
   )
 
   // Computed Route from A to B via Road Network Graph
@@ -157,7 +170,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
 
   // Center on current position (Origin)
   const handleCenterMyLocation = () => {
-    const target = origin || CASE_LOCATIONS[0]
+    const target = origin || caseLocations[0] || DEFAULT_CASE_LOCATIONS[0]
     const newZoom = 0.85
     setZoom(newZoom)
     setPan({
@@ -217,7 +230,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   // Filter locations for picker modal
   const filteredPickerLocations = useMemo(() => {
     const q = selectorSearch.toLowerCase().trim()
-    return CASE_LOCATIONS.filter((loc) => {
+    return caseLocations.filter((loc) => {
       const matchSearch =
         !q ||
         loc.name.toLowerCase().includes(q) ||
@@ -395,7 +408,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
                   <button
                     key={idx}
                     onClick={() => {
-                      const match = CASE_LOCATIONS.find((l) => l.category === chip.cat)
+                      const match = caseLocations.find((l) => l.category === chip.cat)
                       if (match) {
                         setSelectedPlace(match)
                         setZoom(0.9)
@@ -573,7 +586,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
         isNavigating={isNavigating}
         vehiclePos={vehiclePos}
         droppedPin={droppedPin}
-        caseLocations={CASE_LOCATIONS}
+        caseLocations={caseLocations}
         selectedPlace={selectedPlace}
         handlePinClick={handlePinClick}
         handleMapClick={handleMapClick}
@@ -744,7 +757,14 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
                   </div>
                 )}
 
-                <p className="text-[11px] text-gray-500 leading-relaxed pt-1 bg-gray-50 p-2.5 rounded-xl border border-gray-200/80">
+                {selectedPlace.distanceFromScene && (
+                  <div className="flex items-center justify-between text-[11.5px] bg-blue-50 px-2.5 py-1.5 rounded-xl border border-blue-100 text-blue-900">
+                    <span className="font-medium text-blue-700">Cách hiện trường:</span>
+                    <span className="font-bold">{selectedPlace.distanceFromScene} {selectedPlace.travelTime ? `• ${selectedPlace.travelTime}` : ''}</span>
+                  </div>
+                )}
+
+                <p className="text-[11px] text-gray-600 leading-relaxed pt-1 bg-gray-50 p-2.5 rounded-xl border border-gray-200/80 whitespace-pre-line">
                   {selectedPlace.description}
                 </p>
               </div>

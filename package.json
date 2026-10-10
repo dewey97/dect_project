@@ -1,5 +1,5 @@
 {
-  "name": "my-project",
+  "name": "xplore",
   "version": "0.1.1",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
     "sync:docs-to-sheet": "node scripts/sync-docs-to-sheet.js",
     "sync:gdocs": "node scripts/sync-testimonies-gdocs.js",
     "sync:testimonies": "node scripts/sync-testimonies-from-sheet.js",
+    "sync:map": "node scripts/sync-figma-map.js",
     "start": "next start",
     "lint": "tsc --noEmit"
   },
