@@ -69,8 +69,12 @@ export function normalizeMediaUrl(url: string | undefined | null): string {
   }
 
   if (driveId) {
-    // Luôn ưu tiên dùng proxy nội bộ của Next.js để stream mượt, bypass sandbox và CORS của Drive
-    return `/api/image-proxy?id=${driveId}`;
+    // Nếu là file gif/ảnh thì đi qua image-proxy
+    if (trimmed.toLowerCase().includes(".gif") || trimmed.toLowerCase().includes("video.gif")) {
+      return `/api/image-proxy?id=${driveId}`;
+    }
+    // File âm thanh mp3/wav/m4a trên Drive stream trực tiếp qua endpoint uc?export=download
+    return `https://docs.google.com/uc?export=download&id=${driveId}`;
   }
 
   return trimmed;

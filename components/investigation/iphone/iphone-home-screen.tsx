@@ -71,12 +71,6 @@ export function IPhoneHomeScreen({
       appTarget: "notes",
     },
     {
-      id: "wallet",
-      name: "Wallet",
-      icon: "/images/cases/case_000/phone/icons/wallet.png",
-      appTarget: "banking",
-    },
-    {
       id: "settings",
       name: "Settings",
       icon: "/images/cases/case_000/phone/icons/settings.png",
