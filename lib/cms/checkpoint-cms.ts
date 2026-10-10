@@ -275,20 +275,36 @@ export function getCheckpointHints(row?: SheetCheckpointRow): string[] {
   if (!row || typeof row !== "object") return [];
 
   const rawHints = row.hints;
-  if (rawHints && typeof rawHints === "string") {
-    const raw = rawHints.trim();
-    if (raw.startsWith("[") && raw.endsWith("]")) {
-      try {
-        const parsedJson = JSON.parse(raw);
-        if (Array.isArray(parsedJson)) {
-          return parsedJson.map((x) => String(x).trim()).filter(Boolean);
-        }
-      } catch {}
-    }
-    return splitLines(raw);
+  if (!rawHints || typeof rawHints !== "string") return [];
+
+  const raw = rawHints.trim();
+  if (raw.startsWith("[") && raw.endsWith("]") && !raw.includes("\n")) {
+    try {
+      const parsedJson = JSON.parse(raw);
+      if (Array.isArray(parsedJson)) {
+        return parsedJson.map((x) => String(x).trim()).filter(Boolean);
+      }
+    } catch {}
   }
 
-  return [];
+  const categorized = getCategorizedCheckpointHints(row);
+  if (categorized.hasCategories) {
+    return categorized.all;
+  }
+
+  return splitLines(raw).filter((line) => {
+    const lower = line.toLowerCase();
+    return (
+      lower !== "[động cơ]" &&
+      lower !== "động cơ:" &&
+      lower !== "động cơ" &&
+      lower !== "[ngoại phạm]" &&
+      lower !== "ngoại phạm:" &&
+      lower !== "ngoại phạm" &&
+      lower !== "ngoại phạm mâu thuẫn" &&
+      lower !== "[ngoại phạm mâu thuẫn]"
+    );
+  });
 }
 
 export interface CategorizedHints {
