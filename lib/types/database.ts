@@ -1,9 +1,8 @@
 export type CaseStatus = "DRAFT" | "IN_REVIEW" | "PUBLISHED" | "ARCHIVED";
-export type NodeType = "evidence" | "question";
-export type LocationType = "CASE" | "LOCATION" | "EVIDENCE";
 export type UserRole = "player" | "admin";
 export type PlayStatus = "PLAYING" | "COMPLETED" | "ABANDONED";
 
+/** Bảng cases: Metadata danh mục vụ án */
 export interface DbCase {
   id: string;
   title: string;
@@ -16,52 +15,7 @@ export interface DbCase {
   updated_at: string;
 }
 
-export interface DbEvidenceNode {
-  id: string;
-  case_id: string;
-  type: NodeType;
-  position_x: number;
-  position_y: number;
-  label: string;
-  description: string | null;
-  category: string | null;
-  logic_data: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface DbEvidenceEdge {
-  id: string;
-  case_id: string;
-  source_node_id: string;
-  target_node_id: string;
-  created_at: string;
-}
-
-export interface DbTimelineEvent {
-  id: string;
-  case_id: string;
-  character_name: string;
-  event_title: string;
-  location: string | null;
-  start_min: number;
-  end_min: number;
-  is_truth: boolean;
-  is_fatal: boolean;
-  created_at: string;
-}
-
-export interface DbLocation {
-  id: string;
-  case_id: string;
-  title: string;
-  type: LocationType | null;
-  details: string | null;
-  position_x: number;
-  position_y: number;
-  created_at: string;
-}
-
+/** Bảng profiles: Thông tin người dùng & quyền hạn */
 export interface DbProfile {
   id: string;
   display_name: string | null;
@@ -70,6 +24,7 @@ export interface DbProfile {
   created_at: string;
 }
 
+/** Bảng play_sessions: Phiên chơi game của tài khoản */
 export interface DbPlaySession {
   id: string;
   player_id: string;
@@ -80,17 +35,7 @@ export interface DbPlaySession {
   completed_at: string | null;
 }
 
-export interface DbPlayerAnswer {
-  id: string;
-  session_id: string;
-  player_id: string;
-  case_id: string;
-  node_id: string;
-  submitted_answer: string | null;
-  is_correct: boolean;
-  unlocked_at: string;
-}
-
+/** Bảng feedbacks: Góp ý, báo lỗi và đánh giá từ người chơi */
 export interface DbFeedback {
   id: string;
   case_id?: string;
@@ -103,6 +48,7 @@ export interface DbFeedback {
   resolved_at?: string;
 }
 
+/** Bảng app_settings: Cấu hình thông báo toàn cục & trạng thái hệ thống */
 export interface DbAppSettings {
   id: number;
   maintenance_mode: boolean;

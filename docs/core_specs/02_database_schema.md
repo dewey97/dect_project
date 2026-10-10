@@ -1,158 +1,95 @@
 # Cấu trúc Cơ sở dữ liệu (Database Architecture)
 
-Tài liệu này mô tả chi tiết toàn bộ các Table (Bảng) trong cơ sở dữ liệu Supabase (PostgreSQL) của hệ thống Detective Game. Hệ thống được chia thành 3 nhóm dữ liệu chính.
+> **Hệ thống Database Supabase (PostgreSQL) — Kiến trúc Tinh gọn (5 Core Tables)**  
+> _Toàn bộ nội dung kịch bản, dòng thời gian, nhân vật, đáp án checkpoints và vật chứng vụ án được quản lý trực tiếp qua **Google Sheets Live CMS** (Xem chi tiết tại [`03_google_sheets_cms.md`](03_google_sheets_cms.md)). Database Supabase đóng vai trò lưu trữ User Identity, Session, System Settings và Analytics._
 
 ---
 
-## 1. Core (Quản lý Vụ án)
-
-Nhóm này chứa thông tin bao quát của một vụ án mạng/kịch bản.
+## 1. Core Registry (Quản lý Danh mục Vụ án)
 
 ### Table: `cases`
 
-Lưu trữ thông tin metadata của Vụ án.
+Lưu trữ thông tin metadata bao quát của các Vụ án trong hệ thống.
 
-| Tên Cột           | Kiểu Dữ liệu  | Mô tả                                                                | Mặc định            |
-| ----------------- | ------------- | -------------------------------------------------------------------- | ------------------- |
-| `id`              | `UUID`        | Khóa chính (Primary Key).                                            | `gen_random_uuid()` |
-| `title`           | `TEXT`        | Tên vụ án (VD: Lời nguyền Huyết nguyệt).                             | -                   |
-| `synopsis`        | `TEXT`        | Tóm tắt ngắn gọn dành cho người chơi.                                | -                   |
-| `full_story`      | `TEXT`        | Cốt truyện chi tiết ẩn (Dành riêng cho Game Master).                 | -                   |
-| `difficulty`      | `SMALLINT`    | Độ khó (Từ 1 đến 5 sao).                                             | `1`                 |
-| `status`          | `TEXT`        | Trạng thái hiển thị (`DRAFT`, `IN_REVIEW`, `PUBLISHED`, `ARCHIVED`). | `DRAFT`             |
-| `cover_image_url` | `TEXT`        | Đường dẫn CDN trỏ tới ảnh bìa lưu trên Supabase Storage.             | -                   |
-| `created_at`      | `TIMESTAMPTZ` | Thời gian tạo.                                                       | `NOW()`             |
-| `updated_at`      | `TIMESTAMPTZ` | Thời gian cập nhật gần nhất.                                         | `NOW()`             |
-
----
-
-## 2. Game Data (Dữ liệu thành phần)
-
-Chứa nội dung cấu thành nên vụ án (Thẻ bằng chứng, dòng thời gian, tọa độ bản đồ). Mọi bảng ở đây đều liên kết chặt chẽ với bảng `cases` qua `case_id`.
-
-### Table: `evidence_nodes`
-
-Lưu trữ toàn bộ các Thẻ (Node) xuất hiện trên Evidence Board (Bảng điều tra).
-
-| Tên Cột       | Kiểu Dữ liệu | Mô tả                                                                              | Mặc định            |
-| ------------- | ------------ | ---------------------------------------------------------------------------------- | ------------------- |
-| `id`          | `UUID`       | Khóa chính. Cần khớp với ID sinh ra bởi React Flow.                                | `gen_random_uuid()` |
-| `case_id`     | `UUID`       | Foreign Key trỏ về `cases(id)`. Bị xóa tự động nếu case bị xóa.                    | -                   |
-| `type`        | `TEXT`       | Loại thẻ (`evidence` hoặc `question`).                                             | -                   |
-| `position_x`  | `FLOAT8`     | Tọa độ X trên bảng mạch.                                                           | -                   |
-| `position_y`  | `FLOAT8`     | Tọa độ Y trên bảng mạch.                                                           | -                   |
-| `label`       | `TEXT`       | Tiêu đề hiển thị trên thẻ.                                                         | -                   |
-| `description` | `TEXT`       | Mô tả chi tiết của Bằng chứng/Câu hỏi.                                             | -                   |
-| `category`    | `TEXT`       | Nhãn tag (VD: CLUE, FORENSIC, PERSON).                                             | -                   |
-| `logic_data`  | `JSONB`      | Chứa dữ liệu linh hoạt: Danh sách đáp án, Câu trả lời đúng, Phân loại trắc nghiệm. | `{}`                |
-
-### Table: `evidence_edges`
-
-Lưu trữ các sợi dây (chỉ đỏ) nối giữa các Thẻ trên Evidence Board.
-
-| Tên Cột          | Kiểu Dữ liệu | Mô tả                           | Mặc định            |
-| ---------------- | ------------ | ------------------------------- | ------------------- |
-| `id`             | `UUID`       | Khóa chính.                     | `gen_random_uuid()` |
-| `case_id`        | `UUID`       | Foreign Key trỏ về `cases(id)`. | -                   |
-| `source_node_id` | `TEXT`       | ID của thẻ điểm xuất phát.      | -                   |
-| `target_node_id` | `TEXT`       | ID của thẻ điểm đến.            | -                   |
-
-### Table: `boardgame_pins`
-
-Lưu trữ tọa độ tùy chỉnh và thông tin các Ghim hệ thống trên Bảng điều tra Boardgame (`/evidence/boardgame`).
-
-| Tên Cột        | Kiểu Dữ liệu  | Mô tả                                                     | Mặc định |
-| -------------- | ------------- | --------------------------------------------------------- | -------- |
-| `id`           | `TEXT`        | Khóa chính (Mã ID của pin, VD: `c0-pin-evidence`).        | -        |
-| `case_id`      | `TEXT`        | ID vụ án liên kết (VD: `case-000`).                       | -        |
-| `position_x`   | `FLOAT8`      | Tọa độ chuẩn hóa X trên mặt bảng gỗ (từ `0.0` đến `1.0`). | -        |
-| `position_y`   | `FLOAT8`      | Tọa độ chuẩn hóa Y trên mặt bảng gỗ (từ `0.0` đến `1.0`). | -        |
-| `label`        | `TEXT`        | Nhãn hiển thị của ghim.                                   | -        |
-| `detail`       | `TEXT`        | Chi tiết mô tả khi click hoặc xem ghim.                   | -        |
-| `color`        | `TEXT`        | Màu hiển thị của ghim.                                    | -        |
-| `note_color`   | `TEXT`        | Màu giấy ghi chú đính kèm.                                | -        |
-| `pin_color`    | `TEXT`        | Màu đầu kim ghim.                                         | -        |
-| `photo_url`    | `TEXT`        | Đường dẫn ảnh đính kèm ghim.                              | -        |
-| `is_locked`    | `BOOLEAN`     | Ghim có bị khóa hay không.                                | `false`  |
-| `is_solved`    | `BOOLEAN`     | Ghim đã được giải mã hay chưa.                            | `false`  |
-| `pulse_border` | `BOOLEAN`     | Có hiệu ứng viền phát sáng/nhấp nháy hay không.           | `false`  |
-| `created_at`   | `TIMESTAMPTZ` | Thời điểm tạo ghim.                                       | `NOW()`  |
-| `updated_at`   | `TIMESTAMPTZ` | Thời điểm cập nhật tọa độ gần nhất.                       | `NOW()`  |
-
-### Table: `timeline_events`
-
-Lưu trữ các mảnh sự kiện để xây dựng Dòng thời gian.
-
-| Tên Cột          | Kiểu Dữ liệu | Mô tả                                                    | Mặc định            |
-| ---------------- | ------------ | -------------------------------------------------------- | ------------------- |
-| `id`             | `UUID`       | Khóa chính.                                              | `gen_random_uuid()` |
-| `case_id`        | `UUID`       | Foreign Key trỏ về `cases(id)`.                          | -                   |
-| `character_name` | `TEXT`       | Tên nhân vật thực hiện sự kiện.                          | -                   |
-| `event_title`    | `TEXT`       | Tên sự kiện (VD: Ăn tối, Đi dạo).                        | -                   |
-| `location`       | `TEXT`       | Địa điểm diễn ra sự kiện.                                | -                   |
-| `start_min`      | `INT`        | Phút bắt đầu tính từ lúc mở màn (Mở màn = 0).            | -                   |
-| `end_min`        | `INT`        | Phút kết thúc.                                           | -                   |
-| `is_truth`       | `BOOLEAN`    | Sự kiện thật hay lời khai giả dối.                       | `true`              |
-| `is_fatal`       | `BOOLEAN`    | Đánh dấu sự kiện tử vong (Hiển thị biểu tượng xương sọ). | `false`             |
-
-### Table: `locations`
-
-Lưu trữ các địa điểm và tọa độ hiển thị trên Bản đồ tương tác (Interactive Map).
-
-| Tên Cột      | Kiểu Dữ liệu | Mô tả                                       | Mặc định            |
-| ------------ | ------------ | ------------------------------------------- | ------------------- |
-| `id`         | `UUID`       | Khóa chính.                                 | `gen_random_uuid()` |
-| `case_id`    | `UUID`       | Foreign Key trỏ về `cases(id)`.             | -                   |
-| `title`      | `TEXT`       | Tên địa điểm/căn phòng.                     | -                   |
-| `type`       | `TEXT`       | Phân loại (`CASE`, `LOCATION`, `EVIDENCE`). | -                   |
-| `details`    | `TEXT`       | Mô tả chi tiết về địa điểm.                 | -                   |
-| `position_x` | `FLOAT8`     | Tọa độ X trên Map.                          | -                   |
-| `position_y` | `FLOAT8`     | Tọa độ Y trên Map.                          | -                   |
+| Tên Cột | Kiểu Dữ liệu | Mô tả | Mặc định |
+| :--- | :--- | :--- | :--- |
+| `id` | `UUID` | Khóa chính (Primary Key). | `gen_random_uuid()` |
+| `title` | `TEXT` | Tên vụ án (VD: TRỐN TÌM). | - |
+| `synopsis` | `TEXT` | Tóm tắt ngắn gọn dành cho người chơi. | - |
+| `full_story` | `TEXT` | Cốt truyện chi tiết ẩn (Dành riêng cho Game Master). | - |
+| `difficulty` | `SMALLINT` | Độ khó (Từ 1 đến 5 sao). | `1` |
+| `status` | `TEXT` | Trạng thái hiển thị (`DRAFT`, `IN_REVIEW`, `PUBLISHED`, `ARCHIVED`). | `DRAFT` |
+| `cover_image_url` | `TEXT` | Đường dẫn CDN trỏ tới ảnh bìa vụ án. | - |
+| `created_at` | `TIMESTAMPTZ` | Thời gian tạo. | `NOW()` |
+| `updated_at` | `TIMESTAMPTZ` | Thời gian cập nhật gần nhất. | `NOW()` |
 
 ---
 
-## 3. Players & Progression (Dữ liệu Người chơi)
-
-Hệ thống quản lý người dùng và lưu trữ tiến trình phá án (Game Save).
+## 2. Players & Security (Người dùng & Phân quyền)
 
 ### Table: `profiles`
 
-Mở rộng thêm thông tin từ bảng `auth.users` mặc định của Supabase.
+Mở rộng thông tin định danh người dùng từ `auth.users` của Supabase.
 
-| Tên Cột        | Kiểu Dữ liệu | Mô tả                                                                            | Mặc định |
-| -------------- | ------------ | -------------------------------------------------------------------------------- | -------- |
-| `id`           | `UUID`       | Bằng với User ID của Supabase Auth.                                              | -        |
-| `display_name` | `TEXT`       | Tên hiển thị trong game.                                                         | -        |
-| `avatar_url`   | `TEXT`       | Ảnh đại diện.                                                                    | -        |
-| `role`         | `TEXT`       | Chức vụ (`player`, `admin`). Hệ thống dùng biến này để chặn/mở quyền vào Studio. | `player` |
+| Tên Cột | Kiểu Dữ liệu | Mô tả | Mặc định |
+| :--- | :--- | :--- | :--- |
+| `id` | `UUID` | Khóa chính, khớp với User ID của Supabase Auth. | - |
+| `display_name` | `TEXT` | Tên hiển thị của thám tử. | - |
+| `avatar_url` | `TEXT` | Ảnh đại diện. | - |
+| `role` | `TEXT` | Quyền hạn (`player`, `admin`). Hệ thống dùng biến này để xác thực quyền vào Admin Studio qua `requireAdminAuth()`. | `'player'` |
+| `created_at` | `TIMESTAMPTZ` | Thời điểm tham gia. | `NOW()` |
 
 ### Table: `play_sessions`
 
-Lưu lại "File Save" của người chơi. Bất kỳ ai bắt đầu chơi 1 vụ án đều tạo ra 1 dòng ở đây.
+Lưu lại lịch sử phiên chơi và tiến trình của tài khoản.
 
-| Tên Cột        | Kiểu Dữ liệu  | Mô tả                                                    | Mặc định            |
-| -------------- | ------------- | -------------------------------------------------------- | ------------------- |
-| `id`           | `UUID`        | Khóa chính.                                              | `gen_random_uuid()` |
-| `player_id`    | `UUID`        | Foreign Key trỏ về `profiles(id)`.                       | -                   |
-| `case_id`      | `UUID`        | Foreign Key trỏ về `cases(id)`.                          | -                   |
-| `status`       | `TEXT`        | Trạng thái phá án (`PLAYING`, `COMPLETED`, `ABANDONED`). | `PLAYING`           |
-| `score`        | `INT`         | Điểm số tổng kết (nếu trả lời đúng nhiều sẽ cao).        | `0`                 |
-| `started_at`   | `TIMESTAMPTZ` | Thời điểm bắt đầu chơi.                                  | `NOW()`             |
-| `completed_at` | `TIMESTAMPTZ` | Thời điểm nộp đáp án cuối cùng.                          | -                   |
+| Tên Cột | Kiểu Dữ liệu | Mô tả | Mặc định |
+| :--- | :--- | :--- | :--- |
+| `id` | `UUID` | Khóa chính. | `gen_random_uuid()` |
+| `player_id` | `UUID` | Foreign Key trỏ về `profiles(id)`. | - |
+| `case_id` | `UUID` | Foreign Key trỏ về `cases(id)`. | - |
+| `status` | `TEXT` | Trạng thái phá án (`PLAYING`, `COMPLETED`, `ABANDONED`). | `'PLAYING'` |
+| `score` | `INT` | Điểm số tổng kết sau khi nộp hồ sơ. | `0` |
+| `started_at` | `TIMESTAMPTZ` | Thời điểm bắt đầu chơi. | `NOW()` |
+| `completed_at` | `TIMESTAMPTZ` | Thời điểm hoàn thành vụ án. | - |
 
-### Table: `player_answers`
+---
 
-Lưu vết chi tiết tiến trình mở khóa từng thẻ Bằng chứng hoặc lịch sử trả lời Câu hỏi.
+## 3. Operations & System Settings (Vận hành & Phản hồi)
 
-| Tên Cột            | Kiểu Dữ liệu  | Mô tả                                           | Mặc định            |
-| ------------------ | ------------- | ----------------------------------------------- | ------------------- |
-| `id`               | `UUID`        | Khóa chính.                                     | `gen_random_uuid()` |
-| `session_id`       | `UUID`        | Trỏ về phiên chơi của user `play_sessions(id)`. | -                   |
-| `player_id`        | `UUID`        | Trỏ về `profiles(id)`.                          | -                   |
-| `case_id`          | `UUID`        | Trỏ về `cases(id)`.                             | -                   |
-| `node_id`          | `UUID`        | ID của thẻ Câu hỏi / Bằng chứng được giải mã.   | -                   |
-| `submitted_answer` | `TEXT`        | Nội dung câu trả lời user nhập vào.             | -                   |
-| `is_correct`       | `BOOLEAN`     | Nhập đúng hay sai (True nếu thẻ đã mở khóa).    | `false`             |
-| `unlocked_at`      | `TIMESTAMPTZ` | Thời điểm giải mã thành công thẻ này.           | `NOW()`             |
+### Table: `feedbacks`
 
-> Mọi bảng đều đã được kích hoạt tính năng **Row Level Security (RLS)** để đảm bảo dữ liệu của vụ án chưa xuất bản sẽ không bị rò rỉ ra ngoài qua API, và người chơi không thể sửa điểm số của người khác.
+Lưu trữ góp ý, báo lỗi và đánh giá được người chơi gửi trực tiếp từ modal feedback trong game.
+
+| Tên Cột | Kiểu Dữ liệu | Mô tả | Mặc định |
+| :--- | :--- | :--- | :--- |
+| `id` | `UUID` | Khóa chính. | `gen_random_uuid()` |
+| `case_id` | `TEXT` | Mã định danh vụ án (VD: `case_000`). | - |
+| `type` | `TEXT` | Phân loại (`BUG`, `TYPO`, `FEEDBACK`, `RATING`, `OTHER`). | `'FEEDBACK'` |
+| `rating_score` | `INT` | Số sao đánh giá (1 đến 5 sao). | - |
+| `content` | `TEXT` | Nội dung phản hồi / mô tả lỗi. | - |
+| `contact_info` | `TEXT` | Email hoặc SĐT người chơi để lại. | - |
+| `status` | `TEXT` | Trạng thái xử lý (`NEW`, `IN_PROGRESS`, `RESOLVED`, `IGNORED`). | `'NEW'` |
+| `created_at` | `TIMESTAMPTZ` | Thời điểm gửi. | `NOW()` |
+| `resolved_at` | `TIMESTAMPTZ` | Thời điểm hoàn tất xử lý. | - |
+
+### Table: `app_settings`
+
+Cấu hình vận hành toàn cục của ứng dụng (Hiển thị và chỉnh sửa tại `/studio/settings`).
+
+| Tên Cột | Kiểu Dữ liệu | Mô tả | Mặc định |
+| :--- | :--- | :--- | :--- |
+| `id` | `INT` | Khóa chính (Cố định `1` cho toàn hệ thống). | `1` |
+| `maintenance_mode` | `BOOLEAN` | Bật/tắt chế độ bảo trì hệ thống. | `false` |
+| `banner_active` | `BOOLEAN` | Bật/tắt dải băng thông báo vàng trên Landing Page. | `true` |
+| `banner_text` | `TEXT` | Nội dung hiển thị trên Banner thông báo. | - |
+| `updated_at` | `TIMESTAMPTZ` | Thời điểm cập nhật cấu hình gần nhất. | `NOW()` |
+
+---
+
+## 📌 Ghi Chú Chuyển Đổi Kiến Trúc (Architecture Note)
+
+Toàn bộ các bảng sau trong phiên bản thử nghiệm ban đầu **đã được lược bỏ và dọn sạch khỏi database**:
+- `characters`, `relationships`, `timeline_events`, `locations`: Đã quy hoạch 100% vào **Google Sheets Live CMS**.
+- `evidence_nodes`, `evidence_edges`, `boardgame_pins`: Đã chuyển sang cấu trúc Mindmap Canvas tĩnh kết hợp API Google Sheets CSV.
+- `player_answers`: Lưu vết cục bộ qua Client State và LocalStorage theo nguyên tắc Zero-Black-Screen / Online-First.

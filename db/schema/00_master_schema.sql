@@ -1,10 +1,11 @@
--- ==========================================
--- SCRIPT TẠO DATABASE (GỘP) - SUPABASE
--- Chạy toàn bộ script này trên SQL Editor
--- ==========================================
+-- ====================================================================
+-- MASTER SCHEMA (5 CORE TABLES) - SUPABASE POSTGRESQL
+-- Hệ thống điều tra trinh thám (dect_project)
+-- Kịch bản & vật chứng quản lý tại Google Sheets Live CMS
+-- ====================================================================
 
--- 1. BẢNG CASES (VỤ ÁN)
-CREATE TABLE public.cases (
+-- 1. BẢNG CASES (DANH MỤC VỤ ÁN)
+CREATE TABLE IF NOT EXISTS public.cases (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
     synopsis TEXT,
@@ -18,70 +19,8 @@ CREATE TABLE public.cases (
 ALTER TABLE public.cases ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow All Actions for Cases" ON public.cases FOR ALL USING (true);
 
--- 2. BẢNG EVIDENCE_NODES (THẺ TRÊN BẢNG)
-CREATE TABLE public.evidence_nodes (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    case_id UUID NOT NULL REFERENCES public.cases(id) ON DELETE CASCADE,
-    type TEXT NOT NULL CHECK (type IN ('evidence', 'question')),
-    position_x FLOAT8 NOT NULL,
-    position_y FLOAT8 NOT NULL,
-    label TEXT NOT NULL,
-    description TEXT,
-    category TEXT,
-    logic_data JSONB DEFAULT '{}'::jsonb,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX idx_evidence_nodes_case ON public.evidence_nodes(case_id);
-ALTER TABLE public.evidence_nodes ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All Actions for Nodes" ON public.evidence_nodes FOR ALL USING (true);
-
--- 3. BẢNG EVIDENCE_EDGES (DÂY NỐI)
-CREATE TABLE public.evidence_edges (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    case_id UUID NOT NULL REFERENCES public.cases(id) ON DELETE CASCADE,
-    source_node_id TEXT NOT NULL,
-    target_node_id TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX idx_evidence_edges_case ON public.evidence_edges(case_id);
-ALTER TABLE public.evidence_edges ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All Actions for Edges" ON public.evidence_edges FOR ALL USING (true);
-
--- 4. BẢNG TIMELINE_EVENTS (DÒNG THỜI GIAN)
-CREATE TABLE public.timeline_events (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    case_id UUID NOT NULL REFERENCES public.cases(id) ON DELETE CASCADE,
-    character_name TEXT NOT NULL,
-    event_title TEXT NOT NULL,
-    location TEXT,
-    start_min INT NOT NULL,
-    end_min INT NOT NULL,
-    is_truth BOOLEAN DEFAULT true,
-    is_fatal BOOLEAN DEFAULT false,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX idx_timeline_events_case ON public.timeline_events(case_id);
-ALTER TABLE public.timeline_events ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All Actions for Timeline" ON public.timeline_events FOR ALL USING (true);
-
--- 5. BẢNG LOCATIONS (BẢN ĐỒ TƯƠNG TÁC)
-CREATE TABLE public.locations (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    case_id UUID NOT NULL REFERENCES public.cases(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    type TEXT CHECK (type IN ('CASE', 'LOCATION', 'EVIDENCE')),
-    details TEXT,
-    position_x FLOAT8 NOT NULL,
-    position_y FLOAT8 NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX idx_locations_case ON public.locations(case_id);
-ALTER TABLE public.locations ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All Actions for Locations" ON public.locations FOR ALL USING (true);
-
--- 6. BẢNG PROFILES (NGƯỜI CHƠI)
-CREATE TABLE public.profiles (
+-- 2. BẢNG PROFILES (NGƯỜI DÙNG & PHÂN QUYỀN)
+CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     display_name TEXT,
     avatar_url TEXT,
@@ -89,47 +28,53 @@ CREATE TABLE public.profiles (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All Actions for Profiles" ON public.profiles FOR ALL USING (true);
+CREATE POLICY "Profiles are viewable by everyone" ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Users can insert their own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
--- 7. BẢNG PLAY_SESSIONS (TIẾN TRÌNH CHƠI)
-CREATE TABLE public.play_sessions (
+-- 3. BẢNG PLAY_SESSIONS (PHIÊN CHƠI CỦA TÀI KHOẢN)
+CREATE TABLE IF NOT EXISTS public.play_sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     player_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     case_id UUID NOT NULL REFERENCES public.cases(id) ON DELETE CASCADE,
     status TEXT DEFAULT 'PLAYING' CHECK (status IN ('PLAYING', 'COMPLETED', 'ABANDONED')),
     score INT DEFAULT 0,
     started_at TIMESTAMPTZ DEFAULT NOW(),
-    completed_at TIMESTAMPTZ,
-    UNIQUE(player_id, case_id)
+    completed_at TIMESTAMPTZ
 );
-CREATE INDEX idx_play_sessions_player ON public.play_sessions(player_id);
-CREATE INDEX idx_play_sessions_case ON public.play_sessions(case_id);
+CREATE INDEX IF NOT EXISTS idx_play_sessions_player ON public.play_sessions(player_id);
 ALTER TABLE public.play_sessions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All Actions for Sessions" ON public.play_sessions FOR ALL USING (true);
+CREATE POLICY "Allow All for Authenticated" ON public.play_sessions FOR ALL USING (auth.role() = 'authenticated');
 
--- 8. BẢNG PLAYER_ANSWERS (TIẾN TRÌNH CHI TIẾT / MỞ KHÓA BẰNG CHỨNG)
-CREATE TABLE public.player_answers (
+-- 4. BẢNG FEEDBACKS (GÓP Ý & BÁO LỖI TỪ NGƯỜI CHƠI)
+CREATE TABLE IF NOT EXISTS public.feedbacks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    session_id UUID NOT NULL REFERENCES public.play_sessions(id) ON DELETE CASCADE,
-    player_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
-    case_id UUID NOT NULL REFERENCES public.cases(id) ON DELETE CASCADE,
-    node_id UUID NOT NULL REFERENCES public.evidence_nodes(id) ON DELETE CASCADE,
-    submitted_answer TEXT,
-    is_correct BOOLEAN DEFAULT false,
-    unlocked_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(session_id, node_id)
+    case_id TEXT DEFAULT 'case_000',
+    type TEXT DEFAULT 'FEEDBACK' CHECK (type IN ('BUG', 'TYPO', 'FEEDBACK', 'RATING', 'OTHER')),
+    rating_score INT,
+    content TEXT,
+    contact_info TEXT,
+    status TEXT DEFAULT 'NEW' CHECK (status IN ('NEW', 'IN_PROGRESS', 'RESOLVED', 'IGNORED')),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ
 );
-CREATE INDEX idx_player_answers_session ON public.player_answers(session_id);
-ALTER TABLE public.player_answers ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow All Actions for Answers" ON public.player_answers FOR ALL USING (true);
+ALTER TABLE public.feedbacks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow Public Insert Feedbacks" ON public.feedbacks FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow Admins Read/Update Feedbacks" ON public.feedbacks FOR ALL USING (true);
 
--- 9. STORAGE BUCKET (AVATARS & COVERS)
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('avatars', 'avatars', true)
+-- 5. BẢNG APP_SETTINGS (CẤU HÌNH TOÀN CỤC & BANNER)
+CREATE TABLE IF NOT EXISTS public.app_settings (
+    id INT PRIMARY KEY DEFAULT 1,
+    maintenance_mode BOOLEAN DEFAULT false,
+    banner_active BOOLEAN DEFAULT true,
+    banner_text TEXT DEFAULT '🚀 Chào mừng đến với Dect Project!',
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow Read App Settings" ON public.app_settings FOR SELECT USING (true);
+CREATE POLICY "Allow Admin Update App Settings" ON public.app_settings FOR UPDATE USING (true);
+
+-- Khởi tạo dòng cấu hình mặc định (id = 1)
+INSERT INTO public.app_settings (id, maintenance_mode, banner_active, banner_text)
+VALUES (1, false, true, '🚀 Chào mừng đến với Dect Project!')
 ON CONFLICT (id) DO NOTHING;
-
-CREATE POLICY "Public Read Access for avatars" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
-CREATE POLICY "Public Upload Access for avatars" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'avatars');
-CREATE POLICY "Public Update Access for avatars" ON storage.objects FOR UPDATE USING (bucket_id = 'avatars');
-CREATE POLICY "Public Delete Access for avatars" ON storage.objects FOR DELETE USING (bucket_id = 'avatars');
-
