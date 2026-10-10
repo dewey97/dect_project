@@ -310,9 +310,14 @@ export function MainInvestigationCanvas({
           if (rawCode === "avatar_huy" || code.includes("huy"))
             map.huy = normUrl;
           if (
-            code.includes("crime") ||
+            rawCode === "crime_scene" ||
+            rawCode === "chalk_outline" ||
+            rawCode === "thi_the" ||
+            code.includes("chalk") ||
             code.includes("thi_the") ||
-            code.includes("hien_truong")
+            code.includes("thi thể") ||
+            (code.includes("crime") && !code.includes("room")) ||
+            (code.includes("hien_truong") && !code.includes("phong_khach") && !code.includes("phòng khách"))
           )
             map.crime_scene = normUrl;
         }

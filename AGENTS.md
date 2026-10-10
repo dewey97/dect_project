@@ -90,6 +90,10 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
 - **Mô hình Trực tuyến (Online-First)**: Hệ thống game hoạt động với giả định người chơi có kết nối internet để nạp vụ án và đồng bộ tiến độ.
 - **Tuyệt đối không nhồi nhét Mock/Hardcoded Fallback tĩnh**: Dữ liệu kịch bản, lời khai, dẫn truyện (narratives/epilogues), đáp án và sự kiện do Google Sheets Live CMS quản lý 100%. Không duy trì các mảng text cố định lỗi thời trong code vì sẽ gây lệch pha logic với kịch bản biên soạn của GM.
 - **Cơ chế Chống gián đoạn (In-memory & Client Cache)**: Khi đã fetch thành công một lần từ Live CMS, dữ liệu được giữ trong memory cache / client state. Trường hợp mạng chập chờn sau khi đã vào game, hệ thống tận dụng cache có sẵn. Nếu chưa có dữ liệu và lỗi mạng, hiển thị trạng thái đang đồng bộ/thử lại thay vì hiển thị kịch bản giả lập cũ.
+- **Quy Tắc Chống Màn Hình Đen Khi Render Bất Đồng Bộ (Zero-Black-Screen / Immediate-Transition Rule)**:
+  - Khi người chơi ấn các nút bắt đầu / chuyển cảnh (ví dụ: `[ TRỐN TÌM ]`, mở Phase mới, xem Epilogue), giao diện **BẮT BUỘC PHẢI PHẢN HỒI VÀ RENDER NGAY LẬP TỨC** (`activeNarrative` / baseline monologue).
+  - **Tuyệt đối CẤM** render `null` hoặc để trống toàn bộ khung nhìn modal khi dữ liệu Live CMS đang trong trạng thái nạp ngầm (in-flight fetch) hoặc mạng có độ trễ.
+  - Phải luôn có baseline narrative fallback đồng bộ hoặc trạng thái typing tức thì, sau đó Live CMS tự động hydrate/cập nhật đè lên khi có dữ liệu mới từ GM.
 
 ---
 

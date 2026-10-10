@@ -780,19 +780,25 @@ export function HeroInteractive({
       return undefined;
     }
     const lower = `${pin.id} ${pin.label}`.toLowerCase();
-    if (
+    const isCrimeScenePin =
       lower.includes("thi-the") ||
       lower.includes("thi the") ||
       lower.includes("hiện trường") ||
       lower.includes("crime-scene") ||
-      lower.includes("crime_scene")
-    ) {
-      return "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png";
-    }
+      lower.includes("crime_scene") ||
+      lower.includes("chalk");
 
     // 1. Check live Google Sheets photos first (Live-First rule)
     const photosMap = sheetPhotosMapRef.current;
     if (photosMap) {
+      if (isCrimeScenePin) {
+        const liveCrime =
+          photosMap.get("crime_scene") ||
+          photosMap.get("chalk_outline") ||
+          photosMap.get("thi_the") ||
+          photosMap.get("c0-pin-crime-scene");
+        if (liveCrime) return liveCrime;
+      }
       if (lower.includes("khang")) {
         const liveKhang =
           photosMap.get("avatar_khang") || photosMap.get("khang");
@@ -812,6 +818,11 @@ export function HeroInteractive({
       const char =
         findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
       if (char && char.avatarUrl) return char.avatarUrl;
+    }
+
+    // 2. Fallback to local asset if not found in live Google Sheets
+    if (isCrimeScenePin) {
+      return "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png";
     }
 
     return undefined;
@@ -1077,6 +1088,16 @@ export function HeroInteractive({
         if (pc.startsWith("avatar_")) {
           map.set(pc.replace("avatar_", ""), normalized);
         }
+        if (
+          pc === "crime_scene" ||
+          pc === "chalk_outline" ||
+          pc === "thi_the" ||
+          pc.includes("chalk")
+        ) {
+          map.set("crime_scene", normalized);
+          map.set("chalk_outline", normalized);
+          map.set("thi_the", normalized);
+        }
       }
       if (item.title) {
         const titleLower = item.title.toLowerCase().trim();
@@ -1091,6 +1112,16 @@ export function HeroInteractive({
         if (titleLower.includes("lụa") || titleLower.includes("lua")) map.set("lua", normalized);
         if (titleLower.includes("vy")) map.set("vy", normalized);
         if (titleLower.includes("tiến") || titleLower.includes("tien")) map.set("tien", normalized);
+        if (
+          titleLower.includes("thi thể") ||
+          titleLower.includes("thi-the") ||
+          titleLower.includes("chalk") ||
+          (titleLower.includes("hiện trường") && !titleLower.includes("phòng khách"))
+        ) {
+          map.set("crime_scene", normalized);
+          map.set("chalk_outline", normalized);
+          map.set("thi_the", normalized);
+        }
       }
     }
     return map;
@@ -2020,13 +2051,17 @@ export function HeroInteractive({
         const isCustomPin =
           pin.id.startsWith("admin-pin-") || pin.id.startsWith("custom-pin-");
 
-        const isSuspectPin = isCustomPin
-          ? !!rawPin.photoUrl
-          : pin.id.startsWith("node-suspect-") ||
-            pin.id.startsWith("suspect-") ||
-            !!rawPin.photoUrl ||
-            pin.id.includes("thi-the") ||
-            pin.id.includes("crime-scene");
+        const isAvatarPin =
+          pin.id.startsWith("node-suspect-") ||
+          pin.id.startsWith("suspect-") ||
+          pin.id === "c0-pin-victim-khang" ||
+          Boolean(findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id));
+
+        const isPhotoPin =
+          isAvatarPin ||
+          Boolean(rawPin.photoUrl) ||
+          pin.id.includes("thi-the") ||
+          pin.id.includes("crime-scene");
 
         context.save();
         context.translate(pinPosition.x, pinPosition.y);
@@ -2036,18 +2071,25 @@ export function HeroInteractive({
           context.rotate((rawPin.rotation * Math.PI) / 180);
         }
 
-        if (isSuspectPin) {
+        if (isPhotoPin) {
           const char =
             findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
           const fallbackUrl =
             char?.avatarUrl ||
-            (pin.id.includes("crime-scene") || pin.id.includes("thi-the")
+            (pin.id.includes("crime-scene") ||
+            pin.id.includes("thi-the") ||
+            pin.id.includes("chalk")
               ? "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png"
               : "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png");
-          const suspectPhotoUrl =
+          const photoUrl =
             rawPin.photoUrl || resolveSuspectPhotoUrl(pin) || fallbackUrl;
-          const loadedSuspectImg = suspectPhotoUrl
-            ? getCompositeCard(suspectPhotoUrl, pin.label || "NẠN NHÂN", fallbackUrl)
+
+          // AVATAR pins get Polaroid composite with tape & name.
+          // EVIDENCE/SCENE photos load raw image directly (natural aspect ratio, no tape, no text overlay).
+          const loadedSuspectImg = photoUrl
+            ? isAvatarPin
+              ? getCompositeCard(photoUrl, pin.label || "NẠN NHÂN", fallbackUrl)
+              : getLoadedImage(photoUrl, fallbackUrl)
             : null;
 
           if (loadedSuspectImg) {

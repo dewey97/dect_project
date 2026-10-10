@@ -5,6 +5,9 @@ import { getActiveCase, getDevices, getEvidence, getTraceCards } from '@/lib/moc
 import { SettingsProvider } from '@/components/investigation/settings-context'
 import { CheckpointsProvider } from '@/components/investigation/checkpoints-context'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 /**
  * The investigation OS shell. Adapts between:
  * - Mobile portrait view (single central column max ~430px)

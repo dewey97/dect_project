@@ -33,14 +33,6 @@ interface CheckpointGroupData {
   hints: string[];
 }
 
-const CASE_CHECKPOINT_TABS = [
-  { id: "cp-000-0", label: "3 SĐT Ẩn Danh", shortLabel: "3 SĐT" },
-  { id: "cp-000-1a", label: "Lê Quang Vũ", shortLabel: "Lê Quang Vũ" },
-  { id: "cp-000-1b", label: "Nguyễn Thanh Tùng", shortLabel: "Nguyễn Thanh Tùng" },
-  { id: "cp-000-1c", label: "Trần Thị Hà", shortLabel: "Trần Thị Hà" },
-  { id: "cp-000-2b", label: "Bản Cáo Trạng", shortLabel: "Bản Cáo Trạng" },
-];
-
 /**
  * Chuẩn hóa checkpointId sang mã chuẩn vụ án Case #000.
  */
@@ -66,7 +58,7 @@ function normalizeCheckpointId(id?: string): string {
 }
 
 /**
- * Tự động tìm checkpoint đang làm dở khi người chơi mở Gợi ý từ Bảng điều tra.
+ * Tự động nhận diện checkpoint đang điều tra dở theo tiến trình thực tế của người chơi.
  */
 function getLatestActiveCheckpointId(): string {
   if (typeof window !== "undefined") {
@@ -93,7 +85,7 @@ function getLatestActiveCheckpointId(): string {
 }
 
 /**
- * Gom nhóm toàn bộ hints từ tab 'checkpoints' trên Google Sheets theo checkpoint_id,
+ * Gom nhóm hints từ tab 'checkpoints' trên Google Sheets theo checkpoint_id,
  * tự động kế thừa và gộp các dòng con (Động cơ + Ngoại phạm mâu thuẫn).
  */
 function buildGroupedCheckpointsMap(
@@ -140,7 +132,6 @@ function buildGroupedCheckpointsMap(
       const rowHints = getCheckpointHints(row);
       for (const hint of rowHints) {
         const trimmed = hint.trim();
-        // Bỏ qua dòng rỗng hoặc tiêu đề phân mục thuần túy
         if (
           trimmed &&
           trimmed !== "Động cơ" &&
@@ -164,7 +155,7 @@ export function HintModal({
   const { data: sheetCheckpoints } =
     usePhoneData<SheetCheckpointRow>("checkpoints");
 
-  const [selectedCpId, setSelectedCpId] = useState<string>("cp-000-0");
+  const [activeCpId, setActiveCpId] = useState<string>("cp-000-0");
   const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
   const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
 
@@ -173,45 +164,37 @@ export function HintModal({
     return buildGroupedCheckpointsMap(sheetCheckpoints);
   }, [sheetCheckpoints]);
 
-  // Đồng bộ tab checkpoint khi modal mở hoặc checkpointId thay đổi
+  // Tự động nhận diện đúng checkpoint khi mở modal
   useEffect(() => {
     if (isOpen) {
       setUnlockedLevels(
         getStorageJson<Record<string, number>>("hint_unlocked_levels", {}),
       );
 
-      const targetId = checkpointId
+      const resolvedId = checkpointId
         ? normalizeCheckpointId(checkpointId)
         : getLatestActiveCheckpointId();
 
-      setSelectedCpId(targetId || "cp-000-0");
+      setActiveCpId(resolvedId || "cp-000-0");
       setActiveHintIdx(0);
     }
   }, [isOpen, checkpointId]);
 
   if (!isOpen) return null;
 
-  const currentGroup = groupedMap.get(selectedCpId) || {
-    checkpointId: selectedCpId,
-    title:
-      CASE_CHECKPOINT_TABS.find((t) => t.id === selectedCpId)?.label ||
-      `CÂU HỎI CHECKPOINT // ${selectedCpId.toUpperCase()}`,
+  const currentGroup = groupedMap.get(activeCpId) || {
+    checkpointId: activeCpId,
+    title: `CÂU HỎI CHECKPOINT // ${activeCpId.toUpperCase()}`,
     dossier: "Hồ sơ chuyên án",
     hints: [],
   };
 
   const totalHints = currentGroup.hints.length;
   const unlockedCount = Math.min(
-    unlockedLevels[selectedCpId] || 1,
+    unlockedLevels[activeCpId] || 1,
     Math.max(totalHints, 1),
   );
   const viewIdx = Math.min(activeHintIdx, Math.max(unlockedCount - 1, 0));
-
-  const handleSelectTab = (cpId: string) => {
-    detectiveAudio.playTypewriterClick();
-    setSelectedCpId(cpId);
-    setActiveHintIdx(0);
-  };
 
   const handleUnlockNext = () => {
     if (totalHints === 0) return;
@@ -219,7 +202,7 @@ export function HintModal({
     const nextCount = Math.min(unlockedCount + 1, totalHints);
     const updated = {
       ...unlockedLevels,
-      [selectedCpId]: nextCount,
+      [activeCpId]: nextCount,
     };
     setUnlockedLevels(updated);
     setActiveHintIdx(nextCount - 1);
@@ -233,7 +216,7 @@ export function HintModal({
           initial={{ opacity: 0, scale: 0.95, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}
-          className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] rounded-none overflow-hidden flex flex-col max-h-[92vh]"
+          className="relative w-full max-w-xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] rounded-none overflow-hidden flex flex-col max-h-[92vh]"
         >
           {/* HEADER */}
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
@@ -243,7 +226,7 @@ export function HintModal({
                 SỔ TAY GỢI Ý ĐIỀU TRA // CASE 000
               </span>
               <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
-                Gợi Ý & Manh Mối Phá Án
+                Gợi Ý Manh Mối Checkpoint
               </h3>
             </div>
 
@@ -261,43 +244,6 @@ export function HintModal({
             </button>
           </div>
 
-          {/* CHECKPOINT TABS SELECTOR */}
-          <div className="bg-[#e4d7bf] px-3 sm:px-4 py-2 border-b-2 border-[#2b1f14]/30 flex items-center gap-1.5 overflow-x-auto custom-scrollbar">
-            {CASE_CHECKPOINT_TABS.map((tab) => {
-              const isTabActive = selectedCpId === tab.id;
-              const tabData = groupedMap.get(tab.id);
-              const tabHintCount = tabData?.hints.length || 0;
-
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleSelectTab(tab.id)}
-                  className={cn(
-                    "px-3 py-1.5 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap border rounded-none flex items-center gap-1.5 shrink-0",
-                    isTabActive
-                      ? "bg-[#8c1d1d] text-[#fdfbf7] border-[#6b1414] shadow-sm"
-                      : "bg-[#f5ecdc] hover:bg-[#eae0ce] text-[#3d2b1a] border-[#b8a48c]",
-                  )}
-                >
-                  <span>{tab.shortLabel}</span>
-                  {tabHintCount > 0 && (
-                    <span
-                      className={cn(
-                        "text-[9px] px-1 py-0.2 rounded-full font-mono",
-                        isTabActive
-                          ? "bg-white/20 text-white"
-                          : "bg-[#2b1f14]/10 text-[#5c4026]",
-                      )}
-                    >
-                      {tabHintCount}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
           {/* ACTIVE CONTENT AREA */}
           <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] custom-scrollbar">
             {/* STAGE TITLE BAR */}
@@ -305,7 +251,7 @@ export function HintModal({
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-[#8c1d1d] font-mono text-[11px] font-bold uppercase tracking-wider">
                   <Compass className="size-3.5" />
-                  <span>CÂU HỎI CHECKPOINT</span>
+                  <span>TIẾN TRÌNH CÂU HỎI HIỆN TẠI</span>
                 </div>
                 <h4 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wide">
                   {currentGroup.title}
