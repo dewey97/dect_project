@@ -56,6 +56,7 @@ import {
 } from "@/lib/cases/case-000-suspects";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { createClient } from "@/lib/supabase/client";
+import { checkIsAdmin } from "@/lib/actions/auth-guard";
 import {
   getBoardgamePinPositions,
   saveBoardgamePinPositions,
@@ -492,26 +493,18 @@ export function MainInvestigationCanvas({
   // Check admin role and load custom pin layout from DB on mount
   useEffect(() => {
     async function initAdminAndLayout() {
-      // Tự động bật quyền Admin trên Môi trường Local Dev để dễ setup
+      // Tự động bật quyền Admin trên Local Dev, hoặc kiểm tra qua Server Action trên Production
       if (process.env.NODE_ENV === "development") {
         setIsAdmin(true);
       } else {
         try {
-          const supabase = createClient();
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
-          if (user) {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("role")
-              .eq("id", user.id)
-              .single();
-            if (profile && profile.role === "admin") {
-              setIsAdmin(true);
-            }
+          const isAdminRole = await checkIsAdmin();
+          if (isAdminRole) {
+            setIsAdmin(true);
           }
-        } catch {}
+        } catch (err) {
+          console.error("Error checking admin role:", err);
+        }
       }
 
       // 1. Tải cache cục bộ từ storage trước (đáp ứng ngay lập tức)
