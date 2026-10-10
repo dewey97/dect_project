@@ -85,13 +85,16 @@ export default function WebEvidencePage() {
   >("all");
 
   const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<string | undefined>(undefined);
+  const [activeHintCategory, setActiveHintCategory] = useState<"motive" | "alibi" | undefined>(undefined);
 
   // Event bus listeners
   useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
   useInvestigationEvent("OPEN_HINT", (e: any) => {
     const cpId = e?.detail?.checkpointId || (typeof e?.detail === "string" ? e.detail : undefined);
+    const cat = e?.detail?.category || (typeof e?.detail === "object" ? e.detail?.category : undefined);
     setActiveHintCheckpointId(cpId);
+    setActiveHintCategory(cat);
     setActiveModal("hint");
   });
   useInvestigationEvent("OPEN_REINVESTIGATE", () => setActiveModal("reinvestigate"));
@@ -423,9 +426,11 @@ export default function WebEvidencePage() {
       <HintModal
         isOpen={activeModal === "hint"}
         checkpointId={activeHintCheckpointId}
+        category={activeHintCategory}
         onClose={() => {
           setActiveModal(null);
           setActiveHintCheckpointId(undefined);
+          setActiveHintCategory(undefined);
         }}
       />
 

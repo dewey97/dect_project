@@ -109,8 +109,14 @@ export function AddSuspectModal({
       if (suspectCpId === 'cp-000-1a') setStorageItem('last_viewed_suspect', 'vu')
       else if (suspectCpId === 'cp-000-1b') setStorageItem('last_viewed_suspect', 'tung')
       else if (suspectCpId === 'cp-000-1c') setStorageItem('last_viewed_suspect', 'ha')
+
+      if (subTileView === 'motive') {
+        setStorageItem('active_suspect_category', 'motive')
+      } else if (subTileView === 'alibi') {
+        setStorageItem('active_suspect_category', 'alibi')
+      }
     }
-  }, [isOpen, suspectCpId])
+  }, [isOpen, suspectCpId, subTileView])
 
   useEffect(() => {
     if (editingSuspect) {
@@ -406,13 +412,33 @@ export function AddSuspectModal({
               onClick={(e) => {
                 e.stopPropagation()
                 detectiveAudio.playTypewriterClick()
-                emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId })
+                const targetCat: 'motive' | 'alibi' =
+                  subTileView === 'motive'
+                    ? 'motive'
+                    : subTileView === 'alibi'
+                      ? 'alibi'
+                      : isMotiveValid
+                        ? 'alibi'
+                        : 'motive'
+                emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: targetCat })
               }}
               className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-              title="Xem gợi ý phá án cho đối tượng này"
+              title={
+                subTileView === 'motive'
+                  ? 'Xem gợi ý động cơ gây án'
+                  : subTileView === 'alibi'
+                    ? 'Xem gợi ý mâu thuẫn ngoại phạm'
+                    : 'Xem gợi ý phá án'
+              }
             >
               <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-              <span className="hidden sm:inline">GỢI Ý</span>
+              <span className="hidden sm:inline">
+                {subTileView === 'motive'
+                  ? 'GỢI Ý ĐỘNG CƠ'
+                  : subTileView === 'alibi'
+                    ? 'GỢI Ý NGOẠI PHẠM'
+                    : 'GỢI Ý'}
+              </span>
             </button>
 
             <button
@@ -496,9 +522,31 @@ export function AddSuspectModal({
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
                           Động cơ gây án
                         </span>
-                        {isMotiveValid && (
-                          <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              detectiveAudio.playTypewriterClick()
+                              emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'motive' })
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation()
+                                emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'motive' })
+                              }
+                            }}
+                            className="p-1 bg-[#ede3d1] hover:bg-[#dfd3bd] text-[#8c1d1d] border border-[#a88c6f] text-[10px] font-mono font-bold uppercase transition-all flex items-center gap-1 cursor-pointer"
+                            title="Xem gợi ý động cơ"
+                          >
+                            <Lightbulb className="size-3 text-[#8c1d1d]" />
+                            <span className="text-[10px] hidden sm:inline">GỢI Ý</span>
+                          </span>
+                          {isMotiveValid && (
+                            <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
+                          )}
+                        </div>
                       </div>
                     </button>
 
@@ -532,9 +580,31 @@ export function AddSuspectModal({
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
                           Ngoại phạm bất hợp lý
                         </span>
-                        {isAlibiValid && (
-                          <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              detectiveAudio.playTypewriterClick()
+                              emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'alibi' })
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation()
+                                emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'alibi' })
+                              }
+                            }}
+                            className="p-1 bg-[#ede3d1] hover:bg-[#dfd3bd] text-[#8c1d1d] border border-[#a88c6f] text-[10px] font-mono font-bold uppercase transition-all flex items-center gap-1 cursor-pointer"
+                            title="Xem gợi ý ngoại phạm"
+                          >
+                            <Lightbulb className="size-3 text-[#8c1d1d]" />
+                            <span className="text-[10px] hidden sm:inline">GỢI Ý</span>
+                          </span>
+                          {isAlibiValid && (
+                            <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
+                          )}
+                        </div>
                       </div>
                     </button>
                   </div>
@@ -545,10 +615,23 @@ export function AddSuspectModal({
             {/* Sub-View for Tile 1: MOTIVE / ĐỘNG CƠ GÂY ÁN */}
             {subTileView === 'motive' && (
               <div className="space-y-3 pt-1">
-                <div className="border-b border-[#2b1f14]/20 pb-2">
+                <div className="border-b border-[#2b1f14]/20 pb-2 flex items-center justify-between">
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
                     ĐỘNG CƠ GÂY ÁN {name ? `— ${name}` : ''}
                   </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      detectiveAudio.playTypewriterClick()
+                      emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'motive' })
+                    }}
+                    className="px-2 py-1 bg-[#ede3d1] hover:bg-[#dfd3bd] text-[#8c1d1d] border border-[#a88c6f] font-mono text-[10px] font-bold uppercase transition-all flex items-center gap-1 cursor-pointer"
+                    title="Xem gợi ý động cơ"
+                  >
+                    <Lightbulb className="size-3 text-[#8c1d1d]" />
+                    <span>GỢI Ý ĐỘNG CƠ</span>
+                  </button>
                 </div>
 
                 <ClueCodePicker
@@ -595,10 +678,23 @@ export function AddSuspectModal({
             {/* Sub-View for Tile 2: ALIBI */}
             {subTileView === 'alibi' && (
               <div className="space-y-3 pt-1">
-                <div className="border-b border-[#2b1f14]/20 pb-2">
+                <div className="border-b border-[#2b1f14]/20 pb-2 flex items-center justify-between">
                   <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
                     NGOẠI PHẠM BẤT HỢP LÝ {name ? `— ${name}` : ''}
                   </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      detectiveAudio.playTypewriterClick()
+                      emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'alibi' })
+                    }}
+                    className="px-2 py-1 bg-[#ede3d1] hover:bg-[#dfd3bd] text-[#8c1d1d] border border-[#a88c6f] font-mono text-[10px] font-bold uppercase transition-all flex items-center gap-1 cursor-pointer"
+                    title="Xem gợi ý ngoại phạm"
+                  >
+                    <Lightbulb className="size-3 text-[#8c1d1d]" />
+                    <span>GỢI Ý NGOẠI PHẠM</span>
+                  </button>
                 </div>
 
                 <ClueCodePicker

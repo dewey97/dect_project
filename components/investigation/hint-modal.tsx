@@ -219,45 +219,49 @@ export function HintModal({
     );
   }, [groupedMap, effectiveCpId]);
 
-  // State phân nhóm: 'motive' | 'alibi' | 'all'
-  const [selectedCategory, setSelectedCategory] = useState<"motive" | "alibi" | "all">("all");
+  // Nhận diện phân nhóm độc lập (Motive vs Alibi vs All) mà KHÔNG dùng toggle
+  const activeCategory = useMemo<"motive" | "alibi" | "all">(() => {
+    if (category === "motive" || category === "alibi") return category;
+
+    const rawId = (checkpointId || "").toLowerCase();
+    if (rawId.includes("motive") || rawId.includes("dong_co")) return "motive";
+    if (rawId.includes("alibi") || rawId.includes("ngoai_pham")) return "alibi";
+
+    const savedCat = getStorageItem("active_suspect_category");
+    if (savedCat === "motive" || savedCat === "alibi") return savedCat;
+
+    if (currentGroup.hasCategories) {
+      return "motive";
+    }
+
+    return "all";
+  }, [category, checkpointId, currentGroup.hasCategories]);
+
   const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
   const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
 
-  // Khởi tạo phân nhóm theo context truyền vào
   useEffect(() => {
     if (isOpen) {
       setUnlockedLevels(
         getStorageJson<Record<string, number>>("hint_unlocked_levels", {}),
       );
-
-      if (category === "motive" || category === "alibi") {
-        setSelectedCategory(category);
-      } else if (currentGroup.hasCategories) {
-        if (currentGroup.motiveHints.length > 0) setSelectedCategory("motive");
-        else if (currentGroup.alibiHints.length > 0) setSelectedCategory("alibi");
-        else setSelectedCategory("all");
-      } else {
-        setSelectedCategory("all");
-      }
-
       setActiveHintIdx(0);
     }
-  }, [isOpen, category, currentGroup]);
+  }, [isOpen, activeCategory, effectiveCpId]);
 
   if (!isOpen) return null;
 
-  // Lấy danh sách gợi ý đang hiển thị theo nhóm
+  // Lấy danh sách gợi ý đang hiển thị riêng biệt theo nhóm (Không bao giờ gộp chung)
   const displayHints =
-    selectedCategory === "motive" && currentGroup.motiveHints.length > 0
+    activeCategory === "motive" && currentGroup.motiveHints.length > 0
       ? currentGroup.motiveHints
-      : selectedCategory === "alibi" && currentGroup.alibiHints.length > 0
+      : activeCategory === "alibi" && currentGroup.alibiHints.length > 0
         ? currentGroup.alibiHints
         : currentGroup.hints;
 
   const storageKey =
-    currentGroup.hasCategories && selectedCategory !== "all"
-      ? `${effectiveCpId}_${selectedCategory}`
+    currentGroup.hasCategories && activeCategory !== "all"
+      ? `${effectiveCpId}_${activeCategory}`
       : effectiveCpId;
 
   const totalHints = displayHints.length;
@@ -266,12 +270,6 @@ export function HintModal({
     Math.max(totalHints, 1),
   );
   const viewIdx = Math.min(activeHintIdx, Math.max(unlockedCount - 1, 0));
-
-  const handleSwitchCategory = (cat: "motive" | "alibi") => {
-    detectiveAudio.playTypewriterClick();
-    setSelectedCategory(cat);
-    setActiveHintIdx(0);
-  };
 
   const handleUnlockNext = () => {
     if (totalHints === 0) return;
@@ -285,6 +283,9 @@ export function HintModal({
     setActiveHintIdx(nextCount - 1);
     setStorageJson("hint_unlocked_levels", updated);
   };
+
+  const isMotiveGroup = activeCategory === "motive";
+  const isAlibiGroup = activeCategory === "alibi";
 
   return (
     <AnimatePresence>
@@ -303,7 +304,11 @@ export function HintModal({
                 SỔ TAY GỢI Ý ĐIỀU TRA // CASE 000
               </span>
               <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
-                Gợi Ý Manh Mối Checkpoint
+                {isMotiveGroup
+                  ? "Gợi Ý Động Cơ Gây Án"
+                  : isAlibiGroup
+                    ? "Gợi Ý Mâu Thuẫn Ngoại Phạm"
+                    : "Gợi Ý Manh Mối Checkpoint"}
               </h3>
             </div>
 
@@ -327,11 +332,28 @@ export function HintModal({
             <div className="border-b-2 border-[#2b1f14]/20 pb-3 flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-[#8c1d1d] font-mono text-[11px] font-bold uppercase tracking-wider">
-                  <Compass className="size-3.5" />
-                  <span>TIẾN TRÌNH CÂU HỎI HIỆN TẠI</span>
+                  {isMotiveGroup ? (
+                    <Target className="size-3.5" />
+                  ) : isAlibiGroup ? (
+                    <Clock className="size-3.5" />
+                  ) : (
+                    <Compass className="size-3.5" />
+                  )}
+                  <span>
+                    {isMotiveGroup
+                      ? "MỤC TIÊU // BẰNG CHỨNG ĐỘNG CƠ"
+                      : isAlibiGroup
+                        ? "MỤC TIÊU // BẰNG CHỨNG NGOẠI PHẠM"
+                        : "TIẾN TRÌNH CÂU HỎI HIỆN TẠI"}
+                  </span>
                 </div>
                 <h4 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wide">
                   {currentGroup.title}
+                  {isMotiveGroup
+                    ? " — [ĐỘNG CƠ]"
+                    : isAlibiGroup
+                      ? " — [NGOẠI PHẠM]"
+                      : ""}
                 </h4>
               </div>
 
@@ -341,41 +363,6 @@ export function HintModal({
                 </span>
               )}
             </div>
-
-            {/* SUB-CATEGORIES FOR SUSPECT INVESTIGATION (ĐỘNG CƠ / NGOẠI PHẠM) */}
-            {currentGroup.hasCategories && (
-              <div className="flex items-center gap-2 p-1.5 bg-[#ebdcc4] border border-[#a88c6f]/60 font-mono text-xs">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#6b4e2e] px-1.5 shrink-0">
-                  PHÂN LOẠI:
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleSwitchCategory("motive")}
-                  className={cn(
-                    "flex-1 py-1.5 px-2.5 font-bold uppercase transition-all flex items-center justify-center gap-1.5 border cursor-pointer",
-                    selectedCategory === "motive"
-                      ? "bg-[#8c1d1d] text-white border-[#6b1414] shadow-sm"
-                      : "bg-[#f5ecdc] hover:bg-[#eae0ce] text-[#3d2b1a] border-[#b8a48c]",
-                  )}
-                >
-                  <Target className="size-3.5" />
-                  <span>ĐỘNG CƠ ({currentGroup.motiveHints.length})</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSwitchCategory("alibi")}
-                  className={cn(
-                    "flex-1 py-1.5 px-2.5 font-bold uppercase transition-all flex items-center justify-center gap-1.5 border cursor-pointer",
-                    selectedCategory === "alibi"
-                      ? "bg-[#8c1d1d] text-white border-[#6b1414] shadow-sm"
-                      : "bg-[#f5ecdc] hover:bg-[#eae0ce] text-[#3d2b1a] border-[#b8a48c]",
-                  )}
-                >
-                  <Clock className="size-3.5" />
-                  <span>NGOẠI PHẠM ({currentGroup.alibiHints.length})</span>
-                </button>
-              </div>
-            )}
 
             {/* TRƯỜNG HỢP: CHƯA CÓ GỢI Ý HOẶC ĐANG TẢI */}
             {totalHints === 0 ? (
@@ -401,7 +388,7 @@ export function HintModal({
                       {currentGroup.hasCategories && (
                         <span className="text-[#6b4e2e] text-[10px]">
                           [
-                          {selectedCategory === "motive"
+                          {isMotiveGroup
                             ? "ĐỘNG CƠ GÂY ÁN"
                             : "MÂU THUẪN NGOẠI PHẠM"}
                           ]
