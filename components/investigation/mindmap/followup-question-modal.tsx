@@ -289,7 +289,7 @@ export function FollowupQuestionModal({
       onClose()
     } else {
       detectiveAudio.playGlassSound()
-      setErrorMsg('⚠️ Đáp án chưa chính xác. Vui lòng kiểm tra lại mốc thời gian trong Hồ sơ A!')
+      setErrorMsg('⚠️ Đáp án chưa chính xác. Vui lòng kiểm tra lại mốc thời gian trong Hồ sơ B!')
     }
   }
 
@@ -450,10 +450,10 @@ export function FollowupQuestionModal({
                 </div>
               )}
 
-              {/* MỞ TÚI HỒ SƠ A INSTRUCTION */}
+              {/* MỞ TÚI HỒ SƠ B INSTRUCTION */}
               <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-                  📂 MỞ TÚI HỒ SƠ A
+                  📂 MỞ TÚI HỒ SƠ B
                 </span>
               </div>
 
@@ -517,13 +517,10 @@ export function FollowupQuestionModal({
                 </div>
               )}
 
-              {/* TÚI HỒ SƠ C */}
+              {/* TÚI HỒ SƠ D */}
               <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-                  📂 MỞ TÚI HỒ SƠ C // VẬT CHỨNG KHÁM XÉT
-                </span>
-                <span className="font-mono text-[11px] font-bold text-[#6b4e2e]">
-                  VẬT PHẨM: HỘP THIẾC KHÓA MÃ
+                  📂 MỞ TÚI HỒ SƠ D
                 </span>
               </div>
 
@@ -552,9 +549,6 @@ export function FollowupQuestionModal({
                   placeholder="Nhập mật khẩu..."
                   className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-base font-bold placeholder-[#a88c6f]/60 tracking-wider focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
                 />
-                <p className="text-[11px] text-[#6b4e2e] font-mono italic">
-                  💡 Gợi ý: Tra cứu thông tin, ghi chú hoặc ngày kỷ niệm bí mật của đối tượng.
-                </p>
               </div>
 
               {/* FOOTER */}
@@ -590,10 +584,10 @@ export function FollowupQuestionModal({
                 </div>
               )}
 
-              {/* MỞ TÚI HỒ SƠ B */}
+              {/* MỞ TÚI HỒ SƠ B04 */}
               <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm">
                 <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-                  📂 MỞ TÚI HỒ SƠ B
+                  📂 MỞ TÚI HỒ SƠ B04
                 </span>
               </div>
 

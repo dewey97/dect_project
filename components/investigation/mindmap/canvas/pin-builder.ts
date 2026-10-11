@@ -15,7 +15,7 @@ export const DESKTOP_SUSPECT_SLOTS = [
   { x: 0.23, y: 0.62 },
   { x: 0.26, y: 0.48 },
   { x: 0.64, y: 0.24 },
-  { x: 0.76, y: 0.44 },
+  { x: 0.88, y: 0.42 },
 ];
 
 export const MOBILE_SUSPECT_SLOTS = [
@@ -26,7 +26,7 @@ export const MOBILE_SUSPECT_SLOTS = [
   { x: 0.23, y: 0.62 },
   { x: 0.26, y: 0.48 },
   { x: 0.64, y: 0.24 },
-  { x: 0.76, y: 0.44 },
+  { x: 0.88, y: 0.42 },
 ];
 
 const SUSPECT_PHOTO_MAP: Record<string, string> = {

@@ -37,6 +37,7 @@ export const ALL_CASE_000_SUSPECTS: SuspectItem[] = [
   { id: "suspect-mai", name: "Nguyễn Ngọc Mai", clueIds: [] },
   { id: "suspect-dat", name: "Trần Văn Đạt", clueIds: [] },
   { id: "suspect-lua", name: "Nguyễn Thị Lụa", clueIds: [] },
+  { id: "suspect-vy", name: "Thảo Vy", clueIds: [] },
 ];
 
 export function sanitizeSuspectsList(items: SuspectItem[]): SuspectItem[] {
