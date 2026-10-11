@@ -1,21 +1,9 @@
 'use client'
 
 import React from 'react'
-import {
-  MapPin,
-  Utensils,
-  ShoppingBag,
-  Plane,
-  Bus,
-  Landmark,
-  Building,
-  Circle,
-  Compass,
-  Layers,
-  Crosshair
-} from 'lucide-react'
+import { Circle, Compass } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { CaseLocation, RouteResult } from '@/lib/case-locations-data'
+import { CaseLocation, RouteResult, isScannedMapLocation } from '@/lib/case-locations-data'
 
 export interface VectorMapCanvasProps {
   pan: { x: number; y: number }
@@ -213,94 +201,55 @@ export function VectorMapCanvas({
         )}
 
         {/* =================================================================== */}
-        {/* AUTHENTIC GOOGLE MAPS POI PINS                                      */}
+        {/* INTERACTIVE OVERLAYS DIRECTLY ON TOP OF SCANNED MAP DOTS             */}
         {/* =================================================================== */}
-        {caseLocations.map((loc) => {
-          const isOrigin = showRoutePolyline && loc.id === origin.id
-          const isDestination = (showRoutePolyline && loc.id === destination.id) || loc.id === selectedPlace?.id
+        {caseLocations
+          .filter((loc) => isScannedMapLocation(loc.id))
+          .map((loc) => {
+            const isOrigin = showRoutePolyline && loc.id === origin.id
+            const isDestination = (showRoutePolyline && loc.id === destination.id)
+            const isSelected = loc.id === selectedPlace?.id
 
-          const getPoiIcon = () => {
-            switch (loc.category) {
-              case 'food':
-                return <Utensils className="size-2.5" />
-              case 'shopping':
-                return <ShoppingBag className="size-2.5" />
-              case 'transit':
-                return loc.id === 'loc-18' ? <Plane className="size-2.5" /> : <Bus className="size-2.5" />
-              case 'finance':
-                return <Landmark className="size-2.5" />
-              case 'public':
-                return <Building className="size-2.5" />
-              case 'residential':
-              default:
-                return <MapPin className="size-2.5 fill-white" />
-            }
-          }
-
-          return (
-            <div
-              key={loc.id}
-              className="map-pin-btn absolute pointer-events-auto -translate-x-1/2 -translate-y-full cursor-pointer group"
-              style={{ left: loc.x, top: loc.y }}
-              onClick={(e) => {
-                e.stopPropagation()
-                handlePinClick(loc)
-              }}
-            >
-              {/* 1. Origin Pin A: Google Maps Blue Radar Puck */}
-              {isOrigin ? (
-                <div className="flex flex-col items-center">
-                  <div className="size-7 rounded-full bg-[#1A73E8] text-white flex items-center justify-center shadow-lg border-2 border-white ring-4 ring-blue-400/40 animate-pulse">
-                    <Circle className="size-2.5 fill-white text-white" />
+            return (
+              <div
+                key={loc.id}
+                className="map-pin-btn absolute pointer-events-auto -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10 transition-transform active:scale-95 group"
+                style={{ left: loc.x, top: loc.y }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handlePinClick(loc)
+                }}
+              >
+                {/* 1. Origin Pin A: Pulsing Blue Selection Ring */}
+                {isOrigin ? (
+                  <div className="relative size-7 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full bg-[#1A73E8]/35 animate-ping opacity-75" />
+                    <div className="size-5 rounded-full border-2 border-white bg-[#1A73E8] shadow-lg ring-2 ring-[#1A73E8] flex items-center justify-center">
+                      <Circle className="size-1.5 fill-white text-white" />
+                    </div>
                   </div>
-                  <span className="mt-1 px-2 py-0.5 rounded-full bg-[#1A73E8] text-white text-[9.5px] font-bold shadow-md whitespace-nowrap border border-white">
-                    A: {loc.name}
-                  </span>
-                </div>
-              ) : isDestination ? (
-                /* 2. Destination Pin B / Selected Place Pin: Google Maps Teardrop Red Pin */
-                <div className="flex flex-col items-center">
-                  <div className="relative">
-                    <MapPin className="size-9 text-[#EA4335] fill-[#EA4335] drop-shadow-md" />
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 size-2.5 rounded-full bg-white shadow-inner" />
+                ) : isDestination ? (
+                  /* 2. Destination Pin B: Pulsing Red Selection Ring */
+                  <div className="relative size-7 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full bg-[#EA4335]/35 animate-ping opacity-75" />
+                    <div className="size-5 rounded-full border-2 border-white bg-[#EA4335] shadow-lg ring-2 ring-[#EA4335] flex items-center justify-center">
+                      <Circle className="size-1.5 fill-white text-white" />
+                    </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full bg-[#EA4335] text-white text-[9.5px] font-bold shadow-md whitespace-nowrap border border-white -mt-1">
-                    {showRoutePolyline ? `B: ${loc.name}` : loc.name}
-                  </span>
-                </div>
-              ) : (
-                /* 3. Regular Google Maps POI Badge */
-                <div className="flex flex-col items-center transition-transform hover:scale-110">
-                  <div
-                    className={cn(
-                      'size-5 rounded-full flex items-center justify-center shadow-sm border border-white text-white transition-all',
-                      loc.category === 'residential'
-                        ? 'bg-slate-600'
-                        : loc.category === 'food'
-                        ? 'bg-orange-600'
-                        : loc.category === 'shopping'
-                        ? 'bg-blue-600'
-                        : loc.category === 'transit'
-                        ? 'bg-cyan-700'
-                        : loc.category === 'finance'
-                        ? 'bg-emerald-600'
-                        : 'bg-gray-600',
-                      'hover:ring-2 hover:ring-blue-500'
-                    )}
-                  >
-                    {getPoiIcon()}
+                ) : isSelected ? (
+                  /* 3. Selected Place: Amber Highlight Ring */
+                  <div className="relative size-7 flex items-center justify-center">
+                    <div className="size-5 rounded-full border-2 border-white bg-[#FBBC04] shadow-lg ring-2 ring-[#FBBC04] flex items-center justify-center animate-pulse">
+                      <Circle className="size-1.5 fill-white text-white" />
+                    </div>
                   </div>
-                  <span
-                    style={{ paintOrder: 'stroke fill' }}
-                    className="mt-0.5 text-[9px] font-semibold text-gray-800 whitespace-nowrap select-none drop-shadow-xs stroke-white stroke-[2.5px]"
-                  >
-                    {loc.shortName}
-                  </span>
-                </div>
-              )}
-            </div>
-          )
-        })}
+                ) : (
+                  /* 4. Normal Dot Overlay: Clean White-Bordered Circular Hotspot (No Text) */
+                  <div className="size-5 rounded-full border-2 border-white/80 bg-transparent hover:scale-125 hover:border-blue-400 hover:bg-blue-500/25 transition-all shadow-xs" />
+                )}
+              </div>
+            )
+          })}
       </div>
 
       {/* ======================================================================= */}

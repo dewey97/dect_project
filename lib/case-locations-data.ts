@@ -205,16 +205,16 @@ interface LocationMeta {
 
 export const LOCATION_METAS: Record<string, LocationMeta> = {
   // 1: Số 14 Đường Bờ Sông (Hiện trường chính) - Dot 1 trên MAP.png
-  '1': { title: 'Số 14 Đường Bờ Sông', address: 'Số 14, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'crime_scene', roadNodeId: 'node-bosong-14', x: 853, y: 225, lat: 21.0058, lng: 105.8682, plusCode: '7P28+3M Phân khu Cảng, Hà Nội' },
-  'loc-01': { title: 'Số 14 Đường Bờ Sông', address: 'Số 14, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'crime_scene', roadNodeId: 'node-bosong-14', x: 853, y: 225, lat: 21.0058, lng: 105.8682, plusCode: '7P28+3M Phân khu Cảng, Hà Nội' },
+  '1': { title: 'Số 14 Đường Bờ Sông', address: 'Số 14, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'crime_scene', roadNodeId: 'node-bosong-14', x: 854, y: 226, lat: 21.0058, lng: 105.8682, plusCode: '7P28+3M Phân khu Cảng, Hà Nội' },
+  'loc-01': { title: 'Số 14 Đường Bờ Sông', address: 'Số 14, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'crime_scene', roadNodeId: 'node-bosong-14', x: 854, y: 226, lat: 21.0058, lng: 105.8682, plusCode: '7P28+3M Phân khu Cảng, Hà Nội' },
 
   // 2: Số 12 Đường Bờ Sông (Nhà bà Lụa) - Dot 2 trên MAP.png
-  '2': { title: 'Số 12 Đường Bờ Sông', address: 'Số 12, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-bosong-south', x: 863, y: 241, lat: 21.0053, lng: 105.8686, plusCode: '7P28+2M Phân khu Cảng, Hà Nội' },
-  'loc-02': { title: 'Số 12 Đường Bờ Sông', address: 'Số 12, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-bosong-south', x: 863, y: 241, lat: 21.0053, lng: 105.8686, plusCode: '7P28+2M Phân khu Cảng, Hà Nội' },
+  '2': { title: 'Số 12 Đường Bờ Sông', address: 'Số 12, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-bosong-south', x: 864, y: 242, lat: 21.0053, lng: 105.8686, plusCode: '7P28+2M Phân khu Cảng, Hà Nội' },
+  'loc-02': { title: 'Số 12 Đường Bờ Sông', address: 'Số 12, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-bosong-south', x: 864, y: 242, lat: 21.0053, lng: 105.8686, plusCode: '7P28+2M Phân khu Cảng, Hà Nội' },
 
   // 3: Số 10 Đường Bờ Sông (Nhà cũ bố mẹ Tùng) - Dot 3 trên MAP.png
-  '3': { title: 'Số 10 Đường Bờ Sông', address: 'Số 10, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-bosong-south', x: 864, y: 260, lat: 21.0048, lng: 105.8690, plusCode: '7P28+1M Phân khu Cảng, Hà Nội' },
-  'loc-03': { title: 'Số 10 Đường Bờ Sông', address: 'Số 10, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-bosong-south', x: 864, y: 260, lat: 21.0048, lng: 105.8690, plusCode: '7P28+1M Phân khu Cảng, Hà Nội' },
+  '3': { title: 'Số 10 Đường Bờ Sông', address: 'Số 10, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-bosong-south', x: 865, y: 260, lat: 21.0048, lng: 105.8690, plusCode: '7P28+1M Phân khu Cảng, Hà Nội' },
+  'loc-03': { title: 'Số 10 Đường Bờ Sông', address: 'Số 10, Đường Bờ Sông, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-bosong-south', x: 865, y: 260, lat: 21.0048, lng: 105.8690, plusCode: '7P28+1M Phân khu Cảng, Hà Nội' },
 
   // 4: Bãi đất ven sông (Hiện trường 1996) - Dot 4 trên MAP.png
   '4': { title: 'Bãi đất ven sông', address: 'Khu bãi ven sông cũ, P. Phân khu Cảng, Hà Nội', category: 'public', roadNodeId: 'node-desong-south', x: 871, y: 192, lat: 21.0035, lng: 105.8715, plusCode: '7P18+8K Phân khu Cảng, Hà Nội' },
@@ -225,16 +225,16 @@ export const LOCATION_METAS: Record<string, LocationMeta> = {
   'loc-05': { title: 'Số 45 Đường Đoàn Kết', address: 'Số 45, Đường Đoàn Kết, P. Cảng Đông, Hà Nội', category: 'residential', roadNodeId: 'node-doanket-west', x: 1094, y: 251, lat: 21.0085, lng: 105.8640, plusCode: '7P37+4G Cảng Đông, Hà Nội' },
 
   // 6: Số 8 Ngõ 12 Đường Bờ Kè (Phòng trọ Hà) - Dot 6 trên MAP.png
-  '6': { title: 'Số 8 Ngõ 12 Đường Bờ Kè', address: 'Số 8, Ngõ 12, Đường Bờ Kè, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-boke-ngo12', x: 883, y: 366, lat: 21.0092, lng: 105.8712, plusCode: '7P39+9H Phân khu Cảng, Hà Nội' },
-  'loc-06': { title: 'Số 8 Ngõ 12 Đường Bờ Kè', address: 'Số 8, Ngõ 12, Đường Bờ Kè, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-boke-ngo12', x: 883, y: 366, lat: 21.0092, lng: 105.8712, plusCode: '7P39+9H Phân khu Cảng, Hà Nội' },
+  '6': { title: 'Số 8 Ngõ 12 Đường Bờ Kè', address: 'Số 8, Ngõ 12, Đường Bờ Kè, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-boke-ngo12', x: 883, y: 367, lat: 21.0092, lng: 105.8712, plusCode: '7P39+9H Phân khu Cảng, Hà Nội' },
+  'loc-06': { title: 'Số 8 Ngõ 12 Đường Bờ Kè', address: 'Số 8, Ngõ 12, Đường Bờ Kè, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-boke-ngo12', x: 883, y: 367, lat: 21.0092, lng: 105.8712, plusCode: '7P39+9H Phân khu Cảng, Hà Nội' },
 
   // 7: Quán Bia 88 - Dot 7 (Bia 88) trên MAP.png
   '7': { title: 'Quán Bia 88', address: 'Số 88, Đường Vĩnh Hà, P. Cảng Đông, Hà Nội', category: 'food', roadNodeId: 'node-caucang-88', x: 997, y: 229, lat: 21.0035, lng: 105.8632, phone: '024 3982 8888', plusCode: '7P16+9X Cảng Đông, Hà Nội' },
   'loc-07': { title: 'Quán Bia 88', address: 'Số 88, Đường Vĩnh Hà, P. Cảng Đông, Hà Nội', category: 'food', roadNodeId: 'node-caucang-88', x: 997, y: 229, lat: 21.0035, lng: 105.8632, phone: '024 3982 8888', plusCode: '7P16+9X Cảng Đông, Hà Nội' },
 
   // 8: Số 52 Đường Cầu Cảng (Nhà Đạt Gà) - Dot 8 trên MAP.png
-  '8': { title: 'Số 52 Đường Cầu Cảng', address: 'Số 52, Đường Cầu Cảng, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-caucang-main', x: 731, y: 205, lat: 21.0048, lng: 105.8645, plusCode: '7P17+5P Phân khu Cảng, Hà Nội' },
-  'loc-08': { title: 'Số 52 Đường Cầu Cảng', address: 'Số 52, Đường Cầu Cảng, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-caucang-main', x: 731, y: 205, lat: 21.0048, lng: 105.8645, plusCode: '7P17+5P Phân khu Cảng, Hà Nội' },
+  '8': { title: 'Số 52 Đường Cầu Cảng', address: 'Số 52, Đường Cầu Cảng, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-caucang-main', x: 731, y: 206, lat: 21.0048, lng: 105.8645, plusCode: '7P17+5P Phân khu Cảng, Hà Nội' },
+  'loc-08': { title: 'Số 52 Đường Cầu Cảng', address: 'Số 52, Đường Cầu Cảng, P. Phân khu Cảng, Hà Nội', category: 'residential', roadNodeId: 'node-caucang-main', x: 731, y: 206, lat: 21.0048, lng: 105.8645, plusCode: '7P17+5P Phân khu Cảng, Hà Nội' },
 
   // 9: Chợ Cầu Cảng (Sạp bán gia cầm) - Dot 9 trên MAP.png
   '9': { title: 'Chợ Cầu Cảng', address: 'Khu B, Chợ Dân sinh Cầu Cảng, Hà Nội', category: 'shopping', roadNodeId: 'node-caucang-main', x: 772, y: 211, lat: 21.0051, lng: 105.8628, plusCode: '7P26+7R Phân khu Cảng, Hà Nội' },
@@ -249,12 +249,12 @@ export const LOCATION_METAS: Record<string, LocationMeta> = {
   'loc-11': { title: 'Nhà nghỉ Hoàng Gia', address: 'Đường Đoàn Kết, P. Cảng Đông, Hà Nội', category: 'residential', roadNodeId: 'node-doanket-west', x: 1080, y: 265, lat: 21.0070, lng: 105.8660, phone: '024 3862 9999', plusCode: '7P38+RH Phân khu Cảng, Hà Nội' },
 
   // 12: Số 18 Phố Cầu Bươu (Lạc Hà / Tùng) - Dot 12 trên MAP.png
-  '12': { title: 'Số 18 Phố Cầu Bươu', address: 'Số 18 Phố Cầu Bươu, Phường Lạc Hà, Hà Nội', category: 'residential', roadNodeId: 'node-caubuou-terminal', x: 673, y: 68, lat: 20.9554, lng: 105.8152, plusCode: '7P05+53 Phân khu Cảng, Hà Nội' },
-  'loc-12': { title: 'Số 18 Phố Cầu Bươu', address: 'Số 18 Phố Cầu Bươu, Phường Lạc Hà, Hà Nội', category: 'residential', roadNodeId: 'node-caubuou-terminal', x: 673, y: 68, lat: 20.9554, lng: 105.8152, plusCode: '7P05+53 Phân khu Cảng, Hà Nội' },
+  '12': { title: 'Số 18 Phố Cầu Bươu', address: 'Số 18 Phố Cầu Bươu, Phường Lạc Hà, Hà Nội', category: 'residential', roadNodeId: 'node-caubuou-terminal', x: 674, y: 71, lat: 20.9554, lng: 105.8152, plusCode: '7P05+53 Phân khu Cảng, Hà Nội' },
+  'loc-12': { title: 'Số 18 Phố Cầu Bươu', address: 'Số 18 Phố Cầu Bươu, Phường Lạc Hà, Hà Nội', category: 'residential', roadNodeId: 'node-caubuou-terminal', x: 674, y: 71, lat: 20.9554, lng: 105.8152, plusCode: '7P05+53 Phân khu Cảng, Hà Nội' },
 
   // 13: Cty TNHH Vận tải Sông Hồng - Dot 13 trên MAP.png
-  '13': { title: 'Cty TNHH Vận tải Sông Hồng', address: 'Số 15 Cảng Cát Lái, Hà Nội', category: 'shopping', roadNodeId: 'node-vantaish', x: 783, y: 187, lat: 21.0115, lng: 105.8725, phone: '024 3829 5566', plusCode: '7P49+J2 Phân khu Cảng, Hà Nội' },
-  'loc-13': { title: 'Cty TNHH Vận tải Sông Hồng', address: 'Số 15 Cảng Cát Lái, Hà Nội', category: 'shopping', roadNodeId: 'node-vantaish', x: 783, y: 187, lat: 21.0115, lng: 105.8725, phone: '024 3829 5566', plusCode: '7P49+J2 Phân khu Cảng, Hà Nội' },
+  '13': { title: 'Cty TNHH Vận tải Sông Hồng', address: 'Số 15 Cảng Cát Lái, Hà Nội', category: 'shopping', roadNodeId: 'node-vantaish', x: 784, y: 189, lat: 21.0115, lng: 105.8725, phone: '024 3829 5566', plusCode: '7P49+J2 Phân khu Cảng, Hà Nội' },
+  'loc-13': { title: 'Cty TNHH Vận tải Sông Hồng', address: 'Số 15 Cảng Cát Lái, Hà Nội', category: 'shopping', roadNodeId: 'node-vantaish', x: 784, y: 189, lat: 21.0115, lng: 105.8725, phone: '024 3829 5566', plusCode: '7P49+J2 Phân khu Cảng, Hà Nội' },
 
   // 14: CLB Billiards X-Club
   '14': { title: 'CLB Billiards X-Club', address: 'Số 68 Phố Vọng, Hai Bà Trưng, Hà Nội', category: 'entertainment', roadNodeId: 'node-phovong', x: 810, y: 280, lat: 20.9982, lng: 105.8451, phone: '0988 123 456', plusCode: '7P18+72 Phân khu Cảng, Hà Nội' },
@@ -269,8 +269,8 @@ export const LOCATION_METAS: Record<string, LocationMeta> = {
   'loc-16': { title: 'Sân bay Quốc tế Nội Bài (T1)', address: 'Xã Phú Minh, Sóc Sơn, Hà Nội', category: 'transit', roadNodeId: 'node-noibai-airport', x: 600, y: 25, lat: 21.2212, lng: 105.8072, phone: '1900 636 535', plusCode: '9PQG+7P Nội Bài, Hà Nội' },
 
   // 17: Nhà nghỉ Đạt Phú (Cảng Tây) - Dot 17 trên MAP.png
-  '17': { title: 'Nhà nghỉ Đạt Phú', address: 'Ngõ 12 Đường Bờ Kè, Phường Cảng Tây, Hà Nội', category: 'residential', roadNodeId: 'node-boke-ngo12', x: 633, y: 243, lat: 21.0080, lng: 105.8700, phone: '024 3869 2929', plusCode: '7P38+5X Cảng Tây, Hà Nội' },
-  'loc-17': { title: 'Nhà nghỉ Đạt Phú', address: 'Ngõ 12 Đường Bờ Kè, Phường Cảng Tây, Hà Nội', category: 'residential', roadNodeId: 'node-boke-ngo12', x: 633, y: 243, lat: 21.0080, lng: 105.8700, phone: '024 3869 2929', plusCode: '7P38+5X Cảng Tây, Hà Nội' },
+  '17': { title: 'Nhà nghỉ Đạt Phú', address: 'Ngõ 12 Đường Bờ Kè, Phường Cảng Tây, Hà Nội', category: 'residential', roadNodeId: 'node-boke-ngo12', x: 634, y: 243, lat: 21.0080, lng: 105.8700, phone: '024 3869 2929', plusCode: '7P38+5X Cảng Tây, Hà Nội' },
+  'loc-17': { title: 'Nhà nghỉ Đạt Phú', address: 'Ngõ 12 Đường Bờ Kè, Phường Cảng Tây, Hà Nội', category: 'residential', roadNodeId: 'node-boke-ngo12', x: 634, y: 243, lat: 21.0080, lng: 105.8700, phone: '024 3869 2929', plusCode: '7P38+5X Cảng Tây, Hà Nội' },
 
   // 18: Quán Cơm Chị Ba
   '18': { title: 'Quán Cơm Chị Ba', address: 'Số 15 Cầu Cảng, Hà Nội', category: 'food', roadNodeId: 'node-caucang-junction', x: 840, y: 250, lat: 21.0062, lng: 105.8652, phone: '0908 334 991', plusCode: '7P28+4A Phân khu Cảng, Hà Nội' },
@@ -306,7 +306,14 @@ export const LOCATION_METAS: Record<string, LocationMeta> = {
 
   // 26: Phòng Kỹ thuật Hình sự (PC54)
   '26': { title: 'Phòng Kỹ thuật Hình sự (PC54)', address: 'TP. Hà Nội', category: 'government', roadNodeId: 'node-city-center', x: 460, y: 410, lat: 21.0245, lng: 105.8510, plusCode: '7P53+1M Sông Hồng, Hà Nội' },
-  'loc-26': { title: 'Phòng Kỹ thuật Hình sự (PC54)', address: 'TP. Hà Nội', category: 'government', roadNodeId: 'node-city-center', x: 460, y: 410, lat: 21.0245, lng: 105.8510, plusCode: '7P53+1M Sông Hồng, Hà Nội' }
+}
+
+export const SCANNED_MAP_DOT_CODES = new Set(['1', '2', '3', '4', '5', '6', '7', '8', '9', '12', '13', '17'])
+
+export function isScannedMapLocation(id: string): boolean {
+  if (!id) return false
+  const norm = id.replace(/^loc-0?/, '')
+  return SCANNED_MAP_DOT_CODES.has(norm) || SCANNED_MAP_DOT_CODES.has(id)
 }
 
 export function getLocationMeta(rawId: string): LocationMeta | undefined {

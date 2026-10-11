@@ -3,16 +3,12 @@
 import { useState, useRef } from "react";
 import {
   Lock,
-  Unlock,
   Home,
-  Eye,
-  EyeOff,
-  Smartphone,
-  Fingerprint,
   ShieldCheck,
-  Phone,
   MessageSquare,
+  Users,
   X,
+  EyeOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
@@ -70,7 +66,7 @@ export function IPhoneFrame({
   const frameless = false;
   const [isLocked, setIsLocked] = useState(false);
   const [activeApp, setActiveApp] = useState<IPhoneApp>(null);
-  const [showAssistiveTouch, setShowAssistiveTouch] = useState(false);
+  const [showAssistiveTouch, setShowAssistiveTouch] = useState(true);
   const [assistiveMenuOpen, setAssistiveMenuOpen] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [screenPage, setScreenPage] = useState<number>(0);
@@ -100,55 +96,9 @@ export function IPhoneFrame({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-hidden py-0 sm:py-1">
-      {/* Top Quick Control Bar (Cùng dòng: Khóa máy, Home ảo, Về Home, Đóng X) */}
+      {/* Top Quick Control Bar (Về Home khi đang trong app, Đóng X) */}
       <div className="flex items-center justify-between w-full max-w-[390px] px-2 text-[11px] font-mono shrink-0 mb-1.5 z-40">
-        <div className="flex items-center gap-1.5">
-          {/* Lock / Unlock Screen */}
-          <button
-            onClick={() => setIsLocked(!isLocked)}
-            className={cn(
-              "flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
-              isLocked
-                ? "bg-[#30D158]/15 text-[#30D158] border-[#30D158]/40 font-semibold hover:bg-[#30D158]/25"
-                : "bg-[#1C1C1E] text-zinc-300 hover:text-white border-white/10 hover:border-white/20",
-            )}
-            title={
-              isLocked ? "Bấm để Mở khóa màn hình" : "Bấm để Khóa màn hình"
-            }
-          >
-            {isLocked ? (
-              <Unlock className="size-3 text-[#30D158]" />
-            ) : (
-              <Lock className="size-3 text-[#FF453A]" />
-            )}
-            <span>{isLocked ? "Mở khóa" : "Khóa máy"}</span>
-          </button>
-
-          {/* AssistiveTouch Toggle */}
-          <button
-            onClick={() => setShowAssistiveTouch(!showAssistiveTouch)}
-            className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
-              showAssistiveTouch
-                ? "bg-[#0A84FF]/15 text-[#0A84FF] border-[#0A84FF]/40 font-medium hover:bg-[#0A84FF]/25"
-                : "bg-[#1C1C1E] text-zinc-400 hover:text-zinc-200 border-white/10 hover:border-white/20",
-            )}
-            title={
-              showAssistiveTouch
-                ? "Ẩn nút Home ảo (AssistiveTouch)"
-                : "Hiện nút Home ảo (AssistiveTouch)"
-            }
-          >
-            {showAssistiveTouch ? (
-              <EyeOff className="size-3 text-[#0A84FF]" />
-            ) : (
-              <Eye className="size-3 text-zinc-400" />
-            )}
-            <span>{showAssistiveTouch ? "Home ảo" : "Bật Home"}</span>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-1.5 ml-auto">
+        <div>
           {activeApp && (
             <button
               onClick={() => setActiveApp(null)}
@@ -159,18 +109,18 @@ export function IPhoneFrame({
               <span>Về Home</span>
             </button>
           )}
-
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="size-7 rounded-lg flex items-center justify-center bg-[#1C1C1E] text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10 active:scale-95 transition-all cursor-pointer shadow-sm ml-1"
-              title="Đóng điện thoại"
-              aria-label="Đóng điện thoại"
-            >
-              <X className="size-4 text-[#d9a066]" />
-            </button>
-          )}
         </div>
+
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="size-7 rounded-lg flex items-center justify-center bg-[#1C1C1E] text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10 active:scale-95 transition-all cursor-pointer shadow-sm ml-auto"
+            title="Đóng điện thoại"
+            aria-label="Đóng điện thoại"
+          >
+            <X className="size-4 text-[#d9a066]" />
+          </button>
+        )}
       </div>
 
       {/* PHONE CONTAINER: Exact iPhone 375x667 Canvas Aspect Ratio */}
@@ -369,76 +319,8 @@ export function IPhoneFrame({
                   </span>
                 </div>
 
-                {/* Center Widgets Container */}
-                <div className="space-y-3 max-w-[320px] mx-auto w-full my-auto relative z-10">
-                  {/* Figma Ocean Waves Ambient / Cupertino Sounds Music Widget (Node 22:403 - 320x56px, blur 40px) */}
-                  <div className="w-full h-[56px] px-2 py-2 rounded-[12px] bg-white/20 backdrop-blur-[40px] shadow-[0_4px_20px_rgba(0,0,0,0.15)] flex items-center justify-between">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="size-[40px] rounded-[8px] bg-white/90 shadow-[0_1px_2px_rgba(0,0,0,0.05)] flex items-center justify-center shrink-0">
-                        <svg
-                          className="w-[11px] h-[16.5px] fill-[#0058BC]"
-                          viewBox="0 0 12 18"
-                        >
-                          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                        </svg>
-                      </div>
-                      <div className="min-w-0 flex flex-col justify-center">
-                        <div className="text-[13px] font-medium text-white tracking-normal leading-[18px] truncate">
-                          Ocean Waves Ambient
-                        </div>
-                        <div className="text-[12px] font-normal text-white/80 tracking-normal leading-[20px] truncate">
-                          Now Playing • Cupertino Sounds
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsPlayingMusic(!isPlayingMusic);
-                      }}
-                      className="pr-1 flex items-center justify-center text-white/90 hover:text-white active:scale-95 transition-transform cursor-pointer shrink-0 ml-2"
-                      title={isPlayingMusic ? "Tạm dừng phát" : "Phát nhạc"}
-                    >
-                      {isPlayingMusic ? (
-                        <span className="text-[12px] font-bold">❚❚</span>
-                      ) : (
-                        <svg
-                          className="w-[9.17px] h-[11.67px] fill-white/90"
-                          viewBox="0 0 10 12"
-                        >
-                          <path d="M0 0l10 6-10 6V0z" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Lockscreen Clue Notifications */}
-                  <div className="p-2.5 rounded-2xl bg-black/35 backdrop-blur-xl border border-white/15 shadow-xl">
-                    <div className="flex items-center justify-between text-[10px] text-white/70 mb-0.5">
-                      <span className="font-semibold flex items-center gap-1 text-[#FF453A]">
-                        <Phone className="size-3 text-[#FF453A]" /> Cuộc gọi nhỡ
-                        (1) • Hà
-                      </span>
-                      <span className="font-mono text-[9px]">12:15</span>
-                    </div>
-                    <p className="text-[11px] text-white/95">
-                      Hà đã để lại 1 thư thoại (0:08)
-                    </p>
-                  </div>
-
-                  <div className="p-2.5 rounded-2xl bg-black/35 backdrop-blur-xl border border-white/15 shadow-xl">
-                    <div className="flex items-center justify-between text-[10px] text-white/70 mb-0.5">
-                      <span className="font-semibold flex items-center gap-1 text-white">
-                        <MessageSquare className="size-3 text-[#30D158]" /> Tin
-                        nhắn • Thảo Vy
-                      </span>
-                      <span className="font-mono text-[9px]">12:30</span>
-                    </div>
-                    <p className="text-[11px] text-white/95 line-clamp-2 leading-relaxed">
-                      Ok, vậy hẹn anh ở địa chỉ cũ trên bản đồ nhé.
-                    </p>
-                  </div>
-                </div>
+                {/* Center Empty Space (Không hiện thông báo/widget, giữ màn hình khóa sạch) */}
+                <div className="flex-1 my-auto" />
 
                 {/* Bottom Bar: Classic iOS 9 "slide to unlock" + Camera Glyph (Figma Node 22:417) */}
                 <div className="relative z-10 w-full flex flex-col items-center pb-2 pt-1">
@@ -459,23 +341,18 @@ export function IPhoneFrame({
                         › trượt để mở khóa
                       </span>
                     </div>
-                    {/* Bottom-right Camera Quick-Action Button (Node 22:421: 44x44px circle, fill white/10, blur 12px) */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsLocked(false);
-                        setActiveApp("photos");
-                      }}
-                      className="size-[44px] rounded-full bg-white/10 backdrop-blur-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-white/10 flex items-center justify-center text-white/90 hover:text-white hover:bg-white/20 active:scale-95 transition-all cursor-pointer"
-                      title="Mở nhanh Thư viện ảnh / Máy ảnh"
+                    {/* Bottom-right Camera Quick-Action Glyph (Node 22:421) */}
+                    <div
+                      className="size-[44px] rounded-full bg-white/10 backdrop-blur-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-white/10 flex items-center justify-center text-white/70 select-none opacity-60"
+                      title="Máy ảnh (Tạm thời khóa)"
                     >
                       <svg
-                        className="w-[18.33px] h-[16.5px] fill-white/90 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]"
+                        className="w-[18.33px] h-[16.5px] fill-white/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]"
                         viewBox="0 0 19 17"
                       >
                         <path d="M4 4h3l2-2h6l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm8 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6z" />
                       </svg>
-                    </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -656,13 +533,13 @@ export function IPhoneFrame({
 
                         <button
                           onClick={() => {
-                            setShowAssistiveTouch(false);
+                            setActiveApp("contacts");
                             setAssistiveMenuOpen(false);
                           }}
-                          className="p-3 rounded-2xl bg-[#2C2C2E]/80 hover:bg-[#3A3A3C] flex flex-col items-center gap-1.5 text-white transition-colors cursor-pointer"
+                          className="p-3 rounded-2xl bg-[#2C2C2E] hover:bg-[#3A3A3C] flex flex-col items-center gap-1.5 text-white transition-colors cursor-pointer"
                         >
-                          <EyeOff className="size-5 text-[#FF3B30]" />
-                          <span className="text-[9.5px]">Ẩn Home ảo</span>
+                          <Users className="size-5 text-[#0A84FF]" />
+                          <span className="text-[9.5px]">Danh bạ</span>
                         </button>
                       </div>
 

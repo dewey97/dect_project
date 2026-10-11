@@ -34,6 +34,7 @@ RUN adduser --system --uid 1001 nextjs
 
 # Copy static assets and standalone build artifacts
 COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/data ./data
 
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

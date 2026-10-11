@@ -270,22 +270,28 @@ export function HeroInteractive({
       if (item.title) {
         const titleLower = item.title.toLowerCase().trim();
         map.set(titleLower, normalized);
-        // Also map clean name from title (e.g. "Ảnh chân dung Lê Quang Vũ" -> "vũ", "lê quang vũ")
-        if (titleLower.includes("khang")) map.set("khang", normalized);
-        if (titleLower.includes("vũ") || titleLower.includes("vu"))
-          map.set("vu", normalized);
-        if (titleLower.includes("tùng") || titleLower.includes("tung"))
-          map.set("tung", normalized);
-        if (titleLower.includes("hà") || titleLower.includes("ha"))
-          map.set("ha", normalized);
-        if (titleLower.includes("mai")) map.set("mai", normalized);
-        if (titleLower.includes("đạt") || titleLower.includes("dat"))
-          map.set("dat", normalized);
-        if (titleLower.includes("lụa") || titleLower.includes("lua"))
-          map.set("lua", normalized);
-        if (titleLower.includes("vy")) map.set("vy", normalized);
-        if (titleLower.includes("tiến") || titleLower.includes("tien"))
-          map.set("tien", normalized);
+        const pc = (item.photo_code || "").toLowerCase().trim();
+        const isAvatar = pc.startsWith("avatar_") || (item.category || "").toUpperCase().trim() === "AVATAR" || titleLower.includes("chân dung");
+
+        // Only map suspect keys if the row is truly an avatar/portrait photo
+        if (isAvatar) {
+          if (titleLower.includes("khang")) map.set("khang", normalized);
+          if (titleLower.includes("vũ") || titleLower.includes("vu"))
+            map.set("vu", normalized);
+          if (titleLower.includes("tùng") || titleLower.includes("tung"))
+            map.set("tung", normalized);
+          if (titleLower.includes("hà") || titleLower.includes("ha"))
+            map.set("ha", normalized);
+          if (titleLower.includes("mai")) map.set("mai", normalized);
+          if (titleLower.includes("đạt") || titleLower.includes("dat"))
+            map.set("dat", normalized);
+          if (titleLower.includes("lụa") || titleLower.includes("lua"))
+            map.set("lua", normalized);
+          if (titleLower.includes("vy")) map.set("vy", normalized);
+          if (titleLower.includes("tiến") || titleLower.includes("tien"))
+            map.set("tien", normalized);
+        }
+
         if (
           titleLower.includes("thi thể") ||
           titleLower.includes("thi-the") ||
