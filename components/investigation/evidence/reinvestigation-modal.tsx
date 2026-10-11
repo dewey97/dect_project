@@ -216,7 +216,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
         Boolean(item.drive_url || item.direct_cdn_url || item.url || item.photo_url || item.link_anh || item.image_url)
       )
       .map((item: any, idx: number) => {
-        const photoCode = item.photo_code || item.photo_id || item.id || `photo-${idx + 1}`
+        const photoCode = item.code || item.photo_code || item.photo_id || item.id || `photo-${idx + 1}`
         const driveUrl = item.drive_url || ''
         const rawUrl =
           item.direct_cdn_url ||
@@ -228,6 +228,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
           ''
         const normUrl = normalizeImageUrl(rawUrl)
         const title =
+          item.label ||
           item.title ||
           item.Title ||
           item.file_name ||
@@ -236,7 +237,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
           item['tên ảnh'] ||
           `Ảnh #${idx + 1}`
         return {
-          id: photoCode, // ID photo_code chuẩn trong sheet
+          id: photoCode, // ID code / photo_code chuẩn trong sheet
           title,
           url: normUrl,
           driveUrl,

@@ -25,6 +25,9 @@ export interface SheetEvidenceRow {
   position_x?: string | number;
   position_y?: string | number;
   logic_data?: string;
+  drive_url?: string;
+  photo_code?: string;
+  title?: string;
   [key: string]: any;
 }
 

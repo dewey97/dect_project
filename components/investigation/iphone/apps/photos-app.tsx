@@ -22,7 +22,7 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null);
   const [showExifInfo, setShowExifInfo] = useState(false);
 
-  const { data: sheetPhotos, loading, error } = usePhoneData("photos");
+  const { data: sheetPhotos, loading, error } = usePhoneData("evidences");
   const [isBoxUnlocked, setIsBoxUnlocked] = useState(false);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
         Boolean(item.drive_url || item.direct_cdn_url || item.url || item.photo_url)
     )
     .filter((item: any) => {
-      const code = (item.photo_code || item.photo_id || "").toUpperCase().trim();
+      const code = (item.code || item.photo_code || item.photo_id || "").toUpperCase().trim();
       // 3 vật chứng hộp thiếc D-06, D-05, D-04 chỉ được mở ra sau khi đã trả lời đúng mã khóa
       if (["D-06", "D-05", "D-04", "D06", "D05", "D04"].includes(code)) {
         return isBoxUnlocked;
@@ -49,11 +49,13 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
       return true;
     })
     .map((item: any, idx: number) => ({
-      id: item.photo_code || item.photo_id || `photo-${idx + 1}`,
+      id: item.code || item.photo_code || item.photo_id || `photo-${idx + 1}`,
       filename:
+        item.label ||
         item.title ||
         item.file_name ||
         item.filename ||
+        item.code ||
         item.photo_code ||
         `IMG_${idx + 1000}.png`,
       driveUrl: normalizeImageUrl(

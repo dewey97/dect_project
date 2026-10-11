@@ -113,7 +113,16 @@ async function fetchPublicSheetRows(spreadsheetId: string, tab: string): Promise
     throw new Error(`Google Sheets public export failed with HTTP ${res.status}`);
   }
   const text = await res.text();
-  return parseCsvRows(text);
+  const parsed = parseCsvRows(text);
+  // Quirk detection: Nếu tab không phải 'design' mà gviz trả về header của tab design,
+  // nghĩa là tab yêu cầu không tồn tại và Google Sheets tự redirect về tab đầu tiên.
+  if (tab !== "design" && parsed.length > 0) {
+    const firstRowStr = parsed[0].join(" ").toLowerCase();
+    if (firstRowStr.includes("link canva") || (firstRowStr.includes("poster") && firstRowStr.includes("tên"))) {
+      throw new Error(`Tab '${tab}' does not exist on spreadsheet (redirected to default tab)`);
+    }
+  }
+  return parsed;
 }
 
 export async function GET(request: Request) {
@@ -149,36 +158,43 @@ export async function GET(request: Request) {
   const spreadsheetId =
     process.env.GOOGLE_SHEETS_ID || DEFAULT_SPREADSHEET_ID;
 
-  let rawRows: any[][] = [];
+  const auth = createGoogleAuth();
 
-  try {
-    const auth = createGoogleAuth();
-    if (auth) {
-      const sheets = google.sheets({ version: "v4", auth });
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: `'${tab}'!A1:Z500`,
-      });
-      rawRows = response.data.values || [];
-    } else {
-      // Chế độ Public Fetch mượt mà khi không có Service Account
-      rawRows = await fetchPublicSheetRows(spreadsheetId, tab);
-    }
-  } catch (primaryError: any) {
-    console.warn("Primary Google Sheets fetch failed, falling back to public export:", primaryError?.message);
+  const fetchTab = async (sheetName: string): Promise<any[][]> => {
     try {
-      rawRows = await fetchPublicSheetRows(spreadsheetId, tab);
-    } catch (fallbackError: any) {
-      console.error("Both primary and public fetch failed:", fallbackError);
-      return NextResponse.json({
-        success: false,
-        caseId: rawCaseId,
-        tab,
-        totalCount: 0,
-        data: [],
-        error: fallbackError.message || primaryError?.message || "Failed to fetch data from Google Sheets",
-      });
+      if (auth) {
+        const sheets = google.sheets({ version: "v4", auth });
+        const response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: `'${sheetName}'!A1:Z500`,
+        });
+        return response.data.values || [];
+      } else {
+        return await fetchPublicSheetRows(spreadsheetId, sheetName);
+      }
+    } catch {
+      try {
+        return await fetchPublicSheetRows(spreadsheetId, sheetName);
+      } catch {
+        return [];
+      }
     }
+  };
+
+  let rawRows: any[][] = [];
+  if (tab === "photos" || tab === "evidences") {
+    rawRows = await fetchTab("evidences");
+    if (rawRows.length === 0) {
+      rawRows = await fetchTab("photos");
+    }
+    if (rawRows.length === 0) {
+      rawRows = await fetchTab("photos_old");
+    }
+    if (rawRows.length === 0) {
+      rawRows = await fetchTab("evidences_old");
+    }
+  } else {
+    rawRows = await fetchTab(tab);
   }
 
   if (rawRows.length === 0) {
@@ -201,6 +217,29 @@ export async function GET(request: Request) {
           obj[header] = row[index] !== undefined ? row[index] : "";
         }
       });
+
+      // Two-way aliasing: Đảm bảo tương thích 100% giữa code / photo_code và label / title
+      const canonicalCode = String(obj.code || obj.photo_code || obj.photo_id || "").trim();
+      const canonicalLabel = String(obj.label || obj.title || obj.name || "").trim();
+      const canonicalUrl = String(obj.drive_url || obj.direct_cdn_url || obj.url || "").trim();
+      const canonicalDesc = String(obj.description || obj.description_prompt || "").trim();
+
+      if (canonicalCode) {
+        obj.code = canonicalCode;
+        obj.photo_code = canonicalCode;
+      }
+      if (canonicalLabel) {
+        obj.label = canonicalLabel;
+        obj.title = canonicalLabel;
+      }
+      if (canonicalUrl) {
+        obj.drive_url = canonicalUrl;
+      }
+      if (canonicalDesc) {
+        obj.description = canonicalDesc;
+        obj.description_prompt = canonicalDesc;
+      }
+
       return obj;
     });
 
