@@ -60,6 +60,7 @@ export interface PinPoint {
     | "dark";
   pulseBorder?: boolean;
   photoUrl?: string;
+  isAvatar?: boolean;
   noteTextureUrl?: string;
   isLocked?: boolean;
   isSolved?: boolean;

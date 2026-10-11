@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" width="300" height="400">
+  <defs>
+    <radialGradient id="vignette" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#2a2622" />
+      <stop offset="100%" stop-color="#141210" />
+    </radialGradient>
+    <linearGradient id="silhouetteGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4a443d" />
+      <stop offset="100%" stop-color="#26221d" />
+    </linearGradient>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.03"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="300" height="400" fill="url(#vignette)" />
+  <rect width="300" height="400" fill="url(#grid)" />
+
+  <!-- Archival Corner Registration Marks -->
+  <path d="M 16 28 L 16 16 L 28 16" fill="none" stroke="#78716c" stroke-width="1.2" stroke-opacity="0.4" />
+  <path d="M 284 28 L 284 16 L 272 16" fill="none" stroke="#78716c" stroke-width="1.2" stroke-opacity="0.4" />
+  <path d="M 16 372 L 16 384 L 28 384" fill="none" stroke="#78716c" stroke-width="1.2" stroke-opacity="0.4" />
+  <path d="M 284 372 L 284 384 L 272 384" fill="none" stroke="#78716c" stroke-width="1.2" stroke-opacity="0.4" />
+
+  <!-- Center Crosshair Lines -->
+  <line x1="150" y1="36" x2="150" y2="48" stroke="#78716c" stroke-width="1" stroke-opacity="0.3" />
+  <line x1="150" y1="320" x2="150" y2="332" stroke="#78716c" stroke-width="1" stroke-opacity="0.3" />
+  <line x1="32" y1="170" x2="44" y2="170" stroke="#78716c" stroke-width="1" stroke-opacity="0.3" />
+  <line x1="256" y1="170" x2="268" y2="170" stroke="#78716c" stroke-width="1" stroke-opacity="0.3" />
+
+  <!-- Silhouette Bust -->
+  <!-- Head -->
+  <circle cx="150" cy="140" r="48" fill="url(#silhouetteGrad)" />
+  <!-- Neck -->
+  <path d="M 134 180 L 134 205 L 166 205 L 166 180 Z" fill="url(#silhouetteGrad)" />
+  <!-- Shoulders & Torso -->
+  <path d="M 68 288 C 72 230, 110 206, 134 204 L 166 204 C 190 206, 228 230, 232 288 C 233 294, 230 300, 220 300 L 80 300 C 70 300, 67 294, 68 288 Z" fill="url(#silhouetteGrad)" />
+
+  <!-- Question Mark / Dossier Badge Overlay -->
+  <circle cx="150" cy="140" r="18" fill="#181512" fill-opacity="0.7" stroke="#78716c" stroke-width="1" stroke-opacity="0.4" />
+  <text x="150" y="146" text-anchor="middle" font-family="monospace, Courier, sans-serif" font-size="16" font-weight="bold" fill="#a8a29e">?</text>
+
+  <!-- Confidential Stamp Badge -->
+  <g transform="translate(150, 344)">
+    <rect x="-85" y="-14" width="170" height="24" rx="2" fill="#181512" fill-opacity="0.85" stroke="#78716c" stroke-width="1" stroke-opacity="0.5" />
+    <text x="0" y="2" text-anchor="middle" font-family="monospace, Courier, sans-serif" font-size="10" font-weight="bold" fill="#d6d3d1" letter-spacing="1.5">HỒ SƠ BẢO MẬT</text>
+  </g>
+
+  <!-- File Subtitle -->
+  <text x="150" y="378" text-anchor="middle" font-family="monospace, Courier, sans-serif" font-size="8" fill="#78716c" letter-spacing="1">CHƯA CẬP NHẬT ẢNH</text>
+</svg>

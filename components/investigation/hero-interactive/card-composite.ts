@@ -37,8 +37,7 @@ export const resolveSuspectPhotoUrl = (
       const liveCrime =
         photosMap.get("crime_scene") ||
         photosMap.get("chalk_outline") ||
-        photosMap.get("thi_the") ||
-        photosMap.get("c0-pin-crime-scene");
+        photosMap.get("thi_the");
       if (liveCrime) return liveCrime;
     }
     if (lower.includes("khang")) {
@@ -61,9 +60,9 @@ export const resolveSuspectPhotoUrl = (
     if (char && char.avatarUrl) return char.avatarUrl;
   }
 
-  // 2. Fallback to local asset if not found in live Google Sheets
+  // 2. Fallback if not found in live Google Sheets
   if (isCrimeScenePin) {
-    return "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png";
+    return "/images/avatar_placeholder.svg";
   }
 
   return undefined;
@@ -126,11 +125,6 @@ export const getCompositeCard = (
       : null;
   }
   const url = normalizeImageUrl(rawUrl);
-
-  // If already pre-rendered local asset with tape, return image directly
-  if (url.includes("pinned_photos_with_tape") || url.includes("pinned_tape_")) {
-    return getLoadedImage(url, imageCache, fallbackUrl, onLoaded);
-  }
 
   const rawLabel = (label || "NẠN NHÂN").trim();
   let cleanLabel = rawLabel.replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim();

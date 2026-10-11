@@ -239,7 +239,7 @@ export function HeroInteractive({
 
   // ── Live Google Sheets Photos Integration ──
   const { data: sheetPhotos } = usePhoneData(
-    "photos",
+    "evidences",
     currentCaseId || "case-000",
   );
 
@@ -250,8 +250,9 @@ export function HeroInteractive({
       const liveUrl = (item.direct_cdn_url || item.drive_url || "").trim();
       if (!liveUrl) continue;
       const normalized = normalizeImageUrl(liveUrl);
-      if (item.photo_code) {
-        const pc = item.photo_code.toLowerCase().trim();
+      const code = item.code || item.photo_code;
+      if (code) {
+        const pc = code.toLowerCase().trim();
         map.set(pc, normalized);
         if (pc.startsWith("avatar_")) {
           map.set(pc.replace("avatar_", ""), normalized);
@@ -260,6 +261,7 @@ export function HeroInteractive({
           pc === "crime_scene" ||
           pc === "chalk_outline" ||
           pc === "thi_the" ||
+          pc === "a-06" ||
           pc.includes("chalk")
         ) {
           map.set("crime_scene", normalized);
@@ -267,10 +269,11 @@ export function HeroInteractive({
           map.set("thi_the", normalized);
         }
       }
-      if (item.title) {
-        const titleLower = item.title.toLowerCase().trim();
+      const title = item.label || item.title;
+      if (title) {
+        const titleLower = title.toLowerCase().trim();
         map.set(titleLower, normalized);
-        const pc = (item.photo_code || "").toLowerCase().trim();
+        const pc = (item.code || item.photo_code || "").toLowerCase().trim();
         const isAvatar = pc.startsWith("avatar_") || (item.category || "").toUpperCase().trim() === "AVATAR" || titleLower.includes("chân dung");
 
         // Only map suspect keys if the row is truly an avatar/portrait photo
@@ -1265,9 +1268,14 @@ export function HeroInteractive({
           pin.id.startsWith("admin-pin-") || pin.id.startsWith("custom-pin-");
 
         const isAvatarPin =
+          Boolean((pin as any).isAvatar) ||
           pin.id.startsWith("node-suspect-") ||
           pin.id.startsWith("suspect-") ||
-          pin.id === "c0-pin-victim-khang" ||
+          pin.id.toLowerCase().includes("avatar_") ||
+          (pin.label && (
+            pin.label.toLowerCase().includes("ảnh chân dung") ||
+            pin.label.toLowerCase().includes("chân dung")
+          )) ||
           Boolean(
             findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id),
           );
@@ -1292,13 +1300,9 @@ export function HeroInteractive({
             findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
           const fallbackUrl =
             char?.avatarUrl ||
-            (pin.id.includes("crime-scene") ||
-            pin.id.includes("thi-the") ||
-            pin.id.includes("chalk")
-              ? "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png"
-              : pin.id.includes("phone")
-                ? "/phone.png"
-                : "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png");
+            (pin.id.includes("phone")
+              ? "/phone.png"
+              : "/images/avatar_placeholder.svg");
           const photoUrl =
             rawPin.photoUrl || resolveSuspectPhotoUrl(pin) || fallbackUrl;
 
