@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   FileText,
@@ -11,6 +11,17 @@ import {
   Box,
   X,
   Home,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  Minimize2,
+  PanelRightClose,
+  PanelRightOpen,
+  GripVertical,
+  Eye,
+  Layers,
+  FolderOpen,
+  Search,
 } from "lucide-react";
 import { PDFViewerModal } from "@/components/investigation/pdf-viewer-modal";
 import { CASES } from "@/lib/mock-data";
@@ -37,9 +48,10 @@ import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
-import { PhoneSimulator } from "@/components/investigation/phone-simulator";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
+import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { normalizeImageUrl } from "@/lib/utils";
 import {
   getStorageItem,
   setStorageItem,
@@ -78,6 +90,18 @@ export default function WebEvidencePage() {
 
   // Category filter: 'all' | 'pdf' | 'evidence'
   const [filterTab, setFilterTab] = useState<"all" | "pdf" | "evidence">("all");
+
+  // Nạp dữ liệu Live CMS từ tab 'evidences' trên Google Sheets
+  const { data: sheetEvidences, loading: isLoadingSheet } = usePhoneData<any>("evidences", "case_000");
+
+  // 3-Zone Layout State (Desktop):
+  // Zone 1 (Bảng Điều Tra): width %
+  // Zone 2 (Danh mục Preview Card ở giữa): width cố định (240px -> 320px) hoặc tự co giãn
+  // Zone 3 (Trình duyệt chi tiết PDF / Vật chứng bên phải)
+  const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
+  const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false); // Phóng to trình đọc PDF toàn nửa phải
+  const [boardWidthPercent, setBoardWidthPercent] = useState<number>(48);
+  const [isDraggingSplit, setIsDraggingSplit] = useState<boolean>(false);
 
   // Phase filter: 'all' | 0 | 1 | 2 | 3
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<
@@ -125,6 +149,56 @@ export default function WebEvidencePage() {
     } else {
       setUnlockedPhase(1);
     }
+
+    // Khôi phục layout preference từ storage
+    const savedRatio = getStorageItem("web_board_split_ratio");
+    if (savedRatio) {
+      const parsed = parseFloat(savedRatio);
+      if (!isNaN(parsed) && parsed >= 30 && parsed <= 70) {
+        setBoardWidthPercent(parsed);
+      }
+    }
+    const savedCollapsed = getStorageItem("web_dossier_collapsed");
+    if (savedCollapsed === "true") {
+      setIsDossierCollapsed(true);
+    }
+  }, []);
+
+  // Xử lý kéo thả thanh phân chia giữa Vùng 1 (Board) và Vùng 2+3 (Dossier)
+  useEffect(() => {
+    if (!isDraggingSplit) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const windowWidth = window.innerWidth;
+      if (windowWidth < 1024) return; // Chỉ áp dụng trên desktop
+
+      // Giới hạn tỉ lệ Board từ 30% đến 65% để chừa không gian cho Zone 2 & 3
+      const newRatio = (e.clientX / windowWidth) * 100;
+      const clampedRatio = Math.min(Math.max(newRatio, 30), 65);
+      setBoardWidthPercent(clampedRatio);
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingSplit(false);
+      setStorageItem("web_board_split_ratio", boardWidthPercent.toString());
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDraggingSplit, boardWidthPercent]);
+
+  const toggleDossierCollapse = useCallback(() => {
+    detectiveAudio.playPaperRustle();
+    setIsDossierCollapsed((prev) => {
+      const next = !prev;
+      setStorageItem("web_dossier_collapsed", next ? "true" : "false");
+      return next;
+    });
   }, []);
 
   const isPhaseUnlocked = useCallback(
@@ -162,45 +236,161 @@ export default function WebEvidencePage() {
     window.location.reload();
   };
 
-  const filteredPdfs = CASE_000_PDFS.filter((doc) => {
-    if (!isPhaseUnlocked(doc.phase)) return false;
-    if (filterTab === "evidence") return false;
-    if (selectedPhaseFilter !== "all" && doc.phase !== selectedPhaseFilter)
-      return false;
-    return true;
-  });
+  // Hợp nhất dữ liệu Live Sheet (tab 'evidences') với Fallback local:
+  // Nếu Sheet có dữ liệu, ưu tiên nạp từ Sheet; nếu một mục chưa có link Drive thì dùng link PDF/ảnh local tương ứng
+  const effectiveItems = useMemo(() => {
+    if (!sheetEvidences || sheetEvidences.length === 0) {
+      // Fallback khi chưa nạp xong Sheet
+      return [
+        ...CASE_000_PDFS.map((doc): CombinedItem => ({
+          type: "pdf",
+          data: doc,
+          phase: doc.phase,
+          order: doc.order,
+        })),
+        ...CASE_000_EVIDENCE.map((item): CombinedItem => ({
+          type: "evidence",
+          data: item,
+          phase: item.phase,
+          order: item.order,
+        })),
+      ];
+    }
 
-  const filteredEvidence = CASE_000_EVIDENCE.filter((item) => {
-    if (!isPhaseUnlocked(item.phase)) return false;
-    if (filterTab === "pdf") return false;
-    if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter)
-      return false;
-    return true;
-  });
+    // Lọc bỏ avatar nhân vật và scene chỉ dùng cho bảng ghim
+    const validRows = sheetEvidences.filter((row: any) => {
+      const c = String(row.code || "").trim();
+      return c && !c.startsWith("avatar_") && c !== "crime_scene";
+    });
 
-  const combinedItems: CombinedItem[] = [
-    ...filteredPdfs.map((doc): CombinedItem => ({
-      type: "pdf",
-      data: doc,
-      phase: doc.phase,
-      order: doc.order,
-    })),
-    ...filteredEvidence.map((item): CombinedItem => ({
-      type: "evidence",
-      data: item,
-      phase: item.phase,
-      order: item.order,
-    })),
-  ].sort((a, b) => a.order - b.order);
+    return validRows.map((row: any, idx: number): CombinedItem => {
+      const code = String(row.code || "").trim();
+      const title = String(row.label || row.title || `Vật chứng #${code}`).trim();
+      const driveUrl = String(row.drive_url || "").trim();
+      const cat = String(row.category || "").toUpperCase();
+      const boStr = String(row["bộ hồ sơ"] || "").toUpperCase();
+
+      // Xác định Phase dựa theo nhãn 'Bộ hồ sơ' trên Sheet (A = 1, B = 2, C = 3, D = 3, còn lại mặc định 0)
+      let phase = 0;
+      if (boStr === "A" || code.startsWith("A-")) phase = 1;
+      else if (boStr === "B" || code.startsWith("B-") || boStr === "E" || code.startsWith("E-")) phase = 2;
+      else if (boStr === "C" || code.startsWith("C-") || boStr === "D" || code.startsWith("D-")) phase = 3;
+
+      // Phân loại: Nếu có chứa chữ 'Ảnh' hoặc category = 'FORENSIC' / 'SCENE' -> type 'evidence' (Ảnh)
+      // Nếu có category = 'DOCUMENT' / 'DOSSIER' hoặc tên biên bản/lý lịch/lời khai -> type 'pdf'
+      const isPhoto =
+        title.toLowerCase().includes("ảnh") ||
+        cat === "FORENSIC" ||
+        cat === "SCENE" ||
+        title.toLowerCase().includes("lược") ||
+        title.toLowerCase().includes("hoa xoan") ||
+        title.toLowerCase().includes("bùa yêu");
+
+      if (isPhoto) {
+        // Tìm ảnh fallback local nếu chưa có Drive link
+        const localFallback = CASE_000_EVIDENCE.find(
+          (e) => e.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(e.title.toLowerCase())
+        );
+        const imgUrl = driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
+
+        return {
+          type: "evidence",
+          phase,
+          order: idx * 10,
+          data: {
+            id: `sheet-${code}`,
+            caseId: "case-000",
+            kind: "photo",
+            title,
+            preview: String(row.description || title),
+            evidenceId: code,
+            thumbnail: imgUrl,
+            timestamp: "24/07/2016",
+            recoveredBy: "ĐIỀU TRA VIÊN",
+            integrityStatus: "secured",
+            chainOfCustody: "VERIFIED",
+            phase,
+            order: idx * 10,
+          },
+        };
+      } else {
+        // Tài liệu PDF: Tìm link PDF local tương ứng nếu Sheet chưa gắn link Drive
+        const localDoc = CASE_000_PDFS.find(
+          (d) => d.code === code || d.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(d.title.toLowerCase())
+        );
+        const docUrl = driveUrl || localDoc?.url || "/documents/case_000/00_khoi_dau/00_huong_dan_ban_dau.pdf";
+
+        return {
+          type: "pdf",
+          phase,
+          order: idx * 10,
+          data: {
+            id: `sheet-${code}`,
+            code,
+            title,
+            url: docUrl,
+            phase,
+            order: idx * 10,
+          },
+        };
+      }
+    });
+  }, [sheetEvidences]);
+
+  const combinedItems: CombinedItem[] = useMemo(() => {
+    return (effectiveItems as CombinedItem[])
+      .filter((item: CombinedItem) => {
+        if (!isPhaseUnlocked(item.phase)) return false;
+        if (filterTab === "evidence" && item.type !== "evidence") return false;
+        if (filterTab === "pdf" && item.type !== "pdf") return false;
+        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter) return false;
+        return true;
+      })
+      .sort((a: CombinedItem, b: CombinedItem) => a.order - b.order);
+  }, [effectiveItems, isPhaseUnlocked, filterTab, selectedPhaseFilter]);
 
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-3 box-border min-h-0 min-w-0"
+      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-3 box-border min-h-0 min-w-0 select-none"
     >
-      <div className="w-full max-w-[1900px] h-full flex flex-col lg:flex-row gap-3 xl:gap-4 items-stretch justify-center overflow-hidden min-h-0 min-w-0">
-        {/* LEFT COLUMN: FULL BOARDGAME INVESTIGATION CANVAS */}
-        <div className="w-full lg:w-[58%] xl:w-[60%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex flex-col min-h-0 relative">
+      <div className="w-full max-w-[1920px] h-full flex flex-col lg:flex-row items-stretch justify-center overflow-hidden min-h-0 min-w-0 relative gap-2 sm:gap-2.5">
+        {/* VÙNG 1: BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
+        <div
+          style={{
+            width: isDossierCollapsed
+              ? "100%"
+              : typeof window !== "undefined" && window.innerWidth >= 1024
+                ? `${boardWidthPercent}%`
+                : "100%",
+          }}
+          className={cn(
+            "h-full shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col min-h-0 relative transition-[width] duration-150 ease-out",
+            isDraggingSplit && "transition-none",
+          )}
+        >
+          {/* TOP RIGHT TOOLBAR: TOGGLE HỒ SƠ FOCUS / SPLIT */}
+          <div className="hidden lg:flex absolute top-3 right-3 z-30 items-center gap-1.5 bg-[#1e150e]/90 backdrop-blur-md px-2 py-1 rounded-lg border border-[#4a3625] shadow-xl">
+            <span className="font-mono text-[0.62rem] text-[#ad9885] tracking-wider uppercase font-bold">
+              {isDossierCollapsed ? "CHẾ ĐỘ TẬP TRUNG (FOCUS)" : "BÀN PHÁ ÁN (3 VÙNG)"}
+            </span>
+            <button
+              onClick={toggleDossierCollapse}
+              className="p-1 rounded hover:bg-[#342417] text-[#d9a066] hover:text-[#fef5ec] transition-colors cursor-pointer"
+              title={
+                isDossierCollapsed
+                  ? "Mở thanh Hồ sơ & Trình duyệt (3 vùng)"
+                  : "Thu gọn để toàn màn hình Bảng phá án"
+              }
+            >
+              {isDossierCollapsed ? (
+                <PanelRightOpen className="size-4" />
+              ) : (
+                <PanelRightClose className="size-4" />
+              )}
+            </button>
+          </div>
+
           {/* MAIN CANVAS */}
           <div className="flex-1 min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
@@ -211,179 +401,255 @@ export default function WebEvidencePage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: DOSSIER LIST (TOP) + DOCUMENT PREVIEW / INSPECTOR (BOTTOM) */}
-        <div className="flex-1 min-w-0 h-full flex flex-col gap-3 min-h-0 overflow-hidden">
-          {/* TOP SECTION: DOSSIER INDEX WITH FILTER TABS */}
-          <div className="h-[38%] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-lg overflow-hidden flex flex-col min-h-0">
-            <div className="shrink-0 border-b border-[#3d2c1e] px-4 py-2.5 bg-[#241a12] flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <Paperclip className="size-3.5 text-[#d9a066]" />
-                <h2 className="font-mono text-xs font-bold uppercase tracking-wider text-[#e6d3c1]">
-                  DANH MỤC HỒ SƠ & TANG CHỨNG
-                </h2>
-              </div>
-
-              <div className="flex items-center gap-1 font-mono text-[0.6rem]">
-                <button
-                  onClick={() => setFilterTab("all")}
-                  className={cn(
-                    "px-2 py-0.5 font-bold transition-all cursor-pointer border rounded-xs",
-                    filterTab === "all"
-                      ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                      : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
-                  )}
-                >
-                  TẤT CẢ
-                </button>
-                <button
-                  onClick={() => setFilterTab("pdf")}
-                  className={cn(
-                    "px-2 py-0.5 font-bold transition-all cursor-pointer border rounded-xs",
-                    filterTab === "pdf"
-                      ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                      : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
-                  )}
-                >
-                  HỒ SƠ
-                </button>
-                <button
-                  onClick={() => setFilterTab("evidence")}
-                  className={cn(
-                    "px-2 py-0.5 font-bold transition-all cursor-pointer border rounded-xs",
-                    filterTab === "evidence"
-                      ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                      : "bg-[#241a12] text-[#ad9885] border-[#4a3625]",
-                  )}
-                >
-                  VẬT CHỨNG
-                </button>
-              </div>
+        {/* RESIZABLE SPLIT DRAGGER GIỮA VÙNG 1 VÀ VÙNG 2 (DESKTOP) */}
+        {!isDossierCollapsed && (
+          <div
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setIsDraggingSplit(true);
+            }}
+            className={cn(
+              "hidden lg:flex w-2.5 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+              isDraggingSplit && "cursor-col-resize",
+            )}
+            title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Khay hồ sơ"
+          >
+            <div
+              className={cn(
+                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
+                isDraggingSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+              )}
+            >
+              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
+          </div>
+        )}
 
-            {/* DOSSIER PACKET FILTER PILLS */}
-            <div className="shrink-0 px-3 py-1.5 border-b border-[#3d2c1e]/60 bg-[#1a1410] flex items-center gap-1.5 overflow-x-auto text-[0.62rem] font-mono">
-              <span className="text-[#8c735d] uppercase tracking-wider pr-1">
-                HỒ SƠ:
-              </span>
-              {[
-                { label: "TẤT CẢ", val: "all" as const },
-                { label: "BAN ĐẦU", val: 0 },
-                { label: "BỘ A", val: 1 },
-                { label: "BỘ B", val: 2 },
-                { label: "BỘ C", val: 3 },
-              ].map((p) => {
-                const isLocked =
-                  typeof p.val === "number" && !isPhaseUnlocked(p.val);
-                const isSelected = selectedPhaseFilter === p.val;
+        {/* VÙNG 2: KHAY PREVIEW THẺ HỒ SƠ & VẬT CHỨNG (MIDDLE PREVIEW CARDS STRIP) */}
+        <div
+          style={{
+            display: isDossierCollapsed ? "none" : undefined,
+          }}
+          className={cn(
+            "w-full lg:w-[260px] xl:w-[280px] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-0",
+            isDossierCollapsed && "hidden",
+            isViewerExpanded && "hidden xl:flex", // Ẩn vùng giữa trên màn nhỏ nếu đang phóng to viewer
+          )}
+        >
+          {/* HEADER VÙNG 2: TABS & FILTER */}
+          <div className="shrink-0 border-b border-[#3d2c1e] px-3 py-2 bg-[#241a12] flex items-center justify-between gap-1.5">
+            <div className="flex items-center gap-1.5 overflow-hidden">
+              <Layers className="size-3.5 text-[#d9a066] shrink-0" />
+              <h2 className="font-mono text-[0.68rem] font-bold uppercase tracking-wider text-[#e6d3c1] truncate">
+                KHAY TÀI LIỆU
+              </h2>
+            </div>
+            <div className="flex items-center gap-1 font-mono text-[0.58rem]">
+              <button
+                onClick={() => setFilterTab("all")}
+                className={cn(
+                  "px-1.5 py-0.5 font-bold transition-all cursor-pointer rounded-xs",
+                  filterTab === "all"
+                    ? "bg-[#d9a066] text-[#1a0f07]"
+                    : "text-[#ad9885] hover:text-[#e6d3c1]",
+                )}
+              >
+                ALL
+              </button>
+              <button
+                onClick={() => setFilterTab("pdf")}
+                className={cn(
+                  "px-1.5 py-0.5 font-bold transition-all cursor-pointer rounded-xs",
+                  filterTab === "pdf"
+                    ? "bg-[#d9a066] text-[#1a0f07]"
+                    : "text-[#ad9885] hover:text-[#e6d3c1]",
+                )}
+              >
+                HỒ SƠ
+              </button>
+              <button
+                onClick={() => setFilterTab("evidence")}
+                className={cn(
+                  "px-1.5 py-0.5 font-bold transition-all cursor-pointer rounded-xs",
+                  filterTab === "evidence"
+                    ? "bg-[#d9a066] text-[#1a0f07]"
+                    : "text-[#ad9885] hover:text-[#e6d3c1]",
+                )}
+              >
+                VẬT CHỨNG
+              </button>
+            </div>
+          </div>
+
+          {/* PHASE FILTER CHIPS */}
+          <div className="shrink-0 px-2.5 py-1.5 border-b border-[#3d2c1e]/60 bg-[#1a1410] flex items-center gap-1 overflow-x-auto text-[0.6rem] font-mono custom-scrollbar">
+            {[
+              { label: "TẤT CẢ", val: "all" as const },
+              { label: "BAN ĐẦU", val: 0 },
+              { label: "BỘ A", val: 1 },
+              { label: "BỘ B", val: 2 },
+              { label: "BỘ C", val: 3 },
+            ].map((p) => {
+              const isLocked =
+                typeof p.val === "number" && !isPhaseUnlocked(p.val);
+              const isSelected = selectedPhaseFilter === p.val;
+              return (
+                <button
+                  key={p.label}
+                  disabled={isLocked}
+                  onClick={() => setSelectedPhaseFilter(p.val)}
+                  className={cn(
+                    "px-1.5 py-0.5 rounded transition-all whitespace-nowrap text-[0.58rem]",
+                    isLocked
+                      ? "opacity-35 cursor-not-allowed text-[#6b5847]"
+                      : isSelected
+                        ? "bg-[#d9a066] text-[#1a0f07] font-bold"
+                        : "bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#342417] cursor-pointer",
+                  )}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* DANH SÁCH PREVIEW THẺ CARD NHỎ GỌN (THUMBNAIL CARDS) */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2 min-h-0 bg-[#120d09]">
+            {combinedItems.length === 0 ? (
+              <div className="p-4 text-center text-xs font-mono text-[#8c735d]">
+                Không có tài liệu nào.
+              </div>
+            ) : (
+              combinedItems.map((item) => {
+                const isSelected =
+                  selectedView.type === item.type &&
+                  selectedView.data.id === item.data.id;
+                const isPdf = item.type === "pdf";
+                const pdfDoc = isPdf ? (item.data as PDFDocument) : null;
+                const evItem = !isPdf ? (item.data as PhysicalEvidence) : null;
+
+                const dossierBadge =
+                  item.phase === 0
+                    ? "BAN ĐẦU"
+                    : item.phase === 1
+                      ? "BỘ A"
+                      : item.phase === 2
+                        ? "BỘ B"
+                        : "BỘ C";
+
                 return (
                   <button
-                    key={p.label}
-                    disabled={isLocked}
-                    onClick={() => setSelectedPhaseFilter(p.val)}
+                    key={`${item.type}-${item.data.id}`}
+                    onClick={() =>
+                      isPdf
+                        ? handleSelectPdf(pdfDoc!)
+                        : handleSelectEvidence(evItem!)
+                    }
                     className={cn(
-                      "px-2 py-0.5 rounded transition-all whitespace-nowrap",
-                      isLocked
-                        ? "opacity-35 cursor-not-allowed text-[#6b5847]"
-                        : isSelected
-                          ? "bg-[#d9a066] text-[#1a0f07] font-bold"
-                          : "bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#342417] cursor-pointer",
+                      "w-full text-left rounded-lg border transition-all cursor-pointer p-2 flex flex-col gap-1.5 relative overflow-hidden group shadow-sm",
+                      isSelected
+                        ? "bg-[#2a1d12] border-[#d9a066] shadow-[0_0_12px_rgba(217,160,102,0.2)]"
+                        : "bg-[#18120d] hover:bg-[#201710] border-[#382618] hover:border-[#523824]",
                     )}
                   >
-                    {p.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* SCROLLABLE LIST */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1 min-h-0">
-              {combinedItems.length === 0 ? (
-                <div className="p-4 text-center text-xs font-mono text-[#8c735d]">
-                  Không có tài liệu nào phù hợp với bộ lọc.
-                </div>
-              ) : (
-                combinedItems.map((item) => {
-                  const isSelected =
-                    selectedView.type === item.type &&
-                    selectedView.data.id === item.data.id;
-                  const isPdf = item.type === "pdf";
-                  const dossierName =
-                    item.phase === 0
-                      ? "Ban Đầu"
-                      : item.phase === 1
-                        ? "Bộ A"
-                        : item.phase === 2
-                          ? "Bộ B"
-                          : "Bộ C";
-
-                  return (
-                    <button
-                      key={`${item.type}-${item.data.id}`}
-                      onClick={() =>
-                        isPdf
-                          ? handleSelectPdf(item.data as PDFDocument)
-                          : handleSelectEvidence(item.data as PhysicalEvidence)
-                      }
-                      className={cn(
-                        "w-full text-left p-2 rounded border transition-all cursor-pointer flex items-center justify-between gap-2 text-xs",
-                        isSelected
-                          ? "bg-[#2e2014] border-[#d9a066] text-[#fef5ec] shadow-sm"
-                          : "bg-[#1c1611] hover:bg-[#251d16] border-[#3d2c1e] text-[#ad9885] hover:text-[#e6d3c1]",
-                      )}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        {isPdf ? (
-                          <FileText
-                            className={cn(
-                              "size-3.5 shrink-0",
-                              isSelected ? "text-[#d9a066]" : "text-[#8c735d]",
-                            )}
-                          />
-                        ) : (
-                          <ImageIcon
-                            className={cn(
-                              "size-3.5 shrink-0",
-                              isSelected ? "text-[#d9a066]" : "text-[#8c735d]",
-                            )}
-                          />
+                    {/* TOP BADGE BAR */}
+                    <div className="flex items-center justify-between gap-1 text-[0.55rem] font-mono">
+                      <span
+                        className={cn(
+                          "px-1.5 py-0.2 rounded font-bold uppercase tracking-wider",
+                          isSelected
+                            ? "bg-[#d9a066] text-[#1a0f07]"
+                            : "bg-[#281b10] text-[#ad9885] border border-[#3d2c1e]",
                         )}
-                        <div className="min-w-0">
-                          <p className="font-bold truncate leading-tight">
-                            {item.data.title}
-                          </p>
-                          <span className="font-mono text-[0.6rem] text-[#8c735d] block">
-                            {item.data.id} // {dossierName}
+                      >
+                        {isPdf ? (pdfDoc?.code ? `📄 ${pdfDoc.code}` : "📄 HỒ SƠ") : "📸 ẢNH VẬT CHỨNG"}
+                      </span>
+                      <span className="text-[#8c735d] uppercase font-bold">{dossierBadge}</span>
+                    </div>
+
+                    {/* NẾU LÀ ẢNH VẬT CHỨNG: HIỂN THỊ TRỰC TIẾP KHUNG ẢNH PREVIEW RÕ NÉT (KHÔNG CHÈN TEXT DÀI DÒNG) */}
+                    {!isPdf ? (
+                      <div className="relative w-full aspect-[4/3] bg-[#0c0805] border border-[#3e2b1c] rounded-md overflow-hidden group-hover:border-[#d9a066]/70 transition-colors">
+                        <img
+                          src={normalizeImageUrl(evItem?.thumbnail) || "/photo_scene_overview.jpg"}
+                          alt="Vật chứng hiện trường"
+                          className="w-full h-full object-cover"
+                        />
+                        {/* Overlay nhẹ góc dưới với mã vật chứng */}
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-1.5 flex items-center justify-between">
+                          <span className="font-mono text-[0.58rem] font-bold text-[#e5d8cb] tracking-wider">
+                            📸 {evItem?.evidenceId || "VẬT CHỨNG"}
                           </span>
                         </div>
                       </div>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-          </div>
+                    ) : (
+                      /* NẾU LÀ HỒ SƠ PDF: HIỂN THỊ TIÊU ĐỀ VĂN BẢN KÈM ICON PDF */
+                      <div className="flex items-center gap-2">
+                        <div className="size-9 shrink-0 bg-[#251910] border border-[#3e2b1c] rounded flex flex-col items-center justify-center text-[#d9a066] group-hover:scale-105 transition-transform">
+                          <FileText className="size-4 opacity-85" />
+                          <span className="text-[0.42rem] font-mono font-bold text-[#ad9885]">
+                            PDF
+                          </span>
+                        </div>
 
-          {/* BOTTOM SECTION: DOCUMENT PREVIEW OR INLINE PHONE SIMULATOR */}
-          <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-            {activeModal === "phone" ? (
-              <div className="flex-1 bg-[#120c08] border-2 border-[#543b27] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden h-full flex flex-col relative items-center justify-center p-2 pt-10 min-h-0">
-                <button
-                  onClick={() => setActiveModal(null)}
-                  className="absolute top-2 right-2 z-50 p-1.5 px-2.5 text-[#ad9885] hover:text-[#fef5ec] bg-[#24170e]/95 hover:bg-[#382618] rounded-full transition-colors cursor-pointer border border-[#543b27] shadow-lg flex items-center gap-1 text-[0.65rem] font-mono font-bold"
-                  title="Đóng điện thoại"
-                >
-                  <X className="size-3 text-[#d9a066]" />
-                  <span>ĐÓNG PHONE</span>
-                </button>
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className={cn(
+                              "font-bold text-[0.68rem] leading-snug line-clamp-2 transition-colors",
+                              isSelected
+                                ? "text-[#fef5ec]"
+                                : "text-[#ad9885] group-hover:text-[#e6d3c1]",
+                            )}
+                          >
+                            {item.data.title}
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
-                <div className="flex-1 w-full min-h-0 flex items-center justify-center p-1 overflow-hidden">
-                  <PhoneSimulator />
-                </div>
-              </div>
-            ) : (
-              <EvidenceDetailInspector selectedView={selectedView} />
+                    {/* ACTIVE INDICATOR STRIP */}
+                    {isSelected && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
+                    )}
+                  </button>
+                );
+              })
             )}
           </div>
+        </div>
+
+        {/* VÙNG 3: TRÌNH DUYỆT CHI TIẾT HỒ SƠ & VẬT CHỨNG (RIGHT VIEWER INSPECTOR) */}
+        <div
+          style={{
+            display: isDossierCollapsed ? "none" : undefined,
+          }}
+          className={cn(
+            "flex-1 min-w-0 h-full flex flex-col min-h-0 overflow-hidden relative",
+            isDossierCollapsed && "hidden",
+          )}
+        >
+          {/* HEADER TOOLBAR VÙNG 3 */}
+          <div className="hidden lg:flex absolute top-2 right-2 z-40 items-center gap-1.5">
+            <button
+              onClick={() => setIsViewerExpanded((prev) => !prev)}
+              className="p-1.5 px-2 bg-[#22160e]/90 hover:bg-[#322014] text-[#ad9885] hover:text-[#fef5ec] rounded border border-[#4a3625] transition-colors cursor-pointer flex items-center gap-1 font-mono text-[0.6rem] shadow-md"
+              title={isViewerExpanded ? "Thu nhỏ về 3 vùng" : "Phóng to toàn khung phải"}
+            >
+              {isViewerExpanded ? (
+                <>
+                  <Minimize2 className="size-3 text-[#d9a066]" />
+                  <span>CHUẨN</span>
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="size-3 text-[#d9a066]" />
+                  <span>MỞ RỘNG</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <EvidenceDetailInspector selectedView={selectedView} />
         </div>
       </div>
 

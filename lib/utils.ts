@@ -87,3 +87,33 @@ export function normalizeMediaUrl(url: string | undefined | null): string {
 
   return trimmed;
 }
+
+/**
+ * Normalizes PDF URLs from Google Drive or local/public sources.
+ * Converts Google Drive share links to /preview URLs so they can be embedded cleanly in <iframe> without toolbar.
+ */
+export function normalizeDrivePdfUrl(url: string | undefined | null): string {
+  if (!url) return "";
+  const trimmed = url.trim();
+
+  // If local PDF path (/documents/...)
+  if (trimmed.startsWith("/")) {
+    return `${trimmed}#toolbar=0&navpanes=0`;
+  }
+
+  // Google Drive /file/d/{id}/view, /file/d/{id} -> /file/d/{id}/preview
+  const driveFileMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveFileMatch && driveFileMatch[1]) {
+    return `https://drive.google.com/file/d/${driveFileMatch[1]}/preview`;
+  }
+
+  // Google Drive query parameter id: ?id={id}
+  if (trimmed.includes("drive.google.com")) {
+    const driveIdMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (driveIdMatch && driveIdMatch[1]) {
+      return `https://drive.google.com/file/d/${driveIdMatch[1]}/preview`;
+    }
+  }
+
+  return trimmed;
+}
