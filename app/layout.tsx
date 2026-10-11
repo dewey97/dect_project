@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Inter, Roboto_Mono, Playpen_Sans } from 'next/font/google'
+import { Inter, Roboto_Mono, Caveat } from 'next/font/google'
 import { FeedbackModal } from '@/components/investigation/feedback-modal'
 import './globals.css'
 
@@ -15,8 +15,8 @@ const fontMono = Roboto_Mono({
   variable: '--font-geist-mono',
 })
 
-const handwritingFont = Playpen_Sans({
-  subsets: ['vietnamese', 'latin'],
+const handwritingFont = Caveat({
+  subsets: ['latin'],
   variable: '--font-handwriting',
   weight: ['600', '700'],
 })
