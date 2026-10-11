@@ -94,27 +94,29 @@ export function AddSuspectModal({
 
   const suspectCpId = useMemo(() => {
     const norm = (name || editingSuspect?.name || editingSuspect?.id || '').toLowerCase()
-    if (norm.includes('vũ') || norm.includes('vu')) return 'cp-000-1a'
-    if (norm.includes('tùng') || norm.includes('tung')) return 'cp-000-1b'
-    if (norm.includes('hà') || norm.includes('ha')) return 'cp-000-1c'
-    return 'cp-000-1a'
+    if (norm === 'vũ' || norm === 'vu' || norm === 'lê quang vũ') return 'cp-000-1a'
+    if (norm === 'tùng' || norm === 'tung' || norm === 'nguyễn thanh tùng') return 'cp-000-1b'
+    if (norm === 'hà' || norm === 'ha' || norm === 'trần thị hà') return 'cp-000-1c'
+    return ''
   }, [name, editingSuspect])
 
   useEffect(() => {
     if (isOpen) {
-      if (typeof window !== 'undefined') {
-        (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = suspectCpId
-      }
-      setStorageItem('active_investigation_checkpoint', suspectCpId)
-      setStorageItem('last_interacted_checkpoint', suspectCpId)
-      if (suspectCpId === 'cp-000-1a') setStorageItem('last_viewed_suspect', 'vu')
-      else if (suspectCpId === 'cp-000-1b') setStorageItem('last_viewed_suspect', 'tung')
-      else if (suspectCpId === 'cp-000-1c') setStorageItem('last_viewed_suspect', 'ha')
+      if (suspectCpId) {
+        if (typeof window !== 'undefined') {
+          (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = suspectCpId
+        }
+        setStorageItem('active_investigation_checkpoint', suspectCpId)
+        setStorageItem('last_interacted_checkpoint', suspectCpId)
+        if (suspectCpId === 'cp-000-1a') setStorageItem('last_viewed_suspect', 'vu')
+        else if (suspectCpId === 'cp-000-1b') setStorageItem('last_viewed_suspect', 'tung')
+        else if (suspectCpId === 'cp-000-1c') setStorageItem('last_viewed_suspect', 'ha')
 
-      if (subTileView === 'motive') {
-        setStorageItem('active_suspect_category', 'motive')
-      } else if (subTileView === 'alibi') {
-        setStorageItem('active_suspect_category', 'alibi')
+        if (subTileView === 'motive') {
+          setStorageItem('active_suspect_category', 'motive')
+        } else if (subTileView === 'alibi') {
+          setStorageItem('active_suspect_category', 'alibi')
+        }
       }
     }
   }, [isOpen, suspectCpId, subTileView])
@@ -147,13 +149,15 @@ export function AddSuspectModal({
   const validateMotive = (_charId: string, clues: string[]) => {
     if (hasAdminBypassInArray(clues)) return true
     const liveMotive = matchedCheckpoint?.pickerConfig?.motiveEvidenceIds || []
-    return checkMotiveValid(liveMotive, clues)
+    const optionalMotive = matchedCheckpoint?.pickerConfig?.optionalMotiveIds || []
+    return checkMotiveValid(liveMotive, clues, optionalMotive)
   }
 
   const validateAlibi = (_charId: string, clues: string[]) => {
     if (hasAdminBypassInArray(clues)) return true
     const liveAlibi = matchedCheckpoint?.pickerConfig?.alibiEvidenceIds || []
-    return checkAlibiValid(liveAlibi, clues)
+    const optionalAlibi = matchedCheckpoint?.pickerConfig?.optionalAlibiIds || []
+    return checkAlibiValid(liveAlibi, clues, optionalAlibi)
   }
 
   // XÁC NHẬN MANH MỐI ĐỘNG CƠ (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
@@ -591,19 +595,21 @@ export function AddSuspectModal({
                   </button>
 
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        detectiveAudio.playTypewriterClick()
-                        emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'motive' })
-                      }}
-                      className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                      title="Xem gợi ý động cơ gây án"
-                    >
-                      <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                      <span>GỢI Ý</span>
-                    </button>
+                    {Boolean(suspectCpId) && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          detectiveAudio.playTypewriterClick()
+                          emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'motive' })
+                        }}
+                        className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                        title="Xem gợi ý động cơ gây án"
+                      >
+                        <Lightbulb className="size-3.5 text-[#8c1d1d]" />
+                        <span>GỢI Ý</span>
+                      </button>
+                    )}
 
                     <button
                       type="button"
@@ -657,19 +663,21 @@ export function AddSuspectModal({
                   </button>
 
                   <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        detectiveAudio.playTypewriterClick()
-                        emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'alibi' })
-                      }}
-                      className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                      title="Xem gợi ý mâu thuẫn ngoại phạm"
-                    >
-                      <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                      <span>GỢI Ý</span>
-                    </button>
+                    {Boolean(suspectCpId) && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          detectiveAudio.playTypewriterClick()
+                          emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'alibi' })
+                        }}
+                        className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
+                        title="Xem gợi ý mâu thuẫn ngoại phạm"
+                      >
+                        <Lightbulb className="size-3.5 text-[#8c1d1d]" />
+                        <span>GỢI Ý</span>
+                      </button>
+                    )}
 
                     <button
                       type="button"

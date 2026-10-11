@@ -11,10 +11,38 @@ import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '
 
 function isPhoneMatch(val: string, validKeywords: string[]): boolean {
   if (isAdminBypassCode(val)) return true
-  const norm = val.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]/g, '')
+  const normWords = val
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+  if (normWords.length === 0) return false
+
   return validKeywords.some((kw) => {
-    const kwNorm = kw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]/g, '')
-    return norm.includes(kwNorm) || kwNorm.includes(norm)
+    const kwWords = kw
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+
+    // Khớp chính xác toàn bộ (ví dụ "vu" === "vu", "le quang vu" === "le quang vu")
+    if (normWords.join('') === kwWords.join('')) return true
+
+    // Cho phép nhập tên riêng rút gọn ("Vũ" thay cho "Lê Quang Vũ", "Đạt Gà" cho "Đạt Gà Chợ Cảng"):
+    // Toàn bộ từ người chơi nhập phải nằm trong từ khóa hợp lệ và KHÔNG được chứa thêm từ lạ bên ngoài
+    if (normWords.length < kwWords.length) {
+      return normWords.every((w) => kwWords.includes(w))
+    }
+
+    return false
   })
 }
 

@@ -94,28 +94,6 @@ export function QuickActionFab({
               <span>Sổ tay hướng dẫn</span>
             </button>
 
-            {/* OPTION: HINT */}
-            <button
-              type="button"
-              onClick={() =>
-                handleAction(() => {
-                  const activeCp =
-                    typeof window !== "undefined"
-                      ? (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ || undefined
-                      : undefined;
-                  if (onOpenHint) {
-                    onOpenHint();
-                  } else {
-                    emitInvestigationEvent("OPEN_HINT", { checkpointId: activeCp });
-                  }
-                })
-              }
-              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#e5d8cb] hover:text-amber-300 group"
-            >
-              <Lightbulb className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
-              <span>Gợi ý phá án</span>
-            </button>
-
             {/* OPTION: BOARD GAME MODE */}
             {onOpenBoardGame && (
               <button

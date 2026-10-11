@@ -53,22 +53,22 @@ export function normalizeCheckpointId(id?: string): string {
   }
   if (
     clean === "phone" ||
-    clean.includes("phone") ||
     clean === "cp-000-0" ||
-    clean === "c0-pin-phone"
+    clean === "c0-pin-phone" ||
+    clean.startsWith("phone")
   )
     return "cp-000-0";
-  if (clean === "vu" || clean.includes("vu") || clean === "cp-000-1a")
+  if (clean === "vu" || clean === "vũ" || clean === "cp-000-1a" || clean.endsWith("-vu"))
     return "cp-000-1a";
-  if (clean === "tung" || clean.includes("tung") || clean === "cp-000-1b")
+  if (clean === "tung" || clean === "tùng" || clean === "cp-000-1b" || clean.endsWith("-tung"))
     return "cp-000-1b";
-  if (clean === "ha" || clean.includes("ha") || clean === "cp-000-1c")
+  if (clean === "ha" || clean === "hà" || clean === "cp-000-1c" || clean.endsWith("-ha"))
     return "cp-000-1c";
   if (
     clean === "indictment" ||
-    clean.includes("indictment") ||
-    clean.includes("cao-trang") ||
-    clean === "cp-000-2b"
+    clean === "cao-trang" ||
+    clean === "cp-000-2b" ||
+    clean.includes("indictment")
   )
     return "cp-000-2b";
   return clean;
@@ -213,10 +213,10 @@ export function HintModal({
     return buildGroupedCheckpointsMap(sheetCheckpoints);
   }, [sheetCheckpoints]);
 
-  // Nhận diện đồng bộ checkpoint ID ngay lập tức
+  // Nhận diện đồng bộ checkpoint ID: CHỈ hiển thị nếu có checkpointId truyền vào
   const effectiveCpId = useMemo(() => {
     if (checkpointId) return normalizeCheckpointId(checkpointId);
-    return getLatestActiveCheckpointId() || "cp-000-0";
+    return "";
   }, [checkpointId, isOpen]);
 
   const currentGroup = useMemo(() => {
