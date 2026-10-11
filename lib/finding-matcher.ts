@@ -36,19 +36,27 @@ export function isVietnameseTextMatch(
   const inputWords = normInput.split(" ").filter(Boolean);
   const candidateWords = normCandidate.split(" ").filter(Boolean);
 
-  // 2. Đáp án một từ (VD: `vũ`, `hà`, `tùng`): input phải chứa chính xác từ đó
-  if (candidateWords.length === 1) {
-    return inputWords.includes(candidateWords[0]);
+  // 2. Input là tập con các từ của đáp án (VD: gõ `Vũ` cho đáp án `Lê Quang Vũ`, `Đạt Gà` cho `Đạt Gà Chợ Cảng`)
+  // BẮT BUỘC: Mọi từ người chơi gõ đều phải nằm trong đáp án (không được có từ lạ / tên người khác)
+  if (inputWords.length < candidateWords.length) {
+    if (inputWords.every((word) => candidateWords.includes(word))) {
+      return true;
+    }
   }
 
-  // 3. Input chứa trọn vẹn cụm từ của đáp án (VD: `Đạt Gà Chợ Cảng` cho đáp án `Đạt Gà`)
-  if (normInput.includes(normCandidate)) return true;
+  // 3. Người chơi gõ họ tên đầy đủ (VD: `Lê Quang Vũ`) khi trên Sheet chỉ để tên gọi tắt (`Vũ`)
+  // BẮT BUỘC: Tên người chơi gõ phải kết thúc bằng từ của đáp án, độ dài hợp lý (<= 4 từ),
+  // và KHÔNG được chứa các liên từ nối 2 người ("va", "cung", "hoac", "voi"...)
+  if (candidateWords.length === 1 && inputWords.length > 1 && inputWords.length <= 4) {
+    const lastWord = inputWords[inputWords.length - 1];
+    const invalidConjunctions = ["va", "cung", "hoac", "voi", "khong", "phai"];
+    const hasConjunction = inputWords.some((w) => invalidConjunctions.includes(w));
+    if (!hasConjunction && lastWord === candidateWords[0]) {
+      return true;
+    }
+  }
 
-  // 4. Mọi từ của đáp án đều có trong input
-  if (candidateWords.every((word) => inputWords.includes(word))) return true;
-
-  // 5. Input là tập con các từ của đáp án (VD: gõ `Vũ` cho đáp án `Lê Quang Vũ`)
-  return inputWords.every((word) => candidateWords.includes(word));
+  return false;
 }
 
 /**

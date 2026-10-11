@@ -97,6 +97,16 @@ export function validateCheckpointAnswer(
         (reqId) => !selectedCodes.has(normalizeEvidenceCode(reqId)),
       );
       if (missingEvidence.length > 0) return false;
+
+      // Chặn chọn thêm vật chứng sai: Toàn bộ mã được chọn phải nằm trong danh sách hợp lệ
+      const allowedCodes = new Set([
+        ...cp.pickerConfig.requiredEvidenceIds.map((id) => normalizeEvidenceCode(id)),
+        ...(cp.pickerConfig.optionalEvidenceIds || []).map((id) => normalizeEvidenceCode(id)),
+      ]);
+      const hasInvalidSelection = Array.from(selectedCodes).some(
+        (code) => !allowedCodes.has(code),
+      );
+      if (hasInvalidSelection) return false;
     }
 
     return true;

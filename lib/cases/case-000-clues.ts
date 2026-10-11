@@ -113,34 +113,65 @@ export function isEvidenceMatching(clueId: string, targetCodes: string[]): boole
  * Validates motive evidence selection strictly against target codes from Google Sheets Live CMS (answers_id).
  * Zero static hardcoded fallback - 100% Google Sheets CMS driven.
  */
-export function checkMotiveValid(targetCodes: string[], selectedIds: string[]): boolean {
+export function checkMotiveValid(
+  targetCodes: string[],
+  selectedIds: string[],
+  optionalCodes: string[] = []
+): boolean {
   if (!targetCodes || targetCodes.length === 0 || !selectedIds || selectedIds.length === 0) return false
   if (hasAdminBypassInArray(selectedIds)) return true
 
   // Nếu GM khai báo nhiều lựa chọn SĐT cùng loại trong mục động cơ (ví dụ 2 SĐT SMS), chỉ cần trúng 1 trong các số
   const isAllPhoneSms = targetCodes.every((t) => /phone|sdt|sms|09/i.test(t))
   if (isAllPhoneSms && targetCodes.length > 1) {
-    return targetCodes.some((target) =>
+    const matchedAnyPhone = targetCodes.some((target) =>
       selectedIds.some((c) => isEvidenceMatching(c, [target]))
     )
+    if (!matchedAnyPhone) return false
+  } else {
+    // 1. Phải thỏa mãn đầy đủ các manh mối bắt buộc
+    const allRequiredSatisfied = targetCodes.every((target) =>
+      selectedIds.some((c) => isEvidenceMatching(c, [target]))
+    )
+    if (!allRequiredSatisfied) return false
   }
 
-  return targetCodes.every((target) =>
-    selectedIds.some((c) => isEvidenceMatching(c, [target]))
+  // 2. Chặn việc chọn thêm manh mối sai: Mọi manh mối đã chọn BẮT BUỘC phải nằm trong danh sách đáp án hợp lệ
+  const allowedPool = [...targetCodes, ...optionalCodes]
+  const allSelectedAreValid = selectedIds.every((selected) =>
+    allowedPool.some((target) => isEvidenceMatching(selected, [target]))
   )
+  if (!allSelectedAreValid) return false
+
+  return true
 }
 
 /**
  * Validates alibi evidence selection strictly against target codes from Google Sheets Live CMS (answers_id).
  * Zero static hardcoded fallback - 100% Google Sheets CMS driven.
  */
-export function checkAlibiValid(targetCodes: string[], selectedIds: string[]): boolean {
+export function checkAlibiValid(
+  targetCodes: string[],
+  selectedIds: string[],
+  optionalCodes: string[] = []
+): boolean {
   if (!targetCodes || targetCodes.length === 0 || !selectedIds || selectedIds.length === 0) return false
   if (hasAdminBypassInArray(selectedIds)) return true
 
-  return targetCodes.every((target) =>
+  // 1. Phải thỏa mãn đầy đủ các manh mối bắt buộc
+  const allRequiredSatisfied = targetCodes.every((target) =>
     selectedIds.some((c) => isEvidenceMatching(c, [target]))
   )
+  if (!allRequiredSatisfied) return false
+
+  // 2. Chặn việc chọn thêm manh mối sai: Mọi manh mối đã chọn BẮT BUỘC phải nằm trong danh sách đáp án hợp lệ
+  const allowedPool = [...targetCodes, ...optionalCodes]
+  const allSelectedAreValid = selectedIds.every((selected) =>
+    allowedPool.some((target) => isEvidenceMatching(selected, [target]))
+  )
+  if (!allSelectedAreValid) return false
+
+  return true
 }
 
 /**

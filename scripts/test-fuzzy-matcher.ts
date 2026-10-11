@@ -60,6 +60,14 @@ const cases: [string, string, boolean][] = [
   ["Vương", "Lê Quang Vũ", false],
   ["Lê Hoàng", "Lê Quang Vũ", false],
   ["Nguyễn Văn A", "Trần Thị Hà", false],
+
+  // 6. Chống lọt khi nhập đúng rồi thêm một cái không đúng (VD: Vũ Tùng, Lê Quang Vũ và Tùng)
+  ["Vũ Tùng", "Vũ", false],
+  ["Vũ và Tùng", "Vũ", false],
+  ["Lê Quang Vũ và Nguyễn Thanh Tùng", "Lê Quang Vũ", false],
+  ["Lê Quang Vũ Tùng", "Lê Quang Vũ", false],
+  ["Đạt Gà và Vũ", "Đạt Gà", false],
+  ["Hà Khang", "Hà", false],
 ];
 
 let failed = 0;
