@@ -1,25 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Inter, Roboto_Mono, Caveat } from 'next/font/google'
 import { FeedbackModal } from '@/components/investigation/feedback-modal'
 import './globals.css'
-
-const fontSans = Inter({
-  subsets: ['vietnamese', 'latin'],
-  variable: '--font-geist-sans',
-})
-
-const fontMono = Roboto_Mono({
-  subsets: ['vietnamese', 'latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-geist-mono',
-})
-
-const handwritingFont = Caveat({
-  subsets: ['latin'],
-  variable: '--font-handwriting',
-  weight: ['600', '700'],
-})
 
 export const metadata: Metadata = {
   title: 'XPLORE',
@@ -80,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
-      className={`dark ${fontSans.variable} ${fontMono.variable} ${handwritingFont.variable}`}
+      className="dark font-sans"
       suppressHydrationWarning
     >
       <body suppressHydrationWarning className="min-h-dvh w-full bg-background font-sans text-foreground antialiased">

@@ -148,5 +148,18 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
    - Trước khi thông báo hoàn tất bất kỳ tác vụ hoặc xin lệnh commit: Agent bắt buộc phải chạy `npm run lint` (`tsc --noEmit`) để bắt sạch lỗi kiểu dữ liệu TypeScript.
    - Khi có thay đổi lớn liên quan đến cấu hình Next.js, routing, server actions hoặc build scripts: Phải chủ động kiểm tra hoặc khuyến nghị chạy `npm run build` cục bộ trước khi deploy.
 
+---
+
+## 🔤 11. Quy Chuẩn Quản Lý Font Chữ & Cấm Tuyệt Đối `next/font/google` (No Next Font Google / Turbopack Bug Prevention)
+
+- **Cấm tuyệt đối sử dụng `next/font/google`**: 
+  - Trình biên dịch Turbopack trong Next.js 16 dính lỗi nghiêm trọng (Next.js Issue #99114: `next/font/google queries have exactly one entry` khi Google Fonts API trả về các URL extensionless hoặc có ký tự `&`/nhiều query parameters trong quá trình CI/CD build Docker).
+  - Lỗi này gây ra hiện tượng build flake ngẫu nhiên (chạy local có thể pass do cache nhưng CI/CD trên Docker/Linux bị exit code 1).
+- **Chuẩn tải Font áp dụng cho toàn bộ dự án**:
+  - Toàn bộ font Google (`Inter`, `Roboto Mono`, `Caveat`, `Playpen Sans`, `Courier Prime`, `Special Elite`) **BẮT BUỘC** phải được nạp thông qua `@import url("https://fonts.googleapis.com/css2?...")` trực tiếp ở dòng đầu của `app/globals.css`.
+  - Khai báo CSS variables (`--font-geist-sans`, `--font-geist-mono`, `--font-handwriting`) trực tiếp trong block `:root` và `@theme inline` của `app/globals.css`.
+  - Không import hoặc inject font thông qua `layout.tsx` bằng `next/font/google`.
+
+
 
 
