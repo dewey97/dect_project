@@ -28,15 +28,24 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
   const { data: contactsData, loading, error } = usePhoneData('contacts')
 
   // Map sheet format (contact_id, name, phone_number, category, note) to component structure
-  const contacts = contactsData.map((item: any, idx: number) => ({
-    id: item.contact_id || `c-${idx + 1}`,
-    name: item.name || 'Không tên',
-    phone: item.phone_number || '',
-    relationship: item.category || 'Người quen',
-    note: item.note || '',
-    address: 'TP. Hà Nội',
-    avatarColor: 'from-[#0A84FF] to-[#5856D6]'
-  }))
+  const contacts = contactsData
+    .filter((item: any) => {
+      const rawName = (item.name || item.display_name || "").trim();
+      const isSaved =
+        item.is_saved !== undefined
+          ? String(item.is_saved).trim().toUpperCase() !== "FALSE"
+          : true;
+      return rawName.length > 0 && isSaved;
+    })
+    .map((item: any, idx: number) => ({
+      id: item.contact_id || `c-${idx + 1}`,
+      name: (item.name || item.display_name || "").trim(),
+      phone: item.phone_number || '',
+      relationship: item.category || 'Người quen',
+      note: item.note || '',
+      address: 'TP. Hà Nội',
+      avatarColor: 'from-[#0A84FF] to-[#5856D6]'
+    }))
 
   const filteredContacts = contacts.filter((c) =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

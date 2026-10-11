@@ -48,13 +48,13 @@ export function IPhoneHomeScreen({
       id: "photos",
       name: "Photos",
       icon: "/images/cases/case_000/phone/icons/photos.png",
-      appTarget: "photos",
+      appTarget: null,
     },
     {
       id: "camera",
       name: "Camera",
       icon: "/images/cases/case_000/phone/icons/camera.png",
-      appTarget: "photos",
+      appTarget: null,
     },
     {
       id: "maps",
@@ -125,9 +125,12 @@ export function IPhoneHomeScreen({
           >
             <button
               onClick={() => app.appTarget && onOpenApp(app.appTarget)}
+              disabled={!app.appTarget}
               className={cn(
-                "group flex flex-col items-center focus:outline-none transition-transform duration-100 cursor-pointer",
-                "active:scale-95 active:brightness-90",
+                "group flex flex-col items-center focus:outline-none transition-transform duration-100",
+                app.appTarget
+                  ? "cursor-pointer active:scale-95 active:brightness-90"
+                  : "cursor-default",
               )}
               title={app.name}
             >

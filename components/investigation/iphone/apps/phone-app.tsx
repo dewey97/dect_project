@@ -54,13 +54,23 @@ export function PhoneApp({
   const [contactsSearch, setContactsSearch] = useState("");
   const [selectedContact, setSelectedContact] = useState<any | null>(null);
 
-  const contacts = rawContactsData.map((item: any, idx: number) => ({
-    id: item.contact_id || `c-${idx + 1}`,
-    name: item.name || item.display_name || "Không rõ",
-    phone: item.phone_number || "",
-    category: item.category || "Người quen",
-    note: item.note || "",
-  }));
+  const contacts = rawContactsData
+    .filter((item: any) => {
+      const rawName = (item.name || item.display_name || "").trim();
+      const isSaved =
+        item.is_saved !== undefined
+          ? String(item.is_saved).trim().toUpperCase() !== "FALSE"
+          : true;
+      // Số điện thoại không có tên hoặc không lưu (is_saved = FALSE) thì không hiện trong danh bạ
+      return rawName.length > 0 && isSaved;
+    })
+    .map((item: any, idx: number) => ({
+      id: item.contact_id || `c-${idx + 1}`,
+      name: (item.name || item.display_name || "").trim(),
+      phone: item.phone_number || "",
+      category: item.category || "Người quen",
+      note: item.note || "",
+    }));
 
   const filteredContacts = contacts.filter((c: any) =>
     c.name.toLowerCase().includes(contactsSearch.toLowerCase()) ||

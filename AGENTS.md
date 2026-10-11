@@ -123,4 +123,30 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
   - Là không gian phá án chính thức, nhận dữ liệu động từ Google Sheets Live CMS, local state và checkpoint gameplay.
   - Tang vật thiết bị (như túi đựng điện thoại `victim-phone`) hiển thị dưới dạng vật chứng thực tế độc lập: **tuyệt đối KHÔNG ghim đè thêm ghim pushpin 3D hay nối sợi chỉ đỏ** vào thiết bị tang vật. Node `Mở rộng điều tra` (`c0-pin-phone`) là giấy note nghiệp vụ riêng biệt, không được gán nhầm ảnh túi điện thoại vào node này.
 
+---
+
+## ⚖️ 10. Nguyên Tắc Đồng Bộ Tuyệt Đối Local & Production (Local vs. Prod/Docker Parity Protocol)
+
+Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy đồng nhất 100% giữa môi trường phát triển máy cá nhân (**Local Dev trên Windows**) và môi trường máy chủ (**Production trong Docker container Linux trên VPS**):
+
+1. **Khớp Tên File & Thư Mục Tuyệt Đối (Zero Case-Mismatch Rule — Windows vs. Linux)**:
+   - Hệ điều hành Windows không phân biệt hoa/thường, nhưng Docker / Alpine Linux phân biệt nghiêm ngặt.
+   - **Bắt buộc**: Mọi câu lệnh `import` (component, lib, types) và đường dẫn file tài nguyên trong `public/` (ảnh, icon, font, audio, pdf) phải khớp chính xác từng chữ hoa/thường với tên file thực tế trên ổ đĩa.
+2. **An Toàn Khởi Tạo & Render Trình Duyệt (Safe Browser API & SSR/SSG Guard)**:
+   - Trong Next.js, `npm run build` trên máy chủ sẽ chạy static prerendering (SSG) cho tất cả các trang.
+   - **Tuyệt đối CẤM**: Truy cập trực tiếp các biến trình duyệt toàn cục (`window`, `document`, `localStorage`, `sessionStorage`, `navigator`, `screen`) ở top-level module hoặc trong thân hàm render của Server/Client Components khi chưa mount.
+   - **Chuẩn xử lý**: Luôn bọc trong `useEffect`, kiểm tra `typeof window !== 'undefined'`, hoặc sử dụng dynamic import `next/dynamic` với `{ ssr: false }`.
+3. **Chống Lệch Pha Hydration (Hydration Mismatch Prevention)**:
+   - Đảm bảo HTML render lần đầu trên máy chủ (SSR) khớp hoàn toàn với client DOM.
+   - Các giá trị phụ thuộc vào thời gian thực (`Date.now()`, `new Date().toISOString()`), ngẫu nhiên (`Math.random()`), hoặc kích thước màn hình chỉ được khởi tạo/gán state sau khi component đã mount trên client (`useEffect` hoặc cờ `isMounted`).
+4. **Không Hardcode URL Môi Trường (Relative Paths & Dynamic Env Rule)**:
+   - Tuyệt đối không hardcode domain `http://localhost:3000` hay IP nội bộ trong client-side code hay API calls.
+   - Luôn sử dụng đường dẫn tương đối (như `/api/...`, `/images/...`) hoặc biến môi trường `NEXT_PUBLIC_*`.
+5. **Đồng Bộ Dữ Liệu Thời Gian Thực & Cache (Consistent Live Fetch Policy)**:
+   - Tránh tình trạng local fetch mới nhưng production trả về cache cũ: Các route API đọc dữ liệu động (Google Sheets CMS, Supabase live tables) phải luôn có `export const dynamic = 'force-dynamic'` hoặc gắn headers `cache: 'no-store'`.
+6. **Tiền Kiểm Tra Biên Dịch & Typecheck Bắt Buộc (Pre-Flight Verification Protocol)**:
+   - Trước khi thông báo hoàn tất bất kỳ tác vụ hoặc xin lệnh commit: Agent bắt buộc phải chạy `npm run lint` (`tsc --noEmit`) để bắt sạch lỗi kiểu dữ liệu TypeScript.
+   - Khi có thay đổi lớn liên quan đến cấu hình Next.js, routing, server actions hoặc build scripts: Phải chủ động kiểm tra hoặc khuyến nghị chạy `npm run build` cục bộ trước khi deploy.
+
+
 
