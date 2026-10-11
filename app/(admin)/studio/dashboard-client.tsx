@@ -265,11 +265,9 @@ export function DashboardClient({
             { tab: "contacts", label: "Danh bạ iPhone", status: "Live" },
             { tab: "calls", label: "Cuộc gọi & Voicemail", status: "Live" },
             { tab: "messages", label: "Tin nhắn Messages", status: "Live" },
-            { tab: "photos", label: "Thư viện Ảnh", status: "Live" },
-            { tab: "banking", label: "Giao dịch Ngân hàng", status: "Live" },
             {
-              tab: "notes_and_browser",
-              label: "Ghi chú & Safari",
+              tab: "apps",
+              label: "Ứng dụng (Notes / Safari / Bank)",
               status: "Live",
             },
             { tab: "audios", label: "Băng âm thanh SFX", status: "Live" },

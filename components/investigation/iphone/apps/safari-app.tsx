@@ -27,7 +27,7 @@ interface SafariAppProps {
 }
 
 export function SafariApp({ onBackToHome }: SafariAppProps) {
-  const { data: rawData, loading } = usePhoneData('notes_and_browser')
+  const { data: rawData, loading } = usePhoneData('apps')
 
   // Filter items where type == 'SAFARI'
   const safariItems = rawData.filter((item: any) => String(item.type).toUpperCase() === 'SAFARI')

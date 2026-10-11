@@ -27,22 +27,38 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
   const [selectedTx, setSelectedTx] = useState<any | null>(null);
   const [filterType, setFilterType] = useState<"all" | "in" | "out">("all");
 
-  const { data: sheetData, loading } = usePhoneData("banking");
+  const { data: sheetData, loading } = usePhoneData("apps");
 
-  const transactions = sheetData.map((item: any, idx: number) => ({
-    id: item.tx_id || `tx-${idx + 1}`,
-    refId: item.ref_id || `FT${idx + 1000000}`,
-    title: item.title || "Giao dịch ngân hàng",
-    receiver: item.receiver || "Đối tác",
-    accountNo: item.account_no || "Chưa rõ STK",
-    amount: Number(item.amount) || 0,
-    time: item.timestamp || "",
-    category: item.category || "Chuyển khoản",
-    note: item.note || "",
-    isEvidence:
-      String(item.is_evidence).toLowerCase() === "true" ||
-      item.is_evidence === true,
-  }));
+  const transactions = sheetData
+    .filter((item: any) => String(item.type).toUpperCase() === "BANK")
+    .map((item: any, idx: number) => {
+      const amount = Number(item.amount) || 0;
+      const receiver = item.receiver || item.title_or_domain || "Đối tác";
+      const note = item.note || item.content_or_url || "";
+      const isIncome = amount > 0;
+      const title =
+        item.title ||
+        (isIncome ? `Nhận tiền từ ${receiver}` : `Chuyển tiền đến ${receiver}`);
+
+      // Tự sinh mã FT chuẩn ngân hàng (năm 16 + index + hash số tiền), không bắt GM phải quản lý trên Sheet
+      const seed = Math.abs(amount % 900000) + 100000;
+      const autoRefId = `FT16${String(idx + 1).padStart(2, "0")}${seed}`;
+
+      return {
+        id: item.tx_id || `tx-${idx + 1}`,
+        refId: item.ref_id || autoRefId,
+        title,
+        receiver,
+        accountNo: item.account_no || "Chưa rõ STK",
+        amount,
+        time: item.timestamp || "",
+        category: item.category || (isIncome ? "Nhận tiền" : "Chuyển tiền"),
+        note,
+        isEvidence:
+          String(item.is_evidence).toLowerCase() === "true" ||
+          item.is_evidence === true,
+      };
+    });
 
   const filteredTransactions = transactions.filter((tx) => {
     if (filterType === "in") return tx.amount > 0;

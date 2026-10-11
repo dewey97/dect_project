@@ -25,8 +25,8 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
   const [pinError, setPinError] = useState(false)
   const [unlockedNoteIds, setUnlockedNoteIds] = useState<string[]>([])
 
-  // Fetch notes from Google Sheets live CMS (tab: notes_and_browser)
-  const { data: rawData, loading } = usePhoneData('notes_and_browser')
+  // Fetch notes from Google Sheets live CMS (tab: apps)
+  const { data: rawData, loading } = usePhoneData('apps')
 
   // Filter items where type == 'NOTE'
   const sheetNotes: RichNote[] = rawData

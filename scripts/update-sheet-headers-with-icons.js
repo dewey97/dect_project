@@ -82,14 +82,15 @@ const TAB_SCHEMAS = {
     "⚡ description_prompt",
     "⚡ is_key_asset",
   ],
-  notes_and_browser: [
+  apps: [
     "🔑 case_id",
     "🔑 type",
     "⚡ title_or_domain",
     "⚡ content_or_url",
     "⚡ timestamp",
     "⚡ category",
-    "⚡ clue_tag",
+    "⚡ account_no",
+    "⚡ amount",
   ],
   checkpoints: [
     "🔑 case_id",
