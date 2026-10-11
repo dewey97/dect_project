@@ -57,67 +57,29 @@ export function CustomPinModal({
   // Fetch live checkpoints from Google Sheets Live CMS
   const { checkpoints } = useCaseCheckpoints("case-000");
 
-  // Auto-detect target checkpoint ID with smart fallback for suspect names & node IDs
+  // Auto-detect target checkpoint ID strictly for actual question/checkpoint pins
   const targetCpId = useMemo(() => {
     if (!pin) return "";
     if (pin.checkpointId) return pin.checkpointId;
 
-    const pid = (pin.id || "").toLowerCase();
-    if (pid === "c0-pin-phone" || pid.includes("phone")) return "cp-000-0";
-    if (
-      pid === "c0-pin-followup-vu" ||
-      pid === "node-suspect-vu" ||
-      pid.includes("vu")
-    )
-      return "cp-000-1a";
-    if (
-      pid === "c0-pin-followup-tung" ||
-      pid === "node-suspect-tung" ||
-      pid.includes("tung")
-    )
-      return "cp-000-1b";
-    if (
-      pid === "c0-pin-followup-ha" ||
-      pid === "node-suspect-ha" ||
-      pid.includes("ha")
-    )
-      return "cp-000-1c";
-    if (
-      pid === "c0-pin-reinvestigate" ||
-      pid.includes("reinvestigate") ||
-      pid.includes("kham-xet")
-    )
-      return "cp-000-convergence";
-    if (
-      pid === "c0-pin-indictment" ||
-      pid.includes("indictment") ||
-      pid.includes("cao-trang")
-    )
-      return "cp-000-2b";
+    // Chỉ nhận diện checkpoint nếu node có actionType rõ ràng là checkpoint/câu hỏi
+    if (pin.actionType === "sheet_checkpoint" || pin.actionType === "custom_question") {
+      const pid = (pin.id || "").toLowerCase();
+      if (pid === "c0-pin-phone") return "cp-000-0";
+      if (pid === "c0-pin-followup-vu") return "cp-000-1a-followup";
+      if (pid === "c0-pin-followup-tung") return "cp-000-1b";
+      if (pid === "c0-pin-followup-ha") return "cp-000-1c-followup";
+      if (pid === "c0-pin-indictment") return "cp-000-2b";
+      if (pid === "c0-pin-reinvestigate") return "cp-000-convergence";
 
-    const text = `${pin.label || ""} ${pin.detail || ""}`.toLowerCase();
-    if (text.includes("vũ") || text.includes("vu")) return "cp-000-1a";
-    if (text.includes("tùng") || text.includes("tung")) return "cp-000-1b";
-    if (text.includes("hà") || text.includes("ha")) return "cp-000-1c";
-    if (
-      text.includes("sđt") ||
-      text.includes("danh tính") ||
-      text.includes("nghi vấn") ||
-      text.includes("điện thoại")
-    )
-      return "cp-000-0";
-    if (
-      text.includes("khám xét") ||
-      text.includes("tái khám") ||
-      text.includes("hội tụ")
-    )
-      return "cp-000-convergence";
-    if (
-      text.includes("cáo trạng") ||
-      text.includes("kết luận") ||
-      text.includes("định tội")
-    )
-      return "cp-000-2b";
+      const text = `${pid} ${pin.label || ""} ${pin.detail || ""}`.toLowerCase();
+      if (text.includes("vũ") || text.includes("vu")) return "cp-000-1a";
+      if (text.includes("tùng") || text.includes("tung")) return "cp-000-1b";
+      if (text.includes("hà") || text.includes("ha")) return "cp-000-1c";
+      if (text.includes("sđt") || text.includes("điện thoại")) return "cp-000-0";
+      if (text.includes("cáo trạng") || text.includes("định tội")) return "cp-000-2b";
+      if (text.includes("khám xét") || text.includes("hội tụ")) return "cp-000-convergence";
+    }
 
     return "";
   }, [pin]);
@@ -131,13 +93,7 @@ export function CustomPinModal({
       );
       if (found) return found;
     }
-    return (
-      checkpoints.find(
-        (cp) =>
-          (cp as any).nodeId?.toLowerCase().trim() ===
-          pin.id.toLowerCase().trim(),
-      ) || null
-    );
+    return null;
   }, [checkpoints, targetCpId, pin]);
 
   // Reset inputs when pin changes
@@ -155,10 +111,8 @@ export function CustomPinModal({
   }, [pin, isOpen]);
 
   const isQuestionNode =
-    Boolean(matchedCheckpoint) ||
     pin?.actionType === "sheet_checkpoint" ||
     pin?.actionType === "custom_question" ||
-    Boolean(targetCpId) ||
     Boolean(pin?.question);
 
   const questionTitle =

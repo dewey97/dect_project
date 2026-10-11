@@ -451,18 +451,27 @@ export function findFollowupCulprit(pinId: string, detail: string): CulpritKey {
 }
 
 export function detectCheckpointForPin(pin?: PinPoint): string | null {
-  if (pin?.checkpointId) return pin.checkpointId;
-  const pText = `${pin?.id || ""} ${(pin?.label || "").toLowerCase()} ${(pin?.detail || "").toLowerCase()}`;
-  if (pText.includes("vu") || pText.includes("vũ")) return "cp-000-1a";
-  if (pText.includes("tung") || pText.includes("tùng")) return "cp-000-1b";
-  if (pText.includes("ha") || pText.includes("hà")) return "cp-000-1c";
-  if (
-    pText.includes("phone") ||
-    pText.includes("điện thoại") ||
-    pText.includes("sđt")
-  )
-    return "cp-000-0";
-  if (pText.includes("indictment") || pText.includes("cáo trạng"))
-    return "cp-000-2b";
+  if (!pin) return null;
+  if (pin.checkpointId) return pin.checkpointId;
+
+  // Chỉ nhận diện các node có actionType rõ ràng hoặc mã ID chuyên biệt
+  const id = pin.id || "";
+  if (id === "c0-pin-phone") return "cp-000-0";
+  if (id === "c0-pin-followup-vu") return "cp-000-1a-followup";
+  if (id === "c0-pin-followup-tung") return "cp-000-1b";
+  if (id === "c0-pin-followup-ha") return "cp-000-1c-followup";
+  if (id === "c0-pin-indictment") return "cp-000-2b";
+  if (id === "c0-pin-reinvestigate") return "cp-000-convergence";
+
+  if (pin.actionType === "sheet_checkpoint" || pin.actionType === "custom_question") {
+    const pText = `${id} ${(pin.label || "").toLowerCase()} ${(pin.detail || "").toLowerCase()}`;
+    if (pText.includes("vu") || pText.includes("vũ")) return "cp-000-1a";
+    if (pText.includes("tung") || pText.includes("tùng")) return "cp-000-1b";
+    if (pText.includes("ha") || pText.includes("hà")) return "cp-000-1c";
+    if (pText.includes("phone") || pText.includes("sđt")) return "cp-000-0";
+    if (pText.includes("indictment") || pText.includes("cáo trạng")) return "cp-000-2b";
+    if (pText.includes("kham-xet") || pText.includes("khám xét") || pText.includes("hội tụ")) return "cp-000-convergence";
+  }
+
   return null;
 }

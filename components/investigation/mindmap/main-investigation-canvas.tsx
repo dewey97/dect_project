@@ -127,17 +127,18 @@ export function MainInvestigationCanvas({
     } else if (state.isIndictmentOpen) {
       currentCp = "cp-000-2b";
     } else if (state.isAddSuspectOpen || state.editingSuspect) {
-      const sName = (state.editingSuspect?.name || "").toLowerCase();
-      const sId = (state.editingSuspect?.id || "").toLowerCase();
-      if (sName.includes("vũ") || sName.includes("vu") || sId === "vu")
+      const sName = (state.editingSuspect?.name || "").toLowerCase().trim();
+      const sId = (state.editingSuspect?.id || "").toLowerCase().trim();
+      if (sName === "vũ" || sName === "vu" || sName === "lê quang vũ" || sId === "vu")
         currentCp = "cp-000-1a";
       else if (
-        sName.includes("tùng") ||
-        sName.includes("tung") ||
+        sName === "tùng" ||
+        sName === "tung" ||
+        sName === "nguyễn thanh tùng" ||
         sId === "tung"
       )
         currentCp = "cp-000-1b";
-      else if (sName.includes("hà") || sName.includes("ha") || sId === "ha")
+      else if (sName === "hà" || sName === "ha" || sName === "trần thị hà" || sId === "ha")
         currentCp = "cp-000-1c";
     } else if (activeCustomPinModal) {
       currentCp = detectCheckpointForPin(activeCustomPinModal);
