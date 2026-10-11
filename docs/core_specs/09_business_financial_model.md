@@ -97,14 +97,13 @@ Cấu trúc sản phẩm được bóc tách thành 3 nhóm linh kiện độc l
 
 ---
 
-## PHẦN 3: THỎA THUẬN SÁNG LẬP & PHÂN BỔ DOANH THU
-
-### 3.1. Nguyên Tắc Cốt Lõi
-1. **Minh bạch từ đầu để giữ tình bạn:** Tiền bạc và công sức phải có thước đo rõ ràng, tránh tâm lý "ai cũng nghĩ mình làm nhiều nhất" hoặc "ngại không dám nói".
-2. **Tách biệt Nền tảng và Nội dung Vụ án:** 
-   * **Nền tảng** là tài sản chung tích lũy lâu dài (mã nguồn, thương hiệu, hệ thống quản lý, cộng đồng).
-   * **Nội dung (từng vụ án)** là sản phẩm cụ thể: ai bỏ công sức viết kịch bản, thiết kế vụ án nào thì hưởng doanh thu trực tiếp trên vụ án đó.
-3. **Làm nhiều hưởng nhiều, không làm không có phần:** Tránh tình trạng cổ đông "treo" (người không đóng góp gì vẫn nhận đều tiền của các vụ án sau do người khác sáng tạo).
+### 3.1. Bối Cảnh Hợp Tác: All-in vs. Part-time
+* **Bạn (Lead Founder):** Định hướng **All-in** (toàn thời gian, chịu rủi ro cao nhất, tự bỏ vốn đầu tư ban đầu, tự tay lập trình 100% nền tảng công nghệ, điều hành tiến độ tổng thể).
+* **2 Người bạn (Contributor Partners):** Tham gia **Part-time** (vẫn có công việc chính, đóng góp thời gian rảnh theo cam kết tối thiểu 5–8 giờ/tuần vào cuối tuần).
+* **Nguyên tắc cốt lõi:**
+  1. **Quyền sở hữu công nghệ (IP & Source Code):** Toàn bộ mã nguồn web app, kiến trúc hạ tầng và hệ thống cấp phép thuộc **sở hữu cá nhân của Bạn 100%**. Nhóm được cấp quyền khai thác độc quyền nền tảng này cho các vụ án.
+  2. **Bảo vệ vốn đầu tư túi:** Tiền túi Bạn bỏ ra in ấn/sản xuất được tính là **Khoản Vay Ưu Tiên**. Khi có doanh thu bán hàng, tiền phải **ưu tiên hoàn vốn túi của Bạn trước 100%**, sau đó số tiền lời mới đem ra chia.
+  3. **Không cào bằng thời gian:** Ai làm nhiều hưởng nhiều; thù lao lao động gắn chặt với từng vụ án cụ thể, tránh mâu thuẫn tị nạnh công sức.
 
 ### 3.2. Mô Hình Phân Bổ Quyền Lợi 2 Tầng
 
@@ -117,49 +116,60 @@ Cấu trúc sản phẩm được bóc tách thành 3 nhóm linh kiện độc l
                                     │
             ┌───────────────────────┴───────────────────────┐
             ▼                                               ▼
-   20% - 25% VÀO QUỸ NỀN TẢNG                      75% - 80% VÀO QUỸ VỤ ÁN
-            │                                               │
-  • Trừ chi phí chung (Server, duy trì)           • Chia trực tiếp cho những người
-  • Lợi nhuận chia theo CỔ PHẦN NỀN TẢNG             sản xuất ra vụ án cụ thể đó
+      25% PHÍ NỀN TẢNG                                75% QUỸ VỤ ÁN
+(Thuộc về Bạn - Công Dev & Duy trì máy chủ)      (Chia theo đóng góp nội dung)
+                                                            │
+                                            ┌───────────────┼───────────────┐
+                                            ▼               ▼               ▼
+                                       Kịch bản (45%)  Mỹ thuật (30%)  Kỹ thuật Web (25%)
+                                                                       (Thuộc về Bạn)
 ```
 
-#### TẦNG 1: CỔ PHẦN NỀN TẢNG
-Đại diện cho quyền sở hữu thương hiệu chung, website, mã nguồn hệ thống, danh sách khách hàng và quỹ nền tảng.
+#### TẦNG 1: QUYỀN SỞ HỮU & PHÍ NỀN TẢNG (25%)
+Đại diện cho giá trị của cỗ máy công nghệ hoạt động 24/7 (hệ thống CMS, máy chủ, xử lý mã QR, phòng chơi nhóm):
+* **Cơ chế thu phí:** Trích **25% doanh thu thuần** trả về cho Nền tảng (thuộc về Bạn) để bù đắp chi phí máy chủ và công sức xây dựng kiến trúc kỹ thuật.
+* **Tỷ lệ cổ phần thương hiệu chung:**
+  * **Bạn:** **65% – 70%** (Nắm quyền phủ quyết và quyền quyết định chiến lược cao nhất).
+  * **Người bạn 2 & 3:** **15% – 17.5% mỗi người** (đi kèm cam kết thời gian đồng hành tối thiểu).
 
-* **Bạn (Lead Dev, Kiến trúc hệ thống, Tác giả Vụ án #000):** **55% – 60%** (Nắm quyền phủ quyết và định hướng kỹ thuật/sản phẩm).
-* **Người bạn 2 (Phụ trách Vận hành / In ấn / Đóng gói / CSKH):** **20% – 22.5%**
-* **Người bạn 3 (Phụ trách Marketing / Kênh Bán / Cộng đồng / Đối ngoại):** **20% – 22.5%**
-
-*Điều khoản Đồng hành:*
-* Cổ phần nền tảng được tích lũy theo thời gian đồng hành (ví dụ: tối thiểu phải đồng hành 6 tháng đầu mới bắt đầu nhận cổ phần, phân bổ đều trong 24 tháng).
-* Nếu một người rời đi trước 6 tháng: Toàn bộ cổ phần hoàn lại cho nhóm.
-* Nếu rời đi sau 1 năm: Giữ lại phần cổ phần đã tích lũy của giai đoạn đó, nhưng không tham gia biểu quyết vận hành.
-
-#### TẦNG 2: PHÂN BỔ THEO TỪNG VỤ ÁN (75% đến 80%)
-Mỗi vụ án là một "dự án con". Doanh thu thuần của vụ án nào sẽ chuyển vào quỹ của vụ án đó và chia theo tỷ lệ đóng góp thực tế:
+#### TẦNG 2: PHÂN BỔ THEO TỪNG VỤ ÁN (75%)
+Doanh thu thuần còn lại của vụ án nào sẽ chuyển vào quỹ của vụ án đó và chia theo tỷ lệ công việc thực tế:
 
 | Khâu công việc trong Vụ án | Tỷ trọng | Phân bổ Vụ án #000 | Định hướng từ Vụ án #001 trở đi |
 |---|---|---|---|
 | **Kịch bản & Câu đố** | **45%** | **Cả 3 người cùng làm** (mỗi người 15%) | Ai là người viết chính nhận phần này |
-| **Mỹ thuật & Hiện vật** | **30%** | **Cả nhóm cùng tham gia** | Phân bổ theo người thiết kế đồ họa / đạo cụ |
-| **Tích hợp Kỹ thuật & Đưa lên Web** | **25%** | **Bạn** (100% khâu kỹ thuật) | Phân bổ cho người đưa kịch bản lên Web app |
+| **Mỹ thuật & Hiện vật** | **30%** | **Cả nhóm cùng tham gia** (mỗi người 10%) | Phân bổ theo người thiết kế đồ họa / đạo cụ |
+| **Tích hợp Kỹ thuật & Đưa lên Web** | **25%** | **Bạn** (100% khâu kỹ thuật) | Người đưa kịch bản và cấu hình lên Web app |
 
-#### Ví dụ áp dụng thực tế:
-
+#### Tỷ lệ thực nhận trên thực tế:
 * **Vụ án #000 (Vụ án khởi động):**
-  * Khâu Kịch bản & Câu đố (45%): Cả 3 người cùng thảo luận, lên ý tưởng và viết chung -> Chia đều mỗi người 15%.
-  * Khâu Mỹ thuật, ảnh & đạo cụ (30%): Cả nhóm cùng đóng góp, tìm kiếm và hoàn thiện -> Chia theo đóng góp thực tế (hoặc chia đều mỗi người 10%).
-  * Khâu Kỹ thuật & Đưa lên Web (25%): Bạn chịu trách nhiệm toàn bộ -> Bạn nhận 25%.
-  * **Tổng kết Vụ án #000:** Bạn nhận **~50%** quỹ vụ án (do gánh thêm phần kỹ thuật), 2 người bạn mỗi người nhận **~25%**.
-  * *(Doanh thu quỹ nền tảng 20% - 25%: Sau khi trừ tiền máy chủ, chia theo tỷ lệ Cổ phần Tầng 1).*
-
+  * Trong Quỹ Vụ án (75%): Bạn nhận 15% (Kịch bản) + 10% (Mỹ thuật) + 25% (Kỹ thuật) = **50% quỹ**; 2 người bạn mỗi người nhận **25% quỹ**.
+  * Cộng thêm 25% Phí nền tảng ban đầu: **Tổng thực nhận thực tế của Bạn là ~62.5% tổng doanh thu**, mỗi người bạn nhận **~18.75% tổng doanh thu**.
 * **Từ Vụ án #001 trở đi:**
-  * Nhóm sẽ thống nhất giao vai trò rõ ràng trước khi bấm máy: Ai là người viết chính, ai vẽ tranh/làm hiện vật, ai đưa lên Web.
-  * Ví dụ: Người bạn 2 viết chính (nhận trọn 45% Kịch bản), Người bạn 3 vẽ chính (nhận 30% Mỹ thuật), Bạn đưa lên Web (nhận 25% Kỹ thuật).
-  * Ai không tham gia khâu nào của vụ án đó thì không nhận tiền của khâu đó.
+  * Kể cả Bạn không trực tiếp viết chữ nào (để 2 bạn kia tự viết kịch bản và vẽ tranh): Nhờ sở hữu nền tảng và phụ trách kỹ thuật web, **Bạn vẫn luôn nhận: 25% (Phí nền tảng) + [25% x 75% = 18.75%] (Kỹ thuật) = ~43.75% doanh thu của vụ án đó**.
+  * Hai bạn kia chia nhau phần còn lại dựa trên khối lượng kịch bản và mỹ thuật thực tế họ đóng góp.
 
 ### 3.3. Quy Tắc Quyết Định & Điều Hành
-1. **Quyền quyết định Kỹ thuật & Hạ tầng:** Thuộc về Bạn.
-2. **Quyền duyệt phát hành Vụ án mới:** Cần tối thiểu 2/3 người sáng lập đồng thuận sau khi chơi thử nghiệm thu.
-3. **Tái đầu tư quay vòng vốn:** Trong 3 tháng đầu hoặc 100 sản phẩm đầu tiên, đề xuất giữ lại 50% lợi nhuận để quay vòng vốn sản xuất đợt in ấn tiếp theo.
-4. **Minh bạch tài chính:** Mọi chi phí, hóa đơn in ấn, doanh thu ngân hàng, doanh thu sàn thương mại điện tử phải được cập nhật vào một file Google Sheets nội bộ để cả 3 người cùng theo dõi hàng tuần.
+1. **Quyền quyết định tối cao (Final Call):** Thuộc về Bạn (Lead Founder All-in) đối với mọi vấn đề kỹ thuật, kiến trúc, hạ tầng và tiến độ phát hành.
+2. **Cam kết trách nhiệm Part-time:** Hai bạn cam kết hoàn thành các đầu việc độc lập đúng hạn, không nằm trên luồng phụ thuộc khẩn cấp để tránh làm tắc nghẽn dự án.
+3. **Thu hồi vốn đầu tư:** Tiền túi Bạn bỏ ra in ấn hoặc làm mẫu được ưu tiên hoàn trả ngay từ các đợt doanh thu đầu tiên trước khi chia lợi nhuận.
+4. **Minh bạch tài chính:** Doanh thu và chi phí được cập nhật tự động hoặc định kỳ vào file theo dõi nội bộ để cả 3 người cùng nắm bắt.
+
+---
+
+## PHẦN 4: ĐỊNH HƯỚNG PHÁP LÝ & VẬN HÀNH BÁN HÀNG
+
+### 4.1. Giai đoạn Khởi động & Bán thử nghiệm (Chưa cần thành lập công ty)
+* **Hình thức:** Bán hàng dưới tư cách **Cá nhân kinh doanh** (dùng CCCD, mã số thuế cá nhân và tài khoản ngân hàng chính chủ).
+* **Kênh phân phối:**
+  * Bán Boardgame qua tài khoản người bán cá nhân trên Shopee / TikTok Shop / Mạng xã hội.
+  * Bản Online tích hợp cổng thanh toán cá nhân (PayOS / VietQR tự động) cấp mã code vào game ngay lập tức.
+* **Nghĩa vụ thuế cá nhân:** Doanh thu dưới 100 triệu/năm được miễn thuế; khi vượt 100 triệu, sàn thương mại điện tử sẽ tự động khấu trừ nộp thay (~1.5% doanh thu).
+
+### 4.2. Lý do không vội vã mở công ty ở giai đoạn đầu
+1. **Rủi ro và chi phí khi giải thể:** Thủ tục giải thể công ty tại Việt Nam cực kỳ phức tạp và kéo dài (6 tháng đến 1 năm) do phải quyết toán thuế toàn bộ quá trình hoạt động, chi phí thuê dịch vụ giải thể tốn 5 – 10 triệu đồng.
+2. **Chi phí duy trì cố định:** Kể cả không có doanh thu, công ty vẫn phải chịu phí duy trì chữ ký số, thuế môn bài (2 triệu/năm từ năm thứ 2), và phí thuê dịch vụ kế toán làm báo cáo 4 quý (~8 – 15 triệu/năm).
+
+### 4.3. Lộ trình nâng cấp pháp nhân tương lai
+* **Mốc xem xét:** Khi sản phẩm đã chứng minh được nhu cầu thị trường, dòng tiền ổn định (> 50–100 triệu/tháng) hoặc cần xuất hóa đơn đỏ cho các đơn hàng lớn (trường học, quán cafe, công ty đặt hàng teambuilding).
+* **Phương án ưu tiên kế tiếp:** Thành lập **Hộ kinh doanh cá thể** (thủ tục mở/đóng đơn giản tại UBND Quận/Huyện, thuế khoán nhẹ nhàng, không nặng gánh kế toán báo cáo). Chỉ chuyển đổi lên **Công ty TNHH** khi quy mô thật sự lớn và sẵn sàng chi trả chi phí bộ máy kế toán chuyên nghiệp.
