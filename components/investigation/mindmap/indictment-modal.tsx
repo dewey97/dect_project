@@ -126,7 +126,7 @@ export function IndictmentModal({
         detectiveAudio.playGlassSound()
         return
       }
-      const validEvidenceCodes = ['53', 'c-02', 'c02', 'c2', 'd-04', 'd04', 'd4', 'd-05', 'd05', 'd5', 'd-02', 'd02', 'd2']
+      const validEvidenceCodes = ['53', 'c-02', 'c02', 'c2', 'd-06', 'd06', 'd6', 'd-04', 'd04', 'd4', 'd-05', 'd05', 'd5', 'd-02', 'd02', 'd2']
       if (!checkIndictmentEvidenceMatch(cluesEvidenceInput, validEvidenceCodes)) {
         setErrorMsg('Mã chứng cứ mục 2 chưa chính xác!')
         detectiveAudio.playGlassSound()
@@ -308,7 +308,7 @@ export function IndictmentModal({
                   setCluesEvidenceInput(e.target.value)
                   if (errorMsg) setErrorMsg('')
                 }}
-                placeholder="Nhập mã chứng cứ (ví dụ: C-02, D-04, D-05, D-02 hoặc 53)..."
+                placeholder="Nhập mã chứng cứ (ví dụ: D-06, D-05, D-04, C-02 hoặc 53)..."
                 className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
               />
             </div>

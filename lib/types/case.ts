@@ -186,6 +186,8 @@ export interface Checkpoint {
     }[];
   };
   photoCodes?: string[];
+  rawAnswersId?: string;
+  rawAnswers?: string;
   pickerConfig?: {
     suspectLabel?: string;
     validSuspects?: string[];
@@ -194,6 +196,11 @@ export interface Checkpoint {
     validMotives?: string[];
     availableEvidences?: CheckpointOptionItem[];
     requiredEvidenceIds?: string[];
+    optionalEvidenceIds?: string[];
+    motiveEvidenceIds?: string[];
+    optionalMotiveIds?: string[];
+    alibiEvidenceIds?: string[];
+    optionalAlibiIds?: string[];
     mismatchTypeLabel?: string;
     validMismatchTypes?: string[];
     mismatchTypeOptions?: string[];

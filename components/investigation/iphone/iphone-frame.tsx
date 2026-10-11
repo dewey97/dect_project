@@ -125,8 +125,9 @@ export function IPhoneFrame({
 
       {/* PHONE CONTAINER: Exact iPhone 375x667 Canvas Aspect Ratio */}
       <div
+        data-iphone-frame="true"
         className={cn(
-          "relative w-[375px] max-w-full h-[667px] max-h-full aspect-[375/667] transition-all flex flex-col overflow-hidden shadow-2xl shrink-0 my-auto",
+          "relative w-[375px] max-w-full h-[667px] max-h-full aspect-[375/667] transition-all flex flex-col overflow-hidden shadow-2xl shrink-0 my-auto iphone-frame no-scrollbar",
           frameless
             ? "bg-black rounded-lg border border-white/20"
             : "bg-[#121214] rounded-xl p-2.5 border-[6px] border-[#2C2C30] ring-1 ring-white/10",
@@ -160,7 +161,7 @@ export function IPhoneFrame({
         {/* SCREEN CONTAINER (Uses Authentic Figma Beach Wallpaper & Vignette) */}
         <div
           className={cn(
-            "relative w-full h-full bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col",
+            "relative w-full h-full bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col iphone-screen no-scrollbar",
             !frameless && "rounded-md",
           )}
         >

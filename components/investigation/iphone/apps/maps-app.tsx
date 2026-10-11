@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState, useMemo, useRef } from 'react'
 import {
   Search,
   Navigation,
@@ -10,7 +10,8 @@ import {
   MapPin,
   Bookmark,
   Phone,
-  ExternalLink
+  ExternalLink,
+  Compass
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
@@ -47,9 +48,10 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   const [destinationId, setDestinationId] = useState<string>('6')
   const [useAlternativeRoute, setUseAlternativeRoute] = useState<boolean>(false)
 
-  // Selector dropdown modal state ('origin' | 'destination' | null)
-  const [pickingTarget, setPickingTarget] = useState<'origin' | 'destination' | null>(null)
+  // Selector dropdown modal state ('single' | 'origin' | 'destination' | null)
+  const [pickingTarget, setPickingTarget] = useState<'single' | 'origin' | 'destination' | null>(null)
   const [selectorSearch, setSelectorSearch] = useState('')
+  const [selectingStep, setSelectingStep] = useState<1 | 2>(1)
 
   // Map view & Layer state
   const [mapLayer, setMapLayer] = useState<'standard' | 'satellite'>('standard')
@@ -202,27 +204,77 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
 
   // Select location from picker
   const handleSelectPickedLocation = (loc: CaseLocation) => {
+    if (pickingTarget === 'single') {
+      setSelectedPlace(loc)
+      setPickingTarget(null)
+      setSelectorSearch('')
+      setPan({
+        x: 180 - loc.x * zoom,
+        y: 320 - loc.y * zoom
+      })
+      setIsCentered(false)
+      setIsPlaceSheetExpanded(false)
+      return
+    }
+
     if (pickingTarget === 'origin') {
       setOriginId(loc.id)
-    } else {
-      setDestinationId(loc.id)
-      setSelectedPlace(loc)
+      setSelectingStep(2)
+      setPickingTarget('destination') // Khi chọn vị trí 1 thì hiện ra cái chọn vị trí 2 luôn
+      setSelectorSearch('')
+      return
     }
+
+    // Selected Position 2 (destination)
+    setDestinationId(loc.id)
+    setSelectingStep(1)
     setPickingTarget(null)
     setSelectorSearch('')
+    setActiveTab('directions')
 
-    // Center camera smoothly on chosen location
+    // Center camera smoothly between origin and destination
+    const midX = (origin.x + loc.x) / 2
+    const midY = (origin.y + loc.y) / 2
     setPan({
-      x: 180 - loc.x * zoom,
-      y: 320 - loc.y * zoom
+      x: 180 - midX * zoom,
+      y: 320 - midY * zoom
     })
+    setIsCentered(false)
   }
 
-  // Pin click on map -> Opens Google Place Sheet
+  // Pin click on map
   const handlePinClick = (loc: CaseLocation) => {
-    setSelectedPlace(loc)
-    setIsPlaceSheetExpanded(false)
-    setIsBookmarked(false)
+    if (activeTab === 'explore') {
+      setSelectedPlace(loc)
+      setIsPlaceSheetExpanded(false)
+      setPan({
+        x: 180 - loc.x * zoom,
+        y: 320 - loc.y * zoom
+      })
+      setIsCentered(false)
+      return
+    }
+
+    // When in directions mode:
+    if (selectingStep === 2) {
+      setDestinationId(loc.id)
+      setSelectingStep(1)
+      setSelectedPlace(null)
+      const midX = (origin.x + loc.x) / 2
+      const midY = (origin.y + loc.y) / 2
+      setPan({
+        x: 180 - midX * zoom,
+        y: 320 - midY * zoom
+      })
+      setIsCentered(false)
+      return
+    }
+
+    // First position picked -> immediately prompt for second position
+    setOriginId(loc.id)
+    setSelectingStep(2)
+    setSelectedPlace(null)
+    setPickingTarget('destination')
   }
 
   // Dynamic Scale text in meters
@@ -232,134 +284,150 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
     <div className="flex flex-col h-full w-full bg-[#E5E3DF] text-[#202124] select-none overflow-hidden font-sans relative">
       
       {/* ========================================================================= */}
-      {/* 1. GOOGLE MAPS AUTHENTIC TOP HEADER & DIRECTIONS PANEL                     */}
+      {/* 1. TOP SEGMENT SWITCHER & HEADER PANELS (PHƯƠNG ÁN 1)                     */}
       {/* ========================================================================= */}
-        <div className="absolute top-2 left-2 right-2 z-30 flex flex-col gap-1.5 pointer-events-auto">
-          {activeTab === 'explore' ? (
-            /* EXPLORE / SEARCH PILL (Exact Google Maps Search Bar) */
-            <div className="flex flex-col gap-1.5">
-              <div className="h-11 rounded-full bg-white shadow-[0_2px_6px_rgba(60,64,67,0.3)] border border-transparent px-3.5 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                  {onBackToHome && (
-                    <button
-                      onClick={onBackToHome}
-                      className="p-1 -ml-1 text-gray-600 hover:text-blue-600 cursor-pointer rounded-full active:bg-gray-100"
-                      title="Về màn hình chính"
-                    >
-                      <ChevronLeft className="size-5 text-gray-700" />
-                    </button>
-                  )}
-                  {/* Google "G" 4-color icon */}
-                  <div className="size-5 flex items-center justify-center font-bold text-xs font-serif bg-gradient-to-r from-blue-500 via-red-500 to-yellow-500 text-white rounded-full shrink-0 shadow-xs">
-                    G
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm (29 Vĩnh Thụy, Đạt Phú...)"
-                    onClick={() => {
-                      setPickingTarget('destination')
-                    }}
-                    readOnly
-                    className="w-full text-[13px] font-normal text-gray-800 placeholder-gray-500 bg-transparent outline-none cursor-pointer"
-                  />
-                </div>
-
-                <button
-                  onClick={() => setActiveTab('directions')}
-                  className="p-1.5 text-[#1A73E8] hover:bg-blue-50 rounded-full cursor-pointer shrink-0 transition-colors"
-                  title="Đo khoảng cách giữa 2 điểm"
-                >
-                  <Navigation className="size-4" />
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* GOOGLE MAPS ROUTE DIRECTION HEADER */
-            <div className="rounded-2xl bg-white shadow-[0_4px_14px_rgba(60,64,67,0.25)] border border-gray-200/90 p-2.5 space-y-2 animate-in fade-in-50">
-              {/* Top Navigation Row: Back, Title & Options */}
-              <div className="flex items-center justify-between pb-1 border-b border-gray-100">
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => setActiveTab('explore')}
-                    className="p-1 text-gray-600 hover:text-black rounded-full cursor-pointer hover:bg-gray-100"
-                    title="Quay lại tìm kiếm"
-                  >
-                    <ChevronLeft className="size-4 text-gray-700" />
-                  </button>
-                  <span className="text-[12px] font-semibold text-gray-900 tracking-tight">
-                    Đo khoảng cách giữa 2 điểm
-                  </span>
-                </div>
-
-                {onBackToHome && (
-                  <button
-                    onClick={onBackToHome}
-                    className="text-[11px] text-[#1A73E8] font-semibold hover:underline cursor-pointer"
-                  >
-                    Về Home
-                  </button>
-                )}
-              </div>
-
-              {/* Origin A & Destination B with Swap Button */}
-              <div className="flex items-center gap-2">
-                {/* Visual Route Connectors (Blue ring, dotted line, Red pin) */}
-                <div className="flex flex-col items-center justify-between py-2 shrink-0 w-4 h-16">
-                  {/* Origin Circle */}
-                  <div className="size-3 rounded-full border-2 border-[#1A73E8] bg-white flex items-center justify-center">
-                    <div className="size-1 rounded-full bg-[#1A73E8]" />
-                  </div>
-                  {/* Dotted line */}
-                  <div className="w-[1.5px] flex-1 my-0.5 border-l-2 border-dotted border-gray-400" />
-                  {/* Destination Pin */}
-                  <MapPin className="size-3.5 text-[#EA4335] fill-[#EA4335]" />
-                </div>
-
-                {/* Input Fields for Origin A and Destination B */}
-                <div className="flex-1 space-y-1.5 min-w-0">
-                  {/* Point A Selector */}
-                  <button
-                    onClick={() => setPickingTarget('origin')}
-                    className="w-full h-8 px-2.5 rounded-lg bg-gray-100 hover:bg-gray-200/80 text-left flex items-center justify-between transition-colors border border-gray-200/60 cursor-pointer"
-                  >
-                    <span className="text-[11.5px] font-medium text-gray-800 truncate">
-                      {origin.name}
-                    </span>
-                    <span className="text-[9px] text-[#1A73E8] font-bold shrink-0 font-mono ml-1">ĐIỂM A</span>
-                  </button>
-
-                  {/* Point B Selector */}
-                  <button
-                    onClick={() => setPickingTarget('destination')}
-                    className="w-full h-8 px-2.5 rounded-lg bg-gray-100 hover:bg-gray-200/80 text-left flex items-center justify-between transition-colors border border-gray-200/60 cursor-pointer"
-                  >
-                    <span className="text-[11.5px] font-semibold text-gray-900 truncate">
-                      {destination.name}
-                    </span>
-                    <span className="text-[9px] text-[#EA4335] font-bold shrink-0 font-mono ml-1">ĐIỂM B</span>
-                  </button>
-                </div>
-
-                {/* Swap A/B Button */}
-                <button
-                  onClick={handleSwapLocations}
-                  className="size-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700 cursor-pointer transition-transform active:rotate-180"
-                  title="Đổi chiều A - B"
-                >
-                  <ArrowUpDown className="size-3.5" />
-                </button>
-              </div>
-
-              {/* Distance Summary Bar (No Motorbike / Walk Tabs) */}
-              <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
-                <span className="text-gray-500 font-medium">Khoảng cách giữa 2 điểm:</span>
-                <span className="font-bold text-[#1A73E8] font-mono text-[13px] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-                  {activeRoute.distanceText}
-                </span>
-              </div>
-            </div>
+      <div className="absolute top-2 left-2 right-2 z-30 flex flex-col gap-1.5 pointer-events-auto">
+        {/* Top 2-Mode Segment Bar */}
+        <div className="bg-white/95 backdrop-blur-md p-1 rounded-2xl shadow-[0_2px_8px_rgba(60,64,67,0.18)] border border-gray-200/80 flex items-center gap-1.5">
+          {onBackToHome && (
+            <button
+              onClick={onBackToHome}
+              className="p-1.5 text-gray-600 hover:text-black cursor-pointer rounded-xl active:bg-gray-100 shrink-0"
+              title="Về màn hình chính"
+            >
+              <ChevronLeft className="size-4 text-gray-700" />
+            </button>
           )}
+          <div className="grid grid-cols-2 gap-1 flex-1 bg-gray-100 p-0.5 rounded-xl">
+            <button
+              onClick={() => {
+                setActiveTab('explore')
+                setSelectingStep(1)
+              }}
+              className={cn(
+                'py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer',
+                activeTab === 'explore'
+                  ? 'bg-white text-[#1A73E8] shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              )}
+            >
+              <Search className="size-3.5" />
+              <span>Tra cứu</span>
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('directions')
+              }}
+              className={cn(
+                'py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer',
+                activeTab === 'directions'
+                  ? 'bg-white text-[#1A73E8] shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900'
+              )}
+            >
+              <Navigation className="size-3.5" />
+              <span>Chỉ đường</span>
+            </button>
+          </div>
         </div>
+
+        {activeTab === 'explore' ? (
+          /* EXPLORE / SEARCH BAR */
+          <div className="flex flex-col gap-1.5">
+            <div className="h-10 rounded-xl bg-white shadow-[0_2px_6px_rgba(60,64,67,0.22)] border border-gray-200/70 px-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                <Search className="size-4 text-gray-400 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm địa điểm..."
+                  onClick={() => {
+                    setPickingTarget('single')
+                  }}
+                  readOnly
+                  className="w-full text-[13px] font-normal text-gray-800 placeholder-gray-500 bg-transparent outline-none cursor-pointer"
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* DIRECTIONS PANEL */
+          <div className="rounded-2xl bg-white shadow-[0_4px_14px_rgba(60,64,67,0.22)] border border-gray-200/90 p-2.5 space-y-2 animate-in fade-in-50">
+            {/* Origin A & Destination B with Swap Button */}
+            <div className="flex items-center gap-2">
+              {/* Visual Route Connectors (Blue ring, dotted line, Red pin) */}
+              <div className="flex flex-col items-center justify-between py-2 shrink-0 w-4 h-16">
+                <div className="size-3 rounded-full border-2 border-[#1A73E8] bg-white flex items-center justify-center">
+                  <div className="size-1 rounded-full bg-[#1A73E8]" />
+                </div>
+                <div className="w-[1.5px] flex-1 my-0.5 border-l-2 border-dotted border-gray-400" />
+                <MapPin className="size-3.5 text-[#EA4335] fill-[#EA4335]" />
+              </div>
+
+              {/* Input Fields for Origin A and Destination B */}
+              <div className="flex-1 space-y-1.5 min-w-0">
+                {/* Point A Selector */}
+                <button
+                  onClick={() => {
+                    setSelectingStep(1)
+                    setPickingTarget('origin')
+                  }}
+                  className="w-full h-8 px-2.5 rounded-lg bg-gray-100 hover:bg-gray-200/80 text-left flex items-center justify-between transition-colors border border-gray-200/60 cursor-pointer"
+                >
+                  <span className="text-[11.5px] font-medium text-gray-800 truncate">
+                    {origin.name}
+                  </span>
+                  <span className="text-[9px] text-[#1A73E8] font-bold shrink-0 font-mono ml-1">ĐIỂM 1</span>
+                </button>
+
+                {/* Point B Selector */}
+                <button
+                  onClick={() => {
+                    setSelectingStep(2)
+                    setPickingTarget('destination')
+                  }}
+                  className="w-full h-8 px-2.5 rounded-lg bg-gray-100 hover:bg-gray-200/80 text-left flex items-center justify-between transition-colors border border-gray-200/60 cursor-pointer"
+                >
+                  <span className="text-[11.5px] font-semibold text-gray-900 truncate">
+                    {destination.name}
+                  </span>
+                  <span className="text-[9px] text-[#EA4335] font-bold shrink-0 font-mono ml-1">ĐIỂM 2</span>
+                </button>
+              </div>
+
+              {/* Swap A/B Button */}
+              <button
+                onClick={handleSwapLocations}
+                className="size-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-700 cursor-pointer transition-transform active:rotate-180"
+                title="Đổi chiều 1 - 2"
+              >
+                <ArrowUpDown className="size-3.5" />
+              </button>
+            </div>
+
+            {/* Distance Summary Bar */}
+            <div className="pt-2 border-t border-gray-100 flex items-center justify-between text-xs">
+              <span className="text-gray-500 font-medium">Khoảng cách giữa 2 điểm:</span>
+              <span className="font-bold text-[#1A73E8] font-mono text-[13px] bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                {activeRoute.distanceText}
+              </span>
+            </div>
+
+            {/* Floating guide when selecting position 2 directly on map */}
+            {selectingStep === 2 && !pickingTarget && (
+              <div className="px-3 py-1.5 rounded-xl bg-[#1A73E8] text-white text-[11px] font-medium shadow-xs flex items-center justify-between">
+                <span className="truncate">Điểm 1: {origin.name}. Chạm điểm thứ 2 trên bản đồ</span>
+                <button
+                  onClick={() => setSelectingStep(1)}
+                  className="p-0.5 ml-2 hover:bg-white/20 rounded-full cursor-pointer shrink-0"
+                  title="Hủy"
+                >
+                  <X className="size-3" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* ========================================================================= */}
       {/* 2. THE GOOGLE MAPS INTERACTIVE VECTOR CANVAS (STANDALONE COMPONENT)       */}
@@ -401,143 +469,147 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
       {/* ========================================================================= */}
       {/* 3. GOOGLE MAPS BOTTOM SHEET & PLACE DETAILS / ROUTE SUMMARY               */}
       {/* ========================================================================= */}
-      <div className={cn(
-        'absolute bottom-0 inset-x-0 z-30 bg-white border-t border-gray-200/90 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.15)] pointer-events-auto transition-all duration-300 overflow-y-auto',
-        isPlaceSheetExpanded ? 'h-[75%]' : 'max-h-[46%]'
-      )}>
-        <div
-          onClick={() => setIsPlaceSheetExpanded(!isPlaceSheetExpanded)}
-          className="w-full py-2 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
-        >
-          <div className="w-9 h-1 bg-gray-300 rounded-full" />
-        </div>
+      {(selectedPlace || activeTab === 'directions') && (
+        <div className={cn(
+          'absolute bottom-0 inset-x-0 z-30 bg-white border-t border-gray-200/90 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.15)] pointer-events-auto transition-all duration-300 overflow-y-auto',
+          isPlaceSheetExpanded ? 'h-[75%]' : 'max-h-[46%]'
+        )}>
+          <div
+            onClick={() => setIsPlaceSheetExpanded(!isPlaceSheetExpanded)}
+            className="w-full py-2 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            <div className="w-9 h-1 bg-gray-300 rounded-full" />
+          </div>
 
-        <div className="px-4 pb-4 space-y-3">
-          {selectedPlace ? (
-            <div className="space-y-3 animate-in slide-in-from-bottom-2">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-[16px] font-bold text-gray-900 leading-tight">
-                    {selectedPlace.name}
-                  </h3>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-600 mt-1">
-                    <span className="text-gray-600">{selectedPlace.categoryLabel || 'Địa điểm'}</span>
+          <div className="px-4 pb-4 space-y-3">
+            {selectedPlace ? (
+              <div className="space-y-3 animate-in slide-in-from-bottom-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-[16px] font-bold text-gray-900 leading-tight">
+                      {selectedPlace.name}
+                    </h3>
+                    <div className="flex items-center gap-1.5 text-[11px] text-gray-600 mt-1">
+                      <span className="text-gray-600">{selectedPlace.categoryLabel || 'Địa điểm'}</span>
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={() => setSelectedPlace(null)}
-                  className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
-                >
-                  <X className="size-5" />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between gap-2 py-1 overflow-x-auto no-scrollbar">
-                <button
-                  onClick={() => {
-                    setDestinationId(selectedPlace.id)
-                    setSelectedPlace(null)
-                    setActiveTab('directions')
-                    setUseAlternativeRoute(false)
-                  }}
-                  className="flex-1 py-2 px-3 bg-[#1A73E8] hover:bg-[#1557b0] text-white rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  <Navigation className="size-3.5 fill-white" />
-                  <span>Nối khoảng cách</span>
-                </button>
-
-                {selectedPlace.phone && (
-                  <a
-                    href={`tel:${selectedPlace.phone.replace(/\s+/g, '')}`}
-                    className="py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full text-xs font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer whitespace-nowrap shrink-0"
+                  <button
+                    onClick={() => setSelectedPlace(null)}
+                    className="p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
                   >
-                    <Phone className="size-3.5 text-gray-600" />
-                    <span>Gọi</span>
-                  </a>
-                )}
-
-                <button
-                  onClick={() => setIsBookmarked(!isBookmarked)}
-                  className={cn(
-                    'py-2 px-3 rounded-full text-xs font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer whitespace-nowrap shrink-0',
-                    isBookmarked ? 'bg-blue-50 text-[#1A73E8] border border-blue-200' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-                  )}
-                >
-                  <Bookmark className={cn('size-3.5', isBookmarked && 'fill-[#1A73E8] text-[#1A73E8]')} />
-                  <span>{isBookmarked ? 'Đã lưu' : 'Lưu'}</span>
-                </button>
-              </div>
-
-              <div className="space-y-2.5 pt-2 border-t border-gray-100 text-[12px] text-gray-700">
-                <div className="flex items-start gap-2.5">
-                  <MapPin className="size-4 text-gray-500 shrink-0 mt-0.5" />
-                  <span>{selectedPlace.address}</span>
+                    <X className="size-5" />
+                  </button>
                 </div>
 
-                {selectedPlace.phone && (
-                  <div className="flex items-start gap-2.5">
-                    <Phone className="size-4 text-gray-500 shrink-0 mt-0.5" />
-                    <span className="text-[#1A73E8] font-mono">{selectedPlace.phone}</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 py-1 overflow-x-auto no-scrollbar">
+                  {/* Button Chỉ đường từ đây */}
+                  <button
+                    onClick={() => {
+                      setOriginId(selectedPlace.id)
+                      setActiveTab('directions')
+                      setSelectingStep(2)
+                      setSelectedPlace(null)
+                      setPickingTarget('destination')
+                    }}
+                    className="py-2 px-3 rounded-full text-xs font-semibold bg-[#1A73E8] text-white hover:bg-blue-600 flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer whitespace-nowrap shrink-0 shadow-xs"
+                  >
+                    <Navigation className="size-3.5" />
+                    <span>Chỉ đường từ đây</span>
+                  </button>
 
-                {selectedPlace.plusCode && (
+                  {selectedPlace.phone && (
+                    <a
+                      href={`tel:${selectedPlace.phone.replace(/\s+/g, '')}`}
+                      className="py-2 px-3 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full text-xs font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer whitespace-nowrap shrink-0"
+                    >
+                      <Phone className="size-3.5 text-gray-600" />
+                      <span>Gọi điện</span>
+                    </a>
+                  )}
+
+                  <button
+                    onClick={() => setIsBookmarked(!isBookmarked)}
+                    className={cn(
+                      'py-2 px-3 rounded-full text-xs font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer whitespace-nowrap shrink-0',
+                      isBookmarked ? 'bg-blue-50 text-[#1A73E8] border border-blue-200' : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+                    )}
+                  >
+                    <Bookmark className={cn('size-3.5', isBookmarked && 'fill-[#1A73E8] text-[#1A73E8]')} />
+                    <span>{isBookmarked ? 'Đã lưu' : 'Lưu'}</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2.5 pt-2 border-t border-gray-100 text-[12px] text-gray-700">
                   <div className="flex items-start gap-2.5">
-                    <ExternalLink className="size-4 text-gray-500 shrink-0 mt-0.5" />
-                    <span className="text-gray-500 font-mono text-[11px]">
-                      Plus Code: {selectedPlace.plusCode}
+                    <MapPin className="size-4 text-gray-500 shrink-0 mt-0.5" />
+                    <span>{selectedPlace.address}</span>
+                  </div>
+
+                  {selectedPlace.phone && (
+                    <div className="flex items-start gap-2.5">
+                      <Phone className="size-4 text-gray-500 shrink-0 mt-0.5" />
+                      <span className="text-[#1A73E8] font-mono">{selectedPlace.phone}</span>
+                    </div>
+                  )}
+
+                  {selectedPlace.plusCode && (
+                    <div className="flex items-start gap-2.5">
+                      <ExternalLink className="size-4 text-gray-500 shrink-0 mt-0.5" />
+                      <span className="text-gray-500 font-mono text-[11px]">
+                        Plus Code: {selectedPlace.plusCode}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* DISTANCE MEASUREMENT SUMMARY BOTTOM SHEET */
+              <div className="space-y-2.5 animate-in slide-in-from-bottom-2">
+                <div className="flex items-baseline justify-between">
+                  <div>
+                    <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider block">Khoảng cách nối điểm</span>
+                    <span className="text-[26px] font-bold text-[#1A73E8] tracking-tight font-mono">
+                      {activeRoute.distanceText}
                     </span>
                   </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            /* DISTANCE MEASUREMENT SUMMARY BOTTOM SHEET */
-            <div className="space-y-2.5 animate-in slide-in-from-bottom-2">
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <span className="text-[11px] font-medium text-gray-500 uppercase tracking-wider block">Khoảng cách nối điểm</span>
-                  <span className="text-[26px] font-bold text-[#1A73E8] tracking-tight font-mono">
-                    {activeRoute.distanceText}
-                  </span>
+
+                  <button
+                    onClick={handleSwapLocations}
+                    className="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                    title="Đổi chiều"
+                  >
+                    <ArrowUpDown className="size-3" />
+                    <span>Đổi chiều</span>
+                  </button>
                 </div>
 
-                <button
-                  onClick={handleSwapLocations}
-                  className="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors"
-                  title="Đổi chiều"
-                >
-                  <ArrowUpDown className="size-3" />
-                  <span>Đổi chiều</span>
-                </button>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-200/80 space-y-1.5 text-xs">
-                <div className="flex items-center gap-2 text-gray-800">
-                  <div className="size-2 rounded-full bg-[#1A73E8] shrink-0" />
-                  <span className="font-semibold truncate">A: {origin.name}</span>
+                <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-200/80 space-y-1.5 text-xs">
+                  <div className="flex items-center gap-2 text-gray-800">
+                    <div className="size-2 rounded-full bg-[#1A73E8] shrink-0" />
+                    <span className="font-semibold truncate">A: {origin.name}</span>
+                  </div>
+                  <div className="w-[1px] h-2 bg-gray-300 ml-1" />
+                  <div className="flex items-center gap-2 text-gray-800">
+                    <div className="size-2 rounded-full bg-[#EA4335] shrink-0" />
+                    <span className="font-semibold truncate">B: {destination.name}</span>
+                  </div>
                 </div>
-                <div className="w-[1px] h-2 bg-gray-300 ml-1" />
-                <div className="flex items-center gap-2 text-gray-800">
-                  <div className="size-2 rounded-full bg-[#EA4335] shrink-0" />
-                  <span className="font-semibold truncate">B: {destination.name}</span>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    onClick={() => setActiveTab('explore')}
+                    className="flex-1 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <X className="size-3.5" />
+                    <span>Đóng chỉ đường</span>
+                  </button>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2 pt-1">
-                <button
-                  onClick={() => setActiveTab('explore')}
-                  className="flex-1 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                >
-                  <X className="size-3.5" />
-                  <span>Đóng đo khoảng cách</span>
-                </button>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 4. LOCATION PICKER MODAL (NO CATEGORY CHIPS, NO STARS)                    */}
@@ -557,7 +629,13 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
                 type="text"
                 value={selectorSearch}
                 onChange={(e) => setSelectorSearch(e.target.value)}
-                placeholder={`Chọn ${pickingTarget === 'origin' ? 'Điểm bắt đầu (A)' : 'Điểm đến (B)'}...`}
+                placeholder={
+                  pickingTarget === 'single'
+                    ? 'Tìm kiếm địa điểm...'
+                    : pickingTarget === 'origin'
+                    ? 'Chọn vị trí thứ 1...'
+                    : 'Chọn vị trí thứ 2...'
+                }
                 className="w-full text-xs text-gray-800 bg-transparent outline-none placeholder-gray-400"
               />
               {selectorSearch && (
@@ -568,10 +646,30 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
             </div>
           </div>
 
+          {/* Subheader when picking destination (Position 2) */}
+          {pickingTarget === 'destination' && (
+            <div className="px-3.5 py-2 bg-blue-50/80 border-b border-blue-100 flex items-center justify-between">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="text-[10px] font-bold text-[#1A73E8] bg-blue-100 px-1.5 py-0.5 rounded">VỊ TRÍ 1</span>
+                <span className="text-xs font-semibold text-gray-800 truncate">{origin.name}</span>
+              </div>
+              <button
+                onClick={() => setPickingTarget(null)}
+                className="text-[11px] text-[#1A73E8] font-semibold hover:underline shrink-0 ml-2 cursor-pointer"
+              >
+                Chạm trên bản đồ
+              </button>
+            </div>
+          )}
+
           <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
-            {filteredPickerLocations.map((loc) => {
+            {filteredPickerLocations.map((loc: CaseLocation) => {
               const isCurrent =
-                pickingTarget === 'origin' ? loc.id === originId : loc.id === destinationId
+                pickingTarget === 'single'
+                  ? selectedPlace?.id === loc.id
+                  : pickingTarget === 'origin'
+                  ? loc.id === originId
+                  : loc.id === destinationId
 
               return (
                 <button

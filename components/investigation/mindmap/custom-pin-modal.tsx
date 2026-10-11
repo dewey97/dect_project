@@ -21,6 +21,7 @@ import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { parseAnswersColumn } from "@/lib/cms/checkpoint-cms";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { isVietnameseTextMatch } from "@/lib/finding-matcher";
+import { isEvidenceMatching } from "@/lib/cases/case-000-clues";
 
 interface CustomPinModalProps {
   isOpen: boolean;
@@ -218,16 +219,12 @@ export function CustomPinModal({
             s.includes(suspectName),
         );
 
-      const requiredEvs = (config.requiredEvidenceIds || []).map((id) =>
-        id.toLowerCase(),
-      );
-      const userSelected = selectedEvidences.map((id) => id.toLowerCase());
-
-      const hasAllRequiredEvidences = requiredEvs.every(
-        (req) =>
-          userSelected.includes(req) ||
-          userSelected.some((sel) => sel.includes(req) || req.includes(sel)),
-      );
+      const requiredEvs = config.requiredEvidenceIds || [];
+      const hasAllRequiredEvidences =
+        requiredEvs.length === 0 ||
+        requiredEvs.every((req) =>
+          selectedEvidences.some((sel) => isEvidenceMatching(sel, [req]))
+        );
 
       if (isSuspectCorrect && hasAllRequiredEvidences) {
         isCorrect = true;

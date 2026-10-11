@@ -16,6 +16,8 @@ export interface SheetCheckpointRow {
   type?: "text_match_3" | "evidence_picker" | "mcq" | "text";
   unlocked_evidence_id?: string;
   answers?: string;
+  answers_id?: string;
+  answer_id?: string;
   hints?: string;
   narrative?: string;
   suspect_label?: string;
@@ -181,99 +183,243 @@ function parseInputLine(
   return null;
 }
 
+function extractPhoneDigits(str: string): string | null {
+  const digits = str.replace(/\D/g, "");
+  return digits.length >= 3 ? digits : null;
+}
+
 /**
- * Bóc cột `answers` hợp nhất thành object cấu hình UI.
+ * Bóc cột `answers_id` (hoặc `answers`) hợp nhất thành object cấu hình UI.
+ * Hỗ trợ cả 2 định dạng:
+ * 1. Định dạng khóa/giá trị: `dap_an: 21:15`, `0988.200.991: Vũ`
+ * 2. Định dạng phân vùng: `[ĐỘNG CƠ]`, `[NGOẠI PHẠM]`, `Optional`, các mã vật chứng A-12, C-01, SĐT
  */
 export function parseAnswersColumn(raw?: string): ParsedAnswers {
-  const parsed: ParsedAnswers = {};
+  const parsed: ParsedAnswers = {
+    options: [],
+    validSuspects: [],
+    validMotives: [],
+    requiredEvidenceIds: [],
+    optionalEvidenceIds: [],
+    motiveEvidenceIds: [],
+    optionalMotiveIds: [],
+    alibiEvidenceIds: [],
+    optionalAlibiIds: [],
+    textMatchInputs: [],
+  };
   if (!raw || typeof raw !== "string") return parsed;
 
   const lines = splitLines(raw);
+  if (lines.length === 0) return parsed;
 
-  // Nếu chỉ có 1 dòng và không có dấu ':' -> xem toàn bộ là đáp án text
-  if (lines.length === 1 && !lines[0].includes(":")) {
-    parsed.correctAnswer = lines[0].trim();
-    return parsed;
+  // Xử lý trường hợp chỉ có 1 dòng (đáp án trắc nghiệm hoặc text đơn, ví dụ "21:15" hay "120713")
+  if (lines.length === 1) {
+    const single = lines[0].trim();
+    const sep = single.indexOf(":");
+    if (sep === -1) {
+      parsed.correctAnswer = single;
+      return parsed;
+    }
+    const rawKey = single.slice(0, sep).trim();
+    const val = single.slice(sep + 1).trim();
+    const normKey = normalizeKey(rawKey);
+    if (ANSWER_KEYS[normKey] === "correct") {
+      parsed.correctAnswer = val;
+      return parsed;
+    }
+    // Nếu là giờ/phút dạng 21:15 hoặc không phải từ khóa lệnh đặc biệt
+    if (!ANSWER_KEYS[normKey] && !normKey.startsWith("0")) {
+      parsed.correctAnswer = single;
+      return parsed;
+    }
   }
 
-  lines.forEach((line) => {
-    const separatorIndex = line.indexOf(":");
-    if (separatorIndex === -1) {
-      if (!parsed.correctAnswer) {
-        parsed.correctAnswer = line.trim();
-      }
-      return;
+  let currentCategory: "none" | "motive" | "alibi" | "indictment_evidence" = "none";
+  let isOptional = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lower = line.toLowerCase();
+
+    // 1. Nhận diện các thẻ phân vùng (Section Triggers)
+    if (
+      lower === "[động cơ]" ||
+      lower === "động cơ:" ||
+      lower === "[motive]" ||
+      lower === "động cơ" ||
+      lower === "[dong co]"
+    ) {
+      currentCategory = "motive";
+      isOptional = false;
+      continue;
+    }
+    if (
+      lower === "[ngoại phạm]" ||
+      lower === "ngoại phạm:" ||
+      lower === "[alibi]" ||
+      lower === "ngoại phạm" ||
+      lower === "[ngoai pham]" ||
+      lower === "ngoại phạm mâu thuẫn" ||
+      lower === "[ngoại phạm mâu thuẫn]"
+    ) {
+      currentCategory = "alibi";
+      isOptional = false;
+      continue;
+    }
+    if (
+      lower === "optional" ||
+      lower === "[optional]" ||
+      lower === "tùy chọn" ||
+      lower === "[tùy chọn]" ||
+      lower === "tuy chon" ||
+      lower === "[tuy chon]"
+    ) {
+      isOptional = true;
+      continue;
+    }
+    if (lower.startsWith("nghi phạm:") || lower.startsWith("suspect:")) {
+      const val = line.slice(line.indexOf(":") + 1).trim();
+      if (val) (parsed.validSuspects ??= []).push(val);
+      continue;
+    }
+    if (lower.startsWith("mâu thuẫn:") || lower.startsWith("động cơ:")) {
+      const val = line.slice(line.indexOf(":") + 1).trim();
+      if (val) (parsed.validMotives ??= []).push(val);
+      continue;
+    }
+    if (lower.includes("bằng chứng để lại dấu vết") || lower.includes("chứng cứ:")) {
+      currentCategory = "indictment_evidence";
+      isOptional = false;
+      continue;
+    }
+    if (lower.startsWith("optional:")) {
+      const val = line.slice(line.indexOf(":") + 1).trim();
+      val
+        .split(/[\s,]+/)
+        .filter(Boolean)
+        .forEach((c) => (parsed.optionalEvidenceIds ??= []).push(c));
+      continue;
     }
 
-    const rawKey = line.slice(0, separatorIndex);
-    const value = line.slice(separatorIndex + 1).trim();
-    const normalizedKey = normalizeKey(rawKey);
-    const key = ANSWER_KEYS[normalizedKey];
+    // 2. Nhận diện cặp key: value bên ngoài phân vùng
+    const separatorIndex = line.indexOf(":");
+    if (separatorIndex !== -1 && currentCategory === "none") {
+      const rawKey = line.slice(0, separatorIndex).trim();
+      const value = line.slice(separatorIndex + 1).trim();
+      const normalizedKey = normalizeKey(rawKey);
+      const key = ANSWER_KEYS[normalizedKey];
 
-    if (!value) return;
+      if (key) {
+        switch (key) {
+          case "option":
+            (parsed.options ??= []).push(value);
+            break;
+          case "correct":
+            parsed.correctAnswer = value;
+            break;
+          case "suspect":
+            parsed.validSuspects = splitCommas(value);
+            break;
+          case "motive":
+            parsed.validMotives = splitCommas(value);
+            parsed.motiveEvidenceIds = splitCommas(value);
+            break;
+          case "optional_motive":
+            parsed.optionalMotiveIds = splitCommas(value);
+            break;
+          case "alibi":
+            parsed.alibiEvidenceIds = splitCommas(value);
+            break;
+          case "optional_alibi":
+            parsed.optionalAlibiIds = splitCommas(value);
+            break;
+          case "optional":
+            parsed.optionalEvidenceIds = splitCommas(value);
+            break;
+          case "require":
+            parsed.requiredEvidenceIds = splitCommas(value);
+            break;
+          case "show":
+            parsed.availableEvidences = splitCommas(value).map((code) => ({
+              id: code,
+              code,
+              label: code,
+            }));
+            break;
+          case "photo":
+            parsed.photoCodes = splitCommas(value);
+            break;
+          case "input": {
+            const input = parseInputLine(value);
+            if (input) (parsed.textMatchInputs ??= []).push(input);
+            break;
+          }
+        }
+        continue;
+      } else if (
+        normalizedKey.startsWith("09") ||
+        normalizedKey.startsWith("08") ||
+        normalizedKey.startsWith("07") ||
+        normalizedKey.startsWith("03") ||
+        normalizedKey.startsWith("phone_") ||
+        normalizedKey.startsWith("sdt_")
+      ) {
+        const input = parseInputLine(value, rawKey);
+        if (input) (parsed.textMatchInputs ??= []).push(input);
+        continue;
+      }
+    }
 
-    if (key) {
-      switch (key) {
-        case "option":
-          (parsed.options ??= []).push(value);
-          break;
-        case "correct":
-          parsed.correctAnswer = value;
-          break;
-        case "suspect":
-          parsed.validSuspects = splitCommas(value);
-          break;
-        case "motive":
-          parsed.validMotives = splitCommas(value);
-          parsed.motiveEvidenceIds = splitCommas(value);
-          break;
-        case "optional_motive":
-          parsed.optionalMotiveIds = splitCommas(value);
-          break;
-        case "alibi":
-          parsed.alibiEvidenceIds = splitCommas(value);
-          break;
-        case "optional_alibi":
-          parsed.optionalAlibiIds = splitCommas(value);
-          break;
-        case "optional":
-          parsed.optionalEvidenceIds = splitCommas(value);
-          break;
-        case "require":
-          parsed.requiredEvidenceIds = splitCommas(value);
-          break;
-        case "show":
-          parsed.availableEvidences = splitCommas(value).map((code) => ({
-            id: code,
-            code,
-            label: code,
-          }));
-          break;
-        case "photo":
-          parsed.photoCodes = splitCommas(value);
-          break;
-        case "input": {
-          const input = parseInputLine(value);
-          if (input) (parsed.textMatchInputs ??= []).push(input);
-          break;
+    // 3. Nhận diện mã vật chứng / SĐT bên trong phân vùng
+    if (currentCategory !== "none") {
+      const codeOrPhone = line.replace(/^-\s*/, "").trim();
+      if (!codeOrPhone) continue;
+
+      const hasVoice = /voice|thoại/i.test(codeOrPhone);
+      let phoneDigits = extractPhoneDigits(codeOrPhone);
+
+      // Trường hợp dòng 1 là "- Tin nhắn với SDT" và dòng kế là "0988.200.991"
+      if (!phoneDigits && i + 1 < lines.length) {
+        const nextDigits = extractPhoneDigits(lines[i + 1]);
+        if (nextDigits && nextDigits.length >= 3) {
+          phoneDigits = nextDigits;
+          i++; // Bỏ qua dòng kế tiếp vì đã bóc số điện thoại
         }
       }
-    } else if (
-      normalizedKey.startsWith("09") ||
-      normalizedKey.startsWith("08") ||
-      normalizedKey.startsWith("07") ||
-      normalizedKey.startsWith("03") ||
-      normalizedKey.startsWith("phone_") ||
-      normalizedKey.startsWith("sdt_")
-    ) {
-      // Hỗ trợ viết thẳng: 0988.200.991: Vũ, Lê Quang Vũ
-      const input = parseInputLine(value, rawKey);
-      if (input) (parsed.textMatchInputs ??= []).push(input);
-    } else {
-      // Lưu các khóa quy tắc mở rộng (tile_ao_gio, chung_cu_2_1, ...)
-      (parsed.clueRules ??= {})[normalizedKey] = splitCommas(value);
+
+      let resolvedId = codeOrPhone;
+      if (phoneDigits) {
+        resolvedId = hasVoice ? `voice_phone_${phoneDigits}` : `sms_phone_${phoneDigits}`;
+      }
+
+      if (currentCategory === "motive") {
+        if (isOptional) {
+          (parsed.optionalMotiveIds ??= []).push(resolvedId);
+        } else {
+          (parsed.motiveEvidenceIds ??= []).push(resolvedId);
+          (parsed.validMotives ??= []).push(resolvedId);
+        }
+      } else if (currentCategory === "alibi") {
+        if (isOptional) {
+          (parsed.optionalAlibiIds ??= []).push(resolvedId);
+        } else {
+          (parsed.alibiEvidenceIds ??= []).push(resolvedId);
+        }
+      } else if (currentCategory === "indictment_evidence") {
+        if (isOptional) {
+          (parsed.optionalEvidenceIds ??= []).push(resolvedId);
+        } else {
+          (parsed.requiredEvidenceIds ??= []).push(resolvedId);
+        }
+      }
+      continue;
     }
-  });
+
+    // Fallback: nếu không ở trong phân vùng và không có dấu ':'
+    if (!parsed.correctAnswer) {
+      parsed.correctAnswer = line.trim();
+    }
+  }
 
   return parsed;
 }
@@ -407,12 +553,25 @@ export function getCheckpointOptions(row?: SheetCheckpointRow): string[] {
 export function transformSheetCheckpoint(
   row: SheetCheckpointRow,
 ): Checkpoint {
-  const answers = parseAnswersColumn(row.answers);
+  const rawAnswersId =
+    typeof row.answers_id === "string" && row.answers_id.trim()
+      ? row.answers_id.trim()
+      : typeof row.answer_id === "string" && row.answer_id.trim()
+      ? row.answer_id.trim()
+      : "";
+  const rawAnswersText =
+    typeof row.answers === "string" ? row.answers.trim() : "";
+
+  // answers_id là cột quét chính, fallback sang answers nếu answers_id trống
+  const primaryRaw = rawAnswersId || rawAnswersText;
+  const answers = parseAnswersColumn(primaryRaw);
   const dynamicHints = getCheckpointHints(row);
 
   const hasPickerConfig =
     (answers.validSuspects && answers.validSuspects.length > 0) ||
     (answers.requiredEvidenceIds && answers.requiredEvidenceIds.length > 0) ||
+    (answers.motiveEvidenceIds && answers.motiveEvidenceIds.length > 0) ||
+    (answers.alibiEvidenceIds && answers.alibiEvidenceIds.length > 0) ||
     (answers.availableEvidences && answers.availableEvidences.length > 0) ||
     (row.suspect_label !== undefined && row.suspect_label !== "") ||
     (row.evidence_step_label !== undefined && row.evidence_step_label !== "");
@@ -427,6 +586,21 @@ export function transformSheetCheckpoint(
           : {}),
         ...(answers.requiredEvidenceIds && answers.requiredEvidenceIds.length > 0
           ? { requiredEvidenceIds: answers.requiredEvidenceIds }
+          : {}),
+        ...(answers.optionalEvidenceIds && answers.optionalEvidenceIds.length > 0
+          ? { optionalEvidenceIds: answers.optionalEvidenceIds }
+          : {}),
+        ...(answers.motiveEvidenceIds && answers.motiveEvidenceIds.length > 0
+          ? { motiveEvidenceIds: answers.motiveEvidenceIds }
+          : {}),
+        ...(answers.optionalMotiveIds && answers.optionalMotiveIds.length > 0
+          ? { optionalMotiveIds: answers.optionalMotiveIds }
+          : {}),
+        ...(answers.alibiEvidenceIds && answers.alibiEvidenceIds.length > 0
+          ? { alibiEvidenceIds: answers.alibiEvidenceIds }
+          : {}),
+        ...(answers.optionalAlibiIds && answers.optionalAlibiIds.length > 0
+          ? { optionalAlibiIds: answers.optionalAlibiIds }
           : {}),
         ...(answers.availableEvidences && answers.availableEvidences.length > 0
           ? { availableEvidences: answers.availableEvidences }
@@ -478,6 +652,8 @@ export function transformSheetCheckpoint(
     textMatchConfig,
     pickerConfig,
     storyConfig,
+    rawAnswersId,
+    rawAnswers: rawAnswersText,
   } as Checkpoint;
 }
 

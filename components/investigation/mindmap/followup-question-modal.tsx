@@ -102,6 +102,7 @@ export function FollowupQuestionModal({
   }, [checkpoints])
 
   // Lấy 3 ảnh từ sheet photos cho popup kết quả (100% Live CMS)
+  // Lấy 3 vật chứng (D-06, D-05, D-04) từ sheet photos cho popup kết quả (100% Live CMS)
   const haDiscoveredPhotos = useMemo(() => {
     if (!rawSheetPhotos || rawSheetPhotos.length === 0) return []
 
@@ -114,52 +115,85 @@ export function FollowupQuestionModal({
         url: normalizeImageUrl(p.direct_cdn_url || p.drive_url || p.url || p.local_file_path || ''),
       }))
 
-    // 1. Nếu trên checkpoint có cấu hình danh sách photoCodes (ví dụ photos: photo_bua_yeu, photo_keo_toc, photo_tui_toc_mai)
-    if (haCheckpoint?.photoCodes && haCheckpoint.photoCodes.length > 0) {
-      const explicitPhotos: Array<{ id: string; title: string; url: string }> = []
-      for (const code of haCheckpoint.photoCodes) {
-        const found = mappedPhotos.find(
-          (p) => p.id.toLowerCase() === code.toLowerCase() || p.title.toLowerCase().includes(code.toLowerCase())
+    // Thứ tự ưu tiên mở khóa chính xác: D-06 (Túi bùa đỏ), D-05 (Chiếc kéo dính máu), D-04 (Túi zip chứa tóc dính máu)
+    const TARGET_CODES =
+      haCheckpoint?.photoCodes && haCheckpoint.photoCodes.length >= 3
+        ? haCheckpoint.photoCodes
+        : ['D-06', 'D-05', 'D-04']
+
+    const discovered: Array<{ id: string; title: string; url: string }> = []
+
+    // 1. Quét tìm chính xác theo mã photo_code (D-06, D-05, D-04)
+    for (const code of TARGET_CODES) {
+      const cleanCode = code.trim().toLowerCase()
+      const normCode = cleanCode.replace(/[-_\s]/g, '')
+
+      const found = mappedPhotos.find((p) => {
+        const pid = p.id.toLowerCase()
+        const pidNorm = pid.replace(/[-_\s]/g, '')
+        const ptitle = p.title.toLowerCase()
+        return (
+          pid === cleanCode ||
+          pidNorm === normCode ||
+          ptitle.startsWith(cleanCode) ||
+          ptitle.startsWith(`${cleanCode}:`) ||
+          ptitle.includes(`[${cleanCode}]`) ||
+          ptitle.includes(`(${cleanCode})`)
         )
+      })
+
+      if (found && !discovered.some((item) => item.id === found.id)) {
+        discovered.push(found)
+      }
+    }
+
+    // 2. Nếu thiếu, bổ sung theo từ khóa đặc trưng tương ứng với D-06 (bùa), D-05 (kéo), D-04 (tóc)
+    if (discovered.length < 3) {
+      const codeFallbacks: Array<{ code: string; keywords: string[] }> = [
+        { code: 'D-06', keywords: ['d-06', 'd06', 'bùa', 'túi bùa'] },
+        { code: 'D-05', keywords: ['d-05', 'd05', 'kéo'] },
+        { code: 'D-04', keywords: ['d-04', 'd04', 'tóc', 'túi zip'] },
+      ]
+
+      for (const fb of codeFallbacks) {
+        if (discovered.length >= 3) break
+        const alreadyHas = discovered.some((d) => {
+          const did = d.id.toLowerCase()
+          return (
+            did.includes(fb.code.toLowerCase()) ||
+            fb.keywords.some((kw) => did.includes(kw) || d.title.toLowerCase().includes(kw))
+          )
+        })
+        if (alreadyHas) continue
+
+        const found = mappedPhotos.find((p) => {
+          const pid = p.id.toLowerCase()
+          const ptitle = p.title.toLowerCase()
+          return (
+            fb.keywords.some((kw) => pid.includes(kw) || ptitle.includes(kw)) &&
+            !discovered.some((d) => d.id === p.id)
+          )
+        })
+
         if (found) {
-          explicitPhotos.push(found)
+          discovered.push(found)
         }
       }
-      if (explicitPhotos.length > 0) {
-        return explicitPhotos.slice(0, 3)
+    }
+
+    // 3. Fallback an toàn nếu vẫn chưa đủ 3 ảnh: lấy các ảnh hợp lệ khác ngoại trừ avatar chân dung
+    if (discovered.length < 3) {
+      for (const p of mappedPhotos) {
+        const t = p.title.toLowerCase()
+        if (t.includes('chân dung') || p.id.toLowerCase().startsWith('avatar_')) continue
+        if (!discovered.some((item) => item.id === p.id)) {
+          discovered.push(p)
+        }
+        if (discovered.length >= 3) break
       }
     }
 
-    // 2. Ưu tiên 3 vật chứng thu giữ bên trong hộp thiếc nhà Hà: Bùa yêu, Kéo cắt tóc, Túi zip đựng tóc
-    const targetKeywords = ['bùa yêu', 'kéo', 'tóc']
-    const matchedByKeywords: Array<{ id: string; title: string; url: string }> = []
-
-    targetKeywords.forEach((kw) => {
-      const found = mappedPhotos.find(
-        (p) =>
-          (p.title.toLowerCase().includes(kw) || p.id.toLowerCase().includes(kw)) &&
-          !matchedByKeywords.some((item) => item.id === p.id)
-      )
-      if (found) matchedByKeywords.push(found)
-    })
-
-    if (matchedByKeywords.length >= 3) {
-      return matchedByKeywords.slice(0, 3)
-    }
-
-    // 3. Nếu chưa đủ 3, lấy các ảnh có link hợp lệ trong danh mục vật chứng mới của Hà
-    const combined = [...matchedByKeywords]
-    for (const p of mappedPhotos) {
-      const t = p.title.toLowerCase()
-      // Bỏ qua avatar nhân vật để tránh hiển thị nhầm ảnh chân dung Khang/Mai/Vũ
-      if (t.includes('chân dung') || p.id.startsWith('avatar_')) continue
-      if (!combined.some((item) => item.id === p.id)) {
-        combined.push(p)
-      }
-      if (combined.length >= 3) break
-    }
-
-    return combined.slice(0, 3)
+    return discovered.slice(0, 3)
   }, [rawSheetPhotos, haCheckpoint])
 
   const [errorMsg, setErrorMsg] = useState('')
@@ -199,14 +233,9 @@ export function FollowupQuestionModal({
     if (!culprit || !isOpen) return
     setErrorMsg('')
     if (culprit === 'ha') {
-      const savedHa = getStorageItem('followup_ha_password')
-      if (savedHa) {
-        setHaPasswordInput(savedHa)
-        setShowHaPhotoPopup(true)
-      } else {
-        setHaPasswordInput('')
-        setShowHaPhotoPopup(false)
-      }
+      // Luôn đặt false khi mở modal: Người chơi phải thao tác mở khóa xong mới bật popup 3 vật chứng
+      setShowHaPhotoPopup(false)
+      setHaPasswordInput('')
     } else if (culprit === 'vu') {
       const savedVu = getStorageItem('followup_vu')
       if (savedVu) {
@@ -290,14 +319,19 @@ export function FollowupQuestionModal({
       return
     }
 
-    // Lấy đáp án chuẩn từ Live CMS (checkpoints)
-    const expectedFromSheet = (haCheckpoint?.correctAnswer || '18100909')
+    // Lấy đáp án chuẩn từ Live CMS (checkpoints: 120713)
+    const expectedFromSheet = (haCheckpoint?.correctAnswer || '120713')
       .trim()
       .toLowerCase()
       .replace(/\s+/g, '')
 
     const isMasterBypass = rawVal === '000' || rawVal === '0000' || rawVal === 'admin'
-    const isCorrect = isMasterBypass || rawVal === expectedFromSheet || (expectedFromSheet.includes(rawVal) && rawVal.length >= 6)
+    const isCorrect =
+      isMasterBypass ||
+      rawVal === expectedFromSheet ||
+      rawVal === '120713' ||
+      rawVal === '18100909' ||
+      (expectedFromSheet.includes(rawVal) && rawVal.length >= 6)
 
     if (isCorrect) {
       detectiveAudio.playStampSound()

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { X } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
-import { resolveEvidenceCode, getSortedClues } from '@/lib/cases/case-000-clues'
+import { resolveEvidenceCode, getSortedClues, KNOWN_CASE_PHONES } from '@/lib/cases/case-000-clues'
 
 interface ClueCodePickerProps {
   selectedClueIds: string[]
@@ -48,8 +48,13 @@ export function ClueCodePicker({
     if (!raw) return
     const digits = raw.replace(/\D/g, '')
     if (digits.length < 3) return
-    const id = `sms_phone_${digits}`
-    const labelStr = `Tin nhắn văn bản với SĐT: ${raw}`
+    const known = KNOWN_CASE_PHONES[digits.slice(-3)]
+    const id = known ? `sms_phone_${known.full}` : `sms_phone_${digits}`
+    const labelStr = known
+      ? `Tin nhắn văn bản với SĐT: ${known.formatted}`
+      : digits.length === 10
+      ? `Tin nhắn văn bản với SĐT: ${digits.slice(0, 4)}.${digits.slice(4, 7)}.${digits.slice(7)}`
+      : `Tin nhắn văn bản với SĐT: ${raw}`
     if (onAddCustomPhone) {
       onAddCustomPhone({ id, label: labelStr })
     }
@@ -64,8 +69,13 @@ export function ClueCodePicker({
     if (!raw) return
     const digits = raw.replace(/\D/g, '')
     if (digits.length < 3) return
-    const id = `voice_phone_${digits}`
-    const labelStr = `Tin nhắn thoại với SĐT: ${raw}`
+    const known = KNOWN_CASE_PHONES[digits.slice(-3)]
+    const id = known ? `voice_phone_${known.full}` : `voice_phone_${digits}`
+    const labelStr = known
+      ? `Tin nhắn thoại với SĐT: ${known.formatted}`
+      : digits.length === 10
+      ? `Tin nhắn thoại với SĐT: ${digits.slice(0, 4)}.${digits.slice(4, 7)}.${digits.slice(7)}`
+      : `Tin nhắn thoại với SĐT: ${raw}`
     if (onAddCustomPhone) {
       onAddCustomPhone({ id, label: labelStr })
     }
@@ -158,7 +168,7 @@ export function ClueCodePicker({
                       setTextPhoneInputValue('')
                     }
                   }}
-                  placeholder="Nhập SĐT..."
+                  placeholder="Nhập 3 số cuối SĐT..."
                   className="flex-1 min-w-0 px-2 py-1 bg-white border border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none"
                 />
                 <button
@@ -220,7 +230,7 @@ export function ClueCodePicker({
                       setVoicePhoneInputValue('')
                     }
                   }}
-                  placeholder="Nhập SĐT..."
+                  placeholder="Nhập 3 số cuối SĐT..."
                   className="flex-1 min-w-0 px-2 py-1 bg-white border border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none"
                 />
                 <button

@@ -408,7 +408,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           </div>
 
           {/* Messages Bubble Stream */}
-          <div className="flex-1 overflow-y-auto ios-scrollbar px-4 py-3 space-y-3 flex flex-col justify-start pb-10 scroll-smooth">
+          <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-3 space-y-3 flex flex-col justify-start pb-10 scroll-smooth">
             <div className="text-center my-1">
               <span className="text-[11px] text-[#717786] bg-[#E9E7ED] px-3 py-1 rounded-full font-medium">
                 iMessage · iSMS
@@ -690,7 +690,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
               Lỗi: {error}
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto ios-scrollbar divide-y divide-[#E3E2E7] bg-[#FAF9FE] pb-10">
+            <div className="flex-1 overflow-y-auto no-scrollbar divide-y divide-[#E3E2E7] bg-[#FAF9FE] pb-10">
               {filteredThreads.map((thread: any) => (
                 <div
                   key={thread.id}

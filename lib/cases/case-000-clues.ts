@@ -18,9 +18,18 @@ export const PHONE_LOOKUP_EVIDENCE_IDS = [
   'sms_phone_0984180357',
 ]
 
+export const KNOWN_CASE_PHONES: Record<string, { full: string; formatted: string; name: string }> = {
+  '991': { full: '0988200991', formatted: '0988.200.991', name: 'Lê Quang Vũ' },
+  '888': { full: '0912331888', formatted: '0912.331.888', name: 'Nguyễn Thanh Tùng' },
+  '109': { full: '0978552109', formatted: '0978.552.109', name: 'Trần Thị Hà' },
+  '568': { full: '0984112568', formatted: '0984.112.568', name: 'Trần Thị Hà' },
+  '357': { full: '0984180357', formatted: '0984.180.357', name: 'Trần Văn Đạt' },
+}
+
 /**
  * Checks if a clue identifier matches any of the allowed target codes/numbers.
- * Normalizes integers ('8' === '08' === 'doc_08') and phone digits ('0988.200.991' === 'sms_phone_0988200991').
+ * Normalizes document codes ('A-12' === 'a12' === 'A12' === '12')
+ * Normalizes phone numbers by full digits or last 3 digits ('991' === '0988.200.991').
  */
 export function isEvidenceMatching(clueId: string, targetCodes: string[]): boolean {
   if (!clueId) return false
@@ -29,38 +38,71 @@ export function isEvidenceMatching(clueId: string, targetCodes: string[]): boole
   const cleanClue = clueId
     .toLowerCase()
     .replace(/^(doc_|custom_code_|ev_)/i, '')
-    .replace(/^#/, '')
+    .replace(/^[#]/, '')
     .trim()
 
   const clueDigits = clueId.replace(/\D/g, '')
+  const clueIsVoice = /voice|thoại/i.test(clueId)
+  const clueIsPhone =
+    /phone|sdt|sms|voice/i.test(clueId) ||
+    clueDigits.length >= 9 ||
+    (clueDigits.length >= 3 && KNOWN_CASE_PHONES[clueDigits.slice(-3)] !== undefined)
+
+  const normClueCode = cleanClue.replace(/[-_.\s]/g, '')
+  const normClueAlphanum = normClueCode.replace(/^([a-z])0+(\d+)$/, '$1$2')
+
   const clueNum = parseInt(cleanClue, 10)
   const isClueNumeric = !isNaN(clueNum) && cleanClue === String(clueNum).padStart(cleanClue.length, '0')
 
   return targetCodes.some((target) => {
+    if (!target) return false
     if (isAdminBypassCode(target)) return true
 
     const cleanTarget = target
       .toLowerCase()
       .replace(/^(doc_|custom_code_|ev_)/i, '')
-      .replace(/^#/, '')
+      .replace(/^[#]/, '')
       .trim()
 
-    // 1. Exact string match (e.g. "45" === "45" or "07b" === "07b")
+    // 1. Direct string match
     if (cleanClue === cleanTarget) return true
 
-    // 2. Numeric match (e.g. "8" === "08")
+    const normTargetCode = cleanTarget.replace(/[-_.\s]/g, '')
+    const normTargetAlphanum = normTargetCode.replace(/^([a-z])0+(\d+)$/, '$1$2')
+
+    // 2. Alphanumeric match (A-12 === a12, A-09 === a9 === a-9)
+    if (normClueCode === normTargetCode || normClueAlphanum === normTargetAlphanum) return true
+
+    // 3. Numeric match for integer equivalents
     if (isClueNumeric) {
       const targetNum = parseInt(cleanTarget, 10)
       if (!isNaN(targetNum) && clueNum === targetNum) return true
+      const targetDigitsOnly = cleanTarget.replace(/\D/g, '')
+      if (targetDigitsOnly && parseInt(targetDigitsOnly, 10) === clueNum) return true
+    } else {
+      const clueDigitsOnly = cleanClue.replace(/\D/g, '')
+      if (clueDigitsOnly && cleanTarget === clueDigitsOnly) return true
     }
 
-    // 3. Exact phone digits match (e.g. "0988200991" === "0988200991")
+    // 4. PHONE NUMBER MATCHING (supports scanning 3 last digits or full phone number)
     const targetDigits = target.replace(/\D/g, '')
-    if (targetDigits.length >= 9 && clueDigits === targetDigits) {
-      if (target.toLowerCase().includes('voice') || target.toLowerCase().includes('thoai')) {
-        return clueId.toLowerCase().includes('voice')
+    const targetIsVoice = /voice|thoại/i.test(target)
+    const targetIsPhone =
+      /phone|sdt|sms|voice/i.test(target) ||
+      targetDigits.length >= 9 ||
+      (targetDigits.length >= 3 && KNOWN_CASE_PHONES[targetDigits.slice(-3)] !== undefined)
+
+    if (clueIsPhone || targetIsPhone || (clueDigits.length >= 3 && targetDigits.length >= 3)) {
+      if (clueDigits.length >= 3 && targetDigits.length >= 3) {
+        // Voice vs SMS distinction
+        if (targetIsVoice && !clueIsVoice) return false
+        if (!targetIsVoice && clueIsVoice && /sms|tin\s*nhắn/i.test(target)) return false
+
+        // Match on the last 3 digits
+        if (clueDigits.slice(-3) === targetDigits.slice(-3)) {
+          return true
+        }
       }
-      return true
     }
 
     return false
@@ -68,84 +110,37 @@ export function isEvidenceMatching(clueId: string, targetCodes: string[]): boole
 }
 
 /**
- * Validates motive evidence selection based on the master answer table.
+ * Validates motive evidence selection strictly against target codes from Google Sheets Live CMS (answers_id).
+ * Zero static hardcoded fallback - 100% Google Sheets CMS driven.
  */
-export function checkMotiveValid(characterId: string, selectedIds: string[]): boolean {
-  if (!characterId || selectedIds.length === 0) return false
+export function checkMotiveValid(targetCodes: string[], selectedIds: string[]): boolean {
+  if (!targetCodes || targetCodes.length === 0 || !selectedIds || selectedIds.length === 0) return false
   if (hasAdminBypassInArray(selectedIds)) return true
 
-  if (characterId === 'vu') {
-    // Vũ: Bắt buộc CẢ HAI: Mã 13 (Sổ ghi nợ) VÀ Tin nhắn văn bản SĐT 0988.200.991
-    const hasDoc13 = selectedIds.some((id) => isEvidenceMatching(id, ['13', '10']))
-    const hasPhoneSms = selectedIds.some((id) =>
-      isEvidenceMatching(id, ['0988.200.991', '0988200991', 'sms_phone_0988200991'])
+  // Nếu GM khai báo nhiều lựa chọn SĐT cùng loại trong mục động cơ (ví dụ 2 SĐT SMS), chỉ cần trúng 1 trong các số
+  const isAllPhoneSms = targetCodes.every((t) => /phone|sdt|sms|09/i.test(t))
+  if (isAllPhoneSms && targetCodes.length > 1) {
+    return targetCodes.some((target) =>
+      selectedIds.some((c) => isEvidenceMatching(c, [target]))
     )
-    return hasDoc13 && hasPhoneSms
   }
 
-  if (characterId === 'tung') {
-    // Tùng: Bắt buộc CẢ HAI: Tài liệu 1996 (18 hoặc 40) VÀ Tin nhắn văn bản SĐT 0912.331.888
-    const hasDoc1996 = selectedIds.some((id) => isEvidenceMatching(id, ['18', '40']))
-    const hasPhoneSms = selectedIds.some((id) =>
-      isEvidenceMatching(id, ['0912.331.888', '0912331888', 'sms_phone_0912331888'])
-    )
-    return hasDoc1996 && hasPhoneSms
-  }
-
-  if (characterId === 'ha') {
-    // Hà: (văn bản 0978.552.109 hoặc thoại 0978.552.109)
-    // Optional: (văn bản 0984.112.568 hoặc thoại 0984.112.568), 53, 48
-    const validCodes = [
-      '0978.552.109',
-      '0978552109',
-      'sms_phone_0978552109',
-      'voice_phone_0978552109',
-      '0984.112.568',
-      '0984112568',
-      'sms_phone_0984112568',
-      'voice_phone_0984112568',
-      '53',
-      '48',
-    ]
-    return selectedIds.some((id) => isEvidenceMatching(id, validCodes))
-  }
-
-  return false
+  return targetCodes.every((target) =>
+    selectedIds.some((c) => isEvidenceMatching(c, [target]))
+  )
 }
 
 /**
- * Validates alibi evidence selection based on the master answer table.
+ * Validates alibi evidence selection strictly against target codes from Google Sheets Live CMS (answers_id).
+ * Zero static hardcoded fallback - 100% Google Sheets CMS driven.
  */
-export function checkAlibiValid(characterId: string, selectedIds: string[]): boolean {
-  if (!characterId || selectedIds.length === 0) return false
+export function checkAlibiValid(targetCodes: string[], selectedIds: string[]): boolean {
+  if (!targetCodes || targetCodes.length === 0 || !selectedIds || selectedIds.length === 0) return false
   if (hasAdminBypassInArray(selectedIds)) return true
 
-  if (characterId === 'vu') {
-    // Vũ: 10, 42 (Optional: 6, 8) -> Bắt buộc CẢ HAI: (10 hoặc optional 6) VÀ (42 hoặc optional 8)
-    const hasPart1 = selectedIds.some((id) => isEvidenceMatching(id, ['10', '6']))
-    const hasPart2 = selectedIds.some((id) => isEvidenceMatching(id, ['42', '8']))
-    return hasPart1 && hasPart2
-  }
-
-  if (characterId === 'tung') {
-    // Tùng: Bắt buộc CẢ HAI: 20 VÀ 41
-    const hasDoc20 = selectedIds.some((id) => isEvidenceMatching(id, ['20']))
-    const hasDoc41 = selectedIds.some((id) => isEvidenceMatching(id, ['41']))
-    return hasDoc20 && hasDoc41
-  }
-
-  if (characterId === 'ha') {
-    // Hà: Bắt buộc CẢ HAI: Tin nhắn thoại 0984.112.568 VÀ Lịch VTV3 (12, 44 hoặc optional 9, 7, 45)
-    const hasVoice = selectedIds.some((id) =>
-      isEvidenceMatching(id, ['voice_phone_0984112568', '0984.112.568', '0984112568'])
-    )
-    const hasDocVtv3 = selectedIds.some((id) =>
-      isEvidenceMatching(id, ['12', '44', '9', '7', '45'])
-    )
-    return hasVoice && hasDocVtv3
-  }
-
-  return false
+  return targetCodes.every((target) =>
+    selectedIds.some((c) => isEvidenceMatching(c, [target]))
+  )
 }
 
 /**
@@ -173,6 +168,16 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
     }
   }
 
+  // 1b. 3 last digits of phone number
+  if (digitsOnly.length === 3 && KNOWN_CASE_PHONES[digitsOnly]) {
+    const known = KNOWN_CASE_PHONES[digitsOnly]
+    return {
+      id: `sms_phone_${known.full}`,
+      label: `Tin nhắn văn bản với SĐT: ${known.formatted}`,
+      code: known.formatted,
+    }
+  }
+
   // 2. Voice message with phone number (chuẩn voice_)
   if (
     trimmed.toLowerCase().startsWith('voice_') ||
@@ -180,11 +185,15 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
   ) {
     const num = trimmed.replace(/^voice[_:]/i, '').trim()
     const digits = num.replace(/\D/g, '')
-    const formatted = digits.length === 10
+    const known = KNOWN_CASE_PHONES[digits.slice(-3)]
+    const formatted = known
+      ? known.formatted
+      : digits.length === 10
       ? `${digits.slice(0, 4)}.${digits.slice(4, 7)}.${digits.slice(7)}`
       : num
+    const finalDigits = known ? known.full : digits
     return {
-      id: `voice_phone_${digits}`,
+      id: `voice_phone_${finalDigits}`,
       label: `Tin nhắn thoại với SĐT: ${formatted}`,
       code: `voice_${formatted}`,
     }
@@ -200,10 +209,15 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
 
   if (!normalized) return null
 
+  // Format code nicely (e.g. a-12 -> A-12)
+  const formattedCode = /^[a-z]-?\d+/i.test(normalized)
+    ? normalized.toUpperCase()
+    : normalized
+
   return {
-    id: normalized,
-    label: `Tài liệu #${normalized}`,
-    code: normalized,
+    id: formattedCode,
+    label: `Tài liệu #${formattedCode}`,
+    code: formattedCode,
   }
 }
 
@@ -228,19 +242,30 @@ export function getClueBadgeInfo(
 
   if (id.startsWith('sms_phone_')) {
     const raw = id.replace('sms_phone_', '')
-    const formatted = raw.length === 10 ? `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}` : raw
+    const known = KNOWN_CASE_PHONES[raw.slice(-3)]
+    const formatted = known
+      ? known.formatted
+      : raw.length === 10
+      ? `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}`
+      : raw
     const label = `Tin nhắn văn bản với SĐT: ${formatted}`
     return { code: 'SĐT', label, displayCode: label, isPhone: true }
   }
 
   if (id.startsWith('voice_phone_')) {
     const raw = id.replace('voice_phone_', '')
-    const formatted = raw.length === 10 ? `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}` : raw
+    const known = KNOWN_CASE_PHONES[raw.slice(-3)]
+    const formatted = known
+      ? known.formatted
+      : raw.length === 10
+      ? `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}`
+      : raw
     const label = `Tin nhắn thoại với SĐT: ${formatted}`
     return { code: 'VOICE', label, displayCode: label, isPhone: true }
   }
 
-  const code = id.replace(/^(doc_|custom_code_|ev_)/i, '').replace(/^#/, '').trim()
+  const rawCode = id.replace(/^(doc_|custom_code_|ev_)/i, '').replace(/^#/, '').trim()
+  const code = /^[a-z]-?\d+/i.test(rawCode) ? rawCode.toUpperCase() : rawCode
   return { code, label: `Tài liệu #${code}`, displayCode: code, isPhone: false }
 }
 

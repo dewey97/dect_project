@@ -54,8 +54,9 @@ export const PHONE_LOOKUP_EVIDENCE_IDS = [
 ]
 
 import { findValidCaseCharacter, VALID_CASE_CHARACTERS } from '@/lib/cases/case-000-suspects'
-import { checkMotiveValid, checkAlibiValid } from '@/lib/cases/case-000-clues'
+import { isEvidenceMatching, checkMotiveValid, checkAlibiValid } from '@/lib/cases/case-000-clues'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
+import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 export { findValidCaseCharacter, VALID_CASE_CHARACTERS, checkMotiveValid, checkAlibiValid }
 
@@ -138,12 +139,29 @@ export function AddSuspectModal({
 
   if (!isOpen) return null
 
+  const { checkpoints } = useCaseCheckpoints('case-000')
+  const matchedCheckpoint = useMemo(() => {
+    return checkpoints.find((cp) => cp.id === suspectCpId)
+  }, [checkpoints, suspectCpId])
+
+  const validateMotive = (_charId: string, clues: string[]) => {
+    if (hasAdminBypassInArray(clues)) return true
+    const liveMotive = matchedCheckpoint?.pickerConfig?.motiveEvidenceIds || []
+    return checkMotiveValid(liveMotive, clues)
+  }
+
+  const validateAlibi = (_charId: string, clues: string[]) => {
+    if (hasAdminBypassInArray(clues)) return true
+    const liveAlibi = matchedCheckpoint?.pickerConfig?.alibiEvidenceIds || []
+    return checkAlibiValid(liveAlibi, clues)
+  }
+
   // XÁC NHẬN MANH MỐI ĐỘNG CƠ (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
   const handleConfirmMotiveClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
     const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
-    const isValid = matched ? checkMotiveValid(matched.id, motiveClueIds) : false
+    const isValid = matched ? validateMotive(matched.id, motiveClueIds) : false
 
     if (!isCore || !isValid) {
       detectiveAudio.playGlassSound()
@@ -188,7 +206,7 @@ export function AddSuspectModal({
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name)
     const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
-    const isValid = matched ? checkAlibiValid(matched.id, alibiClueIds) : false
+    const isValid = matched ? validateAlibi(matched.id, alibiClueIds) : false
 
     if (!isCore || !isValid) {
       detectiveAudio.playGlassSound()
@@ -262,8 +280,8 @@ export function AddSuspectModal({
     }
 
     const charId = (isAdmin000 ? 'vu' : isVu ? 'vu' : isTung ? 'tung' : 'ha') as 'vu' | 'tung' | 'ha'
-    const isMotiveOk = isAdmin000 || checkMotiveValid(charId, motiveClueIds)
-    const isAlibiOk = isAdmin000 || checkAlibiValid(charId, alibiClueIds)
+    const isMotiveOk = isAdmin000 || validateMotive(charId, motiveClueIds)
+    const isAlibiOk = isAdmin000 || validateAlibi(charId, alibiClueIds)
 
     if (!isMotiveOk || !isAlibiOk) {
       setErrorMsg('Bằng chứng động cơ hoặc mâu thuẫn ngoại phạm chưa chính xác. Vui lòng rà soát lại đúng cả 2 mục trước khi tiến hành điều tra!')
@@ -297,8 +315,8 @@ export function AddSuspectModal({
   const isHa = matchedChar?.id === 'ha'
 
   // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
-  const isMotiveValid = matchedChar ? checkMotiveValid(matchedChar.id, motiveClueIds) : false
-  const isAlibiValid = matchedChar ? checkAlibiValid(matchedChar.id, alibiClueIds) : false
+  const isMotiveValid = matchedChar ? validateMotive(matchedChar.id, motiveClueIds) : false
+  const isAlibiValid = matchedChar ? validateAlibi(matchedChar.id, alibiClueIds) : false
   const isAdmin000 = name.trim() === '000' || name.trim() === '00' || name.trim() === '0'
   const isBothValid = (isMotiveValid && isAlibiValid) || isAdmin000
 

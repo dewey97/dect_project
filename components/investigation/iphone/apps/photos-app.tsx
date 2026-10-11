@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Image as ImageIcon,
   ArrowLeft,
@@ -23,12 +23,31 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
   const [showExifInfo, setShowExifInfo] = useState(false);
 
   const { data: sheetPhotos, loading, error } = usePhoneData("photos");
+  const [isBoxUnlocked, setIsBoxUnlocked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const unlocked = Boolean(
+        localStorage.getItem("followup_ha_password") ||
+        localStorage.getItem("followup_ha") === "solved"
+      );
+      setIsBoxUnlocked(unlocked);
+    }
+  }, []);
 
   const photos = sheetPhotos
     .filter(
       (item: any) =>
         Boolean(item.drive_url || item.direct_cdn_url || item.url || item.photo_url)
     )
+    .filter((item: any) => {
+      const code = (item.photo_code || item.photo_id || "").toUpperCase().trim();
+      // 3 vật chứng hộp thiếc D-06, D-05, D-04 chỉ được mở ra sau khi đã trả lời đúng mã khóa
+      if (["D-06", "D-05", "D-04", "D06", "D05", "D04"].includes(code)) {
+        return isBoxUnlocked;
+      }
+      return true;
+    })
     .map((item: any, idx: number) => ({
       id: item.photo_code || item.photo_id || `photo-${idx + 1}`,
       filename:
