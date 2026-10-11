@@ -107,7 +107,7 @@ export function useCaseCheckpoints(caseId: string = "case-000"): CaseCheckpoints
   const checkpoints = useMemo(() => {
     const targetId = normalizeCaseId(caseId);
     const matchingRows = checkpointRows.filter(
-      (row) => normalizeCaseId(row.case_id || "") === targetId,
+      (row) => !row.case_id || normalizeCaseId(row.case_id) === targetId,
     );
 
     if (matchingRows.length > 0) {

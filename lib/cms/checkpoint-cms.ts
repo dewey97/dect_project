@@ -454,15 +454,16 @@ export function transformSheetCheckpoint(
       }
     : undefined;
 
-  const effectiveId =
+  const effectiveId = String(
     row.checkpoint_id ||
     row.node_id ||
     (row as any).id ||
-    "cp-dynamic";
+    "cp-dynamic"
+  ).trim();
 
   return {
     id: effectiveId,
-    nodeId: row.node_id || effectiveId,
+    nodeId: String(row.node_id || effectiveId).trim(),
     caseId: row.case_id || "case-000",
     title: row.title || "",
     question: row.question || "",

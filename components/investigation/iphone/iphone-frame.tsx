@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Phone,
   MessageSquare,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
@@ -41,6 +42,7 @@ interface IPhoneFrameProps {
   history: BrowserHistory[];
   files: RecoveredFile[];
   onSwitchToForensics?: () => void;
+  onClose?: () => void;
 }
 
 type IPhoneApp =
@@ -63,8 +65,9 @@ export function IPhoneFrame({
   history,
   files,
   onSwitchToForensics,
+  onClose,
 }: IPhoneFrameProps) {
-  const [frameless, setFrameless] = useState(true);
+  const frameless = false;
   const [isLocked, setIsLocked] = useState(false);
   const [activeApp, setActiveApp] = useState<IPhoneApp>(null);
   const [showAssistiveTouch, setShowAssistiveTouch] = useState(false);
@@ -97,12 +100,8 @@ export function IPhoneFrame({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-hidden py-0 sm:py-1">
-      {/* Top Quick Control Bar (Desktop controls only) */}
-      <div
-        className={cn(
-          "items-center justify-between w-full max-w-[390px] px-2 text-[11px] font-mono shrink-0 hidden sm:flex mb-1",
-        )}
-      >
+      {/* Top Quick Control Bar (Cùng dòng: Khóa máy, Home ảo, Về Home, Đóng X) */}
+      <div className="flex items-center justify-between w-full max-w-[390px] px-2 text-[11px] font-mono shrink-0 mb-1.5 z-40">
         <div className="flex items-center gap-1.5">
           {/* Lock / Unlock Screen */}
           <button
@@ -147,33 +146,31 @@ export function IPhoneFrame({
             )}
             <span>{showAssistiveTouch ? "Home ảo" : "Bật Home"}</span>
           </button>
-
-          {/* Frameless vs Framed Toggle */}
-          <button
-            onClick={() => setFrameless(!frameless)}
-            className={cn(
-              "flex items-center gap-1 px-2 py-1 rounded-lg border transition-all active:scale-95 shadow-sm cursor-pointer",
-              frameless
-                ? "bg-[#AF52DE]/15 text-[#AF52DE] border-[#AF52DE]/40 font-medium hover:bg-[#AF52DE]/25"
-                : "bg-[#1C1C1E] text-zinc-400 hover:text-zinc-200 border-white/10 hover:border-white/20",
-            )}
-            title="Chuyển đổi giữa Chế độ Tràn viền và Khung máy cổ điển"
-          >
-            <Smartphone className="size-3 text-[#AF52DE]" />
-            <span>{frameless ? "Tràn viền" : "Khung"}</span>
-          </button>
         </div>
 
-        {activeApp && (
-          <button
-            onClick={() => setActiveApp(null)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#0A84FF]/40 bg-[#0A84FF]/15 text-[#0A84FF] hover:bg-[#0A84FF]/25 active:scale-95 font-semibold transition-all shadow-sm cursor-pointer ml-auto"
-            title="Thoát ứng dụng về Màn hình chính"
-          >
-            <Home className="size-3" />
-            <span>Về Home</span>
-          </button>
-        )}
+        <div className="flex items-center gap-1.5 ml-auto">
+          {activeApp && (
+            <button
+              onClick={() => setActiveApp(null)}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#0A84FF]/40 bg-[#0A84FF]/15 text-[#0A84FF] hover:bg-[#0A84FF]/25 active:scale-95 font-semibold transition-all shadow-sm cursor-pointer"
+              title="Thoát ứng dụng về Màn hình chính"
+            >
+              <Home className="size-3" />
+              <span>Về Home</span>
+            </button>
+          )}
+
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="size-7 rounded-lg flex items-center justify-center bg-[#1C1C1E] text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10 active:scale-95 transition-all cursor-pointer shadow-sm ml-1"
+              title="Đóng điện thoại"
+              aria-label="Đóng điện thoại"
+            >
+              <X className="size-4 text-[#d9a066]" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* PHONE CONTAINER: Exact iPhone 375x667 Canvas Aspect Ratio */}

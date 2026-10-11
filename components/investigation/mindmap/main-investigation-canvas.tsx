@@ -189,41 +189,28 @@ export function MainInvestigationCanvas({
         ).toLowerCase();
         if (normUrl) {
           const rawCode = (item.photo_code || "").toLowerCase().trim();
-          if (
-            rawCode === "avatar_vu" ||
-            code.includes("vu") ||
-            code.includes("vũ")
-          )
+          const category = (item.category || "").toUpperCase().trim();
+          const isAvatar = rawCode.startsWith("avatar_") || category === "AVATAR";
+
+          // 1. Prioritize explicit avatar codes (avatar_<id>)
+          if (rawCode === "avatar_vu" || (isAvatar && (code === "vu" || code.includes("lê quang vũ"))))
             map.vu = normUrl;
-          if (
-            rawCode === "avatar_tung" ||
-            code.includes("tung") ||
-            code.includes("tùng")
-          )
+          if (rawCode === "avatar_tung" || (isAvatar && (code === "tung" || code.includes("nguyễn thanh tùng"))))
             map.tung = normUrl;
-          if (
-            rawCode === "avatar_ha" ||
-            code.includes("ha") ||
-            code.includes("hà")
-          )
+          if (rawCode === "avatar_ha" || (isAvatar && (code === "ha" || code.includes("trần thị hà"))))
             map.ha = normUrl;
-          if (rawCode === "avatar_mai" || code.includes("mai"))
+          if (rawCode === "avatar_mai" || (isAvatar && (code === "mai" || code.includes("nguyễn ngọc mai"))))
             map.mai = normUrl;
-          if (rawCode === "avatar_khang" || code.includes("khang"))
+          if (rawCode === "avatar_khang" || (isAvatar && (code === "khang" || code.includes("nguyễn văn khang"))))
             map.khang = normUrl;
-          if (
-            rawCode === "avatar_dat" ||
-            code.includes("dat") ||
-            code.includes("đạt")
-          )
+          if (rawCode === "avatar_dat" || (isAvatar && (code === "dat" || code.includes("trần văn đạt"))))
             map.dat = normUrl;
-          if (
-            rawCode === "avatar_lua" ||
-            code.includes("lua") ||
-            code.includes("lụa")
-          )
+          if (rawCode === "avatar_lua" || (isAvatar && (code === "lua" || code.includes("nguyễn thị lụa"))))
             map.lua = normUrl;
-          if (rawCode === "avatar_vy" || code.includes("vy")) map.vy = normUrl;
+          if (rawCode === "avatar_vy" || (isAvatar && (code === "vy" || code.includes("thảo vy"))))
+            map.vy = normUrl;
+
+          // 2. Crime scene
           if (
             rawCode === "crime_scene" ||
             rawCode === "chalk_outline" ||

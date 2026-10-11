@@ -46,7 +46,17 @@ interface CheckpointGroupData {
 export function normalizeCheckpointId(id?: string): string {
   if (!id) return "";
   const clean = id.trim().toLowerCase();
-  if (clean === "phone" || clean.includes("phone") || clean === "cp-000-0")
+  if (clean.includes("followup")) {
+    if (clean.includes("vu") || clean.includes("1a")) return "cp-000-1a-followup";
+    if (clean.includes("ha") || clean.includes("1c")) return "cp-000-1c-followup";
+    return clean;
+  }
+  if (
+    clean === "phone" ||
+    clean.includes("phone") ||
+    clean === "cp-000-0" ||
+    clean === "c0-pin-phone"
+  )
     return "cp-000-0";
   if (clean === "vu" || clean.includes("vu") || clean === "cp-000-1a")
     return "cp-000-1a";
@@ -123,7 +133,11 @@ function buildGroupedCheckpointsMap(
 
     // Nhận diện theo ngữ cảnh nếu dòng con để trống checkpoint_id
     if (!id) {
-      if (title.includes("hà") || title.includes("ha")) {
+      if (title.includes("hộp thiếc") || title.includes("mật khẩu")) {
+        id = "cp-000-1c-followup";
+      } else if (title.includes("quán bia") || title.includes("thanh toán")) {
+        id = "cp-000-1a-followup";
+      } else if (title.includes("hà") || title.includes("ha")) {
         id = "cp-000-1c";
       } else if (title.includes("tùng") || title.includes("tung")) {
         id = "cp-000-1b";

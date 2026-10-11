@@ -40,6 +40,7 @@ interface PhoneSimulatorProps {
   notes?: Document[]
   history?: BrowserHistory[]
   files?: RecoveredFile[]
+  onClose?: () => void
 }
 
 const DEFAULT_VICTIM_DEVICE: Device = {
@@ -62,7 +63,8 @@ export function PhoneSimulator({
   photos = [],
   notes = [],
   history = [],
-  files = []
+  files = [],
+  onClose
 }: PhoneSimulatorProps) {
   const activeDevice: Device = {
     ...DEFAULT_VICTIM_DEVICE,
@@ -78,6 +80,7 @@ export function PhoneSimulator({
         notes={notes}
         history={history}
         files={files}
+        onClose={onClose}
       />
     </div>
   )

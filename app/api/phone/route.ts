@@ -107,7 +107,7 @@ function parseCsvRows(text: string): string[][] {
  * Tải trực tiếp dữ liệu dạng CSV từ Google Sheets công khai khi không có Service Account.
  */
 async function fetchPublicSheetRows(spreadsheetId: string, tab: string): Promise<string[][]> {
-  const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
+  const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(tab)}`;
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) {
     throw new Error(`Google Sheets public export failed with HTTP ${res.status}`);
@@ -187,17 +187,22 @@ export async function GET(request: Request) {
   }
 
   const headers = rawRows[0].map((h: string) =>
-    typeof h === "string" ? h.replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim() : h,
+    typeof h === "string"
+      ? h.replace(/^\uFEFF/, "").replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim()
+      : h,
   );
-  const rawData = rawRows.slice(1).map((row) => {
-    const obj: Record<string, any> = {};
-    headers.forEach((header, index) => {
-      if (header) {
-        obj[header] = row[index] !== undefined ? row[index] : "";
-      }
+  const rawData = rawRows
+    .slice(1)
+    .filter((row) => row && row.some((cell) => typeof cell === "string" ? cell.trim() : Boolean(cell)))
+    .map((row) => {
+      const obj: Record<string, any> = {};
+      headers.forEach((header, index) => {
+        if (header) {
+          obj[header] = row[index] !== undefined ? row[index] : "";
+        }
+      });
+      return obj;
     });
-    return obj;
-  });
 
   // Case-insensitive & dash/underscore-agnostic filter by case_id
   const filteredData = rawData.filter((item) => {

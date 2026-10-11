@@ -378,7 +378,11 @@ export function FollowupQuestionModal({
                 onClick={(e) => {
                   e.stopPropagation()
                   detectiveAudio.playTypewriterClick()
-                  const cpId = isVu ? 'cp-000-1a' : isTung ? 'cp-000-1b' : 'cp-000-1c'
+                  const cpId = isVu
+                    ? 'cp-000-1a-followup'
+                    : isTung
+                      ? 'cp-000-1b'
+                      : 'cp-000-1c-followup'
                   emitInvestigationEvent('OPEN_HINT', { checkpointId: cpId })
                 }}
                 className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
