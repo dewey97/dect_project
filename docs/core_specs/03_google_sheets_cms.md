@@ -86,8 +86,7 @@ flowchart LR
   - `calls`: Lịch sử cuộc gọi đến/đi/nhỡ, các cuộc gọi có đoạn ghi âm giọng nói / tiếng động hiện trường (`is_key_clue = TRUE`).
   - `messages`: Lịch sử nhắn tin SMS/Zalo, các tin nhắn đe dọa đòi nợ, nhắn tin hẹn gặp.
   - `photos`: Thư viện ảnh hiện trường, giấy tờ vay nợ, ảnh chụp ngoại phạm, ảnh căn cước.
-  - `banking`: Lịch sử chuyển tiền ngân hàng, các giao dịch bất thường trước giờ nạn nhân tử vong.
-  - `notes_and_browser`: Ghi chú cá nhân, nhật ký chi tiêu và lịch sử duyệt web của nạn nhân.
+  - `apps`: Tổng hợp dữ liệu ứng dụng của nạn nhân gồm Ghi chú cá nhân (`NOTE`), Lịch sử duyệt web Safari (`SAFARI`), và Biến động tài khoản ngân hàng (`BANK`). Mã giao dịch và đối tác được tự động xử lý.
 
 ---
 
@@ -236,21 +235,23 @@ flowchart LR
 
 ---
 
-### 5. Tab `photos` — Thư Viện Ảnh Bằng Chứng, Nghi Phạm & Dynamic Composite
+### 5. Tab `evidences` / `photos` — Thư Viện Vật Chứng, Ảnh Chân Dung & Dynamic Composite
 
-| Cột | Tên trường | Loại | Ý nghĩa & Quy ước |
-| :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`, `case_001`). |
-| 2 | `photo_code` | 🔴 `🔑` | Mã ảnh (`avatar_khang`, `avatar_vu`, `avatar_ha`, `p1`, `p2`...). |
-| 3 | `title` | 🟢 `⚡` | Tiêu đề ảnh / Tên nhân vật (Hệ thống tự bóc tách để in hoa lên băng dính). |
-| 4 | `category` | 🟢 `⚡` | Phân loại (`AVATAR`, `EVIDENCE`, `SCENE`, `HOTSPOT`). |
-| 5 | `file_name` | 🟢 `⚡` | Tên file quy ước lưu trữ (`Ảnh_Hà.png`, `avata_khang.png`...). |
-| 6 | `ratio` | 📝 | Tỉ lệ khung hình (`3:4`, `16:9`, `1:1`). |
-| 7 | `local_file_path`| 📝 | Đường dẫn file gốc lưu tại `docs/cases/<case_id>/...` |
-| 8 | `drive_url` | 🟢 `⚡` | **Link chia sẻ Google Drive công khai** (`https://drive.google.com/file/d/{id}/view`). Hệ thống tự chuyển thành Google CDN direct link. |
-| 9 | `direct_cdn_url` | 🟢 `⚡` | Đường dẫn CDN trực tiếp (nếu có, ưu tiên cao nhất). |
-| 10 | `description_prompt` | 🟢 `⚡` | Mô tả prompt ngoại hình nhân vật hoặc vật chứng. |
-| 11 | `is_key_asset`| 🟢 `⚡` | `TRUE` nếu là ảnh vật chứng mấu chốt để bóc trần hung thủ. |
+> 💡 **Khả năng tương thích linh hoạt**: Hệ thống API `/api/phone` tự động nhận diện và đồng bộ dữ liệu cho cả 2 tên tab: `evidences` (chuẩn mới quản lý vật chứng tổng thể) và `photos` (chuẩn ban đầu). Khi truy vấn, API thử lần lượt `evidences` ➔ `photos` ➔ `photos_old` ➔ `evidences_old` để đảm bảo không bao giờ bị đứt mạch dữ liệu.
+
+| Cột | Tên trường chuẩn | Tên trường alias | Loại | Ý nghĩa & Quy ước |
+| :---: | :--- | :--- | :---: | :--- |
+| 1 | `case_id` | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`, `case_001`). |
+| 2 | `code` | `photo_code`, `photo_id` | 🔴 `🔑` | Mã ảnh / mã vật chứng (`avatar_khang`, `avatar_vu`, `avatar_ha`, `A-06`, `D-04`...). |
+| 3 | `label` | `title`, `name` | 🟢 `⚡` | Tiêu đề ảnh / Tên nhân vật (Hệ thống tự bóc tách để in hoa lên băng dính). |
+| 4 | `category` | `type` | 🟢 `⚡` | Phân loại (`AVATAR`, `EVIDENCE`, `SCENE`, `HOTSPOT`). |
+| 5 | `file_name` | `filename` | 🟢 `⚡` | Tên file quy ước lưu trữ (`Ảnh_Hà.png`, `avata_khang.png`...). |
+| 6 | `ratio` | `aspect_ratio` | 📝 | Tỉ lệ khung hình (`3:4`, `16:9`, `1:1`). |
+| 7 | `local_file_path`| `path` | 📝 | Đường dẫn file gốc lưu tại `docs/cases/<case_id>/...` |
+| 8 | `drive_url` | `url`, `image_url` | 🟢 `⚡` | **Link chia sẻ Google Drive công khai** (`https://drive.google.com/file/d/{id}/view`). Hệ thống tự chuyển thành Google CDN direct link. |
+| 9 | `direct_cdn_url` | `cdn_url` | 🟢 `⚡` | Đường dẫn CDN trực tiếp (nếu có, ưu tiên cao nhất). |
+| 10 | `description` | `description_prompt` | 🟢 `⚡` | Mô tả prompt ngoại hình nhân vật hoặc biên bản phân tích vật chứng. |
+| 11 | `is_key_asset`| `key_clue` | 🟢 `⚡` | `TRUE` nếu là ảnh vật chứng mấu chốt để bóc trần hung thủ. |
 
 #### 🖼️ Giao thức Live Dynamic Composite & Bộ Nhớ Đệm Offscreen Canvas:
 1. **Mô hình Live 100% không cần Build lại**:
@@ -259,8 +260,10 @@ flowchart LR
 2. **Tối ưu Hiệu năng 60 FPS (Offscreen Canvas Caching)**:
    - Toàn bộ quá trình ghép khung Polaroid và vẽ băng dính chỉ thực hiện **ĐÚNG 1 LẦN DUY NHẤT** vào một `OffscreenCanvas` trong bộ nhớ RAM khi ảnh tải về.
    - Khi người chơi kéo chuột, phóng to/thu nhỏ trên bàn điều tra 60 FPS, Web Canvas chỉ copy trực tiếp Bitmap từ RAM ra màn hình với độ trễ siêu tốc (<0.1ms), hoàn toàn không tính toán lại ziczac băng dính, không gây nóng máy hay tụt khung hình.
-3. **Cơ chế An toàn Tuyệt đối (Graceful Fallback)**:
-   - Nếu link Google Drive chưa bật quyền *"Bất kỳ ai có liên kết đều có thể xem"* (lỗi 403) hoặc mất mạng, hệ thống tự động fallback âm thầm về ảnh thẻ local tương ứng trong `public/images/cases/case_000/`, đảm bảo không bao giờ vỡ giao diện hay hiện icon ảnh lỗi.
+3. **Cơ chế An toàn Tuyệt đối & Chống Quirk Redirect (Graceful Fallback)**:
+   - **Bắt lỗi Google Sheets gviz Redirect**: Khi tab yêu cầu không tồn tại trên bảng tính, Google Sheets public CSV export tự động redirect về tab đầu tiên của spreadsheet (thường là tab `design` chứa cột link Canva). API `/api/phone` tự động phát hiện header dị thường này và lập tức chuyển sang nạp tab fallback an toàn (`photos`, `photos_old`, `evidences_old`).
+   - **Chuẩn hóa trường 2 chiều (Two-Way Aliasing)**: Tự động gán đồng thời `code` $\leftrightarrow$ `photo_code` và `label` $\leftrightarrow$ `title`, đảm bảo mọi component dù dùng chuẩn schema nào cũng đọc dữ liệu thông suốt.
+   - **Fallback Avatar Placeholder**: Nếu link Google Drive lỗi 403 hoặc mất kết nối mạng, hệ thống fallback về `/images/avatar_placeholder.svg` thay vì phụ thuộc vào các file ảnh dán băng dính tĩnh cũ, đảm bảo không bao giờ vỡ layout hay lỗi hình ảnh.
 4. **Quy chuẩn dành cho Biên kịch & Designer**:
    - **Quyền file trên Drive**: Luôn bật quyền *Viewer - Anyone with the link* (Người xem có liên kết).
    - **Tỉ lệ ảnh chân dung**: Khuyến nghị tỉ lệ `3:4` hoặc `1:1`, góc chụp từ ngực trở lên, rõ nét khuôn mặt.
@@ -268,20 +271,21 @@ flowchart LR
 
 ---
 
-### 6. Tab `banking` — Lịch Sử Giao Dịch Ngân Hàng
+### 6. Tab `apps` — Hợp Nhất Ứng Dụng iPhone (Notes, Safari & Banking)
 
-| Cột | Tên trường | Loại | Ý nghĩa |
+> 💡 **Hợp nhất ứng dụng iPhone**: Tab `apps` tích hợp toàn bộ dữ liệu ứng dụng của nạn nhân gồm Ghi chú cá nhân (`NOTE`), Lịch sử duyệt web Safari (`SAFARI`), và Biến động số dư tài khoản ngân hàng (`BANK`) trong cùng một cấu trúc bảng tối giản.
+
+| Cột | Tên trường | Loại | Ý nghĩa & Quy ước |
 | :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
-| 2 | `tx_id` | 🔴 `🔑` | Mã giao dịch (`tx-01`, `tx-02`...). |
-| 3 | `ref_id` | 🟢 `⚡` | Mã tham chiếu ngân hàng (`FT1620589231`). |
-| 4 | `title` | 🟢 `⚡` | Nội dung chuyển khoản. |
-| 5 | `receiver` | 🟢 `⚡` | Tên người nhận / người gửi. |
-| 6 | `account_no` | 🟢 `⚡` | Số tài khoản ngân hàng. |
-| 7 | `amount` | 🟢 `⚡` | Số tiền giao dịch (`-50,000,000 VND`, `+200,000,000 VND`). |
-| 8 | `timestamp` | 🟢 `⚡` | Thời gian thực hiện giao dịch. |
-| 9 | `category` | 🟢 `⚡` | `income` (tiền vào) hoặc `expense` (tiền ra). |
-| 10 | `is_evidence` | 🟢 `⚡` | `TRUE` nếu là giao dịch chứng minh động cơ phạm tội. |
+| 1 | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`). |
+| 2 | `type` | 🔴 `🔑` | Phân loại ứng dụng: `NOTE` (Ghi chú), `SAFARI` (Trang web), `BANK` (Giao dịch ngân hàng). |
+| 3 | `title_or_domain` | 🟢 `⚡` | Tiêu đề ghi chú (`NOTE`), Domain trang web (`SAFARI`), hoặc Người nhận / gửi (`BANK`). |
+| 4 | `content_or_url` | 🟢 `⚡` | Nội dung ghi chú (`NOTE`), URL web (`SAFARI`), hoặc Lời nhắn chuyển khoản (`BANK`). |
+| 5 | `timestamp` | 🟢 `⚡` | Mốc thời gian tạo ghi chú, duyệt web hoặc thực hiện giao dịch ngân hàng. |
+| 6 | `category` | 🟢 `⚡` | Danh mục phân loại (`iCloud`, `Local`, `Lịch sử`, `Nhận tiền`, `Chuyển tiền`). |
+| 7 | `account_no` | 🟢 `⚡` | Số tài khoản ngân hàng đối tác (chỉ dùng cho `BANK`). |
+| 8 | `amount` | 🟢 `⚡` | Số tiền giao dịch (dương là tiền vào, âm là tiền ra; hệ thống tự sinh mã tham chiếu FT). |
+| 9 | `is_evidence` | 🟢 `⚡` | `TRUE` nếu là dữ liệu/giao dịch mấu chốt chứng minh động cơ hoặc mốc thời gian. |
 
 ---
 

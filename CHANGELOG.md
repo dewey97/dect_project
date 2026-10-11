@@ -2,7 +2,38 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
-## [Unreleased] - 2026-10-10
+## [Unreleased] - 2026-10-12
+
+### Added
+
+- **Vertical Corkboard Stage Preview (`/board-stage`)**:
+  - Thêm trang stage preview thử nghiệm bảng ghim khổ dọc với các nút ghim và dây chỉ điều tra nối động (`app/(investigation)/board-stage/page.tsx`).
+  - Bổ sung 3 ảnh nền texture corkboard dọc (`detective_desk_ambient_vertical.jpg`, `pure_cork_texture_vertical.jpg`, `vintage_framed_corkboard_vertical.jpg`).
+- **Default Avatar Placeholder (`/public/images/avatar_placeholder.svg`)**:
+  - Bổ sung SVG placeholder hình bóng điều tra trung tính làm fallback chuẩn cho toàn bộ nghi phạm và nhân chứng.
+- **Drive PDF URL Normalizer (`lib/utils.ts`)**:
+  - Bổ sung hàm `normalizeDrivePdfUrl` tự động chuyển link Google Drive sang `/preview` và gỡ bỏ thanh công cụ PDF iframe `#toolbar=0&navpanes=0`.
+
+### Changed & Enhanced
+
+- **Evidence Workspace Reorganization (`app/(investigation)/evidence/web/page.tsx`)**:
+  - Tái cấu trúc không gian phòng lưu trữ vật chứng thành layout 3 vùng độc lập (Dossier Selector ➔ Item List ➔ Full-Viewport Inspector).
+  - Tối ưu hóa khung soi vật chứng (`evidence-detail-inspector.tsx`) với chế độ hiển thị tối đa diện tích (Full Viewport Object-Contain), nút mở rộng/thu gọn và iframe tài liệu sạch sẽ.
+- **Dynamic Pin Cards & Asset Deprecation (`card-composite.ts`, `hero-interactive.tsx`)**:
+  - Gỡ bỏ hoàn toàn 14 file ảnh dán băng dính tĩnh cũ (`pinned_photos_with_tape/*`).
+  - Chuyển giao sang công nghệ Dynamic Card Composite dựng khung Polaroid + băng dính giấy răng cưa động trên Canvas 60 FPS.
+- **Live Google Sheets CMS Resilience (`app/api/phone/route.ts`)**:
+  - Hỗ trợ cơ chế phân giải tab kép: tự động truy vấn tab `evidences` và fallback sang `photos`, `photos_old`, `evidences_old`.
+  - Bổ sung ánh xạ 2 chiều (Two-way aliasing) giữa `code` <-> `photo_code` và `label` <-> `title`.
+  - Phát hiện lỗi redirect tự động của Google Sheets gviz CSV khi tab không tồn tại.
+- **Consolidate iPhone Apps Sheet (`apps` Tab)**:
+  - Hợp nhất dữ liệu 3 ứng dụng `banking`, `notes` và `safari` vào chung một tab `apps` duy nhất trên Google Sheets Live CMS (`scripts/migrate-to-apps-sheet.js`, `update-sheet-headers-with-icons.js`).
+  - Cập nhật các component `banking-app.tsx`, `notes-app.tsx`, `safari-app.tsx` và `dashboard-client.tsx` đọc trực tiếp từ tab `apps`, tự sinh mã FT tham chiếu ngân hàng.
+- **Dynamic Suspect Pool (`lib/cases/case-000-suspects.ts`, `mindmap/add-suspect-modal.tsx`)**:
+  - Hỗ trợ nạp nghi phạm mở rộng (`extraCharacters`) từ Live CMS vào hàm nhận diện `findValidCaseCharacter`.
+  - Cải tiến tương tác click mở modal chỉnh sửa và zoom ảnh trên Mindmap Canvas.
+
+## [2026-10-10] - 2026-10-10
 
 ### Added
 

@@ -9,13 +9,12 @@
 ```
 d:\code_world\dect_project/
 ├── app/                            # Next.js 16 App Router
-│   ├── (admin)/                    # Phân hệ Quản trị Studio (/studio)
-│   │   └── studio/                 # Quản lý vụ án, người chơi, phản hồi, cài đặt
 │   ├── (investigation)/            # Không gian điều tra & Bàn phá án
+│   │   ├── board-stage/            # Thử nghiệm stage corkboard khổ dọc & bố trí ghim án
 │   │   ├── evidence/               # Danh sách & Trình duyệt hồ sơ vật chứng
 │   │   │   ├── [id]/               # Soi chi tiết tang vật / Giả lập thiết bị
 │   │   │   ├── boardgame/          # Bảng điều tra dạng Ghim án (Boardgame Pins)
-│   │   │   └── web/                # Bảng sơ đồ nơ-ron mạng nhện (React Flow)
+│   │   │   └── web/                # Phòng lưu trữ vật chứng (Layout 3 vùng: Dossier, Item Grid, Inspector)
 │   │   └── cabinet-demo/           # Demo ngăn kéo / tủ hồ sơ vật lý
 │   ├── activate/                   # Cổng nhập mã kích hoạt vụ án
 │   ├── auth/                       # Xử lý xác thực OAuth / Supabase Callback
@@ -93,6 +92,9 @@ Hệ thống sử dụng cơ chế **Google Docs / Google Sheets Live CMS** đ�
    npm run sync:docs-to-sheet   # Đồng bộ chỉ mục Docs -> Sheets
    npm run sync:testimonies     # Cập nhật lời khai từ Sheets
    ```
+4. **Nhúng PDF & Chuẩn hóa URL (`normalizeDrivePdfUrl`)**:
+   - Tài liệu PDF từ Google Drive hoặc thư mục tĩnh `/documents/` được hiển thị qua `<iframe>` với hàm `normalizeDrivePdfUrl()` (`lib/utils.ts`).
+   - Tự động chuyển đổi link Drive sang dạng `/file/d/{id}/preview` và gắn `#toolbar=0&navpanes=0` cho file local, triệt tiêu thanh công cụ thừa của trình duyệt để tạo trải nghiệm đọc hồ sơ trinh thám liền mạch.
 
 ---
 

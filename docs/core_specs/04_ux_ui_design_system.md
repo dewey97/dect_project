@@ -59,3 +59,24 @@ Sử dụng 2 họ font chính:
 - **`PhotosApp` (`photos-app.tsx`):** Thư viện ảnh chụp hiện trường, ảnh chụp lén kèm metadata EXIF.
 - **`BankingApp` (`banking-app.tsx`):** Biến động số dư tài khoản ngân hàng, hóa đơn chuyển tiền bất thường.
 - **`MapsApp` (`maps-app.tsx`):** Bản đồ tọa độ di chuyển GPS của nạn nhân trước giờ tử vong.
+
+---
+
+## 🗄️ 5. Không Gian Phòng Vật Chứng & Dynamic Pin Cards
+
+### 1. Không Gian Phòng Vật Chứng 3 Vùng (Evidence Workspace — 3-Region Layout):
+Áp dụng tại `app/(investigation)/evidence/web/page.tsx` nhằm tối ưu hóa khả năng đối chiếu hồ sơ song song:
+- **Vùng 1 (Dossier Selector - ~180px Desktop)**: Thanh điều hướng chọn danh mục hồ sơ theo từng chặng vụ án (`Tất cả`, `Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`) kèm chỉ báo số lượng tài liệu đã mở khóa. Hỗ trợ nút thu gọn trên màn hình hẹp.
+- **Vùng 2 (Evidence & Document Grid - ~260px Desktop)**: Danh sách cuộn độc lập hiển thị thẻ vật chứng:
+  - *Vật chứng ảnh*: Hiển thị thumbnail ảnh chụp hiện trường thực tế, overlay mã vật chứng (`📸 A-06`...).
+  - *Hồ sơ văn bản*: Hiển thị badge icon `PDF` màu amber viền nâu cổ điển, mã hồ sơ và trích yếu tiêu đề.
+  - *Dải chỉ báo Active*: Strip dọc màu hổ phách (`#d9a066`) đánh dấu tài liệu đang xem.
+- **Vùng 3 (Inspector Viewer - Flex-1 mở rộng)**: Khung soi chi tiết tài liệu toàn màn hình:
+  - *Vật chứng hiện trường*: Hiển thị ảnh chụp độ nét cao ở tỉ lệ tối đa (Full Viewport Object-Contain), nền tối sâu có họa tiết grid tế vi, khử hoàn toàn viền rườm rà.
+  - *Hồ sơ pháp y PDF*: Nhúng trực tiếp iframe Google Drive hoặc PDF local đã chuẩn hóa URL (triệt tiêu thanh công cụ trình duyệt bằng `#toolbar=0&navpanes=0`).
+  - *Nút Mở Rộng / Chuẩn*: Cho phép phóng to vùng soi tài liệu chiếm trọn toàn bộ khung nhìn bên phải để đọc văn bản cỡ chữ nhỏ.
+
+### 2. Thẻ Ghim Điều Tra Động (Dynamic Pin Cards & Canvas Composite):
+Áp dụng tại `HeroInteractive` và `MainInvestigationCanvas`:
+- **Vẽ thẻ ảnh động trên Canvas**: Khung ảnh Polaroid kèm băng dính dán tường răng cưa được dựng trực tiếp bằng `card-composite.ts` và lưu vào `OffscreenCanvas` trong bộ nhớ RAM, đạt tốc độ kết xuất 60 FPS mà không cần phụ thuộc vào ảnh tĩnh pre-render.
+- **Avatar Placeholder Chuẩn (`/images/avatar_placeholder.svg`)**: Đảm bảo nhân vật mới hoặc nghi phạm mở rộng từ Live CMS luôn có hình đại diện đồng nhất trước khi gắn ảnh hồ sơ chính thức.

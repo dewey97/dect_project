@@ -77,6 +77,9 @@ public/
 | `crime_scene_outline_bg.jpg` | Hình nền hiện trường kẻ vệt phấn | Background màn hình phân tích hiện trường |
 | `mobile_evidence_board_bg.jpg` | Hình nền tối ưu cho giao diện di động | Bảng điều tra Mobile View |
 | `ios7_wallpaper.jpg` | Hình nền màn hình khóa điện thoại tang vật | Trình giả lập iPhone (`components/investigation/iphone`)|
+| `detective_desk_ambient_vertical.jpg` | Bàn điều tra góc dọc với ánh sáng đèn chụp ambient | Thử nghiệm bảng án khổ dọc (`app/(investigation)/board-stage`)|
+| `pure_cork_texture_vertical.jpg` | Texture gỗ bần nguyên chất liền mạch khổ dọc | Thử nghiệm bảng án khổ dọc (`app/(investigation)/board-stage`)|
+| `vintage_framed_corkboard_vertical.jpg` | Khung bảng gỗ bần viền gỗ vintage cổ điển khổ dọc | Thử nghiệm bảng án khổ dọc (`app/(investigation)/board-stage`)|
 
 ---
 
@@ -94,18 +97,10 @@ Hệ thống ghim cắm bảng phân loại theo màu sắc nghiệp vụ (mỗi
 
 ## 🕵️ 7. Phân Hệ Vụ Án #000: TRỐN TÌM (`/public/images/cases/case_000/`)
 
-### 7.1. Ảnh Thẻ Nhân Vật Có Băng Dính (`pinned_photos_with_tape/`)
-Ảnh polaroid chụp nhân dạng kèm băng dính dán tường hiển thị trên Corkboard & Mindmap:
-- `pinned_tape_khang.png`: Nạn nhân Nguyễn Văn Khang.
-- `pinned_tape_mai.png`: Nghi phạm 1 Nguyễn Ngọc Mai.
-- `pinned_tape_vu.png`: Nghi phạm 2 Lê Quang Vũ.
-- `pinned_tape_tung.png`: Nghi phạm 3 Nguyễn Thanh Tùng.
-- `pinned_tape_ha.png`: Thủ phạm Trần Thị Hà.
-- `pinned_tape_dat_ga.png`: Đạt Gà Chợ Cảng (Ngoại phạm/nhiễu).
-- `pinned_tape_ba_lua.png`: Nhân chứng Bà Lụa hàng xóm.
-- `pinned_tape_vy.png`: Thảo Vy (Người tình mới của Khang).
-- `pinned_photo_crime_scene_v2.png`: Ảnh hiện trường án mạng phòng khách.
-- `pinned_tape_chalk_outline.png`: Vệt phấn tư thế ngã của nạn nhân.
+### 7.1. Ảnh Thẻ Nhân Vật, Avatar Placeholder & Dynamic Canvas Composite
+- **`/public/images/avatar_placeholder.svg`**: Hình bóng avatar điều tra trung tính chuẩn, hiển thị mặc định cho mọi nghi phạm và nhân chứng khi chưa có ảnh chân dung từ Live CMS Google Sheets.
+- **Loại bỏ ảnh tĩnh `pinned_photos_with_tape/`**: Toàn bộ các ảnh PNG ghép sẵn băng dính giấy tĩnh trước đây (`pinned_tape_khang.png`, `pinned_tape_vu.png`...) đã được gỡ bỏ khỏi `public/` để tối ưu dung lượng và chuyển sang kiến trúc **Dynamic Card Composite**.
+- **Cơ chế Dựng Thẻ Động (`card-composite.ts`)**: Trình duyệt nạp ảnh chân dung gốc từ Google Drive Live CMS, tự động ghép khung Polaroid và vẽ băng dính giấy răng cưa trên Canvas bộ nhớ (Offscreen Canvas 60 FPS), đảm bảo nội dung luôn đồng bộ với dữ liệu bảng tính mà không cần re-build code.
 
 ### 7.2. Giấy Ghi Chú Nghiệp Vụ (`clue_notes/rendered_notes/`)
 Giấy note vàng/trắng viết tay đã kết xuất sẵn nét mực để cắm lên bảng:
