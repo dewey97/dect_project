@@ -110,8 +110,8 @@ export function FollowupQuestionModal({
     const mappedPhotos = rawSheetPhotos
       .filter((p: any) => Boolean(p.drive_url || p.direct_cdn_url || p.url || p.local_file_path))
       .map((p: any, idx: number) => ({
-        id: (p.photo_code || p.code || `photo-ha-${idx}`).trim(),
-        title: (p.title || p.file_name || `Vật chứng #${idx + 1}`).trim(),
+        id: (p.code || p.photo_code || `photo-ha-${idx}`).trim(),
+        title: (p.label || p.title || p.file_name || `Vật chứng #${idx + 1}`).trim(),
         url: normalizeImageUrl(p.direct_cdn_url || p.drive_url || p.url || p.local_file_path || ''),
       }))
 

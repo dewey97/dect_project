@@ -34,19 +34,14 @@ export const ALL_CASE_000_SUSPECTS: SuspectItem[] = [
   },
   { id: "suspect-tung", name: "Nguyễn Thanh Tùng", clueIds: ["c0-clue-03"] },
   { id: "suspect-ha", name: "Trần Thị Hà", clueIds: ["c0-clue-04"] },
-  { id: "suspect-mai", name: "Nguyễn Ngọc Mai", clueIds: [] },
-  { id: "suspect-dat", name: "Trần Văn Đạt", clueIds: [] },
-  { id: "suspect-lua", name: "Nguyễn Thị Lụa", clueIds: [] },
-  { id: "suspect-vy", name: "Thảo Vy", clueIds: [] },
 ];
 
 export function sanitizeSuspectsList(items: SuspectItem[]): SuspectItem[] {
   const map = new Map<string, SuspectItem>();
   for (const s of items) {
     if (!s || !s.name) continue;
-    const matchedChar = findValidCaseCharacter(s.name || s.id);
-    if (!matchedChar || matchedChar.id === "khang") continue;
     const { canonicalId, canonicalName } = getCanonicalSuspectKey(s);
+    if (canonicalId === "khang" || (s.name && s.name.toLowerCase().includes("khang"))) continue;
     map.set(canonicalId, {
       ...s,
       id: canonicalId,
@@ -109,7 +104,12 @@ export function useInvestigationState(opts?: {
   useEffect(() => {
     const rawSuspects = getStorageJson<any[]>("canvas_suspects", []);
     const validList = rawSuspects.filter((s) => s?.id !== "suspect-default-1");
-    setSuspects(sanitizeSuspectsList(validList));
+    if (validList.length === 0) {
+      setSuspects(ALL_CASE_000_SUSPECTS);
+      setStorageJson("canvas_suspects", ALL_CASE_000_SUSPECTS);
+    } else {
+      setSuspects(sanitizeSuspectsList(validList));
+    }
 
     const solvedFollowups = getStorageJson<CulpritKey[]>(
       "solved_followups",

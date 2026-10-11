@@ -34,33 +34,6 @@ const PRESET_CASE_PHOTOS: Array<{
   url: string;
   defaultCheckpointId?: string;
 }> = [
-  {
-    label: "Nạn nhân Khang",
-    url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
-  },
-  {
-    label: "Hiện trường Vết Máu",
-    url: "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
-  },
-  {
-    label: "Trần Thị Hà",
-    url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ha.png",
-    defaultCheckpointId: "cp-000-2a",
-  },
-  {
-    label: "Lê Quang Vũ",
-    url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vu.png",
-    defaultCheckpointId: "cp-000-1a",
-  },
-  {
-    label: "Nguyễn Thanh Tùng",
-    url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_tung.png",
-    defaultCheckpointId: "cp-000-1b",
-  },
-  {
-    label: "Nguyễn Ngọc Mai",
-    url: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_mai.png",
-  },
   { label: "Vé xe Tùng", url: "/images/cases/case_000/cuong_ve_xe_tung.png" },
   {
     label: "Tin nhắn tống tiền",
@@ -71,6 +44,10 @@ const PRESET_CASE_PHOTOS: Array<{
     label: "Phòng tái khám xét",
     url: "/images/cases/case_000/photo-reinvestigation-room-realistic.jpg",
     defaultCheckpointId: "cp-000-convergence",
+  },
+  {
+    label: "Ảnh ẩn danh (Placeholder)",
+    url: "/images/avatar_placeholder.svg",
   },
 ];
 
@@ -247,13 +224,16 @@ export function AdminCreatePinModal({
         if (rawUrl) {
           const normUrl = normalizeImageUrl(rawUrl);
           const label =
+            item.label ||
             item.title ||
             item.Title ||
             item.ten_anh ||
             item["tên ảnh"] ||
             item.name ||
             item.filename ||
+            item.code ||
             item.photo_id ||
+            item.photo_code ||
             `Ảnh Sheet #${idx + 1}`;
           if (!list.some((p) => p.url === normUrl || p.url === rawUrl)) {
             list.push({
@@ -289,9 +269,7 @@ export function AdminCreatePinModal({
       const resolvedPhoto =
         initialPin.photoUrl ||
         char?.avatarUrl ||
-        (isCrimeScene
-          ? "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png"
-          : "");
+        (isCrimeScene ? "/images/avatar_placeholder.svg" : "");
 
       const labelLower = (initialPin.label || "").toLowerCase();
       const idLower = (initialPin.id || "").toLowerCase();

@@ -53,10 +53,11 @@ export const PHONE_LOOKUP_EVIDENCE_IDS = [
   'p5_manh_bao',
 ]
 
-import { findValidCaseCharacter, VALID_CASE_CHARACTERS } from '@/lib/cases/case-000-suspects'
+import { findValidCaseCharacter, VALID_CASE_CHARACTERS, type SuspectCharacter } from '@/lib/cases/case-000-suspects'
 import { isEvidenceMatching, checkMotiveValid, checkAlibiValid } from '@/lib/cases/case-000-clues'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
+import { usePhoneData } from '@/lib/hooks/use-phone-data'
 
 export { findValidCaseCharacter, VALID_CASE_CHARACTERS, checkMotiveValid, checkAlibiValid }
 
@@ -92,13 +93,70 @@ export function AddSuspectModal({
     }
   }, [isOpen])
 
+  const { checkpoints } = useCaseCheckpoints('case-000')
+  const { data: sheetEvidences } = usePhoneData('evidences', 'case-000')
+
+  // Parse all avatar/character items from Google Sheet
+  const sheetCharacters: SuspectCharacter[] = useMemo(() => {
+    if (!Array.isArray(sheetEvidences)) return []
+    const list: SuspectCharacter[] = []
+    sheetEvidences.forEach((item: any, idx: number) => {
+      const code = String(item.code || item.photo_code || '').trim()
+      const codeLower = code.toLowerCase()
+      const label = String(item.label || item.title || '').trim()
+      const category = String(item.category || '').toUpperCase().trim()
+      const isAvatar =
+        category === 'AVATAR' ||
+        category === 'SUSPECT' ||
+        category === 'WITNESS' ||
+        codeLower.startsWith('avatar_') ||
+        label.toLowerCase().includes('chân dung')
+
+      if (!isAvatar || !label) return
+      const cleanName = label
+        .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i, '')
+        .replace(/\s*\([^)]*\)/g, '')
+        .trim()
+      if (!cleanName) return
+
+      const charId = codeLower.replace(/^avatar_/, '') || `char-${idx}`
+      const aliases = [
+        cleanName.toLowerCase(),
+        charId,
+        ...(cleanName.includes(' ') ? [cleanName.split(' ').slice(-1)[0].toLowerCase()] : []),
+      ]
+
+      list.push({
+        id: charId,
+        canonicalName: cleanName,
+        aliases,
+        role: item.description || 'Đối tượng liên quan vụ án',
+        avatarUrl: item.drive_url || item.direct_cdn_url || item.url || '/images/avatar_placeholder.svg',
+        slotIndex: 3 + (idx % 5),
+      })
+    })
+    return list
+  }, [sheetEvidences])
+
+  const matchedChar = useMemo(() => {
+    return findValidCaseCharacter(name, sheetCharacters)
+  }, [name, sheetCharacters])
+
   const suspectCpId = useMemo(() => {
     const norm = (name || editingSuspect?.name || editingSuspect?.id || '').toLowerCase()
     if (norm === 'vũ' || norm === 'vu' || norm === 'lê quang vũ') return 'cp-000-1a'
     if (norm === 'tùng' || norm === 'tung' || norm === 'nguyễn thanh tùng') return 'cp-000-1b'
     if (norm === 'hà' || norm === 'ha' || norm === 'trần thị hà') return 'cp-000-1c'
+    if (matchedChar) {
+      const foundCp = checkpoints.find((cp) => {
+        const titleLower = (cp.title || '').toLowerCase()
+        const questionLower = (cp.question || '').toLowerCase()
+        return titleLower.includes(matchedChar.id) || questionLower.includes(matchedChar.canonicalName.toLowerCase())
+      })
+      if (foundCp) return foundCp.id
+    }
     return ''
-  }, [name, editingSuspect])
+  }, [name, editingSuspect, matchedChar, checkpoints])
 
   useEffect(() => {
     if (isOpen) {
@@ -139,12 +197,10 @@ export function AddSuspectModal({
     setShowExitConfirmModal(false)
   }, [editingSuspect, isOpen])
 
-  if (!isOpen) return null
-
-  const { checkpoints } = useCaseCheckpoints('case-000')
   const matchedCheckpoint = useMemo(() => {
     return checkpoints.find((cp) => cp.id === suspectCpId)
   }, [checkpoints, suspectCpId])
+
 
   const validateMotive = (_charId: string, clues: string[]) => {
     if (hasAdminBypassInArray(clues)) return true
@@ -163,11 +219,11 @@ export function AddSuspectModal({
   // XÁC NHẬN MANH MỐI ĐỘNG CƠ (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
   const handleConfirmMotiveClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
-    const matched = findValidCaseCharacter(name)
+    const matched = findValidCaseCharacter(name, sheetCharacters)
     const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
-    const isValid = matched ? validateMotive(matched.id, motiveClueIds) : false
+    const isValid = matched && isCore ? validateMotive(matched.id, motiveClueIds) : true
 
-    if (!isCore || !isValid) {
+    if (isCore && !isValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
@@ -208,11 +264,11 @@ export function AddSuspectModal({
   // XÁC NHẬN MANH MỐI BÁC BỎ NGOẠI PHẠM (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
   const handleConfirmAlibiClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
-    const matched = findValidCaseCharacter(name)
+    const matched = findValidCaseCharacter(name, sheetCharacters)
     const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
-    const isValid = matched ? validateAlibi(matched.id, alibiClueIds) : false
+    const isValid = matched && isCore ? validateAlibi(matched.id, alibiClueIds) : true
 
-    if (!isCore || !isValid) {
+    if (isCore && !isValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
@@ -272,18 +328,25 @@ export function AddSuspectModal({
       return
     }
 
-    const isVu = matchedChar.id === 'vu'
-    const isTung = matchedChar.id === 'tung'
-    const isHa = matchedChar.id === 'ha'
-
+    const isCore = matchedChar.id === 'vu' || matchedChar.id === 'tung' || matchedChar.id === 'ha'
     const isAdmin000 = currentName === '000' || currentName === '00' || currentName === '0'
-    if (!isVu && !isTung && !isHa && !isAdmin000) {
-      setErrorMsg('Chưa đủ căn cứ pháp lý: Đối tượng này không thuộc diện điều tra trọng điểm (Vũ / Tùng / Hà)!')
-      detectiveAudio.playGlassSound()
+
+    // If non-core suspect (Bà Lụa, Đạt, Mai...), save directly as related person of interest
+    if (!isCore && !isAdmin000) {
+      detectiveAudio.playStampSound()
+      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+      onSave({
+        id: matchedChar.id,
+        name: matchedChar.canonicalName,
+        clueIds: combinedClues,
+        motiveClueIds,
+        alibiClueIds
+      })
+      onClose()
       return
     }
 
-    const charId = (isAdmin000 ? 'vu' : isVu ? 'vu' : isTung ? 'tung' : 'ha') as 'vu' | 'tung' | 'ha'
+    const charId = (isAdmin000 ? 'vu' : matchedChar.id) as 'vu' | 'tung' | 'ha'
     const isMotiveOk = isAdmin000 || validateMotive(charId, motiveClueIds)
     const isAlibiOk = isAdmin000 || validateAlibi(charId, alibiClueIds)
 
@@ -312,17 +375,18 @@ export function AddSuspectModal({
     onClose()
   }
 
-  const matchedChar = findValidCaseCharacter(name)
   const isValidName = !!matchedChar && matchedChar.id !== 'khang'
+  const isCore = !!matchedChar && (matchedChar.id === 'vu' || matchedChar.id === 'tung' || matchedChar.id === 'ha')
   const isVu = matchedChar?.id === 'vu'
   const isTung = matchedChar?.id === 'tung'
   const isHa = matchedChar?.id === 'ha'
 
   // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
-  const isMotiveValid = matchedChar ? validateMotive(matchedChar.id, motiveClueIds) : false
-  const isAlibiValid = matchedChar ? validateAlibi(matchedChar.id, alibiClueIds) : false
+  const isMotiveValid = matchedChar && isCore ? validateMotive(matchedChar.id, motiveClueIds) : false
+  const isAlibiValid = matchedChar && isCore ? validateAlibi(matchedChar.id, alibiClueIds) : false
   const isAdmin000 = name.trim() === '000' || name.trim() === '00' || name.trim() === '0'
-  const isBothValid = (isMotiveValid && isAlibiValid) || isAdmin000
+  // For non-core suspects, having a valid recognized name is enough to save/investigate them
+  const isBothValid = isValidName && (!isCore || (isMotiveValid && isAlibiValid) || isAdmin000)
 
   // KIỂM TRA XEM CÓ THAY ĐỔI CHƯA LƯU HAY KHÔNG (CHỈ XÉT KHI TÊN ĐÚNG)
   const hasUnsavedChanges = () => {
@@ -460,11 +524,18 @@ export function AddSuspectModal({
                     <input
                       type="text"
                       value={name}
+                      readOnly={Boolean(editingSuspect?.name)}
                       onChange={(e) => {
+                        if (editingSuspect?.name) return
                         setName(e.target.value)
                         if (errorMsg) setErrorMsg('')
                       }}
-                      className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-4 py-2.5 text-base sm:text-lg text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
+                      className={cn(
+                        "w-full border-2 border-[#2b1f14] rounded-none px-4 py-2.5 text-base sm:text-lg font-[family-name:var(--font-handwriting)] font-bold focus:outline-none transition-colors shadow-inner",
+                        editingSuspect?.name
+                          ? "bg-[#ede4d0] text-[#1a120b] cursor-default border-[#4a3520]"
+                          : "bg-[#fdfcf9] text-[#0e2b5c] focus:border-black"
+                      )}
                     />
                   </div>
 

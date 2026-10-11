@@ -5,6 +5,7 @@ import type {
   PinPoint,
 } from "@/components/investigation/hero-interactive";
 import { getCanonicalSuspectKey } from "@/lib/cases/case-000-suspects";
+import { normalizeImageUrl } from "@/lib/utils";
 import type { CulpritKey, SuspectItem } from "./use-investigation-state";
 
 export const DESKTOP_SUSPECT_SLOTS = [
@@ -29,16 +30,15 @@ export const MOBILE_SUSPECT_SLOTS = [
   { x: 0.88, y: 0.42 },
 ];
 
-const SUSPECT_PHOTO_MAP: Record<string, string> = {
-  vu: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vu.png",
-  tung: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_tung.png",
-  ha: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ha.png",
-  mai: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_mai.png",
-  khang: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
-  dat: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_dat_ga.png",
-  lua: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_ba_lua.png",
-  vy: "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_vy.png",
-};
+const DYNAMIC_PHOTO_SLOTS: { x: number; y: number }[] = [
+  { x: 0.88, y: 0.22 },
+  { x: 0.78, y: 0.76 },
+  { x: 0.62, y: 0.78 },
+  { x: 0.46, y: 0.78 },
+  { x: 0.38, y: 0.62 },
+  { x: 0.12, y: 0.55 },
+  { x: 0.88, y: 0.72 },
+];
 
 const SUSPECT_CHECKPOINT_MAP: Record<string, string> = {
   vu: "cp-000-1a",
@@ -51,10 +51,13 @@ function buildSuspectPins(
   slots: { x: number; y: number }[],
   sheetPhotoMap: Record<string, string>,
 ): PinPoint[] {
-  return effectiveSuspects.map((suspect) => {
+  return effectiveSuspects.map((suspect, idx) => {
     const { canonicalId, slotIndex, canonicalName } =
       getCanonicalSuspectKey(suspect);
-    const slot = slots[slotIndex] || slots[0];
+    const assignedSlotIndex = typeof slotIndex === "number" && slotIndex >= 0 && slotIndex < 3
+      ? slotIndex
+      : (3 + (idx % (slots.length - 3)));
+    const slot = slots[assignedSlotIndex] || slots[idx % slots.length] || slots[0];
     const cpId = SUSPECT_CHECKPOINT_MAP[canonicalId];
     return {
       id: `node-suspect-${canonicalId}`,
@@ -65,8 +68,8 @@ function buildSuspectPins(
       color: "blue" as const,
       photoUrl:
         sheetPhotoMap[canonicalId] ||
-        SUSPECT_PHOTO_MAP[canonicalId] ||
-        undefined,
+        "/images/avatar_placeholder.svg",
+      isAvatar: true,
       actionType: cpId ? ("sheet_checkpoint" as const) : ("info" as const),
       checkpointId: cpId || undefined,
     };
@@ -131,6 +134,19 @@ export type PinBuilderInput = {
   isMobile: boolean;
   effectiveSuspects: SuspectItem[];
   sheetPhotoMap: Record<string, string>;
+  sheetPinnedItems?: Array<{
+    code?: string;
+    photo_code?: string;
+    label?: string;
+    title?: string;
+    drive_url?: string;
+    direct_cdn_url?: string;
+    url?: string;
+    description?: string;
+    category?: string;
+    board_x?: string | number;
+    board_y?: string | number;
+  }>;
   hasVuFollowup: boolean;
   hasTungFollowup: boolean;
   hasHaFollowup: boolean;
@@ -180,18 +196,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           isSolved: input.effectivePhoneSolved,
         },
         {
-          id: "c0-pin-victim-khang",
-          x: 0.55,
-          y: 0.12,
-          label: "Nạn nhân Nguyễn Văn Khang",
-          detail:
-            "Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài",
-          color: "red" as const,
-          photoUrl:
-            input.sheetPhotoMap.khang ||
-            "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
-        },
-        {
           id: "c0-pin-victim-phone",
           x: 0.38,
           y: 0.14,
@@ -201,17 +205,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           color: "yellow" as const,
           photoUrl: "/phone.png",
           scale: 0.85,
-        },
-        {
-          id: "c0-pin-crime-scene",
-          x: 0.73,
-          y: 0.21,
-          label: "Hiện trường thi thể",
-          detail: "Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn",
-          color: "orange" as const,
-          photoUrl:
-            input.sheetPhotoMap.crime_scene ||
-            "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
         },
         {
           id: "c0-pin-reinvestigate",
@@ -281,19 +274,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           isSolved: input.effectivePhoneSolved,
         },
         {
-          id: "c0-pin-victim-khang",
-          x: 0.55,
-          y: 0.12,
-          label: "Nạn nhân Nguyễn Văn Khang",
-          detail:
-            "Nạn nhân vụ án — Thi thể được phát hiện tại bờ sông xóm Chài",
-          color: "yellow" as const,
-          pinColor: "yellow" as const,
-          photoUrl:
-            input.sheetPhotoMap.khang ||
-            "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
-        },
-        {
           id: "c0-pin-victim-phone",
           x: 0.38,
           y: 0.14,
@@ -304,18 +284,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           pinColor: "yellow" as const,
           photoUrl: "/phone.png",
           scale: 0.85,
-        },
-        {
-          id: "c0-pin-crime-scene",
-          x: 0.73,
-          y: 0.21,
-          label: "Hiện trường thi thể",
-          detail: "Ảnh hiện trường khám nghiệm tử thi và vệt máu trên sàn",
-          color: "yellow" as const,
-          pinColor: "yellow" as const,
-          photoUrl:
-            input.sheetPhotoMap.crime_scene ||
-            "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
         },
         {
           id: "c0-pin-reinvestigate",
@@ -361,7 +329,56 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         },
       ] as PinPoint[]);
 
-  return [...base, ...followupPins, ...suspectPins];
+  // Dynamically pin any evidence/photo from Google Sheets where pin_on_board is TRUE
+  const dynamicPhotoPins: PinPoint[] = [];
+  if (Array.isArray(input.sheetPinnedItems)) {
+    let autoSlotIdx = 0;
+    input.sheetPinnedItems.forEach((item) => {
+      const code = String(item.code || item.photo_code || "").trim();
+      const codeLower = code.toLowerCase();
+      if (!codeLower) return;
+
+      const rawX = typeof item.board_x === "number" ? item.board_x : parseFloat(String(item.board_x || ""));
+      const rawY = typeof item.board_y === "number" ? item.board_y : parseFloat(String(item.board_y || ""));
+      const hasCustomCoords = !isNaN(rawX) && !isNaN(rawY) && rawX > 0 && rawY > 0;
+
+      let posX = rawX;
+      let posY = rawY;
+      if (!hasCustomCoords) {
+        const slot = DYNAMIC_PHOTO_SLOTS[autoSlotIdx % DYNAMIC_PHOTO_SLOTS.length];
+        posX = slot.x;
+        posY = slot.y;
+        autoSlotIdx++;
+      }
+
+      const pinId = `c0-pin-evidence-${codeLower}`;
+      const pinColor: "yellow" | "red" | "blue" | "orange" = "yellow";
+
+      const rawUrl = item.drive_url || item.direct_cdn_url || item.url || "";
+      const photoUrl = rawUrl ? normalizeImageUrl(rawUrl) : "/images/avatar_placeholder.svg";
+
+      const rawCategory = String(item.category || "").toUpperCase().trim();
+      const rawLabel = String(item.label || item.title || "").toLowerCase().trim();
+      const isAvatar =
+        rawCategory === "AVATAR" ||
+        codeLower.startsWith("avatar_") ||
+        rawLabel.includes("ảnh chân dung") ||
+        rawLabel.includes("chân dung");
+
+      dynamicPhotoPins.push({
+        id: pinId,
+        x: posX,
+        y: posY,
+        label: item.label || item.title || item.code || "Vật chứng",
+        detail: item.description || `Vật chứng vụ án: ${item.label || item.code}`,
+        color: pinColor,
+        photoUrl,
+        isAvatar,
+      });
+    });
+  }
+
+  return [...base, ...followupPins, ...suspectPins, ...dynamicPhotoPins];
 }
 
 export function buildCustomConnections(opts: {

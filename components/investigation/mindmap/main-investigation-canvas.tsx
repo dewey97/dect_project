@@ -169,67 +169,63 @@ export function MainInvestigationCanvas({
     state.editingSuspect,
   ]);
 
-  const { data: sheetPhotos } = usePhoneData("photos");
+  const { data: sheetEvidences } = usePhoneData("evidences");
   const sheetPhotoMap = useMemo(() => {
     const map: Record<string, string> = {};
-    if (Array.isArray(sheetPhotos)) {
-      sheetPhotos.forEach((item: any) => {
+    if (Array.isArray(sheetEvidences)) {
+      sheetEvidences.forEach((item: any) => {
         const rawUrl =
           item.drive_url ||
+          item.direct_cdn_url ||
           item.url ||
           item.photo_url ||
-          item.direct_cdn_url ||
           "";
+        if (!rawUrl) return;
         const normUrl = normalizeImageUrl(rawUrl);
-        const code = (
-          item.photo_code ||
-          item.code ||
-          item.title ||
-          item.filename ||
-          ""
-        ).toLowerCase();
-        if (normUrl) {
-          const rawCode = (item.photo_code || "").toLowerCase().trim();
-          const category = (item.category || "").toUpperCase().trim();
-          const isAvatar = rawCode.startsWith("avatar_") || category === "AVATAR";
+        const rawCode = String(item.code || item.photo_code || "").toLowerCase().trim();
+        const rawLabel = String(item.label || item.title || "").toLowerCase().trim();
+        const category = String(item.category || "").toUpperCase().trim();
+        const isAvatar = rawCode.startsWith("avatar_") || category === "AVATAR" || rawLabel.includes("chân dung");
 
-          // 1. Prioritize explicit avatar codes (avatar_<id>)
-          if (rawCode === "avatar_vu" || (isAvatar && (code === "vu" || code.includes("lê quang vũ"))))
-            map.vu = normUrl;
-          if (rawCode === "avatar_tung" || (isAvatar && (code === "tung" || code.includes("nguyễn thanh tùng"))))
-            map.tung = normUrl;
-          if (rawCode === "avatar_ha" || (isAvatar && (code === "ha" || code.includes("trần thị hà"))))
-            map.ha = normUrl;
-          if (rawCode === "avatar_mai" || (isAvatar && (code === "mai" || code.includes("nguyễn ngọc mai"))))
-            map.mai = normUrl;
-          if (rawCode === "avatar_khang" || (isAvatar && (code === "khang" || code.includes("nguyễn văn khang"))))
-            map.khang = normUrl;
-          if (rawCode === "avatar_dat" || (isAvatar && (code === "dat" || code.includes("trần văn đạt"))))
-            map.dat = normUrl;
-          if (rawCode === "avatar_lua" || (isAvatar && (code === "lua" || code.includes("nguyễn thị lụa"))))
-            map.lua = normUrl;
-          if (rawCode === "avatar_vy" || (isAvatar && (code === "vy" || code.includes("thảo vy"))))
-            map.vy = normUrl;
+        // 1. Suspect / Character avatars
+        if (rawCode === "avatar_vu" || (isAvatar && (rawCode === "vu" || rawLabel.includes("vũ"))))
+          map.vu = normUrl;
+        if (rawCode === "avatar_tung" || (isAvatar && (rawCode === "tung" || rawLabel.includes("tùng"))))
+          map.tung = normUrl;
+        if (rawCode === "avatar_ha" || (isAvatar && (rawCode === "ha" || rawLabel.includes("hà"))))
+          map.ha = normUrl;
+        if (rawCode === "avatar_mai" || (isAvatar && (rawCode === "mai" || rawLabel.includes("mai"))))
+          map.mai = normUrl;
+        if (rawCode === "avatar_khang" || (isAvatar && (rawCode === "khang" || rawLabel.includes("khang"))))
+          map.khang = normUrl;
+        if (rawCode === "avatar_dat" || (isAvatar && (rawCode === "dat" || rawLabel.includes("đạt"))))
+          map.dat = normUrl;
+        if (rawCode === "avatar_lua" || (isAvatar && (rawCode === "lua" || rawLabel.includes("lụa"))))
+          map.lua = normUrl;
+        if (rawCode === "avatar_vy" || (isAvatar && (rawCode === "vy" || rawLabel.includes("vy"))))
+          map.vy = normUrl;
 
-          // 2. Crime scene
-          if (
-            rawCode === "crime_scene" ||
-            rawCode === "chalk_outline" ||
-            rawCode === "thi_the" ||
-            code.includes("chalk") ||
-            code.includes("thi_the") ||
-            code.includes("thi thể") ||
-            (code.includes("crime") && !code.includes("room")) ||
-            (code.includes("hien_truong") &&
-              !code.includes("phong_khach") &&
-              !code.includes("phòng khách"))
-          )
-            map.crime_scene = normUrl;
+        // 2. Crime scene
+        if (
+          rawCode === "crime_scene" ||
+          rawCode === "chalk_outline" ||
+          rawCode === "thi_the" ||
+          rawCode === "a-06" ||
+          rawCode.includes("chalk") ||
+          rawLabel.includes("thi thể") ||
+          (rawLabel.includes("hiện trường") && !rawLabel.includes("phòng khách"))
+        ) {
+          map.crime_scene = normUrl;
+        }
+
+        // Direct code mapping
+        if (rawCode) {
+          map[rawCode] = normUrl;
         }
       });
     }
     return map;
-  }, [sheetPhotos]);
+  }, [sheetEvidences]);
 
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -264,12 +260,21 @@ export function MainInvestigationCanvas({
   const isReinvestigateBlinking =
     state.effectiveReinvestigateUnlocked && !state.hasOpenedReinvestigation;
 
+  const sheetPinnedItems = useMemo(() => {
+    if (!Array.isArray(sheetEvidences)) return [];
+    return sheetEvidences.filter((item: any) => {
+      const pinVal = String(item.pin_on_board || "").toUpperCase().trim();
+      return pinVal === "TRUE" || pinVal === "1" || pinVal === "YES";
+    });
+  }, [sheetEvidences]);
+
   const basePins = useMemo(
     () =>
       buildCustomPins({
         isMobile,
         effectiveSuspects,
         sheetPhotoMap,
+        sheetPinnedItems,
         hasVuFollowup,
         hasTungFollowup,
         hasHaFollowup,
@@ -282,6 +287,7 @@ export function MainInvestigationCanvas({
       isMobile,
       effectiveSuspects,
       sheetPhotoMap,
+      sheetPinnedItems,
       hasVuFollowup,
       hasTungFollowup,
       hasHaFollowup,
@@ -392,8 +398,8 @@ export function MainInvestigationCanvas({
       }
 
       if (id === "c0-pin-suspects" || id === "c0-pin-question") {
-        state.setEditingSuspect(null);
-        state.setIsAddSuspectOpen(true);
+        // Node note 'Nghi phạm' giữ làm điểm neo nối dây chỉ đỏ nghiệp vụ, không bật modal nhập tên nữa
+        detectiveAudio.playPaperRustle();
       } else if (id === "c0-pin-evidence") {
         state.setIsEvidenceGuideOpen(true);
       } else if (
@@ -408,21 +414,36 @@ export function MainInvestigationCanvas({
         if (state.phoneLookupSuccess) state.setIsDossierEOpen(true);
         else state.setIsPhoneLookupOpen(true);
       } else if (
-        id === "c0-pin-crime-scene" ||
-        id.includes("crime-scene") ||
-        id.includes("thi-the")
+        id.startsWith("node-suspect-") ||
+        id.startsWith("suspect-") ||
+        (Boolean(pin?.isAvatar) &&
+          !id.includes("khang") &&
+          !label.includes("khang"))
       ) {
-        handleOpenPhotoZoom(
-          sheetPhotoMap.crime_scene ||
-            "/images/cases/case_000/pinned_photos_with_tape/pinned_photo_crime_scene_v2.png",
-          coords,
+        // Thẻ chân dung nghi phạm/nhân vật trên bảng: Mở thẳng modal Thẩm tra Căn cứ tình nghi (Động cơ & Ngoại phạm)
+        const charName = (pin?.label || "")
+          .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i, "")
+          .replace(/\s*\([^)]*\)/g, "")
+          .trim();
+        const existing = state.suspects.find(
+          (s) => s.id === id || s.name.toLowerCase() === charName.toLowerCase(),
         );
-      } else if (id === "c0-pin-victim-khang" || id === "khang") {
-        handleOpenPhotoZoom(
-          sheetPhotoMap.khang ||
-            "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
-          coords,
+        state.setEditingSuspect(
+          existing || {
+            id,
+            name: charName || pin?.label || "Nghi phạm",
+            clueIds: [],
+          },
         );
+        state.setIsAddSuspectOpen(true);
+      } else if (
+        id.startsWith("c0-pin-evidence-") ||
+        id.startsWith("sheet-pin-") ||
+        pin?.photoUrl
+      ) {
+        if (pin?.photoUrl) {
+          handleOpenPhotoZoom(pin.photoUrl, coords);
+        }
       } else if (id === "c0-pin-reinvestigate") {
         if (state.isReinvestigateUnlocked) {
           detectiveAudio.playGlassSound();
@@ -477,8 +498,7 @@ export function MainInvestigationCanvas({
           id.includes("khang")
         ) {
           handleOpenPhotoZoom(
-            sheetPhotoMap.khang ||
-              "/images/cases/case_000/pinned_photos_with_tape/pinned_tape_khang.png",
+            sheetPhotoMap.khang || "/images/avatar_placeholder.svg",
             coords,
           );
           return;
