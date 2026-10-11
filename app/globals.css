@@ -195,6 +195,28 @@
     border-radius: 2px;
   }
 
+  /* Discrete iOS-style scrollbar for iPhone simulation apps */
+  .ios-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .ios-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+    border: none;
+  }
+  .ios-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 9999px;
+    border: none;
+  }
+  .ios-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+  .ios-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+
   /* Section eyebrows / metadata. Override color when needed (e.g. text-primary). */
   .label-system {
     @apply font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ChevronLeft,
   Search,
@@ -51,6 +51,20 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
 
   // Fetch messages live from Google Sheets CMS
   const { data: rawMessagesData, loading, error } = usePhoneData("messages");
+
+  // Ref to message stream container to auto-scroll to latest message
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-scroll to latest messages when opening a conversation
+  useEffect(() => {
+    if (selectedThread) {
+      // Use requestAnimationFrame / small timeout to guarantee DOM rendered
+      const timer = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedThread?.id]);
 
   // Global audio element reference
   useEffect(() => {
@@ -113,7 +127,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           const duration = audioMatch[2]?.trim() || "0:08";
           attachment = {
             type: "audio",
-            url: normalizeMediaUrl(rawUrl),
+            url: rawUrl.includes("drive.google.com") || rawUrl.match(/\/file\/d\/[a-zA-Z0-9_-]+/)
+              ? `/api/audio-proxy?id=${(rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/))?.[1]}`
+              : normalizeMediaUrl(rawUrl),
             duration,
           };
           cleanLine = cleanLine.replace(audioMatch[0], "").trim();
@@ -155,7 +171,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
 
             attachment = {
               type: "audio",
-              url: normalizeMediaUrl(rawUrl),
+              url: rawUrl.includes("drive.google.com") || rawUrl.match(/\/file\/d\/[a-zA-Z0-9_-]+/)
+                ? `/api/audio-proxy?id=${(rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/))?.[1]}`
+                : normalizeMediaUrl(rawUrl),
               duration,
             };
             cleanLine = cleanLine.replace(vnAudioWithLinkMatch[0], "").trim();
@@ -390,7 +408,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           </div>
 
           {/* Messages Bubble Stream */}
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 flex flex-col justify-start pb-10">
+          <div className="flex-1 overflow-y-auto ios-scrollbar px-4 py-3 space-y-3 flex flex-col justify-start pb-10 scroll-smooth">
             <div className="text-center my-1">
               <span className="text-[11px] text-[#717786] bg-[#E9E7ED] px-3 py-1 rounded-full font-medium">
                 iMessage · iSMS
@@ -606,6 +624,8 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                 </div>
               );
             })}
+            {/* Invisible bottom anchor for auto-scroll */}
+            <div ref={messagesEndRef} className="h-2 shrink-0" />
           </div>
         </div>
       ) : (
@@ -670,7 +690,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
               Lỗi: {error}
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto divide-y divide-[#E3E2E7] bg-[#FAF9FE] pb-10">
+            <div className="flex-1 overflow-y-auto ios-scrollbar divide-y divide-[#E3E2E7] bg-[#FAF9FE] pb-10">
               {filteredThreads.map((thread: any) => (
                 <div
                   key={thread.id}

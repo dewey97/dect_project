@@ -69,12 +69,20 @@ export function normalizeMediaUrl(url: string | undefined | null): string {
   }
 
   if (driveId) {
-    // Nếu là file gif/ảnh thì đi qua image-proxy
-    if (trimmed.toLowerCase().includes(".gif") || trimmed.toLowerCase().includes("video.gif")) {
-      return `/api/image-proxy?id=${driveId}`;
+    // Nếu là file video hoặc gif từ Drive, cho đi qua /api/image-proxy để xem được cả ảnh động GIF và stream
+    // Hoặc stream audio qua /api/audio-proxy
+    const isAudio =
+      trimmed.toLowerCase().includes(".mp3") ||
+      trimmed.toLowerCase().includes(".wav") ||
+      trimmed.toLowerCase().includes(".m4a") ||
+      trimmed.toLowerCase().includes(".ogg");
+
+    if (isAudio) {
+      return `/api/audio-proxy?id=${driveId}`;
     }
-    // File âm thanh mp3/wav/m4a trên Drive stream mượt qua audio-proxy nội bộ (bỏ qua CORS & sandbox)
-    return `/api/audio-proxy?id=${driveId}`;
+
+    // Mặc định cho video và gif từ Drive qua image-proxy (stream an toàn không dính CSP/sandbox)
+    return `/api/image-proxy?id=${driveId}`;
   }
 
   return trimmed;
