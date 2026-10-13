@@ -224,14 +224,22 @@ flowchart LR
   - Có dấu `>` ở đầu dòng: **Nạn nhân Khang gửi đi** (bong bóng xanh bên phải).
 - **Mốc giờ**: `(24/07 • 20:32) Nội dung...`
 - **Tin nhắn thoại (Audio)**:
-  - `(24/07 • 20:32) [AUDIO: https://drive.google.com/file/d/.../view | 0:08]`
-  - Hoặc dạng nhận diện tự động: `(24/07 • 20:32) 🎙️ [Tin nhắn thoại 0:08]` *(tự động phát audio tương ứng của nhân vật)*.
+  - Cú pháp chuẩn: `(24/07 • 20:32) [AUDIO: https://drive.google.com/file/d/.../view | 0:08]`
+  - Cú pháp rút gọn (không cần thời lượng): `(24/07 • 20:32) [AUDIO: https://drive.google.com/file/d/.../view]`
+  - Cú pháp tiếng Việt: `(24/07 • 20:32) 🎙️ [Tin nhắn thoại | https://drive.google.com/file/d/.../view]`
+  - Dạng fallback (khi chưa fill link): `(24/07 • 20:32) 🎙️ [Tin nhắn thoại 0:08]` *(tự phát audio mặc định của nhân vật)*.
+  - *Cơ chế Auto-Duration*: Nếu không điền thời lượng, hệ thống sẽ tự động đo thời lượng từ file audio và hiển thị lên giao diện khi phát.
+  - *Cơ chế Audio-Proxy*: File âm thanh trên Google Drive được stream thông qua `/api/audio-proxy?id={id}` giúp vượt qua rào cản CORS & CSP Sandbox của Google Drive.
 - **Tin nhắn hình ảnh (Image)**:
-  - `(20:15) Xem ảnh này đi [IMAGE: https://drive.google.com/file/d/.../view]` *(Bấm vào ảnh bung popup phóng to)*.
-- **Tin nhắn Video (Video)**:
-  - `(20:16) [VIDEO: https://drive.google.com/file/d/.../view]` *(Bấm vào mở trình phát video trực tiếp)*.
+  - `(20:15) Xem ảnh này đi [IMAGE: https://drive.google.com/file/d/.../view]` *(Bấm vào ảnh bung lightbox phóng to toàn màn hình)*.
+- **Tin nhắn Video (Video / Animated GIF)**:
+  - `(20:16) [VIDEO: https://drive.google.com/file/d/.../view]` *(Hỗ trợ cả file video MP4 lẫn ảnh động GIF dung lượng lớn qua `/api/image-proxy`, có preview trực tiếp trong khung chat và modal phát)*.
 - **Gắn thẻ manh mối nghiệp vụ**:
-  - `[CLUE: Tiêu đề manh mối | Phân tích nghiệp vụ suy luận]` ở cuối dòng.
+  - `[CLUE: Tiêu đề manh mối | Phân tích nghiệp vụ suy luận]` ở cuối dòng (người chơi có thể bấm ghim vào sổ tay điều tra).
+- **Trải nghiệm giao diện (UX Rules)**:
+  - Tự động cuộn xuống tin nhắn mới nhất ở đáy khung chat khi người chơi mở một hội thoại (đúng hành vi iMessage/Zalo).
+  - Sử dụng thanh cuộn siêu mỏng `ios-scrollbar` (4px trong suốt bo tròn) thay cho scrollbar desktop thô.
+  - Ứng dụng Điện thoại (`PhoneApp`) tinh gọn chuẩn 3 tab: **Gần đây (Recents)**, **Danh bạ (Contacts)**, **Bàn phím (Keypad)**; bỏ tab Voicemail thừa vì toàn bộ audio chat đã tích hợp trực tiếp vào ứng dụng Tin nhắn (`MessagesApp`).
 
 ---
 

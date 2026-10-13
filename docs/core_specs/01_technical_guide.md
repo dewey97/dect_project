@@ -21,6 +21,8 @@ d:\code_world\dect_project/
 │   ├── cases/                      # Danh sách hồ sơ vụ án
 │   ├── login/                      # Đăng nhập điều tra viên / Quản trị viên
 │   ├── api/                        # Next.js Serverless Route Handlers
+│   │   ├── audio-proxy/            # Proxy stream audio Google Drive (bypass CORS & CSP sandbox)
+│   │   ├── image-proxy/            # Proxy tải ảnh/GIF Google Drive (in-memory caching 0ms)
 │   │   ├── phone/                  # API trích xuất dữ liệu điện thoại tang vật
 │   │   └── verify-finding/         # API xác thực lập luận & nghiệm thu manh mối
 │   ├── layout.tsx                  # Root Layout & Theme Providers
