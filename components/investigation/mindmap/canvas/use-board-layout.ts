@@ -31,7 +31,12 @@ export type LayoutSnapshot = {
 const LAYOUT_VERSION = "2026.10.10_v8_db_sync";
 
 /** Quản lý layout bảng, edit mode, undo/redo, Supabase sync, cache cục bộ. */
-export function useBoardLayout() {
+export function useBoardLayout(caseId: string = "case-000") {
+  const pinsKey = `boardgame_pins_${caseId}`;
+  const adminPinsKey = `admin_custom_pins_${caseId}`;
+  const transformsKey = `boardgame_transforms_${caseId}`;
+  const connectionsKey = `admin_connections_${caseId}`;
+
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isSavingLayout, setIsSavingLayout] = useState(false);
@@ -190,34 +195,34 @@ export function useBoardLayout() {
 
       const savedLayoutVersion = getStorageItem("board_layout_version");
       if (savedLayoutVersion !== LAYOUT_VERSION) {
-        removeStorageItem("boardgame_pins_case-000");
-        removeStorageItem("admin_custom_pins_case-000");
-        removeStorageItem("boardgame_transforms_case-000");
-        removeStorageItem("admin_connections_case-000");
+        removeStorageItem(pinsKey);
+        removeStorageItem(adminPinsKey);
+        removeStorageItem(transformsKey);
+        removeStorageItem(connectionsKey);
         setStorageItem("board_layout_version", LAYOUT_VERSION);
       }
 
       setCustomPinPositions(
         getStorageJson<Record<string, { x: number; y: number }>>(
-          "boardgame_pins_case-000",
+          pinsKey,
           {},
         ),
       );
       setAdminCustomPins(
-        getStorageJson<PinPoint[]>("admin_custom_pins_case-000", []),
+        getStorageJson<PinPoint[]>(adminPinsKey, []),
       );
       setPinTransforms(
         getStorageJson<Record<string, { rotation: number; scale: number }>>(
-          "boardgame_transforms_case-000",
+          transformsKey,
           {},
         ),
       );
       setAdminConnections(
-        getStorageJson<CaseConnection[]>("admin_connections_case-000", []),
+        getStorageJson<CaseConnection[]>(connectionsKey, []),
       );
 
       try {
-        const res = await getBoardgamePinPositions("case-000");
+        const res = await getBoardgamePinPositions(caseId);
         if (res.success && res.pins.length > 0) {
           const posMap: Record<string, { x: number; y: number }> = {};
           const dbCustomPins: PinPoint[] = [];
@@ -247,13 +252,13 @@ export function useBoardLayout() {
           if (res.connections && res.connections.length > 0) {
             setAdminConnections(res.connections);
           }
-          setStorageJson("boardgame_pins_case-000", posMap);
-          setStorageJson("boardgame_transforms_case-000", tfMap);
+          setStorageJson(pinsKey, posMap);
+          setStorageJson(transformsKey, tfMap);
           if (dbCustomPins.length > 0) {
-            setStorageJson("admin_custom_pins_case-000", dbCustomPins);
+            setStorageJson(adminPinsKey, dbCustomPins);
           }
           if (res.connections && res.connections.length > 0) {
-            setStorageJson("admin_connections_case-000", res.connections);
+            setStorageJson(connectionsKey, res.connections);
           }
         }
       } catch {}
@@ -279,8 +284,8 @@ export function useBoardLayout() {
             scale: pin.scale ?? 1.0,
           };
         }
-        setStorageJson("admin_custom_pins_case-000", nextAdminPins);
-        setStorageJson("boardgame_transforms_case-000", nextTransforms);
+        setStorageJson(adminPinsKey, nextAdminPins);
+        setStorageJson(transformsKey, nextTransforms);
         return {
           posMap: nextPosMap,
           adminPins: nextAdminPins,
@@ -290,7 +295,7 @@ export function useBoardLayout() {
       }, `save-pin-${pin.id}`);
       toast.success("Đã thêm ghim vào bảng!");
     },
-    [commitLayout],
+    [commitLayout, adminPinsKey, transformsKey],
   );
 
   const handleDeleteAdminPin = useCallback(
@@ -304,9 +309,9 @@ export function useBoardLayout() {
         const nextConns = draft.connections.filter(
           (c) => c.fromPinId !== pinId && c.toPinId !== pinId,
         );
-        setStorageJson("admin_custom_pins_case-000", nextAdminPins);
-        setStorageJson("boardgame_transforms_case-000", nextTransforms);
-        setStorageJson("admin_connections_case-000", nextConns);
+        setStorageJson(adminPinsKey, nextAdminPins);
+        setStorageJson(transformsKey, nextTransforms);
+        setStorageJson(connectionsKey, nextConns);
         return {
           posMap: nextPosMap,
           adminPins: nextAdminPins,
@@ -316,7 +321,7 @@ export function useBoardLayout() {
       }, `delete-pin-${pinId}`);
       toast.info("Đã xoá ghim khỏi bảng!");
     },
-    [commitLayout],
+    [commitLayout, adminPinsKey, transformsKey, connectionsKey],
   );
 
   /** Xoay / phóng to thu nhỏ node đang chọn ngay trên bảng (không cần mở modal) */
@@ -338,7 +343,7 @@ export function useBoardLayout() {
             ),
           },
         };
-        setStorageJson("boardgame_transforms_case-000", nextTransforms);
+        setStorageJson(transformsKey, nextTransforms);
         return {
           posMap: draft.posMap,
           adminPins: draft.adminPins,
@@ -347,7 +352,7 @@ export function useBoardLayout() {
         };
       }, `transform-${pinId}`);
     },
-    [commitLayout],
+    [commitLayout, transformsKey],
   );
 
   const handleConnectPins = useCallback(
@@ -367,7 +372,7 @@ export function useBoardLayout() {
         const nextConns = exists
           ? draft.connections.filter((_, idx) => idx !== existingIndex)
           : [...draft.connections, { id: connId1, fromPinId, toPinId }];
-        setStorageJson("admin_connections_case-000", nextConns);
+        setStorageJson(connectionsKey, nextConns);
         if (exists) {
           toast.info("Đã tháo dây chỉ đỏ giữa 2 node!");
         } else {
@@ -376,19 +381,19 @@ export function useBoardLayout() {
         return { ...draft, connections: nextConns };
       }, `toggle-connect-${fromPinId}-${toPinId}`);
     },
-    [commitLayout],
+    [commitLayout, connectionsKey],
   );
 
   const handleDeleteConnection = useCallback(
     (connId: string) => {
       commitLayout((draft) => {
         const nextConns = draft.connections.filter((c) => c.id !== connId);
-        setStorageJson("admin_connections_case-000", nextConns);
+        setStorageJson(connectionsKey, nextConns);
         return { ...draft, connections: nextConns };
       }, `delete-conn-${connId}`);
       toast.info("Đã tháo dây chỉ đỏ!");
     },
-    [commitLayout],
+    [commitLayout, connectionsKey],
   );
 
   const handlePinPositionChange = useCallback(
@@ -406,10 +411,10 @@ export function useBoardLayout() {
   /** Ép khôi phục & xóa toàn bộ cache cũ về layout mới nhất của hệ thống */
   const handleForceResetLayout = useCallback(() => {
     detectiveAudio.playPaperRustle();
-    removeStorageItem("boardgame_pins_case-000");
-    removeStorageItem("admin_custom_pins_case-000");
-    removeStorageItem("boardgame_transforms_case-000");
-    removeStorageItem("admin_connections_case-000");
+    removeStorageItem(pinsKey);
+    removeStorageItem(adminPinsKey);
+    removeStorageItem(transformsKey);
+    removeStorageItem(connectionsKey);
     setStorageItem("board_layout_version", LAYOUT_VERSION);
     setCustomPinPositions({});
     setAdminCustomPins([]);
@@ -418,7 +423,7 @@ export function useBoardLayout() {
     setSelectedPinId(null);
     setHasUnsavedChanges(false);
     toast.success("Đã ép cập nhật và nạp lại layout mới nhất từ hệ thống!");
-  }, []);
+  }, [pinsKey, adminPinsKey, transformsKey, connectionsKey]);
 
   const handleSavePinLayout = async (pinsToSave: PinPoint[]) => {
     setIsSavingLayout(true);
@@ -434,8 +439,8 @@ export function useBoardLayout() {
           };
         }
       });
-      setStorageJson("boardgame_pins_case-000", posMap);
-      setStorageJson("boardgame_transforms_case-000", {
+      setStorageJson(pinsKey, posMap);
+      setStorageJson(transformsKey, {
         ...pinTransforms,
         ...tfMap,
       });
@@ -449,7 +454,7 @@ export function useBoardLayout() {
     // 3. Đồng bộ lên Supabase Database (pins + connections dây đỏ admin).
     try {
       const res = await saveBoardgamePinPositions(
-        "case-000",
+        caseId,
         pinsToSave,
         adminConnections,
       );

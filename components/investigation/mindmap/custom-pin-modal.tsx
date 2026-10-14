@@ -28,6 +28,7 @@ interface CustomPinModalProps {
   onClose: () => void;
   pin: PinPoint | null;
   onSolve?: (pinId: string) => void;
+  caseId?: string;
 }
 
 export function CustomPinModal({
@@ -35,6 +36,7 @@ export function CustomPinModal({
   onClose,
   pin,
   onSolve,
+  caseId = "case-000",
 }: CustomPinModalProps) {
   const [userInput, setUserInput] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -55,7 +57,7 @@ export function CustomPinModal({
   const [isSolved, setIsSolved] = useState(false);
 
   // Fetch live checkpoints from Google Sheets Live CMS
-  const { checkpoints } = useCaseCheckpoints("case-000");
+  const { checkpoints } = useCaseCheckpoints(caseId);
 
   // Auto-detect target checkpoint ID strictly for actual question/checkpoint pins
   const targetCpId = useMemo(() => {
@@ -65,6 +67,11 @@ export function CustomPinModal({
     // Chỉ nhận diện checkpoint nếu node có actionType rõ ràng là checkpoint/câu hỏi
     if (pin.actionType === "sheet_checkpoint" || pin.actionType === "custom_question") {
       const pid = (pin.id || "").toLowerCase();
+
+      // Direct match from live checkpoints
+      const directMatch = checkpoints.find((c) => c.id.toLowerCase() === pid || pid.endsWith(c.id.toLowerCase()));
+      if (directMatch) return directMatch.id;
+
       if (pid === "c0-pin-phone") return "cp-000-0";
       if (pid === "c0-pin-followup-vu") return "cp-000-1a-followup";
       if (pid === "c0-pin-followup-tung") return "cp-000-1b";
@@ -73,6 +80,11 @@ export function CustomPinModal({
       if (pid === "c0-pin-reinvestigate") return "cp-000-convergence";
 
       const text = `${pid} ${pin.label || ""} ${pin.detail || ""}`.toLowerCase();
+      const titleMatch = checkpoints.find(
+        (c) => text.includes(c.title?.toLowerCase() || "") || (c.dossier && text.includes(`hồ sơ ${c.dossier.toLowerCase()}`))
+      );
+      if (titleMatch) return titleMatch.id;
+
       if (text.includes("vũ") || text.includes("vu")) return "cp-000-1a";
       if (text.includes("tùng") || text.includes("tung")) return "cp-000-1b";
       if (text.includes("hà") || text.includes("ha")) return "cp-000-1c";
@@ -82,7 +94,7 @@ export function CustomPinModal({
     }
 
     return "";
-  }, [pin]);
+  }, [pin, checkpoints]);
 
   // Lookup matching checkpoint from live CMS or fallback
   const matchedCheckpoint = useMemo(() => {

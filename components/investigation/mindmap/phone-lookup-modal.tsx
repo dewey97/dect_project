@@ -45,6 +45,7 @@ function isPhoneMatch(val: string, validKeywords: string[]): boolean {
 }
 
 interface PhoneLookupModalProps {
+  caseId?: string
   isOpen: boolean
   onClose: () => void
   onSuccess: (phone: string, info: string) => void
@@ -58,13 +59,15 @@ const DEFAULT_PHONE_INPUTS = [
 ]
 
 export function PhoneLookupModal({
+  caseId = 'case-000',
   isOpen,
   onClose,
   onSuccess,
   onOpenPhoneSimulator
 }: PhoneLookupModalProps) {
-  const { checkpoints } = useCaseCheckpoints('case-000')
-  const cp0 = checkpoints.find((c) => c.id === 'cp-000-0')
+  const sKey = (k: string) => (caseId === 'case-000' ? k : `${caseId}::${k}`)
+  const { checkpoints } = useCaseCheckpoints(caseId)
+  const cp0 = checkpoints.find((c) => c.id.includes('-0') || c.id.includes('phone'))
 
   const inputsList = useMemo(() => {
     const dynamic = cp0?.textMatchConfig?.inputs
@@ -78,22 +81,23 @@ export function PhoneLookupModal({
 
   useEffect(() => {
     if (isOpen) {
+      const activeCp = cp0?.id || 'cp-000-0'
       if (typeof window !== 'undefined') {
-        (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = 'cp-000-0'
+        (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = activeCp
       }
-      setStorageItem('active_investigation_checkpoint', 'cp-000-0')
-      setStorageItem('last_interacted_checkpoint', 'cp-000-0')
+      setStorageItem('active_investigation_checkpoint', activeCp)
+      setStorageItem('last_interacted_checkpoint', activeCp)
       localStorage.removeItem('active_suspect_category')
     }
 
-    const data = getStorageJson<Record<string, string>>('phone_inputs', {})
+    const data = getStorageJson<Record<string, string>>(sKey('phone_inputs'), {})
     setInputValues(data)
 
-    const approved = getStorageItem('reinvestigate_unlocked')
+    const approved = getStorageItem(sKey('reinvestigate_unlocked'))
     if (approved === 'true') {
       setIsApproved(true)
     }
-  }, [isOpen])
+  }, [isOpen, cp0, caseId])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,8 +133,8 @@ export function PhoneLookupModal({
 
     detectiveAudio.playStampSound()
     setIsApproved(true)
-    setStorageJson('phone_inputs', inputValues)
-    setStorageItem('phone_solved', 'true')
+    setStorageJson(sKey('phone_inputs'), inputValues)
+    setStorageItem(sKey('phone_solved'), 'true')
 
     onSuccess('0988200991', 'Đã xác minh danh tính SĐT thành công.')
     onClose()

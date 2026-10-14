@@ -10,10 +10,11 @@ import { emitInvestigationEvent } from '@/lib/investigation-events'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 interface IndictmentModalProps {
+  caseId?: string
   isOpen: boolean
   onClose: () => void
   onSubmitIndictment: (data: {
-    culprit: 'vu' | 'tung' | 'ha'
+    culprit: 'vu' | 'tung' | 'ha' | string
     suspectName: string
     motive: string
     selectedClueIds: string[]
@@ -81,14 +82,15 @@ export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false 
 }
 
 export function IndictmentModal({
+  caseId = 'case-000',
   isOpen,
   onClose,
   onSubmitIndictment,
   isPhoneSolved
 }: IndictmentModalProps) {
-  const { checkpoints } = useCaseCheckpoints('case-000')
+  const { checkpoints } = useCaseCheckpoints(caseId)
   const indictmentCp = checkpoints.find(
-    (c) => c.id === 'cp-000-2b' || c.id === 'cp-000-indictment'
+    (c) => c.id.includes('indictment') || c.id.includes('-2b')
   )
 
   const motiveOptions = React.useMemo(() => {
@@ -137,7 +139,7 @@ export function IndictmentModal({
       return
     }
 
-    const culprit = (isAdmin000 ? 'ha' : isCulpritValid(suspectName)) || 'ha'
+    const culprit = (isAdmin000 ? 'ha' : isCulpritValid(suspectName)) || normalizeName(suspectName) || 'ha'
 
     if (!selectedMotiveOption && !isAdmin000) {
       setErrorMsg('Vui lòng chọn Động cơ gây án chính của bị can!')

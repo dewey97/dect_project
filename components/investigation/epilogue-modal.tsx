@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 interface EpilogueModalProps {
   isOpen: boolean
   onClose?: () => void
+  caseId?: string
 }
 
 const EPILOGUE_META = [
@@ -20,21 +21,51 @@ const EPILOGUE_META = [
   { id: 'cp-epilogue-closure', defaultTitle: 'Hậu Án IV: Khép Lại Chuyên Án Số 14 Đường Bờ Sông' },
 ]
 
-export function EpilogueModal({ isOpen, onClose }: EpilogueModalProps) {
+export function EpilogueModal({ isOpen, onClose, caseId = 'case-000' }: EpilogueModalProps) {
   const [activeStoryIdx, setActiveStoryIdx] = useState(0)
-  const { checkpoints, loading } = useCaseCheckpoints('case-000')
+  const { checkpoints, loading } = useCaseCheckpoints(caseId)
 
-  // Đọc 4 bài Hậu Án trực tiếp từ Google Sheets Live CMS (tab checkpoints)
+  // Đọc các bài Hậu Án trực tiếp từ Google Sheets Live CMS (tab checkpoints)
   const epilogueStories = useMemo(() => {
-    return EPILOGUE_META.map((meta) => {
-      const cp = checkpoints.find((c) => c.id === meta.id)
-      return {
-        id: meta.id,
-        title: cp?.title || meta.defaultTitle,
-        monologue: cp?.storyConfig?.monologue || '',
-      }
-    })
-  }, [checkpoints])
+    if (caseId === 'case-000') {
+      return EPILOGUE_META.map((meta) => {
+        const cp = checkpoints.find((c) => c.id === meta.id)
+        return {
+          id: meta.id,
+          title: cp?.title || meta.defaultTitle,
+          monologue: cp?.storyConfig?.monologue || '',
+        }
+      })
+    }
+
+    // Dynamic case: Tìm toàn bộ checkpoints có hậu án hoặc epilogue
+    const dynamicEpilogues = checkpoints.filter(
+      (c) =>
+        c.id.includes('epilogue') ||
+        c.id.includes('hau-an') ||
+        c.title?.toLowerCase().includes('hậu án')
+    )
+
+    if (dynamicEpilogues.length > 0) {
+      return dynamicEpilogues.map((cp, idx) => ({
+        id: cp.id,
+        title: cp.title || `Hậu Án ${idx + 1}`,
+        monologue: cp.storyConfig?.monologue || '',
+      }))
+    }
+
+    // Fallback nếu case chưa cấu hình epilogue riêng: Lấy checkpoint kết án cuối
+    const lastCp = checkpoints[checkpoints.length - 1]
+    return [
+      {
+        id: lastCp?.id || 'epilogue-final',
+        title: lastCp?.title || 'Khép lại chuyên án',
+        monologue:
+          lastCp?.storyConfig?.monologue ||
+          'Chuyên án điều tra chính thức khép lại. Mọi chứng cứ và diễn biến đã được thu thập đầy đủ.',
+      },
+    ]
+  }, [checkpoints, caseId])
 
   if (!isOpen) return null
 

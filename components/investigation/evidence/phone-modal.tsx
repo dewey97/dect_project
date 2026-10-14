@@ -7,9 +7,10 @@ import { PhoneSimulator } from '../phone-simulator'
 interface PhoneModalProps {
   isOpen: boolean
   onClose: () => void
+  caseId?: string
 }
 
-export function PhoneModal({ isOpen, onClose }: PhoneModalProps) {
+export function PhoneModal({ isOpen, onClose, caseId }: PhoneModalProps) {
   if (!isOpen) return null
 
   return (
@@ -23,7 +24,7 @@ export function PhoneModal({ isOpen, onClose }: PhoneModalProps) {
           className="w-full flex-1 min-h-0 max-w-[430px] flex flex-col items-center justify-center relative p-0 my-auto overflow-hidden"
         >
           <div className="w-full h-full overflow-hidden flex items-center justify-center p-0">
-            <PhoneSimulator onClose={onClose} />
+            <PhoneSimulator onClose={onClose} device={caseId ? { caseId } : undefined} />
           </div>
         </motion.div>
       </div>

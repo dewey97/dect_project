@@ -16,6 +16,7 @@ import { usePhoneData } from '@/lib/hooks/use-phone-data'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 interface FollowupQuestionModalProps {
+  caseId?: string
   isOpen: boolean
   culprit: string | null
   onClose: () => void
@@ -30,6 +31,7 @@ const DEFAULT_OPTIONS_TUNG = [
 ]
 
 export function FollowupQuestionModal({
+  caseId = 'case-000',
   isOpen,
   culprit,
   onClose,
@@ -37,7 +39,8 @@ export function FollowupQuestionModal({
   onOpenDossier,
   isPhoneSolved
 }: FollowupQuestionModalProps) {
-  const { checkpoints } = useCaseCheckpoints('case-000')
+  const normalizedCaseId = useMemo(() => caseId.replace(/-/g, '_'), [caseId])
+  const { checkpoints } = useCaseCheckpoints(caseId)
 
   const availableEvidences = useMemo(() => {
     return (
@@ -61,7 +64,7 @@ export function FollowupQuestionModal({
   const [customSelectedOption, setCustomSelectedOption] = useState<string | null>(null)
   
   // Fetch photos dynamically from Google Sheets Live CMS ('evidences' tab)
-  const { data: rawSheetPhotos } = usePhoneData('evidences')
+  const { data: rawSheetPhotos } = usePhoneData('evidences', normalizedCaseId)
 
   const isVu = culprit === 'vu'
   const isTung = culprit === 'tung'

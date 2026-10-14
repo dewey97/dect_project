@@ -183,7 +183,15 @@ export async function GET(request: Request) {
 
   let rawRows: any[][] = [];
   if (tab === "photos" || tab === "evidences") {
-    rawRows = await fetchTab("evidences");
+    if (caseIdFilter !== "case_000") {
+      rawRows = await fetchTab(`${caseIdFilter}_evidences`);
+      if (rawRows.length === 0) {
+        rawRows = await fetchTab(`${caseIdFilter}_photos`);
+      }
+    }
+    if (rawRows.length === 0) {
+      rawRows = await fetchTab("evidences");
+    }
     if (rawRows.length === 0) {
       rawRows = await fetchTab("photos");
     }
@@ -194,7 +202,12 @@ export async function GET(request: Request) {
       rawRows = await fetchTab("evidences_old");
     }
   } else {
-    rawRows = await fetchTab(tab);
+    if (caseIdFilter !== "case_000") {
+      rawRows = await fetchTab(`${caseIdFilter}_${tab}`);
+    }
+    if (rawRows.length === 0) {
+      rawRows = await fetchTab(tab);
+    }
   }
 
   if (rawRows.length === 0) {

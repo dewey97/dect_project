@@ -19,7 +19,16 @@ export function usePhoneData<T = any>(
   tab: string,
   caseId: string = "case_000",
 ): PhoneDataState<T> {
-  const cacheKey = `${tab}:${caseId}`;
+  let effectiveCaseId = caseId;
+  if (typeof window !== "undefined" && (caseId === "case_000" || caseId === "case-000")) {
+    const params = new URLSearchParams(window.location.search);
+    const paramCase = params.get("case_id") || params.get("caseId");
+    if (paramCase) {
+      effectiveCaseId = paramCase.replace(/-/g, "_");
+    }
+  }
+
+  const cacheKey = `${tab}:${effectiveCaseId}`;
   const cached = memoryCache[cacheKey];
   const isCacheFresh = cached && Date.now() - cached.timestamp < CACHE_TTL_MS;
 
@@ -53,7 +62,7 @@ export function usePhoneData<T = any>(
     const isForcedRefetch = reloadToken > 0;
 
     if (!requestPromise || isForcedRefetch) {
-      const url = `/api/phone?tab=${encodeURIComponent(tab)}&caseId=${encodeURIComponent(caseId)}&_t=${Date.now()}${isForcedRefetch ? "&refresh=true" : ""}`;
+      const url = `/api/phone?tab=${encodeURIComponent(tab)}&caseId=${encodeURIComponent(effectiveCaseId)}&_t=${Date.now()}${isForcedRefetch ? "&refresh=true" : ""}`;
 
       requestPromise = fetch(url, { cache: "no-store" })
         .then((res) => {

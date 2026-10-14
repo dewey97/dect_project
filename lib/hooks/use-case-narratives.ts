@@ -47,58 +47,132 @@ const PHASE_TO_CHECKPOINT: Record<number, string> = {
   3: "cp-000-1c",
 };
 
+const GENERIC_FALLBACK_NARRATIVES: Record<
+  number,
+  { date: string; monologue: string }
+> = {
+  0: {
+    date: "KHỞI ĐẦU CHUYÊN ÁN",
+    monologue:
+      "Hiện trường vụ án vừa được phong tỏa. Toàn bộ tài liệu, manh mối ban đầu đã được chuyển tới bàn điều tra.\n\nHãy phân tích nhật ký liên lạc và các manh mối đầu tiên để mở rộng diện điều tra.",
+  },
+  1: {
+    date: "HỒ SƠ BỘ A",
+    monologue:
+      "Lời khai của đối tượng đầu tiên đã được cập nhật vào hồ sơ vụ án.\n\nHãy phân tích kỹ lưỡng các mâu thuẫn để tiếp tục mở rộng hướng điều tra.",
+  },
+  2: {
+    date: "HỒ SƠ BỘ B",
+    monologue:
+      "Đối tượng thứ hai đã cung cấp các tình tiết mới liên quan đến thời điểm xảy ra vụ án.\n\nCác mắt xích logic đang dần thu hẹp vòng nghi vấn.",
+  },
+  3: {
+    date: "HỒ SƠ BỘ C",
+    monologue:
+      "Manh mối then chốt đã xuất hiện. Mọi chứng cứ dường như đang hướng về đối tượng có nhiều biểu hiện bất thường nhất.\n\nHãy chuẩn bị các chứng cứ pháp lý đanh thép để tiến hành định tội.",
+  },
+};
+
+function resolveCheckpointForPhase(
+  checkpoints: any[],
+  phase: number,
+  caseId: string,
+) {
+  if (caseId === "case-000") {
+    const fixedId = PHASE_TO_CHECKPOINT[phase];
+    return checkpoints.find((c) => c.id === fixedId);
+  }
+
+  const dossierMap: Record<number, string> = { 0: "0", 1: "A", 2: "B", 3: "C" };
+  const targetDossier = dossierMap[phase];
+  if (targetDossier) {
+    const byDossier = checkpoints.find(
+      (c) => (c.dossier || "").toUpperCase() === targetDossier,
+    );
+    if (byDossier) return byDossier;
+  }
+
+  if (phase === 0) {
+    const p0 = checkpoints.find(
+      (c) =>
+        c.id.includes("-0") ||
+        c.id.includes("phone") ||
+        c.id.includes("start"),
+    );
+    if (p0) return p0;
+  } else if (phase === 1) {
+    const p1 = checkpoints.find(
+      (c) => c.id.includes("-1a") || c.id.includes("phase-1"),
+    );
+    if (p1) return p1;
+  } else if (phase === 2) {
+    const p2 = checkpoints.find(
+      (c) => c.id.includes("-1b") || c.id.includes("phase-2"),
+    );
+    if (p2) return p2;
+  } else if (phase === 3) {
+    const p3 = checkpoints.find(
+      (c) => c.id.includes("-1c") || c.id.includes("phase-3"),
+    );
+    if (p3) return p3;
+  }
+
+  return checkpoints[phase];
+}
+
 /**
  * Hook kết nối trực tiếp cột `narrative` từ tab `checkpoints` trên Google Sheets Live CMS 100%,
  * tự động cập nhật lời dẫn mở đầu và dẫn truyện các bộ hồ sơ theo thời gian thực.
- * Luôn có fallback an toàn từ DEFAULT_NARRATIVES để không bao giờ bị màn hình đen khi mạng đang fetch.
+ * Luôn có fallback an toàn để không bao giờ bị màn hình đen khi mạng đang fetch.
  */
 export function useCaseNarratives(
   caseId: string = "case-000",
 ): CaseNarrativesState {
   const { checkpoints, loading, refetch } = useCaseCheckpoints(caseId);
 
+  const fallbackRecord =
+    caseId === "case-000" ? DEFAULT_NARRATIVES : GENERIC_FALLBACK_NARRATIVES;
+
   const narratives: PhaseNarrative[] = useMemo(() => {
     const list: PhaseNarrative[] = [];
-    Object.entries(PHASE_TO_CHECKPOINT).forEach(([phaseStr, cpId]) => {
-      const phase = Number(phaseStr);
-      const cp = checkpoints.find((c) => c.id === cpId);
+    [0, 1, 2, 3].forEach((phase) => {
+      const cp = resolveCheckpointForPhase(checkpoints, phase, caseId);
       if (cp && cp.storyConfig?.monologue) {
         list.push({
           caseId,
           phase,
-          date: cp.storyConfig.date || DEFAULT_NARRATIVES[phase]?.date || "",
+          date: cp.storyConfig.date || fallbackRecord[phase]?.date || "",
           monologue: cp.storyConfig.monologue,
         });
       }
     });
     return list;
-  }, [checkpoints, caseId]);
+  }, [checkpoints, caseId, fallbackRecord]);
 
   const getPhaseNarrative = useCallback(
     (phase: number) => {
-      const targetCpId = PHASE_TO_CHECKPOINT[phase];
-      const cp = checkpoints.find((c) => c.id === targetCpId);
+      const cp = resolveCheckpointForPhase(checkpoints, phase, caseId);
       if (cp && cp.storyConfig?.monologue) {
         return {
-          date: cp.storyConfig.date || DEFAULT_NARRATIVES[phase]?.date || "",
+          date: cp.storyConfig.date || fallbackRecord[phase]?.date || "",
           monologue: cp.storyConfig.monologue,
         };
       }
       const match = narratives.find((n) => n.phase === phase);
       if (match) {
         return {
-          date: match.date || DEFAULT_NARRATIVES[phase]?.date || "",
+          date: match.date || fallbackRecord[phase]?.date || "",
           monologue: match.monologue,
         };
       }
       return (
-        DEFAULT_NARRATIVES[phase] || {
-          date: "BAN ĐẦU",
-          monologue: DEFAULT_NARRATIVES[0].monologue,
+        fallbackRecord[phase] || {
+          date: "KHỞI ĐẦU",
+          monologue: fallbackRecord[0].monologue,
         }
       );
     },
-    [checkpoints, narratives],
+    [checkpoints, narratives, caseId, fallbackRecord],
   );
 
   return {

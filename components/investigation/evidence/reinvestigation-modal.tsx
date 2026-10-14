@@ -110,8 +110,9 @@ export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
 ]
 
 export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: ReinvestigationModalProps) {
+  const isCase000 = caseId === 'case_000' || caseId === 'case-000'
   // Hotspots list with server + localStorage persistence
-  const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>(HOTSPOTS_2D_LIST)
+  const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>(isCase000 ? HOTSPOTS_2D_LIST : [])
   const [selectedSpot, setSelectedSpot] = useState<ReinvestigationHotspot2D | null>(null)
   const [activeAudioToast, setActiveAudioToast] = useState<string | null>(null)
   const dragDistanceRef = useRef(0)
@@ -264,6 +265,31 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: R
   // DYNAMICALLY SYNC HOTSPOTS FROM GOOGLE SHEETS BY photoId, code (C-01..C-05), or title
   // Nếu Sheet cập nhật link Drive hay title cho photoId, game tự động đọc theo photoId mới nhất!
   const resolvedHotspots = useMemo(() => {
+    if (!isCase000 && hotspots.length === 0) {
+      // Tự động trích xuất các điểm khám xét từ Google Sheet của case động
+      const customSpots = sheetPhotosList.filter(
+        (p) =>
+          p.category?.toLowerCase().includes('reinvestigat') ||
+          p.category?.toLowerCase().includes('khám xét') ||
+          p.category?.toLowerCase().includes('hotspot') ||
+          (p.board_x && p.board_y)
+      )
+      if (customSpots.length > 0) {
+        return customSpots.map((p, idx) => ({
+          id: p.id || `spot-${idx + 1}`,
+          num: idx + 1,
+          photoId: p.id,
+          title: p.title || `Vật chứng #${idx + 1}`,
+          x: parseFloat(p.board_x) || (20 + idx * 20),
+          y: parseFloat(p.board_y) || 50,
+          imageUrl: p.url,
+          driveUrl: p.driveUrl,
+          soundFile: 'sat_soat.mp3',
+          soundCaption: p.description ? `*${p.description}*` : '*Sột soạt...*'
+        }))
+      }
+    }
+
     if (sheetPhotosList.length === 0) return hotspots
 
     return hotspots.map((spot) => {
@@ -294,7 +320,7 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: R
       }
       return spot
     })
-  }, [hotspots, sheetPhotosList])
+  }, [hotspots, sheetPhotosList, isCase000])
 
   // Cleanup animation frame
   useEffect(() => {

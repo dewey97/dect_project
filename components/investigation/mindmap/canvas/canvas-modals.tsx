@@ -59,6 +59,7 @@ export function CanvasModals({
               ? `suspect-${state.editingSuspect.id}`
               : "suspect-modal"
           }
+          caseId={state.caseId}
           isOpen={state.isAddSuspectOpen}
           onClose={() => {
             state.setIsAddSuspectOpen(false);
@@ -90,6 +91,7 @@ export function CanvasModals({
       {/* 2. Modal Tra Cứu Số Điện Thoại */}
       {state.isPhoneLookupOpen && (
         <PhoneLookupModal
+          caseId={state.caseId}
           isOpen={state.isPhoneLookupOpen}
           onClose={() => state.setIsPhoneLookupOpen(false)}
           onSuccess={state.handlePhoneLookupSuccess}
@@ -102,6 +104,7 @@ export function CanvasModals({
       {/* 3. Modal Dẫn Truyện Điện Thoại Tang Vật */}
       {state.isPhoneNarrativeOpen && (
         <PhoneNarrativeModal
+          caseId={state.caseId}
           isOpen={state.isPhoneNarrativeOpen}
           onClose={() => state.setIsPhoneNarrativeOpen(false)}
           onTakeTestimony={() => state.setIsDossierEOpen(true)}
@@ -111,6 +114,7 @@ export function CanvasModals({
       {/* 4. Modal Giả Lập Điện Thoại Tang Vật Nội Bộ */}
       {state.isInternalPhoneOpen && (
         <PhoneModal
+          caseId={state.caseId}
           isOpen={state.isInternalPhoneOpen}
           onClose={() => state.setIsInternalPhoneOpen(false)}
         />
@@ -137,6 +141,7 @@ export function CanvasModals({
       {/* 7. Modal Tái Khám Xét Hiện Trường */}
       {state.isReinvestigateModalOpen && (
         <ReinvestigationModal
+          caseId={state.caseId}
           isOpen={state.isReinvestigateModalOpen}
           onClose={() => state.setIsReinvestigateModalOpen(false)}
         />
@@ -145,6 +150,7 @@ export function CanvasModals({
       {/* 8. Modal Bản Kết Luận Điều Tra / Cáo Trạng */}
       {state.isIndictmentOpen && (
         <IndictmentModal
+          caseId={state.caseId}
           isOpen={state.isIndictmentOpen}
           onClose={() => state.setIsIndictmentOpen(false)}
           onSubmitIndictment={state.handleSubmitIndictment}
@@ -155,6 +161,7 @@ export function CanvasModals({
       {/* 9. Modal Lời Khai / Epilogue Hung Thủ */}
       {state.isEpilogueOpen && (
         <CulpritEpilogueModal
+          caseId={state.caseId}
           isOpen={state.isEpilogueOpen}
           culprit={
             state.narrativeCulprit ||
@@ -174,7 +181,7 @@ export function CanvasModals({
               state.narrativeCulprit ||
               state.activeFollowupCulprit ||
               state.solvedCulprit ||
-              "vu";
+              (state.suspects[0]?.id || "vu");
             state.setActiveFollowupCulprit(c);
             state.setIsEpilogueOpen(false);
             state.setNarrativeCulprit(null);
@@ -193,6 +200,14 @@ export function CanvasModals({
       {/* 10. Modal Kết Quả Hồ Sơ Nghi Phạm (A, B, C) */}
       {state.isDossierOpen && (
         <DossierResultModal
+          caseId={state.caseId}
+          suspectName={
+            state.activeDossierType === "A"
+              ? state.suspects[0]?.name
+              : state.activeDossierType === "B"
+                ? state.suspects[1]?.name
+                : state.suspects[2]?.name
+          }
           isOpen={state.isDossierOpen}
           dossierType={state.activeDossierType}
           onClose={() => state.setIsDossierOpen(false)}
@@ -200,10 +215,10 @@ export function CanvasModals({
             state.setIsDossierOpen(false);
             const c =
               state.activeDossierType === "A"
-                ? "vu"
+                ? (state.suspects[0]?.id || "vu")
                 : state.activeDossierType === "B"
-                  ? "tung"
-                  : "ha";
+                  ? (state.suspects[1]?.id || "tung")
+                  : (state.suspects[2]?.id || "ha");
             state.setActiveFollowupCulprit(c);
             state.setIsFollowupQuestionOpen(true);
           }}
@@ -214,12 +229,13 @@ export function CanvasModals({
       {state.isFollowupQuestionOpen && (
         <FollowupQuestionModal
           key={`followup-${state.activeFollowupCulprit || state.narrativeCulprit || state.solvedCulprit || "vu"}`}
+          caseId={state.caseId}
           isOpen={state.isFollowupQuestionOpen}
           culprit={
             state.activeFollowupCulprit ||
             state.narrativeCulprit ||
             state.solvedCulprit ||
-            "vu"
+            (state.suspects[0]?.id || "vu")
           }
           onClose={() => {
             state.setIsFollowupQuestionOpen(false);
@@ -234,6 +250,7 @@ export function CanvasModals({
       {/* 12. Modal Khép Lại Vụ Án (Final Epilogue) */}
       {state.isFinalEpilogueOpen && (
         <EpilogueModal
+          caseId={state.caseId}
           isOpen={state.isFinalEpilogueOpen}
           onClose={() => state.setIsFinalEpilogueOpen(false)}
         />
@@ -256,6 +273,7 @@ export function CanvasModals({
       {/* 14. Modal Trả Lời Câu Hỏi Của Node Tự Tạo */}
       {activeCustomPinModal !== null && (
         <CustomPinModal
+          caseId={state.caseId}
           isOpen={activeCustomPinModal !== null}
           onClose={() => setActiveCustomPinModal(null)}
           pin={activeCustomPinModal}

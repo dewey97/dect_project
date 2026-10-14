@@ -1,59 +1,27 @@
-# 💼 Mô Hình Kinh Doanh, Tài Chính & Phân Bổ Sáng Lập
+# 💰 Mô Hình Tài Chính, Điểm Hòa Vốn & Thỏa Thuận Sáng Lập
 
-> **Trạng thái:** Bản thảo chiến lược tổng hợp  
-> **Cập nhật lần cuối:** 2026-10-10  
-> **Tài liệu liên quan:** `07_license_access_system.md`, `08_license_technical_spec.md`
-
----
-
-## PHẦN 1: MÔ HÌNH KINH DOANH & CÁC DÒNG DOANH THU
-
-Dự án kết hợp giữa **Boardgame** (tạo niềm tin, hiện vật cầm nắm, tính gắn kết xã hội) và **Bản Online** (biên lợi nhuận cao, khả năng nhân rộng không giới hạn).
-
-```
-   ┌────────────────────────────────────────────────────────┐
-   │                                                        ▼
-[Bán Bộ Boardgame] ──► [Quét QR vào App] ──► [Tạo tài khoản / Chơi thử]
-                                                        │
-                                                        ▼
-[Mua tiếp Vụ án sau / Mua Lượt nhóm] ◄── [Trải nghiệm xuất sắc]
-```
-
-### 1.1. Doanh thu Boardgame
-* **Đối tượng:** Nhóm bạn thích cầm hiện vật, chơi trực tiếp, quà tặng sinh nhật.
-* **Quy cách:** Hộp hồ sơ vụ án, biên bản khám nghiệm, ảnh hiện trường in màu, chứng cứ thực tế (vải, thư tay, mã QR kích hoạt web tool).
-* **Mức giá dự kiến:** `249.000đ – 349.000đ` / bộ.
-* **Kênh phân phối:** Shopee, TikTok Shop, mạng xã hội, các quán Boardgame Cafe.
-
-### 1.2. Doanh thu Bản Online
-* **Đối tượng:** Người chơi đơn lẻ, người ở xa, nhóm bạn chơi online từ xa.
-* **Nội dung:** Toàn bộ tài liệu số tương tác, ảnh pháp y chất lượng cao, file thoại thẩm vấn, hiện trường 3D.
-* **Cấu trúc gói bán:**
-  * **Gói Đơn (Solo):** `69.000đ – 89.000đ` (quyền chơi vĩnh viễn cho 1 tài khoản).
-  * **Gói Nhóm (Party):** `129.000đ – 149.000đ` (quyền chơi đơn + 3 lượt tạo phòng chơi chung).
-* **Biên lợi nhuận gộp:** `> 90%` (chỉ trừ phí cổng thanh toán ngân hàng/QR ~1.5% - 2%).
-
-### 1.3. Bán Lẻ Lượt Chơi Nhóm
-* **Đối tượng:** Khách hàng đã có gói Đơn hoặc đã dùng hết lượt nhóm, muốn mở phòng mới cho nhóm bạn khác.
-* **Mức giá:** `25.000đ – 35.000đ` / 1 lượt tạo phòng.
+> **Trạng thái:** Đặc tả tài chính & quản trị nội bộ  
+> **Cập nhật lần cuối:** 2026-10-14  
+> **Tài liệu kinh doanh chi tiết:** xem `09_business_model_spec.md`  
+> **Hệ thống cấp quyền:** xem `07_license_access_system.md`
 
 ---
 
-## PHẦN 2: CẤU TRÚC CHI PHÍ & DỰ PHÓNG TÀI CHÍNH
+## 1. Cấu Trúc Chi Phí Chi Tiết (Cost Breakdown)
 
-### 2.1. Chi Phí Cố Định
-* **Hạ tầng máy chủ (VPS):** ~150.000đ – 300.000đ / tháng (đã chạy Docker tối ưu tại `72.62.199.110`).
+### 1.1. Chi Phí Cố Định (Fixed Costs)
+* **Hạ tầng máy chủ (VPS):** ~150.000đ – 300.000đ / tháng (chạy Docker container tối ưu tại `72.62.199.110`).
 * **Tên miền:** ~250.000đ – 350.000đ / năm.
 * **Lưu trữ & Dịch vụ Cloud:** Sử dụng gói miễn phí Supabase + Cloudflare (chi phí hiện tại ~0đ).
 
-### 2.2. Chi Phí Sản Xuất Boardgame
+### 1.2. Bóc Tách Chi Phí Sản Xuất Boardgame (COGS trên 1 bộ)
 
-Cấu trúc sản phẩm được bóc tách thành 3 nhóm linh kiện độc lập:
-1. **Ruột tài liệu:** Đa số in màu/đen trắng trên giấy màu (kraft, ngả vàng vintage, xi măng) để tạo chất hồ sơ vụ án cũ; số ít in trên giấy trắng (kết quả giám định y khoa, xét nghiệm hóa sinh).
+Sản phẩm gồm 3 nhóm cấu phần vật lý:
+1. **Ruột tài liệu:** In màu/đen trắng trên giấy màu (kraft, ngả vàng vintage, xi măng) để tạo chất hồ sơ vụ án cũ; số ít in trên giấy trắng (kết quả giám định y khoa, xét nghiệm hóa sinh).
 2. **Hiện vật vụ án:** Mẫu vật chứng (túi zip, vải chứng cứ, thư tay, tem niêm phong, ảnh polaroid chụp hiện trường).
 3. **Bao bì ngoài:** Cân nhắc giữa **Túi hồ sơ giấy Kraft dây quấn** (chuẩn phong cách hồ sơ tuyệt mật vụ án, chi phí thấp, nhẹ tiền ship) và **Hộp cứng nắp gài** (sang trọng, bảo vệ tốt hơn nhưng chi phí và cước vận chuyển cao hơn).
 
-#### Bảng 1: Bóc tách chi phí linh kiện trên 1 bộ theo quy mô sản xuất (VNĐ)
+#### Bảng 1: Chi phí linh kiện 1 bộ theo quy mô sản xuất (VNĐ)
 
 | Nhóm cấu phần | Chi tiết quy cách | In mẫu lẻ (< 10 bộ) | Lô nhỏ (50 – 100 bộ) | Lô chuẩn (300 – 500 bộ) |
 |---|---|---|---|---|
@@ -63,14 +31,14 @@ Cấu trúc sản phẩm được bóc tách thành 3 nhóm linh kiện độc l
 | **3B. Hộp cứng nắp gài** | Hộp carton sóng E bồi giấy kraft in 1 màu | 40.000 – 50.000 | 25.000 – 35.000 | 15.000 – 20.000 |
 | **Phụ kiện & Dán tem** | Ghim rỉ, kẹp tài liệu, nhãn mã QR vào app | 5.000 | 4.000 | 3.000 |
 
-#### Bảng 2: Tổng giá vốn sản xuất (COGS) 1 bộ theo 2 phương án bao bì (VNĐ)
+#### Bảng 2: Tổng giá vốn sản xuất (COGS) theo phương án bao bì (VNĐ)
 
 | Phương án đóng gói | In mẫu lẻ (< 10 bộ) | Lô nhỏ (50 – 100 bộ) | Lô chuẩn (300 – 500 bộ) | Nhận xét & Đánh giá |
 |---|---|---|---|---|
 | **Phương án A: Túi Kraft hồ sơ** | **95.000 – 125.000** | **55.000 – 76.000** | **38.000 – 51.000** | • Rất hợp vibe hồ sơ cảnh sát bí mật.<br>• Nhẹ, mỏng, tiết kiệm cước ship và bọc lót.<br>• Phù hợp nhất cho giai đoạn khởi động (MVP). |
 | **Phương án B: Hộp cứng nắp gài** | **120.000 – 155.000** | **72.000 – 99.000** | **48.000 – 64.000** | • Cảm giác cao cấp, dày dặn.<br>• Cồng kềnh, dễ móp góc khi vận chuyển đường dài.<br>• Thích hợp làm bản đặc biệt (Collector Edition). |
 
-### 2.3. Chi Phí Bán Hàng & Vận Hành Đơn Hàng
+### 1.3. Chi Phí Bán Hàng & Vận Hành Đơn Hàng
 
 | Hạng mục chi phí | Mức chi phí dự tính | Ghi chú |
 |---|---|---|
@@ -78,14 +46,16 @@ Cấu trúc sản phẩm được bóc tách thành 3 nhóm linh kiện độc l
 | **Vật tư đóng gói ship** | 3.000 – 5.000đ / đơn | Thùng carton bảo vệ bên ngoài + màng chống sốc |
 | **Cổng thanh toán Bản Online** | 1.5% – 2% / giao dịch | PayOS / Quét mã VietQR tự động |
 
-### 2.4. Dự Phóng Điểm Hòa Vốn
+---
 
-#### Giả định Chi phí Đầu tư Ban đầu (cho Vụ án #000):
+## 2. Dự Phóng Điểm Hòa Vốn (Break-even Analysis)
+
+### Giả định Chi phí Đầu tư Ban đầu (cho Vụ án #000):
 * Thiết kế mẫu in, mockup, sản xuất mẫu kiểm tra: ~5.000.000đ.
 * Chi phí marketing mồi (ảnh chụp mẫu, video giới thiệu): ~5.000.000đ.
 * **Tổng vốn khởi điểm:** `10.000.000đ`.
 
-#### Kịch bản Hòa vốn:
+### Kịch bản Hòa vốn:
 | Chỉ số | Kênh Boardgame | Kênh Bản Online |
 |---|---|---|
 | **Giá bán trung bình** | 299.000đ | 89.000đ |
@@ -96,6 +66,8 @@ Cấu trúc sản phẩm được bóc tách thành 3 nhóm linh kiện độc l
 > **Nhận xét:** Với cộng đồng yêu thích trinh thám và boardgame tại Việt Nam, con số 56 bộ hoặc 115 lượt mua online là mục tiêu rất khả thi ngay trong tháng đầu tiên mở bán.
 
 ---
+
+## 3. Thỏa Thuận Sáng Lập & Cơ Chế Phân Bổ Doanh Thu
 
 ### 3.1. Bối Cảnh Hợp Tác: All-in vs. Part-time
 * **Bạn (Lead Founder):** Định hướng **All-in** (toàn thời gian, chịu rủi ro cao nhất, tự bỏ vốn đầu tư ban đầu, tự tay lập trình 100% nền tảng công nghệ, điều hành tiến độ tổng thể).
@@ -157,7 +129,7 @@ Doanh thu thuần còn lại của vụ án nào sẽ chuyển vào quỹ của 
 
 ---
 
-## PHẦN 4: ĐỊNH HƯỚNG PHÁP LÝ & VẬN HÀNH BÁN HÀNG
+## 4. Định Hướng Pháp Lý & Vận Hành Bán Hàng
 
 ### 4.1. Giai đoạn Khởi động & Bán thử nghiệm (Chưa cần thành lập công ty)
 * **Hình thức:** Bán hàng dưới tư cách **Cá nhân kinh doanh** (dùng CCCD, mã số thuế cá nhân và tài khoản ngân hàng chính chủ).

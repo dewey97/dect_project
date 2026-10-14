@@ -32,6 +32,7 @@ import { CanvasModals } from "./canvas/canvas-modals";
 import { CanvasPhotoZoom } from "./canvas/canvas-photo-zoom";
 
 interface MainInvestigationCanvasProps {
+  caseId?: string;
   onOpenPhoneSimulator?: () => void;
   onOpenReinvestigation?: () => void;
   onOpenEpilogue?: () => void;
@@ -39,13 +40,15 @@ interface MainInvestigationCanvasProps {
 }
 
 export function MainInvestigationCanvas({
+  caseId = "case-000",
   onOpenPhoneSimulator,
   onOpenReinvestigation,
   onOpenEpilogue,
   customBgImage,
 }: MainInvestigationCanvasProps) {
-  const layout = useBoardLayout();
+  const layout = useBoardLayout(caseId);
   const state = useInvestigationState({
+    caseId,
     onOpenReinvestigation,
     onOpenEpilogue,
   });
@@ -168,7 +171,38 @@ export function MainInvestigationCanvas({
     state.editingSuspect,
   ]);
 
-  const { data: sheetEvidences } = usePhoneData("evidences");
+  const normalizedSheetCaseId = useMemo(
+    () => caseId.replace(/-/g, "_"),
+    [caseId],
+  );
+  const { data: sheetEvidences } = usePhoneData("evidences", normalizedSheetCaseId);
+
+  const victimItem = useMemo(() => {
+    if (!Array.isArray(sheetEvidences)) return null;
+    return sheetEvidences.find((item: any) => {
+      const code = String(item.code || item.photo_code || "").toLowerCase().trim();
+      const cat = String(item.category || "").toUpperCase().trim();
+      const label = String(item.label || item.title || "").toLowerCase().trim();
+      return (
+        code === "avatar_khang" ||
+        code === "khang" ||
+        cat === "VICTIM" ||
+        label.includes("nạn nhân")
+      );
+    });
+  }, [sheetEvidences]);
+
+  const victimName = useMemo(() => {
+    if (victimItem) {
+      const label = String(victimItem.label || victimItem.title || "").trim();
+      const clean = label
+        .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân)\s+/i, "")
+        .replace(/\s*\([^)]*\)/g, "")
+        .trim();
+      if (clean) return clean;
+    }
+    return "Nguyễn Văn Khang";
+  }, [victimItem]);
   const sheetPhotoMap = useMemo(() => {
     const map: Record<string, string> = {};
     if (Array.isArray(sheetEvidences)) {
@@ -404,6 +438,9 @@ export function MainInvestigationCanvas({
         effectivePhoneSolved: state.effectivePhoneSolved,
         effectiveIndictmentSolved: state.effectiveIndictmentSolved,
         isReinvestigateBlinking,
+        caseCheckpoints: state.checkpoints,
+        victimName,
+        caseId,
       }),
     [
       isMobile,
@@ -418,6 +455,9 @@ export function MainInvestigationCanvas({
       state.effectivePhoneSolved,
       state.effectiveIndictmentSolved,
       isReinvestigateBlinking,
+      state.checkpoints,
+      victimName,
+      caseId,
     ],
   );
 
@@ -683,7 +723,7 @@ export function MainInvestigationCanvas({
       {/* 2. Interactive Pinboard Canvas */}
       <HeroInteractive
         className="w-full h-full flex-1 min-h-0"
-        controlledCaseId="case-000"
+        controlledCaseId={caseId}
         customPins={displayPins}
         customConnections={customConnections}
         customBgImage={customBgImage}

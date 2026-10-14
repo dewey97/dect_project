@@ -28,6 +28,7 @@ interface HintModalProps {
   onClose: () => void;
   checkpointId?: string;
   category?: "motive" | "alibi" | "all";
+  caseId?: string;
 }
 
 interface CheckpointGroupData {
@@ -41,11 +42,14 @@ interface CheckpointGroupData {
 }
 
 /**
- * Chuẩn hóa checkpointId sang mã chuẩn vụ án Case #000.
+ * Chuẩn hóa checkpointId: hỗ trợ cả Case 000 legacy và case động
  */
-export function normalizeCheckpointId(id?: string): string {
+export function normalizeCheckpointId(id?: string, caseId?: string): string {
   if (!id) return "";
   const clean = id.trim().toLowerCase();
+  if (caseId && caseId !== "case-000") {
+    return clean;
+  }
   if (clean.includes("followup")) {
     if (clean.includes("vu") || clean.includes("1a")) return "cp-000-1a-followup";
     if (clean.includes("ha") || clean.includes("1c")) return "cp-000-1c-followup";
@@ -204,9 +208,11 @@ export function HintModal({
   onClose,
   checkpointId,
   category,
+  caseId = "case-000",
 }: HintModalProps) {
+  const normalizedCaseId = caseId.replace(/-/g, "_");
   const { data: sheetCheckpoints } =
-    usePhoneData<SheetCheckpointRow>("checkpoints");
+    usePhoneData<SheetCheckpointRow>("checkpoints", normalizedCaseId);
 
   // Xây dựng map gợi ý gom từ Google Sheet
   const groupedMap = useMemo(() => {
@@ -215,9 +221,9 @@ export function HintModal({
 
   // Nhận diện đồng bộ checkpoint ID: CHỈ hiển thị nếu có checkpointId truyền vào
   const effectiveCpId = useMemo(() => {
-    if (checkpointId) return normalizeCheckpointId(checkpointId);
+    if (checkpointId) return normalizeCheckpointId(checkpointId, caseId);
     return "";
-  }, [checkpointId, isOpen]);
+  }, [checkpointId, isOpen, caseId]);
 
   const currentGroup = useMemo(() => {
     return (

@@ -18,6 +18,7 @@ interface SuspectItemData {
 }
 
 interface AddSuspectModalProps {
+  caseId?: string
   isOpen: boolean
   onClose: () => void
   onSave: (suspect: SuspectItemData) => void
@@ -54,6 +55,7 @@ import { usePhoneData } from '@/lib/hooks/use-phone-data'
 export { findValidCaseCharacter, VALID_CASE_CHARACTERS, checkMotiveValid, checkAlibiValid }
 
 export function AddSuspectModal({
+  caseId = 'case-000',
   isOpen,
   onClose,
   onSave,
@@ -85,8 +87,9 @@ export function AddSuspectModal({
     }
   }, [isOpen])
 
-  const { checkpoints } = useCaseCheckpoints('case-000')
-  const { data: sheetEvidences } = usePhoneData('evidences', 'case-000')
+  const normalizedCaseId = useMemo(() => caseId.replace(/-/g, '_'), [caseId])
+  const { checkpoints } = useCaseCheckpoints(caseId)
+  const { data: sheetEvidences } = usePhoneData('evidences', normalizedCaseId)
 
   // Parse all avatar/character items from Google Sheet
   const sheetCharacters: SuspectCharacter[] = useMemo(() => {

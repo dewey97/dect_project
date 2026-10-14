@@ -10,31 +10,44 @@ interface DossierResultModalProps {
   dossierType: 'A' | 'B' | 'C' | null
   onClose: () => void
   onOpenFollowupQuestion?: () => void
+  caseId?: string
+  suspectName?: string
 }
 
 export function DossierResultModal({
   isOpen,
   dossierType,
   onClose,
-  onOpenFollowupQuestion
+  onOpenFollowupQuestion,
+  caseId = 'case-000',
+  suspectName
 }: DossierResultModalProps) {
   if (!isOpen || !dossierType) return null
 
   const isA = dossierType === 'A'
   const isB = dossierType === 'B'
   const isC = dossierType === 'C'
+  const isCase000 = caseId === 'case-000'
 
-  const title = isA
-    ? 'HỒ SƠ A — BIÊN BẢN KẾT LUẬN ĐỐI TƯỢNG LÊ QUANG VŨ'
-    : isB
-    ? 'HỒ SƠ B — BIÊN BẢN KẾT LUẬN ĐỐI TƯỢNG NGUYỄN THANH TÙNG'
-    : 'HỒ SƠ C — ĐỀ XUẤT LỆNH KHÁM XẾT CHỖ Ở TRẦN THỊ HÀ'
+  const effectiveSuspectName =
+    suspectName ||
+    (isA ? 'Lê Quang Vũ' : isB ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà')
 
-  const code = isA
-    ? 'HỒ SƠ A // CÁO TRẠNG 001'
-    : isB
-    ? 'HỒ SƠ B // CÁO TRẠNG 002'
-    : 'HỒ SƠ C // LỆNH KHÁM XẾT 003'
+  const title = isCase000
+    ? isA
+      ? 'HỒ SƠ A — BIÊN BẢN KẾT LUẬN ĐỐI TƯỢNG LÊ QUANG VŨ'
+      : isB
+      ? 'HỒ SƠ B — BIÊN BẢN KẾT LUẬN ĐỐI TƯỢNG NGUYỄN THANH TÙNG'
+      : 'HỒ SƠ C — ĐỀ XUẤT LỆNH KHÁM XẾT CHỖ Ở TRẦN THỊ HÀ'
+    : `HỒ SƠ ${dossierType} — BIÊN BẢN ĐIỀU TRA ĐỐI TƯỢNG ${effectiveSuspectName.toUpperCase()}`
+
+  const code = isCase000
+    ? isA
+      ? 'HỒ SƠ A // CÁO TRẠNG 001'
+      : isB
+      ? 'HỒ SƠ B // CÁO TRẠNG 002'
+      : 'HỒ SƠ C // LỆNH KHÁM XẾT 003'
+    : `HỒ SƠ ${dossierType} // ${caseId.toUpperCase()}`
 
   return (
     <AnimatePresence>
@@ -74,7 +87,13 @@ export function DossierResultModal({
             <div className="flex items-center justify-between border-b-2 border-[#2b1f14]/20 pb-3">
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#4a3520] uppercase">
                 <FileText className="size-4 text-[#8c1d1d]" />
-                <span>{isC ? 'ĐỀ XUẤT LỆNH KHÁM XẾT KHẨN CẤP' : 'BIÊN BẢN KẾT THÚC CHUYÊN ÁN #000'}</span>
+                <span>
+                  {isCase000
+                    ? isC
+                      ? 'ĐỀ XUẤT LỆNH KHÁM XẾT KHẨN CẤP'
+                      : 'BIÊN BẢN KẾT THÚC CHUYÊN ÁN #000'
+                    : `BIÊN BẢN ĐIỀU TRA HỒ SƠ ${dossierType}`}
+                </span>
               </div>
               <div className="px-3 py-1 border-2 border-[#8c1d1d] text-[#8c1d1d] bg-red-900/10 font-mono text-[11px] font-black uppercase tracking-wider">
                 {isC ? '★ MẬT // ĐỀ XUẤT KHÁM XẾT ★' : '★ CHÍNH THỨC NIÊM PHONG ★'}
@@ -84,20 +103,28 @@ export function DossierResultModal({
             {/* CONTENT CARD */}
             <div className="p-5 bg-[#ebdcc4] border-2 border-[#a88c6f] text-[#2b1f14] font-mono text-xs sm:text-sm leading-relaxed space-y-3 shadow-inner">
               <div className="font-bold text-[#6b1e1e] uppercase tracking-wide border-b border-[#a88c6f]/40 pb-2 flex items-center justify-between">
-                <span>NỘI DUNG {isC ? 'ĐỀ XUẤT' : 'CHI TIẾT'} {isA ? 'HỒ SƠ A' : isB ? 'HỒ SƠ B' : 'HỒ SƠ C'}:</span>
-                <span>ĐỐI TƯỢNG: {isA ? 'LÊ QUANG VŨ' : isB ? 'NGUYỄN THANH TÙNG' : 'TRẦN THỊ HÀ'}</span>
+                <span>NỘI DUNG {isC ? 'ĐỀ XUẤT' : 'CHI TIẾT'} HỒ SƠ {dossierType}:</span>
+                <span>ĐỐI TƯỢNG: {effectiveSuspectName.toUpperCase()}</span>
               </div>
               <div className="text-xs sm:text-sm text-[#1a120b] font-medium leading-relaxed whitespace-pre-line space-y-2">
-                {isA &&
-                  'Đây là Hồ sơ A ghi nhận đầy đủ diễn tiến vụ án, biên bản hỏi cung đối tượng Lê Quang Vũ cùng toàn bộ lời khai và bằng chứng buộc tội chính thức đã được Viện Kiểm sát phê chuẩn.'}
-                {isB &&
-                  'Đây là Hồ sơ B ghi nhận đầy đủ diễn tiến vụ án, biên bản hỏi cung đối tượng Nguyễn Thanh Tùng cùng toàn bộ lời khai và bằng chứng buộc tội chính thức đã được Viện Kiểm sát phê chuẩn.'}
-                {isC && (
+                {!isCase000 ? (
+                  <p>
+                    Đây là Hồ sơ {dossierType} ghi nhận đầy đủ diễn tiến vụ án, biên bản điều tra và lời khai của đối tượng {effectiveSuspectName} cùng toàn bộ tài liệu bằng chứng liên quan đã được thu thập và phê chuẩn.
+                  </p>
+                ) : (
                   <>
-                    <p>Đối tượng Trần Thị Hà có thái độ bất hợp tác, không giải trình được các mâu thuẫn trong lời khai ban đầu.</p>
-                    <p>Qua đánh giá dấu vết nghiệp vụ, có căn cứ nhận định nhiều khả năng các vật chứng, tư trang hoặc công cụ gây án hiện đang được cất giấu tại nơi ở của đối tượng.</p>
-                    <p>Để ngăn chặn nguy cơ tẩu tán chứng cứ, căn cứ Điều 140 và Điều 141 Bộ luật Tố tụng hình sự, Đội 5 kính đề xuất:</p>
-                    <p className="font-bold text-[#8c1d1d] italic">Phê duyệt Lệnh khám xét khẩn cấp chỗ ở đối với Trần Thị Hà, giao Tổ công tác phối hợp cùng Công an phường Phân khu Cảng và VKSND TP. Hà Nội thực hiện theo quy định.</p>
+                    {isA &&
+                      'Đây là Hồ sơ A ghi nhận đầy đủ diễn tiến vụ án, biên bản hỏi cung đối tượng Lê Quang Vũ cùng toàn bộ lời khai và bằng chứng buộc tội chính thức đã được Viện Kiểm sát phê chuẩn.'}
+                    {isB &&
+                      'Đây là Hồ sơ B ghi nhận đầy đủ diễn tiến vụ án, biên bản hỏi cung đối tượng Nguyễn Thanh Tùng cùng toàn bộ lời khai và bằng chứng buộc tội chính thức đã được Viện Kiểm sát phê chuẩn.'}
+                    {isC && (
+                      <>
+                        <p>Đối tượng Trần Thị Hà có thái độ bất hợp tác, không giải trình được các mâu thuẫn trong lời khai ban đầu.</p>
+                        <p>Qua đánh giá dấu vết nghiệp vụ, có căn cứ nhận định nhiều khả năng các vật chứng, tư trang hoặc công cụ gây án hiện đang được cất giấu tại nơi ở của đối tượng.</p>
+                        <p>Để ngăn chặn nguy cơ tẩu tán chứng cứ, căn cứ Điều 140 và Điều 141 Bộ luật Tố tụng hình sự, Đội 5 kính đề xuất:</p>
+                        <p className="font-bold text-[#8c1d1d] italic">Phê duyệt Lệnh khám xét khẩn cấp chỗ ở đối với Trần Thị Hà, giao Tổ công tác phối hợp cùng Công an phường Phân khu Cảng và VKSND TP. Hà Nội thực hiện theo quy định.</p>
+                      </>
+                    )}
                   </>
                 )}
               </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FileText,
   Paperclip,
@@ -68,9 +68,25 @@ type ActiveModal =
   | "mobile_pdf"
   | null;
 
-export default function WebEvidencePage() {
+function WebEvidencePageContent() {
   const router = useRouter();
-  const activeCase = CASES.find((c) => c.id === "case-000");
+  const searchParams = useSearchParams();
+  const caseId =
+    searchParams.get("case_id") || searchParams.get("caseId") || "case-000";
+  const normalizedSheetCaseId = useMemo(
+    () => caseId.replace(/-/g, "_"),
+    [caseId],
+  );
+
+  const activeCase = CASES.find((c) => c.id === caseId) || {
+    id: caseId,
+    title: `Vụ án #${caseId}`,
+    description: "Hồ sơ điều tra",
+    status: "active" as const,
+    bgImage: "/board_texture.jpg",
+    pins: [],
+    connections: [],
+  };
 
   // Single modal registry
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
@@ -91,8 +107,11 @@ export default function WebEvidencePage() {
   // Category filter: 'all' | 'pdf' | 'evidence'
   const [filterTab, setFilterTab] = useState<"all" | "pdf" | "evidence">("all");
 
-  // Nạp dữ liệu Live CMS từ tab 'evidences' trên Google Sheets
-  const { data: sheetEvidences, loading: isLoadingSheet } = usePhoneData<any>("evidences", "case_000");
+  // Nạp dữ liệu Live CMS từ tab 'evidences' trên Google Sheets theo caseId
+  const { data: sheetEvidences, loading: isLoadingSheet } = usePhoneData<any>(
+    "evidences",
+    normalizedSheetCaseId,
+  );
 
   // 3-Zone Layout State (Desktop):
   // Zone 1 (Bảng Điều Tra): width %
@@ -121,26 +140,153 @@ export default function WebEvidencePage() {
     setActiveHintCategory(cat);
     setActiveModal("hint");
   });
-  useInvestigationEvent("OPEN_REINVESTIGATE", () => setActiveModal("reinvestigate"));
+  // Hợp nhất dữ liệu Live Sheet (tab 'evidences') với Fallback local:
+  // Nếu Sheet có dữ liệu, ưu tiên nạp từ Sheet; nếu một mục chưa có link Drive thì dùng link PDF/ảnh local tương ứng
+  const effectiveItems = useMemo(() => {
+    if (!sheetEvidences || sheetEvidences.length === 0) {
+      if (caseId !== "case-000") return [];
+      // Fallback khi chưa nạp xong Sheet cho case-000
+      return [
+        ...CASE_000_PDFS.map((doc): CombinedItem => ({
+          type: "pdf",
+          data: doc,
+          phase: doc.phase,
+          order: doc.order,
+        })),
+        ...CASE_000_EVIDENCE.map((item): CombinedItem => ({
+          type: "evidence",
+          data: item,
+          phase: item.phase,
+          order: item.order,
+        })),
+      ];
+    }
+
+    // Lọc bỏ avatar nhân vật và scene chỉ dùng cho bảng ghim
+    const validRows = sheetEvidences.filter((row: any) => {
+      const c = String(row.code || "").trim();
+      return c && !c.startsWith("avatar_") && c !== "crime_scene";
+    });
+
+    return validRows.map((row: any, idx: number): CombinedItem => {
+      const code = String(row.code || "").trim();
+      const title = String(row.label || row.title || `Vật chứng #${code}`).trim();
+      const driveUrl = String(row.drive_url || "").trim();
+      const cat = String(row.category || "").toUpperCase();
+      const boStr = String(row["bộ hồ sơ"] || "").toUpperCase();
+
+      // Xác định Phase dựa theo nhãn 'Bộ hồ sơ' trên Sheet (A = 1, B = 2, C = 3, D = 3, còn lại mặc định 0)
+      let phase = 0;
+      if (boStr === "A" || code.startsWith("A-")) phase = 1;
+      else if (boStr === "B" || code.startsWith("B-") || boStr === "E" || code.startsWith("E-")) phase = 2;
+      else if (boStr === "C" || code.startsWith("C-") || boStr === "D" || code.startsWith("D-")) phase = 3;
+
+      // Phân loại: Nếu có chứa chữ 'Ảnh' hoặc category = 'FORENSIC' / 'SCENE' -> type 'evidence' (Ảnh)
+      // Nếu có category = 'DOCUMENT' / 'DOSSIER' hoặc tên biên bản/lý lịch/lời khai -> type 'pdf'
+      const isPhoto =
+        title.toLowerCase().includes("ảnh") ||
+        cat === "FORENSIC" ||
+        cat === "SCENE" ||
+        title.toLowerCase().includes("lược") ||
+        title.toLowerCase().includes("hoa xoan") ||
+        title.toLowerCase().includes("bùa yêu");
+
+      if (isPhoto) {
+        // Tìm ảnh fallback local nếu chưa có Drive link
+        const localFallback = caseId === "case-000" ? CASE_000_EVIDENCE.find(
+          (e) => e.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(e.title.toLowerCase())
+        ) : undefined;
+        const imgUrl = driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
+
+        return {
+          type: "evidence",
+          phase,
+          order: idx * 10,
+          data: {
+            id: `sheet-${code}`,
+            caseId,
+            kind: "photo",
+            title,
+            preview: String(row.description || title),
+            evidenceId: code,
+            thumbnail: imgUrl,
+            timestamp: "24/07/2016",
+            recoveredBy: "ĐIỀU TRA VIÊN",
+            integrityStatus: "secured",
+            chainOfCustody: "VERIFIED",
+            phase,
+            order: idx * 10,
+          },
+        };
+      } else {
+        // Tài liệu PDF: Tìm link PDF local tương ứng nếu Sheet chưa gắn link Drive
+        const localDoc = caseId === "case-000" ? CASE_000_PDFS.find(
+          (d) => d.code === code || d.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(d.title.toLowerCase())
+        ) : undefined;
+        const docUrl = driveUrl || localDoc?.url || "/documents/case_000/00_khoi_dau/00_huong_dan_ban_dau.pdf";
+
+        return {
+          type: "pdf",
+          phase,
+          order: idx * 10,
+          data: {
+            id: `sheet-${code}`,
+            code,
+            title,
+            url: docUrl,
+            phase,
+            order: idx * 10,
+          },
+        };
+      }
+    });
+  }, [sheetEvidences, caseId]);
 
   useEffect(() => {
     setStorageItem("play_experience", "web");
 
-    const isIntroSeen = getStorageItem("intro_seen");
+    const introKey = caseId === "case-000" ? "intro_seen" : `${caseId}::intro_seen`;
+    const isIntroSeen = getStorageItem(introKey);
     if (isIntroSeen !== "true") {
-      setUnlockedModalData({
-        unlockedPhase: 0,
-        newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-        newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
-      });
+      const initPdfs = (effectiveItems as CombinedItem[])
+        .filter((i) => i.type === "pdf" && i.phase === 0)
+        .map((i) => i.data as PDFDocument);
+      const initEvidence = (effectiveItems as CombinedItem[])
+        .filter((i) => i.type === "evidence" && i.phase === 0)
+        .map((i) => i.data as PhysicalEvidence);
+
+      if (initPdfs.length > 0 || initEvidence.length > 0) {
+        setUnlockedModalData({
+          unlockedPhase: 0,
+          newPdfs: initPdfs,
+          newEvidence: initEvidence,
+        });
+      } else if (caseId === "case-000") {
+        setUnlockedModalData({
+          unlockedPhase: 0,
+          newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
+          newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
+        });
+      }
     }
 
     // Check current unlocked phase from boardgame progress
-    const solvedFollowups = getStorageJson<string[]>("solved_followups", []);
+    const solvedFollowups = getStorageJson<string[]>(
+      caseId === "case-000" ? "solved_followups" : `${caseId}::solved_followups`,
+      [],
+    );
     const isReinvestigateUnlocked =
-      getStorageItem("reinvestigate_unlocked") === "true";
+      getStorageItem(
+        caseId === "case-000"
+          ? "reinvestigate_unlocked"
+          : `${caseId}::reinvestigate_unlocked`,
+      ) === "true";
     const isIndictmentSolved =
-      getStorageItem("indictment_solved") === "true";
+      getStorageItem(
+        caseId === "case-000"
+          ? "indictment_solved"
+          : `${caseId}::indictment_solved`,
+      ) === "true";
 
     if (isIndictmentSolved) {
       setUnlockedPhase(3);
@@ -162,7 +308,7 @@ export default function WebEvidencePage() {
     if (savedCollapsed === "true") {
       setIsDossierCollapsed(true);
     }
-  }, []);
+  }, [caseId, effectiveItems]);
 
   // Xử lý kéo thả thanh phân chia giữa Vùng 1 (Board) và Vùng 2+3 (Dossier)
   useEffect(() => {
@@ -232,110 +378,37 @@ export default function WebEvidencePage() {
   };
 
   const resetAllProgress = () => {
-    clearInvestigationStorage();
+    if (caseId === "case-000") {
+      clearInvestigationStorage();
+    } else {
+      [
+        `${caseId}::intro_seen`,
+        `${caseId}::solved_followups`,
+        `${caseId}::reinvestigate_unlocked`,
+        `${caseId}::indictment_solved`,
+      ].forEach((k) => setStorageItem(k, ""));
+    }
     window.location.reload();
   };
 
-  // Hợp nhất dữ liệu Live Sheet (tab 'evidences') với Fallback local:
-  // Nếu Sheet có dữ liệu, ưu tiên nạp từ Sheet; nếu một mục chưa có link Drive thì dùng link PDF/ảnh local tương ứng
-  const effectiveItems = useMemo(() => {
-    if (!sheetEvidences || sheetEvidences.length === 0) {
-      // Fallback khi chưa nạp xong Sheet
-      return [
-        ...CASE_000_PDFS.map((doc): CombinedItem => ({
-          type: "pdf",
-          data: doc,
-          phase: doc.phase,
-          order: doc.order,
-        })),
-        ...CASE_000_EVIDENCE.map((item): CombinedItem => ({
-          type: "evidence",
-          data: item,
-          phase: item.phase,
-          order: item.order,
-        })),
-      ];
+
+
+  // Tự động chọn tài liệu đầu tiên khi khay hồ sơ nạp xong
+  useEffect(() => {
+    if (effectiveItems.length > 0) {
+      setSelectedView((prev) => {
+        const currentId = prev?.data?.id;
+        const exists = effectiveItems.some(
+          (item) => item.data.id === currentId,
+        );
+        if (!exists) {
+          const first = effectiveItems[0];
+          return { type: first.type, data: first.data as any };
+        }
+        return prev;
+      });
     }
-
-    // Lọc bỏ avatar nhân vật và scene chỉ dùng cho bảng ghim
-    const validRows = sheetEvidences.filter((row: any) => {
-      const c = String(row.code || "").trim();
-      return c && !c.startsWith("avatar_") && c !== "crime_scene";
-    });
-
-    return validRows.map((row: any, idx: number): CombinedItem => {
-      const code = String(row.code || "").trim();
-      const title = String(row.label || row.title || `Vật chứng #${code}`).trim();
-      const driveUrl = String(row.drive_url || "").trim();
-      const cat = String(row.category || "").toUpperCase();
-      const boStr = String(row["bộ hồ sơ"] || "").toUpperCase();
-
-      // Xác định Phase dựa theo nhãn 'Bộ hồ sơ' trên Sheet (A = 1, B = 2, C = 3, D = 3, còn lại mặc định 0)
-      let phase = 0;
-      if (boStr === "A" || code.startsWith("A-")) phase = 1;
-      else if (boStr === "B" || code.startsWith("B-") || boStr === "E" || code.startsWith("E-")) phase = 2;
-      else if (boStr === "C" || code.startsWith("C-") || boStr === "D" || code.startsWith("D-")) phase = 3;
-
-      // Phân loại: Nếu có chứa chữ 'Ảnh' hoặc category = 'FORENSIC' / 'SCENE' -> type 'evidence' (Ảnh)
-      // Nếu có category = 'DOCUMENT' / 'DOSSIER' hoặc tên biên bản/lý lịch/lời khai -> type 'pdf'
-      const isPhoto =
-        title.toLowerCase().includes("ảnh") ||
-        cat === "FORENSIC" ||
-        cat === "SCENE" ||
-        title.toLowerCase().includes("lược") ||
-        title.toLowerCase().includes("hoa xoan") ||
-        title.toLowerCase().includes("bùa yêu");
-
-      if (isPhoto) {
-        // Tìm ảnh fallback local nếu chưa có Drive link
-        const localFallback = CASE_000_EVIDENCE.find(
-          (e) => e.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(e.title.toLowerCase())
-        );
-        const imgUrl = driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
-
-        return {
-          type: "evidence",
-          phase,
-          order: idx * 10,
-          data: {
-            id: `sheet-${code}`,
-            caseId: "case-000",
-            kind: "photo",
-            title,
-            preview: String(row.description || title),
-            evidenceId: code,
-            thumbnail: imgUrl,
-            timestamp: "24/07/2016",
-            recoveredBy: "ĐIỀU TRA VIÊN",
-            integrityStatus: "secured",
-            chainOfCustody: "VERIFIED",
-            phase,
-            order: idx * 10,
-          },
-        };
-      } else {
-        // Tài liệu PDF: Tìm link PDF local tương ứng nếu Sheet chưa gắn link Drive
-        const localDoc = CASE_000_PDFS.find(
-          (d) => d.code === code || d.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(d.title.toLowerCase())
-        );
-        const docUrl = driveUrl || localDoc?.url || "/documents/case_000/00_khoi_dau/00_huong_dan_ban_dau.pdf";
-
-        return {
-          type: "pdf",
-          phase,
-          order: idx * 10,
-          data: {
-            id: `sheet-${code}`,
-            code,
-            title,
-            url: docUrl,
-            phase,
-            order: idx * 10,
-          },
-        };
-      }
-    });
-  }, [sheetEvidences]);
+  }, [effectiveItems]);
 
   const combinedItems: CombinedItem[] = useMemo(() => {
     return (effectiveItems as CombinedItem[])
@@ -394,6 +467,7 @@ export default function WebEvidencePage() {
           {/* MAIN CANVAS */}
           <div className="flex-1 min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
+              caseId={caseId}
               onOpenPhoneSimulator={() => setActiveModal("phone")}
               onOpenReinvestigation={() => setActiveModal("reinvestigate")}
               onOpenEpilogue={() => setActiveModal("epilogue")}
@@ -674,6 +748,7 @@ export default function WebEvidencePage() {
 
       {/* POST-CASE EPILOGUE STORIES MODAL */}
       <EpilogueModal
+        caseId={caseId}
         isOpen={activeModal === "epilogue"}
         onClose={() => setActiveModal(null)}
       />
@@ -692,6 +767,7 @@ export default function WebEvidencePage() {
 
       {/* HINT SYSTEM MODAL */}
       <HintModal
+        caseId={caseId}
         isOpen={activeModal === "hint"}
         checkpointId={activeHintCheckpointId}
         category={activeHintCategory}
@@ -704,12 +780,14 @@ export default function WebEvidencePage() {
 
       {/* VICTIM PHONE SIMULATOR MODAL */}
       <PhoneModal
+        caseId={caseId}
         isOpen={activeModal === "phone"}
         onClose={() => setActiveModal(null)}
       />
 
       {/* RE-INVESTIGATION CRIME SCENE MODAL */}
       <ReinvestigationModal
+        caseId={caseId}
         isOpen={activeModal === "reinvestigate"}
         onClose={() => setActiveModal(null)}
       />
@@ -723,5 +801,19 @@ export default function WebEvidencePage() {
         onClose={() => setActiveModal(null)}
       />
     </div>
+  );
+}
+
+export default function WebEvidencePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-full w-full bg-[#0d0a08] flex items-center justify-center text-[#d9a066] font-mono text-xs">
+          Đang nạp hồ sơ vụ án...
+        </div>
+      }
+    >
+      <WebEvidencePageContent />
+    </Suspense>
   );
 }

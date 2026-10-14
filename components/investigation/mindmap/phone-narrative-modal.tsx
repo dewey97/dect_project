@@ -12,15 +12,17 @@ interface PhoneNarrativeModalProps {
   isOpen: boolean
   onClose: () => void
   onTakeTestimony?: () => void
+  caseId?: string
 }
 
 export function PhoneNarrativeModal({
   isOpen,
   onClose,
-  onTakeTestimony
+  onTakeTestimony,
+  caseId = 'case-000'
 }: PhoneNarrativeModalProps) {
   const [isNarrativeComplete, setIsNarrativeComplete] = useState(false)
-  const { checkpoints } = useCaseCheckpoints('case-000')
+  const { checkpoints } = useCaseCheckpoints(caseId)
 
   React.useEffect(() => {
     setIsNarrativeComplete(false)
@@ -28,11 +30,13 @@ export function PhoneNarrativeModal({
 
   if (!isOpen) return null
 
-  const cp0 = checkpoints.find((c) => c.id === 'cp-000-0')
+  const cp0 = checkpoints.find(
+    (c) => c.id === 'cp-000-0' || c.id.includes('-0') || c.id.includes('phone')
+  ) || checkpoints[0]
   const dateLabel = cp0?.title || 'Thành công xác minh danh tính các thuê bao.'
   const storyText =
     cp0?.storyConfig?.monologue ||
-    'Chúc mừng các thám tử đã thành công truy vết chủ sở hữu 3 số thuê bao trong nhật ký điện thoại.\n\nTiếp theo, hãy tiến hành triệu tập và ghi lời khai đối với từng trường hợp để làm rõ mục đích liên lạc.'
+    'Chúc mừng các thám tử đã thành công truy vết chủ sở hữu các số thuê bao trong nhật ký điện thoại.\n\nTiếp theo, hãy tiến hành triệu tập và ghi lời khai đối với từng trường hợp để làm rõ mục đích liên lạc.'
 
   return (
     <AnimatePresence>

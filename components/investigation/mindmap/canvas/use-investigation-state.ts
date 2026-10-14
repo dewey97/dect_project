@@ -50,9 +50,16 @@ export function sanitizeSuspectsList(items: SuspectItem[]): SuspectItem[] {
 
 /** Gom state tiến trình vụ án: suspects, phone, followup, indictment, reinvestigate. */
 export function useInvestigationState(opts?: {
+  caseId?: string;
   onOpenReinvestigation?: () => void;
   onOpenEpilogue?: () => void;
 }) {
+  const caseId = opts?.caseId || "case-000";
+  const sKey = useCallback(
+    (key: string) => (caseId === "case-000" ? key : `${caseId}::${key}`),
+    [caseId],
+  );
+
   const [suspects, setSuspects] = useState<SuspectItem[]>([]);
   const [isReinvestigateUnlocked, setIsReinvestigateUnlocked] = useState(false);
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] =
@@ -98,10 +105,10 @@ export function useInvestigationState(opts?: {
   const [isPhoneLookupOpen, setIsPhoneLookupOpen] = useState(false);
   const [isIndictmentOpen, setIsIndictmentOpen] = useState(false);
 
-  const { checkpoints } = useCaseCheckpoints("case-000");
+  const { checkpoints } = useCaseCheckpoints(caseId);
 
   const convergenceCp = useMemo(() => {
-    return checkpoints.find((cp) => cp.id === "cp-000-convergence");
+    return checkpoints.find((cp) => cp.id.includes("convergence"));
   }, [checkpoints]);
 
   const requiredForReinvestigate = useMemo(() => {
@@ -120,32 +127,32 @@ export function useInvestigationState(opts?: {
   );
 
   useEffect(() => {
-    const rawSuspects = getStorageJson<any[]>("canvas_suspects", []);
+    const rawSuspects = getStorageJson<any[]>(sKey("canvas_suspects"), []);
     const validList = rawSuspects.filter((s) => s && s.id && s.name);
     if (validList.length > 0) {
       setSuspects(sanitizeSuspectsList(validList));
     }
 
     const solvedFollowups = getStorageJson<CulpritKey[]>(
-      "solved_followups",
+      sKey("solved_followups"),
       [],
     );
     setSolvedFollowupQuestions(solvedFollowups);
     if (
       isReinvestigateConditionMet(solvedFollowups) ||
-      getStorageItem("reinvestigate_unlocked") === "true"
+      getStorageItem(sKey("reinvestigate_unlocked")) === "true"
     ) {
       setIsReinvestigateUnlocked(true);
     }
-    if (getStorageItem("reinvestigate_opened") === "true") {
+    if (getStorageItem(sKey("reinvestigate_opened")) === "true") {
       setHasOpenedReinvestigation(true);
     }
 
     const phoneInputs = getStorageJson<Record<string, string>>(
-      "phone_inputs",
+      sKey("phone_inputs"),
       {},
     );
-    const isPhoneSolved = getStorageItem("phone_solved") === "true";
+    const isPhoneSolved = getStorageItem(sKey("phone_solved")) === "true";
     if (
       phoneInputs.phone1 ||
       phoneInputs.phone2 ||
@@ -156,24 +163,24 @@ export function useInvestigationState(opts?: {
     }
 
     setInvestigatedSuspects(
-      getStorageJson<CulpritKey[]>("investigated_suspects", []),
+      getStorageJson<CulpritKey[]>(sKey("investigated_suspects"), []),
     );
 
-    if (getStorageItem("indictment_solved") === "true") {
+    if (getStorageItem(sKey("indictment_solved")) === "true") {
       const savedCulprit = getStorageItem(
-        "indictment_culprit",
+        sKey("indictment_culprit"),
       ) as CulpritKey | null;
       if (savedCulprit) {
         setIsIndictmentSolved(true);
         setSolvedCulprit(savedCulprit);
       }
     }
-  }, []);
+  }, [sKey, isReinvestigateConditionMet]);
 
   const saveSuspectsState = (newSuspects: SuspectItem[]) => {
     const sanitized = sanitizeSuspectsList(newSuspects);
     setSuspects(sanitized);
-    setStorageJson("canvas_suspects", sanitized);
+    setStorageJson(sKey("canvas_suspects"), sanitized);
   };
 
   const handleSaveSuspect = (savedSuspect: SuspectItem) => {
@@ -190,8 +197,8 @@ export function useInvestigationState(opts?: {
 
     setSuspects((prev) => {
       const existingIndex = prev.findIndex((s) => {
-        const sKey = getCanonicalSuspectKey(s);
-        return sKey.canonicalId === canonicalId || s.id === canonicalId;
+        const suspectKey = getCanonicalSuspectKey(s);
+        return suspectKey.canonicalId === canonicalId || s.id === canonicalId;
       });
       let updated: SuspectItem[];
       if (existingIndex >= 0) {
@@ -201,7 +208,7 @@ export function useInvestigationState(opts?: {
         updated = [...prev, normalizedItem];
       }
       const sanitized = sanitizeSuspectsList(updated);
-      setStorageItem("canvas_suspects", JSON.stringify(sanitized));
+      setStorageItem(sKey("canvas_suspects"), JSON.stringify(sanitized));
       return sanitized;
     });
   };
@@ -219,22 +226,22 @@ export function useInvestigationState(opts?: {
     saveSuspectsState(updated);
 
     if (suspectToDelete) {
-      const { canonicalId } = getCanonicalSuspectKey(suspectToDelete);
-      const culpritType: CulpritKey = canonicalId;
+      const { canonicalId: cId } = getCanonicalSuspectKey(suspectToDelete);
+      const culpritType: CulpritKey = cId;
       const remainingHasCulprit = updated.some(
         (s) => getCanonicalSuspectKey(s).canonicalId === culpritType,
       );
       if (!remainingHasCulprit) {
         setInvestigatedSuspects((prev) => {
           const next = prev.filter((c) => c !== culpritType);
-          setStorageItem("investigated_suspects", JSON.stringify(next));
+          setStorageItem(sKey("investigated_suspects"), JSON.stringify(next));
           return next;
         });
         if (solvedCulprit === culpritType) {
           setSolvedCulprit(null);
           setIsIndictmentSolved(false);
-          removeStorageItem("indictment_solved");
-          removeStorageItem("indictment_culprit");
+          removeStorageItem(sKey("indictment_solved"));
+          removeStorageItem(sKey("indictment_culprit"));
         }
       }
     }
@@ -242,7 +249,7 @@ export function useInvestigationState(opts?: {
 
   const handlePhoneLookupSuccess = (_phone: string, _info: string) => {
     setPhoneLookupSuccess(true);
-    setStorageItem("phone_solved", "true");
+    setStorageItem(sKey("phone_solved"), "true");
     setIsPhoneLookupOpen(false);
     setIsPhoneNarrativeOpen(true);
   };
@@ -250,13 +257,13 @@ export function useInvestigationState(opts?: {
   const handleFollowupSuccess = (culprit: CulpritKey, choice?: string) => {
     const updated = Array.from(new Set([...solvedFollowupQuestions, culprit]));
     setSolvedFollowupQuestions(updated);
-    setStorageItem("solved_followups", JSON.stringify(updated));
+    setStorageItem(sKey("solved_followups"), JSON.stringify(updated));
     if (choice) {
-      setStorageItem(`followup_${culprit}_choice`, choice);
+      setStorageItem(sKey(`followup_${culprit}_choice`), choice);
     }
     if (isReinvestigateConditionMet(updated)) {
       setIsReinvestigateUnlocked(true);
-      setStorageItem("reinvestigate_unlocked", "true");
+      setStorageItem(sKey("reinvestigate_unlocked"), "true");
     }
     setIsFollowupQuestionOpen(false);
     setNarrativeCulprit(culprit);
@@ -274,8 +281,8 @@ export function useInvestigationState(opts?: {
     setIsIndictmentSolved(true);
     setSolvedCulprit(data.culprit);
     setIsIndictmentOpen(false);
-    setStorageItem("indictment_solved", "true");
-    setStorageItem("indictment_culprit", data.culprit);
+    setStorageItem(sKey("indictment_solved"), "true");
+    setStorageItem(sKey("indictment_culprit"), data.culprit);
     setIsFinalEpilogueOpen(true);
     if (opts?.onOpenEpilogue) {
       opts.onOpenEpilogue();
@@ -307,17 +314,31 @@ export function useInvestigationState(opts?: {
     setIsDossierOpen(false);
     setIsFollowupQuestionOpen(false);
     setIsPhoneNarrativeOpen(false);
-    clearInvestigationStorage();
+    if (caseId === "case-000") {
+      clearInvestigationStorage();
+    } else {
+      [
+        sKey("canvas_suspects"),
+        sKey("investigated_suspects"),
+        sKey("solved_followups"),
+        sKey("indictment_solved"),
+        sKey("indictment_culprit"),
+        sKey("reinvestigate_unlocked"),
+        sKey("reinvestigate_opened"),
+        sKey("phone_inputs"),
+        sKey("phone_solved"),
+      ].forEach(removeStorageItem);
+    }
   };
 
   const handleOpenReinvestigation = useCallback(() => {
     setIsReinvestigateModalOpen(true);
     setHasOpenedReinvestigation(true);
-    setStorageItem("reinvestigate_opened", "true");
+    setStorageItem(sKey("reinvestigate_opened"), "true");
     if (opts?.onOpenReinvestigation) {
       opts.onOpenReinvestigation();
     }
-  }, [opts?.onOpenReinvestigation]);
+  }, [opts?.onOpenReinvestigation, sKey]);
 
   const effectiveReinvestigateUnlocked =
     isShowAllPinsPreview || isReinvestigateUnlocked;
@@ -325,6 +346,8 @@ export function useInvestigationState(opts?: {
   const effectiveIndictmentSolved = isShowAllPinsPreview || isIndictmentSolved;
 
   return {
+    caseId,
+    checkpoints,
     suspects,
     setSuspects,
     saveSuspectsState,
