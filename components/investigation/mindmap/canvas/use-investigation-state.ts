@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import {
   getCanonicalSuspectKey,
   findValidCaseCharacter,
@@ -24,16 +25,12 @@ export interface SuspectItem {
   alibiClueIds?: string[];
 }
 
-export type CulpritKey = "vu" | "tung" | "ha";
+export type CulpritKey = "vu" | "tung" | "ha" | (string & {});
 
 export const ALL_CASE_000_SUSPECTS: SuspectItem[] = [
-  {
-    id: "suspect-vu",
-    name: "Lê Quang Vũ",
-    clueIds: ["c0-clue-01", "c0-clue-02"],
-  },
-  { id: "suspect-tung", name: "Nguyễn Thanh Tùng", clueIds: ["c0-clue-03"] },
-  { id: "suspect-ha", name: "Trần Thị Hà", clueIds: ["c0-clue-04"] },
+  { id: "suspect-vu", name: "Lê Quang Vũ", clueIds: [] },
+  { id: "suspect-tung", name: "Nguyễn Thanh Tùng", clueIds: [] },
+  { id: "suspect-ha", name: "Trần Thị Hà", clueIds: [] },
 ];
 
 export function sanitizeSuspectsList(items: SuspectItem[]): SuspectItem[] {
@@ -101,13 +98,31 @@ export function useInvestigationState(opts?: {
   const [isPhoneLookupOpen, setIsPhoneLookupOpen] = useState(false);
   const [isIndictmentOpen, setIsIndictmentOpen] = useState(false);
 
+  const { checkpoints } = useCaseCheckpoints("case-000");
+
+  const convergenceCp = useMemo(() => {
+    return checkpoints.find((cp) => cp.id === "cp-000-convergence");
+  }, [checkpoints]);
+
+  const requiredForReinvestigate = useMemo(() => {
+    const reqs = convergenceCp?.pickerConfig?.requiredEvidenceIds;
+    if (reqs && reqs.length > 0) {
+      return reqs.map((r) => r.toLowerCase().trim());
+    }
+    return ["vu", "tung"];
+  }, [convergenceCp]);
+
+  const isReinvestigateConditionMet = useCallback(
+    (solved: string[]) => {
+      return requiredForReinvestigate.every((req) => solved.includes(req));
+    },
+    [requiredForReinvestigate]
+  );
+
   useEffect(() => {
     const rawSuspects = getStorageJson<any[]>("canvas_suspects", []);
-    const validList = rawSuspects.filter((s) => s?.id !== "suspect-default-1");
-    if (validList.length === 0) {
-      setSuspects(ALL_CASE_000_SUSPECTS);
-      setStorageJson("canvas_suspects", ALL_CASE_000_SUSPECTS);
-    } else {
+    const validList = rawSuspects.filter((s) => s && s.id && s.name);
+    if (validList.length > 0) {
       setSuspects(sanitizeSuspectsList(validList));
     }
 
@@ -117,7 +132,7 @@ export function useInvestigationState(opts?: {
     );
     setSolvedFollowupQuestions(solvedFollowups);
     if (
-      (solvedFollowups.includes("vu") && solvedFollowups.includes("tung")) ||
+      isReinvestigateConditionMet(solvedFollowups) ||
       getStorageItem("reinvestigate_unlocked") === "true"
     ) {
       setIsReinvestigateUnlocked(true);
@@ -162,12 +177,11 @@ export function useInvestigationState(opts?: {
   };
 
   const handleSaveSuspect = (savedSuspect: SuspectItem) => {
-    const matchedChar = findValidCaseCharacter(
-      savedSuspect.name || savedSuspect.id,
-    );
-    if (!matchedChar || matchedChar.id === "khang") return;
+    if (!savedSuspect.name || savedSuspect.name.toLowerCase().includes("khang")) return;
 
     const { canonicalId, canonicalName } = getCanonicalSuspectKey(savedSuspect);
+    if (canonicalId === "khang") return;
+
     const normalizedItem: SuspectItem = {
       ...savedSuspect,
       id: canonicalId,
@@ -206,26 +220,21 @@ export function useInvestigationState(opts?: {
 
     if (suspectToDelete) {
       const { canonicalId } = getCanonicalSuspectKey(suspectToDelete);
-      const culpritType: CulpritKey | null =
-        canonicalId === "vu" || canonicalId === "tung" || canonicalId === "ha"
-          ? (canonicalId as CulpritKey)
-          : null;
-      if (culpritType) {
-        const remainingHasCulprit = updated.some(
-          (s) => getCanonicalSuspectKey(s).canonicalId === culpritType,
-        );
-        if (!remainingHasCulprit) {
-          setInvestigatedSuspects((prev) => {
-            const next = prev.filter((c) => c !== culpritType);
-            setStorageItem("investigated_suspects", JSON.stringify(next));
-            return next;
-          });
-          if (solvedCulprit === culpritType) {
-            setSolvedCulprit(null);
-            setIsIndictmentSolved(false);
-            removeStorageItem("indictment_solved");
-            removeStorageItem("indictment_culprit");
-          }
+      const culpritType: CulpritKey = canonicalId;
+      const remainingHasCulprit = updated.some(
+        (s) => getCanonicalSuspectKey(s).canonicalId === culpritType,
+      );
+      if (!remainingHasCulprit) {
+        setInvestigatedSuspects((prev) => {
+          const next = prev.filter((c) => c !== culpritType);
+          setStorageItem("investigated_suspects", JSON.stringify(next));
+          return next;
+        });
+        if (solvedCulprit === culpritType) {
+          setSolvedCulprit(null);
+          setIsIndictmentSolved(false);
+          removeStorageItem("indictment_solved");
+          removeStorageItem("indictment_culprit");
         }
       }
     }
@@ -245,7 +254,7 @@ export function useInvestigationState(opts?: {
     if (choice) {
       setStorageItem(`followup_${culprit}_choice`, choice);
     }
-    if (updated.includes("vu") && updated.includes("tung")) {
+    if (isReinvestigateConditionMet(updated)) {
       setIsReinvestigateUnlocked(true);
       setStorageItem("reinvestigate_unlocked", "true");
     }

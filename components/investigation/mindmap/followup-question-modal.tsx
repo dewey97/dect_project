@@ -7,60 +7,27 @@ import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
 import { emitInvestigationEvent } from '@/lib/investigation-events'
 
-import { PHONE_LOOKUP_EVIDENCE_IDS } from './add-suspect-modal'
 import { ClueCodePicker } from './clue-code-picker'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { isEvidenceMatching } from '@/lib/cases/case-000-clues'
 import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
 import { normalizeImageUrl } from '@/lib/utils'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
+import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 interface FollowupQuestionModalProps {
   isOpen: boolean
-  culprit: 'vu' | 'tung' | 'ha' | null
+  culprit: string | null
   onClose: () => void
-  onSuccess?: (culprit: 'vu' | 'tung' | 'ha', choice?: string) => void
+  onSuccess?: (culprit: string, choice?: string) => void
   onOpenDossier?: (dossierType: 'A' | 'B' | 'C') => void
   isPhoneSolved?: boolean
 }
 
-const MOCK_OPTIONS_TUNG = [
+const DEFAULT_OPTIONS_TUNG = [
   { id: 'tin', label: 'CÓ' },
   { id: 'khong_tin', label: 'KHÔNG' }
 ]
-
-// 3 TILES MANH MỐI THU ĐƯỢC TẠI NHÀ VÀ THÂN THỂ TRẦN THỊ HÀ
-export const HA_CLUE_TILES = [
-  {
-    id: 'tile_ao_gio',
-    number: '01',
-    title: 'Áo khoác gió',
-    subtitle: 'Thu giữ sau cánh cửa phòng trọ',
-    description: 'Áo khoác gió xám đen dính bụi mùn đất đặc trưng quanh gốc cây xoan trước ngõ nhà Khang.',
-    validDocIds: ['45', '10', '6'],
-    matchHint: 'Khớp nối lời khai: bóng người mặc áo gió trùm đầu rình rập dưới gốc cây xoan trước cổng (45, 10, 6).',
-  },
-  {
-    id: 'tile_lon_toc',
-    number: '02',
-    title: 'Kéo và nhúm tóc',
-    subtitle: 'Thu giữ giấu trong áo ngực',
-    description: 'Lọn tóc mai dính máu cắt bằng kéo, kết quả giám định sinh học trùng khớp 100% mẫu ADN của Khang.',
-    validDocIds: ['4'],
-    matchHint: 'Khớp nối Khám nghiệm tử thi: mảng tóc mai bên trái bị cắt tỉa sát da đầu & vết đâm cổ lúc 21:00 (4).',
-  },
-  {
-    id: 'tile_thuoc_an_than',
-    number: '03',
-    title: 'Bùa yêu',
-    subtitle: 'Thu giữ tại phòng & thân thể',
-    description: 'Lá bùa yêu nhuộm đỏ cùng các vật phẩm mê tín được chuẩn bị từ trước.',
-    validDocIds: ['49'],
-    matchHint: 'Khớp nối vật chứng bùa yêu thu được (49).',
-  },
-]
-
-import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 export function FollowupQuestionModal({
   isOpen,
@@ -88,9 +55,18 @@ export function FollowupQuestionModal({
   // State for Ha Password & Photo Popup (Live CMS)
   const [haPasswordInput, setHaPasswordInput] = useState<string>('')
   const [showHaPhotoPopup, setShowHaPhotoPopup] = useState<boolean>(false)
+
+  // State for Dynamic Custom Suspects
+  const [customTextInput, setCustomTextInput] = useState<string>('')
+  const [customSelectedOption, setCustomSelectedOption] = useState<string | null>(null)
   
-  // Fetch photos dynamically from Google Sheets Live CMS ('photos' tab)
-  const { data: rawSheetPhotos } = usePhoneData('photos')
+  // Fetch photos dynamically from Google Sheets Live CMS ('evidences' tab)
+  const { data: rawSheetPhotos } = usePhoneData('evidences')
+
+  const isVu = culprit === 'vu'
+  const isTung = culprit === 'tung'
+  const isHa = culprit === 'ha'
+  const isCustom = !isVu && !isTung && !isHa
 
   // Live Checkpoint metadata for Ha followup (cp-000-1c-followup or cp-000-2a or cp-000-1c)
   const haCheckpoint = useMemo(() => {
@@ -100,6 +76,54 @@ export function FollowupQuestionModal({
       checkpoints.find((cp) => cp.id === 'cp-000-1c')
     )
   }, [checkpoints])
+
+  // Live Checkpoint metadata for Vu followup (cp-000-1a-followup or cp-000-1a)
+  const vuCheckpoint = useMemo(() => {
+    return (
+      checkpoints.find((cp) => cp.id === 'cp-000-1a-followup') ||
+      checkpoints.find((cp) => cp.id === 'cp-000-1a')
+    )
+  }, [checkpoints])
+
+  // Live Checkpoint metadata for Tung followup (cp-000-1b-followup or cp-000-1b)
+  const tungCheckpoint = useMemo(() => {
+    return (
+      checkpoints.find((cp) => cp.id === 'cp-000-1b-followup') ||
+      checkpoints.find((cp) => cp.id === 'cp-000-1b')
+    )
+  }, [checkpoints])
+
+  // Live Checkpoint metadata for Custom Suspect
+  const customCheckpoint = useMemo(() => {
+    if (!culprit || isVu || isTung || isHa) return null
+    return (
+      checkpoints.find((cp) => cp.id === `cp-${culprit}-followup`) ||
+      checkpoints.find((cp) => cp.id === `cp-${culprit}`) ||
+      checkpoints.find((cp) => {
+        const titleLower = (cp.title || '').toLowerCase()
+        const qLower = (cp.question || '').toLowerCase()
+        return titleLower.includes(culprit) || qLower.includes(culprit)
+      }) ||
+      null
+    )
+  }, [checkpoints, culprit, isVu, isTung, isHa])
+
+  const customCharacterName = useMemo(() => {
+    if (!culprit || isVu || isTung || isHa) return ''
+    if (Array.isArray(rawSheetPhotos)) {
+      const match = rawSheetPhotos.find((p: any) => {
+        const code = String(p.code || p.photo_code || '').toLowerCase()
+        return code === culprit || code === `avatar_${culprit}`
+      })
+      if (match) {
+        return String(match.label || match.title || '')
+          .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i, '')
+          .replace(/\s*\([^)]*\)/g, '')
+          .trim()
+      }
+    }
+    return culprit
+  }, [culprit, rawSheetPhotos, isVu, isTung, isHa])
 
   // Lấy 3 ảnh từ sheet photos cho popup kết quả (100% Live CMS)
   // Lấy 3 vật chứng (D-06, D-05, D-04) từ sheet photos cho popup kết quả (100% Live CMS)
@@ -243,12 +267,21 @@ export function FollowupQuestionModal({
       } else {
         setVuTimeInput('')
       }
-    } else {
-      const saved = getStorageItem(`followup_${culprit}`)
+    } else if (culprit === 'tung') {
+      const saved = getStorageItem('followup_tung')
       if (saved) {
         setSelectedOption(saved)
       } else {
         setSelectedOption(null)
+      }
+    } else {
+      const saved = getStorageItem(`followup_${culprit}`)
+      if (saved) {
+        setCustomTextInput(saved)
+        setCustomSelectedOption(saved)
+      } else {
+        setCustomTextInput('')
+        setCustomSelectedOption(null)
       }
     }
   }, [culprit, isOpen])
@@ -264,10 +297,6 @@ export function FollowupQuestionModal({
 
   if (!isOpen || !culprit) return null
 
-  const isVu = culprit === 'vu'
-  const isTung = culprit === 'tung'
-  const isHa = culprit === 'ha'
-
   const handleSubmitVu = (e: React.FormEvent) => {
     e.preventDefault()
     const normalized = vuTimeInput.trim().toLowerCase().replace(/\s+/g, '')
@@ -277,14 +306,27 @@ export function FollowupQuestionModal({
       return
     }
 
-    const is000 = normalized === '000' || normalized === '00' || normalized === '0'
+    const isBypass = isAdminBypassCode(normalized)
+    const expectedFromSheet = (vuCheckpoint?.correctAnswer || '21:15')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '')
 
-    if (normalized === '21:15' || normalized === '21h15' || is000) {
+    const isMatch =
+      isBypass ||
+      normalized === expectedFromSheet ||
+      normalized === expectedFromSheet.replace(':', 'h') ||
+      normalized === expectedFromSheet.replace('h', ':') ||
+      normalized === '21:15' ||
+      normalized === '21h15'
+
+    if (isMatch) {
       detectiveAudio.playStampSound()
       setErrorMsg('')
-      setStorageItem('followup_vu', '21:15')
+      const finalVuAnswer = vuCheckpoint?.correctAnswer || '21:15'
+      setStorageItem('followup_vu', finalVuAnswer)
       if (onSuccess) {
-        onSuccess('vu', '21:15')
+        onSuccess('vu', finalVuAnswer)
       }
       onClose()
     } else {
@@ -310,6 +352,78 @@ export function FollowupQuestionModal({
     onClose()
   }
 
+  const handleSubmitCustom = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!culprit) return
+
+    if (!customCheckpoint) {
+      detectiveAudio.playStampSound()
+      setStorageItem(`followup_${culprit}`, 'solved')
+      if (onSuccess) {
+        onSuccess(culprit, 'solved')
+      }
+      onClose()
+      return
+    }
+
+    if (customCheckpoint?.options && customCheckpoint.options.length > 0) {
+      if (!customSelectedOption) {
+        setErrorMsg('Vui lòng tích chọn một phương án!')
+        detectiveAudio.playGlassSound()
+        return
+      }
+
+      const expected = (customCheckpoint.correctAnswer || '').trim().toLowerCase()
+      const isBypass = isAdminBypassCode(customSelectedOption)
+      const isCorrect =
+        !expected ||
+        isBypass ||
+        customSelectedOption.toLowerCase().includes(expected)
+
+      if (isCorrect) {
+        detectiveAudio.playStampSound()
+        setErrorMsg('')
+        setStorageItem(`followup_${culprit}`, customSelectedOption)
+        if (onSuccess) {
+          onSuccess(culprit, customSelectedOption)
+        }
+        onClose()
+      } else {
+        detectiveAudio.playGlassSound()
+        setErrorMsg('⚠️ Đáp án chưa chính xác. Vui lòng rà soát lại các manh mối!')
+      }
+      return
+    }
+
+    // Text input
+    const rawVal = customTextInput.trim()
+    if (!rawVal) {
+      setErrorMsg('Vui lòng nhập câu trả lời!')
+      detectiveAudio.playGlassSound()
+      return
+    }
+
+    const expected = (customCheckpoint?.correctAnswer || '').trim().toLowerCase()
+    const isBypass = isAdminBypassCode(rawVal)
+    const isCorrect =
+      !expected ||
+      isBypass ||
+      rawVal.toLowerCase().replace(/\s+/g, '') === expected.replace(/\s+/g, '')
+
+    if (isCorrect) {
+      detectiveAudio.playStampSound()
+      setErrorMsg('')
+      setStorageItem(`followup_${culprit}`, rawVal)
+      if (onSuccess) {
+        onSuccess(culprit, rawVal)
+      }
+      onClose()
+    } else {
+      detectiveAudio.playGlassSound()
+      setErrorMsg('⚠️ Đáp án chưa chính xác. Vui lòng kiểm tra lại tài liệu điều tra!')
+    }
+  }
+
   const handleSubmitHa = (e: React.FormEvent) => {
     e.preventDefault()
     const rawVal = haPasswordInput.trim().toLowerCase().replace(/\s+/g, '')
@@ -325,13 +439,12 @@ export function FollowupQuestionModal({
       .toLowerCase()
       .replace(/\s+/g, '')
 
-    const isMasterBypass = rawVal === '000' || rawVal === '0000' || rawVal === 'admin'
+    const isMasterBypass = isAdminBypassCode(rawVal)
     const isCorrect =
       isMasterBypass ||
       rawVal === expectedFromSheet ||
       rawVal === '120713' ||
-      rawVal === '18100909' ||
-      (expectedFromSheet.includes(rawVal) && rawVal.length >= 6)
+      (expectedFromSheet.length >= 6 && expectedFromSheet.includes(rawVal))
 
     if (isCorrect) {
       detectiveAudio.playStampSound()
@@ -355,7 +468,23 @@ export function FollowupQuestionModal({
     onClose()
   }
 
-  const questionTextTung = 'Toàn bộ hành tung của Nguyễn Thanh Tùng trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?'
+  const questionTextTung =
+    tungCheckpoint?.question ||
+    'Toàn bộ hành tung của Nguyễn Thanh Tùng trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?'
+
+  const optionsTung = useMemo(() => {
+    if (tungCheckpoint?.options && tungCheckpoint.options.length > 0) {
+      return tungCheckpoint.options.map((opt, idx) => ({
+        id: opt.toLowerCase().includes('không')
+          ? 'khong_tin'
+          : opt.toLowerCase().includes('có')
+          ? 'tin'
+          : `opt_${idx}`,
+        label: opt,
+      }))
+    }
+    return DEFAULT_OPTIONS_TUNG
+  }, [tungCheckpoint])
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return
@@ -386,7 +515,9 @@ export function FollowupQuestionModal({
                     ? (haCheckpoint?.title || 'HỒ SƠ MỞ RỘNG // HỘP THIẾC ĐÁNG NGỜ')
                     : isVu
                     ? 'CÂU HỎI ĐIỀU TRA'
-                    : 'HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN'}
+                    : isTung
+                    ? 'HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN'
+                    : (customCheckpoint?.title || 'HỒ SƠ MỞ RỘNG // CÂU HỎI SUY LUẬN')}
                 </h3>
                 {isVu && (
                   <span className="font-mono text-xs font-bold text-[#8c1d1d] block mt-0.5">
@@ -403,6 +534,11 @@ export function FollowupQuestionModal({
                     Đối tượng: Trần Thị Hà
                   </span>
                 )}
+                {isCustom && (
+                  <span className="font-mono text-xs font-bold text-[#8c1d1d] block mt-0.5">
+                    Đối tượng: {customCheckpoint?.suspectLabel || customCharacterName || culprit}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -416,7 +552,9 @@ export function FollowupQuestionModal({
                     ? 'cp-000-1a-followup'
                     : isTung
                       ? 'cp-000-1b'
-                      : 'cp-000-1c-followup'
+                      : isHa
+                        ? 'cp-000-1c-followup'
+                        : (customCheckpoint?.id || `cp-${culprit}-followup`)
                   emitInvestigationEvent('OPEN_HINT', { checkpointId: cpId })
                 }}
                 className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
@@ -575,7 +713,7 @@ export function FollowupQuestionModal({
                 </button>
               </div>
             </form>
-          ) : (
+          ) : isTung ? (
             /* FORM FOR TUNG */
             <form onSubmit={handleSubmitTung} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
               {errorMsg && (
@@ -608,7 +746,7 @@ export function FollowupQuestionModal({
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {MOCK_OPTIONS_TUNG.map((opt) => {
+                  {optionsTung.map((opt) => {
                     const isSelected = selectedOption === opt.id
                     return (
                       <button
@@ -654,6 +792,109 @@ export function FollowupQuestionModal({
                 <button
                   type="submit"
                   className="px-6 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all flex items-center gap-2 border-2 border-[#2b1f14] shadow-md cursor-pointer"
+                >
+                  <span>CẬP NHẬT KẾT LUẬN</span>
+                  <ArrowRight className="size-3.5" />
+                </button>
+              </div>
+            </form>
+          ) : (
+            /* FORM FOR DYNAMIC CUSTOM SUSPECT */
+            <form onSubmit={handleSubmitCustom} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5]">
+              {errorMsg && (
+                <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
+                  ⚠️ {errorMsg}
+                </div>
+              )}
+
+              {/* TÚI HỒ SƠ */}
+              <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
+                  📂 {customCheckpoint?.dossier || 'TÀI LIỆU ĐIỀU TRA MỞ RỘNG'}
+                </span>
+              </div>
+
+              {/* QUESTION BOX */}
+              <div className="p-4 bg-[#f4ebd9] border-2 border-[#a88c6f] rounded-none">
+                <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
+                  YÊU CẦU ĐIỀU TRA:
+                </span>
+                <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed whitespace-pre-line">
+                  {customCheckpoint?.question ||
+                    'Hồ sơ tình nghi của đối tượng đã được tiếp nhận. Hãy hoàn tất điều tra đối tượng này.'}
+                </p>
+              </div>
+
+              {/* OPTIONS HOẶC TEXT INPUT */}
+              {customCheckpoint?.options && customCheckpoint.options.length > 0 ? (
+                <div className="space-y-3">
+                  <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
+                    LỰA CHỌN KẾT LUẬN CỦA ĐIỀU TRA VIÊN:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {customCheckpoint.options.map((opt, idx) => {
+                      const isSelected = customSelectedOption === opt
+                      return (
+                        <button
+                          key={`custom-opt-${idx}`}
+                          type="button"
+                          onClick={() => {
+                            detectiveAudio.playTypewriterClick()
+                            setCustomSelectedOption(opt)
+                            setErrorMsg('')
+                          }}
+                          className={cn(
+                            'p-4 text-left border-2 transition-all cursor-pointer select-none rounded-none relative flex items-center justify-between',
+                            isSelected
+                              ? 'bg-[#e7f0dc] border-[#2e5220] shadow-sm text-[#193310]'
+                              : 'bg-[#fdfcf9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
+                          )}
+                        >
+                          <span className="font-mono text-xs sm:text-sm font-bold">
+                            {opt}
+                          </span>
+                          {isSelected && (
+                            <Check className="size-4 text-[#2e5220] stroke-[2.5]" />
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2 pt-1">
+                  <label className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
+                    Nhập câu trả lời / mã số suy luận:
+                  </label>
+                  <input
+                    type="text"
+                    value={customTextInput}
+                    onChange={(e) => {
+                      setCustomTextInput(e.target.value)
+                      setErrorMsg('')
+                    }}
+                    placeholder="Nhập đáp án hoặc kết luận..."
+                    className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
+                  />
+                </div>
+              )}
+
+              {/* FOOTER */}
+              <div className="pt-2 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    detectiveAudio.playPaperRustle()
+                    onClose()
+                  }}
+                  className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
+                >
+                  ĐÓNG
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono font-bold text-xs uppercase tracking-wider rounded-none transition-all flex items-center gap-2 border-2 border-[#2b1f14] shadow-md cursor-pointer active:scale-95"
                 >
                   <span>CẬP NHẬT KẾT LUẬN</span>
                   <ArrowRight className="size-3.5" />

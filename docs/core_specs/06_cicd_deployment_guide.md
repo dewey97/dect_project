@@ -10,28 +10,41 @@ Dự án `dect_project` sử dụng luồng CI/CD hiện đại tách biệt ho�
 
 ```
 [ Developer Local ]
-       │  git push origin main
+       │  git push origin main / PR
        ▼
 [ GitHub Repository (dewey97/dect_project) ]
        │  Trigger Workflow (.github/workflows/deploy.yml)
+       │  (Concurrency Group: Auto-cancel PR runs cũ)
        ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 🐳 Job 1: GitHub Actions Cloud Runner                       │
+│ 🔍 Job 1: Pre-Flight Check (TypeScript & Lint Gate)         │
+│ - Tải mã nguồn & kích hoạt Node.js 22                       │
+│ - Cài đặt dependencies (npm ci --legacy-peer-deps + cache)  │
+│ - Chạy kiểm thử: `npm run lint` (`tsc --noEmit`)            │
+│ ➔ Bắt sạch 100% lỗi type trước khi tốn phút build Docker    │
+└─────────────────────────────────────────────────────────────┘
+       │  Pass Pre-Flight & (Event == push main | dispatch)
+       ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 🐳 Job 2: GitHub Actions Cloud Runner                       │
 │ - Tải mã nguồn & kích hoạt Docker Buildx                    │
 │ - Tận dụng GitHub Actions Cache (gha) siêu tốc              │
 │ - Biên dịch Next.js 16 Production & đóng gói Standalone     │
 │ - Đẩy Image lên GitHub Container Registry (GHCR):           │
 │   🏷️ ghcr.io/dewey97/dect_project:latest                    │
+│   🏷️ ghcr.io/dewey97/dect_project:sha-<commit_sha>          │
 └─────────────────────────────────────────────────────────────┘
-       │  Build Success -> Trigger Job 2
+       │  Build & Push Success -> Trigger Job 3
        ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ 🚀 Job 2: SSH Deployer to VPS                               │
+│ 🚀 Job 3: Safe Deploy, Healthcheck & Auto-Rollback to VPS   │
 │ - Kết nối SSH an toàn qua `appleboy/ssh-action`             │
 │ - Mục tiêu: VPS IP `72.62.199.110` (/var/www/dect_project)  │
-│ - Kéo Image mới: `docker pull ghcr.io/...:latest` (~5s)     │
-│ - Khởi chạy lại Container: `docker compose up -d`           │
-│ - Dọn dẹp layer cũ: `docker image prune -f`                 │
+│ - Backup tag: `docker tag :latest :previous` phòng rủi ro   │
+│ - Kéo Image mới & khởi chạy: `docker compose up -d`         │
+│ - 🩺 Probing Healthcheck: Polling HTTP 200 trong 45s        │
+│   ├─ NẾU LỖI: Tự động khôi phục image :previous & báo đỏ   │
+│   └─ NẾU OK: Giữ nguyên & dọn dẹp layer dangling cũ         │
 └─────────────────────────────────────────────────────────────┘
        │
        ▼
@@ -67,9 +80,13 @@ Hệ thống CI/CD yêu cầu 3 biến bảo mật được khai báo tại **Gi
 ## 📂 4. Cấu Trúc Các Tệp Tin Cấu Hình
 
 ### 4.1. GitHub Actions Workflow (`.github/workflows/deploy.yml`)
-- **Tự động kích hoạt**: Khi có commit mới đẩy lên nhánh `main` hoặc kích hoạt thủ công qua nút *Run workflow*.
+- **Tự động kích hoạt**: Khi có commit mới đẩy lên nhánh `main`, tạo PR vào `main`, hoặc kích hoạt thủ công (*Run workflow*).
+- **Concurrency Management**: Tự động hủy (`cancel-in-progress`) các lần chạy cũ trên PR khi có commit mới nhằm tiết kiệm tài nguyên.
+- **3 Giai đoạn thực thi (3-Stage Execution)**:
+  1. `preflight`: Kiểm tra cú pháp và kiểu dữ liệu TypeScript (`npm run lint` / `tsc --noEmit`). Chặn đứng lỗi trước khi chuyển sang build Docker.
+  2. `build-and-push`: Biên dịch và đóng gói Docker image với Buildx, đẩy lên GHCR (`:latest` và `:sha-<commit>`) có cache `gha`. (Chỉ chạy trên nhánh `main`).
+  3. `deploy-to-vps`: SSH vào VPS, backup tag `:previous`, kéo image mới, khởi chạy lại, thăm dò Health Check (`curl`/`wget` mỗi 3s trong 45s). Nếu lỗi, tự động rollback về `:previous` và thoát mã lỗi 1; nếu thành công, dọn dẹp layer dangling.
 - **Quyền hạn**: `packages: write` cho phép đẩy image trực tiếp lên GHCR mà không cần cấu hình thêm token bên ngoài.
-- **Docker Layer Caching**: Sử dụng `cache-from: type=gha` và `cache-to: type=gha,mode=max`.
 
 ### 4.2. Dockerfile Đa Tầng (`Dockerfile`)
 - **Base Image**: `node:22-alpine` (Đồng bộ phiên bản Node.js hiện đại).

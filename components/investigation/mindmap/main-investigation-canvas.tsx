@@ -19,10 +19,7 @@ import { setStorageItem, getStorageItem } from "@/lib/storage";
 import { useInvestigationEvent } from "@/lib/investigation-events";
 
 import { useBoardLayout } from "./canvas/use-board-layout";
-import {
-  useInvestigationState,
-  ALL_CASE_000_SUSPECTS,
-} from "./canvas/use-investigation-state";
+import { useInvestigationState, type SuspectItem } from "./canvas/use-investigation-state";
 import {
   buildCustomPins,
   buildCustomConnections,
@@ -38,12 +35,14 @@ interface MainInvestigationCanvasProps {
   onOpenPhoneSimulator?: () => void;
   onOpenReinvestigation?: () => void;
   onOpenEpilogue?: () => void;
+  customBgImage?: string;
 }
 
 export function MainInvestigationCanvas({
   onOpenPhoneSimulator,
   onOpenReinvestigation,
   onOpenEpilogue,
+  customBgImage,
 }: MainInvestigationCanvasProps) {
   const layout = useBoardLayout();
   const state = useInvestigationState({
@@ -221,6 +220,9 @@ export function MainInvestigationCanvas({
         // Direct code mapping
         if (rawCode) {
           map[rawCode] = normUrl;
+          if (rawCode.startsWith("avatar_")) {
+            map[rawCode.replace("avatar_", "")] = normUrl;
+          }
         }
       });
     }
@@ -235,10 +237,98 @@ export function MainInvestigationCanvas({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const effectiveSuspects =
-    layout.isAdmin && state.isShowAllPinsPreview
-      ? ALL_CASE_000_SUSPECTS
-      : state.suspects;
+  const parseSuspectFlag = useCallback((item: any): boolean => {
+    if (!item) return false;
+    const suspectVal = String(
+      item.is_suspect ||
+      item["is suspect"] ||
+      item.suspect ||
+      item.nghi_pham ||
+      item["nghi pham"] ||
+      "",
+    ).toUpperCase().trim();
+    const cat = String(item.category || "").toUpperCase().trim();
+    return (
+      suspectVal === "TRUE" ||
+      suspectVal === "1" ||
+      suspectVal === "YES" ||
+      cat === "SUSPECT"
+    );
+  }, []);
+
+  const parsePinOnBoardFlag = useCallback((item: any): boolean => {
+    if (!item) return false;
+    const pinVal = String(
+      item.pin_on_board ||
+      item["pin on board"] ||
+      item.pin ||
+      item.ghim ||
+      item.ghim_len_bang ||
+      item["ghim len bang"] ||
+      "",
+    ).toUpperCase().trim();
+    return pinVal === "TRUE" || pinVal === "1" || pinVal === "YES";
+  }, []);
+
+  const effectiveSuspects = useMemo(() => {
+    const list: SuspectItem[] = [];
+    const seen = new Set<string>();
+
+    const hasExplicitSuspectOnSheet =
+      Array.isArray(sheetEvidences) &&
+      sheetEvidences.some(parseSuspectFlag);
+
+    if (Array.isArray(sheetEvidences) && sheetEvidences.length > 0) {
+      sheetEvidences.forEach((item: any) => {
+        const isPinned = parsePinOnBoardFlag(item);
+        const isExplicit = parseSuspectFlag(item);
+        const code = String(item.code || item.photo_code || "").toLowerCase().trim();
+
+        // Nếu trên Sheet có đánh dấu tường minh is_suspect: TRUE hoặc category: SUSPECT thì ưu tiên 100%
+        // Nếu Sheet chưa cấu hình cột is_suspect (tất cả đều trống), giữ fallback cho 3 nhân vật kinh điển của Case #000
+        const isSuspect = hasExplicitSuspectOnSheet
+          ? isExplicit
+          : isExplicit || (isPinned && (code === "avatar_vu" || code === "avatar_tung" || code === "avatar_ha"));
+
+        if (!isSuspect || code === "avatar_khang" || code === "khang") return;
+
+        const charId = code.replace(/^avatar_/, "");
+        const label = String(item.label || item.title || "").trim();
+        const cleanName =
+          label
+            .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i, "")
+            .replace(/\s*\([^)]*\)/g, "")
+            .trim() || charId;
+
+        // Bảo lưu tiến trình điều tra manh mối từ local state nếu có
+        const saved = state.suspects.find(
+          (s) =>
+            s.id === charId ||
+            s.id === `suspect-${charId}` ||
+            s.name.toLowerCase() === cleanName.toLowerCase(),
+        );
+
+        if (!seen.has(charId)) {
+          seen.add(charId);
+          list.push({
+            id: `suspect-${charId}`,
+            name: cleanName,
+            clueIds: saved?.clueIds || [],
+            motiveClueIds: saved?.motiveClueIds,
+            alibiClueIds: saved?.alibiClueIds,
+          });
+        }
+      });
+    }
+
+    // Nếu đã nạp từ Sheet thì ưu tiên 100% Sheet
+    if (list.length > 0) {
+      return list;
+    }
+
+    // Fallback tạm thời nếu Sheet đang load và local state đã có sẵn
+    return state.suspects;
+  }, [state.suspects, sheetEvidences]);
 
   const vuSuspect = effectiveSuspects.find(
     (s) => getCanonicalSuspectKey(s).canonicalId === "vu",
@@ -257,16 +347,47 @@ export function MainInvestigationCanvas({
   const hasHaFollowup =
     state.isShowAllPinsPreview || state.investigatedSuspects.includes("ha");
 
+  // Tập hợp toàn bộ culprit IDs có câu hỏi mở rộng
+  const followupCulpritIds = useMemo(() => {
+    if (state.isShowAllPinsPreview) {
+      return effectiveSuspects.map(
+        (s) => getCanonicalSuspectKey(s).canonicalId,
+      );
+    }
+    return state.investigatedSuspects.map((c) => String(c));
+  }, [state.isShowAllPinsPreview, effectiveSuspects, state.investigatedSuspects]);
+
   const isReinvestigateBlinking =
     state.effectiveReinvestigateUnlocked && !state.hasOpenedReinvestigation;
 
   const sheetPinnedItems = useMemo(() => {
     if (!Array.isArray(sheetEvidences)) return [];
+    const suspectIdSet = new Set(
+      effectiveSuspects.map((s) =>
+        getCanonicalSuspectKey(s).canonicalId.toLowerCase(),
+      ),
+    );
+
     return sheetEvidences.filter((item: any) => {
-      const pinVal = String(item.pin_on_board || "").toUpperCase().trim();
-      return pinVal === "TRUE" || pinVal === "1" || pinVal === "YES";
+      const isPinned = parsePinOnBoardFlag(item);
+      if (!isPinned) return false;
+
+      const code = String(item.code || item.photo_code || "").toLowerCase().trim();
+      const charId = code.replace(/^avatar_/, "");
+
+      // NẾU ĐÃ LÀ NGHI PHẠM trong effectiveSuspects THÌ LOẠI TRỪ NGAY LẬP TỨC
+      // (Bởi vì nghi phạm đã được sinh ghim node-suspect-* với chỉ đỏ nối từ note 'Nghi phạm')
+      if (suspectIdSet.has(charId) || suspectIdSet.has(code)) {
+        return false;
+      }
+
+      if (parseSuspectFlag(item)) {
+        return false;
+      }
+
+      return true;
     });
-  }, [sheetEvidences]);
+  }, [sheetEvidences, effectiveSuspects, parsePinOnBoardFlag, parseSuspectFlag]);
 
   const basePins = useMemo(
     () =>
@@ -275,6 +396,7 @@ export function MainInvestigationCanvas({
         effectiveSuspects,
         sheetPhotoMap,
         sheetPinnedItems,
+        followupCulpritIds,
         hasVuFollowup,
         hasTungFollowup,
         hasHaFollowup,
@@ -288,6 +410,7 @@ export function MainInvestigationCanvas({
       effectiveSuspects,
       sheetPhotoMap,
       sheetPinnedItems,
+      followupCulpritIds,
       hasVuFollowup,
       hasTungFollowup,
       hasHaFollowup,
@@ -321,6 +444,7 @@ export function MainInvestigationCanvas({
     () =>
       buildCustomConnections({
         effectiveSuspects,
+        followupCulpritIds,
         hasVuFollowup,
         hasTungFollowup,
         hasHaFollowup,
@@ -331,6 +455,7 @@ export function MainInvestigationCanvas({
       }),
     [
       effectiveSuspects,
+      followupCulpritIds,
       hasVuFollowup,
       hasTungFollowup,
       hasHaFollowup,
@@ -397,7 +522,7 @@ export function MainInvestigationCanvas({
         return;
       }
 
-      if (id === "c0-pin-suspects" || id === "c0-pin-question") {
+      if (id === "c0-pin-suspects") {
         // Node note 'Nghi phạm' giữ làm điểm neo nối dây chỉ đỏ nghiệp vụ, không bật modal nhập tên nữa
         detectiveAudio.playPaperRustle();
       } else if (id === "c0-pin-evidence") {
@@ -415,10 +540,7 @@ export function MainInvestigationCanvas({
         else state.setIsPhoneLookupOpen(true);
       } else if (
         id.startsWith("node-suspect-") ||
-        id.startsWith("suspect-") ||
-        (Boolean(pin?.isAvatar) &&
-          !id.includes("khang") &&
-          !label.includes("khang"))
+        id.startsWith("suspect-")
       ) {
         // Thẻ chân dung nghi phạm/nhân vật trên bảng: Mở thẳng modal Thẩm tra Căn cứ tình nghi (Động cơ & Ngoại phạm)
         const charName = (pin?.label || "")
@@ -564,6 +686,7 @@ export function MainInvestigationCanvas({
         controlledCaseId="case-000"
         customPins={displayPins}
         customConnections={customConnections}
+        customBgImage={customBgImage}
         selectedPinId={layout.selectedPinId}
         onSelectPin={layout.setSelectedPinId}
         onConnectPins={layout.handleConnectPins}

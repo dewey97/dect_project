@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Gavel, AlertTriangle, Lightbulb } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
-import { emitInvestigationEvent } from '@/lib/investigation-events'
-import { PHONE_LOOKUP_EVIDENCE_IDS } from '@/lib/cases/case-000-clues'
 import { setStorageItem } from '@/lib/storage'
+import { emitInvestigationEvent } from '@/lib/investigation-events'
+import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 interface IndictmentModalProps {
   isOpen: boolean
@@ -21,7 +21,7 @@ interface IndictmentModalProps {
   }) => void
   isPhoneSolved?: boolean
 }
-const MOTIVE_OPTIONS = [
+const DEFAULT_MOTIVE_OPTIONS = [
   { id: 'motive-1', label: 'Mâu thuẫn tài chính (ra tay do lợi ích kinh tế)' },
   { id: 'motive-2', label: 'Báo thù (ra tay do một mâu thuẫn từ quá khứ)' },
   { id: 'motive-3', label: 'Mâu thuẫn tình cảm (thuần túy do cảm xúc)' },
@@ -86,6 +86,21 @@ export function IndictmentModal({
   onSubmitIndictment,
   isPhoneSolved
 }: IndictmentModalProps) {
+  const { checkpoints } = useCaseCheckpoints('case-000')
+  const indictmentCp = checkpoints.find(
+    (c) => c.id === 'cp-000-2b' || c.id === 'cp-000-indictment'
+  )
+
+  const motiveOptions = React.useMemo(() => {
+    if (indictmentCp?.options && indictmentCp.options.length > 0) {
+      return indictmentCp.options.map((opt, idx) => ({
+        id: `motive-${idx + 1}`,
+        label: opt,
+      }))
+    }
+    return DEFAULT_MOTIVE_OPTIONS
+  }, [indictmentCp])
+
   const [suspectName, setSuspectName] = useState('')
   const [selectedMotiveOption, setSelectedMotiveOption] = useState<string>('')
   const [cluesEvidenceInput, setCluesEvidenceInput] = useState('')
@@ -105,12 +120,24 @@ export function IndictmentModal({
       isAdminBypassCode(suspectName) ||
       isAdminBypassCode(cluesEvidenceInput)
 
-    const culprit = isAdmin000 ? 'ha' : isCulpritValid(suspectName)
-    if (!culprit || (culprit !== 'ha' && !isAdmin000)) {
-      setErrorMsg('Kết luận chưa chính xác. Vui lòng đối chiếu lại toàn bộ chứng cứ.')
+    const validSuspectsFromSheet = indictmentCp?.pickerConfig?.validSuspects
+    const targetSuspects = (validSuspectsFromSheet && validSuspectsFromSheet.length > 0)
+      ? validSuspectsFromSheet
+      : ['Trần Thị Hà', 'ha']
+
+    const isSuspectMatch = isAdmin000 || targetSuspects.some((ts) => {
+      const cleanTs = normalizeName(ts)
+      const cleanInput = normalizeName(suspectName)
+      return cleanInput.includes(cleanTs) || cleanTs.includes(cleanInput)
+    })
+
+    if (!isSuspectMatch) {
+      setErrorMsg('Kết luận đối tượng chưa chính xác. Vui lòng đối chiếu lại toàn bộ chứng cứ.')
       detectiveAudio.playGlassSound()
       return
     }
+
+    const culprit = (isAdmin000 ? 'ha' : isCulpritValid(suspectName)) || 'ha'
 
     if (!selectedMotiveOption && !isAdmin000) {
       setErrorMsg('Vui lòng chọn Động cơ gây án chính của bị can!')
@@ -118,15 +145,36 @@ export function IndictmentModal({
       return
     }
 
+    const selectedOptionLabel = motiveOptions.find((m) => m.id === selectedMotiveOption)?.label || ''
+
+    const validMotivesFromSheet = indictmentCp?.pickerConfig?.validMotives
+    if (validMotivesFromSheet && validMotivesFromSheet.length > 0 && !isAdmin000) {
+      const isMotiveMatch = validMotivesFromSheet.some((vm) => {
+        const cleanVm = normalizeName(vm)
+        const cleanOpt = normalizeName(selectedOptionLabel)
+        return cleanOpt.includes(cleanVm) || selectedMotiveOption.toLowerCase() === vm.toLowerCase()
+      })
+      if (!isMotiveMatch) {
+        setErrorMsg('Động cơ gây án chưa chính xác. Vui lòng xem xét lại bản chất mâu thuẫn!')
+        detectiveAudio.playGlassSound()
+        return
+      }
+    }
+
     // Validation mục 2 (chứng minh dấu vết vụ án):
-    // Chấp nhận mã số 53 (tài liệu dấu vết cũ) hoặc các mã vật chứng C-02, D-04, D-05, D-02 (hoa xoan, lọn tóc, kéo, hộp sắt)
+    // Ưu tiên đọc từ Live CMS (pickerConfig.requiredEvidenceIds), fallback mã chứng cứ vụ án
     if (!isAdmin000) {
       if (!cluesEvidenceInput.trim()) {
         setErrorMsg('Vui lòng nhập Mã chứng cứ chứng minh dấu vết phạm tội!')
         detectiveAudio.playGlassSound()
         return
       }
-      const validEvidenceCodes = ['53', 'c-02', 'c02', 'c2', 'd-06', 'd06', 'd6', 'd-04', 'd04', 'd4', 'd-05', 'd05', 'd5', 'd-02', 'd02', 'd2']
+      const fallbackEvidenceCodes = ['53', 'c-02', 'c02', 'c2', 'd-06', 'd06', 'd6', 'd-04', 'd04', 'd4', 'd-05', 'd05', 'd5', 'd-02', 'd02', 'd2']
+      const sheetRequiredCodes = indictmentCp?.pickerConfig?.requiredEvidenceIds
+      const validEvidenceCodes = sheetRequiredCodes && sheetRequiredCodes.length > 0
+        ? [...sheetRequiredCodes, ...fallbackEvidenceCodes]
+        : fallbackEvidenceCodes
+
       if (!checkIndictmentEvidenceMatch(cluesEvidenceInput, validEvidenceCodes)) {
         setErrorMsg('Mã chứng cứ mục 2 chưa chính xác!')
         detectiveAudio.playGlassSound()
@@ -139,9 +187,7 @@ export function IndictmentModal({
 
     detectiveAudio.playStampSound()
     setStorageItem('indictment_solved', 'true')
-    setStorageItem('indictment_culprit', 'ha')
-
-    const selectedOptionLabel = MOTIVE_OPTIONS.find((m) => m.id === selectedMotiveOption)?.label || ''
+    setStorageItem('indictment_culprit', culprit)
 
     onSubmitIndictment({
       culprit,
@@ -263,7 +309,7 @@ export function IndictmentModal({
                     • Động cơ gây án chính: <span className="text-red-700">*</span>
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {MOTIVE_OPTIONS.map((opt) => {
+                    {motiveOptions.map((opt) => {
                       const isSelected = selectedMotiveOption === opt.id
                       return (
                         <button

@@ -9,11 +9,11 @@ import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 interface CulpritEpilogueModalProps {
   isOpen: boolean
-  culprit: 'vu' | 'tung' | 'ha' | null
+  culprit: 'vu' | 'tung' | 'ha' | string | null
   choice?: string | null
   onClose: () => void
   onOpenDossier?: (dossierType: 'A' | 'B' | 'C') => void
-  onOpenFollowupQuestion?: (targetCulprit?: 'vu' | 'tung' | 'ha') => void
+  onOpenFollowupQuestion?: (targetCulprit?: 'vu' | 'tung' | 'ha' | string) => void
   onOpenIndictment?: () => void
 }
 
@@ -51,7 +51,13 @@ export function CulpritEpilogueModal({
   const isHaBoxSolved = isHa && (choice === 'solved_box' || choice === 'solved' || choice === 'matched_3_tiles' || choice === 'matched_3_tiles_indictment')
   const isQuestionSolved = (choice === '21:15' || choice === 'question_solved' || choice === 'tin' || choice === 'khong_tin') && !isHaBoxSolved
   const showTwoChoiceButtons = (isVu || isTung) && isQuestionSolved && !internalChoice
-  const suspectName = isVu ? 'Lê Quang Vũ' : isTung ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà'
+  const suspectName = isVu
+    ? 'Lê Quang Vũ'
+    : isTung
+    ? 'Nguyễn Thanh Tùng'
+    : isHa
+    ? 'Trần Thị Hà'
+    : (culprit || 'Nghi phạm')
 
   const getCheckpointMonologue = (cpId: string) => {
     const cp = checkpoints.find((c) => c.id === cpId);
@@ -64,7 +70,9 @@ export function CulpritEpilogueModal({
     ? 'THÔNG BÁO ĐIỀU TRA — NGUYỄN THANH TÙNG'
     : isHaBoxSolved
     ? 'BẢN KẾT LUẬN ĐIỀU TRA — KẾT ÁN THỦ PHẠM TRẦN THỊ HÀ'
-    : 'THÔNG BÁO ĐIỀU TRA — TRẦN THỊ HÀ'
+    : isHa
+    ? 'THÔNG BÁO ĐIỀU TRA — TRẦN THỊ HÀ'
+    : `THÔNG BÁO ĐIỀU TRA — ${String(culprit).toUpperCase()}`
 
   let storyText = ''
 
@@ -85,9 +93,9 @@ export function CulpritEpilogueModal({
       storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`
     }
   } else {
-    const suspectCpId = isVu ? 'cp-000-1a' : isTung ? 'cp-000-1b' : 'cp-000-1c'
-    const epilogueCpId = isVu ? 'cp-epilogue-mai-vu' : isTung ? 'cp-epilogue-tung' : 'cp-epilogue-ha'
-    storyText = getCheckpointMonologue(suspectCpId) || getCheckpointMonologue(epilogueCpId)
+    const suspectCpId = isVu ? 'cp-000-1a' : isTung ? 'cp-000-1b' : isHa ? 'cp-000-1c' : `cp-${culprit}`
+    const epilogueCpId = isVu ? 'cp-epilogue-mai-vu' : isTung ? 'cp-epilogue-tung' : isHa ? 'cp-epilogue-ha' : `cp-epilogue-${culprit}`
+    storyText = getCheckpointMonologue(suspectCpId) || getCheckpointMonologue(epilogueCpId) || `Hồ sơ điều tra của đối tượng ${suspectName} đã được ghi nhận vào hệ thống.`
   }
 
   let ctaButtonText = 'TIẾP TỤC ĐIỀU TRA'

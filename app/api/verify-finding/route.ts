@@ -1,19 +1,35 @@
 import { NextResponse } from 'next/server'
 import { CASE_000_MASTER_STORYLINE } from '@/lib/ai/storyline-context'
+import { getClientIp, checkRateLimit } from '@/lib/security/rate-limiter'
+import { defensiveErrorResponse, rateLimitResponse, dynamicSuccessResponse } from '@/lib/security/defensive-cache'
 
 export async function POST(req: Request) {
   try {
+    // 1. Kiểm tra giới hạn tần suất gửi yêu cầu suy luận (tối đa 15 lần / phút / IP)
+    const clientIp = getClientIp(req)
+    const rateCheck = checkRateLimit(`verify-finding:${clientIp}`, {
+      limit: 15,
+      windowMs: 60_000,
+    })
+
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(
+        rateCheck.retryAfterSeconds,
+        'Bạn đang suy luận quá nhanh! Vui lòng tạm dừng vài giây trước khi gửi phán đoán tiếp theo.'
+      )
+    }
+
     const { inputText, currentPhase, findings } = await req.json()
 
     if (!inputText || typeof inputText !== 'string') {
-      return NextResponse.json({ matched: false, error: 'Invalid input' }, { status: 400 })
+      return defensiveErrorResponse({ matched: false, error: 'Invalid input' }, 400)
     }
 
     const apiKey = process.env.GEMINI_API_KEY
 
     // If API Key is missing or placeholder, signal fallback to keyword matcher
     if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
-      return NextResponse.json({ matched: false, fallback: true })
+      return dynamicSuccessResponse({ matched: false, fallback: true })
     }
 
     const prompt = `
@@ -64,18 +80,18 @@ BẮT BUỘC trả về duy nhất 1 chuỗi JSON hợp lệ theo đúng cấu t
 
     if (!response.ok) {
       console.warn('Gemini API call failed, falling back to keyword matcher.')
-      return NextResponse.json({ matched: false, fallback: true })
+      return dynamicSuccessResponse({ matched: false, fallback: true })
     }
 
     const data = await response.json()
     const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text
 
     if (!textOutput) {
-      return NextResponse.json({ matched: false, fallback: true })
+      return dynamicSuccessResponse({ matched: false, fallback: true })
     }
 
     const result = JSON.parse(textOutput)
-    return NextResponse.json({
+    return dynamicSuccessResponse({
       matched: !!result.matched,
       title: result.title || '',
       description: result.description || '',
@@ -86,6 +102,6 @@ BẮT BUỘC trả về duy nhất 1 chuỗi JSON hợp lệ theo đúng cấu t
     })
   } catch (err) {
     console.error('Error in verify-finding API:', err)
-    return NextResponse.json({ matched: false, fallback: true })
+    return defensiveErrorResponse({ matched: false, fallback: true, error: 'Internal verification error' }, 500)
   }
 }

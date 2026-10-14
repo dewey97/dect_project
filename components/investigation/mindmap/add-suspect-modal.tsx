@@ -25,7 +25,7 @@ interface AddSuspectModalProps {
   editingSuspect?: SuspectItemData | null
   existingSuspects?: SuspectItemData[]
   onSelectSuspect?: (suspect: SuspectItemData | null) => void
-  onSubmitConclusion?: (culprit: 'vu' | 'tung' | 'ha') => void
+  onSubmitConclusion?: (culprit: 'vu' | 'tung' | 'ha' | string) => void
   isPhoneSolved?: boolean
 }
 
@@ -40,20 +40,12 @@ interface EvaluationModalState {
   selectedCount: number
 }
 
-
-
-export const PHONE_LOOKUP_EVIDENCE_IDS = [
-  'sms_dev00',
-  'doc_07b_loi_khai_vu',
-  'doc_14_loi_khai_tung',
-  'p6_anh_vu',
-  'p10_app_xe',
-  'p4_anh_1996',
-  'p4_van_tay',
-  'p5_manh_bao',
-]
-
-import { findValidCaseCharacter, VALID_CASE_CHARACTERS, type SuspectCharacter } from '@/lib/cases/case-000-suspects'
+import {
+  findValidCaseCharacter,
+  buildDynamicSuspectCharacters,
+  VALID_CASE_CHARACTERS,
+  type SuspectCharacter,
+} from '@/lib/cases/case-000-suspects'
 import { isEvidenceMatching, checkMotiveValid, checkAlibiValid } from '@/lib/cases/case-000-clues'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
@@ -98,44 +90,7 @@ export function AddSuspectModal({
 
   // Parse all avatar/character items from Google Sheet
   const sheetCharacters: SuspectCharacter[] = useMemo(() => {
-    if (!Array.isArray(sheetEvidences)) return []
-    const list: SuspectCharacter[] = []
-    sheetEvidences.forEach((item: any, idx: number) => {
-      const code = String(item.code || item.photo_code || '').trim()
-      const codeLower = code.toLowerCase()
-      const label = String(item.label || item.title || '').trim()
-      const category = String(item.category || '').toUpperCase().trim()
-      const isAvatar =
-        category === 'AVATAR' ||
-        category === 'SUSPECT' ||
-        category === 'WITNESS' ||
-        codeLower.startsWith('avatar_') ||
-        label.toLowerCase().includes('chân dung')
-
-      if (!isAvatar || !label) return
-      const cleanName = label
-        .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i, '')
-        .replace(/\s*\([^)]*\)/g, '')
-        .trim()
-      if (!cleanName) return
-
-      const charId = codeLower.replace(/^avatar_/, '') || `char-${idx}`
-      const aliases = [
-        cleanName.toLowerCase(),
-        charId,
-        ...(cleanName.includes(' ') ? [cleanName.split(' ').slice(-1)[0].toLowerCase()] : []),
-      ]
-
-      list.push({
-        id: charId,
-        canonicalName: cleanName,
-        aliases,
-        role: item.description || 'Đối tượng liên quan vụ án',
-        avatarUrl: item.drive_url || item.direct_cdn_url || item.url || '/images/avatar_placeholder.svg',
-        slotIndex: 3 + (idx % 5),
-      })
-    })
-    return list
+    return buildDynamicSuspectCharacters(sheetEvidences)
   }, [sheetEvidences])
 
   const matchedChar = useMemo(() => {
@@ -144,17 +99,26 @@ export function AddSuspectModal({
 
   const suspectCpId = useMemo(() => {
     const norm = (name || editingSuspect?.name || editingSuspect?.id || '').toLowerCase()
-    if (norm === 'vũ' || norm === 'vu' || norm === 'lê quang vũ') return 'cp-000-1a'
-    if (norm === 'tùng' || norm === 'tung' || norm === 'nguyễn thanh tùng') return 'cp-000-1b'
-    if (norm === 'hà' || norm === 'ha' || norm === 'trần thị hà') return 'cp-000-1c'
     if (matchedChar) {
       const foundCp = checkpoints.find((cp) => {
         const titleLower = (cp.title || '').toLowerCase()
         const questionLower = (cp.question || '').toLowerCase()
-        return titleLower.includes(matchedChar.id) || questionLower.includes(matchedChar.canonicalName.toLowerCase())
+        const suspectLabelLower = (cp.suspectLabel || '').toLowerCase()
+        const validSuspects = (cp.pickerConfig?.validSuspects || []).map((s) => s.toLowerCase())
+        return (
+          titleLower.includes(matchedChar.id) ||
+          titleLower.includes(matchedChar.canonicalName.toLowerCase()) ||
+          questionLower.includes(matchedChar.canonicalName.toLowerCase()) ||
+          suspectLabelLower.includes(matchedChar.canonicalName.toLowerCase()) ||
+          validSuspects.includes(matchedChar.canonicalName.toLowerCase()) ||
+          validSuspects.includes(matchedChar.id)
+        )
       })
       if (foundCp) return foundCp.id
     }
+    if (norm === 'vũ' || norm === 'vu' || norm === 'lê quang vũ') return 'cp-000-1a'
+    if (norm === 'tùng' || norm === 'tung' || norm === 'nguyễn thanh tùng') return 'cp-000-1b'
+    if (norm === 'hà' || norm === 'ha' || norm === 'trần thị hà') return 'cp-000-1c'
     return ''
   }, [name, editingSuspect, matchedChar, checkpoints])
 
@@ -220,10 +184,10 @@ export function AddSuspectModal({
   const handleConfirmMotiveClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name, sheetCharacters)
-    const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
-    const isValid = matched && isCore ? validateMotive(matched.id, motiveClueIds) : true
+    const hasMotiveReqs = (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0
+    const isValid = hasMotiveReqs ? validateMotive(matched?.id || '', motiveClueIds) : true
 
-    if (isCore && !isValid) {
+    if (hasMotiveReqs && !isValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
@@ -265,10 +229,10 @@ export function AddSuspectModal({
   const handleConfirmAlibiClues = () => {
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name, sheetCharacters)
-    const isCore = matched?.id === 'vu' || matched?.id === 'tung' || matched?.id === 'ha'
-    const isValid = matched && isCore ? validateAlibi(matched.id, alibiClueIds) : true
+    const hasAlibiReqs = (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0
+    const isValid = hasAlibiReqs ? validateAlibi(matched?.id || '', alibiClueIds) : true
 
-    if (isCore && !isValid) {
+    if (hasAlibiReqs && !isValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
@@ -315,7 +279,7 @@ export function AddSuspectModal({
       return
     }
 
-    const matchedChar = findValidCaseCharacter(currentName)
+    const matchedChar = findValidCaseCharacter(currentName, sheetCharacters)
     if (!matchedChar) {
       setErrorMsg('Họ và tên đối tượng không chính xác hoặc không có trong hồ sơ vụ án! Vui lòng kiểm tra lại tài liệu điều tra.')
       detectiveAudio.playGlassSound()
@@ -342,6 +306,9 @@ export function AddSuspectModal({
         motiveClueIds,
         alibiClueIds
       })
+      if (onSubmitConclusion) {
+        onSubmitConclusion(matchedChar.id)
+      }
       onClose()
       return
     }

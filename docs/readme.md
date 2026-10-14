@@ -20,6 +20,11 @@ Tài liệu về kiến trúc kỹ thuật, cơ sở dữ liệu, quy trình xu�
 | **08. License Technical Spec** | Đặc tả kỹ thuật mã hóa RSA JWT, keypair management và RLS policy cho License | [`core_specs/08_license_technical_spec.md`](core_specs/08_license_technical_spec.md) |
 | **09. Business, Financial & Founder Model** | Mô hình kinh doanh Boardgame / Online, bảng tính chi phí in ấn, điểm hòa vốn và thỏa thuận phân bổ 3 founder | [`core_specs/09_business_financial_model.md`](core_specs/09_business_financial_model.md) |
 | **10. Figma Design Workflow** | Quy trình kết nối Figma, cấu hình MCP, trích xuất asset @3x, interactive hotspots và thiết kế UI | [`core_specs/10_figma_design_workflow.md`](core_specs/10_figma_design_workflow.md) |
+| **11. Group Play Realtime Spec** | Đặc tả kiến trúc đồng bộ chơi nhóm qua Supabase Realtime, phòng 4 chữ cái và chống race condition | [`core_specs/11_group_play_realtime_spec.md`](core_specs/11_group_play_realtime_spec.md) |
+| **12. Group Play Plan** | Kế hoạch triển khai kỹ thuật chi tiết theo 4 giai đoạn, schema và kịch bản kiểm thử | [`core_specs/12_group_play_implementation_plan.md`](core_specs/12_group_play_implementation_plan.md) |
+| **13. Architecture Hardening & Roadmap** | Đúc kết tinh hoa hệ thống Lendi: CI/CD phòng thủ, tự động rollback, dọn đĩa VPS và rate limit | [`core_specs/13_architecture_hardening_and_roadmap.md`](core_specs/13_architecture_hardening_and_roadmap.md) |
+| **14. Multi-Case Engine & Hybrid CMS** | Chuẩn hóa kiến trúc đa vụ án, Figma Document Pipeline, chống leak kịch bản và 1-Click Sync Database | [`core_specs/14_multi_case_engine_and_cms_architecture.md`](core_specs/14_multi_case_engine_and_cms_architecture.md) |
+| **Nợ Kỹ Thuật (Tech Debt)** | Sổ cái quản lý nợ kỹ thuật 2 tầng, danh mục mock UI và mã số bất biến `#ID` | [`TECHDEBT.md`](TECHDEBT.md) |
 
 ---
 

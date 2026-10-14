@@ -20,6 +20,10 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
   - License Technical Spec: [`docs/core_specs/08_license_technical_spec.md`](docs/core_specs/08_license_technical_spec.md)
   - Business, Financial & Founder Model: [`docs/core_specs/09_business_financial_model.md`](docs/core_specs/09_business_financial_model.md)
   - Figma Design Workflow & Integration: [`docs/core_specs/10_figma_design_workflow.md`](docs/core_specs/10_figma_design_workflow.md)
+  - Group Play Realtime Architecture: [`docs/core_specs/11_group_play_realtime_spec.md`](docs/core_specs/11_group_play_realtime_spec.md)
+  - Group Play Implementation Plan: [`docs/core_specs/12_group_play_implementation_plan.md`](docs/core_specs/12_group_play_implementation_plan.md)
+  - Architecture Hardening & Roadmap: [`docs/core_specs/13_architecture_hardening_and_roadmap.md`](docs/core_specs/13_architecture_hardening_and_roadmap.md)
+  - Tech Debt Ledger: [`docs/TECHDEBT.md`](docs/TECHDEBT.md)
 - **🧠 Domain & Case Docs (Nghiệp vụ & Hồ sơ vụ án)**:
   - Bối cảnh & Cốt truyện Master Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)
   - Gameplay & Hành trình điều tra: [`docs/cases/case_000/01_design/gameplay_design.md`](docs/cases/case_000/01_design/gameplay_design.md)
@@ -145,7 +149,7 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
 5. **Đồng Bộ Dữ Liệu Thời Gian Thực & Cache (Consistent Live Fetch Policy)**:
    - Tránh tình trạng local fetch mới nhưng production trả về cache cũ: Các route API đọc dữ liệu động (Google Sheets CMS, Supabase live tables) phải luôn có `export const dynamic = 'force-dynamic'` hoặc gắn headers `cache: 'no-store'`.
 6. **Tiền Kiểm Tra Biên Dịch & Typecheck Bắt Buộc (Pre-Flight Verification Protocol)**:
-   - Trước khi thông báo hoàn tất bất kỳ tác vụ hoặc xin lệnh commit: Agent bắt buộc phải chạy `npm run lint` (`tsc --noEmit`) để bắt sạch lỗi kiểu dữ liệu TypeScript.
+   - **Tần suất & thời điểm**: Chỉ chạy `npm run lint` (`tsc --noEmit`) **1 lần duy nhất ở bước cuối cùng** trước khi thông báo hoàn tất tác vụ hoặc xin lệnh commit. Tuyệt đối **KHÔNG lạm dụng chạy liên tục** giữa các bước sửa mã nhỏ/đang debug dở để tránh làm chậm tiến độ và gây gián đoạn phiên làm việc.
    - Khi có thay đổi lớn liên quan đến cấu hình Next.js, routing, server actions hoặc build scripts: Phải chủ động kiểm tra hoặc khuyến nghị chạy `npm run build` cục bộ trước khi deploy.
 
 ---
@@ -159,6 +163,22 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
   - Toàn bộ font Google (`Inter`, `Roboto Mono`, `Caveat`, `Playpen Sans`, `Courier Prime`, `Special Elite`) **BẮT BUỘC** phải được nạp thông qua `@import url("https://fonts.googleapis.com/css2?...")` trực tiếp ở dòng đầu của `app/globals.css`.
   - Khai báo CSS variables (`--font-geist-sans`, `--font-geist-mono`, `--font-handwriting`) trực tiếp trong block `:root` và `@theme inline` của `app/globals.css`.
   - Không import hoặc inject font thông qua `layout.tsx` bằng `next/font/google`.
+
+---
+
+## 🧩 12. Bẫy Lỗi Type-Only Import trên Next.js 16 / Turbopack (Silent 404 Prevention Rule)
+
+- **Hiện tượng 404 âm thầm (Silent 404 Trap)**:
+  - Khi import một TypeScript `interface` hoặc `type` vào các component hoặc `page.tsx`, nếu quên từ khóa `type` (ví dụ: `import { UnlockedModalData } from '...'`), trình biên dịch Turbopack / Next.js 16 sẽ tìm kiếm export này như một biến JavaScript thực thi lúc runtime.
+  - Do interface bị TypeScript erase (xóa sạch) sau khi chuyển mã, runtime bundle bị thiếu export, dẫn đến lỗi nạp module cấp route. Khi đó, Next.js 16 sẽ **âm thầm nuốt lỗi và render sang trang `/_not-found` (HTTP 404)** mà không báo crash rõ ràng trên server console.
+- **Bắt buộc tuân thủ (Type-Only Import Convention)**:
+  - Mọi import interface/type bắt buộc phải dùng cú pháp type-only:
+    ```ts
+    import type { UnlockedModalData } from '@/components/...';
+    // hoặc
+    import { ComponentName, type UnlockedModalData } from '@/components/...';
+    ```
+  - Khi một route bất ngờ bị 404 dù file `page.tsx` và cấu trúc thư mục vẫn tồn tại đầy đủ, điều đầu tiên cần kiểm tra là danh sách các câu lệnh `import` xem có type/interface nào bị import nhầm dưới dạng value hay không.
 
 
 

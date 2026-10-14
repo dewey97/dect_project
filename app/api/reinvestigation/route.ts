@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { getClientIp, checkRateLimit } from "@/lib/security/rate-limiter";
+import {
+  defensiveErrorResponse,
+  rateLimitResponse,
+  dynamicSuccessResponse,
+} from "@/lib/security/defensive-cache";
 
 export const dynamic = "force-dynamic";
 
 const DATA_DIR = path.resolve(process.cwd(), "data");
-const HOTSPOTS_FILE = path.join(DATA_DIR, "case_000_hotspots.json");
+
+function getHotspotsFile(rawCaseId?: string | null): string {
+  const safeCaseId = (rawCaseId || "case_000")
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, "_");
+  return path.join(DATA_DIR, `${safeCaseId}_hotspots.json`);
+}
 
 function ensureDirectoryExists() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -13,47 +26,66 @@ function ensureDirectoryExists() {
   }
 }
 
-// GET: Lấy cấu hình Hotspots đã lưu
-export async function GET() {
+// GET: Lấy cấu hình Hotspots đã lưu theo caseId
+export async function GET(request: NextRequest) {
   try {
     ensureDirectoryExists();
-    if (fs.existsSync(HOTSPOTS_FILE)) {
-      const content = fs.readFileSync(HOTSPOTS_FILE, "utf-8");
+    const { searchParams } = new URL(request.url);
+    const caseId = searchParams.get("caseId") || "case_000";
+    const filePath = getHotspotsFile(caseId);
+
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
       const parsed = JSON.parse(content);
-      return NextResponse.json({ success: true, hotspots: parsed });
+      return dynamicSuccessResponse({ success: true, hotspots: parsed, caseId });
     }
-    return NextResponse.json({ success: true, hotspots: null });
+    return dynamicSuccessResponse({ success: true, hotspots: null, caseId });
   } catch (error: any) {
     console.error("Error reading hotspots file:", error);
-    return NextResponse.json(
+    return defensiveErrorResponse(
       { success: false, error: error.message },
-      { status: 500 }
+      500
     );
   }
 }
 
-// POST: Lưu vĩnh viễn cấu hình Hotspots (vị trí + ảnh gán theo ID)
+// POST: Lưu vĩnh viễn cấu hình Hotspots (vị trí + ảnh gán theo ID) theo caseId
 export async function POST(request: NextRequest) {
   try {
+    // Giới hạn tần suất lưu cấu hình (tối đa 15 lần / phút / IP)
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`reinvestigation-save:${clientIp}`, {
+      limit: 15,
+      windowMs: 60_000,
+    });
+
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(
+        rateCheck.retryAfterSeconds,
+        "Bạn đang lưu cấu hình quá thường xuyên. Vui lòng thử lại sau vài giây."
+      );
+    }
+
     const body = await request.json();
-    const { hotspots } = body;
+    const { hotspots, caseId = "case_000" } = body;
 
     if (!Array.isArray(hotspots)) {
-      return NextResponse.json(
+      return defensiveErrorResponse(
         { success: false, error: "hotspots must be an array" },
-        { status: 400 }
+        400
       );
     }
 
     ensureDirectoryExists();
-    fs.writeFileSync(HOTSPOTS_FILE, JSON.stringify(hotspots, null, 2), "utf-8");
+    const filePath = getHotspotsFile(caseId);
+    fs.writeFileSync(filePath, JSON.stringify(hotspots, null, 2), "utf-8");
 
-    return NextResponse.json({ success: true });
+    return dynamicSuccessResponse({ success: true, caseId, count: hotspots.length });
   } catch (error: any) {
     console.error("Error writing hotspots file:", error);
-    return NextResponse.json(
+    return defensiveErrorResponse(
       { success: false, error: error.message },
-      { status: 500 }
+      500
     );
   }
 }

@@ -57,7 +57,7 @@ export function CanvasModals({
           key={
             state.editingSuspect
               ? `suspect-${state.editingSuspect.id}`
-              : "new-suspect-form"
+              : "suspect-modal"
           }
           isOpen={state.isAddSuspectOpen}
           onClose={() => {

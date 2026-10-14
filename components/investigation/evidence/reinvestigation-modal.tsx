@@ -27,6 +27,7 @@ import { toast } from '@/components/ui/toast'
 interface ReinvestigationModalProps {
   isOpen: boolean
   onClose: () => void
+  caseId?: string
 }
 
 export interface ReinvestigationHotspot2D {
@@ -56,66 +57,59 @@ const SFX_OPTIONS = [
   { file: 'paper_rustle.mp3', label: 'Lật trang hồ sơ', caption: '*Xào xạc...*' }
 ]
 
-// 5 ĐIỂM KHÁM XÉT KHỞI TẠO BAN ĐẦU
+// 4 ĐIỂM KHÁM XÉT KHỞI TẠO ĐỒNG BỘ TỪ DATA CASE #000
 export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
   {
     id: 'spot-1',
     num: 1,
-    photoId: 'hotspot_window',
-    title: 'Khung cửa sổ hướng trạm tàu (Trạm số 2)',
-    x: 20.2,
-    y: 34,
-    imageUrl: '/images/cases/case_000/15.png',
+    photoId: 'tu_go',
+    title: 'Tủ gỗ',
+    x: 44.5,
+    y: 51.1,
+    imageUrl: '/api/image-proxy?id=1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR',
     soundFile: 'train_sound.mp3',
-    soundCaption: '*Tu tu... Xình xịch...*'
+    soundCaption: '*Tu tu... Xình xịch...*',
+    driveUrl: 'https://drive.google.com/file/d/1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR/view?usp=drive_link',
   },
   {
     id: 'spot-2',
     num: 2,
-    photoId: 'p1',
-    title: 'Tủ gỗ lim 1996 then sắt',
+    photoId: 'bua_goi',
+    title: 'Bùa yêu dưới gối',
     x: 58.5,
     y: 56,
-    imageUrl: '/images/cases/case_000/17.png',
+    imageUrl: '/api/image-proxy?id=11rPmlApf5TsTDguEOBKQBqL09SIks8eU',
     soundFile: 'sound_tu.mp3',
-    soundCaption: '*Két... Cạch...*'
+    soundCaption: '*Két... Cạch...*',
+    driveUrl: 'https://drive.google.com/file/d/11rPmlApf5TsTDguEOBKQBqL09SIks8eU/view?usp=drive_link',
   },
   {
     id: 'spot-3',
     num: 3,
-    photoId: 'p3',
-    title: 'Mảnh ấm chén vỡ gờ bàn',
-    x: 6.4,
-    y: 62,
-    imageUrl: '/images/cases/case_000/9.png',
+    photoId: 'luoc_dinh_toc',
+    title: 'Lược dính tóc',
+    x: 52.7,
+    y: 56.9,
+    imageUrl: '/api/image-proxy?id=1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe',
     soundFile: 'breaking.mp3',
-    soundCaption: '*Choang! Xoảng...*'
+    soundCaption: '*Choang! Xoảng...*',
+    driveUrl: 'https://drive.google.com/file/d/1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe/view?usp=drive_link',
   },
   {
     id: 'spot-4',
     num: 4,
-    photoId: 'photo_hop_thiec',
-    title: 'Thùng rác & chốt cửa hậu',
-    x: 15.4,
-    y: 62,
-    imageUrl: '/images/cases/case_000/18.png',
+    photoId: 'canh_hoa',
+    title: 'Cánh hoa xoan dưới sàn nhà',
+    x: 11.2,
+    y: 74,
+    imageUrl: '/api/image-proxy?id=1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z',
     soundFile: 'Clack.mp3',
-    soundCaption: '*Cạch... cạch...*'
+    soundCaption: '*Cạch... cạch...*',
+    driveUrl: 'https://drive.google.com/file/d/1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z/view?usp=drive_link',
   },
-  {
-    id: 'spot-5',
-    num: 5,
-    photoId: 'p2',
-    title: 'Đơn đòi đất 200m² & tài liệu',
-    x: 9.6,
-    y: 78,
-    imageUrl: '/images/cases/case_000/11.png',
-    soundFile: 'sat_soat.mp3',
-    soundCaption: '*Sột soạt... sột soạt...*'
-  }
 ]
 
-export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalProps) {
+export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: ReinvestigationModalProps) {
   // Hotspots list with server + localStorage persistence
   const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>(HOTSPOTS_2D_LIST)
   const [selectedSpot, setSelectedSpot] = useState<ReinvestigationHotspot2D | null>(null)
@@ -142,15 +136,15 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
   const [isSavingDb, setIsSavingDb] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  // Fetch live photos from Google Sheets
-  const { data: rawSheetPhotos, loading: isPhotosLoading } = usePhoneData('photos')
+  // Fetch live photos & hotspots from Google Sheets (evidences tab)
+  const { data: rawSheetPhotos, loading: isPhotosLoading } = usePhoneData('evidences', caseId)
 
   // Load hotspots from Server API, falling back to localStorage
   useEffect(() => {
     let mounted = true
     async function loadSavedHotspots() {
       try {
-        const res = await fetch('/api/reinvestigation', { cache: 'no-store' })
+        const res = await fetch(`/api/reinvestigation?caseId=${encodeURIComponent(caseId)}`, { cache: 'no-store' })
         if (res.ok) {
           const data = await res.json()
           if (mounted && data.success && Array.isArray(data.hotspots) && data.hotspots.length > 0) {
@@ -161,7 +155,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
       } catch {}
 
       if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('reinvestigate_custom_hotspots')
+        const saved = localStorage.getItem(`reinvestigate_custom_hotspots_${caseId}`) || localStorage.getItem('reinvestigate_custom_hotspots')
         if (saved) {
           try {
             const parsed = JSON.parse(saved)
@@ -243,7 +237,9 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
           driveUrl,
           description: item.description_prompt || item.description || item.note || '',
           location: item.location || '',
-          category: item.category || 'VẬT CHỨNG'
+          category: item.category || 'VẬT CHỨNG',
+          board_x: item.board_x || item.x || '',
+          board_y: item.board_y || item.y || '',
         }
       })
   }, [rawSheetPhotos])
@@ -265,21 +261,35 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
     return hotspots.find((s) => s.id === selectedCalibrateSpotId) || hotspots[0] || null
   }, [hotspots, selectedCalibrateSpotId])
 
-  // DYNAMICALLY SYNC HOTSPOTS FROM GOOGLE SHEETS BY photoId
+  // DYNAMICALLY SYNC HOTSPOTS FROM GOOGLE SHEETS BY photoId, code (C-01..C-05), or title
   // Nếu Sheet cập nhật link Drive hay title cho photoId, game tự động đọc theo photoId mới nhất!
   const resolvedHotspots = useMemo(() => {
     if (sheetPhotosList.length === 0) return hotspots
 
     return hotspots.map((spot) => {
       if (!spot.photoId) return spot
-      const matched = sheetPhotosList.find((p) => p.id === spot.photoId)
+      const pid = (spot.photoId || '').toLowerCase()
+      const matched = sheetPhotosList.find((p) => {
+        const idLower = (p.id || '').toLowerCase()
+        const titleLower = (p.title || '').toLowerCase()
+        if (idLower === pid) return true
+        if (pid === 'tu_go' && (idLower === 'c-05' || titleLower.includes('tủ gỗ'))) return true
+        if (pid === 'bua_goi' && (idLower === 'c-04' || titleLower.includes('bùa'))) return true
+        if (pid === 'luoc_dinh_toc' && (idLower === 'c-03' || titleLower.includes('lược'))) return true
+        if (pid === 'canh_hoa' && (idLower === 'c-02' || titleLower.includes('hoa xoan') || titleLower.includes('cánh hoa'))) return true
+        return false
+      })
       if (matched) {
+        const xNum = matched.board_x && !isNaN(parseFloat(matched.board_x)) ? parseFloat(matched.board_x) : spot.x
+        const yNum = matched.board_y && !isNaN(parseFloat(matched.board_y)) ? parseFloat(matched.board_y) : spot.y
         return {
           ...spot,
           title: matched.title || spot.title,
           imageUrl: matched.url || spot.imageUrl,
           driveUrl: matched.driveUrl || spot.driveUrl,
-          soundCaption: matched.description ? `*${matched.description}*` : spot.soundCaption
+          soundCaption: matched.description ? `*${matched.description}*` : spot.soundCaption,
+          x: xNum,
+          y: yNum,
         }
       }
       return spot
@@ -434,17 +444,17 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
   const handleSaveToSystem = async () => {
     setIsSavingDb(true)
     try {
-      localStorage.setItem('reinvestigate_custom_hotspots', JSON.stringify(hotspots))
+      localStorage.setItem(`reinvestigate_custom_hotspots_${caseId}`, JSON.stringify(hotspots))
 
       const res = await fetch('/api/reinvestigation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hotspots })
+        body: JSON.stringify({ hotspots, caseId })
       })
 
       if (res.ok) {
         setHasUnsavedChanges(false)
-        toast.success('Đã lưu thành công toàn bộ vị trí và danh sách ảnh gán!')
+        toast.success(`Đã lưu thành công cấu hình điểm khám xét (${caseId})!`)
       } else {
         const data = await res.json()
         toast.error('Lỗi khi lưu lên Server: ' + (data.error || 'Server error'))
@@ -460,6 +470,7 @@ export function ReinvestigationModal({ isOpen, onClose }: ReinvestigationModalPr
     setHotspots(HOTSPOTS_2D_LIST)
     setSelectedCalibrateSpotId(HOTSPOTS_2D_LIST[0]?.id || null)
     setHasUnsavedChanges(true)
+    localStorage.removeItem(`reinvestigate_custom_hotspots_${caseId}`)
     localStorage.removeItem('reinvestigate_custom_hotspots')
     toast.info('Đã khôi phục danh sách điểm mặc định! Bấm "Lưu" để xác nhận lên hệ thống.')
   }

@@ -40,7 +40,7 @@ import {
 } from "@/components/investigation/evidence/evidence-data";
 import {
   PhaseUnlockedModal,
-  UnlockedModalData,
+  type UnlockedModalData,
 } from "@/components/investigation/evidence/phase-unlocked-modal";
 import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";

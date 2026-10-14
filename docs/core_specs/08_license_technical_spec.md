@@ -6,30 +6,24 @@
 
 ---
 
-## 1. Offline Mode — QR Verification
+## 1. Offline Mode — Physical Boardgame Companion (Zero-Auth / Static QR)
 
-### 1.1 QR Code Format
-QR chứa một **signed JWT** được ký bằng RSA private key (bên phát hành giữ):
+### 1.1 Triết Lý Thiết Kế (Pragmatic Architecture)
+- **Tài liệu mật nằm trên giấy vật lý:** Toàn bộ lời khai, ảnh tử thi, mẫu vật chứng nằm trong hộp giấy. Web app chỉ đóng vai trò công cụ phụ trợ (bẻ khóa điện thoại Khang, máy nghe audio, nhập đáp án checkpoint).
+- **Không cần bảo mật RSA / JWT phức tạp:** Người không có hộp giấy dù có link web cũng không thể giải được vụ án. Việc chia sẻ link còn đóng vai trò phễu marketing miễn phí (Upsell mua hộp thật).
+- **Tối ưu chi phí in ấn:** Toàn bộ lô hàng (500 – 1.000 hộp) in **chung một mã QR tĩnh duy nhất**, không cần in mã biến đổi đắt đỏ.
 
-```json
-{
-  "kit_id": "KIT-CASE000-0042",
-  "game_id": "case_000",
-  "tier": "offline",
-  "iat": 1728000000
-}
-```
-
-### 1.2 Cơ Chế Verify
-- App nhúng sẵn **RSA public key** tại build time
-- Khi quét QR → verify chữ ký ngay trên máy, không cần gọi server
-- Không thể giả mạo QR nếu không có private key
-
-### 1.3 Keypair Management
-```
-private_key.pem  → Bên phát hành giữ, dùng để ký QR khi in hộp
-public_key.pem   → Nhúng vào app bundle (readonly)
-```
+### 1.2 QR Code & Activation Flow
+- **Định dạng QR:** In bên trong nắp hộp, trỏ trực tiếp về:
+  ```
+  https://dect.vn/play/case-000?mode=box
+  ```
+- **Kích hoạt Client-side:**
+  - Khi quét QR vào app, client lưu cờ trạng thái:
+    `investigation_mode: 'box'` vào `localStorage`.
+  - Không cần đăng ký tài khoản, không cần gọi API xác thực, vào thẳng bàn chơi trong 1 giây.
+- **Tạo phòng nhóm từ bản hộp:**
+  - Người cầm hộp có thể tạo phòng chơi nhóm trực tiếp mà không cần trừ credit, sinh mã 4 chữ (VD: `SHER`) để bạn bè cùng bàn quét vào chơi đồng bộ.
 
 ---
 
@@ -178,7 +172,7 @@ Mua Case #000 → tự ý gọi API với case_id=case_001 → xem được nộ
 | Auth & Account | Supabase Auth |
 | License DB | Supabase PostgreSQL |
 | JWT Online | `jose` library |
-| QR Offline | RSA keypair (private ký, public verify) |
+| QR Offline (Hộp giấy) | Static QR trỏ URL mode=box + localStorage |
 | Payment | PayOS / Stripe |
 | Rate limiting | Next.js Edge Middleware |
 | Realtime (phòng nhóm) | Supabase Realtime |

@@ -28,9 +28,10 @@ Hai hình thức chơi, phân biệt bởi **nơi tài liệu được lưu tr�
 | Vấn đề | Quyết định |
 |---|---|
 | Cần account? | ❌ Không |
-| Cần mạng? | ❌ Không |
-| Chống share QR? | ❌ Không cần — share QR chỉ vào app công cụ, không có tài liệu số |
-| Có expiry? | Chưa quyết định |
+| Cần mạng? | ❌ Không (khi chơi solo) / Có (khi sync phòng nhóm) |
+| Chống share QR? | ❌ Không cần — share QR chỉ vào app công cụ, tài liệu trên giấy là ổ khóa chính. Share link đóng vai trò phễu bán hàng (upsell mua hộp). |
+| Định dạng QR | Static QR tĩnh in chung toàn bộ hộp (`dect.vn/play/case-000?mode=box`) |
+| Có expiry? | ❌ Không hết hạn |
 | Track lượt chơi? | ❌ Không track được — chấp nhận |
 
 ---
@@ -127,8 +128,8 @@ Can thiệp vào app → bỏ qua kiểm tra QR → vào game không cần mua B
 
 ## 8. Quyết Định Còn Mở
 
-- [ ] **Số người tối đa/phòng**
-- [ ] **Thời gian tối đa 1 phòng**
+- [x] **Hết hạn QR:** Không hết hạn. In 1 mã QR tĩnh vĩnh viễn cho toàn bộ hộp, tài liệu in là ổ khóa bảo vệ thực tế.
+- [ ] **Số người tối đa/phòng:** Dự kiến 2 – 6 người.
+- [ ] **Thời gian tối đa 1 phòng:** 24 giờ kể từ khi tạo phòng.
 - [ ] **Nâng cấp từ Boardgame lên Bản Online:** Người mua Boardgame có được giảm giá khi mua Bản Online không?
-- [ ] **Hết hạn QR:** Mã QR trong bộ game cũ có hết hạn không?
 - [ ] **Gói mua nhiều vụ án:** 1 license có bao gồm nhiều vụ án cùng lúc không?

@@ -13,7 +13,7 @@ import {
 import { BoardGameCompanionView } from "@/components/investigation/evidence/board-game-companion-view";
 import {
   PhaseUnlockedModal,
-  UnlockedModalData,
+  type UnlockedModalData,
 } from "@/components/investigation/evidence/phase-unlocked-modal";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";

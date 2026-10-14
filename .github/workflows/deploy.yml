@@ -4,15 +4,44 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  preflight:
+    name: 🔍 Pre-Flight Check (TypeScript & Lint Gate)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🧪 Run Typecheck & Lint Gate
+        run: npm run lint
+
   build-and-push:
     name: 🐳 Build Docker Image & Push to GHCR
+    needs: preflight
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -52,12 +81,13 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy-to-vps:
-    name: 🚀 Deploy to VPS (Fast Pull & Run)
+    name: 🚀 Deploy to VPS (Safe Pull, Healthcheck & Auto-Rollback)
     needs: build-and-push
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🌐 SSH to VPS and update container
+      - name: 🌐 SSH to VPS, Deploy & Verify
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -66,15 +96,19 @@ jobs:
           port: 22
           script_stop: true
           script: |
-            echo "🚀 [1/3] Cập nhật repository tại /var/www/dect_project..."
+            set -euo pipefail
+            echo "🚀 [1/5] Cập nhật repository tại /var/www/dect_project..."
             cd /var/www/dect_project
             git fetch origin main
             git reset --hard origin/main
 
-            echo "📦 [2/3] Kéo Docker image mới nhất từ GHCR..."
+            echo "🛡️ [2/5] Sao lưu thẻ image hiện tại (làm điểm phục hồi rollback)..."
+            docker tag ghcr.io/dewey97/dect_project:latest ghcr.io/dewey97/dect_project:previous 2>/dev/null || true
+
+            echo "📦 [3/5] Kéo Docker image mới nhất từ GHCR..."
             docker pull ghcr.io/dewey97/dect_project:latest
 
-            echo "⚡ [3/3] Khởi chạy container..."
+            echo "⚡ [4/5] Khởi chạy container mới..."
             docker compose up -d --force-recreate --remove-orphans
 
             for net in traefik coolify dokploy caddy web gateway; do
@@ -84,10 +118,31 @@ jobs:
               fi
             done
 
+            echo "🩺 [5/5] Kiểm tra sức khỏe ứng dụng (Health Check Probing)..."
+            HEALTHY=0
+            for i in $(seq 1 15); do
+              echo "Thử nghiệm probe lần $i/15..."
+              if curl -fsS -o /dev/null --max-time 3 http://127.0.0.1:3000/ 2>/dev/null || wget -q -O /dev/null --timeout=3 http://127.0.0.1:3000/ 2>/dev/null; then
+                echo "✅ Ứng dụng đã phản hồi HTTP OK!"
+                HEALTHY=1
+                break
+              fi
+              sleep 3
+            done
 
-            echo "🧹 Dọn dẹp images cũ..."
+            if [ "$HEALTHY" -ne 1 ]; then
+              echo "❌ [ALERT] Ứng dụng không phản hồi sau 45s! Container logs gần nhất:"
+              docker logs dect_project_app --tail 40 || true
+              echo "🔄 [ROLLBACK] Đang tự động khôi phục về image previous..."
+              docker tag ghcr.io/dewey97/dect_project:previous ghcr.io/dewey97/dect_project:latest 2>/dev/null || true
+              docker compose up -d --force-recreate
+              echo "🚨 Đã khôi phục lại phiên bản trước đó để tránh downtime!"
+              exit 1
+            fi
+
+            echo "🧹 Dọn dẹp các dangling layer cũ..."
             docker image prune -f
 
-            echo "✅ Triển khai hoàn tất! Kiểm tra container:"
+            echo "🎉 Triển khai và xác thực hoàn tất! Container đang chạy ổn định:"
             docker compose ps
 

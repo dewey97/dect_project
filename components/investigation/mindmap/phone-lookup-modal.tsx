@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ArrowRight, CheckCircle2, ArrowLeft, Lightbulb } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { emitInvestigationEvent } from '@/lib/investigation-events'
 import { isAdminBypassCode } from '@/lib/cases/admin-bypass'
 import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
+import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 
 function isPhoneMatch(val: string, validKeywords: string[]): boolean {
   if (isAdminBypassCode(val)) return true
@@ -33,11 +34,8 @@ function isPhoneMatch(val: string, validKeywords: string[]): boolean {
       .split(/\s+/)
       .filter(Boolean)
 
-    // Khớp chính xác toàn bộ (ví dụ "vu" === "vu", "le quang vu" === "le quang vu")
     if (normWords.join('') === kwWords.join('')) return true
 
-    // Cho phép nhập tên riêng rút gọn ("Vũ" thay cho "Lê Quang Vũ", "Đạt Gà" cho "Đạt Gà Chợ Cảng"):
-    // Toàn bộ từ người chơi nhập phải nằm trong từ khóa hợp lệ và KHÔNG được chứa thêm từ lạ bên ngoài
     if (normWords.length < kwWords.length) {
       return normWords.every((w) => kwWords.includes(w))
     }
@@ -53,15 +51,28 @@ interface PhoneLookupModalProps {
   onOpenPhoneSimulator?: () => void
 }
 
+const DEFAULT_PHONE_INPUTS = [
+  { id: 'phone1', label: 'SĐT 0988.200.991:', placeholder: 'Nhập tên nghi phạm...', validAnswers: ['vu', 'le quang vu', 'vũ', 'lê quang vũ'] },
+  { id: 'phone2', label: 'SĐT 0912.331.888:', placeholder: 'Nhập tên nghi phạm...', validAnswers: ['tung', 'nguyen thanh tung', 'tùng', 'nguyễn thanh tùng'] },
+  { id: 'phone3', label: 'SĐT 0984.180.357:', placeholder: 'Nhập tên nghi phạm...', validAnswers: ['dat', 'dat ga', 'tran van dat', 'đạt', 'đạt gà', 'trần văn đạt'] },
+]
+
 export function PhoneLookupModal({
   isOpen,
   onClose,
   onSuccess,
   onOpenPhoneSimulator
 }: PhoneLookupModalProps) {
-  const [phone1, setPhone1] = useState('')
-  const [phone2, setPhone2] = useState('')
-  const [phone3, setPhone3] = useState('')
+  const { checkpoints } = useCaseCheckpoints('case-000')
+  const cp0 = checkpoints.find((c) => c.id === 'cp-000-0')
+
+  const inputsList = useMemo(() => {
+    const dynamic = cp0?.textMatchConfig?.inputs
+    if (dynamic && dynamic.length > 0) return dynamic
+    return DEFAULT_PHONE_INPUTS
+  }, [cp0])
+
+  const [inputValues, setInputValues] = useState<Record<string, string>>({})
   const [isApproved, setIsApproved] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -76,9 +87,7 @@ export function PhoneLookupModal({
     }
 
     const data = getStorageJson<Record<string, string>>('phone_inputs', {})
-    setPhone1(data.phone1 || '')
-    setPhone2(data.phone2 || '')
-    setPhone3(data.phone3 || '')
+    setInputValues(data)
 
     const approved = getStorageItem('reinvestigate_unlocked')
     if (approved === 'true') {
@@ -88,30 +97,39 @@ export function PhoneLookupModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!phone1.trim() || !phone2.trim() || !phone3.trim()) {
-      const hasBypass = isAdminBypassCode(phone1) || isAdminBypassCode(phone2) || isAdminBypassCode(phone3)
-      if (!hasBypass) {
-        setErrorMsg('Vui lòng điền đầy đủ danh tính chủ thể cho cả 3 số điện thoại!')
+
+    const hasAnyBypass = inputsList.some((inp, idx) => {
+      const val = inputValues[inp.id] ?? (idx === 0 ? inputValues.phone1 : idx === 1 ? inputValues.phone2 : inputValues.phone3) ?? ''
+      return isAdminBypassCode(val)
+    })
+
+    if (!hasAnyBypass) {
+      const isMissingAny = inputsList.some((inp, idx) => {
+        const val = inputValues[inp.id] ?? (idx === 0 ? inputValues.phone1 : idx === 1 ? inputValues.phone2 : inputValues.phone3) ?? ''
+        return !val.trim()
+      })
+
+      if (isMissingAny) {
+        setErrorMsg('Vui lòng điền đầy đủ danh tính chủ thể cho các số điện thoại!')
+        detectiveAudio.playGlassSound()
+        return
+      }
+
+      const allValid = inputsList.every((inp, idx) => {
+        const val = inputValues[inp.id] ?? (idx === 0 ? inputValues.phone1 : idx === 1 ? inputValues.phone2 : inputValues.phone3) ?? ''
+        return isPhoneMatch(val, inp.validAnswers || [])
+      })
+
+      if (!allValid) {
+        setErrorMsg('Danh tính chủ thể chưa chính xác. Vui lòng đối chiếu lại tài liệu điều tra.')
         detectiveAudio.playGlassSound()
         return
       }
     }
 
-    const hasBypass = isAdminBypassCode(phone1) || isAdminBypassCode(phone2) || isAdminBypassCode(phone3)
-
-    const isP1Valid = isPhoneMatch(phone1, ['vu', 'le quang vu', 'vũ', 'lê quang vũ'])
-    const isP2Valid = isPhoneMatch(phone2, ['tung', 'nguyen thanh tung', 'tùng', 'nguyễn thanh tùng'])
-    const isP3Valid = isPhoneMatch(phone3, ['dat', 'dat ga', 'tran van dat', 'đạt', 'đạt gà', 'trần văn đạt'])
-
-    if (!hasBypass && (!isP1Valid || !isP2Valid || !isP3Valid)) {
-      setErrorMsg('Danh tính chủ thể chưa chính xác.')
-      detectiveAudio.playGlassSound()
-      return
-    }
-
     detectiveAudio.playStampSound()
     setIsApproved(true)
-    setStorageJson('phone_inputs', { phone1, phone2, phone3 })
+    setStorageJson('phone_inputs', inputValues)
     setStorageItem('phone_solved', 'true')
 
     onSuccess('0988200991', 'Đã xác minh danh tính SĐT thành công.')
@@ -149,7 +167,7 @@ export function PhoneLookupModal({
                 MỞ RỘNG ĐIỀU TRA
               </span>
               <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
-                Truy Vết Liên Lạc
+                {cp0?.title || 'Truy Vết Liên Lạc'}
               </h3>
             </div>
 
@@ -174,60 +192,42 @@ export function PhoneLookupModal({
             {/* DESCRIPTION TEXT */}
             <div className="space-y-1.5">
               <p className="text-xs sm:text-sm text-[#1a120b] leading-relaxed font-sans">
-                Tổ chức rà soát, tra cứu dữ liệu viễn thông nhằm xác minh, làm rõ thông tin lai lịch & lý do liên hệ của 03 đối tượng sử dụng các số điện thoại có lịch sử liên lạc trong thời hạn 12 giờ trước thời điểm xảy ra vụ án.
+                {cp0?.question || 'Tổ chức rà soát, tra cứu dữ liệu viễn thông nhằm xác minh, làm rõ thông tin lai lịch & lý do liên hệ của các đối tượng sử dụng các số điện thoại có lịch sử liên lạc trong thời hạn 12 giờ trước thời điểm xảy ra vụ án.'}
               </p>
             </div>
 
             <span className="font-mono text-xs text-[#4a3520] uppercase font-bold tracking-wider block">
-              Điền danh tính chủ sở hữu 3 SDT sau:
+              Điền danh tính chủ sở hữu các SĐT sau:
             </span>
 
-            {/* 3 PHONE INPUT FIELDS */}
+            {/* DYNAMIC PHONE INPUT FIELDS */}
             <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[#2b1f14] block font-mono">
-                  SĐT 0988.200.991:
-                </label>
-                <input
-                  type="text"
-                  value={phone1}
-                  onChange={(e) => {
-                    setPhone1(e.target.value)
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-base text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[#2b1f14] block font-mono">
-                  SĐT 0912.331.888:
-                </label>
-                <input
-                  type="text"
-                  value={phone2}
-                  onChange={(e) => {
-                    setPhone2(e.target.value)
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-base text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[#2b1f14] block font-mono">
-                  SĐT 0984.180.357:
-                </label>
-                <input
-                  type="text"
-                  value={phone3}
-                  onChange={(e) => {
-                    setPhone3(e.target.value)
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-base text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
-                />
-              </div>
+              {inputsList.map((inp, idx) => {
+                const currentVal = inputValues[inp.id] ?? (idx === 0 ? inputValues.phone1 : idx === 1 ? inputValues.phone2 : inputValues.phone3) ?? ''
+                const displayLabel = inp.label.startsWith('SĐT') ? inp.label : `SĐT ${inp.label}:`
+                return (
+                  <div key={inp.id || idx} className="space-y-1">
+                    <label className="text-xs font-bold text-[#2b1f14] block font-mono">
+                      {displayLabel}
+                    </label>
+                    <input
+                      type="text"
+                      value={currentVal}
+                      placeholder={inp.placeholder || 'Nhập tên nghi phạm...'}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setInputValues((prev) => ({
+                          ...prev,
+                          [inp.id]: val,
+                          [`phone${idx + 1}`]: val,
+                        }))
+                        if (errorMsg) setErrorMsg('')
+                      }}
+                      className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-base text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
+                    />
+                  </div>
+                )
+              })}
             </div>
 
             {errorMsg && (

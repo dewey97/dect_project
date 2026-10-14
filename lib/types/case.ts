@@ -166,6 +166,8 @@ export interface Checkpoint {
   unlockedEvidenceId?: string;
   nodeId?: string;
   status: "locked" | "active" | "completed";
+  dossier?: string;
+  suspectLabel?: string;
   type?:
     "mcq" | "text_match_3" | "evidence_picker" | "convergence" | "accusation";
   hintsList?: string[];

@@ -32,7 +32,7 @@ export const VALID_CASE_CHARACTERS: SuspectCharacter[] = [
     id: 'ha',
     canonicalName: 'Trần Thị Hà',
     aliases: ['trần thị hà', 'tran thi ha', 'hà', 'ha', 'thị hà', 'thi ha'],
-    role: 'Kế toán / Bạn gái Khang (Hung thủ)',
+    role: 'Kế toán / Bạn gái Khang',
     avatarUrl: DEFAULT_AVATAR_PLACEHOLDER,
     slotIndex: 2,
   },
@@ -91,11 +91,80 @@ export function findValidCaseCharacter(
   return null
 }
 
-export function getCanonicalSuspectKey(suspect: { id?: string; name: string }) {
+/**
+ * Tự động tạo danh sách SuspectCharacter từ các hàng avatar trong Google Sheet ('evidences' tab).
+ * Tự động phân tách tên, sinh bí danh (aliases) không dấu, tên riêng rút gọn để nhận diện linh hoạt.
+ */
+export function buildDynamicSuspectCharacters(sheetEvidences?: any[]): SuspectCharacter[] {
+  if (!Array.isArray(sheetEvidences) || sheetEvidences.length === 0) return []
+
+  const result: SuspectCharacter[] = []
+  sheetEvidences
+    .filter((e) => {
+      const cat = String(e.category || '').toUpperCase().trim()
+      const code = String(e.code || '').toLowerCase().trim()
+      return cat === 'AVATAR' || code.startsWith('avatar_')
+    })
+    .forEach((item, idx) => {
+      const code = String(item.code || '').toLowerCase().trim()
+      const id = code.replace(/^avatar_/, '') || `suspect_${idx}`
+      if (id === 'khang') return // Bỏ qua nạn nhân
+
+      const rawLabel = String(item.label || item.title || '').trim()
+      const cleanName = rawLabel
+        .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i, '')
+        .replace(/\s*\([^)]*\)/g, '')
+        .trim() || id
+
+      const noAccents = removeDiacritics(cleanName)
+      const words = cleanName.split(/\s+/).filter(Boolean)
+      const wordsNoAccents = noAccents.split(/\s+/).filter(Boolean)
+
+      const aliases = new Set<string>()
+      aliases.add(cleanName.toLowerCase())
+      aliases.add(noAccents)
+      aliases.add(id)
+
+      if (words.length > 1) {
+        // Tên gọi ngắn gọn (từ cuối cùng: "Vũ", "Tùng", "Hà", "Đạt", "Mai")
+        const lastName = words[words.length - 1].toLowerCase()
+        const lastNameNoAccents = wordsNoAccents[wordsNoAccents.length - 1]
+        aliases.add(lastName)
+        aliases.add(lastNameNoAccents)
+
+        // 2 từ cuối (ví dụ "Quang Vũ", "Thanh Tùng", "Thị Hà", "Ngọc Mai")
+        if (words.length >= 2) {
+          const lastTwo = `${words[words.length - 2]} ${words[words.length - 1]}`.toLowerCase()
+          aliases.add(lastTwo)
+          aliases.add(removeDiacritics(lastTwo))
+        }
+      }
+
+      result.push({
+        id,
+        canonicalName: cleanName,
+        aliases: Array.from(aliases),
+        role: item.description || 'Đối tượng liên quan vụ án',
+        avatarUrl: item.drive_url || item.direct_cdn_url || item.url || DEFAULT_AVATAR_PLACEHOLDER,
+        slotIndex: idx < 3 ? idx : 3 + (idx % 5),
+      })
+    })
+
+  return result
+}
+
+export function getCanonicalSuspectKey(
+  suspect: { id?: string; name: string },
+  extraCharacters?: SuspectCharacter[]
+) {
+  const pool = Array.isArray(extraCharacters) && extraCharacters.length > 0
+    ? [...VALID_CASE_CHARACTERS, ...extraCharacters]
+    : VALID_CASE_CHARACTERS
+
   // 1. Exact ID match first (handling prefixes like node-suspect- or suspect-)
   const rawId = (suspect.id || '').toLowerCase()
   const cleanId = rawId.replace(/^(node-)?suspect-/, '')
-  const exactIdChar = VALID_CASE_CHARACTERS.find((c) => c.id === cleanId)
+  const exactIdChar = pool.find((c) => c.id === cleanId)
   if (exactIdChar) {
     return {
       canonicalId: exactIdChar.id,
@@ -106,7 +175,9 @@ export function getCanonicalSuspectKey(suspect: { id?: string; name: string }) {
   }
 
   // 2. Strict character matching by name or id
-  const char = findValidCaseCharacter(suspect.name || '') || findValidCaseCharacter(suspect.id || '')
+  const char =
+    findValidCaseCharacter(suspect.name || '', extraCharacters) ||
+    findValidCaseCharacter(suspect.id || '', extraCharacters)
   if (char) {
     return {
       canonicalId: char.id,
@@ -117,10 +188,12 @@ export function getCanonicalSuspectKey(suspect: { id?: string; name: string }) {
   }
 
   const lower = (suspect.name || '').trim().toLowerCase()
+  const fallbackId = cleanId || lower.replace(/[^a-z0-9_-]/g, '') || 'suspect'
   return {
-    canonicalId: suspect.id || `suspect-${lower.replace(/\s+/g, '-')}`,
+    canonicalId: fallbackId,
     slotIndex: 4,
     canonicalName: suspect.name,
     photoUrl: undefined,
   }
 }
+

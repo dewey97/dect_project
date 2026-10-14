@@ -188,7 +188,7 @@ export function AdminCreatePinModal({
   const [isPinColorOpen, setIsPinColorOpen] = useState(false);
 
   // Fetch live photos & checkpoints from Google Sheets
-  const { data: sheetPhotos } = usePhoneData("photos");
+  const { data: sheetPhotos } = usePhoneData("evidences");
   const { data: sheetCheckpoints } = usePhoneData("checkpoints");
 
   const combinedCheckpoints = React.useMemo(() => {

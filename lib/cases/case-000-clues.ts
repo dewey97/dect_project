@@ -12,12 +12,6 @@ export {
   ADMIN_MASTER_EVIDENCE_ID,
 }
 
-export const PHONE_LOOKUP_EVIDENCE_IDS = [
-  'sms_phone_0988200991',
-  'sms_phone_0912331888',
-  'sms_phone_0984180357',
-]
-
 export const KNOWN_CASE_PHONES: Record<string, { full: string; formatted: string; name: string }> = {
   '991': { full: '0988200991', formatted: '0988.200.991', name: 'Lê Quang Vũ' },
   '888': { full: '0912331888', formatted: '0912.331.888', name: 'Nguyễn Thanh Tùng' },

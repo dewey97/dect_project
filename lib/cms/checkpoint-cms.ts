@@ -652,6 +652,8 @@ export function transformSheetCheckpoint(
     textMatchConfig,
     pickerConfig,
     storyConfig,
+    dossier: row.dossier || undefined,
+    suspectLabel: row.suspect_label || pickerConfig?.suspectLabel || undefined,
     rawAnswersId,
     rawAnswers: rawAnswersText,
   } as Checkpoint;
