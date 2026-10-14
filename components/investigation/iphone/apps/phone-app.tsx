@@ -152,60 +152,60 @@ export function PhoneApp({
 
   return (
     <div className="flex flex-col h-full bg-[#FAF9FE] text-[#1A1B1F] select-none overflow-hidden font-sans">
-      {/* Top Header bar: Only visible on Recents and Contacts tabs (iOS Phone Keypad has NO header bar) */}
-      {activeTab !== "keypad" && (
-        <div className="px-3 bg-[#FFFFFF] shrink-0 border-b border-[#E3E2E7] flex items-center justify-between h-[44px]">
-          {/* Left Action */}
-          {activeTab === "contacts" && selectedContact ? (
-            <button
-              onClick={() => setSelectedContact(null)}
-              className="flex items-center gap-1 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
-            >
-              <ArrowLeft className="size-4" />
-              <span>Danh bạ</span>
-            </button>
-          ) : activeTab === "contacts" ? (
-            <span className="text-[16px] font-normal text-[#0058BC] cursor-pointer">
-              Nhóm
-            </span>
-          ) : (
-            <button className="text-[16px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
-              Sửa
-            </button>
-          )}
-
-          {/* Center: Title */}
-          <span className="text-[17px] font-semibold tracking-tight text-[#1A1B1F]">
-            {activeTab === "recents" && "Gần đây"}
-            {activeTab === "contacts" &&
-              (selectedContact ? "" : "Tất cả danh bạ")}
+      {/* Top Header bar: Visible on all tabs (iOS Phone) */}
+      <div className="px-3 bg-[#FFFFFF] shrink-0 border-b border-[#E3E2E7] flex items-center justify-between h-[44px]">
+        {/* Left Action */}
+        {activeTab === "contacts" && selectedContact ? (
+          <button
+            onClick={() => setSelectedContact(null)}
+            className="flex items-center gap-1 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
+          >
+            <ArrowLeft className="size-4" />
+            <span>Danh bạ</span>
+          </button>
+        ) : onBackToHome ? (
+          <button
+            onClick={onBackToHome}
+            className="flex items-center gap-1 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
+            title="Thoát về Trang chính"
+          >
+            <ArrowLeft className="size-4" />
+            <span>Trang chính</span>
+          </button>
+        ) : activeTab === "contacts" ? (
+          <span className="text-[16px] font-normal text-[#0058BC] cursor-pointer">
+            Nhóm
           </span>
+        ) : (
+          <button className="text-[16px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
+            Sửa
+          </button>
+        )}
 
-          {/* Right Action */}
-          {activeTab === "contacts" && selectedContact ? (
-            <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 cursor-pointer">
-              Sửa
-            </button>
-          ) : activeTab === "contacts" ? (
-            <button
-              className="text-[#0058BC] hover:opacity-80 cursor-pointer p-1"
-              title="Thêm danh bạ"
-            >
-              <Plus className="size-5" />
-            </button>
-          ) : onBackToHome ? (
-            <button
-              onClick={onBackToHome}
-              className="flex items-center text-[#0058BC] text-[13px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
-              title="Thoát về Trang chính"
-            >
-              <span>Đóng</span>
-            </button>
-          ) : (
-            <div className="w-8" />
-          )}
-        </div>
-      )}
+        {/* Center: Title */}
+        <span className="text-[17px] font-semibold tracking-tight text-[#1A1B1F]">
+          {activeTab === "recents" && "Gần đây"}
+          {activeTab === "contacts" &&
+            (selectedContact ? "" : "Tất cả danh bạ")}
+          {activeTab === "keypad" && "Bàn phím"}
+        </span>
+
+        {/* Right Action */}
+        {activeTab === "contacts" && selectedContact ? (
+          <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 cursor-pointer">
+            Sửa
+          </button>
+        ) : activeTab === "contacts" ? (
+          <button
+            className="text-[#0058BC] hover:opacity-80 cursor-pointer p-1"
+            title="Thêm danh bạ"
+          >
+            <Plus className="size-5" />
+          </button>
+        ) : (
+          <div className="w-8" />
+        )}
+      </div>
 
       {/* Main Content Area */}
       <div
@@ -216,10 +216,10 @@ export function PhoneApp({
       >
         {/* KEYPAD TAB (iOS Dial Pad scaled to fit 375x600 screen) */}
         {activeTab === "keypad" && (
-          <div className="flex flex-col items-center justify-between h-full pt-4 pb-3 px-4 select-none">
+          <div className="flex flex-col items-center justify-between h-full pt-2 pb-3 px-4 select-none">
             {/* Displayed Number Area */}
-            <div className="flex flex-col items-center justify-center min-h-[64px] w-full shrink-0">
-              <div className="h-[40px] text-[32px] font-light tracking-tight text-[#1A1B1F] text-center font-sans flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center min-h-[56px] w-full shrink-0">
+              <div className="h-[36px] text-[30px] font-light tracking-tight text-[#1A1B1F] text-center font-sans flex items-center justify-center">
                 {keypadInput}
               </div>
               {keypadInput ? (
@@ -232,7 +232,7 @@ export function PhoneApp({
                   Thêm số
                 </button>
               ) : (
-                <div className="h-[20px]" />
+                <div className="h-[16px]" />
               )}
             </div>
 
@@ -303,7 +303,7 @@ export function PhoneApp({
 
         {/* RECENTS TAB (Figma Frame 22:582) */}
         {activeTab === "recents" && (
-          <div className="bg-[#FFFFFF]">
+          <div className="bg-[#FFFFFF] pb-12">
             {loading ? (
               <div className="flex flex-col items-center justify-center p-8 text-[#717786]">
                 <Loader2 className="size-6 animate-spin mb-2 text-[#0058BC]" />

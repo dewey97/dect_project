@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  X,
   ChevronRight,
   ChevronLeft,
   Check
@@ -200,10 +199,7 @@ export function InteractiveWalkthrough({
     if (!isOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        detectiveAudio.playPaperRustle()
-        onClose()
-      } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
         e.preventDefault()
         handleNext()
       } else if (e.key === 'ArrowLeft') {
@@ -214,7 +210,7 @@ export function InteractiveWalkthrough({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, currentStepIndex, isLastStep, onClose])
+  }, [isOpen, currentStepIndex, isLastStep])
 
   if (!isOpen || !mounted) return null
 
@@ -232,12 +228,6 @@ export function InteractiveWalkthrough({
     if (isFirstStep) return
     detectiveAudio.playPaperRustle()
     setCurrentStepIndex((prev) => prev - 1)
-  }
-
-  const handleSkip = () => {
-    detectiveAudio.playPaperRustle()
-    setStorageItem('walkthrough_completed', 'true')
-    onClose()
   }
 
   // Dynamic card placement: place opposite to the spotlight
@@ -273,7 +263,7 @@ export function InteractiveWalkthrough({
             y="0"
             width="100%"
             height="100%"
-            fill={step.targetType === 'canvas-center' ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.78)'}
+            fill={step.targetType === 'canvas-center' ? 'rgba(0, 0, 0, 0.12)' : 'rgba(0, 0, 0, 0.52)'}
             mask="url(#walkthrough-spotlight-mask)"
           />
         </svg>
@@ -314,13 +304,12 @@ export function InteractiveWalkthrough({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -16, scale: 0.96 }}
               transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-[430px] bg-[#f6f1e5] text-[#1a120b] border border-[#2b1f14]/40 shadow-[0_20px_45px_rgba(0,0,0,0.8)] rounded-none overflow-hidden flex flex-col pointer-events-auto p-3.5 sm:p-4 space-y-3"
+              className="w-full max-w-[390px] bg-[#f6f1e5] text-[#1a120b] border border-[#2b1f14]/30 shadow-[0_15px_35px_rgba(0,0,0,0.65)] rounded-none overflow-hidden flex flex-col pointer-events-auto p-3 sm:p-3.5 space-y-2"
             >
               <WalkthroughCardContent
                 step={step}
                 isFirstStep={isFirstStep}
                 isLastStep={isLastStep}
-                onSkip={handleSkip}
                 onPrev={handlePrev}
                 onNext={handleNext}
               />
@@ -337,13 +326,12 @@ export function InteractiveWalkthrough({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 16, scale: 0.96 }}
               transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-[430px] bg-[#f6f1e5] text-[#1a120b] border border-[#2b1f14]/40 shadow-[0_20px_45px_rgba(0,0,0,0.8)] rounded-none overflow-hidden flex flex-col pointer-events-auto p-3.5 sm:p-4 space-y-3"
+              className="w-full max-w-[390px] bg-[#f6f1e5] text-[#1a120b] border border-[#2b1f14]/30 shadow-[0_15px_35px_rgba(0,0,0,0.65)] rounded-none overflow-hidden flex flex-col pointer-events-auto p-3 sm:p-3.5 space-y-2"
             >
               <WalkthroughCardContent
                 step={step}
                 isFirstStep={isFirstStep}
                 isLastStep={isLastStep}
-                onSkip={handleSkip}
                 onPrev={handlePrev}
                 onNext={handleNext}
               />
@@ -360,22 +348,20 @@ function WalkthroughCardContent({
   step,
   isFirstStep,
   isLastStep,
-  onSkip,
   onPrev,
   onNext
 }: {
   step: WalkthroughStep
   isFirstStep: boolean
   isLastStep: boolean
-  onSkip: () => void
   onPrev: () => void
   onNext: () => void
 }) {
   return (
     <>
-      {/* TẦNG 1: HEADER (Badge + Tiêu đề + Nút đóng ✕) */}
+      {/* TẦNG 1: HEADER (Badge + Tiêu đề + Cụm điều hướng [‹] [›]) */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0">
           <span className="px-1.5 py-0.5 bg-[#8c1d1d] text-[#fbf8f1] font-mono text-[10px] font-bold uppercase tracking-wider shrink-0">
             {step.stepNumber}/{step.totalSteps}
           </span>
@@ -384,32 +370,16 @@ function WalkthroughCardContent({
           </h3>
         </div>
 
-        <button
-          type="button"
-          onClick={onSkip}
-          className="p-1 text-[#5c4026] hover:text-black hover:bg-[#2b1f14]/10 transition-colors cursor-pointer shrink-0"
-          title="Đóng [Esc]"
-        >
-          <X className="size-4" />
-        </button>
-      </div>
-
-      {/* TẦNG 2: NỘI DUNG & CỤM NÚT ĐIỀU HƯỚNG ICON */}
-      <div className="space-y-3">
-        <p className="text-xs sm:text-[13px] text-[#2b1f14] leading-relaxed font-sans whitespace-pre-line">
-          {step.description}
-        </p>
-
-        {/* NÚT ĐIỀU HƯỚNG ICON THUẦN TÚY (GÓC DƯỚI PHẢI) */}
-        <div className="flex items-center justify-end gap-1.5 pt-0.5">
+        {/* NÚT ĐIỀU HƯỚNG ICON TRÊN HEADER */}
+        <div className="flex items-center gap-1 shrink-0">
           {!isFirstStep && (
             <button
               type="button"
               onClick={onPrev}
-              className="size-7 bg-[#2b1f14]/10 hover:bg-[#2b1f14]/20 text-[#2b1f14] flex items-center justify-center transition-colors cursor-pointer"
+              className="size-6 bg-[#2b1f14]/10 hover:bg-[#2b1f14]/20 text-[#2b1f14] flex items-center justify-center transition-colors cursor-pointer"
               title="Bước trước [◄]"
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-3.5" />
             </button>
           )}
 
@@ -417,7 +387,7 @@ function WalkthroughCardContent({
             type="button"
             onClick={onNext}
             className={cn(
-              "size-7 flex items-center justify-center transition-colors cursor-pointer shadow-xs",
+              "size-6 flex items-center justify-center transition-colors cursor-pointer shadow-xs",
               isLastStep
                 ? "bg-[#8c1d1d] hover:bg-[#a32222] text-[#fbf8f1]"
                 : "bg-[#2b1f14] hover:bg-[#433020] text-[#f6f1e5]"
@@ -425,13 +395,18 @@ function WalkthroughCardContent({
             title={isLastStep ? "Bắt đầu điều tra" : "Bước tiếp [►]"}
           >
             {isLastStep ? (
-              <Check className="size-4 text-amber-300" />
+              <Check className="size-3.5 text-amber-300" />
             ) : (
-              <ChevronRight className="size-4 text-amber-300" />
+              <ChevronRight className="size-3.5 text-amber-300" />
             )}
           </button>
         </div>
       </div>
+
+      {/* TẦNG 2: NỘI DUNG (Gọn gàng, kết thúc ngay sau text) */}
+      <p className="text-xs sm:text-[12.5px] text-[#2b1f14] leading-relaxed font-sans whitespace-pre-line">
+        {step.description}
+      </p>
     </>
   )
 }

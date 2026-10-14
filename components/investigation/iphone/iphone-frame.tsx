@@ -99,22 +99,24 @@ export function IPhoneFrame({
 
   useEffect(() => {
     const updateScale = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const availWidth = rect.width;
-      const availHeight = rect.height;
+      // Chiều rộng & chiều cao khả dụng thực tế của viewport
+      const availWidth = window.innerWidth;
+      const availHeight = window.innerHeight;
 
-      // Base dimensions of the iPhone chassis: width 415px, height 768px (top bezel 72px + screen 600px + bottom bezel 72px + borders/padding 24px)
+      // Kích thước chuẩn của chassis iPhone 6s Plus (415px x 768px)
       const baseW = 415;
       const baseH = 768;
 
-      // Leave a tiny safe margin (8px)
-      const scaleX = (availWidth - 12) / baseW;
-      const scaleH = (availHeight - 8) / baseH;
+      // Khoảng trừ an toàn: Header bar (40px) + padding trên dưới và thanh điều hướng mobile (20px) = 60px
+      const usableW = Math.max(300, availWidth - 16);
+      const usableH = Math.max(400, availHeight - 64);
 
-      // Pick the constraining dimension, clamp maximum to 1
+      const scaleX = usableW / baseW;
+      const scaleH = usableH / baseH;
+
+      // Giữ tỉ lệ hoàn hảo không bị vỡ hoặc che khuất mép
       const optimalScale = Math.min(1, Math.min(scaleX, scaleH));
-      setScale(Math.max(0.45, optimalScale));
+      setScale(Math.max(0.42, optimalScale));
     };
 
     updateScale();
@@ -127,12 +129,12 @@ export function IPhoneFrame({
     !isLocked && (activeApp === "phone" || activeApp === "messages");
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-between select-none overflow-hidden p-1 sm:p-2">
-      {/* Top Header Bar: Tiêu đề "ĐIỆN THOẠI NẠN NHÂN" & Nút "Quay lại" */}
-      <div className="flex items-center justify-between w-full max-w-[415px] px-2 shrink-0 h-[36px] z-40">
+    <div className="w-full h-full flex flex-col items-center justify-start select-none overflow-hidden p-0 relative">
+      {/* Top Header Bar: Tiêu đề "ĐIỆN THOẠI NẠN NHÂN" & Nút "Quay lại" (Cố định 40px không bao giờ bị che) */}
+      <div className="w-full h-[40px] px-3 sm:px-4 flex items-center justify-between shrink-0 z-50 bg-[#0A0A0C]/90 backdrop-blur-md border-b border-white/10">
         <div className="flex items-center gap-2">
           <span className="size-2 rounded-full bg-[#FF453A] animate-pulse" />
-          <span className="text-[12px] font-mono uppercase tracking-widest text-zinc-300 font-semibold drop-shadow">
+          <span className="text-[12px] font-mono uppercase tracking-widest text-zinc-200 font-bold drop-shadow">
             Điện thoại nạn nhân
           </span>
         </div>
@@ -140,7 +142,7 @@ export function IPhoneFrame({
         {onClose && (
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1C1C1E]/90 text-zinc-300 hover:text-white hover:bg-white/15 border border-white/10 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1C1C1E] text-zinc-200 hover:text-white hover:bg-white/15 border border-white/15 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
             title="Quay lại hiện trường"
             aria-label="Quay lại"
           >
@@ -153,7 +155,7 @@ export function IPhoneFrame({
       {/* PHONE SCALE WRAPPER: Measures available space and scales phone precisely */}
       <div
         ref={containerRef}
-        className="flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden relative"
+        className="flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden relative p-1"
       >
         <div
           data-iphone-frame="true"
@@ -348,15 +350,48 @@ export function IPhoneFrame({
             ) : activeApp ? (
               /* 2. ACTIVE APP RUNNING */
               <div className="flex-1 min-h-0 flex flex-col h-full bg-black overflow-hidden">
-                {activeApp === "messages" && <MessagesApp />}
-                {activeApp === "phone" && <PhoneApp initialTab="keypad" />}
-                {activeApp === "safari" && <SafariApp history={history} />}
-                {activeApp === "notes" && <NotesApp notes={notes} />}
-                {activeApp === "photos" && <PhotosApp photos={photos} />}
-                {activeApp === "camera" && <CameraApp />}
-                {activeApp === "maps" && <MapsApp />}
-                {activeApp === "contacts" && <PhoneApp initialTab="contacts" />}
-                {activeApp === "banking" && <BankingApp />}
+                {activeApp === "messages" && (
+                  <MessagesApp onBackToHome={() => setActiveApp(null)} />
+                )}
+                {activeApp === "phone" && (
+                  <PhoneApp
+                    initialTab="keypad"
+                    onBackToHome={() => setActiveApp(null)}
+                  />
+                )}
+                {activeApp === "safari" && (
+                  <SafariApp
+                    history={history}
+                    onBackToHome={() => setActiveApp(null)}
+                  />
+                )}
+                {activeApp === "notes" && (
+                  <NotesApp
+                    notes={notes}
+                    onBackToHome={() => setActiveApp(null)}
+                  />
+                )}
+                {activeApp === "photos" && (
+                  <PhotosApp
+                    photos={photos}
+                    onBackToHome={() => setActiveApp(null)}
+                  />
+                )}
+                {activeApp === "camera" && (
+                  <CameraApp onBackToHome={() => setActiveApp(null)} />
+                )}
+                {activeApp === "maps" && (
+                  <MapsApp onBackToHome={() => setActiveApp(null)} />
+                )}
+                {activeApp === "contacts" && (
+                  <PhoneApp
+                    initialTab="contacts"
+                    onBackToHome={() => setActiveApp(null)}
+                  />
+                )}
+                {activeApp === "banking" && (
+                  <BankingApp onBackToHome={() => setActiveApp(null)} />
+                )}
                 {activeApp === "settings" && (
                   <div className="p-4 text-white space-y-4 font-sans overflow-y-auto">
                     <div className="flex items-center justify-between border-b border-[#2C2C2E] pb-2">
