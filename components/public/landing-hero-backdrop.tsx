@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface LandingHeroBackdropProps {
   bgImage: string;
@@ -8,39 +8,45 @@ interface LandingHeroBackdropProps {
 
 export function LandingHeroBackdrop({ bgImage }: LandingHeroBackdropProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [pointer, setPointer] = useState<{
-    x: number;
-    y: number;
-    active: boolean;
-  }>({
-    x: -1000,
-    y: -1000,
-    active: false,
-  });
+  const spotlightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handlePointerMove = (e: PointerEvent) => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      setPointer({ x, y, active: true });
-    };
-
-    const handlePointerLeave = () => {
-      setPointer((prev) => ({ ...prev, active: false }));
-    };
-
-    const el = containerRef.current;
-    if (el) {
-      el.addEventListener("pointermove", handlePointerMove);
-      el.addEventListener("pointerleave", handlePointerLeave);
+    // Chỉ kích hoạt hiệu ứng đèn pin trên Desktop (chuột fine-pointer và màn hình lớn >= 1024px)
+    const isFinePointer = window.matchMedia("(pointer: fine)").matches;
+    const isLargeScreen = window.innerWidth >= 1024;
+    if (!isFinePointer || !isLargeScreen) {
+      return;
     }
+
+    const container = containerRef.current;
+    const spotlight = spotlightRef.current;
+    if (!container || !spotlight) return;
+
+    let rafId: number | null = null;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        spotlight.style.opacity = "1";
+        spotlight.style.background = `radial-gradient(circle 320px at ${x}px ${y}px, rgba(255,230,180,0.28) 0%, rgba(0,0,0,0.72) 70%, rgba(0,0,0,0.85) 100%)`;
+      });
+    };
+
+    const handleMouseLeave = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      spotlight.style.opacity = "0";
+    };
+
+    container.addEventListener("mousemove", handleMouseMove, { passive: true });
+    container.addEventListener("mouseleave", handleMouseLeave, { passive: true });
+
     return () => {
-      if (el) {
-        el.removeEventListener("pointermove", handlePointerMove);
-        el.removeEventListener("pointerleave", handlePointerLeave);
-      }
+      if (rafId) cancelAnimationFrame(rafId);
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, []);
 
@@ -52,15 +58,16 @@ export function LandingHeroBackdrop({ bgImage }: LandingHeroBackdropProps) {
       <img
         src={bgImage}
         alt="Bảng điều tra hero"
-        className="w-full h-full object-cover object-center filter brightness-[0.7] contrast-[1.1]"
+        className="w-full h-full object-cover object-center filter brightness-[0.65] contrast-[1.1] lg:brightness-[0.7]"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/70 pointer-events-none" />
+      {/* Lớp phủ tương phản tối tĩnh: Trên mobile sâu hơn để bảo vệ độ sắc nét của văn bản */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/85 lg:from-black/80 lg:via-black/30 lg:to-black/70 pointer-events-none" />
+
+      {/* Quầng sáng đèn pin — Chỉ bật trên Desktop */}
       <div
-        className="absolute inset-0 pointer-events-none transition-opacity duration-300"
-        style={{
-          opacity: pointer.active ? 1 : 0,
-          background: `radial-gradient(circle 280px at ${pointer.x}px ${pointer.y}px, rgba(255,230,180,0.28) 0%, rgba(0,0,0,0.72) 70%, rgba(0,0,0,0.85) 100%)`,
-        }}
+        ref={spotlightRef}
+        aria-hidden="true"
+        className="hidden lg:block absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-300 ease-out"
       />
     </div>
   );

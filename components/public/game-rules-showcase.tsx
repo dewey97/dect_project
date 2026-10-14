@@ -118,7 +118,7 @@ export function GameRulesShowcase() {
                 {activeRule === 'means' ? 'Tang vật thu được tại hiện trường' : activeRule === 'motive' ? 'Nghiên cứu tâm lý hành vi' : 'Đối chiếu sơ đồ ngoại phạm'}
               </span>
               <span className="font-mono text-[0.55rem] text-zinc-400 block uppercase">
-                Bản ghi pháp y số: 009-CA-B{activeRule === 'means' ? '1' : activeRule === 'motive' ? '2' : '3'}
+                Hồ sơ vật chứng số: 009-CA-B{activeRule === 'means' ? '1' : activeRule === 'motive' ? '2' : '3'}
               </span>
             </div>
           </div>

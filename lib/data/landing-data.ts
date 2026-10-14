@@ -9,7 +9,7 @@ export const SHOWCASE_ITEMS = {
   phone: {
     title: 'Điện Thoại Phụ (Burner Phone)',
     desc: 'Một mẫu điện thoại phím bấm thực tế đi kèm hộp game chứa mã vạch mở khóa đính sau pin.',
-    digitalTitle: 'Trình Giả Lập Pháp Y Di Động',
+    digitalTitle: 'Trích Xuất Điện Thoại Trực Tuyến',
     digitalDesc: 'Giao diện trích xuất chip-off, giải mã tin nhắn đã xóa, xem email nội bộ cảng và định vị GPS di chuyển.',
     badgeText: 'THIẾT BỊ TANG VẬT'
   },
@@ -25,11 +25,11 @@ export const SHOWCASE_ITEMS = {
 export const FAQ_DATA = [
   {
     q: 'Trò chơi dành cho mấy người chơi?',
-    a: 'Bạn có thể chơi một mình như một thám tử độc hành hoặc chơi nhóm từ 2 - 4 người dưới dạng thảo luận, phân chia nhiệm vụ (ví dụ: một người đọc hồ sơ giấy, một người thao tác bẻ khóa trên Web).'
+    a: 'Bạn có thể chơi một mình như một thám tử độc hành hoặc chơi nhóm từ 2 - 4 người dưới dạng thảo luận, phân chia nhiệm vụ (ví dụ: một người đọc hồ sơ giấy, một người thao tác bẻ khóa trên Bàn Điều Tra Trực Tuyến).'
   },
   {
     q: 'Tôi có bắt buộc phải mua hộp game vật lý không?',
-    a: 'Có. Trình giả lập trực tuyến này là một phần của trải nghiệm XPLORE. Bạn cần có các tài liệu giấy, mã số chìa khóa và mã kích hoạt in độc quyền trong hộp game vật lý để giải mã các câu đố trên Web.'
+    a: 'Có. Bàn Điều Tra Trực Tuyến là một phần của trải nghiệm XPLORE. Bạn cần có các tài liệu giấy, mã số chìa khóa và mã kích hoạt in độc quyền trong hộp game vật lý để giải mã các câu đố trên Web.'
   },
   {
     q: 'Thời gian chơi game trung bình là bao lâu?',
@@ -37,7 +37,7 @@ export const FAQ_DATA = [
   },
   {
     q: 'Mạng internet có bắt buộc để chơi game không?',
-    a: 'Có, bạn cần kết nối internet để truy cập vào trình giả lập pháp y này. Máy trạm hỗ trợ mượt mà trên cả trình duyệt máy tính, máy tính bảng và điện thoại di động.'
+    a: 'Có, bạn cần kết nối internet để truy cập vào Bàn Điều Tra Trực Tuyến. Hệ thống hỗ trợ mượt mà trên cả trình duyệt máy tính, máy tính bảng và điện thoại di động.'
   },
   {
     q: 'Chính sách giao hàng và phí ship thế nào?',
@@ -68,7 +68,7 @@ export const TESTIMONIALS_DATA = [
     author: 'Thám tử Blackwood',
     div: 'Phân khu 9 // Tỉnh Cảng Bắc',
     stars: 5,
-    quote: 'Việc kết hợp tài liệu giấy và máy trạm số tạo ra trải nghiệm cực kỳ lôi cuốn. Khi bạn tìm thấy mã PIN viết tay trên mép tài liệu giấy và nhập vào bẻ khóa điện thoại trên web, cảm giác nhập vai vượt trội.'
+    quote: 'Việc kết hợp tài liệu giấy và Bàn Điều Tra Trực Tuyến tạo ra trải nghiệm cực kỳ lôi cuốn. Khi bạn tìm thấy mã PIN viết tay trên mép tài liệu giấy và nhập vào bẻ khóa điện thoại trên web, cảm giác nhập vai vượt trội.'
   },
   {
     author: 'Thám tử V. Dung',
@@ -80,6 +80,6 @@ export const TESTIMONIALS_DATA = [
     author: 'Thám tử L. Quốc',
     div: 'Tổ Đặc Nhiệm // Tỉnh Cảng Bắc',
     stars: 4,
-    quote: 'Các thông số pháp y như mã băm SHA-256, phân vùng khôi phục dữ liệu burner mang lại chiều sâu công nghệ tuyệt vời. Tuy nhiên việc có nút ẩn bớt các thông số này giúp người chơi không bị ngợp.'
+    quote: 'Các tính năng điều tra chuyên sâu như đối chiếu manh mối, phân vùng khôi phục dữ liệu burner mang lại chiều sâu công nghệ tuyệt vời. Tuy nhiên việc có nút ẩn bớt các thông số này giúp người chơi không bị ngợp.'
   }
 ]
