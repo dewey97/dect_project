@@ -4,7 +4,7 @@ import type {
   CaseConnection,
   PinPoint,
 } from "@/components/investigation/hero-interactive";
-import { getCanonicalSuspectKey } from "@/lib/cases/case-000-suspects";
+import { getCanonicalSuspectKey, removeDiacritics } from "@/lib/cases/case-000-suspects";
 import { normalizeImageUrl } from "@/lib/utils";
 import type { CulpritKey, SuspectItem } from "./use-investigation-state";
 
@@ -65,23 +65,40 @@ function buildSuspectPins(
     if (caseCheckpoints && caseCheckpoints.length > 0) {
       const match = caseCheckpoints.find((cp) => {
         const idLow = cp.id.toLowerCase();
-        const titleLow = (cp.title || "").toLowerCase();
-        const qLow = (cp.question || "").toLowerCase();
-        const sNameLow = (suspect.name || "").toLowerCase();
-        const cNameLow = (canonicalName || "").toLowerCase();
-        return (
-          !idLow.includes("followup") &&
-          (idLow.includes(canonicalId) ||
-           titleLow.includes(canonicalId) ||
-           (cNameLow && titleLow.includes(cNameLow)) ||
-           (sNameLow && titleLow.includes(sNameLow)) ||
-           qLow.includes(canonicalId))
+        const nodeLow = (cp.nodeId || "").toLowerCase();
+        const titleClean = removeDiacritics(cp.title || "");
+        const qClean = removeDiacritics(cp.question || "");
+        const sNameClean = removeDiacritics(suspect.name || "");
+        const cNameClean = removeDiacritics(canonicalName || "");
+        const aliasList = [canonicalId, sNameClean, cNameClean].filter(Boolean);
+
+        // Bỏ qua các checkpoint followup (dành cho node Nghi vấn)
+        if (
+          cp.followupOf ||
+          idLow.includes("followup") ||
+          nodeLow.includes("followup")
+        ) {
+          return false;
+        }
+
+        // 1. Nhận diện theo ID kinh điển Case #000
+        if (canonicalId === "vu" && (idLow === "cp-000-1a" || idLow.includes("1a"))) return true;
+        if (canonicalId === "tung" && (idLow === "cp-000-1b" || idLow.includes("1b"))) return true;
+        if (canonicalId === "ha" && (idLow === "cp-000-1c" || idLow.includes("1c"))) return true;
+
+        // 2. Nhận diện dynamic theo tên nghi phạm
+        return aliasList.some(
+          (alias) =>
+            idLow.includes(alias) ||
+            titleClean.includes(alias) ||
+            qClean.includes(alias)
         );
       });
       if (match) cpId = match.id;
     }
-    if (!cpId) {
-      cpId = SUSPECT_CHECKPOINT_MAP[canonicalId] || `cp-${canonicalId}`;
+    // Chỉ fallback về checkpoint mặc định của case-000 nếu caseCheckpoints chưa nạp (tránh tạo checkpoint ma khi CMS không cấu hình câu hỏi)
+    if (!cpId && (!caseCheckpoints || caseCheckpoints.length === 0)) {
+      cpId = SUSPECT_CHECKPOINT_MAP[canonicalId] || "";
     }
 
     return {
@@ -105,7 +122,7 @@ function buildFollowupPins(
   effectiveSuspects: SuspectItem[],
   slots: { x: number; y: number }[],
   activeFollowupSet: Set<string>,
-  caseCheckpoints?: Array<{ id: string; title?: string; question?: string; [key: string]: any }>,
+  caseCheckpoints?: Array<{ id: string; title?: string; question?: string; followupOf?: string; [key: string]: any }>,
 ): PinPoint[] {
   const pins: PinPoint[] = [];
 
@@ -126,18 +143,75 @@ function buildFollowupPins(
     if (caseCheckpoints && caseCheckpoints.length > 0) {
       const match = caseCheckpoints.find((cp) => {
         const idLow = cp.id.toLowerCase();
-        const titleLow = (cp.title || "").toLowerCase();
-        const sNameLow = (suspect.name || "").toLowerCase();
-        const cNameLow = (canonicalName || "").toLowerCase();
-        return (
-          idLow.includes("followup") &&
-          (idLow.includes(canonicalId) ||
-           titleLow.includes(canonicalId) ||
-           (cNameLow && titleLow.includes(cNameLow)) ||
-           (sNameLow && titleLow.includes(sNameLow)))
+        const nodeLow = (cp.nodeId || "").toLowerCase();
+        const titleClean = removeDiacritics(cp.title || "");
+        const qClean = removeDiacritics(cp.question || "");
+        const sNameClean = removeDiacritics(suspect.name || "");
+        const cNameClean = removeDiacritics(canonicalName || "");
+        const aliasList = [canonicalId, sNameClean, cNameClean].filter(Boolean);
+
+        // 0. ƯU TIÊN TUYỆT ĐỐI: Cột `followup_of` trên Google Sheet Live CMS
+        if (cp.followupOf) {
+          const rawTarget = cp.followupOf.trim();
+          const targetClean = removeDiacritics(rawTarget).toLowerCase();
+          return (
+            targetClean === canonicalId ||
+            targetClean === sNameClean ||
+            targetClean === cNameClean ||
+            aliasList.some((alias) => targetClean === alias || targetClean.includes(alias))
+          );
+        }
+
+        // 1. Nhận diện trực tiếp theo ID hoặc Node ID kinh điển của Case #000
+        if (canonicalId === "vu") {
+          if (
+            idLow === "cp-000-1a-followup" ||
+            idLow.includes("1a-followup") ||
+            idLow.includes("vu-followup") ||
+            nodeLow === "c0-pin-followup-vu"
+          ) return true;
+        } else if (canonicalId === "tung") {
+          if (
+            idLow === "cp-000-1b-followup" ||
+            idLow.includes("1b-followup") ||
+            idLow.includes("tung-followup") ||
+            nodeLow === "c0-pin-followup-tung"
+          ) return true;
+        } else if (canonicalId === "ha") {
+          if (
+            idLow === "cp-000-1c-followup" ||
+            idLow.includes("1c-followup") ||
+            idLow.includes("ha-followup") ||
+            nodeLow === "c0-pin-followup-ha"
+          ) return true;
+        }
+
+        // 2. Nhận diện dynamic theo tiêu chuẩn: ID/NodeID chứa 'followup' VÀ khớp tên/mã nghi phạm
+        const isFollowup = idLow.includes("followup") || nodeLow.includes("followup");
+        if (!isFollowup) return false;
+
+        return aliasList.some(
+          (alias) =>
+            idLow.includes(alias) ||
+            nodeLow.includes(alias) ||
+            titleClean.includes(alias) ||
+            qClean.includes(alias)
         );
       });
       if (match) cpId = match.id;
+    }
+
+    // Nếu caseCheckpoints chưa nạp (đang fetch), giữ fallback cho 3 nhân vật kinh điển của Case #000
+    if (!cpId && (!caseCheckpoints || caseCheckpoints.length === 0)) {
+      if (canonicalId === "vu") cpId = "cp-000-1a-followup";
+      else if (canonicalId === "tung") cpId = "cp-000-1b-followup";
+      else if (canonicalId === "ha") cpId = "cp-000-1c-followup";
+    }
+
+    // QUAN TRỌNG: Nếu đối tượng này KHÔNG có câu hỏi / checkpoint tương ứng trên Google Sheets
+    // TUYỆT ĐỐI KHÔNG sinh ghim "Nghi vấn" rỗng (tránh hiển thị node mà không có câu hỏi)!
+    if (!cpId) {
+      return;
     }
 
     // Đối với 3 nhân vật kinh điển của Case #000, giữ nguyên tọa độ gốc
@@ -151,7 +225,7 @@ function buildFollowupPins(
         color: "purple" as const,
         noteColor: "yellow" as const,
         actionType: "sheet_checkpoint" as const,
-        checkpointId: cpId || "cp-000-1a-followup",
+        checkpointId: cpId,
       });
       return;
     }
@@ -166,7 +240,7 @@ function buildFollowupPins(
         color: "purple" as const,
         noteColor: "yellow" as const,
         actionType: "sheet_checkpoint" as const,
-        checkpointId: cpId || "cp-000-1b-followup",
+        checkpointId: cpId,
       });
       return;
     }
@@ -181,7 +255,7 @@ function buildFollowupPins(
         color: "purple" as const,
         noteColor: "yellow" as const,
         actionType: "sheet_checkpoint" as const,
-        checkpointId: cpId || "cp-000-1c-followup",
+        checkpointId: cpId,
       });
       return;
     }
@@ -196,7 +270,7 @@ function buildFollowupPins(
       color: "purple" as const,
       noteColor: "yellow" as const,
       actionType: "sheet_checkpoint" as const,
-      checkpointId: cpId || `cp-${canonicalId}-followup`,
+      checkpointId: cpId,
     });
   });
 
@@ -490,6 +564,7 @@ export function buildCustomConnections(opts: {
   vuSuspect?: SuspectItem;
   tungSuspect?: SuspectItem;
   haSuspect?: SuspectItem;
+  activePins?: PinPoint[];
   adminConnections: CaseConnection[];
 }): CaseConnection[] {
   const activeFollowupSet = new Set<string>(opts.followupCulpritIds || []);
@@ -510,6 +585,11 @@ export function buildCustomConnections(opts: {
     },
   ];
 
+  const pinExists = (targetId: string) => {
+    if (!opts.activePins || opts.activePins.length === 0) return true;
+    return opts.activePins.some((p) => p.id === targetId);
+  };
+
   // 1. Dây đỏ từ note 'Nghi phạm' sang tất cả các nghi phạm
   opts.effectiveSuspects.forEach((suspect) => {
     const { canonicalId } = getCanonicalSuspectKey(suspect);
@@ -519,13 +599,16 @@ export function buildCustomConnections(opts: {
       toPinId: `node-suspect-${canonicalId}`,
     });
 
-    // 2. Dây đỏ từ từng nghi phạm sang note 'Nghi vấn' của chính họ (nếu có)
+    // 2. Dây đỏ từ từng nghi phạm sang note 'Nghi vấn' của chính họ (chỉ nối khi ghim Nghi vấn thực sự tồn tại)
     if (activeFollowupSet.has(canonicalId)) {
-      conns.push({
-        id: `c0-conn-followup-${canonicalId}`,
-        fromPinId: `node-suspect-${canonicalId}`,
-        toPinId: `c0-pin-followup-${canonicalId}`,
-      });
+      const followupPinId = `c0-pin-followup-${canonicalId}`;
+      if (pinExists(followupPinId)) {
+        conns.push({
+          id: `c0-conn-followup-${canonicalId}`,
+          fromPinId: `node-suspect-${canonicalId}`,
+          toPinId: followupPinId,
+        });
+      }
     }
   });
 

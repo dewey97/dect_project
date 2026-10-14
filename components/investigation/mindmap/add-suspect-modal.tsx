@@ -309,7 +309,8 @@ export function AddSuspectModal({
         motiveClueIds,
         alibiClueIds
       })
-      if (onSubmitConclusion) {
+      // Chỉ kích hoạt onSubmitConclusion nếu nhân vật này thực sự có checkpoint/câu hỏi điều tra tương ứng trên CMS
+      if (onSubmitConclusion && (suspectCpId || matchedCheckpoint)) {
         onSubmitConclusion(matchedChar.id)
       }
       onClose()

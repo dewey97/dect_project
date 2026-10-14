@@ -491,6 +491,7 @@ export function MainInvestigationCanvas({
         vuSuspect,
         tungSuspect,
         haSuspect,
+        activePins: displayPins,
         adminConnections: layout.adminConnections,
       }),
     [
@@ -502,6 +503,7 @@ export function MainInvestigationCanvas({
       vuSuspect,
       tungSuspect,
       haSuspect,
+      displayPins,
       layout.adminConnections,
     ],
   );

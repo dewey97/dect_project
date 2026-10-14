@@ -22,6 +22,7 @@
 | **01** | **File ghi âm giọng nói nhân chứng phụ (Voice Acting)** | Một số lời khai chưa có file thoại thật (`.mp3`), hiện hiển thị text kèm hiệu ứng sóng âm tượng trưng. | Cần file thu âm diễn viên lồng tiếng (Khang, Vy, Hà) đưa vào `public/audio/`. | Modal lời khai nhân chứng (`testimony-modal.tsx`). |
 | **02** | **Tính năng Chơi Nhóm Realtime (Group Play)** | Giao diện đã có nút chuyển đổi chế độ nhưng backend đồng bộ phòng chơi 4 chữ cái chưa kích hoạt. | Chờ triển khai Supabase Realtime theo tài liệu [`core_specs/11_group_play_realtime_spec.md`](core_specs/11_group_play_realtime_spec.md). | Menu điều hướng phòng chơi nhóm. |
 | **03** | **Khám xét lại hiện trường 360 Panorama** | Toàn bộ phân hệ 3D/360 hiện đóng băng an toàn trong `archive_3d_vault/`; giao diện đang dùng 2D Point-and-Click. | Giữ nguyên 2D Point-and-Click cho đến khi có ảnh panorama 360 render hoàn thiện và User ra lệnh mở lại. | Khám xét lại hiện trường (`reinvestigation_hotspots.md`). |
+| **08** | **Liên kết Google Sheet cho Waitlist Landing Page** | Giao diện và API `/api/waitlist` đã dựng xong với rate-limit và local backup `data/waitlist_pending.json`. | Cung cấp ID Google Sheet vào biến môi trường `WAITLIST_SHEET_ID` để kích hoạt ghi realtime vào Sheet. | Landing Hero, Case Dispatch Section, Landing Footer. |
 
 ---
 

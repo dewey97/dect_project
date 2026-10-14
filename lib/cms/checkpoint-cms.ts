@@ -22,6 +22,10 @@ export interface SheetCheckpointRow {
   narrative?: string;
   suspect_label?: string;
   evidence_step_label?: string;
+  followup_of?: string;
+  followup_suspect?: string;
+  nghi_van_cua?: string;
+  suspect_id?: string;
   [key: string]: unknown;
 }
 
@@ -41,6 +45,7 @@ export interface ParsedAnswers {
   availableEvidences?: CheckpointOptionItem[];
   textMatchInputs?: NonNullable<Checkpoint["textMatchConfig"]>["inputs"];
   photoCodes?: string[];
+  followupOf?: string;
 }
 
 /**
@@ -102,6 +107,14 @@ const ANSWER_KEYS: Record<string, string> = {
   input: "input",
   inputs: "input",
   o_nhap: "input",
+
+  // Followup / Nghi vấn nghi phạm
+  followup_of: "followup_of",
+  followup: "followup_of",
+  follow_up: "followup_of",
+  nghi_van_cua: "followup_of",
+  nghi_van: "followup_of",
+  suspect_id: "followup_of",
 };
 
 /** Tách ô đa dòng (Alt+Enter) thành mảng dòng đã trim, bỏ dòng rỗng. */
@@ -348,6 +361,9 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
             break;
           case "photo":
             parsed.photoCodes = splitCommas(value);
+            break;
+          case "followup_of":
+            parsed.followupOf = value.trim();
             break;
           case "input": {
             const input = parseInputLine(value);
@@ -635,6 +651,17 @@ export function transformSheetCheckpoint(
     "cp-dynamic"
   ).trim();
 
+  const rawFollowupOf =
+    typeof row.followup_of === "string" && row.followup_of.trim()
+      ? row.followup_of.trim()
+      : typeof row.followup_suspect === "string" && row.followup_suspect.trim()
+      ? row.followup_suspect.trim()
+      : typeof row.nghi_van_cua === "string" && row.nghi_van_cua.trim()
+      ? row.nghi_van_cua.trim()
+      : typeof row.suspect_id === "string" && row.suspect_id.trim()
+      ? row.suspect_id.trim()
+      : answers.followupOf || undefined;
+
   return {
     id: effectiveId,
     nodeId: String(row.node_id || effectiveId).trim(),
@@ -654,6 +681,8 @@ export function transformSheetCheckpoint(
     storyConfig,
     dossier: row.dossier || undefined,
     suspectLabel: row.suspect_label || pickerConfig?.suspectLabel || undefined,
+    followupOf: rawFollowupOf,
+    suspectId: rawFollowupOf,
     rawAnswersId,
     rawAnswers: rawAnswersText,
   } as Checkpoint;

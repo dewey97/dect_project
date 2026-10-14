@@ -74,6 +74,7 @@ export function FollowupQuestionModal({
   // Live Checkpoint metadata for Ha followup (cp-000-1c-followup or cp-000-2a or cp-000-1c)
   const haCheckpoint = useMemo(() => {
     return (
+      checkpoints.find((cp) => cp.followupOf?.toLowerCase().trim() === 'ha') ||
       checkpoints.find((cp) => cp.id === 'cp-000-1c-followup') ||
       checkpoints.find((cp) => cp.id === 'cp-000-2a') ||
       checkpoints.find((cp) => cp.id === 'cp-000-1c')
@@ -83,6 +84,7 @@ export function FollowupQuestionModal({
   // Live Checkpoint metadata for Vu followup (cp-000-1a-followup or cp-000-1a)
   const vuCheckpoint = useMemo(() => {
     return (
+      checkpoints.find((cp) => cp.followupOf?.toLowerCase().trim() === 'vu') ||
       checkpoints.find((cp) => cp.id === 'cp-000-1a-followup') ||
       checkpoints.find((cp) => cp.id === 'cp-000-1a')
     )
@@ -91,6 +93,7 @@ export function FollowupQuestionModal({
   // Live Checkpoint metadata for Tung followup (cp-000-1b-followup or cp-000-1b)
   const tungCheckpoint = useMemo(() => {
     return (
+      checkpoints.find((cp) => cp.followupOf?.toLowerCase().trim() === 'tung') ||
       checkpoints.find((cp) => cp.id === 'cp-000-1b-followup') ||
       checkpoints.find((cp) => cp.id === 'cp-000-1b')
     )
@@ -99,7 +102,9 @@ export function FollowupQuestionModal({
   // Live Checkpoint metadata for Custom Suspect
   const customCheckpoint = useMemo(() => {
     if (!culprit || isVu || isTung || isHa) return null
+    const cLow = culprit.toLowerCase().trim()
     return (
+      checkpoints.find((cp) => cp.followupOf?.toLowerCase().trim() === cLow) ||
       checkpoints.find((cp) => cp.id === `cp-${culprit}-followup`) ||
       checkpoints.find((cp) => cp.id === `cp-${culprit}`) ||
       checkpoints.find((cp) => {
