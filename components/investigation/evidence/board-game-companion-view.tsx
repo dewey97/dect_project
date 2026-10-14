@@ -4,20 +4,9 @@ import React from 'react'
 import { MainInvestigationCanvas } from '@/components/investigation/mindmap/main-investigation-canvas'
 
 interface BoardGameCompanionViewProps {
-  checkpoints?: any[]
-  completedCheckpointIds?: string[]
-  selectedAnswers?: Record<string, string>
-  checkpointErrors?: Record<string, boolean>
-  checkpointSuccesses?: Record<string, boolean>
-  unlockedHintLevel?: Record<string, number>
-  onAnswerSelect?: (cpId: string, option: string) => void
-  onSubmitAnswer?: (cp: any) => void
-  onUnlockNextHint?: (cpId: string, maxHints: number) => void
-  onOpenEpilogue?: () => void
-  onSwitchToWebMode?: () => void
-  onProceedNextPhase?: (cpId: string) => void
   onOpenPhoneSimulator?: () => void
   onOpenReinvestigation?: () => void
+  onOpenEpilogue?: () => void
 }
 
 export function BoardGameCompanionView({

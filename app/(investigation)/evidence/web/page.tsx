@@ -24,7 +24,6 @@ import {
   Search,
 } from "lucide-react";
 import { PDFViewerModal } from "@/components/investigation/pdf-viewer-modal";
-import { CASES } from "@/lib/mock-data";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
 
@@ -77,16 +76,6 @@ function WebEvidencePageContent() {
     () => caseId.replace(/-/g, "_"),
     [caseId],
   );
-
-  const activeCase = CASES.find((c) => c.id === caseId) || {
-    id: caseId,
-    title: `Vụ án #${caseId}`,
-    description: "Hồ sơ điều tra",
-    status: "active" as const,
-    bgImage: "/board_texture.jpg",
-    pins: [],
-    connections: [],
-  };
 
   // Single modal registry
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);

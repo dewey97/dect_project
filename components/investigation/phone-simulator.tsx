@@ -1,36 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import type { Device, Conversation, Photo, Email, Document, BrowserHistory, RecoveredFile } from '@/lib/types'
-import {
-  MessageSquare,
-  Phone,
-  Users,
-  Image as ImageIcon,
-  Mail,
-  FileText,
-  Mic,
-  FolderOpen,
-  Calendar,
-  Globe,
-  ArrowLeft,
-  AlertTriangle
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { IPhoneFrame } from './iphone/iphone-frame'
-import { Smartphone, Terminal } from 'lucide-react'
-
-// Import Reusable Evidence Viewers
-import { MetadataPanel } from './viewers/metadata-panel'
-import { ConversationViewer } from './viewers/conversation-viewer'
-import { PhotoGallery } from './viewers/photo-gallery'
-import { EmailViewer } from './viewers/email-viewer'
-import { DocumentViewer } from './viewers/document-viewer'
-import { TimelineViewer } from './viewers/timeline-viewer'
-import { FileExplorer } from './viewers/file-explorer'
-import { RecoveryStatusPanel } from './viewers/recovery-status-panel'
-import { IntegrityIndicator } from './viewers/integrity-indicator'
 
 interface PhoneSimulatorProps {
   device?: Partial<Device>
