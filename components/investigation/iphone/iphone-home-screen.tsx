@@ -31,8 +31,6 @@ interface AppItem {
 
 export function IPhoneHomeScreen({
   onOpenApp,
-  unreadMessages = 1,
-  missedCalls = 0,
 }: IPhoneHomeScreenProps) {
   // Only apps with REAL investigation / gameplay functionality
   const gridApps: AppItem[] = [
@@ -42,13 +40,12 @@ export function IPhoneHomeScreen({
       name: "Messages",
       icon: "/images/cases/case_000/phone/icons/messages.png",
       appTarget: "messages",
-      badge: unreadMessages > 0 ? unreadMessages : undefined,
     },
     {
       id: "photos",
       name: "Photos",
       icon: "/images/cases/case_000/phone/icons/photos.png",
-      appTarget: null,
+      appTarget: "photos",
     },
     {
       id: "camera",
@@ -85,7 +82,6 @@ export function IPhoneHomeScreen({
       name: "Phone",
       icon: "/images/cases/case_000/phone/icons/phone.png",
       appTarget: "phone",
-      badge: missedCalls > 0 ? missedCalls : undefined,
     },
     {
       id: "contacts",
@@ -109,14 +105,7 @@ export function IPhoneHomeScreen({
 
   return (
     <div className="relative w-full h-full select-none overflow-hidden z-10 font-sans">
-      {/* 1. TOP MAIN APP GRID: 4 columns x 4 rows
-          Exact Figma AST metrics:
-          - Screen: 375px width
-          - 4 columns, each 93.75px (25% width)
-          - Icon size: exactly 74px x 74px (centered in 93.75px column, leaving ~9.8px side margins)
-          - Row pitch: 111px per row
-          - Top offset: 16px below status bar (y = 36px from screen top)
-      */}
+      {/* 1. TOP MAIN APP GRID: 4 columns x 4 rows */}
       <div className="absolute inset-x-0 top-[16px] grid grid-cols-4">
         {gridApps.map((app) => (
           <div
@@ -141,12 +130,6 @@ export function IPhoneHomeScreen({
                   className="w-full h-full object-contain pointer-events-none select-none"
                   draggable={false}
                 />
-                {/* Dynamic Notification Badge (if not already baked into icon) */}
-                {app.badge && app.id !== "messages" && (
-                  <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-[#FF3B30] text-white text-[12px] font-sans font-bold flex items-center justify-center border-2 border-white shadow-sm z-20">
-                    {app.badge}
-                  </span>
-                )}
               </div>
               <span className="mt-[4px] text-[12px] font-sans font-medium text-white tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate max-w-[84px] text-center">
                 {app.name}
@@ -156,19 +139,13 @@ export function IPhoneHomeScreen({
         ))}
       </div>
 
-      {/* 2. PAGE INDICATOR (Exact Figma Node between Apps and Dock: y ≈ 485px) */}
-      <div className="absolute inset-x-0 top-[470px] flex items-center justify-center gap-[6px]">
+      {/* 2. PAGE INDICATOR (Sits neatly right above the Dock) */}
+      <div className="absolute inset-x-0 bottom-[100px] flex items-center justify-center gap-[6px]">
         <span className="size-[6px] rounded-full bg-white shadow-xs" />
         <span className="size-[6px] rounded-full bg-white/40 shadow-xs" />
       </div>
 
-      {/* 3. AUTHENTIC iOS 9 DOCK (Exact Figma Node 14:40)
-          - Height: 111px
-          - Bottom: 0 (pinned to screen bottom)
-          - 4 columns, each 93.75px
-          - Icon size: 74px x 74px
-          - Frosted glass: bg-white/25 backdrop-blur-2xl
-      */}
+      {/* 3. AUTHENTIC iOS 9 DOCK (Exact Figma Node 14:40) */}
       <div className="absolute inset-x-0 bottom-0 h-[111px] bg-white/25 backdrop-blur-2xl border-t border-white/20 shadow-[0_-4px_20px_rgba(0,0,0,0.12)]">
         {/* Dock Highlight Reflection on top edge */}
         <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/50 to-transparent" />
@@ -194,12 +171,6 @@ export function IPhoneHomeScreen({
                     className="w-full h-full object-contain pointer-events-none select-none"
                     draggable={false}
                   />
-                  {/* Dynamic Badge for dock app */}
-                  {app.badge && (
-                    <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-[#FF3B30] text-white text-[12px] font-sans font-bold flex items-center justify-center border-2 border-white shadow-sm z-20">
-                      {app.badge}
-                    </span>
-                  )}
                 </div>
                 <span className="mt-[4px] text-[12px] font-sans font-medium text-white tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] truncate max-w-[84px] text-center">
                   {app.name}

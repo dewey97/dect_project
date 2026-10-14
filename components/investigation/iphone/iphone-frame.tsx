@@ -9,6 +9,7 @@ import {
   Users,
   X,
   EyeOff,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
@@ -64,10 +65,9 @@ export function IPhoneFrame({
   onClose,
 }: IPhoneFrameProps) {
   const frameless = false;
-  const [isLocked, setIsLocked] = useState(false);
+  // Mới mở điện thoại luôn xuất hiện màn hình khóa (Lockscreen) đầu tiên
+  const [isLocked, setIsLocked] = useState(true);
   const [activeApp, setActiveApp] = useState<IPhoneApp>(null);
-  const [showAssistiveTouch, setShowAssistiveTouch] = useState(true);
-  const [assistiveMenuOpen, setAssistiveMenuOpen] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [screenPage, setScreenPage] = useState<number>(0);
 
@@ -95,74 +95,66 @@ export function IPhoneFrame({
     !isLocked && (activeApp === "phone" || activeApp === "messages");
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-hidden py-0 sm:py-1">
-      {/* Top Quick Control Bar (Về Home khi đang trong app, Đóng X) */}
-      <div className="flex items-center justify-between w-full max-w-[390px] px-2 text-[11px] font-mono shrink-0 mb-1.5 z-40">
-        <div>
-          {activeApp && (
-            <button
-              onClick={() => setActiveApp(null)}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#0A84FF]/40 bg-[#0A84FF]/15 text-[#0A84FF] hover:bg-[#0A84FF]/25 active:scale-95 font-semibold transition-all shadow-sm cursor-pointer"
-              title="Thoát ứng dụng về Màn hình chính"
-            >
-              <Home className="size-3" />
-              <span>Về Home</span>
-            </button>
-          )}
+    <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-y-auto no-scrollbar py-2">
+      {/* Top Header Bar: Tiêu đề "ĐIỆN THOẠI NẠN NHÂN" & Nút "Quay lại" */}
+      <div className="flex items-center justify-between w-full max-w-[415px] px-2 shrink-0 mb-2 z-40">
+        <div className="flex items-center gap-2">
+          <span className="size-2 rounded-full bg-[#FF453A] animate-pulse" />
+          <span className="text-[12px] font-mono uppercase tracking-widest text-zinc-300 font-semibold drop-shadow">
+            Điện thoại nạn nhân
+          </span>
         </div>
 
         {onClose && (
           <button
             onClick={onClose}
-            className="size-7 rounded-lg flex items-center justify-center bg-[#1C1C1E] text-zinc-400 hover:text-white hover:bg-white/10 border border-white/10 active:scale-95 transition-all cursor-pointer shadow-sm ml-auto"
-            title="Đóng điện thoại"
-            aria-label="Đóng điện thoại"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1C1C1E]/90 text-zinc-300 hover:text-white hover:bg-white/15 border border-white/10 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
+            title="Quay lại hiện trường"
+            aria-label="Quay lại"
           >
-            <X className="size-4 text-[#d9a066]" />
+            <ArrowLeft className="size-3.5 text-[#d9a066]" />
+            <span>Quay lại</span>
           </button>
         )}
       </div>
 
-      {/* PHONE CONTAINER: Exact iPhone 375x667 Canvas Aspect Ratio */}
+      {/* PHONE CHASSIS: Classic Anodized Silver/Grey iPhone Faceplate (Full 100% Scale) */}
       <div
         data-iphone-frame="true"
         className={cn(
-          "relative w-[375px] max-w-full h-[667px] max-h-full aspect-[375/667] transition-all flex flex-col overflow-hidden shadow-2xl shrink-0 my-auto iphone-frame no-scrollbar",
+          "relative w-[415px] max-w-full transition-all flex flex-col items-center shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] shrink-0 my-auto iphone-frame no-scrollbar",
           frameless
-            ? "bg-black rounded-lg border border-white/20"
-            : "bg-[#121214] rounded-xl p-2.5 border-[6px] border-[#2C2C30] ring-1 ring-white/10",
+            ? "bg-black rounded-lg border border-white/20 h-[667px]"
+            : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]",
         )}
       >
         {!frameless && (
           <>
-            {/* Hardware Sleep / Lock Button */}
-            <button
-              onClick={() => setIsLocked(!isLocked)}
-              title={
-                isLocked
-                  ? "Nút Nguồn vật lý: Bấm để Mở khóa"
-                  : "Nút Nguồn vật lý: Bấm để Khóa máy"
-              }
-              className="absolute -right-[7px] sm:-right-[9px] top-24 w-2 sm:w-2.5 h-12 sm:h-14 bg-[#3A3A3C] hover:bg-[#0A84FF] active:bg-[#0A84FF] rounded-r-md cursor-pointer border-y border-r border-white/20 shadow-md transition-colors z-30 group flex items-center justify-center"
-            >
-              <span className="sr-only">Nút Nguồn vật lý</span>
-            </button>
+            {/* Top Bezel: Authentic Classic iPhone (Proximity sensor, Front Camera & Speaker) */}
+            <div className="w-full h-[72px] flex flex-col items-center justify-center shrink-0 relative">
+              {/* Proximity / Light Sensor dot */}
+              <div className="size-1.5 rounded-full bg-[#3F3F46] opacity-80 mb-2 shadow-inner" />
+              
+              <div className="flex items-center justify-center relative w-full">
+                {/* Front Camera Lens (Positioned to the left of ear speaker) */}
+                <div className="absolute left-1/2 -translate-x-14 size-3 rounded-full bg-[#27272A] border border-black/30 shadow-inner flex items-center justify-center">
+                  <div className="size-1 rounded-full bg-[#0369a1]/60" />
+                </div>
+                {/* Ear Speaker Grill (Silver/Grey mesh) */}
+                <div className="w-14 h-1.5 rounded-full bg-[#52525B] border border-black/30 shadow-inner" />
+              </div>
+            </div>
 
-            {/* Hardware Volume Buttons */}
-            <div className="absolute -left-[6px] sm:-left-[8px] top-20 w-1.5 sm:w-2 h-6 bg-[#2C2C2E] rounded-l-sm border-y border-l border-white/20" />
-            <div className="absolute -left-[6px] sm:-left-[8px] top-30 w-1.5 sm:w-2 h-9 bg-[#3A3A3C] rounded-l-md border-y border-l border-white/20" />
-            <div className="absolute -left-[6px] sm:-left-[8px] top-42 w-1.5 sm:w-2 h-9 bg-[#3A3A3C] rounded-l-md border-y border-l border-white/20" />
-
-            {/* Subtle Metallic Bezel Highlights */}
-            <div className="absolute inset-0 rounded-lg pointer-events-none border border-white/10" />
+            {/* Subtle Metallic Chamfer Edge Highlight */}
+            <div className="absolute inset-0 rounded-[48px] pointer-events-none border border-white/40 shadow-[inset_0_0_3px_rgba(0,0,0,0.1)]" />
           </>
         )}
 
-        {/* SCREEN CONTAINER (Uses Authentic Figma Beach Wallpaper & Vignette) */}
+        {/* SCREEN CONTAINER: Compact 375x600 iOS Screen Dimension */}
         <div
           className={cn(
-            "relative w-full h-full bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col iphone-screen no-scrollbar",
-            !frameless && "rounded-md",
+            "relative w-[375px] max-w-full h-[600px] shrink-0 bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col iphone-screen no-scrollbar",
+            !frameless && "rounded-lg border border-black/50 shadow-inner",
           )}
         >
           {/* Authentic iOS Vignette Gradient (Figma Node 14:39) */}
@@ -177,65 +169,56 @@ export function IPhoneFrame({
                   : "bg-transparent text-white",
               )}
             >
-              {/* Left: 5 Signal Dots + Carrier + Wi-Fi */}
+              {/* Left: Empty Signal Dots + "Không có Dịch vụ" (No Service) */}
               <div
                 className="flex items-center gap-1.5"
-                title="Trạng thái mạng: giffgaff"
+                title="Trạng thái mạng: Không có Dịch vụ"
               >
                 <div className="flex items-center gap-[2.5px]">
                   <span
                     className={cn(
-                      "size-1.5 rounded-full shadow-sm inline-block",
-                      isLightStatusBar ? "bg-black" : "bg-white",
+                      "size-1.5 rounded-full inline-block border",
+                      isLightStatusBar ? "border-black/50 bg-transparent" : "border-white/50 bg-transparent",
                     )}
                   />
                   <span
                     className={cn(
-                      "size-1.5 rounded-full shadow-sm inline-block",
-                      isLightStatusBar ? "bg-black" : "bg-white",
+                      "size-1.5 rounded-full inline-block border",
+                      isLightStatusBar ? "border-black/50 bg-transparent" : "border-white/50 bg-transparent",
                     )}
                   />
                   <span
                     className={cn(
-                      "size-1.5 rounded-full shadow-sm inline-block",
-                      isLightStatusBar ? "bg-black" : "bg-white",
+                      "size-1.5 rounded-full inline-block border",
+                      isLightStatusBar ? "border-black/50 bg-transparent" : "border-white/50 bg-transparent",
                     )}
                   />
                   <span
                     className={cn(
-                      "size-1.5 rounded-full shadow-sm inline-block",
-                      isLightStatusBar ? "bg-black" : "bg-white",
+                      "size-1.5 rounded-full inline-block border",
+                      isLightStatusBar ? "border-black/50 bg-transparent" : "border-white/50 bg-transparent",
                     )}
                   />
                   <span
                     className={cn(
-                      "size-1.5 rounded-full shadow-sm inline-block",
-                      isLightStatusBar ? "bg-black" : "bg-white",
+                      "size-1.5 rounded-full inline-block border",
+                      isLightStatusBar ? "border-black/50 bg-transparent" : "border-white/50 bg-transparent",
                     )}
                   />
                 </div>
                 <span
                   className={cn(
-                    "font-medium text-[10px] ml-0.5",
+                    "font-medium text-[9.5px] ml-0.5 tracking-tight",
                     isLightStatusBar
                       ? "text-black"
-                      : "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]",
+                      : "text-white/80 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]",
                   )}
                 >
-                  giffgaff
+                  Không có Dịch vụ
                 </span>
-                <svg
-                  className={cn(
-                    "size-3 fill-current",
-                    isLightStatusBar ? "text-black" : "text-white drop-shadow",
-                  )}
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0012 4zm0 4.5c3.31 0 6.3 1.34 8.49 3.51L12 20.49 3.51 12.01A11.91 11.91 0 0112 8.5z" />
-                </svg>
               </div>
 
-              {/* Center: Clock 12:35 */}
+              {/* Center: Frozen Evidence Clock 21:30 */}
               <div
                 className={cn(
                   "absolute left-1/2 -translate-x-1/2 font-semibold text-[11.5px] tracking-tight font-sans",
@@ -244,25 +227,16 @@ export function IPhoneFrame({
                     : "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]",
                 )}
               >
-                12:35
+                21:30
               </div>
 
-              {/* Right: Bluetooth + 20% + Solid Battery */}
+              {/* Right: Critical Battery Icon (No percentage, No Bluetooth) */}
               <div
                 className={cn(
-                  "flex items-center gap-1 font-semibold",
+                  "flex items-center gap-1",
                   isLightStatusBar ? "text-black" : "text-white",
                 )}
               >
-                <span
-                  className={cn(
-                    "text-[9.5px] font-sans font-medium",
-                    !isLightStatusBar &&
-                      "drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]",
-                  )}
-                >
-                  20%
-                </span>
                 <div
                   className={cn(
                     "w-5 h-2.5 rounded-[3px] p-[1px] relative flex items-center shadow-sm",
@@ -271,7 +245,7 @@ export function IPhoneFrame({
                       : "border border-white/90 bg-black/20",
                   )}
                 >
-                  <div className="h-full w-[20%] bg-[#FF3B30] rounded-[1px]" />
+                  <div className="h-full w-[15%] bg-[#FF3B30] rounded-[1px]" />
                   <div
                     className={cn(
                       "absolute -right-[3px] top-[2px] w-[2px] h-[4px] rounded-r-[1px]",
@@ -310,95 +284,37 @@ export function IPhoneFrame({
                 {/* Top Notification Grabber Hint */}
                 <div className="w-10 h-1 bg-white/40 rounded-full mx-auto -mt-1 mb-1 shadow-xs" />
 
-                {/* Lock Screen Header & Clock (Figma Spec 22:389) */}
+                {/* Lock Screen Header & Clock (Frozen at Crime Scene Timestamp) */}
                 <div className="flex flex-col items-center pt-2 space-y-1 relative z-10">
                   <span className="text-[17px] font-normal text-white/95 tracking-[0.425px] drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)] font-sans">
-                    Thứ Sáu, 12 tháng 9
+                    Thứ Bảy, 23 tháng 7
                   </span>
                   <span className="text-[76px] sm:text-[80px] font-extralight text-white tracking-[-1.9px] leading-[80px] drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)] font-sans">
-                    12:35
+                    21:30
                   </span>
                 </div>
 
                 {/* Center Empty Space (Không hiện thông báo/widget, giữ màn hình khóa sạch) */}
                 <div className="flex-1 my-auto" />
 
-                {/* Bottom Bar: Classic iOS 9 "slide to unlock" + Camera Glyph (Figma Node 22:417) */}
-                <div className="relative z-10 w-full flex flex-col items-center pb-2 pt-1">
-                  {/* Control Center Drag Indicator (Node 22:419: 36x4px, blur 12px, margin-bottom 24px) */}
-                  <div className="w-[36px] h-[4px] bg-white/35 rounded-full backdrop-blur-[12px] mb-4" />
-
-                  {/* Shimmer Slider Row */}
-                  <div className="w-full flex items-center justify-between px-3 relative">
-                    <div className="w-11" />{" "}
-                    {/* Spacer to center the shimmer text */}
-                    {/* Shimmer "slide to unlock" Action (Node 22:424) */}
-                    <div
-                      onClick={() => setIsLocked(false)}
-                      className="flex items-center gap-1 cursor-pointer group active:opacity-60 transition-opacity select-none"
-                      title="Bấm hoặc vuốt để mở khóa"
-                    >
-                      <span className="ios-shimmer-text font-extralight text-[16px] sm:text-[18px] tracking-[0.5px]">
-                        › trượt để mở khóa
-                      </span>
-                    </div>
-                    {/* Bottom-right Camera Quick-Action Glyph (Node 22:421) */}
-                    <div
-                      className="size-[44px] rounded-full bg-white/10 backdrop-blur-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-white/10 flex items-center justify-center text-white/70 select-none opacity-60"
-                      title="Máy ảnh (Tạm thời khóa)"
-                    >
-                      <svg
-                        className="w-[18.33px] h-[16.5px] fill-white/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]"
-                        viewBox="0 0 19 17"
-                      >
-                        <path d="M4 4h3l2-2h6l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm8 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6z" />
-                      </svg>
-                    </div>
+                {/* Bottom Bar: Clean subtle prompt for physical Home button */}
+                <div className="relative z-10 w-full flex flex-col items-center pb-3 pt-1">
+                  <div className="text-white/70 font-sans text-[13px] font-normal tracking-wide drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)] animate-pulse">
+                    Nhấn nút Home để mở khóa
                   </div>
                 </div>
               </div>
             ) : activeApp ? (
               /* 2. ACTIVE APP RUNNING */
               <div className="flex-1 min-h-0 flex flex-col h-full bg-black overflow-hidden">
-                {activeApp === "messages" && (
-                  <MessagesApp onBackToHome={() => setActiveApp(null)} />
-                )}
-                {activeApp === "phone" && (
-                  <PhoneApp
-                    initialTab="recents"
-                    onBackToHome={() => setActiveApp(null)}
-                  />
-                )}
-                {activeApp === "safari" && (
-                  <SafariApp
-                    history={history}
-                    onBackToHome={() => setActiveApp(null)}
-                  />
-                )}
-                {activeApp === "notes" && (
-                  <NotesApp
-                    notes={notes}
-                    onBackToHome={() => setActiveApp(null)}
-                  />
-                )}
-                {activeApp === "photos" && (
-                  <PhotosApp
-                    photos={photos}
-                    onBackToHome={() => setActiveApp(null)}
-                  />
-                )}
-                {activeApp === "maps" && (
-                  <MapsApp onBackToHome={() => setActiveApp(null)} />
-                )}
-                {activeApp === "contacts" && (
-                  <PhoneApp
-                    initialTab="contacts"
-                    onBackToHome={() => setActiveApp(null)}
-                  />
-                )}
-                {activeApp === "banking" && (
-                  <BankingApp onBackToHome={() => setActiveApp(null)} />
-                )}
+                {activeApp === "messages" && <MessagesApp />}
+                {activeApp === "phone" && <PhoneApp initialTab="recents" />}
+                {activeApp === "safari" && <SafariApp history={history} />}
+                {activeApp === "notes" && <NotesApp notes={notes} />}
+                {activeApp === "photos" && <PhotosApp photos={photos} />}
+                {activeApp === "maps" && <MapsApp />}
+                {activeApp === "contacts" && <PhoneApp initialTab="contacts" />}
+                {activeApp === "banking" && <BankingApp />}
                 {activeApp === "settings" && (
                   <div className="p-4 text-white space-y-4 font-sans overflow-y-auto">
                     <div className="flex items-center justify-between border-b border-[#2C2C2E] pb-2">
@@ -476,87 +392,32 @@ export function IPhoneFrame({
               />
             )}
 
-            {/* 4. FLOATING ASSISTIVETOUCH (Nút Home ảo) */}
-            {showAssistiveTouch && !isLocked && (
-              <>
-                {/* AssistiveTouch Button */}
-                <button
-                  onClick={() => setAssistiveMenuOpen(!assistiveMenuOpen)}
-                  className="absolute z-50 size-11 right-3.5 bottom-16 rounded-full bg-black/70 backdrop-blur-md border border-white/30 shadow-2xl flex items-center justify-center cursor-pointer active:scale-90 transition-transform group"
-                  title="Nút Home ảo AssistiveTouch (Bấm để mở Menu)"
-                >
-                  <div className="size-7 rounded-full bg-white/40 group-hover:bg-white/70 border border-white/60 flex items-center justify-center">
-                    <div className="size-3.5 rounded-full bg-white shadow" />
-                  </div>
-                </button>
-
-                {/* AssistiveTouch Popup Menu */}
-                {assistiveMenuOpen && (
-                  <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in-50">
-                    <div className="relative w-[210px] rounded-3xl bg-[#1C1C1E]/95 border border-white/20 p-4 shadow-2xl space-y-3">
-                      <div className="text-[11px] font-bold text-center text-white/90">
-                        ASSISTIVE TOUCH
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <button
-                          onClick={() => {
-                            setActiveApp(null);
-                            setAssistiveMenuOpen(false);
-                          }}
-                          className="p-3 rounded-2xl bg-[#2C2C2E] hover:bg-[#3A3A3C] flex flex-col items-center gap-1.5 text-white transition-colors cursor-pointer"
-                        >
-                          <Home className="size-5 text-[#0A84FF]" />
-                          <span className="text-[9.5px]">Màn hình chính</span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setIsLocked(true);
-                            setAssistiveMenuOpen(false);
-                          }}
-                          className="p-3 rounded-2xl bg-[#2C2C2E] hover:bg-[#3A3A3C] flex flex-col items-center gap-1.5 text-white transition-colors cursor-pointer"
-                        >
-                          <Lock className="size-5 text-[#FF9F0A]" />
-                          <span className="text-[9.5px]">Khóa máy</span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setActiveApp("messages");
-                            setAssistiveMenuOpen(false);
-                          }}
-                          className="p-3 rounded-2xl bg-[#2C2C2E] hover:bg-[#3A3A3C] flex flex-col items-center gap-1.5 text-white transition-colors cursor-pointer"
-                        >
-                          <MessageSquare className="size-5 text-[#30D158]" />
-                          <span className="text-[9.5px]">Tin nhắn</span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setActiveApp("contacts");
-                            setAssistiveMenuOpen(false);
-                          }}
-                          className="p-3 rounded-2xl bg-[#2C2C2E] hover:bg-[#3A3A3C] flex flex-col items-center gap-1.5 text-white transition-colors cursor-pointer"
-                        >
-                          <Users className="size-5 text-[#0A84FF]" />
-                          <span className="text-[9.5px]">Danh bạ</span>
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={() => setAssistiveMenuOpen(false)}
-                        className="w-full py-1.5 text-center text-[11px] text-[#0A84FF] font-semibold hover:underline cursor-pointer"
-                      >
-                        Đóng
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
           </div>
         </div>
+
+        {!frameless && (
+          /* Bottom Bezel: Authentic Classic iPhone Touch ID (Symmetrical 72px Height) */
+          <div className="w-full h-[72px] flex items-center justify-center shrink-0">
+            <button
+              onClick={() => {
+                if (isLocked) {
+                  // Mở khóa nếu đang ở lockscreen
+                  setIsLocked(false);
+                } else {
+                  // Thoát về màn hình chính
+                  setActiveApp(null);
+                }
+              }}
+              className="group size-14 rounded-full bg-[#D8D8DC] border-[2px] border-[#A1A1A6] hover:border-[#71717A] active:scale-95 transition-all flex items-center justify-center shadow-[0_2px_4px_rgba(0,0,0,0.12),inset_0_1px_2px_rgba(0,0,0,0.06)] cursor-pointer relative"
+              title="Nút Home vật lý (Touch ID): Bấm để về Màn hình chính hoặc Mở khóa"
+            >
+              {/* Touch ID Silver Chamfer Ring Accent */}
+              <div className="absolute inset-[1.5px] rounded-full border-[1.5px] border-[#8E8E93] group-hover:border-[#52525B] pointer-events-none" />
+              {/* Inner concave center */}
+              <div className="size-9 rounded-full bg-[#D8D8DC] shadow-[inset_0_1px_2px_rgba(0,0,0,0.08)] group-active:brightness-90 transition-all" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
