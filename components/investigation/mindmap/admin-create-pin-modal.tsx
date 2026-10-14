@@ -186,6 +186,9 @@ export function AdminCreatePinModal({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isNoteColorOpen, setIsNoteColorOpen] = useState(false);
   const [isPinColorOpen, setIsPinColorOpen] = useState(false);
+  const [syncToSheet, setSyncToSheet] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
   // Fetch live photos & checkpoints from Google Sheets
   const { data: sheetPhotos } = usePhoneData("evidences");
@@ -365,7 +368,7 @@ export function AdminCreatePinModal({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     // Ảnh không cần tiêu đề: ảnh render trực tiếp trên bảng, không hiện chữ nào.
     const isPhotoPin = pinType === "photo";
@@ -421,6 +424,31 @@ export function AdminCreatePinModal({
       rotation: rotation !== 0 ? rotation : undefined,
       scale: scale !== 1 ? scale : undefined,
     };
+
+    if (syncToSheet) {
+      setIsSyncing(true);
+      setSyncStatus("Đang đồng bộ Google Sheets...");
+      try {
+        const res = await fetch("/api/admin/pins", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            caseId: "case_000",
+            pin: createdPin,
+          }),
+        });
+        const result = await res.json();
+        if (result.success) {
+          setSyncStatus("Đã đồng bộ thành công!");
+        } else {
+          console.warn("Lỗi sync Google Sheets:", result.error);
+        }
+      } catch (err) {
+        console.error("Lỗi mạng khi sync Google Sheets:", err);
+      } finally {
+        setIsSyncing(false);
+      }
+    }
 
     onSavePin(createdPin);
     onClose();
@@ -966,7 +994,18 @@ export function AdminCreatePinModal({
                 <span>XOÁ NODE</span>
               </button>
             ) : (
-              <div />
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={syncToSheet}
+                  onChange={(e) => setSyncToSheet(e.target.checked)}
+                  className="rounded border-zinc-700 bg-zinc-900 text-amber-500 focus:ring-0 focus:ring-offset-0"
+                />
+                <span className="text-[11px] font-mono text-zinc-300 flex items-center gap-1">
+                  <span>📊 Đồng bộ Google Sheet</span>
+                  {isSyncing && <span className="text-amber-400 animate-pulse">...</span>}
+                </span>
+              </label>
             )}
 
             <div className="flex items-center gap-2">
@@ -979,10 +1018,11 @@ export function AdminCreatePinModal({
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-500 text-zinc-950 hover:bg-amber-400 font-bold rounded text-xs font-mono transition-all"
+                disabled={isSyncing}
+                className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-500 text-zinc-950 hover:bg-amber-400 font-bold rounded text-xs font-mono transition-all disabled:opacity-50"
               >
                 <Check className="size-3.5" />
-                <span>{initialPin ? "LƯU" : "THÊM"}</span>
+                <span>{isSyncing ? "ĐANG ĐỒNG BỘ..." : initialPin ? "LƯU" : "THÊM"}</span>
               </button>
             </div>
           </div>
