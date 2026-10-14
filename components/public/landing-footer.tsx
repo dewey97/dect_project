@@ -1,14 +1,28 @@
 'use client'
 
 import { BrandMark } from '@/components/investigation/brand-mark'
+import { WaitlistForm } from '@/components/public/waitlist-form'
 
 export function LandingFooter() {
   return (
     <footer className="w-full border-t border-border/10 bg-card/5 pt-12 pb-6 z-10 font-sans">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-        {/* Col 1: About */}
+        {/* Col 1: About & Dispatch signup */}
         <div className="flex flex-col gap-3">
           <BrandMark href="/" />
+          <p className="text-xs text-muted-foreground/80 leading-relaxed font-mono">
+            Hệ sinh thái trinh thám tương tác đa nền tảng đầu tiên tại Việt Nam.
+          </p>
+          <div className="mt-2 flex flex-col gap-1.5">
+            <span className="text-[0.68rem] font-mono text-amber-400/90 font-bold uppercase tracking-wider">
+              Nhận bản tin chuyên án:
+            </span>
+            <WaitlistForm
+              source="footer"
+              variant="compact"
+              placeholder="Email của bạn..."
+            />
+          </div>
         </div>
 
         {/* Col 2: Support menu */}

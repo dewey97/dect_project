@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Search, ShoppingCart, Dices, ChevronRight } from "lucide-react";
 import { UserNav } from "@/components/auth/user-nav";
 import { LandingBanner } from "@/components/public/landing-banner";
+import { WaitlistForm } from "@/components/public/waitlist-form";
 
 export function LandingHero() {
   const router = useRouter();
@@ -118,6 +119,20 @@ export function LandingHero() {
                 <span>Trốn Tìm (Boardgame)</span>
                 <ChevronRight className="size-4 opacity-60 group-hover/btn:translate-x-0.5 transition-transform" />
               </button>
+            </div>
+
+            {/* Quick Email Dispatch Box */}
+            <div className="w-full mt-2 pt-3 border-t border-border/15 flex flex-col gap-1.5">
+              <span className="text-[0.68rem] font-mono uppercase tracking-wider text-amber-400/90 font-bold flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
+                Nhận mật mã sớm & thông báo chuyên án mới:
+              </span>
+              <WaitlistForm
+                source="hero"
+                variant="inline"
+                placeholder="Nhập email thám tử của bạn..."
+                buttonLabel="ĐĂNG KÝ"
+              />
             </div>
           </div>
         </div>

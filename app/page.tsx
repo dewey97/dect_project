@@ -10,6 +10,7 @@ import { WorldArchiveSection } from "@/components/public/world-archive-section";
 import { GameRulesShowcase } from "@/components/public/game-rules-showcase";
 import { LandingFeaturesSection } from "@/components/public/landing-features-section";
 import { ReviewsAndFaqSection } from "@/components/public/reviews-and-faq-section";
+import { CaseDispatchSection } from "@/components/public/case-dispatch-section";
 import { LandingFooter } from "@/components/public/landing-footer";
 
 export default function MarketingLandingPage() {
@@ -53,6 +54,9 @@ export default function MarketingLandingPage() {
 
       {/* Reviews & FAQ */}
       <ReviewsAndFaqSection />
+
+      {/* Case Dispatch & Waitlist */}
+      <CaseDispatchSection />
 
       {/* Footer */}
       <LandingFooter />
