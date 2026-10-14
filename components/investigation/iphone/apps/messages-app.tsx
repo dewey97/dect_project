@@ -225,23 +225,25 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     }
 
     const isUnread = item.unread === "TRUE" || item.unread === true;
+    const lastParsedMsg = parsedMessages.length > 0 ? parsedMessages[parsedMessages.length - 1] : null;
+    const resolvedTimestamp = item.timestamp || (lastParsedMsg?.timestamp ? lastParsedMsg.timestamp.replace(/^.*\s*•\s*/, "") : "") || (lastParsedMsg?.timestamp || "");
 
     return {
       id: item.message_id || `conv-${idx + 1}`,
       name: item.contact_name || item.name || "Không tên",
       phoneNumber: item.phone_number || "",
       unread: isUnread,
-      timestamp: item.timestamp || "",
+      timestamp: resolvedTimestamp,
       previewText:
         item.preview_text ||
-        (parsedMessages.length > 0
-          ? parsedMessages[parsedMessages.length - 1].attachment?.type === "audio"
+        (lastParsedMsg
+          ? lastParsedMsg.attachment?.type === "audio"
             ? "🎙️ Tin nhắn thoại"
-            : parsedMessages[parsedMessages.length - 1].attachment?.type === "image"
+            : lastParsedMsg.attachment?.type === "image"
             ? "📷 Hình ảnh"
-            : parsedMessages[parsedMessages.length - 1].attachment?.type === "video"
+            : lastParsedMsg.attachment?.type === "video"
             ? "📹 Video"
-            : parsedMessages[parsedMessages.length - 1].text
+            : lastParsedMsg.text
           : ""),
       messages: parsedMessages.map((m: any, mIdx: number) => ({
         id: m.id || `msg-${idx}-${mIdx}`,
@@ -408,9 +410,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           </div>
 
           {/* Messages Bubble Stream */}
-          <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-3 space-y-3 flex flex-col justify-start pb-10 scroll-smooth">
-            <div className="text-center my-1">
-              <span className="text-[11px] text-[#717786] bg-[#E9E7ED] px-3 py-1 rounded-full font-medium">
+          <div className="flex-1 overflow-y-auto no-scrollbar px-3 py-2 space-y-2 flex flex-col justify-start pb-8 scroll-smooth">
+            <div className="text-center my-0.5">
+              <span className="text-[11px] text-[#717786] bg-[#E9E7ED] px-2.5 py-0.5 rounded-full font-medium">
                 iMessage · iSMS
               </span>
             </div>
@@ -599,7 +601,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                   {Boolean(msg.text) && (
                     <div
                       className={cn(
-                        "rounded-[18px] px-3.5 py-2 text-[15px] leading-relaxed shadow-xs relative transition-all font-normal",
+                        "rounded-[18px] px-3 py-1.5 text-[14.5px] leading-snug shadow-xs relative transition-all font-normal",
                         isMe
                           ? "bg-[#0058BC] text-white rounded-br-[4px]"
                           : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
@@ -683,7 +685,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           {loading ? (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-[#717786]">
               <Loader2 className="size-6 animate-spin mb-2 text-[#0058BC]" />
-              <span className="text-xs">Đang tải tin nhắn từ Live CMS...</span>
+              <span className="text-xs">Đang tải...</span>
             </div>
           ) : error ? (
             <div className="flex-1 p-4 text-center text-xs text-[#FF3B30]">
@@ -695,35 +697,32 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                 <div
                   key={thread.id}
                   onClick={() => setSelectedThread(thread)}
-                  className="flex items-center h-[86px] px-4 py-[12px] hover:bg-[#FFFFFF] active:bg-[#EEEFF1] cursor-pointer transition-colors bg-[#FAF9FE]"
+                  className="flex items-center min-h-[62px] px-3.5 py-2 hover:bg-[#FFFFFF] active:bg-[#EEEFF1] cursor-pointer transition-colors bg-[#FAF9FE]"
                 >
                   {/* Conversation Row Text Body */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-center pr-2">
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
                     {/* Header line: Sender Name + Timestamp */}
                     <div className="flex items-center justify-between">
-                      <span className="text-[17px] font-semibold text-[#1A1B1F] truncate leading-tight">
+                      <span className="text-[16px] font-semibold text-[#1A1B1F] truncate leading-tight">
                         {thread.name}
                       </span>
                       <span
                         className={cn(
-                          "text-[13px] font-normal shrink-0 ml-2",
+                          "text-[12px] font-normal shrink-0 ml-2 font-sans",
                           thread.unread
-                            ? "text-[#0058BC] font-medium"
-                            : "text-[#717786]",
+                            ? "text-[#0058BC] font-semibold"
+                            : "text-[#8E8E93]",
                         )}
                       >
                         {thread.timestamp}
                       </span>
                     </div>
 
-                    {/* Preview Text Line (Figma Node 22:766: 15px #414755) */}
-                    <p className="text-[15px] font-normal text-[#414755] truncate mt-1 leading-snug">
+                    {/* Preview Text Line */}
+                    <p className="text-[13.5px] font-normal text-[#636366] truncate mt-0.5 leading-snug">
                       {thread.previewText}
                     </p>
                   </div>
-
-                  {/* Chevron Mũi Tên > (Figma Node 22:769: 6x10 chevron #C1C6D7) */}
-                  <ChevronRight className="w-[6px] h-[10px] text-[#C1C6D7] shrink-0 ml-1" />
                 </div>
               ))}
             </div>

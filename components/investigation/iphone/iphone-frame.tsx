@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Lock,
   Home,
@@ -29,6 +29,7 @@ import { NotesApp } from "./apps/notes-app";
 import { PhotosApp } from "./apps/photos-app";
 import { MapsApp } from "./apps/maps-app";
 import { BankingApp } from "./apps/banking-app";
+import { CameraApp } from "./apps/camera-app";
 import { IPhoneHomeScreen } from "./iphone-home-screen";
 
 interface IPhoneFrameProps {
@@ -48,6 +49,7 @@ type IPhoneApp =
   | "safari"
   | "notes"
   | "photos"
+  | "camera"
   | "maps"
   | "contacts"
   | "banking"
@@ -90,14 +92,44 @@ export function IPhoneFrame({
     lockDragStartY.current = null;
   };
 
+  // Dynamic auto-scale calculation so the entire iPhone (415px x 768px)
+  // always fits 100% within the user's viewport without clipping or scrollbars
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState<number>(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const availWidth = rect.width;
+      const availHeight = rect.height;
+
+      // Base dimensions of the iPhone chassis: width 415px, height 768px (top bezel 72px + screen 600px + bottom bezel 72px + borders/padding 24px)
+      const baseW = 415;
+      const baseH = 768;
+
+      // Leave a tiny safe margin (8px)
+      const scaleX = (availWidth - 12) / baseW;
+      const scaleH = (availHeight - 8) / baseH;
+
+      // Pick the constraining dimension, clamp maximum to 1
+      const optimalScale = Math.min(1, Math.min(scaleX, scaleH));
+      setScale(Math.max(0.45, optimalScale));
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, []);
+
   // Light status bar (black text) on light-theme apps per Figma spec
   const isLightStatusBar =
     !isLocked && (activeApp === "phone" || activeApp === "messages");
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-y-auto no-scrollbar py-2">
+    <div className="w-full h-full flex flex-col items-center justify-between select-none overflow-hidden p-1 sm:p-2">
       {/* Top Header Bar: Tiêu đề "ĐIỆN THOẠI NẠN NHÂN" & Nút "Quay lại" */}
-      <div className="flex items-center justify-between w-full max-w-[415px] px-2 shrink-0 mb-2 z-40">
+      <div className="flex items-center justify-between w-full max-w-[415px] px-2 shrink-0 h-[36px] z-40">
         <div className="flex items-center gap-2">
           <span className="size-2 rounded-full bg-[#FF453A] animate-pulse" />
           <span className="text-[12px] font-mono uppercase tracking-widest text-zinc-300 font-semibold drop-shadow">
@@ -108,7 +140,7 @@ export function IPhoneFrame({
         {onClose && (
           <button
             onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1C1C1E]/90 text-zinc-300 hover:text-white hover:bg-white/15 border border-white/10 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1C1C1E]/90 text-zinc-300 hover:text-white hover:bg-white/15 border border-white/10 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
             title="Quay lại hiện trường"
             aria-label="Quay lại"
           >
@@ -118,16 +150,25 @@ export function IPhoneFrame({
         )}
       </div>
 
-      {/* PHONE CHASSIS: Classic Anodized Silver/Grey iPhone Faceplate (Full 100% Scale) */}
+      {/* PHONE SCALE WRAPPER: Measures available space and scales phone precisely */}
       <div
-        data-iphone-frame="true"
-        className={cn(
-          "relative w-[415px] max-w-full transition-all flex flex-col items-center shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] shrink-0 my-auto iphone-frame no-scrollbar",
-          frameless
-            ? "bg-black rounded-lg border border-white/20 h-[667px]"
-            : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]",
-        )}
+        ref={containerRef}
+        className="flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden relative"
       >
+        <div
+          data-iphone-frame="true"
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: "center center",
+            width: "415px",
+          }}
+          className={cn(
+            "relative transition-transform duration-75 flex flex-col items-center shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] shrink-0 iphone-frame no-scrollbar",
+            frameless
+              ? "bg-black rounded-lg border border-white/20 h-[667px]"
+              : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]",
+          )}
+        >
         {!frameless && (
           <>
             {/* Top Bezel: Authentic Classic iPhone (Proximity sensor, Front Camera & Speaker) */}
@@ -308,10 +349,11 @@ export function IPhoneFrame({
               /* 2. ACTIVE APP RUNNING */
               <div className="flex-1 min-h-0 flex flex-col h-full bg-black overflow-hidden">
                 {activeApp === "messages" && <MessagesApp />}
-                {activeApp === "phone" && <PhoneApp initialTab="recents" />}
+                {activeApp === "phone" && <PhoneApp initialTab="keypad" />}
                 {activeApp === "safari" && <SafariApp history={history} />}
                 {activeApp === "notes" && <NotesApp notes={notes} />}
                 {activeApp === "photos" && <PhotosApp photos={photos} />}
+                {activeApp === "camera" && <CameraApp />}
                 {activeApp === "maps" && <MapsApp />}
                 {activeApp === "contacts" && <PhoneApp initialTab="contacts" />}
                 {activeApp === "banking" && <BankingApp />}
@@ -418,6 +460,7 @@ export function IPhoneFrame({
             </button>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

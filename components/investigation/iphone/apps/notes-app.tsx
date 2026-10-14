@@ -37,7 +37,6 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
       content: item.content_or_url || '',
       timestamp: item.timestamp || '',
       meta: item.timestamp || '',
-      folder: item.category || 'iCloud',
       isLocked: false
     }))
 
@@ -191,11 +190,6 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
                           )}
                           <span className="truncate">{note.title}</span>
                         </div>
-                        {note.folder && (
-                          <span className="text-[9px] font-sans px-1.5 py-0.5 rounded bg-[#FFD60A]/10 text-[#FFD60A] border border-[#FFD60A]/20 shrink-0">
-                            {note.folder}
-                          </span>
-                        )}
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-[11px] text-[#8E8E93] font-sans shrink-0">{note.timestamp || note.meta}</span>

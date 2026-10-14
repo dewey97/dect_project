@@ -64,7 +64,7 @@ export function SafariApp({ onBackToHome }: SafariAppProps) {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93] space-y-2">
             <Loader2 className="size-6 animate-spin text-[#0A84FF]" />
-            <span className="text-[12px]">Đang tải lịch sử Safari...</span>
+            <span className="text-[12px]">Đang tải...</span>
           </div>
         ) : safariItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
@@ -114,10 +114,6 @@ export function SafariApp({ onBackToHome }: SafariAppProps) {
                     <p className="text-[12px] text-[#D1D1D6] line-clamp-2 leading-relaxed pl-5 font-mono">
                       {content}
                     </p>
-
-                    <div className="flex items-center justify-between pl-5 pt-0.5 text-[10px]">
-                      <span className="px-1.5 py-0.5 rounded bg-[#2C2C2E] text-[#8E8E93] font-medium">{category}</span>
-                    </div>
                   </div>
                 )
               })}

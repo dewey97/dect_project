@@ -183,7 +183,7 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
           <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93] space-y-2">
             <Loader2 className="size-5 animate-spin text-[#0A84FF]" />
             <span className="text-[11px] font-mono">
-              Đang tải lịch sử giao dịch...
+              Đang tải...
             </span>
           </div>
         ) : filteredTransactions.length === 0 ? (

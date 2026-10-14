@@ -9,6 +9,7 @@ export type IPhoneApp =
   | "safari"
   | "notes"
   | "photos"
+  | "camera"
   | "maps"
   | "contacts"
   | "banking"
@@ -36,14 +37,8 @@ export function IPhoneHomeScreen({
   const gridApps: AppItem[] = [
     // Row 1
     {
-      id: "messages",
-      name: "Messages",
-      icon: "/images/cases/case_000/phone/icons/messages.png",
-      appTarget: "messages",
-    },
-    {
       id: "photos",
-      name: "Photos",
+      name: "Ảnh",
       icon: "/images/cases/case_000/phone/icons/photos.png",
       appTarget: "photos",
     },
@@ -51,41 +46,59 @@ export function IPhoneHomeScreen({
       id: "camera",
       name: "Camera",
       icon: "/images/cases/case_000/phone/icons/camera.png",
-      appTarget: null,
+      appTarget: "camera",
     },
     {
       id: "maps",
-      name: "Maps",
+      name: "Bản đồ",
       icon: "/images/cases/case_000/phone/icons/maps.png",
       appTarget: "maps",
+    },
+    {
+      id: "notes",
+      name: "Ghi chú",
+      icon: "/images/cases/case_000/phone/icons/notes.png",
+      appTarget: "notes",
     },
 
     // Row 2
     {
-      id: "notes",
-      name: "Notes",
-      icon: "/images/cases/case_000/phone/icons/notes.png",
-      appTarget: "notes",
-    },
-    {
       id: "settings",
-      name: "Settings",
+      name: "Cài đặt",
       icon: "/images/cases/case_000/phone/icons/settings.png",
       appTarget: "settings",
     },
+    {
+      id: "youtube",
+      name: "YouTube",
+      icon: "/images/cases/case_000/phone/icons/youtube.png",
+      appTarget: null,
+    },
+    {
+      id: "calculator",
+      name: "Máy tính",
+      icon: "/images/cases/case_000/phone/icons/calculator.png",
+      appTarget: null,
+    },
   ];
 
-  // 4 Dock Apps at the bottom (Figma Node 14:40: w:74, h:74)
+  // 4 Classic Dock Apps: Điện thoại, Tin nhắn, Danh bạ, Safari
   const dockApps: AppItem[] = [
     {
       id: "phone",
-      name: "Phone",
+      name: "Điện thoại",
       icon: "/images/cases/case_000/phone/icons/phone.png",
       appTarget: "phone",
     },
     {
+      id: "messages",
+      name: "Tin nhắn",
+      icon: "/images/cases/case_000/phone/icons/messages.png",
+      appTarget: "messages",
+    },
+    {
       id: "contacts",
-      name: "Contacts",
+      name: "Danh bạ",
       icon: "/images/cases/case_000/phone/icons/contacts.png",
       appTarget: "contacts",
     },
@@ -94,12 +107,6 @@ export function IPhoneHomeScreen({
       name: "Safari",
       icon: "/images/cases/case_000/phone/icons/safari.png",
       appTarget: "safari",
-    },
-    {
-      id: "music",
-      name: "Music",
-      icon: "/images/cases/case_000/phone/icons/music.png",
-      appTarget: "phone",
     },
   ];
 

@@ -88,8 +88,6 @@ export function PhoneApp({
       groupedContacts[key].push(c);
     });
 
-  const [recentsFilter, setRecentsFilter] = useState<"all" | "missed">("all");
-
   const defaultDurations: Record<string, string> = {
     L01: "00:45",
     L02: "01:24",
@@ -144,9 +142,7 @@ export function PhoneApp({
     };
   });
 
-  const displayedRecents = recents.filter((c: any) =>
-    recentsFilter === "missed" ? c.isMissed : true,
-  );
+  const displayedRecents = recents;
 
   const handleKeypadPress = (num: string) => {
     if (keypadInput.length < 15) {
@@ -156,87 +152,60 @@ export function PhoneApp({
 
   return (
     <div className="flex flex-col h-full bg-[#FAF9FE] text-[#1A1B1F] select-none overflow-hidden font-sans">
-      {/* Top Header bar with exact Figma status bar height offset */}
-      <div className="px-3 bg-[#FFFFFF] shrink-0 border-b border-[#E3E2E7] flex items-center justify-between h-[44px]">
-        {/* Left Action */}
-        {activeTab === "contacts" && selectedContact ? (
-          <button
-            onClick={() => setSelectedContact(null)}
-            className="flex items-center gap-1 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
-          >
-            <ArrowLeft className="size-4" />
-            <span>Danh bạ</span>
-          </button>
-        ) : activeTab === "contacts" ? (
-          <span className="text-[16px] font-normal text-[#0058BC] cursor-pointer">
-            Nhóm
-          </span>
-        ) : activeTab === "recents" ? (
-          <button className="text-[16px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
-            Sửa
-          </button>
-        ) : (
-          <div className="w-8" />
-        )}
+      {/* Top Header bar: Only visible on Recents and Contacts tabs (iOS Phone Keypad has NO header bar) */}
+      {activeTab !== "keypad" && (
+        <div className="px-3 bg-[#FFFFFF] shrink-0 border-b border-[#E3E2E7] flex items-center justify-between h-[44px]">
+          {/* Left Action */}
+          {activeTab === "contacts" && selectedContact ? (
+            <button
+              onClick={() => setSelectedContact(null)}
+              className="flex items-center gap-1 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
+            >
+              <ArrowLeft className="size-4" />
+              <span>Danh bạ</span>
+            </button>
+          ) : activeTab === "contacts" ? (
+            <span className="text-[16px] font-normal text-[#0058BC] cursor-pointer">
+              Nhóm
+            </span>
+          ) : (
+            <button className="text-[16px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
+              Sửa
+            </button>
+          )}
 
-        {/* Center: Title / Segmented Control */}
-        {activeTab === "recents" ? (
-          <div className="flex items-center rounded-lg bg-[#E3E2E7]/70 p-0.5 border border-[#D1D1D6]">
-            <button
-              onClick={() => setRecentsFilter("all")}
-              className={cn(
-                "px-3 py-0.5 text-[12px] font-medium rounded-md transition-all cursor-pointer",
-                recentsFilter === "all"
-                  ? "bg-[#FFFFFF] text-[#000000] shadow-xs"
-                  : "text-[#717786] hover:text-[#000000]",
-              )}
-            >
-              Tất cả
-            </button>
-            <button
-              onClick={() => setRecentsFilter("missed")}
-              className={cn(
-                "px-3 py-0.5 text-[12px] font-medium rounded-md transition-all cursor-pointer",
-                recentsFilter === "missed"
-                  ? "bg-[#FFFFFF] text-[#000000] shadow-xs"
-                  : "text-[#717786] hover:text-[#000000]",
-              )}
-            >
-              Cuộc gọi nhỡ
-            </button>
-          </div>
-        ) : (
+          {/* Center: Title */}
           <span className="text-[17px] font-semibold tracking-tight text-[#1A1B1F]">
-            {activeTab === "keypad" && ""}
+            {activeTab === "recents" && "Gần đây"}
             {activeTab === "contacts" &&
               (selectedContact ? "" : "Tất cả danh bạ")}
           </span>
-        )}
 
-        {/* Right Action */}
-        {activeTab === "contacts" && selectedContact ? (
-          <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 cursor-pointer">
-            Sửa
-          </button>
-        ) : activeTab === "contacts" ? (
-          <button
-            className="text-[#0058BC] hover:opacity-80 cursor-pointer p-1"
-            title="Thêm danh bạ"
-          >
-            <Plus className="size-5" />
-          </button>
-        ) : onBackToHome ? (
-          <button
-            onClick={onBackToHome}
-            className="flex items-center text-[#0058BC] text-[13px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
-            title="Thoát về Trang chính"
-          >
-            <span>Đóng</span>
-          </button>
-        ) : (
-          <div className="w-8" />
-        )}
-      </div>
+          {/* Right Action */}
+          {activeTab === "contacts" && selectedContact ? (
+            <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 cursor-pointer">
+              Sửa
+            </button>
+          ) : activeTab === "contacts" ? (
+            <button
+              className="text-[#0058BC] hover:opacity-80 cursor-pointer p-1"
+              title="Thêm danh bạ"
+            >
+              <Plus className="size-5" />
+            </button>
+          ) : onBackToHome ? (
+            <button
+              onClick={onBackToHome}
+              className="flex items-center text-[#0058BC] text-[13px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
+              title="Thoát về Trang chính"
+            >
+              <span>Đóng</span>
+            </button>
+          ) : (
+            <div className="w-8" />
+          )}
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div
@@ -247,10 +216,10 @@ export function PhoneApp({
       >
         {/* KEYPAD TAB (iOS Dial Pad scaled to fit 375x600 screen) */}
         {activeTab === "keypad" && (
-          <div className="flex flex-col items-center justify-between h-full pt-1 pb-2 px-4 select-none">
+          <div className="flex flex-col items-center justify-between h-full pt-4 pb-3 px-4 select-none">
             {/* Displayed Number Area */}
-            <div className="flex flex-col items-center justify-center min-h-[56px] w-full shrink-0">
-              <div className="h-[36px] text-[30px] font-light tracking-tight text-[#1A1B1F] text-center font-sans flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center min-h-[64px] w-full shrink-0">
+              <div className="h-[40px] text-[32px] font-light tracking-tight text-[#1A1B1F] text-center font-sans flex items-center justify-center">
                 {keypadInput}
               </div>
               {keypadInput ? (
@@ -258,17 +227,17 @@ export function PhoneApp({
                   onClick={() => {
                     /* quick action Add to contacts */
                   }}
-                  className="text-[12px] font-normal text-[#0058BC] hover:underline cursor-pointer"
+                  className="text-[13px] font-normal text-[#0058BC] hover:underline cursor-pointer"
                 >
                   Thêm số
                 </button>
               ) : (
-                <div className="h-[18px]" />
+                <div className="h-[20px]" />
               )}
             </div>
 
-            {/* Keypad Grid (Buttons 64x64, gap 10px, row gap 10px) */}
-            <div className="flex flex-col gap-[9px] items-center my-auto shrink-0">
+            {/* Keypad Grid (Buttons 68x68, gap 20px, row gap 11px) */}
+            <div className="flex flex-col gap-[11px] items-center my-auto shrink-0">
               {/* Rows 1-4 */}
               {[
                 [KEYPAD_BUTTONS[0], KEYPAD_BUTTONS[1], KEYPAD_BUTTONS[2]],
@@ -276,40 +245,40 @@ export function PhoneApp({
                 [KEYPAD_BUTTONS[6], KEYPAD_BUTTONS[7], KEYPAD_BUTTONS[8]],
                 [KEYPAD_BUTTONS[9], KEYPAD_BUTTONS[10], KEYPAD_BUTTONS[11]],
               ].map((row, rIdx) => (
-                <div key={rIdx} className="flex gap-[18px]">
+                <div key={rIdx} className="flex gap-[20px]">
                   {row.map((k) => (
                     <button
                       key={k.num}
                       onClick={() => handleKeypadPress(k.num)}
                       aria-label={`Số ${k.num} ${k.sub}`}
-                      className="size-[64px] rounded-full bg-[#F2F2F7] hover:bg-[#E5E5EA] active:bg-[#D1D1D6] flex flex-col items-center justify-center transition-colors shadow-xs cursor-pointer select-none"
+                      className="size-[68px] rounded-full bg-[#F2F2F7] hover:bg-[#E5E5EA] active:bg-[#D1D1D6] flex flex-col items-center justify-center transition-colors shadow-xs cursor-pointer select-none"
                     >
-                      <span className="text-[28px] font-light text-[#1A1B1F] leading-none tracking-tight">
+                      <span className="text-[30px] font-light text-[#1A1B1F] leading-none tracking-tight">
                         {k.num}
                       </span>
                       {k.sub ? (
-                        <span className="text-[8.5px] font-medium tracking-wider text-[#414755] mt-[1px] leading-none uppercase">
+                        <span className="text-[9px] font-medium tracking-wider text-[#414755] mt-[1.5px] leading-none uppercase">
                           {k.sub}
                         </span>
                       ) : (
-                        <span className="h-[8.5px] mt-[1px]" />
+                        <span className="h-[9px] mt-[1.5px]" />
                       )}
                     </button>
                   ))}
                 </div>
               ))}
 
-              {/* Row 5: Call Button Anchor (64x64 green circle #4CD964) + Delete */}
-              <div className="flex gap-[18px] items-center justify-center relative w-[228px]">
-                <div className="w-[64px]" />
+              {/* Row 5: Call Button Anchor (68x68 green circle #4CD964) + Delete */}
+              <div className="flex gap-[20px] items-center justify-center relative w-[244px]">
+                <div className="w-[68px]" />
                 <button
                   onClick={() => {}}
                   aria-label="Gọi điện"
-                  className="size-[64px] rounded-full bg-[#4CD964] hover:bg-[#42C85A] active:scale-95 text-white flex items-center justify-center shadow-md transition-all cursor-pointer min-h-[44px] min-w-[44px]"
+                  className="size-[68px] rounded-full bg-[#4CD964] hover:bg-[#42C85A] active:scale-95 text-white flex items-center justify-center shadow-md transition-all cursor-pointer min-h-[44px] min-w-[44px]"
                   title="Gọi"
                 >
                   <svg
-                    className="w-[24px] h-[24px] fill-white"
+                    className="w-[26px] h-[26px] fill-white"
                     viewBox="0 0 24 24"
                   >
                     <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
@@ -319,13 +288,13 @@ export function PhoneApp({
                   <button
                     onClick={() => setKeypadInput((p) => p.slice(0, -1))}
                     aria-label="Xóa chữ số vừa nhập"
-                    className="w-[64px] h-[64px] min-h-[44px] min-w-[44px] flex items-center justify-center text-[#717786] hover:text-[#1A1B1F] active:opacity-60 cursor-pointer"
+                    className="w-[68px] h-[68px] min-h-[44px] min-w-[44px] flex items-center justify-center text-[#717786] hover:text-[#1A1B1F] active:opacity-60 cursor-pointer"
                     title="Xóa"
                   >
                     <Delete className="size-6" />
                   </button>
                 ) : (
-                  <div className="w-[64px]" />
+                  <div className="w-[68px]" />
                 )}
               </div>
             </div>
@@ -338,7 +307,7 @@ export function PhoneApp({
             {loading ? (
               <div className="flex flex-col items-center justify-center p-8 text-[#717786]">
                 <Loader2 className="size-6 animate-spin mb-2 text-[#0058BC]" />
-                <span className="text-xs">Đang tải nhật ký cuộc gọi...</span>
+                <span className="text-xs">Đang tải...</span>
               </div>
             ) : error ? (
               <div className="p-4 text-center text-xs text-red-500">
@@ -565,7 +534,7 @@ export function PhoneApp({
                 {contactsLoading ? (
                   <div className="flex flex-col items-center justify-center p-8 text-[#717786]">
                     <Loader2 className="size-6 animate-spin mb-2 text-[#0058BC]" />
-                    <span className="text-xs">Đang tải danh bạ từ Live CMS...</span>
+                    <span className="text-xs">Đang tải...</span>
                   </div>
                 ) : Object.keys(groupedContacts).length === 0 ? (
                   <div className="text-center py-12 text-[#717786] text-sm">

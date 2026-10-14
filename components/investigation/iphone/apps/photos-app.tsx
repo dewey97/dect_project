@@ -173,9 +173,7 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
           {loading ? (
             <div className="flex-1 flex flex-col items-center justify-center p-4 text-[#8E8E93]">
               <Loader2 className="size-6 animate-spin mb-2 text-[#0A84FF]" />
-              <span className="text-xs">
-                Đang tải thư viện ảnh từ Google Sheets...
-              </span>
+              <span className="text-xs">Đang tải...</span>
             </div>
           ) : error ? (
             <div className="flex-1 p-4 text-center text-xs text-red-400">
