@@ -6,9 +6,11 @@ import Link from 'next/link'
  */
 export function BrandMark({
   className,
+  imageClassName,
   href,
 }: {
   className?: string
+  imageClassName?: string
   href?: string
 }) {
   const content = (
@@ -16,7 +18,7 @@ export function BrandMark({
       <img
         src="/brand/logo.png"
         alt="XPLORE"
-        className="h-8 sm:h-9 w-auto object-contain"
+        className={cn('h-6 sm:h-7 w-auto object-contain', imageClassName)}
       />
     </div>
   )

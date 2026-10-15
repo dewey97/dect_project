@@ -194,22 +194,8 @@ export default function BoardStagePage() {
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#070503] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col justify-start items-center p-0 relative box-border flex-1 min-h-0"
+      className="h-full w-full bg-[#0b0704] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col justify-start items-center p-0 relative box-border flex-1 min-h-0"
     >
-      {/* ─────────────────────────────────────────────────────────────
-          1. LỚP BỐI CẢNH PHÒNG / BÀN THÁM TỬ NGOÀI RÌA
-      ───────────────────────────────────────────────────────────── */}
-      <div className="absolute inset-0 bg-[#080503] pointer-events-none overflow-hidden z-0">
-        <Image
-          src="/images/backgrounds/detective_desk_ambient_vertical.jpg"
-          alt="Bàn điều tra ngoài rìa"
-          fill
-          priority
-          className="object-cover opacity-60 filter blur-[1.5px] scale-105"
-        />
-        <div className="absolute inset-0 bg-radial-vignette opacity-80" />
-        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/80 via-transparent to-stone-950/90" />
-      </div>
 
       {/* ─────────────────────────────────────────────────────────────
           2. THANH TEST CONTROL: CHUYỂN BACKGROUND & NÓN ÁNH SÁNG

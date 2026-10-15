@@ -163,23 +163,16 @@ export function PhoneApp({
             <ArrowLeft className="size-4" />
             <span>Danh bạ</span>
           </button>
-        ) : onBackToHome ? (
-          <button
-            onClick={onBackToHome}
-            className="flex items-center gap-1 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
-            title="Thoát về Trang chính"
-          >
-            <ArrowLeft className="size-4" />
-            <span>Trang chính</span>
-          </button>
         ) : activeTab === "contacts" ? (
           <span className="text-[16px] font-normal text-[#0058BC] cursor-pointer">
             Nhóm
           </span>
-        ) : (
+        ) : activeTab === "recents" ? (
           <button className="text-[16px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
             Sửa
           </button>
+        ) : (
+          <div className="w-8" />
         )}
 
         {/* Center: Title */}

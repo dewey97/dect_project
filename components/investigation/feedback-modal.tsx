@@ -48,7 +48,7 @@ export function FeedbackModal() {
     }
   }
 
-  if (pathname.startsWith('/studio') || pathname.startsWith('/evidence')) return null
+  if (!pathname || pathname === '/' || pathname.startsWith('/studio') || pathname.startsWith('/evidence')) return null
 
   return (
     <>

@@ -22,6 +22,7 @@ interface PhaseUnlockedModalProps {
   onSelectEvidence: (item: PhysicalEvidence) => void;
   onSetPhaseFilter: (phase: number) => void;
   playExperience?: "web" | "boardgame";
+  autoStartStory?: boolean;
 }
 
 export function PhaseUnlockedModal({
@@ -31,8 +32,9 @@ export function PhaseUnlockedModal({
   onSelectEvidence,
   onSetPhaseFilter,
   playExperience = "web",
+  autoStartStory = false,
 }: PhaseUnlockedModalProps) {
-  const [isStoryStarted, setIsStoryStarted] = React.useState(false);
+  const [isStoryStarted, setIsStoryStarted] = React.useState(autoStartStory);
   const [isNarrativeComplete, setIsNarrativeComplete] = React.useState(false);
 
   // Đọc danh sách dẫn truyện cinematic trực tiếp từ tab `narratives` trên Google Sheet Live CMS
@@ -51,9 +53,14 @@ export function PhaseUnlockedModal({
   const activeNarrative = currentNarrative || fallbackNarrative;
 
   React.useEffect(() => {
-    setIsStoryStarted(false);
+    setIsStoryStarted(autoStartStory);
     setIsNarrativeComplete(false);
-  }, [unlockedModalData]);
+    if (autoStartStory && unlockedModalData && unlockedModalData.unlockedPhase === 0) {
+      setTimeout(() => {
+        detectiveAudio.playCeramicShatterSound();
+      }, 3000);
+    }
+  }, [unlockedModalData, autoStartStory]);
 
   React.useEffect(() => {
     if (!unlockedModalData) return;

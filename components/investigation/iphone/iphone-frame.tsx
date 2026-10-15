@@ -99,24 +99,22 @@ export function IPhoneFrame({
 
   useEffect(() => {
     const updateScale = () => {
-      // Chiều rộng & chiều cao khả dụng thực tế của viewport
-      const availWidth = window.innerWidth;
-      const availHeight = window.innerHeight;
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const availWidth = rect.width || window.innerWidth;
+      const availHeight = rect.height || (window.innerHeight - 56);
 
       // Kích thước chuẩn của chassis iPhone 6s Plus (415px x 768px)
       const baseW = 415;
       const baseH = 768;
 
-      // Khoảng trừ an toàn: Header bar (40px) + padding trên dưới và thanh điều hướng mobile (20px) = 60px
-      const usableW = Math.max(300, availWidth - 16);
-      const usableH = Math.max(400, availHeight - 64);
-
-      const scaleX = usableW / baseW;
-      const scaleH = usableH / baseH;
+      // Trừ khoảng an toàn để điện thoại luôn lọt thỏm trong màn hình, không bị cắt trên/dưới/trái/phải
+      const scaleX = (availWidth - 16) / baseW;
+      const scaleH = (availHeight - 16) / baseH;
 
       // Giữ tỉ lệ hoàn hảo không bị vỡ hoặc che khuất mép
       const optimalScale = Math.min(1, Math.min(scaleX, scaleH));
-      setScale(Math.max(0.42, optimalScale));
+      setScale(Math.max(0.4, optimalScale));
     };
 
     updateScale();
@@ -129,33 +127,11 @@ export function IPhoneFrame({
     !isLocked && (activeApp === "phone" || activeApp === "messages");
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-start select-none overflow-hidden p-0 relative">
-      {/* Top Header Bar: Tiêu đề "ĐIỆN THOẠI NẠN NHÂN" & Nút "Quay lại" (Cố định 40px không bao giờ bị che) */}
-      <div className="w-full h-[40px] px-3 sm:px-4 flex items-center justify-between shrink-0 z-50 bg-[#0A0A0C]/90 backdrop-blur-md border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <span className="size-2 rounded-full bg-[#FF453A] animate-pulse" />
-          <span className="text-[12px] font-mono uppercase tracking-widest text-zinc-200 font-bold drop-shadow">
-            Điện thoại nạn nhân
-          </span>
-        </div>
-
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1C1C1E] text-zinc-200 hover:text-white hover:bg-white/15 border border-white/15 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
-            title="Quay lại hiện trường"
-            aria-label="Quay lại"
-          >
-            <ArrowLeft className="size-3.5 text-[#d9a066]" />
-            <span>Quay lại</span>
-          </button>
-        )}
-      </div>
-
+    <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-hidden p-0 relative">
       {/* PHONE SCALE WRAPPER: Measures available space and scales phone precisely */}
       <div
         ref={containerRef}
-        className="flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden relative p-1"
+        className="w-full h-full flex items-center justify-center overflow-hidden relative p-1"
       >
         <div
           data-iphone-frame="true"
