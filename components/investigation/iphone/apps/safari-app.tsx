@@ -39,16 +39,7 @@ export function SafariApp({ onBackToHome }: SafariAppProps) {
       {/* Top URL Bar */}
       <div className="px-3 pt-2.5 pb-2 bg-[#161618] border-b border-[#2C2C2E] shrink-0">
         <div className="h-8 rounded-lg bg-[#2C2C2E] border border-white/10 px-2.5 flex items-center justify-between text-[#8E8E93] text-[12px]">
-          {onBackToHome && (
-            <button
-              onClick={onBackToHome}
-              className="flex items-center gap-0.5 text-[#0A84FF] text-[12px] font-medium hover:underline cursor-pointer mr-1 shrink-0"
-              title="Thoát ứng dụng về Màn hình chính"
-            >
-              <ChevronLeft className="size-3.5 text-[#0A84FF]" />
-              <span>Trang chính</span>
-            </button>
-          )}
+          {/* Safari URL center title */}
           <div className="flex items-center gap-1.5 truncate flex-1 justify-center px-1">
             <ShieldCheck className="size-3.5 text-[#30D158] shrink-0" />
             <span className="text-white font-normal text-[12px] truncate">

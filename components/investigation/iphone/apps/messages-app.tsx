@@ -638,20 +638,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           {/* Top Nav Header (Figma Node 22:820 - 375x68px, white bg) */}
           <div className="px-4 pt-1 pb-2 bg-[#FFFFFF] border-b border-[#E3E2E7] shrink-0">
             <div className="flex items-center justify-between h-[44px]">
-              {onBackToHome ? (
-                <button
-                  onClick={onBackToHome}
-                  className="flex items-center gap-0.5 text-[#0058BC] text-[15px] font-normal hover:opacity-80 active:opacity-60 cursor-pointer"
-                  title="Thoát về Trang chính"
-                >
-                  <ChevronLeft className="size-5" />
-                  <span>Trang chính</span>
-                </button>
-              ) : (
-                <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
-                  Sửa
-                </button>
-              )}
+              <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
+                Sửa
+              </button>
 
               {/* Title (Figma Node 22:843: 17px semi-bold #1A1B1F) */}
               <span className="text-[17px] font-semibold tracking-tight text-[#1A1B1F]">

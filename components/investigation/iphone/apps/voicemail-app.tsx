@@ -61,18 +61,7 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
       {/* Top Header */}
       <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
         <div className="flex items-center justify-between">
-          {onBackToHome ? (
-            <button
-              onClick={onBackToHome}
-              className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium hover:opacity-80 active:opacity-60 cursor-pointer"
-              title="Thoát ứng dụng về Màn hình chính"
-            >
-              <ChevronLeft className="size-4" />
-              <span>Trang chính</span>
-            </button>
-          ) : (
-            <span className="w-12" />
-          )}
+          <span className="w-12" />
           <span className="text-[17px] font-semibold tracking-tight text-white">
             {activeTab === 'recents' ? 'Gần đây' : 'Bàn phím'}
           </span>

@@ -99,27 +99,55 @@ export function IPhoneFrame({
 
   useEffect(() => {
     const updateScale = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const availWidth = rect.width || window.innerWidth;
-      const availHeight = rect.height || (window.innerHeight - 56);
+      // 1. Lấy kích thước thực tế từ container chứa iPhone nếu có
+      let availW = containerRef.current?.clientWidth || 0;
+      let availH = containerRef.current?.clientHeight || 0;
 
-      // Kích thước chuẩn của chassis iPhone 6s Plus (415px x 768px)
+      // 2. Fallback sang visualViewport nếu container chưa mount hoặc bằng 0
+      if (!availW || !availH) {
+        const viewportW = window.visualViewport?.width || window.innerWidth;
+        const viewportH = window.visualViewport?.height || window.innerHeight;
+        // Trừ đi header 46px, safe areas và lề an toàn
+        availW = viewportW - 16;
+        availH = viewportH - 120;
+      } else {
+        // Trừ nhẹ padding 12px để không chạm sát mép container
+        availW = Math.max(260, availW - 12);
+        availH = Math.max(360, availH - 16);
+      }
+
+      // Base dimensions của iPhone 6s Plus chassis: width 415px, height 768px
       const baseW = 415;
       const baseH = 768;
 
-      // Trừ khoảng an toàn để điện thoại luôn lọt thỏm trong màn hình, không bị cắt trên/dưới/trái/phải
-      const scaleX = (availWidth - 16) / baseW;
-      const scaleH = (availHeight - 16) / baseH;
+      const scaleX = availW / baseW;
+      const scaleH = availH / baseH;
 
-      // Giữ tỉ lệ hoàn hảo không bị vỡ hoặc che khuất mép
+      // Chọn tỉ lệ co nhỏ nhất để vừa khít cả ngang lẫn dọc mà không bao giờ bị cắt
       const optimalScale = Math.min(1, Math.min(scaleX, scaleH));
-      setScale(Math.max(0.4, optimalScale));
+      setScale(Math.max(0.35, Number(optimalScale.toFixed(3))));
     };
 
     updateScale();
+    const ro = new ResizeObserver(() => {
+      updateScale();
+    });
+    if (containerRef.current) {
+      ro.observe(containerRef.current);
+    }
     window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", updateScale);
+      window.visualViewport.addEventListener("scroll", updateScale);
+    }
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", updateScale);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", updateScale);
+        window.visualViewport.removeEventListener("scroll", updateScale);
+      }
+    };
   }, []);
 
   // Light status bar (black text) on light-theme apps per Figma spec
@@ -371,14 +399,7 @@ export function IPhoneFrame({
                 {activeApp === "settings" && (
                   <div className="p-4 text-white space-y-4 font-sans overflow-y-auto">
                     <div className="flex items-center justify-between border-b border-[#2C2C2E] pb-2">
-                      <button
-                        onClick={() => setActiveApp(null)}
-                        className="flex items-center gap-0.5 text-[#0A84FF] text-[13px] font-medium cursor-pointer hover:opacity-80 active:opacity-60"
-                        title="Về màn hình chính"
-                      >
-                        <Home className="size-4" />
-                        <span>Trang chính</span>
-                      </button>
+                      <span className="w-8" />
                       <div className="text-[17px] font-bold">Cài đặt</div>
                       <span className="w-8" />
                     </div>
