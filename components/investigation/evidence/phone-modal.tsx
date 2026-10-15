@@ -14,7 +14,7 @@ export function PhoneModal({ isOpen, onClose, caseId }: PhoneModalProps) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[60] bg-black flex flex-col items-stretch justify-start select-none overflow-hidden touch-none">
+      <div className="fixed inset-0 z-[60] bg-black flex flex-col items-stretch justify-start select-none overflow-hidden touch-none h-[100dvh] w-full">
         {/* TOP FIXED CONTROLS BAR: Always sticks to top, with padding-top: env(safe-area-inset-top) */}
         <div className="w-full shrink-0 z-50 bg-[#0A0A0C] border-b border-white/10 shadow-lg pt-safe">
           <div className="h-[46px] px-3 sm:px-4 flex items-center justify-between">
@@ -37,12 +37,12 @@ export function PhoneModal({ isOpen, onClose, caseId }: PhoneModalProps) {
           </div>
         </div>
 
-        {/* Phone Frame Simulator Container: Fills 100% of remaining space */}
+        {/* Phone Frame Simulator Container: Fills 100% of remaining space with safe bottom padding */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="w-full flex-1 min-h-0 flex flex-col items-center justify-center relative p-0 overflow-hidden"
+          className="w-full flex-1 min-h-0 flex flex-col items-center justify-center relative p-0 overflow-hidden pb-safe"
         >
           <div className="w-full h-full overflow-hidden flex items-center justify-center p-0">
             <PhoneSimulator onClose={onClose} device={caseId ? { caseId } : undefined} />

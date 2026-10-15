@@ -163,14 +163,6 @@ export function PhoneApp({
             <ArrowLeft className="size-4" />
             <span>Danh bạ</span>
           </button>
-        ) : activeTab === "contacts" ? (
-          <span className="text-[16px] font-normal text-[#0058BC] cursor-pointer">
-            Nhóm
-          </span>
-        ) : activeTab === "recents" ? (
-          <button className="text-[16px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
-            Sửa
-          </button>
         ) : (
           <div className="w-8" />
         )}
@@ -184,20 +176,7 @@ export function PhoneApp({
         </span>
 
         {/* Right Action */}
-        {activeTab === "contacts" && selectedContact ? (
-          <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 cursor-pointer">
-            Sửa
-          </button>
-        ) : activeTab === "contacts" ? (
-          <button
-            className="text-[#0058BC] hover:opacity-80 cursor-pointer p-1"
-            title="Thêm danh bạ"
-          >
-            <Plus className="size-5" />
-          </button>
-        ) : (
-          <div className="w-8" />
-        )}
+        <div className="w-8" />
       </div>
 
       {/* Main Content Area */}
@@ -515,9 +494,6 @@ export function PhoneApp({
                     <div className="flex flex-col">
                       <span className="text-[15px] font-medium text-[#1A1B1F]">
                         Nguyễn Văn Khang
-                      </span>
-                      <span className="text-[11px] text-[#8E8E93]">
-                        Thẻ của tôi (Nạn nhân)
                       </span>
                     </div>
                   </div>

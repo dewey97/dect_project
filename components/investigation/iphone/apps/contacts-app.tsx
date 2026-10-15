@@ -65,7 +65,7 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
               <ArrowLeft className="size-4" />
               <span>Danh bạ</span>
             </button>
-            <span className="text-[13px] font-medium text-[#0A84FF]">Sửa</span>
+            <div className="w-8" />
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-12">
@@ -130,10 +130,8 @@ export function ContactsApp({ onBackToHome }: ContactsAppProps) {
         /* CONTACTS LIST VIEW */
         <div className="flex flex-col h-full">
           <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[13px] text-[#0A84FF] font-medium">Nhóm</span>
+            <div className="flex items-center justify-center mb-2">
               <span className="text-[17px] font-semibold tracking-tight text-white">Danh bạ</span>
-              <UserPlus className="size-4 text-[#0A84FF]" />
             </div>
 
             <div className="relative">

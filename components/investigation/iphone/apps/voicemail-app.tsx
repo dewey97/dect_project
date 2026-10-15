@@ -60,12 +60,10 @@ export function VoicemailApp({ onBackToHome }: VoicemailAppProps) {
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans">
       {/* Top Header */}
       <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
-        <div className="flex items-center justify-between">
-          <span className="w-12" />
+        <div className="flex items-center justify-center">
           <span className="text-[17px] font-semibold tracking-tight text-white">
             {activeTab === 'recents' ? 'Gần đây' : 'Bàn phím'}
           </span>
-          <span className="text-[13px] font-medium text-[#0A84FF]">Sửa</span>
         </div>
       </div>
 

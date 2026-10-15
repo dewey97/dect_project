@@ -637,23 +637,11 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
         <div className="flex flex-col h-full bg-[#FAF9FE]">
           {/* Top Nav Header (Figma Node 22:820 - 375x68px, white bg) */}
           <div className="px-4 pt-1 pb-2 bg-[#FFFFFF] border-b border-[#E3E2E7] shrink-0">
-            <div className="flex items-center justify-between h-[44px]">
-              <button className="text-[15px] font-normal text-[#0058BC] hover:opacity-80 active:opacity-60 cursor-pointer">
-                Sửa
-              </button>
-
+            <div className="flex items-center justify-center h-[44px]">
               {/* Title (Figma Node 22:843: 17px semi-bold #1A1B1F) */}
               <span className="text-[17px] font-semibold tracking-tight text-[#1A1B1F]">
                 Tin nhắn
               </span>
-
-              {/* New Message Icon (Figma Node 22:847: 18x18 icon #0058BC) */}
-              <button
-                aria-label="Soạn tin nhắn mới"
-                className="text-[#0058BC] hover:opacity-80 active:opacity-60 p-1 cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
-              >
-                <SquarePen className="size-[18px] stroke-[1.75]" />
-              </button>
             </div>
 
             {/* iOS Search Bar (Figma Node 22:849: 343x36px, fill #EEEFF1, placeholder #717786) */}

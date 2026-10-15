@@ -99,33 +99,33 @@ export function IPhoneFrame({
 
   useEffect(() => {
     const updateScale = () => {
-      // 1. Lấy kích thước thực tế từ container chứa iPhone nếu có
-      let availW = containerRef.current?.clientWidth || 0;
-      let availH = containerRef.current?.clientHeight || 0;
+      // Đo kích thước thực tế khả dụng bên trong container
+      const container = containerRef.current;
+      let availW = container ? container.clientWidth : 0;
+      let availH = container ? container.clientHeight : 0;
 
-      // 2. Fallback sang visualViewport nếu container chưa mount hoặc bằng 0
+      // Fallback nếu chưa mount
       if (!availW || !availH) {
-        const viewportW = window.visualViewport?.width || window.innerWidth;
-        const viewportH = window.visualViewport?.height || window.innerHeight;
-        // Trừ đi header 46px, safe areas và lề an toàn
-        availW = viewportW - 16;
-        availH = viewportH - 120;
-      } else {
-        // Trừ nhẹ padding 12px để không chạm sát mép container
-        availW = Math.max(260, availW - 12);
-        availH = Math.max(360, availH - 16);
+        const vpW = window.visualViewport?.width || window.innerWidth;
+        const vpH = window.visualViewport?.height || window.innerHeight;
+        availW = vpW;
+        availH = vpH - 110;
       }
 
-      // Base dimensions của iPhone 6s Plus chassis: width 415px, height 768px
+      // Kích thước thật của chassis iPhone 6s Plus: 415px x 768px
       const baseW = 415;
       const baseH = 768;
 
-      const scaleX = availW / baseW;
-      const scaleH = availH / baseH;
+      // Trừ lề an toàn tối thiểu (16px ngang, 20px dọc) để viền máy không bao giờ chạm sát mép
+      const usableW = Math.max(200, availW - 16);
+      const usableH = Math.max(260, availH - 20);
 
-      // Chọn tỉ lệ co nhỏ nhất để vừa khít cả ngang lẫn dọc mà không bao giờ bị cắt
+      const scaleX = usableW / baseW;
+      const scaleH = usableH / baseH;
+
+      // Luôn lấy scale nhỏ nhất để đảm bảo chiều nào hẹp hơn thì toàn bộ máy phải thu nhỏ vừa khít chiều đó
       const optimalScale = Math.min(1, Math.min(scaleX, scaleH));
-      setScale(Math.max(0.35, Number(optimalScale.toFixed(3))));
+      setScale(Math.max(0.3, Number(optimalScale.toFixed(3))));
     };
 
     updateScale();
@@ -154,27 +154,40 @@ export function IPhoneFrame({
   const isLightStatusBar =
     !isLocked && (activeApp === "phone" || activeApp === "messages");
 
+  // Kích thước chiếm chỗ đã scale trong layout flow
+  const scaledWidth = Math.round(415 * scale);
+  const scaledHeight = Math.round(768 * scale);
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-hidden p-0 relative">
-      {/* PHONE SCALE WRAPPER: Measures available space and scales phone precisely */}
+      {/* PHONE SCALE WRAPPER: Measures available space and centers phone precisely */}
       <div
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center overflow-hidden relative p-1"
+        className="w-full h-full flex items-center justify-center overflow-hidden relative"
       >
+        {/* Wrapper có kích thước layout đúng bằng kích thước sau scale để flexbox căn giữa hoàn hảo */}
         <div
-          data-iphone-frame="true"
           style={{
-            transform: `scale(${scale})`,
-            transformOrigin: "center center",
-            width: "415px",
+            width: `${scaledWidth}px`,
+            height: `${scaledHeight}px`,
           }}
-          className={cn(
-            "relative transition-transform duration-75 flex flex-col items-center shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] shrink-0 iphone-frame no-scrollbar",
-            frameless
-              ? "bg-black rounded-lg border border-white/20 h-[667px]"
-              : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]",
-          )}
+          className="relative flex items-center justify-center shrink-0 overflow-visible"
         >
+          <div
+            data-iphone-frame="true"
+            style={{
+              transform: `scale(${scale})`,
+              transformOrigin: "center center",
+              width: "415px",
+              height: "768px",
+            }}
+            className={cn(
+              "relative transition-transform duration-75 flex flex-col items-center shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] shrink-0 iphone-frame no-scrollbar",
+              frameless
+                ? "bg-black rounded-lg border border-white/20 h-[667px]"
+                : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]",
+            )}
+          >
         {!frameless && (
           <>
             {/* Top Bezel: Authentic Classic iPhone (Proximity sensor, Front Camera & Speaker) */}
@@ -492,6 +505,7 @@ export function IPhoneFrame({
             </button>
           </div>
         )}
+      </div>
       </div>
       </div>
     </div>

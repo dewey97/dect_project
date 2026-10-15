@@ -133,10 +133,8 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
         /* NOTE LIST VIEW */
         <div className="flex flex-col h-full">
           <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[13px] text-[#FFD60A] font-medium">Thư mục</span>
+            <div className="flex items-center justify-center mb-2">
               <span className="text-[17px] font-semibold tracking-tight text-white">Ghi chú</span>
-              <span className="text-[13px] font-medium text-[#FFD60A]">Sửa</span>
             </div>
 
             <div className="relative">

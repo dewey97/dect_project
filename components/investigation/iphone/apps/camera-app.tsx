@@ -92,32 +92,11 @@ export function CameraApp({ onBackToHome }: CameraAppProps) {
           {shutterFlash && (
             <div className="absolute inset-0 bg-black z-30 animate-in fade-in duration-75" />
           )}
-
-          {/* Camera lens covered cue */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/60 border border-white/10 backdrop-blur-xs text-[11px] text-white/50 font-sans pointer-events-none">
-            {cameraFacing === "back"
-              ? "Ống kính sau bị che khuất"
-              : "Ống kính trước bị che khuất"}
-          </div>
         </div>
       </div>
 
-      {/* 3. MODE SLIDER (ẢNH, VIDEO, VUÔNG, PANO) */}
-      <div className="h-[32px] bg-black flex items-center justify-center gap-6 text-[12px] font-semibold tracking-wider text-white shrink-0 uppercase select-none">
-        <span className="text-white/40 cursor-pointer text-[11px]">Video</span>
-        <span className="text-[#FFD60A] cursor-pointer text-[11px] font-bold">
-          ẢNH
-        </span>
-        <span className="text-white/40 cursor-pointer text-[11px]">Vuông</span>
-      </div>
-
-      {/* 4. BOTTOM SHUTTER BAR */}
-      <div className="h-[96px] bg-black px-6 flex items-center justify-between shrink-0 pb-3">
-        {/* Thumbnail Preview (Left) */}
-        <div className="size-12 rounded-lg border border-white/20 bg-zinc-900 overflow-hidden flex items-center justify-center shadow-inner">
-          <div className="size-full bg-black/80" />
-        </div>
-
+      {/* 3. BOTTOM SHUTTER BAR */}
+      <div className="h-[96px] bg-black px-6 flex items-center justify-center shrink-0 pb-3 relative">
         {/* Shutter Button (Center: Classic iPhone white ring with solid button) */}
         <button
           onClick={handleShutter}
@@ -126,9 +105,6 @@ export function CameraApp({ onBackToHome }: CameraAppProps) {
         >
           <div className="size-full rounded-full bg-white active:scale-90 transition-transform shadow-md" />
         </button>
-
-        {/* Spacer for symmetry */}
-        <div className="size-12" />
       </div>
     </div>
   );

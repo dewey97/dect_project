@@ -150,12 +150,10 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
         /* PHOTO GRID VIEW */
         <div className="flex flex-col h-full">
           <div className="px-3 pt-2.5 pb-2 bg-[#000000] shrink-0 border-b border-[#1C1C1E]">
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] text-[#0A84FF] font-medium">Năm</span>
+            <div className="flex items-center justify-center">
               <span className="text-[17px] font-semibold tracking-tight text-white">
                 Ảnh
               </span>
-              <span className="text-[13px] text-[#0A84FF] font-medium">Chọn</span>
             </div>
           </div>
 
