@@ -113,7 +113,7 @@ export function WaitlistForm({
             }}
             placeholder={placeholder}
             disabled={status === "submitting"}
-            className="w-full h-10 pl-9 pr-24 rounded-md border border-border/40 bg-zinc-950/80 text-xs font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary/80 transition-all disabled:opacity-50"
+            className="w-full h-10 pl-9 pr-24 rounded-md border border-zinc-500/80 hover:border-zinc-400 bg-zinc-950/90 text-xs font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400 transition-all disabled:opacity-50"
           />
           <button
             type="submit"
@@ -223,7 +223,7 @@ export function WaitlistForm({
             }}
             placeholder={placeholder}
             disabled={status === "submitting"}
-            className="w-full h-11 px-4 rounded-md border border-border/40 bg-zinc-950/80 text-xs font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all disabled:opacity-50"
+            className="w-full h-11 px-4 rounded-md border border-zinc-500/80 hover:border-zinc-400 bg-zinc-950/90 text-xs font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400 transition-all disabled:opacity-50 shadow-xs"
           />
         </div>
 
