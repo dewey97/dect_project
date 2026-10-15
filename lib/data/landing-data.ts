@@ -50,11 +50,11 @@ export const FAQ_DATA = [
 ]
 
 export const POSTER_ITEMS = [
-  { id: 0, img: '/images/landing/xplore_case_9.png', title: 'Bóng Ma Cầu Cảng Số 9' },
-  { id: 1, img: '/images/landing/xplore_case_north.png', title: 'Mật Mã Cảng Bắc' },
-  { id: 2, img: '/images/landing/suspect_marsh.png', title: 'Bí Mật Xí Nghiệp Đường Sắt' },
-  { id: 3, img: '/images/landing/newspaper_clipping.png', title: 'Vụ Án Tẩy Xóa Hồ Sơ' },
-  { id: 4, img: '/images/landing/victim_thomas.png', title: 'Hồ Sơ Mất Tích Phân Khu 4' },
+  { id: 0, img: '/poster_c0.png', title: 'Trốn Tìm', code: 'CASE #000', status: 'Đang mở điều tra' },
+  { id: 1, img: '/images/landing/poster_classified.png', title: 'Hồ Sơ Mật', code: 'CASE #001', status: 'Sắp ra mắt' },
+  { id: 2, img: '/images/landing/poster_classified.png', title: 'Hồ Sơ Mật', code: 'CASE #002', status: 'Sắp ra mắt' },
+  { id: 3, img: '/images/landing/poster_classified.png', title: 'Hồ Sơ Mật', code: 'CASE #003', status: 'Sắp ra mắt' },
+  { id: 4, img: '/images/landing/poster_classified.png', title: 'Hồ Sơ Mật', code: 'CASE #004', status: 'Sắp ra mắt' },
 ]
 
 export const CASE_FOLDERS = [
@@ -68,18 +68,18 @@ export const TESTIMONIALS_DATA = [
     author: 'Thám tử Blackwood',
     div: 'Phân khu 9 // Tỉnh Cảng Bắc',
     stars: 5,
-    quote: 'Việc kết hợp tài liệu giấy và Bàn Điều Tra Trực Tuyến tạo ra trải nghiệm cực kỳ lôi cuốn. Khi bạn tìm thấy mã PIN viết tay trên mép tài liệu giấy và nhập vào bẻ khóa điện thoại trên web, cảm giác nhập vai vượt trội.'
+    quote: 'Cầm hồ sơ giấy đối chiếu hiện trường rồi giải mã trên web cực kỳ bánh cuốn. Cảm giác nhập vai chân thực vượt mong đợi.'
   },
   {
     author: 'Thám tử V. Dung',
     div: 'Phân khu 4 // Tỉnh Cảng Bắc',
     stars: 5,
-    quote: 'Bộ công cụ đối chiếu dòng thời gian (Timeline Tool) rất tuyệt vời. Việc so sánh lời khai nói dối của nghi phạm với nhật ký GPS thật để phát hiện điểm mâu thuẫn chớp đỏ làm tôi có cảm giác như thám tử thực thụ.'
+    quote: 'Logic án gài cắm rất chặt chẽ. Cảm giác bóc tách mâu thuẫn trong lời khai nghi phạm cực kỳ thỏa mãn.'
   },
   {
     author: 'Thám tử L. Quốc',
     div: 'Tổ Đặc Nhiệm // Tỉnh Cảng Bắc',
     stars: 4,
-    quote: 'Các tính năng điều tra chuyên sâu như đối chiếu manh mối, phân vùng khôi phục dữ liệu burner mang lại chiều sâu công nghệ tuyệt vời. Tuy nhiên việc có nút ẩn bớt các thông số này giúp người chơi không bị ngợp.'
+    quote: 'Cả nhóm ngồi tranh luận suốt 2 tiếng không dứt. Rất lâu rồi mới có một tựa game trinh thám xuất sắc thế này.'
   }
 ]

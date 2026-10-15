@@ -4,33 +4,17 @@ import { CASE_FOLDERS } from '@/lib/data/landing-data'
 
 export function WorldArchiveSection() {
   return (
-    <section id="bocanh" className="w-full max-w-6xl px-6 py-20 z-10 border-t border-border/20 bg-card/5 relative min-h-[700px] flex items-center justify-center">
+    <section id="bocanh" className="w-full max-w-6xl px-6 py-8 sm:py-10 lg:py-16 z-10 bg-card/5 relative min-h-0 lg:min-h-[560px] flex items-center justify-center">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-destructive/5 rounded-full blur-[140px] pointer-events-none" />
 
-      {/* 5 SCATTERED PHOTOS — left side */}
-      <div className="hidden lg:block absolute top-20 left-2 w-44 shadow-xl rotate-[-13deg] hover:rotate-[-6deg] hover:scale-105 hover:z-30 transition-all duration-300 select-none cursor-pointer overflow-hidden">
-        <img src="/images/landing/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.25] brightness-85" />
+      {/* SCATTERED PHOTOS (OVERLAPPING) — left side (2 photos for desktop) */}
+      <div className="hidden lg:block absolute top-[22%] left-2 w-48 shadow-2xl rotate-[-7deg] hover:rotate-[-3deg] hover:scale-105 hover:z-30 transition-all duration-300 select-none cursor-pointer overflow-hidden z-10 border border-white/20 rounded-xs">
+        <img src="/images/landing/chalk_outline.png" alt="Hiện trường chalk outline" className="w-full h-full object-cover filter contrast-105" />
       </div>
 
-      <div className="hidden lg:block absolute top-[28%] left-0 w-36 shadow-lg rotate-[7deg] hover:rotate-[3deg] hover:scale-105 hover:z-35 transition-all duration-300 select-none cursor-pointer overflow-hidden z-10">
-        <img src="/images/landing/xplore_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
-      </div>
-
-      <div className="hidden lg:block absolute top-[55%] left-14 w-32 shadow-md rotate-[-5deg] hover:rotate-0 hover:scale-105 hover:z-30 transition-all duration-300 select-none cursor-pointer overflow-hidden">
-        <img src="/images/landing/suspect_marsh.png" alt="" className="w-full aspect-square object-cover filter grayscale contrast-125" />
-      </div>
-
-      <div className="hidden lg:block absolute bottom-16 left-4 w-40 shadow-lg rotate-[9deg] hover:rotate-[4deg] hover:scale-105 hover:z-35 transition-all duration-300 select-none cursor-pointer overflow-hidden z-10">
-        <img src="/images/landing/xplore_case_north.png" alt="" className="w-full h-full object-cover filter sepia-[0.15] brightness-88" />
-      </div>
-
-      {/* 2 PHOTOS ON TOP OF FOLDER STACK — right side */}
-      <div className="hidden lg:block absolute bottom-[420px] right-[80px] w-36 shadow-xl rotate-[-11deg] hover:rotate-[-5deg] hover:scale-105 hover:z-[60] transition-all duration-300 select-none cursor-pointer overflow-hidden z-[55]">
-        <img src="/images/landing/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.2] brightness-88" />
-      </div>
-      <div className="hidden lg:block absolute bottom-[400px] right-[-10px] w-32 shadow-lg rotate-[8deg] hover:rotate-[3deg] hover:scale-105 hover:z-[60] transition-all duration-300 select-none cursor-pointer overflow-hidden z-[55]">
-        <img src="/images/landing/opportunity_evidence.png" alt="" className="w-full aspect-square object-cover filter grayscale brightness-80 contrast-115" />
+      <div className="hidden lg:block absolute top-[44%] left-12 w-44 shadow-xl rotate-[7deg] hover:rotate-[3deg] hover:scale-105 hover:z-30 transition-all duration-300 select-none cursor-pointer overflow-hidden z-20 border border-white/10 rounded-xs">
+        <img src="/images/landing/newspaper_clipping.png" alt="Mẩu báo điều tra" className="w-full h-full object-cover filter sepia-[0.2] brightness-90" />
       </div>
 
       {/* MANILA FOLDER STACK — right side */}
@@ -68,39 +52,15 @@ export function WorldArchiveSection() {
       </div>
 
       {/* Centered Text Container */}
-      <div className="max-w-xl mx-auto text-center flex flex-col gap-6 items-center z-10 relative">
-        <div className="relative inline-block">
-          <span className="font-mono text-[0.6rem] text-amber-500 uppercase tracking-[0.25em] font-bold block mb-2">
-            HỒ SƠ THUYẾT MINH // BAN CHUYÊN ÁN HỒ SƠ LẠNH
-          </span>
-          <h2 className="text-3xl lg:text-4xl font-black uppercase text-foreground tracking-tight leading-none mb-4">
-            THÀNH PHỐ BÓNG TỐI
-          </h2>
-          <div className="absolute -top-7 right-[-72px] border-3 border-red-700/50 text-red-700/70 font-mono text-[0.95rem] uppercase tracking-widest px-4.5 py-2 rotate-[12deg] rounded-sm pointer-events-none font-black shadow-[0_0_8px_rgba(185,28,28,0.15)] z-20">
-            Tài Liệu Mật
-          </div>
-        </div>
+      <div className="max-w-xl mx-auto text-center flex flex-col gap-5 items-center z-10 relative">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase text-foreground tracking-tight leading-tight text-center font-sans">
+          Chào mừng các bạn đến với <span className="text-primary font-bold">Tổ Điều Tra Đặc Biệt</span>
+        </h2>
 
-        <div className="border-t border-b border-primary/20 py-6 px-4 flex flex-col gap-4 text-xs md:text-sm text-muted-foreground leading-relaxed font-sans">
+        <div className="border-t border-b border-primary/20 py-5 px-4 sm:px-8 flex flex-col gap-3 text-xs sm:text-sm text-muted-foreground leading-relaxed font-sans text-center">
           <p>
-            Chào mừng bạn đến với <strong className="text-foreground">Đô thị cảng Đông Bình</strong> — nơi những cơn mưa rào nhiệt đới dai dẳng trút xuống các con hẻm sâu hút và những khu tập thể cũ kỹ loang lổ vôi vữa. Đằng sau ánh đèn neon vàng vọt nhấp nháy bên những quán cà phê cóc ven sông và làn sương ẩm dày đặc từ bến cảng, là một mạng lưới ngầm phức tạp nơi sự thật dễ dàng bị mua bán và chìm vào im lặng.
+            Khi cảnh sát địa phương hoàn toàn bế tắc trước những kỳ án chấn động, tập hồ sơ niêm phong sẽ được chuyển giao thẳng cho nhóm thám tử tập sự của bạn. Hãy cùng các cộng sự mở hộp tang vật, phân chia nhiệm vụ và đối chiếu từng manh mối nhỏ nhất.
           </p>
-          <p>
-            Tại đây, mỗi năm có hàng tá hồ sơ chuyên án bị đóng dấu đỏ <span className="text-destructive font-mono font-bold">"TẠM ĐÌNH CHỈ"</span> rồi xếp xó vào những ngăn tủ sắt bám bụi của phòng hồ sơ lạnh. Một vụ mất tích không dấu vết của người quản đốc ngay trong đêm mưa bão tại Cầu cảng số 9, chiếc điện thoại burner bị đập vỡ góc giấu dưới gầm tủ locker, hay những bản kê khai vận đơn container bị tẩy xóa cẩu thả... Tất cả dường như đều bị thời gian và dư luận bỏ quên.
-          </p>
-          <p>
-            Nhưng hiện trường luôn để lại tiếng nói của nó. Kẻ thủ ác dù có xóa sạch dấu vết đến đâu cũng không thể phủ nhận sự thật vật lý. Chuyên án đang rất cần những thám tử độc lập có bộ óc nhạy bén, sẵn sàng rà soát lại từng bức ảnh đen trắng, đối chiếu biên bản hỏi cung và xâu chuỗi những manh mối nhỏ nhất để trả lại công lý cho nạn nhân. Bạn đã sẵn sàng dấn thân vào hành trình này?
-          </p>
-        </div>
-
-        {/* Mobile quick grid */}
-        <div className="grid grid-cols-2 gap-3 mt-4 lg:hidden w-full max-w-md">
-          <div className="overflow-hidden shadow-md rotate-[-2deg]">
-            <img src="/images/landing/newspaper_clipping.png" alt="" className="w-full h-full object-cover filter sepia-[0.2] brightness-90" />
-          </div>
-          <div className="overflow-hidden shadow-md rotate-[3deg]">
-            <img src="/images/landing/xplore_case_9.png" alt="" className="w-full h-full object-cover filter grayscale contrast-110" />
-          </div>
         </div>
       </div>
     </section>

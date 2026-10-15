@@ -1,15 +1,50 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { LandingHeroBackdrop } from "@/components/public/landing-hero-backdrop";
-import { Button } from "@/components/ui/button";
-import { Search, ShoppingCart, Dices, ChevronRight } from "lucide-react";
 import { UserNav } from "@/components/auth/user-nav";
 import { LandingBanner } from "@/components/public/landing-banner";
 import { WaitlistForm } from "@/components/public/waitlist-form";
+import { cn } from "@/lib/utils";
+
+const DETECTIVE_QUOTES = [
+  {
+    quote: "Khi bạn đã loại bỏ tất cả những điều không thể, thì điều còn lại, dù vô lý đến đâu, cũng chính là sự thật.",
+    author: "Sherlock Holmes",
+  },
+  {
+    quote: "Mọi tiếp xúc đều để lại dấu vết. Kẻ thủ ác không thể rời hiện trường mà không mang theo hoặc bỏ lại điều gì.",
+    author: "Edmond Locard",
+  },
+  {
+    quote: "Những tế bào xám nhỏ bé không bao giờ nói dối. Sự thật luôn ẩn mình sau những chi tiết vụn vặt nhất.",
+    author: "Hercule Poirot",
+  },
+  {
+    quote: "Thế giới này chứa đầy những điều hiển nhiên mà chẳng mấy ai chịu để mắt quan sát.",
+    author: "Arthur Conan Doyle",
+  },
+  {
+    quote: "Kẻ quan sát sắc bén không chỉ nhìn vào những gì phơi bày trước mắt, mà nhìn thấu những gì bị che giấu.",
+    author: "C. Auguste Dupin",
+  },
+];
 
 export function LandingHero() {
-  const router = useRouter();
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsFading(true);
+      setTimeout(() => {
+        setQuoteIndex((prev) => (prev + 1) % DETECTIVE_QUOTES.length);
+        setIsFading(false);
+      }, 400); // 400ms fade-out, sau đó đổi quote và fade-in
+    }, 6000); // Đổi câu trích dẫn mỗi 6 giây
+
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <>
@@ -18,7 +53,7 @@ export function LandingHero() {
 
       {/* STICKY HEADER NAV */}
       <header className="sticky top-0 w-full z-50 border-b border-border/10 bg-card/90 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 lg:py-4 flex items-center justify-between">
           <BrandMark href="/" />
 
           {/* Quick links navigation on the right side */}
@@ -26,14 +61,14 @@ export function LandingHero() {
             <a href="#bocanh" className="hover:text-primary transition-colors">
               Bối cảnh
             </a>
+            <a href="#vuan" className="hover:text-primary transition-colors">
+              Vụ án
+            </a>
             <a
               href="#mm-opportunity"
               className="hover:text-primary transition-colors"
             >
               Cách chơi
-            </a>
-            <a href="/cases" className="hover:text-primary transition-colors">
-              Vụ án
             </a>
             <a href="#danhgia" className="hover:text-primary transition-colors">
               Đánh giá
@@ -43,94 +78,53 @@ export function LandingHero() {
             </a>
           </nav>
 
-          {/* Action controls (Search, Cart, LogIn) */}
+          {/* Action controls (LogIn / User Profile) */}
           <div className="flex items-center gap-3 text-muted-foreground">
-            <button
-              onClick={() =>
-                alert("Chức năng tìm kiếm dữ liệu vụ án đang được kết nối.")
-              }
-              className="p-2 hover:text-primary transition-colors cursor-pointer flex items-center justify-center"
-              title="Tìm kiếm hồ sơ"
-            >
-              <Search className="size-4.5" />
-            </button>
-
-            <button
-              onClick={() => router.push("/cases")}
-              className="p-2 hover:text-primary transition-colors relative cursor-pointer flex items-center justify-center"
-              title="Giỏ hàng"
-            >
-              <ShoppingCart className="size-4.5" />
-              <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-destructive text-[0.5rem] font-bold text-white rounded-full flex items-center justify-center shadow-[0_0_8px_rgba(239,68,68,0.5)]">
-                1
-              </span>
-            </button>
-
             <UserNav />
           </div>
         </div>
       </header>
 
-      {/* HERO SECTION — FULL WIDTH & HEIGHT STATIC BACKDROP + FLASHLIGHT */}
-      <section className="relative w-full h-[80vh] min-h-[580px] lg:h-[85vh] flex items-center justify-center border-b border-border/10 overflow-hidden">
+      {/* HERO SECTION — FULL VIEWPORT ON MOBILE (FITS PHONE SCREEN EXACTLY) + FLASHLIGHT ON DESKTOP */}
+      <section className="relative w-full h-[calc(100svh-3.5rem)] min-h-[500px] lg:h-[85vh] flex items-center justify-center border-b border-border/10 overflow-hidden">
         {/* Background static image + flashlight */}
         <div className="absolute inset-0 w-full h-full z-0">
-          <LandingHeroBackdrop bgImage="/images/hero/evidence-board-bg.png" />
+          <LandingHeroBackdrop
+            desktopImage="/images/hero/hero_wall_desktop.webp"
+            mobileImage="/images/hero/hero_wall_mobile.webp"
+          />
         </div>
 
         {/* Foreground Content overlay */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 flex justify-start lg:pl-0 pointer-events-none">
-          <div className="w-full max-w-md flex flex-col items-start gap-5 pointer-events-auto lg:translate-x-[-1.5rem]">
-            <h1 className="text-balance text-3xl lg:text-4xl font-black leading-tight tracking-tight uppercase">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-5 sm:px-6 flex justify-start lg:pl-0 pointer-events-none">
+          <div className="w-full max-w-md flex flex-col items-start gap-4 sm:gap-5 pointer-events-auto lg:translate-x-[-1.5rem]">
+            <h1 className="text-balance text-2xl sm:text-3xl lg:text-4xl font-black leading-tight tracking-tight uppercase">
               Những vụ án chưa có lời giải...
             </h1>
-            <p className="text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground font-mono italic">
-              "Khi bạn đã loại bỏ tất cả những điều không thể, thì điều còn lại,
-              dù vô lý đến đâu, cũng chính là sự thật."
-              <span className="block mt-1 not-italic text-primary/60">
-                — Sherlock Holmes
-              </span>
-            </p>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-2 w-full">
-              <div className="relative group inline-flex">
-                {/* Huy hiệu kính lúp ở góc trên cùng bên trái */}
-                <div
-                  className="absolute -top-3 -left-3 z-20 size-8 rounded-full bg-zinc-950 border border-primary/60 text-primary flex items-center justify-center shadow-lg shadow-black/80 ring-2 ring-background group-hover:scale-110 group-hover:border-primary group-hover:rotate-12 transition-all duration-300 pointer-events-none"
-                  aria-hidden="true"
-                >
-                  <Search className="size-4" strokeWidth={2.5} />
-                </div>
-
-                <Button
-                  onClick={() => router.push("/evidence/boardgame")}
-                  size="lg"
-                  className="relative h-14 sm:h-16 px-8 sm:px-10 font-mono text-sm sm:text-base font-black uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_25px_rgba(217,119,6,0.35)] hover:shadow-[0_0_40px_rgba(217,119,6,0.55)] border border-amber-400/50 transition-all duration-300 active:scale-[0.98] cursor-pointer"
-                >
-                  Phá Án Online
-                </Button>
-              </div>
-
-              {/* Nút truy cập nhanh: Trốn Tìm (Bản Boardgame) */}
-              <button
-                onClick={() => router.push("/evidence/boardgame")}
-                className="group/btn flex items-center justify-center gap-2 h-14 sm:h-16 px-5 font-mono text-xs sm:text-sm font-bold uppercase tracking-wider rounded-md border border-amber-500/40 bg-zinc-950/80 hover:bg-amber-500/10 hover:border-amber-400/70 text-amber-400 transition-all duration-300 active:scale-[0.98] cursor-pointer shadow-md backdrop-blur-sm"
+            {/* Animated Rotating Detective Quote */}
+            <div className="w-full min-h-[68px] sm:min-h-[68px] flex items-center">
+              <p
+                className={cn(
+                  "text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground font-mono italic transition-all duration-400 ease-in-out",
+                  isFading ? "opacity-0 -translate-y-1" : "opacity-100 translate-y-0"
+                )}
               >
-                <Dices className="size-4.5 text-amber-400 group-hover/btn:rotate-12 transition-transform" />
-                <span>Trốn Tìm (Boardgame)</span>
-                <ChevronRight className="size-4 opacity-60 group-hover/btn:translate-x-0.5 transition-transform" />
-              </button>
+                "{DETECTIVE_QUOTES[quoteIndex].quote}"
+                <span className="block mt-1 not-italic text-primary/75 font-sans font-semibold text-[0.75rem] tracking-wider uppercase">
+                  — {DETECTIVE_QUOTES[quoteIndex].author}
+                </span>
+              </p>
             </div>
 
-            {/* Quick Email Dispatch Box */}
-            <div className="w-full mt-2 pt-3 border-t border-border/15 flex flex-col gap-1.5">
-              <span className="text-[0.68rem] font-mono uppercase tracking-wider text-amber-400/90 font-bold flex items-center gap-1.5">
-                <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
-                Nhận mật mã sớm & thông báo chuyên án mới:
+            {/* Primary Hero CTA: Email Registration Form */}
+            <div className="w-full mt-1 sm:mt-2 flex flex-col gap-2">
+              <span className="text-[0.72rem] font-mono uppercase tracking-wider text-amber-400 font-bold">
+                NHẬN ƯU ĐÃI VÀ THÔNG BÁO SỚM NHẤT
               </span>
               <WaitlistForm
                 source="hero"
                 variant="inline"
-                placeholder="Nhập email thám tử của bạn..."
+                placeholder="Nhập email của bạn..."
                 buttonLabel="ĐĂNG KÝ"
               />
             </div>

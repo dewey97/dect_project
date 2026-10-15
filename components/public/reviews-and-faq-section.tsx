@@ -24,30 +24,22 @@ export function ReviewsAndFaqSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
           {TESTIMONIALS_DATA.map((t, idx) => (
-            <div key={idx} className="relative bg-[#ebe4d5] text-[#2d251e] border border-[#d6cbaf] p-6 shadow-[0_8px_16px_rgba(0,0,0,0.3)] rounded-sm min-h-[240px] flex flex-col justify-between hover:scale-[1.01] hover:shadow-[0_12px_24px_rgba(0,0,0,0.4)] transition-all duration-300">
+            <div key={idx} className="relative bg-[#ebe4d5] text-[#2d251f] border border-[#d6cbaf] p-6 shadow-[0_8px_16px_rgba(0,0,0,0.3)] rounded-sm flex flex-col justify-between hover:scale-[1.01] hover:shadow-[0_12px_24px_rgba(0,0,0,0.4)] transition-all duration-300">
               <Quote className="absolute top-4 right-4 size-8 text-amber-900/10 pointer-events-none" />
 
               <div>
-                <div className="flex items-center justify-between border-b border-dashed border-[#a3977c] pb-2 mb-4 font-mono">
+                <div className="flex items-center justify-between border-b border-dashed border-[#a3977c] pb-2 mb-3.5 font-mono">
                   <span className="text-[0.55rem] font-bold text-red-850 uppercase tracking-widest">
                     BÁO CÁO CÔNG TÁC
+                  </span>
+                  <span className="text-[0.65rem] font-bold text-zinc-900 font-typewriter uppercase tracking-wide">
+                    {t.author}
                   </span>
                 </div>
 
                 <p className="font-typewriter text-xs text-zinc-800 leading-relaxed italic">
                   "{t.quote}"
                 </p>
-              </div>
-
-              <div className="mt-6 pt-3 border-t border-[#d6cbaf] flex justify-between items-end font-typewriter text-[0.55rem]">
-                <div className="flex flex-col">
-                  <span className="text-[0.45rem] uppercase text-zinc-500 font-sans font-bold">ĐIỀU TRA VIÊN</span>
-                  <span className="text-zinc-900 font-bold text-[0.7rem]">{t.author}</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[0.45rem] uppercase text-zinc-500 font-sans block font-bold">ĐƠN VỊ</span>
-                  <span className="text-zinc-700">{t.div}</span>
-                </div>
               </div>
             </div>
           ))}

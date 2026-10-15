@@ -3,10 +3,18 @@
 import { useEffect, useRef } from "react";
 
 interface LandingHeroBackdropProps {
-  bgImage: string;
+  bgImage?: string;
+  desktopImage?: string;
+  mobileImage?: string;
 }
 
-export function LandingHeroBackdrop({ bgImage }: LandingHeroBackdropProps) {
+export function LandingHeroBackdrop({
+  bgImage,
+  desktopImage = "/images/hero/hero_wall_desktop.webp",
+  mobileImage = "/images/hero/hero_wall_mobile.webp",
+}: LandingHeroBackdropProps) {
+  const finalDesktop = desktopImage || bgImage || "/images/hero/hero_wall_desktop.webp";
+  const finalMobile = mobileImage || finalDesktop;
   const containerRef = useRef<HTMLDivElement>(null);
   const spotlightRef = useRef<HTMLDivElement>(null);
 
@@ -55,13 +63,16 @@ export function LandingHeroBackdrop({ bgImage }: LandingHeroBackdropProps) {
       ref={containerRef}
       className="relative w-full h-full overflow-hidden select-none bg-[#0c0805]"
     >
-      <img
-        src={bgImage}
-        alt="Bảng điều tra hero"
-        className="w-full h-full object-cover object-center filter brightness-[0.65] contrast-[1.1] lg:brightness-[0.7]"
-      />
+      <picture className="w-full h-full block">
+        <source media="(max-width: 767px)" srcSet={finalMobile} />
+        <img
+          src={finalDesktop}
+          alt="Bảng điều tra hero"
+          className="w-full h-full object-cover object-center filter brightness-[0.7] contrast-[1.05] lg:brightness-[0.72]"
+        />
+      </picture>
       {/* Lớp phủ tương phản tối tĩnh: Trên mobile sâu hơn để bảo vệ độ sắc nét của văn bản */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/85 lg:from-black/80 lg:via-black/30 lg:to-black/70 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/85 lg:from-black/80 lg:via-black/35 lg:to-black/75 pointer-events-none" />
 
       {/* Quầng sáng đèn pin — Chỉ bật trên Desktop */}
       <div

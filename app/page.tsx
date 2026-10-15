@@ -37,14 +37,14 @@ export default function MarketingLandingPage() {
       {/* Hero & Navigation */}
       <LandingHero />
 
+      {/* World Archive & Lore */}
+      <WorldArchiveSection />
+
       {/* 3D Poster Carousel */}
       <CaseCarouselSection
         activePoster={activePoster}
         setActivePoster={setActivePoster}
       />
-
-      {/* World Archive & Lore */}
-      <WorldArchiveSection />
 
       {/* Game Rules (Means / Motive / Opportunity) */}
       <GameRulesShowcase />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Mail, CheckCircle2, AlertCircle, Loader2, Send } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
@@ -25,6 +25,16 @@ export function WaitlistForm({
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (status === "error") {
+      const timer = setTimeout(() => {
+        setStatus("idle");
+        setErrorMessage("");
+      }, 3500); // Tự động ẩn thông báo lỗi sau 3.5 giây
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -191,20 +201,19 @@ export function WaitlistForm({
             <span>{errorMessage}</span>
           </p>
         )}
-
-        <div className="text-[0.65rem] text-zinc-500 font-mono text-left flex items-center gap-1.5">
-          <span>🔒 Bảo mật 100%. Không thư rác. Hủy đăng ký bất kỳ lúc nào chỉ bằng một cú nhấp.</span>
-        </div>
       </form>
     );
   }
 
-  // Default "inline" variant for Hero Section
+  // Default "inline" variant for Hero Section & Dispatch Banner
   return (
-    <form onSubmit={handleSubmit} className={`w-full max-w-md flex flex-col gap-2 ${className}`} noValidate>
+    <form
+      onSubmit={handleSubmit}
+      className={`w-full ${className.includes("max-w-") ? "" : "max-w-md"} flex flex-col gap-2 ${className}`}
+      noValidate
+    >
       <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full">
         <div className="relative flex-1">
-          <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60 pointer-events-none" />
           <input
             type="email"
             value={email}
@@ -214,22 +223,19 @@ export function WaitlistForm({
             }}
             placeholder={placeholder}
             disabled={status === "submitting"}
-            className="w-full h-11 pl-10 pr-3 rounded-md border border-border/40 bg-zinc-950/80 text-xs font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all disabled:opacity-50"
+            className="w-full h-11 px-4 rounded-md border border-border/40 bg-zinc-950/80 text-xs font-mono text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all disabled:opacity-50"
           />
         </div>
 
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="h-11 px-5 rounded-md bg-amber-500/90 hover:bg-amber-400 text-zinc-950 font-mono text-xs font-black uppercase tracking-wider shadow-md hover:shadow-amber-500/30 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
+          className="h-11 px-6 rounded-md bg-amber-500/90 hover:bg-amber-400 text-zinc-950 font-mono text-xs font-black uppercase tracking-wider shadow-md hover:shadow-amber-500/30 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center disabled:opacity-50 shrink-0"
         >
           {status === "submitting" ? (
             <Loader2 className="size-3.5 animate-spin" />
           ) : (
-            <>
-              <Mail className="size-3.5" />
-              <span>{buttonLabel}</span>
-            </>
+            <span>{buttonLabel}</span>
           )}
         </button>
       </div>
