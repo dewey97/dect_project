@@ -163,3 +163,82 @@ Trước khi commit bất kỳ thay đổi nào liên quan đến Figma:
 - [ ] Tuân thủ **Mobile UX Rule**: Không sử dụng `autoFocus` tự động bật bàn phím ảo.
 - [ ] Kiểm tra lỗi TypeScript: Chạy `npx tsc --noEmit` đạt 0 lỗi.
 - [ ] Tạo Git commit theo chuẩn Conventional Commits (ví dụ: `feat(iphone): sync ... with figma design`).
+
+---
+
+## 📑 7. Kiến Trúc Tự Động Hóa Xuất Tài Liệu & Hồ Sơ Vụ Án (Figma Document & PDF Automation Pipeline)
+
+Trong quá trình phát triển các vụ án trinh thám, việc quản lý và xuất bản hàng chục biên bản lời khai (`LK-...`), hồ sơ lý lịch (`HS-...`), báo cáo pháp y (`BC`) và hợp đồng (`HĐ`) từ Figma vào Web App có thể được tự động hóa qua 3 phương pháp cốt lõi:
+
+```mermaid
+flowchart TD
+    subgraph INPUT["Nguồn Kịch Bản & Thiết Kế"]
+        GS["Google Sheets CMS\n(Quản lý danh sách, tên tài liệu, nội dung Q&A)"]
+        FG["Figma Master\nPage: Docs Format (Node: 55:2)"]
+    end
+
+    subgraph AUTOMATION["3 Phương Pháp Tự Động Hóa"]
+        direction TB
+        M1["Phương Pháp 1: Pipeline Vector SVG ➔ Headless PDF\n(Khuyên dùng khi cần xuất file PDF A4 sắc nét)"]
+        M2["Phương Pháp 2: Web Component Live 100%\n(Khuyên dùng cho Gameplay tương tác & Mobile)"]
+        M3["Phương Pháp 3: Figma REST API Direct Export\n(Xuất PDF nhanh qua Cloud Endpoint)"]
+    end
+
+    subgraph OUTPUT["Đầu Ra Hệ Thống"]
+        PDF["Tệp PDF A4 Vector sắc nét 100%\n(public/documents/case_000/.../xxx.pdf)"]
+        LIVE["Giao diện Web tương tác tức thì\n(Copy chữ, Ctrl+F, Zero loading delay)"]
+    end
+
+    GS --> M1 & M2 & M3
+    FG --> M1 & M2 & M3
+    M1 --> PDF
+    M2 --> LIVE
+    M3 --> PDF
+```
+
+### 7.1. Phương Pháp 1: Pipeline Vector SVG ➔ Headless PDF (Khuyên dùng cho hồ sơ in ấn & PDF Viewer)
+* **Nguyên lý giải quyết lỗi nhòe/mờ**:
+  * Tránh tuyệt đối việc lấy ảnh raster PNG nhúng vào trang PDF (sẽ gây vỡ hạt khi zoom > 100%).
+  * Kéo file vector gốc dạng **SVG** (`download_figma_images` với đuôi `.svg`).
+  * Sử dụng engine Chromium không đầu (**Playwright / Puppeteer**) đọc SVG và in ra file PDF với chuẩn in ấn **A4 (210 x 297 mm / 595.28 x 841.89 pt)**, cờ `printBackground: true`.
+* **Luồng tự động hóa hoàn toàn từ Google Sheets**:
+  1. Script đọc Google Sheet để lấy danh sách tên tài liệu (ví dụ: `LK-Vũ`, `LK-Mai`, `HS-01`).
+  2. Duyệt cây node Figma (Node `55:2` - `Docs Format`) thông qua MCP / API để tự động tìm Node tương ứng theo thuộc tính `name`.
+  3. Kéo SVG của từng node về thư mục tạm.
+  4. Playwright render và đóng gói thành file `.pdf` vector hoàn chỉnh vào đúng thư mục đích: `public/documents/case_000/<phase>/`.
+  5. **Chất lượng**: Độ sắc nét tuyệt đối (zoom 1000% không vỡ hạt), dung lượng tối ưu, chuẩn tỷ lệ trang in hành chính Việt Nam.
+
+### 7.2. Phương Pháp 2: Web Component Live 100% (Khuyên dùng cho Gameplay trinh thám & Mobile)
+* **Nguyên lý**: Tách bạch triệt để giữa **Khung trang giấy (Skin/Shell)** và **Nội dung (Data)**.
+* **Cấu tạo**:
+  * **Khung giao diện (HTML/Tailwind CSS)**: Thiết kế 1 lần duy nhất theo đúng layout chuẩn của Figma (viền chỉ đôi, quốc hiệu, tiêu ngữ, căn lề hành chính, nốt gập giấy A4, con dấu đỏ PC02 nghiêng -5 độ, chữ ký tay mẫu dạng ảnh nhỏ 10KB dùng chung).
+  * **Nội dung sống (Live Hydration)**: Bơm trực tiếp dữ liệu câu hỏi, câu trả lời, họ tên nhân chứng từ Google Sheets Live CMS.
+* **Lợi thế vượt trội**:
+  * **Siêu nhẹ**: Payload chỉ từ `3 KB – 5 KB` JSON thay vì `300 KB – 1 MB` file ảnh/PDF (nhẹ hơn 50 - 100 lần, tiết kiệm băng thông và RAM).
+  * **Tương tác gameplay sâu**: Người chơi có thể bôi đen chữ, highlight câu khai nghi vấn, dùng `Ctrl + F` tìm manh mối, click vào câu trả lời để đối chất trực tiếp.
+  * **Sửa án tức thì**: Game Master (GM) chỉnh sửa tình tiết vụ án trên Google Sheets, người chơi F5 là thấy ngay lập tức mà không cần Designer phải xuất lại file.
+  * **Responsive Mobile hoàn hảo**: Không phải dùng ngón tay zoom ảnh A4 khổ lớn trên màn hình điện thoại nhỏ.
+
+### 7.3. Phương Pháp 3: Figma REST API Direct Export (Native Endpoint)
+* **Nguyên lý**: Sử dụng trực tiếp endpoint chính thức của Figma:
+  ```http
+  GET https://api.figma.com/v1/images/:fileKey?ids=:nodeId&format=pdf
+  Header: X-Figma-Token: <FIGMA_ACCESS_TOKEN>
+  ```
+* **Cơ chế**: Máy chủ Figma tự động render node thành file PDF và trả về link tải tạm thời (S3 URL).
+* **Đặc điểm**: Đơn giản, không phụ thuộc vào trình duyệt Chromium cục bộ, nhưng bị giới hạn bởi tốc độ render của máy chủ Figma và thời hạn tồn tại của link tạm thời.
+
+---
+
+### 7.4. Bảng So Sánh & Hướng Dẫn Ra Quyết Định (Decision Matrix)
+
+| Tiêu chí | Phương Pháp 1: Vector SVG ➔ Headless PDF | Phương Pháp 2: Web Component Live 100% | Phương Pháp 3: Figma REST API Direct |
+| :--- | :--- | :--- | :--- |
+| **Định dạng đầu ra** | File `.pdf` vector thực tế | DOM HTML / CSS React Component | File `.pdf` do Figma server render |
+| **Độ nét khi Zoom** | 🌟 Sắc nét tuyệt đối (Vector 100%) | 🌟 Sắc nét tuyệt đối (HTML Font) | 🌟 Sắc nét (Vector PDF) |
+| **Dung lượng tải** | ~200 KB – 900 KB / file | **Siêu nhẹ: ~3 KB – 5 KB** JSON | ~200 KB – 800 KB / file |
+| **Tốc độ mở trong game** | Cần nạp PDF viewer | **Mở tức thì 0.05s** (Zero lag) | Cần nạp PDF viewer |
+| **Khả năng tương tác** | Chỉ đọc, cuộn trang | Bôi đen, Ctrl+F, click đối chất | Chỉ đọc, cuộn trang |
+| **Tính linh hoạt kịch bản** | Phải chạy lệnh build lại file | **Cập nhật tức thì 0s từ Google Sheets** | Phải chạy lệnh build lại file |
+| **Trường hợp áp dụng** | Người chơi tải hồ sơ về máy, in ấn giấy, hoặc lưu trữ pháp y chính thức | **Gameplay phá án trực tiếp trên Web & Mobile** | Xuất nhanh kiểm tra thiết kế, trao đổi nội bộ |
+

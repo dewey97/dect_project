@@ -113,7 +113,8 @@ Giấy note vàng/trắng viết tay đã kết xuất sẵn nét mực để c�
 - `note_ket_luan_dieu_tra.png`: Bản kết luận điều tra và cáo trạng.
 
 ### 7.3. Ảnh Hiện Trường & Manh Mối Chi Tiết
-- `photo-reinvestigation-room-realistic.jpg`: Toàn cảnh 2D căn phòng khách nhà Khang số 14 Đường Bờ Sông.
+- `photo-reinvestigation-room-realistic.jpg`: Toàn cảnh 2D căn phòng khách nhà Khang số 14 Đường Bờ Sông (dùng cho ReinvestigationModal).
+- `reinvestigation_crime_scene_prop.png`: Vật thể vật lý khám xét hiện trường (ảnh chụp toàn cảnh phòng khách, dải băng niêm phong cảnh sát vàng đen, thước đo pháp y Forensic Scale và dấu mộc tái khám nghiệm) đặt trên mặt bàn điều tra thay thế tờ note giấy.
 - `photo_cheating_sms.jpg`: Ảnh chụp màn hình tin nhắn Khang hẹn hò Thảo Vy.
 - `cuong_ve_xe_tung.png`: Cuống vé xe buýt của Tùng lúc 20:15.
 - `wardrobe_eyes.jpg`: Tủ gỗ lim 1996 then cài sắt.

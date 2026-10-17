@@ -24,6 +24,9 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
   - Group Play Realtime Architecture: [`docs/core_specs/11_group_play_realtime_spec.md`](docs/core_specs/11_group_play_realtime_spec.md)
   - Group Play Implementation Plan: [`docs/core_specs/12_group_play_implementation_plan.md`](docs/core_specs/12_group_play_implementation_plan.md)
   - Architecture Hardening & Roadmap: [`docs/core_specs/13_architecture_hardening_and_roadmap.md`](docs/core_specs/13_architecture_hardening_and_roadmap.md)
+  - Multi-Case Engine & Hybrid CMS: [`docs/core_specs/14_multi_case_engine_and_cms_architecture.md`](docs/core_specs/14_multi_case_engine_and_cms_architecture.md)
+  - Cross-Case Phone Simulator Spec: [`docs/core_specs/15_cross_case_phone_simulator_spec.md`](docs/core_specs/15_cross_case_phone_simulator_spec.md)
+  - Detective Rating & Leaderboard Spec: [`docs/core_specs/16_detective_rating_and_leaderboard_spec.md`](docs/core_specs/16_detective_rating_and_leaderboard_spec.md)
   - Tech Debt Ledger: [`docs/TECHDEBT.md`](docs/TECHDEBT.md)
 - **🧠 Domain & Case Docs (Nghiệp vụ & Hồ sơ vụ án)**:
   - Bối cảnh & Cốt truyện Master Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)
