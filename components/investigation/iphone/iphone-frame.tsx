@@ -154,40 +154,28 @@ export function IPhoneFrame({
   const isLightStatusBar =
     !isLocked && (activeApp === "phone" || activeApp === "messages");
 
-  // Kích thước chiếm chỗ đã scale trong layout flow
-  const scaledWidth = Math.round(415 * scale);
-  const scaledHeight = Math.round(768 * scale);
-
   return (
     <div className="w-full h-full flex flex-col items-center justify-center select-none overflow-hidden p-0 relative">
       {/* PHONE SCALE WRAPPER: Measures available space and centers phone precisely */}
       <div
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center overflow-hidden relative"
+        className="w-full h-full flex items-center justify-center overflow-hidden relative p-1"
       >
-        {/* Wrapper có kích thước layout đúng bằng kích thước sau scale để flexbox căn giữa hoàn hảo */}
         <div
+          data-iphone-frame="true"
           style={{
-            width: `${scaledWidth}px`,
-            height: `${scaledHeight}px`,
+            transform: `scale(${scale})`,
+            transformOrigin: "center center",
+            width: "415px",
+            height: "768px",
           }}
-          className="relative flex items-center justify-center shrink-0 overflow-visible"
+          className={cn(
+            "relative transition-transform duration-75 flex flex-col items-center shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] shrink-0 iphone-frame no-scrollbar",
+            frameless
+              ? "bg-black rounded-lg border border-white/20 h-[667px]"
+              : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]",
+          )}
         >
-          <div
-            data-iphone-frame="true"
-            style={{
-              transform: `scale(${scale})`,
-              transformOrigin: "center center",
-              width: "415px",
-              height: "768px",
-            }}
-            className={cn(
-              "relative transition-transform duration-75 flex flex-col items-center shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] shrink-0 iphone-frame no-scrollbar",
-              frameless
-                ? "bg-black rounded-lg border border-white/20 h-[667px]"
-                : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]",
-            )}
-          >
         {!frameless && (
           <>
             {/* Top Bezel: Authentic Classic iPhone (Proximity sensor, Front Camera & Speaker) */}
@@ -505,7 +493,6 @@ export function IPhoneFrame({
             </button>
           </div>
         )}
-      </div>
       </div>
       </div>
     </div>

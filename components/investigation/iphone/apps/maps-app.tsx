@@ -69,6 +69,9 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   const [pan, setPan] = useState({ x: -545, y: 130 })
   const [isDragging, setIsDragging] = useState(false)
   const [isCentered, setIsCentered] = useState(true)
+  const isDraggingRef = useRef(false)
+  const hasMovedRef = useRef(false)
+  const rAFRef = useRef<number | null>(null)
   const dragStart = useRef({ x: 0, y: 0 })
   const panStart = useRef({ x: 0, y: 0 })
   const mapContainerRef = useRef<HTMLDivElement>(null)
@@ -152,36 +155,72 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
     setIs3DView(false)
   }
 
-  // Handle Drag / Pan Map
-  const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+  // Handle Pointer / Drag / Pan Map
+  const handlePointerDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('.map-pin-btn')) return
+    if (e.button !== 0 && e.pointerType === 'mouse') return
+
+    isDraggingRef.current = true
+    hasMovedRef.current = false
     setIsDragging(true)
     setIsCentered(false)
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
-    dragStart.current = { x: clientX, y: clientY }
+
+    dragStart.current = { x: e.clientX, y: e.clientY }
     panStart.current = { ...pan }
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId)
+    } catch {}
   }
 
-  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging) return
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
-    const dx = clientX - dragStart.current.x
-    const dy = clientY - dragStart.current.y
-    setPan({
-      x: panStart.current.x + dx,
-      y: panStart.current.y + dy
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return
+
+    const dx = e.clientX - dragStart.current.x
+    const dy = e.clientY - dragStart.current.y
+
+    if (Math.hypot(dx, dy) > 4) {
+      hasMovedRef.current = true
+    }
+
+    if (rAFRef.current) {
+      cancelAnimationFrame(rAFRef.current)
+    }
+
+    rAFRef.current = requestAnimationFrame(() => {
+      setPan({
+        x: panStart.current.x + dx,
+        y: panStart.current.y + dy
+      })
     })
   }
 
-  const handleMouseUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return
+    isDraggingRef.current = false
     setIsDragging(false)
+    if (rAFRef.current) {
+      cancelAnimationFrame(rAFRef.current)
+    }
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {}
+  }
+
+  // Mouse wheel zoom
+  const handleWheel = (e: React.WheelEvent) => {
+    e.stopPropagation()
+    const zoomDelta = e.deltaY < 0 ? 0.08 : -0.08
+    setZoom((prevZoom) => {
+      const nextZoom = Math.min(2.5, Math.max(0.35, prevZoom + zoomDelta))
+      return Math.round(nextZoom * 100) / 100
+    })
+    setIsCentered(false)
   }
 
   // Map click
   const handleMapClick = (e: React.MouseEvent) => {
-    if (isDragging) return
+    if (hasMovedRef.current || isDraggingRef.current) return
     const target = e.target as HTMLElement
     if (target.closest('.map-pin-btn') || target.closest('button')) return
     setSelectedPlace(null)
@@ -450,9 +489,11 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
         selectedPlace={selectedPlace}
         handlePinClick={handlePinClick}
         handleMapClick={handleMapClick}
-        handleMouseDown={handleMouseDown}
-        handleMouseMove={handleMouseMove}
-        handleMouseUp={handleMouseUp}
+        handlePointerDown={handlePointerDown}
+        handlePointerMove={handlePointerMove}
+        handlePointerUp={handlePointerUp}
+        handleWheel={handleWheel}
+        isDragging={isDragging}
         mapContainerRef={mapContainerRef}
         scaleMeters={scaleMeters}
         setPan={setPan}

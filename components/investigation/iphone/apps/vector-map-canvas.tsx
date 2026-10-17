@@ -24,9 +24,14 @@ export interface VectorMapCanvasProps {
   selectedPlace: CaseLocation | null
   handlePinClick: (loc: CaseLocation) => void
   handleMapClick: (e: React.MouseEvent) => void
-  handleMouseDown: (e: React.MouseEvent | React.TouchEvent) => void
-  handleMouseMove: (e: React.MouseEvent | React.TouchEvent) => void
-  handleMouseUp: () => void
+  handleMouseDown?: (e: React.MouseEvent | React.TouchEvent) => void
+  handleMouseMove?: (e: React.MouseEvent | React.TouchEvent) => void
+  handleMouseUp?: () => void
+  handlePointerDown?: (e: React.PointerEvent) => void
+  handlePointerMove?: (e: React.PointerEvent) => void
+  handlePointerUp?: (e: React.PointerEvent) => void
+  handleWheel?: (e: React.WheelEvent) => void
+  isDragging?: boolean
   mapContainerRef: React.RefObject<HTMLDivElement | null>
   scaleMeters: number
   setPan: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>
@@ -61,6 +66,11 @@ export function VectorMapCanvas({
   handleMouseDown,
   handleMouseMove,
   handleMouseUp,
+  handlePointerDown,
+  handlePointerMove,
+  handlePointerUp,
+  handleWheel,
+  isDragging = false,
   mapContainerRef,
   scaleMeters,
   setPan,
@@ -77,22 +87,24 @@ export function VectorMapCanvas({
     <div
       ref={mapContainerRef}
       onClick={handleMapClick}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onTouchStart={handleMouseDown}
-      onTouchMove={handleMouseMove}
-      onTouchEnd={handleMouseUp}
+      onPointerDown={handlePointerDown || handleMouseDown}
+      onPointerMove={handlePointerMove || handleMouseMove}
+      onPointerUp={handlePointerUp || handleMouseUp}
+      onPointerCancel={handlePointerUp || handleMouseUp}
+      onWheel={handleWheel}
       className={cn(
-        'w-full h-full relative overflow-hidden transition-colors cursor-grab active:cursor-grabbing select-none',
+        'w-full h-full relative overflow-hidden transition-colors cursor-grab active:cursor-grabbing select-none touch-none',
         mapLayer === 'satellite' ? 'bg-[#18232c]' : 'bg-[#F5F7FA]'
       )}
     >
       {/* World Layer Transformed by Pan & Zoom & 3D Tilt in Navigation mode */}
       <div
-        className="absolute inset-0 origin-top-left pointer-events-none transition-transform duration-300"
+        className={cn(
+          'absolute inset-0 origin-top-left pointer-events-none will-change-transform',
+          isDragging ? 'transition-none' : 'transition-transform duration-500 ease-out'
+        )}
         style={{
-          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom}) ${
+          transform: `translate3d(${pan.x}px, ${pan.y}px, 0px) scale(${zoom}) ${
             is3DView ? 'perspective(700px) rotateX(28deg)' : ''
           }`,
           width: '1237px',
@@ -106,7 +118,7 @@ export function VectorMapCanvas({
           src="/images/cases/case_000/map/hanoi_master_map.png"
           alt="Bản đồ Hà Nội Master"
           className={cn(
-            'absolute inset-0 w-full h-full object-cover select-none pointer-events-none transition-all duration-300',
+            'absolute inset-0 w-full h-full object-cover select-none pointer-events-none transition-[filter] duration-300',
             mapLayer === 'satellite' ? 'brightness-75 contrast-125 saturate-50' : 'brightness-100'
           )}
           draggable={false}
