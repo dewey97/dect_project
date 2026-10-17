@@ -7,12 +7,12 @@
 
 ## 📦 Danh Mục Thành Phần Trong Kho:
 
-1. **`crime-scene-3d/` & `crime-scene-room-3d.tsx`**:
-   - Hiện trường 3D căn phòng án mạng (Three.js canvas, procedural textures sàn gạch/gỗ, chalk outline thi thể, camera controller, hotspot pins).
+1. **`scene-360-viewer.tsx`**:
+   - Trình xem ảnh toàn cảnh Panorama 360 hình cầu (Three.js equirectangular sphere). Sẵn sàng kích hoạt lại khi có ảnh 360 hiện trường.
 2. **`3d-cabinet/` & `file_cabinet_3d.tsx`**:
    - Tủ hồ sơ ngăn kéo kim loại 3D tương tác (Three.js, đèn trần dao động, kéo mở ngăn tủ, dossier slide-over).
-3. **`scene-360-viewer.tsx`**:
-   - Trình xem ảnh toàn cảnh Panorama 360 hình cầu (Three.js equirectangular sphere).
+
+*(Lưu ý: Phân hệ dựng phòng 3D hình học WebGL `crime-scene-3d/` và các model `.glb` đã được dọn sạch hoàn toàn theo chỉ thị của người dùng vào tháng 10/2026 để chuyển hẳn sang giải pháp ảnh Panorama 360 tối ưu hơn).*
 
 ---
 
