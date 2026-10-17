@@ -267,8 +267,8 @@ export function getViewTransform(zoom: ZoomState, pan: Point): ViewTransform {
   if (!zoom.active) {
     return {
       scale: 1,
-      translateX: 0,
-      translateY: 0,
+      translateX: pan.x,
+      translateY: pan.y,
     };
   }
 

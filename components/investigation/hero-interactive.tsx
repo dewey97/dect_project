@@ -475,6 +475,16 @@ export function HeroInteractive({
   useInvestigationEvent("OPEN_WALKTHROUGH", () => {
     resetZoom();
   });
+  useInvestigationEvent("RESET_BOARD_VIEW", () => {
+    resetZoom();
+  });
+  useInvestigationEvent("BOARD_ZOOM_IN", () => {
+    const { width, height } = containerSizeRef.current;
+    activateZoom(width > 0 ? width / 2 : 400, height > 0 ? height / 2 : 300);
+  });
+
+  const lastTapTimeRef = useRef<number>(0);
+  const lastTapPosRef = useRef<Point>({ x: 0, y: 0 });
 
   const toggleZoomAt = useCallback(
     (screenX: number, screenY: number) => {
@@ -713,7 +723,8 @@ export function HeroInteractive({
       } else if (
         isPointerDownRef.current &&
         isActivePointer &&
-        zoomRef.current.active
+        !draggingPinIdRef.current &&
+        !isDraggingConnectionRef.current
       ) {
         const deltaX = x - pointerDownRef.current.x;
         const deltaY = y - pointerDownRef.current.y;
@@ -726,8 +737,8 @@ export function HeroInteractive({
 
         const { width, height } = containerSizeRef.current;
 
-        const maxPanX = width * MAX_PAN_RATIO;
-        const maxPanY = height * MAX_PAN_RATIO;
+        const maxPanX = width * 1.5;
+        const maxPanY = height * 1.5;
 
         panRef.current = {
           x: clamp(panAtPointerDownRef.current.x + deltaX, -maxPanX, maxPanX),
@@ -895,6 +906,21 @@ export function HeroInteractive({
           }
         } else if (isEditModeRef.current && onSelectPinRef.current) {
           onSelectPinRef.current(null);
+        } else if (!isEditModeRef.current) {
+          // Double-tap on empty canvas space toggles zoom at that point
+          const now = Date.now();
+          const timeSinceLast = now - lastTapTimeRef.current;
+          const distFromLast = Math.hypot(
+            x - lastTapPosRef.current.x,
+            y - lastTapPosRef.current.y,
+          );
+          if (timeSinceLast < 350 && distFromLast < 30) {
+            toggleZoomAt(x, y);
+            lastTapTimeRef.current = 0;
+          } else {
+            lastTapTimeRef.current = now;
+            lastTapPosRef.current = { x, y };
+          }
         }
       } else {
         updateHoveredPin(x, y);

@@ -23,6 +23,7 @@ import { checkIsAdmin } from '@/lib/actions/auth-guard'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
 import { normalizeImageUrl } from '@/lib/utils'
 import { toast } from '@/components/ui/toast'
+import { Scene360Viewer } from '@/components/investigation/scene-360-viewer'
 
 interface ReinvestigationModalProps {
   isOpen: boolean
@@ -37,6 +38,8 @@ export interface ReinvestigationHotspot2D {
   title?: string
   x: number // percentage 0-100
   y: number // percentage 0-100
+  yaw?: number // Tọa độ góc nhìn 360 (-180 to 180)
+  pitch?: number // Tọa độ góc nhìn 360 (-85 to 85)
   imageUrl: string
   driveUrl?: string
   soundFile: string
@@ -544,56 +547,23 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: R
       {/* SCANLINES EFFECT */}
       <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-15 z-10" />
 
-      {/* TOP HEADER / STATUS BAR */}
+      {/* TOP HEADER / STATUS BAR - CLEAN NO CLUTTER */}
       <div className="relative z-30 bg-[#160d07] border-b-2 border-[#3d2412] px-3 sm:px-5 py-2.5 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-2.5 sm:gap-4">
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-xs sm:text-sm text-[#f5ebd9] tracking-wider uppercase">
-                KHÁM XÉT LẠI HIỆN TRƯỜNG
+                KHÁM XÉT LẠI HIỆN TRƯỜNG (3D / 360°)
               </span>
-              {isCalibrateMode && (
-                <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold animate-pulse">
-                  CHẾ ĐỘ HIỆU CHỈNH ADMIN
-                </span>
-              )}
             </div>
             <p className="text-[11px] text-[#9e7a56] hidden sm:block">
-              {isCalibrateMode
-                ? 'Nhấp vào chấm số 1, 2, 3... để chọn ảnh theo ID từ Sheet • Kéo thả để đổi vị trí • Bấm "Lưu" để hoàn tất'
-                : 'Kéo ảnh sang trái/phải để quay 360° nối vòng quanh phòng • Bấm vào các điểm đỏ để soi chi tiết'}
+              Kéo chuột hoặc vuốt để xoay nhìn toàn cảnh 3D hiện trường • Nhấp vào các điểm đỏ để soi chi tiết
             </p>
           </div>
         </div>
 
-        {/* CONTROLS (ADMIN + CLOSE) */}
+        {/* CLOSE BUTTON ONLY - NO CLUTTER ACTION MENU ICONS */}
         <div className="flex items-center gap-2">
-          {/* ADMIN TOGGLE CALIBRATOR BUTTON */}
-          {isAdmin && (
-            <button
-              type="button"
-              onClick={() => {
-                detectiveAudio.playTypewriterClick()
-                setIsCalibrateMode(!isCalibrateMode)
-                if (!isCalibrateMode && !selectedCalibrateSpotId) {
-                  setSelectedCalibrateSpotId(hotspots[0]?.id || null)
-                }
-              }}
-              className={`px-2.5 sm:px-3 py-1.5 text-xs font-mono font-bold tracking-wider rounded border transition-all flex items-center gap-1.5 cursor-pointer ${
-                isCalibrateMode
-                  ? 'bg-amber-500 text-black border-amber-300 ring-2 ring-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.6)]'
-                  : 'bg-[#2b170c] text-amber-400 border-amber-500/40 hover:bg-[#3d2212]'
-              }`}
-              title="Bật/Tắt chế độ kéo thả tọa độ và gán ảnh từ Google Sheets"
-            >
-              <Settings2 className="size-3.5" />
-              <span className="hidden sm:inline">
-                {isCalibrateMode ? 'THOÁT HIỆU CHỈNH' : 'HIỆU CHỈNH HOTSPOT'}
-              </span>
-            </button>
-          )}
-
-          {/* CLOSE BUTTON */}
           <button
             type="button"
             onClick={(e) => {
@@ -609,286 +579,19 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: R
         </div>
       </div>
 
-      {/* ADMIN CALIBRATOR TOOLBAR (ONLY SHOWN IN CALIBRATE MODE) */}
-      {isCalibrateMode && (
-        <div className="relative z-30 bg-[#1e1108]/95 border-b border-amber-600/40 px-3 py-2 flex flex-wrap items-center justify-between gap-2 shadow-2xl backdrop-blur-md">
-          {/* HOTSPOT SELECTOR TABS: JUST 1 2 3 4... */}
-          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 sm:pb-0">
-            <span className="text-xs text-amber-300/80 uppercase font-bold shrink-0 mr-1 flex items-center gap-1">
-              <Move className="size-3.5 text-amber-400" />
-              Điểm:
-            </span>
-            {hotspots.map((spot) => {
-              const isActive = activeCalibrateSpot?.id === spot.id
-              return (
-                <button
-                  key={spot.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedCalibrateSpotId(spot.id)
-                    setIsPhotoPickerOpen(true) // Nhấp vào số là mở luôn danh sách ảnh từ Sheet!
-                  }}
-                  className={`size-7 text-xs rounded-full border transition-all cursor-pointer shrink-0 font-bold flex items-center justify-center font-mono ${
-                    isActive
-                      ? 'bg-amber-400 text-black border-amber-100 ring-2 ring-amber-400/90 shadow-md scale-110'
-                      : 'bg-[#2e180d] text-[#e8d5c4] border-[#59341c] hover:bg-[#422212]'
-                  }`}
-                  title={`Điểm ${spot.num} (Đang gán: ${spot.photoId || 'chưa gán'}) - Bấm để chọn ảnh từ Sheet`}
-                >
-                  {spot.num}
-                </button>
-              )
-            })}
 
-            <button
-              type="button"
-              onClick={handleAddNewHotspot}
-              className="p-1 px-2 text-xs rounded bg-emerald-950/80 text-emerald-300 border border-emerald-600/60 hover:bg-emerald-900 transition-colors flex items-center gap-1 shrink-0 cursor-pointer font-bold ml-1"
-              title="Thêm điểm khám xét mới"
-            >
-              <Plus className="size-3.5" /> Thêm điểm
-            </button>
-          </div>
 
-          {/* ACTIVE HOTSPOT ACTIONS & DEDICATED SAVE BUTTON */}
-          <div className="flex items-center gap-2 shrink-0">
-            {activeCalibrateSpot && (
-              <>
-                {/* SELECT PHOTO FROM GOOGLE SHEETS */}
-                <button
-                  type="button"
-                  onClick={() => setIsPhotoPickerOpen(true)}
-                  className="px-2.5 py-1 text-xs rounded bg-amber-600/30 text-amber-200 border border-amber-500 hover:bg-amber-600/50 transition-colors flex items-center gap-1.5 cursor-pointer font-bold shadow-sm"
-                  title="Mở danh sách ảnh theo ID trong Sheet photos"
-                >
-                  <FileText className="size-3.5 text-amber-400" />
-                  <span className="truncate max-w-[200px]">
-                    {activeCalibrateSpot.photoId
-                      ? `[${activeCalibrateSpot.photoId}] ${activeCalibrateSpot.title || ''}`
-                      : `Gán ảnh cho điểm ${activeCalibrateSpot.num}`}
-                  </span>
-                </button>
-
-                {/* SELECT SFX SOUND (TẠM ẨN THEO YÊU CẦU) */}
-                {/*
-                <select
-                  value={activeCalibrateSpot.soundFile}
-                  onChange={(e) => {
-                    const sfx = SFX_OPTIONS.find((s) => s.file === e.target.value)
-                    if (sfx) {
-                      setHotspots((prev) =>
-                        prev.map((s) =>
-                          s.id === activeCalibrateSpot.id
-                            ? { ...s, soundFile: sfx.file, soundCaption: sfx.caption }
-                            : s
-                        )
-                      )
-                      setHasUnsavedChanges(true)
-                      playCustomSfx(sfx.file)
-                    }
-                  }}
-                  className="bg-[#2a160c] text-amber-200 border border-[#59341c] text-xs px-2 py-1 rounded cursor-pointer font-mono outline-none"
-                  title="Âm thanh SFX kích hoạt"
-                >
-                  {SFX_OPTIONS.map((s) => (
-                    <option key={s.file} value={s.file}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-                */}
-
-                {/* DELETE ACTIVE SPOT */}
-                <button
-                  type="button"
-                  onClick={() => handleDeleteHotspot(activeCalibrateSpot.id)}
-                  className="p-1 text-xs rounded bg-red-950/80 text-red-300 border border-red-700/60 hover:bg-red-900 transition-colors cursor-pointer"
-                  title="Xóa điểm này"
-                >
-                  <Trash2 className="size-3.5" />
-                </button>
-              </>
-            )}
-
-            <div className="h-4 w-px bg-white/20 mx-1" />
-
-            {/* DEDICATED SAVE BUTTON: LƯU TẤT CẢ VỊ TRÍ & ẢNH ĐÃ GÁN */}
-            <button
-              type="button"
-              disabled={isSavingDb}
-              onClick={handleSaveToSystem}
-              className={`px-3 py-1 text-xs rounded font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-md ${
-                hasUnsavedChanges
-                  ? 'bg-amber-400 hover:bg-amber-300 text-black ring-2 ring-amber-300 animate-pulse'
-                  : 'bg-emerald-600 hover:bg-emerald-500 text-black border border-emerald-400'
-              }`}
-              title="Lưu toàn bộ vị trí và ảnh gán vào hệ thống"
-            >
-              <Save className="size-3.5" />
-              <span>{isSavingDb ? 'Đang lưu...' : hasUnsavedChanges ? 'LƯU THAY ĐỔI' : 'ĐÃ LƯU'}</span>
-            </button>
-
-            {/* RESET DEFAULTS */}
-            <button
-              type="button"
-              onClick={handleResetToDefault}
-              className="p-1 text-xs rounded bg-zinc-800 text-zinc-300 border border-zinc-600 hover:bg-zinc-700 transition-colors cursor-pointer"
-              title="Khôi phục mặc định"
-            >
-              <RefreshCw className="size-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* MAIN VIEW AREA: 2D INFINITE SEAMLESS LOOP PANORAMA */}
-      <div
-        ref={containerRef}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerCancel}
-        onWheel={handleWheel}
-        className="relative flex-1 w-full h-full overflow-hidden bg-[#060402] cursor-grab active:cursor-grabbing touch-none select-none"
-      >
-        {/* NUDGE LEFT ARROW */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleNudge('left')
+      {/* MAIN VIEW AREA: TRUE 3D / 360° SPHERICAL WEBGL CANVAS */}
+      <div className="relative flex-1 w-full h-full overflow-hidden bg-[#060402]">
+        <Scene360Viewer
+          imageUrl="/images/cases/case_000/crime_scene_360.jpg"
+          fallbackImageUrl="/images/cases/case_000/PANORAMA.png"
+          hotspots={resolvedHotspots}
+          onSelectSpot={(spot) => {
+            handleSpotClick(spot as any);
           }}
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-40 size-10 rounded-full bg-black/60 hover:bg-black/85 border border-[#59341c] text-[#d9a066] hover:text-white flex items-center justify-center backdrop-blur-sm transition-all active:scale-90 cursor-pointer shadow-lg"
-          title="Lia sang trái"
-        >
-          <ChevronLeft className="size-6 pointer-events-none" />
-        </button>
-
-        {/* NUDGE RIGHT ARROW */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleNudge('right')
-          }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-40 size-10 rounded-full bg-black/60 hover:bg-black/85 border border-[#59341c] text-[#d9a066] hover:text-white flex items-center justify-center backdrop-blur-sm transition-all active:scale-90 cursor-pointer shadow-lg"
-          title="Lia sang phải"
-        >
-          <ChevronRight className="size-6 pointer-events-none" />
-        </button>
-
-        {/* REPEATED PANORAMIC SEGMENTS TO FORM AN INFINITE 360° WRAP */}
-        {[-1, 0, 1, 2].map((copyIndex) => {
-          const leftOffset = normalizedX + copyIndex * renderedWidth
-          return (
-            <div
-              key={copyIndex}
-              data-panorama-segment="true"
-              onClick={(e) => {
-                if (!isCalibrateMode || !activeCalibrateSpot || dragDistanceRef.current > 6) return
-                const rect = e.currentTarget.getBoundingClientRect()
-                const rawX = ((e.clientX - rect.left) / rect.width) * 100
-                const rawY = ((e.clientY - rect.top) / rect.height) * 100
-                const clampedX = Math.max(0.5, Math.min(99.5, Math.round(rawX * 10) / 10))
-                const clampedY = Math.max(0.5, Math.min(99.5, Math.round(rawY * 10) / 10))
-                setHotspots((prev) =>
-                  prev.map((s) => (s.id === activeCalibrateSpot.id ? { ...s, x: clampedX, y: clampedY } : s))
-                )
-                setHasUnsavedChanges(true)
-                toast.info(`Đã cập nhật vị trí cho điểm ${activeCalibrateSpot.num}`)
-              }}
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                width: renderedWidth,
-                height: renderedHeight,
-                transform: `translate3d(${leftOffset}px, 0, 0)`,
-                willChange: 'transform'
-              }}
-              className="shrink-0 select-none touch-none"
-            >
-              {/* CRIME SCENE REALISTIC ROOM 2D IMAGE */}
-              <img
-                src="/images/cases/case_000/PANORAMA.png"
-                alt="Toàn cảnh phòng khách hiện trường"
-                draggable={false}
-                className="w-full h-full object-cover pointer-events-none rounded-none shadow-2xl border-r border-black/40"
-              />
-
-              {/* HOTSPOT PINS OVERLAY */}
-              {resolvedHotspots.map((spot) => {
-                const isSelected = selectedSpot?.id === spot.id
-                const isCalibrateActive = isCalibrateMode && activeCalibrateSpot?.id === spot.id
-
-                return (
-                  <div
-                    key={`${spot.id}-${copyIndex}`}
-                    style={{
-                      left: `${spot.x}%`,
-                      top: `${spot.y}%`
-                    }}
-                    className="absolute -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto"
-                  >
-                    <div
-                      onPointerDown={(e) => {
-                        if (!isCalibrateMode) return
-                        e.stopPropagation()
-                        setSelectedCalibrateSpotId(spot.id)
-
-                        const segmentEl = (e.currentTarget as HTMLElement).closest(
-                          '[data-panorama-segment="true"]'
-                        ) as HTMLElement
-                        if (!segmentEl) return
-
-                        const handlePinMove = (moveEv: PointerEvent) => {
-                          const rect = segmentEl.getBoundingClientRect()
-                          const rawX = ((moveEv.clientX - rect.left) / rect.width) * 100
-                          const rawY = ((moveEv.clientY - rect.top) / rect.height) * 100
-                          const clampedX = Math.max(0.5, Math.min(99.5, Math.round(rawX * 10) / 10))
-                          const clampedY = Math.max(0.5, Math.min(99.5, Math.round(rawY * 10) / 10))
-
-                          setHotspots((prev) =>
-                            prev.map((s) => (s.id === spot.id ? { ...s, x: clampedX, y: clampedY } : s))
-                          )
-                          setHasUnsavedChanges(true)
-                        }
-
-                        const handlePinUp = () => {
-                          window.removeEventListener('pointermove', handlePinMove)
-                          window.removeEventListener('pointerup', handlePinUp)
-                        }
-
-                        window.addEventListener('pointermove', handlePinMove)
-                        window.addEventListener('pointerup', handlePinUp)
-                      }}
-                      className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2"
-                    >
-                      {/* Numbered Solid Red Pin: 1, 2, 3... */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleSpotClick(spot)
-                        }}
-                        className={`size-6 sm:size-7 rounded-full text-white font-bold text-xs sm:text-[13px] font-mono flex items-center justify-center shadow-lg transition-transform duration-150 group-hover:scale-125 border ${
-                          isCalibrateActive
-                            ? 'bg-amber-400 border-white text-neutral-950 ring-4 ring-amber-400/90 scale-125 animate-pulse'
-                            : isSelected
-                            ? 'bg-amber-500 border-amber-200 text-neutral-950 ring-2 ring-amber-400/80 scale-125'
-                            : 'bg-[#cc1818] group-hover:bg-[#ee2222] border-[#ffe4e4]/80'
-                        }`}
-                        aria-label={`Điểm khám xét #${spot.num}`}
-                      >
-                        {spot.num}
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )
-        })}
+          selectedSpotId={selectedSpot?.id}
+        />
       </div>
 
       {/* LIGHTBOX PHOTO ZOOM MODAL (REGULAR PLAYER VIEW) */}
