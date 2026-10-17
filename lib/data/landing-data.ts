@@ -1,27 +1,3 @@
-export const SHOWCASE_ITEMS = {
-  dossier: {
-    title: 'Tệp Hồ Sơ Vụ Án Giấy',
-    desc: 'Bản in hiện vật chứa biên bản khám nghiệm, sơ đồ hiện trường vụ án và thông tin cá nhân nạn nhân.',
-    digitalTitle: 'Hồ Sơ Vụ Án Trực Tuyến',
-    digitalDesc: 'Dữ liệu được số hóa tự động khi bạn nhập mã kích hoạt, giúp bạn đối chiếu dòng thời gian thám tử.',
-    badgeText: 'HỒ SƠ GỐC CẢNG BẮC'
-  },
-  phone: {
-    title: 'Điện Thoại Phụ (Burner Phone)',
-    desc: 'Một mẫu điện thoại phím bấm thực tế đi kèm hộp game chứa mã vạch mở khóa đính sau pin.',
-    digitalTitle: 'Trích Xuất Điện Thoại Trực Tuyến',
-    digitalDesc: 'Giao diện trích xuất chip-off, giải mã tin nhắn đã xóa, xem email nội bộ cảng và định vị GPS di chuyển.',
-    badgeText: 'THIẾT BỊ TANG VẬT'
-  },
-  key: {
-    title: 'Chìa Khóa Đồng Đúc',
-    desc: 'Mẫu chìa khóa đồng nặng trĩu của cảnh sát chứa mã số chìm khắc trên bề mặt.',
-    digitalTitle: 'Hệ Thống Bẻ Khóa Két Sắt',
-    digitalDesc: 'Nhập mã số chìa khóa để mở phân vùng bảo mật của máy chủ cảng biển, tìm tệp tin ghi âm lầm bầm của Marsh.',
-    badgeText: 'VẬT THỂ LIÊN KẾT'
-  }
-}
-
 export const FAQ_DATA = [
   {
     q: 'Trò chơi dành cho mấy người chơi?',
@@ -33,7 +9,7 @@ export const FAQ_DATA = [
   },
   {
     q: 'Thời gian chơi game trung bình là bao lâu?',
-    a: 'Vụ án đầu tiên "Ánh Sáng Cảng Biển" có thời gian phá án trung bình từ 60 - 90 phút tùy thuộc vào khả năng lập luận logic và xâu chuỗi manh mối của bạn.'
+    a: 'Vụ án "Trốn Tìm" có thời gian phá án trung bình từ 60 - 90 phút tùy thuộc vào khả năng lập luận logic và xâu chuỗi manh mối của bạn.'
   },
   {
     q: 'Mạng internet có bắt buộc để chơi game không?',
@@ -58,27 +34,27 @@ export const POSTER_ITEMS = [
 ]
 
 export const CASE_FOLDERS = [
-  { label: 'NX-4471', title: 'BÓNG MA CẦU CẢNG SỐ 9', status: 'TẠM ĐÌNH CHỈ', idx: 0, defaultR: '16deg', right: '10px' },
-  { label: 'NX-4472', title: 'MẬT MÃ CẢNG BẮC', status: 'ĐANG MỞ ĐT', idx: 1, defaultR: '4deg', right: '44px' },
-  { label: 'NX-4473', title: 'BÍ MẬT XÍ NGHIỆP ĐS', status: 'PHONG TỎA', idx: 2, defaultR: '-8deg', right: '78px' },
+  { label: 'C-000', title: 'VỤ ÁN TRỐN TÌM', status: 'ĐANG MỞ ĐT', idx: 0, defaultR: '16deg', right: '10px' },
+  { label: 'C-001', title: 'HỒ SƠ MẬT PHÂN KHU 2', status: 'SẮP RA MẮT', idx: 1, defaultR: '4deg', right: '44px' },
+  { label: 'C-002', title: 'HỒ SƠ MẬT PHÂN KHU 3', status: 'PHONG TỎA', idx: 2, defaultR: '-8deg', right: '78px' },
 ]
 
 export const TESTIMONIALS_DATA = [
   {
     author: 'Thám tử Blackwood',
-    div: 'Phân khu 9 // Tỉnh Cảng Bắc',
+    div: 'Tổ Trọng Án // Ban Chuyên Án Độc Lập',
     stars: 5,
     quote: 'Cầm hồ sơ giấy đối chiếu hiện trường rồi giải mã trên web cực kỳ bánh cuốn. Cảm giác nhập vai chân thực vượt mong đợi.'
   },
   {
     author: 'Thám tử V. Dung',
-    div: 'Phân khu 4 // Tỉnh Cảng Bắc',
+    div: 'Phòng Kỹ Thuật Hình Sự',
     stars: 5,
     quote: 'Logic án gài cắm rất chặt chẽ. Cảm giác bóc tách mâu thuẫn trong lời khai nghi phạm cực kỳ thỏa mãn.'
   },
   {
     author: 'Thám tử L. Quốc',
-    div: 'Tổ Đặc Nhiệm // Tỉnh Cảng Bắc',
+    div: 'Tổ Đặc Nhiệm Hình Sự',
     stars: 4,
     quote: 'Cả nhóm ngồi tranh luận suốt 2 tiếng không dứt. Rất lâu rồi mới có một tựa game trinh thám xuất sắc thế này.'
   }
