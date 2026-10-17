@@ -735,15 +735,8 @@ export function HeroInteractive({
           hasDraggedRef.current = true;
         }
 
-        const { width, height } = containerSizeRef.current;
-
-        const maxPanX = width * 1.5;
-        const maxPanY = height * 1.5;
-
-        panRef.current = {
-          x: clamp(panAtPointerDownRef.current.x + deltaX, -maxPanX, maxPanX),
-          y: clamp(panAtPointerDownRef.current.y + deltaY, -maxPanY, maxPanY),
-        };
+        // Option 2: Khóa cố định bảng 100% (Full Fixed Board) - Không cho phép pan nền
+        panRef.current = { x: 0, y: 0 };
       }
 
       updateHoveredPin(x, y);
@@ -907,20 +900,8 @@ export function HeroInteractive({
         } else if (isEditModeRef.current && onSelectPinRef.current) {
           onSelectPinRef.current(null);
         } else if (!isEditModeRef.current) {
-          // Double-tap on empty canvas space toggles zoom at that point
-          const now = Date.now();
-          const timeSinceLast = now - lastTapTimeRef.current;
-          const distFromLast = Math.hypot(
-            x - lastTapPosRef.current.x,
-            y - lastTapPosRef.current.y,
-          );
-          if (timeSinceLast < 350 && distFromLast < 30) {
-            toggleZoomAt(x, y);
-            lastTapTimeRef.current = 0;
-          } else {
-            lastTapTimeRef.current = now;
-            lastTapPosRef.current = { x, y };
-          }
+          // Option 2: Khóa cố định bảng 100% - Vô hiệu hóa double-tap zoom trên nền trống
+          // Người chơi tương tác bằng cách click trực tiếp vào từng ghim/ảnh
         }
       } else {
         updateHoveredPin(x, y);
@@ -2496,13 +2477,7 @@ export function HeroInteractive({
         ref={containerRef}
         tabIndex={0}
         role="application"
-        aria-label={
-          boardMode === "zoom"
-            ? zoomActive
-              ? "Bảng bằng chứng đang phóng to. Kéo để di chuyển."
-              : "Bảng bằng chứng ở chế độ zoom."
-            : "Bảng bằng chứng ở chế độ ghim và nối dây. Click vùng trống để thêm ghim, click ghim để nối hoặc tháo dây."
-        }
+        aria-label="Bảng bằng chứng vụ án. Chọn các ghim để kiểm tra manh mối và lời khai."
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -2515,7 +2490,6 @@ export function HeroInteractive({
           "focus-visible:outline-none",
           "focus-visible:ring-2 focus-visible:ring-primary/70",
           "focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-          zoomActive && "cursor-grab active:cursor-grabbing",
         )}
       >
         <canvas

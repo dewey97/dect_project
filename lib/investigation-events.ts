@@ -9,6 +9,7 @@ export const INVESTIGATION_EVENTS = {
   OPEN_WALKTHROUGH: "open-interactive-walkthrough",
   RESET_BOARD_VIEW: "reset-board-view",
   BOARD_ZOOM_IN: "board-zoom-in",
+  OPEN_FEEDBACK: "open-feedback-modal",
 } as const;
 
 export type InvestigationEventName =

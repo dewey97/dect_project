@@ -263,26 +263,13 @@ export function getInnerBoardBounds(
   };
 }
 
-export function getViewTransform(zoom: ZoomState, pan: Point): ViewTransform {
-  if (!zoom.active) {
-    return {
-      scale: 1,
-      translateX: pan.x,
-      translateY: pan.y,
-    };
-  }
-
-  /*
-   * Công thức này giữ vị trí người dùng nhấp tại cùng một điểm
-   * trên màn hình sau khi phóng to:
-   *
-   * screenX = worldX * scale + translateX
-   * translateX = originX * (1 - scale)
-   */
+export function getViewTransform(_zoom: ZoomState, _pan: Point): ViewTransform {
+  // Option 2: Khóa cố định 100% bảng điều tra (Full Fixed Board)
+  // Bảng luôn fit chính giữa màn hình với scale = 1, translateX = 0, translateY = 0
   return {
-    scale: ZOOM_SCALE,
-    translateX: zoom.originX * (1 - ZOOM_SCALE) + pan.x,
-    translateY: zoom.originY * (1 - ZOOM_SCALE) + pan.y,
+    scale: 1,
+    translateX: 0,
+    translateY: 0,
   };
 }
 

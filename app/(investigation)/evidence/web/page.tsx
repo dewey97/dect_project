@@ -430,10 +430,10 @@ function WebEvidencePageContent() {
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start p-1.5 sm:p-2 lg:p-3 box-border min-h-0 min-w-0 select-none"
+      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start p-0 lg:p-3 box-border min-h-0 min-w-0 select-none"
     >
-      {/* MOBILE VIEW SWITCHER (CHỈ HIỂN THỊ TRÊN MÀN HÌNH DI ĐỘNG < LG) */}
-      <div className="flex lg:hidden shrink-0 items-center justify-between p-1 bg-[#16120e] border border-[#3d2c1e] rounded-xl shadow-md w-full mb-1 z-30">
+      {/* MOBILE VIEW SWITCHER (CHỈ HIỂN THỊ TRÊN MÀN HÌNH DI ĐỘNG < LG) - 3 TABS: BẢNG ĐIỀU TRA | TÀI LIỆU | ẢNH */}
+      <div className="flex lg:hidden shrink-0 items-center justify-between p-1 bg-[#16120e] border-b border-[#3d2c1e] shadow-md w-full z-30 gap-1">
         <button
           type="button"
           onClick={() => {
@@ -441,10 +441,10 @@ function WebEvidencePageContent() {
             setMobileTab("board");
           }}
           className={cn(
-            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg font-mono text-[0.72rem] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
+            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1.5 sm:px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap",
             mobileTab === "board"
               ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
-              : "text-[#ad9885] hover:text-[#e5d8cb]"
+              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710]"
           )}
         >
           <Layers className="size-3.5 shrink-0" />
@@ -455,20 +455,38 @@ function WebEvidencePageContent() {
           onClick={() => {
             detectiveAudio.playPaperRustle();
             setMobileTab("dossier");
+            setFilterTab("pdf");
           }}
           className={cn(
-            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg font-mono text-[0.72rem] sm:text-xs font-bold transition-all cursor-pointer relative whitespace-nowrap",
-            mobileTab === "dossier"
+            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1.5 sm:px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer relative whitespace-nowrap",
+            mobileTab === "dossier" && filterTab === "pdf"
               ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
-              : "text-[#ad9885] hover:text-[#e5d8cb]"
+              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710]"
           )}
         >
-          <FolderOpen className="size-3.5 shrink-0" />
-          <span className="truncate">KHAY TÀI LIỆU</span>
+          <FileText className="size-3.5 shrink-0" />
+          <span className="truncate">TÀI LIỆU</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            detectiveAudio.playGlassSound();
+            setMobileTab("dossier");
+            setFilterTab("evidence");
+          }}
+          className={cn(
+            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1.5 sm:px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer relative whitespace-nowrap",
+            mobileTab === "dossier" && filterTab === "evidence"
+              ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
+              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710]"
+          )}
+        >
+          <ImageIcon className="size-3.5 shrink-0" />
+          <span className="truncate">ẢNH</span>
         </button>
       </div>
 
-      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-center overflow-hidden min-w-0 relative gap-2 sm:gap-2.5">
+      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-center overflow-hidden min-w-0 relative gap-0 lg:gap-2.5">
         {/* VÙNG 1: BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
         <div
           style={{
@@ -477,7 +495,7 @@ function WebEvidencePageContent() {
               : `${boardWidthPercent}%`,
           }}
           className={cn(
-            "w-full lg:w-[var(--board-split-width)] h-full shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col min-h-0 relative transition-[width] duration-150 ease-out",
+            "w-full lg:w-[var(--board-split-width)] h-full shrink-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex flex-col min-h-0 relative transition-[width] duration-150 ease-out",
             isDraggingSplit && "transition-none",
             mobileTab === "board" ? "flex" : "hidden lg:flex"
           )}
@@ -550,14 +568,14 @@ function WebEvidencePageContent() {
                 : undefined,
           }}
           className={cn(
-            "w-full lg:w-[210px] xl:w-[230px] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-0",
+            "w-full lg:w-[210px] xl:w-[230px] shrink-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex flex-col h-full min-h-0",
             isDossierCollapsed && "lg:hidden",
             isViewerExpanded && "hidden xl:flex",
             mobileTab === "dossier" ? "flex" : "hidden lg:flex"
           )}
         >
-          {/* HEADER VÙNG 2: 2 OPTION TÀI LIỆU VÀ ẢNH */}
-          <div className="shrink-0 p-1.5 bg-[#241a12] border-b border-[#3d2c1e] flex items-center gap-1.5">
+          {/* HEADER VÙNG 2: 2 OPTION TÀI LIỆU VÀ ẢNH (CHỈ HIỂN THỊ TRÊN DESKTOP, MOBILE ĐÃ CÓ 3 TABS Ở HEADER TRÊN) */}
+          <div className="hidden lg:flex shrink-0 p-1.5 bg-[#241a12] border-b border-[#3d2c1e] items-center gap-1.5">
             <button
               type="button"
               onClick={() => {
@@ -565,7 +583,7 @@ function WebEvidencePageContent() {
                 setFilterTab("pdf");
               }}
               className={cn(
-                "flex-1 py-1.5 px-2 font-mono text-[0.72rem] sm:text-xs font-bold transition-all cursor-pointer rounded flex items-center justify-center gap-1.5",
+                "flex-1 py-1.5 px-2 font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer rounded flex items-center justify-center gap-1.5",
                 filterTab === "pdf"
                   ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
                   : "bg-[#18110b] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#2d2015] border border-[#3d2c1e]"
@@ -581,7 +599,7 @@ function WebEvidencePageContent() {
                 setFilterTab("evidence");
               }}
               className={cn(
-                "flex-1 py-1.5 px-2 font-mono text-[0.72rem] sm:text-xs font-bold transition-all cursor-pointer rounded flex items-center justify-center gap-1.5",
+                "flex-1 py-1.5 px-2 font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer rounded flex items-center justify-center gap-1.5",
                 filterTab === "evidence"
                   ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
                   : "bg-[#18110b] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#2d2015] border border-[#3d2c1e]"
@@ -610,7 +628,7 @@ function WebEvidencePageContent() {
                   disabled={isLocked}
                   onClick={() => setSelectedPhaseFilter(p.val)}
                   className={cn(
-                    "px-2.5 py-1 sm:px-3 sm:py-1 rounded-sm transition-all whitespace-nowrap text-[0.68rem] sm:text-xs font-bold min-h-[26px] flex items-center justify-center",
+                    "px-2.5 py-1 sm:px-3 sm:py-1 rounded-sm transition-all whitespace-nowrap text-xs sm:text-[0.82rem] font-bold min-h-[28px] flex items-center justify-center",
                     isLocked
                       ? "opacity-35 cursor-not-allowed text-[#6b5847] border border-[#2d2015]"
                       : isSelected
@@ -657,7 +675,7 @@ function WebEvidencePageContent() {
                           className="w-full h-full object-cover select-none transition-transform duration-200 group-hover:scale-105 rounded-none"
                         />
                         {evItem?.evidenceId && (
-                          <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded-none bg-black/75 text-[0.55rem] font-mono font-bold text-[#e5d8cb]">
+                          <div className="absolute bottom-1 left-1 px-2 py-0.5 rounded-none bg-black/80 text-[0.68rem] sm:text-xs font-mono font-bold tracking-wider text-[#e5d8cb]">
                             {evItem.evidenceId}
                           </div>
                         )}
@@ -696,7 +714,7 @@ function WebEvidencePageContent() {
                       >
                         <span
                           className={cn(
-                            "shrink-0 font-mono text-[0.65rem] font-bold tracking-wider transition-colors",
+                            "shrink-0 font-mono text-xs sm:text-sm font-bold tracking-wider transition-colors",
                             isSelected
                               ? "lg:text-[#d9a066] text-[#d9a066]/80"
                               : "text-[#d9a066]/80 group-hover:text-[#d9a066]"
@@ -708,7 +726,7 @@ function WebEvidencePageContent() {
                         <div className="min-w-0 flex-1">
                           <p
                             className={cn(
-                              "font-bold text-[0.68rem] leading-snug line-clamp-2 transition-colors",
+                              "font-bold text-[0.82rem] sm:text-sm leading-snug line-clamp-2 transition-colors",
                               isSelected
                                 ? "lg:text-[#fef5ec] text-[#ad9885] group-hover:text-[#e6d3c1]"
                                 : "text-[#ad9885] group-hover:text-[#e6d3c1]",

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { PhoneSimulator } from '../phone-simulator'
@@ -10,11 +10,29 @@ interface PhoneModalProps {
 }
 
 export function PhoneModal({ isOpen, onClose, caseId }: PhoneModalProps) {
+  // Lock body scroll and rubber-banding on mobile while phone simulator is open
+  useEffect(() => {
+    if (!isOpen) return
+    const prevOverflow = document.body.style.overflow
+    const prevTouchAction = document.body.style.touchAction
+    document.body.style.overflow = 'hidden'
+    document.body.style.touchAction = 'none'
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.body.style.touchAction = prevTouchAction
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[60] bg-black flex flex-col items-stretch justify-start select-none overflow-hidden touch-none h-[100dvh] w-full">
+      <div
+        className="fixed inset-0 z-[60] bg-black flex flex-col items-stretch justify-start select-none overflow-hidden touch-none w-full h-[100dvh]"
+        style={{
+          overscrollBehavior: 'none',
+        }}
+      >
         {/* TOP FIXED CONTROLS BAR: Always sticks to top, with padding-top: env(safe-area-inset-top) */}
         <div className="w-full shrink-0 z-50 bg-[#0A0A0C] border-b border-white/10 shadow-lg pt-safe">
           <div className="h-[46px] px-3 sm:px-4 flex items-center justify-between">

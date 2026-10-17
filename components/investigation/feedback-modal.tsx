@@ -4,14 +4,18 @@ import React, { useState } from 'react'
 import { MessageSquare, X, Send, Star, AlertCircle } from 'lucide-react'
 import { submitFeedback } from '@/lib/actions/feedback-actions'
 import { DbFeedback } from '@/lib/types/database'
-import { usePathname } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
+import { useInvestigationEvent } from '@/lib/investigation-events'
 
 export function FeedbackModal() {
-  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+
+  // Listen to open event from QuickActionFab action menu
+  useInvestigationEvent('OPEN_FEEDBACK', () => {
+    setIsOpen(true)
+  })
 
   const [type, setType] = useState<DbFeedback['type']>('FEEDBACK')
   const [rating, setRating] = useState<number>(0)
@@ -48,19 +52,9 @@ export function FeedbackModal() {
     }
   }
 
-  if (!pathname || pathname === '/' || pathname.startsWith('/studio') || pathname.startsWith('/evidence')) return null
+  if (!isOpen) return null
 
   return (
-    <>
-      <button 
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-zinc-900 border border-white/10 hover:border-primary text-zinc-400 hover:text-zinc-100 rounded-full shadow-2xl transition-all hover:scale-105 hover:bg-zinc-800"
-        title="Góp ý / Báo lỗi"
-      >
-        <MessageSquare className="size-5" />
-      </button>
-
-      {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-zinc-950 border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             
@@ -166,7 +160,5 @@ export function FeedbackModal() {
             )}
           </div>
         </div>
-      )}
-    </>
   )
 }

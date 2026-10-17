@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lightbulb, RefreshCw, X, Box, BookOpen, Home } from "lucide-react";
+import { Lightbulb, RefreshCw, X, Box, BookOpen, Home, MessageSquare } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 
@@ -112,7 +112,7 @@ export function QuickActionFab({
               onClick={() =>
                 handleAction(() => {
                   if (onGoHome) {
-                    onGoHome();
+                     onGoHome();
                   } else {
                     router.push("/");
                   }
@@ -122,6 +122,20 @@ export function QuickActionFab({
             >
               <Home className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Về màn hình chính</span>
+            </button>
+
+            {/* OPTION: FEEDBACK & REPORT */}
+            <button
+              type="button"
+              onClick={() =>
+                handleAction(() => {
+                  emitInvestigationEvent("OPEN_FEEDBACK");
+                })
+              }
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#f3e8dc] hover:text-amber-300 group"
+            >
+              <MessageSquare className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Góp ý & Báo lỗi</span>
             </button>
 
             {/* DIVIDER */}

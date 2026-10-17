@@ -98,37 +98,40 @@ export function IPhoneFrame({
   const [scale, setScale] = useState<number>(1);
 
   useEffect(() => {
-    const updateScale = () => {
-      // Đo kích thước thực tế khả dụng bên trong container
-      const container = containerRef.current;
-      let availW = container ? container.clientWidth : 0;
-      let availH = container ? container.clientHeight : 0;
+    let t1: NodeJS.Timeout | undefined;
+    let t2: NodeJS.Timeout | undefined;
 
-      // Fallback nếu chưa mount
-      if (!availW || !availH) {
-        const vpW = window.visualViewport?.width || window.innerWidth;
-        const vpH = window.visualViewport?.height || window.innerHeight;
-        availW = vpW;
-        availH = vpH - 110;
-      }
+    const updateScale = () => {
+      const container = containerRef.current;
+      const rect = container?.getBoundingClientRect();
+
+      const vpW = window.visualViewport?.width || window.innerWidth;
+      const vpH = window.visualViewport?.height || window.innerHeight;
+
+      // Ưu tiên đo kích thước thực tế của container, fallback theo viewport trừ header
+      const availW = Math.min(rect?.width && rect.width > 100 ? rect.width : vpW, vpW);
+      const availH = Math.min(rect?.height && rect.height > 200 ? rect.height : vpH - 110, vpH - 100);
 
       // Kích thước thật của chassis iPhone 6s Plus: 415px x 768px
       const baseW = 415;
       const baseH = 768;
 
-      // Trừ lề an toàn tối thiểu (16px ngang, 20px dọc) để viền máy không bao giờ chạm sát mép
-      const usableW = Math.max(200, availW - 16);
-      const usableH = Math.max(260, availH - 20);
+      // Trừ lề an toàn nhẹ (16px ngang, 20px dọc) để máy vừa khít tối đa
+      const usableW = Math.max(260, availW - 16);
+      const usableH = Math.max(380, availH - 20);
 
       const scaleX = usableW / baseW;
       const scaleH = usableH / baseH;
 
-      // Luôn lấy scale nhỏ nhất để đảm bảo chiều nào hẹp hơn thì toàn bộ máy phải thu nhỏ vừa khít chiều đó
+      // Lấy tỉ lệ tối ưu và giới hạn tối thiểu 0.58 để trên mobile máy luôn to rõ, không bao giờ bị biến thành tí hon
       const optimalScale = Math.min(1, Math.min(scaleX, scaleH));
-      setScale(Math.max(0.3, Number(optimalScale.toFixed(3))));
+      setScale(Math.max(0.58, Number(optimalScale.toFixed(3))));
     };
 
     updateScale();
+    t1 = setTimeout(updateScale, 80);
+    t2 = setTimeout(updateScale, 280);
+
     const ro = new ResizeObserver(() => {
       updateScale();
     });
@@ -141,6 +144,8 @@ export function IPhoneFrame({
       window.visualViewport.addEventListener("scroll", updateScale);
     }
     return () => {
+      if (t1) clearTimeout(t1);
+      if (t2) clearTimeout(t2);
       ro.disconnect();
       window.removeEventListener("resize", updateScale);
       if (window.visualViewport) {
@@ -159,7 +164,7 @@ export function IPhoneFrame({
       {/* PHONE SCALE WRAPPER: Measures available space and centers phone precisely */}
       <div
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center overflow-hidden relative p-1"
+        className="w-full h-full flex items-center justify-center overflow-hidden relative"
       >
         <div
           data-iphone-frame="true"
