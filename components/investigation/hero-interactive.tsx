@@ -95,6 +95,7 @@ export function HeroInteractive({
   onPinClick,
   isEditMode = false,
   onPinPositionChange,
+  lightConeConfig,
 }: HeroInteractiveProps) {
   const customPinsRef = useRef<PinPoint[] | undefined>(customPins);
   const customConnectionsRef = useRef<CaseConnection[] | undefined>(
@@ -107,6 +108,7 @@ export function HeroInteractive({
   const onPinClickRef = useRef(onPinClick);
   const isEditModeRef = useRef(isEditMode);
   const onPinPositionChangeRef = useRef(onPinPositionChange);
+  const lightConeConfigRef = useRef(lightConeConfig);
 
   const draggingPinIdRef = useRef<string | null>(null);
   const clickedPinIdRef = useRef<string | null>(null);
@@ -122,10 +124,11 @@ export function HeroInteractive({
   onPinClickRef.current = onPinClick;
   isEditModeRef.current = isEditMode;
   onPinPositionChangeRef.current = onPinPositionChange;
+  lightConeConfigRef.current = lightConeConfig;
 
   useEffect(() => {
     if (requestRenderRef.current) requestRenderRef.current();
-  }, [customPins, customConnections, selectedPinId, onPinClick]);
+  }, [customPins, customConnections, selectedPinId, onPinClick, lightConeConfig]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -1285,7 +1288,8 @@ export function HeroInteractive({
           Boolean(rawPin.photoUrl) ||
           pin.id.includes("thi-the") ||
           pin.id.includes("crime-scene") ||
-          pin.id === "c0-pin-victim-phone";
+          pin.id === "c0-pin-victim-phone" ||
+          pin.id === "c0-pin-reinvestigate";
 
         context.save();
         context.translate(pinPosition.x, pinPosition.y);
@@ -1302,7 +1306,9 @@ export function HeroInteractive({
             char?.avatarUrl ||
             (pin.id.includes("phone")
               ? "/phone.png"
-              : "/images/avatar_placeholder.svg");
+              : pin.id === "c0-pin-reinvestigate"
+                ? "/images/cases/case_000/crime_scene.png"
+                : "/images/avatar_placeholder.svg");
           const photoUrl =
             rawPin.photoUrl || resolveSuspectPhotoUrl(pin) || fallbackUrl;
 
@@ -1328,8 +1334,16 @@ export function HeroInteractive({
               (pin.id.includes("phone") &&
                 pin.id !== "c0-pin-phone" &&
                 Boolean((pin as any).photoUrl));
+            const isReinvestigateProp =
+              pin.id === "c0-pin-reinvestigate" ||
+              Boolean(
+                rawPin.photoUrl &&
+                  (rawPin.photoUrl.includes("crime_scene") ||
+                    rawPin.photoUrl.includes("reinvestigation")),
+              );
             const isKhang =
               !isVictimPhone &&
+              !isReinvestigateProp &&
               (pin.id.includes("khang") ||
                 (pin.label && pin.label.toLowerCase().includes("khang")));
             const isCrimeScene =
@@ -1342,7 +1356,9 @@ export function HeroInteractive({
                 ? 186
                 : isVictimPhone
                   ? 135
-                  : 158;
+                  : isReinvestigateProp
+                    ? 195
+                    : 158;
             const cardWidth =
               (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = (cardWidth * imgH) / imgW;
@@ -1352,7 +1368,9 @@ export function HeroInteractive({
               ? -cardHeight * 0.05
               : isVictimPhone
                 ? -cardHeight * 0.04
-                : -cardHeight * 0.1;
+                : isReinvestigateProp
+                  ? -cardHeight * 0.05
+                  : -cardHeight * 0.1;
 
             // Pass 1 — wide ambient occlusion: soft halo lifting the card off the corkboard
             context.save();
@@ -1415,8 +1433,16 @@ export function HeroInteractive({
               (pin.id.includes("phone") &&
                 pin.id !== "c0-pin-phone" &&
                 Boolean((pin as any).photoUrl));
+            const isReinvestigateProp =
+              pin.id === "c0-pin-reinvestigate" ||
+              Boolean(
+                rawPin.photoUrl &&
+                  (rawPin.photoUrl.includes("crime_scene") ||
+                    rawPin.photoUrl.includes("reinvestigation")),
+              );
             const isKhang =
               !isVictimPhone &&
+              !isReinvestigateProp &&
               (pin.id.includes("khang") ||
                 (pin.label && pin.label.toLowerCase().includes("khang")));
             const isCrimeScene =
@@ -1429,7 +1455,9 @@ export function HeroInteractive({
                 ? 186
                 : isVictimPhone
                   ? 135
-                  : 158;
+                  : isReinvestigateProp
+                    ? 195
+                    : 158;
             const cardWidth =
               (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
             const cardHeight = loadedSuspectImg
@@ -1446,7 +1474,9 @@ export function HeroInteractive({
               ? -cardHeight * 0.05
               : isVictimPhone
                 ? -cardHeight * 0.04
-                : -cardHeight * 0.1;
+                : isReinvestigateProp
+                  ? -cardHeight * 0.05
+                  : -cardHeight * 0.1;
 
             context.save();
             if (isPhotoSelected) {
@@ -1914,9 +1944,16 @@ export function HeroInteractive({
 
         context.restore(); // restore paper / polaroid transform
 
-        // Pinhole puncture (Skip for victim phone evidence item which already has physical evidence bag pins)
-        const isVictimPhone = pin.id === "c0-pin-victim-phone";
-        if (!isVictimPhone) {
+        // Pinhole puncture (Skip for physical evidence props which already have realistic self-contained shadows & pins)
+        const isSelfContainedProp =
+          pin.id === "c0-pin-victim-phone" ||
+          pin.id === "c0-pin-reinvestigate" ||
+          Boolean(
+            (pin as any).photoUrl &&
+              ((pin as any).photoUrl.includes("crime_scene") ||
+                (pin as any).photoUrl.includes("reinvestigation")),
+          );
+        if (!isSelfContainedProp) {
           context.save();
           context.fillStyle = "rgba(35, 20, 10, 0.85)";
           context.beginPath();
@@ -2073,7 +2110,17 @@ export function HeroInteractive({
       allPinsUnified.forEach((pin) => {
         const pinPosition = pinPositionsMap.get(pin.id);
         if (!pinPosition) return;
-        if (pin.id === "c0-pin-victim-phone") return; // Evidence bag item already has self-contained pins, no overlay pushpin
+        if (
+          pin.id === "c0-pin-victim-phone" ||
+          pin.id === "c0-pin-reinvestigate" ||
+          Boolean(
+            (pin as any).photoUrl &&
+              ((pin as any).photoUrl.includes("crime_scene") ||
+                (pin as any).photoUrl.includes("reinvestigation")),
+          )
+        ) {
+          return; // Self-contained physical evidence items, no overlay pushpin
+        }
 
         const isEvidencePin =
           pin.id === "c0-pin-evidence" ||
@@ -2212,8 +2259,82 @@ export function HeroInteractive({
       context.restore();
 
       // ──────────────────────────────────
-      // 4. Dark mask & vignette removed for full natural clarity
+      // 4. Draw Atmospheric Spotlight Cone DIRECTLY on Corkboard Surface
+      // (Constrained to board bounds - ZERO light spill outside)
       // ──────────────────────────────────
+      const lightConfig = lightConeConfigRef.current;
+      if (lightConfig?.enabled) {
+        context.save();
+        // Clip exact inner board rectangle so light never spills onto the surrounding desk
+        context.beginPath();
+        context.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        context.clip();
+
+        const intensity = (lightConfig.intensity ?? 85) / 100;
+        const spreadRatio = (lightConfig.coneSpread ?? 65) / 100;
+        const centerX = bounds.x + bounds.width * 0.5;
+        const topY = bounds.y;
+
+        // Conic-like triangular spotlight beam from top center
+        const beamHalfWidth = (bounds.width * 0.5) * spreadRatio + (bounds.width * 0.15);
+        const beamGrad = context.createLinearGradient(centerX, topY, centerX, bounds.y + bounds.height);
+        beamGrad.addColorStop(0, `rgba(255, 245, 210, ${0.40 * intensity})`);
+        beamGrad.addColorStop(0.35, `rgba(255, 230, 160, ${0.20 * intensity})`);
+        beamGrad.addColorStop(0.75, `rgba(180, 120, 60, ${0.08 * intensity})`);
+        beamGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+        context.save();
+        context.globalCompositeOperation = "screen";
+        context.fillStyle = beamGrad;
+        context.beginPath();
+        context.moveTo(centerX, topY);
+        context.lineTo(centerX + beamHalfWidth, bounds.y + bounds.height);
+        context.lineTo(centerX - beamHalfWidth, bounds.y + bounds.height);
+        context.closePath();
+        context.fill();
+        context.restore();
+
+        // Soft radial ambient glow right at the lamp fixture
+        const lampGlow = context.createRadialGradient(
+          centerX,
+          topY,
+          bounds.width * 0.02,
+          centerX,
+          topY + bounds.height * 0.25,
+          bounds.width * 0.55 * spreadRatio
+        );
+        lampGlow.addColorStop(0, `rgba(255, 255, 235, ${0.45 * intensity})`);
+        lampGlow.addColorStop(0.3, `rgba(255, 225, 150, ${0.22 * intensity})`);
+        lampGlow.addColorStop(0.7, `rgba(140, 70, 20, ${0.06 * intensity})`);
+        lampGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+        context.save();
+        context.globalCompositeOperation = "screen";
+        context.fillStyle = lampGlow;
+        context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        context.restore();
+
+        // Edge vignette: darken bottom and corners of the corkboard naturally
+        const edgeVignette = context.createRadialGradient(
+          centerX,
+          bounds.y + bounds.height * 0.35,
+          bounds.width * 0.25,
+          centerX,
+          bounds.y + bounds.height * 0.5,
+          bounds.width * 0.72
+        );
+        edgeVignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+        edgeVignette.addColorStop(0.65, "rgba(10, 5, 2, 0.25)");
+        edgeVignette.addColorStop(1, `rgba(5, 2, 1, ${0.60 * intensity})`);
+
+        context.save();
+        context.globalCompositeOperation = "multiply";
+        context.fillStyle = edgeVignette;
+        context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        context.restore();
+
+        context.restore();
+      }
     };
 
     renderSceneRef.current = renderScene;

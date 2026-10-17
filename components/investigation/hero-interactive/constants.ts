@@ -12,14 +12,6 @@ export const CASES_LIST: CaseData[] = [
     bgImage: "/images/backgrounds/corkboard_vertical_empty.jpg",
     pins: [
       {
-        id: "c0-pin-evidence",
-        x: 0.22,
-        y: 0.18,
-        label: "BỔ SUNG CHỨNG CỨ",
-        detail: "Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra",
-        noteColor: "yellow",
-      },
-      {
         id: "c0-pin-question",
         x: 0.42,
         y: 0.18,
@@ -61,18 +53,7 @@ export const CASES_LIST: CaseData[] = [
         pinColor: "red",
       },
     ],
-    connections: [
-      {
-        id: "c0-conn-1",
-        fromPinId: "c0-pin-evidence",
-        toPinId: "c0-pin-phone",
-      },
-      {
-        id: "c0-conn-2",
-        fromPinId: "c0-pin-evidence",
-        toPinId: "c0-pin-reinvestigate",
-      },
-    ],
+    connections: [],
   },
   {
     id: "case-01",

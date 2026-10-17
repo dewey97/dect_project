@@ -134,9 +134,17 @@ export function isPinHit(
     (pin.id.includes("phone") &&
       pin.id !== "c0-pin-phone" &&
       Boolean((pin as any).photoUrl));
+  const isReinvestigateProp =
+    pin.id === "c0-pin-reinvestigate" ||
+    Boolean(
+      (pin as any).photoUrl &&
+        ((pin as any).photoUrl.includes("crime_scene") ||
+          (pin as any).photoUrl.includes("reinvestigation")),
+    );
   const isKhang =
     !isFollowup &&
     !isVictimPhone &&
+    !isReinvestigateProp &&
     (pin.id.includes("khang") ||
       (pin.label && pin.label.toLowerCase().includes("khang")));
   const isCrimeScene =
@@ -151,7 +159,8 @@ export function isPinHit(
       !!(pin as any).photoUrl ||
       isKhang ||
       isCrimeScene ||
-      isVictimPhone);
+      isVictimPhone ||
+      isReinvestigateProp);
 
   let baseCardWidth = 142;
   let baseCardHeight = 167;
@@ -164,13 +173,23 @@ export function isPinHit(
         ? 186
         : isVictimPhone
           ? 135
-          : 158;
+          : isReinvestigateProp
+            ? 195
+            : 158;
     baseCardHeight = isCrimeScene
       ? (baseCardWidth * 420) / 560
       : isVictimPhone
         ? (baseCardWidth * 997) / 757
-        : (baseCardWidth * 380) / 300;
-    tagYRatio = isCrimeScene ? -0.05 : isVictimPhone ? -0.04 : -0.1;
+        : isReinvestigateProp
+          ? (baseCardWidth * 1080) / 1463
+          : (baseCardWidth * 380) / 300;
+    tagYRatio = isCrimeScene
+      ? -0.05
+      : isVictimPhone
+        ? -0.04
+        : isReinvestigateProp
+          ? -0.05
+          : -0.1;
   } else {
     const upperLabel = (pin.label || "").toUpperCase();
     const isWhiteNote =

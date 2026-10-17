@@ -134,4 +134,9 @@ export interface HeroInteractiveProps {
   ) => void;
   isEditMode?: boolean;
   onPinPositionChange?: (pinId: string, newX: number, newY: number) => void;
+  lightConeConfig?: {
+    enabled: boolean;
+    coneSpread: number;
+    intensity: number;
+  };
 }
