@@ -1,6 +1,7 @@
 'use client'
 
 import { BrandMark } from '@/components/investigation/brand-mark'
+import Link from 'next/link'
 
 export function LandingFooter() {
   return (
@@ -53,6 +54,8 @@ export function LandingFooter() {
           <a href="#" className="hover:text-foreground transition-colors">Điều khoản dịch vụ</a>
           <span>·</span>
           <a href="#" className="hover:text-foreground transition-colors">Chính sách bảo mật</a>
+          <span>·</span>
+          <Link href="/brand" className="hover:text-primary transition-colors text-muted-foreground/80">Bộ nhận diện (Brand)</Link>
         </div>
         <span>© 2026 XPLORE</span>
       </div>

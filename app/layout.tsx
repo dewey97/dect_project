@@ -4,14 +4,38 @@ import { FeedbackModal } from '@/components/investigation/feedback-modal'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'XPLORE',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://xplore.vn'),
+  title: 'XPLORE — Hệ Thống Trinh Thám Tương Tác',
   description:
-    'Hệ thống game trinh thám điều tra tương tác, tài liệu chứng cứ vụ án và hồ sơ Google Docs / Live CMS.',
+    'Game trinh thám điều tra tương tác lai: Đối chiếu hồ sơ hiện vật giấy, khai thác dữ liệu điện thoại và bẻ khóa kỳ án trực tuyến.',
   applicationName: 'XPLORE',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
     title: 'XPLORE',
+  },
+  openGraph: {
+    title: 'XPLORE — Hệ Thống Trinh Thám Tương Tác',
+    description:
+      'Chuyên án #000: Trốn Tìm. Đối chiếu hồ sơ vật chứng, trích xuất dữ liệu điện thoại và vạch trần thủ phạm.',
+    siteName: 'XPLORE',
+    images: [
+      {
+        url: '/brand/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'XPLORE — Chuyên Án #000: Trốn Tìm',
+      },
+    ],
+    locale: 'vi_VN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'XPLORE — Hệ Thống Trinh Thám Tương Tác',
+    description:
+      'Chuyên án #000: Trốn Tìm. Đối chiếu hồ sơ vật chứng, trích xuất dữ liệu điện thoại và vạch trần thủ phạm.',
+    images: ['/brand/og-image.jpg'],
   },
   icons: {
     icon: [
