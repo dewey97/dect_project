@@ -127,7 +127,7 @@ export function EvidenceGuideModal({
                 {isReinvestigateUnlocked ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-800 text-amber-100 font-mono text-[10px] font-bold uppercase tracking-wider">
                     <CheckCircle2 className="size-3 text-amber-300" />
-                    ĐÃ PHÊ DUYỆT
+                    SẴN SÀNG KHÁM XÉT
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#d8c7b0] text-[#4a3520] border border-[#a88c6f] font-mono text-[10px] font-bold uppercase tracking-wider">
@@ -140,16 +140,25 @@ export function EvidenceGuideModal({
                 <p className="text-[#1a120b]">
                   Là thao tác tiến hành xem xét, đo đạc, thu thập lại dấu vết tại nơi xảy ra vụ án khi lần khám nghiệm trước đó có thiếu sót, chưa đầy đủ hoặc phát sinh tình tiết mới cần làm rõ.
                 </p>
-                <div className="pt-1 space-y-1.5">
-                  <p>
-                    <strong className="text-[#8c1d1d] font-mono uppercase text-[11px] block">Điều kiện kích hoạt:</strong>
-                    Hoàn thành toàn bộ câu hỏi suy luận hoặc khai thác hết tài liệu, chứng cứ hiện có nhưng chưa đủ căn cứ xác định thủ phạm.
-                  </p>
-                  <p>
-                    <strong className="text-[#8c1d1d] font-mono uppercase text-[11px] block">Cơ chế:</strong>
-                    Lệnh tự động khả dụng (sáng lên) khi thỏa mãn các điều kiện trên.
-                  </p>
-                </div>
+                {isReinvestigateUnlocked ? (
+                  <div className="pt-1 space-y-1.5">
+                    <p>
+                      <strong className="text-[#8c1d1d] font-mono uppercase text-[11px] block">Trạng thái:</strong>
+                      Hiện trường được mở sẵn ngay từ đầu để điều tra viên chủ động rà soát, thu thập vật chứng và phân tích dấu vết vi mô bất cứ lúc nào.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="pt-1 space-y-1.5">
+                    <p>
+                      <strong className="text-[#8c1d1d] font-mono uppercase text-[11px] block">Điều kiện kích hoạt:</strong>
+                      Hoàn thành toàn bộ câu hỏi suy luận hoặc khai thác hết tài liệu, chứng cứ hiện có nhưng chưa đủ căn cứ xác định thủ phạm.
+                    </p>
+                    <p>
+                      <strong className="text-[#8c1d1d] font-mono uppercase text-[11px] block">Cơ chế:</strong>
+                      Lệnh tự động khả dụng (sáng lên) khi thỏa mãn các điều kiện trên.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

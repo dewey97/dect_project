@@ -88,10 +88,6 @@ export function isEvidenceMatching(clueId: string, targetCodes: string[]): boole
 
     if (clueIsPhone || targetIsPhone || (clueDigits.length >= 3 && targetDigits.length >= 3)) {
       if (clueDigits.length >= 3 && targetDigits.length >= 3) {
-        // Voice vs SMS distinction
-        if (targetIsVoice && !clueIsVoice) return false
-        if (!targetIsVoice && clueIsVoice && /sms|tin\s*nhắn/i.test(target)) return false
-
         // Match on the last 3 digits
         if (clueDigits.slice(-3) === targetDigits.slice(-3)) {
           return true
@@ -188,7 +184,7 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
       : trimmed
     return {
       id: `sms_phone_${digitsOnly}`,
-      label: `Tin nhắn văn bản với SĐT: ${formatted}`,
+      label: `Tin nhắn với SĐT: ${formatted}`,
       code: formatted,
     }
   }
@@ -198,7 +194,7 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
     const known = KNOWN_CASE_PHONES[digitsOnly]
     return {
       id: `sms_phone_${known.full}`,
-      label: `Tin nhắn văn bản với SĐT: ${known.formatted}`,
+      label: `Tin nhắn với SĐT: ${known.formatted}`,
       code: known.formatted,
     }
   }
@@ -273,7 +269,7 @@ export function getClueBadgeInfo(
       : raw.length === 10
       ? `${raw.slice(0, 4)}.${raw.slice(4, 7)}.${raw.slice(7)}`
       : raw
-    const label = `Tin nhắn văn bản với SĐT: ${formatted}`
+    const label = `Tin nhắn với SĐT: ${formatted}`
     return { code: 'SĐT', label, displayCode: label, isPhone: true }
   }
 

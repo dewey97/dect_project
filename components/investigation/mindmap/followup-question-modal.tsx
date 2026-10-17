@@ -14,6 +14,7 @@ import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '
 import { normalizeImageUrl } from '@/lib/utils'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
+import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
 
 interface FollowupQuestionModalProps {
   caseId?: string
@@ -555,27 +556,6 @@ export function FollowupQuestionModal({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
-                  detectiveAudio.playTypewriterClick()
-                  const cpId = isVu
-                    ? 'cp-000-1a-followup'
-                    : isTung
-                      ? 'cp-000-1b'
-                      : isHa
-                        ? 'cp-000-1c-followup'
-                        : (customCheckpoint?.id || `cp-${culprit}-followup`)
-                  emitInvestigationEvent('OPEN_HINT', { checkpointId: cpId })
-                }}
-                className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                title="Xem gợi ý phá án cho câu hỏi này"
-              >
-                <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                <span className="hidden sm:inline">GỢI Ý</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
                   detectiveAudio.playPaperRustle()
                   onClose()
                 }}
@@ -631,6 +611,12 @@ export function FollowupQuestionModal({
                   className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-base font-bold placeholder-[#a88c6f]/60 focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
                 />
               </div>
+
+              {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM NHẬP */}
+              <CheckpointHintSection
+                checkpointId="cp-000-1a-followup"
+                caseId={caseId}
+              />
 
               {/* FOOTER */}
               <div className="pt-2 flex items-center justify-between">
@@ -696,6 +682,12 @@ export function FollowupQuestionModal({
                   className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-base font-bold placeholder-[#a88c6f]/60 tracking-wider focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
                 />
               </div>
+
+              {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM NHẬP */}
+              <CheckpointHintSection
+                checkpointId="cp-000-1c-followup"
+                caseId={caseId}
+              />
 
               {/* FOOTER */}
               <div className="pt-3 flex items-center justify-between border-t border-[#2b1f14]/20">
@@ -783,6 +775,12 @@ export function FollowupQuestionModal({
                   })}
                 </div>
               </div>
+
+              {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM */}
+              <CheckpointHintSection
+                checkpointId="cp-000-1b"
+                caseId={caseId}
+              />
 
               {/* FOOTER */}
               <div className="pt-2 flex items-center justify-between">
@@ -886,6 +884,12 @@ export function FollowupQuestionModal({
                   />
                 </div>
               )}
+
+              {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM */}
+              <CheckpointHintSection
+                checkpointId={customCheckpoint?.id || (culprit ? `cp-${culprit}-followup` : '')}
+                caseId={caseId}
+              />
 
               {/* FOOTER */}
               <div className="pt-2 flex items-center justify-between">

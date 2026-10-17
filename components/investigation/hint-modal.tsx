@@ -1,17 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Lightbulb,
   X,
-  Unlock,
-  Compass,
-  ArrowLeft,
-  ArrowRight,
+  Lock,
   HelpCircle,
-  Target,
-  Clock,
 } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
@@ -125,7 +119,7 @@ export function getLatestActiveCheckpointId(): string {
  * Gom nhóm hints từ tab 'checkpoints' trên Google Sheets theo checkpoint_id,
  * tự động bóc tách 2 nhóm [ĐỘNG CƠ] và [NGOẠI PHẠM].
  */
-function buildGroupedCheckpointsMap(
+export function buildGroupedCheckpointsMap(
   sheetCheckpoints: SheetCheckpointRow[],
 ): Map<string, CheckpointGroupData> {
   const map = new Map<string, CheckpointGroupData>();
@@ -203,7 +197,13 @@ function buildGroupedCheckpointsMap(
   return map;
 }
 
-export function HintModal({
+export function HintModal(_props: HintModalProps) {
+  // Gợi ý đã được tích hợp trực tiếp vào bên dưới màn nhập mã (CheckpointHintSection)
+  // Bỏ hoàn toàn modal nảy riêng theo yêu cầu của người chơi
+  return null;
+}
+
+function _LegacyHintModal({
   isOpen,
   onClose,
   checkpointId,
@@ -260,18 +260,35 @@ export function HintModal({
   }, [category, checkpointId, currentGroup.hasCategories]);
 
   const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
-  const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
+
+  // Cơ chế Giữ 3 giây (Hold-to-Reveal) để phá niêm phong gợi ý
+  const [holdProgress, setHoldProgress] = useState(0);
+  const [isHolding, setIsHolding] = useState(false);
+  const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const holdStartRef = useRef<number>(0);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const HOLD_DURATION_MS = 1200;
+
+  const cancelHold = () => {
+    if (holdTimerRef.current) {
+      clearInterval(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+    setIsHolding(false);
+    setHoldProgress(0);
+  };
 
   useEffect(() => {
     if (isOpen) {
       setUnlockedLevels(
         getStorageJson<Record<string, number>>("hint_unlocked_levels", {}),
       );
-      setActiveHintIdx(0);
     }
+    cancelHold();
+    return () => {
+      if (holdTimerRef.current) clearInterval(holdTimerRef.current);
+    };
   }, [isOpen, activeCategory, effectiveCpId]);
-
-  if (!isOpen) return null;
 
   // Lấy danh sách gợi ý đang hiển thị riêng biệt theo nhóm (Không bao giờ gộp chung)
   const displayHints =
@@ -287,27 +304,65 @@ export function HintModal({
       : effectiveCpId;
 
   const totalHints = displayHints.length;
+  // Mặc định ban đầu chưa mở khóa (0) — người chơi bắt buộc phải bóc niêm phong
   const unlockedCount = Math.min(
-    unlockedLevels[storageKey] || 1,
-    Math.max(totalHints, 1),
+    unlockedLevels[storageKey] || 0,
+    totalHints,
   );
-  const viewIdx = Math.min(activeHintIdx, Math.max(unlockedCount - 1, 0));
 
   const handleUnlockNext = () => {
     if (totalHints === 0) return;
-    detectiveAudio.playTypewriterClick();
-    const nextCount = Math.min(unlockedCount + 1, totalHints);
+    detectiveAudio.playPaperRustle();
+    const currentUnlocked = unlockedLevels[storageKey] || 0;
+    const nextCount = Math.min(currentUnlocked + 1, totalHints);
     const updated = {
       ...unlockedLevels,
       [storageKey]: nextCount,
     };
     setUnlockedLevels(updated);
-    setActiveHintIdx(nextCount - 1);
     setStorageJson("hint_unlocked_levels", updated);
+  };
+
+  useEffect(() => {
+    if (isOpen && unlockedCount > 0 && scrollContainerRef.current) {
+      setTimeout(() => {
+        scrollContainerRef.current?.scrollTo({
+          top: scrollContainerRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  }, [isOpen, unlockedCount]);
+
+  const startHold = () => {
+    if (totalHints === 0) return;
+    setIsHolding(true);
+    setHoldProgress(0);
+    holdStartRef.current = Date.now();
+
+    if (holdTimerRef.current) clearInterval(holdTimerRef.current);
+
+    holdTimerRef.current = setInterval(() => {
+      const elapsed = Date.now() - holdStartRef.current;
+      const progress = Math.min(100, (elapsed / HOLD_DURATION_MS) * 100);
+      setHoldProgress(progress);
+
+      if (progress >= 100) {
+        if (holdTimerRef.current) {
+          clearInterval(holdTimerRef.current);
+          holdTimerRef.current = null;
+        }
+        setIsHolding(false);
+        setHoldProgress(0);
+        handleUnlockNext();
+      }
+    }, 40);
   };
 
   const isMotiveGroup = activeCategory === "motive";
   const isAlibiGroup = activeCategory === "alibi";
+
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
@@ -316,68 +371,34 @@ export function HintModal({
           initial={{ opacity: 0, scale: 0.95, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}
-          className="relative w-full max-w-xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] rounded-none overflow-hidden flex flex-col max-h-[92vh]"
+          className="relative w-full max-w-lg bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] rounded-none overflow-hidden flex flex-col max-h-[90vh]"
         >
-          {/* HEADER */}
-          <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
-            <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider flex items-center gap-2">
-              <Lightbulb className="size-4 text-[#8c1d1d]" />
-              <span>
-                {isMotiveGroup
-                  ? "Gợi Ý Động Cơ Gây Án"
-                  : isAlibiGroup
-                    ? "Gợi Ý Mâu Thuẫn Ngoại Phạm"
-                    : "Gợi Ý Manh Mối Checkpoint"}
-              </span>
+          {/* COMPACT HEADER - NỐI LIỀN MÀU NỀN */}
+          <div className="bg-[#f6f1e5] px-4 pt-3.5 pb-1 sm:px-5 sm:pt-4 sm:pb-1.5 flex items-center justify-between">
+            <h3 className="font-mono font-bold text-xs sm:text-sm text-[#1a120b] uppercase tracking-wide truncate pr-2">
+              {currentGroup.title}
             </h3>
 
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                cancelHold();
                 detectiveAudio.playPaperRustle();
                 onClose();
               }}
-              className="p-2 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026]/40 pointer-events-auto"
+              className="p-1.5 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026]/40 pointer-events-auto shrink-0"
               title="Đóng"
             >
-              <X className="size-5 pointer-events-none" />
+              <X className="size-4 pointer-events-none" />
             </button>
           </div>
 
           {/* ACTIVE CONTENT AREA */}
-          <div className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] custom-scrollbar">
-            {/* STAGE TITLE BAR */}
-            <div>
-              <div className="space-y-1">
-                {(isMotiveGroup || isAlibiGroup) && (
-                  <div className="flex items-center gap-1.5 text-[#8c1d1d] font-mono text-[11px] font-bold uppercase tracking-wider">
-                    {isMotiveGroup ? (
-                      <Target className="size-3.5" />
-                    ) : (
-                      <Clock className="size-3.5" />
-                    )}
-                    <span>
-                      {isMotiveGroup
-                        ? "MỤC TIÊU // BẰNG CHỨNG ĐỘNG CƠ"
-                        : "MỤC TIÊU // BẰNG CHỨNG NGOẠI PHẠM"}
-                    </span>
-                  </div>
-                )}
-                <h4 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wide">
-                  {currentGroup.title}
-                  {isMotiveGroup
-                    ? " — [ĐỘNG CƠ]"
-                    : isAlibiGroup
-                      ? " — [NGOẠI PHẠM]"
-                      : ""}
-                </h4>
-              </div>
-            </div>
-
-            {/* TRƯỜNG HỢP: CHƯA CÓ GỢI Ý HOẶC ĐANG TẢI */}
+          <div ref={scrollContainerRef} className="p-4 sm:p-5 pt-2 sm:pt-2.5 flex-1 overflow-y-auto space-y-3 bg-[#f6f1e5] custom-scrollbar">
+            {/* TRƯỜNG HỢP 1: CHƯA CÓ GỢI Ý HOẶC ĐANG TẢI */}
             {totalHints === 0 ? (
-              <div className="p-5 border-2 border-[#2b1f14]/30 bg-[#fdfbf7] text-[#1a120b] rounded-none font-sans text-xs sm:text-[13px] leading-relaxed space-y-2">
+              <div className="p-4 border-2 border-[#2b1f14]/30 bg-[#fdfbf7] text-[#1a120b] rounded-none font-sans text-xs sm:text-[13px] leading-relaxed space-y-2">
                 <div className="flex items-center gap-2 text-[#8c6b45] font-mono font-bold uppercase text-xs">
                   <HelpCircle className="size-4" />
                   <span>Chưa có gợi ý bổ sung cho mục này</span>
@@ -386,119 +407,105 @@ export function HintModal({
                   Vui lòng vận dụng các tài liệu hồ sơ, lời khai và chứng cứ đã thu thập để tiến hành suy luận phá án.
                 </p>
               </div>
-            ) : (
-              /* TRƯỜNG HỢP: CÓ GỢI Ý TỪ GOOGLE SHEETS */
-              <>
-                <div className="pt-1">
-                  <div className="p-4 border-2 border-[#2b1f14] bg-[#fdfbf7] text-[#1a120b] shadow-sm rounded-none font-sans text-xs sm:text-[13px] leading-relaxed">
-                    <div className="flex items-center justify-between pb-2 mb-2 font-mono text-[10px] sm:text-[11px] font-bold uppercase">
-                      <span className="flex items-center gap-1.5 text-[#8c1d1d]">
-                        <Unlock className="size-3.5" />
-                        Gợi ý mức {viewIdx + 1}/{totalHints}
-                      </span>
-                      {currentGroup.hasCategories && (
-                        <span className="text-[#6b4e2e] text-[10px]">
-                          [
-                          {isMotiveGroup
-                            ? "ĐỘNG CƠ GÂY ÁN"
-                            : "MÂU THUẪN NGOẠI PHẠM"}
-                          ]
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="grid">
-                      {displayHints.map((hintText, hIdx) => (
-                        <p
-                          key={hIdx}
-                          aria-hidden={hIdx !== viewIdx}
-                          className={cn(
-                            "col-start-1 row-start-1 text-[#1a120b] whitespace-pre-line leading-relaxed transition-opacity duration-200 ease-out",
-                            hIdx === viewIdx
-                              ? "opacity-100"
-                              : "opacity-0 pointer-events-none select-none",
-                          )}
-                        >
-                          {hintText}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tiến độ mở khóa các mức gợi ý */}
-                  <div className="flex items-center gap-1.5 pt-3">
-                    {displayHints.map((_, hIdx) => (
-                      <button
-                        key={hIdx}
-                        type="button"
-                        disabled={hIdx >= unlockedCount}
-                        onClick={() => {
-                          if (hIdx >= unlockedCount) return;
-                          detectiveAudio.playTypewriterClick();
-                          setActiveHintIdx(hIdx);
-                        }}
-                        title={
-                          hIdx < unlockedCount
-                            ? `Xem gợi ý mức ${hIdx + 1}`
-                            : `Gợi ý mức ${hIdx + 1} chưa mở khóa`
-                        }
-                        className={cn(
-                          "h-2 flex-1 rounded-none transition-colors",
-                          hIdx === viewIdx
-                            ? "bg-[#8c1d1d]"
-                            : hIdx < unlockedCount
-                              ? "bg-[#8c1d1d]/40 hover:bg-[#8c1d1d]/60 cursor-pointer"
-                              : "bg-[#2b1f14]/15 cursor-not-allowed",
-                        )}
-                      />
-                    ))}
+            ) : unlockedCount === 0 ? (
+              /* TRƯỜNG HỢP 2: CHƯA MỞ GỢI Ý MỨC 1 (COMPACT HOLD TO REVEAL) */
+              <div className="space-y-3 pt-1">
+                <div className="p-4 sm:p-5 border-2 border-[#2b1f14]/25 bg-[#fdfbf7] shadow-sm relative overflow-hidden">
+                  {/* Redacted lines mockup */}
+                  <div className="space-y-2.5 py-1 opacity-25 select-none pointer-events-none" aria-hidden="true">
+                    <div className="h-3 bg-[#2b1f14] w-3/4 rounded-none" />
+                    <div className="h-3 bg-[#2b1f14] w-full rounded-none" />
+                    <div className="h-3 bg-[#2b1f14] w-5/6 rounded-none" />
+                    <div className="h-3 bg-[#2b1f14] w-1/2 rounded-none" />
                   </div>
                 </div>
 
-                {/* ĐIỀU HƯỚNG LÙI / TIẾN GIỮA CÁC MỨC GỢI Ý */}
-                <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#2b1f14]/20">
-                  {viewIdx > 0 ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        detectiveAudio.playTypewriterClick();
-                        setActiveHintIdx((prev) => Math.max(prev - 1, 0));
-                      }}
-                      className="px-4 py-2 bg-[#eae0cd] hover:bg-[#dfd4be] text-[#2b1f14] border-2 border-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 rounded-none active:scale-95"
-                    >
-                      <ArrowLeft className="size-3.5" />
-                      <span>GỢI Ý TRƯỚC</span>
-                    </button>
-                  ) : (
-                    <div />
+                {/* HOLD TO REVEAL BUTTON LEVEL 1 */}
+                <button
+                  type="button"
+                  onMouseDown={startHold}
+                  onMouseUp={cancelHold}
+                  onMouseLeave={cancelHold}
+                  onTouchStart={startHold}
+                  onTouchEnd={cancelHold}
+                  onTouchCancel={cancelHold}
+                  onContextMenu={(e) => e.preventDefault()}
+                  className={cn(
+                    "relative w-full overflow-hidden select-none touch-none py-3 px-4 border-2 font-mono text-xs font-bold uppercase transition-all rounded-none flex items-center justify-center gap-2",
+                    isHolding
+                      ? "border-[#8c1d1d] bg-[#2b1f14] text-[#f6f1e5] scale-[0.99]"
+                      : "border-[#2b1f14] bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] shadow cursor-pointer active:scale-95"
                   )}
+                >
+                  {/* Progress fill */}
+                  <div
+                    className="absolute inset-0 bg-[#8c1d1d] transition-all ease-linear pointer-events-none"
+                    style={{ width: `${holdProgress}%` }}
+                  />
+                  <div className="relative z-10 flex items-center gap-2 pointer-events-none">
+                    <Lock className={cn("size-4 transition-transform", isHolding && "animate-pulse text-amber-300")} />
+                    <span>
+                      {isHolding
+                        ? `ĐANG MỞ MỨC 1... ${Math.round(holdProgress)}%`
+                        : "GIỮ ĐỂ MỞ MỨC 1"}
+                    </span>
+                  </div>
+                </button>
+              </div>
+            ) : (
+              /* TRƯỜNG HỢP 3: ĐÃ BÓC NIÊM PHONG — HIỂN THỊ DỌC TỪ TRÊN XUỐNG DƯỚI */
+              <div className="space-y-3 pt-1">
+                {displayHints.slice(0, unlockedCount).map((hintText, hIdx) => (
+                  <div
+                    key={hIdx}
+                    className="p-3.5 sm:p-4 border-2 border-[#2b1f14] bg-[#fdfbf7] text-[#1a120b] shadow-sm rounded-none font-sans text-xs sm:text-[13px] leading-relaxed space-y-1.5"
+                  >
+                    <div className="font-mono text-[10px] sm:text-[11px] font-bold uppercase text-[#8c1d1d]">
+                      Gợi ý {hIdx + 1}
+                    </div>
 
-                  {viewIdx < unlockedCount - 1 ? (
+                    <p className="text-[#1a120b] whitespace-pre-line leading-relaxed">
+                      {hintText}
+                    </p>
+                  </div>
+                ))}
+
+                {/* NÚT MỞ GỢI Ý TIẾP THEO (NẰM Ở ĐÁY DANH SÁCH) */}
+                {unlockedCount < totalHints && (
+                  <div className="pt-1">
                     <button
                       type="button"
-                      onClick={() => {
-                        detectiveAudio.playTypewriterClick();
-                        setActiveHintIdx((prev) => prev + 1);
-                      }}
-                      className="px-4 py-2 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-2 border-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 rounded-none active:scale-95 ml-auto"
+                      onMouseDown={startHold}
+                      onMouseUp={cancelHold}
+                      onMouseLeave={cancelHold}
+                      onTouchStart={startHold}
+                      onTouchEnd={cancelHold}
+                      onTouchCancel={cancelHold}
+                      onContextMenu={(e) => e.preventDefault()}
+                      className={cn(
+                        "relative w-full overflow-hidden select-none touch-none py-2.5 px-4 border-2 font-mono text-xs font-bold uppercase transition-all rounded-none flex items-center justify-center gap-2",
+                        isHolding
+                          ? "border-[#8c1d1d] bg-[#2b1f14] text-[#f6f1e5] scale-[0.99]"
+                          : "border-[#2b1f14] bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] shadow cursor-pointer active:scale-95"
+                      )}
+                      title={`Nhấn và giữ để mở gợi ý mức ${unlockedCount + 1}`}
                     >
-                      <span>GỢI Ý SAU</span>
-                      <ArrowRight className="size-3.5" />
+                      <div
+                        className="absolute inset-0 bg-[#8c1d1d] transition-all ease-linear pointer-events-none"
+                        style={{ width: `${holdProgress}%` }}
+                      />
+                      <div className="relative z-10 flex items-center gap-2 pointer-events-none">
+                        <Lock className={cn("size-3.5 text-[#d9a066]", isHolding && "animate-pulse text-amber-300")} />
+                        <span>
+                          {isHolding
+                            ? `ĐANG MỞ MỨC ${unlockedCount + 1}... ${Math.round(holdProgress)}%`
+                            : `GIỮ ĐỂ MỞ MỨC ${unlockedCount + 1}`}
+                        </span>
+                      </div>
                     </button>
-                  ) : unlockedCount < totalHints ? (
-                    <button
-                      type="button"
-                      onClick={handleUnlockNext}
-                      className="px-4 py-2 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-2 border-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 rounded-none active:scale-95 ml-auto"
-                    >
-                      <Unlock className="size-3.5 text-[#d9a066]" />
-                      <span>
-                        MỞ GỢI Ý MỚI ({unlockedCount + 1}/{totalHints})
-                      </span>
-                    </button>
-                  ) : null}
-                </div>
-              </>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </motion.div>
@@ -506,3 +513,4 @@ export function HintModal({
     </AnimatePresence>
   );
 }
+

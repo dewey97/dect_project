@@ -37,6 +37,11 @@ interface MainInvestigationCanvasProps {
   onOpenReinvestigation?: () => void;
   onOpenEpilogue?: () => void;
   customBgImage?: string;
+  lightConeConfig?: {
+    enabled: boolean;
+    coneSpread: number;
+    intensity: number;
+  };
 }
 
 export function MainInvestigationCanvas({
@@ -45,6 +50,7 @@ export function MainInvestigationCanvas({
   onOpenReinvestigation,
   onOpenEpilogue,
   customBgImage,
+  lightConeConfig,
 }: MainInvestigationCanvasProps) {
   const layout = useBoardLayout(caseId);
   const state = useInvestigationState({
@@ -577,6 +583,17 @@ export function MainInvestigationCanvas({
         detectiveAudio.playPaperRustle();
         if (onOpenPhoneSimulator) onOpenPhoneSimulator();
         else state.setIsInternalPhoneOpen(true);
+      } else if (
+        id === "c0-pin-reinvestigate" ||
+        id === "reinvestigate-prop" ||
+        (pin?.photoUrl && pin.photoUrl.includes("reinvestigation_crime_scene_prop"))
+      ) {
+        if (state.effectiveReinvestigateUnlocked) {
+          detectiveAudio.playGlassSound();
+          state.handleOpenReinvestigation();
+        } else {
+          detectiveAudio.playGlassSound();
+        }
       } else if (id === "c0-pin-phone") {
         if (state.phoneLookupSuccess) state.setIsDossierEOpen(true);
         else state.setIsPhoneLookupOpen(true);
@@ -607,13 +624,6 @@ export function MainInvestigationCanvas({
       ) {
         if (pin?.photoUrl) {
           handleOpenPhotoZoom(pin.photoUrl, coords);
-        }
-      } else if (id === "c0-pin-reinvestigate") {
-        if (state.isReinvestigateUnlocked) {
-          detectiveAudio.playGlassSound();
-          state.handleOpenReinvestigation();
-        } else {
-          detectiveAudio.playGlassSound();
         }
       } else if (id === "c0-pin-indictment") {
         if (state.isIndictmentSolved) {
@@ -736,6 +746,7 @@ export function MainInvestigationCanvas({
         onPinClick={handlePinClick}
         isEditMode={layout.isEditMode}
         onPinPositionChange={layout.handlePinPositionChange}
+        lightConeConfig={lightConeConfig}
       />
 
       {/* 3. Modals & Narrative Layers */}

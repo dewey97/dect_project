@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ArrowRight, ArrowLeft, Trash2, Check, AlertTriangle, CheckCircle2, Lightbulb } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
-import { ClueCodePicker } from './clue-code-picker'
+import { ClueCodePicker, type PendingClueInputs } from './clue-code-picker'
 import { emitInvestigationEvent } from '@/lib/investigation-events'
 import { setStorageItem } from '@/lib/storage'
+import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
 
 interface SuspectItemData {
   id: string
@@ -47,7 +48,13 @@ import {
   VALID_CASE_CHARACTERS,
   type SuspectCharacter,
 } from '@/lib/cases/case-000-suspects'
-import { isEvidenceMatching, checkMotiveValid, checkAlibiValid } from '@/lib/cases/case-000-clues'
+import {
+  isEvidenceMatching,
+  checkMotiveValid,
+  checkAlibiValid,
+  resolveEvidenceCode,
+  KNOWN_CASE_PHONES,
+} from '@/lib/cases/case-000-clues'
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
@@ -80,6 +87,8 @@ export function AddSuspectModal({
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null)
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
   const openTimeRef = useRef(0)
+  const pendingMotiveRef = useRef<PendingClueInputs>({})
+  const pendingAlibiRef = useRef<PendingClueInputs>({})
 
   useEffect(() => {
     if (isOpen) {
@@ -158,6 +167,8 @@ export function AddSuspectModal({
       setMotiveClueIds([])
       setAlibiClueIds([])
     }
+    pendingMotiveRef.current = {}
+    pendingAlibiRef.current = {}
     setSubTileView('overview')
     setErrorMsg('')
     setEvalModal(null)
@@ -168,6 +179,44 @@ export function AddSuspectModal({
     return checkpoints.find((cp) => cp.id === suspectCpId)
   }, [checkpoints, suspectCpId])
 
+  const extractClueIdsFromPending = (pending: PendingClueInputs): string[] => {
+    const ids: string[] = []
+    if (pending.code && pending.code.trim()) {
+      const raw = pending.code.trim()
+      const direct = resolveEvidenceCode(raw)
+      if (direct) {
+        ids.push(direct.id)
+      } else {
+        const tokens = raw
+          .split(/[,;\n\r]+/)
+          .flatMap((t) => t.trim().split(/\s+/))
+          .map((t) => t.trim())
+          .filter(Boolean)
+        tokens.forEach((token) => {
+          const resolved = resolveEvidenceCode(token)
+          if (resolved) ids.push(resolved.id)
+        })
+      }
+    }
+
+    if (pending.textPhone && pending.textPhone.trim()) {
+      const digits = pending.textPhone.replace(/\D/g, '')
+      if (digits.length >= 3) {
+        const known = KNOWN_CASE_PHONES[digits.slice(-3)]
+        ids.push(known ? `sms_phone_${known.full}` : `sms_phone_${digits}`)
+      }
+    }
+
+    if (pending.voicePhone && pending.voicePhone.trim()) {
+      const digits = pending.voicePhone.replace(/\D/g, '')
+      if (digits.length >= 3) {
+        const known = KNOWN_CASE_PHONES[digits.slice(-3)]
+        ids.push(known ? `voice_phone_${known.full}` : `voice_phone_${digits}`)
+      }
+    }
+
+    return ids
+  }
 
   const validateMotive = (_charId: string, clues: string[]) => {
     if (hasAdminBypassInArray(clues)) return true
@@ -185,10 +234,17 @@ export function AddSuspectModal({
 
   // XÁC NHẬN MANH MỐI ĐỘNG CƠ (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
   const handleConfirmMotiveClues = () => {
+    const pendingIds = extractClueIdsFromPending(pendingMotiveRef.current)
+    const effectiveClues = Array.from(new Set([...motiveClueIds, ...pendingIds]))
+    if (pendingIds.length > 0) {
+      setMotiveClueIds(effectiveClues)
+      pendingMotiveRef.current = {}
+    }
+
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name, sheetCharacters)
     const hasMotiveReqs = (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0
-    const isValid = hasMotiveReqs ? validateMotive(matched?.id || '', motiveClueIds) : true
+    const isValid = hasMotiveReqs ? validateMotive(matched?.id || '', effectiveClues) : true
 
     if (hasMotiveReqs && !isValid) {
       detectiveAudio.playGlassSound()
@@ -200,19 +256,19 @@ export function AddSuspectModal({
         message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
         subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
         suspectName: suspectDisplayName,
-        selectedCount: motiveClueIds.length,
+        selectedCount: effectiveClues.length,
       })
       return
     }
 
     detectiveAudio.playStampSound()
     if (matched) {
-      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+      const combinedClues = Array.from(new Set([...effectiveClues, ...alibiClueIds]))
       onSave({
         id: matched.id,
         name: matched.canonicalName,
         clueIds: combinedClues,
-        motiveClueIds,
+        motiveClueIds: effectiveClues,
         alibiClueIds
       })
     }
@@ -223,17 +279,24 @@ export function AddSuspectModal({
       heading: '',
       message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
       suspectName: suspectDisplayName,
-      selectedCount: motiveClueIds.length,
+      selectedCount: effectiveClues.length,
     })
     setErrorMsg('')
   }
 
   // XÁC NHẬN MANH MỐI BÁC BỎ NGOẠI PHẠM (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
   const handleConfirmAlibiClues = () => {
+    const pendingIds = extractClueIdsFromPending(pendingAlibiRef.current)
+    const effectiveClues = Array.from(new Set([...alibiClueIds, ...pendingIds]))
+    if (pendingIds.length > 0) {
+      setAlibiClueIds(effectiveClues)
+      pendingAlibiRef.current = {}
+    }
+
     const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
     const matched = findValidCaseCharacter(name, sheetCharacters)
     const hasAlibiReqs = (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0
-    const isValid = hasAlibiReqs ? validateAlibi(matched?.id || '', alibiClueIds) : true
+    const isValid = hasAlibiReqs ? validateAlibi(matched?.id || '', effectiveClues) : true
 
     if (hasAlibiReqs && !isValid) {
       detectiveAudio.playGlassSound()
@@ -245,20 +308,20 @@ export function AddSuspectModal({
         message: 'Bằng chứng chứng minh mâu thuẫn ngoại phạm chưa chính xác.',
         subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
         suspectName: suspectDisplayName,
-        selectedCount: alibiClueIds.length,
+        selectedCount: effectiveClues.length,
       })
       return
     }
 
     detectiveAudio.playStampSound()
     if (matched) {
-      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+      const combinedClues = Array.from(new Set([...motiveClueIds, ...effectiveClues]))
       onSave({
         id: matched.id,
         name: matched.canonicalName,
         clueIds: combinedClues,
         motiveClueIds,
-        alibiClueIds
+        alibiClueIds: effectiveClues
       })
     }
     setEvalModal({
@@ -268,7 +331,7 @@ export function AddSuspectModal({
       heading: '',
       message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
       suspectName: suspectDisplayName,
-      selectedCount: alibiClueIds.length,
+      selectedCount: effectiveClues.length,
     })
     setErrorMsg('')
   }
@@ -295,19 +358,28 @@ export function AddSuspectModal({
       return
     }
 
+    const pendingMotiveIds = extractClueIdsFromPending(pendingMotiveRef.current)
+    const effectiveMotiveClues = Array.from(new Set([...motiveClueIds, ...pendingMotiveIds]))
+    const pendingAlibiIds = extractClueIdsFromPending(pendingAlibiRef.current)
+    const effectiveAlibiClues = Array.from(new Set([...alibiClueIds, ...pendingAlibiIds]))
+    if (pendingMotiveIds.length > 0) setMotiveClueIds(effectiveMotiveClues)
+    if (pendingAlibiIds.length > 0) setAlibiClueIds(effectiveAlibiClues)
+    pendingMotiveRef.current = {}
+    pendingAlibiRef.current = {}
+
     const isCore = matchedChar.id === 'vu' || matchedChar.id === 'tung' || matchedChar.id === 'ha'
     const isAdmin000 = currentName === '000' || currentName === '00' || currentName === '0'
 
     // If non-core suspect (Bà Lụa, Đạt, Mai...), save directly as related person of interest
     if (!isCore && !isAdmin000) {
       detectiveAudio.playStampSound()
-      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+      const combinedClues = Array.from(new Set([...effectiveMotiveClues, ...effectiveAlibiClues]))
       onSave({
         id: matchedChar.id,
         name: matchedChar.canonicalName,
         clueIds: combinedClues,
-        motiveClueIds,
-        alibiClueIds
+        motiveClueIds: effectiveMotiveClues,
+        alibiClueIds: effectiveAlibiClues
       })
       // Chỉ kích hoạt onSubmitConclusion nếu nhân vật này thực sự có checkpoint/câu hỏi điều tra tương ứng trên CMS
       if (onSubmitConclusion && (suspectCpId || matchedCheckpoint)) {
@@ -318,8 +390,8 @@ export function AddSuspectModal({
     }
 
     const charId = (isAdmin000 ? 'vu' : matchedChar.id) as 'vu' | 'tung' | 'ha'
-    const isMotiveOk = isAdmin000 || validateMotive(charId, motiveClueIds)
-    const isAlibiOk = isAdmin000 || validateAlibi(charId, alibiClueIds)
+    const isMotiveOk = isAdmin000 || validateMotive(charId, effectiveMotiveClues)
+    const isAlibiOk = isAdmin000 || validateAlibi(charId, effectiveAlibiClues)
 
     if (!isMotiveOk || !isAlibiOk) {
       setErrorMsg('Bằng chứng động cơ hoặc mâu thuẫn ngoại phạm chưa chính xác. Vui lòng rà soát lại đúng cả 2 mục trước khi tiến hành điều tra!')
@@ -330,15 +402,15 @@ export function AddSuspectModal({
     const suspectId = charId
     const suspectName = matchedChar.canonicalName
 
-    const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+    const combinedClues = Array.from(new Set([...effectiveMotiveClues, ...effectiveAlibiClues]))
 
     detectiveAudio.playStampSound()
     onSave({
       id: suspectId,
       name: suspectName,
       clueIds: combinedClues,
-      motiveClueIds,
-      alibiClueIds
+      motiveClueIds: effectiveMotiveClues,
+      alibiClueIds: effectiveAlibiClues
     })
     if (onSubmitConclusion) {
       onSubmitConclusion(charId)
@@ -476,9 +548,39 @@ export function AddSuspectModal({
 
           {/* DOCUMENT HEADER & QUESTION */}
           <div className="space-y-1.5 pr-8">
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#6b4e2e] block">
-              Xác Định Đối Tượng Tình Nghi
-            </span>
+            <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e]">
+              {subTileView === 'motive'
+                ? 'Xác Định Động Cơ Gây Án'
+                : subTileView === 'alibi'
+                ? 'Xác Định Ngoại Phạm Bất Hợp Lý'
+                : 'Xác Định Đối Tượng Tình Nghi'}
+            </h3>
+
+            {/* TÊN ĐỐI TƯỢNG ĐẨY XUỐNG DÒNG RIÊNG */}
+            <div className="pt-0.5">
+              {editingSuspect?.name || subTileView !== 'overview' ? (
+                <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-xl font-bold text-[#0e2b5c] normal-case tracking-normal">
+                  {name || editingSuspect?.name}
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value)
+                    if (errorMsg) setErrorMsg('')
+                  }}
+                  placeholder="Nhập tên đối tượng..."
+                  className="w-full max-w-sm bg-transparent border-b-2 border-[#2b1f14] px-1 py-0.5 text-base sm:text-xl font-[family-name:var(--font-handwriting)] font-bold text-[#0e2b5c] focus:outline-none focus:border-black placeholder:text-[#8c7355]/50 placeholder:font-sans placeholder:text-xs normal-case tracking-normal"
+                />
+              )}
+            </div>
+
+            {errorMsg && (
+              <p className="text-xs text-red-700 font-mono font-bold mt-1">
+                ⚠️ {errorMsg}
+              </p>
+            )}
           </div>
 
           {/* FORM BODY */}
@@ -486,37 +588,6 @@ export function AddSuspectModal({
             {/* 2-TILE OVERVIEW VIEW */}
             {subTileView === 'overview' && (
               <>
-                {/* SUSPECT NAME INPUT */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                    Họ và tên đối tượng:
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={name}
-                      readOnly={Boolean(editingSuspect?.name)}
-                      onChange={(e) => {
-                        if (editingSuspect?.name) return
-                        setName(e.target.value)
-                        if (errorMsg) setErrorMsg('')
-                      }}
-                      className={cn(
-                        "w-full border-2 border-[#2b1f14] rounded-none px-4 py-2.5 text-base sm:text-lg font-[family-name:var(--font-handwriting)] font-bold focus:outline-none transition-colors shadow-inner",
-                        editingSuspect?.name
-                          ? "bg-[#ede4d0] text-[#1a120b] cursor-default border-[#4a3520]"
-                          : "bg-[#fdfcf9] text-[#0e2b5c] focus:border-black"
-                      )}
-                    />
-                  </div>
-
-                  {errorMsg && (
-                    <p className="text-xs text-red-700 font-mono font-bold mt-1">
-                      ⚠️ {errorMsg}
-                    </p>
-                  )}
-                </div>
-
                 <div className="space-y-3 pt-1">
                   <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
                     CĂN CỨ TÌNH NGHI:
@@ -601,12 +672,6 @@ export function AddSuspectModal({
             {/* Sub-View for Tile 1: MOTIVE / ĐỘNG CƠ GÂY ÁN */}
             {subTileView === 'motive' && (
               <div className="space-y-3 pt-1">
-                <div className="border-b border-[#2b1f14]/20 pb-2 flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
-                    ĐỘNG CƠ GÂY ÁN {name ? `— ${name}` : ''}
-                  </span>
-                </div>
-
                 <ClueCodePicker
                   selectedClueIds={motiveClueIds}
                   customPhoneEvidences={[]}
@@ -618,48 +683,44 @@ export function AddSuspectModal({
                     setMotiveClueIds((prev) => prev.filter((item) => item !== id))
                   }}
                   onAddCustomPhone={() => {}}
+                  onPendingChange={(pending) => {
+                    pendingMotiveRef.current = pending
+                  }}
                   label="BẰNG CHỨNG ĐÃ NHẬP"
                   placeholder="Nhập mã chứng cứ..."
                   emptyStateText="Chưa có bằng chứng nào được nhập."
                 />
 
-                <div className="pt-2 flex items-center justify-between gap-2">
+                {/* GỢI Ý ĐỘNG CƠ ĐẨY XUỐNG DƯỚI MÀN NHẬP MÃ */}
+                {Boolean(suspectCpId) && (
+                  <CheckpointHintSection
+                    checkpointId={suspectCpId}
+                    caseId={caseId}
+                    category="motive"
+                  />
+                )}
+
+                <div className="pt-3 border-t border-[#d4c5b0]/60 flex items-center justify-between gap-2 select-none">
                   <button
                     type="button"
                     onClick={() => {
                       detectiveAudio.playPaperRustle()
                       setSubTileView('overview')
                     }}
-                    className="px-4 py-2.5 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14]"
+                    className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95"
                   >
-                    <ArrowLeft className="size-3.5 text-[#4a3520]" />
+                    <ArrowLeft className="size-3.5 text-[#4a3520] shrink-0" />
                     <span>QUAY LẠI</span>
                   </button>
 
-                  <div className="flex items-center gap-2">
-                    {Boolean(suspectCpId) && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          detectiveAudio.playTypewriterClick()
-                          emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'motive' })
-                        }}
-                        className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                        title="Xem gợi ý động cơ gây án"
-                      >
-                        <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                        <span>GỢI Ý</span>
-                      </button>
-                    )}
-
+                  <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
                     <button
                       type="button"
                       onClick={handleConfirmMotiveClues}
-                      className="px-5 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95"
+                      className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0"
                     >
-                      <Check className="size-3.5 text-[#d9a066]" />
-                      <span>XÁC NHẬN MANH MỐI</span>
+                      <Check className="size-3.5 text-[#d9a066] shrink-0" />
+                      <span>XÁC NHẬN</span>
                     </button>
                   </div>
                 </div>
@@ -669,12 +730,6 @@ export function AddSuspectModal({
             {/* Sub-View for Tile 2: ALIBI */}
             {subTileView === 'alibi' && (
               <div className="space-y-3 pt-1">
-                <div className="border-b border-[#2b1f14]/20 pb-2 flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold text-[#1a120b] uppercase flex items-center gap-1.5">
-                    NGOẠI PHẠM BẤT HỢP LÝ {name ? `— ${name}` : ''}
-                  </span>
-                </div>
-
                 <ClueCodePicker
                   selectedClueIds={alibiClueIds}
                   customPhoneEvidences={[]}
@@ -686,48 +741,45 @@ export function AddSuspectModal({
                     setAlibiClueIds((prev) => prev.filter((item) => item !== id))
                   }}
                   onAddCustomPhone={() => {}}
+                  onPendingChange={(pending) => {
+                    pendingAlibiRef.current = pending
+                  }}
                   label="BẰNG CHỨNG NGOẠI PHẠM ĐÃ NHẬP"
                   placeholder="Nhập mã chứng cứ..."
                   emptyStateText="Chưa có bằng chứng ngoại phạm nào được nhập."
                 />
 
-                <div className="pt-2 flex items-center justify-between gap-2">
+                {/* GỢI Ý NGOẠI PHẠM ĐẨY XUỐNG DƯỚI MÀN NHẬP MÃ */}
+                {Boolean(suspectCpId) && (
+                  <CheckpointHintSection
+                    checkpointId={suspectCpId}
+                    caseId={caseId}
+                    category="alibi"
+                  />
+                )}
+
+                <div className="pt-3 border-t border-[#d4c5b0]/60 flex items-center justify-between gap-2 select-none">
                   <button
                     type="button"
                     onClick={() => {
                       detectiveAudio.playPaperRustle()
                       setSubTileView('overview')
                     }}
-                    className="px-4 py-2.5 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14]"
+                    className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95"
                   >
-                    <ArrowLeft className="size-3.5 text-[#4a3520]" />
+                    <ArrowLeft className="size-3.5 text-[#4a3520] shrink-0" />
                     <span>QUAY LẠI</span>
                   </button>
 
-                  <div className="flex items-center gap-2">
-                    {Boolean(suspectCpId) && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          detectiveAudio.playTypewriterClick()
-                          emitInvestigationEvent('OPEN_HINT', { checkpointId: suspectCpId, category: 'alibi' })
-                        }}
-                        className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                        title="Xem gợi ý mâu thuẫn ngoại phạm"
-                      >
-                        <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                        <span>GỢI Ý</span>
-                      </button>
-                    )}
+                  <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
 
                     <button
                       type="button"
                       onClick={handleConfirmAlibiClues}
-                      className="px-5 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95"
+                      className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0"
                     >
-                      <Check className="size-3.5 text-[#d9a066]" />
-                      <span>XÁC NHẬN MANH MỐI</span>
+                      <Check className="size-3.5 text-[#d9a066] shrink-0" />
+                      <span>XÁC NHẬN</span>
                     </button>
                   </div>
                 </div>
@@ -736,7 +788,7 @@ export function AddSuspectModal({
 
             {/* ACTION TOOLBAR: SAVE & SUBMIT (ONLY VISIBLE ON OVERVIEW) */}
             {subTileView === 'overview' && (
-              <div className="pt-2 flex flex-wrap items-center justify-between gap-2">
+              <div className="pt-3 border-t border-[#d4c5b0]/60 flex items-center justify-between gap-2 select-none">
                 <div>
                   {editingSuspect && onDelete && (
                     <button
@@ -747,7 +799,7 @@ export function AddSuspectModal({
                         onClose()
                       }}
                       title="Xóa hồ sơ nghi phạm"
-                      className="p-2 rounded-none border-2 border-[#a81c1c] bg-[#fce8e6] hover:bg-[#f8d7d4] text-[#a81c1c] transition-all cursor-pointer flex items-center justify-center active:scale-95"
+                      className="h-10 px-3 rounded-none border-2 border-[#a81c1c] bg-[#fce8e6] hover:bg-[#f8d7d4] text-[#a81c1c] transition-all cursor-pointer flex items-center justify-center active:scale-95 shrink-0 shadow-xs"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -760,7 +812,7 @@ export function AddSuspectModal({
                     disabled={!isBothValid}
                     onClick={handleSubmitConclusion}
                     className={cn(
-                      "text-xs uppercase tracking-wider px-5 py-2.5 rounded-none font-bold transition-all border-2 flex items-center justify-center",
+                      "h-10 px-5 rounded-none font-bold font-mono text-xs uppercase tracking-wider transition-all border-2 flex items-center justify-center whitespace-nowrap shrink-0",
                       isBothValid
                         ? "cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
                         : "opacity-40 cursor-not-allowed bg-[#2b1f14]/50 text-[#f6f1e5]/60 border-[#2b1f14]/40"

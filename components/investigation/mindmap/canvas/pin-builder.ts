@@ -341,15 +341,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   const base = input.isMobile
     ? ([
         {
-          id: "c0-pin-evidence",
-          x: 0.2,
-          y: 0.18,
-          label: "Bổ sung chứng cứ",
-          detail: "Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra",
-          color: "red" as const,
-          noteColor: "yellow" as const,
-        },
-        {
           id: "c0-pin-phone",
           x: 0.42,
           y: 0.27,
@@ -374,13 +365,13 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         },
         {
           id: "c0-pin-reinvestigate",
-          x: 0.2,
-          y: 0.35,
+          x: 0.18,
+          y: 0.36,
           label: input.effectiveReinvestigateUnlocked
-            ? "Khám xét lại"
+            ? "Khám xét lại hiện trường"
             : "Khám xét lại (Chờ phê duyệt)",
           detail: input.effectiveReinvestigateUnlocked
-            ? "Mở biên bản tái khám xét hiện trường"
+            ? "Mở biên bản tái khám xét & rà soát hiện trường số 14 Đường Bờ Sông"
             : "Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]",
           color: input.effectiveReinvestigateUnlocked
             ? ("yellow" as const)
@@ -389,6 +380,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           pinColor: input.effectiveReinvestigateUnlocked
             ? ("yellow" as const)
             : ("dark" as const),
+          photoUrl: "/images/cases/case_000/crime_scene.png",
+          scale: 0.95,
           pulseBorder: input.isReinvestigateBlinking,
           isLocked: !input.effectiveReinvestigateUnlocked,
           checkpointId: reinvestigateCp,
@@ -419,16 +412,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       ] as PinPoint[])
     : ([
         {
-          id: "c0-pin-evidence",
-          x: 0.2,
-          y: 0.18,
-          label: "Bổ sung chứng cứ",
-          detail: "Chỉ dẫn nghiệp vụ & hướng dẫn các thao tác mở rộng điều tra",
-          color: "red" as const,
-          pinColor: "red" as const,
-          noteColor: "yellow" as const,
-        },
-        {
           id: "c0-pin-phone",
           x: 0.42,
           y: 0.27,
@@ -453,13 +436,13 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         },
         {
           id: "c0-pin-reinvestigate",
-          x: 0.2,
-          y: 0.35,
+          x: 0.18,
+          y: 0.36,
           label: input.effectiveReinvestigateUnlocked
-            ? "Khám xét lại"
+            ? "Khám xét lại hiện trường"
             : "Khám xét lại (Chờ phê duyệt)",
           detail: input.effectiveReinvestigateUnlocked
-            ? "Mở biên bản tái khám xét hiện trường"
+            ? "Mở biên bản tái khám xét & rà soát hiện trường số 14 Đường Bờ Sông"
             : "Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]",
           color: input.effectiveReinvestigateUnlocked
             ? ("yellow" as const)
@@ -468,6 +451,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           pinColor: input.effectiveReinvestigateUnlocked
             ? ("yellow" as const)
             : ("dark" as const),
+          photoUrl: "/images/cases/case_000/crime_scene.png",
+          scale: 0.95,
           pulseBorder: input.isReinvestigateBlinking,
           isLocked: !input.effectiveReinvestigateUnlocked,
           checkpointId: reinvestigateCp,
@@ -572,18 +557,9 @@ export function buildCustomConnections(opts: {
   if (opts.hasTungFollowup) activeFollowupSet.add("tung");
   if (opts.hasHaFollowup) activeFollowupSet.add("ha");
 
-  const conns: CaseConnection[] = [
-    {
-      id: "c0-conn-phone",
-      fromPinId: "c0-pin-evidence",
-      toPinId: "c0-pin-phone",
-    },
-    {
-      id: "c0-conn-reinvestigate",
-      fromPinId: "c0-pin-evidence",
-      toPinId: "c0-pin-reinvestigate",
-    },
-  ];
+  // Không hardcode dây nối cố định từ 'Bổ sung chứng cứ' sang Điện thoại / Khám xét lại.
+  // Người chơi / Điều tra viên hoàn toàn tự do nối dây thủ công theo suy luận cá nhân.
+  const conns: CaseConnection[] = [];
 
   const pinExists = (targetId: string) => {
     if (!opts.activePins || opts.activePins.length === 0) return true;

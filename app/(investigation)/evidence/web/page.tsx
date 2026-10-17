@@ -591,15 +591,6 @@ function WebEvidencePageContent() {
                 const pdfDoc = isPdf ? (item.data as PDFDocument) : null;
                 const evItem = !isPdf ? (item.data as PhysicalEvidence) : null;
 
-                const dossierBadge =
-                  item.phase === 0
-                    ? "BAN ĐẦU"
-                    : item.phase === 1
-                      ? "BỘ A"
-                      : item.phase === 2
-                        ? "BỘ B"
-                        : "BỘ C";
-
                 return (
                   <button
                     key={`${item.type}-${item.data.id}`}
@@ -615,22 +606,7 @@ function WebEvidencePageContent() {
                         : "bg-[#18120d] hover:bg-[#201710] border-[#382618] hover:border-[#523824]",
                     )}
                   >
-                    {/* TOP BADGE BAR */}
-                    <div className="flex items-center justify-between gap-1 text-[0.55rem] font-mono">
-                      <span
-                        className={cn(
-                          "px-1.5 py-0.2 rounded font-bold uppercase tracking-wider",
-                          isSelected
-                            ? "bg-[#d9a066] text-[#1a0f07]"
-                            : "bg-[#281b10] text-[#ad9885] border border-[#3d2c1e]",
-                        )}
-                      >
-                        {isPdf ? (pdfDoc?.code ? `📄 ${pdfDoc.code}` : "📄 HỒ SƠ") : "📸 ẢNH VẬT CHỨNG"}
-                      </span>
-                      <span className="text-[#8c735d] uppercase font-bold">{dossierBadge}</span>
-                    </div>
-
-                    {/* NẾU LÀ ẢNH VẬT CHỨNG: HIỂN THỊ TRỰC TIẾP KHUNG ẢNH PREVIEW RÕ NÉT (KHÔNG CHÈN TEXT DÀI DÒNG) */}
+                    {/* NẾU LÀ ẢNH VẬT CHỨNG: CHỈ RENDER PREVIEW TRỰC TIẾP (KHÔNG BADGE, KHÔNG TEXT DÀI DÒNG) */}
                     {!isPdf ? (
                       <div className="relative w-full aspect-[4/3] bg-[#0c0805] border border-[#3e2b1c] rounded-md overflow-hidden group-hover:border-[#d9a066]/70 transition-colors">
                         <img
@@ -638,21 +614,24 @@ function WebEvidencePageContent() {
                           alt="Vật chứng hiện trường"
                           className="w-full h-full object-cover"
                         />
-                        {/* Overlay nhẹ góc dưới với mã vật chứng */}
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-1.5 flex items-center justify-between">
-                          <span className="font-mono text-[0.58rem] font-bold text-[#e5d8cb] tracking-wider">
-                            📸 {evItem?.evidenceId || "VẬT CHỨNG"}
-                          </span>
-                        </div>
+                        {evItem?.evidenceId && (
+                          <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 backdrop-blur-xs border border-white/10 text-[0.55rem] font-mono font-bold text-[#e5d8cb]">
+                            {evItem.evidenceId}
+                          </div>
+                        )}
                       </div>
                     ) : (
-                      /* NẾU LÀ HỒ SƠ PDF: HIỂN THỊ TIÊU ĐỀ VĂN BẢN KÈM ICON PDF */
-                      <div className="flex items-center gap-2">
-                        <div className="size-9 shrink-0 bg-[#251910] border border-[#3e2b1c] rounded flex flex-col items-center justify-center text-[#d9a066] group-hover:scale-105 transition-transform">
-                          <FileText className="size-4 opacity-85" />
-                          <span className="text-[0.42rem] font-mono font-bold text-[#ad9885]">
-                            PDF
-                          </span>
+                      /* NẾU LÀ HỒ SƠ PDF: THAY ICON PDF BẰNG Ô MÃ CODE RÕ RÀNG + TIÊU ĐỀ */
+                      <div className="flex items-center gap-2 py-0.5">
+                        <div
+                          className={cn(
+                            "px-2 py-1 shrink-0 rounded font-mono text-[0.6rem] font-bold tracking-wider text-center border min-w-[46px]",
+                            isSelected
+                              ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
+                              : "bg-[#251910] text-[#d9a066] border-[#3e2b1c]"
+                          )}
+                        >
+                          {pdfDoc?.code || "DOC"}
                         </div>
 
                         <div className="min-w-0 flex-1">

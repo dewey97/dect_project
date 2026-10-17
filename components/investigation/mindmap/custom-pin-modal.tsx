@@ -22,6 +22,7 @@ import { parseAnswersColumn } from "@/lib/cms/checkpoint-cms";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { isVietnameseTextMatch } from "@/lib/finding-matcher";
 import { isEvidenceMatching } from "@/lib/cases/case-000-clues";
+import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 
 interface CustomPinModalProps {
   isOpen: boolean;

@@ -296,100 +296,49 @@ export default function BoardStagePage() {
           3. CONTAINER BẢNG ĐIỀU TRA CHÍNH THỨC CỦA GAME
           (Dùng 100% component MainInvestigationCanvas và logic của boardgame)
       ───────────────────────────────────────────────────────────── */}
-      <div className="w-full max-w-none sm:max-w-6xl mx-auto h-full flex-1 min-h-0 flex flex-col relative z-10 overflow-hidden p-0 pb-0 sm:pb-2">
-        <MainInvestigationCanvas
-          customBgImage={currentBgOption.url}
-          onOpenPhoneSimulator={() => setActiveModal("phone")}
-          onOpenReinvestigation={() => setActiveModal("reinvestigate")}
-          onOpenEpilogue={() => setActiveModal("epilogue")}
-        />
-
-        {/* ─────────────────────────────────────────────────────────────
-            3.5. LỚP KHUNG 3D BEVEL NẸP ĐỒNG MOCKUP (PBR 2.5D OVERLAY)
-            - pointer-events-none: Không cản trở click node
-            - Viền gỗ 3D đè lên 4 cạnh mép ngoài, khoét rỗng lòng giữa để lộ mặt nỉ và ghim
-        ───────────────────────────────────────────────────────────── */}
-        {currentBgOption.hasPbrFrame && (
-          <div className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center p-0">
-            <div
-              className="relative w-full h-full max-h-full aspect-[896/1200] overflow-hidden"
-              style={{
-                // Dùng mask-image để đục lỗ rỗng hình chữ nhật ở giữa khung, để lộ mặt nỉ bần và node ghim bên dưới
-                WebkitMaskImage: `
-                  linear-gradient(black, black),
-                  linear-gradient(black, black)
-                `,
-                WebkitMaskComposite: "xor",
-                maskComposite: "exclude",
-              }}
-            >
-              {/* Ảnh khung gỗ 3D thật */}
-              <Image
-                src="/images/backgrounds/pbr_3d_frame.jpg"
-                alt="Khung gỗ 3D PBR"
-                fill
-                priority
-                className="object-contain pointer-events-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.95)]"
-                style={{
-                  // Mask đục thủng đúng hình chữ nhật lòng trong (14% từ mỗi mép)
-                  clipPath: `polygon(
-                    0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%,
-                    14% 12%, 14% 88%, 86% 88%, 86% 12%, 14% 12%
-                  )`,
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ─────────────────────────────────────────────────────────────
-            4. LỚP NÓN ÁNH SÁNG RỌI TỪ CHÍNH GIỮA ĐỈNH XUỐNG (CENTERED LIGHT CONE)
-            - pointer-events-none: Hoàn toàn không chặn thao tác chạm/click
-            - Hình nón đối xứng tỏa từ điểm giữa mép trên xuống toàn bộ lòng bảng
-        ───────────────────────────────────────────────────────────── */}
-        {lampOn && (
-          <div
-            className="absolute inset-0 pointer-events-none z-30 transition-all duration-200 overflow-hidden"
-            style={{
-              background: `
-                /* 1. Nón tia sáng chính: Đỉnh tại chính giữa (50%, -2%), tỏa hình quạt đối xứng thẳng xuống (180deg) */
-                conic-gradient(
-                  from ${180 - coneSpread / 2}deg at 50% -2%,
-                  transparent 0deg,
-                  rgba(255, 235, 175, ${(0.18 * lampIntensity) / 100}) ${coneSpread * 0.15}deg,
-                  rgba(255, 248, 220, ${(0.38 * lampIntensity) / 100}) ${coneSpread * 0.5}deg,
-                  rgba(255, 235, 175, ${(0.18 * lampIntensity) / 100}) ${coneSpread * 0.85}deg,
-                  transparent ${coneSpread}deg
-                ),
-                /* 2. Quầng sáng ấm tròn rọi thẳng vào trung tâm bảng */
-                radial-gradient(
-                  ellipse ${coneSpread + 25}% 80% at 50% 18%,
-                  rgba(255, 245, 210, ${(0.42 * lampIntensity) / 100}) 0%,
-                  rgba(245, 210, 130, ${(0.22 * lampIntensity) / 100}) 42%,
-                  rgba(25, 12, 6, 0.48) 78%,
-                  rgba(6, 3, 1, 0.92) 100%
-                )
-              `,
-              mixBlendMode: "screen",
+      <div className="w-full max-w-none sm:max-w-6xl mx-auto h-full flex-1 min-h-0 flex items-center justify-center relative z-10 overflow-hidden p-0 pb-0 sm:pb-2">
+        {/* Bảng điều tra canvas thực tế (tự render nón ánh sáng lọt lòng bên trong bounds) */}
+        <div className="relative w-full h-full flex items-center justify-center">
+          <MainInvestigationCanvas
+            customBgImage={currentBgOption.url}
+            onOpenPhoneSimulator={() => setActiveModal("phone")}
+            onOpenReinvestigation={() => setActiveModal("reinvestigate")}
+            onOpenEpilogue={() => setActiveModal("epilogue")}
+            lightConeConfig={{
+              enabled: lampOn,
+              coneSpread,
+              intensity: lampIntensity,
             }}
-          >
-            {/* Lớp chao đèn phía trên và vignette viền tối 2 bên đáy */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background: `
-                  radial-gradient(
-                    circle at 50% 0%,
-                    rgba(255, 255, 240, ${(0.55 * lampIntensity) / 100}) 0%,
-                    rgba(255, 230, 160, ${(0.25 * lampIntensity) / 100}) 8%,
-                    transparent 24%
-                  ),
-                  linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, transparent 45%)
-                `,
-              }}
-            />
-          </div>
-        )}
+          />
+
+          {/* Khung 3D PBR chỉ hiển thị khi chọn tùy chọn PBR */}
+          {currentBgOption.hasPbrFrame && (
+            <div className="absolute inset-0 pointer-events-none z-20 flex items-center justify-center p-0">
+              <div
+                className="relative w-full h-full max-h-full aspect-[896/1200] overflow-hidden"
+                style={{
+                  WebkitMaskImage: `linear-gradient(black, black), linear-gradient(black, black)`,
+                  WebkitMaskComposite: "xor",
+                  maskComposite: "exclude",
+                }}
+              >
+                <Image
+                  src="/images/backgrounds/pbr_3d_frame.jpg"
+                  alt="Khung gỗ 3D PBR"
+                  fill
+                  priority
+                  className="object-contain pointer-events-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.95)]"
+                  style={{
+                    clipPath: `polygon(
+                      0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%,
+                      14% 12%, 14% 88%, 86% 88%, 86% 12%, 14% 12%
+                    )`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* PHASE UNLOCKED CINEMATIC STORY MODAL */}

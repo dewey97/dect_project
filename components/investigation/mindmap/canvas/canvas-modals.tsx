@@ -134,7 +134,7 @@ export function CanvasModals({
           isOpen={state.isEvidenceGuideOpen}
           onClose={() => state.setIsEvidenceGuideOpen(false)}
           isPhoneSolved={state.phoneLookupSuccess}
-          isReinvestigateUnlocked={state.isReinvestigateUnlocked}
+          isReinvestigateUnlocked={state.effectiveReinvestigateUnlocked}
         />
       )}
 

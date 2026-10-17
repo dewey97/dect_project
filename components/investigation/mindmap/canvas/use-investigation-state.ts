@@ -48,6 +48,14 @@ export function sanitizeSuspectsList(items: SuspectItem[]): SuspectItem[] {
   return Array.from(map.values());
 }
 
+/**
+ * CỜ CẤU HÌNH PHÊ DUYỆT KHÁM XÉT LẠI (USP FEATURE):
+ * - false (MẶC ĐỊNH HIỆN TẠI): Khám xét hiện trường là USP đặc sắc của game, được MỞ SẴN NGAY TỪ ĐẦU cho người chơi.
+ * - true (DỰ PHÒNG TƯƠNG LAI): Yêu cầu vượt qua điều kiện câu hỏi suy luận / checkpoints của Vũ & Tùng mới phê duyệt lệnh.
+ * Giữ nguyên toàn bộ logic điều kiện phê duyệt để khi cần có thể kích hoạt lại bất kỳ lúc nào.
+ */
+export const REQUIRE_REINVESTIGATION_APPROVAL = false;
+
 /** Gom state tiến trình vụ án: suspects, phone, followup, indictment, reinvestigate. */
 export function useInvestigationState(opts?: {
   caseId?: string;
@@ -61,7 +69,9 @@ export function useInvestigationState(opts?: {
   );
 
   const [suspects, setSuspects] = useState<SuspectItem[]>([]);
-  const [isReinvestigateUnlocked, setIsReinvestigateUnlocked] = useState(false);
+  const [isReinvestigateUnlocked, setIsReinvestigateUnlocked] = useState(
+    !REQUIRE_REINVESTIGATION_APPROVAL,
+  );
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] =
     useState(false);
   const [hasOpenedReinvestigation, setHasOpenedReinvestigation] =
@@ -139,6 +149,7 @@ export function useInvestigationState(opts?: {
     );
     setSolvedFollowupQuestions(solvedFollowups);
     if (
+      !REQUIRE_REINVESTIGATION_APPROVAL ||
       isReinvestigateConditionMet(solvedFollowups) ||
       getStorageItem(sKey("reinvestigate_unlocked")) === "true"
     ) {
@@ -306,7 +317,7 @@ export function useInvestigationState(opts?: {
     setNarrativeChoice(null);
     setIsIndictmentSolved(false);
     setSolvedCulprit(null);
-    setIsReinvestigateUnlocked(false);
+    setIsReinvestigateUnlocked(!REQUIRE_REINVESTIGATION_APPROVAL);
     setIsReinvestigateModalOpen(false);
     setHasOpenedReinvestigation(false);
     setIsEpilogueOpen(false);
@@ -341,7 +352,9 @@ export function useInvestigationState(opts?: {
   }, [opts?.onOpenReinvestigation, sKey]);
 
   const effectiveReinvestigateUnlocked =
-    isShowAllPinsPreview || isReinvestigateUnlocked;
+    !REQUIRE_REINVESTIGATION_APPROVAL ||
+    isShowAllPinsPreview ||
+    isReinvestigateUnlocked;
   const effectivePhoneSolved = isShowAllPinsPreview || phoneLookupSuccess;
   const effectiveIndictmentSolved = isShowAllPinsPreview || isIndictmentSolved;
 

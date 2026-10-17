@@ -42,14 +42,14 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     targetPinId: 'c0-pin-victim-phone'
   },
   {
-    id: 'step-evidence',
+    id: 'step-reinvestigate',
     stepNumber: 4,
     totalSteps: 6,
-    title: 'Bổ sung chứng cứ',
+    title: 'Khám xét lại hiện trường',
     description:
-      'Thực hiện nghiệp vụ thu thập thêm chứng cứ:\n• 4.1. Truy vết liên lạc: Tra cứu danh tính chủ thuê bao ẩn danh để triệu tập và mở khóa lời khai mới.\n• 4.2. Khám xét lại hiện trường: Nhằm thu thập thêm chứng cứ khi chuỗi bằng chứng ban đầu chưa thể khép lại vụ án. Yêu cầu xác lập thành công tối thiểu 2 hồ sơ nghi phạm để mở khóa thao tác.',
+      'Tương tác trực tiếp với không gian hiện trường số 14 Đường Bờ Sông để tìm kiếm các manh mối vật chứng vi mô, vết máu và đồ vật bị xáo trộn.',
     targetType: 'pin',
-    targetPinId: 'c0-pin-evidence'
+    targetPinId: 'c0-pin-reinvestigate'
   },
   {
     id: 'step-indictment',

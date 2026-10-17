@@ -9,6 +9,7 @@ import { emitInvestigationEvent } from '@/lib/investigation-events'
 import { isAdminBypassCode } from '@/lib/cases/admin-bypass'
 import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
+import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
 
 function isPhoneMatch(val: string, validKeywords: string[]): boolean {
   if (isAdminBypassCode(val)) return true
@@ -240,20 +241,24 @@ export function PhoneLookupModal({
               </p>
             )}
 
+            {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM */}
+            <CheckpointHintSection
+              checkpointId={cp0?.id || 'cp-000-0'}
+              caseId={caseId}
+            />
+
             {/* ACTION FOOTER */}
             <div className="pt-2 flex items-center justify-between gap-2">
               <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
-                  detectiveAudio.playTypewriterClick()
-                  emitInvestigationEvent('OPEN_HINT', { checkpointId: 'cp-000-0' })
+                  detectiveAudio.playPaperRustle()
+                  onClose()
                 }}
-                className="px-3.5 py-2.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border-2 border-[#a88c6f] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                title="Xem gợi ý phá án cho câu hỏi này"
+                className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
               >
-                <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                <span>GỢI Ý</span>
+                ĐÓNG
               </button>
 
               <button

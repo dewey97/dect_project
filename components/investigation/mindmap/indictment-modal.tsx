@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { setStorageItem } from '@/lib/storage'
 import { emitInvestigationEvent } from '@/lib/investigation-events'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
+import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
 
 interface IndictmentModalProps {
   caseId?: string
@@ -225,20 +226,6 @@ export function IndictmentModal({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
-                  detectiveAudio.playTypewriterClick()
-                  emitInvestigationEvent('OPEN_HINT', { checkpointId: 'cp-000-2b' })
-                }}
-                className="px-2.5 py-1.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] text-[#8c1d1d] hover:text-[#6e1515] border border-[#a88c6f] font-mono text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
-                title="Xem gợi ý phá án cho câu hỏi này"
-              >
-                <Lightbulb className="size-3.5 text-[#8c1d1d]" />
-                <span className="hidden sm:inline">GỢI Ý</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
                   detectiveAudio.playPaperRustle()
                   onClose()
                 }}
@@ -360,6 +347,12 @@ export function IndictmentModal({
                 className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
               />
             </div>
+
+            {/* GỢI Ý CÁO TRẠNG ĐẨY XUỐNG DƯỚI FORM */}
+            <CheckpointHintSection
+              checkpointId="cp-000-2b"
+              caseId={caseId}
+            />
 
             {/* FOOTER / CTA */}
             <div className="pt-3 flex items-center justify-end border-t-2 border-[#2b1f14]/15">

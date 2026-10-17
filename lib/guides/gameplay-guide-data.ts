@@ -52,11 +52,11 @@ export const GAMEPLAY_GUIDE_CONFIG: {
         },
         {
           title: 'Khám xét lại hiện trường',
-          desc: 'Tương tác trực tiếp với hình ảnh 360 độ của hiện trường để thu thập thêm chứng cứ quan trọng.'
+          desc: 'Tương tác trực tiếp với hiện trường vụ án để rà soát và thu thập thêm chứng cứ quan trọng.'
         }
       ],
       requirementTip:
-        'Yêu cầu xác lập thành công tối thiểu 2 hồ sơ nghi phạm để mở khóa thao tác.'
+        'Khám xét hiện trường được mở sẵn cho điều tra viên chủ động rà soát ngay từ đầu.'
     },
     {
       id: 'indictment',
