@@ -205,6 +205,8 @@ export interface Checkpoint {
     optionalMotiveIds?: string[];
     alibiEvidenceIds?: string[];
     optionalAlibiIds?: string[];
+    contradictionEvidenceIds?: string[];
+    optionalContradictionIds?: string[];
     mismatchTypeLabel?: string;
     validMismatchTypes?: string[];
     mismatchTypeOptions?: string[];

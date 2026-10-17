@@ -17,7 +17,7 @@ import {
 interface CheckpointHintSectionProps {
   checkpointId: string;
   caseId?: string;
-  category?: "motive" | "alibi" | "all";
+  category?: "motive" | "alibi" | "contradiction" | "all";
   className?: string;
 }
 
@@ -50,23 +50,25 @@ export function CheckpointHintSection({
         hints: [],
         motiveHints: [],
         alibiHints: [],
+        contradictionHints: [],
         hasCategories: false,
       }
     );
   }, [groupedMap, effectiveCpId]);
 
-  const activeCategory = useMemo<"motive" | "alibi" | "all">(() => {
+  const activeCategory = useMemo<"motive" | "alibi" | "contradiction" | "all">(() => {
     if (!currentGroup.hasCategories) {
       return "all";
     }
-    if (category === "motive" || category === "alibi") return category;
+    if (category === "motive" || category === "alibi" || category === "contradiction") return category;
 
     const rawId = (checkpointId || "").toLowerCase();
     if (rawId.includes("motive") || rawId.includes("dong_co")) return "motive";
     if (rawId.includes("alibi") || rawId.includes("ngoai_pham")) return "alibi";
+    if (rawId.includes("contradiction") || rawId.includes("mau_thuan")) return "contradiction";
 
     const savedCat = getStorageItem("active_suspect_category");
-    if (savedCat === "motive" || savedCat === "alibi") return savedCat;
+    if (savedCat === "motive" || savedCat === "alibi" || savedCat === "contradiction") return savedCat;
 
     return "motive";
   }, [category, checkpointId, currentGroup.hasCategories]);
@@ -103,6 +105,9 @@ export function CheckpointHintSection({
     }
     if (activeCategory === "alibi" && currentGroup.alibiHints.length > 0) {
       return currentGroup.alibiHints;
+    }
+    if (activeCategory === "contradiction" && currentGroup.contradictionHints.length > 0) {
+      return currentGroup.contradictionHints;
     }
     return currentGroup.hints;
   }, [activeCategory, currentGroup]);

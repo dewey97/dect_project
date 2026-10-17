@@ -21,7 +21,7 @@ interface HintModalProps {
   isOpen: boolean;
   onClose: () => void;
   checkpointId?: string;
-  category?: "motive" | "alibi" | "all";
+  category?: "motive" | "alibi" | "contradiction" | "all";
   caseId?: string;
 }
 
@@ -32,6 +32,7 @@ interface CheckpointGroupData {
   hints: string[];
   motiveHints: string[];
   alibiHints: string[];
+  contradictionHints: string[];
   hasCategories: boolean;
 }
 
@@ -156,6 +157,7 @@ export function buildGroupedCheckpointsMap(
           hints: [],
           motiveHints: [],
           alibiHints: [],
+          contradictionHints: [],
           hasCategories: false,
         });
       }
@@ -167,7 +169,7 @@ export function buildGroupedCheckpointsMap(
         entry.dossier = row.dossier;
       }
 
-      // Trích xuất phân nhóm Động cơ & Ngoại phạm
+      // Trích xuất phân nhóm Động cơ, Ngoại phạm & Mâu thuẫn
       const categorized = getCategorizedCheckpointHints(row);
       if (categorized.hasCategories) {
         entry.hasCategories = true;
@@ -176,6 +178,9 @@ export function buildGroupedCheckpointsMap(
         }
         for (const h of categorized.alibi) {
           if (!entry.alibiHints.includes(h)) entry.alibiHints.push(h);
+        }
+        for (const h of categorized.contradiction) {
+          if (!entry.contradictionHints.includes(h)) entry.contradictionHints.push(h);
         }
       }
 

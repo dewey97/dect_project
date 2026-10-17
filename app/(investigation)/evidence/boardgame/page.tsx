@@ -31,9 +31,6 @@ export default function BoardGameCompanionPage() {
   const router = useRouter();
   const { completedCheckpointIds } = useCheckpoints();
 
-  // Gatekeeper: Always require clicking [ TRỐN TÌM ] when coming into the game session!
-  const [hasEnteredSession, setHasEnteredSession] = useState(false);
-
   // Single modal state
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [isJumpscareActive, setIsJumpscareActive] = useState(false);
@@ -59,10 +56,6 @@ export default function BoardGameCompanionPage() {
 
   useEffect(() => {
     setStorageItem("play_experience", "boardgame");
-  }, []);
-
-  const handleEnterGame = () => {
-    setHasEnteredSession(true);
     const isIntroSeen = getStorageItem("intro_seen");
     if (isIntroSeen !== "true") {
       setUnlockedModalData({
@@ -71,7 +64,7 @@ export default function BoardGameCompanionPage() {
         newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
       });
     }
-  };
+  }, []);
 
   const resetFindingsProgress = () => {
     clearInvestigationStorage();
@@ -87,21 +80,6 @@ export default function BoardGameCompanionPage() {
       <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[900px] max-w-full h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(217,160,102,0.13),transparent_75%)] z-0" />
       <div className="noir-scanlines pointer-events-none fixed inset-0 opacity-15 z-0" />
 
-      {/* ENTRY GATE: ALWAYS PRESENTS THE CENTERED [ TRỐN TÌM ] BUTTON BEFORE CONTINUING */}
-      {!hasEnteredSession && (
-        <div className="fixed inset-0 z-50 bg-[#0c0805] text-[#e5d8cb] flex flex-col items-center justify-center p-6 select-none animate-in fade-in duration-300">
-          <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-0" />
-          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[radial-gradient(ellipse_at_center,rgba(217,160,102,0.14),transparent_70%)] z-0" />
-
-          <button
-            onClick={handleEnterGame}
-            className="relative z-10 px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm sm:text-base font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-2xl rounded hover:scale-105 active:scale-95"
-          >
-            [ TRỐN TÌM ]
-          </button>
-        </div>
-      )}
-
       <BoardGameCompanionView
         onOpenEpilogue={() => setActiveModal("epilogue")}
         onOpenPhoneSimulator={() => setActiveModal("phone")}
@@ -112,7 +90,7 @@ export default function BoardGameCompanionPage() {
       <PhaseUnlockedModal
         unlockedModalData={unlockedModalData}
         playExperience="boardgame"
-        autoStartStory={true}
+        autoStartStory={false}
         onClose={() => setUnlockedModalData(null)}
         onSelectPdf={() => {}}
         onSelectEvidence={() => {}}

@@ -41,6 +41,8 @@ export interface ParsedAnswers {
   optionalMotiveIds?: string[];
   alibiEvidenceIds?: string[];
   optionalAlibiIds?: string[];
+  contradictionEvidenceIds?: string[];
+  optionalContradictionIds?: string[];
   clueRules?: Record<string, string[]>;
   availableEvidences?: CheckpointOptionItem[];
   textMatchInputs?: NonNullable<Checkpoint["textMatchConfig"]>["inputs"];
@@ -80,6 +82,17 @@ const ANSWER_KEYS: Record<string, string> = {
   chung_cu_ngoai_pham: "alibi",
   optional_alibi: "optional_alibi",
   tuy_chon_ngoai_pham: "optional_alibi",
+
+  // Mâu thuẫn lời khai & Tùy chọn Mâu thuẫn
+  contradiction: "contradiction",
+  contradictions: "contradiction",
+  mau_thuan: "contradiction",
+  mau_thuan_loi_khai: "contradiction",
+  loi_khai_mau_thuan: "contradiction",
+  loi_noi_doi: "contradiction",
+  chung_cu_mau_thuan: "contradiction",
+  optional_contradiction: "optional_contradiction",
+  tuy_chon_mau_thuan: "optional_contradiction",
 
   // Tùy chọn chung (Optional clues)
   optional: "optional",
@@ -247,7 +260,7 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
     }
   }
 
-  let currentCategory: "none" | "motive" | "alibi" | "indictment_evidence" = "none";
+  let currentCategory: "none" | "motive" | "alibi" | "contradiction" | "indictment_evidence" = "none";
   let isOptional = false;
 
   for (let i = 0; i < lines.length; i++) {
@@ -276,6 +289,22 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
       lower === "[ngoại phạm mâu thuẫn]"
     ) {
       currentCategory = "alibi";
+      isOptional = false;
+      continue;
+    }
+    if (
+      lower === "[mâu thuẫn]" ||
+      lower === "mâu thuẫn:" ||
+      lower === "[mâu thuẫn lời khai]" ||
+      lower === "mâu thuẫn lời khai:" ||
+      lower === "[contradiction]" ||
+      lower === "contradiction:" ||
+      lower === "mâu thuẫn" ||
+      lower === "mâu thuẫn lời khai" ||
+      lower === "lời nói dối" ||
+      lower === "[lời nói dối]"
+    ) {
+      currentCategory = "contradiction";
       isOptional = false;
       continue;
     }
@@ -345,6 +374,12 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
             break;
           case "optional_alibi":
             parsed.optionalAlibiIds = splitCommas(value);
+            break;
+          case "contradiction":
+            parsed.contradictionEvidenceIds = splitCommas(value);
+            break;
+          case "optional_contradiction":
+            parsed.optionalContradictionIds = splitCommas(value);
             break;
           case "optional":
             parsed.optionalEvidenceIds = splitCommas(value);
@@ -421,6 +456,12 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
         } else {
           (parsed.alibiEvidenceIds ??= []).push(resolvedId);
         }
+      } else if (currentCategory === "contradiction") {
+        if (isOptional) {
+          (parsed.optionalContradictionIds ??= []).push(resolvedId);
+        } else {
+          (parsed.contradictionEvidenceIds ??= []).push(resolvedId);
+        }
       } else if (currentCategory === "indictment_evidence") {
         if (isOptional) {
           (parsed.optionalEvidenceIds ??= []).push(resolvedId);
@@ -483,11 +524,12 @@ export interface CategorizedHints {
   all: string[];
   motive: string[];
   alibi: string[];
+  contradiction: string[];
   hasCategories: boolean;
 }
 
 /**
- * Bóc tách gợi ý theo 2 nhóm [ĐỘNG CƠ] và [NGOẠI PHẠM] từ ô `hints` của Sheet.
+ * Bóc tách gợi ý theo các nhóm [ĐỘNG CƠ], [NGOẠI PHẠM], [MÂU THUẪN] từ ô `hints` của Sheet.
  */
 export function getCategorizedCheckpointHints(
   row?: SheetCheckpointRow,
@@ -496,6 +538,7 @@ export function getCategorizedCheckpointHints(
     all: [],
     motive: [],
     alibi: [],
+    contradiction: [],
     hasCategories: false,
   };
 
@@ -505,7 +548,7 @@ export function getCategorizedCheckpointHints(
   if (!rawHints || typeof rawHints !== "string") return result;
 
   const lines = splitLines(rawHints.trim());
-  let currentCategory: "motive" | "alibi" | "none" = "none";
+  let currentCategory: "motive" | "alibi" | "contradiction" | "none" = "none";
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -538,11 +581,30 @@ export function getCategorizedCheckpointHints(
       continue;
     }
 
+    if (
+      lower === "[mâu thuẫn]" ||
+      lower === "mâu thuẫn:" ||
+      lower === "[mâu thuẫn lời khai]" ||
+      lower === "mâu thuẫn lời khai:" ||
+      lower === "[contradiction]" ||
+      lower === "contradiction:" ||
+      lower === "mâu thuẫn" ||
+      lower === "mâu thuẫn lời khai" ||
+      lower === "lời nói dối" ||
+      lower === "[lời nói dối]"
+    ) {
+      currentCategory = "contradiction";
+      result.hasCategories = true;
+      continue;
+    }
+
     result.all.push(trimmed);
     if (currentCategory === "motive") {
       result.motive.push(trimmed);
     } else if (currentCategory === "alibi") {
       result.alibi.push(trimmed);
+    } else if (currentCategory === "contradiction") {
+      result.contradiction.push(trimmed);
     }
   }
 
@@ -588,6 +650,7 @@ export function transformSheetCheckpoint(
     (answers.requiredEvidenceIds && answers.requiredEvidenceIds.length > 0) ||
     (answers.motiveEvidenceIds && answers.motiveEvidenceIds.length > 0) ||
     (answers.alibiEvidenceIds && answers.alibiEvidenceIds.length > 0) ||
+    (answers.contradictionEvidenceIds && answers.contradictionEvidenceIds.length > 0) ||
     (answers.availableEvidences && answers.availableEvidences.length > 0) ||
     (row.suspect_label !== undefined && row.suspect_label !== "") ||
     (row.evidence_step_label !== undefined && row.evidence_step_label !== "");
@@ -617,6 +680,12 @@ export function transformSheetCheckpoint(
           : {}),
         ...(answers.optionalAlibiIds && answers.optionalAlibiIds.length > 0
           ? { optionalAlibiIds: answers.optionalAlibiIds }
+          : {}),
+        ...(answers.contradictionEvidenceIds && answers.contradictionEvidenceIds.length > 0
+          ? { contradictionEvidenceIds: answers.contradictionEvidenceIds }
+          : {}),
+        ...(answers.optionalContradictionIds && answers.optionalContradictionIds.length > 0
+          ? { optionalContradictionIds: answers.optionalContradictionIds }
           : {}),
         ...(answers.availableEvidences && answers.availableEvidences.length > 0
           ? { availableEvidences: answers.availableEvidences }

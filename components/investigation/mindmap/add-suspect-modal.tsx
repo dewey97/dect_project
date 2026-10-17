@@ -16,6 +16,7 @@ interface SuspectItemData {
   clueIds: string[]
   motiveClueIds?: string[]
   alibiClueIds?: string[]
+  contradictionClueIds?: string[]
 }
 
 interface AddSuspectModalProps {
@@ -52,6 +53,7 @@ import {
   isEvidenceMatching,
   checkMotiveValid,
   checkAlibiValid,
+  checkContradictionValid,
   resolveEvidenceCode,
   KNOWN_CASE_PHONES,
 } from '@/lib/cases/case-000-clues'
@@ -59,7 +61,7 @@ import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypa
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
 
-export { findValidCaseCharacter, VALID_CASE_CHARACTERS, checkMotiveValid, checkAlibiValid }
+export { findValidCaseCharacter, VALID_CASE_CHARACTERS, checkMotiveValid, checkAlibiValid, checkContradictionValid }
 
 export function AddSuspectModal({
   caseId = 'case-000',
@@ -74,7 +76,7 @@ export function AddSuspectModal({
   isPhoneSolved = false
 }: AddSuspectModalProps) {
   const [name, setName] = useState(() => editingSuspect?.name || '')
-  const [subTileView, setSubTileView] = useState<'overview' | 'motive' | 'alibi'>('overview')
+  const [subTileView, setSubTileView] = useState<'overview' | 'motive' | 'alibi' | 'contradiction'>('overview')
   const [motiveClueIds, setMotiveClueIds] = useState<string[]>(() => {
     if (editingSuspect?.motiveClueIds) return editingSuspect.motiveClueIds
     return []
@@ -83,12 +85,17 @@ export function AddSuspectModal({
     if (editingSuspect?.alibiClueIds) return editingSuspect.alibiClueIds
     return []
   })
+  const [contradictionClueIds, setContradictionClueIds] = useState<string[]>(() => {
+    if (editingSuspect?.contradictionClueIds) return editingSuspect.contradictionClueIds
+    return []
+  })
   const [errorMsg, setErrorMsg] = useState('')
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null)
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
   const openTimeRef = useRef(0)
   const pendingMotiveRef = useRef<PendingClueInputs>({})
   const pendingAlibiRef = useRef<PendingClueInputs>({})
+  const pendingContradictionRef = useRef<PendingClueInputs>({})
 
   useEffect(() => {
     if (isOpen) {
@@ -150,6 +157,8 @@ export function AddSuspectModal({
           setStorageItem('active_suspect_category', 'motive')
         } else if (subTileView === 'alibi') {
           setStorageItem('active_suspect_category', 'alibi')
+        } else if (subTileView === 'contradiction') {
+          setStorageItem('active_suspect_category', 'contradiction')
         }
       }
     }
@@ -158,17 +167,20 @@ export function AddSuspectModal({
   useEffect(() => {
     if (editingSuspect) {
       setName(editingSuspect.name)
-      if (editingSuspect.motiveClueIds || editingSuspect.alibiClueIds) {
+      if (editingSuspect.motiveClueIds || editingSuspect.alibiClueIds || editingSuspect.contradictionClueIds) {
         setMotiveClueIds(editingSuspect.motiveClueIds || [])
         setAlibiClueIds(editingSuspect.alibiClueIds || [])
+        setContradictionClueIds(editingSuspect.contradictionClueIds || [])
       }
     } else {
       setName('')
       setMotiveClueIds([])
       setAlibiClueIds([])
+      setContradictionClueIds([])
     }
     pendingMotiveRef.current = {}
     pendingAlibiRef.current = {}
+    pendingContradictionRef.current = {}
     setSubTileView('overview')
     setErrorMsg('')
     setEvalModal(null)
@@ -232,6 +244,13 @@ export function AddSuspectModal({
     return checkAlibiValid(liveAlibi, clues, optionalAlibi)
   }
 
+  const validateContradiction = (_charId: string, clues: string[]) => {
+    if (hasAdminBypassInArray(clues)) return true
+    const liveContradiction = matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds || []
+    const optionalContradiction = matchedCheckpoint?.pickerConfig?.optionalContradictionIds || []
+    return checkContradictionValid(liveContradiction, clues, optionalContradiction)
+  }
+
   // XÁC NHẬN MANH MỐI ĐỘNG CƠ (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
   const handleConfirmMotiveClues = () => {
     const pendingIds = extractClueIdsFromPending(pendingMotiveRef.current)
@@ -241,7 +260,7 @@ export function AddSuspectModal({
       pendingMotiveRef.current = {}
     }
 
-    const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
+    const suspectDisplayName = name.trim() || 'Đối tượng điều tra'
     const matched = findValidCaseCharacter(name, sheetCharacters)
     const hasMotiveReqs = (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0
     const isValid = hasMotiveReqs ? validateMotive(matched?.id || '', effectiveClues) : true
@@ -254,7 +273,7 @@ export function AddSuspectModal({
         title: 'THÔNG BÁO',
         heading: '',
         message: 'Bằng chứng chứng minh đối tượng có động cơ chưa chính xác.',
-        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
+        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang thẩm tra',
         suspectName: suspectDisplayName,
         selectedCount: effectiveClues.length,
       })
@@ -263,13 +282,14 @@ export function AddSuspectModal({
 
     detectiveAudio.playStampSound()
     if (matched) {
-      const combinedClues = Array.from(new Set([...effectiveClues, ...alibiClueIds]))
+      const combinedClues = Array.from(new Set([...effectiveClues, ...alibiClueIds, ...contradictionClueIds]))
       onSave({
         id: matched.id,
         name: matched.canonicalName,
         clueIds: combinedClues,
         motiveClueIds: effectiveClues,
-        alibiClueIds
+        alibiClueIds,
+        contradictionClueIds
       })
     }
     setEvalModal({
@@ -277,7 +297,7 @@ export function AddSuspectModal({
       isSuccess: true,
       title: 'THÔNG BÁO',
       heading: '',
-      message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
+      message: 'Bằng chứng lựa chọn chính xác. Căn cứ động cơ đã được ghi nhận',
       suspectName: suspectDisplayName,
       selectedCount: effectiveClues.length,
     })
@@ -293,7 +313,7 @@ export function AddSuspectModal({
       pendingAlibiRef.current = {}
     }
 
-    const suspectDisplayName = name.trim() || 'Đối tượng tình nghi'
+    const suspectDisplayName = name.trim() || 'Đối tượng điều tra'
     const matched = findValidCaseCharacter(name, sheetCharacters)
     const hasAlibiReqs = (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0
     const isValid = hasAlibiReqs ? validateAlibi(matched?.id || '', effectiveClues) : true
@@ -306,7 +326,7 @@ export function AddSuspectModal({
         title: 'THÔNG BÁO',
         heading: '',
         message: 'Bằng chứng chứng minh mâu thuẫn ngoại phạm chưa chính xác.',
-        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang lựa chọn tình nghi',
+        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang thẩm tra',
         suspectName: suspectDisplayName,
         selectedCount: effectiveClues.length,
       })
@@ -315,13 +335,14 @@ export function AddSuspectModal({
 
     detectiveAudio.playStampSound()
     if (matched) {
-      const combinedClues = Array.from(new Set([...motiveClueIds, ...effectiveClues]))
+      const combinedClues = Array.from(new Set([...motiveClueIds, ...effectiveClues, ...contradictionClueIds]))
       onSave({
         id: matched.id,
         name: matched.canonicalName,
         clueIds: combinedClues,
         motiveClueIds,
-        alibiClueIds: effectiveClues
+        alibiClueIds: effectiveClues,
+        contradictionClueIds
       })
     }
     setEvalModal({
@@ -329,7 +350,60 @@ export function AddSuspectModal({
       isSuccess: true,
       title: 'THÔNG BÁO',
       heading: '',
-      message: 'Bằng chứng lựa chọn chính xác. Căn cứ tình nghi đã được ghi nhận',
+      message: 'Bằng chứng lựa chọn chính xác. Căn cứ ngoại phạm đã được ghi nhận',
+      suspectName: suspectDisplayName,
+      selectedCount: effectiveClues.length,
+    })
+    setErrorMsg('')
+  }
+
+  // XÁC NHẬN MANH MỐI MÂU THUẪN LỜI KHAI (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
+  const handleConfirmContradictionClues = () => {
+    const pendingIds = extractClueIdsFromPending(pendingContradictionRef.current)
+    const effectiveClues = Array.from(new Set([...contradictionClueIds, ...pendingIds]))
+    if (pendingIds.length > 0) {
+      setContradictionClueIds(effectiveClues)
+      pendingContradictionRef.current = {}
+    }
+
+    const suspectDisplayName = name.trim() || 'Đối tượng điều tra'
+    const matched = findValidCaseCharacter(name, sheetCharacters)
+    const hasContradictionReqs = (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
+    const isValid = hasContradictionReqs ? validateContradiction(matched?.id || '', effectiveClues) : true
+
+    if (hasContradictionReqs && !isValid) {
+      detectiveAudio.playGlassSound()
+      setEvalModal({
+        isOpen: true,
+        isSuccess: false,
+        title: 'THÔNG BÁO',
+        heading: '',
+        message: 'Bằng chứng chứng minh mâu thuẫn lời khai chưa chính xác.',
+        subMessage: 'Kiểm tra lại bằng chứng hoặc đối tượng đang thẩm tra',
+        suspectName: suspectDisplayName,
+        selectedCount: effectiveClues.length,
+      })
+      return
+    }
+
+    detectiveAudio.playStampSound()
+    if (matched) {
+      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds, ...effectiveClues]))
+      onSave({
+        id: matched.id,
+        name: matched.canonicalName,
+        clueIds: combinedClues,
+        motiveClueIds,
+        alibiClueIds,
+        contradictionClueIds: effectiveClues
+      })
+    }
+    setEvalModal({
+      isOpen: true,
+      isSuccess: true,
+      title: 'THÔNG BÁO',
+      heading: '',
+      message: 'Bằng chứng lựa chọn chính xác. Mâu thuẫn lời khai đã được ghi nhận',
       suspectName: suspectDisplayName,
       selectedCount: effectiveClues.length,
     })
@@ -362,10 +436,14 @@ export function AddSuspectModal({
     const effectiveMotiveClues = Array.from(new Set([...motiveClueIds, ...pendingMotiveIds]))
     const pendingAlibiIds = extractClueIdsFromPending(pendingAlibiRef.current)
     const effectiveAlibiClues = Array.from(new Set([...alibiClueIds, ...pendingAlibiIds]))
+    const pendingContradictionIds = extractClueIdsFromPending(pendingContradictionRef.current)
+    const effectiveContradictionClues = Array.from(new Set([...contradictionClueIds, ...pendingContradictionIds]))
     if (pendingMotiveIds.length > 0) setMotiveClueIds(effectiveMotiveClues)
     if (pendingAlibiIds.length > 0) setAlibiClueIds(effectiveAlibiClues)
+    if (pendingContradictionIds.length > 0) setContradictionClueIds(effectiveContradictionClues)
     pendingMotiveRef.current = {}
     pendingAlibiRef.current = {}
+    pendingContradictionRef.current = {}
 
     const isCore = matchedChar.id === 'vu' || matchedChar.id === 'tung' || matchedChar.id === 'ha'
     const isAdmin000 = currentName === '000' || currentName === '00' || currentName === '0'
@@ -373,13 +451,14 @@ export function AddSuspectModal({
     // If non-core suspect (Bà Lụa, Đạt, Mai...), save directly as related person of interest
     if (!isCore && !isAdmin000) {
       detectiveAudio.playStampSound()
-      const combinedClues = Array.from(new Set([...effectiveMotiveClues, ...effectiveAlibiClues]))
+      const combinedClues = Array.from(new Set([...effectiveMotiveClues, ...effectiveAlibiClues, ...effectiveContradictionClues]))
       onSave({
         id: matchedChar.id,
         name: matchedChar.canonicalName,
         clueIds: combinedClues,
         motiveClueIds: effectiveMotiveClues,
-        alibiClueIds: effectiveAlibiClues
+        alibiClueIds: effectiveAlibiClues,
+        contradictionClueIds: effectiveContradictionClues
       })
       // Chỉ kích hoạt onSubmitConclusion nếu nhân vật này thực sự có checkpoint/câu hỏi điều tra tương ứng trên CMS
       if (onSubmitConclusion && (suspectCpId || matchedCheckpoint)) {
@@ -392,9 +471,11 @@ export function AddSuspectModal({
     const charId = (isAdmin000 ? 'vu' : matchedChar.id) as 'vu' | 'tung' | 'ha'
     const isMotiveOk = isAdmin000 || validateMotive(charId, effectiveMotiveClues)
     const isAlibiOk = isAdmin000 || validateAlibi(charId, effectiveAlibiClues)
+    const hasContradictionReqs = (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
+    const isContradictionOk = isAdmin000 || !hasContradictionReqs || validateContradiction(charId, effectiveContradictionClues)
 
-    if (!isMotiveOk || !isAlibiOk) {
-      setErrorMsg('Bằng chứng động cơ hoặc mâu thuẫn ngoại phạm chưa chính xác. Vui lòng rà soát lại đúng cả 2 mục trước khi tiến hành điều tra!')
+    if (!isMotiveOk || !isAlibiOk || !isContradictionOk) {
+      setErrorMsg('Bằng chứng động cơ, ngoại phạm hoặc mâu thuẫn lời khai chưa chính xác. Vui lòng rà soát lại trước khi hoàn tất thẩm tra!')
       detectiveAudio.playGlassSound()
       return
     }
@@ -402,7 +483,7 @@ export function AddSuspectModal({
     const suspectId = charId
     const suspectName = matchedChar.canonicalName
 
-    const combinedClues = Array.from(new Set([...effectiveMotiveClues, ...effectiveAlibiClues]))
+    const combinedClues = Array.from(new Set([...effectiveMotiveClues, ...effectiveAlibiClues, ...effectiveContradictionClues]))
 
     detectiveAudio.playStampSound()
     onSave({
@@ -410,7 +491,8 @@ export function AddSuspectModal({
       name: suspectName,
       clueIds: combinedClues,
       motiveClueIds: effectiveMotiveClues,
-      alibiClueIds: effectiveAlibiClues
+      alibiClueIds: effectiveAlibiClues,
+      contradictionClueIds: effectiveContradictionClues
     })
     if (onSubmitConclusion) {
       onSubmitConclusion(charId)
@@ -427,19 +509,28 @@ export function AddSuspectModal({
   // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
   const isMotiveValid = matchedChar && isCore ? validateMotive(matchedChar.id, motiveClueIds) : false
   const isAlibiValid = matchedChar && isCore ? validateAlibi(matchedChar.id, alibiClueIds) : false
+  const hasContradictionReqs = (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
+  const isContradictionValid = matchedChar && isCore
+    ? hasContradictionReqs
+      ? validateContradiction(matchedChar.id, contradictionClueIds)
+      : contradictionClueIds.length > 0
+    : false
   const isAdmin000 = name.trim() === '000' || name.trim() === '00' || name.trim() === '0'
-  // For non-core suspects, having a valid recognized name is enough to save/investigate them
-  const isBothValid = isValidName && (!isCore || (isMotiveValid && isAlibiValid) || isAdmin000)
+  const isCoreReqsMet = hasContradictionReqs
+    ? isMotiveValid && isAlibiValid && isContradictionValid
+    : isMotiveValid && isAlibiValid
+  const isBothValid = isValidName && (!isCore || isCoreReqsMet || isAdmin000)
 
   // KIỂM TRA XEM CÓ THAY ĐỔI CHƯA LƯU HAY KHÔNG (CHỈ XÉT KHI TÊN ĐÚNG)
   const hasUnsavedChanges = () => {
     if (!isValidName) return false
     if (!editingSuspect) {
-      return name.trim().length > 0 || motiveClueIds.length > 0 || alibiClueIds.length > 0
+      return name.trim().length > 0 || motiveClueIds.length > 0 || alibiClueIds.length > 0 || contradictionClueIds.length > 0
     }
     const initialName = (editingSuspect.name || '').trim()
     const initialMotive = editingSuspect.motiveClueIds || []
     const initialAlibi = editingSuspect.alibiClueIds || []
+    const initialContradiction = editingSuspect.contradictionClueIds || []
     const nameChanged = name.trim() !== initialName
     const motiveChanged =
       motiveClueIds.length !== initialMotive.length ||
@@ -447,7 +538,10 @@ export function AddSuspectModal({
     const alibiChanged =
       alibiClueIds.length !== initialAlibi.length ||
       alibiClueIds.some((id) => !initialAlibi.includes(id))
-    return nameChanged || motiveChanged || alibiChanged
+    const contradictionChanged =
+      contradictionClueIds.length !== initialContradiction.length ||
+      contradictionClueIds.some((id) => !initialContradiction.includes(id))
+    return nameChanged || motiveChanged || alibiChanged || contradictionChanged
   }
 
   // XỬ LÝ KHI ẤN DẤU X ĐÓNG TRỰC TIẾP
@@ -457,20 +551,21 @@ export function AddSuspectModal({
     }
     detectiveAudio.playPaperRustle()
 
-    // Nếu đã trả lời đúng 1 trong 2 căn cứ chính (động cơ hoặc ngoại phạm), tự động lưu không hỏi
-    if (isMotiveValid || isAlibiValid) {
+    // Nếu đã trả lời đúng 1 trong các căn cứ, tự động lưu không hỏi
+    if (isMotiveValid || isAlibiValid || isContradictionValid) {
       const currentName = name.trim() || editingSuspect?.name?.trim() || ''
       const matched = findValidCaseCharacter(currentName)
       if (matched && matched.id !== 'khang') {
         const suspectId = matched.id
         const suspectName = matched.canonicalName
-        const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+        const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds, ...contradictionClueIds]))
         onSave({
           id: suspectId,
           name: suspectName,
           clueIds: combinedClues,
           motiveClueIds,
           alibiClueIds,
+          contradictionClueIds,
         })
       }
       onClose()
@@ -498,7 +593,7 @@ export function AddSuspectModal({
     if (matched && matched.id !== 'khang') {
       const suspectId = matched.id
       const suspectName = matched.canonicalName
-      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds]))
+      const combinedClues = Array.from(new Set([...motiveClueIds, ...alibiClueIds, ...contradictionClueIds]))
       detectiveAudio.playStampSound()
       onSave({
         id: suspectId,
@@ -506,6 +601,7 @@ export function AddSuspectModal({
         clueIds: combinedClues,
         motiveClueIds,
         alibiClueIds,
+        contradictionClueIds,
       })
     } else {
       detectiveAudio.playPaperRustle()
@@ -550,10 +646,12 @@ export function AddSuspectModal({
           <div className="space-y-1.5 pr-8">
             <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e]">
               {subTileView === 'motive'
-                ? 'Xác Định Động Cơ Gây Án'
+                ? 'Động Cơ Gây Án'
                 : subTileView === 'alibi'
-                ? 'Xác Định Ngoại Phạm Bất Hợp Lý'
-                : 'Xác Định Đối Tượng Tình Nghi'}
+                ? 'Xác Minh Ngoại Phạm'
+                : subTileView === 'contradiction'
+                ? 'Mâu Thuẫn Lời Khai'
+                : 'THẨM TRA ĐỐI TƯỢNG'}
             </h3>
 
             {/* TÊN ĐỐI TƯỢNG ĐẨY XUỐNG DÒNG RIÊNG */}
@@ -585,14 +683,14 @@ export function AddSuspectModal({
 
           {/* FORM BODY */}
           <form onSubmit={(e) => e.preventDefault()} className="space-y-4 pt-2">
-            {/* 2-TILE OVERVIEW VIEW */}
+            {/* 3-TILE OVERVIEW VIEW */}
             {subTileView === 'overview' && (
               <>
                 <div className="space-y-3 pt-1">
                   <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                    CĂN CỨ TÌNH NGHI:
+                    HẠNG MỤC THẨM TRA:
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 items-stretch">
                     {/* Tile 1: ĐỘNG CƠ GÂY ÁN */}
                     <button
                       type="button"
@@ -601,7 +699,7 @@ export function AddSuspectModal({
                         if (isMotiveValid) return
                         const currentName = name.trim() || editingSuspect?.name?.trim() || ''
                         if (!currentName) {
-                          setErrorMsg('Vui lòng nhập tên đối tượng tình nghi trước!')
+                          setErrorMsg('Vui lòng nhập tên đối tượng trước!')
                           detectiveAudio.playGlassSound()
                           return
                         }
@@ -613,7 +711,7 @@ export function AddSuspectModal({
                         setSubTileView('motive')
                       }}
                       className={cn(
-                        'w-full text-left p-3.5 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]',
+                        'w-full text-left p-3 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]',
                         isMotiveValid
                           ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95'
                           : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer'
@@ -629,7 +727,7 @@ export function AddSuspectModal({
                       </div>
                     </button>
 
-                    {/* Tile 2: NGOẠI PHẠM BẤT HỢP LÝ */}
+                    {/* Tile 2: XÁC MINH NGOẠI PHẠM */}
                     <button
                       type="button"
                       disabled={isAlibiValid}
@@ -637,7 +735,7 @@ export function AddSuspectModal({
                         if (isAlibiValid) return
                         const currentName = name.trim() || editingSuspect?.name?.trim() || ''
                         if (!currentName) {
-                          setErrorMsg('Vui lòng nhập tên đối tượng tình nghi trước!')
+                          setErrorMsg('Vui lòng nhập tên đối tượng trước!')
                           detectiveAudio.playGlassSound()
                           return
                         }
@@ -649,7 +747,7 @@ export function AddSuspectModal({
                         setSubTileView('alibi')
                       }}
                       className={cn(
-                        'w-full text-left p-3.5 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]',
+                        'w-full text-left p-3 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]',
                         isAlibiValid
                           ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95'
                           : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer'
@@ -657,9 +755,45 @@ export function AddSuspectModal({
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
-                          Ngoại phạm bất hợp lý
+                          Xác minh ngoại phạm
                         </span>
                         {isAlibiValid && (
+                          <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Tile 3: MÂU THUẪN LỜI KHAI */}
+                    <button
+                      type="button"
+                      disabled={isContradictionValid}
+                      onClick={() => {
+                        if (isContradictionValid) return
+                        const currentName = name.trim() || editingSuspect?.name?.trim() || ''
+                        if (!currentName) {
+                          setErrorMsg('Vui lòng nhập tên đối tượng trước!')
+                          detectiveAudio.playGlassSound()
+                          return
+                        }
+                        if (!name.trim() && editingSuspect?.name) {
+                          setName(editingSuspect.name)
+                        }
+                        detectiveAudio.playTypewriterClick()
+                        setErrorMsg('')
+                        setSubTileView('contradiction')
+                      }}
+                      className={cn(
+                        'w-full text-left p-3 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]',
+                        isContradictionValid
+                          ? 'bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95'
+                          : 'bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer'
+                      )}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
+                          Mâu thuẫn lời khai
+                        </span>
+                        {isContradictionValid && (
                           <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
                         )}
                       </div>
@@ -776,6 +910,64 @@ export function AddSuspectModal({
                     <button
                       type="button"
                       onClick={handleConfirmAlibiClues}
+                      className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0"
+                    >
+                      <Check className="size-3.5 text-[#d9a066] shrink-0" />
+                      <span>XÁC NHẬN</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sub-View for Tile 3: CONTRADICTION / MÂU THUẪN LỜI KHAI */}
+            {subTileView === 'contradiction' && (
+              <div className="space-y-3 pt-1">
+                <ClueCodePicker
+                  selectedClueIds={contradictionClueIds}
+                  customPhoneEvidences={[]}
+                  onAddClueId={(id) => {
+                    setContradictionClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+                    if (errorMsg) setErrorMsg('')
+                  }}
+                  onRemoveClueId={(id) => {
+                    setContradictionClueIds((prev) => prev.filter((item) => item !== id))
+                  }}
+                  onAddCustomPhone={() => {}}
+                  onPendingChange={(pending) => {
+                    pendingContradictionRef.current = pending
+                  }}
+                  label="BẰNG CHỨNG MÂU THUẪN ĐÃ NHẬP"
+                  placeholder="Nhập mã chứng cứ..."
+                  emptyStateText="Chưa có bằng chứng mâu thuẫn nào được nhập."
+                />
+
+                {/* GỢI Ý MÂU THUẪN ĐẨY XUỐNG DƯỚI MÀN NHẬP MÃ */}
+                {Boolean(suspectCpId) && (
+                  <CheckpointHintSection
+                    checkpointId={suspectCpId}
+                    caseId={caseId}
+                    category="contradiction"
+                  />
+                )}
+
+                <div className="pt-3 border-t border-[#d4c5b0]/60 flex items-center justify-between gap-2 select-none">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      detectiveAudio.playPaperRustle()
+                      setSubTileView('overview')
+                    }}
+                    className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95"
+                  >
+                    <ArrowLeft className="size-3.5 text-[#4a3520] shrink-0" />
+                    <span>QUAY LẠI</span>
+                  </button>
+
+                  <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleConfirmContradictionClues}
                       className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0"
                     >
                       <Check className="size-3.5 text-[#d9a066] shrink-0" />

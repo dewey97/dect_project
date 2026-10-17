@@ -366,6 +366,7 @@ export function MainInvestigationCanvas({
             clueIds: saved?.clueIds || [],
             motiveClueIds: saved?.motiveClueIds,
             alibiClueIds: saved?.alibiClueIds,
+            contradictionClueIds: saved?.contradictionClueIds,
           });
         }
       });

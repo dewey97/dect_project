@@ -165,6 +165,34 @@ export function checkAlibiValid(
 }
 
 /**
+ * Validates contradiction evidence selection strictly against target codes from Google Sheets Live CMS (answers_id).
+ * Zero static hardcoded fallback - 100% Google Sheets CMS driven.
+ */
+export function checkContradictionValid(
+  targetCodes: string[],
+  selectedIds: string[],
+  optionalCodes: string[] = []
+): boolean {
+  if (!targetCodes || targetCodes.length === 0 || !selectedIds || selectedIds.length === 0) return false
+  if (hasAdminBypassInArray(selectedIds)) return true
+
+  // 1. Phải thỏa mãn đầy đủ các manh mối bắt buộc
+  const allRequiredSatisfied = targetCodes.every((target) =>
+    selectedIds.some((c) => isEvidenceMatching(c, [target]))
+  )
+  if (!allRequiredSatisfied) return false
+
+  // 2. Chặn việc chọn thêm manh mối sai: Mọi manh mối đã chọn BẮT BUỘC phải nằm trong danh sách đáp án hợp lệ
+  const allowedPool = [...targetCodes, ...optionalCodes]
+  const allSelectedAreValid = selectedIds.every((selected) =>
+    allowedPool.some((target) => isEvidenceMatching(selected, [target]))
+  )
+  if (!allSelectedAreValid) return false
+
+  return true
+}
+
+/**
  * Resolves user text input into a structured evidence object.
  * Retains exact document numbers/codes without rewriting or mutating them.
  */

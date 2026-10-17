@@ -97,9 +97,9 @@ export function PhaseUnlockedModal({
                   <div className="py-16 flex flex-col items-center justify-center w-full my-auto">
                     <button
                       onClick={handleStartStory}
-                      className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
+                      className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-base sm:text-lg font-bold tracking-[0.25em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
                     >
-                      [ TRỐN TÌM ]
+                      TRỐN TÌM
                     </button>
                   </div>
                 ) : (
@@ -149,9 +149,9 @@ export function PhaseUnlockedModal({
                     <div className="py-12 flex flex-col items-center justify-center w-full my-auto">
                       <button
                         onClick={handleStartStory}
-                        className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-sm font-bold tracking-[0.3em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
+                        className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-base sm:text-lg font-bold tracking-[0.25em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
                       >
-                        [ TRỐN TÌM ]
+                        TRỐN TÌM
                       </button>
                     </div>
                   ) : (
