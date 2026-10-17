@@ -7,6 +7,8 @@ export const INVESTIGATION_EVENTS = {
   OPEN_REINVESTIGATE: "open-reinvestigate-modal",
   OPEN_GUIDE: "open-gameplay-guide-modal",
   OPEN_WALKTHROUGH: "open-interactive-walkthrough",
+  RESET_BOARD_VIEW: "reset-board-view",
+  BOARD_ZOOM_IN: "board-zoom-in",
 } as const;
 
 export type InvestigationEventName =

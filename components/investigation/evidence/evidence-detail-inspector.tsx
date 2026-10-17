@@ -50,13 +50,19 @@ export function EvidenceDetailInspector({ selectedView }: EvidenceDetailInspecto
             {/* Background Texture / Subtle Grid */}
             <div className="absolute inset-0 bg-[radial-gradient(#3d2c1e_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
 
-            {/* Photo Showcase Frame - Maximum Viewport */}
-            <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-lg">
+            {/* Photo Showcase Frame - Neat framed photo without over-enlarging */}
+            <div className="relative max-w-sm sm:max-w-md xl:max-w-lg max-h-[75%] p-2.5 bg-[#1b140e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-200">
               <img
                 src={photoUrl}
                 alt={selectedView.data.title}
-                className="max-w-full max-h-full object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.9)] select-none"
+                className="max-w-full max-h-[55vh] object-contain rounded-lg border border-[#3e2e20] shadow-inner select-none"
               />
+              {displayCode && (
+                <div className="mt-2.5 text-center flex items-center gap-1.5 font-mono text-[0.68rem] font-bold text-[#d9a066] tracking-wider uppercase">
+                  <span>📸</span>
+                  <span>VẬT CHỨNG [{displayCode}]</span>
+                </div>
+              )}
             </div>
           </div>
         )}

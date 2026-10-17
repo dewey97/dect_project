@@ -93,8 +93,9 @@ function WebEvidencePageContent() {
     data: CASE_000_PDFS[0],
   });
 
-  // Category filter: 'all' | 'pdf' | 'evidence'
-  const [filterTab, setFilterTab] = useState<"all" | "pdf" | "evidence">("all");
+  // Category filter: 'pdf' | 'evidence' (tách riêng hồ sơ và vật chứng)
+  const [filterTab, setFilterTab] = useState<"pdf" | "evidence">("pdf");
+  const [mobileTab, setMobileTab] = useState<"board" | "dossier">("board");
 
   // Nạp dữ liệu Live CMS từ tab 'evidences' trên Google Sheets theo caseId
   const { data: sheetEvidences, loading: isLoadingSheet } = usePhoneData<any>(
@@ -108,7 +109,7 @@ function WebEvidencePageContent() {
   // Zone 3 (Trình duyệt chi tiết PDF / Vật chứng bên phải)
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
   const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false); // Phóng to trình đọc PDF toàn nửa phải
-  const [boardWidthPercent, setBoardWidthPercent] = useState<number>(48);
+  const [boardWidthPercent, setBoardWidthPercent] = useState<number>(60);
   const [isDraggingSplit, setIsDraggingSplit] = useState<boolean>(false);
 
   // Phase filter: 'all' | 0 | 1 | 2 | 3
@@ -289,9 +290,13 @@ function WebEvidencePageContent() {
     const savedRatio = getStorageItem("web_board_split_ratio");
     if (savedRatio) {
       const parsed = parseFloat(savedRatio);
-      if (!isNaN(parsed) && parsed >= 30 && parsed <= 70) {
+      if (!isNaN(parsed) && parsed >= 45 && parsed <= 75) {
         setBoardWidthPercent(parsed);
+      } else {
+        setBoardWidthPercent(60);
       }
+    } else {
+      setBoardWidthPercent(60);
     }
     const savedCollapsed = getStorageItem("web_dossier_collapsed");
     if (savedCollapsed === "true") {
@@ -307,9 +312,9 @@ function WebEvidencePageContent() {
       const windowWidth = window.innerWidth;
       if (windowWidth < 1024) return; // Chỉ áp dụng trên desktop
 
-      // Giới hạn tỉ lệ Board từ 30% đến 65% để chừa không gian cho Zone 2 & 3
+      // Giới hạn tỉ lệ Board từ 45% đến 75% để chừa không gian cho Zone 2 & 3
       const newRatio = (e.clientX / windowWidth) * 100;
-      const clampedRatio = Math.min(Math.max(newRatio, 30), 65);
+      const clampedRatio = Math.min(Math.max(newRatio, 45), 75);
       setBoardWidthPercent(clampedRatio);
     };
 
@@ -382,53 +387,109 @@ function WebEvidencePageContent() {
 
 
 
-  // Tự động chọn tài liệu đầu tiên khi khay hồ sơ nạp xong
+  const pdfItems = useMemo(() => {
+    return (effectiveItems as CombinedItem[])
+      .filter((item: CombinedItem) => {
+        if (!isPhaseUnlocked(item.phase)) return false;
+        if (item.type !== "pdf") return false;
+        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter) return false;
+        return true;
+      })
+      .sort((a: CombinedItem, b: CombinedItem) => a.order - b.order);
+  }, [effectiveItems, isPhaseUnlocked, selectedPhaseFilter]);
+
+  const evidenceItems = useMemo(() => {
+    return (effectiveItems as CombinedItem[])
+      .filter((item: CombinedItem) => {
+        if (!isPhaseUnlocked(item.phase)) return false;
+        if (item.type !== "evidence") return false;
+        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter) return false;
+        return true;
+      })
+      .sort((a: CombinedItem, b: CombinedItem) => a.order - b.order);
+  }, [effectiveItems, isPhaseUnlocked, selectedPhaseFilter]);
+
+  // Tự động chọn tài liệu/vật chứng đầu tiên khi khay hồ sơ nạp xong hoặc chuyển tab
   useEffect(() => {
-    if (effectiveItems.length > 0) {
+    const currentList = filterTab === "evidence" ? evidenceItems : pdfItems;
+    if (currentList.length > 0) {
       setSelectedView((prev) => {
         const currentId = prev?.data?.id;
-        const exists = effectiveItems.some(
+        const exists = currentList.some(
           (item) => item.data.id === currentId,
         );
         if (!exists) {
-          const first = effectiveItems[0];
+          const first = currentList[0];
           return { type: first.type, data: first.data as any };
         }
         return prev;
       });
     }
-  }, [effectiveItems]);
-
-  const combinedItems: CombinedItem[] = useMemo(() => {
-    return (effectiveItems as CombinedItem[])
-      .filter((item: CombinedItem) => {
-        if (!isPhaseUnlocked(item.phase)) return false;
-        if (filterTab === "evidence" && item.type !== "evidence") return false;
-        if (filterTab === "pdf" && item.type !== "pdf") return false;
-        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter) return false;
-        return true;
-      })
-      .sort((a: CombinedItem, b: CombinedItem) => a.order - b.order);
-  }, [effectiveItems, isPhaseUnlocked, filterTab, selectedPhaseFilter]);
+  }, [filterTab, pdfItems, evidenceItems]);
 
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex items-center justify-center p-2 sm:p-3 box-border min-h-0 min-w-0 select-none"
+      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start p-1.5 sm:p-2 lg:p-3 box-border min-h-0 min-w-0 select-none"
     >
-      <div className="w-full max-w-[1920px] h-full flex flex-col lg:flex-row items-stretch justify-center overflow-hidden min-h-0 min-w-0 relative gap-2 sm:gap-2.5">
+      {/* MOBILE VIEW SWITCHER (CHỈ HIỂN THỊ TRÊN MÀN HÌNH DI ĐỘNG < LG) */}
+      <div className="flex lg:hidden shrink-0 items-center justify-between p-1 bg-[#16120e] border border-[#3d2c1e] rounded-xl shadow-md w-full mb-1 z-30">
+        <button
+          type="button"
+          onClick={() => {
+            detectiveAudio.playPaperRustle();
+            setMobileTab("board");
+          }}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer",
+            mobileTab === "board"
+              ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
+              : "text-[#ad9885] hover:text-[#e5d8cb]"
+          )}
+        >
+          <Layers className="size-3.5" />
+          <span>BẢNG ĐIỀU TRA</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            detectiveAudio.playPaperRustle();
+            setMobileTab("dossier");
+          }}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer relative",
+            mobileTab === "dossier"
+              ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
+              : "text-[#ad9885] hover:text-[#e5d8cb]"
+          )}
+        >
+          <FolderOpen className="size-3.5" />
+          <span>HỒ SƠ & VẬT CHỨNG</span>
+          <span
+            className={cn(
+              "px-1.5 py-0.2 rounded-full text-[0.55rem] font-bold font-mono ml-0.5",
+              mobileTab === "dossier"
+                ? "bg-[#1a0f07]/20 text-[#1a0f07]"
+                : "bg-[#2a1d12] text-[#d9a066] border border-[#d9a066]/30"
+            )}
+          >
+            {pdfItems.length + evidenceItems.length}
+          </span>
+        </button>
+      </div>
+
+      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-center overflow-hidden min-w-0 relative gap-2 sm:gap-2.5">
         {/* VÙNG 1: BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
         <div
           style={{
-            width: isDossierCollapsed
+            ["--board-split-width" as any]: isDossierCollapsed
               ? "100%"
-              : typeof window !== "undefined" && window.innerWidth >= 1024
-                ? `${boardWidthPercent}%`
-                : "100%",
+              : `${boardWidthPercent}%`,
           }}
           className={cn(
-            "h-full shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col min-h-0 relative transition-[width] duration-150 ease-out",
+            "w-full lg:w-[var(--board-split-width)] h-full shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col min-h-0 relative transition-[width] duration-150 ease-out",
             isDraggingSplit && "transition-none",
+            mobileTab === "board" ? "flex" : "hidden lg:flex"
           )}
         >
           {/* TOP RIGHT TOOLBAR: TOGGLE HỒ SƠ FOCUS / SPLIT */}
@@ -491,16 +552,20 @@ function WebEvidencePageContent() {
         {/* VÙNG 2: KHAY PREVIEW THẺ HỒ SƠ & VẬT CHỨNG (MIDDLE PREVIEW CARDS STRIP) */}
         <div
           style={{
-            display: isDossierCollapsed ? "none" : undefined,
+            display:
+              typeof window !== "undefined" && window.innerWidth >= 1024 && isDossierCollapsed
+                ? "none"
+                : undefined,
           }}
           className={cn(
-            "w-full lg:w-[260px] xl:w-[280px] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-0",
-            isDossierCollapsed && "hidden",
-            isViewerExpanded && "hidden xl:flex", // Ẩn vùng giữa trên màn nhỏ nếu đang phóng to viewer
+            "w-full lg:w-[210px] xl:w-[230px] shrink-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-lg overflow-hidden flex flex-col h-full min-h-0",
+            isDossierCollapsed && "lg:hidden",
+            isViewerExpanded && "hidden xl:flex",
+            mobileTab === "dossier" ? "flex" : "hidden lg:flex"
           )}
         >
-          {/* HEADER VÙNG 2: TABS & FILTER */}
-          <div className="shrink-0 border-b border-[#3d2c1e] px-3 py-2 bg-[#241a12] flex items-center justify-between gap-1.5">
+          {/* HEADER VÙNG 2: TABS PHÂN TÁCH HỒ SƠ VS VẬT CHỨNG */}
+          <div className="shrink-0 border-b border-[#3d2c1e] px-2.5 py-2 bg-[#241a12] flex items-center justify-between gap-1.5">
             <div className="flex items-center gap-1.5 overflow-hidden">
               <Layers className="size-3.5 text-[#d9a066] shrink-0" />
               <h2 className="font-mono text-[0.68rem] font-bold uppercase tracking-wider text-[#e6d3c1] truncate">
@@ -509,37 +574,30 @@ function WebEvidencePageContent() {
             </div>
             <div className="flex items-center gap-1 font-mono text-[0.58rem]">
               <button
-                onClick={() => setFilterTab("all")}
-                className={cn(
-                  "px-1.5 py-0.5 font-bold transition-all cursor-pointer rounded-xs",
-                  filterTab === "all"
-                    ? "bg-[#d9a066] text-[#1a0f07]"
-                    : "text-[#ad9885] hover:text-[#e6d3c1]",
-                )}
-              >
-                ALL
-              </button>
-              <button
+                type="button"
                 onClick={() => setFilterTab("pdf")}
                 className={cn(
-                  "px-1.5 py-0.5 font-bold transition-all cursor-pointer rounded-xs",
+                  "px-2 py-0.5 font-bold transition-all cursor-pointer rounded-xs flex items-center gap-1",
                   filterTab === "pdf"
                     ? "bg-[#d9a066] text-[#1a0f07]"
-                    : "text-[#ad9885] hover:text-[#e6d3c1]",
+                    : "text-[#ad9885] hover:text-[#e6d3c1]"
                 )}
               >
-                HỒ SƠ
+                <span>HỒ SƠ</span>
+                <span className="opacity-75">({pdfItems.length})</span>
               </button>
               <button
+                type="button"
                 onClick={() => setFilterTab("evidence")}
                 className={cn(
-                  "px-1.5 py-0.5 font-bold transition-all cursor-pointer rounded-xs",
+                  "px-2 py-0.5 font-bold transition-all cursor-pointer rounded-xs flex items-center gap-1",
                   filterTab === "evidence"
                     ? "bg-[#d9a066] text-[#1a0f07]"
-                    : "text-[#ad9885] hover:text-[#e6d3c1]",
+                    : "text-[#ad9885] hover:text-[#e6d3c1]"
                 )}
               >
-                VẬT CHỨNG
+                <span>VẬT CHỨNG</span>
+                <span className="opacity-75">({evidenceItems.length})</span>
               </button>
             </div>
           </div>
@@ -576,53 +634,78 @@ function WebEvidencePageContent() {
             })}
           </div>
 
-          {/* DANH SÁCH PREVIEW THẺ CARD NHỎ GỌN (THUMBNAIL CARDS) */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2 min-h-0 bg-[#120d09]">
-            {combinedItems.length === 0 ? (
-              <div className="p-4 text-center text-xs font-mono text-[#8c735d]">
-                Không có tài liệu nào.
-              </div>
-            ) : (
-              combinedItems.map((item) => {
-                const isSelected =
-                  selectedView.type === item.type &&
-                  selectedView.data.id === item.data.id;
-                const isPdf = item.type === "pdf";
-                const pdfDoc = isPdf ? (item.data as PDFDocument) : null;
-                const evItem = !isPdf ? (item.data as PhysicalEvidence) : null;
+          {/* DANH SÁCH PREVIEW THẺ CARD */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 min-h-0 bg-[#120d09]">
+            {filterTab === "evidence" ? (
+              /* NẾU LÀ VẬT CHỨNG: HIỂN THỊ DẠNG LƯỚI GRID GỌN GÀNG (2 CỘT) */
+              evidenceItems.length === 0 ? (
+                <div className="p-4 text-center text-xs font-mono text-[#8c735d]">
+                  Không có vật chứng nào.
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {evidenceItems.map((item) => {
+                    const isSelected =
+                      selectedView.type === item.type &&
+                      selectedView.data.id === item.data.id;
+                    const evItem = item.data as PhysicalEvidence;
 
-                return (
-                  <button
-                    key={`${item.type}-${item.data.id}`}
-                    onClick={() =>
-                      isPdf
-                        ? handleSelectPdf(pdfDoc!)
-                        : handleSelectEvidence(evItem!)
-                    }
-                    className={cn(
-                      "w-full text-left rounded-lg border transition-all cursor-pointer p-2 flex flex-col gap-1.5 relative overflow-hidden group shadow-sm",
-                      isSelected
-                        ? "bg-[#2a1d12] border-[#d9a066] shadow-[0_0_12px_rgba(217,160,102,0.2)]"
-                        : "bg-[#18120d] hover:bg-[#201710] border-[#382618] hover:border-[#523824]",
-                    )}
-                  >
-                    {/* NẾU LÀ ẢNH VẬT CHỨNG: CHỈ RENDER PREVIEW TRỰC TIẾP (KHÔNG BADGE, KHÔNG TEXT DÀI DÒNG) */}
-                    {!isPdf ? (
-                      <div className="relative w-full aspect-[4/3] bg-[#0c0805] border border-[#3e2b1c] rounded-md overflow-hidden group-hover:border-[#d9a066]/70 transition-colors">
-                        <img
-                          src={normalizeImageUrl(evItem?.thumbnail) || "/photo_scene_overview.jpg"}
-                          alt="Vật chứng hiện trường"
-                          className="w-full h-full object-cover"
-                        />
-                        {evItem?.evidenceId && (
-                          <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/75 backdrop-blur-xs border border-white/10 text-[0.55rem] font-mono font-bold text-[#e5d8cb]">
-                            {evItem.evidenceId}
-                          </div>
+                    return (
+                      <button
+                        key={`evidence-${item.data.id}`}
+                        onClick={() => handleSelectEvidence(evItem)}
+                        className={cn(
+                          "w-full text-left rounded-lg border transition-all cursor-pointer p-1.5 flex flex-col gap-1 relative overflow-hidden group shadow-sm",
+                          isSelected
+                            ? "bg-[#2a1d12] border-[#d9a066] shadow-[0_0_12px_rgba(217,160,102,0.25)] ring-1 ring-[#d9a066]"
+                            : "bg-[#18120d] hover:bg-[#201710] border-[#382618] hover:border-[#523824]",
                         )}
-                      </div>
-                    ) : (
-                      /* NẾU LÀ HỒ SƠ PDF: THAY ICON PDF BẰNG Ô MÃ CODE RÕ RÀNG + TIÊU ĐỀ */
-                      <div className="flex items-center gap-2 py-0.5">
+                      >
+                        <div className="relative w-full aspect-[4/3] bg-[#0c0805] border border-[#3e2b1c] rounded overflow-hidden">
+                          <img
+                            src={normalizeImageUrl(evItem?.thumbnail) || "/photo_scene_overview.jpg"}
+                            alt="Vật chứng"
+                            className="w-full h-full object-cover select-none"
+                          />
+                          {evItem?.evidenceId && (
+                            <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-xs border border-white/10 text-[0.52rem] font-mono font-bold text-[#e5d8cb]">
+                              {evItem.evidenceId}
+                            </div>
+                          )}
+                        </div>
+                        {isSelected && (
+                          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#d9a066]" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )
+            ) : (
+              /* NẾU LÀ HỒ SƠ PDF: DANH SÁCH COMPACT ROW */
+              pdfItems.length === 0 ? (
+                <div className="p-4 text-center text-xs font-mono text-[#8c735d]">
+                  Không có hồ sơ nào.
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {pdfItems.map((item) => {
+                    const isSelected =
+                      selectedView.type === item.type &&
+                      selectedView.data.id === item.data.id;
+                    const pdfDoc = item.data as PDFDocument;
+
+                    return (
+                      <button
+                        key={`pdf-${item.data.id}`}
+                        onClick={() => handleSelectPdf(pdfDoc)}
+                        className={cn(
+                          "w-full text-left rounded-lg border transition-all cursor-pointer p-2 flex items-center gap-2 relative overflow-hidden group shadow-sm",
+                          isSelected
+                            ? "bg-[#2a1d12] border-[#d9a066] shadow-[0_0_12px_rgba(217,160,102,0.2)]"
+                            : "bg-[#18120d] hover:bg-[#201710] border-[#382618] hover:border-[#523824]",
+                        )}
+                      >
                         <div
                           className={cn(
                             "px-2 py-1 shrink-0 rounded font-mono text-[0.6rem] font-bold tracking-wider text-center border min-w-[46px]",
@@ -646,16 +729,15 @@ function WebEvidencePageContent() {
                             {item.data.title}
                           </p>
                         </div>
-                      </div>
-                    )}
 
-                    {/* ACTIVE INDICATOR STRIP */}
-                    {isSelected && (
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
-                    )}
-                  </button>
-                );
-              })
+                        {isSelected && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )
             )}
           </div>
         </div>
@@ -666,8 +748,8 @@ function WebEvidencePageContent() {
             display: isDossierCollapsed ? "none" : undefined,
           }}
           className={cn(
-            "flex-1 min-w-0 h-full flex flex-col min-h-0 overflow-hidden relative",
-            isDossierCollapsed && "hidden",
+            "hidden lg:flex flex-1 min-w-0 h-full flex-col min-h-0 overflow-hidden relative",
+            isDossierCollapsed && "lg:hidden",
           )}
         >
           {/* HEADER TOOLBAR VÙNG 3 */}

@@ -586,11 +586,13 @@ export function MainInvestigationCanvas({
       } else if (
         id === "c0-pin-reinvestigate" ||
         id === "reinvestigate-prop" ||
+        (pin?.photoUrl && pin.photoUrl.includes("crime_scene")) ||
         (pin?.photoUrl && pin.photoUrl.includes("reinvestigation_crime_scene_prop"))
       ) {
         if (state.effectiveReinvestigateUnlocked) {
           detectiveAudio.playGlassSound();
-          state.handleOpenReinvestigation();
+          if (onOpenReinvestigation) onOpenReinvestigation();
+          else state.handleOpenReinvestigation();
         } else {
           detectiveAudio.playGlassSound();
         }
@@ -712,25 +714,27 @@ export function MainInvestigationCanvas({
       }`}
     >
       {/* 1. Header Toolbar & Floating Node Toolbar */}
-      <CanvasToolbar
-        layout={layout}
-        state={state}
-        isAudioMuted={isAudioMuted}
-        onToggleAudio={() => {
-          const next = detectiveAudio.toggleMute();
-          setIsAudioMuted(next);
-        }}
-        selectedPin={selectedPin}
-        displayPins={displayPins}
-        onOpenCreatePinModal={() => {
-          setEditingCustomPin(null);
-          setIsCreatePinModalOpen(true);
-        }}
-        onEditSelectedPin={(pin) => {
-          setEditingCustomPin(pin);
-          setIsCreatePinModalOpen(true);
-        }}
-      />
+      {!state.isReinvestigateModalOpen && (
+        <CanvasToolbar
+          layout={layout}
+          state={state}
+          isAudioMuted={isAudioMuted}
+          onToggleAudio={() => {
+            const next = detectiveAudio.toggleMute();
+            setIsAudioMuted(next);
+          }}
+          selectedPin={selectedPin}
+          displayPins={displayPins}
+          onOpenCreatePinModal={() => {
+            setEditingCustomPin(null);
+            setIsCreatePinModalOpen(true);
+          }}
+          onEditSelectedPin={(pin) => {
+            setEditingCustomPin(pin);
+            setIsCreatePinModalOpen(true);
+          }}
+        />
+      )}
 
       {/* 2. Interactive Pinboard Canvas */}
       <HeroInteractive

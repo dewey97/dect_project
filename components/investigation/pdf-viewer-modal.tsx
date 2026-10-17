@@ -2,6 +2,7 @@
 
 import { X, FileText, ImageIcon, ShieldCheck } from 'lucide-react'
 import type { SelectedView } from '@/components/investigation/evidence/evidence-types'
+import { normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
 
 interface PDFViewerModalProps {
   pdfUrl?: string | null
@@ -16,7 +17,8 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose }:
 
   const isEvidence = selectedView?.type === 'evidence'
   const activeTitle = title || (selectedView ? selectedView.data.title : 'Tài liệu')
-  const activePdfUrl = pdfUrl || (selectedView?.type === 'pdf' ? selectedView.data.url : null)
+  const rawPdfUrl = pdfUrl || (selectedView?.type === 'pdf' ? selectedView.data.url : null)
+  const normalizedPdfUrl = rawPdfUrl ? normalizeDrivePdfUrl(rawPdfUrl) : null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-2 sm:p-4">
@@ -48,49 +50,25 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose }:
         {/* Modal Body */}
         <div className="flex-1 w-full h-full bg-[#120d09] relative overflow-hidden flex flex-col">
           {isEvidence && selectedView ? (
-            <div className="flex-1 p-4 sm:p-6 overflow-y-auto custom-scrollbar space-y-5">
-              <div className="relative w-full aspect-video bg-[#0d0906] border-2 border-[#3d2c1e] rounded-xl overflow-hidden shadow-2xl flex items-center justify-center group">
+            <div className="flex-1 p-3 sm:p-6 overflow-y-auto custom-scrollbar flex flex-col items-center justify-center bg-[#0d0906]">
+              <div className="relative max-w-sm sm:max-w-lg max-h-[75vh] p-2 bg-[#1b140e] border-2 border-[#3d2c1e] rounded-xl shadow-2xl flex flex-col items-center justify-center">
                 <img
-                  src={selectedView.data.thumbnail}
-                  alt={selectedView.data.title}
-                  className="w-full h-full object-contain p-2"
+                  src={normalizeImageUrl(selectedView.data.thumbnail) || "/photo_scene_overview.jpg"}
+                  alt={selectedView.data.title || "Vật chứng"}
+                  className="max-w-full max-h-[60vh] object-contain rounded-lg border border-[#3e2e20] select-none"
                 />
-                <div className="absolute top-3 left-3 bg-[#1e1610]/90 backdrop-blur-md px-3 py-1 border border-[#4a3625] text-amber-200 font-mono text-[0.65rem] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md">
-                  <ShieldCheck className="size-3.5 text-[#d9a066]" />
-                  <span>MÃ NIÊM PHONG: {selectedView.data.evidenceId}</span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-[#1b140e] border border-[#3e2e20] rounded-xl space-y-3 font-mono text-xs shadow-inner">
-                <div className="grid grid-cols-2 gap-3 pb-3 border-b border-[#3d2c1e] text-[0.7rem]">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[#ad9885] uppercase tracking-wider font-bold">Mốc thời gian:</span>
-                    <span className="text-[#f4e8d8] font-bold">{selectedView.data.timestamp || '24/07/2016'}</span>
-                  </div>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[#ad9885] uppercase tracking-wider font-bold">Người thu thập:</span>
-                    <span className="text-[#d9a066] font-bold">{selectedView.data.recoveredBy || 'ĐIỀU TRA VIÊN'}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-2">
-                    <FileText className="size-4 text-[#d9a066]" />
-                    <span className="font-mono text-xs font-bold text-[#d9a066] uppercase tracking-wider">
-                      BIÊN BẢN PHÂN TÍCH PHÁP Y:
+                {selectedView.data.evidenceId && (
+                  <div className="mt-2 text-center">
+                    <span className="font-mono text-xs font-bold text-[#d9a066] tracking-wider uppercase">
+                      📸 VẬT CHỨNG [{selectedView.data.evidenceId}]
                     </span>
                   </div>
-                  <div className="p-4 bg-[#221a13] border border-[#443324] rounded-xl font-mono text-xs leading-relaxed text-amber-100/90 shadow-inner">
-                    <p className="font-bold italic text-amber-200/90">
-                      "{selectedView.data.preview}"
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
-          ) : activePdfUrl ? (
+          ) : normalizedPdfUrl ? (
             <iframe
-              src={`${activePdfUrl}#toolbar=0&navpanes=0`}
+              src={normalizedPdfUrl.includes('drive.google.com') ? normalizedPdfUrl : `${normalizedPdfUrl}#toolbar=0&navpanes=0`}
               className="w-full h-full border-0"
               title={activeTitle}
             />

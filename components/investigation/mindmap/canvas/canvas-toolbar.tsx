@@ -146,7 +146,11 @@ export function CanvasToolbar({
 
       {/* Floating Node Toolbar: Active Node Controls (Rotate, Scale, Edit Detail Modal) */}
       <AnimatePresence>
-        {layout.isEditMode && selectedPin && (
+        {layout.isEditMode &&
+          selectedPin &&
+          selectedPin.id !== "c0-pin-reinvestigate" &&
+          selectedPin.id !== "c0-pin-victim-phone" &&
+          !selectedPin.id.includes("reinvestigate") && (
           <motion.div
             data-board-ui="true"
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
