@@ -113,11 +113,12 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
 
 ---
 
-## 🧊 8. Quy Tắc Đóng Băng & Lưu Trữ Phân Hệ 3D (3D Vault Freeze & Inactivity Rule)
+## 🧊 8. Quy Tắc Phân Định Phân Hệ 3D & Mở Khóa 360 Panorama (3D Vault Freeze & Active 360 Policy)
 
-- **Trạng thái đóng băng toàn diện**: Toàn bộ hệ thống 3D Three.js WebGL (bao gồm hiện trường 3D `crime-scene-3d`, tủ hồ sơ 3D `3d-cabinet`, `file_cabinet_3d`, trình xem ảnh 360 `scene-360-viewer` và các model `.glb`) đã được cách ly, vô hiệu hóa và gom vào kho lưu trữ an toàn `components/investigation/archive_3d_vault/`.
-- **Cấm tự ý kích hoạt hoặc can thiệp**: Agent tuyệt đối **KHÔNG ĐƯỢC PHÉP** tự ý import, render, chỉnh sửa, mở lại hoặc nhúng bất kỳ thành phần 3D nào ra giao diện người dùng.
-- **Điều kiện kích hoạt duy nhất**: Phân hệ này **CHỈ ĐƯỢC PHÉP MỞ LẠI HOẶC CHẠM VÀO KHI VÀ CHỈ KHI NGƯỜI DÙNG (USER) TRỰC TIẾP RA LỆNH NHẮC LẠI**.
+- **Phân hệ 3D tiếp tục đóng băng trong `archive_3d_vault/`**: Các thành phần dựng hình học 3D Three.js nặng (tủ hồ sơ 3D `3d-cabinet`, `file_cabinet_3d`, `crime-scene-3d` và các file model `.glb`) tiếp tục bị cách ly và đóng băng an toàn trong `components/investigation/archive_3d_vault/`. Tuyệt đối CẤM tự ý import hoặc render các component này trừ khi User trực tiếp yêu cầu.
+- **Ngoại lệ mở khóa chính thức — Trình xem ảnh 360 Panorama (`Scene360Viewer`)**:
+  - Component `components/investigation/scene-360-viewer.tsx` (sử dụng Three.js ánh xạ hình cầu Equirectangular Sphere chiếu ảnh `PANORAMA.png` / `crime_scene_360.jpg`) **ĐÃ ĐƯỢC MỞ KHÓA HOẠT ĐỘNG** phục vụ chế độ Khám xét lại hiện trường tại `ReinvestigationModal`.
+  - Đây là giải pháp chiếu ảnh toàn cảnh nhẹ, không phải mô hình dựng 3D polygon. Mọi hiệu chỉnh liên quan đến hotspot 360, camera yaw/pitch được phép thực hiện trên component này.
 
 ---
 
@@ -184,6 +185,18 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
     ```
   - Khi một route bất ngờ bị 404 dù file `page.tsx` và cấu trúc thư mục vẫn tồn tại đầy đủ, điều đầu tiên cần kiểm tra là danh sách các câu lệnh `import` xem có type/interface nào bị import nhầm dưới dạng value hay không.
 
+---
 
+## ⚖️ 13. Quy Chuẩn Thẩm Tra Nghi Phạm 3 Lớp & Chặn Chọn Manh Mối Rác (3-Tier Interrogation & Valid Clue Pool Rule)
 
-
+- **Mô hình Thẩm tra 3 lớp độc lập (`AddSuspectModal`)**:
+  - Giao diện thẩm tra đối tượng tình nghi phân chia thành 3 thẻ (Tiles) tương tác độc lập:
+    1. **Động cơ phạm tội (Motive)**: Cần các chứng cứ chứng minh lý do đối tượng có hiềm khích/lợi ích khi nạn nhân chết.
+    2. **Xác minh ngoại phạm (Alibi)**: Bóc tách mâu thuẫn giữa khung giờ đối tượng khai báo với lịch trình thực tế.
+    3. **Mâu thuẫn lời khai (Contradiction)**: Bắt thóp những điểm nói dối trắng trợn trong biên bản lấy lời khai (doc `14`, `08`, `12`...).
+  - Checkpoint CMS quản lý đáp án qua các nhóm key: `dong_co`/`tuy_chon_dong_co`, `ngoai_pham`/`tuy_chon_ngoai_pham`, `mau_thuan` (`contradiction`)/`tuy_chon_mau_thuan`, và phân loại gợi ý đa cấp bằng tiêu đề block `[động cơ]`, `[ngoại phạm]`, `[mâu thuẫn]`.
+- **Nguyên tắc Chặn Chọn Manh Mối Rác (`validateEvidenceSelection`)**:
+  - Khi người chơi chọn bộ chứng cứ để giải đố, hệ thống áp dụng hàm thẩm tra hai chiều `validateEvidenceSelection`:
+    1. Thỏa mãn đầy đủ tất cả manh mối bắt buộc (`targetCodes`).
+    2. **Tuyệt đối không chọn dư mã sai**: Mọi manh mối đã chọn BẮT BUỘC phải thuộc tập hợp hợp lệ `[...targetCodes, ...optionalCodes]`.
+  - Ngăn chặn hoàn toàn hành vi spam chọn tất cả thẻ vật chứng để vượt qua câu hỏi.

@@ -9,6 +9,8 @@
 ```
 d:\code_world\dect_project/
 ├── app/                            # Next.js 16 App Router
+│   ├── (admin)/                    # Quản trị nghiệp vụ nội bộ
+│   │   └── studio/                 # Studio quản lý vụ án & tinh chỉnh kịch bản
 │   ├── (investigation)/            # Không gian điều tra & Bàn phá án
 │   │   ├── board-stage/            # Thử nghiệm stage corkboard khổ dọc & bố trí ghim án
 │   │   ├── evidence/               # Danh sách & Trình duyệt hồ sơ vật chứng
@@ -18,13 +20,17 @@ d:\code_world\dect_project/
 │   │   └── cabinet-demo/           # Demo ngăn kéo / tủ hồ sơ vật lý
 │   ├── activate/                   # Cổng nhập mã kích hoạt vụ án
 │   ├── auth/                       # Xử lý xác thực OAuth / Supabase Callback
-│   ├── cases/                      # Danh sách hồ sơ vụ án
 │   ├── login/                      # Đăng nhập điều tra viên / Quản trị viên
+│   ├── test-ai/                    # Giao diện sandbox kiểm thử AI chấm điểm câu trả lời
 │   ├── api/                        # Next.js Serverless Route Handlers
+│   │   ├── admin/                  # API quản trị và kiểm tra quyền admin
 │   │   ├── audio-proxy/            # Proxy stream audio Google Drive (bypass CORS & CSP sandbox)
 │   │   ├── image-proxy/            # Proxy tải ảnh/GIF Google Drive (in-memory caching 0ms)
 │   │   ├── phone/                  # API trích xuất dữ liệu điện thoại tang vật
-│   │   └── verify-finding/         # API xác thực lập luận & nghiệm thu manh mối
+│   │   ├── reinvestigation/        # API nạp & lưu tọa độ điểm khám xét lại hiện trường
+│   │   ├── test-scan-answer/       # API AI Gemini phân tích & chấm câu trả lời người chơi
+│   │   ├── verify-finding/         # API xác thực lập luận & nghiệm thu manh mối
+│   │   └── waitlist/               # API tiếp nhận đăng ký waitlist trải nghiệm vụ án
 │   ├── layout.tsx                  # Root Layout & Theme Providers
 │   └── page.tsx                    # Trang chủ & Story Hook
 ├── components/                     # React UI Components

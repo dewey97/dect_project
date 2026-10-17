@@ -51,19 +51,19 @@ Kiến trúc Module Điện Thoại được thiết kế theo nguyên tắc **D
 | [`lib/hooks/use-phone-engine.ts`](file:///d:/code_world/dect_project/lib/hooks/use-phone-engine.ts) | Controller Hook: passcode, navigation stack, clue pinning | ✅ Đã hoàn thành |
 | [`lib/hooks/use-phone-data.ts`](file:///d:/code_world/dect_project/lib/hooks/use-phone-data.ts) | Hook nạp dữ liệu động từ Google Sheets / API theo tab & caseId | ✅ Sẵn sàng |
 | [`components/investigation/iphone/iphone-home-screen.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/iphone-home-screen.tsx) | Màn hình Home, đã kích hoạt `appTarget: "photos"` | ✅ Đã sửa |
-| [`components/investigation/iphone/iphone-frame.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/iphone-frame.tsx) | Khung máy iPhone, thanh điều hướng nhanh và các App view | ⏳ Đang đợi dọn dẹp UI |
+| [`components/investigation/iphone/iphone-frame.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/iphone-frame.tsx) | Khung máy iPhone, thanh điều hướng nhanh và các App view | ✅ Đã tối ưu & tinh gọn UI |
+| [`components/investigation/iphone/apps/maps-app.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/apps/maps-app.tsx) | Ứng dụng Maps (Bản đồ số, tra cứu vị trí nghi phạm & hiện trường) | ✅ Đã hoàn thành |
+| [`components/investigation/iphone/apps/vector-map-canvas.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/apps/vector-map-canvas.tsx) | Canvas kết xuất vector bản đồ và các chốt điểm điều tra | ✅ Đã hoàn thành |
 
 ---
 
-## 📋 4. Hạng Mục Cần Clean Up Giao Diện Hiện Tại (UI Debt & Polish Checklist)
-
-Theo phản hồi từ người dùng, trước khi gắn thêm tính năng mới, cần rà soát và clean lại UI của màn hình hiện tại:
+## 📋 4. Hạng Mục Tối Ưu Giao Diện Đã Hoàn Tất (UI Polish Milestones)
 
 1. **Khung máy & Tỷ lệ hiển thị (Phone Frame & Viewport)**:
-   - Đảm bảo khung máy hiển thị vừa vặn trên cả màn hình nhỏ (laptop 13-14 inch và mobile) mà không bị che khuất thanh điều hướng.
+   - Khung máy hiển thị vừa vặn trên cả màn hình nhỏ (laptop 13-14 inch và mobile) mà không bị che khuất thanh điều hướng.
    - Bỏ các viền thừa hoặc padding gây chật chội.
 2. **Thanh Header / Quick Actions**:
    - Tối giản nút `Về Home` và nút `Đóng X` để giao diện nhìn thanh thoát, đúng chất thiết bị thật.
-3. **Các Màn Hình App Chưa Đồng Nhất**:
-   - Rà soát giao diện Messages, Photos, Phone, Notes để đảm bảo phong cách iOS đồng bộ, chữ rõ ràng, không bị vỡ layout hoặc tràn chữ.
-   - Thao tác cuộn mượt mà (smooth scrolling) và không bị giật lag.
+3. **Các Màn Hình App Đồng Nhất**:
+   - Giao diện Messages, Photos, Phone, Notes, Maps đồng bộ phong cách iOS, chữ rõ ràng, không bị vỡ layout hoặc tràn chữ.
+   - Thao tác cuộn mượt mà với thanh cuộn mỏng `ios-scrollbar`.

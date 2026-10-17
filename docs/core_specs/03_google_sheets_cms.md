@@ -307,8 +307,8 @@ flowchart LR
 | 4 | `title` | 🟢 `⚡` | Tiêu đề câu hỏi / thử thách. |
 | 5 | `question` | 🟢 `⚡` | Lời dẫn yêu cầu điều tra chi tiết. |
 | 6 | `type` | 🔴 `🔑` | `evidence_picker` (chọn vật chứng + người), `text_match_3` (điền 3 ô), `mcq` (trắc nghiệm), `text` (nhập tự do). |
-| 7 | `answers` | 🟢 `⚡` | **Đáp án hợp nhất**: Dùng cú pháp khóa/giá trị tối giản trực tiếp (Alt+Enter xuống dòng). Luôn sử dụng **mã số chứng cứ (evidence code)** hoặc số điện thoại, tuyệt đối không nhập văn bản mô tả tiếng Việt dài dòng.<br>• *3 SĐT (`text_match_3`)*: Viết từng dòng `<SĐT>: <Tên>`, ví dụ `0988.200.991: Vũ, Lê Quang Vũ`.<br>• *Thẩm tra nghi phạm (Động cơ & Ngoại phạm)*:<br>  `dong_co: 13, 0988.200.991`<br>  `tuy_chon_dong_co: 0984.112.568, 53`<br>  `ngoai_pham: 10, 42`<br>  `tuy_chon_ngoai_pham: 6, 8`<br>• *Trắc nghiệm / Text / Thời gian*: `dap_an: 21:15` hoặc `phuong_an: A, B, C`.<br>• *Bắt buộc vật chứng*: `bat_buoc: 52, 50, 51, 53`. |
-| 8 | `hints` | 🟢 `⚡` | **Gợi ý đa cấp**: Mỗi dòng Alt+Enter là 1 cấp độ gợi ý (Cấp 1 ➔ Cấp 2 ➔ Đáp án gợi mở). Hỗ trợ tách biệt gợi ý động cơ & ngoại phạm bằng tiền tố `dong_co: Gợi ý...` / `ngoai_pham: Gợi ý...`. |
+| 7 | `answers` | 🟢 `⚡` | **Đáp án hợp nhất**: Dùng cú pháp khóa/giá trị tối giản trực tiếp (Alt+Enter xuống dòng). Luôn sử dụng **mã số chứng cứ (evidence code)** hoặc số điện thoại, tuyệt đối không nhập văn bản mô tả tiếng Việt dài dòng.<br>• *3 SĐT (`text_match_3`)*: Viết từng dòng `<SĐT>: <Tên>`, ví dụ `0988.200.991: Vũ, Lê Quang Vũ`.<br>• *Thẩm tra nghi phạm (Động cơ, Ngoại phạm & Mâu thuẫn lời khai)*:<br>  `dong_co: 13, 0988.200.991`<br>  `tuy_chon_dong_co: 0984.112.568, 53`<br>  `ngoai_pham: 10, 42`<br>  `tuy_chon_ngoai_pham: 6, 8`<br>  `mau_thuan: 14, p4`<br>  `tuy_chon_mau_thuan: p5`<br>• *Trắc nghiệm / Text / Thời gian*: `dap_an: 21:15` hoặc `phuong_an: A, B, C`.<br>• *Bắt buộc vật chứng*: `bat_buoc: 52, 50, 51, 53`. |
+| 8 | `hints` | 🟢 `⚡` | **Gợi ý đa cấp**: Mỗi dòng Alt+Enter là 1 cấp độ gợi ý (Cấp 1 ➔ Cấp 2 ➔ Đáp án gợi mở). Hỗ trợ tách biệt gợi ý từng nhóm bằng tiêu đề block `[động cơ]`, `[ngoại phạm]`, `[mâu thuẫn]` (hoặc tiền tố `dong_co: ...`, `ngoai_pham: ...`, `mau_thuan: ...`). |
 
 > 📌 **Ghi chú & Quy chuẩn Cột `answers` (Evidence Code Standard)**:
 > - **Chỉ dùng Mã số / Mã định danh (Evidence Codes & SĐT)**: Cột `answers` chỉ chứa mã số vật chứng (`13`, `10`, `42`, `52`...) hoặc mã file cuộc gọi (`voice_0984.112.568`, `0988.200.991`). **Tuyệt đối KHÔNG** nhập tên tiếng Việt văn xuôi (như `Sổ ghi nợ`, `Tin nhắn đe dọa`) vào các trường chứng cứ vì UI so khớp trực tiếp bằng ID chứng cứ.
@@ -317,6 +317,8 @@ flowchart LR
 >   - `tuy_chon_dong_co`: Các mã chứng cứ bổ sung/tùy chọn cho động cơ (chọn thêm không bị phạt/vẫn hợp lệ).
 >   - `ngoai_pham`: Các mã chứng cứ bắt buộc chứng minh mâu thuẫn ngoại phạm.
 >   - `tuy_chon_ngoai_pham`: Các mã chứng cứ bổ sung/tùy chọn cho ngoại phạm.
+>   - `mau_thuan` / `contradiction` / `mau_thuan_loi_khai`: Các mã chứng cứ bắt buộc vạch trần mâu thuẫn lời khai.
+>   - `tuy_chon_mau_thuan` / `optional_contradiction`: Các mã chứng cứ bổ sung/tùy chọn cho mâu thuẫn lời khai.
 >   - `bat_buoc`: Danh sách mã chứng cứ bắt buộc phải chọn để giải quyết checkpoint.
 >   - `dap_an`: Giá trị đáp án dạng chuỗi (thời gian, con số, phương án).
 >   - `nghi_pham`: Tên nghi phạm mục tiêu của checkpoint (ví dụ `Trần Thị Hà`).

@@ -117,10 +117,13 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 ---
 
 * 🧩 **CÂU HỎI 2A (Thẩm tra Lê Quang Vũ):**
-  - **Hình thức trả lời (2 bước & câu dẫn định hướng):**
+  - **Hình thức trả lời (Giao diện Thẩm vấn 3 lớp — AddSuspectModal):**
     - **Bước 1 (Nhập tên nghi vấn):** `Lê Quang Vũ` (hoặc `Vũ`).
-    - **Câu dẫn định hướng:** *"Dựa trên 2 tiêu chí điều tra là Động cơ và Bằng chứng ngoại phạm không rõ ràng"*
-    - **Bước 2 (Chọn tài liệu chứng minh):** `Sổ tay ghi nợ của Khang` (`05`) + `SMS đòi nợ của Khang` (`dev-00`) + `Ảnh chân dung Lê Quang Vũ` (`p6`) + `Lời khai bà Lụa` (`11`) + `Ảnh Screenshot App đặt xe` (`p10`).
+    - **Bước 2 (Chất vấn 3 lớp bằng chứng):**
+      - 🎯 *Tile 1 — Động cơ phạm tội:* `Sổ tay ghi nợ 300M của Khang` (`05`), `Ảnh chân dung Vũ` (`p6`).
+      - ⏱️ *Tile 2 — Xác minh ngoại phạm:* `Screenshot App đặt xe lúc 19:30` (`p10`), `Lời khai bà Lụa` (`11`).
+      - ⚡ *Tile 3 — Mâu thuẫn lời khai:* `SMS đòi nợ Lệch Pha` (`dev-00`).
+    - **Quy tắc nghiệm thu:** Áp dụng `validateEvidenceSelection`, bắt buộc thỏa mãn manh mối cốt lõi và không chọn dư mã sai ngoài pool hợp lệ.
 
 ---
 
@@ -144,10 +147,13 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 ---
 
 * 🧩 **CÂU HỎI 2B (Thẩm tra Nguyễn Thanh Tùng):**
-  - **Hình thức trả lời (2 bước & câu dẫn định hướng):**
+  - **Hình thức trả lời (Giao diện Thẩm vấn 3 lớp — AddSuspectModal):**
     - **Bước 1 (Nhập tên nghi phạm hiện trường):** `Nguyễn Thanh Tùng` (hoặc `Tùng`).
-    - **Câu dẫn định hướng:** *"Dựa trên mâu thuẫn giữa lời khai chối bỏ với dấu vết hiện trường và động cơ bi kịch 1996"*
-    - **Bước 2 (Chọn 4 tài liệu & vật chứng chứng minh):** `Lời khai Tùng lần 1` (`14`) + `Dấu vân tay trên khung bức ảnh vỡ` (`p4`) + `Mảnh báo cũ xé vụn` (`p5`) + `Ảnh kỷ niệm 1996` (`p4`).
+    - **Bước 2 (Chất vấn 3 lớp bằng chứng):**
+      - 🎯 *Tile 1 — Động cơ phạm tội:* `Mảnh báo cũ xé vụn` (`p5`), `Ảnh kỷ niệm 1996` (`p4`).
+      - ⏱️ *Tile 2 — Xác minh ngoại phạm:* `Cuống vé xe buýt` (`cuong_ve_xe_tung` / `14`).
+      - ⚡ *Tile 3 — Mâu thuẫn lời khai:* `Lời khai Tùng lần 1` (`14`), `Dấu vân tay trên khung bức ảnh vỡ` (`p4`).
+    - **Quy tắc nghiệm thu:** Bắt buộc nhập đủ chứng cứ mâu thuẫn then chốt để mở khóa Thẻ tự thú.
 
 ---
 
