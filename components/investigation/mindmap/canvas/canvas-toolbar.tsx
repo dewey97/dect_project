@@ -12,10 +12,12 @@ import {
   Pencil,
   Volume2,
   VolumeX,
+  BookOpen,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
+import { cn } from "@/lib/utils";
 import type { useBoardLayout } from "./use-board-layout";
 import type { useInvestigationState } from "./use-investigation-state";
 
@@ -28,6 +30,8 @@ export interface CanvasToolbarProps {
   displayPins: PinPoint[];
   onOpenCreatePinModal: () => void;
   onEditSelectedPin: (pin: PinPoint) => void;
+  hideTitleBadgeOnMobile?: boolean;
+  isBoardGame?: boolean;
 }
 
 export function CanvasToolbar({
@@ -39,15 +43,22 @@ export function CanvasToolbar({
   displayPins,
   onOpenCreatePinModal,
   onEditSelectedPin,
+  hideTitleBadgeOnMobile = false,
+  isBoardGame = false,
 }: CanvasToolbarProps) {
   return (
     <>
       {/* Top Left Header Bar: Status Indicator, Audio Toggle, Admin Layout Controls */}
       <div
-        className="absolute left-4 z-20 flex items-center gap-2 pointer-events-none"
-        style={{ top: "max(12px, env(safe-area-inset-top, 12px))" }}
+        className="absolute left-2.5 sm:left-4 z-20 flex items-center gap-1.5 sm:gap-2 pointer-events-none"
+        style={{ top: "max(10px, env(safe-area-inset-top, 10px))" }}
       >
-        <div className="flex items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto">
+        <div
+          className={cn(
+            "items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto",
+            hideTitleBadgeOnMobile ? "hidden lg:flex" : "flex"
+          )}
+        >
           <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
         </div>
@@ -66,6 +77,21 @@ export function CanvasToolbar({
             <Volume2 className="size-4 text-amber-400" />
           )}
         </button>
+
+        {isBoardGame && (
+          <button
+            type="button"
+            onClick={() => {
+              detectiveAudio.playPaperRustle();
+              state.setIsGameplayGuideOpen(true);
+            }}
+            className="p-1.5 bg-[#1b140e]/85 hover:bg-[#342417] backdrop-blur-md border border-[#593c26]/60 text-[#d9a066] hover:text-[#fef5ec] transition-colors cursor-pointer rounded-lg shadow-lg pointer-events-auto flex items-center justify-center"
+            title="Sổ tay hướng dẫn gameplay"
+            aria-label="Sổ tay hướng dẫn gameplay"
+          >
+            <BookOpen className="size-4 text-amber-400" />
+          </button>
+        )}
 
         {layout.isAdmin && (
           <div
@@ -146,11 +172,7 @@ export function CanvasToolbar({
 
       {/* Floating Node Toolbar: Active Node Controls (Rotate, Scale, Edit Detail Modal) */}
       <AnimatePresence>
-        {layout.isEditMode &&
-          selectedPin &&
-          selectedPin.id !== "c0-pin-reinvestigate" &&
-          selectedPin.id !== "c0-pin-victim-phone" &&
-          !selectedPin.id.includes("reinvestigate") && (
+        {layout.isEditMode && selectedPin && (
           <motion.div
             data-board-ui="true"
             initial={{ opacity: 0, y: -10, scale: 0.95 }}

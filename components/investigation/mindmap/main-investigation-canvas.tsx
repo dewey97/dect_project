@@ -42,6 +42,8 @@ interface MainInvestigationCanvasProps {
     coneSpread: number;
     intensity: number;
   };
+  hideTitleBadgeOnMobile?: boolean;
+  isBoardGame?: boolean;
 }
 
 export function MainInvestigationCanvas({
@@ -51,7 +53,15 @@ export function MainInvestigationCanvas({
   onOpenEpilogue,
   customBgImage,
   lightConeConfig,
+  hideTitleBadgeOnMobile = false,
+  isBoardGame,
 }: MainInvestigationCanvasProps) {
+  const isBoardGameMode =
+    isBoardGame !== undefined
+      ? isBoardGame
+      : typeof window !== "undefined" &&
+        getStorageItem("play_experience") === "boardgame";
+
   const layout = useBoardLayout(caseId);
   const state = useInvestigationState({
     caseId,
@@ -733,6 +743,8 @@ export function MainInvestigationCanvas({
             setEditingCustomPin(pin);
             setIsCreatePinModalOpen(true);
           }}
+          hideTitleBadgeOnMobile={hideTitleBadgeOnMobile}
+          isBoardGame={isBoardGameMode}
         />
       )}
 

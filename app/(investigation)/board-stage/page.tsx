@@ -300,6 +300,7 @@ export default function BoardStagePage() {
         {/* Bảng điều tra canvas thực tế (tự render nón ánh sáng lọt lòng bên trong bounds) */}
         <div className="relative w-full h-full flex items-center justify-center">
           <MainInvestigationCanvas
+            isBoardGame={true}
             customBgImage={currentBgOption.url}
             onOpenPhoneSimulator={() => setActiveModal("phone")}
             onOpenReinvestigation={() => setActiveModal("reinvestigate")}

@@ -441,14 +441,14 @@ function WebEvidencePageContent() {
             setMobileTab("board");
           }}
           className={cn(
-            "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer",
+            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg font-mono text-[0.72rem] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
             mobileTab === "board"
               ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
               : "text-[#ad9885] hover:text-[#e5d8cb]"
           )}
         >
-          <Layers className="size-3.5" />
-          <span>BẢNG ĐIỀU TRA</span>
+          <Layers className="size-3.5 shrink-0" />
+          <span className="truncate">BẢNG ĐIỀU TRA</span>
         </button>
         <button
           type="button"
@@ -457,24 +457,14 @@ function WebEvidencePageContent() {
             setMobileTab("dossier");
           }}
           className={cn(
-            "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer relative",
+            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg font-mono text-[0.72rem] sm:text-xs font-bold transition-all cursor-pointer relative whitespace-nowrap",
             mobileTab === "dossier"
               ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
               : "text-[#ad9885] hover:text-[#e5d8cb]"
           )}
         >
-          <FolderOpen className="size-3.5" />
-          <span>HỒ SƠ & VẬT CHỨNG</span>
-          <span
-            className={cn(
-              "px-1.5 py-0.2 rounded-full text-[0.55rem] font-bold font-mono ml-0.5",
-              mobileTab === "dossier"
-                ? "bg-[#1a0f07]/20 text-[#1a0f07]"
-                : "bg-[#2a1d12] text-[#d9a066] border border-[#d9a066]/30"
-            )}
-          >
-            {pdfItems.length + evidenceItems.length}
-          </span>
+          <FolderOpen className="size-3.5 shrink-0" />
+          <span className="truncate">KHAY TÀI LIỆU</span>
         </button>
       </div>
 
@@ -518,6 +508,8 @@ function WebEvidencePageContent() {
           <div className="flex-1 min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
               caseId={caseId}
+              isBoardGame={false}
+              hideTitleBadgeOnMobile={true}
               onOpenPhoneSimulator={() => setActiveModal("phone")}
               onOpenReinvestigation={() => setActiveModal("reinvestigate")}
               onOpenEpilogue={() => setActiveModal("epilogue")}
@@ -564,46 +556,44 @@ function WebEvidencePageContent() {
             mobileTab === "dossier" ? "flex" : "hidden lg:flex"
           )}
         >
-          {/* HEADER VÙNG 2: TABS PHÂN TÁCH HỒ SƠ VS VẬT CHỨNG */}
-          <div className="shrink-0 border-b border-[#3d2c1e] px-2.5 py-2 bg-[#241a12] flex items-center justify-between gap-1.5">
-            <div className="flex items-center gap-1.5 overflow-hidden">
-              <Layers className="size-3.5 text-[#d9a066] shrink-0" />
-              <h2 className="font-mono text-[0.68rem] font-bold uppercase tracking-wider text-[#e6d3c1] truncate">
-                KHAY TÀI LIỆU
-              </h2>
-            </div>
-            <div className="flex items-center gap-1 font-mono text-[0.58rem]">
-              <button
-                type="button"
-                onClick={() => setFilterTab("pdf")}
-                className={cn(
-                  "px-2 py-0.5 font-bold transition-all cursor-pointer rounded-xs flex items-center gap-1",
-                  filterTab === "pdf"
-                    ? "bg-[#d9a066] text-[#1a0f07]"
-                    : "text-[#ad9885] hover:text-[#e6d3c1]"
-                )}
-              >
-                <span>HỒ SƠ</span>
-                <span className="opacity-75">({pdfItems.length})</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setFilterTab("evidence")}
-                className={cn(
-                  "px-2 py-0.5 font-bold transition-all cursor-pointer rounded-xs flex items-center gap-1",
-                  filterTab === "evidence"
-                    ? "bg-[#d9a066] text-[#1a0f07]"
-                    : "text-[#ad9885] hover:text-[#e6d3c1]"
-                )}
-              >
-                <span>VẬT CHỨNG</span>
-                <span className="opacity-75">({evidenceItems.length})</span>
-              </button>
-            </div>
+          {/* HEADER VÙNG 2: 2 OPTION TÀI LIỆU VÀ ẢNH */}
+          <div className="shrink-0 p-1.5 bg-[#241a12] border-b border-[#3d2c1e] flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                detectiveAudio.playPaperRustle();
+                setFilterTab("pdf");
+              }}
+              className={cn(
+                "flex-1 py-1.5 px-2 font-mono text-[0.72rem] sm:text-xs font-bold transition-all cursor-pointer rounded flex items-center justify-center gap-1.5",
+                filterTab === "pdf"
+                  ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
+                  : "bg-[#18110b] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#2d2015] border border-[#3d2c1e]"
+              )}
+            >
+              <FileText className="size-3.5" />
+              <span>TÀI LIỆU</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                detectiveAudio.playGlassSound();
+                setFilterTab("evidence");
+              }}
+              className={cn(
+                "flex-1 py-1.5 px-2 font-mono text-[0.72rem] sm:text-xs font-bold transition-all cursor-pointer rounded flex items-center justify-center gap-1.5",
+                filterTab === "evidence"
+                  ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
+                  : "bg-[#18110b] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#2d2015] border border-[#3d2c1e]"
+              )}
+            >
+              <ImageIcon className="size-3.5" />
+              <span>ẢNH</span>
+            </button>
           </div>
 
           {/* PHASE FILTER CHIPS */}
-          <div className="shrink-0 px-2.5 py-1.5 border-b border-[#3d2c1e]/60 bg-[#1a1410] flex items-center gap-1 overflow-x-auto text-[0.6rem] font-mono custom-scrollbar">
+          <div className="shrink-0 px-2.5 py-2 border-b border-[#3d2c1e]/60 bg-[#1a1410] flex items-center gap-1.5 overflow-x-auto font-mono custom-scrollbar">
             {[
               { label: "TẤT CẢ", val: "all" as const },
               { label: "BAN ĐẦU", val: 0 },
@@ -620,12 +610,12 @@ function WebEvidencePageContent() {
                   disabled={isLocked}
                   onClick={() => setSelectedPhaseFilter(p.val)}
                   className={cn(
-                    "px-1.5 py-0.5 rounded transition-all whitespace-nowrap text-[0.58rem]",
+                    "px-2.5 py-1 sm:px-3 sm:py-1 rounded-sm transition-all whitespace-nowrap text-[0.68rem] sm:text-xs font-bold min-h-[26px] flex items-center justify-center",
                     isLocked
-                      ? "opacity-35 cursor-not-allowed text-[#6b5847]"
+                      ? "opacity-35 cursor-not-allowed text-[#6b5847] border border-[#2d2015]"
                       : isSelected
-                        ? "bg-[#d9a066] text-[#1a0f07] font-bold"
-                        : "bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#342417] cursor-pointer",
+                        ? "bg-[#d9a066] text-[#1a0f07] font-extrabold shadow-xs"
+                        : "bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#342417] border border-[#3e2b1c] cursor-pointer",
                   )}
                 >
                   {p.label}
@@ -655,26 +645,24 @@ function WebEvidencePageContent() {
                         key={`evidence-${item.data.id}`}
                         onClick={() => handleSelectEvidence(evItem)}
                         className={cn(
-                          "w-full text-left rounded-lg border transition-all cursor-pointer p-1.5 flex flex-col gap-1 relative overflow-hidden group shadow-sm",
+                          "w-full aspect-[4/3] text-left rounded-none border transition-all cursor-pointer relative overflow-hidden group shadow-sm bg-[#0c0805] active:scale-[0.98]",
                           isSelected
-                            ? "bg-[#2a1d12] border-[#d9a066] shadow-[0_0_12px_rgba(217,160,102,0.25)] ring-1 ring-[#d9a066]"
-                            : "bg-[#18120d] hover:bg-[#201710] border-[#382618] hover:border-[#523824]",
+                            ? "lg:border-[#d9a066] lg:shadow-[0_0_12px_rgba(217,160,102,0.3)] border-[#2a1d13]"
+                            : "border-[#2a1d13] hover:border-[#4a3423]",
                         )}
                       >
-                        <div className="relative w-full aspect-[4/3] bg-[#0c0805] border border-[#3e2b1c] rounded overflow-hidden">
-                          <img
-                            src={normalizeImageUrl(evItem?.thumbnail) || "/photo_scene_overview.jpg"}
-                            alt="Vật chứng"
-                            className="w-full h-full object-cover select-none"
-                          />
-                          {evItem?.evidenceId && (
-                            <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-xs border border-white/10 text-[0.52rem] font-mono font-bold text-[#e5d8cb]">
-                              {evItem.evidenceId}
-                            </div>
-                          )}
-                        </div>
+                        <img
+                          src={normalizeImageUrl(evItem?.thumbnail) || "/photo_scene_overview.jpg"}
+                          alt="Vật chứng"
+                          className="w-full h-full object-cover select-none transition-transform duration-200 group-hover:scale-105 rounded-none"
+                        />
+                        {evItem?.evidenceId && (
+                          <div className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded-none bg-black/75 text-[0.55rem] font-mono font-bold text-[#e5d8cb]">
+                            {evItem.evidenceId}
+                          </div>
+                        )}
                         {isSelected && (
-                          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#d9a066]" />
+                          <div className="hidden lg:block absolute inset-0 border-2 border-[#d9a066] pointer-events-none rounded-none" />
                         )}
                       </button>
                     );
@@ -700,29 +688,29 @@ function WebEvidencePageContent() {
                         key={`pdf-${item.data.id}`}
                         onClick={() => handleSelectPdf(pdfDoc)}
                         className={cn(
-                          "w-full text-left rounded-lg border transition-all cursor-pointer p-2 flex items-center gap-2 relative overflow-hidden group shadow-sm",
+                          "w-full text-left rounded-lg border transition-all cursor-pointer p-2 flex items-center gap-2 relative overflow-hidden group shadow-sm active:scale-[0.99] active:bg-[#201710]",
                           isSelected
-                            ? "bg-[#2a1d12] border-[#d9a066] shadow-[0_0_12px_rgba(217,160,102,0.2)]"
+                            ? "lg:bg-[#2a1d12] lg:border-[#d9a066] lg:shadow-[0_0_12px_rgba(217,160,102,0.2)] bg-[#18120d] border-[#382618]"
                             : "bg-[#18120d] hover:bg-[#201710] border-[#382618] hover:border-[#523824]",
                         )}
                       >
-                        <div
+                        <span
                           className={cn(
-                            "px-2 py-1 shrink-0 rounded font-mono text-[0.6rem] font-bold tracking-wider text-center border min-w-[46px]",
+                            "shrink-0 font-mono text-[0.65rem] font-bold tracking-wider transition-colors",
                             isSelected
-                              ? "bg-[#d9a066] text-[#1a0f07] border-[#d9a066]"
-                              : "bg-[#251910] text-[#d9a066] border-[#3e2b1c]"
+                              ? "lg:text-[#d9a066] text-[#d9a066]/80"
+                              : "text-[#d9a066]/80 group-hover:text-[#d9a066]"
                           )}
                         >
                           {pdfDoc?.code || "DOC"}
-                        </div>
+                        </span>
 
                         <div className="min-w-0 flex-1">
                           <p
                             className={cn(
                               "font-bold text-[0.68rem] leading-snug line-clamp-2 transition-colors",
                               isSelected
-                                ? "text-[#fef5ec]"
+                                ? "lg:text-[#fef5ec] text-[#ad9885] group-hover:text-[#e6d3c1]"
                                 : "text-[#ad9885] group-hover:text-[#e6d3c1]",
                             )}
                           >
@@ -730,8 +718,10 @@ function WebEvidencePageContent() {
                           </p>
                         </div>
 
+                        <ChevronRight className="size-3.5 text-[#5a422e] shrink-0 group-hover:text-[#d9a066] group-active:text-[#d9a066] transition-colors" />
+
                         {isSelected && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
+                          <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
                         )}
                       </button>
                     );
@@ -753,10 +743,10 @@ function WebEvidencePageContent() {
           )}
         >
           {/* HEADER TOOLBAR VÙNG 3 */}
-          <div className="hidden lg:flex absolute top-2 right-2 z-40 items-center gap-1.5">
+          <div className="hidden lg:flex absolute top-3 right-3 z-40 items-center gap-1.5 pointer-events-auto">
             <button
               onClick={() => setIsViewerExpanded((prev) => !prev)}
-              className="p-1.5 px-2 bg-[#22160e]/90 hover:bg-[#322014] text-[#ad9885] hover:text-[#fef5ec] rounded border border-[#4a3625] transition-colors cursor-pointer flex items-center gap-1 font-mono text-[0.6rem] shadow-md"
+              className="p-1.5 px-2 bg-[#1b140e]/90 hover:bg-[#322014] text-[#ad9885] hover:text-[#fef5ec] rounded border border-[#4a3625] transition-colors cursor-pointer flex items-center gap-1 font-mono text-[0.6rem] shadow-md backdrop-blur-sm"
               title={isViewerExpanded ? "Thu nhỏ về 3 vùng" : "Phóng to toàn khung phải"}
             >
               {isViewerExpanded ? (

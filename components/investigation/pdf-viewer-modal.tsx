@@ -22,7 +22,7 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose }:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-2 sm:p-4">
-      <div className="relative flex flex-col w-full max-w-4xl h-[90vh] bg-[#16120e] border-2 border-[#3d2c1e] rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative flex flex-col w-full max-w-4xl h-[90vh] bg-[#16120e] border-2 border-[#3d2c1e] rounded-none shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#3d2c1e] bg-[#241a12]">
           <div className="flex items-center gap-2.5 overflow-hidden">
@@ -39,7 +39,7 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose }:
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={onClose}
-              className="p-1.5 text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#342417] border border-[#3e2e20] rounded-md transition-colors cursor-pointer"
+              className="p-1.5 text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#342417] border border-[#3e2e20] rounded-none transition-colors cursor-pointer"
               aria-label="Đóng"
             >
               <X className="size-5" />
@@ -51,11 +51,11 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose }:
         <div className="flex-1 w-full h-full bg-[#120d09] relative overflow-hidden flex flex-col">
           {isEvidence && selectedView ? (
             <div className="flex-1 p-3 sm:p-6 overflow-y-auto custom-scrollbar flex flex-col items-center justify-center bg-[#0d0906]">
-              <div className="relative max-w-sm sm:max-w-lg max-h-[75vh] p-2 bg-[#1b140e] border-2 border-[#3d2c1e] rounded-xl shadow-2xl flex flex-col items-center justify-center">
+              <div className="relative max-w-sm sm:max-w-lg max-h-[75vh] p-2 bg-[#1b140e] border border-[#3d2c1e] rounded-none shadow-2xl flex flex-col items-center justify-center">
                 <img
                   src={normalizeImageUrl(selectedView.data.thumbnail) || "/photo_scene_overview.jpg"}
                   alt={selectedView.data.title || "Vật chứng"}
-                  className="max-w-full max-h-[60vh] object-contain rounded-lg border border-[#3e2e20] select-none"
+                  className="max-w-full max-h-[60vh] object-contain rounded-none select-none shadow-md"
                 />
                 {selectedView.data.evidenceId && (
                   <div className="mt-2 text-center">
