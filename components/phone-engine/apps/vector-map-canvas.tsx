@@ -111,14 +111,16 @@ export function VectorMapCanvas({
       <div
         className={cn(
           'absolute inset-0 origin-top-left pointer-events-none will-change-transform',
-          isDragging ? 'transition-none' : 'transition-transform duration-500 ease-out'
+          isDragging ? 'transition-none' : 'transition-transform duration-150 ease-out'
         )}
         style={{
           transform: `translate3d(${pan.x}px, ${pan.y}px, 0px) scale(${zoom}) ${
             is3DView ? 'perspective(700px) rotateX(28deg)' : ''
           }`,
           width: `${mapWidth}px`,
-          height: `${mapHeight}px`
+          height: `${mapHeight}px`,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
         }}
       >
         {/* =================================================================== */}
@@ -276,15 +278,6 @@ export function VectorMapCanvas({
               <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#1A73E8" floodOpacity="0.45" />
             </filter>
           </defs>
-
-          {/* Live Traffic Overlay */}
-          {showTrafficLayer && (
-            <g fill="none" strokeLinecap="round" opacity="0.85">
-              <path d="M 90,20 C 260,90 410,160 575,220" stroke="#0F9D58" strokeWidth="2.5" />
-              <path d="M 575,220 C 620,240 640,290 635,360" stroke="#F4B400" strokeWidth="2.5" />
-              <path d="M 635,360 C 625,440 605,525 660,640" stroke="#EA4335" strokeWidth="2.5" />
-            </g>
-          )}
 
           {/* 13. Real-World Road Route Polyline using Dijkstra */}
           {showRoutePolyline && origin && destination && origin.id !== destination.id && (

@@ -14,13 +14,9 @@ import {
   Compass
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { usePhoneData } from '@/lib/hooks/use-phone-data'
 import {
-  transformSheetLocationToCaseLocation,
-  DEFAULT_CASE_LOCATIONS,
   type CaseLocation,
   type RouteResult,
-  type SheetLocationRow,
   type TransportMode
 } from '@/lib/case-locations-data'
 import { calculateVectorRoute, METERS_PER_PIXEL } from '@/lib/map-routing-engine'
@@ -33,10 +29,7 @@ interface MapsAppProps {
 }
 
 export function MapsApp({ onBackToHome }: MapsAppProps) {
-  // Live CMS Integration: Fetch locations from Google Sheets tab 'locations'
-  const { data: rawSheetLocations } = usePhoneData<SheetLocationRow>('locations')
-
-  // Custom Map Studio Vector Data Integration (Khởi tạo ngay lập tức với seed vector, tự động hydrate từ Database)
+  // Custom Map Studio Vector Data Integration (Khởi tạo với vector map data chuẩn của vụ án, tự động hydrate từ Database)
   const [customMapVector, setCustomMapVector] = useState<MapVectorData | null>(() =>
     getDefaultMapVectorData('case_000')
   )
@@ -60,31 +53,13 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
     }
   }, [])
 
+  // Nạp 100% danh sách địa điểm từ hệ thống tọa độ Vector của vụ án (không dùng Google Sheets / mock)
   const caseLocations: CaseLocation[] = useMemo(() => {
-    // 1. Ưu tiên dữ liệu địa điểm thực tế của vụ án từ Database / Live CMS
-    if (rawSheetLocations && rawSheetLocations.length > 0) {
-      return rawSheetLocations.map((row) => {
-        const loc = transformSheetLocationToCaseLocation(row)
-        // Nếu bản đồ vector có tọa độ tinh chỉnh cho POI này, đồng bộ tọa độ (X, Y)
-        const vectorMatch = customMapVector?.pois?.find(
-          (p) => p.id === loc.id || p.id === `poi-${loc.id}` || p.name.includes(loc.name) || loc.name.includes(p.name)
-        )
-        if (vectorMatch) {
-          loc.x = vectorMatch.x
-          loc.y = vectorMatch.y
-        }
-        return loc
-      })
-    }
-
-    // 2. Dự phòng: Đọc từ POI của bản đồ Vector
     if (customMapVector && customMapVector.pois && customMapVector.pois.length > 0) {
       return customMapVector.pois.map(transformPoiToCaseLocation)
     }
-
-    // 3. Dự phòng khởi tạo tức thời: 26 mốc án mạng chính thức
-    return DEFAULT_CASE_LOCATIONS
-  }, [rawSheetLocations, customMapVector])
+    return []
+  }, [customMapVector])
 
   // Navigation & UI States
   const [activeTab, setActiveTab] = useState<'explore' | 'directions'>('explore')
@@ -148,8 +123,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
           l.id === originId.replace(/^loc-0?/, '') ||
           `loc-${l.id.padStart?.(2, '0') || l.id}` === originId
       ) ||
-      caseLocations[0] ||
-      DEFAULT_CASE_LOCATIONS[0],
+      caseLocations[0],
     [caseLocations, originId]
   )
   const destination = useMemo(
@@ -163,8 +137,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
           `loc-${l.id.padStart?.(2, '0') || l.id}` === destinationId
       ) ||
       caseLocations[1] ||
-      caseLocations[0] ||
-      DEFAULT_CASE_LOCATIONS[1],
+      caseLocations[0],
     [caseLocations, destinationId]
   )
 
@@ -192,7 +165,10 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   // Midpoint on active route for the floating duration callout bubble
   const routeMidpoint = useMemo(() => {
     if (!activeRoute.points || activeRoute.points.length === 0) {
-      return { x: (origin.x + destination.x) / 2, y: (origin.y + destination.y) / 2 }
+      if (origin && destination) {
+        return { x: (origin.x + destination.x) / 2, y: (origin.y + destination.y) / 2 }
+      }
+      return { x: 1800, y: 1400 }
     }
     const midIdx = Math.floor(activeRoute.points.length / 2)
     return activeRoute.points[midIdx]
@@ -209,7 +185,8 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
 
   // Center on current position (Origin)
   const handleCenterMyLocation = () => {
-    const target = origin || caseLocations[0] || DEFAULT_CASE_LOCATIONS[0]
+    const target = origin || caseLocations[0]
+    if (!target) return
     const newZoom = 0.50
     setZoom(newZoom)
     setPan({
@@ -272,13 +249,30 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
     } catch {}
   }
 
-  // Mouse wheel zoom
+  // Mouse wheel zoom centered on cursor position (Google Maps style smooth zoom)
   const handleWheel = (e: React.WheelEvent) => {
     e.stopPropagation()
-    const zoomDelta = e.deltaY < 0 ? 0.08 : -0.08
+    const container = mapContainerRef.current
+    if (!container) return
+
+    const rect = container.getBoundingClientRect()
+    const cursorX = e.clientX - rect.left
+    const cursorY = e.clientY - rect.top
+
+    // Smooth exponential zoom factor
+    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87
     setZoom((prevZoom) => {
-      const nextZoom = Math.min(2.5, Math.max(0.35, prevZoom + zoomDelta))
-      return Math.round(nextZoom * 100) / 100
+      const nextZoom = Math.min(3.0, Math.max(0.35, prevZoom * zoomFactor))
+      if (Math.abs(nextZoom - prevZoom) < 0.001) return prevZoom
+
+      // Điều chỉnh pan để điểm dưới con trỏ chuột giữ nguyên vị trí trên màn hình
+      const scaleChange = nextZoom / prevZoom
+      setPan((prevPan) => ({
+        x: cursorX - (cursorX - prevPan.x) * scaleChange,
+        y: cursorY - (cursorY - prevPan.y) * scaleChange,
+      }))
+
+      return Math.round(nextZoom * 1000) / 1000
     })
     setIsCentered(false)
   }
