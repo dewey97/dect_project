@@ -66,6 +66,7 @@ export default async function LoginPage(props: {
             <button
               type="submit"
               formAction={loginWithGoogle}
+              formNoValidate
               className="border border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-9 px-4 py-2 transition-colors gap-2"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
