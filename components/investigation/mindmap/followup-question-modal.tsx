@@ -569,7 +569,7 @@ export function FollowupQuestionModal({
 
           {/* FORM BODY FOR VU */}
           {isVu ? (
-            <form onSubmit={handleSubmitVu} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
+            <form onSubmit={handleSubmitVu} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5] paper-scrollbar">
               {errorMsg && (
                 <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
                   {errorMsg}
@@ -642,7 +642,7 @@ export function FollowupQuestionModal({
             </form>
           ) : isHa ? (
             /* FORM BODY FOR HA - LIVE CMS PASSWORD INPUT */
-            <form onSubmit={handleSubmitHa} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5]">
+            <form onSubmit={handleSubmitHa} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] paper-scrollbar">
               {errorMsg && (
                 <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
                   ⚠️ {errorMsg}
@@ -715,7 +715,7 @@ export function FollowupQuestionModal({
             </form>
           ) : isTung ? (
             /* FORM FOR TUNG */
-            <form onSubmit={handleSubmitTung} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
+            <form onSubmit={handleSubmitTung} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5] paper-scrollbar">
               {errorMsg && (
                 <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
                   ⚠️ {errorMsg}
@@ -806,7 +806,7 @@ export function FollowupQuestionModal({
             </form>
           ) : (
             /* FORM FOR DYNAMIC CUSTOM SUSPECT */
-            <form onSubmit={handleSubmitCustom} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5]">
+            <form onSubmit={handleSubmitCustom} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] paper-scrollbar">
               {errorMsg && (
                 <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
                   ⚠️ {errorMsg}

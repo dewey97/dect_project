@@ -351,7 +351,6 @@ function WebEvidencePageContent() {
 
   const handleSelectPdf = (doc: PDFDocument) => {
     if (!isPhaseUnlocked(doc.phase)) return;
-    detectiveAudio.playTypewriterClick();
     setSelectedView({ type: "pdf", data: doc });
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       setActiveModal("mobile_pdf");
@@ -362,7 +361,6 @@ function WebEvidencePageContent() {
 
   const handleSelectEvidence = (item: PhysicalEvidence) => {
     if (!isPhaseUnlocked(item.phase)) return;
-    detectiveAudio.playGlassSound();
     setSelectedView({ type: "evidence", data: item });
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       setActiveModal("mobile_pdf");
@@ -433,55 +431,52 @@ function WebEvidencePageContent() {
       className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start p-0 lg:p-3 box-border min-h-0 min-w-0 select-none"
     >
       {/* MOBILE VIEW SWITCHER (CHỈ HIỂN THỊ TRÊN MÀN HÌNH DI ĐỘNG < LG) - 3 TABS: BẢNG ĐIỀU TRA | TÀI LIỆU | ẢNH */}
-      <div className="flex lg:hidden shrink-0 items-center justify-between p-1 bg-[#16120e] border-b border-[#3d2c1e] shadow-md w-full z-30 gap-1">
+      <div className="flex lg:hidden shrink-0 items-center justify-between p-2 bg-[#16120e] border-b border-[#3d2c1e] shadow-md w-full z-30 gap-2">
         <button
           type="button"
           onClick={() => {
-            detectiveAudio.playPaperRustle();
             setMobileTab("board");
           }}
           className={cn(
-            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1.5 sm:px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap",
+            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap min-h-[44px]",
             mobileTab === "board"
               ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
-              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710]"
+              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710] bg-[#1a130d] border border-[#2f2015]"
           )}
         >
-          <Layers className="size-3.5 shrink-0" />
+          <Layers className="size-4 shrink-0" />
           <span className="truncate">BẢNG ĐIỀU TRA</span>
         </button>
         <button
           type="button"
           onClick={() => {
-            detectiveAudio.playPaperRustle();
             setMobileTab("dossier");
             setFilterTab("pdf");
           }}
           className={cn(
-            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1.5 sm:px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer relative whitespace-nowrap",
+            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer relative whitespace-nowrap min-h-[44px]",
             mobileTab === "dossier" && filterTab === "pdf"
               ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
-              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710]"
+              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710] bg-[#1a130d] border border-[#2f2015]"
           )}
         >
-          <FileText className="size-3.5 shrink-0" />
+          <FileText className="size-4 shrink-0" />
           <span className="truncate">TÀI LIỆU</span>
         </button>
         <button
           type="button"
           onClick={() => {
-            detectiveAudio.playGlassSound();
             setMobileTab("dossier");
             setFilterTab("evidence");
           }}
           className={cn(
-            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-1.5 px-1.5 sm:px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer relative whitespace-nowrap",
+            "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-lg font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer relative whitespace-nowrap min-h-[44px]",
             mobileTab === "dossier" && filterTab === "evidence"
               ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
-              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710]"
+              : "text-[#ad9885] hover:text-[#e5d8cb] hover:bg-[#201710] bg-[#1a130d] border border-[#2f2015]"
           )}
         >
-          <ImageIcon className="size-3.5 shrink-0" />
+          <ImageIcon className="size-4 shrink-0" />
           <span className="truncate">ẢNH</span>
         </button>
       </div>
@@ -579,7 +574,6 @@ function WebEvidencePageContent() {
             <button
               type="button"
               onClick={() => {
-                detectiveAudio.playPaperRustle();
                 setFilterTab("pdf");
               }}
               className={cn(
@@ -595,7 +589,6 @@ function WebEvidencePageContent() {
             <button
               type="button"
               onClick={() => {
-                detectiveAudio.playGlassSound();
                 setFilterTab("evidence");
               }}
               className={cn(
@@ -643,7 +636,7 @@ function WebEvidencePageContent() {
           </div>
 
           {/* DANH SÁCH PREVIEW THẺ CARD */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-2 min-h-0 bg-[#120d09]">
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 bg-[#120d09]">
             {filterTab === "evidence" ? (
               /* NẾU LÀ VẬT CHỨNG: HIỂN THỊ DẠNG LƯỚI GRID GỌN GÀNG (2 CỘT) */
               evidenceItems.length === 0 ? (
@@ -651,7 +644,7 @@ function WebEvidencePageContent() {
                   Không có vật chứng nào.
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 p-2">
                   {evidenceItems.map((item) => {
                     const isSelected =
                       selectedView.type === item.type &&
@@ -690,60 +683,148 @@ function WebEvidencePageContent() {
             ) : (
               /* NẾU LÀ HỒ SƠ PDF: DANH SÁCH COMPACT ROW */
               pdfItems.length === 0 ? (
-                <div className="p-4 text-center text-xs font-mono text-[#8c735d]">
-                  Không có hồ sơ nào.
+                <div className="p-6 text-center text-xs font-mono text-[#8c735d]">
+                  Không có hồ sơ nào trong mục này.
                 </div>
               ) : (
-                <div className="space-y-1.5">
-                  {pdfItems.map((item) => {
-                    const isSelected =
-                      selectedView.type === item.type &&
-                      selectedView.data.id === item.data.id;
-                    const pdfDoc = item.data as PDFDocument;
+                <div className="flex flex-col">
+                  {/* THANH BÌA KẸP HỒ SƠ VỤ ÁN */}
+                  <div className="shrink-0 px-3 py-2 bg-[#1b130c] border-b border-[#382618] flex items-center justify-between text-xs font-mono">
+                    <div className="flex items-center gap-1.5 text-[#ad9885]">
+                      <Paperclip className="size-3.5 text-[#d9a066] -rotate-45" />
+                      <span className="font-bold text-[#e5d8cb] tracking-wider text-[0.75rem] uppercase">
+                        KẸP HỒ SƠ VỤ ÁN
+                      </span>
+                    </div>
+                    <span className="text-[0.68rem] font-bold px-1.5 py-0.5 rounded bg-[#100a06] text-[#d9a066] border border-[#382618]">
+                      {pdfItems.length} VĂN BẢN
+                    </span>
+                  </div>
 
-                    return (
-                      <button
-                        key={`pdf-${item.data.id}`}
-                        onClick={() => handleSelectPdf(pdfDoc)}
-                        className={cn(
-                          "w-full text-left rounded-lg border transition-all cursor-pointer p-2 flex items-center gap-2 relative overflow-hidden group shadow-sm active:scale-[0.99] active:bg-[#201710]",
-                          isSelected
-                            ? "lg:bg-[#2a1d12] lg:border-[#d9a066] lg:shadow-[0_0_12px_rgba(217,160,102,0.2)] bg-[#18120d] border-[#382618]"
-                            : "bg-[#18120d] hover:bg-[#201710] border-[#382618] hover:border-[#523824]",
-                        )}
-                      >
-                        <span
+                  {/* DANH SÁCH CÁC TỜ HỒ SƠ XẾP CHỒNG GỐI ĐẦU (OVERLAPPING STACK) */}
+                  <div className="p-2 sm:p-2.5 pb-8 flex flex-col">
+                    {pdfItems.map((item, index) => {
+                      const isSelected =
+                        selectedView.type === item.type &&
+                        selectedView.data.id === item.data.id;
+                      const prevIsSelected =
+                        index > 0 &&
+                        selectedView.type === pdfItems[index - 1].type &&
+                        selectedView.data.id === pdfItems[index - 1].data.id;
+                      const pdfDoc = item.data as PDFDocument;
+
+                      return (
+                        <div
+                          key={`pdf-${item.data.id}`}
+                          style={{
+                            zIndex: isSelected ? 30 : index + 1,
+                          }}
                           className={cn(
-                            "shrink-0 font-mono text-xs sm:text-sm font-bold tracking-wider transition-colors",
-                            isSelected
-                              ? "lg:text-[#d9a066] text-[#d9a066]/80"
-                              : "text-[#d9a066]/80 group-hover:text-[#d9a066]"
+                            "relative transition-all duration-200 ease-out",
+                            !isSelected && index > 0 && !prevIsSelected && "-mt-2",
+                            isSelected && "my-2.5",
                           )}
                         >
-                          {pdfDoc?.code || "DOC"}
-                        </span>
-
-                        <div className="min-w-0 flex-1">
-                          <p
+                          <div
+                            onClick={() => {
+                              if (!isSelected) {
+                                setSelectedView({ type: "pdf", data: pdfDoc });
+                              } else {
+                                if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                                  setActiveModal("mobile_pdf");
+                                }
+                              }
+                            }}
                             className={cn(
-                              "font-bold text-[0.82rem] sm:text-sm leading-snug line-clamp-2 transition-colors",
+                              "w-full text-left transition-all duration-200 cursor-pointer overflow-hidden group select-none",
                               isSelected
-                                ? "lg:text-[#fef5ec] text-[#ad9885] group-hover:text-[#e6d3c1]"
-                                : "text-[#ad9885] group-hover:text-[#e6d3c1]",
+                                ? "bg-[#26190f] border-2 border-[#d9a066] rounded-lg p-3 sm:p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.7)] ring-1 ring-[#d9a066]/40"
+                                : "bg-[#1c130c] hover:bg-[#23180f] border-t-2 border-x border-b border-[#3d2a1b] hover:border-[#66462d] rounded-t-lg rounded-b-sm px-3 py-2 sm:py-2.5 shadow-[0_-3px_8px_rgba(0,0,0,0.5)] active:bg-[#251910] min-h-[52px]"
                             )}
                           >
-                            {item.data.title}
-                          </p>
+                            {/* THANH HEADER CHÍNH (LUÔN HIỂN THỊ CẢ KHI XẾP CHỒNG VÀ MỞ RỘNG) */}
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                <Paperclip
+                                  className={cn(
+                                    "size-3.5 -rotate-45 shrink-0 transition-colors",
+                                    isSelected
+                                      ? "text-[#d9a066]"
+                                      : "text-[#8a7057] group-hover:text-[#d9a066]"
+                                  )}
+                                />
+                                <span
+                                  className={cn(
+                                    "font-mono text-xs font-black tracking-wider px-1.5 py-0.5 rounded-sm border shrink-0 transition-colors",
+                                    isSelected
+                                      ? "bg-[#120b06] text-[#d9a066] border-[#d9a066]/60 shadow-xs"
+                                      : "bg-[#140d07] text-[#d9a066]/90 border-[#382618]"
+                                  )}
+                                >
+                                  {pdfDoc?.code || "DOC"}
+                                </span>
+
+                                {/* Khi không chọn: hiển thị tiêu đề ngay trên dải tab gối đầu này */}
+                                {!isSelected && (
+                                  <span className="font-bold text-xs sm:text-[0.85rem] text-[#e2d4c3] group-hover:text-[#ffffff] truncate ml-1">
+                                    {item.data.title}
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="font-mono text-[0.6rem] sm:text-[0.65rem] text-[#8a725b] uppercase tracking-wider font-semibold">
+                                  {pdfDoc.phase === 0
+                                    ? "BAN ĐẦU"
+                                    : `BỘ ${String.fromCharCode(64 + pdfDoc.phase)}`}
+                                </span>
+                                <ChevronRight
+                                  className={cn(
+                                    "size-3.5 transition-transform duration-200",
+                                    isSelected
+                                      ? "rotate-90 text-[#d9a066]"
+                                      : "text-[#5a402d] group-hover:text-[#d9a066]"
+                                  )}
+                                />
+                              </div>
+                            </div>
+
+                            {/* NỘI DUNG CHI TIẾT KHI TỜ GIẤY BUNG MỞ RỘNG (EXPANDED) */}
+                            {isSelected && (
+                              <div className="mt-2.5 pt-2.5 border-t border-dashed border-[#443020]">
+                                <h4 className="font-bold text-sm sm:text-base text-[#ffffff] leading-snug mb-3">
+                                  {item.data.title}
+                                </h4>
+
+                                <div className="flex items-center justify-between text-[0.65rem] font-mono text-[#a88a6d] mb-3">
+                                  <span className="flex items-center gap-1">
+                                    <FileText className="size-3 text-[#d9a066]" />
+                                    <span>BẢN GỐC // ĐÃ GIẢI MÃ</span>
+                                  </span>
+                                  <span className="text-[#8a725b]">CHẠM ĐỂ ĐỌC CHI TIẾT</span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                                      setActiveModal("mobile_pdf");
+                                    }
+                                  }}
+                                  className="w-full py-2.5 px-3 rounded bg-[#d9a066] hover:bg-[#e2ad76] active:bg-[#c68e54] text-[#1a0f07] font-mono text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
+                                >
+                                  <FileText className="size-4" />
+                                  <span>MỞ ĐỌC TOÀN VĂN HỒ SƠ</span>
+                                  <ChevronRight className="size-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
-
-                        <ChevronRight className="size-3.5 text-[#5a422e] shrink-0 group-hover:text-[#d9a066] group-active:text-[#d9a066] transition-colors" />
-
-                        {isSelected && (
-                          <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
-                        )}
-                      </button>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               )
             )}

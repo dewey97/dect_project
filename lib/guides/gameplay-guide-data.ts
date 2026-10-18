@@ -40,25 +40,6 @@ export const GAMEPLAY_GUIDE_CONFIG: {
         'Bạn có thể chuyển sang điều tra đối tượng khác bất cứ lúc nào mà không sợ mất tiến độ điều tra đối tượng hiện tại.'
     },
     {
-      id: 'evidence',
-      tabLabel: 'Bổ sung chứng cứ',
-      title: 'BỔ SUNG CHỨNG CỨ',
-      summary: 'Thực hiện nghiệp vụ thu thập thêm chứng cứ mở rộng vụ án.',
-      iconName: 'evidence',
-      steps: [
-        {
-          title: 'Truy vết liên lạc',
-          desc: 'Nhập chính xác danh tính chủ thuê bao được yêu cầu điều tra.'
-        },
-        {
-          title: 'Khám xét lại hiện trường',
-          desc: 'Tương tác trực tiếp với hiện trường vụ án để rà soát và thu thập thêm chứng cứ quan trọng.'
-        }
-      ],
-      requirementTip:
-        'Khám xét hiện trường được mở sẵn cho điều tra viên chủ động rà soát ngay từ đầu.'
-    },
-    {
       id: 'indictment',
       tabLabel: 'Kết luận điều tra',
       title: 'KẾT LUẬN ĐIỀU TRA',

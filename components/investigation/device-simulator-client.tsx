@@ -78,16 +78,41 @@ export function DeviceSimulatorClient({
   // Render high-fidelity simulator for phone
   if (device.kind === 'phone') {
     return (
-      <div suppressHydrationWarning className="w-full h-full overflow-hidden">
-        <PhoneSimulator
-          device={device}
-          threads={threads}
-          photos={photos}
-          emails={emails}
-          notes={notes}
-          history={history}
-          files={files}
-        />
+      <div suppressHydrationWarning className="w-full h-full flex flex-col overflow-hidden bg-[#0a0a0c]">
+        {/* Top Navigation Bar */}
+        <div className="w-full shrink-0 z-50 bg-[#121215] border-b border-white/10 px-4 py-2 flex items-center justify-between shadow-md">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/evidence/web"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 text-zinc-200 hover:text-white hover:bg-white/15 border border-white/15 text-xs font-medium transition-all cursor-pointer"
+            >
+              <ArrowLeft className="size-3.5 text-[#d9a066]" />
+              <span>Về Bàn Điều Tra Game</span>
+            </Link>
+            <div className="h-4 w-[1px] bg-white/10 hidden sm:block" />
+            <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-400">
+              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Điện thoại tang vật: <strong className="text-zinc-200">{device.label}</strong></span>
+            </div>
+          </div>
+
+          <div className="text-[11px] text-zinc-400 hidden md:flex items-center gap-1.5 font-sans">
+            <span>💡 Bấm nút Home tròn ở dưới đáy để Mở khóa / Mở app Bản đồ</span>
+          </div>
+        </div>
+
+        {/* Phone Simulator Frame */}
+        <div className="flex-1 min-h-0 w-full overflow-hidden">
+          <PhoneSimulator
+            device={device}
+            threads={threads}
+            photos={photos}
+            emails={emails}
+            notes={notes}
+            history={history}
+            files={files}
+          />
+        </div>
       </div>
     )
   }

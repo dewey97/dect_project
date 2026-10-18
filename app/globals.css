@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Special+Elite&family=Caveat:wght@400;700&family=Playpen+Sans:wght@600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Special+Elite&family=Caveat:wght@400;700&family=Playpen+Sans:wght@600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Dancing+Script:wght@500;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 /* @import 'shadcn/tailwind.css'; */
@@ -151,26 +151,48 @@
 
   /* Custom detective-themed scrollbar */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
   ::-webkit-scrollbar-track {
-    background: #0d0d11; /* Very dark background to match the theme */
-    border-left: 1px solid rgba(229, 184, 90, 0.08);
+    background: transparent !important;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(229, 184, 90, 0.2); /* Muted primary amber */
-    border-radius: 5px;
-    border: 2px solid #0d0d11;
+    background: rgba(180, 130, 80, 0.35);
+    border-radius: 9999px;
+    border: none;
     transition: background 0.2s;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(229, 184, 90, 0.45); /* Bright primary amber on hover */
+    background: rgba(217, 160, 102, 0.7);
   }
-  /* Firefox fallback */
-  html {
+  ::-webkit-scrollbar-corner {
+    background: transparent !important;
+  }
+  /* Modern browser standard scrollbar */
+  * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(229, 184, 90, 0.2) #0d0d11;
+    scrollbar-color: rgba(180, 130, 80, 0.35) transparent;
+  }
+
+  /* Paper / Light dossier scrollbar */
+  .paper-scrollbar,
+  [data-paper-modal] {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(92, 64, 38, 0.3) transparent;
+  }
+  .paper-scrollbar::-webkit-scrollbar-thumb,
+  [data-paper-modal]::-webkit-scrollbar-thumb {
+    background: rgba(92, 64, 38, 0.3);
+  }
+  .paper-scrollbar::-webkit-scrollbar-thumb:hover,
+  [data-paper-modal]::-webkit-scrollbar-thumb:hover {
+    background: rgba(92, 64, 38, 0.6);
   }
 }
 
