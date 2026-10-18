@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { PhoneSimulator } from '../phone-simulator'
 
 interface PhoneModalProps {
@@ -43,15 +44,27 @@ export function PhoneModal({ isOpen, onClose, caseId }: PhoneModalProps) {
               </span>
             </div>
 
-            <button
-              onClick={onClose}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1C1C1E] text-zinc-200 hover:text-white hover:bg-white/15 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
-              title="Quay lại hiện trường"
-              aria-label="Quay lại hiện trường"
-            >
-              <ArrowLeft className="size-3.5 text-[#d9a066]" />
-              <span>Quay lại</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/evidence/victim-phone"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#1C1C1E] text-zinc-300 hover:text-white hover:bg-white/15 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
+                title="Mở toàn màn hình / Tab riêng"
+                aria-label="Mở toàn màn hình / Tab riêng"
+              >
+                <ExternalLink className="size-3.5 text-zinc-300" />
+                <span className="hidden sm:inline">Mở riêng</span>
+              </Link>
+
+              <button
+                onClick={onClose}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1C1C1E] text-zinc-200 hover:text-white hover:bg-white/15 border border-white/20 active:scale-95 transition-all cursor-pointer shadow-md text-[12px] font-sans font-medium"
+                title="Quay lại hiện trường"
+                aria-label="Quay lại hiện trường"
+              >
+                <ArrowLeft className="size-3.5 text-[#d9a066]" />
+                <span>Quay lại</span>
+              </button>
+            </div>
           </div>
         </div>
 
