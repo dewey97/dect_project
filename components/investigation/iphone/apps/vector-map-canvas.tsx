@@ -1,9 +1,11 @@
 'use client'
 
 import React from 'react'
-import { Circle, Compass } from 'lucide-react'
+import { Circle, Compass, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { CaseLocation, RouteResult, isScannedMapLocation } from '@/lib/case-locations-data'
+import { isScannedMapLocation, type CaseLocation, type RouteResult } from '@/lib/case-locations-data'
+import type { MapVectorData } from '@/types/map-vector'
+import { pointsToSvgPath, generateRailwayPaths } from '@/lib/map-vector-utils'
 
 export interface VectorMapCanvasProps {
   pan: { x: number; y: number }
@@ -32,6 +34,7 @@ export interface VectorMapCanvasProps {
   handlePointerUp?: (e: React.PointerEvent) => void
   handleWheel?: (e: React.WheelEvent) => void
   isDragging?: boolean
+  customMapVector?: MapVectorData | null
   mapContainerRef: React.RefObject<HTMLDivElement | null>
   scaleMeters: number
   setPan: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>
@@ -71,6 +74,7 @@ export function VectorMapCanvas({
   handlePointerUp,
   handleWheel,
   isDragging = false,
+  customMapVector,
   mapContainerRef,
   scaleMeters,
   setPan,
@@ -83,6 +87,12 @@ export function VectorMapCanvas({
   routeMidpoint,
   showRoutePolyline = true
 }: VectorMapCanvasProps) {
+  const isCustomVector = Boolean(
+    customMapVector && (customMapVector.water.length > 0 || customMapVector.roads.length > 0)
+  )
+  const mapWidth = customMapVector?.canvasWidth || 1237
+  const mapHeight = customMapVector?.canvasHeight || 866
+
   return (
     <div
       ref={mapContainerRef}
@@ -107,27 +117,154 @@ export function VectorMapCanvas({
           transform: `translate3d(${pan.x}px, ${pan.y}px, 0px) scale(${zoom}) ${
             is3DView ? 'perspective(700px) rotateX(28deg)' : ''
           }`,
-          width: '1237px',
-          height: '866px'
+          width: `${mapWidth}px`,
+          height: `${mapHeight}px`
         }}
       >
         {/* =================================================================== */}
-        {/* 1. MASTER FIGMA HIGH-RES WORLD MAP RENDER LAYER (Frame 96:9215)     */}
+        {/* 1. MASTER WORLD MAP LAYER (CUSTOM VECTOR OR FALLBACK IMAGE)         */}
         {/* =================================================================== */}
-        <img
-          src="/images/cases/case_000/map/hanoi_master_map.png"
-          alt="Bản đồ Hà Nội Master"
-          className={cn(
-            'absolute inset-0 w-full h-full object-cover select-none pointer-events-none transition-[filter] duration-300',
-            mapLayer === 'satellite' ? 'brightness-75 contrast-125 saturate-50' : 'brightness-100'
-          )}
-          draggable={false}
-        />
+        {isCustomVector && customMapVector ? (
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-visible"
+            viewBox={`0 0 ${mapWidth} ${mapHeight}`}
+          >
+            {/* Background Board - Infinite Expansion */}
+            <rect
+              x="-200000"
+              y="-200000"
+              width="400000"
+              height="400000"
+              fill={customMapVector.backgroundColor || '#F3F2EE'}
+            />
+
+            {/* Custom Water Features (Lakes / Rivers) */}
+            {customMapVector.water.map((w) => {
+              const d = pointsToSvgPath(w.points, w.closed, w.smooth)
+              return w.closed ? (
+                <path
+                  key={w.id}
+                  d={d}
+                  fill={w.color}
+                  opacity={w.opacity}
+                  stroke="#7BB6E8"
+                  strokeWidth="1"
+                />
+              ) : (
+                <path
+                  key={w.id}
+                  d={d}
+                  fill="none"
+                  stroke={w.color}
+                  strokeWidth={w.width || 80}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity={w.opacity}
+                />
+              )
+            })}
+
+            {/* Custom Zones */}
+            {customMapVector.zones.map((z) => {
+              const d = pointsToSvgPath(z.points, true, false)
+              return (
+                <path
+                  key={z.id}
+                  d={d}
+                  fill={z.fillColor}
+                  stroke={z.strokeColor || '#CBD5E1'}
+                  strokeWidth={z.strokeWidth || 1.5}
+                  opacity={z.opacity}
+                />
+              )
+            })}
+
+            {/* Custom Roads (Casing + Surface + Bridge Shadows) */}
+            {customMapVector.roads.map((r) => {
+              const d = pointsToSvgPath(r.points, false, r.smooth)
+              return (
+                <g key={r.id}>
+                  {r.isBridge && (
+                    <path
+                      d={d}
+                      fill="none"
+                      stroke="#000000"
+                      strokeWidth={r.width + (r.casingWidth || 2) * 2 + 6}
+                      strokeLinecap="round"
+                      opacity="0.25"
+                    />
+                  )}
+                  <path
+                    d={d}
+                    fill="none"
+                    stroke={r.casingColor || '#94A3B8'}
+                    strokeWidth={r.width + (r.casingWidth || 2) * 2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d={d}
+                    fill="none"
+                    stroke={r.color || '#FFFFFF'}
+                    strokeWidth={r.width}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray={r.dashed ? '8 6' : undefined}
+                  />
+                </g>
+              )
+            })}
+
+            {/* Custom Railways */}
+            {customMapVector.railways.map((rw) => {
+              const { railsPath, sleepersPath } = generateRailwayPaths(
+                rw.points,
+                rw.width,
+                rw.sleeperSpacing
+              )
+              return (
+                <g key={rw.id}>
+                  <path d={sleepersPath} stroke="#1E293B" strokeWidth="2.5" strokeLinecap="butt" />
+                  <path d={railsPath} stroke={rw.color || '#475569'} strokeWidth="1.8" fill="none" />
+                </g>
+              )
+            })}
+
+            {/* Custom Text Labels */}
+            {customMapVector.labels.map((l) => (
+              <text
+                key={l.id}
+                x={l.x}
+                y={l.y}
+                fill={l.color}
+                fontSize={l.fontSize}
+                letterSpacing={l.letterSpacing ? `${l.letterSpacing}px` : undefined}
+                fontWeight={l.fontWeight || 'bold'}
+                transform={`rotate(${l.rotation || 0}, ${l.x}, ${l.y})`}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="font-sans"
+              >
+                {l.text}
+              </text>
+            ))}
+          </svg>
+        ) : (
+          <img
+            src="/images/cases/case_000/map/hanoi_master_map.png"
+            alt="Bản đồ Hà Nội Master"
+            className={cn(
+              'absolute inset-0 w-full h-full object-cover select-none pointer-events-none transition-[filter] duration-300',
+              mapLayer === 'satellite' ? 'brightness-75 contrast-125 saturate-50' : 'brightness-100'
+            )}
+            draggable={false}
+          />
+        )}
 
         {/* =================================================================== */}
         {/* 2. DYNAMIC INTERACTIVE OVERLAY CANVAS                               */}
         {/* =================================================================== */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1237 866">
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox={`0 0 ${mapWidth} ${mapHeight}`}>
           <defs>
             <linearGradient id="riverGrad" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#55CBE8" />
@@ -216,7 +353,7 @@ export function VectorMapCanvas({
         {/* INTERACTIVE OVERLAYS DIRECTLY ON TOP OF SCANNED MAP DOTS             */}
         {/* =================================================================== */}
         {caseLocations
-          .filter((loc) => isScannedMapLocation(loc.id))
+          .filter((loc) => (isCustomVector ? true : isScannedMapLocation(loc.id)))
           .map((loc) => {
             const isOrigin = showRoutePolyline && loc.id === origin.id
             const isDestination = (showRoutePolyline && loc.id === destination.id)
@@ -232,7 +369,7 @@ export function VectorMapCanvas({
                   handlePinClick(loc)
                 }}
               >
-                {/* 1. Origin Pin A: Pulsing Blue Selection Ring */}
+                {/* 1. Origin Pin A: Pulsing Blue Selection Ring (Chỉ hiện khi đang bật Chỉ đường) */}
                 {isOrigin ? (
                   <div className="relative size-7 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-full bg-[#1A73E8]/35 animate-ping opacity-75" />
@@ -241,7 +378,7 @@ export function VectorMapCanvas({
                     </div>
                   </div>
                 ) : isDestination ? (
-                  /* 2. Destination Pin B: Pulsing Red Selection Ring */
+                  /* 2. Destination Pin B: Pulsing Red Selection Ring (Chỉ hiện khi đang bật Chỉ đường) */
                   <div className="relative size-7 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-full bg-[#EA4335]/35 animate-ping opacity-75" />
                     <div className="size-5 rounded-full border-2 border-white bg-[#EA4335] shadow-lg ring-2 ring-[#EA4335] flex items-center justify-center">
@@ -249,15 +386,19 @@ export function VectorMapCanvas({
                     </div>
                   </div>
                 ) : isSelected ? (
-                  /* 3. Selected Place: Amber Highlight Ring */
-                  <div className="relative size-7 flex items-center justify-center">
-                    <div className="size-5 rounded-full border-2 border-white bg-[#FBBC04] shadow-lg ring-2 ring-[#FBBC04] flex items-center justify-center animate-pulse">
-                      <Circle className="size-1.5 fill-white text-white" />
+                  /* 3. Ghim tìm kiếm khi Người chơi Tra cứu địa điểm (Ghim đỏ giọt nước chuẩn Apple/Google Maps) */
+                  <div className="relative -translate-y-3.5 cursor-pointer z-30 transition-transform animate-in zoom-in-75 duration-200">
+                    <div className="flex flex-col items-center">
+                      <div className="size-8 rounded-full bg-[#EA4335] text-white flex items-center justify-center shadow-[0_4px_12px_rgba(234,67,53,0.55)] border-2 border-white ring-2 ring-[#EA4335]/30">
+                        <MapPin className="size-4.5 fill-white text-white" />
+                      </div>
+                      <div className="w-1.5 h-1.5 bg-[#EA4335] rotate-45 -mt-1 shadow-xs" />
+                      <div className="w-3.5 h-1 bg-black/35 rounded-full blur-[1px] mt-0.5" />
                     </div>
                   </div>
                 ) : (
-                  /* 4. Normal Dot Overlay: Clean White-Bordered Circular Hotspot (No Text) */
-                  <div className="size-5 rounded-full border-2 border-white/80 bg-transparent hover:scale-125 hover:border-blue-400 hover:bg-blue-500/25 transition-all shadow-xs" />
+                  /* 4. Player View: Bản đồ dân sự hoàn toàn sạch sẽ — Không lộ số, không highlight, không lộ vết án */
+                  <div className="size-7 rounded-full bg-transparent opacity-0 hover:opacity-10 hover:bg-black/20 transition-opacity" />
                 )}
               </div>
             )

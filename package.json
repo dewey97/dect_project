@@ -11,6 +11,7 @@
     "sync:gdocs": "node scripts/sync-testimonies-gdocs.js",
     "sync:testimonies": "node scripts/sync-testimonies-from-sheet.js",
     "sync:map": "node scripts/sync-figma-map.js",
+    "scan:map-vector": "python scripts/scan_figma_map_vector.py",
     "start": "next start",
     "lint": "tsc --noEmit"
   },

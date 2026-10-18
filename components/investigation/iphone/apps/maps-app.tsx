@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import {
   Search,
   Navigation,
@@ -16,13 +16,15 @@ import {
 import { cn } from '@/lib/utils'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
 import {
-  CaseLocation,
   calculateRoute,
-  RouteResult,
   transformSheetLocationToCaseLocation,
   DEFAULT_CASE_LOCATIONS,
-  SheetLocationRow
+  type CaseLocation,
+  type RouteResult,
+  type SheetLocationRow
 } from '@/lib/case-locations-data'
+import type { MapVectorData } from '@/types/map-vector'
+import { transformPoiToCaseLocation, getDefaultMapVectorData } from '@/lib/map-vector-utils'
 import { VectorMapCanvas } from './vector-map-canvas'
 
 interface MapsAppProps {
@@ -33,12 +35,41 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
   // Live CMS Integration: Fetch locations from Google Sheets tab 'locations'
   const { data: rawSheetLocations } = usePhoneData<SheetLocationRow>('locations')
 
+  // Custom Map Studio Vector Data Integration (Khởi tạo ngay lập tức với seed vector, tự động hydrate từ Database)
+  const [customMapVector, setCustomMapVector] = useState<MapVectorData | null>(() =>
+    getDefaultMapVectorData('case_000')
+  )
+
+  useEffect(() => {
+    let isMounted = true
+    async function loadCustomMap() {
+      try {
+        const res = await fetch('/api/admin/map-vector?caseId=case_000')
+        const json = await res.json()
+        if (json.success && json.data && isMounted) {
+          setCustomMapVector(json.data)
+        }
+      } catch (err) {
+        console.warn('Could not fetch custom map vector:', err)
+      }
+    }
+    loadCustomMap()
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   const caseLocations: CaseLocation[] = useMemo(() => {
+    // If Map Studio has custom POIs, use them as first-class case locations
+    if (customMapVector && customMapVector.pois && customMapVector.pois.length > 0) {
+      return customMapVector.pois.map(transformPoiToCaseLocation)
+    }
+
     if (!rawSheetLocations || rawSheetLocations.length === 0) {
       return DEFAULT_CASE_LOCATIONS
     }
     return rawSheetLocations.map(transformSheetLocationToCaseLocation)
-  }, [rawSheetLocations])
+  }, [rawSheetLocations, customMapVector])
 
   // Navigation & UI States
   const [activeTab, setActiveTab] = useState<'explore' | 'directions'>('explore')
@@ -66,7 +97,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
 
   // Map Pan & Zoom state (Expanded canvas centered on Dot 1 - Phân khu Cảng)
   const [zoom, setZoom] = useState(0.85)
-  const [pan, setPan] = useState({ x: -545, y: 130 })
+  const [pan, setPan] = useState({ x: -1270, y: -64 })
   const [isDragging, setIsDragging] = useState(false)
   const [isCentered, setIsCentered] = useState(true)
   const isDraggingRef = useRef(false)
@@ -82,6 +113,8 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
       caseLocations.find(
         (l) =>
           l.id === originId ||
+          l.id === `poi-${originId}` ||
+          l.id.replace(/^poi-/, '') === originId ||
           l.id === originId.replace(/^loc-0?/, '') ||
           `loc-${l.id.padStart?.(2, '0') || l.id}` === originId
       ) ||
@@ -94,6 +127,8 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
       caseLocations.find(
         (l) =>
           l.id === destinationId ||
+          l.id === `poi-${destinationId}` ||
+          l.id.replace(/^poi-/, '') === destinationId ||
           l.id === destinationId.replace(/^loc-0?/, '') ||
           `loc-${l.id.padStart?.(2, '0') || l.id}` === destinationId
       ) ||
@@ -494,6 +529,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
         handlePointerUp={handlePointerUp}
         handleWheel={handleWheel}
         isDragging={isDragging}
+        customMapVector={customMapVector}
         mapContainerRef={mapContainerRef}
         scaleMeters={scaleMeters}
         setPan={setPan}
