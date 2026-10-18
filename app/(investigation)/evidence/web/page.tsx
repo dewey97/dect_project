@@ -22,6 +22,7 @@ import {
   Layers,
   FolderOpen,
   Search,
+  PenLine,
 } from "lucide-react";
 import { PDFViewerModal } from "@/components/investigation/pdf-viewer-modal";
 import { detectiveAudio } from "@/lib/investigation-audio";
@@ -48,6 +49,7 @@ import { QuickActionFab } from "@/components/investigation/evidence/quick-action
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
 import { HintModal } from "@/components/investigation/hint-modal";
+import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { normalizeImageUrl } from "@/lib/utils";
@@ -65,6 +67,7 @@ type ActiveModal =
   | "epilogue"
   | "hint"
   | "mobile_pdf"
+  | "notebook"
   | null;
 
 function WebEvidencePageContent() {
@@ -123,6 +126,7 @@ function WebEvidencePageContent() {
   // Event bus listeners
   useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
+  useInvestigationEvent("OPEN_NOTEBOOK", () => setActiveModal("notebook"));
   useInvestigationEvent("OPEN_HINT", (e: any) => {
     const cpId = e?.detail?.checkpointId || (typeof e?.detail === "string" ? e.detail : undefined);
     const cat = e?.detail?.category || (typeof e?.detail === "object" ? e.detail?.category : undefined);
@@ -479,6 +483,14 @@ function WebEvidencePageContent() {
           <ImageIcon className="size-4 shrink-0" />
           <span className="truncate">ẢNH</span>
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveModal("notebook")}
+          className="size-11 shrink-0 flex items-center justify-center rounded-lg bg-[#24170e] hover:bg-[#382315] border border-[#4d3420] text-[#d9a066] hover:text-[#fdebd7] transition-all cursor-pointer shadow-sm active:scale-95"
+          title="Sổ tay thám tử"
+        >
+          <PenLine className="size-4" />
+        </button>
       </div>
 
       <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-center overflow-hidden min-w-0 relative gap-0 lg:gap-2.5">
@@ -495,8 +507,17 @@ function WebEvidencePageContent() {
             mobileTab === "board" ? "flex" : "hidden lg:flex"
           )}
         >
-          {/* TOP RIGHT TOOLBAR: TOGGLE HỒ SƠ FOCUS / SPLIT */}
+          {/* TOP RIGHT TOOLBAR: SỔ TAY & TOGGLE HỒ SƠ FOCUS / SPLIT */}
           <div className="hidden lg:flex absolute top-3 right-3 z-30 items-center gap-1.5 bg-[#1e150e]/90 backdrop-blur-md px-2 py-1 rounded-lg border border-[#4a3625] shadow-xl">
+            <button
+              onClick={() => setActiveModal("notebook")}
+              className="px-2 py-1 rounded bg-[#2b1b11] hover:bg-[#3d2618] border border-[#523824] text-[#d9a066] hover:text-[#fef5ec] transition-colors cursor-pointer flex items-center gap-1.5 font-mono text-[0.62rem] font-bold"
+              title="Mở sổ tay ghi chép thám tử"
+            >
+              <PenLine className="size-3" />
+              <span>SỔ TAY</span>
+            </button>
+            <div className="w-[1px] h-3 bg-[#4a3625]" />
             <span className="font-mono text-[0.62rem] text-[#ad9885] tracking-wider uppercase font-bold">
               {isDossierCollapsed ? "CHẾ ĐỘ TẬP TRUNG (FOCUS)" : "BÀN PHÁ ÁN (3 VÙNG)"}
             </span>
@@ -862,7 +883,7 @@ function WebEvidencePageContent() {
             </button>
           </div>
 
-          <EvidenceDetailInspector selectedView={selectedView} />
+          <EvidenceDetailInspector selectedView={selectedView} caseId={caseId} />
         </div>
       </div>
 
@@ -931,12 +952,20 @@ function WebEvidencePageContent() {
         onClose={() => setActiveModal(null)}
       />
 
+      {/* DETECTIVE NOTEBOOK MODAL */}
+      <DetectiveNotebookModal
+        isOpen={activeModal === "notebook"}
+        onClose={() => setActiveModal(null)}
+        caseId={caseId}
+      />
+
       {/* MOBILE FULL SCREEN MODAL */}
       <PDFViewerModal
         isOpen={activeModal === "mobile_pdf"}
         selectedView={selectedView}
         pdfUrl={selectedView.type === "pdf" ? selectedView.data.url : null}
         title={selectedView.data.title}
+        caseId={caseId}
         onClose={() => setActiveModal(null)}
       />
     </div>

@@ -10,6 +10,7 @@ export const INVESTIGATION_EVENTS = {
   RESET_BOARD_VIEW: "reset-board-view",
   BOARD_ZOOM_IN: "board-zoom-in",
   OPEN_FEEDBACK: "open-feedback-modal",
+  OPEN_NOTEBOOK: "open-notebook-modal",
 } as const;
 
 export type InvestigationEventName =

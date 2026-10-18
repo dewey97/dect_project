@@ -85,3 +85,16 @@ export interface DbAppSettings {
   banner_text: string;
   updated_at: string;
 }
+
+/** Bảng dossier_documents: Hồ sơ biên bản lấy lời khai và lý lịch tư pháp nghi phạm */
+export interface DbDossierDocument {
+  id: string;
+  case_id: string;
+  mode: 'loi_khai' | 'ly_lich';
+  tag_code: string;
+  subject_name: string;
+  paper_config: any;
+  content: any;
+  created_at: string;
+  updated_at: string;
+}

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lightbulb, RefreshCw, X, Box, BookOpen, Home, MessageSquare } from "lucide-react";
+import { Lightbulb, RefreshCw, X, Box, BookOpen, Home, MessageSquare, PenLine } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 
@@ -14,6 +14,7 @@ interface QuickActionFabProps {
   onOpenWebMode?: () => void;
   onOpenHint?: () => void;
   onOpenGuide?: () => void;
+  onOpenNotebook?: () => void;
   onOpenReinvestigation?: () => void;
   onOpenSuspects?: () => void;
   onReinvestigate?: () => void;
@@ -27,6 +28,7 @@ export function QuickActionFab({
   onOpenWebMode,
   onOpenHint,
   onOpenGuide,
+  onOpenNotebook,
   onOpenReinvestigation,
   onOpenSuspects,
   onReinvestigate,
@@ -76,6 +78,24 @@ export function QuickActionFab({
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className="mb-2.5 w-56 bg-[#140d08]/95 border border-[#3d2b1d] shadow-[0_15px_40px_rgba(0,0,0,0.95),0_0_15px_rgba(217,160,102,0.06)] rounded-xl p-2 space-y-1.5 backdrop-blur-md text-[#fef5ec]"
           >
+            {/* OPTION: DETECTIVE NOTEBOOK */}
+            <button
+              type="button"
+              onClick={() =>
+                handleAction(() => {
+                  if (onOpenNotebook) {
+                    onOpenNotebook();
+                  } else {
+                    emitInvestigationEvent("OPEN_NOTEBOOK");
+                  }
+                })
+              }
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-bold text-[#fef5ec] hover:text-[#d9a066] group bg-[#1d140d] border border-[#3f2b1d]"
+            >
+              <PenLine className="size-4 text-[#d9a066] shrink-0 group-hover:scale-110 transition-transform" />
+              <span>Sổ tay thám tử</span>
+            </button>
+
             {/* OPTION: GAMEPLAY GUIDE */}
             <button
               type="button"

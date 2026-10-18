@@ -3,6 +3,8 @@
 import { X, FileText, ImageIcon, ShieldCheck } from 'lucide-react'
 import type { SelectedView } from '@/components/investigation/evidence/evidence-types'
 import { normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
+import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'
+import { DiegeticDossierSheet } from './evidence/diegetic-dossier-sheet'
 
 interface PDFViewerModalProps {
   pdfUrl?: string | null
@@ -10,15 +12,25 @@ interface PDFViewerModalProps {
   selectedView?: SelectedView | null
   isOpen: boolean
   onClose: () => void
+  caseId?: string
 }
 
-export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose }: PDFViewerModalProps) {
-  if (!isOpen) return null
-
+export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, caseId = 'case_000' }: PDFViewerModalProps) {
   const isEvidence = selectedView?.type === 'evidence'
+  const isPdf = selectedView?.type === 'pdf'
   const activeTitle = title || (selectedView ? selectedView.data.title : 'Tài liệu')
-  const rawPdfUrl = pdfUrl || (selectedView?.type === 'pdf' ? selectedView.data.url : null)
+  const rawPdfUrl = pdfUrl || (isPdf ? selectedView.data.url : null)
   const normalizedPdfUrl = rawPdfUrl ? normalizeDrivePdfUrl(rawPdfUrl) : null
+
+  // Tra cứu xem hồ sơ này đã được số hóa trên Dossier Studio chưa
+  const { findMatchingDocument } = useDossierDocuments(caseId)
+  const matchedDossier = isPdf ? findMatchingDocument({
+    code: selectedView?.data.code,
+    title: selectedView?.data.title,
+    id: selectedView?.data.id
+  }) : undefined
+
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-2 sm:p-4">
@@ -64,6 +76,13 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose }:
                     </span>
                   </div>
                 )}
+              </div>
+            </div>
+          ) : isPdf && matchedDossier ? (
+            /* Hiển thị trực tiếp bản in Diegetic Dossier Sheet */
+            <div className="w-full h-full overflow-y-auto custom-scrollbar bg-[#0f0c09] p-3 sm:p-6 flex flex-col items-center">
+              <div className="w-full max-w-full overflow-x-auto flex justify-center pb-4">
+                <DiegeticDossierSheet document={matchedDossier} />
               </div>
             </div>
           ) : normalizedPdfUrl ? (

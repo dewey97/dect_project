@@ -8,6 +8,25 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/admin/map-studio',
+        destination: '/studio/map',
+        permanent: true,
+      },
+      {
+        source: '/admin/dossier-studio',
+        destination: '/studio/dossier',
+        permanent: true,
+      },
+      {
+        source: '/admin',
+        destination: '/studio',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {
