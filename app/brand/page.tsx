@@ -69,41 +69,6 @@ export default function BrandGuidelinesPage() {
     }
   ]
 
-  const ASSET_DOWNLOADS = [
-    {
-      title: 'Logo Ngang Chính Thức',
-      file: '/brand/logo.png',
-      format: 'PNG',
-      dims: '1920 × 1080 px',
-      previewSrc: '/brand/logo.png',
-      previewAspect: 'aspect-[16/9]'
-    },
-    {
-      title: 'Biểu Tượng X Noir',
-      file: '/brand/logo-x.png',
-      format: 'PNG',
-      dims: '512 × 512 px',
-      previewSrc: '/brand/logo-x.png',
-      previewAspect: 'aspect-[16/9]'
-    },
-    {
-      title: 'Bộ Favicon Trình Duyệt',
-      file: '/brand/favicon.ico',
-      format: 'ICO Multi-Res',
-      dims: '16x16, 32x32, 48x48',
-      previewSrc: '/brand/icon-dark-32x32.png',
-      previewAspect: 'aspect-[16/9]'
-    },
-    {
-      title: 'Ảnh Chia Sẻ Mạng Xã Hội (OG Image)',
-      file: '/brand/og-image.jpg',
-      format: 'JPG',
-      dims: '1200 × 630 px',
-      previewSrc: '/brand/og-image.jpg',
-      previewAspect: 'aspect-[16/9]'
-    }
-  ]
-
   const FONT_SPECIMENS = [
     {
       type: 'Sans / Giao diện & Nội dung',
@@ -209,54 +174,44 @@ export default function BrandGuidelinesPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Horizontal Logo */}
+            {/* Logo Chính */}
             <div
-              className={`rounded-xl border p-6 flex flex-col justify-between gap-6 transition-all min-h-[240px] ${
+              className={`rounded-xl border p-6 flex flex-col justify-between gap-4 transition-all min-h-[220px] ${
                 logoTheme === 'dark'
                   ? 'bg-[#0a0a0d] border-zinc-800 text-white'
                   : 'bg-[#f4efe6] border-[#d8d0c2] text-zinc-900'
               }`}
             >
               <span className="font-mono text-[0.65rem] uppercase tracking-widest opacity-60">
-                LOGO CHÍNH (NGANG)
+                LOGO CHÍNH
               </span>
 
-              <div className="flex items-center justify-center py-4">
+              <div className="flex items-center justify-center py-6">
                 <img
                   src="/brand/logo.png"
                   alt="XPLORE Logo"
-                  className={`max-h-14 w-auto object-contain transition-all ${
+                  className={`max-h-16 w-auto object-contain transition-all ${
                     logoTheme === 'light' ? 'invert hue-rotate-180 brightness-90' : ''
                   }`}
                 />
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-current/10 text-xs font-mono">
-                <span className="opacity-75">Tỉ lệ 16:5</span>
-                <a
-                  href="/brand/logo.png"
-                  download="xplore_logo.png"
-                  className="inline-flex items-center gap-1 text-primary hover:underline"
-                >
-                  <Download className="size-3.5" />
-                  <span>Tải PNG</span>
-                </a>
-              </div>
+              <div />
             </div>
 
-            {/* Emblem Mark (Clean, transparent, no wrapped border) */}
+            {/* Biểu Tượng */}
             <div
-              className={`rounded-xl border p-6 flex flex-col justify-between gap-6 transition-all min-h-[240px] ${
+              className={`rounded-xl border p-6 flex flex-col justify-between gap-4 transition-all min-h-[220px] ${
                 logoTheme === 'dark'
                   ? 'bg-[#0a0a0d] border-zinc-800 text-white'
                   : 'bg-[#f4efe6] border-[#d8d0c2] text-zinc-900'
               }`}
             >
               <span className="font-mono text-[0.65rem] uppercase tracking-widest opacity-60">
-                BIỂU TƯỢNG (MONOGRAM)
+                BIỂU TƯỢNG
               </span>
 
-              <div className="flex items-center justify-center py-4">
+              <div className="flex items-center justify-center py-6">
                 <img
                   src="/brand/logo-x.png"
                   alt="XPLORE Mark"
@@ -266,17 +221,7 @@ export default function BrandGuidelinesPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-current/10 text-xs font-mono">
-                <span className="opacity-75">Tỉ lệ 1:1</span>
-                <a
-                  href="/brand/logo-x.png"
-                  download="xplore_mark.png"
-                  className="inline-flex items-center gap-1 text-primary hover:underline"
-                >
-                  <Download className="size-3.5" />
-                  <span>Tải PNG</span>
-                </a>
-              </div>
+              <div />
             </div>
           </div>
 
@@ -372,7 +317,7 @@ export default function BrandGuidelinesPage() {
           </div>
         </section>
 
-        {/* 4. DOWNLOADS WITH FULL VISUAL PREVIEWS */}
+        {/* 4. DOWNLOADS WITH LARGE VISUAL PREVIEWS */}
         <section id="downloads" className="flex flex-col gap-6 scroll-mt-20">
           <div className="border-b border-border/30 pb-3">
             <h2 className="text-lg sm:text-xl font-bold uppercase font-sans">
@@ -380,38 +325,64 @@ export default function BrandGuidelinesPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {ASSET_DOWNLOADS.map((item) => (
-              <div
-                key={item.file}
-                className="rounded-xl border border-border/40 bg-card/40 p-4 flex flex-col justify-between gap-4 hover:border-primary/60 transition-all hover:shadow-lg group"
-              >
-                {/* Visual Preview Box */}
-                <div className="w-full h-36 rounded-lg bg-black/60 border border-white/5 flex items-center justify-center p-3 overflow-hidden relative group-hover:border-primary/30 transition-colors">
+          <div className="flex flex-col gap-5">
+            {/* FEATURED: OpenGraph Social Banner (Large, High-Clarity View) */}
+            <div className="rounded-xl border border-border/40 bg-card/40 p-5 sm:p-6 flex flex-col gap-4 hover:border-primary/50 transition-all shadow-md group">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-bold text-base text-foreground font-sans">
+                    Ảnh Chia Sẻ Mạng Xã Hội (OpenGraph Image)
+                  </h3>
+                  <span className="text-xs font-mono text-muted-foreground">
+                    1200 × 630 px
+                  </span>
+                </div>
+
+                <a
+                  href="/brand/og-image.jpg"
+                  download="xplore_og_image.jpg"
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-black font-bold text-xs hover:bg-primary/90 transition-all shadow-sm active:scale-95 w-fit"
+                >
+                  <Download className="size-4" />
+                  <span>Tải File (1200×630)</span>
+                </a>
+              </div>
+
+              {/* Large Image Preview Box */}
+              <div className="w-full aspect-[1.91/1] max-h-[380px] rounded-lg bg-black/80 border border-white/10 overflow-hidden relative flex items-center justify-center">
+                <img
+                  src="/brand/og-image.jpg"
+                  alt="OpenGraph Preview"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.01]"
+                />
+              </div>
+            </div>
+
+            {/* 3 Brand Mark & Icon Assets */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Logo Ngang */}
+              <div className="rounded-xl border border-border/40 bg-card/40 p-4 flex flex-col justify-between gap-4 hover:border-primary/50 transition-all shadow-sm group">
+                <div className="w-full h-32 rounded-lg bg-black/60 border border-white/5 flex items-center justify-center p-4 overflow-hidden relative">
                   <img
-                    src={item.previewSrc}
-                    alt={item.title}
+                    src="/brand/logo.png"
+                    alt="Logo Ngang"
                     className="max-h-full max-w-full object-contain drop-shadow transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
 
-                {/* Meta info & Action */}
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-col">
-                    <h3 className="font-bold text-sm text-foreground truncate" title={item.title}>
-                      {item.title}
+                    <h3 className="font-bold text-sm text-foreground truncate">
+                      Logo Chính
                     </h3>
-                    <div className="flex items-center gap-2 text-[0.7rem] font-mono text-muted-foreground mt-0.5">
-                      <span className="px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-300">
-                        {item.format}
-                      </span>
-                      <span>{item.dims}</span>
-                    </div>
+                    <span className="text-[0.7rem] font-mono text-muted-foreground mt-0.5">
+                      1920 × 1080 px
+                    </span>
                   </div>
 
                   <a
-                    href={item.file}
-                    download
+                    href="/brand/logo.png"
+                    download="xplore_logo.png"
                     className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-black font-bold text-xs hover:bg-primary/90 transition-all shadow-sm active:scale-95"
                   >
                     <Download className="size-3.5" />
@@ -419,7 +390,69 @@ export default function BrandGuidelinesPage() {
                   </a>
                 </div>
               </div>
-            ))}
+
+              {/* Biểu Tượng X */}
+              <div className="rounded-xl border border-border/40 bg-card/40 p-4 flex flex-col justify-between gap-4 hover:border-primary/50 transition-all shadow-sm group">
+                <div className="w-full h-32 rounded-lg bg-black/60 border border-white/5 flex items-center justify-center p-4 overflow-hidden relative">
+                  <img
+                    src="/brand/logo-x.png"
+                    alt="Biểu Tượng X"
+                    className="max-h-full max-w-full object-contain drop-shadow transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col">
+                    <h3 className="font-bold text-sm text-foreground truncate">
+                      Biểu Tượng
+                    </h3>
+                    <span className="text-[0.7rem] font-mono text-muted-foreground mt-0.5">
+                      512 × 512 px
+                    </span>
+                  </div>
+
+                  <a
+                    href="/brand/logo-x.png"
+                    download="xplore_mark.png"
+                    className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-black font-bold text-xs hover:bg-primary/90 transition-all shadow-sm active:scale-95"
+                  >
+                    <Download className="size-3.5" />
+                    <span>Tải File</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Bộ Favicon */}
+              <div className="rounded-xl border border-border/40 bg-card/40 p-4 flex flex-col justify-between gap-4 hover:border-primary/50 transition-all shadow-sm group">
+                <div className="w-full h-32 rounded-lg bg-black/60 border border-white/5 flex items-center justify-center p-4 overflow-hidden relative">
+                  <img
+                    src="/brand/icon-dark-32x32.png"
+                    alt="Favicon"
+                    className="size-10 object-contain drop-shadow transition-transform duration-300 group-hover:scale-110"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col">
+                    <h3 className="font-bold text-sm text-foreground truncate">
+                      Bộ Favicon Trình Duyệt
+                    </h3>
+                    <span className="text-[0.7rem] font-mono text-muted-foreground mt-0.5">
+                      16x16, 32x32, 48x48
+                    </span>
+                  </div>
+
+                  <a
+                    href="/brand/favicon.ico"
+                    download="favicon.ico"
+                    className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-black font-bold text-xs hover:bg-primary/90 transition-all shadow-sm active:scale-95"
+                  >
+                    <Download className="size-3.5" />
+                    <span>Tải File</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
