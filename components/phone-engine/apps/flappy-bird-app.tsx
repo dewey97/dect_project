@@ -458,7 +458,7 @@ export function FlappyBirdApp({
       {/* Secret Clue Toast */}
       {clueUnlocked && (
         <div className="mx-3 mt-1 px-3 py-1 bg-amber-400 text-amber-950 font-bold text-[11px] rounded shadow-md z-30 text-center animate-bounce border border-amber-600">
-          🔓 Đạt 15 điểm! Mật mã nhật ký nạn nhân: "FLAP_0814"
+          🔓 Đạt 15 điểm! Mở khóa: "FLAP_0814"
         </div>
       )}
 
@@ -514,7 +514,7 @@ export function FlappyBirdApp({
               </div>
 
               <div className="flex justify-between items-center text-xs font-bold text-zinc-700">
-                <span>Kỷ lục nạn nhân:</span>
+                <span>Kỷ lục:</span>
                 <span className="font-black text-lg text-[#ea580c] font-mono">
                   {bestScore}
                 </span>

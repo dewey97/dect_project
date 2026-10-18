@@ -202,7 +202,7 @@ export function SnakeApp({
         </div>
         <div className="flex items-center gap-1.5 text-zinc-400">
           <Trophy className="size-3 text-amber-400" />
-          <span>Kỷ lục nạn nhân:</span>
+          <span>Kỷ lục:</span>
           <span className="font-mono text-amber-300 font-bold">
             {highScore}
           </span>
