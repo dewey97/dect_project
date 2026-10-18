@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, RotateCcw, Trophy, Play, Pause } from "lucide-react";
+import { RotateCcw, Trophy, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SnakeAppProps {
-  onBackToHome: () => void;
-  targetClueScore?: number; // Điểm số bí mật để mở manh mối
+  onBackToHome?: () => void;
+  targetClueScore?: number;
   onSecretUnlocked?: () => void;
 }
 
@@ -14,10 +14,9 @@ type Point = { x: number; y: number };
 type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
 
 const GRID_SIZE = 18;
-const INITIAL_SPEED = 140;
+const INITIAL_SPEED = 135;
 
 export function SnakeApp({
-  onBackToHome,
   targetClueScore = 50,
   onSecretUnlocked,
 }: SnakeAppProps) {
@@ -31,13 +30,12 @@ export function SnakeApp({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
-  const [highScore, setHighScore] = useState<number>(140); // Điểm kỷ lục của nạn nhân
+  const [highScore, setHighScore] = useState<number>(140);
   const [clueUnlocked, setClueUnlocked] = useState<boolean>(false);
 
   const directionRef = useRef<Direction>(direction);
   directionRef.current = direction;
 
-  // Tạo thức ăn ngẫu nhiên
   const generateFood = useCallback((currentSnake: Point[]): Point => {
     while (true) {
       const newFood = {
@@ -51,7 +49,6 @@ export function SnakeApp({
     }
   }, []);
 
-  // Khởi động lại
   const resetGame = () => {
     const initSnake: Point[] = [
       { x: 9, y: 9 },
@@ -67,13 +64,41 @@ export function SnakeApp({
     setIsPlaying(true);
   };
 
-  // Thay đổi hướng đi an toàn
-  const changeDirection = (newDir: Direction) => {
+  const changeDirection = useCallback((newDir: Direction) => {
     const cur = directionRef.current;
     if (newDir === "UP" && cur !== "DOWN") setDirection("UP");
     if (newDir === "DOWN" && cur !== "UP") setDirection("DOWN");
     if (newDir === "LEFT" && cur !== "RIGHT") setDirection("LEFT");
     if (newDir === "RIGHT" && cur !== "LEFT") setDirection("RIGHT");
+  }, []);
+
+  // -------------------------------------------------------------
+  // THAO TÁC CẢM ỨNG VUỐT 4 HƯỚNG TỰ NHIÊN (SWIPE GESTURES)
+  // -------------------------------------------------------------
+  const touchStartPos = useRef<{ x: number; y: number } | null>(null);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartPos.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+    };
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartPos.current) return;
+    const diffX = e.changedTouches[0].clientX - touchStartPos.current.x;
+    const diffY = e.changedTouches[0].clientY - touchStartPos.current.y;
+
+    if (Math.abs(diffX) > 20 || Math.abs(diffY) > 20) {
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > 0) changeDirection("RIGHT");
+        else changeDirection("LEFT");
+      } else {
+        if (diffY > 0) changeDirection("DOWN");
+        else changeDirection("UP");
+      }
+    }
+    touchStartPos.current = null;
   };
 
   // Vòng lặp game
@@ -115,7 +140,6 @@ export function SnakeApp({
           setScore(newScore);
           if (newScore > highScore) setHighScore(newScore);
 
-          // Kích hoạt bí mật vụ án nếu đạt điểm
           if (newScore >= targetClueScore && !clueUnlocked) {
             setClueUnlocked(true);
             if (onSecretUnlocked) onSecretUnlocked();
@@ -144,10 +168,15 @@ export function SnakeApp({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [changeDirection]);
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-[#111827] text-white font-sans select-none overflow-hidden">
+    <div
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      className="flex-1 min-h-0 flex flex-col bg-[#111827] text-white font-sans select-none overflow-hidden touch-none"
+      style={{ touchAction: "none" }}
+    >
       {/* App Header */}
       <div className="h-11 px-3 bg-[#1F2937] border-b border-white/10 flex items-center justify-between shrink-0">
         <span className="w-8" />
@@ -156,7 +185,7 @@ export function SnakeApp({
         </div>
         <button
           onClick={resetGame}
-          className="p-1 rounded text-zinc-400 hover:text-white active:scale-95"
+          className="p-1 rounded text-zinc-400 hover:text-white active:scale-95 cursor-pointer"
           title="Chơi lại"
         >
           <RotateCcw className="size-3.5" />
@@ -164,7 +193,7 @@ export function SnakeApp({
       </div>
 
       {/* Scoreboard */}
-      <div className="px-4 py-2 bg-emerald-950/40 border-b border-emerald-900/40 flex items-center justify-between text-xs">
+      <div className="px-4 py-2 bg-emerald-950/40 border-b border-emerald-900/40 flex items-center justify-between text-xs shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-zinc-400">Điểm:</span>
           <span className="font-mono text-emerald-300 font-bold text-sm">
@@ -182,15 +211,15 @@ export function SnakeApp({
 
       {/* Secret Clue Toast */}
       {clueUnlocked && (
-        <div className="mx-3 mt-2 px-2.5 py-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-[11px] text-emerald-300 flex items-center justify-between animate-pulse">
+        <div className="mx-3 mt-2 px-2.5 py-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-[11px] text-emerald-300 flex items-center justify-between animate-pulse shrink-0">
           <span>🔓 Ghi chú bí mật: "Mật khẩu két sắt: 2407"</span>
         </div>
       )}
 
-      {/* Game Board */}
-      <div className="flex-1 min-h-0 flex items-center justify-center p-2 relative">
+      {/* Game Board - Tận dụng toàn bộ không gian màn hình */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-3 relative">
         <div
-          className="aspect-square w-full max-w-[280px] bg-[#064E3B]/20 border-2 border-emerald-800/60 rounded-lg relative overflow-hidden grid"
+          className="aspect-square w-full max-w-[340px] bg-[#064E3B]/20 border-2 border-emerald-800/60 rounded-xl relative overflow-hidden grid shadow-2xl"
           style={{
             gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
@@ -229,7 +258,7 @@ export function SnakeApp({
 
           {/* Overlay Khi Chưa Bắt Đầu Hoặc Game Over */}
           {(!isPlaying || isGameOver) && (
-            <div className="absolute inset-0 bg-black/75 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-10">
+            <div className="absolute inset-0 bg-black/75 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-10 pointer-events-auto">
               {isGameOver ? (
                 <>
                   <div className="text-red-400 font-bold text-base mb-1">
@@ -240,7 +269,7 @@ export function SnakeApp({
                   </div>
                   <button
                     onClick={resetGame}
-                    className="px-4 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs flex items-center gap-1.5 active:scale-95 transition-all shadow-md cursor-pointer"
+                    className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs flex items-center gap-1.5 active:scale-95 transition-all shadow-md cursor-pointer"
                   >
                     <RotateCcw className="size-3.5" />
                     <span>Chơi lại</span>
@@ -248,15 +277,12 @@ export function SnakeApp({
                 </>
               ) : (
                 <>
-                  <div className="text-emerald-400 font-bold text-base mb-1">
+                  <div className="text-emerald-400 font-bold text-base mb-3">
                     RẮN SĂN MỒI
-                  </div>
-                  <div className="text-[11px] text-zinc-400 mb-3">
-                    Đạt 50 điểm để mở manh mối ẩn
                   </div>
                   <button
                     onClick={resetGame}
-                    className="px-4 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs flex items-center gap-1.5 active:scale-95 transition-all shadow-md cursor-pointer"
+                    className="px-6 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs flex items-center gap-1.5 active:scale-95 transition-all shadow-md cursor-pointer"
                   >
                     <Play className="size-3.5 fill-current" />
                     <span>Bắt đầu</span>
@@ -265,47 +291,6 @@ export function SnakeApp({
               )}
             </div>
           )}
-        </div>
-      </div>
-
-      {/* D-Pad Controller ảo cho Mobile */}
-      <div className="p-3 bg-[#1F2937]/80 border-t border-white/5 flex flex-col items-center justify-center shrink-0">
-        <div className="grid grid-cols-3 gap-1.5 w-36">
-          <div />
-          <button
-            onClick={() => changeDirection("UP")}
-            className="h-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-bold flex items-center justify-center shadow-md active:scale-95 transition-all"
-          >
-            ▲
-          </button>
-          <div />
-          <button
-            onClick={() => changeDirection("LEFT")}
-            className="h-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-bold flex items-center justify-center shadow-md active:scale-95 transition-all"
-          >
-            ◀
-          </button>
-          <button
-            onClick={() => setIsPlaying((p) => !p)}
-            className="h-10 rounded-lg bg-zinc-700 hover:bg-zinc-600 active:scale-95 text-xs text-zinc-300 flex items-center justify-center"
-            title="Tạm dừng"
-          >
-            {isPlaying ? <Pause className="size-3.5" /> : <Play className="size-3.5 fill-current" />}
-          </button>
-          <button
-            onClick={() => changeDirection("RIGHT")}
-            className="h-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-bold flex items-center justify-center shadow-md active:scale-95 transition-all"
-          >
-            ▶
-          </button>
-          <div />
-          <button
-            onClick={() => changeDirection("DOWN")}
-            className="h-10 rounded-lg bg-zinc-800 hover:bg-zinc-700 active:bg-emerald-600 text-white font-bold flex items-center justify-center shadow-md active:scale-95 transition-all"
-          >
-            ▼
-          </button>
-          <div />
         </div>
       </div>
     </div>

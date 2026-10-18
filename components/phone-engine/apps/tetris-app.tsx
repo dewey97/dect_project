@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, RotateCcw, Trophy, Play, Pause } from "lucide-react";
+import { RotateCcw, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TetrisProps {
-  onBackToHome: () => void;
+  onBackToHome?: () => void;
   targetClueLines?: number;
   onSecretUnlocked?: () => void;
 }
@@ -26,20 +26,22 @@ const TETROMINOES = {
 
 type TetrominoKey = keyof typeof TETROMINOES;
 
+interface PieceItem {
+  shape: number[][];
+  color: string;
+  x: number;
+  y: number;
+}
+
 export function TetrisApp({
-  onBackToHome,
   targetClueLines = 4,
   onSecretUnlocked,
 }: TetrisProps) {
   const [board, setBoard] = useState<string[][]>(() =>
     Array.from({ length: ROWS }, () => Array(COLS).fill(""))
   );
-  const [currentPiece, setCurrentPiece] = useState<{
-    shape: number[][];
-    color: string;
-    x: number;
-    y: number;
-  } | null>(null);
+  const [currentPiece, setCurrentPiece] = useState<PieceItem | null>(null);
+  const [nextPiece, setNextPiece] = useState<PieceItem | null>(null);
 
   const [score, setScore] = useState<number>(0);
   const [lines, setLines] = useState<number>(0);
@@ -51,26 +53,34 @@ export function TetrisApp({
   boardRef.current = board;
   const currentPieceRef = useRef(currentPiece);
   currentPieceRef.current = currentPiece;
+  const nextPieceRef = useRef(nextPiece);
+  nextPieceRef.current = nextPiece;
 
-  // Sinh khối gạch mới
-  const spawnPiece = useCallback(() => {
+  // Tạo ngẫu nhiên một khối gạch mới
+  const createRandomPiece = useCallback((): PieceItem => {
     const keys = Object.keys(TETROMINOES) as TetrominoKey[];
     const randomKey = keys[Math.floor(Math.random() * keys.length)];
     const item = TETROMINOES[randomKey];
 
-    const newPiece = {
+    return {
       shape: item.shape,
       color: item.color,
       x: Math.floor(COLS / 2) - Math.floor(item.shape[0].length / 2),
       y: 0,
     };
+  }, []);
+
+  // Đưa khối Next vào Current, và sinh khối Next tiếp theo
+  const spawnPiece = useCallback(() => {
+    const incomingPiece = nextPieceRef.current || createRandomPiece();
+    const futurePiece = createRandomPiece();
 
     // Kiểm tra đụng nóc (Game Over)
-    for (let r = 0; r < newPiece.shape.length; r++) {
-      for (let c = 0; c < newPiece.shape[r].length; c++) {
+    for (let r = 0; r < incomingPiece.shape.length; r++) {
+      for (let c = 0; c < incomingPiece.shape[r].length; c++) {
         if (
-          newPiece.shape[r][c] &&
-          boardRef.current[newPiece.y + r]?.[newPiece.x + c]
+          incomingPiece.shape[r][c] &&
+          boardRef.current[incomingPiece.y + r]?.[incomingPiece.x + c]
         ) {
           setIsGameOver(true);
           setIsPlaying(false);
@@ -79,9 +89,11 @@ export function TetrisApp({
       }
     }
 
-    setCurrentPiece(newPiece);
-    return newPiece;
-  }, []);
+    setCurrentPiece(incomingPiece);
+    setNextPiece(futurePiece);
+    nextPieceRef.current = futurePiece;
+    return incomingPiece;
+  }, [createRandomPiece]);
 
   const resetGame = () => {
     setBoard(Array.from({ length: ROWS }, () => Array(COLS).fill("")));
@@ -89,7 +101,12 @@ export function TetrisApp({
     setLines(0);
     setIsGameOver(false);
     setIsPlaying(true);
-    spawnPiece();
+
+    const first = createRandomPiece();
+    const second = createRandomPiece();
+    setCurrentPiece(first);
+    setNextPiece(second);
+    nextPieceRef.current = second;
   };
 
   // Kiểm tra va chạm
@@ -118,7 +135,7 @@ export function TetrisApp({
     return false;
   };
 
-  // Cố định khối gạch vào bàn cờ & xóa hàng kín
+  // Cố định khối gạch & xóa hàng kín
   const lockPiece = useCallback(() => {
     const piece = currentPieceRef.current;
     if (!piece) return;
@@ -137,7 +154,6 @@ export function TetrisApp({
       });
     });
 
-    // Quét và xóa các hàng đã lấp đầy
     let clearedLines = 0;
     const filteredBoard = newBoard.filter((row) => {
       const isFull = row.every((c) => c !== "");
@@ -167,13 +183,13 @@ export function TetrisApp({
   }, [spawnPiece, targetClueLines, clueUnlocked, onSecretUnlocked]);
 
   // Di chuyển ngang
-  const moveHorizontal = (dir: -1 | 1) => {
+  const moveHorizontal = useCallback((dir: -1 | 1) => {
     const piece = currentPieceRef.current;
     if (!piece || !isPlaying || isGameOver) return;
     if (!checkCollision(piece.shape, { x: piece.x + dir, y: piece.y }, boardRef.current)) {
       setCurrentPiece({ ...piece, x: piece.x + dir });
     }
-  };
+  }, [isPlaying, isGameOver]);
 
   // Rơi xuống 1 ô
   const moveDown = useCallback(() => {
@@ -187,7 +203,7 @@ export function TetrisApp({
   }, [isPlaying, isGameOver, lockPiece]);
 
   // Xoay khối gạch
-  const rotatePiece = () => {
+  const rotatePiece = useCallback(() => {
     const piece = currentPieceRef.current;
     if (!piece || !isPlaying || isGameOver) return;
     const rotated = piece.shape[0].map((_, index) =>
@@ -196,10 +212,10 @@ export function TetrisApp({
     if (!checkCollision(rotated, { x: piece.x, y: piece.y }, boardRef.current)) {
       setCurrentPiece({ ...piece, shape: rotated });
     }
-  };
+  }, [isPlaying, isGameOver]);
 
   // Thả rơi tức thì (Hard Drop)
-  const hardDrop = () => {
+  const hardDrop = useCallback(() => {
     const piece = currentPieceRef.current;
     if (!piece || !isPlaying || isGameOver) return;
     let newY = piece.y;
@@ -208,7 +224,7 @@ export function TetrisApp({
     }
     currentPieceRef.current = { ...piece, y: newY };
     lockPiece();
-  };
+  }, [isPlaying, isGameOver, lockPiece]);
 
   // Game Loop
   useEffect(() => {
@@ -228,10 +244,72 @@ export function TetrisApp({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [moveDown]);
+  }, [moveHorizontal, moveDown, rotatePiece, hardDrop]);
+
+  // Touch handlers
+  const touchStartPos = useRef<{ x: number; y: number; time: number } | null>(null);
+  const accumulatedDeltaX = useRef<number>(0);
+  const CELL_STEP = 24;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartPos.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      time: Date.now(),
+    };
+    accumulatedDeltaX.current = 0;
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartPos.current || !isPlaying || isGameOver) return;
+    const curX = e.touches[0].clientX;
+    const curY = e.touches[0].clientY;
+
+    const diffX = curX - touchStartPos.current.x - accumulatedDeltaX.current;
+    const diffY = curY - touchStartPos.current.y;
+
+    if (Math.abs(diffX) >= CELL_STEP) {
+      const steps = Math.trunc(diffX / CELL_STEP);
+      if (steps > 0) {
+        for (let i = 0; i < steps; i++) moveHorizontal(1);
+      } else {
+        for (let i = 0; i < Math.abs(steps); i++) moveHorizontal(-1);
+      }
+      accumulatedDeltaX.current += steps * CELL_STEP;
+    }
+
+    if (diffY > 40) {
+      moveDown();
+      touchStartPos.current.y = curY;
+    }
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartPos.current) return;
+    const endTime = Date.now();
+    const duration = endTime - touchStartPos.current.time;
+    const touch = e.changedTouches[0];
+    const totalDiffX = touch.clientX - touchStartPos.current.x;
+    const totalDiffY = touch.clientY - touchStartPos.current.y;
+
+    if (duration < 220 && Math.abs(totalDiffX) < 14 && Math.abs(totalDiffY) < 14) {
+      rotatePiece();
+    } else if (duration < 280 && totalDiffY > 50 && Math.abs(totalDiffY) > Math.abs(totalDiffX) * 1.5) {
+      hardDrop();
+    }
+
+    touchStartPos.current = null;
+    accumulatedDeltaX.current = 0;
+  };
 
   return (
-    <div className="flex-1 min-h-0 flex flex-col bg-[#0F172A] text-white select-none overflow-hidden font-sans">
+    <div
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      className="flex-1 min-h-0 flex flex-col bg-[#0F172A] text-white select-none overflow-hidden font-sans touch-none"
+      style={{ touchAction: "none" }}
+    >
       {/* Header */}
       <div className="h-10 px-3 bg-[#1E293B] border-b border-white/10 flex items-center justify-between shrink-0">
         <span className="w-8" />
@@ -247,16 +325,6 @@ export function TetrisApp({
         </button>
       </div>
 
-      {/* Score bar */}
-      <div className="px-4 py-1.5 bg-[#1E293B]/60 flex items-center justify-between text-xs border-b border-white/5 shrink-0">
-        <div>
-          Điểm: <span className="font-mono text-cyan-300 font-bold">{score}</span>
-        </div>
-        <div>
-          Số hàng phá: <span className="font-mono text-amber-300 font-bold">{lines}</span>
-        </div>
-      </div>
-
       {/* Secret Clue Toast */}
       {clueUnlocked && (
         <div className="mx-3 mt-1 px-2.5 py-1 bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 text-[11px] rounded text-center animate-pulse">
@@ -264,12 +332,12 @@ export function TetrisApp({
         </div>
       )}
 
-      {/* Tetris Board */}
-      <div className="flex-1 min-h-0 flex items-center justify-center p-2 relative">
-        <div className="w-[180px] sm:w-[200px] h-[360px] sm:h-[400px] bg-slate-900 border-2 border-cyan-700/60 rounded-md grid grid-cols-10 grid-rows-20 gap-[1px] p-[1px] shadow-2xl relative overflow-hidden">
+      {/* Main Play Area with Side Dashboard */}
+      <div className="flex-1 min-h-0 flex items-center justify-center gap-3 p-2 relative">
+        {/* Tetris Board */}
+        <div className="w-[190px] h-[380px] sm:w-[210px] sm:h-[420px] bg-slate-900 border-2 border-cyan-700/60 rounded-md grid grid-cols-10 grid-rows-20 gap-[1px] p-[1px] shadow-2xl relative overflow-hidden shrink-0">
           {board.map((row, r) =>
             row.map((cell, c) => {
-              // Kiểm tra xem ô này có thuộc piece đang rơi hay không
               let activeColor = cell;
               if (
                 currentPiece &&
@@ -297,7 +365,7 @@ export function TetrisApp({
 
           {/* Start / Game Over Overlay */}
           {(!isPlaying || isGameOver) && (
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-2xs flex flex-col items-center justify-center p-3 text-center z-10">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-2xs flex flex-col items-center justify-center p-3 text-center z-10 pointer-events-auto">
               {isGameOver ? (
                 <>
                   <div className="text-rose-500 font-black text-lg mb-1">
@@ -308,7 +376,7 @@ export function TetrisApp({
                   </div>
                   <button
                     onClick={resetGame}
-                    className="px-4 py-1.5 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1 active:scale-95 shadow-md"
+                    className="px-5 py-2 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1 active:scale-95 shadow-md cursor-pointer"
                   >
                     <RotateCcw className="size-3.5" />
                     <span>Chơi lại</span>
@@ -316,15 +384,12 @@ export function TetrisApp({
                 </>
               ) : (
                 <>
-                  <div className="text-cyan-400 font-black text-lg mb-1">
+                  <div className="text-cyan-400 font-black text-lg mb-3">
                     XẾP GẠCH
-                  </div>
-                  <div className="text-[11px] text-zinc-400 mb-3">
-                    Phá 4 hàng để mở khóa manh mối
                   </div>
                   <button
                     onClick={resetGame}
-                    className="px-4 py-1.5 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1 active:scale-95 shadow-md"
+                    className="px-6 py-2 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1 active:scale-95 shadow-md cursor-pointer"
                   >
                     <Play className="size-3.5 fill-current" />
                     <span>Bắt đầu</span>
@@ -334,42 +399,59 @@ export function TetrisApp({
             </div>
           )}
         </div>
-      </div>
 
-      {/* D-Pad Buttons for Mobile */}
-      <div className="p-2 bg-[#1E293B] border-t border-white/5 flex items-center justify-center gap-2 shrink-0">
-        <button
-          onClick={() => moveHorizontal(-1)}
-          className="size-10 rounded-lg bg-slate-800 active:bg-cyan-600 text-white font-bold text-sm flex items-center justify-center shadow-md active:scale-95"
-        >
-          ◀
-        </button>
-        <button
-          onClick={rotatePiece}
-          className="size-10 rounded-lg bg-cyan-700 active:bg-cyan-600 text-white font-bold text-xs flex items-center justify-center shadow-md active:scale-95"
-          title="Xoay"
-        >
-          🔄
-        </button>
-        <button
-          onClick={moveDown}
-          className="size-10 rounded-lg bg-slate-800 active:bg-cyan-600 text-white font-bold text-sm flex items-center justify-center shadow-md active:scale-95"
-        >
-          ▼
-        </button>
-        <button
-          onClick={() => moveHorizontal(1)}
-          className="size-10 rounded-lg bg-slate-800 active:bg-cyan-600 text-white font-bold text-sm flex items-center justify-center shadow-md active:scale-95"
-        >
-          ▶
-        </button>
-        <button
-          onClick={hardDrop}
-          className="h-10 px-3 rounded-lg bg-amber-600 active:bg-amber-500 text-white font-bold text-xs flex items-center justify-center shadow-md active:scale-95"
-          title="Thả rơi ngay"
-        >
-          ⚡ Rơi
-        </button>
+        {/* Side Panel: TIẾP THEO (Next Piece Preview) + SCORE + LINES */}
+        <div className="flex flex-col justify-between h-[380px] sm:h-[420px] w-[95px] py-1 shrink-0">
+          {/* Ô DỰ BÁO HÌNH TIẾP THEO (NEXT PIECE PREVIEW) */}
+          <div className="p-2 rounded-xl bg-slate-900/90 border border-cyan-800/60 shadow-lg flex flex-col items-center">
+            <span className="text-[9.5px] uppercase font-bold text-cyan-400/90 tracking-wider mb-2 font-mono">
+              TIẾP THEO
+            </span>
+            <div className="size-16 flex items-center justify-center bg-slate-950/60 rounded-lg border border-white/5">
+              {nextPiece && (
+                <div
+                  className="grid gap-[2px]"
+                  style={{
+                    gridTemplateColumns: `repeat(${nextPiece.shape[0].length}, minmax(0, 1fr))`,
+                  }}
+                >
+                  {nextPiece.shape.map((row, r) =>
+                    row.map((cell, c) => (
+                      <div
+                        key={`${r}-${c}`}
+                        className={cn(
+                          "size-3 rounded-[1px]",
+                          cell ? `${nextPiece.color} shadow-xs` : "opacity-0"
+                        )}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* SCORE PANEL */}
+          <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 shadow-lg flex flex-col space-y-2">
+            <div>
+              <div className="text-[9px] uppercase font-bold text-zinc-400 tracking-wider font-mono">
+                ĐIỂM SỐ
+              </div>
+              <div className="font-mono text-cyan-300 font-bold text-base truncate">
+                {score}
+              </div>
+            </div>
+
+            <div className="border-t border-white/10 pt-1.5">
+              <div className="text-[9px] uppercase font-bold text-zinc-400 tracking-wider font-mono">
+                SỐ HÀNG
+              </div>
+              <div className="font-mono text-amber-300 font-bold text-base">
+                {lines}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

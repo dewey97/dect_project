@@ -20,7 +20,7 @@ const DEFAULT_VICTIM_DEVICE: Device = {
   id: 'dev-000-1',
   caseId: 'case-000',
   evidenceId: 'EV-PHONE-KHANG',
-  label: 'iPhone 6s Plus (Vàng Hồng)',
+  label: 'Điện thoại nạn nhân',
   kind: 'phone',
   owner: 'Nguyễn Văn Khang',
   locked: false,

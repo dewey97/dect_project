@@ -342,32 +342,9 @@ export function Game2048App({
         </div>
       </div>
 
-      {/* D-Pad Buttons on mobile */}
-      <div className="p-2 bg-[#EBE5DE] border-t border-[#D8D4D0] flex items-center justify-center gap-1 shrink-0">
-        <button
-          onClick={moveLeft}
-          className="px-3 py-1.5 rounded-lg bg-[#8F7A66] text-white font-bold text-xs active:scale-95"
-        >
-          ◀ Trái
-        </button>
-        <button
-          onClick={moveUp}
-          className="px-3 py-1.5 rounded-lg bg-[#8F7A66] text-white font-bold text-xs active:scale-95"
-        >
-          ▲ Lên
-        </button>
-        <button
-          onClick={moveDown}
-          className="px-3 py-1.5 rounded-lg bg-[#8F7A66] text-white font-bold text-xs active:scale-95"
-        >
-          ▼ Xuống
-        </button>
-        <button
-          onClick={moveRight}
-          className="px-3 py-1.5 rounded-lg bg-[#8F7A66] text-white font-bold text-xs active:scale-95"
-        >
-          Phải ▶
-        </button>
+      {/* Hướng dẫn cử chỉ vuốt tự nhiên */}
+      <div className="py-2 text-center text-[10px] text-[#8F7A66] font-medium shrink-0">
+        👆 Vuốt cảm ứng 4 hướng để ghép số
       </div>
     </div>
   );
