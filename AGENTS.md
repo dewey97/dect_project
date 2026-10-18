@@ -27,6 +27,8 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
   - Multi-Case Engine & Hybrid CMS: [`docs/core_specs/14_multi_case_engine_and_cms_architecture.md`](docs/core_specs/14_multi_case_engine_and_cms_architecture.md)
   - Cross-Case Phone Simulator Spec: [`docs/core_specs/15_cross_case_phone_simulator_spec.md`](docs/core_specs/15_cross_case_phone_simulator_spec.md)
   - Detective Rating & Leaderboard Spec: [`docs/core_specs/16_detective_rating_and_leaderboard_spec.md`](docs/core_specs/16_detective_rating_and_leaderboard_spec.md)
+  - Vector Map Engine & Studio Spec: [`docs/core_specs/17_vector_map_engine_and_studio_spec.md`](docs/core_specs/17_vector_map_engine_and_studio_spec.md)
+  - Dossier Studio & Document Spec: [`docs/core_specs/18_dossier_studio_and_document_spec.md`](docs/core_specs/18_dossier_studio_and_document_spec.md)
   - Tech Debt Ledger: [`docs/TECHDEBT.md`](docs/TECHDEBT.md)
 - **🧠 Domain & Case Docs (Nghiệp vụ & Hồ sơ vụ án)**:
   - Bối cảnh & Cốt truyện Master Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)

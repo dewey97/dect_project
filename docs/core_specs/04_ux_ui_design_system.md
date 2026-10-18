@@ -80,3 +80,32 @@ Sử dụng 2 họ font chính:
 Áp dụng tại `HeroInteractive` và `MainInvestigationCanvas`:
 - **Vẽ thẻ ảnh động trên Canvas**: Khung ảnh Polaroid kèm băng dính dán tường răng cưa được dựng trực tiếp bằng `card-composite.ts` và lưu vào `OffscreenCanvas` trong bộ nhớ RAM, đạt tốc độ kết xuất 60 FPS mà không cần phụ thuộc vào ảnh tĩnh pre-render.
 - **Avatar Placeholder Chuẩn (`/images/avatar_placeholder.svg`)**: Đảm bảo nhân vật mới hoặc nghi phạm mở rộng từ Live CMS luôn có hình đại diện đồng nhất trước khi gắn ảnh hồ sơ chính thức.
+
+---
+
+## 📑 6. Các Thành Phần Giao Diện Nâng Cao (Advanced UI Components)
+
+### 1. Hiệu Ứng Tập Tài Liệu Xếp Chồng Gối Đầu (Overlapping Dossier Paper Stack):
+Áp dụng tại danh sách hồ sơ PDF trong `app/(investigation)/evidence/web/page.tsx`:
+- **Gối đầu tự nhiên (`-mt-2`)**: Các tài liệu không được chọn xếp chồng gối đầu lên nhau như một tệp hồ sơ lưu trữ thật trong ngăn kéo điều tra viên.
+- **Thanh Header kẹp ghim (`Paperclip`)**: Luôn hiển thị mã số hồ sơ (`DOC A-01`...), tên tài liệu vắn tắt và giai đoạn vụ án (`BAN ĐẦU` / `BỘ A` / `BỘ B`).
+- **Mở rộng linh hoạt (Expanded State)**: Khi người chơi click chọn một tài liệu, tấm thẻ bung rộng với viền amber nổi bật (`#d9a066`), đổ bóng đa tầng (`shadow-[0_8px_24px_rgba(0,0,0,0.7)]`), hiện trích yếu và nút gọi hành động mở đọc toàn văn hồ sơ.
+
+### 2. Sổ Tay Trinh Thám Lật Trang 3 Tầng (Detective Flip Notebook Modal):
+Áp dụng tại `components/investigation/mindmap/gameplay-guide-modal.tsx`:
+- **Cấu trúc lật sách (Book Page Flipping)**: Mô phỏng cuốn sổ tay bìa da/giấy bồi ghi chép nghiệp vụ của điều tra viên kỳ cựu với 3 trang nội dung chuyên sâu:
+  - **Trang 1 / 3 (Quy Trình Nghiệp Vụ)**: 4 bước điều tra cốt lõi (Rà soát hiện trường ➔ Bóc tách lời khai ➔ Đối chiếu mâu thuẫn ➔ Kết luận điều tra).
+  - **Trang 2 / 3 (Sơ Đồ Manh Mối)**: Giải thích hệ thống đường nối chỉ đỏ, logic liên kết vật chứng và cách suy luận từ các mẩu tin nhắn điện thoại.
+  - **Trang 3 / 3 (Thao Tác Thực Chiến & Tour Hướng Dẫn)**: Hướng dẫn kéo thả canvas, zoom bản đồ, và nút kích hoạt Tour thực chiến tập sự (`Walkthrough Tour`) dẫn dắt trực tiếp trên bàn điều tra.
+- **Chỉ báo trang sách**: Dãy chấm tròn (dots indicator) và nút lật trang trước/sau có âm thanh bấm tactile typewriter.
+
+### 3. Thanh Cuộn Tài Liệu Trinh Thám & Giấy Cũ (Detective & Paper Scrollbars):
+Áp dụng trong `app/globals.css`:
+- **Dark Mode Workspace Scrollbar**: Thanh cuộn siêu mảnh ($6\text{ px}$), không nút bấm, nền trong suốt hoàn toàn, thanh trượt màu hổ phách mờ (`rgba(180, 130, 80, 0.35)`) và sáng lên khi hover.
+- **Paper Scrollbar (`.paper-scrollbar`, `[data-paper-modal]`)**: Dành riêng cho các modal tài liệu giấy cũ (`AddSuspectModal`, `FollowupQuestionModal`), sử dụng tông màu nâu gỗ đất cổ điển (`rgba(92, 64, 38, 0.3)`), hài hòa 100% với nền giấy kraft vàng.
+
+### 4. Trung Tâm Tải Tài Nguyên & Banner Mạng Xã Hội (Brand Asset Download Center):
+Áp dụng tại trang `app/brand/page.tsx`:
+- **OpenGraph Social Banner (Featured)**: Hiển thị khung xem trước độ nét cao tỉ lệ vàng $1.91 : 1$ ($1200 \times 630\text{ px}$) kèm nút tải trực tiếp file `xplore_og_image.jpg`.
+- **Bộ nhận diện chuẩn hóa 3 khối**: Khung tải Logo chính ($1920 \times 1080$), Biểu tượng X ($512 \times 512$), và Gói Favicon trình duyệt đa kích thước ($16\times16$, $32\times32$, $48\times48$).
+
