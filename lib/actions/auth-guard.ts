@@ -14,6 +14,11 @@ export async function requireAdminAuth() {
     throw new Error('Unauthorized: Bạn chưa đăng nhập.')
   }
 
+  // Ưu tiên kiểm tra quyền admin trực tiếp từ app_metadata của tài khoản
+  if (user.app_metadata?.role === 'super_admin' || user.app_metadata?.role === 'admin') {
+    return { user, profile: { role: 'admin' } }
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
