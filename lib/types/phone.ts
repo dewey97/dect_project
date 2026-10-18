@@ -8,7 +8,12 @@ export type PhoneAppId =
   | "banking"
   | "voicemail"
   | "contacts"
-  | "settings";
+  | "settings"
+  | "snake"
+  | "game2048"
+  | "minesweeper"
+  | "flappybird"
+  | "tetris";
 
 export type PhoneDeviceModel =
   | "iphone_classic"   // Viền dày, nút Home vật lý (ví dụ: iPhone 6s/7/8 - hợp các case bối cảnh quá khứ như 2016)

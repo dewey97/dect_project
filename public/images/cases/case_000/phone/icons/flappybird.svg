@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4EC0CA"/><stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+  <!-- Authentic Apple Squircle 256x256 rx=56 -->
+  <rect width="256" height="256" rx="56" ry="56" fill="url(#grad)" />
+  
+  <!-- Ground Grass strip inside icon -->
+  <rect x="0" y="195" width="256" height="61" fill="#73BF2E" />
+  <rect x="0" y="195" width="256" height="8" fill="#9DE64E" />
+  <line x1="0" y1="195" x2="256" y2="195" stroke="#000000" stroke-width="4" />
+  <!-- Bird Body -->
+  <ellipse cx="120" cy="115" rx="52" ry="38" fill="#F8E038" stroke="#000000" stroke-width="8" />
+  <!-- Wing -->
+  <ellipse cx="94" cy="120" rx="25" ry="15" fill="#FFFFFF" stroke="#000000" stroke-width="6" />
+  <!-- Big Eye -->
+  <circle cx="144" cy="98" r="17" fill="#FFFFFF" stroke="#000000" stroke-width="6" />
+  <circle cx="150" cy="98" r="6" fill="#000000" />
+  <!-- Chunky Beak -->
+  <path d="M152 114 L194 122 L178 144 L146 136 Z" fill="#F85820" stroke="#000000" stroke-width="7" />
+
+</svg>

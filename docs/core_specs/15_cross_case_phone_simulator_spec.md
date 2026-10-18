@@ -1,69 +1,149 @@
-# Đặc Tả Kỹ Thuật: Module Điện Thoại & Bằng Chứng Số Dùng Chung (Cross-Case Phone Simulator Spec)
+# Phone Engine Architecture & Multi-Device Modular Guide
 
 > **Mã tài liệu**: `docs/core_specs/15_cross_case_phone_simulator_spec.md`  
-> **Trạng thái**: Đã chuẩn hóa Schema & State Hook (Đang hoàn thiện View Layer & Clean UI)  
-> **Áp dụng cho**: Toàn bộ các vụ án (Case #000, #001, #002,...)
+> **Trạng thái**: Đã chuẩn hóa Kiến trúc 4 Tầng & Định hướng Tách Module dùng chung cho mọi Case  
+> **Áp dụng cho**: Toàn bộ các vụ án (Case #000, #001, #002,...) và các dòng thiết bị (iOS, Android, Dumbphone)
 
 ---
 
-## 🎯 1. Mục Tiêu & Tầm Nhìn Kiến Trúc
+## 🎯 1. Tầm Nhìn & Mục Tiêu Module Hóa
 
-Trong bất kỳ vụ án trinh thám hiện đại nào, **Điện thoại / Thiết bị cá nhân của nạn nhân hoặc nghi phạm** luôn là một trong những trung tâm bằng chứng số (Digital Evidence) quan trọng nhất.
+Trong game trinh thám, thiết bị di động (điện thoại của nạn nhân, điện thoại của các đối tượng tình nghi, máy burner dùng một lần) là trung tâm của các **Bằng chứng số (Digital Evidence)**.
 
-Kiến trúc Module Điện Thoại được thiết kế theo nguyên tắc **Data-Driven & Plug-and-Play**:
-1. **Dùng chung 1 Engine cho mọi Case**: Logic máy (mở khóa passcode, pin, sóng, navigation giữa các app, ghim bằng chứng) hoàn toàn độc lập với nội dung vụ án.
-2. **Hỗ trợ Đa Thiết Bị**: 1 case có thể có nhiều điện thoại khác nhau (điện thoại nạn nhân, điện thoại nghi phạm A, v.v.) chỉ cần truyền `deviceId` hoặc `PhoneDeviceProfile`.
-3. **Kết nối trực tiếp Bảng Phá Án (Evidence Mindmap)**: Bất kỳ mẩu tin nhắn, ảnh chụp EXIF, cuộc gọi ghi âm hoặc ghi chú nào cũng có thể đóng vai trò là một mẩu bằng chứng được ghim lên bảng suy luận.
+### Thách thức thực tế:
+- **Case #000 (Án mạng 2016)**: Chiếc iPhone 6s Plus Rose Gold viền dày, nút Home tròn.
+- **Case hiện đại**: iPhone 15 Pro / Dynamic Island hoặc điện thoại màn hình tràn viền.
+- **Case nghi phạm / tội phạm chuyên nghiệp**: Máy Android phổ thông (Samsung/Xiaomi) hoặc Nokia "cục gạch" bàn phím T9.
+- **Tuy nhiên, nghiệp vụ phá án không đổi**: Người chơi luôn cần đọc **Tin nhắn, Lịch sử cuộc gọi, Album ảnh & EXIF, Ghi chú, Bản đồ số, Biến động ngân hàng** và **Ghim bằng chứng lên Mindmap**.
+
+Do đó, Phone Engine được thiết kế tách rời **Khung vỏ phần cứng (Hardware Chassis)** khỏi **Ứng dụng nghiệp vụ (Generic Apps)** và **Trạng thái máy (Headless Engine)**.
 
 ---
 
-## 🏗️ 2. Mô Hình Kiến Trúc 3 Tầng (3-Tier Engine)
+## 🏗️ 2. Mô Hình Phân Tách 4 Tầng (Clean Decoupled Architecture)
 
 ```
-┌────────────────────────────────────────────────────────┐
-│  1. DATA LAYER (Live CMS & Case Spec)                  │
-│     - Google Sheets / Database API: /api/phone         │
-│     - Schema: PhoneDeviceProfile, Message, Photo, etc. │
-└───────────────────────────┬────────────────────────────┘
-                            │
-┌───────────────────────────▼────────────────────────────┐
-│  2. CORE STATE ENGINE (usePhoneEngine)                 │
-│     - Trạng thái khóa: isLocked, passcodeAttempt, PIN  │
-│     - Điều hướng: activeApp, openApp, goHome, goBack   │
-│     - Tương tác phá án: togglePinClue, isCluePinned    │
-└───────────────────────────┬────────────────────────────┘
-                            │
-┌───────────────────────────▼────────────────────────────┐
-│  3. VIEW SHELL & APPS (Presentation Layer)             │
-│     - IPhoneFrame: Khung vỏ vật lý + Dynamic Status Bar│
-│     - IPhoneHomeScreen: Grid ứng dụng theo installedApps│
-│     - Modular Apps: Messages, Photos, Phone, Notes,... │
-└────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│ 1. DATA LAYER (Data-Driven / Case-Agnostic)                            │
+│    - API & Live CMS: /api/phone?caseId=...&deviceId=...                │
+│    - Schema thuần dữ liệu: messages, calls, photos, notes, banking     │
+│    - Không chứa mã giao diện, dễ dàng nạp từ Google Sheets             │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ 2. CORE HEADLESS ENGINE (usePhoneEngine / PhoneContext)                │
+│    - Quản lý trạng thái logic: isLocked, passcodeAttempt, PIN hint     │
+│    - Điều hướng màn hình: activeApp, openApp, goHome, goBack           │
+│    - Cầu nối Mindmap: isCluePinned, togglePinClue(clueId)              │
+│    - Cơ chế pin ảo, đồng hồ đóng băng theo mốc thời gian vụ án         │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ 3. GENERIC APPS RUNTIME (Design System Phù Hợp)                        │
+│    - <MessagesApp />, <PhotosApp />, <BankingApp />, <NotesApp />      │
+│    - <MapsApp /> (Vector Map Engine tích hợp điều tra số)              │
+│    - Tự động thích ứng style theo OS (iOS style hoặc Material)        │
+│    - Nhận dữ liệu và callback ghim bằng chứng qua Context/Props        │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│ 4. HARDWARE CHASSIS / SHELL (Vỏ phần cứng tách biệt hoàn toàn)         │
+│    - <IPhoneClassicChassis />: iPhone 6s/7/8 (Bezel dày + nút Home)    │
+│    - <IPhoneModernChassis />: Dynamic Island, viền siêu mỏng          │
+│    - <AndroidChassis />: Camera đục lỗ, thanh 3 nút điều hướng        │
+│    - <FeaturePhoneChassis />: Màn hình 2.4 inch + Bàn phím số T9      │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📑 3. Danh Mục Tệp Đã Chuẩn Hóa
+## 📁 3. Sơ Đồ Cấu Trúc Thư Mục Chuẩn Hóa (`components/phone-engine/`)
 
-| Tệp tin | Vai trò | Trạng thái |
-| :--- | :--- | :--- |
-| [`lib/types/phone.ts`](file:///d:/code_world/dect_project/lib/types/phone.ts) | Định nghĩa Type: `PhoneAppId`, `PhoneDeviceModel`, `PhoneDeviceProfile`, `DigitalClueLink` | ✅ Đã hoàn thành |
-| [`lib/hooks/use-phone-engine.ts`](file:///d:/code_world/dect_project/lib/hooks/use-phone-engine.ts) | Controller Hook: passcode, navigation stack, clue pinning | ✅ Đã hoàn thành |
-| [`lib/hooks/use-phone-data.ts`](file:///d:/code_world/dect_project/lib/hooks/use-phone-data.ts) | Hook nạp dữ liệu động từ Google Sheets / API theo tab & caseId | ✅ Sẵn sàng |
-| [`components/investigation/iphone/iphone-home-screen.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/iphone-home-screen.tsx) | Màn hình Home, đã kích hoạt `appTarget: "photos"` | ✅ Đã sửa |
-| [`components/investigation/iphone/iphone-frame.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/iphone-frame.tsx) | Khung máy iPhone, thanh điều hướng nhanh và các App view | ✅ Đã tối ưu & tinh gọn UI |
-| [`components/investigation/iphone/apps/maps-app.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/apps/maps-app.tsx) | Ứng dụng Maps (Bản đồ số, tra cứu vị trí nghi phạm & hiện trường) | ✅ Đã hoàn thành |
-| [`components/investigation/iphone/apps/vector-map-canvas.tsx`](file:///d:/code_world/dect_project/components/investigation/iphone/apps/vector-map-canvas.tsx) | Canvas kết xuất vector bản đồ và các chốt điểm điều tra | ✅ Đã hoàn thành |
+Khi tách thành module độc lập, cây thư mục sẽ được tổ chức như sau:
+
+```text
+components/phone-engine/
+├── chassis/                     # Khung vỏ vật lý (Chỉ bọc ngoài & nhận {children})
+│   ├── iphone-modern-chassis.tsx# iPhone tai thỏ / Dynamic Island
+│   ├── iphone-classic-chassis.tsx# iPhone đời cũ có phím Home vật lý
+│   └── android-chassis.tsx      # Khung máy Android
+├── core/                        # Headless State & Logic
+│   ├── phone-context.tsx        # React Context chia sẻ state máy cho mọi App
+│   ├── use-phone-engine.ts      # Hook điều khiển khóa, pin, stack app, pin clue
+│   └── phone-data-provider.tsx  # Cung cấp dữ liệu tin nhắn, ảnh, cuộc gọi
+├── apps/                        # Bộ ứng dụng nghiệp vụ dùng chung 100%
+│   ├── messages/                # Tin nhắn SMS / iMessage / Zalo
+│   ├── photos/                  # Thư viện ảnh + Inspector EXIF GPS
+│   ├── calls/                   # Nhật ký cuộc gọi & Bàn phím quay số
+│   ├── notes/                   # Sổ ghi chép cá nhân
+│   ├── banking/                 # Sao kê tài chính / Biến động số dư
+│   └── maps/                    # Bản đồ số & Dấu vết di chuyển
+├── system/                      # Màn hình hệ điều hành
+│   ├── lock-screen.tsx          # Màn hình khóa (nhập PIN, passcode)
+│   ├── home-screen.tsx          # Lưới ứng dụng (Grid App Icons)
+│   └── status-bar.tsx           # Đồng hồ đóng băng, pin, cột sóng
+├── phone-simulator.tsx          # Facade Entrypoint: Cắm Chassis + Engine + Screen
+└── README.md                    # Tài liệu hướng dẫn tích hợp nhanh cho Case mới
+```
 
 ---
 
-## 📋 4. Hạng Mục Tối Ưu Giao Diện Đã Hoàn Tất (UI Polish Milestones)
+## ⚙️ 4. Chuẩn Định Nghĩa Thiết Bị (`PhoneDeviceProfile`)
 
-1. **Khung máy & Tỷ lệ hiển thị (Phone Frame & Viewport)**:
-   - Khung máy hiển thị vừa vặn trên cả màn hình nhỏ (laptop 13-14 inch và mobile) mà không bị che khuất thanh điều hướng.
-   - Bỏ các viền thừa hoặc padding gây chật chội.
-2. **Thanh Header / Quick Actions**:
-   - Tối giản nút `Về Home` và nút `Đóng X` để giao diện nhìn thanh thoát, đúng chất thiết bị thật.
-3. **Các Màn Hình App Đồng Nhất**:
-   - Giao diện Messages, Photos, Phone, Notes, Maps đồng bộ phong cách iOS, chữ rõ ràng, không bị vỡ layout hoặc tràn chữ.
-   - Thao tác cuộn mượt mà với thanh cuộn mỏng `ios-scrollbar`.
+Mỗi chiếc điện thoại trong vụ án được khai báo bằng một Profile độc lập:
+
+```typescript
+export interface PhoneDeviceProfile {
+  id: string;                      // vd: "case_000_victim_phone"
+  caseId: string;                  // vd: "case_000"
+  label: string;                   // "iPhone 6s Plus (Vàng Hồng)"
+  owner: string;                   // "Nguyễn Văn Khang"
+  model: 'iphone_modern' | 'iphone_classic' | 'android_modern' | 'feature_phone';
+  osTheme: 'ios' | 'android';
+  
+  // Thời gian & Trạng thái vật lý
+  timeFreeze: string;              // "17:55"
+  dateFreeze?: string;             // "Chủ Nhật, 24 tháng 7"
+  batteryLevel?: number;           // 14 (%)
+  wallpaperUrl?: string;
+  
+  // Bảo mật & Giải mã
+  isLocked: boolean;
+  passcode?: string;               // "2407"
+  passcodeHint?: string;           // "Ngày sinh nhật hoặc ngày kỷ niệm"
+  
+  // Danh sách ứng dụng cài sẵn
+  installedApps: PhoneAppId[];     // ['messages', 'banking', 'photos', 'notes', 'maps']
+}
+```
+
+---
+
+## 📌 5. Cơ Chế Ghim Bằng Chứng Số Lên Mindmap (`DigitalClueLink`)
+
+Bất kỳ item nào trong điện thoại (một tin nhắn đe dọa, một tấm ảnh chụp hiện trường lúc 16:30, một giao dịch chuyển khoản 500 triệu) đều có thể được biến thành chứng cứ:
+
+```typescript
+export interface DigitalClueLink {
+  isClue?: boolean;                // true nếu là vật chứng phá án
+  clueId?: string;                 // Mã chứng cứ trên canvas (vd: "CLUE_MSG_THREAT_01")
+  clueTitle?: string;              // Tiêu đề tóm tắt hiển thị trên thẻ Mindmap
+  clueAnalysis?: string;           // Ghi chú nghiệp vụ của điều tra viên
+  leadsToCardId?: string;          // Mở khóa hoặc liên kết đến Card nào trên bảng
+}
+```
+
+Người chơi chỉ cần nhấn vào nút **📌 Ghim** trên thanh công cụ của tin nhắn/ảnh, hệ thống tự động đồng bộ sang Canvas Bảng Phá Án thông qua `togglePinClue(clue)`.
+
+---
+
+## 🚀 6. Lộ Trình Triển Khai Module Hóa (Roadmap)
+
+1. **Giai đoạn 1 (Chassis Extraction)**:
+   - Tách phần khung vỏ iPhone ra thành `IPhoneFrameWrapper` / `IPhoneChassis`.
+   - Giữ nguyên toàn bộ logic hoạt động của Case #000 hiện tại, đảm bảo không hồi quy (zero regression).
+2. **Giai đoạn 2 (PhoneContext & Decoupled Apps)**:
+   - Các component `messages-app.tsx`, `photos-app.tsx`, `banking-app.tsx` lấy dữ liệu qua Hook/Context thay vì nhận props cồng kềnh từ component cha.
+3. **Giai đoạn 3 (Multi-Device Plug & Play)**:
+   - Tạo thêm chassis Android mẫu (`android-chassis.tsx`).
+   - Hỗ trợ switch đổi profile thiết bị ngay trên dev mode / testbed để dễ dàng kiểm thử các vụ án tiếp theo.

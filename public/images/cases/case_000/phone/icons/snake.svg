@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#374151"/><stop offset="100%" stop-color="#1F2937"/>
+    </linearGradient>
+  </defs>
+  <!-- Authentic Apple Squircle 256x256 rx=56 -->
+  <rect width="256" height="256" rx="56" ry="56" fill="url(#grad)" />
+  
+  <!-- LCD Screen Window -->
+  <rect x="36" y="36" width="184" height="184" rx="20" fill="#879B5A" stroke="#556B2F" stroke-width="6" />
+  <!-- Snake Segments -->
+  <rect x="68" y="68" width="24" height="24" rx="3" fill="#1A2E05" />
+  <rect x="96" y="68" width="24" height="24" rx="3" fill="#1A2E05" />
+  <rect x="124" y="68" width="24" height="24" rx="3" fill="#1A2E05" />
+  <rect x="124" y="96" width="24" height="24" rx="3" fill="#1A2E05" />
+  <rect x="124" y="124" width="24" height="24" rx="3" fill="#1A2E05" />
+  <rect x="152" y="124" width="24" height="24" rx="3" fill="#1A2E05" />
+  <!-- Apple -->
+  <circle cx="178" cy="172" r="12" fill="#8B0000" />
+
+</svg>
