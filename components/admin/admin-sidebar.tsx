@@ -9,23 +9,61 @@ import {
   Settings,
   LogOut,
   MessageSquare,
-  Play,
   Bell,
   ExternalLink,
+  Map,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { getUnreadFeedbackCount } from "@/lib/actions/feedback-actions";
 
-const globalNavItems = [
-  { name: "Dashboard", href: "/studio", icon: LayoutDashboard },
-  { name: "Danh sách Vụ Án", href: "/studio/cases", icon: Folders },
-  { name: "Người chơi", href: "/studio/players", icon: Users },
-  { name: "Góp ý & Báo lỗi", href: "/studio/feedbacks", icon: MessageSquare },
-  { name: "Cài đặt Hệ thống", href: "/studio/settings", icon: Settings },
+interface NavGroup {
+  groupName: string;
+  items: {
+    name: string;
+    href: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: string;
+  }[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    groupName: "TỔNG QUAN",
+    items: [
+      { name: "Dashboard", href: "/studio", icon: LayoutDashboard },
+      { name: "Danh sách Vụ Án", href: "/studio/cases", icon: Folders },
+    ],
+  },
+  {
+    groupName: "STUDIO ENGINES",
+    items: [
+      { name: "Map Studio", href: "/studio/map", icon: Map },
+      { name: "Dossier Studio", href: "/studio/dossier", icon: FileText },
+    ],
+  },
+  {
+    groupName: "VẬN HÀNH",
+    items: [
+      { name: "Người chơi", href: "/studio/players", icon: Users },
+      { name: "Góp ý & Báo lỗi", href: "/studio/feedbacks", icon: MessageSquare },
+      { name: "Cài đặt Hệ thống", href: "/studio/settings", icon: Settings },
+    ],
+  },
 ];
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+}
+
+export function AdminSidebar({
+  isCollapsed = false,
+  onToggleCollapse,
+}: AdminSidebarProps) {
   const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -36,103 +74,145 @@ export function AdminSidebar() {
   }, [pathname]);
 
   return (
-    <aside className="w-64 border-r border-border/40 bg-zinc-950/50 backdrop-blur-sm flex flex-col h-full z-20 relative transition-all duration-300">
+    <aside
+      className={cn(
+        "border-r border-white/10 bg-zinc-950/80 backdrop-blur-md flex flex-col h-full z-20 relative transition-all duration-300 shrink-0",
+        isCollapsed ? "w-16" : "w-64"
+      )}
+    >
       {/* HEADER */}
-      <div className="p-6 h-24 flex items-center shrink-0 border-b border-border/20">
+      <div className="p-4 h-16 flex items-center justify-between shrink-0 border-b border-white/10">
         <Link
           href="/studio"
-          className="flex items-center gap-2 transition-opacity hover:opacity-80"
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-80 min-w-0"
         >
-          <div className="size-8 rounded bg-primary/20 flex items-center justify-center border border-primary/30">
+          <div className="size-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
             <span className="font-mono text-primary font-bold text-xs tracking-tighter">
               AS
             </span>
           </div>
-          <div>
-            <h1 className="font-semibold text-sm leading-tight text-zinc-100">
-              Admin Studio
-            </h1>
-            <p className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">
-              Live CMS Hub
-            </p>
-          </div>
+          {!isCollapsed && (
+            <div className="min-w-0">
+              <h1 className="font-semibold text-sm leading-tight text-zinc-100 truncate">
+                Admin Studio
+              </h1>
+            </div>
+          )}
         </Link>
+
+        {onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className={cn(
+              "p-1.5 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 transition-colors",
+              isCollapsed && "mx-auto mt-0"
+            )}
+            title={isCollapsed ? "Mở rộng thanh điều hướng" : "Thu gọn thanh điều hướng"}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="size-4" />
+            ) : (
+              <ChevronLeft className="size-4" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* NAVIGATION */}
-      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-        {globalNavItems.map((item) => {
-          const isActive =
-            item.href === "/studio"
-              ? pathname === "/studio"
-              : pathname.startsWith(item.href);
+      <nav className="flex-1 px-2.5 py-4 space-y-5 overflow-y-auto overflow-x-hidden">
+        {navGroups.map((group, groupIdx) => (
+          <div key={groupIdx} className="space-y-1">
+            {!isCollapsed && (
+              <div className="px-2.5 py-1 text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-semibold">
+                {group.groupName}
+              </div>
+            )}
+            {group.items.map((item) => {
+              const isActive =
+                item.href === "/studio"
+                  ? pathname === "/studio"
+                  : pathname.startsWith(item.href);
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-200",
-                isActive
-                  ? "bg-zinc-800/80 text-zinc-100 shadow-sm border border-white/5 font-medium"
-                  : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40",
-              )}
-            >
-              <item.icon
-                className={cn(
-                  "size-4",
-                  isActive ? "text-primary" : "text-zinc-500",
-                )}
-              />
-              {item.name}
-            </Link>
-          );
-        })}
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  title={isCollapsed ? item.name : undefined}
+                  className={cn(
+                    "flex items-center gap-3 px-2.5 py-2 rounded-lg text-sm transition-all duration-200 group relative",
+                    isActive
+                      ? "bg-primary/15 text-primary font-medium border border-primary/25 shadow-sm"
+                      : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 hover:bg-zinc-800/40",
+                    isCollapsed && "justify-center px-0"
+                  )}
+                >
+                  <item.icon
+                    className={cn(
+                      "size-4 shrink-0 transition-colors",
+                      isActive
+                        ? "text-primary"
+                        : "text-zinc-400 group-hover:text-zinc-200"
+                    )}
+                  />
 
-        {/* GOOGLE SHEETS LIVE CMS EXTERNAL LINK */}
-        <a
-          href="https://docs.google.com/spreadsheets/d/1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q/edit"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-between px-3 py-2 rounded-md text-sm text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 border border-emerald-500/20 transition-all duration-200 mt-4"
-        >
-          <span className="flex items-center gap-2">
-            <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-            Google Sheet CMS
-          </span>
-          <ExternalLink className="size-3.5 opacity-70" />
-        </a>
+                  {!isCollapsed && (
+                    <span className="flex-1 truncate">{item.name}</span>
+                  )}
+
+                  {!isCollapsed && item.badge && (
+                    <span
+                      className={cn(
+                        "text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-semibold",
+                        isActive
+                          ? "bg-primary/25 text-primary"
+                          : "bg-zinc-800 text-zinc-400"
+                      )}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+
+                  {/* Feedback Notification Pill inside button */}
+                  {item.href === "/studio/feedbacks" && unreadCount > 0 && (
+                    <span
+                      className={cn(
+                        "size-2 rounded-full bg-red-500 animate-pulse",
+                        isCollapsed ? "absolute top-1.5 right-1.5" : "ml-auto"
+                      )}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* FOOTER ACTIONS */}
-      <div className="p-4 border-t border-border/40 space-y-2">
-        {/* Launch Game / Playtest */}
-        <Link
-          href="/evidence/web"
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-primary text-primary-foreground font-bold rounded-md hover:bg-primary/90 shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-all text-xs tracking-wider"
-        >
-          <Play className="size-4" fill="currentColor" />
-          PLAYTEST CASE_000
-        </Link>
-
-        <div className="flex items-center gap-2 pt-2">
+      <div className="p-3 border-t border-white/10">
+        <div className={cn("flex items-center gap-1.5", isCollapsed && "flex-col")}>
           {/* Exit Studio */}
           <Link
             href="/"
-            className="flex-1 flex items-center gap-2 px-3 py-2 rounded-md text-sm text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 transition-colors"
+            title={isCollapsed ? "Thoát Studio" : undefined}
+            className={cn(
+              "flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors",
+              isCollapsed && "justify-center w-full px-0"
+            )}
           >
-            <LogOut className="size-4" />
-            Exit
+            <LogOut className="size-3.5 shrink-0" />
+            {!isCollapsed && <span>Thoát</span>}
           </Link>
 
           {/* Notifications */}
           <Link
             href="/studio/feedbacks"
-            className="relative p-2 text-zinc-400 hover:text-zinc-100 transition-colors rounded-md hover:bg-zinc-800/50"
+            title="Góp ý & Báo lỗi"
+            className="relative p-1.5 text-zinc-400 hover:text-zinc-100 transition-colors rounded-md hover:bg-zinc-800/50"
           >
             <Bell className="size-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 animate-pulse border border-zinc-950" />
+              <span className="absolute top-1 right-1 size-2 rounded-full bg-red-500 animate-pulse border border-zinc-950" />
             )}
           </Link>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import {
   Users,
   Activity,
@@ -8,6 +9,10 @@ import {
   Clock,
   AlertCircle,
   CheckCircle2,
+  Map,
+  FileText,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import {
   AreaChart,
@@ -224,6 +229,69 @@ export function DashboardClient({
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2.5. CREATIVE STUDIO ENGINES (MAP & DOSSIER) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Map Studio Card */}
+        <div className="bg-zinc-900/40 border border-white/5 hover:border-primary/30 rounded-xl p-6 relative overflow-hidden group transition-all">
+          <div className="flex items-start justify-between mb-4">
+            <div className="size-10 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-105 transition-transform">
+              <Map className="size-5" />
+            </div>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 font-semibold uppercase">
+              Vector 2800x2000
+            </span>
+          </div>
+          <h3 className="text-base font-semibold text-zinc-100 group-hover:text-primary transition-colors flex items-center gap-2">
+            Map Studio
+            <ArrowRight className="size-4 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-primary" />
+          </h3>
+          <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+            Biên tập địa hình SVG không giới hạn: sông ngòi, đại lộ, đường ray xe lửa, phân khu đô thị và 31 tọa độ mốc án của Case #000.
+          </p>
+          <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
+            <span className="text-[11px] text-zinc-500 font-mono">
+              Mode: Admin / Civilian Preview
+            </span>
+            <Link
+              href="/studio/map"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-primary hover:text-primary-foreground text-zinc-200 text-xs font-medium transition-all"
+            >
+              Mở Map Studio
+            </Link>
+          </div>
+        </div>
+
+        {/* Dossier Studio Card */}
+        <div className="bg-zinc-900/40 border border-white/5 hover:border-amber-500/30 rounded-xl p-6 relative overflow-hidden group transition-all">
+          <div className="flex items-start justify-between mb-4">
+            <div className="size-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
+              <FileText className="size-5" />
+            </div>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold uppercase">
+              Print A4/A5
+            </span>
+          </div>
+          <h3 className="text-base font-semibold text-zinc-100 group-hover:text-amber-400 transition-colors flex items-center gap-2">
+            Dossier Studio
+            <ArrowRight className="size-4 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-amber-400" />
+          </h3>
+          <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+            Dàn trang & xuất bản tài liệu tư pháp chuẩn in offset: Biên bản ghi lời khai (LK), Lý lịch tư pháp (HS), con dấu đỏ và vân tay nhân vật.
+          </p>
+          <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
+            <span className="text-[11px] text-zinc-500 font-mono">
+              Engine: WYSIWYG Print CSS
+            </span>
+            <Link
+              href="/studio/dossier"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 text-zinc-200 text-xs font-medium transition-all"
+            >
+              Mở Dossier Studio
+            </Link>
           </div>
         </div>
       </div>
