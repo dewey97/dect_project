@@ -9,6 +9,9 @@ import { ClueCodePicker, type PendingClueInputs } from './clue-code-picker'
 import { emitInvestigationEvent } from '@/lib/investigation-events'
 import { setStorageItem } from '@/lib/storage'
 import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
+import { SuspectEvaluationModal, type EvaluationModalState } from './suspect/suspect-evaluation-modal'
+import { SuspectExitConfirmModal } from './suspect/suspect-exit-confirm-modal'
+import { InterrogationClueStep } from './suspect/interrogation-clue-step'
 
 interface SuspectItemData {
   id: string
@@ -30,17 +33,6 @@ interface AddSuspectModalProps {
   onSelectSuspect?: (suspect: SuspectItemData | null) => void
   onSubmitConclusion?: (culprit: 'vu' | 'tung' | 'ha' | string) => void
   isPhoneSolved?: boolean
-}
-
-interface EvaluationModalState {
-  isOpen: boolean
-  isSuccess: boolean
-  title: string
-  heading: string
-  message: string
-  subMessage?: string
-  suspectName: string
-  selectedCount: number
 }
 
 import {
@@ -805,177 +797,68 @@ export function AddSuspectModal({
 
             {/* Sub-View for Tile 1: MOTIVE / ĐỘNG CƠ GÂY ÁN */}
             {subTileView === 'motive' && (
-              <div className="space-y-3 pt-1">
-                <ClueCodePicker
-                  selectedClueIds={motiveClueIds}
-                  customPhoneEvidences={[]}
-                  onAddClueId={(id) => {
-                    setMotiveClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  onRemoveClueId={(id) => {
-                    setMotiveClueIds((prev) => prev.filter((item) => item !== id))
-                  }}
-                  onAddCustomPhone={() => {}}
-                  onPendingChange={(pending) => {
-                    pendingMotiveRef.current = pending
-                  }}
-                  label="BẰNG CHỨNG ĐÃ NHẬP"
-                  placeholder="Nhập mã chứng cứ..."
-                  emptyStateText="Chưa có bằng chứng nào được nhập."
-                />
-
-                {/* GỢI Ý ĐỘNG CƠ ĐẨY XUỐNG DƯỚI MÀN NHẬP MÃ */}
-                {Boolean(suspectCpId) && (
-                  <CheckpointHintSection
-                    checkpointId={suspectCpId}
-                    caseId={caseId}
-                    category="motive"
-                  />
-                )}
-
-                <div className="pt-3 border-t border-[#d4c5b0]/60 flex items-center justify-between gap-2 select-none">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      detectiveAudio.playPaperRustle()
-                      setSubTileView('overview')
-                    }}
-                    className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95"
-                  >
-                    <ArrowLeft className="size-3.5 text-[#4a3520] shrink-0" />
-                    <span>QUAY LẠI</span>
-                  </button>
-
-                  <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                    <button
-                      type="button"
-                      onClick={handleConfirmMotiveClues}
-                      className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0"
-                    >
-                      <Check className="size-3.5 text-[#d9a066] shrink-0" />
-                      <span>XÁC NHẬN</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <InterrogationClueStep
+                category="motive"
+                clueIds={motiveClueIds}
+                onAddClueId={(id) => {
+                  setMotiveClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+                  if (errorMsg) setErrorMsg('')
+                }}
+                onRemoveClueId={(id) => {
+                  setMotiveClueIds((prev) => prev.filter((item) => item !== id))
+                }}
+                onPendingChange={(pending) => {
+                  pendingMotiveRef.current = pending
+                }}
+                checkpointId={suspectCpId}
+                caseId={caseId}
+                onBack={() => setSubTileView('overview')}
+                onConfirm={handleConfirmMotiveClues}
+              />
             )}
 
             {/* Sub-View for Tile 2: ALIBI */}
             {subTileView === 'alibi' && (
-              <div className="space-y-3 pt-1">
-                <ClueCodePicker
-                  selectedClueIds={alibiClueIds}
-                  customPhoneEvidences={[]}
-                  onAddClueId={(id) => {
-                    setAlibiClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  onRemoveClueId={(id) => {
-                    setAlibiClueIds((prev) => prev.filter((item) => item !== id))
-                  }}
-                  onAddCustomPhone={() => {}}
-                  onPendingChange={(pending) => {
-                    pendingAlibiRef.current = pending
-                  }}
-                  label="BẰNG CHỨNG NGOẠI PHẠM ĐÃ NHẬP"
-                  placeholder="Nhập mã chứng cứ..."
-                  emptyStateText="Chưa có bằng chứng ngoại phạm nào được nhập."
-                />
-
-                {/* GỢI Ý NGOẠI PHẠM ĐẨY XUỐNG DƯỚI MÀN NHẬP MÃ */}
-                {Boolean(suspectCpId) && (
-                  <CheckpointHintSection
-                    checkpointId={suspectCpId}
-                    caseId={caseId}
-                    category="alibi"
-                  />
-                )}
-
-                <div className="pt-3 border-t border-[#d4c5b0]/60 flex items-center justify-between gap-2 select-none">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      detectiveAudio.playPaperRustle()
-                      setSubTileView('overview')
-                    }}
-                    className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95"
-                  >
-                    <ArrowLeft className="size-3.5 text-[#4a3520] shrink-0" />
-                    <span>QUAY LẠI</span>
-                  </button>
-
-                  <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-
-                    <button
-                      type="button"
-                      onClick={handleConfirmAlibiClues}
-                      className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0"
-                    >
-                      <Check className="size-3.5 text-[#d9a066] shrink-0" />
-                      <span>XÁC NHẬN</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <InterrogationClueStep
+                category="alibi"
+                clueIds={alibiClueIds}
+                onAddClueId={(id) => {
+                  setAlibiClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+                  if (errorMsg) setErrorMsg('')
+                }}
+                onRemoveClueId={(id) => {
+                  setAlibiClueIds((prev) => prev.filter((item) => item !== id))
+                }}
+                onPendingChange={(pending) => {
+                  pendingAlibiRef.current = pending
+                }}
+                checkpointId={suspectCpId}
+                caseId={caseId}
+                onBack={() => setSubTileView('overview')}
+                onConfirm={handleConfirmAlibiClues}
+              />
             )}
 
             {/* Sub-View for Tile 3: CONTRADICTION / MÂU THUẪN LỜI KHAI */}
             {subTileView === 'contradiction' && (
-              <div className="space-y-3 pt-1">
-                <ClueCodePicker
-                  selectedClueIds={contradictionClueIds}
-                  customPhoneEvidences={[]}
-                  onAddClueId={(id) => {
-                    setContradictionClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
-                    if (errorMsg) setErrorMsg('')
-                  }}
-                  onRemoveClueId={(id) => {
-                    setContradictionClueIds((prev) => prev.filter((item) => item !== id))
-                  }}
-                  onAddCustomPhone={() => {}}
-                  onPendingChange={(pending) => {
-                    pendingContradictionRef.current = pending
-                  }}
-                  label="BẰNG CHỨNG MÂU THUẪN ĐÃ NHẬP"
-                  placeholder="Nhập mã chứng cứ..."
-                  emptyStateText="Chưa có bằng chứng mâu thuẫn nào được nhập."
-                />
-
-                {/* GỢI Ý MÂU THUẪN ĐẨY XUỐNG DƯỚI MÀN NHẬP MÃ */}
-                {Boolean(suspectCpId) && (
-                  <CheckpointHintSection
-                    checkpointId={suspectCpId}
-                    caseId={caseId}
-                    category="contradiction"
-                  />
-                )}
-
-                <div className="pt-3 border-t border-[#d4c5b0]/60 flex items-center justify-between gap-2 select-none">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      detectiveAudio.playPaperRustle()
-                      setSubTileView('overview')
-                    }}
-                    className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95"
-                  >
-                    <ArrowLeft className="size-3.5 text-[#4a3520] shrink-0" />
-                    <span>QUAY LẠI</span>
-                  </button>
-
-                  <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                    <button
-                      type="button"
-                      onClick={handleConfirmContradictionClues}
-                      className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0"
-                    >
-                      <Check className="size-3.5 text-[#d9a066] shrink-0" />
-                      <span>XÁC NHẬN</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <InterrogationClueStep
+                category="contradiction"
+                clueIds={contradictionClueIds}
+                onAddClueId={(id) => {
+                  setContradictionClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+                  if (errorMsg) setErrorMsg('')
+                }}
+                onRemoveClueId={(id) => {
+                  setContradictionClueIds((prev) => prev.filter((item) => item !== id))
+                }}
+                onPendingChange={(pending) => {
+                  pendingContradictionRef.current = pending
+                }}
+                checkpointId={suspectCpId}
+                caseId={caseId}
+                onBack={() => setSubTileView('overview')}
+                onConfirm={handleConfirmContradictionClues}
+              />
             )}
 
             {/* ACTION TOOLBAR: SAVE & SUBMIT (ONLY VISIBLE ON OVERVIEW) */}
@@ -1019,135 +902,21 @@ export function AddSuspectModal({
         </motion.div>
 
         {/* MODAL PHẢN HỒI KẾT QUẢ XÁC NHẬN MANH MỐI */}
-        <AnimatePresence>
-          {evalModal && evalModal.isOpen && (
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-            >
-              <motion.div
-                onClick={(e) => e.stopPropagation()}
-                initial={{ opacity: 0, scale: 0.92, y: 12 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.92, y: 12 }}
-                className={cn(
-                  'relative w-full max-w-md p-6 border-2 shadow-[0_25px_60px_rgba(0,0,0,0.9)] text-[#1a120b]',
-                  evalModal.isSuccess
-                    ? 'bg-[#f5f9f2] border-[#2e5220]'
-                    : 'bg-[#fcf3f2] border-[#a81c1c]'
-                )}
-              >
-                {/* Icon & Message side-by-side (No separate header or 'THÔNG BÁO' text) */}
-                <div className="flex items-start gap-3.5 pb-4">
-                  <div
-                    className={cn(
-                      'p-2.5 rounded-none border-2 flex items-center justify-center shrink-0',
-                      evalModal.isSuccess
-                        ? 'bg-[#e7f0dc] border-[#2e5220] text-[#2e5220]'
-                        : 'bg-[#fce8e6] border-[#a81c1c] text-[#a81c1c]'
-                    )}
-                  >
-                    {evalModal.isSuccess ? (
-                      <CheckCircle2 className="size-6" />
-                    ) : (
-                      <AlertTriangle className="size-6" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0 font-sans space-y-1.5 pt-0.5">
-                    <p
-                      className={cn(
-                        'font-bold leading-snug text-sm sm:text-base',
-                        evalModal.isSuccess ? 'text-[#193310]' : 'text-[#a81c1c]'
-                      )}
-                    >
-                      {evalModal.message}
-                    </p>
-                    {evalModal.subMessage && (
-                      <p className="text-xs text-[#6b5847] leading-relaxed">
-                        {evalModal.subMessage}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Action Button */}
-                <div className="pt-2 flex justify-end">
-                  {evalModal.isSuccess ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        detectiveAudio.playPaperRustle()
-                        setEvalModal(null)
-                        setSubTileView('overview')
-                      }}
-                      className="px-5 py-2.5 bg-[#2e5220] hover:bg-[#203a16] text-[#f6f1e5] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 border-2 border-[#193310] shadow-md active:scale-95"
-                    >
-                      <span>TIẾP TỤC ĐIỀU TRA</span>
-                      <ArrowRight className="size-3.5" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        detectiveAudio.playPaperRustle()
-                        setEvalModal(null)
-                      }}
-                      className="px-5 py-2.5 bg-[#a81c1c] hover:bg-[#851414] text-[#f6f1e5] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 border-2 border-[#5c0f0f] shadow-md active:scale-95"
-                    >
-                      <span>RÀ SOÁT LẠI</span>
-                      <ArrowLeft className="size-3.5" />
-                    </button>
-                  )}
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+        <SuspectEvaluationModal
+          evalModal={evalModal}
+          onCloseSuccess={() => {
+            setEvalModal(null)
+            setSubTileView('overview')
+          }}
+          onCloseFailure={() => setEvalModal(null)}
+        />
 
         {/* MODAL XÁC NHẬN KHI THOÁT MÀ CHƯA LƯU HỒ SƠ */}
-        <AnimatePresence>
-          {showExitConfirmModal && (
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="fixed inset-0 z-[80] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4"
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.94, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.94, y: 10 }}
-                className="relative w-full max-w-md p-6 bg-[#f6f1e5] border-2 border-[#2b1f14] shadow-[0_25px_70px_rgba(0,0,0,0.95)] text-[#1a120b] space-y-5"
-              >
-                <div className="space-y-2 text-center">
-                  <span className="font-mono text-xs font-bold uppercase tracking-wider text-[#8c1d1d] block">
-                    XÁC NHẬN LƯU HỒ SƠ
-                  </span>
-                  <p className="font-sans font-bold text-sm sm:text-base text-[#1a120b] leading-relaxed">
-                    Bạn có muốn lưu hồ sơ này chờ hoàn thiện sau không?
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-center gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={handleConfirmSaveAndClose}
-                    className="flex-1 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border-2 border-[#2b1f14] shadow-sm active:scale-95 text-center"
-                  >
-                    CÓ
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleDiscardAndClose}
-                    className="flex-1 py-2.5 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border-2 border-[#2b1f14] active:scale-95 text-center"
-                  >
-                    KHÔNG
-                  </button>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+        <SuspectExitConfirmModal
+          isOpen={showExitConfirmModal}
+          onConfirmSave={handleConfirmSaveAndClose}
+          onDiscard={handleDiscardAndClose}
+        />
       </div>
     </AnimatePresence>
   )
