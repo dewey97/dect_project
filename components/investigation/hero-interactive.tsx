@@ -96,6 +96,8 @@ export function HeroInteractive({
   isEditMode = false,
   onPinPositionChange,
   lightConeConfig,
+  activePing,
+  onPinPing,
 }: HeroInteractiveProps) {
   const customPinsRef = useRef<PinPoint[] | undefined>(customPins);
   const customConnectionsRef = useRef<CaseConnection[] | undefined>(
@@ -109,6 +111,8 @@ export function HeroInteractive({
   const isEditModeRef = useRef(isEditMode);
   const onPinPositionChangeRef = useRef(onPinPositionChange);
   const lightConeConfigRef = useRef(lightConeConfig);
+  const activePingRef = useRef(activePing);
+  const onPinPingRef = useRef(onPinPing);
 
   const draggingPinIdRef = useRef<string | null>(null);
   const clickedPinIdRef = useRef<string | null>(null);
@@ -125,10 +129,12 @@ export function HeroInteractive({
   isEditModeRef.current = isEditMode;
   onPinPositionChangeRef.current = onPinPositionChange;
   lightConeConfigRef.current = lightConeConfig;
+  activePingRef.current = activePing;
+  onPinPingRef.current = onPinPing;
 
   useEffect(() => {
     if (requestRenderRef.current) requestRenderRef.current();
-  }, [customPins, customConnections, selectedPinId, onPinClick, lightConeConfig]);
+  }, [customPins, customConnections, selectedPinId, onPinClick, lightConeConfig, activePing]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -220,6 +226,12 @@ export function HeroInteractive({
 
   // Track hovered pin by string ID (or null) to prevent magic number collisions
   const hoveredPinRef = useRef<string | null>(null);
+
+  // Track double-click on pin to trigger instant Detective Ping
+  const lastPinClickRef = useRef<{ pinId: string; time: number }>({
+    pinId: "",
+    time: 0,
+  });
 
   const animationFrameRef = useRef<number | null>(null);
   const renderSceneRef = useRef<((timestamp: number) => void) | null>(null);
@@ -883,10 +895,27 @@ export function HeroInteractive({
         }
 
         if (bestHitPin) {
+          // Always select this pin so toolbar or actions can react
+          if (onSelectPinRef.current) {
+            onSelectPinRef.current(bestHitPin.id);
+          }
+
+          // Check double click for Detective Ping (within 350ms)
+          const now = Date.now();
+          const prevClick = lastPinClickRef.current;
+          if (
+            prevClick.pinId === bestHitPin.id &&
+            now - prevClick.time < 350 &&
+            onPinPingRef.current
+          ) {
+            lastPinClickRef.current = { pinId: "", time: 0 };
+            onPinPingRef.current(bestHitPin.id, bestHitPin);
+          } else {
+            lastPinClickRef.current = { pinId: bestHitPin.id, time: now };
+          }
+
           if (isEditModeRef.current) {
-            if (onSelectPinRef.current) {
-              onSelectPinRef.current(bestHitPin.id);
-            }
+            // Already handled onSelectPin above
           } else if (onPinClickRef.current) {
             try {
               event.preventDefault();
@@ -897,11 +926,8 @@ export function HeroInteractive({
               clientY: event.clientY,
             });
           }
-        } else if (isEditModeRef.current && onSelectPinRef.current) {
+        } else if (onSelectPinRef.current) {
           onSelectPinRef.current(null);
-        } else if (!isEditModeRef.current) {
-          // Option 2: Khóa cố định bảng 100% - Vô hiệu hóa double-tap zoom trên nền trống
-          // Người chơi tương tác bằng cách click trực tiếp vào từng ghim/ảnh
         }
       } else {
         updateHoveredPin(x, y);
@@ -2263,6 +2289,100 @@ export function HeroInteractive({
         }
       });
 
+      // ──────────────────────────────────
+      // 3.5. Draw Detective Laser Radar Ping (Realtime Broadcast Ping Marker)
+      // ──────────────────────────────────
+      const ping = activePingRef.current;
+      if (ping) {
+        const pingAge = Date.now() - ping.timestamp;
+        if (pingAge < 4500) {
+          // Locate ping position
+          let pingPos: Point | null = null;
+          if (ping.targetId && pinPositionsMap.has(ping.targetId)) {
+            pingPos = pinPositionsMap.get(ping.targetId)!;
+          } else if (ping.coords) {
+            pingPos = {
+              x: bounds.x + ping.coords.x * bounds.width,
+              y: bounds.y + ping.coords.y * bounds.height,
+            };
+          }
+
+          if (pingPos) {
+            context.save();
+
+            // Overall fadeout in the last 1000ms
+            const overallAlpha = pingAge > 3500 ? Math.max(0, (4500 - pingAge) / 1000) : 1;
+
+            // 3 expanding radar wave rings
+            const cycleMs = 1400;
+            const cycleProgress = (pingAge % cycleMs) / cycleMs;
+
+            for (let ringIdx = 0; ringIdx < 3; ringIdx++) {
+              const ringOffset = (cycleProgress + ringIdx * 0.33) % 1;
+              const radius = 18 + ringOffset * 75;
+              const ringAlpha = (1 - ringOffset) * 0.75 * overallAlpha;
+
+              context.beginPath();
+              context.arc(pingPos.x, pingPos.y, radius, 0, Math.PI * 2);
+              context.strokeStyle = `rgba(245, 158, 11, ${ringAlpha})`;
+              context.lineWidth = (2.5 - ringOffset * 1.5) / transform.scale;
+              context.stroke();
+            }
+
+            // Laser center bullseye target circle
+            context.beginPath();
+            context.arc(pingPos.x, pingPos.y, 14 / transform.scale, 0, Math.PI * 2);
+            context.strokeStyle = `rgba(239, 68, 68, ${0.9 * overallAlpha})`;
+            context.lineWidth = 2.5 / transform.scale;
+            context.stroke();
+
+            // Laser crosshair lines
+            const crossLen = 22 / transform.scale;
+            context.beginPath();
+            context.moveTo(pingPos.x - crossLen, pingPos.y);
+            context.lineTo(pingPos.x + crossLen, pingPos.y);
+            context.moveTo(pingPos.x, pingPos.y - crossLen);
+            context.lineTo(pingPos.x, pingPos.y + crossLen);
+            context.strokeStyle = `rgba(239, 68, 68, ${0.75 * overallAlpha})`;
+            context.lineWidth = 1.8 / transform.scale;
+            context.stroke();
+
+            // Glowing center dot
+            context.beginPath();
+            context.arc(pingPos.x, pingPos.y, 4 / transform.scale, 0, Math.PI * 2);
+            context.fillStyle = `rgba(255, 255, 255, ${0.95 * overallAlpha})`;
+            context.fill();
+
+            // Floating Detective Tag badge above pin
+            const badgeText = `🎯 ${ping.actorName}: ${ping.label || 'Chỉ điểm'}`;
+            context.font = `bold ${Math.round(13 / transform.scale)}px "Roboto Mono", monospace`;
+            const textMetrics = context.measureText(badgeText);
+            const badgeW = textMetrics.width + 20 / transform.scale;
+            const badgeH = 26 / transform.scale;
+            const badgeX = pingPos.x - badgeW / 2;
+            const badgeY = pingPos.y - 48 / transform.scale;
+
+            // Badge shadow & background pill
+            context.fillStyle = `rgba(15, 10, 5, ${0.92 * overallAlpha})`;
+            context.beginPath();
+            const r = 6 / transform.scale;
+            context.roundRect(badgeX, badgeY, badgeW, badgeH, r);
+            context.fill();
+            context.strokeStyle = `rgba(245, 158, 11, ${0.85 * overallAlpha})`;
+            context.lineWidth = 1.5 / transform.scale;
+            context.stroke();
+
+            // Badge text
+            context.fillStyle = `rgba(254, 243, 199, ${overallAlpha})`;
+            context.textBaseline = "middle";
+            context.textAlign = "center";
+            context.fillText(badgeText, pingPos.x, badgeY + badgeH / 2);
+
+            context.restore();
+          }
+        }
+      }
+
       context.restore();
 
       // ──────────────────────────────────
@@ -2360,11 +2480,14 @@ export function HeroInteractive({
             customPinsRef.current ?? activeCaseRef.current.pins
           ).some((p) => (p as any).pulseBorder);
 
+          const hasActivePing = !!activePingRef.current && (Date.now() - activePingRef.current.timestamp < 4500);
+
           const shouldContinueAnimating =
             !reducedMotionRef.current &&
             (hoveredPinRef.current !== null ||
               connectionStartIdRef.current !== null ||
-              hasPulsingPins);
+              hasPulsingPins ||
+              hasActivePing);
 
           if (!shouldContinueAnimating || timestamp - lastRenderTime >= 33) {
             renderSceneRef.current?.(timestamp);

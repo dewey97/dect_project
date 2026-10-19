@@ -17,6 +17,7 @@ import { normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { setStorageItem, getStorageItem } from "@/lib/storage";
 import { useInvestigationEvent } from "@/lib/investigation-events";
+import { useRoomSync } from "@/components/investigation/room-sync-context";
 
 import { useBoardLayout } from "./canvas/use-board-layout";
 import { useInvestigationState, type SuspectItem } from "./canvas/use-investigation-state";
@@ -68,6 +69,15 @@ export function MainInvestigationCanvas({
     onOpenReinvestigation,
     onOpenEpilogue,
   });
+
+  const { activePing, broadcastPing, roomCode } = useRoomSync();
+
+  const handlePinPing = useCallback(
+    (pinId: string, pin: PinPoint) => {
+      broadcastPing(pinId, pin.label || "Ghim điều tra", { x: pin.x, y: pin.y });
+    },
+    [broadcastPing]
+  );
 
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isCreatePinModalOpen, setIsCreatePinModalOpen] = useState(false);
@@ -764,6 +774,8 @@ export function MainInvestigationCanvas({
         isEditMode={layout.isEditMode}
         onPinPositionChange={layout.handlePinPositionChange}
         lightConeConfig={lightConeConfig}
+        activePing={activePing}
+        onPinPing={handlePinPing}
       />
 
       {/* 3. Modals & Narrative Layers */}

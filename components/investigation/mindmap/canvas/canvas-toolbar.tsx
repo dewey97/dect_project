@@ -14,6 +14,7 @@ import {
   VolumeX,
   BookOpen,
   Users,
+  Target,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PinPoint } from "@/components/investigation/hero-interactive";
@@ -49,7 +50,7 @@ export function CanvasToolbar({
   hideTitleBadgeOnMobile = false,
   isBoardGame = false,
 }: CanvasToolbarProps) {
-  const { roomCode, nickname, memberCount } = useRoomSync();
+  const { roomCode, nickname, memberCount, broadcastPing } = useRoomSync();
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
 
   return (
@@ -269,6 +270,59 @@ export function CanvasToolbar({
               title="Chỉnh sửa chi tiết nội dung node"
             >
               <Pencil className="size-3.5" />
+            </button>
+
+            {roomCode && (
+              <>
+                <div className="h-3.5 w-px bg-white/15" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    broadcastPing(selectedPin.id, selectedPin.label || "Ghim điều tra", {
+                      x: selectedPin.x,
+                      y: selectedPin.y,
+                    });
+                  }}
+                  className="px-1.5 py-1 rounded-md bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 transition-colors flex items-center gap-1 font-bold text-[10px]"
+                  title="Chỉ điểm ghim này cho toàn bộ thám tử trong phòng"
+                >
+                  <Target className="size-3.5 text-emerald-400" />
+                  <span>Chỉ điểm</span>
+                </button>
+              </>
+            )}
+          </motion.div>
+        )}
+
+        {/* Regular gameplay mode: quick ping button when a pin is selected */}
+        {!layout.isEditMode && selectedPin && (
+          <motion.div
+            data-board-ui="true"
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-2.5 py-1.5 bg-[#1b140e]/95 backdrop-blur-md rounded-lg border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
+            style={{
+              top: "calc(max(12px, env(safe-area-inset-top, 12px)) + 44px)",
+            }}
+          >
+            <span className="text-amber-200/90 truncate max-w-[140px] sm:max-w-[200px] font-bold text-[11px]">
+              {selectedPin.label}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                broadcastPing(selectedPin.id, selectedPin.label || "Ghim điều tra", {
+                  x: selectedPin.x,
+                  y: selectedPin.y,
+                });
+              }}
+              className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 border border-amber-500/60 transition-colors flex items-center gap-1 font-bold text-[11px] cursor-pointer"
+              title="Phát tín hiệu radar chỉ điểm ghim này cho đồng đội"
+            >
+              <Target className="size-3.5 text-amber-400 animate-pulse" />
+              <span>Chỉ điểm 🎯</span>
             </button>
           </motion.div>
         )}

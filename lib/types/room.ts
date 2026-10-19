@@ -6,6 +6,21 @@ export interface AnnotationStroke {
   points: { x: number; y: number }[];
 }
 
+/** Ping sự kiện thám tử chỉ điểm - realtime broadcast */
+export interface DetectivePing {
+  id: string
+  actorName: string
+  targetId: string        // ID của ghim, tài liệu hoặc vật chứng được chỉ điểm
+  label: string           // Nhãn hiển thị (VD: "DOC-A01", "Lời khai Lê Quang Vũ")
+  targetType?: 'pin' | 'doc' | 'evidence' // Loại mục tiêu chỉ điểm
+  docType?: 'pdf' | 'evidence'            // Loại tài liệu để tự động chuyển tab
+  phase?: number                          // Phase của tài liệu để tự mở bộ hồ sơ tương ứng
+  page?: number                           // Trang tài liệu (nếu có)
+  /** Tọa độ chuẩn hóa trên bảng Corkboard [0..1], nếu có */
+  coords?: { x: number; y: number }
+  timestamp: number
+}
+
 export interface RoomMember {
   key: string;
   nickname: string;

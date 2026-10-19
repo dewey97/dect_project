@@ -10,8 +10,10 @@ import {
   Eraser,
   MousePointer,
   Trash2,
+  Target,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useRoomSync } from '../room-sync-context'
 import {
   DossierAnnotationLayer,
   type AnnotationTool,
@@ -41,6 +43,7 @@ export function EvidencePhotoAnnotator({
   className,
 }: EvidencePhotoAnnotatorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const { broadcastPing } = useRoomSync()
   const [zoom, setZoom] = useState<number>(1)
   const [activeTool, setActiveTool] = useState<AnnotationTool>('cursor')
   const [activeColor, setActiveColor] = useState<AnnotationColor>('#dc2626')
@@ -234,6 +237,24 @@ export function EvidencePhotoAnnotator({
           title="Đặt lại kích thước (100%)"
         >
           <RotateCcw className="size-3.5" />
+        </button>
+
+        {/* NÚT CHỈ ĐIỂM VẬT CHỨNG / ẢNH CHO ĐỒNG ĐỘI */}
+        <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
+        <button
+          type="button"
+          onClick={() => {
+            const targetId = evidenceId || title
+            broadcastPing(targetId, title, undefined, {
+              targetType: 'evidence',
+              docType: 'evidence',
+            })
+          }}
+          className="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 border border-amber-500/60 transition-colors flex items-center gap-1.5 font-mono text-xs font-bold cursor-pointer"
+          title="Chỉ điểm vật chứng này cho toàn bộ đồng đội đang cùng phá án"
+        >
+          <Target className="size-3.5 text-amber-400 animate-pulse" />
+          <span className="hidden sm:inline">Chỉ điểm</span>
         </button>
       </div>
 

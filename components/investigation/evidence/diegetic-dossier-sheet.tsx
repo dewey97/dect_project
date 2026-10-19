@@ -15,6 +15,7 @@ import {
   MousePointer,
   Trash2,
   Users,
+  Target,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRoomSync } from '@/components/investigation/room-sync-context'
@@ -61,7 +62,7 @@ export function DiegeticDossierSheet({
   const containerRef = useRef<HTMLDivElement>(null)
   const paperWrapperRef = useRef<HTMLDivElement>(null)
   const [unscaledHeight, setUnscaledHeight] = useState<number>(isLoiKhai ? 1123 : 730)
-  const { roomCode } = useRoomSync()
+  const { roomCode, broadcastPing, activePing } = useRoomSync()
 
   // Annotation states
   const [activeTool, setActiveTool] = useState<AnnotationTool>('cursor')
@@ -317,6 +318,24 @@ export function DiegeticDossierSheet({
           title="Đặt lại kích thước vừa vặn (Reset zoom)"
         >
           <RotateCcw className="size-3.5" />
+        </button>
+
+        {/* NÚT CHỈ ĐIỂM TÀI LIỆU (PING VĂN BẢN CHO ĐỒNG ĐỘI) */}
+        <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
+        <button
+          type="button"
+          onClick={() => {
+            const title = docItem.subject_name ? `Lời khai: ${docItem.subject_name}` : `Hồ sơ #${docItem.tag_code || ''}`
+            broadcastPing(`dossier-${docItem.id}`, title, undefined, {
+              targetType: 'doc',
+              docType: 'pdf',
+            })
+          }}
+          className="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 border border-amber-500/60 transition-colors flex items-center gap-1.5 font-mono text-xs font-bold cursor-pointer"
+          title="Chỉ điểm tài liệu này cho toàn bộ đồng đội đang cùng phá án"
+        >
+          <Target className="size-3.5 text-amber-400 animate-pulse" />
+          <span className="hidden sm:inline">Chỉ điểm</span>
         </button>
       </div>
 

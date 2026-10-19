@@ -13,8 +13,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Target,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useRoomSync } from '../room-sync-context'
 import {
   DossierAnnotationLayer,
   type AnnotationTool,
@@ -44,6 +46,7 @@ export function NativePdfAnnotator({
   className,
 }: NativePdfAnnotatorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const { broadcastPing } = useRoomSync()
   const [numPages, setNumPages] = useState<number>(0)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [zoom, setZoom] = useState<number>(1)
@@ -403,6 +406,25 @@ export function NativePdfAnnotator({
           title="Đặt lại kích thước vừa vặn (Reset zoom)"
         >
           <RotateCcw className="size-3.5" />
+        </button>
+
+        {/* NÚT CHỈ ĐIỂM TÀI LIỆU PDF CHO ĐỒNG ĐỘI */}
+        <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
+        <button
+          type="button"
+          onClick={() => {
+            const targetId = docCode || title
+            broadcastPing(targetId, title, undefined, {
+              targetType: 'doc',
+              docType: 'pdf',
+              page: currentPage,
+            })
+          }}
+          className="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 border border-amber-500/60 transition-colors flex items-center gap-1.5 font-mono text-xs font-bold cursor-pointer"
+          title="Chỉ điểm tài liệu PDF này cho toàn bộ đồng đội đang cùng phá án"
+        >
+          <Target className="size-3.5 text-amber-400 animate-pulse" />
+          <span className="hidden sm:inline">Chỉ điểm</span>
         </button>
       </div>
 

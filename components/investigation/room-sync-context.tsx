@@ -10,7 +10,7 @@ import React, {
   useMemo,
 } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { RoomInvestigationState, GameRoomRow, RoomMember } from '@/lib/types/room'
+import type { RoomInvestigationState, GameRoomRow, RoomMember, DetectivePing } from '@/lib/types/room'
 import { DEFAULT_ROOM_STATE } from '@/lib/types/room'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -30,9 +30,21 @@ interface RoomSyncContextType {
   members: RoomMember[]
   memberCount: number
   activeToast: ToastNotice | null
+  activePing: DetectivePing | null
   joinRoom: (code: string, customNick?: string) => Promise<{ success: boolean; error?: string }>
   leaveRoom: () => void
   syncUpdate: (patch: Partial<RoomInvestigationState>, actionText?: string) => Promise<void>
+  broadcastPing: (
+    targetId: string,
+    label: string,
+    coords?: { x: number; y: number },
+    options?: {
+      targetType?: 'pin' | 'doc' | 'evidence'
+      docType?: 'pdf' | 'evidence'
+      phase?: number
+      page?: number
+    }
+  ) => void
   setNickname: (name: string) => void
 }
 
@@ -64,6 +76,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const [roomState, setRoomState] = useState<RoomInvestigationState>(DEFAULT_ROOM_STATE)
   const [members, setMembers] = useState<RoomMember[]>([])
   const [activeToast, setActiveToast] = useState<ToastNotice | null>(null)
+  const [activePing, setActivePing] = useState<DetectivePing | null>(null)
+  const activePingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const supabase = useMemo(() => createClient(), [])
   const channelRef = useRef<RealtimeChannel | null>(null)
@@ -110,6 +124,63 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       setActiveToast((prev) => (prev?.id === notice.id ? null : prev))
     }, 4500)
   }, [])
+
+  // Handle incoming or local ping
+  const triggerPing = useCallback((ping: DetectivePing) => {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate([30, 40, 30])
+      } catch {}
+    }
+    if (activePingTimerRef.current) {
+      clearTimeout(activePingTimerRef.current)
+    }
+    setActivePing(ping)
+    activePingTimerRef.current = setTimeout(() => {
+      setActivePing(null)
+    }, 4500)
+  }, [])
+
+  // Broadcast ping to teammates
+  const broadcastPing = useCallback(
+    (
+      targetId: string,
+      label: string,
+      coords?: { x: number; y: number },
+      options?: {
+        targetType?: 'pin' | 'doc' | 'evidence'
+        docType?: 'pdf' | 'evidence'
+        phase?: number
+        page?: number
+      }
+    ) => {
+      const ping: DetectivePing = {
+        id: Math.random().toString(36).slice(2),
+        actorName: nickname,
+        targetId,
+        label,
+        coords,
+        targetType: options?.targetType,
+        docType: options?.docType,
+        phase: options?.phase,
+        page: options?.page,
+        timestamp: Date.now(),
+      }
+
+      // Trigger locally immediately
+      triggerPing(ping)
+
+      // Broadcast over channel
+      if (channelRef.current) {
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'DETECTIVE_PING',
+          payload: ping,
+        })
+      }
+    },
+    [nickname, triggerPing]
+  )
 
   // Leave room logic
   const leaveRoom = useCallback(() => {
@@ -238,6 +309,12 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
             if (actor && actor !== activeNick) {
               triggerToast(actor, 'đã rời phòng')
             }
+          })
+          .on('broadcast', { event: 'DETECTIVE_PING' }, ({ payload }) => {
+            if (!payload) return
+            const ping = payload as DetectivePing
+            triggerPing(ping)
+            triggerToast(ping.actorName || 'Đồng đội', `đang chỉ vào: ${ping.label || 'manh mối'}`)
           })
           .on('broadcast', { event: 'STATE_PATCH' }, ({ payload }) => {
             if (!payload || !payload.patch) return
@@ -476,9 +553,11 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       members,
       memberCount,
       activeToast,
+      activePing,
       joinRoom,
       leaveRoom,
       syncUpdate,
+      broadcastPing,
       setNickname,
     }),
     [
@@ -490,9 +569,11 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       members,
       memberCount,
       activeToast,
+      activePing,
       joinRoom,
       leaveRoom,
       syncUpdate,
+      broadcastPing,
       setNickname,
     ]
   )
@@ -525,9 +606,11 @@ const DEFAULT_ROOM_SYNC_CONTEXT: RoomSyncContextType = {
   members: [],
   memberCount: 0,
   activeToast: null,
+  activePing: null,
   joinRoom: async () => ({ success: false, error: 'No Room Provider' }),
   leaveRoom: () => {},
   syncUpdate: async () => {},
+  broadcastPing: () => {},
   setNickname: () => {},
 }
 

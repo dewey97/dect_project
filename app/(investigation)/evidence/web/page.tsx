@@ -17,10 +17,12 @@ import {
   FolderOpen,
   Search,
   PenLine,
+  Target,
 } from "lucide-react";
 import { PDFViewerModal } from "@/components/investigation/pdf-viewer-modal";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
+import { useRoomSync } from "@/components/investigation/room-sync-context";
 
 import type {
   PDFDocument,
@@ -126,6 +128,8 @@ function WebEvidencePageContent() {
 
   const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<string | undefined>(undefined);
   const [activeHintCategory, setActiveHintCategory] = useState<"motive" | "alibi" | undefined>(undefined);
+
+  const { activePing, broadcastPing, roomCode } = useRoomSync();
 
   // Event bus listeners
   useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
@@ -254,6 +258,44 @@ function WebEvidencePageContent() {
 
     return [...testPdfItems, ...dossierItems, ...photoItems];
   }, [dossierDocs, sheetEvidences, caseId]);
+
+  // Tự động nhảy đến vị trí tài liệu/vật chứng khi có đồng đội chỉ điểm (Ping)
+  useEffect(() => {
+    if (!activePing) return;
+    if (activePing.targetType === "doc" || activePing.targetType === "evidence") {
+      // Tìm tài liệu tương ứng trong danh sách effectiveItems
+      const targetItem = (effectiveItems as CombinedItem[]).find(
+        (i) => i.data.id === activePing.targetId || (i.data as any).code === activePing.targetId
+      );
+
+      if (targetItem) {
+        // Tự động mở tab phân loại phù hợp (Hồ sơ hay Vật chứng)
+        if (targetItem.type === "evidence") {
+          setFilterTab("evidence");
+          setSelectedView({ type: "evidence", data: targetItem.data as PhysicalEvidence });
+        } else {
+          setFilterTab("pdf");
+          setSelectedView({ type: "pdf", data: targetItem.data as PDFDocument });
+        }
+
+        // Tự chuyển tab trên mobile nếu đang ở tab bảng
+        setMobileTab("dossier");
+
+        // Bỏ thu nhỏ khay tài liệu nếu đang bị thu nhỏ
+        setIsDossierCollapsed(false);
+
+        // Cuộn thẻ tài liệu vào tầm nhìn nếu có trong DOM
+        if (typeof document !== "undefined") {
+          setTimeout(() => {
+            const el = document.getElementById(`doc-card-${targetItem.data.id}`);
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+          }, 150);
+        }
+      }
+    }
+  }, [activePing, effectiveItems]);
 
   useEffect(() => {
     setStorageItem("play_experience", "web");
@@ -700,17 +742,23 @@ function WebEvidencePageContent() {
                       selectedView.type === item.type &&
                       selectedView.data.id === item.data.id;
                     const evItem = item.data as PhysicalEvidence;
+                    const isPinged =
+                      activePing?.targetId === item.data.id ||
+                      (evItem.evidenceId && activePing?.targetId === evItem.evidenceId);
 
                     return (
-                      <button
+                      <div
+                        id={`doc-card-${item.data.id}`}
                         key={`evidence-${item.data.id}`}
-                        onClick={() => handleSelectEvidence(evItem)}
                         className={cn(
                           "w-full aspect-[4/3] text-left border transition-all cursor-pointer relative overflow-hidden group shadow-md bg-[#0a0705] active:scale-[0.98]",
-                          isSelected
+                          isPinged
+                            ? "border-amber-400 ring-2 ring-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.6)] animate-pulse"
+                            : isSelected
                             ? "border-[#d9a066] shadow-[0_0_15px_rgba(217,160,102,0.35)] ring-1 ring-[#d9a066]"
                             : "border-[#2d1e13] hover:border-[#4d3422]",
                         )}
+                        onClick={() => handleSelectEvidence(evItem)}
                       >
                         <img
                           src={normalizeImageUrl(evItem?.thumbnail) || "/photo_scene_overview.jpg"}
@@ -718,14 +766,39 @@ function WebEvidencePageContent() {
                           className="w-full h-full object-cover select-none transition-transform duration-200 group-hover:scale-105"
                         />
                         {evItem?.evidenceId && (
-                          <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/85 text-[0.65rem] font-mono font-bold tracking-wider text-[#e5d8cb] border border-white/10">
+                          <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/85 text-[0.65rem] font-mono font-bold tracking-wider text-[#e5d8cb] border border-white/10 z-10">
                             {evItem.evidenceId}
                           </div>
                         )}
-                        {isSelected && (
+
+                        {/* NÚT CHỈ ĐIỂM NHANH KHI HOVER */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            broadcastPing(evItem.evidenceId || item.data.id, item.data.title, undefined, {
+                              targetType: "evidence",
+                              docType: "evidence",
+                            });
+                          }}
+                          className="absolute top-1 right-1 p-1 rounded bg-black/75 hover:bg-amber-500/80 text-white/70 hover:text-black border border-white/20 transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer"
+                          title="Chỉ điểm vật chứng này cho đồng đội"
+                        >
+                          <Target className="size-3.5" />
+                        </button>
+
+                        {/* BADGE THÁM TỬ ĐANG CHỈ ĐIỂM */}
+                        {isPinged && activePing && (
+                          <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-amber-500 text-black font-mono text-[0.6rem] font-black uppercase tracking-wider shadow-lg flex items-center gap-1 z-20 animate-bounce">
+                            <Target className="size-3" />
+                            <span className="truncate max-w-[80px]">{activePing.actorName}</span>
+                          </div>
+                        )}
+
+                        {isSelected && !isPinged && (
                           <div className="absolute inset-0 border-2 border-[#d9a066] pointer-events-none" />
                         )}
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -775,8 +848,13 @@ function WebEvidencePageContent() {
                     ? "border-l-2 border-l-[#3b82f6]/60"
                     : "border-l-2 border-l-[#78350f]/60";
 
+                  const isPinged =
+                    activePing?.targetId === item.data.id ||
+                    (code && activePing?.targetId === code);
+
                   return (
                     <div
+                      id={`doc-card-${item.data.id}`}
                       key={`pdf-${item.data.id}`}
                       onClick={() => {
                         setSelectedView({ type: "pdf", data: pdfDoc });
@@ -787,33 +865,61 @@ function WebEvidencePageContent() {
                       className={cn(
                         "w-full text-left transition-all duration-150 cursor-pointer overflow-hidden group select-none relative p-3 rounded-xs border shadow-sm",
                         accentBorder,
-                        isSelected
+                        isPinged
+                          ? "bg-amber-950/40 border-amber-400 ring-2 ring-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)] animate-pulse"
+                          : isSelected
                           ? "bg-[#25180f] border-[#d9a066] shadow-[0_4px_16px_rgba(0,0,0,0.8)] ring-1 ring-[#d9a066]/30"
                           : "bg-[#18110b] hover:bg-[#1f150e] border-[#2d1e13] hover:border-[#4d3422]"
                       )}
                     >
-                      {/* DÒNG 1: MÃ HỒ SƠ + BADGE PHÂN LOẠI */}
+                      {/* DÒNG 1: MÃ HỒ SƠ + BADGE PHÂN LOẠI + NÚT CHỈ ĐIỂM NHANH */}
                       <div className="flex items-center justify-between gap-2 mb-1.5">
-                        <span
-                          className={cn(
-                            "font-mono text-xs font-black tracking-wider transition-colors",
-                            isSelected
-                              ? "text-[#d9a066]"
-                              : "text-[#c29668] group-hover:text-[#e8b988]"
-                          )}
-                        >
-                          {code}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              "font-mono text-xs font-black tracking-wider transition-colors",
+                              isSelected
+                                ? "text-[#d9a066]"
+                                : "text-[#c29668] group-hover:text-[#e8b988]"
+                            )}
+                          >
+                            {code}
+                          </span>
 
-                        <span
-                          className={cn(
-                            "font-mono text-[0.62rem] font-bold px-1.5 py-0.5 rounded-2xs border tracking-wider",
-                            badgeColor
-                          )}
+                          <span
+                            className={cn(
+                              "font-mono text-[0.62rem] font-bold px-1.5 py-0.5 rounded-2xs border tracking-wider",
+                              badgeColor
+                            )}
+                          >
+                            {badgeText}
+                          </span>
+                        </div>
+
+                        {/* NÚT CHỈ ĐIỂM NHANH (HOVER HOẶC ĐANG CHỌN) */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            broadcastPing(item.data.id, title, undefined, {
+                              targetType: "doc",
+                              docType: "pdf",
+                            });
+                          }}
+                          className="p-1 rounded hover:bg-amber-500/20 text-stone-400 hover:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-1 font-mono text-[0.65rem]"
+                          title="Chỉ điểm tài liệu này cho đồng đội"
                         >
-                          {badgeText}
-                        </span>
+                          <Target className="size-3.5" />
+                        </button>
                       </div>
+
+                      {/* BADGE BÁO ĐỒNG ĐỘI ĐANG CHỈ ĐIỂM */}
+                      {isPinged && activePing && (
+                        <div className="mb-2 px-2 py-0.5 rounded bg-amber-500 text-black font-mono text-[0.65rem] font-black flex items-center gap-1.5 shadow-md">
+                          <Target className="size-3 animate-spin" />
+                          <span>🎯 {activePing.actorName} đang chỉ điểm văn bản này</span>
+                        </div>
+                      )}
 
                       {/* DÒNG 2: TIÊU ĐỀ TÀI LIỆU */}
                       <p

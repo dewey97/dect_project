@@ -139,4 +139,13 @@ export interface HeroInteractiveProps {
     coneSpread: number;
     intensity: number;
   };
+  activePing?: {
+    id: string;
+    actorName: string;
+    targetId: string;
+    label: string;
+    coords?: { x: number; y: number };
+    timestamp: number;
+  } | null;
+  onPinPing?: (pinId: string, pin: PinPoint) => void;
 }
