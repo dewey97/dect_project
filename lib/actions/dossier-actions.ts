@@ -113,3 +113,21 @@ export async function reorderDossierDocuments(orderedDocIds: { id: string; sortO
     return { success: false, error: error.message }
   }
 }
+
+/** Xóa hồ sơ khỏi Supabase */
+export async function deleteDossierDocument(id: string) {
+  try {
+    const supabase = await createClient()
+    const { error } = await supabase
+      .from('dossier_documents')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
+    revalidatePath('/studio/dossier')
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error deleting dossier document:', error)
+    return { success: false, error: error.message }
+  }
+}

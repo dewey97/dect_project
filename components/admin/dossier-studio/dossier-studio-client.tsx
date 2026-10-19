@@ -217,19 +217,21 @@ export function DossierStudioClient({
     }
   }, [caseId, mode, lkData, hsData, lkPaper, hsPaper])
 
-  // Di chuyển thứ tự hồ sơ (Đẩy Trái / Đẩy Phải) và tự động lưu vị trí vào DB
-  const handleMoveDocument = useCallback(async (tagCode: string, direction: 'left' | 'right') => {
-    const currentIndex = dbDocuments.findIndex(d => d.tag_code === tagCode)
-    if (currentIndex === -1) return
+  // Kéo thả sắp xếp lại thứ tự hồ sơ (Đồng bộ trực tiếp canvas và DB)
+  const handleReorderDocuments = useCallback(async (sourceIndex: number, targetIndex: number) => {
+    if (
+      sourceIndex === targetIndex ||
+      sourceIndex < 0 ||
+      sourceIndex >= dbDocuments.length ||
+      targetIndex < 0 ||
+      targetIndex >= dbDocuments.length
+    ) {
+      return
+    }
 
-    const targetIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1
-    if (targetIndex < 0 || targetIndex >= dbDocuments.length) return
-
-    // Tạo mảng mới sau khi hoán đổi vị trí
     const updatedDocs = [...dbDocuments]
-    const temp = updatedDocs[currentIndex]
-    updatedDocs[currentIndex] = updatedDocs[targetIndex]
-    updatedDocs[targetIndex] = temp
+    const [movedItem] = updatedDocs.splice(sourceIndex, 1)
+    updatedDocs.splice(targetIndex, 0, movedItem)
 
     // Gán sortOrder liên tục 0, 1, 2, 3...
     const reorderedPayload = updatedDocs.map((doc, idx) => ({
@@ -260,9 +262,11 @@ export function DossierStudioClient({
 
   // Helper cập nhật dữ liệu cho một tài liệu cụ thể trong dbDocuments (Hỗ trợ edit trực tiếp trong chế độ Matrix)
   const updateMatrixLkDocument = useCallback((tagCode: string, updater: (prev: LoiKhaiData) => LoiKhaiData) => {
-    if (lkData.tagCode === tagCode) {
-      setLkData(updater)
-    }
+    setSelectedTagCode(tagCode)
+    setLkData(prev => {
+      const current = prev.tagCode === tagCode ? prev : ((dbDocuments.find(d => d.tag_code === tagCode)?.content as LoiKhaiData) || EMPTY_LK)
+      return updater(current)
+    })
     setDbDocuments(prevDocs =>
       prevDocs.map(doc => {
         if (doc.tag_code === tagCode) {
@@ -277,7 +281,7 @@ export function DossierStudioClient({
         return doc
       })
     )
-  }, [lkData.tagCode])
+  }, [dbDocuments])
 
   const updateMatrixHsDocument = useCallback((tagCode: string, updater: (prev: LyLichData) => LyLichData) => {
     if (hsData.tagCode === tagCode) {
@@ -568,6 +572,83 @@ export function DossierStudioClient({
     focusOnDossier(selectedTag)
   }
 
+  // Tạo văn bản mới để nhập liệu
+  const handleCreateNewDocument = () => {
+    const existingCodes = dbDocuments.map(d => d.tag_code)
+    let newTag = mode === 'loi_khai' ? 'LK-NEW' : 'HS-NEW'
+    let counter = 1
+    while (existingCodes.includes(newTag)) {
+      newTag = `${mode === 'loi_khai' ? 'LK' : 'HS'}-${String(counter).padStart(2, '0')}`
+      counter++
+    }
+
+    const defaultPaper = mode === 'loi_khai' ? lkPaper : hsPaper
+
+    if (mode === 'loi_khai') {
+      const newLk: LoiKhaiData = {
+        ...EMPTY_LK,
+        tagCode: newTag,
+        docTitle: 'BIÊN BẢN GHI LỜI KHAI',
+        subjectName: 'Người khai mới',
+        caseSubtitle: 'V/v: Vụ án điều tra',
+        recordLead: 'Hồi ... giờ ... ngày ... tháng ... năm ..., tại Công an quận ...',
+        investigatorText: 'Cán bộ thụ lý hồ sơ',
+        reasonText: 'Lấy lời khai phục vụ công tác điều tra',
+        relationText: 'Nhân chứng / Người liên quan',
+        qaList: [
+          {
+            id: 'qa-1',
+            question: 'Hỏi: Đề nghị anh/chị trình bày rõ sự việc đã chứng kiến?',
+            answer: 'Đáp: Vào thời điểm xảy ra vụ việc, tôi...'
+          }
+        ]
+      }
+      const newDocItem: DbDossierDocument = {
+        id: `temp-${Date.now()}`,
+        case_id: caseId,
+        mode: 'loi_khai',
+        tag_code: newTag,
+        subject_name: newLk.subjectName,
+        paper_config: defaultPaper,
+        content: newLk,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+      setDbDocuments(prev => [...prev, newDocItem])
+      setSelectedTagCode(newTag)
+      setLkData(newLk)
+    } else {
+      const newHs: LyLichData = {
+        ...EMPTY_HS,
+        tagCode: newTag,
+        fullName: 'Đối tượng mới',
+        signingCity: 'TP. HỒ CHÍ MINH',
+        signingDay: String(new Date().getDate()).padStart(2, '0'),
+        signingMonth: String(new Date().getMonth() + 1).padStart(2, '0'),
+        signingYear: String(new Date().getFullYear()),
+        investigatorRankAndName: 'Đại úy Nguyễn Văn A'
+      }
+      const newDocItem: DbDossierDocument = {
+        id: `temp-${Date.now()}`,
+        case_id: caseId,
+        mode: 'ly_lich',
+        tag_code: newTag,
+        subject_name: newHs.fullName,
+        paper_config: defaultPaper,
+        content: newHs,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+      setDbDocuments(prev => [...prev, newDocItem])
+      setSelectedTagCode(newTag)
+      setHsData(newHs)
+    }
+
+    setTimeout(() => {
+      focusOnDossier(newTag)
+    }, 100)
+  }
+
   return (
     <div className="h-full w-full bg-[#0a0a0d] text-zinc-100 flex flex-col overflow-hidden font-sans antialiased selection:bg-amber-500/30">
       {/* Print Specific CSS */}
@@ -699,9 +780,9 @@ export function DossierStudioClient({
             {/* TRẢI TOÀN BỘ HỒ SƠ THEO CHIỀU NGANG */}
             <div className="flex flex-row items-start gap-12">
               {mode === 'loi_khai' ? (
-                dbDocuments.map((docItem, index) => {
+                dbDocuments.map((docItem) => {
                   const isSelected = selectedTagCode === docItem.tag_code
-                  const docData = (isSelected ? lkData : docItem.content) as LoiKhaiData
+                  const docData = (docItem.content as LoiKhaiData) || EMPTY_LK
                   // Khổ giấy của Lời Khai luôn đồng bộ thống nhất toàn bộ danh sách
                   const docPaper = lkPaper
 
@@ -713,10 +794,6 @@ export function DossierStudioClient({
                       docPaper={docPaper}
                       isSelected={isSelected}
                       highlightEditable={highlightEditable}
-                      canMoveLeft={index > 0}
-                      canMoveRight={index < dbDocuments.length - 1}
-                      onMoveLeft={() => handleMoveDocument(docItem.tag_code, 'left')}
-                      onMoveRight={() => handleMoveDocument(docItem.tag_code, 'right')}
                       onSelect={() => {
                         setSelectedTagCode(docItem.tag_code)
                         setLkData(docItem.content as LoiKhaiData)
@@ -726,7 +803,7 @@ export function DossierStudioClient({
                   )
                 })
               ) : (
-                dbDocuments.map((docItem, index) => {
+                dbDocuments.map((docItem) => {
                   const isSelected = selectedTagCode === docItem.tag_code
                   const docData = (isSelected ? hsData : docItem.content) as LyLichData
                   // Khổ giấy của Lý Lịch luôn đồng bộ thống nhất toàn bộ danh sách
@@ -742,10 +819,6 @@ export function DossierStudioClient({
                       highlightEditable={highlightEditable}
                       showSeal={showSeal}
                       sealAngle={sealAngle}
-                      canMoveLeft={index > 0}
-                      canMoveRight={index < dbDocuments.length - 1}
-                      onMoveLeft={() => handleMoveDocument(docItem.tag_code, 'left')}
-                      onMoveRight={() => handleMoveDocument(docItem.tag_code, 'right')}
                       onSelect={() => {
                         setSelectedTagCode(docItem.tag_code)
                         setHsData(docItem.content as LyLichData)
@@ -769,6 +842,8 @@ export function DossierStudioClient({
           dbDocuments={dbDocuments}
           selectedTagCode={selectedTagCode}
           onSelectDossier={handleSelectDossier}
+          onCreateNewDocument={handleCreateNewDocument}
+          onReorderDocuments={handleReorderDocuments}
           lkData={lkData}
           setLkData={setLkData}
           addLkQuestion={addLkQuestion}

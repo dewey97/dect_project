@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
+import { MoveUp, MoveDown, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { LoiKhaiData, PaperConfig, QABlock } from '@/types/dossier'
 import type { DbDossierDocument } from '@/lib/actions/dossier-actions'
@@ -34,6 +35,50 @@ export function DossierLoiKhaiSheet({
   onUpdateDoc = () => {},
   readOnly = false
 }: DossierLoiKhaiSheetProps) {
+  // Thao tác chỉnh sửa danh sách câu hỏi Q&A (Thêm, Xóa, Đổi vị trí lên/xuống)
+  const handleAddQuestion = (targetQaId?: string) => {
+    onUpdateDoc(docItem.tag_code, prev => {
+      const list = [...(prev.qaList || [])]
+      const newQ: QABlock = {
+        id: `q_${Date.now()}`,
+        question: 'Đề nghị khai báo nội dung câu hỏi...',
+        answer: 'Tôi xin khai nhận rằng...'
+      }
+      if (targetQaId) {
+        const idx = list.findIndex(q => q.id === targetQaId)
+        if (idx !== -1) {
+          list.splice(idx + 1, 0, newQ)
+        } else {
+          list.push(newQ)
+        }
+      } else {
+        list.push(newQ)
+      }
+      return { ...prev, qaList: list }
+    })
+  }
+
+  const handleRemoveQuestion = (targetQaId: string) => {
+    onUpdateDoc(docItem.tag_code, prev => ({
+      ...prev,
+      qaList: (prev.qaList || []).filter(q => q.id !== targetQaId)
+    }))
+  }
+
+  const handleMoveQuestion = (targetQaId: string, direction: 'up' | 'down') => {
+    onUpdateDoc(docItem.tag_code, prev => {
+      const list = [...(prev.qaList || [])]
+      const idx = list.findIndex(q => q.id === targetQaId)
+      if (idx === -1) return prev
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1
+      if (targetIdx < 0 || targetIdx >= list.length) return prev
+
+      const temp = list[idx]
+      list[idx] = list[targetIdx]
+      list[targetIdx] = temp
+      return { ...prev, qaList: list }
+    })
+  }
   // Tính toán trang động dựa trên dung lượng chữ thực tế (Weighted Capacity Pagination)
   // để trang A4/A5 luôn thoáng đẹp, tự động đẩy sang trang mới khi vượt ngưỡng chứ không ép nhồi nhét
   const docPages = useMemo(() => {
@@ -42,30 +87,33 @@ export function DossierLoiKhaiSheet({
       return [{ pageNumber: 1, items: [], isFirst: true, isLast: true }]
     }
 
-    // Giới hạn chiều cao pixel khả dụng tối đa trước khi bắt buộc phải ngắt trang:
-    // A4 portrait: 1123px tổng thể, padding trên dưới 110px, footer 70px -> còn lại: ~940px.
-    // - Trang 1: Phần header hành chính chiếm ~260px -> khả dụng cho Q&A: ~680px
-    // - Trang tiếp theo: Header phụ chiếm ~45px -> khả dụng cho Q&A: ~890px
+    // Giới hạn chiều cao pixel khả dụng tối đa của Trang 1:
+    // A4 portrait: 1123px tổng thể:
+    // - Padding trên dưới: 48px (pt-32px pb-16px)
+    // - Header hành chính (Tiêu đề, vụ án, cán bộ, lý do, mục Q&A): ~320px
+    // - Footer chân trang: ~25px
+    // => Chiều cao thực tế khả dụng cho các thẻ Q&A chạm sát mép trên footer là: 1123 - 48 - 320 - 25 = ~730px!
+    // Cho phép dung lượng lên đến 765px để tận dụng tối đa từng centimet khoảng trống đáy trang trước khi ngắt!
     const isA4 = docPaper.size === 'A4'
     const isPortrait = docPaper.orientation === 'portrait'
 
-    const maxWeightP1 = isA4 ? (isPortrait ? 680 : 380) : (isPortrait ? 420 : 250)
-    const maxWeightNext = isA4 ? (isPortrait ? 890 : 540) : (isPortrait ? 580 : 350)
+    const maxWeightP1 = isA4 ? (isPortrait ? 765 : 470) : (isPortrait ? 480 : 310)
+    const maxWeightNext = isA4 ? (isPortrait ? 980 : 660) : (isPortrait ? 660 : 440)
 
     // Ước lượng chiều cao pixel thực tế của một card Hỏi & Đáp:
     const calculateQAWeight = (item: QABlock) => {
       const qLen = (item.question || '').length
       const aLen = (item.answer || '').length
-      // Base: padding thẻ + viền border + nhãn Hỏi/Đáp: ~48px
-      const baseHeightPx = 48
-      // Chữ 15.5px EB Garamond: trung bình ~78 ký tự/dòng, line-height 20px
-      const charsPerLine = isA4 ? (isPortrait ? 78 : 110) : (isPortrait ? 52 : 78)
-      const lineHeightPx = isA4 ? (isPortrait ? 20 : 18) : (isPortrait ? 17 : 15)
+      // Base: padding thẻ py-1.5 * 2 + viền border + nhãn: ~32px
+      const baseHeightPx = 32
+      // Chữ 15.5px EB Garamond: trung bình ~82 ký tự/dòng, line-height 18.5px
+      const charsPerLine = isA4 ? (isPortrait ? 82 : 115) : (isPortrait ? 55 : 80)
+      const lineHeightPx = isA4 ? (isPortrait ? 18.5 : 16.5) : (isPortrait ? 15.5 : 13.5)
       const qLines = Math.max(1, Math.ceil(qLen / charsPerLine))
       const aLines = Math.max(1, Math.ceil(aLen / charsPerLine))
 
-      // Chiều cao pixel thực tế của khối này (kèm margin-bottom 12px)
-      return baseHeightPx + (qLines + aLines) * lineHeightPx + 12
+      // Chiều cao pixel thực tế của khối này (kèm khoảng cách 0px giữa các thẻ)
+      return baseHeightPx + (qLines + aLines) * lineHeightPx
     }
 
     const pages: { pageNumber: number; items: QABlock[]; isFirst: boolean; isLast: boolean }[] = []
@@ -78,8 +126,6 @@ export function DossierLoiKhaiSheet({
       const weight = calculateQAWeight(item)
       const currentLimit = isFirstPage ? maxWeightP1 : maxWeightNext
 
-      // Nếu thêm câu này mà vượt quá tải trọng của trang hiện tại (và trang hiện tại đã có ít nhất 1 câu)
-      // thì ngắt trang ngay lập tức để trang không bị tràn layout!
       if (currentPageItems.length > 0 && currentWeight + weight > currentLimit) {
         pages.push({
           pageNumber: pages.length + 1,
@@ -96,7 +142,6 @@ export function DossierLoiKhaiSheet({
       }
     }
 
-    // Đẩy trang cuối cùng vào danh sách
     if (currentPageItems.length > 0 || pages.length === 0) {
       pages.push({
         pageNumber: pages.length + 1,
@@ -106,7 +151,6 @@ export function DossierLoiKhaiSheet({
       })
     }
 
-    // Đảm bảo cờ isLast của trang cuối luôn đúng
     if (pages.length > 0) {
       pages[pages.length - 1].isLast = true
     }
@@ -127,57 +171,15 @@ export function DossierLoiKhaiSheet({
         )
       )}
     >
-      {/* Column Header Label / Pill & Reorder Buttons */}
+      {/* Column Header Label / Pill */}
       {!readOnly && (
         <div className="flex items-center justify-between w-full px-2 py-1 text-xs">
           <div className="flex items-center gap-2">
-            {/* Nút Đẩy Trái / Đẩy Phải */}
-            <div className="flex items-center bg-black/60 rounded-md border border-white/10 p-0.5">
-            <button
-              type="button"
-              disabled={!canMoveLeft}
-              onClick={(e) => {
-                e.stopPropagation()
-                onMoveLeft?.()
-              }}
-              title="Đẩy sang trái (Di chuyển hồ sơ lên trước)"
+            <span
               className={cn(
-                "p-1 rounded transition-all",
-                canMoveLeft
-                  ? "text-neutral-300 hover:text-white hover:bg-white/15 active:scale-95"
-                  : "text-neutral-600 cursor-not-allowed opacity-40"
+                "font-mono font-bold px-2 py-0.5 rounded text-[11px]",
+                isSelected ? "bg-amber-500 text-black font-extrabold" : "bg-zinc-800 text-zinc-300"
               )}
-            >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              disabled={!canMoveRight}
-              onClick={(e) => {
-                e.stopPropagation()
-                onMoveRight?.()
-              }}
-              title="Đẩy sang phải (Di chuyển hồ sơ về sau)"
-              className={cn(
-                "p-1 rounded transition-all",
-                canMoveRight
-                  ? "text-neutral-300 hover:text-white hover:bg-white/15 active:scale-95"
-                  : "text-neutral-600 cursor-not-allowed opacity-40"
-              )}
-            >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </button>
-          </div>
-
-          <span
-            className={cn(
-              "font-mono font-bold px-2 py-0.5 rounded text-[11px]",
-              isSelected ? "bg-amber-500 text-black font-extrabold" : "bg-zinc-800 text-zinc-300"
-            )}
           >
             {docItem.tag_code}
           </span>
@@ -201,19 +203,22 @@ export function DossierLoiKhaiSheet({
               width: docPaper.size === 'A4'
                 ? (docPaper.orientation === 'portrait' ? '794px' : '1123px')
                 : (docPaper.orientation === 'portrait' ? '559px' : '794px'),
-              minHeight: docPaper.size === 'A4'
+              height: docPaper.size === 'A4'
+                ? (docPaper.orientation === 'portrait' ? '1123px' : '794px')
+                : (docPaper.orientation === 'portrait' ? '794px' : '559px'),
+              maxHeight: docPaper.size === 'A4'
                 ? (docPaper.orientation === 'portrait' ? '1123px' : '794px')
                 : (docPaper.orientation === 'portrait' ? '794px' : '559px')
             }}
             className={cn(
-              "print-canvas-lk bg-white shadow-2xl relative select-text text-[#171717] flex flex-col justify-between print-page-break",
-              docPaper.size === 'A4' ? "p-[55px]" : "p-[35px]"
+              "print-canvas-lk bg-white shadow-2xl relative select-text text-[#171717] flex flex-col justify-between print-page-break box-border",
+              docPaper.size === 'A4' ? "px-[44px] pt-[32px] pb-[16px]" : "px-[28px] pt-[24px] pb-[14px]"
             )}
           >
             <div>
               {page.isFirst ? (
                 <>
-                  <div className="text-center space-y-1.5 mb-5">
+                  <div className="text-center space-y-1 mb-3.5">
                     <h1
                       contentEditable
                       suppressContentEditableWarning
@@ -222,9 +227,9 @@ export function DossierLoiKhaiSheet({
                         onUpdateDoc(docItem.tag_code, prev => ({ ...prev, docTitle: val }))
                       }}
                       className={cn(
-                        "font-bold tracking-[0.05em] uppercase text-[#171717] leading-[1.33] outline-none rounded transition-all",
+                        "font-bold tracking-[0.05em] uppercase text-[#171717] leading-[1.3] outline-none rounded transition-all",
                         highlightEditable && "editable-field-indicator bg-amber-500/10 hover:bg-amber-500/20 ring-1 ring-amber-400/40 px-1.5 -mx-1.5",
-                        docPaper.size === 'A4' ? "text-[24px]" : "text-[20px]"
+                        docPaper.size === 'A4' ? "text-[23px]" : "text-[19px]"
                       )}
                     >
                       {docData.docTitle || 'BIÊN BẢN GHI LỜI KHAI'}
@@ -237,9 +242,9 @@ export function DossierLoiKhaiSheet({
                         onUpdateDoc(docItem.tag_code, prev => ({ ...prev, caseSubtitle: val }))
                       }}
                       className={cn(
-                        "text-[#404040] leading-[1.37] outline-none rounded transition-all",
+                        "text-[#404040] leading-[1.3] outline-none rounded transition-all",
                         highlightEditable && "editable-field-indicator bg-amber-500/10 hover:bg-amber-500/20 ring-1 ring-amber-400/40 px-1 -mx-1",
-                        docPaper.size === 'A4' ? "text-[16px]" : "text-[14px]"
+                        docPaper.size === 'A4' ? "text-[15.5px]" : "text-[13.5px]"
                       )}
                     >
                       {docData.caseSubtitle}
@@ -252,9 +257,9 @@ export function DossierLoiKhaiSheet({
                         onUpdateDoc(docItem.tag_code, prev => ({ ...prev, recordLead: val }))
                       }}
                       className={cn(
-                        "text-[#1A1A1A] leading-[1.27] text-left pt-1.5 outline-none rounded transition-all",
+                        "text-[#1A1A1A] leading-[1.25] text-left pt-1 outline-none rounded transition-all",
                         highlightEditable && "editable-field-indicator bg-amber-500/10 hover:bg-amber-500/20 ring-1 ring-amber-400/40 px-1 -mx-1",
-                        docPaper.size === 'A4' ? "text-[15.5px]" : "text-[13.5px]"
+                        docPaper.size === 'A4' ? "text-[15px]" : "text-[13px]"
                       )}
                     >
                       {docData.recordLead}
@@ -263,8 +268,8 @@ export function DossierLoiKhaiSheet({
 
                   {/* Section - Administrative and Officers Info */}
                   <div className={cn(
-                    "space-y-1.5 mb-5 text-[#1A1A1A]",
-                    docPaper.size === 'A4' ? "text-[15.5px] leading-[1.37]" : "text-[13.5px] leading-[1.3]"
+                    "space-y-1 mb-3.5 text-[#1A1A1A]",
+                    docPaper.size === 'A4' ? "text-[15px] leading-[1.32]" : "text-[13px] leading-[1.28]"
                   )}>
                     {/* CHÚNG TÔI GỒM: khối điều tra viên và người được lấy lời khai thụt lề pl-4 */}
                     <div className="space-y-1">
@@ -373,16 +378,73 @@ export function DossierLoiKhaiSheet({
                 </div>
               )}
 
-              {/* Q&A Content Cards */}
-              <div className="space-y-3">
-                {page.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="group relative rounded-[4px] border border-[#E5E5E5] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]"
-                  >
+              {/* Q&A Content Cards (Liền kề nhau, không có khoảng cách gap) */}
+              <div className="space-y-0 -space-y-px">
+                {page.items.map((item) => {
+                  const fullList = docData.qaList || []
+                  const globalIndex = fullList.findIndex(q => q.id === item.id)
+
+                  return (
+                    <div
+                      key={item.id}
+                      className="group/qa relative border border-[#E5E5E5] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.02)] first:rounded-t-[4px] last:rounded-b-[4px]"
+                    >
+                      {/* Hover Action Toolbar: Xếp dọc sang bên phải thẻ Q&A kèm cầu nối hover (Invisible Bridge) */}
+                      {!readOnly && (
+                        <div className="no-print absolute -right-12 top-0 bottom-0 w-12 z-30 hidden group-hover/qa:flex items-center justify-end pr-1 select-none pointer-events-auto">
+                          <div className="flex flex-col items-center gap-1 bg-zinc-900/95 border border-white/20 text-white rounded-md p-1 shadow-2xl backdrop-blur-sm">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleMoveQuestion(item.id, 'up')
+                              }}
+                              disabled={globalIndex <= 0}
+                              className="p-1 hover:bg-white/20 rounded disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                              title="Di chuyển lên trên"
+                            >
+                              <MoveUp className="w-3 h-3 text-neutral-300" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleMoveQuestion(item.id, 'down')
+                              }}
+                              disabled={globalIndex >= fullList.length - 1}
+                              className="p-1 hover:bg-white/20 rounded disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                              title="Di chuyển xuống dưới"
+                            >
+                              <MoveDown className="w-3 h-3 text-neutral-300" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleAddQuestion(item.id)
+                              }}
+                              className="p-1 hover:bg-emerald-500/30 rounded text-emerald-400 transition-all"
+                              title="Chèn thêm câu hỏi mới bên dưới"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleRemoveQuestion(item.id)
+                              }}
+                              className="p-1 hover:bg-red-500/30 rounded text-red-400 transition-all"
+                              title="Xóa câu hỏi này"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     {/* Question Row */}
                     <div className={cn(
-                      "bg-[#E5E5E5] border-l-2 border-[#262626] px-4 py-2 text-[#171717] leading-[1.35] text-justify font-normal flex items-start gap-2",
+                      "bg-[#E5E5E5] px-3.5 py-1.5 text-[#171717] leading-[1.32] text-justify font-normal flex items-start gap-2",
                       docPaper.size === 'A4' ? "text-[15.5px]" : "text-[13.5px]"
                     )}>
                       {/* Cụm nhãn: "Hỏi" căn lề trái, dấu ":" dóng thẳng đứng tuyệt đối */}
@@ -401,7 +463,7 @@ export function DossierLoiKhaiSheet({
                           }))
                         }}
                         className={cn(
-                          "outline-none flex-1 min-w-0 rounded transition-all text-left",
+                          "outline-none flex-1 min-w-0 rounded transition-all text-justify",
                           highlightEditable && "editable-field-indicator bg-amber-500/10 hover:bg-amber-500/20 ring-1 ring-amber-400/40 px-1 -mx-1"
                         )}
                       >
@@ -411,7 +473,7 @@ export function DossierLoiKhaiSheet({
 
                     {/* Answer Row */}
                     <div className={cn(
-                      "bg-white border-l-2 border-[#262626] px-4 py-2.5 text-[#262626] leading-[1.35] text-justify font-normal flex items-start gap-2",
+                      "bg-white px-3.5 py-1.5 text-[#262626] leading-[1.32] text-justify font-normal flex items-start gap-2",
                       docPaper.size === 'A4' ? "text-[15.5px]" : "text-[13.5px]"
                     )}>
                       {/* Cụm nhãn: "Đáp" căn lề trái, dấu ":" dóng thẳng đứng tuyệt đối */}
@@ -430,7 +492,7 @@ export function DossierLoiKhaiSheet({
                           }))
                         }}
                         className={cn(
-                          "outline-none flex-1 min-w-0 rounded transition-all text-left",
+                          "outline-none flex-1 min-w-0 rounded transition-all text-justify",
                           highlightEditable && "editable-field-indicator bg-amber-500/10 hover:bg-amber-500/20 ring-1 ring-amber-400/40 px-1 -mx-1"
                         )}
                       >
@@ -438,12 +500,13 @@ export function DossierLoiKhaiSheet({
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                )
+              })}
             </div>
+          </div>
 
-            {/* Bottom Footer Section */}
-            <div className="pt-6 border-t border-neutral-200/60 mt-6 flex justify-between items-center text-[12px] text-neutral-500">
+            {/* Bottom Footer Section (Không đường kẻ line, đẩy sát mép đáy) */}
+            <div className="pt-2 pb-0 mt-auto flex justify-between items-center text-[12px] text-neutral-500">
               <span className="font-mono">
                 Trang {page.pageNumber} / {docPages.length}
               </span>
