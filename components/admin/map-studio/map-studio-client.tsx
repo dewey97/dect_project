@@ -496,8 +496,10 @@ export function MapStudioClient() {
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
 
-      const rawX = (clientX - rect.left - pan.x) / zoom
-      const rawY = (clientY - rect.top - pan.y) / zoom
+      const curPan = currentPanRef.current
+      const curZoom = zoomRef.current
+      const rawX = (clientX - rect.left - curPan.x) / curZoom
+      const rawY = (clientY - rect.top - curPan.y) / curZoom
 
       // O(1) Snap candidates: check only 3x3 surrounding spatial cells (10-20 points max instead of 10,000)
       const candidatePoints: Point[] = []
@@ -517,7 +519,7 @@ export function MapStudioClient() {
 
       return snapPoint({ x: rawX, y: rawY }, gridSize, snapToGrid, candidatePoints, 14)
     },
-    [pan, zoom, snapToGrid, gridSize, vertexSpatialGrid]
+    [snapToGrid, gridSize, vertexSpatialGrid]
   )
 
   // Find currently selected feature
@@ -627,6 +629,7 @@ export function MapStudioClient() {
   const handleFeatureMouseDown = useCallback(
     (e: React.MouseEvent, id: string) => {
       if (e.button !== 0) return
+      if (isSpacePressedRef.current || activeTool === 'pan') return
       if (activeTool !== 'select') return
 
       e.stopPropagation()
@@ -1037,13 +1040,31 @@ export function MapStudioClient() {
       }
     }
 
+    const handleWindowBlur = () => {
+      isSpacePressedRef.current = false
+      setIsSpacePressed(false)
+      if (isPanningRef.current) {
+        handleCanvasMouseUp()
+      }
+    }
+
+    const handleWindowMouseUp = () => {
+      if (isPanningRef.current || isDraggingVertex || isDraggingFeature) {
+        handleCanvasMouseUp()
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
+    window.addEventListener('blur', handleWindowBlur)
+    window.addEventListener('mouseup', handleWindowMouseUp)
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
+      window.removeEventListener('blur', handleWindowBlur)
+      window.removeEventListener('mouseup', handleWindowMouseUp)
     }
-  }, [selectedFeatureId, drawingPoints, historyIndex, history])
+  }, [selectedFeatureId, drawingPoints, historyIndex, history, isDraggingVertex, isDraggingFeature])
 
   // Sorting all features for z-index order
   const allFeaturesSorted = useMemo(() => {
@@ -1314,102 +1335,109 @@ export function MapStudioClient() {
             {/* ================================================================= */}
             {/* RENDER ALL ORDERED FEATURES (WATER, ZONES, ROADS, RAILS, POIS)    */}
             {/* ================================================================= */}
-            {allFeaturesSorted.map(({ type, item }) => {
-              if (hiddenFeatureIds[item.id]) return null
-              // Viewport Culling: Loại bỏ các node SVG nằm ngoài khung nhìn để giữ 60-120 FPS
-              if (!isFeatureInView(item.id)) return null
+            <g
+              id="map-static-features-group"
+              style={{
+                pointerEvents: activeTool === 'select' && !isSpacePressed ? 'auto' : 'none'
+              }}
+            >
+              {allFeaturesSorted.map(({ type, item }) => {
+                if (hiddenFeatureIds[item.id]) return null
+                // Viewport Culling: Loại bỏ các node SVG nằm ngoài khung nhìn để giữ 60-120 FPS
+                if (!isFeatureInView(item.id)) return null
 
-              const isSelected = selectedFeatureId === item.id
+                const isSelected = selectedFeatureId === item.id
 
-              if (type === 'water') {
-                return (
-                  <MemoWaterFeature
-                    key={item.id}
-                    feature={item}
-                    isSelected={isSelected}
-                    onSelect={handleSelectFeature}
-                    onStartDrag={handleFeatureMouseDown}
-                  />
-                )
-              }
-              if (type === 'zone') {
-                return (
-                  <MemoZoneFeature
-                    key={item.id}
-                    feature={item}
-                    isSelected={isSelected}
-                    onSelect={handleSelectFeature}
-                    onStartDrag={handleFeatureMouseDown}
-                  />
-                )
-              }
-              if (type === 'building') {
-                const d = pointsToSvgPath(item.points, true, false)
-                return (
-                  <path
-                    key={item.id}
-                    d={d}
-                    fill={isSelected ? '#FDE68A' : item.color || '#E2E8F0'}
-                    stroke={isSelected ? '#D97706' : item.strokeColor || '#CBD5E1'}
-                    strokeWidth={isSelected ? 1.5 : item.strokeWidth || 0.8}
-                    opacity={item.opacity ?? 0.85}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleSelectFeature(item.id)
-                    }}
-                    className="cursor-pointer transition-colors"
-                  >
-                    {item.name && <title>{item.name}</title>}
-                  </path>
-                )
-              }
-              if (type === 'road') {
-                return (
-                  <MemoRoadFeature
-                    key={item.id}
-                    feature={item}
-                    isSelected={isSelected}
-                    onSelect={handleSelectFeature}
-                    onStartDrag={handleFeatureMouseDown}
-                  />
-                )
-              }
-              if (type === 'railway') {
-                return (
-                  <MemoRailwayFeature
-                    key={item.id}
-                    feature={item}
-                    isSelected={isSelected}
-                    onSelect={handleSelectFeature}
-                    onStartDrag={handleFeatureMouseDown}
-                  />
-                )
-              }
-              if (type === 'label') {
-                return (
-                  <MemoLabelFeature
-                    key={item.id}
-                    feature={item}
-                    isSelected={isSelected}
-                    onSelect={handleSelectFeature}
-                    onStartDrag={handleFeatureMouseDown}
-                  />
-                )
-              }
-              if (type === 'poi') {
-                return (
-                  <MemoPoiFeature
-                    key={item.id}
-                    feature={item}
-                    isSelected={isSelected}
-                    viewMode={viewMode}
-                    onSelect={handleSelectFeature}
-                    onStartDrag={handleFeatureMouseDown}
-                  />
-                )
-              }
-              return null
-            })}
+                if (type === 'water') {
+                  return (
+                    <MemoWaterFeature
+                      key={item.id}
+                      feature={item}
+                      isSelected={isSelected}
+                      onSelect={handleSelectFeature}
+                      onStartDrag={handleFeatureMouseDown}
+                    />
+                  )
+                }
+                if (type === 'zone') {
+                  return (
+                    <MemoZoneFeature
+                      key={item.id}
+                      feature={item}
+                      isSelected={isSelected}
+                      onSelect={handleSelectFeature}
+                      onStartDrag={handleFeatureMouseDown}
+                    />
+                  )
+                }
+                if (type === 'building') {
+                  const d = pointsToSvgPath(item.points, true, false)
+                  return (
+                    <path
+                      key={item.id}
+                      d={d}
+                      fill={isSelected ? '#FDE68A' : item.color || '#E2E8F0'}
+                      stroke={isSelected ? '#D97706' : item.strokeColor || '#CBD5E1'}
+                      strokeWidth={isSelected ? 1.5 : item.strokeWidth || 0.8}
+                      opacity={item.opacity ?? 0.85}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleSelectFeature(item.id)
+                      }}
+                      className="cursor-pointer transition-colors"
+                    >
+                      {item.name && <title>{item.name}</title>}
+                    </path>
+                  )
+                }
+                if (type === 'road') {
+                  return (
+                    <MemoRoadFeature
+                      key={item.id}
+                      feature={item}
+                      isSelected={isSelected}
+                      onSelect={handleSelectFeature}
+                      onStartDrag={handleFeatureMouseDown}
+                    />
+                  )
+                }
+                if (type === 'railway') {
+                  return (
+                    <MemoRailwayFeature
+                      key={item.id}
+                      feature={item}
+                      isSelected={isSelected}
+                      onSelect={handleSelectFeature}
+                      onStartDrag={handleFeatureMouseDown}
+                    />
+                  )
+                }
+                if (type === 'label') {
+                  return (
+                    <MemoLabelFeature
+                      key={item.id}
+                      feature={item}
+                      isSelected={isSelected}
+                      onSelect={handleSelectFeature}
+                      onStartDrag={handleFeatureMouseDown}
+                    />
+                  )
+                }
+                if (type === 'poi') {
+                  return (
+                    <MemoPoiFeature
+                      key={item.id}
+                      feature={item}
+                      isSelected={isSelected}
+                      viewMode={viewMode}
+                      onSelect={handleSelectFeature}
+                      onStartDrag={handleFeatureMouseDown}
+                    />
+                  )
+                }
+                return null
+              })}
+            </g>
 
             {/* ================================================================= */}
             {/* LIVE DRAWING PREVIEW PATH (IN-PROGRESS)                           */}
