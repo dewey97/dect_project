@@ -48,7 +48,7 @@ export interface VectorMapCanvasProps {
   showRoutePolyline?: boolean
 }
 
-export function VectorMapCanvas({
+function VectorMapCanvasComponent({
   pan,
   zoom,
   is3DView,
@@ -181,6 +181,48 @@ export function VectorMapCanvas({
     }
   }, [customMapVector?.roads, zoom])
 
+  // Pre-compute static geometry SVG path strings (water, zones, railways)
+  // Avoids recalculating complex string paths on every single pan frame
+  const memoizedStaticLayers = React.useMemo(() => {
+    if (!customMapVector) {
+      return { waterPaths: [], zonePaths: [], railwayPaths: [] }
+    }
+
+    const waterPaths = customMapVector.water.map((w) => ({
+      id: w.id,
+      closed: w.closed,
+      color: w.color,
+      opacity: w.opacity,
+      width: w.width || 80,
+      d: pointsToSvgPath(w.points, w.closed, w.smooth)
+    }))
+
+    const zonePaths = customMapVector.zones.map((z) => ({
+      id: z.id,
+      fillColor: z.fillColor,
+      strokeColor: z.strokeColor || '#CBD5E1',
+      strokeWidth: z.strokeWidth || 1.5,
+      opacity: z.opacity,
+      d: pointsToSvgPath(z.points, true, false)
+    }))
+
+    const railwayPaths = customMapVector.railways.map((rw) => {
+      const { railsPath, sleepersPath } = generateRailwayPaths(
+        rw.points,
+        rw.width,
+        rw.sleeperSpacing
+      )
+      return {
+        id: rw.id,
+        railsPath,
+        sleepersPath,
+        color: rw.color || '#475569'
+      }
+    })
+
+    return { waterPaths, zonePaths, railwayPaths }
+  }, [customMapVector])
+
   return (
     <div
       ref={mapContainerRef}
@@ -225,13 +267,12 @@ export function VectorMapCanvas({
               fill={customMapVector.backgroundColor || '#F3F2EE'}
             />
 
-            {/* Custom Water Features (Lakes / Rivers) */}
-            {customMapVector.water.map((w) => {
-              const d = pointsToSvgPath(w.points, w.closed, w.smooth)
-              return w.closed ? (
+            {/* Custom Water Features (Lakes / Rivers) - Precomputed */}
+            {memoizedStaticLayers.waterPaths.map((w) =>
+              w.closed ? (
                 <path
                   key={w.id}
-                  d={d}
+                  d={w.d}
                   fill={w.color}
                   opacity={w.opacity}
                   stroke="#7BB6E8"
@@ -240,31 +281,28 @@ export function VectorMapCanvas({
               ) : (
                 <path
                   key={w.id}
-                  d={d}
+                  d={w.d}
                   fill="none"
                   stroke={w.color}
-                  strokeWidth={w.width || 80}
+                  strokeWidth={w.width}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   opacity={w.opacity}
                 />
               )
-            })}
+            )}
 
-            {/* Custom Zones */}
-            {customMapVector.zones.map((z) => {
-              const d = pointsToSvgPath(z.points, true, false)
-              return (
-                <path
-                  key={z.id}
-                  d={d}
-                  fill={z.fillColor}
-                  stroke={z.strokeColor || '#CBD5E1'}
-                  strokeWidth={z.strokeWidth || 1.5}
-                  opacity={z.opacity}
-                />
-              )
-            })}
+            {/* Custom Zones - Precomputed */}
+            {memoizedStaticLayers.zonePaths.map((z) => (
+              <path
+                key={z.id}
+                d={z.d}
+                fill={z.fillColor}
+                stroke={z.strokeColor}
+                strokeWidth={z.strokeWidth}
+                opacity={z.opacity}
+              />
+            ))}
 
             {/* Custom Building Footprints (Batched Compound Paths - Renders 2,000+ buildings in just 4 DOM nodes) */}
             {zoom >= 0.52 && batchedBuildingPaths.length > 0 && (
@@ -326,20 +364,13 @@ export function VectorMapCanvas({
               ))}
             </g>
 
-            {/* Custom Railways */}
-            {customMapVector.railways.map((rw) => {
-              const { railsPath, sleepersPath } = generateRailwayPaths(
-                rw.points,
-                rw.width,
-                rw.sleeperSpacing
-              )
-              return (
-                <g key={rw.id}>
-                  <path d={sleepersPath} stroke="#1E293B" strokeWidth="2.5" strokeLinecap="butt" />
-                  <path d={railsPath} stroke={rw.color || '#475569'} strokeWidth="1.8" fill="none" />
-                </g>
-              )
-            })}
+            {/* Custom Railways - Precomputed */}
+            {memoizedStaticLayers.railwayPaths.map((rw) => (
+              <g key={rw.id}>
+                <path d={rw.sleepersPath} stroke="#1E293B" strokeWidth="2.5" strokeLinecap="butt" />
+                <path d={rw.railsPath} stroke={rw.color} strokeWidth="1.8" fill="none" />
+              </g>
+            ))}
 
             {/* Custom Text Labels */}
             {customMapVector.labels.map((l) => (
@@ -578,3 +609,5 @@ export function VectorMapCanvas({
     </div>
   )
 }
+
+export const VectorMapCanvas = React.memo(VectorMapCanvasComponent)

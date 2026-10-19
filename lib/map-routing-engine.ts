@@ -47,11 +47,55 @@ interface GraphEdge {
   streetName: string
 }
 
+// Spatial grid bucket index for fast node lookup (O(1) instead of scanning thousands of nodes)
+const GRID_CELL_SIZE = 150
+
+class SpatialGrid {
+  private cells = new Map<string, string[]>()
+
+  private cellKey(x: number, y: number): string {
+    const cx = Math.floor(x / GRID_CELL_SIZE)
+    const cy = Math.floor(y / GRID_CELL_SIZE)
+    return `${cx}:${cy}`
+  }
+
+  insert(nodeKey: string, pt: Point) {
+    const ck = this.cellKey(pt.x, pt.y)
+    let list = this.cells.get(ck)
+    if (!list) {
+      list = []
+      this.cells.set(ck, list)
+    }
+    list.push(nodeKey)
+  }
+
+  getNearby(pt: Point, searchRadiusPx = GRID_CELL_SIZE * 2): string[] {
+    const minCx = Math.floor((pt.x - searchRadiusPx) / GRID_CELL_SIZE)
+    const maxCx = Math.floor((pt.x + searchRadiusPx) / GRID_CELL_SIZE)
+    const minCy = Math.floor((pt.y - searchRadiusPx) / GRID_CELL_SIZE)
+    const maxCy = Math.floor((pt.y + searchRadiusPx) / GRID_CELL_SIZE)
+
+    const result: string[] = []
+    for (let cx = minCx; cx <= maxCx; cx++) {
+      for (let cy = minCy; cy <= maxCy; cy++) {
+        const bucket = this.cells.get(`${cx}:${cy}`)
+        if (bucket) {
+          for (let i = 0; i < bucket.length; i++) {
+            result.push(bucket[i])
+          }
+        }
+      }
+    }
+    return result
+  }
+}
+
 interface CachedGraph {
   roadsRef: RoadFeature[]
   adjList: Map<string, GraphEdge[]>
   nodeCoords: Map<string, Point>
   nodeKeys: string[]
+  spatialGrid: SpatialGrid
 }
 
 let graphCache: CachedGraph | null = null
@@ -66,7 +110,7 @@ function keyToCoord(key: string): Point {
 }
 
 /**
- * Xây dựng đồ thị giao thông từ các trục đường Vector (Được Cache tối ưu)
+ * Xây dựng đồ thị giao thông từ các trục đường Vector (Được Cache tối ưu + Spatial Grid Index)
  */
 export function buildRoadGraph(roads: RoadFeature[]): CachedGraph {
   if (graphCache && graphCache.roadsRef === roads) {
@@ -75,6 +119,7 @@ export function buildRoadGraph(roads: RoadFeature[]): CachedGraph {
 
   const adjList = new Map<string, GraphEdge[]>()
   const nodeCoords = new Map<string, Point>()
+  const spatialGrid = new SpatialGrid()
 
   for (const road of roads) {
     const pts = road.points
@@ -90,8 +135,16 @@ export function buildRoadGraph(roads: RoadFeature[]): CachedGraph {
       const p2 = pts[i + 1]
       const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y)
 
-      if (!nodeCoords.has(k1)) nodeCoords.set(k1, { x: Math.round(p1.x), y: Math.round(p1.y) })
-      if (!nodeCoords.has(k2)) nodeCoords.set(k2, { x: Math.round(p2.x), y: Math.round(p2.y) })
+      if (!nodeCoords.has(k1)) {
+        const pt1 = { x: Math.round(p1.x), y: Math.round(p1.y) }
+        nodeCoords.set(k1, pt1)
+        spatialGrid.insert(k1, pt1)
+      }
+      if (!nodeCoords.has(k2)) {
+        const pt2 = { x: Math.round(p2.x), y: Math.round(p2.y) }
+        nodeCoords.set(k2, pt2)
+        spatialGrid.insert(k2, pt2)
+      }
 
       let edges1 = adjList.get(k1)
       if (!edges1) {
@@ -110,18 +163,30 @@ export function buildRoadGraph(roads: RoadFeature[]): CachedGraph {
   }
 
   const nodeKeys = Array.from(nodeCoords.keys())
-  graphCache = { roadsRef: roads, adjList, nodeCoords, nodeKeys }
+  graphCache = { roadsRef: roads, adjList, nodeCoords, nodeKeys, spatialGrid }
   return graphCache
 }
 
 /**
  * Bắt dính (Snap) một điểm bất kỳ vào nút giao / tim đường gần nhất trên mạng lưới
+ * Sử dụng Spatial Grid để tìm kiếm theo bucket O(1) thay vì O(N) toàn bộ đồ thị
  */
 export function snapToNearestRoadNode(pt: Point, graph: CachedGraph): { nodeKey: string; coord: Point; distPx: number } {
   let bestKey = ''
   let bestDistSq = Infinity
 
-  for (const key of graph.nodeKeys) {
+  // 1. Tìm trong bucket lân cận trước
+  let candidateKeys = graph.spatialGrid?.getNearby(pt, 300) || []
+  if (candidateKeys.length === 0) {
+    // Nếu điểm nằm ngoài khu vực mật độ đường sá cao, mở rộng bán kính
+    candidateKeys = graph.spatialGrid?.getNearby(pt, 800) || []
+  }
+  // Fallback toàn bộ nếu vẫn không thấy
+  if (candidateKeys.length === 0) {
+    candidateKeys = graph.nodeKeys
+  }
+
+  for (const key of candidateKeys) {
     const coord = graph.nodeCoords.get(key)
     if (!coord) continue
     const dx = coord.x - pt.x

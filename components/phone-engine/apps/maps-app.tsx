@@ -28,18 +28,27 @@ interface MapsAppProps {
   onBackToHome?: () => void
 }
 
+// Client-side module cache so opening and closing MapsApp doesn't trigger 1.5MB network requests & re-parsing
+let _clientMapCache: MapVectorData | null = null
+
 export function MapsApp({ onBackToHome }: MapsAppProps) {
   // Custom Map Studio Vector Data Integration (Nạp 100% từ Database/API, không dùng seed hardcode)
-  const [customMapVector, setCustomMapVector] = useState<MapVectorData | null>(null)
-  const [isLoadingMap, setIsLoadingMap] = useState<boolean>(true)
+  const [customMapVector, setCustomMapVector] = useState<MapVectorData | null>(_clientMapCache)
+  const [isLoadingMap, setIsLoadingMap] = useState<boolean>(!_clientMapCache)
 
   useEffect(() => {
     let isMounted = true
+    if (_clientMapCache) {
+      setIsLoadingMap(false)
+      return
+    }
+
     async function loadCustomMap() {
       try {
-        const res = await fetch('/api/admin/map-vector')
+        const res = await fetch('/api/admin/map-vector', { cache: 'force-cache' })
         const json = await res.json()
         if (json.success && json.data && isMounted) {
+          _clientMapCache = json.data
           setCustomMapVector(json.data)
         }
       } catch (err) {
