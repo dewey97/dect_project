@@ -109,29 +109,65 @@ export function AddSuspectModal({
   }, [name, sheetCharacters])
 
   const suspectCpId = useMemo(() => {
-    const norm = (name || editingSuspect?.name || editingSuspect?.id || '').toLowerCase()
+    const rawName = (name || editingSuspect?.name || editingSuspect?.id || '').trim()
+    const norm = rawName.toLowerCase()
+    if (!norm) return ''
+
+    // 1. Quét tìm Checkpoint khớp trực tiếp theo suspectId, followupOf, hoặc suspectLabel
+    const directMatch = checkpoints.find((cp) => {
+      const sId = (cp.suspectId || '').toLowerCase().trim()
+      const fOf = (cp.followupOf || '').toLowerCase().trim()
+      const sLabel = (cp.suspectLabel || '').toLowerCase().trim()
+      const validSuspects = (cp.pickerConfig?.validSuspects || []).map((s) => s.toLowerCase().trim())
+
+      return (
+        (sId && (norm === sId || norm.includes(sId) || sId.includes(norm))) ||
+        (fOf && (norm === fOf || norm.includes(fOf) || fOf.includes(norm))) ||
+        (sLabel && (norm === sLabel || norm.includes(sLabel) || sLabel.includes(norm))) ||
+        validSuspects.some((v) => norm === v || norm.includes(v) || v.includes(norm))
+      )
+    })
+    if (directMatch) return directMatch.id
+
+    // 2. Tìm theo matchedChar (từ danh mục nhân vật)
     if (matchedChar) {
+      const charId = matchedChar.id.toLowerCase()
+      const charName = matchedChar.canonicalName.toLowerCase()
+      const charAliases = (matchedChar.aliases || []).map((a) => a.toLowerCase())
+
       const foundCp = checkpoints.find((cp) => {
         const titleLower = (cp.title || '').toLowerCase()
         const questionLower = (cp.question || '').toLowerCase()
         const suspectLabelLower = (cp.suspectLabel || '').toLowerCase()
+        const sId = (cp.suspectId || '').toLowerCase()
+        const fOf = (cp.followupOf || '').toLowerCase()
         const validSuspects = (cp.pickerConfig?.validSuspects || []).map((s) => s.toLowerCase())
+
         return (
-          titleLower.includes(matchedChar.id) ||
-          titleLower.includes(matchedChar.canonicalName.toLowerCase()) ||
-          questionLower.includes(matchedChar.canonicalName.toLowerCase()) ||
-          suspectLabelLower.includes(matchedChar.canonicalName.toLowerCase()) ||
-          validSuspects.includes(matchedChar.canonicalName.toLowerCase()) ||
-          validSuspects.includes(matchedChar.id)
+          sId === charId ||
+          fOf === charId ||
+          titleLower.includes(charId) ||
+          titleLower.includes(charName) ||
+          questionLower.includes(charName) ||
+          suspectLabelLower.includes(charName) ||
+          validSuspects.includes(charName) ||
+          validSuspects.includes(charId) ||
+          charAliases.some((alias) => titleLower.includes(alias) || validSuspects.includes(alias))
         )
       })
       if (foundCp) return foundCp.id
     }
+
+    // 3. Fallback cho Case 000 nếu Sheet chưa gắn mã
     if (norm === 'vũ' || norm === 'vu' || norm === 'lê quang vũ') return 'cp-000-1a'
     if (norm === 'tùng' || norm === 'tung' || norm === 'nguyễn thanh tùng') return 'cp-000-1b'
     if (norm === 'hà' || norm === 'ha' || norm === 'trần thị hà') return 'cp-000-1c'
     return ''
   }, [name, editingSuspect, matchedChar, checkpoints])
+
+  const matchedCheckpoint = useMemo(() => {
+    return checkpoints.find((cp) => cp.id === suspectCpId)
+  }, [checkpoints, suspectCpId])
 
   useEffect(() => {
     if (isOpen) {
@@ -141,9 +177,20 @@ export function AddSuspectModal({
         }
         setStorageItem('active_investigation_checkpoint', suspectCpId)
         setStorageItem('last_interacted_checkpoint', suspectCpId)
-        if (suspectCpId === 'cp-000-1a') setStorageItem('last_viewed_suspect', 'vu')
-        else if (suspectCpId === 'cp-000-1b') setStorageItem('last_viewed_suspect', 'tung')
-        else if (suspectCpId === 'cp-000-1c') setStorageItem('last_viewed_suspect', 'ha')
+
+        const suspectKey =
+          matchedCheckpoint?.suspectId ||
+          matchedCheckpoint?.followupOf ||
+          matchedChar?.id ||
+          (suspectCpId === 'cp-000-1a'
+            ? 'vu'
+            : suspectCpId === 'cp-000-1b'
+            ? 'tung'
+            : suspectCpId === 'cp-000-1c'
+            ? 'ha'
+            : (name || '').toLowerCase().trim())
+
+        setStorageItem('last_viewed_suspect', suspectKey)
 
         if (subTileView === 'motive') {
           setStorageItem('active_suspect_category', 'motive')
@@ -154,7 +201,7 @@ export function AddSuspectModal({
         }
       }
     }
-  }, [isOpen, suspectCpId, subTileView])
+  }, [isOpen, suspectCpId, subTileView, matchedCheckpoint, matchedChar, name])
 
   useEffect(() => {
     if (editingSuspect) {
@@ -178,10 +225,6 @@ export function AddSuspectModal({
     setEvalModal(null)
     setShowExitConfirmModal(false)
   }, [editingSuspect, isOpen])
-
-  const matchedCheckpoint = useMemo(() => {
-    return checkpoints.find((cp) => cp.id === suspectCpId)
-  }, [checkpoints, suspectCpId])
 
   const extractClueIdsFromPending = (pending: PendingClueInputs): string[] => {
     const ids: string[] = []
@@ -437,11 +480,16 @@ export function AddSuspectModal({
     pendingAlibiRef.current = {}
     pendingContradictionRef.current = {}
 
-    const isCore = matchedChar.id === 'vu' || matchedChar.id === 'tung' || matchedChar.id === 'ha'
+    const hasInterrogationReqs = !!(
+      (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0 ||
+      (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0 ||
+      (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0 ||
+      matchedChar.id === 'vu' || matchedChar.id === 'tung' || matchedChar.id === 'ha'
+    )
     const isAdmin000 = currentName === '000' || currentName === '00' || currentName === '0'
 
     // If non-core suspect (Bà Lụa, Đạt, Mai...), save directly as related person of interest
-    if (!isCore && !isAdmin000) {
+    if (!hasInterrogationReqs && !isAdmin000) {
       detectiveAudio.playStampSound()
       const combinedClues = Array.from(new Set([...effectiveMotiveClues, ...effectiveAlibiClues, ...effectiveContradictionClues]))
       onSave({
@@ -460,9 +508,11 @@ export function AddSuspectModal({
       return
     }
 
-    const charId = (isAdmin000 ? 'vu' : matchedChar.id) as 'vu' | 'tung' | 'ha'
-    const isMotiveOk = isAdmin000 || validateMotive(charId, effectiveMotiveClues)
-    const isAlibiOk = isAdmin000 || validateAlibi(charId, effectiveAlibiClues)
+    const charId = (isAdmin000 ? 'vu' : matchedChar.id) as string
+    const hasMotiveReqs = (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0
+    const isMotiveOk = isAdmin000 || !hasMotiveReqs || validateMotive(charId, effectiveMotiveClues)
+    const hasAlibiReqs = (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0
+    const isAlibiOk = isAdmin000 || !hasAlibiReqs || validateAlibi(charId, effectiveAlibiClues)
     const hasContradictionReqs = (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
     const isContradictionOk = isAdmin000 || !hasContradictionReqs || validateContradiction(charId, effectiveContradictionClues)
 
@@ -493,14 +543,25 @@ export function AddSuspectModal({
   }
 
   const isValidName = !!matchedChar && matchedChar.id !== 'khang'
-  const isCore = !!matchedChar && (matchedChar.id === 'vu' || matchedChar.id === 'tung' || matchedChar.id === 'ha')
+  const hasInterrogationReqs = !!(
+    (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0 ||
+    (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0 ||
+    matchedChar?.id === 'vu' || matchedChar?.id === 'tung' || matchedChar?.id === 'ha'
+  )
+  const isCore = !!matchedChar && hasInterrogationReqs
   const isVu = matchedChar?.id === 'vu'
   const isTung = matchedChar?.id === 'tung'
   const isHa = matchedChar?.id === 'ha'
 
   // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
-  const isMotiveValid = matchedChar && isCore ? validateMotive(matchedChar.id, motiveClueIds) : false
-  const isAlibiValid = matchedChar && isCore ? validateAlibi(matchedChar.id, alibiClueIds) : false
+  const hasMotiveReqs = (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0
+  const isMotiveValid = matchedChar && isCore
+    ? hasMotiveReqs ? validateMotive(matchedChar.id, motiveClueIds) : motiveClueIds.length > 0
+    : false
+  const hasAlibiReqs = (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0
+  const isAlibiValid = matchedChar && isCore
+    ? hasAlibiReqs ? validateAlibi(matchedChar.id, alibiClueIds) : alibiClueIds.length > 0
+    : false
   const hasContradictionReqs = (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
   const isContradictionValid = matchedChar && isCore
     ? hasContradictionReqs

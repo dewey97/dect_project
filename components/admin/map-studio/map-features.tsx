@@ -151,7 +151,7 @@ export const MemoRoadFeature = React.memo(function RoadFeatureItem({
         fill="none"
         stroke={isSelected ? '#2563EB' : feature.casingColor || '#CBD5E1'}
         strokeWidth={feature.width + (feature.casingWidth || 2) * 2}
-        strokeLinecap="butt"
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
       {/* Road Center Surface (Mặt đường trung tâm hàn phẳng các ngã rẽ) */}
@@ -160,7 +160,7 @@ export const MemoRoadFeature = React.memo(function RoadFeatureItem({
         fill="none"
         stroke={feature.color || '#FFFFFF'}
         strokeWidth={feature.width}
-        strokeLinecap="butt"
+        strokeLinecap="round"
         strokeLinejoin="round"
         strokeDasharray={feature.dashed ? '8 6' : undefined}
       />
