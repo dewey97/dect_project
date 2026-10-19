@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { isScannedMapLocation, type CaseLocation, type RouteResult } from '@/lib/case-locations-data'
 import type { MapVectorData } from '@/types/map-vector'
 import { pointsToSvgPath, generateRailwayPaths } from '@/lib/map-vector-utils'
+import { calculateVisibleBounds, renderVectorMapToCanvas } from '@/lib/map-vector-canvas-renderer'
 
 export interface VectorMapCanvasProps {
   pan: { x: number; y: number }
@@ -93,135 +94,25 @@ function VectorMapCanvasComponent({
   const mapWidth = customMapVector?.canvasWidth || 1237
   const mapHeight = customMapVector?.canvasHeight || 866
 
-  // Batch thousands of building footprints into a few compound SVG path elements
-  // This reduces SVG DOM node count from 2,000+ down to ~4 nodes, giving native 60fps
-  const batchedBuildingPaths = React.useMemo(() => {
-    if (!customMapVector?.buildings || customMapVector.buildings.length === 0) return []
-    const groups: Record<string, { fill: string; stroke: string; strokeWidth: number; d: string[] }> = {}
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
 
-    for (const b of customMapVector.buildings) {
-      const fill = b.color || '#ECEFF1'
-      const stroke = b.strokeColor || '#CFD8DC'
-      const strokeWidth = b.strokeWidth || 0.6
-      const key = `${fill}|${stroke}|${strokeWidth}`
+  // Render the vector map onto HTML5 Canvas 2D with Viewport Culling & LOD
+  // Bypasses the DOM tree entirely for 2,000+ buildings and 726 roads.
+  // Only elements inside the visible phone viewport are rasterized by the GPU.
+  React.useEffect(() => {
+    if (!isCustomVector || !customMapVector) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d', { alpha: false })
+    if (!ctx) return
 
-      if (!groups[key]) {
-        groups[key] = { fill, stroke, strokeWidth, d: [] }
-      }
-      const pathStr = pointsToSvgPath(b.points, true, false)
-      if (pathStr) {
-        groups[key].d.push(pathStr)
-      }
-    }
+    const container = mapContainerRef.current
+    const viewW = container ? container.clientWidth : 400
+    const viewH = container ? container.clientHeight : 700
 
-    return Object.entries(groups).map(([key, group]) => ({
-      key,
-      fill: group.fill,
-      stroke: group.stroke,
-      strokeWidth: group.strokeWidth,
-      d: group.d.join(' ')
-    }))
-  }, [customMapVector?.buildings])
-
-  // Batch road segments into compound paths grouped by visual style.
-  // Painter's algorithm: casing layer first, then surface layer on top.
-  // At low zoom levels, alleys (type='alley') are excluded — they are too thin to be visible
-  // and each adds 2 SVG path nodes. This alone removes ~360 nodes when zoomed out.
-  // Bridge shadows are still rendered individually (rare, only a few per map).
-  const { batchedRoadCasings, batchedRoadSurfaces, bridgeShadows } = React.useMemo(() => {
-    if (!customMapVector?.roads || customMapVector.roads.length === 0) {
-      return { batchedRoadCasings: [], batchedRoadSurfaces: [], bridgeShadows: [] }
-    }
-
-    const showAlleys = zoom >= 0.52
-    const casingGroups: Record<string, { casingColor: string; casingW: number; d: string[] }> = {}
-    const surfaceGroups: Record<string, { color: string; width: number; dashed: boolean; d: string[] }> = {}
-    const shadows: Array<{ d: string; strokeW: number }> = []
-
-    for (const r of customMapVector.roads) {
-      if (!showAlleys && r.type === 'alley') continue
-      const d = pointsToSvgPath(r.points, false, r.smooth)
-      if (!d) continue
-
-      // Bridge shadow (individual — rare)
-      if (r.isBridge) {
-        shadows.push({ d, strokeW: r.width + (r.casingWidth || 2) * 2 + 6 })
-      }
-
-      // Casing batch key
-      const casingColor = r.casingColor || '#94A3B8'
-      const casingW = r.width + (r.casingWidth || 2) * 2
-      const casingKey = `${casingColor}|${casingW}`
-      if (!casingGroups[casingKey]) casingGroups[casingKey] = { casingColor, casingW, d: [] }
-      casingGroups[casingKey].d.push(d)
-
-      // Surface batch key
-      const color = r.color || '#FFFFFF'
-      const dashed = !!r.dashed
-      const surfaceKey = `${color}|${r.width}|${dashed}`
-      if (!surfaceGroups[surfaceKey]) surfaceGroups[surfaceKey] = { color, width: r.width, dashed, d: [] }
-      surfaceGroups[surfaceKey].d.push(d)
-    }
-
-    return {
-      batchedRoadCasings: Object.entries(casingGroups).map(([key, g]) => ({
-        key,
-        casingColor: g.casingColor,
-        casingW: g.casingW,
-        d: g.d.join(' ')
-      })),
-      batchedRoadSurfaces: Object.entries(surfaceGroups).map(([key, g]) => ({
-        key,
-        color: g.color,
-        width: g.width,
-        dashed: g.dashed,
-        d: g.d.join(' ')
-      })),
-      bridgeShadows: shadows
-    }
-  }, [customMapVector?.roads, zoom])
-
-  // Pre-compute static geometry SVG path strings (water, zones, railways)
-  // Avoids recalculating complex string paths on every single pan frame
-  const memoizedStaticLayers = React.useMemo(() => {
-    if (!customMapVector) {
-      return { waterPaths: [], zonePaths: [], railwayPaths: [] }
-    }
-
-    const waterPaths = customMapVector.water.map((w) => ({
-      id: w.id,
-      closed: w.closed,
-      color: w.color,
-      opacity: w.opacity,
-      width: w.width || 80,
-      d: pointsToSvgPath(w.points, w.closed, w.smooth)
-    }))
-
-    const zonePaths = customMapVector.zones.map((z) => ({
-      id: z.id,
-      fillColor: z.fillColor,
-      strokeColor: z.strokeColor || '#CBD5E1',
-      strokeWidth: z.strokeWidth || 1.5,
-      opacity: z.opacity,
-      d: pointsToSvgPath(z.points, true, false)
-    }))
-
-    const railwayPaths = customMapVector.railways.map((rw) => {
-      const { railsPath, sleepersPath } = generateRailwayPaths(
-        rw.points,
-        rw.width,
-        rw.sleeperSpacing
-      )
-      return {
-        id: rw.id,
-        railsPath,
-        sleepersPath,
-        color: rw.color || '#475569'
-      }
-    })
-
-    return { waterPaths, zonePaths, railwayPaths }
-  }, [customMapVector])
+    const visibleBounds = calculateVisibleBounds(pan, zoom, viewW, viewH, 120)
+    renderVectorMapToCanvas(ctx, customMapVector, visibleBounds, zoom, mapLayer)
+  }, [isCustomVector, customMapVector, pan, zoom, mapLayer, mapContainerRef])
 
   return (
     <div
@@ -233,9 +124,12 @@ function VectorMapCanvasComponent({
       onPointerCancel={handlePointerUp || handleMouseUp}
       onWheel={handleWheel}
       className={cn(
-        'w-full h-full relative overflow-hidden transition-colors cursor-grab active:cursor-grabbing select-none touch-none',
-        mapLayer === 'satellite' ? 'bg-[#18232c]' : 'bg-[#F5F7FA]'
+        'w-full h-full relative overflow-hidden cursor-grab active:cursor-grabbing select-none touch-none',
+        mapLayer === 'satellite' ? 'bg-[#18232c]' : ''
       )}
+      style={{
+        backgroundColor: mapLayer === 'satellite' ? '#18232c' : (customMapVector?.backgroundColor || '#F3F2EE')
+      }}
     >
       {/* World Layer Transformed by Pan & Zoom & 3D Tilt in Navigation mode */}
       <div
@@ -251,146 +145,16 @@ function VectorMapCanvasComponent({
         }}
       >
         {/* =================================================================== */}
-        {/* 1. MASTER WORLD MAP LAYER (CUSTOM VECTOR OR FALLBACK IMAGE)         */}
+        {/* 1. MASTER WORLD MAP LAYER — HIGH-PERFORMANCE 2D CANVAS              */}
         {/* =================================================================== */}
         {isCustomVector && customMapVector ? (
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-visible"
-            viewBox={`0 0 ${mapWidth} ${mapHeight}`}
-          >
-            {/* Background Board - Infinite Expansion */}
-            <rect
-              x="-200000"
-              y="-200000"
-              width="400000"
-              height="400000"
-              fill={customMapVector.backgroundColor || '#F3F2EE'}
-            />
-
-            {/* Custom Water Features (Lakes / Rivers) - Precomputed */}
-            {memoizedStaticLayers.waterPaths.map((w) =>
-              w.closed ? (
-                <path
-                  key={w.id}
-                  d={w.d}
-                  fill={w.color}
-                  opacity={w.opacity}
-                  stroke="#7BB6E8"
-                  strokeWidth="1"
-                />
-              ) : (
-                <path
-                  key={w.id}
-                  d={w.d}
-                  fill="none"
-                  stroke={w.color}
-                  strokeWidth={w.width}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  opacity={w.opacity}
-                />
-              )
-            )}
-
-            {/* Custom Zones - Precomputed */}
-            {memoizedStaticLayers.zonePaths.map((z) => (
-              <path
-                key={z.id}
-                d={z.d}
-                fill={z.fillColor}
-                stroke={z.strokeColor}
-                strokeWidth={z.strokeWidth}
-                opacity={z.opacity}
-              />
-            ))}
-
-            {/* Custom Building Footprints (Batched Compound Paths - Renders 2,000+ buildings in just 4 DOM nodes) */}
-            {zoom >= 0.52 && batchedBuildingPaths.length > 0 && (
-              <g id="map-buildings-layer" pointerEvents="none">
-                {batchedBuildingPaths.map((bp) => (
-                  <path
-                    key={bp.key}
-                    d={bp.d}
-                    fill={bp.fill}
-                    stroke={bp.stroke}
-                    strokeWidth={bp.strokeWidth}
-                    opacity={0.88}
-                  />
-                ))}
-              </g>
-            )}
-
-            {/* Custom Roads — Batched Compound Paths (726 roads → ~8 DOM nodes)
-                Painter's algorithm: bridge shadows → casings → surfaces */}
-            {/* 1. Bridge drop-shadows (rare, keep individual) */}
-            {bridgeShadows.map((bs, i) => (
-              <path
-                key={`bridge-shadow-${i}`}
-                d={bs.d}
-                fill="none"
-                stroke="#000000"
-                strokeWidth={bs.strokeW}
-                strokeLinecap="round"
-                opacity="0.25"
-              />
-            ))}
-            {/* 2. Road casings (border/outline layer) */}
-            <g id="map-road-casings-layer" pointerEvents="none">
-              {batchedRoadCasings.map((rc) => (
-                <path
-                  key={rc.key}
-                  d={rc.d}
-                  fill="none"
-                  stroke={rc.casingColor}
-                  strokeWidth={rc.casingW}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              ))}
-            </g>
-            {/* 3. Road surfaces (fill layer on top of casings) */}
-            <g id="map-road-surfaces-layer" pointerEvents="none">
-              {batchedRoadSurfaces.map((rs) => (
-                <path
-                  key={rs.key}
-                  d={rs.d}
-                  fill="none"
-                  stroke={rs.color}
-                  strokeWidth={rs.width}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeDasharray={rs.dashed ? '8 6' : undefined}
-                />
-              ))}
-            </g>
-
-            {/* Custom Railways - Precomputed */}
-            {memoizedStaticLayers.railwayPaths.map((rw) => (
-              <g key={rw.id}>
-                <path d={rw.sleepersPath} stroke="#1E293B" strokeWidth="2.5" strokeLinecap="butt" />
-                <path d={rw.railsPath} stroke={rw.color} strokeWidth="1.8" fill="none" />
-              </g>
-            ))}
-
-            {/* Custom Text Labels */}
-            {customMapVector.labels.map((l) => (
-              <text
-                key={l.id}
-                x={l.x}
-                y={l.y}
-                fill={l.color}
-                fontSize={l.fontSize}
-                letterSpacing={l.letterSpacing ? `${l.letterSpacing}px` : undefined}
-                fontWeight={l.fontWeight || 'bold'}
-                transform={`rotate(${l.rotation || 0}, ${l.x}, ${l.y})`}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="font-sans"
-              >
-                {l.text}
-              </text>
-            ))}
-          </svg>
+          <canvas
+            ref={canvasRef}
+            width={mapWidth}
+            height={mapHeight}
+            className="absolute inset-0 w-full h-full pointer-events-none select-none"
+            style={{ width: `${mapWidth}px`, height: `${mapHeight}px` }}
+          />
         ) : null}
 
         {/* =================================================================== */}
@@ -561,7 +325,7 @@ function VectorMapCanvasComponent({
                       <div className="size-1 rounded-full bg-white" />
                     </div>
                     {zoom >= 0.38 && (
-                      <span className="mt-0.5 px-1 py-0.2 text-[8.5px] font-medium text-slate-700 bg-white/85 backdrop-blur-xs rounded shadow-xs border border-slate-200/50 whitespace-nowrap max-w-[100px] truncate pointer-events-none">
+                      <span className="mt-0.5 px-1 py-0.2 text-[8.5px] font-medium text-slate-700 bg-white/95 rounded shadow-xs border border-slate-200/50 whitespace-nowrap max-w-[100px] truncate pointer-events-none">
                         {loc.shortName || loc.name}
                       </span>
                     )}
