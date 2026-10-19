@@ -1,7 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { getStorageJson, setStorageJson } from '@/lib/storage'
+import { useRoomSync } from '@/components/investigation/room-sync-context'
 
 interface CheckpointsContextType {
   completedCheckpointIds: string[]
@@ -15,20 +16,40 @@ const CheckpointsContext = createContext<CheckpointsContextType | undefined>(und
 
 export function CheckpointsProvider({ children }: { children: React.ReactNode }) {
   const [completedCheckpointIds, setCompletedCheckpointIds] = useState<string[]>([])
+  const { roomCode, roomState, syncUpdate } = useRoomSync()
 
-  // Load from storage
+  // Load from storage in Solo mode
   useEffect(() => {
-    setCompletedCheckpointIds(getStorageJson<string[]>('completed_checkpoints', []))
-  }, [])
+    if (!roomCode) {
+      setCompletedCheckpointIds(getStorageJson<string[]>('completed_checkpoints', []))
+    }
+  }, [roomCode])
 
-  const completeCheckpoint = (id: string) => {
-    setCompletedCheckpointIds((prev) => {
-      if (prev.includes(id)) return prev
-      const next = [...prev, id]
-      setStorageJson('completed_checkpoints', next)
-      return next
-    })
-  }
+  // Sync with Room state when in group mode
+  useEffect(() => {
+    if (roomCode && roomState.completedCheckpoints) {
+      setCompletedCheckpointIds((prev) => {
+        const merged = Array.from(new Set([...prev, ...roomState.completedCheckpoints]))
+        return merged
+      })
+    }
+  }, [roomCode, roomState.completedCheckpoints])
+
+  const completeCheckpoint = useCallback(
+    (id: string) => {
+      setCompletedCheckpointIds((prev) => {
+        if (prev.includes(id)) return prev
+        const next = [...prev, id]
+        if (roomCode) {
+          syncUpdate({ completedCheckpoints: next }, `đã giải xong một mục tiêu điều tra`)
+        } else {
+          setStorageJson('completed_checkpoints', next)
+        }
+        return next
+      })
+    },
+    [roomCode, syncUpdate]
+  )
 
   const isCheckpointCompleted = (id: string) => {
     return completedCheckpointIds.includes(id)

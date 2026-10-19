@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
+import { useRoomSync } from "@/components/investigation/room-sync-context";
 import {
   getCanonicalSuspectKey,
   findValidCaseCharacter,
@@ -64,6 +65,8 @@ export function useInvestigationState(opts?: {
   onOpenEpilogue?: () => void;
 }) {
   const caseId = opts?.caseId || "case-000";
+  const { roomCode, roomState, syncUpdate } = useRoomSync();
+
   const sKey = useCallback(
     (key: string) => (caseId === "case-000" ? key : `${caseId}::${key}`),
     [caseId],
@@ -189,6 +192,34 @@ export function useInvestigationState(opts?: {
     }
   }, [sKey, isReinvestigateConditionMet]);
 
+  // Sync state when in a group room
+  useEffect(() => {
+    if (!roomCode) return;
+
+    if (roomState.phoneSolved) {
+      setPhoneLookupSuccess(true);
+    }
+    if (roomState.solvedFollowups && roomState.solvedFollowups.length > 0) {
+      setSolvedFollowupQuestions((prev) => {
+        const merged = Array.from(new Set([...prev, ...roomState.solvedFollowups])) as CulpritKey[];
+        return merged;
+      });
+      if (roomState.reinvestigateUnlocked || isReinvestigateConditionMet(roomState.solvedFollowups)) {
+        setIsReinvestigateUnlocked(true);
+      }
+    }
+    if (roomState.investigatedSuspects && roomState.investigatedSuspects.length > 0) {
+      setInvestigatedSuspects((prev) => {
+        const merged = Array.from(new Set([...prev, ...roomState.investigatedSuspects])) as CulpritKey[];
+        return merged;
+      });
+    }
+    if (roomState.indictmentSolved && roomState.solvedCulprit) {
+      setIsIndictmentSolved(true);
+      setSolvedCulprit(roomState.solvedCulprit as CulpritKey);
+    }
+  }, [roomCode, roomState, isReinvestigateConditionMet]);
+
   const saveSuspectsState = (newSuspects: SuspectItem[]) => {
     const sanitized = sanitizeSuspectsList(newSuspects);
     setSuspects(sanitized);
@@ -261,7 +292,11 @@ export function useInvestigationState(opts?: {
 
   const handlePhoneLookupSuccess = (_phone: string, _info: string) => {
     setPhoneLookupSuccess(true);
-    setStorageItem(sKey("phone_solved"), "true");
+    if (roomCode) {
+      syncUpdate({ phoneSolved: true }, "đã bẻ khóa thành công điện thoại của Khang");
+    } else {
+      setStorageItem(sKey("phone_solved"), "true");
+    }
     setIsPhoneLookupOpen(false);
     setIsPhoneNarrativeOpen(true);
   };
@@ -269,14 +304,26 @@ export function useInvestigationState(opts?: {
   const handleFollowupSuccess = (culprit: CulpritKey, choice?: string) => {
     const updated = Array.from(new Set([...solvedFollowupQuestions, culprit]));
     setSolvedFollowupQuestions(updated);
-    setStorageItem(sKey("solved_followups"), JSON.stringify(updated));
-    if (choice) {
-      setStorageItem(sKey(`followup_${culprit}_choice`), choice);
-    }
-    if (isReinvestigateConditionMet(updated)) {
+    const isUnlocked = isReinvestigateConditionMet(updated);
+    if (isUnlocked) {
       setIsReinvestigateUnlocked(true);
-      setStorageItem(sKey("reinvestigate_unlocked"), "true");
     }
+
+    if (roomCode) {
+      syncUpdate(
+        { solvedFollowups: updated, reinvestigateUnlocked: isUnlocked },
+        `đã hoàn thành thẩm tra nghi phạm`
+      );
+    } else {
+      setStorageItem(sKey("solved_followups"), JSON.stringify(updated));
+      if (choice) {
+        setStorageItem(sKey(`followup_${culprit}_choice`), choice);
+      }
+      if (isUnlocked) {
+        setStorageItem(sKey("reinvestigate_unlocked"), "true");
+      }
+    }
+
     setIsFollowupQuestionOpen(false);
     setNarrativeCulprit(culprit);
     setNarrativeChoice(choice || null);
@@ -293,8 +340,17 @@ export function useInvestigationState(opts?: {
     setIsIndictmentSolved(true);
     setSolvedCulprit(data.culprit);
     setIsIndictmentOpen(false);
-    setStorageItem(sKey("indictment_solved"), "true");
-    setStorageItem(sKey("indictment_culprit"), data.culprit);
+
+    if (roomCode) {
+      syncUpdate(
+        { indictmentSolved: true, solvedCulprit: data.culprit },
+        "đã nộp bản kết luận điều tra và vạch trần hung thủ!"
+      );
+    } else {
+      setStorageItem(sKey("indictment_solved"), "true");
+      setStorageItem(sKey("indictment_culprit"), data.culprit);
+    }
+
     setIsFinalEpilogueOpen(true);
     if (opts?.onOpenEpilogue) {
       opts.onOpenEpilogue();

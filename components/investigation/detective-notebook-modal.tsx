@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, BookOpen, Trash2, Check, PenLine, Sparkles } from "lucide-react";
+import { X, BookOpen, Trash2, Check, PenLine, Sparkles, Users, User, ArrowRightLeft } from "lucide-react";
 import { getStorageItem, setStorageItem } from "@/lib/storage";
+import { useRoomSync } from "@/components/investigation/room-sync-context";
 import { cn } from "@/lib/utils";
 
 interface DetectiveNotebookModalProps {
@@ -17,36 +18,74 @@ export function DetectiveNotebookModal({
   onClose,
   caseId = "case-000",
 }: DetectiveNotebookModalProps) {
+  const { roomCode, nickname, roomState, syncUpdate } = useRoomSync();
   const storageKey = `detective_notebook_${caseId}`;
-  const [content, setContent] = useState<string>("");
+
+  const [activeTab, setActiveTab] = useState<"solo" | "team">(roomCode ? "team" : "solo");
+  const [soloContent, setSoloContent] = useState<string>("");
+  const [teamContent, setTeamContent] = useState<string>("");
   const [isSaved, setIsSaved] = useState<boolean>(true);
   const [showClearConfirm, setShowClearConfirm] = useState<boolean>(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isTypingTeamRef = useRef<boolean>(false);
+
+  // If roomCode activates/deactivates, align tab
+  useEffect(() => {
+    if (!roomCode) {
+      setActiveTab("solo");
+    }
+  }, [roomCode]);
 
   // Load existing notes on open / case change
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const saved = getStorageItem(storageKey) || "";
-      setContent(saved);
+      const savedSolo = getStorageItem(storageKey) || "";
+      setSoloContent(savedSolo);
+      setTeamContent(roomState.teamNotes || "");
       setIsSaved(true);
       setShowClearConfirm(false);
     }
-  }, [storageKey, isOpen]);
+  }, [storageKey, isOpen, roomState.teamNotes]);
+
+  // Realtime update from team when someone else edits
+  useEffect(() => {
+    if (roomCode && !isTypingTeamRef.current) {
+      setTeamContent(roomState.teamNotes || "");
+    }
+  }, [roomCode, roomState.teamNotes]);
+
+  const activeContent = activeTab === "team" ? teamContent : soloContent;
 
   // Handle text edit with auto-save debounce
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const nextVal = e.target.value;
-    setContent(nextVal);
     setIsSaved(false);
 
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
+    if (activeTab === "team") {
+      setTeamContent(nextVal);
+      isTypingTeamRef.current = true;
 
-    saveTimeoutRef.current = setTimeout(() => {
-      setStorageItem(storageKey, nextVal);
-      setIsSaved(true);
-    }, 600);
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      saveTimeoutRef.current = setTimeout(() => {
+        syncUpdate({ teamNotes: nextVal }, "đã cập nhật sổ tay chuyên án");
+        isTypingTeamRef.current = false;
+        setIsSaved(true);
+      }, 700);
+    } else {
+      setSoloContent(nextVal);
+
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      saveTimeoutRef.current = setTimeout(() => {
+        setStorageItem(storageKey, nextVal);
+        setIsSaved(true);
+      }, 600);
+    }
   };
 
   // Immediate save on blur or close
@@ -54,22 +93,51 @@ export function DetectiveNotebookModal({
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
-    setStorageItem(storageKey, content);
+    if (activeTab === "team" && roomCode) {
+      syncUpdate({ teamNotes: teamContent }, "đã cập nhật sổ tay chuyên án");
+      isTypingTeamRef.current = false;
+    } else {
+      setStorageItem(storageKey, soloContent);
+    }
     setIsSaved(true);
   };
 
   const handleClear = () => {
-    setContent("");
-    setStorageItem(storageKey, "");
+    if (activeTab === "team" && roomCode) {
+      setTeamContent("");
+      syncUpdate({ teamNotes: "" }, "đã xóa trắng sổ tay chuyên án");
+    } else {
+      setSoloContent("");
+      setStorageItem(storageKey, "");
+    }
     setIsSaved(true);
     setShowClearConfirm(false);
   };
 
   const handleInsertQuickTemplate = () => {
     const template = `\n---\n[MỐC THỜI GIAN]: \n[NGHI PHẠM]: \n[MANH MỐI ĐÁNG NGỜ]: \n`;
-    const nextVal = content ? `${content.trimEnd()}${template}` : template.trimStart();
-    setContent(nextVal);
-    setStorageItem(storageKey, nextVal);
+    const cur = activeTab === "team" ? teamContent : soloContent;
+    const nextVal = cur ? `${cur.trimEnd()}${template}` : template.trimStart();
+
+    if (activeTab === "team" && roomCode) {
+      setTeamContent(nextVal);
+      syncUpdate({ teamNotes: nextVal }, "đã thêm mẫu phân tích vào sổ chuyên án");
+    } else {
+      setSoloContent(nextVal);
+      setStorageItem(storageKey, nextVal);
+    }
+    setIsSaved(true);
+  };
+
+  // Copy solo notes into team journal
+  const handleCopySoloToTeam = () => {
+    if (!soloContent.trim() || !roomCode) return;
+    const combined = teamContent
+      ? `${teamContent.trimEnd()}\n\n--- [GHI CHÉP TỪ ${nickname.toUpperCase()}] ---\n${soloContent}`
+      : soloContent;
+    setTeamContent(combined);
+    setActiveTab("team");
+    syncUpdate({ teamNotes: combined }, `đã đồng bộ ghi chép cá nhân vào sổ chuyên án`);
     setIsSaved(true);
   };
 
@@ -108,7 +176,9 @@ export function DetectiveNotebookModal({
                     </span>
                   </h3>
                   <p className="text-[0.68rem] text-[#9e836b] font-mono">
-                    Ghi chép & suy luận cá nhân • Tự động lưu
+                    {activeTab === "team" && roomCode
+                      ? `Nhật ký Tổ chuyên án (${roomCode}) • Tự động đồng bộ`
+                      : "Ghi chép & suy luận cá nhân • Tự động lưu"}
                   </p>
                 </div>
               </div>
@@ -125,7 +195,7 @@ export function DetectiveNotebookModal({
                 >
                   {isSaved ? (
                     <>
-                      <Check className="size-3" /> Đã lưu
+                      <Check className="size-3" /> {activeTab === "team" ? "Đã đồng bộ" : "Đã lưu"}
                     </>
                   ) : (
                     <>
@@ -144,6 +214,52 @@ export function DetectiveNotebookModal({
                 </button>
               </div>
             </div>
+
+            {/* TAB SELECTOR (WHEN IN ROOM) */}
+            {roomCode && (
+              <div className="shrink-0 px-4 py-1.5 bg-[#20150e] border-b border-[#3b2718] flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("team")}
+                  className={cn(
+                    "px-3 py-1 rounded-md text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
+                    activeTab === "team"
+                      ? "bg-[#3d2717] text-[#f5ebd9] border border-[#d9a066]/60 shadow-sm"
+                      : "text-[#9e836b] hover:text-[#f5ebd9] hover:bg-[#2b1b11]"
+                  )}
+                >
+                  <Users className="size-3.5 text-emerald-400" />
+                  <span>Tổ Chuyên Án ({roomCode})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("solo")}
+                  className={cn(
+                    "px-3 py-1 rounded-md text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer",
+                    activeTab === "solo"
+                      ? "bg-[#3d2717] text-[#f5ebd9] border border-[#d9a066]/60 shadow-sm"
+                      : "text-[#9e836b] hover:text-[#f5ebd9] hover:bg-[#2b1b11]"
+                  )}
+                >
+                  <User className="size-3.5 text-amber-400" />
+                  <span>Sổ Riêng Của Tôi</span>
+                </button>
+
+                {/* COPY SOLO TO TEAM SHORTCUT */}
+                {activeTab === "solo" && soloContent.trim().length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleCopySoloToTeam}
+                    className="ml-auto px-2 py-0.5 rounded bg-[#18100a] hover:bg-[#342215] border border-[#523924] text-[#d9a066] hover:text-[#fff] text-[0.65rem] font-mono flex items-center gap-1 transition-colors cursor-pointer"
+                    title="Chép nội dung sổ riêng này sang sổ chung của Tổ chuyên án"
+                  >
+                    <ArrowRightLeft className="size-3" />
+                    <span className="hidden sm:inline">Chép sang Sổ chung</span>
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* QUICK ACTIONS TOOLBAR */}
             <div className="shrink-0 px-4 py-2 bg-[#1b130d] border-b border-[#3b2718] flex items-center justify-between text-xs font-mono">
@@ -180,9 +296,9 @@ export function DetectiveNotebookModal({
                 <button
                   type="button"
                   onClick={() => setShowClearConfirm(true)}
-                  disabled={!content.trim()}
+                  disabled={!activeContent.trim()}
                   className="px-2 py-1 rounded hover:bg-[#2e1915] text-[#8c6753] hover:text-red-400 transition-colors flex items-center gap-1 text-[0.7rem] cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
-                  title="Xóa toàn bộ ghi chép"
+                  title="Xóa toàn bộ ghi chép của mục này"
                 >
                   <Trash2 className="size-3" />
                   <span>Xóa trắng</span>
@@ -204,10 +320,14 @@ export function DetectiveNotebookModal({
               <div className="absolute top-0 bottom-0 left-9 sm:left-12 w-[1px] bg-red-800/30 pointer-events-none" />
 
               <textarea
-                value={content}
+                value={activeContent}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder={`Ghi lại các mốc thời gian, điểm nghi vấn, lời khai mâu thuẫn...\n\nVí dụ:\n- 21:00: Nạn nhân gặp đối tượng X ở sảnh.\n- Vết bầm ở cổ tay có dấu hiệu giằng co...\n- Manh mối A-01 mâu thuẫn với lời khai của lễ tân.`}
+                placeholder={
+                  activeTab === "team"
+                    ? `[NHẬT KÝ TỔ CHUYÊN ÁN - PHÒNG ${roomCode}]\nCả nhóm cùng ghi chép, suy luận các manh mối quan trọng...\n\nVí dụ:\n- Đồng đội A: Nạn nhân bị sát hại trước 23h.\n- Đồng đội B: Kiểm tra lại biên bản khám nghiệm #14...`
+                    : `Ghi lại các mốc thời gian, điểm nghi vấn, lời khai mâu thuẫn...\n\nVí dụ:\n- 21:00: Nạn nhân gặp đối tượng X ở sảnh.\n- Vết bầm ở cổ tay có dấu hiệu giằng co...\n- Manh mối A-01 mâu thuẫn với lời khai của lễ tân.`
+                }
                 className="w-full h-full bg-transparent resize-none border-0 outline-none text-[#e8ded1] placeholder:text-[#6a5441] text-xs sm:text-sm font-sans leading-[28px] pl-7 sm:pl-9 relative z-10 custom-scrollbar selection:bg-[#d9a066]/30 selection:text-[#fff]"
                 spellCheck={false}
               />
@@ -215,7 +335,15 @@ export function DetectiveNotebookModal({
 
             {/* FOOTER BAR */}
             <div className="shrink-0 px-4 py-2 bg-[#20160e] border-t border-[#3d2c1e] flex items-center justify-between text-[0.65rem] font-mono text-[#8a725b]">
-              <span>Ký tự: {content.length}</span>
+              <div className="flex items-center gap-3">
+                <span>Ký tự: {activeContent.length}</span>
+                {activeTab === "team" && roomCode && (
+                  <span className="text-emerald-400/90 flex items-center gap-1">
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                    Đang đồng bộ phòng {roomCode}
+                  </span>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={onClose}

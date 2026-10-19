@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Move,
   Plus,
@@ -13,11 +13,14 @@ import {
   Volume2,
   VolumeX,
   BookOpen,
+  Users,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
+import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { RoomModal } from "@/components/investigation/room-modal";
 import type { useBoardLayout } from "./use-board-layout";
 import type { useInvestigationState } from "./use-investigation-state";
 
@@ -46,9 +49,12 @@ export function CanvasToolbar({
   hideTitleBadgeOnMobile = false,
   isBoardGame = false,
 }: CanvasToolbarProps) {
+  const { roomCode } = useRoomSync();
+  const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+
   return (
     <>
-      {/* Top Left Header Bar: Status Indicator, Audio Toggle, Admin Layout Controls */}
+      {/* Top Left Header Bar: Status Indicator, Group Play, Audio Toggle, Admin Layout Controls */}
       <div
         className="absolute left-2.5 sm:left-4 z-20 flex items-center gap-1.5 sm:gap-2 pointer-events-none"
         style={{ top: "max(10px, env(safe-area-inset-top, 10px))" }}
@@ -62,6 +68,23 @@ export function CanvasToolbar({
           <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
           <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
         </div>
+
+        {/* Group Play Room Button */}
+        <button
+          type="button"
+          onClick={() => setIsRoomModalOpen(true)}
+          className={cn(
+            "px-2.5 py-1.5 backdrop-blur-md border rounded-lg shadow-lg pointer-events-auto flex items-center gap-1.5 text-xs font-mono font-bold transition-all cursor-pointer",
+            roomCode
+              ? "bg-emerald-950/85 border-emerald-500/60 text-emerald-300 hover:bg-emerald-900/90"
+              : "bg-[#1b140e]/85 hover:bg-[#342417] border-[#593c26]/60 text-[#d9a066]"
+          )}
+          title={roomCode ? `Đang đồng bộ phòng: ${roomCode}` : "Chơi nhóm đồng bộ (Group ID)"}
+        >
+          <Users className="size-3.5 text-amber-500" />
+          <span>{roomCode ? roomCode : "Chơi Nhóm"}</span>
+          {roomCode && <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+        </button>
 
         <button
           type="button"
@@ -246,6 +269,11 @@ export function CanvasToolbar({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <RoomModal
+        isOpen={isRoomModalOpen}
+        onClose={() => setIsRoomModalOpen(false)}
+      />
     </>
   );
 }
