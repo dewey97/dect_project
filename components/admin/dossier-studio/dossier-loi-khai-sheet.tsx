@@ -220,7 +220,7 @@ export function DossierLoiKhaiSheet({
                 <>
                   <div className="text-center space-y-1 mb-3.5">
                     <h1
-                      contentEditable
+                      contentEditable={!readOnly}
                       suppressContentEditableWarning
                       onBlur={e => {
                         const val = e.currentTarget.textContent || ''
@@ -235,7 +235,7 @@ export function DossierLoiKhaiSheet({
                       {docData.docTitle || 'BIÊN BẢN GHI LỜI KHAI'}
                     </h1>
                     <p
-                      contentEditable
+                      contentEditable={!readOnly}
                       suppressContentEditableWarning
                       onBlur={e => {
                         const val = e.currentTarget.textContent || ''
@@ -250,7 +250,7 @@ export function DossierLoiKhaiSheet({
                       {docData.caseSubtitle}
                     </p>
                     <p
-                      contentEditable
+                      contentEditable={!readOnly}
                       suppressContentEditableWarning
                       onBlur={e => {
                         const val = e.currentTarget.textContent || ''
@@ -280,7 +280,7 @@ export function DossierLoiKhaiSheet({
                         <div>
                           <span>Điều tra viên: </span>
                           <span
-                            contentEditable
+                            contentEditable={!readOnly}
                             suppressContentEditableWarning
                             onBlur={e => {
                               const val = e.currentTarget.textContent || ''
@@ -297,7 +297,7 @@ export function DossierLoiKhaiSheet({
                         <div>
                           <span>Người được lấy lời khai: </span>
                           <span
-                            contentEditable
+                            contentEditable={!readOnly}
                             suppressContentEditableWarning
                             onBlur={e => {
                               const val = e.currentTarget.textContent || ''
@@ -321,7 +321,7 @@ export function DossierLoiKhaiSheet({
                           Lý do lấy lời khai:{' '}
                         </span>
                         <span
-                          contentEditable
+                          contentEditable={!readOnly}
                           suppressContentEditableWarning
                           onBlur={e => {
                             const val = e.currentTarget.textContent || ''
@@ -340,7 +340,7 @@ export function DossierLoiKhaiSheet({
                           Mối quan hệ với nạn nhân:{' '}
                         </span>
                         <span
-                          contentEditable
+                          contentEditable={!readOnly}
                           suppressContentEditableWarning
                           onBlur={e => {
                             const val = e.currentTarget.textContent || ''
@@ -453,7 +453,7 @@ export function DossierLoiKhaiSheet({
                         <span>:</span>
                       </div>
                       <div
-                        contentEditable
+                        contentEditable={!readOnly}
                         suppressContentEditableWarning
                         onBlur={e => {
                           const val = e.currentTarget.textContent || ''
@@ -482,7 +482,7 @@ export function DossierLoiKhaiSheet({
                         <span>:</span>
                       </div>
                       <div
-                        contentEditable
+                        contentEditable={!readOnly}
                         suppressContentEditableWarning
                         onBlur={e => {
                           const val = e.currentTarget.textContent || ''
@@ -516,7 +516,7 @@ export function DossierLoiKhaiSheet({
                 highlightEditable && "editable-field-indicator ring-2 ring-amber-400 ring-offset-2 ring-offset-white"
               )}>
                 <span
-                  contentEditable
+                  contentEditable={!readOnly}
                   suppressContentEditableWarning
                   onBlur={e => {
                     const val = e.currentTarget.textContent || ''

@@ -5,6 +5,8 @@ import type { SelectedView } from '@/components/investigation/evidence/evidence-
 import { normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
 import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'
 import { DiegeticDossierSheet } from './evidence/diegetic-dossier-sheet'
+import { EvidencePhotoAnnotator } from './evidence/evidence-photo-annotator'
+import { NativePdfAnnotator } from './evidence/native-pdf-annotator'
 
 interface PDFViewerModalProps {
   pdfUrl?: string | null
@@ -62,34 +64,21 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, c
         {/* Modal Body */}
         <div className="flex-1 w-full h-full bg-[#120d09] relative overflow-hidden flex flex-col">
           {isEvidence && selectedView ? (
-            <div className="flex-1 p-3 sm:p-6 overflow-y-auto custom-scrollbar flex flex-col items-center justify-center bg-[#0d0906]">
-              <div className="relative max-w-sm sm:max-w-lg max-h-[75vh] p-2 bg-[#1b140e] border border-[#3d2c1e] rounded-none shadow-2xl flex flex-col items-center justify-center">
-                <img
-                  src={normalizeImageUrl(selectedView.data.thumbnail) || "/photo_scene_overview.jpg"}
-                  alt={selectedView.data.title || "Vật chứng"}
-                  className="max-w-full max-h-[60vh] object-contain rounded-none select-none shadow-md"
-                />
-                {selectedView.data.evidenceId && (
-                  <div className="mt-2 text-center">
-                    <span className="font-mono text-xs font-bold text-[#d9a066] tracking-wider uppercase">
-                      📸 VẬT CHỨNG [{selectedView.data.evidenceId}]
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+            <EvidencePhotoAnnotator
+              photoUrl={normalizeImageUrl(selectedView.data.thumbnail) || "/photo_scene_overview.jpg"}
+              title={selectedView.data.title || "Vật chứng"}
+              evidenceId={selectedView.data.evidenceId}
+            />
           ) : isPdf && matchedDossier ? (
             /* Hiển thị trực tiếp bản in Diegetic Dossier Sheet */
-            <div className="w-full h-full overflow-y-auto custom-scrollbar bg-[#0f0c09] p-3 sm:p-6 flex flex-col items-center">
-              <div className="w-full max-w-full overflow-x-auto flex justify-center pb-4">
-                <DiegeticDossierSheet document={matchedDossier} />
-              </div>
+            <div className="w-full h-full min-h-0 min-w-0 bg-[#0f0c09] relative flex flex-col">
+              <DiegeticDossierSheet document={matchedDossier} />
             </div>
           ) : normalizedPdfUrl ? (
-            <iframe
-              src={normalizedPdfUrl.includes('drive.google.com') ? normalizedPdfUrl : `${normalizedPdfUrl}#toolbar=0&navpanes=0`}
-              className="w-full h-full border-0"
+            <NativePdfAnnotator
+              url={normalizedPdfUrl}
               title={activeTitle}
+              docCode={selectedView?.type === 'pdf' ? selectedView.data.code : undefined}
             />
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">
