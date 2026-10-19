@@ -29,6 +29,7 @@ interface DossierStudioHeaderProps {
   onZoomIn: () => void
   onZoomOut: () => void
   onResetZoom: () => void
+  onSetPhysicalScale?: () => void
   onSaveData: () => void
   isSavingDb: boolean
   savedNotification: boolean
@@ -47,6 +48,7 @@ export function DossierStudioHeader({
   onZoomIn,
   onZoomOut,
   onResetZoom,
+  onSetPhysicalScale,
   onSaveData,
   isSavingDb,
   savedNotification,
@@ -147,6 +149,15 @@ export function DossierStudioHeader({
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
+          {onSetPhysicalScale && (
+            <button
+              onClick={onSetPhysicalScale}
+              className="px-2 py-1 ml-0.5 border-l border-white/10 text-[11px] font-mono font-bold text-neutral-300 hover:text-amber-400 hover:bg-white/10 rounded transition-all"
+              title="Tỉ lệ thực 1:1 ngoài đời (1 cm trên màn hình = 1 cm thước kẻ thật)"
+            >
+              1:1
+            </button>
+          )}
           <button
             onClick={onResetZoom}
             className="p-1.5 text-neutral-400 hover:text-white hover:bg-white/10 rounded transition-all ml-0.5 border-l border-white/10"

@@ -102,8 +102,13 @@ export function useDossierDocuments(caseId: string = 'case_000'): DossierDataSta
       if (direct) return direct
     }
 
-    // 2. Tìm theo id (ví dụ 'pdf-08' -> match '08')
+    // 2. Tìm theo id (ví dụ 'dossier-UUID' hoặc 'pdf-08' -> match '08')
     if (query.id) {
+      if (query.id.startsWith('dossier-')) {
+        const docId = query.id.replace('dossier-', '')
+        const foundById = documents.find(d => d.id === docId)
+        if (foundById) return foundById
+      }
       const idMatch = query.id.match(/\d+[a-z]?/i)
       if (idMatch) {
         const key = `${idMatch[0].toUpperCase()}-LK`

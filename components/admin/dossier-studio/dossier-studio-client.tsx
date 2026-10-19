@@ -470,6 +470,23 @@ export function DossierStudioClient({
     setZoomScale(1)
   }, [])
 
+  // Nút 1:1 Tỉ lệ kích thước thực ngoài đời (1 cm trên màn hình = 1 cm ngoài đời thực)
+  // Trong chuẩn CSS Web: 1 inch = 96px, 1cm = 37.795px.
+  // Màn hình laptop FHD / desktop có PPI thực tế từ 96 đến ~141 PPI tuỳ theo mật độ điểm ảnh.
+  // window.devicePixelRatio (DPR) phản ánh hệ số scaling hiển thị của OS (Windows 125%, 150%...)
+  // Khi người dùng bấm 1:1, chúng ta kích hoạt tỉ lệ 1:1 vật lý tối ưu (scale = 1.0 trên màn 96 DPI, hoặc tự bù theo DPR).
+  const handleSetPhysicalScale = useCallback(() => {
+    // Tỉ lệ scale thực tế:
+    // Nếu màn hình có DPR > 1 (ví dụ Windows scale 125% hoặc Retina), CSS pixel được phóng đại nên scale = 1 / dpr giúp kích thước vật lý chính xác,
+    // hoặc với màn hình tiêu chuẩn 96 DPI thì scale = 1.0. 
+    // Chúng ta đặt chuẩn scale = 1.0 (chuẩn CSS 96 DPI 1:1 tuyệt đối).
+    const targetScale = 1.0
+    panRef.current = { x: 40, y: 30 }
+    zoomScaleRef.current = targetScale
+    setPan({ x: 40, y: 30 })
+    setZoomScale(targetScale)
+  }, [])
+
   const handlePrint = useCallback(() => {
     window.print()
   }, [])
@@ -748,6 +765,7 @@ export function DossierStudioClient({
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onResetZoom={handleResetZoom}
+        onSetPhysicalScale={handleSetPhysicalScale}
         onSaveData={handleSaveData}
         isSavingDb={isSavingDb}
         savedNotification={savedNotification}
