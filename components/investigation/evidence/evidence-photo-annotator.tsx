@@ -46,6 +46,7 @@ export function EvidencePhotoAnnotator({
   const [activeColor, setActiveColor] = useState<AnnotationColor>('#dc2626')
   const [activeSize, setActiveSize] = useState<number>(3)
   const [clearTrigger, setClearTrigger] = useState<number>(0)
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState<boolean>(false)
 
   // Zoom controls
   const zoomIn = useCallback(() => {
@@ -91,8 +92,8 @@ export function EvidencePhotoAnnotator({
       {/* Background Texture Grid */}
       <div className="absolute inset-0 bg-[radial-gradient(#3d2c1e_1px,transparent_1px)] [background-size:16px_16px] opacity-25 pointer-events-none" />
 
-      {/* FLOATING ANNOTATION & ZOOM TOOLBAR */}
-      <div className="absolute bottom-4 right-4 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066]">
+      {/* FLOATING ANNOTATION & ZOOM TOOLBAR (Căn giữa phía dưới màn hình) */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066] max-w-[calc(100%-2rem)]">
         {/* NÚT CHỌN CHUỘT THƯỜNG */}
         <button
           type="button"
@@ -113,7 +114,6 @@ export function EvidencePhotoAnnotator({
           type="button"
           onClick={() => {
             setActiveTool('pen')
-            if (activeColor === '#eab308') setActiveColor('#dc2626')
             setActiveSize(2.5)
           }}
           className={cn(
@@ -132,7 +132,6 @@ export function EvidencePhotoAnnotator({
           type="button"
           onClick={() => {
             setActiveTool('highlighter')
-            setActiveColor('#eab308')
             setActiveSize(6)
           }}
           className={cn(
@@ -146,22 +145,47 @@ export function EvidencePhotoAnnotator({
           <Highlighter className="size-4" />
         </button>
 
-        {/* BẢNG CHỌN MÀU */}
+        {/* Ô CHỌN MÀU GỌN GÀNG (TỰ ĐÓNG KHI DI CHUỘT RA NGOÀI) */}
         {activeTool !== 'cursor' && activeTool !== 'eraser' && (
-          <div className="flex items-center gap-1 px-1 border-l border-r border-[#4a3625]/80 mx-0.5">
-            {COLOR_PALETTE.map((p) => (
-              <button
-                key={p.color}
-                type="button"
-                onClick={() => setActiveColor(p.color)}
-                style={{ backgroundColor: p.color }}
-                className={cn(
-                  "size-4 rounded-full transition-transform cursor-pointer border border-white/20",
-                  activeColor === p.color && "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#1a120b]"
-                )}
-                title={p.label}
+          <div
+            className="relative"
+            onMouseLeave={() => setIsColorPickerOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setIsColorPickerOpen((prev) => !prev)}
+              className="p-1 rounded-lg hover:bg-[#342417] transition-colors cursor-pointer flex items-center justify-center"
+              title="Đổi màu bút"
+            >
+              <span
+                style={{ backgroundColor: activeColor }}
+                className="size-4 rounded-full border-2 border-white/60 shadow-sm"
               />
-            ))}
+            </button>
+
+            {isColorPickerOpen && (
+              <div
+                onMouseLeave={() => setIsColorPickerOpen(false)}
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-1.5 bg-[#1e150f] border border-[#523924] rounded-xl shadow-2xl flex items-center gap-1.5 z-50 animate-in fade-in zoom-in-95 duration-100"
+              >
+                {COLOR_PALETTE.map((p) => (
+                  <button
+                    key={p.color}
+                    type="button"
+                    onClick={() => {
+                      setActiveColor(p.color)
+                      setIsColorPickerOpen(false)
+                    }}
+                    style={{ backgroundColor: p.color }}
+                    className={cn(
+                      "size-5 rounded-full transition-transform cursor-pointer border border-white/20 hover:scale-110",
+                      activeColor === p.color && "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#1e150f]"
+                    )}
+                    title={p.label}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -180,16 +204,6 @@ export function EvidencePhotoAnnotator({
           <Eraser className="size-4" />
         </button>
 
-        {/* XÓA TẤT CẢ */}
-        <button
-          type="button"
-          onClick={() => setClearTrigger(Date.now())}
-          className="p-1.5 rounded-lg hover:bg-red-950/80 text-[#ad9885] hover:text-red-400 transition-colors cursor-pointer"
-          title="Xóa toàn bộ hình vẽ trên ảnh này"
-        >
-          <Trash2 className="size-4" />
-        </button>
-
         <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
 
         {/* ZOOM CONTROLS */}
@@ -202,10 +216,6 @@ export function EvidencePhotoAnnotator({
         >
           <ZoomOut className="size-4" />
         </button>
-
-        <span className="font-mono text-xs font-bold px-1 min-w-[38px] text-center text-[#e5d8cb] select-none">
-          {Math.round(zoom * 100)}%
-        </span>
 
         <button
           type="button"

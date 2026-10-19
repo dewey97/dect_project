@@ -59,6 +59,8 @@ export function DiegeticDossierSheet({
   // Khởi tạo mức zoom tự động vừa vặn ban đầu (Fit width thông minh)
   const [internalZoom, setInternalZoom] = useState<number>(1)
   const containerRef = useRef<HTMLDivElement>(null)
+  const paperWrapperRef = useRef<HTMLDivElement>(null)
+  const [unscaledHeight, setUnscaledHeight] = useState<number>(isLoiKhai ? 1123 : 730)
   const { roomCode } = useRoomSync()
 
   // Annotation states
@@ -66,25 +68,46 @@ export function DiegeticDossierSheet({
   const [activeColor, setActiveColor] = useState<AnnotationColor>('#dc2626')
   const [activeSize, setActiveSize] = useState<number>(3)
   const [clearTrigger, setClearTrigger] = useState<number>(0)
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState<boolean>(false)
 
-  // Tính toán scale ban đầu để tờ giấy vừa vặn chiều rộng khung nhìn
+  // Chiều rộng thiết kế chuẩn của văn bản
+  const docBaseWidth = isLoiKhai
+    ? paperConfig.orientation === 'portrait' ? 794 : 1123
+    : 1050 // Lý Lịch đôi
+
+  // Dynamic measure of unscaled paper height for exact Sizer Box calculation
+  useEffect(() => {
+    const el = paperWrapperRef.current
+    if (!el) return
+    const updateHeight = () => {
+      const h = el.scrollHeight || el.offsetHeight
+      if (h > 0) {
+        setUnscaledHeight((prev) => (Math.abs(h - prev) > 2 ? h : prev))
+      }
+    }
+    updateHeight()
+    const ro = new ResizeObserver(updateHeight)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [docItem, isLoiKhai])
+
+  // Tính toán scale vừa vặn khung nhìn với ResizeObserver (chống tràn màn hình 100%)
   useEffect(() => {
     if (externalScale !== undefined) {
       setInternalZoom(externalScale)
       return
     }
+    const el = containerRef.current
+    if (!el) return
+
     const updateFitZoom = () => {
-      if (!containerRef.current) return
-      const availableWidth = containerRef.current.clientWidth - 32 // trừ padding 16px mỗi bên
+      const pad = el.clientWidth < 640 ? 16 : 32
+      const availableWidth = el.clientWidth - pad
       if (availableWidth <= 0) return
 
-      // Chiều rộng thiết kế của văn bản
-      const docBaseWidth = isLoiKhai
-        ? paperConfig.orientation === 'portrait' ? 794 : 1123
-        : 1050 // Lý Lịch đôi
-
       if (availableWidth < docBaseWidth) {
-        const fitScale = Math.max(0.4, Math.min(1, Math.floor((availableWidth / docBaseWidth) * 100) / 100))
+        // Cho phép scale co giãn xuống 0.22 để vừa khít cả màn hình nhỏ mà không bị tràn
+        const fitScale = Math.max(0.22, Math.min(1.2, Math.floor((availableWidth / docBaseWidth) * 100) / 100))
         setInternalZoom(fitScale)
       } else {
         setInternalZoom(1)
@@ -92,9 +115,10 @@ export function DiegeticDossierSheet({
     }
 
     updateFitZoom()
-    window.addEventListener('resize', updateFitZoom)
-    return () => window.removeEventListener('resize', updateFitZoom)
-  }, [docItem.id, isLoiKhai, paperConfig.orientation, externalScale])
+    const ro = new ResizeObserver(updateFitZoom)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [docItem.id, isLoiKhai, paperConfig.orientation, externalScale, docBaseWidth])
 
   // Lắng nghe Ctrl + Wheel để Zoom In / Out mượt mà
   useEffect(() => {
@@ -105,7 +129,7 @@ export function DiegeticDossierSheet({
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault()
         const zoomDelta = e.deltaY < 0 ? 0.08 : -0.08
-        setInternalZoom((prev) => Math.min(2.0, Math.max(0.4, Math.round((prev + zoomDelta) * 100) / 100)))
+        setInternalZoom((prev) => Math.min(2.0, Math.max(0.25, Math.round((prev + zoomDelta) * 100) / 100)))
       }
     }
 
@@ -118,7 +142,7 @@ export function DiegeticDossierSheet({
   }, [])
 
   const zoomOut = useCallback(() => {
-    setInternalZoom((prev) => Math.max(0.4, Math.round((prev - 0.1) * 10) / 10))
+    setInternalZoom((prev) => Math.max(0.25, Math.round((prev - 0.1) * 10) / 10))
   }, [])
 
   const resetZoom = useCallback(() => {
@@ -126,18 +150,18 @@ export function DiegeticDossierSheet({
       setInternalZoom(1)
       return
     }
-    const availableWidth = containerRef.current.clientWidth - 32
-    const docBaseWidth = isLoiKhai
-      ? paperConfig.orientation === 'portrait' ? 794 : 1123
-      : 1050
+    const pad = containerRef.current.clientWidth < 640 ? 16 : 32
+    const availableWidth = containerRef.current.clientWidth - pad
     if (availableWidth > 0 && availableWidth < docBaseWidth) {
-      setInternalZoom(Math.max(0.4, Math.min(1, Math.floor((availableWidth / docBaseWidth) * 100) / 100)))
+      setInternalZoom(Math.max(0.22, Math.min(1.2, Math.floor((availableWidth / docBaseWidth) * 100) / 100)))
     } else {
       setInternalZoom(1)
     }
-  }, [isLoiKhai, paperConfig.orientation])
+  }, [docBaseWidth])
 
   const activeZoom = externalScale ?? internalZoom
+  const scaledWidth = Math.round(docBaseWidth * activeZoom)
+  const scaledHeight = Math.round(unscaledHeight * activeZoom)
 
   return (
     <div
@@ -151,8 +175,8 @@ export function DiegeticDossierSheet({
         className
       )}
     >
-      {/* FLOATING ANNOTATION & ZOOM TOOLBAR (Góc dưới bên phải giống Adobe Acrobat & Studio) */}
-      <div className="absolute bottom-4 right-4 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066]">
+      {/* FLOATING ANNOTATION & ZOOM TOOLBAR (Căn giữa phía dưới màn hình) */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066] max-w-[calc(100%-2rem)]">
         {/* NÚT CHỌN CHUỘT THƯỜNG / SELECT TEXT */}
         <button
           type="button"
@@ -173,7 +197,6 @@ export function DiegeticDossierSheet({
           type="button"
           onClick={() => {
             setActiveTool('pen')
-            if (activeColor === '#eab308') setActiveColor('#dc2626')
             setActiveSize(2.5)
           }}
           className={cn(
@@ -192,7 +215,6 @@ export function DiegeticDossierSheet({
           type="button"
           onClick={() => {
             setActiveTool('highlighter')
-            setActiveColor('#eab308')
             setActiveSize(6)
           }}
           className={cn(
@@ -206,22 +228,47 @@ export function DiegeticDossierSheet({
           <Highlighter className="size-4" />
         </button>
 
-        {/* BẢNG CHỌN MÀU BÚT KHI ĐANG VẼ / TÔ */}
+        {/* Ô CHỌN MÀU GỌN GÀNG (TỰ ĐÓNG KHI DI CHUỘT RA NGOÀI) */}
         {activeTool !== 'cursor' && activeTool !== 'eraser' && (
-          <div className="flex items-center gap-1 px-1 border-l border-r border-[#4a3625]/80 mx-0.5">
-            {COLOR_PALETTE.map((p) => (
-              <button
-                key={p.color}
-                type="button"
-                onClick={() => setActiveColor(p.color)}
-                style={{ backgroundColor: p.color }}
-                className={cn(
-                  "size-4 rounded-full transition-transform cursor-pointer border border-white/20",
-                  activeColor === p.color && "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#1a120b]"
-                )}
-                title={p.label}
+          <div
+            className="relative"
+            onMouseLeave={() => setIsColorPickerOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setIsColorPickerOpen((prev) => !prev)}
+              className="p-1 rounded-lg hover:bg-[#342417] transition-colors cursor-pointer flex items-center justify-center"
+              title="Đổi màu bút"
+            >
+              <span
+                style={{ backgroundColor: activeColor }}
+                className="size-4 rounded-full border-2 border-white/60 shadow-sm"
               />
-            ))}
+            </button>
+
+            {isColorPickerOpen && (
+              <div
+                onMouseLeave={() => setIsColorPickerOpen(false)}
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-1.5 bg-[#1e150f] border border-[#523924] rounded-xl shadow-2xl flex items-center gap-1.5 z-50 animate-in fade-in zoom-in-95 duration-100"
+              >
+                {COLOR_PALETTE.map((p) => (
+                  <button
+                    key={p.color}
+                    type="button"
+                    onClick={() => {
+                      setActiveColor(p.color)
+                      setIsColorPickerOpen(false)
+                    }}
+                    style={{ backgroundColor: p.color }}
+                    className={cn(
+                      "size-5 rounded-full transition-transform cursor-pointer border border-white/20 hover:scale-110",
+                      activeColor === p.color && "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#1e150f]"
+                    )}
+                    title={p.label}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -240,26 +287,6 @@ export function DiegeticDossierSheet({
           <Eraser className="size-4" />
         </button>
 
-        {/* NÚT XÓA TOÀN BỘ GHI CHÚ TRÊN VĂN BẢN NÀY */}
-        <button
-          type="button"
-          onClick={() => setClearTrigger(Date.now())}
-          className="p-1.5 rounded-lg hover:bg-red-950/80 text-[#ad9885] hover:text-red-400 transition-colors cursor-pointer"
-          title="Xóa hết toàn bộ hình vẽ trên hồ sơ này"
-        >
-          <Trash2 className="size-4" />
-        </button>
-
-        {roomCode && (
-          <span
-            className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-700/50 text-[0.62rem] text-emerald-300 font-mono select-none"
-            title={`Nét vẽ đang được đồng bộ trực tiếp với tổ chuyên án phòng ${roomCode}`}
-          >
-            <Users className="size-3 text-emerald-400" />
-            <span>Phòng {roomCode}</span>
-          </span>
-        )}
-
         <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
 
         {/* ZOOM CONTROLS */}
@@ -272,10 +299,6 @@ export function DiegeticDossierSheet({
         >
           <ZoomOut className="size-4" />
         </button>
-
-        <span className="font-mono text-xs font-bold px-1 min-w-[38px] text-center text-[#e5d8cb] select-none">
-          {Math.round(activeZoom * 100)}%
-        </span>
 
         <button
           type="button"
@@ -298,46 +321,64 @@ export function DiegeticDossierSheet({
       </div>
 
       {/* SCROLLABLE CANVAS FOR PAPERS */}
-      <div className="w-full flex-1 overflow-auto custom-scrollbar p-4 sm:p-6 flex flex-col items-center">
+      <div className="w-full flex-1 overflow-auto custom-scrollbar p-2 sm:p-5 flex flex-col items-center">
+        {/* SIZER BOX: Có kích thước DOM khớp 100% với kích thước đã scale (chống tràn lề và lỗi flex center) */}
         <div
           style={{
-            transform: `scale(${activeZoom})`,
-            transformOrigin: 'top center',
-            transition: 'transform 0.15s ease-out',
-            marginBottom: `${Math.max(0, (activeZoom - 1) * 800)}px`,
+            width: `${scaledWidth}px`,
+            minWidth: `${scaledWidth}px`,
+            height: `${scaledHeight}px`,
+            minHeight: `${scaledHeight}px`,
+            position: 'relative',
           }}
-          className="shrink-0 flex flex-col items-center relative"
+          className="shrink-0 flex justify-center"
         >
-          {/* LỚP VẼ ĐÈ TƯƠNG TÁC (ANNOTATION OVERLAY LAYER) */}
-          <DossierAnnotationLayer
-            documentId={docItem.tag_code || docItem.id || 'default_doc'}
-            activeTool={activeTool}
-            activeColor={activeColor}
-            activeSize={activeSize}
-            scale={activeZoom}
-            onClearTrigger={clearTrigger}
-          />
+          {/* BẢN IN GỐC: Scale từ góc trên bên trái của Sizer Box */}
+          <div
+            ref={paperWrapperRef}
+            style={{
+              width: `${docBaseWidth}px`,
+              transform: `scale(${activeZoom})`,
+              transformOrigin: 'top left',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+            }}
+            className="shrink-0 flex flex-col items-center"
+          >
+            {/* LỚP VẼ ĐÈ TƯƠNG TÁC (ANNOTATION OVERLAY LAYER) */}
+            <DossierAnnotationLayer
+              documentId={docItem.tag_code || docItem.id || 'default_doc'}
+              activeTool={activeTool}
+              activeColor={activeColor}
+              activeSize={activeSize}
+              scale={activeZoom}
+              onClearTrigger={clearTrigger}
+              width={docBaseWidth}
+              height={unscaledHeight}
+            />
 
-          {isLoiKhai ? (
-            <DossierLoiKhaiSheet
-              docItem={docItem}
-              docData={docItem.content as LoiKhaiData}
-              docPaper={paperConfig}
-              readOnly={true}
-              isSelected={false}
-              highlightEditable={false}
-            />
-          ) : (
-            <DossierLyLichSheet
-              docItem={docItem}
-              docData={docItem.content as LyLichData}
-              docPaper={paperConfig}
-              readOnly={true}
-              isSelected={false}
-              highlightEditable={false}
-              showSeal={true}
-            />
-          )}
+            {isLoiKhai ? (
+              <DossierLoiKhaiSheet
+                docItem={docItem}
+                docData={docItem.content as LoiKhaiData}
+                docPaper={paperConfig}
+                readOnly={true}
+                isSelected={false}
+                highlightEditable={false}
+              />
+            ) : (
+              <DossierLyLichSheet
+                docItem={docItem}
+                docData={docItem.content as LyLichData}
+                docPaper={paperConfig}
+                readOnly={true}
+                isSelected={false}
+                highlightEditable={false}
+                showSeal={true}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

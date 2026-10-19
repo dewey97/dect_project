@@ -50,11 +50,14 @@ export function NativePdfAnnotator({
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
+  const [pageSize, setPageSize] = useState<{ width: number; height: number }>({ width: 595, height: 842 })
+
   // Annotation states
   const [activeTool, setActiveTool] = useState<AnnotationTool>('cursor')
   const [activeColor, setActiveColor] = useState<AnnotationColor>('#dc2626')
   const [activeSize, setActiveSize] = useState<number>(3)
   const [clearTrigger, setClearTrigger] = useState<number>(0)
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState<boolean>(false)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pdfDocRef = useRef<any>(null)
@@ -106,8 +109,8 @@ export function NativePdfAnnotator({
     }
   }, [cleanUrl])
 
-  // Render current page to Canvas
-  const renderPage = useCallback(async (pageNumber: number, targetScale: number) => {
+  // Render current page to Canvas at sharp 2x resolution once per page
+  const renderPage = useCallback(async (pageNumber: number) => {
     if (!pdfDocRef.current || !canvasRef.current) return
 
     try {
@@ -116,20 +119,26 @@ export function NativePdfAnnotator({
       }
 
       const page = await pdfDocRef.current.getPage(pageNumber)
-      const viewport = page.getViewport({ scale: targetScale * 1.5 }) // 1.5x resolution for sharp text on retina screens
+      const baseViewport = page.getViewport({ scale: 1.0 })
+      const baseW = Math.round(baseViewport.width)
+      const baseH = Math.round(baseViewport.height)
+      setPageSize({ width: baseW, height: baseH })
+
+      const RENDER_SCALE = 2.0 // Sharp 2x retina resolution
+      const renderViewport = page.getViewport({ scale: RENDER_SCALE })
 
       const canvas = canvasRef.current
       const context = canvas.getContext('2d')
       if (!context) return
 
-      canvas.width = viewport.width
-      canvas.height = viewport.height
-      canvas.style.width = `${viewport.width / 1.5}px`
-      canvas.style.height = `${viewport.height / 1.5}px`
+      canvas.width = renderViewport.width
+      canvas.height = renderViewport.height
+      canvas.style.width = `${baseW}px`
+      canvas.style.height = `${baseH}px`
 
       const renderContext = {
         canvasContext: context,
-        viewport,
+        viewport: renderViewport,
       }
 
       const task = page.render(renderContext)
@@ -144,23 +153,31 @@ export function NativePdfAnnotator({
 
   useEffect(() => {
     if (pdfDocRef.current && !loading) {
-      renderPage(currentPage, zoom)
+      renderPage(currentPage)
     }
-  }, [currentPage, zoom, loading, renderPage])
+  }, [currentPage, loading, renderPage])
 
-  // Auto fit width on mount
+  // Auto fit width on mount & resize
   useEffect(() => {
+    const el = containerRef.current
+    if (!el || pageSize.width <= 0) return
+
     const updateFitZoom = () => {
-      if (!containerRef.current) return
-      const availableWidth = containerRef.current.clientWidth - 48
-      if (availableWidth > 0 && availableWidth < 800) {
-        setZoom(Math.max(0.4, Math.min(1.2, Math.round((availableWidth / 800) * 100) / 100)))
+      const pad = el.clientWidth < 640 ? 16 : 48
+      const availableWidth = el.clientWidth - pad
+      if (availableWidth <= 0) return
+
+      if (availableWidth < pageSize.width) {
+        setZoom(Math.max(0.25, Math.min(1.5, Math.floor((availableWidth / pageSize.width) * 100) / 100)))
+      } else {
+        setZoom(1.0)
       }
     }
     updateFitZoom()
-    window.addEventListener('resize', updateFitZoom)
-    return () => window.removeEventListener('resize', updateFitZoom)
-  }, [])
+    const ro = new ResizeObserver(updateFitZoom)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [pageSize.width])
 
   // Ctrl + Wheel to Zoom
   useEffect(() => {
@@ -171,7 +188,7 @@ export function NativePdfAnnotator({
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault()
         const zoomDelta = e.deltaY < 0 ? 0.08 : -0.08
-        setZoom((prev) => Math.min(2.5, Math.max(0.4, Math.round((prev + zoomDelta) * 100) / 100)))
+        setZoom((prev) => Math.min(2.5, Math.max(0.25, Math.round((prev + zoomDelta) * 100) / 100)))
       }
     }
 
@@ -180,8 +197,21 @@ export function NativePdfAnnotator({
   }, [])
 
   const zoomIn = () => setZoom((prev) => Math.min(2.5, Math.round((prev + 0.1) * 10) / 10))
-  const zoomOut = () => setZoom((prev) => Math.max(0.4, Math.round((prev - 0.1) * 10) / 10))
-  const resetZoom = () => setZoom(1)
+  const zoomOut = () => setZoom((prev) => Math.max(0.25, Math.round((prev - 0.1) * 10) / 10))
+  const resetZoom = useCallback(() => {
+    const el = containerRef.current
+    if (!el || pageSize.width <= 0) {
+      setZoom(1)
+      return
+    }
+    const pad = el.clientWidth < 640 ? 16 : 48
+    const availableWidth = el.clientWidth - pad
+    if (availableWidth > 0 && availableWidth < pageSize.width) {
+      setZoom(Math.max(0.25, Math.min(1.5, Math.floor((availableWidth / pageSize.width) * 100) / 100)))
+    } else {
+      setZoom(1)
+    }
+  }, [pageSize.width])
 
   // Nếu lỗi (ví dụ file Drive không có CORS hoặc link preview), fallback về iframe chuẩn
   if (error) {
@@ -203,8 +233,8 @@ export function NativePdfAnnotator({
         className
       )}
     >
-      {/* FLOATING ANNOTATION & ZOOM TOOLBAR */}
-      <div className="absolute bottom-4 right-4 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066]">
+      {/* FLOATING ANNOTATION & ZOOM TOOLBAR (Căn giữa phía dưới màn hình) */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066] max-w-[calc(100%-2rem)]">
         {/* NÚT CHỌN CON TRỎ */}
         <button
           type="button"
@@ -225,7 +255,6 @@ export function NativePdfAnnotator({
           type="button"
           onClick={() => {
             setActiveTool('pen')
-            if (activeColor === '#eab308') setActiveColor('#dc2626')
             setActiveSize(2.5)
           }}
           className={cn(
@@ -244,7 +273,6 @@ export function NativePdfAnnotator({
           type="button"
           onClick={() => {
             setActiveTool('highlighter')
-            setActiveColor('#eab308')
             setActiveSize(6)
           }}
           className={cn(
@@ -258,22 +286,47 @@ export function NativePdfAnnotator({
           <Highlighter className="size-4" />
         </button>
 
-        {/* BẢNG CHỌN MÀU */}
+        {/* Ô CHỌN MÀU GỌN GÀNG (TỰ ĐÓNG KHI DI CHUỘT RA NGOÀI) */}
         {activeTool !== 'cursor' && activeTool !== 'eraser' && (
-          <div className="flex items-center gap-1 px-1 border-l border-r border-[#4a3625]/80 mx-0.5">
-            {COLOR_PALETTE.map((p) => (
-              <button
-                key={p.color}
-                type="button"
-                onClick={() => setActiveColor(p.color)}
-                style={{ backgroundColor: p.color }}
-                className={cn(
-                  "size-4 rounded-full transition-transform cursor-pointer border border-white/20",
-                  activeColor === p.color && "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#1a120b]"
-                )}
-                title={p.label}
+          <div
+            className="relative"
+            onMouseLeave={() => setIsColorPickerOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setIsColorPickerOpen((prev) => !prev)}
+              className="p-1 rounded-lg hover:bg-[#342417] transition-colors cursor-pointer flex items-center justify-center"
+              title="Đổi màu bút"
+            >
+              <span
+                style={{ backgroundColor: activeColor }}
+                className="size-4 rounded-full border-2 border-white/60 shadow-sm"
               />
-            ))}
+            </button>
+
+            {isColorPickerOpen && (
+              <div
+                onMouseLeave={() => setIsColorPickerOpen(false)}
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-1.5 bg-[#1e150f] border border-[#523924] rounded-xl shadow-2xl flex items-center gap-1.5 z-50 animate-in fade-in zoom-in-95 duration-100"
+              >
+                {COLOR_PALETTE.map((p) => (
+                  <button
+                    key={p.color}
+                    type="button"
+                    onClick={() => {
+                      setActiveColor(p.color)
+                      setIsColorPickerOpen(false)
+                    }}
+                    style={{ backgroundColor: p.color }}
+                    className={cn(
+                      "size-5 rounded-full transition-transform cursor-pointer border border-white/20 hover:scale-110",
+                      activeColor === p.color && "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#1e150f]"
+                    )}
+                    title={p.label}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -290,16 +343,6 @@ export function NativePdfAnnotator({
           title="Tẩy nét vẽ (Chạm vào nét vẽ để xóa)"
         >
           <Eraser className="size-4" />
-        </button>
-
-        {/* XÓA TẤT CẢ NÉT VẼ */}
-        <button
-          type="button"
-          onClick={() => setClearTrigger(Date.now())}
-          className="p-1.5 rounded-lg hover:bg-red-950/80 text-[#ad9885] hover:text-red-400 transition-colors cursor-pointer"
-          title="Xóa hết hình vẽ trên trang PDF này"
-        >
-          <Trash2 className="size-4" />
         </button>
 
         <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
@@ -343,10 +386,6 @@ export function NativePdfAnnotator({
           <ZoomOut className="size-4" />
         </button>
 
-        <span className="font-mono text-xs font-bold px-1 min-w-[38px] text-center text-[#e5d8cb] select-none">
-          {Math.round(zoom * 100)}%
-        </span>
-
         <button
           type="button"
           onClick={zoomIn}
@@ -368,26 +407,52 @@ export function NativePdfAnnotator({
       </div>
 
       {/* PDF CANVAS BODY */}
-      <div className="w-full flex-1 overflow-auto custom-scrollbar p-4 sm:p-6 flex flex-col items-center">
+      <div className="w-full flex-1 overflow-auto custom-scrollbar p-2 sm:p-5 flex flex-col items-center">
         {loading ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-2 text-[#d9a066]">
             <Loader2 className="size-6 animate-spin text-[#d9a066]" />
             <span className="font-mono text-xs text-[#ad9885]">Đang giải mã trang PDF điều tra...</span>
           </div>
         ) : (
-          <div className="relative shadow-2xl bg-white shrink-0 my-auto">
-            {/* Lớp vẽ khoanh tròn và tô màu dạ quang */}
-            <DossierAnnotationLayer
-              documentId={documentId}
-              activeTool={activeTool}
-              activeColor={activeColor}
-              activeSize={activeSize}
-              scale={1}
-              onClearTrigger={clearTrigger}
-            />
+          /* SIZER BOX: Trùng khớp kích thước sau scale để thanh cuộn và căn giữa flex hoạt động hoàn hảo */
+          <div
+            style={{
+              width: `${Math.round(pageSize.width * zoom)}px`,
+              minWidth: `${Math.round(pageSize.width * zoom)}px`,
+              height: `${Math.round(pageSize.height * zoom)}px`,
+              minHeight: `${Math.round(pageSize.height * zoom)}px`,
+              position: 'relative',
+            }}
+            className="shrink-0 flex justify-center my-auto"
+          >
+            {/* BẢN IN GỐC: Scale GPU 60fps từ góc trên bên trái của Sizer Box, khóa chặt nét vẽ 100% */}
+            <div
+              style={{
+                width: `${pageSize.width}px`,
+                height: `${pageSize.height}px`,
+                transform: `scale(${zoom})`,
+                transformOrigin: 'top left',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+              }}
+              className="shrink-0 shadow-2xl bg-white relative"
+            >
+              {/* Lớp vẽ khoanh tròn và tô màu dạ quang */}
+              <DossierAnnotationLayer
+                documentId={documentId}
+                activeTool={activeTool}
+                activeColor={activeColor}
+                activeSize={activeSize}
+                scale={zoom}
+                onClearTrigger={clearTrigger}
+                width={pageSize.width}
+                height={pageSize.height}
+              />
 
-            {/* Canvas render nội dung trang PDF */}
-            <canvas ref={canvasRef} className="block select-none" />
+              {/* Canvas render nội dung trang PDF */}
+              <canvas ref={canvasRef} className="block select-none" />
+            </div>
           </div>
         )}
       </div>

@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   FileText,
-  Paperclip,
   ImageIcon,
   Volume2,
   VolumeX,
@@ -12,9 +11,6 @@ import {
   X,
   Home,
   ChevronLeft,
-  ChevronRight,
-  Maximize2,
-  Minimize2,
   GripVertical,
   Eye,
   Layers,
@@ -50,6 +46,7 @@ import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
 import { normalizeImageUrl } from "@/lib/utils";
 import {
   getStorageItem,
@@ -71,8 +68,12 @@ type ActiveModal =
 function WebEvidencePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const caseId =
+  const rawCaseId =
     searchParams.get("case_id") || searchParams.get("caseId") || "case-000";
+  const caseId =
+    rawCaseId === "case_000" || rawCaseId === "case-000"
+      ? "case-000"
+      : rawCaseId;
   const normalizedSheetCaseId = useMemo(
     () => caseId.replace(/-/g, "_"),
     [caseId],
@@ -104,13 +105,16 @@ function WebEvidencePageContent() {
     normalizedSheetCaseId,
   );
 
+  // Nạp toàn bộ hồ sơ từ Dossier Studio (nguồn tài liệu chính)
+  const { documents: dossierDocs } = useDossierDocuments(caseId);
+
   // 3-Zone Layout State (Desktop):
   // Zone 1 (Bảng Điều Tra): width %
   // Zone 2 (Danh mục Preview Card ở giữa): width cố định (240px -> 320px) hoặc tự co giãn
   // Zone 3 (Trình duyệt chi tiết PDF / Vật chứng bên phải)
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
   const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false); // Phóng to trình đọc PDF toàn nửa phải
-  const [boardWidthPercent, setBoardWidthPercent] = useState<number>(60);
+  const [boardWidthPercent, setBoardWidthPercent] = useState<number>(42);
   const [dossierWidth, setDossierWidth] = useState<number>(320);
   const [isDraggingSplit, setIsDraggingSplit] = useState<boolean>(false);
   const [isDraggingDossierSplit, setIsDraggingDossierSplit] = useState<boolean>(false);
@@ -134,107 +138,122 @@ function WebEvidencePageContent() {
     setActiveHintCategory(cat);
     setActiveModal("hint");
   });
-  // Hợp nhất dữ liệu Live Sheet (tab 'evidences') với Fallback local:
-  // Nếu Sheet có dữ liệu, ưu tiên nạp từ Sheet; nếu một mục chưa có link Drive thì dùng link PDF/ảnh local tương ứng
+
+  // Hợp nhất dữ liệu: Dossier Studio (nguồn chính) + 1 PDF test + Vật chứng / Ảnh từ Live Sheet
   const effectiveItems = useMemo(() => {
-    if (!sheetEvidences || sheetEvidences.length === 0) {
-      if (caseId !== "case-000") return [];
-      // Fallback khi chưa nạp xong Sheet cho case-000
-      return [
-        ...CASE_000_PDFS.map((doc): CombinedItem => ({
-          type: "pdf",
-          data: doc,
-          phase: doc.phase,
-          order: doc.order,
-        })),
-        ...CASE_000_EVIDENCE.map((item): CombinedItem => ({
-          type: "evidence",
-          data: item,
-          phase: item.phase,
-          order: item.order,
-        })),
-      ];
+    // 1. Chuyển đổi toàn bộ hồ sơ từ Dossier Studio thành PDF/Dossier Items
+    const dossierItems: CombinedItem[] = (dossierDocs || []).map((doc, idx) => {
+      const code = (doc.tag_code || "").trim();
+      const firstChar = code.charAt(0).toUpperCase();
+
+      // Xác định Phase / Bộ hồ sơ theo chữ cái đầu tiên của mã (A -> Bộ A, B -> Bộ B, C -> Bộ C, ...)
+      let phase = 0;
+      if (firstChar === "A") phase = 1;
+      else if (firstChar === "B" || firstChar === "E") phase = 2;
+      else if (firstChar === "C" || firstChar === "D") phase = 3;
+
+      const rawContent: any = doc.content || {};
+      const title =
+        doc.mode === "ly_lich"
+          ? (doc.subject_name ? `Lý lịch: ${doc.subject_name}` : rawContent.fullName ? `Lý lịch: ${rawContent.fullName}` : `Lý lịch #${code}`)
+          : (rawContent.docTitle || (doc.subject_name ? `Lời khai: ${doc.subject_name}` : `Lời khai #${code}`));
+
+      const sortOrder = typeof rawContent.sortOrder === "number" ? rawContent.sortOrder : idx * 10;
+
+      return {
+        type: "pdf",
+        phase,
+        order: sortOrder,
+        data: {
+          id: `dossier-${doc.id}`,
+          code,
+          title,
+          url: "", // Sẽ render qua DiegeticDossierSheet
+          phase,
+          order: sortOrder,
+        },
+      };
+    });
+
+    // 2. Thêm file PDF kiểm thử duy nhất (Phase 0)
+    const testPdfItems: CombinedItem[] = CASE_000_PDFS.map((doc) => ({
+      type: "pdf" as const,
+      data: doc,
+      phase: doc.phase,
+      order: doc.order,
+    }));
+
+    // 3. Vật chứng ảnh từ Sheet hoặc fallback local
+    let photoItems: CombinedItem[] = [];
+    if (sheetEvidences && sheetEvidences.length > 0) {
+      const validRows = sheetEvidences.filter((row: any) => {
+        const c = String(row.code || "").trim();
+        return c && !c.startsWith("avatar_") && c !== "crime_scene";
+      });
+
+      photoItems = validRows
+        .filter((row: any) => {
+          const title = String(row.label || row.title || "").toLowerCase();
+          const cat = String(row.category || "").toUpperCase();
+          return (
+            title.includes("ảnh") ||
+            cat === "FORENSIC" ||
+            cat === "SCENE" ||
+            title.includes("lược") ||
+            title.includes("hoa xoan") ||
+            title.includes("bùa yêu")
+          );
+        })
+        .map((row: any, idx: number): CombinedItem => {
+          const code = String(row.code || "").trim();
+          const title = String(row.label || row.title || `Vật chứng #${code}`).trim();
+          const driveUrl = String(row.drive_url || "").trim();
+          const boStr = String(row["bộ hồ sơ"] || "").toUpperCase();
+
+          let phase = 0;
+          if (boStr === "A" || code.startsWith("A-")) phase = 1;
+          else if (boStr === "B" || code.startsWith("B-") || boStr === "E" || code.startsWith("E-")) phase = 2;
+          else if (boStr === "C" || code.startsWith("C-") || boStr === "D" || code.startsWith("D-")) phase = 3;
+
+          const localFallback = caseId === "case-000"
+            ? CASE_000_EVIDENCE.find(
+                (e) => e.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(e.title.toLowerCase())
+              )
+            : undefined;
+          const imgUrl = driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
+
+          return {
+            type: "evidence",
+            phase,
+            order: idx * 10,
+            data: {
+              id: `sheet-${code}`,
+              caseId,
+              kind: "photo",
+              title,
+              preview: String(row.description || title),
+              evidenceId: code,
+              thumbnail: imgUrl,
+              timestamp: "24/07/2016",
+              recoveredBy: "ĐIỀU TRA VIÊN",
+              integrityStatus: "secured",
+              chainOfCustody: "VERIFIED",
+              phase,
+              order: idx * 10,
+            },
+          };
+        });
+    } else if (caseId === "case-000") {
+      photoItems = CASE_000_EVIDENCE.map((item): CombinedItem => ({
+        type: "evidence",
+        data: item,
+        phase: item.phase,
+        order: item.order,
+      }));
     }
 
-    // Lọc bỏ avatar nhân vật và scene chỉ dùng cho bảng ghim
-    const validRows = sheetEvidences.filter((row: any) => {
-      const c = String(row.code || "").trim();
-      return c && !c.startsWith("avatar_") && c !== "crime_scene";
-    });
-
-    return validRows.map((row: any, idx: number): CombinedItem => {
-      const code = String(row.code || "").trim();
-      const title = String(row.label || row.title || `Vật chứng #${code}`).trim();
-      const driveUrl = String(row.drive_url || "").trim();
-      const cat = String(row.category || "").toUpperCase();
-      const boStr = String(row["bộ hồ sơ"] || "").toUpperCase();
-
-      // Xác định Phase dựa theo nhãn 'Bộ hồ sơ' trên Sheet (A = 1, B = 2, C = 3, D = 3, còn lại mặc định 0)
-      let phase = 0;
-      if (boStr === "A" || code.startsWith("A-")) phase = 1;
-      else if (boStr === "B" || code.startsWith("B-") || boStr === "E" || code.startsWith("E-")) phase = 2;
-      else if (boStr === "C" || code.startsWith("C-") || boStr === "D" || code.startsWith("D-")) phase = 3;
-
-      // Phân loại: Nếu có chứa chữ 'Ảnh' hoặc category = 'FORENSIC' / 'SCENE' -> type 'evidence' (Ảnh)
-      // Nếu có category = 'DOCUMENT' / 'DOSSIER' hoặc tên biên bản/lý lịch/lời khai -> type 'pdf'
-      const isPhoto =
-        title.toLowerCase().includes("ảnh") ||
-        cat === "FORENSIC" ||
-        cat === "SCENE" ||
-        title.toLowerCase().includes("lược") ||
-        title.toLowerCase().includes("hoa xoan") ||
-        title.toLowerCase().includes("bùa yêu");
-
-      if (isPhoto) {
-        // Tìm ảnh fallback local nếu chưa có Drive link
-        const localFallback = caseId === "case-000" ? CASE_000_EVIDENCE.find(
-          (e) => e.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(e.title.toLowerCase())
-        ) : undefined;
-        const imgUrl = driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
-
-        return {
-          type: "evidence",
-          phase,
-          order: idx * 10,
-          data: {
-            id: `sheet-${code}`,
-            caseId,
-            kind: "photo",
-            title,
-            preview: String(row.description || title),
-            evidenceId: code,
-            thumbnail: imgUrl,
-            timestamp: "24/07/2016",
-            recoveredBy: "ĐIỀU TRA VIÊN",
-            integrityStatus: "secured",
-            chainOfCustody: "VERIFIED",
-            phase,
-            order: idx * 10,
-          },
-        };
-      } else {
-        // Tài liệu PDF: Tìm link PDF local tương ứng nếu Sheet chưa gắn link Drive
-        const localDoc = caseId === "case-000" ? CASE_000_PDFS.find(
-          (d) => d.code === code || d.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(d.title.toLowerCase())
-        ) : undefined;
-        const docUrl = driveUrl || localDoc?.url || "/documents/case_000/00_khoi_dau/00_huong_dan_ban_dau.pdf";
-
-        return {
-          type: "pdf",
-          phase,
-          order: idx * 10,
-          data: {
-            id: `sheet-${code}`,
-            code,
-            title,
-            url: docUrl,
-            phase,
-            order: idx * 10,
-          },
-        };
-      }
-    });
-  }, [sheetEvidences, caseId]);
+    return [...testPdfItems, ...dossierItems, ...photoItems];
+  }, [dossierDocs, sheetEvidences, caseId]);
 
   useEffect(() => {
     setStorageItem("play_experience", "web");
@@ -294,20 +313,24 @@ function WebEvidencePageContent() {
     const savedRatio = getStorageItem("web_board_split_ratio");
     if (savedRatio) {
       const parsed = parseFloat(savedRatio);
-      if (!isNaN(parsed) && parsed >= 25 && parsed <= 75) {
+      if (!isNaN(parsed) && parsed >= 30 && parsed <= 65) {
         setBoardWidthPercent(parsed);
       } else {
-        setBoardWidthPercent(60);
+        setBoardWidthPercent(42);
       }
     } else {
-      setBoardWidthPercent(60);
+      setBoardWidthPercent(42);
     }
     const savedDossierWidth = getStorageItem("web_dossier_width");
     if (savedDossierWidth) {
       const parsedW = parseFloat(savedDossierWidth);
-      if (!isNaN(parsedW) && parsedW >= 240 && parsedW <= 500) {
+      if (!isNaN(parsedW) && parsedW >= 240 && parsedW <= 450) {
         setDossierWidth(parsedW);
+      } else {
+        setDossierWidth(320);
       }
+    } else {
+      setDossierWidth(320);
     }
     const savedCollapsed = getStorageItem("web_dossier_collapsed");
     if (savedCollapsed === "true") {
@@ -323,9 +346,9 @@ function WebEvidencePageContent() {
       const windowWidth = window.innerWidth;
       if (windowWidth < 1024) return; // Chỉ áp dụng trên desktop
 
-      // Cho phép tỉ lệ Board co lại từ 25% đến 75% để người dùng tự do thu gọn khung bảng điều tra
+      // Giới hạn tỉ lệ Board từ 30% đến 65% để luôn chừa đủ không gian cho Zone 2 & 3
       const newRatio = (e.clientX / windowWidth) * 100;
-      const clampedRatio = Math.min(Math.max(newRatio, 25), 75);
+      const clampedRatio = Math.min(Math.max(newRatio, 30), 65);
       setBoardWidthPercent(clampedRatio);
     };
 
@@ -352,7 +375,7 @@ function WebEvidencePageContent() {
       // Chiều rộng Zone 2 tính từ mép phải của Zone 1
       const boardWidthPx = (window.innerWidth * boardWidthPercent) / 100;
       const newDossierWidth = e.clientX - boardWidthPx;
-      const clampedDossierWidth = Math.min(Math.max(newDossierWidth, 240), 520);
+      const clampedDossierWidth = Math.min(Math.max(newDossierWidth, 240), 450);
       setDossierWidth(clampedDossierWidth);
     };
 
@@ -527,18 +550,16 @@ function WebEvidencePageContent() {
         </button>
       </div>
 
-      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-center overflow-hidden min-w-0 relative gap-0 lg:gap-2.5">
+      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-2">
         {/* VÙNG 1: BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
         <div
           style={{
-            ["--board-split-width" as any]: isDossierCollapsed
-              ? "100%"
-              : `${boardWidthPercent}%`,
+            width: isDossierCollapsed ? "100%" : `${boardWidthPercent}%`,
           }}
           className={cn(
-            "w-full lg:w-[var(--board-split-width)] h-full shrink-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex flex-col min-h-0 relative transition-[width] duration-150 ease-out",
+            "h-full shrink-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex flex-col min-h-0 relative transition-[width] duration-150 ease-out",
             isDraggingSplit && "transition-none",
-            mobileTab === "board" ? "flex" : "hidden lg:flex"
+            mobileTab === "board" ? "flex w-full" : "hidden lg:flex"
           )}
         >
           {/* TOP RIGHT TOOLBAR: SỔ TAY */}
@@ -574,7 +595,7 @@ function WebEvidencePageContent() {
               setIsDraggingSplit(true);
             }}
             className={cn(
-              "hidden lg:flex w-2.5 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
               isDraggingSplit && "cursor-col-resize",
             )}
             title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Khay hồ sơ"
@@ -590,61 +611,50 @@ function WebEvidencePageContent() {
           </div>
         )}
 
-        {/* VÙNG 2: KHAY PREVIEW THẺ HỒ SƠ & VẬT CHỨNG (MIDDLE PREVIEW CARDS STRIP) */}
+        {/* VÙNG 2: KHAY HỒ SƠ & VẬT CHỨNG (MANILA ARCHIVAL DOSSIER TRAY) */}
         <div
           style={{
-            width:
-              typeof window !== "undefined" && window.innerWidth >= 1024
-                ? `${dossierWidth}px`
-                : undefined,
-            display:
-              typeof window !== "undefined" && window.innerWidth >= 1024 && isDossierCollapsed
-                ? "none"
-                : undefined,
+            width: isDossierCollapsed ? 0 : `${dossierWidth}px`,
           }}
           className={cn(
-            "w-full shrink-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex flex-col h-full min-h-0",
+            "w-full lg:w-auto shrink-0 bg-[#140e0a] border-r border-[#2d1e13] rounded-none overflow-hidden flex flex-col h-full min-h-0",
             isDossierCollapsed && "lg:hidden",
             isViewerExpanded && "hidden xl:flex",
             mobileTab === "dossier" ? "flex" : "hidden lg:flex"
           )}
         >
-          {/* HEADER VÙNG 2: 2 OPTION TÀI LIỆU VÀ ẢNH (CHỈ HIỂN THỊ TRÊN DESKTOP, MOBILE ĐÃ CÓ 3 TABS Ở HEADER TRÊN) */}
-          <div className="hidden lg:flex shrink-0 p-1.5 bg-[#241a12] border-b border-[#3d2c1e] items-center gap-1.5">
+          {/* HEADER VÙNG 2: 2 TABS TÀI LIỆU VÀ ẢNH CHUẨN BIÊN MỤC HỒ SƠ */}
+          <div className="hidden lg:flex shrink-0 p-2 bg-[#1b120c] border-b border-[#2d1e13] items-center gap-1.5">
             <button
               type="button"
-              onClick={() => {
-                setFilterTab("pdf");
-              }}
+              onClick={() => setFilterTab("pdf")}
               className={cn(
-                "flex-1 py-1.5 px-2 font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer rounded flex items-center justify-center gap-1.5",
+                "flex-1 py-1.5 px-3 font-mono text-xs tracking-wider font-bold transition-all cursor-pointer rounded-xs flex items-center justify-center gap-1.5 border",
                 filterTab === "pdf"
-                  ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
-                  : "bg-[#18110b] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#2d2015] border border-[#3d2c1e]"
+                  ? "bg-[#2c1d12] text-[#e8a86a] border-[#e8a86a]/60 shadow-[inset_0_1px_0_rgba(232,168,106,0.3)] font-extrabold"
+                  : "bg-[#140e0a] text-[#8e7663] hover:text-[#d4c3b3] hover:bg-[#1f1610] border-[#291b12]"
               )}
             >
               <FileText className="size-3.5" />
-              <span>TÀI LIỆU</span>
+              <span>HỒ SƠ TÀI LIỆU</span>
             </button>
             <button
               type="button"
-              onClick={() => {
-                setFilterTab("evidence");
-              }}
+              onClick={() => setFilterTab("evidence")}
               className={cn(
-                "flex-1 py-1.5 px-2 font-mono text-xs sm:text-sm font-bold transition-all cursor-pointer rounded flex items-center justify-center gap-1.5",
+                "flex-1 py-1.5 px-3 font-mono text-xs tracking-wider font-bold transition-all cursor-pointer rounded-xs flex items-center justify-center gap-1.5 border",
                 filterTab === "evidence"
-                  ? "bg-[#d9a066] text-[#1a0f07] shadow-sm font-extrabold"
-                  : "bg-[#18110b] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#2d2015] border border-[#3d2c1e]"
+                  ? "bg-[#2c1d12] text-[#e8a86a] border-[#e8a86a]/60 shadow-[inset_0_1px_0_rgba(232,168,106,0.3)] font-extrabold"
+                  : "bg-[#140e0a] text-[#8e7663] hover:text-[#d4c3b3] hover:bg-[#1f1610] border-[#291b12]"
               )}
             >
               <ImageIcon className="size-3.5" />
-              <span>ẢNH</span>
+              <span>VẬT CHỨNG</span>
             </button>
           </div>
 
-          {/* PHASE FILTER CHIPS */}
-          <div className="shrink-0 px-2.5 py-2 border-b border-[#3d2c1e]/60 bg-[#1a1410] flex items-center gap-1.5 overflow-x-auto font-mono custom-scrollbar">
+          {/* PHASE FILTER TABS: TAB CHỈ MỤC NGĂN KÉO LƯU TRỮ */}
+          <div className="shrink-0 px-2 py-1.5 border-b border-[#291b12] bg-[#120c08] flex items-center gap-1 overflow-x-auto font-mono custom-scrollbar">
             {[
               { label: "TẤT CẢ", val: "all" as const },
               { label: "BAN ĐẦU", val: 0 },
@@ -661,12 +671,12 @@ function WebEvidencePageContent() {
                   disabled={isLocked}
                   onClick={() => setSelectedPhaseFilter(p.val)}
                   className={cn(
-                    "px-2.5 py-1 sm:px-3 sm:py-1 rounded-sm transition-all whitespace-nowrap text-xs sm:text-[0.82rem] font-bold min-h-[28px] flex items-center justify-center",
+                    "px-2.5 py-1 rounded-xs transition-all whitespace-nowrap text-[0.72rem] tracking-wide font-bold min-h-[26px] flex items-center justify-center border",
                     isLocked
-                      ? "opacity-35 cursor-not-allowed text-[#6b5847] border border-[#2d2015]"
+                      ? "opacity-30 cursor-not-allowed text-[#5a483a] border-transparent"
                       : isSelected
-                        ? "bg-[#d9a066] text-[#1a0f07] font-extrabold shadow-xs"
-                        : "bg-[#241a12] text-[#ad9885] hover:text-[#e6d3c1] hover:bg-[#342417] border border-[#3e2b1c] cursor-pointer",
+                        ? "bg-[#d9a066] text-[#140e0a] border-[#d9a066] font-black shadow-xs"
+                        : "bg-[#1a120c] text-[#9b8572] hover:text-[#f0e4d7] hover:bg-[#251a12] border-[#2d1e14] cursor-pointer",
                   )}
                 >
                   {p.label}
@@ -675,16 +685,16 @@ function WebEvidencePageContent() {
             })}
           </div>
 
-          {/* DANH SÁCH PREVIEW THẺ CARD */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 bg-[#120d09]">
+          {/* DANH SÁCH THẺ HỒ SƠ LƯU TRỮ (MANILA ARCHIVAL DOSSIER FOLDERS) */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 bg-[#0e0906] p-2 space-y-2">
             {filterTab === "evidence" ? (
-              /* NẾU LÀ VẬT CHỨNG: HIỂN THỊ DẠNG LƯỚI GRID GỌN GÀNG (2 CỘT) */
+              /* NẾU LÀ VẬT CHỨNG: HIỂN THỊ DẠNG GRID */
               evidenceItems.length === 0 ? (
-                <div className="p-4 text-center text-xs font-mono text-[#8c735d]">
-                  Không có vật chứng nào.
+                <div className="p-6 text-center text-xs font-mono text-[#78614e]">
+                  Chưa thu thập vật chứng nào.
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2 p-2">
+                <div className="grid grid-cols-2 gap-2">
                   {evidenceItems.map((item) => {
                     const isSelected =
                       selectedView.type === item.type &&
@@ -696,24 +706,24 @@ function WebEvidencePageContent() {
                         key={`evidence-${item.data.id}`}
                         onClick={() => handleSelectEvidence(evItem)}
                         className={cn(
-                          "w-full aspect-[4/3] text-left rounded-none border transition-all cursor-pointer relative overflow-hidden group shadow-sm bg-[#0c0805] active:scale-[0.98]",
+                          "w-full aspect-[4/3] text-left border transition-all cursor-pointer relative overflow-hidden group shadow-md bg-[#0a0705] active:scale-[0.98]",
                           isSelected
-                            ? "lg:border-[#d9a066] lg:shadow-[0_0_12px_rgba(217,160,102,0.3)] border-[#2a1d13]"
-                            : "border-[#2a1d13] hover:border-[#4a3423]",
+                            ? "border-[#d9a066] shadow-[0_0_15px_rgba(217,160,102,0.35)] ring-1 ring-[#d9a066]"
+                            : "border-[#2d1e13] hover:border-[#4d3422]",
                         )}
                       >
                         <img
                           src={normalizeImageUrl(evItem?.thumbnail) || "/photo_scene_overview.jpg"}
                           alt="Vật chứng"
-                          className="w-full h-full object-cover select-none transition-transform duration-200 group-hover:scale-105 rounded-none"
+                          className="w-full h-full object-cover select-none transition-transform duration-200 group-hover:scale-105"
                         />
                         {evItem?.evidenceId && (
-                          <div className="absolute bottom-1 left-1 px-2 py-0.5 rounded-none bg-black/80 text-[0.68rem] sm:text-xs font-mono font-bold tracking-wider text-[#e5d8cb]">
+                          <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/85 text-[0.65rem] font-mono font-bold tracking-wider text-[#e5d8cb] border border-white/10">
                             {evItem.evidenceId}
                           </div>
                         )}
                         {isSelected && (
-                          <div className="hidden lg:block absolute inset-0 border-2 border-[#d9a066] pointer-events-none rounded-none" />
+                          <div className="absolute inset-0 border-2 border-[#d9a066] pointer-events-none" />
                         )}
                       </button>
                     );
@@ -721,102 +731,111 @@ function WebEvidencePageContent() {
                 </div>
               )
             ) : (
-              /* NẾU LÀ HỒ SƠ PDF: DANH SÁCH TỜ GIẤY XẾP CHỒNG (STACKED SHEETS) */
+              /* NẾU LÀ HỒ SƠ: THẺ BÌA MANILA CỔ ĐIỂN VỚI TAB GÁY VÀ VẠCH CHỈ THỊ */
               pdfItems.length === 0 ? (
-                <div className="p-6 text-center text-xs font-mono text-[#8c735d]">
-                  Không có hồ sơ nào trong mục này.
+                <div className="p-8 text-center text-xs font-mono text-[#78614e]">
+                  Không tìm thấy tài liệu trong danh mục này.
                 </div>
               ) : (
-                <div className="p-2 sm:p-2.5 pb-8 flex flex-col">
-                  {pdfItems.map((item, index) => {
-                    const isSelected =
-                      selectedView.type === item.type &&
-                      selectedView.data.id === item.data.id;
-                    const prevIsSelected =
-                      index > 0 &&
-                      selectedView.type === pdfItems[index - 1].type &&
-                      selectedView.data.id === pdfItems[index - 1].data.id;
-                    const pdfDoc = item.data as PDFDocument;
+                pdfItems.map((item) => {
+                  const isSelected =
+                    selectedView.type === item.type &&
+                    selectedView.data.id === item.data.id;
+                  const pdfDoc = item.data as PDFDocument;
+                  const code = pdfDoc?.code || "DOC";
+                  const title = item.data.title || "";
+                  const titleLower = title.toLowerCase();
 
-                    return (
-                      <div
-                        key={`pdf-${item.data.id}`}
-                        style={{
-                          zIndex: isSelected ? 30 : index + 1,
-                        }}
-                        className={cn(
-                          "relative transition-all duration-200 ease-out",
-                          !isSelected && index > 0 && !prevIsSelected && "-mt-2 sm:-mt-2.5",
-                          isSelected && "my-2 sm:my-2.5",
-                        )}
-                      >
-                        <div
-                          onClick={() => {
-                            setSelectedView({ type: "pdf", data: pdfDoc });
-                            if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                              setActiveModal("mobile_pdf");
-                            }
-                          }}
+                  // Nhận diện kiểu văn bản để gắn nhãn phân loại (Type badge & Accent bar)
+                  const isLyLich = titleLower.includes("lý lịch") || titleLower.includes("nhân thân");
+                  const isLoiKhai = titleLower.includes("lời khai") || titleLower.includes("hỏi cung") || titleLower.includes("tự thú");
+                  const isHuongDan = code === "00-HD" || titleLower.includes("hướng dẫn");
+
+                  const badgeText = isLyLich
+                    ? "LÝ LỊCH"
+                    : isLoiKhai
+                    ? "HỎI CUNG"
+                    : isHuongDan
+                    ? "CHỈ DẪN"
+                    : "HỒ SƠ";
+
+                  const badgeColor = isLyLich
+                    ? "text-[#f87171] border-[#7f1d1d] bg-[#450a0a]/40"
+                    : isLoiKhai
+                    ? "text-[#60a5fa] border-[#1e3a8a] bg-[#172554]/40"
+                    : isHuongDan
+                    ? "text-[#34d399] border-[#065f46] bg-[#022c22]/40"
+                    : "text-[#d9a066] border-[#78350f] bg-[#451a03]/40";
+
+                  const accentBorder = isSelected
+                    ? "border-l-4 border-l-[#d9a066]"
+                    : isLyLich
+                    ? "border-l-2 border-l-[#ef4444]/60"
+                    : isLoiKhai
+                    ? "border-l-2 border-l-[#3b82f6]/60"
+                    : "border-l-2 border-l-[#78350f]/60";
+
+                  return (
+                    <div
+                      key={`pdf-${item.data.id}`}
+                      onClick={() => {
+                        setSelectedView({ type: "pdf", data: pdfDoc });
+                        if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                          setActiveModal("mobile_pdf");
+                        }
+                      }}
+                      className={cn(
+                        "w-full text-left transition-all duration-150 cursor-pointer overflow-hidden group select-none relative p-3 rounded-xs border shadow-sm",
+                        accentBorder,
+                        isSelected
+                          ? "bg-[#25180f] border-[#d9a066] shadow-[0_4px_16px_rgba(0,0,0,0.8)] ring-1 ring-[#d9a066]/30"
+                          : "bg-[#18110b] hover:bg-[#1f150e] border-[#2d1e13] hover:border-[#4d3422]"
+                      )}
+                    >
+                      {/* DÒNG 1: MÃ HỒ SƠ + BADGE PHÂN LOẠI */}
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <span
                           className={cn(
-                            "w-full text-left transition-all duration-200 cursor-pointer overflow-hidden group select-none relative",
+                            "font-mono text-xs font-black tracking-wider transition-colors",
                             isSelected
-                              ? "bg-[#25180e] border-2 border-[#d9a066] rounded-lg p-3 sm:p-3.5 shadow-[0_8px_25px_rgba(0,0,0,0.85)] ring-1 ring-[#d9a066]/40"
-                              : "bg-[#1c130c] hover:bg-[#23180f] border-t-2 border-x border-b border-[#3e2b1c] hover:border-[#63442c] rounded-t-lg rounded-b-sm px-3 py-2.5 shadow-[0_-3px_8px_rgba(0,0,0,0.6)] active:bg-[#261910] min-h-[50px]"
+                              ? "text-[#d9a066]"
+                              : "text-[#c29668] group-hover:text-[#e8b988]"
                           )}
                         >
-                          {/* ACTIVE ACCENT BAR */}
-                          {isSelected && (
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
+                          {code}
+                        </span>
+
+                        <span
+                          className={cn(
+                            "font-mono text-[0.62rem] font-bold px-1.5 py-0.5 rounded-2xs border tracking-wider",
+                            badgeColor
                           )}
-
-                          {/* DẢI TIÊU ĐỀ LỘ RA TRÊN XẤP GIẤY */}
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2 min-w-0 flex-1">
-                              <Paperclip
-                                className={cn(
-                                  "size-3.5 -rotate-45 shrink-0 transition-colors",
-                                  isSelected
-                                    ? "text-[#d9a066]"
-                                    : "text-[#8a7057] group-hover:text-[#d9a066]"
-                                )}
-                              />
-                              <span
-                                className={cn(
-                                  "font-mono text-xs font-bold tracking-wider shrink-0 transition-colors",
-                                  isSelected
-                                    ? "text-[#d9a066]"
-                                    : "text-[#d9a066]/85 group-hover:text-[#d9a066]"
-                                )}
-                              >
-                                {pdfDoc?.code || "DOC"}
-                              </span>
-
-                              {/* TIÊU ĐỀ KHI ĐANG XẾP CHỒNG */}
-                              {!isSelected && (
-                                <span className="font-bold text-xs sm:text-[0.84rem] text-[#ded0be] group-hover:text-[#ffffff] truncate">
-                                  {item.data.title}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* TIÊU ĐỀ ĐẦY ĐỦ KHI TỜ GIẤY BUNG MỞ RỘNG (EXPANDED) */}
-                          {isSelected && (
-                            <div className="mt-2.5 pt-2 border-t border-dashed border-[#443020]">
-                              <p className="font-bold text-sm sm:text-[0.92rem] text-[#fef5ec] leading-snug">
-                                {item.data.title}
-                              </p>
-                              {/* Hướng dẫn chạm trên mobile */}
-                              <p className="block lg:hidden mt-2 text-[0.68rem] font-mono text-[#d9a066] text-right font-medium">
-                                Chạm để mở toàn màn hình ❯
-                              </p>
-                            </div>
-                          )}
-                        </div>
+                        >
+                          {badgeText}
+                        </span>
                       </div>
-                    );
-                  })}
-                </div>
+
+                      {/* DÒNG 2: TIÊU ĐỀ TÀI LIỆU */}
+                      <p
+                        className={cn(
+                          "font-normal text-xs sm:text-[0.82rem] leading-snug line-clamp-2 transition-colors",
+                          isSelected
+                            ? "text-[#fef5ec] font-medium"
+                            : "text-[#c2b29f] group-hover:text-[#ffffff]"
+                        )}
+                      >
+                        {title}
+                      </p>
+
+                      {/* Hướng dẫn trên mobile khi mở */}
+                      {isSelected && (
+                        <p className="block lg:hidden mt-2 text-[0.65rem] font-mono text-[#d9a066] text-right font-medium">
+                          Chạm để mở toàn màn hình ❯
+                        </p>
+                      )}
+                    </div>
+                  );
+                })
               )
             )}
           </div>
@@ -830,7 +849,7 @@ function WebEvidencePageContent() {
               setIsDraggingDossierSplit(true);
             }}
             className={cn(
-              "hidden lg:flex w-2.5 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
               isDraggingDossierSplit && "cursor-col-resize",
             )}
             title="Kéo để điều chỉnh độ rộng Khay tài liệu vs. Trình đọc"
@@ -852,31 +871,11 @@ function WebEvidencePageContent() {
             display: isDossierCollapsed ? "none" : undefined,
           }}
           className={cn(
-            "hidden lg:flex flex-1 min-w-0 h-full flex-col min-h-0 overflow-hidden relative",
+            "hidden lg:flex flex-1 min-w-[300px] h-full flex-col min-h-0 overflow-hidden relative",
             isDossierCollapsed && "lg:hidden",
           )}
         >
-          {/* HEADER TOOLBAR VÙNG 3 */}
-          <div className="hidden lg:flex absolute top-3 right-3 z-40 items-center gap-1.5 pointer-events-auto">
-            <button
-              onClick={() => setIsViewerExpanded((prev) => !prev)}
-              className="p-1.5 px-2 bg-[#1b140e]/90 hover:bg-[#322014] text-[#ad9885] hover:text-[#fef5ec] rounded border border-[#4a3625] transition-colors cursor-pointer flex items-center gap-1 font-mono text-[0.6rem] shadow-md backdrop-blur-sm"
-              title={isViewerExpanded ? "Thu nhỏ về 3 vùng" : "Phóng to toàn khung phải"}
-            >
-              {isViewerExpanded ? (
-                <>
-                  <Minimize2 className="size-3 text-[#d9a066]" />
-                  <span>CHUẨN</span>
-                </>
-              ) : (
-                <>
-                  <Maximize2 className="size-3 text-[#d9a066]" />
-                  <span>MỞ RỘNG</span>
-                </>
-              )}
-            </button>
-          </div>
-
+          {/* EVIDENCE DETAIL INSPECTOR */}
           <EvidenceDetailInspector selectedView={selectedView} caseId={caseId} />
         </div>
       </div>
