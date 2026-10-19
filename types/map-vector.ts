@@ -89,6 +89,8 @@ export interface PoiFeature {
   clueNotes?: string
   iconColor?: string
   badgeNumber?: number
+  caseId?: string // Thuộc vụ án cụ thể (vd: 'case_000') hoặc để trống/undefined nếu là địa điểm công cộng dùng chung
+  caseIds?: string[] // Danh sách các vụ án liên quan
   zIndex: number
 }
 

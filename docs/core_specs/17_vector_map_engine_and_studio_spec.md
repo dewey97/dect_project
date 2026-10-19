@@ -107,17 +107,18 @@ Map Studio cung cấp môi trường làm việc trực quan cho tác giả vụ
 ## 🔌 6. API Contracts
 
 ### 6.1. `GET /api/admin/map-vector`
-Lấy dữ liệu vector bản đồ của vụ án.
-- **Query Params**: `caseId` (string, mặc định `case_000`).
+Lấy dữ liệu vector bản đồ thế giới mở rộng dùng chung.
+- **Query Params**: `caseId` (tùy chọn; dùng để lọc hoặc highlight POI theo vụ án cụ thể).
+- **Kho dữ liệu chuẩn**: `data/maps/world_vector_map.json` (tự động fallback sang `case_000_vector.json` để tương thích dữ liệu cũ).
 - **Response**:
 ```json
 {
   "success": true,
   "data": {
-    "version": "2.0.0",
-    "caseId": "case_000",
-    "canvasWidth": 2800,
-    "canvasHeight": 2000,
+    "version": "3.0.0-osm-realworld-gps",
+    "caseId": "world_map",
+    "canvasWidth": 3600,
+    "canvasHeight": 2800,
     "water": [...],
     "zones": [...],
     "roads": [...],
@@ -130,11 +131,10 @@ Lấy dữ liệu vector bản đồ của vụ án.
 ```
 
 ### 6.2. `POST /api/admin/map-vector`
-Lưu dữ liệu vector bản đồ từ Map Studio vào file hệ thống / database.
+Lưu dữ liệu vector bản đồ từ Map Studio vào kho bản đồ thế giới duy nhất.
 - **Payload**:
 ```json
 {
-  "caseId": "case_000",
   "mapData": { ... }
 }
 ```
@@ -142,15 +142,25 @@ Lưu dữ liệu vector bản đồ từ Map Studio vào file hệ thống / dat
 ```json
 {
   "success": true,
-  "message": "Map vector data saved successfully",
-  "updatedAt": "2026-10-18T07:30:00.000Z"
+  "message": "Unified world map vector data saved successfully",
+  "updatedAt": "2026-10-19T07:30:00.000Z"
 }
 ```
 
 ---
 
-## 📜 7. Quy Trình Trích Xuất & Seed Dữ Liệu Tự Động
+## 🌐 7. Kiến Trúc Bản Đồ Thế Giới Dùng Chung Duy Nhất (Single Unified World Map Rule)
 
-Dự án trang bị 2 công cụ chuyên dụng:
-1. `scripts/scan_figma_map_vector.py`: Sử dụng thư viện `scikit-image` và `PIL` để quét ảnh bản đồ gốc $1237 \times 866$, tách mask màu vùng nước `#92D9E9`, trích xuất contour đa giác và nhân tỉ lệ $2\times$ lên canvas $2474 \times 1732$.
-2. `scripts/seed-figma-vector-map.js`: Dựng bộ dữ liệu hoàn chỉnh 26 mốc án mạng, các cây cầu vượt Sông Hồng (Vĩnh Tuy, Long Biên, Chương Dương, Nhật Tân) và ghi trực tiếp vào `data/maps/case_000_vector.json`.
+> [!IMPORTANT]
+> **Nguyên tắc cốt lõi**: Dự án chỉ sử dụng **1 Bản đồ Thế giới Duy nhất (`data/maps/world_vector_map.json`)** cho toàn bộ các vụ án hiện tại và tương lai. Không tạo các file bản đồ địa hình rời rạc theo từng vụ án. Địa giới thế giới sẽ liên tục được mở rộng ra các phân khu mới.
+
+### Quy tắc phân định Hạ Tầng vs Manh Mối Vụ Án:
+1. **Hạ tầng địa lý chung (100% Shared Geography)**:
+   - Sông hồ (`water`), đường cao tốc, đại lộ, hẻm phố (`roads`), cầu cống, đường sắt (`railways`) và phân khu đô thị (`zones`) là tài sản chung toàn cầu.
+   - Khi Game Master (GM) thiết kế vụ án mới (Case #001, #002...), GM chỉ vẽ mở rộng thêm các nhánh đường hoặc mở thêm phân khu mới trên cùng một bản đồ thế giới.
+2. **Quản lý POI & Tang vật theo Vụ án (`caseId` / `caseIds`)**:
+   - Mỗi địa điểm (`PoiFeature`) có thể thuộc về một vụ án cụ thể (`caseId: 'case_000'`) hoặc mở cho nhiều vụ án (`caseIds: ['case_000', 'case_001']`), hoặc là địa điểm dân sự công cộng (bến xe, bệnh viện, nhà ga) dùng chung vĩnh viễn (`caseId: undefined`).
+   - Ứng dụng điện thoại (`MapsApp`) trên thiết bị của từng vụ án sẽ hiển thị toàn cảnh thế giới và kích hoạt các manh mối phù hợp theo tiến trình điều tra.
+3. **Tuyệt đối không dùng Mock / Hardcode Fallback**:
+   - Ứng dụng nạp trực tiếp qua API `/api/admin/map-vector`. Không duy trì mảng `DEFAULT_CASE_LOCATIONS` hay seed tĩnh trong mã nguồn client.
+

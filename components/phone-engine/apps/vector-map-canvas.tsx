@@ -251,17 +251,7 @@ export function VectorMapCanvas({
               </text>
             ))}
           </svg>
-        ) : (
-          <img
-            src="/images/cases/case_000/map/hanoi_master_map.png"
-            alt="Bản đồ Hà Nội Master"
-            className={cn(
-              'absolute inset-0 w-full h-full object-cover select-none pointer-events-none transition-[filter] duration-300',
-              mapLayer === 'satellite' ? 'brightness-75 contrast-125 saturate-50' : 'brightness-100'
-            )}
-            draggable={false}
-          />
-        )}
+        ) : null}
 
         {/* =================================================================== */}
         {/* 2. DYNAMIC INTERACTIVE OVERLAY CANVAS                               */}

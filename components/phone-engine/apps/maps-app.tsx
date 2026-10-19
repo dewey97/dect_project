@@ -21,7 +21,7 @@ import {
 } from '@/lib/case-locations-data'
 import { calculateVectorRoute, METERS_PER_PIXEL } from '@/lib/map-routing-engine'
 import type { MapVectorData } from '@/types/map-vector'
-import { transformPoiToCaseLocation, getDefaultMapVectorData } from '@/lib/map-vector-utils'
+import { transformPoiToCaseLocation } from '@/lib/map-vector-utils'
 import { VectorMapCanvas } from './vector-map-canvas'
 
 interface MapsAppProps {
@@ -29,22 +29,23 @@ interface MapsAppProps {
 }
 
 export function MapsApp({ onBackToHome }: MapsAppProps) {
-  // Custom Map Studio Vector Data Integration (Khởi tạo với vector map data chuẩn của vụ án, tự động hydrate từ Database)
-  const [customMapVector, setCustomMapVector] = useState<MapVectorData | null>(() =>
-    getDefaultMapVectorData('case_000')
-  )
+  // Custom Map Studio Vector Data Integration (Nạp 100% từ Database/API, không dùng seed hardcode)
+  const [customMapVector, setCustomMapVector] = useState<MapVectorData | null>(null)
+  const [isLoadingMap, setIsLoadingMap] = useState<boolean>(true)
 
   useEffect(() => {
     let isMounted = true
     async function loadCustomMap() {
       try {
-        const res = await fetch('/api/admin/map-vector?caseId=case_000')
+        const res = await fetch('/api/admin/map-vector')
         const json = await res.json()
         if (json.success && json.data && isMounted) {
           setCustomMapVector(json.data)
         }
       } catch (err) {
         console.warn('Could not fetch custom map vector:', err)
+      } finally {
+        if (isMounted) setIsLoadingMap(false)
       }
     }
     loadCustomMap()

@@ -202,3 +202,17 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
     1. Thỏa mãn đầy đủ tất cả manh mối bắt buộc (`targetCodes`).
     2. **Tuyệt đối không chọn dư mã sai**: Mọi manh mối đã chọn BẮT BUỘC phải thuộc tập hợp hợp lệ `[...targetCodes, ...optionalCodes]`.
   - Ngăn chặn hoàn toàn hành vi spam chọn tất cả thẻ vật chứng để vượt qua câu hỏi.
+
+---
+
+## 🗺️ 14. Quy Chuẩn Bản Đồ Thế Giới Mở Rộng Dùng Chung Duy Nhất (Single Unified World Map Rule)
+
+- **Một Bản Đồ Thế Giới Duy Nhất (`data/maps/world_vector_map.json`)**:
+  - Toàn bộ các vụ án (Case #000, #001, #002...) diễn ra trên cùng một thế giới mở rộng liên tục.
+  - Tuyệt đối **CẤM** tạo các file bản đồ vector địa lý rời rạc theo từng vụ án. Toàn bộ sông hồ (`water`), đường giao thông (`roads`), cầu cống, đường ray (`railways`), và phân khu (`zones`) là hạ tầng dùng chung 100%.
+  - Khi có vụ án mới, Game Master (GM) sử dụng Map Studio (`/admin/map-studio`) để vẽ mở rộng thêm các cung đường hoặc mở thêm phân khu mới trên bản đồ thế giới này.
+- **Phân định Manh mối POI theo Vụ án**:
+  - Các địa điểm điều tra (`PoiFeature`) được gắn cờ `caseId` hoặc `caseIds` để xác định manh mối tương ứng của từng vụ án. Địa điểm công cộng dân sự (bến bãi, bệnh viện, nhà ga) không gắn `caseId` và hiển thị chung cho toàn thế giới.
+- **Không nhồi nhét Mock / Seed Fallback tĩnh**:
+  - Ứng dụng điện thoại (`MapsApp`) và Studio nạp trực tiếp qua API `/api/admin/map-vector`. Tuyệt đối không nhúng mảng địa điểm tĩnh `DEFAULT_CASE_LOCATIONS` hoặc fallback ảnh raster vào client-side code.
+

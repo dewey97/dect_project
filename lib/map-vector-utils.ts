@@ -196,11 +196,6 @@ export function getEmptyMapVectorData(caseId = 'case_000'): MapVectorData {
   }
 }
 
-/**
- * Initial rich default seed for Case 000 (Re-exported from presets)
- */
-export { getDefaultMapVectorData } from '@/lib/presets/default-map-vector-seed'
-
 import { canvasXYToLatLng } from '@/lib/map-routing-engine'
 
 /**

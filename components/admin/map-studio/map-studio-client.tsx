@@ -168,7 +168,7 @@ export function MapStudioClient() {
     let isMounted = true
     async function loadData() {
       try {
-        const res = await fetch('/api/admin/map-vector?caseId=case_000')
+        const res = await fetch('/api/admin/map-vector')
         const json = await res.json()
         if (json.success && json.data && isMounted) {
           setMapData(json.data)
