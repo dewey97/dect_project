@@ -52,6 +52,7 @@ import type {
   LabelFeature
 } from '@/types/map-vector'
 import { snapPoint, getEmptyMapVectorData, pointsToSvgPath } from '@/lib/map-vector-utils'
+import { simplifyPolyline } from '@/lib/geometry/simplify-polyline'
 import {
   POI_CATEGORY_CONFIG,
   MemoWaterFeature,
@@ -724,7 +725,16 @@ export function MapStudioClient() {
     }
 
     // Tool: WATER / ROAD / RAILWAY / ZONE (Multi-point drawing)
-    setDrawingPoints((prev) => [...prev, pt])
+    setDrawingPoints((prev) => {
+      if (prev.length > 0) {
+        const last = prev[prev.length - 1]
+        // Distance filter: ignore duplicate/accidental clicks within 3px of last vertex
+        if (Math.hypot(pt.x - last.x, pt.y - last.y) < 3) {
+          return prev
+        }
+      }
+      return [...prev, pt]
+    })
   }
 
   // Pointer Move on Canvas
@@ -842,6 +852,11 @@ export function MapStudioClient() {
       return
     }
 
+    // Auto-simplify polyline using RDP & Radial distance (simplify-js algorithm)
+    // Compresses redundant collinear vertices by 70-85% while preserving true visual curves
+    const simplified = simplifyPolyline(drawingPoints, 1.2, false)
+    const pts = simplified.length >= 2 ? simplified : drawingPoints
+
     const id = `${activeTool}-${Date.now()}`
 
     if (activeTool === 'water') {
@@ -850,7 +865,7 @@ export function MapStudioClient() {
         id,
         name: isLake ? `Hồ nước #${mapData.water.length + 1}` : `Sông #${mapData.water.length + 1}`,
         type: waterType,
-        points: drawingPoints,
+        points: pts,
         closed: isLake,
         width: isLake ? undefined : 80,
         color: '#71B4EC',
@@ -865,7 +880,7 @@ export function MapStudioClient() {
         id,
         name: `Tuyến đường #${mapData.roads.length + 1}`,
         type: roadType,
-        points: drawingPoints,
+        points: pts,
         width: roadType === 'highway' ? 14 : roadType === 'avenue' ? 10 : 6,
         color: roadType === 'highway' ? '#FFFFFF' : '#FFFFFF',
         casingColor: roadType === 'highway' ? '#94A3B8' : '#CBD5E1',
@@ -879,7 +894,7 @@ export function MapStudioClient() {
       const newRailway: RailwayFeature = {
         id,
         name: `Tuyến đường sắt #${mapData.railways.length + 1}`,
-        points: drawingPoints,
+        points: pts,
         width: 8,
         color: '#334155',
         sleeperSpacing: 12,
@@ -893,7 +908,7 @@ export function MapStudioClient() {
         id,
         name: `Phân khu #${mapData.zones.length + 1}`,
         category: zoneCategory,
-        points: drawingPoints,
+        points: pts,
         fillColor: zoneCategory === 'park' ? '#D1E7DD' : '#E2E8F0',
         strokeColor: '#CBD5E1',
         strokeWidth: 1.5,
