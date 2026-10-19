@@ -57,6 +57,8 @@ import {
   POI_CATEGORY_CONFIG,
   MemoWaterFeature,
   MemoRoadFeature,
+  RoadCasingItem,
+  RoadSurfaceItem,
   MemoRailwayFeature,
   MemoZoneFeature,
   MemoPoiFeature,
@@ -1391,13 +1393,12 @@ export function MapStudioClient() {
                   )
                 }
                 if (type === 'road') {
+                  // Pass 1: Render casing border under the surface
                   return (
-                    <MemoRoadFeature
-                      key={item.id}
+                    <RoadCasingItem
+                      key={`casing-${item.id}`}
                       feature={item}
                       isSelected={isSelected}
-                      onSelect={handleSelectFeature}
-                      onStartDrag={handleFeatureMouseDown}
                     />
                   )
                 }
@@ -1437,6 +1438,20 @@ export function MapStudioClient() {
                 }
                 return null
               })}
+
+              {/* PASS 2 FOR ROADS: All white surfaces rendered ON TOP of all casings */}
+              {/* This completely eliminates cutting lines at any crossroads / T-junctions */}
+              {allFeaturesSorted
+                .filter(({ type, item }) => type === 'road' && !hiddenFeatureIds[item.id] && isFeatureInView(item.id))
+                .map(({ item }) => (
+                  <RoadSurfaceItem
+                    key={`surface-${item.id}`}
+                    feature={item}
+                    isSelected={selectedFeatureId === item.id}
+                    onSelect={handleSelectFeature}
+                    onStartDrag={handleFeatureMouseDown}
+                  />
+                ))}
             </g>
 
             {/* ================================================================= */}

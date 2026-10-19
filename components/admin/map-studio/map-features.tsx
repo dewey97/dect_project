@@ -108,16 +108,12 @@ export const MemoZoneFeature = React.memo(function ZoneFeatureItem({
   )
 })
 
-export const MemoRoadFeature = React.memo(function RoadFeatureItem({
+export const RoadCasingItem = React.memo(function RoadCasingItem({
   feature,
-  isSelected,
-  onSelect,
-  onStartDrag
+  isSelected
 }: {
   feature: RoadFeature
   isSelected: boolean
-  onSelect: (id: string) => void
-  onStartDrag?: (e: React.MouseEvent, id: string) => void
 }) {
   const d = useMemo(
     () => pointsToSvgPath(feature.points, false, feature.smooth),
@@ -125,14 +121,7 @@ export const MemoRoadFeature = React.memo(function RoadFeatureItem({
   )
 
   return (
-    <g
-      onMouseDown={(e) => onStartDrag?.(e, feature.id)}
-      onClick={(e) => {
-        e.stopPropagation()
-        onSelect(feature.id)
-      }}
-      className={cn('cursor-pointer', isSelected && 'cursor-move')}
-    >
+    <g>
       {/* Bridge Drop Shadow */}
       {feature.isBridge && (
         <path
@@ -154,15 +143,64 @@ export const MemoRoadFeature = React.memo(function RoadFeatureItem({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Road Center Surface (Mặt đường trung tâm hàn phẳng các ngã rẽ) */}
-      <path
-        d={d}
-        fill="none"
-        stroke={feature.color || '#FFFFFF'}
-        strokeWidth={feature.width}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeDasharray={feature.dashed ? '8 6' : undefined}
+    </g>
+  )
+})
+
+export const RoadSurfaceItem = React.memo(function RoadSurfaceItem({
+  feature,
+  isSelected,
+  onSelect,
+  onStartDrag
+}: {
+  feature: RoadFeature
+  isSelected: boolean
+  onSelect: (id: string) => void
+  onStartDrag?: (e: React.MouseEvent, id: string) => void
+}) {
+  const d = useMemo(
+    () => pointsToSvgPath(feature.points, false, feature.smooth),
+    [feature.points, feature.smooth]
+  )
+
+  return (
+    <path
+      d={d}
+      fill="none"
+      stroke={feature.color || '#FFFFFF'}
+      strokeWidth={feature.width}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeDasharray={feature.dashed ? '8 6' : undefined}
+      onMouseDown={(e) => onStartDrag?.(e, feature.id)}
+      onClick={(e) => {
+        e.stopPropagation()
+        onSelect(feature.id)
+      }}
+      className={cn('cursor-pointer', isSelected && 'cursor-move')}
+    />
+  )
+})
+
+export const MemoRoadFeature = React.memo(function RoadFeatureItem({
+  feature,
+  isSelected,
+  onSelect,
+  onStartDrag
+}: {
+  feature: RoadFeature
+  isSelected: boolean
+  onSelect: (id: string) => void
+  onStartDrag?: (e: React.MouseEvent, id: string) => void
+}) {
+  return (
+    <g>
+      <RoadCasingItem feature={feature} isSelected={isSelected} />
+      <RoadSurfaceItem
+        feature={feature}
+        isSelected={isSelected}
+        onSelect={onSelect}
+        onStartDrag={onStartDrag}
       />
     </g>
   )
