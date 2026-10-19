@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Users, X, Copy, Check, LogOut, ArrowRight, Sparkles, QrCode } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { useRoomSync } from '@/components/investigation/room-sync-context'
 
 interface RoomModalProps {
@@ -11,16 +12,31 @@ interface RoomModalProps {
 }
 
 export function RoomModal({ isOpen, onClose }: RoomModalProps) {
-  const { roomCode, nickname, isConnected, isConnecting, joinRoom, leaveRoom, setNickname } = useRoomSync()
+  const {
+    roomCode,
+    nickname,
+    isConnected,
+    isConnecting,
+    joinRoom,
+    leaveRoom,
+    setNickname,
+    syncUpdate,
+    members,
+    memberCount,
+  } = useRoomSync()
 
   const [inputCode, setInputCode] = useState('')
   const [inputNick, setInputNick] = useState(nickname)
+  const [isEditingNick, setIsEditingNick] = useState(false)
+  const [editNickVal, setEditNickVal] = useState(nickname)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
       setInputNick(nickname)
+      setEditNickVal(nickname)
+      setIsEditingNick(false)
       setErrorMsg(null)
       if (roomCode) {
         setInputCode(roomCode)
@@ -57,6 +73,11 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
     if (typeof window === 'undefined' || !roomCode) return
     const url = new URL(window.location.href)
     url.searchParams.set('room', roomCode)
+    const rawCase = url.searchParams.get('case_id') || url.searchParams.get('caseId')
+    if (rawCase === 'case_000' || rawCase === 'case-000') {
+      url.searchParams.set('case_id', 'case-000')
+      url.searchParams.delete('caseId')
+    }
     navigator.clipboard.writeText(url.toString())
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -94,16 +115,99 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
               {isConnected && roomCode ? (
                 /* Already connected state */
                 <div className="space-y-4">
-                  <div className="p-4 rounded-lg bg-[#241a12] border border-emerald-500/50 flex flex-col items-center text-center space-y-2">
+                  <div className="p-4 rounded-lg bg-[#241a12] border border-emerald-500/50 flex flex-col items-center text-center space-y-2.5">
                     <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
                       <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                      ĐANG KẾT NỐI PHÒNG
+                      <span>ĐANG KẾT NỐI PHÒNG • {memberCount} ONLINE</span>
                     </div>
                     <div className="text-3xl font-extrabold text-amber-400 tracking-widest font-mono">
                       {roomCode}
                     </div>
-                    <div className="text-xs text-[#a89078]">
-                      Thám tử hiển thị: <span className="text-amber-300 font-bold">{nickname}</span>
+                    {isEditingNick ? (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault()
+                          const clean = editNickVal.trim().slice(0, 20)
+                          if (clean) {
+                            setNickname(clean)
+                            syncUpdate({}, `đã đổi tên hiển thị thành ${clean}`)
+                            setIsEditingNick(false)
+                          }
+                        }}
+                        className="flex items-center gap-1.5 mt-1"
+                      >
+                        <input
+                          type="text"
+                          value={editNickVal}
+                          onChange={(e) => setEditNickVal(e.target.value)}
+                          maxLength={20}
+                          placeholder="Tên thám tử..."
+                          className="px-2 py-1 bg-[#120e0a] border border-amber-500 text-amber-200 text-xs rounded font-mono focus:outline-none w-36"
+                        />
+                        <button
+                          type="submit"
+                          className="px-2 py-1 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded cursor-pointer transition-colors"
+                        >
+                          Lưu
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingNick(false)}
+                          className="px-1.5 py-1 text-[#a89078] hover:text-[#fff] text-xs cursor-pointer transition-colors"
+                        >
+                          Hủy
+                        </button>
+                      </form>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-xs text-[#a89078]">
+                        <span>Thám tử của bạn:</span>
+                        <span className="text-amber-300 font-bold">{nickname}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditNickVal(nickname)
+                            setIsEditingNick(true)
+                          }}
+                          className="text-[11px] text-amber-500 hover:text-amber-300 underline cursor-pointer ml-1"
+                        >
+                          (Đổi tên)
+                        </button>
+                      </div>
+                    )}
+
+                    {/* DANH SÁCH THÁM TỬ ĐANG TRỰC TUYẾN TRONG PHÒNG */}
+                    <div className="w-full pt-2.5 border-t border-[#4a3422]/60 flex flex-col items-center gap-1.5">
+                      <span className="text-[11px] text-[#a89078] uppercase tracking-wider font-bold flex items-center gap-1">
+                        <Users className="size-3 text-amber-500" />
+                        <span>Tổ chuyên án trực tuyến ({memberCount}):</span>
+                      </span>
+                      <div className="flex flex-wrap items-center justify-center gap-1.5 max-h-24 overflow-y-auto custom-scrollbar px-1">
+                        {members.length > 0 ? (
+                          members.map((m) => {
+                            const isMe = m.nickname === nickname
+                            return (
+                              <span
+                                key={m.key}
+                                className={cn(
+                                  "px-2 py-0.5 rounded text-[11px] font-mono flex items-center gap-1 border",
+                                  isMe
+                                    ? "bg-amber-950/70 border-amber-500/80 text-amber-300 font-bold shadow-sm"
+                                    : "bg-[#18110b] border-[#483321] text-[#d9c5af]"
+                                )}
+                              >
+                                <span className={cn("size-1.5 rounded-full", isMe ? "bg-amber-400 animate-pulse" : "bg-emerald-400")} />
+                                <span>{m.nickname}</span>
+                                {isMe && <span className="text-[9px] text-amber-400/80">(Bạn)</span>}
+                              </span>
+                            )
+                          })
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-amber-950/70 border-amber-500/80 text-amber-300 font-bold flex items-center gap-1">
+                            <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
+                            <span>{nickname} (Bạn)</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 

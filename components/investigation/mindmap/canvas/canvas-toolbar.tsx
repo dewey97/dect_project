@@ -49,7 +49,7 @@ export function CanvasToolbar({
   hideTitleBadgeOnMobile = false,
   isBoardGame = false,
 }: CanvasToolbarProps) {
-  const { roomCode } = useRoomSync();
+  const { roomCode, nickname, memberCount } = useRoomSync();
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
 
   return (
@@ -79,10 +79,14 @@ export function CanvasToolbar({
               ? "bg-emerald-950/85 border-emerald-500/60 text-emerald-300 hover:bg-emerald-900/90"
               : "bg-[#1b140e]/85 hover:bg-[#342417] border-[#593c26]/60 text-[#d9a066]"
           )}
-          title={roomCode ? `Đang đồng bộ phòng: ${roomCode}` : "Chơi nhóm đồng bộ (Group ID)"}
+          title={
+            roomCode
+              ? `Phòng: ${roomCode} • ${memberCount} thám tử đang trực tuyến • Bạn: ${nickname}`
+              : "Chơi nhóm đồng bộ (Group ID)"
+          }
         >
           <Users className="size-3.5 text-amber-500" />
-          <span>{roomCode ? roomCode : "Chơi Nhóm"}</span>
+          <span>{roomCode ? `${roomCode} (${memberCount} 👤)` : "Chơi Nhóm"}</span>
           {roomCode && <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />}
         </button>
 

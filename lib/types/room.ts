@@ -6,6 +6,12 @@ export interface AnnotationStroke {
   points: { x: number; y: number }[];
 }
 
+export interface RoomMember {
+  key: string;
+  nickname: string;
+  joinedAt: number;
+}
+
 export interface RoomInvestigationState {
   completedCheckpoints: string[];
   phoneSolved: boolean;

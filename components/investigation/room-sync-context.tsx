@@ -10,7 +10,7 @@ import React, {
   useMemo,
 } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { RoomInvestigationState, GameRoomRow } from '@/lib/types/room'
+import type { RoomInvestigationState, GameRoomRow, RoomMember } from '@/lib/types/room'
 import { DEFAULT_ROOM_STATE } from '@/lib/types/room'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
@@ -27,6 +27,8 @@ interface RoomSyncContextType {
   isConnected: boolean
   isConnecting: boolean
   roomState: RoomInvestigationState
+  members: RoomMember[]
+  memberCount: number
   activeToast: ToastNotice | null
   joinRoom: (code: string, customNick?: string) => Promise<{ success: boolean; error?: string }>
   leaveRoom: () => void
@@ -38,6 +40,21 @@ const RoomSyncContext = createContext<RoomSyncContextType | undefined>(undefined
 
 const ROOM_CODE_STORAGE_KEY = 'dect_current_room_code'
 const NICKNAME_STORAGE_KEY = 'dect_player_nickname'
+const DEVICE_ID_KEY = 'dect_device_id'
+
+function getDeviceId(): string {
+  if (typeof window === 'undefined') return 'server'
+  try {
+    let id = localStorage.getItem(DEVICE_ID_KEY)
+    if (!id) {
+      id = 'dev_' + Math.random().toString(36).slice(2, 10)
+      localStorage.setItem(DEVICE_ID_KEY, id)
+    }
+    return id
+  } catch {
+    return 'dev_' + Math.random().toString(36).slice(2, 10)
+  }
+}
 
 export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const [roomCode, setRoomCode] = useState<string | null>(null)
@@ -45,6 +62,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [roomState, setRoomState] = useState<RoomInvestigationState>(DEFAULT_ROOM_STATE)
+  const [members, setMembers] = useState<RoomMember[]>([])
   const [activeToast, setActiveToast] = useState<ToastNotice | null>(null)
 
   const supabase = useMemo(() => createClient(), [])
@@ -63,6 +81,14 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       try {
         localStorage.setItem(NICKNAME_STORAGE_KEY, clean)
       } catch {}
+    }
+    if (channelRef.current) {
+      channelRef.current
+        .track({
+          nickname: clean,
+          joinedAt: Date.now(),
+        })
+        .catch(() => {})
     }
   }, [])
 
@@ -93,6 +119,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
     }
     setRoomCode(null)
     setIsConnected(false)
+    setMembers([])
     setRoomState(DEFAULT_ROOM_STATE)
     if (typeof window !== 'undefined') {
       try {
@@ -173,12 +200,45 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
           channelRef.current = null
         }
 
-        // 3. Subscribe to Realtime Channel
+        // 3. Subscribe to Realtime Channel with Presence tracking
+        const deviceId = getDeviceId()
         const channel = supabase.channel(`room:${cleanCode}`, {
-          config: { broadcast: { self: false } },
+          config: {
+            broadcast: { self: false },
+            presence: { key: deviceId },
+          },
         })
 
         channel
+          .on('presence', { event: 'sync' }, () => {
+            const state = channel.presenceState()
+            const list: RoomMember[] = []
+            Object.keys(state).forEach((key) => {
+              const presences = state[key] as any[]
+              if (presences && presences.length > 0) {
+                const p = presences[0]
+                list.push({
+                  key,
+                  nickname: p.nickname || 'Thám tử',
+                  joinedAt: p.joinedAt || Date.now(),
+                })
+              }
+            })
+            list.sort((a, b) => a.joinedAt - b.joinedAt)
+            setMembers(list)
+          })
+          .on('presence', { event: 'join' }, ({ newPresences }) => {
+            const actor = (newPresences?.[0] as any)?.nickname
+            if (actor && actor !== activeNick) {
+              triggerToast(actor, 'vừa tham gia tổ chuyên án')
+            }
+          })
+          .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+            const actor = (leftPresences?.[0] as any)?.nickname
+            if (actor && actor !== activeNick) {
+              triggerToast(actor, 'đã rời phòng')
+            }
+          })
           .on('broadcast', { event: 'STATE_PATCH' }, ({ payload }) => {
             if (!payload || !payload.patch) return
             const patch = payload.patch as Partial<RoomInvestigationState>
@@ -246,9 +306,17 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
               }
             }
           )
-          .subscribe((status) => {
+          .subscribe(async (status) => {
             if (status === 'SUBSCRIBED') {
               setIsConnected(true)
+              try {
+                await channel.track({
+                  nickname: activeNick,
+                  joinedAt: Date.now(),
+                })
+              } catch (trackErr) {
+                console.warn('[RoomSync] Track error:', trackErr)
+              }
             }
           })
 
@@ -396,6 +464,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, [joinRoom])
 
+  const memberCount = Math.max(isConnected ? 1 : 0, members.length)
+
   const contextValue = useMemo<RoomSyncContextType>(
     () => ({
       roomCode,
@@ -403,6 +473,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       isConnected,
       isConnecting,
       roomState,
+      members,
+      memberCount,
       activeToast,
       joinRoom,
       leaveRoom,
@@ -415,6 +487,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       isConnected,
       isConnecting,
       roomState,
+      members,
+      memberCount,
       activeToast,
       joinRoom,
       leaveRoom,
@@ -448,6 +522,8 @@ const DEFAULT_ROOM_SYNC_CONTEXT: RoomSyncContextType = {
   isConnected: false,
   isConnecting: false,
   roomState: DEFAULT_ROOM_STATE,
+  members: [],
+  memberCount: 0,
   activeToast: null,
   joinRoom: async () => ({ success: false, error: 'No Room Provider' }),
   leaveRoom: () => {},
