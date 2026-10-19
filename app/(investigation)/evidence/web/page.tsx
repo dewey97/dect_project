@@ -15,8 +15,6 @@ import {
   ChevronRight,
   Maximize2,
   Minimize2,
-  PanelRightClose,
-  PanelRightOpen,
   GripVertical,
   Eye,
   Layers,
@@ -113,7 +111,9 @@ function WebEvidencePageContent() {
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
   const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false); // Phóng to trình đọc PDF toàn nửa phải
   const [boardWidthPercent, setBoardWidthPercent] = useState<number>(60);
+  const [dossierWidth, setDossierWidth] = useState<number>(320);
   const [isDraggingSplit, setIsDraggingSplit] = useState<boolean>(false);
+  const [isDraggingDossierSplit, setIsDraggingDossierSplit] = useState<boolean>(false);
 
   // Phase filter: 'all' | 0 | 1 | 2 | 3
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<
@@ -294,13 +294,20 @@ function WebEvidencePageContent() {
     const savedRatio = getStorageItem("web_board_split_ratio");
     if (savedRatio) {
       const parsed = parseFloat(savedRatio);
-      if (!isNaN(parsed) && parsed >= 45 && parsed <= 75) {
+      if (!isNaN(parsed) && parsed >= 25 && parsed <= 75) {
         setBoardWidthPercent(parsed);
       } else {
         setBoardWidthPercent(60);
       }
     } else {
       setBoardWidthPercent(60);
+    }
+    const savedDossierWidth = getStorageItem("web_dossier_width");
+    if (savedDossierWidth) {
+      const parsedW = parseFloat(savedDossierWidth);
+      if (!isNaN(parsedW) && parsedW >= 240 && parsedW <= 500) {
+        setDossierWidth(parsedW);
+      }
     }
     const savedCollapsed = getStorageItem("web_dossier_collapsed");
     if (savedCollapsed === "true") {
@@ -316,9 +323,9 @@ function WebEvidencePageContent() {
       const windowWidth = window.innerWidth;
       if (windowWidth < 1024) return; // Chỉ áp dụng trên desktop
 
-      // Giới hạn tỉ lệ Board từ 45% đến 75% để chừa không gian cho Zone 2 & 3
+      // Cho phép tỉ lệ Board co lại từ 25% đến 75% để người dùng tự do thu gọn khung bảng điều tra
       const newRatio = (e.clientX / windowWidth) * 100;
-      const clampedRatio = Math.min(Math.max(newRatio, 45), 75);
+      const clampedRatio = Math.min(Math.max(newRatio, 25), 75);
       setBoardWidthPercent(clampedRatio);
     };
 
@@ -335,6 +342,33 @@ function WebEvidencePageContent() {
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isDraggingSplit, boardWidthPercent]);
+
+  // Xử lý kéo thả điều chỉnh độ rộng Khay tài liệu (Zone 2)
+  useEffect(() => {
+    if (!isDraggingDossierSplit) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (window.innerWidth < 1024) return;
+      // Chiều rộng Zone 2 tính từ mép phải của Zone 1
+      const boardWidthPx = (window.innerWidth * boardWidthPercent) / 100;
+      const newDossierWidth = e.clientX - boardWidthPx;
+      const clampedDossierWidth = Math.min(Math.max(newDossierWidth, 240), 520);
+      setDossierWidth(clampedDossierWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingDossierSplit(false);
+      setStorageItem("web_dossier_width", dossierWidth.toString());
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDraggingDossierSplit, boardWidthPercent, dossierWidth]);
 
   const toggleDossierCollapse = useCallback(() => {
     detectiveAudio.playPaperRustle();
@@ -507,7 +541,7 @@ function WebEvidencePageContent() {
             mobileTab === "board" ? "flex" : "hidden lg:flex"
           )}
         >
-          {/* TOP RIGHT TOOLBAR: SỔ TAY & TOGGLE HỒ SƠ FOCUS / SPLIT */}
+          {/* TOP RIGHT TOOLBAR: SỔ TAY */}
           <div className="hidden lg:flex absolute top-3 right-3 z-30 items-center gap-1.5 bg-[#1e150e]/90 backdrop-blur-md px-2 py-1 rounded-lg border border-[#4a3625] shadow-xl">
             <button
               onClick={() => setActiveModal("notebook")}
@@ -516,25 +550,6 @@ function WebEvidencePageContent() {
             >
               <PenLine className="size-3" />
               <span>SỔ TAY</span>
-            </button>
-            <div className="w-[1px] h-3 bg-[#4a3625]" />
-            <span className="font-mono text-[0.62rem] text-[#ad9885] tracking-wider uppercase font-bold">
-              {isDossierCollapsed ? "CHẾ ĐỘ TẬP TRUNG (FOCUS)" : "BÀN PHÁ ÁN (3 VÙNG)"}
-            </span>
-            <button
-              onClick={toggleDossierCollapse}
-              className="p-1 rounded hover:bg-[#342417] text-[#d9a066] hover:text-[#fef5ec] transition-colors cursor-pointer"
-              title={
-                isDossierCollapsed
-                  ? "Mở thanh Hồ sơ & Trình duyệt (3 vùng)"
-                  : "Thu gọn để toàn màn hình Bảng phá án"
-              }
-            >
-              {isDossierCollapsed ? (
-                <PanelRightOpen className="size-4" />
-              ) : (
-                <PanelRightClose className="size-4" />
-              )}
             </button>
           </div>
 
@@ -578,13 +593,17 @@ function WebEvidencePageContent() {
         {/* VÙNG 2: KHAY PREVIEW THẺ HỒ SƠ & VẬT CHỨNG (MIDDLE PREVIEW CARDS STRIP) */}
         <div
           style={{
+            width:
+              typeof window !== "undefined" && window.innerWidth >= 1024
+                ? `${dossierWidth}px`
+                : undefined,
             display:
               typeof window !== "undefined" && window.innerWidth >= 1024 && isDossierCollapsed
                 ? "none"
                 : undefined,
           }}
           className={cn(
-            "w-full lg:w-[210px] xl:w-[230px] shrink-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex flex-col h-full min-h-0",
+            "w-full shrink-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex flex-col h-full min-h-0",
             isDossierCollapsed && "lg:hidden",
             isViewerExpanded && "hidden xl:flex",
             mobileTab === "dossier" ? "flex" : "hidden lg:flex"
@@ -702,155 +721,130 @@ function WebEvidencePageContent() {
                 </div>
               )
             ) : (
-              /* NẾU LÀ HỒ SƠ PDF: DANH SÁCH COMPACT ROW */
+              /* NẾU LÀ HỒ SƠ PDF: DANH SÁCH TỜ GIẤY XẾP CHỒNG (STACKED SHEETS) */
               pdfItems.length === 0 ? (
                 <div className="p-6 text-center text-xs font-mono text-[#8c735d]">
                   Không có hồ sơ nào trong mục này.
                 </div>
               ) : (
-                <div className="flex flex-col">
-                  {/* THANH BÌA KẸP HỒ SƠ VỤ ÁN */}
-                  <div className="shrink-0 px-3 py-2 bg-[#1b130c] border-b border-[#382618] flex items-center justify-between text-xs font-mono">
-                    <div className="flex items-center gap-1.5 text-[#ad9885]">
-                      <Paperclip className="size-3.5 text-[#d9a066] -rotate-45" />
-                      <span className="font-bold text-[#e5d8cb] tracking-wider text-[0.75rem] uppercase">
-                        KẸP HỒ SƠ VỤ ÁN
-                      </span>
-                    </div>
-                    <span className="text-[0.68rem] font-bold px-1.5 py-0.5 rounded bg-[#100a06] text-[#d9a066] border border-[#382618]">
-                      {pdfItems.length} VĂN BẢN
-                    </span>
-                  </div>
+                <div className="p-2 sm:p-2.5 pb-8 flex flex-col">
+                  {pdfItems.map((item, index) => {
+                    const isSelected =
+                      selectedView.type === item.type &&
+                      selectedView.data.id === item.data.id;
+                    const prevIsSelected =
+                      index > 0 &&
+                      selectedView.type === pdfItems[index - 1].type &&
+                      selectedView.data.id === pdfItems[index - 1].data.id;
+                    const pdfDoc = item.data as PDFDocument;
 
-                  {/* DANH SÁCH CÁC TỜ HỒ SƠ XẾP CHỒNG GỐI ĐẦU (OVERLAPPING STACK) */}
-                  <div className="p-2 sm:p-2.5 pb-8 flex flex-col">
-                    {pdfItems.map((item, index) => {
-                      const isSelected =
-                        selectedView.type === item.type &&
-                        selectedView.data.id === item.data.id;
-                      const prevIsSelected =
-                        index > 0 &&
-                        selectedView.type === pdfItems[index - 1].type &&
-                        selectedView.data.id === pdfItems[index - 1].data.id;
-                      const pdfDoc = item.data as PDFDocument;
-
-                      return (
+                    return (
+                      <div
+                        key={`pdf-${item.data.id}`}
+                        style={{
+                          zIndex: isSelected ? 30 : index + 1,
+                        }}
+                        className={cn(
+                          "relative transition-all duration-200 ease-out",
+                          !isSelected && index > 0 && !prevIsSelected && "-mt-2 sm:-mt-2.5",
+                          isSelected && "my-2 sm:my-2.5",
+                        )}
+                      >
                         <div
-                          key={`pdf-${item.data.id}`}
-                          style={{
-                            zIndex: isSelected ? 30 : index + 1,
+                          onClick={() => {
+                            setSelectedView({ type: "pdf", data: pdfDoc });
+                            if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                              setActiveModal("mobile_pdf");
+                            }
                           }}
                           className={cn(
-                            "relative transition-all duration-200 ease-out",
-                            !isSelected && index > 0 && !prevIsSelected && "-mt-2",
-                            isSelected && "my-2.5",
+                            "w-full text-left transition-all duration-200 cursor-pointer overflow-hidden group select-none relative",
+                            isSelected
+                              ? "bg-[#25180e] border-2 border-[#d9a066] rounded-lg p-3 sm:p-3.5 shadow-[0_8px_25px_rgba(0,0,0,0.85)] ring-1 ring-[#d9a066]/40"
+                              : "bg-[#1c130c] hover:bg-[#23180f] border-t-2 border-x border-b border-[#3e2b1c] hover:border-[#63442c] rounded-t-lg rounded-b-sm px-3 py-2.5 shadow-[0_-3px_8px_rgba(0,0,0,0.6)] active:bg-[#261910] min-h-[50px]"
                           )}
                         >
-                          <div
-                            onClick={() => {
-                              if (!isSelected) {
-                                setSelectedView({ type: "pdf", data: pdfDoc });
-                              } else {
-                                if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                                  setActiveModal("mobile_pdf");
-                                }
-                              }
-                            }}
-                            className={cn(
-                              "w-full text-left transition-all duration-200 cursor-pointer overflow-hidden group select-none",
-                              isSelected
-                                ? "bg-[#26190f] border-2 border-[#d9a066] rounded-lg p-3 sm:p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.7)] ring-1 ring-[#d9a066]/40"
-                                : "bg-[#1c130c] hover:bg-[#23180f] border-t-2 border-x border-b border-[#3d2a1b] hover:border-[#66462d] rounded-t-lg rounded-b-sm px-3 py-2 sm:py-2.5 shadow-[0_-3px_8px_rgba(0,0,0,0.5)] active:bg-[#251910] min-h-[52px]"
-                            )}
-                          >
-                            {/* THANH HEADER CHÍNH (LUÔN HIỂN THỊ CẢ KHI XẾP CHỒNG VÀ MỞ RỘNG) */}
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                <Paperclip
-                                  className={cn(
-                                    "size-3.5 -rotate-45 shrink-0 transition-colors",
-                                    isSelected
-                                      ? "text-[#d9a066]"
-                                      : "text-[#8a7057] group-hover:text-[#d9a066]"
-                                  )}
-                                />
-                                <span
-                                  className={cn(
-                                    "font-mono text-xs font-black tracking-wider px-1.5 py-0.5 rounded-sm border shrink-0 transition-colors",
-                                    isSelected
-                                      ? "bg-[#120b06] text-[#d9a066] border-[#d9a066]/60 shadow-xs"
-                                      : "bg-[#140d07] text-[#d9a066]/90 border-[#382618]"
-                                  )}
-                                >
-                                  {pdfDoc?.code || "DOC"}
-                                </span>
+                          {/* ACTIVE ACCENT BAR */}
+                          {isSelected && (
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
+                          )}
 
-                                {/* Khi không chọn: hiển thị tiêu đề ngay trên dải tab gối đầu này */}
-                                {!isSelected && (
-                                  <span className="font-bold text-xs sm:text-[0.85rem] text-[#e2d4c3] group-hover:text-[#ffffff] truncate ml-1">
-                                    {item.data.title}
-                                  </span>
+                          {/* DẢI TIÊU ĐỀ LỘ RA TRÊN XẤP GIẤY */}
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              <Paperclip
+                                className={cn(
+                                  "size-3.5 -rotate-45 shrink-0 transition-colors",
+                                  isSelected
+                                    ? "text-[#d9a066]"
+                                    : "text-[#8a7057] group-hover:text-[#d9a066]"
                                 )}
-                              </div>
+                              />
+                              <span
+                                className={cn(
+                                  "font-mono text-xs font-bold tracking-wider shrink-0 transition-colors",
+                                  isSelected
+                                    ? "text-[#d9a066]"
+                                    : "text-[#d9a066]/85 group-hover:text-[#d9a066]"
+                                )}
+                              >
+                                {pdfDoc?.code || "DOC"}
+                              </span>
 
-                              <div className="flex items-center gap-1.5 shrink-0">
-                                <span className="font-mono text-[0.6rem] sm:text-[0.65rem] text-[#8a725b] uppercase tracking-wider font-semibold">
-                                  {pdfDoc.phase === 0
-                                    ? "BAN ĐẦU"
-                                    : `BỘ ${String.fromCharCode(64 + pdfDoc.phase)}`}
-                                </span>
-                                <ChevronRight
-                                  className={cn(
-                                    "size-3.5 transition-transform duration-200",
-                                    isSelected
-                                      ? "rotate-90 text-[#d9a066]"
-                                      : "text-[#5a402d] group-hover:text-[#d9a066]"
-                                  )}
-                                />
-                              </div>
-                            </div>
-
-                            {/* NỘI DUNG CHI TIẾT KHI TỜ GIẤY BUNG MỞ RỘNG (EXPANDED) */}
-                            {isSelected && (
-                              <div className="mt-2.5 pt-2.5 border-t border-dashed border-[#443020]">
-                                <h4 className="font-bold text-sm sm:text-base text-[#ffffff] leading-snug mb-3">
+                              {/* TIÊU ĐỀ KHI ĐANG XẾP CHỒNG */}
+                              {!isSelected && (
+                                <span className="font-bold text-xs sm:text-[0.84rem] text-[#ded0be] group-hover:text-[#ffffff] truncate">
                                   {item.data.title}
-                                </h4>
-
-                                <div className="flex items-center justify-between text-[0.65rem] font-mono text-[#a88a6d] mb-3">
-                                  <span className="flex items-center gap-1">
-                                    <FileText className="size-3 text-[#d9a066]" />
-                                    <span>BẢN GỐC // ĐÃ GIẢI MÃ</span>
-                                  </span>
-                                  <span className="text-[#8a725b]">CHẠM ĐỂ ĐỌC CHI TIẾT</span>
-                                </div>
-
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                                      setActiveModal("mobile_pdf");
-                                    }
-                                  }}
-                                  className="w-full py-2.5 px-3 rounded bg-[#d9a066] hover:bg-[#e2ad76] active:bg-[#c68e54] text-[#1a0f07] font-mono text-xs font-black tracking-wider flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer"
-                                >
-                                  <FileText className="size-4" />
-                                  <span>MỞ ĐỌC TOÀN VĂN HỒ SƠ</span>
-                                  <ChevronRight className="size-4" />
-                                </button>
-                              </div>
-                            )}
+                                </span>
+                              )}
+                            </div>
                           </div>
+
+                          {/* TIÊU ĐỀ ĐẦY ĐỦ KHI TỜ GIẤY BUNG MỞ RỘNG (EXPANDED) */}
+                          {isSelected && (
+                            <div className="mt-2.5 pt-2 border-t border-dashed border-[#443020]">
+                              <p className="font-bold text-sm sm:text-[0.92rem] text-[#fef5ec] leading-snug">
+                                {item.data.title}
+                              </p>
+                              {/* Hướng dẫn chạm trên mobile */}
+                              <p className="block lg:hidden mt-2 text-[0.68rem] font-mono text-[#d9a066] text-right font-medium">
+                                Chạm để mở toàn màn hình ❯
+                              </p>
+                            </div>
+                          )}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )
             )}
           </div>
         </div>
+
+        {/* RESIZABLE SPLIT DRAGGER GIỮA VÙNG 2 VÀ VÙNG 3 (DESKTOP) */}
+        {!isDossierCollapsed && (
+          <div
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setIsDraggingDossierSplit(true);
+            }}
+            className={cn(
+              "hidden lg:flex w-2.5 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+              isDraggingDossierSplit && "cursor-col-resize",
+            )}
+            title="Kéo để điều chỉnh độ rộng Khay tài liệu vs. Trình đọc"
+          >
+            <div
+              className={cn(
+                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
+                isDraggingDossierSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+              )}
+            >
+              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </div>
+        )}
 
         {/* VÙNG 3: TRÌNH DUYỆT CHI TIẾT HỒ SƠ & VẬT CHỨNG (RIGHT VIEWER INSPECTOR) */}
         <div
