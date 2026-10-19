@@ -123,6 +123,64 @@ export function VectorMapCanvas({
     }))
   }, [customMapVector?.buildings])
 
+  // Batch road segments into compound paths grouped by visual style.
+  // Painter's algorithm: casing layer first, then surface layer on top.
+  // At low zoom levels, alleys (type='alley') are excluded — they are too thin to be visible
+  // and each adds 2 SVG path nodes. This alone removes ~360 nodes when zoomed out.
+  // Bridge shadows are still rendered individually (rare, only a few per map).
+  const { batchedRoadCasings, batchedRoadSurfaces, bridgeShadows } = React.useMemo(() => {
+    if (!customMapVector?.roads || customMapVector.roads.length === 0) {
+      return { batchedRoadCasings: [], batchedRoadSurfaces: [], bridgeShadows: [] }
+    }
+
+    const showAlleys = zoom >= 0.52
+    const casingGroups: Record<string, { casingColor: string; casingW: number; d: string[] }> = {}
+    const surfaceGroups: Record<string, { color: string; width: number; dashed: boolean; d: string[] }> = {}
+    const shadows: Array<{ d: string; strokeW: number }> = []
+
+    for (const r of customMapVector.roads) {
+      if (!showAlleys && r.type === 'alley') continue
+      const d = pointsToSvgPath(r.points, false, r.smooth)
+      if (!d) continue
+
+      // Bridge shadow (individual — rare)
+      if (r.isBridge) {
+        shadows.push({ d, strokeW: r.width + (r.casingWidth || 2) * 2 + 6 })
+      }
+
+      // Casing batch key
+      const casingColor = r.casingColor || '#94A3B8'
+      const casingW = r.width + (r.casingWidth || 2) * 2
+      const casingKey = `${casingColor}|${casingW}`
+      if (!casingGroups[casingKey]) casingGroups[casingKey] = { casingColor, casingW, d: [] }
+      casingGroups[casingKey].d.push(d)
+
+      // Surface batch key
+      const color = r.color || '#FFFFFF'
+      const dashed = !!r.dashed
+      const surfaceKey = `${color}|${r.width}|${dashed}`
+      if (!surfaceGroups[surfaceKey]) surfaceGroups[surfaceKey] = { color, width: r.width, dashed, d: [] }
+      surfaceGroups[surfaceKey].d.push(d)
+    }
+
+    return {
+      batchedRoadCasings: Object.entries(casingGroups).map(([key, g]) => ({
+        key,
+        casingColor: g.casingColor,
+        casingW: g.casingW,
+        d: g.d.join(' ')
+      })),
+      batchedRoadSurfaces: Object.entries(surfaceGroups).map(([key, g]) => ({
+        key,
+        color: g.color,
+        width: g.width,
+        dashed: g.dashed,
+        d: g.d.join(' ')
+      })),
+      bridgeShadows: shadows
+    }
+  }, [customMapVector?.roads, zoom])
+
   return (
     <div
       ref={mapContainerRef}
@@ -224,41 +282,49 @@ export function VectorMapCanvas({
               </g>
             )}
 
-            {/* Custom Roads (Casing + Surface + Bridge Shadows) */}
-            {customMapVector.roads.map((r) => {
-              const d = pointsToSvgPath(r.points, false, r.smooth)
-              return (
-                <g key={r.id}>
-                  {r.isBridge && (
-                    <path
-                      d={d}
-                      fill="none"
-                      stroke="#000000"
-                      strokeWidth={r.width + (r.casingWidth || 2) * 2 + 6}
-                      strokeLinecap="round"
-                      opacity="0.25"
-                    />
-                  )}
-                  <path
-                    d={d}
-                    fill="none"
-                    stroke={r.casingColor || '#94A3B8'}
-                    strokeWidth={r.width + (r.casingWidth || 2) * 2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d={d}
-                    fill="none"
-                    stroke={r.color || '#FFFFFF'}
-                    strokeWidth={r.width}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeDasharray={r.dashed ? '8 6' : undefined}
-                  />
-                </g>
-              )
-            })}
+            {/* Custom Roads — Batched Compound Paths (726 roads → ~8 DOM nodes)
+                Painter's algorithm: bridge shadows → casings → surfaces */}
+            {/* 1. Bridge drop-shadows (rare, keep individual) */}
+            {bridgeShadows.map((bs, i) => (
+              <path
+                key={`bridge-shadow-${i}`}
+                d={bs.d}
+                fill="none"
+                stroke="#000000"
+                strokeWidth={bs.strokeW}
+                strokeLinecap="round"
+                opacity="0.25"
+              />
+            ))}
+            {/* 2. Road casings (border/outline layer) */}
+            <g id="map-road-casings-layer" pointerEvents="none">
+              {batchedRoadCasings.map((rc) => (
+                <path
+                  key={rc.key}
+                  d={rc.d}
+                  fill="none"
+                  stroke={rc.casingColor}
+                  strokeWidth={rc.casingW}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              ))}
+            </g>
+            {/* 3. Road surfaces (fill layer on top of casings) */}
+            <g id="map-road-surfaces-layer" pointerEvents="none">
+              {batchedRoadSurfaces.map((rs) => (
+                <path
+                  key={rs.key}
+                  d={rs.d}
+                  fill="none"
+                  stroke={rs.color}
+                  strokeWidth={rs.width}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeDasharray={rs.dashed ? '8 6' : undefined}
+                />
+              ))}
+            </g>
 
             {/* Custom Railways */}
             {customMapVector.railways.map((rw) => {

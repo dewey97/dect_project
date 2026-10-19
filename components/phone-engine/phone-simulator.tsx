@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import {
   ShieldCheck,
@@ -23,20 +24,42 @@ import { PhoneStatusBar } from "./system/status-bar";
 import { LockScreen } from "./system/lock-screen";
 import { IPhoneHomeScreen } from "./system/home-screen";
 
-// Generic Apps
+// Light apps — always eagerly imported (small, used frequently)
 import { MessagesApp } from "./apps/messages-app";
 import { PhoneApp } from "./apps/phone-app";
 import { SafariApp } from "./apps/safari-app";
 import { NotesApp } from "./apps/notes-app";
 import { PhotosApp } from "./apps/photos-app";
-import { MapsApp } from "./apps/maps-app";
 import { BankingApp } from "./apps/banking-app";
 import { CameraApp } from "./apps/camera-app";
-import { SnakeApp } from "./apps/snake-game-app";
-import { Game2048App } from "./apps/game-2048-app";
-import { MinesweeperApp } from "./apps/minesweeper-app";
-import { FlappyBirdApp } from "./apps/flappy-bird-app";
-import { TetrisApp } from "./apps/tetris-app";
+
+// Heavy apps — lazy loaded only when the user opens them (cuts initial JS bundle significantly)
+// MapsApp: 970 lines, fetches 1.5MB map JSON, contains full SVG renderer
+const MapsApp = dynamic(
+  () => import("./apps/maps-app").then((m) => ({ default: m.MapsApp })),
+  { ssr: false }
+)
+// Game apps: large canvas-based bundles, rarely opened, no SSR needed
+const SnakeApp = dynamic(
+  () => import("./apps/snake-game-app").then((m) => ({ default: m.SnakeApp })),
+  { ssr: false }
+)
+const Game2048App = dynamic(
+  () => import("./apps/game-2048-app").then((m) => ({ default: m.Game2048App })),
+  { ssr: false }
+)
+const MinesweeperApp = dynamic(
+  () => import("./apps/minesweeper-app").then((m) => ({ default: m.MinesweeperApp })),
+  { ssr: false }
+)
+const FlappyBirdApp = dynamic(
+  () => import("./apps/flappy-bird-app").then((m) => ({ default: m.FlappyBirdApp })),
+  { ssr: false }
+)
+const TetrisApp = dynamic(
+  () => import("./apps/tetris-app").then((m) => ({ default: m.TetrisApp })),
+  { ssr: false }
+)
 
 export interface PhoneSimulatorProps {
   device?: Partial<Device>;

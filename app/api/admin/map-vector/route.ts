@@ -3,7 +3,8 @@ import fs from 'fs'
 import path from 'path'
 import type { MapVectorData } from '@/types/map-vector'
 
-export const dynamic = 'force-dynamic'
+// NOTE: dynamic = 'force-dynamic' intentionally removed so Next.js can serve cached responses.
+// The map JSON only changes when admin saves via POST — no need to bypass HTTP cache on every read.
 
 const MAPS_DIR = path.join(process.cwd(), 'data', 'maps')
 
@@ -14,6 +15,10 @@ function ensureDirExists(dir: string) {
 }
 
 const WORLD_MAP_FILE = 'world_vector_map.json'
+
+// Module-level in-process cache: avoids re-reading & re-parsing the 1.5MB JSON on every request.
+// Invalidated automatically when the POST handler saves a new version (bumps cachedAt).
+let _mapCache: { data: MapVectorData; cachedAt: number } | null = null
 
 export async function GET(req: NextRequest) {
   try {
@@ -38,12 +43,27 @@ export async function GET(req: NextRequest) {
       )
     }
 
+    // Serve from in-process cache if available (TTL: 10 minutes)
+    const now = Date.now()
+    if (_mapCache && now - _mapCache.cachedAt < 10 * 60 * 1000) {
+      return NextResponse.json(
+        { success: true, data: _mapCache.data, source: 'cache' },
+        { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } }
+      )
+    }
+
     const raw = fs.readFileSync(filePath, 'utf-8')
     const parsed: MapVectorData = JSON.parse(raw)
 
+    // Store in module-level cache
+    _mapCache = { data: parsed, cachedAt: now }
+
     // Nếu người chơi gọi theo vụ án cụ thể, có thể gắn cờ phân loại POI cho vụ án đó
     // nhưng giữ nguyên toàn bộ địa lý (đường, sông hồ, công trình, cầu cống) của bản đồ thế giới chung
-    return NextResponse.json({ success: true, data: parsed, source: 'file' })
+    return NextResponse.json(
+      { success: true, data: parsed, source: 'file' },
+      { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } }
+    )
   } catch (error: any) {
     console.error('[API /api/admin/map-vector] GET error:', error)
     return NextResponse.json(
@@ -81,6 +101,9 @@ export async function POST(req: NextRequest) {
     // Đồng bộ thêm vào case_000_vector.json để tương thích ngược tuyệt đối
     const legacyCaseFilePath = path.join(MAPS_DIR, 'case_000_vector.json')
     fs.writeFileSync(legacyCaseFilePath, JSON.stringify(dataToSave, null, 2), 'utf-8')
+
+    // Invalidate in-process GET cache so next read picks up the new file
+    _mapCache = null
 
     return NextResponse.json({
       success: true,
