@@ -6,7 +6,7 @@
  * Provides smooth 60-120 FPS panning & zooming by bypassing DOM/SVG rasterization entirely.
  */
 
-import type { Point, MapVectorData, RoadFeature, BuildingFeature } from '@/types/map-vector'
+import type { Point, MapVectorData, RoadFeature } from '@/types/map-vector'
 
 export interface ViewportBox {
   minX: number
@@ -133,32 +133,7 @@ export function renderVectorMapToCanvas(
     }
   }
 
-  // 4. Buildings Footprints (Level of Detail: zoom >= 0.52 only)
-  if (zoom >= 0.52 && mapData.buildings && mapData.buildings.length > 0) {
-    ctx.save()
-    ctx.globalAlpha = isSatellite ? 0.6 : 0.88
-
-    for (const b of mapData.buildings) {
-      if (!isFeatureInViewport(b.points, viewport)) continue
-      const pts = b.points
-      if (!pts || pts.length < 3) continue
-
-      ctx.beginPath()
-      ctx.moveTo(pts[0].x, pts[0].y)
-      for (let i = 1; i < pts.length; i++) {
-        ctx.lineTo(pts[i].x, pts[i].y)
-      }
-      ctx.closePath()
-      ctx.fillStyle = isSatellite ? '#2A3B4C' : (b.color || '#ECEFF1')
-      ctx.fill()
-      ctx.strokeStyle = isSatellite ? '#3B4E63' : (b.strokeColor || '#CFD8DC')
-      ctx.lineWidth = b.strokeWidth || 0.6
-      ctx.stroke()
-    }
-    ctx.restore()
-  }
-
-  // 5. Roads (Painter's algorithm: bridge shadows -> casings -> surfaces)
+  // 4. Roads (Painter's algorithm: bridge shadows -> casings -> surfaces)
   if (mapData.roads && mapData.roads.length > 0) {
     const showAlleys = zoom >= 0.52
 

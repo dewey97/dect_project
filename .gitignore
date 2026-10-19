@@ -45,3 +45,4 @@ scripts/bin/
 
 # Server runtime saved data files
 data/*.json
+*.backup.json

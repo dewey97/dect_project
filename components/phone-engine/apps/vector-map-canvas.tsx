@@ -308,20 +308,9 @@ function VectorMapCanvasComponent({
                     </div>
                   </div>
                 ) : (
-                  /* 4. Default Clean POI Pin: Điểm mốc bản đồ trang nhã, nhận diện màu danh mục */
+                  /* 4. Default Clean POI Pin: Điểm mốc bản đồ trang nhã, đồng nhất cho mọi POI, không phân màu số */
                   <div className="flex flex-col items-center transition-transform group-hover:scale-110">
-                    <div
-                      className={cn(
-                        'size-3.5 rounded-full border border-white shadow-xs flex items-center justify-center transition-all',
-                        loc.category === 'crime_scene'
-                          ? 'bg-rose-600 ring-2 ring-rose-400/40'
-                          : loc.category === 'food'
-                          ? 'bg-amber-500'
-                          : loc.category === 'transit'
-                          ? 'bg-blue-600'
-                          : 'bg-slate-600'
-                      )}
-                    >
+                    <div className="size-3.5 rounded-full border border-white shadow-xs flex items-center justify-center transition-all bg-[#475569]">
                       <div className="size-1 rounded-full bg-white" />
                     </div>
                     {zoom >= 0.38 && (
