@@ -151,7 +151,10 @@ export function MapStudioClient() {
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null)
   const draftCheckedRef = useRef(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const containerRectRef = useRef<DOMRect | null>(null)
   const coordRef = useRef<HTMLSpanElement>(null)
+  const candidateLineRef = useRef<SVGLineElement>(null)
+  const candidateDotRef = useRef<SVGCircleElement>(null)
 
   const handleSelectFeature = useCallback((id: string) => {
     setSelectedFeatureId(id)
@@ -206,6 +209,22 @@ export function MapStudioClient() {
     loadData()
     return () => {
       isMounted = false
+    }
+  }, [])
+
+  // Cache container bounding rect to eliminate synchronous layout reflows during pointermove
+  useEffect(() => {
+    const updateRect = () => {
+      if (containerRef.current) {
+        containerRectRef.current = containerRef.current.getBoundingClientRect()
+      }
+    }
+    updateRect()
+    window.addEventListener('resize', updateRect)
+    window.addEventListener('scroll', updateRect, true)
+    return () => {
+      window.removeEventListener('resize', updateRect)
+      window.removeEventListener('scroll', updateRect, true)
     }
   }, [])
 
@@ -443,29 +462,61 @@ export function MapStudioClient() {
     }
   }
 
-  // Screen to Canvas Coordinates Converter
+  // Spatial Hash Grid for O(1) localized vertex magnetic snapping (cell size: 80px)
+  const vertexSpatialGrid = useMemo(() => {
+    const cellSize = 80
+    const grid = new Map<string, Point[]>()
+
+    const addPoint = (p: Point) => {
+      const cx = Math.floor(p.x / cellSize)
+      const cy = Math.floor(p.y / cellSize)
+      const key = `${cx},${cy}`
+      let cell = grid.get(key)
+      if (!cell) {
+        cell = []
+        grid.set(key, cell)
+      }
+      cell.push(p)
+    }
+
+    mapData.roads.forEach((r) => r.points.forEach(addPoint))
+    mapData.railways.forEach((rw) => rw.points.forEach(addPoint))
+    mapData.water.forEach((w) => w.points.forEach(addPoint))
+    mapData.pois.forEach((p) => addPoint({ x: p.x, y: p.y }))
+
+    return { grid, cellSize }
+  }, [mapData])
+
+  // Screen to Canvas Coordinates Converter (Zero layout thrashing & O(1) snapping)
   const getCanvasCoords = useCallback(
     (e: React.MouseEvent | React.TouchEvent | MouseEvent): Point => {
       if (!containerRef.current) return { x: 0, y: 0 }
-      const rect = containerRef.current.getBoundingClientRect()
+      const rect = containerRectRef.current || containerRef.current.getBoundingClientRect()
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
       const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
 
       const rawX = (clientX - rect.left - pan.x) / zoom
       const rawY = (clientY - rect.top - pan.y) / zoom
 
-      // Collect all existing vertices for magnetic snapping
-      const allPoints: Point[] = []
+      // O(1) Snap candidates: check only 3x3 surrounding spatial cells (10-20 points max instead of 10,000)
+      const candidatePoints: Point[] = []
       if (snapToGrid) {
-        mapData.roads.forEach((r) => allPoints.push(...r.points))
-        mapData.railways.forEach((rw) => allPoints.push(...rw.points))
-        mapData.water.forEach((w) => allPoints.push(...w.points))
-        mapData.pois.forEach((p) => allPoints.push({ x: p.x, y: p.y }))
+        const { grid, cellSize } = vertexSpatialGrid
+        const cx = Math.floor(rawX / cellSize)
+        const cy = Math.floor(rawY / cellSize)
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            const cell = grid.get(`${cx + dx},${cy + dy}`)
+            if (cell) {
+              candidatePoints.push(...cell)
+            }
+          }
+        }
       }
 
-      return snapPoint({ x: rawX, y: rawY }, gridSize, snapToGrid, allPoints, 14)
+      return snapPoint({ x: rawX, y: rawY }, gridSize, snapToGrid, candidatePoints, 14)
     },
-    [pan, zoom, snapToGrid, gridSize, mapData]
+    [pan, zoom, snapToGrid, gridSize, vertexSpatialGrid]
   )
 
   // Find currently selected feature
@@ -703,9 +754,16 @@ export function MapStudioClient() {
       coordRef.current.textContent = `X: ${Math.round(pt.x)} Y: ${Math.round(pt.y)}`
     }
 
-    // Only update React state for cursorPos when actively drawing a multi-point feature
+    // Direct 144Hz DOM mutation for candidate drawing preview (Zero React reconciliation overhead)
     if (drawingPoints.length > 0) {
-      setCursorPos(pt)
+      if (candidateLineRef.current) {
+        candidateLineRef.current.setAttribute('x2', pt.x.toString())
+        candidateLineRef.current.setAttribute('y2', pt.y.toString())
+      }
+      if (candidateDotRef.current) {
+        candidateDotRef.current.setAttribute('cx', pt.x.toString())
+        candidateDotRef.current.setAttribute('cy', pt.y.toString())
+      }
     }
 
     // Dragging an existing vertex
@@ -1341,7 +1399,11 @@ export function MapStudioClient() {
             {/* ================================================================= */}
             {/* LIVE DRAWING PREVIEW PATH (IN-PROGRESS)                           */}
             {/* ================================================================= */}
-            <ActiveDrawingPreview drawingPoints={drawingPoints} cursorPos={cursorPos} />
+            <ActiveDrawingPreview
+              drawingPoints={drawingPoints}
+              candidateLineRef={candidateLineRef}
+              candidateDotRef={candidateDotRef}
+            />
 
             {/* ================================================================= */}
             {/* SELECTED FEATURE EDITABLE VERTEX HANDLES                          */}
