@@ -871,8 +871,8 @@ export function MapStudioClient() {
         points: pts,
         closed: isLake,
         width: isLake ? undefined : 80,
-        color: '#71B4EC',
-        opacity: 0.95,
+        color: '#76C3E8',
+        opacity: 1.0,
         smooth: true,
         zIndex: 2
       }
@@ -885,8 +885,8 @@ export function MapStudioClient() {
         type: roadType,
         points: pts,
         width: roadType === 'highway' ? 14 : roadType === 'avenue' ? 10 : 6,
-        color: roadType === 'highway' ? '#FFFFFF' : '#FFFFFF',
-        casingColor: roadType === 'highway' ? '#94A3B8' : '#CBD5E1',
+        color: '#FFFFFF',
+        casingColor: '#CBD5E1',
         casingWidth: 2,
         smooth: true,
         zIndex: 12

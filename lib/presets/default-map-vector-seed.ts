@@ -29,7 +29,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
         ],
         closed: false,
         width: 190,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 1
@@ -67,7 +67,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 490, y: 40 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -83,7 +83,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 950, y: 430 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -99,7 +99,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 800, y: 530 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -115,7 +115,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 310, y: 910 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -131,7 +131,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 700, y: 990 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -147,7 +147,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 550, y: 1280 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -164,7 +164,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 1370, y: 1440 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -180,7 +180,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 1330, y: 1490 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -196,7 +196,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 1640, y: 910 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -212,7 +212,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 1750, y: 1440 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -228,7 +228,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 1730, y: 1732 }
         ],
         closed: true,
-        color: '#A4D8EE',
+        color: '#76C3E8',
         opacity: 0.95,
         smooth: true,
         zIndex: 2
@@ -246,7 +246,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 1510, y: 880 }
         ],
         fillColor: '#E2E8F0',
-        strokeColor: '#94A3B8',
+        strokeColor: '#CBD5E1',
         strokeWidth: 1.5,
         opacity: 0.85,
         zIndex: 3
@@ -278,7 +278,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 2080, y: 780 }
         ],
         fillColor: '#E5E7EB',
-        strokeColor: '#94A3B8',
+        strokeColor: '#CBD5E1',
         strokeWidth: 1.5,
         opacity: 0.85,
         zIndex: 3
@@ -373,7 +373,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
           { x: 1380, y: 1740 },
           { x: 1200, y: 1740 }
         ],
-        fillColor: '#FEF3C7',
+        fillColor: '#FFFFFF',
         strokeColor: '#FCD34D',
         strokeWidth: 1.5,
         opacity: 0.85,
@@ -535,7 +535,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
         ],
         width: 14,
         color: '#FFFFFF',
-        casingColor: '#94A3B8',
+        casingColor: '#CBD5E1',
         casingWidth: 2,
         smooth: true,
         zIndex: 10
@@ -556,7 +556,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
         ],
         width: 14,
         color: '#FFFFFF',
-        casingColor: '#94A3B8',
+        casingColor: '#CBD5E1',
         casingWidth: 2,
         smooth: true,
         zIndex: 10
@@ -594,7 +594,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
         ],
         width: 9,
         color: '#FFFFFF',
-        casingColor: '#94A3B8',
+        casingColor: '#CBD5E1',
         casingWidth: 1.5,
         smooth: true,
         zIndex: 10
@@ -611,7 +611,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
         ],
         width: 9,
         color: '#FFFFFF',
-        casingColor: '#94A3B8',
+        casingColor: '#CBD5E1',
         casingWidth: 1.5,
         smooth: true,
         zIndex: 10
@@ -628,7 +628,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
         ],
         width: 9,
         color: '#FFFFFF',
-        casingColor: '#94A3B8',
+        casingColor: '#CBD5E1',
         casingWidth: 1.5,
         smooth: false,
         zIndex: 10
@@ -660,7 +660,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
         ],
         width: 12,
         color: '#FFFFFF',
-        casingColor: '#94A3B8',
+        casingColor: '#CBD5E1',
         casingWidth: 1.8,
         smooth: true,
         zIndex: 10
@@ -675,7 +675,7 @@ export function getDefaultMapVectorData(caseId = 'case_000'): MapVectorData {
         ],
         width: 14,
         color: '#FFFFFF',
-        casingColor: '#94A3B8',
+        casingColor: '#CBD5E1',
         casingWidth: 2,
         smooth: true,
         zIndex: 10
