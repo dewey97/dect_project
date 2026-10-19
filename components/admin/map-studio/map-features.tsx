@@ -249,7 +249,6 @@ export const MemoPoiFeature = React.memo(function PoiFeatureItem({
   onStartDrag?: (e: React.MouseEvent, id: string) => void
 }) {
   if (viewMode === 'player') return null
-  const cfg = POI_CATEGORY_CONFIG[feature.category] || POI_CATEGORY_CONFIG.crime_scene
 
   return (
     <g
@@ -261,35 +260,23 @@ export const MemoPoiFeature = React.memo(function PoiFeatureItem({
       }}
       className={cn('cursor-pointer group', isSelected && 'cursor-move')}
     >
-      {/* Pulsing ring for crime scene */}
-      {feature.category === 'crime_scene' && (
-        <circle r="22" fill="#EA4335" opacity="0.25" className="animate-ping" />
-      )}
-
       {/* Outer selection ring */}
       {isSelected && (
-        <circle r="20" fill="none" stroke="#2563EB" strokeWidth="3" strokeDasharray="4 3" />
+        <circle r="16" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeDasharray="4 3" />
       )}
 
-      {/* Marker badge circle */}
+      {/* Uniform Clean Marker Dot — Tất cả POI đều như nhau, không số, không màu mè, không toả ra */}
       <circle
-        r="14"
-        fill={feature.iconColor || cfg.color}
+        r="7"
+        fill="#475569"
         stroke="#FFFFFF"
-        strokeWidth="2.5"
-        className="shadow-md"
+        strokeWidth="2"
+        className="shadow-sm transition-transform group-hover:scale-125"
       />
-
-      {/* Badge number or icon */}
-      <text
-        textAnchor="middle"
-        dominantBaseline="central"
+      <circle
+        r="2"
         fill="#FFFFFF"
-        fontSize="10"
-        fontWeight="bold"
-      >
-        {feature.badgeNumber || '•'}
-      </text>
+      />
 
       {/* POI Title text underneath without enclosing box */}
       <text
@@ -313,12 +300,19 @@ export const MemoPoiFeature = React.memo(function PoiFeatureItem({
 
 export const ActiveDrawingPreview = React.memo(function ActiveDrawingPreviewComponent({
   drawingPoints,
-  cursorPos
+  cursorPos,
+  candidateLineRef,
+  candidateDotRef
 }: {
   drawingPoints: Point[]
-  cursorPos: Point
+  cursorPos?: Point
+  candidateLineRef?: React.RefObject<SVGLineElement | null>
+  candidateDotRef?: React.RefObject<SVGCircleElement | null>
 }) {
   if (drawingPoints.length === 0) return null
+  const lastPt = drawingPoints[drawingPoints.length - 1]
+  const curX = cursorPos?.x ?? lastPt.x
+  const curY = cursorPos?.y ?? lastPt.y
 
   return (
     <g pointerEvents="none">
@@ -334,10 +328,11 @@ export const ActiveDrawingPreview = React.memo(function ActiveDrawingPreviewComp
       {/* Candidate line from last point to current mouse position */}
       {drawingPoints.length > 0 && (
         <line
-          x1={drawingPoints[drawingPoints.length - 1].x}
-          y1={drawingPoints[drawingPoints.length - 1].y}
-          x2={cursorPos.x}
-          y2={cursorPos.y}
+          ref={candidateLineRef}
+          x1={lastPt.x}
+          y1={lastPt.y}
+          x2={curX}
+          y2={curY}
           stroke="#2563EB"
           strokeWidth="2"
           strokeDasharray="4 4"
@@ -350,7 +345,15 @@ export const ActiveDrawingPreview = React.memo(function ActiveDrawingPreviewComp
       ))}
 
       {/* Current cursor target dot */}
-      <circle cx={cursorPos.x} cy={cursorPos.y} r="6" fill="#EA580C" stroke="#FFFFFF" strokeWidth="2" />
+      <circle
+        ref={candidateDotRef}
+        cx={curX}
+        cy={curY}
+        r="6"
+        fill="#EA580C"
+        stroke="#FFFFFF"
+        strokeWidth="2"
+      />
     </g>
   )
 })
