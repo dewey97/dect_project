@@ -117,9 +117,22 @@ export type MapStudioTool =
   | 'poi'
   | 'label'
 
+export interface BuildingFeature {
+  id: string
+  name?: string
+  points: Point[]
+  color?: string
+  strokeColor?: string
+  strokeWidth?: number
+  opacity?: number
+  height?: number
+  zIndex: number
+}
+
 export type AnyMapFeature =
   | WaterFeature
   | ZoneFeature
+  | BuildingFeature
   | RoadFeature
   | RailwayFeature
   | PoiFeature
@@ -133,6 +146,7 @@ export interface MapVectorData {
   backgroundColor: string
   water: WaterFeature[]
   zones: ZoneFeature[]
+  buildings?: BuildingFeature[]
   roads: RoadFeature[]
   railways: RailwayFeature[]
   pois: PoiFeature[]

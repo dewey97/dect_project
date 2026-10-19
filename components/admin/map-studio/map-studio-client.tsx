@@ -51,7 +51,7 @@ import type {
   PoiCategory,
   LabelFeature
 } from '@/types/map-vector'
-import { snapPoint, getEmptyMapVectorData } from '@/lib/map-vector-utils'
+import { snapPoint, getEmptyMapVectorData, pointsToSvgPath } from '@/lib/map-vector-utils'
 import {
   POI_CATEGORY_CONFIG,
   MemoWaterFeature,
@@ -977,6 +977,7 @@ export function MapStudioClient() {
     const list: { type: string; item: any }[] = []
     mapData.water.forEach((item) => list.push({ type: 'water', item }))
     mapData.zones.forEach((item) => list.push({ type: 'zone', item }))
+    mapData.buildings?.forEach((item) => list.push({ type: 'building', item }))
     mapData.roads.forEach((item) => list.push({ type: 'road', item }))
     mapData.railways.forEach((item) => list.push({ type: 'railway', item }))
     mapData.labels.forEach((item) => list.push({ type: 'label', item }))
@@ -992,7 +993,7 @@ export function MapStudioClient() {
         if (filterLayer === 'water' && type !== 'water') return false
         if (filterLayer === 'roads' && type !== 'road') return false
         if (filterLayer === 'railways' && type !== 'railway') return false
-        if (filterLayer === 'zones' && type !== 'zone') return false
+        if (filterLayer === 'zones' && type !== 'zone' && type !== 'building') return false
         if (filterLayer === 'pois' && type !== 'poi') return false
         if (filterLayer === 'labels' && type !== 'label') return false
       }
@@ -1267,6 +1268,26 @@ export function MapStudioClient() {
                     onSelect={handleSelectFeature}
                     onStartDrag={handleFeatureMouseDown}
                   />
+                )
+              }
+              if (type === 'building') {
+                const d = pointsToSvgPath(item.points, true, false)
+                return (
+                  <path
+                    key={item.id}
+                    d={d}
+                    fill={isSelected ? '#FDE68A' : item.color || '#E2E8F0'}
+                    stroke={isSelected ? '#D97706' : item.strokeColor || '#CBD5E1'}
+                    strokeWidth={isSelected ? 1.5 : item.strokeWidth || 0.8}
+                    opacity={item.opacity ?? 0.85}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleSelectFeature(item.id)
+                    }}
+                    className="cursor-pointer transition-colors"
+                  >
+                    {item.name && <title>{item.name}</title>}
+                  </path>
                 )
               }
               if (type === 'road') {
