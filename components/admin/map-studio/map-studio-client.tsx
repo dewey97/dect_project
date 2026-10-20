@@ -68,10 +68,10 @@ import {
 import { MapStudioSidebar } from './map-studio-sidebar'
 import { MapStudioHeader, MapStudioToolsPalette } from './map-studio-toolbar'
 
-// Color palettes for authentic urban vector map aesthetic
+// Color palettes for authentic Apple Maps-style urban vector map aesthetic
 const WATER_COLORS = ['#97C8EB', '#71B4EC', '#55CBE8', '#3498DB', '#1D4ED8', '#A4CEEC']
-const ROAD_COLORS = ['#FFFFFF', '#F8FAFC', '#FEF3C7', '#FDE047', '#E2E8F0', '#94A3B8']
-const ZONE_COLORS = ['#E2E8F0', '#D1E7DD', '#FEF3C7', '#FCE7F3', '#E0E7FF', '#F1F5F9']
+const ROAD_COLORS = ['#CFDDE8', '#C4D5E3', '#D6E2EC', '#B8CBD8', '#E8F0F6', '#FFFFFF']
+const ZONE_COLORS = ['#F5F0E8', '#EDF4ED', '#FFF5E1', '#FCE7F3', '#E0E7FF', '#F1F5F9']
 
 export function MapStudioClient() {
   // Core Map Vector Data (Khởi tạo rỗng, nạp 100% dữ liệu thật từ Database)
@@ -1319,7 +1319,7 @@ export function MapStudioClient() {
               y="-300000"
               width="600000"
               height="600000"
-              fill={mapData.backgroundColor || '#F3F4F3'}
+              fill={mapData.backgroundColor || '#F4F6F8'}
             />
 
             {/* Infinite Grid Overlay (Chỉ hiện trong chế độ Admin) */}

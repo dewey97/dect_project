@@ -120,6 +120,14 @@ export const RoadCasingItem = React.memo(function RoadCasingItem({
     [feature.points, feature.smooth]
   )
 
+  // Apple Maps-style: casing chỉ dày hơn surface 1px mỗi bên, đồng tông xanh xám mờ
+  // Không còn viền cứng xám tương phản cao — giao lộ hòa vào nhau hoàn toàn
+  const casingColor = isSelected
+    ? '#2563EB'
+    : (feature.casingColor && feature.casingColor !== '#CBD5E1')
+      ? feature.casingColor
+      : '#B8CBD8'  // soft slate-blue casing thay thế #CBD5E1
+
   return (
     <g>
       {/* Bridge Drop Shadow */}
@@ -131,17 +139,18 @@ export const RoadCasingItem = React.memo(function RoadCasingItem({
           strokeWidth={feature.width + (feature.casingWidth || 2) * 2 + 6}
           strokeLinecap="round"
           strokeLinejoin="round"
-          opacity="0.25"
+          opacity="0.20"
         />
       )}
-      {/* Road Casing (Border / Viền ngoài) */}
+      {/* Road Casing — thin soft border, same-family tone as surface */}
       <path
         d={d}
         fill="none"
-        stroke={isSelected ? '#2563EB' : feature.casingColor || '#CBD5E1'}
-        strokeWidth={feature.width + (feature.casingWidth || 2) * 2}
+        stroke={casingColor}
+        strokeWidth={feature.width + (feature.casingWidth || 1) * 2}
         strokeLinecap="round"
         strokeLinejoin="round"
+        opacity={isSelected ? 1 : 0.75}
       />
     </g>
   )
@@ -163,22 +172,74 @@ export const RoadSurfaceItem = React.memo(function RoadSurfaceItem({
     [feature.points, feature.smooth]
   )
 
+  // Compute total path length to decide if label fits
+  const pathLength = useMemo(() => {
+    const pts = feature.points
+    if (pts.length < 2) return 0
+    return pts.reduce((sum, pt, i) => {
+      if (i === 0) return sum
+      const dx = pt.x - pts[i - 1].x
+      const dy = pt.y - pts[i - 1].y
+      return sum + Math.hypot(dx, dy)
+    }, 0)
+  }, [feature.points])
+
+  const pathId = `road-path-${feature.id}`
+  const showLabel = !!feature.name && pathLength > 80
+
+  // Label font size scales with road width: big roads get bigger labels
+  const labelFontSize = Math.max(8, Math.min(13, feature.width * 0.65))
+
   return (
-    <path
-      d={d}
-      fill="none"
-      stroke={feature.color || '#FFFFFF'}
-      strokeWidth={feature.width}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeDasharray={feature.dashed ? '8 6' : undefined}
-      onMouseDown={(e) => onStartDrag?.(e, feature.id)}
-      onClick={(e) => {
-        e.stopPropagation()
-        onSelect(feature.id)
-      }}
-      className={cn('cursor-pointer', isSelected && 'cursor-move')}
-    />
+    <g>
+      {/* Invisible path definition for textPath reference */}
+      {showLabel && (
+        <defs>
+          <path id={pathId} d={d} />
+        </defs>
+      )}
+
+      {/* Road Surface */}
+      <path
+        d={d}
+        fill="none"
+        stroke={feature.color || '#CFDDE8'}
+        strokeWidth={feature.width}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray={feature.dashed ? '8 6' : undefined}
+        onMouseDown={(e) => onStartDrag?.(e, feature.id)}
+        onClick={(e) => {
+          e.stopPropagation()
+          onSelect(feature.id)
+        }}
+        className={cn('cursor-pointer', isSelected && 'cursor-move')}
+      />
+
+      {/* Road Name Label — bám theo tim đường (Apple/Google Maps style) */}
+      {showLabel && (
+        <text
+          pointerEvents="none"
+          className="select-none"
+        >
+          <textPath
+            href={`#${pathId}`}
+            startOffset="50%"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            style={{
+              fontSize: labelFontSize,
+              fontWeight: feature.width >= 14 ? '600' : '400',
+              fill: feature.width >= 14 ? '#334155' : '#64748B',
+              letterSpacing: '0.01em',
+              paintOrder: 'stroke fill'
+            }}
+          >
+            {feature.name}
+          </textPath>
+        </text>
+      )}
+    </g>
   )
 })
 
