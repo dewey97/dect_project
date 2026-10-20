@@ -9,9 +9,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Map Studio & Dossier Studio require edge-to-edge canvas without default p-8 padding
+  // Map / Dossier / Checkpoint Studio require edge-to-edge canvas without default p-8 padding
   const isFullBleedStudio =
-    pathname.startsWith("/studio/map") || pathname.startsWith("/studio/dossier");
+    pathname.startsWith("/studio/map") ||
+    pathname.startsWith("/studio/dossier") ||
+    pathname.startsWith("/studio/checkpoints");
 
   return (
     <div className="flex h-screen w-screen bg-[#0a0a0d] text-zinc-100 selection:bg-primary/30 font-sans overflow-hidden">
@@ -25,7 +27,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             "flex-1 relative z-10 min-w-0 min-h-0",
             isFullBleedStudio
               ? "h-full w-full overflow-hidden flex flex-col p-0"
-              : "overflow-auto p-8"
+              : "overflow-auto p-8",
           )}
         >
           {children}

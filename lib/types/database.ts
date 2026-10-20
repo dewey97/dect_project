@@ -86,11 +86,39 @@ export interface DbAppSettings {
   updated_at: string;
 }
 
+/**
+ * Bảng case_checkpoints: Dữ liệu checkpoint do Checkpoint Studio biên tập.
+ * Chưa nối vào runtime — gameplay vẫn đọc Google Sheets.
+ */
+export interface DbCaseCheckpoint {
+  id: string;
+  case_id: string;
+  checkpoint_id: string;
+  node_id: string | null;
+  dossier: string | null;
+  title: string;
+  question: string;
+  type: string;
+  question_type: string | null;
+  unlocked_evidence_id: string | null;
+  followup_of: string | null;
+  suspect_label: string | null;
+  evidence_step_label: string | null;
+  answer_config: Record<string, unknown>;
+  hints: unknown;
+  narrative: string | null;
+  ai_context: string | null;
+  ai_valid_cases: unknown;
+  ai_invalid_cases: unknown;
+  created_at: string;
+  updated_at: string;
+}
+
 /** Bảng dossier_documents: Hồ sơ biên bản lấy lời khai và lý lịch tư pháp nghi phạm */
 export interface DbDossierDocument {
   id: string;
   case_id: string;
-  mode: 'loi_khai' | 'ly_lich';
+  mode: "loi_khai" | "ly_lich";
   tag_code: string;
   subject_name: string;
   paper_config: any;

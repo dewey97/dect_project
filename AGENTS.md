@@ -29,6 +29,7 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
   - Detective Rating & Leaderboard Spec: [`docs/core_specs/16_detective_rating_and_leaderboard_spec.md`](docs/core_specs/16_detective_rating_and_leaderboard_spec.md)
   - Vector Map Engine & Studio Spec: [`docs/core_specs/17_vector_map_engine_and_studio_spec.md`](docs/core_specs/17_vector_map_engine_and_studio_spec.md)
   - Dossier Studio & Document Spec: [`docs/core_specs/18_dossier_studio_and_document_spec.md`](docs/core_specs/18_dossier_studio_and_document_spec.md)
+  - Checkpoint Studio & Structured Authoring: [`docs/core_specs/19_checkpoint_studio.md`](docs/core_specs/19_checkpoint_studio.md)
   - Tech Debt Ledger: [`docs/TECHDEBT.md`](docs/TECHDEBT.md)
 - **🧠 Domain & Case Docs (Nghiệp vụ & Hồ sơ vụ án)**:
   - Bối cảnh & Cốt truyện Master Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)
@@ -163,7 +164,7 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
 
 ## 🔤 11. Quy Chuẩn Quản Lý Font Chữ & Cấm Tuyệt Đối `next/font/google` (No Next Font Google / Turbopack Bug Prevention)
 
-- **Cấm tuyệt đối sử dụng `next/font/google`**: 
+- **Cấm tuyệt đối sử dụng `next/font/google`**:
   - Trình biên dịch Turbopack trong Next.js 16 dính lỗi nghiêm trọng (Next.js Issue #99114: `next/font/google queries have exactly one entry` khi Google Fonts API trả về các URL extensionless hoặc có ký tự `&`/nhiều query parameters trong quá trình CI/CD build Docker).
   - Lỗi này gây ra hiện tượng build flake ngẫu nhiên (chạy local có thể pass do cache nhưng CI/CD trên Docker/Linux bị exit code 1).
 - **Chuẩn tải Font áp dụng cho toàn bộ dự án**:
@@ -181,9 +182,9 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
 - **Bắt buộc tuân thủ (Type-Only Import Convention)**:
   - Mọi import interface/type bắt buộc phải dùng cú pháp type-only:
     ```ts
-    import type { UnlockedModalData } from '@/components/...';
+    import type { UnlockedModalData } from "@/components/...";
     // hoặc
-    import { ComponentName, type UnlockedModalData } from '@/components/...';
+    import { ComponentName, type UnlockedModalData } from "@/components/...";
     ```
   - Khi một route bất ngờ bị 404 dù file `page.tsx` và cấu trúc thư mục vẫn tồn tại đầy đủ, điều đầu tiên cần kiểm tra là danh sách các câu lệnh `import` xem có type/interface nào bị import nhầm dưới dạng value hay không.
 
@@ -215,4 +216,3 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
   - Các địa điểm điều tra (`PoiFeature`) được gắn cờ `caseId` hoặc `caseIds` để xác định manh mối tương ứng của từng vụ án. Địa điểm công cộng dân sự (bến bãi, bệnh viện, nhà ga) không gắn `caseId` và hiển thị chung cho toàn thế giới.
 - **Không nhồi nhét Mock / Seed Fallback tĩnh**:
   - Ứng dụng điện thoại (`MapsApp`) và Studio nạp trực tiếp qua API `/api/admin/map-vector`. Tuyệt đối không nhúng mảng địa điểm tĩnh `DEFAULT_CASE_LOCATIONS` hoặc fallback ảnh raster vào client-side code.
-

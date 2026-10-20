@@ -2,6 +2,22 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-10-20]
+
+### Added
+
+- **Checkpoint Studio (`/studio/checkpoints`)**:
+  - Module master-detail biên tập checkpoint, đáp án, gợi ý đa cấp, narrative và AI check bằng form có cấu trúc.
+  - Bảng Supabase mới `case_checkpoints` (`db/schema/16_case_checkpoints.sql`) với RLS chỉ admin.
+  - Server actions CRUD `getCheckpointsByCase`, `saveCheckpoint`, `deleteCheckpoint` trong `lib/actions/checkpoint-actions.ts`.
+  - Bộ component `components/admin/checkpoint-studio/*` và section form theo 3 lớp Động cơ / Ngoại phạm / Mâu thuẫn.
+  - Sidebar Admin Studio bổ sung mục Checkpoint Studio; `AdminShell` mở full-bleed cho route mới.
+  - Đặc tả kỹ thuật `docs/core_specs/19_checkpoint_studio.md`.
+
+### Notes
+
+- Runtime gameplay **chưa** chuyển nguồn: vẫn đọc tab `checkpoints` từ Google Sheets. Chưa import dữ liệu cũ, chưa nối `useCaseCheckpoints`.
+
 ## [Unreleased] - 2026-10-12
 
 ### Added

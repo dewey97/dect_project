@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Map,
   FileText,
+  ListChecks,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -43,13 +44,22 @@ const navGroups: NavGroup[] = [
     items: [
       { name: "Map Studio", href: "/studio/map", icon: Map },
       { name: "Dossier Studio", href: "/studio/dossier", icon: FileText },
+      {
+        name: "Checkpoint Studio",
+        href: "/studio/checkpoints",
+        icon: ListChecks,
+      },
     ],
   },
   {
     groupName: "VẬN HÀNH",
     items: [
       { name: "Người chơi", href: "/studio/players", icon: Users },
-      { name: "Góp ý & Báo lỗi", href: "/studio/feedbacks", icon: MessageSquare },
+      {
+        name: "Góp ý & Báo lỗi",
+        href: "/studio/feedbacks",
+        icon: MessageSquare,
+      },
       { name: "Cài đặt Hệ thống", href: "/studio/settings", icon: Settings },
     ],
   },
@@ -77,7 +87,7 @@ export function AdminSidebar({
     <aside
       className={cn(
         "border-r border-white/10 bg-zinc-950/80 backdrop-blur-md flex flex-col h-full z-20 relative transition-all duration-300 shrink-0",
-        isCollapsed ? "w-16" : "w-64"
+        isCollapsed ? "w-16" : "w-64",
       )}
     >
       {/* HEADER */}
@@ -105,9 +115,13 @@ export function AdminSidebar({
             onClick={onToggleCollapse}
             className={cn(
               "p-1.5 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 transition-colors",
-              isCollapsed && "mx-auto mt-0"
+              isCollapsed && "mx-auto mt-0",
             )}
-            title={isCollapsed ? "Mở rộng thanh điều hướng" : "Thu gọn thanh điều hướng"}
+            title={
+              isCollapsed
+                ? "Mở rộng thanh điều hướng"
+                : "Thu gọn thanh điều hướng"
+            }
           >
             {isCollapsed ? (
               <ChevronRight className="size-4" />
@@ -143,7 +157,7 @@ export function AdminSidebar({
                     isActive
                       ? "bg-primary/15 text-primary font-medium border border-primary/25 shadow-sm"
                       : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-850 hover:bg-zinc-800/40",
-                    isCollapsed && "justify-center px-0"
+                    isCollapsed && "justify-center px-0",
                   )}
                 >
                   <item.icon
@@ -151,7 +165,7 @@ export function AdminSidebar({
                       "size-4 shrink-0 transition-colors",
                       isActive
                         ? "text-primary"
-                        : "text-zinc-400 group-hover:text-zinc-200"
+                        : "text-zinc-400 group-hover:text-zinc-200",
                     )}
                   />
 
@@ -165,7 +179,7 @@ export function AdminSidebar({
                         "text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-semibold",
                         isActive
                           ? "bg-primary/25 text-primary"
-                          : "bg-zinc-800 text-zinc-400"
+                          : "bg-zinc-800 text-zinc-400",
                       )}
                     >
                       {item.badge}
@@ -177,7 +191,7 @@ export function AdminSidebar({
                     <span
                       className={cn(
                         "size-2 rounded-full bg-red-500 animate-pulse",
-                        isCollapsed ? "absolute top-1.5 right-1.5" : "ml-auto"
+                        isCollapsed ? "absolute top-1.5 right-1.5" : "ml-auto",
                       )}
                     />
                   )}
@@ -190,14 +204,16 @@ export function AdminSidebar({
 
       {/* FOOTER ACTIONS */}
       <div className="p-3 border-t border-white/10">
-        <div className={cn("flex items-center gap-1.5", isCollapsed && "flex-col")}>
+        <div
+          className={cn("flex items-center gap-1.5", isCollapsed && "flex-col")}
+        >
           {/* Exit Studio */}
           <Link
             href="/"
             title={isCollapsed ? "Thoát Studio" : undefined}
             className={cn(
               "flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors",
-              isCollapsed && "justify-center w-full px-0"
+              isCollapsed && "justify-center w-full px-0",
             )}
           >
             <LogOut className="size-3.5 shrink-0" />
