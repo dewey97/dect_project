@@ -7,7 +7,11 @@ import type { DbCaseCheckpoint } from "./database";
  * Google Sheets qua `lib/cms/checkpoint-cms.ts`; chưa có kết nối nào giữa hai bên.
  */
 
-export type CheckpointStudioType = "evidence_picker";
+/**
+ * Loại checkpoint đọc từ dữ liệu gốc. Studio V1 chỉ biên tập được
+ * `evidence_picker`; các loại khác được giữ nguyên và hiển thị read-only.
+ */
+export type CheckpointStudioType = string;
 
 export type CheckpointHintGroup =
   "general" | "motive" | "alibi" | "contradiction";
@@ -158,7 +162,7 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     dossier: asString(row.dossier),
     title: asString(row.title),
     question: asString(row.question),
-    type: "evidence_picker",
+    type: asString(row.type) || "evidence_picker",
     questionType: asString(row.question_type) || "evidence_picker",
     unlockedEvidenceId: asString(row.unlocked_evidence_id),
     followupOf: asString(row.followup_of),
@@ -201,8 +205,8 @@ export function toRowPayload(
     dossier: draft.dossier.trim() || null,
     title: draft.title.trim(),
     question: draft.question.trim(),
-    type: "evidence_picker",
-    question_type: draft.questionType.trim() || "evidence_picker",
+    type: draft.type.trim() || "evidence_picker",
+    question_type: draft.questionType.trim() || draft.type.trim() || null,
     unlocked_evidence_id: draft.unlockedEvidenceId.trim() || null,
     followup_of: draft.followupOf.trim() || null,
     suspect_label: draft.suspectLabel.trim() || null,

@@ -72,9 +72,11 @@ export function CheckpointIdentityForm({
 
         <Field label="Loại checkpoint">
           <div className="flex h-8 items-center rounded-lg border border-white/10 bg-black/20 px-2.5 font-mono text-xs text-zinc-400">
-            evidence_picker
+            {draft.type || "evidence_picker"}
             <span className="ml-auto text-[10px] text-zinc-600">
-              V1 chỉ hỗ trợ loại này
+              {draft.type === "evidence_picker"
+                ? "V1 hỗ trợ biên tập"
+                : "chỉ đọc — V1 chưa hỗ trợ"}
             </span>
           </div>
         </Field>

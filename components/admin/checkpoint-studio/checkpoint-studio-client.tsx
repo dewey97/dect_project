@@ -131,6 +131,12 @@ export function CheckpointStudioClient({
 
   const handleSave = async () => {
     if (!draft) return;
+    if (draft.type !== "evidence_picker") {
+      toast.error(
+        `Loại ${draft.type} chưa hỗ trợ biên tập trong V1. Dữ liệu chỉ đọc.`,
+      );
+      return;
+    }
     if (!draft.checkpointId.trim()) {
       toast.error("Nhập mã checkpoint trước khi lưu.");
       return;

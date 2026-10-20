@@ -66,7 +66,9 @@ export function CheckpointEditor({
     );
   }
 
-  const canSave = isDirty && !isSaving && draft.checkpointId.trim().length > 0;
+  const isEditable = draft.type === "evidence_picker";
+  const canSave =
+    isEditable && isDirty && !isSaving && draft.checkpointId.trim().length > 0;
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#0a0a0d]">
@@ -77,6 +79,9 @@ export function CheckpointEditor({
               {draft.title || draft.checkpointId || "Checkpoint mới"}
             </h2>
             <span className="shrink-0 rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-amber-300">
+              {draft.type || "evidence_picker"}
+            </span>
+            <span className="shrink-0 rounded border border-white/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-zinc-500">
               Supabase only
             </span>
           </div>
@@ -127,40 +132,50 @@ export function CheckpointEditor({
       </header>
 
       <div className="min-h-0 flex-1 space-y-8 overflow-y-auto px-4 py-5 md:px-6">
-        <Section
-          title="Thông tin checkpoint"
-          description="Định danh, vị trí trên board và liên kết mở khóa."
-        >
-          <CheckpointIdentityForm draft={draft} onChange={onChange} />
-        </Section>
+        {!isEditable && (
+          <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-xs leading-relaxed text-zinc-400">
+            Loại <span className="font-mono text-zinc-200">{draft.type}</span>{" "}
+            chưa có editor trong V1. Dữ liệu đã import được giữ nguyên và chỉ
+            đọc; không thể lưu đè từ Studio.
+          </div>
+        )}
 
-        <Section
-          title="Cấu hình đáp án"
-          description="Mã chứng cứ bắt buộc và tùy chọn cho 3 lớp thẩm tra."
-        >
-          <EvidencePickerConfigForm draft={draft} onChange={onChange} />
-        </Section>
+        <fieldset disabled={!isEditable} className="min-w-0 space-y-8">
+          <Section
+            title="Thông tin checkpoint"
+            description="Định danh, vị trí trên board và liên kết mở khóa."
+          >
+            <CheckpointIdentityForm draft={draft} onChange={onChange} />
+          </Section>
 
-        <Section
-          title="Gợi ý đa cấp"
-          description="Mỗi nhóm có thứ tự từ gợi ý mở đến đáp án gợi mở."
-        >
-          <CheckpointHintsForm draft={draft} onChange={onChange} />
-        </Section>
+          <Section
+            title="Cấu hình đáp án"
+            description="Mã chứng cứ bắt buộc và tùy chọn cho 3 lớp thẩm tra."
+          >
+            <EvidencePickerConfigForm draft={draft} onChange={onChange} />
+          </Section>
 
-        <Section
-          title="Narrative"
-          description="Độc thoại dẫn truyện của checkpoint."
-        >
-          <CheckpointNarrativeForm draft={draft} onChange={onChange} />
-        </Section>
+          <Section
+            title="Gợi ý đa cấp"
+            description="Mỗi nhóm có thứ tự từ gợi ý mở đến đáp án gợi mở."
+          >
+            <CheckpointHintsForm draft={draft} onChange={onChange} />
+          </Section>
 
-        <Section
-          title="AI check"
-          description="Bối cảnh và few-shot dùng khi chấm lập luận thẩm tra."
-        >
-          <CheckpointAiCheckForm draft={draft} onChange={onChange} />
-        </Section>
+          <Section
+            title="Narrative"
+            description="Độc thoại dẫn truyện của checkpoint."
+          >
+            <CheckpointNarrativeForm draft={draft} onChange={onChange} />
+          </Section>
+
+          <Section
+            title="AI check"
+            description="Bối cảnh và few-shot dùng khi chấm lập luận thẩm tra."
+          >
+            <CheckpointAiCheckForm draft={draft} onChange={onChange} />
+          </Section>
+        </fieldset>
       </div>
     </div>
   );

@@ -12,6 +12,7 @@
     "sync:testimonies": "node scripts/sync-testimonies-from-sheet.js",
     "sync:map": "node scripts/sync-figma-map.js",
     "scan:map-vector": "python scripts/scan_figma_map_vector.py",
+    "import:checkpoints": "node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs",
     "start": "next start",
     "lint": "tsc --noEmit"
   },

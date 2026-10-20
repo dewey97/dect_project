@@ -56,6 +56,13 @@ export async function saveCheckpoint(
   try {
     await requireAdminAuth();
 
+    if (draft.type !== "evidence_picker") {
+      return {
+        success: false,
+        error: `Loại ${draft.type || "(trống)"} chưa hỗ trợ biên tập trong V1.`,
+      };
+    }
+
     const checkpointId = draft.checkpointId.trim();
     if (!checkpointId) {
       return { success: false, error: "Mã checkpoint không được để trống." };

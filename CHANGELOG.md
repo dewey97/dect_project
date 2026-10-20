@@ -13,10 +13,12 @@ All notable changes to the Detective Case System (dect_project) will be document
   - Bộ component `components/admin/checkpoint-studio/*` và section form theo 3 lớp Động cơ / Ngoại phạm / Mâu thuẫn.
   - Sidebar Admin Studio bổ sung mục Checkpoint Studio; `AdminShell` mở full-bleed cho route mới.
   - Đặc tả kỹ thuật `docs/core_specs/19_checkpoint_studio.md`.
+  - Script `scripts/import-checkpoints-to-supabase.mjs` (`pnpm import:checkpoints`) import toàn bộ tab `checkpoints` vào `case_checkpoints`, upsert theo `(case_id, checkpoint_id)`.
+  - Giữ nguyên `type` gốc khi import; checkpoint ngoài `evidence_picker` hiển thị read-only trong Studio V1.
 
 ### Notes
 
-- Runtime gameplay **chưa** chuyển nguồn: vẫn đọc tab `checkpoints` từ Google Sheets. Chưa import dữ liệu cũ, chưa nối `useCaseCheckpoints`.
+- Runtime gameplay **chưa** chuyển nguồn: vẫn đọc tab `checkpoints` từ Google Sheets. Đã import 13 checkpoint của `case_000` vào Supabase nhưng chưa nối `useCaseCheckpoints`.
 
 ## [Unreleased] - 2026-10-12
 

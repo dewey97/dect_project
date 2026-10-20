@@ -58,7 +58,7 @@ Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.s
 | `node_id`                                          | TEXT       | Tùy chọn, mặc định dùng `checkpoint_id`                   |
 | `dossier`                                          | TEXT       | Ban Đầu / Bộ A / Bộ B / Bộ C                              |
 | `title`, `question`                                | TEXT       | Nội dung hiển thị                                         |
-| `type`                                             | TEXT       | V1 cố định `evidence_picker`                              |
+| `type`                                             | TEXT       | Loại gốc từ Sheet; V1 chỉ biên tập `evidence_picker`      |
 | `question_type`                                    | TEXT       | Mặc định `evidence_picker`                                |
 | `unlocked_evidence_id`, `followup_of`              | TEXT       | Liên kết tiến trình                                       |
 | `suspect_label`, `evidence_step_label`             | TEXT       | Nhãn bước thẩm tra                                        |
@@ -83,6 +83,10 @@ Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.s
   "optionalContradictionIds": []
 }
 ```
+
+Dữ liệu import từ Sheet có thể kèm các khóa phục vụ loại checkpoint khác:
+`options`, `correctAnswer`, `textMatchInputs`, `photoCodes`, `availableEvidences`, `rawAnswers`.
+Studio V1 giữ nguyên các khóa này; form chỉ đọc/ghi 10 mảng `evidence_picker`.
 
 ### 3.2. Shape `hints`
 
@@ -133,20 +137,38 @@ lib/types/database.ts                            # DbCaseCheckpoint
 | `deleteCheckpoint(id)`         | Xóa theo UUID                          |
 
 Mọi action gọi `requireAdminAuth()` trước khi thao tác Supabase.
+`saveCheckpoint` từ chối mọi draft có `type !== 'evidence_picker'` để tránh ghi đè dữ liệu loại khác.
 
-### 4.2. Quy tắc UX
+### 4.2. Import dữ liệu Google Sheets
+
+Script [`scripts/import-checkpoints-to-supabase.mjs`](../scripts/import-checkpoints-to-supabase.mjs) đọc tab
+`<case_id>_checkpoints` (fallback `checkpoints`), bóc DSL bằng chính parser runtime, rồi sinh SQL upsert:
+
+```bash
+pnpm import:checkpoints
+# hoặc chọn vụ án khác (Node >= 22.6):
+node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --case=case_001
+```
+
+- Kết quả ghi vào `.tmp/checkpoints-import.sql`; áp dụng bằng Supabase MCP `execute_sql` hoặc `psql`.
+- Upsert theo `(case_id, checkpoint_id)`, chạy lại nhiều lần không tạo bản ghi trùng.
+- Import **tất cả** loại checkpoint. Loại chưa có editor (`text_match_3`, `mcq`, `text`, ...) được lưu read-only:
+  form hiển thị dữ liệu nhưng khóa toàn bộ field và nút Lưu.
+- Script chỉ đọc Sheet, không sửa runtime và không ghi ngược Google Sheets.
+
+### 4.3. Quy tắc UX
 
 - Master-detail: danh sách bên trái, form bên phải; mobile xếp dọc.
 - Dirty tracking bằng so sánh JSON draft với baseline; cảnh báo khi đổi row / đổi vụ án / đóng tab.
 - Không `autoFocus`, không gọi `.focus()` tự động khi mở form (quy tắc mobile của dự án).
 - Mã chứng cứ nhập tự do dạng chip; V1 chưa đọc danh mục từ tab `evidences`.
+- Checkpoint không phải `evidence_picker` hiển thị banner cảnh báo và toàn bộ form ở trạng thái disabled.
 
 ---
 
 ## 5. Lộ trình tiếp theo
 
-1. Import dữ liệu hiện có từ tab `checkpoints` sang `case_checkpoints`.
-2. Bổ sung editor cho `text_match_3`, `mcq`, `time`, `code`, `text`.
-3. Viết exporter Supabase → `SheetCheckpointRow` để đồng bộ ngược hoặc chuyển runtime sang Supabase.
-4. Đọc danh mục vật chứng từ Live CMS để gợi ý mã (vẫn giữ khả năng nhập tự do).
-5. Nối runtime: thay `useCaseCheckpoints` bằng nguồn Supabase sau khi dữ liệu đã được kiểm chứng song song.
+1. Bổ sung editor cho `text_match_3`, `mcq`, `time`, `code`, `text`.
+2. Viết exporter Supabase → `SheetCheckpointRow` để đồng bộ ngược hoặc chuyển runtime sang Supabase.
+3. Đọc danh mục vật chứng từ Live CMS để gợi ý mã (vẫn giữ khả năng nhập tự do).
+4. Nối runtime: thay `useCaseCheckpoints` bằng nguồn Supabase sau khi dữ liệu đã được kiểm chứng song song.
