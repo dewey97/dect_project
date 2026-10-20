@@ -4,7 +4,6 @@ import React from 'react'
 import {
   Undo2,
   Redo2,
-  Grid3X3,
   Wrench,
   Eye,
   RefreshCw,
@@ -72,8 +71,6 @@ export interface MapStudioHeaderProps {
   handleRedo: () => void
   historyIndex: number
   historyLength: number
-  snapToGrid: boolean
-  setSnapToGrid: (val: boolean) => void
   showGrid: boolean
   setShowGrid: (val: boolean) => void
   viewMode: 'admin' | 'player'
@@ -99,8 +96,6 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
   handleRedo,
   historyIndex,
   historyLength,
-  snapToGrid,
-  setSnapToGrid,
   showGrid,
   setShowGrid,
   viewMode,
@@ -154,22 +149,8 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
 
         <div className="h-4 w-[1px] bg-slate-800 mx-1" />
 
-        {/* Grid & Snapping Controls */}
+        {/* Grid Controls */}
         <div className="flex items-center gap-1">
-          <button
-            onClick={() => setSnapToGrid(!snapToGrid)}
-            className={cn(
-              'px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border',
-              snapToGrid
-                ? 'bg-blue-600/30 text-blue-400 border-blue-500/50'
-                : 'text-slate-400 border-slate-800 hover:bg-slate-800'
-            )}
-            title="Bật/Tắt hít điểm lưới (Magnetic Snap)"
-          >
-            <Grid3X3 className="size-3.5" />
-            <span>Hít lưới</span>
-          </button>
-
           <button
             onClick={() => setShowGrid(!showGrid)}
             className={cn(

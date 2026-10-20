@@ -160,12 +160,14 @@ export const RoadSurfaceItem = React.memo(function RoadSurfaceItem({
   feature,
   isSelected,
   onSelect,
-  onStartDrag
+  onStartDrag,
+  showLabel = true
 }: {
   feature: RoadFeature
   isSelected: boolean
   onSelect: (id: string) => void
   onStartDrag?: (e: React.MouseEvent, id: string) => void
+  showLabel?: boolean
 }) {
   const d = useMemo(
     () => pointsToSvgPath(feature.points, false, feature.smooth),
@@ -185,7 +187,7 @@ export const RoadSurfaceItem = React.memo(function RoadSurfaceItem({
   }, [feature.points])
 
   const pathId = `road-path-${feature.id}`
-  const showLabel = !!feature.name && pathLength > 80
+  const shouldShowLabel = showLabel && !!feature.name && pathLength > 80
 
   // Label font size scales with road width: big roads get bigger labels
   const labelFontSize = Math.max(8, Math.min(13, feature.width * 0.65))
@@ -193,7 +195,7 @@ export const RoadSurfaceItem = React.memo(function RoadSurfaceItem({
   return (
     <g>
       {/* Invisible path definition for textPath reference */}
-      {showLabel && (
+      {shouldShowLabel && (
         <defs>
           <path id={pathId} d={d} />
         </defs>
@@ -217,7 +219,7 @@ export const RoadSurfaceItem = React.memo(function RoadSurfaceItem({
       />
 
       {/* Road Name Label — bám theo tim đường (Apple/Google Maps style) */}
-      {showLabel && (
+      {shouldShowLabel && (
         <text
           pointerEvents="none"
           className="select-none"

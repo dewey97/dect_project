@@ -1,54 +1,47 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { ArrowLeft, Check, Loader2 } from 'lucide-react'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { ClueCodePicker, type PendingClueInputs } from '../clue-code-picker'
-import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
+import React from "react";
+import { ArrowLeft, Check, Loader2 } from "lucide-react";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { ClueCodePicker, type PendingClueInputs } from "../clue-code-picker";
+import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 
 interface InterrogationClueStepProps {
-  category: 'motive' | 'alibi' | 'contradiction'
-  clueIds: string[]
-  reason?: string
-  onReasonChange?: (val: string) => void
-  onAddClueId: (id: string) => void
-  onRemoveClueId: (id: string) => void
-  onPendingChange: (pending: PendingClueInputs) => void
-  checkpointId?: string
-  caseId?: string
-  onBack: () => void
-  onConfirm: () => void
-  isLoading?: boolean
+  category: "motive" | "contradiction";
+  clueIds: string[];
+  reason?: string;
+  onReasonChange?: (val: string) => void;
+  onAddClueId: (id: string) => void;
+  onRemoveClueId: (id: string) => void;
+  onPendingChange: (pending: PendingClueInputs) => void;
+  checkpointId?: string;
+  caseId?: string;
+  onBack: () => void;
+  onConfirm: () => void;
+  isLoading?: boolean;
 }
 
 const CATEGORY_CONFIG = {
   motive: {
-    reasonLabel: 'LÝ DO & CĂN CỨ VỀ ĐỘNG CƠ GÂY ÁN',
-    reasonPlaceholder: 'Nhập phân tích lý do đối tượng có động cơ gây án (tùy chọn)...',
-    clueLabel: 'TÀI LIỆU / MANH MỐI MINH CHỨNG CHO ĐỘNG CƠ',
-    cluePlaceholder: 'Nhập mã chứng cứ minh chứng...',
-    emptyStateText: 'Chưa có bằng chứng nào được nhập.',
-  },
-  alibi: {
-    reasonLabel: 'LÝ DO & CĂN CỨ XÁC MINH NGOẠI PHẠM',
-    reasonPlaceholder: 'Nhập phân tích mốc thời gian hoặc tình tiết ngoại phạm (tùy chọn)...',
-    clueLabel: 'TÀI LIỆU / MANH MỐI MINH CHỨNG CHO NGOẠI PHẠM',
-    cluePlaceholder: 'Nhập mã chứng cứ minh chứng...',
-    emptyStateText: 'Chưa có bằng chứng ngoại phạm nào được nhập.',
+    reasonLabel: "ĐỘNG CƠ",
+    reasonPlaceholder: "Nhập động cơ...",
+    clueLabel: "TÀI LIỆU / MANH MỐI MINH CHỨNG CHO ĐỘNG CƠ",
+    cluePlaceholder: "Nhập mã chứng cứ minh chứng...",
+    emptyStateText: "Chưa có bằng chứng nào được nhập.",
   },
   contradiction: {
-    reasonLabel: 'LÝ DO & CĂN CỨ VỀ MÂU THUẪN LỜI KHAI',
-    reasonPlaceholder: 'Nhập phân tích điểm mâu thuẫn trong lời khai (tùy chọn)...',
-    clueLabel: 'TÀI LIỆU / MANH MỐI MINH CHỨNG CHO MÂU THUẪN',
-    cluePlaceholder: 'Nhập mã chứng cứ minh chứng...',
-    emptyStateText: 'Chưa có bằng chứng mâu thuẫn nào được nhập.',
+    reasonLabel: "MÂU THUẪN LỜI KHAI",
+    reasonPlaceholder: "Nhập mâu thuẫn lời khai...",
+    clueLabel: "TÀI LIỆU / MANH MỐI MINH CHỨNG CHO MÂU THUẪN",
+    cluePlaceholder: "Nhập mã chứng cứ minh chứng...",
+    emptyStateText: "Chưa có bằng chứng mâu thuẫn nào được nhập.",
   },
-}
+};
 
 export function InterrogationClueStep({
   category,
   clueIds,
-  reason = '',
+  reason = "",
   onReasonChange,
   onAddClueId,
   onRemoveClueId,
@@ -59,7 +52,7 @@ export function InterrogationClueStep({
   onConfirm,
   isLoading = false,
 }: InterrogationClueStepProps) {
-  const cfg = CATEGORY_CONFIG[category]
+  const cfg = CATEGORY_CONFIG[category];
 
   return (
     <div className="space-y-4 pt-1">
@@ -109,8 +102,8 @@ export function InterrogationClueStep({
           type="button"
           disabled={isLoading}
           onClick={() => {
-            detectiveAudio.playPaperRustle()
-            onBack()
+            detectiveAudio.playPaperRustle();
+            onBack();
           }}
           className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95 disabled:opacity-50"
         >
@@ -140,5 +133,5 @@ export function InterrogationClueStep({
         </div>
       </div>
     </div>
-  )
+  );
 }

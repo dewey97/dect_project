@@ -18,7 +18,6 @@ import {
   Upload,
   Layers,
   Sliders,
-  Grid3X3,
   ZoomIn,
   ZoomOut,
   RotateCcw,
@@ -132,8 +131,7 @@ export function MapStudioClient() {
   const [poiCategory, setPoiCategory] = useState<PoiCategory>('crime_scene')
 
   // Canvas Settings
-  const [showGrid, setShowGrid] = useState(true)
-  const [snapToGrid, setSnapToGrid] = useState(true)
+  const [showGrid, setShowGrid] = useState(false)
   const [gridSize, setGridSize] = useState(25)
   const [hiddenFeatureIds, setHiddenFeatureIds] = useState<Record<string, boolean>>({})
   const [showPhoneOverlay, setShowPhoneOverlay] = useState(false)
@@ -505,23 +503,21 @@ export function MapStudioClient() {
 
       // O(1) Snap candidates: check only 3x3 surrounding spatial cells (10-20 points max instead of 10,000)
       const candidatePoints: Point[] = []
-      if (snapToGrid) {
-        const { grid, cellSize } = vertexSpatialGrid
-        const cx = Math.floor(rawX / cellSize)
-        const cy = Math.floor(rawY / cellSize)
-        for (let dx = -1; dx <= 1; dx++) {
-          for (let dy = -1; dy <= 1; dy++) {
-            const cell = grid.get(`${cx + dx},${cy + dy}`)
-            if (cell) {
-              candidatePoints.push(...cell)
-            }
+      const { grid, cellSize } = vertexSpatialGrid
+      const cx = Math.floor(rawX / cellSize)
+      const cy = Math.floor(rawY / cellSize)
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const cell = grid.get(`${cx + dx},${cy + dy}`)
+          if (cell) {
+            candidatePoints.push(...cell)
           }
         }
       }
 
-      return snapPoint({ x: rawX, y: rawY }, gridSize, snapToGrid, candidatePoints, 14)
+      return snapPoint({ x: rawX, y: rawY }, gridSize, false, candidatePoints, 14)
     },
-    [snapToGrid, gridSize, vertexSpatialGrid]
+    [gridSize, vertexSpatialGrid]
   )
 
   // Find currently selected feature
@@ -1205,8 +1201,6 @@ export function MapStudioClient() {
         handleRedo={handleRedo}
         historyIndex={historyIndex}
         historyLength={history.length}
-        snapToGrid={snapToGrid}
-        setSnapToGrid={setSnapToGrid}
         showGrid={showGrid}
         setShowGrid={setShowGrid}
         viewMode={viewMode}
@@ -1264,7 +1258,8 @@ export function MapStudioClient() {
               : 'cursor-crosshair'
           )}
           style={{
-            contain: 'paint layout'
+            contain: 'paint layout',
+            backgroundColor: mapData.backgroundColor || '#F4F6F8'
           }}
         >
           {/* Loading State Overlay */}
@@ -1311,16 +1306,6 @@ export function MapStudioClient() {
                 />
               </pattern>
             </defs>
-
-            {/* Infinite Background Canvas Board (Unbounded 600,000 x 600,000 Universe) */}
-            <rect
-              id="map-canvas-bg"
-              x="-300000"
-              y="-300000"
-              width="600000"
-              height="600000"
-              fill={mapData.backgroundColor || '#F4F6F8'}
-            />
 
             {/* Infinite Grid Overlay (Chỉ hiện trong chế độ Admin) */}
             {showGrid && viewMode === 'admin' && (
@@ -1450,6 +1435,7 @@ export function MapStudioClient() {
                     isSelected={selectedFeatureId === item.id}
                     onSelect={handleSelectFeature}
                     onStartDrag={handleFeatureMouseDown}
+                    showLabel={!isPanning}
                   />
                 ))}
             </g>

@@ -54,6 +54,7 @@ flowchart LR
 ---
 
 ### 🟢 Bước 1: Khởi Tạo Ý Tưởng, Động Cơ & Thủ Đoạn Gây Án
+
 - **Mục tiêu**: Xác định bản chất vụ án (Án mạng trả thù, siết nợ, chiếm đoạt tài sản, hay án mạng liên hoàn).
 - **Tab thực hiện trên Sheet**:
   - `motive_ideas`: Chọn mẫu động cơ tâm lý (Tài chính, Tình ái, Uất ức thù hằn, Che giấu tội ác quá khứ).
@@ -62,6 +63,7 @@ flowchart LR
 ---
 
 ### 🟢 Bước 2: Xây Dựng Dòng Thời Gian Vụ Án & Mạng Lưới Nhân Vật
+
 - **Mục tiêu**: Lập bảng thời gian thực (Truth Timeline) đối chiếu với bảng thời gian gian dối (Fake Timeline).
 - **Tab thực hiện trên Sheet**:
   - `characters`: Tạo danh sách nghi phạm, nhân chứng, mối quan hệ, đặc điểm nhận dạng.
@@ -71,6 +73,7 @@ flowchart LR
 ---
 
 ### 🟢 Bước 3: Biên Soạn Hồ Sơ Lời Khai & Biên Bản Thẩm Vấn (Google Docs)
+
 - **Mục tiêu**: Tạo ra các biên bản hỏi cung, lấy lời khai nhân chứng có mâu thuẫn để người chơi phát hiện lỗ hổng.
 - **Cách thực hiện**:
   1. Nhập danh mục văn bản vào tab `testimonies` trên Sheet (Mã văn bản `06`, `07`, `08`, Họ tên, Mốc giờ, Cán bộ, Tóm tắt ngoại phạm).
@@ -80,6 +83,7 @@ flowchart LR
 ---
 
 ### 🟢 Bước 4: Tái Hiện Hiện Trường Điện Thoại Nạn Nhân / Nghi Phạm
+
 - **Mục tiêu**: Người chơi mở chiếc điện thoại thu giữ được tại hiện trường để bắt đầu bóc tách manh mối.
 - **Tab thực hiện trên Sheet**:
   - `contacts`: Danh bạ điện thoại của nạn nhân (bao gồm các số nghi vấn, tên lưu ẩn dụ).
@@ -91,6 +95,7 @@ flowchart LR
 ---
 
 ### 🟢 Bước 5: Thiết Kế Mốc Phá Án, Hệ Thống Gợi Ý & Dẫn Truyện Cinematic
+
 - **Mục tiêu**: Định tuyến trải nghiệm phá án qua từng chặng (Phases: Mở đầu ➔ Bộ A ➔ Bộ B ➔ Bộ C ➔ Bản Cáo Trạng Định Tội).
 - **Tab thực hiện trên Sheet**:
   - `checkpoints`: Tạo các câu hỏi suy luận, chọn nghi phạm, chọn mã vật chứng kết hợp, nhập đáp án (`answers`) và gợi ý đa cấp (`hints`).
@@ -102,6 +107,7 @@ flowchart LR
 ## 📑 PHẦN III: ĐẶC TẢ CHI TIẾT TẤT CẢ CÁC TAB TRÊN GOOGLE SHEET MASTER
 
 ### 🏷️ Quy Ước Ký Hiệu Phân Loại Cột:
+
 - 🔴 **`🔑 Core Identifier`**: Khóa ID kỹ thuật bắt buộc code dùng để map dữ liệu và định tuyến logic.
 - 🟢 **`⚡ Live Reactive`**: Dữ liệu đọc trực tiếp runtime qua API (Sửa trên Sheet là web đổi ngay tức thì).
 - ⚪ **`📝 Editorial Note`**: Ghi chú nghiệp vụ phân loại cho Game Designer/Biên kịch (Code bỏ qua).
@@ -110,24 +116,24 @@ flowchart LR
 
 ### 1. Tab `testimonies` — Hồ Sơ Lời Khai & Biên Bản Thẩm Vấn (Google Docs)
 
-| Cột | Tên trường | Loại | Ý nghĩa & Quy ước |
-| :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | ID vụ án (`case_000`, `case_001`). |
-| 2 | `doc_code` | 🔴 `🔑` | Mã số văn bản (`06`, `07`, `08`, `09`, `12`, `A02`, `B01`...). |
-| 3 | `phase` | 🔴 `🔑` | Phân chặng (`00_khoi_dau`, `01_nhanh_mai_vu`, `02_nhanh_tung`, `03_nhanh_ha`). |
-| 4 | `person_name` | 🟢 `⚡` | Họ tên người khai báo (`Nguyễn Ngọc Mai`, `Lê Quang Vũ`...). |
-| 5 | `role` | 🟢 `⚡` | Tư cách tham gia tố tụng (Nhân chứng, Nghi phạm, Bị can). |
-| 6 | `doc_title` | 🟢 `⚡` | Tiêu đề văn bản (`BIÊN BẢN LẤY LỜI KHAI`, `BẢN TỰ THÚ`...). |
-| 7 | `doc_number` | 🟢 `⚡` | Số công văn lưu trữ (`07/BB-LK`). |
-| 8 | `time_taken` | 🟢 `⚡` | Thời gian lập biên bản (`14h00 ngày 25/07/2016`). |
-| 10 | `location` | 🟢 `⚡` | Địa điểm lập biên bản. |
-| 11 | `officer` | 🟢 `⚡` | Cán bộ điều tra phụ trách (`Đại úy Lê Minh`). |
-| 12 | `participants` | 🟢 `⚡` | Thành phần tham gia. |
-| 13 | `core_content` | 🟢 `⚡` | Tóm tắt các ý chính / key clues của lời khai. |
-| 14 | `alibi_claim` | 🟢 `⚡` | Tóm tắt luận điểm ngoại phạm đối tượng khai. |
-| 15 | `clue_flaw` | 🟢 `⚡` | Lỗ hổng / mâu thuẫn để người chơi bóc trần. |
-| 16 | `gdoc_tab_title` | 🟢 `⚡` | Tên Document Tab trên Master Google Doc. |
-| 17 | `gdoc_url` | 🟢 `⚡` | Link trực tiếp tới Master Google Doc. |
+| Cột | Tên trường       |  Loại   | Ý nghĩa & Quy ước                                                              |
+| :-: | :--------------- | :-----: | :----------------------------------------------------------------------------- |
+|  1  | `case_id`        | 🔴 `🔑` | ID vụ án (`case_000`, `case_001`).                                             |
+|  2  | `doc_code`       | 🔴 `🔑` | Mã số văn bản (`06`, `07`, `08`, `09`, `12`, `A02`, `B01`...).                 |
+|  3  | `phase`          | 🔴 `🔑` | Phân chặng (`00_khoi_dau`, `01_nhanh_mai_vu`, `02_nhanh_tung`, `03_nhanh_ha`). |
+|  4  | `person_name`    | 🟢 `⚡` | Họ tên người khai báo (`Nguyễn Ngọc Mai`, `Lê Quang Vũ`...).                   |
+|  5  | `role`           | 🟢 `⚡` | Tư cách tham gia tố tụng (Nhân chứng, Nghi phạm, Bị can).                      |
+|  6  | `doc_title`      | 🟢 `⚡` | Tiêu đề văn bản (`BIÊN BẢN LẤY LỜI KHAI`, `BẢN TỰ THÚ`...).                    |
+|  7  | `doc_number`     | 🟢 `⚡` | Số công văn lưu trữ (`07/BB-LK`).                                              |
+|  8  | `time_taken`     | 🟢 `⚡` | Thời gian lập biên bản (`14h00 ngày 25/07/2016`).                              |
+| 10  | `location`       | 🟢 `⚡` | Địa điểm lập biên bản.                                                         |
+| 11  | `officer`        | 🟢 `⚡` | Cán bộ điều tra phụ trách (`Đại úy Lê Minh`).                                  |
+| 12  | `participants`   | 🟢 `⚡` | Thành phần tham gia.                                                           |
+| 13  | `core_content`   | 🟢 `⚡` | Tóm tắt các ý chính / key clues của lời khai.                                  |
+| 14  | `alibi_claim`    | 🟢 `⚡` | Tóm tắt luận điểm ngoại phạm đối tượng khai.                                   |
+| 15  | `clue_flaw`      | 🟢 `⚡` | Lỗ hổng / mâu thuẫn để người chơi bóc trần.                                    |
+| 16  | `gdoc_tab_title` | 🟢 `⚡` | Tên Document Tab trên Master Google Doc.                                       |
+| 17  | `gdoc_url`       | 🟢 `⚡` | Link trực tiếp tới Master Google Doc.                                          |
 
 ---
 
@@ -178,47 +184,48 @@ flowchart LR
 
 ### 2. Tab `contacts` — Danh Bạ Điện Thoại Nạn Nhân
 
-| Cột | Tên trường | Loại | Ý nghĩa |
-| :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`). |
-| 2 | `contact_id` | 🔴 `🔑` | ID danh bạ (`c-mai`, `c-vu`, `c-ha`, `c-tung`...). |
-| 3 | `name` | 🟢 `⚡` | Tên hiển thị trong danh bạ (`Mai Em Họ`, `Vũ Rể`, `Hà Vợ Iu`...). |
-| 4 | `phone_number`| 🟢 `⚡` | Số điện thoại (`0988.200.991`, `0912.345.678`...). |
-| 5 | `category` | 🟢 `⚡` | Nhóm (`Gia đình`, `Công việc`, `Nợ nần`, `Dịch vụ`). |
-| 6 | `note` | 🟢 `⚡` | Ghi chú trong danh bạ điện thoại. |
+| Cột | Tên trường     |  Loại   | Ý nghĩa                                                           |
+| :-: | :------------- | :-----: | :---------------------------------------------------------------- |
+|  1  | `case_id`      | 🔴 `🔑` | Mã vụ án (`case_000`).                                            |
+|  2  | `contact_id`   | 🔴 `🔑` | ID danh bạ (`c-mai`, `c-vu`, `c-ha`, `c-tung`...).                |
+|  3  | `name`         | 🟢 `⚡` | Tên hiển thị trong danh bạ (`Mai Em Họ`, `Vũ Rể`, `Hà Vợ Iu`...). |
+|  4  | `phone_number` | 🟢 `⚡` | Số điện thoại (`0988.200.991`, `0912.345.678`...).                |
+|  5  | `category`     | 🟢 `⚡` | Nhóm (`Gia đình`, `Công việc`, `Nợ nần`, `Dịch vụ`).              |
+|  6  | `note`         | 🟢 `⚡` | Ghi chú trong danh bạ điện thoại.                                 |
 
 ---
 
 ### 3. Tab `calls` — Lịch Sử Cuộc Gọi & Hộp Thư Thoại Ghi Âm
 
-| Cột | Tên trường | Loại | Ý nghĩa |
-| :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
-| 2 | `call_id` | 🔴 `🔑` | Khóa cuộc gọi (`call-01`, `call-ha-voicemail`...). |
-| 3 | `date_str` | 🟢 `⚡` | Ngày gọi (`24/07/2016`). |
-| 4 | `time_str` | 🟢 `⚡` | Giờ gọi (`21:12`, `20:45`...). |
-| 5 | `display_name`| 🟢 `⚡` | Tên người gọi / người nhận. |
-| 6 | `phone_number`| 🟢 `⚡` | Số điện thoại. |
-| 7 | `call_type` | 🟢 `⚡` | `incoming` (đến), `outgoing` (đi), `missed` (nhỡ). |
-| 8 | `is_missed` | 🟢 `⚡` | `TRUE` nếu là cuộc gọi nhỡ. |
-| 9 | `is_key_clue` | 🟢 `⚡` | `TRUE` nếu có đoạn ghi âm âm thanh manh mối quan trọng. |
+| Cột | Tên trường     |  Loại   | Ý nghĩa                                                 |
+| :-: | :------------- | :-----: | :------------------------------------------------------ |
+|  1  | `case_id`      | 🔴 `🔑` | Mã vụ án.                                               |
+|  2  | `call_id`      | 🔴 `🔑` | Khóa cuộc gọi (`call-01`, `call-ha-voicemail`...).      |
+|  3  | `date_str`     | 🟢 `⚡` | Ngày gọi (`24/07/2016`).                                |
+|  4  | `time_str`     | 🟢 `⚡` | Giờ gọi (`21:12`, `20:45`...).                          |
+|  5  | `display_name` | 🟢 `⚡` | Tên người gọi / người nhận.                             |
+|  6  | `phone_number` | 🟢 `⚡` | Số điện thoại.                                          |
+|  7  | `call_type`    | 🟢 `⚡` | `incoming` (đến), `outgoing` (đi), `missed` (nhỡ).      |
+|  8  | `is_missed`    | 🟢 `⚡` | `TRUE` nếu là cuộc gọi nhỡ.                             |
+|  9  | `is_key_clue`  | 🟢 `⚡` | `TRUE` nếu có đoạn ghi âm âm thanh manh mối quan trọng. |
 
 ---
 
 ### 4. Tab `messages` — Tin Nhắn SMS / Trao Đổi Bí Mật
 
-| Cột | Tên trường | Loại | Ý nghĩa |
-| :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
-| 2 | `contact_name`| 🔴 `🔑` | Tên người nhắn trong hội thoại. |
-| 3 | `phone_number`| 🟢 `⚡` | Số điện thoại đối phương. |
-| 4 | `avatar_color`| 🟢 `⚡` | Màu avatar đại diện (`blue`, `emerald`, `amber`, `rose`). |
-| 5 | `unread` | 🟢 `⚡` | Số tin nhắn chưa đọc (`0`, `1`, `2`...). |
-| 6 | `timestamp` | 🟢 `⚡` | Thời gian gửi tin nhắn cuối cùng (`24/07 20:55`). |
-| 7 | `preview_text`| 🟢 `⚡` | Đoạn xem trước tin nhắn ở danh sách. |
-| 8 | `messages_text`| 🟢 `⚡` | Toàn bộ các dòng chat từ trên xuống dưới (hỗ trợ xuống dòng). |
+| Cột | Tên trường      |  Loại   | Ý nghĩa                                                       |
+| :-: | :-------------- | :-----: | :------------------------------------------------------------ |
+|  1  | `case_id`       | 🔴 `🔑` | Mã vụ án.                                                     |
+|  2  | `contact_name`  | 🔴 `🔑` | Tên người nhắn trong hội thoại.                               |
+|  3  | `phone_number`  | 🟢 `⚡` | Số điện thoại đối phương.                                     |
+|  4  | `avatar_color`  | 🟢 `⚡` | Màu avatar đại diện (`blue`, `emerald`, `amber`, `rose`).     |
+|  5  | `unread`        | 🟢 `⚡` | Số tin nhắn chưa đọc (`0`, `1`, `2`...).                      |
+|  6  | `timestamp`     | 🟢 `⚡` | Thời gian gửi tin nhắn cuối cùng (`24/07 20:55`).             |
+|  7  | `preview_text`  | 🟢 `⚡` | Đoạn xem trước tin nhắn ở danh sách.                          |
+|  8  | `messages_text` | 🟢 `⚡` | Toàn bộ các dòng chat từ trên xuống dưới (hỗ trợ xuống dòng). |
 
 #### 📱 Cú pháp biên soạn tin nhắn đa phương tiện (`messages_text`):
+
 - **Phía gửi/nhận**:
   - Không có `>` ở đầu dòng: **Tin nhắn người kia gửi đến** (bong bóng xám bên trái).
   - Có dấu `>` ở đầu dòng: **Nạn nhân Khang gửi đi** (bong bóng xanh bên phải).
@@ -227,13 +234,13 @@ flowchart LR
   - Cú pháp chuẩn: `(24/07 • 20:32) [AUDIO: https://drive.google.com/file/d/.../view | 0:08]`
   - Cú pháp rút gọn (không cần thời lượng): `(24/07 • 20:32) [AUDIO: https://drive.google.com/file/d/.../view]`
   - Cú pháp tiếng Việt: `(24/07 • 20:32) 🎙️ [Tin nhắn thoại | https://drive.google.com/file/d/.../view]`
-  - Dạng fallback (khi chưa fill link): `(24/07 • 20:32) 🎙️ [Tin nhắn thoại 0:08]` *(tự phát audio mặc định của nhân vật)*.
-  - *Cơ chế Auto-Duration*: Nếu không điền thời lượng, hệ thống sẽ tự động đo thời lượng từ file audio và hiển thị lên giao diện khi phát.
-  - *Cơ chế Audio-Proxy*: File âm thanh trên Google Drive được stream thông qua `/api/audio-proxy?id={id}` giúp vượt qua rào cản CORS & CSP Sandbox của Google Drive.
+  - Dạng fallback (khi chưa fill link): `(24/07 • 20:32) 🎙️ [Tin nhắn thoại 0:08]` _(tự phát audio mặc định của nhân vật)_.
+  - _Cơ chế Auto-Duration_: Nếu không điền thời lượng, hệ thống sẽ tự động đo thời lượng từ file audio và hiển thị lên giao diện khi phát.
+  - _Cơ chế Audio-Proxy_: File âm thanh trên Google Drive được stream thông qua `/api/audio-proxy?id={id}` giúp vượt qua rào cản CORS & CSP Sandbox của Google Drive.
 - **Tin nhắn hình ảnh (Image)**:
-  - `(20:15) Xem ảnh này đi [IMAGE: https://drive.google.com/file/d/.../view]` *(Bấm vào ảnh bung lightbox phóng to toàn màn hình)*.
+  - `(20:15) Xem ảnh này đi [IMAGE: https://drive.google.com/file/d/.../view]` _(Bấm vào ảnh bung lightbox phóng to toàn màn hình)_.
 - **Tin nhắn Video (Video / Animated GIF)**:
-  - `(20:16) [VIDEO: https://drive.google.com/file/d/.../view]` *(Hỗ trợ cả file video MP4 lẫn ảnh động GIF dung lượng lớn qua `/api/image-proxy`, có preview trực tiếp trong khung chat và modal phát)*.
+  - `(20:16) [VIDEO: https://drive.google.com/file/d/.../view]` _(Hỗ trợ cả file video MP4 lẫn ảnh động GIF dung lượng lớn qua `/api/image-proxy`, có preview trực tiếp trong khung chat và modal phát)_.
 - **Gắn thẻ manh mối nghiệp vụ**:
   - `[CLUE: Tiêu đề manh mối | Phân tích nghiệp vụ suy luận]` ở cuối dòng (người chơi có thể bấm ghim vào sổ tay điều tra).
 - **Trải nghiệm giao diện (UX Rules)**:
@@ -247,21 +254,22 @@ flowchart LR
 
 > 💡 **Khả năng tương thích linh hoạt**: Hệ thống API `/api/phone` tự động nhận diện và đồng bộ dữ liệu cho cả 2 tên tab: `evidences` (chuẩn mới quản lý vật chứng tổng thể) và `photos` (chuẩn ban đầu). Khi truy vấn, API thử lần lượt `evidences` ➔ `photos` ➔ `photos_old` ➔ `evidences_old` để đảm bảo không bao giờ bị đứt mạch dữ liệu.
 
-| Cột | Tên trường chuẩn | Tên trường alias | Loại | Ý nghĩa & Quy ước |
-| :---: | :--- | :--- | :---: | :--- |
-| 1 | `case_id` | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`, `case_001`). |
-| 2 | `code` | `photo_code`, `photo_id` | 🔴 `🔑` | Mã ảnh / mã vật chứng (`avatar_khang`, `avatar_vu`, `avatar_ha`, `A-06`, `D-04`...). |
-| 3 | `label` | `title`, `name` | 🟢 `⚡` | Tiêu đề ảnh / Tên nhân vật (Hệ thống tự bóc tách để in hoa lên băng dính). |
-| 4 | `category` | `type` | 🟢 `⚡` | Phân loại (`AVATAR`, `EVIDENCE`, `SCENE`, `HOTSPOT`). |
-| 5 | `file_name` | `filename` | 🟢 `⚡` | Tên file quy ước lưu trữ (`Ảnh_Hà.png`, `avata_khang.png`...). |
-| 6 | `ratio` | `aspect_ratio` | 📝 | Tỉ lệ khung hình (`3:4`, `16:9`, `1:1`). |
-| 7 | `local_file_path`| `path` | 📝 | Đường dẫn file gốc lưu tại `docs/cases/<case_id>/...` |
-| 8 | `drive_url` | `url`, `image_url` | 🟢 `⚡` | **Link chia sẻ Google Drive công khai** (`https://drive.google.com/file/d/{id}/view`). Hệ thống tự chuyển thành Google CDN direct link. |
-| 9 | `direct_cdn_url` | `cdn_url` | 🟢 `⚡` | Đường dẫn CDN trực tiếp (nếu có, ưu tiên cao nhất). |
-| 10 | `description` | `description_prompt` | 🟢 `⚡` | Mô tả prompt ngoại hình nhân vật hoặc biên bản phân tích vật chứng. |
-| 11 | `is_key_asset`| `key_clue` | 🟢 `⚡` | `TRUE` nếu là ảnh vật chứng mấu chốt để bóc trần hung thủ. |
+| Cột | Tên trường chuẩn  | Tên trường alias         |  Loại   | Ý nghĩa & Quy ước                                                                                                                       |
+| :-: | :---------------- | :----------------------- | :-----: | :-------------------------------------------------------------------------------------------------------------------------------------- |
+|  1  | `case_id`         | `case_id`                | 🔴 `🔑` | Mã vụ án (`case_000`, `case_001`).                                                                                                      |
+|  2  | `code`            | `photo_code`, `photo_id` | 🔴 `🔑` | Mã ảnh / mã vật chứng (`avatar_khang`, `avatar_vu`, `avatar_ha`, `A-06`, `D-04`...).                                                    |
+|  3  | `label`           | `title`, `name`          | 🟢 `⚡` | Tiêu đề ảnh / Tên nhân vật (Hệ thống tự bóc tách để in hoa lên băng dính).                                                              |
+|  4  | `category`        | `type`                   | 🟢 `⚡` | Phân loại (`AVATAR`, `EVIDENCE`, `SCENE`, `HOTSPOT`).                                                                                   |
+|  5  | `file_name`       | `filename`               | 🟢 `⚡` | Tên file quy ước lưu trữ (`Ảnh_Hà.png`, `avata_khang.png`...).                                                                          |
+|  6  | `ratio`           | `aspect_ratio`           |   📝    | Tỉ lệ khung hình (`3:4`, `16:9`, `1:1`).                                                                                                |
+|  7  | `local_file_path` | `path`                   |   📝    | Đường dẫn file gốc lưu tại `docs/cases/<case_id>/...`                                                                                   |
+|  8  | `drive_url`       | `url`, `image_url`       | 🟢 `⚡` | **Link chia sẻ Google Drive công khai** (`https://drive.google.com/file/d/{id}/view`). Hệ thống tự chuyển thành Google CDN direct link. |
+|  9  | `direct_cdn_url`  | `cdn_url`                | 🟢 `⚡` | Đường dẫn CDN trực tiếp (nếu có, ưu tiên cao nhất).                                                                                     |
+| 10  | `description`     | `description_prompt`     | 🟢 `⚡` | Mô tả prompt ngoại hình nhân vật hoặc biên bản phân tích vật chứng.                                                                     |
+| 11  | `is_key_asset`    | `key_clue`               | 🟢 `⚡` | `TRUE` nếu là ảnh vật chứng mấu chốt để bóc trần hung thủ.                                                                              |
 
 #### 🖼️ Giao thức Live Dynamic Composite & Bộ Nhớ Đệm Offscreen Canvas:
+
 1. **Mô hình Live 100% không cần Build lại**:
    - Khi GM/Designer tải một ảnh khuôn mặt bất kỳ lên Google Drive và dán link vào cột `drive_url`, Web Client tự động tải ảnh về và áp dụng công nghệ **Dynamic Composite (Ghép khung động)**.
    - Trình duyệt tự động bo khung ảnh Polaroid trắng ngà, tạo miếng băng dính giấy răng cưa (masking tape) đè lên chân ảnh và in hoa tên nhân vật lấy từ Sheet.
@@ -273,7 +281,7 @@ flowchart LR
    - **Chuẩn hóa trường 2 chiều (Two-Way Aliasing)**: Tự động gán đồng thời `code` $\leftrightarrow$ `photo_code` và `label` $\leftrightarrow$ `title`, đảm bảo mọi component dù dùng chuẩn schema nào cũng đọc dữ liệu thông suốt.
    - **Fallback Avatar Placeholder**: Nếu link Google Drive lỗi 403 hoặc mất kết nối mạng, hệ thống fallback về `/images/avatar_placeholder.svg` thay vì phụ thuộc vào các file ảnh dán băng dính tĩnh cũ, đảm bảo không bao giờ vỡ layout hay lỗi hình ảnh.
 4. **Quy chuẩn dành cho Biên kịch & Designer**:
-   - **Quyền file trên Drive**: Luôn bật quyền *Viewer - Anyone with the link* (Người xem có liên kết).
+   - **Quyền file trên Drive**: Luôn bật quyền _Viewer - Anyone with the link_ (Người xem có liên kết).
    - **Tỉ lệ ảnh chân dung**: Khuyến nghị tỉ lệ `3:4` hoặc `1:1`, góc chụp từ ngực trở lên, rõ nét khuôn mặt.
    - **Dung lượng ảnh**: Khuyến nghị < 1.5MB để người chơi trên mạng 4G di động tải mượt mà.
 
@@ -283,71 +291,84 @@ flowchart LR
 
 > 💡 **Hợp nhất ứng dụng iPhone**: Tab `apps` tích hợp toàn bộ dữ liệu ứng dụng của nạn nhân gồm Ghi chú cá nhân (`NOTE`), Lịch sử duyệt web Safari (`SAFARI`), và Biến động số dư tài khoản ngân hàng (`BANK`) trong cùng một cấu trúc bảng tối giản.
 
-| Cột | Tên trường | Loại | Ý nghĩa & Quy ước |
-| :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`). |
-| 2 | `type` | 🔴 `🔑` | Phân loại ứng dụng: `NOTE` (Ghi chú), `SAFARI` (Trang web), `BANK` (Giao dịch ngân hàng). |
-| 3 | `title_or_domain` | 🟢 `⚡` | Tiêu đề ghi chú (`NOTE`), Domain trang web (`SAFARI`), hoặc Người nhận / gửi (`BANK`). |
-| 4 | `content_or_url` | 🟢 `⚡` | Nội dung ghi chú (`NOTE`), URL web (`SAFARI`), hoặc Lời nhắn chuyển khoản (`BANK`). |
-| 5 | `timestamp` | 🟢 `⚡` | Mốc thời gian tạo ghi chú, duyệt web hoặc thực hiện giao dịch ngân hàng. |
-| 6 | `category` | 🟢 `⚡` | Danh mục phân loại (`iCloud`, `Local`, `Lịch sử`, `Nhận tiền`, `Chuyển tiền`). |
-| 7 | `account_no` | 🟢 `⚡` | Số tài khoản ngân hàng đối tác (chỉ dùng cho `BANK`). |
-| 8 | `amount` | 🟢 `⚡` | Số tiền giao dịch (dương là tiền vào, âm là tiền ra; hệ thống tự sinh mã tham chiếu FT). |
-| 9 | `is_evidence` | 🟢 `⚡` | `TRUE` nếu là dữ liệu/giao dịch mấu chốt chứng minh động cơ hoặc mốc thời gian. |
+| Cột | Tên trường        |  Loại   | Ý nghĩa & Quy ước                                                                         |
+| :-: | :---------------- | :-----: | :---------------------------------------------------------------------------------------- |
+|  1  | `case_id`         | 🔴 `🔑` | Mã vụ án (`case_000`).                                                                    |
+|  2  | `type`            | 🔴 `🔑` | Phân loại ứng dụng: `NOTE` (Ghi chú), `SAFARI` (Trang web), `BANK` (Giao dịch ngân hàng). |
+|  3  | `title_or_domain` | 🟢 `⚡` | Tiêu đề ghi chú (`NOTE`), Domain trang web (`SAFARI`), hoặc Người nhận / gửi (`BANK`).    |
+|  4  | `content_or_url`  | 🟢 `⚡` | Nội dung ghi chú (`NOTE`), URL web (`SAFARI`), hoặc Lời nhắn chuyển khoản (`BANK`).       |
+|  5  | `timestamp`       | 🟢 `⚡` | Mốc thời gian tạo ghi chú, duyệt web hoặc thực hiện giao dịch ngân hàng.                  |
+|  6  | `category`        | 🟢 `⚡` | Danh mục phân loại (`iCloud`, `Local`, `Lịch sử`, `Nhận tiền`, `Chuyển tiền`).            |
+|  7  | `account_no`      | 🟢 `⚡` | Số tài khoản ngân hàng đối tác (chỉ dùng cho `BANK`).                                     |
+|  8  | `amount`          | 🟢 `⚡` | Số tiền giao dịch (dương là tiền vào, âm là tiền ra; hệ thống tự sinh mã tham chiếu FT).  |
+|  9  | `is_evidence`     | 🟢 `⚡` | `TRUE` nếu là dữ liệu/giao dịch mấu chốt chứng minh động cơ hoặc mốc thời gian.           |
 
 ---
 
 ### 7. Tab `checkpoints` — Hệ Thống Câu Hỏi, Đáp Án & Mở Khóa Chặng
 
-| Cột | Tên trường | Loại | Mô tả & Quy ước |
-| :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | Mã vụ án (`case_000`). |
-| 2 | `checkpoint_id`| 🔴 `🔑` | Khóa chính duy nhất đại diện cho cả mốc tiến trình và ghim câu hỏi trên Canvas (`cp-000-0`, `cp-000-1a`, `cp-000-1b`, `cp-000-1c`, `cp-000-2b`...). Hệ thống hỗ trợ tương thích ngược tự nhận diện `node_id` nếu có. |
-| 3 | `dossier` | ⚪ `📝` | Nhãn bộ hồ sơ (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`). |
-| 4 | `title` | 🟢 `⚡` | Tiêu đề câu hỏi / thử thách. |
-| 5 | `question` | 🟢 `⚡` | Lời dẫn yêu cầu điều tra chi tiết. |
-| 6 | `type` | 🔴 `🔑` | `evidence_picker` (chọn vật chứng + người), `text_match_3` (điền 3 ô), `mcq` (trắc nghiệm), `text` (nhập tự do). |
-| 7 | `answers` | 🟢 `⚡` | **Đáp án hợp nhất**: Dùng cú pháp khóa/giá trị tối giản trực tiếp (Alt+Enter xuống dòng). Luôn sử dụng **mã số chứng cứ (evidence code)** hoặc số điện thoại, tuyệt đối không nhập văn bản mô tả tiếng Việt dài dòng.<br>• *3 SĐT (`text_match_3`)*: Viết từng dòng `<SĐT>: <Tên>`, ví dụ `0988.200.991: Vũ, Lê Quang Vũ`.<br>• *Thẩm tra nghi phạm (Động cơ, Ngoại phạm & Mâu thuẫn lời khai)*:<br>  `dong_co: 13, 0988.200.991`<br>  `tuy_chon_dong_co: 0984.112.568, 53`<br>  `ngoai_pham: 10, 42`<br>  `tuy_chon_ngoai_pham: 6, 8`<br>  `mau_thuan: 14, p4`<br>  `tuy_chon_mau_thuan: p5`<br>• *Trắc nghiệm / Text / Thời gian*: `dap_an: 21:15` hoặc `phuong_an: A, B, C`.<br>• *Bắt buộc vật chứng*: `bat_buoc: 52, 50, 51, 53`. |
-| 8 | `hints` | 🟢 `⚡` | **Gợi ý đa cấp**: Mỗi dòng Alt+Enter là 1 cấp độ gợi ý (Cấp 1 ➔ Cấp 2 ➔ Đáp án gợi mở). Hỗ trợ tách biệt gợi ý từng nhóm bằng tiêu đề block `[động cơ]`, `[ngoại phạm]`, `[mâu thuẫn]` (hoặc tiền tố `dong_co: ...`, `ngoai_pham: ...`, `mau_thuan: ...`). |
+| Cột | Tên trường         |  Loại   | Mô tả & Quy ước                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| :-: | :----------------- | :-----: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  1  | `case_id`          | 🔴 `🔑` | Mã vụ án (`case_000`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|  2  | `checkpoint_id`    | 🔴 `🔑` | Khóa chính duy nhất đại diện cho cả mốc tiến trình và ghim câu hỏi trên Canvas (`cp-000-0`, `cp-000-1a`, `cp-000-1b`, `cp-000-1c`, `cp-000-2b`...). Hệ thống hỗ trợ tương thích ngược tự nhận diện `node_id` nếu có.                                                                                                                                                                                                                                                                                                                                                  |
+|  3  | `dossier`          | ⚪ `📝` | Nhãn bộ hồ sơ (`Ban Đầu`, `Bộ A`, `Bộ B`, `Bộ C`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|  4  | `title`            | 🟢 `⚡` | Tiêu đề câu hỏi / thử thách.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+|  5  | `question`         | 🟢 `⚡` | Lời dẫn yêu cầu điều tra chi tiết.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|  6  | `type`             | 🔴 `🔑` | `evidence_picker` (chọn vật chứng + người), `text_match_3` (điền 3 ô), `mcq` (trắc nghiệm), `text` (nhập tự do).                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|  7  | `answers`          | 🟢 `⚡` | **Đáp án dự phòng (legacy)**: Chỉ dùng khi `answers_id` để trống. Cú pháp khóa/giá trị (Alt+Enter xuống dòng): `dap_an: 21:15`, `phuong_an: A, B, C`, `bat_buoc: 52, 50, 51, 53`, `nghi_pham: Trần Thị Hà`. Tuyệt đối dùng **mã chứng cứ** hoặc số điện thoại, không nhập văn bản mô tả.                                                                                                                                                                                                                                                                              |
+|  8  | `answers_id`       | 🟢 `⚡` | **Đáp án chính (Primary)**: Ưu tiên đọc trước `answers`. Hỗ trợ 2 dạng:<br>• _Khóa/giá trị_: `dong_co: 13, 0988.200.991`, `tuy_chon_dong_co: ...`, `mau_thuan: 14, p4`, `tuy_chon_mau_thuan: ...`.<br>• _Phân vùng bằng block_: mở nhóm bằng dòng `[ĐỘNG CƠ]`, `[MÂU THUẪN LỜI KHAI]`; đặt `Optional` trên một dòng riêng để chuyển các mã phía sau thành tùy chọn; mỗi mã một dòng (Alt+Enter).<br>• _3 SĐT_ (`text_match_3`): mỗi dòng `0988.200.991: Vũ, Lê Quang Vũ`.<br>• Tin nhắn: `- Tin nhắn với SDT: 0912.331.888` (voice: `- Tin nhắn thoại với SDT: ...`). |
+|  9  | `hints`            | 🟢 `⚡` | **Gợi ý đa cấp**: Mỗi dòng Alt+Enter là 1 cấp độ gợi ý (Cấp 1 ➔ Cấp 2 ➔ Đáp án gợi mở). Tách nhóm bằng dòng tiêu đề `[ĐỘNG CƠ]`, `[MÂU THUẪN LỜI KHAI]`.                                                                                                                                                                                                                                                                                                                                                                                                              |
+| 10  | `narrative`        | ⚪ `📝` | Độc thoại dẫn truyện của checkpoint (typewriter). Để trống nếu checkpoint không có cinematic.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 11  | `followup_of`      | 🔴 `🔑` | ID checkpoint/nghi phạm cha khi đây là checkpoint hỏi tiếp (ví dụ `cp-000-1a-followup` → `cp-000-1a`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 12  | `ai_context`       | ⚪ `📝` | **Bối cảnh chấm lập luận AI**: Đoạn văn mô tả sự thật khách quan, bằng chứng và logic của checkpoint/nghi phạm. Khi có dữ liệu, Gemini dùng nguyên văn bối cảnh này thay cho từ điển tĩnh trong code.                                                                                                                                                                                                                                                                                                                                                                 |
+| 13  | `ai_valid_cases`   | ⚪ `📝` | **Few-shot ĐẠT**: Các câu trả lời mẫu được chấp nhận. Mỗi câu 1 dòng (Alt+Enter), hoặc phân cách bằng ký tự `                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `.  |
+| 14  | `ai_invalid_cases` | ⚪ `📝` | **Few-shot TRƯỢT**: Các câu trả lời mẫu phải đánh trượt. Mỗi câu 1 dòng (Alt+Enter), hoặc phân cách bằng ký tự `                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `.  |
+
+> 🧠 **Quy ước 3 cột AI (`ai_context`, `ai_valid_cases`, `ai_invalid_cases`)**:
+>
+> - Áp dụng cho các checkpoint thẩm tra nghi phạm (`type: evidence_picker`, nhóm Động cơ / Mâu thuẫn lời khai).
+> - Thứ tự ưu tiên khi chấm: **Live CMS (`ai_context`)** → từ điển tĩnh `lib/ai/suspect-interrogation-context.ts` → fallback tổng quát từ `title`/`question`/`hint`.
+> - Để trống cả 3 cột: hệ thống giữ nguyên hành vi cũ. Chỉ cần điền `ai_context` là đủ để ghi đè bối cảnh; hai cột few-shot còn lại là tùy chọn.
+> - Không đưa plot twist của nghi phạm khác vào `ai_context` để tránh lộ kịch bản (Zero-Spoiler).
 
 > 📌 **Ghi chú & Quy chuẩn Cột `answers` (Evidence Code Standard)**:
+>
 > - **Chỉ dùng Mã số / Mã định danh (Evidence Codes & SĐT)**: Cột `answers` chỉ chứa mã số vật chứng (`13`, `10`, `42`, `52`...) hoặc mã file cuộc gọi (`voice_0984.112.568`, `0988.200.991`). **Tuyệt đối KHÔNG** nhập tên tiếng Việt văn xuôi (như `Sổ ghi nợ`, `Tin nhắn đe dọa`) vào các trường chứng cứ vì UI so khớp trực tiếp bằng ID chứng cứ.
 > - **Các từ khóa chuẩn hóa (Keys)**:
 >   - `dong_co`: Các mã chứng cứ bắt buộc chứng minh động cơ phạm tội.
 >   - `tuy_chon_dong_co`: Các mã chứng cứ bổ sung/tùy chọn cho động cơ (chọn thêm không bị phạt/vẫn hợp lệ).
->   - `ngoai_pham`: Các mã chứng cứ bắt buộc chứng minh mâu thuẫn ngoại phạm.
->   - `tuy_chon_ngoai_pham`: Các mã chứng cứ bổ sung/tùy chọn cho ngoại phạm.
 >   - `mau_thuan` / `contradiction` / `mau_thuan_loi_khai`: Các mã chứng cứ bắt buộc vạch trần mâu thuẫn lời khai.
 >   - `tuy_chon_mau_thuan` / `optional_contradiction`: Các mã chứng cứ bổ sung/tùy chọn cho mâu thuẫn lời khai.
+> - **Ngừng sử dụng (`ngoai_pham`, `tuy_chon_ngoai_pham`, block `[NGOẠI PHẠM]`)**: Hạng mục Xác minh ngoại phạm đã bị loại khỏi UI thẩm tra nghi phạm. Parser vẫn đọc để tương thích ngược nhưng dữ liệu này không còn hiển thị hoặc dùng để chấm điểm. Chuyển nội dung cũ sang block `[MÂU THUẪN LỜI KHAI]` nếu vẫn cần dùng.
+> - **Cú pháp block trong `answers_id`**: Chỉ dùng khi một checkpoint có nhiều nhóm chứng cứ. `Optional` có hiệu lực từ dòng đó đến hết block hiện tại, nên đặt đúng vị trí trong từng block. Với checkpoint chỉ có một nhóm, dùng cú pháp khóa/giá trị (`dong_co: ...`) để tránh phụ thuộc thứ tự dòng.
 >   - `bat_buoc`: Danh sách mã chứng cứ bắt buộc phải chọn để giải quyết checkpoint.
 >   - `dap_an`: Giá trị đáp án dạng chuỗi (thời gian, con số, phương án).
 >   - `nghi_pham`: Tên nghi phạm mục tiêu của checkpoint (ví dụ `Trần Thị Hà`).
 > - **Gộp `node_id` vào `checkpoint_id`**: Dùng chung 1 mã khóa duy nhất (`cp-000-0`, `cp-000-1a`...).
 > - **Tối giản cú pháp `answers`**: Hệ thống tích hợp sẵn thuật toán `isVietnameseTextMatch` tự động chuẩn hóa dấu tiếng Việt (không cần viết thêm bản không dấu như `Vu, Dat, Tung` trên Sheet). Cú pháp 3 ô SĐT cho phép viết gọn: `<số_điện_thoại>: <tên_nghi_phạm>`.
 
-
 ---
 
 ### 8. Tab `narratives` — Dẫn Truyện Cinematic Typewriter
 
-| Cột | Tên trường | Loại | Mô tả |
-| :---: | :--- | :---: | :--- |
-| 1 | `case_id` | 🔴 `🔑` | Mã vụ án. |
-| 2 | `phase` | 🔴 `🔑` | `0` = Ban Đầu, `1` = Mở Bộ A, `2` = Mở Bộ B, `3` = Mở Bộ C. |
-| 3 | `dossier` | ⚪ `📝` | Tên chặng. |
-| 4 | `date` | 🟢 `⚡` | Mốc thời gian hiển thị trên header modal (`Đêm 24/07/2016`). |
-| 5 | `monologue` | 🟢 `⚡` | Nội dung lời dẫn chạy chữ máy đánh chữ cinematic (Alt+Enter ngắt đoạn). |
+| Cột | Tên trường  |  Loại   | Mô tả                                                                   |
+| :-: | :---------- | :-----: | :---------------------------------------------------------------------- |
+|  1  | `case_id`   | 🔴 `🔑` | Mã vụ án.                                                               |
+|  2  | `phase`     | 🔴 `🔑` | `0` = Ban Đầu, `1` = Mở Bộ A, `2` = Mở Bộ B, `3` = Mở Bộ C.             |
+|  3  | `dossier`   | ⚪ `📝` | Tên chặng.                                                              |
+|  4  | `date`      | 🟢 `⚡` | Mốc thời gian hiển thị trên header modal (`Đêm 24/07/2016`).            |
+|  5  | `monologue` | 🟢 `⚡` | Nội dung lời dẫn chạy chữ máy đánh chữ cinematic (Alt+Enter ngắt đoạn). |
 
 ---
 
 ## 🛠️ PHẦN IV: CẨM NANG THAO TÁC LỆNH 1-CHẠM (CLI TOOLBOX)
 
-| Lệnh Dòng Lệnh | Chức Năng | Khi Nào Sử Dụng? |
-| :--- | :--- | :--- |
-| `npm run export:docs-pdf` | Xuất bản toàn bộ 21 Document Tabs từ Master Google Docs thành PDF | Khi cần cập nhật các file PDF hồ sơ hiển thị trên web app. |
-| `npm run build:master-doc` | Khởi tạo / dựng lại toàn bộ 21 Document Tabs trên Master Google Docs & Sheet | Khi khởi tạo hoặc reset lại cấu trúc tài liệu Master. |
-| `npm run sync:docs-to-sheet` | Đọc toàn bộ nội dung từ Google Docs và lưu ngược vào Sheet | Khi bạn vừa viết hoặc sửa văn phong trực tiếp trong file Google Docs. |
-| `npm run sync:testimonies` | Kéo toàn bộ dữ liệu từ Sheet về file Markdown local trong repo | Khi chuẩn bị commit Git hoặc kiểm tra tài liệu local. |
+| Lệnh Dòng Lệnh               | Chức Năng                                                                    | Khi Nào Sử Dụng?                                                      |
+| :--------------------------- | :--------------------------------------------------------------------------- | :-------------------------------------------------------------------- |
+| `npm run export:docs-pdf`    | Xuất bản toàn bộ 21 Document Tabs từ Master Google Docs thành PDF            | Khi cần cập nhật các file PDF hồ sơ hiển thị trên web app.            |
+| `npm run build:master-doc`   | Khởi tạo / dựng lại toàn bộ 21 Document Tabs trên Master Google Docs & Sheet | Khi khởi tạo hoặc reset lại cấu trúc tài liệu Master.                 |
+| `npm run sync:docs-to-sheet` | Đọc toàn bộ nội dung từ Google Docs và lưu ngược vào Sheet                   | Khi bạn vừa viết hoặc sửa văn phong trực tiếp trong file Google Docs. |
+| `npm run sync:testimonies`   | Kéo toàn bộ dữ liệu từ Sheet về file Markdown local trong repo               | Khi chuẩn bị commit Git hoặc kiểm tra tài liệu local.                 |
 
 ---
 

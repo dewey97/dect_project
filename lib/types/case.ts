@@ -170,9 +170,13 @@ export interface Checkpoint {
   status: "locked" | "active" | "completed";
   dossier?: string;
   suspectLabel?: string;
+  aiContext?: string;
+  aiValidCases?: string[];
+  aiInvalidCases?: string[];
   type?:
     "mcq" | "text_match_3" | "evidence_picker" | "convergence" | "accusation";
-  questionType?: "time" | "choice" | "code" | "text" | "evidence_picker" | string;
+  questionType?:
+    "time" | "choice" | "code" | "text" | "evidence_picker" | string;
   inputType?: string;
   hintsList?: string[];
   storyConfig?: {
@@ -251,4 +255,3 @@ export interface Finding {
   // Key Finding kích hoạt mở khóa chặng tiếp theo
   isKeyFinding?: boolean;
 }
-

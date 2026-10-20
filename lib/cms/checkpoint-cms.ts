@@ -25,6 +25,9 @@ export interface SheetCheckpointRow {
   narrative?: string;
   suspect_label?: string;
   evidence_step_label?: string;
+  ai_context?: string;
+  ai_valid_cases?: string;
+  ai_invalid_cases?: string;
   followup_of?: string;
   followup_suspect?: string;
   nghi_van_cua?: string;
@@ -162,6 +165,20 @@ function splitCommas(raw?: string): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Tách danh sách câu mẫu AI: ưu tiên xuống dòng (Alt+Enter),
+ * nếu không có xuống dòng thì tách theo dấu `|`.
+ */
+function splitAiCases(raw?: string): string[] {
+  if (!raw || typeof raw !== "string") return [];
+  const byLine = splitLines(raw);
+  if (byLine.length > 1) return byLine;
+  return (byLine[0] || raw)
+    .split("|")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 /** Chuẩn hóa tên khóa: chữ thường, khoảng trắng và gạch nối thành gạch dưới. */
 function normalizeKey(key: string): string {
   return key
@@ -170,7 +187,7 @@ function normalizeKey(key: string): string {
     .replace(/[\s-]+/g, "_");
 }
 
-/** 
+/**
  * Bóc một dòng ô nhập văn bản:
  * - Dạng tối giản: `0988.200.991: Vũ, Lê Quang Vũ` hoặc `SĐT 0988.200.991: Vũ`
  * - Dạng đầy đủ: `phone_1 | SĐT 0988.200.991: | Nhập tên nghi phạm... | Lê Quang Vũ, Vũ`
@@ -274,7 +291,9 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
     }
   }
 
-  let currentCategory: "none" | "motive" | "alibi" | "contradiction" | "indictment_evidence" = "none";
+  let currentCategory:
+    "none" | "motive" | "alibi" | "contradiction" | "indictment_evidence" =
+    "none";
   let isOptional = false;
 
   for (let i = 0; i < lines.length; i++) {
@@ -343,7 +362,10 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
       if (val) (parsed.validMotives ??= []).push(val);
       continue;
     }
-    if (lower.includes("bằng chứng để lại dấu vết") || lower.includes("chứng cứ:")) {
+    if (
+      lower.includes("bằng chứng để lại dấu vết") ||
+      lower.includes("chứng cứ:")
+    ) {
       currentCategory = "indictment_evidence";
       isOptional = false;
       continue;
@@ -416,15 +438,37 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
             break;
           case "question_type": {
             const normType = value.toLowerCase().trim();
-            if (normType.includes("thoi_gian") || normType.includes("time") || normType.includes("gio")) {
+            if (
+              normType.includes("thoi_gian") ||
+              normType.includes("time") ||
+              normType.includes("gio")
+            ) {
               parsed.questionType = "time";
-            } else if (normType.includes("trac_nghiem") || normType.includes("choice") || normType.includes("lua_chon") || normType.includes("mcq")) {
+            } else if (
+              normType.includes("trac_nghiem") ||
+              normType.includes("choice") ||
+              normType.includes("lua_chon") ||
+              normType.includes("mcq")
+            ) {
               parsed.questionType = "choice";
-            } else if (normType.includes("mat_khau") || normType.includes("code") || normType.includes("password") || normType.includes("khoa")) {
+            } else if (
+              normType.includes("mat_khau") ||
+              normType.includes("code") ||
+              normType.includes("password") ||
+              normType.includes("khoa")
+            ) {
               parsed.questionType = "code";
-            } else if (normType.includes("tu_luan") || normType.includes("text") || normType.includes("chu")) {
+            } else if (
+              normType.includes("tu_luan") ||
+              normType.includes("text") ||
+              normType.includes("chu")
+            ) {
               parsed.questionType = "text";
-            } else if (normType.includes("manh_moi") || normType.includes("chung_cu") || normType.includes("evidence")) {
+            } else if (
+              normType.includes("manh_moi") ||
+              normType.includes("chung_cu") ||
+              normType.includes("evidence")
+            ) {
               parsed.questionType = "evidence_picker";
             } else {
               parsed.questionType = normType;
@@ -471,7 +515,9 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
 
       let resolvedId = codeOrPhone;
       if (phoneDigits) {
-        resolvedId = hasVoice ? `voice_phone_${phoneDigits}` : `sms_phone_${phoneDigits}`;
+        resolvedId = hasVoice
+          ? `voice_phone_${phoneDigits}`
+          : `sms_phone_${phoneDigits}`;
       }
 
       if (currentCategory === "motive") {
@@ -659,15 +705,13 @@ export function getCheckpointOptions(row?: SheetCheckpointRow): string[] {
  * Chuyển một dòng thô từ tab 'checkpoints' trên Google Sheet thành object Checkpoint 100% trực tiếp từ dữ liệu Sheet,
  * không sử dụng bất kỳ static fallback nào.
  */
-export function transformSheetCheckpoint(
-  row: SheetCheckpointRow,
-): Checkpoint {
+export function transformSheetCheckpoint(row: SheetCheckpointRow): Checkpoint {
   const rawAnswersId =
     typeof row.answers_id === "string" && row.answers_id.trim()
       ? row.answers_id.trim()
       : typeof row.answer_id === "string" && row.answer_id.trim()
-      ? row.answer_id.trim()
-      : "";
+        ? row.answer_id.trim()
+        : "";
   const rawAnswersText =
     typeof row.answers === "string" ? row.answers.trim() : "";
 
@@ -681,7 +725,8 @@ export function transformSheetCheckpoint(
     (answers.requiredEvidenceIds && answers.requiredEvidenceIds.length > 0) ||
     (answers.motiveEvidenceIds && answers.motiveEvidenceIds.length > 0) ||
     (answers.alibiEvidenceIds && answers.alibiEvidenceIds.length > 0) ||
-    (answers.contradictionEvidenceIds && answers.contradictionEvidenceIds.length > 0) ||
+    (answers.contradictionEvidenceIds &&
+      answers.contradictionEvidenceIds.length > 0) ||
     (answers.availableEvidences && answers.availableEvidences.length > 0) ||
     (row.suspect_label !== undefined && row.suspect_label !== "") ||
     (row.evidence_step_label !== undefined && row.evidence_step_label !== "");
@@ -694,10 +739,12 @@ export function transformSheetCheckpoint(
         ...(answers.validMotives && answers.validMotives.length > 0
           ? { validMotives: answers.validMotives }
           : {}),
-        ...(answers.requiredEvidenceIds && answers.requiredEvidenceIds.length > 0
+        ...(answers.requiredEvidenceIds &&
+        answers.requiredEvidenceIds.length > 0
           ? { requiredEvidenceIds: answers.requiredEvidenceIds }
           : {}),
-        ...(answers.optionalEvidenceIds && answers.optionalEvidenceIds.length > 0
+        ...(answers.optionalEvidenceIds &&
+        answers.optionalEvidenceIds.length > 0
           ? { optionalEvidenceIds: answers.optionalEvidenceIds }
           : {}),
         ...(answers.motiveEvidenceIds && answers.motiveEvidenceIds.length > 0
@@ -712,10 +759,12 @@ export function transformSheetCheckpoint(
         ...(answers.optionalAlibiIds && answers.optionalAlibiIds.length > 0
           ? { optionalAlibiIds: answers.optionalAlibiIds }
           : {}),
-        ...(answers.contradictionEvidenceIds && answers.contradictionEvidenceIds.length > 0
+        ...(answers.contradictionEvidenceIds &&
+        answers.contradictionEvidenceIds.length > 0
           ? { contradictionEvidenceIds: answers.contradictionEvidenceIds }
           : {}),
-        ...(answers.optionalContradictionIds && answers.optionalContradictionIds.length > 0
+        ...(answers.optionalContradictionIds &&
+        answers.optionalContradictionIds.length > 0
           ? { optionalContradictionIds: answers.optionalContradictionIds }
           : {}),
         ...(answers.availableEvidences && answers.availableEvidences.length > 0
@@ -745,33 +794,34 @@ export function transformSheetCheckpoint(
     : undefined;
 
   const effectiveId = String(
-    row.checkpoint_id ||
-    row.node_id ||
-    (row as any).id ||
-    "cp-dynamic"
+    row.checkpoint_id || row.node_id || (row as any).id || "cp-dynamic",
   ).trim();
 
   const rawFollowupOf =
     typeof row.followup_of === "string" && row.followup_of.trim()
       ? row.followup_of.trim()
       : typeof row.followup_suspect === "string" && row.followup_suspect.trim()
-      ? row.followup_suspect.trim()
-      : typeof row.nghi_van_cua === "string" && row.nghi_van_cua.trim()
-      ? row.nghi_van_cua.trim()
-      : typeof row.suspect_id === "string" && row.suspect_id.trim()
-      ? row.suspect_id.trim()
-      : answers.followupOf || undefined;
+        ? row.followup_suspect.trim()
+        : typeof row.nghi_van_cua === "string" && row.nghi_van_cua.trim()
+          ? row.nghi_van_cua.trim()
+          : typeof row.suspect_id === "string" && row.suspect_id.trim()
+            ? row.suspect_id.trim()
+            : answers.followupOf || undefined;
 
   // Tự động phân giải questionType
   let resolvedQuestionType: string | undefined =
     answers.questionType ||
-    (typeof row.question_type === "string" ? row.question_type.trim() : undefined) ||
+    (typeof row.question_type === "string"
+      ? row.question_type.trim()
+      : undefined) ||
     (typeof row.input_type === "string" ? row.input_type.trim() : undefined) ||
     (typeof row.form_type === "string" ? row.form_type.trim() : undefined);
 
   if (!resolvedQuestionType && typeof row.type === "string") {
     const rowType = row.type.toLowerCase().trim();
-    if (["time", "choice", "code", "text", "evidence_picker"].includes(rowType)) {
+    if (
+      ["time", "choice", "code", "text", "evidence_picker"].includes(rowType)
+    ) {
       resolvedQuestionType = rowType;
     }
   }
@@ -784,7 +834,8 @@ export function transformSheetCheckpoint(
     } else if (
       (answers.motiveEvidenceIds && answers.motiveEvidenceIds.length > 0) ||
       (answers.alibiEvidenceIds && answers.alibiEvidenceIds.length > 0) ||
-      (answers.contradictionEvidenceIds && answers.contradictionEvidenceIds.length > 0)
+      (answers.contradictionEvidenceIds &&
+        answers.contradictionEvidenceIds.length > 0)
     ) {
       resolvedQuestionType = "evidence_picker";
     }
@@ -811,6 +862,12 @@ export function transformSheetCheckpoint(
     storyConfig,
     dossier: row.dossier || undefined,
     suspectLabel: row.suspect_label || pickerConfig?.suspectLabel || undefined,
+    aiContext:
+      typeof row.ai_context === "string" && row.ai_context.trim()
+        ? row.ai_context.trim()
+        : undefined,
+    aiValidCases: splitAiCases(row.ai_valid_cases),
+    aiInvalidCases: splitAiCases(row.ai_invalid_cases),
     followupOf: rawFollowupOf,
     suspectId: rawFollowupOf,
     rawAnswersId,

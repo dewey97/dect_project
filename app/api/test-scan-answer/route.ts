@@ -147,12 +147,24 @@ BẮT BUỘC TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ THEO SCHEMA:
       )
     }
 
-    const parsed = JSON.parse(textOutput)
+    let parsed: { isCorrect?: unknown; confidenceScore?: unknown; feedback?: unknown }
+    try {
+      parsed = JSON.parse(textOutput)
+    } catch {
+      console.error('Gemini returned invalid JSON:', textOutput)
+      return NextResponse.json(
+        { isCorrect: false, feedback: 'AI trả về dữ liệu không hợp lệ, vui lòng thử lại.' },
+        { status: 502 }
+      )
+    }
 
     return NextResponse.json({
       isCorrect: !!parsed.isCorrect,
-      confidenceScore: typeof parsed.confidenceScore === 'number' ? parsed.confidenceScore : 0,
-      feedback: parsed.feedback || ''
+      confidenceScore:
+        typeof parsed.confidenceScore === 'number'
+          ? Math.max(0, Math.min(100, Math.round(parsed.confidenceScore)))
+          : 0,
+      feedback: typeof parsed.feedback === 'string' ? parsed.feedback : ''
     })
   } catch (error) {
     console.error('Error scanning answer:', error)
