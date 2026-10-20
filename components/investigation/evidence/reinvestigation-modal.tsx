@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -16,7 +16,8 @@ import {
   Save,
   Move,
   Link2,
-  FileText
+  FileText,
+  Maximize2
 } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { checkIsAdmin } from '@/lib/actions/auth-guard'
@@ -29,6 +30,10 @@ interface ReinvestigationModalProps {
   isOpen: boolean
   onClose: () => void
   caseId?: string
+  /** Nếu true: render inline trong container cha (không fullscreen fixed). Desktop Zone 3 mode. */
+  inline?: boolean
+  /** Callback khi ấn nút mở toàn màn hình (chỉ hiển thị khi inline=true) */
+  onExpand?: () => void
 }
 
 export interface ReinvestigationHotspot2D {
@@ -112,7 +117,7 @@ export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
   },
 ]
 
-export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: ReinvestigationModalProps) {
+export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inline = false, onExpand }: ReinvestigationModalProps) {
   const isCase000 = caseId === 'case_000' || caseId === 'case-000'
   // Hotspots list with server + localStorage persistence
   const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>(isCase000 ? HOTSPOTS_2D_LIST : [])
@@ -542,8 +547,14 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: R
       ? (((offsetX % renderedWidth) + renderedWidth) % renderedWidth) - renderedWidth
       : 0
 
+  // Khi inline=true trên desktop: render như block bình thường trong Zone 3
+  // Khi inline=false (mobile/fullscreen): render fixed overlay
+  const rootClassName = inline
+    ? "flex flex-col w-full h-full bg-[#080503] font-mono text-[#f4e8d8] select-none overflow-hidden"
+    : "fixed inset-0 bg-[#080503] z-[100] flex flex-col font-mono text-[#f4e8d8] select-none overflow-hidden w-screen h-[100dvh] pt-safe"
+
   return (
-    <div className="fixed inset-0 bg-[#080503] z-[100] flex flex-col font-mono text-[#f4e8d8] select-none overflow-hidden w-screen h-[100dvh] pt-safe">
+    <div className={rootClassName}>
       {/* SCANLINES EFFECT */}
       <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-15 z-10" />
 
@@ -562,8 +573,22 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000' }: R
           </div>
         </div>
 
-        {/* CLOSE BUTTON ONLY - NO CLUTTER ACTION MENU ICONS */}
+        {/* ACTIONS */}
         <div className="flex items-center gap-2">
+          {inline && onExpand && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onExpand()
+              }}
+              className="p-2 bg-[#2b170c] hover:bg-[#422413] border border-[#59341c] text-[#d9a066] hover:text-white rounded-none transition-colors cursor-pointer pointer-events-auto"
+              title="Mở toàn màn hình"
+              aria-label="Mở toàn màn hình"
+            >
+              <Maximize2 className="size-5 pointer-events-none" />
+            </button>
+          )}
           <button
             type="button"
             onClick={(e) => {

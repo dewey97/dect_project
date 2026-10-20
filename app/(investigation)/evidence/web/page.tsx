@@ -118,6 +118,7 @@ function WebEvidencePageContent() {
   // Zone 3 (Trình duyệt chi tiết PDF / Vật chứng bên phải)
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
   const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false); // Phóng to trình đọc PDF toàn nửa phải
+  const [isReinvestigationExpanded, setIsReinvestigationExpanded] = useState(false);
   const [boardWidthPercent, setBoardWidthPercent] = useState<number>(42);
   const [dossierWidth, setDossierWidth] = useState<number>(320);
   const [isDraggingSplit, setIsDraggingSplit] = useState<boolean>(false);
@@ -698,6 +699,17 @@ function WebEvidencePageContent() {
                 />
               </div>
             </div>
+          ) : activeModal === "reinvestigate" ? (
+            <ReinvestigationModal
+              caseId={caseId}
+              isOpen
+              inline={!isReinvestigationExpanded}
+              onExpand={() => setIsReinvestigationExpanded(true)}
+              onClose={() => {
+                setIsReinvestigationExpanded(false)
+                setActiveModal(null)
+              }}
+            />
           ) : (
             /* EVIDENCE DETAIL INSPECTOR */
             <EvidenceDetailInspector selectedView={selectedView} caseId={caseId} />
@@ -761,16 +773,24 @@ function WebEvidencePageContent() {
         <PhoneModal
           caseId={caseId}
           isOpen={activeModal === "phone"}
-          onClose={() => setActiveModal(null)}
+          onClose={() => {
+            setIsReinvestigationExpanded(false)
+            setActiveModal(null)
+          }}
         />
       </div>
 
-      {/* RE-INVESTIGATION CRIME SCENE MODAL */}
-      <ReinvestigationModal
-        caseId={caseId}
-        isOpen={activeModal === "reinvestigate"}
-        onClose={() => setActiveModal(null)}
-      />
+      {/* RE-INVESTIGATION CRIME SCENE MODAL — MOBILE ONLY */}
+      <div className="lg:hidden">
+        <ReinvestigationModal
+          caseId={caseId}
+          isOpen={activeModal === "reinvestigate"}
+          onClose={() => {
+            setIsReinvestigationExpanded(false)
+            setActiveModal(null)
+          }}
+        />
+      </div>
 
       {/* DETECTIVE NOTEBOOK MODAL */}
       <DetectiveNotebookModal
