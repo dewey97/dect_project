@@ -26,10 +26,17 @@ export function LandingFeaturesSection() {
                   Tuyệt Mật
                 </span>
               </div>
-              <div className="py-12 text-center flex flex-col items-center justify-center gap-2">
-                <span className="font-typewriter text-xs text-zinc-600/80 uppercase tracking-widest font-bold">
-                  [ Fill sau ]
+              <div className="py-6 flex flex-col gap-2 font-mono text-left">
+                <span className="font-typewriter text-xs font-bold text-zinc-900 uppercase">
+                  Bản Giám Định Pháp Y & ADN
                 </span>
+                <p className="text-[0.72rem] text-zinc-700 leading-relaxed font-sans">
+                  Hồ sơ giải phẫu tử thi, xét nghiệm độc chất và phân tích dấu vân tay được biên soạn công phu theo chuẩn nghiệp vụ hình sự thực tế.
+                </p>
+                <div className="mt-2 p-2 bg-amber-50/60 rounded border border-amber-900/10 text-[0.62rem] text-zinc-600 font-mono">
+                  ✦ Bút lục số: 14/KLĐT-PY<br />
+                  ✦ Kết luận: Nạn nhân ngạt thở cơ học kèm độc tố
+                </div>
               </div>
             </div>
             <div className="mt-6 font-typewriter text-[0.55rem] text-[#7c6f56] flex justify-between items-center border-t border-[#d6cbaf] pt-3">
@@ -51,10 +58,16 @@ export function LandingFeaturesSection() {
                   TRANG TIN AN NINH // SỐ ĐẶC BIỆT
                 </span>
               </div>
-              <div className="py-16 text-center flex flex-col items-center justify-center gap-2">
-                <span className="font-serif text-sm font-bold text-zinc-700 uppercase tracking-wider">
-                  [ Fill sau ]
+              <div className="py-4 flex flex-col gap-2 text-left">
+                <span className="font-serif text-sm font-bold text-zinc-900 leading-snug">
+                  "Án mạng bí ẩn tại biệt thự Ánh Dương chấn động dư luận"
                 </span>
+                <p className="font-serif text-[0.72rem] text-zinc-700 leading-relaxed">
+                  Thi thể vị doanh nhân được phát hiện lúc rạng sáng. Nhiều mâu thuẫn tài chính và các bản hợp đồng bí mật đang dần lộ diện qua các mẩu tin đăng tải.
+                </p>
+                <div className="text-[0.62rem] font-serif italic text-zinc-500 border-l-2 border-zinc-400 pl-2 mt-1">
+                  "Cảnh sát phong tỏa ngọn hải đăng, triệu tập 3 nghi phạm chính."
+                </div>
               </div>
             </div>
 
@@ -77,10 +90,16 @@ export function LandingFeaturesSection() {
                   Hiện Trường
                 </span>
               </div>
-              <div className="py-16 text-center flex flex-col items-center justify-center gap-2">
-                <span className="font-handwriting text-xl text-zinc-700 block">
-                  [ Fill sau ]
+              <div className="py-4 flex flex-col gap-2 text-left">
+                <span className="font-handwriting text-lg text-zinc-900 font-bold block">
+                  Bút lục ghi nhận của điều tra viên
                 </span>
+                <p className="font-handwriting text-sm text-zinc-700 leading-relaxed">
+                  "23h45: Phát hiện điện thoại nạn nhân rơi dưới thảm. Chốt cửa sổ bị bẻ khóa từ ban công ngoài. Cần đối chiếu dấu giày bùn đất."
+                </p>
+                <div className="mt-1 font-mono text-[0.6rem] text-red-800 bg-red-50 p-1.5 rounded border border-red-200">
+                  ⚠️ Lưu ý: Kẻ thủ ác thuận tay trái, có hiểu biết về hóa chất.
+                </div>
               </div>
             </div>
 

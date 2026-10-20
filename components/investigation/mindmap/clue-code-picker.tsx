@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { X } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
-import { resolveEvidenceCode, getSortedClues, KNOWN_CASE_PHONES } from '@/lib/cases/case-000-clues'
+import { resolveEvidenceCode, getSortedClues } from '@/lib/cases/case-000-clues'
 
 export interface PendingClueInputs {
   code?: string
@@ -30,15 +30,12 @@ export function ClueCodePicker({
   customPhoneEvidences = [],
   onAddClueId,
   onRemoveClueId,
-  onAddCustomPhone,
   onPendingChange,
   label = 'BẰNG CHỨNG ĐÃ CHỌN',
   placeholder = 'Nhập mã chứng cứ...',
   emptyStateText = 'Chưa có bằng chứng nào được chọn.',
-  hidePhoneInputs = false,
 }: ClueCodePickerProps) {
   const [codeInput, setCodeInput] = useState('')
-  const [textPhoneInputValue, setTextPhoneInputValue] = useState('')
 
   const handleAddCode = (codeStr: string) => {
     if (!codeStr || !codeStr.trim()) return
@@ -71,43 +68,18 @@ export function ClueCodePicker({
       setCodeInput('')
       onPendingChange?.({
         code: '',
-        textPhone: textPhoneInputValue,
       })
     }
-  }
-
-  const handleAddTextPhoneNumber = () => {
-    const raw = textPhoneInputValue.trim()
-    if (!raw) return
-    const digits = raw.replace(/\D/g, '')
-    if (digits.length < 3) return
-    const known = KNOWN_CASE_PHONES[digits.slice(-3)]
-    const id = known ? `sms_phone_${known.full}` : `sms_phone_${digits}`
-    const labelStr = known
-      ? `Tin nhắn với SĐT: ${known.formatted}`
-      : digits.length === 10
-      ? `Tin nhắn với SĐT: ${digits.slice(0, 4)}.${digits.slice(4, 7)}.${digits.slice(7)}`
-      : `Tin nhắn với SĐT: ${raw}`
-    if (onAddCustomPhone) {
-      onAddCustomPhone({ id, label: labelStr })
-    }
-    detectiveAudio.playTypewriterClick()
-    onAddClueId(id)
-    setTextPhoneInputValue('')
-    onPendingChange?.({
-      code: codeInput,
-      textPhone: '',
-    })
   }
 
   const sortedClues = getSortedClues(selectedClueIds, customPhoneEvidences)
 
   return (
     <div className="space-y-3">
-      {/* 1. THANH NHẬP MÃ SỐ TÀI LIỆU CHỨNG CỨ */}
+      {/* 1. THANH NHẬP MÃ BẰNG CHỨNG */}
       <div className="space-y-1">
         <label className="text-[11px] font-mono font-bold text-[#1a120b] flex items-center gap-1.5">
-          📄 Mã tài liệu:
+          🔍 Mã bằng chứng:
         </label>
         <div className="flex gap-2 items-center">
           <div className="relative flex-1">
@@ -122,7 +94,6 @@ export function ClueCodePicker({
                   setCodeInput(val)
                   onPendingChange?.({
                     code: val,
-                    textPhone: textPhoneInputValue,
                   })
                 }
               }}
@@ -155,56 +126,6 @@ export function ClueCodePicker({
           </button>
         </div>
       </div>
-
-      {/* 2. KHU VỰC NHẬP SĐT LIÊN QUAN CHUYÊN DỤNG (CHỈ HIỂN THỊ KHI CẦN) */}
-      {!hidePhoneInputs && (
-        <div className="space-y-1">
-          <label className="text-[11px] font-mono font-bold text-[#1a120b] flex items-center gap-1.5">
-            📱 Tin nhắn với SĐT:
-          </label>
-          <div className="flex gap-2 items-center">
-            <div className="relative flex-1">
-              <input
-                type="tel"
-                value={textPhoneInputValue}
-                onChange={(e) => {
-                  const val = e.target.value
-                  setTextPhoneInputValue(val)
-                  onPendingChange?.({
-                    code: codeInput,
-                    textPhone: val,
-                  })
-                }}
-                onBlur={() => {
-                  if (textPhoneInputValue.trim()) {
-                    handleAddTextPhoneNumber()
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddTextPhoneNumber()
-                  }
-                }}
-                placeholder="Nhập 3 số cuối SĐT..."
-                className="w-full px-3 py-2 bg-white border-2 border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none focus:border-black placeholder:text-[#8c7355]/60 shadow-inner"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleAddTextPhoneNumber}
-              className={cn(
-                "px-4 py-2 font-mono text-xs uppercase shrink-0 cursor-pointer shadow-sm transition-all active:scale-95 flex items-center justify-center",
-                textPhoneInputValue.trim().length >= 3
-                  ? "bg-amber-600 hover:bg-amber-700 text-white font-black shadow-md ring-2 ring-amber-400/80 animate-pulse"
-                  : "bg-[#2b1f14] text-[#f6f1e5] font-bold hover:bg-[#140d08]"
-              )}
-            >
-              Thêm
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 3. DANH SÁCH BẰNG CHỨNG ĐÃ CHỌN (BADGES CONTAINER) */}
       <div className="space-y-1.5">

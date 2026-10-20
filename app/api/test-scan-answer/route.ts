@@ -2,14 +2,21 @@ import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
+interface TestCaseItem {
+  text: string
+  reason?: string
+}
+
 interface RequestBody {
   context: string
   answer: string
+  validCases?: (string | TestCaseItem)[]
+  invalidCases?: (string | TestCaseItem)[]
 }
 
 export async function POST(req: Request) {
   try {
-    const { context, answer }: RequestBody = await req.json()
+    const { context, answer, validCases = [], invalidCases = [] }: RequestBody = await req.json()
 
     if (!context || !answer) {
       return NextResponse.json(
@@ -27,34 +34,58 @@ export async function POST(req: Request) {
       )
     }
 
+    // Format các ví dụ mẫu ĐẠT (nếu có)
+    const validExamplesText = validCases.length > 0
+      ? `=== CÁC VÍ DỤ MẪU ĐƯỢC CHẤP NHẬN (ĐẠT / PASS) ===\n` +
+        validCases
+          .map((c, i) => {
+            if (typeof c === 'string') return `${i + 1}. "${c}"`
+            return `${i + 1}. "${c.text}" ${c.reason ? `(Lý do đạt: ${c.reason})` : ''}`
+          })
+          .join('\n') + '\n==================================================='
+      : ''
+
+    // Format các ví dụ mẫu TRƯỢT (nếu có)
+    const invalidExamplesText = invalidCases.length > 0
+      ? `=== CÁC VÍ DỤ MẪU BẮT BUỘC ĐÁNH TRƯỢT (KHÔNG ĐẠT / FAIL) ===\n` +
+        invalidCases
+          .map((c, i) => {
+            if (typeof c === 'string') return `${i + 1}. "${c}"`
+            return `${i + 1}. "${c.text}" ${c.reason ? `(Lý do trượt: ${c.reason})` : ''}`
+          })
+          .join('\n') + '\n============================================================'
+      : ''
+
     const prompt = `
-Bạn là Giám Khảo Điều Tra Hình Sự & Giám Định Pháp Y sắc sảo.
+Bạn là Giám Khảo Điều Tra Hình Sự & Giám Định Pháp Y nghiêm cẩn, khách quan và sắc sảo.
 
 === BỐI CẢNH / SỰ THẬT (GROUND TRUTH) ===
 ${context.trim()}
 =========================================
 
+${validExamplesText}
+
+${invalidExamplesText}
+
 === CÂU TRẢ LỜI CỦA NGƯỜI CHƠI ===
-${answer.trim()}
+"${answer.trim()}"
 ==================================
 
-QUY TẮC ĐÁNH GIÁ TỔNG QUÁT (KHÔNG THIÊN VỊ, ÁP DỤNG CHO MỌI VỤ ÁN):
-1. ĐỊNH NGHĨA "CĂN CỨ / CHỨNG CỨ HỢP LÝ":
-   - Căn cứ chứng minh được chấp nhận khi người chơi dẫn xuất được ít nhất một trong các yếu tố có trong BỐI CẢNH:
-     + Nhân chứng / Nguồn tin làm chứng (VD: "theo lời ai đó", "do ai đó nhắc đến/kể lại").
-     + Tài liệu / Hiện vật / Tang vật (VD: "trong sổ sách", "trên bảng tin", "theo tin nhắn").
-     + Hoàn cảnh / Nguyên nhân / Địa điểm cụ thể (VD: "bị tai nạn ở đâu", "tại thời điểm nào").
-   - Cho phép gọi tắt danh xưng, tên riêng quen thuộc hoặc lỗi chính tả nhỏ.
+QUY TẮC THẨM ĐỊNH NGHIỆP VỤ (BẮT BUỘC TUÂN THỦ):
+1. NGUYÊN TẮC QUAN TRỌNG:
+   - Học ranh giới logic từ các ví dụ mẫu ĐẠT và KHÔNG ĐẠT ở trên (nếu có).
+   - Tuyệt đối KHÔNG ĐƯỢC "suy diễn hộ" người chơi. Nếu câu trả lời quá ngắn, quá mơ hồ hoặc tương đồng với các ví dụ KHÔNG ĐẠT (thiếu tên, thiếu nhân chứng, thiếu hoàn cảnh) -> BẮT BUỘC ĐÁNH TRƯỢT: "isCorrect": false.
+   - Khi đánh trượt: TUYỆT ĐỐI CẤM khen người chơi "đã xác định đúng một phần" hay "đúng đối tượng". Bắt buộc phản hồi thẳng thắn là nhận định vô căn cứ hoặc thiếu chứng cứ/nguồn tin chứng minh.
 
-2. TRƯỜNG HỢP ĐẠT (isCorrect = true):
-   - Người chơi nêu được KẾT LUẬN kèm theo ít nhất một CĂN CỨ / NGUỒN TIN / HOÀN CẢNH hợp lý khớp với bối cảnh đã cung cấp.
+2. ĐIỀU KIỆN ĐỂ ĐẠT ("isCorrect": true):
+   - Người chơi nêu được KẾT LUẬN kèm theo ít nhất một CĂN CỨ HỢP LÝ (nhân chứng cụ thể, tài liệu, mốc thời gian, nguyên nhân hoặc hoàn cảnh xảy ra sự việc khớp với bối cảnh hoặc chuẩn tương đương các ví dụ mẫu ĐẠT).
    - Điểm confidenceScore từ 80 đến 100.
-   - Phản hồi: Xác nhận kết luận chính xác và có viện dẫn căn cứ chứng minh.
+   - Phản hồi: Xác nhận kết luận chính xác, có viện dẫn căn cứ chứng minh.
 
-3. TRƯỜNG HỢP KHÔNG ĐẠT (isCorrect = false):
-   - Người chơi chỉ nêu kết luận khơi khơi, võ đoán, nói chung chung mù mờ mà HOÀN TOÀN KHÔNG có căn cứ, không có nhân chứng, không có nguồn tin hay hoàn cảnh nào.
-   - Điểm confidenceScore từ 0 đến 20.
-   - TUYỆT ĐỐI CẤM khen người chơi "đã xác định đúng một phần" hay "đúng đối tượng". Bắt buộc phản hồi thẳng là nhận định vô căn cứ do thiếu chứng cứ/nguồn tin chứng minh.
+3. ĐIỀU KIỆN ĐÁNH TRƯỢT ("isCorrect": false):
+   - Nói khơi khơi, phán đoán mù mờ, hoặc thiếu chứng cứ/nhân chứng/hoàn cảnh cụ thể.
+   - Điểm confidenceScore từ 0 đến 30.
+   - Phản hồi: Chỉ ra nhận định thiếu căn cứ hoặc thiếu dữ kiện chứng minh.
 
 BẮT BUỘC TRẢ VỀ DUY NHẤT 1 CHUỖI JSON HỢP LỆ THEO SCHEMA:
 {

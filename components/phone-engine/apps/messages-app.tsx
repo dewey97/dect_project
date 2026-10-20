@@ -21,6 +21,7 @@ import {
 import { cn, normalizeImageUrl, normalizeMediaUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { getStorageJson, setStorageJson } from "@/lib/storage";
+import { EvidenceAnchorItem } from "../core/evidence-anchor-item";
 
 interface MessagesAppProps {
   onBackToHome?: () => void;
@@ -417,19 +418,21 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
               </span>
             </div>
 
-            {selectedThread.messages.map((msg: any) => {
+            {selectedThread.messages.map((msg: any, mIdx: number) => {
               const isMe = msg.role === "sent";
               const isPinned = pinnedClueIds.includes(msg.id);
               const attachment = msg.attachment;
+              const msgCode = msg.code || (msg.isClue ? `CLUE-${String(mIdx + 1).padStart(2, "0")}` : `MSG-${String(mIdx + 1).padStart(2, "0")}`);
 
               return (
-                <div
-                  key={msg.id}
-                  className={cn(
-                    "flex flex-col max-w-[85%]",
-                    isMe ? "self-end items-end" : "self-start items-start",
-                  )}
-                >
+                <div key={msg.id} className={cn("flex flex-col w-full", isMe ? "items-end" : "items-start")}>
+                  <EvidenceAnchorItem
+                    code={msgCode}
+                    className={cn(
+                      "flex flex-col max-w-[85%]",
+                      isMe ? "self-end items-end" : "self-start items-start",
+                    )}
+                  >
                   {/* ATTACHMENT: AUDIO / VOICE MESSAGE */}
                   {attachment?.type === "audio" && (
                     <div
@@ -623,6 +626,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                       {msg.timestamp}
                     </span>
                   )}
+                  </EvidenceAnchorItem>
                 </div>
               );
             })}
@@ -670,38 +674,43 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto no-scrollbar divide-y divide-[#E3E2E7] bg-[#FAF9FE] pb-10">
-              {filteredThreads.map((thread: any) => (
-                <div
-                  key={thread.id}
-                  onClick={() => setSelectedThread(thread)}
-                  className="flex items-center min-h-[62px] px-3.5 py-2 hover:bg-[#FFFFFF] active:bg-[#EEEFF1] cursor-pointer transition-colors bg-[#FAF9FE]"
-                >
-                  {/* Conversation Row Text Body */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-center">
-                    {/* Header line: Sender Name + Timestamp */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-[16px] font-semibold text-[#1A1B1F] truncate leading-tight">
-                        {thread.name}
-                      </span>
-                      <span
-                        className={cn(
-                          "text-[12px] font-normal shrink-0 ml-2 font-sans",
-                          thread.unread
-                            ? "text-[#0058BC] font-semibold"
-                            : "text-[#8E8E93]",
-                        )}
-                      >
-                        {thread.timestamp}
-                      </span>
-                    </div>
+              {filteredThreads.map((thread: any, idx: number) => {
+                const threadCode = thread.code || thread.id || `MSG-${String(idx + 1).padStart(2, "0")}`;
+                const displayCode = threadCode.startsWith("MSG-") || threadCode.startsWith("CLUE-") ? threadCode : `MSG-${String(idx + 1).padStart(2, "0")}`;
+                return (
+                  <EvidenceAnchorItem key={thread.id} code={displayCode}>
+                    <div
+                      onClick={() => setSelectedThread(thread)}
+                      className="flex items-center min-h-[62px] px-3.5 py-2 hover:bg-[#FFFFFF] active:bg-[#EEEFF1] cursor-pointer transition-colors bg-[#FAF9FE]"
+                    >
+                      {/* Conversation Row Text Body */}
+                      <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        {/* Header line: Sender Name + Timestamp */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-[16px] font-semibold text-[#1A1B1F] truncate leading-tight">
+                            {thread.name}
+                          </span>
+                          <span
+                            className={cn(
+                              "text-[12px] font-normal shrink-0 ml-2 font-sans",
+                              thread.unread
+                                ? "text-[#0058BC] font-semibold"
+                                : "text-[#8E8E93]",
+                            )}
+                          >
+                            {thread.timestamp}
+                          </span>
+                        </div>
 
-                    {/* Preview Text Line */}
-                    <p className="text-[13.5px] font-normal text-[#636366] truncate mt-0.5 leading-snug">
-                      {thread.previewText}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                        {/* Preview Text Line */}
+                        <p className="text-[13.5px] font-normal text-[#636366] truncate mt-0.5 leading-snug">
+                          {thread.previewText}
+                        </p>
+                      </div>
+                    </div>
+                  </EvidenceAnchorItem>
+                );
+              })}
             </div>
           )}
         </div>

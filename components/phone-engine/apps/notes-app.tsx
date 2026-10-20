@@ -5,6 +5,7 @@ import { FileText, ArrowLeft, ChevronLeft, Search, Lock, Unlock, Folder } from '
 import type { Document } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
+import { EvidenceAnchorItem } from '../core/evidence-anchor-item'
 
 interface NotesAppProps {
   notes?: Document[]
@@ -162,29 +163,32 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
               </div>
             ) : (
               <div className="divide-y divide-[#2C2C2E] rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] overflow-hidden">
-                {filteredNotes.map((note) => {
+                {filteredNotes.map((note, idx) => {
                   const isLocked = note.isLocked && !unlockedNoteIds.includes(note.id)
+                  const noteCode = (note as any).code || note.id || `NOTE-${String(idx + 1).padStart(2, '0')}`
+                  const displayCode = noteCode.startsWith('NOTE-') || noteCode.startsWith('CLUE-') ? noteCode : `NOTE-${String(idx + 1).padStart(2, '0')}`
                   return (
-                    <div
-                      key={note.id}
-                      onClick={() => setSelectedNote(note)}
-                      className="p-3 hover:bg-[#2C2C2E]/60 active:bg-[#3A3A3C] cursor-pointer transition-colors"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="text-[14px] font-semibold text-white truncate flex items-center gap-1.5">
-                          {note.isLocked && (
-                            <Lock className={cn('size-3.5 shrink-0', isLocked ? 'text-[#FFD60A]' : 'text-[#30D158]')} />
-                          )}
-                          <span className="truncate">{note.title}</span>
+                    <EvidenceAnchorItem key={note.id} code={displayCode}>
+                      <div
+                        onClick={() => setSelectedNote(note)}
+                        className="p-3 hover:bg-[#2C2C2E]/60 active:bg-[#3A3A3C] cursor-pointer transition-colors"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="text-[14px] font-semibold text-white truncate flex items-center gap-1.5">
+                            {note.isLocked && (
+                              <Lock className={cn('size-3.5 shrink-0', isLocked ? 'text-[#FFD60A]' : 'text-[#30D158]')} />
+                            )}
+                            <span className="truncate">{note.title}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[11px] text-[#8E8E93] font-sans shrink-0">{note.timestamp || note.meta}</span>
+                          <span className="text-[12px] text-[#A1A1A6] truncate">
+                            {isLocked ? '•••••••• (Ghi chú bị khóa bằng mật khẩu)' : note.content.replace(/\n/g, ' ')}
+                          </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] text-[#8E8E93] font-sans shrink-0">{note.timestamp || note.meta}</span>
-                        <span className="text-[12px] text-[#A1A1A6] truncate">
-                          {isLocked ? '•••••••• (Ghi chú bị khóa bằng mật khẩu)' : note.content.replace(/\n/g, ' ')}
-                        </span>
-                      </div>
-                    </div>
+                    </EvidenceAnchorItem>
                   )
                 })}
               </div>

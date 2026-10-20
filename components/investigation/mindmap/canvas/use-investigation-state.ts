@@ -23,8 +23,11 @@ export interface SuspectItem {
   name: string;
   clueIds: string[];
   motiveClueIds?: string[];
+  motiveReason?: string;
   alibiClueIds?: string[];
+  alibiReason?: string;
   contradictionClueIds?: string[];
+  contradictionReason?: string;
 }
 
 export type CulpritKey = "vu" | "tung" | "ha" | (string & {});

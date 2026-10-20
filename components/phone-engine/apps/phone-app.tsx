@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { EvidenceAnchorItem } from "../core/evidence-anchor-item";
 
 interface PhoneAppProps {
   onBackToHome?: () => void;
@@ -124,7 +125,10 @@ export function PhoneApp({
       item.duration_str ||
       (!isMissed ? defaultDurations[item.call_id] || defaultDurations[`L0${idx + 1}`] || "01:15" : "");
 
+    const callCode = item.code || item.call_id || `CALL-${String(idx + 1).padStart(2, "0")}`;
+
     return {
+      code: callCode,
       name,
       phone,
       type:
@@ -292,78 +296,77 @@ export function PhoneApp({
             ) : (
               <div className="divide-y divide-[#E3E2E7]">
                 {displayedRecents.map((call: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className="h-[60px] pl-4 pr-4 py-[10px] flex items-center justify-between hover:bg-[#FAF9FE] active:bg-[#F2F2F7] cursor-pointer transition-colors"
-                  >
-                    {/* Left: Contact Name + Call Direction Arrow on the right of name */}
-                    <div className="min-w-0 pr-3 flex flex-col justify-center">
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className={cn(
-                            "text-[17px] font-normal leading-tight truncate",
-                            call.isMissed
-                              ? "text-[#BA1A1A] font-medium"
-                              : "text-[#000000]",
-                          )}
-                        >
-                          {call.name}
-                        </span>
+                  <EvidenceAnchorItem key={call.code || idx} code={call.code}>
+                    <div className="h-[60px] pl-4 pr-4 py-[10px] flex items-center justify-between hover:bg-[#FAF9FE] active:bg-[#F2F2F7] cursor-pointer transition-colors">
+                      {/* Left: Contact Name + Call Direction Arrow on the right of name */}
+                      <div className="min-w-0 pr-3 flex flex-col justify-center">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={cn(
+                              "text-[17px] font-normal leading-tight truncate",
+                              call.isMissed
+                                ? "text-[#BA1A1A] font-medium"
+                                : "text-[#000000]",
+                            )}
+                          >
+                            {call.name}
+                          </span>
 
-                        {/* Missed count (red) */}
-                        {call.isMissed && call.missedCount > 1 && (
-                          <span className="text-[15px] font-normal text-[#BA1A1A]">
-                            ({call.missedCount})
+                          {/* Missed count (red) */}
+                          {call.isMissed && call.missedCount > 1 && (
+                            <span className="text-[15px] font-normal text-[#BA1A1A]">
+                              ({call.missedCount})
+                            </span>
+                          )}
+
+                          {/* Dấu gọi đi / gọi đến đẩy sang bên phải của liên hệ */}
+                          {!call.isMissed && call.isOutgoing && (
+                            <svg
+                              className="w-[11px] h-[11px] text-[#34C759] shrink-0"
+                              viewBox="0 0 11 11"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M1 10L10 1M10 1H3M10 1V8" />
+                            </svg>
+                          )}
+                          {!call.isMissed && call.isIncoming && (
+                            <svg
+                              className="w-[11px] h-[11px] text-[#007AFF] shrink-0"
+                              viewBox="0 0 11 11"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M10 1L1 10M1 10H8M1 10V3" />
+                            </svg>
+                          )}
+                        </div>
+
+                        {/* Sub-label: di động, nhà riêng, Cuộc gọi FaceTime... */}
+                        <div className="text-[13px] font-normal text-[#8E8E93] mt-0.5 leading-none">
+                          {call.type}
+                        </div>
+                      </div>
+
+                      {/* Right: [Thời lượng]  [Thời điểm] (ĐÃ BỎ ICON THÔNG TIN (i)) */}
+                      <div className="flex items-center gap-2 shrink-0 text-right">
+                        {call.duration && (
+                          <span className="text-[13px] font-mono font-normal text-[#8E8E93]">
+                            ({call.duration})
                           </span>
                         )}
-
-                        {/* Dấu gọi đi / gọi đến đẩy sang bên phải của liên hệ */}
-                        {!call.isMissed && call.isOutgoing && (
-                          <svg
-                            className="w-[11px] h-[11px] text-[#34C759] shrink-0"
-                            viewBox="0 0 11 11"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M1 10L10 1M10 1H3M10 1V8" />
-                          </svg>
-                        )}
-                        {!call.isMissed && call.isIncoming && (
-                          <svg
-                            className="w-[11px] h-[11px] text-[#007AFF] shrink-0"
-                            viewBox="0 0 11 11"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M10 1L1 10M1 10H8M1 10V3" />
-                          </svg>
-                        )}
-                      </div>
-
-                      {/* Sub-label: di động, nhà riêng, Cuộc gọi FaceTime... */}
-                      <div className="text-[13px] font-normal text-[#8E8E93] mt-0.5 leading-none">
-                        {call.type}
-                      </div>
-                    </div>
-
-                    {/* Right: [Thời lượng]  [Thời điểm] (ĐÃ BỎ ICON THÔNG TIN (i)) */}
-                    <div className="flex items-center gap-2 shrink-0 text-right">
-                      {call.duration && (
-                        <span className="text-[13px] font-mono font-normal text-[#8E8E93]">
-                          ({call.duration})
+                        <span className="text-[14px] font-normal text-[#8E8E93]">
+                          {call.time}
                         </span>
-                      )}
-                      <span className="text-[14px] font-normal text-[#8E8E93]">
-                        {call.time}
-                      </span>
+                      </div>
                     </div>
-                  </div>
+                  </EvidenceAnchorItem>
                 ))}
               </div>
             )}

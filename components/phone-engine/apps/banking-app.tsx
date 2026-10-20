@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { EvidenceAnchorItem } from "../core/evidence-anchor-item";
 
 interface BankingAppProps {
   onBackToHome?: () => void;
@@ -46,6 +47,7 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
 
       return {
         id: item.tx_id || `tx-${idx + 1}`,
+        code: item.code || item.tx_id || autoRefId,
         refId: item.ref_id || autoRefId,
         title,
         receiver,
@@ -194,67 +196,69 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
             </span>
           </div>
         ) : (
-          filteredTransactions.map((tx) => {
+          filteredTransactions.map((tx, idx) => {
             const isIncome = tx.amount > 0;
+            const txCode = tx.code || (tx.refId ? (tx.refId.startsWith("FT") ? tx.refId : `BANK-${String(idx + 1).padStart(2, "0")}`) : `BANK-${String(idx + 1).padStart(2, "0")}`);
             return (
-              <div
-                key={tx.id}
-                onClick={() => setSelectedTx(tx)}
-                className={cn(
-                  "p-3 rounded-xl bg-[#141A26] border border-white/5 hover:border-white/15 cursor-pointer transition-all active:scale-[0.98]",
-                  tx.isEvidence && "border-l-4 border-l-[#0A84FF]",
-                )}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className={cn(
-                        "size-8 rounded-full flex items-center justify-center shrink-0",
-                        isIncome
-                          ? "bg-[#30D158]/15 text-[#30D158]"
-                          : "bg-[#FF453A]/15 text-[#FF453A]",
-                      )}
-                    >
-                      {isIncome ? (
-                        <ArrowDownLeft className="size-4" />
-                      ) : (
-                        <ArrowUpRight className="size-4" />
-                      )}
-                    </div>
-                    <div>
-                      <div className="text-[12px] font-semibold text-white truncate max-w-[150px]">
-                        {tx.title}
+              <EvidenceAnchorItem key={tx.id} code={txCode}>
+                <div
+                  onClick={() => setSelectedTx(tx)}
+                  className={cn(
+                    "p-3 rounded-xl bg-[#141A26] border border-white/5 hover:border-white/15 cursor-pointer transition-all active:scale-[0.98]",
+                    tx.isEvidence && "border-l-4 border-l-[#0A84FF]",
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={cn(
+                          "size-8 rounded-full flex items-center justify-center shrink-0",
+                          isIncome
+                            ? "bg-[#30D158]/15 text-[#30D158]"
+                            : "bg-[#FF453A]/15 text-[#FF453A]",
+                        )}
+                      >
+                        {isIncome ? (
+                          <ArrowDownLeft className="size-4" />
+                        ) : (
+                          <ArrowUpRight className="size-4" />
+                        )}
                       </div>
-                      <div className="text-[9.5px] text-[#8E8E93] truncate">
-                        {tx.receiver}
+                      <div>
+                        <div className="text-[12px] font-semibold text-white truncate max-w-[150px]">
+                          {tx.title}
+                        </div>
+                        <div className="text-[9.5px] text-[#8E8E93] truncate">
+                          {tx.receiver}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <div
+                        className={cn(
+                          "text-[12.5px] font-bold font-mono",
+                          isIncome ? "text-[#30D158]" : "text-white",
+                        )}
+                      >
+                        {isIncome ? "+" : ""}
+                        {tx.amount.toLocaleString("vi-VN")} đ
+                      </div>
+                      <div className="text-[9px] text-[#8E8E93] font-mono">
+                        {tx.time.split(" ")[0]}
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-right shrink-0">
-                    <div
-                      className={cn(
-                        "text-[12.5px] font-bold font-mono",
-                        isIncome ? "text-[#30D158]" : "text-white",
-                      )}
-                    >
-                      {isIncome ? "+" : ""}
-                      {tx.amount.toLocaleString("vi-VN")} đ
-                    </div>
-                    <div className="text-[9px] text-[#8E8E93] font-mono">
-                      {tx.time.split(" ")[0]}
-                    </div>
+                  {/* Transaction note tag */}
+                  <div className="mt-2 text-[10.5px] text-[#A1A1A6] bg-[#0B0E14] px-2 py-1 rounded-md border border-white/5 truncate font-mono flex items-center justify-between">
+                    <span>💬 {tx.note}</span>
+                    <span className="text-[8.5px] text-[#0A84FF]">
+                      Chi tiết →
+                    </span>
                   </div>
                 </div>
-
-                {/* Transaction note tag */}
-                <div className="mt-2 text-[10.5px] text-[#A1A1A6] bg-[#0B0E14] px-2 py-1 rounded-md border border-white/5 truncate font-mono flex items-center justify-between">
-                  <span>💬 {tx.note}</span>
-                  <span className="text-[8.5px] text-[#0A84FF]">
-                    Chi tiết →
-                  </span>
-                </div>
-              </div>
+              </EvidenceAnchorItem>
             );
           })
         )}

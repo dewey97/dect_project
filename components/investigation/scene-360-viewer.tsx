@@ -22,17 +22,25 @@ export interface HotspotItem {
 interface Scene360ViewerProps {
   imageUrl?: string
   fallbackImageUrl?: string
-  hotspots: HotspotItem[]
-  onSelectSpot: (spot: HotspotItem) => void
+  hotspots?: HotspotItem[]
+  onSelectSpot?: (spot: HotspotItem) => void
   selectedSpotId?: string | null
+  hideControls?: boolean
+  hideCompass?: boolean
+  disableZoom?: boolean
+  rotateOnHover?: boolean
 }
 
 export function Scene360Viewer({
   imageUrl = '/images/cases/case_000/crime_scene_360.jpg',
   fallbackImageUrl = '/images/cases/case_000/PANORAMA.png',
-  hotspots,
+  hotspots = [],
   onSelectSpot,
-  selectedSpotId
+  selectedSpotId,
+  hideControls = false,
+  hideCompass = false,
+  disableZoom = false,
+  rotateOnHover = false
 }: Scene360ViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -64,6 +72,9 @@ export function Scene360Viewer({
     onPointerDownPointerY: 0,
     onPointerDownLon: 0,
     onPointerDownLat: 0,
+    lastPointerX: 0,
+    lastPointerY: 0,
+    hasLastPointer: false,
     camera: null as THREE.PerspectiveCamera | null,
     renderer: null as THREE.WebGLRenderer | null,
     scene: null as THREE.Scene | null,
@@ -206,19 +217,32 @@ export function Scene360Viewer({
 
     renderLoop()
 
-    // 5. RESIZE LISTENER
+    // 5. RESIZE LISTENER & RESIZE OBSERVER
     const handleResize = () => {
       if (!container || !camera || !renderer) return
       const w = container.clientWidth
       const h = container.clientHeight
+      if (w === 0 || h === 0) return
       camera.aspect = w / h
       camera.updateProjectionMatrix()
       renderer.setSize(w, h)
     }
+
     window.addEventListener('resize', handleResize)
+
+    let resizeObserver: ResizeObserver | null = null
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize()
+      })
+      resizeObserver.observe(container)
+    }
 
     return () => {
       window.removeEventListener('resize', handleResize)
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+      }
       cancelAnimationFrame(state.animationFrameId)
       renderer.dispose()
       geometry.dispose()
@@ -234,6 +258,10 @@ export function Scene360Viewer({
     state.onPointerDownLon = state.targetLon
     state.onPointerDownLat = state.targetLat
 
+    state.lastPointerX = e.clientX
+    state.lastPointerY = e.clientY
+    state.hasLastPointer = true
+
     try {
       e.currentTarget.setPointerCapture(e.pointerId)
     } catch {}
@@ -241,6 +269,26 @@ export function Scene360Viewer({
 
   const handlePointerMove = (e: React.PointerEvent) => {
     const state = stateRef.current
+
+    // Chế độ xoay tự do theo chuyển động di chuột không cần click (Hover to rotate)
+    if (rotateOnHover) {
+      if (!state.hasLastPointer) {
+        state.lastPointerX = e.clientX
+        state.lastPointerY = e.clientY
+        state.hasLastPointer = true
+        return
+      }
+      const deltaX = e.clientX - state.lastPointerX
+      const deltaY = e.clientY - state.lastPointerY
+      state.lastPointerX = e.clientX
+      state.lastPointerY = e.clientY
+
+      const factor = ((state.camera?.fov || 70) / 70) * 0.22
+      state.targetLon += deltaX * factor
+      state.targetLat -= deltaY * factor
+      return
+    }
+
     if (!state.isUserInteracting) return
 
     const factor = ((state.camera?.fov || 70) / 70) * 0.18
@@ -250,13 +298,20 @@ export function Scene360Viewer({
 
   const handlePointerUp = (e: React.PointerEvent) => {
     stateRef.current.isUserInteracting = false
+    stateRef.current.hasLastPointer = false
     try {
       e.currentTarget.releasePointerCapture(e.pointerId)
     } catch {}
   }
 
+  const handlePointerLeave = () => {
+    stateRef.current.hasLastPointer = false
+    stateRef.current.isUserInteracting = false
+  }
+
   // WHEEL ZOOM HANDLER
   const handleWheel = (e: React.WheelEvent) => {
+    if (disableZoom) return // Bỏ zoom in / zoom out theo yêu cầu
     e.preventDefault()
     setFov((prev) => {
       const nextFov = Math.max(35, Math.min(85, prev + e.deltaY * 0.05))
@@ -305,8 +360,11 @@ export function Scene360Viewer({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
+      onPointerLeave={handlePointerLeave}
       onWheel={handleWheel}
-      className="relative w-full h-full bg-[#050403] select-none overflow-hidden cursor-grab active:cursor-grabbing touch-none"
+      className={`relative w-full h-full bg-[#050403] select-none overflow-hidden touch-none ${
+        rotateOnHover ? 'cursor-move' : 'cursor-grab active:cursor-grabbing'
+      }`}
     >
       {/* 3D WEBGL CANVAS */}
       <canvas ref={canvasRef} className="w-full h-full block" />
@@ -340,7 +398,7 @@ export function Scene360Viewer({
               type="button"
               onClick={(e) => {
                 e.stopPropagation()
-                onSelectSpot(spot)
+                onSelectSpot?.(spot)
               }}
               className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2"
               aria-label={`Điểm khám xét #${spot.num} - ${spot.title || ''}`}
@@ -371,74 +429,78 @@ export function Scene360Viewer({
       })}
 
       {/* TOP-LEFT COMPASS HUD */}
-      <div className="absolute top-3 left-3 z-20 pointer-events-none flex items-center gap-2 bg-black/75 border border-[#8c5e35]/50 px-3 py-1.5 rounded backdrop-blur-md shadow-lg select-none">
-        <div
-          className="relative size-6 flex items-center justify-center transition-transform duration-75 ease-out"
-          style={{ transform: `rotate(${-heading}deg)` }}
-        >
-          <div className="absolute -top-0.5 w-0 h-0 border-x-[3px] border-x-transparent border-b-[10px] border-b-[#ef4444]" />
-          <div className="absolute -bottom-0.5 w-0 h-0 border-x-[3px] border-x-transparent border-t-[10px] border-t-[#cbd5e1]" />
-          <div className="relative size-1 rounded-full bg-white" />
+      {!hideCompass && (
+        <div className="absolute top-3 left-3 z-20 pointer-events-none flex items-center gap-2 bg-black/75 border border-[#8c5e35]/50 px-3 py-1.5 rounded backdrop-blur-md shadow-lg select-none">
+          <div
+            className="relative size-6 flex items-center justify-center transition-transform duration-75 ease-out"
+            style={{ transform: `rotate(${-heading}deg)` }}
+          >
+            <div className="absolute -top-0.5 w-0 h-0 border-x-[3px] border-x-transparent border-b-[10px] border-b-[#ef4444]" />
+            <div className="absolute -bottom-0.5 w-0 h-0 border-x-[3px] border-x-transparent border-t-[10px] border-t-[#cbd5e1]" />
+            <div className="relative size-1 rounded-full bg-white" />
+          </div>
+          <div className="font-mono text-[11px] text-[#e5c07b] font-bold">
+            HƯỚNG: {dirName} ({heading}°)
+          </div>
         </div>
-        <div className="font-mono text-[11px] text-[#e5c07b] font-bold">
-          HƯỚNG: {dirName} ({heading}°)
-        </div>
-      </div>
+      )}
 
       {/* BOTTOM-RIGHT FLOATING CONTROLS */}
-      <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 bg-black/85 border border-[#593c26] p-1.5 rounded-lg backdrop-blur-sm shadow-xl pointer-events-auto">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            setAutoRotate((prev) => !prev)
-          }}
-          className={`p-1.5 rounded transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-mono ${
-            autoRotate
-              ? 'bg-amber-600/80 text-white'
-              : 'text-[#d9a066] hover:text-white hover:bg-[#382314]'
-          }`}
-          title={autoRotate ? 'Dừng tự động xoay' : 'Bật tự động xoay 360°'}
-        >
-          {autoRotate ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
-          <span className="hidden sm:inline">Tự xoay</span>
-        </button>
-        <div className="w-px h-4 bg-[#593c26]" />
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleZoom(-10)
-          }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
-          title="Phóng to góc nhìn"
-        >
-          <ZoomIn className="size-3.5" />
-        </button>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleZoom(10)
-          }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
-          title="Thu nhỏ góc nhìn"
-        >
-          <ZoomOut className="size-3.5" />
-        </button>
-        <div className="w-px h-4 bg-[#593c26]" />
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            handleResetView()
-          }}
-          className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
-          title="Đặt lại hướng nhìn ban đầu"
-        >
-          <RotateCcw className="size-3.5" />
-        </button>
-      </div>
+      {!hideControls && (
+        <div className="absolute bottom-3 right-3 z-20 flex items-center gap-1.5 bg-black/85 border border-[#593c26] p-1.5 rounded-lg backdrop-blur-sm shadow-xl pointer-events-auto">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setAutoRotate((prev) => !prev)
+            }}
+            className={`p-1.5 rounded transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-mono ${
+              autoRotate
+                ? 'bg-amber-600/80 text-white'
+                : 'text-[#d9a066] hover:text-white hover:bg-[#382314]'
+            }`}
+            title={autoRotate ? 'Dừng tự động xoay' : 'Bật tự động xoay 360°'}
+          >
+            {autoRotate ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
+            <span className="hidden sm:inline">Tự xoay</span>
+          </button>
+          <div className="w-px h-4 bg-[#593c26]" />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleZoom(-10)
+            }}
+            className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
+            title="Phóng to góc nhìn"
+          >
+            <ZoomIn className="size-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleZoom(10)
+            }}
+            className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
+            title="Thu nhỏ góc nhìn"
+          >
+            <ZoomOut className="size-3.5" />
+          </button>
+          <div className="w-px h-4 bg-[#593c26]" />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleResetView()
+            }}
+            className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
+            title="Đặt lại hướng nhìn ban đầu"
+          >
+            <RotateCcw className="size-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

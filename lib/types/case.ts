@@ -172,6 +172,8 @@ export interface Checkpoint {
   suspectLabel?: string;
   type?:
     "mcq" | "text_match_3" | "evidence_picker" | "convergence" | "accusation";
+  questionType?: "time" | "choice" | "code" | "text" | "evidence_picker" | string;
+  inputType?: string;
   hintsList?: string[];
   storyConfig?: {
     /** Mốc thời gian in trên header, ví dụ `Đêm 24/07/2016`. */

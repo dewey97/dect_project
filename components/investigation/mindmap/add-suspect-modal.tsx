@@ -18,8 +18,11 @@ interface SuspectItemData {
   name: string
   clueIds: string[]
   motiveClueIds?: string[]
+  motiveReason?: string
   alibiClueIds?: string[]
+  alibiReason?: string
   contradictionClueIds?: string[]
+  contradictionReason?: string
 }
 
 interface AddSuspectModalProps {
@@ -52,6 +55,7 @@ import {
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 import { usePhoneData } from '@/lib/hooks/use-phone-data'
+import { getInterrogationCriteria } from '@/lib/ai/suspect-interrogation-context'
 
 export { findValidCaseCharacter, VALID_CASE_CHARACTERS, checkMotiveValid, checkAlibiValid, checkContradictionValid }
 
@@ -73,14 +77,18 @@ export function AddSuspectModal({
     if (editingSuspect?.motiveClueIds) return editingSuspect.motiveClueIds
     return []
   })
+  const [motiveReason, setMotiveReason] = useState<string>(() => editingSuspect?.motiveReason || '')
   const [alibiClueIds, setAlibiClueIds] = useState<string[]>(() => {
     if (editingSuspect?.alibiClueIds) return editingSuspect.alibiClueIds
     return []
   })
+  const [alibiReason, setAlibiReason] = useState<string>(() => editingSuspect?.alibiReason || '')
   const [contradictionClueIds, setContradictionClueIds] = useState<string[]>(() => {
     if (editingSuspect?.contradictionClueIds) return editingSuspect.contradictionClueIds
     return []
   })
+  const [contradictionReason, setContradictionReason] = useState<string>(() => editingSuspect?.contradictionReason || '')
+  const [isVerifyingAI, setIsVerifyingAI] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null)
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false)
@@ -206,16 +214,20 @@ export function AddSuspectModal({
   useEffect(() => {
     if (editingSuspect) {
       setName(editingSuspect.name)
-      if (editingSuspect.motiveClueIds || editingSuspect.alibiClueIds || editingSuspect.contradictionClueIds) {
-        setMotiveClueIds(editingSuspect.motiveClueIds || [])
-        setAlibiClueIds(editingSuspect.alibiClueIds || [])
-        setContradictionClueIds(editingSuspect.contradictionClueIds || [])
-      }
+      setMotiveClueIds(editingSuspect.motiveClueIds || [])
+      setMotiveReason(editingSuspect.motiveReason || '')
+      setAlibiClueIds(editingSuspect.alibiClueIds || [])
+      setAlibiReason(editingSuspect.alibiReason || '')
+      setContradictionClueIds(editingSuspect.contradictionClueIds || [])
+      setContradictionReason(editingSuspect.contradictionReason || '')
     } else {
       setName('')
       setMotiveClueIds([])
+      setMotiveReason('')
       setAlibiClueIds([])
+      setAlibiReason('')
       setContradictionClueIds([])
+      setContradictionReason('')
     }
     pendingMotiveRef.current = {}
     pendingAlibiRef.current = {}
@@ -224,6 +236,7 @@ export function AddSuspectModal({
     setErrorMsg('')
     setEvalModal(null)
     setShowExitConfirmModal(false)
+    setIsVerifyingAI(false)
   }, [editingSuspect, isOpen])
 
   const extractClueIdsFromPending = (pending: PendingClueInputs): string[] => {
@@ -286,8 +299,48 @@ export function AddSuspectModal({
     return checkContradictionValid(liveContradiction, clues, optionalContradiction)
   }
 
+  // HÀM HỖ TRỢ GỌI AI KIỂM TRA LẬP LUẬN LÝ DO
+  const verifyReasonWithAI = async (
+    category: 'motive' | 'alibi' | 'contradiction',
+    reasonText: string,
+    charId: string
+  ): Promise<{ isCorrect: boolean; feedback: string }> => {
+    try {
+      const criteria = getInterrogationCriteria(charId, category, {
+        title: matchedCheckpoint?.title,
+        question: matchedCheckpoint?.question,
+        hint: matchedCheckpoint?.hint,
+      })
+
+      const res = await fetch('/api/test-scan-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          context: criteria.context,
+          answer: reasonText,
+          validCases: criteria.validCases,
+          invalidCases: criteria.invalidCases,
+        }),
+      })
+
+      if (!res.ok) {
+        // Nếu API lỗi tạm thời (hết quota / mạng), không chặn người chơi nếu mã chứng cứ đã đúng
+        return { isCorrect: true, feedback: 'Xác nhận căn cứ lập luận.' }
+      }
+
+      const data = await res.json()
+      return {
+        isCorrect: !!data.isCorrect,
+        feedback: data.feedback || '',
+      }
+    } catch (e) {
+      console.warn('Lỗi kiểm tra AI, cho phép fallback qua mã chứng cứ:', e)
+      return { isCorrect: true, feedback: 'Xác nhận căn cứ lập luận.' }
+    }
+  }
+
   // XÁC NHẬN MANH MỐI ĐỘNG CƠ (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
-  const handleConfirmMotiveClues = () => {
+  const handleConfirmMotiveClues = async () => {
     const pendingIds = extractClueIdsFromPending(pendingMotiveRef.current)
     const effectiveClues = Array.from(new Set([...motiveClueIds, ...pendingIds]))
     if (pendingIds.length > 0) {
@@ -297,10 +350,12 @@ export function AddSuspectModal({
 
     const suspectDisplayName = name.trim() || 'Đối tượng điều tra'
     const matched = findValidCaseCharacter(name, sheetCharacters)
-    const hasMotiveReqs = (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0
-    const isValid = hasMotiveReqs ? validateMotive(matched?.id || '', effectiveClues) : true
 
-    if (hasMotiveReqs && !isValid) {
+    // Kiểm tra mã chứng cứ
+    const hasMotiveReqs = (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0
+    const isCluesValid = hasMotiveReqs ? validateMotive(matched?.id || '', effectiveClues) : true
+
+    if (hasMotiveReqs && !isCluesValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
@@ -323,8 +378,11 @@ export function AddSuspectModal({
         name: matched.canonicalName,
         clueIds: combinedClues,
         motiveClueIds: effectiveClues,
+        motiveReason,
         alibiClueIds,
-        contradictionClueIds
+        alibiReason,
+        contradictionClueIds,
+        contradictionReason,
       })
     }
     setEvalModal({
@@ -332,15 +390,15 @@ export function AddSuspectModal({
       isSuccess: true,
       title: 'THÔNG BÁO',
       heading: '',
-      message: 'Bằng chứng lựa chọn chính xác. Căn cứ động cơ đã được ghi nhận',
+      message: 'Bằng chứng chính xác. Căn cứ động cơ đã được ghi nhận',
       suspectName: suspectDisplayName,
       selectedCount: effectiveClues.length,
     })
     setErrorMsg('')
   }
 
-  // XÁC NHẬN MANH MỐI BÁC BỎ NGOẠI PHẠM (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
-  const handleConfirmAlibiClues = () => {
+  // XÁC NHẬN MANH MỐI NGOẠI PHẠM (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
+  const handleConfirmAlibiClues = async () => {
     const pendingIds = extractClueIdsFromPending(pendingAlibiRef.current)
     const effectiveClues = Array.from(new Set([...alibiClueIds, ...pendingIds]))
     if (pendingIds.length > 0) {
@@ -350,10 +408,12 @@ export function AddSuspectModal({
 
     const suspectDisplayName = name.trim() || 'Đối tượng điều tra'
     const matched = findValidCaseCharacter(name, sheetCharacters)
-    const hasAlibiReqs = (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0
-    const isValid = hasAlibiReqs ? validateAlibi(matched?.id || '', effectiveClues) : true
 
-    if (hasAlibiReqs && !isValid) {
+    // Kiểm tra mã chứng cứ
+    const hasAlibiReqs = (matchedCheckpoint?.pickerConfig?.alibiEvidenceIds?.length ?? 0) > 0
+    const isCluesValid = hasAlibiReqs ? validateAlibi(matched?.id || '', effectiveClues) : true
+
+    if (hasAlibiReqs && !isCluesValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
@@ -376,8 +436,11 @@ export function AddSuspectModal({
         name: matched.canonicalName,
         clueIds: combinedClues,
         motiveClueIds,
+        motiveReason,
         alibiClueIds: effectiveClues,
-        contradictionClueIds
+        alibiReason,
+        contradictionClueIds,
+        contradictionReason,
       })
     }
     setEvalModal({
@@ -385,7 +448,7 @@ export function AddSuspectModal({
       isSuccess: true,
       title: 'THÔNG BÁO',
       heading: '',
-      message: 'Bằng chứng lựa chọn chính xác. Căn cứ ngoại phạm đã được ghi nhận',
+      message: 'Bằng chứng chính xác. Căn cứ ngoại phạm đã được ghi nhận',
       suspectName: suspectDisplayName,
       selectedCount: effectiveClues.length,
     })
@@ -393,7 +456,7 @@ export function AddSuspectModal({
   }
 
   // XÁC NHẬN MANH MỐI MÂU THUẪN LỜI KHAI (HIỂN THỊ PHẢN HỒI ĐÚNG / SAI)
-  const handleConfirmContradictionClues = () => {
+  const handleConfirmContradictionClues = async () => {
     const pendingIds = extractClueIdsFromPending(pendingContradictionRef.current)
     const effectiveClues = Array.from(new Set([...contradictionClueIds, ...pendingIds]))
     if (pendingIds.length > 0) {
@@ -403,10 +466,12 @@ export function AddSuspectModal({
 
     const suspectDisplayName = name.trim() || 'Đối tượng điều tra'
     const matched = findValidCaseCharacter(name, sheetCharacters)
-    const hasContradictionReqs = (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
-    const isValid = hasContradictionReqs ? validateContradiction(matched?.id || '', effectiveClues) : true
 
-    if (hasContradictionReqs && !isValid) {
+    // Kiểm tra mã chứng cứ
+    const hasContradictionReqs = (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
+    const isCluesValid = hasContradictionReqs ? validateContradiction(matched?.id || '', effectiveClues) : true
+
+    if (hasContradictionReqs && !isCluesValid) {
       detectiveAudio.playGlassSound()
       setEvalModal({
         isOpen: true,
@@ -429,8 +494,11 @@ export function AddSuspectModal({
         name: matched.canonicalName,
         clueIds: combinedClues,
         motiveClueIds,
+        motiveReason,
         alibiClueIds,
-        contradictionClueIds: effectiveClues
+        alibiReason,
+        contradictionClueIds: effectiveClues,
+        contradictionReason,
       })
     }
     setEvalModal({
@@ -438,7 +506,7 @@ export function AddSuspectModal({
       isSuccess: true,
       title: 'THÔNG BÁO',
       heading: '',
-      message: 'Bằng chứng lựa chọn chính xác. Mâu thuẫn lời khai đã được ghi nhận',
+      message: 'Bằng chứng chính xác. Mâu thuẫn lời khai đã được ghi nhận',
       suspectName: suspectDisplayName,
       selectedCount: effectiveClues.length,
     })
@@ -497,8 +565,11 @@ export function AddSuspectModal({
         name: matchedChar.canonicalName,
         clueIds: combinedClues,
         motiveClueIds: effectiveMotiveClues,
+        motiveReason,
         alibiClueIds: effectiveAlibiClues,
-        contradictionClueIds: effectiveContradictionClues
+        alibiReason,
+        contradictionClueIds: effectiveContradictionClues,
+        contradictionReason,
       })
       // Chỉ kích hoạt onSubmitConclusion nếu nhân vật này thực sự có checkpoint/câu hỏi điều tra tương ứng trên CMS
       if (onSubmitConclusion && (suspectCpId || matchedCheckpoint)) {
@@ -533,8 +604,11 @@ export function AddSuspectModal({
       name: suspectName,
       clueIds: combinedClues,
       motiveClueIds: effectiveMotiveClues,
+      motiveReason,
       alibiClueIds: effectiveAlibiClues,
-      contradictionClueIds: effectiveContradictionClues
+      alibiReason,
+      contradictionClueIds: effectiveContradictionClues,
+      contradictionReason,
     })
     if (onSubmitConclusion) {
       onSubmitConclusion(charId)
@@ -578,7 +652,15 @@ export function AddSuspectModal({
   const hasUnsavedChanges = () => {
     if (!isValidName) return false
     if (!editingSuspect) {
-      return name.trim().length > 0 || motiveClueIds.length > 0 || alibiClueIds.length > 0 || contradictionClueIds.length > 0
+      return (
+        name.trim().length > 0 ||
+        motiveClueIds.length > 0 ||
+        motiveReason.trim().length > 0 ||
+        alibiClueIds.length > 0 ||
+        alibiReason.trim().length > 0 ||
+        contradictionClueIds.length > 0 ||
+        contradictionReason.trim().length > 0
+      )
     }
     const initialName = (editingSuspect.name || '').trim()
     const initialMotive = editingSuspect.motiveClueIds || []
@@ -587,13 +669,16 @@ export function AddSuspectModal({
     const nameChanged = name.trim() !== initialName
     const motiveChanged =
       motiveClueIds.length !== initialMotive.length ||
-      motiveClueIds.some((id) => !initialMotive.includes(id))
+      motiveClueIds.some((id) => !initialMotive.includes(id)) ||
+      motiveReason !== (editingSuspect.motiveReason || '')
     const alibiChanged =
       alibiClueIds.length !== initialAlibi.length ||
-      alibiClueIds.some((id) => !initialAlibi.includes(id))
+      alibiClueIds.some((id) => !initialAlibi.includes(id)) ||
+      alibiReason !== (editingSuspect.alibiReason || '')
     const contradictionChanged =
       contradictionClueIds.length !== initialContradiction.length ||
-      contradictionClueIds.some((id) => !initialContradiction.includes(id))
+      contradictionClueIds.some((id) => !initialContradiction.includes(id)) ||
+      contradictionReason !== (editingSuspect.contradictionReason || '')
     return nameChanged || motiveChanged || alibiChanged || contradictionChanged
   }
 
@@ -617,8 +702,11 @@ export function AddSuspectModal({
           name: suspectName,
           clueIds: combinedClues,
           motiveClueIds,
+          motiveReason,
           alibiClueIds,
+          alibiReason,
           contradictionClueIds,
+          contradictionReason,
         })
       }
       onClose()
@@ -653,8 +741,11 @@ export function AddSuspectModal({
         name: suspectName,
         clueIds: combinedClues,
         motiveClueIds,
+        motiveReason,
         alibiClueIds,
+        alibiReason,
         contradictionClueIds,
+        contradictionReason,
       })
     } else {
       detectiveAudio.playPaperRustle()
@@ -861,6 +952,9 @@ export function AddSuspectModal({
               <InterrogationClueStep
                 category="motive"
                 clueIds={motiveClueIds}
+                reason={motiveReason}
+                onReasonChange={setMotiveReason}
+                isLoading={isVerifyingAI}
                 onAddClueId={(id) => {
                   setMotiveClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
                   if (errorMsg) setErrorMsg('')
@@ -883,6 +977,9 @@ export function AddSuspectModal({
               <InterrogationClueStep
                 category="alibi"
                 clueIds={alibiClueIds}
+                reason={alibiReason}
+                onReasonChange={setAlibiReason}
+                isLoading={isVerifyingAI}
                 onAddClueId={(id) => {
                   setAlibiClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
                   if (errorMsg) setErrorMsg('')
@@ -905,6 +1002,9 @@ export function AddSuspectModal({
               <InterrogationClueStep
                 category="contradiction"
                 clueIds={contradictionClueIds}
+                reason={contradictionReason}
+                onReasonChange={setContradictionReason}
+                isLoading={isVerifyingAI}
                 onAddClueId={(id) => {
                   setContradictionClueIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
                   if (errorMsg) setErrorMsg('')

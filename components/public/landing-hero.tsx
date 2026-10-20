@@ -64,6 +64,9 @@ export function LandingHero() {
             <a href="#vuan" className="hover:text-primary transition-colors">
               Vụ án
             </a>
+            <a href="#trai-nghiem-dieu-tra" className="hover:text-primary transition-colors">
+              Trải nghiệm phá án
+            </a>
             <a
               href="#mm-opportunity"
               className="hover:text-primary transition-colors"

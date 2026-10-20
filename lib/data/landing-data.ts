@@ -16,6 +16,14 @@ export const FAQ_DATA = [
     a: 'Có, bạn cần kết nối internet để truy cập vào Bàn Điều Tra Trực Tuyến. Hệ thống hỗ trợ mượt mà trên cả trình duyệt máy tính, máy tính bảng và điện thoại di động.'
   },
   {
+    q: 'Điện thoại giả lập tang vật hoạt động như thế nào?',
+    a: 'Khi khám phá vụ án, bạn sẽ được cấp quyền truy cập vào điện thoại của nạn nhân ngay trên giao diện web. Bạn có thể tự do mở các ứng dụng Tin nhắn, Danh bạ, Album ảnh, Ghi chú và bẻ khóa PIN để tìm ra các file ghi âm bí mật hay dữ liệu đã bị hung thủ xóa vội vã.'
+  },
+  {
+    q: 'Chế độ khám xét hiện trường 360° có gì đặc biệt?',
+    a: 'Thay vì chỉ nhìn những tấm ảnh 2D thông thường, bạn có thể xoay nhìn 360 độ quanh căn phòng án mạng, zoom cận cảnh từng góc khuất, chạm vào các vật chứng để đọc kết quả giám định pháp y và kích hoạt chế độ đèn huỳnh quang UV để soi dấu máu và vân tay ẩn.'
+  },
+  {
     q: 'Chính sách giao hàng và phí ship thế nào?',
     a: 'Chúng tôi miễn phí vận chuyển tiêu chuẩn toàn quốc cho tất cả các đơn hàng hộp hồ sơ vụ án vật lý. Đơn hàng nội thành Hà Nội/TP.HCM dự kiến nhận trong 1 - 2 ngày, các tỉnh thành khác từ 3 - 4 ngày.'
   },

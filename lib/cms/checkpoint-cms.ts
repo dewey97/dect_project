@@ -13,7 +13,10 @@ export interface SheetCheckpointRow {
   dossier?: string;
   title?: string;
   question?: string;
-  type?: "text_match_3" | "evidence_picker" | "mcq" | "text";
+  type?: "text_match_3" | "evidence_picker" | "mcq" | "text" | string;
+  question_type?: string;
+  input_type?: string;
+  form_type?: string;
   unlocked_evidence_id?: string;
   answers?: string;
   answers_id?: string;
@@ -33,6 +36,7 @@ export interface SheetCheckpointRow {
 export interface ParsedAnswers {
   options?: string[];
   correctAnswer?: string;
+  questionType?: string;
   validSuspects?: string[];
   validMotives?: string[];
   requiredEvidenceIds?: string[];
@@ -62,6 +66,16 @@ const ANSWER_KEYS: Record<string, string> = {
   correct_answer: "correct",
   dap_an: "correct",
   gio_roi_quan: "correct",
+
+  // Kiểu câu hỏi tương tác (Question / Input / Form type)
+  kieu: "question_type",
+  kieu_cau_hoi: "question_type",
+  loai_cau_hoi: "question_type",
+  question_type: "question_type",
+  input_type: "question_type",
+  form_type: "question_type",
+  form: "question_type",
+  type: "question_type",
 
   // Nhập tên nghi phạm
   suspect: "suspect",
@@ -400,6 +414,23 @@ export function parseAnswersColumn(raw?: string): ParsedAnswers {
           case "followup_of":
             parsed.followupOf = value.trim();
             break;
+          case "question_type": {
+            const normType = value.toLowerCase().trim();
+            if (normType.includes("thoi_gian") || normType.includes("time") || normType.includes("gio")) {
+              parsed.questionType = "time";
+            } else if (normType.includes("trac_nghiem") || normType.includes("choice") || normType.includes("lua_chon") || normType.includes("mcq")) {
+              parsed.questionType = "choice";
+            } else if (normType.includes("mat_khau") || normType.includes("code") || normType.includes("password") || normType.includes("khoa")) {
+              parsed.questionType = "code";
+            } else if (normType.includes("tu_luan") || normType.includes("text") || normType.includes("chu")) {
+              parsed.questionType = "text";
+            } else if (normType.includes("manh_moi") || normType.includes("chung_cu") || normType.includes("evidence")) {
+              parsed.questionType = "evidence_picker";
+            } else {
+              parsed.questionType = normType;
+            }
+            break;
+          }
           case "input": {
             const input = parseInputLine(value);
             if (input) (parsed.textMatchInputs ??= []).push(input);
@@ -731,6 +762,34 @@ export function transformSheetCheckpoint(
       ? row.suspect_id.trim()
       : answers.followupOf || undefined;
 
+  // Tự động phân giải questionType
+  let resolvedQuestionType: string | undefined =
+    answers.questionType ||
+    (typeof row.question_type === "string" ? row.question_type.trim() : undefined) ||
+    (typeof row.input_type === "string" ? row.input_type.trim() : undefined) ||
+    (typeof row.form_type === "string" ? row.form_type.trim() : undefined);
+
+  if (!resolvedQuestionType && typeof row.type === "string") {
+    const rowType = row.type.toLowerCase().trim();
+    if (["time", "choice", "code", "text", "evidence_picker"].includes(rowType)) {
+      resolvedQuestionType = rowType;
+    }
+  }
+
+  if (!resolvedQuestionType) {
+    if (answers.options && answers.options.length > 0) {
+      resolvedQuestionType = "choice";
+    } else if (textMatchConfig && textMatchConfig.inputs.length > 0) {
+      resolvedQuestionType = "text_match_3";
+    } else if (
+      (answers.motiveEvidenceIds && answers.motiveEvidenceIds.length > 0) ||
+      (answers.alibiEvidenceIds && answers.alibiEvidenceIds.length > 0) ||
+      (answers.contradictionEvidenceIds && answers.contradictionEvidenceIds.length > 0)
+    ) {
+      resolvedQuestionType = "evidence_picker";
+    }
+  }
+
   return {
     id: effectiveId,
     nodeId: String(row.node_id || effectiveId).trim(),
@@ -744,6 +803,8 @@ export function transformSheetCheckpoint(
     unlockedEvidenceId: row.unlocked_evidence_id || undefined,
     status: "locked",
     type: (row.type as Checkpoint["type"]) || "evidence_picker",
+    questionType: resolvedQuestionType,
+    inputType: resolvedQuestionType,
     photoCodes: answers.photoCodes,
     textMatchConfig,
     pickerConfig,

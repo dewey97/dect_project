@@ -14,6 +14,7 @@ import type { Device, Conversation, Photo, Email, Document, BrowserHistory, Reco
 
 // Context & Engine
 import { PhoneProvider, usePhone, type ActivePhoneApp } from "./core/phone-context";
+import { EvidenceAnchorProvider } from "./core/evidence-anchor-context";
 
 // Chassis
 import { IPhoneClassicChassis } from "./chassis/iphone-classic-chassis";
@@ -302,7 +303,9 @@ export function PhoneSimulator({
       onClose={onClose}
       onPinClue={onPinClue}
     >
-      <PhoneSimulatorShell frameless={frameless} onClose={onClose} />
+      <EvidenceAnchorProvider>
+        <PhoneSimulatorShell frameless={frameless} onClose={onClose} />
+      </EvidenceAnchorProvider>
     </PhoneProvider>
   );
 }

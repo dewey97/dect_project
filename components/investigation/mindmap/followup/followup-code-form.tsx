@@ -4,27 +4,43 @@ import { detectiveAudio } from '@/lib/investigation-audio'
 import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
 import type { Checkpoint } from '@/lib/types/case'
 
-interface FollowupHaFormProps {
+interface FollowupCodeFormProps {
   caseId: string
-  haCheckpoint?: Checkpoint | null
-  haPasswordInput: string
-  onHaPasswordInputChange: (val: string) => void
+  checkpoint?: Checkpoint | null
+  dossierLabel?: string
+  questionText?: string
+  inputLabel?: string
+  placeholder?: string
+  codeInput: string
+  onCodeInputChange: (val: string) => void
   errorMsg: string
   onClearError: () => void
   onSubmit: (e: React.FormEvent) => void
   onClose: () => void
 }
 
-export function FollowupHaForm({
+export function FollowupCodeForm({
   caseId,
-  haCheckpoint,
-  haPasswordInput,
-  onHaPasswordInputChange,
+  checkpoint,
+  dossierLabel,
+  questionText,
+  inputLabel,
+  placeholder,
+  codeInput,
+  onCodeInputChange,
   errorMsg,
   onClearError,
   onSubmit,
   onClose,
-}: FollowupHaFormProps) {
+}: FollowupCodeFormProps) {
+  const displayDossier = dossierLabel || checkpoint?.dossier || '📂 MỞ TÚI HỒ SƠ D'
+  const displayQuestion =
+    questionText ||
+    checkpoint?.question ||
+    'Xác định mã khóa số / mật khẩu mở khóa vật chứng đáng ngờ.'
+  const displayLabel = inputLabel || 'MẬT KHẨU / MÃ KHÓA SỐ:'
+  const targetCheckpointId = checkpoint?.id || 'cp-000-1c-followup'
+
   return (
     <form onSubmit={onSubmit} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] paper-scrollbar">
       {errorMsg && (
@@ -33,43 +49,43 @@ export function FollowupHaForm({
         </div>
       )}
 
-      {/* TÚI HỒ SƠ D */}
+      {/* TÚI HỒ SƠ */}
       <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between">
         <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-          📂 MỞ TÚI HỒ SƠ D
+          {displayDossier.startsWith('📂') ? displayDossier : `📂 ${displayDossier}`}
         </span>
       </div>
 
-      {/* QUESTION BOX (LIVE CMS) */}
+      {/* QUESTION BOX */}
       <div className="p-3.5 bg-[#f4ebd9] border-2 border-[#a88c6f] rounded-none">
         <span className="font-mono text-[11px] font-bold text-[#6b4e2e] uppercase block mb-1">
           YÊU CẦU ĐIỀU TRA:
         </span>
-        <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed">
-          {haCheckpoint?.question || 'Xác định khoá mật khẩu hộp thiếc đáng ngờ thu giữ trong phòng trọ của Trần Thị Hà.'}
+        <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed whitespace-pre-line">
+          {displayQuestion}
         </p>
       </div>
 
-      {/* PASSWORD INPUT BOX */}
+      {/* CODE / PASSWORD INPUT BOX */}
       <div className="space-y-2 pt-1">
         <label className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
-          MẬT KHẨU MỞ KHÓA HỘP THIẾC:
+          {displayLabel}
         </label>
         <input
           type="text"
-          value={haPasswordInput}
+          value={codeInput}
           onChange={(e) => {
-            onHaPasswordInputChange(e.target.value)
+            onCodeInputChange(e.target.value)
             onClearError()
           }}
-          placeholder="Nhập mật khẩu..."
+          placeholder={placeholder || 'Nhập mã khóa số / mật khẩu...'}
           className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-base font-bold placeholder-[#a88c6f]/60 tracking-wider focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
         />
       </div>
 
       {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM NHẬP */}
       <CheckpointHintSection
-        checkpointId="cp-000-1c-followup"
+        checkpointId={targetCheckpointId}
         caseId={caseId}
       />
 

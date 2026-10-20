@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { EvidenceSideAnchors } from "../core/evidence-side-anchors";
 
 export interface ChassisProps {
   children: React.ReactNode;
@@ -125,6 +126,7 @@ export function IPhoneClassicChassis({
 
           {/* SCREEN CONTAINER: 375x600 Display */}
           <div
+            data-phone-screen="true"
             className={cn(
               "relative w-[375px] max-w-full h-[600px] shrink-0 bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col no-scrollbar",
               !frameless && "rounded-lg border border-black/50 shadow-inner"
@@ -132,6 +134,9 @@ export function IPhoneClassicChassis({
           >
             {children}
           </div>
+
+          {/* Dải thẻ mã chứng cứ nổi bên ngoài viền phải điện thoại */}
+          <EvidenceSideAnchors />
 
           {!frameless && (
             /* Bottom Bezel: Physical Home Button (Touch ID) */

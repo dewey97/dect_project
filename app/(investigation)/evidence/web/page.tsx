@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -18,7 +18,9 @@ import {
   Search,
   PenLine,
   Target,
+  ExternalLink,
 } from "lucide-react";
+import Link from "next/link";
 import { PDFViewerModal } from "@/components/investigation/pdf-viewer-modal";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
@@ -42,6 +44,7 @@ import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
+import { PhoneSimulator } from "@/components/investigation/phone-simulator";
 import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
@@ -659,8 +662,46 @@ function WebEvidencePageContent() {
             isDossierCollapsed && "lg:hidden",
           )}
         >
-          {/* EVIDENCE DETAIL INSPECTOR */}
-          <EvidenceDetailInspector selectedView={selectedView} caseId={caseId} />
+          {activeModal === "phone" ? (
+            /* ĐIỆN THOẠI NHÚNG INLINE — DESKTOP ONLY */
+            <div className="flex-1 h-full flex flex-col min-h-0 overflow-hidden bg-[#0A0A0C]">
+              {/* Toolbar nhỏ phía trên */}
+              <div className="shrink-0 h-10 px-3 flex items-center justify-between bg-[#0A0A0C] border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-[#FF453A] animate-pulse" />
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 font-bold">
+                    Điện thoại nạn nhân
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Link
+                    href="/evidence/victim-phone"
+                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#1C1C1E] text-zinc-400 hover:text-white border border-white/10 text-[11px] font-sans transition-all"
+                  >
+                    <ExternalLink className="size-3" />
+                    <span>Mở riêng</span>
+                  </Link>
+                  <button
+                    onClick={() => setActiveModal(null)}
+                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#1C1C1E] text-zinc-400 hover:text-white border border-white/10 text-[11px] font-sans transition-all cursor-pointer"
+                  >
+                    <X className="size-3" />
+                    <span>Đóng</span>
+                  </button>
+                </div>
+              </div>
+              {/* Phone Simulator */}
+              <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
+                <PhoneSimulator
+                  onClose={() => setActiveModal(null)}
+                  device={caseId ? { caseId } : undefined}
+                />
+              </div>
+            </div>
+          ) : (
+            /* EVIDENCE DETAIL INSPECTOR */
+            <EvidenceDetailInspector selectedView={selectedView} caseId={caseId} />
+          )}
         </div>
       </div>
 
@@ -715,12 +756,14 @@ function WebEvidencePageContent() {
         }}
       />
 
-      {/* VICTIM PHONE SIMULATOR MODAL */}
-      <PhoneModal
-        caseId={caseId}
-        isOpen={activeModal === "phone"}
-        onClose={() => setActiveModal(null)}
-      />
+      {/* VICTIM PHONE SIMULATOR MODAL — MOBILE ONLY (desktop dùng inline Zone 3) */}
+      <div className="lg:hidden">
+        <PhoneModal
+          caseId={caseId}
+          isOpen={activeModal === "phone"}
+          onClose={() => setActiveModal(null)}
+        />
+      </div>
 
       {/* RE-INVESTIGATION CRIME SCENE MODAL */}
       <ReinvestigationModal

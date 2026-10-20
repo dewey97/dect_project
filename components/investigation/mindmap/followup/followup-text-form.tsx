@@ -5,33 +5,50 @@ import { cn } from '@/lib/utils'
 import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
 import type { Checkpoint } from '@/lib/types/case'
 
-interface FollowupCustomFormProps {
+interface FollowupTextFormProps {
   caseId: string
-  culprit: string | null
-  customCheckpoint?: Checkpoint | null
-  customSelectedOption: string | null
-  onSelectCustomOption: (opt: string) => void
-  customTextInput: string
-  onCustomTextInputChange: (val: string) => void
+  checkpoint?: Checkpoint | null
+  dossierLabel?: string
+  questionText?: string
+  inputLabel?: string
+  placeholder?: string
+  textInput: string
+  onTextInputChange: (val: string) => void
+  options?: string[]
+  selectedOption?: string | null
+  onSelectOption?: (val: string) => void
   errorMsg: string
   onClearError: () => void
   onSubmit: (e: React.FormEvent) => void
   onClose: () => void
 }
 
-export function FollowupCustomForm({
+export function FollowupTextForm({
   caseId,
-  culprit,
-  customCheckpoint,
-  customSelectedOption,
-  onSelectCustomOption,
-  customTextInput,
-  onCustomTextInputChange,
+  checkpoint,
+  dossierLabel,
+  questionText,
+  inputLabel,
+  placeholder,
+  textInput,
+  onTextInputChange,
+  options,
+  selectedOption,
+  onSelectOption,
   errorMsg,
   onClearError,
   onSubmit,
   onClose,
-}: FollowupCustomFormProps) {
+}: FollowupTextFormProps) {
+  const displayDossier = dossierLabel || checkpoint?.dossier || '📂 TÀI LIỆU ĐIỀU TRA MỞ RỘNG'
+  const displayQuestion =
+    questionText ||
+    checkpoint?.question ||
+    'Hồ sơ tình nghi của đối tượng đã được tiếp nhận. Hãy hoàn tất điều tra đối tượng này.'
+  const displayLabel = inputLabel || 'Nhập câu trả lời / mã số suy luận:'
+  const effectiveOptions = options || checkpoint?.options || []
+  const hasOptions = effectiveOptions.length > 0
+
   return (
     <form onSubmit={onSubmit} className="p-4 sm:p-6 flex-1 overflow-y-auto space-y-4 bg-[#f6f1e5] paper-scrollbar">
       {errorMsg && (
@@ -43,7 +60,7 @@ export function FollowupCustomForm({
       {/* TÚI HỒ SƠ */}
       <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm flex items-center justify-between">
         <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-          📂 {customCheckpoint?.dossier || 'TÀI LIỆU ĐIỀU TRA MỞ RỘNG'}
+          {displayDossier.startsWith('📂') ? displayDossier : `📂 ${displayDossier}`}
         </span>
       </div>
 
@@ -53,27 +70,26 @@ export function FollowupCustomForm({
           YÊU CẦU ĐIỀU TRA:
         </span>
         <p className="text-xs sm:text-sm font-bold text-[#1a120b] leading-relaxed whitespace-pre-line">
-          {customCheckpoint?.question ||
-            'Hồ sơ tình nghi của đối tượng đã được tiếp nhận. Hãy hoàn tất điều tra đối tượng này.'}
+          {displayQuestion}
         </p>
       </div>
 
       {/* OPTIONS HOẶC TEXT INPUT */}
-      {customCheckpoint?.options && customCheckpoint.options.length > 0 ? (
+      {hasOptions ? (
         <div className="space-y-3">
           <span className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
             LỰA CHỌN KẾT LUẬN CỦA ĐIỀU TRA VIÊN:
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {customCheckpoint.options.map((opt: string, idx: number) => {
-              const isSelected = customSelectedOption === opt
+            {effectiveOptions.map((opt: string, idx: number) => {
+              const isSelected = selectedOption === opt
               return (
                 <button
-                  key={`custom-opt-${idx}`}
+                  key={`text-form-opt-${idx}`}
                   type="button"
                   onClick={() => {
                     detectiveAudio.playTypewriterClick()
-                    onSelectCustomOption(opt)
+                    if (onSelectOption) onSelectOption(opt)
                     onClearError()
                   }}
                   className={cn(
@@ -97,16 +113,16 @@ export function FollowupCustomForm({
       ) : (
         <div className="space-y-2 pt-1">
           <label className="font-mono text-xs font-bold text-[#4a3520] uppercase tracking-wider block">
-            Nhập câu trả lời / mã số suy luận:
+            {displayLabel}
           </label>
           <input
             type="text"
-            value={customTextInput}
+            value={textInput}
             onChange={(e) => {
-              onCustomTextInputChange(e.target.value)
+              onTextInputChange(e.target.value)
               onClearError()
             }}
-            placeholder="Nhập đáp án hoặc kết luận..."
+            placeholder={placeholder || 'Nhập đáp án hoặc kết luận...'}
             className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
           />
         </div>
@@ -114,7 +130,7 @@ export function FollowupCustomForm({
 
       {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM */}
       <CheckpointHintSection
-        checkpointId={customCheckpoint?.id || (culprit ? `cp-${culprit}-followup` : '')}
+        checkpointId={checkpoint?.id || ''}
         caseId={caseId}
       />
 
