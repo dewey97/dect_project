@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { DbCase, DbCaseCheckpoint } from "@/lib/types/database";
+import type { DbCase, DbCaseCheckpoint, DbCaseDossier } from "@/lib/types/database";
 import {
   createEmptyDraft,
   toDraft,
@@ -18,6 +18,11 @@ import {
   updateCheckpointPositions,
 } from "@/lib/actions/checkpoint-actions";
 import {
+  getCaseDossiers,
+  getAllCaseDocumentsCatalog,
+  type AvailableDocumentItem,
+} from "@/lib/actions/dossier-config-actions";
+import {
   buildDependencyEdges,
   suggestDependencyEdges,
   wouldCreateCycle,
@@ -27,6 +32,7 @@ import { toast } from "@/components/ui/toast";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
 import { CheckpointEditor } from "./checkpoint-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
+import { DossierConfigModal } from "./dossier-config-modal";
 
 /** Mỗi lần click danh sách tăng nonce để Flow căn lại node, kể cả node đang chọn. */
 interface NodeFocusRequest {
@@ -65,15 +71,26 @@ interface CheckpointStudioClientProps {
   initialCaseId?: string;
   initialCases?: DbCase[];
   initialRows?: DbCaseCheckpoint[];
+  initialDossiers?: DbCaseDossier[];
+  initialAvailableDocuments?: AvailableDocumentItem[];
 }
 
 export function CheckpointStudioClient({
   initialCaseId = "case_000",
   initialCases = [],
   initialRows = [],
+  initialDossiers = [],
+  initialAvailableDocuments = [],
 }: CheckpointStudioClientProps) {
   const [caseId, setCaseId] = useState(initialCaseId);
   const [rows, setRows] = useState<DbCaseCheckpoint[]>(initialRows);
+  const [dossiers, setDossiers] = useState<DbCaseDossier[]>(initialDossiers);
+  const [availableDocs, setAvailableDocs] = useState<AvailableDocumentItem[]>(
+    initialAvailableDocuments,
+  );
+  const [activeDossierForEdit, setActiveDossierForEdit] =
+    useState<DbCaseDossier | null>(null);
+  const [isDossierModalOpen, setIsDossierModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(
     initialRows[0]?.id ?? null,
   );
@@ -155,16 +172,22 @@ export function CheckpointStudioClient({
   const loadCase = useCallback(async (nextCaseId: string) => {
     setIsLoading(true);
     try {
-      const result = await getCheckpointsByCase(nextCaseId);
-      if (!result.success) {
-        toast.error(result.error);
+      const [cpRes, dossierList, docsList] = await Promise.all([
+        getCheckpointsByCase(nextCaseId),
+        getCaseDossiers(nextCaseId),
+        getAllCaseDocumentsCatalog(nextCaseId),
+      ]);
+      if (!cpRes.success) {
+        toast.error(cpRes.error);
         return;
       }
-      setRows(result.data);
-      setPendingEdges(buildDependencyEdges(result.data));
+      setRows(cpRes.data);
+      setDossiers(dossierList);
+      setAvailableDocs(docsList);
+      setPendingEdges(buildDependencyEdges(cpRes.data));
       setPendingPositions({});
       setFocusRequest(null);
-      const first = result.data[0] ?? null;
+      const first = cpRes.data[0] ?? null;
       setSelectedId(first?.id ?? null);
       const nextDraft = first ? toDraft(first) : null;
       setDraft(nextDraft);
@@ -246,6 +269,75 @@ export function CheckpointStudioClient({
         (edge) => !(edge.source === source && edge.target === target),
       ),
     );
+  }, []);
+
+  const handleDossierClick = useCallback(
+    (dossierOrName: DbCaseDossier | string) => {
+      if (typeof dossierOrName === "object" && dossierOrName !== null) {
+        setActiveDossierForEdit(dossierOrName);
+        setIsDossierModalOpen(true);
+        return;
+      }
+
+      const label = String(dossierOrName).trim();
+      const found = dossiers.find(
+        (d) =>
+          d.title.toLowerCase() === label.toLowerCase() ||
+          d.dossier_key.toLowerCase() === label.toLowerCase(),
+      );
+
+      if (found) {
+        setActiveDossierForEdit(found);
+      } else {
+        const generatedKey = label
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_+|_+$/g, "");
+
+        setActiveDossierForEdit({
+          id: "",
+          case_id: caseId,
+          dossier_key: generatedKey || "bo_moi",
+          title: label,
+          document_codes: [] as string[],
+          description: "",
+          flow_position: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      }
+      setIsDossierModalOpen(true);
+    },
+    [dossiers, caseId],
+  );
+
+  const handleCreateDossier = useCallback(() => {
+    setActiveDossierForEdit({
+      id: "",
+      case_id: caseId,
+      dossier_key: "",
+      title: "",
+      document_codes: [] as string[],
+      description: "",
+      flow_position: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+    setIsDossierModalOpen(true);
+  }, [caseId]);
+
+  const handleDossierSaved = useCallback((saved: DbCaseDossier) => {
+    setDossiers((prev) => {
+      const exists = prev.some((d) => d.dossier_key === saved.dossier_key);
+      if (exists) {
+        return prev.map((d) =>
+          d.dossier_key === saved.dossier_key ? saved : d,
+        );
+      }
+      return [...prev, saved];
+    });
   }, []);
 
   const applySuggestions = useCallback(() => {
@@ -479,6 +571,7 @@ export function CheckpointStudioClient({
         <CheckpointFlowView
           caseId={caseId}
           rows={rows}
+          dossiers={dossiers}
           selectedId={selectedId}
           pendingEdges={pendingEdges}
           suggestions={suggestions}
@@ -492,6 +585,8 @@ export function CheckpointStudioClient({
           onApplySuggestions={applySuggestions}
           onNodePositionChange={updateNodePosition}
           onSaveFlow={handleSaveFlow}
+          onDossierClick={handleDossierClick}
+          onCreateDossier={handleCreateDossier}
         />
       </div>
 
@@ -518,6 +613,18 @@ export function CheckpointStudioClient({
           )}
         </CheckpointListSidebar>
       </div>
+
+      <DossierConfigModal
+        isOpen={isDossierModalOpen}
+        onClose={() => {
+          setIsDossierModalOpen(false);
+          setActiveDossierForEdit(null);
+        }}
+        caseId={caseId}
+        dossier={activeDossierForEdit}
+        availableDocuments={availableDocs}
+        onSaved={handleDossierSaved}
+      />
     </div>
   );
 }

@@ -65,10 +65,6 @@ export function EvidencePickerConfigForm({
     (config.contradictionEvidenceIds?.length || 0) +
     (config.optionalContradictionIds?.length || 0);
 
-  const alibiCount =
-    (config.alibiEvidenceIds?.length || 0) +
-    (config.optionalAlibiIds?.length || 0);
-
   const extraCount =
     (config.validSuspects?.length || 0) +
     (config.validMotives?.length || 0) +
@@ -77,7 +73,8 @@ export function EvidencePickerConfigForm({
 
   return (
     <div className="space-y-2">
-      <TierCard title="Động cơ" count={motiveCount}>
+      {/* Tile 1: Động cơ phạm tội */}
+      <TierCard title="1. Động cơ" count={motiveCount}>
         <Field label="Bắt buộc" required>
           <CodeChipInput
             value={config.motiveEvidenceIds}
@@ -96,7 +93,8 @@ export function EvidencePickerConfigForm({
         </Field>
       </TierCard>
 
-      <TierCard title="Mâu thuẫn" count={contradictionCount}>
+      {/* Tile 2: Mâu thuẫn lời khai */}
+      <TierCard title="2. Mâu thuẫn" count={contradictionCount}>
         <Field label="Bắt buộc" required>
           <CodeChipInput
             value={config.contradictionEvidenceIds}
@@ -115,25 +113,7 @@ export function EvidencePickerConfigForm({
         </Field>
       </TierCard>
 
-      <TierCard title="Ngoại phạm" collapsed count={alibiCount}>
-        <Field label="Bắt buộc">
-          <CodeChipInput
-            value={config.alibiEvidenceIds}
-            onChange={(value) => setList("alibiEvidenceIds", value)}
-            placeholder="Không dùng…"
-            className="min-h-8"
-          />
-        </Field>
-        <Field label="Tùy chọn">
-          <CodeChipInput
-            value={config.optionalAlibiIds}
-            onChange={(value) => setList("optionalAlibiIds", value)}
-            placeholder="Không dùng…"
-            className="min-h-8"
-          />
-        </Field>
-      </TierCard>
-
+      {/* Cấu hình bổ sung (nếu có) */}
       <TierCard title="Bổ sung" collapsed count={extraCount}>
         <Field label="Nghi phạm hợp lệ">
           <CodeChipInput

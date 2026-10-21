@@ -128,3 +128,16 @@ export interface DbDossierDocument {
   created_at: string;
   updated_at: string;
 }
+
+/** Bảng case_dossiers: Quản lý danh mục các bộ hồ sơ và danh sách mã tài liệu/vật chứng thuộc mỗi bộ */
+export interface DbCaseDossier {
+  id: string;
+  case_id: string;
+  dossier_key: string;
+  title: string;
+  document_codes: string[];
+  flow_position: { x: number; y: number } | null;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}

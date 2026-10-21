@@ -55,7 +55,7 @@ app/api/checkpoints/route.ts
 
 ## 3. Database
 
-Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.sql)
+Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.sql) và [`db/schema/20_case_dossiers.sql`](../db/schema/20_case_dossiers.sql)
 
 | Cột                                                | Kiểu       | Ghi chú                                                         |
 | :------------------------------------------------- | :--------- | :-------------------------------------------------------------- |
@@ -65,18 +65,26 @@ Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.s
 | `node_id`                                          | TEXT       | Định danh người biên tập quản lý, mặc định dùng `checkpoint_id` |
 | `dossier`                                          | TEXT       | Ban Đầu / Bộ A / Bộ B / Bộ C                                    |
 | `title`, `question`                                | TEXT       | Nội dung hiển thị                                               |
-| `type`                                             | TEXT       | Loại gốc khi import; V1 chỉ biên tập `evidence_picker`          |
+| `type`                                             | TEXT       | Loại gốc khi import; hỗ trợ `evidence_picker`, `epilogue`, ...  |
 | `question_type`                                    | TEXT       | Mặc định `evidence_picker`                                      |
 | `unlocked_evidence_id`, `followup_of`              | TEXT       | Liên kết tiến trình; `followup_of` là khóa tham chiếu tự do     |
 | `suspect_label`, `evidence_step_label`             | TEXT       | Nhãn bước thẩm tra                                              |
 | `depends_on`                                       | TEXT[]     | Danh sách `checkpoint_id` phải hoàn thành trước                 |
 | `flow_position`                                    | JSONB      | Vị trí node Flow view `{ x, y }`; NULL dùng auto-layout          |
-| `answer_config`                                    | JSONB      | Mã chứng cứ theo 3 lớp                                          |
+| `answer_config`                                    | JSONB      | Mã chứng cứ (2 lớp), epilogue stories hoặc đáp án tự luận/mã    |
 | `hints`                                            | JSONB      | Mảng `{ group, text }`, giữ thứ tự cấp                          |
 | `narrative`                                        | TEXT       | Độc thoại dẫn truyện                                            |
 | `ai_context`, `ai_valid_cases`, `ai_invalid_cases` | TEXT/JSONB | Cấu hình chấm AI                                                |
 
-### 3.1. Shape `answer_config`
+### 3.1. Bảng `case_dossiers` (Quản lý Hồ sơ Vụ án)
+
+Migration: [`db/schema/20_case_dossiers.sql`](../db/schema/20_case_dossiers.sql)
+
+- Quản lý các tập hồ sơ (Bộ Ban Đầu, Bộ A, Bộ B, Bộ C, ...) và danh sách tài liệu/vật chứng thuộc mỗi bộ (`document_codes: TEXT[]`).
+- Lưu vị trí node dossier trên Canvas (`flow_position: JSONB`).
+- Hiển thị trực quan dạng **Dossier Node** trên React Flow, tự động nối cạnh từ checkpoint mở khóa (`unlocksDossier`) đến Dossier Node tương ứng.
+
+### 3.2. Shape `answer_config`
 
 ```json
 {
@@ -86,16 +94,16 @@ Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.s
   "optionalEvidenceIds": [],
   "motiveEvidenceIds": [],
   "optionalMotiveIds": [],
-  "alibiEvidenceIds": [],
-  "optionalAlibiIds": [],
   "contradictionEvidenceIds": [],
-  "optionalContradictionIds": []
+  "optionalContradictionIds": [],
+  "unlocksDossier": "bo_a",
+  "epilogueStories": [
+    { "id": "epilogue-1", "title": "Phần 1: Sự Thật", "monologue": "..." }
+  ]
 }
 ```
 
-Dữ liệu import từ Sheet có thể kèm các khóa phục vụ loại checkpoint khác:
-`options`, `correctAnswer`, `textMatchInputs`, `photoCodes`, `availableEvidences`, `rawAnswers`.
-Studio V1 giữ nguyên các khóa này; form chỉ đọc/ghi 10 mảng `evidence_picker`.
+Studio áp dụng mô hình thẩm tra 2 lớp cốt lõi: **Động cơ** và **Mâu thuẫn lời khai** (đã loại bỏ tầng alibi theo quy chuẩn thiết kế tinh gọn). Với checkpoint loại `epilogue`, `answer_config` chứa mảng `epilogueStories` phục vụ màn hình hậu án đa chương.
 
 ### 3.2. Shape `hints`
 

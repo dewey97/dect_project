@@ -33,7 +33,13 @@ export interface CheckpointPositionUpdate {
   position: CheckpointFlowPosition;
 }
 
-/** Cấu hình đáp án cho checkpoint thẩm tra nghi phạm (3 lớp). */
+export interface EpilogueStoryItem {
+  id: string;
+  title: string;
+  monologue: string;
+}
+
+/** Cấu hình đáp án cho checkpoint thẩm tra nghi phạm (2 lớp: Động cơ & Mâu thuẫn) hoặc Hậu án. */
 export interface EvidencePickerConfig {
   validSuspects: string[];
   validMotives: string[];
@@ -48,6 +54,7 @@ export interface EvidencePickerConfig {
   correctAnswer?: string;
   options?: string[];
   unlocksDossier?: string;
+  epilogueStories?: EpilogueStoryItem[];
 }
 
 export interface CheckpointStudioDraft {
@@ -186,6 +193,13 @@ function parseConfig(
     options: asStringArray(source.options),
     unlocksDossier:
       asString(source.unlocksDossier) || asString(source.unlocks_dossier),
+    epilogueStories: Array.isArray(source.epilogueStories)
+      ? (source.epilogueStories as any[]).map((s) => ({
+          id: asString(s?.id),
+          title: asString(s?.title),
+          monologue: asString(s?.monologue || s?.text),
+        }))
+      : undefined,
   };
 }
 
@@ -303,6 +317,9 @@ export function toRowPayload(
         : {}),
       ...(draft.unlocksDossier?.trim()
         ? { unlocksDossier: draft.unlocksDossier.trim() }
+        : {}),
+      ...(Array.isArray(draft.answerConfig.epilogueStories)
+        ? { epilogueStories: draft.answerConfig.epilogueStories }
         : {}),
     },
     hints: draft.hints

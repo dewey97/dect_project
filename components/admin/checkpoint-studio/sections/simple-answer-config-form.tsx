@@ -55,7 +55,7 @@ export function SimpleAnswerConfigForm({
         </Field>
       )}
 
-      <Field label="Đáp án chính xác" required>
+      <Field label="Giá trị đáp án đúng" required>
         <Input
           value={config.correctAnswer || ""}
           onChange={(event) =>
@@ -66,7 +66,7 @@ export function SimpleAnswerConfigForm({
               ? "vd: 21:15, 03:30…"
               : type === "code"
                 ? "vd: 120713, PASSCODE…"
-                : "Nhập đáp án đúng…"
+                : "Nhập nội dung đáp án đúng…"
           }
           className={INPUT_CLASS}
         />

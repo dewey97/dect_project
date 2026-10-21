@@ -9,6 +9,7 @@ import { SimpleAnswerConfigForm } from "./sections/simple-answer-config-form";
 import { CheckpointHintsForm } from "./sections/checkpoint-hints-form";
 import { CheckpointNarrativeForm } from "./sections/checkpoint-narrative-form";
 import { CheckpointAiCheckForm } from "./sections/checkpoint-ai-check-form";
+import { CheckpointEpilogueForm } from "./sections/checkpoint-epilogue-form";
 import { cn } from "@/lib/utils";
 
 interface CheckpointEditorProps {
@@ -48,6 +49,7 @@ export function CheckpointEditor({
   if (!draft) return null;
 
   const isEvidencePicker = (draft.type || "evidence_picker") === "evidence_picker";
+  const isEpilogue = draft.type === "epilogue" || draft.checkpointId.includes("epilogue");
   const canSave = isDirty && !isSaving && draft.title.trim().length > 0;
 
   return (
@@ -101,25 +103,38 @@ export function CheckpointEditor({
             <CheckpointIdentityForm draft={draft} onChange={onChange} />
           </Section>
 
-          <Section title="Đáp án">
-            {isEvidencePicker ? (
-              <EvidencePickerConfigForm draft={draft} onChange={onChange} />
-            ) : (
-              <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
-            )}
-          </Section>
+          {isEpilogue ? (
+            <Section title="Nội dung Hậu Án (Ký sự sau phá án)">
+              <CheckpointEpilogueForm draft={draft} onChange={onChange} />
+            </Section>
+          ) : (
+            <>
+              {isEvidencePicker ? (
+                <Section title="Vật chứng thẩm tra">
+                  <EvidencePickerConfigForm draft={draft} onChange={onChange} />
+                </Section>
+              ) : (
+                <Section title="Đáp án">
+                  <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
+                </Section>
+              )}
 
-          <Section title="Gợi ý">
-            <CheckpointHintsForm draft={draft} onChange={onChange} />
-          </Section>
+              <Section title="Gợi ý">
+                <CheckpointHintsForm draft={draft} onChange={onChange} />
+              </Section>
 
-          <Section title="Narrative">
-            <CheckpointNarrativeForm draft={draft} onChange={onChange} />
-          </Section>
+              <Section title="Narrative">
+                <CheckpointNarrativeForm draft={draft} onChange={onChange} />
+              </Section>
 
-          <Section title="AI check">
-            <CheckpointAiCheckForm draft={draft} onChange={onChange} />
-          </Section>
+              {/* AI check chỉ dành cho câu hỏi nhập văn bản / tự luận */}
+              {draft.type === "text" && (
+                <Section title="AI check (Đánh giá câu trả lời)">
+                  <CheckpointAiCheckForm draft={draft} onChange={onChange} />
+                </Section>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
