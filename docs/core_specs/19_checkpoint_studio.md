@@ -2,7 +2,7 @@
 
 > **Phạm vi:** Module quản trị `/studio/checkpoints` cho phép biên tập checkpoint, đáp án, gợi ý đa cấp, narrative và cấu hình AI check bằng form có cấu trúc, lưu vào Supabase.
 >
-> **Trạng thái:** V1 — dữ liệu Studio **chưa nối vào runtime**. Gameplay vẫn đọc tab `checkpoints` từ Google Sheets Live CMS.
+> **Trạng thái:** Runtime đọc checkpoint trực tiếp từ Supabase (`case_checkpoints`) qua `/api/checkpoints`. Google Sheets chỉ còn quản lý `evidences`.
 
 ---
 
@@ -28,21 +28,28 @@ Checkpoint Studio thay thế thao tác biên tập bằng form:
 
 ---
 
-## 2. Ranh giới Runtime (Quan trọng)
+## 2. Nguồn dữ liệu Runtime (Quan trọng)
 
-| Thành phần        | Nguồn dữ liệu                                                                                |
-| :---------------- | :------------------------------------------------------------------------------------------- |
-| Gameplay hiện tại | Google Sheets — `app/api/phone/route.ts` → `useCaseCheckpoints` → `transformSheetCheckpoint` |
-| Checkpoint Studio | Supabase — bảng `public.case_checkpoints`                                                    |
+| Thành phần        | Nguồn dữ liệu                                                                                             |
+| :---------------- | :-------------------------------------------------------------------------------------------------------- |
+| Gameplay          | Supabase `public.case_checkpoints` → `/api/checkpoints` → `useStudioCheckpoints` → `toRuntimeCheckpoints` |
+| Checkpoint Studio | Supabase — cùng bảng, đọc/ghi qua server actions admin                                                    |
+| Vật chứng         | Google Sheets tab `evidences`                                                                             |
 
-V1 **không** sửa các file runtime sau:
+Luồng runtime:
 
-- `app/api/phone/route.ts`
-- `lib/hooks/use-case-checkpoints.ts`
-- `lib/cms/checkpoint-cms.ts`
-- Các component gameplay trong `components/investigation/*`
+```
+app/api/checkpoints/route.ts
+  → lib/hooks/use-studio-checkpoints.ts   (memory cache 30s + dedupe request)
+  → lib/cms/checkpoint-runtime.ts         (map row DB → Checkpoint runtime)
+  → lib/hooks/use-case-checkpoints.ts     (ghép checkpoint với evidences)
+  → components/investigation/*
+```
 
-Do đó, chỉnh sửa trong Studio **chưa thay đổi game đang chạy**. UI hiển thị badge `SUPABASE ONLY` để tránh nhầm lẫn.
+- API route dùng `force-dynamic`, `cache: no-store`, trả `{ success, caseId, totalCount, data }`.
+- `caseId` chuẩn hóa `case-000` → `case_000`.
+- Không còn đọc tab `checkpoints` từ Google Sheets ở runtime.
+- RLS cho phép `anon` đọc `case_checkpoints`; ghi vẫn chỉ admin.
 
 ---
 
@@ -50,22 +57,24 @@ Do đó, chỉnh sửa trong Studio **chưa thay đổi game đang chạy**. UI 
 
 Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.sql)
 
-| Cột                                                | Kiểu       | Ghi chú                                                   |
-| :------------------------------------------------- | :--------- | :-------------------------------------------------------- |
-| `id`                                               | UUID       | Khóa chính                                                |
-| `case_id`                                          | TEXT       | Khóa Sheet (`case_000`), không phải UUID của bảng `cases` |
-| `checkpoint_id`                                    | TEXT       | Duy nhất theo `(case_id, checkpoint_id)`                  |
-| `node_id`                                          | TEXT       | Tùy chọn, mặc định dùng `checkpoint_id`                   |
-| `dossier`                                          | TEXT       | Ban Đầu / Bộ A / Bộ B / Bộ C                              |
-| `title`, `question`                                | TEXT       | Nội dung hiển thị                                         |
-| `type`                                             | TEXT       | Loại gốc từ Sheet; V1 chỉ biên tập `evidence_picker`      |
-| `question_type`                                    | TEXT       | Mặc định `evidence_picker`                                |
-| `unlocked_evidence_id`, `followup_of`              | TEXT       | Liên kết tiến trình                                       |
-| `suspect_label`, `evidence_step_label`             | TEXT       | Nhãn bước thẩm tra                                        |
-| `answer_config`                                    | JSONB      | Mã chứng cứ theo 3 lớp                                    |
-| `hints`                                            | JSONB      | Mảng `{ group, text }`, giữ thứ tự cấp                    |
-| `narrative`                                        | TEXT       | Độc thoại dẫn truyện                                      |
-| `ai_context`, `ai_valid_cases`, `ai_invalid_cases` | TEXT/JSONB | Cấu hình chấm AI                                          |
+| Cột                                                | Kiểu       | Ghi chú                                                         |
+| :------------------------------------------------- | :--------- | :-------------------------------------------------------------- |
+| `id`                                               | UUID       | Khóa chính                                                      |
+| `case_id`                                          | TEXT       | Mã vụ án (`case_000`), không phải UUID của bảng `cases`         |
+| `checkpoint_id`                                    | TEXT       | Khóa kỹ thuật, duy nhất theo `(case_id, checkpoint_id)`         |
+| `node_id`                                          | TEXT       | Định danh người biên tập quản lý, mặc định dùng `checkpoint_id` |
+| `dossier`                                          | TEXT       | Ban Đầu / Bộ A / Bộ B / Bộ C                                    |
+| `title`, `question`                                | TEXT       | Nội dung hiển thị                                               |
+| `type`                                             | TEXT       | Loại gốc khi import; V1 chỉ biên tập `evidence_picker`          |
+| `question_type`                                    | TEXT       | Mặc định `evidence_picker`                                      |
+| `unlocked_evidence_id`, `followup_of`              | TEXT       | Liên kết tiến trình; `followup_of` là khóa tham chiếu tự do     |
+| `suspect_label`, `evidence_step_label`             | TEXT       | Nhãn bước thẩm tra                                              |
+| `depends_on`                                       | TEXT[]     | Danh sách `checkpoint_id` phải hoàn thành trước                 |
+| `flow_position`                                    | JSONB      | Vị trí node Flow view `{ x, y }`; NULL dùng auto-layout          |
+| `answer_config`                                    | JSONB      | Mã chứng cứ theo 3 lớp                                          |
+| `hints`                                            | JSONB      | Mảng `{ group, text }`, giữ thứ tự cấp                          |
+| `narrative`                                        | TEXT       | Độc thoại dẫn truyện                                            |
+| `ai_context`, `ai_valid_cases`, `ai_invalid_cases` | TEXT/JSONB | Cấu hình chấm AI                                                |
 
 ### 3.1. Shape `answer_config`
 
@@ -100,11 +109,30 @@ Studio V1 giữ nguyên các khóa này; form chỉ đọc/ghi 10 mảng `eviden
 
 `group` nhận một trong `general | motive | alibi | contradiction`.
 
-### 3.3. RLS
+### 3.3. Đồ thị phụ thuộc (`depends_on`)
 
-- Chỉ admin đọc/ghi.
-- Policy chấp nhận `service_role`, JWT `app_metadata.role` là `admin`/`super_admin`, hoặc `profiles.role = 'admin'`.
-- Runtime hiện không đọc bảng này, nên chưa cần policy public.
+Migration: [`db/schema/17_case_checkpoint_dependencies.sql`](../db/schema/17_case_checkpoint_dependencies.sql)
+
+- Cạnh có hướng: prerequisite (`source`) → checkpoint phụ thuộc (`target`).
+- `depends_on` lưu mảng `checkpoint_id`; GIN index `idx_case_checkpoints_depends_on`.
+- Quan hệ do Flow view quản lý, **không** do form ghi. `CaseCheckpointPayload` loại bỏ `depends_on` để lần lưu form không ghi đè sơ đồ.
+- Server action `updateCheckpointDependencies()` validate batch: checkpoint cùng vụ án, không self-edge, không tham chiếu thiếu, không cycle.
+- Xóa checkpoint sẽ tự dọn `checkpoint_id` khỏi `depends_on` của các row cùng vụ án.
+- `checkpoint_id` bị khóa sau khi tạo vì các cạnh đang tham chiếu mã đó.
+- UI quản lý theo `node_id`: sidebar, node flow và nhãn cạnh hiển thị `node_id`, không hiển thị `checkpoint_id`. `checkpoint_id` chỉ là khóa kỹ thuật nội bộ của graph.
+- Danh sách node nằm bên phải, không hiển thị badge hay bộ lọc bộ hồ sơ. Bộ hồ sơ chỉ thể hiện bằng lane nền trên Flow view.
+- Kéo node trên Flow view rồi bấm **Lưu sơ đồ** để ghi `flow_position`; **Tự sắp xếp** cũng ghi vị trí mới vào batch chờ lưu.
+- Migration vị trí: [`db/schema/19_case_checkpoint_flow_positions.sql`](../db/schema/19_case_checkpoint_flow_positions.sql).
+
+Gợi ý cạnh (`suggestDependencyEdges`) chỉ đọc dữ liệu CMS: `followup_of` và `requiredEvidenceIds`.
+Không hardcode tên nhân vật, tên bộ hồ sơ hay mã vụ án; checkpoint mới có thể dùng khóa tham chiếu tùy ý.
+Người dùng phải bấm nhận gợi ý thì cạnh mới được ghi.
+
+### 3.4. RLS
+
+- Ghi: chỉ admin.
+- Policy ghi chấp nhận `service_role`, JWT `app_metadata.role` là `admin`/`super_admin`, hoặc `profiles.role = 'admin'`.
+- Đọc: policy public (`anon`, `authenticated`) tại [`db/schema/18_case_checkpoints_public_read.sql`](../db/schema/18_case_checkpoints_public_read.sql) để runtime tải checkpoint.
 
 ---
 
@@ -116,6 +144,7 @@ components/admin/checkpoint-studio/
   checkpoint-studio-client.tsx                   # State, dirty tracking, CRUD
   checkpoint-list-sidebar.tsx                    # Danh sách + search + filter dossier
   checkpoint-editor.tsx                          # Header + các section
+  checkpoint-flow-view.tsx                       # React Flow: xem/sửa đồ thị phụ thuộc
   code-chip-input.tsx                            # Nhập mã chứng cứ dạng chip
   sections/
     checkpoint-identity-form.tsx
@@ -123,21 +152,30 @@ components/admin/checkpoint-studio/
     checkpoint-hints-form.tsx
     checkpoint-narrative-form.tsx
     checkpoint-ai-check-form.tsx
-lib/actions/checkpoint-actions.ts                # Server actions CRUD
+lib/actions/checkpoint-actions.ts                # Server actions CRUD + dependencies
+lib/cms/checkpoint-graph.ts                      # Graph build/suggest/validate/layout
 lib/types/checkpoint-studio.ts                   # Draft model + mapping
 lib/types/database.ts                            # DbCaseCheckpoint
+
+app/api/checkpoints/route.ts                     # Runtime API, force-dynamic, no-store
+lib/hooks/use-studio-checkpoints.ts              # Fetch + memory cache 30s + dedupe
+lib/cms/checkpoint-runtime.ts                    # Map DB row → Checkpoint runtime
+lib/hooks/use-case-checkpoints.ts                # Ghép checkpoint Studio + evidences Sheet
 ```
 
 ### 4.1. Server actions
 
-| Action                         | Mô tả                                  |
-| :----------------------------- | :------------------------------------- |
-| `getCheckpointsByCase(caseId)` | Đọc danh sách theo vụ án               |
-| `saveCheckpoint(draft)`        | Insert nếu chưa có `id`, update nếu có |
-| `deleteCheckpoint(id)`         | Xóa theo UUID                          |
+| Action                                          | Mô tả                                         |
+| :---------------------------------------------- | :-------------------------------------------- |
+| `getCheckpointsByCase(caseId)`                  | Đọc danh sách theo vụ án                      |
+| `saveCheckpoint(draft)`                         | Insert nếu chưa có `id`, update nếu có        |
+| `deleteCheckpoint(id)`                          | Xóa theo UUID + dọn cạnh tham chiếu           |
+| `updateCheckpointDependencies(caseId, updates)` | Ghi batch `depends_on` sau khi validate cycle |
+| `updateCheckpointPositions(caseId, updates)`    | Ghi batch `flow_position` cho Flow view       |
 
 Mọi action gọi `requireAdminAuth()` trước khi thao tác Supabase.
 `saveCheckpoint` từ chối mọi draft có `type !== 'evidence_picker'` để tránh ghi đè dữ liệu loại khác.
+Update cũng từ chối đổi `checkpoint_id` và `case_id` của row đã tạo.
 
 ### 4.2. Import dữ liệu Google Sheets
 
@@ -154,12 +192,23 @@ node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --cas
 - Upsert theo `(case_id, checkpoint_id)`, chạy lại nhiều lần không tạo bản ghi trùng.
 - Import **tất cả** loại checkpoint. Loại chưa có editor (`text_match_3`, `mcq`, `text`, ...) được lưu read-only:
   form hiển thị dữ liệu nhưng khóa toàn bộ field và nút Lưu.
-- Script chỉ đọc Sheet, không sửa runtime và không ghi ngược Google Sheets.
+- Script chỉ đọc Sheet và ghi SQL vào `.tmp/`; không ghi ngược Google Sheets.
+- Sau khi import, runtime đọc trực tiếp Supabase. Script không còn là nguồn runtime.
 
 ### 4.3. Quy tắc UX
 
-- Master-detail: danh sách bên trái, form bên phải; mobile xếp dọc.
-- Dirty tracking bằng so sánh JSON draft với baseline; cảnh báo khi đổi row / đổi vụ án / đóng tab.
+- Master-detail: Form/Flow bên trái, danh sách node bên phải; mobile xếp dọc.
+- Danh sách node không hiển thị bộ hồ sơ; tìm theo Node ID hoặc tiêu đề.
+- Flow view dùng `@xyflow/react`: node = checkpoint, cạnh = `depends_on`.
+  - Mỗi bộ hồ sơ là một lane nền có nhãn, gom các node cùng `dossier`.
+  - Auto-layout xếp lane theo thứ tự bộ, node trong lane theo tầng phụ thuộc.
+  - Kéo node để sắp xếp; vị trí chỉ ghi khi bấm **Lưu sơ đồ**.
+  - Kéo từ cổng phải sang node khác để tạo cạnh; click cạnh để chọn rồi xóa.
+  - Cạnh nét đứt màu cyan là gợi ý từ CMS, chưa lưu; nhận từng cạnh hoặc nhận tất cả.
+  - Toolbar có Fit và Tự sắp xếp theo tầng; node có badge cảnh báo dữ liệu thiếu.
+  - Node hiển thị số gợi ý, số mã chứng cứ và badge cảnh báo thiếu dữ liệu.
+  - Mobile chỉ xem/pan/zoom; kéo nối và lưu cạnh chỉ bật từ breakpoint `md`.
+- Dirty tracking riêng cho form và sơ đồ; cảnh báo khi đổi row / đổi vụ án / đóng tab.
 - Không `autoFocus`, không gọi `.focus()` tự động khi mở form (quy tắc mobile của dự án).
 - Mã chứng cứ nhập tự do dạng chip; V1 chưa đọc danh mục từ tab `evidences`.
 - Checkpoint không phải `evidence_picker` hiển thị banner cảnh báo và toàn bộ form ở trạng thái disabled.
@@ -169,6 +218,6 @@ node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --cas
 ## 5. Lộ trình tiếp theo
 
 1. Bổ sung editor cho `text_match_3`, `mcq`, `time`, `code`, `text`.
-2. Viết exporter Supabase → `SheetCheckpointRow` để đồng bộ ngược hoặc chuyển runtime sang Supabase.
-3. Đọc danh mục vật chứng từ Live CMS để gợi ý mã (vẫn giữ khả năng nhập tự do).
-4. Nối runtime: thay `useCaseCheckpoints` bằng nguồn Supabase sau khi dữ liệu đã được kiểm chứng song song.
+2. Đọc danh mục vật chứng từ tab `evidences` để gợi ý mã (vẫn giữ khả năng nhập tự do).
+3. Bổ sung realtime/subscription nếu cần cập nhật checkpoint ngay khi GM sửa.
+4. Loại bỏ hoàn toàn parser `checkpoint-cms.ts` sau khi hết nhu cầu import.

@@ -36,14 +36,6 @@ export const CASES_LIST: CaseData[] = [
         noteColor: "white",
       },
       {
-        id: "c0-pin-reinvestigate",
-        x: 0.22,
-        y: 0.35,
-        label: "BIÊN BẢN XIN KHÁM XÉT LẠI",
-        detail: "Khám xét lại hiện trường để rà soát manh mối bổ sung",
-        noteColor: "white",
-      },
-      {
         id: "c0-pin-indictment",
         x: 0.22,
         y: 0.8,

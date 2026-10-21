@@ -4,10 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
-import { usePhoneData } from "@/lib/hooks/use-phone-data";
-import {
-  type SheetCheckpointRow,
-} from "@/lib/cms/checkpoint-cms";
+import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
 import { getStorageJson, setStorageJson, getStorageItem } from "@/lib/storage";
 import {
   buildGroupedCheckpointsMap,
@@ -28,14 +25,11 @@ export function CheckpointHintSection({
   className,
 }: CheckpointHintSectionProps) {
   const normalizedCaseId = caseId.replace(/-/g, "_");
-  const { data: sheetCheckpoints } = usePhoneData<SheetCheckpointRow>(
-    "checkpoints",
-    normalizedCaseId,
-  );
+  const { rows: checkpointRows } = useStudioCheckpoints(normalizedCaseId);
 
   const groupedMap = useMemo(() => {
-    return buildGroupedCheckpointsMap(sheetCheckpoints);
-  }, [sheetCheckpoints]);
+    return buildGroupedCheckpointsMap(checkpointRows);
+  }, [checkpointRows]);
 
   const effectiveCpId = useMemo(() => {
     return normalizeCheckpointId(checkpointId, caseId);
@@ -56,24 +50,39 @@ export function CheckpointHintSection({
     );
   }, [groupedMap, effectiveCpId]);
 
-  const activeCategory = useMemo<"motive" | "alibi" | "contradiction" | "all">(() => {
+  const activeCategory = useMemo<
+    "motive" | "alibi" | "contradiction" | "all"
+  >(() => {
     if (!currentGroup.hasCategories) {
       return "all";
     }
-    if (category === "motive" || category === "alibi" || category === "contradiction") return category;
+    if (
+      category === "motive" ||
+      category === "alibi" ||
+      category === "contradiction"
+    )
+      return category;
 
     const rawId = (checkpointId || "").toLowerCase();
     if (rawId.includes("motive") || rawId.includes("dong_co")) return "motive";
     if (rawId.includes("alibi") || rawId.includes("ngoai_pham")) return "alibi";
-    if (rawId.includes("contradiction") || rawId.includes("mau_thuan")) return "contradiction";
+    if (rawId.includes("contradiction") || rawId.includes("mau_thuan"))
+      return "contradiction";
 
     const savedCat = getStorageItem("active_suspect_category");
-    if (savedCat === "motive" || savedCat === "alibi" || savedCat === "contradiction") return savedCat;
+    if (
+      savedCat === "motive" ||
+      savedCat === "alibi" ||
+      savedCat === "contradiction"
+    )
+      return savedCat;
 
     return "motive";
   }, [category, checkpointId, currentGroup.hasCategories]);
 
-  const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>({});
+  const [unlockedLevels, setUnlockedLevels] = useState<Record<string, number>>(
+    {},
+  );
   const [holdProgress, setHoldProgress] = useState(0);
   const [isHolding, setIsHolding] = useState(false);
   const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -106,7 +115,10 @@ export function CheckpointHintSection({
     if (activeCategory === "alibi" && currentGroup.alibiHints.length > 0) {
       return currentGroup.alibiHints;
     }
-    if (activeCategory === "contradiction" && currentGroup.contradictionHints.length > 0) {
+    if (
+      activeCategory === "contradiction" &&
+      currentGroup.contradictionHints.length > 0
+    ) {
       return currentGroup.contradictionHints;
     }
     return currentGroup.hints;
@@ -118,10 +130,7 @@ export function CheckpointHintSection({
       : effectiveCpId;
 
   const totalHints = displayHints.length;
-  const unlockedCount = Math.min(
-    unlockedLevels[storageKey] || 0,
-    totalHints,
-  );
+  const unlockedCount = Math.min(unlockedLevels[storageKey] || 0, totalHints);
 
   const handleUnlockNext = () => {
     if (totalHints === 0) return;
@@ -190,9 +199,7 @@ export function CheckpointHintSection({
               <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider mr-1.5 inline">
                 Gợi ý {index + 1}:
               </span>
-              <span className="inline whitespace-pre-line">
-                {hintText}
-              </span>
+              <span className="inline whitespace-pre-line">{hintText}</span>
             </motion.div>
           ))}
         </div>

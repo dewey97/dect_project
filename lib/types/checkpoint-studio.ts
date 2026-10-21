@@ -3,8 +3,9 @@ import type { DbCaseCheckpoint } from "./database";
 /**
  * Checkpoint Studio (Admin) — model biên tập có cấu trúc.
  *
- * Lưu ý: đây là nguồn dữ liệu RIÊNG của Studio. Runtime gameplay hiện vẫn đọc
- * Google Sheets qua `lib/cms/checkpoint-cms.ts`; chưa có kết nối nào giữa hai bên.
+ * Lưu ý: đây là model biên tập của Studio trên bảng `case_checkpoints`.
+ * Runtime gameplay đọc cùng bảng qua `/api/checkpoints` và
+ * `lib/cms/checkpoint-runtime.ts`; Google Sheets chỉ còn quản lý `evidences`.
  */
 
 /**
@@ -19,6 +20,17 @@ export type CheckpointHintGroup =
 export interface CheckpointHint {
   group: CheckpointHintGroup;
   text: string;
+}
+
+/** Vị trí node trên Flow view, lưu trong `case_checkpoints.flow_position`. */
+export interface CheckpointFlowPosition {
+  x: number;
+  y: number;
+}
+
+export interface CheckpointPositionUpdate {
+  checkpointId: string;
+  position: CheckpointFlowPosition;
 }
 
 /** Cấu hình đáp án cho checkpoint thẩm tra nghi phạm (3 lớp). */
@@ -49,12 +61,20 @@ export interface CheckpointStudioDraft {
   followupOf: string;
   suspectLabel: string;
   evidenceStepLabel: string;
+  /** checkpoint_id của các checkpoint phải hoàn thành trước (graph Studio). */
+  dependsOn: string[];
   answerConfig: EvidencePickerConfig;
   hints: CheckpointHint[];
   narrative: string;
   aiContext: string;
   aiValidCases: string[];
   aiInvalidCases: string[];
+}
+
+/** Batch cập nhật cạnh phụ thuộc do Flow view gửi lên. */
+export interface CheckpointDependencyUpdate {
+  checkpointId: string;
+  dependsOn: string[];
 }
 
 export const EMPTY_EVIDENCE_CONFIG: EvidencePickerConfig = {
@@ -84,6 +104,7 @@ export function createEmptyDraft(caseId: string): CheckpointStudioDraft {
     followupOf: "",
     suspectLabel: "",
     evidenceStepLabel: "",
+    dependsOn: [],
     answerConfig: { ...EMPTY_EVIDENCE_CONFIG },
     hints: [],
     narrative: "",
@@ -168,6 +189,7 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     followupOf: asString(row.followup_of),
     suspectLabel: asString(row.suspect_label),
     evidenceStepLabel: asString(row.evidence_step_label),
+    dependsOn: asStringArray(row.depends_on),
     answerConfig: parseConfig(row.answer_config),
     hints: parseHints(row.hints),
     narrative: asString(row.narrative),
@@ -189,19 +211,28 @@ function cleanList(values: string[]): string[] {
   return result;
 }
 
+/**
+ * Payload form không ghi `depends_on`: quan hệ đồ thị do
+ * `updateCheckpointDependencies()` quản lý để tránh ghi đè khi lưu form.
+ */
 export type CaseCheckpointPayload = Omit<
   DbCaseCheckpoint,
-  "id" | "created_at" | "updated_at"
+  "id" | "created_at" | "updated_at" | "depends_on" | "flow_position"
 >;
 
 /** Chuyển draft thành payload insert/update. */
 export function toRowPayload(
   draft: CheckpointStudioDraft,
 ): CaseCheckpointPayload {
+  // Node là định danh người biên tập quản lý. `checkpoint_id` chỉ là khóa
+  // kỹ thuật; nếu người dùng bỏ trống thì dùng luôn Node ID.
+  const nodeId = draft.nodeId.trim();
+  const checkpointId = draft.checkpointId.trim() || nodeId;
+
   return {
     case_id: draft.caseId.trim() || "case_000",
-    checkpoint_id: draft.checkpointId.trim(),
-    node_id: draft.nodeId.trim() || null,
+    checkpoint_id: checkpointId,
+    node_id: nodeId || checkpointId || null,
     dossier: draft.dossier.trim() || null,
     title: draft.title.trim(),
     question: draft.question.trim(),

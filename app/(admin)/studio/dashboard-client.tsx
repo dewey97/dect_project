@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Map,
   FileText,
+  ListChecks,
   ArrowRight,
   Sparkles,
 } from "lucide-react";
@@ -234,7 +235,7 @@ export function DashboardClient({
       </div>
 
       {/* 2.5. CREATIVE STUDIO ENGINES (MAP & DOSSIER) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Map Studio Card */}
         <div className="bg-zinc-900/40 border border-white/5 hover:border-primary/30 rounded-xl p-6 relative overflow-hidden group transition-all">
           <div className="flex items-start justify-between mb-4">
@@ -250,7 +251,8 @@ export function DashboardClient({
             <ArrowRight className="size-4 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-primary" />
           </h3>
           <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-            Biên tập địa hình SVG không giới hạn: sông ngòi, đại lộ, đường ray xe lửa, phân khu đô thị và 31 tọa độ mốc án của Case #000.
+            Biên tập địa hình SVG không giới hạn: sông ngòi, đại lộ, đường ray
+            xe lửa, phân khu đô thị và 31 tọa độ mốc án của Case #000.
           </p>
           <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
             <span className="text-[11px] text-zinc-500 font-mono">
@@ -280,7 +282,8 @@ export function DashboardClient({
             <ArrowRight className="size-4 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-amber-400" />
           </h3>
           <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-            Dàn trang & xuất bản tài liệu tư pháp chuẩn in offset: Biên bản ghi lời khai (LK), Lý lịch tư pháp (HS), con dấu đỏ và vân tay nhân vật.
+            Dàn trang & xuất bản tài liệu tư pháp chuẩn in offset: Biên bản ghi
+            lời khai (LK), Lý lịch tư pháp (HS), con dấu đỏ và vân tay nhân vật.
           </p>
           <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
             <span className="text-[11px] text-zinc-500 font-mono">
@@ -291,6 +294,37 @@ export function DashboardClient({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 text-zinc-200 text-xs font-medium transition-all"
             >
               Mở Dossier Studio
+            </Link>
+          </div>
+        </div>
+
+        {/* Checkpoint Studio Card */}
+        <div className="bg-zinc-900/40 border border-white/5 hover:border-cyan-500/30 rounded-xl p-6 relative overflow-hidden group transition-all">
+          <div className="flex items-start justify-between mb-4">
+            <div className="size-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
+              <ListChecks className="size-5" />
+            </div>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold uppercase">
+              Supabase
+            </span>
+          </div>
+          <h3 className="text-base font-semibold text-zinc-100 group-hover:text-cyan-400 transition-colors flex items-center gap-2">
+            Checkpoint Studio
+            <ArrowRight className="size-4 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-cyan-400" />
+          </h3>
+          <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+            Biên tập câu hỏi, đáp án 3 lớp, gợi ý, narrative và đồ thị phụ thuộc
+            theo Node ID. Đây là nguồn checkpoint trực tiếp của runtime.
+          </p>
+          <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
+            <span className="text-[11px] text-zinc-500 font-mono">
+              Engine: Checkpoint Graph
+            </span>
+            <Link
+              href="/studio/checkpoints"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-cyan-500 hover:text-zinc-950 text-zinc-200 text-xs font-medium transition-all"
+            >
+              Mở Checkpoint Studio
             </Link>
           </div>
         </div>
@@ -307,8 +341,8 @@ export function DashboardClient({
               </h2>
             </div>
             <p className="text-xs text-zinc-400 mt-1">
-              Toàn bộ kịch bản, vật chứng, mốc giải đố & iPhone apps đồng bộ
-              trực tiếp từ Google Sheet, không cần rebuild hay deploy lại app.
+              Vật chứng, dẫn truyện & dữ liệu iPhone apps đồng bộ trực tiếp từ
+              Google Sheet. Checkpoint đã chuyển sang Checkpoint Studio.
             </p>
           </div>
           <a
@@ -323,7 +357,6 @@ export function DashboardClient({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           {[
-            { tab: "checkpoints", label: "Câu hỏi & Gợi ý", status: "Live" },
             {
               tab: "narratives",
               label: "Dẫn truyện Cinematic",

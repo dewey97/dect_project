@@ -58,8 +58,8 @@ export function CheckpointEditor({
             Chọn hoặc tạo một checkpoint
           </h2>
           <p className="mt-2 text-xs leading-relaxed text-zinc-500">
-            Dữ liệu tại đây được lưu vào Supabase. Runtime gameplay vẫn đọc
-            Google Sheets — thay đổi trong Studio chưa ảnh hưởng game đang chạy.
+            Dữ liệu tại đây là nguồn runtime của game. Lưu trong Studio sẽ cập
+            nhật checkpoint mà người chơi tải từ Supabase.
           </p>
         </div>
       </div>
@@ -67,8 +67,12 @@ export function CheckpointEditor({
   }
 
   const isEditable = draft.type === "evidence_picker";
+  const displayNode = draft.nodeId.trim() || draft.checkpointId.trim();
   const canSave =
-    isEditable && isDirty && !isSaving && draft.checkpointId.trim().length > 0;
+    isEditable &&
+    isDirty &&
+    !isSaving &&
+    (draft.nodeId.trim().length > 0 || draft.checkpointId.trim().length > 0);
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#0a0a0d]">
@@ -76,17 +80,17 @@ export function CheckpointEditor({
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h2 className="truncate text-sm font-semibold text-zinc-100">
-              {draft.title || draft.checkpointId || "Checkpoint mới"}
+              {draft.title || displayNode || "Checkpoint mới"}
             </h2>
             <span className="shrink-0 rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-amber-300">
               {draft.type || "evidence_picker"}
             </span>
             <span className="shrink-0 rounded border border-white/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-zinc-500">
-              Supabase only
+              Live
             </span>
           </div>
           <p className="truncate font-mono text-[11px] text-zinc-500">
-            {draft.checkpointId || "chưa có mã"} · runtime chưa nối
+            node {displayNode || "chưa có"} · nguồn runtime
           </p>
         </div>
 

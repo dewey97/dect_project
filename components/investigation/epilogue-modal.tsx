@@ -1,85 +1,101 @@
-'use client'
+"use client";
 
-import React, { useState, useMemo } from 'react'
-import { AnimatePresence } from 'framer-motion'
-import { BookOpen, X } from 'lucide-react'
-import { TypewriterNarrator } from './evidence/typewriter-narrator'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
-import { cn } from '@/lib/utils'
+import React, { useState, useMemo } from "react";
+import { AnimatePresence } from "framer-motion";
+import { BookOpen, X } from "lucide-react";
+import { TypewriterNarrator } from "./evidence/typewriter-narrator";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
+import { cn } from "@/lib/utils";
 
 interface EpilogueModalProps {
-  isOpen: boolean
-  onClose?: () => void
-  caseId?: string
+  isOpen: boolean;
+  onClose?: () => void;
+  caseId?: string;
 }
 
 const EPILOGUE_META = [
-  { id: 'cp-epilogue-ha', defaultTitle: 'Hậu Án I: Trần Thị Hà & Bản Án Lương Tâm' },
-  { id: 'cp-epilogue-mai-vu', defaultTitle: 'Hậu Án II: Vợ Chồng Mai - Vũ & Mảnh Đất Tranh Chấp' },
-  { id: 'cp-epilogue-tung', defaultTitle: 'Hậu Án III: Nguyễn Thanh Tùng & Bức Thư Cứu Rỗi' },
-  { id: 'cp-epilogue-closure', defaultTitle: 'Hậu Án IV: Khép Lại Chuyên Án Số 14 Đường Bờ Sông' },
-]
+  {
+    id: "cp-epilogue-ha",
+    defaultTitle: "Hậu Án I: Trần Thị Hà & Bản Án Lương Tâm",
+  },
+  {
+    id: "cp-epilogue-mai-vu",
+    defaultTitle: "Hậu Án II: Vợ Chồng Mai - Vũ & Mảnh Đất Tranh Chấp",
+  },
+  {
+    id: "cp-epilogue-tung",
+    defaultTitle: "Hậu Án III: Nguyễn Thanh Tùng & Bức Thư Cứu Rỗi",
+  },
+  {
+    id: "cp-epilogue-closure",
+    defaultTitle: "Hậu Án IV: Khép Lại Chuyên Án Số 14 Đường Bờ Sông",
+  },
+];
 
-export function EpilogueModal({ isOpen, onClose, caseId = 'case-000' }: EpilogueModalProps) {
-  const [activeStoryIdx, setActiveStoryIdx] = useState(0)
-  const { checkpoints, loading } = useCaseCheckpoints(caseId)
+export function EpilogueModal({
+  isOpen,
+  onClose,
+  caseId = "case-000",
+}: EpilogueModalProps) {
+  const [activeStoryIdx, setActiveStoryIdx] = useState(0);
+  const { checkpoints, loading } = useCaseCheckpoints(caseId);
 
-  // Đọc các bài Hậu Án trực tiếp từ Google Sheets Live CMS (tab checkpoints)
+  // Đọc các bài Hậu Án từ Checkpoint Studio (Supabase) qua useCaseCheckpoints
   const epilogueStories = useMemo(() => {
-    if (caseId === 'case-000') {
+    if (caseId === "case-000") {
       return EPILOGUE_META.map((meta) => {
-        const cp = checkpoints.find((c) => c.id === meta.id)
+        const cp = checkpoints.find((c) => c.id === meta.id);
         return {
           id: meta.id,
           title: cp?.title || meta.defaultTitle,
-          monologue: cp?.storyConfig?.monologue || '',
-        }
-      })
+          monologue: cp?.storyConfig?.monologue || "",
+        };
+      });
     }
 
     // Dynamic case: Tìm toàn bộ checkpoints có hậu án hoặc epilogue
     const dynamicEpilogues = checkpoints.filter(
       (c) =>
-        c.id.includes('epilogue') ||
-        c.id.includes('hau-an') ||
-        c.title?.toLowerCase().includes('hậu án')
-    )
+        c.id.includes("epilogue") ||
+        c.id.includes("hau-an") ||
+        c.title?.toLowerCase().includes("hậu án"),
+    );
 
     if (dynamicEpilogues.length > 0) {
       return dynamicEpilogues.map((cp, idx) => ({
         id: cp.id,
         title: cp.title || `Hậu Án ${idx + 1}`,
-        monologue: cp.storyConfig?.monologue || '',
-      }))
+        monologue: cp.storyConfig?.monologue || "",
+      }));
     }
 
     // Fallback nếu case chưa cấu hình epilogue riêng: Lấy checkpoint kết án cuối
-    const lastCp = checkpoints[checkpoints.length - 1]
+    const lastCp = checkpoints[checkpoints.length - 1];
     return [
       {
-        id: lastCp?.id || 'epilogue-final',
-        title: lastCp?.title || 'Khép lại chuyên án',
+        id: lastCp?.id || "epilogue-final",
+        title: lastCp?.title || "Khép lại chuyên án",
         monologue:
           lastCp?.storyConfig?.monologue ||
-          'Chuyên án điều tra chính thức khép lại. Mọi chứng cứ và diễn biến đã được thu thập đầy đủ.',
+          "Chuyên án điều tra chính thức khép lại. Mọi chứng cứ và diễn biến đã được thu thập đầy đủ.",
       },
-    ]
-  }, [checkpoints, caseId])
+    ];
+  }, [checkpoints, caseId]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
-  const currentStory = epilogueStories[activeStoryIdx] || epilogueStories[0]
+  const currentStory = epilogueStories[activeStoryIdx] || epilogueStories[0];
 
   const handleSelectStory = (idx: number) => {
-    detectiveAudio.playTypewriterClick()
-    setActiveStoryIdx(idx)
-  }
+    detectiveAudio.playTypewriterClick();
+    setActiveStoryIdx(idx);
+  };
 
   const handleClose = () => {
-    detectiveAudio.playPaperRustle()
-    if (onClose) onClose()
-  }
+    detectiveAudio.playPaperRustle();
+    if (onClose) onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -109,21 +125,21 @@ export function EpilogueModal({ isOpen, onClose, caseId = 'case-000' }: Epilogue
         {/* Mobile Horizontal Tabs Selector */}
         <nav className="relative z-20 flex lg:hidden overflow-x-auto custom-scrollbar bg-[#100b07] border-b border-[#22160d] p-1 px-2 gap-1 shrink-0">
           {epilogueStories.map((s, idx) => {
-            const isSelected = activeStoryIdx === idx
+            const isSelected = activeStoryIdx === idx;
             return (
               <button
                 key={s.id}
                 onClick={() => handleSelectStory(idx)}
                 className={cn(
-                  'px-2.5 py-1 text-[0.72rem] font-mono tracking-tight transition-all shrink-0 cursor-pointer border rounded-none',
+                  "px-2.5 py-1 text-[0.72rem] font-mono tracking-tight transition-all shrink-0 cursor-pointer border rounded-none",
                   isSelected
-                    ? 'bg-[#24170e] border-[#c49257]/80 text-[#d9a066] font-semibold'
-                    : 'bg-transparent border-[#22160d] text-[#7e6d5e] hover:text-[#d9c4b1] hover:bg-[#18100a]'
+                    ? "bg-[#24170e] border-[#c49257]/80 text-[#d9a066] font-semibold"
+                    : "bg-transparent border-[#22160d] text-[#7e6d5e] hover:text-[#d9c4b1] hover:bg-[#18100a]",
                 )}
               >
                 <span>{s.title}</span>
               </button>
-            )
+            );
           })}
         </nav>
 
@@ -143,8 +159,8 @@ export function EpilogueModal({ isOpen, onClose, caseId = 'case-000' }: Epilogue
                 ) : (
                   <div className="py-12 text-center text-xs font-mono text-[#a88a6d] animate-pulse">
                     {loading
-                      ? 'Đang đồng bộ hồ sơ hậu án từ Google Sheets Live CMS...'
-                      : 'Hồ sơ hậu án đang được cập nhật.'}
+                      ? "Đang đồng bộ hồ sơ hậu án từ Google Sheets Live CMS..."
+                      : "Hồ sơ hậu án đang được cập nhật."}
                   </div>
                 )}
               </div>
@@ -163,16 +179,16 @@ export function EpilogueModal({ isOpen, onClose, caseId = 'case-000' }: Epilogue
               {/* 4 Story Option Cards */}
               <div className="space-y-1.5">
                 {epilogueStories.map((s, idx) => {
-                  const isSelected = activeStoryIdx === idx
+                  const isSelected = activeStoryIdx === idx;
                   return (
                     <button
                       key={s.id}
                       onClick={() => handleSelectStory(idx)}
                       className={cn(
-                        'w-full text-left px-3 py-2 text-xs font-serif transition-all flex items-center justify-between cursor-pointer border rounded-none',
+                        "w-full text-left px-3 py-2 text-xs font-serif transition-all flex items-center justify-between cursor-pointer border rounded-none",
                         isSelected
-                          ? 'bg-[#291b11] border-[#c49257]/80 text-[#f5ebd9] font-semibold'
-                          : 'bg-[#19110b]/80 border-[#26190f] text-[#8e7b6c] hover:bg-[#20160f] hover:text-[#d9c4b1] hover:border-[#382618]'
+                          ? "bg-[#291b11] border-[#c49257]/80 text-[#f5ebd9] font-semibold"
+                          : "bg-[#19110b]/80 border-[#26190f] text-[#8e7b6c] hover:bg-[#20160f] hover:text-[#d9c4b1] hover:border-[#382618]",
                       )}
                     >
                       <span className="line-clamp-2">{s.title}</span>
@@ -180,7 +196,7 @@ export function EpilogueModal({ isOpen, onClose, caseId = 'case-000' }: Epilogue
                         <span className="w-1.5 h-1.5 bg-[#c49257] shrink-0 ml-2" />
                       )}
                     </button>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -199,5 +215,5 @@ export function EpilogueModal({ isOpen, onClose, caseId = 'case-000' }: Epilogue
         </div>
       </div>
     </AnimatePresence>
-  )
+  );
 }

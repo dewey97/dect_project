@@ -43,20 +43,15 @@ export function CheckpointIdentityForm({
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
-        <Field label="Mã checkpoint" required hint="VD: cp-000-1a">
-          <Input
-            value={draft.checkpointId}
-            onChange={(event) => onChange({ checkpointId: event.target.value })}
-            placeholder="cp-000-1a"
-            className="border-white/10 bg-black/30 font-mono text-sm"
-          />
-        </Field>
-
-        <Field label="Node ID" hint="Tùy chọn, mặc định dùng mã checkpoint">
+        <Field
+          label="Node ID"
+          required
+          hint="Định danh chính trên sơ đồ"
+        >
           <Input
             value={draft.nodeId}
             onChange={(event) => onChange({ nodeId: event.target.value })}
-            placeholder={draft.checkpointId || "c0-pin-phone"}
+            placeholder="c0-pin-phone"
             className="border-white/10 bg-black/30 font-mono text-sm"
           />
         </Field>
@@ -81,6 +76,25 @@ export function CheckpointIdentityForm({
           </div>
         </Field>
       </div>
+
+      <details className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2">
+        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          Khóa kỹ thuật
+        </summary>
+        <div className="mt-2 space-y-1.5">
+          <p className="text-[11px] text-zinc-600">
+            Chỉ dùng cho đồ thị phụ thuộc. Bỏ trống để dùng Node ID.
+            {draft.id ? " Không thể đổi sau khi tạo." : ""}
+          </p>
+          <Input
+            value={draft.checkpointId}
+            onChange={(event) => onChange({ checkpointId: event.target.value })}
+            placeholder={draft.nodeId || "tự động"}
+            disabled={Boolean(draft.id)}
+            className="border-white/10 bg-black/30 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-60"
+          />
+        </div>
+      </details>
 
       <Field label="Tiêu đề" hint="Hiển thị trên ghim câu hỏi">
         <Input
@@ -120,12 +134,12 @@ export function CheckpointIdentityForm({
 
         <Field
           label="Follow-up của"
-          hint="Mã checkpoint cha, nếu là câu hỏi tiếp"
+          hint="Khóa tham chiếu tự do, không cố định tên nhân vật"
         >
           <Input
             value={draft.followupOf}
             onChange={(event) => onChange({ followupOf: event.target.value })}
-            placeholder="cp-000-1a"
+            placeholder="mã-tham-chiếu"
             className="border-white/10 bg-black/30 font-mono text-sm"
           />
         </Field>

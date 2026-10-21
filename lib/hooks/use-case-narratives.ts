@@ -95,9 +95,7 @@ function resolveCheckpointForPhase(
   if (phase === 0) {
     const p0 = checkpoints.find(
       (c) =>
-        c.id.includes("-0") ||
-        c.id.includes("phone") ||
-        c.id.includes("start"),
+        c.id.includes("-0") || c.id.includes("phone") || c.id.includes("start"),
     );
     if (p0) return p0;
   } else if (phase === 1) {
@@ -121,8 +119,8 @@ function resolveCheckpointForPhase(
 }
 
 /**
- * Hook kết nối trực tiếp cột `narrative` từ tab `checkpoints` trên Google Sheets Live CMS 100%,
- * tự động cập nhật lời dẫn mở đầu và dẫn truyện các bộ hồ sơ theo thời gian thực.
+ * Hook kết nối cột `narrative` từ Checkpoint Studio (Supabase) qua useCaseCheckpoints,
+ * tự động cập nhật lời dẫn mở đầu và dẫn truyện các bộ hồ sơ theo dữ liệu Live CMS.
  * Luôn có fallback an toàn để không bao giờ bị màn hình đen khi mạng đang fetch.
  */
 export function useCaseNarratives(
@@ -182,5 +180,3 @@ export function useCaseNarratives(
     getPhaseNarrative,
   };
 }
-
-

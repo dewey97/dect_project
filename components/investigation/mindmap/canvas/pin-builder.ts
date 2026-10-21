@@ -4,7 +4,10 @@ import type {
   CaseConnection,
   PinPoint,
 } from "@/components/investigation/hero-interactive";
-import { getCanonicalSuspectKey, removeDiacritics } from "@/lib/cases/case-000-suspects";
+import {
+  getCanonicalSuspectKey,
+  removeDiacritics,
+} from "@/lib/cases/case-000-suspects";
 import { normalizeImageUrl } from "@/lib/utils";
 import type { CulpritKey, SuspectItem } from "./use-investigation-state";
 
@@ -50,16 +53,23 @@ function buildSuspectPins(
   effectiveSuspects: SuspectItem[],
   slots: { x: number; y: number }[],
   sheetPhotoMap: Record<string, string>,
-  caseCheckpoints?: Array<{ id: string; title?: string; question?: string; [key: string]: any }>,
+  caseCheckpoints?: Array<{
+    id: string;
+    title?: string;
+    question?: string;
+    [key: string]: any;
+  }>,
 ): PinPoint[] {
   return effectiveSuspects.map((suspect, idx) => {
     const { canonicalId, slotIndex, canonicalName } =
       getCanonicalSuspectKey(suspect);
-    const assignedSlotIndex = typeof slotIndex === "number" && slotIndex >= 0 && slotIndex < 3
-      ? slotIndex
-      : (3 + (idx % (slots.length - 3)));
-    const slot = slots[assignedSlotIndex] || slots[idx % slots.length] || slots[0];
-    
+    const assignedSlotIndex =
+      typeof slotIndex === "number" && slotIndex >= 0 && slotIndex < 3
+        ? slotIndex
+        : 3 + (idx % (slots.length - 3));
+    const slot =
+      slots[assignedSlotIndex] || slots[idx % slots.length] || slots[0];
+
     // Dynamic checkpoint resolution:
     let cpId = "";
     if (caseCheckpoints && caseCheckpoints.length > 0) {
@@ -82,16 +92,28 @@ function buildSuspectPins(
         }
 
         // 1. Nhận diện theo ID kinh điển Case #000
-        if (canonicalId === "vu" && (idLow === "cp-000-1a" || idLow.includes("1a"))) return true;
-        if (canonicalId === "tung" && (idLow === "cp-000-1b" || idLow.includes("1b"))) return true;
-        if (canonicalId === "ha" && (idLow === "cp-000-1c" || idLow.includes("1c"))) return true;
+        if (
+          canonicalId === "vu" &&
+          (idLow === "cp-000-1a" || idLow.includes("1a"))
+        )
+          return true;
+        if (
+          canonicalId === "tung" &&
+          (idLow === "cp-000-1b" || idLow.includes("1b"))
+        )
+          return true;
+        if (
+          canonicalId === "ha" &&
+          (idLow === "cp-000-1c" || idLow.includes("1c"))
+        )
+          return true;
 
         // 2. Nhận diện dynamic theo tên nghi phạm
         return aliasList.some(
           (alias) =>
             idLow.includes(alias) ||
             titleClean.includes(alias) ||
-            qClean.includes(alias)
+            qClean.includes(alias),
         );
       });
       if (match) cpId = match.id;
@@ -108,9 +130,7 @@ function buildSuspectPins(
       label: canonicalName || suspect.name,
       detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
       color: "blue" as const,
-      photoUrl:
-        sheetPhotoMap[canonicalId] ||
-        "/images/avatar_placeholder.svg",
+      photoUrl: sheetPhotoMap[canonicalId] || "/images/avatar_placeholder.svg",
       isAvatar: true,
       actionType: cpId ? ("sheet_checkpoint" as const) : ("info" as const),
       checkpointId: cpId || undefined,
@@ -122,7 +142,13 @@ function buildFollowupPins(
   effectiveSuspects: SuspectItem[],
   slots: { x: number; y: number }[],
   activeFollowupSet: Set<string>,
-  caseCheckpoints?: Array<{ id: string; title?: string; question?: string; followupOf?: string; [key: string]: any }>,
+  caseCheckpoints?: Array<{
+    id: string;
+    title?: string;
+    question?: string;
+    followupOf?: string;
+    [key: string]: any;
+  }>,
 ): PinPoint[] {
   const pins: PinPoint[] = [];
 
@@ -158,7 +184,9 @@ function buildFollowupPins(
             targetClean === canonicalId ||
             targetClean === sNameClean ||
             targetClean === cNameClean ||
-            aliasList.some((alias) => targetClean === alias || targetClean.includes(alias))
+            aliasList.some(
+              (alias) => targetClean === alias || targetClean.includes(alias),
+            )
           );
         }
 
@@ -169,25 +197,29 @@ function buildFollowupPins(
             idLow.includes("1a-followup") ||
             idLow.includes("vu-followup") ||
             nodeLow === "c0-pin-followup-vu"
-          ) return true;
+          )
+            return true;
         } else if (canonicalId === "tung") {
           if (
             idLow === "cp-000-1b-followup" ||
             idLow.includes("1b-followup") ||
             idLow.includes("tung-followup") ||
             nodeLow === "c0-pin-followup-tung"
-          ) return true;
+          )
+            return true;
         } else if (canonicalId === "ha") {
           if (
             idLow === "cp-000-1c-followup" ||
             idLow.includes("1c-followup") ||
             idLow.includes("ha-followup") ||
             nodeLow === "c0-pin-followup-ha"
-          ) return true;
+          )
+            return true;
         }
 
         // 2. Nhận diện dynamic theo tiêu chuẩn: ID/NodeID chứa 'followup' VÀ khớp tên/mã nghi phạm
-        const isFollowup = idLow.includes("followup") || nodeLow.includes("followup");
+        const isFollowup =
+          idLow.includes("followup") || nodeLow.includes("followup");
         if (!isFollowup) return false;
 
         return aliasList.some(
@@ -195,7 +227,7 @@ function buildFollowupPins(
             idLow.includes(alias) ||
             nodeLow.includes(alias) ||
             titleClean.includes(alias) ||
-            qClean.includes(alias)
+            qClean.includes(alias),
         );
       });
       if (match) cpId = match.id;
@@ -208,7 +240,7 @@ function buildFollowupPins(
       else if (canonicalId === "ha") cpId = "cp-000-1c-followup";
     }
 
-    // QUAN TRỌNG: Nếu đối tượng này KHÔNG có câu hỏi / checkpoint tương ứng trên Google Sheets
+    // QUAN TRỌNG: Nếu đối tượng này KHÔNG có checkpoint tương ứng trong Studio
     // TUYỆT ĐỐI KHÔNG sinh ghim "Nghi vấn" rỗng (tránh hiển thị node mà không có câu hỏi)!
     if (!cpId) {
       return;
@@ -302,7 +334,12 @@ export type PinBuilderInput = {
   effectivePhoneSolved: boolean;
   effectiveIndictmentSolved: boolean;
   isReinvestigateBlinking: boolean;
-  caseCheckpoints?: Array<{ id: string; title?: string; question?: string; [key: string]: any }>;
+  caseCheckpoints?: Array<{
+    id: string;
+    title?: string;
+    question?: string;
+    [key: string]: any;
+  }>;
   victimName?: string;
   caseId?: string;
 };
@@ -334,9 +371,14 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     ? "Đã xác minh danh tính SĐT thành công"
     : `Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân ${victimName}`;
 
-  const phoneCp = input.caseCheckpoints?.find((cp) => cp.id.includes("-0") || cp.id.includes("phone"))?.id || "cp-000-0";
-  const reinvestigateCp = input.caseCheckpoints?.find((cp) => cp.id.includes("convergence") || cp.id.includes("kham-xet"))?.id || "cp-000-convergence";
-  const indictmentCp = input.caseCheckpoints?.find((cp) => cp.id.includes("indictment") || cp.id.includes("-2b"))?.id || "cp-000-2b";
+  const phoneCp =
+    input.caseCheckpoints?.find(
+      (cp) => cp.id.includes("-0") || cp.id.includes("phone"),
+    )?.id || "cp-000-0";
+  const indictmentCp =
+    input.caseCheckpoints?.find(
+      (cp) => cp.id.includes("indictment") || cp.id.includes("-2b"),
+    )?.id || "cp-000-2b";
 
   const base = input.isMobile
     ? ([
@@ -362,29 +404,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           color: "yellow" as const,
           photoUrl: "/phone.png",
           scale: 0.85,
-        },
-        {
-          id: "c0-pin-reinvestigate",
-          x: 0.18,
-          y: 0.36,
-          label: input.effectiveReinvestigateUnlocked
-            ? "Khám xét lại hiện trường"
-            : "Khám xét lại (Chờ phê duyệt)",
-          detail: input.effectiveReinvestigateUnlocked
-            ? "Mở biên bản tái khám xét & rà soát hiện trường số 14 Đường Bờ Sông"
-            : "Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]",
-          color: input.effectiveReinvestigateUnlocked
-            ? ("yellow" as const)
-            : ("dark" as const),
-          noteColor: "white" as const,
-          pinColor: input.effectiveReinvestigateUnlocked
-            ? ("yellow" as const)
-            : ("dark" as const),
-          photoUrl: "/images/cases/case_000/crime_scene.png",
-          scale: 0.95,
-          pulseBorder: input.isReinvestigateBlinking,
-          isLocked: !input.effectiveReinvestigateUnlocked,
-          checkpointId: reinvestigateCp,
         },
         {
           id: "c0-pin-suspects",
@@ -435,29 +454,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           scale: 0.85,
         },
         {
-          id: "c0-pin-reinvestigate",
-          x: 0.18,
-          y: 0.36,
-          label: input.effectiveReinvestigateUnlocked
-            ? "Khám xét lại hiện trường"
-            : "Khám xét lại (Chờ phê duyệt)",
-          detail: input.effectiveReinvestigateUnlocked
-            ? "Mở biên bản tái khám xét & rà soát hiện trường số 14 Đường Bờ Sông"
-            : "Khám xét lại hiện trường [Chờ phê duyệt lệnh — Cần trả lời xong câu hỏi của Vũ & Tùng]",
-          color: input.effectiveReinvestigateUnlocked
-            ? ("yellow" as const)
-            : ("dark" as const),
-          noteColor: "white" as const,
-          pinColor: input.effectiveReinvestigateUnlocked
-            ? ("yellow" as const)
-            : ("dark" as const),
-          photoUrl: "/images/cases/case_000/crime_scene.png",
-          scale: 0.95,
-          pulseBorder: input.isReinvestigateBlinking,
-          isLocked: !input.effectiveReinvestigateUnlocked,
-          checkpointId: reinvestigateCp,
-        },
-        {
           id: "c0-pin-suspects",
           x: 0.58,
           y: 0.38,
@@ -491,14 +487,22 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       const codeLower = code.toLowerCase();
       if (!codeLower) return;
 
-      const rawX = typeof item.board_x === "number" ? item.board_x : parseFloat(String(item.board_x || ""));
-      const rawY = typeof item.board_y === "number" ? item.board_y : parseFloat(String(item.board_y || ""));
-      const hasCustomCoords = !isNaN(rawX) && !isNaN(rawY) && rawX > 0 && rawY > 0;
+      const rawX =
+        typeof item.board_x === "number"
+          ? item.board_x
+          : parseFloat(String(item.board_x || ""));
+      const rawY =
+        typeof item.board_y === "number"
+          ? item.board_y
+          : parseFloat(String(item.board_y || ""));
+      const hasCustomCoords =
+        !isNaN(rawX) && !isNaN(rawY) && rawX > 0 && rawY > 0;
 
       let posX = rawX;
       let posY = rawY;
       if (!hasCustomCoords) {
-        const slot = DYNAMIC_PHOTO_SLOTS[autoSlotIdx % DYNAMIC_PHOTO_SLOTS.length];
+        const slot =
+          DYNAMIC_PHOTO_SLOTS[autoSlotIdx % DYNAMIC_PHOTO_SLOTS.length];
         posX = slot.x;
         posY = slot.y;
         autoSlotIdx++;
@@ -515,8 +519,12 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         ? normalizeImageUrl(rawUrl)
         : fallbackPhoto || "/images/avatar_placeholder.svg";
 
-      const rawCategory = String(item.category || "").toUpperCase().trim();
-      const rawLabel = String(item.label || item.title || "").toLowerCase().trim();
+      const rawCategory = String(item.category || "")
+        .toUpperCase()
+        .trim();
+      const rawLabel = String(item.label || item.title || "")
+        .toLowerCase()
+        .trim();
       const isAvatar =
         rawCategory === "AVATAR" ||
         codeLower.startsWith("avatar_") ||
@@ -528,7 +536,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         x: posX,
         y: posY,
         label: item.label || item.title || item.code || "Vật chứng",
-        detail: item.description || `Vật chứng vụ án: ${item.label || item.code}`,
+        detail:
+          item.description || `Vật chứng vụ án: ${item.label || item.code}`,
         color: pinColor,
         photoUrl,
         isAvatar,
@@ -635,19 +644,21 @@ export function detectCheckpointForPin(pin?: PinPoint): string | null {
   if (id === "c0-pin-followup-tung") return "cp-000-1b-followup";
   if (id === "c0-pin-followup-ha") return "cp-000-1c-followup";
   if (id === "c0-pin-indictment") return "cp-000-2b";
-  if (id === "c0-pin-reinvestigate") return "cp-000-convergence";
   if (id.startsWith("c0-pin-followup-")) {
     return `cp-${id.replace("c0-pin-followup-", "")}-followup`;
   }
 
-  if (pin.actionType === "sheet_checkpoint" || pin.actionType === "custom_question") {
+  if (
+    pin.actionType === "sheet_checkpoint" ||
+    pin.actionType === "custom_question"
+  ) {
     const pText = `${id} ${(pin.label || "").toLowerCase()} ${(pin.detail || "").toLowerCase()}`;
     if (pText.includes("vu") || pText.includes("vũ")) return "cp-000-1a";
     if (pText.includes("tung") || pText.includes("tùng")) return "cp-000-1b";
     if (pText.includes("ha") || pText.includes("hà")) return "cp-000-1c";
     if (pText.includes("phone") || pText.includes("sđt")) return "cp-000-0";
-    if (pText.includes("indictment") || pText.includes("cáo trạng")) return "cp-000-2b";
-    if (pText.includes("kham-xet") || pText.includes("khám xét") || pText.includes("hội tụ")) return "cp-000-convergence";
+    if (pText.includes("indictment") || pText.includes("cáo trạng"))
+      return "cp-000-2b";
   }
 
   return null;

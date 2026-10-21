@@ -33,31 +33,22 @@ export function CheckpointListSidebar({
   isLoading,
 }: CheckpointListSidebarProps) {
   const [search, setSearch] = useState("");
-  const [dossier, setDossier] = useState("all");
-
-  const dossiers = useMemo(() => {
-    const set = new Set<string>();
-    for (const row of rows) {
-      if (row.dossier) set.add(row.dossier);
-    }
-    return Array.from(set).sort();
-  }, [rows]);
 
   const visibleRows = useMemo(() => {
     const keyword = search.trim().toLowerCase();
     return rows.filter((row) => {
-      if (dossier !== "all" && row.dossier !== dossier) return false;
       if (!keyword) return true;
       return (
+        (row.node_id || row.checkpoint_id).toLowerCase().includes(keyword) ||
         row.checkpoint_id.toLowerCase().includes(keyword) ||
         row.title.toLowerCase().includes(keyword) ||
         row.question.toLowerCase().includes(keyword)
       );
     });
-  }, [rows, search, dossier]);
+  }, [rows, search]);
 
   return (
-    <aside className="flex h-full w-full shrink-0 flex-col border-r border-white/10 bg-[#0c0c10] md:w-80">
+    <aside className="flex h-full w-full shrink-0 flex-col border-l border-white/10 bg-[#0c0c10] md:w-80">
       <div className="shrink-0 space-y-2.5 border-b border-white/10 p-3">
         <div className="flex items-center gap-2">
           <select
@@ -90,25 +81,10 @@ export function CheckpointListSidebar({
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Tìm mã hoặc tiêu đề…"
+            placeholder="Tìm node hoặc tiêu đề…"
             className="h-8 border-white/10 bg-black/40 pl-8 text-xs"
           />
         </div>
-
-        <select
-          value={dossier}
-          onChange={(event) => setDossier(event.target.value)}
-          className="h-8 w-full rounded-lg border border-white/10 bg-black/40 px-2 text-xs text-zinc-300 outline-none focus:border-amber-500/50"
-        >
-          <option value="all" className="bg-[#141618]">
-            Tất cả bộ hồ sơ
-          </option>
-          {dossiers.map((item) => (
-            <option key={item} value={item} className="bg-[#141618]">
-              {item}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-2">
@@ -156,13 +132,8 @@ export function CheckpointListSidebar({
                           active ? "text-amber-300" : "text-zinc-500",
                         )}
                       >
-                        {row.checkpoint_id}
+                        {row.node_id?.trim() || row.checkpoint_id}
                       </span>
-                      {row.dossier && (
-                        <span className="ml-auto shrink-0 rounded border border-white/10 px-1 py-0.5 text-[9px] text-zinc-500">
-                          {row.dossier}
-                        </span>
-                      )}
                     </div>
                     <p
                       className={cn(

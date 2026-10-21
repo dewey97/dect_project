@@ -2,10 +2,8 @@
 
 import { useMemo } from "react";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
-import {
-  transformSheetCheckpoints,
-  type SheetCheckpointRow,
-} from "@/lib/cms/checkpoint-cms";
+import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
+import { toRuntimeCheckpoints } from "@/lib/cms/checkpoint-runtime";
 import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
 
 export interface CaseCheckpointsState {
@@ -86,15 +84,17 @@ function enrichCheckpointsWithEvidences(
 }
 
 /**
- * Hook kết nối trực tiếp tab `checkpoints` & `evidences` từ Google Sheets Live CMS 100%,
- * tự động đồng bộ danh sách câu hỏi, đáp án, gợi ý.
+ * Hook runtime: checkpoint đọc từ Checkpoint Studio (Supabase), danh mục vật
+ * chứng vẫn đọc từ Google Sheets để bổ sung label/description.
  */
-export function useCaseCheckpoints(caseId: string = "case-000"): CaseCheckpointsState {
+export function useCaseCheckpoints(
+  caseId: string = "case-000",
+): CaseCheckpointsState {
   const {
-    data: checkpointRows,
+    rows: checkpointRows,
     loading: cpLoading,
     refetch: refetchCp,
-  } = usePhoneData<SheetCheckpointRow>("checkpoints", caseId);
+  } = useStudioCheckpoints(caseId);
 
   const {
     data: evidenceRows,
@@ -113,12 +113,10 @@ export function useCaseCheckpoints(caseId: string = "case-000"): CaseCheckpoints
       (row) => !row.case_id || normalizeCaseId(row.case_id) === targetId,
     );
 
-    if (matchingRows.length > 0) {
-      const transformed = transformSheetCheckpoints(matchingRows);
-      return enrichCheckpointsWithEvidences(transformed, evidenceRows);
-    }
-
-    return [];
+    return enrichCheckpointsWithEvidences(
+      toRuntimeCheckpoints(matchingRows),
+      evidenceRows,
+    );
   }, [checkpointRows, evidenceRows, caseId]);
 
   return {
@@ -127,4 +125,3 @@ export function useCaseCheckpoints(caseId: string = "case-000"): CaseCheckpoints
     refetch,
   };
 }
-

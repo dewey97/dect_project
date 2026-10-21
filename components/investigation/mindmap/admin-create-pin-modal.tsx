@@ -19,6 +19,7 @@ import { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
 import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
 
 interface AdminCreatePinModalProps {
@@ -40,11 +41,6 @@ const PRESET_CASE_PHOTOS: Array<{
     url: "/images/cases/case_000/photo_cheating_sms.jpg",
   },
   { label: "Tủ gỗ trốn tìm", url: "/images/cases/case_000/wardrobe_eyes.jpg" },
-  {
-    label: "Phòng tái khám xét",
-    url: "/images/cases/case_000/photo-reinvestigation-room-realistic.jpg",
-    defaultCheckpointId: "cp-000-convergence",
-  },
   {
     label: "Ảnh ẩn danh (Placeholder)",
     url: "/images/avatar_placeholder.svg",
@@ -105,12 +101,6 @@ const PRESET_DOSSIER_TEMPLATES: NoteTemplate[] = [
     defaultCheckpointId: "cp-000-0",
   },
   {
-    label: "Biên bản khám xét",
-    url: "/images/cases/case_000/clue_notes/rendered_notes/note_kham_xet_lai.png",
-    defaultLabel: "BIÊN BẢN KHÁM XÉT HIỆN TRƯỜNG",
-    defaultCheckpointId: "cp-000-convergence",
-  },
-  {
     label: "Kết luận điều tra",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_ket_luan_dieu_tra.png",
     defaultLabel: "BẢN KẾT LUẬN ĐIỀU TRA",
@@ -130,10 +120,6 @@ const PRESET_SHEET_CHECKPOINTS = [
   {
     id: "cp-000-1b",
     label: "CP-000-1b // Đối chất Hồ sơ B — Nguyễn Thanh Tùng",
-  },
-  {
-    id: "cp-000-convergence",
-    label: "CP-000-convergence // Nút hội tụ — Khám xét lại hiện trường",
   },
   {
     id: "cp-000-2a",
@@ -190,25 +176,23 @@ export function AdminCreatePinModal({
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
-  // Fetch live photos & checkpoints from Google Sheets
+  // Fetch live photos từ Sheets; checkpoint lấy từ Checkpoint Studio.
   const { data: sheetPhotos } = usePhoneData("evidences");
-  const { data: sheetCheckpoints } = usePhoneData("checkpoints");
+  const { rows: studioCheckpoints } = useStudioCheckpoints("case_000");
 
   const combinedCheckpoints = React.useMemo(() => {
     const list = [...PRESET_SHEET_CHECKPOINTS];
-    if (Array.isArray(sheetCheckpoints)) {
-      sheetCheckpoints.forEach((cp: any) => {
-        const cpId = cp.checkpoint_id || cp.id;
-        if (cpId && !list.some((item) => item.id === cpId)) {
-          list.push({
-            id: cpId,
-            label: `${cpId} // ${cp.title || cp.question || cp.label || "Checkpoint"}`,
-          });
-        }
-      });
+    for (const cp of studioCheckpoints) {
+      const cpId = cp.checkpoint_id || cp.node_id;
+      if (cpId && !list.some((item) => item.id === cpId)) {
+        list.push({
+          id: cpId,
+          label: `${cpId} // ${cp.title || cp.question || "Checkpoint"}`,
+        });
+      }
     }
     return list;
-  }, [sheetCheckpoints]);
+  }, [studioCheckpoints]);
 
   const combinedPhotos = React.useMemo(() => {
     const list = [...PRESET_CASE_PHOTOS];
@@ -299,14 +283,11 @@ export function AdminCreatePinModal({
                   labelLower.includes("nghi vấn") ||
                   idLower.includes("phone")
                 ? "cp-000-0"
-                : labelLower.includes("khám xét") ||
-                    idLower.includes("reinvestigate")
-                  ? "cp-000-convergence"
-                  : labelLower.includes("cáo trạng") ||
-                      labelLower.includes("kết luận") ||
-                      idLower.includes("indictment")
-                    ? "cp-000-2b"
-                    : undefined);
+                : labelLower.includes("cáo trạng") ||
+                    labelLower.includes("kết luận") ||
+                    idLower.includes("indictment")
+                  ? "cp-000-2b"
+                  : undefined);
 
       setLabel(initialPin.label || (char ? char.canonicalName : ""));
       setDetail(initialPin.detail || "");
@@ -427,7 +408,7 @@ export function AdminCreatePinModal({
 
     if (syncToSheet) {
       setIsSyncing(true);
-      setSyncStatus("Đang đồng bộ Google Sheets...");
+      setSyncStatus("Đang đồng bộ Checkpoint Studio...");
       try {
         const res = await fetch("/api/admin/pins", {
           method: "POST",
@@ -441,10 +422,10 @@ export function AdminCreatePinModal({
         if (result.success) {
           setSyncStatus("Đã đồng bộ thành công!");
         } else {
-          console.warn("Lỗi sync Google Sheets:", result.error);
+          console.warn("Lỗi sync Checkpoint Studio:", result.error);
         }
       } catch (err) {
-        console.error("Lỗi mạng khi sync Google Sheets:", err);
+        console.error("Lỗi mạng khi sync Checkpoint Studio:", err);
       } finally {
         setIsSyncing(false);
       }
@@ -455,7 +436,7 @@ export function AdminCreatePinModal({
   };
 
   const activeCheckpointLabel =
-    PRESET_SHEET_CHECKPOINTS.find((c) => c.id === checkpointId)?.label ||
+    combinedCheckpoints.find((c) => c.id === checkpointId)?.label ||
     checkpointId;
 
   return (
@@ -944,7 +925,7 @@ export function AdminCreatePinModal({
                 }`}
               >
                 <Link2 className="size-3.5 text-blue-400" />
-                <span>Mở Checkpoint (Sheet CMS)</span>
+                <span>Mở Checkpoint (Studio)</span>
               </button>
             </div>
 
@@ -953,10 +934,10 @@ export function AdminCreatePinModal({
               <div className="space-y-1.5 pt-1.5 border-t border-white/5">
                 <div className="flex items-center justify-between">
                   <label className="block text-[11px] font-mono text-zinc-300">
-                    Chọn Checkpoint CMS từ Google Sheet:
+                    Chọn Checkpoint từ Studio:
                   </label>
                   <span className="text-[10px] font-mono text-emerald-400">
-                    ✓ Quản lý câu hỏi trên Sheet
+                    ✓ Quản lý câu hỏi trong Studio
                   </span>
                 </div>
                 <select
@@ -972,7 +953,7 @@ export function AdminCreatePinModal({
                 </select>
                 <p className="text-[10px] font-mono text-zinc-400 italic">
                   💡 Câu hỏi, đáp án đúng và gợi ý được đồng bộ realtime 100% từ
-                  tab "checkpoints" trên Google Sheet.
+                  Checkpoint Studio (Supabase).
                 </p>
               </div>
             )}
@@ -1002,7 +983,7 @@ export function AdminCreatePinModal({
                   className="rounded border-zinc-700 bg-zinc-900 text-amber-500 focus:ring-0 focus:ring-offset-0"
                 />
                 <span className="text-[11px] font-mono text-zinc-300 flex items-center gap-1">
-                  <span>📊 Đồng bộ Google Sheet</span>
+                  <span>📊 Đồng bộ Checkpoint Studio</span>
                   {isSyncing && <span className="text-amber-400 animate-pulse">...</span>}
                 </span>
               </label>

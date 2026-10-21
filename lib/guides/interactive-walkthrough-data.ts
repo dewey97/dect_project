@@ -15,7 +15,7 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'step-overview',
     stepNumber: 1,
-    totalSteps: 6,
+    totalSteps: 5,
     title: 'Tổng quan bảng điều tra',
     description:
       'Hiển thị toàn bộ hồ sơ đối tượng, các liên kết và tiến trình phá án.',
@@ -24,7 +24,7 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'step-suspects',
     stepNumber: 2,
-    totalSteps: 6,
+    totalSteps: 5,
     title: 'Hồ sơ nghi phạm',
     description:
       'Nơi xác lập đối tượng tình nghi khi chứng minh được đối tượng có:\n• Động cơ gây án\n• Mâu thuẫn trong lời khai hoặc ngoại phạm',
@@ -34,7 +34,7 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   {
     id: 'step-victim-phone',
     stepNumber: 3,
-    totalSteps: 6,
+    totalSteps: 5,
     title: 'Điện thoại nạn nhân',
     description:
       'Nơi lưu trữ các dấu vết số của nạn nhân. Bạn có thể tự thao tác trực tiếp trên điện thoại.',
@@ -42,19 +42,9 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     targetPinId: 'c0-pin-victim-phone'
   },
   {
-    id: 'step-reinvestigate',
-    stepNumber: 4,
-    totalSteps: 6,
-    title: 'Khám xét lại hiện trường',
-    description:
-      'Tương tác trực tiếp với không gian hiện trường số 14 Đường Bờ Sông để tìm kiếm các manh mối vật chứng vi mô, vết máu và đồ vật bị xáo trộn.',
-    targetType: 'pin',
-    targetPinId: 'c0-pin-reinvestigate'
-  },
-  {
     id: 'step-indictment',
-    stepNumber: 5,
-    totalSteps: 6,
+    stepNumber: 4,
+    totalSteps: 5,
     title: 'Kết luận điều tra',
     description:
       'Nơi đưa ra phán quyết cuối cùng về danh tính hung thủ. Tính năng luôn mở nhưng không cung cấp gợi ý, vì vậy hãy cân nhắc thật kỹ trước khi nộp kết luận.',
@@ -63,8 +53,8 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
   },
   {
     id: 'step-quick-menu',
-    stepNumber: 6,
-    totalSteps: 6,
+    stepNumber: 5,
+    totalSteps: 5,
     title: 'Menu thao tác nhanh',
     description:
       'Bao gồm:\n• Gợi ý: Cung cấp manh mối định hướng khi bạn gặp bế tắc.\n• Sổ tay hướng dẫn: Tra cứu lại các chức năng điều tra.\n• Chơi lại từ đầu: Đặt lại toàn bộ tiến trình điều tra về trạng thái ban đầu.',

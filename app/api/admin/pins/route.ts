@@ -2,6 +2,7 @@ import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,8 @@ function createGoogleAuth() {
   }
 
   const relativeKeyPath =
-    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH || "google-service-account.json";
+    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH ||
+    "google-service-account.json";
 
   const absoluteKeyPath = path.resolve(process.cwd(), relativeKeyPath);
   if (fs.existsSync(absoluteKeyPath)) {
@@ -39,17 +41,6 @@ function createGoogleAuth() {
 
 export async function POST(req: NextRequest) {
   try {
-    const auth = createGoogleAuth();
-    if (!auth) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Không tìm thấy Service Account credentials để ghi vào Google Sheet.",
-        },
-        { status: 500 }
-      );
-    }
-
     const body = await req.json();
     const {
       caseId = "case_000",
@@ -60,63 +51,97 @@ export async function POST(req: NextRequest) {
     if (!pin) {
       return NextResponse.json(
         { success: false, error: "Thiếu dữ liệu pin." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const sheets = google.sheets({ version: "v4", auth });
-    const spreadsheetId = DEFAULT_SPREADSHEET_ID;
-
-    // Phân loại ghi vào tab nào:
-    // Nếu actionType là custom_question hoặc có câu hỏi -> checkpoints
-    // Nếu là ảnh, dossier, sticky note -> evidences
+    // Phân loại ghi:
+    // custom question -> Checkpoint Studio (Supabase)
+    // ảnh, dossier, sticky note -> tab evidences (Google Sheets)
     const isCheckpoint =
       target === "checkpoints" ||
       pin.actionType === "custom_question" ||
       Boolean(pin.question);
 
     if (isCheckpoint) {
-      // Tab checkpoints headers:
-      // case_id, checkpoint_id, dossier, title, question, type, answers, answers_id, hints, narrative
-      const checkpointId = pin.checkpointId || pin.id || `cp_${Date.now()}`;
-      const dossier = pin.dossier || "BỘ MỞ RỘNG (WEB PIN)";
-      const title = pin.label || "Câu hỏi suy luận";
-      const question = pin.question || pin.label || "";
-      const type = pin.questionType || "text";
-      const answers = pin.answers || "";
-      const answersId = pin.unlockedEvidenceId || "";
-      const hints = pin.hints || "";
-      const narrative = pin.detail || "";
+      const checkpointId = String(
+        pin.checkpointId || pin.id || `cp_${Date.now()}`,
+      ).trim();
+      const rawAnswers = String(pin.answers || "").trim();
+      const hints = String(pin.hints || "")
+        .split(/\r?\n/)
+        .map((text) => text.trim())
+        .filter(Boolean)
+        .map((text) => ({ group: "general", text }));
 
-      const rowValues = [
-        caseId,
-        checkpointId,
-        dossier,
-        title,
-        question,
-        type,
-        answers,
-        answersId,
-        hints,
-        narrative,
-      ];
-
-      await sheets.spreadsheets.values.append({
-        spreadsheetId,
-        range: "checkpoints!A:J",
-        valueInputOption: "USER_ENTERED",
-        requestBody: {
-          values: [rowValues],
+      const supabase = await createClient();
+      const { error } = await supabase.from("case_checkpoints").upsert(
+        {
+          case_id: String(caseId).trim().toLowerCase().replace(/-/g, "_"),
+          checkpoint_id: checkpointId,
+          node_id: checkpointId,
+          dossier: pin.dossier || "BỘ MỞ RỘNG (WEB PIN)",
+          title: pin.label || "Câu hỏi suy luận",
+          question: pin.question || pin.label || "",
+          type: pin.questionType || "text",
+          question_type: pin.questionType || "text",
+          unlocked_evidence_id: pin.unlockedEvidenceId || null,
+          answer_config: {
+            rawAnswers,
+            options: [],
+            correctAnswer: null,
+            validSuspects: [],
+            validMotives: [],
+            requiredEvidenceIds: [],
+            optionalEvidenceIds: [],
+            motiveEvidenceIds: [],
+            optionalMotiveIds: [],
+            alibiEvidenceIds: [],
+            optionalAlibiIds: [],
+            contradictionEvidenceIds: [],
+            optionalContradictionIds: [],
+            textMatchInputs: [],
+            photoCodes: [],
+            availableEvidences: [],
+          },
+          hints,
+          narrative: pin.detail || null,
+          updated_at: new Date().toISOString(),
         },
-      });
+        { onConflict: "case_id,checkpoint_id" },
+      );
+
+      if (error) {
+        return NextResponse.json(
+          { success: false, error: error.message },
+          { status: 500 },
+        );
+      }
 
       return NextResponse.json({
         success: true,
         tab: "checkpoints",
         checkpointId,
-        message: `Đã đồng bộ checkpoint [${checkpointId}] lên Google Sheet tab checkpoints!`,
+        message: `Đã đồng bộ checkpoint [${checkpointId}] vào Checkpoint Studio!`,
       });
-    } else {
+    }
+
+    const auth = createGoogleAuth();
+    if (!auth) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Không tìm thấy Service Account credentials để ghi vào Google Sheet.",
+        },
+        { status: 500 },
+      );
+    }
+
+    const sheets = google.sheets({ version: "v4", auth });
+    const spreadsheetId = DEFAULT_SPREADSHEET_ID;
+
+    {
       // Tab evidences headers:
       // case_id, code, bộ hồ sơ, label, category, pin_on_board, is_suspect, drive_url, description
       const code = pin.id || `pin_${Date.now()}`;
@@ -157,13 +182,13 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (error: any) {
-    console.error("Lỗi khi ghi vào Google Sheets:", error);
+    console.error("Lỗi khi đồng bộ pin:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Lỗi không xác định khi ghi vào Google Sheets.",
+        error: error.message || "Lỗi không xác định khi đồng bộ pin.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -104,6 +104,8 @@ export interface DbCaseCheckpoint {
   followup_of: string | null;
   suspect_label: string | null;
   evidence_step_label: string | null;
+  depends_on: string[];
+  flow_position: { x: number; y: number } | null;
   answer_config: Record<string, unknown>;
   hints: unknown;
   narrative: string | null;

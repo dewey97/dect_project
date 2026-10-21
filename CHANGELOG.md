@@ -2,6 +2,44 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-10-21]
+
+### Added
+
+- **Checkpoint dependency graph & Flow view (`/studio/checkpoints`)**:
+  - Cột `case_checkpoints.depends_on TEXT[]` + GIN index (`db/schema/17_case_checkpoint_dependencies.sql`).
+  - Graph engine `lib/cms/checkpoint-graph.ts`: dựng cạnh, gợi ý từ `followup_of` / `requiredEvidenceIds`, chặn cycle, layout theo tầng.
+  - React Flow view `components/admin/checkpoint-studio/checkpoint-flow-view.tsx`: kéo nối, xóa cạnh, nhận gợi ý, Fit, tự sắp xếp; mobile read-only.
+  - Server action `updateCheckpointDependencies()` validate batch và chỉ ghi `depends_on`.
+  - Form/Flow toggle trong Checkpoint Studio; dirty tracking độc lập cho form và sơ đồ.
+  - Xóa checkpoint tự dọn tham chiếu trong `depends_on`; khóa đổi `checkpoint_id` sau khi tạo.
+  - Gợi ý cạnh không hardcode tên nhân vật/tên bộ hồ sơ, dùng khóa tham chiếu CMS tự do.
+
+### Changed
+
+- **Runtime checkpoint chuyển sang Checkpoint Studio (Supabase)**:
+  - Thêm `app/api/checkpoints/route.ts` (`force-dynamic`, `no-store`) và hook `useStudioCheckpoints` (memory cache 30s, dedupe request).
+  - Thêm `lib/cms/checkpoint-runtime.ts` map row `case_checkpoints` sang `Checkpoint` runtime.
+  - `useCaseCheckpoints` ghép checkpoint từ Studio với evidences từ Google Sheets; không còn đọc tab `checkpoints`.
+  - `hint-modal`, `checkpoint-hint-section`, `use-active-checkpoint-hints` đọc dữ liệu Studio.
+  - Migration `db/schema/18_case_checkpoints_public_read.sql` mở quyền đọc public cho runtime.
+- **UI quản lý checkpoint theo Node ID**:
+  - Sidebar, node flow, nhãn cạnh và cảnh báo phụ thuộc hiển thị `node_id` thay vì `checkpoint_id`.
+  - Admin pin modal lấy danh sách checkpoint từ Studio/Supabase thay vì preset Sheet.
+- **Gỡ checkpoint "Khám xét lại" khỏi bàn điều tra**: xóa base pin `c0-pin-reinvestigate`, fallback hội tụ trong `pin-builder.ts`, pin preset và step walkthrough.
+- **Lưu vị trí node trên Flow view**:
+  - Thêm cột `case_checkpoints.flow_position JSONB` (`db/schema/19_case_checkpoint_flow_positions.sql`).
+  - Server action `updateCheckpointPositions()` ghi batch vị trí.
+  - Kéo node hoặc bấm Tự sắp xếp sẽ đánh dấu sơ đồ chưa lưu; nút **Lưu sơ đồ** ghi cả `depends_on` và `flow_position`.
+- **Bố cục lại Checkpoint Studio**:
+  - Danh sách node chuyển sang bên phải; bỏ bộ lọc và badge bộ hồ sơ khỏi danh sách.
+  - Flow view gom node theo lane bộ hồ sơ (`dossier`) để thấy checkpoint thuộc bộ nào.
+
+### Notes
+
+- Google Sheets chỉ còn quản lý tab `evidences`.
+- `checkpoint_id` vẫn là khóa kỹ thuật nội bộ của đồ thị phụ thuộc.
+
 ## [2026-10-20]
 
 ### Added

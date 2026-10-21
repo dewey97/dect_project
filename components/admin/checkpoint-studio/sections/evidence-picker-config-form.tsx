@@ -139,7 +139,7 @@ export function EvidencePickerConfigForm({
           <CodeChipInput
             value={config.validSuspects}
             onChange={(value) => setList("validSuspects", value)}
-            placeholder="Trần Thị Hà…"
+            placeholder="mã hoặc tên đối tượng…"
           />
         </Field>
         <Field label="Động cơ hợp lệ">

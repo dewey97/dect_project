@@ -1,8 +1,7 @@
 -- ==============================================================================
 -- Table: case_checkpoints
--- Mô tả: Nguồn dữ liệu có cấu trúc cho Checkpoint Studio (Admin).
--- Runtime gameplay hiện vẫn đọc tab `checkpoints` từ Google Sheets.
--- Bảng này chưa được nối vào runtime — chỉ phục vụ biên tập trong Studio.
+-- Mô tả: Nguồn dữ liệu checkpoint cho cả Checkpoint Studio (Admin) và runtime.
+-- Runtime đọc qua /api/checkpoints; Google Sheets chỉ còn tab `evidences`.
 -- ==============================================================================
 
 CREATE TABLE IF NOT EXISTS public.case_checkpoints (

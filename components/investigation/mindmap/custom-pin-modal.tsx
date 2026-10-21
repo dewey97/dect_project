@@ -57,7 +57,7 @@ export function CustomPinModal({
   } | null>(null);
   const [isSolved, setIsSolved] = useState(false);
 
-  // Fetch live checkpoints from Google Sheets Live CMS
+  // Fetch live checkpoints from Checkpoint Studio (Supabase)
   const { checkpoints } = useCaseCheckpoints(caseId);
 
   // Auto-detect target checkpoint ID strictly for actual question/checkpoint pins
@@ -66,11 +66,16 @@ export function CustomPinModal({
     if (pin.checkpointId) return pin.checkpointId;
 
     // Chỉ nhận diện checkpoint nếu node có actionType rõ ràng là checkpoint/câu hỏi
-    if (pin.actionType === "sheet_checkpoint" || pin.actionType === "custom_question") {
+    if (
+      pin.actionType === "sheet_checkpoint" ||
+      pin.actionType === "custom_question"
+    ) {
       const pid = (pin.id || "").toLowerCase();
 
       // Direct match from live checkpoints
-      const directMatch = checkpoints.find((c) => c.id.toLowerCase() === pid || pid.endsWith(c.id.toLowerCase()));
+      const directMatch = checkpoints.find(
+        (c) => c.id.toLowerCase() === pid || pid.endsWith(c.id.toLowerCase()),
+      );
       if (directMatch) return directMatch.id;
 
       if (pid === "c0-pin-phone") return "cp-000-0";
@@ -80,18 +85,24 @@ export function CustomPinModal({
       if (pid === "c0-pin-indictment") return "cp-000-2b";
       if (pid === "c0-pin-reinvestigate") return "cp-000-convergence";
 
-      const text = `${pid} ${pin.label || ""} ${pin.detail || ""}`.toLowerCase();
+      const text =
+        `${pid} ${pin.label || ""} ${pin.detail || ""}`.toLowerCase();
       const titleMatch = checkpoints.find(
-        (c) => text.includes(c.title?.toLowerCase() || "") || (c.dossier && text.includes(`hồ sơ ${c.dossier.toLowerCase()}`))
+        (c) =>
+          text.includes(c.title?.toLowerCase() || "") ||
+          (c.dossier && text.includes(`hồ sơ ${c.dossier.toLowerCase()}`)),
       );
       if (titleMatch) return titleMatch.id;
 
       if (text.includes("vũ") || text.includes("vu")) return "cp-000-1a";
       if (text.includes("tùng") || text.includes("tung")) return "cp-000-1b";
       if (text.includes("hà") || text.includes("ha")) return "cp-000-1c";
-      if (text.includes("sđt") || text.includes("điện thoại")) return "cp-000-0";
-      if (text.includes("cáo trạng") || text.includes("định tội")) return "cp-000-2b";
-      if (text.includes("khám xét") || text.includes("hội tụ")) return "cp-000-convergence";
+      if (text.includes("sđt") || text.includes("điện thoại"))
+        return "cp-000-0";
+      if (text.includes("cáo trạng") || text.includes("định tội"))
+        return "cp-000-2b";
+      if (text.includes("khám xét") || text.includes("hội tụ"))
+        return "cp-000-convergence";
     }
 
     return "";
@@ -140,7 +151,10 @@ export function CustomPinModal({
 
   // Graded hints extracted strictly from live Sheet checkpoint (or pin.hints)
   const hintsList = useMemo<string[]>(() => {
-    if (matchedCheckpoint?.hintsList && matchedCheckpoint.hintsList.length > 0) {
+    if (
+      matchedCheckpoint?.hintsList &&
+      matchedCheckpoint.hintsList.length > 0
+    ) {
       return matchedCheckpoint.hintsList;
     }
     if (matchedCheckpoint?.hint) {
@@ -190,7 +204,7 @@ export function CustomPinModal({
       const hasAllRequiredEvidences =
         requiredEvs.length === 0 ||
         requiredEvs.every((req) =>
-          selectedEvidences.some((sel) => isEvidenceMatching(sel, [req]))
+          selectedEvidences.some((sel) => isEvidenceMatching(sel, [req])),
         );
 
       if (isSuspectCorrect && hasAllRequiredEvidences) {
@@ -207,14 +221,14 @@ export function CustomPinModal({
       const val2 = phoneInput2.trim().toLowerCase();
       const val3 = phoneInput3.trim().toLowerCase();
 
-      const check1 = (inputsConfig[0]?.validAnswers || []).some(
-        (a) => isVietnameseTextMatch(val1, a),
+      const check1 = (inputsConfig[0]?.validAnswers || []).some((a) =>
+        isVietnameseTextMatch(val1, a),
       );
-      const check2 = (inputsConfig[1]?.validAnswers || []).some(
-        (a) => isVietnameseTextMatch(val2, a),
+      const check2 = (inputsConfig[1]?.validAnswers || []).some((a) =>
+        isVietnameseTextMatch(val2, a),
       );
-      const check3 = (inputsConfig[2]?.validAnswers || []).some(
-        (a) => isVietnameseTextMatch(val3, a),
+      const check3 = (inputsConfig[2]?.validAnswers || []).some((a) =>
+        isVietnameseTextMatch(val3, a),
       );
 
       if (check1 && check2 && check3) {
@@ -486,7 +500,9 @@ export function CustomPinModal({
                               disabled={activeHintIdx === 0}
                               onClick={() => {
                                 detectiveAudio.playTypewriterClick();
-                                setActiveHintIdx((prev) => Math.max(prev - 1, 0));
+                                setActiveHintIdx((prev) =>
+                                  Math.max(prev - 1, 0),
+                                );
                               }}
                               className="p-0.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] disabled:opacity-30 disabled:cursor-not-allowed border border-[#4a3520] cursor-pointer"
                               title="Gợi ý trước"
@@ -498,7 +514,9 @@ export function CustomPinModal({
                               disabled={activeHintIdx >= hintsList.length - 1}
                               onClick={() => {
                                 detectiveAudio.playTypewriterClick();
-                                setActiveHintIdx((prev) => Math.min(prev + 1, hintsList.length - 1));
+                                setActiveHintIdx((prev) =>
+                                  Math.min(prev + 1, hintsList.length - 1),
+                                );
                               }}
                               className="p-0.5 bg-[#dfd3bd] hover:bg-[#d4c5ab] disabled:opacity-30 disabled:cursor-not-allowed border border-[#4a3520] cursor-pointer"
                               title="Gợi ý sâu hơn"
