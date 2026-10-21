@@ -78,6 +78,12 @@ interface CheckpointNodeData extends Record<string, unknown> {
   hintCount: number;
   evidenceCount: number;
   isSelected: boolean;
+  unlockedDossier?: {
+    name: string;
+    count: number;
+    dossierObj?: DbCaseDossier;
+  };
+  onDossierClick?: (dossierOrName: DbCaseDossier | string) => void;
 }
 
 type CheckpointFlowNode = Node<CheckpointNodeData, "checkpoint">;
@@ -134,7 +140,14 @@ function CheckpointFlowNodeCard({
   data,
   selected,
 }: NodeProps<CheckpointFlowNode>) {
-  const { row, issueLabels, hintCount: hints, evidenceCount: evidences } = data;
+  const {
+    row,
+    issueLabels,
+    hintCount: hints,
+    evidenceCount: evidences,
+    unlockedDossier,
+    onDossierClick,
+  } = data;
   const active = selected || data.isSelected;
   const isEpilogue = row.type === "epilogue" || row.checkpoint_id.includes("epilogue");
 
@@ -174,17 +187,6 @@ function CheckpointFlowNodeCard({
           width: 10,
           height: 10,
           background: isEpilogue ? "#10b981" : "#fbbf24",
-          border: "2px solid #101014",
-        }}
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="bottom"
-        style={{
-          width: 8,
-          height: 8,
-          background: "#a855f7",
           border: "2px solid #101014",
         }}
       />
@@ -238,6 +240,31 @@ function CheckpointFlowNodeCard({
           </>
         )}
       </div>
+
+      {unlockedDossier && (
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            if (unlockedDossier.dossierObj) {
+              onDossierClick?.(unlockedDossier.dossierObj);
+            } else {
+              onDossierClick?.(unlockedDossier.name);
+            }
+          }}
+          className="mt-2.5 flex items-center justify-between rounded-lg border border-purple-500/35 bg-purple-950/30 px-2 py-1.5 text-purple-200 transition-colors hover:border-purple-400 hover:bg-purple-900/40 cursor-pointer group"
+          title="Bấm để quản lý tài liệu trong bộ hồ sơ này"
+        >
+          <div className="flex items-center gap-1.5 min-w-0">
+            <FolderOpen className="size-3.5 shrink-0 text-purple-400 group-hover:scale-110 transition-transform" />
+            <span className="truncate font-mono text-[10px] font-bold tracking-tight uppercase text-purple-100">
+              Mở: {unlockedDossier.name}
+            </span>
+          </div>
+          <span className="shrink-0 rounded bg-purple-500/20 px-1.5 py-0.2 font-mono text-[9px] font-semibold text-purple-300">
+            {unlockedDossier.count} tài liệu
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -501,6 +528,36 @@ export function CheckpointFlowView({
           saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)
             ? saved
             : null;
+
+        // Kiểm tra xem checkpoint này có mở khóa Bộ hồ sơ nào không
+        const unlocked = (row.answer_config as any)?.unlocksDossier?.trim();
+        let unlockedDossier:
+          | {
+              name: string;
+              count: number;
+              dossierObj?: DbCaseDossier;
+            }
+          | undefined = undefined;
+
+        if (unlocked) {
+          const matchedInfo = Array.from(dossiersMap.entries()).find(
+            ([k, v]) =>
+              k.toLowerCase() === unlocked.toLowerCase() ||
+              v.dossierObj?.dossier_key.toLowerCase() === unlocked.toLowerCase(),
+          );
+          const dName = matchedInfo ? matchedInfo[0] : unlocked;
+          const dObj = matchedInfo ? matchedInfo[1].dossierObj : undefined;
+          const docCount = dObj?.document_codes
+            ? dObj.document_codes.length
+            : countDocumentsForDossier(dName, dossierDocs);
+
+          unlockedDossier = {
+            name: dName,
+            count: docCount,
+            dossierObj: dObj,
+          };
+        }
+
         return {
           id: row.checkpoint_id,
           type: "checkpoint" as const,
@@ -514,13 +571,15 @@ export function CheckpointFlowView({
             hintCount: hintCount(row),
             evidenceCount: evidenceCount(row),
             isSelected: row.id === selectedId,
+            unlockedDossier,
+            onDossierClick,
           },
           selected: row.id === selectedId,
           zIndex: 1,
         };
       });
 
-      // 2. Dossier square box nodes - neo trực tiếp bên dưới Checkpoint mở khóa
+      // 2. Dossier square box nodes - CHỈ TẠO CHO CÁC BỘ ĐỘC LẬP (ví dụ bộ khởi đầu chưa ai mở khóa)
       const cpPositions = new Map<string, { x: number; y: number }>();
       for (const cp of cpNodes) {
         cpPositions.set(cp.id, cp.position);
@@ -529,7 +588,11 @@ export function CheckpointFlowView({
       // Vị trí mặc định tham chiếu nếu là bộ "Ban Đầu" (chưa ai mở khóa)
       const firstCp = cpNodes[0]?.position ?? { x: 0, y: 0 };
 
-      const dNodes: DossierNode[] = Array.from(dossiersMap, ([label, info]) => {
+      const unattachedDossiers = Array.from(dossiersMap).filter(
+        ([, info]) => !info.unlockedBy,
+      );
+
+      const dNodes: DossierNode[] = unattachedDossiers.map(([label, info]) => {
         // Lấy số tài liệu trực tiếp từ cấu hình case_dossiers nếu có
         const docCount = info.dossierObj?.document_codes
           ? info.dossierObj.document_codes.length
@@ -537,29 +600,24 @@ export function CheckpointFlowView({
 
         let finalPos = { x: firstCp.x - 160, y: firstCp.y + 10 };
 
-        if (info.unlockedBy) {
-          const parentPos = cpPositions.get(info.unlockedBy.checkpoint_id) ??
-            info.unlockedBy.flow_position ??
-            layout[info.unlockedBy.checkpoint_id] ?? { x: 0, y: 0 };
-          // Checkpoint rộng 260px, Dossier Box rộng 120px => Căn giữa: parent.x + (260 - 120) / 2 = parent.x + 70
-          // Đặt ngay bên dưới cách 165px
-          finalPos = {
-            x: Math.round(parentPos.x + 70),
-            y: Math.round(parentPos.y + 165),
-          };
-        } else {
-          // Nếu không có ai unlock (ví dụ bộ khởi đầu hoặc gom chung):
-          const xs = info.group.map(
-            (r) => cpPositions.get(r.checkpoint_id)?.x ?? r.flow_position?.x ?? layout[r.checkpoint_id]?.x ?? 0,
-          );
-          const ys = info.group.map(
-            (r) => cpPositions.get(r.checkpoint_id)?.y ?? r.flow_position?.y ?? layout[r.checkpoint_id]?.y ?? 0,
-          );
-          if (xs.length > 0) {
-            const minX = Math.min(...xs);
-            const avgY = Math.round(ys.reduce((a, b) => a + b, 0) / ys.length);
-            finalPos = { x: minX - 160, y: avgY };
-          }
+        const xs = info.group.map(
+          (r) =>
+            cpPositions.get(r.checkpoint_id)?.x ??
+            r.flow_position?.x ??
+            layout[r.checkpoint_id]?.x ??
+            0,
+        );
+        const ys = info.group.map(
+          (r) =>
+            cpPositions.get(r.checkpoint_id)?.y ??
+            r.flow_position?.y ??
+            layout[r.checkpoint_id]?.y ??
+            0,
+        );
+        if (xs.length > 0) {
+          const minX = Math.min(...xs);
+          const avgY = Math.round(ys.reduce((a, b) => a + b, 0) / ys.length);
+          finalPos = { x: minX - 160, y: avgY };
         }
 
         return {
@@ -589,6 +647,7 @@ export function CheckpointFlowView({
     dossierDocs,
     isDesktop,
     setNodes,
+    onDossierClick,
   ]);
 
   useEffect(() => {
@@ -635,30 +694,8 @@ export function CheckpointFlowView({
       return dossierLabels.get(name.toLowerCase().trim()) || name.trim();
     };
 
-    // 1. Cạnh mở khóa: từ Checkpoint giải xong -> Bộ Hồ Sơ được mở
-    for (const row of rows) {
-      const unlocked = (row.answer_config as any)?.unlocksDossier?.trim();
-      if (unlocked) {
-        const targetLabel = resolveLabel(unlocked);
-        list.push({
-          id: `unlock-dossier:${row.checkpoint_id}->${targetLabel}`,
-          source: row.checkpoint_id,
-          sourceHandle: "bottom",
-          target: `dossier-node:${targetLabel}`,
-          targetHandle: "top",
-          type: "smoothstep",
-          animated: false,
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 14,
-            height: 14,
-            color: "#a855f7",
-          },
-          style: { stroke: "#a855f7", strokeWidth: 1.8 },
-        });
-      }
-    }
-
+    // 1. Cạnh mở khóa: bộ hồ sơ hiện đã được gắn trực tiếp thành badge/footer trong chính Checkpoint
+    // nên không cần vẽ thêm cạnh riêng cho bộ được mở khóa nữa.
     return list;
   }, [rows, dossiers]);
 
@@ -924,27 +961,6 @@ export function CheckpointFlowView({
               handleDossierPositionChange(node.id, node.position);
             } else {
               onNodePositionChange(node.id, node.position);
-
-              // Tự động neo lại vị trí bộ hồ sơ mở khóa trực tiếp dưới checkpoint vừa di chuyển
-              const draggedRow = rows.find((item) => item.checkpoint_id === node.id);
-              const unlocked = (draggedRow?.answer_config as any)?.unlocksDossier?.trim();
-              if (unlocked) {
-                const dossierNodeId = `dossier-node:${unlocked}`;
-                setNodes((current) =>
-                  current.map((n) => {
-                    if (n.id.toLowerCase() === dossierNodeId.toLowerCase()) {
-                      return {
-                        ...n,
-                        position: {
-                          x: Math.round(node.position.x + 70),
-                          y: Math.round(node.position.y + 165),
-                        },
-                      };
-                    }
-                    return n;
-                  }),
-                );
-              }
             }
           }}
           onEdgeClick={(_, edge) => setSelectedEdgeId(edge.id)}

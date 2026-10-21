@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   // Map / Dossier / Checkpoint Studio require edge-to-edge canvas without default p-8 padding
   const isFullBleedStudio =
