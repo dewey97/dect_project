@@ -4,6 +4,14 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-21]
 
+### Fixed
+
+- **Landing 360 keyhole section (`#hien-truong-360`)**:
+  - Gốc lỗi: `html, body { overflow-x: hidden }` biến body thành scroll container không cuộn ⇒ `position: sticky` mất tác dụng, section cao `340vh` chỉ dính 1 màn hình đầu rồi để lại 240vh đen. Đổi sang `overflow-x: clip` (giữ chặn tràn ngang, không tạo scroll container).
+  - Dựng lại mặt khoá + lỗ aperture bằng một SVG duy nhất trong cùng hệ toạ độ, scale tính theo viewport để hết scroll thì lỗ phủ kín màn hình.
+  - Bỏ `LandingKeyholeModel` (Three.js + `keyhole.glb` 6.6MB + HDR `Environment` tải từ CDN) khỏi landing; hardware SVG fade dần khi camera xuyên qua.
+  - Panorama landing dùng `PANORAMA.webp` (`3072×1715`, 0.46MB) thay `PANORAMA.png` 10.1MB; bản PNG giữ nguyên cho `Scene360Viewer`.
+
 ### Added
 
 - **Checkpoint dependency graph & Flow view (`/studio/checkpoints`)**:

@@ -104,8 +104,15 @@ Sử dụng 2 họ font chính:
 - **Dark Mode Workspace Scrollbar**: Thanh cuộn siêu mảnh ($6\text{ px}$), không nút bấm, nền trong suốt hoàn toàn, thanh trượt màu hổ phách mờ (`rgba(180, 130, 80, 0.35)`) và sáng lên khi hover.
 - **Paper Scrollbar (`.paper-scrollbar`, `[data-paper-modal]`)**: Dành riêng cho các modal tài liệu giấy cũ (`AddSuspectModal`, `FollowupQuestionModal`), sử dụng tông màu nâu gỗ đất cổ điển (`rgba(92, 64, 38, 0.3)`), hài hòa 100% với nền giấy kraft vàng.
 
-### 4. Trung Tâm Tải Tài Nguyên & Banner Mạng Xã Hội (Brand Asset Download Center):
-Áp dụng tại trang `app/brand/page.tsx`:
+### 4. Hiệu Ứng Nhìn Qua Ổ Khoá — Landing 360 (`LandingScene360Showcase`):
+Áp dụng tại `components/public/landing-scene-360-showcase.tsx`:
+- **Một SVG duy nhất**: mặt khoá đồng thau và lỗ aperture nằm trong cùng một hệ toạ độ + cùng một `<mask>`, nên mép cắt luôn khớp tuyệt đối ở mọi mức zoom.
+- **Scale tính theo viewport**: `scaleEnd = (w / 34) × 1.08` để hết scroll thì lỗ keyhole phủ kín màn hình; zoom dùng nội suy mũ (tốc độ zoom cảm nhận không đổi).
+- **Hardware fade**: mặt khoá + bevel mờ dần khi `eased > 0.6` để vòng bevel không trôi lơ lửng trên cảnh sau khi đã xuyên qua.
+- **Sticky & overflow**: `html, body` phải dùng `overflow-x: clip`, **tuyệt đối không dùng `hidden`** — `hidden` biến body thành scroll container không cuộn và vô hiệu hoá toàn bộ `position: sticky` trong app.
+- **Asset**: dùng `PANORAMA.webp` (0.46MB) cho landing; `PANORAMA.png` giữ cho `Scene360Viewer`.
+
+### 5. Trung Tâm Tải Tài Nguyên & Banner Mạng Xã Hội (Brand Asset Download Center):Áp dụng tại trang `app/brand/page.tsx`:
 - **OpenGraph Social Banner (Featured)**: Hiển thị khung xem trước độ nét cao tỉ lệ vàng $1.91 : 1$ ($1200 \times 630\text{ px}$) kèm nút tải trực tiếp file `xplore_og_image.jpg`.
 - **Bộ nhận diện chuẩn hóa 3 khối**: Khung tải Logo chính ($1920 \times 1080$), Biểu tượng X ($512 \times 512$), và Gói Favicon trình duyệt đa kích thước ($16\times16$, $32\times32$, $48\times48$).
 
