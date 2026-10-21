@@ -12,6 +12,7 @@ import {
   SLOT_CY,
   SLOT_PATH,
 } from "./landing-keyhole-model";
+import { LandingMagnifierModel } from "./landing-magnifier-model";
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const PANORAMA = "/images/cases/case_000/PANORAMA.webp";
@@ -83,6 +84,7 @@ export function LandingScene360Showcase() {
   const modelOpacity = 1 - fadeRaw * fadeRaw * (3 - 2 * fadeRaw);
   // Follow up by opening the black surround
   const maskOpacity = 1 - clamp01((p - 0.87) / 0.08);
+  const portalRadius = size.w > 0 ? size.w / 2 : 240;
   // Blow the aperture open around the screen centre
   const maskSpread = 1 + clamp01((p - 0.78) / 0.07) * 2.6;
 
@@ -114,7 +116,7 @@ export function LandingScene360Showcase() {
     <section
       ref={sectionRef}
       id="hien-truong-360"
-      aria-label="Hiện trường vụ án 000 — nhìn qua ổ khoá"
+      aria-label="Hiện trường vụ án 000 — nhìn qua kính lúp thám tử"
       className={
         reduced ? "relative h-[100dvh] w-full" : "relative h-[280vh] w-full"
       }
@@ -133,13 +135,13 @@ export function LandingScene360Showcase() {
               Ánh Mắt Nhìn Thấu Qua Khe Cửa
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground font-mono leading-relaxed">
-              Căn phòng nơi nạn nhân tử vong bị khóa trái từ bên trong. Ghé mắt qua lỗ khóa cũ kỹ để nhìn thấu không gian hiện trường 360 độ và phát hiện các dấu vết chưa từng được ghi nhận.
+              Căn phòng nơi nạn nhân tử vong bị khóa trái từ bên trong. Ghé mắt qua kính lúp quang học để soi chiếu từng góc cạnh hiện trường 360 độ và phát hiện các dấu vết chưa từng được ghi nhận.
             </p>
 
             {/* Sleek Progress Line */}
             <div className="w-full max-w-xs mt-3 flex flex-col gap-1.5 font-mono">
               <div className="flex items-center justify-between text-[0.7rem] text-muted-foreground tracking-wider uppercase">
-                <span>Tiến độ khám xét</span>
+                <span>Tiến độ phóng đại kính lúp</span>
                 <span className="text-amber-400 font-semibold">{Math.round(progress * 100)}%</span>
               </div>
               <div className="w-full h-1 bg-zinc-800/80 rounded-full overflow-hidden">
@@ -151,93 +153,106 @@ export function LandingScene360Showcase() {
             </div>
           </div>
 
-          {/* Right Column: Keyhole Portal Stage */}
-          <div className="relative w-full flex items-center justify-center lg:justify-end">
-            <div
-              ref={portalRef}
-              className="relative w-full max-w-[420px] sm:max-w-[460px] lg:max-w-[500px] h-[360px] sm:h-[440px] lg:h-[520px] rounded-3xl overflow-hidden bg-[#070503] shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
-              style={{
-                WebkitMaskImage:
-                  "radial-gradient(ellipse 96% 96% at 50% 50%, black 76%, transparent 100%)",
-                maskImage:
-                  "radial-gradient(ellipse 96% 96% at 50% 50%, black 76%, transparent 100%)",
-              }}
-            >
-              {/* Room seen through the keyway */}
+          {/* Right Column: Detective Magnifying Glass Stage */}
+          <div className="relative w-full flex items-center justify-center lg:justify-end py-6">
+            <div className="relative">
+              {/* 1. Circular Magnifying Glass Lens Portal (Khung nhìn tròn qua thấu kính) */}
               <div
-                aria-hidden="true"
-                className="absolute inset-0 z-0"
+                ref={portalRef}
+                className="relative z-10 w-[310px] h-[310px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px] xl:w-[520px] xl:h-[520px] rounded-full overflow-hidden bg-[#070503]"
                 style={{
-                  backgroundImage: `url(${PANORAMA})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  transform: `scale(${1.04 + eased * 0.5 + clamp01((p - 0.72) / 0.28) * 0.26})`,
-                  filter: `brightness(${brightness}) saturate(1.05)`,
-                  willChange: "transform, filter",
+                  boxShadow: "0 0 50px rgba(245,158,11,0.12)",
                 }}
-              />
-
-              {/* Everything outside the projected keyway stays softly shadowed */}
-              <svg
-                aria-hidden="true"
-                className="absolute inset-0 z-10 h-full w-full pointer-events-none"
-                viewBox={`0 0 ${Math.max(1, w)} ${Math.max(1, h)}`}
-                preserveAspectRatio="none"
               >
-                <defs>
-                  <filter id="keyhole-soft-blur" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur stdDeviation={blurAmount.toFixed(1)} />
-                  </filter>
-                  <mask id="keyhole-mask" maskUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="100%" height="100%" fill="#fff" />
-                    {maskPath ? (
-                      <path
-                        d={maskPath}
-                        fill="#000"
-                        filter="url(#keyhole-soft-blur)"
-                      />
-                    ) : null}
-                  </mask>
-                </defs>
-                <rect
-                  x="0"
-                  y="0"
-                  width="100%"
-                  height="100%"
-                  fill="#070503"
-                  fillOpacity={maskOpacity}
-                  mask="url(#keyhole-mask)"
+                {/* Room seen through the keyway */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 z-0"
+                  style={{
+                    backgroundImage: `url(${PANORAMA})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    transform: `scale(${1.04 + eased * 0.5 + clamp01((p - 0.72) / 0.28) * 0.26})`,
+                    filter: `brightness(${brightness}) saturate(1.05)`,
+                    willChange: "transform, filter",
+                  }}
                 />
 
-                {/* Subtle light leak / warm amber rim glow around the keyhole opening */}
-                {maskPath && maskOpacity > 0.05 ? (
-                  <path
-                    d={maskPath}
-                    fill="none"
-                    stroke="rgba(245, 158, 11, 0.4)"
-                    strokeWidth={Math.max(1.5, 3 * (1 - p * 0.8))}
-                    opacity={Math.min(1, Math.max(0, 1 - p * 1.2))}
-                    style={{ filter: "blur(2.5px)" }}
+                {/* Everything outside the projected keyway stays softly shadowed */}
+                <svg
+                  aria-hidden="true"
+                  className="absolute inset-0 z-10 h-full w-full pointer-events-none"
+                  viewBox={`0 0 ${Math.max(1, w)} ${Math.max(1, h)}`}
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <filter id="keyhole-soft-blur" x="-30%" y="-30%" width="160%" height="160%">
+                      <feGaussianBlur stdDeviation={blurAmount.toFixed(1)} />
+                    </filter>
+                    <mask id="keyhole-mask" maskUnits="userSpaceOnUse">
+                      <rect x="0" y="0" width="100%" height="100%" fill="#fff" />
+                      {maskPath ? (
+                        <path
+                          d={maskPath}
+                          fill="#000"
+                          filter="url(#keyhole-soft-blur)"
+                        />
+                      ) : null}
+                    </mask>
+                  </defs>
+                  <rect
+                    x="0"
+                    y="0"
+                    width="100%"
+                    height="100%"
+                    fill="#070503"
+                    fillOpacity={maskOpacity}
+                    mask="url(#keyhole-mask)"
                   />
-                ) : null}
-              </svg>
 
-              <LandingKeyholeModel
-                distance={distance}
-                pitch={pitch}
-                lookY={lookY}
-                opacity={modelOpacity}
-              />
+                  {/* Subtle light leak / warm amber rim glow around the keyhole opening */}
+                  {maskPath && maskOpacity > 0.05 ? (
+                    <path
+                      d={maskPath}
+                      fill="none"
+                      stroke="rgba(245, 158, 11, 0.4)"
+                      strokeWidth={Math.max(1.5, 3 * (1 - p * 0.8))}
+                      opacity={Math.min(1, Math.max(0, 1 - p * 1.2))}
+                      style={{ filter: "blur(2.5px)" }}
+                    />
+                  ) : null}
+                </svg>
 
-              {/* Cinematic vignette inside the portal */}
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 z-30 pointer-events-none"
-                style={{
-                  background:
-                    "radial-gradient(ellipse 72% 62% at 50% 50%, transparent 0%, rgba(5,4,3,0.6) 100%)",
-                }}
-              />
+                <LandingKeyholeModel
+                  distance={distance}
+                  pitch={pitch}
+                  lookY={lookY}
+                  opacity={modelOpacity}
+                />
+
+                {/* Glass Glare Sheen Reflection (Vệt phản quang mặt kính quang học) */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-full z-25"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 32%, transparent 48%, rgba(245,158,11,0.06) 100%)",
+                  }}
+                />
+
+                {/* Cinematic vignette inside the lens */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 z-30 pointer-events-none"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 50% 50%, transparent 45%, rgba(5,4,3,0.55) 85%, rgba(0,0,0,0.85) 100%)",
+                  }}
+                />
+              </div>
+
+              {/* 2. Genuine 3D Magnifying Glass Model (Model 3D kính lúp với tay cầm cố định góc dưới trái) */}
+              <LandingMagnifierModel portalRadius={portalRadius} />
             </div>
           </div>
         </div>
