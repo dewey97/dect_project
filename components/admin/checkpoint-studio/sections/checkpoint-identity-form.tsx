@@ -9,27 +9,22 @@ interface CheckpointIdentityFormProps {
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
 }
 
+const INPUT_CLASS = "h-7 border-white/10 bg-black/30 text-xs";
+
 function Field({
   label,
-  hint,
   required,
   children,
 }: {
   label: string;
-  hint?: string;
   required?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <label className="block space-y-1.5">
-      <span className="flex items-baseline gap-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+    <label className="block min-w-0 space-y-1">
+      <span className="flex items-baseline gap-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
         {label}
         {required && <span className="text-amber-400">*</span>}
-        {hint && (
-          <span className="ml-auto font-normal normal-case tracking-normal text-zinc-600">
-            {hint}
-          </span>
-        )}
       </span>
       {children}
     </label>
@@ -41,131 +36,105 @@ export function CheckpointIdentityForm({
   onChange,
 }: CheckpointIdentityFormProps) {
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <Field
-          label="Node ID"
-          required
-          hint="Định danh chính trên sơ đồ"
-        >
+    <div className="space-y-2.5">
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Node ID" required>
           <Input
             value={draft.nodeId}
             onChange={(event) => onChange({ nodeId: event.target.value })}
             placeholder="c0-pin-phone"
-            className="border-white/10 bg-black/30 font-mono text-sm"
+            className={`${INPUT_CLASS} font-mono`}
           />
         </Field>
 
-        <Field label="Bộ hồ sơ / chặng" hint="Ban Đầu, Bộ A, Bộ B, Bộ C">
+        <Field label="Bộ hồ sơ">
           <Input
             value={draft.dossier}
             onChange={(event) => onChange({ dossier: event.target.value })}
             placeholder="Bộ A"
-            className="border-white/10 bg-black/30 text-sm"
+            className={INPUT_CLASS}
           />
         </Field>
 
-        <Field label="Loại checkpoint">
-          <div className="flex h-8 items-center rounded-lg border border-white/10 bg-black/20 px-2.5 font-mono text-xs text-zinc-400">
+        <Field label="Loại">
+          <div className="flex h-7 items-center truncate rounded-lg border border-white/10 bg-black/20 px-2 font-mono text-[11px] text-zinc-400">
             {draft.type || "evidence_picker"}
-            <span className="ml-auto text-[10px] text-zinc-600">
-              {draft.type === "evidence_picker"
-                ? "V1 hỗ trợ biên tập"
-                : "chỉ đọc — V1 chưa hỗ trợ"}
-            </span>
           </div>
+        </Field>
+
+        <Field label="Khóa">
+          <Input
+            value={draft.checkpointId}
+            onChange={(event) =>
+              onChange({ checkpointId: event.target.value })
+            }
+            placeholder={draft.nodeId || "tự động"}
+            disabled={Boolean(draft.id)}
+            className={`${INPUT_CLASS} font-mono`}
+          />
         </Field>
       </div>
 
-      <details className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2">
-        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-          Khóa kỹ thuật
-        </summary>
-        <div className="mt-2 space-y-1.5">
-          <p className="text-[11px] text-zinc-600">
-            Chỉ dùng cho đồ thị phụ thuộc. Bỏ trống để dùng Node ID.
-            {draft.id ? " Không thể đổi sau khi tạo." : ""}
-          </p>
-          <Input
-            value={draft.checkpointId}
-            onChange={(event) => onChange({ checkpointId: event.target.value })}
-            placeholder={draft.nodeId || "tự động"}
-            disabled={Boolean(draft.id)}
-            className="border-white/10 bg-black/30 font-mono text-sm disabled:cursor-not-allowed disabled:opacity-60"
-          />
-        </div>
-      </details>
-
-      <Field label="Tiêu đề" hint="Hiển thị trên ghim câu hỏi">
+      <Field label="Tiêu đề">
         <Input
           value={draft.title}
           onChange={(event) => onChange({ title: event.target.value })}
           placeholder="Thẩm tra động cơ của nghi phạm"
-          className="border-white/10 bg-black/30 text-sm"
+          className={INPUT_CLASS}
         />
       </Field>
 
-      <Field
-        label="Câu hỏi / lời dẫn"
-        hint="Xuống dòng thoải mái — không giới hạn"
-      >
+      <Field label="Câu hỏi">
         <Textarea
           value={draft.question}
           onChange={(event) => onChange({ question: event.target.value })}
           placeholder="Hãy chọn những chứng cứ chứng minh động cơ phạm tội…"
-          className="min-h-24 border-white/10 bg-black/30 text-sm"
+          className="min-h-16 border-white/10 bg-black/30 text-xs"
         />
       </Field>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Field
-          label="Mở khóa vật chứng"
-          hint="Mã evidence được mở sau khi giải"
-        >
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Mở khóa vật chứng">
           <Input
             value={draft.unlockedEvidenceId}
             onChange={(event) =>
               onChange({ unlockedEvidenceId: event.target.value })
             }
             placeholder="A-12"
-            className="border-white/10 bg-black/30 font-mono text-sm"
+            className={`${INPUT_CLASS} font-mono`}
           />
         </Field>
 
-        <Field
-          label="Follow-up của"
-          hint="Khóa tham chiếu tự do, không cố định tên nhân vật"
-        >
+        <Field label="Follow-up của">
           <Input
             value={draft.followupOf}
             onChange={(event) => onChange({ followupOf: event.target.value })}
-            placeholder="mã-tham-chiếu"
-            className="border-white/10 bg-black/30 font-mono text-sm"
+            placeholder="mã tham chiếu"
+            className={`${INPUT_CLASS} font-mono`}
           />
         </Field>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Field label="Nhãn chọn nghi phạm" hint="Tiêu đề bước chọn đối tượng">
+      <div className="grid grid-cols-2 gap-2">
+        <Field label="Nhãn nghi phạm">
           <Input
             value={draft.suspectLabel}
-            onChange={(event) => onChange({ suspectLabel: event.target.value })}
-            placeholder="Chọn nghi phạm cần thẩm tra"
-            className="border-white/10 bg-black/30 text-sm"
+            onChange={(event) =>
+              onChange({ suspectLabel: event.target.value })
+            }
+            placeholder="Chọn nghi phạm"
+            className={INPUT_CLASS}
           />
         </Field>
 
-        <Field
-          label="Nhãn bước chọn chứng cứ"
-          hint="Tiêu đề bước chọn vật chứng"
-        >
+        <Field label="Nhãn chứng cứ">
           <Input
             value={draft.evidenceStepLabel}
             onChange={(event) =>
               onChange({ evidenceStepLabel: event.target.value })
             }
-            placeholder="Chọn chứng cứ chứng minh"
-            className="border-white/10 bg-black/30 text-sm"
+            placeholder="Chọn chứng cứ"
+            className={INPUT_CLASS}
           />
         </Field>
       </div>

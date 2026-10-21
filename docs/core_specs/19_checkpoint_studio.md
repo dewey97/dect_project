@@ -141,10 +141,10 @@ Người dùng phải bấm nhận gợi ý thì cạnh mới được ghi.
 ```
 app/(admin)/studio/checkpoints/page.tsx          # Server component, force-dynamic
 components/admin/checkpoint-studio/
-  checkpoint-studio-client.tsx                   # State, dirty tracking, CRUD
-  checkpoint-list-sidebar.tsx                    # Danh sách + search + filter dossier
-  checkpoint-editor.tsx                          # Header + các section
-  checkpoint-flow-view.tsx                       # React Flow: xem/sửa đồ thị phụ thuộc
+  checkpoint-studio-client.tsx                   # State, dirty tracking, CRUD, focus node
+  checkpoint-list-sidebar.tsx                    # Danh sách compact + search + hộp biên tập inline
+  checkpoint-editor.tsx                          # Hộp biên tập compact dưới danh sách
+  checkpoint-flow-view.tsx                       # React Flow: xem/sửa đồ thị phụ thuộc, căn node
   code-chip-input.tsx                            # Nhập mã chứng cứ dạng chip
   sections/
     checkpoint-identity-form.tsx
@@ -197,7 +197,10 @@ node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --cas
 
 ### 4.3. Quy tắc UX
 
-- Master-detail: Form/Flow bên trái, danh sách node bên phải; mobile xếp dọc.
+- Flow view luôn là vùng chính; không còn tab Form/Flow. Rail phải gồm danh sách node phía trên và hộp biên tập ngay bên dưới.
+- Danh sách node compact: chỉ hiển thị tiêu đề, phân cách bằng đường mảnh, không hiển thị Node ID hay `checkpoint_id`, không card padding lớn. Tìm kiếm nội bộ vẫn nhận Node ID, tiêu đề và câu hỏi.
+- Bấm một dòng trong danh sách sẽ chọn checkpoint, mở hộp biên tập dưới rail và căn node tương ứng vào giữa Flow view. Bấm lại vẫn căn lại.
+- Hộp biên tập dùng input nhỏ cho trường ít thông tin (Node ID, bộ hồ sơ, khóa, nhãn); field dài dùng textarea thấp. Không hiển thị mô tả/hint lặp lại.
 - Danh sách node không hiển thị bộ hồ sơ; tìm theo Node ID hoặc tiêu đề.
 - Flow view dùng `@xyflow/react`: node = checkpoint, cạnh = `depends_on`.
   - Mỗi bộ hồ sơ là một lane nền có nhãn, gom các node cùng `dossier`.

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { GitBranch, ListChecks } from "lucide-react";
 import type { DbCase, DbCaseCheckpoint } from "@/lib/types/database";
 import {
   createEmptyDraft,
@@ -25,12 +24,15 @@ import {
   type CheckpointGraphEdge,
 } from "@/lib/cms/checkpoint-graph";
 import { toast } from "@/components/ui/toast";
-import { cn } from "@/lib/utils";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
 import { CheckpointEditor } from "./checkpoint-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
 
-type StudioView = "form" | "flow";
+/** Mỗi lần click danh sách tăng nonce để Flow căn lại node, kể cả node đang chọn. */
+interface NodeFocusRequest {
+  checkpointId: string;
+  nonce: number;
+}
 
 function edgeKey(edge: CheckpointGraphEdge): string {
   return `${edge.source}->${edge.target}`;
@@ -84,7 +86,9 @@ export function CheckpointStudioClient({
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingDependencies, setIsSavingDependencies] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [view, setView] = useState<StudioView>("form");
+  const [focusRequest, setFocusRequest] = useState<NodeFocusRequest | null>(
+    null,
+  );
   const [pendingEdges, setPendingEdges] = useState<CheckpointGraphEdge[]>(() =>
     buildDependencyEdges(initialRows),
   );
@@ -136,13 +140,15 @@ export function CheckpointStudioClient({
 
   const confirmDiscardForm = useCallback(() => {
     if (!formDirty) return true;
-    return window.confirm("Form có thay đổi chưa lưu. Bỏ các thay đổi này?");
+    return window.confirm(
+      "Checkpoint có thay đổi chưa lưu. Bỏ các thay đổi này?",
+    );
   }, [formDirty]);
 
   const confirmDiscardAll = useCallback(() => {
     if (!hasUnsaved) return true;
     return window.confirm(
-      "Có thay đổi chưa lưu ở form hoặc sơ đồ. Bỏ tất cả thay đổi này?",
+      "Có thay đổi chưa lưu ở checkpoint hoặc sơ đồ. Bỏ tất cả thay đổi này?",
     );
   }, [hasUnsaved]);
 
@@ -157,6 +163,7 @@ export function CheckpointStudioClient({
       setRows(result.data);
       setPendingEdges(buildDependencyEdges(result.data));
       setPendingPositions({});
+      setFocusRequest(null);
       const first = result.data[0] ?? null;
       setSelectedId(first?.id ?? null);
       const nextDraft = first ? toDraft(first) : null;
@@ -167,13 +174,22 @@ export function CheckpointStudioClient({
     }
   }, []);
 
-  const selectRow = (row: DbCaseCheckpoint) => {
-    if (row.id === selectedId) return;
-    if (!confirmDiscardForm()) return;
+  const selectRow = (row: DbCaseCheckpoint): boolean => {
+    if (row.id === selectedId) return true;
+    if (!confirmDiscardForm()) return false;
     const nextDraft = toDraft(row);
     setSelectedId(row.id);
     setDraft(nextDraft);
     setBaseline(JSON.stringify(nextDraft));
+    return true;
+  };
+
+  const selectFromList = (row: DbCaseCheckpoint) => {
+    if (!selectRow(row)) return;
+    setFocusRequest((current) => ({
+      checkpointId: row.checkpoint_id,
+      nonce: (current?.nonce ?? 0) + 1,
+    }));
   };
 
   const createRow = () => {
@@ -182,6 +198,7 @@ export function CheckpointStudioClient({
     setSelectedId(null);
     setDraft(nextDraft);
     setBaseline(JSON.stringify(nextDraft));
+    setFocusRequest(null);
   };
 
   const changeCase = async (nextCaseId: string) => {
@@ -464,84 +481,47 @@ export function CheckpointStudioClient({
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col md:flex-row">
-      <div className="order-2 h-72 shrink-0 md:h-full md:w-80">
+      <div className="order-1 flex min-h-0 min-w-0 flex-1 flex-col">
+        <CheckpointFlowView
+          rows={rows}
+          selectedId={selectedId}
+          pendingEdges={pendingEdges}
+          suggestions={suggestions}
+          flowDirty={flowDirty}
+          isSaving={isSavingDependencies}
+          focusRequest={focusRequest}
+          onSelect={selectRow}
+          onCreate={createRow}
+          onAddEdge={addDependency}
+          onDeleteEdge={deleteDependency}
+          onApplySuggestions={applySuggestions}
+          onNodePositionChange={updateNodePosition}
+          onSaveFlow={handleSaveFlow}
+        />
+      </div>
+
+      <div className="order-2 flex h-[55%] min-h-0 shrink-0 flex-col md:h-full md:w-[360px]">
         <CheckpointListSidebar
           cases={caseOptions}
           caseId={caseId}
           onCaseChange={changeCase}
           rows={rows}
           selectedId={selectedId}
-          onSelect={selectRow}
+          onSelect={selectFromList}
           onCreate={createRow}
           isLoading={isLoading}
-        />
-      </div>
-      <div className="order-1 flex min-h-0 min-w-0 flex-1 flex-col">
-        <div className="flex shrink-0 items-center gap-1 border-b border-white/10 bg-[#0b0b0e] px-3 py-1.5">
-          <div className="inline-flex rounded-lg border border-white/10 bg-black/30 p-0.5">
-            <button
-              type="button"
-              onClick={() => setView("form")}
-              aria-pressed={view === "form"}
-              className={cn(
-                "inline-flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-semibold transition-colors",
-                view === "form"
-                  ? "bg-amber-500 text-black"
-                  : "text-zinc-400 hover:text-zinc-200",
-              )}
-            >
-              <ListChecks className="size-3.5" />
-              Form
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("flow")}
-              aria-pressed={view === "flow"}
-              className={cn(
-                "inline-flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[11px] font-semibold transition-colors",
-                view === "flow"
-                  ? "bg-amber-500 text-black"
-                  : "text-zinc-400 hover:text-zinc-200",
-              )}
-            >
-              <GitBranch className="size-3.5" />
-              Flow
-            </button>
-          </div>
-
-          {flowDirty && (
-            <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide text-amber-300">
-              Sơ đồ chưa lưu
-            </span>
+        >
+          {draft && (
+            <CheckpointEditor
+              draft={draft}
+              onChange={updateDraft}
+              onSave={handleSave}
+              onDelete={handleDelete}
+              isSaving={isSaving}
+              isDirty={formDirty}
+            />
           )}
-        </div>
-
-        {view === "form" ? (
-          <CheckpointEditor
-            draft={draft}
-            onChange={updateDraft}
-            onSave={handleSave}
-            onDelete={handleDelete}
-            isSaving={isSaving}
-            isDirty={formDirty}
-          />
-        ) : (
-          <CheckpointFlowView
-            rows={rows}
-            selectedId={selectedId}
-            pendingEdges={pendingEdges}
-            suggestions={suggestions}
-            flowDirty={flowDirty}
-            isSaving={isSavingDependencies}
-            onSelect={selectRow}
-            onCreate={createRow}
-            onAddEdge={addDependency}
-            onDeleteEdge={deleteDependency}
-            onApplySuggestions={applySuggestions}
-            onNodePositionChange={updateNodePosition}
-            onSaveFlow={handleSaveFlow}
-          />
-        )}
+        </CheckpointListSidebar>
       </div>
     </div>
   );

@@ -42,6 +42,9 @@ All notable changes to the Detective Case System (dect_project) will be document
 - **Bố cục lại Checkpoint Studio**:
   - Danh sách node chuyển sang bên phải; bỏ bộ lọc và badge bộ hồ sơ khỏi danh sách.
   - Flow view gom node theo lane bộ hồ sơ (`dossier`) để thấy checkpoint thuộc bộ nào.
+  - Danh sách node compact: chỉ hiện tiêu đề, phân cách bằng đường mảnh, bỏ Node ID khỏi từng dòng.
+  - Bấm node trong danh sách căn node tương ứng vào giữa Flow view và mở hộp biên tập ngay dưới danh sách.
+  - Bỏ tab Form/Flow; hộp biên tập compact thay cho trang form cũ, lược mô tả và dùng input nhỏ cho trường ít thông tin.
 
 ### Notes
 

@@ -39,6 +39,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+interface NodeFocusRequest {
+  checkpointId: string;
+  nonce: number;
+}
+
 interface CheckpointFlowViewProps {
   rows: DbCaseCheckpoint[];
   selectedId: string | null;
@@ -46,6 +51,7 @@ interface CheckpointFlowViewProps {
   suggestions: CheckpointGraphEdge[];
   flowDirty: boolean;
   isSaving: boolean;
+  focusRequest: NodeFocusRequest | null;
   onSelect: (row: DbCaseCheckpoint) => void;
   onCreate: () => void;
   onAddEdge: (source: string, target: string) => void;
@@ -234,6 +240,7 @@ export function CheckpointFlowView({
   suggestions,
   flowDirty,
   isSaving,
+  focusRequest,
   onSelect,
   onCreate,
   onAddEdge,
@@ -246,6 +253,8 @@ export function CheckpointFlowView({
   const flowRef = useRef<ReactFlowInstance<CheckpointCanvasNode, Edge> | null>(
     null,
   );
+  const lastFocusNonce = useRef(0);
+  const [isFlowReady, setIsFlowReady] = useState(false);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState<CheckpointFlowNode>(
     [],
@@ -333,6 +342,27 @@ export function CheckpointFlowView({
     () => [...laneNodes, ...nodes],
     [laneNodes, nodes],
   );
+
+  useEffect(() => {
+    if (!isFlowReady) return;
+    if (!focusRequest || lastFocusNonce.current === focusRequest.nonce) return;
+    const instance = flowRef.current;
+    if (!instance) return;
+    const node = instance.getNode(focusRequest.checkpointId);
+    if (!node) return;
+
+    lastFocusNonce.current = focusRequest.nonce;
+    const width = node.measured?.width ?? 260;
+    const height = node.measured?.height ?? 140;
+    instance.setCenter(
+      node.position.x + width / 2,
+      node.position.y + height / 2,
+      {
+        zoom: Math.max(instance.getZoom(), 0.9),
+        duration: 300,
+      },
+    );
+  }, [focusRequest, allNodes, isFlowReady]);
 
   const rfEdges = useMemo<Edge[]>(() => {
     const actual: Edge[] = pendingEdges.map((edge) => {
@@ -587,8 +617,8 @@ export function CheckpointFlowView({
 
       {!isDesktop && (
         <p className="shrink-0 border-b border-white/5 bg-white/[0.02] px-3 py-1.5 text-[10px] text-zinc-500">
-          Chế độ xem trên di động. Chạm node để mở form; kéo nối và lưu liên kết
-          chỉ khả dụng trên desktop.
+          Chế độ xem trên di động. Chạm node để mở hộp biên tập; kéo nối và lưu
+          liên kết chỉ khả dụng trên desktop.
         </p>
       )}
 
@@ -610,6 +640,7 @@ export function CheckpointFlowView({
           onPaneClick={() => setSelectedEdgeId(null)}
           onInit={(instance) => {
             flowRef.current = instance;
+            setIsFlowReady(true);
             window.setTimeout(() => instance.fitView({ padding: 0.2 }), 60);
           }}
           nodesConnectable={isDesktop}
