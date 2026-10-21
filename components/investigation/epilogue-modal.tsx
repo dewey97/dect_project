@@ -43,6 +43,26 @@ export function EpilogueModal({
 
   // Đọc các bài Hậu Án từ Checkpoint Studio (Supabase) qua useCaseCheckpoints
   const epilogueStories = useMemo(() => {
+    // 1. Kiểm tra checkpoint tổng kết hậu án gộp (Merged Epilogue Checkpoint)
+    const mergedCp = checkpoints.find(
+      (c) =>
+        c.id === "cp-000-epilogue" ||
+        (c as any).type === "epilogue" ||
+        Boolean((c as any).answerConfig?.epilogueStories) ||
+        Boolean((c.pickerConfig as any)?.epilogueStories),
+    );
+    const mergedList =
+      (mergedCp as any)?.answerConfig?.epilogueStories ||
+      (mergedCp?.pickerConfig as any)?.epilogueStories;
+
+    if (Array.isArray(mergedList) && mergedList.length > 0) {
+      return mergedList.map((story: any, idx: number) => ({
+        id: story.id || `epilogue-${idx}`,
+        title: story.title || `Hậu Án ${idx + 1}`,
+        monologue: story.monologue || story.text || "",
+      }));
+    }
+
     if (caseId === "case-000") {
       return EPILOGUE_META.map((meta) => {
         const cp = checkpoints.find((c) => c.id === meta.id);

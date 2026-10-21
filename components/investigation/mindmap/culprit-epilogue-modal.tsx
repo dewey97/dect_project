@@ -77,6 +77,13 @@ export function CulpritEpilogueModal({
 
   const getCheckpointMonologue = (cpId: string) => {
     const cp = checkpoints.find((c) => c.id === cpId || c.id.endsWith(cpId));
+    if (cp?.storyConfig?.monologue) return cp.storyConfig.monologue;
+    const merged = checkpoints.find((c) => c.id === "cp-000-epilogue" || (c as any).answerConfig?.epilogueStories);
+    const stories: any[] = (merged as any)?.answerConfig?.epilogueStories || (merged as any)?.pickerConfig?.epilogueStories;
+    if (Array.isArray(stories)) {
+      const match = stories.find((s) => s.id === cpId || s.id?.endsWith(cpId));
+      if (match?.monologue) return match.monologue;
+    }
     return cp?.storyConfig?.monologue || "";
   }
 
