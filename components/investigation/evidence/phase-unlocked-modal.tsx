@@ -84,7 +84,7 @@ export function PhaseUnlockedModal({
   return (
     <AnimatePresence>
       {unlockedModalData && (
-        <div className="fixed inset-0 z-50 w-full h-[100dvh] max-h-[100dvh] bg-[#0c0805] text-[#e5d8cb] overflow-hidden flex flex-col font-sans select-none pt-safe">
+        <div className="fixed inset-0 z-50 w-full h-[100dvh] max-h-[100dvh] bg-[#09090b] text-[#f4f4f5] overflow-hidden flex flex-col font-sans select-none pt-safe">
           {/* CRT Background scanlines */}
           <div className="noir-scanlines pointer-events-none absolute inset-0 opacity-20 z-10" />
 
@@ -95,7 +95,7 @@ export function PhaseUnlockedModal({
                 <div className="py-16 flex flex-col items-center justify-center w-full my-auto">
                   <button
                     onClick={handleStartStory}
-                    className="px-8 py-4 bg-[#221810] hover:bg-[#342418] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-base sm:text-lg font-bold tracking-[0.25em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
+                    className="px-8 py-4 bg-[#18181c] hover:bg-[#26262e] border border-[#d9a066]/50 hover:border-[#d9a066] text-[#d9a066] font-mono text-base sm:text-lg font-bold tracking-[0.25em] uppercase transition-all cursor-pointer shadow-xl rounded hover:scale-105 active:scale-95"
                   >
                     TRỐN TÌM
                   </button>

@@ -231,13 +231,13 @@ export function NativePdfAnnotator({
     <div
       ref={containerRef}
       className={cn(
-        "w-full h-full flex flex-col relative overflow-hidden bg-[#0d0906]",
+        "w-full h-full flex flex-col relative overflow-hidden bg-[#09090b]",
         activeTool === 'cursor' ? "select-auto" : "select-none",
         className
       )}
     >
       {/* FLOATING ANNOTATION & ZOOM TOOLBAR (Căn giữa phía dưới màn hình) */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066] max-w-[calc(100%-2rem)]">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#121217]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#2b2b36] shadow-2xl text-[#d9a066] max-w-[calc(100%-2rem)]">
         {/* NÚT CHỌN CON TRỎ */}
         <button
           type="button"
@@ -246,7 +246,7 @@ export function NativePdfAnnotator({
             "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1",
             activeTool === 'cursor'
               ? "bg-[#d9a066] text-[#1a0f07] font-bold shadow-sm"
-              : "hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec]"
+              : "hover:bg-[#1e1e28] text-[#a1a1aa] hover:text-white"
           )}
           title="Con trỏ thông thường"
         >
@@ -264,7 +264,7 @@ export function NativePdfAnnotator({
             "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1",
             activeTool === 'pen'
               ? "bg-[#d9a066] text-[#1a0f07] font-bold shadow-sm"
-              : "hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec]"
+              : "hover:bg-[#1e1e28] text-[#a1a1aa] hover:text-white"
           )}
           title="Bút vẽ & khoanh tròn PDF"
         >
@@ -282,7 +282,7 @@ export function NativePdfAnnotator({
             "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1",
             activeTool === 'highlighter'
               ? "bg-[#d9a066] text-[#1a0f07] font-bold shadow-sm"
-              : "hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec]"
+              : "hover:bg-[#1e1e28] text-[#a1a1aa] hover:text-white"
           )}
           title="Bút dạ quang highlight chữ trong PDF"
         >
@@ -298,7 +298,7 @@ export function NativePdfAnnotator({
             <button
               type="button"
               onClick={() => setIsColorPickerOpen((prev) => !prev)}
-              className="p-1 rounded-lg hover:bg-[#342417] transition-colors cursor-pointer flex items-center justify-center"
+              className="p-1 rounded-lg hover:bg-[#1e1e28] transition-colors cursor-pointer flex items-center justify-center"
               title="Đổi màu bút"
             >
               <span
@@ -310,7 +310,7 @@ export function NativePdfAnnotator({
             {isColorPickerOpen && (
               <div
                 onMouseLeave={() => setIsColorPickerOpen(false)}
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-1.5 bg-[#1e150f] border border-[#523924] rounded-xl shadow-2xl flex items-center gap-1.5 z-50 animate-in fade-in zoom-in-95 duration-100"
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-1.5 bg-[#181820] border border-[#343440] rounded-xl shadow-2xl flex items-center gap-1.5 z-50 animate-in fade-in zoom-in-95 duration-100"
               >
                 {COLOR_PALETTE.map((p) => (
                   <button
@@ -323,7 +323,7 @@ export function NativePdfAnnotator({
                     style={{ backgroundColor: p.color }}
                     className={cn(
                       "size-5 rounded-full transition-transform cursor-pointer border border-white/20 hover:scale-110",
-                      activeColor === p.color && "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#1e150f]"
+                      activeColor === p.color && "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#181820]"
                     )}
                     title={p.label}
                   />
@@ -341,14 +341,14 @@ export function NativePdfAnnotator({
             "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1",
             activeTool === 'eraser'
               ? "bg-[#d9a066] text-[#1a0f07] font-bold shadow-sm"
-              : "hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec]"
+              : "hover:bg-[#1e1e28] text-[#a1a1aa] hover:text-white"
           )}
           title="Tẩy nét vẽ (Chạm vào nét vẽ để xóa)"
         >
           <Eraser className="size-4" />
         </button>
 
-        <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
+        <div className="w-[1px] h-4 bg-[#2b2b36] mx-1" />
 
         {/* CHUYỂN TRANG PDF NẾU CÓ NHIỀU TRANG */}
         {numPages > 1 && (
@@ -357,7 +357,7 @@ export function NativePdfAnnotator({
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="p-1.5 rounded hover:bg-[#342417] hover:text-[#fef5ec] disabled:opacity-40 transition-colors cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#1e1e28] hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
               title="Trang trước"
             >
               <ChevronLeft className="size-4" />
@@ -369,12 +369,12 @@ export function NativePdfAnnotator({
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(numPages, p + 1))}
               disabled={currentPage >= numPages}
-              className="p-1.5 rounded hover:bg-[#342417] hover:text-[#fef5ec] disabled:opacity-40 transition-colors cursor-pointer"
+              className="p-1.5 rounded hover:bg-[#1e1e28] hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
               title="Trang tiếp"
             >
               <ChevronRight className="size-4" />
             </button>
-            <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
+            <div className="w-[1px] h-4 bg-[#2b2b36] mx-1" />
           </>
         )}
 
@@ -383,7 +383,7 @@ export function NativePdfAnnotator({
           type="button"
           onClick={zoomOut}
           disabled={zoom <= 0.4}
-          className="p-1.5 rounded hover:bg-[#342417] hover:text-[#fef5ec] disabled:opacity-40 transition-colors cursor-pointer"
+          className="p-1.5 rounded hover:bg-[#1e1e28] hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
           title="Thu nhỏ (Zoom out)"
         >
           <ZoomOut className="size-4" />
@@ -393,7 +393,7 @@ export function NativePdfAnnotator({
           type="button"
           onClick={zoomIn}
           disabled={zoom >= 2.5}
-          className="p-1.5 rounded hover:bg-[#342417] hover:text-[#fef5ec] disabled:opacity-40 transition-colors cursor-pointer"
+          className="p-1.5 rounded hover:bg-[#1e1e28] hover:text-white disabled:opacity-40 transition-colors cursor-pointer"
           title="Phóng to (Zoom in)"
         >
           <ZoomIn className="size-4" />
@@ -402,14 +402,14 @@ export function NativePdfAnnotator({
         <button
           type="button"
           onClick={resetZoom}
-          className="p-1.5 rounded hover:bg-[#342417] hover:text-[#fef5ec] transition-colors cursor-pointer"
+          className="p-1.5 rounded hover:bg-[#1e1e28] hover:text-white transition-colors cursor-pointer"
           title="Đặt lại kích thước vừa vặn (Reset zoom)"
         >
           <RotateCcw className="size-3.5" />
         </button>
 
         {/* NÚT CHỈ ĐIỂM TÀI LIỆU PDF CHO ĐỒNG ĐỘI */}
-        <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
+        <div className="w-[1px] h-4 bg-[#2b2b36] mx-1" />
         <button
           type="button"
           onClick={() => {

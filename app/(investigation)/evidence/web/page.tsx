@@ -39,6 +39,7 @@ import {
 import { PhaseUnlockedModal, type UnlockedModalData } from "@/components/investigation/evidence/phase-unlocked-modal";
 import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
 import { InvestigationMobileNav } from "@/components/investigation/evidence/investigation-mobile-nav";
+import { EvidenceThemeProvider, useEvidenceTheme, EvidenceThemeSwitcher } from "@/components/investigation/evidence/evidence-theme-context";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
@@ -70,6 +71,8 @@ type ActiveModal =
   | null;
 
 function WebEvidencePageContent() {
+  const { theme, setTheme } = useEvidenceTheme();
+  const isNoir = theme === 'noir';
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawCaseId =
@@ -532,7 +535,12 @@ function WebEvidencePageContent() {
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start p-0 lg:p-3 box-border min-h-0 min-w-0 select-none"
+      className={cn(
+        "h-full w-full font-sans overflow-hidden flex flex-col items-center justify-start p-0 lg:p-3 box-border min-h-0 min-w-0 select-none transition-colors duration-200",
+        isNoir
+          ? "bg-[#050507] text-[#f4f4f5] selection:bg-[#38bdf8]/30 selection:text-white"
+          : "bg-[#0d0a08] text-[#e5d8cb] selection:bg-[#d9a066]/30 selection:text-[#f4e8d8]"
+      )}
     >
       {/* MOBILE VIEW SWITCHER (CHỈ HIỂN THỊ TRÊN MÀN HÌNH DI ĐỘNG < LG) */}
       <InvestigationMobileNav
@@ -587,8 +595,9 @@ function WebEvidencePageContent() {
           >
             <div
               className={cn(
-                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-                isDraggingLeftSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+                "w-1 h-14 rounded-full transition-all flex items-center justify-center",
+                isNoir ? "bg-[#22222a] group-hover:bg-[#38bdf8]" : "bg-[#4a3625] group-hover:bg-[#d9a066]",
+                isDraggingLeftSplit && (isNoir ? "bg-[#38bdf8] scale-y-150 shadow-[0_0_8px_#38bdf8]" : "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]"),
               )}
             >
               <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -599,16 +608,28 @@ function WebEvidencePageContent() {
         {/* CỘT 2 (Ở GIỮA): BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
         <div
           className={cn(
-            "h-full flex-1 min-w-0 bg-[#16120e] border border-[#2d1e13] rounded-none overflow-hidden flex flex-col min-h-0 relative shadow-inner",
+            "h-full flex-1 min-w-0 rounded-none overflow-hidden flex flex-col min-h-0 relative shadow-inner transition-colors duration-200 border",
+            isNoir ? "bg-[#08080a] border-[#1e1e24]" : "bg-[#16120e] border-[#2d1e13]",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
             mobileTab === "board" ? "flex w-full" : "hidden lg:flex"
           )}
         >
-          {/* TOP RIGHT TOOLBAR: SỔ TAY */}
-          <div className="hidden lg:flex absolute top-3 right-3 z-30 items-center gap-1.5 bg-[#1e150e]/90 backdrop-blur-md px-2 py-1 rounded-lg border border-[#4a3625] shadow-xl">
+          {/* TOP RIGHT TOOLBAR: GIAO DIỆN & SỔ TAY */}
+          <div className={cn(
+            "hidden lg:flex absolute top-3 right-3 z-30 items-center gap-2 backdrop-blur-md px-2 py-1 rounded-lg border shadow-xl transition-colors",
+            isNoir ? "bg-[#0e0e13]/90 border-[#23232c]" : "bg-[#1e150e]/90 border-[#4a3625]"
+          )}>
+            {/* NÚT CHUYỂN ĐỔI GIAO DIỆN NÂU CỔ ĐIỂN / ĐEN NOIR */}
+            <EvidenceThemeSwitcher />
+
             <button
               onClick={() => setActiveModal("notebook")}
-              className="px-2 py-1 rounded bg-[#2b1b11] hover:bg-[#3d2618] border border-[#523824] text-[#d9a066] hover:text-[#fef5ec] transition-colors cursor-pointer flex items-center gap-1.5 font-mono text-[0.62rem] font-bold"
+              className={cn(
+                "px-2 py-1 rounded border transition-colors cursor-pointer flex items-center gap-1.5 font-mono text-[0.62rem] font-bold",
+                isNoir
+                  ? "bg-[#141824] hover:bg-[#1a2234] border-[#38bdf8]/40 text-[#38bdf8] hover:text-white"
+                  : "bg-[#2b1b11] hover:bg-[#3d2618] border-[#523824] text-[#d9a066] hover:text-[#fef5ec]"
+              )}
               title="Mở sổ tay ghi chép thám tử"
             >
               <PenLine className="size-3" />
@@ -616,7 +637,7 @@ function WebEvidencePageContent() {
             </button>
           </div>
 
-          {/* MAIN CANVAS */}
+          {/* MAIN CANVAS (Giữ 100% màu gốc chân thực cho ảnh, tài liệu và vật chứng) */}
           <div className="flex-1 min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
               caseId={caseId}
@@ -643,7 +664,7 @@ function WebEvidencePageContent() {
         >
           <div
             className={cn(
-              "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
+              "w-1 h-14 rounded-full bg-[#2e2e38] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
               isDraggingRightSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
             )}
           >
@@ -657,7 +678,8 @@ function WebEvidencePageContent() {
             width: `${viewerWidth}px`,
           }}
           className={cn(
-            "hidden lg:flex shrink-0 min-w-[320px] h-full flex-col min-h-0 overflow-hidden relative border-l border-[#2d1e13]",
+            "hidden lg:flex shrink-0 min-w-[320px] h-full flex-col min-h-0 overflow-hidden relative border-l transition-colors duration-200",
+            isNoir ? "border-[#1e1e24] bg-[#050507]" : "border-[#2d1e13] bg-[#120d09]",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
           )}
         >

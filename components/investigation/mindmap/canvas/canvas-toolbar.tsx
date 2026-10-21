@@ -22,6 +22,7 @@ import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
 import { useRoomSync } from "@/components/investigation/room-sync-context";
 import { RoomModal } from "@/components/investigation/room-modal";
+import { useEvidenceTheme } from "@/components/investigation/evidence/evidence-theme-context";
 import type { useBoardLayout } from "./use-board-layout";
 import type { useInvestigationState } from "./use-investigation-state";
 
@@ -51,6 +52,8 @@ export function CanvasToolbar({
   isBoardGame = false,
 }: CanvasToolbarProps) {
   const { roomCode, nickname, memberCount, broadcastPing } = useRoomSync();
+  const { theme } = useEvidenceTheme();
+  const isNoir = theme === 'noir';
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
 
   return (
@@ -62,11 +65,12 @@ export function CanvasToolbar({
       >
         <div
           className={cn(
-            "items-center gap-2 bg-[#1b140e]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-[#593c26]/60 text-xs text-[#d9a066] font-mono shadow-lg pointer-events-auto",
+            "items-center gap-2 backdrop-blur-md px-3.5 py-1.5 rounded-lg border text-xs font-mono shadow-lg pointer-events-auto transition-colors",
+            isNoir ? "bg-[#101014]/90 border-[#23232c] text-[#38bdf8]" : "bg-[#1b140e]/90 border-[#593c26]/60 text-[#d9a066]",
             hideTitleBadgeOnMobile ? "hidden lg:flex" : "flex"
           )}
         >
-          <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+          <span className={cn("size-2 rounded-full animate-pulse", isNoir ? "bg-sky-400" : "bg-amber-500")} />
           <span className="font-bold tracking-wide">BẢNG ĐIỀU TRA</span>
         </div>
 
@@ -78,7 +82,9 @@ export function CanvasToolbar({
             "px-2.5 py-1.5 backdrop-blur-md border rounded-lg shadow-lg pointer-events-auto flex items-center gap-1.5 text-xs font-mono font-bold transition-all cursor-pointer",
             roomCode
               ? "bg-emerald-950/85 border-emerald-500/60 text-emerald-300 hover:bg-emerald-900/90"
-              : "bg-[#1b140e]/85 hover:bg-[#342417] border-[#593c26]/60 text-[#d9a066]"
+              : isNoir
+                ? "bg-[#101014]/90 hover:bg-[#1a1a24] border-[#23232c] text-[#38bdf8]"
+                : "bg-[#1b140e]/90 hover:bg-[#342417] border-[#593c26]/60 text-[#d9a066]"
           )}
           title={
             roomCode
@@ -86,7 +92,7 @@ export function CanvasToolbar({
               : "Chơi nhóm đồng bộ (Group ID)"
           }
         >
-          <Users className="size-3.5 text-amber-500" />
+          <Users className={cn("size-3.5", isNoir ? "text-sky-400" : "text-amber-500")} />
           <span>{roomCode ? `${roomCode} (${memberCount} 👤)` : "Chơi Nhóm"}</span>
           {roomCode && <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />}
         </button>
@@ -94,7 +100,12 @@ export function CanvasToolbar({
         <button
           type="button"
           onClick={onToggleAudio}
-          className="p-1.5 bg-[#1b140e]/85 hover:bg-[#342417] backdrop-blur-md border border-[#593c26]/60 text-[#d9a066] transition-colors cursor-pointer rounded-lg shadow-lg pointer-events-auto flex items-center justify-center"
+          className={cn(
+            "p-1.5 backdrop-blur-md border transition-colors cursor-pointer rounded-lg shadow-lg pointer-events-auto flex items-center justify-center",
+            isNoir
+              ? "bg-[#101014]/90 hover:bg-[#1a1a24] border-[#23232c] text-zinc-300 hover:text-white"
+              : "bg-[#1b140e]/90 hover:bg-[#342417] border-[#593c26]/60 text-[#d9a066] hover:text-[#fef5ec]"
+          )}
           title={
             isAudioMuted ? "Bật âm thanh trinh thám" : "Tắt âm thanh trinh thám"
           }
@@ -102,7 +113,7 @@ export function CanvasToolbar({
           {isAudioMuted ? (
             <VolumeX className="size-4 text-amber-500/60" />
           ) : (
-            <Volume2 className="size-4 text-amber-400" />
+            <Volume2 className={cn("size-4", isNoir ? "text-zinc-200" : "text-amber-400")} />
           )}
         </button>
 
@@ -113,7 +124,7 @@ export function CanvasToolbar({
               detectiveAudio.playPaperRustle();
               state.setIsGameplayGuideOpen(true);
             }}
-            className="p-1.5 bg-[#1b140e]/85 hover:bg-[#342417] backdrop-blur-md border border-[#593c26]/60 text-[#d9a066] hover:text-[#fef5ec] transition-colors cursor-pointer rounded-lg shadow-lg pointer-events-auto flex items-center justify-center"
+            className="p-1.5 bg-[#121217]/90 hover:bg-[#202028] backdrop-blur-md border border-[#2e2e38] text-[#d9a066] hover:text-white transition-colors cursor-pointer rounded-lg shadow-lg pointer-events-auto flex items-center justify-center"
             title="Sổ tay hướng dẫn gameplay"
             aria-label="Sổ tay hướng dẫn gameplay"
           >

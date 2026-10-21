@@ -76,7 +76,7 @@ export function QuickActionFab({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 10 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-2.5 w-56 bg-[#140d08]/95 border border-[#3d2b1d] shadow-[0_15px_40px_rgba(0,0,0,0.95),0_0_15px_rgba(217,160,102,0.06)] rounded-xl p-2 space-y-1.5 backdrop-blur-md text-[#fef5ec]"
+            className="mb-2.5 w-56 bg-[#0f0f13]/95 border border-[#272730] shadow-[0_15px_40px_rgba(0,0,0,0.95),0_0_15px_rgba(255,255,255,0.05)] rounded-xl p-2 space-y-1.5 backdrop-blur-md text-white"
           >
             {/* OPTION: DETECTIVE NOTEBOOK */}
             <button
@@ -90,7 +90,7 @@ export function QuickActionFab({
                   }
                 })
               }
-              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-bold text-[#fef5ec] hover:text-[#d9a066] group bg-[#1d140d] border border-[#3f2b1d]"
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#22222b] transition-colors cursor-pointer flex items-center gap-3 text-xs font-bold text-white hover:text-[#d9a066] group bg-[#16161c] border border-[#2e2e38]"
             >
               <PenLine className="size-4 text-[#d9a066] shrink-0 group-hover:scale-110 transition-transform" />
               <span>Sổ tay thám tử</span>
@@ -108,7 +108,7 @@ export function QuickActionFab({
                   }
                 })
               }
-              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#f3e8dc] hover:text-amber-300 group"
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a1a22] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#d4d4d8] hover:text-amber-300 group"
             >
               <BookOpen className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Sổ tay hướng dẫn</span>
@@ -138,7 +138,7 @@ export function QuickActionFab({
                   }
                 })
               }
-              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#f3e8dc] hover:text-amber-300 group"
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a1a22] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#d4d4d8] hover:text-amber-300 group"
             >
               <Home className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Về màn hình chính</span>
@@ -152,14 +152,14 @@ export function QuickActionFab({
                   emitInvestigationEvent("OPEN_FEEDBACK");
                 })
               }
-              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#281b11] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#f3e8dc] hover:text-amber-300 group"
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a1a22] transition-colors cursor-pointer flex items-center gap-3 text-xs font-medium text-[#d4d4d8] hover:text-amber-300 group"
             >
               <MessageSquare className="size-4 text-amber-400 shrink-0 group-hover:scale-110 transition-transform" />
               <span>Góp ý & Báo lỗi</span>
             </button>
 
             {/* DIVIDER */}
-            <div className="border-t border-[#2b1e14] my-1" />
+            <div className="border-t border-[#23232a] my-1" />
 
             {/* OPTION: RESET CASE */}
             <button
