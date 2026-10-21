@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { LandingHeroBackdrop } from "@/components/public/landing-hero-backdrop";
 import { UserNav } from "@/components/auth/user-nav";
 import { LandingBanner } from "@/components/public/landing-banner";
-import { WaitlistForm } from "@/components/public/waitlist-form";
 import { cn } from "@/lib/utils";
 
 const DETECTIVE_QUOTES = [
@@ -67,12 +68,12 @@ export function LandingHero() {
             <a href="#trai-nghiem-dieu-tra" className="hover:text-primary transition-colors">
               Trải nghiệm phá án
             </a>
-            <a
-              href="#mm-opportunity"
+            <Link
+              href="/how-to-play"
               className="hover:text-primary transition-colors"
             >
               Cách chơi
-            </a>
+            </Link>
             <a href="#danhgia" className="hover:text-primary transition-colors">
               Đánh giá
             </a>
@@ -89,7 +90,7 @@ export function LandingHero() {
       </header>
 
       {/* HERO SECTION — FULL VIEWPORT ON MOBILE (FITS PHONE SCREEN EXACTLY) + FLASHLIGHT ON DESKTOP */}
-      <section className="relative w-full h-[calc(100svh-3.5rem)] min-h-[500px] lg:h-[85vh] flex items-center justify-center border-b border-border/10 overflow-hidden">
+      <section className="relative w-full h-[calc(100svh-3.5rem)] min-h-[500px] lg:h-[85vh] flex items-center justify-center overflow-hidden">
         {/* Background static image + flashlight */}
         <div className="absolute inset-0 w-full h-full z-0">
           <LandingHeroBackdrop
@@ -119,17 +120,15 @@ export function LandingHero() {
               </p>
             </div>
 
-            {/* Primary Hero CTA: Email Registration Form */}
-            <div className="w-full mt-1 sm:mt-2 flex flex-col gap-2">
-              <span className="text-[0.72rem] font-mono uppercase tracking-wider text-amber-400 font-bold">
-                NHẬN ƯU ĐÃI VÀ THÔNG BÁO SỚM NHẤT
-              </span>
-              <WaitlistForm
-                source="hero"
-                variant="inline"
-                placeholder="Nhập email của bạn..."
-                buttonLabel="ĐĂNG KÝ"
-              />
+            {/* Primary Hero CTA: Phá Án Ngay */}
+            <div className="w-full mt-2 sm:mt-3 flex items-center">
+              <Link
+                href="/evidence/web"
+                className="group inline-flex items-center justify-center gap-2.5 h-12 sm:h-13 px-8 sm:px-10 font-mono text-sm sm:text-base font-black uppercase tracking-wider rounded-md bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] border border-amber-300 transition-all duration-300 active:scale-[0.98] cursor-pointer"
+              >
+                <span>Phá Án Ngay</span>
+                <ChevronRight className="size-4.5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
           </div>
         </div>

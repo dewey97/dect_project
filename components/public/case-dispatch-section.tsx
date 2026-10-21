@@ -5,7 +5,7 @@ import { WaitlistForm } from "@/components/public/waitlist-form";
 
 export function CaseDispatchSection() {
   return (
-    <section className="relative w-full py-20 px-6 border-b border-border/10 bg-gradient-to-b from-card/30 via-zinc-950/80 to-background flex flex-col items-center justify-center overflow-hidden z-10">
+    <section className="relative w-full py-20 px-6 bg-gradient-to-b from-card/30 via-zinc-950/80 to-background flex flex-col items-center justify-center overflow-hidden z-10">
       {/* Background ambient lighting */}
       <div
         aria-hidden="true"

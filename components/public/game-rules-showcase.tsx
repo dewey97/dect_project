@@ -7,7 +7,7 @@ export function GameRulesShowcase() {
   const [activeRule, setActiveRule] = useState<'means' | 'motive' | 'opportunity'>('means')
 
   return (
-    <section id="mm-opportunity" className="w-full max-w-6xl px-6 py-16 z-10 border-t border-border/20">
+    <section id="mm-opportunity" className="w-full max-w-6xl px-6 py-16 z-10">
       <div className="text-center max-w-2xl mx-auto mb-12 flex flex-col items-center">
         <h2 className="text-2xl lg:text-3xl font-black uppercase text-foreground">
           HƯỚNG DẪN PHÁ ÁN

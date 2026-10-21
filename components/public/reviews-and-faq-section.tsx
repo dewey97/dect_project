@@ -15,7 +15,7 @@ export function ReviewsAndFaqSection() {
   return (
     <>
       {/* DETECTIVE TESTIMONIALS (Social Proof) */}
-      <section id="danhgia" className="w-full max-w-6xl px-6 py-16 z-10 border-t border-border/20">
+      <section id="danhgia" className="w-full max-w-6xl px-6 py-16 z-10">
         <div className="text-center max-w-2xl mx-auto mb-12 flex flex-col items-center">
           <h2 className="text-2xl lg:text-3xl font-black mt-2 uppercase">
             Đánh Giá Từ Thám Tử Đi Trước
@@ -47,7 +47,7 @@ export function ReviewsAndFaqSection() {
       </section>
 
       {/* FAQ SECTION (Accordions) */}
-      <section id="faq" className="w-full max-w-4xl px-6 py-16 z-10 border-t border-border/20 flex flex-col items-center">
+      <section id="faq" className="w-full max-w-4xl px-6 py-16 z-10 flex flex-col items-center">
         <div className="text-center max-w-2xl mx-auto mb-10 flex flex-col items-center">
           <h2 className="text-2xl lg:text-3xl font-black mt-2 uppercase">
             Hỏi Đáp Nhanh

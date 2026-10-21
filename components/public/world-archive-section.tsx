@@ -57,7 +57,7 @@ export function WorldArchiveSection() {
           Chào mừng các bạn đến với <span className="text-primary font-bold">Tổ Điều Tra Đặc Biệt</span>
         </h2>
 
-        <div className="border-t border-b border-primary/20 py-5 px-4 sm:px-8 flex flex-col gap-3 text-xs sm:text-sm text-muted-foreground leading-relaxed font-sans text-center">
+        <div className="py-2 px-4 sm:px-8 flex flex-col gap-3 text-xs sm:text-sm text-muted-foreground leading-relaxed font-sans text-center">
           <p>
             Khi cảnh sát địa phương hoàn toàn bế tắc trước những kỳ án chấn động, tập hồ sơ niêm phong sẽ được chuyển giao thẳng cho nhóm thám tử tập sự của bạn. Hãy cùng các cộng sự mở hộp tang vật, phân chia nhiệm vụ và đối chiếu từng manh mối nhỏ nhất.
           </p>

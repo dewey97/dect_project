@@ -26,7 +26,7 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
 
   return (
     <section id="vuan" className="w-full max-w-6xl px-6 py-6 z-10 flex flex-col items-center justify-center relative overflow-hidden">
-      <div className="relative w-full md:max-w-3xl max-w-xl flex items-center justify-center h-[240px] select-none">
+      <div className="relative w-full md:max-w-3xl max-w-xl flex items-center justify-center h-[270px] select-none">
         {/* Navigation Arrows */}
         <button
           onClick={() => setActivePoster((prev) => (prev === 0 ? total - 1 : prev - 1))}
@@ -45,7 +45,7 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
         </button>
 
         {/* 3D Perspective container */}
-        <div className="relative w-full flex items-center justify-center h-[240px]" style={{ perspective: '900px' }}>
+        <div className="relative w-full flex items-center justify-center h-[270px]" style={{ perspective: '900px' }}>
           {POSTER_ITEMS.map((poster, index) => {
             const isActive = activePoster === index
             const isLeft = (activePoster - 1 + total) % total === index
@@ -53,10 +53,10 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
             const isFarLeft = (activePoster - 2 + total) % total === index
             const isFarRight = (activePoster + 2) % total === index
 
-            const leftOffset = isMobile ? -120 : -170
-            const rightOffset = isMobile ? 120 : 170
-            const farLeftOffset = isMobile ? -200 : -320
-            const farRightOffset = isMobile ? 200 : 320
+            const leftOffset = isMobile ? -135 : -190
+            const rightOffset = isMobile ? 135 : 190
+            const farLeftOffset = isMobile ? -225 : -350
+            const farRightOffset = isMobile ? 225 : 350
 
             let transformStyle = 'scale(0) translate3d(0, 0, -200px)'
             let opacity = 0
@@ -104,7 +104,7 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
                   transformStyle: 'preserve-3d',
                 }}
                 title={isActive && isTrontim ? "Bấm để vào chơi vụ án Trốn Tìm" : undefined}
-                className="absolute w-[150px] h-[212px] aspect-[1/1.414] rounded-md overflow-hidden cursor-pointer group bg-zinc-950 transition-all duration-300 border border-white/45 shadow-[0_0_14px_rgba(255,255,255,0.12),0_12px_28px_rgba(0,0,0,0.85)] hover:border-white/75 hover:shadow-[0_0_18px_rgba(255,255,255,0.2),0_14px_32px_rgba(0,0,0,0.9)]"
+                className="absolute w-[170px] h-[240px] aspect-[1/1.414] rounded-md overflow-hidden cursor-pointer group bg-zinc-950 transition-all duration-300 border border-white/45 shadow-[0_0_14px_rgba(255,255,255,0.12),0_12px_28px_rgba(0,0,0,0.85)] hover:border-white/75 hover:shadow-[0_0_18px_rgba(255,255,255,0.2),0_14px_32px_rgba(0,0,0,0.9)]"
               >
                 <img
                   src={poster.img}
@@ -114,7 +114,7 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.08, backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
 
                 {isActive && isTrontim && (
-                  <div className="absolute inset-x-0 bottom-0 py-1.5 bg-black/85 backdrop-blur-xs text-center text-[0.62rem] font-mono text-amber-400 font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-x-0 bottom-0 py-1.5 bg-black/85 backdrop-blur-xs text-center text-[0.68rem] font-mono text-amber-400 font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">
                     VÀO CHƠI NGAY →
                   </div>
                 )}
@@ -125,13 +125,13 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
       </div>
 
       {/* Active Case Status Bar — Hiển thị thông số vụ án (Case mở và Case mật dấu hỏi) */}
-      <div className="mt-3 min-h-[42px] flex flex-col items-center justify-center gap-1 font-mono text-center">
+      <div className="mt-4 min-h-[46px] flex flex-col items-center justify-center gap-1 font-mono text-center">
         <div className="flex items-center gap-2.5">
           <span
             className={
               activePoster === 0
-                ? "text-[0.7rem] text-amber-400 font-bold tracking-widest uppercase"
-                : "text-[0.7rem] text-zinc-500 font-bold tracking-widest uppercase"
+                ? "text-xs text-amber-400 font-bold tracking-widest uppercase"
+                : "text-xs text-zinc-500 font-bold tracking-widest uppercase"
             }
           >
             {currentCase.code}
@@ -140,32 +140,32 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
           <span
             className={
               activePoster === 0
-                ? "text-xs text-foreground font-black uppercase tracking-wider"
-                : "text-xs text-zinc-400 font-black uppercase tracking-wider"
+                ? "text-sm text-foreground font-black uppercase tracking-wider"
+                : "text-sm text-zinc-400 font-black uppercase tracking-wider"
             }
           >
             {currentCase.title}
           </span>
         </div>
-        <div className="grid grid-cols-[auto_auto] items-center gap-x-2.5 gap-y-1 text-[0.68rem] text-muted-foreground font-mono mt-1.5 mx-auto">
+        <div className="grid grid-cols-[auto_auto] items-center gap-x-3 gap-y-1 text-[0.75rem] text-muted-foreground font-mono mt-1 mx-auto">
           <span className="text-right">Độ khó:</span>
           {activePoster === 0 ? (
-            <span className="text-left text-amber-400 tracking-widest text-xs font-bold">
+            <span className="text-left text-amber-400 tracking-widest text-[0.8rem] font-bold">
               ★★★☆☆
             </span>
           ) : (
-            <span className="text-left text-zinc-500 tracking-widest text-xs font-bold">
+            <span className="text-left text-zinc-500 tracking-widest text-[0.8rem] font-bold">
               ?????
             </span>
           )}
 
           <span className="text-right">Độ kinh dị:</span>
           {activePoster === 0 ? (
-            <span className="text-left text-red-500 tracking-widest text-xs font-bold">
+            <span className="text-left text-red-500 tracking-widest text-[0.8rem] font-bold">
               ★★☆☆☆
             </span>
           ) : (
-            <span className="text-left text-zinc-500 tracking-widest text-xs font-bold">
+            <span className="text-left text-zinc-500 tracking-widest text-[0.8rem] font-bold">
               ?????
             </span>
           )}

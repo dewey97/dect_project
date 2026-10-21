@@ -18,6 +18,7 @@ const PANORAMA = "/images/cases/case_000/PANORAMA.webp";
 
 export function LandingScene360Showcase() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const [reduced, setReduced] = useState(false);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -37,7 +38,12 @@ export function LandingScene360Showcase() {
       const rect = el.getBoundingClientRect();
       const scrollable = el.clientHeight - window.innerHeight;
       setProgress(scrollable <= 0 ? 0 : clamp01(-rect.top / scrollable));
-      setSize({ w: window.innerWidth, h: window.innerHeight });
+      if (portalRef.current) {
+        const portalRect = portalRef.current.getBoundingClientRect();
+        setSize({ w: portalRect.width, h: portalRect.height });
+      } else {
+        setSize({ w: window.innerWidth, h: window.innerHeight });
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -72,19 +78,18 @@ export function LandingScene360Showcase() {
     REST_DISTANCE * Math.pow(END_DISTANCE / REST_DISTANCE, eased);
   const brightness = 0.42 + eased * 0.68;
 
-  // The keyway narrows mid-way, so its rim can never fill the frame corners.
-  // Dissolve the plate as the camera reaches the cut, so no blurry brass
-  // wedges linger while the room takes over.
+  // Dissolve the brass plate as camera approaches keyway
   const fadeRaw = clamp01((p - 0.72) / 0.11);
   const modelOpacity = 1 - fadeRaw * fadeRaw * (3 - 2 * fadeRaw);
-  // Follow up by opening the black surround, otherwise its edge survives as a
-  // hard triangle in the frame corners once the plate is gone.
+  // Follow up by opening the black surround
   const maskOpacity = 1 - clamp01((p - 0.87) / 0.08);
-  // Below the cut, blow the aperture open around the screen centre so the
-  // narrow keyway rim stops slicing hard triangles out of the frame corners.
+  // Blow the aperture open around the screen centre
   const maskSpread = 1 + clamp01((p - 0.78) / 0.07) * 2.6;
 
-  // The black overlay's hole must match the 3D keyway silhouette exactly.
+  // Dynamic optical depth-of-field: as camera approaches the keyhole,
+  // the metal rim blurs and dissolves smoothly, removing harsh cut edges.
+  const blurAmount = 2.5 + clamp01((p - 0.3) / 0.5) * 14;
+
   // Project the slot through the live camera onto the viewport.
   const { w, h } = size;
   let maskPath = "";
@@ -111,70 +116,131 @@ export function LandingScene360Showcase() {
       id="hien-truong-360"
       aria-label="Hiện trường vụ án 000 — nhìn qua ổ khoá"
       className={
-        reduced ? "relative h-[100dvh] w-full" : "relative h-[300vh] w-full"
+        reduced ? "relative h-[100dvh] w-full" : "relative h-[280vh] w-full"
       }
     >
-      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-[#070503] select-none">
-        {/* Room seen through the keyway */}
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-background flex items-center justify-center px-6 sm:px-8 select-none">
+        {/* Ambient backlight glow */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: `url(${PANORAMA})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            transform: `scale(${1.04 + eased * 0.5 + clamp01((p - 0.72) / 0.28) * 0.26})`,
-            filter: `brightness(${brightness}) saturate(1.05)`,
-            willChange: "transform, filter",
-          }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-amber-500/[0.05] blur-[160px] pointer-events-none"
         />
 
-        {/* Everything outside the projected keyway stays pitch black */}
-        <svg
-          aria-hidden="true"
-          className="absolute inset-0 z-10 h-full w-full pointer-events-none"
-          viewBox={`0 0 ${Math.max(1, w)} ${Math.max(1, h)}`}
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <mask id="keyhole-mask" maskUnits="userSpaceOnUse">
-              <rect x="0" y="0" width="100%" height="100%" fill="#fff" />
-              {maskPath ? (
-                <path
-                  d={maskPath}
-                  fill="#000"
-                  style={{ filter: "blur(0.6px)" }}
+        <div className="relative w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-center z-10">
+          {/* Left Column: Story / Context */}
+          <div className="flex flex-col items-start text-left gap-4 max-w-lg">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase text-foreground tracking-tight font-sans text-balance leading-tight">
+              Ánh Mắt Nhìn Thấu Qua Khe Cửa
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground font-mono leading-relaxed">
+              Căn phòng nơi nạn nhân tử vong bị khóa trái từ bên trong. Ghé mắt qua lỗ khóa cũ kỹ để nhìn thấu không gian hiện trường 360 độ và phát hiện các dấu vết chưa từng được ghi nhận.
+            </p>
+
+            {/* Sleek Progress Line */}
+            <div className="w-full max-w-xs mt-3 flex flex-col gap-1.5 font-mono">
+              <div className="flex items-center justify-between text-[0.7rem] text-muted-foreground tracking-wider uppercase">
+                <span>Tiến độ khám xét</span>
+                <span className="text-amber-400 font-semibold">{Math.round(progress * 100)}%</span>
+              </div>
+              <div className="w-full h-1 bg-zinc-800/80 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-150 rounded-full"
+                  style={{ width: `${Math.max(2, Math.min(100, progress * 100))}%` }}
                 />
-              ) : null}
-            </mask>
-          </defs>
-          <rect
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            fill="#070503"
-            fillOpacity={maskOpacity}
-            mask="url(#keyhole-mask)"
-          />
-        </svg>
+              </div>
+            </div>
+          </div>
 
-        <LandingKeyholeModel
-          distance={distance}
-          pitch={pitch}
-          lookY={lookY}
-          opacity={modelOpacity}
-        />
+          {/* Right Column: Keyhole Portal Stage */}
+          <div className="relative w-full flex items-center justify-center lg:justify-end">
+            <div
+              ref={portalRef}
+              className="relative w-full max-w-[420px] sm:max-w-[460px] lg:max-w-[500px] h-[360px] sm:h-[440px] lg:h-[520px] rounded-3xl overflow-hidden bg-[#070503] shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
+              style={{
+                WebkitMaskImage:
+                  "radial-gradient(ellipse 96% 96% at 50% 50%, black 76%, transparent 100%)",
+                maskImage:
+                  "radial-gradient(ellipse 96% 96% at 50% 50%, black 76%, transparent 100%)",
+              }}
+            >
+              {/* Room seen through the keyway */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 z-0"
+                style={{
+                  backgroundImage: `url(${PANORAMA})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  transform: `scale(${1.04 + eased * 0.5 + clamp01((p - 0.72) / 0.28) * 0.26})`,
+                  filter: `brightness(${brightness}) saturate(1.05)`,
+                  willChange: "transform, filter",
+                }}
+              />
 
-        {/* Cinematic vignette */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 z-30 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 72% 62% at 50% 50%, transparent 0%, rgba(5,4,3,0.6) 100%)",
-          }}
-        />
+              {/* Everything outside the projected keyway stays softly shadowed */}
+              <svg
+                aria-hidden="true"
+                className="absolute inset-0 z-10 h-full w-full pointer-events-none"
+                viewBox={`0 0 ${Math.max(1, w)} ${Math.max(1, h)}`}
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <filter id="keyhole-soft-blur" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation={blurAmount.toFixed(1)} />
+                  </filter>
+                  <mask id="keyhole-mask" maskUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="100%" height="100%" fill="#fff" />
+                    {maskPath ? (
+                      <path
+                        d={maskPath}
+                        fill="#000"
+                        filter="url(#keyhole-soft-blur)"
+                      />
+                    ) : null}
+                  </mask>
+                </defs>
+                <rect
+                  x="0"
+                  y="0"
+                  width="100%"
+                  height="100%"
+                  fill="#070503"
+                  fillOpacity={maskOpacity}
+                  mask="url(#keyhole-mask)"
+                />
+
+                {/* Subtle light leak / warm amber rim glow around the keyhole opening */}
+                {maskPath && maskOpacity > 0.05 ? (
+                  <path
+                    d={maskPath}
+                    fill="none"
+                    stroke="rgba(245, 158, 11, 0.4)"
+                    strokeWidth={Math.max(1.5, 3 * (1 - p * 0.8))}
+                    opacity={Math.min(1, Math.max(0, 1 - p * 1.2))}
+                    style={{ filter: "blur(2.5px)" }}
+                  />
+                ) : null}
+              </svg>
+
+              <LandingKeyholeModel
+                distance={distance}
+                pitch={pitch}
+                lookY={lookY}
+                opacity={modelOpacity}
+              />
+
+              {/* Cinematic vignette inside the portal */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 z-30 pointer-events-none"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 72% 62% at 50% 50%, transparent 0%, rgba(5,4,3,0.6) 100%)",
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

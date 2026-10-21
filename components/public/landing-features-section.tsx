@@ -5,7 +5,7 @@ export function LandingFeaturesSection() {
   return (
     <>
       {/* VALUE PROPOSITION & FEATURES */}
-      <section id="loiich" className="w-full max-w-6xl px-6 py-16 z-10 border-t border-border/20 bg-card/5">
+      <section id="loiich" className="w-full max-w-6xl px-6 py-16 z-10">
         <div className="text-center max-w-2xl mx-auto mb-12 flex flex-col items-center">
           <h2 className="text-2xl lg:text-3xl font-black mt-2 uppercase">
             Tại Sao Nên Chọn XPLORE?
@@ -112,7 +112,7 @@ export function LandingFeaturesSection() {
       </section>
 
       {/* COMMUNITY ENGAGEMENT */}
-      <section className="w-full max-w-6xl px-6 py-16 z-10 border-t border-border/20 bg-card/5">
+      <section className="w-full max-w-6xl px-6 py-16 z-10">
         <div className="max-w-4xl mx-auto border border-primary/20 bg-primary/5 rounded-lg p-6 lg:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none" />
           <div className="max-w-xl">
