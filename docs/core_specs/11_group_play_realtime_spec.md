@@ -173,6 +173,13 @@ Khi người chơi tắt màn hình điện thoại hoặc mạng 4G bị gián 
    * Khi thành viên giải xong mục tiêu, góc màn hình hiện Toast thông báo màu vàng/xanh kèm âm thanh hiệu ứng nhẹ:  
      `🕵️ Nam vừa bẻ khóa thành công tin nhắn của Khang!`
 
+
+5. **Cơ Chế Chỉ Điểm Đồng Đội (Document & Clue Ping Protocol):**
+   * **Tập trung vào Tài Liệu & Vật Chứng (Dossier / Evidence Focus):** Khi một thành viên phát hiện manh mối hoặc văn bản mấu chốt, bấm nút [ 🎯 Chỉ điểm ] trên thẻ tài liệu hoặc vật chứng.
+   * **Phản hồi tức thì trên máy đồng đội:**
+     - Tên thám tử và badge chỉ điểm [ 🎯 Nam đang chỉ điểm văn bản này ] hiển thị ngay trên thẻ tài liệu tương ứng của tất cả các thành viên trong phòng.
+     - Tự động cuộn (auto-scroll) danh mục tới tài liệu được chỉ điểm để mọi người cùng mở ra đối chiếu.
+   * **Quy chuẩn Cách Ly Bảng Ghim:** Không áp dụng laser ping / radar ping gây nhiễu lên bảng ghim Corkboard; tính năng chỉ điểm được giới hạn tập trung trong không gian hồ sơ chứng cứ và tài liệu đọc.
 ### 4.3. Cơ Chế Room Token & Phục Hồi Session (Handshake Protocol)
 1. **Phân quyền Host vs Guest:**
    * Khi Host tạo phòng (`POST /api/rooms/create`): Server cấp `host_token` lưu trong `localStorage` của Host. Chỉ Host mới có quyền đóng phòng/kết thúc phiên.

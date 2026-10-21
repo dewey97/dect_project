@@ -2,8 +2,7 @@
 
 import React from 'react'
 import { SelectedView } from './evidence-types'
-import { useEvidenceTheme } from './evidence-theme-context'
-import { cn, normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
+import { normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
 import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'
 import { DiegeticDossierSheet } from './diegetic-dossier-sheet'
 import { EvidencePhotoAnnotator } from './evidence-photo-annotator'
@@ -15,8 +14,6 @@ interface EvidenceDetailInspectorProps {
 }
 
 export function EvidenceDetailInspector({ selectedView, caseId = 'case_000' }: EvidenceDetailInspectorProps) {
-  const { theme } = useEvidenceTheme()
-  const isNoir = theme === 'noir'
   const isPdf = selectedView.type === 'pdf'
   const displayCode = isPdf 
     ? (selectedView.data.code || 'HỒ SƠ')
@@ -34,20 +31,14 @@ export function EvidenceDetailInspector({ selectedView, caseId = 'case_000' }: E
   }) : undefined
 
   return (
-    <div className={cn(
-        "hidden lg:flex flex-1 min-w-0 min-h-0 border-2 rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex-col h-full relative transition-colors duration-200",
-        isNoir ? "bg-[#0a0a0d] border-[#1e1e24]" : "bg-[#16120e] border-[#3d2c1e]"
-      )}>
+    <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex-col h-full relative">
 
       {/* Main View Container */}
-      <div className={cn(
-        "flex-1 min-h-0 min-w-0 p-0 overflow-hidden flex flex-col transition-colors",
-        isNoir ? "bg-[#050507]" : "bg-[#120d09]"
-      )}>
+      <div className="flex-1 min-h-0 min-w-0 bg-[#120d09] p-0 overflow-hidden flex flex-col">
         {isPdf ? (
           matchedDossier ? (
             /* Hiển thị trực tiếp bản in Diegetic Dossier Sheet với zoom controls */
-            <div className="w-full h-full min-h-0 min-w-0 bg-[#09090b] relative flex flex-col">
+            <div className="w-full h-full min-h-0 min-w-0 bg-[#0f0c09] relative flex flex-col">
               <DiegeticDossierSheet document={matchedDossier} />
             </div>
           ) : (
