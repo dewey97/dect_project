@@ -14,6 +14,7 @@ import { FollowupTimeForm } from './followup/followup-time-form'
 import { FollowupChoiceForm } from './followup/followup-choice-form'
 import { FollowupCodeForm } from './followup/followup-code-form'
 import { FollowupTextForm } from './followup/followup-text-form'
+import { caseStorageKey } from '@/lib/cases/case-id'
 
 interface FollowupQuestionModalProps {
   caseId?: string
@@ -260,13 +261,13 @@ export function FollowupQuestionModal({
     if (questionType === 'code') {
       setCodeInput('')
     } else if (questionType === 'time') {
-      const savedTime = getStorageItem(`followup_${culprit}`) || getStorageItem('followup_vu')
+      const savedTime = getStorageItem(caseStorageKey(caseId, `followup_${culprit}`)) || getStorageItem(caseStorageKey(caseId, 'followup_vu'))
       setTimeInput(savedTime || '')
     } else if (questionType === 'choice') {
-      const savedChoice = getStorageItem(`followup_${culprit}`) || getStorageItem('followup_tung')
+      const savedChoice = getStorageItem(caseStorageKey(caseId, `followup_${culprit}`)) || getStorageItem(caseStorageKey(caseId, 'followup_tung'))
       setSelectedChoice(savedChoice || null)
     } else {
-      const savedText = getStorageItem(`followup_${culprit}`)
+      const savedText = getStorageItem(caseStorageKey(caseId, `followup_${culprit}`))
       setTextInput(savedText || '')
       setSelectedChoice(savedText || null)
     }
@@ -311,8 +312,8 @@ export function FollowupQuestionModal({
       detectiveAudio.playStampSound()
       setErrorMsg('')
       const finalAnswer = activeCheckpoint?.correctAnswer || timeInput.trim()
-      setStorageItem(`followup_${culprit}`, finalAnswer)
-      if (culprit === 'vu') setStorageItem('followup_vu', finalAnswer)
+      setStorageItem(caseStorageKey(caseId, `followup_${culprit}`), finalAnswer)
+      if (culprit === 'vu') setStorageItem(caseStorageKey(caseId, 'followup_vu'), finalAnswer)
       if (onSuccess) {
         onSuccess(culprit, finalAnswer)
       }
@@ -339,8 +340,8 @@ export function FollowupQuestionModal({
     if (isCorrect) {
       detectiveAudio.playStampSound()
       setErrorMsg('')
-      setStorageItem(`followup_${culprit}`, selectedChoice)
-      if (culprit === 'tung') setStorageItem('followup_tung', selectedChoice)
+      setStorageItem(caseStorageKey(caseId, `followup_${culprit}`), selectedChoice)
+      if (culprit === 'tung') setStorageItem(caseStorageKey(caseId, 'followup_tung'), selectedChoice)
       if (onSuccess) {
         onSuccess(culprit, selectedChoice)
       }
@@ -376,11 +377,11 @@ export function FollowupQuestionModal({
     if (isCorrect) {
       detectiveAudio.playStampSound()
       setErrorMsg('')
-      setStorageItem(`followup_${culprit}_password`, rawVal)
-      setStorageItem(`followup_${culprit}`, 'solved')
+      setStorageItem(caseStorageKey(caseId, `followup_${culprit}_password`), rawVal)
+      setStorageItem(caseStorageKey(caseId, `followup_${culprit}`), 'solved')
       if (culprit === 'ha') {
-        setStorageItem('followup_ha_password', rawVal)
-        setStorageItem('followup_ha', 'solved')
+        setStorageItem(caseStorageKey(caseId, 'followup_ha_password'), rawVal)
+        setStorageItem(caseStorageKey(caseId, 'followup_ha'), 'solved')
       }
       // Mở popup ảnh vật chứng nếu có
       if (discoveredPhotos.length > 0) {
@@ -416,7 +417,7 @@ export function FollowupQuestionModal({
     if (isCorrect) {
       detectiveAudio.playStampSound()
       setErrorMsg('')
-      setStorageItem(`followup_${culprit}`, finalVal)
+      setStorageItem(caseStorageKey(caseId, `followup_${culprit}`), finalVal)
       if (onSuccess) {
         onSuccess(culprit, finalVal)
       }

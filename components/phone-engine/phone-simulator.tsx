@@ -33,6 +33,7 @@ import { NotesApp } from "./apps/notes-app";
 import { PhotosApp } from "./apps/photos-app";
 import { BankingApp } from "./apps/banking-app";
 import { CameraApp } from "./apps/camera-app";
+import { getActiveCaseId, getActiveVictim } from "@/lib/cases/case-characters";
 
 // Heavy apps — lazy loaded only when the user opens them (cuts initial JS bundle significantly)
 // MapsApp: 970 lines, fetches 1.5MB map JSON, contains full SVG renderer
@@ -75,19 +76,32 @@ export interface PhoneSimulatorProps {
   onPinClue?: (clueId: string, metadata?: Record<string, unknown>) => void;
 }
 
-const DEFAULT_VICTIM_DEVICE: Device = {
-  id: "dev-000-1",
-  caseId: "case-000",
-  evidenceId: "DEV-000-1",
+const BASE_DEVICE: Device = {
+  id: "dev-victim",
+  caseId: "",
+  evidenceId: "DEV-VICTIM",
   label: "Điện thoại nạn nhân",
   kind: "phone",
-  owner: "Nguyễn Văn Khang",
+  owner: "",
   locked: false,
   status: "unlocked",
   recoveryLevel: 100,
-  lastUpdated: "24/07/2016 // 17:55",
-  description: "Điện thoại cá nhân của nạn nhân Khang",
+  lastUpdated: "",
+  description: "",
 };
+
+/** Thông tin máy lấy từ nạn nhân của vụ án (bảng `case_characters`). */
+function getCaseVictimDevice(): Partial<Device> {
+  const victim = getActiveVictim();
+  if (!victim) return {};
+  return {
+    caseId: getActiveCaseId() || "",
+    owner: victim.name,
+    ...(victim.device?.label ? { label: victim.device.label } : {}),
+    lastUpdated: victim.device?.lastUpdated || "",
+    description: victim.device?.description || "",
+  };
+}
 
 /**
  * Nội dung hiển thị bên trong màn hình điện thoại (Screen Controller)
@@ -277,7 +291,7 @@ function PhoneSimulatorShell({
  * PhoneSimulator: Entry point module hóa dùng chung cho mọi Case
  */
 export function PhoneSimulator({
-  device = DEFAULT_VICTIM_DEVICE,
+  device,
   threads = [],
   photos = [],
   notes = [],
@@ -288,7 +302,8 @@ export function PhoneSimulator({
   onPinClue,
 }: PhoneSimulatorProps) {
   const activeDevice: Device = {
-    ...DEFAULT_VICTIM_DEVICE,
+    ...BASE_DEVICE,
+    ...getCaseVictimDevice(),
     ...device,
   };
 

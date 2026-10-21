@@ -9,6 +9,7 @@ import { emitInvestigationEvent } from '@/lib/investigation-events'
 import { isAdminBypassCode } from '@/lib/cases/admin-bypass'
 import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
+import { caseStorageKey } from '@/lib/cases/case-id'
 import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
 
 function isPhoneMatch(val: string, validKeywords: string[]): boolean {
@@ -66,7 +67,7 @@ export function PhoneLookupModal({
   onSuccess,
   onOpenPhoneSimulator
 }: PhoneLookupModalProps) {
-  const sKey = (k: string) => (caseId === 'case-000' ? k : `${caseId}::${k}`)
+  const sKey = (k: string) => caseStorageKey(caseId, k)
   const { checkpoints } = useCaseCheckpoints(caseId)
   const cp0 = checkpoints.find((c) => c.id.includes('-0') || c.id.includes('phone'))
 

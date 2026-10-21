@@ -8,6 +8,8 @@ import { TypewriterNarrator } from "./typewriter-narrator";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useCaseNarratives, DEFAULT_NARRATIVES } from "@/lib/hooks/use-case-narratives";
 import { setStorageItem } from "@/lib/storage";
+import { normalizeCaseId } from "@/lib/cases/case-id";
+import { getActiveCaseId } from "@/lib/cases/case-characters";
 
 export interface UnlockedModalData {
   unlockedPhase: number;
@@ -38,7 +40,7 @@ export function PhaseUnlockedModal({
   const [isNarrativeComplete, setIsNarrativeComplete] = React.useState(false);
 
   // Đọc danh sách dẫn truyện cinematic trực tiếp từ tab `narratives` trên Google Sheet Live CMS
-  const { getPhaseNarrative } = useCaseNarratives("case-000");
+  const { getPhaseNarrative } = useCaseNarratives(normalizeCaseId(getActiveCaseId()));
 
   const currentNarrative = React.useMemo(() => {
     if (!unlockedModalData) return null;

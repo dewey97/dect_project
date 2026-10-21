@@ -30,6 +30,7 @@ import {
 import { CanvasToolbar } from "./canvas/canvas-toolbar";
 import { CanvasModals } from "./canvas/canvas-modals";
 import { CanvasPhotoZoom } from "./canvas/canvas-photo-zoom";
+import { caseStorageKey } from "@/lib/cases/case-id";
 
 interface MainInvestigationCanvasProps {
   caseId?: string;
@@ -657,9 +658,9 @@ export function MainInvestigationCanvas({
         // Kiểm tra xem câu hỏi mở rộng của đối tượng này đã được giải xong chưa
         const isAlreadySolved =
           state.solvedFollowupQuestions.includes(c) ||
-          getStorageItem(`followup_${c}`) === 'solved' ||
-          (c === 'ha' && !!getStorageItem('followup_ha_password')) ||
-          (c === 'vu' && !!getStorageItem('followup_vu'))
+          getStorageItem(caseStorageKey(caseId, `followup_${c}`)) === 'solved' ||
+          (c === 'ha' && !!getStorageItem(caseStorageKey(caseId, 'followup_ha_password'))) ||
+          (c === 'vu' && !!getStorageItem(caseStorageKey(caseId, 'followup_vu')))
 
         if (isAlreadySolved) {
           if (c === 'ha') {
@@ -667,7 +668,7 @@ export function MainInvestigationCanvas({
             state.setIsFollowupQuestionOpen(true);
           } else {
             // Vũ / Tùng: Mở thẳng narrative lời khai sau khi giải xong
-            const savedChoice = getStorageItem(`followup_${c}_choice`) || (c === 'vu' ? '21:15' : 'question_solved');
+            const savedChoice = getStorageItem(caseStorageKey(caseId, `followup_${c}_choice`)) || (c === 'vu' ? '21:15' : 'question_solved');
             state.setNarrativeCulprit(c);
             state.setNarrativeChoice(savedChoice);
             state.setIsEpilogueOpen(true);

@@ -67,7 +67,7 @@ export function DossierStudioHeader({
           >
             {initialCases.length > 0 ? (
               initialCases.map(c => (
-                <option key={c.id} value={c.id === '7edde065-c9ea-4f41-875e-5526a29f5804' ? 'case_000' : c.id} className="bg-[#141618] text-white">
+                <option key={c.id} value={c.slug} className="bg-[#141618] text-white">
                   {c.title}
                 </option>
               ))

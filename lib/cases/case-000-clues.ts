@@ -4,20 +4,13 @@ import {
   ADMIN_MASTER_EVIDENCE,
   ADMIN_MASTER_EVIDENCE_ID,
 } from './admin-bypass'
+import { getKnownCasePhones } from './case-characters'
 
 export {
   isAdminBypassCode,
   hasAdminBypassInArray,
   ADMIN_MASTER_EVIDENCE,
   ADMIN_MASTER_EVIDENCE_ID,
-}
-
-export const KNOWN_CASE_PHONES: Record<string, { full: string; formatted: string; name: string }> = {
-  '991': { full: '0988200991', formatted: '0988.200.991', name: 'Lê Quang Vũ' },
-  '888': { full: '0912331888', formatted: '0912.331.888', name: 'Nguyễn Thanh Tùng' },
-  '109': { full: '0978552109', formatted: '0978.552.109', name: 'Trần Thị Hà' },
-  '568': { full: '0984112568', formatted: '0984.112.568', name: 'Trần Thị Hà' },
-  '357': { full: '0984180357', formatted: '0984.180.357', name: 'Trần Văn Đạt' },
 }
 
 /**
@@ -40,7 +33,7 @@ export function isEvidenceMatching(clueId: string, targetCodes: string[]): boole
   const clueIsPhone =
     /phone|sdt|sms|voice/i.test(clueId) ||
     clueDigits.length >= 9 ||
-    (clueDigits.length >= 3 && KNOWN_CASE_PHONES[clueDigits.slice(-3)] !== undefined)
+    (clueDigits.length >= 3 && getKnownCasePhones()[clueDigits.slice(-3)] !== undefined)
 
   const normClueCode = cleanClue.replace(/[-_.\s]/g, '')
   const normClueAlphanum = normClueCode.replace(/^([a-z])0+(\d+)$/, '$1$2')
@@ -84,7 +77,7 @@ export function isEvidenceMatching(clueId: string, targetCodes: string[]): boole
     const targetIsPhone =
       /phone|sdt|sms|voice/i.test(target) ||
       targetDigits.length >= 9 ||
-      (targetDigits.length >= 3 && KNOWN_CASE_PHONES[targetDigits.slice(-3)] !== undefined)
+      (targetDigits.length >= 3 && getKnownCasePhones()[targetDigits.slice(-3)] !== undefined)
 
     if (clueIsPhone || targetIsPhone || (clueDigits.length >= 3 && targetDigits.length >= 3)) {
       if (clueDigits.length >= 3 && targetDigits.length >= 3) {
@@ -218,8 +211,8 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
   }
 
   // 1b. 3 last digits of phone number
-  if (digitsOnly.length === 3 && KNOWN_CASE_PHONES[digitsOnly]) {
-    const known = KNOWN_CASE_PHONES[digitsOnly]
+  if (digitsOnly.length === 3 && getKnownCasePhones()[digitsOnly]) {
+    const known = getKnownCasePhones()[digitsOnly]
     return {
       id: `sms_phone_${known.full}`,
       label: `Tin nhắn với SĐT: ${known.formatted}`,
@@ -234,7 +227,7 @@ export function resolveEvidenceCode(rawInput: string): { id: string; label: stri
   ) {
     const num = trimmed.replace(/^voice[_:]/i, '').trim()
     const digits = num.replace(/\D/g, '')
-    const known = KNOWN_CASE_PHONES[digits.slice(-3)]
+    const known = getKnownCasePhones()[digits.slice(-3)]
     const formatted = known
       ? known.formatted
       : digits.length === 10
@@ -291,7 +284,7 @@ export function getClueBadgeInfo(
 
   if (id.startsWith('sms_phone_')) {
     const raw = id.replace('sms_phone_', '')
-    const known = KNOWN_CASE_PHONES[raw.slice(-3)]
+    const known = getKnownCasePhones()[raw.slice(-3)]
     const formatted = known
       ? known.formatted
       : raw.length === 10
@@ -303,7 +296,7 @@ export function getClueBadgeInfo(
 
   if (id.startsWith('voice_phone_')) {
     const raw = id.replace('voice_phone_', '')
-    const known = KNOWN_CASE_PHONES[raw.slice(-3)]
+    const known = getKnownCasePhones()[raw.slice(-3)]
     const formatted = known
       ? known.formatted
       : raw.length === 10

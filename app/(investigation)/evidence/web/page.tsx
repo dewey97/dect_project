@@ -36,7 +36,10 @@ import {
   CASE_000_PDFS,
   CASE_000_EVIDENCE,
 } from "@/components/investigation/evidence/evidence-data";
-import { PhaseUnlockedModal, type UnlockedModalData } from "@/components/investigation/evidence/phase-unlocked-modal";
+import {
+  PhaseUnlockedModal,
+  type UnlockedModalData,
+} from "@/components/investigation/evidence/phase-unlocked-modal";
 import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
 import { InvestigationMobileNav } from "@/components/investigation/evidence/investigation-mobile-nav";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
@@ -58,6 +61,7 @@ import {
   clearInvestigationStorage,
   getStorageJson,
 } from "@/lib/storage";
+import { caseStorageKey, normalizeCaseId } from "@/lib/cases/case-id";
 import { useInvestigationEvent } from "@/lib/investigation-events";
 
 type ActiveModal =
@@ -79,7 +83,7 @@ function WebEvidencePageContent() {
       ? "case-000"
       : rawCaseId;
   const normalizedSheetCaseId = useMemo(
-    () => caseId.replace(/-/g, "_"),
+    () => normalizeCaseId(caseId),
     [caseId],
   );
 
@@ -118,19 +122,26 @@ function WebEvidencePageContent() {
   // Cột 3 (Phải): Trình duyệt chi tiết PDF / Vật chứng / Phone (Viewer Inspector) - width cố định/resizable (320px -> 750px)
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
   const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false);
-  const [isReinvestigationExpanded, setIsReinvestigationExpanded] = useState(false);
+  const [isReinvestigationExpanded, setIsReinvestigationExpanded] =
+    useState(false);
   const [dossierWidth, setDossierWidth] = useState<number>(300);
   const [viewerWidth, setViewerWidth] = useState<number>(460);
-  const [isDraggingLeftSplit, setIsDraggingLeftSplit] = useState<boolean>(false);
-  const [isDraggingRightSplit, setIsDraggingRightSplit] = useState<boolean>(false);
+  const [isDraggingLeftSplit, setIsDraggingLeftSplit] =
+    useState<boolean>(false);
+  const [isDraggingRightSplit, setIsDraggingRightSplit] =
+    useState<boolean>(false);
 
   // Phase filter: 'all' | 0 | 1 | 2 | 3
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<
     "all" | number
   >("all");
 
-  const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<string | undefined>(undefined);
-  const [activeHintCategory, setActiveHintCategory] = useState<"motive" | "alibi" | undefined>(undefined);
+  const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<
+    string | undefined
+  >(undefined);
+  const [activeHintCategory, setActiveHintCategory] = useState<
+    "motive" | "alibi" | undefined
+  >(undefined);
 
   const { activePing, broadcastPing, roomCode } = useRoomSync();
 
@@ -139,8 +150,12 @@ function WebEvidencePageContent() {
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
   useInvestigationEvent("OPEN_NOTEBOOK", () => setActiveModal("notebook"));
   useInvestigationEvent("OPEN_HINT", (e: any) => {
-    const cpId = e?.detail?.checkpointId || (typeof e?.detail === "string" ? e.detail : undefined);
-    const cat = e?.detail?.category || (typeof e?.detail === "object" ? e.detail?.category : undefined);
+    const cpId =
+      e?.detail?.checkpointId ||
+      (typeof e?.detail === "string" ? e.detail : undefined);
+    const cat =
+      e?.detail?.category ||
+      (typeof e?.detail === "object" ? e.detail?.category : undefined);
     setActiveHintCheckpointId(cpId);
     setActiveHintCategory(cat);
     setActiveModal("hint");
@@ -162,10 +177,20 @@ function WebEvidencePageContent() {
       const rawContent: any = doc.content || {};
       const title =
         doc.mode === "ly_lich"
-          ? (doc.subject_name ? `Lý lịch: ${doc.subject_name}` : rawContent.fullName ? `Lý lịch: ${rawContent.fullName}` : `Lý lịch #${code}`)
-          : (rawContent.docTitle || (doc.subject_name ? `Lời khai: ${doc.subject_name}` : `Lời khai #${code}`));
+          ? doc.subject_name
+            ? `Lý lịch: ${doc.subject_name}`
+            : rawContent.fullName
+              ? `Lý lịch: ${rawContent.fullName}`
+              : `Lý lịch #${code}`
+          : rawContent.docTitle ||
+            (doc.subject_name
+              ? `Lời khai: ${doc.subject_name}`
+              : `Lời khai #${code}`);
 
-      const sortOrder = typeof rawContent.sortOrder === "number" ? rawContent.sortOrder : idx * 10;
+      const sortOrder =
+        typeof rawContent.sortOrder === "number"
+          ? rawContent.sortOrder
+          : idx * 10;
 
       return {
         type: "pdf",
@@ -213,21 +238,39 @@ function WebEvidencePageContent() {
         })
         .map((row: any, idx: number): CombinedItem => {
           const code = String(row.code || "").trim();
-          const title = String(row.label || row.title || `Vật chứng #${code}`).trim();
+          const title = String(
+            row.label || row.title || `Vật chứng #${code}`,
+          ).trim();
           const driveUrl = String(row.drive_url || "").trim();
           const boStr = String(row["bộ hồ sơ"] || "").toUpperCase();
 
           let phase = 0;
           if (boStr === "A" || code.startsWith("A-")) phase = 1;
-          else if (boStr === "B" || code.startsWith("B-") || boStr === "E" || code.startsWith("E-")) phase = 2;
-          else if (boStr === "C" || code.startsWith("C-") || boStr === "D" || code.startsWith("D-")) phase = 3;
+          else if (
+            boStr === "B" ||
+            code.startsWith("B-") ||
+            boStr === "E" ||
+            code.startsWith("E-")
+          )
+            phase = 2;
+          else if (
+            boStr === "C" ||
+            code.startsWith("C-") ||
+            boStr === "D" ||
+            code.startsWith("D-")
+          )
+            phase = 3;
 
-          const localFallback = caseId === "case-000"
-            ? CASE_000_EVIDENCE.find(
-                (e) => e.title.toLowerCase().includes(title.toLowerCase()) || title.toLowerCase().includes(e.title.toLowerCase())
-              )
-            : undefined;
-          const imgUrl = driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
+          const localFallback =
+            caseId === "case-000"
+              ? CASE_000_EVIDENCE.find(
+                  (e) =>
+                    e.title.toLowerCase().includes(title.toLowerCase()) ||
+                    title.toLowerCase().includes(e.title.toLowerCase()),
+                )
+              : undefined;
+          const imgUrl =
+            driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
 
           return {
             type: "evidence",
@@ -265,20 +308,31 @@ function WebEvidencePageContent() {
   // Tự động nhảy đến vị trí tài liệu/vật chứng khi có đồng đội chỉ điểm (Ping)
   useEffect(() => {
     if (!activePing) return;
-    if (activePing.targetType === "doc" || activePing.targetType === "evidence") {
+    if (
+      activePing.targetType === "doc" ||
+      activePing.targetType === "evidence"
+    ) {
       // Tìm tài liệu tương ứng trong danh sách effectiveItems
       const targetItem = (effectiveItems as CombinedItem[]).find(
-        (i) => i.data.id === activePing.targetId || (i.data as any).code === activePing.targetId
+        (i) =>
+          i.data.id === activePing.targetId ||
+          (i.data as any).code === activePing.targetId,
       );
 
       if (targetItem) {
         // Tự động mở tab phân loại phù hợp (Hồ sơ hay Vật chứng)
         if (targetItem.type === "evidence") {
           setFilterTab("evidence");
-          setSelectedView({ type: "evidence", data: targetItem.data as PhysicalEvidence });
+          setSelectedView({
+            type: "evidence",
+            data: targetItem.data as PhysicalEvidence,
+          });
         } else {
           setFilterTab("pdf");
-          setSelectedView({ type: "pdf", data: targetItem.data as PDFDocument });
+          setSelectedView({
+            type: "pdf",
+            data: targetItem.data as PDFDocument,
+          });
         }
 
         // Tự chuyển tab trên mobile nếu đang ở tab bảng
@@ -290,7 +344,9 @@ function WebEvidencePageContent() {
         // Cuộn thẻ tài liệu vào tầm nhìn nếu có trong DOM
         if (typeof document !== "undefined") {
           setTimeout(() => {
-            const el = document.getElementById(`doc-card-${targetItem.data.id}`);
+            const el = document.getElementById(
+              `doc-card-${targetItem.data.id}`,
+            );
             if (el) {
               el.scrollIntoView({ behavior: "smooth", block: "center" });
             }
@@ -303,8 +359,7 @@ function WebEvidencePageContent() {
   useEffect(() => {
     setStorageItem("play_experience", "web");
 
-    const introKey = caseId === "case-000" ? "intro_seen" : `${caseId}::intro_seen`;
-    const isIntroSeen = getStorageItem(introKey);
+    const isIntroSeen = getStorageItem(caseStorageKey(caseId, "intro_seen"));
     if (isIntroSeen !== "true") {
       const initPdfs = (effectiveItems as CombinedItem[])
         .filter((i) => i.type === "pdf" && i.phase === 0)
@@ -330,21 +385,14 @@ function WebEvidencePageContent() {
 
     // Check current unlocked phase from boardgame progress
     const solvedFollowups = getStorageJson<string[]>(
-      caseId === "case-000" ? "solved_followups" : `${caseId}::solved_followups`,
+      caseStorageKey(caseId, "solved_followups"),
       [],
     );
     const isReinvestigateUnlocked =
-      getStorageItem(
-        caseId === "case-000"
-          ? "reinvestigate_unlocked"
-          : `${caseId}::reinvestigate_unlocked`,
-      ) === "true";
+      getStorageItem(caseStorageKey(caseId, "reinvestigate_unlocked")) ===
+      "true";
     const isIndictmentSolved =
-      getStorageItem(
-        caseId === "case-000"
-          ? "indictment_solved"
-          : `${caseId}::indictment_solved`,
-      ) === "true";
+      getStorageItem(caseStorageKey(caseId, "indictment_solved")) === "true";
 
     if (isIndictmentSolved) {
       setUnlockedPhase(3);
@@ -391,7 +439,10 @@ function WebEvidencePageContent() {
       if (window.innerWidth < 1024) return;
       const windowWidth = window.innerWidth;
       const maxLeft = Math.min(460, windowWidth - viewerWidth - 360);
-      const clamped = Math.min(Math.max(e.clientX, 220), Math.max(220, maxLeft));
+      const clamped = Math.min(
+        Math.max(e.clientX, 220),
+        Math.max(220, maxLeft),
+      );
       setDossierWidth(clamped);
     };
 
@@ -418,7 +469,10 @@ function WebEvidencePageContent() {
       const windowWidth = window.innerWidth;
       const newViewerWidth = windowWidth - e.clientX;
       const maxRight = Math.min(750, windowWidth - dossierWidth - 360);
-      const clamped = Math.min(Math.max(newViewerWidth, 320), Math.max(320, maxRight));
+      const clamped = Math.min(
+        Math.max(newViewerWidth, 320),
+        Math.max(320, maxRight),
+      );
       setViewerWidth(clamped);
     };
 
@@ -474,27 +528,26 @@ function WebEvidencePageContent() {
   };
 
   const resetAllProgress = () => {
-    if (caseId === "case-000") {
+    if (normalizeCaseId(caseId) === "case_000") {
       clearInvestigationStorage();
     } else {
       [
-        `${caseId}::intro_seen`,
-        `${caseId}::solved_followups`,
-        `${caseId}::reinvestigate_unlocked`,
-        `${caseId}::indictment_solved`,
-      ].forEach((k) => setStorageItem(k, ""));
+        "intro_seen",
+        "solved_followups",
+        "reinvestigate_unlocked",
+        "indictment_solved",
+      ].forEach((k) => setStorageItem(caseStorageKey(caseId, k), ""));
     }
     window.location.reload();
   };
-
-
 
   const pdfItems = useMemo(() => {
     return (effectiveItems as CombinedItem[])
       .filter((item: CombinedItem) => {
         if (!isPhaseUnlocked(item.phase)) return false;
         if (item.type !== "pdf") return false;
-        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter) return false;
+        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter)
+          return false;
         return true;
       })
       .sort((a: CombinedItem, b: CombinedItem) => a.order - b.order);
@@ -505,7 +558,8 @@ function WebEvidencePageContent() {
       .filter((item: CombinedItem) => {
         if (!isPhaseUnlocked(item.phase)) return false;
         if (item.type !== "evidence") return false;
-        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter) return false;
+        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter)
+          return false;
         return true;
       })
       .sort((a: CombinedItem, b: CombinedItem) => a.order - b.order);
@@ -517,9 +571,7 @@ function WebEvidencePageContent() {
     if (currentList.length > 0) {
       setSelectedView((prev) => {
         const currentId = prev?.data?.id;
-        const exists = currentList.some(
-          (item) => item.data.id === currentId,
-        );
+        const exists = currentList.some((item) => item.data.id === currentId);
         if (!exists) {
           const first = currentList[0];
           return { type: first.type, data: first.data as any };
@@ -588,7 +640,8 @@ function WebEvidencePageContent() {
             <div
               className={cn(
                 "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-                isDraggingLeftSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+                isDraggingLeftSplit &&
+                  "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
               )}
             >
               <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -601,7 +654,7 @@ function WebEvidencePageContent() {
           className={cn(
             "h-full flex-1 min-w-0 bg-[#16120e] border border-[#2d1e13] rounded-none overflow-hidden flex flex-col min-h-0 relative shadow-inner",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
-            mobileTab === "board" ? "flex w-full" : "hidden lg:flex"
+            mobileTab === "board" ? "flex w-full" : "hidden lg:flex",
           )}
         >
           {/* TOP RIGHT TOOLBAR: SỔ TAY */}
@@ -644,7 +697,8 @@ function WebEvidencePageContent() {
           <div
             className={cn(
               "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-              isDraggingRightSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+              isDraggingRightSplit &&
+                "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
             )}
           >
             <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -704,13 +758,16 @@ function WebEvidencePageContent() {
               inline={!isReinvestigationExpanded}
               onExpand={() => setIsReinvestigationExpanded(true)}
               onClose={() => {
-                setIsReinvestigationExpanded(false)
-                setActiveModal(null)
+                setIsReinvestigationExpanded(false);
+                setActiveModal(null);
               }}
             />
           ) : (
             /* EVIDENCE DETAIL INSPECTOR */
-            <EvidenceDetailInspector selectedView={selectedView} caseId={caseId} />
+            <EvidenceDetailInspector
+              selectedView={selectedView}
+              caseId={caseId}
+            />
           )}
         </div>
       </div>
@@ -772,8 +829,8 @@ function WebEvidencePageContent() {
           caseId={caseId}
           isOpen={activeModal === "phone"}
           onClose={() => {
-            setIsReinvestigationExpanded(false)
-            setActiveModal(null)
+            setIsReinvestigationExpanded(false);
+            setActiveModal(null);
           }}
         />
       </div>
@@ -784,8 +841,8 @@ function WebEvidencePageContent() {
           caseId={caseId}
           isOpen={activeModal === "reinvestigate"}
           onClose={() => {
-            setIsReinvestigationExpanded(false)
-            setActiveModal(null)
+            setIsReinvestigationExpanded(false);
+            setActiveModal(null);
           }}
         />
       </div>

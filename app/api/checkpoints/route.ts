@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-function normalizeCaseId(caseId: string): string {
-  return (caseId || "case_000")
-    .trim()
-    .toLowerCase()
-    .replace(/-/g, "_");
-}
 
 /**
  * Runtime checkpoint feed — đọc trực tiếp Checkpoint Studio (Supabase).

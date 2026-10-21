@@ -64,6 +64,14 @@ export function DossierStudioClient({
   initialHsDocuments = []
 }: DossierStudioClientProps) {
   const [caseId, setCaseId] = useState<string>(initialCaseId)
+
+  // Giữ vụ án đang chọn trên URL (?case=) để tải lại trang không quay về case_000.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("case") === caseId) return;
+    url.searchParams.set("case", caseId);
+    window.history.replaceState(null, "", url);
+  }, [caseId]);
   const [mode, setMode] = useState<DossierMode>('loi_khai')
 
   const initialLk = (initialLkDocuments[0]?.content as LoiKhaiData) || EMPTY_LK

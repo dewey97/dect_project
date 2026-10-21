@@ -16,6 +16,7 @@ import {
   ListChecks,
   ChevronLeft,
   ChevronRight,
+  UserRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -45,6 +46,7 @@ const navGroups: NavGroup[] = [
     items: [
       { name: "Map Studio", shortName: "Map", href: "/studio/map", icon: Map },
       { name: "Dossier Studio", shortName: "Hồ sơ", href: "/studio/dossier", icon: FileText },
+      { name: "Nhân vật", shortName: "Nhân vật", href: "/studio/characters", icon: UserRound },
       {
         name: "Checkpoint Studio",
         shortName: "Checkpoint",

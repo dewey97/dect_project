@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { DbCase, CaseStatus } from '@/lib/types/database'
 import { revalidatePath } from 'next/cache'
+import { isValidCaseId, normalizeCaseId } from '@/lib/cases/case-id'
 import { requireAdminAuth } from './auth-guard'
 
 /** Lấy thống kê tổng quan cho Dashboard */
@@ -96,7 +97,9 @@ export async function deleteCase(caseId: string) {
     return { success: true }
   } catch (error: any) {
     console.error('Error deleting case:', error)
-    return { success: false, error: error.message }
+    return { success: false, error: error?.code === '23503'
+      ? 'Vụ án còn checkpoint, hồ sơ hoặc nhân vật. Xóa nội dung trước khi xóa vụ án.'
+      : error.message }
   }
 }
 
@@ -139,6 +142,9 @@ export async function createNewCase(title: string, customCaseId?: string) {
     if (!title.trim()) {
       return { success: false, error: 'Vui lòng nhập tên vụ án.' };
     }
+    if (customCaseId?.trim() && !isValidCaseId(customCaseId)) {
+      return { success: false, error: 'Mã vụ án chỉ gồm chữ thường, số và dấu gạch dưới (vd: case_002).' };
+    }
 
     // 1. Tạo bản ghi trong cases
     const { data: newCase, error: insertError } = await supabase
@@ -146,22 +152,19 @@ export async function createNewCase(title: string, customCaseId?: string) {
       .insert([{
         title: title.trim(),
         status: 'DRAFT',
+        // Bỏ trống slug để DB tự cấp mã tuần tự (trigger assign_case_slug).
+        ...(customCaseId?.trim() ? { slug: normalizeCaseId(customCaseId) } : {}),
       }])
       .select()
       .single();
 
     if (insertError) throw insertError;
 
-    // 2. Định danh mã case
-    let normalizedCaseId = customCaseId?.trim();
-    if (!normalizedCaseId) {
-      const { data: existingCases } = await supabase.from('cases').select('id');
-      const count = (existingCases?.length || 1);
-      normalizedCaseId = `case_${String(count).padStart(3, '0')}`;
-    }
+    // 2. Mã vụ án do DB cấp
+    const normalizedCaseId = (newCase as DbCase).slug;
 
     // 3. Tự động sinh 2 node cốt lõi: Hồ sơ ban đầu và Hậu án
-    await supabase.from('case_checkpoints').insert([
+    const { error: seedError } = await supabase.from('case_checkpoints').insert([
       {
         case_id: normalizedCaseId,
         checkpoint_id: 'cp-start',
@@ -190,6 +193,7 @@ export async function createNewCase(title: string, customCaseId?: string) {
         depends_on: ['cp-start'],
       },
     ]);
+    if (seedError) throw seedError;
 
     revalidatePath('/studio/checkpoints');
     revalidatePath('/studio/cases');

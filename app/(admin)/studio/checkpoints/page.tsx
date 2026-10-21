@@ -6,6 +6,7 @@ import {
   getCaseDossiers,
   getAllCaseDocumentsCatalog,
 } from "@/lib/actions/dossier-config-actions";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 export const metadata: Metadata = {
   title: "Checkpoint Studio | Detective Case System",
@@ -15,18 +16,23 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function CheckpointStudioPage() {
+export default async function CheckpointStudioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ case?: string }>;
+}) {
+  const caseId = normalizeCaseId((await searchParams).case);
   const [casesResult, checkpointsResult, dossiers, availableDocs] =
     await Promise.all([
       getCases(),
-      getCheckpointsByCase("case_000"),
-      getCaseDossiers("case_000"),
-      getAllCaseDocumentsCatalog("case_000"),
+      getCheckpointsByCase(caseId),
+      getCaseDossiers(caseId),
+      getAllCaseDocumentsCatalog(caseId),
     ]);
 
   return (
     <CheckpointStudioClient
-      initialCaseId="case_000"
+      initialCaseId={caseId}
       initialCases={casesResult.data || []}
       initialRows={checkpointsResult.data || []}
       initialDossiers={dossiers}

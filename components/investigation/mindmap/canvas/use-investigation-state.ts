@@ -15,6 +15,8 @@ import {
   getStorageJson,
   setStorageJson,
 } from "@/lib/storage";
+import { caseStorageKey } from "@/lib/cases/case-id";
+import { getActiveVictim, isVictimReference } from "@/lib/cases/case-characters";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 
@@ -32,18 +34,12 @@ export interface SuspectItem {
 
 export type CulpritKey = "vu" | "tung" | "ha" | (string & {});
 
-export const ALL_CASE_000_SUSPECTS: SuspectItem[] = [
-  { id: "suspect-vu", name: "Lê Quang Vũ", clueIds: [] },
-  { id: "suspect-tung", name: "Nguyễn Thanh Tùng", clueIds: [] },
-  { id: "suspect-ha", name: "Trần Thị Hà", clueIds: [] },
-];
-
 export function sanitizeSuspectsList(items: SuspectItem[]): SuspectItem[] {
   const map = new Map<string, SuspectItem>();
   for (const s of items) {
     if (!s || !s.name) continue;
     const { canonicalId, canonicalName } = getCanonicalSuspectKey(s);
-    if (canonicalId === "khang" || (s.name && s.name.toLowerCase().includes("khang"))) continue;
+    if (isVictimReference(canonicalId) || isVictimReference(s.name)) continue;
     map.set(canonicalId, {
       ...s,
       id: canonicalId,
@@ -71,7 +67,7 @@ export function useInvestigationState(opts?: {
   const { roomCode, roomState, syncUpdate } = useRoomSync();
 
   const sKey = useCallback(
-    (key: string) => (caseId === "case-000" ? key : `${caseId}::${key}`),
+    (key: string) => caseStorageKey(caseId, key),
     [caseId],
   );
 
@@ -217,10 +213,10 @@ export function useInvestigationState(opts?: {
   };
 
   const handleSaveSuspect = (savedSuspect: SuspectItem) => {
-    if (!savedSuspect.name || savedSuspect.name.toLowerCase().includes("khang")) return;
+    if (!savedSuspect.name || isVictimReference(savedSuspect.name)) return;
 
     const { canonicalId, canonicalName } = getCanonicalSuspectKey(savedSuspect);
-    if (canonicalId === "khang") return;
+    if (isVictimReference(canonicalId)) return;
 
     const normalizedItem: SuspectItem = {
       ...savedSuspect,
@@ -283,7 +279,7 @@ export function useInvestigationState(opts?: {
   const handlePhoneLookupSuccess = (_phone: string, _info: string) => {
     setPhoneLookupSuccess(true);
     if (roomCode) {
-      syncUpdate({ phoneSolved: true }, "đã bẻ khóa thành công điện thoại của Khang");
+      syncUpdate({ phoneSolved: true }, `đã bẻ khóa thành công điện thoại của ${getActiveVictim()?.name || "nạn nhân"}`);
     } else {
       setStorageItem(sKey("phone_solved"), "true");
     }

@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { BrandMark } from '@/components/investigation/brand-mark'
 import { cn } from '@/lib/utils'
 import { toast } from '@/components/ui/toast'
+import { normalizeCaseId } from '@/lib/cases/case-id'
 
 interface CaseItem {
   id: string
@@ -250,7 +251,7 @@ export function CaseActivation() {
 
       // Step 5: Navigate to Evidence Page
       setTimeout(() => {
-        router.push('/evidence/web')
+        router.push(`/evidence/web?case_id=${normalizeCaseId(selectedCase.id)}`)
       }, 1800)
     } else {
       setCodeError(true)

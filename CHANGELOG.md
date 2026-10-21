@@ -4,6 +4,17 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-22]
 
+### Added
+
+- **Mã vụ án thống nhất (`cases.slug`)** — migration `22_case_slug.sql`: DB tự cấp `case_00N`, nội dung vụ án tham chiếu slug qua FK. Helper `lib/cases/case-id.ts` (`normalizeCaseId`, `caseStorageKey`, `caseIdVariants`) thay 3 bản `normalizeCaseId` trùng lặp.
+- **Nhân vật theo vụ án (`case_characters`)** — migration `23_case_characters.sql` (seed case_000), API `GET /api/characters`, Studio `/studio/characters`, `CaseCharactersProvider` nạp nhân vật trước khi render bàn điều tra.
+
+### Changed
+
+- Gameplay đọc nghi phạm, nạn nhân, danh bạ SĐT và thông tin điện thoại tang vật từ `case_characters`; bỏ `VALID_CASE_CHARACTERS`, `KNOWN_CASE_PHONES`, `ALL_CASE_000_SUSPECTS`, `DEFAULT_VICTIM_DEVICE` hardcode.
+- Studio Checkpoint/Dossier nhận vụ án từ URL `?case=` và giữ lựa chọn khi tải lại; bỏ alias UUID→`case_000`. Playtest, trang kích hoạt và phòng chơi nhóm dùng slug của vụ án.
+- Key localStorage của mọi vụ khác `case_000` luôn có tiền tố `<slug>::` (kể cả `followup_*`, `indictment_*`); case_000 giữ key cũ để không mất tiến trình.
+
 ### Security
 
 - **RLS hardening** (`db/schema/21_security_hardening_rls.sql`, đã áp dụng production): chặn leo thang quyền qua `profiles.role` (trước đó anon cũng sửa được); `cases`, `dossier_documents`, `case_dossiers`, `app_settings`, `play_sessions`, bucket `avatars` chỉ admin ghi; `feedbacks` chỉ admin đọc/cập nhật.

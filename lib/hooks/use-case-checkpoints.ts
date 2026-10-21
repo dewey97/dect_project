@@ -5,6 +5,7 @@ import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
 import { toRuntimeCheckpoints } from "@/lib/cms/checkpoint-runtime";
 import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 export interface CaseCheckpointsState {
   checkpoints: Checkpoint[];
@@ -27,10 +28,6 @@ export interface SheetEvidenceRow {
   photo_code?: string;
   title?: string;
   [key: string]: any;
-}
-
-function normalizeCaseId(caseId: string): string {
-  return (caseId || "").trim().replace(/-/g, "_").toLowerCase();
 }
 
 /**

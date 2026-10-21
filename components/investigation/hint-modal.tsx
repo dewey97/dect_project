@@ -3,6 +3,8 @@
 import { parseRuntimeHints } from "@/lib/cms/checkpoint-runtime";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 import { getStorageItem } from "@/lib/storage";
+import { caseStorageKey } from "@/lib/cases/case-id";
+import { getActiveCaseId } from "@/lib/cases/case-characters";
 
 interface HintModalProps {
   isOpen: boolean;
@@ -103,19 +105,19 @@ export function getLatestActiveCheckpointId(): string {
   }
 
   // 2. Kiểm tra tiến trình giải đố thực tế trong storage
-  const isPhoneSolved = getStorageItem("phone_solved") === "true";
+  const isPhoneSolved = getStorageItem(caseStorageKey(getActiveCaseId(), "phone_solved")) === "true";
   if (!isPhoneSolved) return "cp-000-0";
 
-  const isVuSolved = Boolean(getStorageItem("followup_vu"));
+  const isVuSolved = Boolean(getStorageItem(caseStorageKey(getActiveCaseId(), "followup_vu")));
   if (!isVuSolved) return "cp-000-1a";
 
-  const isTungSolved = Boolean(getStorageItem("followup_tung"));
+  const isTungSolved = Boolean(getStorageItem(caseStorageKey(getActiveCaseId(), "followup_tung")));
   if (!isTungSolved) return "cp-000-1b";
 
-  const isHaSolved = Boolean(getStorageItem("followup_ha"));
+  const isHaSolved = Boolean(getStorageItem(caseStorageKey(getActiveCaseId(), "followup_ha")));
   if (!isHaSolved) return "cp-000-1c";
 
-  const isIndictmentSolved = getStorageItem("indictment_solved") === "true";
+  const isIndictmentSolved = getStorageItem(caseStorageKey(getActiveCaseId(), "indictment_solved")) === "true";
   if (!isIndictmentSolved) return "cp-000-2b";
 
   return "cp-000-2b";

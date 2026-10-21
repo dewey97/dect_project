@@ -22,6 +22,34 @@ Lưu trữ thông tin metadata bao quát của các Vụ án trong hệ thống.
 | `cover_image_url` | `TEXT`        | Đường dẫn CDN trỏ tới ảnh bìa vụ án.                                 | -                   |
 | `created_at`      | `TIMESTAMPTZ` | Thời gian tạo.                                                       | `NOW()`             |
 | `updated_at`      | `TIMESTAMPTZ` | Thời gian cập nhật gần nhất.                                         | `NOW()`             |
+| `slug`            | `TEXT`        | Mã nghiệp vụ duy nhất (`case_000`), `^[a-z0-9_]{1,64}$`.             | Trigger tự cấp      |
+
+**Mã vụ án (`db/schema/22_case_slug.sql`)**
+
+- `slug` là khóa tham chiếu của mọi bảng nội dung: `case_checkpoints.case_id`, `case_dossiers.case_id`, `dossier_documents.case_id`, `case_characters.case_slug` (FK `ON UPDATE CASCADE`, `ON DELETE RESTRICT`).
+- INSERT không truyền `slug` thì trigger `assign_case_slug` cấp số kế tiếp (`case_001`, `case_002`...). App không tự đếm.
+- Xóa vụ án còn nội dung sẽ bị DB chặn (lỗi `23503`); xóa nội dung trước.
+- `boardgame_pins` / `boardgame_connections` chưa có FK vì dữ liệu cũ còn `case-000`. `board-actions.ts` đọc cả hai dạng và ghi dạng chuẩn.
+- Code chuẩn hóa mọi mã đầu vào qua `normalizeCaseId()` (`lib/cases/case-id.ts`). URL gameplay: `/evidence/web?case_id=<slug>`; Studio: `?case=<slug>`.
+
+### Table: `case_characters`
+
+Danh sách nhân vật theo vụ án (`db/schema/23_case_characters.sql`). Gameplay nạp qua `GET /api/characters?caseId=` trong `CaseCharactersProvider` trước khi render bàn điều tra; Studio biên tập tại `/studio/characters`.
+
+| Tên Cột       | Kiểu Dữ liệu | Mô tả                                                                                 |
+| :------------ | :----------- | :------------------------------------------------------------------------------------ |
+| `case_slug`   | `TEXT`       | FK `cases.slug`.                                                                      |
+| `key`         | `TEXT`       | Mã ngắn không dấu (`vu`, `ha`), duy nhất trong vụ án; khớp ảnh `avatar_<key>`.        |
+| `name`        | `TEXT`       | Họ tên đầy đủ.                                                                        |
+| `aliases`     | `TEXT[]`     | Các cách gõ tên để so khớp câu trả lời (so khớp không dấu).                           |
+| `role`        | `TEXT`       | `victim`, `suspect`, `witness`, `related`. Nạn nhân bị loại khỏi danh sách nghi phạm. |
+| `description` | `TEXT`       | Quan hệ / nghề nghiệp.                                                                |
+| `avatar_code` | `TEXT`       | Mã ảnh trên tab `evidences`.                                                          |
+| `phones`      | `TEXT[]`     | SĐT (chỉ chữ số). Dùng để nhận diện manh mối SĐT theo 3 số cuối.                      |
+| `slot_index`  | `INTEGER`    | Thứ tự trên bàn điều tra.                                                             |
+| `device`      | `JSONB`      | Điện thoại tang vật của nạn nhân: `label`, `model`, `lastUpdated`, `description`.     |
+
+RLS: đọc công khai, ghi chỉ admin (`is_admin()`).
 
 ---
 

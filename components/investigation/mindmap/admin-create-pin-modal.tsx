@@ -21,6 +21,8 @@ import { normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
 import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
+import { normalizeCaseId } from "@/lib/cases/case-id";
+import { getActiveCaseId } from "@/lib/cases/case-characters";
 
 interface AdminCreatePinModalProps {
   isOpen: boolean;
@@ -178,7 +180,7 @@ export function AdminCreatePinModal({
 
   // Fetch live photos từ Sheets; checkpoint lấy từ Checkpoint Studio.
   const { data: sheetPhotos } = usePhoneData("evidences");
-  const { rows: studioCheckpoints } = useStudioCheckpoints("case_000");
+  const { rows: studioCheckpoints } = useStudioCheckpoints(normalizeCaseId(getActiveCaseId()));
 
   const combinedCheckpoints = React.useMemo(() => {
     const list = [...PRESET_SHEET_CHECKPOINTS];
@@ -414,7 +416,7 @@ export function AdminCreatePinModal({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            caseId: "case_000",
+            caseId: normalizeCaseId(getActiveCaseId()),
             pin: createdPin,
           }),
         });

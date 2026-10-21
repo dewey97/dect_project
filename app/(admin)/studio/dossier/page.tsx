@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { DossierStudioClient } from '@/components/admin/dossier-studio/dossier-studio-client'
 import { getDossierDocuments } from '@/lib/actions/dossier-actions'
 import { getCases } from '@/lib/actions/case-actions'
+import { normalizeCaseId } from '@/lib/cases/case-id'
 
 export const metadata: Metadata = {
   title: 'Dossier Studio | Detective Case System',
@@ -10,16 +11,21 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic'
 
-export default async function DossierStudioPage() {
+export default async function DossierStudioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ case?: string }>
+}) {
+  const caseId = normalizeCaseId((await searchParams).case)
   const [lkRes, hsRes, casesRes] = await Promise.all([
-    getDossierDocuments('case_000', 'loi_khai'),
-    getDossierDocuments('case_000', 'ly_lich'),
+    getDossierDocuments(caseId, 'loi_khai'),
+    getDossierDocuments(caseId, 'ly_lich'),
     getCases()
   ])
 
   return (
     <DossierStudioClient
-      initialCaseId="case_000"
+      initialCaseId={caseId}
       initialCases={casesRes.data || []}
       initialLkDocuments={lkRes.data || []}
       initialHsDocuments={hsRes.data || []}

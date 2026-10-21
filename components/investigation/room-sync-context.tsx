@@ -13,6 +13,8 @@ import { createClient } from '@/lib/supabase/client'
 import type { RoomInvestigationState, GameRoomRow, RoomMember, DetectivePing } from '@/lib/types/room'
 import { DEFAULT_ROOM_STATE } from '@/lib/types/room'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import { normalizeCaseId } from '@/lib/cases/case-id'
+import { getActiveCaseId } from '@/lib/cases/case-characters'
 
 interface ToastNotice {
   id: string
@@ -240,7 +242,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
           // Create new room row
           const { error: insertErr } = await supabase.from('game_rooms').insert({
             room_code: cleanCode,
-            game_id: 'case_000',
+            game_id: normalizeCaseId(getActiveCaseId()),
             state_json: DEFAULT_ROOM_STATE,
             last_action: `${activeNick} đã tạo phòng`,
           })

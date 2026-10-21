@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { cn, normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { caseStorageKey } from "@/lib/cases/case-id";
+import { getActiveCaseId } from "@/lib/cases/case-characters";
 
 interface PhotosAppProps {
   photos?: any[];
@@ -28,8 +30,8 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const unlocked = Boolean(
-        localStorage.getItem("followup_ha_password") ||
-        localStorage.getItem("followup_ha") === "solved"
+        localStorage.getItem(caseStorageKey(getActiveCaseId(), "followup_ha_password")) ||
+        localStorage.getItem(caseStorageKey(getActiveCaseId(), "followup_ha")) === "solved"
       );
       setIsBoxUnlocked(unlocked);
     }

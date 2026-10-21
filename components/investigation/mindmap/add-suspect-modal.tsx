@@ -50,7 +50,6 @@ interface AddSuspectModalProps {
 import {
   findValidCaseCharacter,
   buildDynamicSuspectCharacters,
-  VALID_CASE_CHARACTERS,
   type SuspectCharacter,
 } from "@/lib/cases/case-000-suspects";
 import {
@@ -58,8 +57,8 @@ import {
   checkMotiveValid,
   checkContradictionValid,
   resolveEvidenceCode,
-  KNOWN_CASE_PHONES,
 } from "@/lib/cases/case-000-clues";
+import { getKnownCasePhones } from "@/lib/cases/case-characters";
 import {
   isAdminBypassCode,
   hasAdminBypassInArray,
@@ -70,7 +69,6 @@ import { getInterrogationCriteria } from "@/lib/ai/suspect-interrogation-context
 
 export {
   findValidCaseCharacter,
-  VALID_CASE_CHARACTERS,
   checkMotiveValid,
   checkContradictionValid,
 };
@@ -294,7 +292,7 @@ export function AddSuspectModal({
     if (pending.textPhone && pending.textPhone.trim()) {
       const digits = pending.textPhone.replace(/\D/g, "");
       if (digits.length >= 3) {
-        const known = KNOWN_CASE_PHONES[digits.slice(-3)];
+        const known = getKnownCasePhones()[digits.slice(-3)];
         ids.push(known ? `sms_phone_${known.full}` : `sms_phone_${digits}`);
       }
     }
@@ -302,7 +300,7 @@ export function AddSuspectModal({
     if (pending.voicePhone && pending.voicePhone.trim()) {
       const digits = pending.voicePhone.replace(/\D/g, "");
       if (digits.length >= 3) {
-        const known = KNOWN_CASE_PHONES[digits.slice(-3)];
+        const known = getKnownCasePhones()[digits.slice(-3)];
         ids.push(known ? `voice_phone_${known.full}` : `voice_phone_${digits}`);
       }
     }

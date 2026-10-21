@@ -44,6 +44,7 @@ function normalizeName(str: string): string {
 }
 
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
+import { caseStorageKey } from '@/lib/cases/case-id'
 
 export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false {
   if (isAdminBypassCode(inputName)) return 'ha'
@@ -195,8 +196,8 @@ export function IndictmentModal({
       motive: selectedOptionLabel,
     });
     detectiveAudio.playStampSound()
-    setStorageItem('indictment_solved', 'true')
-    setStorageItem('indictment_culprit', culprit)
+    setStorageItem(caseStorageKey(caseId, 'indictment_solved'), 'true')
+    setStorageItem(caseStorageKey(caseId, 'indictment_culprit'), culprit)
 
     onSubmitIndictment({
       culprit,

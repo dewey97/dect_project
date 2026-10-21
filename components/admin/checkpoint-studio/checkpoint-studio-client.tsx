@@ -62,14 +62,6 @@ function sameList(a: string[], b: string[]): boolean {
   return a.length === b.length && a.every((value, index) => value === b[index]);
 }
 
-const CASE_KEY_ALIAS: Record<string, string> = {
-  "7edde065-c9ea-4f41-875e-5526a29f5804": "case_000",
-};
-
-function toCaseKey(id: string): string {
-  return CASE_KEY_ALIAS[id] || id;
-}
-
 interface CheckpointStudioClientProps {
   initialCaseId?: string;
   initialCases?: DbCase[];
@@ -86,6 +78,14 @@ export function CheckpointStudioClient({
   initialAvailableDocuments = [],
 }: CheckpointStudioClientProps) {
   const [caseId, setCaseId] = useState(initialCaseId);
+
+  // Giữ vụ án đang chọn trên URL (?case=) để tải lại trang không quay về case_000.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("case") === caseId) return;
+    url.searchParams.set("case", caseId);
+    window.history.replaceState(null, "", url);
+  }, [caseId]);
   const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
     if (typeof window === "undefined") return 420;
     const saved = localStorage.getItem("checkpoint_studio_sidebar_width");
@@ -198,7 +198,7 @@ export function CheckpointStudioClient({
   const caseOptions = useMemo(() => {
     const map = new Map<string, string>();
     for (const item of allCases) {
-      map.set(toCaseKey(item.id), item.title);
+      map.set(item.slug, item.title);
     }
     if (!map.has(caseId)) {
       map.set(caseId, caseId === "case_000" ? "Vụ án #000" : caseId);

@@ -5,6 +5,8 @@ export type PlayStatus = "PLAYING" | "COMPLETED" | "ABANDONED";
 /** Bảng cases: Metadata danh mục vụ án */
 export interface DbCase {
   id: string;
+  /** Mã nghiệp vụ duy nhất (`case_000`), khóa tham chiếu của mọi bảng nội dung vụ án. */
+  slug: string;
   title: string;
   synopsis: string | null;
   full_story: string | null;
@@ -138,6 +140,33 @@ export interface DbCaseDossier {
   document_codes: string[];
   flow_position: { x: number; y: number } | null;
   description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CaseCharacterRole = "victim" | "suspect" | "witness" | "related";
+
+/** Metadata điện thoại tang vật gắn với nhân vật (thường là nạn nhân). */
+export interface CaseCharacterDevice {
+  label?: string;
+  model?: string;
+  lastUpdated?: string;
+  description?: string;
+}
+
+/** Bảng case_characters: danh sách nhân vật theo vụ án (Case Bible) */
+export interface DbCaseCharacter {
+  id: string;
+  case_slug: string;
+  key: string;
+  name: string;
+  aliases: string[];
+  role: CaseCharacterRole;
+  description: string | null;
+  avatar_code: string | null;
+  phones: string[];
+  slot_index: number;
+  device: CaseCharacterDevice | null;
   created_at: string;
   updated_at: string;
 }

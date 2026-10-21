@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 export interface StudioCheckpointsState {
   rows: DbCaseCheckpoint[];
@@ -16,10 +17,6 @@ const memoryCache: Record<
   { rows: DbCaseCheckpoint[]; timestamp: number }
 > = {};
 const inFlight: Record<string, Promise<DbCaseCheckpoint[]>> = {};
-
-function normalizeCaseId(caseId: string): string {
-  return (caseId || "case_000").trim().toLowerCase().replace(/-/g, "_");
-}
 
 function caseIdFromUrl(fallback: string): string {
   if (typeof window === "undefined") return fallback;
