@@ -44,7 +44,7 @@ import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
-import { PhoneSimulator } from "@/components/investigation/phone-simulator";
+import { PhoneSimulator } from "@/components/phone-engine/phone-simulator";
 import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";

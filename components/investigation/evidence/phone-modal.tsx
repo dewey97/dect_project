@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { PhoneSimulator } from '../phone-simulator'
+import { PhoneSimulator } from '@/components/phone-engine/phone-simulator'
 
 interface PhoneModalProps {
   isOpen: boolean

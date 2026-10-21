@@ -2,6 +2,13 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-10-22]
+
+### Removed
+
+- **Dead code**: 14 file không còn importer (xem `docs/TECHDEBT.md` #13). Import `PhoneSimulator` trỏ thẳng `@/components/phone-engine/phone-simulator`.
+- **Dependencies**: `pdfkit`, `pdf-lib`, `leaflet`, `@types/leaflet`, `shadcn`, `@playwright/test`, `@vercel/analytics` (app chạy VPS, không còn trên Vercel). `@types/three` chuyển sang devDependencies. Đồng bộ cả `pnpm-lock.yaml` và `package-lock.json` (Docker/CI dùng npm).
+
 ## [2026-10-21]
 
 ### Fixed

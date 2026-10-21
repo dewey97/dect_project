@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { FeedbackModal } from '@/components/investigation/feedback-modal'
 import './globals.css'
@@ -92,7 +91,6 @@ export default function RootLayout({
       <body suppressHydrationWarning className="min-h-dvh w-full bg-background font-sans text-foreground antialiased">
         {children}
         <FeedbackModal />
-        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )
