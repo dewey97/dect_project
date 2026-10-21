@@ -47,10 +47,12 @@ export interface EvidencePickerConfig {
   optionalEvidenceIds: string[];
   motiveEvidenceIds: string[];
   optionalMotiveIds: string[];
+  motiveContext?: string;
   alibiEvidenceIds: string[];
   optionalAlibiIds: string[];
   contradictionEvidenceIds: string[];
   optionalContradictionIds: string[];
+  contradictionContext?: string;
   correctAnswer?: string;
   options?: string[];
   unlocksDossier?: string;
@@ -184,10 +186,14 @@ function parseConfig(
     optionalEvidenceIds: asStringArray(source.optionalEvidenceIds),
     motiveEvidenceIds: asStringArray(source.motiveEvidenceIds),
     optionalMotiveIds: asStringArray(source.optionalMotiveIds),
+    motiveContext: asString(source.motiveContext || source.motive_context),
     alibiEvidenceIds: asStringArray(source.alibiEvidenceIds),
     optionalAlibiIds: asStringArray(source.optionalAlibiIds),
     contradictionEvidenceIds: asStringArray(source.contradictionEvidenceIds),
     optionalContradictionIds: asStringArray(source.optionalContradictionIds),
+    contradictionContext: asString(
+      source.contradictionContext || source.contradiction_context,
+    ),
     correctAnswer:
       asString(source.correctAnswer) || asString(source.correct_answer),
     options: asStringArray(source.options),
@@ -301,6 +307,9 @@ export function toRowPayload(
       optionalEvidenceIds: cleanList(draft.answerConfig.optionalEvidenceIds),
       motiveEvidenceIds: cleanList(draft.answerConfig.motiveEvidenceIds),
       optionalMotiveIds: cleanList(draft.answerConfig.optionalMotiveIds),
+      ...(draft.answerConfig.motiveContext?.trim()
+        ? { motiveContext: draft.answerConfig.motiveContext.trim() }
+        : {}),
       alibiEvidenceIds: cleanList(draft.answerConfig.alibiEvidenceIds),
       optionalAlibiIds: cleanList(draft.answerConfig.optionalAlibiIds),
       contradictionEvidenceIds: cleanList(
@@ -309,6 +318,9 @@ export function toRowPayload(
       optionalContradictionIds: cleanList(
         draft.answerConfig.optionalContradictionIds,
       ),
+      ...(draft.answerConfig.contradictionContext?.trim()
+        ? { contradictionContext: draft.answerConfig.contradictionContext.trim() }
+        : {}),
       ...(draft.answerConfig.correctAnswer?.trim()
         ? { correctAnswer: draft.answerConfig.correctAnswer.trim() }
         : {}),

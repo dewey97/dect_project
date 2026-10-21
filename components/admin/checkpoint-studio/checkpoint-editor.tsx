@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2, Save, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import type { DbCaseDossier } from "@/lib/types/database";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import { Button } from "@/components/ui/button";
 import { CheckpointIdentityForm } from "./sections/checkpoint-identity-form";
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 
 interface CheckpointEditorProps {
   draft: CheckpointStudioDraft | null;
+  dossiers?: DbCaseDossier[];
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
   onSave: () => void;
   onDelete: () => void;
@@ -40,6 +42,7 @@ function Section({
 
 export function CheckpointEditor({
   draft,
+  dossiers = [],
   onChange,
   onSave,
   onDelete,
@@ -62,12 +65,25 @@ export function CheckpointEditor({
           )}
           title={isDirty ? "Chưa lưu" : "Đã lưu"}
         />
-        <h2 className="min-w-0 truncate text-xs font-semibold text-zinc-100">
-          {draft.title || "Checkpoint mới"}
-        </h2>
+        {isEpilogue ? (
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+              Hậu án
+            </span>
+            <span className="text-[10px] text-zinc-500 font-mono">
+              ({Array.isArray(draft.answerConfig?.epilogueStories) ? draft.answerConfig.epilogueStories.length : 1} phần)
+            </span>
+          </div>
+        ) : (
+          <input
+            value={draft.title}
+            onChange={(e) => onChange({ title: e.target.value })}
+            className="min-w-0 flex-1 bg-transparent text-xs font-semibold text-zinc-100 outline-none border-b border-transparent focus:border-amber-500/50 hover:bg-white/[0.04] px-1.5 py-0.5 rounded transition-colors"
+          />
+        )}
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
-          {draft.id && (
+          {draft.id && !isEpilogue && (
             <Button
               type="button"
               variant="destructive"
@@ -79,49 +95,38 @@ export function CheckpointEditor({
               <Trash2 className="size-3.5" />
             </Button>
           )}
-
-          <Button
-            type="button"
-            size="sm"
-            onClick={onSave}
-            disabled={!canSave}
-            className="bg-amber-500 text-black hover:bg-amber-400 disabled:opacity-50"
-          >
-            {isSaving ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Save className="size-3.5" />
-            )}
-            {isSaving ? "Đang lưu…" : "Lưu"}
-          </Button>
         </div>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
-        <div className="min-w-0 space-y-5">
-          <Section title="Thông tin">
-            <CheckpointIdentityForm draft={draft} onChange={onChange} />
-          </Section>
+        <div className="min-w-0 space-y-4">
+          {!isEpilogue && (
+            <CheckpointIdentityForm
+              draft={draft}
+              dossiers={dossiers}
+              onChange={onChange}
+            />
+          )}
 
           {isEpilogue ? (
-            <Section title="Nội dung Hậu Án (Ký sự sau phá án)">
-              <CheckpointEpilogueForm draft={draft} onChange={onChange} />
-            </Section>
+            <CheckpointEpilogueForm draft={draft} onChange={onChange} />
           ) : (
             <>
               {isEvidencePicker ? (
-                <Section title="Vật chứng thẩm tra">
+                <Section title="Thẩm tra nghi phạm">
                   <EvidencePickerConfigForm draft={draft} onChange={onChange} />
                 </Section>
               ) : (
-                <Section title="Đáp án">
-                  <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
-                </Section>
-              )}
+                <>
+                  <Section title="Đáp án">
+                    <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
+                  </Section>
 
-              <Section title="Gợi ý">
-                <CheckpointHintsForm draft={draft} onChange={onChange} />
-              </Section>
+                  <Section title="Gợi ý">
+                    <CheckpointHintsForm draft={draft} onChange={onChange} />
+                  </Section>
+                </>
+              )}
 
               <Section title="Narrative">
                 <CheckpointNarrativeForm draft={draft} onChange={onChange} />

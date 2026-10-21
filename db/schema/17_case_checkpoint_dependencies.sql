@@ -27,8 +27,8 @@ SET depends_on = ARRAY['cp-000-1a', 'cp-000-1b']
 WHERE case_id = 'case_000' AND checkpoint_id = 'cp-000-convergence' AND depends_on = '{}';
 
 UPDATE public.case_checkpoints
-SET depends_on = ARRAY['cp-000-1c', 'cp-000-convergence']
-WHERE case_id = 'case_000' AND checkpoint_id = 'cp-000-2b' AND depends_on = '{}';
+SET depends_on = ARRAY['cp-000-1c-followup']
+WHERE case_id = 'case_000' AND checkpoint_id = 'cp-000-2b';
 
 UPDATE public.case_checkpoints
 SET depends_on = ARRAY['cp-000-2b']

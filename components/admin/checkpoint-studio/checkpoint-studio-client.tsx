@@ -17,6 +17,7 @@ import {
   updateCheckpointDependencies,
   updateCheckpointPositions,
 } from "@/lib/actions/checkpoint-actions";
+import { createNewCase } from "@/lib/actions/case-actions";
 import {
   getCaseDossiers,
   getAllCaseDocumentsCatalog,
@@ -29,8 +30,10 @@ import {
   type CheckpointGraphEdge,
 } from "@/lib/cms/checkpoint-graph";
 import { toast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
 import { CheckpointEditor } from "./checkpoint-editor";
+import { DossierEditor } from "./dossier-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
 import { DossierConfigModal } from "./dossier-config-modal";
 
@@ -83,6 +86,55 @@ export function CheckpointStudioClient({
   initialAvailableDocuments = [],
 }: CheckpointStudioClientProps) {
   const [caseId, setCaseId] = useState(initialCaseId);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
+    if (typeof window === "undefined") return 420;
+    const saved = localStorage.getItem("checkpoint_studio_sidebar_width");
+    return saved ? Math.max(320, Math.min(800, Number(saved))) : 420;
+  });
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResizing = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // Sidebar nằm ở bên phải màn hình
+      const newWidth = window.innerWidth - e.clientX;
+      if (newWidth >= 320 && newWidth <= 900) {
+        setSidebarWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      try {
+        localStorage.setItem("checkpoint_studio_sidebar_width", String(sidebarWidth));
+      } catch {}
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isResizing, sidebarWidth]);
+  const [allCases, setAllCases] = useState<DbCase[]>(initialCases);
+  const [isCreateCaseOpen, setIsCreateCaseOpen] = useState(false);
+  const [newCaseTitle, setNewCaseTitle] = useState("");
+  const [newCaseCode, setNewCaseCode] = useState("");
+  const [isCreatingCase, setIsCreatingCase] = useState(false);
   const [rows, setRows] = useState<DbCaseCheckpoint[]>(initialRows);
   const [dossiers, setDossiers] = useState<DbCaseDossier[]>(initialDossiers);
   const [availableDocs, setAvailableDocs] = useState<AvailableDocumentItem[]>(
@@ -90,7 +142,6 @@ export function CheckpointStudioClient({
   );
   const [activeDossierForEdit, setActiveDossierForEdit] =
     useState<DbCaseDossier | null>(null);
-  const [isDossierModalOpen, setIsDossierModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(
     initialRows[0]?.id ?? null,
   );
@@ -146,14 +197,51 @@ export function CheckpointStudioClient({
 
   const caseOptions = useMemo(() => {
     const map = new Map<string, string>();
-    for (const item of initialCases) {
+    for (const item of allCases) {
       map.set(toCaseKey(item.id), item.title);
     }
     if (!map.has(caseId)) {
       map.set(caseId, caseId === "case_000" ? "Vụ án #000" : caseId);
     }
     return Array.from(map, ([value, label]) => ({ value, label }));
-  }, [initialCases, caseId]);
+  }, [allCases, caseId]);
+
+  const handleCreateCaseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCaseTitle.trim()) {
+      toast.error("Vui lòng nhập tên vụ án");
+      return;
+    }
+
+    setIsCreatingCase(true);
+    try {
+      const res = await createNewCase(newCaseTitle, newCaseCode || undefined);
+      if (!res.success || !res.caseId) {
+        toast.error(res.error || "Không tạo được vụ án mới");
+        return;
+      }
+
+      toast.success(`Đã tạo vụ án "${newCaseTitle}" thành công!`);
+      if (res.data) {
+        setAllCases((prev) => [res.data as DbCase, ...prev]);
+      }
+      setIsCreateCaseOpen(false);
+      setNewCaseTitle("");
+      setNewCaseCode("");
+
+      setCaseId(res.caseId);
+      setSelectedId(null);
+      setDraft(null);
+      setBaseline("");
+      setPendingEdges([]);
+      setPendingPositions({});
+      await loadCase(res.caseId);
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi tạo vụ án");
+    } finally {
+      setIsCreatingCase(false);
+    }
+  };
 
   const confirmDiscardForm = useCallback(() => {
     if (!formDirty) return true;
@@ -198,6 +286,7 @@ export function CheckpointStudioClient({
   }, []);
 
   const selectRow = (row: DbCaseCheckpoint): boolean => {
+    setActiveDossierForEdit(null); // Đóng dossier editor nếu đang mở để quay về checkpoint
     if (row.id === selectedId) return true;
     if (!confirmDiscardForm()) return false;
     const nextDraft = toDraft(row);
@@ -216,6 +305,7 @@ export function CheckpointStudioClient({
   };
 
   const createRow = () => {
+    setActiveDossierForEdit(null);
     if (!confirmDiscardForm()) return;
     const nextDraft = createEmptyDraft(caseId);
     setSelectedId(null);
@@ -237,7 +327,59 @@ export function CheckpointStudioClient({
   };
 
   const updateDraft = (patch: Partial<CheckpointStudioDraft>) => {
-    setDraft((current) => (current ? { ...current, ...patch } : current));
+    setDraft((current) => {
+      if (!current) return current;
+      const next = { ...current, ...patch };
+
+      // Cập nhật live vào rows ngay lập tức để Canvas phản ánh theo thời gian thực (0s độ trễ)
+      setRows((prevRows) => {
+        const selectedDossier =
+          patch.unlocksDossier !== undefined
+            ? patch.unlocksDossier.trim()
+            : (next.unlocksDossier ? next.unlocksDossier.trim() : "");
+
+        return prevRows.map((r) => {
+          const isTarget =
+            (current.id && r.id === current.id) ||
+            r.checkpoint_id === current.checkpointId;
+
+          if (isTarget) {
+            return {
+              ...r,
+              title: next.title,
+              type: next.type,
+              question: next.question,
+              answer_config: {
+                ...(r.answer_config as Record<string, unknown>),
+                ...next.answerConfig,
+                ...(patch.unlocksDossier !== undefined
+                  ? { unlocksDossier: patch.unlocksDossier }
+                  : {}),
+              },
+            };
+          }
+
+          // Nguyên tắc 1 bộ hồ sơ chỉ tồn tại ở 1 node duy nhất:
+          // Nếu node hiện tại lấy selectedDossier (khác rỗng), bất kỳ node nào khác đang giữ bộ đó phải nhả ra!
+          if (
+            selectedDossier &&
+            (r.answer_config as any)?.unlocksDossier?.trim() === selectedDossier
+          ) {
+            return {
+              ...r,
+              answer_config: {
+                ...(r.answer_config as Record<string, unknown>),
+                unlocksDossier: "",
+              },
+            };
+          }
+
+          return r;
+        });
+      });
+
+      return next;
+    });
   };
 
   const addDependency = useCallback(
@@ -273,9 +415,9 @@ export function CheckpointStudioClient({
 
   const handleDossierClick = useCallback(
     (dossierOrName: DbCaseDossier | string) => {
+      // Khi mở cấu hình dossier trong sidebar, tạm bỏ chọn checkpoint để sidebar hiển thị DossierEditor
       if (typeof dossierOrName === "object" && dossierOrName !== null) {
         setActiveDossierForEdit(dossierOrName);
-        setIsDossierModalOpen(true);
         return;
       }
 
@@ -308,7 +450,6 @@ export function CheckpointStudioClient({
           updated_at: new Date().toISOString(),
         });
       }
-      setIsDossierModalOpen(true);
     },
     [dossiers, caseId],
   );
@@ -325,7 +466,6 @@ export function CheckpointStudioClient({
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     });
-    setIsDossierModalOpen(true);
   }, [caseId]);
 
   const handleDossierSaved = useCallback((saved: DbCaseDossier) => {
@@ -565,18 +705,77 @@ export function CheckpointStudioClient({
     }
   };
 
+  const handleSaveAll = async () => {
+    if (!hasUnsaved) {
+      toast.info("Không có thay đổi nào cần lưu.");
+      return;
+    }
+
+    setIsSaving(true);
+    let savedAny = false;
+    try {
+      if (formDirty && draft) {
+        if (!draft.title.trim()) {
+          toast.error("Nhập tiêu đề checkpoint trước khi lưu.");
+          setIsSaving(false);
+          return;
+        }
+        const result = await saveCheckpoint(draft);
+        if (!result.success) {
+          toast.error(result.error);
+          setIsSaving(false);
+          return;
+        }
+
+        const saved = result.data;
+        setRows((current) => {
+          const exists = current.some((row) => row.id === saved.id);
+          const next = exists
+            ? current.map((row) => (row.id === saved.id ? saved : row))
+            : [...current, saved];
+          return next.sort((a, b) =>
+            a.checkpoint_id.localeCompare(b.checkpoint_id),
+          );
+        });
+
+        const nextDraft = toDraft(saved);
+        setSelectedId(saved.id);
+        setDraft(nextDraft);
+        setBaseline(JSON.stringify(nextDraft));
+        savedAny = true;
+      }
+
+      if (flowDirty) {
+        await handleSaveFlow();
+        savedAny = true;
+      }
+
+      if (savedAny) {
+        toast.success("Đã lưu tất cả thay đổi!");
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Lỗi khi lưu dữ liệu.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="flex h-full min-h-0 w-full flex-col md:flex-row">
-      <div className="order-1 flex min-h-0 min-w-0 flex-1 flex-col">
+      {/* 1. Sơ đồ FlowView bên trái */}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <CheckpointFlowView
           caseId={caseId}
+          cases={caseOptions}
+          onCaseChange={changeCase}
           rows={rows}
           dossiers={dossiers}
           selectedId={selectedId}
           pendingEdges={pendingEdges}
           suggestions={suggestions}
           flowDirty={flowDirty}
-          isSaving={isSavingDependencies}
+          hasUnsaved={hasUnsaved}
+          isSaving={isSaving || isSavingDependencies}
           focusRequest={focusRequest}
           onSelect={selectRow}
           onCreate={createRow}
@@ -585,46 +784,115 @@ export function CheckpointStudioClient({
           onApplySuggestions={applySuggestions}
           onNodePositionChange={updateNodePosition}
           onSaveFlow={handleSaveFlow}
+          onSaveAll={handleSaveAll}
           onDossierClick={handleDossierClick}
           onCreateDossier={handleCreateDossier}
+          onCreateCase={() => setIsCreateCaseOpen(true)}
         />
       </div>
 
-      <div className="order-2 flex h-[55%] min-h-0 shrink-0 flex-col md:h-full md:w-[380px] lg:w-[420px]">
+      {/* 2. Đường viền kéo dãn độ rộng sidebar bên phải (Desktop only, ẩn grip, chỉ hiện cursor khi hover) */}
+      <div
+        onMouseDown={startResizing}
+        className={cn(
+          "hidden md:block relative z-30 w-1 -mr-0.5 cursor-col-resize select-none shrink-0 bg-white/10 transition-colors hover:bg-amber-400 active:bg-amber-500",
+          isResizing && "bg-amber-500",
+        )}
+        title="Kéo sang trái/phải để điều chỉnh độ rộng"
+      />
+
+      {/* 3. Hộp biên tập Checkpoint / Dossier bên phải */}
+      <div
+        style={{ width: `${sidebarWidth}px` }}
+        className={cn(
+          "flex h-[55%] min-h-0 shrink-0 flex-col md:h-full max-w-[85vw]",
+          !isResizing && "transition-[width] duration-75 ease-out",
+        )}
+      >
         <CheckpointListSidebar
-          cases={caseOptions}
-          caseId={caseId}
-          onCaseChange={changeCase}
-          rows={rows}
-          selectedId={selectedId}
-          onSelect={selectFromList}
           onCreate={createRow}
           isLoading={isLoading}
         >
-          {draft && (
+          {activeDossierForEdit ? (
+            <DossierEditor
+              caseId={caseId}
+              dossier={activeDossierForEdit}
+              availableDocuments={availableDocs}
+              onSaved={(saved) => {
+                handleDossierSaved(saved);
+                setActiveDossierForEdit(saved);
+              }}
+              onClose={() => setActiveDossierForEdit(null)}
+            />
+          ) : draft ? (
             <CheckpointEditor
               draft={draft}
+              dossiers={dossiers}
               onChange={updateDraft}
               onSave={handleSave}
               onDelete={handleDelete}
               isSaving={isSaving}
               isDirty={formDirty}
             />
-          )}
+          ) : null}
         </CheckpointListSidebar>
       </div>
 
-      <DossierConfigModal
-        isOpen={isDossierModalOpen}
-        onClose={() => {
-          setIsDossierModalOpen(false);
-          setActiveDossierForEdit(null);
-        }}
-        caseId={caseId}
-        dossier={activeDossierForEdit}
-        availableDocuments={availableDocs}
-        onSaved={handleDossierSaved}
-      />
+      {/* Modal Tạo Vụ Án Mới */}
+      {isCreateCaseOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-xl border border-white/10 bg-[#0e0e14] p-4 shadow-2xl">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-200 mb-3">
+              Tạo vụ án mới
+            </h3>
+            <form onSubmit={handleCreateCaseSubmit} className="space-y-3">
+              <div>
+                <label className="mb-1 block text-[10px] font-semibold uppercase text-zinc-500">
+                  Tên vụ án *
+                </label>
+                <input
+                  type="text"
+                  value={newCaseTitle}
+                  onChange={(e) => setNewCaseTitle(e.target.value)}
+                  className="w-full rounded-md border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs text-zinc-100 outline-none focus:border-amber-500/50"
+                  autoFocus={false}
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-[10px] font-semibold uppercase text-zinc-500">
+                  Mã vụ án (Tùy chọn)
+                </label>
+                <input
+                  type="text"
+                  value={newCaseCode}
+                  onChange={(e) => setNewCaseCode(e.target.value)}
+                  className="w-full rounded-md border border-white/10 bg-black/40 px-2.5 py-1.5 font-mono text-xs text-zinc-200 outline-none focus:border-amber-500/50"
+                  autoFocus={false}
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateCaseOpen(false)}
+                  disabled={isCreatingCase}
+                  className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-zinc-400 hover:bg-white/5"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isCreatingCase || !newCaseTitle.trim()}
+                  className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-amber-400 disabled:opacity-50"
+                >
+                  {isCreatingCase ? "Đang tạo…" : "Tạo vụ án"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -43,34 +43,36 @@ export function SimpleAnswerConfigForm({
   };
 
   return (
-    <div className="space-y-3 rounded-lg border border-white/10 bg-black/20 p-2.5">
-      {type === "choice" && (
-        <Field label="Các phương án lựa chọn (Options)">
-          <CodeChipInput
-            value={config.options || []}
-            onChange={(options) => setConfig({ options })}
-            placeholder="Nhập phương án rồi Enter…"
-            className="min-h-8"
-          />
-        </Field>
-      )}
+    <div className="space-y-2">
+      {type === "choice" ? (
+        <>
+          <Field label="Các phương án lựa chọn">
+            <CodeChipInput
+              value={config.options || []}
+              onChange={(options) => setConfig({ options })}
+              className="min-h-8"
+            />
+          </Field>
 
-      <Field label="Giá trị đáp án đúng" required>
+          <Field label="Đáp án đúng" required>
+            <Input
+              value={config.correctAnswer || ""}
+              onChange={(event) =>
+                setConfig({ correctAnswer: event.target.value })
+              }
+              className={INPUT_CLASS}
+            />
+          </Field>
+        </>
+      ) : (
         <Input
           value={config.correctAnswer || ""}
           onChange={(event) =>
             setConfig({ correctAnswer: event.target.value })
           }
-          placeholder={
-            type === "time"
-              ? "vd: 21:15, 03:30…"
-              : type === "code"
-                ? "vd: 120713, PASSCODE…"
-                : "Nhập nội dung đáp án đúng…"
-          }
           className={INPUT_CLASS}
         />
-      </Field>
+      )}
     </div>
   );
 }

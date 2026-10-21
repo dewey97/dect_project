@@ -43,11 +43,11 @@ const navGroups: NavGroup[] = [
   {
     groupName: "STUDIO ENGINES",
     items: [
-      { name: "Map Studio", shortName: "Bản đồ", href: "/studio/map", icon: Map },
+      { name: "Map Studio", shortName: "Map", href: "/studio/map", icon: Map },
       { name: "Dossier Studio", shortName: "Hồ sơ", href: "/studio/dossier", icon: FileText },
       {
         name: "Checkpoint Studio",
-        shortName: "Điểm chốt",
+        shortName: "Checkpoint",
         href: "/studio/checkpoints",
         icon: ListChecks,
       },

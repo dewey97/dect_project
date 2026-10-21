@@ -21,12 +21,12 @@ import {
 } from "@xyflow/react";
 import {
   ArrowRight,
-  BookOpen,
   FolderOpen,
   GitBranch,
   LayoutGrid,
   Link2,
   Loader2,
+  Plus,
   Save,
   Sparkles,
   Trash2,
@@ -48,14 +48,22 @@ interface NodeFocusRequest {
   nonce: number;
 }
 
+interface CaseOption {
+  value: string;
+  label: string;
+}
+
 interface CheckpointFlowViewProps {
   caseId?: string;
+  cases?: CaseOption[];
+  onCaseChange?: (caseId: string) => void;
   rows: DbCaseCheckpoint[];
   dossiers?: DbCaseDossier[];
   selectedId: string | null;
   pendingEdges: CheckpointGraphEdge[];
   suggestions: CheckpointGraphEdge[];
   flowDirty: boolean;
+  hasUnsaved?: boolean;
   isSaving: boolean;
   focusRequest: NodeFocusRequest | null;
   onSelect: (row: DbCaseCheckpoint) => void;
@@ -68,8 +76,10 @@ interface CheckpointFlowViewProps {
     position: CheckpointFlowPosition,
   ) => void;
   onSaveFlow: () => void;
+  onSaveAll?: () => void;
   onDossierClick?: (dossierOrName: DbCaseDossier | string) => void;
   onCreateDossier?: () => void;
+  onCreateCase?: () => void;
 }
 
 interface CheckpointNodeData extends Record<string, unknown> {
@@ -160,14 +170,20 @@ function CheckpointFlowNodeCard({
   return (
     <div
       className={cn(
-        "w-[260px] rounded-xl border p-3 shadow-xl transition-all",
+        "rounded-xl border shadow-xl transition-all",
         isEpilogue
-          ? active
-            ? "border-emerald-400 bg-[#0d1813] ring-2 ring-emerald-400/25 shadow-[0_0_20px_rgba(16,185,129,0.15)]"
-            : "border-emerald-500/40 bg-[#0a130f] hover:border-emerald-400 hover:bg-[#0d1813]"
-          : active
-            ? "border-amber-400/70 bg-[#141418] ring-2 ring-amber-400/20"
-            : "border-white/10 bg-[#101014] hover:border-white/25",
+          ? cn(
+              "w-[190px] px-3 py-2.5",
+              active
+                ? "border-emerald-400 bg-[#0d1813] ring-2 ring-emerald-400/25 shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+                : "border-emerald-500/40 bg-[#0a130f] hover:border-emerald-400 hover:bg-[#0d1813]",
+            )
+          : cn(
+              "w-[260px] p-3",
+              active
+                ? "border-amber-400/70 bg-[#141418] ring-2 ring-amber-400/20"
+                : "border-white/10 bg-[#101014] hover:border-white/25",
+            ),
       )}
     >
       <Handle
@@ -191,79 +207,68 @@ function CheckpointFlowNodeCard({
         }}
       />
 
-      <div className="flex items-center gap-1.5">
-        <span
-          className={cn(
-            "rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide flex items-center gap-1 font-semibold",
-            isEpilogue
-              ? "border border-emerald-500/30 bg-emerald-500/20 text-emerald-300"
-              : "bg-amber-500/10 text-amber-300",
-          )}
-        >
-          {isEpilogue ? (
-            <>
-              <BookOpen className="size-3" />
-              <span>Hậu Án</span>
-            </>
-          ) : (
-            row.type || "evidence_picker"
-          )}
-        </span>
-        {issueLabels.length > 0 && (
-          <span
-            title={issueLabels.join(" · ")}
-            className="ml-auto flex size-4 items-center justify-center rounded-full bg-red-500/15 text-[9px] font-bold text-red-300"
-          >
-            {issueLabels.length}
+      {isEpilogue ? (
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-bold text-xs text-emerald-300 uppercase tracking-wide">
+            Hậu Án
           </span>
-        )}
-      </div>
-
-      <p className="mt-2 line-clamp-2 text-xs font-semibold leading-snug text-zinc-100">
-        {row.title || "(Chưa có tiêu đề)"}
-      </p>
-
-      <div className="mt-2 flex items-center gap-2 text-[10px] text-zinc-500">
-        {isEpilogue ? (
-          <span className="font-medium text-emerald-400/80">
-            {epilogueStoriesCount} chương ký sự kết án
+          <span className="font-mono text-[11px] font-medium text-emerald-400/80">
+            {epilogueStoriesCount} phần
           </span>
-        ) : (
-          <>
-            <span>{hints} gợi ý</span>
-            {row.type === "evidence_picker" && (
-              <>
-                <span className="text-zinc-700">·</span>
-                <span>{evidences} mã chứng cứ</span>
-              </>
-            )}
-          </>
-        )}
-      </div>
-
-      {unlockedDossier && (
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            if (unlockedDossier.dossierObj) {
-              onDossierClick?.(unlockedDossier.dossierObj);
-            } else {
-              onDossierClick?.(unlockedDossier.name);
-            }
-          }}
-          className="mt-2.5 flex items-center justify-between rounded-lg border border-purple-500/35 bg-purple-950/30 px-2 py-1.5 text-purple-200 transition-colors hover:border-purple-400 hover:bg-purple-900/40 cursor-pointer group"
-          title="Bấm để quản lý tài liệu trong bộ hồ sơ này"
-        >
-          <div className="flex items-center gap-1.5 min-w-0">
-            <FolderOpen className="size-3.5 shrink-0 text-purple-400 group-hover:scale-110 transition-transform" />
-            <span className="truncate font-mono text-[10px] font-bold tracking-tight uppercase text-purple-100">
-              Mở: {unlockedDossier.name}
+          {issueLabels.length > 0 && (
+            <span
+              title={issueLabels.join(" · ")}
+              className="flex size-4 items-center justify-center rounded-full bg-red-500/15 text-[9px] font-bold text-red-300"
+            >
+              {issueLabels.length}
             </span>
-          </div>
-          <span className="shrink-0 rounded bg-purple-500/20 px-1.5 py-0.2 font-mono text-[9px] font-semibold text-purple-300">
-            {unlockedDossier.count} tài liệu
-          </span>
+          )}
         </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-1.5">
+            <span className="rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide flex items-center gap-1 font-semibold bg-amber-500/10 text-amber-300">
+              {row.type || "evidence_picker"}
+            </span>
+            {issueLabels.length > 0 && (
+              <span
+                title={issueLabels.join(" · ")}
+                className="ml-auto flex size-4 items-center justify-center rounded-full bg-red-500/15 text-[9px] font-bold text-red-300"
+              >
+                {issueLabels.length}
+              </span>
+            )}
+          </div>
+
+          <p className="mt-2 line-clamp-2 text-xs font-semibold leading-snug text-zinc-100">
+            {row.title || "(Chưa có tiêu đề)"}
+          </p>
+
+          {unlockedDossier && (
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                if (unlockedDossier.dossierObj) {
+                  onDossierClick?.(unlockedDossier.dossierObj);
+                } else {
+                  onDossierClick?.(unlockedDossier.name);
+                }
+              }}
+              className="mt-2.5 flex items-center justify-between rounded-lg border border-purple-500/35 bg-purple-950/30 px-2 py-1.5 text-purple-200 transition-colors hover:border-purple-400 hover:bg-purple-900/40 cursor-pointer group"
+              title="Bấm để quản lý tài liệu trong bộ hồ sơ này"
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <FolderOpen className="size-3.5 shrink-0 text-purple-400 group-hover:scale-110 transition-transform" />
+                <span className="truncate font-mono text-[10px] font-bold tracking-tight uppercase text-purple-100">
+                  Mở: {unlockedDossier.name}
+                </span>
+              </div>
+              <span className="shrink-0 rounded bg-purple-500/20 px-1.5 py-0.2 font-mono text-[9px] font-semibold text-purple-300">
+                {unlockedDossier.count} tài liệu
+              </span>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -394,12 +399,15 @@ function useIsDesktop(): boolean {
 
 export function CheckpointFlowView({
   caseId = "case_000",
+  cases = [],
+  onCaseChange,
   rows,
   dossiers = [],
   selectedId,
   pendingEdges,
   suggestions,
   flowDirty,
+  hasUnsaved,
   isSaving,
   focusRequest,
   onSelect,
@@ -409,8 +417,10 @@ export function CheckpointFlowView({
   onApplySuggestions,
   onNodePositionChange,
   onSaveFlow,
+  onSaveAll,
   onDossierClick,
   onCreateDossier,
+  onCreateCase,
 }: CheckpointFlowViewProps) {
   const isDesktop = useIsDesktop();
   const { documents: dossierDocs } = useDossierDocuments(caseId);
@@ -593,31 +603,36 @@ export function CheckpointFlowView({
       );
 
       const dNodes: DossierNode[] = unattachedDossiers.map(([label, info]) => {
+        const existing = previous.get(`dossier-node:${label}`);
+        const savedPos = dossierPositions[`dossier-node:${label}`];
+
         // Lấy số tài liệu trực tiếp từ cấu hình case_dossiers nếu có
         const docCount = info.dossierObj?.document_codes
           ? info.dossierObj.document_codes.length
           : countDocumentsForDossier(label, dossierDocs);
 
-        let finalPos = { x: firstCp.x - 160, y: firstCp.y + 10 };
+        let finalPos = existing?.position ?? savedPos ?? { x: firstCp.x - 160, y: firstCp.y + 10 };
 
-        const xs = info.group.map(
-          (r) =>
-            cpPositions.get(r.checkpoint_id)?.x ??
-            r.flow_position?.x ??
-            layout[r.checkpoint_id]?.x ??
-            0,
-        );
-        const ys = info.group.map(
-          (r) =>
-            cpPositions.get(r.checkpoint_id)?.y ??
-            r.flow_position?.y ??
-            layout[r.checkpoint_id]?.y ??
-            0,
-        );
-        if (xs.length > 0) {
-          const minX = Math.min(...xs);
-          const avgY = Math.round(ys.reduce((a, b) => a + b, 0) / ys.length);
-          finalPos = { x: minX - 160, y: avgY };
+        if (!existing?.position && !savedPos) {
+          const xs = info.group.map(
+            (r) =>
+              cpPositions.get(r.checkpoint_id)?.x ??
+              r.flow_position?.x ??
+              layout[r.checkpoint_id]?.x ??
+              0,
+          );
+          const ys = info.group.map(
+            (r) =>
+              cpPositions.get(r.checkpoint_id)?.y ??
+              r.flow_position?.y ??
+              layout[r.checkpoint_id]?.y ??
+              0,
+          );
+          if (xs.length > 0) {
+            const minX = Math.min(...xs);
+            const avgY = Math.round(ys.reduce((a, b) => a + b, 0) / ys.length);
+            finalPos = { x: minX - 160, y: avgY };
+          }
         }
 
         return {
@@ -628,7 +643,7 @@ export function CheckpointFlowView({
             dossierName: label,
             documentCount: docCount,
           },
-          draggable: false, // Khóa cố định, không cho kéo đi lung tung
+          draggable: isDesktop, // Cho phép kéo di chuyển tự do
           selectable: true,
           connectable: false,
           zIndex: 5,
@@ -811,65 +826,75 @@ export function CheckpointFlowView({
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#09090c]">
       <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-white/10 bg-[#0b0b0e]/95 px-3 py-2.5">
+        {/* Bộ lọc Vụ án đặt ở đầu header */}
+        {cases.length > 0 && onCaseChange && (
+          <div className="flex items-center gap-1.5 mr-2 shrink-0">
+            <select
+              value={caseId}
+              onChange={(e) => onCaseChange(e.target.value)}
+              className="h-8 rounded-lg border border-white/10 bg-black/50 px-2.5 text-xs font-semibold text-zinc-100 outline-none focus:border-amber-500/50 shadow-inner"
+            >
+              {cases.map((item) => (
+                <option
+                  key={item.value}
+                  value={item.value}
+                  className="bg-[#141618] text-zinc-100 font-sans"
+                >
+                  {item.label}
+                </option>
+              ))}
+            </select>
+
+            {onCreateCase && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={onCreateCase}
+                className="h-8 border-white/10 bg-white/[0.04] text-xs text-zinc-300 hover:text-amber-300 hover:border-amber-500/40 px-2"
+                title="Tạo vụ án mới"
+              >
+                <Plus className="size-3.5" />
+                <span>Case</span>
+              </Button>
+            )}
+          </div>
+        )}
+
         <div className="mr-auto min-w-0">
           <div className="flex items-center gap-2">
             <GitBranch className="size-3.5 text-amber-400" />
             <h2 className="text-xs font-semibold text-zinc-100">
               Sơ đồ phụ thuộc
             </h2>
-            {flowDirty && (
+            {(flowDirty || hasUnsaved) && (
               <span className="rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-amber-300">
                 chưa lưu
               </span>
             )}
           </div>
           <p className="truncate text-[10px] text-zinc-500">
-            {rows.length} checkpoint · {pendingEdges.length} liên kết
+            {rows.length} checkpoint
             {issueCount > 0 ? ` · ${issueCount} node cần bổ sung` : ""}
           </p>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={fitGraph}
-            className="border-white/10 bg-white/[0.03] text-zinc-300"
-            title="Fit sơ đồ vào khung nhìn"
-          >
-            <LayoutGrid className="size-3.5" />
-            <span className="hidden lg:inline">Fit</span>
-          </Button>
-
           {isDesktop && (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={autoLayout}
-                className="border-white/10 bg-white/[0.03] text-zinc-300"
-              >
-                <LayoutGrid className="size-3.5" />
-                <span className="hidden lg:inline">Tự sắp xếp</span>
-              </Button>
-
-              <Button
-                type="button"
-                size="sm"
-                onClick={onSaveFlow}
-                disabled={!flowDirty || isSaving}
-                className="bg-amber-500 text-black hover:bg-amber-400 disabled:opacity-50"
-              >
-                {isSaving ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <Save className="size-3.5" />
-                )}
-                <span className="hidden sm:inline">Lưu sơ đồ</span>
-              </Button>
-            </>
+            <Button
+              type="button"
+              size="sm"
+              onClick={onSaveAll || onSaveFlow}
+              disabled={(!flowDirty && !hasUnsaved) || isSaving}
+              className="bg-amber-500 text-black hover:bg-amber-400 disabled:opacity-50"
+            >
+              {isSaving ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Save className="size-3.5" />
+              )}
+              <span className="hidden sm:inline">Lưu</span>
+            </Button>
           )}
 
           {onCreateDossier && (

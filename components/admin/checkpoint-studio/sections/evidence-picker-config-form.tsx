@@ -1,11 +1,15 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { Flame, Scale } from "lucide-react";
 import type {
   CheckpointStudioDraft,
   EvidencePickerConfig,
 } from "@/lib/types/checkpoint-studio";
 import { CodeChipInput } from "../code-chip-input";
+import { AutoExpandingTextarea } from "../auto-expanding-textarea";
+import { cn } from "@/lib/utils";
+import { CheckpointHintsForm } from "./checkpoint-hints-form";
 
 interface EvidencePickerConfigFormProps {
   draft: CheckpointStudioDraft;
@@ -14,43 +18,11 @@ interface EvidencePickerConfigFormProps {
 
 type ConfigListKey = keyof EvidencePickerConfig;
 
-function TierCard({
-  title,
-  collapsed,
-  count = 0,
-  children,
-}: {
-  title: string;
-  collapsed?: boolean;
-  count?: number;
-  children: React.ReactNode;
-}) {
-  const isOpen = count > 0 || !collapsed;
-  return (
-    <details
-      open={isOpen}
-      className="group rounded-lg border border-white/10 bg-black/20"
-    >
-      <summary className="flex cursor-pointer list-none items-center gap-1.5 px-2 py-1.5">
-        <ChevronDown className="size-3 text-zinc-500 transition-transform group-open:rotate-0 -rotate-90" />
-        <span className="text-[11px] font-semibold text-zinc-200">{title}</span>
-        {count > 0 && (
-          <span className="ml-auto rounded bg-amber-500/20 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-amber-300">
-            {count}
-          </span>
-        )}
-      </summary>
-      <div className="space-y-2 border-t border-white/10 px-2 py-2">
-        {children}
-      </div>
-    </details>
-  );
-}
-
 export function EvidencePickerConfigForm({
   draft,
   onChange,
 }: EvidencePickerConfigFormProps) {
+  const [activeTab, setActiveTab] = useState<"motive" | "contradiction">("motive");
   const config = draft.answerConfig;
 
   const setList = (key: ConfigListKey, value: string[]) => {
@@ -65,89 +37,140 @@ export function EvidencePickerConfigForm({
     (config.contradictionEvidenceIds?.length || 0) +
     (config.optionalContradictionIds?.length || 0);
 
-  const extraCount =
-    (config.validSuspects?.length || 0) +
-    (config.validMotives?.length || 0) +
-    (config.requiredEvidenceIds?.length || 0) +
-    (config.optionalEvidenceIds?.length || 0);
-
   return (
-    <div className="space-y-2">
-      {/* Tile 1: Động cơ phạm tội */}
-      <TierCard title="1. Động cơ" count={motiveCount}>
-        <Field label="Bắt buộc" required>
-          <CodeChipInput
-            value={config.motiveEvidenceIds}
-            onChange={(value) => setList("motiveEvidenceIds", value)}
-            placeholder="13, 42…"
-            className="min-h-8"
-          />
-        </Field>
-        <Field label="Tùy chọn">
-          <CodeChipInput
-            value={config.optionalMotiveIds}
-            onChange={(value) => setList("optionalMotiveIds", value)}
-            placeholder="Tùy chọn…"
-            className="min-h-8"
-          />
-        </Field>
-      </TierCard>
+    <div className="space-y-3">
+      {/* 2 Subtabs phẳng, tối giản: Động cơ & Mâu thuẫn */}
+      <div className="flex rounded-md border border-white/10 bg-black/40 p-0.5 gap-1">
+        <button
+          type="button"
+          onClick={() => setActiveTab("motive")}
+          className={cn(
+            "flex flex-1 items-center justify-center gap-1.5 rounded py-1.5 text-xs font-semibold transition-all",
+            activeTab === "motive"
+              ? "bg-amber-500/20 text-amber-300 shadow-sm border border-amber-500/30"
+              : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
+          )}
+        >
+          <Flame className="size-3.5 text-amber-400" />
+          <span>Động cơ</span>
+          {motiveCount > 0 && (
+            <span className="rounded bg-amber-500/30 px-1.5 py-0.2 font-mono text-[9px] font-bold text-amber-200">
+              {motiveCount}
+            </span>
+          )}
+        </button>
 
-      {/* Tile 2: Mâu thuẫn lời khai */}
-      <TierCard title="2. Mâu thuẫn" count={contradictionCount}>
-        <Field label="Bắt buộc" required>
-          <CodeChipInput
-            value={config.contradictionEvidenceIds}
-            onChange={(value) => setList("contradictionEvidenceIds", value)}
-            placeholder="14, p4…"
-            className="min-h-8"
-          />
-        </Field>
-        <Field label="Tùy chọn">
-          <CodeChipInput
-            value={config.optionalContradictionIds}
-            onChange={(value) => setList("optionalContradictionIds", value)}
-            placeholder="Tùy chọn…"
-            className="min-h-8"
-          />
-        </Field>
-      </TierCard>
+        <button
+          type="button"
+          onClick={() => setActiveTab("contradiction")}
+          className={cn(
+            "flex flex-1 items-center justify-center gap-1.5 rounded py-1.5 text-xs font-semibold transition-all",
+            activeTab === "contradiction"
+              ? "bg-rose-500/20 text-rose-300 shadow-sm border border-rose-500/30"
+              : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
+          )}
+        >
+          <Scale className="size-3.5 text-rose-400" />
+          <span>Mâu thuẫn lời khai</span>
+          {contradictionCount > 0 && (
+            <span className="rounded bg-rose-500/30 px-1.5 py-0.2 font-mono text-[9px] font-bold text-rose-200">
+              {contradictionCount}
+            </span>
+          )}
+        </button>
+      </div>
 
-      {/* Cấu hình bổ sung (nếu có) */}
-      <TierCard title="Bổ sung" collapsed count={extraCount}>
-        <Field label="Nghi phạm hợp lệ">
-          <CodeChipInput
-            value={config.validSuspects}
-            onChange={(value) => setList("validSuspects", value)}
-            placeholder="mã hoặc tên…"
-            className="min-h-8"
-          />
-        </Field>
-        <Field label="Động cơ hợp lệ">
-          <CodeChipInput
-            value={config.validMotives}
-            onChange={(value) => setList("validMotives", value)}
-            placeholder="động_cơ_1…"
-            className="min-h-8"
-          />
-        </Field>
-        <Field label="Vật chứng bắt buộc">
-          <CodeChipInput
-            value={config.requiredEvidenceIds}
-            onChange={(value) => setList("requiredEvidenceIds", value)}
-            placeholder="52, 50…"
-            className="min-h-8"
-          />
-        </Field>
-        <Field label="Vật chứng tùy chọn">
-          <CodeChipInput
-            value={config.optionalEvidenceIds}
-            onChange={(value) => setList("optionalEvidenceIds", value)}
-            placeholder="Tùy chọn…"
-            className="min-h-8"
-          />
-        </Field>
-      </TierCard>
+      {/* Tab 1: Động cơ (Clean, không box viền thừa, không lặp lại chữ 'Động cơ') */}
+      {activeTab === "motive" && (
+        <div className="space-y-2.5">
+          <Field label="Vật chứng bắt buộc" required>
+            <CodeChipInput
+              value={config.motiveEvidenceIds}
+              onChange={(value) => setList("motiveEvidenceIds", value)}
+              className="min-h-8 border-white/10 bg-black/40"
+            />
+          </Field>
+
+          <Field label="Vật chứng tùy chọn">
+            <CodeChipInput
+              value={config.optionalMotiveIds}
+              onChange={(value) => setList("optionalMotiveIds", value)}
+              className="min-h-8 border-white/10 bg-black/40"
+            />
+          </Field>
+
+          <Field label="Bối cảnh">
+            <AutoExpandingTextarea
+              value={config.motiveContext || ""}
+              onChange={(e) =>
+                onChange({
+                  answerConfig: { ...config, motiveContext: e.target.value },
+                })
+              }
+              minRows={1}
+              className="min-h-8"
+            />
+          </Field>
+
+          <div>
+            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+              Gợi ý
+            </span>
+            <CheckpointHintsForm
+              draft={draft}
+              activeGroup="motive"
+              hideGroupTabs
+              onChange={onChange}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Tab 2: Mâu thuẫn lời khai (Clean, không box viền thừa, không lặp lại) */}
+      {activeTab === "contradiction" && (
+        <div className="space-y-2.5">
+          <Field label="Vật chứng bắt buộc" required>
+            <CodeChipInput
+              value={config.contradictionEvidenceIds}
+              onChange={(value) => setList("contradictionEvidenceIds", value)}
+              className="min-h-8 border-white/10 bg-black/40"
+            />
+          </Field>
+
+          <Field label="Vật chứng tùy chọn">
+            <CodeChipInput
+              value={config.optionalContradictionIds}
+              onChange={(value) => setList("optionalContradictionIds", value)}
+              className="min-h-8 border-white/10 bg-black/40"
+            />
+          </Field>
+
+          <Field label="Bối cảnh">
+            <AutoExpandingTextarea
+              value={config.contradictionContext || ""}
+              onChange={(e) =>
+                onChange({
+                  answerConfig: { ...config, contradictionContext: e.target.value },
+                })
+              }
+              minRows={1}
+              className="min-h-8"
+            />
+          </Field>
+
+          <div>
+            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+              Gợi ý
+            </span>
+            <CheckpointHintsForm
+              draft={draft}
+              activeGroup="contradiction"
+              hideGroupTabs
+              onChange={onChange}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

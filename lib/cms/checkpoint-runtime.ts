@@ -176,6 +176,9 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
         ...(pickerFields.optionalMotiveIds.length > 0
           ? { optionalMotiveIds: pickerFields.optionalMotiveIds }
           : {}),
+        ...(asString(config.motiveContext)
+          ? { motiveContext: asString(config.motiveContext) }
+          : {}),
         ...(pickerFields.alibiEvidenceIds.length > 0
           ? { alibiEvidenceIds: pickerFields.alibiEvidenceIds }
           : {}),
@@ -187,6 +190,9 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
           : {}),
         ...(pickerFields.optionalContradictionIds.length > 0
           ? { optionalContradictionIds: pickerFields.optionalContradictionIds }
+          : {}),
+        ...(asString(config.contradictionContext)
+          ? { contradictionContext: asString(config.contradictionContext) }
           : {}),
         ...(availableEvidences.length > 0 ? { availableEvidences } : {}),
         ...(suspectLabel ? { suspectLabel } : {}),

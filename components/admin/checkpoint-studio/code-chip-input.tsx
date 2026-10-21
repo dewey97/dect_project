@@ -83,7 +83,6 @@ export function CodeChipInput({
             commit(pasted);
           }
         }}
-        placeholder={placeholder}
         className="h-6 min-w-28 flex-1 border-0 bg-transparent px-1 text-xs shadow-none focus-visible:ring-0 dark:bg-transparent"
       />
     </div>

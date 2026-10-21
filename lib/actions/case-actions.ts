@@ -122,3 +122,78 @@ export async function duplicateCase(caseId: string) {
     return { success: false, error: error.message }
   }
 }
+
+
+/** Tạo một vụ án mới hoàn chỉnh với 2 node cơ bản: Hồ sơ ban đầu và Hậu án */
+export async function createNewCase(title: string, customCaseId?: string) {
+  try {
+    const supabase = await createClient();
+
+    if (!title.trim()) {
+      return { success: false, error: 'Vui lòng nhập tên vụ án.' };
+    }
+
+    // 1. Tạo bản ghi trong cases
+    const { data: newCase, error: insertError } = await supabase
+      .from('cases')
+      .insert([{
+        title: title.trim(),
+        status: 'DRAFT',
+      }])
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    // 2. Định danh mã case
+    let normalizedCaseId = customCaseId?.trim();
+    if (!normalizedCaseId) {
+      const { data: existingCases } = await supabase.from('cases').select('id');
+      const count = (existingCases?.length || 1);
+      normalizedCaseId = `case_${String(count).padStart(3, '0')}`;
+    }
+
+    // 3. Tự động sinh 2 node cốt lõi: Hồ sơ ban đầu và Hậu án
+    await supabase.from('case_checkpoints').insert([
+      {
+        case_id: normalizedCaseId,
+        checkpoint_id: 'cp-start',
+        title: 'Hồ sơ ban đầu',
+        type: 'choice',
+        question: 'Nghiên cứu tài liệu khởi đầu vụ án.',
+        answer_config: {},
+        hints: [],
+      },
+      {
+        case_id: normalizedCaseId,
+        checkpoint_id: 'cp-epilogue',
+        title: 'Hậu án',
+        type: 'epilogue',
+        question: 'Tổng kết vụ án',
+        answer_config: {
+          epilogueStories: [
+            {
+              id: 'cp-epilogue-1',
+              title: 'Phần 1: Sự thật phơi bày',
+              monologue: '',
+            },
+          ],
+        },
+        hints: [],
+        depends_on: ['cp-start'],
+      },
+    ]);
+
+    revalidatePath('/studio/checkpoints');
+    revalidatePath('/studio/cases');
+
+    return {
+      success: true,
+      data: newCase as DbCase,
+      caseId: normalizedCaseId,
+    };
+  } catch (error: any) {
+    console.error('Error creating new case:', error);
+    return { success: false, error: error.message || 'Không tạo được vụ án mới.' };
+  }
+}

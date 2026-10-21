@@ -1,7 +1,7 @@
 "use client";
 
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
-import { Textarea } from "@/components/ui/textarea";
+import { AutoExpandingTextarea } from "../auto-expanding-textarea";
 
 interface CheckpointAiCheckFormProps {
   draft: CheckpointStudioDraft;
@@ -32,33 +32,33 @@ export function CheckpointAiCheckForm({
   return (
     <div className="space-y-2">
       <Field label="Bối cảnh">
-        <Textarea
+        <AutoExpandingTextarea
           value={draft.aiContext}
           onChange={(event) => onChange({ aiContext: event.target.value })}
-          placeholder="Sự thật, bằng chứng và logic để chấm…"
-          className="min-h-20 border-white/10 bg-black/30 text-xs leading-relaxed"
+          minRows={1}
+          className="min-h-8"
         />
       </Field>
 
       <Field label="Mẫu ĐẠT">
-        <Textarea
+        <AutoExpandingTextarea
           value={draft.aiValidCases.join("\n")}
           onChange={(event) =>
             onChange({ aiValidCases: event.target.value.split("\n") })
           }
-          placeholder="Mỗi dòng một câu trả lời mẫu"
-          className="min-h-20 border-white/10 bg-black/30 font-mono text-xs leading-relaxed"
+          minRows={1}
+          className="min-h-8 font-mono"
         />
       </Field>
 
       <Field label="Mẫu TRƯỢT">
-        <Textarea
+        <AutoExpandingTextarea
           value={draft.aiInvalidCases.join("\n")}
           onChange={(event) =>
             onChange({ aiInvalidCases: event.target.value.split("\n") })
           }
-          placeholder="Mỗi dòng một câu trả lời mẫu"
-          className="min-h-20 border-white/10 bg-black/30 font-mono text-xs leading-relaxed"
+          minRows={1}
+          className="min-h-8 font-mono"
         />
       </Field>
     </div>
