@@ -231,6 +231,8 @@ export function getInterrogationCriteria(
     aiContext?: string;
     aiValidCases?: string[];
     aiInvalidCases?: string[];
+    motiveContext?: string;
+    contradictionContext?: string;
   },
 ): SuspectCategoryCriteria {
   const normId = (suspectId || "").toLowerCase().trim();
@@ -242,7 +244,31 @@ export function getInterrogationCriteria(
         ? "Xác minh ngoại phạm"
         : "Mâu thuẫn lời khai";
 
-  // Live CMS ghi đè toàn bộ (không cần sửa code khi đổi kịch bản)
+  // 1. Ưu tiên cao nhất: Bối cảnh riêng biệt từng hạng mục được biên soạn trong Checkpoint Studio
+  const specificCategoryContext =
+    category === "motive"
+      ? checkpointData?.motiveContext?.trim()
+      : category === "contradiction"
+        ? checkpointData?.contradictionContext?.trim()
+        : "";
+
+  if (specificCategoryContext) {
+    return {
+      context:
+        `${specificCategoryContext}\n` +
+        `Nghi phạm: ${suspectId}. Hạng mục thẩm tra: ${categoryLabel}.`,
+      validCases: (checkpointData?.aiValidCases || []).map((text) => ({
+        text,
+        reason: "",
+      })),
+      invalidCases: (checkpointData?.aiInvalidCases || []).map((text) => ({
+        text,
+        reason: "",
+      })),
+    };
+  }
+
+  // Live CMS ghi đè toàn bộ (nếu có aiContext chung)
   if (checkpointData?.aiContext?.trim()) {
     return {
       context:

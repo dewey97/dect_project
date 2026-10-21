@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo, useRef, useEffect } from "react";
 import type {
   Device,
   Conversation,
@@ -10,6 +10,7 @@ import type {
   RecoveredFile,
 } from "@/lib/types";
 import type { PhoneAppId } from "@/lib/types/phone";
+import { trackPhoneAppUsed, trackEvent } from "@/lib/analytics";
 
 export type ActivePhoneApp = PhoneAppId | "camera" | null;
 
@@ -68,10 +69,58 @@ export function PhoneProvider({
   const [activeApp, setActiveApp] = useState<ActivePhoneApp>(initialApp);
   const [pinnedClueIds, setPinnedClueIds] = useState<Set<string>>(new Set());
 
+  // Phone app usage timing tracking
+  const appStartTimeRef = useRef<number>(Date.now());
+  const currentAppRef = useRef<ActivePhoneApp>(initialApp);
+  const phoneOpenTimeRef = useRef<number>(Date.now());
+
+  // Track phone session duration on unmount
+  useEffect(() => {
+    phoneOpenTimeRef.current = Date.now();
+    return () => {
+      const phoneDuration = Math.round((Date.now() - phoneOpenTimeRef.current) / 1000);
+      if (phoneDuration >= 1) {
+        trackEvent("phone_session", {
+          device_id: device.id,
+          device_name: (device as any).name || (device as any).title || "victim_phone",
+          duration_seconds: phoneDuration,
+        });
+      }
+    };
+  }, [device.id]);
+
   const unlock = useCallback(() => setIsLocked(false), []);
   const lock = useCallback(() => setIsLocked(true), []);
-  const openApp = useCallback((app: ActivePhoneApp) => setActiveApp(app), []);
-  const goHome = useCallback(() => setActiveApp(null), []);
+
+  const openApp = useCallback((app: ActivePhoneApp) => {
+    // Track previous app duration if any
+    if (currentAppRef.current) {
+      const duration = Math.round((Date.now() - appStartTimeRef.current) / 1000);
+      if (duration >= 1) {
+        trackPhoneAppUsed({
+          appId: currentAppRef.current,
+          durationSeconds: duration,
+        });
+      }
+    }
+    currentAppRef.current = app;
+    appStartTimeRef.current = Date.now();
+    setActiveApp(app);
+  }, []);
+
+  const goHome = useCallback(() => {
+    if (currentAppRef.current) {
+      const duration = Math.round((Date.now() - appStartTimeRef.current) / 1000);
+      if (duration >= 1) {
+        trackPhoneAppUsed({
+          appId: currentAppRef.current,
+          durationSeconds: duration,
+        });
+      }
+    }
+    currentAppRef.current = null;
+    setActiveApp(null);
+  }, []);
 
   const togglePinClue = useCallback(
     (clueId: string, metadata?: Record<string, unknown>) => {

@@ -6,6 +6,7 @@ import { detectiveAudio } from "@/lib/investigation-audio";
 import { cn } from "@/lib/utils";
 import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
 import { getStorageJson, setStorageJson, getStorageItem } from "@/lib/storage";
+import { trackHintViewed } from "@/lib/analytics";
 import {
   buildGroupedCheckpointsMap,
   normalizeCheckpointId,
@@ -143,6 +144,12 @@ export function CheckpointHintSection({
     };
     setUnlockedLevels(updated);
     setStorageJson("hint_unlocked_levels", updated);
+
+    // Track event xem gợi ý kèm cấp độ gợi ý (tier 1, 2, 3)
+    trackHintViewed({
+      checkpointId: storageKey,
+      hintTier: nextCount,
+    });
   };
 
   const startHold = () => {

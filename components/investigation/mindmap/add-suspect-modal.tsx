@@ -350,6 +350,9 @@ export function AddSuspectModal({
         aiContext: matchedCheckpoint?.aiContext,
         aiValidCases: matchedCheckpoint?.aiValidCases,
         aiInvalidCases: matchedCheckpoint?.aiInvalidCases,
+        motiveContext: matchedCheckpoint?.pickerConfig?.motiveContext,
+        contradictionContext:
+          matchedCheckpoint?.pickerConfig?.contradictionContext,
       });
 
       const res = await fetch("/api/test-scan-answer", {

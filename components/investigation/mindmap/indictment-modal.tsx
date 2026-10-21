@@ -9,6 +9,7 @@ import { setStorageItem } from '@/lib/storage'
 import { emitInvestigationEvent } from '@/lib/investigation-events'
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
+import { trackEvent } from '@/lib/analytics'
 
 interface IndictmentModalProps {
   caseId?: string
@@ -188,6 +189,11 @@ export function IndictmentModal({
     const combinedClueInputs = [cluesEvidenceInput]
       .filter((s) => s.trim().length > 0)
 
+    trackEvent('indictment_submitted', {
+      culprit,
+      suspect_name: suspectName.trim(),
+      motive: selectedOptionLabel,
+    });
     detectiveAudio.playStampSound()
     setStorageItem('indictment_solved', 'true')
     setStorageItem('indictment_culprit', culprit)

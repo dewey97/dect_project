@@ -1,5 +1,5 @@
-import React from 'react'
-import { FileText, ImageIcon, Target } from 'lucide-react'
+import React, { useState, useMemo } from 'react'
+import { FileText, ImageIcon, Target, FolderOpen, Search, X } from 'lucide-react'
 import { cn, normalizeImageUrl } from '@/lib/utils'
 import type {
   CombinedItem,
@@ -58,56 +58,138 @@ export function DossierTray({
   activePing,
   onBroadcastPing,
 }: DossierTrayProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // Lọc tài liệu theo từ khóa tìm kiếm
+  const filteredPdfs = useMemo(() => {
+    if (!searchQuery.trim()) return pdfItems
+    const q = searchQuery.toLowerCase().trim()
+    return pdfItems.filter((item) => {
+      const pdf = item.data as PDFDocument
+      const code = (pdf.code || '').toLowerCase()
+      const title = (item.data.title || '').toLowerCase()
+      return code.includes(q) || title.includes(q)
+    })
+  }, [pdfItems, searchQuery])
+
+  // Lọc vật chứng theo từ khóa tìm kiếm
+  const filteredEvidence = useMemo(() => {
+    if (!searchQuery.trim()) return evidenceItems
+    const q = searchQuery.toLowerCase().trim()
+    return evidenceItems.filter((item) => {
+      const ev = item.data as PhysicalEvidence
+      const code = (ev.evidenceId || '').toLowerCase()
+      const title = (item.data.title || '').toLowerCase()
+      return code.includes(q) || title.includes(q)
+    })
+  }, [evidenceItems, searchQuery])
+
   return (
     <div
       style={{
         width: isDossierCollapsed ? 0 : `${dossierWidth}px`,
       }}
       className={cn(
-        'w-full lg:w-auto shrink-0 bg-[#140e0a] border-r border-[#2d1e13] rounded-none overflow-hidden flex flex-col h-full min-h-0',
+        'w-full lg:w-auto shrink-0 bg-[#130f0c] border-r border-[#261b12] rounded-none overflow-hidden flex flex-col h-full min-h-0 select-none transition-[width] duration-150 ease-out',
         isDossierCollapsed && 'lg:hidden',
         isViewerExpanded && 'hidden xl:flex',
         mobileTab === 'dossier' ? 'flex' : 'hidden lg:flex'
       )}
     >
-      {/* HEADER: 2 TABS TÀI LIỆU VÀ ẢNH CHUẨN BIÊN MỤC HỒ SƠ */}
-      <div className="hidden lg:flex shrink-0 p-2 bg-[#1b120c] border-b border-[#2d1e13] items-center gap-1.5">
-        <button
-          type="button"
-          onClick={() => onSetFilterTab('pdf')}
-          className={cn(
-            'flex-1 py-1.5 px-3 font-mono text-xs tracking-wider font-bold transition-all cursor-pointer rounded-xs flex items-center justify-center gap-1.5 border',
-            filterTab === 'pdf'
-              ? 'bg-[#2c1d12] text-[#e8a86a] border-[#e8a86a]/60 shadow-[inset_0_1px_0_rgba(232,168,106,0.3)] font-extrabold'
-              : 'bg-[#140e0a] text-[#8e7663] hover:text-[#d4c3b3] hover:bg-[#1f1610] border-[#291b12]'
-          )}
-        >
-          <FileText className="size-3.5" />
-          <span>HỒ SƠ TÀI LIỆU</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => onSetFilterTab('evidence')}
-          className={cn(
-            'flex-1 py-1.5 px-3 font-mono text-xs tracking-wider font-bold transition-all cursor-pointer rounded-xs flex items-center justify-center gap-1.5 border',
-            filterTab === 'evidence'
-              ? 'bg-[#2c1d12] text-[#e8a86a] border-[#e8a86a]/60 shadow-[inset_0_1px_0_rgba(232,168,106,0.3)] font-extrabold'
-              : 'bg-[#140e0a] text-[#8e7663] hover:text-[#d4c3b3] hover:bg-[#1f1610] border-[#291b12]'
-          )}
-        >
-          <ImageIcon className="size-3.5" />
-          <span>VẬT CHỨNG</span>
-        </button>
+      {/* 1. SIDEBAR HEADER: TÊN DANH MỤC + TỔNG SỐ LƯỢNG */}
+      <div className="shrink-0 px-3 pt-3 pb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          <FolderOpen className="size-4 text-[#d9a066] shrink-0" />
+          <span className="font-sans text-xs font-semibold tracking-wide text-[#e8dcce] uppercase truncate">
+            Hồ sơ & Vật chứng
+          </span>
+        </div>
+        <span className="font-mono text-[10px] text-[#9c8472] bg-[#1d1510] px-1.5 py-0.5 rounded border border-[#302115] shrink-0">
+          {filterTab === 'pdf' ? `${filteredPdfs.length} tài liệu` : `${filteredEvidence.length} vật chứng`}
+        </span>
       </div>
 
-      {/* PHASE FILTER TABS: TAB CHỈ MỤC NGĂN KÉO LƯU TRỮ */}
-      <div className="shrink-0 px-2 py-1.5 border-b border-[#291b12] bg-[#120c08] flex items-center gap-1 overflow-x-auto font-mono custom-scrollbar">
+      {/* 2. MODERN SEGMENTED TABS (TÀI LIỆU | VẬT CHỨNG) */}
+      <div className="shrink-0 px-3 pb-2">
+        <div className="p-1 bg-[#0b0806] rounded-md border border-[#23170e] flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onSetFilterTab('pdf')}
+            className={cn(
+              'flex-1 py-1.5 px-2 rounded-sm font-sans text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer',
+              filterTab === 'pdf'
+                ? 'bg-[#291b12] text-[#f4e8d8] font-semibold border border-[#442e1f] shadow-xs'
+                : 'text-[#846f5d] hover:text-[#d4c3b3] hover:bg-[#160f09]'
+            )}
+          >
+            <FileText className="size-3.5 shrink-0" />
+            <span className="truncate">Tài liệu</span>
+            <span
+              className={cn(
+                'font-mono text-[10px] px-1.5 py-0.2 rounded-full leading-none',
+                filterTab === 'pdf' ? 'bg-[#3d2719] text-[#e8a86a]' : 'bg-[#18110b] text-[#6d5b4d]'
+              )}
+            >
+              {pdfItems.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSetFilterTab('evidence')}
+            className={cn(
+              'flex-1 py-1.5 px-2 rounded-sm font-sans text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer',
+              filterTab === 'evidence'
+                ? 'bg-[#291b12] text-[#f4e8d8] font-semibold border border-[#442e1f] shadow-xs'
+                : 'text-[#846f5d] hover:text-[#d4c3b3] hover:bg-[#160f09]'
+            )}
+          >
+            <ImageIcon className="size-3.5 shrink-0" />
+            <span className="truncate">Vật chứng</span>
+            <span
+              className={cn(
+                'font-mono text-[10px] px-1.5 py-0.2 rounded-full leading-none',
+                filterTab === 'evidence' ? 'bg-[#3d2719] text-[#e8a86a]' : 'bg-[#18110b] text-[#6d5b4d]'
+              )}
+            >
+              {evidenceItems.length}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* 3. TÌM KIẾM NHANH (SEARCH INPUT) */}
+      <div className="shrink-0 px-3 pb-2">
+        <div className="relative flex items-center">
+          <Search className="size-3.5 absolute left-2.5 text-[#6c5746] pointer-events-none shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={filterTab === 'pdf' ? 'Tìm mã hoặc tên tài liệu...' : 'Tìm tên hoặc mã vật chứng...'}
+            className="w-full pl-8 pr-7 py-1.5 bg-[#0b0806] border border-[#23170e] focus:border-[#d9a066]/60 rounded-md text-xs text-[#e5d8cb] placeholder:text-[#5e4b3c] outline-none transition-colors"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 p-0.5 text-[#846f5d] hover:text-[#f4e8d8] cursor-pointer"
+              title="Xóa tìm kiếm"
+            >
+              <X className="size-3" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 4. PHASE FILTER CHIPS (TẤT CẢ / KHỞI ĐẦU / BỘ A / BỘ B / BỘ C) */}
+      <div className="shrink-0 px-3 pb-2.5 flex items-center gap-1 overflow-x-auto custom-scrollbar border-b border-[#23170e]">
         {[
-          { label: 'TẤT CẢ', val: 'all' as const },
-          { label: 'BAN ĐẦU', val: 0 },
-          { label: 'BỘ A', val: 1 },
-          { label: 'BỘ B', val: 2 },
-          { label: 'BỘ C', val: 3 },
+          { label: 'Tất cả', val: 'all' as const },
+          { label: 'Khởi đầu', val: 0 },
+          { label: 'Bộ A', val: 1 },
+          { label: 'Bộ B', val: 2 },
+          { label: 'Bộ C', val: 3 },
         ].map((p) => {
           const isLocked = typeof p.val === 'number' && !isPhaseUnlocked(p.val)
           const isSelected = selectedPhaseFilter === p.val
@@ -117,12 +199,12 @@ export function DossierTray({
               disabled={isLocked}
               onClick={() => onSetPhaseFilter(p.val)}
               className={cn(
-                'px-2.5 py-1 rounded-xs transition-all whitespace-nowrap text-[0.72rem] tracking-wide font-bold min-h-[26px] flex items-center justify-center border',
+                'px-2 py-1 rounded text-[11px] font-sans font-medium transition-all whitespace-nowrap',
                 isLocked
-                  ? 'opacity-30 cursor-not-allowed text-[#5a483a] border-transparent'
+                  ? 'opacity-25 cursor-not-allowed text-[#5a483a]'
                   : isSelected
-                  ? 'bg-[#d9a066] text-[#140e0a] border-[#d9a066] font-black shadow-xs'
-                  : 'bg-[#1a120c] text-[#9b8572] hover:text-[#f0e4d7] hover:bg-[#251a12] border-[#2d1e14] cursor-pointer'
+                  ? 'bg-[#d9a066] text-[#120a05] font-bold shadow-xs cursor-default'
+                  : 'text-[#846f5d] hover:text-[#d4c3b3] hover:bg-[#1a120b] cursor-pointer'
               )}
             >
               {p.label}
@@ -131,17 +213,20 @@ export function DossierTray({
         })}
       </div>
 
-      {/* DANH SÁCH THẺ HỒ SƠ LƯU TRỮ (MANILA ARCHIVAL DOSSIER FOLDERS) */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 bg-[#0e0906] p-2 space-y-2">
+      {/* 5. DANH SÁCH CUỘN CHÍNH (MAIN SCROLLABLE CONTENT) */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 p-2 space-y-1.5">
         {filterTab === 'evidence' ? (
-          /* NẾU LÀ VẬT CHỨNG: HIỂN THỊ DẠNG GRID */
-          evidenceItems.length === 0 ? (
-            <div className="p-6 text-center text-xs font-mono text-[#78614e]">
-              Chưa thu thập vật chứng nào.
+          /* DANH SÁCH VẬT CHỨNG: 2 CỘT GRID HIỆN ĐẠI */
+          filteredEvidence.length === 0 ? (
+            <div className="py-12 px-4 text-center">
+              <ImageIcon className="size-8 text-[#3d2c1e] mx-auto mb-2" />
+              <p className="text-xs font-sans text-[#78614e]">
+                {searchQuery ? 'Không tìm thấy vật chứng phù hợp.' : 'Chưa thu thập vật chứng nào.'}
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {evidenceItems.map((item) => {
+              {filteredEvidence.map((item) => {
                 const isSelected =
                   selectedView.type === item.type &&
                   selectedView.data.id === item.data.id
@@ -154,28 +239,38 @@ export function DossierTray({
                   <div
                     id={`doc-card-${item.data.id}`}
                     key={`evidence-${item.data.id}`}
-                    className={cn(
-                      'w-full aspect-[4/3] text-left border transition-all cursor-pointer relative overflow-hidden group shadow-md bg-[#0a0705] active:scale-[0.98]',
-                      isPinged
-                        ? 'border-amber-400 ring-2 ring-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.6)] animate-pulse'
-                        : isSelected
-                        ? 'border-[#d9a066] shadow-[0_0_15px_rgba(217,160,102,0.35)] ring-1 ring-[#d9a066]'
-                        : 'border-[#2d1e13] hover:border-[#4d3422]'
-                    )}
                     onClick={() => onSelectEvidence(evItem)}
+                    className={cn(
+                      'w-full aspect-[4/3] text-left rounded-md border transition-all duration-150 cursor-pointer relative overflow-hidden group bg-[#090705]',
+                      isPinged
+                        ? 'border-amber-400 ring-2 ring-amber-400/80 shadow-[0_0_16px_rgba(245,158,11,0.5)] animate-pulse'
+                        : isSelected
+                        ? 'border-[#d9a066] ring-1 ring-[#d9a066] shadow-[0_4px_16px_rgba(0,0,0,0.8)]'
+                        : 'border-[#261b12] hover:border-[#4d3624]'
+                    )}
                   >
                     <img
                       src={normalizeImageUrl(evItem?.thumbnail) || '/photo_scene_overview.jpg'}
-                      alt="Vật chứng"
+                      alt={item.data.title || 'Vật chứng'}
                       className="w-full h-full object-cover select-none transition-transform duration-200 group-hover:scale-105"
                     />
-                    {evItem?.evidenceId && (
-                      <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/85 text-[0.65rem] font-mono font-bold tracking-wider text-[#e5d8cb] border border-white/10 z-10">
-                        {evItem.evidenceId}
-                      </div>
-                    )}
 
-                    {/* NÚT CHỈ ĐIỂM NHANH KHI HOVER */}
+                    {/* Gradient overlay nhẹ cho chân ảnh */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+
+                    {/* Nhãn mã số + tiêu đề ở chân thẻ */}
+                    <div className="absolute bottom-1.5 left-1.5 right-1.5 pointer-events-none">
+                      {evItem?.evidenceId && (
+                        <span className="inline-block px-1.5 py-0.5 rounded-xs bg-[#1a120c]/90 text-[0.6rem] font-mono font-bold tracking-wider text-[#e8a86a] border border-[#3d2719] mb-0.5">
+                          {evItem.evidenceId}
+                        </span>
+                      )}
+                      <p className="text-[11px] font-sans text-stone-200 truncate leading-tight">
+                        {item.data.title}
+                      </p>
+                    </div>
+
+                    {/* Nút chỉ điểm nhanh khi hover */}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -185,22 +280,18 @@ export function DossierTray({
                           docType: 'evidence',
                         })
                       }}
-                      className="absolute top-1 right-1 p-1 rounded bg-black/75 hover:bg-amber-500/80 text-white/70 hover:text-black border border-white/20 transition-all opacity-0 group-hover:opacity-100 z-20 cursor-pointer"
+                      className="absolute top-1.5 right-1.5 size-6 rounded bg-black/75 hover:bg-amber-500 text-stone-300 hover:text-black border border-white/15 transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer shadow-sm z-10"
                       title="Chỉ điểm vật chứng này cho đồng đội"
                     >
                       <Target className="size-3.5" />
                     </button>
 
-                    {/* BADGE THÁM TỬ ĐANG CHỈ ĐIỂM */}
+                    {/* Badge đồng đội đang chỉ điểm */}
                     {isPinged && activePing && (
-                      <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-amber-500 text-black font-mono text-[0.6rem] font-black uppercase tracking-wider shadow-lg flex items-center gap-1 z-20 animate-bounce">
-                        <Target className="size-3" />
-                        <span className="truncate max-w-[80px]">{activePing.actorName}</span>
+                      <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-amber-500 text-black font-mono text-[0.6rem] font-bold tracking-wider shadow-md flex items-center gap-1 z-10 animate-bounce">
+                        <Target className="size-2.5" />
+                        <span className="truncate max-w-[70px]">{activePing.actorName}</span>
                       </div>
-                    )}
-
-                    {isSelected && !isPinged && (
-                      <div className="absolute inset-0 border-2 border-[#d9a066] pointer-events-none" />
                     )}
                   </div>
                 )
@@ -208,13 +299,16 @@ export function DossierTray({
             </div>
           )
         ) : (
-          /* NẾU LÀ HỒ SƠ: THẺ BÌA MANILA CỔ ĐIỂN VỚI TAB GÁY VÀ VẠCH CHỈ THỊ */
-          pdfItems.length === 0 ? (
-            <div className="p-8 text-center text-xs font-mono text-[#78614e]">
-              Không tìm thấy tài liệu trong danh mục này.
+          /* DANH SÁCH HỒ SƠ TÀI LIỆU: SIDEBAR LIST ITEMS HIỆN ĐẠI */
+          filteredPdfs.length === 0 ? (
+            <div className="py-12 px-4 text-center">
+              <FileText className="size-8 text-[#3d2c1e] mx-auto mb-2" />
+              <p className="text-xs font-sans text-[#78614e]">
+                {searchQuery ? 'Không tìm thấy tài liệu phù hợp.' : 'Chưa có tài liệu trong giai đoạn này.'}
+              </p>
             </div>
           ) : (
-            pdfItems.map((item) => {
+            filteredPdfs.map((item) => {
               const isSelected =
                 selectedView.type === item.type &&
                 selectedView.data.id === item.data.id
@@ -223,34 +317,25 @@ export function DossierTray({
               const title = item.data.title || ''
               const titleLower = title.toLowerCase()
 
-              // Nhận diện kiểu văn bản để gắn nhãn phân loại (Type badge & Accent bar)
               const isLyLich = titleLower.includes('lý lịch') || titleLower.includes('nhân thân')
               const isLoiKhai = titleLower.includes('lời khai') || titleLower.includes('hỏi cung') || titleLower.includes('tự thú')
               const isHuongDan = code === '00-HD' || titleLower.includes('hướng dẫn')
 
               const badgeText = isLyLich
-                ? 'LÝ LỊCH'
+                ? 'Lý lịch'
                 : isLoiKhai
-                ? 'HỎI CUNG'
+                ? 'Lời khai'
                 : isHuongDan
-                ? 'CHỈ DẪN'
-                : 'HỒ SƠ'
+                ? 'Chỉ dẫn'
+                : 'Hồ sơ'
 
               const badgeColor = isLyLich
-                ? 'text-[#f87171] border-[#7f1d1d] bg-[#450a0a]/40'
+                ? 'text-rose-400 bg-rose-950/40 border-rose-900/40'
                 : isLoiKhai
-                ? 'text-[#60a5fa] border-[#1e3a8a] bg-[#172554]/40'
+                ? 'text-sky-400 bg-sky-950/40 border-sky-900/40'
                 : isHuongDan
-                ? 'text-[#34d399] border-[#065f46] bg-[#022c22]/40'
-                : 'text-[#d9a066] border-[#78350f] bg-[#451a03]/40'
-
-              const accentBorder = isSelected
-                ? 'border-l-4 border-l-[#d9a066]'
-                : isLyLich
-                ? 'border-l-2 border-l-[#ef4444]/60'
-                : isLoiKhai
-                ? 'border-l-2 border-l-[#3b82f6]/60'
-                : 'border-l-2 border-l-[#78350f]/60'
+                ? 'text-emerald-400 bg-emerald-950/40 border-emerald-900/40'
+                : 'text-amber-400 bg-amber-950/40 border-amber-900/40'
 
               const isPinged =
                 activePing?.targetId === item.data.id ||
@@ -262,32 +347,33 @@ export function DossierTray({
                   key={`pdf-${item.data.id}`}
                   onClick={() => onSelectPdf(pdfDoc)}
                   className={cn(
-                    'w-full text-left transition-all duration-150 cursor-pointer overflow-hidden group select-none relative p-3 rounded-xs border shadow-sm',
-                    accentBorder,
+                    'w-full text-left p-2.5 rounded-md transition-all duration-150 cursor-pointer relative overflow-hidden group select-none border',
                     isPinged
-                      ? 'bg-amber-950/40 border-amber-400 ring-2 ring-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)] animate-pulse'
+                      ? 'bg-amber-950/30 border-amber-400 ring-2 ring-amber-400/80 shadow-[0_0_16px_rgba(245,158,11,0.4)] animate-pulse'
                       : isSelected
-                      ? 'bg-[#25180f] border-[#d9a066] shadow-[0_4px_16px_rgba(0,0,0,0.8)] ring-1 ring-[#d9a066]/30'
-                      : 'bg-[#18110b] hover:bg-[#1f150e] border-[#2d1e13] hover:border-[#4d3422]'
+                      ? 'bg-[#21160e] border-[#d9a066]/70 shadow-xs ring-1 ring-[#d9a066]/20'
+                      : 'bg-[#150f0a] hover:bg-[#1b130d] border-[#241910] hover:border-[#382618]'
                   )}
                 >
-                  {/* DÒNG 1: MÃ HỒ SƠ + BADGE PHÂN LOẠI + NÚT CHỈ ĐIỂM NHANH */}
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <div className="flex items-center gap-2">
+                  {/* Vạch chỉ thị active bên trái */}
+                  {isSelected && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
+                  )}
+
+                  {/* Dòng 1: Mã hồ sơ + Badge phân loại + Nút Ping */}
+                  <div className="flex items-center justify-between gap-1.5 mb-1 pl-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
                       <span
                         className={cn(
-                          'font-mono text-xs font-black tracking-wider transition-colors',
-                          isSelected
-                            ? 'text-[#d9a066]'
-                            : 'text-[#c29668] group-hover:text-[#e8b988]'
+                          'font-mono text-[11px] font-bold tracking-wide transition-colors shrink-0',
+                          isSelected ? 'text-[#d9a066]' : 'text-[#b88c60] group-hover:text-[#e0ad7b]'
                         )}
                       >
                         {code}
                       </span>
-
                       <span
                         className={cn(
-                          'font-mono text-[0.62rem] font-bold px-1.5 py-0.5 rounded-2xs border tracking-wider',
+                          'font-sans text-[10px] px-1.5 py-0.2 rounded border font-medium shrink-0',
                           badgeColor
                         )}
                       >
@@ -295,7 +381,7 @@ export function DossierTray({
                       </span>
                     </div>
 
-                    {/* NÚT CHỈ ĐIỂM NHANH (HOVER HOẶC ĐANG CHỌN) */}
+                    {/* Nút chỉ điểm nhanh */}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -305,43 +391,37 @@ export function DossierTray({
                           docType: 'pdf',
                         })
                       }}
-                      className="p-1 rounded hover:bg-amber-500/20 text-stone-400 hover:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-1 font-mono text-[0.65rem]"
+                      className="size-5 rounded hover:bg-amber-500/20 text-[#846f5d] hover:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center shrink-0"
                       title="Chỉ điểm tài liệu này cho đồng đội"
                     >
-                      <Target className="size-3.5" />
+                      <Target className="size-3" />
                     </button>
                   </div>
 
-                  {/* BADGE BÁO ĐỒNG ĐỘI ĐANG CHỈ ĐIỂM */}
+                  {/* Badge báo đồng đội đang ping */}
                   {isPinged && activePing && (
-                    <div className="mb-2 px-2 py-0.5 rounded bg-amber-500 text-black font-mono text-[0.65rem] font-black flex items-center gap-1.5 shadow-md">
-                      <Target className="size-3 animate-spin" />
-                      <span>🎯 {activePing.actorName} đang chỉ điểm văn bản này</span>
+                    <div className="mb-1.5 ml-1 px-1.5 py-0.5 rounded bg-amber-500 text-black font-mono text-[10px] font-bold flex items-center gap-1 shadow-xs">
+                      <Target className="size-2.5 animate-spin shrink-0" />
+                      <span className="truncate">{activePing.actorName} đang chỉ điểm</span>
                     </div>
                   )}
 
-                  {/* DÒNG 2: TIÊU ĐỀ TÀI LIỆU */}
+                  {/* Dòng 2: Tiêu đề tài liệu */}
                   <p
                     className={cn(
-                      'font-normal text-xs sm:text-[0.82rem] leading-snug line-clamp-2 transition-colors',
+                      'font-sans text-xs leading-snug line-clamp-2 pl-1 transition-colors',
                       isSelected
-                        ? 'text-[#fef5ec] font-medium'
-                        : 'text-[#c2b29f] group-hover:text-[#ffffff]'
+                        ? 'text-[#fbf4eb] font-medium'
+                        : 'text-[#beb09f] group-hover:text-[#f2e7db]'
                     )}
                   >
                     {title}
                   </p>
-
-                  {/* Hướng dẫn trên mobile khi mở */}
-                  {isSelected && (
-                    <p className="block lg:hidden mt-2 text-[0.65rem] font-mono text-[#d9a066] text-right font-medium">
-                      Chạm để mở toàn màn hình ❯
-                    </p>
-                  )}
                 </div>
               )
             })
-          ))}
+          )
+        )}
       </div>
     </div>
   )

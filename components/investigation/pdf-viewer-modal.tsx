@@ -1,9 +1,11 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { X, FileText, ImageIcon, ShieldCheck } from 'lucide-react'
 import type { SelectedView } from '@/components/investigation/evidence/evidence-types'
 import { normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
 import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'
+import { trackDossierView, trackPhotoInspected } from '@/lib/analytics'
 import { DiegeticDossierSheet } from './evidence/diegetic-dossier-sheet'
 import { EvidencePhotoAnnotator } from './evidence/evidence-photo-annotator'
 import { NativePdfAnnotator } from './evidence/native-pdf-annotator'
@@ -23,6 +25,34 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, c
   const activeTitle = title || (selectedView ? selectedView.data.title : 'Tài liệu')
   const rawPdfUrl = pdfUrl || (isPdf ? selectedView.data.url : null)
   const normalizedPdfUrl = rawPdfUrl ? normalizeDrivePdfUrl(rawPdfUrl) : null
+
+  // Tracking thời gian xem tài liệu hoặc soi ảnh
+  const openTimeRef = useRef<number>(Date.now())
+
+  useEffect(() => {
+    if (isOpen) {
+      openTimeRef.current = Date.now()
+    } else {
+      const durationSeconds = Math.round((Date.now() - openTimeRef.current) / 1000)
+      if (durationSeconds >= 1) {
+        if (isEvidence && selectedView) {
+          trackPhotoInspected({
+            photoId: selectedView.data.evidenceId || selectedView.data.id || 'unknown_photo',
+            title: activeTitle,
+            durationSeconds,
+          })
+        } else if (isPdf || pdfUrl) {
+          trackDossierView({
+            docId: selectedView?.type === 'pdf' ? (selectedView.data.code || selectedView.data.id) : (title || 'document'),
+            docTitle: activeTitle,
+            docType: isPdf ? 'pdf_dossier' : 'legacy_pdf',
+            durationSeconds,
+            caseId,
+          })
+        }
+      }
+    }
+  }, [isOpen, isEvidence, isPdf, selectedView, activeTitle, pdfUrl, caseId])
 
   // Tra cứu xem hồ sơ này đã được số hóa trên Dossier Studio chưa
   const { findMatchingDocument } = useDossierDocuments(caseId)
