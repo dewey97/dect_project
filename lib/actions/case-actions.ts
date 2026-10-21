@@ -3,10 +3,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { DbCase, CaseStatus } from '@/lib/types/database'
 import { revalidatePath } from 'next/cache'
+import { requireAdminAuth } from './auth-guard'
 
 /** Lấy thống kê tổng quan cho Dashboard */
 export async function getDashboardStats() {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     
     // Đếm tổng số players
@@ -43,6 +45,7 @@ export async function getDashboardStats() {
 /** Lấy danh sách toàn bộ Vụ án (Cho trang /studio/cases) */
 export async function getCases() {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('cases')
@@ -60,6 +63,7 @@ export async function getCases() {
 /** Tạo Vụ án mới (Bản nháp) */
 export async function createCaseDraft(title: string = 'Untitled Mystery') {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('cases')
@@ -79,6 +83,7 @@ export async function createCaseDraft(title: string = 'Untitled Mystery') {
 /** Xóa Vụ án */
 export async function deleteCase(caseId: string) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const { error } = await supabase
       .from('cases')
@@ -98,6 +103,7 @@ export async function deleteCase(caseId: string) {
 /** Nhân bản Vụ án (Metadata) */
 export async function duplicateCase(caseId: string) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     
     // 1. Fetch case gốc
@@ -127,6 +133,7 @@ export async function duplicateCase(caseId: string) {
 /** Tạo một vụ án mới hoàn chỉnh với 2 node cơ bản: Hồ sơ ban đầu và Hậu án */
 export async function createNewCase(title: string, customCaseId?: string) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient();
 
     if (!title.trim()) {

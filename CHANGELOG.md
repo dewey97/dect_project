@@ -4,6 +4,13 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-22]
 
+### Security
+
+- **RLS hardening** (`db/schema/21_security_hardening_rls.sql`, đã áp dụng production): chặn leo thang quyền qua `profiles.role` (trước đó anon cũng sửa được); `cases`, `dossier_documents`, `case_dossiers`, `app_settings`, `play_sessions`, bucket `avatars` chỉ admin ghi; `feedbacks` chỉ admin đọc/cập nhật.
+- `requireAdminAuth()` chặn user không có row `profiles` (trước đây lọt qua).
+- Thêm `requireAdminAuth()` cho 15 server action quản trị; bỏ bypass `NODE_ENV === 'development'` trong `board-actions.ts`.
+- `denyIfNotAdmin()` cho POST `/api/admin/map-vector`, `/api/admin/pins`, `/api/reinvestigation`; `/api/reinvestigation` whitelist `caseId` chống path traversal.
+
 ### Removed
 
 - **Dead code**: 14 file không còn importer (xem `docs/TECHDEBT.md` #13). Import `PhoneSimulator` trỏ thẳng `@/components/phone-engine/phone-simulator`.

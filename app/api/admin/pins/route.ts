@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 import { createClient } from "@/lib/supabase/server";
+import { denyIfNotAdmin } from "@/lib/security/admin-route-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,9 @@ function createGoogleAuth() {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = await denyIfNotAdmin();
+  if (denied) return denied;
+
   try {
     const body = await req.json();
     const {

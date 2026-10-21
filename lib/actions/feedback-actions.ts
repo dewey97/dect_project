@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { DbFeedback } from '@/lib/types/database'
 import { revalidatePath } from 'next/cache'
+import { requireAdminAuth } from './auth-guard'
 
 export async function submitFeedback(payload: Partial<DbFeedback>) {
   try {
@@ -24,6 +25,7 @@ export async function submitFeedback(payload: Partial<DbFeedback>) {
 
 export async function getFeedbacks(statusFilter?: string) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     let query = supabase.from('feedbacks').select('*').order('created_at', { ascending: false })
     
@@ -43,6 +45,7 @@ export async function getFeedbacks(statusFilter?: string) {
 
 export async function updateFeedbackStatus(id: string, status: string) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const payload: any = { status }
     if (status === 'RESOLVED') {
@@ -65,6 +68,7 @@ export async function updateFeedbackStatus(id: string, status: string) {
 
 export async function getUnreadFeedbackCount() {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const { count, error } = await supabase
       .from('feedbacks')

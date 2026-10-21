@@ -39,6 +39,17 @@ Mở rộng thông tin định danh người dùng từ `auth.users` của Supab
 | `role`         | `TEXT`        | Quyền hạn (`player`, `admin`). Hệ thống dùng biến này để xác thực quyền vào Admin Studio qua `requireAdminAuth()`. | `'player'` |
 | `created_at`   | `TIMESTAMPTZ` | Thời điểm tham gia.                                                                                                | `NOW()`    |
 
+### Phân quyền RLS (`db/schema/21_security_hardening_rls.sql`)
+
+- `public.is_admin()` (SECURITY DEFINER): `true` khi JWT `app_metadata.role` là `admin`/`super_admin` hoặc `profiles.role = 'admin'`. Mọi policy ghi của admin dùng hàm này.
+- `profiles`: chỉ chủ tài khoản hoặc admin đọc được. User tự tạo profile với `role = 'player'`. Qua API công khai chỉ sửa được `display_name`, `avatar_url`; đổi `role` phải dùng dashboard hoặc `service_role`.
+- `cases`, `dossier_documents`, `case_dossiers`, `app_settings`: đọc công khai, ghi chỉ admin.
+- `feedbacks`: ai cũng gửi được; chỉ admin đọc và cập nhật.
+- `play_sessions`: người chơi thao tác phiên của mình; admin thao tác tất cả.
+- Bucket `avatars`: đọc công khai, ghi chỉ admin.
+- Chưa khóa: `game_rooms` (chơi nhóm cần ghi công khai), `case_checkpoints` (đọc công khai cho tới khi chuyển chấm điểm lên server).
+- Server phải tự kiểm tra quyền trước khi ghi: `requireAdminAuth()` trong server action, `denyIfNotAdmin()` (`lib/security/admin-route-guard.ts`) trong Route Handler.
+
 ### Table: `play_sessions`
 
 Lưu lại lịch sử phiên chơi và tiến trình của tài khoản.

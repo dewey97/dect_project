@@ -17,9 +17,7 @@ export async function saveBoardgamePinPositions(
   connections: CaseConnection[] = [],
 ) {
   try {
-    if (process.env.NODE_ENV !== "development") {
-      await requireAdminAuth(); // Chỉ bắt buộc đăng nhập admin trên production
-    }
+    await requireAdminAuth();
 
     const supabase = await createClient();
 
@@ -322,12 +320,10 @@ export interface ReinvestigateHotspotConfig {
 
 export async function saveReinvestigationHotspots(
   caseId: string,
-  hotspots: ReinvestigateHotspotConfig[]
+  hotspots: ReinvestigateHotspotConfig[],
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    if (process.env.NODE_ENV !== "development") {
-      await requireAdminAuth();
-    }
+    await requireAdminAuth();
     const supabase = await createClient();
     const formatted = hotspots.map((s) => ({
       id: `reinvestigate-${caseId}-${s.num}`,
@@ -357,9 +353,11 @@ export async function saveReinvestigationHotspots(
   }
 }
 
-export async function getReinvestigationHotspots(
-  caseId: string
-): Promise<{ success: boolean; hotspots: ReinvestigateHotspotConfig[]; error?: string }> {
+export async function getReinvestigationHotspots(caseId: string): Promise<{
+  success: boolean;
+  hotspots: ReinvestigateHotspotConfig[];
+  error?: string;
+}> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase

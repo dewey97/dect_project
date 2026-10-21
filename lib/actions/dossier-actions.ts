@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { DossierMode, PaperConfig, LoiKhaiData, LyLichData } from '@/types/dossier'
+import { requireAdminAuth } from './auth-guard'
 
 export interface DbDossierDocument {
   id: string
@@ -58,6 +59,7 @@ export async function saveDossierDocument(params: {
   content: LoiKhaiData | LyLichData
 }) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const caseId = params.caseId || 'case_000'
 
@@ -90,6 +92,7 @@ export async function saveDossierDocument(params: {
 /** Lưu thứ tự danh sách hồ sơ sau khi bấm nút Đẩy Trái / Đẩy Phải */
 export async function reorderDossierDocuments(orderedDocIds: { id: string; sortOrder: number; content: any }[]) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const updates = orderedDocIds.map(doc => {
       const updatedContent = {
@@ -117,6 +120,7 @@ export async function reorderDossierDocuments(orderedDocIds: { id: string; sortO
 /** Xóa hồ sơ khỏi Supabase */
 export async function deleteDossierDocument(id: string) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const { error } = await supabase
       .from('dossier_documents')

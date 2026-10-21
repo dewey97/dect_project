@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { DbAppSettings } from '@/lib/types/database'
+import { requireAdminAuth } from './auth-guard'
 
 /** Lấy cấu hình toàn cục */
 export async function getAppSettings() {
@@ -34,6 +35,7 @@ export async function getAppSettings() {
 /** Cập nhật cấu hình toàn cục */
 export async function updateAppSettings(payload: Partial<DbAppSettings>) {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const { error } = await supabase
       .from('app_settings')

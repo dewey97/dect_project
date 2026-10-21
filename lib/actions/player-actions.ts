@@ -2,9 +2,11 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { DbProfile } from '@/lib/types/database'
+import { requireAdminAuth } from './auth-guard'
 
 export async function getPlayers() {
   try {
+    await requireAdminAuth()
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('profiles')

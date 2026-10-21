@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import type { DbCaseDossier } from "@/lib/types/database";
+import { requireAdminAuth } from "./auth-guard";
 
 export interface AvailableDocumentItem {
   code: string;
@@ -44,6 +45,7 @@ export async function saveCaseDossier(
   },
 ): Promise<{ ok: boolean; error?: string; dossier?: DbCaseDossier }> {
   try {
+    await requireAdminAuth();
     const supabase = await createClient();
 
     const upsertData = {
@@ -80,6 +82,7 @@ export async function deleteCaseDossier(
   dossierKey: string,
 ): Promise<{ ok: boolean; error?: string }> {
   try {
+    await requireAdminAuth();
     const supabase = await createClient();
     const { error } = await supabase
       .from("case_dossiers")

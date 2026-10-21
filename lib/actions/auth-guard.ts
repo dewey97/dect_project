@@ -1,35 +1,41 @@
-'use server'
+"use server";
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Kiểm tra xem người dùng hiện tại có authenticated và có role admin (hoặc creator) không.
  * Ném lỗi hoặc trả về false nếu không hợp lệ.
  */
 export async function requireAdminAuth() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
   if (userError || !user) {
-    throw new Error('Unauthorized: Bạn chưa đăng nhập.')
+    throw new Error("Unauthorized: Bạn chưa đăng nhập.");
   }
 
   // Ưu tiên kiểm tra quyền admin trực tiếp từ app_metadata của tài khoản
-  if (user.app_metadata?.role === 'super_admin' || user.app_metadata?.role === 'admin') {
-    return { user, profile: { role: 'admin' } }
+  if (
+    user.app_metadata?.role === "super_admin" ||
+    user.app_metadata?.role === "admin"
+  ) {
+    return { user, profile: { role: "admin" } };
   }
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
 
-  if (profile && profile.role !== 'admin') {
-    throw new Error('Forbidden: Bạn không có quyền truy cập Admin Studio.')
+  if (profile?.role !== "admin") {
+    throw new Error("Forbidden: Bạn không có quyền truy cập Admin Studio.");
   }
 
-  return { user, profile }
+  return { user, profile };
 }
 
 /**
@@ -38,24 +44,28 @@ export async function requireAdminAuth() {
  */
 export async function checkIsAdmin(): Promise<boolean> {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return false
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return false;
 
     // Kiểm tra role từ app_metadata (nếu có)
-    if (user.app_metadata?.role === 'super_admin' || user.app_metadata?.role === 'admin') {
-      return true
+    if (
+      user.app_metadata?.role === "super_admin" ||
+      user.app_metadata?.role === "admin"
+    ) {
+      return true;
     }
 
     const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
 
-    return profile?.role === 'admin'
+    return profile?.role === "admin";
   } catch {
-    return false
+    return false;
   }
 }
-
