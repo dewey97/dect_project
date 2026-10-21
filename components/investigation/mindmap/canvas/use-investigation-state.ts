@@ -124,23 +124,10 @@ export function useInvestigationState(opts?: {
 
   const { checkpoints } = useCaseCheckpoints(caseId);
 
-  const convergenceCp = useMemo(() => {
-    return checkpoints.find((cp) => cp.id.includes("convergence"));
-  }, [checkpoints]);
-
-  const requiredForReinvestigate = useMemo(() => {
-    const reqs = convergenceCp?.pickerConfig?.requiredEvidenceIds;
-    if (reqs && reqs.length > 0) {
-      return reqs.map((r) => r.toLowerCase().trim());
-    }
-    return ["vu", "tung"];
-  }, [convergenceCp]);
-
+  // Khám xét hiện trường luôn mở sẵn ngay từ đầu game
   const isReinvestigateConditionMet = useCallback(
-    (solved: string[]) => {
-      return requiredForReinvestigate.every((req) => solved.includes(req));
-    },
-    [requiredForReinvestigate]
+    (_solved?: string[]) => true,
+    []
   );
 
   useEffect(() => {

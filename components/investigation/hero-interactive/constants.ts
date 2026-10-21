@@ -36,6 +36,14 @@ export const CASES_LIST: CaseData[] = [
         noteColor: "white",
       },
       {
+        id: "c0-pin-reinvestigate",
+        x: 0.18,
+        y: 0.36,
+        label: "KHÁM XÉT HIỆN TRƯỜNG",
+        detail: "Khám xét và rà soát hiện trường số 14 Đường Bờ Sông (Toàn cảnh 360)",
+        noteColor: "white",
+      },
+      {
         id: "c0-pin-indictment",
         x: 0.22,
         y: 0.8,

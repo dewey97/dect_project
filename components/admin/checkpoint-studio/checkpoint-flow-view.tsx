@@ -21,6 +21,7 @@ import {
 } from "@xyflow/react";
 import {
   ArrowRight,
+  FolderOpen,
   GitBranch,
   LayoutGrid,
   Link2,
@@ -45,6 +46,7 @@ interface NodeFocusRequest {
 }
 
 interface CheckpointFlowViewProps {
+  caseId?: string;
   rows: DbCaseCheckpoint[];
   selectedId: string | null;
   pendingEdges: CheckpointGraphEdge[];
@@ -80,7 +82,14 @@ interface DossierLaneData extends Record<string, unknown> {
 }
 
 type DossierLaneNode = Node<DossierLaneData, "dossierLane">;
-type CheckpointCanvasNode = CheckpointFlowNode | DossierLaneNode;
+
+interface DossierNodeData extends Record<string, unknown> {
+  dossierName: string;
+  documentCount: number;
+}
+
+type DossierNode = Node<DossierNodeData, "dossierNode">;
+type CheckpointCanvasNode = CheckpointFlowNode | DossierNode;
 
 const EVIDENCE_KEYS = [
   "validSuspects",
@@ -121,7 +130,6 @@ function CheckpointFlowNodeCard({
 }: NodeProps<CheckpointFlowNode>) {
   const { row, issueLabels, hintCount: hints, evidenceCount: evidences } = data;
   const active = selected || data.isSelected;
-  const readOnly = row.type !== "evidence_picker";
 
   return (
     <div
@@ -154,14 +162,7 @@ function CheckpointFlowNodeCard({
       />
 
       <div className="flex items-center gap-1.5">
-        <span
-          className={cn(
-            "rounded px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide",
-            readOnly
-              ? "bg-sky-500/10 text-sky-300"
-              : "bg-amber-500/10 text-amber-300",
-          )}
-        >
+        <span className="rounded bg-amber-500/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-amber-300">
           {row.type || "evidence_picker"}
         </span>
         {issueLabels.length > 0 && (
@@ -174,41 +175,107 @@ function CheckpointFlowNodeCard({
         )}
       </div>
 
-      <p className="mt-2 truncate font-mono text-[10px] text-zinc-500">
-        {row.node_id?.trim() || row.checkpoint_id}
-      </p>
-      <p className="mt-0.5 line-clamp-2 text-xs font-semibold leading-snug text-zinc-100">
+      <p className="mt-2 line-clamp-2 text-xs font-semibold leading-snug text-zinc-100">
         {row.title || "(Chưa có tiêu đề)"}
       </p>
 
       <div className="mt-2 flex items-center gap-2 text-[10px] text-zinc-500">
         <span>{hints} gợi ý</span>
-        <span className="text-zinc-700">·</span>
-        <span>{evidences} mã chứng cứ</span>
-        {readOnly && <span className="ml-auto text-sky-400/70">chỉ đọc</span>}
+        {row.type === "evidence_picker" && (
+          <>
+            <span className="text-zinc-700">·</span>
+            <span>{evidences} mã chứng cứ</span>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-function DossierLaneCard({ data }: NodeProps<DossierLaneNode>) {
+function DossierNodeCard({ data, selected }: NodeProps<DossierNode>) {
+  const dossierName = String(data?.dossierName || "Hồ Sơ");
+  const count = Number(data?.documentCount ?? 0);
+
   return (
-    <div className="h-full w-full rounded-2xl border border-dashed border-white/15 bg-white/[0.015] px-4 py-3">
-      <div className="flex items-baseline gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
-          {data.label}
-        </span>
-        <span className="text-[10px] text-zinc-600">
-          {data.count} checkpoint
-        </span>
-      </div>
+    <div
+      className={cn(
+        "relative flex h-[120px] w-[120px] flex-col items-center justify-center rounded-xl border bg-[#101014] p-3 text-center transition-colors select-none",
+        selected
+          ? "border-amber-400 ring-2 ring-amber-400/20"
+          : "border-white/10 hover:border-white/25",
+      )}
+    >
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{
+          width: 8,
+          height: 8,
+          background: "#a1a1aa",
+          border: "2px solid #101014",
+        }}
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{
+          width: 8,
+          height: 8,
+          background: "#fbbf24",
+          border: "2px solid #101014",
+        }}
+      />
+
+      <FolderOpen className="size-5 text-amber-400/90 mb-2" />
+      <h3 className="line-clamp-2 font-mono text-xs font-bold uppercase tracking-wider text-zinc-100">
+        {dossierName}
+      </h3>
+      <p className="mt-1 font-mono text-[10px] text-zinc-400">
+        {count} tài liệu
+      </p>
     </div>
   );
+}
+
+function countDocumentsForDossier(dossierName: string, allDocs: DbDossierDocument[] = []): number {
+  const norm = dossierName.toLowerCase().trim();
+
+  if (norm.includes("a") || norm === "bộ a") {
+    const docs = allDocs.filter((d) => (d.tag_code || "").toUpperCase().startsWith("A-"));
+    return docs.length || 9;
+  }
+  if (norm.includes("b") || norm === "bộ b") {
+    const docs = allDocs.filter((d) => {
+      const code = (d.tag_code || "").toUpperCase();
+      return code.startsWith("B-") || code.startsWith("E-");
+    });
+    return docs.length || 8;
+  }
+  if (norm.includes("c") || norm === "bộ c") {
+    const docs = allDocs.filter((d) => {
+      const code = (d.tag_code || "").toUpperCase();
+      return code.startsWith("C-") || code.startsWith("D-");
+    });
+    return docs.length || 6;
+  }
+  if (norm.includes("ban đầu") || norm.includes("khởi đầu") || norm.includes("mở đầu")) {
+    return 4;
+  }
+  if (norm.includes("kết luận") || norm.includes("hậu án")) {
+    return 4;
+  }
+
+  const matched = allDocs.filter((d) => {
+    const tag = (d.tag_code || "").toLowerCase();
+    const title = (d.subject_name || "").toLowerCase();
+    return tag.includes(norm) || title.includes(norm);
+  });
+  return matched.length;
 }
 
 const nodeTypes: NodeTypes = {
   checkpoint: CheckpointFlowNodeCard,
-  dossierLane: DossierLaneCard,
+  dossierNode: DossierNodeCard,
 };
 
 function edgeId(edge: CheckpointGraphEdge): string {
@@ -234,6 +301,7 @@ function useIsDesktop(): boolean {
 }
 
 export function CheckpointFlowView({
+  caseId = "case_000",
   rows,
   selectedId,
   pendingEdges,
@@ -250,15 +318,14 @@ export function CheckpointFlowView({
   onSaveFlow,
 }: CheckpointFlowViewProps) {
   const isDesktop = useIsDesktop();
+  const { documents: dossierDocs } = useDossierDocuments(caseId);
   const flowRef = useRef<ReactFlowInstance<CheckpointCanvasNode, Edge> | null>(
     null,
   );
   const lastFocusNonce = useRef(0);
   const [isFlowReady, setIsFlowReady] = useState(false);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState<CheckpointFlowNode>(
-    [],
-  );
+  const [nodes, setNodes, onNodesChange] = useNodesState<CheckpointCanvasNode>([]);
 
   const issueMap = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -271,11 +338,65 @@ export function CheckpointFlowView({
     return map;
   }, [rows]);
 
+  const [dossierPositions, setDossierPositions] = useState<
+    Record<string, { x: number; y: number }>
+  >(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = localStorage.getItem("checkpoint_studio_dossier_positions");
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleDossierPositionChange = useCallback(
+    (id: string, pos: { x: number; y: number }) => {
+      setDossierPositions((prev) => {
+        const next = {
+          ...prev,
+          [id]: { x: Math.round(pos.x), y: Math.round(pos.y) },
+        };
+        try {
+          localStorage.setItem(
+            "checkpoint_studio_dossier_positions",
+            JSON.stringify(next),
+          );
+        } catch {}
+        return next;
+      });
+    },
+    [],
+  );
+
   useEffect(() => {
     const layout = layoutCheckpointGraph(rows, pendingEdges);
+
+    // Gom checkpoint theo bộ hồ sơ
+    const dossiers = new Map<
+      string,
+      { group: DbCaseCheckpoint[]; unlockedBy?: DbCaseCheckpoint }
+    >();
+
+    for (const row of rows) {
+      const dName = row.dossier?.trim() || "Chưa xếp bộ";
+      const existing = dossiers.get(dName) || { group: [] };
+      existing.group.push(row);
+      dossiers.set(dName, existing);
+    }
+
+    for (const row of rows) {
+      const unlocked = (row.answer_config as any)?.unlocksDossier?.trim();
+      if (unlocked && dossiers.has(unlocked)) {
+        dossiers.get(unlocked)!.unlockedBy = row;
+      }
+    }
+
     setNodes((current) => {
       const previous = new Map(current.map((node) => [node.id, node]));
-      return rows.map((row) => {
+
+      // 1. Checkpoint nodes
+      const cpNodes: CheckpointFlowNode[] = rows.map((row) => {
         const existing = previous.get(row.checkpoint_id);
         const saved = row.flow_position;
         const savedPosition =
@@ -285,7 +406,8 @@ export function CheckpointFlowView({
         return {
           id: row.checkpoint_id,
           type: "checkpoint" as const,
-          position: existing?.position ??
+          position:
+            existing?.position ??
             savedPosition ??
             layout[row.checkpoint_id] ?? { x: 0, y: 0 },
           data: {
@@ -299,49 +421,52 @@ export function CheckpointFlowView({
           zIndex: 1,
         };
       });
+
+      // 2. Dossier square box nodes
+      const dNodes: DossierNode[] = Array.from(dossiers, ([label, info]) => {
+        const existing = previous.get(`dossier-node:${label}`);
+        const savedPos = dossierPositions[`dossier-node:${label}`];
+
+        const xs = info.group.map(
+          (r) => r.flow_position?.x ?? layout[r.checkpoint_id]?.x ?? 0,
+        );
+        const ys = info.group.map(
+          (r) => r.flow_position?.y ?? layout[r.checkpoint_id]?.y ?? 0,
+        );
+        const minX = xs.length ? Math.min(...xs) : 0;
+        const avgY = ys.length
+          ? Math.round(ys.reduce((a, b) => a + b, 0) / ys.length)
+          : 0;
+
+        const defaultPos = { x: minX - 240, y: avgY };
+
+        return {
+          id: `dossier-node:${label}`,
+          type: "dossierNode" as const,
+          position: existing?.position ?? savedPos ?? defaultPos,
+          data: {
+            dossierName: label,
+            documentCount: countDocumentsForDossier(label, dossierDocs),
+          },
+          draggable: isDesktop,
+          selectable: true,
+          connectable: false,
+          zIndex: 5,
+        };
+      });
+
+      return [...dNodes, ...cpNodes];
     });
-  }, [rows, pendingEdges, selectedId, issueMap, setNodes]);
-
-  const laneNodes = useMemo<DossierLaneNode[]>(() => {
-    const groups = new Map<string, CheckpointFlowNode[]>();
-    for (const node of nodes) {
-      const label = node.data.row.dossier?.trim() || "Chưa xếp bộ";
-      const group = groups.get(label) || [];
-      group.push(node);
-      groups.set(label, group);
-    }
-
-    return Array.from(groups, ([label, group]) => {
-      const xs = group.map((node) => node.position.x);
-      const ys = group.map((node) => node.position.y);
-      const minX = Math.min(...xs);
-      const maxX = Math.max(...xs);
-      const minY = Math.min(...ys);
-      const maxY = Math.max(...ys);
-
-      return {
-        id: `dossier-lane:${label}`,
-        type: "dossierLane" as const,
-        position: { x: minX - 28, y: minY - 64 },
-        data: { label, count: group.length },
-        style: {
-          width: Math.max(320, maxX - minX + 260 + 56),
-          height: Math.max(190, maxY - minY + 140 + 52),
-        },
-        draggable: false,
-        selectable: false,
-        connectable: false,
-        focusable: false,
-        zIndex: 0,
-        className: "pointer-events-none",
-      };
-    });
-  }, [nodes]);
-
-  const allNodes = useMemo<CheckpointCanvasNode[]>(
-    () => [...laneNodes, ...nodes],
-    [laneNodes, nodes],
-  );
+  }, [
+    rows,
+    pendingEdges,
+    selectedId,
+    issueMap,
+    dossierPositions,
+    dossierDocs,
+    isDesktop,
+    setNodes,
+  ]);
 
   useEffect(() => {
     if (!isFlowReady) return;
@@ -362,7 +487,78 @@ export function CheckpointFlowView({
         duration: 300,
       },
     );
-  }, [focusRequest, allNodes, isFlowReady]);
+  }, [focusRequest, nodes, isFlowReady]);
+
+  const dossierEdges = useMemo<Edge[]>(() => {
+    const list: Edge[] = [];
+
+    // 1. Cạnh mở khóa: từ Checkpoint giải xong -> Bộ Hồ Sơ được mở
+    for (const row of rows) {
+      const unlocked = (row.answer_config as any)?.unlocksDossier?.trim();
+      if (unlocked) {
+        list.push({
+          id: `unlock-dossier:${row.checkpoint_id}->${unlocked}`,
+          source: row.checkpoint_id,
+          target: `dossier-node:${unlocked}`,
+          type: "smoothstep",
+          animated: false,
+          label: `Mở ${unlocked}`,
+          labelStyle: { fill: "#f59e0b", fontSize: 9, fontWeight: 600 },
+          labelBgStyle: { fill: "#141416", rx: 3, ry: 3 },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: 14,
+            height: 14,
+            color: "#d97706",
+          },
+          style: { stroke: "#d97706", strokeWidth: 1.6 },
+        });
+      }
+    }
+
+    // 2. Cạnh thuộc bộ: từ Bộ Hồ Sơ -> các Checkpoint khởi đầu bên trong bộ
+    const byDossier = new Map<string, DbCaseCheckpoint[]>();
+    for (const row of rows) {
+      const dName = row.dossier?.trim();
+      if (dName) {
+        const group = byDossier.get(dName) || [];
+        group.push(row);
+        byDossier.set(dName, group);
+      }
+    }
+
+    for (const [dName, group] of byDossier.entries()) {
+      const groupIds = new Set(group.map((r) => r.checkpoint_id));
+      for (const row of group) {
+        const hasParentInSameDossier = (row.depends_on || []).some((dep) =>
+          groupIds.has(dep),
+        );
+        if (!hasParentInSameDossier) {
+          list.push({
+            id: `dossier-entry:${dName}->${row.checkpoint_id}`,
+            source: `dossier-node:${dName}`,
+            target: row.checkpoint_id,
+            type: "smoothstep",
+            selectable: false,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 12,
+              height: 12,
+              color: "#38bdf8",
+            },
+            style: {
+              stroke: "#0284c7",
+              strokeWidth: 1.5,
+              strokeDasharray: "4 3",
+              opacity: 0.7,
+            },
+          });
+        }
+      }
+    }
+
+    return list;
+  }, [rows]);
 
   const rfEdges = useMemo<Edge[]>(() => {
     const actual: Edge[] = pendingEdges.map((edge) => {
@@ -413,8 +609,8 @@ export function CheckpointFlowView({
       };
     });
 
-    return [...actual, ...inferred];
-  }, [pendingEdges, suggestions, selectedEdgeId]);
+    return [...actual, ...dossierEdges];
+  }, [pendingEdges, selectedEdgeId, dossierEdges]);
 
   useEffect(() => {
     if (!selectedEdgeId) return;
@@ -472,7 +668,7 @@ export function CheckpointFlowView({
   const nodeLabel = useCallback(
     (checkpointId: string) => {
       const row = rows.find((item) => item.checkpoint_id === checkpointId);
-      return row?.node_id?.trim() || checkpointId;
+      return row?.title?.trim() || row?.question?.trim() || "Checkpoint";
     },
     [rows],
   );
@@ -500,50 +696,13 @@ export function CheckpointFlowView({
             )}
           </div>
           <p className="truncate text-[10px] text-zinc-500">
-            {rows.length} checkpoint · {pendingEdges.length} liên kết ·{" "}
-            {suggestions.length} gợi ý
+            {rows.length} checkpoint · {pendingEdges.length} liên kết
             {issueCount > 0 ? ` · ${issueCount} node cần bổ sung` : ""}
           </p>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={fitGraph}
-            className="border-white/10 bg-white/[0.03] text-zinc-300"
-            title="Fit sơ đồ vào khung nhìn"
-          >
-            <LayoutGrid className="size-3.5" />
-            <span className="hidden lg:inline">Fit</span>
-          </Button>
-
-          {isDesktop && (
-            <>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={autoLayout}
-                className="border-white/10 bg-white/[0.03] text-zinc-300"
-              >
-                <LayoutGrid className="size-3.5" />
-                <span className="hidden lg:inline">Tự sắp xếp</span>
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={onApplySuggestions}
-                disabled={suggestions.length === 0}
-                className="border-cyan-500/30 bg-cyan-500/10 text-cyan-200 hover:bg-cyan-500/20"
-                title="Thêm tất cả cạnh gợi ý từ followup_of / requiredEvidenceIds"
-              >
-                <Sparkles className="size-3.5" />
-                Gợi ý ({suggestions.length})
-              </Button>
+          
 
               <Button
                 type="button"
@@ -583,33 +742,18 @@ export function CheckpointFlowView({
             <span className="truncate font-mono text-zinc-300">
               {nodeLabel(selectedEdge.target)}
             </span>
-            <span
-              className={cn(
-                "shrink-0 rounded px-1.5 py-0.5 text-[9px] uppercase tracking-wide",
-                selectedEdge.data?.inferred
-                  ? "bg-cyan-500/10 text-cyan-300"
-                  : "bg-amber-500/10 text-amber-300",
-              )}
-            >
-              {selectedEdge.data?.inferred ? "gợi ý" : "đã lưu"}
+            <span className="shrink-0 rounded bg-amber-500/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-amber-300">
+              liên kết
             </span>
             <Button
               type="button"
               size="sm"
-              variant={selectedEdge.data?.inferred ? "default" : "destructive"}
+              variant="destructive"
               onClick={confirmSelectedEdge}
-              className={cn(
-                "ml-auto h-7",
-                Boolean(selectedEdge.data?.inferred) &&
-                  "bg-cyan-500 text-black hover:bg-cyan-400",
-              )}
+              className="ml-auto h-7"
             >
-              {selectedEdge.data?.inferred ? (
-                <Sparkles className="size-3.5" />
-              ) : (
-                <Trash2 className="size-3.5" />
-              )}
-              {selectedEdge.data?.inferred ? "Nhận gợi ý" : "Xóa liên kết"}
+              <Trash2 className="size-3.5" />
+              Xóa liên kết
             </Button>
           </div>
         )}
@@ -624,18 +768,22 @@ export function CheckpointFlowView({
 
       <div className="min-h-0 flex-1">
         <ReactFlow<CheckpointCanvasNode, Edge>
-          nodes={allNodes}
+          nodes={nodes}
           edges={rfEdges}
           nodeTypes={nodeTypes}
-          onNodesChange={onNodesChange as OnNodesChange<CheckpointCanvasNode>}
+          onNodesChange={onNodesChange}
           onConnect={handleConnect}
           onNodeClick={(_, node) => {
             const row = rows.find((item) => item.checkpoint_id === node.id);
             if (row) onSelect(row);
           }}
-          onNodeDragStop={(_, node) =>
-            onNodePositionChange(node.id, node.position)
-          }
+          onNodeDragStop={(_, node) => {
+            if (node.id.startsWith("dossier-node:")) {
+              handleDossierPositionChange(node.id, node.position);
+            } else {
+              onNodePositionChange(node.id, node.position);
+            }
+          }}
           onEdgeClick={(_, edge) => setSelectedEdgeId(edge.id)}
           onPaneClick={() => setSelectedEdgeId(null)}
           onInit={(instance) => {
@@ -665,6 +813,7 @@ export function CheckpointFlowView({
             zoomable
             className="hidden md:block"
             nodeColor={(node) => {
+              if (node.id.startsWith("dossier-node:")) return "#f59e0b";
               const row = rows.find((item) => item.checkpoint_id === node.id);
               if (!row) return "#18181b";
               return row.type === "evidence_picker" ? "#a16207" : "#0369a1";
@@ -678,10 +827,7 @@ export function CheckpointFlowView({
         <span className="inline-flex items-center gap-1.5">
           <span className="h-px w-5 bg-amber-600" /> phụ thuộc đã lưu
         </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-px w-5 border-t border-dashed border-cyan-700" />{" "}
-          gợi ý từ CMS
-        </span>
+        
         <span className="ml-auto hidden sm:inline">
           Kéo node để sắp xếp · kéo cổng phải để nối · bấm Lưu sơ đồ để giữ vị
           trí

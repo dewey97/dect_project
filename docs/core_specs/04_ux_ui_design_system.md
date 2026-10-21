@@ -104,13 +104,14 @@ Sử dụng 2 họ font chính:
 - **Dark Mode Workspace Scrollbar**: Thanh cuộn siêu mảnh ($6\text{ px}$), không nút bấm, nền trong suốt hoàn toàn, thanh trượt màu hổ phách mờ (`rgba(180, 130, 80, 0.35)`) và sáng lên khi hover.
 - **Paper Scrollbar (`.paper-scrollbar`, `[data-paper-modal]`)**: Dành riêng cho các modal tài liệu giấy cũ (`AddSuspectModal`, `FollowupQuestionModal`), sử dụng tông màu nâu gỗ đất cổ điển (`rgba(92, 64, 38, 0.3)`), hài hòa 100% với nền giấy kraft vàng.
 
-### 4. Hiệu Ứng Nhìn Qua Ổ Khoá — Landing 360 (`LandingScene360Showcase`):
+### 4. Hiệu Ứng Nhìn Qua Ổ Khoá — Landing 360 (`LandingScene360Showcase` + `LandingKeyholeModel`):
 Áp dụng tại `components/public/landing-scene-360-showcase.tsx`:
-- **Một SVG duy nhất**: mặt khoá đồng thau và lỗ aperture nằm trong cùng một hệ toạ độ + cùng một `<mask>`, nên mép cắt luôn khớp tuyệt đối ở mọi mức zoom.
-- **Scale tính theo viewport**: `scaleEnd = (w / 34) × 1.08` để hết scroll thì lỗ keyhole phủ kín màn hình; zoom dùng nội suy mũ (tốc độ zoom cảm nhận không đổi).
-- **Hardware fade**: mặt khoá + bevel mờ dần khi `eased > 0.6` để vòng bevel không trôi lơ lửng trên cảnh sau khi đã xuyên qua.
+- **Mô hình 3D thật (React Three Fiber)**: Mặt khoá đồng thau dựng bằng `ExtrudeGeometry` dày `0.15` đơn vị, bevel siêu nhỏ `0.002` + lỗ xuyên tâm (bevel lớn từng tạo vết cắt phẳng ở đỉnh nên chỉ dùng đúng mức bắt sáng mép). Silhouette `PLATE_OUTLINE` và lỗ khoá `SLOT_POINTS` được trace trực tiếp từ ảnh chính diện (quét pixel) nên viền ngoài và mép lỗ khớp với ảnh. Lỗ khoá được densify rồi Chaikin 2 lượt để mép cắt không còn bậc thang pixel; texture có alpha cut-out theo silhouette nên không lộ nền xám studio.
+- **Hai pha theo scroll**: (1) camera bắt đầu ở góc nhìn từ trên xuống (`PITCH_REST = 0.85 rad`), xoay dần về chính diện; (2) khi đã chính diện, camera dolly theo hàm mũ xuyên qua lỗ khoá vào trong phòng. `distance`, `pitch`, `lookY` và `opacity` là các prop điều khiển rig; `opacity` làm mặt khoá mờ dần khi camera chạm lỗ để không còn mảng đồng thau nhoè ở góc khung.
+- **Texture & ánh sáng**: mặt trước dùng `keyhole_plate_albedo.webp` với `MeshBasicMaterial` (`toneMapped: false`) để giữ nguyên highlight/scratch đã bake trong ảnh; thành khoá dùng `MeshStandardMaterial` đồng thau + `RoomEnvironment` (PMREM) để bắt sáng ở mép và lòng lỗ.
+- **Mặt nạ đen ngoài lỗ khoá**: panorama nằm ở layer DOM phía sau; một `<mask>` SVG che toàn bộ phần ngoài lỗ. Toạ độ lỗ được chiếu bằng tay qua đúng camera (forward/right/up + focal theo `fov`) nên mép mask bám khít mép hình học ở mọi mức `pitch`/`distance`. Vì lỗ khoá hẹp dần ở giữa nên không bao giờ phủ kín 4 góc khung: từ `p = 0.78` khẩu độ được nới rộng dần quanh tâm màn hình và mặt nạ mờ đi, tránh vệt tam giác đen cứng ở góc. Canvas trong suốt (`alpha: true`), không scene background.
+- **Phòng phía sau**: `PANORAMA.webp` (0.46MB) làm nền DOM, scale 1.04 → ~1.8 và `brightness` 0.32 → 1.1 theo tiến trình scroll.
 - **Sticky & overflow**: `html, body` phải dùng `overflow-x: clip`, **tuyệt đối không dùng `hidden`** — `hidden` biến body thành scroll container không cuộn và vô hiệu hoá toàn bộ `position: sticky` trong app.
-- **Asset**: dùng `PANORAMA.webp` (0.46MB) cho landing; `PANORAMA.png` giữ cho `Scene360Viewer`.
 
 ### 5. Trung Tâm Tải Tài Nguyên & Banner Mạng Xã Hội (Brand Asset Download Center):Áp dụng tại trang `app/brand/page.tsx`:
 - **OpenGraph Social Banner (Featured)**: Hiển thị khung xem trước độ nét cao tỉ lệ vàng $1.91 : 1$ ($1200 \times 630\text{ px}$) kèm nút tải trực tiếp file `xplore_og_image.jpg`.

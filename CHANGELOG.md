@@ -8,8 +8,10 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 - **Landing 360 keyhole section (`#hien-truong-360`)**:
   - Gốc lỗi: `html, body { overflow-x: hidden }` biến body thành scroll container không cuộn ⇒ `position: sticky` mất tác dụng, section cao `340vh` chỉ dính 1 màn hình đầu rồi để lại 240vh đen. Đổi sang `overflow-x: clip` (giữ chặn tràn ngang, không tạo scroll container).
-  - Dựng lại mặt khoá + lỗ aperture bằng một SVG duy nhất trong cùng hệ toạ độ, scale tính theo viewport để hết scroll thì lỗ phủ kín màn hình.
-  - Bỏ `LandingKeyholeModel` (Three.js + `keyhole.glb` 6.6MB + HDR `Environment` tải từ CDN) khỏi landing; hardware SVG fade dần khi camera xuyên qua.
+  - Dựng lại mặt khoá bằng mô hình 3D thật (`LandingKeyholeModel`, React Three Fiber): `ExtrudeGeometry` dày `0.15` đơn vị, bevel siêu nhỏ `0.002` (đủ bắt sáng mép, không tạo vết cắt phẳng) + lỗ xuyên tâm. Silhouette `PLATE_OUTLINE` và lỗ khoá `SLOT_POINTS` trace trực tiếp từ ảnh chính diện; lỗ được densify + Chaikin để mép cắt sạch bậc thang pixel khi soi gần.
+  - Texture `keyhole_plate_albedo.webp` (WebP 120KB, `910×1725`) có alpha cut-out theo silhouette đồng thau, nên mép mô hình không lộ nền xám studio.
+  - Scroll 2 pha: camera xoay từ góc nhìn trên xuống về chính diện, rồi dolly xuyên qua lỗ khoá. Mặt nạ SVG che ngoài lỗ được chiếu qua đúng camera nên mép khít ở mọi góc; khi camera vào tới lỗ, mặt khoá mờ dần và khẩu độ mở rộng để không còn mảng đồng thau nhoè ở góc khung.
+  - Bỏ hẳn `keyhole.glb` 6.6MB + HDR `Environment` tải từ CDN khỏi landing.
   - Panorama landing dùng `PANORAMA.webp` (`3072×1715`, 0.46MB) thay `PANORAMA.png` 10.1MB; bản PNG giữ nguyên cho `Scene360Viewer`.
 
 ### Added

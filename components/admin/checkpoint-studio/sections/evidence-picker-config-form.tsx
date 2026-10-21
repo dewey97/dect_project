@@ -17,20 +17,28 @@ type ConfigListKey = keyof EvidencePickerConfig;
 function TierCard({
   title,
   collapsed,
+  count = 0,
   children,
 }: {
   title: string;
   collapsed?: boolean;
+  count?: number;
   children: React.ReactNode;
 }) {
+  const isOpen = count > 0 || !collapsed;
   return (
     <details
-      open={!collapsed}
+      open={isOpen}
       className="group rounded-lg border border-white/10 bg-black/20"
     >
       <summary className="flex cursor-pointer list-none items-center gap-1.5 px-2 py-1.5">
         <ChevronDown className="size-3 text-zinc-500 transition-transform group-open:rotate-0 -rotate-90" />
         <span className="text-[11px] font-semibold text-zinc-200">{title}</span>
+        {count > 0 && (
+          <span className="ml-auto rounded bg-amber-500/20 px-1.5 py-0.5 font-mono text-[9px] font-semibold text-amber-300">
+            {count}
+          </span>
+        )}
       </summary>
       <div className="space-y-2 border-t border-white/10 px-2 py-2">
         {children}
@@ -49,9 +57,27 @@ export function EvidencePickerConfigForm({
     onChange({ answerConfig: { ...config, [key]: value } });
   };
 
+  const motiveCount =
+    (config.motiveEvidenceIds?.length || 0) +
+    (config.optionalMotiveIds?.length || 0);
+
+  const contradictionCount =
+    (config.contradictionEvidenceIds?.length || 0) +
+    (config.optionalContradictionIds?.length || 0);
+
+  const alibiCount =
+    (config.alibiEvidenceIds?.length || 0) +
+    (config.optionalAlibiIds?.length || 0);
+
+  const extraCount =
+    (config.validSuspects?.length || 0) +
+    (config.validMotives?.length || 0) +
+    (config.requiredEvidenceIds?.length || 0) +
+    (config.optionalEvidenceIds?.length || 0);
+
   return (
     <div className="space-y-2">
-      <TierCard title="Động cơ">
+      <TierCard title="Động cơ" count={motiveCount}>
         <Field label="Bắt buộc" required>
           <CodeChipInput
             value={config.motiveEvidenceIds}
@@ -70,7 +96,7 @@ export function EvidencePickerConfigForm({
         </Field>
       </TierCard>
 
-      <TierCard title="Mâu thuẫn">
+      <TierCard title="Mâu thuẫn" count={contradictionCount}>
         <Field label="Bắt buộc" required>
           <CodeChipInput
             value={config.contradictionEvidenceIds}
@@ -89,7 +115,7 @@ export function EvidencePickerConfigForm({
         </Field>
       </TierCard>
 
-      <TierCard title="Ngoại phạm" collapsed>
+      <TierCard title="Ngoại phạm" collapsed count={alibiCount}>
         <Field label="Bắt buộc">
           <CodeChipInput
             value={config.alibiEvidenceIds}
@@ -108,7 +134,7 @@ export function EvidencePickerConfigForm({
         </Field>
       </TierCard>
 
-      <TierCard title="Bổ sung" collapsed>
+      <TierCard title="Bổ sung" collapsed count={extraCount}>
         <Field label="Nghi phạm hợp lệ">
           <CodeChipInput
             value={config.validSuspects}

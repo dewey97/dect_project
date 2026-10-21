@@ -169,6 +169,7 @@ export interface Checkpoint {
   suspectId?: string;
   status: "locked" | "active" | "completed";
   dossier?: string;
+  unlocksDossier?: string;
   suspectLabel?: string;
   aiContext?: string;
   aiValidCases?: string[];

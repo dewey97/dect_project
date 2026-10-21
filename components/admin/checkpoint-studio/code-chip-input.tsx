@@ -49,7 +49,7 @@ export function CodeChipInput({
     >
       {value.map((code, index) => (
         <span
-          key={code}
+          key={`${code}-${index}`}
           className="inline-flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[11px] text-amber-200"
         >
           {code}

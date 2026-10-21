@@ -113,16 +113,16 @@ function WebEvidencePageContent() {
   const { documents: dossierDocs } = useDossierDocuments(caseId);
 
   // 3-Zone Layout State (Desktop):
-  // Zone 1 (Bảng Điều Tra): width %
-  // Zone 2 (Danh mục Preview Card ở giữa): width cố định (240px -> 320px) hoặc tự co giãn
-  // Zone 3 (Trình duyệt chi tiết PDF / Vật chứng bên phải)
+  // Cột 1 (Trái): Khay hồ sơ & vật chứng (Dossier Tray) - width cố định/resizable (240px -> 450px)
+  // Cột 2 (Giữa): Bảng điều tra (Investigation Canvas) - flex-1 (chiếm trọn không gian trung tâm)
+  // Cột 3 (Phải): Trình duyệt chi tiết PDF / Vật chứng / Phone (Viewer Inspector) - width cố định/resizable (320px -> 750px)
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
-  const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false); // Phóng to trình đọc PDF toàn nửa phải
+  const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false);
   const [isReinvestigationExpanded, setIsReinvestigationExpanded] = useState(false);
-  const [boardWidthPercent, setBoardWidthPercent] = useState<number>(42);
-  const [dossierWidth, setDossierWidth] = useState<number>(320);
-  const [isDraggingSplit, setIsDraggingSplit] = useState<boolean>(false);
-  const [isDraggingDossierSplit, setIsDraggingDossierSplit] = useState<boolean>(false);
+  const [dossierWidth, setDossierWidth] = useState<number>(300);
+  const [viewerWidth, setViewerWidth] = useState<number>(460);
+  const [isDraggingLeftSplit, setIsDraggingLeftSplit] = useState<boolean>(false);
+  const [isDraggingRightSplit, setIsDraggingRightSplit] = useState<boolean>(false);
 
   // Phase filter: 'all' | 0 | 1 | 2 | 3
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<
@@ -355,27 +355,27 @@ function WebEvidencePageContent() {
     }
 
     // Khôi phục layout preference từ storage
-    const savedRatio = getStorageItem("web_board_split_ratio");
-    if (savedRatio) {
-      const parsed = parseFloat(savedRatio);
-      if (!isNaN(parsed) && parsed >= 30 && parsed <= 65) {
-        setBoardWidthPercent(parsed);
-      } else {
-        setBoardWidthPercent(42);
-      }
-    } else {
-      setBoardWidthPercent(42);
-    }
     const savedDossierWidth = getStorageItem("web_dossier_width");
     if (savedDossierWidth) {
       const parsedW = parseFloat(savedDossierWidth);
-      if (!isNaN(parsedW) && parsedW >= 240 && parsedW <= 450) {
+      if (!isNaN(parsedW) && parsedW >= 220 && parsedW <= 460) {
         setDossierWidth(parsedW);
       } else {
-        setDossierWidth(320);
+        setDossierWidth(300);
       }
     } else {
-      setDossierWidth(320);
+      setDossierWidth(300);
+    }
+    const savedViewerWidth = getStorageItem("web_viewer_width");
+    if (savedViewerWidth) {
+      const parsedV = parseFloat(savedViewerWidth);
+      if (!isNaN(parsedV) && parsedV >= 320 && parsedV <= 750) {
+        setViewerWidth(parsedV);
+      } else {
+        setViewerWidth(460);
+      }
+    } else {
+      setViewerWidth(460);
     }
     const savedCollapsed = getStorageItem("web_dossier_collapsed");
     if (savedCollapsed === "true") {
@@ -383,49 +383,20 @@ function WebEvidencePageContent() {
     }
   }, [caseId, effectiveItems]);
 
-  // Xử lý kéo thả thanh phân chia giữa Vùng 1 (Board) và Vùng 2+3 (Dossier)
+  // Xử lý kéo thả điều chỉnh độ rộng Khay tài liệu (Cột 1 bên trái)
   useEffect(() => {
-    if (!isDraggingSplit) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const windowWidth = window.innerWidth;
-      if (windowWidth < 1024) return; // Chỉ áp dụng trên desktop
-
-      // Giới hạn tỉ lệ Board từ 30% đến 65% để luôn chừa đủ không gian cho Zone 2 & 3
-      const newRatio = (e.clientX / windowWidth) * 100;
-      const clampedRatio = Math.min(Math.max(newRatio, 30), 65);
-      setBoardWidthPercent(clampedRatio);
-    };
-
-    const handleMouseUp = () => {
-      setIsDraggingSplit(false);
-      setStorageItem("web_board_split_ratio", boardWidthPercent.toString());
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDraggingSplit, boardWidthPercent]);
-
-  // Xử lý kéo thả điều chỉnh độ rộng Khay tài liệu (Zone 2)
-  useEffect(() => {
-    if (!isDraggingDossierSplit) return;
+    if (!isDraggingLeftSplit) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (window.innerWidth < 1024) return;
-      // Chiều rộng Zone 2 tính từ mép phải của Zone 1
-      const boardWidthPx = (window.innerWidth * boardWidthPercent) / 100;
-      const newDossierWidth = e.clientX - boardWidthPx;
-      const clampedDossierWidth = Math.min(Math.max(newDossierWidth, 240), 450);
-      setDossierWidth(clampedDossierWidth);
+      const windowWidth = window.innerWidth;
+      const maxLeft = Math.min(460, windowWidth - viewerWidth - 360);
+      const clamped = Math.min(Math.max(e.clientX, 220), Math.max(220, maxLeft));
+      setDossierWidth(clamped);
     };
 
     const handleMouseUp = () => {
-      setIsDraggingDossierSplit(false);
+      setIsDraggingLeftSplit(false);
       setStorageItem("web_dossier_width", dossierWidth.toString());
     };
 
@@ -436,7 +407,34 @@ function WebEvidencePageContent() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDraggingDossierSplit, boardWidthPercent, dossierWidth]);
+  }, [isDraggingLeftSplit, dossierWidth, viewerWidth]);
+
+  // Xử lý kéo thả điều chỉnh độ rộng Trình duyệt chi tiết (Cột 3 bên phải)
+  useEffect(() => {
+    if (!isDraggingRightSplit) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (window.innerWidth < 1024) return;
+      const windowWidth = window.innerWidth;
+      const newViewerWidth = windowWidth - e.clientX;
+      const maxRight = Math.min(750, windowWidth - dossierWidth - 360);
+      const clamped = Math.min(Math.max(newViewerWidth, 320), Math.max(320, maxRight));
+      setViewerWidth(clamped);
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingRightSplit(false);
+      setStorageItem("web_viewer_width", viewerWidth.toString());
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDraggingRightSplit, dossierWidth, viewerWidth]);
 
   const toggleDossierCollapse = useCallback(() => {
     detectiveAudio.playPaperRustle();
@@ -548,15 +546,61 @@ function WebEvidencePageContent() {
         onOpenNotebook={() => setActiveModal("notebook")}
       />
 
-      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-2">
-        {/* VÙNG 1: BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
+      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-1.5">
+        {/* OVERLAY CHỐNG MẤT SỰ KIỆN KHI KÉO THẢ RESIZE TRÊN TOÀN MÀN HÌNH */}
+        {(isDraggingLeftSplit || isDraggingRightSplit) && (
+          <div className="fixed inset-0 z-50 cursor-col-resize select-none bg-transparent" />
+        )}
+
+        {/* CỘT 1 (BÊN TRÁI): KHAY HỒ SƠ & VẬT CHỨNG (MANILA ARCHIVAL DOSSIER TRAY) */}
+        <DossierTray
+          dossierWidth={dossierWidth}
+          isDossierCollapsed={isDossierCollapsed}
+          isViewerExpanded={isViewerExpanded}
+          mobileTab={mobileTab}
+          filterTab={filterTab}
+          onSetFilterTab={(tab) => setFilterTab(tab)}
+          selectedPhaseFilter={selectedPhaseFilter}
+          onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
+          isPhaseUnlocked={isPhaseUnlocked}
+          pdfItems={pdfItems}
+          evidenceItems={evidenceItems}
+          selectedView={selectedView}
+          onSelectPdf={handleSelectPdf}
+          onSelectEvidence={handleSelectEvidence}
+          activePing={activePing}
+          onBroadcastPing={broadcastPing}
+        />
+
+        {/* RESIZABLE SPLIT DRAGGER GIỮA KHAY HỒ SƠ VÀ BẢNG ĐIỀU TRA (DESKTOP) */}
+        {!isDossierCollapsed && (
+          <div
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setIsDraggingLeftSplit(true);
+            }}
+            className={cn(
+              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+              isDraggingLeftSplit && "cursor-col-resize",
+            )}
+            title="Kéo để điều chỉnh độ rộng Khay tài liệu vs. Bảng điều tra"
+          >
+            <div
+              className={cn(
+                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
+                isDraggingLeftSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+              )}
+            >
+              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </div>
+        )}
+
+        {/* CỘT 2 (Ở GIỮA): BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
         <div
-          style={{
-            width: isDossierCollapsed ? "100%" : `${boardWidthPercent}%`,
-          }}
           className={cn(
-            "h-full shrink-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex flex-col min-h-0 relative transition-[width] duration-150 ease-out",
-            isDraggingSplit && "transition-none",
+            "h-full flex-1 min-w-0 bg-[#16120e] border border-[#2d1e13] rounded-none overflow-hidden flex flex-col min-h-0 relative shadow-inner",
+            (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
             mobileTab === "board" ? "flex w-full" : "hidden lg:flex"
           )}
         >
@@ -585,82 +629,36 @@ function WebEvidencePageContent() {
           </div>
         </div>
 
-        {/* RESIZABLE SPLIT DRAGGER GIỮA VÙNG 1 VÀ VÙNG 2 (DESKTOP) */}
-        {!isDossierCollapsed && (
-          <div
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setIsDraggingSplit(true);
-            }}
-            className={cn(
-              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
-              isDraggingSplit && "cursor-col-resize",
-            )}
-            title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Khay hồ sơ"
-          >
-            <div
-              className={cn(
-                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-                isDraggingSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
-              )}
-            >
-              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          </div>
-        )}
-
-        {/* VÙNG 2: KHAY HỒ SƠ & VẬT CHỨNG (MANILA ARCHIVAL DOSSIER TRAY) */}
-        <DossierTray
-          dossierWidth={dossierWidth}
-          isDossierCollapsed={isDossierCollapsed}
-          isViewerExpanded={isViewerExpanded}
-          mobileTab={mobileTab}
-          filterTab={filterTab}
-          onSetFilterTab={(tab) => setFilterTab(tab)}
-          selectedPhaseFilter={selectedPhaseFilter}
-          onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
-          isPhaseUnlocked={isPhaseUnlocked}
-          pdfItems={pdfItems}
-          evidenceItems={evidenceItems}
-          selectedView={selectedView}
-          onSelectPdf={handleSelectPdf}
-          onSelectEvidence={handleSelectEvidence}
-          activePing={activePing}
-          onBroadcastPing={broadcastPing}
-        />
-
-        {/* RESIZABLE SPLIT DRAGGER GIỮA VÙNG 2 VÀ VÙNG 3 (DESKTOP) */}
-        {!isDossierCollapsed && (
-          <div
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setIsDraggingDossierSplit(true);
-            }}
-            className={cn(
-              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
-              isDraggingDossierSplit && "cursor-col-resize",
-            )}
-            title="Kéo để điều chỉnh độ rộng Khay tài liệu vs. Trình đọc"
-          >
-            <div
-              className={cn(
-                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-                isDraggingDossierSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
-              )}
-            >
-              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          </div>
-        )}
-
-        {/* VÙNG 3: TRÌNH DUYỆT CHI TIẾT HỒ SƠ & VẬT CHỨNG (RIGHT VIEWER INSPECTOR) */}
+        {/* RESIZABLE SPLIT DRAGGER GIỮA BẢNG ĐIỀU TRA VÀ TRÌNH DUYỆT CHI TIẾT (DESKTOP) */}
         <div
-          style={{
-            display: isDossierCollapsed ? "none" : undefined,
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setIsDraggingRightSplit(true);
           }}
           className={cn(
-            "hidden lg:flex flex-1 min-w-[300px] h-full flex-col min-h-0 overflow-hidden relative",
-            isDossierCollapsed && "lg:hidden",
+            "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+            isDraggingRightSplit && "cursor-col-resize",
+          )}
+          title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Trình đọc chi tiết"
+        >
+          <div
+            className={cn(
+              "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
+              isDraggingRightSplit && "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+            )}
+          >
+            <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        </div>
+
+        {/* CỘT 3 (BÊN PHẢI): TRÌNH DUYỆT CHI TIẾT HỒ SƠ & VẬT CHỨNG (RIGHT VIEWER INSPECTOR) */}
+        <div
+          style={{
+            width: `${viewerWidth}px`,
+          }}
+          className={cn(
+            "hidden lg:flex shrink-0 min-w-[320px] h-full flex-col min-h-0 overflow-hidden relative border-l border-[#2d1e13]",
+            (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
           )}
         >
           {activeModal === "phone" ? (

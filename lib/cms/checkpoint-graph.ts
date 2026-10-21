@@ -329,7 +329,7 @@ export function layoutCheckpointGraph(
   }
 
   const positions: Record<string, CheckpointGraphPosition> = {};
-  let laneY = 0;
+  let laneY = 110;
 
   for (const nodes of byDossier.values()) {
     nodes.sort((a, b) => {
@@ -347,7 +347,7 @@ export function layoutCheckpointGraph(
       };
     });
 
-    laneY += nodes.length * 150 + 90;
+    laneY += nodes.length * 150 + 130;
   }
 
   return positions;

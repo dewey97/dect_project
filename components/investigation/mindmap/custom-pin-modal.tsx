@@ -83,7 +83,6 @@ export function CustomPinModal({
       if (pid === "c0-pin-followup-tung") return "cp-000-1b";
       if (pid === "c0-pin-followup-ha") return "cp-000-1c-followup";
       if (pid === "c0-pin-indictment") return "cp-000-2b";
-      if (pid === "c0-pin-reinvestigate") return "cp-000-convergence";
 
       const text =
         `${pid} ${pin.label || ""} ${pin.detail || ""}`.toLowerCase();
@@ -101,8 +100,6 @@ export function CustomPinModal({
         return "cp-000-0";
       if (text.includes("cáo trạng") || text.includes("định tội"))
         return "cp-000-2b";
-      if (text.includes("khám xét") || text.includes("hội tụ"))
-        return "cp-000-convergence";
     }
 
     return "";

@@ -45,6 +45,9 @@ export interface EvidencePickerConfig {
   optionalAlibiIds: string[];
   contradictionEvidenceIds: string[];
   optionalContradictionIds: string[];
+  correctAnswer?: string;
+  options?: string[];
+  unlocksDossier?: string;
 }
 
 export interface CheckpointStudioDraft {
@@ -53,6 +56,7 @@ export interface CheckpointStudioDraft {
   checkpointId: string;
   nodeId: string;
   dossier: string;
+  unlocksDossier: string;
   title: string;
   question: string;
   type: CheckpointStudioType;
@@ -88,14 +92,34 @@ export const EMPTY_EVIDENCE_CONFIG: EvidencePickerConfig = {
   optionalAlibiIds: [],
   contradictionEvidenceIds: [],
   optionalContradictionIds: [],
+  correctAnswer: "",
+  options: [],
+  unlocksDossier: "",
 };
 
+/** Tạo ID kỹ thuật ngầm trong background (Game Master không cần nhập ID). */
+export function generateCheckpointKey(title?: string): string {
+  const base = (title || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 24);
+  const suffix = Math.random().toString(36).slice(2, 7);
+  return base ? `cp_${base}_${suffix}` : `cp_${Date.now().toString(36)}_${suffix}`;
+}
+
 export function createEmptyDraft(caseId: string): CheckpointStudioDraft {
+  const generated = generateCheckpointKey();
   return {
     caseId,
-    checkpointId: "",
-    nodeId: "",
+    checkpointId: generated,
+    nodeId: generated,
     dossier: "",
+    unlocksDossier: "",
     title: "",
     question: "",
     type: "evidence_picker",
@@ -157,6 +181,11 @@ function parseConfig(
     optionalAlibiIds: asStringArray(source.optionalAlibiIds),
     contradictionEvidenceIds: asStringArray(source.contradictionEvidenceIds),
     optionalContradictionIds: asStringArray(source.optionalContradictionIds),
+    correctAnswer:
+      asString(source.correctAnswer) || asString(source.correct_answer),
+    options: asStringArray(source.options),
+    unlocksDossier:
+      asString(source.unlocksDossier) || asString(source.unlocks_dossier),
   };
 }
 
@@ -175,12 +204,19 @@ function parseHints(raw: unknown): CheckpointHint[] {
 
 /** Chuyển row Supabase thành draft phẳng cho form. */
 export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
+  const config = parseConfig(row.answer_config);
+  const unlocksDossier =
+    config.unlocksDossier ||
+    asString((row.answer_config as any)?.unlocksDossier) ||
+    "";
+
   return {
     id: row.id,
     caseId: row.case_id,
     checkpointId: asString(row.checkpoint_id),
     nodeId: asString(row.node_id),
     dossier: asString(row.dossier),
+    unlocksDossier,
     title: asString(row.title),
     question: asString(row.question),
     type: asString(row.type) || "evidence_picker",
@@ -190,7 +226,7 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     suspectLabel: asString(row.suspect_label),
     evidenceStepLabel: asString(row.evidence_step_label),
     dependsOn: asStringArray(row.depends_on),
-    answerConfig: parseConfig(row.answer_config),
+    answerConfig: config,
     hints: parseHints(row.hints),
     narrative: asString(row.narrative),
     aiContext: asString(row.ai_context),
@@ -224,15 +260,17 @@ export type CaseCheckpointPayload = Omit<
 export function toRowPayload(
   draft: CheckpointStudioDraft,
 ): CaseCheckpointPayload {
-  // Node là định danh người biên tập quản lý. `checkpoint_id` chỉ là khóa
-  // kỹ thuật; nếu người dùng bỏ trống thì dùng luôn Node ID.
-  const nodeId = draft.nodeId.trim();
-  const checkpointId = draft.checkpointId.trim() || nodeId;
+  // ID kỹ thuật được quản lý ngầm trong background. Nếu draft chưa có thì sinh tự động từ tiêu đề.
+  const checkpointId =
+    draft.checkpointId.trim() ||
+    draft.nodeId.trim() ||
+    generateCheckpointKey(draft.title);
+  const nodeId = draft.nodeId.trim() || checkpointId;
 
   return {
     case_id: draft.caseId.trim() || "case_000",
     checkpoint_id: checkpointId,
-    node_id: nodeId || checkpointId || null,
+    node_id: nodeId,
     dossier: draft.dossier.trim() || null,
     title: draft.title.trim(),
     question: draft.question.trim(),
@@ -257,6 +295,15 @@ export function toRowPayload(
       optionalContradictionIds: cleanList(
         draft.answerConfig.optionalContradictionIds,
       ),
+      ...(draft.answerConfig.correctAnswer?.trim()
+        ? { correctAnswer: draft.answerConfig.correctAnswer.trim() }
+        : {}),
+      ...(draft.answerConfig.options && draft.answerConfig.options.length > 0
+        ? { options: cleanList(draft.answerConfig.options) }
+        : {}),
+      ...(draft.unlocksDossier?.trim()
+        ? { unlocksDossier: draft.unlocksDossier.trim() }
+        : {}),
     },
     hints: draft.hints
       .map((hint) => ({ group: hint.group, text: hint.text.trim() }))

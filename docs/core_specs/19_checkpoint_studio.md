@@ -198,10 +198,15 @@ node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --cas
 ### 4.3. Quy tắc UX
 
 - Flow view luôn là vùng chính; không còn tab Form/Flow. Rail phải gồm danh sách node phía trên và hộp biên tập ngay bên dưới.
-- Danh sách node compact: chỉ hiển thị tiêu đề, phân cách bằng đường mảnh, không hiển thị Node ID hay `checkpoint_id`, không card padding lớn. Tìm kiếm nội bộ vẫn nhận Node ID, tiêu đề và câu hỏi.
+- **Ẩn hoàn toàn ID kỹ thuật**: `Node ID`, `checkpoint_id`, `Khóa` được hệ thống quản lý ngầm trong background (tự sinh slug từ tiêu đề khi tạo mới). Người biên tập chỉ nhìn và quản lý checkpoint theo Tên / Tiêu đề (`title`).
+- **Nối liên kết trực quan trên sơ đồ**: Mọi quan hệ phụ thuộc (`depends_on`, follow-up) được kéo nối trực tiếp giữa các cổng node trên canvas React Flow; không nhập thủ công mã liên kết trong form.
+- **Ẩn/hiện động theo Loại câu hỏi**:
+  - Hỗ trợ chọn loại câu hỏi: `evidence_picker` (Thẩm tra vật chứng 3 lớp), `choice` (Trắc nghiệm), `text` (Nhập văn bản/Tự luận), `code` (Mật mã/Mã số), `time` (Mốc thời gian).
+  - Khi chọn `evidence_picker`: hiển thị các thẻ thẩm tra vật chứng (Động cơ, Mâu thuẫn, Ngoại phạm, Bổ sung) và nhãn bước thẩm tra.
+  - Khi chọn các loại câu hỏi khác: tự động **ẨN** toàn bộ các mục thẩm tra vật chứng không tương ứng; hiển thị hộp cấu hình đáp án đơn giản (phương án lựa chọn hoặc đáp án chính xác).
+- Danh sách node compact: chỉ hiển thị tiêu đề, phân cách bằng đường mảnh, không card padding lớn. Tìm kiếm nội bộ nhận tiêu đề và nội dung câu hỏi.
 - Bấm một dòng trong danh sách sẽ chọn checkpoint, mở hộp biên tập dưới rail và căn node tương ứng vào giữa Flow view. Bấm lại vẫn căn lại.
-- Hộp biên tập dùng input nhỏ cho trường ít thông tin (Node ID, bộ hồ sơ, khóa, nhãn); field dài dùng textarea thấp. Không hiển thị mô tả/hint lặp lại.
-- Danh sách node không hiển thị bộ hồ sơ; tìm theo Node ID hoặc tiêu đề.
+- Hộp biên tập dùng input nhỏ cho trường ít thông tin (bộ hồ sơ, loại câu hỏi); field dài dùng textarea thấp. Không hiển thị mô tả/hint lặp lại.
 - Flow view dùng `@xyflow/react`: node = checkpoint, cạnh = `depends_on`.
   - Mỗi bộ hồ sơ là một lane nền có nhãn, gom các node cùng `dossier`.
   - Auto-layout xếp lane theo thứ tự bộ, node trong lane theo tầng phụ thuộc.
@@ -214,7 +219,6 @@ node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --cas
 - Dirty tracking riêng cho form và sơ đồ; cảnh báo khi đổi row / đổi vụ án / đóng tab.
 - Không `autoFocus`, không gọi `.focus()` tự động khi mở form (quy tắc mobile của dự án).
 - Mã chứng cứ nhập tự do dạng chip; V1 chưa đọc danh mục từ tab `evidences`.
-- Checkpoint không phải `evidence_picker` hiển thị banner cảnh báo và toàn bộ form ở trạng thái disabled.
 
 ---
 

@@ -59,16 +59,8 @@ export async function saveCheckpoint(
   try {
     await requireAdminAuth();
 
-    if (draft.type !== "evidence_picker") {
-      return {
-        success: false,
-        error: `Loại ${draft.type || "(trống)"} chưa hỗ trợ biên tập trong V1.`,
-      };
-    }
-
-    const checkpointId = draft.checkpointId.trim() || draft.nodeId.trim();
-    if (!checkpointId) {
-      return { success: false, error: "Node ID không được để trống." };
+    if (!draft.title.trim()) {
+      return { success: false, error: "Tiêu đề checkpoint không được để trống." };
     }
     if (!draft.caseId.trim()) {
       return { success: false, error: "Vụ án không hợp lệ." };
@@ -76,6 +68,7 @@ export async function saveCheckpoint(
 
     const supabase = await createClient();
     const payload = toRowPayload(draft);
+    const checkpointId = payload.checkpoint_id;
 
     if (draft.id) {
       const { data: existing, error: existingError } = await supabase
@@ -121,7 +114,7 @@ export async function saveCheckpoint(
     if (error?.code === "23505") {
       return {
         success: false,
-        error: `Node "${draft.nodeId.trim() || draft.checkpointId.trim()}" đã tồn tại trong vụ án này.`,
+        error: `Checkpoint "${draft.title.trim()}" đã tồn tại trong vụ án này.`,
       };
     }
     console.error("Error saving checkpoint:", error);

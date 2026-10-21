@@ -5,6 +5,7 @@ import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import { Button } from "@/components/ui/button";
 import { CheckpointIdentityForm } from "./sections/checkpoint-identity-form";
 import { EvidencePickerConfigForm } from "./sections/evidence-picker-config-form";
+import { SimpleAnswerConfigForm } from "./sections/simple-answer-config-form";
 import { CheckpointHintsForm } from "./sections/checkpoint-hints-form";
 import { CheckpointNarrativeForm } from "./sections/checkpoint-narrative-form";
 import { CheckpointAiCheckForm } from "./sections/checkpoint-ai-check-form";
@@ -46,12 +47,8 @@ export function CheckpointEditor({
 }: CheckpointEditorProps) {
   if (!draft) return null;
 
-  const isEditable = draft.type === "evidence_picker";
-  const canSave =
-    isEditable &&
-    isDirty &&
-    !isSaving &&
-    (draft.nodeId.trim().length > 0 || draft.checkpointId.trim().length > 0);
+  const isEvidencePicker = (draft.type || "evidence_picker") === "evidence_picker";
+  const canSave = isDirty && !isSaving && draft.title.trim().length > 0;
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#0a0a0d]">
@@ -99,23 +96,17 @@ export function CheckpointEditor({
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
-        {!isEditable && (
-          <p className="mb-3 rounded-md border border-white/10 bg-white/[0.03] px-2 py-1.5 text-[11px] text-zinc-400">
-            Chỉ đọc — loại{" "}
-            <span className="font-mono text-zinc-200">{draft.type}</span>.
-          </p>
-        )}
-
-        <fieldset
-          disabled={!isEditable}
-          className="min-w-0 space-y-5 disabled:opacity-70"
-        >
+        <div className="min-w-0 space-y-5">
           <Section title="Thông tin">
             <CheckpointIdentityForm draft={draft} onChange={onChange} />
           </Section>
 
           <Section title="Đáp án">
-            <EvidencePickerConfigForm draft={draft} onChange={onChange} />
+            {isEvidencePicker ? (
+              <EvidencePickerConfigForm draft={draft} onChange={onChange} />
+            ) : (
+              <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
+            )}
           </Section>
 
           <Section title="Gợi ý">
@@ -129,7 +120,7 @@ export function CheckpointEditor({
           <Section title="AI check">
             <CheckpointAiCheckForm draft={draft} onChange={onChange} />
           </Section>
-        </fieldset>
+        </div>
       </div>
     </div>
   );

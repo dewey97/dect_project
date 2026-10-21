@@ -389,14 +389,8 @@ export function CheckpointStudioClient({
 
   const handleSave = async () => {
     if (!draft) return;
-    if (draft.type !== "evidence_picker") {
-      toast.error(
-        `Loại ${draft.type} chưa hỗ trợ biên tập trong V1. Dữ liệu chỉ đọc.`,
-      );
-      return;
-    }
-    if (!draft.nodeId.trim() && !draft.checkpointId.trim()) {
-      toast.error("Nhập Node ID trước khi lưu.");
+    if (!draft.title.trim()) {
+      toast.error("Nhập tiêu đề checkpoint trước khi lưu.");
       return;
     }
 
@@ -435,7 +429,7 @@ export function CheckpointStudioClient({
     if (!draft?.id) return;
     if (
       !window.confirm(
-        `Xóa checkpoint "${draft.checkpointId}"? Thao tác này không thể hoàn tác.`,
+        `Xóa checkpoint "${draft.title || draft.checkpointId}"? Thao tác này không thể hoàn tác.`,
       )
     ) {
       return;
@@ -483,6 +477,7 @@ export function CheckpointStudioClient({
     <div className="flex h-full min-h-0 w-full flex-col md:flex-row">
       <div className="order-1 flex min-h-0 min-w-0 flex-1 flex-col">
         <CheckpointFlowView
+          caseId={caseId}
           rows={rows}
           selectedId={selectedId}
           pendingEdges={pendingEdges}
@@ -500,7 +495,7 @@ export function CheckpointStudioClient({
         />
       </div>
 
-      <div className="order-2 flex h-[55%] min-h-0 shrink-0 flex-col md:h-full md:w-[360px]">
+      <div className="order-2 flex h-[55%] min-h-0 shrink-0 flex-col md:h-full md:w-[380px] lg:w-[420px]">
         <CheckpointListSidebar
           cases={caseOptions}
           caseId={caseId}

@@ -84,7 +84,7 @@ export function CheckpointListSidebar({
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Tìm node hoặc tiêu đề…"
+            placeholder="Tìm kiếm theo tên…"
             className="h-8 border-white/10 bg-black/40 pl-8 text-xs"
           />
         </div>
@@ -94,7 +94,7 @@ export function CheckpointListSidebar({
         className={cn(
           "min-h-0 overflow-y-auto",
           children
-            ? "basis-[42%] shrink-0 border-b border-white/10"
+            ? "max-h-[36%] shrink-0 border-b border-white/10"
             : "flex-1",
         )}
       >

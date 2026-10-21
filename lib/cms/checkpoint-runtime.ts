@@ -232,6 +232,7 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
         }
       : undefined,
     dossier: row.dossier || undefined,
+    unlocksDossier: asString(config.unlocksDossier) || undefined,
     suspectLabel: suspectLabel || undefined,
     aiContext: asString(row.ai_context) || undefined,
     aiValidCases: asStringArray(row.ai_valid_cases),

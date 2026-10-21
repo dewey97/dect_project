@@ -121,6 +121,7 @@ Giấy note vàng/trắng viết tay đã kết xuất sẵn nét mực để c�
 - `crime_scene.png`: Toàn cảnh 2D hiện trường căn phòng khách nhà Khang số 14 Đường Bờ Sông (dùng cho `HeroInteractive` và chế độ 2D khám nghiệm).
 - `PANORAMA.png`: Ảnh toàn cảnh hình cầu equirectangular phục vụ `Scene360Viewer` (chế độ khám xét lại hiện trường 360 WebGL trong `ReinvestigationModal`).
 - `PANORAMA.webp`: Bản nén `3072×1715` (0.46MB) của panorama dùng riêng cho hiệu ứng nhìn qua ổ khoá ở landing page (`LandingScene360Showcase`).
+- `keyhole_plate_albedo.webp`: Mặt khoá đồng thau `910×1725` (120KB) trích từ ảnh chính diện gốc (`docs/cases/case_000/02_photos/reference/keyhole_front_ref.png`, vùng `left:36, top:4, 364×690`), phóng 2.5× Lanczos, sharpen nhẹ và nén WebP q90. Ảnh có **alpha cut-out theo đúng silhouette đồng thau** (flood-fill nền xám studio + feather 1.6px) để mép mô hình không lộ nền xám. Dùng làm texture bề mặt cho `LandingKeyholeModel` (mô hình 3D ổ khoá ở landing).
 - `reinvestigation_crime_scene_prop.png`: Vật thể vật lý khám xét hiện trường (ảnh chụp toàn cảnh phòng khách, dải băng niêm phong cảnh sát vàng đen, thước đo pháp y Forensic Scale và dấu mộc tái khám nghiệm) đặt trên mặt bàn điều tra thay thế tờ note giấy.
 - `photo_cheating_sms.jpg`: Ảnh chụp màn hình tin nhắn Khang hẹn hò Thảo Vy.
 - `cuong_ve_xe_tung.png`: Cuống vé xe buýt của Tùng lúc 20:15.
