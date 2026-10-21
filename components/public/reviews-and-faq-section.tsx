@@ -29,10 +29,7 @@ export function ReviewsAndFaqSection() {
 
               <div>
                 <div className="flex items-center justify-between border-b border-dashed border-[#a3977c] pb-2 mb-3.5 font-mono">
-                  <span className="text-[0.55rem] font-bold text-red-850 uppercase tracking-widest">
-                    BÁO CÁO CÔNG TÁC
-                  </span>
-                  <span className="text-[0.65rem] font-bold text-zinc-900 font-typewriter uppercase tracking-wide">
+                  <span className="text-[0.68rem] font-bold text-zinc-900 font-typewriter uppercase tracking-wide">
                     {t.author}
                   </span>
                 </div>

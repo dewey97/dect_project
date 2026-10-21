@@ -1,7 +1,7 @@
 "use client";
 
-import React, { Suspense, useEffect, useMemo, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
@@ -54,8 +54,11 @@ function StudioLighting() {
   );
 }
 
-function MagnifierMesh() {
+function MagnifierMesh({ mouseX = 0, mouseY = 0 }: { mouseX?: number; mouseY?: number }) {
   const { scene } = useGLTF(MODEL_PATH);
+  const groupRef = useRef<THREE.Group>(null);
+  const curX = useRef(0);
+  const curY = useRef(0);
 
   const model = useMemo(() => {
     const cloned = scene.clone(true);
@@ -77,12 +80,29 @@ function MagnifierMesh() {
       }
     });
 
-    // Rotate around Z axis so the handle points fixed at the bottom-left (-135 degrees)
+    // Rotate around Z axis so the handle points fixed at the bottom-left (-75 degrees)
     cloned.rotation.set(0, 0, -75 * (Math.PI / 180));
     return cloned;
   }, [scene]);
 
-  return <primitive object={model} position={[0, 0, 0]} />;
+  useFrame((state, delta) => {
+    if (!groupRef.current) return;
+    const t = 1 - Math.exp(-delta * 8);
+    curX.current = THREE.MathUtils.lerp(curX.current, mouseX, t);
+    curY.current = THREE.MathUtils.lerp(curY.current, mouseY, t);
+
+    // Dynamic 3D tilt & parallax responding to mouse
+    groupRef.current.rotation.y = curX.current * 0.22;
+    groupRef.current.rotation.x = -curY.current * 0.16;
+    groupRef.current.position.x = curX.current * 0.04;
+    groupRef.current.position.y = -curY.current * 0.03;
+  });
+
+  return (
+    <group ref={groupRef}>
+      <primitive object={model} position={[0, 0, 0]} />
+    </group>
+  );
 }
 
 function OrthoCameraController({ zoom }: { zoom: number }) {
@@ -100,9 +120,15 @@ function OrthoCameraController({ zoom }: { zoom: number }) {
 
 export interface LandingMagnifierModelProps {
   portalRadius?: number;
+  mouseX?: number;
+  mouseY?: number;
 }
 
-export function LandingMagnifierModel({ portalRadius = 240 }: LandingMagnifierModelProps) {
+export function LandingMagnifierModel({
+  portalRadius = 260,
+  mouseX = 0,
+  mouseY = 0,
+}: LandingMagnifierModelProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -112,14 +138,20 @@ export function LandingMagnifierModel({ portalRadius = 240 }: LandingMagnifierMo
   // Safe SSR guard: only render WebGL canvas once mounted on client
   if (!mounted) return null;
 
-  // The inner lens radius in the 3D model is ~1.07.
-  // We set targetRadius slightly larger than portalRadius so the 3D metallic rim
-  // generously frames the portal and completely conceals any background boundary.
-  const targetRadius = Math.max(90, portalRadius + 6);
-  const zoom = targetRadius / 1.07;
+  // Exact 3D world-space measurements of magnifier.glb circular rim:
+  // - Inner lens opening: 0.7713 world units
+  // - Outer bezel edge: 0.8048 world units
+  // Using 0.778 as reference radius ensures:
+  // - The outer bezel (0.8048 / 0.778 = 1.034 × portalRadius) extends ~9px OUTSIDE the portal
+  // - The inner opening (0.7713 / 0.778 = 0.991 × portalRadius) sits ~2px INSIDE the portal
+  // Result: The metallic bezel completely sandwiches and conceals the circular portal's boundary,
+  // making the magnifying glass rim fit snugly and seamlessly with zero black edge peeking out.
+  const RIM_REFERENCE_RADIUS = 0.778;
+  const targetRadius = Math.max(90, portalRadius);
+  const zoom = targetRadius / RIM_REFERENCE_RADIUS;
 
-  // Canvas size dynamically sized so the angled handle never clips on any viewport
-  const canvasSize = Math.max(540, Math.round(portalRadius * 3.4));
+  // Canvas size dynamically sized so the angled handle (~2.5× radius) never clips
+  const canvasSize = Math.max(600, Math.round(targetRadius * 5.4));
 
   return (
     <div
@@ -143,6 +175,7 @@ export function LandingMagnifierModel({ portalRadius = 240 }: LandingMagnifierMo
           far: 100,
         }}
         gl={{ antialias: true, alpha: true }}
+        dpr={[1, 1.75]}
         style={{
           width: "100%",
           height: "100%",
@@ -152,7 +185,7 @@ export function LandingMagnifierModel({ portalRadius = 240 }: LandingMagnifierMo
         <StudioLighting />
         <OrthoCameraController zoom={zoom} />
         <Suspense fallback={null}>
-          <MagnifierMesh />
+          <MagnifierMesh mouseX={mouseX} mouseY={mouseY} />
         </Suspense>
       </Canvas>
     </div>

@@ -18,7 +18,7 @@ export function WorldArchiveSection() {
       </div>
 
       {/* MANILA FOLDER STACK — right side */}
-      <div className="hidden lg:block absolute bottom-16 right-[-20px] w-[290px] h-[400px]">
+      <div className="hidden lg:block absolute bottom-28 right-[-20px] w-[290px] h-[400px]">
         {CASE_FOLDERS.map((f) => (
           <button
             key={f.idx}
