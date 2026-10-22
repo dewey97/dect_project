@@ -4,9 +4,19 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-22]
 
+### Added
+
+- **Checkpoint Kind Schema (B2)** — migration `26_checkpoint_kind.sql`: cột `kind` (`phone_lookup | suspect_interrogation | followup | indictment | epilogue | choice | code | time | text`) và `subject_key`, backfill 9 checkpoint case_000.
+- **Discriminated Union Types (B3)** — `lib/checkpoints/kinds.ts`: union type, `parseCheckpointConfig`, `validateCheckpointConfig`.
+
+### Fixed
+
+- **Hậu án hiển thị rỗng (L1)**: `toRuntimeCheckpoint()` parse và map `epilogueStories` vào runtime Checkpoint; `epilogue-modal.tsx` đọc trực tiếp từ thuộc tính thay vì fallback metadata rỗng.
+- `/api/checkpoints` query fallback cho database production chưa chạy migration 26.
+
 ### Testing
 
-- E2E Playwright baseline case_000 (`e2e/case-000.spec.ts`, `pnpm test:e2e`): 8 kịch bản từ tra SĐT tới cáo trạng.
+- E2E Playwright baseline nâng lên 9 kịch bản (thêm kịch bản kiểm tra Hậu án hiển thị 4 phần có nội dung đầy đủ). Pass 9/9.
 
 ### Fixed
 

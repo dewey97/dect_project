@@ -56,9 +56,10 @@
 | A      | A5 dữ liệu ghi file → Supabase                                        | Model khác viết, chủ dự án chạy SQL | 0.5–1 ngày |
 | A      | A6 rotate key `.env`, `git rm --cached .env`                          | Chủ dự án                           | 30 phút    |
 | A      | A9 `is_admin()` sang schema `private`                                 | Claude                              | 1 giờ      |
-| Lỗi    | L1 Hậu án hiển thị rỗng (`epilogueStories` bị rơi)                    | Claude (gộp B3)                     | —          |
+| Lỗi    | L1 Hậu án hiển thị rỗng (`epilogueStories` bị rơi)                    | ✅ `079af56`                        | —          |
 | Lỗi    | L2 font tiêu đề Hậu án sai dấu tiếng Việt                             | Model khác                          | 1 giờ      |
-| B      | B2–B7 checkpoint theo `kind` + chấm điểm server                       | Claude                              | 5–7 ngày   |
+| B      | B2–B3 checkpoint kind schema + types                                  | ✅ `079af56`                        | —          |
+| B      | B4–B7 Studio editor theo kind, chấm điểm server, refactor runtime     | Claude                              | 4–5 ngày   |
 | C      | Tiến trình theo đồ thị, case lint, template vụ án                     | Claude (sau B)                      | 4–5 ngày   |
 | D      | D3 nén ảnh, D7 giảm `any`, D8 tách god-component, D11                 | Model khác                          | 1–3 ngày   |
 | E      | Chia `scripts/ops` / `scripts/archive`; quyết định `archive_3d_vault` | Model khác + chủ dự án              | 0.5 ngày   |
@@ -306,13 +307,13 @@ Ghi chú:
 - Mock `/api/test-scan-answer` (không gọi Gemini). Chưa phủ: Hậu án (L1), chơi nhóm, khám xét 360, điện thoại nạn nhân.
 - Lỗi phát hiện khi viết baseline: (1) ✅ trắc nghiệm so id `khong_tin` với nhãn "KHÔNG"; (2) L1 Hậu án rỗng; (3) L2 font sai dấu.
 
-### B2. Schema — ⏳
+### B2. Schema — ✅ `079af56`
 
-Cột `kind`, `subject_key` (xem brief B2–B3). Cập nhật `createNewCase` seed node theo `kind`.
+Cột `kind`, `subject_key` (`db/schema/26_checkpoint_kind.sql`). Đã cập nhật `createNewCase` seed node theo `kind`. Query route `/api/checkpoints` có fallback khi DB chưa chạy migration.
 
-### B3. Kiểu cấu hình theo kind — ⏳
+### B3. Kiểu cấu hình theo kind — ✅ `079af56`
 
-`lib/checkpoints/kinds.ts` thay `EvidencePickerConfig` gộp chung (`lib/types/checkpoint-studio.ts`) và mapper `lib/cms/checkpoint-runtime.ts`. Map `epilogueStories` (L1).
+`lib/checkpoints/kinds.ts`: discriminated union theo `kind`, `parseCheckpointConfig`, `validateCheckpointConfig`. Mapper `lib/cms/checkpoint-runtime.ts` đã map `epilogueStories`, `kind`, `subjectKey`. Sửa L1 (Hậu án hiển thị 4 phần đầy đủ). E2E baseline 9/9 pass.
 
 ### B4. Editor Studio theo kind — ⏳
 
