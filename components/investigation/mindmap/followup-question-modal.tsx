@@ -30,8 +30,8 @@ interface FollowupQuestionModalProps {
 }
 
 const DEFAULT_CHOICE_OPTIONS = [
-  { id: "tin", label: "CÓ" },
-  { id: "khong_tin", label: "KHÔNG" },
+  { id: "CÓ", label: "CÓ" },
+  { id: "KHÔNG", label: "KHÔNG" },
 ];
 
 export function FollowupQuestionModal({
@@ -99,25 +99,6 @@ export function FollowupQuestionModal({
       ) ||
       checkpoints.find((cp) => cp.id === `cp-${cLow}-followup`) ||
       checkpoints.find((cp) => cp.id === `cp-${cLow}`) ||
-      // Legacy Case 000 fallbacks
-      (cLow === "vu"
-        ? checkpoints.find(
-            (cp) => cp.id === "cp-000-1a-followup" || cp.id === "cp-000-1a",
-          )
-        : null) ||
-      (cLow === "tung"
-        ? checkpoints.find(
-            (cp) => cp.id === "cp-000-1b-followup" || cp.id === "cp-000-1b",
-          )
-        : null) ||
-      (cLow === "ha"
-        ? checkpoints.find(
-            (cp) =>
-              cp.id === "cp-000-1c-followup" ||
-              cp.id === "cp-000-2a" ||
-              cp.id === "cp-000-1c",
-          )
-        : null) ||
       checkpoints.find((cp) => {
         const titleLower = (cp.title || "").toLowerCase();
         const qLower = (cp.question || "").toLowerCase();
@@ -451,18 +432,14 @@ export function FollowupQuestionModal({
       if (serverResult.success && serverResult.correct) {
         isCorrect = true;
       } else {
-        // Fallback offline client-side (bảo vệ khi DB chưa migrate cột kind/answer_config)
+        // Fallback offline client-side
         const expected = (activeCheckpoint.correctAnswer || "")
           .trim()
           .toLowerCase();
-        // Đặc biệt cho Tùng: so sánh nhãn ("KHÔNG") hoặc id ("khong_tin") với giá trị kỳ vọng
         isCorrect =
           !expected ||
           selectedLabel.trim().toLowerCase() === expected ||
-          selectedChoice.toLowerCase() === expected ||
-          (targetCulprit === "tung" &&
-            (selectedChoice === "khong_tin" ||
-              selectedLabel.toLowerCase().includes("không")));
+          selectedChoice.trim().toLowerCase() === expected;
       }
     }
 
@@ -529,7 +506,10 @@ export function FollowupQuestionModal({
         caseStorageKey(caseId, `followup_${targetCulprit}_password`),
         rawVal,
       );
-      setStorageItem(caseStorageKey(caseId, `followup_${targetCulprit}`), "solved");
+      setStorageItem(
+        caseStorageKey(caseId, `followup_${targetCulprit}`),
+        "solved",
+      );
       if (targetCulprit === "ha") {
         setStorageItem(caseStorageKey(caseId, "followup_ha_password"), rawVal);
         setStorageItem(caseStorageKey(caseId, "followup_ha"), rawVal);
@@ -586,7 +566,10 @@ export function FollowupQuestionModal({
     if (isCorrect) {
       detectiveAudio.playStampSound();
       setErrorMsg("");
-      setStorageItem(caseStorageKey(caseId, `followup_${targetCulprit}`), finalVal);
+      setStorageItem(
+        caseStorageKey(caseId, `followup_${targetCulprit}`),
+        finalVal,
+      );
       if (onSuccess) {
         onSuccess(targetCulprit, finalVal);
       }
@@ -614,12 +597,8 @@ export function FollowupQuestionModal({
 
   const choiceOptions = useMemo(() => {
     if (activeCheckpoint?.options && activeCheckpoint.options.length > 0) {
-      return activeCheckpoint.options.map((opt, idx) => ({
-        id: opt.toLowerCase().includes("không")
-          ? "khong_tin"
-          : opt.toLowerCase().includes("có")
-            ? "tin"
-            : `opt_${idx}`,
+      return activeCheckpoint.options.map((opt) => ({
+        id: opt,
         label: opt,
       }));
     }

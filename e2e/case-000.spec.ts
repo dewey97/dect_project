@@ -210,7 +210,7 @@ test.describe("case_000 baseline", () => {
 
     await page.getByRole("button", { name: "KHÔNG", exact: true }).click();
     await tap(page, "CẬP NHẬT KẾT LUẬN");
-    await expect.poll(() => storage(page, "followup_tung")).toBe("khong_tin");
+    await expect.poll(() => storage(page, "followup_tung")).toBe("KHÔNG");
     expect(
       JSON.parse((await storage(page, "solved_followups")) || "[]"),
     ).toContain("tung");

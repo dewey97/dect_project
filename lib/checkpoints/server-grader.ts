@@ -126,27 +126,6 @@ const DEFAULT_CASE_000_PHONE_INPUTS: PhoneLookupConfig["textMatchInputs"] = [
 
 function inferCheckpointKind(checkpoint: DbCaseCheckpoint): CheckpointKind {
   if (checkpoint.kind) return checkpoint.kind as CheckpointKind;
-  const id = (checkpoint.checkpoint_id || "").toLowerCase();
-  const cfg = (checkpoint.answer_config || {}) as Record<string, any>;
-  if (
-    id.endsWith("-0") ||
-    id.includes("-0-") ||
-    id.includes("phone") ||
-    (cfg.textMatchInputs && cfg.textMatchInputs.length > 0)
-  ) {
-    return "phone_lookup";
-  }
-  if (id.includes("indictment") || id.includes("-2b")) return "indictment";
-  if (id.includes("epilogue")) return "epilogue";
-  if (id.includes("followup")) return "followup";
-  if (
-    id.includes("-1a") ||
-    id.includes("-1b") ||
-    id.includes("-1c") ||
-    checkpoint.type === "evidence_picker"
-  ) {
-    return "suspect_interrogation";
-  }
   return (checkpoint.type as CheckpointKind) || "text";
 }
 
@@ -368,22 +347,17 @@ export function gradeCheckpoint(
       const options = (cfg.options || []) as string[];
 
       if (isAdminBypassCode(userAns)) {
-        return { correct: true, feedback: "Admin bypass accepted", ...baseUnlock };
+        return {
+          correct: true,
+          feedback: "Admin bypass accepted",
+          ...baseUnlock,
+        };
       }
 
       const normUser = normalizeForMatch(userAns);
       const normCorrect = normalizeForMatch(correctAns);
       let isMatch = normUser === normCorrect;
 
-      if (!isMatch) {
-        const normKhong = normalizeForMatch("khong");
-        const normCo = normalizeForMatch("co");
-        if (userAns.toLowerCase() === "khong_tin" && normCorrect === normKhong) {
-          isMatch = true;
-        } else if (userAns.toLowerCase() === "tin" && normCorrect === normCo) {
-          isMatch = true;
-        }
-      }
       if (!isMatch && !isNaN(Number(userAns))) {
         const idx = Number(userAns);
         if (options[idx]) {
@@ -404,7 +378,11 @@ export function gradeCheckpoint(
       const correctAns = (cfg.correctAnswer || cfg.correct_answer || "").trim();
 
       if (isAdminBypassCode(userAns)) {
-        return { correct: true, feedback: "Admin bypass accepted", ...baseUnlock };
+        return {
+          correct: true,
+          feedback: "Admin bypass accepted",
+          ...baseUnlock,
+        };
       }
 
       const cleanUser = userAns.replace(/\s+/g, "").toLowerCase();
@@ -412,12 +390,13 @@ export function gradeCheckpoint(
       const isMatch =
         cleanUser === cleanCorrect ||
         cleanUser === cleanCorrect.replace(":", "h") ||
-        cleanUser === cleanCorrect.replace("h", ":") ||
-        (cleanCorrect === "21:15" && (cleanUser === "21:15" || cleanUser === "21h15"));
+        cleanUser === cleanCorrect.replace("h", ":");
 
       return {
         correct: isMatch,
-        feedback: isMatch ? "Mốc thời gian chính xác" : "Mốc thời gian chưa chính xác",
+        feedback: isMatch
+          ? "Mốc thời gian chính xác"
+          : "Mốc thời gian chưa chính xác",
         ...baseUnlock,
       };
     }
@@ -425,15 +404,19 @@ export function gradeCheckpoint(
     // 4c. Followup mật mã (Code)
     if (rawType === "code") {
       const userAns = (sub.answer || "").trim().replace(/\s+/g, "");
-      const correctAns = (cfg.correctAnswer || cfg.correct_answer || "").trim().replace(/\s+/g, "");
+      const correctAns = (cfg.correctAnswer || cfg.correct_answer || "")
+        .trim()
+        .replace(/\s+/g, "");
 
       if (isAdminBypassCode(userAns)) {
-        return { correct: true, feedback: "Admin bypass accepted", ...baseUnlock };
+        return {
+          correct: true,
+          feedback: "Admin bypass accepted",
+          ...baseUnlock,
+        };
       }
 
-      const isMatch =
-        userAns.toLowerCase() === correctAns.toLowerCase() ||
-        (correctAns === "120713" && userAns === "120713");
+      const isMatch = userAns.toLowerCase() === correctAns.toLowerCase();
 
       return {
         correct: isMatch,
@@ -471,30 +454,14 @@ export function gradeCheckpoint(
 
     let isMatch = normUser === normCorrect;
 
-    // Chỉ chấp nhận id nội bộ "khong_tin"/"tin" khi khớp nhãn đúng; không nới rộng
-    // để tránh accept "CÓ" cho câu hỏi mà đáp án đúng là "KHÔNG".
-    if (!isMatch) {
-      const normKhong = normalizeForMatch("khong");
-      const normCo = normalizeForMatch("co");
-      if (userAns.toLowerCase() === "khong_tin" && normCorrect === normKhong) {
-        isMatch = true;
-      } else if (userAns.toLowerCase() === "tin" && normCorrect === normCo) {
-        isMatch = true;
-      }
-    }
-
-    // Hỗ trợ định dạng giờ linh hoạt (21:15 vs 21h15)
-    if (
-      !isMatch &&
-      (normCorrect.includes("21:15") || normCorrect.includes("21h15"))
-    ) {
+    // Hỗ trợ định dạng giờ linh hoạt (: vs h)
+    if (!isMatch && normCorrect.includes(":")) {
       const cleanUser = userAns.replace(/\s+/g, "").toLowerCase();
-      isMatch = cleanUser === "21:15" || cleanUser === "21h15";
-    }
-
-    // Hỗ trợ mật khẩu hộp thiếc (120713)
-    if (!isMatch && normCorrect === "120713") {
-      isMatch = userAns.replace(/\s+/g, "") === "120713";
+      const cleanCorrect = normCorrect.replace(/\s+/g, "").toLowerCase();
+      isMatch =
+        cleanUser === cleanCorrect ||
+        cleanUser === cleanCorrect.replace(":", "h") ||
+        cleanUser === cleanCorrect.replace("h", ":");
     }
 
     return {
@@ -521,16 +488,6 @@ export function gradeCheckpoint(
     const normCorrect = normalizeForMatch(correctAns);
 
     let isMatch = normUser === normCorrect;
-    // Chấp nhận id nội bộ ("khong_tin"/"tin") khi khớp nhãn đáp án đúng.
-    if (!isMatch) {
-      const normKhong = normalizeForMatch("khong");
-      const normCo = normalizeForMatch("co");
-      if (userAns.toLowerCase() === "khong_tin" && normCorrect === normKhong) {
-        isMatch = true;
-      } else if (userAns.toLowerCase() === "tin" && normCorrect === normCo) {
-        isMatch = true;
-      }
-    }
     if (!isMatch && !isNaN(Number(userAns))) {
       const idx = Number(userAns);
       if (options[idx]) {

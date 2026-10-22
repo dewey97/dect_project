@@ -38,8 +38,15 @@ export function CulpritEpilogueModal({
   const { checkpoints } = useCaseCheckpoints(caseId);
   const [isNarrativeComplete, setIsNarrativeComplete] = useState(false);
   const [internalChoice, setInternalChoice] = useState<
-    "tin" | "khong_tin" | null
-  >(choice === "tin" || choice === "khong_tin" ? choice : null);
+    "CÓ" | "KHÔNG" | "tin" | "khong_tin" | null
+  >(
+    choice === "CÓ" ||
+      choice === "KHÔNG" ||
+      choice === "tin" ||
+      choice === "khong_tin"
+      ? (choice as "CÓ" | "KHÔNG" | "tin" | "khong_tin")
+      : null,
+  );
   const [haWarrantStep, setHaWarrantStep] = useState(false);
 
   const targetCulprit = subjectKey || culprit || null;
@@ -47,8 +54,13 @@ export function CulpritEpilogueModal({
   React.useEffect(() => {
     setIsNarrativeComplete(false);
     setHaWarrantStep(false);
-    if (choice === "tin" || choice === "khong_tin") {
-      setInternalChoice(choice);
+    if (
+      choice === "CÓ" ||
+      choice === "KHÔNG" ||
+      choice === "tin" ||
+      choice === "khong_tin"
+    ) {
+      setInternalChoice(choice as "CÓ" | "KHÔNG" | "tin" | "khong_tin");
     } else {
       setInternalChoice(null);
     }
@@ -73,12 +85,7 @@ export function CulpritEpilogueModal({
       choice === "matched_3_tiles" ||
       choice === "matched_3_tiles_indictment" ||
       choice === "indictment_ready");
-  const isQuestionSolved =
-    (choice === "21:15" ||
-      choice === "question_solved" ||
-      choice === "tin" ||
-      choice === "khong_tin") &&
-    !isHaBoxSolved;
+  const isQuestionSolved = Boolean(choice) && !isHaBoxSolved;
   const showTwoChoiceButtons =
     (isVu || isTung || caseId !== "case-000") &&
     isQuestionSolved &&
@@ -88,7 +95,8 @@ export function CulpritEpilogueModal({
     (c) =>
       (c.subjectKey &&
         (c.subjectKey.toLowerCase() === targetCulprit.toLowerCase() ||
-          c.subjectKey.toLowerCase() === matchedCharacter?.key.toLowerCase())) ||
+          c.subjectKey.toLowerCase() ===
+            matchedCharacter?.key.toLowerCase())) ||
       c.id.toLowerCase() === targetCulprit.toLowerCase() ||
       c.id.toLowerCase().includes(targetCulprit.toLowerCase()) ||
       c.title?.toLowerCase().includes(targetCulprit.toLowerCase()),
@@ -152,9 +160,9 @@ export function CulpritEpilogueModal({
       `Toàn bộ vật chứng chí mạng đã vạch trần tội ác!\n\nBức tường ngoại phạm của ${suspectName} hoàn toàn sụp đổ.\n\nĐã có đủ căn cứ pháp lý đanh thép để khởi tố và định tội hung thủ!`;
   } else if (showTwoChoiceButtons) {
     storyText = `Toàn bộ hành tung của ${suspectName} trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?`;
-  } else if (internalChoice === "tin") {
+  } else if (internalChoice === "CÓ" || internalChoice === "tin") {
     storyText = `Bạn lựa chọn tạm thời tin tưởng ${suspectName}.\n\nHãy chuyển hướng điều tra vụ án.\nTuy nhiên, xin các thám tử nhớ rằng: Một người chỉ được kết luận vô tội khi bạn tìm ra được hung thủ thực sự.`;
-  } else if (internalChoice === "khong_tin") {
+  } else if (internalChoice === "KHÔNG" || internalChoice === "khong_tin") {
     if (isHa && haWarrantStep) {
       storyText = getCheckpointMonologue("cp-000-2b");
     } else {

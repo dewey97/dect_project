@@ -2,6 +2,26 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-10-23]
+
+### Database & Security
+
+- **Áp dụng toàn bộ Migrations 24-28 lên Production**:
+  - `24_runtime_data_tables.sql`: chuyển `map_vectors`, `reinvestigation_hotspots`, `waitlist_entries` sang Supabase với RLS hoàn chỉnh.
+  - `25_private_is_admin.sql`: di chuyển hàm `is_admin()` sang schema `private`, cập nhật 9 policy, giải quyết triệt để cảnh báo security advisor.
+  - `26_checkpoint_kind.sql`: thêm cột `kind` và `subject_key`, backfill toàn bộ 9 checkpoint của `case_000`.
+  - `27_checkpoint_server_grading.sql`: tạo view `case_checkpoints_public` với `security_invoker = true` che giấu đáp án nhạy cảm trước client.
+  - `28_checkpoint_config_normalize.sql`: chuẩn hóa `input_type` cho followup và `valid_suspects` cho indictment.
+
+### Refactor
+
+- **Dọn dẹp Fallback Legacy & Chuẩn Hóa Lựa Chọn Trắc Nghiệm (B6-cleanup)**:
+  - `lib/checkpoints/server-grader.ts`: `inferCheckpointKind` đọc trực tiếp `checkpoint.kind` (NOT NULL); loại bỏ hoàn toàn các nhánh dò id cứng `-1a/-1b/-1c`, `endsWith("-0")`, `includes("indictment")`, `cleanCorrect === "21:15"` và `cleanCorrect === "120713"`.
+  - `components/investigation/mindmap/canvas/pin-builder.ts`: xóa bỏ `SUSPECT_CHECKPOINT_MAP` tĩnh và các nhánh dò id `cp-000-*`. Ghim nghi phạm và câu hỏi đào sâu khớp 100% qua `kind` và `subject_key`.
+  - `components/investigation/mindmap/followup-question-modal.tsx`: loại bỏ 3 nhánh fallback id `cp-000-1a/1b/1c-followup`; chuẩn hóa `DEFAULT_CHOICE_OPTIONS` và form trắc nghiệm submit trực tiếp nhãn hiển thị thay vì id ẩn ("khong_tin"/"tin").
+  - `components/investigation/mindmap/culprit-epilogue-modal.tsx`: hỗ trợ trực tiếp nhãn trắc nghiệm cho đối tượng sau điều tra.
+  - `e2e/case-000.spec.ts`: cập nhật kiểm tra tiến trình `followup_tung` lưu đúng nhãn "KHÔNG".
+
 ## [2026-10-22]
 
 ### Refactor

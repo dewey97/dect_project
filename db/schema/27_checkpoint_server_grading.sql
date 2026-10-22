@@ -10,7 +10,8 @@
 --     `hints`, `narrative`, `flow_position`, `created_at`, `updated_at`).
 -- 3. Cấp quyền SELECT trên view cho `anon, authenticated`.
 
-CREATE OR REPLACE VIEW public.case_checkpoints_public AS
+CREATE OR REPLACE VIEW public.case_checkpoints_public
+WITH (security_invoker = true) AS
 SELECT
   id,
   case_id,
