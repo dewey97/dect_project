@@ -115,7 +115,7 @@ export async function deleteCase(caseId: string) {
   }
 }
 
-/** Nhân bản Vụ án (Metadata) */
+/** Nhân bản Vụ án (Đầy đủ: Metadata, Checkpoints, Dossiers, Characters, Documents) */
 export async function duplicateCase(caseId: string) {
   try {
     await requireAdminAuth();
@@ -128,6 +128,8 @@ export async function duplicateCase(caseId: string) {
       .eq("id", caseId)
       .single();
     if (error) throw error;
+
+    const sourceSlug = c.slug || normalizeCaseId(caseId);
 
     // 2. Insert case mới
     const { data: newCase, error: insertError } = await supabase
@@ -146,7 +148,76 @@ export async function duplicateCase(caseId: string) {
       .single();
     if (insertError) throw insertError;
 
+    const targetSlug = (newCase as DbCase).slug;
+
+    // 3. Clone case_checkpoints
+    const { data: checkpoints } = await supabase
+      .from("case_checkpoints")
+      .select("*")
+      .eq("case_id", sourceSlug);
+
+    if (checkpoints && checkpoints.length > 0) {
+      const clonedCps = checkpoints.map(
+        ({ id, created_at, updated_at, ...rest }: any) => ({
+          ...rest,
+          case_id: targetSlug,
+        }),
+      );
+      await supabase.from("case_checkpoints").insert(clonedCps);
+    }
+
+    // 4. Clone case_dossiers
+    const { data: dossiers } = await supabase
+      .from("case_dossiers")
+      .select("*")
+      .eq("case_id", sourceSlug);
+
+    if (dossiers && dossiers.length > 0) {
+      const clonedDossiers = dossiers.map(
+        ({ id, created_at, updated_at, ...rest }: any) => ({
+          ...rest,
+          case_id: targetSlug,
+        }),
+      );
+      await supabase.from("case_dossiers").insert(clonedDossiers);
+    }
+
+    // 5. Clone case_characters
+    const { data: characters } = await supabase
+      .from("case_characters")
+      .select("*")
+      .eq("case_slug", sourceSlug);
+
+    if (characters && characters.length > 0) {
+      const clonedChars = characters.map(
+        ({ id, created_at, updated_at, ...rest }: any) => ({
+          ...rest,
+          case_slug: targetSlug,
+        }),
+      );
+      await supabase.from("case_characters").insert(clonedChars);
+    }
+
+    // 6. Clone dossier_documents
+    const { data: documents } = await supabase
+      .from("dossier_documents")
+      .select("*")
+      .eq("case_id", sourceSlug);
+
+    if (documents && documents.length > 0) {
+      const clonedDocs = documents.map(
+        ({ id, created_at, updated_at, ...rest }: any) => ({
+          ...rest,
+          case_id: targetSlug,
+        }),
+      );
+      await supabase.from("dossier_documents").insert(clonedDocs);
+    }
+
     revalidatePath("/studio/cases");
+    revalidatePath("/studio/checkpoints");
+    revalidatePath("/studio/characters");
+    revalidatePath("/studio/dossier");
     return { success: true, data: newCase };
   } catch (error: unknown) {
     console.error("Error duplicating case:", error);
