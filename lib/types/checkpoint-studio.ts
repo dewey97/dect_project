@@ -58,6 +58,13 @@ export interface EvidencePickerConfig {
   options?: string[];
   unlocksDossier?: string;
   epilogueStories?: EpilogueStoryItem[];
+  textMatchInputs?: {
+    id: string;
+    label: string;
+    placeholder: string;
+    validAnswers: string[];
+  }[];
+  photoCodes?: string[];
 }
 
 export interface CheckpointStudioDraft {
@@ -207,6 +214,15 @@ function parseConfig(
           monologue: asString(s?.monologue || s?.text),
         }))
       : undefined,
+    textMatchInputs: Array.isArray(source.textMatchInputs)
+      ? (source.textMatchInputs as any[]).map((inp, idx) => ({
+          id: asString(inp?.id) || `input_${idx}`,
+          label: asString(inp?.label),
+          placeholder: asString(inp?.placeholder),
+          validAnswers: asStringArray(inp?.validAnswers || inp?.valid_answers),
+        }))
+      : undefined,
+    photoCodes: asStringArray(source.photoCodes || source.photo_codes),
   };
 }
 
@@ -340,6 +356,20 @@ export function toRowPayload(
         : {}),
       ...(Array.isArray(draft.answerConfig.epilogueStories)
         ? { epilogueStories: draft.answerConfig.epilogueStories }
+        : {}),
+      ...(Array.isArray(draft.answerConfig.textMatchInputs)
+        ? {
+            textMatchInputs: draft.answerConfig.textMatchInputs.map((inp) => ({
+              id: inp.id.trim(),
+              label: inp.label.trim(),
+              placeholder: inp.placeholder.trim(),
+              validAnswers: cleanList(inp.validAnswers),
+            })),
+          }
+        : {}),
+      ...(draft.answerConfig.photoCodes &&
+      draft.answerConfig.photoCodes.length > 0
+        ? { photoCodes: cleanList(draft.answerConfig.photoCodes) }
         : {}),
     },
     hints: draft.hints

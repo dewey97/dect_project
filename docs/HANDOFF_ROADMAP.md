@@ -323,15 +323,16 @@ Cột `kind`, `subject_key` (`db/schema/26_checkpoint_kind.sql`). Đã cập nh�
 
 `lib/checkpoints/kinds.ts`: discriminated union theo `kind`, `parseCheckpointConfig`, `validateCheckpointConfig`. Mapper `lib/cms/checkpoint-runtime.ts` đã map `epilogueStories`, `kind`, `subjectKey`. Sửa L1 (Hậu án hiển thị 4 phần đầy đủ). E2E baseline 9/9 pass.
 
-### B4. Editor Studio theo kind — ⏳
+### B4. Editor Studio theo kind — ✅
 
 Thư mục `components/admin/checkpoint-studio/sections/`:
 
-- `phone_lookup`: danh sách ô `textMatchInputs` (label, placeholder, validAnswers).
-- `suspect_interrogation`: chọn nghi phạm từ `case_characters` (role `suspect`); chọn mã chứng cứ từ tab `evidences` (`/api/phone?tab=evidences&caseId=`), nhóm bắt buộc/tùy chọn; context AI.
-- `followup`: checkpoint cha (nối trên Flow view), dạng time/choice/code/text, `correctAnswer`, `options`, `photoCodes`.
-- `indictment`: `validSuspects` từ nhân vật, `requiredEvidenceIds`, phương án động cơ (`validMotives`, `options`).
-- `epilogue`: danh sách `epilogueStories` (title, monologue).
+- `phone_lookup`: `phone-lookup-config-form.tsx` — quản lý danh sách ô `textMatchInputs` (label, placeholder, validAnswers).
+- `suspect_interrogation`: `suspect-interrogation-config-form.tsx` — 3 lớp (Động cơ / Ngoại phạm / Mâu thuẫn), mã chứng cứ bắt buộc/tùy chọn, bối cảnh AI, gợi ý từng lớp.
+- `followup`: `followup-config-form.tsx` — loại phụ (time/choice/code/text), `correctAnswer`, `options`, `photoCodes`, `followupOf`.
+- `indictment`: `indictment-config-form.tsx` — `validSuspects`, `validMotives`, `requiredEvidenceIds`, `optionalEvidenceIds`.
+- `epilogue`: `checkpoint-epilogue-form.tsx` — danh sách `epilogueStories`.
+- Dropdown `kind` 9 loại và `subjectKey` trên `checkpoint-identity-form.tsx`. Router theo kind trên `checkpoint-editor.tsx`.
 
 ### B5. Chấm điểm trên server — ⏳
 

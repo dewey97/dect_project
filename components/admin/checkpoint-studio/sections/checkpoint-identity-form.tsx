@@ -3,6 +3,7 @@
 import type { DbCaseDossier } from "@/lib/types/database";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import { AutoExpandingTextarea } from "../auto-expanding-textarea";
+import { Input } from "@/components/ui/input";
 
 interface CheckpointIdentityFormProps {
   draft: CheckpointStudioDraft;
@@ -10,13 +11,18 @@ interface CheckpointIdentityFormProps {
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
 }
 
-const INPUT_CLASS = "h-7 border-white/10 bg-black/30 text-xs";
+const INPUT_CLASS = "h-7 border-white/10 bg-black/30 text-xs text-zinc-100";
 
-const QUESTION_TYPES = [
-  { value: "evidence_picker", label: "Thẩm tra vật chứng (Động cơ & Mâu thuẫn)" },
-  { value: "choice", label: "Trắc nghiệm" },
-  { value: "code", label: "Nhập mã số / Thời gian" },
-  { value: "text", label: "Nhập văn bản / Tự luận" },
+const KIND_OPTIONS = [
+  { value: "phone_lookup", label: "📞 Tra cứu SĐT / Danh bạ" },
+  { value: "suspect_interrogation", label: "🕵️ Thẩm tra nghi phạm (3 lớp)" },
+  { value: "followup", label: "❓ Câu hỏi phụ sau thẩm tra" },
+  { value: "indictment", label: "⚖️ Cáo trạng kết án" },
+  { value: "choice", label: "🔘 Trắc nghiệm" },
+  { value: "code", label: "🔢 Nhập mã số / Mật khẩu" },
+  { value: "time", label: "⏰ Mốc thời gian" },
+  { value: "text", label: "📝 Nhập văn bản / Tự luận" },
+  { value: "epilogue", label: "📜 Hậu án" },
 ];
 
 function Field({
@@ -44,8 +50,34 @@ export function CheckpointIdentityForm({
   dossiers = [],
   onChange,
 }: CheckpointIdentityFormProps) {
-  const isEpilogue = draft.type === "epilogue" || draft.checkpointId.includes("epilogue");
+  const isEpilogue =
+    draft.kind === "epilogue" ||
+    draft.type === "epilogue" ||
+    draft.checkpointId.includes("epilogue");
   if (isEpilogue) return null;
+
+  const currentKind =
+    draft.kind ||
+    (draft.type === "evidence_picker"
+      ? "suspect_interrogation"
+      : draft.type || "text");
+
+  const handleKindChange = (nextKind: string) => {
+    // Map kind sang type để tương thích ngược với runtime cũ
+    let legacyType = nextKind;
+    if (nextKind === "suspect_interrogation") legacyType = "evidence_picker";
+    else if (nextKind === "phone_lookup") legacyType = "text";
+    else if (nextKind === "indictment") legacyType = "evidence_picker";
+
+    onChange({
+      kind: nextKind,
+      type: legacyType,
+      questionType: nextKind,
+    });
+  };
+
+  const showSubjectKey =
+    currentKind === "suspect_interrogation" || currentKind === "followup";
 
   return (
     <div className="space-y-2.5">
@@ -69,24 +101,32 @@ export function CheckpointIdentityForm({
         ))}
       </select>
 
-      <Field label="Loại checkpoint">
-        <select
-          value={draft.type === "time" ? "code" : (draft.type || "evidence_picker")}
-          onChange={(event) =>
-            onChange({
-              type: event.target.value,
-              questionType: event.target.value,
-            })
-          }
-          className="h-7 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50"
-        >
-          {QUESTION_TYPES.map((item) => (
-            <option key={item.value} value={item.value}>
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </Field>
+      <div className={showSubjectKey ? "grid grid-cols-2 gap-2" : ""}>
+        <Field label="Loại Checkpoint (Kind)" required>
+          <select
+            value={currentKind}
+            onChange={(e) => handleKindChange(e.target.value)}
+            className="h-7 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50"
+          >
+            {KIND_OPTIONS.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        {showSubjectKey && (
+          <Field label="Khóa nhân vật (subjectKey)">
+            <Input
+              value={draft.subjectKey || ""}
+              onChange={(e) => onChange({ subjectKey: e.target.value })}
+              placeholder="VD: vu, tung, ha..."
+              className={INPUT_CLASS}
+            />
+          </Field>
+        )}
+      </div>
 
       <Field label="Câu hỏi">
         <AutoExpandingTextarea

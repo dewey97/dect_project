@@ -5,7 +5,10 @@ import type { DbCaseDossier } from "@/lib/types/database";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import { Button } from "@/components/ui/button";
 import { CheckpointIdentityForm } from "./sections/checkpoint-identity-form";
-import { EvidencePickerConfigForm } from "./sections/evidence-picker-config-form";
+import { SuspectInterrogationConfigForm } from "./sections/suspect-interrogation-config-form";
+import { PhoneLookupConfigForm } from "./sections/phone-lookup-config-form";
+import { FollowupConfigForm } from "./sections/followup-config-form";
+import { IndictmentConfigForm } from "./sections/indictment-config-form";
 import { SimpleAnswerConfigForm } from "./sections/simple-answer-config-form";
 import { CheckpointHintsForm } from "./sections/checkpoint-hints-form";
 import { CheckpointNarrativeForm } from "./sections/checkpoint-narrative-form";
@@ -51,9 +54,16 @@ export function CheckpointEditor({
 }: CheckpointEditorProps) {
   if (!draft) return null;
 
-  const isEvidencePicker = (draft.type || "evidence_picker") === "evidence_picker";
-  const isEpilogue = draft.type === "epilogue" || draft.checkpointId.includes("epilogue");
-  const canSave = isDirty && !isSaving && draft.title.trim().length > 0;
+  const isEpilogue =
+    draft.kind === "epilogue" ||
+    draft.type === "epilogue" ||
+    draft.checkpointId.includes("epilogue");
+
+  const effectiveKind =
+    draft.kind ||
+    (draft.type === "evidence_picker"
+      ? "suspect_interrogation"
+      : draft.type || "text");
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#0a0a0d]">
@@ -71,7 +81,11 @@ export function CheckpointEditor({
               Hậu án
             </span>
             <span className="text-[10px] text-zinc-500 font-mono">
-              ({Array.isArray(draft.answerConfig?.epilogueStories) ? draft.answerConfig.epilogueStories.length : 1} phần)
+              (
+              {Array.isArray(draft.answerConfig?.epilogueStories)
+                ? draft.answerConfig.epilogueStories.length
+                : 1}{" "}
+              phần)
             </span>
           </div>
         ) : (
@@ -112,11 +126,38 @@ export function CheckpointEditor({
             <CheckpointEpilogueForm draft={draft} onChange={onChange} />
           ) : (
             <>
-              {isEvidencePicker ? (
-                <Section title="Thẩm tra nghi phạm">
-                  <EvidencePickerConfigForm draft={draft} onChange={onChange} />
+              {/* Form đáp án theo kind */}
+              {effectiveKind === "phone_lookup" && (
+                <Section title="Cấu hình tra cứu SĐT / Danh bạ">
+                  <PhoneLookupConfigForm draft={draft} onChange={onChange} />
                 </Section>
-              ) : (
+              )}
+
+              {effectiveKind === "suspect_interrogation" && (
+                <Section title="Thẩm tra nghi phạm (3 lớp)">
+                  <SuspectInterrogationConfigForm
+                    draft={draft}
+                    onChange={onChange}
+                  />
+                </Section>
+              )}
+
+              {effectiveKind === "followup" && (
+                <Section title="Cấu hình câu hỏi phụ">
+                  <FollowupConfigForm draft={draft} onChange={onChange} />
+                </Section>
+              )}
+
+              {effectiveKind === "indictment" && (
+                <Section title="Cấu hình cáo trạng kết án">
+                  <IndictmentConfigForm draft={draft} onChange={onChange} />
+                </Section>
+              )}
+
+              {(effectiveKind === "choice" ||
+                effectiveKind === "code" ||
+                effectiveKind === "time" ||
+                effectiveKind === "text") && (
                 <>
                   <Section title="Đáp án">
                     <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
@@ -128,12 +169,21 @@ export function CheckpointEditor({
                 </>
               )}
 
-              <Section title="Narrative">
+              {/* Gợi ý cho phone_lookup / followup / indictment nếu chưa có trong form riêng */}
+              {(effectiveKind === "phone_lookup" ||
+                effectiveKind === "followup" ||
+                effectiveKind === "indictment") && (
+                <Section title="Gợi ý">
+                  <CheckpointHintsForm draft={draft} onChange={onChange} />
+                </Section>
+              )}
+
+              <Section title="Narrative (Lời dẫn / Độc thoại)">
                 <CheckpointNarrativeForm draft={draft} onChange={onChange} />
               </Section>
 
-              {/* AI check chỉ dành cho câu hỏi nhập văn bản / tự luận */}
-              {draft.type === "text" && (
+              {/* AI check dành cho câu hỏi nhập văn bản / tự luận */}
+              {(effectiveKind === "text" || draft.type === "text") && (
                 <Section title="AI check (Đánh giá câu trả lời)">
                   <CheckpointAiCheckForm draft={draft} onChange={onChange} />
                 </Section>
