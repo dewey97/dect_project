@@ -38,9 +38,9 @@ Tất cả các màn hình đều thiết kế theo kích thước chuẩn **iPh
 Tất cả đã nằm sẵn trong project `d:\code_world\dect_project`:
 
 ### A. Dữ liệu AST JSON (Full Cây DOM từ Figma API)
-- `scripts/all_frames_full.json`: Toàn bộ cây AST chi tiết của cả 4 frames (`22:389`, `22:453`, `22:582`, `22:755`), bao gồm từng tọa độ, fill gradient, hex color, typography, gap, padding, border radius.
-- `scripts/lockscreen_node.json`: Chi tiết riêng của Frame Lock Screen `22:389`.
-- `scripts/figma_node_22_393.json`: Chi tiết riêng của Layer Vignette `22:393`.
+- `scripts/archive/all_frames_full.json`: Toàn bộ cây AST chi tiết của cả 4 frames (`22:389`, `22:453`, `22:582`, `22:755`), bao gồm từng tọa độ, fill gradient, hex color, typography, gap, padding, border radius.
+- `scripts/archive/lockscreen_node.json`: Chi tiết riêng của Frame Lock Screen `22:389`.
+- `scripts/archive/figma_node_22_393.json`: Chi tiết riêng của Layer Vignette `22:393`.
 
 ### B. Hình ảnh Render Pixel-Perfect từ Figma API
 Thư mục: `docs/cases/case_000/01_design/figma_refs/`
@@ -50,9 +50,9 @@ Thư mục: `docs/cases/case_000/01_design/figma_refs/`
 - `messages.png` (95 KB) - Render thực tế danh sách tin nhắn.
 
 ### C. Các Tool Scripts Tự Động Hóa
-- `scripts/inspect_all_frames.js`: Script phân tích typography, colors, layout mode của cả 4 frames.
-- `scripts/find_parent_frame.js`: Script tra cứu phân cấp cây Frame của file Figma.
-- `scripts/download_figma_refs.js`: Script gọi endpoint `/v1/images/` để tải ảnh PNG render trực tiếp từ cloud Figma.
+- `scripts/archive/inspect_all_frames.js`: Script phân tích typography, colors, layout mode của cả 4 frames.
+- `scripts/archive/find_parent_frame.js`: Script tra cứu phân cấp cây Frame của file Figma.
+- `scripts/archive/download_figma_refs.js`: Script gọi endpoint `/v1/images/` để tải ảnh PNG render trực tiếp từ cloud Figma.
 
 ---
 

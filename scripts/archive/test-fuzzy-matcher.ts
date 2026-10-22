@@ -5,9 +5,9 @@
  * Google Sheet: chấp nhận khác dấu/khác hoa thường/tên gọi tắt, đồng thời chặn
  * các trường hợp khớp chuỗi con sai (Khang lọt vào Hà, Vương lọt vào Vũ).
  *
- * Chạy: npx tsx scripts/test-fuzzy-matcher.ts
+ * Chạy: npx tsx scripts/archive/test-fuzzy-matcher.ts
  */
-import { isVietnameseTextMatch } from "../lib/finding-matcher";
+import { isVietnameseTextMatch } from "../../lib/finding-matcher";
 
 const cases: [string, string, boolean][] = [
   // 1. Trùng khớp hoàn toàn (có/không dấu, hoa/thường)

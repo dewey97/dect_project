@@ -4,6 +4,10 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-22]
 
+### Refactor
+
+- **Quy hoạch thư mục `scripts/` (E)**: Phân tách toàn bộ script thành 2 thư mục rõ ràng: `scripts/ops/` (10 script còn đang dùng cho export, sync, scan map, import data, docker reclaim) và `scripts/archive/` (68 script inspect, test, download một lần). Cập nhật toàn bộ đường dẫn trong `package.json`, tài liệu kỹ thuật và `.gitignore`.
+
 ### Added
 
 - **Checkpoint Kind Schema (B2)** — migration `26_checkpoint_kind.sql`: cột `kind` (`phone_lookup | suspect_interrogation | followup | indictment | epilogue | choice | code | time | text`) và `subject_key`, backfill 9 checkpoint case_000.

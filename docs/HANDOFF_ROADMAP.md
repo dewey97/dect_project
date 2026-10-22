@@ -384,7 +384,7 @@ File: `canvas/pin-builder.ts`, `main-investigation-canvas.tsx`, `canvas/use-inve
 ## 10. Nhóm E — Dọn repo
 
 - ✅ Bỏ track `scripts/*.json`, `scripts/__pycache__/`, `data/maps/*.backup*.json` (`db73360`).
-- ⏳ Chia `scripts/` → `ops/` và `archive/` (brief mục 4.4).
+- ✅ Chia `scripts/` → `ops/` (10 script) và `archive/` (68 script) (Task E).
 - ⏳ `world_vector_map.json` và `case_000_vector.json` trùng hoàn toàn; bỏ bản legacy khi xong A5.
 - ⏳ `archive_3d_vault/` + `/cabinet-demo`: chủ dự án quyết (AGENTS.md §8).
 - ⏳ `components/investigation/evidence/evidence-theme-context.tsx` chưa có ai dùng → hỏi chủ dự án.
