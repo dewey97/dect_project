@@ -75,7 +75,8 @@ Mở rộng thông tin định danh người dùng từ `auth.users` của Supab
 - `feedbacks`: ai cũng gửi được; chỉ admin đọc và cập nhật.
 - `play_sessions`: người chơi thao tác phiên của mình; admin thao tác tất cả.
 - Bucket `avatars`: đọc công khai, ghi chỉ admin.
-- Chưa khóa: `game_rooms` (chơi nhóm cần ghi công khai), `case_checkpoints` (đọc công khai cho tới khi chuyển chấm điểm lên server).
+- Đã bảo mật đáp án: `case_checkpoints` chỉ cấp quyền SELECT cho `service_role` (hoặc admin qua `private.is_admin()`). Client/anon đọc danh sách checkpoint qua view `case_checkpoints_public` (chỉ lộ gợi ý, không lộ `answer_config` hay đáp án).
+- Chưa khóa: `game_rooms` (chơi nhóm cần ghi công khai).
 - Server phải tự kiểm tra quyền trước khi ghi: `requireAdminAuth()` trong server action, `denyIfNotAdmin()` (`lib/security/admin-route-guard.ts`) trong Route Handler.
 
 ### Table: `play_sessions`

@@ -113,3 +113,7 @@ export function useCaseCharacters(): CaseCharactersValue {
   }
   return value;
 }
+
+export function useOptionalCaseCharacters(): CaseCharactersValue | null {
+  return useContext(CaseCharactersContext);
+}

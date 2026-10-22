@@ -66,6 +66,7 @@ import {
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { getInterrogationCriteria } from "@/lib/ai/suspect-interrogation-context";
+import { normalizeForMatch } from "@/lib/text";
 
 export { findValidCaseCharacter, checkMotiveValid, checkContradictionValid };
 
@@ -137,18 +138,20 @@ export function AddSuspectModal({
     ).trim();
     const norm = rawName.toLowerCase();
     if (!norm) return "";
+    const cleanNorm = normalizeForMatch(norm);
+    const charId = matchedChar?.id ? normalizeForMatch(matchedChar.id) : "";
 
     // 0. Ưu tiên tìm Checkpoint có kind = suspect_interrogation khớp subjectKey
-    const charId = matchedChar?.id.toLowerCase();
     const kindMatch = checkpoints.find((cp) => {
       if (cp.kind !== "suspect_interrogation") return false;
-      const sKey = (cp.subjectKey || "").toLowerCase().trim();
+      const sKey = (cp.subjectKey || "").trim();
       if (!sKey) return false;
+      const cleanSKey = normalizeForMatch(sKey);
       return (
-        sKey === norm ||
-        norm.includes(sKey) ||
-        sKey.includes(norm) ||
-        (charId && sKey === charId)
+        cleanSKey === cleanNorm ||
+        cleanNorm.includes(cleanSKey) ||
+        cleanSKey.includes(cleanNorm) ||
+        (charId && cleanSKey === charId)
       );
     });
     if (kindMatch) return kindMatch.id;

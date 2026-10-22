@@ -401,20 +401,24 @@ Thư mục `components/admin/checkpoint-studio/sections/`:
 - View `case_checkpoints_public` (`db/schema/27`), cấp SELECT cho anon/authenticated. Route `/api/checkpoints` hỗ trợ `mode=public`.
 - Migration 27 chờ chủ dự án duyệt và chạy production.
 
-### B6. Refactor runtime gameplay — ⏳
+### B6. Refactor runtime gameplay — ✅ (Hoàn thành bỏ hardcode vu/tung/ha, đa vụ án)
 
-File: `canvas/pin-builder.ts`, `main-investigation-canvas.tsx`, `canvas/use-investigation-state.ts`, `add-suspect-modal.tsx`, `followup-question-modal.tsx` (+ `followup/*`), `indictment-modal.tsx`, `phone-lookup-modal.tsx`, `phone-narrative-modal.tsx`, `culprit-epilogue-modal.tsx`, `custom-pin-modal.tsx`, `hint-modal.tsx`, `dossier-result-modal.tsx`, `lib/hooks/use-case-narratives.ts`.
+- Schema `28_checkpoint_config_normalize.sql`: chuẩn hóa `input_type` cho followup (`time`, `choice`, `code`), `valid_suspects` cho indictment.
+- `lib/checkpoints/kinds.ts`: Thêm `inputType` vào `FollowupConfig`, parse hỗ trợ cả `snake_case` và `camelCase`.
+- `lib/checkpoints/server-grader.ts`: Chấm điểm followup theo `inputType`, fix heuristic trắc nghiệm, chuẩn hóa giờ/code.
+- `components/investigation/mindmap/canvas/pin-builder.ts`: Ghim nghi phạm và câu hỏi đào sâu ưu tiên khớp theo `kind` và `subjectKey`.
+- `components/investigation/mindmap/followup-question-modal.tsx`: Nhận `subjectKey`, hiển thị avatar và tên từ `useOptionalCaseCharacters()`, nạp form theo `inputType`.
+- `components/investigation/mindmap/indictment-modal.tsx`: Datalist gợi ý nhân vật từ `useOptionalCaseCharacters()`, so khớp `character.key` với `valid_suspects`, loại bỏ đoạn tự động ghép cứng mã chứng cứ case_000.
+- `components/investigation/mindmap/culprit-epilogue-modal.tsx`: Nhận `subjectKey`, nạp monologue và ảnh nghi phạm động từ checkpoint và case characters.
+- `lib/cms/checkpoint-runtime.ts`: Hỗ trợ cả `snake_case` và `camelCase` cho `pickerConfig` (`motive_evidence_ids`, `contradiction_evidence_ids`, `valid_suspects`...) và `answer_config`.
+- `playwright.config.ts`: Cấu hình URL warm-up dev server trỏ thẳng vào `/evidence/web?case_id=case_000` triệt tiêu lỗi Turbopack 404 race condition.
+- E2E Playwright: 9/9 kịch bản PASS (1.4m), Typecheck 100% PASS.
 
-- Tìm checkpoint theo `kind` + `subject_key`, bỏ dò chuỗi ID (`-0`, `phone`, `-2b`, `cp-000-*`).
-- Xóa đáp án hardcode: `'21:15'`, `'120713'` (fallback trong `followup-question-modal.tsx`), `"VALID_ANSWER"` (`app/(investigation)/board-stage/page.tsx`), mã case_000 tự cộng vào cáo trạng (`indictment-modal.tsx`), `DEFAULT_PHONE_INPUTS`, `DEFAULT_NARRATIVES`.
-- `CulpritKey "vu"|"tung"|"ha"` → `character.key`; gating `isVu/isTung/isHa` → theo checkpoint.
-- Bỏ registry `lib/cases/case-characters.ts` → `useCaseCharacters()`; đổi tên `case-000-suspects.ts` / `case-000-clues.ts` → `characters.ts` / `clues.ts`.
-- `lib/ai/suspect-interrogation-context.ts` (`CASE_000_INTERROGATION_CRITERIA`) → dùng `ai_context` của checkpoint.
-- E2E phải giữ 8/8 (sửa locator nếu đổi chữ nút, không đổi kịch bản).
+### B7. Docs — ✅
 
-### B7. Docs — ⏳
-
-`19_checkpoint_studio.md`, `02_database_schema.md`, `CHANGELOG.md`, `TECHDEBT.md` #14.
+- Cập nhật `docs/core_specs/19_checkpoint_studio.md` (chuẩn hóa schema `input_type`, `subject_key`, dynamic multi-case).
+- Cập nhật `docs/core_specs/02_database_schema.md` (bổ sung migration 28).
+- Cập nhật `CHANGELOG.md` và `docs/HANDOFF_ROADMAP.md`.
 
 ---
 

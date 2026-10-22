@@ -6,10 +6,12 @@ import { Search } from "lucide-react";
 import { TypewriterNarrator } from "@/components/investigation/evidence/typewriter-narrator";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
+import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
 
 interface CulpritEpilogueModalProps {
   isOpen: boolean;
-  culprit: "vu" | "tung" | "ha" | string | null;
+  culprit?: "vu" | "tung" | "ha" | string | null;
+  subjectKey?: "vu" | "tung" | "ha" | string | null;
   choice?: string | null;
   onClose: () => void;
   onOpenDossier?: (dossierType: "A" | "B" | "C") => void;
@@ -23,6 +25,7 @@ interface CulpritEpilogueModalProps {
 export function CulpritEpilogueModal({
   isOpen,
   culprit,
+  subjectKey,
   choice,
   onClose,
   onOpenDossier,
@@ -30,12 +33,16 @@ export function CulpritEpilogueModal({
   onOpenIndictment,
   caseId = "case-000",
 }: CulpritEpilogueModalProps) {
+  const charactersContext = useOptionalCaseCharacters();
+  const characters = charactersContext?.characters || [];
   const { checkpoints } = useCaseCheckpoints(caseId);
   const [isNarrativeComplete, setIsNarrativeComplete] = useState(false);
   const [internalChoice, setInternalChoice] = useState<
     "tin" | "khong_tin" | null
   >(choice === "tin" || choice === "khong_tin" ? choice : null);
   const [haWarrantStep, setHaWarrantStep] = useState(false);
+
+  const targetCulprit = subjectKey || culprit || null;
 
   React.useEffect(() => {
     setIsNarrativeComplete(false);
@@ -45,13 +52,20 @@ export function CulpritEpilogueModal({
     } else {
       setInternalChoice(null);
     }
-  }, [culprit, choice, isOpen]);
+  }, [targetCulprit, choice, isOpen]);
 
-  if (!isOpen || !culprit) return null;
+  if (!isOpen || !targetCulprit) return null;
 
-  const isVu = culprit === "vu";
-  const isTung = culprit === "tung";
-  const isHa = culprit === "ha";
+  const matchedCharacter = characters.find(
+    (c) =>
+      c.key === targetCulprit ||
+      c.key.toLowerCase() === targetCulprit.toLowerCase() ||
+      c.name.toLowerCase() === targetCulprit.toLowerCase(),
+  );
+
+  const isVu = targetCulprit === "vu";
+  const isTung = targetCulprit === "tung";
+  const isHa = targetCulprit === "ha";
   const isHaBoxSolved =
     (isHa || caseId !== "case-000") &&
     (choice === "solved_box" ||
@@ -72,20 +86,25 @@ export function CulpritEpilogueModal({
 
   const matchedCp = checkpoints.find(
     (c) =>
-      c.id.toLowerCase() === culprit.toLowerCase() ||
-      c.id.toLowerCase().includes(culprit.toLowerCase()) ||
-      c.title?.toLowerCase().includes(culprit.toLowerCase()),
+      (c.subjectKey &&
+        (c.subjectKey.toLowerCase() === targetCulprit.toLowerCase() ||
+          c.subjectKey.toLowerCase() === matchedCharacter?.key.toLowerCase())) ||
+      c.id.toLowerCase() === targetCulprit.toLowerCase() ||
+      c.id.toLowerCase().includes(targetCulprit.toLowerCase()) ||
+      c.title?.toLowerCase().includes(targetCulprit.toLowerCase()),
   );
 
-  const suspectName = isVu
-    ? "Lê Quang Vũ"
-    : isTung
-      ? "Nguyễn Thanh Tùng"
-      : isHa
-        ? "Trần Thị Hà"
-        : matchedCp?.title?.replace(/^Hồ sơ\s*[:\s]*/i, "") ||
-          culprit ||
-          "Nghi phạm";
+  const suspectName =
+    matchedCharacter?.name ||
+    (isVu
+      ? "Lê Quang Vũ"
+      : isTung
+        ? "Nguyễn Thanh Tùng"
+        : isHa
+          ? "Trần Thị Hà"
+          : matchedCp?.title?.replace(/^Hồ sơ\s*[:\s]*/i, "") ||
+            targetCulprit ||
+            "Nghi phạm");
 
   const getCheckpointMonologue = (cpId: string) => {
     const cp = checkpoints.find((c) => c.id === cpId || c.id.endsWith(cpId));
@@ -148,18 +167,18 @@ export function CulpritEpilogueModal({
         ? "cp-000-1b"
         : isHa
           ? "cp-000-1c"
-          : `cp-${culprit}`;
+          : `cp-${targetCulprit}`;
     const epilogueCpId = isVu
       ? "cp-epilogue-mai-vu"
       : isTung
         ? "cp-epilogue-tung"
         : isHa
           ? "cp-epilogue-ha"
-          : `cp-epilogue-${culprit}`;
+          : `cp-epilogue-${targetCulprit}`;
     storyText =
+      matchedCp?.storyConfig?.monologue ||
       getCheckpointMonologue(suspectCpId) ||
       getCheckpointMonologue(epilogueCpId) ||
-      matchedCp?.storyConfig?.monologue ||
       `Hồ sơ điều tra của đối tượng ${suspectName} đã được ghi nhận vào hệ thống.`;
   }
 
@@ -190,7 +209,7 @@ export function CulpritEpilogueModal({
     if (!choice && !internalChoice) {
       onClose();
       if (onOpenFollowupQuestion) {
-        onOpenFollowupQuestion(culprit || undefined);
+        onOpenFollowupQuestion(targetCulprit || undefined);
       }
     } else {
       onClose();
@@ -214,7 +233,7 @@ export function CulpritEpilogueModal({
             {/* Typewriter Monologue */}
             <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
               <TypewriterNarrator
-                key={`${culprit}-${internalChoice || (showTwoChoiceButtons ? "choice" : "default")}-${haWarrantStep}`}
+                key={`${targetCulprit}-${internalChoice || (showTwoChoiceButtons ? "choice" : "default")}-${haWarrantStep}`}
                 text={storyText}
                 speed={12}
                 onComplete={() => setIsNarrativeComplete(true)}

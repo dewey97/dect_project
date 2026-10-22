@@ -66,12 +66,14 @@ Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.s
 | `dossier`                                          | TEXT       | Ban Đầu / Bộ A / Bộ B / Bộ C                                    |
 | `title`, `question`                                | TEXT       | Nội dung hiển thị                                               |
 | `type`                                             | TEXT       | Loại gốc khi import; hỗ trợ `evidence_picker`, `epilogue`, ...  |
+| `kind`                                             | TEXT       | 9 loại có cấu trúc: `phone_lookup`, `suspect_interrogation`, `followup`, `indictment`, `epilogue`, `evidence_picker`, `text`, `code`, `multiple_choice` (Migration 26) |
+| `subject_key`                                      | TEXT       | Khóa đối tượng liên kết tới `case_characters.key` (Migration 26)|
 | `question_type`                                    | TEXT       | Mặc định `evidence_picker`                                      |
 | `unlocked_evidence_id`, `followup_of`              | TEXT       | Liên kết tiến trình; `followup_of` là khóa tham chiếu tự do     |
 | `suspect_label`, `evidence_step_label`             | TEXT       | Nhãn bước thẩm tra                                              |
 | `depends_on`                                       | TEXT[]     | Danh sách `checkpoint_id` phải hoàn thành trước                 |
 | `flow_position`                                    | JSONB      | Vị trí node Flow view `{ x, y }`; NULL dùng auto-layout          |
-| `answer_config`                                    | JSONB      | Mã chứng cứ (2 lớp), epilogue stories hoặc đáp án tự luận/mã    |
+| `answer_config`                                    | JSONB      | Cấu hình đáp án chuẩn hóa theo `kind` (Migration 27 & 28)       |
 | `hints`                                            | JSONB      | Mảng `{ group, text }`, giữ thứ tự cấp                          |
 | `narrative`                                        | TEXT       | Độc thoại dẫn truyện                                            |
 | `ai_context`, `ai_valid_cases`, `ai_invalid_cases` | TEXT/JSONB | Cấu hình chấm AI                                                |

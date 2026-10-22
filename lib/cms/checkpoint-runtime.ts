@@ -156,21 +156,39 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
       : {};
 
   const options = asStringArray(config.options);
-  const textMatchInputsRaw = parseTextMatchInputs(config.textMatchInputs);
+  const textMatchInputsRaw = parseTextMatchInputs(
+    config.textMatchInputs || config.text_match_inputs,
+  );
   const textMatchConfig =
     textMatchInputsRaw.length > 0 ? { inputs: textMatchInputsRaw } : undefined;
 
   const pickerFields = {
-    validSuspects: asStringArray(config.validSuspects),
-    validMotives: asStringArray(config.validMotives),
-    requiredEvidenceIds: asStringArray(config.requiredEvidenceIds),
-    optionalEvidenceIds: asStringArray(config.optionalEvidenceIds),
-    motiveEvidenceIds: asStringArray(config.motiveEvidenceIds),
-    optionalMotiveIds: asStringArray(config.optionalMotiveIds),
-    alibiEvidenceIds: asStringArray(config.alibiEvidenceIds),
-    optionalAlibiIds: asStringArray(config.optionalAlibiIds),
-    contradictionEvidenceIds: asStringArray(config.contradictionEvidenceIds),
-    optionalContradictionIds: asStringArray(config.optionalContradictionIds),
+    validSuspects: asStringArray(config.validSuspects || config.valid_suspects),
+    validMotives: asStringArray(config.validMotives || config.valid_motives),
+    requiredEvidenceIds: asStringArray(
+      config.requiredEvidenceIds || config.required_evidence_ids,
+    ),
+    optionalEvidenceIds: asStringArray(
+      config.optionalEvidenceIds || config.optional_evidence_ids,
+    ),
+    motiveEvidenceIds: asStringArray(
+      config.motiveEvidenceIds || config.motive_evidence_ids,
+    ),
+    optionalMotiveIds: asStringArray(
+      config.optionalMotiveIds || config.optional_motive_ids,
+    ),
+    alibiEvidenceIds: asStringArray(
+      config.alibiEvidenceIds || config.alibi_evidence_ids,
+    ),
+    optionalAlibiIds: asStringArray(
+      config.optionalAlibiIds || config.optional_alibi_ids,
+    ),
+    contradictionEvidenceIds: asStringArray(
+      config.contradictionEvidenceIds || config.contradiction_evidence_ids,
+    ),
+    optionalContradictionIds: asStringArray(
+      config.optionalContradictionIds || config.optional_contradiction_ids,
+    ),
   };
   const availableEvidences = parseAvailableEvidences(config.availableEvidences);
   const suspectLabel = asString(row.suspect_label);
@@ -200,8 +218,12 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
         ...(pickerFields.optionalMotiveIds.length > 0
           ? { optionalMotiveIds: pickerFields.optionalMotiveIds }
           : {}),
-        ...(asString(config.motiveContext)
-          ? { motiveContext: asString(config.motiveContext) }
+        ...(asString(config.motiveContext || config.motive_context)
+          ? {
+              motiveContext: asString(
+                config.motiveContext || config.motive_context,
+              ),
+            }
           : {}),
         ...(pickerFields.alibiEvidenceIds.length > 0
           ? { alibiEvidenceIds: pickerFields.alibiEvidenceIds }
@@ -215,8 +237,12 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
         ...(pickerFields.optionalContradictionIds.length > 0
           ? { optionalContradictionIds: pickerFields.optionalContradictionIds }
           : {}),
-        ...(asString(config.contradictionContext)
-          ? { contradictionContext: asString(config.contradictionContext) }
+        ...(asString(config.contradictionContext || config.contradiction_context)
+          ? {
+              contradictionContext: asString(
+                config.contradictionContext || config.contradiction_context,
+              ),
+            }
           : {}),
         ...(availableEvidences.length > 0 ? { availableEvidences } : {}),
         ...(suspectLabel ? { suspectLabel } : {}),
@@ -233,12 +259,16 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
     textMatchConfig,
     hasPickerConfig,
   );
-  const followupOf = asString(row.followup_of) || asString(config.followupOf);
-  const rawAnswers = asString(config.rawAnswers);
+  const followupOf =
+    asString(row.followup_of) ||
+    asString(config.followupOf || config.followup_of);
+  const rawAnswers = asString(config.rawAnswers || config.raw_answers);
   const narrative = asString(row.narrative);
 
   // Parse epilogue stories từ answer_config (L1 fix)
-  const epilogueStories = parseEpilogueStories(config.epilogueStories);
+  const epilogueStories = parseEpilogueStories(
+    config.epilogueStories || config.epilogue_stories,
+  );
 
   // kind và subject_key (B2 migration 26)
   const kind = asString(row.kind) || undefined;
@@ -252,7 +282,8 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
     hint: hintsList[0] || "",
     hintsList,
     options,
-    correctAnswer: asString(config.correctAnswer) || undefined,
+    correctAnswer:
+      asString(config.correctAnswer || config.correct_answer) || undefined,
     unlockedEvidenceId: row.unlocked_evidence_id || undefined,
     status: "locked",
     kind,
@@ -260,7 +291,7 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
     type: (row.type || "evidence_picker") as Checkpoint["type"],
     questionType,
     inputType: questionType,
-    photoCodes: asStringArray(config.photoCodes),
+    photoCodes: asStringArray(config.photoCodes || config.photo_codes),
     textMatchConfig,
     pickerConfig,
     epilogueStories,

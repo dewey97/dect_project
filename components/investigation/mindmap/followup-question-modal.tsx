@@ -16,11 +16,13 @@ import { FollowupCodeForm } from "./followup/followup-code-form";
 import { FollowupTextForm } from "./followup/followup-text-form";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { verifyCheckpointOnServer } from "@/lib/checkpoints/client-verify";
+import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
 
 interface FollowupQuestionModalProps {
   caseId?: string;
   isOpen: boolean;
-  culprit: string | null;
+  culprit?: string | null;
+  subjectKey?: string | null;
   onClose: () => void;
   onSuccess?: (culprit: string, choice?: string) => void;
   onOpenDossier?: (dossierType: "A" | "B" | "C") => void;
@@ -36,13 +38,25 @@ export function FollowupQuestionModal({
   caseId = "case-000",
   isOpen,
   culprit,
+  subjectKey,
   onClose,
   onSuccess,
   onOpenDossier,
   isPhoneSolved,
 }: FollowupQuestionModalProps) {
+  const targetCulprit = subjectKey || culprit || null;
+  const charactersContext = useOptionalCaseCharacters();
+  const characters = charactersContext?.characters || [];
   const normalizedCaseId = useMemo(() => caseId.replace(/-/g, "_"), [caseId]);
   const { checkpoints } = useCaseCheckpoints(caseId);
+
+  const matchedCharacter = useMemo(() => {
+    if (!targetCulprit) return null;
+    const low = targetCulprit.toLowerCase().trim();
+    return characters.find(
+      (c) => c.key.toLowerCase() === low || c.name.toLowerCase() === low,
+    );
+  }, [characters, targetCulprit]);
 
   // Input states theo từng nhóm generic input
   const [timeInput, setTimeInput] = useState<string>("");
@@ -57,16 +71,32 @@ export function FollowupQuestionModal({
 
   // 1. Tự động nhận diện Checkpoint tương ứng với đối tượng đang thẩm vấn
   const activeCheckpoint = useMemo(() => {
-    if (!culprit) return null;
-    const cLow = culprit.toLowerCase().trim();
+    if (!targetCulprit) return null;
+    const cLow = targetCulprit.toLowerCase().trim();
+    const charKeyLow = matchedCharacter?.key.toLowerCase().trim();
     return (
       checkpoints.find(
         (cp) =>
           cp.kind === "followup" &&
-          (cp.subjectKey?.toLowerCase().trim() === cLow ||
-            cp.followupOf?.toLowerCase().trim() === cLow),
+          ((cp.subjectKey &&
+            (cp.subjectKey.toLowerCase().trim() === cLow ||
+              cp.subjectKey.toLowerCase().trim() === charKeyLow)) ||
+            (cp.followupOf &&
+              (cp.followupOf.toLowerCase().trim() === cLow ||
+                cp.followupOf.toLowerCase().trim() === charKeyLow))),
       ) ||
-      checkpoints.find((cp) => cp.followupOf?.toLowerCase().trim() === cLow) ||
+      checkpoints.find(
+        (cp) =>
+          cp.subjectKey &&
+          (cp.subjectKey.toLowerCase().trim() === cLow ||
+            cp.subjectKey.toLowerCase().trim() === charKeyLow),
+      ) ||
+      checkpoints.find(
+        (cp) =>
+          cp.followupOf &&
+          (cp.followupOf.toLowerCase().trim() === cLow ||
+            cp.followupOf.toLowerCase().trim() === charKeyLow),
+      ) ||
       checkpoints.find((cp) => cp.id === `cp-${cLow}-followup`) ||
       checkpoints.find((cp) => cp.id === `cp-${cLow}`) ||
       // Legacy Case 000 fallbacks
@@ -95,14 +125,14 @@ export function FollowupQuestionModal({
       }) ||
       null
     );
-  }, [checkpoints, culprit]);
+  }, [checkpoints, targetCulprit, matchedCharacter]);
 
   // 2. Xác định Loại Form tương tác tổng quan (time | choice | code | text)
   const questionType = useMemo<"time" | "choice" | "code" | "text">(() => {
     const rawType = (
+      activeCheckpoint?.inputType ||
       activeCheckpoint?.questionType ||
-      activeCheckpoint?.type ||
-      activeCheckpoint?.inputType
+      activeCheckpoint?.type
     )
       ?.toString()
       .toLowerCase()
@@ -121,25 +151,26 @@ export function FollowupQuestionModal({
     if (rawType === "text") return "text";
 
     // Fallback thông minh cho Case #000 theo nhân vật
-    if (culprit === "vu") return "time";
-    if (culprit === "tung") return "choice";
-    if (culprit === "ha") return "code";
+    if (targetCulprit === "vu") return "time";
+    if (targetCulprit === "tung") return "choice";
+    if (targetCulprit === "ha") return "code";
 
     return "text";
-  }, [activeCheckpoint, culprit]);
+  }, [activeCheckpoint, targetCulprit]);
 
   // Tên hiển thị của nhân vật
   const suspectDisplayLabel = useMemo(() => {
-    if (!culprit) return "";
+    if (!targetCulprit) return "";
+    if (matchedCharacter?.name) return matchedCharacter.name;
     if (activeCheckpoint?.suspectLabel) return activeCheckpoint.suspectLabel;
-    if (culprit === "vu") return "Lê Quang Vũ";
-    if (culprit === "tung") return "Nguyễn Thanh Tùng";
-    if (culprit === "ha") return "Trần Thị Hà";
+    if (targetCulprit === "vu") return "Lê Quang Vũ";
+    if (targetCulprit === "tung") return "Nguyễn Thanh Tùng";
+    if (targetCulprit === "ha") return "Trần Thị Hà";
 
     if (Array.isArray(rawSheetPhotos)) {
       const match = rawSheetPhotos.find((p: any) => {
         const code = String(p.code || p.photo_code || "").toLowerCase();
-        return code === culprit || code === `avatar_${culprit}`;
+        return code === targetCulprit || code === `avatar_${targetCulprit}`;
       });
       if (match) {
         return String(match.label || match.title || "")
@@ -151,8 +182,8 @@ export function FollowupQuestionModal({
           .trim();
       }
     }
-    return culprit;
-  }, [culprit, activeCheckpoint, rawSheetPhotos]);
+    return targetCulprit;
+  }, [targetCulprit, matchedCharacter, activeCheckpoint, rawSheetPhotos]);
 
   // Tiêu đề modal câu hỏi
   const modalTitle = useMemo(() => {
@@ -287,7 +318,7 @@ export function FollowupQuestionModal({
 
   // Khôi phục giá trị đã lưu khi mở modal
   useEffect(() => {
-    if (!culprit || !isOpen) return;
+    if (!targetCulprit || !isOpen) return;
     setErrorMsg("");
     setShowPhotoPopup(false);
 
@@ -295,22 +326,22 @@ export function FollowupQuestionModal({
       setCodeInput("");
     } else if (questionType === "time") {
       const savedTime =
-        getStorageItem(caseStorageKey(caseId, `followup_${culprit}`)) ||
+        getStorageItem(caseStorageKey(caseId, `followup_${targetCulprit}`)) ||
         getStorageItem(caseStorageKey(caseId, "followup_vu"));
       setTimeInput(savedTime || "");
     } else if (questionType === "choice") {
       const savedChoice =
-        getStorageItem(caseStorageKey(caseId, `followup_${culprit}`)) ||
+        getStorageItem(caseStorageKey(caseId, `followup_${targetCulprit}`)) ||
         getStorageItem(caseStorageKey(caseId, "followup_tung"));
       setSelectedChoice(savedChoice || null);
     } else {
       const savedText = getStorageItem(
-        caseStorageKey(caseId, `followup_${culprit}`),
+        caseStorageKey(caseId, `followup_${targetCulprit}`),
       );
       setTextInput(savedText || "");
       setSelectedChoice(savedText || null);
     }
-  }, [culprit, isOpen, questionType]);
+  }, [targetCulprit, isOpen, questionType, caseId]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -321,7 +352,7 @@ export function FollowupQuestionModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen || !culprit) return null;
+  if (!isOpen || !targetCulprit) return null;
 
   // 1. Xử lý nộp đáp án Mốc Thời Gian (Time Form)
   const handleSubmitTime = async (e: React.FormEvent) => {
@@ -378,13 +409,13 @@ export function FollowupQuestionModal({
       setErrorMsg("");
       const finalAnswer = activeCheckpoint?.correctAnswer || timeInput.trim();
       setStorageItem(
-        caseStorageKey(caseId, `followup_${culprit}`),
+        caseStorageKey(caseId, `followup_${targetCulprit}`),
         finalAnswer,
       );
-      if (culprit === "vu")
+      if (targetCulprit === "vu")
         setStorageItem(caseStorageKey(caseId, "followup_vu"), finalAnswer);
       if (onSuccess) {
-        onSuccess(culprit, finalAnswer);
+        onSuccess(targetCulprit, finalAnswer);
       }
       onClose();
     } else {
@@ -429,7 +460,7 @@ export function FollowupQuestionModal({
           !expected ||
           selectedLabel.trim().toLowerCase() === expected ||
           selectedChoice.toLowerCase() === expected ||
-          (culprit === "tung" &&
+          (targetCulprit === "tung" &&
             (selectedChoice === "khong_tin" ||
               selectedLabel.toLowerCase().includes("không")));
       }
@@ -439,13 +470,13 @@ export function FollowupQuestionModal({
       detectiveAudio.playStampSound();
       setErrorMsg("");
       setStorageItem(
-        caseStorageKey(caseId, `followup_${culprit}`),
+        caseStorageKey(caseId, `followup_${targetCulprit}`),
         selectedChoice,
       );
-      if (culprit === "tung")
+      if (targetCulprit === "tung")
         setStorageItem(caseStorageKey(caseId, "followup_tung"), selectedChoice);
       if (onSuccess) {
-        onSuccess(culprit, selectedChoice);
+        onSuccess(targetCulprit, selectedChoice);
       }
       onClose();
     } else {
@@ -495,11 +526,11 @@ export function FollowupQuestionModal({
       detectiveAudio.playStampSound();
       setErrorMsg("");
       setStorageItem(
-        caseStorageKey(caseId, `followup_${culprit}_password`),
+        caseStorageKey(caseId, `followup_${targetCulprit}_password`),
         rawVal,
       );
-      setStorageItem(caseStorageKey(caseId, `followup_${culprit}`), "solved");
-      if (culprit === "ha") {
+      setStorageItem(caseStorageKey(caseId, `followup_${targetCulprit}`), "solved");
+      if (targetCulprit === "ha") {
         setStorageItem(caseStorageKey(caseId, "followup_ha_password"), rawVal);
         setStorageItem(caseStorageKey(caseId, "followup_ha"), rawVal);
       }
@@ -507,7 +538,7 @@ export function FollowupQuestionModal({
       if (discoveredPhotos.length > 0) {
         setShowPhotoPopup(true);
       } else {
-        if (onSuccess) onSuccess(culprit, "solved");
+        if (onSuccess) onSuccess(targetCulprit, "solved");
         onClose();
       }
     } else {
@@ -555,9 +586,9 @@ export function FollowupQuestionModal({
     if (isCorrect) {
       detectiveAudio.playStampSound();
       setErrorMsg("");
-      setStorageItem(caseStorageKey(caseId, `followup_${culprit}`), finalVal);
+      setStorageItem(caseStorageKey(caseId, `followup_${targetCulprit}`), finalVal);
       if (onSuccess) {
-        onSuccess(culprit, finalVal);
+        onSuccess(targetCulprit, finalVal);
       }
       onClose();
     } else {
@@ -572,7 +603,7 @@ export function FollowupQuestionModal({
     detectiveAudio.playStampSound();
     setShowPhotoPopup(false);
     if (onSuccess) {
-      onSuccess(culprit, "solved_box");
+      onSuccess(targetCulprit, "solved_box");
     }
     onClose();
   };

@@ -11,6 +11,7 @@ import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 import { trackEvent } from "@/lib/analytics";
 import { verifyCheckpointOnServer } from "@/lib/checkpoints/client-verify";
+import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
 
 interface IndictmentModalProps {
   caseId?: string;
@@ -107,6 +108,15 @@ export function IndictmentModal({
   onSubmitIndictment,
   isPhoneSolved,
 }: IndictmentModalProps) {
+  const charactersContext = useOptionalCaseCharacters();
+  const allCharacters = charactersContext?.characters || [];
+  const suspectCharacters = React.useMemo(() => {
+    const list = allCharacters.filter((c) => c.role === "suspect");
+    return list.length > 0
+      ? list
+      : allCharacters.filter((c) => c.role !== "victim");
+  }, [allCharacters]);
+
   const { checkpoints } = useCaseCheckpoints(caseId);
   const indictmentCp = checkpoints.find(
     (c) =>
@@ -179,6 +189,18 @@ export function IndictmentModal({
         }
       } else {
         // Fallback offline client-side nếu server lỗi/không phản hồi
+        const cleanInput = normalizeName(suspectName);
+        const matchedChar = allCharacters.find((c) => {
+          const cKey = normalizeName(c.key);
+          const cName = normalizeName(c.name);
+          return (
+            cleanInput === cKey ||
+            cleanInput === cName ||
+            cleanInput.includes(cName) ||
+            cName.includes(cleanInput)
+          );
+        });
+
         const validSuspectsFromSheet =
           indictmentCp?.pickerConfig?.validSuspects;
         const targetSuspects =
@@ -188,8 +210,15 @@ export function IndictmentModal({
 
         const isSuspectMatch = targetSuspects.some((ts) => {
           const cleanTs = normalizeName(ts);
-          const cleanInput = normalizeName(suspectName);
-          return cleanInput.includes(cleanTs) || cleanTs.includes(cleanInput);
+          const cleanCharKey = matchedChar ? normalizeName(matchedChar.key) : "";
+          const cleanCharName = matchedChar ? normalizeName(matchedChar.name) : "";
+          return (
+            cleanInput === cleanTs ||
+            cleanCharKey === cleanTs ||
+            cleanCharName === cleanTs ||
+            cleanInput.includes(cleanTs) ||
+            cleanTs.includes(cleanInput)
+          );
         });
 
         if (!isSuspectMatch) {
@@ -244,9 +273,11 @@ export function IndictmentModal({
           ];
           const sheetRequiredCodes =
             indictmentCp?.pickerConfig?.requiredEvidenceIds;
+          const sheetOptionalCodes =
+            indictmentCp?.pickerConfig?.optionalEvidenceIds || [];
           const validEvidenceCodes =
             sheetRequiredCodes && sheetRequiredCodes.length > 0
-              ? [...sheetRequiredCodes, ...fallbackEvidenceCodes]
+              ? [...sheetRequiredCodes, ...sheetOptionalCodes]
               : fallbackEvidenceCodes;
 
           if (
@@ -265,7 +296,20 @@ export function IndictmentModal({
       if (!isCorrect) return; // Dừng nếu có lỗi từ server hoặc fallback client
     }
 
+    const cleanInputForCulprit = normalizeName(suspectName);
+    const matchedCharForCulprit = allCharacters.find((c) => {
+      const cKey = normalizeName(c.key);
+      const cName = normalizeName(c.name);
+      return (
+        cleanInputForCulprit === cKey ||
+        cleanInputForCulprit === cName ||
+        cleanInputForCulprit.includes(cName) ||
+        cName.includes(cleanInputForCulprit)
+      );
+    });
+
     const culprit =
+      matchedCharForCulprit?.key ||
       (isAdmin000 ? "ha" : isCulpritValid(suspectName)) ||
       normalizeName(suspectName) ||
       "ha";
@@ -354,13 +398,20 @@ export function IndictmentModal({
                   </label>
                   <input
                     type="text"
+                    list="indictment-suspects-list"
                     value={suspectName}
                     onChange={(e) => {
                       setSuspectName(e.target.value);
                       if (errorMsg) setErrorMsg("");
                     }}
+                    placeholder="Nhập hoặc chọn tên bị can..."
                     className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-sm sm:text-base text-[#0e2b5c] font-sans font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                   />
+                  <datalist id="indictment-suspects-list">
+                    {suspectCharacters.map((c) => (
+                      <option key={c.id || c.key} value={c.name} />
+                    ))}
+                  </datalist>
                 </div>
 
                 {/* 1.2 - 1.5 Static Case Details */}

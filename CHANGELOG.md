@@ -4,6 +4,17 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-22]
 
+### Added
+
+- **Multi-Case Checkpoint Engine & Dynamic Gameplay (B6)**:
+  - Khởi tạo migration `28_checkpoint_config_normalize.sql` chuẩn hóa `input_type` cho câu hỏi đào sâu (`time`, `choice`, `code`, `text`) và `valid_suspects` cho cáo trạng.
+  - Hỗ trợ `subject_key` liên kết trực tiếp tới `case_characters.key`, xóa bỏ hardcode `CulpritKey "vu" | "tung" | "ha"` trong `use-investigation-state.ts`.
+  - Khám nghiệm & thẩm tra động: `FollowupQuestionModal`, `IndictmentModal`, và `CulpritEpilogueModal` tự động nạp ảnh, tên nhân vật và độc thoại từ Checkpoint Studio qua `useOptionalCaseCharacters()`.
+  - Loại bỏ hoàn toàn việc tự động nối ghép mã chứng cứ cứng case_000 trong `IndictmentModal`.
+  - Hỗ trợ 2 chiều `snake_case` và `camelCase` cho `pickerConfig` và `answer_config` trong `lib/cms/checkpoint-runtime.ts`.
+  - Thêm cấu hình warm-up route `/evidence/web?case_id=case_000` trong `playwright.config.ts`, giải quyết triệt để lỗi Turbopack 404 race condition khi dev server khởi động.
+  - Verification: `npx tsc --noEmit --incremental false` pass 100%, `pnpm test:e2e` **9/9 PASS** (1.4m).
+
 ### Fixed
 
 - **Grader trắc nghiệm & Chấm điểm Server (B5-fix)**: Chuẩn hóa so khớp đáp án trắc nghiệm theo nhãn ("KHÔNG") và id nội bộ ("khong_tin"); hỗ trợ định dạng thời gian và mật khẩu linh hoạt. Toàn bộ 9/9 kịch bản E2E baseline case_000 pass 100%.

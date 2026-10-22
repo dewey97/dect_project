@@ -32,7 +32,7 @@ export interface SuspectItem {
   contradictionReason?: string;
 }
 
-export type CulpritKey = "vu" | "tung" | "ha" | (string & {});
+export type CulpritKey = string;
 
 export function sanitizeSuspectsList(items: SuspectItem[]): SuspectItem[] {
   const map = new Map<string, SuspectItem>();

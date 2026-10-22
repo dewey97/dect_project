@@ -171,6 +171,12 @@ export function CanvasModals({
         <CulpritEpilogueModal
           caseId={state.caseId}
           isOpen={state.isEpilogueOpen}
+          subjectKey={
+            state.activeFollowupCulprit ||
+            state.narrativeCulprit ||
+            state.solvedCulprit ||
+            (state.suspects[0]?.id || "vu")
+          }
           culprit={
             state.narrativeCulprit ||
             state.activeFollowupCulprit ||
@@ -239,6 +245,12 @@ export function CanvasModals({
           key={`followup-${state.activeFollowupCulprit || state.narrativeCulprit || state.solvedCulprit || "vu"}`}
           caseId={state.caseId}
           isOpen={state.isFollowupQuestionOpen}
+          subjectKey={
+            state.activeFollowupCulprit ||
+            state.narrativeCulprit ||
+            state.solvedCulprit ||
+            (state.suspects[0]?.id || "vu")
+          }
           culprit={
             state.activeFollowupCulprit ||
             state.narrativeCulprit ||

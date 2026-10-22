@@ -32,7 +32,7 @@ export default defineConfig({
   ],
   webServer: {
     command: `node node_modules/next/dist/bin/next dev -p ${PORT}`,
-    url: `http://localhost:${PORT}`,
+    url: `http://localhost:${PORT}/evidence/web?case_id=case_000`,
     env: { NEXT_DIST_DIR: ".next_dev" },
     reuseExistingServer: true,
     timeout: 180_000,
