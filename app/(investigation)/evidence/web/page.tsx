@@ -665,18 +665,6 @@ function WebEvidencePageContent() {
             mobileTab === "board" ? "flex w-full" : "hidden lg:flex",
           )}
         >
-          {/* TOP RIGHT TOOLBAR: SỔ TAY */}
-          <div className="hidden lg:flex absolute top-3 right-3 z-30 items-center gap-1.5 bg-[#1e150e]/90 backdrop-blur-md px-2 py-1 rounded-lg border border-[#4a3625] shadow-xl">
-            <button
-              onClick={() => setActiveModal("notebook")}
-              className="px-2 py-1 rounded bg-[#2b1b11] hover:bg-[#3d2618] border border-[#523824] text-[#d9a066] hover:text-[#fef5ec] transition-colors cursor-pointer flex items-center gap-1.5 font-mono text-[0.62rem] font-bold"
-              title="Mở sổ tay ghi chép thám tử"
-            >
-              <PenLine className="size-3" />
-              <span>SỔ TAY</span>
-            </button>
-          </div>
-
           {/* MAIN CANVAS */}
           <div className="flex-1 min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
@@ -686,6 +674,7 @@ function WebEvidencePageContent() {
               onOpenPhoneSimulator={() => setActiveModal("phone")}
               onOpenReinvestigation={() => setActiveModal("reinvestigate")}
               onOpenEpilogue={() => setActiveModal("epilogue")}
+              onOpenNotebook={() => setActiveModal("notebook")}
             />
           </div>
         </div>

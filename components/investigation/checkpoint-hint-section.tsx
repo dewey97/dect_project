@@ -17,6 +17,11 @@ interface CheckpointHintSectionProps {
   caseId?: string;
   category?: "motive" | "alibi" | "contradiction" | "all";
   className?: string;
+  /**
+   * Khi truyền vào: nút gợi ý gọn ("GỢI Ý n", vẫn nhấn giữ để mở) được đưa
+   * vào hàng nút hành động do nơi dùng dựng. Nhận `null` khi không còn gợi ý.
+   */
+  renderActions?: (hintButton: React.ReactNode | null) => React.ReactNode;
 }
 
 export function CheckpointHintSection({
@@ -24,6 +29,7 @@ export function CheckpointHintSection({
   caseId = "case-000",
   category,
   className,
+  renderActions,
 }: CheckpointHintSectionProps) {
   const normalizedCaseId = caseId.replace(/-/g, "_");
   const { rows: checkpointRows } = useStudioCheckpoints(normalizedCaseId);
@@ -179,11 +185,43 @@ export function CheckpointHintSection({
 
   // Nếu checkpoint không có gợi ý nào trên Sheet, không render section này
   if (totalHints === 0) {
-    return null;
+    return renderActions ? <>{renderActions(null)}</> : null;
   }
 
   const nextLevel = unlockedCount + 1;
   const isFullyUnlocked = unlockedCount >= totalHints;
+
+  const holdHandlers = {
+    onMouseDown: startHold,
+    onMouseUp: cancelHold,
+    onMouseLeave: cancelHold,
+    onTouchStart: startHold,
+    onTouchEnd: cancelHold,
+    onTouchCancel: cancelHold,
+  };
+
+  const compactHintButton = isFullyUnlocked ? null : (
+    <button
+      type="button"
+      {...holdHandlers}
+      aria-label={`Nhấn giữ để mở gợi ý ${nextLevel}`}
+      className={cn(
+        "relative h-10 shrink-0 overflow-hidden border-2 px-4 font-mono text-xs font-bold uppercase tracking-wider transition-all select-none cursor-pointer text-center",
+        isHolding
+          ? "border-[#8c1d1d] bg-[#fdf8f0] text-[#8c1d1d]"
+          : "border-[#a88c6f] bg-[#ede3d1] hover:bg-[#e4d8c3] text-[#2b1f14] hover:border-[#8c1d1d]",
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className="absolute left-0 top-0 bottom-0 bg-[#8c1d1d]/20 transition-all duration-75 ease-linear pointer-events-none"
+        style={{ width: `${holdProgress}%` }}
+      />
+      <span className="relative z-10 block truncate pointer-events-none">
+        {isHolding ? `${Math.round(holdProgress)}%` : `GỢI Ý ${nextLevel}`}
+      </span>
+    </button>
+  );
 
   return (
     <div
@@ -212,8 +250,10 @@ export function CheckpointHintSection({
         </div>
       )}
 
+      {renderActions && renderActions(compactHintButton)}
+
       {/* KHU VỰC BẤM GIỮ ĐỂ BÓC GỢI Ý TIẾP THEO */}
-      {!isFullyUnlocked && (
+      {!renderActions && !isFullyUnlocked && (
         <div className="pt-1">
           <button
             type="button"

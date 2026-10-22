@@ -15,6 +15,7 @@ import {
   BookOpen,
   Users,
   Target,
+  PenLine,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { PinPoint } from "@/components/investigation/hero-interactive";
@@ -36,6 +37,7 @@ export interface CanvasToolbarProps {
   onEditSelectedPin: (pin: PinPoint) => void;
   hideTitleBadgeOnMobile?: boolean;
   isBoardGame?: boolean;
+  onOpenNotebook?: () => void;
 }
 
 export function CanvasToolbar({
@@ -49,6 +51,7 @@ export function CanvasToolbar({
   onEditSelectedPin,
   hideTitleBadgeOnMobile = false,
   isBoardGame = false,
+  onOpenNotebook,
 }: CanvasToolbarProps) {
   const { roomCode, nickname, memberCount, broadcastPing } = useRoomSync();
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
@@ -105,6 +108,18 @@ export function CanvasToolbar({
             <Volume2 className="size-4 text-amber-400" />
           )}
         </button>
+
+        {onOpenNotebook && (
+          <button
+            type="button"
+            onClick={onOpenNotebook}
+            className="px-2.5 py-1.5 bg-[#1b140e]/85 hover:bg-[#342417] backdrop-blur-md border border-[#593c26]/60 text-[#d9a066] hover:text-[#fef5ec] transition-colors cursor-pointer rounded-lg shadow-lg pointer-events-auto flex items-center gap-1.5 text-xs font-mono font-bold"
+            title="Mở sổ tay ghi chép thám tử"
+          >
+            <PenLine className="size-3.5 text-amber-500" />
+            <span>SỔ TAY</span>
+          </button>
+        )}
 
         {isBoardGame && (
           <button

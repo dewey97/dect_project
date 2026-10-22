@@ -37,6 +37,8 @@ interface MainInvestigationCanvasProps {
   onOpenPhoneSimulator?: () => void;
   onOpenReinvestigation?: () => void;
   onOpenEpilogue?: () => void;
+  /** Mở sổ tay ghi chép; nút nằm cạnh nút âm lượng trên toolbar. */
+  onOpenNotebook?: () => void;
   customBgImage?: string;
   lightConeConfig?: {
     enabled: boolean;
@@ -52,6 +54,7 @@ export function MainInvestigationCanvas({
   onOpenPhoneSimulator,
   onOpenReinvestigation,
   onOpenEpilogue,
+  onOpenNotebook,
   customBgImage,
   lightConeConfig,
   hideTitleBadgeOnMobile = false,
@@ -747,6 +750,7 @@ export function MainInvestigationCanvas({
           }}
           hideTitleBadgeOnMobile={hideTitleBadgeOnMobile}
           isBoardGame={isBoardGameMode}
+          onOpenNotebook={onOpenNotebook}
         />
       )}
 

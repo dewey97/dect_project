@@ -131,13 +131,13 @@ export function ClueCodePicker({
       <div className="space-y-1.5">
         <div>
           <span className="text-[11px] font-mono font-bold uppercase text-[#1a120b]">
-            {label} ({selectedClueIds.length}):
+            {label}:
           </span>
         </div>
 
-        <div className="min-h-[64px] max-h-[140px] overflow-y-auto custom-scrollbar p-2.5 bg-[#ede4d0]/80 border-2 border-dashed border-[#8c7355]/70 rounded-sm flex flex-col gap-2 shadow-inner">
+        <div className="max-h-[140px] overflow-y-auto custom-scrollbar p-2 bg-[#ede4d0]/80 border-2 border-dashed border-[#8c7355]/70 rounded-sm flex flex-col gap-2 shadow-inner">
           {selectedClueIds.length === 0 ? (
-            <p className="text-xs text-[#8c7355] italic self-center m-auto font-sans">
+            <p className="text-xs text-[#8c7355] italic self-center font-sans">
               {emptyStateText}
             </p>
           ) : (

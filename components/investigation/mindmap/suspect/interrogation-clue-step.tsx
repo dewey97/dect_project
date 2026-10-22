@@ -5,6 +5,7 @@ import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { ClueCodePicker, type PendingClueInputs } from "../clue-code-picker";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 
 interface InterrogationClueStepProps {
   category: "motive" | "contradiction";
@@ -25,14 +26,14 @@ const CATEGORY_CONFIG = {
   motive: {
     reasonLabel: "ĐỘNG CƠ",
     reasonPlaceholder: "Nhập động cơ...",
-    clueLabel: "TÀI LIỆU / MANH MỐI MINH CHỨNG CHO ĐỘNG CƠ",
+    clueLabel: "Bằng chứng đã chọn",
     cluePlaceholder: "Nhập mã chứng cứ minh chứng...",
     emptyStateText: "Chưa có bằng chứng nào được nhập.",
   },
   contradiction: {
     reasonLabel: "MÂU THUẪN LỜI KHAI",
     reasonPlaceholder: "Nhập mâu thuẫn lời khai...",
-    clueLabel: "TÀI LIỆU / MANH MỐI MINH CHỨNG CHO MÂU THUẪN",
+    clueLabel: "Bằng chứng đã chọn",
     cluePlaceholder: "Nhập mã chứng cứ minh chứng...",
     emptyStateText: "Chưa có bằng chứng mâu thuẫn nào được nhập.",
   },
@@ -54,6 +55,47 @@ export function InterrogationClueStep({
 }: InterrogationClueStepProps) {
   const cfg = CATEGORY_CONFIG[category];
 
+  // Hàng nút: QUAY LẠI | GỢI Ý n (nhấn giữ để mở) | XÁC NHẬN
+  const renderFooter = (hintButton: React.ReactNode | null) => (
+    <div className="pt-3 flex items-center justify-between gap-2 select-none">
+      <button
+        type="button"
+        disabled={isLoading}
+        onClick={() => {
+          detectiveAudio.playPaperRustle();
+          onBack();
+        }}
+        className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95 disabled:opacity-50"
+      >
+        <ArrowLeft className="size-3.5 text-[#4a3520] shrink-0" />
+        <span>QUAY LẠI</span>
+      </button>
+
+      {hintButton}
+
+      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <button
+          type="button"
+          disabled={isLoading}
+          onClick={onConfirm}
+          className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0 disabled:opacity-50"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="size-3.5 text-[#d9a066] animate-spin shrink-0" />
+              <span>ĐANG THẨM ĐỊNH...</span>
+            </>
+          ) : (
+            <>
+              <Check className="size-3.5 text-[#d9a066] shrink-0" />
+              <span>XÁC NHẬN</span>
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-4 pt-1">
       {/* 1. Ô LÝ DO & LẬP LUẬN (TÙY CHỌN, KHÔNG BỌC BOX NGOÀI) */}
@@ -62,8 +104,7 @@ export function InterrogationClueStep({
           <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
             {cfg.reasonLabel}:
           </label>
-          <textarea
-            rows={3}
+          <AutoGrowTextarea
             value={reason}
             onChange={(e) => onReasonChange?.(e.target.value)}
             placeholder={cfg.reasonPlaceholder}
@@ -88,50 +129,16 @@ export function InterrogationClueStep({
         />
       </div>
 
-      {Boolean(checkpointId) && (
+      {checkpointId ? (
         <CheckpointHintSection
-          checkpointId={checkpointId!}
+          checkpointId={checkpointId}
           caseId={caseId}
           category={category}
+          renderActions={renderFooter}
         />
+      ) : (
+        renderFooter(null)
       )}
-
-      {/* FOOTER ACTIONS */}
-      <div className="pt-3 border-t border-[#d4c5b0]/60 flex items-center justify-between gap-2 select-none">
-        <button
-          type="button"
-          disabled={isLoading}
-          onClick={() => {
-            detectiveAudio.playPaperRustle();
-            onBack();
-          }}
-          className="h-10 px-3 sm:px-4 bg-[#f4ebd9] hover:bg-[#ede3cf] text-[#2b1f14] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] whitespace-nowrap shrink-0 shadow-xs active:scale-95 disabled:opacity-50"
-        >
-          <ArrowLeft className="size-3.5 text-[#4a3520] shrink-0" />
-          <span>QUAY LẠI</span>
-        </button>
-
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-          <button
-            type="button"
-            disabled={isLoading}
-            onClick={onConfirm}
-            className="h-10 px-4 sm:px-5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#2b1f14] shadow-sm active:scale-95 whitespace-nowrap shrink-0 disabled:opacity-50"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="size-3.5 text-[#d9a066] animate-spin shrink-0" />
-                <span>ĐANG THẨM ĐỊNH...</span>
-              </>
-            ) : (
-              <>
-                <Check className="size-3.5 text-[#d9a066] shrink-0" />
-                <span>XÁC NHẬN</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
