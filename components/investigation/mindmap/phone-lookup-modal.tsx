@@ -11,30 +11,22 @@ import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '
 import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
 import { caseStorageKey } from '@/lib/cases/case-id'
 import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
+import { normalizeForMatch } from '@/lib/text'
+
+function toWords(str: string): string[] {
+  return normalizeForMatch(str)
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+}
 
 function isPhoneMatch(val: string, validKeywords: string[]): boolean {
   if (isAdminBypassCode(val)) return true
-  const normWords = val
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
+  const normWords = toWords(val)
   if (normWords.length === 0) return false
 
   return validKeywords.some((kw) => {
-    const kwWords = kw
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/đ/g, 'd')
-      .replace(/[^a-z0-9\s]/g, ' ')
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
+    const kwWords = toWords(kw)
 
     if (normWords.join('') === kwWords.join('')) return true
 

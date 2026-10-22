@@ -33,18 +33,13 @@ const DEFAULT_MOTIVE_OPTIONS = [
   { id: 'motive-6', label: 'Tâm thần (xuất phát từ vấn đề tâm lý của hung thủ)' },
 ]
 
-function normalizeName(str: string): string {
-  return str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/[^a-z0-9]/g, '')
-    .trim()
-}
-
 import { isAdminBypassCode, hasAdminBypassInArray } from '@/lib/cases/admin-bypass'
 import { caseStorageKey } from '@/lib/cases/case-id'
+import { normalizeForMatch } from '@/lib/text'
+
+function normalizeName(str: string): string {
+  return normalizeForMatch(str).replace(/[^a-z0-9]/g, '')
+}
 
 export function isCulpritValid(inputName: string): 'vu' | 'tung' | 'ha' | false {
   if (isAdminBypassCode(inputName)) return 'ha'

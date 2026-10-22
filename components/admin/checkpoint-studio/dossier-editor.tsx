@@ -18,6 +18,7 @@ import type { AvailableDocumentItem } from "@/lib/actions/dossier-config-actions
 import { saveCaseDossier } from "@/lib/actions/dossier-config-actions";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
+import { slugifyVietnamese } from "@/lib/text";
 
 interface DossierEditorProps {
   caseId?: string;
@@ -102,13 +103,7 @@ export function DossierEditor({
     }
 
     // Tự động sinh khóa định danh (key) ở phía sau từ title hoặc giữ key cũ
-    const generatedKey = title
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "");
+    const generatedKey = slugifyVietnamese(title.trim());
 
     const finalKey = dossier.dossier_key || generatedKey || "bo_ho_so";
 

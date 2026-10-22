@@ -1,7 +1,18 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { FolderOpen, X, Search, Check, Plus, Trash2, Loader2, FileText, UserCheck, ShieldAlert } from "lucide-react";
+import {
+  FolderOpen,
+  X,
+  Search,
+  Check,
+  Plus,
+  Trash2,
+  Loader2,
+  FileText,
+  UserCheck,
+  ShieldAlert,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +22,7 @@ import type { AvailableDocumentItem } from "@/lib/actions/dossier-config-actions
 import { saveCaseDossier } from "@/lib/actions/dossier-config-actions";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
+import { slugifyVietnamese } from "@/lib/text";
 
 interface DossierConfigModalProps {
   isOpen: boolean;
@@ -34,7 +46,9 @@ export function DossierConfigModal({
   const [description, setDescription] = useState("");
   const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<"all" | "loi_khai" | "ly_lich" | "evidence">("all");
+  const [activeCategory, setActiveCategory] = useState<
+    "all" | "loi_khai" | "ly_lich" | "evidence"
+  >("all");
   const [customCodeInput, setCustomCodeInput] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -60,7 +74,9 @@ export function DossierConfigModal({
     const trimmed = code.trim();
     if (!trimmed) return;
     setSelectedCodes((prev) =>
-      prev.includes(trimmed) ? prev.filter((c) => c !== trimmed) : [...prev, trimmed],
+      prev.includes(trimmed)
+        ? prev.filter((c) => c !== trimmed)
+        : [...prev, trimmed],
     );
   };
 
@@ -80,7 +96,8 @@ export function DossierConfigModal({
 
   // Lọc danh sách tài liệu hiển thị
   const filteredDocs = availableDocuments.filter((doc) => {
-    if (activeCategory !== "all" && doc.category !== activeCategory) return false;
+    if (activeCategory !== "all" && doc.category !== activeCategory)
+      return false;
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase().trim();
     return (
@@ -96,14 +113,7 @@ export function DossierConfigModal({
       return;
     }
 
-    const finalKey = (dossierKey || title)
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "");
-
+    const finalKey = slugifyVietnamese((dossierKey || title).trim());
     if (!finalKey) {
       toast.error("Vui lòng nhập mã định danh (key) cho bộ hồ sơ");
       return;
@@ -120,7 +130,9 @@ export function DossierConfigModal({
       });
 
       if (res.ok && res.dossier) {
-        toast.success(`Đã lưu ${res.dossier.title} (${res.dossier.document_codes.length} tài liệu)`);
+        toast.success(
+          `Đã lưu ${res.dossier.title} (${res.dossier.document_codes.length} tài liệu)`,
+        );
         onSaved(res.dossier);
         onClose();
       } else {
@@ -147,8 +159,15 @@ export function DossierConfigModal({
                 {title ? `Bộ Hồ Sơ: ${title}` : "Tạo Bộ Hồ Sơ Mới"}
               </h2>
               <p className="text-xs text-zinc-500">
-                Khóa kỹ thuật: <span className="font-mono text-zinc-400">{dossierKey || "tự động tạo"}</span> ·{" "}
-                <span className="font-semibold text-amber-400">{selectedCodes.length}</span> tài liệu được mở khóa
+                Khóa kỹ thuật:{" "}
+                <span className="font-mono text-zinc-400">
+                  {dossierKey || "tự động tạo"}
+                </span>{" "}
+                ·{" "}
+                <span className="font-semibold text-amber-400">
+                  {selectedCodes.length}
+                </span>{" "}
+                tài liệu được mở khóa
               </p>
             </div>
           </div>
@@ -174,14 +193,7 @@ export function DossierConfigModal({
                 onChange={(e) => {
                   setTitle(e.target.value);
                   if (!dossier.dossier_key) {
-                    setDossierKey(
-                      e.target.value
-                        .toLowerCase()
-                        .normalize("NFD")
-                        .replace(/[\u0300-\u036f]/g, "")
-                        .replace(/[^a-z0-9]+/g, "_")
-                        .replace(/^_+|_+$/g, "")
-                    );
+                    setDossierKey(slugifyVietnamese(e.target.value));
                   }
                 }}
                 placeholder="Ví dụ: Bộ A, Bộ B, Hồ Sơ Hiện Trường..."
@@ -232,7 +244,8 @@ export function DossierConfigModal({
 
             {selectedCodes.length === 0 ? (
               <p className="py-2 text-center text-xs text-zinc-600">
-                Chưa có tài liệu nào. Tích chọn tài liệu ở danh sách bên dưới hoặc thêm mã trực tiếp.
+                Chưa có tài liệu nào. Tích chọn tài liệu ở danh sách bên dưới
+                hoặc thêm mã trực tiếp.
               </p>
             ) : (
               <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
@@ -256,7 +269,10 @@ export function DossierConfigModal({
             )}
 
             {/* Quick add custom code */}
-            <form onSubmit={handleAddCustomCode} className="mt-2.5 flex items-center gap-2 border-t border-white/5 pt-2">
+            <form
+              onSubmit={handleAddCustomCode}
+              className="mt-2.5 flex items-center gap-2 border-t border-white/5 pt-2"
+            >
               <Input
                 value={customCodeInput}
                 onChange={(e) => setCustomCodeInput(e.target.value)}
@@ -360,7 +376,12 @@ export function DossierConfigModal({
 
                       {/* Title & Info */}
                       <div className="min-w-0 flex-1">
-                        <p className={cn("truncate text-xs font-medium", isChecked ? "text-zinc-100" : "text-zinc-300")}>
+                        <p
+                          className={cn(
+                            "truncate text-xs font-medium",
+                            isChecked ? "text-zinc-100" : "text-zinc-300",
+                          )}
+                        >
                           {doc.title}
                         </p>
                         {doc.description && (
@@ -372,7 +393,11 @@ export function DossierConfigModal({
 
                       {/* Category tag */}
                       <span className="shrink-0 text-[10px] uppercase tracking-wider text-zinc-600">
-                        {doc.category === "loi_khai" ? "Lời khai" : doc.category === "ly_lich" ? "Lý lịch" : "Vật chứng"}
+                        {doc.category === "loi_khai"
+                          ? "Lời khai"
+                          : doc.category === "ly_lich"
+                            ? "Lý lịch"
+                            : "Vật chứng"}
                       </span>
                     </div>
                   );
@@ -385,7 +410,9 @@ export function DossierConfigModal({
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-white/10 px-5 py-3">
           <span className="text-xs text-zinc-500">
-            Đã gán <strong className="text-amber-400">{selectedCodes.length}</strong> tài liệu vào {title || dossier.title}
+            Đã gán{" "}
+            <strong className="text-amber-400">{selectedCodes.length}</strong>{" "}
+            tài liệu vào {title || dossier.title}
           </span>
           <div className="flex items-center gap-2">
             <Button
@@ -405,7 +432,9 @@ export function DossierConfigModal({
               disabled={isSaving}
               className="bg-amber-500 text-black hover:bg-amber-400"
             >
-              {isSaving ? <Loader2 className="size-3.5 animate-spin mr-1.5" /> : null}
+              {isSaving ? (
+                <Loader2 className="size-3.5 animate-spin mr-1.5" />
+              ) : null}
               Lưu bộ hồ sơ
             </Button>
           </div>

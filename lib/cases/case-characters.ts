@@ -1,4 +1,5 @@
 import type { CaseCharacterRole, DbCaseCharacter } from "@/lib/types/database";
+import { normalizeForMatch } from "@/lib/text";
 
 /**
  * Registry nhân vật của vụ án đang chơi (nguồn: bảng `case_characters`).
@@ -44,21 +45,12 @@ export function isVictimReference(value: string | null | undefined): boolean {
   if (!victim || !raw) return false;
   const cleanId = raw.replace(/^(node-)?suspect-/, "").replace(/^avatar_/, "");
   if (cleanId === victim.key) return true;
-  const plain = stripDiacritics(raw);
+  const plain = normalizeForMatch(raw);
   const tokens = plain.split(/[^a-z0-9]+/).filter(Boolean);
   return (
-    tokens.includes(victim.key) || plain.includes(stripDiacritics(victim.name))
+    tokens.includes(victim.key) ||
+    plain.includes(normalizeForMatch(victim.name))
   );
-}
-
-function stripDiacritics(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .trim();
 }
 
 export interface KnownCasePhone {

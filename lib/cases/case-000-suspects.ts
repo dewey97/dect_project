@@ -1,5 +1,6 @@
 import { isAdminBypassCode } from "./admin-bypass";
 import { getActiveCaseCharacters, isVictimReference } from "./case-characters";
+import { normalizeForMatch } from "@/lib/text";
 
 export interface SuspectCharacter {
   id: string;
@@ -30,13 +31,7 @@ export function getValidCaseCharacters(): SuspectCharacter[] {
 }
 
 export function removeDiacritics(str: string): string {
-  return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .trim();
+  return normalizeForMatch(str);
 }
 
 export function findValidCaseCharacter(

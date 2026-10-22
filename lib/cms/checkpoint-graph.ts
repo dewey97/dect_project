@@ -1,4 +1,5 @@
 import type { DbCaseCheckpoint } from "@/lib/types/database";
+import { normalizeForMatch } from "@/lib/text";
 
 /**
  * Đồ thị phụ thuộc checkpoint cho Checkpoint Studio.
@@ -25,13 +26,7 @@ export type DependencyValidation =
   | { ok: false; error: string };
 
 function normalize(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .trim();
+  return normalizeForMatch(value);
 }
 
 function tokens(value: string): string[] {

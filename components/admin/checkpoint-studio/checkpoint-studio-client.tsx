@@ -18,6 +18,7 @@ import {
   updateCheckpointPositions,
 } from "@/lib/actions/checkpoint-actions";
 import { createNewCase } from "@/lib/actions/case-actions";
+import { slugifyVietnamese } from "@/lib/text";
 import {
   getCaseDossiers,
   getAllCaseDocumentsCatalog,
@@ -432,12 +433,7 @@ export function CheckpointStudioClient({
       if (found) {
         setActiveDossierForEdit(found);
       } else {
-        const generatedKey = label
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-z0-9]+/g, "_")
-          .replace(/^_+|_+$/g, "");
+        const generatedKey = slugifyVietnamese(label);
 
         setActiveDossierForEdit({
           id: "",

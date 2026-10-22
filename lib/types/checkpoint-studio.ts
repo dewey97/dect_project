@@ -1,4 +1,5 @@
 import type { DbCaseCheckpoint } from "./database";
+import { slugifyVietnamese } from "@/lib/text";
 
 /**
  * Checkpoint Studio (Admin) — model biên tập có cấu trúc.
@@ -69,6 +70,10 @@ export interface CheckpointStudioDraft {
   title: string;
   question: string;
   type: CheckpointStudioType;
+  /** Loại checkpoint theo gameplay (migration 26). */
+  kind: string;
+  /** Khóa nhân vật liên quan (`case_characters.key` cùng vụ). */
+  subjectKey: string;
   questionType: string;
   unlockedEvidenceId: string;
   followupOf: string;
@@ -108,17 +113,11 @@ export const EMPTY_EVIDENCE_CONFIG: EvidencePickerConfig = {
 
 /** Tạo ID kỹ thuật ngầm trong background (Game Master không cần nhập ID). */
 export function generateCheckpointKey(title?: string): string {
-  const base = (title || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "")
-    .slice(0, 24);
+  const base = slugifyVietnamese(title || "").slice(0, 24);
   const suffix = Math.random().toString(36).slice(2, 7);
-  return base ? `cp_${base}_${suffix}` : `cp_${Date.now().toString(36)}_${suffix}`;
+  return base
+    ? `cp_${base}_${suffix}`
+    : `cp_${Date.now().toString(36)}_${suffix}`;
 }
 
 export function createEmptyDraft(caseId: string): CheckpointStudioDraft {
@@ -132,6 +131,8 @@ export function createEmptyDraft(caseId: string): CheckpointStudioDraft {
     title: "",
     question: "",
     type: "evidence_picker",
+    kind: "text",
+    subjectKey: "",
     questionType: "evidence_picker",
     unlockedEvidenceId: "",
     followupOf: "",
@@ -240,6 +241,8 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     title: asString(row.title),
     question: asString(row.question),
     type: asString(row.type) || "evidence_picker",
+    kind: asString(row.kind) || "text",
+    subjectKey: asString(row.subject_key),
     questionType: asString(row.question_type) || "evidence_picker",
     unlockedEvidenceId: asString(row.unlocked_evidence_id),
     followupOf: asString(row.followup_of),
@@ -295,6 +298,8 @@ export function toRowPayload(
     title: draft.title.trim(),
     question: draft.question.trim(),
     type: draft.type.trim() || "evidence_picker",
+    kind: draft.kind.trim() || "text",
+    subject_key: draft.subjectKey.trim() || null,
     question_type: draft.questionType.trim() || draft.type.trim() || null,
     unlocked_evidence_id: draft.unlockedEvidenceId.trim() || null,
     followup_of: draft.followupOf.trim() || null,
@@ -319,7 +324,10 @@ export function toRowPayload(
         draft.answerConfig.optionalContradictionIds,
       ),
       ...(draft.answerConfig.contradictionContext?.trim()
-        ? { contradictionContext: draft.answerConfig.contradictionContext.trim() }
+        ? {
+            contradictionContext:
+              draft.answerConfig.contradictionContext.trim(),
+          }
         : {}),
       ...(draft.answerConfig.correctAnswer?.trim()
         ? { correctAnswer: draft.answerConfig.correctAnswer.trim() }

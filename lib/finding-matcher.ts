@@ -1,18 +1,13 @@
 import type { Finding } from "@/lib/types";
+import { normalizeForMatch } from "@/lib/text";
 
 /**
  * Removes Vietnamese diacritics / accents and converts string to lowercase for fuzzy matching
  */
 export function normalizeVietnameseText(str: string): string {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "d")
+  return normalizeForMatch(str)
     .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/\s+/g, " ");
 }
 
 /**
@@ -47,10 +42,16 @@ export function isVietnameseTextMatch(
   // 3. Người chơi gõ họ tên đầy đủ (VD: `Lê Quang Vũ`) khi trên Sheet chỉ để tên gọi tắt (`Vũ`)
   // BẮT BUỘC: Tên người chơi gõ phải kết thúc bằng từ của đáp án, độ dài hợp lý (<= 4 từ),
   // và KHÔNG được chứa các liên từ nối 2 người ("va", "cung", "hoac", "voi"...)
-  if (candidateWords.length === 1 && inputWords.length > 1 && inputWords.length <= 4) {
+  if (
+    candidateWords.length === 1 &&
+    inputWords.length > 1 &&
+    inputWords.length <= 4
+  ) {
     const lastWord = inputWords[inputWords.length - 1];
     const invalidConjunctions = ["va", "cung", "hoac", "voi", "khong", "phai"];
-    const hasConjunction = inputWords.some((w) => invalidConjunctions.includes(w));
+    const hasConjunction = inputWords.some((w) =>
+      invalidConjunctions.includes(w),
+    );
     if (!hasConjunction && lastWord === candidateWords[0]) {
       return true;
     }
