@@ -15,7 +15,7 @@ import { DossierResultModal } from "../dossier-result-modal";
 import { FollowupQuestionModal } from "../followup-question-modal";
 import { AdminCreatePinModal } from "../admin-create-pin-modal";
 import { CustomPinModal } from "../custom-pin-modal";
-import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
+import nextDynamic from "next/dynamic";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { detectiveAudio } from "@/lib/investigation-audio";
@@ -23,6 +23,14 @@ import { toast } from "@/components/ui/toast";
 import { setStorageItem } from "@/lib/storage";
 import type { useBoardLayout } from "./use-board-layout";
 import type { useInvestigationState, CulpritKey } from "./use-investigation-state";
+// Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.
+const ReinvestigationModal = nextDynamic(
+  () =>
+    import("@/components/investigation/evidence/reinvestigation-modal").then(
+      (m) => m.ReinvestigationModal,
+    ),
+  { ssr: false },
+);
 
 export interface CanvasModalsProps {
   layout: ReturnType<typeof useBoardLayout>;

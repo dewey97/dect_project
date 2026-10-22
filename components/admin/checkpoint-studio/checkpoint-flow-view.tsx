@@ -445,15 +445,16 @@ export function CheckpointFlowView({
 
   const [dossierPositions, setDossierPositions] = useState<
     Record<string, { x: number; y: number }>
-  >(() => {
-    if (typeof window === "undefined") return {};
+  >({});
+  // Nạp vị trí node hồ sơ đã lưu sau khi mount (tránh lệch hydration).
+  useEffect(() => {
     try {
       const raw = localStorage.getItem("checkpoint_studio_dossier_positions");
-      return raw ? JSON.parse(raw) : {};
+      if (raw) setDossierPositions(JSON.parse(raw));
     } catch {
-      return {};
+      // Bỏ qua dữ liệu hỏng, dùng vị trí mặc định.
     }
-  });
+  }, []);
 
   const handleDossierPositionChange = useCallback(
     (id: string, pos: { x: number; y: number }) => {

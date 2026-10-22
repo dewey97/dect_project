@@ -48,7 +48,7 @@ import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import { PhoneSimulator } from "@/components/phone-engine/phone-simulator";
-import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
+import nextDynamic from "next/dynamic";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
@@ -63,6 +63,14 @@ import {
 } from "@/lib/storage";
 import { caseStorageKey, normalizeCaseId } from "@/lib/cases/case-id";
 import { useInvestigationEvent } from "@/lib/investigation-events";
+// Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.
+const ReinvestigationModal = nextDynamic(
+  () =>
+    import("@/components/investigation/evidence/reinvestigation-modal").then(
+      (m) => m.ReinvestigationModal,
+    ),
+  { ssr: false },
+);
 
 type ActiveModal =
   | "phone"

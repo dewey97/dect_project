@@ -132,16 +132,26 @@ export function Scene360Viewer({
 
     const textureLoader = new THREE.TextureLoader()
     setIsLoading(true)
+    let disposed = false
+    let loadedTexture: THREE.Texture | null = null
+    let loadedMaterial: THREE.Material | null = null
 
     const loadTexture = (url: string, fallback?: string) => {
       textureLoader.load(
         url,
         (texture) => {
+          // Viewer đã đóng trước khi ảnh tải xong: giải phóng ngay, không gắn vào scene.
+          if (disposed) {
+            texture.dispose()
+            return
+          }
+          loadedTexture = texture
           texture.colorSpace = THREE.SRGBColorSpace
           texture.minFilter = THREE.LinearFilter
           texture.generateMipmaps = false
 
           const material = new THREE.MeshBasicMaterial({ map: texture })
+          loadedMaterial = material
           const mesh = new THREE.Mesh(geometry, material)
           scene.add(mesh)
           setIsLoading(false)
@@ -244,8 +254,11 @@ export function Scene360Viewer({
         resizeObserver.disconnect()
       }
       cancelAnimationFrame(state.animationFrameId)
+      disposed = true
       renderer.dispose()
       geometry.dispose()
+      loadedMaterial?.dispose()
+      loadedTexture?.dispose()
     }
   }, [imageUrl, fallbackImageUrl, hotspots, getVectorFromYawPitch, getSpotAngles, autoRotate])
 

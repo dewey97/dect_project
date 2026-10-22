@@ -86,11 +86,12 @@ export function CheckpointStudioClient({
     url.searchParams.set("case", caseId);
     window.history.replaceState(null, "", url);
   }, [caseId]);
-  const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
-    if (typeof window === "undefined") return 420;
-    const saved = localStorage.getItem("checkpoint_studio_sidebar_width");
-    return saved ? Math.max(320, Math.min(800, Number(saved))) : 420;
-  });
+  const [sidebarWidth, setSidebarWidth] = useState<number>(420);
+  // Đọc độ rộng đã lưu sau khi mount để HTML server và client khớp nhau.
+  useEffect(() => {
+    const saved = Number(localStorage.getItem("checkpoint_studio_sidebar_width"));
+    if (saved) setSidebarWidth(Math.max(320, Math.min(800, saved)));
+  }, []);
   const [isResizing, setIsResizing] = useState(false);
 
   const startResizing = useCallback((e: React.MouseEvent) => {

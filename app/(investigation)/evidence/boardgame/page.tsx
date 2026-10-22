@@ -16,7 +16,7 @@ import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
-import { ReinvestigationModal } from "@/components/investigation/evidence/reinvestigation-modal";
+import nextDynamic from "next/dynamic";
 import { HintModal } from "@/components/investigation/hint-modal";
 import {
   getStorageItem,
@@ -24,6 +24,14 @@ import {
   clearInvestigationStorage,
 } from "@/lib/storage";
 import { useInvestigationEvent } from "@/lib/investigation-events";
+// Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.
+const ReinvestigationModal = nextDynamic(
+  () =>
+    import("@/components/investigation/evidence/reinvestigation-modal").then(
+      (m) => m.ReinvestigationModal,
+    ),
+  { ssr: false },
+);
 
 type ActiveModal = "phone" | "reinvestigate" | "epilogue" | "hint" | null;
 

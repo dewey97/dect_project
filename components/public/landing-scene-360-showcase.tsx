@@ -1,18 +1,27 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   CAMERA_FOV,
   END_DISTANCE,
-  LandingKeyholeModel,
   PITCH_REST,
   PLATE_DEPTH,
   REST_DISTANCE,
   SLOT_CX,
   SLOT_CY,
   SLOT_PATH,
-} from "./landing-keyhole-model";
-import { LandingMagnifierModel } from "./landing-magnifier-model";
+} from "./landing-keyhole-geometry";
+
+// three.js / R3F chỉ tải sau khi trang đã hydrate, không nằm trong bundle đầu.
+const LandingKeyholeModel = dynamic(
+  () => import("./landing-keyhole-model").then((m) => m.LandingKeyholeModel),
+  { ssr: false },
+);
+const LandingMagnifierModel = dynamic(
+  () => import("./landing-magnifier-model").then((m) => m.LandingMagnifierModel),
+  { ssr: false },
+);
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const PANORAMA = "/images/cases/case_000/PANORAMA.webp";
