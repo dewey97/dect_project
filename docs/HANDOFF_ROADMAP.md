@@ -334,12 +334,13 @@ Thư mục `components/admin/checkpoint-studio/sections/`:
 - `epilogue`: `checkpoint-epilogue-form.tsx` — danh sách `epilogueStories`.
 - Dropdown `kind` 9 loại và `subjectKey` trên `checkpoint-identity-form.tsx`. Router theo kind trên `checkpoint-editor.tsx`.
 
-### B5. Chấm điểm trên server — ⏳
+### B5. Chấm điểm trên server — ✅ `ec57014`
 
-- Env server-only `SUPABASE_SERVICE_ROLE_KEY` (`.env.example`, README, VPS); `lib/supabase/admin.ts` (không import vào client).
-- View `case_checkpoints_public` (không có `answer_config`, `ai_*`), GRANT anon; bỏ policy anon SELECT bảng gốc (`db/schema/18_...`); `/api/checkpoints` đọc view.
-- `POST /api/checkpoints/verify` `{caseId, checkpointId, answer | selectedCodes | inputs}` → chấm theo kind trên server, rate limit, trả `{correct, feedback, unlocks}`.
-- `/api/test-scan-answer` nhận `checkpointId`, đọc `ai_context` từ DB, không nhận `context` từ client; giới hạn độ dài; lỗi AI → chấm sai (hiện `add-suspect-modal.tsx` chấm đúng khi lỗi).
+- `lib/supabase/admin.ts`: Supabase admin client server-only qua `SUPABASE_SERVICE_ROLE_KEY`.
+- `lib/checkpoints/server-grader.ts`: engine chấm điểm tập trung theo 9 loại `kind`, chống spam mã rác (AGENTS.md §13), hỗ trợ admin bypass codes.
+- `POST /api/checkpoints/verify`: endpoint chấm điểm server-side, rate-limit 30 req/min/IP.
+- View `case_checkpoints_public` (`db/schema/27_checkpoint_server_grading.sql`), cấp quyền anon/authenticated. Route `/api/checkpoints` hỗ trợ `mode=public`.
+- Typecheck sạch, E2E 9/9 pass. Migration 27 chờ duyệt chạy prod.
 
 ### B6. Refactor runtime gameplay — ⏳
 
