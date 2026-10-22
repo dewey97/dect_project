@@ -265,4 +265,45 @@ test.describe("case_000 baseline", () => {
     await expect.poll(() => storage(page, "indictment_solved")).toBe("true");
     expect(await storage(page, "indictment_culprit")).toBe("ha");
   });
+
+  test("hậu án hiển thị 4 phần có nội dung sau cáo trạng", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("intro_seen", "true");
+      localStorage.setItem("indictment_solved", "true");
+      localStorage.setItem("indictment_culprit", "ha");
+    });
+    await page.route("**/api/test-scan-answer", (route) =>
+      route.fulfill({
+        json: { isCorrect: true, confidenceScore: 95, feedback: "E2E mock" },
+      }),
+    );
+    await page.goto(CASE_URL);
+    await expect(
+      page.locator('[data-pin-id="c0-pin-indictment"]'),
+    ).toBeAttached();
+
+    // Bấm pin cáo trạng (đã giải) -> mở thẳng EpilogueModal
+    await clickPin(page, "c0-pin-indictment");
+
+    // Xác nhận modal Hậu Án hiển thị
+    await expect(
+      page.getByText("KÝ SỰ HẬU ÁN", { exact: false }).first(),
+    ).toBeVisible({
+      timeout: 10_000,
+    });
+
+    // Phải có các nút chọn phần hậu án đang hiển thị
+    const storyButtons = page
+      .locator("button:visible")
+      .filter({ hasText: /Hậu Án/i });
+    await expect(storyButtons.first()).toBeVisible();
+    const count = await storyButtons.count();
+    expect(count).toBeGreaterThanOrEqual(4);
+
+    // Phần đầu tiên phải có nội dung (TypewriterNarrator render text)
+    // Kiểm tra vùng nội dung không hiển thị trạng thái "đang cập nhật"
+    await expect(
+      page.getByText("Hồ sơ hậu án đang được cập nhật", { exact: false }),
+    ).toHaveCount(0);
+  });
 });

@@ -101,6 +101,10 @@ export interface DbCaseCheckpoint {
   title: string;
   question: string;
   type: string;
+  /** Loại checkpoint theo gameplay (migration 26). */
+  kind?: string;
+  /** Khóa nhân vật liên quan (`case_characters.key` cùng vụ). */
+  subject_key?: string | null;
   question_type: string | null;
   unlocked_evidence_id: string | null;
   followup_of: string | null;

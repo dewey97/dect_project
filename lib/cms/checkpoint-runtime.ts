@@ -1,5 +1,9 @@
 import type { DbCaseCheckpoint } from "@/lib/types/database";
-import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
+import type {
+  Checkpoint,
+  CheckpointOptionItem,
+  EpilogueStoryRuntime,
+} from "@/lib/types";
 import type { CheckpointHintGroup } from "@/lib/types/checkpoint-studio";
 
 /**
@@ -72,7 +76,9 @@ function parseTextMatchInputs(
       };
     })
     .filter(
-      (item): item is NonNullable<Checkpoint["textMatchConfig"]>["inputs"][number] =>
+      (
+        item,
+      ): item is NonNullable<Checkpoint["textMatchConfig"]>["inputs"][number] =>
         item !== null,
     );
 }
@@ -123,6 +129,24 @@ function resolveQuestionType(
   if (options.length > 0) return "choice";
   if (hasPickerConfig) return "evidence_picker";
   return type || undefined;
+}
+
+function parseEpilogueStories(
+  raw: unknown,
+): EpilogueStoryRuntime[] | undefined {
+  if (!Array.isArray(raw) || raw.length === 0) return undefined;
+  const stories = raw
+    .map((s, idx): EpilogueStoryRuntime | null => {
+      if (!s || typeof s !== "object") return null;
+      const item = s as Record<string, unknown>;
+      return {
+        id: asString(item.id) || `epilogue-${idx}`,
+        title: asString(item.title) || `Hậu Án ${idx + 1}`,
+        monologue: asString(item.monologue) || asString(item.text),
+      };
+    })
+    .filter((s): s is EpilogueStoryRuntime => s !== null && s.monologue !== "");
+  return stories.length > 0 ? stories : undefined;
 }
 
 export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
@@ -213,6 +237,13 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
   const rawAnswers = asString(config.rawAnswers);
   const narrative = asString(row.narrative);
 
+  // Parse epilogue stories từ answer_config (L1 fix)
+  const epilogueStories = parseEpilogueStories(config.epilogueStories);
+
+  // kind và subject_key (B2 migration 26)
+  const kind = asString(row.kind) || undefined;
+  const subjectKey = asString(row.subject_key) || undefined;
+
   return {
     id: row.checkpoint_id,
     caseId: row.case_id,
@@ -224,12 +255,15 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
     correctAnswer: asString(config.correctAnswer) || undefined,
     unlockedEvidenceId: row.unlocked_evidence_id || undefined,
     status: "locked",
+    kind,
+    subjectKey,
     type: (row.type || "evidence_picker") as Checkpoint["type"],
     questionType,
     inputType: questionType,
     photoCodes: asStringArray(config.photoCodes),
     textMatchConfig,
     pickerConfig,
+    epilogueStories,
     storyConfig: narrative
       ? {
           monologue: narrative,

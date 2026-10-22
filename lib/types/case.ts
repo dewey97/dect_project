@@ -155,6 +155,12 @@ export interface CheckpointOptionItem {
   description?: string;
 }
 
+export interface EpilogueStoryRuntime {
+  id: string;
+  title: string;
+  monologue: string;
+}
+
 export interface Checkpoint {
   id: string;
   caseId: string;
@@ -174,6 +180,10 @@ export interface Checkpoint {
   aiContext?: string;
   aiValidCases?: string[];
   aiInvalidCases?: string[];
+  /** Loại checkpoint theo gameplay (migration 26). */
+  kind?: string;
+  /** Khóa nhân vật liên quan (`case_characters.key` cùng vụ). */
+  subjectKey?: string;
   type?:
     "mcq" | "text_match_3" | "evidence_picker" | "convergence" | "accusation";
   questionType?:
@@ -188,6 +198,8 @@ export interface Checkpoint {
     /** Đoạn độc thoại dẫn truyện (xuống dòng bằng Alt+Enter trên Sheet). */
     monologue: string;
   };
+  /** Danh sách bài Hậu Án (chỉ có khi kind = epilogue). */
+  epilogueStories?: EpilogueStoryRuntime[];
   textMatchConfig?: {
     inputs: {
       id: string;

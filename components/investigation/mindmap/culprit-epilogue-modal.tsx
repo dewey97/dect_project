@@ -1,21 +1,23 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search } from 'lucide-react'
-import { TypewriterNarrator } from '@/components/investigation/evidence/typewriter-narrator'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search } from "lucide-react";
+import { TypewriterNarrator } from "@/components/investigation/evidence/typewriter-narrator";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 
 interface CulpritEpilogueModalProps {
-  isOpen: boolean
-  culprit: 'vu' | 'tung' | 'ha' | string | null
-  choice?: string | null
-  onClose: () => void
-  onOpenDossier?: (dossierType: 'A' | 'B' | 'C') => void
-  onOpenFollowupQuestion?: (targetCulprit?: 'vu' | 'tung' | 'ha' | string) => void
-  onOpenIndictment?: () => void
-  caseId?: string
+  isOpen: boolean;
+  culprit: "vu" | "tung" | "ha" | string | null;
+  choice?: string | null;
+  onClose: () => void;
+  onOpenDossier?: (dossierType: "A" | "B" | "C") => void;
+  onOpenFollowupQuestion?: (
+    targetCulprit?: "vu" | "tung" | "ha" | string,
+  ) => void;
+  onOpenIndictment?: () => void;
+  caseId?: string;
 }
 
 export function CulpritEpilogueModal({
@@ -26,142 +28,174 @@ export function CulpritEpilogueModal({
   onOpenDossier,
   onOpenFollowupQuestion,
   onOpenIndictment,
-  caseId = 'case-000'
+  caseId = "case-000",
 }: CulpritEpilogueModalProps) {
-  const { checkpoints } = useCaseCheckpoints(caseId)
-  const [isNarrativeComplete, setIsNarrativeComplete] = useState(false)
-  const [internalChoice, setInternalChoice] = useState<'tin' | 'khong_tin' | null>(
-    (choice === 'tin' || choice === 'khong_tin') ? choice : null
-  )
-  const [haWarrantStep, setHaWarrantStep] = useState(false)
+  const { checkpoints } = useCaseCheckpoints(caseId);
+  const [isNarrativeComplete, setIsNarrativeComplete] = useState(false);
+  const [internalChoice, setInternalChoice] = useState<
+    "tin" | "khong_tin" | null
+  >(choice === "tin" || choice === "khong_tin" ? choice : null);
+  const [haWarrantStep, setHaWarrantStep] = useState(false);
 
   React.useEffect(() => {
-    setIsNarrativeComplete(false)
-    setHaWarrantStep(false)
-    if (choice === 'tin' || choice === 'khong_tin') {
-      setInternalChoice(choice)
+    setIsNarrativeComplete(false);
+    setHaWarrantStep(false);
+    if (choice === "tin" || choice === "khong_tin") {
+      setInternalChoice(choice);
     } else {
-      setInternalChoice(null)
+      setInternalChoice(null);
     }
-  }, [culprit, choice, isOpen])
+  }, [culprit, choice, isOpen]);
 
-  if (!isOpen || !culprit) return null
+  if (!isOpen || !culprit) return null;
 
-  const isVu = culprit === 'vu'
-  const isTung = culprit === 'tung'
-  const isHa = culprit === 'ha'
+  const isVu = culprit === "vu";
+  const isTung = culprit === "tung";
+  const isHa = culprit === "ha";
   const isHaBoxSolved =
-    (isHa || caseId !== 'case-000') &&
-    (choice === 'solved_box' ||
-      choice === 'solved' ||
-      choice === 'matched_3_tiles' ||
-      choice === 'matched_3_tiles_indictment' ||
-      choice === 'indictment_ready')
-  const isQuestionSolved = (choice === '21:15' || choice === 'question_solved' || choice === 'tin' || choice === 'khong_tin') && !isHaBoxSolved
-  const showTwoChoiceButtons = (isVu || isTung || caseId !== 'case-000') && isQuestionSolved && !internalChoice
+    (isHa || caseId !== "case-000") &&
+    (choice === "solved_box" ||
+      choice === "solved" ||
+      choice === "matched_3_tiles" ||
+      choice === "matched_3_tiles_indictment" ||
+      choice === "indictment_ready");
+  const isQuestionSolved =
+    (choice === "21:15" ||
+      choice === "question_solved" ||
+      choice === "tin" ||
+      choice === "khong_tin") &&
+    !isHaBoxSolved;
+  const showTwoChoiceButtons =
+    (isVu || isTung || caseId !== "case-000") &&
+    isQuestionSolved &&
+    !internalChoice;
 
   const matchedCp = checkpoints.find(
     (c) =>
       c.id.toLowerCase() === culprit.toLowerCase() ||
       c.id.toLowerCase().includes(culprit.toLowerCase()) ||
-      c.title?.toLowerCase().includes(culprit.toLowerCase())
-  )
+      c.title?.toLowerCase().includes(culprit.toLowerCase()),
+  );
 
   const suspectName = isVu
-    ? 'Lê Quang Vũ'
+    ? "Lê Quang Vũ"
     : isTung
-    ? 'Nguyễn Thanh Tùng'
-    : isHa
-    ? 'Trần Thị Hà'
-    : matchedCp?.title?.replace(/^Hồ sơ\s*[:\s]*/i, '') || culprit || 'Nghi phạm'
+      ? "Nguyễn Thanh Tùng"
+      : isHa
+        ? "Trần Thị Hà"
+        : matchedCp?.title?.replace(/^Hồ sơ\s*[:\s]*/i, "") ||
+          culprit ||
+          "Nghi phạm";
 
   const getCheckpointMonologue = (cpId: string) => {
     const cp = checkpoints.find((c) => c.id === cpId || c.id.endsWith(cpId));
     if (cp?.storyConfig?.monologue) return cp.storyConfig.monologue;
-    const merged = checkpoints.find((c) => c.id === "cp-000-epilogue" || (c as any).answerConfig?.epilogueStories);
-    const stories: any[] = (merged as any)?.answerConfig?.epilogueStories || (merged as any)?.pickerConfig?.epilogueStories;
-    if (Array.isArray(stories)) {
-      const match = stories.find((s) => s.id === cpId || s.id?.endsWith(cpId));
+    // Tìm checkpoint epilogue tổng kết chứa epilogueStories (L1 fix)
+    const merged = checkpoints.find(
+      (c) =>
+        c.kind === "epilogue" ||
+        c.id === "cp-000-epilogue" ||
+        (c.epilogueStories && c.epilogueStories.length > 0),
+    );
+    if (merged?.epilogueStories) {
+      const match = merged.epilogueStories.find(
+        (s) => s.id === cpId || s.id?.endsWith(cpId),
+      );
       if (match?.monologue) return match.monologue;
     }
     return cp?.storyConfig?.monologue || "";
-  }
+  };
 
   let dateLabel = isVu
-    ? 'THÔNG BÁO ĐIỀU TRA — LÊ QUANG VŨ'
+    ? "THÔNG BÁO ĐIỀU TRA — LÊ QUANG VŨ"
     : isTung
-    ? 'THÔNG BÁO ĐIỀU TRA — NGUYỄN THANH TÙNG'
-    : isHaBoxSolved
-    ? `BẢN KẾT LUẬN ĐIỀU TRA — KẾT ÁN THỦ PHẠM ${suspectName.toUpperCase()}`
-    : isHa
-    ? 'THÔNG BÁO ĐIỀU TRA — TRẦN THỊ HÀ'
-    : `THÔNG BÁO ĐIỀU TRA — ${suspectName.toUpperCase()}`
+      ? "THÔNG BÁO ĐIỀU TRA — NGUYỄN THANH TÙNG"
+      : isHaBoxSolved
+        ? `BẢN KẾT LUẬN ĐIỀU TRA — KẾT ÁN THỦ PHẠM ${suspectName.toUpperCase()}`
+        : isHa
+          ? "THÔNG BÁO ĐIỀU TRA — TRẦN THỊ HÀ"
+          : `THÔNG BÁO ĐIỀU TRA — ${suspectName.toUpperCase()}`;
 
-  let storyText = ''
+  let storyText = "";
 
   if (isHaBoxSolved) {
     // Narrative kết án trực tiếp từ checkpoint kết án cp-000-2b / cp-epilogue-ha hoặc indictment checkpoint
     const dynamicIndictmentCp = checkpoints.find(
-      (c) => c.id.includes('indictment') || c.id.includes('-2b') || c.id.includes('epilogue')
-    )
+      (c) =>
+        c.id.includes("indictment") ||
+        c.id.includes("-2b") ||
+        c.id.includes("epilogue"),
+    );
     storyText =
-      getCheckpointMonologue('cp-000-2b') ||
-      getCheckpointMonologue('cp-epilogue-ha') ||
+      getCheckpointMonologue("cp-000-2b") ||
+      getCheckpointMonologue("cp-epilogue-ha") ||
       dynamicIndictmentCp?.storyConfig?.monologue ||
-      `Toàn bộ vật chứng chí mạng đã vạch trần tội ác!\n\nBức tường ngoại phạm của ${suspectName} hoàn toàn sụp đổ.\n\nĐã có đủ căn cứ pháp lý đanh thép để khởi tố và định tội hung thủ!`
+      `Toàn bộ vật chứng chí mạng đã vạch trần tội ác!\n\nBức tường ngoại phạm của ${suspectName} hoàn toàn sụp đổ.\n\nĐã có đủ căn cứ pháp lý đanh thép để khởi tố và định tội hung thủ!`;
   } else if (showTwoChoiceButtons) {
-    storyText = `Toàn bộ hành tung của ${suspectName} trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?`
-  } else if (internalChoice === 'tin') {
-    storyText = `Bạn lựa chọn tạm thời tin tưởng ${suspectName}.\n\nHãy chuyển hướng điều tra vụ án.\nTuy nhiên, xin các thám tử nhớ rằng: Một người chỉ được kết luận vô tội khi bạn tìm ra được hung thủ thực sự.`
-  } else if (internalChoice === 'khong_tin') {
+    storyText = `Toàn bộ hành tung của ${suspectName} trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?`;
+  } else if (internalChoice === "tin") {
+    storyText = `Bạn lựa chọn tạm thời tin tưởng ${suspectName}.\n\nHãy chuyển hướng điều tra vụ án.\nTuy nhiên, xin các thám tử nhớ rằng: Một người chỉ được kết luận vô tội khi bạn tìm ra được hung thủ thực sự.`;
+  } else if (internalChoice === "khong_tin") {
     if (isHa && haWarrantStep) {
-      storyText = getCheckpointMonologue('cp-000-2b')
+      storyText = getCheckpointMonologue("cp-000-2b");
     } else {
-      storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`
+      storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`;
     }
   } else {
-    const suspectCpId = isVu ? 'cp-000-1a' : isTung ? 'cp-000-1b' : isHa ? 'cp-000-1c' : `cp-${culprit}`
-    const epilogueCpId = isVu ? 'cp-epilogue-mai-vu' : isTung ? 'cp-epilogue-tung' : isHa ? 'cp-epilogue-ha' : `cp-epilogue-${culprit}`
+    const suspectCpId = isVu
+      ? "cp-000-1a"
+      : isTung
+        ? "cp-000-1b"
+        : isHa
+          ? "cp-000-1c"
+          : `cp-${culprit}`;
+    const epilogueCpId = isVu
+      ? "cp-epilogue-mai-vu"
+      : isTung
+        ? "cp-epilogue-tung"
+        : isHa
+          ? "cp-epilogue-ha"
+          : `cp-epilogue-${culprit}`;
     storyText =
       getCheckpointMonologue(suspectCpId) ||
       getCheckpointMonologue(epilogueCpId) ||
       matchedCp?.storyConfig?.monologue ||
-      `Hồ sơ điều tra của đối tượng ${suspectName} đã được ghi nhận vào hệ thống.`
+      `Hồ sơ điều tra của đối tượng ${suspectName} đã được ghi nhận vào hệ thống.`;
   }
 
-  let ctaButtonText = 'TIẾP TỤC ĐIỀU TRA'
+  let ctaButtonText = "TIẾP TỤC ĐIỀU TRA";
   if (isHaBoxSolved) {
-    ctaButtonText = 'LẬP BẢN CÁO TRẠNG ĐỊNH TỘI'
+    ctaButtonText = "LẬP BẢN CÁO TRẠNG ĐỊNH TỘI";
   } else if (!choice && !internalChoice) {
-    ctaButtonText = 'Bắt đầu điều tra'
-  } else if (internalChoice === 'tin') {
-    ctaButtonText = 'Chuyển hướng điều tra'
-  } else if (internalChoice === 'khong_tin') {
+    ctaButtonText = "Bắt đầu điều tra";
+  } else if (internalChoice === "tin") {
+    ctaButtonText = "Chuyển hướng điều tra";
+  } else if (internalChoice === "khong_tin") {
     if (isHa) {
-      ctaButtonText = haWarrantStep ? 'Tiến hành khám xét' : 'Mở rộng điều tra'
+      ctaButtonText = haWarrantStep ? "Tiến hành khám xét" : "Mở rộng điều tra";
     } else {
-      ctaButtonText = 'Mở rộng điều tra'
+      ctaButtonText = "Mở rộng điều tra";
     }
   }
 
   const handleCtaClick = () => {
-    detectiveAudio.playStampSound()
+    detectiveAudio.playStampSound();
     if (isHaBoxSolved) {
-      onClose()
+      onClose();
       if (onOpenIndictment) {
-        onOpenIndictment()
+        onOpenIndictment();
       }
-      return
+      return;
     }
     if (!choice && !internalChoice) {
-      onClose()
+      onClose();
       if (onOpenFollowupQuestion) {
-        onOpenFollowupQuestion(culprit || undefined)
+        onOpenFollowupQuestion(culprit || undefined);
       }
     } else {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   return (
     <AnimatePresence>
@@ -180,7 +214,7 @@ export function CulpritEpilogueModal({
             {/* Typewriter Monologue */}
             <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
               <TypewriterNarrator
-                key={`${culprit}-${internalChoice || (showTwoChoiceButtons ? 'choice' : 'default')}-${haWarrantStep}`}
+                key={`${culprit}-${internalChoice || (showTwoChoiceButtons ? "choice" : "default")}-${haWarrantStep}`}
                 text={storyText}
                 speed={12}
                 onComplete={() => setIsNarrativeComplete(true)}
@@ -194,8 +228,8 @@ export function CulpritEpilogueModal({
               <button
                 type="button"
                 onClick={() => {
-                  detectiveAudio.playPaperRustle()
-                  setInternalChoice('tin')
+                  detectiveAudio.playPaperRustle();
+                  setInternalChoice("tin");
                 }}
                 className="py-3.5 bg-[#2e5220] hover:bg-[#203a16] text-[#f6f1e5] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 border-2 border-[#193310] active:scale-[0.99]"
               >
@@ -205,8 +239,8 @@ export function CulpritEpilogueModal({
               <button
                 type="button"
                 onClick={() => {
-                  detectiveAudio.playGlassSound()
-                  setInternalChoice('khong_tin')
+                  detectiveAudio.playGlassSound();
+                  setInternalChoice("khong_tin");
                 }}
                 className="py-3.5 bg-[#8c1d1d] hover:bg-[#a82424] text-[#fff5f5] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 border-2 border-[#5c1313] active:scale-[0.99]"
               >
@@ -228,5 +262,5 @@ export function CulpritEpilogueModal({
         </div>
       </div>
     </AnimatePresence>
-  )
+  );
 }

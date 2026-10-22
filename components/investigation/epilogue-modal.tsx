@@ -43,23 +43,19 @@ export function EpilogueModal({
 
   // Đọc các bài Hậu Án từ Checkpoint Studio (Supabase) qua useCaseCheckpoints
   const epilogueStories = useMemo(() => {
-    // 1. Kiểm tra checkpoint tổng kết hậu án gộp (Merged Epilogue Checkpoint)
+    // 1. Tìm checkpoint epilogue tổng kết (kind = epilogue hoặc id cp-000-epilogue)
     const mergedCp = checkpoints.find(
       (c) =>
+        c.kind === "epilogue" ||
         c.id === "cp-000-epilogue" ||
-        (c as any).type === "epilogue" ||
-        Boolean((c as any).answerConfig?.epilogueStories) ||
-        Boolean((c.pickerConfig as any)?.epilogueStories),
+        (c.epilogueStories && c.epilogueStories.length > 0),
     );
-    const mergedList =
-      (mergedCp as any)?.answerConfig?.epilogueStories ||
-      (mergedCp?.pickerConfig as any)?.epilogueStories;
 
-    if (Array.isArray(mergedList) && mergedList.length > 0) {
-      return mergedList.map((story: any, idx: number) => ({
+    if (mergedCp?.epilogueStories && mergedCp.epilogueStories.length > 0) {
+      return mergedCp.epilogueStories.map((story, idx) => ({
         id: story.id || `epilogue-${idx}`,
         title: story.title || `Hậu Án ${idx + 1}`,
-        monologue: story.monologue || story.text || "",
+        monologue: story.monologue || "",
       }));
     }
 
@@ -77,6 +73,7 @@ export function EpilogueModal({
     // Dynamic case: Tìm toàn bộ checkpoints có hậu án hoặc epilogue
     const dynamicEpilogues = checkpoints.filter(
       (c) =>
+        c.kind === "epilogue" ||
         c.id.includes("epilogue") ||
         c.id.includes("hau-an") ||
         c.title?.toLowerCase().includes("hậu án"),
