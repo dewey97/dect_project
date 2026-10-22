@@ -27,10 +27,63 @@ interface MessagesAppProps {
   onBackToHome?: () => void;
 }
 
+interface MessageAttachment {
+  type: "audio" | "image" | "video";
+  url: string;
+  duration?: string;
+}
+
+interface ParsedMessage {
+  id: string;
+  sender: string;
+  role: "sent" | "received" | string;
+  text: string;
+  timestamp: string;
+  attachment?: MessageAttachment;
+  isClue: boolean;
+  clueTitle: string;
+  clueAnalysis: string;
+  code?: string;
+}
+
+interface MessageThread {
+  id: string;
+  name: string;
+  phoneNumber: string;
+  unread: boolean;
+  timestamp: string;
+  previewText: string;
+  code?: string;
+  messages: ParsedMessage[];
+}
+
+interface RawMessageThreadRow {
+  thread_id?: string;
+  id?: string;
+  message_id?: string;
+  name?: string;
+  contact_name?: string;
+  sender_name?: string;
+  phone_number?: string;
+  avatar_url?: string;
+  unread?: string | boolean;
+  unread_count?: number;
+  timestamp?: string;
+  last_time?: string;
+  preview_text?: string;
+  last_message?: string;
+  messages_json?: string | unknown[];
+  messages_text?: string;
+}
+
 export function MessagesApp({ onBackToHome }: MessagesAppProps) {
-  const [selectedThread, setSelectedThread] = useState<any | null>(null);
+  const [selectedThread, setSelectedThread] = useState<MessageThread | null>(
+    null,
+  );
   const [searchQuery, setSearchQuery] = useState("");
-  const [inspectingClue, setInspectingClue] = useState<any | null>(null);
+  const [inspectingClue, setInspectingClue] = useState<ParsedMessage | null>(
+    null,
+  );
   const [pinnedClueIds, setPinnedClueIds] = useState<string[]>([]);
   const [pinnedNotification, setPinnedNotification] = useState<string | null>(
     null,
@@ -78,15 +131,17 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   }, [activeAudioId]);
 
   // Map CMS rows to thread objects
-  const threads = rawMessagesData.map((item: any, idx: number) => {
-    let parsedMessages: any[] = [];
+  const threads: MessageThread[] = (
+    rawMessagesData as RawMessageThreadRow[]
+  ).map((item: RawMessageThreadRow, idx: number): MessageThread => {
+    let parsedMessages: ParsedMessage[] = [];
 
     if (item.messages_json) {
       try {
         parsedMessages =
           typeof item.messages_json === "string"
             ? JSON.parse(item.messages_json)
-            : item.messages_json;
+            : (item.messages_json as ParsedMessage[]);
       } catch {}
     }
 
@@ -96,7 +151,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
         .map((l) => l.trim())
         .filter(Boolean);
 
-      parsedMessages = lines.map((line, mIdx) => {
+      parsedMessages = lines.map((line, mIdx): ParsedMessage => {
         const isSent = line.startsWith(">");
         let cleanLine = isSent ? line.substring(1).trim() : line;
 
@@ -118,7 +173,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
         }
 
         // 2. Parse attachments: [AUDIO: url | duration], [IMAGE: url], [VIDEO: url]
-        let attachment: any = null;
+        let attachment: MessageAttachment | undefined = undefined;
 
         const audioMatch = cleanLine.match(
           /\[AUDIO:\s*([^|\]]+)(?:\s*\|\s*([^\]]+))?\]/i,
@@ -128,9 +183,11 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           const duration = audioMatch[2]?.trim() || "0:08";
           attachment = {
             type: "audio",
-            url: rawUrl.includes("drive.google.com") || rawUrl.match(/\/file\/d\/[a-zA-Z0-9_-]+/)
-              ? `/api/audio-proxy?id=${(rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/))?.[1]}`
-              : normalizeMediaUrl(rawUrl),
+            url:
+              rawUrl.includes("drive.google.com") ||
+              rawUrl.match(/\/file\/d\/[a-zA-Z0-9_-]+/)
+                ? `/api/audio-proxy?id=${(rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/))?.[1]}`
+                : normalizeMediaUrl(rawUrl),
             duration,
           };
           cleanLine = cleanLine.replace(audioMatch[0], "").trim();
@@ -158,7 +215,11 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
               const part = vnAudioWithLinkMatch[5].trim();
               if (/^[0-9:]+$/.test(part)) {
                 duration = part;
-              } else if (part.includes("http") || part.includes("/") || part.includes("drive")) {
+              } else if (
+                part.includes("http") ||
+                part.includes("/") ||
+                part.includes("drive")
+              ) {
                 rawUrl = part;
               }
             }
@@ -172,9 +233,11 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
 
             attachment = {
               type: "audio",
-              url: rawUrl.includes("drive.google.com") || rawUrl.match(/\/file\/d\/[a-zA-Z0-9_-]+/)
-                ? `/api/audio-proxy?id=${(rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/))?.[1]}`
-                : normalizeMediaUrl(rawUrl),
+              url:
+                rawUrl.includes("drive.google.com") ||
+                rawUrl.match(/\/file\/d\/[a-zA-Z0-9_-]+/)
+                  ? `/api/audio-proxy?id=${(rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/))?.[1]}`
+                  : normalizeMediaUrl(rawUrl),
               duration,
             };
             cleanLine = cleanLine.replace(vnAudioWithLinkMatch[0], "").trim();
@@ -226,8 +289,17 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     }
 
     const isUnread = item.unread === "TRUE" || item.unread === true;
-    const lastParsedMsg = parsedMessages.length > 0 ? parsedMessages[parsedMessages.length - 1] : null;
-    const resolvedTimestamp = item.timestamp || (lastParsedMsg?.timestamp ? lastParsedMsg.timestamp.replace(/^.*\s*•\s*/, "") : "") || (lastParsedMsg?.timestamp || "");
+    const lastParsedMsg =
+      parsedMessages.length > 0
+        ? parsedMessages[parsedMessages.length - 1]
+        : null;
+    const resolvedTimestamp =
+      item.timestamp ||
+      (lastParsedMsg?.timestamp
+        ? lastParsedMsg.timestamp.replace(/^.*\s*•\s*/, "")
+        : "") ||
+      lastParsedMsg?.timestamp ||
+      "";
 
     return {
       id: item.message_id || `conv-${idx + 1}`,
@@ -241,26 +313,57 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           ? lastParsedMsg.attachment?.type === "audio"
             ? "🎙️ Tin nhắn thoại"
             : lastParsedMsg.attachment?.type === "image"
-            ? "📷 Hình ảnh"
-            : lastParsedMsg.attachment?.type === "video"
-            ? "📹 Video"
-            : lastParsedMsg.text
+              ? "📷 Hình ảnh"
+              : lastParsedMsg.attachment?.type === "video"
+                ? "📹 Video"
+                : lastParsedMsg.text
           : ""),
-      messages: parsedMessages.map((m: any, mIdx: number) => ({
-        id: m.id || `msg-${idx}-${mIdx}`,
-        sender: m.sender || m.role || item.contact_name,
-        role: m.role || (m.sender === "Khang" ? "sent" : "received"),
-        text: m.text || m.content || "",
-        timestamp: m.timestamp || "",
-        attachment: m.attachment || (m.media_url ? {
-          type: m.media_type || "image",
-          url: m.media_type === "audio" || m.media_type === "video" ? normalizeMediaUrl(m.media_url) : normalizeImageUrl(m.media_url),
-          duration: m.duration
-        } : undefined),
-        isClue: m.isClue || m.is_clue === "TRUE" || m.is_clue === true,
-        clueTitle: m.clueTitle || m.clue_title || "",
-        clueAnalysis: m.clueAnalysis || m.clue_analysis || "",
-      })),
+      messages: parsedMessages.map(
+        (m: ParsedMessage, mIdx: number): ParsedMessage => ({
+          id: m.id || `msg-${idx}-${mIdx}`,
+          sender: m.sender || m.role || item.contact_name || "",
+          role: m.role || (m.sender === "Khang" ? "sent" : "received"),
+          text: m.text || (m as { content?: string }).content || "",
+          timestamp: m.timestamp || "",
+          attachment:
+            m.attachment ||
+            ((m as unknown as { media_url?: string }).media_url
+              ? {
+                  type:
+                    (
+                      m as unknown as {
+                        media_type?: "audio" | "image" | "video";
+                      }
+                    ).media_type || "image",
+                  url:
+                    (m as unknown as { media_type?: string }).media_type ===
+                      "audio" ||
+                    (m as unknown as { media_type?: string }).media_type ===
+                      "video"
+                      ? normalizeMediaUrl(
+                          (m as unknown as { media_url: string }).media_url,
+                        )
+                      : normalizeImageUrl(
+                          (m as unknown as { media_url: string }).media_url,
+                        ),
+                  duration: (m as unknown as { duration?: string }).duration,
+                }
+              : undefined),
+          isClue:
+            m.isClue ||
+            (m as unknown as { is_clue?: string | boolean }).is_clue ===
+              "TRUE" ||
+            (m as unknown as { is_clue?: string | boolean }).is_clue === true,
+          clueTitle:
+            m.clueTitle ||
+            (m as unknown as { clue_title?: string }).clue_title ||
+            "",
+          clueAnalysis:
+            m.clueAnalysis ||
+            (m as { clue_analysis?: string }).clue_analysis ||
+            "",
+        }),
+      ),
     };
   });
 
@@ -285,7 +388,9 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   };
 
   // Audio durations dynamically loaded from files (msgId -> mm:ss)
-  const [loadedDurations, setLoadedDurations] = useState<Record<string, string>>({});
+  const [loadedDurations, setLoadedDurations] = useState<
+    Record<string, string>
+  >({});
 
   // Helper format seconds to mm:ss
   const formatTime = (seconds: number) => {
@@ -351,7 +456,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   };
 
   const filteredThreads = threads.filter(
-    (t: any) =>
+    (t: MessageThread) =>
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.previewText.toLowerCase().includes(searchQuery.toLowerCase()),
   );
@@ -399,7 +504,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             <button
               onClick={() => {
                 const firstClue = selectedThread.messages.find(
-                  (m: any) => m.isClue,
+                  (m: ParsedMessage) => m.isClue,
                 );
                 if (firstClue) setInspectingClue(firstClue);
               }}
@@ -418,14 +523,24 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
               </span>
             </div>
 
-            {selectedThread.messages.map((msg: any, mIdx: number) => {
+            {selectedThread.messages.map((msg: ParsedMessage, mIdx: number) => {
               const isMe = msg.role === "sent";
               const isPinned = pinnedClueIds.includes(msg.id);
               const attachment = msg.attachment;
-              const msgCode = msg.code || (msg.isClue ? `CLUE-${String(mIdx + 1).padStart(2, "0")}` : `MSG-${String(mIdx + 1).padStart(2, "0")}`);
+              const msgCode =
+                msg.code ||
+                (msg.isClue
+                  ? `CLUE-${String(mIdx + 1).padStart(2, "0")}`
+                  : `MSG-${String(mIdx + 1).padStart(2, "0")}`);
 
               return (
-                <div key={msg.id} className={cn("flex flex-col w-full", isMe ? "items-end" : "items-start")}>
+                <div
+                  key={msg.id}
+                  className={cn(
+                    "flex flex-col w-full",
+                    isMe ? "items-end" : "items-start",
+                  )}
+                >
                   <EvidenceAnchorItem
                     code={msgCode}
                     className={cn(
@@ -433,59 +548,63 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                       isMe ? "self-end items-end" : "self-start items-start",
                     )}
                   >
-                  {/* ATTACHMENT: AUDIO / VOICE MESSAGE */}
-                  {attachment?.type === "audio" && (
-                    <div
-                      className={cn(
-                        "rounded-[20px] p-2.5 px-3.5 mb-1 shadow-xs relative transition-all flex items-center gap-3 min-w-[210px]",
-                        isMe
-                          ? "bg-[#0058BC] text-white rounded-br-[4px]"
-                          : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
-                      )}
-                    >
-                      <button
-                        onClick={() => togglePlayAudio(msg.id, attachment.url)}
+                    {/* ATTACHMENT: AUDIO / VOICE MESSAGE */}
+                    {attachment?.type === "audio" && (
+                      <div
                         className={cn(
-                          "size-8 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 cursor-pointer shadow-xs",
+                          "rounded-[20px] p-2.5 px-3.5 mb-1 shadow-xs relative transition-all flex items-center gap-3 min-w-[210px]",
                           isMe
-                            ? "bg-white text-[#0058BC] hover:bg-slate-100"
-                            : "bg-[#0058BC] text-white hover:bg-[#004899]",
+                            ? "bg-[#0058BC] text-white rounded-br-[4px]"
+                            : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
                         )}
-                        title="Nghe tin nhắn thoại"
                       >
-                        {activeAudioId === msg.id && isPlayingAudio ? (
-                          <Pause className="size-4 fill-current" />
-                        ) : (
-                          <Play className="size-4 fill-current ml-0.5" />
-                        )}
-                      </button>
+                        <button
+                          onClick={() =>
+                            togglePlayAudio(msg.id, attachment.url)
+                          }
+                          className={cn(
+                            "size-8 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 cursor-pointer shadow-xs",
+                            isMe
+                              ? "bg-white text-[#0058BC] hover:bg-slate-100"
+                              : "bg-[#0058BC] text-white hover:bg-[#004899]",
+                          )}
+                          title="Nghe tin nhắn thoại"
+                        >
+                          {activeAudioId === msg.id && isPlayingAudio ? (
+                            <Pause className="size-4 fill-current" />
+                          ) : (
+                            <Play className="size-4 fill-current ml-0.5" />
+                          )}
+                        </button>
 
-                      <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <span
-                            className={cn(
-                              "text-[11px] font-semibold tracking-wide uppercase flex items-center gap-1",
-                              isMe ? "text-white/80" : "text-[#717786]",
-                            )}
-                          >
-                            <Volume2 className="size-3" /> Tin nhắn thoại
-                          </span>
-                          <span
-                            className={cn(
-                              "text-[11px] font-mono",
-                              isMe ? "text-white/90" : "text-[#414755]",
-                            )}
-                          >
-                            {loadedDurations[msg.id] ||
-                              attachment.duration ||
-                              "0:08"}
-                          </span>
-                        </div>
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <span
+                              className={cn(
+                                "text-[11px] font-semibold tracking-wide uppercase flex items-center gap-1",
+                                isMe ? "text-white/80" : "text-[#717786]",
+                              )}
+                            >
+                              <Volume2 className="size-3" /> Tin nhắn thoại
+                            </span>
+                            <span
+                              className={cn(
+                                "text-[11px] font-mono",
+                                isMe ? "text-white/90" : "text-[#414755]",
+                              )}
+                            >
+                              {loadedDurations[msg.id] ||
+                                attachment.duration ||
+                                "0:08"}
+                            </span>
+                          </div>
 
-                        {/* Audio Waveform visualization */}
-                        <div className="h-3 flex items-center gap-[3px] w-full">
-                          {[30, 70, 45, 90, 60, 100, 40, 80, 50, 85, 30, 95, 60, 40, 70].map(
-                            (heightPercent, barIdx) => {
+                          {/* Audio Waveform visualization */}
+                          <div className="h-3 flex items-center gap-[3px] w-full">
+                            {[
+                              30, 70, 45, 90, 60, 100, 40, 80, 50, 85, 30, 95,
+                              60, 40, 70,
+                            ].map((heightPercent, barIdx) => {
                               const barThreshold = (barIdx / 15) * 100;
                               const isPast =
                                 activeAudioId === msg.id &&
@@ -500,132 +619,133 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                                         ? "bg-white"
                                         : "bg-white/40"
                                       : isPast
-                                      ? "bg-[#0058BC]"
-                                      : "bg-[#C1C6D7]",
+                                        ? "bg-[#0058BC]"
+                                        : "bg-[#C1C6D7]",
                                   )}
                                   style={{ height: `${heightPercent}%` }}
                                 />
                               );
-                            },
-                          )}
+                            })}
+                          </div>
                         </div>
+
+                        {isPinned && (
+                          <span className="absolute -top-1 -right-1 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
+                            ★
+                          </span>
+                        )}
                       </div>
+                    )}
 
-                      {isPinned && (
-                        <span className="absolute -top-1 -right-1 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
-                          ★
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ATTACHMENT: IMAGE */}
-                  {attachment?.type === "image" && (
-                    <div
-                      onClick={() =>
-                        setMediaPreview({
-                          type: "image",
-                          url: attachment.url,
-                          title: msg.text || "Ảnh đính kèm",
-                        })
-                      }
-                      className={cn(
-                        "rounded-[16px] overflow-hidden mb-1 shadow-xs border border-[#E3E2E7] cursor-pointer hover:opacity-95 transition-opacity max-w-[240px] relative group",
-                        isMe ? "rounded-br-[4px]" : "rounded-bl-[4px]",
-                      )}
-                    >
-                      <img
-                        src={attachment.url}
-                        alt="Đính kèm"
-                        className="w-full max-h-[220px] object-cover bg-black/5"
-                        loading="lazy"
-                      />
-                      <div className="absolute bottom-1.5 right-1.5 bg-black/60 backdrop-blur-xs text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Maximize2 className="size-3.5" />
-                      </div>
-                      {isPinned && (
-                        <span className="absolute top-1.5 right-1.5 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
-                          ★
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ATTACHMENT: VIDEO / ANIMATED GIF */}
-                  {attachment?.type === "video" && (
-                    <div
-                      onClick={() =>
-                        setMediaPreview({
-                          type: "video",
-                          url: attachment.url,
-                          title: msg.text || "Video đính kèm",
-                        })
-                      }
-                      className={cn(
-                        "rounded-[16px] overflow-hidden mb-1 shadow-xs border border-[#E3E2E7] cursor-pointer hover:opacity-95 transition-opacity max-w-[240px] relative bg-black aspect-video flex items-center justify-center group",
-                        isMe ? "rounded-br-[4px]" : "rounded-bl-[4px]",
-                      )}
-                    >
-                      {/* If it's a GIF or image proxy, render the live animated preview */}
-                      {attachment.url.includes("lh3.googleusercontent.com") || attachment.url.includes("image-proxy") || attachment.url.endsWith(".gif") ? (
+                    {/* ATTACHMENT: IMAGE */}
+                    {attachment?.type === "image" && (
+                      <div
+                        onClick={() =>
+                          setMediaPreview({
+                            type: "image",
+                            url: attachment.url,
+                            title: msg.text || "Ảnh đính kèm",
+                          })
+                        }
+                        className={cn(
+                          "rounded-[16px] overflow-hidden mb-1 shadow-xs border border-[#E3E2E7] cursor-pointer hover:opacity-95 transition-opacity max-w-[240px] relative group",
+                          isMe ? "rounded-br-[4px]" : "rounded-bl-[4px]",
+                        )}
+                      >
                         <img
                           src={attachment.url}
-                          alt="Video Preview"
-                          className="w-full h-full object-cover"
+                          alt="Đính kèm"
+                          className="w-full max-h-[220px] object-cover bg-black/5"
                           loading="lazy"
                         />
-                      ) : (
-                        <video
-                          src={attachment.url}
-                          className="w-full h-full object-cover"
-                          muted
-                          playsInline
-                        />
-                      )}
-
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                        <div className="size-10 rounded-full bg-white/80 group-hover:bg-white text-[#1A1B1F] flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                          <Play className="size-5 fill-current ml-0.5" />
+                        <div className="absolute bottom-1.5 right-1.5 bg-black/60 backdrop-blur-xs text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Maximize2 className="size-3.5" />
                         </div>
+                        {isPinned && (
+                          <span className="absolute top-1.5 right-1.5 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
+                            ★
+                          </span>
+                        )}
                       </div>
+                    )}
 
-                      <span className="absolute bottom-1.5 left-2 text-[10px] text-white/90 font-medium flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded backdrop-blur-xs">
-                        <Film className="size-3" /> Video
+                    {/* ATTACHMENT: VIDEO / ANIMATED GIF */}
+                    {attachment?.type === "video" && (
+                      <div
+                        onClick={() =>
+                          setMediaPreview({
+                            type: "video",
+                            url: attachment.url,
+                            title: msg.text || "Video đính kèm",
+                          })
+                        }
+                        className={cn(
+                          "rounded-[16px] overflow-hidden mb-1 shadow-xs border border-[#E3E2E7] cursor-pointer hover:opacity-95 transition-opacity max-w-[240px] relative bg-black aspect-video flex items-center justify-center group",
+                          isMe ? "rounded-br-[4px]" : "rounded-bl-[4px]",
+                        )}
+                      >
+                        {/* If it's a GIF or image proxy, render the live animated preview */}
+                        {attachment.url.includes("lh3.googleusercontent.com") ||
+                        attachment.url.includes("image-proxy") ||
+                        attachment.url.endsWith(".gif") ? (
+                          <img
+                            src={attachment.url}
+                            alt="Video Preview"
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <video
+                            src={attachment.url}
+                            className="w-full h-full object-cover"
+                            muted
+                            playsInline
+                          />
+                        )}
+
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                          <div className="size-10 rounded-full bg-white/80 group-hover:bg-white text-[#1A1B1F] flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                            <Play className="size-5 fill-current ml-0.5" />
+                          </div>
+                        </div>
+
+                        <span className="absolute bottom-1.5 left-2 text-[10px] text-white/90 font-medium flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded backdrop-blur-xs">
+                          <Film className="size-3" /> Video
+                        </span>
+                        {isPinned && (
+                          <span className="absolute top-1.5 right-1.5 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
+                            ★
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* REGULAR TEXT BUBBLE (If text exists) */}
+                    {Boolean(msg.text) && (
+                      <div
+                        className={cn(
+                          "rounded-[18px] px-3 py-1.5 text-[14.5px] leading-snug shadow-xs relative transition-all font-normal",
+                          isMe
+                            ? "bg-[#0058BC] text-white rounded-br-[4px]"
+                            : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
+                        )}
+                      >
+                        <p className="whitespace-pre-wrap break-words">
+                          {msg.text}
+                        </p>
+                        {isPinned && !attachment && (
+                          <span className="absolute -top-1 -right-1 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
+                            ★
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {msg.timestamp && (
+                      <span className="text-[11px] text-[#717786] font-normal mt-0.5 px-1">
+                        {msg.timestamp}
                       </span>
-                      {isPinned && (
-                        <span className="absolute top-1.5 right-1.5 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
-                          ★
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* REGULAR TEXT BUBBLE (If text exists) */}
-                  {Boolean(msg.text) && (
-                    <div
-                      className={cn(
-                        "rounded-[18px] px-3 py-1.5 text-[14.5px] leading-snug shadow-xs relative transition-all font-normal",
-                        isMe
-                          ? "bg-[#0058BC] text-white rounded-br-[4px]"
-                          : "bg-[#E9E7ED] text-[#1A1B1F] rounded-bl-[4px]",
-                      )}
-                    >
-                      <p className="whitespace-pre-wrap break-words">
-                        {msg.text}
-                      </p>
-                      {isPinned && !attachment && (
-                        <span className="absolute -top-1 -right-1 size-4 bg-[#FF3B30] rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-xs">
-                          ★
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {msg.timestamp && (
-                    <span className="text-[11px] text-[#717786] font-normal mt-0.5 px-1">
-                      {msg.timestamp}
-                    </span>
-                  )}
+                    )}
                   </EvidenceAnchorItem>
                 </div>
               );
@@ -674,9 +794,16 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto no-scrollbar divide-y divide-[#E3E2E7] bg-[#FAF9FE] pb-10">
-              {filteredThreads.map((thread: any, idx: number) => {
-                const threadCode = thread.code || thread.id || `MSG-${String(idx + 1).padStart(2, "0")}`;
-                const displayCode = threadCode.startsWith("MSG-") || threadCode.startsWith("CLUE-") ? threadCode : `MSG-${String(idx + 1).padStart(2, "0")}`;
+              {filteredThreads.map((thread: MessageThread, idx: number) => {
+                const threadCode =
+                  thread.code ||
+                  thread.id ||
+                  `MSG-${String(idx + 1).padStart(2, "0")}`;
+                const displayCode =
+                  threadCode.startsWith("MSG-") ||
+                  threadCode.startsWith("CLUE-")
+                    ? threadCode
+                    : `MSG-${String(idx + 1).padStart(2, "0")}`;
                 return (
                   <EvidenceAnchorItem key={thread.id} code={displayCode}>
                     <div
@@ -771,7 +898,10 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           <div className="w-full max-w-[340px] flex flex-col items-center">
             <div className="w-full flex items-center justify-between pb-2 text-white/80">
               <span className="text-[12px] font-medium truncate max-w-[240px]">
-                {mediaPreview.title || (mediaPreview.type === "image" ? "Xem hình ảnh" : "Phát video")}
+                {mediaPreview.title ||
+                  (mediaPreview.type === "image"
+                    ? "Xem hình ảnh"
+                    : "Phát video")}
               </span>
               <button
                 onClick={() => setMediaPreview(null)}

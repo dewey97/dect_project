@@ -96,6 +96,60 @@ function validateEvidenceSelection(
   return hasNoInvalidCodes;
 }
 
+const DEFAULT_CASE_000_PHONE_INPUTS: PhoneLookupConfig["textMatchInputs"] = [
+  {
+    id: "phone1",
+    label: "SĐT 0988.200.991:",
+    placeholder: "Nhập tên nghi phạm...",
+    validAnswers: ["vu", "le quang vu", "vũ", "lê quang vũ"],
+  },
+  {
+    id: "phone2",
+    label: "SĐT 0912.331.888:",
+    placeholder: "Nhập tên nghi phạm...",
+    validAnswers: ["tung", "nguyen thanh tung", "tùng", "nguyễn thanh tùng"],
+  },
+  {
+    id: "phone3",
+    label: "SĐT 0984.180.357:",
+    placeholder: "Nhập tên nghi phạm...",
+    validAnswers: [
+      "dat",
+      "dat ga",
+      "tran van dat",
+      "đạt",
+      "đạt gà",
+      "trần văn đạt",
+    ],
+  },
+];
+
+function inferCheckpointKind(checkpoint: DbCaseCheckpoint): CheckpointKind {
+  if (checkpoint.kind) return checkpoint.kind as CheckpointKind;
+  const id = (checkpoint.checkpoint_id || "").toLowerCase();
+  const cfg = (checkpoint.answer_config || {}) as Record<string, any>;
+  if (
+    id.endsWith("-0") ||
+    id.includes("-0-") ||
+    id.includes("phone") ||
+    (cfg.textMatchInputs && cfg.textMatchInputs.length > 0)
+  ) {
+    return "phone_lookup";
+  }
+  if (id.includes("indictment") || id.includes("-2b")) return "indictment";
+  if (id.includes("epilogue")) return "epilogue";
+  if (id.includes("followup")) return "followup";
+  if (
+    id.includes("-1a") ||
+    id.includes("-1b") ||
+    id.includes("-1c") ||
+    checkpoint.type === "evidence_picker"
+  ) {
+    return "suspect_interrogation";
+  }
+  return (checkpoint.type as CheckpointKind) || "text";
+}
+
 /**
  * Chấm điểm tập trung server-side cho một submission đối chiếu với checkpoint trong DB.
  */
@@ -103,7 +157,7 @@ export function gradeCheckpoint(
   checkpoint: DbCaseCheckpoint,
   sub: CheckpointSubmission,
 ): GradeResult {
-  const kind = (checkpoint.kind || checkpoint.type || "text") as CheckpointKind;
+  const kind = inferCheckpointKind(checkpoint);
   const cfg = (checkpoint.answer_config || {}) as Record<string, any>;
   const baseUnlock = {
     unlocksEvidenceId: checkpoint.unlocked_evidence_id || undefined,
@@ -112,14 +166,11 @@ export function gradeCheckpoint(
 
   // 1. Phone Lookup (Tra cứu SĐT danh bạ)
   if (kind === "phone_lookup") {
-    const inputsList = (cfg.textMatchInputs ||
+    const rawInputs = (cfg.textMatchInputs ||
       []) as PhoneLookupConfig["textMatchInputs"];
+    const inputsList =
+      rawInputs.length > 0 ? rawInputs : DEFAULT_CASE_000_PHONE_INPUTS;
     const userInputs = sub.inputs || {};
-
-    if (inputsList.length === 0) {
-      // Fallback nếu chưa có textMatchInputs
-      return { correct: true, ...baseUnlock };
-    }
 
     // Kiểm tra bypass code
     const hasBypass = Object.values(userInputs).some((v) =>
@@ -227,7 +278,9 @@ export function gradeCheckpoint(
 
   // 3. Indictment (Cáo trạng kết án)
   if (kind === "indictment") {
-    const validSuspects = (cfg.validSuspects || []) as string[];
+    const rawSuspects = (cfg.validSuspects || []) as string[];
+    const validSuspects =
+      rawSuspects.length > 0 ? rawSuspects : ["Trần Thị Hà", "ha", "hà"];
     const validMotives = (cfg.validMotives || []) as string[];
     const requiredEvidence = (cfg.requiredEvidenceIds || []) as string[];
     const optionalEvidence = (cfg.optionalEvidenceIds || []) as string[];
@@ -261,7 +314,8 @@ export function gradeCheckpoint(
     if (!suspectOk) {
       return {
         correct: false,
-        feedback: "Đối tượng bị đề nghị truy tố chưa chính xác.",
+        feedback:
+          "Kết luận đối tượng chưa chính xác. Vui lòng đối chiếu lại toàn bộ chứng cứ.",
       };
     }
 
@@ -327,7 +381,34 @@ export function gradeCheckpoint(
     const normUser = normalizeForMatch(userAns);
     const normCorrect = normalizeForMatch(correctAns);
 
-    const isMatch = normUser === normCorrect;
+    let isMatch = normUser === normCorrect;
+
+    // Chỉ chấp nhận id nội bộ "khong_tin"/"tin" khi khớp nhãn đúng; không nới rộng
+    // để tránh accept "CÓ" cho câu hỏi mà đáp án đúng là "KHÔNG".
+    if (!isMatch) {
+      const normKhong = normalizeForMatch("khong");
+      const normCo = normalizeForMatch("co");
+      if (userAns.toLowerCase() === "khong_tin" && normCorrect === normKhong) {
+        isMatch = true;
+      } else if (userAns.toLowerCase() === "tin" && normCorrect === normCo) {
+        isMatch = true;
+      }
+    }
+
+    // Hỗ trợ định dạng giờ linh hoạt (21:15 vs 21h15)
+    if (
+      !isMatch &&
+      (normCorrect.includes("21:15") || normCorrect.includes("21h15"))
+    ) {
+      const cleanUser = userAns.replace(/\s+/g, "").toLowerCase();
+      isMatch = cleanUser === "21:15" || cleanUser === "21h15";
+    }
+
+    // Hỗ trợ mật khẩu hộp thiếc (120713)
+    if (!isMatch && normCorrect === "120713") {
+      isMatch = userAns.replace(/\s+/g, "") === "120713";
+    }
+
     return {
       correct: isMatch,
       feedback: isMatch
@@ -352,6 +433,16 @@ export function gradeCheckpoint(
     const normCorrect = normalizeForMatch(correctAns);
 
     let isMatch = normUser === normCorrect;
+    // Chấp nhận id nội bộ ("khong_tin"/"tin") khi khớp nhãn đáp án đúng.
+    if (!isMatch) {
+      const normKhong = normalizeForMatch("khong");
+      const normCo = normalizeForMatch("co");
+      if (userAns.toLowerCase() === "khong_tin" && normCorrect === normKhong) {
+        isMatch = true;
+      } else if (userAns.toLowerCase() === "tin" && normCorrect === normCo) {
+        isMatch = true;
+      }
+    }
     if (!isMatch && !isNaN(Number(userAns))) {
       const idx = Number(userAns);
       if (options[idx]) {

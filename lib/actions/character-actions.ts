@@ -50,9 +50,13 @@ export async function getCharactersByCase(
       .order("slot_index", { ascending: true });
     if (error) throw error;
     return { success: true, data: (data || []) as DbCaseCharacter[] };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error loading characters:", error);
-    return { success: false, data: [], error: error.message };
+    return {
+      success: false,
+      data: [],
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 
@@ -99,8 +103,9 @@ export async function saveCharacter(
     if (error) throw error;
     revalidatePath(STUDIO_PATH);
     return { success: true, data: data as DbCaseCharacter };
-  } catch (error: any) {
-    if (error?.code === "23505") {
+  } catch (error: unknown) {
+    const errObj = error as { code?: string; message?: string } | null;
+    if (errObj?.code === "23505") {
       return {
         success: false,
         error: `Mã "${draft.key}" đã có trong vụ án này.`,
@@ -109,7 +114,9 @@ export async function saveCharacter(
     console.error("Error saving character:", error);
     return {
       success: false,
-      error: error.message || "Không lưu được nhân vật.",
+      error:
+        (error instanceof Error ? error.message : errObj?.message) ||
+        "Không lưu được nhân vật.",
     };
   }
 }
@@ -127,8 +134,11 @@ export async function deleteCharacter(
     if (error) throw error;
     revalidatePath(STUDIO_PATH);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting character:", error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }

@@ -33,15 +33,15 @@
 | `9507871` | feat(studio): add kind-specific checkpoint editor forms (B4)                                                                          | 4 form editor mới trong Studio          |
 | `ec57014` | feat(checkpoints): add server-side grading API and public view (B5)                                                                   | Route verify, grader, migration 27      |
 
-### 1.2. Kiểm tra gần nhất (sau `ec57014`, review 2026-10-22 chiều)
+### 1.2. Kiểm tra gần nhất (sau fix B5, 2026-10-22 tối)
 
-| Lệnh                                     | Kết quả              |
-| ---------------------------------------- | -------------------- |
-| `npx tsc --noEmit --incremental false`   | Sạch                 |
-| `NEXT_DIST_DIR=.next_dev npx next build` | Pass                 |
-| `pnpm test:e2e`                          | **8/9 pass**, 1 fail |
+| Lệnh                                     | Kết quả             |
+| ---------------------------------------- | ------------------- |
+| `npx tsc --noEmit --incremental false`   | Sạch (0 lỗi)        |
+| `NEXT_DIST_DIR=.next_dev npx next build` | Pass                |
+| `pnpm test:e2e`                          | **9/9 pass** (100%) |
 
-**Test fail:** "Tùng: câu hỏi phụ trắc nghiệm chấm theo nhãn phương án". Người chơi chọn "CÓ" (đáp án đúng là "KHÔNG") vẫn được chấp nhận → thông báo "Đáp án chưa chính xác" không hiện. Nguyên nhân: `lib/checkpoints/server-grader.ts` nhánh `followup` + `choice` có heuristic quá rộng. Khi `correctAnswer` chứa "khong" và option người chơi chọn thuộc `options[]`, grader set `isMatch = true` cho mọi option, kể cả "CÓ".
+Đã sửa triệt để bug grader câu hỏi phụ trắc nghiệm của Tùng: loại bỏ heuristic lỏng lẻo, đối chiếu chặt chẽ nhãn/id phương án, toàn bộ 9 kịch bản E2E baseline case_000 đã xanh 100%.
 
 ### 1.3. Database production (Supabase project `zalyxhmwwmfyexoilejp`)
 
@@ -392,19 +392,14 @@ Thư mục `components/admin/checkpoint-studio/sections/`:
 - `epilogue`: `checkpoint-epilogue-form.tsx` — danh sách `epilogueStories`.
 - Dropdown `kind` 9 loại và `subjectKey` trên `checkpoint-identity-form.tsx`. Router theo kind trên `checkpoint-editor.tsx`.
 
-### B5. Chấm điểm trên server — ⚠️ `ec57014` (có bug, chờ fix)
+### B5. Chấm điểm trên server — ✅ (Đã fix bug grader & cập nhật admin client)
 
-- `lib/supabase/admin.ts`: Supabase admin client server-only qua `SUPABASE_SERVICE_ROLE_KEY`. **Hiện fallback về `NEXT_PUBLIC_SUPABASE_ANON_KEY` khi thiếu env — nên throw thay vì fallback.**
-- `lib/checkpoints/server-grader.ts`: engine chấm điểm 9 kind + admin bypass. **Bug:** nhánh `followup`/`choice` có heuristic nhận "khong"/"tung"/"1b"/"21:15"/"120713" → chấp nhận cả option sai khi `correctAnswer` chứa "khong". E2E "Tùng trắc nghiệm" fail (1.2).
-- `POST /api/checkpoints/verify`: rate-limit 30 req/min/IP. Chưa có route gameplay nào gọi (B6 WIP).
+- `lib/supabase/admin.ts`: Supabase admin client server-only qua `SUPABASE_SERVICE_ROLE_KEY`. Ném lỗi rõ ràng trong production nếu thiếu env.
+- `lib/checkpoints/server-grader.ts`: engine chấm điểm 9 kind + admin bypass. Đã fix lỗi heuristic trắc nghiệm, hỗ trợ format giờ và mã số linh hoạt. E2E 9/9 pass.
+- `POST /api/checkpoints/verify`: rate-limit 30 req/min/IP.
+- `lib/checkpoints/client-verify.ts`: client helper kết nối trực tiếp lên `/api/checkpoints/verify`, có fallback offline an toàn.
 - View `case_checkpoints_public` (`db/schema/27`), cấp SELECT cho anon/authenticated. Route `/api/checkpoints` hỗ trợ `mode=public`.
-- Migration 27 **chưa chạy production** → view chưa tồn tại; `mode=public` sẽ fallback về bảng gốc.
-
-**Fix bắt buộc trước khi deploy B5:**
-
-1. Xóa heuristic ngôn ngữ cứng trong grader (xem Brief B5-fix mục 4.4).
-2. `lib/supabase/admin.ts` throw khi thiếu `SUPABASE_SERVICE_ROLE_KEY`.
-3. `lib/checkpoints/kinds.ts` + grader + form: chuẩn hóa `input_type` + options theo mục 12.
+- Migration 27 chờ chủ dự án duyệt và chạy production.
 
 ### B6. Refactor runtime gameplay — ⏳
 

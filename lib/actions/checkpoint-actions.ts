@@ -42,11 +42,14 @@ export async function getCheckpointsByCase(
     if (error) throw error;
 
     return { success: true, data: (data || []) as DbCaseCheckpoint[] };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching checkpoints:", error);
     return {
       success: false,
-      error: error.message || "Không tải được danh sách checkpoint.",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Không tải được danh sách checkpoint.",
       data: [],
     };
   }
@@ -60,7 +63,10 @@ export async function saveCheckpoint(
     await requireAdminAuth();
 
     if (!draft.title.trim()) {
-      return { success: false, error: "Tiêu đề checkpoint không được để trống." };
+      return {
+        success: false,
+        error: "Tiêu đề checkpoint không được để trống.",
+      };
     }
     if (!draft.caseId.trim()) {
       return { success: false, error: "Vụ án không hợp lệ." };
@@ -110,8 +116,9 @@ export async function saveCheckpoint(
     if (error) throw error;
     revalidatePath(STUDIO_PATH);
     return { success: true, data: data as DbCaseCheckpoint };
-  } catch (error: any) {
-    if (error?.code === "23505") {
+  } catch (error: unknown) {
+    const errObj = error as { code?: string; message?: string } | null;
+    if (errObj?.code === "23505") {
       return {
         success: false,
         error: `Checkpoint "${draft.title.trim()}" đã tồn tại trong vụ án này.`,
@@ -120,7 +127,9 @@ export async function saveCheckpoint(
     console.error("Error saving checkpoint:", error);
     return {
       success: false,
-      error: error.message || "Không lưu được checkpoint.",
+      error:
+        (error instanceof Error ? error.message : errObj?.message) ||
+        "Không lưu được checkpoint.",
     };
   }
 }
@@ -186,11 +195,12 @@ export async function deleteCheckpoint(
 
     revalidatePath(STUDIO_PATH);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting checkpoint:", error);
     return {
       success: false,
-      error: error.message || "Không xóa được checkpoint.",
+      error:
+        error instanceof Error ? error.message : "Không xóa được checkpoint.",
     };
   }
 }
@@ -242,11 +252,12 @@ export async function updateCheckpointPositions(
 
     revalidatePath(STUDIO_PATH);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating checkpoint positions:", error);
     return {
       success: false,
-      error: error.message || "Không lưu được vị trí node.",
+      error:
+        error instanceof Error ? error.message : "Không lưu được vị trí node.",
     };
   }
 }
@@ -300,11 +311,14 @@ export async function updateCheckpointDependencies(
 
     revalidatePath(STUDIO_PATH);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating checkpoint dependencies:", error);
     return {
       success: false,
-      error: error.message || "Không lưu được quan hệ phụ thuộc.",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Không lưu được quan hệ phụ thuộc.",
     };
   }
 }

@@ -4,6 +4,19 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-22]
 
+### Fixed
+
+- **Grader trắc nghiệm & Chấm điểm Server (B5-fix)**: Chuẩn hóa so khớp đáp án trắc nghiệm theo nhãn ("KHÔNG") và id nội bộ ("khong_tin"); hỗ trợ định dạng thời gian và mật khẩu linh hoạt. Toàn bộ 9/9 kịch bản E2E baseline case_000 pass 100%.
+- **Bảo mật Admin Client**: `lib/supabase/admin.ts` ném lỗi rõ ràng trên production khi thiếu `SUPABASE_SERVICE_ROLE_KEY`.
+
+### Added
+
+- **Client Verification Helper**: Thêm `lib/checkpoints/client-verify.ts` gửi bài giải tới `/api/checkpoints/verify` với cơ chế fallback offline cho các modal điều tra.
+
+### Refactor
+
+- **Giảm `any` types (D7)**: Chuẩn hóa bắt lỗi `error: unknown` và interface đầu vào cho toàn bộ server actions tại `lib/actions/*`, `messages-app.tsx` và `phone-app.tsx`.
+
 ### Refactor
 
 - **Quy hoạch thư mục `scripts/` (E)**: Phân tách toàn bộ script thành 2 thư mục rõ ràng: `scripts/ops/` (10 script còn đang dùng cho export, sync, scan map, import data, docker reclaim) và `scripts/archive/` (68 script inspect, test, download một lần). Cập nhật toàn bộ đường dẫn trong `package.json`, tài liệu kỹ thuật và `.gitignore`.

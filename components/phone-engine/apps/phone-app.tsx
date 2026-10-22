@@ -24,6 +24,56 @@ interface PhoneAppProps {
   initialTab?: "recents" | "keypad" | "contacts";
 }
 
+interface PhoneContact {
+  id: string;
+  name: string;
+  phone: string;
+  category: string;
+  note: string;
+}
+
+interface RawPhoneContact {
+  contact_id?: string;
+  name?: string;
+  display_name?: string;
+  is_saved?: string | boolean;
+  phone_number?: string;
+  category?: string;
+  note?: string;
+}
+
+interface PhoneCallRecord {
+  code: string;
+  name: string;
+  phone: string;
+  type: string;
+  time: string;
+  duration: string;
+  isMissed: boolean;
+  isOutgoing: boolean;
+  isIncoming: boolean;
+  missedCount: number;
+}
+
+interface RawCallRecord {
+  code?: string;
+  call_id?: string;
+  display_name?: string;
+  contact_name?: string;
+  caller_name?: string;
+  phone_number?: string;
+  time_str?: string;
+  timestamp?: string;
+  time?: string;
+  call_type?: string;
+  is_missed?: string | boolean;
+  duration?: string;
+  call_duration?: string;
+  duration_str?: string;
+  label_type?: string;
+  missed_count?: number;
+}
+
 // Exact Figma Keypad spec (Frame 22:453)
 const KEYPAD_BUTTONS = [
   { num: "1", sub: "" },
@@ -44,19 +94,22 @@ export function PhoneApp({
   onBackToHome,
   initialTab = "keypad",
 }: PhoneAppProps) {
-  const [activeTab, setActiveTab] = useState<
-    "recents" | "contacts" | "keypad"
-  >(initialTab);
+  const [activeTab, setActiveTab] = useState<"recents" | "contacts" | "keypad">(
+    initialTab,
+  );
   const [keypadInput, setKeypadInput] = useState("");
 
   const { data: callsData, loading, error } = usePhoneData("calls");
-  const { data: rawContactsData, loading: contactsLoading } = usePhoneData("contacts");
+  const { data: rawContactsData, loading: contactsLoading } =
+    usePhoneData("contacts");
 
   const [contactsSearch, setContactsSearch] = useState("");
-  const [selectedContact, setSelectedContact] = useState<any | null>(null);
+  const [selectedContact, setSelectedContact] = useState<PhoneContact | null>(
+    null,
+  );
 
-  const contacts = rawContactsData
-    .filter((item: any) => {
+  const contacts: PhoneContact[] = (rawContactsData as RawPhoneContact[])
+    .filter((item: RawPhoneContact) => {
       const rawName = (item.name || item.display_name || "").trim();
       const isSaved =
         item.is_saved !== undefined
@@ -65,7 +118,7 @@ export function PhoneApp({
       // Số điện thoại không có tên hoặc không lưu (is_saved = FALSE) thì không hiện trong danh bạ
       return rawName.length > 0 && isSaved;
     })
-    .map((item: any, idx: number) => ({
+    .map((item: RawPhoneContact, idx: number): PhoneContact => ({
       id: item.contact_id || `c-${idx + 1}`,
       name: (item.name || item.display_name || "").trim(),
       phone: item.phone_number || "",
@@ -73,16 +126,19 @@ export function PhoneApp({
       note: item.note || "",
     }));
 
-  const filteredContacts = contacts.filter((c: any) =>
-    c.name.toLowerCase().includes(contactsSearch.toLowerCase()) ||
-    c.phone.includes(contactsSearch),
+  const filteredContacts = contacts.filter(
+    (c: PhoneContact) =>
+      c.name.toLowerCase().includes(contactsSearch.toLowerCase()) ||
+      c.phone.includes(contactsSearch),
   );
 
-  const groupedContacts: Record<string, typeof contacts> = {};
+  const groupedContacts: Record<string, PhoneContact[]> = {};
   filteredContacts
     .slice()
-    .sort((a: any, b: any) => a.name.localeCompare(b.name, "vi"))
-    .forEach((c: any) => {
+    .sort((a: PhoneContact, b: PhoneContact) =>
+      a.name.localeCompare(b.name, "vi"),
+    )
+    .forEach((c: PhoneContact) => {
       const firstLetter = c.name.charAt(0).toUpperCase();
       const key = /[A-ZÀ-Ỹ]/.test(firstLetter) ? firstLetter : "#";
       if (!groupedContacts[key]) groupedContacts[key] = [];
@@ -102,49 +158,57 @@ export function PhoneApp({
     L10: "01:40",
   };
 
-  const recents = callsData.map((item: any, idx: number) => {
-    const rawName = item.display_name || item.contact_name || item.caller_name;
-    const name = rawName || item.phone_number || "Không rõ";
-    const phone = item.phone_number || "";
-    const timeFormatted = item.time_str
-      ? item.time_str
-      : item.timestamp || item.time || "";
+  const recents: PhoneCallRecord[] = (callsData as RawCallRecord[]).map(
+    (item: RawCallRecord, idx: number): PhoneCallRecord => {
+      const rawName =
+        item.display_name || item.contact_name || item.caller_name;
+      const name = rawName || item.phone_number || "Không rõ";
+      const phone = item.phone_number || "";
+      const timeFormatted = item.time_str
+        ? item.time_str
+        : item.timestamp || item.time || "";
 
-    const isMissed =
-      item.call_type === "INCOMING_MISSED" ||
-      String(item.is_missed).toUpperCase() === "TRUE" ||
-      item.is_missed === true;
+      const isMissed =
+        item.call_type === "INCOMING_MISSED" ||
+        String(item.is_missed).toUpperCase() === "TRUE" ||
+        item.is_missed === true;
 
-    const isOutgoing = item.call_type === "OUTGOING";
-    const isIncoming =
-      item.call_type === "INCOMING" || item.call_type === "INCOMING_ACCEPTED";
+      const isOutgoing = item.call_type === "OUTGOING";
+      const isIncoming =
+        item.call_type === "INCOMING" || item.call_type === "INCOMING_ACCEPTED";
 
-    const duration =
-      item.duration ||
-      item.call_duration ||
-      item.duration_str ||
-      (!isMissed ? defaultDurations[item.call_id] || defaultDurations[`L0${idx + 1}`] || "01:15" : "");
+      const duration =
+        item.duration ||
+        item.call_duration ||
+        item.duration_str ||
+        (!isMissed
+          ? defaultDurations[item.call_id || ""] ||
+            defaultDurations[`L0${idx + 1}`] ||
+            "01:15"
+          : "");
 
-    const callCode = item.code || item.call_id || `CALL-${String(idx + 1).padStart(2, "0")}`;
+      const callCode =
+        item.code || item.call_id || `CALL-${String(idx + 1).padStart(2, "0")}`;
 
-    return {
-      code: callCode,
-      name,
-      phone,
-      type:
-        item.call_type === "INCOMING_MISSED"
-          ? "di động"
-          : isOutgoing
-            ? "cuộc gọi đi"
-            : item.label_type || "di động",
-      time: timeFormatted,
-      duration,
-      isMissed,
-      isOutgoing,
-      isIncoming,
-      missedCount: item.missed_count || (isMissed ? 1 : 0),
-    };
-  });
+      return {
+        code: callCode,
+        name,
+        phone,
+        type:
+          item.call_type === "INCOMING_MISSED"
+            ? "di động"
+            : isOutgoing
+              ? "cuộc gọi đi"
+              : item.label_type || "di động",
+        time: timeFormatted,
+        duration,
+        isMissed,
+        isOutgoing,
+        isIncoming,
+        missedCount: item.missed_count || (isMissed ? 1 : 0),
+      };
+    },
+  );
 
   const displayedRecents = recents;
 
@@ -295,7 +359,7 @@ export function PhoneApp({
               </div>
             ) : (
               <div className="divide-y divide-[#E3E2E7]">
-                {displayedRecents.map((call: any, idx: number) => (
+                {displayedRecents.map((call: PhoneCallRecord, idx: number) => (
                   <EvidenceAnchorItem key={call.code || idx} code={call.code}>
                     <div className="h-[60px] pl-4 pr-4 py-[10px] flex items-center justify-between hover:bg-[#FAF9FE] active:bg-[#F2F2F7] cursor-pointer transition-colors">
                       {/* Left: Contact Name + Call Direction Arrow on the right of name */}
@@ -523,7 +587,7 @@ export function PhoneApp({
 
                         {/* Contact Rows */}
                         <div className="divide-y divide-[#E3E2E7] bg-[#FFFFFF]">
-                          {list.map((c: any) => (
+                          {list.map((c: PhoneContact) => (
                             <div
                               key={c.id}
                               onClick={() => setSelectedContact(c)}

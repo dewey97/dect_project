@@ -1,149 +1,232 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, ArrowRight, CheckCircle2, ArrowLeft, Lightbulb } from 'lucide-react'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { cn } from '@/lib/utils'
-import { emitInvestigationEvent } from '@/lib/investigation-events'
-import { isAdminBypassCode } from '@/lib/cases/admin-bypass'
-import { getStorageItem, setStorageItem, getStorageJson, setStorageJson } from '@/lib/storage'
-import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
-import { caseStorageKey } from '@/lib/cases/case-id'
-import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
-import { normalizeForMatch } from '@/lib/text'
+import React, { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  X,
+  ArrowRight,
+  CheckCircle2,
+  ArrowLeft,
+  Lightbulb,
+} from "lucide-react";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { cn } from "@/lib/utils";
+import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { isAdminBypassCode } from "@/lib/cases/admin-bypass";
+import {
+  getStorageItem,
+  setStorageItem,
+  getStorageJson,
+  setStorageJson,
+} from "@/lib/storage";
+import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
+import { caseStorageKey } from "@/lib/cases/case-id";
+import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
+import { normalizeForMatch } from "@/lib/text";
+import { verifyCheckpointOnServer } from "@/lib/checkpoints/client-verify";
 
 function toWords(str: string): string[] {
   return normalizeForMatch(str)
     .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
-    .filter(Boolean)
+    .filter(Boolean);
 }
 
 function isPhoneMatch(val: string, validKeywords: string[]): boolean {
-  if (isAdminBypassCode(val)) return true
-  const normWords = toWords(val)
-  if (normWords.length === 0) return false
+  if (isAdminBypassCode(val)) return true;
+  const normWords = toWords(val);
+  if (normWords.length === 0) return false;
 
   return validKeywords.some((kw) => {
-    const kwWords = toWords(kw)
+    const kwWords = toWords(kw);
 
-    if (normWords.join('') === kwWords.join('')) return true
+    if (normWords.join("") === kwWords.join("")) return true;
 
     if (normWords.length < kwWords.length) {
-      return normWords.every((w) => kwWords.includes(w))
+      return normWords.every((w) => kwWords.includes(w));
     }
 
-    return false
-  })
+    return false;
+  });
 }
 
 interface PhoneLookupModalProps {
-  caseId?: string
-  isOpen: boolean
-  onClose: () => void
-  onSuccess: (phone: string, info: string) => void
-  onOpenPhoneSimulator?: () => void
+  caseId?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (phone: string, info: string) => void;
+  onOpenPhoneSimulator?: () => void;
 }
 
 const DEFAULT_PHONE_INPUTS = [
-  { id: 'phone1', label: 'SĐT 0988.200.991:', placeholder: 'Nhập tên nghi phạm...', validAnswers: ['vu', 'le quang vu', 'vũ', 'lê quang vũ'] },
-  { id: 'phone2', label: 'SĐT 0912.331.888:', placeholder: 'Nhập tên nghi phạm...', validAnswers: ['tung', 'nguyen thanh tung', 'tùng', 'nguyễn thanh tùng'] },
-  { id: 'phone3', label: 'SĐT 0984.180.357:', placeholder: 'Nhập tên nghi phạm...', validAnswers: ['dat', 'dat ga', 'tran van dat', 'đạt', 'đạt gà', 'trần văn đạt'] },
-]
+  {
+    id: "phone1",
+    label: "SĐT 0988.200.991:",
+    placeholder: "Nhập tên nghi phạm...",
+    validAnswers: ["vu", "le quang vu", "vũ", "lê quang vũ"],
+  },
+  {
+    id: "phone2",
+    label: "SĐT 0912.331.888:",
+    placeholder: "Nhập tên nghi phạm...",
+    validAnswers: ["tung", "nguyen thanh tung", "tùng", "nguyễn thanh tùng"],
+  },
+  {
+    id: "phone3",
+    label: "SĐT 0984.180.357:",
+    placeholder: "Nhập tên nghi phạm...",
+    validAnswers: [
+      "dat",
+      "dat ga",
+      "tran van dat",
+      "đạt",
+      "đạt gà",
+      "trần văn đạt",
+    ],
+  },
+];
 
 export function PhoneLookupModal({
-  caseId = 'case-000',
+  caseId = "case-000",
   isOpen,
   onClose,
   onSuccess,
-  onOpenPhoneSimulator
+  onOpenPhoneSimulator,
 }: PhoneLookupModalProps) {
-  const sKey = (k: string) => caseStorageKey(caseId, k)
-  const { checkpoints } = useCaseCheckpoints(caseId)
-  const cp0 = checkpoints.find((c) => c.id.includes('-0') || c.id.includes('phone'))
+  const sKey = (k: string) => caseStorageKey(caseId, k);
+  const { checkpoints } = useCaseCheckpoints(caseId);
+  const cp0 = checkpoints.find(
+    (c) =>
+      c.kind === "phone_lookup" ||
+      c.id.includes("-0") ||
+      c.id.includes("phone"),
+  );
 
   const inputsList = useMemo(() => {
-    const dynamic = cp0?.textMatchConfig?.inputs
-    if (dynamic && dynamic.length > 0) return dynamic
-    return DEFAULT_PHONE_INPUTS
-  }, [cp0])
+    const dynamic = cp0?.textMatchConfig?.inputs;
+    if (dynamic && dynamic.length > 0) return dynamic;
+    return DEFAULT_PHONE_INPUTS;
+  }, [cp0]);
 
-  const [inputValues, setInputValues] = useState<Record<string, string>>({})
-  const [isApproved, setIsApproved] = useState(false)
-  const [errorMsg, setErrorMsg] = useState('')
+  const [inputValues, setInputValues] = useState<Record<string, string>>({});
+  const [isApproved, setIsApproved] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     if (isOpen) {
-      const activeCp = cp0?.id || 'cp-000-0'
-      if (typeof window !== 'undefined') {
-        (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = activeCp
+      const activeCp = cp0?.id || "cp-000-0";
+      if (typeof window !== "undefined") {
+        (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = activeCp;
       }
-      setStorageItem('active_investigation_checkpoint', activeCp)
-      setStorageItem('last_interacted_checkpoint', activeCp)
-      localStorage.removeItem('active_suspect_category')
+      setStorageItem("active_investigation_checkpoint", activeCp);
+      setStorageItem("last_interacted_checkpoint", activeCp);
+      localStorage.removeItem("active_suspect_category");
     }
 
-    const data = getStorageJson<Record<string, string>>(sKey('phone_inputs'), {})
-    setInputValues(data)
+    const data = getStorageJson<Record<string, string>>(
+      sKey("phone_inputs"),
+      {},
+    );
+    setInputValues(data);
 
-    const approved = getStorageItem(sKey('reinvestigate_unlocked'))
-    if (approved === 'true') {
-      setIsApproved(true)
+    const approved = getStorageItem(sKey("reinvestigate_unlocked"));
+    if (approved === "true") {
+      setIsApproved(true);
     }
-  }, [isOpen, cp0, caseId])
+  }, [isOpen, cp0, caseId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     const hasAnyBypass = inputsList.some((inp, idx) => {
-      const val = inputValues[inp.id] ?? (idx === 0 ? inputValues.phone1 : idx === 1 ? inputValues.phone2 : inputValues.phone3) ?? ''
-      return isAdminBypassCode(val)
-    })
+      const val =
+        inputValues[inp.id] ??
+        (idx === 0
+          ? inputValues.phone1
+          : idx === 1
+            ? inputValues.phone2
+            : inputValues.phone3) ??
+        "";
+      return isAdminBypassCode(val);
+    });
 
     if (!hasAnyBypass) {
       const isMissingAny = inputsList.some((inp, idx) => {
-        const val = inputValues[inp.id] ?? (idx === 0 ? inputValues.phone1 : idx === 1 ? inputValues.phone2 : inputValues.phone3) ?? ''
-        return !val.trim()
-      })
+        const val =
+          inputValues[inp.id] ??
+          (idx === 0
+            ? inputValues.phone1
+            : idx === 1
+              ? inputValues.phone2
+              : inputValues.phone3) ??
+          "";
+        return !val.trim();
+      });
 
       if (isMissingAny) {
-        setErrorMsg('Vui lòng điền đầy đủ danh tính chủ thể cho các số điện thoại!')
-        detectiveAudio.playGlassSound()
-        return
+        setErrorMsg(
+          "Vui lòng điền đầy đủ danh tính chủ thể cho các số điện thoại!",
+        );
+        detectiveAudio.playGlassSound();
+        return;
       }
 
-      const allValid = inputsList.every((inp, idx) => {
-        const val = inputValues[inp.id] ?? (idx === 0 ? inputValues.phone1 : idx === 1 ? inputValues.phone2 : inputValues.phone3) ?? ''
-        return isPhoneMatch(val, inp.validAnswers || [])
-      })
+      // 1. Thử chấm điểm trên server-side trước
+      const serverResult = await verifyCheckpointOnServer({
+        caseId,
+        checkpointId: cp0?.id || "cp-000-0",
+        inputs: inputValues,
+      });
 
-      if (!allValid) {
-        setErrorMsg('Danh tính chủ thể chưa chính xác. Vui lòng đối chiếu lại tài liệu điều tra.')
-        detectiveAudio.playGlassSound()
-        return
+      let isSuccess = false;
+      if (serverResult.success && serverResult.correct) {
+        isSuccess = true;
+      } else {
+        // Fallback offline client-side (bảo vệ khi DB chưa migrate cột kind/answer_config)
+        const allValid = inputsList.every((inp, idx) => {
+          const val =
+            inputValues[inp.id] ??
+            (idx === 0
+              ? inputValues.phone1
+              : idx === 1
+                ? inputValues.phone2
+                : inputValues.phone3) ??
+            "";
+          return isPhoneMatch(val, inp.validAnswers || []);
+        });
+
+        if (allValid) {
+          isSuccess = true;
+        } else {
+          setErrorMsg(
+            serverResult.feedback ||
+              "Danh tính chủ thể chưa chính xác. Vui lòng đối chiếu lại tài liệu điều tra.",
+          );
+          detectiveAudio.playGlassSound();
+          return;
+        }
       }
     }
 
-    detectiveAudio.playStampSound()
-    setIsApproved(true)
-    setStorageJson(sKey('phone_inputs'), inputValues)
-    setStorageItem(sKey('phone_solved'), 'true')
+    detectiveAudio.playStampSound();
+    setIsApproved(true);
+    setStorageJson(sKey("phone_inputs"), inputValues);
+    setStorageItem(sKey("phone_solved"), "true");
 
-    onSuccess('0988200991', 'Đã xác minh danh tính SĐT thành công.')
-    onClose()
-  }
+    onSuccess("0988200991", "Đã xác minh danh tính SĐT thành công.");
+    onClose();
+  };
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <AnimatePresence>
@@ -165,7 +248,7 @@ export function PhoneLookupModal({
                 MỞ RỘNG ĐIỀU TRA
               </span>
               <h3 className="font-mono font-bold text-sm sm:text-base text-[#1a120b] uppercase tracking-wider">
-                {cp0?.title || 'Truy Vết Liên Lạc'}
+                {cp0?.title || "Truy Vết Liên Lạc"}
               </h3>
             </div>
 
@@ -173,9 +256,9 @@ export function PhoneLookupModal({
               <button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation()
-                  detectiveAudio.playPaperRustle()
-                  onClose()
+                  e.stopPropagation();
+                  detectiveAudio.playPaperRustle();
+                  onClose();
                 }}
                 className="p-2 text-[#5c4026] hover:text-black hover:bg-[#dfd3bd] transition-colors rounded-none cursor-pointer border border-[#5c4026] pointer-events-auto"
                 title="Đóng"
@@ -186,11 +269,15 @@ export function PhoneLookupModal({
           </div>
 
           {/* FORM BODY */}
-          <form onSubmit={handleSubmit} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]">
+          <form
+            onSubmit={handleSubmit}
+            className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5]"
+          >
             {/* DESCRIPTION TEXT */}
             <div className="space-y-1.5">
               <p className="text-xs sm:text-sm text-[#1a120b] leading-relaxed font-sans">
-                {cp0?.question || 'Tổ chức rà soát, tra cứu dữ liệu viễn thông nhằm xác minh, làm rõ thông tin lai lịch & lý do liên hệ của các đối tượng sử dụng các số điện thoại có lịch sử liên lạc trong thời hạn 12 giờ trước thời điểm xảy ra vụ án.'}
+                {cp0?.question ||
+                  "Tổ chức rà soát, tra cứu dữ liệu viễn thông nhằm xác minh, làm rõ thông tin lai lịch & lý do liên hệ của các đối tượng sử dụng các số điện thoại có lịch sử liên lạc trong thời hạn 12 giờ trước thời điểm xảy ra vụ án."}
               </p>
             </div>
 
@@ -201,8 +288,17 @@ export function PhoneLookupModal({
             {/* DYNAMIC PHONE INPUT FIELDS */}
             <div className="space-y-3">
               {inputsList.map((inp, idx) => {
-                const currentVal = inputValues[inp.id] ?? (idx === 0 ? inputValues.phone1 : idx === 1 ? inputValues.phone2 : inputValues.phone3) ?? ''
-                const displayLabel = inp.label.startsWith('SĐT') ? inp.label : `SĐT ${inp.label}:`
+                const currentVal =
+                  inputValues[inp.id] ??
+                  (idx === 0
+                    ? inputValues.phone1
+                    : idx === 1
+                      ? inputValues.phone2
+                      : inputValues.phone3) ??
+                  "";
+                const displayLabel = inp.label.startsWith("SĐT")
+                  ? inp.label
+                  : `SĐT ${inp.label}:`;
                 return (
                   <div key={inp.id || idx} className="space-y-1">
                     <label className="text-xs font-bold text-[#2b1f14] block font-mono">
@@ -211,20 +307,20 @@ export function PhoneLookupModal({
                     <input
                       type="text"
                       value={currentVal}
-                      placeholder={inp.placeholder || 'Nhập tên nghi phạm...'}
+                      placeholder={inp.placeholder || "Nhập tên nghi phạm..."}
                       onChange={(e) => {
-                        const val = e.target.value
+                        const val = e.target.value;
                         setInputValues((prev) => ({
                           ...prev,
                           [inp.id]: val,
                           [`phone${idx + 1}`]: val,
-                        }))
-                        if (errorMsg) setErrorMsg('')
+                        }));
+                        if (errorMsg) setErrorMsg("");
                       }}
                       className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-base text-[#0e2b5c] font-[family-name:var(--font-handwriting)] font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                     />
                   </div>
-                )
+                );
               })}
             </div>
 
@@ -236,7 +332,7 @@ export function PhoneLookupModal({
 
             {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM */}
             <CheckpointHintSection
-              checkpointId={cp0?.id || 'cp-000-0'}
+              checkpointId={cp0?.id || "cp-000-0"}
               caseId={caseId}
             />
 
@@ -245,9 +341,9 @@ export function PhoneLookupModal({
               <button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation()
-                  detectiveAudio.playPaperRustle()
-                  onClose()
+                  e.stopPropagation();
+                  detectiveAudio.playPaperRustle();
+                  onClose();
                 }}
                 className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
               >
@@ -257,10 +353,10 @@ export function PhoneLookupModal({
               <button
                 type="submit"
                 className={cn(
-                  'text-xs uppercase tracking-wider px-6 py-2.5 rounded-none font-bold transition-all cursor-pointer flex items-center gap-2 border-2 shadow-md font-mono',
+                  "text-xs uppercase tracking-wider px-6 py-2.5 rounded-none font-bold transition-all cursor-pointer flex items-center gap-2 border-2 shadow-md font-mono",
                   !isApproved
-                    ? 'bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95'
-                    : 'bg-emerald-900 hover:bg-emerald-950 text-white border-emerald-950'
+                    ? "bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
+                    : "bg-emerald-900 hover:bg-emerald-950 text-white border-emerald-950",
                 )}
               >
                 <span>LIÊN LẠC LẤY THÔNG TIN</span>
@@ -271,5 +367,5 @@ export function PhoneLookupModal({
         </motion.div>
       </div>
     </AnimatePresence>
-  )
+  );
 }

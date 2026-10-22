@@ -26,9 +26,9 @@ export async function getAppSettings() {
     }
     
     return { success: true, data: data as DbAppSettings }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching settings:', error)
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : String(error) }
   }
 }
 
@@ -46,12 +46,12 @@ export async function updateAppSettings(payload: Partial<DbAppSettings>) {
       .eq('id', 1)
 
     if (error) throw error
-    
+
     // Cập nhật lại toàn bộ ứng dụng vì settings ảnh hưởng mọi nơi
     revalidatePath('/', 'layout')
     return { success: true }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating settings:', error)
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : String(error) }
   }
 }

@@ -62,7 +62,10 @@ export async function saveBoardgamePinPositions(
         .in("case_id", caseIdVariants(caseId))
         .not("id", "in", `(${quotedPinIds})`);
     } else {
-      await supabase.from("boardgame_pins").delete().in("case_id", caseIdVariants(caseId));
+      await supabase
+        .from("boardgame_pins")
+        .delete()
+        .in("case_id", caseIdVariants(caseId));
     }
 
     // 3. Upsert Pins (bao rotation/scale, id TEXT cho phép c0-pin-...)
@@ -97,9 +100,12 @@ export async function saveBoardgamePinPositions(
 
     revalidatePath(`/cases/${caseId}/evidence/boardgame`);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error saving boardgame pin positions:", error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 
@@ -151,16 +157,39 @@ export async function getBoardgamePinPositions(caseId: string): Promise<{
     }));
 
     return { success: true, pins, connections };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching boardgame pin positions:", error);
-    return { success: false, error: error.message, pins: [], connections: [] };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+      pins: [],
+      connections: [],
+    };
   }
+}
+
+export interface EvidenceNodeInput {
+  id?: string;
+  type?: string;
+  position: { x: number; y: number };
+  data?: {
+    label?: string;
+    description?: string;
+    category?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface EvidenceEdgeInput {
+  id?: string;
+  source: string;
+  target: string;
 }
 
 export async function saveEvidenceBoard(
   caseId: string,
-  nodes: any[],
-  edges: any[],
+  nodes: EvidenceNodeInput[],
+  edges: EvidenceEdgeInput[],
 ) {
   try {
     await requireAdminAuth(); // Chỉ admin mới được sửa
@@ -174,11 +203,11 @@ export async function saveEvidenceBoard(
 
     // 1. Format Nodes với UUID hợp lệ
     const formattedNodes = nodes.map((n) => {
-      const nodeId = isUuid(n.id) ? n.id : crypto.randomUUID();
+      const nodeId = n.id && isUuid(n.id) ? n.id : crypto.randomUUID();
       return {
         id: nodeId,
         case_id: caseId,
-        type: n.type,
+        type: n.type || "default",
         position_x: n.position.x,
         position_y: n.position.y,
         label: n.data?.label || "",
@@ -243,9 +272,12 @@ export async function saveEvidenceBoard(
 
     revalidatePath(`/studio/cases/${caseId}/evidence`);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error saving evidence board:", error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 
@@ -273,7 +305,7 @@ export async function getEvidenceBoard(caseId: string) {
       type: n.type,
       position: { x: n.position_x, y: n.position_y },
       data: {
-        ...n.logic_data,
+        ...((n.logic_data as Record<string, unknown>) || {}),
         label: n.label,
         description: n.description,
         category: n.category,
@@ -301,9 +333,14 @@ export async function getEvidenceBoard(caseId: string) {
     });
 
     return { success: true, nodes, edges };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching evidence board:", error);
-    return { success: false, error: error.message, nodes: [], edges: [] };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+      nodes: [],
+      edges: [],
+    };
   }
 }
 
@@ -348,9 +385,12 @@ export async function saveReinvestigationHotspots(
     revalidatePath(`/evidence/boardgame`);
     revalidatePath(`/evidence/web`);
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error saving reinvestigation hotspots:", error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 
@@ -390,8 +430,12 @@ export async function getReinvestigationHotspots(caseId: string): Promise<{
       .sort((a, b) => a.num - b.num);
 
     return { success: true, hotspots };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching reinvestigation hotspots:", error);
-    return { success: false, hotspots: [], error: error.message };
+    return {
+      success: false,
+      hotspots: [],
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }

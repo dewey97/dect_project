@@ -15,6 +15,7 @@ import { FollowupChoiceForm } from "./followup/followup-choice-form";
 import { FollowupCodeForm } from "./followup/followup-code-form";
 import { FollowupTextForm } from "./followup/followup-text-form";
 import { caseStorageKey } from "@/lib/cases/case-id";
+import { verifyCheckpointOnServer } from "@/lib/checkpoints/client-verify";
 
 interface FollowupQuestionModalProps {
   caseId?: string;
@@ -59,6 +60,12 @@ export function FollowupQuestionModal({
     if (!culprit) return null;
     const cLow = culprit.toLowerCase().trim();
     return (
+      checkpoints.find(
+        (cp) =>
+          cp.kind === "followup" &&
+          (cp.subjectKey?.toLowerCase().trim() === cLow ||
+            cp.followupOf?.toLowerCase().trim() === cLow),
+      ) ||
       checkpoints.find((cp) => cp.followupOf?.toLowerCase().trim() === cLow) ||
       checkpoints.find((cp) => cp.id === `cp-${cLow}-followup`) ||
       checkpoints.find((cp) => cp.id === `cp-${cLow}`) ||
@@ -317,9 +324,10 @@ export function FollowupQuestionModal({
   if (!isOpen || !culprit) return null;
 
   // 1. Xử lý nộp đáp án Mốc Thời Gian (Time Form)
-  const handleSubmitTime = (e: React.FormEvent) => {
+  const handleSubmitTime = async (e: React.FormEvent) => {
     e.preventDefault();
-    const normalized = timeInput.trim().toLowerCase().replace(/\s+/g, "");
+    const rawAnswer = timeInput.trim();
+    const normalized = rawAnswer.toLowerCase().replace(/\s+/g, "");
     if (!normalized) {
       setErrorMsg("Vui lòng nhập mốc thời gian!");
       detectiveAudio.playGlassSound();
@@ -327,20 +335,45 @@ export function FollowupQuestionModal({
     }
 
     const isBypass = isAdminBypassCode(normalized);
-    const expectedFromSheet = (activeCheckpoint?.correctAnswer || "21:15")
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "");
+    let isCorrect = isBypass;
 
-    const isMatch =
-      isBypass ||
-      normalized === expectedFromSheet ||
-      normalized === expectedFromSheet.replace(":", "h") ||
-      normalized === expectedFromSheet.replace("h", ":") ||
-      normalized === "21:15" ||
-      normalized === "21h15";
+    if (!isBypass && activeCheckpoint?.id) {
+      // 1. Thử chấm server-side trước
+      const serverResult = await verifyCheckpointOnServer({
+        caseId: normalizedCaseId,
+        checkpointId: activeCheckpoint.id,
+        answer: rawAnswer,
+      });
 
-    if (isMatch) {
+      if (serverResult.success) {
+        isCorrect = serverResult.correct;
+        // If server returned `success: true` but `correct: false`, try client-side fallback
+        if (!isCorrect) {
+          const expected = (activeCheckpoint.correctAnswer || "")
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "");
+          isCorrect =
+            Boolean(expected) &&
+            (normalized === expected ||
+              normalized === expected.replace(":", "h") ||
+              normalized === expected.replace("h", ":"));
+        }
+      } else {
+        // Server did not succeed, fallback offline client-side
+        const expected = (activeCheckpoint.correctAnswer || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "");
+        isCorrect =
+          Boolean(expected) &&
+          (normalized === expected ||
+            normalized === expected.replace(":", "h") ||
+            normalized === expected.replace("h", ":"));
+      }
+    }
+
+    if (isCorrect) {
       detectiveAudio.playStampSound();
       setErrorMsg("");
       const finalAnswer = activeCheckpoint?.correctAnswer || timeInput.trim();
@@ -363,7 +396,7 @@ export function FollowupQuestionModal({
   };
 
   // 2. Xử lý nộp đáp án Trắc nghiệm (Choice Form)
-  const handleSubmitChoice = (e: React.FormEvent) => {
+  const handleSubmitChoice = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedChoice) {
       setErrorMsg("Vui lòng tích chọn một phương án trả lời!");
@@ -371,20 +404,36 @@ export function FollowupQuestionModal({
       return;
     }
 
-    const expected = (activeCheckpoint?.correctAnswer || "")
-      .trim()
-      .toLowerCase();
     const isBypass = isAdminBypassCode(selectedChoice);
-    // Id phương án là mã nội bộ (`tin` / `khong_tin`), đáp án CMS là nhãn hiển thị ("KHÔNG"),
-    // nên so bằng nhãn của phương án đã chọn.
     const selectedLabel =
       choiceOptions.find((opt) => opt.id === selectedChoice)?.label ??
       selectedChoice;
-    const isCorrect =
-      !expected ||
-      isBypass ||
-      selectedLabel.trim().toLowerCase() === expected ||
-      selectedChoice.toLowerCase() === expected;
+    let isCorrect = isBypass;
+
+    if (!isBypass && activeCheckpoint?.id) {
+      const serverResult = await verifyCheckpointOnServer({
+        caseId: normalizedCaseId,
+        checkpointId: activeCheckpoint.id,
+        answer: selectedLabel,
+      });
+
+      if (serverResult.success && serverResult.correct) {
+        isCorrect = true;
+      } else {
+        // Fallback offline client-side (bảo vệ khi DB chưa migrate cột kind/answer_config)
+        const expected = (activeCheckpoint.correctAnswer || "")
+          .trim()
+          .toLowerCase();
+        // Đặc biệt cho Tùng: so sánh nhãn ("KHÔNG") hoặc id ("khong_tin") với giá trị kỳ vọng
+        isCorrect =
+          !expected ||
+          selectedLabel.trim().toLowerCase() === expected ||
+          selectedChoice.toLowerCase() === expected ||
+          (culprit === "tung" &&
+            (selectedChoice === "khong_tin" ||
+              selectedLabel.toLowerCase().includes("không")));
+      }
+    }
 
     if (isCorrect) {
       detectiveAudio.playStampSound();
@@ -408,7 +457,7 @@ export function FollowupQuestionModal({
   };
 
   // 3. Xử lý nộp đáp án Mật mã / Khóa số (Code Form)
-  const handleSubmitCode = (e: React.FormEvent) => {
+  const handleSubmitCode = async (e: React.FormEvent) => {
     e.preventDefault();
     const rawVal = codeInput.trim().toLowerCase().replace(/\s+/g, "");
     if (!rawVal) {
@@ -417,17 +466,30 @@ export function FollowupQuestionModal({
       return;
     }
 
-    const expectedFromSheet = (activeCheckpoint?.correctAnswer || "120713")
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "");
-
     const isMasterBypass = isAdminBypassCode(rawVal);
-    const isCorrect =
-      isMasterBypass ||
-      rawVal === expectedFromSheet ||
-      rawVal === "120713" ||
-      (expectedFromSheet.length >= 6 && expectedFromSheet.includes(rawVal));
+    let isCorrect = isMasterBypass;
+
+    if (!isMasterBypass && activeCheckpoint?.id) {
+      const serverResult = await verifyCheckpointOnServer({
+        caseId: normalizedCaseId,
+        checkpointId: activeCheckpoint.id,
+        answer: codeInput.trim(),
+      });
+
+      if (serverResult.success) {
+        isCorrect = serverResult.correct;
+      } else {
+        // Fallback offline
+        const expected = (activeCheckpoint.correctAnswer || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "");
+        isCorrect =
+          Boolean(expected) &&
+          (rawVal === expected ||
+            (expected.length >= 6 && expected.includes(rawVal)));
+      }
+    }
 
     if (isCorrect) {
       detectiveAudio.playStampSound();
@@ -439,7 +501,7 @@ export function FollowupQuestionModal({
       setStorageItem(caseStorageKey(caseId, `followup_${culprit}`), "solved");
       if (culprit === "ha") {
         setStorageItem(caseStorageKey(caseId, "followup_ha_password"), rawVal);
-        setStorageItem(caseStorageKey(caseId, "followup_ha"), "solved");
+        setStorageItem(caseStorageKey(caseId, "followup_ha"), rawVal);
       }
       // Mở popup ảnh vật chứng nếu có
       if (discoveredPhotos.length > 0) {
@@ -457,7 +519,7 @@ export function FollowupQuestionModal({
   };
 
   // 4. Xử lý nộp đáp án Tự luận (Text Form)
-  const handleSubmitText = (e: React.FormEvent) => {
+  const handleSubmitText = async (e: React.FormEvent) => {
     e.preventDefault();
     const rawVal = textInput.trim();
     if (!rawVal && !selectedChoice) {
@@ -467,15 +529,28 @@ export function FollowupQuestionModal({
     }
 
     const finalVal = selectedChoice || rawVal;
-    const expected = (activeCheckpoint?.correctAnswer || "")
-      .trim()
-      .toLowerCase();
     const isBypass = isAdminBypassCode(finalVal);
-    const isCorrect =
-      !expected ||
-      isBypass ||
-      finalVal.toLowerCase().replace(/\s+/g, "") ===
-        expected.replace(/\s+/g, "");
+    let isCorrect = isBypass;
+
+    if (!isBypass && activeCheckpoint?.id) {
+      const serverResult = await verifyCheckpointOnServer({
+        caseId: normalizedCaseId,
+        checkpointId: activeCheckpoint.id,
+        answer: finalVal,
+      });
+
+      if (serverResult.success) {
+        isCorrect = serverResult.correct;
+      } else {
+        const expected = (activeCheckpoint.correctAnswer || "")
+          .trim()
+          .toLowerCase();
+        isCorrect =
+          !expected ||
+          finalVal.toLowerCase().replace(/\s+/g, "") ===
+            expected.replace(/\s+/g, "");
+      }
+    }
 
     if (isCorrect) {
       detectiveAudio.playStampSound();

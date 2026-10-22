@@ -1,25 +1,31 @@
-'use server'
+"use server";
 
-import { createClient } from '@/lib/supabase/server'
-import type { DbProfile } from '@/lib/types/database'
-import { requireAdminAuth } from '@/lib/auth/admin'
+import { createClient } from "@/lib/supabase/server";
+import type { DbProfile } from "@/lib/types/database";
+import { requireAdminAuth } from "@/lib/auth/admin";
 
 export async function getPlayers() {
   try {
-    await requireAdminAuth()
-    const supabase = await createClient()
+    await requireAdminAuth();
+    const supabase = await createClient();
     const { data, error } = await supabase
-      .from('profiles')
-      .select(`
+      .from("profiles")
+      .select(
+        `
         *,
         play_sessions (count)
-      `)
-      .eq('role', 'player')
+      `,
+      )
+      .eq("role", "player");
 
-    if (error) throw error
-    return { success: true, data: data }
-  } catch (error: any) {
-    console.error('Error fetching players:', error)
-    return { success: false, error: error.message, data: [] }
+    if (error) throw error;
+    return { success: true, data: data };
+  } catch (error: unknown) {
+    console.error("Error fetching players:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+      data: [],
+    };
   }
 }

@@ -12,7 +12,9 @@ export interface AvailableDocumentItem {
 }
 
 /** Lấy toàn bộ danh sách Bộ Hồ Sơ của vụ án từ bảng case_dossiers */
-export async function getCaseDossiers(caseId: string = "case_000"): Promise<DbCaseDossier[]> {
+export async function getCaseDossiers(
+  caseId: string = "case_000",
+): Promise<DbCaseDossier[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -52,7 +54,9 @@ export async function saveCaseDossier(
       case_id: caseId,
       dossier_key: payload.dossierKey.trim().toLowerCase(),
       title: payload.title.trim(),
-      document_codes: Array.from(new Set(payload.documentCodes.map((c) => c.trim()).filter(Boolean))),
+      document_codes: Array.from(
+        new Set(payload.documentCodes.map((c) => c.trim()).filter(Boolean)),
+      ),
       description: payload.description?.trim() || null,
       flow_position: payload.flowPosition || null,
       updated_at: new Date().toISOString(),
@@ -70,9 +74,15 @@ export async function saveCaseDossier(
     }
 
     return { ok: true, dossier: data as DbCaseDossier };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[saveCaseDossier] Unexpected error:", err);
-    return { ok: false, error: err?.message || "Lỗi không xác định khi lưu bộ hồ sơ" };
+    return {
+      ok: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Lỗi không xác định khi lưu bộ hồ sơ",
+    };
   }
 }
 
@@ -95,8 +105,11 @@ export async function deleteCaseDossier(
     }
 
     return { ok: true };
-  } catch (err: any) {
-    return { ok: false, error: err?.message || "Lỗi khi xóa bộ hồ sơ" };
+  } catch (err: unknown) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Lỗi khi xóa bộ hồ sơ",
+    };
   }
 }
 
@@ -117,18 +130,37 @@ export async function getAllCaseDocumentsCatalog(
       return [];
     }
 
-    const list: AvailableDocumentItem[] = (data || []).map((doc: any) => {
+    interface RawDossierCatalogRow {
+      tag_code?: string | null;
+      subject_name?: string | null;
+      mode?: string | null;
+      content?: {
+        docTitle?: string;
+        reasonText?: string;
+        caseSubtitle?: string;
+      } | null;
+    }
+
+    const list: AvailableDocumentItem[] = (
+      (data || []) as RawDossierCatalogRow[]
+    ).map((doc) => {
       const code = (doc.tag_code || "").trim();
       const rawContent = doc.content || {};
       const title =
         doc.mode === "ly_lich"
-          ? (doc.subject_name ? `Lý lịch: ${doc.subject_name}` : `Lý lịch #${code}`)
-          : (rawContent.docTitle || (doc.subject_name ? `Lời khai: ${doc.subject_name}` : `Lời khai #${code}`));
+          ? doc.subject_name
+            ? `Lý lịch: ${doc.subject_name}`
+            : `Lý lịch #${code}`
+          : rawContent.docTitle ||
+            (doc.subject_name
+              ? `Lời khai: ${doc.subject_name}`
+              : `Lời khai #${code}`);
 
       return {
         code,
         title,
-        category: doc.mode as "loi_khai" | "ly_lich",
+        category: (doc.mode === "ly_lich" ? "ly_lich" : "loi_khai") as
+          "loi_khai" | "ly_lich",
         description: rawContent.reasonText || rawContent.caseSubtitle,
       };
     });

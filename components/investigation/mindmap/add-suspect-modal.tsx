@@ -67,11 +67,7 @@ import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { getInterrogationCriteria } from "@/lib/ai/suspect-interrogation-context";
 
-export {
-  findValidCaseCharacter,
-  checkMotiveValid,
-  checkContradictionValid,
-};
+export { findValidCaseCharacter, checkMotiveValid, checkContradictionValid };
 
 export function AddSuspectModal({
   caseId = "case-000",
@@ -141,6 +137,21 @@ export function AddSuspectModal({
     ).trim();
     const norm = rawName.toLowerCase();
     if (!norm) return "";
+
+    // 0. Ưu tiên tìm Checkpoint có kind = suspect_interrogation khớp subjectKey
+    const charId = matchedChar?.id.toLowerCase();
+    const kindMatch = checkpoints.find((cp) => {
+      if (cp.kind !== "suspect_interrogation") return false;
+      const sKey = (cp.subjectKey || "").toLowerCase().trim();
+      if (!sKey) return false;
+      return (
+        sKey === norm ||
+        norm.includes(sKey) ||
+        sKey.includes(norm) ||
+        (charId && sKey === charId)
+      );
+    });
+    if (kindMatch) return kindMatch.id;
 
     // 1. Quét tìm Checkpoint khớp trực tiếp theo suspectId, followupOf, hoặc suspectLabel
     const directMatch = checkpoints.find((cp) => {

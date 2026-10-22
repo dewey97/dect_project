@@ -37,9 +37,12 @@ export async function getDashboardStats() {
         activeSessions: activeSessionsCount || 0,
       },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching dashboard stats:", error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 
@@ -55,9 +58,13 @@ export async function getCases() {
 
     if (error) throw error;
     return { success: true, data: data as DbCase[] };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching cases:", error);
-    return { success: false, error: error.message, data: [] };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+      data: [],
+    };
   }
 }
 
@@ -75,9 +82,12 @@ export async function createCaseDraft(title: string = "Untitled Mystery") {
     if (error) throw error;
     revalidatePath("/studio/cases");
     return { success: true, data: data as DbCase };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating case draft:", error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 
@@ -92,14 +102,15 @@ export async function deleteCase(caseId: string) {
 
     revalidatePath("/studio/cases");
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting case:", error);
+    const errObj = error as { code?: string; message?: string } | null;
     return {
       success: false,
       error:
-        error?.code === "23503"
+        errObj?.code === "23503"
           ? "Vụ án còn checkpoint, hồ sơ hoặc nhân vật. Xóa nội dung trước khi xóa vụ án."
-          : error.message,
+          : errObj?.message || String(error),
     };
   }
 }
@@ -137,9 +148,12 @@ export async function duplicateCase(caseId: string) {
 
     revalidatePath("/studio/cases");
     return { success: true, data: newCase };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error duplicating case:", error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 
@@ -225,11 +239,12 @@ export async function createNewCase(title: string, customCaseId?: string) {
       data: newCase as DbCase,
       caseId: normalizedCaseId,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating new case:", error);
     return {
       success: false,
-      error: error.message || "Không tạo được vụ án mới.",
+      error:
+        error instanceof Error ? error.message : "Không tạo được vụ án mới.",
     };
   }
 }
