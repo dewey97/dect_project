@@ -519,8 +519,8 @@ Sau B6, GM tạo `case_001`:
 2. ✅ **Case lint trong Studio (C2):** Module `lib/checkpoints/case-linter.ts` + modal `case-lint-modal.tsx` tích hợp nút "Kiểm tra" trên thanh công cụ: phát hiện node không tới được (unreachable), cycle BFS/DFS, checkpoint thiếu đáp án, mã chứng cứ lạ, nghi phạm chưa có checkpoint thẩm tra, vụ thiếu nạn nhân.
 3. ✅ **Nhân bản vụ án làm template (C3):** `duplicateCase` nhân bản đầy đủ trọn gói `case_checkpoints`, `case_dossiers`, `case_characters`, `dossier_documents` sang slug mới.
 4. ✅ **Chơi thử từ node X (C4):** Nút "Chơi thử" trên Checkpoint Editor (`case-playtest.ts`): tự động truy vết tổ tiên đồ thị phụ thuộc, ghi tiến trình giả theo `caseStorageKey` rồi mở tab gameplay `/evidence/web?case_id=`.
-5. ⏳ **Bàn điều tra theo vụ (C5):** `pin-builder` dựng pin gốc từ nhân vật + checkpoint; `board-stage`, `evidence/boardgame`, `evidence/[id]` nhận `case_id`; ghi lại `boardgame_pins` dạng `case_000` rồi thêm FK → `cases.slug`.
-6. ⏳ **Tài nguyên theo vụ (C6):** bỏ `CASE_000_PDFS`/`CASE_000_EVIDENCE` (`components/investigation/evidence/evidence-data.ts`) → `dossier_documents`; ảnh 360/hotspots theo slug; bỏ chữ "Khang" trong `messages-app.tsx`, `phone-app.tsx`, `photos-app.tsx`; dời asset dùng chung khỏi `public/images/cases/case_000/`; `/api/phone` không trả row thiếu `case_id` cho mọi vụ.
+5. ⏳ **Bàn điều tra theo vụ (C5):** `board-stage`, `evidence/boardgame`, `evidence/[id]` đã nhận `case_id` và bọc `Suspense`; `pin-builder` dựng pin gốc từ nhân vật + checkpoint; ghi lại `boardgame_pins` dạng `case_000` rồi thêm FK → `cases.slug`.
+6. ⏳ **Tài nguyên theo vụ (C6):** Đã bỏ hardcode "Khang" trong `messages-app.tsx`, `phone-app.tsx`, `phone-simulator.tsx` (dùng `getActiveVictim()` động); `/api/phone` đã chặn trả row thiếu `case_id` cho vụ mới; bỏ `CASE_000_PDFS`/`CASE_000_EVIDENCE` (`components/investigation/evidence/evidence-data.ts`) → `dossier_documents`; ảnh 360/hotspots theo slug; dời asset dùng chung khỏi `public/images/cases/case_000/`.
 7. ⏳ **`/activate` đọc bảng `cases` (C7):** (bỏ `CASES_CATALOG` tĩnh và luật "mã ≥ 4 ký tự là hợp lệ") — làm cùng License (`TECHDEBT.md` #09).
 
 ---

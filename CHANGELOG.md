@@ -4,6 +4,14 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-22]
 
+### Refactor
+
+- **Phổ Quát Hóa Thiết Bị & Cách Ly Vụ Án (C5, C6)**:
+  - **Bỏ hardcode tên nạn nhân**: `messages-app.tsx`, `phone-app.tsx`, `phone-simulator.tsx` không còn gán cứng tên "Khang" hay "Nguyễn Văn Khang", tự động lấy tên chủ thiết bị động qua `device.owner` hoặc `getActiveVictim()` của vụ án đang chơi.
+  - **Phân tách theo `case_id` trên toàn bộ màn hình điều tra**: Các route `board-stage`, `evidence/boardgame`, `evidence/[id]` nhận `case_id` từ URL query (`useSearchParams()` bọc `<Suspense>`), đồng bộ truyền `caseId` xuống `MainInvestigationCanvas`, `useCaseCheckpoints`, và `EpilogueModal`.
+  - **Ngăn chặn rò rỉ dữ liệu Google Sheets (`/api/phone`)**: Các hàng không có `case_id` trên Google Sheets chỉ trả về cho vụ án mặc định `case_000`, tuyệt đối không rò rỉ sang các vụ án mới.
+  - Verification: `npx tsc --noEmit --incremental false` pass 100%, `pnpm test:e2e` **9/9 PASS** (1.1m).
+
 ### Added
 
 - **Tiến Trình Theo Đồ Thị & Công Cụ Biên Tập Vụ Án (Nhóm C: C1 - C4)**:
