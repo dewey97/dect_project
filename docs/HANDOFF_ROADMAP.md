@@ -22,14 +22,22 @@
 | `cc8ab02` | perf: A8 `middleware.ts` → `proxy.ts`; D1/D2 tải lười three.js và modal 360; D4 hydration; D9 dispose 360; D10                        |                                         |
 | `1efcf33` | UI: ô lý do thẩm tra tự giãn từ 1 dòng; nút "GỢI Ý n" giữa "Quay lại"/"Xác nhận"; nhãn "Bằng chứng đã chọn"; Sổ tay cạnh nút âm lượng | Chủ dự án yêu cầu                       |
 | `7d20787` | test(e2e): baseline 8 kịch bản case_000; sửa lỗi chấm câu hỏi phụ trắc nghiệm                                                         |                                         |
+| `3cc5780` | feat(security): migration 25 — move is_admin() to schema private (A9)                                                                 | Migration 25 chờ duyệt                  |
+| `541ff18` | fix(ui): use Vietnamese-compatible font for epilogue titles (L2)                                                                      | EB Garamond Vietnamese subset           |
+| `2ef43b1` | refactor: extract Vietnamese diacritics helpers to lib/text.ts (D11)                                                                  | 3 helpers, 12 vị trí / 10 files         |
+| `079af56` | feat(checkpoints): add checkpoint kind schema, discriminated union types, and fix epilogue rendering (B2-B3, L1)                      | Migration 26, E2E 9/9                   |
+| `517ab6f` | feat(db): persist runtime data (map, hotspots, waitlist) to Supabase (A5)                                                             | Migration 24 chờ duyệt                  |
+| `6008770` | perf(assets): convert large PNGs in public to WebP (D3)                                                                               | -94.4% dung lượng (-58.9MB)             |
+| `9ccb511` | refactor(canvas): modularize hero-interactive into scene renderer and hooks (D8)                                                      | hero-interactive từ 2544 → 534 dòng     |
+| `78365f1` | refactor(scripts): organize scripts into ops and archive (E)                                                                          | 10 ops, 61 archive                      |
 
-### 1.2. Kiểm tra gần nhất (sau `7d20787`)
+### 1.2. Kiểm tra gần nhất (sau `78365f1`)
 
-| Lệnh                                     | Kết quả            |
-| ---------------------------------------- | ------------------ |
-| `npx tsc --noEmit --incremental false`   | Sạch               |
-| `NEXT_DIST_DIR=.next_dev npx next build` | Pass               |
-| `pnpm test:e2e`                          | 8/8 pass (~1 phút) |
+| Lệnh                                     | Kết quả              |
+| ---------------------------------------- | -------------------- |
+| `npx tsc --noEmit --incremental false`   | Sạch 100%            |
+| `NEXT_DIST_DIR=.next_dev npx next build` | Pass (14/14 static)  |
+| `pnpm test:e2e`                          | 9/9 pass (~1.2 phút) |
 
 ### 1.3. Database production (Supabase project `zalyxhmwwmfyexoilejp`)
 
@@ -372,10 +380,10 @@ File: `canvas/pin-builder.ts`, `main-investigation-canvas.tsx`, `canvas/use-inve
 | D5  | `lib/google/auth.ts` gộp 3 bản `createGoogleAuth`                                            | ✅ `db73360`     |
 | D6  | `import type` 13 chỗ                                                                         | ✅ `db73360`     |
 | D7  | Giảm `any` (~226)                                                                            | ⏳ brief mục 4.4 |
-| D8  | Tách `hero-interactive.tsx`, `map-studio-client.tsx`                                         | ⏳ brief mục 4.4 |
+| D8  | Tách `hero-interactive.tsx` (534 dòng)                                                       | ✅ `9ccb511`     |
 | D9  | `Scene360Viewer` dispose texture/material                                                    | ✅ `cc8ab02`     |
 | D10 | `user-nav` memo Supabase client                                                              | ✅ `cc8ab02`     |
-| D11 | Gộp hàm bỏ dấu tiếng Việt (~11 chỗ) → `lib/text.ts`                                          | ⏳ brief mục 4.4 |
+| D11 | Gộp hàm bỏ dấu tiếng Việt (~11 chỗ) → `lib/text.ts`                                          | ✅ `2ef43b1`     |
 
 `map-studio-client.tsx` (1.500 dòng) điểm tách: `useMapDraft` (autosave localStorage), `useHistory` (undo/redo), tiện ích lưới snap + đổi tọa độ, `useMapTools` (pointer/vẽ), phím tắt, `useViewportCulling`.
 
