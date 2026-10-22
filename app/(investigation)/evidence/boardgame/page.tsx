@@ -56,32 +56,44 @@ function BoardGameCompanionContent() {
   const [unlockedModalData, setUnlockedModalData] =
     useState<UnlockedModalData | null>(null);
 
-  const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<string | undefined>(undefined);
-  const [activeHintCategory, setActiveHintCategory] = useState<"motive" | "alibi" | undefined>(undefined);
+  const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<
+    string | undefined
+  >(undefined);
+  const [activeHintCategory, setActiveHintCategory] = useState<
+    "motive" | "alibi" | undefined
+  >(undefined);
 
   // Event bus listeners
   useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
   useInvestigationEvent("OPEN_HINT", (e: any) => {
-    const cpId = e?.detail?.checkpointId || (typeof e?.detail === "string" ? e.detail : undefined);
-    const cat = e?.detail?.category || (typeof e?.detail === "object" ? e.detail?.category : undefined);
+    const cpId =
+      e?.detail?.checkpointId ||
+      (typeof e?.detail === "string" ? e.detail : undefined);
+    const cat =
+      e?.detail?.category ||
+      (typeof e?.detail === "object" ? e.detail?.category : undefined);
     setActiveHintCheckpointId(cpId);
     setActiveHintCategory(cat);
     setActiveModal("hint");
   });
-  useInvestigationEvent("OPEN_REINVESTIGATE", () => setActiveModal("reinvestigate"));
+  useInvestigationEvent("OPEN_REINVESTIGATE", () =>
+    setActiveModal("reinvestigate"),
+  );
+
+  const isCase000 = caseId === "case-000" || caseId === "case_000";
 
   useEffect(() => {
     setStorageItem("play_experience", "boardgame");
     const isIntroSeen = getStorageItem(caseStorageKey(caseId, "intro_seen"));
-    if (isIntroSeen !== "true") {
+    if (isIntroSeen !== "true" && isCase000) {
       setUnlockedModalData({
         unlockedPhase: 0,
         newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
         newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
       });
     }
-  }, []);
+  }, [caseId, isCase000]);
 
   const resetFindingsProgress = () => {
     clearInvestigationStorage();

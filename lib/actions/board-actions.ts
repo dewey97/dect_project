@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireAdminAuth } from "@/lib/auth/admin";
-import { caseIdVariants, normalizeCaseId } from "@/lib/cases/case-id";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 import {
   PinPoint,
   CaseConnection,
@@ -22,10 +22,12 @@ export async function saveBoardgamePinPositions(
 
     const supabase = await createClient();
 
+    const normalizedId = normalizeCaseId(caseId);
+
     // 1. Map PinPoint sang format DB
     const formattedPins = pins.map((p) => ({
       id: p.id,
-      case_id: normalizeCaseId(caseId),
+      case_id: normalizedId,
       position_x: p.x,
       position_y: p.y,
       label: p.label,
@@ -44,7 +46,7 @@ export async function saveBoardgamePinPositions(
 
     const formattedConns = (connections || []).map((c) => ({
       id: c.id,
-      case_id: normalizeCaseId(caseId),
+      case_id: normalizedId,
       from_pin_id: c.fromPinId,
       to_pin_id: c.toPinId,
       updated_at: new Date().toISOString(),
@@ -59,13 +61,13 @@ export async function saveBoardgamePinPositions(
       await supabase
         .from("boardgame_pins")
         .delete()
-        .in("case_id", caseIdVariants(caseId))
+        .eq("case_id", normalizedId)
         .not("id", "in", `(${quotedPinIds})`);
     } else {
       await supabase
         .from("boardgame_pins")
         .delete()
-        .in("case_id", caseIdVariants(caseId));
+        .eq("case_id", normalizedId);
     }
 
     // 3. Upsert Pins (bao rotation/scale, id TEXT cho phép c0-pin-...)
@@ -83,7 +85,7 @@ export async function saveBoardgamePinPositions(
       const { error: delConnError } = await supabase
         .from("boardgame_connections")
         .delete()
-        .in("case_id", caseIdVariants(caseId))
+        .eq("case_id", normalizedId)
         .not("id", "in", `(${quotedConnIds})`);
       if (delConnError) throw delConnError;
       const { error: connError } = await supabase
@@ -94,7 +96,7 @@ export async function saveBoardgamePinPositions(
       const { error: delAllError } = await supabase
         .from("boardgame_connections")
         .delete()
-        .in("case_id", caseIdVariants(caseId));
+        .eq("case_id", normalizedId);
       if (delAllError) throw delAllError;
     }
 
@@ -119,17 +121,19 @@ export async function getBoardgamePinPositions(caseId: string): Promise<{
   try {
     const supabase = await createClient();
 
+    const normalizedId = normalizeCaseId(caseId);
+
     const { data: pinsData, error: pinError } = await supabase
       .from("boardgame_pins")
       .select("*")
-      .in("case_id", caseIdVariants(caseId));
+      .eq("case_id", normalizedId);
 
     if (pinError) throw pinError;
 
     const { data: connsData, error: connError } = await supabase
       .from("boardgame_connections")
       .select("*")
-      .in("case_id", caseIdVariants(caseId));
+      .eq("case_id", normalizedId);
 
     if (connError) throw connError;
 

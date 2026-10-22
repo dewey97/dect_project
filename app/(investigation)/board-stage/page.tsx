@@ -28,7 +28,12 @@ import {
   clearInvestigationStorage,
 } from "@/lib/storage";
 import { useInvestigationEvent } from "@/lib/investigation-events";
-import { Lightbulb, Sliders, ArrowLeft, Image as ImageIcon } from "lucide-react";
+import {
+  Lightbulb,
+  Sliders,
+  ArrowLeft,
+  Image as ImageIcon,
+} from "lucide-react";
 import Link from "next/link";
 // Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.
 const ReinvestigationModal = nextDynamic(
@@ -116,7 +121,8 @@ function BoardStageContent() {
   // TÙY CHỈNH BACKGROUND & NÓN ÁNH SÁNG TESTING
   // ──────────────────────────────────────────────
   const [selectedBgId, setSelectedBgId] = useState(BG_OPTIONS[0].id);
-  const currentBgOption = BG_OPTIONS.find((b) => b.id === selectedBgId) || BG_OPTIONS[0];
+  const currentBgOption =
+    BG_OPTIONS.find((b) => b.id === selectedBgId) || BG_OPTIONS[0];
   const [lampOn, setLampOn] = useState(true);
   const [coneSpread, setConeSpread] = useState(65); // Độ mở nón (35° -> 90°)
   const [lampIntensity, setLampIntensity] = useState(85); // 20% -> 100%
@@ -140,17 +146,19 @@ function BoardStageContent() {
     setActiveModal("reinvestigate"),
   );
 
+  const isCase000 = caseId === "case-000" || caseId === "case_000";
+
   useEffect(() => {
     setStorageItem("play_experience", "boardgame");
     const isIntroSeen = getStorageItem("intro_seen");
-    if (isIntroSeen !== "true") {
+    if (isIntroSeen !== "true" && isCase000) {
       setUnlockedModalData({
         unlockedPhase: 0,
         newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
         newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
       });
     }
-  }, [completedCheckpointIds.length]);
+  }, [completedCheckpointIds.length, isCase000]);
 
   const handleAnswerSelect = (cpId: string, option: string) => {
     detectiveAudio.playTypewriterClick();
@@ -212,7 +220,6 @@ function BoardStageContent() {
       suppressHydrationWarning
       className="h-full w-full bg-[#0b0704] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col justify-start items-center p-0 relative box-border flex-1 min-h-0"
     >
-
       {/* ─────────────────────────────────────────────────────────────
           2. THANH TEST CONTROL: CHUYỂN BACKGROUND & NÓN ÁNH SÁNG
       ───────────────────────────────────────────────────────────── */}
@@ -241,7 +248,11 @@ function BoardStageContent() {
               className="bg-transparent text-[10.5px] text-stone-200 outline-none cursor-pointer pr-1"
             >
               {BG_OPTIONS.map((opt) => (
-                <option key={opt.id} value={opt.id} className="bg-stone-900 text-stone-200">
+                <option
+                  key={opt.id}
+                  value={opt.id}
+                  className="bg-stone-900 text-stone-200"
+                >
                   {opt.name}
                 </option>
               ))}
@@ -279,11 +290,15 @@ function BoardStageContent() {
         <div className="z-40 w-full max-w-4xl px-4 py-3 bg-stone-950/95 border-b border-amber-900/40 backdrop-blur-md animate-in slide-in-from-top-2 duration-150 shadow-2xl">
           <div className="text-[11px] font-mono text-amber-400 uppercase font-semibold mb-2 flex items-center justify-between">
             <span>Tùy chỉnh Nón Ánh Sáng Chiếu Đỉnh (Tâm chính giữa)</span>
-            <span className="text-[10px] text-stone-400 font-normal">Realtime Spotlight Cone</span>
+            <span className="text-[10px] text-stone-400 font-normal">
+              Realtime Spotlight Cone
+            </span>
           </div>
           <div className="grid grid-cols-2 gap-6 text-[10px] text-stone-300">
             <div>
-              <span className="text-stone-400 block mb-1">Độ mở nón sáng: {coneSpread}°</span>
+              <span className="text-stone-400 block mb-1">
+                Độ mở nón sáng: {coneSpread}°
+              </span>
               <input
                 type="range"
                 min="35"
@@ -294,7 +309,9 @@ function BoardStageContent() {
               />
             </div>
             <div>
-              <span className="text-stone-400 block mb-1">Cường độ ánh sáng: {lampIntensity}%</span>
+              <span className="text-stone-400 block mb-1">
+                Cường độ ánh sáng: {lampIntensity}%
+              </span>
               <input
                 type="range"
                 min="20"

@@ -214,13 +214,16 @@ function WebEvidencePageContent() {
       };
     });
 
-    // 2. Thêm file PDF kiểm thử duy nhất (Phase 0)
-    const testPdfItems: CombinedItem[] = CASE_000_PDFS.map((doc) => ({
-      type: "pdf" as const,
-      data: doc,
-      phase: doc.phase,
-      order: doc.order,
-    }));
+    // 2. Thêm file PDF kiểm thử duy nhất (Phase 0) cho case_000
+    const isCase000 = caseId === "case-000" || caseId === "case_000";
+    const testPdfItems: CombinedItem[] = isCase000
+      ? CASE_000_PDFS.map((doc) => ({
+          type: "pdf" as const,
+          data: doc,
+          phase: doc.phase,
+          order: doc.order,
+        }))
+      : [];
 
     // 3. Vật chứng ảnh từ Sheet hoặc fallback local
     let photoItems: CombinedItem[] = [];

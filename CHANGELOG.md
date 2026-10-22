@@ -4,16 +4,19 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-23]
 
-### Database & Security
+### Database & Schema
 
-- **Áp dụng toàn bộ Migrations 24-28 lên Production**:
-  - `24_runtime_data_tables.sql`: chuyển `map_vectors`, `reinvestigation_hotspots`, `waitlist_entries` sang Supabase với RLS hoàn chỉnh.
-  - `25_private_is_admin.sql`: di chuyển hàm `is_admin()` sang schema `private`, cập nhật 9 policy, giải quyết triệt để cảnh báo security advisor.
-  - `26_checkpoint_kind.sql`: thêm cột `kind` và `subject_key`, backfill toàn bộ 9 checkpoint của `case_000`.
-  - `27_checkpoint_server_grading.sql`: tạo view `case_checkpoints_public` với `security_invoker = true` che giấu đáp án nhạy cảm trước client.
-  - `28_checkpoint_config_normalize.sql`: chuẩn hóa `input_type` cho followup và `valid_suspects` cho indictment.
+- **Migration 29: Khóa Ngoại Boardgame Pins & Connections (`29_boardgame_pins_case_slug_fk.sql`) (C5)**:
+  - Chuẩn hóa toàn bộ `case_id` dạng cũ có dấu gạch ngang (`case-000`) sang gạch dưới chuẩn (`case_000`).
+  - Thiết lập khóa ngoại `FOREIGN KEY (case_id) REFERENCES public.cases(slug) ON UPDATE CASCADE ON DELETE RESTRICT` trên 2 bảng `boardgame_pins` và `boardgame_connections`.
+  - Refactor `lib/actions/board-actions.ts`: gỡ bỏ hàm biến thể `caseIdVariants()`, sử dụng `normalizeCaseId()` trực tiếp với query `.eq('case_id', ...)`.
 
 ### Refactor
+
+- **Phổ Quát Hóa Tài Nguyên Đa Vụ Án & Tách Khám Xét Hiện Trường 360 (C6)**:
+  - `components/investigation/evidence/reinvestigation-modal.tsx`: `Scene360Viewer` tải động ảnh 360 equirectangular theo vụ án (`/images/cases/${normalizeCaseId(caseId)}/crime_scene_360.jpg` và `PANORAMA.png`). Vụ án mới không bị ép nạp 4 hotspot tĩnh của `case_000`.
+  - `components/investigation/mindmap/canvas/pin-builder.ts`: ghim khám xét hiện trường (`c0-pin-reinvestigate`) nạp `photoUrl` và mô tả chi tiết động theo `input.caseId`.
+  - `app/(investigation)/evidence/web/page.tsx`, `board-stage/page.tsx`, `evidence/boardgame/page.tsx`: tách biệt `CASE_000_PDFS` và `CASE_000_EVIDENCE` fallback tĩnh, chỉ nạp cho `case_000`, ngăn chặn hiển thị nhầm vào các vụ án mới.
 
 - **Dọn dẹp Fallback Legacy & Chuẩn Hóa Lựa Chọn Trắc Nghiệm (B6-cleanup)**:
   - `lib/checkpoints/server-grader.ts`: `inferCheckpointKind` đọc trực tiếp `checkpoint.kind` (NOT NULL); loại bỏ hoàn toàn các nhánh dò id cứng `-1a/-1b/-1c`, `endsWith("-0")`, `includes("indictment")`, `cleanCorrect === "21:15"` và `cleanCorrect === "120713"`.

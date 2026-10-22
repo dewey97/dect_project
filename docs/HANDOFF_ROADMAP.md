@@ -71,14 +71,14 @@ E2E case_000 xanh 100% gồm cả test Tùng (bug grader đã sửa). Working tr
 
 ### 1.5. Việc còn lại — tổng quan
 
-| Nhóm   | Mục                                                                     | Người làm đề xuất   | Ước lượng |
-| ------ | ----------------------------------------------------------------------- | ------------------- | --------- |
-| Bước 0 | Đặt `SUPABASE_SERVICE_ROLE_KEY` trên VPS, push code, smoke test         | Chủ dự án           | 30 phút   |
-| A      | A6 rotate key `.env`, `git rm --cached .env`                            | Chủ dự án           | 30 phút   |
-| B      | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm | Claude              | —         |
-| C      | C5 (FK boardgame_pins), C6 (tách asset theo vụ), C7 (/activate đọc DB)  | Claude / model khác | 1–2 ngày  |
-| D      | D7 giảm `any` (~còn), D11 tiếp                                          | Model khác          | 1–2 ngày  |
-| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`             | Chủ dự án           | —         |
+| Nhóm   | Mục                                                                                         | Người làm đề xuất   | Ước lượng |
+| ------ | ------------------------------------------------------------------------------------------- | ------------------- | --------- |
+| Bước 0 | Đặt `SUPABASE_SERVICE_ROLE_KEY` trên VPS, push code, smoke test                             | Chủ dự án           | 30 phút   |
+| A      | A6 rotate key `.env`, `git rm --cached .env`                                                | Chủ dự án           | 30 phút   |
+| B      | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm                     | Claude              | —         |
+| C      | C5 (FK boardgame_pins: ✅ migration 29), C6 (tách asset theo vụ: ✅), C7 (/activate đọc DB) | Claude / model khác | 1 ngày    |
+| D      | D7 giảm `any` (~còn), D11 tiếp                                                              | Model khác          | 1–2 ngày  |
+| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`                                 | Chủ dự án           | —         |
 
 Đã hoàn tất kể từ bản roadmap trước: Migration 24–28 đã chạy production, B6-cleanup, A5, A9, L1, L2, B2–B6 (bước chính), C1–C6, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard.
 | E | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx` | Chủ dự án | — |
@@ -533,8 +533,8 @@ Sau B6, GM tạo `case_001`:
 2. ✅ **Case lint trong Studio (C2):** Module `lib/checkpoints/case-linter.ts` + modal `case-lint-modal.tsx` tích hợp nút "Kiểm tra" trên thanh công cụ: phát hiện node không tới được (unreachable), cycle BFS/DFS, checkpoint thiếu đáp án, mã chứng cứ lạ, nghi phạm chưa có checkpoint thẩm tra, vụ thiếu nạn nhân.
 3. ✅ **Nhân bản vụ án làm template (C3):** `duplicateCase` nhân bản đầy đủ trọn gói `case_checkpoints`, `case_dossiers`, `case_characters`, `dossier_documents` sang slug mới.
 4. ✅ **Chơi thử từ node X (C4):** Nút "Chơi thử" trên Checkpoint Editor (`case-playtest.ts`): tự động truy vết tổ tiên đồ thị phụ thuộc, ghi tiến trình giả theo `caseStorageKey` rồi mở tab gameplay `/evidence/web?case_id=`.
-5. ⏳ **Bàn điều tra theo vụ (C5):** `board-stage`, `evidence/boardgame`, `evidence/[id]` đã nhận `case_id` và bọc `Suspense`; `pin-builder` dựng pin gốc từ nhân vật + checkpoint; ghi lại `boardgame_pins` dạng `case_000` rồi thêm FK → `cases.slug`.
-6. ⏳ **Tài nguyên theo vụ (C6):** Đã bỏ hardcode "Khang" trong `messages-app.tsx`, `phone-app.tsx`, `phone-simulator.tsx` (dùng `getActiveVictim()` động); `/api/phone` đã chặn trả row thiếu `case_id` cho vụ mới; bỏ `CASE_000_PDFS`/`CASE_000_EVIDENCE` (`components/investigation/evidence/evidence-data.ts`) → `dossier_documents`; ảnh 360/hotspots theo slug; dời asset dùng chung khỏi `public/images/cases/case_000/`.
+5. ✅ **Bàn điều tra theo vụ (C5):** `board-stage`, `evidence/boardgame`, `evidence/[id]` đã nhận `case_id` và bọc `Suspense`; `pin-builder` dựng pin gốc từ nhân vật + checkpoint; migration `29_boardgame_pins_case_slug_fk.sql` chuẩn hóa case_id và thêm FK → `cases.slug`; `board-actions.ts` dùng `normalizeCaseId` và bỏ `caseIdVariants`.
+6. ✅ **Tài nguyên theo vụ (C6):** Đã bỏ hardcode "Khang" trong `messages-app.tsx`, `phone-app.tsx`, `phone-simulator.tsx` (dùng `getActiveVictim()` động); `/api/phone` đã chặn trả row thiếu `case_id` cho vụ mới; cách ly `CASE_000_PDFS`/`CASE_000_EVIDENCE` chỉ nạp cho `case_000`; `Scene360Viewer` và `pin-builder` nạp ảnh hiện trường theo caseId; hỗ trợ nạp hotspot qua API `/api/reinvestigation`.
 7. ⏳ **`/activate` đọc bảng `cases` (C7):** (bỏ `CASES_CATALOG` tĩnh và luật "mã ≥ 4 ký tự là hợp lệ") — làm cùng License (`TECHDEBT.md` #09).
 
 ---

@@ -1,7 +1,7 @@
-﻿'use client'
+﻿"use client";
 
-import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   Volume2,
@@ -17,159 +17,227 @@ import {
   Move,
   Link2,
   FileText,
-  Maximize2
-} from 'lucide-react'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { checkIsAdmin } from '@/lib/actions/auth-guard'
-import { usePhoneData } from '@/lib/hooks/use-phone-data'
-import { normalizeImageUrl } from '@/lib/utils'
-import { toast } from '@/components/ui/toast'
-import { Scene360Viewer } from '@/components/investigation/scene-360-viewer'
+  Maximize2,
+} from "lucide-react";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { checkIsAdmin } from "@/lib/actions/auth-guard";
+import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { normalizeImageUrl } from "@/lib/utils";
+import { toast } from "@/components/ui/toast";
+import { Scene360Viewer } from "@/components/investigation/scene-360-viewer";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 interface ReinvestigationModalProps {
-  isOpen: boolean
-  onClose: () => void
-  caseId?: string
+  isOpen: boolean;
+  onClose: () => void;
+  caseId?: string;
   /** Nếu true: render inline trong container cha (không fullscreen fixed). Desktop Zone 3 mode. */
-  inline?: boolean
+  inline?: boolean;
   /** Callback khi ấn nút mở toàn màn hình (chỉ hiển thị khi inline=true) */
-  onExpand?: () => void
+  onExpand?: () => void;
 }
 
 export interface ReinvestigationHotspot2D {
-  id: string
-  num: number
-  photoId?: string // Mã photo_code trong Google Sheets (VD: photo_bua_yeu, p1, photo_keo_toc...)
-  title?: string
-  x: number // percentage 0-100
-  y: number // percentage 0-100
-  yaw?: number // Tọa độ góc nhìn 360 (-180 to 180)
-  pitch?: number // Tọa độ góc nhìn 360 (-85 to 85)
-  imageUrl: string
-  driveUrl?: string
-  soundFile: string
-  soundCaption: string
+  id: string;
+  num: number;
+  photoId?: string; // Mã photo_code trong Google Sheets (VD: photo_bua_yeu, p1, photo_keo_toc...)
+  title?: string;
+  x: number; // percentage 0-100
+  y: number; // percentage 0-100
+  yaw?: number; // Tọa độ góc nhìn 360 (-180 to 180)
+  pitch?: number; // Tọa độ góc nhìn 360 (-85 to 85)
+  imageUrl: string;
+  driveUrl?: string;
+  soundFile: string;
+  soundCaption: string;
 }
 
 // SFX HIỆU ỨNG ÂM THANH CÓ SẴN
 const SFX_OPTIONS = [
-  { file: 'train_sound.mp3', label: 'Còi tàu & chuông đường sắt', caption: '*Tu tu... Xình xịch...*' },
-  { file: 'sound_tu.mp3', label: 'Kẹt then cửa sắt / Tủ gỗ', caption: '*Két... Cạch...*' },
-  { file: 'breaking.mp3', label: 'Mảnh ấm chén rơi vỡ', caption: '*Choang! Xoảng...*' },
-  { file: 'Clack.mp3', label: 'Cạch then cửa hậu', caption: '*Cạch... cạch...*' },
-  { file: 'sat_soat.mp3', label: 'Giấy sột soạt / Khăn giấy', caption: '*Sột soạt... sột soạt...*' },
-  { file: 'ceramic_shatter.mp3', label: 'Gốm sứ vỡ vụn', caption: '*Xoảng...*' },
-  { file: 'glass_break.mp3', label: 'Thủy tinh vỡ', caption: '*Choang!*' },
-  { file: 'ha_voicemail_2032.mp3', label: 'Thì thầm ma mị', caption: '*Thì thào...*' },
-  { file: 'heartbeat.mp3', label: 'Nhịp tim dồn dập', caption: '*Thình thịch...*' },
-  { file: 'paper_rustle.mp3', label: 'Lật trang hồ sơ', caption: '*Xào xạc...*' }
-]
+  {
+    file: "train_sound.mp3",
+    label: "Còi tàu & chuông đường sắt",
+    caption: "*Tu tu... Xình xịch...*",
+  },
+  {
+    file: "sound_tu.mp3",
+    label: "Kẹt then cửa sắt / Tủ gỗ",
+    caption: "*Két... Cạch...*",
+  },
+  {
+    file: "breaking.mp3",
+    label: "Mảnh ấm chén rơi vỡ",
+    caption: "*Choang! Xoảng...*",
+  },
+  {
+    file: "Clack.mp3",
+    label: "Cạch then cửa hậu",
+    caption: "*Cạch... cạch...*",
+  },
+  {
+    file: "sat_soat.mp3",
+    label: "Giấy sột soạt / Khăn giấy",
+    caption: "*Sột soạt... sột soạt...*",
+  },
+  {
+    file: "ceramic_shatter.mp3",
+    label: "Gốm sứ vỡ vụn",
+    caption: "*Xoảng...*",
+  },
+  { file: "glass_break.mp3", label: "Thủy tinh vỡ", caption: "*Choang!*" },
+  {
+    file: "ha_voicemail_2032.mp3",
+    label: "Thì thầm ma mị",
+    caption: "*Thì thào...*",
+  },
+  {
+    file: "heartbeat.mp3",
+    label: "Nhịp tim dồn dập",
+    caption: "*Thình thịch...*",
+  },
+  {
+    file: "paper_rustle.mp3",
+    label: "Lật trang hồ sơ",
+    caption: "*Xào xạc...*",
+  },
+];
 
 // 4 ĐIỂM KHÁM XÉT KHỞI TẠO ĐỒNG BỘ TỪ DATA CASE #000
 export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
   {
-    id: 'spot-1',
+    id: "spot-1",
     num: 1,
-    photoId: 'tu_go',
-    title: 'Tủ gỗ',
+    photoId: "tu_go",
+    title: "Tủ gỗ",
     x: 44.5,
     y: 51.1,
-    imageUrl: '/api/image-proxy?id=1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR',
-    soundFile: 'train_sound.mp3',
-    soundCaption: '*Tu tu... Xình xịch...*',
-    driveUrl: 'https://drive.google.com/file/d/1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR/view?usp=drive_link',
+    imageUrl: "/api/image-proxy?id=1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR",
+    soundFile: "train_sound.mp3",
+    soundCaption: "*Tu tu... Xình xịch...*",
+    driveUrl:
+      "https://drive.google.com/file/d/1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR/view?usp=drive_link",
   },
   {
-    id: 'spot-2',
+    id: "spot-2",
     num: 2,
-    photoId: 'bua_goi',
-    title: 'Bùa yêu dưới gối',
+    photoId: "bua_goi",
+    title: "Bùa yêu dưới gối",
     x: 58.5,
     y: 56,
-    imageUrl: '/api/image-proxy?id=11rPmlApf5TsTDguEOBKQBqL09SIks8eU',
-    soundFile: 'sound_tu.mp3',
-    soundCaption: '*Két... Cạch...*',
-    driveUrl: 'https://drive.google.com/file/d/11rPmlApf5TsTDguEOBKQBqL09SIks8eU/view?usp=drive_link',
+    imageUrl: "/api/image-proxy?id=11rPmlApf5TsTDguEOBKQBqL09SIks8eU",
+    soundFile: "sound_tu.mp3",
+    soundCaption: "*Két... Cạch...*",
+    driveUrl:
+      "https://drive.google.com/file/d/11rPmlApf5TsTDguEOBKQBqL09SIks8eU/view?usp=drive_link",
   },
   {
-    id: 'spot-3',
+    id: "spot-3",
     num: 3,
-    photoId: 'luoc_dinh_toc',
-    title: 'Lược dính tóc',
+    photoId: "luoc_dinh_toc",
+    title: "Lược dính tóc",
     x: 52.7,
     y: 56.9,
-    imageUrl: '/api/image-proxy?id=1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe',
-    soundFile: 'breaking.mp3',
-    soundCaption: '*Choang! Xoảng...*',
-    driveUrl: 'https://drive.google.com/file/d/1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe/view?usp=drive_link',
+    imageUrl: "/api/image-proxy?id=1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe",
+    soundFile: "breaking.mp3",
+    soundCaption: "*Choang! Xoảng...*",
+    driveUrl:
+      "https://drive.google.com/file/d/1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe/view?usp=drive_link",
   },
   {
-    id: 'spot-4',
+    id: "spot-4",
     num: 4,
-    photoId: 'canh_hoa',
-    title: 'Cánh hoa xoan dưới sàn nhà',
+    photoId: "canh_hoa",
+    title: "Cánh hoa xoan dưới sàn nhà",
     x: 11.2,
     y: 74,
-    imageUrl: '/api/image-proxy?id=1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z',
-    soundFile: 'Clack.mp3',
-    soundCaption: '*Cạch... cạch...*',
-    driveUrl: 'https://drive.google.com/file/d/1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z/view?usp=drive_link',
+    imageUrl: "/api/image-proxy?id=1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z",
+    soundFile: "Clack.mp3",
+    soundCaption: "*Cạch... cạch...*",
+    driveUrl:
+      "https://drive.google.com/file/d/1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z/view?usp=drive_link",
   },
-]
+];
 
-export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inline = false, onExpand }: ReinvestigationModalProps) {
-  const isCase000 = caseId === 'case_000' || caseId === 'case-000'
+export function ReinvestigationModal({
+  isOpen,
+  onClose,
+  caseId = "case_000",
+  inline = false,
+  onExpand,
+}: ReinvestigationModalProps) {
+  const isCase000 = caseId === "case_000" || caseId === "case-000";
   // Hotspots list with server + localStorage persistence
-  const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>(isCase000 ? HOTSPOTS_2D_LIST : [])
-  const [selectedSpot, setSelectedSpot] = useState<ReinvestigationHotspot2D | null>(null)
-  const [activeAudioToast, setActiveAudioToast] = useState<string | null>(null)
-  const dragDistanceRef = useRef(0)
-  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>(
+    isCase000 ? HOTSPOTS_2D_LIST : [],
+  );
+  const [selectedSpot, setSelectedSpot] =
+    useState<ReinvestigationHotspot2D | null>(null);
+  const [activeAudioToast, setActiveAudioToast] = useState<string | null>(null);
+  const dragDistanceRef = useRef(0);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Infinite horizontal pan state & refs
-  const [offsetX, setOffsetX] = useState(0)
-  const isDraggingRef = useRef(false)
-  const lastXRef = useRef(0)
-  const velocityRef = useRef(0)
-  const animFrameRef = useRef<number | null>(null)
+  const [offsetX, setOffsetX] = useState(0);
+  const isDraggingRef = useRef(false);
+  const lastXRef = useRef(0);
+  const velocityRef = useRef(0);
+  const animFrameRef = useRef<number | null>(null);
 
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [containerSize, setContainerSize] = useState({ width: 1200, height: 800 })
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState({
+    width: 1200,
+    height: 800,
+  });
 
   // Admin & Calibrator states
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isCalibrateMode, setIsCalibrateMode] = useState(false)
-  const [selectedCalibrateSpotId, setSelectedCalibrateSpotId] = useState<string | null>(null)
-  const [isPhotoPickerOpen, setIsPhotoPickerOpen] = useState(false)
-  const [photoSearchQuery, setPhotoSearchQuery] = useState('')
-  const [isSavingDb, setIsSavingDb] = useState(false)
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isCalibrateMode, setIsCalibrateMode] = useState(false);
+  const [selectedCalibrateSpotId, setSelectedCalibrateSpotId] = useState<
+    string | null
+  >(null);
+  const [isPhotoPickerOpen, setIsPhotoPickerOpen] = useState(false);
+  const [photoSearchQuery, setPhotoSearchQuery] = useState("");
+  const [isSavingDb, setIsSavingDb] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Fetch live photos & hotspots from Google Sheets (evidences tab)
-  const { data: rawSheetPhotos, loading: isPhotosLoading } = usePhoneData('evidences', caseId)
+  const { data: rawSheetPhotos, loading: isPhotosLoading } = usePhoneData(
+    "evidences",
+    caseId,
+  );
 
   // Load hotspots from Server API, falling back to localStorage
   useEffect(() => {
-    let mounted = true
+    let mounted = true;
     async function loadSavedHotspots() {
       try {
-        const res = await fetch(`/api/reinvestigation?caseId=${encodeURIComponent(caseId)}`, { cache: 'no-store' })
+        const res = await fetch(
+          `/api/reinvestigation?caseId=${encodeURIComponent(caseId)}`,
+          { cache: "no-store" },
+        );
         if (res.ok) {
-          const data = await res.json()
-          if (mounted && data.success && Array.isArray(data.hotspots) && data.hotspots.length > 0) {
-            setHotspots(data.hotspots)
-            return
+          const data = await res.json();
+          if (
+            mounted &&
+            data.success &&
+            Array.isArray(data.hotspots) &&
+            data.hotspots.length > 0
+          ) {
+            setHotspots(data.hotspots);
+            return;
           }
         }
       } catch {}
 
-      if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem(`reinvestigate_custom_hotspots_${caseId}`) || localStorage.getItem('reinvestigate_custom_hotspots')
+      if (typeof window !== "undefined") {
+        const saved =
+          localStorage.getItem(`reinvestigate_custom_hotspots_${caseId}`) ||
+          localStorage.getItem("reinvestigate_custom_hotspots");
         if (saved) {
           try {
-            const parsed = JSON.parse(saved)
+            const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0 && mounted) {
-              setHotspots(parsed)
+              setHotspots(parsed);
             }
           } catch {}
         }
@@ -177,50 +245,62 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
     }
 
     if (isOpen) {
-      loadSavedHotspots()
+      loadSavedHotspots();
     }
 
     return () => {
-      mounted = false
-    }
-  }, [isOpen])
+      mounted = false;
+    };
+  }, [isOpen]);
 
   // Check admin role
   useEffect(() => {
-    let mounted = true
+    let mounted = true;
     async function verifyAdmin() {
-      if (typeof window !== 'undefined') {
-        const urlParams = new URLSearchParams(window.location.search)
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
         if (
-          urlParams.get('admin') === 'true' ||
-          localStorage.getItem('is_admin') === 'true' ||
-          localStorage.getItem('admin') === 'true'
+          urlParams.get("admin") === "true" ||
+          localStorage.getItem("is_admin") === "true" ||
+          localStorage.getItem("admin") === "true"
         ) {
-          if (mounted) setIsAdmin(true)
-          return
+          if (mounted) setIsAdmin(true);
+          return;
         }
       }
       try {
-        const adminRole = await checkIsAdmin()
-        if (mounted && adminRole) setIsAdmin(true)
+        const adminRole = await checkIsAdmin();
+        if (mounted && adminRole) setIsAdmin(true);
       } catch {}
     }
-    verifyAdmin()
+    verifyAdmin();
     return () => {
-      mounted = false
-    }
-  }, [])
+      mounted = false;
+    };
+  }, []);
 
   // Process Google Sheets photos: Map by photo_code ID & Title
   const sheetPhotosList = useMemo(() => {
-    if (!Array.isArray(rawSheetPhotos)) return []
+    if (!Array.isArray(rawSheetPhotos)) return [];
     return rawSheetPhotos
       .filter((item: any) =>
-        Boolean(item.drive_url || item.direct_cdn_url || item.url || item.photo_url || item.link_anh || item.image_url)
+        Boolean(
+          item.drive_url ||
+          item.direct_cdn_url ||
+          item.url ||
+          item.photo_url ||
+          item.link_anh ||
+          item.image_url,
+        ),
       )
       .map((item: any, idx: number) => {
-        const photoCode = item.code || item.photo_code || item.photo_id || item.id || `photo-${idx + 1}`
-        const driveUrl = item.drive_url || ''
+        const photoCode =
+          item.code ||
+          item.photo_code ||
+          item.photo_id ||
+          item.id ||
+          `photo-${idx + 1}`;
+        const driveUrl = item.drive_url || "";
         const rawUrl =
           item.direct_cdn_url ||
           item.drive_url ||
@@ -228,8 +308,8 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
           item.photo_url ||
           item.link_anh ||
           item.image_url ||
-          ''
-        const normUrl = normalizeImageUrl(rawUrl)
+          "";
+        const normUrl = normalizeImageUrl(rawUrl);
         const title =
           item.label ||
           item.title ||
@@ -237,38 +317,43 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
           item.file_name ||
           item.filename ||
           item.ten_anh ||
-          item['tên ảnh'] ||
-          `Ảnh #${idx + 1}`
+          item["tên ảnh"] ||
+          `Ảnh #${idx + 1}`;
         return {
           id: photoCode, // ID code / photo_code chuẩn trong sheet
           title,
           url: normUrl,
           driveUrl,
-          description: item.description_prompt || item.description || item.note || '',
-          location: item.location || '',
-          category: item.category || 'VẬT CHỨNG',
-          board_x: item.board_x || item.x || '',
-          board_y: item.board_y || item.y || '',
-        }
-      })
-  }, [rawSheetPhotos])
+          description:
+            item.description_prompt || item.description || item.note || "",
+          location: item.location || "",
+          category: item.category || "VẬT CHỨNG",
+          board_x: item.board_x || item.x || "",
+          board_y: item.board_y || item.y || "",
+        };
+      });
+  }, [rawSheetPhotos]);
 
   // Filtered photos for picker (Text only list)
   const filteredSheetPhotos = useMemo(() => {
-    if (!photoSearchQuery.trim()) return sheetPhotosList
-    const q = photoSearchQuery.toLowerCase()
+    if (!photoSearchQuery.trim()) return sheetPhotosList;
+    const q = photoSearchQuery.toLowerCase();
     return sheetPhotosList.filter(
       (p) =>
         p.title.toLowerCase().includes(q) ||
         p.id.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
-    )
-  }, [sheetPhotosList, photoSearchQuery])
+        p.description.toLowerCase().includes(q),
+    );
+  }, [sheetPhotosList, photoSearchQuery]);
 
   // Active hotspot in calibrate mode
   const activeCalibrateSpot = useMemo(() => {
-    return hotspots.find((s) => s.id === selectedCalibrateSpotId) || hotspots[0] || null
-  }, [hotspots, selectedCalibrateSpotId])
+    return (
+      hotspots.find((s) => s.id === selectedCalibrateSpotId) ||
+      hotspots[0] ||
+      null
+    );
+  }, [hotspots, selectedCalibrateSpotId]);
 
   // DYNAMICALLY SYNC HOTSPOTS FROM GOOGLE SHEETS BY photoId, code (C-01..C-05), or title
   // Nếu Sheet cập nhật link Drive hay title cho photoId, game tự động đọc theo photoId mới nhất!
@@ -277,247 +362,282 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
       // Tự động trích xuất các điểm khám xét từ Google Sheet của case động
       const customSpots = sheetPhotosList.filter(
         (p) =>
-          p.category?.toLowerCase().includes('reinvestigat') ||
-          p.category?.toLowerCase().includes('khám xét') ||
-          p.category?.toLowerCase().includes('hotspot') ||
-          (p.board_x && p.board_y)
-      )
+          p.category?.toLowerCase().includes("reinvestigat") ||
+          p.category?.toLowerCase().includes("khám xét") ||
+          p.category?.toLowerCase().includes("hotspot") ||
+          (p.board_x && p.board_y),
+      );
       if (customSpots.length > 0) {
         return customSpots.map((p, idx) => ({
           id: p.id || `spot-${idx + 1}`,
           num: idx + 1,
           photoId: p.id,
           title: p.title || `Vật chứng #${idx + 1}`,
-          x: parseFloat(p.board_x) || (20 + idx * 20),
+          x: parseFloat(p.board_x) || 20 + idx * 20,
           y: parseFloat(p.board_y) || 50,
           imageUrl: p.url,
           driveUrl: p.driveUrl,
-          soundFile: 'sat_soat.mp3',
-          soundCaption: p.description ? `*${p.description}*` : '*Sột soạt...*'
-        }))
+          soundFile: "sat_soat.mp3",
+          soundCaption: p.description ? `*${p.description}*` : "*Sột soạt...*",
+        }));
       }
     }
 
-    if (sheetPhotosList.length === 0) return hotspots
+    if (sheetPhotosList.length === 0) return hotspots;
 
     return hotspots.map((spot) => {
-      if (!spot.photoId) return spot
-      const pid = (spot.photoId || '').toLowerCase()
+      if (!spot.photoId) return spot;
+      const pid = (spot.photoId || "").toLowerCase();
       const matched = sheetPhotosList.find((p) => {
-        const idLower = (p.id || '').toLowerCase()
-        const titleLower = (p.title || '').toLowerCase()
-        if (idLower === pid) return true
-        if (pid === 'tu_go' && (idLower === 'c-05' || titleLower.includes('tủ gỗ'))) return true
-        if (pid === 'bua_goi' && (idLower === 'c-04' || titleLower.includes('bùa'))) return true
-        if (pid === 'luoc_dinh_toc' && (idLower === 'c-03' || titleLower.includes('lược'))) return true
-        if (pid === 'canh_hoa' && (idLower === 'c-02' || titleLower.includes('hoa xoan') || titleLower.includes('cánh hoa'))) return true
-        return false
-      })
+        const idLower = (p.id || "").toLowerCase();
+        const titleLower = (p.title || "").toLowerCase();
+        if (idLower === pid) return true;
+        if (
+          pid === "tu_go" &&
+          (idLower === "c-05" || titleLower.includes("tủ gỗ"))
+        )
+          return true;
+        if (
+          pid === "bua_goi" &&
+          (idLower === "c-04" || titleLower.includes("bùa"))
+        )
+          return true;
+        if (
+          pid === "luoc_dinh_toc" &&
+          (idLower === "c-03" || titleLower.includes("lược"))
+        )
+          return true;
+        if (
+          pid === "canh_hoa" &&
+          (idLower === "c-02" ||
+            titleLower.includes("hoa xoan") ||
+            titleLower.includes("cánh hoa"))
+        )
+          return true;
+        return false;
+      });
       if (matched) {
-        const xNum = matched.board_x && !isNaN(parseFloat(matched.board_x)) ? parseFloat(matched.board_x) : spot.x
-        const yNum = matched.board_y && !isNaN(parseFloat(matched.board_y)) ? parseFloat(matched.board_y) : spot.y
+        const xNum =
+          matched.board_x && !isNaN(parseFloat(matched.board_x))
+            ? parseFloat(matched.board_x)
+            : spot.x;
+        const yNum =
+          matched.board_y && !isNaN(parseFloat(matched.board_y))
+            ? parseFloat(matched.board_y)
+            : spot.y;
         return {
           ...spot,
           title: matched.title || spot.title,
           imageUrl: matched.url || spot.imageUrl,
           driveUrl: matched.driveUrl || spot.driveUrl,
-          soundCaption: matched.description ? `*${matched.description}*` : spot.soundCaption,
+          soundCaption: matched.description
+            ? `*${matched.description}*`
+            : spot.soundCaption,
           x: xNum,
           y: yNum,
-        }
+        };
       }
-      return spot
-    })
-  }, [hotspots, sheetPhotosList, isCase000])
+      return spot;
+    });
+  }, [hotspots, sheetPhotosList, isCase000]);
 
   // Cleanup animation frame
   useEffect(() => {
     return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    }
-  }, [])
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, []);
 
   // Track container dimensions on resize
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
     const updateSize = () => {
       if (containerRef.current) {
         setContainerSize({
           width: containerRef.current.clientWidth || 1200,
-          height: containerRef.current.clientHeight || 800
-        })
+          height: containerRef.current.clientHeight || 800,
+        });
       }
-    }
-    updateSize()
-    window.addEventListener('resize', updateSize)
-    return () => window.removeEventListener('resize', updateSize)
-  }, [isOpen])
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, [isOpen]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const playCustomSfx = (_filename: string) => {
     // Tạm ẩn âm thanh theo yêu cầu
-  }
+  };
 
   // Handle clicking a hotspot pin on the scene
   const handleSpotClick = (spot: ReinvestigationHotspot2D) => {
     if (isCalibrateMode) {
       // Trong chế độ hiệu chỉnh: Nhấp vào số là mở luôn danh sách ảnh từ Sheet để chọn gán!
-      setSelectedCalibrateSpotId(spot.id)
-      setIsPhotoPickerOpen(true)
-      return
+      setSelectedCalibrateSpotId(spot.id);
+      setIsPhotoPickerOpen(true);
+      return;
     }
 
-    if (dragDistanceRef.current > 8) return
+    if (dragDistanceRef.current > 8) return;
 
     // Tạm ẩn âm thanh SFX và toast phụ đề âm thanh
     // playCustomSfx(spot.soundFile)
     // setActiveAudioToast(spot.soundCaption)
-    setSelectedSpot(spot)
-  }
+    setSelectedSpot(spot);
+  };
 
   // Pointer drag event handlers for smooth infinite horizontal loop
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.button !== 0) return
-    isDraggingRef.current = true
-    lastXRef.current = e.clientX
-    dragDistanceRef.current = 0
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+    if (e.button !== 0) return;
+    isDraggingRef.current = true;
+    lastXRef.current = e.clientX;
+    dragDistanceRef.current = 0;
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     try {
-      ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
     } catch {}
-  }
+  };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDraggingRef.current) return
-    const dx = e.clientX - lastXRef.current
-    lastXRef.current = e.clientX
-    dragDistanceRef.current += Math.abs(dx)
-    velocityRef.current = dx
-    setOffsetX((prev) => prev + dx)
-  }
+    if (!isDraggingRef.current) return;
+    const dx = e.clientX - lastXRef.current;
+    lastXRef.current = e.clientX;
+    dragDistanceRef.current += Math.abs(dx);
+    velocityRef.current = dx;
+    setOffsetX((prev) => prev + dx);
+  };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    if (!isDraggingRef.current) return
-    isDraggingRef.current = false
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
     try {
-      ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     } catch {}
 
     const applyMomentum = () => {
-      velocityRef.current *= 0.92
+      velocityRef.current *= 0.92;
       if (Math.abs(velocityRef.current) > 0.3) {
-        setOffsetX((prev) => prev + velocityRef.current)
-        animFrameRef.current = requestAnimationFrame(applyMomentum)
+        setOffsetX((prev) => prev + velocityRef.current);
+        animFrameRef.current = requestAnimationFrame(applyMomentum);
       }
-    }
+    };
     if (Math.abs(velocityRef.current) > 1.2) {
-      animFrameRef.current = requestAnimationFrame(applyMomentum)
+      animFrameRef.current = requestAnimationFrame(applyMomentum);
     }
-  }
+  };
 
   const handlePointerCancel = () => {
-    isDraggingRef.current = false
-  }
+    isDraggingRef.current = false;
+  };
 
   const handleWheel = (e: React.WheelEvent) => {
-    const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY
-    setOffsetX((prev) => prev - delta * 0.9)
-  }
+    const delta = e.deltaX !== 0 ? e.deltaX : e.deltaY;
+    setOffsetX((prev) => prev - delta * 0.9);
+  };
 
-  const handleNudge = (direction: 'left' | 'right') => {
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    velocityRef.current = direction === 'left' ? 22 : -22
+  const handleNudge = (direction: "left" | "right") => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    velocityRef.current = direction === "left" ? 22 : -22;
     const applyMomentum = () => {
-      velocityRef.current *= 0.92
+      velocityRef.current *= 0.92;
       if (Math.abs(velocityRef.current) > 0.3) {
-        setOffsetX((prev) => prev + velocityRef.current)
-        animFrameRef.current = requestAnimationFrame(applyMomentum)
+        setOffsetX((prev) => prev + velocityRef.current);
+        animFrameRef.current = requestAnimationFrame(applyMomentum);
       }
-    }
-    animFrameRef.current = requestAnimationFrame(applyMomentum)
-  }
+    };
+    animFrameRef.current = requestAnimationFrame(applyMomentum);
+  };
 
   // --- CALIBRATOR ACTION HANDLERS ---
   const handleAddNewHotspot = () => {
-    const nextNum = hotspots.length > 0 ? Math.max(...hotspots.map((s) => s.num)) + 1 : 1
+    const nextNum =
+      hotspots.length > 0 ? Math.max(...hotspots.map((s) => s.num)) + 1 : 1;
     const newSpot: ReinvestigationHotspot2D = {
       id: `spot-${Date.now().toString().slice(-4)}`,
       num: nextNum,
-      photoId: '',
+      photoId: "",
       title: `Điểm #${nextNum}`,
       x: 50.0,
       y: 50.0,
-      imageUrl: '/images/cases/case_000/photo-reinvestigation-room-realistic.jpg',
-      soundFile: 'sat_soat.mp3',
-      soundCaption: '*Kiểm tra vật chứng...*'
-    }
-    const updated = [...hotspots, newSpot]
-    setHotspots(updated)
-    setSelectedCalibrateSpotId(newSpot.id)
-    setHasUnsavedChanges(true)
-    setIsPhotoPickerOpen(true) // Mở luôn danh sách để gán ảnh
-    toast.success(`Đã thêm điểm ${nextNum}. Chọn ảnh từ Sheet để gán!`)
-  }
+      imageUrl:
+        "/images/cases/case_000/photo-reinvestigation-room-realistic.jpg",
+      soundFile: "sat_soat.mp3",
+      soundCaption: "*Kiểm tra vật chứng...*",
+    };
+    const updated = [...hotspots, newSpot];
+    setHotspots(updated);
+    setSelectedCalibrateSpotId(newSpot.id);
+    setHasUnsavedChanges(true);
+    setIsPhotoPickerOpen(true); // Mở luôn danh sách để gán ảnh
+    toast.success(`Đã thêm điểm ${nextNum}. Chọn ảnh từ Sheet để gán!`);
+  };
 
   const handleDeleteHotspot = (id: string) => {
     if (hotspots.length <= 1) {
-      toast.error('Phải giữ lại ít nhất 1 điểm!')
-      return
+      toast.error("Phải giữ lại ít nhất 1 điểm!");
+      return;
     }
-    const updated = hotspots.filter((s) => s.id !== id)
-    setHotspots(updated)
-    setHasUnsavedChanges(true)
+    const updated = hotspots.filter((s) => s.id !== id);
+    setHotspots(updated);
+    setHasUnsavedChanges(true);
     if (selectedCalibrateSpotId === id) {
-      setSelectedCalibrateSpotId(updated[0]?.id || null)
+      setSelectedCalibrateSpotId(updated[0]?.id || null);
     }
-    toast.info('Đã xóa điểm!')
-  }
+    toast.info("Đã xóa điểm!");
+  };
 
   // NÚT LƯU RIÊNG DÀNH CHO ADMIN: LƯU CẢ VỊ TRÍ (X, Y) VÀ ẢNH GÁN VÀO SERVER VÀ LOCAL
   const handleSaveToSystem = async () => {
-    setIsSavingDb(true)
+    setIsSavingDb(true);
     try {
-      localStorage.setItem(`reinvestigate_custom_hotspots_${caseId}`, JSON.stringify(hotspots))
+      localStorage.setItem(
+        `reinvestigate_custom_hotspots_${caseId}`,
+        JSON.stringify(hotspots),
+      );
 
-      const res = await fetch('/api/reinvestigation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hotspots, caseId })
-      })
+      const res = await fetch("/api/reinvestigation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hotspots, caseId }),
+      });
 
       if (res.ok) {
-        setHasUnsavedChanges(false)
-        toast.success(`Đã lưu thành công cấu hình điểm khám xét (${caseId})!`)
+        setHasUnsavedChanges(false);
+        toast.success(`Đã lưu thành công cấu hình điểm khám xét (${caseId})!`);
       } else {
-        const data = await res.json()
-        toast.error('Lỗi khi lưu lên Server: ' + (data.error || 'Server error'))
+        const data = await res.json();
+        toast.error(
+          "Lỗi khi lưu lên Server: " + (data.error || "Server error"),
+        );
       }
     } catch (e: any) {
-      toast.error('Lỗi khi lưu: ' + e.message)
+      toast.error("Lỗi khi lưu: " + e.message);
     } finally {
-      setIsSavingDb(false)
+      setIsSavingDb(false);
     }
-  }
+  };
 
   const handleResetToDefault = () => {
-    setHotspots(HOTSPOTS_2D_LIST)
-    setSelectedCalibrateSpotId(HOTSPOTS_2D_LIST[0]?.id || null)
-    setHasUnsavedChanges(true)
-    localStorage.removeItem(`reinvestigate_custom_hotspots_${caseId}`)
-    localStorage.removeItem('reinvestigate_custom_hotspots')
-    toast.info('Đã khôi phục danh sách điểm mặc định! Bấm "Lưu" để xác nhận lên hệ thống.')
-  }
+    setHotspots(HOTSPOTS_2D_LIST);
+    setSelectedCalibrateSpotId(HOTSPOTS_2D_LIST[0]?.id || null);
+    setHasUnsavedChanges(true);
+    localStorage.removeItem(`reinvestigate_custom_hotspots_${caseId}`);
+    localStorage.removeItem("reinvestigate_custom_hotspots");
+    toast.info(
+      'Đã khôi phục danh sách điểm mặc định! Bấm "Lưu" để xác nhận lên hệ thống.',
+    );
+  };
 
   // GÁN ẢNH THEO ID (PHOTO_CODE) TỪ GOOGLE SHEETS
   const handleSelectSheetPhoto = (photo: {
-    id: string
-    title: string
-    url: string
-    driveUrl?: string
-    description: string
+    id: string;
+    title: string;
+    url: string;
+    driveUrl?: string;
+    description: string;
   }) => {
-    if (!activeCalibrateSpot) return
+    if (!activeCalibrateSpot) return;
     const updated = hotspots.map((s) =>
       s.id === activeCalibrateSpot.id
         ? {
@@ -526,32 +646,37 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
             title: photo.title,
             imageUrl: photo.url,
             driveUrl: photo.driveUrl,
-            soundCaption: photo.description ? `*${photo.description}*` : s.soundCaption
+            soundCaption: photo.description
+              ? `*${photo.description}*`
+              : s.soundCaption,
           }
-        : s
-    )
-    setHotspots(updated)
-    setHasUnsavedChanges(true)
-    setIsPhotoPickerOpen(false)
-    toast.success(`Đã gán ảnh [${photo.id}] "${photo.title}" cho Điểm ${activeCalibrateSpot.num}! Bấm "Lưu" để hoàn tất.`)
-  }
+        : s,
+    );
+    setHotspots(updated);
+    setHasUnsavedChanges(true);
+    setIsPhotoPickerOpen(false);
+    toast.success(
+      `Đã gán ảnh [${photo.id}] "${photo.title}" cho Điểm ${activeCalibrateSpot.num}! Bấm "Lưu" để hoàn tất.`,
+    );
+  };
 
   // Calculate dynamic dimensions for seamless wrapping
-  const imageAspect = 4096 / 2286
-  const renderedHeight = containerSize.height || 800
-  const renderedWidth = renderedHeight * imageAspect
+  const imageAspect = 4096 / 2286;
+  const renderedHeight = containerSize.height || 800;
+  const renderedWidth = renderedHeight * imageAspect;
 
   // Calculate seamless normalized offset in range [-renderedWidth, 0]
   const normalizedX =
     renderedWidth > 0
-      ? (((offsetX % renderedWidth) + renderedWidth) % renderedWidth) - renderedWidth
-      : 0
+      ? (((offsetX % renderedWidth) + renderedWidth) % renderedWidth) -
+        renderedWidth
+      : 0;
 
   // Khi inline=true trên desktop: render như block bình thường trong Zone 3
   // Khi inline=false (mobile/fullscreen): render fixed overlay
   const rootClassName = inline
     ? "flex flex-col w-full h-full bg-[#080503] font-mono text-[#f4e8d8] select-none overflow-hidden"
-    : "fixed inset-0 bg-[#080503] z-[100] flex flex-col font-mono text-[#f4e8d8] select-none overflow-hidden w-screen h-[100dvh] pt-safe"
+    : "fixed inset-0 bg-[#080503] z-[100] flex flex-col font-mono text-[#f4e8d8] select-none overflow-hidden w-screen h-[100dvh] pt-safe";
 
   return (
     <div className={rootClassName}>
@@ -568,7 +693,8 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
               </span>
             </div>
             <p className="text-[11px] text-[#9e7a56] hidden sm:block">
-              Kéo chuột hoặc vuốt để xoay nhìn toàn cảnh 3D hiện trường • Nhấp vào các điểm đỏ để soi chi tiết
+              Kéo chuột hoặc vuốt để xoay nhìn toàn cảnh 3D hiện trường • Nhấp
+              vào các điểm đỏ để soi chi tiết
             </p>
           </div>
         </div>
@@ -579,8 +705,8 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
             <button
               type="button"
               onClick={(e) => {
-                e.stopPropagation()
-                onExpand()
+                e.stopPropagation();
+                onExpand();
               }}
               className="p-2 bg-[#2b170c] hover:bg-[#422413] border border-[#59341c] text-[#d9a066] hover:text-white rounded-none transition-colors cursor-pointer pointer-events-auto"
               title="Mở toàn màn hình"
@@ -592,9 +718,9 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation()
-              detectiveAudio.playPaperRustle()
-              onClose()
+              e.stopPropagation();
+              detectiveAudio.playPaperRustle();
+              onClose();
             }}
             className="p-2 bg-[#2b170c] hover:bg-[#422413] border border-[#59341c] text-[#d9a066] hover:text-white rounded-none transition-colors cursor-pointer ml-1 pointer-events-auto"
             title="Đóng bảng khám xét"
@@ -604,13 +730,19 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
         </div>
       </div>
 
-
-
       {/* MAIN VIEW AREA: TRUE 3D / 360° SPHERICAL WEBGL CANVAS */}
       <div className="relative flex-1 w-full h-full overflow-hidden bg-[#060402]">
         <Scene360Viewer
-          imageUrl="/images/cases/case_000/crime_scene_360.jpg"
-          fallbackImageUrl="/images/cases/case_000/PANORAMA.png"
+          imageUrl={
+            isCase000
+              ? "/images/cases/case_000/crime_scene_360.jpg"
+              : `/images/cases/${normalizeCaseId(caseId)}/crime_scene_360.jpg`
+          }
+          fallbackImageUrl={
+            isCase000
+              ? "/images/cases/case_000/PANORAMA.png"
+              : `/images/cases/${normalizeCaseId(caseId)}/PANORAMA.png`
+          }
           hotspots={resolvedHotspots}
           onSelectSpot={(spot) => {
             handleSpotClick(spot as any);
@@ -630,7 +762,7 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
               initial={{ scale: 0.75, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.75, opacity: 0 }}
-              transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+              transition={{ type: "spring", damping: 26, stiffness: 320 }}
               onClick={(e) => e.stopPropagation()}
               className="relative max-w-[92vw] max-h-[88vh] flex flex-col items-center justify-center"
             >
@@ -654,7 +786,10 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
               {/* CAPTION INFO BELOW PHOTO */}
               {selectedSpot.title && (
                 <div className="mt-2.5 px-4 py-1.5 bg-[#140e08]/90 border border-[#59341c] rounded text-xs text-[#e8d5c4] font-mono text-center max-w-xl backdrop-blur-sm">
-                  <span className="font-bold text-amber-300">Điểm {selectedSpot.num}:</span> {selectedSpot.title}
+                  <span className="font-bold text-amber-300">
+                    Điểm {selectedSpot.num}:
+                  </span>{" "}
+                  {selectedSpot.title}
                 </div>
               )}
             </motion.div>
@@ -684,7 +819,8 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
                     CHỌN ẢNH SHEET PHOTOS CHO ĐIỂM {activeCalibrateSpot.num}
                   </h3>
                   <p className="text-xs text-[#a88a6d] mt-0.5">
-                    Hệ thống sẽ lưu và đọc theo mã ID (`photo_code`). Bấm để gán.
+                    Hệ thống sẽ lưu và đọc theo mã ID (`photo_code`). Bấm để
+                    gán.
                   </p>
                 </div>
                 <button
@@ -710,7 +846,7 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
                 {photoSearchQuery && (
                   <button
                     type="button"
-                    onClick={() => setPhotoSearchQuery('')}
+                    onClick={() => setPhotoSearchQuery("")}
                     className="text-xs text-neutral-400 hover:text-white px-2 cursor-pointer"
                   >
                     Xóa
@@ -723,7 +859,9 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
                 {isPhotosLoading ? (
                   <div className="py-16 flex flex-col items-center justify-center gap-2 text-amber-400">
                     <RefreshCw className="size-6 animate-spin" />
-                    <span className="text-xs">Đang nạp danh sách từ Google Sheets...</span>
+                    <span className="text-xs">
+                      Đang nạp danh sách từ Google Sheets...
+                    </span>
                   </div>
                 ) : filteredSheetPhotos.length === 0 ? (
                   <div className="py-12 text-center text-xs text-neutral-500">
@@ -731,8 +869,11 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
                   </div>
                 ) : (
                   filteredSheetPhotos.map((photo) => {
-                    const isAssigned = activeCalibrateSpot.photoId === photo.id
-                    const hasDrive = Boolean(photo.driveUrl && photo.driveUrl.includes('drive.google.com'))
+                    const isAssigned = activeCalibrateSpot.photoId === photo.id;
+                    const hasDrive = Boolean(
+                      photo.driveUrl &&
+                      photo.driveUrl.includes("drive.google.com"),
+                    );
 
                     return (
                       <button
@@ -741,8 +882,8 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
                         onClick={() => handleSelectSheetPhoto(photo)}
                         className={`w-full px-3.5 py-2.5 rounded-lg border text-left transition-all cursor-pointer flex items-center justify-between gap-3 group ${
                           isAssigned
-                            ? 'bg-amber-500/20 border-amber-400 text-white ring-1 ring-amber-400'
-                            : 'bg-[#180e07] hover:bg-[#2b170c] border-[#382010] hover:border-amber-600/70 text-[#e6d6c6]'
+                            ? "bg-amber-500/20 border-amber-400 text-white ring-1 ring-amber-400"
+                            : "bg-[#180e07] hover:bg-[#2b170c] border-[#382010] hover:border-amber-600/70 text-[#e6d6c6]"
                         }`}
                       >
                         <div className="flex-1 min-w-0">
@@ -780,15 +921,19 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
                           </div>
                         )}
                       </button>
-                    )
+                    );
                   })
                 )}
               </div>
 
               {/* FOOTER */}
               <div className="px-5 py-2.5 bg-[#190f08] border-t border-[#3d2412] text-xs text-[#a88a6d] flex items-center justify-between">
-                <span>Tổng cộng: {filteredSheetPhotos.length} ảnh trong Sheet</span>
-                <span className="italic text-amber-400">Bấm vào mục để gán cho điểm {activeCalibrateSpot.num}</span>
+                <span>
+                  Tổng cộng: {filteredSheetPhotos.length} ảnh trong Sheet
+                </span>
+                <span className="italic text-amber-400">
+                  Bấm vào mục để gán cho điểm {activeCalibrateSpot.num}
+                </span>
               </div>
             </motion.div>
           </div>
@@ -819,5 +964,5 @@ export function ReinvestigationModal({ isOpen, onClose, caseId = 'case_000', inl
       </AnimatePresence>
       */}
     </div>
-  )
+  );
 }

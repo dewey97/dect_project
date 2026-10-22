@@ -9,6 +9,7 @@ import {
   removeDiacritics,
 } from "@/lib/cases/case-000-suspects";
 import { normalizeImageUrl } from "@/lib/utils";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 import type { CulpritKey, SuspectItem } from "./use-investigation-state";
 
 export const DESKTOP_SUSPECT_SLOTS = [
@@ -345,6 +346,12 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       cp.id.includes("-2b"),
   )?.id;
 
+  const normalizedCaseId = normalizeCaseId(input.caseId);
+  const isCase000 = normalizedCaseId === "case_000";
+  const crimeScenePhotoUrl = isCase000
+    ? "/images/cases/case_000/crime_scene.png"
+    : `/images/cases/${normalizedCaseId}/crime_scene.png`;
+
   const base = input.isMobile
     ? ([
         {
@@ -375,12 +382,13 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           x: 0.18,
           y: 0.36,
           label: "Khám xét hiện trường",
-          detail:
-            "Mở biên bản và rà soát toàn cảnh 360 hiện trường số 14 Đường Bờ Sông",
+          detail: isCase000
+            ? "Mở biên bản và rà soát toàn cảnh 360 hiện trường số 14 Đường Bờ Sông"
+            : "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án",
           color: "yellow" as const,
           noteColor: "white" as const,
           pinColor: "yellow" as const,
-          photoUrl: "/images/cases/case_000/crime_scene.png",
+          photoUrl: crimeScenePhotoUrl,
           scale: 0.95,
           pulseBorder: input.isReinvestigateBlinking,
           isLocked: false,
@@ -450,12 +458,13 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           x: 0.18,
           y: 0.36,
           label: "Khám xét hiện trường",
-          detail:
-            "Mở biên bản và rà soát toàn cảnh 360 hiện trường số 14 Đường Bờ Sông",
+          detail: isCase000
+            ? "Mở biên bản và rà soát toàn cảnh 360 hiện trường số 14 Đường Bờ Sông"
+            : "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án",
           color: "yellow" as const,
           noteColor: "white" as const,
           pinColor: "yellow" as const,
-          photoUrl: "/images/cases/case_000/crime_scene.png",
+          photoUrl: crimeScenePhotoUrl,
           scale: 0.95,
           pulseBorder: input.isReinvestigateBlinking,
           isLocked: false,

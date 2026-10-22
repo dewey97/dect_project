@@ -26,10 +26,10 @@ Lưu trữ thông tin metadata bao quát của các Vụ án trong hệ thống.
 
 **Mã vụ án (`db/schema/22_case_slug.sql`)**
 
-- `slug` là khóa tham chiếu của mọi bảng nội dung: `case_checkpoints.case_id`, `case_dossiers.case_id`, `dossier_documents.case_id`, `case_characters.case_slug` (FK `ON UPDATE CASCADE`, `ON DELETE RESTRICT`).
+- `slug` là khóa tham chiếu của mọi bảng nội dung: `case_checkpoints.case_id`, `case_dossiers.case_id`, `dossier_documents.case_id`, `case_characters.case_slug`, `boardgame_pins.case_id`, `boardgame_connections.case_id` (FK `ON UPDATE CASCADE`, `ON DELETE RESTRICT`).
 - INSERT không truyền `slug` thì trigger `assign_case_slug` cấp số kế tiếp (`case_001`, `case_002`...). App không tự đếm.
 - Xóa vụ án còn nội dung sẽ bị DB chặn (lỗi `23503`); xóa nội dung trước.
-- `boardgame_pins` / `boardgame_connections` chưa có FK vì dữ liệu cũ còn `case-000`. `board-actions.ts` đọc cả hai dạng và ghi dạng chuẩn.
+- `boardgame_pins` / `boardgame_connections` đã được chuẩn hóa `case-000` -> `case_000` và gắn FK qua migration 29 (`29_boardgame_pins_case_slug_fk.sql`). `board-actions.ts` dùng trực tiếp `normalizeCaseId()`.
 - Code chuẩn hóa mọi mã đầu vào qua `normalizeCaseId()` (`lib/cases/case-id.ts`). URL gameplay: `/evidence/web?case_id=<slug>`; Studio: `?case=<slug>`.
 
 ### Table: `case_characters`
