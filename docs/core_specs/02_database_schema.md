@@ -49,7 +49,7 @@ Danh sách nhân vật theo vụ án (`db/schema/23_case_characters.sql`). Gamep
 | `slot_index`  | `INTEGER`    | Thứ tự trên bàn điều tra.                                                             |
 | `device`      | `JSONB`      | Điện thoại tang vật của nạn nhân: `label`, `model`, `lastUpdated`, `description`.     |
 
-RLS: đọc công khai, ghi chỉ admin (`is_admin()`).
+RLS: đọc công khai, ghi chỉ admin (`private.is_admin()`).
 
 ---
 
@@ -69,7 +69,7 @@ Mở rộng thông tin định danh người dùng từ `auth.users` của Supab
 
 ### Phân quyền RLS (`db/schema/21_security_hardening_rls.sql`)
 
-- `public.is_admin()` (SECURITY DEFINER): `true` khi JWT `app_metadata.role` là `admin`/`super_admin` hoặc `profiles.role = 'admin'`. Mọi policy ghi của admin dùng hàm này.
+- `private.is_admin()` (SECURITY DEFINER, schema `private` — không expose qua PostgREST/RPC): `true` khi JWT `app_metadata.role` là `admin`/`super_admin` hoặc `profiles.role = 'admin'`. Mọi policy ghi của admin dùng hàm này.
 - `profiles`: chỉ chủ tài khoản hoặc admin đọc được. User tự tạo profile với `role = 'player'`. Qua API công khai chỉ sửa được `display_name`, `avatar_url`; đổi `role` phải dùng dashboard hoặc `service_role`.
 - `cases`, `dossier_documents`, `case_dossiers`, `app_settings`: đọc công khai, ghi chỉ admin.
 - `feedbacks`: ai cũng gửi được; chỉ admin đọc và cập nhật.

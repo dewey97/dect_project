@@ -38,7 +38,7 @@
 - `case_characters`: 10 nhân vật case_000 (1 nạn nhân, 6 nghi phạm, 1 nhân chứng, 2 liên quan).
 - `case_checkpoints`: 9 checkpoint case_000 (`cp-000-0`, `cp-000-1a/1b/1c`, 3 follow-up, `cp-000-2b`, `cp-000-epilogue`).
 - Admin: 2 tài khoản có `app_metadata.role` admin/super_admin và `profiles.role = 'admin'`.
-- Security advisors còn 3 WARN rủi ro thấp: `is_admin()` và `rls_auto_enable()` gọi được qua RPC; Leaked Password Protection tắt.
+- Security advisors còn 2 WARN rủi ro thấp: `rls_auto_enable()` gọi được qua RPC; Leaked Password Protection tắt. (`is_admin()` đã chuyển sang schema `private` — migration 25.)
 
 ### 1.4. Rủi ro đang mở
 
@@ -94,7 +94,7 @@
 - **Mã vụ án:** luôn qua `normalizeCaseId()` (`lib/cases/case-id.ts`) → dạng `case_000`. URL gameplay `/evidence/web?case_id=<slug>`; Studio `?case=<slug>`.
 - **Storage:** key tiến trình qua `caseStorageKey(caseId, key)`. case_000 giữ key không tiền tố để không mất tiến trình người chơi cũ; vụ khác dùng `<slug>::<key>`.
 - **Nhân vật:** `CaseCharactersProvider` (`components/investigation/case-characters-context.tsx`) nạp `/api/characters` trước khi render bàn điều tra, ghi vào registry `lib/cases/case-characters.ts`. Hàm so khớp tên/SĐT (`lib/cases/case-000-suspects.ts`, `case-000-clues.ts`) đọc registry. Registry là giải pháp tạm; B6 thay bằng context.
-- **Quyền admin:** `requireAdminAuth()` / `checkIsAdmin()` ở `lib/auth/admin.ts` (server-only). Client gọi `checkIsAdmin` qua server action `lib/actions/auth-guard.ts`. Route Handler dùng `denyIfNotAdmin()` (`lib/security/admin-route-guard.ts`). RLS dùng `public.is_admin()`.
+- **Quyền admin:** `requireAdminAuth()` / `checkIsAdmin()` ở `lib/auth/admin.ts` (server-only). Client gọi `checkIsAdmin` qua server action `lib/actions/auth-guard.ts`. Route Handler dùng `denyIfNotAdmin()` (`lib/security/admin-route-guard.ts`). RLS dùng `private.is_admin()` (migration 25).
 - **Google Sheets:** `createGoogleAuth(scope)` ở `lib/google/auth.ts`. `/api/phone` chỉ cho tab `evidences, photos, contacts, calls, messages, apps`; `refresh=true` chỉ admin.
 - **Bàn điều tra:** vẽ bằng canvas (`components/investigation/hero-interactive.tsx`). Danh sách nút ghim ẩn `[data-pin-id]` dùng cho bàn phím, trình đọc màn hình và E2E — **không xóa**.
 
@@ -262,19 +262,19 @@ Mỗi brief đã kèm phạm vi, file, ràng buộc và điều kiện done. Ng�
 
 ## 6. Nhóm A — Bảo mật & hạ tầng
 
-| #   | Việc                                                                                    | Trạng thái                 |
-| --- | --------------------------------------------------------------------------------------- | -------------------------- |
-| A1  | `image-proxy` / `audio-proxy` chỉ host Google + Drive id, cache LRU giới hạn            | ✅ `09ee212`               |
-| A2  | Rate limiter ưu tiên `X-Real-IP` (Traefik), phần tử cuối `X-Forwarded-For`              | ✅ `09ee212`               |
-| A3  | `/api/phone` whitelist tab, `refresh=true` chỉ admin, cache giới hạn                    | ✅ `09ee212` (bản sửa lại) |
-| A4  | Ghi Sheet `RAW`; validate `source` waitlist                                             | ✅ `09ee212`               |
-| A5  | Dữ liệu ghi file → Supabase                                                             | ⏳ brief mục 4.4           |
-| A6  | Rotate key `.env`, `git rm --cached .env`, thêm `.env` vào `.gitignore`/`.dockerignore` | ⏳ chủ dự án               |
-| A7  | CI/Docker pnpm pinned, bỏ `package-lock.json`                                           | ✅ `09ee212`               |
-| A8  | `middleware.ts` → `proxy.ts`, bỏ qua file tĩnh và proxy media                           | ✅ `cc8ab02`               |
-| A9  | `is_admin()` sang schema `private`                                                      | ⏳ brief mục 4.4           |
-| A10 | Room sync đóng channel/timer khi unmount, auto-connect một lần                          | ✅ `09ee212`               |
-| A11 | `requireAdminAuth` không còn là server action công khai                                 | ✅ `09ee212` (bản sửa lại) |
+| #   | Việc                                                                                    | Trạng thái                                                                    |
+| --- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| A1  | `image-proxy` / `audio-proxy` chỉ host Google + Drive id, cache LRU giới hạn            | ✅ `09ee212`                                                                  |
+| A2  | Rate limiter ưu tiên `X-Real-IP` (Traefik), phần tử cuối `X-Forwarded-For`              | ✅ `09ee212`                                                                  |
+| A3  | `/api/phone` whitelist tab, `refresh=true` chỉ admin, cache giới hạn                    | ✅ `09ee212` (bản sửa lại)                                                    |
+| A4  | Ghi Sheet `RAW`; validate `source` waitlist                                             | ✅ `09ee212`                                                                  |
+| A5  | Dữ liệu ghi file → Supabase                                                             | ⏳ brief mục 4.4                                                              |
+| A6  | Rotate key `.env`, `git rm --cached .env`, thêm `.env` vào `.gitignore`/`.dockerignore` | ⏳ chủ dự án                                                                  |
+| A7  | CI/Docker pnpm pinned, bỏ `package-lock.json`                                           | ✅ `09ee212`                                                                  |
+| A8  | `middleware.ts` → `proxy.ts`, bỏ qua file tĩnh và proxy media                           | ✅ `cc8ab02`                                                                  |
+| A9  | `is_admin()` sang schema `private`                                                      | ✅ migration `25_private_is_admin.sql` viết xong, chờ chủ dự án duyệt và chạy |
+| A10 | Room sync đóng channel/timer khi unmount, auto-connect một lần                          | ✅ `09ee212`                                                                  |
+| A11 | `requireAdminAuth` không còn là server action công khai                                 | ✅ `09ee212` (bản sửa lại)                                                    |
 
 Ghi chú bảo mật còn lại (ưu tiên thấp):
 
