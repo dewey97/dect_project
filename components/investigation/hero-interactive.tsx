@@ -128,7 +128,13 @@ export function HeroInteractive({
 
   useEffect(() => {
     if (requestRenderRef.current) requestRenderRef.current();
-  }, [customPins, customConnections, selectedPinId, onPinClick, lightConeConfig]);
+  }, [
+    customPins,
+    customConnections,
+    selectedPinId,
+    onPinClick,
+    lightConeConfig,
+  ]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -277,7 +283,10 @@ export function HeroInteractive({
         const titleLower = title.toLowerCase().trim();
         map.set(titleLower, normalized);
         const pc = (item.code || item.photo_code || "").toLowerCase().trim();
-        const isAvatar = pc.startsWith("avatar_") || (item.category || "").toUpperCase().trim() === "AVATAR" || titleLower.includes("chân dung");
+        const isAvatar =
+          pc.startsWith("avatar_") ||
+          (item.category || "").toUpperCase().trim() === "AVATAR" ||
+          titleLower.includes("chân dung");
 
         // Only map suspect keys if the row is truly an avatar/portrait photo
         if (isAvatar) {
@@ -1282,10 +1291,9 @@ export function HeroInteractive({
           pin.id.startsWith("node-suspect-") ||
           pin.id.startsWith("suspect-") ||
           pin.id.toLowerCase().includes("avatar_") ||
-          (pin.label && (
-            pin.label.toLowerCase().includes("ảnh chân dung") ||
-            pin.label.toLowerCase().includes("chân dung")
-          )) ||
+          (pin.label &&
+            (pin.label.toLowerCase().includes("ảnh chân dung") ||
+              pin.label.toLowerCase().includes("chân dung"))) ||
           Boolean(
             findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id),
           );
@@ -1345,8 +1353,8 @@ export function HeroInteractive({
               pin.id === "c0-pin-reinvestigate" ||
               Boolean(
                 rawPin.photoUrl &&
-                  (rawPin.photoUrl.includes("crime_scene") ||
-                    rawPin.photoUrl.includes("reinvestigation")),
+                (rawPin.photoUrl.includes("crime_scene") ||
+                  rawPin.photoUrl.includes("reinvestigation")),
               );
             const isKhang =
               !isVictimPhone &&
@@ -1444,8 +1452,8 @@ export function HeroInteractive({
               pin.id === "c0-pin-reinvestigate" ||
               Boolean(
                 rawPin.photoUrl &&
-                  (rawPin.photoUrl.includes("crime_scene") ||
-                    rawPin.photoUrl.includes("reinvestigation")),
+                (rawPin.photoUrl.includes("crime_scene") ||
+                  rawPin.photoUrl.includes("reinvestigation")),
               );
             const isKhang =
               !isVictimPhone &&
@@ -1957,8 +1965,8 @@ export function HeroInteractive({
           pin.id === "c0-pin-reinvestigate" ||
           Boolean(
             (pin as any).photoUrl &&
-              ((pin as any).photoUrl.includes("crime_scene") ||
-                (pin as any).photoUrl.includes("reinvestigation")),
+            ((pin as any).photoUrl.includes("crime_scene") ||
+              (pin as any).photoUrl.includes("reinvestigation")),
           );
         if (!isSelfContainedProp) {
           context.save();
@@ -2122,8 +2130,8 @@ export function HeroInteractive({
           pin.id === "c0-pin-reinvestigate" ||
           Boolean(
             (pin as any).photoUrl &&
-              ((pin as any).photoUrl.includes("crime_scene") ||
-                (pin as any).photoUrl.includes("reinvestigation")),
+            ((pin as any).photoUrl.includes("crime_scene") ||
+              (pin as any).photoUrl.includes("reinvestigation")),
           )
         ) {
           return; // Self-contained physical evidence items, no overlay pushpin
@@ -2283,10 +2291,16 @@ export function HeroInteractive({
         const topY = bounds.y;
 
         // Conic-like triangular spotlight beam from top center
-        const beamHalfWidth = (bounds.width * 0.5) * spreadRatio + (bounds.width * 0.15);
-        const beamGrad = context.createLinearGradient(centerX, topY, centerX, bounds.y + bounds.height);
-        beamGrad.addColorStop(0, `rgba(255, 245, 210, ${0.40 * intensity})`);
-        beamGrad.addColorStop(0.35, `rgba(255, 230, 160, ${0.20 * intensity})`);
+        const beamHalfWidth =
+          bounds.width * 0.5 * spreadRatio + bounds.width * 0.15;
+        const beamGrad = context.createLinearGradient(
+          centerX,
+          topY,
+          centerX,
+          bounds.y + bounds.height,
+        );
+        beamGrad.addColorStop(0, `rgba(255, 245, 210, ${0.4 * intensity})`);
+        beamGrad.addColorStop(0.35, `rgba(255, 230, 160, ${0.2 * intensity})`);
         beamGrad.addColorStop(0.75, `rgba(180, 120, 60, ${0.08 * intensity})`);
         beamGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
 
@@ -2308,7 +2322,7 @@ export function HeroInteractive({
           bounds.width * 0.02,
           centerX,
           topY + bounds.height * 0.25,
-          bounds.width * 0.55 * spreadRatio
+          bounds.width * 0.55 * spreadRatio,
         );
         lampGlow.addColorStop(0, `rgba(255, 255, 235, ${0.45 * intensity})`);
         lampGlow.addColorStop(0.3, `rgba(255, 225, 150, ${0.22 * intensity})`);
@@ -2328,11 +2342,11 @@ export function HeroInteractive({
           bounds.width * 0.25,
           centerX,
           bounds.y + bounds.height * 0.5,
-          bounds.width * 0.72
+          bounds.width * 0.72,
         );
         edgeVignette.addColorStop(0, "rgba(0, 0, 0, 0)");
         edgeVignette.addColorStop(0.65, "rgba(10, 5, 2, 0.25)");
-        edgeVignette.addColorStop(1, `rgba(5, 2, 1, ${0.60 * intensity})`);
+        edgeVignette.addColorStop(1, `rgba(5, 2, 1, ${0.6 * intensity})`);
 
         context.save();
         context.globalCompositeOperation = "multiply";
@@ -2498,6 +2512,33 @@ export function HeroInteractive({
           className="absolute inset-0 h-full w-full"
         />
       </div>
+
+      {/* Ghim vẽ trên canvas không có trong DOM: danh sách nút ẩn cho bàn phím,
+          trình đọc màn hình và kiểm thử E2E. Hiện ra khi được focus. */}
+      {!isEditMode && onPinClick && customPins && customPins.length > 0 && (
+        <nav
+          aria-label="Danh sách ghim trên bảng điều tra"
+          className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-2 focus-within:top-2 focus-within:z-50 focus-within:flex focus-within:max-w-xs focus-within:flex-col focus-within:gap-1 focus-within:rounded focus-within:bg-background/95 focus-within:p-2"
+        >
+          {customPins.map((pin) => (
+            <button
+              key={pin.id}
+              type="button"
+              data-pin-id={pin.id}
+              onClick={(event) => {
+                const rect = containerRef.current?.getBoundingClientRect();
+                onPinClick(pin.id, pin, {
+                  clientX: rect ? rect.left + rect.width / 2 : event.clientX,
+                  clientY: rect ? rect.top + rect.height / 2 : event.clientY,
+                });
+              }}
+              className="min-h-11 rounded px-2 text-left text-sm text-foreground hover:bg-muted"
+            >
+              {pin.label || pin.id}
+            </button>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }

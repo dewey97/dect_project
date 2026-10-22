@@ -4,6 +4,22 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-22]
 
+### Testing
+
+- E2E Playwright baseline case_000 (`e2e/case-000.spec.ts`, `pnpm test:e2e`): 8 kịch bản từ tra SĐT tới cáo trạng.
+
+### Fixed
+
+- Câu hỏi phụ trắc nghiệm (Tùng) luôn báo sai: so nhãn phương án thay vì id nội bộ.
+
+### UI
+
+- Ô lý do thẩm tra bắt đầu 1 dòng, tự giãn theo nội dung (`components/ui/auto-grow-textarea.tsx`, Checkpoint Studio dùng chung).
+- Danh sách chứng cứ: nhãn "Bằng chứng đã chọn" (bỏ số đếm), hộp chứa gọn hơn.
+- Nút gợi ý nằm giữa "Quay lại" và "Xác nhận", nhãn "GỢI Ý n", vẫn nhấn giữ để mở; bỏ đường kẻ dưới gợi ý.
+- Nút Sổ tay chuyển vào toolbar bàn điều tra, cạnh nút âm lượng.
+- Bàn điều tra có danh sách nút ghim ẩn (bàn phím / trình đọc màn hình).
+
 ### Added
 
 - **Mã vụ án thống nhất (`cases.slug`)** — migration `22_case_slug.sql`: DB tự cấp `case_00N`, nội dung vụ án tham chiếu slug qua FK. Helper `lib/cases/case-id.ts` (`normalizeCaseId`, `caseStorageKey`, `caseIdVariants`) thay 3 bản `normalizeCaseId` trùng lặp.

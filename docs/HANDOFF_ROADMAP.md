@@ -82,9 +82,13 @@ Còn từ audit (P1): `app/api/test-scan-answer` là proxy Gemini công khai (x�
 
 Gộp với "ẩn đáp án". Hiện đáp án lộ ở: `/api/checkpoints` trả `answer_config`/`ai_*`; RLS `case_checkpoints` cho anon SELECT; client tự so đáp án.
 
-### B1. Baseline E2E (bắt buộc làm trước)
-
-Playwright chơi trọn case_000: tra SĐT (3 số) → thêm Vũ/Tùng/Hà (động cơ + mâu thuẫn) → 3 câu hỏi phụ (time/choice/code) → cáo trạng → hậu án. Lưu ở `e2e/case-000.spec.ts`. Mọi refactor sau phải giữ pass. Đáp án lấy từ `case_checkpoints` trên DB.
+### B1. Baseline E2E — ✅ xong
+- `e2e/case-000.spec.ts` (8 test, `pnpm test:e2e`, ~1 phút): tải bàn điều tra, sổ tay, tra 3 SĐT, thẩm tra Vũ/Tùng/Hà (động cơ + mâu thuẫn), 3 câu hỏi phụ (21:15 / KHÔNG / 120713), cáo trạng (sai bị can bị từ chối, Trần Thị Hà + C-02, D-04, D-05 được kết án).
+- `playwright.config.ts` tự chạy dev server cổng 3100 với `NEXT_DIST_DIR=.next_dev` (không đụng `.next` của dev server cổng 3000).
+- Ghim trên canvas có danh sách nút `[data-pin-id]` (sr-only, hiện khi focus) — dùng cho bàn phím, trình đọc màn hình và E2E.
+- `/api/test-scan-answer` được mock (không gọi Gemini). Nhiều nút dùng CSS `uppercase` → helper `tap()` so chữ không phân biệt hoa thường.
+- Chưa phủ: luồng Hậu án (đang hiển thị rỗng — xem lỗi dưới), chơi nhóm, khám xét hiện trường 360.
+- Lỗi phát hiện khi viết baseline: (1) đã sửa — câu hỏi phụ trắc nghiệm so id phương án (`khong_tin`) với nhãn đáp án ("KHÔNG") nên không bao giờ đúng; (2) **chưa sửa** — Hậu án hiện "Hồ sơ hậu án đang được cập nhật" vì runtime làm rơi `epilogueStories` (xử lý ở B3); (3) **chưa sửa** — font tiêu đề Hậu án hiển thị sai dấu tiếng Việt ("Trầ`n").
 
 ### B2. Schema
 
