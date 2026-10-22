@@ -13,8 +13,15 @@
 | --------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `979b1e0` | refactor: xóa 14 file dead code, gỡ 7 dependency thừa, đồng bộ `pnpm-lock.yaml` + `package-lock.json`                   |
 | `e2da1e9` | fix(security): `requireAdminAuth` chặn user không có profile; 15 server action + 3 API admin có guard; migration 21 RLS |
+| `d83f402` | feat(multi-case): `cases.slug`, `case_characters`, Studio Nhân vật (giai đoạn 0+1, migration 22/23 đã chạy production) |
+| `09ee212` | fix(security): nhóm A — A1, A2, A3, A4, A7, A8 (một phần), A10, A11; xóa `/api/verify-finding`; login redirect |
+| _(commit kế)_ | D5 `lib/google/auth.ts`, D6 `import type` 13 chỗ, E bỏ track dump `scripts/*.json`, `__pycache__`, `case_000_vector.backup_old.json` |
 
-### Đã làm nhưng CHƯA commit (giai đoạn 0+1 multi-case)
+**Còn lại theo nhóm:** A5 (dữ liệu ghi file → Supabase), A6 (rotate `.env` — chủ dự án), A8 phần đổi tên `middleware.ts` → `proxy.ts`, A9 (`is_admin` sang schema `private`); toàn bộ B, C; D1–D4, D7–D11; E phần chia `scripts/ops` / `scripts/archive` và quyết định `archive_3d_vault`.
+
+> Ghi chú review 2026-10-22: bản sửa `/api/phone` của agent trước đã bị **hoàn tác** vì bỏ fallback gviz công khai, bỏ chuỗi tab dự phòng (`photos_old`, `evidences_old`) và bỏ lọc emoji ở header. Chỉ giữ phần bảo mật (whitelist tab, refresh chỉ admin, cache giới hạn). Docker/CI cài `pnpm@11.25.0` bằng `npm install -g` (không dùng corepack vì có thể lỗi khóa chữ ký với pnpm mới); `package.json` có `packageManager` cho `pnpm/action-setup`.
+
+### Giai đoạn 0+1 multi-case (đã commit `d83f402`)
 
 - Migration **đã chạy trên production**: `db/schema/22_case_slug.sql`, `db/schema/23_case_characters.sql`.
 - Code mới: `lib/cases/case-id.ts`, `lib/cases/case-characters.ts`, `components/investigation/case-characters-context.tsx`, `app/api/characters/route.ts`, `lib/actions/character-actions.ts`, `app/(admin)/studio/characters/page.tsx`, `components/admin/character-studio/characters-studio-client.tsx`.

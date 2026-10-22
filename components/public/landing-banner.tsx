@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getAppSettings } from '@/lib/actions/settings-actions'
-import { DbAppSettings } from '@/lib/types/database'
+import type { DbAppSettings } from '@/lib/types/database'
 
 export function LandingBanner() {
   const [settings, setSettings] = useState<DbAppSettings | null>(null)

@@ -6,7 +6,7 @@ import { Search, Filter } from "lucide-react";
 import { CreateCaseButton } from "./create-case-button";
 import { DeleteCaseButton } from "./delete-case-button";
 import { DuplicateCaseButton } from "./duplicate-case-button";
-import { DbCase } from "@/lib/types/database";
+import type { DbCase } from "@/lib/types/database";
 
 export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
   const [searchQuery, setSearchQuery] = useState("");

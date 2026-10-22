@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { DbCase, CaseStatus } from '@/lib/types/database'
+import type { DbCase, CaseStatus } from '@/lib/types/database'
 import { revalidatePath } from 'next/cache'
 import { isValidCaseId, normalizeCaseId } from '@/lib/cases/case-id'
 import { requireAdminAuth } from '@/lib/auth/admin'

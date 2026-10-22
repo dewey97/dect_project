@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 import { google } from "googleapis";
+import { createGoogleAuth } from "@/lib/google/auth";
 import { getClientIp, checkRateLimit } from "@/lib/security/rate-limiter";
 import {
   defensiveErrorResponse,
@@ -50,34 +51,6 @@ function saveLocalPending(entry: { email: string; source: string; timestamp: str
   }
 }
 
-/**
- * Khởi tạo Google Auth an toàn
- */
-function createGoogleAuth(): InstanceType<typeof google.auth.GoogleAuth> | null {
-  const inlineCredentials = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
-  if (inlineCredentials) {
-    try {
-      return new google.auth.GoogleAuth({
-        credentials: JSON.parse(inlineCredentials),
-        scopes: [SHEETS_SCOPE],
-      });
-    } catch (e) {
-      console.error("[WAITLIST] Invalid GOOGLE_SERVICE_ACCOUNT_JSON:", e);
-    }
-  }
-
-  const relativeKeyPath =
-    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH || "google-service-account.json";
-  const absoluteKeyPath = path.resolve(process.cwd(), relativeKeyPath);
-  if (fs.existsSync(absoluteKeyPath)) {
-    return new google.auth.GoogleAuth({
-      keyFile: absoluteKeyPath,
-      scopes: [SHEETS_SCOPE],
-    });
-  }
-
-  return null;
-}
 
 export async function POST(req: Request) {
   try {
@@ -117,7 +90,7 @@ export async function POST(req: Request) {
     // 4. Nếu đã cấu hình WAITLIST_SHEET_ID -> ghi thẳng vào Google Sheet
     const sheetId = process.env.WAITLIST_SHEET_ID?.trim();
     if (sheetId) {
-      const auth = createGoogleAuth();
+      const auth = createGoogleAuth(SHEETS_SCOPE);
       if (auth) {
         try {
           const sheets = google.sheets({ version: "v4", auth });

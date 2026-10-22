@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { SelectedView } from './evidence-types'
+import type { SelectedView } from './evidence-types'
 import { normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
 import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'
 import { DiegeticDossierSheet } from './diegetic-dossier-sheet'

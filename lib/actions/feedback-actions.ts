@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { DbFeedback } from '@/lib/types/database'
+import type { DbFeedback } from '@/lib/types/database'
 import { revalidatePath } from 'next/cache'
 import { requireAdminAuth } from '@/lib/auth/admin'
 

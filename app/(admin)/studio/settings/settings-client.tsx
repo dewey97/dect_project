@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Save, Settings2, Bell, Shield, Users } from 'lucide-react'
-import { DbAppSettings } from '@/lib/types/database'
+import type { DbAppSettings } from '@/lib/types/database'
 import { updateAppSettings } from '@/lib/actions/settings-actions'
 import { toast } from '@/components/ui/toast'
 

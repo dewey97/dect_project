@@ -1,7 +1,6 @@
 import { google } from "googleapis";
+import { createGoogleAuth } from "@/lib/google/auth";
 import { NextRequest, NextResponse } from "next/server";
-import path from "path";
-import fs from "fs";
 import { createClient } from "@/lib/supabase/server";
 import { denyIfNotAdmin } from "@/lib/security/admin-route-guard";
 
@@ -12,33 +11,6 @@ const DEFAULT_SPREADSHEET_ID =
   process.env.GOOGLE_SHEETS_SPREADSHEET_ID ||
   "1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q";
 
-function createGoogleAuth() {
-  const inlineCredentials = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
-  if (inlineCredentials) {
-    try {
-      return new google.auth.GoogleAuth({
-        credentials: JSON.parse(inlineCredentials),
-        scopes: [SHEETS_SCOPE],
-      });
-    } catch (e) {
-      console.error("Invalid GOOGLE_SERVICE_ACCOUNT_JSON format:", e);
-    }
-  }
-
-  const relativeKeyPath =
-    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH ||
-    "google-service-account.json";
-
-  const absoluteKeyPath = path.resolve(process.cwd(), relativeKeyPath);
-  if (fs.existsSync(absoluteKeyPath)) {
-    return new google.auth.GoogleAuth({
-      keyFile: absoluteKeyPath,
-      scopes: [SHEETS_SCOPE],
-    });
-  }
-
-  return null;
-}
 
 export async function POST(req: NextRequest) {
   const denied = await denyIfNotAdmin();
@@ -130,7 +102,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const auth = createGoogleAuth();
+    const auth = createGoogleAuth(SHEETS_SCOPE);
     if (!auth) {
       return NextResponse.json(
         {

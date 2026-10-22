@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { DbFeedback } from '@/lib/types/database'
+import type { DbFeedback } from '@/lib/types/database'
 import { updateFeedbackStatus } from '@/lib/actions/feedback-actions'
 import { MessageSquare, CheckCircle, XCircle, Clock, Star, Mail } from 'lucide-react'
 

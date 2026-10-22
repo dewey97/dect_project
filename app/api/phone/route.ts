@@ -1,7 +1,6 @@
 import { google } from "googleapis";
+import { createGoogleAuth } from "@/lib/google/auth";
 import { NextResponse } from "next/server";
-import path from "path";
-import fs from "fs";
 import { denyIfNotAdmin } from "@/lib/security/admin-route-guard";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 
@@ -33,38 +32,6 @@ function setCacheEntry(key: string, data: any[], timestamp: number) {
 /** Tab công khai cho runtime; tab nội bộ (checkpoints, cấu hình...) không được đọc qua route này. */
 const ALLOWED_TABS = new Set(["evidences", "photos", "contacts", "calls", "messages", "apps"]);
 
-/**
- * Dựng cấu hình xác thực Google Sheets an toàn từ Env hoặc Key File.
- * Nếu không có credentials, trả về null để chuyển sang chế độ Public Export mà không gây lỗi.
- */
-function createGoogleAuth(): InstanceType<typeof google.auth.GoogleAuth> | null {
-  const inlineCredentials = process.env.GOOGLE_SERVICE_ACCOUNT_JSON?.trim();
-  if (inlineCredentials) {
-    try {
-      return new google.auth.GoogleAuth({
-        credentials: JSON.parse(inlineCredentials),
-        scopes: [SHEETS_SCOPE],
-      });
-    } catch (e) {
-      console.error("Invalid GOOGLE_SERVICE_ACCOUNT_JSON format:", e);
-    }
-  }
-
-  const relativeKeyPath =
-    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH ||
-    "google-service-account.json";
-
-  const absoluteKeyPath = path.resolve(process.cwd(), relativeKeyPath);
-  if (fs.existsSync(absoluteKeyPath)) {
-    return new google.auth.GoogleAuth({
-      keyFile: absoluteKeyPath,
-      scopes: [SHEETS_SCOPE],
-    });
-  }
-
-  // Không cố gọi ADC khi môi trường container/server không có cấu hình để tránh văng lỗi
-  return null;
-}
 
 /**
  * Trình bóc tách CSV chuẩn RFC 4180 cho dữ liệu xuất bản công khai từ Google Sheets
@@ -182,7 +149,7 @@ export async function GET(request: Request) {
   const spreadsheetId =
     process.env.GOOGLE_SHEETS_ID || DEFAULT_SPREADSHEET_ID;
 
-  const auth = createGoogleAuth();
+  const auth = createGoogleAuth(SHEETS_SCOPE);
 
   const fetchTab = async (sheetName: string): Promise<any[][]> => {
     try {

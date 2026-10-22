@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { PinPoint } from "@/components/investigation/hero-interactive";
+import type { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";

@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { MessageSquare, X, Send, Star, AlertCircle } from 'lucide-react'
 import { submitFeedback } from '@/lib/actions/feedback-actions'
-import { DbFeedback } from '@/lib/types/database'
+import type { DbFeedback } from '@/lib/types/database'
 import { toast } from '@/components/ui/toast'
 import { useInvestigationEvent } from '@/lib/investigation-events'
 

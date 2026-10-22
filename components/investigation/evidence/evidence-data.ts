@@ -1,4 +1,4 @@
-import { PDFDocument, PhysicalEvidence } from './evidence-types'
+import type { PDFDocument, PhysicalEvidence } from './evidence-types'
 
 export const CASE_000_PDFS: PDFDocument[] = [
   // 1 PDF duy nhất để kiểm thử kết xuất PDF gốc & tính năng vẽ/đánh dấu

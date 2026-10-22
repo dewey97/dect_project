@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { DbAppSettings } from '@/lib/types/database'
+import type { DbAppSettings } from '@/lib/types/database'
 import { requireAdminAuth } from '@/lib/auth/admin'
 
 /** Lấy cấu hình toàn cục */

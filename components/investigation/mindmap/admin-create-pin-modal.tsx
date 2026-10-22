@@ -15,7 +15,7 @@ import {
   Eye,
   ChevronDown,
 } from "lucide-react";
-import { PinPoint } from "@/components/investigation/hero-interactive";
+import type { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
