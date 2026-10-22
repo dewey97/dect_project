@@ -9,6 +9,7 @@ import {
   rateLimitResponse,
   dynamicSuccessResponse,
 } from "@/lib/security/defensive-cache";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +26,14 @@ function ensureDirectoryExists() {
 
 /**
  * Lưu dự phòng cục bộ vào tệp JSON để không bao giờ thất thoát email
- * kể cả khi chưa cấu hình Google Sheet hoặc mất mạng tạm thời.
+ * kể cả khi chưa cấu hình Google Sheet, chưa migrate DB hoặc mất mạng.
  */
-function saveLocalPending(entry: { email: string; source: string; timestamp: string; ip: string }) {
+function saveLocalPending(entry: {
+  email: string;
+  source: string;
+  timestamp: string;
+  ip: string;
+}) {
   try {
     ensureDirectoryExists();
     let entries: any[] = [];
@@ -40,7 +46,9 @@ function saveLocalPending(entry: { email: string; source: string; timestamp: str
     }
     // Tránh trùng lặp email cùng nguồn trong file lưu tạm
     const exists = entries.some(
-      (e) => e.email.toLowerCase() === entry.email.toLowerCase() && e.source === entry.source
+      (e) =>
+        e.email.toLowerCase() === entry.email.toLowerCase() &&
+        e.source === entry.source,
     );
     if (!exists) {
       entries.push(entry);
@@ -50,7 +58,6 @@ function saveLocalPending(entry: { email: string; source: string; timestamp: str
     console.error("[WAITLIST] Failed to write local pending entry:", err);
   }
 }
-
 
 export async function POST(req: Request) {
   try {
@@ -64,30 +71,55 @@ export async function POST(req: Request) {
     if (!rateCheck.allowed) {
       return rateLimitResponse(
         rateCheck.retryAfterSeconds,
-        "Bạn đã gửi yêu cầu quá thường xuyên. Vui lòng thử lại sau vài giây."
+        "Bạn đã gửi yêu cầu quá thường xuyên. Vui lòng thử lại sau vài giây.",
       );
     }
 
     // 2. Validate input
     const body = await req.json().catch(() => null);
     const email = body?.email?.trim();
-    const rawSource = typeof body?.source === "string" ? body.source.trim() : "";
-    const source = /^[a-zA-Z0-9_\-\.]{1,64}$/.test(rawSource) ? rawSource : "landing_hero";
+    const rawSource =
+      typeof body?.source === "string" ? body.source.trim() : "";
+    const source = /^[a-zA-Z0-9_\-\.]{1,64}$/.test(rawSource)
+      ? rawSource
+      : "landing_hero";
 
     if (!email || !EMAIL_REGEX.test(email)) {
       return defensiveErrorResponse(
-        { success: false, error: "Định dạng email không hợp lệ. Vui lòng kiểm tra lại." },
-        400
+        {
+          success: false,
+          error: "Định dạng email không hợp lệ. Vui lòng kiểm tra lại.",
+        },
+        400,
       );
     }
 
     const timestamp = new Date().toISOString();
     const entry = { email, source, timestamp, ip: clientIp };
 
-    // 3. Luôn lưu bản sao dự phòng cục bộ
+    // 3. Lưu vào Supabase bảng waitlist_entries
+    try {
+      const supabase = await createClient();
+      const { error: dbError } = await supabase.from("waitlist_entries").upsert(
+        {
+          email: email.toLowerCase(),
+          source,
+          ip: clientIp,
+          created_at: timestamp,
+        },
+        { onConflict: "email,source" },
+      );
+      if (dbError) {
+        console.warn("[WAITLIST] Supabase save warning:", dbError.message);
+      }
+    } catch (dbErr) {
+      console.warn("[WAITLIST] Supabase connection error:", dbErr);
+    }
+
+    // 4. Luôn lưu bản sao dự phòng cục bộ
     saveLocalPending(entry);
 
-    // 4. Nếu đã cấu hình WAITLIST_SHEET_ID -> ghi thẳng vào Google Sheet
+    // 5. Nếu đã cấu hình WAITLIST_SHEET_ID -> ghi thẳng vào Google Sheet
     const sheetId = process.env.WAITLIST_SHEET_ID?.trim();
     if (sheetId) {
       const auth = createGoogleAuth(SHEETS_SCOPE);
@@ -103,26 +135,39 @@ export async function POST(req: Request) {
               values: [[timestamp, email, source, clientIp]],
             },
           });
-          console.log(`[WAITLIST] Successfully appended ${email} to Google Sheet (${sheetId})`);
+          console.log(
+            `[WAITLIST] Successfully appended ${email} to Google Sheet (${sheetId})`,
+          );
         } catch (sheetError) {
-          console.error("[WAITLIST] Error appending to Google Sheet (saved to local backup):", sheetError);
+          console.error(
+            "[WAITLIST] Error appending to Google Sheet (saved to local backup):",
+            sheetError,
+          );
         }
       } else {
-        console.warn("[WAITLIST] WAITLIST_SHEET_ID is set but Google Auth credentials not found. Saved locally.");
+        console.warn(
+          "[WAITLIST] WAITLIST_SHEET_ID is set but Google Auth credentials not found. Saved locally.",
+        );
       }
     } else {
-      console.log(`[WAITLIST] Registered: ${email} [${source}] (Waiting for WAITLIST_SHEET_ID link)`);
+      console.log(
+        `[WAITLIST] Registered: ${email} [${source}] (Waiting for WAITLIST_SHEET_ID link)`,
+      );
     }
 
     return dynamicSuccessResponse({
       success: true,
-      message: "Đăng ký thành công! Hồ sơ của bạn đã được niêm phong vào danh sách ưu tiên.",
+      message:
+        "Đăng ký thành công! Hồ sơ của bạn đã được niêm phong vào danh sách ưu tiên.",
     });
   } catch (err: any) {
     console.error("[WAITLIST] Internal error:", err);
     return defensiveErrorResponse(
-      { success: false, error: "Có lỗi xảy ra trên máy chủ. Vui lòng thử lại sau." },
-      500
+      {
+        success: false,
+        error: "Có lỗi xảy ra trên máy chủ. Vui lòng thử lại sau.",
+      },
+      500,
     );
   }
 }

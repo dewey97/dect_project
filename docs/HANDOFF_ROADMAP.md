@@ -263,19 +263,19 @@ Mỗi brief đã kèm phạm vi, file, ràng buộc và điều kiện done. Ng�
 
 ## 6. Nhóm A — Bảo mật & hạ tầng
 
-| #   | Việc                                                                                    | Trạng thái                                                                    |
-| --- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| A1  | `image-proxy` / `audio-proxy` chỉ host Google + Drive id, cache LRU giới hạn            | ✅ `09ee212`                                                                  |
-| A2  | Rate limiter ưu tiên `X-Real-IP` (Traefik), phần tử cuối `X-Forwarded-For`              | ✅ `09ee212`                                                                  |
-| A3  | `/api/phone` whitelist tab, `refresh=true` chỉ admin, cache giới hạn                    | ✅ `09ee212` (bản sửa lại)                                                    |
-| A4  | Ghi Sheet `RAW`; validate `source` waitlist                                             | ✅ `09ee212`                                                                  |
-| A5  | Dữ liệu ghi file → Supabase                                                             | ⏳ brief mục 4.4                                                              |
-| A6  | Rotate key `.env`, `git rm --cached .env`, thêm `.env` vào `.gitignore`/`.dockerignore` | ⏳ chủ dự án                                                                  |
-| A7  | CI/Docker pnpm pinned, bỏ `package-lock.json`                                           | ✅ `09ee212`                                                                  |
-| A8  | `middleware.ts` → `proxy.ts`, bỏ qua file tĩnh và proxy media                           | ✅ `cc8ab02`                                                                  |
-| A9  | `is_admin()` sang schema `private`                                                      | ✅ migration `25_private_is_admin.sql` viết xong, chờ chủ dự án duyệt và chạy |
-| A10 | Room sync đóng channel/timer khi unmount, auto-connect một lần                          | ✅ `09ee212`                                                                  |
-| A11 | `requireAdminAuth` không còn là server action công khai                                 | ✅ `09ee212` (bản sửa lại)                                                    |
+| #   | Việc                                                                                    | Trạng thái                                                                                                                                    |
+| --- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1  | `image-proxy` / `audio-proxy` chỉ host Google + Drive id, cache LRU giới hạn            | ✅ `09ee212`                                                                                                                                  |
+| A2  | Rate limiter ưu tiên `X-Real-IP` (Traefik), phần tử cuối `X-Forwarded-For`              | ✅ `09ee212`                                                                                                                                  |
+| A3  | `/api/phone` whitelist tab, `refresh=true` chỉ admin, cache giới hạn                    | ✅ `09ee212` (bản sửa lại)                                                                                                                    |
+| A4  | Ghi Sheet `RAW`; validate `source` waitlist                                             | ✅ `09ee212`                                                                                                                                  |
+| A5  | Dữ liệu ghi file → Supabase                                                             | ✅ migration `24_runtime_data_tables.sql` viết xong, 3 route đã tích hợp Supabase fallback, script `scripts/import-runtime-data.mjs` sẵn sàng |
+| A6  | Rotate key `.env`, `git rm --cached .env`, thêm `.env` vào `.gitignore`/`.dockerignore` | ⏳ chủ dự án                                                                                                                                  |
+| A7  | CI/Docker pnpm pinned, bỏ `package-lock.json`                                           | ✅ `09ee212`                                                                                                                                  |
+| A8  | `middleware.ts` → `proxy.ts`, bỏ qua file tĩnh và proxy media                           | ✅ `cc8ab02`                                                                                                                                  |
+| A9  | `is_admin()` sang schema `private`                                                      | ✅ migration `25_private_is_admin.sql` viết xong, chờ chủ dự án duyệt và chạy                                                                 |
+| A10 | Room sync đóng channel/timer khi unmount, auto-connect một lần                          | ✅ `09ee212`                                                                                                                                  |
+| A11 | `requireAdminAuth` không còn là server action công khai                                 | ✅ `09ee212` (bản sửa lại)                                                                                                                    |
 
 Ghi chú bảo mật còn lại (ưu tiên thấp):
 

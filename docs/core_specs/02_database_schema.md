@@ -165,6 +165,51 @@ Lưu vết các sợi dây chỉ đỏ nối giữa 2 ghim do Admin cài đặt 
 
 ---
 
+## 5. Runtime Data Tables (Dữ liệu Runtime Đã Chuyển Từ File Sang Supabase — Migration 24)
+
+Nhằm đảm bảo dữ liệu không bị mất khi deploy container Docker (không gắn volume), các dữ liệu runtime trước đây ghi vào file JSON trong `data/` đã được chuyển sang Supabase:
+
+### Table: `map_vectors`
+
+Bản đồ vector thế giới mở rộng dùng chung duy nhất (`data/maps/world_vector_map.json`).
+
+| Tên Cột      | Kiểu Dữ liệu  | Mô tả                                                        | Mặc định  |
+| :----------- | :------------ | :----------------------------------------------------------- | :-------- |
+| `id`         | `TEXT`        | Khóa chính định danh bản đồ (`world`).                       | `'world'` |
+| `data`       | `JSONB`       | Dữ liệu hình học vector (water, roads, buildings, pois,...). | -         |
+| `updated_at` | `TIMESTAMPTZ` | Thời điểm cập nhật cấu hình bản đồ.                          | `NOW()`   |
+
+RLS: Đọc công khai (`anon`, `authenticated`), Ghi chỉ admin (`private.is_admin()`).
+
+### Table: `reinvestigation_hotspots`
+
+Danh sách điểm khám xét lại hiện trường (hotspots 2D / 360) theo từng vụ án (`data/<case_slug>_hotspots.json`).
+
+| Tên Cột      | Kiểu Dữ liệu  | Mô tả                                                      | Mặc định |
+| :----------- | :------------ | :--------------------------------------------------------- | :------- |
+| `case_slug`  | `TEXT`        | Khóa chính, FK `cases.slug` (CASCADE/RESTRICT).            | -        |
+| `hotspots`   | `JSONB`       | Mảng đối tượng điểm tương tác (tọa độ, ảnh gán, âm thanh). | -        |
+| `updated_at` | `TIMESTAMPTZ` | Thời điểm lưu cấu hình gần nhất.                           | `NOW()`  |
+
+RLS: Đọc công khai (`anon`, `authenticated`), Ghi chỉ admin (`private.is_admin()`).
+
+### Table: `waitlist_entries`
+
+Danh sách email đăng ký nhận thông tin sớm (`data/waitlist_pending.json`).
+
+| Tên Cột      | Kiểu Dữ liệu  | Mô tả                                                      | Mặc định            |
+| :----------- | :------------ | :--------------------------------------------------------- | :------------------ |
+| `id`         | `UUID`        | Khóa chính.                                                | `gen_random_uuid()` |
+| `email`      | `TEXT`        | Địa chỉ email hợp lệ.                                      | -                   |
+| `source`     | `TEXT`        | Nguồn đăng ký (VD: `landing_hero`).                        | `'landing_hero'`    |
+| `ip`         | `TEXT`        | IP người đăng ký (ghi nhận phục vụ rate-limit/chống spam). | -                   |
+| `created_at` | `TIMESTAMPTZ` | Thời điểm đăng ký.                                         | `NOW()`             |
+
+Ràng buộc: `UNIQUE(email, source)`.  
+RLS: Thêm công khai (`anon`, `authenticated`), Đọc/sửa/xóa chỉ admin (`private.is_admin()`).
+
+---
+
 ## 📌 Ghi Chú Chuyển Đổi Kiến Trúc (Architecture Note)
 
 Toàn bộ các bảng sau trong phiên bản thử nghiệm ban đầu **đã được lược bỏ và dọn sạch khỏi database**:

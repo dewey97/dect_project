@@ -174,3 +174,26 @@ export interface DbCaseCharacter {
   created_at: string;
   updated_at: string;
 }
+
+/** Bảng map_vectors: Bản đồ vector thế giới mở rộng dùng chung */
+export interface DbMapVector {
+  id: string;
+  data: unknown;
+  updated_at: string;
+}
+
+/** Bảng reinvestigation_hotspots: Danh sách điểm khám xét lại theo từng vụ án */
+export interface DbReinvestigationHotspots {
+  case_slug: string;
+  hotspots: unknown;
+  updated_at: string;
+}
+
+/** Bảng waitlist_entries: Danh sách email đăng ký nhận thông tin vụ án mới */
+export interface DbWaitlistEntry {
+  id: string;
+  email: string;
+  source: string;
+  ip: string | null;
+  created_at: string;
+}
