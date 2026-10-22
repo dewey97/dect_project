@@ -57,6 +57,7 @@ export interface FollowupConfig {
   kind: "followup";
   /** Loại phụ: time | choice | code | text */
   questionType: "time" | "choice" | "code" | "text";
+  inputType?: "time" | "choice" | "code" | "text";
   correctAnswer?: string;
   options?: string[];
   photoCodes?: string[];
@@ -176,27 +177,41 @@ export function parseCheckpointConfig(
           asString(source.contradictionContext) || undefined,
       };
 
-    case "followup":
+    case "followup": {
+      const rawType = asString(
+        source.inputType || source.input_type || source.questionType,
+      );
+      const inputType = (
+        ["time", "choice", "code", "text"].includes(rawType)
+          ? rawType
+          : "text"
+      ) as FollowupConfig["questionType"];
       return {
         kind: "followup",
-        questionType: (["time", "choice", "code", "text"].includes(
-          asString(source.questionType),
-        )
-          ? asString(source.questionType)
-          : "text") as FollowupConfig["questionType"],
-        correctAnswer: asString(source.correctAnswer) || undefined,
+        questionType: inputType,
+        inputType,
+        correctAnswer:
+          asString(source.correctAnswer || source.correct_answer) || undefined,
         options: asStringArray(source.options),
-        photoCodes: asStringArray(source.photoCodes),
+        photoCodes: asStringArray(source.photoCodes || source.photo_codes),
       };
+    }
 
     case "indictment":
       return {
         kind: "indictment",
-        validSuspects: asStringArray(source.validSuspects),
-        validMotives: asStringArray(source.validMotives),
-        requiredEvidenceIds: asStringArray(source.requiredEvidenceIds),
-        optionalEvidenceIds: asStringArray(source.optionalEvidenceIds),
-        unlocksDossier: asString(source.unlocksDossier) || undefined,
+        validSuspects: asStringArray(
+          source.validSuspects || source.valid_suspects,
+        ),
+        validMotives: asStringArray(source.validMotives || source.valid_motives),
+        requiredEvidenceIds: asStringArray(
+          source.requiredEvidenceIds || source.required_evidence_ids,
+        ),
+        optionalEvidenceIds: asStringArray(
+          source.optionalEvidenceIds || source.optional_evidence_ids,
+        ),
+        unlocksDossier:
+          asString(source.unlocksDossier || source.unlocks_dossier) || undefined,
       };
 
     case "epilogue":

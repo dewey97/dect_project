@@ -85,10 +85,22 @@ function buildSuspectPins(
         // Bỏ qua các checkpoint followup (dành cho node Nghi vấn)
         if (
           cp.followupOf ||
+          cp.kind === "followup" ||
           idLow.includes("followup") ||
           nodeLow.includes("followup")
         ) {
           return false;
+        }
+
+        // 0. Ưu tiên số 1: khớp trực tiếp qua kind = suspect_interrogation và subject_key
+        if (cp.kind === "suspect_interrogation" && cp.subjectKey) {
+          const sKeyClean = cp.subjectKey.trim().toLowerCase();
+          if (
+            sKeyClean === canonicalId ||
+            sKeyClean === (suspect.id || "").toLowerCase()
+          ) {
+            return true;
+          }
         }
 
         // 1. Nhận diện theo ID kinh điển Case #000
@@ -176,7 +188,17 @@ function buildFollowupPins(
         const cNameClean = removeDiacritics(canonicalName || "");
         const aliasList = [canonicalId, sNameClean, cNameClean].filter(Boolean);
 
-        // 0. ƯU TIÊN TUYỆT ĐỐI: Cột `followup_of` trên Google Sheet Live CMS
+        // 0. ƯU TIÊN TUYỆT ĐỐI: kind = followup + subject_key hoặc cột `followup_of` trên Google Sheet Live CMS
+        if (cp.kind === "followup" && cp.subjectKey) {
+          const sKeyClean = cp.subjectKey.trim().toLowerCase();
+          if (
+            sKeyClean === canonicalId ||
+            sKeyClean === (suspect.id || "").toLowerCase()
+          ) {
+            return true;
+          }
+        }
+
         if (cp.followupOf) {
           const rawTarget = cp.followupOf.trim();
           const targetClean = removeDiacritics(rawTarget).toLowerCase();

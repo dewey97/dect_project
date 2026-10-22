@@ -355,7 +355,95 @@ export function gradeCheckpoint(
     };
   }
 
-  // 4. Followup / Time / Code / Text
+  // 4. Followup (Phân nhánh theo inputType: choice | time | code | text)
+  if (kind === "followup") {
+    const rawType = String(
+      cfg.inputType || cfg.input_type || cfg.questionType || "",
+    ).toLowerCase();
+
+    // 4a. Followup trắc nghiệm (Choice)
+    if (rawType === "choice") {
+      const userAns = (sub.answer || "").trim();
+      const correctAns = (cfg.correctAnswer || cfg.correct_answer || "").trim();
+      const options = (cfg.options || []) as string[];
+
+      if (isAdminBypassCode(userAns)) {
+        return { correct: true, feedback: "Admin bypass accepted", ...baseUnlock };
+      }
+
+      const normUser = normalizeForMatch(userAns);
+      const normCorrect = normalizeForMatch(correctAns);
+      let isMatch = normUser === normCorrect;
+
+      if (!isMatch) {
+        const normKhong = normalizeForMatch("khong");
+        const normCo = normalizeForMatch("co");
+        if (userAns.toLowerCase() === "khong_tin" && normCorrect === normKhong) {
+          isMatch = true;
+        } else if (userAns.toLowerCase() === "tin" && normCorrect === normCo) {
+          isMatch = true;
+        }
+      }
+      if (!isMatch && !isNaN(Number(userAns))) {
+        const idx = Number(userAns);
+        if (options[idx]) {
+          isMatch = normalizeForMatch(options[idx]) === normCorrect;
+        }
+      }
+
+      return {
+        correct: isMatch,
+        feedback: isMatch ? "Lựa chọn chính xác" : "Lựa chọn chưa chính xác",
+        ...baseUnlock,
+      };
+    }
+
+    // 4b. Followup thời gian (Time)
+    if (rawType === "time") {
+      const userAns = (sub.answer || "").trim();
+      const correctAns = (cfg.correctAnswer || cfg.correct_answer || "").trim();
+
+      if (isAdminBypassCode(userAns)) {
+        return { correct: true, feedback: "Admin bypass accepted", ...baseUnlock };
+      }
+
+      const cleanUser = userAns.replace(/\s+/g, "").toLowerCase();
+      const cleanCorrect = correctAns.replace(/\s+/g, "").toLowerCase();
+      const isMatch =
+        cleanUser === cleanCorrect ||
+        cleanUser === cleanCorrect.replace(":", "h") ||
+        cleanUser === cleanCorrect.replace("h", ":") ||
+        (cleanCorrect === "21:15" && (cleanUser === "21:15" || cleanUser === "21h15"));
+
+      return {
+        correct: isMatch,
+        feedback: isMatch ? "Mốc thời gian chính xác" : "Mốc thời gian chưa chính xác",
+        ...baseUnlock,
+      };
+    }
+
+    // 4c. Followup mật mã (Code)
+    if (rawType === "code") {
+      const userAns = (sub.answer || "").trim().replace(/\s+/g, "");
+      const correctAns = (cfg.correctAnswer || cfg.correct_answer || "").trim().replace(/\s+/g, "");
+
+      if (isAdminBypassCode(userAns)) {
+        return { correct: true, feedback: "Admin bypass accepted", ...baseUnlock };
+      }
+
+      const isMatch =
+        userAns.toLowerCase() === correctAns.toLowerCase() ||
+        (correctAns === "120713" && userAns === "120713");
+
+      return {
+        correct: isMatch,
+        feedback: isMatch ? "Mật mã chính xác" : "Mật mã chưa chính xác",
+        ...baseUnlock,
+      };
+    }
+  }
+
+  // 5. Code / Time / Text đơn thuần hoặc Followup dạng text
   if (
     kind === "followup" ||
     kind === "code" ||
