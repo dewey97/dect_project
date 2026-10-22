@@ -73,6 +73,7 @@ function getDeviceId(): string {
 export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const [roomCode, setRoomCode] = useState<string | null>(null)
   const [nickname, setNicknameState] = useState<string>('Thám tử')
+  const nicknameRef = useRef<string>('Thám tử')
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
   const [roomState, setRoomState] = useState<RoomInvestigationState>(DEFAULT_ROOM_STATE)
@@ -80,19 +81,44 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const [activeToast, setActiveToast] = useState<ToastNotice | null>(null)
   const [activePing, setActivePing] = useState<DetectivePing | null>(null)
   const activePingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const activeToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const supabase = useMemo(() => createClient(), [])
   const channelRef = useRef<RealtimeChannel | null>(null)
   const roomStateRef = useRef<RoomInvestigationState>(DEFAULT_ROOM_STATE)
+  const didAutoConnectRef = useRef(false)
 
-  // Keep ref synchronized
+  // Keep refs synchronized
   useEffect(() => {
     roomStateRef.current = roomState
   }, [roomState])
 
+  useEffect(() => {
+    nicknameRef.current = nickname
+  }, [nickname])
+
+  // Cleanup channel and timers on unmount
+  useEffect(() => {
+    return () => {
+      if (activePingTimerRef.current) {
+        clearTimeout(activePingTimerRef.current)
+        activePingTimerRef.current = null
+      }
+      if (activeToastTimerRef.current) {
+        clearTimeout(activeToastTimerRef.current)
+        activeToastTimerRef.current = null
+      }
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current)
+        channelRef.current = null
+      }
+    }
+  }, [supabase])
+
   const setNickname = useCallback((name: string) => {
     const clean = name.trim().slice(0, 30) || 'Thám tử'
     setNicknameState(clean)
+    nicknameRef.current = clean
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem(NICKNAME_STORAGE_KEY, clean)
@@ -122,8 +148,12 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       timestamp: Date.now(),
     }
     setActiveToast(notice)
-    setTimeout(() => {
+    if (activeToastTimerRef.current) {
+      clearTimeout(activeToastTimerRef.current)
+    }
+    activeToastTimerRef.current = setTimeout(() => {
       setActiveToast((prev) => (prev?.id === notice.id ? null : prev))
+      activeToastTimerRef.current = null
     }, 4500)
   }, [])
 
@@ -140,6 +170,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
     setActivePing(ping)
     activePingTimerRef.current = setTimeout(() => {
       setActivePing(null)
+      activePingTimerRef.current = null
     }, 4500)
   }, [])
 
@@ -156,9 +187,10 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
         page?: number
       }
     ) => {
+      const currentNick = nicknameRef.current
       const ping: DetectivePing = {
         id: Math.random().toString(36).slice(2),
-        actorName: nickname,
+        actorName: currentNick,
         targetId,
         label,
         coords,
@@ -181,7 +213,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
         })
       }
     },
-    [nickname, triggerPing]
+    [triggerPing]
   )
 
   // Leave room logic
@@ -214,7 +246,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
 
       setIsConnecting(true)
 
-      const activeNick = customNick?.trim() || nickname
+      const activeNick = customNick?.trim() || nicknameRef.current
       if (customNick) {
         setNickname(activeNick)
       }
@@ -408,7 +440,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
         setIsConnecting(false)
       }
     },
-    [nickname, setNickname, supabase, triggerToast]
+    [setNickname, supabase, triggerPing, triggerToast]
   )
 
   // Broadcast & DB update
@@ -457,6 +489,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       setRoomState(nextMerged)
       roomStateRef.current = nextMerged
 
+      const currentNick = nicknameRef.current
       const actionDesc = actionText || 'đã mở khóa manh mối'
 
       // 1. Broadcast immediately to peers (< 30ms)
@@ -466,7 +499,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
           event: 'STATE_PATCH',
           payload: {
             patch,
-            actorName: nickname,
+            actorName: currentNick,
             actionText: actionDesc,
             timestamp: Date.now(),
           },
@@ -479,7 +512,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
           .from('game_rooms')
           .update({
             state_json: nextMerged,
-            last_action: `${nickname} ${actionDesc}`,
+            last_action: `${currentNick} ${actionDesc}`,
             updated_at: new Date().toISOString(),
           })
           .eq('room_code', roomCode)
@@ -487,7 +520,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
         console.error('[RoomSync] DB persist failed:', err)
       }
     },
-    [nickname, roomCode, supabase]
+    [roomCode, supabase]
   )
 
   // Catch-up on tab visibility change or reconnect
@@ -522,14 +555,17 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
     }
   }, [roomCode, supabase])
 
-  // Initial auto-connect from URL or localStorage
+  // Initial auto-connect from URL or localStorage (runs once on mount)
   useEffect(() => {
     if (typeof window === 'undefined') return
+    if (didAutoConnectRef.current) return
+    didAutoConnectRef.current = true
 
     try {
       const savedNick = localStorage.getItem(NICKNAME_STORAGE_KEY)
       if (savedNick) {
         setNicknameState(savedNick)
+        nicknameRef.current = savedNick
       }
 
       const urlParams = new URLSearchParams(window.location.search)

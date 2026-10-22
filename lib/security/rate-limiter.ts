@@ -62,20 +62,26 @@ export function normalizeIp(rawIp: string | null | undefined): string {
 }
 
 /**
- * Trích xuất địa chỉ IP thực tế của client từ HTTP Request headers
+ * Trích xuất địa chỉ IP thực tế của client từ HTTP Request headers.
+ * Ưu tiên X-Real-IP từ reverse proxy (Traefik/Nginx), sau đó đến Cloudflare (CF-Connecting-IP),
+ * và nếu qua X-Forwarded-For thì lấy phần tử CUỐI CÙNG (proxy gần nhất) để chặn bypass.
  */
 export function getClientIp(req: Request): string {
-  const forwardedFor = req.headers.get("x-forwarded-for");
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(",")[0].trim();
-    if (firstIp) return normalizeIp(firstIp);
-  }
-
   const realIp = req.headers.get("x-real-ip");
   if (realIp) return normalizeIp(realIp.trim());
 
   const cfConnectingIp = req.headers.get("cf-connecting-ip");
   if (cfConnectingIp) return normalizeIp(cfConnectingIp.trim());
+
+  const forwardedFor = req.headers.get("x-forwarded-for");
+  if (forwardedFor) {
+    const ips = forwardedFor
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const lastIp = ips[ips.length - 1];
+    if (lastIp) return normalizeIp(lastIp);
+  }
 
   return "127.0.0.1";
 }

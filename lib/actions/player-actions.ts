@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { DbProfile } from '@/lib/types/database'
-import { requireAdminAuth } from './auth-guard'
+import { requireAdminAuth } from '@/lib/auth/admin'
 
 export async function getPlayers() {
   try {

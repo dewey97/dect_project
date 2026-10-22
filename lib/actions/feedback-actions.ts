@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { DbFeedback } from '@/lib/types/database'
 import { revalidatePath } from 'next/cache'
-import { requireAdminAuth } from './auth-guard'
+import { requireAdminAuth } from '@/lib/auth/admin'
 
 export async function submitFeedback(payload: Partial<DbFeedback>) {
   try {

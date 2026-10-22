@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import type { DbCaseDossier } from "@/lib/types/database";
-import { requireAdminAuth } from "./auth-guard";
+import { requireAdminAuth } from "@/lib/auth/admin";
 
 export interface AvailableDocumentItem {
   code: string;

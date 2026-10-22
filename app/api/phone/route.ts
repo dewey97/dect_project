@@ -2,6 +2,8 @@ import { google } from "googleapis";
 import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
+import { denyIfNotAdmin } from "@/lib/security/admin-route-guard";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -14,8 +16,22 @@ interface CacheEntry {
   data: any[];
   timestamp: number;
 }
-const serverCache: Record<string, CacheEntry> = {};
+const serverCache = new Map<string, CacheEntry>();
 const CACHE_TTL_MS = 15_000; // 15 seconds
+const MAX_CACHE_ENTRIES = 100;
+
+function setCacheEntry(key: string, data: any[], timestamp: number) {
+  serverCache.delete(key);
+  while (serverCache.size >= MAX_CACHE_ENTRIES) {
+    const oldestKey = serverCache.keys().next().value;
+    if (oldestKey === undefined) break;
+    serverCache.delete(oldestKey);
+  }
+  serverCache.set(key, { data, timestamp });
+}
+
+/** Tab công khai cho runtime; tab nội bộ (checkpoints, cấu hình...) không được đọc qua route này. */
+const ALLOWED_TABS = new Set(["evidences", "photos", "contacts", "calls", "messages", "apps"]);
 
 /**
  * Dựng cấu hình xác thực Google Sheets an toàn từ Env hoặc Key File.
@@ -127,15 +143,23 @@ async function fetchPublicSheetRows(spreadsheetId: string, tab: string): Promise
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const tab = searchParams.get("tab") || "contacts";
+  const tab = (searchParams.get("tab") || "contacts").trim().toLowerCase();
   const rawCaseId = searchParams.get("caseId") || "case_000";
-  const caseIdFilter = rawCaseId.trim().toLowerCase().replace(/-/g, "_");
-  const forceRefresh =
+  const caseIdFilter = normalizeCaseId(rawCaseId);
+  if (!ALLOWED_TABS.has(tab)) {
+    return NextResponse.json(
+      { success: false, error: `Tab '${tab}' không được phép truy vấn.` },
+      { status: 400 },
+    );
+  }
+  // Bỏ qua cache (gọi thẳng Google Sheets) chỉ dành cho admin, tránh bị spam cạn quota.
+  const wantsRefresh =
     searchParams.get("refresh") === "true" ||
     searchParams.get("_refresh") === "1";
+  const forceRefresh = wantsRefresh && !(await denyIfNotAdmin());
 
   const cacheKey = `${tab}:${caseIdFilter}`;
-  const cached = serverCache[cacheKey];
+  const cached = serverCache.get(cacheKey);
   const now = Date.now();
 
   // Return server cache if fresh and not forced refresh
@@ -211,7 +235,7 @@ export async function GET(request: Request) {
   }
 
   if (rawRows.length === 0) {
-    serverCache[cacheKey] = { data: [], timestamp: now };
+    setCacheEntry(cacheKey, [], now);
     return NextResponse.json({ success: true, tab, data: [] });
   }
 
@@ -269,10 +293,7 @@ export async function GET(request: Request) {
   });
 
   // Save in server cache
-  serverCache[cacheKey] = {
-    data: filteredData,
-    timestamp: now,
-  };
+  setCacheEntry(cacheKey, filteredData, now);
 
   const res = NextResponse.json({
     success: true,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdminAuth } from "@/lib/actions/auth-guard";
+import { requireAdminAuth } from "@/lib/auth/admin";
 
 /**
  * Chặn Route Handler cho admin. Trả về response lỗi nếu không đủ quyền,

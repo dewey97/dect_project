@@ -10,7 +10,7 @@ import {
   type CheckpointStudioDraft,
 } from "@/lib/types/checkpoint-studio";
 import { validateDependencyUpdates } from "@/lib/cms/checkpoint-graph";
-import { requireAdminAuth } from "./auth-guard";
+import { requireAdminAuth } from "@/lib/auth/admin";
 
 const STUDIO_PATH = "/studio/checkpoints";
 

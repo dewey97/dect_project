@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import type { DossierMode, PaperConfig, LoiKhaiData, LyLichData } from '@/types/dossier'
-import { requireAdminAuth } from './auth-guard'
+import { requireAdminAuth } from '@/lib/auth/admin'
 
 export interface DbDossierDocument {
   id: string

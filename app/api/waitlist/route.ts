@@ -98,7 +98,8 @@ export async function POST(req: Request) {
     // 2. Validate input
     const body = await req.json().catch(() => null);
     const email = body?.email?.trim();
-    const source = body?.source?.trim() || "landing_hero";
+    const rawSource = typeof body?.source === "string" ? body.source.trim() : "";
+    const source = /^[a-zA-Z0-9_\-\.]{1,64}$/.test(rawSource) ? rawSource : "landing_hero";
 
     if (!email || !EMAIL_REGEX.test(email)) {
       return defensiveErrorResponse(
@@ -124,7 +125,7 @@ export async function POST(req: Request) {
           await sheets.spreadsheets.values.append({
             spreadsheetId: sheetId,
             range: `'${tabName}'!A:D`,
-            valueInputOption: "USER_ENTERED",
+            valueInputOption: "RAW",
             requestBody: {
               values: [[timestamp, email, source, clientIp]],
             },

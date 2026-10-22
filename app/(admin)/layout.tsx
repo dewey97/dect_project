@@ -1,7 +1,7 @@
 import React from "react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Toaster } from "@/components/ui/toast";
-import { requireAdminAuth } from "@/lib/actions/auth-guard";
+import { requireAdminAuth } from "@/lib/auth/admin";
 import { redirect } from "next/navigation";
 
 export default async function AdminLayout({

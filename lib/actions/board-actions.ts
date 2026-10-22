@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { requireAdminAuth } from "./auth-guard";
+import { requireAdminAuth } from "@/lib/auth/admin";
 import { caseIdVariants, normalizeCaseId } from "@/lib/cases/case-id";
 import {
   PinPoint,

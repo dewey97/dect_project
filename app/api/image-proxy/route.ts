@@ -2,17 +2,85 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-// In-memory binary cache cho Next.js server để phục vụ ảnh tức thì (0ms) sau lần tải đầu
-const imageMemoryCache = new Map<string, { buffer: ArrayBuffer; contentType: string; timestamp: number }>();
+// Allowed upstream hosts for SSRF prevention
+const ALLOWED_HOSTS = new Set([
+  "lh3.googleusercontent.com",
+  "drive.google.com",
+  "docs.google.com",
+]);
+
+interface CacheItem {
+  buffer: ArrayBuffer;
+  contentType: string;
+  timestamp: number;
+  byteLength: number;
+}
+
+// Bounded LRU in-memory binary cache (max 200 items or ~100MB)
+const MAX_ENTRIES = 200;
+const MAX_TOTAL_BYTES = 100 * 1024 * 1024; // 100 MB
 const MAX_CACHE_AGE_MS = 1000 * 60 * 60 * 12; // 12 hours
+
+const imageMemoryCache = new Map<string, CacheItem>();
+let currentCacheBytes = 0;
+
+function getFromCache(key: string): CacheItem | null {
+  const item = imageMemoryCache.get(key);
+  if (!item) return null;
+
+  if (Date.now() - item.timestamp > MAX_CACHE_AGE_MS) {
+    currentCacheBytes -= item.byteLength;
+    imageMemoryCache.delete(key);
+    return null;
+  }
+
+  // Refresh LRU order
+  imageMemoryCache.delete(key);
+  imageMemoryCache.set(key, item);
+  return item;
+}
+
+function addToCache(key: string, buffer: ArrayBuffer, contentType: string) {
+  const byteLength = buffer.byteLength;
+
+  // Don't cache single items larger than 10MB
+  if (byteLength > 10 * 1024 * 1024) return;
+
+  // Evict if over limits
+  while (
+    (imageMemoryCache.size >= MAX_ENTRIES ||
+      currentCacheBytes + byteLength > MAX_TOTAL_BYTES) &&
+    imageMemoryCache.size > 0
+  ) {
+    const oldestKey = imageMemoryCache.keys().next().value;
+    if (!oldestKey) break;
+    const oldItem = imageMemoryCache.get(oldestKey);
+    if (oldItem) {
+      currentCacheBytes -= oldItem.byteLength;
+    }
+    imageMemoryCache.delete(oldestKey);
+  }
+
+  imageMemoryCache.set(key, {
+    buffer,
+    contentType,
+    timestamp: Date.now(),
+    byteLength,
+  });
+  currentCacheBytes += byteLength;
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const rawUrl = searchParams.get("url");
-  const driveId = searchParams.get("id");
+  const rawUrl = searchParams.get("url")?.trim();
+  const driveId = searchParams.get("id")?.trim();
 
-  let targetUrl = rawUrl;
+  let targetUrl: string | null = null;
+
   if (driveId) {
+    if (!/^[a-zA-Z0-9_-]+$/.test(driveId)) {
+      return new NextResponse("Invalid drive id", { status: 400 });
+    }
     targetUrl = `https://lh3.googleusercontent.com/d/${driveId}`;
   } else if (rawUrl) {
     const match =
@@ -20,6 +88,16 @@ export async function GET(request: NextRequest) {
       rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
     if (match && match[1]) {
       targetUrl = `https://lh3.googleusercontent.com/d/${match[1]}`;
+    } else {
+      try {
+        const parsed = new URL(rawUrl);
+        if (parsed.protocol !== "https:" || !ALLOWED_HOSTS.has(parsed.hostname)) {
+          return new NextResponse("Host not allowed", { status: 400 });
+        }
+        targetUrl = parsed.toString();
+      } catch {
+        return new NextResponse("Invalid URL", { status: 400 });
+      }
     }
   }
 
@@ -28,8 +106,8 @@ export async function GET(request: NextRequest) {
   }
 
   const cacheKey = driveId || targetUrl;
-  const cached = imageMemoryCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < MAX_CACHE_AGE_MS) {
+  const cached = getFromCache(cacheKey);
+  if (cached) {
     return new NextResponse(cached.buffer, {
       headers: {
         "Content-Type": cached.contentType,
@@ -60,18 +138,12 @@ export async function GET(request: NextRequest) {
     const contentType = res.headers.get("content-type") || "image/png";
     const buffer = await res.arrayBuffer();
 
-    // Lưu vào bộ nhớ đệm máy chủ
-    imageMemoryCache.set(cacheKey, {
-      buffer,
-      contentType,
-      timestamp: Date.now(),
-    });
+    addToCache(cacheKey, buffer, contentType);
 
     return new NextResponse(buffer, {
       headers: {
         "Content-Type": contentType,
-        "Cache-Control":
-          "public, max-age=31536000, immutable",
+        "Cache-Control": "public, max-age=31536000, immutable",
         "Access-Control-Allow-Origin": "*",
         "X-Cache": "MISS",
       },

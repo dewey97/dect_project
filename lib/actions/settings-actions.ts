@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { DbAppSettings } from '@/lib/types/database'
-import { requireAdminAuth } from './auth-guard'
+import { requireAdminAuth } from '@/lib/auth/admin'
 
 /** Lấy cấu hình toàn cục */
 export async function getAppSettings() {

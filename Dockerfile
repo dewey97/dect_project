@@ -5,12 +5,14 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm install --legacy-peer-deps
+RUN npm install -g pnpm@11.25.0
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
+RUN pnpm install --frozen-lockfile
 
 # 2. Builder Stage
 FROM base AS builder
 WORKDIR /app
+RUN npm install -g pnpm@11.25.0
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -18,7 +20,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-RUN npm run build
+RUN pnpm run build
 
 # 3. Production Runner Stage
 FROM base AS runner
@@ -44,4 +46,3 @@ USER nextjs
 EXPOSE 3000
 
 CMD ["node", "server.js"]
-
