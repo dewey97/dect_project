@@ -32,16 +32,26 @@
 | `78365f1` | refactor(scripts): organize scripts into ops and archive (E)                                                                          | 10 ops, 61 archive                      |
 | `9507871` | feat(studio): add kind-specific checkpoint editor forms (B4)                                                                          | 4 form editor mới trong Studio          |
 | `ec57014` | feat(checkpoints): add server-side grading API and public view (B5)                                                                   | Route verify, grader, migration 27      |
+| `932921c` | docs(roadmap): review handoff, add anti-hardcode design (7B); waitlist upsert `ignoreDuplicates`                                      |                                         |
+| `df04e00` | fix: grader bug (bỏ heuristic "khong"/options), admin client throw ở prod, giảm `any`                                                 |                                         |
+| `601d396` | feat(checkpoints): migration 28 normalize `input_type`; pin-builder đọc `subject_key` cho suspect & followup                          | Migration 28 chờ duyệt                  |
+| `80792e2` | feat(checkpoints): B6 refactor — gameplay modal gọi `/api/checkpoints/verify`, dùng `subject_key`; đổi tên module                     | Còn fallback legacy `cp-000-*`          |
+| `7c57bd5` | fix(typography): L2 epilogue titles `font-mono` thay `font-serif`                                                                     |                                         |
+| `cd2d979` | feat(cases): C3 — `duplicateCase` deep copy 4 bảng (checkpoints, dossiers, characters, documents)                                     |                                         |
+| `72203f3` | feat(dossiers): C1 — mở khóa theo đồ thị `depends_on`/`unlocksDossier`; hook `useCaseDossiers`; bỏ suy phase từ chữ cái               |                                         |
+| `7a40855` | feat(studio): C2+C4 — `lib/checkpoints/case-linter.ts` (6 rule), `case-playtest.ts` (chơi thử từ node X)                              |                                         |
+| `4a6d9b2` | feat(routes): C5 — `board-stage`, `evidence/boardgame`, `evidence/[id]` nhận `case_id` từ URL                                         |                                         |
+| `ff3a40c` | feat(phone): C6 — `phone-simulator` dùng `getActiveVictim`; `messages`/`phone-app` lọc theo `caseId` trên Google Sheet                |                                         |
 
-### 1.2. Kiểm tra gần nhất (sau fix B5, 2026-10-22 tối)
+### 1.2. Kiểm tra gần nhất (sau commit `869026f`, 2026-10-23)
 
-| Lệnh                                     | Kết quả             |
-| ---------------------------------------- | ------------------- |
-| `npx tsc --noEmit --incremental false`   | Sạch (0 lỗi)        |
-| `NEXT_DIST_DIR=.next_dev npx next build` | Pass                |
-| `pnpm test:e2e`                          | **9/9 pass** (100%) |
+| Lệnh                                     | Kết quả                      |
+| ---------------------------------------- | ---------------------------- |
+| `npx tsc --noEmit --incremental false`   | Sạch (0 lỗi)                 |
+| `NEXT_DIST_DIR=.next_dev npx next build` | Pass (14/14 static)          |
+| `pnpm test:e2e`                          | **9/9 pass** (100%, ~1 phút) |
 
-Đã sửa triệt để bug grader câu hỏi phụ trắc nghiệm của Tùng: loại bỏ heuristic lỏng lẻo, đối chiếu chặt chẽ nhãn/id phương án, toàn bộ 9 kịch bản E2E baseline case_000 đã xanh 100%.
+E2E case_000 xanh 100% gồm cả test Tùng (bug grader đã sửa). Working tree sạch.
 
 ### 1.3. Database production (Supabase project `zalyxhmwwmfyexoilejp`)
 
@@ -57,36 +67,29 @@
 1. **Production chạy code cũ trên DB đã migrate.** Tương thích, trừ `createNewCase` cũ tự đếm mã vụ (`case_003`) trong khi DB cấp `case_002` → FK chặn tạo 2 node khởi đầu cho vụ mới. **Push sớm.**
 2. **Lần push đầu thay đổi hạ tầng build:** CI chuyển sang pnpm (`pnpm/action-setup` đọc `packageManager` trong `package.json`), Docker cài `pnpm@11.25.0` bằng `npm install -g`, `middleware.ts` đổi tên `proxy.ts` (Next 16 chạy proxy ở runtime Node). Theo dõi job `preflight` và `build-and-push`, sau đó smoke test production.
 3. **Dev server cổng 3000 của chủ dự án** có thể còn lỗi CSS `Can't resolve '&#x27;/textures/kraft_paper_texture_large.png'` (cache Turbopack quét thư mục build tạm cũ). Sửa: tắt server, `rm -rf .next/dev/cache`, chạy lại `pnpm dev`.
-4. **Migration 24, 25, 26, 27 CHƯA chạy production.** Code đã phụ thuộc:
-   - `/api/checkpoints` có fallback khi thiếu cột `kind` (lỗi `42703`) — chạy được.
-   - `/api/checkpoints/verify` cần `SUPABASE_SERVICE_ROLE_KEY` — chưa cấu hình production.
-   - `/api/admin/map-vector`, `/reinvestigation`, `/waitlist` còn fallback ghi file.
-   - **Phải chạy migration + đặt env trước khi deploy, hoặc sẽ gãy luồng chấm điểm server.**
-5. **`lib/supabase/admin.ts` có fallback về `NEXT_PUBLIC_SUPABASE_ANON_KEY` khi thiếu `SUPABASE_SERVICE_ROLE_KEY`** → mất tác dụng ẩn đáp án (anon key cũng bị RLS chặn SELECT bảng gốc, nhưng view `case_checkpoints_public` thì vẫn đọc được, không lộ gì; vẫn nên throw khi thiếu env để sớm phát hiện).
-6. **`/api/waitlist` upsert `onConflict: email,source`**: RLS anon chỉ cho INSERT, không UPDATE → trùng email báo lỗi RLS. Đã sửa thành `ignoreDuplicates: true` trong working tree (chưa commit).
-7. **Bug grader câu hỏi phụ trắc nghiệm** (xem 1.2) — chưa fix. Phương án fix xem mục 7 (B5).
-8. **Hardcode còn lại cho vụ án mới:**
-   - `server-grader.ts`: heuristic nhận "khong"/"tung"/"1b" trong `followup` và `choice`; nhận "21:15"/"120713" trong followup.
-   - `followup-question-modal.tsx`: fallback id "khong_tin"/"tin"; `DEFAULT_PHONE_INPUTS`; `DEFAULT_NARRATIVES`.
-   - `culprit-epilogue-modal.tsx`: so `isVu/isTung/isHa`.
-   - `pin-builder.ts`: dò `-1a/-1b/-1c`.
-   - Xử lý ở B6 theo thiết kế mục 12 bên dưới.
-9. **Chấm điểm vẫn chạy ở client và đáp án lộ qua `/api/checkpoints`** đến khi B6 chuyển modal sang gọi `/api/checkpoints/verify` và `/api/checkpoints?mode=public`.
+4. **Migration 24, 25, 26, 27, 28 CHƯA chạy production.** Code đã phụ thuộc. **Thứ tự deploy bắt buộc:**
+   1. Đặt env `SUPABASE_SERVICE_ROLE_KEY` trên VPS (lấy ở Supabase Dashboard → Project Settings → API). Không có thì `/api/checkpoints/verify` throw `Missing SUPABASE_SERVICE_ROLE_KEY` ở production.
+   2. Chạy migration 24 → 25 → 26 → 27 → 28 (theo thứ tự số, mỗi file một lần). Advisors sau mỗi lần.
+   3. `git push origin main`, theo dõi CI + VPS deploy.
+   4. Smoke test (xem mục 5).
+   - Trước khi chạy: `/api/checkpoints` có fallback khi thiếu `kind`, `/api/admin/map-vector`/`reinvestigation`/`waitlist` còn fallback ghi file nên app vẫn chạy; nhưng `/api/checkpoints/verify` throw → **mọi câu hỏi phụ, cáo trạng, suspect interrogation sẽ fail chấm điểm**.
+5. **`createAdminClient` throw khi thiếu `SUPABASE_SERVICE_ROLE_KEY` ở `NODE_ENV=production`** (local dev vẫn fallback anon có warn). Đảm bảo env production có key.
+6. **Hardcode `cp-000-*`, vu/tung/ha CÒN** trong `followup-question-modal.tsx` (~59 ref) và `pin-builder.ts` (~69 ref) dưới dạng **fallback legacy** sau nhánh ưu tiên `subject_key`. Chạy đúng với case_000 (có subject_key sau migration 28); vụ mới chỉ cần set `subject_key` là tự dùng nhánh mới. Dọn hẳn sau khi migration 28 đã chạy production và confirm không còn checkpoint nào thiếu `subject_key` (xem Brief B6-cleanup).
+7. **`server-grader.ts` nhánh time/code còn `cleanCorrect === "21:15"` / `=== "120713"`** — redundant với equal check phía trên, vô hại nhưng dọn khi B6-cleanup.
+8. **`inferCheckpointKind` còn fallback dò id `-1a/-1b/-1c`** — hợp lý cho legacy khi `kind` NULL, dọn khi mọi row backfilled.
 
 ### 1.5. Việc còn lại — tổng quan
 
-| Nhóm   | Mục                                                                                        | Người làm đề xuất | Ước lượng |
-| ------ | ------------------------------------------------------------------------------------------ | ----------------- | --------- |
-| Bước 0 | Chạy migration 24/25/26/27, đặt `SUPABASE_SERVICE_ROLE_KEY`, push, theo dõi CI, smoke test | Chủ dự án         | 1 giờ     |
-| Lỗi    | Fix bug grader trắc nghiệm (xem 1.2)                                                       | Claude            | 30 phút   |
-| A      | A6 rotate key `.env`, `git rm --cached .env`                                               | Chủ dự án         | 30 phút   |
-| B      | B6 bỏ hardcode vu/tung/ha, chuẩn hóa `input_type` + options (xem mục 12)                   | Claude            | 2–3 ngày  |
-| B      | B7 docs                                                                                    | Claude            | 2 giờ     |
-| C      | Tiến trình theo đồ thị, case lint, template vụ án                                          | Claude (sau B)    | 4–5 ngày  |
-| D      | D7 giảm `any`, D11                                                                         | Model khác        | 1–2 ngày  |
-| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`                                | Chủ dự án         | —         |
+| Nhóm   | Mục                                                                     | Người làm đề xuất   | Ước lượng |
+| ------ | ----------------------------------------------------------------------- | ------------------- | --------- |
+| Bước 0 | Đặt `SUPABASE_SERVICE_ROLE_KEY`, chạy migration 24–28, push, smoke test | Chủ dự án           | 1 giờ     |
+| A      | A6 rotate key `.env`, `git rm --cached .env`                            | Chủ dự án           | 30 phút   |
+| B      | B6-cleanup: dọn fallback `cp-000-*` legacy sau khi migration 28 chạy ổn | Claude / model khác | 0.5 ngày  |
+| B      | B7 docs                                                                 | Claude              | 2 giờ     |
+| D      | D7 giảm `any` (~còn), D11 tiếp                                          | Model khác          | 1–2 ngày  |
+| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`             | Chủ dự án           | —         |
 
-Đã hoàn tất kể từ bản roadmap trước: A5, A9, L1, L2, B2, B3, B4, B5, D3, D8, D11, E (chia scripts).
+Đã hoàn tất kể từ bản roadmap trước: A5, A9, L1, L2, B2–B6 (bước chính), C1–C6, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard.
 
 ---
 
@@ -253,21 +256,36 @@ Mỗi brief đã kèm phạm vi, file, ràng buộc và điều kiện done. Ng�
 
 > Migration `db/schema/25_private_is_admin.sql`: tạo schema `private` (không expose qua PostgREST), chuyển hàm `is_admin()` sang đó (`SECURITY DEFINER`, `search_path = public`), `GRANT USAGE ON SCHEMA private` và `GRANT EXECUTE` cho `anon, authenticated`, cập nhật **mọi** policy đang gọi `public.is_admin()` (tra `pg_policies`), rồi `DROP FUNCTION public.is_admin()`. Smoke test bằng `SET LOCAL ROLE` như migration 21 (anon/player/admin, kết thúc bằng rollback). Chạy security advisors sau khi chủ dự án duyệt và chạy migration.
 
-#### Brief B5-fix — vá bug grader trắc nghiệm (Claude, ~30 phút)
+#### Brief B5-fix — ✅ `df04e00`
 
-> E2E "Tùng trắc nghiệm" fail sau commit `ec57014`: chọn "CÓ" vẫn pass khi đáp án đúng "KHÔNG".
+Hoàn tất: xóa heuristic chuỗi trong grader, admin client throw ở `NODE_ENV=production`, E2E 9/9 pass.
+
+#### Brief B6-cleanup — dọn fallback legacy sau khi migration 28 đã chạy (~0.5 ngày)
+
+> **Tiền đề:** migration 28 đã chạy production, mọi row `case_checkpoints` đã có `kind` + `subject_key` (nếu áp dụng). Confirm:
 >
-> **Vị trí:** `lib/checkpoints/server-grader.ts`, nhánh `kind === "followup"` (dòng ~388–414) và `kind === "choice"` (dòng ~454–469).
+> ```sql
+> SELECT case_id, count(*) FROM case_checkpoints
+>  WHERE kind IS NULL
+>     OR (kind IN ('suspect_interrogation','followup') AND subject_key IS NULL)
+>  GROUP BY 1;
+> -- rỗng = an toàn
+> ```
 >
 > **Việc:**
 >
-> 1. Xóa heuristic `options.some(normalizeForMatch(opt) === normUser) && (normUser.includes("khong") || normCorrect.includes("khong"))` → chấm sai.
-> 2. Xóa dò `checkpoint_id` chứa `"tung"` / `"1b"` để quyết định kind.
-> 3. Xóa hardcode "21:15"/"120713" trong nhánh followup — đáp án đã có trong `correctAnswer`.
-> 4. Chỉ chấp nhận id ẩn `"khong_tin"`/`"tin"` khi nhãn tương ứng ("KHÔNG"/"CÓ") khớp đáp án đúng. Tạm thời giữ để không gãy modal; B6 sẽ bỏ hẳn id ẩn.
-> 5. `lib/supabase/admin.ts`: throw lỗi khi thiếu `SUPABASE_SERVICE_ROLE_KEY` thay vì fallback anon.
+> 1. `lib/checkpoints/server-grader.ts`:
+>    - `inferCheckpointKind`: bỏ nhánh dò id `-1a/-1b/-1c`, `endsWith("-0")`, `includes("indictment")`, `includes("epilogue")`, `includes("followup")`. Chỉ còn `checkpoint.kind` (NOT NULL sau migration 28).
+>    - Nhánh `time`/`code`: bỏ `cleanCorrect === "21:15"` / `=== "120713"` (redundant).
+>    - Nhánh `choice`/`followup`: bỏ fallback id ẩn "khong_tin"/"tin" nếu form đã submit nhãn.
+> 2. `components/investigation/mindmap/canvas/pin-builder.ts`:
+>    - Bỏ `SUSPECT_CHECKPOINT_MAP = { vu: "cp-000-1a", ... }`.
+>    - Bỏ nhánh dò id `cp-000-*`, `-1a/-1b/-1c`.
+>    - Fallback cuối: nếu không khớp `subject_key` → bỏ qua, log cảnh báo.
+> 3. `components/investigation/mindmap/followup-question-modal.tsx`: bỏ 3 chỗ `cp.id === "cp-000-1a-followup" || ...`, chỉ còn `kind === "followup" && subjectKey`.
+> 4. Nếu còn id ẩn "khong_tin"/"tin" trong `choice-form`: submit nhãn thay vì id (xóa phần dịch chuyển trong `handleSubmitChoice`).
 >
-> **Kiểm tra:** `pnpm test:e2e` 9/9 pass. Done: mục 3.
+> **Kiểm tra:** `pnpm test:e2e` 9/9; grep `grep -rn "cp-000\|-1a\|-1b\|-1c\|khong_tin" components lib` phải sạch (trừ `scripts/archive/`). Done: mục 3.
 
 #### Brief B6 — bỏ hardcode nhân vật và câu hỏi phụ (Claude, ~2–3 ngày)
 
@@ -304,16 +322,35 @@ Mỗi brief đã kèm phạm vi, file, ràng buộc và điều kiện done. Ng�
 
 ---
 
-## 5. Bước 0 — Chốt và deploy (chủ dự án, ~30 phút)
+## 5. Bước 0 — Chốt và deploy (chủ dự án, ~1 giờ)
 
-1. `git push origin main`.
-2. Theo dõi GitHub Actions: job `preflight` (pnpm install + `pnpm run lint`), `build-and-push` (Docker), bước deploy VPS.
-3. Smoke test production:
+**Thứ tự bắt buộc. Đảo thứ tự → chấm điểm server throw ở prod.**
+
+1. **Đặt env** trên VPS (`.env` ở thư mục dự án, container Docker đọc qua `env_file`):
+   - `SUPABASE_SERVICE_ROLE_KEY=<lấy ở Supabase Dashboard → Project Settings → API → service_role>`
+   - Reload compose: `docker compose up -d` (chưa cần image mới).
+2. **Chạy migration production** (Supabase Dashboard → SQL Editor hoặc `supabase db push`, theo thứ tự số):
+   - `db/schema/24_runtime_data_tables.sql`
+   - `db/schema/25_private_is_admin.sql`
+   - `db/schema/26_checkpoint_kind.sql`
+   - `db/schema/27_checkpoint_server_grading.sql`
+   - `db/schema/28_checkpoint_config_normalize.sql`
+   - Sau mỗi file: kiểm tra không lỗi, chạy `get_advisors security`.
+3. **Import dữ liệu runtime cũ** (nếu muốn giữ): `node scripts/ops/import-runtime-data.mjs` → sinh SQL vào `.tmp/`, apply qua Dashboard.
+4. **`git push origin main`**, theo dõi GitHub Actions (job `preflight` + `build-and-push`) rồi bước deploy VPS.
+5. **Smoke test production:**
    - `/evidence/web?case_id=case_000`: intro → bàn điều tra → tra SĐT (Vũ, Tùng, Đạt) → mở điện thoại nạn nhân (chủ máy "Nguyễn Văn Khang").
-   - `/studio/characters` (đăng nhập admin): sửa thử mô tả một nhân vật rồi hoàn tác.
-   - `/studio/checkpoints?case=case_001`, nút Playtest ở `/studio/cases`.
-   - `POST /api/admin/map-vector` khi chưa đăng nhập → 401.
-4. Nếu CI lỗi ở pnpm: kiểm tra `packageManager` trong `package.json`, `pnpm-workspace.yaml` (`allowBuilds`).
+   - Thẩm tra Vũ → bấm "ĐIỀU TRA" → câu hỏi phụ `21:15` → "CHUYỂN HƯỚNG ĐIỀU TRA" (xác minh `/api/checkpoints/verify` chạy — kiểm Network tab 200).
+   - Tùng câu hỏi phụ: "KHÔNG" đúng, "CÓ" sai.
+   - Hà mật khẩu `120713` đúng.
+   - Cáo trạng: `Trần Thị Hà` + `Mâu thuẫn tình cảm` + `C-02, D-04, D-05` → kết án.
+   - Hậu án: 4 phần có nội dung.
+   - `/studio/characters` (đăng nhập admin): sửa thử mô tả rồi hoàn tác.
+   - `/studio/checkpoints`: chọn vụ `case_001`, chọn checkpoint → thấy editor theo `kind`.
+   - `/studio/cases` → nút nhân bản vụ `case_000` → vụ mới có đủ checkpoint, nhân vật, dossier.
+   - `POST /api/admin/map-vector` chưa đăng nhập → 401.
+6. **Nếu CI lỗi ở pnpm:** kiểm tra `packageManager` trong `package.json`, `pnpm-workspace.yaml` (`allowBuilds`).
+7. **Nếu `/api/checkpoints/verify` throw `Missing SUPABASE_SERVICE_ROLE_KEY`:** quay lại bước 1, verify env trong container `docker compose exec app env | grep SUPABASE`.
 
 ---
 
