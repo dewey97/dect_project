@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -54,6 +54,7 @@ import { DetectiveNotebookModal } from "@/components/investigation/detective-not
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
+import { useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
 import { normalizeImageUrl } from "@/lib/utils";
 import {
   getStorageItem,
@@ -124,6 +125,9 @@ function WebEvidencePageContent() {
   // Nạp toàn bộ hồ sơ từ Dossier Studio (nguồn tài liệu chính)
   const { documents: dossierDocs } = useDossierDocuments(caseId);
 
+  // Nạp danh mục các bộ hồ sơ từ bảng case_dossiers theo đồ thị vụ án (C1)
+  const { getPhaseForCode } = useCaseDossiers(caseId);
+
   // 3-Zone Layout State (Desktop):
   // Cột 1 (Trái): Khay hồ sơ & vật chứng (Dossier Tray) - width cố định/resizable (240px -> 450px)
   // Cột 2 (Giữa): Bảng điều tra (Investigation Canvas) - flex-1 (chiếm trọn không gian trung tâm)
@@ -174,13 +178,8 @@ function WebEvidencePageContent() {
     // 1. Chuyển đổi toàn bộ hồ sơ từ Dossier Studio thành PDF/Dossier Items
     const dossierItems: CombinedItem[] = (dossierDocs || []).map((doc, idx) => {
       const code = (doc.tag_code || "").trim();
-      const firstChar = code.charAt(0).toUpperCase();
-
-      // Xác định Phase / Bộ hồ sơ theo chữ cái đầu tiên của mã (A -> Bộ A, B -> Bộ B, C -> Bộ C, ...)
-      let phase = 0;
-      if (firstChar === "A") phase = 1;
-      else if (firstChar === "B" || firstChar === "E") phase = 2;
-      else if (firstChar === "C" || firstChar === "D") phase = 3;
+      // Ánh xạ Phase / Bộ hồ sơ qua case_dossiers (C1), fallback tự động nếu chưa gán
+      const phase = getPhaseForCode(code);
 
       const rawContent: any = doc.content || {};
       const title =
@@ -250,24 +249,9 @@ function WebEvidencePageContent() {
             row.label || row.title || `Vật chứng #${code}`,
           ).trim();
           const driveUrl = String(row.drive_url || "").trim();
-          const boStr = String(row["bộ hồ sơ"] || "").toUpperCase();
 
-          let phase = 0;
-          if (boStr === "A" || code.startsWith("A-")) phase = 1;
-          else if (
-            boStr === "B" ||
-            code.startsWith("B-") ||
-            boStr === "E" ||
-            code.startsWith("E-")
-          )
-            phase = 2;
-          else if (
-            boStr === "C" ||
-            code.startsWith("C-") ||
-            boStr === "D" ||
-            code.startsWith("D-")
-          )
-            phase = 3;
+          // Ánh xạ Phase / Bộ hồ sơ theo case_dossiers (C1)
+          const phase = getPhaseForCode(code);
 
           const localFallback =
             caseId === "case-000"
@@ -311,7 +295,7 @@ function WebEvidencePageContent() {
     }
 
     return [...testPdfItems, ...dossierItems, ...photoItems];
-  }, [dossierDocs, sheetEvidences, caseId]);
+  }, [dossierDocs, sheetEvidences, caseId, getPhaseForCode]);
 
   // Tự động nhảy đến vị trí tài liệu/vật chứng khi có đồng đội chỉ điểm (Ping)
   useEffect(() => {
@@ -391,7 +375,7 @@ function WebEvidencePageContent() {
       }
     }
 
-    // Check current unlocked phase from boardgame progress
+    // Check current unlocked phase from boardgame progress & graph unlocks (C1)
     const solvedFollowups = getStorageJson<string[]>(
       caseStorageKey(caseId, "solved_followups"),
       [],
@@ -401,10 +385,25 @@ function WebEvidencePageContent() {
       "true";
     const isIndictmentSolved =
       getStorageItem(caseStorageKey(caseId, "indictment_solved")) === "true";
+    const unlockedDossiers = getStorageJson<string[]>(
+      caseStorageKey(caseId, "unlocked_dossiers"),
+      [],
+    );
 
-    if (isIndictmentSolved) {
+    if (
+      isIndictmentSolved ||
+      unlockedDossiers.includes("ket_luan") ||
+      unlockedDossiers.includes("phase_4")
+    ) {
       setUnlockedPhase(3);
-    } else if (isReinvestigateUnlocked || solvedFollowups.length >= 2) {
+    } else if (
+      isReinvestigateUnlocked ||
+      solvedFollowups.length >= 2 ||
+      unlockedDossiers.includes("bo_b") ||
+      unlockedDossiers.includes("bo_c") ||
+      unlockedDossiers.includes("phase_2") ||
+      unlockedDossiers.includes("phase_3")
+    ) {
       setUnlockedPhase(2);
     } else {
       setUnlockedPhase(1);
