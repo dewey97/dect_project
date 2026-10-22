@@ -256,7 +256,8 @@ export async function GET(request: Request) {
         .replace(/-/g, "_");
       return itemCaseId === caseIdFilter;
     }
-    return true;
+    // Hàng thiếu case_id chỉ được gán mặc định cho case_000 (legacy compatibility - C6)
+    return caseIdFilter === "case_000";
   });
 
   // Save in server cache

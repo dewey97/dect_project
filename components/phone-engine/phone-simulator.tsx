@@ -202,7 +202,7 @@ function PhoneScreenContent({
                   <div className="flex justify-between border-b border-white/5 pb-2">
                     <span className="text-[#8E8E93]">Chủ sở hữu:</span>
                     <span className="font-semibold text-white">
-                      {device.owner || "Nguyễn Văn Khang"}
+                      {device.owner || getActiveVictim()?.name || "Nguyễn Văn Khang"}
                     </span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-2">

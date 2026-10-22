@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { getActiveVictim } from "@/lib/cases/case-characters";
 import { EvidenceAnchorItem } from "../core/evidence-anchor-item";
 
 interface PhoneAppProps {
@@ -553,18 +554,26 @@ export function PhoneApp({
                 </div>
 
                 {/* My Card */}
-                {!contactsSearch && (
-                  <div className="px-4 py-2.5 border-b border-[#E3E2E7] flex items-center gap-3 bg-[#FFFFFF]">
-                    <div className="size-9 rounded-full bg-gradient-to-b from-[#8E8E93] to-[#636366] text-white flex items-center justify-center text-sm font-semibold">
-                      K
+                {!contactsSearch && (() => {
+                  const victim = getActiveVictim();
+                  const ownerName = victim?.name || "Nguyễn Văn Khang";
+                  const initial =
+                    ownerName.trim().split(" ").pop()?.charAt(0).toUpperCase() ||
+                    ownerName.charAt(0).toUpperCase() ||
+                    "K";
+                  return (
+                    <div className="px-4 py-2.5 border-b border-[#E3E2E7] flex items-center gap-3 bg-[#FFFFFF]">
+                      <div className="size-9 rounded-full bg-gradient-to-b from-[#8E8E93] to-[#636366] text-white flex items-center justify-center text-sm font-semibold">
+                        {initial}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-[15px] font-medium text-[#1A1B1F]">
+                          {ownerName}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-[15px] font-medium text-[#1A1B1F]">
-                        Nguyễn Văn Khang
-                      </span>
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* Contacts Grouped List */}
                 {contactsLoading ? (

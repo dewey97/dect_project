@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { cn, normalizeImageUrl, normalizeMediaUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { getActiveVictim } from "@/lib/cases/case-characters";
 import { getStorageJson, setStorageJson } from "@/lib/storage";
 import { EvidenceAnchorItem } from "../core/evidence-anchor-item";
 
@@ -274,9 +275,13 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
           text = tsMatch[2].trim();
         }
 
+        const victim = getActiveVictim();
+        const victimShortName =
+          victim?.name?.trim().split(" ").pop() || victim?.name || "Khang";
+
         return {
           id: `msg-${idx}-${mIdx}`,
-          sender: isSent ? "Khang" : item.contact_name || "Khác",
+          sender: isSent ? victimShortName : item.contact_name || "Khác",
           role: isSent ? "sent" : "received",
           text,
           timestamp,
@@ -319,12 +324,20 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
                 : lastParsedMsg.text
           : ""),
       messages: parsedMessages.map(
-        (m: ParsedMessage, mIdx: number): ParsedMessage => ({
-          id: m.id || `msg-${idx}-${mIdx}`,
-          sender: m.sender || m.role || item.contact_name || "",
-          role: m.role || (m.sender === "Khang" ? "sent" : "received"),
-          text: m.text || (m as { content?: string }).content || "",
-          timestamp: m.timestamp || "",
+        (m: ParsedMessage, mIdx: number): ParsedMessage => {
+          const victim = getActiveVictim();
+          const victimShortName =
+            victim?.name?.trim().split(" ").pop() || victim?.name || "Khang";
+          const isOwnerMsg =
+            m.sender === victimShortName ||
+            m.sender === "Khang" ||
+            m.sender === victim?.name;
+          return {
+            id: m.id || `msg-${idx}-${mIdx}`,
+            sender: m.sender || m.role || item.contact_name || "",
+            role: m.role || (isOwnerMsg ? "sent" : "received"),
+            text: m.text || (m as { content?: string }).content || "",
+            timestamp: m.timestamp || "",
           attachment:
             m.attachment ||
             ((m as unknown as { media_url?: string }).media_url
@@ -362,8 +375,8 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
             m.clueAnalysis ||
             (m as { clue_analysis?: string }).clue_analysis ||
             "",
-        }),
-      ),
+        };
+      }),
     };
   });
 
