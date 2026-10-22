@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useCheckpoints } from "@/components/investigation/checkpoints-context";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
@@ -68,10 +68,18 @@ const BG_OPTIONS = [
   },
 ];
 
-export default function BoardStagePage() {
+function BoardStageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawCaseId =
+    searchParams.get("case_id") || searchParams.get("caseId") || "case-000";
+  const caseId =
+    rawCaseId === "case_000" || rawCaseId === "case-000"
+      ? "case-000"
+      : rawCaseId;
+
   const { completedCheckpointIds, completeCheckpoint } = useCheckpoints();
-  const { checkpoints } = useCaseCheckpoints("case-000");
+  const { checkpoints } = useCaseCheckpoints(caseId);
 
   // Single modal state
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
@@ -308,6 +316,7 @@ export default function BoardStagePage() {
         {/* Bảng điều tra canvas thực tế (tự render nón ánh sáng lọt lòng bên trong bounds) */}
         <div className="relative w-full h-full flex items-center justify-center">
           <MainInvestigationCanvas
+            caseId={caseId}
             isBoardGame={true}
             customBgImage={currentBgOption.url}
             onOpenPhoneSimulator={() => setActiveModal("phone")}
@@ -373,6 +382,7 @@ export default function BoardStagePage() {
       <EpilogueModal
         isOpen={activeModal === "epilogue"}
         onClose={() => setActiveModal(null)}
+        caseId={caseId}
       />
 
       {/* QUICK ACTION FAB MENU */}
@@ -407,5 +417,19 @@ export default function BoardStagePage() {
         onClose={() => setActiveModal(null)}
       />
     </div>
+  );
+}
+
+export default function BoardStagePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-full w-full bg-[#0d0a08] flex items-center justify-center text-[#d9a066] font-mono text-xs">
+          Đang nạp bàn điều tra...
+        </div>
+      }
+    >
+      <BoardStageContent />
+    </Suspense>
   );
 }

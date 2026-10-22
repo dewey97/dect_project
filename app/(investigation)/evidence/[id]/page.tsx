@@ -35,15 +35,28 @@ const DEFAULT_VICTIM_DEVICE: Device = {
 
 export default async function DeviceSimulatorPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ case_id?: string; caseId?: string }>;
 }) {
   const { id } = await params;
-  const activeCase = ACTIVE_CASE_000;
+  const sParams = searchParams ? await searchParams : {};
+  const rawCaseId = sParams.case_id || sParams.caseId || "case-000";
+  const caseId =
+    rawCaseId === "case_000" || rawCaseId === "case-000"
+      ? "case-000"
+      : rawCaseId;
+
+  const activeCase = {
+    ...ACTIVE_CASE_000,
+    id: caseId,
+  };
 
   const device: Device = {
     ...DEFAULT_VICTIM_DEVICE,
     id,
+    caseId,
   };
 
   return (

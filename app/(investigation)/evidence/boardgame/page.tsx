@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { caseStorageKey } from "@/lib/cases/case-id";
 import { useCheckpoints } from "@/components/investigation/checkpoints-context";
 import {
   CASE_000_PDFS,
@@ -35,8 +36,16 @@ const ReinvestigationModal = nextDynamic(
 
 type ActiveModal = "phone" | "reinvestigate" | "epilogue" | "hint" | null;
 
-export default function BoardGameCompanionPage() {
+function BoardGameCompanionContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawCaseId =
+    searchParams.get("case_id") || searchParams.get("caseId") || "case-000";
+  const caseId =
+    rawCaseId === "case_000" || rawCaseId === "case-000"
+      ? "case-000"
+      : rawCaseId;
+
   const { completedCheckpointIds } = useCheckpoints();
 
   // Single modal state
@@ -64,7 +73,7 @@ export default function BoardGameCompanionPage() {
 
   useEffect(() => {
     setStorageItem("play_experience", "boardgame");
-    const isIntroSeen = getStorageItem("intro_seen");
+    const isIntroSeen = getStorageItem(caseStorageKey(caseId, "intro_seen"));
     if (isIntroSeen !== "true") {
       setUnlockedModalData({
         unlockedPhase: 0,
@@ -118,6 +127,7 @@ export default function BoardGameCompanionPage() {
       <EpilogueModal
         isOpen={activeModal === "epilogue"}
         onClose={() => setActiveModal(null)}
+        caseId={caseId}
       />
 
       {/* QUICK ACTION FAB MENU */}
@@ -152,5 +162,19 @@ export default function BoardGameCompanionPage() {
         onClose={() => setActiveModal(null)}
       />
     </div>
+  );
+}
+
+export default function BoardGameCompanionPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-full w-full bg-[#0d0a08] flex items-center justify-center text-[#d9a066] font-mono text-xs">
+          Đang nạp hồ sơ board game...
+        </div>
+      }
+    >
+      <BoardGameCompanionContent />
+    </Suspense>
   );
 }
