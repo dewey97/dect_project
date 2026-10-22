@@ -4,6 +4,14 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-23]
 
+### Features
+
+- **Trang Kích Hoạt Vụ Án `/activate` Đọc Động Từ Supabase (C7)**:
+  - `lib/actions/case-actions.ts`: thêm server action `getPublicCases()` truy vấn danh mục vụ án từ bảng `cases` Supabase theo quyền công khai RLS.
+  - `components/investigation/case-activation.tsx`: thêm `mapDbCasesToCatalog()` để map danh sách vụ án động vào giao diện tủ hồ sơ Kraft, tự động sinh mã `CASE #...`, độ khó, năm lưu trữ và mã kích hoạt cho phép. Giữ `FALLBACK_CASES_CATALOG` an toàn khi DB chưa nạp.
+  - `app/activate/page.tsx`: SSR nạp `getPublicCases()` truyền vào `CaseActivation initialCases={...}` với `force-dynamic`.
+  - `e2e/case-000.spec.ts`: bổ sung kiểm thử E2E trang `/activate` tải danh mục hồ sơ và mở form kích hoạt.
+
 ### Database & Schema
 
 - **Migration 29: Khóa Ngoại Boardgame Pins & Connections (`29_boardgame_pins_case_slug_fk.sql`) (C5)**:

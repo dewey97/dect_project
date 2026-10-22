@@ -20,8 +20,9 @@ import { BrandMark } from "@/components/investigation/brand-mark";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { normalizeCaseId } from "@/lib/cases/case-id";
+import type { DbCase } from "@/lib/types/database";
 
-interface CaseItem {
+export interface CaseActivationItem {
   id: string;
   code: string;
   title: string;
@@ -38,9 +39,9 @@ interface CaseItem {
   archiveYear: string;
 }
 
-const CASES_CATALOG: CaseItem[] = [
+const FALLBACK_CASES_CATALOG: CaseActivationItem[] = [
   {
-    id: "case-000",
+    id: "case_000",
     code: "CASE #000",
     title: "Trốn Tìm",
     summary:
@@ -48,7 +49,7 @@ const CASES_CATALOG: CaseItem[] = [
     status: "ready",
     estimatedTime: "20-30 phút",
     difficulty: "Trung bình",
-    validCodes: ["TEST-99", "NX-4471", "TRON-TIM", "CASE-000"],
+    validCodes: ["TEST-99", "NX-4471", "TRON-TIM", "CASE-000", "CASE_000"],
     tabPosition: "left",
     folderBg: "bg-[#d9a066]",
     folderBorder: "border border-[#3d2b1c]/30",
@@ -57,7 +58,7 @@ const CASES_CATALOG: CaseItem[] = [
     archiveYear: "1998",
   },
   {
-    id: "case-001",
+    id: "case_001",
     code: "CASE #001",
     title: "Bảo Bảo Trong Đêm",
     summary:
@@ -65,7 +66,7 @@ const CASES_CATALOG: CaseItem[] = [
     status: "ready",
     estimatedTime: "30-45 phút",
     difficulty: "Nâng cao",
-    validCodes: ["TEST-99", "CASE-001", "BAO-BAO"],
+    validCodes: ["TEST-99", "CASE-001", "CASE_001", "BAO-BAO"],
     tabPosition: "center",
     folderBg: "bg-[#c98f55]",
     folderBorder: "border border-[#3d2b1c]/30",
@@ -74,7 +75,7 @@ const CASES_CATALOG: CaseItem[] = [
     archiveYear: "2004",
   },
   {
-    id: "case-002",
+    id: "case_002",
     code: "CASE #002",
     title: "Di Chúc Bị Đánh Tráo",
     summary:
@@ -82,7 +83,7 @@ const CASES_CATALOG: CaseItem[] = [
     status: "locked",
     estimatedTime: "40-60 phút",
     difficulty: "Phức tạp",
-    validCodes: ["CASE-002"],
+    validCodes: ["CASE-002", "CASE_002"],
     tabPosition: "right",
     folderBg: "bg-[#b87e45]",
     folderBorder: "border border-[#3d2b1c]/30",
@@ -91,7 +92,7 @@ const CASES_CATALOG: CaseItem[] = [
     archiveYear: "2012",
   },
   {
-    id: "case-003",
+    id: "case_003",
     code: "CASE #003",
     title: "Bóng Đêm Cầu Cảng",
     summary:
@@ -99,7 +100,7 @@ const CASES_CATALOG: CaseItem[] = [
     status: "locked",
     estimatedTime: "45-60 phút",
     difficulty: "Phức tạp",
-    validCodes: ["CASE-003"],
+    validCodes: ["CASE-003", "CASE_003"],
     tabPosition: "left",
     folderBg: "bg-[#a6723c]",
     folderBorder: "border border-[#3d2b1c]/30",
@@ -108,7 +109,7 @@ const CASES_CATALOG: CaseItem[] = [
     archiveYear: "2007",
   },
   {
-    id: "case-004",
+    id: "case_004",
     code: "CASE #004",
     title: "Tiếng Còi Lúc Nửa Đêm",
     summary:
@@ -116,7 +117,7 @@ const CASES_CATALOG: CaseItem[] = [
     status: "locked",
     estimatedTime: "50-70 phút",
     difficulty: "Chuyên gia",
-    validCodes: ["CASE-004"],
+    validCodes: ["CASE-004", "CASE_004"],
     tabPosition: "center",
     folderBg: "bg-[#966330]",
     folderBorder: "border border-[#3d2b1c]/30",
@@ -125,7 +126,7 @@ const CASES_CATALOG: CaseItem[] = [
     archiveYear: "1995",
   },
   {
-    id: "case-005",
+    id: "case_005",
     code: "CASE #005",
     title: "Bức Thư Tay Bằng Mực Tím",
     summary:
@@ -133,7 +134,7 @@ const CASES_CATALOG: CaseItem[] = [
     status: "locked",
     estimatedTime: "60-80 phút",
     difficulty: "Chuyên gia",
-    validCodes: ["CASE-005"],
+    validCodes: ["CASE-005", "CASE_005"],
     tabPosition: "right",
     folderBg: "bg-[#875525]",
     folderBorder: "border border-[#3d2b1c]/30",
@@ -142,7 +143,7 @@ const CASES_CATALOG: CaseItem[] = [
     archiveYear: "1989",
   },
   {
-    id: "case-006",
+    id: "case_006",
     code: "CASE #006",
     title: "Vết Máu Trên Phím Đàn",
     summary:
@@ -150,7 +151,7 @@ const CASES_CATALOG: CaseItem[] = [
     status: "locked",
     estimatedTime: "40-50 phút",
     difficulty: "Nâng cao",
-    validCodes: ["CASE-006"],
+    validCodes: ["CASE-006", "CASE_006"],
     tabPosition: "left",
     folderBg: "bg-[#d99757]",
     folderBorder: "border border-[#3d2b1c]/30",
@@ -159,7 +160,7 @@ const CASES_CATALOG: CaseItem[] = [
     archiveYear: "2015",
   },
   {
-    id: "case-007",
+    id: "case_007",
     code: "CASE #007",
     title: "Mật Mã Trong Kho Khóa",
     summary:
@@ -167,7 +168,7 @@ const CASES_CATALOG: CaseItem[] = [
     status: "locked",
     estimatedTime: "60-90 phút",
     difficulty: "Huyền thoại",
-    validCodes: ["CASE-007"],
+    validCodes: ["CASE-007", "CASE_007"],
     tabPosition: "right",
     folderBg: "bg-[#c48443]",
     folderBorder: "border border-[#3d2b1c]/30",
@@ -176,6 +177,131 @@ const CASES_CATALOG: CaseItem[] = [
     archiveYear: "2018",
   },
 ];
+
+const STYLING_TEMPLATES = [
+  {
+    tabPosition: "left" as const,
+    folderBg: "bg-[#d9a066]",
+    folderBorder: "border border-[#3d2b1c]/30",
+    textColor: "text-[#24150a]",
+    tapeRotateClass: "rotate-[-1.8deg]",
+  },
+  {
+    tabPosition: "center" as const,
+    folderBg: "bg-[#c98f55]",
+    folderBorder: "border border-[#3d2b1c]/30",
+    textColor: "text-[#24150a]",
+    tapeRotateClass: "rotate-[1.5deg]",
+  },
+  {
+    tabPosition: "right" as const,
+    folderBg: "bg-[#b87e45]",
+    folderBorder: "border border-[#3d2b1c]/30",
+    textColor: "text-[#24150a]",
+    tapeRotateClass: "rotate-[-0.9deg]",
+  },
+  {
+    tabPosition: "left" as const,
+    folderBg: "bg-[#a6723c]",
+    folderBorder: "border border-[#3d2b1c]/30",
+    textColor: "text-[#24150a]",
+    tapeRotateClass: "rotate-[1.8deg]",
+  },
+  {
+    tabPosition: "center" as const,
+    folderBg: "bg-[#966330]",
+    folderBorder: "border border-[#3d2b1c]/30",
+    textColor: "text-[#24150a]",
+    tapeRotateClass: "rotate-[-1.2deg]",
+  },
+  {
+    tabPosition: "right" as const,
+    folderBg: "bg-[#875525]",
+    folderBorder: "border border-[#3d2b1c]/30",
+    textColor: "text-[#24150a]",
+    tapeRotateClass: "rotate-[2.1deg]",
+  },
+];
+
+const DIFFICULTY_MAP: Record<number, string> = {
+  1: "Nhập môn",
+  2: "Dễ",
+  3: "Trung bình",
+  4: "Nâng cao",
+  5: "Chuyên gia",
+};
+
+export function mapDbCasesToCatalog(dbCases: DbCase[]): CaseActivationItem[] {
+  if (!dbCases || dbCases.length === 0) {
+    return FALLBACK_CASES_CATALOG;
+  }
+
+  // Khởi tạo map fallback có sẵn để tái sử dụng metadata chi tiết
+  const fallbackBySlug = new Map<string, CaseActivationItem>();
+  for (const item of FALLBACK_CASES_CATALOG) {
+    fallbackBySlug.set(normalizeCaseId(item.id), item);
+  }
+
+  const result: CaseActivationItem[] = [];
+
+  for (let i = 0; i < dbCases.length; i++) {
+    const c = dbCases[i];
+    const slug = normalizeCaseId(c.slug);
+    const fallback = fallbackBySlug.get(slug);
+    const style = STYLING_TEMPLATES[i % STYLING_TEMPLATES.length];
+
+    // Format display code: "case_000" -> "CASE #000"
+    const slugNumberMatch = slug.match(/(\d+)$/);
+    const displayCode = slugNumberMatch
+      ? `CASE #${slugNumberMatch[1]}`
+      : slug.toUpperCase();
+
+    const isReady =
+      c.status === "PUBLISHED" ||
+      slug === "case_000" ||
+      fallback?.status === "ready";
+
+    result.push({
+      id: slug,
+      code: fallback?.code || displayCode,
+      title: c.title || fallback?.title || `Chuyên án ${displayCode}`,
+      summary:
+        c.synopsis ||
+        fallback?.summary ||
+        "Hồ sơ lưu trữ các biên bản hiện trường, lời khai và manh mối liên quan đến vụ án.",
+      status: isReady ? "ready" : "locked",
+      estimatedTime: fallback?.estimatedTime || "30-45 phút",
+      difficulty:
+        fallback?.difficulty || DIFFICULTY_MAP[c.difficulty] || "Trung bình",
+      validCodes: Array.from(
+        new Set([
+          ...(fallback?.validCodes || []),
+          slug.toUpperCase(),
+          slug.replace(/_/g, "-").toUpperCase(),
+          "TEST-99",
+        ]),
+      ),
+      tabPosition: fallback?.tabPosition || style.tabPosition,
+      folderBg: fallback?.folderBg || style.folderBg,
+      folderBorder: fallback?.folderBorder || style.folderBorder,
+      textColor: fallback?.textColor || style.textColor,
+      tapeRotateClass: fallback?.tapeRotateClass || style.tapeRotateClass,
+      archiveYear:
+        fallback?.archiveYear ||
+        (c.created_at ? String(new Date(c.created_at).getFullYear()) : "2024"),
+    });
+  }
+
+  // Ghép nối các case chưa có trong DB từ fallback để người chơi vẫn thấy preview các vụ sắp mở
+  for (const fallback of FALLBACK_CASES_CATALOG) {
+    const slug = normalizeCaseId(fallback.id);
+    if (!result.some((r) => normalizeCaseId(r.id) === slug)) {
+      result.push(fallback);
+    }
+  }
+
+  return result;
+}
 
 const SEAMLESS_TEXTURE_OFFSETS = [
   "bg-[position:0px_0px]",
@@ -203,14 +329,23 @@ function getFolderToneFilter(archiveYear?: string) {
   }
 }
 
-export function CaseActivation() {
+export interface CaseActivationProps {
+  initialCases?: DbCase[];
+}
+
+export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
   const router = useRouter();
+
+  // Dynamic cases catalog resolved from DB or fallback
+  const casesCatalog = mapDbCasesToCatalog(initialCases || []);
 
   // Hovered dossier index state
   const [hoveredCaseId, setHoveredCaseId] = useState<string | null>(null);
 
   // Selected dossier for activation panel
-  const [selectedCase, setSelectedCase] = useState<CaseItem | null>(null);
+  const [selectedCase, setSelectedCase] = useState<CaseActivationItem | null>(
+    null,
+  );
   const [inputCode, setInputCode] = useState("");
   const [codeError, setCodeError] = useState(false);
 
@@ -221,7 +356,7 @@ export function CaseActivation() {
   const [folderMorphed, setFolderMorphed] = useState(false);
 
   // Direct case switching on click (allows selecting locked cases to view right panel)
-  const handleOpenCase = (cItem: CaseItem) => {
+  const handleOpenCase = (cItem: CaseActivationItem) => {
     if (isOpeningFolder) return;
     setSelectedCase(cItem);
     setInputCode("");
@@ -334,7 +469,7 @@ export function CaseActivation() {
 
           {/* AUTHENTIC SOLID STACKED DEEP KRAFT FOLDERS (BALANCED MODERATE STACK) */}
           <div className="w-full flex flex-col pt-2 pb-1 relative min-h-[390px] sm:min-h-[420px] justify-end z-10 my-auto">
-            {CASES_CATALOG.map((cItem, index) => {
+            {casesCatalog.map((cItem, index) => {
               const isHovered = hoveredCaseId === cItem.id;
               const isSelected = selectedCase?.id === cItem.id;
               // Strict fixed Z-index: never jumps over folders rendered above it
@@ -665,7 +800,7 @@ export function CaseActivation() {
                   <FileText className="size-3.5" /> BIÊN BẢN KHÁM NGHIỆM #001
                 </span>
                 <span className="font-mono text-[0.6rem] bg-[#eae3d2] px-1.5 py-0.5 rounded font-bold">
-                  14/05/1998
+                  {selectedCase.archiveYear}
                 </span>
               </div>
               <p className="text-xs leading-relaxed italic text-[#2b1b0e] font-medium">
@@ -690,7 +825,9 @@ export function CaseActivation() {
                 </span>
               </div>
               <span className="font-[family-name:var(--font-handwriting)] text-sm font-bold text-[#1f1208] text-center mt-1">
-                Hiện trường vụ tử vong
+                {selectedCase.id === "case_000"
+                  ? "Hiện trường vụ tử vong"
+                  : `Hiện trường vụ án ${selectedCase.code}`}
               </span>
             </div>
 
@@ -713,7 +850,9 @@ export function CaseActivation() {
                 </span>
               </div>
               <p className="font-[family-name:var(--font-handwriting)] text-base leading-snug font-bold text-[#1a0f07]">
-                "Tôi thấy ánh đèn lấp lóe lúc 23h30 tại căn nhà dải tỏa..."
+                {selectedCase.id === "case_000"
+                  ? '"Tôi thấy ánh đèn lấp lóe lúc 23h30 tại căn nhà dải tỏa..."'
+                  : '"Chúng tôi đã ghi nhận các bất thường tại hiện trường vụ việc..."'}
               </p>
             </div>
 

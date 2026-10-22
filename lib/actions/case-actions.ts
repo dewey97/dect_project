@@ -68,6 +68,29 @@ export async function getCases() {
   }
 }
 
+/** Lấy danh sách Vụ án công khai cho trang /activate */
+export async function getPublicCases() {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("cases")
+      .select(
+        "id, slug, title, synopsis, difficulty, status, cover_image_url, created_at, updated_at",
+      )
+      .order("slug", { ascending: true });
+
+    if (error) throw error;
+    return { success: true, data: (data || []) as DbCase[] };
+  } catch (error: unknown) {
+    console.error("Error fetching public cases:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+      data: [] as DbCase[],
+    };
+  }
+}
+
 /** Tạo Vụ án mới (Bản nháp) */
 export async function createCaseDraft(title: string = "Untitled Mystery") {
   try {

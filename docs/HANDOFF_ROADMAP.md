@@ -71,19 +71,16 @@ E2E case_000 xanh 100% gồm cả test Tùng (bug grader đã sửa). Working tr
 
 ### 1.5. Việc còn lại — tổng quan
 
-| Nhóm   | Mục                                                                                         | Người làm đề xuất   | Ước lượng |
-| ------ | ------------------------------------------------------------------------------------------- | ------------------- | --------- |
-| Bước 0 | Đặt `SUPABASE_SERVICE_ROLE_KEY` trên VPS, push code, smoke test                             | Chủ dự án           | 30 phút   |
-| A      | A6 rotate key `.env`, `git rm --cached .env`                                                | Chủ dự án           | 30 phút   |
-| B      | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm                     | Claude              | —         |
-| C      | C5 (FK boardgame_pins: ✅ migration 29), C6 (tách asset theo vụ: ✅), C7 (/activate đọc DB) | Claude / model khác | 1 ngày    |
-| D      | D7 giảm `any` (~còn), D11 tiếp                                                              | Model khác          | 1–2 ngày  |
-| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`                                 | Chủ dự án           | —         |
+| Nhóm   | Mục                                                                     | Người làm đề xuất | Ước lượng |
+| ------ | ----------------------------------------------------------------------- | ----------------- | --------- |
+| Bước 0 | Đặt `SUPABASE_SERVICE_ROLE_KEY` trên VPS, push code, smoke test         | Chủ dự án         | 30 phút   |
+| A      | A6 rotate key `.env`, `git rm --cached .env`                            | Chủ dự án         | 30 phút   |
+| B      | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm | Claude            | —         |
+| C      | C5 (FK: ✅), C6 (tách asset: ✅), C7 (/activate đọc DB: ✅)             | Claude            | —         |
+| D      | D7 giảm `any` (~còn), D11 tiếp                                          | Model khác        | 1–2 ngày  |
+| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`             | Chủ dự án         | —         |
 
-Đã hoàn tất kể từ bản roadmap trước: Migration 24–28 đã chạy production, B6-cleanup, A5, A9, L1, L2, B2–B6 (bước chính), C1–C6, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard.
-| E | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx` | Chủ dự án | — |
-
-Đã hoàn tất kể từ bản roadmap trước: A5, A9, L1, L2, B2–B6 (bước chính), C1–C6, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard.
+Đã hoàn tất kể từ bản roadmap trước: Migration 24–28 đã chạy production, B6-cleanup, A5, A9, L1, L2, B2–B6 (bước chính), C1–C7, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard.
 
 ---
 

@@ -306,4 +306,27 @@ test.describe("case_000 baseline", () => {
       page.getByText("Hồ sơ hậu án đang được cập nhật", { exact: false }),
     ).toHaveCount(0);
   });
+
+  test("trang kích hoạt /activate tải danh sách hồ sơ và mở form xác thực", async ({
+    page,
+  }) => {
+    await page.goto("/activate");
+    await expect(
+      page.getByText("PHÒNG LƯU TRỮ CHUYÊN ÁN MẬT", { exact: false }),
+    ).toBeVisible();
+
+    // Hồ sơ case_000 Trốn Tìm có mặt trên màn hình
+    const tronTimTab = page
+      .getByText(/Trốn Tìm/i)
+      .filter({ visible: true })
+      .first();
+    await expect(tronTimTab).toBeVisible();
+
+    // Bấm mở hồ sơ Trốn Tìm để hiển thị panel xác thực bên phải
+    await tronTimTab.click();
+    await expect(
+      page.getByText("XÁC THỰC KÍCH HOẠT // CASE #000", { exact: false }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /PHÁ ÁN/i })).toBeVisible();
+  });
 });
