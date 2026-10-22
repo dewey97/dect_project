@@ -33,13 +33,15 @@
 | `9507871` | feat(studio): add kind-specific checkpoint editor forms (B4)                                                                          | 4 form editor mới trong Studio          |
 | `ec57014` | feat(checkpoints): add server-side grading API and public view (B5)                                                                   | Route verify, grader, migration 27      |
 
-### 1.2. Kiểm tra gần nhất (sau `ec57014`)
+### 1.2. Kiểm tra gần nhất (sau `ec57014`, review 2026-10-22 chiều)
 
 | Lệnh                                     | Kết quả              |
 | ---------------------------------------- | -------------------- |
-| `npx tsc --noEmit --incremental false`   | Sạch 100%            |
-| `NEXT_DIST_DIR=.next_dev npx next build` | Pass (14/14 static)  |
-| `pnpm test:e2e`                          | 9/9 pass (~1.2 phút) |
+| `npx tsc --noEmit --incremental false`   | Sạch                 |
+| `NEXT_DIST_DIR=.next_dev npx next build` | Pass                 |
+| `pnpm test:e2e`                          | **8/9 pass**, 1 fail |
+
+**Test fail:** "Tùng: câu hỏi phụ trắc nghiệm chấm theo nhãn phương án". Người chơi chọn "CÓ" (đáp án đúng là "KHÔNG") vẫn được chấp nhận → thông báo "Đáp án chưa chính xác" không hiện. Nguyên nhân: `lib/checkpoints/server-grader.ts` nhánh `followup` + `choice` có heuristic quá rộng. Khi `correctAnswer` chứa "khong" và option người chơi chọn thuộc `options[]`, grader set `isMatch = true` cho mọi option, kể cả "CÓ".
 
 ### 1.3. Database production (Supabase project `zalyxhmwwmfyexoilejp`)
 
@@ -55,24 +57,36 @@
 1. **Production chạy code cũ trên DB đã migrate.** Tương thích, trừ `createNewCase` cũ tự đếm mã vụ (`case_003`) trong khi DB cấp `case_002` → FK chặn tạo 2 node khởi đầu cho vụ mới. **Push sớm.**
 2. **Lần push đầu thay đổi hạ tầng build:** CI chuyển sang pnpm (`pnpm/action-setup` đọc `packageManager` trong `package.json`), Docker cài `pnpm@11.25.0` bằng `npm install -g`, `middleware.ts` đổi tên `proxy.ts` (Next 16 chạy proxy ở runtime Node). Theo dõi job `preflight` và `build-and-push`, sau đó smoke test production.
 3. **Dev server cổng 3000 của chủ dự án** có thể còn lỗi CSS `Can't resolve '&#x27;/textures/kraft_paper_texture_large.png'` (cache Turbopack quét thư mục build tạm cũ). Sửa: tắt server, `rm -rf .next/dev/cache`, chạy lại `pnpm dev`.
-4. **Chấm điểm vẫn chạy ở client và đáp án lộ qua `/api/checkpoints`** — xử lý ở nhóm B (B5).
-5. **Dữ liệu ghi file trong container mất khi redeploy** (map vector, hotspots, waitlist) — A5.
+4. **Migration 24, 25, 26, 27 CHƯA chạy production.** Code đã phụ thuộc:
+   - `/api/checkpoints` có fallback khi thiếu cột `kind` (lỗi `42703`) — chạy được.
+   - `/api/checkpoints/verify` cần `SUPABASE_SERVICE_ROLE_KEY` — chưa cấu hình production.
+   - `/api/admin/map-vector`, `/reinvestigation`, `/waitlist` còn fallback ghi file.
+   - **Phải chạy migration + đặt env trước khi deploy, hoặc sẽ gãy luồng chấm điểm server.**
+5. **`lib/supabase/admin.ts` có fallback về `NEXT_PUBLIC_SUPABASE_ANON_KEY` khi thiếu `SUPABASE_SERVICE_ROLE_KEY`** → mất tác dụng ẩn đáp án (anon key cũng bị RLS chặn SELECT bảng gốc, nhưng view `case_checkpoints_public` thì vẫn đọc được, không lộ gì; vẫn nên throw khi thiếu env để sớm phát hiện).
+6. **`/api/waitlist` upsert `onConflict: email,source`**: RLS anon chỉ cho INSERT, không UPDATE → trùng email báo lỗi RLS. Đã sửa thành `ignoreDuplicates: true` trong working tree (chưa commit).
+7. **Bug grader câu hỏi phụ trắc nghiệm** (xem 1.2) — chưa fix. Phương án fix xem mục 7 (B5).
+8. **Hardcode còn lại cho vụ án mới:**
+   - `server-grader.ts`: heuristic nhận "khong"/"tung"/"1b" trong `followup` và `choice`; nhận "21:15"/"120713" trong followup.
+   - `followup-question-modal.tsx`: fallback id "khong_tin"/"tin"; `DEFAULT_PHONE_INPUTS`; `DEFAULT_NARRATIVES`.
+   - `culprit-epilogue-modal.tsx`: so `isVu/isTung/isHa`.
+   - `pin-builder.ts`: dò `-1a/-1b/-1c`.
+   - Xử lý ở B6 theo thiết kế mục 12 bên dưới.
+9. **Chấm điểm vẫn chạy ở client và đáp án lộ qua `/api/checkpoints`** đến khi B6 chuyển modal sang gọi `/api/checkpoints/verify` và `/api/checkpoints?mode=public`.
 
 ### 1.5. Việc còn lại — tổng quan
 
-| Nhóm   | Mục                                                                   | Người làm đề xuất                   | Ước lượng  |
-| ------ | --------------------------------------------------------------------- | ----------------------------------- | ---------- |
-| Bước 0 | Push 8 commit, theo dõi CI, smoke test production                     | Chủ dự án                           | 30 phút    |
-| A      | A5 dữ liệu ghi file → Supabase                                        | Model khác viết, chủ dự án chạy SQL | 0.5–1 ngày |
-| A      | A6 rotate key `.env`, `git rm --cached .env`                          | Chủ dự án                           | 30 phút    |
-| A      | A9 `is_admin()` sang schema `private`                                 | Claude                              | 1 giờ      |
-| Lỗi    | L1 Hậu án hiển thị rỗng (`epilogueStories` bị rơi)                    | ✅ `079af56`                        | —          |
-| Lỗi    | L2 font tiêu đề Hậu án sai dấu tiếng Việt                             | Model khác                          | 1 giờ      |
-| B      | B2–B3 checkpoint kind schema + types                                  | ✅ `079af56`                        | —          |
-| B      | B4–B7 Studio editor theo kind, chấm điểm server, refactor runtime     | Claude                              | 4–5 ngày   |
-| C      | Tiến trình theo đồ thị, case lint, template vụ án                     | Claude (sau B)                      | 4–5 ngày   |
-| D      | D3 nén ảnh, D7 giảm `any`, D8 tách god-component, D11                 | Model khác                          | 1–3 ngày   |
-| E      | Chia `scripts/ops` / `scripts/archive`; quyết định `archive_3d_vault` | Model khác + chủ dự án              | 0.5 ngày   |
+| Nhóm   | Mục                                                                                        | Người làm đề xuất | Ước lượng |
+| ------ | ------------------------------------------------------------------------------------------ | ----------------- | --------- |
+| Bước 0 | Chạy migration 24/25/26/27, đặt `SUPABASE_SERVICE_ROLE_KEY`, push, theo dõi CI, smoke test | Chủ dự án         | 1 giờ     |
+| Lỗi    | Fix bug grader trắc nghiệm (xem 1.2)                                                       | Claude            | 30 phút   |
+| A      | A6 rotate key `.env`, `git rm --cached .env`                                               | Chủ dự án         | 30 phút   |
+| B      | B6 bỏ hardcode vu/tung/ha, chuẩn hóa `input_type` + options (xem mục 12)                   | Claude            | 2–3 ngày  |
+| B      | B7 docs                                                                                    | Claude            | 2 giờ     |
+| C      | Tiến trình theo đồ thị, case lint, template vụ án                                          | Claude (sau B)    | 4–5 ngày  |
+| D      | D7 giảm `any`, D11                                                                         | Model khác        | 1–2 ngày  |
+| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`                                | Chủ dự án         | —         |
+
+Đã hoàn tất kể từ bản roadmap trước: A5, A9, L1, L2, B2, B3, B4, B5, D3, D8, D11, E (chia scripts).
 
 ---
 
@@ -150,15 +164,18 @@
 
 ### 4.3. Bài học từ các lần review (tránh lặp lại)
 
-| Sai lầm                                                                                                                                       | Hậu quả                                                                                                                     | Cách tránh                                                                        |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Bỏ `'use server'` khỏi `lib/actions/auth-guard.ts` trong khi client component (`use-board-layout.ts`, `reinvestigation-modal.tsx`) còn import | Build hỏng (module server lọt vào bundle client)                                                                            | `grep -rn "<module>" app components` trước khi đổi ranh giới server/client        |
-| Viết lại toàn bộ `app/api/phone/route.ts`                                                                                                     | Mất fallback gviz công khai, chuỗi tab dự phòng (`photos_old`, `evidences_old`), lọc emoji tên cột → vật chứng có thể trống | Chỉ sửa đúng phần được giao                                                       |
-| Chặn open redirect chỉ kiểm tra `//`                                                                                                          | `/\evil.com` vẫn lọt (trình duyệt hiểu là `//evil.com`)                                                                     | Chặn mọi dấu `\`                                                                  |
-| CI dùng `pnpm/action-setup` không khai báo version; Docker `corepack prepare pnpm@latest`                                                     | CI lỗi; version pnpm trôi                                                                                                   | Giữ `packageManager` trong `package.json`; Docker `npm install -g pnpm@<version>` |
-| Build vào thư mục tạm không gitignore khi dev server đang chạy                                                                                | Tailwind cache CSS sai, dev server lỗi                                                                                      | Chỉ dùng `.next_dev`                                                              |
-| Playwright so chữ chính xác trên nút có CSS `uppercase`                                                                                       | Không tìm thấy nút                                                                                                          | Dùng helper `tap()` (regex không phân biệt hoa thường, chỉ phần tử hiển thị)      |
-| Bấm Enter trong ô mã chứng cứ cáo trạng                                                                                                       | Form bị nộp sớm                                                                                                             | Nhập nhiều mã phân tách dấu phẩy rồi bấm "ĐỀ NGHỊ TRUY TỐ"                        |
+| Sai lầm                                                                                                                                       | Hậu quả                                                                                                                     | Cách tránh                                                                                |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Bỏ `'use server'` khỏi `lib/actions/auth-guard.ts` trong khi client component (`use-board-layout.ts`, `reinvestigation-modal.tsx`) còn import | Build hỏng (module server lọt vào bundle client)                                                                            | `grep -rn "<module>" app components` trước khi đổi ranh giới server/client                |
+| Viết lại toàn bộ `app/api/phone/route.ts`                                                                                                     | Mất fallback gviz công khai, chuỗi tab dự phòng (`photos_old`, `evidences_old`), lọc emoji tên cột → vật chứng có thể trống | Chỉ sửa đúng phần được giao                                                               |
+| Chặn open redirect chỉ kiểm tra `//`                                                                                                          | `/\evil.com` vẫn lọt (trình duyệt hiểu là `//evil.com`)                                                                     | Chặn mọi dấu `\`                                                                          |
+| CI dùng `pnpm/action-setup` không khai báo version; Docker `corepack prepare pnpm@latest`                                                     | CI lỗi; version pnpm trôi                                                                                                   | Giữ `packageManager` trong `package.json`; Docker `npm install -g pnpm@<version>`         |
+| Build vào thư mục tạm không gitignore khi dev server đang chạy                                                                                | Tailwind cache CSS sai, dev server lỗi                                                                                      | Chỉ dùng `.next_dev`                                                                      |
+| Playwright so chữ chính xác trên nút có CSS `uppercase`                                                                                       | Không tìm thấy nút                                                                                                          | Dùng helper `tap()` (regex không phân biệt hoa thường, chỉ phần tử hiển thị)              |
+| Bấm Enter trong ô mã chứng cứ cáo trạng                                                                                                       | Form bị nộp sớm                                                                                                             | Nhập nhiều mã phân tách dấu phẩy rồi bấm "ĐỀ NGHỊ TRUY TỐ"                                |
+| Grader dò chuỗi id (`"tung"`, `"1b"`, `"khong"`) để quyết định đúng/sai                                                                       | Chấm sai nghiêm trọng: "CÓ" cũng pass khi đáp án đúng "KHÔNG" (chỉ cần nhãn thuộc options)                                  | So khớp đáp án theo giá trị normalize; không nhìn checkpoint_id, không heuristic ngôn ngữ |
+| Fallback `SUPABASE_SERVICE_ROLE_KEY` → anon key                                                                                               | Mất tác dụng ẩn đáp án nếu quên đặt env ở prod                                                                              | Throw khi thiếu env, log rõ ràng                                                          |
+| Upsert `onConflict` khi RLS anon chỉ cho INSERT                                                                                               | Trùng key → lỗi RLS 42501                                                                                                   | `ignoreDuplicates: true` hoặc tách INSERT thuần                                           |
 
 ### 4.4. Brief mẫu — dán nguyên văn vào phiên mới
 
@@ -245,6 +262,45 @@ Mỗi brief đã kèm phạm vi, file, ràng buộc và điều kiện done. Ng�
 #### Brief A9 — `is_admin()` sang schema `private` (Claude, ~1 giờ)
 
 > Migration `db/schema/25_private_is_admin.sql`: tạo schema `private` (không expose qua PostgREST), chuyển hàm `is_admin()` sang đó (`SECURITY DEFINER`, `search_path = public`), `GRANT USAGE ON SCHEMA private` và `GRANT EXECUTE` cho `anon, authenticated`, cập nhật **mọi** policy đang gọi `public.is_admin()` (tra `pg_policies`), rồi `DROP FUNCTION public.is_admin()`. Smoke test bằng `SET LOCAL ROLE` như migration 21 (anon/player/admin, kết thúc bằng rollback). Chạy security advisors sau khi chủ dự án duyệt và chạy migration.
+
+#### Brief B5-fix — vá bug grader trắc nghiệm (Claude, ~30 phút)
+
+> E2E "Tùng trắc nghiệm" fail sau commit `ec57014`: chọn "CÓ" vẫn pass khi đáp án đúng "KHÔNG".
+>
+> **Vị trí:** `lib/checkpoints/server-grader.ts`, nhánh `kind === "followup"` (dòng ~388–414) và `kind === "choice"` (dòng ~454–469).
+>
+> **Việc:**
+>
+> 1. Xóa heuristic `options.some(normalizeForMatch(opt) === normUser) && (normUser.includes("khong") || normCorrect.includes("khong"))` → chấm sai.
+> 2. Xóa dò `checkpoint_id` chứa `"tung"` / `"1b"` để quyết định kind.
+> 3. Xóa hardcode "21:15"/"120713" trong nhánh followup — đáp án đã có trong `correctAnswer`.
+> 4. Chỉ chấp nhận id ẩn `"khong_tin"`/`"tin"` khi nhãn tương ứng ("KHÔNG"/"CÓ") khớp đáp án đúng. Tạm thời giữ để không gãy modal; B6 sẽ bỏ hẳn id ẩn.
+> 5. `lib/supabase/admin.ts`: throw lỗi khi thiếu `SUPABASE_SERVICE_ROLE_KEY` thay vì fallback anon.
+>
+> **Kiểm tra:** `pnpm test:e2e` 9/9 pass. Done: mục 3.
+
+#### Brief B6 — bỏ hardcode nhân vật và câu hỏi phụ (Claude, ~2–3 ngày)
+
+> Đọc mục 1–3, 7 (B5, B6) và **7B (thiết kế thống nhất)** trong file này.
+>
+> **Mục tiêu:** vụ án mới chạy được chỉ bằng Studio, không sửa code.
+>
+> **Thứ tự làm (mỗi bước commit riêng, E2E phải xanh):**
+>
+> 1. Migration `28_checkpoint_config_normalize.sql`: backfill `answer_config.input_type` cho followup case_000; đổi `valid_suspects` ở cáo trạng từ tên hiển thị sang `character.key`. Script smoke test như migration 21.
+> 2. `lib/checkpoints/kinds.ts`: thêm `followup.input_type` vào union; `parseCheckpointConfig` đọc input_type.
+> 3. `server-grader.ts`: `gradeFollowup` switch theo `input_type`; `gradeIndictment` so `character.key` với `valid_suspects`. Bỏ mọi heuristic chuỗi.
+> 4. `followup-question-modal.tsx`: props `subjectKey` thay `culprit`; render form theo `input_type`; submit chuỗi raw qua `POST /api/checkpoints/verify`; xóa `DEFAULT_PHONE_INPUTS`, `DEFAULT_NARRATIVES`, "khong_tin"/"tin", gating `isVu/isTung/isHa`.
+> 5. `culprit-epilogue-modal.tsx`: hiển thị `narrative` + ảnh theo `subject_key`; bỏ gating.
+> 6. `pin-builder.ts`: pin follow-up dựng theo `subject_key`, không dò `-1a/-1b/-1c`; pin cáo trạng theo `kind === "indictment"`.
+> 7. `indictment-modal.tsx`: dropdown nhân vật từ `useCaseCharacters()`; so `character.key` với `valid_suspects`; xóa đoạn tự cộng mã case_000.
+> 8. `main-investigation-canvas.tsx`, `use-investigation-state.ts`: `CulpritKey` → `string` (character.key); bỏ `ALL_CASE_000_SUSPECTS`.
+> 9. `/api/checkpoints`: khi `mode=public` dùng view `case_checkpoints_public`; mọi gameplay modal gọi với `mode=public`.
+> 10. Xóa / đổi tên: `lib/cases/case-000-suspects.ts` → `characters.ts`; `case-000-clues.ts` → `clues.ts`; `lib/ai/suspect-interrogation-context.ts` thay bằng `ai_context` của checkpoint; `lib/cases/case-characters.ts` registry → bỏ, dùng context.
+>
+> **E2E:** sửa locator khi đổi chữ nút nhưng không đổi kịch bản; thêm test "tạo vụ_test, chạy luồng tối thiểu" (yêu cầu `TEST_FAST_CASE` seeded qua migration test).
+>
+> Done: mục 3; báo cáo kèm danh sách file đã đổi theo bước.
 
 #### Brief B2–B3 + L1 Hậu án (Claude, ~2 ngày)
 
@@ -336,13 +392,19 @@ Thư mục `components/admin/checkpoint-studio/sections/`:
 - `epilogue`: `checkpoint-epilogue-form.tsx` — danh sách `epilogueStories`.
 - Dropdown `kind` 9 loại và `subjectKey` trên `checkpoint-identity-form.tsx`. Router theo kind trên `checkpoint-editor.tsx`.
 
-### B5. Chấm điểm trên server — ✅ `ec57014`
+### B5. Chấm điểm trên server — ⚠️ `ec57014` (có bug, chờ fix)
 
-- `lib/supabase/admin.ts`: Supabase admin client server-only qua `SUPABASE_SERVICE_ROLE_KEY`.
-- `lib/checkpoints/server-grader.ts`: engine chấm điểm tập trung theo 9 loại `kind`, chống spam mã rác (AGENTS.md §13), hỗ trợ admin bypass codes.
-- `POST /api/checkpoints/verify`: endpoint chấm điểm server-side, rate-limit 30 req/min/IP.
-- View `case_checkpoints_public` (`db/schema/27_checkpoint_server_grading.sql`), cấp quyền anon/authenticated. Route `/api/checkpoints` hỗ trợ `mode=public`.
-- Typecheck sạch, E2E 9/9 pass. Migration 27 chờ duyệt chạy prod.
+- `lib/supabase/admin.ts`: Supabase admin client server-only qua `SUPABASE_SERVICE_ROLE_KEY`. **Hiện fallback về `NEXT_PUBLIC_SUPABASE_ANON_KEY` khi thiếu env — nên throw thay vì fallback.**
+- `lib/checkpoints/server-grader.ts`: engine chấm điểm 9 kind + admin bypass. **Bug:** nhánh `followup`/`choice` có heuristic nhận "khong"/"tung"/"1b"/"21:15"/"120713" → chấp nhận cả option sai khi `correctAnswer` chứa "khong". E2E "Tùng trắc nghiệm" fail (1.2).
+- `POST /api/checkpoints/verify`: rate-limit 30 req/min/IP. Chưa có route gameplay nào gọi (B6 WIP).
+- View `case_checkpoints_public` (`db/schema/27`), cấp SELECT cho anon/authenticated. Route `/api/checkpoints` hỗ trợ `mode=public`.
+- Migration 27 **chưa chạy production** → view chưa tồn tại; `mode=public` sẽ fallback về bảng gốc.
+
+**Fix bắt buộc trước khi deploy B5:**
+
+1. Xóa heuristic ngôn ngữ cứng trong grader (xem Brief B5-fix mục 4.4).
+2. `lib/supabase/admin.ts` throw khi thiếu `SUPABASE_SERVICE_ROLE_KEY`.
+3. `lib/checkpoints/kinds.ts` + grader + form: chuẩn hóa `input_type` + options theo mục 12.
 
 ### B6. Refactor runtime gameplay — ⏳
 
@@ -358,6 +420,107 @@ File: `canvas/pin-builder.ts`, `main-investigation-canvas.tsx`, `canvas/use-inve
 ### B7. Docs — ⏳
 
 `19_checkpoint_studio.md`, `02_database_schema.md`, `CHANGELOG.md`, `TECHDEBT.md` #14.
+
+---
+
+## 7B. Thiết kế bỏ hardcode cho vụ án mới (áp dụng trong B6)
+
+Mục tiêu: Game Master tạo `case_001` không cần sửa code, không nghĩ ra tên "vu/tung/ha".
+
+### 7B.1. Hardcode đến từ 3 nguồn
+
+| Nguồn                                                                                     | Vấn đề                                    | Hướng bỏ                                                                                                                     |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Nghi phạm cố định (`CulpritKey "vu"\|"tung"\|"ha"`, gating `isVu/isTung/isHa`)            | Luồng chơi chỉ 3 nghi phạm, tên khóa cứng | Dùng `subject_key` tham chiếu `case_characters.key` (đã có từ migration 26). N nghi phạm tùy ý.                              |
+| Dạng câu trả lời đoán theo id (`cp-...-1a-followup` = time, `-1b` = choice, `-1c` = code) | Grader + modal có heuristic chuỗi         | `answer_config.input_type` chọn tường minh (`time \| choice \| code \| text`); grader so khớp theo `input_type`, không dò id |
+| Phương án trắc nghiệm có id ẩn (`"khong_tin"`, `"tin"`)                                   | Grader đối chiếu id vs nhãn, dễ sai       | `options: string[]` chứa nhãn; form submit **chuỗi nhãn**; grader so trùng chuỗi (sau khi normalize)                         |
+
+### 7B.2. Schema `answer_config` thống nhất
+
+```jsonc
+// kind = followup
+{
+  "input_type": "choice",             // time | choice | code | text
+  "options": ["Tin", "Không tin"],    // chỉ khi input_type=choice
+  "correct_answer": "Không tin",      // 1 phần tử của options; với time/code/text là chuỗi tự do
+  "photo_codes": []                   // cho hộp ảnh (Hà)
+}
+
+// kind = phone_lookup
+{
+  "text_match_inputs": [
+    { "id": "p1", "label": "SĐT 0988.200.991", "valid_answers": ["Vũ", "Lê Quang Vũ"] }
+  ]
+}
+
+// kind = suspect_interrogation
+{
+  "motive_evidence_ids": [...],
+  "optional_motive_ids": [...],
+  "contradiction_evidence_ids": [...],
+  "optional_contradiction_ids": [...]
+}
+
+// kind = indictment
+{
+  "valid_suspects": ["<character.key>"],   // không dùng tên hiển thị
+  "valid_motives": ["<motive_key>"],
+  "required_evidence_ids": [...],
+  "optional_evidence_ids": [...]
+}
+
+// kind = epilogue
+{
+  "epilogue_stories": [{ "id": "...", "title": "...", "monologue": "..." }]
+}
+```
+
+Không có khóa đặc biệt theo nhân vật; mọi mã nhận diện qua `subject_key` / `valid_suspects` (character.key).
+
+### 7B.3. Grader (`server-grader.ts`)
+
+- Tách thành hàm thuần cho mỗi `kind`.
+- Followup: switch theo `input_type` → `gradeTime/Choice/Code/Text`.
+- Mỗi hàm chỉ normalize + so khớp đáp án; không nhìn `checkpoint_id`, không có nhánh "nếu id chứa `tung` thì…".
+- Trả `{ correct, feedback, unlocks }` + `stageResults` cho suspect_interrogation.
+
+### 7B.4. Gameplay runtime
+
+- `useInvestigationState`: `suspects` là `SuspectItem[]` tùy ý, không có `CulpritKey`.
+- `pin-builder`: với mỗi checkpoint `followup` có `subject_key`, dựng pin trên vị trí avatar của nhân vật đó. Mapping từ bàn → pin dựa vào `subject_key`.
+- `followup-question-modal`:
+  - Props `subjectKey` thay `culprit`.
+  - Hiển thị tên/avatar từ `useCaseCharacters()`.
+  - Render form theo `input_type`.
+  - Submit → `POST /api/checkpoints/verify` với `answer: string`.
+- `culprit-epilogue-modal`: hiển thị `narrative` của checkpoint + ảnh nhân vật theo `subject_key`. Không gating theo tên.
+- `indictment-modal`: nhập/chọn 1 nhân vật từ dropdown `case_characters` (role suspect); so `character.key` với `valid_suspects`.
+
+### 7B.5. Studio
+
+- `checkpoint-identity-form`: dropdown `kind` + `subject_key` (lấy từ `case_characters` cùng vụ).
+- `followup-config-form`: dropdown `input_type` → render editor tương ứng; khi `input_type=choice`, có bộ nhập options + dropdown chọn `correct_answer`.
+- `indictment-config-form`: `valid_suspects` là multi-select nhân vật.
+
+### 7B.6. Migration cần thiết
+
+- `db/schema/28_checkpoint_config_normalize.sql`:
+  - Backfill `answer_config.input_type` cho follow-up case_000:
+    - `cp-000-1a-followup` → `time`
+    - `cp-000-1b-followup` → `choice`
+    - `cp-000-1c-followup` → `code`
+  - Backfill `answer_config.correct_answer` đúng nhãn (hiện đã có).
+  - Backfill `valid_suspects` của `cp-000-2b` từ `["Trần Thị Hà"]` → `["ha"]`.
+  - Không đổi tên khóa snake_case nếu runtime đọc camelCase; tra `parseCheckpointConfig` trước khi đổi tên.
+
+### 7B.7. Checklist "vụ án mới chạy được"
+
+Sau B6, GM tạo `case_001`:
+
+1. Studio Nhân vật: tạo 1 victim + N suspect, key tự do (`an`, `binh`, ...).
+2. Studio Checkpoint: tạo node theo `kind`, không cần đụng code.
+3. Mở `/evidence/web?case_id=case_001` → chạy đủ: bàn điều tra, thẩm tra, followup, cáo trạng, hậu án.
+4. E2E case_000 vẫn 8/8 pass (chứng minh runtime phổ quát).
 
 ---
 

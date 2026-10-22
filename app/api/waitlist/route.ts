@@ -107,7 +107,8 @@ export async function POST(req: Request) {
           ip: clientIp,
           created_at: timestamp,
         },
-        { onConflict: "email,source" },
+        // DO NOTHING khi trùng: anon chỉ có quyền INSERT, DO UPDATE sẽ bị RLS chặn.
+        { onConflict: "email,source", ignoreDuplicates: true },
       );
       if (dbError) {
         console.warn("[WAITLIST] Supabase save warning:", dbError.message);
