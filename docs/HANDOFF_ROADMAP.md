@@ -30,8 +30,10 @@
 | `6008770` | perf(assets): convert large PNGs in public to WebP (D3)                                                                               | -94.4% dung lượng (-58.9MB)             |
 | `9ccb511` | refactor(canvas): modularize hero-interactive into scene renderer and hooks (D8)                                                      | hero-interactive từ 2544 → 534 dòng     |
 | `78365f1` | refactor(scripts): organize scripts into ops and archive (E)                                                                          | 10 ops, 61 archive                      |
+| `9507871` | feat(studio): add kind-specific checkpoint editor forms (B4)                                                                          | 4 form editor mới trong Studio          |
+| `ec57014` | feat(checkpoints): add server-side grading API and public view (B5)                                                                   | Route verify, grader, migration 27      |
 
-### 1.2. Kiểm tra gần nhất (sau `78365f1`)
+### 1.2. Kiểm tra gần nhất (sau `ec57014`)
 
 | Lệnh                                     | Kết quả              |
 | ---------------------------------------- | -------------------- |
