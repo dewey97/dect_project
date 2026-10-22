@@ -6,6 +6,15 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ### Added
 
+- **Tiến Trình Theo Đồ Thị & Công Cụ Biên Tập Vụ Án (Nhóm C: C1 - C4)**:
+  - **Mở khóa theo đồ thị (C1)**: Tạo hook `useCaseDossiers` nạp danh mục các bộ hồ sơ từ bảng `case_dossiers`. Ánh xạ mã tài liệu/vật chứng sang Phase trực tiếp từ `document_codes` và `unlocksDossier`, loại bỏ hoàn toàn việc suy đoán phase từ chữ cái đầu tiên trong `app/(investigation)/evidence/web/page.tsx`.
+  - **Case Linter cho Checkpoint Studio (C2)**: Xây dựng module `lib/checkpoints/case-linter.ts` và component `CaseLintModal` (`case-lint-modal.tsx`). Tích hợp nút kiểm tra kịch bản trên toolbar Checkpoint Flow: phát hiện chu trình phụ thuộc (cycles), node không tới được (unreachable), phụ thuộc không tồn tại, checkpoint thiếu cấu hình đáp án, nghi phạm thiếu thẩm tra, vụ thiếu nạn nhân, và mã chứng cứ lạ. Hỗ trợ bấm chuyển nhanh tới node lỗi trên canvas.
+  - **Nhân bản Vụ Án toàn diện (C3)**: Nâng cấp server action `duplicateCase` trong `lib/actions/case-actions.ts`, tự động sao chép đồng bộ toàn bộ `case_checkpoints`, `case_dossiers`, `case_characters`, và `dossier_documents` sang vụ án mới.
+  - **Chơi thử từ Node X (C4)**: Xây dựng module `lib/checkpoints/case-playtest.ts` và nút "Chơi thử" trên thanh tiêu đề `CheckpointEditor`. Tự động truy vết và mở khóa toàn bộ các checkpoint tiên quyết (ancestors), ghi tiến trình giả lập vào `localStorage` theo `caseStorageKey`, và mở ngay trang gameplay `/evidence/web?case_id=`.
+  - Verification: `npx tsc --noEmit --incremental false` pass 100%, `pnpm test:e2e` **9/9 PASS** (1.1m).
+
+### Added
+
 - **Multi-Case Checkpoint Engine & Dynamic Gameplay (B6)**:
   - Khởi tạo migration `28_checkpoint_config_normalize.sql` chuẩn hóa `input_type` cho câu hỏi đào sâu (`time`, `choice`, `code`, `text`) và `valid_suspects` cho cáo trạng.
   - Hỗ trợ `subject_key` liên kết trực tiếp tới `case_characters.key`, xóa bỏ hardcode `CulpritKey "vu" | "tung" | "ha"` trong `use-investigation-state.ts`.

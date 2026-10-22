@@ -515,13 +515,13 @@ Sau B6, GM tạo `case_001`:
 
 ## 8. Nhóm C — Tiến trình theo đồ thị & công cụ biên tập (sau B)
 
-1. **Mở khóa theo đồ thị:** runtime đọc `depends_on`, `unlocksDossier`, `case_dossiers.document_codes`; bỏ suy phase từ chữ cái đầu mã tài liệu (`app/(investigation)/evidence/web/page.tsx`).
-2. **Case lint** trong Studio: node không tới được, cycle, checkpoint thiếu đáp án, mã chứng cứ không có trên `evidences`, nghi phạm chưa có checkpoint thẩm tra, vụ thiếu nạn nhân.
-3. **Nhân bản vụ án làm template:** `duplicateCase` copy cả `case_checkpoints`, `case_dossiers`, `case_characters`, `dossier_documents` (hiện chỉ metadata).
-4. **Chơi thử từ node X:** Studio ghi tiến trình giả theo `caseStorageKey` rồi mở `/evidence/web?case_id=`.
-5. **Bàn điều tra theo vụ:** `pin-builder` dựng pin gốc từ nhân vật + checkpoint; `board-stage`, `evidence/boardgame`, `evidence/[id]` nhận `case_id`; ghi lại `boardgame_pins` dạng `case_000` rồi thêm FK → `cases.slug`.
-6. **Tài nguyên theo vụ:** bỏ `CASE_000_PDFS`/`CASE_000_EVIDENCE` (`components/investigation/evidence/evidence-data.ts`) → `dossier_documents`; ảnh 360/hotspots theo slug; bỏ chữ "Khang" trong `messages-app.tsx`, `phone-app.tsx`, `photos-app.tsx`; dời asset dùng chung khỏi `public/images/cases/case_000/`; `/api/phone` không trả row thiếu `case_id` cho mọi vụ.
-7. **`/activate` đọc bảng `cases`** (bỏ `CASES_CATALOG` tĩnh và luật "mã ≥ 4 ký tự là hợp lệ") — làm cùng License (`TECHDEBT.md` #09).
+1. ✅ **Mở khóa theo đồ thị (C1):** Hook `useCaseDossiers` đọc danh mục từ `case_dossiers.document_codes` và `unlocksDossier`; bỏ hoàn toàn logic đoán phase theo chữ cái đầu (`app/(investigation)/evidence/web/page.tsx`).
+2. ✅ **Case lint trong Studio (C2):** Module `lib/checkpoints/case-linter.ts` + modal `case-lint-modal.tsx` tích hợp nút "Kiểm tra" trên thanh công cụ: phát hiện node không tới được (unreachable), cycle BFS/DFS, checkpoint thiếu đáp án, mã chứng cứ lạ, nghi phạm chưa có checkpoint thẩm tra, vụ thiếu nạn nhân.
+3. ✅ **Nhân bản vụ án làm template (C3):** `duplicateCase` nhân bản đầy đủ trọn gói `case_checkpoints`, `case_dossiers`, `case_characters`, `dossier_documents` sang slug mới.
+4. ✅ **Chơi thử từ node X (C4):** Nút "Chơi thử" trên Checkpoint Editor (`case-playtest.ts`): tự động truy vết tổ tiên đồ thị phụ thuộc, ghi tiến trình giả theo `caseStorageKey` rồi mở tab gameplay `/evidence/web?case_id=`.
+5. ⏳ **Bàn điều tra theo vụ (C5):** `pin-builder` dựng pin gốc từ nhân vật + checkpoint; `board-stage`, `evidence/boardgame`, `evidence/[id]` nhận `case_id`; ghi lại `boardgame_pins` dạng `case_000` rồi thêm FK → `cases.slug`.
+6. ⏳ **Tài nguyên theo vụ (C6):** bỏ `CASE_000_PDFS`/`CASE_000_EVIDENCE` (`components/investigation/evidence/evidence-data.ts`) → `dossier_documents`; ảnh 360/hotspots theo slug; bỏ chữ "Khang" trong `messages-app.tsx`, `phone-app.tsx`, `photos-app.tsx`; dời asset dùng chung khỏi `public/images/cases/case_000/`; `/api/phone` không trả row thiếu `case_id` cho mọi vụ.
+7. ⏳ **`/activate` đọc bảng `cases` (C7):** (bỏ `CASES_CATALOG` tĩnh và luật "mã ≥ 4 ký tự là hợp lệ") — làm cùng License (`TECHDEBT.md` #09).
 
 ---
 
