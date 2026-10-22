@@ -202,7 +202,7 @@ export function EpilogueModal({
                       key={s.id}
                       onClick={() => handleSelectStory(idx)}
                       className={cn(
-                        "w-full text-left px-3 py-2 text-xs font-serif transition-all flex items-center justify-between cursor-pointer border rounded-none",
+                        "w-full text-left px-3 py-2 text-xs font-mono leading-relaxed transition-all flex items-center justify-between cursor-pointer border rounded-none",
                         isSelected
                           ? "bg-[#291b11] border-[#c49257]/80 text-[#f5ebd9] font-semibold"
                           : "bg-[#19110b]/80 border-[#26190f] text-[#8e7b6c] hover:bg-[#20160f] hover:text-[#d9c4b1] hover:border-[#382618]",

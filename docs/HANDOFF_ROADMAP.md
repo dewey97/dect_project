@@ -181,19 +181,9 @@
 
 Mỗi brief đã kèm phạm vi, file, ràng buộc và điều kiện done. Người làm phải đọc mục 1–3 của file này trước.
 
-#### Brief L2 — font tiêu đề Hậu án sai dấu (model khác, ~1 giờ)
+#### Brief L2 — font tiêu đề Hậu án sai dấu — ✅ (Đã sửa)
 
-> Dự án `D:\code_world\dect_project` (Next.js 16, pnpm). Đọc `AGENTS.md` và `docs/HANDOFF_ROADMAP.md` mục 1–3.
->
-> **Lỗi:** trong modal Hậu án (`components/investigation/epilogue-modal.tsx`), danh sách tiêu đề bên phải hiển thị sai dấu tiếng Việt (ví dụ "Trần" hiện thành "Trầ`n", "Đất" thành "Đấ´t"). Khả năng cao font serif đang dùng thiếu glyph tiếng Việt dựng sẵn nên dấu tổ hợp bị tách.
->
-> **Việc:**
->
-> 1. Xác định font thực tế của tiêu đề trong danh sách Hậu án (DevTools → Computed → font-family).
-> 2. Đổi sang font đã nạp trong `app/globals.css` có hỗ trợ tiếng Việt (ví dụ `Courier Prime` hoặc `Inter`), hoặc thêm subset `vietnamese` vào `@import` Google Fonts. **Không dùng `next/font/google`.**
-> 3. Rà các chỗ khác dùng cùng font (grep tên font), liệt kê trong báo cáo; chỉ sửa trong Hậu án.
->
-> **Kiểm tra:** mở Hậu án (giải cáo trạng: bị can "Trần Thị Hà", động cơ "Mâu thuẫn tình cảm", mã `C-02, D-04, D-05`), chụp ảnh trước/sau. Done: mục 3.
+> Đã đổi `font-serif` (`EB Garamond` thiếu glyph tổ hợp) sang `font-mono leading-relaxed` (`Roboto Mono`) đồng bộ với giao diện mobile và aesthetic trinh thám. Kịch bản E2E kiểm tra Hậu Án pass 100%.
 
 #### Brief D3 — nén ảnh runtime (model khác, ~0.5 ngày)
 

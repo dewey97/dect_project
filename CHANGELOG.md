@@ -17,6 +17,7 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ### Fixed
 
+- **Typography & Font Tiếng Việt Hậu Án (L2)**: Chuyển class tiêu đề danh sách Hậu Án (`epilogue-modal.tsx`) từ `font-serif` (`EB Garamond` thiếu glyph tổ hợp) sang `font-mono leading-relaxed` (`Roboto Mono`), khắc phục triệt để lỗi tách dấu tiếng Việt ("Trần", "Đất", "Hà").
 - **Grader trắc nghiệm & Chấm điểm Server (B5-fix)**: Chuẩn hóa so khớp đáp án trắc nghiệm theo nhãn ("KHÔNG") và id nội bộ ("khong_tin"); hỗ trợ định dạng thời gian và mật khẩu linh hoạt. Toàn bộ 9/9 kịch bản E2E baseline case_000 pass 100%.
 - **Bảo mật Admin Client**: `lib/supabase/admin.ts` ném lỗi rõ ràng trên production khi thiếu `SUPABASE_SERVICE_ROLE_KEY`.
 
