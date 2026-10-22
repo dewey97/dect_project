@@ -1,7 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { DbCase, DbCaseCheckpoint, DbCaseDossier } from "@/lib/types/database";
+import type { DbCase, DbCaseCheckpoint, DbCaseDossier, DbCaseCharacter } from "@/lib/types/database";
+import { lintCase } from "@/lib/checkpoints/case-linter";
+import { launchPlaytestFromCheckpoint } from "@/lib/checkpoints/case-playtest";
+import { CaseLintModal } from "./case-lint-modal";
 import {
   createEmptyDraft,
   toDraft,
@@ -165,6 +168,36 @@ export function CheckpointStudioClient({
   const [pendingPositions, setPendingPositions] = useState<
     Record<string, CheckpointFlowPosition>
   >({});
+  const [characters, setCharacters] = useState<DbCaseCharacter[]>([]);
+  const [isLintModalOpen, setIsLintModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/characters?caseId=${caseId}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data) setCharacters(json.data);
+      })
+      .catch(() => {});
+  }, [caseId]);
+
+  const lintResult = useMemo(() => {
+    return lintCase({
+      checkpoints: rows,
+      characters,
+      availableEvidenceCodes: availableDocs.map((d) => d.code),
+    });
+  }, [rows, characters, availableDocs]);
+
+  const handlePlaytest = (checkpointId: string) => {
+    const targetCp = rows.find((r) => r.checkpoint_id === checkpointId);
+    if (!targetCp) return;
+    launchPlaytestFromCheckpoint({
+      caseId,
+      targetCheckpoint: targetCp,
+      allCheckpoints: rows,
+    });
+    toast.success(`Đã chuẩn bị tiến trình chơi thử cho node ${checkpointId}`);
+  };
 
   const formDirty = useMemo(
     () => (draft ? JSON.stringify(draft) !== baseline : false),
@@ -785,6 +818,8 @@ export function CheckpointStudioClient({
           onDossierClick={handleDossierClick}
           onCreateDossier={handleCreateDossier}
           onCreateCase={() => setIsCreateCaseOpen(true)}
+          lintResult={lintResult}
+          onOpenLintModal={() => setIsLintModalOpen(true)}
         />
       </div>
 
@@ -828,12 +863,24 @@ export function CheckpointStudioClient({
               onChange={updateDraft}
               onSave={handleSave}
               onDelete={handleDelete}
+              onPlaytest={() => handlePlaytest(draft.checkpointId)}
               isSaving={isSaving}
               isDirty={formDirty}
             />
           ) : null}
         </CheckpointListSidebar>
       </div>
+
+      {/* Modal Case Linter */}
+      <CaseLintModal
+        isOpen={isLintModalOpen}
+        onClose={() => setIsLintModalOpen(false)}
+        result={lintResult}
+        onSelectCheckpoint={(cpId) => {
+          const row = rows.find((r) => r.checkpoint_id === cpId);
+          if (row) selectRow(row);
+        }}
+      />
 
       {/* Modal Tạo Vụ Án Mới */}
       {isCreateCaseOpen && (

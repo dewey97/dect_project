@@ -20,6 +20,7 @@ import {
   useNodesState,
 } from "@xyflow/react";
 import {
+  AlertTriangle,
   ArrowRight,
   FolderOpen,
   GitBranch,
@@ -28,10 +29,12 @@ import {
   Loader2,
   Plus,
   Save,
+  ShieldCheck,
   Sparkles,
   Trash2,
 } from "lucide-react";
 import type { DbCaseCheckpoint, DbCaseDossier } from "@/lib/types/database";
+import type { CaseLintResult } from "@/lib/checkpoints/case-linter";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
 import type { DbDossierDocument } from "@/lib/actions/dossier-actions";
 import type { CheckpointFlowPosition } from "@/lib/types/checkpoint-studio";
@@ -80,6 +83,8 @@ interface CheckpointFlowViewProps {
   onDossierClick?: (dossierOrName: DbCaseDossier | string) => void;
   onCreateDossier?: () => void;
   onCreateCase?: () => void;
+  lintResult?: CaseLintResult;
+  onOpenLintModal?: () => void;
 }
 
 interface CheckpointNodeData extends Record<string, unknown> {
@@ -421,6 +426,8 @@ export function CheckpointFlowView({
   onDossierClick,
   onCreateDossier,
   onCreateCase,
+  lintResult,
+  onOpenLintModal,
 }: CheckpointFlowViewProps) {
   const isDesktop = useIsDesktop();
   const { documents: dossierDocs } = useDossierDocuments(caseId);
@@ -921,6 +928,39 @@ export function CheckpointFlowView({
           >
             + Checkpoint
           </Button>
+
+          {onOpenLintModal && lintResult && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onOpenLintModal}
+              className={cn(
+                "text-xs gap-1.5 transition-colors cursor-pointer",
+                lintResult.errorCount > 0
+                  ? "border-red-500/40 bg-red-500/10 text-red-300 hover:bg-red-500/20"
+                  : lintResult.warningCount > 0
+                    ? "border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
+                    : "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20",
+              )}
+              title="Kiểm tra tính toàn vẹn kịch bản vụ án (Case Linter)"
+            >
+              {lintResult.errorCount > 0 ? (
+                <AlertTriangle className="size-3.5 text-red-400" />
+              ) : lintResult.warningCount > 0 ? (
+                <AlertTriangle className="size-3.5 text-amber-400" />
+              ) : (
+                <ShieldCheck className="size-3.5 text-emerald-400" />
+              )}
+              <span>
+                {lintResult.errorCount > 0
+                  ? `${lintResult.errorCount} lỗi`
+                  : lintResult.warningCount > 0
+                    ? `${lintResult.warningCount} lưu ý`
+                    : "Kịch bản chuẩn"}
+              </span>
+            </Button>
+          )}
         </div>
 
         {selectedEdge && isDesktop && (
