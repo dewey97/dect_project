@@ -13,9 +13,35 @@ export const revalidate = 0;
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const caseId = normalizeCaseId(searchParams.get("caseId") || "case_000");
+  const isPublicOnly = searchParams.get("mode") === "public";
 
   try {
     const supabase = await createClient();
+
+    // Nếu yêu cầu chế độ public hoặc bảng view migration 27 đã có:
+    if (isPublicOnly) {
+      const publicViewQuery = await supabase
+        .from("case_checkpoints_public")
+        .select("*")
+        .eq("case_id", caseId)
+        .order("dossier", { ascending: true })
+        .order("checkpoint_id", { ascending: true });
+
+      if (!publicViewQuery.error && publicViewQuery.data) {
+        const res = NextResponse.json({
+          success: true,
+          caseId,
+          totalCount: publicViewQuery.data.length,
+          data: publicViewQuery.data as DbCaseCheckpoint[],
+        });
+        res.headers.set(
+          "Cache-Control",
+          "no-store, no-cache, must-revalidate, proxy-revalidate",
+        );
+        return res;
+      }
+    }
+
     // Thử truy vấn có kind và subject_key (migration 26).
     // Nếu DB chưa chạy migration 26 (code 42703: undefined column),
     // fallback sang truy vấn cũ để đảm bảo tương thích ngược.
