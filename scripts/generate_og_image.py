@@ -116,7 +116,9 @@ for label, bg_col, border_col in pills:
 
 # 5. Right Area: Forensic Poster & Victim Phone Collage
 # Poster layer
-poster_path = 'public/poster_c0.png'
+poster_path = 'public/poster_c0.webp'
+if not os.path.exists(poster_path):
+    poster_path = 'public/poster_c0.png'
 if os.path.exists(poster_path):
     poster = Image.open(poster_path).convert('RGBA')
     # Resize poster to ~440px height

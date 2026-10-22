@@ -49,7 +49,7 @@ public/
 | `xplore_case_9.png`        | Poster thẻ án "Bóng Ma Cầu Cảng Số 9"     | Danh mục vụ án (`app/cases`), Showcase Landing  |
 | `xplore_case_north.png`    | Poster thẻ án "Mật Mã Cảng Bắc"           | Danh mục vụ án (`app/cases`), Showcase Landing  |
 | `suspect_marsh.png`        | Ảnh thẻ nghi phạm Marsh (Vụ xí nghiệp ĐS) | Danh mục vụ án (`app/cases`), Showcase Landing  |
-| `newspaper_clipping.png`   | Mẩu báo cũ điều tra xé dán cổ điển        | Section thế giới ngầm (`WorldArchiveSection`)   |
+| `newspaper_clipping.webp`  | Mẩu báo cũ điều tra xé dán cổ điển        | Section thế giới ngầm (`WorldArchiveSection`)   |
 | `victim_thomas.png`        | Ảnh thẻ nạn nhân Thomas                   | Poster demo vụ án                               |
 | `means_evidence.png`       | Minh họa yếu tố "Công Cụ Gây Án"          | Showcase luật chơi (`GameRulesShowcase`)        |
 | `motive_evidence.png`      | Minh họa yếu tố "Động Cơ"                 | Showcase luật chơi (`GameRulesShowcase`)        |
@@ -80,6 +80,15 @@ public/
 | `detective_desk_ambient_vertical.jpg`   | Bàn điều tra góc dọc với ánh sáng đèn chụp ambient | Thử nghiệm bảng án khổ dọc (`app/(investigation)/board-stage`) |
 | `pure_cork_texture_vertical.jpg`        | Texture gỗ bần nguyên chất liền mạch khổ dọc       | Thử nghiệm bảng án khổ dọc (`app/(investigation)/board-stage`) |
 | `vintage_framed_corkboard_vertical.jpg` | Khung bảng gỗ bần viền gỗ vintage cổ điển khổ dọc  | Thử nghiệm bảng án khổ dọc (`app/(investigation)/board-stage`) |
+
+---
+
+## 📜 5.1. Phân Hệ Texture Giấy Kraft (`/public/textures/`)
+
+| Tên File                         | Mục Đích Sử Dụng                           | Vị Trí Hiển Thị Trong Code / UI                   |
+| :------------------------------- | :----------------------------------------- | :------------------------------------------------ |
+| `kraft_paper_texture_large.webp` | Texture giấy kraft 4K lặp phủ bìa hồ sơ án | Modal kích hoạt chuyên án (`case-activation.tsx`) |
+| `kraft_paper_texture.webp`       | Texture giấy kraft kích thước thường       | Dự phòng phủ nền giấy bìa nâu                     |
 
 ---
 
@@ -127,11 +136,13 @@ Giấy note vàng/trắng viết tay đã kết xuất sẵn nét mực để c�
 - `cuong_ve_xe_tung.png`: Cuống vé xe buýt của Tùng lúc 20:15.
 - `wardrobe_eyes.jpg`: Tủ gỗ lim 1996 then cài sắt.
 - `choi.jpg`: Ảnh chụp buổi chơi nhóm phá án thực tế.
-- `9.png`, `11.png`, `15.png`, `17.png`, `18.png`: 5 ảnh phóng to cận cảnh các điểm khám xét lại (mảnh vỡ, còi tàu, then tủ, khăn giấy, di thư).
+- `9.webp`, `11.webp`, `14.webp`, `15.webp`, `16.webp`, `17.webp`, `18.webp`: Các ảnh cận cảnh điểm khám xét lại và các góc nhìn phục vụ tạo panorama. Đã tối ưu WebP chất lượng 80.
 
 ### 7.4. Ảnh Thiết Bị Tang Vật & Bản Đồ Master
 
+- `poster_c0.webp`: Poster chính thức vụ án #000 Trốn Tìm (thay thế bản PNG 3.48MB bằng WebP 186KB).
 - `phone.png` / `victim_phone_node.png`: Ảnh kết xuất thiết bị iPhone tang vật kèm ghim đỏ cắm trên bảng điều tra Canvas (`HeroInteractive` & `MainInvestigationCanvas`). Cho phép click mở trực tiếp `PhoneModal` / trình giả lập iPhone.
+- `phone/*.webp`: Các ảnh nền, lockscreen và homescreen iPhone của nạn nhân đã được chuyển sang định dạng WebP gọn nhẹ.
 - `hanoi_master_map.png`: Bản đồ đồ họa toàn thành phố và phân khu cảng Hà Nội kết xuất độ phân giải cao (`2474 x 1732px`) từ Figma Frame `96:9215`. Dùng làm Single Source of Truth cho ứng dụng Maps trong điện thoại, radar theo dõi di chuyển và hệ tọa độ vụ án. Cập nhật tự động qua lệnh `npm run sync:map`.
 
 ---

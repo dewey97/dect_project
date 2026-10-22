@@ -9,6 +9,10 @@ All notable changes to the Detective Case System (dect_project) will be document
 - **Checkpoint Kind Schema (B2)** — migration `26_checkpoint_kind.sql`: cột `kind` (`phone_lookup | suspect_interrogation | followup | indictment | epilogue | choice | code | time | text`) và `subject_key`, backfill 9 checkpoint case_000.
 - **Discriminated Union Types (B3)** — `lib/checkpoints/kinds.ts`: union type, `parseCheckpointConfig`, `validateCheckpointConfig`.
 
+### Performance
+
+- **Nén ảnh PNG lớn sang WebP (D3)**: Chuyển đổi 19 ảnh PNG dung lượng > 1MB trong `public/` sang định dạng WebP (chất lượng 80), giảm từ 62.4MB xuống 3.5MB (~94.4% dung lượng). Xóa các file PNG gốc không còn tham chiếu, cập nhật code và tài liệu.
+
 ### Fixed
 
 - **Hậu án hiển thị rỗng (L1)**: `toRuntimeCheckpoint()` parse và map `epilogueStories` vào runtime Checkpoint; `epilogue-modal.tsx` đọc trực tiếp từ thuộc tính thay vì fallback metadata rỗng.

@@ -367,7 +367,7 @@ File: `canvas/pin-builder.ts`, `main-investigation-canvas.tsx`, `canvas/use-inve
 | --- | -------------------------------------------------------------------------------------------- | ---------------- |
 | D1  | Landing tải lười R3F (`landing-keyhole-geometry.ts` tách hằng số)                            | ✅ `cc8ab02`     |
 | D2  | `ReinvestigationModal` qua `next/dynamic` (4 chỗ). `recharts`/`@xyflow` chỉ ở admin → bỏ qua | ✅ `cc8ab02`     |
-| D3  | Nén ảnh PNG lớn → WebP                                                                       | ⏳ brief mục 4.4 |
+| D3  | Nén ảnh PNG lớn → WebP                                                                       | ✅ `93297a7`     |
 | D4  | Đọc localStorage sau mount (Checkpoint Studio)                                               | ✅ `cc8ab02`     |
 | D5  | `lib/google/auth.ts` gộp 3 bản `createGoogleAuth`                                            | ✅ `db73360`     |
 | D6  | `import type` 13 chỗ                                                                         | ✅ `db73360`     |
