@@ -170,6 +170,23 @@ export function SuspectInterrogationConfigForm({
             />
           </Field>
 
+          <Field label="Bối cảnh thẩm tra ngoại phạm (cho AI check)">
+            <AutoExpandingTextarea
+              value={(config as any).alibiContext || ""}
+              onChange={(e) =>
+                onChange({
+                  answerConfig: {
+                    ...config,
+                    alibiContext: e.target.value,
+                  } as any,
+                })
+              }
+              minRows={1}
+              className="min-h-8"
+              placeholder="Mô tả bối cảnh và chứng cứ ngoại phạm..."
+            />
+          </Field>
+
           <div>
             <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
               Gợi ý cho phần Ngoại phạm

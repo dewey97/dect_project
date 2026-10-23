@@ -1,7 +1,7 @@
 import "server-only";
 import { normalizeForMatch } from "@/lib/text";
 import { isAdminBypassCode } from "@/lib/cases/admin-bypass";
-import { isEvidenceMatching } from "@/lib/cases/case-000-clues";
+import { isEvidenceMatching } from "@/lib/cases/clues";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 import type {
   CheckpointKind,
@@ -96,34 +96,6 @@ function validateEvidenceSelection(
   return hasNoInvalidCodes;
 }
 
-const DEFAULT_CASE_000_PHONE_INPUTS: PhoneLookupConfig["textMatchInputs"] = [
-  {
-    id: "phone1",
-    label: "SĐT 0988.200.991:",
-    placeholder: "Nhập tên nghi phạm...",
-    validAnswers: ["vu", "le quang vu", "vũ", "lê quang vũ"],
-  },
-  {
-    id: "phone2",
-    label: "SĐT 0912.331.888:",
-    placeholder: "Nhập tên nghi phạm...",
-    validAnswers: ["tung", "nguyen thanh tung", "tùng", "nguyễn thanh tùng"],
-  },
-  {
-    id: "phone3",
-    label: "SĐT 0984.180.357:",
-    placeholder: "Nhập tên nghi phạm...",
-    validAnswers: [
-      "dat",
-      "dat ga",
-      "tran van dat",
-      "đạt",
-      "đạt gà",
-      "trần văn đạt",
-    ],
-  },
-];
-
 function inferCheckpointKind(checkpoint: DbCaseCheckpoint): CheckpointKind {
   if (checkpoint.kind) return checkpoint.kind as CheckpointKind;
   return (checkpoint.type as CheckpointKind) || "text";
@@ -145,10 +117,15 @@ export function gradeCheckpoint(
 
   // 1. Phone Lookup (Tra cứu SĐT danh bạ)
   if (kind === "phone_lookup") {
-    const rawInputs = (cfg.textMatchInputs ||
+    const inputsList = (cfg.textMatchInputs ||
       []) as PhoneLookupConfig["textMatchInputs"];
-    const inputsList =
-      rawInputs.length > 0 ? rawInputs : DEFAULT_CASE_000_PHONE_INPUTS;
+    if (!inputsList || inputsList.length === 0) {
+      return {
+        correct: false,
+        feedback:
+          "Checkpoint tra cứu danh bạ chưa được cấu hình danh sách số điện thoại trong hệ thống.",
+      };
+    }
     const userInputs = sub.inputs || {};
 
     // Kiểm tra bypass code

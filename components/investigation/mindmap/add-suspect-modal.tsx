@@ -51,13 +51,13 @@ import {
   findValidCaseCharacter,
   buildDynamicSuspectCharacters,
   type SuspectCharacter,
-} from "@/lib/cases/case-000-suspects";
+} from "@/lib/cases/characters";
 import {
   isEvidenceMatching,
   checkMotiveValid,
   checkContradictionValid,
   resolveEvidenceCode,
-} from "@/lib/cases/case-000-clues";
+} from "@/lib/cases/clues";
 import { getKnownCasePhones } from "@/lib/cases/case-characters";
 import {
   isAdminBypassCode,
@@ -215,13 +215,15 @@ export function AddSuspectModal({
       if (foundCp) return foundCp.id;
     }
 
-    // 3. Fallback cho Case 000 nếu Sheet chưa gắn mã
-    if (norm === "vũ" || norm === "vu" || norm === "lê quang vũ")
-      return "cp-000-1a";
-    if (norm === "tùng" || norm === "tung" || norm === "nguyễn thanh tùng")
-      return "cp-000-1b";
-    if (norm === "hà" || norm === "ha" || norm === "trần thị hà")
-      return "cp-000-1c";
+    // 3. Tra cứu theo subject_key của nhân vật đối chiếu checkpoint thẩm tra
+    const charKey = matchedChar?.id || norm;
+    const bySubjectKey = checkpoints.find(
+      (c) =>
+        c.kind === "suspect_interrogation" &&
+        (c.subject_key === charKey || c.id?.endsWith(`-${charKey}`)),
+    );
+    if (bySubjectKey) return bySubjectKey.id;
+
     return "";
   }, [name, editingSuspect, matchedChar, checkpoints]);
 
@@ -239,16 +241,11 @@ export function AddSuspectModal({
         setStorageItem("last_interacted_checkpoint", suspectCpId);
 
         const suspectKey =
+          matchedCheckpoint?.subject_key ||
           matchedCheckpoint?.suspectId ||
           matchedCheckpoint?.followupOf ||
           matchedChar?.id ||
-          (suspectCpId === "cp-000-1a"
-            ? "vu"
-            : suspectCpId === "cp-000-1b"
-              ? "tung"
-              : suspectCpId === "cp-000-1c"
-                ? "ha"
-                : (name || "").toLowerCase().trim());
+          (name || "").toLowerCase().trim();
 
         setStorageItem("last_viewed_suspect", suspectKey);
 

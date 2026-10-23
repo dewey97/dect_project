@@ -121,7 +121,6 @@ export function CulpritEpilogueModal({
     const merged = checkpoints.find(
       (c) =>
         c.kind === "epilogue" ||
-        c.id === "cp-000-epilogue" ||
         (c.epilogueStories && c.epilogueStories.length > 0),
     );
     if (merged?.epilogueStories) {
@@ -146,17 +145,18 @@ export function CulpritEpilogueModal({
   let storyText = "";
 
   if (isHaBoxSolved) {
-    // Narrative kết án trực tiếp từ checkpoint kết án cp-000-2b / cp-epilogue-ha hoặc indictment checkpoint
+    // Narrative kết án trực tiếp từ checkpoint indictment hoặc epilogue
     const dynamicIndictmentCp = checkpoints.find(
       (c) =>
-        c.id.includes("indictment") ||
-        c.id.includes("-2b") ||
-        c.id.includes("epilogue"),
+        c.kind === "indictment" ||
+        c.kind === "epilogue" ||
+        c.id.includes("indictment"),
     );
     storyText =
-      getCheckpointMonologue("cp-000-2b") ||
-      getCheckpointMonologue("cp-epilogue-ha") ||
+      dynamicIndictmentCp?.narrative ||
       dynamicIndictmentCp?.storyConfig?.monologue ||
+      getCheckpointMonologue(dynamicIndictmentCp?.id || "") ||
+      getCheckpointMonologue("cp-epilogue-ha") ||
       `Toàn bộ vật chứng chí mạng đã vạch trần tội ác!\n\nBức tường ngoại phạm của ${suspectName} hoàn toàn sụp đổ.\n\nĐã có đủ căn cứ pháp lý đanh thép để khởi tố và định tội hung thủ!`;
   } else if (showTwoChoiceButtons) {
     storyText = `Toàn bộ hành tung của ${suspectName} trong đêm xảy ra vụ án đã được thu thập & phân tích. Các mảnh ghép đã dần lộ diện.\n\nDựa vào những gì đang nắm giữ, bạn có tin đối tượng này vô tội?`;
@@ -164,29 +164,37 @@ export function CulpritEpilogueModal({
     storyText = `Bạn lựa chọn tạm thời tin tưởng ${suspectName}.\n\nHãy chuyển hướng điều tra vụ án.\nTuy nhiên, xin các thám tử nhớ rằng: Một người chỉ được kết luận vô tội khi bạn tìm ra được hung thủ thực sự.`;
   } else if (internalChoice === "KHÔNG" || internalChoice === "khong_tin") {
     if (isHa && haWarrantStep) {
-      storyText = getCheckpointMonologue("cp-000-2b");
+      const indictmentCp = checkpoints.find(
+        (c) => c.kind === "indictment" || c.id.includes("indictment"),
+      );
+      storyText =
+        indictmentCp?.narrative ||
+        indictmentCp?.storyConfig?.monologue ||
+        getCheckpointMonologue(indictmentCp?.id || "") ||
+        `Lệnh khám xét khẩn cấp đối với ${suspectName} chính thức được phê duyệt!`;
     } else {
       storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`;
     }
   } else {
-    const suspectCpId = isVu
-      ? "cp-000-1a"
-      : isTung
-        ? "cp-000-1b"
-        : isHa
-          ? "cp-000-1c"
-          : `cp-${targetCulprit}`;
-    const epilogueCpId = isVu
-      ? "cp-epilogue-mai-vu"
-      : isTung
-        ? "cp-epilogue-tung"
-        : isHa
-          ? "cp-epilogue-ha"
-          : `cp-epilogue-${targetCulprit}`;
+    const suspectCp =
+      checkpoints.find(
+        (c) =>
+          c.kind === "suspect_interrogation" &&
+          (c.subject_key === targetCulprit ||
+            c.id?.endsWith(`-${targetCulprit}`)),
+      ) || matchedCp;
+    const epilogueCp = checkpoints.find(
+      (c) =>
+        c.kind === "epilogue" &&
+        (c.subject_key === targetCulprit || c.id?.includes(targetCulprit)),
+    );
     storyText =
-      matchedCp?.storyConfig?.monologue ||
-      getCheckpointMonologue(suspectCpId) ||
-      getCheckpointMonologue(epilogueCpId) ||
+      suspectCp?.narrative ||
+      suspectCp?.storyConfig?.monologue ||
+      epilogueCp?.narrative ||
+      epilogueCp?.storyConfig?.monologue ||
+      getCheckpointMonologue(suspectCp?.id || "") ||
+      getCheckpointMonologue(epilogueCp?.id || "") ||
       `Hồ sơ điều tra của đối tượng ${suspectName} đã được ghi nhận vào hệ thống.`;
   }
 

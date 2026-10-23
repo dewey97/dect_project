@@ -171,7 +171,7 @@ export function IndictmentModal({
     if (!isAdmin000) {
       const serverResult = await verifyCheckpointOnServer({
         caseId,
-        checkpointId: indictmentCp?.id || "cp-000-2b",
+        checkpointId: indictmentCp?.id || "",
         suspect: suspectName.trim(),
         motive: selectedOptionLabel,
         selectedCodes: parsedClues,
@@ -210,8 +210,12 @@ export function IndictmentModal({
 
         const isSuspectMatch = targetSuspects.some((ts) => {
           const cleanTs = normalizeName(ts);
-          const cleanCharKey = matchedChar ? normalizeName(matchedChar.key) : "";
-          const cleanCharName = matchedChar ? normalizeName(matchedChar.name) : "";
+          const cleanCharKey = matchedChar
+            ? normalizeName(matchedChar.key)
+            : "";
+          const cleanCharName = matchedChar
+            ? normalizeName(matchedChar.name)
+            : "";
           return (
             cleanInput === cleanTs ||
             cleanCharKey === cleanTs ||
@@ -514,7 +518,10 @@ export function IndictmentModal({
             </div>
 
             {/* GỢI Ý CÁO TRẠNG ĐẨY XUỐNG DƯỚI FORM */}
-            <CheckpointHintSection checkpointId="cp-000-2b" caseId={caseId} />
+            <CheckpointHintSection
+              checkpointId={indictmentCp?.id || ""}
+              caseId={caseId}
+            />
 
             {/* FOOTER / CTA */}
             <div className="pt-3 flex items-center justify-end border-t-2 border-[#2b1f14]/15">
