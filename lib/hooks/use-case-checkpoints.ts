@@ -27,7 +27,7 @@ export interface SheetEvidenceRow {
   drive_url?: string;
   photo_code?: string;
   title?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

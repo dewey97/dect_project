@@ -1,6 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useMemo, useRef, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import type {
   Device,
   Conversation,
@@ -23,14 +31,14 @@ export interface PhoneEngineContextType {
   notes: Document[];
   history: BrowserHistory[];
   files: RecoveredFile[];
-  
+
   // Actions
   unlock: () => void;
   lock: () => void;
   openApp: (app: ActivePhoneApp) => void;
   goHome: () => void;
   closeSimulator?: () => void;
-  
+
   // Forensic / Clue callbacks
   pinnedClueIds: Set<string>;
   togglePinClue: (clueId: string, metadata?: Record<string, unknown>) => void;
@@ -65,7 +73,9 @@ export function PhoneProvider({
   onPinClue,
   children,
 }: PhoneProviderProps) {
-  const [isLocked, setIsLocked] = useState<boolean>(initialLocked ?? device.locked ?? false);
+  const [isLocked, setIsLocked] = useState<boolean>(
+    initialLocked ?? device.locked ?? false,
+  );
   const [activeApp, setActiveApp] = useState<ActivePhoneApp>(initialApp);
   const [pinnedClueIds, setPinnedClueIds] = useState<Set<string>>(new Set());
 
@@ -78,11 +88,19 @@ export function PhoneProvider({
   useEffect(() => {
     phoneOpenTimeRef.current = Date.now();
     return () => {
-      const phoneDuration = Math.round((Date.now() - phoneOpenTimeRef.current) / 1000);
+      const phoneDuration = Math.round(
+        (Date.now() - phoneOpenTimeRef.current) / 1000,
+      );
       if (phoneDuration >= 1) {
+        const devRecord = device as unknown as Record<string, unknown>;
+        const devName =
+          (typeof devRecord.name === "string" ? devRecord.name : undefined) ||
+          (typeof devRecord.title === "string" ? devRecord.title : undefined) ||
+          device.label ||
+          "victim_phone";
         trackEvent("phone_session", {
           device_id: device.id,
-          device_name: (device as any).name || (device as any).title || "victim_phone",
+          device_name: devName,
           duration_seconds: phoneDuration,
         });
       }
@@ -95,7 +113,9 @@ export function PhoneProvider({
   const openApp = useCallback((app: ActivePhoneApp) => {
     // Track previous app duration if any
     if (currentAppRef.current) {
-      const duration = Math.round((Date.now() - appStartTimeRef.current) / 1000);
+      const duration = Math.round(
+        (Date.now() - appStartTimeRef.current) / 1000,
+      );
       if (duration >= 1) {
         trackPhoneAppUsed({
           appId: currentAppRef.current,
@@ -110,7 +130,9 @@ export function PhoneProvider({
 
   const goHome = useCallback(() => {
     if (currentAppRef.current) {
-      const duration = Math.round((Date.now() - appStartTimeRef.current) / 1000);
+      const duration = Math.round(
+        (Date.now() - appStartTimeRef.current) / 1000,
+      );
       if (duration >= 1) {
         trackPhoneAppUsed({
           appId: currentAppRef.current,
@@ -137,7 +159,7 @@ export function PhoneProvider({
         onPinClue(clueId, metadata);
       }
     },
-    [onPinClue]
+    [onPinClue],
   );
 
   const value = useMemo<PhoneEngineContextType>(
@@ -174,7 +196,7 @@ export function PhoneProvider({
       onClose,
       pinnedClueIds,
       togglePinClue,
-    ]
+    ],
   );
 
   return (

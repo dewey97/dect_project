@@ -23,38 +23,62 @@ interface BankingAppProps {
   onBackToHome?: () => void;
 }
 
+interface BankTransaction {
+  id: string;
+  code: string;
+  refId: string;
+  title: string;
+  receiver: string;
+  accountNo: string;
+  amount: number;
+  time: string;
+  category: string;
+  note: string;
+  isEvidence: boolean;
+}
+
 export function BankingApp({ onBackToHome }: BankingAppProps) {
   const [showBalance, setShowBalance] = useState(true);
-  const [selectedTx, setSelectedTx] = useState<any | null>(null);
+  const [selectedTx, setSelectedTx] = useState<BankTransaction | null>(null);
   const [filterType, setFilterType] = useState<"all" | "in" | "out">("all");
 
   const { data: sheetData, loading } = usePhoneData("apps");
 
-  const transactions = sheetData
-    .filter((item: any) => String(item.type).toUpperCase() === "BANK")
-    .map((item: any, idx: number) => {
+  const transactions: BankTransaction[] = sheetData
+    .filter(
+      (item: Record<string, unknown>) =>
+        String(item.type).toUpperCase() === "BANK",
+    )
+    .map((item: Record<string, unknown>, idx: number) => {
       const amount = Number(item.amount) || 0;
-      const receiver = item.receiver || item.title_or_domain || "Đối tác";
-      const note = item.note || item.content_or_url || "";
+      const receiver = String(
+        item.receiver || item.title_or_domain || "Đối tác",
+      );
+      const note = String(item.note || item.content_or_url || "");
       const isIncome = amount > 0;
-      const title =
+      const title = String(
         item.title ||
-        (isIncome ? `Nhận tiền từ ${receiver}` : `Chuyển tiền đến ${receiver}`);
+          (isIncome
+            ? `Nhận tiền từ ${receiver}`
+            : `Chuyển tiền đến ${receiver}`),
+      );
 
       // Tự sinh mã FT chuẩn ngân hàng (năm 16 + index + hash số tiền), không bắt GM phải quản lý trên Sheet
       const seed = Math.abs(amount % 900000) + 100000;
       const autoRefId = `FT16${String(idx + 1).padStart(2, "0")}${seed}`;
 
       return {
-        id: item.tx_id || `tx-${idx + 1}`,
-        code: item.code || item.tx_id || autoRefId,
-        refId: item.ref_id || autoRefId,
+        id: String(item.tx_id || `tx-${idx + 1}`),
+        code: String(item.code || item.tx_id || autoRefId),
+        refId: String(item.ref_id || autoRefId),
         title,
         receiver,
-        accountNo: item.account_no || "Chưa rõ STK",
+        accountNo: String(item.account_no || "Chưa rõ STK"),
         amount,
-        time: item.timestamp || "",
-        category: item.category || (isIncome ? "Nhận tiền" : "Chuyển tiền"),
+        time: String(item.timestamp || ""),
+        category: String(
+          item.category || (isIncome ? "Nhận tiền" : "Chuyển tiền"),
+        ),
         note,
         isEvidence:
           String(item.is_evidence).toLowerCase() === "true" ||
@@ -184,9 +208,7 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
         {loading && sheetData.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93] space-y-2">
             <Loader2 className="size-5 animate-spin text-[#0A84FF]" />
-            <span className="text-[11px] font-mono">
-              Đang tải...
-            </span>
+            <span className="text-[11px] font-mono">Đang tải...</span>
           </div>
         ) : filteredTransactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93] space-y-2">
@@ -198,7 +220,13 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
         ) : (
           filteredTransactions.map((tx, idx) => {
             const isIncome = tx.amount > 0;
-            const txCode = tx.code || (tx.refId ? (tx.refId.startsWith("FT") ? tx.refId : `BANK-${String(idx + 1).padStart(2, "0")}`) : `BANK-${String(idx + 1).padStart(2, "0")}`);
+            const txCode =
+              tx.code ||
+              (tx.refId
+                ? tx.refId.startsWith("FT")
+                  ? tx.refId
+                  : `BANK-${String(idx + 1).padStart(2, "0")}`
+                : `BANK-${String(idx + 1).padStart(2, "0")}`);
             return (
               <EvidenceAnchorItem key={tx.id} code={txCode}>
                 <div

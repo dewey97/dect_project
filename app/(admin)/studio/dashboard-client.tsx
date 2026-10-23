@@ -26,7 +26,13 @@ import {
 } from "recharts";
 
 // Custom Tooltip for Recharts
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number | string }>;
+  label?: string | number;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-zinc-900 border border-white/10 p-3 rounded-lg shadow-xl backdrop-blur-md">
@@ -41,22 +47,37 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+export interface DashboardStats {
+  totalPlayers: number;
+  totalCases: number;
+  activeSessions: number;
+}
+
+export interface DashboardCase {
+  id: string;
+  title: string;
+  status: string;
+  difficulty?: number | string | null;
+  created_at: string;
+}
+
 export function DashboardClient({
-  stats,
-  cases,
+  stats = { totalPlayers: 0, totalCases: 0, activeSessions: 0 },
+  cases = [],
 }: {
-  stats: any;
-  cases: any[];
+  stats?: DashboardStats;
+  cases?: DashboardCase[];
 }) {
+  const safeStats = stats || { totalPlayers: 0, totalCases: 0, activeSessions: 0 };
   // Temporary mock data for the chart until we implement full timeseries in DB
   const playerEngagementData = [
-    { name: "Mon", players: Math.floor(stats.totalPlayers * 0.2) },
-    { name: "Tue", players: Math.floor(stats.totalPlayers * 0.4) },
-    { name: "Wed", players: Math.floor(stats.totalPlayers * 0.5) },
-    { name: "Thu", players: Math.floor(stats.totalPlayers * 0.6) },
-    { name: "Fri", players: Math.floor(stats.totalPlayers * 0.8) },
-    { name: "Sat", players: Math.floor(stats.totalPlayers * 1.1) },
-    { name: "Sun", players: stats.totalPlayers },
+    { name: "Mon", players: Math.floor(safeStats.totalPlayers * 0.2) },
+    { name: "Tue", players: Math.floor(safeStats.totalPlayers * 0.4) },
+    { name: "Wed", players: Math.floor(safeStats.totalPlayers * 0.5) },
+    { name: "Thu", players: Math.floor(safeStats.totalPlayers * 0.6) },
+    { name: "Fri", players: Math.floor(safeStats.totalPlayers * 0.8) },
+    { name: "Sat", players: Math.floor(safeStats.totalPlayers * 1.1) },
+    { name: "Sun", players: safeStats.totalPlayers },
   ];
 
   return (
@@ -454,7 +475,7 @@ export function DashboardClient({
                   </td>
                 </tr>
               ) : (
-                cases.slice(0, 5).map((c: any) => (
+                cases.slice(0, 5).map((c) => (
                   <tr
                     key={c.id}
                     className="hover:bg-white/[0.02] transition-colors group"

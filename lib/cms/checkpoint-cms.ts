@@ -794,7 +794,10 @@ export function transformSheetCheckpoint(row: SheetCheckpointRow): Checkpoint {
     : undefined;
 
   const effectiveId = String(
-    row.checkpoint_id || row.node_id || (row as any).id || "cp-dynamic",
+    row.checkpoint_id ||
+      row.node_id ||
+      (row as { id?: string }).id ||
+      "cp-dynamic",
   ).trim();
 
   const rawFollowupOf =

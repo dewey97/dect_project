@@ -45,8 +45,7 @@ export async function GET(request: Request) {
     // Thử truy vấn có kind và subject_key (migration 26).
     // Nếu DB chưa chạy migration 26 (code 42703: undefined column),
     // fallback sang truy vấn cũ để đảm bảo tương thích ngược.
-    let data: any[] | null = null;
-    let queryError: any = null;
+    let data: Partial<DbCaseCheckpoint>[] | null = null;
 
     const modernQuery = await supabase
       .from("case_checkpoints")
@@ -95,14 +94,18 @@ export async function GET(request: Request) {
       "no-store, no-cache, must-revalidate, proxy-revalidate",
     );
     return res;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error loading Studio checkpoints:", error);
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Không tải được checkpoint từ Studio.";
     const res = NextResponse.json(
       {
         success: false,
         caseId,
         data: [],
-        error: error?.message || "Không tải được checkpoint từ Studio.",
+        error: message,
       },
       { status: 500 },
     );

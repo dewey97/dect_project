@@ -203,6 +203,15 @@ export async function GET(request: Request) {
     // Fallback an toàn khi bảng chưa migrate
   }
 
+  if (caseSlug !== "case_000") {
+    return NextResponse.json({
+      success: true,
+      caseId: caseSlug,
+      data: [],
+      source: "empty",
+    });
+  }
+
   const fallback = DEFAULT_APPS.map((a, idx) => ({
     ...a,
     id: `app-fallback-${idx}`,

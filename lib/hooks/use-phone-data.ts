@@ -10,9 +10,12 @@ export interface PhoneDataState<T> {
 }
 
 // In-memory cache storage for instant tab switching without loading flicker
-const memoryCache: Record<string, { data: any[]; timestamp: number }> = {};
+const memoryCache: Record<string, { data: unknown[]; timestamp: number }> = {};
 // In-flight promise tracker to deduplicate simultaneous requests for the same tab
-const inFlightPromises: Record<string, Promise<any>> = {};
+const inFlightPromises: Record<
+  string,
+  Promise<{ success?: boolean; data?: unknown[]; error?: string }>
+> = {};
 const CACHE_TTL_MS = 30_000; // 30 seconds fresh cache
 
 export function usePhoneData<T = any>(
@@ -35,7 +38,7 @@ export function usePhoneData<T = any>(
   const cached = memoryCache[cacheKey];
   const isCacheFresh = cached && Date.now() - cached.timestamp < CACHE_TTL_MS;
 
-  const [data, setData] = useState<T[]>(cached ? cached.data : []);
+  const [data, setData] = useState<T[]>(cached ? (cached.data as T[]) : []);
   const [loading, setLoading] = useState<boolean>(!cached);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState<number>(0);
@@ -51,7 +54,7 @@ export function usePhoneData<T = any>(
 
     // If cache is fresh and no explicit refetch requested, skip network call
     if (reloadToken === 0 && isCacheFresh) {
-      setData(cached.data);
+      setData(cached.data as T[]);
       setLoading(false);
       return;
     }
@@ -104,7 +107,7 @@ export function usePhoneData<T = any>(
             data: result.data,
             timestamp: Date.now(),
           };
-          setData(result.data);
+          setData(result.data as T[]);
           setError(null);
         } else {
           setError(result.error || "Failed to fetch data");

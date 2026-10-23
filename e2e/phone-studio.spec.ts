@@ -1,6 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+test.use({ storageState: "e2e/.auth/admin.json" });
+
 test.describe("Phone Studio & Simulator", () => {
+  test.beforeEach(async ({}, testInfo) => {
+    if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
+      testInfo.skip(
+        true,
+        "Thiếu biến môi trường E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD cho admin spec",
+      );
+    }
+  });
+
   test("Studio page loads 3-column layout and tabs", async ({ page }) => {
     await page.goto("/studio/phone?case=case_000");
 

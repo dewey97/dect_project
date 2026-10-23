@@ -36,7 +36,12 @@ function saveLocalPending(entry: {
 }) {
   try {
     ensureDirectoryExists();
-    let entries: any[] = [];
+    let entries: Array<{
+      email: string;
+      source: string;
+      timestamp?: string;
+      ip?: string;
+    }> = [];
     if (fs.existsSync(PENDING_FILE)) {
       try {
         entries = JSON.parse(fs.readFileSync(PENDING_FILE, "utf-8"));
@@ -161,7 +166,7 @@ export async function POST(req: Request) {
       message:
         "Đăng ký thành công! Hồ sơ của bạn đã được niêm phong vào danh sách ưu tiên.",
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[WAITLIST] Internal error:", err);
     return defensiveErrorResponse(
       {

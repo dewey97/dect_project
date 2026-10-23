@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import React from 'react'
+import React from "react";
 import {
   Undo2,
   Redo2,
@@ -16,18 +16,19 @@ import {
   TrainTrack,
   LandPlot,
   MapPin,
-  Type
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+  Type,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import type {
   MapStudioTool,
   WaterType,
   RoadType,
   ZoneCategory,
   PoiCategory,
-  Point
-} from '@/types/map-vector'
-import { POI_CATEGORY_CONFIG } from './map-features'
+  Point,
+  MapVectorData,
+} from "@/types/map-vector";
+import { POI_CATEGORY_CONFIG } from "./map-features";
 
 // =============================================================================
 // 1. TOOL BUTTON (Sleek Cloud Island Style)
@@ -36,22 +37,22 @@ export function ToolButton({
   active,
   onClick,
   icon,
-  label
+  label,
 }: {
-  active: boolean
-  onClick: () => void
-  icon: React.ReactNode
-  label: string
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
 }) {
   return (
     <button
       onClick={onClick}
       title={label}
       className={cn(
-        'size-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group',
+        "size-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative group",
         active
-          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105'
-          : 'text-zinc-400 hover:text-white hover:bg-white/10 active:scale-95'
+          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-105"
+          : "text-zinc-400 hover:text-white hover:bg-white/10 active:scale-95",
       )}
     >
       {icon}
@@ -60,35 +61,35 @@ export function ToolButton({
         {label}
       </span>
     </button>
-  )
+  );
 }
 
 // =============================================================================
 // 2. MAP STUDIO TOP HEADER TOOLBAR
 // =============================================================================
 export interface MapStudioHeaderProps {
-  handleUndo: () => void
-  handleRedo: () => void
-  historyIndex: number
-  historyLength: number
-  showGrid: boolean
-  setShowGrid: (val: boolean) => void
-  viewMode: 'admin' | 'player'
-  setViewMode: (val: 'admin' | 'player') => void
-  showPhoneOverlay: boolean
-  setShowPhoneOverlay: (val: boolean) => void
-  drawingPoints: Point[]
-  finishDrawing: () => void
-  setDrawingPoints: (pts: Point[]) => void
-  draftRecoveryAvailable: { timestamp: number; data: any } | null
-  handleRestoreDraft: () => void
-  handleDismissDraft: () => void
-  draftStatus: 'idle' | 'saving' | 'saved'
-  handleSave: () => void
-  isSaving: boolean
-  saveStatus: 'idle' | 'success' | 'error'
-  setSelectedFeatureId: (id: string | null) => void
-  setSelectedVertexIndex: (idx: number | null) => void
+  handleUndo: () => void;
+  handleRedo: () => void;
+  historyIndex: number;
+  historyLength: number;
+  showGrid: boolean;
+  setShowGrid: (val: boolean) => void;
+  viewMode: "admin" | "player";
+  setViewMode: (val: "admin" | "player") => void;
+  showPhoneOverlay: boolean;
+  setShowPhoneOverlay: (val: boolean) => void;
+  drawingPoints: Point[];
+  finishDrawing: () => void;
+  setDrawingPoints: (pts: Point[]) => void;
+  draftRecoveryAvailable: { timestamp: number; data: MapVectorData } | null;
+  handleRestoreDraft: () => void;
+  handleDismissDraft: () => void;
+  draftStatus: "idle" | "saving" | "saved";
+  handleSave: () => void;
+  isSaving: boolean;
+  saveStatus: "idle" | "success" | "error";
+  setSelectedFeatureId: (id: string | null) => void;
+  setSelectedVertexIndex: (idx: number | null) => void;
 }
 
 export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
@@ -113,7 +114,7 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
   isSaving,
   saveStatus,
   setSelectedFeatureId,
-  setSelectedVertexIndex
+  setSelectedVertexIndex,
 }: MapStudioHeaderProps) {
   return (
     <header className="h-14 bg-zinc-950/90 border-b border-white/10 px-4 flex items-center justify-between shrink-0 z-30 shadow-md backdrop-blur-md">
@@ -154,13 +155,13 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
           <button
             onClick={() => setShowGrid(!showGrid)}
             className={cn(
-              'px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border',
+              "px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border",
               showGrid
-                ? 'bg-slate-800 text-slate-200 border-slate-700'
-                : 'text-slate-500 border-slate-800 hover:bg-slate-800'
+                ? "bg-slate-800 text-slate-200 border-slate-700"
+                : "text-slate-500 border-slate-800 hover:bg-slate-800",
             )}
           >
-            <span>{showGrid ? 'Ẩn lưới' : 'Hiện lưới'}</span>
+            <span>{showGrid ? "Ẩn lưới" : "Hiện lưới"}</span>
           </button>
         </div>
 
@@ -169,12 +170,12 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
         {/* View Mode Toggle: Admin Edit vs Player Clean Preview */}
         <div className="flex items-center rounded-lg bg-slate-900 border border-slate-700/80 p-0.5 shadow-inner">
           <button
-            onClick={() => setViewMode('admin')}
+            onClick={() => setViewMode("admin")}
             className={cn(
-              'px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer',
-              viewMode === 'admin'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+              "px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+              viewMode === "admin"
+                ? "bg-blue-600 text-white shadow-sm"
+                : "text-slate-400 hover:text-slate-200",
             )}
             title="Chế độ Admin: Hiển thị đầy đủ mốc án, số thứ tự, ghim POI và công cụ biên tập"
           >
@@ -183,15 +184,15 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
           </button>
           <button
             onClick={() => {
-              setViewMode('player')
-              setSelectedFeatureId(null)
-              setSelectedVertexIndex(null)
+              setViewMode("player");
+              setSelectedFeatureId(null);
+              setSelectedVertexIndex(null);
             }}
             className={cn(
-              'px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer',
-              viewMode === 'player'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+              "px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
+              viewMode === "player"
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "text-slate-400 hover:text-slate-200",
             )}
             title="Chế độ Người chơi: Xem bản đồ dân sự sạch sẽ như trong game, ẩn toàn bộ số mốc và ghim án"
           >
@@ -205,10 +206,10 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
         <button
           onClick={() => setShowPhoneOverlay(!showPhoneOverlay)}
           className={cn(
-            'px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors border',
+            "px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors border",
             showPhoneOverlay
-              ? 'bg-sky-600/30 text-sky-400 border-sky-500/50'
-              : 'text-slate-400 border-slate-800 hover:bg-slate-800'
+              ? "bg-sky-600/30 text-sky-400 border-sky-500/50"
+              : "text-slate-400 border-slate-800 hover:bg-slate-800",
           )}
           title="Bật/Tắt khung mô phỏng màn hình iPhone trong Game"
         >
@@ -220,7 +221,9 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
       <div className="flex items-center gap-2">
         {drawingPoints.length > 0 && (
           <div className="flex items-center gap-2 px-3 py-1 bg-amber-950/80 border border-amber-600/60 rounded-full text-amber-300 text-xs font-medium animate-pulse">
-            <span>Đang vẽ ({drawingPoints.length} điểm) — Bấm đúp hoặc Enter để chốt</span>
+            <span>
+              Đang vẽ ({drawingPoints.length} điểm) — Bấm đúp hoặc Enter để chốt
+            </span>
             <button
               onClick={finishDrawing}
               className="ml-1 px-2 py-0.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded text-[11px]"
@@ -261,9 +264,9 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
         )}
 
         {/* Auto-save status badge */}
-        {draftStatus !== 'idle' && !draftRecoveryAvailable && (
+        {draftStatus !== "idle" && !draftRecoveryAvailable && (
           <div className="flex items-center gap-1.5 px-2 py-0.5 text-[11px] text-zinc-400 font-mono">
-            {draftStatus === 'saving' ? (
+            {draftStatus === "saving" ? (
               <>
                 <RefreshCw className="size-2.5 animate-spin text-zinc-500" />
                 <span className="text-zinc-500">Đang lưu nháp...</span>
@@ -282,12 +285,12 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
           onClick={handleSave}
           disabled={isSaving}
           className={cn(
-            'px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg active:scale-95',
-            saveStatus === 'success'
-              ? 'bg-emerald-600 text-white'
-              : saveStatus === 'error'
-              ? 'bg-red-600 text-white'
-              : 'bg-blue-600 hover:bg-blue-500 text-white'
+            "px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg active:scale-95",
+            saveStatus === "success"
+              ? "bg-emerald-600 text-white"
+              : saveStatus === "error"
+                ? "bg-red-600 text-white"
+                : "bg-blue-600 hover:bg-blue-500 text-white",
           )}
         >
           {isSaving ? (
@@ -295,12 +298,12 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
               <RefreshCw className="size-3.5 animate-spin" />
               <span>Đang lưu...</span>
             </>
-          ) : saveStatus === 'success' ? (
+          ) : saveStatus === "success" ? (
             <>
               <Check className="size-3.5" />
               <span>Đã lưu thành công!</span>
             </>
-          ) : saveStatus === 'error' ? (
+          ) : saveStatus === "error" ? (
             <>
               <AlertCircle className="size-3.5" />
               <span>Lỗi khi lưu!</span>
@@ -314,256 +317,283 @@ export const MapStudioHeader = React.memo(function MapStudioHeaderComponent({
         </button>
       </div>
     </header>
-  )
-})
+  );
+});
 
 // =============================================================================
 // 3. MAP STUDIO TOOLS PALETTE (Left Floating Island + Active Options Strip)
 // =============================================================================
 export interface MapStudioToolsPaletteProps {
-  activeTool: MapStudioTool
-  setActiveTool: (tool: MapStudioTool) => void
-  setDrawingPoints: (pts: Point[]) => void
-  waterType: WaterType
-  setWaterType: (type: WaterType) => void
-  roadType: RoadType
-  setRoadType: (type: RoadType) => void
-  zoneCategory: ZoneCategory
-  setZoneCategory: (cat: ZoneCategory) => void
-  poiCategory: PoiCategory
-  setPoiCategory: (cat: PoiCategory) => void
-  coordRef: React.RefObject<HTMLSpanElement | null>
+  activeTool: MapStudioTool;
+  setActiveTool: (tool: MapStudioTool) => void;
+  setDrawingPoints: (pts: Point[]) => void;
+  waterType: WaterType;
+  setWaterType: (type: WaterType) => void;
+  roadType: RoadType;
+  setRoadType: (type: RoadType) => void;
+  zoneCategory: ZoneCategory;
+  setZoneCategory: (cat: ZoneCategory) => void;
+  poiCategory: PoiCategory;
+  setPoiCategory: (cat: PoiCategory) => void;
+  coordRef: React.RefObject<HTMLSpanElement | null>;
 }
 
-export const MapStudioToolsPalette = React.memo(function MapStudioToolsPaletteComponent({
-  activeTool,
-  setActiveTool,
-  setDrawingPoints,
-  waterType,
-  setWaterType,
-  roadType,
-  setRoadType,
-  zoneCategory,
-  setZoneCategory,
-  poiCategory,
-  setPoiCategory,
-  coordRef
-}: MapStudioToolsPaletteProps) {
-  return (
-    <>
-      {/* FLOATING TOOLS PALETTE (Cloud Island Style) */}
-      <div className="absolute top-4 left-4 z-20 flex flex-col items-center p-1.5 gap-1.5 rounded-2xl bg-zinc-950/80 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/80 ring-1 ring-white/5">
-        <ToolButton
-          active={activeTool === 'select'}
-          onClick={() => setActiveTool('select')}
-          icon={<MousePointer className="size-4" />}
-          label="Chọn / Sửa đỉnh (V)"
-        />
+export const MapStudioToolsPalette = React.memo(
+  function MapStudioToolsPaletteComponent({
+    activeTool,
+    setActiveTool,
+    setDrawingPoints,
+    waterType,
+    setWaterType,
+    roadType,
+    setRoadType,
+    zoneCategory,
+    setZoneCategory,
+    poiCategory,
+    setPoiCategory,
+    coordRef,
+  }: MapStudioToolsPaletteProps) {
+    return (
+      <>
+        {/* FLOATING TOOLS PALETTE (Cloud Island Style) */}
+        <div className="absolute top-4 left-4 z-20 flex flex-col items-center p-1.5 gap-1.5 rounded-2xl bg-zinc-950/80 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/80 ring-1 ring-white/5">
+          <ToolButton
+            active={activeTool === "select"}
+            onClick={() => setActiveTool("select")}
+            icon={<MousePointer className="size-4" />}
+            label="Chọn / Sửa đỉnh (V)"
+          />
 
-        <div className="w-6 h-px bg-white/10 my-0.5" />
+          <div className="w-6 h-px bg-white/10 my-0.5" />
 
-        <ToolButton
-          active={activeTool === 'water'}
-          onClick={() => {
-            setActiveTool('water')
-            setDrawingPoints([])
-          }}
-          icon={<Waves className="size-4" />}
-          label="Vẽ Hồ & Sông (W)"
-        />
-        <ToolButton
-          active={activeTool === 'road'}
-          onClick={() => {
-            setActiveTool('road')
-            setDrawingPoints([])
-          }}
-          icon={<Milestone className="size-4" />}
-          label="Vẽ Tuyến Đường (R)"
-        />
-        <ToolButton
-          active={activeTool === 'railway'}
-          onClick={() => {
-            setActiveTool('railway')
-            setDrawingPoints([])
-          }}
-          icon={<TrainTrack className="size-4" />}
-          label="Vẽ Đường Sắt (T)"
-        />
-        <ToolButton
-          active={activeTool === 'zone'}
-          onClick={() => {
-            setActiveTool('zone')
-            setDrawingPoints([])
-          }}
-          icon={<LandPlot className="size-4" />}
-          label="Vẽ Phân Khu (Z)"
-        />
+          <ToolButton
+            active={activeTool === "water"}
+            onClick={() => {
+              setActiveTool("water");
+              setDrawingPoints([]);
+            }}
+            icon={<Waves className="size-4" />}
+            label="Vẽ Hồ & Sông (W)"
+          />
+          <ToolButton
+            active={activeTool === "road"}
+            onClick={() => {
+              setActiveTool("road");
+              setDrawingPoints([]);
+            }}
+            icon={<Milestone className="size-4" />}
+            label="Vẽ Tuyến Đường (R)"
+          />
+          <ToolButton
+            active={activeTool === "railway"}
+            onClick={() => {
+              setActiveTool("railway");
+              setDrawingPoints([]);
+            }}
+            icon={<TrainTrack className="size-4" />}
+            label="Vẽ Đường Sắt (T)"
+          />
+          <ToolButton
+            active={activeTool === "zone"}
+            onClick={() => {
+              setActiveTool("zone");
+              setDrawingPoints([]);
+            }}
+            icon={<LandPlot className="size-4" />}
+            label="Vẽ Phân Khu (Z)"
+          />
 
-        <div className="w-6 h-px bg-white/10 my-0.5" />
+          <div className="w-6 h-px bg-white/10 my-0.5" />
 
-        <ToolButton
-          active={activeTool === 'poi'}
-          onClick={() => setActiveTool('poi')}
-          icon={<MapPin className="size-4" />}
-          label="Cắm Địa Danh / Hotspot (P)"
-        />
-        <ToolButton
-          active={activeTool === 'label'}
-          onClick={() => setActiveTool('label')}
-          icon={<Type className="size-4" />}
-          label="Đặt Nhãn Chữ (L)"
-        />
-      </div>
-
-      {/* ACTIVE TOOL OPTIONS STRIP (Top floating pill) */}
-      <div className="absolute top-4 left-20 z-10 bg-zinc-950/80 backdrop-blur-xl border border-white/10 px-3.5 py-1.5 rounded-xl shadow-2xl flex items-center gap-3 text-xs ring-1 ring-white/5">
-        {activeTool === 'water' && (
-          <div className="flex items-center gap-2">
-            <span className="text-sky-400 font-semibold">Sông / Hồ:</span>
-            <div className="flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
-              <button
-                onClick={() => setWaterType('river')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  waterType === 'river' ? 'bg-sky-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Sông lớn (Đường)
-              </button>
-              <button
-                onClick={() => setWaterType('lake')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  waterType === 'lake' ? 'bg-sky-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Hồ nước (Đa giác)
-              </button>
-              <button
-                onClick={() => setWaterType('stream')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  waterType === 'stream' ? 'bg-sky-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Con suối (Nét nhỏ)
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeTool === 'road' && (
-          <div className="flex items-center gap-2">
-            <span className="text-amber-400 font-semibold">Loại đường:</span>
-            <div className="flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
-              <button
-                onClick={() => setRoadType('highway')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  roadType === 'highway' ? 'bg-amber-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Đại lộ lớn
-              </button>
-              <button
-                onClick={() => setRoadType('avenue')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  roadType === 'avenue' ? 'bg-amber-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Đường phố
-              </button>
-              <button
-                onClick={() => setRoadType('alley')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  roadType === 'alley' ? 'bg-amber-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Ngõ hẻm
-              </button>
-              <button
-                onClick={() => setRoadType('bridge')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  roadType === 'bridge' ? 'bg-amber-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Cầu vượt sông
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeTool === 'zone' && (
-          <div className="flex items-center gap-2">
-            <span className="text-emerald-400 font-semibold">Phân khu:</span>
-            <div className="flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
-              <button
-                onClick={() => setZoneCategory('port')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  zoneCategory === 'port' ? 'bg-slate-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Cảng biển
-              </button>
-              <button
-                onClick={() => setZoneCategory('park')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  zoneCategory === 'park' ? 'bg-emerald-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Công viên
-              </button>
-              <button
-                onClick={() => setZoneCategory('industrial')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  zoneCategory === 'industrial' ? 'bg-slate-600 text-white' : 'text-slate-400'
-                )}
-              >
-                Khu công nghiệp
-              </button>
-              <button
-                onClick={() => setZoneCategory('residential')}
-                className={cn(
-                  'px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer',
-                  zoneCategory === 'residential' ? 'bg-amber-700 text-white' : 'text-slate-400'
-                )}
-              >
-                Khu dân cư
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeTool === 'poi' && (
-          <div className="flex items-center gap-2">
-            <span className="text-red-400 font-semibold">Loại địa danh:</span>
-            <select
-              value={poiCategory}
-              onChange={(e) => setPoiCategory(e.target.value as PoiCategory)}
-              className="bg-slate-800 text-slate-200 border border-slate-700 rounded px-2 py-0.5 outline-none cursor-pointer"
-            >
-              {Object.entries(POI_CATEGORY_CONFIG).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Coordinate Readout */}
-        <div className="ml-auto flex items-center">
-          <span ref={coordRef} className="font-mono text-[11px] text-slate-400">
-            X: 0 Y: 0
-          </span>
+          <ToolButton
+            active={activeTool === "poi"}
+            onClick={() => setActiveTool("poi")}
+            icon={<MapPin className="size-4" />}
+            label="Cắm Địa Danh / Hotspot (P)"
+          />
+          <ToolButton
+            active={activeTool === "label"}
+            onClick={() => setActiveTool("label")}
+            icon={<Type className="size-4" />}
+            label="Đặt Nhãn Chữ (L)"
+          />
         </div>
-      </div>
-    </>
-  )
-})
+
+        {/* ACTIVE TOOL OPTIONS STRIP (Top floating pill) */}
+        <div className="absolute top-4 left-20 z-10 bg-zinc-950/80 backdrop-blur-xl border border-white/10 px-3.5 py-1.5 rounded-xl shadow-2xl flex items-center gap-3 text-xs ring-1 ring-white/5">
+          {activeTool === "water" && (
+            <div className="flex items-center gap-2">
+              <span className="text-sky-400 font-semibold">Sông / Hồ:</span>
+              <div className="flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
+                <button
+                  onClick={() => setWaterType("river")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    waterType === "river"
+                      ? "bg-sky-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Sông lớn (Đường)
+                </button>
+                <button
+                  onClick={() => setWaterType("lake")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    waterType === "lake"
+                      ? "bg-sky-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Hồ nước (Đa giác)
+                </button>
+                <button
+                  onClick={() => setWaterType("stream")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    waterType === "stream"
+                      ? "bg-sky-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Con suối (Nét nhỏ)
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTool === "road" && (
+            <div className="flex items-center gap-2">
+              <span className="text-amber-400 font-semibold">Loại đường:</span>
+              <div className="flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
+                <button
+                  onClick={() => setRoadType("highway")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    roadType === "highway"
+                      ? "bg-amber-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Đại lộ lớn
+                </button>
+                <button
+                  onClick={() => setRoadType("avenue")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    roadType === "avenue"
+                      ? "bg-amber-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Đường phố
+                </button>
+                <button
+                  onClick={() => setRoadType("alley")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    roadType === "alley"
+                      ? "bg-amber-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Ngõ hẻm
+                </button>
+                <button
+                  onClick={() => setRoadType("bridge")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    roadType === "bridge"
+                      ? "bg-amber-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Cầu vượt sông
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTool === "zone" && (
+            <div className="flex items-center gap-2">
+              <span className="text-emerald-400 font-semibold">Phân khu:</span>
+              <div className="flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
+                <button
+                  onClick={() => setZoneCategory("port")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    zoneCategory === "port"
+                      ? "bg-slate-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Cảng biển
+                </button>
+                <button
+                  onClick={() => setZoneCategory("park")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    zoneCategory === "park"
+                      ? "bg-emerald-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Công viên
+                </button>
+                <button
+                  onClick={() => setZoneCategory("industrial")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    zoneCategory === "industrial"
+                      ? "bg-slate-600 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Khu công nghiệp
+                </button>
+                <button
+                  onClick={() => setZoneCategory("residential")}
+                  className={cn(
+                    "px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer",
+                    zoneCategory === "residential"
+                      ? "bg-amber-700 text-white"
+                      : "text-slate-400",
+                  )}
+                >
+                  Khu dân cư
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTool === "poi" && (
+            <div className="flex items-center gap-2">
+              <span className="text-red-400 font-semibold">Loại địa danh:</span>
+              <select
+                value={poiCategory}
+                onChange={(e) => setPoiCategory(e.target.value as PoiCategory)}
+                className="bg-slate-800 text-slate-200 border border-slate-700 rounded px-2 py-0.5 outline-none cursor-pointer"
+              >
+                {Object.entries(POI_CATEGORY_CONFIG).map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Coordinate Readout */}
+          <div className="ml-auto flex items-center">
+            <span
+              ref={coordRef}
+              className="font-mono text-[11px] text-slate-400"
+            >
+              X: 0 Y: 0
+            </span>
+          </div>
+        </div>
+      </>
+    );
+  },
+);

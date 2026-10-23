@@ -11,7 +11,6 @@ const DEFAULT_SPREADSHEET_ID =
   process.env.GOOGLE_SHEETS_SPREADSHEET_ID ||
   "1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q";
 
-
 export async function POST(req: NextRequest) {
   const denied = await denyIfNotAdmin();
   if (denied) return denied;
@@ -157,12 +156,16 @@ export async function POST(req: NextRequest) {
         message: `Đã đồng bộ vật chứng [${label}] lên Google Sheet tab evidences!`,
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Lỗi khi đồng bộ pin:", error);
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Lỗi không xác định khi đồng bộ pin.";
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Lỗi không xác định khi đồng bộ pin.",
+        error: errorMsg,
       },
       { status: 500 },
     );

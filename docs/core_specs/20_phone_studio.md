@@ -131,3 +131,11 @@ Hàm `duplicatePhoneData(sourceSlug, targetSlug)` trong `lib/actions/phone-actio
 - Bucket: `phone-assets` (public read, authenticated/admin write).
 - Phân thư mục theo vụ án: `phone-assets/<case_slug>/<folder>/<filename>`.
 - Client upload trực tiếp qua Server Action `uploadPhoneAsset(formData)` với kiểm tra MIME type và kích thước an toàn.
+
+---
+
+## 7. Kiểm thử Tự động E2E & Xác thực Admin
+
+- **Playwright Setup Project (`auth.setup.ts`)**: Lưu `storageState` admin vào `e2e/.auth/admin.json` trước khi chạy các spec admin. Nếu thiếu biến môi trường `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`, ghi storageState rỗng và dùng `test.skip` để không làm fail test suite.
+- **P28 — Runtime Case #000 (`e2e/phone-runtime.spec.ts`)**: Mở điện thoại nạn nhân, xác minh 15 ứng dụng hiển thị đầy đủ và ứng dụng Tin nhắn hiển thị ít nhất 1 thread hội thoại.
+- **P29 — Deep Clone & Custom App (`e2e/phone-case-create.spec.ts`)**: Kiểm tra khả năng tạo vụ án mới, thêm ứng dụng launcher tùy biến và hiển thị tức thì trên Phone Simulator preview.

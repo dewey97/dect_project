@@ -208,19 +208,23 @@ function parseConfig(
     unlocksDossier:
       asString(source.unlocksDossier) || asString(source.unlocks_dossier),
     epilogueStories: Array.isArray(source.epilogueStories)
-      ? (source.epilogueStories as any[]).map((s) => ({
+      ? (source.epilogueStories as Array<Record<string, unknown>>).map((s) => ({
           id: asString(s?.id),
           title: asString(s?.title),
           monologue: asString(s?.monologue || s?.text),
         }))
       : undefined,
     textMatchInputs: Array.isArray(source.textMatchInputs)
-      ? (source.textMatchInputs as any[]).map((inp, idx) => ({
-          id: asString(inp?.id) || `input_${idx}`,
-          label: asString(inp?.label),
-          placeholder: asString(inp?.placeholder),
-          validAnswers: asStringArray(inp?.validAnswers || inp?.valid_answers),
-        }))
+      ? (source.textMatchInputs as Array<Record<string, unknown>>).map(
+          (inp, idx) => ({
+            id: asString(inp?.id) || `input_${idx}`,
+            label: asString(inp?.label),
+            placeholder: asString(inp?.placeholder),
+            validAnswers: asStringArray(
+              inp?.validAnswers || inp?.valid_answers,
+            ),
+          }),
+        )
       : undefined,
     photoCodes: asStringArray(source.photoCodes || source.photo_codes),
   };
@@ -244,7 +248,9 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
   const config = parseConfig(row.answer_config);
   const unlocksDossier =
     config.unlocksDossier ||
-    asString((row.answer_config as any)?.unlocksDossier) ||
+    asString(
+      (row.answer_config as Record<string, unknown> | null)?.unlocksDossier,
+    ) ||
     "";
 
   return {

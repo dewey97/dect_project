@@ -1,29 +1,50 @@
-'use client'
+"use client";
 
-import React, { useState, useMemo } from 'react'
-import { Search, Filter, MoreHorizontal, User, Download, Activity, CheckCircle2 } from 'lucide-react'
+import React, { useState, useMemo } from "react";
+import {
+  Search,
+  Filter,
+  MoreHorizontal,
+  User,
+  Download,
+  Activity,
+  CheckCircle2,
+} from "lucide-react";
 
-export function PlayersListClient({ initialPlayers }: { initialPlayers: any[] }) {
-  const [searchQuery, setSearchQuery] = useState('')
+export interface PlayerRecord {
+  id: string;
+  display_name?: string | null;
+  created_at: string;
+  play_sessions?: { count: number }[];
+}
+
+export function PlayersListClient({
+  initialPlayers,
+}: {
+  initialPlayers: PlayerRecord[];
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredPlayers = useMemo(() => {
-    return initialPlayers.filter(p => {
-      const name = (p.display_name || '').toLowerCase()
-      const id = (p.id || '').toLowerCase()
-      const query = searchQuery.toLowerCase()
-      return name.includes(query) || id.includes(query)
-    })
-  }, [initialPlayers, searchQuery])
+    return initialPlayers.filter((p) => {
+      const name = (p.display_name || "").toLowerCase();
+      const id = (p.id || "").toLowerCase();
+      const query = searchQuery.toLowerCase();
+      return name.includes(query) || id.includes(query);
+    });
+  }, [initialPlayers, searchQuery]);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Players Database</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Players Database
+          </h1>
           <p className="text-zinc-400 mt-1 flex items-center gap-2">
-            <User className="size-4" /> {initialPlayers.length} Registered Detectives
+            <User className="size-4" /> {initialPlayers.length} Registered
+            Detectives
           </p>
         </div>
       </div>
@@ -32,11 +53,11 @@ export function PlayersListClient({ initialPlayers }: { initialPlayers: any[] })
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search players by name or ID..." 
+            placeholder="Search players by name or ID..."
             className="w-full bg-zinc-900/50 border border-white/10 rounded-md py-2 pl-9 pr-4 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-zinc-100 placeholder:text-zinc-600"
           />
         </div>
@@ -45,7 +66,6 @@ export function PlayersListClient({ initialPlayers }: { initialPlayers: any[] })
       {/* Players Table */}
       <div className="rounded-xl border border-white/10 bg-zinc-950/50 overflow-hidden shadow-2xl">
         <table className="w-full text-sm text-left">
-          
           <thead className="bg-zinc-900/80 text-zinc-400 border-b border-white/10 text-xs uppercase tracking-wider font-semibold">
             <tr>
               <th className="px-6 py-4">Player Profile</th>
@@ -55,7 +75,7 @@ export function PlayersListClient({ initialPlayers }: { initialPlayers: any[] })
               <th className="px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
-          
+
           <tbody className="divide-y divide-white/5">
             {filteredPlayers.length === 0 ? (
               <tr>
@@ -63,60 +83,72 @@ export function PlayersListClient({ initialPlayers }: { initialPlayers: any[] })
                   No players found in database.
                 </td>
               </tr>
-            ) : filteredPlayers.map((p: any) => (
-              <tr key={p.id} className="hover:bg-white/[0.02] transition-colors group">
-                
-                {/* Profile Column */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-full flex items-center justify-center border border-white/10 font-bold tracking-tighter bg-emerald-500/20 text-emerald-400 uppercase">
-                      {(p.display_name || 'U').charAt(0)}
+            ) : (
+              filteredPlayers.map((p) => (
+                <tr
+                  key={p.id}
+                  className="hover:bg-white/[0.02] transition-colors group"
+                >
+                  {/* Profile Column */}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="size-10 rounded-full flex items-center justify-center border border-white/10 font-bold tracking-tighter bg-emerald-500/20 text-emerald-400 uppercase">
+                        {(p.display_name || "U").charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-medium text-zinc-100">
+                          {p.display_name || "Unknown User"}
+                        </div>
+                        <div className="text-zinc-500 text-xs mt-0.5 font-mono">
+                          {p.id.substring(0, 8)}...
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium text-zinc-100">{p.display_name || 'Unknown User'}</div>
-                      <div className="text-zinc-500 text-xs mt-0.5 font-mono">{p.id.substring(0, 8)}...</div>
+                  </td>
+
+                  {/* Status Column */}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-1.5">
+                      <Activity className="size-3.5 text-emerald-500" />
+                      <span className="text-[10px] font-mono tracking-widest font-bold uppercase text-emerald-500">
+                        ACTIVE
+                      </span>
                     </div>
-                  </div>
-                </td>
+                  </td>
 
-                {/* Status Column */}
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-1.5">
-                    <Activity className="size-3.5 text-emerald-500" />
-                    <span className="text-[10px] font-mono tracking-widest font-bold uppercase text-emerald-500">
-                      ACTIVE
-                    </span>
-                  </div>
-                </td>
+                  {/* Cases Solved Column */}
+                  <td className="px-6 py-4 font-mono">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="size-4 text-zinc-600" />
+                      <span
+                        className={
+                          (p.play_sessions?.[0]?.count ?? 0) > 0
+                            ? "text-zinc-200"
+                            : "text-zinc-600"
+                        }
+                      >
+                        {p.play_sessions?.[0]?.count || 0}
+                      </span>
+                    </div>
+                  </td>
 
-                {/* Cases Solved Column */}
-                <td className="px-6 py-4 font-mono">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="size-4 text-zinc-600" />
-                    <span className={p.play_sessions?.[0]?.count > 0 ? 'text-zinc-200' : 'text-zinc-600'}>
-                      {p.play_sessions?.[0]?.count || 0}
-                    </span>
-                  </div>
-                </td>
+                  {/* Joined At Column */}
+                  <td className="px-6 py-4 text-zinc-500 text-xs">
+                    {new Date(p.created_at).toLocaleDateString()}
+                  </td>
 
-                {/* Joined At Column */}
-                <td className="px-6 py-4 text-zinc-500 text-xs">
-                  {new Date(p.created_at).toLocaleDateString()}
-                </td>
-
-                {/* Actions Column */}
-                <td className="px-6 py-4 text-right">
-                  <button className="p-2 text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors group-hover:opacity-100 opacity-50">
-                    <MoreHorizontal className="size-4" />
-                  </button>
-                </td>
-
-              </tr>
-            ))}
+                  {/* Actions Column */}
+                  <td className="px-6 py-4 text-right">
+                    <button className="p-2 text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800 rounded transition-colors group-hover:opacity-100 opacity-50">
+                      <MoreHorizontal className="size-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
-
     </div>
-  )
+  );
 }

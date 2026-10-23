@@ -108,12 +108,16 @@ export async function GET(req: NextRequest) {
         },
       },
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API /api/admin/map-vector] GET error:", error);
+    const errorMsg =
+      error instanceof Error
+        ? error.message
+        : "Failed to fetch map vector data";
     return NextResponse.json(
       {
         success: false,
-        error: error?.message || "Failed to fetch map vector data",
+        error: errorMsg,
       },
       { status: 500 },
     );
@@ -181,12 +185,14 @@ export async function POST(req: NextRequest) {
       message: "Unified world map vector data saved successfully",
       updatedAt: dataToSave.updatedAt,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[API /api/admin/map-vector] POST error:", error);
+    const errorMsg =
+      error instanceof Error ? error.message : "Failed to save map vector data";
     return NextResponse.json(
       {
         success: false,
-        error: error?.message || "Failed to save map vector data",
+        error: errorMsg,
       },
       { status: 500 },
     );

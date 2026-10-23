@@ -23,7 +23,9 @@ export function WaitlistForm({
   className = "",
 }: WaitlistFormProps) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -42,7 +44,9 @@ export function WaitlistForm({
 
     if (!cleanEmail || !EMAIL_REGEX.test(cleanEmail)) {
       setStatus("error");
-      setErrorMessage("Vui lòng nhập định dạng email hợp lệ (ví dụ: detective@xplore.vn).");
+      setErrorMessage(
+        "Vui lòng nhập định dạng email hợp lệ (ví dụ: detective@xplore.vn).",
+      );
       return;
     }
 
@@ -71,12 +75,19 @@ export function WaitlistForm({
         source,
         timestamp: new Date().toISOString(),
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus("error");
-      if (err.name === "AbortError") {
-        setErrorMessage("Thời gian phản hồi quá lâu. Vui lòng kiểm tra kết nối mạng và thử lại.");
+      const isAbort = err instanceof Error && err.name === "AbortError";
+      if (isAbort) {
+        setErrorMessage(
+          "Thời gian phản hồi quá lâu. Vui lòng kiểm tra kết nối mạng và thử lại.",
+        );
       } else {
-        setErrorMessage(err.message || "Có lỗi kết nối. Vui lòng thử lại sau.");
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Có lỗi kết nối. Vui lòng thử lại sau.";
+        setErrorMessage(message || "Có lỗi kết nối. Vui lòng thử lại sau.");
       }
     } finally {
       clearTimeout(timer);
@@ -90,9 +101,12 @@ export function WaitlistForm({
       >
         <CheckCircle2 className="size-5 shrink-0 text-emerald-400" />
         <div>
-          <span className="font-bold text-emerald-200">ĐÃ NIÊM PHONG HỒ SƠ!</span>
+          <span className="font-bold text-emerald-200">
+            ĐÃ NIÊM PHONG HỒ SƠ!
+          </span>
           <p className="text-[0.75rem] text-emerald-300/80 mt-0.5">
-            Bạn sẽ nhận được mật mã điều tra sớm & thông báo phát hành qua email <strong className="text-emerald-100">{email}</strong>.
+            Bạn sẽ nhận được mật mã điều tra sớm & thông báo phát hành qua email{" "}
+            <strong className="text-emerald-100">{email}</strong>.
           </p>
         </div>
       </div>
@@ -101,7 +115,11 @@ export function WaitlistForm({
 
   if (variant === "compact") {
     return (
-      <form onSubmit={handleSubmit} className={`flex flex-col gap-2 w-full ${className}`} noValidate>
+      <form
+        onSubmit={handleSubmit}
+        className={`flex flex-col gap-2 w-full ${className}`}
+        noValidate
+      >
         <div className="relative flex items-center">
           <Mail className="absolute left-3 size-4 text-muted-foreground/60 pointer-events-none" />
           <input
@@ -156,7 +174,8 @@ export function WaitlistForm({
             Gia Nhập Lực Lượng Điều Tra Đặc Nhiệm
           </h3>
           <p className="text-xs text-zinc-400 font-mono leading-relaxed">
-            Để lại email để nhận thông báo sớm khi mở bản in Board Game vật lý và nhận gợi ý giải đố ẩn độc quyền.
+            Để lại email để nhận thông báo sớm khi mở bản in Board Game vật lý
+            và nhận gợi ý giải đố ẩn độc quyền.
           </p>
         </div>
 

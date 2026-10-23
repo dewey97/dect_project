@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Globe,
   Search,
@@ -15,24 +15,35 @@ import {
   ExternalLink,
   ShieldCheck,
   Loader2,
-  Sparkles
-} from 'lucide-react'
-import type { BrowserHistory } from '@/lib/types'
-import { cn } from '@/lib/utils'
-import { usePhoneData } from '@/lib/hooks/use-phone-data'
+  Sparkles,
+} from "lucide-react";
+import type { BrowserHistory } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { usePhoneData } from "@/lib/hooks/use-phone-data";
 
 interface SafariAppProps {
-  history?: BrowserHistory[]
-  onBackToHome?: () => void
+  history?: BrowserHistory[];
+  onBackToHome?: () => void;
+}
+
+interface SafariItem {
+  type?: string;
+  title_or_domain?: string;
+  content_or_url?: string;
+  timestamp?: string;
+  category?: string;
+  [key: string]: unknown;
 }
 
 export function SafariApp({ onBackToHome }: SafariAppProps) {
-  const { data: rawData, loading } = usePhoneData('apps')
+  const { data: rawData, loading } = usePhoneData("apps");
 
   // Filter items where type == 'SAFARI'
-  const safariItems = rawData.filter((item: any) => String(item.type).toUpperCase() === 'SAFARI')
+  const safariItems = (rawData as SafariItem[]).filter(
+    (item) => String(item.type).toUpperCase() === "SAFARI",
+  );
 
-  const [selectedItem, setSelectedItem] = useState<any | null>(null)
+  const [selectedItem, setSelectedItem] = useState<SafariItem | null>(null);
 
   return (
     <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden font-sans">
@@ -43,7 +54,9 @@ export function SafariApp({ onBackToHome }: SafariAppProps) {
           <div className="flex items-center gap-1.5 truncate flex-1 justify-center px-1">
             <ShieldCheck className="size-3.5 text-[#30D158] shrink-0" />
             <span className="text-white font-normal text-[12px] truncate">
-              {selectedItem ? (selectedItem.title_or_domain || 'safari://view') : 'google.com.vn'}
+              {selectedItem
+                ? selectedItem.title_or_domain || "safari://view"
+                : "google.com.vn"}
             </span>
           </div>
           <RotateCw className="size-3 text-[#8E8E93] shrink-0 cursor-pointer hover:text-white" />
@@ -63,50 +76,63 @@ export function SafariApp({ onBackToHome }: SafariAppProps) {
               <Globe className="size-7 stroke-[1.5]" />
             </div>
             <div className="space-y-1 max-w-[240px]">
-              <h2 className="text-[14px] font-bold text-white tracking-tight">Lịch sử trống</h2>
-              <p className="text-[11px] text-[#8E8E93]">Không tìm thấy dữ liệu tìm kiếm duyệt web.</p>
+              <h2 className="text-[14px] font-bold text-white tracking-tight">
+                Lịch sử trống
+              </h2>
+              <p className="text-[11px] text-[#8E8E93]">
+                Không tìm thấy dữ liệu tìm kiếm duyệt web.
+              </p>
             </div>
           </div>
         ) : (
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1">
               <span className="text-[11px] font-bold tracking-wider uppercase text-[#8E8E93] flex items-center gap-1">
-                <Clock className="size-3.5 text-[#0A84FF]" /> Lịch sử duyệt web & Tìm kiếm
+                <Clock className="size-3.5 text-[#0A84FF]" /> Lịch sử duyệt web
+                & Tìm kiếm
               </span>
-              <span className="text-[11px] text-[#636366] font-sans">{safariItems.length} mục</span>
+              <span className="text-[11px] text-[#636366] font-sans">
+                {safariItems.length} mục
+              </span>
             </div>
 
             <div className="space-y-1.5">
-              {safariItems.map((item: any, idx: number) => {
-                const title = item.title_or_domain || 'Trang web'
-                const content = item.content_or_url || ''
-                const timestamp = item.timestamp || ''
-                const category = item.category || 'Lịch sử'
+              {safariItems.map((item, idx: number) => {
+                const title = item.title_or_domain || "Trang web";
+                const content = item.content_or_url || "";
+                const timestamp = item.timestamp || "";
+                const category = item.category || "Lịch sử";
 
                 return (
                   <div
                     key={idx}
-                    onClick={() => setSelectedItem(selectedItem === item ? null : item)}
+                    onClick={() =>
+                      setSelectedItem(selectedItem === item ? null : item)
+                    }
                     className={cn(
-                      'p-2.5 rounded-xl border transition-all cursor-pointer text-left space-y-1.5',
+                      "p-2.5 rounded-xl border transition-all cursor-pointer text-left space-y-1.5",
                       selectedItem === item
-                        ? 'bg-[#1C1C1E] border-[#0A84FF]/60 ring-1 ring-[#0A84FF]/30 shadow-md'
-                        : 'bg-[#161618] border-[#2C2C2E] hover:bg-[#1C1C1E]'
+                        ? "bg-[#1C1C1E] border-[#0A84FF]/60 ring-1 ring-[#0A84FF]/30 shadow-md"
+                        : "bg-[#161618] border-[#2C2C2E] hover:bg-[#1C1C1E]",
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-1.5 truncate">
                         <Globe className="size-3.5 text-[#0A84FF] shrink-0" />
-                        <span className="text-[13px] font-semibold text-white truncate">{title}</span>
+                        <span className="text-[13px] font-semibold text-white truncate">
+                          {title}
+                        </span>
                       </div>
-                      <span className="text-[10.5px] text-[#8E8E93] font-sans shrink-0">{timestamp}</span>
+                      <span className="text-[10.5px] text-[#8E8E93] font-sans shrink-0">
+                        {timestamp}
+                      </span>
                     </div>
 
                     <p className="text-[12px] text-[#D1D1D6] line-clamp-2 leading-relaxed pl-5 font-mono">
                       {content}
                     </p>
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -122,6 +148,5 @@ export function SafariApp({ onBackToHome }: SafariAppProps) {
         <Layers className="size-4" />
       </div>
     </div>
-  )
+  );
 }
-

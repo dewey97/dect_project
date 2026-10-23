@@ -1,81 +1,87 @@
-'use client'
+"use client";
 
-import { useEffect, useState, useRef, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import { User, LogOut, Settings, UserCircle, Terminal } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { useEffect, useState, useRef, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { User, LogOut, Settings, UserCircle, Terminal } from "lucide-react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
 
 export function UserNav() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [isOpen, setIsOpen] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const supabase = useMemo(() => createClient(), [])
+  const router = useRouter();
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      const currentUser = session?.user ?? null
-      setUser(currentUser)
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
       if (currentUser) {
-        if (currentUser.app_metadata?.role === 'super_admin') {
-          setIsAdmin(true)
+        if (currentUser.app_metadata?.role === "super_admin") {
+          setIsAdmin(true);
         } else {
           const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', currentUser.id)
-            .single()
-          setIsAdmin(profile?.role === 'admin' || !profile)
+            .from("profiles")
+            .select("role")
+            .eq("id", currentUser.id)
+            .single();
+          setIsAdmin(profile?.role === "admin" || !profile);
         }
       } else {
-        setIsAdmin(false)
+        setIsAdmin(false);
       }
-      setLoading(false)
-    }
-    getUser()
+      setLoading(false);
+    };
+    getUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      const currentUser = session?.user ?? null
-      setUser(currentUser)
-      if (!currentUser) setIsAdmin(false)
-    })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      if (!currentUser) setIsAdmin(false);
+    });
 
-    return () => subscription.unsubscribe()
-  }, [supabase])
+    return () => subscription.unsubscribe();
+  }, [supabase]);
 
   // Xử lý click ra ngoài để đóng menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    setIsOpen(false)
-    router.refresh()
-  }
+    await supabase.auth.signOut();
+    setIsOpen(false);
+    router.refresh();
+  };
 
   if (loading) {
-    return (
-      <div className="w-9 h-9 animate-pulse bg-muted rounded-full" />
-    )
+    return <div className="w-9 h-9 animate-pulse bg-muted rounded-full" />;
   }
 
   if (user) {
-    const firstLetter = user.email?.charAt(0).toUpperCase() || 'U'
-    const isSuperAdmin = user.app_metadata?.role === 'super_admin'
-    
+    const firstLetter = user.email?.charAt(0).toUpperCase() || "U";
+    const isSuperAdmin = user.app_metadata?.role === "super_admin";
+
     return (
       <div className="relative" ref={dropdownRef}>
-        <button 
+        <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center justify-center w-9 h-9 rounded-full bg-primary text-primary-foreground font-semibold shadow-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
           title="Tài khoản của bạn"
@@ -87,8 +93,12 @@ export function UserNav() {
           <div className="absolute right-0 mt-2 w-56 bg-popover text-popover-foreground rounded-xl shadow-lg border border-border/60 p-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="px-3 py-2 border-b border-border/60 mb-1 flex items-center justify-between">
               <div className="overflow-hidden">
-                <p className="text-xs text-muted-foreground">Đã đăng nhập bằng</p>
-                <p className="text-sm font-medium truncate" title={user.email}>{user.email}</p>
+                <p className="text-xs text-muted-foreground">
+                  Đã đăng nhập bằng
+                </p>
+                <p className="text-sm font-medium truncate" title={user.email}>
+                  {user.email}
+                </p>
               </div>
               {isAdmin && (
                 <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-destructive text-destructive-foreground ml-2">
@@ -96,13 +106,13 @@ export function UserNav() {
                 </span>
               )}
             </div>
-            
+
             <div className="p-1 flex flex-col gap-1">
               {isAdmin && (
-                <button 
+                <button
                   onClick={() => {
-                    setIsOpen(false)
-                    router.push('/studio')
+                    setIsOpen(false);
+                    router.push("/studio");
                   }}
                   className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 transition-colors text-left font-medium border border-indigo-500/20 mb-1"
                 >
@@ -119,10 +129,10 @@ export function UserNav() {
                 Cài đặt
               </button>
             </div>
-            
+
             <div className="border-t border-border/60 mt-1 p-1">
-              <button 
-                onClick={handleLogout} 
+              <button
+                onClick={handleLogout}
                 className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-destructive/10 hover:text-destructive transition-colors text-left text-destructive font-medium"
               >
                 <LogOut className="w-4 h-4" />
@@ -132,16 +142,16 @@ export function UserNav() {
           </div>
         )}
       </div>
-    )
+    );
   }
 
   return (
-    <button 
-      onClick={() => router.push('/login')}
+    <button
+      onClick={() => router.push("/login")}
       className="p-2 hover:bg-accent hover:text-accent-foreground rounded-full transition-colors cursor-pointer flex items-center justify-center"
       title="Đăng nhập"
     >
       <User className="size-5" />
     </button>
-  )
+  );
 }

@@ -13,7 +13,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { CaseLintResult, CaseLintIssue } from "@/lib/checkpoints/case-linter";
+import type {
+  CaseLintResult,
+  CaseLintIssue,
+} from "@/lib/checkpoints/case-linter";
 
 interface CaseLintModalProps {
   isOpen: boolean;
@@ -102,7 +105,8 @@ export function CaseLintModal({
                   Kịch bản vụ án hoàn toàn hợp lệ!
                 </p>
                 <p className="text-[11px] text-emerald-300/80">
-                  Không phát hiện chu trình, thiếu sót đáp án hay node cô lập nào.
+                  Không phát hiện chu trình, thiếu sót đáp án hay node cô lập
+                  nào.
                 </p>
               </div>
             </div>
@@ -128,7 +132,8 @@ export function CaseLintModal({
                       : `Phát hiện ${result.warningCount} cảnh báo cần lưu ý`}
                   </p>
                   <p className="text-[11px] opacity-80">
-                    Vui lòng rà soát danh sách bên dưới trước khi xuất bản vụ án.
+                    Vui lòng rà soát danh sách bên dưới trước khi xuất bản vụ
+                    án.
                   </p>
                 </div>
               </div>
@@ -150,19 +155,21 @@ export function CaseLintModal({
 
         {/* Filter Chips */}
         <div className="flex items-center gap-1.5 border-b border-white/5 px-5 py-2 text-xs">
-          {[
-            { key: "all", label: `Tất cả (${result.issues.length})` },
-            { key: "error", label: `Lỗi (${result.errorCount})` },
-            { key: "warning", label: `Cảnh báo (${result.warningCount})` },
-            {
-              key: "info",
-              label: `Gợi ý (${result.issues.length - result.errorCount - result.warningCount})`,
-            },
-          ].map((item) => (
+          {(
+            [
+              { key: "all", label: `Tất cả (${result.issues.length})` },
+              { key: "error", label: `Lỗi (${result.errorCount})` },
+              { key: "warning", label: `Cảnh báo (${result.warningCount})` },
+              {
+                key: "info",
+                label: `Gợi ý (${result.issues.length - result.errorCount - result.warningCount})`,
+              },
+            ] as const
+          ).map((item) => (
             <button
               key={item.key}
               type="button"
-              onClick={() => setFilter(item.key as any)}
+              onClick={() => setFilter(item.key)}
               className={cn(
                 "rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors cursor-pointer",
                 filter === item.key

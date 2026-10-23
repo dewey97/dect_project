@@ -559,7 +559,7 @@ export interface ChassisProps {
 }
 ```
 
-CSS: bỏ `bg-[url(...)]` khỏi className, thêm `style={{ backgroundImage: wallpaperUrl ? `url(${wallpaperUrl})` : undefined }}` vào `data-phone-screen` div.
+CSS: bỏ `bg-url-placeholder` khỏi className, thêm `style={{ backgroundImage: wallpaperUrl ? `url(${wallpaperUrl})` : undefined }}` vào `data-phone-screen` div.
 
 ### 4.3. `camera-app.tsx`
 

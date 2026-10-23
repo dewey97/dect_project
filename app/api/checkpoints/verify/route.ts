@@ -99,12 +99,14 @@ export async function POST(request: Request) {
 
     res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
     return res;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in /api/checkpoints/verify:", error);
+    const message =
+      error instanceof Error ? error.message : "Lỗi xử lý yêu cầu chấm điểm.";
     const res = NextResponse.json(
       {
         success: false,
-        error: error?.message || "Lỗi xử lý yêu cầu chấm điểm.",
+        error: message,
       },
       { status: 500 },
     );
