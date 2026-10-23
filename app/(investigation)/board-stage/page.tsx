@@ -5,12 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useCheckpoints } from "@/components/investigation/checkpoints-context";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import type { Checkpoint } from "@/lib/types";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import {
-  CASE_000_PDFS,
-  CASE_000_EVIDENCE,
-} from "@/components/investigation/evidence/evidence-data";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
 import {
   PhaseUnlockedModal,
@@ -146,6 +143,7 @@ function BoardStageContent() {
     setActiveModal("reinvestigate"),
   );
 
+  const { pdfs: casePdfs, evidence: caseEvs } = useCaseEvidence(caseId);
   const isCase000 = caseId === "case-000" || caseId === "case_000";
 
   useEffect(() => {
@@ -154,11 +152,11 @@ function BoardStageContent() {
     if (isIntroSeen !== "true" && isCase000) {
       setUnlockedModalData({
         unlockedPhase: 0,
-        newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-        newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
+        newPdfs: casePdfs.filter((d) => d.phase === 0),
+        newEvidence: caseEvs.filter((e) => e.phase === 0),
       });
     }
-  }, [completedCheckpointIds.length, isCase000]);
+  }, [completedCheckpointIds.length, isCase000, casePdfs, caseEvs]);
 
   const handleAnswerSelect = (cpId: string, option: string) => {
     detectiveAudio.playTypewriterClick();
@@ -204,8 +202,8 @@ function BoardStageContent() {
     if (nextPhase <= 4) {
       setUnlockedModalData({
         unlockedPhase: nextPhase,
-        newPdfs: CASE_000_PDFS.filter((d) => d.phase === nextPhase),
-        newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === nextPhase),
+        newPdfs: casePdfs.filter((d) => d.phase === nextPhase),
+        newEvidence: caseEvs.filter((e) => e.phase === nextPhase),
       });
     }
   };

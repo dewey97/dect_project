@@ -1,65 +1,65 @@
-'use client'
+"use client";
 
-import React, { useEffect, useRef, useState, useCallback } from 'react'
-import * as THREE from 'three'
-import { ZoomIn, ZoomOut, RotateCcw, Play, Pause } from 'lucide-react'
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import * as THREE from "three";
+import { ZoomIn, ZoomOut, RotateCcw, Play, Pause } from "lucide-react";
 
 export interface HotspotItem {
-  id: string
-  num: number
-  photoId?: string
-  title?: string
-  x: number // percentage 0-100
-  y: number // percentage 0-100
-  yaw?: number // degrees (-180 to 180)
-  pitch?: number // degrees (-85 to 85)
-  imageUrl?: string
-  driveUrl?: string
-  soundFile?: string
-  soundCaption?: string
+  id: string;
+  num: number;
+  photoId?: string;
+  title?: string;
+  x: number; // percentage 0-100
+  y: number; // percentage 0-100
+  yaw?: number; // degrees (-180 to 180)
+  pitch?: number; // degrees (-85 to 85)
+  imageUrl?: string;
+  driveUrl?: string;
+  soundFile?: string;
+  soundCaption?: string;
 }
 
 interface Scene360ViewerProps {
-  imageUrl?: string
-  fallbackImageUrl?: string
-  hotspots?: HotspotItem[]
-  onSelectSpot?: (spot: HotspotItem) => void
-  selectedSpotId?: string | null
-  hideControls?: boolean
-  hideCompass?: boolean
-  disableZoom?: boolean
-  rotateOnHover?: boolean
+  imageUrl?: string;
+  fallbackImageUrl?: string;
+  hotspots?: HotspotItem[];
+  onSelectSpot?: (spot: HotspotItem) => void;
+  selectedSpotId?: string | null;
+  hideControls?: boolean;
+  hideCompass?: boolean;
+  disableZoom?: boolean;
+  rotateOnHover?: boolean;
 }
 
 export function Scene360Viewer({
-  imageUrl = '/images/cases/case_000/crime_scene_360.jpg',
-  fallbackImageUrl = '/images/cases/case_000/PANORAMA.png',
+  imageUrl,
+  fallbackImageUrl,
   hotspots = [],
   onSelectSpot,
   selectedSpotId,
   hideControls = false,
   hideCompass = false,
   disableZoom = false,
-  rotateOnHover = false
+  rotateOnHover = false,
 }: Scene360ViewerProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Screen positions for 2D UI hotspots mapped from 3D sphere
   const [screenHotspots, setScreenHotspots] = useState<
     Array<{
-      id: string
-      x: number
-      y: number
-      visible: boolean
-      spot: HotspotItem
+      id: string;
+      x: number;
+      y: number;
+      visible: boolean;
+      spot: HotspotItem;
     }>
-  >([])
+  >([]);
 
-  const [fov, setFov] = useState(70)
-  const [heading, setHeading] = useState(0) // 0 - 360 for compass
-  const [isLoading, setIsLoading] = useState(true)
-  const [autoRotate, setAutoRotate] = useState(false)
+  const [fov, setFov] = useState(70);
+  const [heading, setHeading] = useState(0); // 0 - 360 for compass
+  const [isLoading, setIsLoading] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(false);
 
   // References for Three.js state
   const stateRef = useRef({
@@ -78,63 +78,68 @@ export function Scene360Viewer({
     camera: null as THREE.PerspectiveCamera | null,
     renderer: null as THREE.WebGLRenderer | null,
     scene: null as THREE.Scene | null,
-    animationFrameId: 0
-  })
+    animationFrameId: 0,
+  });
 
   // Convert (yaw, pitch) to 3D Vector3 on sphere surface
-  const getVectorFromYawPitch = useCallback((yawDeg: number, pitchDeg: number, radius = 450) => {
-    const phi = THREE.MathUtils.degToRad(90 - pitchDeg)
-    const theta = THREE.MathUtils.degToRad(yawDeg)
+  const getVectorFromYawPitch = useCallback(
+    (yawDeg: number, pitchDeg: number, radius = 450) => {
+      const phi = THREE.MathUtils.degToRad(90 - pitchDeg);
+      const theta = THREE.MathUtils.degToRad(yawDeg);
 
-    const x = radius * Math.sin(phi) * Math.sin(theta)
-    const y = radius * Math.cos(phi)
-    const z = radius * Math.sin(phi) * Math.cos(theta)
-    return new THREE.Vector3(x, y, z)
-  }, [])
+      const x = radius * Math.sin(phi) * Math.sin(theta);
+      const y = radius * Math.cos(phi);
+      const z = radius * Math.sin(phi) * Math.cos(theta);
+      return new THREE.Vector3(x, y, z);
+    },
+    [],
+  );
 
   // Resolve (yaw, pitch) from spot
   const getSpotAngles = useCallback((spot: HotspotItem) => {
-    const yaw = typeof spot.yaw === 'number' ? spot.yaw : (spot.x / 100) * 360 - 180
-    const pitch = typeof spot.pitch === 'number' ? spot.pitch : 90 - (spot.y / 100) * 180
-    return { yaw, pitch }
-  }, [])
+    const yaw =
+      typeof spot.yaw === "number" ? spot.yaw : (spot.x / 100) * 360 - 180;
+    const pitch =
+      typeof spot.pitch === "number" ? spot.pitch : 90 - (spot.y / 100) * 180;
+    return { yaw, pitch };
+  }, []);
 
   useEffect(() => {
-    const container = containerRef.current
-    const canvas = canvasRef.current
-    if (!container || !canvas) return
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
+    if (!container || !canvas) return;
 
-    const state = stateRef.current
-    const width = container.clientWidth || window.innerWidth
-    const height = container.clientHeight || window.innerHeight
+    const state = stateRef.current;
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
 
     // 1. SCENE & CAMERA
-    const scene = new THREE.Scene()
-    state.scene = scene
+    const scene = new THREE.Scene();
+    state.scene = scene;
 
-    const camera = new THREE.PerspectiveCamera(70, width / height, 1, 1100)
-    state.camera = camera
+    const camera = new THREE.PerspectiveCamera(70, width / height, 1, 1100);
+    state.camera = camera;
 
     // 2. RENDERER
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
       alpha: false,
-      powerPreference: 'high-performance'
-    })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
-    renderer.setSize(width, height)
-    state.renderer = renderer
+      powerPreference: "high-performance",
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height);
+    state.renderer = renderer;
 
     // 3. 360 SPHERE MESH
-    const geometry = new THREE.SphereGeometry(500, 64, 40)
-    geometry.scale(-1, 1, 1) // Invert normals so texture is visible inside
+    const geometry = new THREE.SphereGeometry(500, 64, 40);
+    geometry.scale(-1, 1, 1); // Invert normals so texture is visible inside
 
-    const textureLoader = new THREE.TextureLoader()
-    setIsLoading(true)
-    let disposed = false
-    let loadedTexture: THREE.Texture | null = null
-    let loadedMaterial: THREE.Material | null = null
+    const textureLoader = new THREE.TextureLoader();
+    setIsLoading(true);
+    let disposed = false;
+    let loadedTexture: THREE.Texture | null = null;
+    let loadedMaterial: THREE.Material | null = null;
 
     const loadTexture = (url: string, fallback?: string) => {
       textureLoader.load(
@@ -142,229 +147,267 @@ export function Scene360Viewer({
         (texture) => {
           // Viewer đã đóng trước khi ảnh tải xong: giải phóng ngay, không gắn vào scene.
           if (disposed) {
-            texture.dispose()
-            return
+            texture.dispose();
+            return;
           }
-          loadedTexture = texture
-          texture.colorSpace = THREE.SRGBColorSpace
-          texture.minFilter = THREE.LinearFilter
-          texture.generateMipmaps = false
+          loadedTexture = texture;
+          texture.colorSpace = THREE.SRGBColorSpace;
+          texture.minFilter = THREE.LinearFilter;
+          texture.generateMipmaps = false;
 
-          const material = new THREE.MeshBasicMaterial({ map: texture })
-          loadedMaterial = material
-          const mesh = new THREE.Mesh(geometry, material)
-          scene.add(mesh)
-          setIsLoading(false)
+          const material = new THREE.MeshBasicMaterial({ map: texture });
+          loadedMaterial = material;
+          const mesh = new THREE.Mesh(geometry, material);
+          scene.add(mesh);
+          setIsLoading(false);
         },
         undefined,
         () => {
           if (fallback && fallback !== url) {
-            loadTexture(fallback)
+            loadTexture(fallback);
           } else {
-            setIsLoading(false)
+            setIsLoading(false);
           }
-        }
-      )
-    }
+        },
+      );
+    };
 
-    loadTexture(imageUrl, fallbackImageUrl)
+    if (imageUrl) {
+      loadTexture(imageUrl, fallbackImageUrl);
+    } else if (fallbackImageUrl) {
+      loadTexture(fallbackImageUrl);
+    } else {
+      setIsLoading(false);
+    }
 
     // 4. ANIMATION LOOP & HOTSPOT PROJECTION
     const renderLoop = () => {
       if (autoRotate && !state.isUserInteracting) {
-        state.targetLon += 0.08
+        state.targetLon += 0.08;
       }
 
-      state.lat = THREE.MathUtils.lerp(state.lat, state.targetLat, 0.15)
-      state.lon = THREE.MathUtils.lerp(state.lon, state.targetLon, 0.15)
-      state.lat = Math.max(-85, Math.min(85, state.lat))
+      state.lat = THREE.MathUtils.lerp(state.lat, state.targetLat, 0.15);
+      state.lon = THREE.MathUtils.lerp(state.lon, state.targetLon, 0.15);
+      state.lat = Math.max(-85, Math.min(85, state.lat));
 
-      const phi = THREE.MathUtils.degToRad(90 - state.lat)
-      const theta = THREE.MathUtils.degToRad(state.lon)
+      const phi = THREE.MathUtils.degToRad(90 - state.lat);
+      const theta = THREE.MathUtils.degToRad(state.lon);
 
-      const targetX = 500 * Math.sin(phi) * Math.cos(theta)
-      const targetY = 500 * Math.cos(phi)
-      const targetZ = 500 * Math.sin(phi) * Math.sin(theta)
+      const targetX = 500 * Math.sin(phi) * Math.cos(theta);
+      const targetY = 500 * Math.cos(phi);
+      const targetZ = 500 * Math.sin(phi) * Math.sin(theta);
 
-      camera.lookAt(targetX, targetY, targetZ)
-      renderer.render(scene, camera)
+      camera.lookAt(targetX, targetY, targetZ);
+      renderer.render(scene, camera);
 
       // Calculate heading for compass (0 to 360 deg)
-      const curHeading = Math.round(((state.lon % 360) + 360) % 360)
-      setHeading(curHeading)
+      const curHeading = Math.round(((state.lon % 360) + 360) % 360);
+      setHeading(curHeading);
 
       // Project 3D Hotspots to 2D Screen Coordinates
       if (container) {
-        const cWidth = container.clientWidth
-        const cHeight = container.clientHeight
+        const cWidth = container.clientWidth;
+        const cHeight = container.clientHeight;
         const projected = hotspots.map((spot) => {
-          const { yaw, pitch } = getSpotAngles(spot)
-          const vec = getVectorFromYawPitch(yaw, pitch, 450)
+          const { yaw, pitch } = getSpotAngles(spot);
+          const vec = getVectorFromYawPitch(yaw, pitch, 450);
 
-          const camDir = new THREE.Vector3()
-          camera.getWorldDirection(camDir)
-          const dot = vec.clone().normalize().dot(camDir)
-          const isVisible = dot > 0.15
+          const camDir = new THREE.Vector3();
+          camera.getWorldDirection(camDir);
+          const dot = vec.clone().normalize().dot(camDir);
+          const isVisible = dot > 0.15;
 
-          vec.project(camera)
+          vec.project(camera);
 
-          const screenX = ((vec.x + 1) * cWidth) / 2
-          const screenY = ((-vec.y + 1) * cHeight) / 2
+          const screenX = ((vec.x + 1) * cWidth) / 2;
+          const screenY = ((-vec.y + 1) * cHeight) / 2;
 
           return {
             id: spot.id,
             x: screenX,
             y: screenY,
-            visible: isVisible && screenX >= -30 && screenX <= cWidth + 30 && screenY >= -30 && screenY <= cHeight + 30,
-            spot
-          }
-        })
-        setScreenHotspots(projected)
+            visible:
+              isVisible &&
+              screenX >= -30 &&
+              screenX <= cWidth + 30 &&
+              screenY >= -30 &&
+              screenY <= cHeight + 30,
+            spot,
+          };
+        });
+        setScreenHotspots(projected);
       }
 
-      state.animationFrameId = requestAnimationFrame(renderLoop)
-    }
+      state.animationFrameId = requestAnimationFrame(renderLoop);
+    };
 
-    renderLoop()
+    renderLoop();
 
     // 5. RESIZE LISTENER & RESIZE OBSERVER
     const handleResize = () => {
-      if (!container || !camera || !renderer) return
-      const w = container.clientWidth
-      const h = container.clientHeight
-      if (w === 0 || h === 0) return
-      camera.aspect = w / h
-      camera.updateProjectionMatrix()
-      renderer.setSize(w, h)
-    }
+      if (!container || !camera || !renderer) return;
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (w === 0 || h === 0) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener("resize", handleResize);
 
-    let resizeObserver: ResizeObserver | null = null
-    if (typeof ResizeObserver !== 'undefined') {
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(() => {
-        handleResize()
-      })
-      resizeObserver.observe(container)
+        handleResize();
+      });
+      resizeObserver.observe(container);
     }
 
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener("resize", handleResize);
       if (resizeObserver) {
-        resizeObserver.disconnect()
+        resizeObserver.disconnect();
       }
-      cancelAnimationFrame(state.animationFrameId)
-      disposed = true
-      renderer.dispose()
-      geometry.dispose()
-      loadedMaterial?.dispose()
-      loadedTexture?.dispose()
-    }
-  }, [imageUrl, fallbackImageUrl, hotspots, getVectorFromYawPitch, getSpotAngles, autoRotate])
+      cancelAnimationFrame(state.animationFrameId);
+      disposed = true;
+      renderer.dispose();
+      geometry.dispose();
+      loadedMaterial?.dispose();
+      loadedTexture?.dispose();
+    };
+  }, [
+    imageUrl,
+    fallbackImageUrl,
+    hotspots,
+    getVectorFromYawPitch,
+    getSpotAngles,
+    autoRotate,
+  ]);
 
   // MOUSE & TOUCH EVENT HANDLERS
   const handlePointerDown = (e: React.PointerEvent) => {
-    const state = stateRef.current
-    state.isUserInteracting = true
-    state.onPointerDownPointerX = e.clientX
-    state.onPointerDownPointerY = e.clientY
-    state.onPointerDownLon = state.targetLon
-    state.onPointerDownLat = state.targetLat
+    const state = stateRef.current;
+    state.isUserInteracting = true;
+    state.onPointerDownPointerX = e.clientX;
+    state.onPointerDownPointerY = e.clientY;
+    state.onPointerDownLon = state.targetLon;
+    state.onPointerDownLat = state.targetLat;
 
-    state.lastPointerX = e.clientX
-    state.lastPointerY = e.clientY
-    state.hasLastPointer = true
+    state.lastPointerX = e.clientX;
+    state.lastPointerY = e.clientY;
+    state.hasLastPointer = true;
 
     try {
-      e.currentTarget.setPointerCapture(e.pointerId)
+      e.currentTarget.setPointerCapture(e.pointerId);
     } catch {}
-  }
+  };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    const state = stateRef.current
+    const state = stateRef.current;
 
     // Chế độ xoay tự do theo chuyển động di chuột không cần click (Hover to rotate)
     if (rotateOnHover) {
       if (!state.hasLastPointer) {
-        state.lastPointerX = e.clientX
-        state.lastPointerY = e.clientY
-        state.hasLastPointer = true
-        return
+        state.lastPointerX = e.clientX;
+        state.lastPointerY = e.clientY;
+        state.hasLastPointer = true;
+        return;
       }
-      const deltaX = e.clientX - state.lastPointerX
-      const deltaY = e.clientY - state.lastPointerY
-      state.lastPointerX = e.clientX
-      state.lastPointerY = e.clientY
+      const deltaX = e.clientX - state.lastPointerX;
+      const deltaY = e.clientY - state.lastPointerY;
+      state.lastPointerX = e.clientX;
+      state.lastPointerY = e.clientY;
 
-      const factor = ((state.camera?.fov || 70) / 70) * 0.22
-      state.targetLon += deltaX * factor
-      state.targetLat -= deltaY * factor
-      return
+      const factor = ((state.camera?.fov || 70) / 70) * 0.22;
+      state.targetLon += deltaX * factor;
+      state.targetLat -= deltaY * factor;
+      return;
     }
 
-    if (!state.isUserInteracting) return
+    if (!state.isUserInteracting) return;
 
-    const factor = ((state.camera?.fov || 70) / 70) * 0.18
-    state.targetLon = (e.clientX - state.onPointerDownPointerX) * factor + state.onPointerDownLon
-    state.targetLat = (state.onPointerDownPointerY - e.clientY) * factor + state.onPointerDownLat
-  }
+    const factor = ((state.camera?.fov || 70) / 70) * 0.18;
+    state.targetLon =
+      (e.clientX - state.onPointerDownPointerX) * factor +
+      state.onPointerDownLon;
+    state.targetLat =
+      (state.onPointerDownPointerY - e.clientY) * factor +
+      state.onPointerDownLat;
+  };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    stateRef.current.isUserInteracting = false
-    stateRef.current.hasLastPointer = false
+    stateRef.current.isUserInteracting = false;
+    stateRef.current.hasLastPointer = false;
     try {
-      e.currentTarget.releasePointerCapture(e.pointerId)
+      e.currentTarget.releasePointerCapture(e.pointerId);
     } catch {}
-  }
+  };
 
   const handlePointerLeave = () => {
-    stateRef.current.hasLastPointer = false
-    stateRef.current.isUserInteracting = false
-  }
+    stateRef.current.hasLastPointer = false;
+    stateRef.current.isUserInteracting = false;
+  };
 
   // WHEEL ZOOM HANDLER
   const handleWheel = (e: React.WheelEvent) => {
-    if (disableZoom) return // Bỏ zoom in / zoom out theo yêu cầu
-    e.preventDefault()
+    if (disableZoom) return; // Bỏ zoom in / zoom out theo yêu cầu
+    e.preventDefault();
     setFov((prev) => {
-      const nextFov = Math.max(35, Math.min(85, prev + e.deltaY * 0.05))
+      const nextFov = Math.max(35, Math.min(85, prev + e.deltaY * 0.05));
       if (stateRef.current.camera) {
-        stateRef.current.camera.fov = nextFov
-        stateRef.current.camera.updateProjectionMatrix()
+        stateRef.current.camera.fov = nextFov;
+        stateRef.current.camera.updateProjectionMatrix();
       }
-      return nextFov
-    })
-  }
+      return nextFov;
+    });
+  };
 
   // ZOOM BUTTONS
   const handleZoom = (delta: number) => {
     setFov((prev) => {
-      const nextFov = Math.max(35, Math.min(85, prev + delta))
+      const nextFov = Math.max(35, Math.min(85, prev + delta));
       if (stateRef.current.camera) {
-        stateRef.current.camera.fov = nextFov
-        stateRef.current.camera.updateProjectionMatrix()
+        stateRef.current.camera.fov = nextFov;
+        stateRef.current.camera.updateProjectionMatrix();
       }
-      return nextFov
-    })
-  }
+      return nextFov;
+    });
+  };
 
   // RESET VIEW
   const handleResetView = () => {
-    const state = stateRef.current
-    state.targetLon = 0
-    state.targetLat = 0
-    setFov(70)
+    const state = stateRef.current;
+    state.targetLon = 0;
+    state.targetLat = 0;
+    setFov(70);
     if (state.camera) {
-      state.camera.fov = 70
-      state.camera.updateProjectionMatrix()
+      state.camera.fov = 70;
+      state.camera.updateProjectionMatrix();
     }
-  }
+  };
 
   // Compass cardinal text
-  let dirName = 'BẮC'
-  if (heading >= 45 && heading < 135) dirName = 'ĐÔNG'
-  else if (heading >= 135 && heading < 225) dirName = 'NAM'
-  else if (heading >= 225 && heading < 315) dirName = 'TÂY'
+  let dirName = "BẮC";
+  if (heading >= 45 && heading < 135) dirName = "ĐÔNG";
+  else if (heading >= 135 && heading < 225) dirName = "NAM";
+  else if (heading >= 225 && heading < 315) dirName = "TÂY";
+
+  if (!imageUrl && !fallbackImageUrl) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center bg-[#060402] text-[#a89078] p-6 text-center select-none">
+        <div className="w-12 h-12 rounded-full border border-[#59341c] bg-[#1a0e08] flex items-center justify-center mb-3 text-[#d9a066]">
+          <RotateCcw className="size-6 opacity-60" />
+        </div>
+        <p className="text-sm font-mono uppercase tracking-wider text-[#d9a066]">
+          Chưa có ảnh hiện trường 360
+        </p>
+        <p className="text-xs text-[#8c7b6d] mt-1 max-w-sm">
+          Vụ án này chưa được thiết lập ảnh toàn cảnh Panorama hoặc ảnh cầu 360.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -376,7 +419,7 @@ export function Scene360Viewer({
       onPointerLeave={handlePointerLeave}
       onWheel={handleWheel}
       className={`relative w-full h-full bg-[#050403] select-none overflow-hidden touch-none ${
-        rotateOnHover ? 'cursor-move' : 'cursor-grab active:cursor-grabbing'
+        rotateOnHover ? "cursor-move" : "cursor-grab active:cursor-grabbing"
       }`}
     >
       {/* 3D WEBGL CANVAS */}
@@ -394,8 +437,8 @@ export function Scene360Viewer({
 
       {/* 3D PROJECTED HOTSPOTS */}
       {screenHotspots.map(({ id, x, y, visible, spot }) => {
-        if (!visible) return null
-        const isSelected = selectedSpotId === spot.id
+        if (!visible) return null;
+        const isSelected = selectedSpotId === spot.id;
 
         return (
           <div
@@ -403,18 +446,18 @@ export function Scene360Viewer({
             style={{
               transform: `translate3d(${x}px, ${y}px, 0)`,
               left: 0,
-              top: 0
+              top: 0,
             }}
             className="absolute -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto"
           >
             <button
               type="button"
               onClick={(e) => {
-                e.stopPropagation()
-                onSelectSpot?.(spot)
+                e.stopPropagation();
+                onSelectSpot?.(spot);
               }}
               className="group relative flex items-center justify-center cursor-pointer focus:outline-none p-2"
-              aria-label={`Điểm khám xét #${spot.num} - ${spot.title || ''}`}
+              aria-label={`Điểm khám xét #${spot.num} - ${spot.title || ""}`}
             >
               {/* Radar pulse effect behind pin */}
               <div className="absolute size-8 sm:size-9 rounded-full border border-red-500/60 animate-ping pointer-events-none" />
@@ -423,8 +466,8 @@ export function Scene360Viewer({
               <div
                 className={`size-7 sm:size-8 rounded-full text-white font-bold text-xs sm:text-[13px] font-mono flex items-center justify-center shadow-2xl transition-transform duration-150 group-hover:scale-125 border ${
                   isSelected
-                    ? 'bg-amber-500 border-amber-200 text-neutral-950 ring-2 ring-amber-400/80 scale-125'
-                    : 'bg-[#cc1818] group-hover:bg-[#ee2222] border-[#ffe4e4]/80'
+                    ? "bg-amber-500 border-amber-200 text-neutral-950 ring-2 ring-amber-400/80 scale-125"
+                    : "bg-[#cc1818] group-hover:bg-[#ee2222] border-[#ffe4e4]/80"
                 }`}
               >
                 {spot.num}
@@ -438,7 +481,7 @@ export function Scene360Viewer({
               )}
             </button>
           </div>
-        )
+        );
       })}
 
       {/* TOP-LEFT COMPASS HUD */}
@@ -464,25 +507,29 @@ export function Scene360Viewer({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation()
-              setAutoRotate((prev) => !prev)
+              e.stopPropagation();
+              setAutoRotate((prev) => !prev);
             }}
             className={`p-1.5 rounded transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-mono ${
               autoRotate
-                ? 'bg-amber-600/80 text-white'
-                : 'text-[#d9a066] hover:text-white hover:bg-[#382314]'
+                ? "bg-amber-600/80 text-white"
+                : "text-[#d9a066] hover:text-white hover:bg-[#382314]"
             }`}
-            title={autoRotate ? 'Dừng tự động xoay' : 'Bật tự động xoay 360°'}
+            title={autoRotate ? "Dừng tự động xoay" : "Bật tự động xoay 360°"}
           >
-            {autoRotate ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
+            {autoRotate ? (
+              <Pause className="size-3.5" />
+            ) : (
+              <Play className="size-3.5" />
+            )}
             <span className="hidden sm:inline">Tự xoay</span>
           </button>
           <div className="w-px h-4 bg-[#593c26]" />
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation()
-              handleZoom(-10)
+              e.stopPropagation();
+              handleZoom(-10);
             }}
             className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
             title="Phóng to góc nhìn"
@@ -492,8 +539,8 @@ export function Scene360Viewer({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation()
-              handleZoom(10)
+              e.stopPropagation();
+              handleZoom(10);
             }}
             className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
             title="Thu nhỏ góc nhìn"
@@ -504,8 +551,8 @@ export function Scene360Viewer({
           <button
             type="button"
             onClick={(e) => {
-              e.stopPropagation()
-              handleResetView()
+              e.stopPropagation();
+              handleResetView();
             }}
             className="p-1.5 text-[#d9a066] hover:text-white hover:bg-[#382314] rounded transition-colors cursor-pointer"
             title="Đặt lại hướng nhìn ban đầu"
@@ -515,5 +562,5 @@ export function Scene360Viewer({
         </div>
       )}
     </div>
-  )
+  );
 }

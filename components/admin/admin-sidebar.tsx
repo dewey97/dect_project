@@ -18,6 +18,7 @@ import {
   ChevronRight,
   UserRound,
   Smartphone,
+  Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -67,6 +68,12 @@ const navGroups: NavGroup[] = [
         shortName: "Điện thoại",
         href: "/studio/phone",
         icon: Smartphone,
+      },
+      {
+        name: "Evidence Studio",
+        shortName: "Chứng cứ",
+        href: "/studio/evidence",
+        icon: Archive,
       },
       {
         name: "Nhân vật",

@@ -357,3 +357,27 @@ export interface DbPhoneBrowserHistory {
   created_at: string;
   updated_at: string;
 }
+
+// WT-2
+/** Bảng case_evidence (M3 / WT-2) */
+export interface DbCaseEvidence {
+  id: string;
+  case_slug: string;
+  code: string;
+  title: string;
+  kind: "pdf" | "image" | "photo" | "audio" | "object";
+  file_url: string | null;
+  thumb_url: string | null;
+  phase: number;
+  description: string | null;
+  slot_index: number;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Case metadata mở rộng trường ảnh 360 / Panorama (WT-2) */
+export interface DbCaseWithEvidenceConfig extends DbCase {
+  panorama_url?: string | null;
+  scene_360_url?: string | null;
+}
