@@ -1,27 +1,27 @@
-import React from 'react'
-import { ArrowRight, Check } from 'lucide-react'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { cn } from '@/lib/utils'
-import { CheckpointHintSection } from '@/components/investigation/checkpoint-hint-section'
-import type { Checkpoint } from '@/lib/types/case'
+import React from "react";
+import { ArrowRight, Check } from "lucide-react";
+import { detectiveAudio } from "@/lib/investigation-audio";
+import { cn } from "@/lib/utils";
+import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
+import type { Checkpoint } from "@/lib/types/case";
 
 export interface OptionItem {
-  id: string
-  label: string
+  id: string;
+  label: string;
 }
 
 interface FollowupChoiceFormProps {
-  caseId: string
-  checkpoint?: Checkpoint | null
-  dossierLabel?: string
-  questionText?: string
-  options: Array<OptionItem | string>
-  selectedOption: string | null
-  onSelectOption: (id: string) => void
-  errorMsg: string
-  onClearError?: () => void
-  onSubmit: (e: React.FormEvent) => void
-  onClose: () => void
+  caseId: string;
+  checkpoint?: Checkpoint | null;
+  dossierLabel?: string;
+  questionText?: string;
+  options: Array<OptionItem | string>;
+  selectedOption: string | null;
+  onSelectOption: (id: string) => void;
+  errorMsg: string;
+  onClearError?: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onClose: () => void;
 }
 
 export function FollowupChoiceForm({
@@ -37,23 +37,27 @@ export function FollowupChoiceForm({
   onSubmit,
   onClose,
 }: FollowupChoiceFormProps) {
-  const displayDossier = dossierLabel || checkpoint?.dossier || '📂 MỞ TÚI HỒ SƠ B04'
+  const displayDossier =
+    dossierLabel || checkpoint?.dossier || "📂 MỞ TÚI HỒ SƠ B04";
   const displayQuestion =
     questionText ||
     checkpoint?.question ||
-    'Dựa vào những gì đang nắm giữ, bạn đưa ra nhận định thế nào về đối tượng này?'
-  const targetCheckpointId = checkpoint?.id || 'cp-000-1b'
+    "Dựa vào những gì đang nắm giữ, bạn đưa ra nhận định thế nào về đối tượng này?";
+  const targetCheckpointId = checkpoint?.id || "";
 
   // Chuẩn hóa options dạng { id, label }
   const normalizedOptions: OptionItem[] = options.map((opt, idx) => {
-    if (typeof opt === 'string') {
-      return { id: opt, label: opt }
+    if (typeof opt === "string") {
+      return { id: opt, label: opt };
     }
-    return opt
-  })
+    return opt;
+  });
 
   return (
-    <form onSubmit={onSubmit} className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5] paper-scrollbar">
+    <form
+      onSubmit={onSubmit}
+      className="p-5 sm:p-6 flex-1 overflow-y-auto space-y-5 bg-[#f6f1e5] paper-scrollbar"
+    >
       {errorMsg && (
         <div className="p-3 bg-red-100 border-2 border-red-800 text-red-900 font-mono text-xs font-bold">
           ⚠️ {errorMsg}
@@ -63,7 +67,9 @@ export function FollowupChoiceForm({
       {/* MỞ TÚI HỒ SƠ */}
       <div className="p-3 bg-[#ebdcc4] border-2 border-[#8c1d1d] rounded-none shadow-sm">
         <span className="font-mono text-xs font-bold text-[#8c1d1d] uppercase tracking-wider">
-          {displayDossier.startsWith('📂') ? displayDossier : `📂 ${displayDossier}`}
+          {displayDossier.startsWith("📂")
+            ? displayDossier
+            : `📂 ${displayDossier}`}
         </span>
       </div>
 
@@ -85,21 +91,21 @@ export function FollowupChoiceForm({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {normalizedOptions.map((opt) => {
-            const isSelected = selectedOption === opt.id
+            const isSelected = selectedOption === opt.id;
             return (
               <button
                 key={opt.id}
                 type="button"
                 onClick={() => {
-                  detectiveAudio.playTypewriterClick()
-                  onSelectOption(opt.id)
-                  if (onClearError) onClearError()
+                  detectiveAudio.playTypewriterClick();
+                  onSelectOption(opt.id);
+                  if (onClearError) onClearError();
                 }}
                 className={cn(
-                  'p-4 text-left border-2 transition-all cursor-pointer select-none rounded-none relative flex items-center justify-between',
+                  "p-4 text-left border-2 transition-all cursor-pointer select-none rounded-none relative flex items-center justify-between",
                   isSelected
-                    ? 'bg-[#e7f0dc] border-[#2e5220] shadow-sm text-[#193310]'
-                    : 'bg-[#fdfcf9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]'
+                    ? "bg-[#e7f0dc] border-[#2e5220] shadow-sm text-[#193310]"
+                    : "bg-[#fdfcf9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22]",
                 )}
               >
                 <span className="font-mono text-xs sm:text-sm font-bold">
@@ -109,7 +115,7 @@ export function FollowupChoiceForm({
                   <Check className="size-4 text-[#2e5220] stroke-[2.5]" />
                 )}
               </button>
-            )
+            );
           })}
         </div>
       </div>
@@ -125,9 +131,9 @@ export function FollowupChoiceForm({
         <button
           type="button"
           onClick={(e) => {
-            e.stopPropagation()
-            detectiveAudio.playPaperRustle()
-            onClose()
+            e.stopPropagation();
+            detectiveAudio.playPaperRustle();
+            onClose();
           }}
           className="px-4 py-2 bg-[#dfd3bd] hover:bg-[#d4c5ab] border-2 border-[#4a3520] text-[#2b1f14] text-xs font-mono font-bold rounded-none transition-colors cursor-pointer"
         >
@@ -142,5 +148,5 @@ export function FollowupChoiceForm({
         </button>
       </div>
     </form>
-  )
+  );
 }

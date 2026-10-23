@@ -232,6 +232,7 @@ export function getInterrogationCriteria(
     aiValidCases?: string[];
     aiInvalidCases?: string[];
     motiveContext?: string;
+    alibiContext?: string;
     contradictionContext?: string;
   },
 ): SuspectCategoryCriteria {
@@ -248,9 +249,11 @@ export function getInterrogationCriteria(
   const specificCategoryContext =
     category === "motive"
       ? checkpointData?.motiveContext?.trim()
-      : category === "contradiction"
-        ? checkpointData?.contradictionContext?.trim()
-        : "";
+      : category === "alibi"
+        ? checkpointData?.alibiContext?.trim()
+        : category === "contradiction"
+          ? checkpointData?.contradictionContext?.trim()
+          : "";
 
   if (specificCategoryContext) {
     return {

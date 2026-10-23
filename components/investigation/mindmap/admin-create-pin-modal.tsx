@@ -54,6 +54,8 @@ interface NoteTemplate {
   url: string;
   defaultLabel?: string;
   defaultCheckpointId?: string;
+  defaultCheckpointKind?: string;
+  defaultSubjectKey?: string;
 }
 
 const PRESET_STICKY_TEMPLATES: NoteTemplate[] = [
@@ -67,7 +69,7 @@ const PRESET_STICKY_TEMPLATES: NoteTemplate[] = [
     label: "Nghi vấn vụ án",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_nghi_van.png",
     defaultLabel: "NGHI VẤN VỤ ÁN",
-    defaultCheckpointId: "cp-000-0",
+    defaultCheckpointKind: "phone_lookup",
   },
   {
     label: "Danh sách nghi phạm",
@@ -78,19 +80,19 @@ const PRESET_STICKY_TEMPLATES: NoteTemplate[] = [
     label: "Đối chất Vũ",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_vu.png",
     defaultLabel: "ĐỐI CHẤT LÊ QUANG VŨ",
-    defaultCheckpointId: "cp-000-1a",
+    defaultSubjectKey: "vu",
   },
   {
     label: "Đối chất Tùng",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_tung.png",
     defaultLabel: "ĐỐI CHẤT NGUYỄN THANH TÙNG",
-    defaultCheckpointId: "cp-000-1b",
+    defaultSubjectKey: "tung",
   },
   {
     label: "Đối chất Hà",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_cau_hoi_ha.png",
     defaultLabel: "ĐỐI CHẤT TRẦN THỊ HÀ",
-    defaultCheckpointId: "cp-000-1c",
+    defaultSubjectKey: "ha",
   },
 ];
 
@@ -100,38 +102,45 @@ const PRESET_DOSSIER_TEMPLATES: NoteTemplate[] = [
     label: "Mở rộng điều tra",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_mo_rong_dieu_tra.png",
     defaultLabel: "MỞ RỘNG ĐIỀU TRA",
-    defaultCheckpointId: "cp-000-0",
+    defaultCheckpointKind: "phone_lookup",
   },
   {
     label: "Kết luận điều tra",
     url: "/images/cases/case_000/clue_notes/rendered_notes/note_ket_luan_dieu_tra.png",
     defaultLabel: "BẢN KẾT LUẬN ĐIỀU TRA",
-    defaultCheckpointId: "cp-000-2b",
+    defaultCheckpointKind: "indictment",
   },
 ];
 
-const PRESET_SHEET_CHECKPOINTS = [
-  {
-    id: "cp-000-0",
-    label: "CP-000-0 // Tra cứu 3 SĐT ẩn danh (Ban Đầu)",
-  },
-  {
-    id: "cp-000-1a",
-    label: "CP-000-1a // Đối chất Hồ sơ A — Lê Quang Vũ",
-  },
-  {
-    id: "cp-000-1b",
-    label: "CP-000-1b // Đối chất Hồ sơ B — Nguyễn Thanh Tùng",
-  },
-  {
-    id: "cp-000-2a",
-    label: "CP-000-2a // Khám xét Hồ sơ C — Trần Thị Hà",
-  },
-  {
-    id: "cp-000-2b",
-    label: "CP-000-2b // Cáo trạng kết án Hung thủ (Hồ sơ C)",
-  },
-];
+const PRESET_SHEET_CHECKPOINTS: { id: string; label: string }[] = [];
+
+function resolveCheckpointIdForTemplate(
+  t: NoteTemplate,
+  checkpoints: any[],
+): string | undefined {
+  if (t.defaultCheckpointId) return t.defaultCheckpointId;
+  if (t.defaultCheckpointKind) {
+    const match = checkpoints.find(
+      (c: any) =>
+        c.kind === t.defaultCheckpointKind ||
+        (c.checkpoint_id || c.node_id || c.id || "").includes(
+          t.defaultCheckpointKind,
+        ),
+    );
+    if (match) return match.checkpoint_id || match.node_id || match.id;
+  }
+  if (t.defaultSubjectKey) {
+    const match = checkpoints.find(
+      (c: any) =>
+        (c.subject_key || c.subjectKey) === t.defaultSubjectKey ||
+        (c.checkpoint_id || c.node_id || c.id || "").includes(
+          t.defaultSubjectKey,
+        ),
+    );
+    if (match) return match.checkpoint_id || match.node_id || match.id;
+  }
+  return undefined;
+}
 
 const NOTE_TEXTAREA_ROWS = 2;
 
@@ -180,7 +189,9 @@ export function AdminCreatePinModal({
 
   // Fetch live photos từ Sheets; checkpoint lấy từ Checkpoint Studio.
   const { data: sheetPhotos } = usePhoneData("evidences");
-  const { rows: studioCheckpoints } = useStudioCheckpoints(normalizeCaseId(getActiveCaseId()));
+  const { rows: studioCheckpoints } = useStudioCheckpoints(
+    normalizeCaseId(getActiveCaseId()),
+  );
 
   const combinedCheckpoints = React.useMemo(() => {
     const list = [...PRESET_SHEET_CHECKPOINTS];
@@ -562,9 +573,13 @@ export function AdminCreatePinModal({
                           detectiveAudio.playTypewriterClick();
                           setNoteTextureUrl(t.url);
                           if (t.defaultLabel) setLabel(t.defaultLabel);
-                          if (t.defaultCheckpointId) {
+                          const resolvedCpId = resolveCheckpointIdForTemplate(
+                            t,
+                            combinedCheckpoints,
+                          );
+                          if (resolvedCpId) {
                             setActionType("sheet_checkpoint");
-                            setCheckpointId(t.defaultCheckpointId);
+                            setCheckpointId(resolvedCpId);
                           }
                         }}
                         className={`text-left px-2 py-1 rounded border text-[11px] font-mono truncate transition-all ${
@@ -598,9 +613,13 @@ export function AdminCreatePinModal({
                           detectiveAudio.playTypewriterClick();
                           setNoteTextureUrl(t.url);
                           if (t.defaultLabel) setLabel(t.defaultLabel);
-                          if (t.defaultCheckpointId) {
+                          const resolvedCpId = resolveCheckpointIdForTemplate(
+                            t,
+                            combinedCheckpoints,
+                          );
+                          if (resolvedCpId) {
                             setActionType("sheet_checkpoint");
-                            setCheckpointId(t.defaultCheckpointId);
+                            setCheckpointId(resolvedCpId);
                           }
                         }}
                         className={`text-left px-2 py-1 rounded border text-[11px] font-mono truncate transition-all ${
@@ -986,7 +1005,9 @@ export function AdminCreatePinModal({
                 />
                 <span className="text-[11px] font-mono text-zinc-300 flex items-center gap-1">
                   <span>📊 Đồng bộ Checkpoint Studio</span>
-                  {isSyncing && <span className="text-amber-400 animate-pulse">...</span>}
+                  {isSyncing && (
+                    <span className="text-amber-400 animate-pulse">...</span>
+                  )}
                 </span>
               </label>
             )}
@@ -1005,7 +1026,9 @@ export function AdminCreatePinModal({
                 className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-500 text-zinc-950 hover:bg-amber-400 font-bold rounded text-xs font-mono transition-all disabled:opacity-50"
               >
                 <Check className="size-3.5" />
-                <span>{isSyncing ? "ĐANG ĐỒNG BỘ..." : initialPin ? "LƯU" : "THÊM"}</span>
+                <span>
+                  {isSyncing ? "ĐANG ĐỒNG BỘ..." : initialPin ? "LƯU" : "THÊM"}
+                </span>
               </button>
             </div>
           </div>

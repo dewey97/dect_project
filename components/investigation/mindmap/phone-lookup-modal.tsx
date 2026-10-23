@@ -114,7 +114,7 @@ export function PhoneLookupModal({
 
   useEffect(() => {
     if (isOpen) {
-      const activeCp = cp0?.id || "cp-000-0";
+      const activeCp = cp0?.id || "";
       if (typeof window !== "undefined") {
         (window as any).__ACTIVE_INVESTIGATION_CHECKPOINT__ = activeCp;
       }
@@ -174,7 +174,7 @@ export function PhoneLookupModal({
       // 1. Thử chấm điểm trên server-side trước
       const serverResult = await verifyCheckpointOnServer({
         caseId,
-        checkpointId: cp0?.id || "cp-000-0",
+        checkpointId: cp0?.id || "",
         inputs: inputValues,
       });
 
@@ -332,7 +332,7 @@ export function PhoneLookupModal({
 
             {/* GỢI Ý ĐIỀU TRA ĐẨY XUỐNG DƯỚI FORM */}
             <CheckpointHintSection
-              checkpointId={cp0?.id || "cp-000-0"}
+              checkpointId={cp0?.id || ""}
               caseId={caseId}
             />
 

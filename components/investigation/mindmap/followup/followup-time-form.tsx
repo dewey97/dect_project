@@ -42,7 +42,7 @@ export function FollowupTimeForm({
   const displayGuide =
     formatGuide || 'Cách trả lời: Nhập text format "hh:mm" (giờ:phút)';
   const displayExample = formatExample || "Ví dụ: 12:00, 13:30, 21:15,...";
-  const targetCheckpointId = checkpoint?.id || "cp-000-1a-followup";
+  const targetCheckpointId = checkpoint?.id || "";
 
   return (
     <form

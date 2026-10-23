@@ -1,42 +1,47 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search } from 'lucide-react'
-import { TypewriterNarrator } from '@/components/investigation/evidence/typewriter-narrator'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search } from "lucide-react";
+import { TypewriterNarrator } from "@/components/investigation/evidence/typewriter-narrator";
+import { detectiveAudio } from "@/lib/investigation-audio";
 
-import { useCaseCheckpoints } from '@/lib/hooks/use-case-checkpoints'
+import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 
 interface PhoneNarrativeModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onTakeTestimony?: () => void
-  caseId?: string
+  isOpen: boolean;
+  onClose: () => void;
+  onTakeTestimony?: () => void;
+  caseId?: string;
 }
 
 export function PhoneNarrativeModal({
   isOpen,
   onClose,
   onTakeTestimony,
-  caseId = 'case-000'
+  caseId = "case-000",
 }: PhoneNarrativeModalProps) {
-  const [isNarrativeComplete, setIsNarrativeComplete] = useState(false)
-  const { checkpoints } = useCaseCheckpoints(caseId)
+  const [isNarrativeComplete, setIsNarrativeComplete] = useState(false);
+  const { checkpoints } = useCaseCheckpoints(caseId);
 
   React.useEffect(() => {
-    setIsNarrativeComplete(false)
-  }, [isOpen])
+    setIsNarrativeComplete(false);
+  }, [isOpen]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
-  const cp0 = checkpoints.find(
-    (c) => c.id === 'cp-000-0' || c.id.includes('-0') || c.id.includes('phone')
-  ) || checkpoints[0]
-  const dateLabel = cp0?.title || 'Thành công xác minh danh tính các thuê bao.'
+  const cp0 =
+    checkpoints.find(
+      (c) =>
+        c.kind === "phone_lookup" ||
+        c.id.includes("phone") ||
+        !c.depends_on ||
+        c.depends_on.length === 0,
+    ) || checkpoints[0];
+  const dateLabel = cp0?.title || "Thành công xác minh danh tính các thuê bao.";
   const storyText =
     cp0?.storyConfig?.monologue ||
-    'Chúc mừng các thám tử đã thành công truy vết chủ sở hữu các số thuê bao trong nhật ký điện thoại.\n\nTiếp theo, hãy tiến hành triệu tập và ghi lời khai đối với từng trường hợp để làm rõ mục đích liên lạc.'
+    "Chúc mừng các thám tử đã thành công truy vết chủ sở hữu các số thuê bao trong nhật ký điện thoại.\n\nTiếp theo, hãy tiến hành triệu tập và ghi lời khai đối với từng trường hợp để làm rõ mục đích liên lạc.";
 
   return (
     <AnimatePresence>
@@ -68,10 +73,10 @@ export function PhoneNarrativeModal({
             <button
               type="button"
               onClick={() => {
-                detectiveAudio.playStampSound()
-                onClose()
+                detectiveAudio.playStampSound();
+                onClose();
                 if (onTakeTestimony) {
-                  onTakeTestimony()
+                  onTakeTestimony();
                 }
               }}
               className="w-full py-3.5 bg-[#d9a066] hover:bg-[#c98f55] text-[#1a0f07] font-mono text-sm font-bold tracking-wider uppercase transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 active:scale-[0.99] animate-fade-in"
@@ -83,5 +88,5 @@ export function PhoneNarrativeModal({
         </div>
       </div>
     </AnimatePresence>
-  )
+  );
 }

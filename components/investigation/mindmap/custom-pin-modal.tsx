@@ -21,7 +21,7 @@ import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { parseAnswersColumn } from "@/lib/cms/checkpoint-cms";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { isVietnameseTextMatch } from "@/lib/finding-matcher";
-import { isEvidenceMatching } from "@/lib/cases/case-000-clues";
+import { isEvidenceMatching } from "@/lib/cases/clues";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 
 interface CustomPinModalProps {
@@ -78,28 +78,28 @@ export function CustomPinModal({
       );
       if (directMatch) return directMatch.id;
 
-      if (pid === "c0-pin-phone") return "cp-000-0";
-      if (pid === "c0-pin-followup-vu") return "cp-000-1a-followup";
-      if (pid === "c0-pin-followup-tung") return "cp-000-1b";
-      if (pid === "c0-pin-followup-ha") return "cp-000-1c-followup";
-      if (pid === "c0-pin-indictment") return "cp-000-2b";
-
       const text =
         `${pid} ${pin.label || ""} ${pin.detail || ""}`.toLowerCase();
       const titleMatch = checkpoints.find(
         (c) =>
-          text.includes(c.title?.toLowerCase() || "") ||
-          (c.dossier && text.includes(`hồ sơ ${c.dossier.toLowerCase()}`)),
+          (c.title && text.includes(c.title.toLowerCase())) ||
+          (c.dossier && text.includes(`hồ sơ ${c.dossier.toLowerCase()}`)) ||
+          (c.subject_key && text.includes(c.subject_key.toLowerCase())),
       );
       if (titleMatch) return titleMatch.id;
 
-      if (text.includes("vũ") || text.includes("vu")) return "cp-000-1a";
-      if (text.includes("tùng") || text.includes("tung")) return "cp-000-1b";
-      if (text.includes("hà") || text.includes("ha")) return "cp-000-1c";
-      if (text.includes("sđt") || text.includes("điện thoại"))
-        return "cp-000-0";
-      if (text.includes("cáo trạng") || text.includes("định tội"))
-        return "cp-000-2b";
+      if (text.includes("sđt") || text.includes("điện thoại")) {
+        const phoneCp = checkpoints.find(
+          (c) => c.kind === "phone_lookup" || c.id?.includes("phone"),
+        );
+        if (phoneCp) return phoneCp.id;
+      }
+      if (text.includes("cáo trạng") || text.includes("định tội")) {
+        const indCp = checkpoints.find(
+          (c) => c.kind === "indictment" || c.id?.includes("indictment"),
+        );
+        if (indCp) return indCp.id;
+      }
     }
 
     return "";
