@@ -71,16 +71,20 @@ E2E case_000 xanh 100% gồm cả test Tùng (bug grader đã sửa). Working tr
 
 ### 1.5. Việc còn lại — tổng quan
 
-| Nhóm   | Mục                                                                     | Người làm đề xuất | Ước lượng |
-| ------ | ----------------------------------------------------------------------- | ----------------- | --------- |
-| Bước 0 | Đặt `SUPABASE_SERVICE_ROLE_KEY` trên VPS, push code, smoke test         | Chủ dự án         | 30 phút   |
-| A      | A6 rotate key `.env`, `git rm --cached .env`                            | Chủ dự án         | 30 phút   |
-| B      | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm | Claude            | —         |
-| C      | C5 (FK: ✅), C6 (tách asset: ✅), C7 (/activate đọc DB: ✅)             | Claude            | —         |
-| D      | D7 giảm `any` (Đợt 1 xong 4 file, còn ~143 chỗ)                         | Model khác        | 1 ngày    |
-| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`             | Chủ dự án         | —         |
+| Nhóm   | Mục                                                                                                                  | Người làm đề xuất | Ước lượng |
+| ------ | -------------------------------------------------------------------------------------------------------------------- | ----------------- | --------- |
+| Bước 0 | Đặt `SUPABASE_SERVICE_ROLE_KEY` trên VPS, push code, smoke test                                                      | Chủ dự án         | 30 phút   |
+| A      | A6 rotate key `.env`, `git rm --cached .env`                                                                         | Chủ dự án         | 30 phút   |
+| B      | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm                                              | Claude            | —         |
+| C      | C5 (FK: ✅), C6 (tách asset: ✅), C7 (/activate đọc DB: ✅)                                                          | Claude            | —         |
+| D      | D7 giảm `any` (Đợt 1 xong 4 file, còn ~143 chỗ)                                                                      | Model khác        | 1 ngày    |
+| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`                                                          | Chủ dự án         | —         |
+| Phone  | Phone Studio code ✅ (3 commit `1d3089a`..`a9048cb`), migration 30–34 chưa chạy, E2E auth chưa setup, docs chưa sync | WT-1              | 1–2 ngày  |
+| M1–M12 | Evidence DB, narrative, AI criteria, pin photos, cleanup hardcode case_000                                           | WT-2→WT-4         | 2–3 tuần  |
 
-Đã hoàn tất kể từ bản roadmap trước: Migration 24–28 đã chạy production, B6-cleanup, A5, A9, L1, L2, B2–B6 (bước chính), C1–C7, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard.
+Xem plan worktree chi tiết: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md).
+
+Đã hoàn tất kể từ bản roadmap trước: Migration 24–28 đã chạy production, B6-cleanup, A5, A9, L1, L2, B2–B6 (bước chính), C1–C7, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard. Phone Studio code P1–P27, P30 (commit `1d3089a`).
 
 ---
 

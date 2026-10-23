@@ -7,6 +7,30 @@
 
 ---
 
+## Tiến độ (review 2026-10-24, commit `1d3089a`, `a9048cb`)
+
+| Bước    | Trạng thái | Ghi chú review                                                                                      |
+| ------- | ---------- | --------------------------------------------------------------------------------------------------- |
+| P1–P6   | ✅         | Migration 30–34 viết xong, đúng spec. **Chưa chạy production.**                                     |
+| P7      | ✅ code    | `scripts/ops/migrate-phone-sheets.mjs` có, **chưa chạy** (chờ migration 31).                        |
+| P8      | ✅         | Route chỉ GET, đọc qua RLS public. Ghi đi qua server action có `requireAdminAuth`.                  |
+| P9–P16  | ✅         | Dual-source Supabase → Sheets hoạt động. Chassis switch classic/modern có.                          |
+| P17     | ✅ code    | Migration 34 bucket `phone-assets`, chưa chạy.                                                      |
+| P18–P27 | ✅         | Studio 7 tab + preview + sidebar. Trang được `app/(admin)/layout.tsx` chặn bằng `requireAdminAuth`. |
+| P28     | ❌         | `e2e/phone-studio.spec.ts` chỉ test Studio, chưa test phone runtime case_000.                       |
+| P29     | ❌         | Chưa có.                                                                                            |
+| P30     | ✅         | `docs/core_specs/20_phone_studio.md`.                                                               |
+| P31     | ❌         | `CHANGELOG.md`, `HANDOFF_ROADMAP.md`, `TECHDEBT.md` chưa nhắc Phone Studio.                         |
+
+Lỗi/thiếu phát hiện khi review:
+
+1. **E2E Studio sẽ fail:** Playwright không có bước đăng nhập admin (`storageState`). `/studio/*` redirect `/login`. Cần project `setup` đăng nhập bằng tài khoản test đọc từ env.
+2. **Fallback app launcher dính case_000:** `app/api/phone-data/apps/route.ts` trả 15 app với icon `/images/cases/case_000/...` cho mọi vụ chưa cấu hình. Vụ mới nên trả danh sách rỗng hoặc icon chung `/images/phone/icons/*`.
+3. **Spoiler qua RLS public:** 7 bảng `phone_*` đọc công khai bằng anon key, không cần license. Mức độ tương đương `/api/phone` hiện tại, xử lý cùng hệ thống license (spec 07/08), không chặn release.
+4. Phần việc còn lại chuyển vào [`WORKTREE_PLAN.md`](WORKTREE_PLAN.md) — worktree **WT-1**.
+
+---
+
 ## 0. Trạng thái hiện tại — Hardcode cần bỏ
 
 | File                                                             | Hardcode                                                                                  | Cần làm                                                |

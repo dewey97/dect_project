@@ -1,0 +1,168 @@
+# Worktree Plan — Chạy song song phần việc còn lại
+
+> Mục tiêu: chia việc còn lại thành 5 worktree độc lập, mỗi worktree một nhánh, một model.
+> Xong thì merge lần lượt về `main`. Mỗi worktree chỉ sửa file trong **vùng sở hữu** của nó.
+>
+> Đọc trước: `AGENTS.md` (global + dự án), `docs/HANDOFF_ROADMAP.md` mục 2–3, `docs/PHONE_STUDIO_PLAN.md` mục "Tiến độ".
+
+---
+
+## 0. Tổng quan
+
+| WT   | Nhánh             | Nội dung                                                     | Ước lượng | Migration    |
+| ---- | ----------------- | ------------------------------------------------------------ | --------- | ------------ |
+| WT-1 | `wt/phone-finish` | Phone Studio phần cuối: E2E auth, P28, P29, fallback app     | 1–2 ngày  | —            |
+| WT-2 | `wt/evidence-db`  | Hệ thống chứng cứ per-case: M1, M2, M3, M10, M12             | 5–7 ngày  | 35           |
+| WT-3 | `wt/narrative-ai` | Bỏ hardcode dẫn truyện, AI criteria, file case_000: M4 M5 M8 | 4–5 ngày  | 36 (nếu cần) |
+| WT-4 | `wt/pin-photos`   | M9 ảnh ghim đọc Supabase + giảm `any` trong hero-interactive | 1–2 ngày  | —            |
+| WT-5 | `wt/any-batch-2`  | D7 đợt 2: giảm `any` ở admin studio, API, lib                | 1–2 ngày  | —            |
+
+Bỏ khỏi plan (YAGNI): **M11** nền bảng điều tra per-case. `board-stage` đã cho người chơi chọn nền cork chung, không phải dữ liệu vụ án.
+
+Thứ tự merge đề xuất: **WT-5 → WT-1 → WT-4 → WT-2 → WT-3**, sau đó bước tích hợp (mục 7).
+Lý do: WT-5 chỉ đổi type, rủi ro thấp nhất. WT-3 sửa nhiều file gameplay nhất, merge cuối để rebase một lần.
+
+---
+
+## 1. Quy tắc chung cho mọi worktree
+
+### 1.1. Tạo worktree
+
+```bash
+git worktree add ../dect_wt1 -b wt/phone-finish main
+```
+
+Thay `wt1`/nhánh theo bảng trên. Trong worktree:
+
+```bash
+pnpm install
+```
+
+- Chỉ dùng **pnpm**. Không chạy `npm install`.
+- Copy `.env.local` (nếu có) từ thư mục gốc sang worktree. Không commit file env.
+- Mỗi worktree chạy dev server/E2E trên **cổng riêng**: WT-1 `3101`, WT-2 `3102`, WT-3 `3103`, WT-4 `3104`, WT-5 `3105` (`PORT=310x pnpm dev`, `PORT=310x pnpm test:e2e`).
+
+### 1.2. Vùng sở hữu
+
+- Chỉ sửa file trong cột "Sở hữu" của worktree mình.
+- Cần sửa file ngoài vùng: **không sửa**, ghi vào mục "Việc tích hợp" trong báo cáo bàn giao.
+- File dùng chung có quy tắc riêng:
+
+| File                                                          | Quy tắc                                                                                               |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `lib/types/database.ts`                                       | Chỉ **thêm** interface mới ở **cuối file**, trong block có comment `// WT-x`. Không sửa interface cũ. |
+| `components/admin/admin-sidebar.tsx`                          | Chỉ WT-2 được thêm 1 mục menu.                                                                        |
+| `CHANGELOG.md`, `docs/HANDOFF_ROADMAP.md`, `docs/TECHDEBT.md` | **Không worktree nào sửa.** Người tích hợp cập nhật sau merge.                                        |
+| `db/schema/*.sql`                                             | Chỉ dùng số migration đã cấp ở bảng mục 0.                                                            |
+| `e2e/*`                                                       | Mỗi worktree tạo file spec riêng. Chỉ WT-1 sửa `playwright.config.ts`.                                |
+
+### 1.3. Ràng buộc dự án (nhắc lại)
+
+- Không `git push`. Commit một lần khi xong trọn task (Conventional Commits).
+- Không chạy migration lên production. Viết SQL, chủ dự án duyệt.
+- `import type` cho mọi interface/type (AGENTS.md §12).
+- Không `autoFocus` / `.focus()` khi mở modal (AGENTS.md §3).
+- Không `next/font/google` (AGENTS.md §11).
+- Không thêm mock/fallback nội dung vụ án tĩnh (AGENTS.md §6). Fallback chỉ được là trạng thái rỗng/đang tải.
+- Không đụng `components/investigation/archive_3d_vault/` và `landing-hero.tsx` (AGENTS.md §8, §9).
+
+### 1.4. Điều kiện "done" của một worktree
+
+1. `npx tsc --noEmit --incremental false` sạch (chạy 1 lần ở cuối).
+2. `pnpm test:e2e` pass toàn bộ, gồm spec mới của worktree.
+3. Case_000 chơi được như trước (không regression).
+4. Báo cáo bàn giao gồm: danh sách file đã sửa, migration cần chạy, việc tích hợp còn lại.
+
+---
+
+## 2. WT-1 — `wt/phone-finish`
+
+**Sở hữu:** `e2e/**`, `playwright.config.ts`, `app/api/phone-data/**`, `components/phone-engine/**`, `lib/hooks/use-phone-data.ts`, `lib/hooks/use-phone-apps.ts`, `components/admin/phone-studio/**`, `docs/core_specs/20_phone_studio.md`, `.env.example`.
+
+| #   | Việc                                                                                                                                                                                                                                                                               |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.1 | Thêm Playwright project `setup`: đăng nhập `/login` bằng `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, lưu `storageState` vào `e2e/.auth/admin.json` (gitignore). Spec admin dùng storageState này. Thêm 2 biến vào `.env.example`. Thiếu biến thì `test.skip` spec admin, không fail. |
+| 1.2 | Sửa `e2e/phone-studio.spec.ts` dùng storageState admin.                                                                                                                                                                                                                            |
+| 1.3 | P28: spec `e2e/phone-runtime.spec.ts` — mở phone case_000, kiểm tra home screen đủ 15 app, mở Tin nhắn thấy ít nhất 1 thread.                                                                                                                                                      |
+| 1.4 | P29: spec tạo case tạm qua `duplicateCase` hoặc Studio, thêm 1 app, phone render app đó. Dọn dữ liệu sau test. Nếu cần DB đã migrate 30–34 thì `test.skip` khi bảng chưa có.                                                                                                       |
+| 1.5 | `app/api/phone-data/apps/route.ts`: bỏ fallback 15 app icon case_000 cho vụ khác case_000. Vụ chưa cấu hình trả `data: []`, `source: "empty"`. Case_000 vẫn giữ fallback tới khi migration 33 chạy.                                                                                |
+| 1.6 | Giảm `any` trong `components/phone-engine/**` và `lib/hooks/use-phone-data.ts` (~17 chỗ).                                                                                                                                                                                          |
+
+---
+
+## 3. WT-2 — `wt/evidence-db`
+
+**Sở hữu:** `components/investigation/evidence/**`, `components/investigation/scene-360-viewer.tsx`, `app/(investigation)/evidence/**`, `app/(investigation)/board-stage/**`, `app/(admin)/studio/evidence/**` (mới), `components/admin/evidence-studio/**` (mới), `lib/actions/evidence-actions.ts` (mới), `lib/hooks/use-case-evidence.ts` (mới), `db/schema/35_*.sql`, `docs/core_specs/21_evidence_studio.md` (mới), 1 mục trong `admin-sidebar.tsx`.
+
+| #   | Việc                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.1 | **M3** Migration 35: bảng `case_evidence` (`id`, `case_slug` FK `cases.slug`, `code` unique theo case, `title`, `kind` pdf/image/audio/object, `file_url`, `thumb_url`, `phase`, `description`, `slot_index`, timestamps). RLS: đọc public, ghi `private.is_admin()`. Bucket `evidence-assets` (đọc public, ghi admin). Thêm `cases.panorama_url`, `cases.scene_360_url` (TEXT NULL). Seed case_000 từ `CASE_000_PDFS` + `CASE_000_EVIDENCE`. |
+| 2.2 | Server actions CRUD + upload (`requireAdminAuth`), mở rộng `duplicatePhoneData`-style: export `duplicateEvidenceData(from, to)` — **không** sửa `case-actions.ts`, ghi vào việc tích hợp.                                                                                                                                                                                                                                                     |
+| 2.3 | **M1** Hook `useCaseEvidence(caseId)` đọc Supabase. `evidence-data.ts` giữ nguyên tên export cũ (`CASE_000_PDFS`, `CASE_000_EVIDENCE`) để file mindmap của WT-3 không vỡ; đánh dấu `@deprecated`. Các trang `evidence/**`, `board-stage` chuyển sang hook.                                                                                                                                                                                    |
+| 2.4 | **M2 + M10** Evidence Studio `/studio/evidence`: danh sách chứng cứ theo case, upload PDF/ảnh vào bucket, sửa metadata, sắp xếp. Giao diện theo Phone Studio (form + preview), không kiểu bảng tính.                                                                                                                                                                                                                                          |
+| 2.5 | **M12** `reinvestigation-modal.tsx` và `scene-360-viewer.tsx` đọc `cases.panorama_url` / `scene_360_url`; bỏ path cứng `/images/cases/case_000/...`. Thiếu URL thì hiện trạng thái "Chưa có ảnh hiện trường".                                                                                                                                                                                                                                 |
+| 2.6 | Spec `e2e/evidence-studio.spec.ts` + kiểm tra bàn chứng cứ case_000 vẫn đủ tài liệu.                                                                                                                                                                                                                                                                                                                                                          |
+
+---
+
+## 4. WT-3 — `wt/narrative-ai`
+
+**Sở hữu:** `components/investigation/mindmap/**`, `components/investigation/hint-modal.tsx`, `components/investigation/epilogue-modal.tsx`, `components/investigation/checkpoints-context.tsx`, `lib/hooks/use-case-narratives.ts`, `lib/ai/**`, `lib/cases/case-000-*.ts`, `lib/checkpoints/server-grader.ts`, `components/admin/checkpoint-studio/sections/**`, `db/schema/36_*.sql`.
+
+| #   | Việc                                                                                                                                                                                                         |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 3.1 | Thống kê 97 chỗ `cp-000-*` trong 17 file. Phân loại: (a) id checkpoint thật đọc được từ DB, (b) id cố định cho logic chung, (c) dữ liệu chết. Ghi bảng vào báo cáo.                                          |
+| 3.2 | **M5** `use-case-narratives.ts`: đọc `case_checkpoints.narrative` theo `kind`/`depends_on`, bỏ map phase → `cp-000-*`. Giữ baseline narrative ngay lập tức (AGENTS.md §6 Zero-Black-Screen).                 |
+| 3.3 | **M4** `CASE_000_INTERROGATION_CRITERIA` → đọc `case_checkpoints.ai_context` / `ai_valid_cases` / `ai_invalid_cases` của checkpoint `kind` thẩm tra theo `subject_key`. Nếu thiếu cột thì viết migration 36. |
+| 3.4 | **M8** Gỡ `lib/cases/case-000-suspects.ts`, `case-000-clues.ts`: chuyển sang `case_characters` + `case_checkpoints`. Xóa file khi không còn import.                                                          |
+| 3.5 | Bỏ `cp-000-*` trong `hint-modal.tsx`, `admin-create-pin-modal.tsx`, `custom-pin-modal.tsx`, `culprit-epilogue-modal.tsx`, `main-investigation-canvas.tsx`, `add-suspect-modal.tsx`.                          |
+| 3.6 | **Không** sửa dòng import `CASE_000_EVIDENCE` / `CASE_000_PDFS` trong mindmap (WT-2 đổi nguồn). Ghi vào việc tích hợp.                                                                                       |
+| 3.7 | Spec `e2e/case-000.spec.ts` phải pass nguyên vẹn. Thêm spec chơi thử 1 vụ duplicate từ case_000 (slug khác) qua được checkpoint đầu.                                                                         |
+
+---
+
+## 5. WT-4 — `wt/pin-photos`
+
+**Sở hữu:** `components/investigation/hero-interactive.tsx`, `components/investigation/hero-interactive/**`.
+
+| #   | Việc                                                                                                                                                                                              |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 4.1 | **M9** `use-live-pin-photos.ts`: đọc ảnh từ `/api/phone-data/photos?caseId=` (Supabase) trước, fallback Sheets như `use-phone-data.ts`. Bỏ phụ thuộc tab Sheets `photos` khi Supabase có dữ liệu. |
+| 4.2 | `constants.ts`, `card-composite.ts`: bỏ tham chiếu cứng case_000 nếu có, nhận `caseId` qua props.                                                                                                 |
+| 4.3 | Giảm `any` trong `render-scene.ts` (28), `utils.ts` (7). Không đổi hành vi vẽ canvas.                                                                                                             |
+| 4.4 | Kiểm tra trực quan bảng điều tra case_000 trước/sau (screenshot so sánh).                                                                                                                         |
+
+---
+
+## 6. WT-5 — `wt/any-batch-2`
+
+**Sở hữu:** `components/admin/checkpoint-studio/*.tsx` (trừ `sections/**`), `components/admin/map-studio/**`, `components/admin/dossier-studio/**`, `app/(admin)/studio/dashboard-client.tsx`, `app/(admin)/studio/players/**`, `app/api/**` (trừ `phone-data/**`), `lib/types/checkpoint-studio.ts`, `lib/cms/**`, `lib/hooks/use-case-checkpoints.ts`, `components/investigation/room-sync-context.tsx`, `components/investigation/feedback-modal.tsx`, `components/auth/user-nav.tsx`, `components/public/waitlist-form.tsx`.
+
+| #   | Việc                                                                                        |
+| --- | ------------------------------------------------------------------------------------------- |
+| 5.1 | Thay `any` bằng type thật hoặc `unknown` + type guard. Mục tiêu: 0 `any` trong vùng sở hữu. |
+| 5.2 | Không đổi hành vi, không đổi API response shape.                                            |
+| 5.3 | Ghi số `any` trước/sau vào báo cáo.                                                         |
+
+---
+
+## 7. Bước tích hợp sau merge (người tích hợp)
+
+1. Merge theo thứ tự WT-5 → WT-1 → WT-4 → WT-2 → WT-3. Sau mỗi lần merge chạy `tsc` + `pnpm test:e2e`.
+2. Gọi `duplicateEvidenceData` trong `duplicateCase` (`lib/actions/case-actions.ts`).
+3. Đổi các import `CASE_000_EVIDENCE` / `CASE_000_PDFS` trong `components/investigation/mindmap/**` và `server-grader.ts` sang `useCaseEvidence` / truy vấn `case_evidence`. Xóa export deprecated.
+4. Cập nhật `CHANGELOG.md`, `docs/HANDOFF_ROADMAP.md`, `docs/TECHDEBT.md`, `docs/README.md`.
+5. Chủ dự án duyệt và chạy migration 30–36 theo thứ tự, rồi chạy `scripts/ops/migrate-phone-sheets.mjs`.
+6. Xóa worktree: `git worktree remove ../dect_wtX`, xóa nhánh `wt/*` đã merge.
+
+---
+
+## 8. Rủi ro
+
+| Rủi ro                                           | Giảm thiểu                                                                  |
+| ------------------------------------------------ | --------------------------------------------------------------------------- |
+| WT-2 và WT-3 cùng dùng dữ liệu chứng cứ          | WT-2 giữ export cũ; WT-3 không sửa import đó; nối ở bước tích hợp.          |
+| `main-investigation-canvas.tsx` lớn, dễ conflict | Chỉ WT-3 sở hữu. WT-4 chỉ sửa `HeroInteractive` bên trong, không đổi props. |
+| Migration chưa chạy làm E2E fail                 | Spec phụ thuộc bảng mới phải `test.skip` khi bảng chưa tồn tại.             |
+| 5 dev server cùng lúc tốn RAM                    | Chỉ bật dev server khi chạy E2E/kiểm tra UI, tắt sau khi xong.              |
+| `.next` cache lẫn giữa worktree                  | Mỗi worktree có `.next` riêng; không symlink.                               |
