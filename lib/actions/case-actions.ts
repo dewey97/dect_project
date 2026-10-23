@@ -12,6 +12,7 @@ import type {
 import { revalidatePath } from "next/cache";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
 import { requireAdminAuth } from "@/lib/auth/admin";
+import { duplicatePhoneData } from "./phone-actions";
 
 /** Lấy thống kê tổng quan cho Dashboard */
 export async function getDashboardStats() {
@@ -244,10 +245,14 @@ export async function duplicateCase(caseId: string) {
       await supabase.from("dossier_documents").insert(clonedDocs);
     }
 
+    // 7. Clone phone data (apps, contacts, calls, messages, photos, notes, bank, browser)
+    await duplicatePhoneData(sourceSlug, targetSlug);
+
     revalidatePath("/studio/cases");
     revalidatePath("/studio/checkpoints");
     revalidatePath("/studio/characters");
     revalidatePath("/studio/dossier");
+    revalidatePath("/studio/phone");
     return { success: true, data: newCase };
   } catch (error: unknown) {
     console.error("Error duplicating case:", error);

@@ -12,6 +12,7 @@ export function ModernPhoneChassis({
   children,
   onHomePress,
   className,
+  wallpaperUrl,
 }: ChassisProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState<number>(1);
@@ -30,7 +31,10 @@ export function ModernPhoneChassis({
       const TARGET_W = 390;
       const TARGET_H = 780;
 
-      const fitScale = Math.min((availW - 32) / TARGET_W, (availH - 32) / TARGET_H);
+      const fitScale = Math.min(
+        (availW - 32) / TARGET_W,
+        (availH - 32) / TARGET_H,
+      );
       setScale(Math.min(Math.max(fitScale, 0.45), 1.05));
     };
 
@@ -44,7 +48,7 @@ export function ModernPhoneChassis({
       ref={containerRef}
       className={cn(
         "relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center overflow-hidden p-0",
-        className
+        className,
       )}
     >
       <div
@@ -70,7 +74,18 @@ export function ModernPhoneChassis({
           </div>
 
           {/* Screen Content */}
-          <div className="relative w-full h-full rounded-[42px] overflow-hidden bg-black flex flex-col">
+          <div
+            style={
+              wallpaperUrl
+                ? {
+                    backgroundImage: `url('${wallpaperUrl}')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }
+                : undefined
+            }
+            className="relative w-full h-full rounded-[42px] overflow-hidden bg-black flex flex-col"
+          >
             {children}
 
             {/* Bottom Home Indicator Bar */}

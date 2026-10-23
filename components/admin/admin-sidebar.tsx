@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   UserRound,
+  Smartphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -37,16 +38,42 @@ const navGroups: NavGroup[] = [
   {
     groupName: "TỔNG QUAN",
     items: [
-      { name: "Dashboard", shortName: "Tổng quan", href: "/studio", icon: LayoutDashboard },
-      { name: "Danh sách Vụ Án", shortName: "Vụ án", href: "/studio/cases", icon: Folders },
+      {
+        name: "Dashboard",
+        shortName: "Tổng quan",
+        href: "/studio",
+        icon: LayoutDashboard,
+      },
+      {
+        name: "Danh sách Vụ Án",
+        shortName: "Vụ án",
+        href: "/studio/cases",
+        icon: Folders,
+      },
     ],
   },
   {
     groupName: "STUDIO ENGINES",
     items: [
       { name: "Map Studio", shortName: "Map", href: "/studio/map", icon: Map },
-      { name: "Dossier Studio", shortName: "Hồ sơ", href: "/studio/dossier", icon: FileText },
-      { name: "Nhân vật", shortName: "Nhân vật", href: "/studio/characters", icon: UserRound },
+      {
+        name: "Dossier Studio",
+        shortName: "Hồ sơ",
+        href: "/studio/dossier",
+        icon: FileText,
+      },
+      {
+        name: "Phone Studio",
+        shortName: "Điện thoại",
+        href: "/studio/phone",
+        icon: Smartphone,
+      },
+      {
+        name: "Nhân vật",
+        shortName: "Nhân vật",
+        href: "/studio/characters",
+        icon: UserRound,
+      },
       {
         name: "Checkpoint Studio",
         shortName: "Checkpoint",
@@ -58,14 +85,24 @@ const navGroups: NavGroup[] = [
   {
     groupName: "VẬN HÀNH",
     items: [
-      { name: "Người chơi", shortName: "Players", href: "/studio/players", icon: Users },
+      {
+        name: "Người chơi",
+        shortName: "Players",
+        href: "/studio/players",
+        icon: Users,
+      },
       {
         name: "Góp ý & Báo lỗi",
         shortName: "Góp ý",
         href: "/studio/feedbacks",
         icon: MessageSquare,
       },
-      { name: "Cài đặt Hệ thống", shortName: "Cài đặt", href: "/studio/settings", icon: Settings },
+      {
+        name: "Cài đặt Hệ thống",
+        shortName: "Cài đặt",
+        href: "/studio/settings",
+        icon: Settings,
+      },
     ],
   },
 ];
@@ -96,10 +133,14 @@ export function AdminSidebar({
       )}
     >
       {/* HEADER */}
-      <div className={cn(
-        "p-4 h-16 flex items-center shrink-0 border-b border-white/10",
-        isCollapsed ? "flex-col justify-center gap-1.5 p-2 h-auto py-3" : "justify-between",
-      )}>
+      <div
+        className={cn(
+          "p-4 h-16 flex items-center shrink-0 border-b border-white/10",
+          isCollapsed
+            ? "flex-col justify-center gap-1.5 p-2 h-auto py-3"
+            : "justify-between",
+        )}
+      >
         <Link
           href="/studio"
           className={cn(
@@ -144,10 +185,12 @@ export function AdminSidebar({
       </div>
 
       {/* NAVIGATION */}
-      <nav className={cn(
-        "flex-1 py-4 space-y-4 overflow-y-auto overflow-x-hidden",
-        isCollapsed ? "px-1.5 space-y-3" : "px-2.5 space-y-5",
-      )}>
+      <nav
+        className={cn(
+          "flex-1 py-4 space-y-4 overflow-y-auto overflow-x-hidden",
+          isCollapsed ? "px-1.5 space-y-3" : "px-2.5 space-y-5",
+        )}
+      >
         {navGroups.map((group, groupIdx) => (
           <div key={groupIdx} className="space-y-1">
             {!isCollapsed && (
@@ -236,7 +279,10 @@ export function AdminSidebar({
       {/* FOOTER ACTIONS */}
       <div className="p-2.5 border-t border-white/10">
         <div
-          className={cn("flex items-center gap-1.5", isCollapsed && "flex-col gap-2")}
+          className={cn(
+            "flex items-center gap-1.5",
+            isCollapsed && "flex-col gap-2",
+          )}
         >
           {/* Exit Studio */}
           <Link

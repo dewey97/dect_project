@@ -20,7 +20,10 @@ export function usePhoneData<T = any>(
   caseId: string = "case_000",
 ): PhoneDataState<T> {
   let effectiveCaseId = caseId;
-  if (typeof window !== "undefined" && (caseId === "case_000" || caseId === "case-000")) {
+  if (
+    typeof window !== "undefined" &&
+    (caseId === "case_000" || caseId === "case-000")
+  ) {
     const params = new URLSearchParams(window.location.search);
     const paramCase = params.get("case_id") || params.get("caseId");
     if (paramCase) {
@@ -62,16 +65,33 @@ export function usePhoneData<T = any>(
     const isForcedRefetch = reloadToken > 0;
 
     if (!requestPromise || isForcedRefetch) {
-      const url = `/api/phone?tab=${encodeURIComponent(tab)}&caseId=${encodeURIComponent(effectiveCaseId)}&_t=${Date.now()}${isForcedRefetch ? "&refresh=true" : ""}`;
+      requestPromise = (async () => {
+        // 1. Dual-source: Try Supabase phone-data first
+        try {
+          const supabaseUrl = `/api/phone-data/${encodeURIComponent(tab)}?caseId=${encodeURIComponent(effectiveCaseId)}&_t=${Date.now()}`;
+          const res = await fetch(supabaseUrl, { cache: "no-store" });
+          if (res.ok) {
+            const json = await res.json();
+            if (
+              json.success &&
+              Array.isArray(json.data) &&
+              json.data.length > 0
+            ) {
+              return json;
+            }
+          }
+        } catch {
+          // fall through to Google Sheets fallback
+        }
 
-      requestPromise = fetch(url, { cache: "no-store" })
-        .then((res) => {
-          if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-          return res.json();
-        })
-        .finally(() => {
-          delete inFlightPromises[cacheKey];
-        });
+        // 2. Fallback to Google Sheets /api/phone
+        const sheetsUrl = `/api/phone?tab=${encodeURIComponent(tab)}&caseId=${encodeURIComponent(effectiveCaseId)}&_t=${Date.now()}${isForcedRefetch ? "&refresh=true" : ""}`;
+        const res = await fetch(sheetsUrl, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return res.json();
+      })().finally(() => {
+        delete inFlightPromises[cacheKey];
+      });
 
       inFlightPromises[cacheKey] = requestPromise;
     }

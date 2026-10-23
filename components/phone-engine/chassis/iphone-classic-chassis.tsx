@@ -10,6 +10,7 @@ export interface ChassisProps {
   onPowerPress?: () => void;
   frameless?: boolean;
   className?: string;
+  wallpaperUrl?: string;
 }
 
 /**
@@ -22,6 +23,7 @@ export function IPhoneClassicChassis({
   onHomePress,
   frameless = false,
   className,
+  wallpaperUrl,
 }: ChassisProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState<number>(1);
@@ -83,7 +85,7 @@ export function IPhoneClassicChassis({
       ref={containerRef}
       className={cn(
         "relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center overflow-hidden p-0",
-        className
+        className,
       )}
     >
       <div
@@ -105,7 +107,7 @@ export function IPhoneClassicChassis({
             "relative transition-transform duration-75 flex flex-col items-center shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)] shrink-0 no-scrollbar",
             frameless
               ? "bg-black rounded-lg border border-white/20 h-[667px]"
-              : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]"
+              : "bg-[#D8D8DC] rounded-[48px] pt-3 pb-3 px-[20px] border-[2.5px] border-[#A1A1A6] ring-1 ring-black/25 shadow-[inset_0_1px_3px_rgba(255,255,255,0.4),0_25px_60px_rgba(0,0,0,0.6)]",
           )}
         >
           {!frameless && (
@@ -127,9 +129,12 @@ export function IPhoneClassicChassis({
           {/* SCREEN CONTAINER: 375x600 Display */}
           <div
             data-phone-screen="true"
+            style={{
+              backgroundImage: `url('${wallpaperUrl || "/images/cases/case_000/phone/clean_beach_wallpaper.png"}')`,
+            }}
             className={cn(
-              "relative w-[375px] max-w-full h-[600px] shrink-0 bg-[#0d2a45] bg-[url('/images/cases/case_000/phone/clean_beach_wallpaper.png')] bg-cover bg-center overflow-hidden flex flex-col no-scrollbar",
-              !frameless && "rounded-lg border border-black/50 shadow-inner"
+              "relative w-[375px] max-w-full h-[600px] shrink-0 bg-[#0d2a45] bg-cover bg-center overflow-hidden flex flex-col no-scrollbar",
+              !frameless && "rounded-lg border border-black/50 shadow-inner",
             )}
           >
             {children}

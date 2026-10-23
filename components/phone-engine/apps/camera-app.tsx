@@ -6,15 +6,20 @@ import { cn } from "@/lib/utils";
 
 interface CameraAppProps {
   onBackToHome?: () => void;
+  selfieUrl?: string;
 }
 
-export function CameraApp({ onBackToHome }: CameraAppProps) {
+export function CameraApp({ onBackToHome, selfieUrl }: CameraAppProps) {
   const [flashMode, setFlashMode] = useState<"auto" | "on" | "off">("auto");
   const [hdrMode, setHdrMode] = useState<"auto" | "on" | "off">("auto");
-  const [cameraFacing, setCameraFacing] = useState<"user" | "environment">("user");
+  const [cameraFacing, setCameraFacing] = useState<"user" | "environment">(
+    "user",
+  );
   const [shutterFlash, setShutterFlash] = useState<boolean>(false);
   const [showMonkey, setShowMonkey] = useState<boolean>(false);
-  const [cameraPermission, setCameraPermission] = useState<"pending" | "granted" | "denied">("pending");
+  const [cameraPermission, setCameraPermission] = useState<
+    "pending" | "granted" | "denied"
+  >("pending");
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -25,7 +30,8 @@ export function CameraApp({ onBackToHome }: CameraAppProps) {
     try {
       const AudioCtx =
         window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
       const osc = ctx.createOscillator();
@@ -128,7 +134,7 @@ export function CameraApp({ onBackToHome }: CameraAppProps) {
         <button
           onClick={() =>
             setFlashMode((prev) =>
-              prev === "auto" ? "on" : prev === "on" ? "off" : "auto"
+              prev === "auto" ? "on" : prev === "on" ? "off" : "auto",
             )
           }
           className="flex items-center gap-1 text-[13px] text-[#FFD60A] hover:opacity-80 active:opacity-60 cursor-pointer min-h-[36px]"
@@ -143,7 +149,7 @@ export function CameraApp({ onBackToHome }: CameraAppProps) {
         <button
           onClick={() =>
             setHdrMode((prev) =>
-              prev === "auto" ? "on" : prev === "on" ? "off" : "auto"
+              prev === "auto" ? "on" : prev === "on" ? "off" : "auto",
             )
           }
           className={cn(
@@ -151,8 +157,8 @@ export function CameraApp({ onBackToHome }: CameraAppProps) {
             hdrMode === "on"
               ? "text-[#FFD60A]"
               : hdrMode === "auto"
-              ? "text-white"
-              : "text-white/40"
+                ? "text-white"
+                : "text-white/40",
           )}
           title="HDR"
         >
@@ -179,7 +185,7 @@ export function CameraApp({ onBackToHome }: CameraAppProps) {
           className={cn(
             "absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-300",
             cameraPermission === "granted" ? "opacity-100" : "opacity-0",
-            cameraFacing === "user" && "-scale-x-100"
+            cameraFacing === "user" && "-scale-x-100",
           )}
         />
 
@@ -234,8 +240,10 @@ export function CameraApp({ onBackToHome }: CameraAppProps) {
         {showMonkey && (
           <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-25 overflow-hidden animate-in zoom-in-95 fade-in duration-150">
             <img
-              src="/images/cases/case_000/phone/monkey_selfie.png"
-              alt="Chú khỉ bất ngờ"
+              src={
+                selfieUrl || "/images/cases/case_000/phone/monkey_selfie.png"
+              }
+              alt="Ảnh chụp bất ngờ"
               className="w-full h-full object-cover select-none pointer-events-none"
             />
           </div>

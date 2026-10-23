@@ -158,6 +158,21 @@ export interface CaseCharacterDevice {
   model?: string;
   lastUpdated?: string;
   description?: string;
+  chassis?: "iphone_classic" | "iphone_modern" | "android_vintage";
+  wallpaper_url?: string;
+  lockscreen_url?: string;
+  selfie_url?: string;
+  passcode?: string;
+  status_bar?: {
+    time?: string;
+    battery?: number;
+    service_text?: string;
+  };
+  lock_screen?: {
+    time?: string;
+    date?: string;
+  };
+  settings_info?: Record<string, string>;
 }
 
 /** Bảng case_characters: danh sách nhân vật theo vụ án (Case Bible) */
@@ -198,4 +213,147 @@ export interface DbWaitlistEntry {
   source: string;
   ip: string | null;
   created_at: string;
+}
+
+/** Bảng case_phone_apps: App launcher per-case */
+export interface DbCasePhoneApp {
+  id: string;
+  case_slug: string;
+  app_type: string;
+  display_name: string;
+  icon_url: string | null;
+  slot_index: number;
+  is_dock: boolean;
+  is_locked: boolean;
+  unlock_checkpoint_id: string | null;
+  config: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Bảng phone_contacts */
+export interface DbPhoneContact {
+  id: string;
+  case_slug: string;
+  contact_id: string | null;
+  name: string;
+  display_name: string | null;
+  phone_number: string | null;
+  category: string | null;
+  note: string | null;
+  is_saved: boolean;
+  avatar_url: string | null;
+  is_suspicious: boolean;
+  slot_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Bảng phone_calls */
+export interface DbPhoneCall {
+  id: string;
+  case_slug: string;
+  code: string | null;
+  contact_name: string;
+  phone_number: string | null;
+  call_type: string;
+  timestamp: string | null;
+  duration: string | null;
+  audio_url: string | null;
+  is_key_clue: boolean;
+  clue_title: string | null;
+  clue_analysis: string | null;
+  slot_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Bảng phone_messages */
+export interface DbPhoneMessage {
+  id: string;
+  case_slug: string;
+  thread_key: string;
+  thread_name: string;
+  thread_phone: string | null;
+  sender: string;
+  role: string;
+  body: string;
+  timestamp: string | null;
+  code: string | null;
+  is_clue: boolean;
+  clue_title: string | null;
+  clue_analysis: string | null;
+  attachment_type: string | null;
+  attachment_url: string | null;
+  attachment_duration: string | null;
+  slot_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Bảng phone_photos */
+export interface DbPhonePhoto {
+  id: string;
+  case_slug: string;
+  photo_code: string | null;
+  label: string;
+  image_url: string;
+  taken_at: string | null;
+  description: string | null;
+  exif_json: Record<string, unknown> | null;
+  is_evidence: boolean;
+  slot_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Bảng phone_notes */
+export interface DbPhoneNote {
+  id: string;
+  case_slug: string;
+  title: string;
+  body: string;
+  is_pinned: boolean;
+  code: string | null;
+  is_clue: boolean;
+  clue_title: string | null;
+  clue_analysis: string | null;
+  slot_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Bảng phone_bank_transactions */
+export interface DbPhoneBankTx {
+  id: string;
+  case_slug: string;
+  tx_type: string;
+  amount: number;
+  counterparty: string;
+  note: string | null;
+  timestamp: string | null;
+  code: string | null;
+  is_clue: boolean;
+  clue_title: string | null;
+  clue_analysis: string | null;
+  balance_after: number | null;
+  slot_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Bảng phone_browser_history */
+export interface DbPhoneBrowserHistory {
+  id: string;
+  case_slug: string;
+  title: string;
+  url: string | null;
+  visited_at: string | null;
+  favicon_url: string | null;
+  code: string | null;
+  is_clue: boolean;
+  clue_title: string | null;
+  slot_index: number;
+  created_at: string;
+  updated_at: string;
 }

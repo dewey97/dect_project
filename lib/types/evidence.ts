@@ -25,6 +25,14 @@ export interface EvidenceDevice {
   description?: string;
   previewStats?: string;
   pinLength?: number;
+  chassis?: "iphone_classic" | "iphone_modern" | "android_vintage";
+  wallpaper_url?: string;
+  lockscreen_url?: string;
+  selfie_url?: string;
+  passcode?: string;
+  status_bar?: { time?: string; battery?: number; service_text?: string };
+  lock_screen?: { time?: string; date?: string };
+  settings_info?: Record<string, string>;
 }
 
 // Deprecated alias for legacy code compatibility
