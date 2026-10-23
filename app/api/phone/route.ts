@@ -12,14 +12,18 @@ const DEFAULT_SPREADSHEET_ID = "1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q";
 
 // Server-side in-memory cache (15s TTL) to prevent rate-limiting Google Sheets API
 interface CacheEntry {
-  data: any[];
+  data: Record<string, unknown>[];
   timestamp: number;
 }
 const serverCache = new Map<string, CacheEntry>();
 const CACHE_TTL_MS = 15_000; // 15 seconds
 const MAX_CACHE_ENTRIES = 100;
 
-function setCacheEntry(key: string, data: any[], timestamp: number) {
+function setCacheEntry(
+  key: string,
+  data: Record<string, unknown>[],
+  timestamp: number,
+) {
   serverCache.delete(key);
   while (serverCache.size >= MAX_CACHE_ENTRIES) {
     const oldestKey = serverCache.keys().next().value;
@@ -30,8 +34,14 @@ function setCacheEntry(key: string, data: any[], timestamp: number) {
 }
 
 /** Tab công khai cho runtime; tab nội bộ (checkpoints, cấu hình...) không được đọc qua route này. */
-const ALLOWED_TABS = new Set(["evidences", "photos", "contacts", "calls", "messages", "apps"]);
-
+const ALLOWED_TABS = new Set([
+  "evidences",
+  "photos",
+  "contacts",
+  "calls",
+  "messages",
+  "apps",
+]);
 
 /**
  * Trình bóc tách CSV chuẩn RFC 4180 cho dữ liệu xuất bản công khai từ Google Sheets
@@ -89,11 +99,16 @@ function parseCsvRows(text: string): string[][] {
 /**
  * Tải trực tiếp dữ liệu dạng CSV từ Google Sheets công khai khi không có Service Account.
  */
-async function fetchPublicSheetRows(spreadsheetId: string, tab: string): Promise<string[][]> {
+async function fetchPublicSheetRows(
+  spreadsheetId: string,
+  tab: string,
+): Promise<string[][]> {
   const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(tab)}`;
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) {
-    throw new Error(`Google Sheets public export failed with HTTP ${res.status}`);
+    throw new Error(
+      `Google Sheets public export failed with HTTP ${res.status}`,
+    );
   }
   const text = await res.text();
   const parsed = parseCsvRows(text);
@@ -101,8 +116,13 @@ async function fetchPublicSheetRows(spreadsheetId: string, tab: string): Promise
   // nghĩa là tab yêu cầu không tồn tại và Google Sheets tự redirect về tab đầu tiên.
   if (tab !== "design" && parsed.length > 0) {
     const firstRowStr = parsed[0].join(" ").toLowerCase();
-    if (firstRowStr.includes("link canva") || (firstRowStr.includes("poster") && firstRowStr.includes("tên"))) {
-      throw new Error(`Tab '${tab}' does not exist on spreadsheet (redirected to default tab)`);
+    if (
+      firstRowStr.includes("link canva") ||
+      (firstRowStr.includes("poster") && firstRowStr.includes("tên"))
+    ) {
+      throw new Error(
+        `Tab '${tab}' does not exist on spreadsheet (redirected to default tab)`,
+      );
     }
   }
   return parsed;
@@ -146,12 +166,11 @@ export async function GET(request: Request) {
     return res;
   }
 
-  const spreadsheetId =
-    process.env.GOOGLE_SHEETS_ID || DEFAULT_SPREADSHEET_ID;
+  const spreadsheetId = process.env.GOOGLE_SHEETS_ID || DEFAULT_SPREADSHEET_ID;
 
   const auth = createGoogleAuth(SHEETS_SCOPE);
 
-  const fetchTab = async (sheetName: string): Promise<any[][]> => {
+  const fetchTab = async (sheetName: string): Promise<unknown[][]> => {
     try {
       if (auth) {
         const sheets = google.sheets({ version: "v4", auth });
@@ -159,20 +178,26 @@ export async function GET(request: Request) {
           spreadsheetId,
           range: `'${sheetName}'!A1:Z500`,
         });
-        return response.data.values || [];
+        return (response.data.values as unknown[][]) || [];
       } else {
-        return await fetchPublicSheetRows(spreadsheetId, sheetName);
+        return (await fetchPublicSheetRows(
+          spreadsheetId,
+          sheetName,
+        )) as unknown[][];
       }
     } catch {
       try {
-        return await fetchPublicSheetRows(spreadsheetId, sheetName);
+        return (await fetchPublicSheetRows(
+          spreadsheetId,
+          sheetName,
+        )) as unknown[][];
       } catch {
         return [];
       }
     }
   };
 
-  let rawRows: any[][] = [];
+  let rawRows: unknown[][] = [];
   if (tab === "photos" || tab === "evidences") {
     if (caseIdFilter !== "case_000") {
       rawRows = await fetchTab(`${caseIdFilter}_evidences`);
@@ -206,16 +231,25 @@ export async function GET(request: Request) {
     return NextResponse.json({ success: true, tab, data: [] });
   }
 
-  const headers = rawRows[0].map((h: string) =>
+  const headers = (rawRows[0] as string[]).map((h: string) =>
     typeof h === "string"
-      ? h.replace(/^\uFEFF/, "").replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "").trim()
+      ? h
+          .replace(/^\uFEFF/, "")
+          .replace(/^[🔑⚡📝🔴🟢⚪\s]+/, "")
+          .trim()
       : h,
   );
   const rawData = rawRows
     .slice(1)
-    .filter((row) => row && row.some((cell) => typeof cell === "string" ? cell.trim() : Boolean(cell)))
+    .filter(
+      (row) =>
+        row &&
+        row.some((cell) =>
+          typeof cell === "string" ? cell.trim() : Boolean(cell),
+        ),
+    )
     .map((row) => {
-      const obj: Record<string, any> = {};
+      const obj: Record<string, unknown> = {};
       headers.forEach((header, index) => {
         if (header) {
           obj[header] = row[index] !== undefined ? row[index] : "";
@@ -223,10 +257,18 @@ export async function GET(request: Request) {
       });
 
       // Two-way aliasing: Đảm bảo tương thích 100% giữa code / photo_code và label / title
-      const canonicalCode = String(obj.code || obj.photo_code || obj.photo_id || "").trim();
-      const canonicalLabel = String(obj.label || obj.title || obj.name || "").trim();
-      const canonicalUrl = String(obj.drive_url || obj.direct_cdn_url || obj.url || "").trim();
-      const canonicalDesc = String(obj.description || obj.description_prompt || "").trim();
+      const canonicalCode = String(
+        obj.code || obj.photo_code || obj.photo_id || "",
+      ).trim();
+      const canonicalLabel = String(
+        obj.label || obj.title || obj.name || "",
+      ).trim();
+      const canonicalUrl = String(
+        obj.drive_url || obj.direct_cdn_url || obj.url || "",
+      ).trim();
+      const canonicalDesc = String(
+        obj.description || obj.description_prompt || "",
+      ).trim();
 
       if (canonicalCode) {
         obj.code = canonicalCode;

@@ -14,14 +14,25 @@ import { cn, normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { getActiveCaseId } from "@/lib/cases/case-characters";
+import type { Photo } from "@/lib/types";
+
+interface PhotoItem {
+  id: string;
+  filename: string;
+  driveUrl: string;
+  timestamp: string;
+  location: string;
+  description: string;
+  size: string;
+}
 
 interface PhotosAppProps {
-  photos?: any[];
+  photos?: (Photo | PhotoItem)[];
   onBackToHome?: () => void;
 }
 
 export function PhotosApp({ onBackToHome }: PhotosAppProps) {
-  const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
   const [showExifInfo, setShowExifInfo] = useState(false);
 
   const { data: sheetPhotos, loading, error } = usePhoneData("evidences");
@@ -30,43 +41,63 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const unlocked = Boolean(
-        localStorage.getItem(caseStorageKey(getActiveCaseId(), "followup_ha_password")) ||
-        localStorage.getItem(caseStorageKey(getActiveCaseId(), "followup_ha")) === "solved"
+        localStorage.getItem(
+          caseStorageKey(getActiveCaseId(), "followup_ha_password"),
+        ) ||
+        localStorage.getItem(
+          caseStorageKey(getActiveCaseId(), "followup_ha"),
+        ) === "solved",
       );
       setIsBoxUnlocked(unlocked);
     }
   }, []);
 
-  const photos = sheetPhotos
-    .filter(
-      (item: any) =>
-        Boolean(item.drive_url || item.direct_cdn_url || item.url || item.photo_url)
+  const photos: PhotoItem[] = sheetPhotos
+    .filter((item: Record<string, unknown>) =>
+      Boolean(
+        item.drive_url || item.direct_cdn_url || item.url || item.photo_url,
+      ),
     )
-    .filter((item: any) => {
-      const code = (item.code || item.photo_code || item.photo_id || "").toUpperCase().trim();
+    .filter((item: Record<string, unknown>) => {
+      const code = String(item.code || item.photo_code || item.photo_id || "")
+        .toUpperCase()
+        .trim();
       // 3 vật chứng hộp thiếc D-06, D-05, D-04 chỉ được mở ra sau khi đã trả lời đúng mã khóa
       if (["D-06", "D-05", "D-04", "D06", "D05", "D04"].includes(code)) {
         return isBoxUnlocked;
       }
       return true;
     })
-    .map((item: any, idx: number) => ({
-      id: item.code || item.photo_code || item.photo_id || `photo-${idx + 1}`,
-      filename:
-        item.label ||
-        item.title ||
-        item.file_name ||
-        item.filename ||
-        item.code ||
-        item.photo_code ||
-        `IMG_${idx + 1000}.png`,
-      driveUrl: normalizeImageUrl(
-        item.direct_cdn_url || item.drive_url || item.url || item.photo_url || ""
+    .map((item: Record<string, unknown>, idx: number) => ({
+      id: String(
+        item.code || item.photo_code || item.photo_id || `photo-${idx + 1}`,
       ),
-      timestamp: item.timestamp || item.created_at || "24/07/2016 18:30",
-      location: item.location || "Khu vực Bờ Sông",
-      description: item.description_prompt || item.description || item.note || "",
-      size: item.size || "2.4 MB",
+      filename: String(
+        item.label ||
+          item.title ||
+          item.file_name ||
+          item.filename ||
+          item.code ||
+          item.photo_code ||
+          `IMG_${idx + 1000}.png`,
+      ),
+      driveUrl: normalizeImageUrl(
+        String(
+          item.direct_cdn_url ||
+            item.drive_url ||
+            item.url ||
+            item.photo_url ||
+            "",
+        ),
+      ),
+      timestamp: String(
+        item.timestamp || item.created_at || "24/07/2016 18:30",
+      ),
+      location: String(item.location || "Khu vực Bờ Sông"),
+      description: String(
+        item.description_prompt || item.description || item.note || "",
+      ),
+      size: String(item.size || "2.4 MB"),
     }));
 
   return (

@@ -138,8 +138,10 @@ export function DossierConfigModal({
       } else {
         toast.error(res.error || "Không lưu được cấu hình bộ hồ sơ");
       }
-    } catch (err: any) {
-      toast.error(err?.message || "Lỗi khi lưu bộ hồ sơ");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Lỗi khi lưu bộ hồ sơ";
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }

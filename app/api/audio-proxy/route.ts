@@ -3,10 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 // Allowed hosts for audio files
-const ALLOWED_AUDIO_HOSTS = new Set([
-  "docs.google.com",
-  "drive.google.com",
-]);
+const ALLOWED_AUDIO_HOSTS = new Set(["docs.google.com", "drive.google.com"]);
 
 interface AudioCacheItem {
   buffer: ArrayBuffer;
@@ -39,7 +36,11 @@ function getFromAudioCache(key: string): AudioCacheItem | null {
   return item;
 }
 
-function addToAudioCache(key: string, buffer: ArrayBuffer, contentType: string) {
+function addToAudioCache(
+  key: string,
+  buffer: ArrayBuffer,
+  contentType: string,
+) {
   const byteLength = buffer.byteLength;
   if (byteLength > 15 * 1024 * 1024) return; // Do not cache files > 15MB
 
@@ -81,7 +82,10 @@ export async function GET(request: NextRequest) {
     } else {
       try {
         const parsed = new URL(rawUrl);
-        if (parsed.protocol !== "https:" || !ALLOWED_AUDIO_HOSTS.has(parsed.hostname)) {
+        if (
+          parsed.protocol !== "https:" ||
+          !ALLOWED_AUDIO_HOSTS.has(parsed.hostname)
+        ) {
           return new NextResponse("Host not allowed", { status: 400 });
         }
         fileId = parsed.searchParams.get("id") || undefined;
@@ -92,7 +96,9 @@ export async function GET(request: NextRequest) {
   }
 
   if (!fileId || !/^[a-zA-Z0-9_-]+$/.test(fileId)) {
-    return new NextResponse("Missing or invalid audio file id", { status: 400 });
+    return new NextResponse("Missing or invalid audio file id", {
+      status: 400,
+    });
   }
 
   const cached = getFromAudioCache(fileId);
@@ -119,7 +125,9 @@ export async function GET(request: NextRequest) {
 
     if (!res.ok) {
       console.warn(`Audio proxy upstream failed: ${res.status} for ${fileId}`);
-      return new NextResponse(`Failed to fetch audio: ${res.statusText}`, { status: res.status });
+      return new NextResponse(`Failed to fetch audio: ${res.statusText}`, {
+        status: res.status,
+      });
     }
 
     const contentType = res.headers.get("content-type") || "audio/mpeg";
@@ -136,8 +144,10 @@ export async function GET(request: NextRequest) {
         "X-Cache": "MISS",
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Audio proxy error:", err);
-    return new NextResponse(err.message || "Internal server error", { status: 500 });
+    const message =
+      err instanceof Error ? err.message : "Internal server error";
+    return new NextResponse(message, { status: 500 });
   }
 }

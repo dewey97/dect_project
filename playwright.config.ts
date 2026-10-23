@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = Number(process.env.E2E_PORT || 3100);
+const PORT = Number(process.env.E2E_PORT || process.env.PORT || 3101);
 
 /**
  * E2E gameplay. Chạy: `pnpm test:e2e`.
@@ -23,7 +23,13 @@ export default defineConfig({
   },
   projects: [
     {
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
       name: "chromium",
+      dependencies: ["setup"],
+      testIgnore: /.*\.setup\.ts/,
       use: {
         ...devices["Desktop Chrome"],
         viewport: { width: 1440, height: 900 },

@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { DbCase, DbCaseCheckpoint, DbCaseDossier, DbCaseCharacter } from "@/lib/types/database";
+import type {
+  DbCase,
+  DbCaseCheckpoint,
+  DbCaseDossier,
+  DbCaseCharacter,
+} from "@/lib/types/database";
 import { lintCase } from "@/lib/checkpoints/case-linter";
 import { launchPlaytestFromCheckpoint } from "@/lib/checkpoints/case-playtest";
 import { CaseLintModal } from "./case-lint-modal";
@@ -93,7 +98,9 @@ export function CheckpointStudioClient({
   const [sidebarWidth, setSidebarWidth] = useState<number>(420);
   // Đọc độ rộng đã lưu sau khi mount để HTML server và client khớp nhau.
   useEffect(() => {
-    const saved = Number(localStorage.getItem("checkpoint_studio_sidebar_width"));
+    const saved = Number(
+      localStorage.getItem("checkpoint_studio_sidebar_width"),
+    );
     if (saved) setSidebarWidth(Math.max(320, Math.min(800, saved)));
   }, []);
   const [isResizing, setIsResizing] = useState(false);
@@ -122,7 +129,10 @@ export function CheckpointStudioClient({
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
       try {
-        localStorage.setItem("checkpoint_studio_sidebar_width", String(sidebarWidth));
+        localStorage.setItem(
+          "checkpoint_studio_sidebar_width",
+          String(sidebarWidth),
+        );
       } catch {}
     };
 
@@ -271,8 +281,9 @@ export function CheckpointStudioClient({
       setPendingEdges([]);
       setPendingPositions({});
       await loadCase(res.caseId);
-    } catch (err: any) {
-      toast.error(err?.message || "Lỗi tạo vụ án");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Lỗi tạo vụ án";
+      toast.error(message);
     } finally {
       setIsCreatingCase(false);
     }
@@ -371,7 +382,9 @@ export function CheckpointStudioClient({
         const selectedDossier =
           patch.unlocksDossier !== undefined
             ? patch.unlocksDossier.trim()
-            : (next.unlocksDossier ? next.unlocksDossier.trim() : "");
+            : next.unlocksDossier
+              ? next.unlocksDossier.trim()
+              : "";
 
         return prevRows.map((r) => {
           const isTarget =
@@ -396,9 +409,11 @@ export function CheckpointStudioClient({
 
           // Nguyên tắc 1 bộ hồ sơ chỉ tồn tại ở 1 node duy nhất:
           // Nếu node hiện tại lấy selectedDossier (khác rỗng), bất kỳ node nào khác đang giữ bộ đó phải nhả ra!
+          const rConfig = r.answer_config as Record<string, unknown> | null;
           if (
             selectedDossier &&
-            (r.answer_config as any)?.unlocksDossier?.trim() === selectedDossier
+            typeof rConfig?.unlocksDossier === "string" &&
+            rConfig.unlocksDossier.trim() === selectedDossier
           ) {
             return {
               ...r,
@@ -593,10 +608,7 @@ export function CheckpointStudioClient({
       }
 
       if (positionUpdates.length > 0) {
-        const result = await updateCheckpointPositions(
-          caseId,
-          positionUpdates,
-        );
+        const result = await updateCheckpointPositions(caseId, positionUpdates);
         if (!result.success) {
           toast.error(result.error);
           return;
@@ -642,8 +654,10 @@ export function CheckpointStudioClient({
       });
 
       toast.success("Đã lưu sơ đồ.");
-    } catch (error: any) {
-      toast.error(error?.message || "Không lưu được sơ đồ.");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Không lưu được sơ đồ.";
+      toast.error(message);
     } finally {
       setIsSavingDependencies(false);
     }
@@ -680,8 +694,10 @@ export function CheckpointStudioClient({
       setDraft(nextDraft);
       setBaseline(JSON.stringify(nextDraft));
       toast.success("Đã lưu checkpoint.");
-    } catch (error: any) {
-      toast.error(error?.message || "Không lưu được checkpoint.");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Không lưu được checkpoint.";
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -728,8 +744,10 @@ export function CheckpointStudioClient({
       setDraft(nextDraft);
       setBaseline(nextDraft ? JSON.stringify(nextDraft) : "");
       toast.success("Đã xóa checkpoint.");
-    } catch (error: any) {
-      toast.error(error?.message || "Không xóa được checkpoint.");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Không xóa được checkpoint.";
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -783,8 +801,10 @@ export function CheckpointStudioClient({
       if (savedAny) {
         toast.success("Đã lưu tất cả thay đổi!");
       }
-    } catch (error: any) {
-      toast.error(error?.message || "Lỗi khi lưu dữ liệu.");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Lỗi khi lưu dữ liệu.";
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -841,10 +861,7 @@ export function CheckpointStudioClient({
           !isResizing && "transition-[width] duration-75 ease-out",
         )}
       >
-        <CheckpointListSidebar
-          onCreate={createRow}
-          isLoading={isLoading}
-        >
+        <CheckpointListSidebar onCreate={createRow} isLoading={isLoading}>
           {activeDossierForEdit ? (
             <DossierEditor
               caseId={caseId}

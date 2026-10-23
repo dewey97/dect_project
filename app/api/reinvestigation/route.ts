@@ -88,12 +88,11 @@ export async function GET(request: NextRequest) {
     }
 
     return dynamicSuccessResponse({ success: true, hotspots: null, caseId });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error reading hotspots data:", error);
-    return defensiveErrorResponse(
-      { success: false, error: error.message },
-      500,
-    );
+    const message =
+      error instanceof Error ? error.message : "Error reading hotspots data";
+    return defensiveErrorResponse({ success: false, error: message }, 500);
   }
 }
 
@@ -165,11 +164,10 @@ export async function POST(request: NextRequest) {
       caseId,
       count: hotspots.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error writing hotspots data:", error);
-    return defensiveErrorResponse(
-      { success: false, error: error.message },
-      500,
-    );
+    const message =
+      error instanceof Error ? error.message : "Error writing hotspots data";
+    return defensiveErrorResponse({ success: false, error: message }, 500);
   }
 }

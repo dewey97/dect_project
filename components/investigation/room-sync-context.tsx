@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, {
   createContext,
@@ -8,120 +8,141 @@ import React, {
   useCallback,
   useRef,
   useMemo,
-} from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { RoomInvestigationState, GameRoomRow, RoomMember, DetectivePing } from '@/lib/types/room'
-import { DEFAULT_ROOM_STATE } from '@/lib/types/room'
-import type { RealtimeChannel } from '@supabase/supabase-js'
-import { normalizeCaseId } from '@/lib/cases/case-id'
-import { getActiveCaseId } from '@/lib/cases/case-characters'
+} from "react";
+import { createClient } from "@/lib/supabase/client";
+import type {
+  RoomInvestigationState,
+  GameRoomRow,
+  RoomMember,
+  DetectivePing,
+} from "@/lib/types/room";
+import { DEFAULT_ROOM_STATE } from "@/lib/types/room";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+import { normalizeCaseId } from "@/lib/cases/case-id";
+import { getActiveCaseId } from "@/lib/cases/case-characters";
 
 interface ToastNotice {
-  id: string
-  actorName: string
-  actionText: string
-  timestamp: number
+  id: string;
+  actorName: string;
+  actionText: string;
+  timestamp: number;
+}
+
+interface PresencePayload {
+  nickname?: string;
+  joinedAt?: number;
 }
 
 interface RoomSyncContextType {
-  roomCode: string | null
-  nickname: string
-  isConnected: boolean
-  isConnecting: boolean
-  roomState: RoomInvestigationState
-  members: RoomMember[]
-  memberCount: number
-  activeToast: ToastNotice | null
-  activePing: DetectivePing | null
-  joinRoom: (code: string, customNick?: string) => Promise<{ success: boolean; error?: string }>
-  leaveRoom: () => void
-  syncUpdate: (patch: Partial<RoomInvestigationState>, actionText?: string) => Promise<void>
+  roomCode: string | null;
+  nickname: string;
+  isConnected: boolean;
+  isConnecting: boolean;
+  roomState: RoomInvestigationState;
+  members: RoomMember[];
+  memberCount: number;
+  activeToast: ToastNotice | null;
+  activePing: DetectivePing | null;
+  joinRoom: (
+    code: string,
+    customNick?: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  leaveRoom: () => void;
+  syncUpdate: (
+    patch: Partial<RoomInvestigationState>,
+    actionText?: string,
+  ) => Promise<void>;
   broadcastPing: (
     targetId: string,
     label: string,
     coords?: { x: number; y: number },
     options?: {
-      targetType?: 'pin' | 'doc' | 'evidence'
-      docType?: 'pdf' | 'evidence'
-      phase?: number
-      page?: number
-    }
-  ) => void
-  setNickname: (name: string) => void
+      targetType?: "pin" | "doc" | "evidence";
+      docType?: "pdf" | "evidence";
+      phase?: number;
+      page?: number;
+    },
+  ) => void;
+  setNickname: (name: string) => void;
 }
 
-const RoomSyncContext = createContext<RoomSyncContextType | undefined>(undefined)
+const RoomSyncContext = createContext<RoomSyncContextType | undefined>(
+  undefined,
+);
 
-const ROOM_CODE_STORAGE_KEY = 'dect_current_room_code'
-const NICKNAME_STORAGE_KEY = 'dect_player_nickname'
-const DEVICE_ID_KEY = 'dect_device_id'
+const ROOM_CODE_STORAGE_KEY = "dect_current_room_code";
+const NICKNAME_STORAGE_KEY = "dect_player_nickname";
+const DEVICE_ID_KEY = "dect_device_id";
 
 function getDeviceId(): string {
-  if (typeof window === 'undefined') return 'server'
+  if (typeof window === "undefined") return "server";
   try {
-    let id = localStorage.getItem(DEVICE_ID_KEY)
+    let id = localStorage.getItem(DEVICE_ID_KEY);
     if (!id) {
-      id = 'dev_' + Math.random().toString(36).slice(2, 10)
-      localStorage.setItem(DEVICE_ID_KEY, id)
+      id = "dev_" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem(DEVICE_ID_KEY, id);
     }
-    return id
+    return id;
   } catch {
-    return 'dev_' + Math.random().toString(36).slice(2, 10)
+    return "dev_" + Math.random().toString(36).slice(2, 10);
   }
 }
 
 export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
-  const [roomCode, setRoomCode] = useState<string | null>(null)
-  const [nickname, setNicknameState] = useState<string>('Thám tử')
-  const nicknameRef = useRef<string>('Thám tử')
-  const [isConnected, setIsConnected] = useState(false)
-  const [isConnecting, setIsConnecting] = useState(false)
-  const [roomState, setRoomState] = useState<RoomInvestigationState>(DEFAULT_ROOM_STATE)
-  const [members, setMembers] = useState<RoomMember[]>([])
-  const [activeToast, setActiveToast] = useState<ToastNotice | null>(null)
-  const [activePing, setActivePing] = useState<DetectivePing | null>(null)
-  const activePingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const activeToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [roomCode, setRoomCode] = useState<string | null>(null);
+  const [nickname, setNicknameState] = useState<string>("Thám tử");
+  const nicknameRef = useRef<string>("Thám tử");
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [roomState, setRoomState] =
+    useState<RoomInvestigationState>(DEFAULT_ROOM_STATE);
+  const [members, setMembers] = useState<RoomMember[]>([]);
+  const [activeToast, setActiveToast] = useState<ToastNotice | null>(null);
+  const [activePing, setActivePing] = useState<DetectivePing | null>(null);
+  const activePingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
-  const supabase = useMemo(() => createClient(), [])
-  const channelRef = useRef<RealtimeChannel | null>(null)
-  const roomStateRef = useRef<RoomInvestigationState>(DEFAULT_ROOM_STATE)
-  const didAutoConnectRef = useRef(false)
+  const supabase = useMemo(() => createClient(), []);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const roomStateRef = useRef<RoomInvestigationState>(DEFAULT_ROOM_STATE);
+  const didAutoConnectRef = useRef(false);
 
   // Keep refs synchronized
   useEffect(() => {
-    roomStateRef.current = roomState
-  }, [roomState])
+    roomStateRef.current = roomState;
+  }, [roomState]);
 
   useEffect(() => {
-    nicknameRef.current = nickname
-  }, [nickname])
+    nicknameRef.current = nickname;
+  }, [nickname]);
 
   // Cleanup channel and timers on unmount
   useEffect(() => {
     return () => {
       if (activePingTimerRef.current) {
-        clearTimeout(activePingTimerRef.current)
-        activePingTimerRef.current = null
+        clearTimeout(activePingTimerRef.current);
+        activePingTimerRef.current = null;
       }
       if (activeToastTimerRef.current) {
-        clearTimeout(activeToastTimerRef.current)
-        activeToastTimerRef.current = null
+        clearTimeout(activeToastTimerRef.current);
+        activeToastTimerRef.current = null;
       }
       if (channelRef.current) {
-        supabase.removeChannel(channelRef.current)
-        channelRef.current = null
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
       }
-    }
-  }, [supabase])
+    };
+  }, [supabase]);
 
   const setNickname = useCallback((name: string) => {
-    const clean = name.trim().slice(0, 30) || 'Thám tử'
-    setNicknameState(clean)
-    nicknameRef.current = clean
-    if (typeof window !== 'undefined') {
+    const clean = name.trim().slice(0, 30) || "Thám tử";
+    setNicknameState(clean);
+    nicknameRef.current = clean;
+    if (typeof window !== "undefined") {
       try {
-        localStorage.setItem(NICKNAME_STORAGE_KEY, clean)
+        localStorage.setItem(NICKNAME_STORAGE_KEY, clean);
       } catch {}
     }
     if (channelRef.current) {
@@ -130,15 +151,15 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
           nickname: clean,
           joinedAt: Date.now(),
         })
-        .catch(() => {})
+        .catch(() => {});
     }
-  }, [])
+  }, []);
 
   // Show auto-dismissing toast
   const triggerToast = useCallback((actorName: string, actionText: string) => {
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       try {
-        navigator.vibrate(40)
+        navigator.vibrate(40);
       } catch {}
     }
     const notice: ToastNotice = {
@@ -146,33 +167,33 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       actorName,
       actionText,
       timestamp: Date.now(),
-    }
-    setActiveToast(notice)
+    };
+    setActiveToast(notice);
     if (activeToastTimerRef.current) {
-      clearTimeout(activeToastTimerRef.current)
+      clearTimeout(activeToastTimerRef.current);
     }
     activeToastTimerRef.current = setTimeout(() => {
-      setActiveToast((prev) => (prev?.id === notice.id ? null : prev))
-      activeToastTimerRef.current = null
-    }, 4500)
-  }, [])
+      setActiveToast((prev) => (prev?.id === notice.id ? null : prev));
+      activeToastTimerRef.current = null;
+    }, 4500);
+  }, []);
 
   // Handle incoming or local ping
   const triggerPing = useCallback((ping: DetectivePing) => {
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       try {
-        navigator.vibrate([30, 40, 30])
+        navigator.vibrate([30, 40, 30]);
       } catch {}
     }
     if (activePingTimerRef.current) {
-      clearTimeout(activePingTimerRef.current)
+      clearTimeout(activePingTimerRef.current);
     }
-    setActivePing(ping)
+    setActivePing(ping);
     activePingTimerRef.current = setTimeout(() => {
-      setActivePing(null)
-      activePingTimerRef.current = null
-    }, 4500)
-  }, [])
+      setActivePing(null);
+      activePingTimerRef.current = null;
+    }, 4500);
+  }, []);
 
   // Broadcast ping to teammates
   const broadcastPing = useCallback(
@@ -181,13 +202,13 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       label: string,
       coords?: { x: number; y: number },
       options?: {
-        targetType?: 'pin' | 'doc' | 'evidence'
-        docType?: 'pdf' | 'evidence'
-        phase?: number
-        page?: number
-      }
+        targetType?: "pin" | "doc" | "evidence";
+        docType?: "pdf" | "evidence";
+        phase?: number;
+        page?: number;
+      },
     ) => {
-      const currentNick = nicknameRef.current
+      const currentNick = nicknameRef.current;
       const ping: DetectivePing = {
         id: Math.random().toString(36).slice(2),
         actorName: currentNick,
@@ -199,208 +220,230 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
         phase: options?.phase,
         page: options?.page,
         timestamp: Date.now(),
-      }
+      };
 
       // Trigger locally immediately
-      triggerPing(ping)
+      triggerPing(ping);
 
       // Broadcast over channel
       if (channelRef.current) {
         channelRef.current.send({
-          type: 'broadcast',
-          event: 'DETECTIVE_PING',
+          type: "broadcast",
+          event: "DETECTIVE_PING",
           payload: ping,
-        })
+        });
       }
     },
-    [triggerPing]
-  )
+    [triggerPing],
+  );
 
   // Leave room logic
   const leaveRoom = useCallback(() => {
     if (channelRef.current) {
-      supabase.removeChannel(channelRef.current)
-      channelRef.current = null
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
     }
-    setRoomCode(null)
-    setIsConnected(false)
-    setMembers([])
-    setRoomState(DEFAULT_ROOM_STATE)
-    if (typeof window !== 'undefined') {
+    setRoomCode(null);
+    setIsConnected(false);
+    setMembers([]);
+    setRoomState(DEFAULT_ROOM_STATE);
+    if (typeof window !== "undefined") {
       try {
-        localStorage.removeItem(ROOM_CODE_STORAGE_KEY)
-        const url = new URL(window.location.href)
-        url.searchParams.delete('room')
-        window.history.replaceState({}, '', url.toString())
+        localStorage.removeItem(ROOM_CODE_STORAGE_KEY);
+        const url = new URL(window.location.href);
+        url.searchParams.delete("room");
+        window.history.replaceState({}, "", url.toString());
       } catch {}
     }
-  }, [supabase])
+  }, [supabase]);
 
   // Join or create room
   const joinRoom = useCallback(
-    async (code: string, customNick?: string): Promise<{ success: boolean; error?: string }> => {
-      const cleanCode = code.trim().toUpperCase().replace(/[^A-Z0-9]/g, '')
+    async (
+      code: string,
+      customNick?: string,
+    ): Promise<{ success: boolean; error?: string }> => {
+      const cleanCode = code
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "");
       if (!cleanCode || cleanCode.length < 2) {
-        return { success: false, error: 'Mã phòng phải có ít nhất 2 ký tự' }
+        return { success: false, error: "Mã phòng phải có ít nhất 2 ký tự" };
       }
 
-      setIsConnecting(true)
+      setIsConnecting(true);
 
-      const activeNick = customNick?.trim() || nicknameRef.current
+      const activeNick = customNick?.trim() || nicknameRef.current;
       if (customNick) {
-        setNickname(activeNick)
+        setNickname(activeNick);
       }
 
       try {
         // 1. Check or create row in Supabase
         const { data: existingRoom, error: fetchErr } = await supabase
-          .from('game_rooms')
-          .select('*')
-          .eq('room_code', cleanCode)
-          .maybeSingle()
+          .from("game_rooms")
+          .select("*")
+          .eq("room_code", cleanCode)
+          .maybeSingle();
 
         if (fetchErr) {
-          console.error('[RoomSync] Fetch error:', fetchErr)
+          console.error("[RoomSync] Fetch error:", fetchErr);
         }
 
-        let initialRoomState = DEFAULT_ROOM_STATE
+        let initialRoomState = DEFAULT_ROOM_STATE;
 
         if (existingRoom) {
           initialRoomState = {
             ...DEFAULT_ROOM_STATE,
             ...(existingRoom.state_json || {}),
-          }
+          };
         } else {
           // Create new room row
-          const { error: insertErr } = await supabase.from('game_rooms').insert({
-            room_code: cleanCode,
-            game_id: normalizeCaseId(getActiveCaseId()),
-            state_json: DEFAULT_ROOM_STATE,
-            last_action: `${activeNick} đã tạo phòng`,
-          })
+          const { error: insertErr } = await supabase
+            .from("game_rooms")
+            .insert({
+              room_code: cleanCode,
+              game_id: normalizeCaseId(getActiveCaseId()),
+              state_json: DEFAULT_ROOM_STATE,
+              last_action: `${activeNick} đã tạo phòng`,
+            });
 
           if (insertErr) {
-            console.error('[RoomSync] Insert error:', insertErr)
+            console.error("[RoomSync] Insert error:", insertErr);
           }
         }
 
-        setRoomState(initialRoomState)
-        roomStateRef.current = initialRoomState
-        setRoomCode(cleanCode)
-        setIsConnected(true)
+        setRoomState(initialRoomState);
+        roomStateRef.current = initialRoomState;
+        setRoomCode(cleanCode);
+        setIsConnected(true);
 
         // Save to storage & URL
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           try {
-            localStorage.setItem(ROOM_CODE_STORAGE_KEY, cleanCode)
-            const url = new URL(window.location.href)
-            url.searchParams.set('room', cleanCode)
-            window.history.replaceState({}, '', url.toString())
+            localStorage.setItem(ROOM_CODE_STORAGE_KEY, cleanCode);
+            const url = new URL(window.location.href);
+            url.searchParams.set("room", cleanCode);
+            window.history.replaceState({}, "", url.toString());
           } catch {}
         }
 
         // 2. Unsubscribe old channel if any
         if (channelRef.current) {
-          supabase.removeChannel(channelRef.current)
-          channelRef.current = null
+          supabase.removeChannel(channelRef.current);
+          channelRef.current = null;
         }
 
         // 3. Subscribe to Realtime Channel with Presence tracking
-        const deviceId = getDeviceId()
+        const deviceId = getDeviceId();
         const channel = supabase.channel(`room:${cleanCode}`, {
           config: {
             broadcast: { self: false },
             presence: { key: deviceId },
           },
-        })
+        });
 
         channel
-          .on('presence', { event: 'sync' }, () => {
-            const state = channel.presenceState()
-            const list: RoomMember[] = []
+          .on("presence", { event: "sync" }, () => {
+            const state = channel.presenceState();
+            const list: RoomMember[] = [];
             Object.keys(state).forEach((key) => {
-              const presences = state[key] as any[]
+              const presences = state[key] as unknown as PresencePayload[];
               if (presences && presences.length > 0) {
-                const p = presences[0]
+                const p = presences[0];
                 list.push({
                   key,
-                  nickname: p.nickname || 'Thám tử',
+                  nickname: p.nickname || "Thám tử",
                   joinedAt: p.joinedAt || Date.now(),
-                })
+                });
               }
-            })
-            list.sort((a, b) => a.joinedAt - b.joinedAt)
-            setMembers(list)
+            });
+            list.sort((a, b) => a.joinedAt - b.joinedAt);
+            setMembers(list);
           })
-          .on('presence', { event: 'join' }, ({ newPresences }) => {
-            const actor = (newPresences?.[0] as any)?.nickname
+          .on("presence", { event: "join" }, ({ newPresences }) => {
+            const actor = (newPresences?.[0] as PresencePayload | undefined)
+              ?.nickname;
             if (actor && actor !== activeNick) {
-              triggerToast(actor, 'vừa tham gia tổ chuyên án')
+              triggerToast(actor, "vừa tham gia tổ chuyên án");
             }
           })
-          .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-            const actor = (leftPresences?.[0] as any)?.nickname
+          .on("presence", { event: "leave" }, ({ leftPresences }) => {
+            const actor = (leftPresences?.[0] as PresencePayload | undefined)
+              ?.nickname;
             if (actor && actor !== activeNick) {
-              triggerToast(actor, 'đã rời phòng')
+              triggerToast(actor, "đã rời phòng");
             }
           })
-          .on('broadcast', { event: 'DETECTIVE_PING' }, ({ payload }) => {
-            if (!payload) return
-            const ping = payload as DetectivePing
-            triggerPing(ping)
-            triggerToast(ping.actorName || 'Đồng đội', `đang chỉ vào: ${ping.label || 'manh mối'}`)
+          .on("broadcast", { event: "DETECTIVE_PING" }, ({ payload }) => {
+            if (!payload) return;
+            const ping = payload as DetectivePing;
+            triggerPing(ping);
+            triggerToast(
+              ping.actorName || "Đồng đội",
+              `đang chỉ vào: ${ping.label || "manh mối"}`,
+            );
           })
-          .on('broadcast', { event: 'STATE_PATCH' }, ({ payload }) => {
-            if (!payload || !payload.patch) return
-            const patch = payload.patch as Partial<RoomInvestigationState>
-            const actor = payload.actorName || 'Đồng đội'
-            const action = payload.actionText || 'đã cập nhật tiến trình'
+          .on("broadcast", { event: "STATE_PATCH" }, ({ payload }) => {
+            if (!payload || !payload.patch) return;
+            const patch = payload.patch as Partial<RoomInvestigationState>;
+            const actor = payload.actorName || "Đồng đội";
+            const action = payload.actionText || "đã cập nhật tiến trình";
 
             setRoomState((prev) => {
-              const next = { ...prev, ...patch }
+              const next = { ...prev, ...patch };
               // Merge arrays cleanly
               if (patch.completedCheckpoints) {
                 next.completedCheckpoints = Array.from(
-                  new Set([...prev.completedCheckpoints, ...patch.completedCheckpoints])
-                )
+                  new Set([
+                    ...prev.completedCheckpoints,
+                    ...patch.completedCheckpoints,
+                  ]),
+                );
               }
               if (patch.investigatedSuspects) {
                 next.investigatedSuspects = Array.from(
-                  new Set([...prev.investigatedSuspects, ...patch.investigatedSuspects])
-                )
+                  new Set([
+                    ...prev.investigatedSuspects,
+                    ...patch.investigatedSuspects,
+                  ]),
+                );
               }
               if (patch.solvedFollowups) {
                 next.solvedFollowups = Array.from(
-                  new Set([...prev.solvedFollowups, ...patch.solvedFollowups])
-                )
+                  new Set([...prev.solvedFollowups, ...patch.solvedFollowups]),
+                );
               }
               if (patch.phoneInputs) {
-                next.phoneInputs = { ...prev.phoneInputs, ...patch.phoneInputs }
+                next.phoneInputs = {
+                  ...prev.phoneInputs,
+                  ...patch.phoneInputs,
+                };
               }
               if (patch.annotations) {
                 next.annotations = {
                   ...(prev.annotations || {}),
                   ...patch.annotations,
-                }
+                };
               }
               if (patch.teamNotes !== undefined) {
-                next.teamNotes = patch.teamNotes
+                next.teamNotes = patch.teamNotes;
               }
-              return next
-            })
+              return next;
+            });
 
-            triggerToast(actor, action)
+            triggerToast(actor, action);
           })
           .on(
-            'postgres_changes',
+            "postgres_changes",
             {
-              event: 'UPDATE',
-              schema: 'public',
-              table: 'game_rooms',
+              event: "UPDATE",
+              schema: "public",
+              table: "game_rooms",
               filter: `room_code=eq.${cleanCode}`,
             },
             (payload) => {
-              const newRow = payload.new as GameRoomRow
+              const newRow = payload.new as GameRoomRow;
               if (newRow?.state_json) {
                 setRoomState((prev) => ({
                   ...prev,
@@ -413,173 +456,188 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
                     newRow.state_json.teamNotes !== undefined
                       ? newRow.state_json.teamNotes
                       : prev.teamNotes,
-                }))
+                }));
               }
-            }
+            },
           )
           .subscribe(async (status) => {
-            if (status === 'SUBSCRIBED') {
-              setIsConnected(true)
+            if (status === "SUBSCRIBED") {
+              setIsConnected(true);
               try {
                 await channel.track({
                   nickname: activeNick,
                   joinedAt: Date.now(),
-                })
+                });
               } catch (trackErr) {
-                console.warn('[RoomSync] Track error:', trackErr)
+                console.warn("[RoomSync] Track error:", trackErr);
               }
             }
-          })
+          });
 
-        channelRef.current = channel
-        return { success: true }
-      } catch (err: any) {
-        console.error('[RoomSync] Join room failed:', err)
-        return { success: false, error: err?.message || 'Không thể kết nối phòng' }
+        channelRef.current = channel;
+        return { success: true };
+      } catch (err: unknown) {
+        console.error("[RoomSync] Join room failed:", err);
+        const errorMsg =
+          err instanceof Error
+            ? err.message
+            : typeof err === "object" && err !== null && "message" in err
+              ? String((err as { message: unknown }).message)
+              : "Không thể kết nối phòng";
+        return {
+          success: false,
+          error: errorMsg,
+        };
       } finally {
-        setIsConnecting(false)
+        setIsConnecting(false);
       }
     },
-    [setNickname, supabase, triggerPing, triggerToast]
-  )
+    [setNickname, supabase, triggerPing, triggerToast],
+  );
 
   // Broadcast & DB update
   const syncUpdate = useCallback(
     async (patch: Partial<RoomInvestigationState>, actionText?: string) => {
-      if (!roomCode) return
+      if (!roomCode) return;
 
-      const currentState = roomStateRef.current
+      const currentState = roomStateRef.current;
       const nextMerged: RoomInvestigationState = {
         ...currentState,
         ...patch,
-      }
+      };
 
       // Merge arrays
       if (patch.completedCheckpoints) {
         nextMerged.completedCheckpoints = Array.from(
-          new Set([...currentState.completedCheckpoints, ...patch.completedCheckpoints])
-        )
+          new Set([
+            ...currentState.completedCheckpoints,
+            ...patch.completedCheckpoints,
+          ]),
+        );
       }
       if (patch.investigatedSuspects) {
         nextMerged.investigatedSuspects = Array.from(
-          new Set([...currentState.investigatedSuspects, ...patch.investigatedSuspects])
-        )
+          new Set([
+            ...currentState.investigatedSuspects,
+            ...patch.investigatedSuspects,
+          ]),
+        );
       }
       if (patch.solvedFollowups) {
         nextMerged.solvedFollowups = Array.from(
-          new Set([...currentState.solvedFollowups, ...patch.solvedFollowups])
-        )
+          new Set([...currentState.solvedFollowups, ...patch.solvedFollowups]),
+        );
       }
       if (patch.phoneInputs) {
         nextMerged.phoneInputs = {
           ...currentState.phoneInputs,
           ...patch.phoneInputs,
-        }
+        };
       }
       if (patch.annotations) {
         nextMerged.annotations = {
           ...(currentState.annotations || {}),
           ...patch.annotations,
-        }
+        };
       }
       if (patch.teamNotes !== undefined) {
-        nextMerged.teamNotes = patch.teamNotes
+        nextMerged.teamNotes = patch.teamNotes;
       }
 
-      setRoomState(nextMerged)
-      roomStateRef.current = nextMerged
+      setRoomState(nextMerged);
+      roomStateRef.current = nextMerged;
 
-      const currentNick = nicknameRef.current
-      const actionDesc = actionText || 'đã mở khóa manh mối'
+      const currentNick = nicknameRef.current;
+      const actionDesc = actionText || "đã mở khóa manh mối";
 
       // 1. Broadcast immediately to peers (< 30ms)
       if (channelRef.current) {
         channelRef.current.send({
-          type: 'broadcast',
-          event: 'STATE_PATCH',
+          type: "broadcast",
+          event: "STATE_PATCH",
           payload: {
             patch,
             actorName: currentNick,
             actionText: actionDesc,
             timestamp: Date.now(),
           },
-        })
+        });
       }
 
       // 2. Persist to Postgres
       try {
         await supabase
-          .from('game_rooms')
+          .from("game_rooms")
           .update({
             state_json: nextMerged,
             last_action: `${currentNick} ${actionDesc}`,
             updated_at: new Date().toISOString(),
           })
-          .eq('room_code', roomCode)
+          .eq("room_code", roomCode);
       } catch (err) {
-        console.error('[RoomSync] DB persist failed:', err)
+        console.error("[RoomSync] DB persist failed:", err);
       }
     },
-    [roomCode, supabase]
-  )
+    [roomCode, supabase],
+  );
 
   // Catch-up on tab visibility change or reconnect
   useEffect(() => {
-    if (!roomCode) return
+    if (!roomCode) return;
 
     const handleCatchUp = async () => {
-      if (document.visibilityState === 'visible' && roomCode) {
+      if (document.visibilityState === "visible" && roomCode) {
         try {
           const { data } = await supabase
-            .from('game_rooms')
-            .select('state_json')
-            .eq('room_code', roomCode)
-            .single()
+            .from("game_rooms")
+            .select("state_json")
+            .eq("room_code", roomCode)
+            .single();
 
           if (data?.state_json) {
             setRoomState((prev) => ({
               ...prev,
               ...data.state_json,
-            }))
+            }));
           }
         } catch {}
       }
-    }
+    };
 
-    document.addEventListener('visibilitychange', handleCatchUp)
-    window.addEventListener('online', handleCatchUp)
+    document.addEventListener("visibilitychange", handleCatchUp);
+    window.addEventListener("online", handleCatchUp);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleCatchUp)
-      window.removeEventListener('online', handleCatchUp)
-    }
-  }, [roomCode, supabase])
+      document.removeEventListener("visibilitychange", handleCatchUp);
+      window.removeEventListener("online", handleCatchUp);
+    };
+  }, [roomCode, supabase]);
 
   // Initial auto-connect from URL or localStorage (runs once on mount)
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (didAutoConnectRef.current) return
-    didAutoConnectRef.current = true
+    if (typeof window === "undefined") return;
+    if (didAutoConnectRef.current) return;
+    didAutoConnectRef.current = true;
 
     try {
-      const savedNick = localStorage.getItem(NICKNAME_STORAGE_KEY)
+      const savedNick = localStorage.getItem(NICKNAME_STORAGE_KEY);
       if (savedNick) {
-        setNicknameState(savedNick)
-        nicknameRef.current = savedNick
+        setNicknameState(savedNick);
+        nicknameRef.current = savedNick;
       }
 
-      const urlParams = new URLSearchParams(window.location.search)
-      const urlRoom = urlParams.get('room')
-      const savedRoom = localStorage.getItem(ROOM_CODE_STORAGE_KEY)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlRoom = urlParams.get("room");
+      const savedRoom = localStorage.getItem(ROOM_CODE_STORAGE_KEY);
 
-      const targetRoom = urlRoom || savedRoom
+      const targetRoom = urlRoom || savedRoom;
       if (targetRoom) {
-        joinRoom(targetRoom, savedNick || undefined)
+        joinRoom(targetRoom, savedNick || undefined);
       }
     } catch {}
-  }, [joinRoom])
+  }, [joinRoom]);
 
-  const memberCount = Math.max(isConnected ? 1 : 0, members.length)
+  const memberCount = Math.max(isConnected ? 1 : 0, members.length);
 
   const contextValue = useMemo<RoomSyncContextType>(
     () => ({
@@ -613,8 +671,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       syncUpdate,
       broadcastPing,
       setNickname,
-    ]
-  )
+    ],
+  );
 
   return (
     <RoomSyncContext.Provider value={contextValue}>
@@ -625,19 +683,21 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
           <div className="bg-[#1b140e]/95 border-2 border-amber-500/70 text-[#f5ebd9] px-4 py-3 rounded-lg shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-sm pointer-events-auto">
             <span className="text-xl">🕵️</span>
             <div className="flex-1 text-xs font-mono">
-              <span className="font-bold text-amber-400">{activeToast.actorName}</span>{' '}
+              <span className="font-bold text-amber-400">
+                {activeToast.actorName}
+              </span>{" "}
               <span className="text-[#e8d5b5]">{activeToast.actionText}</span>
             </div>
           </div>
         </div>
       )}
     </RoomSyncContext.Provider>
-  )
+  );
 }
 
 const DEFAULT_ROOM_SYNC_CONTEXT: RoomSyncContextType = {
   roomCode: null,
-  nickname: 'Thám tử',
+  nickname: "Thám tử",
   isConnected: false,
   isConnecting: false,
   roomState: DEFAULT_ROOM_STATE,
@@ -645,17 +705,17 @@ const DEFAULT_ROOM_SYNC_CONTEXT: RoomSyncContextType = {
   memberCount: 0,
   activeToast: null,
   activePing: null,
-  joinRoom: async () => ({ success: false, error: 'No Room Provider' }),
+  joinRoom: async () => ({ success: false, error: "No Room Provider" }),
   leaveRoom: () => {},
   syncUpdate: async () => {},
   broadcastPing: () => {},
   setNickname: () => {},
-}
+};
 
 export function useRoomSync() {
-  const context = useContext(RoomSyncContext)
+  const context = useContext(RoomSyncContext);
   if (!context) {
-    return DEFAULT_ROOM_SYNC_CONTEXT
+    return DEFAULT_ROOM_SYNC_CONTEXT;
   }
-  return context
+  return context;
 }

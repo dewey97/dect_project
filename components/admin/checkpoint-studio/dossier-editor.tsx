@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  FolderOpen,
-  Search,
-  Check,
-  Plus,
-  Loader2,
-  X,
-} from "lucide-react";
+import { FolderOpen, Search, Check, Plus, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -86,7 +79,8 @@ export function DossierEditor({
   };
 
   const filteredDocs = availableDocuments.filter((doc) => {
-    if (activeCategory !== "all" && doc.category !== activeCategory) return false;
+    if (activeCategory !== "all" && doc.category !== activeCategory)
+      return false;
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase().trim();
     return (
@@ -118,13 +112,17 @@ export function DossierEditor({
       });
 
       if (res.ok && res.dossier) {
-        toast.success(`Đã lưu "${res.dossier.title}" (${res.dossier.document_codes.length} tài liệu)`);
+        toast.success(
+          `Đã lưu "${res.dossier.title}" (${res.dossier.document_codes.length} tài liệu)`,
+        );
         onSaved(res.dossier);
       } else {
         toast.error(res.error || "Không lưu được bộ hồ sơ");
       }
-    } catch (error: any) {
-      toast.error(error?.message || "Lỗi lưu bộ hồ sơ");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Lỗi lưu bộ hồ sơ";
+      toast.error(message);
     } finally {
       setIsSaving(false);
     }
@@ -363,9 +361,7 @@ export function DossierEditor({
           disabled={isSaving || !title.trim()}
           className="bg-purple-600 text-white hover:bg-purple-500 text-xs font-semibold"
         >
-          {isSaving ? (
-            <Loader2 className="size-3.5 animate-spin mr-1" />
-          ) : null}
+          {isSaving ? <Loader2 className="size-3.5 animate-spin mr-1" /> : null}
           Lưu bộ hồ sơ
         </Button>
       </div>

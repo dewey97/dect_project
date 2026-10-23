@@ -29,6 +29,7 @@ build_log.txt
 .playwright-cli/
 .playwright-mcp/
 test-results/
+e2e/.auth/
 
 # Temporary audio/video scratch files in root
 /*.wav

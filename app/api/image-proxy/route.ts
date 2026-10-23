@@ -91,7 +91,10 @@ export async function GET(request: NextRequest) {
     } else {
       try {
         const parsed = new URL(rawUrl);
-        if (parsed.protocol !== "https:" || !ALLOWED_HOSTS.has(parsed.hostname)) {
+        if (
+          parsed.protocol !== "https:" ||
+          !ALLOWED_HOSTS.has(parsed.hostname)
+        ) {
           return new NextResponse("Host not allowed", { status: 400 });
         }
         targetUrl = parsed.toString();
@@ -148,8 +151,9 @@ export async function GET(request: NextRequest) {
         "X-Cache": "MISS",
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Image proxy error:", error);
-    return new NextResponse(error.message || "Internal error", { status: 500 });
+    const message = error instanceof Error ? error.message : "Internal error";
+    return new NextResponse(message, { status: 500 });
   }
 }
