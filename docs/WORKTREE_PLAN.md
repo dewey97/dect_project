@@ -39,7 +39,7 @@ pnpm install
 ```
 
 - Chỉ dùng **pnpm**. Không chạy `npm install`.
-- Copy `.env.local` (nếu có) từ thư mục gốc sang worktree. Không commit file env.
+- Copy `.env` từ thư mục gốc sang worktree (`cp ../.env .env`). Không commit file env.
 - Mỗi worktree chạy dev server/E2E trên **cổng riêng**: WT-1 `3101`, WT-2 `3102`, WT-3 `3103`, WT-4 `3104`, WT-5 `3105` (`PORT=310x pnpm dev`, `PORT=310x pnpm test:e2e`).
 
 ### 1.2. Vùng sở hữu
@@ -86,7 +86,7 @@ pnpm install
 | 1.3 | P28: spec `e2e/phone-runtime.spec.ts` — mở phone case_000, kiểm tra home screen đủ 15 app, mở Tin nhắn thấy ít nhất 1 thread.                                                                                                                                                      |
 | 1.4 | P29: spec tạo case tạm qua `duplicateCase` hoặc Studio, thêm 1 app, phone render app đó. Dọn dữ liệu sau test. Nếu cần DB đã migrate 30–34 thì `test.skip` khi bảng chưa có.                                                                                                       |
 | 1.5 | `app/api/phone-data/apps/route.ts`: bỏ fallback 15 app icon case_000 cho vụ khác case_000. Vụ chưa cấu hình trả `data: []`, `source: "empty"`. Case_000 vẫn giữ fallback tới khi migration 33 chạy.                                                                                |
-| 1.6 | Giảm `any` trong `components/phone-engine/**` và `lib/hooks/use-phone-data.ts` (~17 chỗ).                                                                                                                                                                                          |
+| 1.6 | Giảm `any` trong `components/phone-engine/**` (12 chỗ: banking 2, notes 3, photos 4, safari 2, phone-context 1) và `lib/hooks/use-phone-data.ts` (1 chỗ). Tổng 13.                                                                                                                 |
 
 ---
 
@@ -109,15 +109,15 @@ pnpm install
 
 **Sở hữu:** `components/investigation/mindmap/**`, `components/investigation/hint-modal.tsx`, `components/investigation/epilogue-modal.tsx`, `components/investigation/checkpoints-context.tsx`, `lib/hooks/use-case-narratives.ts`, `lib/ai/**`, `lib/cases/case-000-*.ts`, `lib/checkpoints/server-grader.ts`, `components/admin/checkpoint-studio/sections/**`, `db/schema/36_*.sql`.
 
-| #   | Việc                                                                                                                                                                                                         |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 3.1 | Thống kê 97 chỗ `cp-000-*` trong 17 file. Phân loại: (a) id checkpoint thật đọc được từ DB, (b) id cố định cho logic chung, (c) dữ liệu chết. Ghi bảng vào báo cáo.                                          |
-| 3.2 | **M5** `use-case-narratives.ts`: đọc `case_checkpoints.narrative` theo `kind`/`depends_on`, bỏ map phase → `cp-000-*`. Giữ baseline narrative ngay lập tức (AGENTS.md §6 Zero-Black-Screen).                 |
-| 3.3 | **M4** `CASE_000_INTERROGATION_CRITERIA` → đọc `case_checkpoints.ai_context` / `ai_valid_cases` / `ai_invalid_cases` của checkpoint `kind` thẩm tra theo `subject_key`. Nếu thiếu cột thì viết migration 36. |
-| 3.4 | **M8** Gỡ `lib/cases/case-000-suspects.ts`, `case-000-clues.ts`: chuyển sang `case_characters` + `case_checkpoints`. Xóa file khi không còn import.                                                          |
-| 3.5 | Bỏ `cp-000-*` trong `hint-modal.tsx`, `admin-create-pin-modal.tsx`, `custom-pin-modal.tsx`, `culprit-epilogue-modal.tsx`, `main-investigation-canvas.tsx`, `add-suspect-modal.tsx`.                          |
-| 3.6 | **Không** sửa dòng import `CASE_000_EVIDENCE` / `CASE_000_PDFS` trong mindmap (WT-2 đổi nguồn). Ghi vào việc tích hợp.                                                                                       |
-| 3.7 | Spec `e2e/case-000.spec.ts` phải pass nguyên vẹn. Thêm spec chơi thử 1 vụ duplicate từ case_000 (slug khác) qua được checkpoint đầu.                                                                         |
+| #   | Việc                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.1 | Thống kê 66 chỗ `cp-000-*` trong 11 file mindmap + 31 chỗ ngoài mindmap (hint-modal, epilogue, checkpoints-context, narratives). Phân loại: (a) id checkpoint thật đọc được từ DB, (b) id cố định cho logic chung, (c) dữ liệu chết. Ghi bảng vào báo cáo.                                                                                                                                                |
+| 3.2 | **M5** `use-case-narratives.ts`: đọc `case_checkpoints.narrative` theo `kind`/`depends_on`, bỏ map phase → `cp-000-*`. Giữ baseline narrative ngay lập tức (AGENTS.md §6 Zero-Black-Screen).                                                                                                                                                                                                              |
+| 3.3 | **M4** `CASE_000_INTERROGATION_CRITERIA` → đọc `case_checkpoints.ai_context` / `ai_valid_cases` / `ai_invalid_cases` của checkpoint `kind` thẩm tra theo `subject_key`. Nếu thiếu cột thì viết migration 36.                                                                                                                                                                                              |
+| 3.4 | **M8** Gỡ `lib/cases/case-000-suspects.ts`, `case-000-clues.ts`: chuyển sang `case_characters` + `case_checkpoints`. Xóa file khi không còn import. `server-grader.ts`: bỏ `DEFAULT_CASE_000_PHONE_INPUTS` hardcode, đọc config từ checkpoint `answer_config`.                                                                                                                                            |
+| 3.5 | Bỏ `cp-000-*` trong **11 file**: `main-investigation-canvas.tsx` (12), `admin-create-pin-modal.tsx` (22), `custom-pin-modal.tsx` (10), `culprit-epilogue-modal.tsx` (7), `add-suspect-modal.tsx` (6), `phone-lookup-modal.tsx` (3), `indictment-modal.tsx` (2), `phone-narrative-modal.tsx` (1), `followup-choice-form.tsx` (1), `followup-code-form.tsx` (1), `followup-time-form.tsx` (1). Tổng 66 chỗ. |
+| 3.6 | **Không** sửa dòng import `CASE_000_EVIDENCE` / `CASE_000_PDFS` trong mindmap (WT-2 đổi nguồn). Ghi vào việc tích hợp. Lưu ý: mindmap hiện **không import** `CASE_000_EVIDENCE`/`CASE_000_PDFS`, chỉ có trong `evidence/**` và `board-stage` (thuộc WT-2).                                                                                                                                                |
+| 3.7 | Spec `e2e/case-000.spec.ts` phải pass nguyên vẹn. Thêm spec chơi thử 1 vụ duplicate từ case_000 (slug khác) qua được checkpoint đầu. **Lưu ý:** E2E admin spec cần Playwright auth setup từ WT-1; nếu WT-1 chưa merge, dùng `test.skip` hoặc chỉ test route công khai.                                                                                                                                    |
 
 ---
 
@@ -159,10 +159,13 @@ pnpm install
 
 ## 8. Rủi ro
 
-| Rủi ro                                           | Giảm thiểu                                                                  |
-| ------------------------------------------------ | --------------------------------------------------------------------------- |
-| WT-2 và WT-3 cùng dùng dữ liệu chứng cứ          | WT-2 giữ export cũ; WT-3 không sửa import đó; nối ở bước tích hợp.          |
-| `main-investigation-canvas.tsx` lớn, dễ conflict | Chỉ WT-3 sở hữu. WT-4 chỉ sửa `HeroInteractive` bên trong, không đổi props. |
-| Migration chưa chạy làm E2E fail                 | Spec phụ thuộc bảng mới phải `test.skip` khi bảng chưa tồn tại.             |
-| 5 dev server cùng lúc tốn RAM                    | Chỉ bật dev server khi chạy E2E/kiểm tra UI, tắt sau khi xong.              |
-| `.next` cache lẫn giữa worktree                  | Mỗi worktree có `.next` riêng; không symlink.                               |
+| Rủi ro                                                | Giảm thiểu                                                                                                                                   |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| WT-2 và WT-3 cùng dùng dữ liệu chứng cứ               | WT-2 giữ export cũ; WT-3 không sửa import đó; nối ở bước tích hợp.                                                                           |
+| `main-investigation-canvas.tsx` lớn, dễ conflict      | Chỉ WT-3 sở hữu. WT-4 chỉ sửa `HeroInteractive` bên trong, không đổi props.                                                                  |
+| Migration chưa chạy làm E2E fail                      | Spec phụ thuộc bảng mới phải `test.skip` khi bảng chưa tồn tại.                                                                              |
+| 5 dev server cùng lúc tốn RAM                         | Chỉ bật dev server khi chạy E2E/kiểm tra UI, tắt sau khi xong.                                                                               |
+| `.next` cache lẫn giữa worktree                       | Mỗi worktree có `.next` riêng; không symlink.                                                                                                |
+| E2E admin cần auth setup từ WT-1                      | WT-2/WT-3/WT-4 dùng `test.skip` cho spec admin nếu WT-1 chưa merge. Hoặc rebase lên main sau khi WT-1 merge.                                 |
+| `CASE_000_EVIDENCE` import chỉ nằm ở WT-2             | Xác nhận: mindmap (WT-3) **không** import `CASE_000_EVIDENCE`/`CASE_000_PDFS`. Chỉ `evidence/**` và `board-stage` (WT-2). Không có xung đột. |
+| `server-grader.ts` có `DEFAULT_CASE_000_PHONE_INPUTS` | WT-3 sở hữu file này; cần bỏ hardcode fallback, đọc config từ checkpoint `answer_config`.                                                    |
