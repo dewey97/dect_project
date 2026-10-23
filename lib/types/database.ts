@@ -1,3 +1,5 @@
+import type { PaperConfig, LoiKhaiData, LyLichData } from "@/types/dossier";
+
 export type CaseStatus = "DRAFT" | "IN_REVIEW" | "PUBLISHED" | "ARCHIVED";
 export type UserRole = "player" | "admin";
 export type PlayStatus = "PLAYING" | "COMPLETED" | "ABANDONED";
@@ -129,8 +131,8 @@ export interface DbDossierDocument {
   mode: "loi_khai" | "ly_lich";
   tag_code: string;
   subject_name: string;
-  paper_config: any;
-  content: any;
+  paper_config: PaperConfig;
+  content: LoiKhaiData | LyLichData;
   created_at: string;
   updated_at: string;
 }

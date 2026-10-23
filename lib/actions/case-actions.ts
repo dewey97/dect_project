@@ -1,7 +1,14 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import type { DbCase, CaseStatus } from "@/lib/types/database";
+import type {
+  DbCase,
+  CaseStatus,
+  DbCaseCheckpoint,
+  DbCaseDossier,
+  DbCaseCharacter,
+  DbDossierDocument,
+} from "@/lib/types/database";
 import { revalidatePath } from "next/cache";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
 import { requireAdminAuth } from "@/lib/auth/admin";
@@ -180,8 +187,8 @@ export async function duplicateCase(caseId: string) {
       .eq("case_id", sourceSlug);
 
     if (checkpoints && checkpoints.length > 0) {
-      const clonedCps = checkpoints.map(
-        ({ id, created_at, updated_at, ...rest }: any) => ({
+      const clonedCps = (checkpoints as DbCaseCheckpoint[]).map(
+        ({ id, created_at, updated_at, ...rest }) => ({
           ...rest,
           case_id: targetSlug,
         }),
@@ -196,8 +203,8 @@ export async function duplicateCase(caseId: string) {
       .eq("case_id", sourceSlug);
 
     if (dossiers && dossiers.length > 0) {
-      const clonedDossiers = dossiers.map(
-        ({ id, created_at, updated_at, ...rest }: any) => ({
+      const clonedDossiers = (dossiers as DbCaseDossier[]).map(
+        ({ id, created_at, updated_at, ...rest }) => ({
           ...rest,
           case_id: targetSlug,
         }),
@@ -212,8 +219,8 @@ export async function duplicateCase(caseId: string) {
       .eq("case_slug", sourceSlug);
 
     if (characters && characters.length > 0) {
-      const clonedChars = characters.map(
-        ({ id, created_at, updated_at, ...rest }: any) => ({
+      const clonedChars = (characters as DbCaseCharacter[]).map(
+        ({ id, created_at, updated_at, ...rest }) => ({
           ...rest,
           case_slug: targetSlug,
         }),
@@ -228,8 +235,8 @@ export async function duplicateCase(caseId: string) {
       .eq("case_id", sourceSlug);
 
     if (documents && documents.length > 0) {
-      const clonedDocs = documents.map(
-        ({ id, created_at, updated_at, ...rest }: any) => ({
+      const clonedDocs = (documents as DbDossierDocument[]).map(
+        ({ id, created_at, updated_at, ...rest }) => ({
           ...rest,
           case_id: targetSlug,
         }),

@@ -77,7 +77,7 @@ E2E case_000 xanh 100% gồm cả test Tùng (bug grader đã sửa). Working tr
 | A      | A6 rotate key `.env`, `git rm --cached .env`                            | Chủ dự án         | 30 phút   |
 | B      | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm | Claude            | —         |
 | C      | C5 (FK: ✅), C6 (tách asset: ✅), C7 (/activate đọc DB: ✅)             | Claude            | —         |
-| D      | D7 giảm `any` (~còn), D11 tiếp                                          | Model khác        | 1–2 ngày  |
+| D      | D7 giảm `any` (Đợt 1 xong 4 file, còn ~143 chỗ)                         | Model khác        | 1 ngày    |
 | E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`             | Chủ dự án         | —         |
 
 Đã hoàn tất kể từ bản roadmap trước: Migration 24–28 đã chạy production, B6-cleanup, A5, A9, L1, L2, B2–B6 (bước chính), C1–C7, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard.
@@ -211,7 +211,22 @@ Mỗi brief đã kèm phạm vi, file, ràng buộc và điều kiện done. Ng�
 
 #### Brief D7 — giảm `any` (model khác, chia nhiều lần)
 
-> Hiện ~226 chỗ `any`. Mỗi lần làm 1–3 file, ưu tiên: `lib/actions/*.ts`, `components/investigation/hero-interactive.tsx`, `components/phone-engine/apps/phone-app.tsx`, `messages-app.tsx`, `main-investigation-canvas.tsx`. Dùng type có sẵn trong `lib/types/database.ts`, `lib/types/case.ts`; `catch (error: unknown)` + thu hẹp kiểu. Không đổi logic. Done: mục 3.
+> Tổng ban đầu ~226 chỗ `any` → hiện còn ~143 chỗ. Chia nhiều đợt 1–4 file:
+>
+> **Đợt 1 (Đã hoàn tất code, typecheck pass):**
+>
+> 1. `lib/types/database.ts`: `DbDossierDocument.paper_config` (`PaperConfig`), `content` (`LoiKhaiData | LyLichData`).
+> 2. `lib/actions/case-actions.ts`: typed casts clone trong `duplicateCase()` (`DbCaseCheckpoint`, `DbCaseDossier`, `DbCaseCharacter`, `DbDossierDocument`). Hết sạch `any` trong `lib/actions/`.
+> 3. `components/investigation/hero-interactive.tsx`: `Boolean(p.pulseBorder)`. Hết `any`.
+> 4. `components/investigation/evidence/reinvestigation-modal.tsx`: interface `RawSheetPhotoItem`, `catch (error: unknown)`, typed hotspot click. Hết `any`.
+> 5. Typecheck `npx tsc --noEmit` pass 100%. E2E test 3 (`tra 3 SĐT`) có thể flake do timing local, 9/10 pass.
+>
+> **Đợt tiếp theo ưu tiên:**
+>
+> - `components/phone-engine/apps/phone-app.tsx`, `messages-app.tsx`
+> - `components/investigation/mindmap/main-investigation-canvas.tsx`
+> - `components/investigation/hero-interactive/render-scene.ts`
+> - `catch (error: unknown)` + thu hẹp kiểu. Không đổi logic. Done: mục 3.
 
 #### Brief D11 — gộp hàm bỏ dấu tiếng Việt (model khác, ~1 giờ)
 
@@ -532,25 +547,25 @@ Sau B6, GM tạo `case_001`:
 4. ✅ **Chơi thử từ node X (C4):** Nút "Chơi thử" trên Checkpoint Editor (`case-playtest.ts`): tự động truy vết tổ tiên đồ thị phụ thuộc, ghi tiến trình giả theo `caseStorageKey` rồi mở tab gameplay `/evidence/web?case_id=`.
 5. ✅ **Bàn điều tra theo vụ (C5):** `board-stage`, `evidence/boardgame`, `evidence/[id]` đã nhận `case_id` và bọc `Suspense`; `pin-builder` dựng pin gốc từ nhân vật + checkpoint; migration `29_boardgame_pins_case_slug_fk.sql` chuẩn hóa case_id và thêm FK → `cases.slug`; `board-actions.ts` dùng `normalizeCaseId` và bỏ `caseIdVariants`.
 6. ✅ **Tài nguyên theo vụ (C6):** Đã bỏ hardcode "Khang" trong `messages-app.tsx`, `phone-app.tsx`, `phone-simulator.tsx` (dùng `getActiveVictim()` động); `/api/phone` đã chặn trả row thiếu `case_id` cho vụ mới; cách ly `CASE_000_PDFS`/`CASE_000_EVIDENCE` chỉ nạp cho `case_000`; `Scene360Viewer` và `pin-builder` nạp ảnh hiện trường theo caseId; hỗ trợ nạp hotspot qua API `/api/reinvestigation`.
-7. ⏳ **`/activate` đọc bảng `cases` (C7):** (bỏ `CASES_CATALOG` tĩnh và luật "mã ≥ 4 ký tự là hợp lệ") — làm cùng License (`TECHDEBT.md` #09).
+7. ✅ **`/activate` đọc bảng `cases` (C7):** Đã tải động từ Supabase qua `getPublicCases()` server action, map sang catalog với template visual styles, fallback catalog an toàn (`34764ed`).
 
 ---
 
 ## 9. Nhóm D — Hiệu năng & chất lượng code
 
-| #   | Việc                                                                                         | Trạng thái       |
-| --- | -------------------------------------------------------------------------------------------- | ---------------- |
-| D1  | Landing tải lười R3F (`landing-keyhole-geometry.ts` tách hằng số)                            | ✅ `cc8ab02`     |
-| D2  | `ReinvestigationModal` qua `next/dynamic` (4 chỗ). `recharts`/`@xyflow` chỉ ở admin → bỏ qua | ✅ `cc8ab02`     |
-| D3  | Nén ảnh PNG lớn → WebP                                                                       | ✅ `93297a7`     |
-| D4  | Đọc localStorage sau mount (Checkpoint Studio)                                               | ✅ `cc8ab02`     |
-| D5  | `lib/google/auth.ts` gộp 3 bản `createGoogleAuth`                                            | ✅ `db73360`     |
-| D6  | `import type` 13 chỗ                                                                         | ✅ `db73360`     |
-| D7  | Giảm `any` (~226)                                                                            | ⏳ brief mục 4.4 |
-| D8  | Tách `hero-interactive.tsx` (534 dòng)                                                       | ✅ `9ccb511`     |
-| D9  | `Scene360Viewer` dispose texture/material                                                    | ✅ `cc8ab02`     |
-| D10 | `user-nav` memo Supabase client                                                              | ✅ `cc8ab02`     |
-| D11 | Gộp hàm bỏ dấu tiếng Việt (~11 chỗ) → `lib/text.ts`                                          | ✅ `2ef43b1`     |
+| #   | Việc                                                                                         | Trạng thái               |
+| --- | -------------------------------------------------------------------------------------------- | ------------------------ |
+| D1  | Landing tải lười R3F (`landing-keyhole-geometry.ts` tách hằng số)                            | ✅ `cc8ab02`             |
+| D2  | `ReinvestigationModal` qua `next/dynamic` (4 chỗ). `recharts`/`@xyflow` chỉ ở admin → bỏ qua | ✅ `cc8ab02`             |
+| D3  | Nén ảnh PNG lớn → WebP                                                                       | ✅ `93297a7`             |
+| D4  | Đọc localStorage sau mount (Checkpoint Studio)                                               | ✅ `cc8ab02`             |
+| D5  | `lib/google/auth.ts` gộp 3 bản `createGoogleAuth`                                            | ✅ `db73360`             |
+| D6  | `import type` 13 chỗ                                                                         | ✅ `db73360`             |
+| D7  | Giảm `any` (~226 → ~143, đợt 1 xong 4 file)                                                  | ⏳ Đang làm (đợt 1 xong) |
+| D8  | Tách `hero-interactive.tsx` (534 dòng)                                                       | ✅ `9ccb511`             |
+| D9  | `Scene360Viewer` dispose texture/material                                                    | ✅ `cc8ab02`             |
+| D10 | `user-nav` memo Supabase client                                                              | ✅ `cc8ab02`             |
+| D11 | Gộp hàm bỏ dấu tiếng Việt (~11 chỗ) → `lib/text.ts`                                          | ✅ `2ef43b1`             |
 
 `map-studio-client.tsx` (1.500 dòng) điểm tách: `useMapDraft` (autosave localStorage), `useHistory` (undo/redo), tiện ích lưới snap + đổi tọa độ, `useMapTools` (pointer/vẽ), phím tắt, `useViewportCulling`.
 

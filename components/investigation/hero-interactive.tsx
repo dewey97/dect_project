@@ -24,9 +24,7 @@ import {
   CASES_LIST,
   MAX_DEVICE_PIXEL_RATIO,
 } from "./hero-interactive/constants";
-import {
-  getInnerBoardBounds,
-} from "./hero-interactive/utils";
+import { getInnerBoardBounds } from "./hero-interactive/utils";
 import {
   getCompositeCard as getCompositeCardHelper,
   getLoadedImage as getLoadedImageHelper,
@@ -102,7 +100,9 @@ export function HeroInteractive({
 
   const devicePixelRatioRef = useRef(1);
   const animationFrameRef = useRef<number | null>(null);
-  const renderSceneCallbackRef = useRef<((timestamp: number) => void) | null>(null);
+  const renderSceneCallbackRef = useRef<((timestamp: number) => void) | null>(
+    null,
+  );
   const requestRenderRef = useRef<() => void>(() => undefined);
   const reducedMotionRef = useRef(false);
 
@@ -119,7 +119,11 @@ export function HeroInteractive({
   );
 
   const resolveSuspectPhotoUrl = useCallback(
-    (pin: { id: string; label: string; photoUrl?: string }): string | undefined =>
+    (pin: {
+      id: string;
+      label: string;
+      photoUrl?: string;
+    }): string | undefined =>
       resolveSuspectPhotoUrlHelper(pin, sheetPhotosMapRef.current),
     [sheetPhotosMapRef],
   );
@@ -203,11 +207,7 @@ export function HeroInteractive({
   }, []);
 
   // ── Zoom hook ──
-  const {
-    zoomRef,
-    panRef,
-    resetZoom,
-  } = useBoardZoom({
+  const { zoomRef, panRef, resetZoom } = useBoardZoom({
     containerSizeRef,
     onZoomChange: () => {
       requestRenderRef.current();
@@ -373,7 +373,7 @@ export function HeroInteractive({
 
           const hasPulsingPins = (
             customPinsRef.current ?? activeCaseRef.current.pins
-          ).some((p) => (p as any).pulseBorder);
+          ).some((p) => Boolean(p.pulseBorder));
 
           const shouldContinueAnimating =
             !reducedMotionRef.current &&

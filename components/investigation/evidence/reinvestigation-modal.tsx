@@ -52,6 +52,35 @@ export interface ReinvestigationHotspot2D {
   soundCaption: string;
 }
 
+interface RawSheetPhotoItem {
+  id?: string;
+  code?: string;
+  photo_code?: string;
+  photo_id?: string;
+  drive_url?: string;
+  direct_cdn_url?: string;
+  url?: string;
+  photo_url?: string;
+  link_anh?: string;
+  image_url?: string;
+  label?: string;
+  title?: string;
+  Title?: string;
+  file_name?: string;
+  filename?: string;
+  ten_anh?: string;
+  "tên ảnh"?: string;
+  description_prompt?: string;
+  description?: string;
+  note?: string;
+  location?: string;
+  category?: string;
+  board_x?: string | number;
+  board_y?: string | number;
+  x?: string | number;
+  y?: string | number;
+}
+
 // SFX HIỆU ỨNG ÂM THANH CÓ SẴN
 const SFX_OPTIONS = [
   {
@@ -282,8 +311,8 @@ export function ReinvestigationModal({
   // Process Google Sheets photos: Map by photo_code ID & Title
   const sheetPhotosList = useMemo(() => {
     if (!Array.isArray(rawSheetPhotos)) return [];
-    return rawSheetPhotos
-      .filter((item: any) =>
+    return (rawSheetPhotos as RawSheetPhotoItem[])
+      .filter((item: RawSheetPhotoItem) =>
         Boolean(
           item.drive_url ||
           item.direct_cdn_url ||
@@ -293,7 +322,7 @@ export function ReinvestigationModal({
           item.image_url,
         ),
       )
-      .map((item: any, idx: number) => {
+      .map((item: RawSheetPhotoItem, idx: number) => {
         const photoCode =
           item.code ||
           item.photo_code ||
@@ -373,8 +402,8 @@ export function ReinvestigationModal({
           num: idx + 1,
           photoId: p.id,
           title: p.title || `Vật chứng #${idx + 1}`,
-          x: parseFloat(p.board_x) || 20 + idx * 20,
-          y: parseFloat(p.board_y) || 50,
+          x: parseFloat(String(p.board_x)) || 20 + idx * 20,
+          y: parseFloat(String(p.board_y)) || 50,
           imageUrl: p.url,
           driveUrl: p.driveUrl,
           soundFile: "sat_soat.mp3",
@@ -418,12 +447,14 @@ export function ReinvestigationModal({
       });
       if (matched) {
         const xNum =
-          matched.board_x && !isNaN(parseFloat(matched.board_x))
-            ? parseFloat(matched.board_x)
+          matched.board_x !== undefined &&
+          !isNaN(parseFloat(String(matched.board_x)))
+            ? parseFloat(String(matched.board_x))
             : spot.x;
         const yNum =
-          matched.board_y && !isNaN(parseFloat(matched.board_y))
-            ? parseFloat(matched.board_y)
+          matched.board_y !== undefined &&
+          !isNaN(parseFloat(String(matched.board_y)))
+            ? parseFloat(String(matched.board_y))
             : spot.y;
         return {
           ...spot,
@@ -611,8 +642,9 @@ export function ReinvestigationModal({
           "Lỗi khi lưu lên Server: " + (data.error || "Server error"),
         );
       }
-    } catch (e: any) {
-      toast.error("Lỗi khi lưu: " + e.message);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      toast.error("Lỗi khi lưu: " + msg);
     } finally {
       setIsSavingDb(false);
     }
@@ -745,7 +777,10 @@ export function ReinvestigationModal({
           }
           hotspots={resolvedHotspots}
           onSelectSpot={(spot) => {
-            handleSpotClick(spot as any);
+            const matched = resolvedHotspots.find((s) => s.id === spot.id);
+            if (matched) {
+              handleSpotClick(matched);
+            }
           }}
           selectedSpotId={selectedSpot?.id}
         />
