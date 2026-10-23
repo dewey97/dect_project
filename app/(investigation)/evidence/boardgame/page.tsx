@@ -4,10 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { useCheckpoints } from "@/components/investigation/checkpoints-context";
-import {
-  CASE_000_PDFS,
-  CASE_000_EVIDENCE,
-} from "@/components/investigation/evidence/evidence-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { BoardGameCompanionView } from "@/components/investigation/evidence/board-game-companion-view";
 import {
   PhaseUnlockedModal,
@@ -81,6 +78,7 @@ function BoardGameCompanionContent() {
     setActiveModal("reinvestigate"),
   );
 
+  const { pdfs: casePdfs, evidence: caseEvs } = useCaseEvidence(caseId);
   const isCase000 = caseId === "case-000" || caseId === "case_000";
 
   useEffect(() => {
@@ -89,11 +87,11 @@ function BoardGameCompanionContent() {
     if (isIntroSeen !== "true" && isCase000) {
       setUnlockedModalData({
         unlockedPhase: 0,
-        newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-        newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
+        newPdfs: casePdfs.filter((d) => d.phase === 0),
+        newEvidence: caseEvs.filter((e) => e.phase === 0),
       });
     }
-  }, [caseId, isCase000]);
+  }, [caseId, isCase000, casePdfs, caseEvs]);
 
   const resetFindingsProgress = () => {
     clearInvestigationStorage();

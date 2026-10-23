@@ -32,10 +32,7 @@ import type {
   SelectedView,
   CombinedItem,
 } from "@/components/investigation/evidence/evidence-types";
-import {
-  CASE_000_PDFS,
-  CASE_000_EVIDENCE,
-} from "@/components/investigation/evidence/evidence-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import {
   PhaseUnlockedModal,
   type UnlockedModalData,
@@ -128,6 +125,9 @@ function WebEvidencePageContent() {
   // Nạp danh mục các bộ hồ sơ từ bảng case_dossiers theo đồ thị vụ án (C1)
   const { getPhaseForCode } = useCaseDossiers(caseId);
 
+  // Nạp danh mục chứng cứ & PDF per-case từ Supabase (M1 / WT-2)
+  const { pdfs: casePdfs, evidence: caseEvs } = useCaseEvidence(caseId);
+
   // 3-Zone Layout State (Desktop):
   // Cột 1 (Trái): Khay hồ sơ & vật chứng (Dossier Tray) - width cố định/resizable (240px -> 450px)
   // Cột 2 (Giữa): Bảng điều tra (Investigation Canvas) - flex-1 (chiếm trọn không gian trung tâm)
@@ -214,18 +214,15 @@ function WebEvidencePageContent() {
       };
     });
 
-    // 2. Thêm file PDF kiểm thử duy nhất (Phase 0) cho case_000
-    const isCase000 = caseId === "case-000" || caseId === "case_000";
-    const testPdfItems: CombinedItem[] = isCase000
-      ? CASE_000_PDFS.map((doc) => ({
-          type: "pdf" as const,
-          data: doc,
-          phase: doc.phase,
-          order: doc.order,
-        }))
-      : [];
+    // 2. Thêm file PDF từ Supabase / Hook per-case
+    const testPdfItems: CombinedItem[] = casePdfs.map((doc) => ({
+      type: "pdf" as const,
+      data: doc,
+      phase: doc.phase,
+      order: doc.order,
+    }));
 
-    // 3. Vật chứng ảnh từ Sheet hoặc fallback local
+    // 3. Vật chứng ảnh từ Sheet hoặc Supabase
     let photoItems: CombinedItem[] = [];
     if (sheetEvidences && sheetEvidences.length > 0) {
       const validRows = sheetEvidences.filter((row: any) => {
@@ -256,14 +253,11 @@ function WebEvidencePageContent() {
           // Ánh xạ Phase / Bộ hồ sơ theo case_dossiers (C1)
           const phase = getPhaseForCode(code);
 
-          const localFallback =
-            caseId === "case-000"
-              ? CASE_000_EVIDENCE.find(
-                  (e) =>
-                    e.title.toLowerCase().includes(title.toLowerCase()) ||
-                    title.toLowerCase().includes(e.title.toLowerCase()),
-                )
-              : undefined;
+          const localFallback = caseEvs.find(
+            (e) =>
+              e.title.toLowerCase().includes(title.toLowerCase()) ||
+              title.toLowerCase().includes(e.title.toLowerCase()),
+          );
           const imgUrl =
             driveUrl || localFallback?.thumbnail || "/photo_scene_overview.jpg";
 
@@ -288,8 +282,8 @@ function WebEvidencePageContent() {
             },
           };
         });
-    } else if (caseId === "case-000") {
-      photoItems = CASE_000_EVIDENCE.map((item): CombinedItem => ({
+    } else if (caseEvs && caseEvs.length > 0) {
+      photoItems = caseEvs.map((item): CombinedItem => ({
         type: "evidence",
         data: item,
         phase: item.phase,
@@ -298,7 +292,7 @@ function WebEvidencePageContent() {
     }
 
     return [...testPdfItems, ...dossierItems, ...photoItems];
-  }, [dossierDocs, sheetEvidences, caseId, getPhaseForCode]);
+  }, [dossierDocs, sheetEvidences, caseId, getPhaseForCode, casePdfs, caseEvs]);
 
   // Tự động nhảy đến vị trí tài liệu/vật chứng khi có đồng đội chỉ điểm (Ping)
   useEffect(() => {
@@ -369,11 +363,11 @@ function WebEvidencePageContent() {
           newPdfs: initPdfs,
           newEvidence: initEvidence,
         });
-      } else if (caseId === "case-000") {
+      } else if (caseId === "case-000" || caseId === "case_000") {
         setUnlockedModalData({
           unlockedPhase: 0,
-          newPdfs: CASE_000_PDFS.filter((d) => d.phase === 0),
-          newEvidence: CASE_000_EVIDENCE.filter((e) => e.phase === 0),
+          newPdfs: casePdfs.filter((d) => d.phase === 0),
+          newEvidence: caseEvs.filter((e) => e.phase === 0),
         });
       }
     }

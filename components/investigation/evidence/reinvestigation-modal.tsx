@@ -26,6 +26,7 @@ import { normalizeImageUrl } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { Scene360Viewer } from "@/components/investigation/scene-360-viewer";
 import { normalizeCaseId } from "@/lib/cases/case-id";
+import { getCase360Config } from "@/lib/actions/evidence-actions";
 
 interface ReinvestigationModalProps {
   isOpen: boolean;
@@ -307,6 +308,51 @@ export function ReinvestigationModal({
       mounted = false;
     };
   }, []);
+
+  // Đọc ảnh 360 / Panorama theo case từ DB (M12 / WT-2)
+  const [sceneConfig, setSceneConfig] = useState<{
+    panorama_url?: string | null;
+    scene_360_url?: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let mounted = true;
+    getCase360Config(caseId || "case_000")
+      .then((res) => {
+        if (!mounted) return;
+        if (
+          res.success &&
+          res.data &&
+          (res.data.panorama_url || res.data.scene_360_url)
+        ) {
+          setSceneConfig({
+            panorama_url: res.data.panorama_url,
+            scene_360_url: res.data.scene_360_url,
+          });
+        } else if (isCase000) {
+          setSceneConfig({
+            panorama_url: "/images/cases/case_000/PANORAMA.png",
+            scene_360_url: "/images/cases/case_000/crime_scene_360.jpg",
+          });
+        } else {
+          setSceneConfig(null);
+        }
+      })
+      .catch(() => {
+        if (mounted && isCase000) {
+          setSceneConfig({
+            panorama_url: "/images/cases/case_000/PANORAMA.png",
+            scene_360_url: "/images/cases/case_000/crime_scene_360.jpg",
+          });
+        } else if (mounted) {
+          setSceneConfig(null);
+        }
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [isOpen, caseId, isCase000]);
 
   // Process Google Sheets photos: Map by photo_code ID & Title
   const sheetPhotosList = useMemo(() => {
@@ -765,16 +811,8 @@ export function ReinvestigationModal({
       {/* MAIN VIEW AREA: TRUE 3D / 360° SPHERICAL WEBGL CANVAS */}
       <div className="relative flex-1 w-full h-full overflow-hidden bg-[#060402]">
         <Scene360Viewer
-          imageUrl={
-            isCase000
-              ? "/images/cases/case_000/crime_scene_360.jpg"
-              : `/images/cases/${normalizeCaseId(caseId)}/crime_scene_360.jpg`
-          }
-          fallbackImageUrl={
-            isCase000
-              ? "/images/cases/case_000/PANORAMA.png"
-              : `/images/cases/${normalizeCaseId(caseId)}/PANORAMA.png`
-          }
+          imageUrl={sceneConfig?.scene_360_url || undefined}
+          fallbackImageUrl={sceneConfig?.panorama_url || undefined}
           hotspots={resolvedHotspots}
           onSelectSpot={(spot) => {
             const matched = resolvedHotspots.find((s) => s.id === spot.id);
