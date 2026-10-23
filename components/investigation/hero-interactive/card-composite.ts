@@ -8,16 +8,18 @@ export const resolveSuspectPhotoUrl = (
     photoUrl?: string;
   },
   photosMap?: Map<string, string>,
+  caseId?: string,
 ): string | undefined => {
   if (pin.photoUrl) return normalizeImageUrl(pin.photoUrl);
   if (
-    pin.id.startsWith("c0-pin-followup") ||
-    pin.id.startsWith("c0-pin-question") ||
-    pin.id.startsWith("c0-pin-clue") ||
-    pin.id.startsWith("c0-pin-evidence") ||
-    pin.id.startsWith("c0-pin-phone") ||
-    pin.id.startsWith("c0-pin-reinvestigate") ||
-    pin.id.startsWith("c0-pin-indictment") ||
+    pin.id.includes("-pin-followup") ||
+    pin.id.includes("-pin-question") ||
+    pin.id.includes("-pin-clue") ||
+    pin.id.includes("-pin-evidence") ||
+    pin.id.includes("-pin-phone") ||
+    pin.id.includes("-pin-reinvestigate") ||
+    pin.id.includes("-pin-indictment") ||
+    pin.id.endsWith("-pin-suspects") ||
     pin.id === "c0-pin-suspects"
   ) {
     return undefined;
@@ -31,7 +33,7 @@ export const resolveSuspectPhotoUrl = (
     lower.includes("crime_scene") ||
     lower.includes("chalk");
 
-  // 1. Check live Google Sheets photos first (Live-First rule)
+  // 1. Check live photos map first (Live-First rule)
   if (photosMap) {
     if (isCrimeScenePin) {
       const liveCrime =
@@ -44,20 +46,31 @@ export const resolveSuspectPhotoUrl = (
       const liveKhang = photosMap.get("avatar_khang") || photosMap.get("khang");
       if (liveKhang) return liveKhang;
     }
-    const char =
-      findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
-    if (char) {
-      const liveChar =
-        photosMap.get(`avatar_${char.id}`) || photosMap.get(char.id);
-      if (liveChar) return liveChar;
-      if (char.avatarUrl) return char.avatarUrl;
-    }
+
     const directCode = photosMap.get(pin.id.toLowerCase().trim());
     if (directCode) return directCode;
+    const directLabel = photosMap.get(pin.label.toLowerCase().trim());
+    if (directLabel) return directLabel;
+
+    // Fallback to case-000 static character list only for case-000
+    const isCase000 = !caseId || caseId === "case-000" || caseId === "case_000";
+    if (isCase000) {
+      const char =
+        findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
+      if (char) {
+        const liveChar =
+          photosMap.get(`avatar_${char.id}`) || photosMap.get(char.id);
+        if (liveChar) return liveChar;
+        if (char.avatarUrl) return char.avatarUrl;
+      }
+    }
   } else {
-    const char =
-      findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
-    if (char && char.avatarUrl) return char.avatarUrl;
+    const isCase000 = !caseId || caseId === "case-000" || caseId === "case_000";
+    if (isCase000) {
+      const char =
+        findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
+      if (char && char.avatarUrl) return char.avatarUrl;
+    }
   }
 
   // 2. Fallback if not found in live Google Sheets
