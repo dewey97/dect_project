@@ -97,19 +97,20 @@ export function wrapText(
   return lines;
 }
 
+export type HitTargetPin = Partial<PinPoint> & { id: string; label: string };
+
 export function isPinHit(
   worldPointer: Point,
   pinPosition: Point,
-  pin: PinPoint | { id: string; label: string },
+  pin: HitTargetPin,
   transform: ViewTransform,
   bounds?: BoardBounds,
 ): boolean {
   const scaleFactor =
     bounds && bounds.width > 0 ? bounds.width / BOARD_BASE_WIDTH : 1.0;
-  const rawPin = pin as any;
   const userScale =
-    typeof rawPin.scale === "number" && rawPin.scale > 0 ? rawPin.scale : 1.0;
-  const userRot = typeof rawPin.rotation === "number" ? rawPin.rotation : 0;
+    typeof pin.scale === "number" && pin.scale > 0 ? pin.scale : 1.0;
+  const userRot = typeof pin.rotation === "number" ? pin.rotation : 0;
 
   // Hit radius for pinhead (18px scaled by scaleFactor)
   const headHitRadius = (18 * scaleFactor) / transform.scale;
@@ -133,13 +134,13 @@ export function isPinHit(
     pin.id === "c0-pin-victim-phone" ||
     (pin.id.includes("phone") &&
       pin.id !== "c0-pin-phone" &&
-      Boolean((pin as any).photoUrl));
+      Boolean(pin.photoUrl));
   const isReinvestigateProp =
     pin.id === "c0-pin-reinvestigate" ||
     Boolean(
-      (pin as any).photoUrl &&
-        ((pin as any).photoUrl.includes("crime_scene") ||
-          (pin as any).photoUrl.includes("reinvestigation")),
+      pin.photoUrl &&
+      (pin.photoUrl.includes("crime_scene") ||
+        pin.photoUrl.includes("reinvestigation")),
     );
   const isKhang =
     !isFollowup &&
@@ -156,7 +157,7 @@ export function isPinHit(
     !isFollowup &&
     (pin.id.startsWith("node-suspect-") ||
       pin.id.startsWith("suspect-") ||
-      !!(pin as any).photoUrl ||
+      Boolean(pin.photoUrl) ||
       isKhang ||
       isCrimeScene ||
       isVictimPhone ||
@@ -193,7 +194,7 @@ export function isPinHit(
   } else {
     const upperLabel = (pin.label || "").toUpperCase();
     const isWhiteNote =
-      (pin as any).noteColor === "white" ||
+      pin.noteColor === "white" ||
       upperLabel.includes("MỞ RỘNG") ||
       upperLabel.includes("KHÁM XÉT") ||
       upperLabel.includes("KHÁM NGHIỆM") ||

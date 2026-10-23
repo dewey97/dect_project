@@ -45,6 +45,7 @@ export type { PinPoint, CaseConnection, CaseData };
 export function HeroInteractive({
   className,
   controlledCaseId,
+  caseId: propCaseId,
   customPins,
   customConnections,
   customBgImage,
@@ -108,7 +109,7 @@ export function HeroInteractive({
 
   // ── Case and mode states ──
   const [internalCaseId, setInternalCaseId] = useState<string>("case-000");
-  const currentCaseId = controlledCaseId ?? internalCaseId;
+  const currentCaseId = controlledCaseId ?? propCaseId ?? internalCaseId;
 
   // ── Live Google Sheets Photos Integration ──
   const { sheetPhotosMapRef } = useLivePinPhotos(
@@ -124,8 +125,12 @@ export function HeroInteractive({
       label: string;
       photoUrl?: string;
     }): string | undefined =>
-      resolveSuspectPhotoUrlHelper(pin, sheetPhotosMapRef.current),
-    [sheetPhotosMapRef],
+      resolveSuspectPhotoUrlHelper(
+        pin,
+        sheetPhotosMapRef.current,
+        currentCaseId,
+      ),
+    [sheetPhotosMapRef, currentCaseId],
   );
 
   const getLoadedImage = useCallback(
@@ -160,8 +165,16 @@ export function HeroInteractive({
     [],
   );
 
-  const activeCase =
-    CASES_LIST.find((c) => c.id === currentCaseId) || CASES_LIST[0];
+  const activeCase = CASES_LIST.find((c) => c.id === currentCaseId) || {
+    id: currentCaseId,
+    title: currentCaseId,
+    description: "",
+    status: "active" as const,
+    bgImage:
+      customBgImage || "/images/backgrounds/corkboard_vertical_empty.jpg",
+    pins: [],
+    connections: [],
+  };
   const activeCaseRef = useRef<CaseData>(activeCase);
 
   useEffect(() => {
@@ -259,16 +272,17 @@ export function HeroInteractive({
   ]);
 
   // Sync external controlled case id
+  const effectiveControlled = controlledCaseId ?? propCaseId;
   useEffect(() => {
-    if (controlledCaseId && controlledCaseId !== internalCaseId) {
-      setInternalCaseId(controlledCaseId);
+    if (effectiveControlled && effectiveControlled !== internalCaseId) {
+      setInternalCaseId(effectiveControlled);
       updateUserPins([]);
       updateUserConnections([]);
       updateConnectionStartId(null);
       hoveredPinRef.current = null;
     }
   }, [
-    controlledCaseId,
+    effectiveControlled,
     internalCaseId,
     updateUserPins,
     updateUserConnections,

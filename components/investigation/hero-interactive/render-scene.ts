@@ -16,6 +16,10 @@ import {
   wrapText,
 } from "./utils";
 
+export type UnifiedPin = PinPoint & {
+  isUser?: boolean;
+};
+
 export interface RenderSceneParams {
   context: CanvasRenderingContext2D;
   canvas: HTMLCanvasElement;
@@ -43,11 +47,14 @@ export interface RenderSceneParams {
     intensity?: number;
     coneSpread?: number;
   };
-  resolveSuspectPhotoUrl: (pin: {
-    id: string;
-    label: string;
-    photoUrl?: string;
-  }) => string | undefined;
+  resolveSuspectPhotoUrl: (
+    pin: {
+      id: string;
+      label: string;
+      photoUrl?: string;
+    },
+    caseId?: string,
+  ) => string | undefined;
   getLoadedImage: (
     rawUrl: string,
     fallbackUrl?: string,
@@ -209,32 +216,14 @@ export function renderScene({
   // Build unified list of pins for mapping coordinates
   const casePins = customPins ?? activeCase.pins;
   const uPins = userPins;
-  const allPinsUnified = [
+  const allPinsUnified: UnifiedPin[] = [
     ...casePins.map((p) => ({
       ...p,
-      id: p.id,
-      x: p.x,
-      y: p.y,
-      label: p.label,
-      detail: (p as any).detail,
-      color: (p as any).color,
-      noteColor: (p as any).noteColor,
-      pinColor: (p as any).pinColor,
-      pulseBorder: (p as any).pulseBorder,
-      photoUrl: (p as any).photoUrl,
-      noteTextureUrl: (p as any).noteTextureUrl,
-      rotation: (p as any).rotation,
-      scale: (p as any).scale,
-      isLocked: (p as any).isLocked,
-      isSolved: (p as any).isSolved,
       isUser: false,
     })),
     ...uPins.map((p) => ({
       ...p,
-      id: p.id,
-      x: p.x,
-      y: p.y,
-      label: p.label,
+      detail: "",
       color: "yellow" as const,
       noteColor: "yellow" as const,
       pinColor: "yellow" as const,
@@ -262,10 +251,9 @@ export function renderScene({
     if (!pinPosition) return;
 
     // Check if this pin is custom vs system pin
-    const isCustomPin = (pin as any).isCustomNode || (pin as any).isUser;
-    const rawPin = pin as any;
-    const rotationDeg = rawPin.rotation ?? 0;
-    const scaleMod = rawPin.scale ?? 1.0;
+    const isCustomPin = Boolean(pin.isCustomNode || pin.isUser);
+    const rotationDeg = pin.rotation ?? 0;
+    const scaleMod = pin.scale ?? 1.0;
 
     context.save();
     context.translate(pinPosition.x, pinPosition.y);
@@ -274,7 +262,7 @@ export function renderScene({
     }
 
     // Resolve suspect photo URL using live Google Sheets or case-000 suspects mapping
-    const resolvedPhotoUrl = resolveSuspectPhotoUrl(pin);
+    const resolvedPhotoUrl = resolveSuspectPhotoUrl(pin, currentCaseId);
 
     // If pin has a resolved photo URL (Polaroid format for suspects / victims / crime scenes)
     if (resolvedPhotoUrl) {
@@ -285,7 +273,7 @@ export function renderScene({
         pin.id === "c0-pin-victim-phone" ||
         (pin.id.includes("phone") &&
           pin.id !== "c0-pin-phone" &&
-          Boolean((pin as any).photoUrl));
+          Boolean(pin.photoUrl));
 
       let loadedSuspectImg: HTMLCanvasElement | HTMLImageElement | null = null;
       if (isReinvestigate || isVictimPhone) {
@@ -301,19 +289,19 @@ export function renderScene({
       if (loadedSuspectImg) {
         const imgW =
           (loadedSuspectImg as HTMLImageElement).naturalWidth ||
-          (loadedSuspectImg as any).width ||
+          loadedSuspectImg.width ||
           300;
         const imgH =
           (loadedSuspectImg as HTMLImageElement).naturalHeight ||
-          (loadedSuspectImg as any).height ||
+          loadedSuspectImg.height ||
           380;
 
         const isReinvestigateProp =
           pin.id === "c0-pin-reinvestigate" ||
           Boolean(
-            rawPin.photoUrl &&
-            (rawPin.photoUrl.includes("crime_scene") ||
-              rawPin.photoUrl.includes("reinvestigation")),
+            pin.photoUrl &&
+            (pin.photoUrl.includes("crime_scene") ||
+              pin.photoUrl.includes("reinvestigation")),
           );
         const isKhang =
           !isVictimPhone &&
@@ -394,13 +382,13 @@ export function renderScene({
           pin.id === "c0-pin-victim-phone" ||
           (pin.id.includes("phone") &&
             pin.id !== "c0-pin-phone" &&
-            Boolean((pin as any).photoUrl));
+            Boolean(pin.photoUrl));
         const isReinvestigateProp =
           pin.id === "c0-pin-reinvestigate" ||
           Boolean(
-            rawPin.photoUrl &&
-            (rawPin.photoUrl.includes("crime_scene") ||
-              rawPin.photoUrl.includes("reinvestigation")),
+            pin.photoUrl &&
+            (pin.photoUrl.includes("crime_scene") ||
+              pin.photoUrl.includes("reinvestigation")),
           );
         const isKhang =
           !isVictimPhone &&
@@ -425,10 +413,10 @@ export function renderScene({
         const cardHeight = loadedSuspectImg
           ? (cardWidth *
               ((loadedSuspectImg as HTMLImageElement).naturalHeight ||
-                (loadedSuspectImg as any).height ||
+                loadedSuspectImg.height ||
                 380)) /
             ((loadedSuspectImg as HTMLImageElement).naturalWidth ||
-              (loadedSuspectImg as any).width ||
+              loadedSuspectImg.width ||
               300)
           : cardWidth * 1.3;
         const tagX = -cardWidth / 2;
@@ -488,7 +476,7 @@ export function renderScene({
       // ── DISTINGUISH WHITE PINNED NOTES vs YELLOW STICKY NOTES ──
       const upperLabel = (pin.label || "").toUpperCase();
       const isWhiteNote =
-        (pin as any).noteColor === "white" ||
+        pin.noteColor === "white" ||
         upperLabel.includes("MỞ RỘNG") ||
         upperLabel.includes("KHÁM XÉT") ||
         upperLabel.includes("KHÁM NGHIỆM") ||
@@ -499,8 +487,7 @@ export function renderScene({
       let noteUrl = "";
       let isPreRendered = false;
 
-      const customTextureUrl = (pin as any).noteTextureUrl as
-        string | undefined;
+      const customTextureUrl = pin.noteTextureUrl as string | undefined;
 
       if (isCustomPin) {
         if (customTextureUrl) {
@@ -732,7 +719,7 @@ export function renderScene({
       }
 
       // Pulsing border highlight if active
-      if ((pin as any).pulseBorder) {
+      if (pin.pulseBorder) {
         const pulseGlow = (Math.sin(timestamp / 220) + 1) / 2;
         context.save();
         context.shadowColor = `rgba(245, 158, 11, ${0.45 + pulseGlow * 0.55})`;
@@ -902,9 +889,9 @@ export function renderScene({
       pin.id === "c0-pin-victim-phone" ||
       pin.id === "c0-pin-reinvestigate" ||
       Boolean(
-        (pin as any).photoUrl &&
-        ((pin as any).photoUrl.includes("crime_scene") ||
-          (pin as any).photoUrl.includes("reinvestigation")),
+        pin.photoUrl &&
+        (pin.photoUrl.includes("crime_scene") ||
+          pin.photoUrl.includes("reinvestigation")),
       );
     if (!isSelfContainedProp) {
       context.save();
@@ -1065,9 +1052,9 @@ export function renderScene({
       pin.id === "c0-pin-victim-phone" ||
       pin.id === "c0-pin-reinvestigate" ||
       Boolean(
-        (pin as any).photoUrl &&
-        ((pin as any).photoUrl.includes("crime_scene") ||
-          (pin as any).photoUrl.includes("reinvestigation")),
+        pin.photoUrl &&
+        (pin.photoUrl.includes("crime_scene") ||
+          pin.photoUrl.includes("reinvestigation")),
       )
     ) {
       return; // Self-contained physical evidence items, no overlay pushpin

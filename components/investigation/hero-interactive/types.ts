@@ -77,6 +77,10 @@ export interface PinPoint {
   // Visual transform overrides
   rotation?: number; // degrees (-45 to 45)
   scale?: number; // multiplier (0.5 to 2.0)
+
+  // Custom / user node markers
+  isCustomNode?: boolean;
+  isUser?: boolean;
 }
 
 export interface CaseConnection {
@@ -120,6 +124,7 @@ export interface TooltipState {
 export interface HeroInteractiveProps {
   className?: string;
   controlledCaseId?: string;
+  caseId?: string;
   customPins?: PinPoint[];
   customConnections?: CaseConnection[];
   customBgImage?: string;
