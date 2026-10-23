@@ -169,3 +169,59 @@ pnpm install
 | E2E admin cần auth setup từ WT-1                      | WT-2/WT-3/WT-4 dùng `test.skip` cho spec admin nếu WT-1 chưa merge. Hoặc rebase lên main sau khi WT-1 merge.                                 |
 | `CASE_000_EVIDENCE` import chỉ nằm ở WT-2             | Xác nhận: mindmap (WT-3) **không** import `CASE_000_EVIDENCE`/`CASE_000_PDFS`. Chỉ `evidence/**` và `board-stage` (WT-2). Không có xung đột. |
 | `server-grader.ts` có `DEFAULT_CASE_000_PHONE_INPUTS` | WT-3 sở hữu file này; cần bỏ hardcode fallback, đọc config từ checkpoint `answer_config`.                                                    |
+
+---
+
+## 9. Trạng thái review code (cập nhật 2026-10-24)
+
+### WT-5 (`wt/any-batch-2`) — 41 file modified + 3 new
+
+**Kết quả:** Pass. Không có lỗi logic, chỉ thay đổi type-level.
+
+- Phone engine (6 file): Tạo interface `BankTransaction`, `PhotoItem`, `RichNote`. Raw CMS data dùng `Record<string, unknown>`. `usePhoneData` default generic đổi từ `any` sang `Record<string, unknown>`.
+- API routes (10 file): Tất cả `catch (error: any)` → `catch (error: unknown)` + `String()` extraction. `Record<string, unknown>[]` cho data arrays.
+- Checkpoint studio (5 file): `answer_config as Record<string, unknown> | null` thay `as any`.
+- Map/Dossier studio: Chủ yếu formatting (Prettier) + vài `any` cast loại bỏ.
+- Room-sync-context: `PresencePayload[]` thay `any[]`, error handling đúng.
+- user-nav: Import `User as SupabaseUser` thay `any`.
+- E2E specs: `auth.setup.ts` đúng pattern (graceful skip khi thiếu env). `phone-runtime.spec.ts` (P28) OK. `phone-case-create.spec.ts` (P29) gọi `/api/admin/clean-temp-case` chưa tồn tại — test skip an toàn nhờ migration guard.
+
+**Lưu ý scope violation:** WT-5 đã làm luôn phần WT-1 (phone engine `any` reduction, E2E auth, phone specs, playwright config). WT-1 worktree không cần tạo riêng nữa.
+
+### WT-2 (`wt/evidence-db`) — 8 modified + 10 new
+
+**Kết quả:** Pass. Kiến trúc tốt, auth đúng.
+
+- Migration 35: Schema `case_evidence` clean, RLS đúng (`is_admin()` write, public read), storage bucket policies đầy đủ 4 operation, seed case_000 đủ 8 record.
+- `evidence-actions.ts`: 6 server actions, tất cả write op có `requireAdminAuth()`. `uploadEvidenceAsset` sanitize filename, `duplicateEvidenceData` strip id/timestamps.
+- `use-case-evidence.ts`: Dual-source — Supabase first, fallback `CASE_000_PDFS`/`CASE_000_EVIDENCE` cho case_000 khi DB rỗng. Cache 30s.
+- `evidence-data.ts`: `@deprecated` annotation, export giữ nguyên backward compat.
+- Investigation pages: Chuyển từ static import sang `useCaseEvidence(caseId)` hook. `useEffect` deps correct.
+- Minor: Error branch có `if/else` redundant (cả 2 set `[]`) — cosmetic.
+
+### WT-3 (`wt/narrative-ai`) — 16 modified + 3 new
+
+**Kết quả:** Pass với lưu ý.
+
+- `cp-000-*` removed: 14/16 modified file đã có 0 ref. Strategy: dynamic lookup qua `subject_key` + `kind` trên `case_checkpoints`.
+- **Còn lại:** `admin-create-pin-modal.tsx` (11 ref), `main-investigation-canvas.tsx` (12 ref, KHÔNG modified). Đây là checkpoint routing logic case_000 — cần multi-case engine (spec 14) mới dynamic được. Ngoài scope WT-3.
+- Migration 36: Backfill `textMatchInputs`, `motiveContext`, `alibiContext`, `contradictionContext` vào `answer_config`. Server-grader đọc từ DB, bỏ `DEFAULT_CASE_000_PHONE_INPUTS`.
+- `case-000-clues.ts`, `case-000-suspects.ts`: Gutted to `@deprecated` stubs. Logic chuyển sang generic `clues.ts`, `characters.ts`.
+- `use-case-narratives.ts`: Bỏ `PHASE_TO_CHECKPOINT` map cứng, dùng `resolveCheckpointForPhase` generic (match by dossier key, root checkpoint, subject_key).
+
+### WT-4 (`wt/pin-photos`) — 6 modified
+
+**Kết quả:** Pass. Type-level + data source mở rộng.
+
+- `types.ts`: Thêm `isCustomNode`, `isUser`, `caseId` vào `PinPoint`/`HeroInteractiveProps`.
+- `use-live-pin-photos.ts`: Tạo `PinPhotoItem` interface. Data source đổi từ `"evidences"` sang `"photos"` tab (Supabase first). Thêm fallback URL fields (`image_url`, `url`, `photo_url`).
+- `render-scene.ts`: Tạo `UnifiedPin` extending `PinPoint`. 28 `(pin as any).xxx` → direct property access.
+- Không thay đổi hành vi vẽ canvas.
+
+### Việc cần fix khi worktree tiếp tục
+
+| #   | WT   | File                                     | Vấn đề                                                                                                                                                                                                                                                                                         | Mức độ   |
+| --- | ---- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| F1  | WT-5 | `e2e/phone-case-create.spec.ts`          | `finally` block gọi `POST /api/admin/clean-temp-case` chưa tồn tại. Khi migration 30-34 chạy thật, test tạo orphan data không dọn được. Sửa: dọn trực tiếp qua Supabase client `supabase.from('case_phone_apps').delete().eq('case_id', tempCaseSlug)` trong `finally`, hoặc tạo API route đó. | Minor    |
+| F2  | WT-2 | `lib/hooks/use-case-evidence.ts:100-105` | Error branch `if (effectiveSlug === "case_000") { setRawEvidence([]) } else { setRawEvidence([]) }` — cả 2 nhánh giống nhau. Gộp thành `setRawEvidence([])` không cần `if/else`.                                                                                                               | Cosmetic |
+| F3  | WT-3 | `lib/hooks/use-case-narratives.ts`       | `resolveCheckpointForPhase(checkpoints: any[], ...)` vẫn dùng `any[]`. Đổi sang `Checkpoint[]` hoặc `Record<string, unknown>[]`.                                                                                                                                                               | Cosmetic |
