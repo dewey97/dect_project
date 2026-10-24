@@ -35,18 +35,13 @@ function mapDbToPhysicalEvidence(item: DbCaseEvidence): PhysicalEvidence {
   return {
     id: (meta.id as string) || `ev-${item.code}`,
     caseId: item.case_slug,
+    code: item.code,
     kind: (item.kind === "image"
       ? "photo"
       : item.kind) as PhysicalEvidence["kind"],
     title: item.title,
     preview: item.description || "",
     timestamp: (meta.timestamp as string) || "",
-    evidenceId: (meta.evidenceId as string) || `EV-${item.code.toUpperCase()}`,
-    recoveredBy: (meta.recoveredBy as string) || "ĐIỀU TRA VIÊN",
-    integrityStatus:
-      (meta.integrityStatus as PhysicalEvidence["integrityStatus"]) ||
-      "secured",
-    chainOfCustody: (meta.chainOfCustody as string) || "VERIFIED",
     thumbnail: item.thumb_url || item.file_url || undefined,
     phase: item.phase,
     order: item.slot_index,
