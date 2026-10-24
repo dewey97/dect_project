@@ -240,31 +240,13 @@ export function getInnerBoardBounds(
     return { x: 0, y: 0, width: BOARD_BASE_WIDTH, height: BOARD_BASE_HEIGHT };
   }
 
-  const containerAspect = containerWidth / containerHeight;
-  let width = containerWidth;
-  let height = containerHeight;
-  let x = 0;
-  let y = 0;
-
-  if (containerAspect > BOARD_ASPECT) {
-    // Container is wider than the standard board -> fit height, center horizontally
-    height = containerHeight;
-    width = height * BOARD_ASPECT;
-    x = (containerWidth - width) / 2;
-    y = 0;
-  } else {
-    // Container is taller/narrower (like mobile screen) -> fit width, center vertically
-    width = containerWidth;
-    height = width / BOARD_ASPECT;
-    x = 0;
-    y = (containerHeight - height) / 2;
-  }
-
+  // Bảng điều tra co giãn lấp đầy 100% không gian vùng hiển thị (Full-bleed Board),
+  // luôn bám sát theo các thanh kéo điều chỉnh độ rộng (resize split handles).
   return {
-    x,
-    y,
-    width,
-    height,
+    x: 0,
+    y: 0,
+    width: containerWidth,
+    height: containerHeight,
   };
 }
 

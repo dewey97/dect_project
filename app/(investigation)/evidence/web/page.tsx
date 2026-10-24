@@ -800,7 +800,7 @@ function WebEvidencePageContent() {
         {/* CỘT 2 (Ở GIỮA): BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
         <div
           className={cn(
-            "h-full flex-1 min-w-0 overflow-hidden flex items-center justify-center min-h-0 relative",
+            "h-full flex-1 min-w-0 overflow-hidden flex flex-col min-h-0 relative",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
             mobileTab === "board"
               ? "flex w-full"
@@ -810,7 +810,7 @@ function WebEvidencePageContent() {
           )}
         >
           {/* MAIN CANVAS — GIỚI HẠN VÙNG BẢNG ĐÚNG BẰNG ẢNH, KHÔNG BỊ HỞ 2 VÙNG TRỐNG 2 BÊN */}
-          <div className="h-full max-h-full aspect-[896/1200] max-w-full relative overflow-hidden flex items-center justify-center">
+          <div className="flex-1 w-full h-full min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
               caseId={caseId}
               isBoardGame={false}
