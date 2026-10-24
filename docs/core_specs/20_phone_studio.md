@@ -90,6 +90,14 @@ usePhoneData(tab, caseId)
 }
 ```
 
+### 3.3. Quy chuẩn Khung máy (7 Presets) & Giới hạn Viewport Display
+
+- **7 Presets iPhone chuẩn hóa**: `iphone_se` (375×667), `iphone_8_plus` (414×736), `iphone_classic` (415×768), `iphone_12_mini` (375×812), `iphone_13` (390×844), `iphone_15` (393×852), `iphone_15_pro_max` (430×932). Preset `android_vintage` tạm ẩn do chưa có renderer native.
+- **Giới hạn Viewport Logic**:
+  - Toàn bộ app bên trong màn hình chạy trên khung logic 375×600 để đảm bảo 15 ứng dụng không bị vỡ layout.
+  - Khi hiển thị trên các màn hình dài (812px – 932px), khung viền và background mở rộng tràn màn hình (`h-full`); Status Bar neo đỉnh và Home Indicator / Touch ID neo đáy, nội dung bên trong tự co giãn theo tỷ lệ tương ứng.
+  - Khung máy sử dụng `ResizeObserver` để tự động clamp scale theo kích thước container (hỗ trợ split-pane responsive).
+
 ---
 
 ## 4. Kiến trúc Studio WYSIWYG (`/studio/phone`)

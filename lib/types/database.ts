@@ -156,6 +156,7 @@ export type CaseCharacterRole = "victim" | "suspect" | "witness" | "related";
 export interface CaseCharacterDevice {
   label?: string;
   model?: string;
+  model_id?: string;
   lastUpdated?: string;
   description?: string;
   chassis?: "iphone_classic" | "iphone_modern" | "android_vintage";
@@ -185,6 +186,9 @@ export interface DbCaseCharacter {
   role: CaseCharacterRole;
   description: string | null;
   avatar_code: string | null;
+  avatar_url?: string | null;
+  avatar_asset_path?: string | null;
+  avatarUrl?: string;
   phones: string[];
   slot_index: number;
   device: CaseCharacterDevice | null;
