@@ -11,16 +11,19 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCcw,
-  Maximize2,
-  Minimize2,
   FileText,
   ImageIcon,
   Eye,
-  Layers,
   Search,
   ExternalLink,
   Shield,
   FolderOpen,
+  MousePointer,
+  PenTool,
+  Highlighter,
+  Eraser,
+  Trash2,
+  GripHorizontal,
 } from "lucide-react";
 import { cn, normalizeImageUrl } from "@/lib/utils";
 import type {
@@ -33,7 +36,21 @@ import type { DbDossierDocument } from "@/lib/actions/dossier-actions";
 import type { LoiKhaiData, LyLichData } from "@/types/dossier";
 import { DossierLoiKhaiSheet } from "@/components/admin/dossier-studio/dossier-loi-khai-sheet";
 import { DossierLyLichSheet } from "@/components/admin/dossier-studio/dossier-ly-lich-sheet";
+import {
+  DossierAnnotationLayer,
+  type AnnotationTool,
+  type AnnotationColor,
+} from "./dossier-annotation-layer";
 import { CASE_000_DOSSIER_MAP } from "@/lib/hooks/use-dossier-documents";
+
+const COLOR_PALETTE: { color: AnnotationColor; label: string }[] = [
+  { color: "#dc2626", label: "Bút đỏ nghiệp vụ" },
+  { color: "#2563eb", label: "Bút xanh mực máy" },
+  { color: "#eab308", label: "Bút nhớ vàng chanh" },
+  { color: "#16a34a", label: "Bút xanh lá cây" },
+  { color: "#9333ea", label: "Bút tím ghi chú" },
+  { color: "#171717", label: "Bút chì đen" },
+];
 
 interface DossierCanvasBoardProps {
   caseId?: string;
@@ -59,10 +76,6 @@ export function DossierCanvasBoard({
   onSelectPdf,
   onSelectEvidence,
   onOpenInspectModal,
-  onSwitchToSingleView,
-  isExpanded = false,
-  onToggleExpand,
-  activeFilter = "all",
 }: DossierCanvasBoardProps) {
   // Canvas viewport container ref
   const containerRef = useRef<HTMLDivElement>(null);
@@ -82,6 +95,38 @@ export function DossierCanvasBoard({
 
   // Active focus target tag or code
   const [focusedTag, setFocusedTag] = useState<string | null>(null);
+
+  // Dragging individual document state
+  const [customPositions, setCustomPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [activeDraggingId, setActiveDraggingId] = useState<string | null>(null);
+  const draggingItemRef = useRef<{
+    id: string;
+    startX: number;
+    startY: number;
+    initialItemX: number;
+    initialItemY: number;
+  } | null>(null);
+
+  const storagePosKey = `dect_dossier_canvas_pos_${caseId}`;
+
+  // Nạp vị trí tài liệu đã lưu từ localStorage sau khi mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(storagePosKey);
+      if (saved) {
+        setCustomPositions(JSON.parse(saved));
+      }
+    } catch {
+      // Ignore
+    }
+  }, [storagePosKey]);
+
+  // Annotation states (Công cụ vẽ vời ở dưới màn hình)
+  const [activeTool, setActiveTool] = useState<AnnotationTool>("cursor");
+  const [activeColor, setActiveColor] = useState<AnnotationColor>("#dc2626");
+  const [activeSize, setActiveSize] = useState<number>(2.5);
+  const [clearTrigger, setClearTrigger] = useState<number>(0);
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState<boolean>(false);
 
   // Phân tách tài liệu số hóa (Dossier Studio) thành 2 nhóm: Lời Khai và Lý Lịch
   const lkDocuments = useMemo(() => {
@@ -105,6 +150,103 @@ export function DossierCanvasBoard({
       return !mappedTags.has(code);
     });
   }, [pdfItems, dossierDocuments]);
+
+  // Tính toán vị trí mặc định cho từng tài liệu
+  const defaultPositions = useMemo(() => {
+    const map: Record<string, { x: number; y: number }> = {};
+
+    // Hàng 1: Biên bản Lời khai (A4 portrait ~860px bước nhảy)
+    lkDocuments.forEach((doc, idx) => {
+      map[`lk_${doc.tag_code}`] = { x: 80 + idx * 920, y: 80 };
+    });
+
+    // Hàng 2: Lý lịch bị can (A4 landscape ~1180px bước nhảy)
+    hsDocuments.forEach((doc, idx) => {
+      map[`hs_${doc.tag_code}`] = { x: 80 + idx * 1180, y: 1300 };
+    });
+
+    // Hàng 3: Tài liệu lưu trữ & Kết quả giám định
+    unmappedPdfItems.forEach((item, idx) => {
+      const code = item.data.code || item.data.id;
+      map[`pdf_${code}`] = { x: 80 + idx * 380, y: 2250 };
+    });
+
+    // Hàng 4: Tang vật hiện trường
+    evidenceItems.forEach((item, idx) => {
+      const code = item.data.code || item.data.id;
+      map[`ev_${code}`] = { x: 80 + idx * 320, y: 2720 };
+    });
+
+    return map;
+  }, [lkDocuments, hsDocuments, unmappedPdfItems, evidenceItems]);
+
+  const getItemPosition = useCallback(
+    (key: string) => {
+      return customPositions[key] || defaultPositions[key] || { x: 100, y: 100 };
+    },
+    [customPositions, defaultPositions]
+  );
+
+  // Kéo di chuyển tài liệu
+  const handleItemDragStart = useCallback(
+    (e: React.PointerEvent, key: string) => {
+      if (e.button !== 0) return;
+      e.stopPropagation();
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {}
+
+      const currentPos = getItemPosition(key);
+      setActiveDraggingId(key);
+      draggingItemRef.current = {
+        id: key,
+        startX: e.clientX,
+        startY: e.clientY,
+        initialItemX: currentPos.x,
+        initialItemY: currentPos.y,
+      };
+    },
+    [getItemPosition]
+  );
+
+  const handleItemPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!draggingItemRef.current) return;
+    e.stopPropagation();
+    const { id, startX, startY, initialItemX, initialItemY } = draggingItemRef.current;
+    const currentZoom = zoomScaleRef.current;
+    const deltaX = (e.clientX - startX) / currentZoom;
+    const deltaY = (e.clientY - startY) / currentZoom;
+
+    const newX = Math.round(initialItemX + deltaX);
+    const newY = Math.round(initialItemY + deltaY);
+
+    setCustomPositions((prev) => ({
+      ...prev,
+      [id]: { x: newX, y: newY },
+    }));
+  }, []);
+
+  const handleItemPointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (!draggingItemRef.current) return;
+      e.stopPropagation();
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {}
+
+      draggingItemRef.current = null;
+      setActiveDraggingId(null);
+
+      // Lưu vị trí vào localStorage
+      setCustomPositions((latest) => {
+        try {
+          localStorage.setItem(storagePosKey, JSON.stringify(latest));
+        } catch {}
+        return latest;
+      });
+    },
+    [storagePosKey]
+  );
 
   // Xác định mã đang được chọn (Selected Tag / Code)
   const currentSelectedCode = useMemo(() => {
@@ -279,6 +421,11 @@ export function DossierCanvasBoard({
       return;
     }
 
+    // Nếu đang chọn công cụ vẽ (bút, dạ quang, tẩy) và bấm trên canvas vẽ thì nhường tương tác cho nét vẽ
+    if (activeTool !== "cursor" && target?.tagName === "CANVAS") {
+      return;
+    }
+
     if (e.button === 1 || isSpacePressedRef.current || e.button === 0) {
       isPanningRef.current = true;
       panStartRef.current = {
@@ -286,7 +433,7 @@ export function DossierCanvasBoard({
         y: e.clientY - panRef.current.y,
       };
     }
-  }, []);
+  }, [activeTool]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!isPanningRef.current) return;
@@ -348,13 +495,6 @@ export function DossierCanvasBoard({
     setZoomScale(0.8);
   }, []);
 
-  const handleFitAll = useCallback(() => {
-    panRef.current = { x: 40, y: 60 };
-    zoomScaleRef.current = 0.45;
-    setPan({ x: 40, y: 60 });
-    setZoomScale(0.45);
-  }, []);
-
   // Helper tìm item PDF trong danh sách tương ứng với Tag Code
   const findMatchingPdfItem = useCallback(
     (tagCode: string) => {
@@ -373,89 +513,6 @@ export function DossierCanvasBoard({
 
   return (
     <div className="flex-1 min-w-0 min-h-0 bg-[#0c0a08] border-2 border-[#3d2c1e] rounded-none shadow-2xl overflow-hidden flex flex-col h-full relative select-none">
-      {/* Canvas Top Bar Indicator */}
-      <div className="shrink-0 px-4 py-2.5 bg-[#17120e] border-b border-[#2d2015] flex items-center justify-between z-20">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Layers className="size-4 text-[#e8a86a]" />
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#e5d8cb]">
-              Bàn Hồ Sơ Trinh Thám
-            </span>
-          </div>
-          <span className="text-[11px] text-[#8a7768] font-mono hidden md:inline">
-            • Giữ <kbd className="px-1.5 py-0.5 bg-[#251b14] border border-[#3e2e20] text-[#d9a066] rounded text-[10px]">Space</kbd> hoặc chuột trái để kéo bàn • Lăn chuột để thu phóng
-          </span>
-        </div>
-
-        {/* Quick Zoom Bar */}
-        <div className="flex items-center gap-1.5 bg-[#120d09] px-2 py-1 border border-[#38281b] rounded-none">
-          <button
-            onClick={handleZoomOut}
-            className="p-1 text-[#ad9885] hover:text-[#f4e8d8] hover:bg-[#251b14] transition-colors cursor-pointer"
-            title="Thu nhỏ (Ctrl + Cuộn xuống)"
-          >
-            <ZoomOut className="size-3.5" />
-          </button>
-          <button
-            onClick={handleResetZoom}
-            className="px-2 py-0.5 font-mono text-[11px] font-bold text-[#e8a86a] hover:text-[#f3caa1] min-w-[44px] text-center cursor-pointer"
-            title="Đặt lại tỉ lệ đọc chuẩn"
-          >
-            {Math.round(zoomScale * 100)}%
-          </button>
-          <button
-            onClick={handleZoomIn}
-            className="p-1 text-[#ad9885] hover:text-[#f4e8d8] hover:bg-[#251b14] transition-colors cursor-pointer"
-            title="Phóng to (Ctrl + Cuộn lên)"
-          >
-            <ZoomIn className="size-3.5" />
-          </button>
-          <div className="h-3.5 w-px bg-[#38281b] mx-0.5" />
-          <button
-            onClick={handleFitAll}
-            className="px-2 py-0.5 text-[11px] font-mono text-[#ad9885] hover:text-[#f4e8d8] hover:bg-[#251b14] transition-colors cursor-pointer"
-            title="Xem toàn cảnh tất cả hồ sơ"
-          >
-            Toàn cảnh
-          </button>
-          {onSwitchToSingleView && (
-            <>
-              <div className="h-3.5 w-px bg-[#38281b] mx-0.5" />
-              <button
-                onClick={onSwitchToSingleView}
-                className="flex items-center gap-1 px-2 py-0.5 text-[11px] font-mono text-[#ad9885] hover:text-[#e8a86a] hover:bg-[#251b14] transition-colors cursor-pointer"
-                title="Chuyển sang chế độ soi 1 tài liệu đơn"
-              >
-                <FileText className="size-3" />
-                <span>Soi đơn</span>
-              </button>
-            </>
-          )}
-          {onToggleExpand && (
-            <>
-              <div className="h-3.5 w-px bg-[#38281b] mx-0.5" />
-              <button
-                onClick={onToggleExpand}
-                className="flex items-center gap-1 px-2 py-0.5 text-[11px] font-mono text-[#ad9885] hover:text-[#f4e8d8] hover:bg-[#251b14] transition-colors cursor-pointer"
-                title={isExpanded ? "Thu gọn về cột bên phải" : "Phóng to toàn màn hình"}
-              >
-                {isExpanded ? (
-                  <>
-                    <Minimize2 className="size-3" />
-                    <span>Thu gọn</span>
-                  </>
-                ) : (
-                  <>
-                    <Maximize2 className="size-3" />
-                    <span>Toàn bàn</span>
-                  </>
-                )}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
       {/* Center Interactive Surface (Vector Workspace) */}
       <main
         ref={containerRef}
@@ -486,437 +543,680 @@ export function DossierCanvasBoard({
             transition: isPanningRef.current
               ? "none"
               : "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+            width: "8000px",
+            height: "5000px",
           }}
-          className="absolute top-0 left-0 min-w-fit min-h-fit p-16 flex flex-col items-start gap-16 select-text"
+          className="absolute top-0 left-0 relative select-text"
         >
           {/* ============================================================== */}
           {/* PHÂN KHU 1: HỒ SƠ & BIÊN BẢN LẤY LỜI KHAI (STATEMENTS)        */}
           {/* ============================================================== */}
-          {lkDocuments.length > 0 && (
-            <div className="flex flex-col items-start gap-6">
-              <div className="flex items-center gap-3 px-4 py-1.5 bg-[#1e150e]/90 border border-[#4a3523] text-[#e8a86a] font-mono text-xs tracking-wider uppercase shadow-md">
-                <FileText className="size-3.5" />
-                <span className="font-bold">Khu Vực I • Biên Bản Lấy Lời Khai & Lời Khai Nhân Chứng</span>
-                <span className="text-[#8a7768]">({lkDocuments.length} biên bản)</span>
-              </div>
+          {lkDocuments.map((docItem) => {
+            const key = `lk_${docItem.tag_code}`;
+            const pos = getItemPosition(key);
+            const isDragging = activeDraggingId === key;
+            const docData = docItem.content as LoiKhaiData;
+            const isSelected =
+              focusedTag === docItem.tag_code ||
+              currentSelectedCode === docItem.tag_code ||
+              (selectedView?.type === "pdf" &&
+                CASE_000_DOSSIER_MAP[selectedView.data.code?.toUpperCase() || ""] ===
+                  docItem.tag_code);
 
-              <div className="flex flex-row items-start gap-12">
-                {lkDocuments.map((docItem) => {
-                  const docData = docItem.content as LoiKhaiData;
-                  const isSelected =
-                    focusedTag === docItem.tag_code ||
-                    currentSelectedCode === docItem.tag_code ||
-                    (selectedView?.type === "pdf" &&
-                      CASE_000_DOSSIER_MAP[selectedView.data.code?.toUpperCase() || ""] ===
-                        docItem.tag_code);
-
-                  return (
-                    <div
-                      key={docItem.id}
-                      id={`board-dossier-${docItem.tag_code}`}
+            return (
+              <div
+                key={docItem.id}
+                id={`board-dossier-${docItem.tag_code}`}
+                style={{
+                  position: "absolute",
+                  left: `${pos.x}px`,
+                  top: `${pos.y}px`,
+                  zIndex: isDragging ? 50 : isSelected ? 30 : 10,
+                }}
+                className={cn(
+                  "flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-shadow duration-150",
+                  isDragging && "shadow-[0_25px_60px_rgba(0,0,0,0.85)] scale-[1.01]",
+                  isSelected
+                    ? "border-[#d9a066] bg-[#d9a066]/10 shadow-[0_0_35px_rgba(217,160,102,0.25)] ring-4 ring-[#d9a066]/20"
+                    : "border-transparent hover:border-[#4a3523] hover:bg-[#1a130d]/50"
+                )}
+              >
+                {/* Document Card Header Bar with Drag Handle */}
+                <div
+                  onPointerDown={(e) => handleItemDragStart(e, key)}
+                  onPointerMove={handleItemPointerMove}
+                  onPointerUp={handleItemPointerUp}
+                  className="flex items-center justify-between w-full px-2.5 py-1.5 bg-[#19130d] border border-[#38281b] text-xs font-mono cursor-grab active:cursor-grabbing select-none"
+                  title="Nhấn giữ và kéo để di chuyển tài liệu này trên bàn làm việc"
+                >
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <GripHorizontal className="size-4 text-[#8a7768] hover:text-[#d9a066] transition-colors shrink-0" />
+                    <span
                       className={cn(
-                        "relative group flex flex-col items-center gap-4 transition-all duration-300 p-4 rounded-xl border-2",
+                        "font-bold px-2 py-0.5 rounded text-[11px]",
                         isSelected
-                          ? "border-[#d9a066] bg-[#d9a066]/10 shadow-[0_0_35px_rgba(217,160,102,0.25)] ring-4 ring-[#d9a066]/20"
-                          : "border-transparent hover:border-[#4a3523] hover:bg-[#1a130d]/50"
+                          ? "bg-[#d9a066] text-black"
+                          : "bg-[#291e14] text-[#d9a066]"
                       )}
                     >
-                      {/* Document Card Header Bar */}
-                      <div className="flex items-center justify-between w-full px-2 py-1 bg-[#19130d] border border-[#38281b] text-xs font-mono">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                          <span
-                            className={cn(
-                              "font-bold px-2 py-0.5 rounded text-[11px]",
-                              isSelected
-                                ? "bg-[#d9a066] text-black"
-                                : "bg-[#291e14] text-[#d9a066]"
-                            )}
-                          >
-                            {docItem.tag_code}
-                          </span>
-                          <span className="font-semibold text-[#e5d8cb] truncate max-w-[200px]">
-                            {docData.subjectName || docItem.subject_name}
-                          </span>
-                        </div>
+                      {docItem.tag_code}
+                    </span>
+                    <span className="font-semibold text-[#e5d8cb] truncate max-w-[200px]">
+                      {docData.subjectName || docItem.subject_name}
+                    </span>
+                  </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              focusOnElement(`board-dossier-${docItem.tag_code}`, 1.0);
-                              setFocusedTag(docItem.tag_code);
-                              const matchingPdf = findMatchingPdfItem(docItem.tag_code);
-                              if (matchingPdf) {
-                                onSelectPdf(matchingPdf.data as PDFDocument);
-                              }
-                            }}
-                            className="p-1 text-[#ad9885] hover:text-[#f4e8d8] hover:bg-[#2f2015] transition-colors cursor-pointer"
-                            title="Căn giữa tài liệu này"
-                          >
-                            <Search className="size-3.5" />
-                          </button>
-                          {onOpenInspectModal && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const matchingPdf = findMatchingPdfItem(docItem.tag_code);
-                                onOpenInspectModal({
-                                  type: "pdf",
-                                  data: matchingPdf
-                                    ? (matchingPdf.data as PDFDocument)
-                                    : {
-                                        id: docItem.id,
-                                        code: docItem.tag_code,
-                                        title: docData.docTitle || docItem.subject_name,
-                                        url: "",
-                                        phase: 1,
-                                        order: 0,
-                                      },
-                                });
-                              }}
-                              className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-[#d9a066] hover:bg-[#2f2015] border border-[#4a3523] transition-colors cursor-pointer"
-                              title="Soi tài liệu trong khung phóng to"
-                            >
-                              <ExternalLink className="size-3" />
-                              <span>Soi chi tiết</span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Diegetic Dossier Sheet Component */}
-                      <div
-                        onClick={() => {
-                          setFocusedTag(docItem.tag_code);
-                          focusOnElement(`board-dossier-${docItem.tag_code}`, 0.95);
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        focusOnElement(`board-dossier-${docItem.tag_code}`, 1.0);
+                        setFocusedTag(docItem.tag_code);
+                        const matchingPdf = findMatchingPdfItem(docItem.tag_code);
+                        if (matchingPdf) {
+                          onSelectPdf(matchingPdf.data as PDFDocument);
+                        }
+                      }}
+                      className="p-1 text-[#ad9885] hover:text-[#f4e8d8] hover:bg-[#2f2015] transition-colors cursor-pointer"
+                      title="Căn giữa tài liệu này"
+                    >
+                      <Search className="size-3.5" />
+                    </button>
+                    {onOpenInspectModal && (
+                      <button
+                        type="button"
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const matchingPdf = findMatchingPdfItem(docItem.tag_code);
-                          if (matchingPdf) {
-                            onSelectPdf(matchingPdf.data as PDFDocument);
-                          }
+                          onOpenInspectModal({
+                            type: "pdf",
+                            data: matchingPdf
+                              ? (matchingPdf.data as PDFDocument)
+                              : {
+                                  id: docItem.id,
+                                  code: docItem.tag_code,
+                                  title: docData.docTitle || docItem.subject_name,
+                                  url: "",
+                                  phase: 1,
+                                  order: 0,
+                                },
+                          });
                         }}
-                        className="cursor-pointer"
+                        className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-[#d9a066] hover:bg-[#2f2015] border border-[#4a3523] transition-colors cursor-pointer"
+                        title="Soi tài liệu trong khung phóng to"
                       >
-                        <DossierLoiKhaiSheet
-                          docItem={docItem}
-                          docData={docData}
-                          docPaper={
-                            docItem.paper_config || {
-                              size: "A4",
-                              orientation: "portrait",
-                            }
-                          }
-                          isSelected={isSelected}
-                          highlightEditable={false}
-                          readOnly={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
+                        <ExternalLink className="size-3" />
+                        <span>Soi chi tiết</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Diegetic Dossier Sheet Component with Annotation Layer */}
+                <div
+                  onClick={() => {
+                    setFocusedTag(docItem.tag_code);
+                    if (activeTool === "cursor") {
+                      focusOnElement(`board-dossier-${docItem.tag_code}`, 0.95);
+                    }
+                    const matchingPdf = findMatchingPdfItem(docItem.tag_code);
+                    if (matchingPdf) {
+                      onSelectPdf(matchingPdf.data as PDFDocument);
+                    }
+                  }}
+                  className="cursor-pointer relative"
+                >
+                  <DossierAnnotationLayer
+                    documentId={docItem.tag_code || docItem.id}
+                    activeTool={activeTool}
+                    activeColor={activeColor}
+                    activeSize={activeSize}
+                    scale={zoomScale}
+                    onClearTrigger={focusedTag === docItem.tag_code ? clearTrigger : undefined}
+                  />
+                  <DossierLoiKhaiSheet
+                    docItem={docItem}
+                    docData={docData}
+                    docPaper={
+                      docItem.paper_config || {
+                        size: "A4",
+                        orientation: "portrait",
+                      }
+                    }
+                    isSelected={isSelected}
+                    highlightEditable={false}
+                    readOnly={true}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })}
 
           {/* ============================================================== */}
           {/* PHÂN KHU 2: BẢN LÝ LỊCH BỊ CAN & HỒ SƠ TƯ PHÁP (RECORDS)       */}
           {/* ============================================================== */}
-          {hsDocuments.length > 0 && (
-            <div className="flex flex-col items-start gap-6">
-              <div className="flex items-center gap-3 px-4 py-1.5 bg-[#1e150e]/90 border border-[#4a3523] text-[#e8a86a] font-mono text-xs tracking-wider uppercase shadow-md">
-                <Shield className="size-3.5" />
-                <span className="font-bold">Khu Vực II • Trích Lục Lý Lịch Đối Tượng Tình Nghi & Nhân Thân</span>
-                <span className="text-[#8a7768]">({hsDocuments.length} hồ sơ)</span>
-              </div>
+          {hsDocuments.map((docItem) => {
+            const key = `hs_${docItem.tag_code}`;
+            const pos = getItemPosition(key);
+            const isDragging = activeDraggingId === key;
+            const docData = docItem.content as LyLichData;
+            const isSelected =
+              focusedTag === docItem.tag_code ||
+              currentSelectedCode === docItem.tag_code ||
+              (selectedView?.type === "pdf" &&
+                CASE_000_DOSSIER_MAP[selectedView.data.code?.toUpperCase() || ""] ===
+                  docItem.tag_code);
 
-              <div className="flex flex-row items-start gap-12">
-                {hsDocuments.map((docItem) => {
-                  const docData = docItem.content as LyLichData;
-                  const isSelected =
-                    focusedTag === docItem.tag_code ||
-                    currentSelectedCode === docItem.tag_code ||
-                    (selectedView?.type === "pdf" &&
-                      CASE_000_DOSSIER_MAP[selectedView.data.code?.toUpperCase() || ""] ===
-                        docItem.tag_code);
-
-                  return (
-                    <div
-                      key={docItem.id}
-                      id={`board-dossier-${docItem.tag_code}`}
+            return (
+              <div
+                key={docItem.id}
+                id={`board-dossier-${docItem.tag_code}`}
+                style={{
+                  position: "absolute",
+                  left: `${pos.x}px`,
+                  top: `${pos.y}px`,
+                  zIndex: isDragging ? 50 : isSelected ? 30 : 10,
+                }}
+                className={cn(
+                  "flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-shadow duration-150",
+                  isDragging && "shadow-[0_25px_60px_rgba(0,0,0,0.85)] scale-[1.01]",
+                  isSelected
+                    ? "border-[#d9a066] bg-[#d9a066]/10 shadow-[0_0_35px_rgba(217,160,102,0.25)] ring-4 ring-[#d9a066]/20"
+                    : "border-transparent hover:border-[#4a3523] hover:bg-[#1a130d]/50"
+                )}
+              >
+                {/* Document Card Header Bar with Drag Handle */}
+                <div
+                  onPointerDown={(e) => handleItemDragStart(e, key)}
+                  onPointerMove={handleItemPointerMove}
+                  onPointerUp={handleItemPointerUp}
+                  className="flex items-center justify-between w-full px-2.5 py-1.5 bg-[#19130d] border border-[#38281b] text-xs font-mono cursor-grab active:cursor-grabbing select-none"
+                  title="Nhấn giữ và kéo để di chuyển tài liệu này trên bàn làm việc"
+                >
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <GripHorizontal className="size-4 text-[#8a7768] hover:text-[#d9a066] transition-colors shrink-0" />
+                    <span
                       className={cn(
-                        "relative group flex flex-col items-center gap-4 transition-all duration-300 p-4 rounded-xl border-2",
+                        "font-bold px-2 py-0.5 rounded text-[11px]",
                         isSelected
-                          ? "border-[#d9a066] bg-[#d9a066]/10 shadow-[0_0_35px_rgba(217,160,102,0.25)] ring-4 ring-[#d9a066]/20"
-                          : "border-transparent hover:border-[#4a3523] hover:bg-[#1a130d]/50"
+                          ? "bg-[#d9a066] text-black"
+                          : "bg-[#291e14] text-[#d9a066]"
                       )}
                     >
-                      {/* Document Card Header Bar */}
-                      <div className="flex items-center justify-between w-full px-2 py-1 bg-[#19130d] border border-[#38281b] text-xs font-mono">
-                        <div className="flex items-center gap-2 overflow-hidden">
-                          <span
-                            className={cn(
-                              "font-bold px-2 py-0.5 rounded text-[11px]",
-                              isSelected
-                                ? "bg-[#d9a066] text-black"
-                                : "bg-[#291e14] text-[#d9a066]"
-                            )}
-                          >
-                            {docItem.tag_code}
-                          </span>
-                          <span className="font-semibold text-[#e5d8cb] truncate max-w-[200px]">
-                            {docData.fullName || docItem.subject_name}
-                          </span>
-                        </div>
+                      {docItem.tag_code}
+                    </span>
+                    <span className="font-semibold text-[#e5d8cb] truncate max-w-[200px]">
+                      {docData.fullName || docItem.subject_name}
+                    </span>
+                  </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              focusOnElement(`board-dossier-${docItem.tag_code}`, 1.0);
-                              setFocusedTag(docItem.tag_code);
-                              const matchingPdf = findMatchingPdfItem(docItem.tag_code);
-                              if (matchingPdf) {
-                                onSelectPdf(matchingPdf.data as PDFDocument);
-                              }
-                            }}
-                            className="p-1 text-[#ad9885] hover:text-[#f4e8d8] hover:bg-[#2f2015] transition-colors cursor-pointer"
-                            title="Căn giữa tài liệu này"
-                          >
-                            <Search className="size-3.5" />
-                          </button>
-                          {onOpenInspectModal && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const matchingPdf = findMatchingPdfItem(docItem.tag_code);
-                                onOpenInspectModal({
-                                  type: "pdf",
-                                  data: matchingPdf
-                                    ? (matchingPdf.data as PDFDocument)
-                                    : {
-                                        id: docItem.id,
-                                        code: docItem.tag_code,
-                                        title: docData.fullName || docItem.subject_name,
-                                        url: "",
-                                        phase: 1,
-                                        order: 0,
-                                      },
-                                });
-                              }}
-                              className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-[#d9a066] hover:bg-[#2f2015] border border-[#4a3523] transition-colors cursor-pointer"
-                              title="Soi tài liệu trong khung phóng to"
-                            >
-                              <ExternalLink className="size-3" />
-                              <span>Soi chi tiết</span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Diegetic Dossier Sheet Component */}
-                      <div
-                        onClick={() => {
-                          setFocusedTag(docItem.tag_code);
-                          focusOnElement(`board-dossier-${docItem.tag_code}`, 0.95);
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        focusOnElement(`board-dossier-${docItem.tag_code}`, 1.0);
+                        setFocusedTag(docItem.tag_code);
+                        const matchingPdf = findMatchingPdfItem(docItem.tag_code);
+                        if (matchingPdf) {
+                          onSelectPdf(matchingPdf.data as PDFDocument);
+                        }
+                      }}
+                      className="p-1 text-[#ad9885] hover:text-[#f4e8d8] hover:bg-[#2f2015] transition-colors cursor-pointer"
+                      title="Căn giữa tài liệu này"
+                    >
+                      <Search className="size-3.5" />
+                    </button>
+                    {onOpenInspectModal && (
+                      <button
+                        type="button"
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
                           const matchingPdf = findMatchingPdfItem(docItem.tag_code);
-                          if (matchingPdf) {
-                            onSelectPdf(matchingPdf.data as PDFDocument);
-                          }
+                          onOpenInspectModal({
+                            type: "pdf",
+                            data: matchingPdf
+                              ? (matchingPdf.data as PDFDocument)
+                              : {
+                                  id: docItem.id,
+                                  code: docItem.tag_code,
+                                  title: docData.fullName || docItem.subject_name,
+                                  url: "",
+                                  phase: 1,
+                                  order: 0,
+                                },
+                          });
                         }}
-                        className="cursor-pointer"
+                        className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-[#d9a066] hover:bg-[#2f2015] border border-[#4a3523] transition-colors cursor-pointer"
+                        title="Soi tài liệu trong khung phóng to"
                       >
-                        <DossierLyLichSheet
-                          docItem={docItem}
-                          docData={docData}
-                          docPaper={
-                            docItem.paper_config || {
-                              size: "A4",
-                              orientation: "landscape",
-                            }
-                          }
-                          isSelected={isSelected}
-                          highlightEditable={false}
-                          readOnly={true}
-                          showSeal={true}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
+                        <ExternalLink className="size-3" />
+                        <span>Soi chi tiết</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Diegetic Dossier Sheet Component with Annotation Layer */}
+                <div
+                  onClick={() => {
+                    setFocusedTag(docItem.tag_code);
+                    if (activeTool === "cursor") {
+                      focusOnElement(`board-dossier-${docItem.tag_code}`, 0.95);
+                    }
+                    const matchingPdf = findMatchingPdfItem(docItem.tag_code);
+                    if (matchingPdf) {
+                      onSelectPdf(matchingPdf.data as PDFDocument);
+                    }
+                  }}
+                  className="cursor-pointer relative"
+                >
+                  <DossierAnnotationLayer
+                    documentId={docItem.tag_code || docItem.id}
+                    activeTool={activeTool}
+                    activeColor={activeColor}
+                    activeSize={activeSize}
+                    scale={zoomScale}
+                    onClearTrigger={focusedTag === docItem.tag_code ? clearTrigger : undefined}
+                  />
+                  <DossierLyLichSheet
+                    docItem={docItem}
+                    docData={docData}
+                    docPaper={
+                      docItem.paper_config || {
+                        size: "A4",
+                        orientation: "landscape",
+                      }
+                    }
+                    isSelected={isSelected}
+                    highlightEditable={false}
+                    readOnly={true}
+                    showSeal={true}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })}
 
           {/* ============================================================== */}
           {/* PHÂN KHU 3: CÁC VĂN BẢN VỤ ÁN & PHÁP Y KHÁC (CASE ARCHIVES)   */}
           {/* ============================================================== */}
-          {unmappedPdfItems.length > 0 && (
-            <div className="flex flex-col items-start gap-6">
-              <div className="flex items-center gap-3 px-4 py-1.5 bg-[#1e150e]/90 border border-[#4a3523] text-[#e8a86a] font-mono text-xs tracking-wider uppercase shadow-md">
-                <FolderOpen className="size-3.5" />
-                <span className="font-bold">Khu Vực III • Tài Liệu Lưu Trữ Vụ Án & Kết Quả Giám Định Pháp Y</span>
-                <span className="text-[#8a7768]">({unmappedPdfItems.length} tài liệu)</span>
-              </div>
+          {unmappedPdfItems.map((item) => {
+            const pdf = item.data as PDFDocument;
+            const itemCode = pdf.code || pdf.id;
+            const key = `pdf_${itemCode}`;
+            const pos = getItemPosition(key);
+            const isDragging = activeDraggingId === key;
+            const isSelected =
+              focusedTag === itemCode || currentSelectedCode === itemCode;
 
-              <div className="flex flex-row items-start gap-8">
-                {unmappedPdfItems.map((item) => {
-                  const pdf = item.data as PDFDocument;
-                  const itemCode = pdf.code || pdf.id;
-                  const isSelected =
-                    focusedTag === itemCode || currentSelectedCode === itemCode;
-
-                  return (
-                    <div
-                      key={`unmapped_pdf_${itemCode}`}
-                      id={`board-pdf-${itemCode}`}
-                      onClick={() => {
-                        setFocusedTag(itemCode);
-                        focusOnElement(`board-pdf-${itemCode}`, 1.0);
-                        onSelectPdf(pdf);
-                      }}
-                      className={cn(
-                        "w-[340px] bg-[#16120d] border-2 transition-all duration-300 p-5 rounded-lg flex flex-col justify-between cursor-pointer group shadow-xl",
-                        isSelected
-                          ? "border-[#d9a066] bg-[#d9a066]/10 shadow-[0_0_30px_rgba(217,160,102,0.25)] ring-4 ring-[#d9a066]/20"
-                          : "border-[#38281b] hover:border-[#5a402a] hover:bg-[#1e1711]"
-                      )}
-                    >
-                      {/* Paper folder header */}
-                      <div className="flex items-start justify-between border-b border-[#38281b] pb-3 mb-3">
-                        <div className="flex flex-col">
-                          <span className="font-mono text-xs font-bold text-[#d9a066] bg-[#291e14] px-2 py-0.5 border border-[#4a3523] w-fit">
-                            {pdf.code || "HỒ SƠ"}
-                          </span>
-                          <span className="text-[11px] font-mono text-[#8a7768] mt-1">
-                            {pdf.dossierTitle || pdf.dossierKey || `Giai đoạn ${pdf.phase}`}
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 bg-red-950/60 border border-red-700/60 text-red-400 font-bold">
-                          Tối Mật
-                        </span>
-                      </div>
-
-                      {/* Content summary */}
-                      <div className="flex-1 py-2">
-                        <h4 className="font-mono font-bold text-[#e5d8cb] text-sm group-hover:text-[#f4e8d8] transition-colors leading-snug line-clamp-2">
-                          {pdf.title}
-                        </h4>
-                        <p className="font-sans text-xs text-[#a89078] mt-2 line-clamp-3 leading-relaxed">
-                          Tài liệu lưu trữ chính thức thuộc hồ sơ vụ án hình sự.
-                        </p>
-                      </div>
-
-                      {/* Card Footer */}
-                      <div className="mt-4 pt-3 border-t border-[#38281b] flex items-center justify-between">
-                        <span className="text-[10px] font-mono text-[#786454]">
-                          Định dạng: PDF Gốc
-                        </span>
-                        {onOpenInspectModal && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onOpenInspectModal({ type: "pdf", data: pdf });
-                            }}
-                            className="flex items-center gap-1 px-2 py-1 text-[11px] font-mono font-medium text-[#d9a066] bg-[#291e14] border border-[#4a3523] hover:bg-[#38281b] transition-colors cursor-pointer"
-                          >
-                            <Eye className="size-3" />
-                            <span>Xem toàn văn</span>
-                          </button>
-                        )}
-                      </div>
+            return (
+              <div
+                key={`unmapped_pdf_${itemCode}`}
+                id={`board-pdf-${itemCode}`}
+                style={{
+                  position: "absolute",
+                  left: `${pos.x}px`,
+                  top: `${pos.y}px`,
+                  zIndex: isDragging ? 50 : isSelected ? 30 : 10,
+                }}
+                className={cn(
+                  "w-[340px] bg-[#16120d] border-2 transition-shadow duration-150 p-5 rounded-lg flex flex-col justify-between group shadow-xl",
+                  isDragging && "shadow-[0_25px_60px_rgba(0,0,0,0.85)] scale-[1.02]",
+                  isSelected
+                    ? "border-[#d9a066] bg-[#d9a066]/10 shadow-[0_0_30px_rgba(217,160,102,0.25)] ring-4 ring-[#d9a066]/20"
+                    : "border-[#38281b] hover:border-[#5a402a] hover:bg-[#1e1711]"
+                )}
+              >
+                {/* Drag handle header */}
+                <div
+                  onPointerDown={(e) => handleItemDragStart(e, key)}
+                  onPointerMove={handleItemPointerMove}
+                  onPointerUp={handleItemPointerUp}
+                  className="flex items-start justify-between border-b border-[#38281b] pb-3 mb-3 cursor-grab active:cursor-grabbing select-none"
+                  title="Nhấn giữ và kéo để di chuyển tài liệu này trên bàn làm việc"
+                >
+                  <div className="flex items-center gap-2">
+                    <GripHorizontal className="size-4 text-[#8a7768] hover:text-[#d9a066] transition-colors shrink-0" />
+                    <div className="flex flex-col">
+                      <span className="font-mono text-xs font-bold text-[#d9a066] bg-[#291e14] px-2 py-0.5 border border-[#4a3523] w-fit">
+                        {pdf.code || "HỒ SƠ"}
+                      </span>
+                      <span className="text-[11px] font-mono text-[#8a7768] mt-1">
+                        {pdf.dossierTitle || pdf.dossierKey || `Giai đoạn ${pdf.phase}`}
+                      </span>
                     </div>
-                  );
-                })}
+                  </div>
+                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 bg-red-950/60 border border-red-700/60 text-red-400 font-bold">
+                    Tối Mật
+                  </span>
+                </div>
+
+                {/* Content summary */}
+                <div
+                  onClick={() => {
+                    setFocusedTag(itemCode);
+                    if (activeTool === "cursor") {
+                      focusOnElement(`board-pdf-${itemCode}`, 1.0);
+                    }
+                    onSelectPdf(pdf);
+                  }}
+                  className="flex-1 py-2 cursor-pointer"
+                >
+                  <h4 className="font-mono font-bold text-[#e5d8cb] text-sm group-hover:text-[#f4e8d8] transition-colors leading-snug line-clamp-2">
+                    {pdf.title}
+                  </h4>
+                  <p className="font-sans text-xs text-[#a89078] mt-2 line-clamp-3 leading-relaxed">
+                    Tài liệu lưu trữ chính thức thuộc hồ sơ vụ án hình sự.
+                  </p>
+                </div>
+
+                {/* Card Footer */}
+                <div className="mt-4 pt-3 border-t border-[#38281b] flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-[#786454]">
+                    Định dạng: PDF Gốc
+                  </span>
+                  {onOpenInspectModal && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenInspectModal({ type: "pdf", data: pdf });
+                      }}
+                      className="flex items-center gap-1 px-2 py-1 text-[11px] font-mono font-medium text-[#d9a066] bg-[#291e14] border border-[#4a3523] hover:bg-[#38281b] transition-colors cursor-pointer"
+                    >
+                      <Eye className="size-3" />
+                      <span>Xem toàn văn</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })}
 
           {/* ============================================================== */}
           {/* PHÂN KHU 4: VẬT CHỨNG & ẢNH ĐIỀU TRA (EVIDENCE PHOTOS)         */}
           {/* ============================================================== */}
-          {evidenceItems.length > 0 && (
-            <div className="flex flex-col items-start gap-6">
-              <div className="flex items-center gap-3 px-4 py-1.5 bg-[#1e150e]/90 border border-[#4a3523] text-[#e8a86a] font-mono text-xs tracking-wider uppercase shadow-md">
-                <ImageIcon className="size-3.5" />
-                <span className="font-bold">Khu Vực IV • Tang Vật Hiện Trường & Bản Ảnh Giám Định</span>
-                <span className="text-[#8a7768]">({evidenceItems.length} vật chứng)</span>
-              </div>
+          {evidenceItems.map((item) => {
+            const ev = item.data as PhysicalEvidence;
+            const itemCode = ev.code || ev.id;
+            const key = `ev_${itemCode}`;
+            const pos = getItemPosition(key);
+            const isDragging = activeDraggingId === key;
+            const isSelected =
+              focusedTag === itemCode || currentSelectedCode === itemCode;
+            const photoUrl = normalizeImageUrl(ev.thumbnail);
 
-              <div className="flex flex-row items-start gap-8">
-                {evidenceItems.map((item) => {
-                  const ev = item.data as PhysicalEvidence;
-                  const itemCode = ev.code || ev.id;
-                  const isSelected =
-                    focusedTag === itemCode || currentSelectedCode === itemCode;
-                  const photoUrl = normalizeImageUrl(ev.thumbnail);
+            return (
+              <div
+                key={`evidence_${itemCode}`}
+                id={`board-evidence-${itemCode}`}
+                style={{
+                  position: "absolute",
+                  left: `${pos.x}px`,
+                  top: `${pos.y}px`,
+                  zIndex: isDragging ? 50 : isSelected ? 30 : 10,
+                }}
+                className={cn(
+                  "w-[280px] bg-[#14100c] border-2 transition-shadow duration-150 p-3 rounded-lg flex flex-col justify-between group shadow-xl",
+                  isDragging && "shadow-[0_25px_60px_rgba(0,0,0,0.85)] scale-[1.02]",
+                  isSelected
+                    ? "border-[#d9a066] bg-[#d9a066]/10 shadow-[0_0_30px_rgba(217,160,102,0.25)] ring-4 ring-[#d9a066]/20"
+                    : "border-[#38281b] hover:border-[#5a402a] hover:bg-[#1a1410]"
+                )}
+              >
+                {/* Drag handle header */}
+                <div
+                  onPointerDown={(e) => handleItemDragStart(e, key)}
+                  onPointerMove={handleItemPointerMove}
+                  onPointerUp={handleItemPointerUp}
+                  className="flex items-center justify-between pb-2 mb-2 border-b border-[#2d2015] cursor-grab active:cursor-grabbing select-none"
+                  title="Nhấn giữ và kéo để di chuyển vật chứng này trên bàn làm việc"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <GripHorizontal className="size-4 text-[#8a7768] hover:text-[#d9a066] transition-colors shrink-0" />
+                    <span className="font-mono text-[10px] font-bold text-[#e8a86a] bg-black/80 px-2 py-0.5 border border-[#4a3523]">
+                      {ev.code || "TANG VẬT"}
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-[#786454]">
+                    {ev.kind || "Ảnh"}
+                  </span>
+                </div>
 
-                  return (
-                    <div
-                      key={`evidence_${itemCode}`}
-                      id={`board-evidence-${itemCode}`}
-                      onClick={() => {
-                        setFocusedTag(itemCode);
-                        focusOnElement(`board-evidence-${itemCode}`, 1.0);
-                        onSelectEvidence(ev);
+                {/* Photo Thumbnail */}
+                <div
+                  onClick={() => {
+                    setFocusedTag(itemCode);
+                    if (activeTool === "cursor") {
+                      focusOnElement(`board-evidence-${itemCode}`, 1.0);
+                    }
+                    onSelectEvidence(ev);
+                  }}
+                  className="w-full aspect-[4/3] bg-black/60 border border-[#2d2015] relative overflow-hidden flex items-center justify-center cursor-pointer"
+                >
+                  {photoUrl ? (
+                    <img
+                      src={photoUrl}
+                      alt={ev.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <ImageIcon className="size-8 text-[#5a402a]" />
+                  )}
+                </div>
+
+                {/* Photo Title & Code */}
+                <div
+                  onClick={() => {
+                    setFocusedTag(itemCode);
+                    if (activeTool === "cursor") {
+                      focusOnElement(`board-evidence-${itemCode}`, 1.0);
+                    }
+                    onSelectEvidence(ev);
+                  }}
+                  className="py-2.5 cursor-pointer"
+                >
+                  <h4 className="font-mono font-bold text-[#e5d8cb] text-xs group-hover:text-[#f4e8d8] transition-colors truncate">
+                    {ev.title}
+                  </h4>
+                  <p className="font-sans text-[11px] text-[#8a7768] mt-1 line-clamp-2">
+                    {ev.preview || "Tang vật thu thập tại hiện trường phục vụ công tác điều tra."}
+                  </p>
+                </div>
+
+                {/* Card Footer */}
+                <div className="pt-2 border-t border-[#2d2015] flex items-center justify-end">
+                  {onOpenInspectModal && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenInspectModal({ type: "evidence", data: ev });
                       }}
-                      className={cn(
-                        "w-[280px] bg-[#14100c] border-2 transition-all duration-300 p-3 rounded-lg flex flex-col justify-between cursor-pointer group shadow-xl",
-                        isSelected
-                          ? "border-[#d9a066] bg-[#d9a066]/10 shadow-[0_0_30px_rgba(217,160,102,0.25)] ring-4 ring-[#d9a066]/20"
-                          : "border-[#38281b] hover:border-[#5a402a] hover:bg-[#1a1410]"
-                      )}
+                      className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-medium text-[#d9a066] bg-[#291e14] border border-[#4a3523] hover:bg-[#38281b] transition-colors cursor-pointer"
                     >
-                      {/* Photo Thumbnail */}
-                      <div className="w-full aspect-[4/3] bg-black/60 border border-[#2d2015] relative overflow-hidden flex items-center justify-center">
-                        {photoUrl ? (
-                          <img
-                            src={photoUrl}
-                            alt={ev.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <ImageIcon className="size-8 text-[#5a402a]" />
-                        )}
-                        <span className="absolute top-2 left-2 font-mono text-[10px] font-bold text-[#e8a86a] bg-black/80 px-2 py-0.5 border border-[#4a3523]">
-                          {ev.code || "TANG VẬT"}
-                        </span>
-                      </div>
-
-                      {/* Photo Title & Code */}
-                      <div className="py-2.5">
-                        <h4 className="font-mono font-bold text-[#e5d8cb] text-xs group-hover:text-[#f4e8d8] transition-colors truncate">
-                          {ev.title}
-                        </h4>
-                        <p className="font-sans text-[11px] text-[#8a7768] mt-1 line-clamp-2">
-                          {ev.preview || "Tang vật thu thập tại hiện trường phục vụ công tác điều tra."}
-                        </p>
-                      </div>
-
-                      {/* Card Footer */}
-                      <div className="pt-2 border-t border-[#2d2015] flex items-center justify-between">
-                        <span className="text-[10px] font-mono text-[#786454]">
-                          {ev.kind || "Ảnh hiện trường"}
-                        </span>
-                        {onOpenInspectModal && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onOpenInspectModal({ type: "evidence", data: ev });
-                            }}
-                            className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-medium text-[#d9a066] bg-[#291e14] border border-[#4a3523] hover:bg-[#38281b] transition-colors cursor-pointer"
-                          >
-                            <Search className="size-3" />
-                            <span>Soi ảnh</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                      <Search className="size-3" />
+                      <span>Soi ảnh</span>
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })}
         </div>
       </main>
+
+      {/* FLOATING TOOLBAR PHÍA DƯỚI MÀN HÌNH (GỒM CÔNG CỤ VẼ VỜI & BỘ THU PHÓNG ZOOM) */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066] max-w-[calc(100%-2rem)]">
+        {/* NÚT CHUỘT THƯỜNG / DI CHUYỂN */}
+        <button
+          type="button"
+          onClick={() => setActiveTool("cursor")}
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1",
+            activeTool === "cursor"
+              ? "bg-[#d9a066] text-[#1a0f07] font-bold shadow-sm"
+              : "hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec]"
+          )}
+          title="Con trỏ chuột (Bấm chọn & Kéo tài liệu)"
+        >
+          <MousePointer className="size-4" />
+        </button>
+
+        {/* NÚT BÚT VẼ / KHOANH TRÒN */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTool("pen");
+            setActiveSize(2.5);
+          }}
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1",
+            activeTool === "pen"
+              ? "bg-[#d9a066] text-[#1a0f07] font-bold shadow-sm"
+              : "hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec]"
+          )}
+          title="Bút vẽ & khoanh tròn tài liệu"
+        >
+          <PenTool className="size-4" />
+        </button>
+
+        {/* NÚT BÚT DẠ QUANG HIGHLIGHTER */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTool("highlighter");
+            setActiveSize(6);
+          }}
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1",
+            activeTool === "highlighter"
+              ? "bg-[#d9a066] text-[#1a0f07] font-bold shadow-sm"
+              : "hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec]"
+          )}
+          title="Bút nhớ highlight tô màu chữ"
+        >
+          <Highlighter className="size-4" />
+        </button>
+
+        {/* Ô CHỌN MÀU GỌN GÀNG (TỰ ĐÓNG KHI DI CHUỘT RA NGOÀI) */}
+        {activeTool !== "cursor" && activeTool !== "eraser" && (
+          <div
+            className="relative"
+            onMouseLeave={() => setIsColorPickerOpen(false)}
+          >
+            <button
+              type="button"
+              onClick={() => setIsColorPickerOpen((prev) => !prev)}
+              className="p-1 rounded-lg hover:bg-[#342417] transition-colors cursor-pointer flex items-center justify-center"
+              title="Đổi màu bút"
+            >
+              <span
+                style={{ backgroundColor: activeColor }}
+                className="size-4 rounded-full border-2 border-white/60 shadow-sm"
+              />
+            </button>
+
+            {isColorPickerOpen && (
+              <div
+                onMouseLeave={() => setIsColorPickerOpen(false)}
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-1.5 bg-[#1e150f] border border-[#523924] rounded-xl shadow-2xl flex items-center gap-1.5 z-50 animate-in fade-in zoom-in-95 duration-100"
+              >
+                {COLOR_PALETTE.map((p) => (
+                  <button
+                    key={p.color}
+                    type="button"
+                    onClick={() => {
+                      setActiveColor(p.color);
+                      setIsColorPickerOpen(false);
+                    }}
+                    style={{ backgroundColor: p.color }}
+                    className={cn(
+                      "size-5 rounded-full transition-transform cursor-pointer border border-white/20 hover:scale-110",
+                      activeColor === p.color &&
+                        "scale-125 ring-2 ring-[#d9a066] ring-offset-1 ring-offset-[#1e150f]"
+                    )}
+                    title={p.label}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* NÚT TẨY XÓA NÉT VẼ */}
+        <button
+          type="button"
+          onClick={() => setActiveTool("eraser")}
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1",
+            activeTool === "eraser"
+              ? "bg-[#d9a066] text-[#1a0f07] font-bold shadow-sm"
+              : "hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec]"
+          )}
+          title="Tẩy nét vẽ (Chạm vào nét vẽ để xóa)"
+        >
+          <Eraser className="size-4" />
+        </button>
+
+        {/* NÚT XÓA TOÀN BỘ NÉT VẼ */}
+        <button
+          type="button"
+          onClick={() => {
+            setClearTrigger((prev) => prev + 1);
+          }}
+          className="p-1.5 rounded-lg hover:bg-[#342417] text-[#ad9885] hover:text-red-400 transition-colors cursor-pointer"
+          title="Xóa tất cả nét vẽ trên tài liệu đang chọn"
+        >
+          <Trash2 className="size-4" />
+        </button>
+
+        {/* VÁCH NGĂN CÁCH BIỆT GIỮA VẼ VÀ ZOOM */}
+        <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
+
+        {/* THU PHÓNG ZOOM IN / ZOOM OUT & RESET ĐƯỢC CHUYỂN XUỐNG DƯỚI */}
+        <button
+          type="button"
+          onClick={handleZoomOut}
+          className="p-1.5 rounded-lg hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec] transition-colors cursor-pointer"
+          title="Thu nhỏ (Zoom out • hoặc lăn chuột xuống)"
+        >
+          <ZoomOut className="size-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={handleResetZoom}
+          className="px-2 py-0.5 font-mono text-xs font-bold text-[#e8a86a] hover:text-[#f3caa1] min-w-[42px] text-center cursor-pointer"
+          title="Đặt lại tỉ lệ đọc chuẩn 80%"
+        >
+          {Math.round(zoomScale * 100)}%
+        </button>
+
+        <button
+          type="button"
+          onClick={handleZoomIn}
+          className="p-1.5 rounded-lg hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec] transition-colors cursor-pointer"
+          title="Phóng to (Zoom in • hoặc lăn chuột lên)"
+        >
+          <ZoomIn className="size-4" />
+        </button>
+
+        <button
+          type="button"
+          onClick={handleResetZoom}
+          className="p-1.5 rounded-lg hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec] transition-colors cursor-pointer"
+          title="Đặt lại góc nhìn và tỉ lệ chuẩn"
+        >
+          <RotateCcw className="size-3.5" />
+        </button>
+      </div>
     </div>
   );
 }
