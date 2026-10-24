@@ -129,7 +129,7 @@ Quyết định đã chốt:
 - D4: giữ `/api/phone` nhưng không gọi; xóa sau khi grep sạch consumer.
 - D5: đợt song song 1 gồm **WT-4, WT-2, WT-6, WT-7**; WT-1, WT-5, WT-3 chạy sau theo thứ tự tích hợp.
 
-Trạng thái base: working tree có thay đổi gỡ fallback evidence (chưa commit, `tsc` sạch, E2E chưa chạy lại). Chưa tách worktree cho tới khi owner duyệt bắt đầu code.
+Trạng thái base: working tree có thay đổi gỡ fallback evidence (chưa commit, `tsc` sạch, E2E chưa chạy lại) — chi tiết file tại Bước 0 của `WORKTREE_PLAN.md`; phần này thuộc WT-5, đã implement sẵn, chỉ còn chạy E2E + commit base trước khi tách worktree. Chưa tách worktree cho tới khi owner duyệt bắt đầu code.
 
 Kết quả khảo sát nguồn dữ liệu và hardcode: xem phụ lục mục 11 của `WORKTREE_PLAN.md`.
 

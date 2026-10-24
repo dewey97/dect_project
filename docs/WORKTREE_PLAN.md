@@ -1,6 +1,6 @@
 # Worktree Plan v2 — Tách việc song song (2026-10-24)
 
-> Bản kế hoạch thay thế toàn bộ Worktree Plan cũ. Mọi worktree nhánh từ `main` tại commit `a9dcb5e` (hoặc commit base ở Bước 0).
+> Bản kế hoạch thay thế toàn bộ Worktree Plan cũ. Mọi worktree nhánh từ `main` tại commit base của Bước 0 (sau khi commit thay đổi gỡ fallback evidence).
 > Quy ước chung, ràng buộc dự án và điều kiện done giữ nguyên như `AGENTS.md` (global + dự án) và `docs/HANDOFF_ROADMAP.md` mục 2–3.
 >
 > Tài liệu liên quan: `docs/TECHDEBT.md`, `docs/HANDOFF_ROADMAP.md`, `docs/core_specs/13_architecture_hardening_and_roadmap.md`, `docs/core_specs/20_phone_studio.md`.
@@ -9,7 +9,7 @@
 
 ## 0. Trạng thái xuất phát
 
-- `main` = `a9dcb5e`, đã push, working tree đang có thay đổi dở (xem Bước 0).
+- `main` đã có các commit tài liệu mới nhất; working tree còn thay đổi code gỡ fallback evidence (xem Bước 0).
 - Build production (`NEXT_DIST_DIR=.next_dev npx next build`) đã pass sau merge 4 worktree.
 - E2E: 13 pass, 2 skip, 1 fail do `e2e/evidence-studio.spec.ts` thiếu auth admin — đã sửa spec, chưa chạy lại.
 - Migration production: 21–37 đã chạy. Số migration còn trống bắt đầu từ **38**.
@@ -89,10 +89,14 @@ cp ../dect_project/.env .env
 
 ## 2. Bước 0 — Chốt base (làm trước khi tách worktree)
 
-Đang có thay đổi dở trong `main` từ việc gỡ fallback evidence (chưa commit):
+Đang có thay đổi dở trong `main` từ việc gỡ fallback evidence (chưa commit). Đây là phần việc **WT-5 làm sẵn trước khi tách nhánh**:
 
-- Đã xóa `components/investigation/evidence/evidence-data.ts`.
-- Đã sửa `use-case-evidence.ts`, `page.tsx`, `dossier-tray.tsx`, `evidence-detail-inspector.tsx`, `e2e/evidence-studio.spec.ts`.
+- Đã xóa `components/investigation/evidence/evidence-data.ts` (`CASE_000_PDFS`, `CASE_000_EVIDENCE`).
+- `lib/hooks/use-case-evidence.ts`: bỏ import hằng số tĩnh + nhánh fallback; chỉ map `rawEvidence` từ `getCaseEvidence`; fetch rỗng/lỗi giữ danh sách rỗng + trạng thái lỗi.
+- `app/(investigation)/evidence/web/page.tsx`: bỏ import `CASE_000_PDFS`; `selectedView` chuyển sang nullable; `PDFViewerModal` nhận `pdfUrl={selectedView?.type === "pdf" ? selectedView.data.url : null}`.
+- `components/investigation/evidence/dossier-tray.tsx`: prop `selectedView: SelectedView | null`; so khớp lựa chọn dùng optional chaining.
+- `components/investigation/evidence/evidence-detail-inspector.tsx`: `selectedView` nullable, trả `null` khi chưa chọn.
+- `e2e/evidence-studio.spec.ts`: thêm `test.use({ storageState: "e2e/.auth/admin.json" })` + skip guard khi thiếu `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD` (trước đó fail vì admin layout redirect `/login`).
 - `npx tsc --noEmit --incremental false`: **sạch** (sau khi xử lý `selectedView` nullable).
 - `pnpm test:e2e`: chưa chạy lại sau thay đổi.
 
@@ -104,7 +108,7 @@ Việc cần làm khi bắt đầu đợt code (khoảng 15 phút):
 
 Trong lúc chưa chốt base, working tree giữ nguyên, **không commit code**; chỉ commit tài liệu kế hoạch.
 
-Nếu chủ dự án muốn bỏ thay đổi dở: `git checkout -- .` và `git clean -fd components/investigation/evidence`, rồi chuyển toàn bộ việc trên vào WT-5.
+Nếu chủ dự án muốn bỏ thay đổi dở: `git checkout -- .` và `git clean -fd components/investigation/evidence`, rồi chuyển toàn bộ việc trên vào WT-5 (mục 1 giữ nguyên mô tả).
 
 ---
 
@@ -270,7 +274,7 @@ Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; khô
 
 **Nhiệm vụ:**
 
-1. Nhận base từ Bước 0 (fallback removal + spec auth).
+1. Nhận base từ Bước 0 (fallback removal + spec auth). Base này **đã implement sẵn** trên working tree `main`: xóa `evidence-data.ts`, `use-case-evidence.ts` chỉ map DB, `selectedView` nullable ở `page.tsx`/`dossier-tray.tsx`/`evidence-detail-inspector.tsx`, spec evidence dùng admin `storageState` + skip guard. Còn lại: chạy `pnpm test:e2e` rồi commit base trước khi tách nhánh; WT-5 không làm lại các bước này.
 2. **Bỏ metadata rác khỏi UI**: `timestamp`, `recoveredBy`, `integrityStatus`, `chainOfCustody`, `evidenceId` trong `components/admin/evidence-studio/evidence-form.tsx:467-533`, `evidence-preview.tsx:204-245`; bỏ fallback tương ứng trong `use-case-evidence.ts:33-53` và hardcode trong `page.tsx:271-276`.
    - Giữ `code` (khóa tham chiếu checkpoint) nhưng tự sinh từ tiêu đề, ẩn trong "Nâng cao"; bỏ hiển thị `#code`, `P{phase}`, `S{slot}` trong danh sách studio.
    - `chainOfCustody` đang không có input nhưng vẫn ghi payload — xóa khỏi state/payload.
