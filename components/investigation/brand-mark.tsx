@@ -14,18 +14,21 @@ export function BrandMark({
   href?: string
 }) {
   const content = (
-    <div className={cn('inline-flex items-center', className)}>
+    <div className={cn('inline-flex items-center justify-center', className)}>
       <img
         src="/brand/logo.png"
         alt="XPLORE"
-        className={cn('h-6 sm:h-7 w-auto object-contain', imageClassName)}
+        className={cn('h-6 sm:h-7 w-auto object-contain block', imageClassName)}
       />
     </div>
   )
 
   if (href) {
     return (
-      <Link href={href} className="inline-block hover:opacity-90 transition-opacity">
+      <Link
+        href={href}
+        className={cn('inline-flex items-center justify-center hover:opacity-90 transition-opacity', className)}
+      >
         {content}
       </Link>
     )
