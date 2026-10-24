@@ -56,3 +56,4 @@ __pycache__/
 data/maps/*.backup*.json
 .worktrees/
 worktrees/
+test-failed-*.png
