@@ -1,0 +1,88 @@
+# ==============================================================================
+# Caddyfile — Production Edge Reverse Proxy for dect_project (XPLORE)
+# VPS IP: 72.62.199.110
+# Upstream: Next.js standalone container bound to 127.0.0.1:3000
+# ==============================================================================
+
+{
+	# Tắt Caddy admin API để chặn tấn công qua cổng nội bộ
+	admin off
+
+	# Email quản trị viên nhận thông báo Let's Encrypt / ZeroSSL (bỏ comment và điền email thật)
+	# email security@xplore.vn
+}
+
+# ------------------------------------------------------------------------------
+# Reusable Snippet: Defensive Security Headers
+# ------------------------------------------------------------------------------
+(security_headers) {
+	header {
+		# HTTP Strict Transport Security (HSTS): 1 năm (31,536,000 giây)
+		# Bắt buộc trình duyệt luôn kết nối HTTPS, chống SSL Strip
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+		# Chống MIME Sniffing
+		X-Content-Type-Options "nosniff"
+
+		# Chống Clickjacking
+		X-Frame-Options "DENY"
+
+		# Kiểm soát Referrer
+		Referrer-Policy "strict-origin-when-cross-origin"
+
+		# Giới hạn quyền truy cập phần cứng trình duyệt
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+
+		# Xóa định danh server khỏi response header
+		-Server
+	}
+}
+
+# ------------------------------------------------------------------------------
+# Chuyển hướng www -> apex domain
+# ------------------------------------------------------------------------------
+www.xplore.vn {
+	redir https://xplore.vn{uri} permanent
+}
+
+# ------------------------------------------------------------------------------
+# Domain Chính: xplore.vn
+# ------------------------------------------------------------------------------
+xplore.vn {
+	import security_headers
+
+	# --------------------------------------------------------------------------
+	# Access Log Redaction (Xóa query parameters khỏi access log)
+	# Ngăn rò rỉ token, secret, license key vào disk log khi người chơi gửi query
+	# --------------------------------------------------------------------------
+	log {
+		output file /var/log/caddy/access.log {
+			roll_size 50MiB
+			roll_keep 10
+			roll_keep_for 720h
+		}
+		format filter {
+			wrap json
+			fields {
+				uri query {
+					replace "[redacted]"
+				}
+			}
+		}
+	}
+
+	# --------------------------------------------------------------------------
+	# Reverse Proxy chuyển tiếp về Next.js Container (127.0.0.1:3000)
+	# --------------------------------------------------------------------------
+	reverse_proxy 127.0.0.1:3000 {
+		# Forward Real Client IP cho Next.js runtime
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up Host {host}
+
+		# Buffer request/response tăng độ ổn định
+		buffer_requests
+		buffer_responses
+	}
+}

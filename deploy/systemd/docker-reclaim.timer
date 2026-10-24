@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Safe Docker Reclaim at 03:00 AM
+Documentation=https://github.com/dewey97/dect_project
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

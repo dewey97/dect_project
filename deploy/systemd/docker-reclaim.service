@@ -1,0 +1,17 @@
+[Unit]
+Description=Safe Docker Reclaim for dect_project (Lendi Pattern)
+Documentation=https://github.com/dewey97/dect_project
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/var/www/dect_project
+ExecStart=/usr/bin/env bash /var/www/dect_project/scripts/ops/vps-docker-reclaim.sh
+StandardOutput=journal
+StandardError=journal
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target
