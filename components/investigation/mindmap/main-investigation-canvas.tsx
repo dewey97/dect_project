@@ -15,6 +15,7 @@ import { getCanonicalSuspectKey } from "@/lib/cases/case-000-suspects";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
+import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
 import { setStorageItem, getStorageItem } from "@/lib/storage";
 import { useInvestigationEvent } from "@/lib/investigation-events";
 
@@ -75,6 +76,9 @@ export function MainInvestigationCanvas({
     onOpenReinvestigation,
     onOpenEpilogue,
   });
+
+  const charactersValue = useOptionalCaseCharacters();
+  const characters = charactersValue?.characters || [];
 
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isCreatePinModalOpen, setIsCreatePinModalOpen] = useState(false);
@@ -139,42 +143,59 @@ export function MainInvestigationCanvas({
   // Đồng bộ active checkpoint cho hint context
   useEffect(() => {
     let currentCp: string | null = null;
+    let viewedSuspectKey: string | null = null;
+
     if (state.isFollowupQuestionOpen) {
       const c =
         state.activeFollowupCulprit ||
         state.narrativeCulprit ||
         state.solvedCulprit ||
         "vu";
-      currentCp =
-        c === "vu" ? "cp-000-1a" : c === "tung" ? "cp-000-1b" : "cp-000-1c";
+      viewedSuspectKey = c;
+      const matched = state.checkpoints?.find(
+        (cp) =>
+          (cp.kind === "followup" || (cp as any).type === "followup") &&
+          (((cp as any).subject_key || cp.subjectKey || "")
+            .toLowerCase() === c.toLowerCase()),
+      );
+      currentCp = matched
+        ? matched.id
+        : c === "vu"
+          ? "cp-000-1a"
+          : c === "tung"
+            ? "cp-000-1b"
+            : "cp-000-1c";
     } else if (state.isPhoneLookupOpen) {
-      currentCp = "cp-000-0";
+      const matched = state.checkpoints?.find(
+        (cp) => cp.kind === "phone_lookup" || (cp as any).type === "phone_lookup",
+      );
+      currentCp = matched ? matched.id : "cp-000-0";
     } else if (state.isIndictmentOpen) {
-      currentCp = "cp-000-2b";
+      const matched = state.checkpoints?.find(
+        (cp) => cp.kind === "indictment" || (cp as any).type === "indictment",
+      );
+      currentCp = matched ? matched.id : "cp-000-2b";
     } else if (state.isAddSuspectOpen || state.editingSuspect) {
       const sName = (state.editingSuspect?.name || "").toLowerCase().trim();
       const sId = (state.editingSuspect?.id || "").toLowerCase().trim();
-      if (
-        sName === "vũ" ||
-        sName === "vu" ||
-        sName === "lê quang vũ" ||
-        sId === "vu"
-      )
-        currentCp = "cp-000-1a";
-      else if (
-        sName === "tùng" ||
-        sName === "tung" ||
-        sName === "nguyễn thanh tùng" ||
-        sId === "tung"
-      )
-        currentCp = "cp-000-1b";
-      else if (
-        sName === "hà" ||
-        sName === "ha" ||
-        sName === "trần thị hà" ||
-        sId === "ha"
-      )
-        currentCp = "cp-000-1c";
+      viewedSuspectKey = sId || sName;
+      const matched = state.checkpoints?.find(
+        (cp) =>
+          (cp.kind === "suspect_interrogation" ||
+            cp.kind === "suspect" ||
+            (cp as any).type === "suspect_interrogation") &&
+          (((cp as any).subject_key || cp.subjectKey || "")
+            .toLowerCase() === sId),
+      );
+      currentCp = matched
+        ? matched.id
+        : sId === "vu"
+          ? "cp-000-1a"
+          : sId === "tung"
+            ? "cp-000-1b"
+            : sId === "ha"
+              ? "cp-000-1c"
+              : null;
     } else if (activeCustomPinModal) {
       currentCp = detectCheckpointForPin(activeCustomPinModal);
     }
@@ -185,12 +206,9 @@ export function MainInvestigationCanvas({
       }
       setStorageItem("active_investigation_checkpoint", currentCp);
       setStorageItem("last_interacted_checkpoint", currentCp);
-      if (currentCp === "cp-000-1a")
-        setStorageItem("last_viewed_suspect", "vu");
-      else if (currentCp === "cp-000-1b")
-        setStorageItem("last_viewed_suspect", "tung");
-      else if (currentCp === "cp-000-1c")
-        setStorageItem("last_viewed_suspect", "ha");
+    }
+    if (viewedSuspectKey) {
+      setStorageItem("last_viewed_suspect", viewedSuspectKey);
     }
   }, [
     state.isFollowupQuestionOpen,
@@ -202,6 +220,7 @@ export function MainInvestigationCanvas({
     activeCustomPinModal,
     state.isAddSuspectOpen,
     state.editingSuspect,
+    state.checkpoints,
   ]);
 
   const normalizedSheetCaseId = useMemo(
@@ -209,6 +228,10 @@ export function MainInvestigationCanvas({
     [caseId],
   );
   const { rawEvidence: sheetEvidences } = useCaseEvidence(caseId);
+
+  const victimChar = useMemo(() => {
+    return characters.find((c) => c.role === "victim");
+  }, [characters]);
 
   const victimItem = useMemo(() => {
     if (!Array.isArray(sheetEvidences)) return null;
@@ -232,6 +255,7 @@ export function MainInvestigationCanvas({
   }, [sheetEvidences]);
 
   const victimName = useMemo(() => {
+    if (victimChar?.name) return victimChar.name;
     if (victimItem) {
       const label = String(
         (victimItem as any).label || victimItem.title || "",
@@ -243,7 +267,7 @@ export function MainInvestigationCanvas({
       if (clean) return clean;
     }
     return "Nguyễn Văn Khang";
-  }, [victimItem]);
+  }, [victimChar, victimItem]);
   const sheetPhotoMap = useMemo(() => {
     const map: Record<string, string> = {};
     if (Array.isArray(sheetEvidences)) {
@@ -469,13 +493,6 @@ export function MainInvestigationCanvas({
     (s) => getCanonicalSuspectKey(s).canonicalId === "ha",
   );
 
-  const hasVuFollowup =
-    state.isShowAllPinsPreview || state.investigatedSuspects.includes("vu");
-  const hasTungFollowup =
-    state.isShowAllPinsPreview || state.investigatedSuspects.includes("tung");
-  const hasHaFollowup =
-    state.isShowAllPinsPreview || state.investigatedSuspects.includes("ha");
-
   // Tập hợp toàn bộ culprit IDs có câu hỏi mở rộng
   const followupCulpritIds = useMemo(() => {
     if (state.isShowAllPinsPreview) {
@@ -489,6 +506,10 @@ export function MainInvestigationCanvas({
     effectiveSuspects,
     state.investigatedSuspects,
   ]);
+
+  const hasVuFollowup = followupCulpritIds.includes("vu");
+  const hasTungFollowup = followupCulpritIds.includes("tung");
+  const hasHaFollowup = followupCulpritIds.includes("ha");
 
   const isReinvestigateBlinking =
     state.effectiveReinvestigateUnlocked && !state.hasOpenedReinvestigation;
@@ -632,12 +653,9 @@ export function MainInvestigationCanvas({
         }
         setStorageItem("active_investigation_checkpoint", clickedCp);
         setStorageItem("last_interacted_checkpoint", clickedCp);
-        if (clickedCp === "cp-000-1a")
-          setStorageItem("last_viewed_suspect", "vu");
-        else if (clickedCp === "cp-000-1b")
-          setStorageItem("last_viewed_suspect", "tung");
-        else if (clickedCp === "cp-000-1c")
-          setStorageItem("last_viewed_suspect", "ha");
+      }
+      if (pin?.subjectKey) {
+        setStorageItem("last_viewed_suspect", pin.subjectKey);
       }
 
       if (layout.isEditMode) {
@@ -668,6 +686,127 @@ export function MainInvestigationCanvas({
         }
         setActiveCustomPinModal(targetPin);
         return;
+      }
+
+      const nodeKind = pin?.nodeKind;
+
+      switch (nodeKind) {
+        case "suspects_hub": {
+          detectiveAudio.playPaperRustle();
+          return;
+        }
+        case "evidence_hub": {
+          state.setIsEvidenceGuideOpen(true);
+          return;
+        }
+        case "victim_phone": {
+          detectiveAudio.playPaperRustle();
+          if (onOpenPhoneSimulator) onOpenPhoneSimulator();
+          else state.setIsInternalPhoneOpen(true);
+          return;
+        }
+        case "reinvestigate": {
+          if (state.effectiveReinvestigateUnlocked) {
+            detectiveAudio.playGlassSound();
+            if (onOpenReinvestigation) onOpenReinvestigation();
+            else state.handleOpenReinvestigation();
+          } else {
+            detectiveAudio.playGlassSound();
+          }
+          return;
+        }
+        case "phone_lookup": {
+          if (state.phoneLookupSuccess) state.setIsDossierEOpen(true);
+          else state.setIsPhoneLookupOpen(true);
+          return;
+        }
+        case "indictment": {
+          if (state.isIndictmentSolved) {
+            state.setIsFinalEpilogueOpen(true);
+            if (onOpenEpilogue) onOpenEpilogue();
+          } else {
+            state.setIsIndictmentOpen(true);
+          }
+          return;
+        }
+        case "suspect": {
+          const subjectKey = pin?.subjectKey;
+          const charName = (pin?.label || "")
+            .replace(
+              /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
+              "",
+            )
+            .replace(/\s*\([^)]*\)/g, "")
+            .trim();
+          const existing = state.suspects.find(
+            (s) =>
+              (subjectKey && s.id === subjectKey) ||
+              s.id === id ||
+              s.name.toLowerCase() === charName.toLowerCase(),
+          );
+          if (subjectKey) {
+            setStorageItem("last_viewed_suspect", subjectKey);
+          }
+          state.setEditingSuspect(
+            existing || {
+              id: subjectKey || id,
+              name: charName || pin?.label || "Nghi phạm",
+              clueIds: [],
+            },
+          );
+          state.setIsAddSuspectOpen(true);
+          return;
+        }
+        case "followup": {
+          const c = pin?.subjectKey || findFollowupCulprit(id, detail);
+          state.setActiveFollowupCulprit(c);
+          if (c) {
+            setStorageItem("last_viewed_suspect", c);
+          }
+          const isAlreadySolved =
+            state.solvedFollowupQuestions.includes(c) ||
+            getStorageItem(caseStorageKey(caseId, `followup_${c}`)) ===
+              "solved" ||
+            (c === "ha" &&
+              !!getStorageItem(caseStorageKey(caseId, "followup_ha_password"))) ||
+            (c === "vu" &&
+              !!getStorageItem(caseStorageKey(caseId, "followup_vu")));
+
+          if (isAlreadySolved) {
+            if (c === "ha") {
+              state.setIsFollowupQuestionOpen(true);
+            } else {
+              const savedChoice =
+                getStorageItem(caseStorageKey(caseId, `followup_${c}_choice`)) ||
+                (c === "vu" ? "21:15" : "question_solved");
+              state.setNarrativeChoice(savedChoice);
+              state.setNarrativeCulprit(c);
+              state.setIsEpilogueOpen(true);
+            }
+          } else {
+            state.setIsFollowupQuestionOpen(true);
+          }
+          return;
+        }
+        case "photo":
+        case "victim": {
+          if (pin?.photoUrl) {
+            handleOpenPhotoZoom(pin.photoUrl, coords);
+          }
+          return;
+        }
+        case "note": {
+          detectiveAudio.playPaperRustle();
+          return;
+        }
+        case "custom": {
+          if (pin?.photoUrl && pin.actionType !== "sheet_checkpoint") {
+            handleOpenPhotoZoom(pin.photoUrl, coords);
+          } else {
+            setActiveCustomPinModal(pin || null);
+          }
+          return;
+        }
       }
 
       if (id === "c0-pin-suspects") {
