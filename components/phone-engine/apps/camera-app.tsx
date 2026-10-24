@@ -237,12 +237,10 @@ export function CameraApp({ onBackToHome, selfieUrl }: CameraAppProps) {
         )}
 
         {/* HÌNH CON KHỈ EASTER EGG (Sau cú nháy sáng shutter) */}
-        {showMonkey && (
+        {showMonkey && selfieUrl && (
           <div className="absolute inset-0 bg-black flex flex-col items-center justify-center z-25 overflow-hidden animate-in zoom-in-95 fade-in duration-150">
             <img
-              src={
-                selfieUrl || "/images/cases/case_000/phone/monkey_selfie.png"
-              }
+              src={selfieUrl}
               alt="Ảnh chụp bất ngờ"
               className="w-full h-full object-cover select-none pointer-events-none"
             />

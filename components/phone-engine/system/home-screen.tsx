@@ -24,21 +24,21 @@ export type IPhoneApp =
   | null;
 
 export const DEFAULT_APP_ICONS: Record<string, string> = {
-  photos: "/images/cases/case_000/phone/icons/photos.png",
-  camera: "/images/cases/case_000/phone/icons/camera.png",
-  maps: "/images/cases/case_000/phone/icons/maps.png",
-  notes: "/images/cases/case_000/phone/icons/notes.png",
-  banking: "/images/cases/case_000/phone/icons/banking.svg",
-  flappybird: "/images/cases/case_000/phone/icons/flappybird.svg",
-  tetris: "/images/cases/case_000/phone/icons/tetris.svg",
-  snake: "/images/cases/case_000/phone/icons/snake.svg",
-  game2048: "/images/cases/case_000/phone/icons/game2048.svg",
-  minesweeper: "/images/cases/case_000/phone/icons/minesweeper.svg",
-  settings: "/images/cases/case_000/phone/icons/settings.png",
-  phone: "/images/cases/case_000/phone/icons/phone.png",
-  messages: "/images/cases/case_000/phone/icons/messages.png",
-  contacts: "/images/cases/case_000/phone/icons/contacts.png",
-  safari: "/images/cases/case_000/phone/icons/safari.png",
+  photos: "/images/phone/icons/photos.png",
+  camera: "/images/phone/icons/camera.png",
+  maps: "/images/phone/icons/maps.png",
+  notes: "/images/phone/icons/notes.png",
+  banking: "/images/phone/icons/banking.svg",
+  flappybird: "/images/phone/icons/flappybird.svg",
+  tetris: "/images/phone/icons/tetris.svg",
+  snake: "/images/phone/icons/snake.svg",
+  game2048: "/images/phone/icons/game2048.svg",
+  minesweeper: "/images/phone/icons/minesweeper.svg",
+  settings: "/images/phone/icons/settings.png",
+  phone: "/images/phone/icons/phone.png",
+  messages: "/images/phone/icons/messages.png",
+  contacts: "/images/phone/icons/contacts.png",
+  safari: "/images/phone/icons/safari.png",
 };
 
 interface IPhoneHomeScreenProps {

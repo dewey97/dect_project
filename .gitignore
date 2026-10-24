@@ -47,6 +47,7 @@ scripts/bin/
 
 # Server runtime saved data files
 data/*.json
+data/_review/
 *.backup.json
 # Figma/inspect dumps & Python cache (sinh lại bằng scripts, không commit)
 scripts/*.json

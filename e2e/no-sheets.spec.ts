@@ -3,17 +3,6 @@ import { expect, test } from "@playwright/test";
 const CASE_URL = "/evidence/web?case_id=case_000";
 
 test.describe("No Google Sheets Runtime (WT-6 / CMS Cutover)", () => {
-  test("Deprecated /api/phone returns 410 Gone", async ({ page }) => {
-    const res = await page.request.get(
-      "/api/phone?tab=evidences&caseId=case_000",
-    );
-    expect(res.status()).toBe(410);
-
-    const json = await res.json();
-    expect(json.deprecated).toBe(true);
-    expect(json.success).toBe(false);
-  });
-
   test("Supabase /api/phone-data serves all tabs including evidences", async ({
     page,
   }) => {

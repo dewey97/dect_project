@@ -148,7 +148,9 @@ function PhoneScreenContent({
     goHome,
   } = usePhone();
 
-  const { apps } = usePhoneApps(device.caseId || "case_000");
+  const { apps } = usePhoneApps(
+    device.caseId || getActiveCaseId() || "case_000",
+  );
 
   const isLightStatusBar =
     !isLocked && (activeApp === "messages" || activeApp === "notes");

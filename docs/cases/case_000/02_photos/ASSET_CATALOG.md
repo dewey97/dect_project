@@ -19,6 +19,8 @@ public/
 │   │   └── case_000/
 │   ├── hero/                       # Asset khung bàn điều tra interactive ở Hero
 │   ├── landing/                    # Ảnh minh họa thẻ án, bìa báo trên Landing Page
+│   ├── phone/                      # Tài nguyên giao diện điện thoại dùng chung (icons/)
+│   │   └── icons/
 │   └── pins/                       # Ghim các màu (pin-blue, pin-red, pin-brass...)
 ├── models/                         # Mô hình 3D (.glb) phục vụ phòng điều tra 3D
 ├── textures/                       # Textures giấy kraft
@@ -147,6 +149,16 @@ Giấy note vàng/trắng viết tay đã kết xuất sẵn nét mực để c�
 
 ---
 
-## 🗄️ 8. Lưu Trữ Tài Liệu Thiết Kế Nháp (`docs/cases/case_000/02_photos/test_notes_archive/`)
+## 📱 8. Phân Hệ Biểu Tượng Ứng Dụng Điện Thoại Dùng Chung (`/public/images/phone/icons/`)
+
+Toàn bộ icon ứng dụng hệ thống trên trình giả lập điện thoại (iOS retro/chính quy) dùng chung cho tất cả các vụ án:
+
+- `phone.png`, `messages.png`, `contacts.png`, `safari.png` (ứng dụng dock cố định).
+- `photos.png`, `camera.png`, `notes.png`, `settings.png`, `maps.png` (ứng dụng tiện ích hệ thống).
+- `banking.svg`, `flappybird.svg`, `tetris.svg`, `snake.svg`, `game2048.svg`, `minesweeper.svg` (ứng dụng phụ trợ & mini-games).
+
+---
+
+## 🗄️ 9. Lưu Trữ Tài Liệu Thiết Kế Nháp (`docs/cases/case_000/02_photos/test_notes_archive/`)
 
 Toàn bộ các file kết xuất thử nghiệm font chữ (`test_Caveat-Bold.png`, `test_Pangolin.png`...) và các bản nháp trung gian đã được **di dời khỏi `public/`** và lưu trữ an toàn tại thư mục tài liệu thiết kế này để tránh gây nặng bộ cài đặt web.

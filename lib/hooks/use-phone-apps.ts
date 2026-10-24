@@ -15,7 +15,7 @@ const appsCache: Record<string, { data: DbCasePhoneApp[]; timestamp: number }> =
   {};
 const CACHE_TTL_MS = 60_000; // 1 minute
 
-export function usePhoneApps(caseId: string = "case_000"): PhoneAppsState {
+export function usePhoneApps(caseId: string): PhoneAppsState {
   const effectiveSlug = normalizeCaseId(caseId);
   const cached = appsCache[effectiveSlug];
   const isFresh = cached && Date.now() - cached.timestamp < CACHE_TTL_MS;
