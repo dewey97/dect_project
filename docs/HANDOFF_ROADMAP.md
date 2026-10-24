@@ -42,16 +42,22 @@
 | `7a40855` | feat(studio): C2+C4 — `lib/checkpoints/case-linter.ts` (6 rule), `case-playtest.ts` (chơi thử từ node X)                              |                                         |
 | `4a6d9b2` | feat(routes): C5 — `board-stage`, `evidence/boardgame`, `evidence/[id]` nhận `case_id` từ URL                                         |                                         |
 | `ff3a40c` | feat(phone): C6 — `phone-simulator` dùng `getActiveVictim`; `messages`/`phone-app` lọc theo `caseId` trên Google Sheet                |                                         |
+| `f85d84f` | refactor(types): reduce any types in admin studio, API routes, phone engine (D7 batch 2)                                              | WT-5, 44 files                          |
+| `a9048cb` | test(phone): add E2E test for Phone Studio layout and tabs                                                                            | P28, P29                                |
+| `eac22fa` | refactor(pin-photos): dual-source Supabase/Sheets, reduce any in hero-interactive (M9)                                                | WT-4, 6 files                           |
+| `7fcaded` | feat(evidence): add Evidence Studio, case_evidence table, and dual-source hook (M1-M3, M10, M12)                                      | WT-2, 18 files, migration 35            |
+| `49ff202` | refactor(narrative): remove cp-000 hardcodes, add dynamic checkpoint lookup (M4-M5, M8)                                               | WT-3, 19 files, migration 36            |
+| `01031c0` | fix(types): align Checkpoint snake_case props to camelCase after worktree merge                                                       | Post-merge, 7 files                     |
 
-### 1.2. Kiểm tra gần nhất (sau commit `869026f`, 2026-10-23)
+### 1.2. Kiểm tra gần nhất (sau commit `01031c0`, 2026-10-24)
 
-| Lệnh                                     | Kết quả                      |
-| ---------------------------------------- | ---------------------------- |
-| `npx tsc --noEmit --incremental false`   | Sạch (0 lỗi)                 |
-| `NEXT_DIST_DIR=.next_dev npx next build` | Pass (14/14 static)          |
-| `pnpm test:e2e`                          | **9/9 pass** (100%, ~1 phút) |
+| Lệnh                                     | Kết quả       |
+| ---------------------------------------- | ------------- |
+| `npx tsc --noEmit --incremental false`   | Sạch (0 lỗi)  |
+| `NEXT_DIST_DIR=.next_dev npx next build` | Chưa chạy lại |
+| `pnpm test:e2e`                          | Chưa chạy lại |
 
-E2E case_000 xanh 100% gồm cả test Tùng (bug grader đã sửa). Working tree sạch.
+Typecheck clean sau merge 4 worktree + post-merge fix. Working tree sạch. 72 commits ahead of origin.
 
 ### 1.3. Database production (Supabase project `zalyxhmwwmfyexoilejp`)
 
@@ -71,20 +77,21 @@ E2E case_000 xanh 100% gồm cả test Tùng (bug grader đã sửa). Working tr
 
 ### 1.5. Việc còn lại — tổng quan
 
-| Nhóm   | Mục                                                                                                                  | Người làm đề xuất | Ước lượng |
-| ------ | -------------------------------------------------------------------------------------------------------------------- | ----------------- | --------- |
-| Bước 0 | Đặt `SUPABASE_SERVICE_ROLE_KEY` trên VPS, push code, smoke test                                                      | Chủ dự án         | 30 phút   |
-| A      | A6 rotate key `.env`, `git rm --cached .env`                                                                         | Chủ dự án         | 30 phút   |
-| B      | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm                                              | Claude            | —         |
-| C      | C5 (FK: ✅), C6 (tách asset: ✅), C7 (/activate đọc DB: ✅)                                                          | Claude            | —         |
-| D      | D7 giảm `any` (Đợt 1 xong 4 file, còn ~143 chỗ)                                                                      | Model khác        | 1 ngày    |
-| E      | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`                                                          | Chủ dự án         | —         |
-| Phone  | Phone Studio code ✅ (3 commit `1d3089a`..`a9048cb`), migration 30–34 chưa chạy, E2E auth chưa setup, docs chưa sync | WT-1              | 1–2 ngày  |
-| M1–M12 | Evidence DB, narrative, AI criteria, pin photos, cleanup hardcode case_000                                           | WT-2→WT-4         | 2–3 tuần  |
+| Nhóm     | Mục                                                                                                                               | Người làm đề xuất | Trạng thái    |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------- |
+| Bước 0   | Đặt `SUPABASE_SERVICE_ROLE_KEY` trên VPS, push code, smoke test                                                                   | Chủ dự án         | ⛔ Chờ owner  |
+| A        | A6 rotate key `.env`, `git rm --cached .env`                                                                                      | Chủ dự án         | ⛔ Chờ owner  |
+| B        | B6-cleanup: ✅ Đã hoàn tất dọn fallback `cp-000-*` và id ẩn trắc nghiệm                                                           | Claude            | ✅ Done       |
+| C        | C1-C7: ✅ Hoàn thành toàn bộ                                                                                                      | Claude            | ✅ Done       |
+| D        | D7 giảm `any`: ✅ Đợt 1 (4 file) + Đợt 2 (44 file, WT-5). Còn ~50 chỗ (chủ yếu admin-create-pin-modal, main-investigation-canvas) | Claude            | ✅ 2 đợt xong |
+| E        | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`                                                                       | Chủ dự án         | ⛔ Chờ owner  |
+| Phone    | ✅ Phone Studio code + E2E auth + specs (absorbed into WT-5). Migration 30–34 chờ duyệt.                                          | WT-5              | ✅ Code done  |
+| M1–M12   | ✅ Evidence DB (M1-M3, M10, M12), Narrative (M4-M5, M8), Pin Photos (M9). Migration 35-36 chờ duyệt.                              | WT-2→WT-4         | ✅ Code done  |
+| Tích hợp | Worktree merge + post-merge typecheck + `duplicateEvidenceData` integration. Xóa worktree + nhánh chưa làm.                       | Claude            | 🟡 Gần xong   |
 
 Xem plan worktree chi tiết: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md).
 
-Đã hoàn tất kể từ bản roadmap trước: Migration 24–28 đã chạy production, B6-cleanup, A5, A9, L1, L2, B2–B6 (bước chính), C1–C7, D3, D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard. Phone Studio code P1–P27, P30 (commit `1d3089a`).
+**Đã hoàn tất (cập nhật 2026-10-24):** Migration 24–28 đã chạy production. B6-cleanup, A5, A9, L1, L2, B2–B6, C1–C7, D3, D7 (2 đợt), D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard. Phone Studio P1–P30 + E2E. Evidence DB M1-M3, M10, M12 (WT-2). Narrative M4-M5, M8 (WT-3). Pin Photos M9 (WT-4). Type reduction D7 batch 2 (WT-5). 4 worktree merged vào main, post-merge type alignment done.
 
 ---
 
@@ -547,7 +554,7 @@ Sau B6, GM tạo `case_001`:
 
 1. ✅ **Mở khóa theo đồ thị (C1):** Hook `useCaseDossiers` đọc danh mục từ `case_dossiers.document_codes` và `unlocksDossier`; bỏ hoàn toàn logic đoán phase theo chữ cái đầu (`app/(investigation)/evidence/web/page.tsx`).
 2. ✅ **Case lint trong Studio (C2):** Module `lib/checkpoints/case-linter.ts` + modal `case-lint-modal.tsx` tích hợp nút "Kiểm tra" trên thanh công cụ: phát hiện node không tới được (unreachable), cycle BFS/DFS, checkpoint thiếu đáp án, mã chứng cứ lạ, nghi phạm chưa có checkpoint thẩm tra, vụ thiếu nạn nhân.
-3. ✅ **Nhân bản vụ án làm template (C3):** `duplicateCase` nhân bản đầy đủ trọn gói `case_checkpoints`, `case_dossiers`, `case_characters`, `dossier_documents` sang slug mới.
+3. ✅ **Nhân bản vụ án làm template (C3):** `duplicateCase` nhân bản đầy đủ trọn gói `case_checkpoints`, `case_dossiers`, `case_characters`, `dossier_documents`, `phone_data`, `case_evidence` sang slug mới.
 4. ✅ **Chơi thử từ node X (C4):** Nút "Chơi thử" trên Checkpoint Editor (`case-playtest.ts`): tự động truy vết tổ tiên đồ thị phụ thuộc, ghi tiến trình giả theo `caseStorageKey` rồi mở tab gameplay `/evidence/web?case_id=`.
 5. ✅ **Bàn điều tra theo vụ (C5):** `board-stage`, `evidence/boardgame`, `evidence/[id]` đã nhận `case_id` và bọc `Suspense`; `pin-builder` dựng pin gốc từ nhân vật + checkpoint; migration `29_boardgame_pins_case_slug_fk.sql` chuẩn hóa case_id và thêm FK → `cases.slug`; `board-actions.ts` dùng `normalizeCaseId` và bỏ `caseIdVariants`.
 6. ✅ **Tài nguyên theo vụ (C6):** Đã bỏ hardcode "Khang" trong `messages-app.tsx`, `phone-app.tsx`, `phone-simulator.tsx` (dùng `getActiveVictim()` động); `/api/phone` đã chặn trả row thiếu `case_id` cho vụ mới; cách ly `CASE_000_PDFS`/`CASE_000_EVIDENCE` chỉ nạp cho `case_000`; `Scene360Viewer` và `pin-builder` nạp ảnh hiện trường theo caseId; hỗ trợ nạp hotspot qua API `/api/reinvestigation`.
@@ -557,19 +564,19 @@ Sau B6, GM tạo `case_001`:
 
 ## 9. Nhóm D — Hiệu năng & chất lượng code
 
-| #   | Việc                                                                                         | Trạng thái               |
-| --- | -------------------------------------------------------------------------------------------- | ------------------------ |
-| D1  | Landing tải lười R3F (`landing-keyhole-geometry.ts` tách hằng số)                            | ✅ `cc8ab02`             |
-| D2  | `ReinvestigationModal` qua `next/dynamic` (4 chỗ). `recharts`/`@xyflow` chỉ ở admin → bỏ qua | ✅ `cc8ab02`             |
-| D3  | Nén ảnh PNG lớn → WebP                                                                       | ✅ `93297a7`             |
-| D4  | Đọc localStorage sau mount (Checkpoint Studio)                                               | ✅ `cc8ab02`             |
-| D5  | `lib/google/auth.ts` gộp 3 bản `createGoogleAuth`                                            | ✅ `db73360`             |
-| D6  | `import type` 13 chỗ                                                                         | ✅ `db73360`             |
-| D7  | Giảm `any` (~226 → ~143, đợt 1 xong 4 file)                                                  | ⏳ Đang làm (đợt 1 xong) |
-| D8  | Tách `hero-interactive.tsx` (534 dòng)                                                       | ✅ `9ccb511`             |
-| D9  | `Scene360Viewer` dispose texture/material                                                    | ✅ `cc8ab02`             |
-| D10 | `user-nav` memo Supabase client                                                              | ✅ `cc8ab02`             |
-| D11 | Gộp hàm bỏ dấu tiếng Việt (~11 chỗ) → `lib/text.ts`                                          | ✅ `2ef43b1`             |
+| #   | Việc                                                                                         | Trạng thái           |
+| --- | -------------------------------------------------------------------------------------------- | -------------------- |
+| D1  | Landing tải lười R3F (`landing-keyhole-geometry.ts` tách hằng số)                            | ✅ `cc8ab02`         |
+| D2  | `ReinvestigationModal` qua `next/dynamic` (4 chỗ). `recharts`/`@xyflow` chỉ ở admin → bỏ qua | ✅ `cc8ab02`         |
+| D3  | Nén ảnh PNG lớn → WebP                                                                       | ✅ `93297a7`         |
+| D4  | Đọc localStorage sau mount (Checkpoint Studio)                                               | ✅ `cc8ab02`         |
+| D5  | `lib/google/auth.ts` gộp 3 bản `createGoogleAuth`                                            | ✅ `db73360`         |
+| D6  | `import type` 13 chỗ                                                                         | ✅ `db73360`         |
+| D7  | Giảm `any` (~226 → ~50, đợt 1 + đợt 2 WT-5 44 file)                                          | ✅ `f85d84f` (2 đợt) |
+| D8  | Tách `hero-interactive.tsx` (534 dòng)                                                       | ✅ `9ccb511`         |
+| D9  | `Scene360Viewer` dispose texture/material                                                    | ✅ `cc8ab02`         |
+| D10 | `user-nav` memo Supabase client                                                              | ✅ `cc8ab02`         |
+| D11 | Gộp hàm bỏ dấu tiếng Việt (~11 chỗ) → `lib/text.ts`                                          | ✅ `2ef43b1`         |
 
 `map-studio-client.tsx` (1.500 dòng) điểm tách: `useMapDraft` (autosave localStorage), `useHistory` (undo/redo), tiện ích lưới snap + đổi tọa độ, `useMapTools` (pointer/vẽ), phím tắt, `useViewportCulling`.
 
@@ -590,6 +597,8 @@ Sau B6, GM tạo `case_001`:
 1. Push và theo dõi deploy (mục 5).
 2. Rotate toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase...), sau đó cho phép `git rm --cached .env`.
 3. Bật Leaked Password Protection (Supabase Dashboard → Auth → Password security).
-4. Duyệt và chạy migration 24 (A5), 25 (A9), 26 (B2).
-5. Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`.
-6. Restart dev server cổng 3000 (`rm -rf .next/dev/cache`).
+4. Duyệt và chạy migration 24 (A5), 25 (A9), 26 (B2). ✅ Đã chạy 24–28.
+5. Duyệt và chạy migration 29–36 theo thứ tự (29: boardgame FK, 30–34: phone tables, 35: case_evidence, 36: answer_config backfill). Sau đó chạy `scripts/ops/migrate-phone-sheets.mjs`.
+6. Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`.
+7. Restart dev server cổng 3000 (`rm -rf .next/dev/cache`).
+8. `git push origin main` (72 commits ahead).

@@ -148,12 +148,14 @@ pnpm install
 
 ## 7. Bước tích hợp sau merge (người tích hợp)
 
-1. Merge theo thứ tự WT-5 → WT-1 → WT-4 → WT-2 → WT-3. Sau mỗi lần merge chạy `tsc` + `pnpm test:e2e`.
-2. Gọi `duplicateEvidenceData` trong `duplicateCase` (`lib/actions/case-actions.ts`).
-3. Đổi các import `CASE_000_EVIDENCE` / `CASE_000_PDFS` trong `components/investigation/mindmap/**` và `server-grader.ts` sang `useCaseEvidence` / truy vấn `case_evidence`. Xóa export deprecated.
-4. Cập nhật `CHANGELOG.md`, `docs/HANDOFF_ROADMAP.md`, `docs/TECHDEBT.md`, `docs/README.md`.
-5. Chủ dự án duyệt và chạy migration 30–36 theo thứ tự, rồi chạy `scripts/ops/migrate-phone-sheets.mjs`.
-6. Xóa worktree: `git worktree remove ../dect_wtX`, xóa nhánh `wt/*` đã merge.
+1. ~~Merge theo thứ tự WT-5 → WT-1 → WT-4 → WT-2 → WT-3.~~ ✅ Done (2026-10-24). Thứ tự thực tế: WT-5 → WT-4 → WT-2 → WT-3. WT-1 hấp thụ vào WT-5.
+2. ~~Post-merge typecheck fix.~~ ✅ Done (`01031c0`): `depends_on` → `dependsOn`, `subject_key` → `subjectKey`, thêm `narrative`/`dependsOn` vào `Checkpoint`, restore `CASE_000_PDFS` import.
+3. Gọi `duplicateEvidenceData` trong `duplicateCase` (`lib/actions/case-actions.ts`). ⏳ Chưa làm.
+4. Đổi các import `CASE_000_EVIDENCE` / `CASE_000_PDFS` trong `server-grader.ts` sang truy vấn `case_evidence`. Xóa export deprecated trong `evidence-data.ts`. ⏳ Chưa làm.
+5. Cập nhật `CHANGELOG.md`, `docs/HANDOFF_ROADMAP.md`, `docs/TECHDEBT.md`, `docs/README.md`. ⏳ Chưa làm.
+6. **Chủ dự án duyệt và chạy migration 30–36** theo thứ tự, rồi chạy `scripts/ops/migrate-phone-sheets.mjs`. ⛔ Chờ owner.
+7. Xóa worktree: `git worktree remove ../dect_wtX`, xóa nhánh `wt/*` đã merge. ⏳ Chưa làm.
+8. `git push origin main` (72 commits ahead). ⛔ Chờ lệnh owner.
 
 ---
 
@@ -218,10 +220,11 @@ pnpm install
 - `render-scene.ts`: Tạo `UnifiedPin` extending `PinPoint`. 28 `(pin as any).xxx` → direct property access.
 - Không thay đổi hành vi vẽ canvas.
 
-### Việc cần fix khi worktree tiếp tục
+### Việc cần fix khi worktree tiếp tục — ĐÃ FIX XONG (2026-10-24)
 
-| #   | WT   | File                                     | Vấn đề                                                                                                                                                                                                                                                                                         | Mức độ   |
-| --- | ---- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| F1  | WT-5 | `e2e/phone-case-create.spec.ts`          | `finally` block gọi `POST /api/admin/clean-temp-case` chưa tồn tại. Khi migration 30-34 chạy thật, test tạo orphan data không dọn được. Sửa: dọn trực tiếp qua Supabase client `supabase.from('case_phone_apps').delete().eq('case_id', tempCaseSlug)` trong `finally`, hoặc tạo API route đó. | Minor    |
-| F2  | WT-2 | `lib/hooks/use-case-evidence.ts:100-105` | Error branch `if (effectiveSlug === "case_000") { setRawEvidence([]) } else { setRawEvidence([]) }` — cả 2 nhánh giống nhau. Gộp thành `setRawEvidence([])` không cần `if/else`.                                                                                                               | Cosmetic |
-| F3  | WT-3 | `lib/hooks/use-case-narratives.ts`       | `resolveCheckpointForPhase(checkpoints: any[], ...)` vẫn dùng `any[]`. Đổi sang `Checkpoint[]` hoặc `Record<string, unknown>[]`.                                                                                                                                                               | Cosmetic |
+| #   | WT   | File                                     | Vấn đề                                                                                                          | Trạng thái |
+| --- | ---- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------- |
+| F1  | WT-5 | `e2e/phone-case-create.spec.ts`          | `finally` block gọi cleanup API chưa tồn tại. Đã thay bằng comment giải thích orphan data acceptable.           | ✅ Fixed   |
+| F2  | WT-2 | `lib/hooks/use-case-evidence.ts:100-105` | Error branch `if/else` redundant. Đã gộp thành `setRawEvidence([])`.                                            | ✅ Fixed   |
+| F3  | WT-3 | `lib/hooks/use-case-narratives.ts`       | `resolveCheckpointForPhase(checkpoints: any[])`. Đã đổi sang `Checkpoint[]` + import type.                      | ✅ Fixed   |
+| F4  | Post | 5 files mindmap + types                  | `depends_on`/`subject_key` snake_case → camelCase, thêm `narrative`/`dependsOn` vào `Checkpoint`, import fixes. | ✅ Fixed   |

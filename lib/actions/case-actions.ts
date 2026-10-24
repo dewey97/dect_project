@@ -13,6 +13,7 @@ import { revalidatePath } from "next/cache";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
 import { requireAdminAuth } from "@/lib/auth/admin";
 import { duplicatePhoneData } from "./phone-actions";
+import { duplicateEvidenceData } from "./evidence-actions";
 
 /** Lấy thống kê tổng quan cho Dashboard */
 export async function getDashboardStats() {
@@ -248,7 +249,11 @@ export async function duplicateCase(caseId: string) {
     // 7. Clone phone data (apps, contacts, calls, messages, photos, notes, bank, browser)
     await duplicatePhoneData(sourceSlug, targetSlug);
 
+    // 8. Clone case_evidence (chứng cứ vật lý, PDF hồ sơ, ảnh 360)
+    await duplicateEvidenceData(sourceSlug, targetSlug);
+
     revalidatePath("/studio/cases");
+    revalidatePath("/studio/evidence");
     revalidatePath("/studio/checkpoints");
     revalidatePath("/studio/characters");
     revalidatePath("/studio/dossier");

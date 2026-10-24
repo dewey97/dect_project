@@ -2,6 +2,49 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-10-24]
+
+### Features
+
+- **Evidence Studio & Chứng Cứ Per-Case (M1-M3, M10, M12)**:
+  - Migration 35: Bảng `case_evidence` (RLS public read, admin write), bucket `evidence-assets`, seed 8 record case_000.
+  - 6 server actions trong `evidence-actions.ts` (`requireAdminAuth` toàn bộ write).
+  - Hook `useCaseEvidence(caseId)`: dual-source Supabase → fallback `CASE_000_PDFS`/`CASE_000_EVIDENCE` cho case_000 khi DB rỗng.
+  - `duplicateEvidenceData` tích hợp vào `duplicateCase` — clone chứng cứ khi nhân bản vụ án.
+  - Các trang `evidence/web`, `board-stage`, `evidence/boardgame` chuyển sang hook.
+
+- **Dynamic Checkpoint Narratives (M4-M5, M8)**:
+  - Bỏ `PHASE_TO_CHECKPOINT` map cứng, dùng `resolveCheckpointForPhase` generic (match by dossier key, root checkpoint, subjectKey).
+  - Migration 36: Backfill `textMatchInputs`, `motiveContext`, `alibiContext`, `contradictionContext` vào `answer_config`.
+  - `case-000-clues.ts`, `case-000-suspects.ts` gutted to `@deprecated` stubs. Logic chuyển sang generic `clues.ts`, `characters.ts`.
+
+- **Pin Photos Dual-Source (M9)**:
+  - `use-live-pin-photos.ts`: Supabase `photos` tab first, fallback Google Sheets.
+  - `PinPhotoItem` interface, `UnifiedPin` extending `PinPoint` trong `render-scene.ts`.
+
+- **Phone Studio (WT-1, absorbed into WT-5)**:
+  - E2E auth setup, P28 phone runtime spec, P29 case create spec.
+  - `auth.setup.ts` graceful skip khi thiếu env.
+
+### Refactor
+
+- **Type Reduction D7 Batch 2 (WT-5)**:
+  - 44 file: `any` → typed interfaces/`unknown` trong admin studio, API routes, phone engine.
+  - `usePhoneData` giữ default generic `any` (backward compat); callers truyền explicit generic.
+  - `PresencePayload[]` thay `any[]` trong `room-sync-context.tsx`.
+
+- **Post-Merge Type Alignment**:
+  - `depends_on` → `dependsOn`, `subject_key` → `subjectKey` trên 5 components.
+  - Thêm `narrative`, `dependsOn` vào `Checkpoint` interface.
+
+### Database & Schema
+
+- Migration 35: `case_evidence` table + `evidence-assets` bucket + seed data.
+- Migration 36: Backfill checkpoint `answer_config` fields.
+- (Cả 2 migration chờ owner duyệt chạy production.)
+
+---
+
 ## [2026-10-23]
 
 ### Features
