@@ -10,6 +10,8 @@
 -- 6. Cập nhật khóa cũ trong boardgame_pins sang id node mới
 -- ==============================================================================
 
+BEGIN;
+
 -- 1. Bổ sung board_config vào case_checkpoints
 ALTER TABLE public.case_checkpoints
   ADD COLUMN IF NOT EXISTS board_config JSONB NOT NULL DEFAULT '{}'::jsonb;
@@ -23,7 +25,7 @@ CREATE TABLE IF NOT EXISTS public.case_board_nodes (
                    'note','photo','dossier','custom')),
   title         TEXT,
   subject_key   TEXT,
-  checkpoint_id TEXT REFERENCES public.case_checkpoints(id) ON DELETE CASCADE,
+  checkpoint_id UUID REFERENCES public.case_checkpoints(id) ON DELETE CASCADE,
   slot_index    INT NOT NULL DEFAULT 0,
   config        JSONB NOT NULL DEFAULT '{}'::jsonb,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -168,3 +170,5 @@ UPDATE public.boardgame_pins SET id = 'case_000:victim_phone:item' WHERE id = 'c
 UPDATE public.boardgame_pins SET id = 'case_000:reinvestigate:scene' WHERE id = 'c0-pin-reinvestigate';
 UPDATE public.boardgame_pins SET id = 'case_000:suspects_hub:hub' WHERE id = 'c0-pin-suspects';
 UPDATE public.boardgame_pins SET id = 'case_000:indictment:verdict' WHERE id = 'c0-pin-indictment';
+
+COMMIT;
