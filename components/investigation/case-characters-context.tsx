@@ -10,6 +10,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 import { setActiveCaseCharacters } from "@/lib/cases/case-characters";
+import { DEFAULT_AVATAR_PLACEHOLDER } from "@/lib/cases/characters";
 import type { DbCaseCharacter } from "@/lib/types/database";
 
 interface CaseCharactersValue {
@@ -31,7 +32,11 @@ async function fetchCharacters(caseId: string): Promise<DbCaseCharacter[]> {
   if (!response.ok || !result.success) {
     throw new Error(result?.error || `HTTP ${response.status}`);
   }
-  return result.data as DbCaseCharacter[];
+  const raw = (result.data || []) as DbCaseCharacter[];
+  return raw.map((char) => ({
+    ...char,
+    avatarUrl: char.avatar_url || DEFAULT_AVATAR_PLACEHOLDER,
+  }));
 }
 
 /**

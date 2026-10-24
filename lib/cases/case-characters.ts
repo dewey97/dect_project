@@ -81,3 +81,42 @@ export function getKnownCasePhones(): Record<string, KnownCasePhone> {
   }
   return directory;
 }
+
+/** So khớp liên hệ danh bạ điện thoại với nhân vật vụ án theo SĐT hoặc tên/bí danh. */
+export function findCharacterByPhoneOrName(
+  phone?: string | null,
+  name?: string | null,
+): DbCaseCharacter | undefined {
+  const characters = activeCharacters;
+  const cleanPhone = (phone || "").replace(/\D/g, "");
+  if (cleanPhone) {
+    const byPhone = characters.find((c) =>
+      c.phones?.some((p) => {
+        const pDigits = p.replace(/\D/g, "");
+        return (
+          pDigits === cleanPhone ||
+          (cleanPhone.length >= 7 && pDigits.endsWith(cleanPhone)) ||
+          (pDigits.length >= 7 && cleanPhone.endsWith(pDigits))
+        );
+      }),
+    );
+    if (byPhone) return byPhone;
+  }
+
+  if (name) {
+    const raw = name.trim().toLowerCase();
+    if (!raw) return undefined;
+    const clean = normalizeForMatch(raw);
+    const byName = characters.find((c) => {
+      if (c.name.toLowerCase() === raw || normalizeForMatch(c.name) === clean)
+        return true;
+      if (c.key.toLowerCase() === raw) return true;
+      return c.aliases?.some(
+        (a) => a.toLowerCase() === raw || normalizeForMatch(a) === clean,
+      );
+    });
+    if (byName) return byName;
+  }
+
+  return undefined;
+}

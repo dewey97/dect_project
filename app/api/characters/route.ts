@@ -21,8 +21,62 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
+    const characters = (data || []) as DbCaseCharacter[];
+
+    // Bổ sung ảnh từ legacy evidence nếu nhân vật chưa có avatar_url
+    const missingAvatarCodes = characters
+      .filter((c) => !c.avatar_url && c.avatar_code)
+      .map((c) => c.avatar_code as string);
+
+    const legacyMap: Record<string, string> = {};
+    if (missingAvatarCodes.length > 0) {
+      const { data: evidences } = await supabase
+        .from("case_evidence")
+        .select("code, file_url, thumb_url")
+        .eq("case_slug", caseId)
+        .in("code", missingAvatarCodes);
+
+      if (evidences) {
+        for (const ev of evidences) {
+          const u = ev.thumb_url || ev.file_url;
+          if (u && ev.code) {
+            legacyMap[ev.code.toLowerCase().trim()] = u;
+          }
+        }
+      }
+
+      const stillMissing = missingAvatarCodes.filter(
+        (code) => !legacyMap[code.toLowerCase().trim()],
+      );
+      if (stillMissing.length > 0) {
+        const { data: photos } = await supabase
+          .from("phone_photos")
+          .select("photo_code, image_url")
+          .eq("case_slug", caseId)
+          .in("photo_code", stillMissing);
+
+        if (photos) {
+          for (const p of photos) {
+            if (p.image_url && p.photo_code) {
+              legacyMap[p.photo_code.toLowerCase().trim()] = p.image_url;
+            }
+          }
+        }
+      }
+    }
+
+    const resolved = characters.map((c) => {
+      const legacy = c.avatar_code
+        ? legacyMap[c.avatar_code.toLowerCase().trim()]
+        : null;
+      return {
+        ...c,
+        avatar_url: c.avatar_url || legacy || null,
+      };
+    });
+
     return NextResponse.json(
-      { success: true, caseId, data: (data || []) as DbCaseCharacter[] },
+      { success: true, caseId, data: resolved },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error: unknown) {

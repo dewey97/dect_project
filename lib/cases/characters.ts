@@ -25,7 +25,7 @@ export function getValidCaseCharacters(): SuspectCharacter[] {
       canonicalName: c.name,
       aliases: c.aliases,
       role: c.description || "",
-      avatarUrl: DEFAULT_AVATAR_PLACEHOLDER,
+      avatarUrl: c.avatar_url || c.avatarUrl || DEFAULT_AVATAR_PLACEHOLDER,
       slotIndex: c.slot_index,
     }));
 }
