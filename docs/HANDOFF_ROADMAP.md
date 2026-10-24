@@ -107,29 +107,22 @@ Xem plan worktree chi tiết: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md).
 
 ---
 
-## 1.6. Kế hoạch Worktree v3 (2026-10-24)
+## 1.6. Kế hoạch Worktree v4 (2026-10-24)
 
-Bản duy nhất còn hiệu lực: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md) v3. Base work 7 track đã trên `main`; mỗi worktree làm nốt phần còn lại.
+Bản duy nhất còn hiệu lực: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md) v4 (khảo sát code thật, file:dòng).
 
-| WT   | Nhánh                 | Base | Còn lại chính                                                  | Migration     |
-| ---- | --------------------- | ---- | -------------------------------------------------------------- | ------------- |
-| WT-1 | `wt/board-dynamic`    | 30%  | Migration 39, pin-builder data-driven, board editor vào Studio | 39            |
-| WT-2 | `wt/phone-devices`    | 40%  | Preset end-to-end, MessagesApp row phẳng, batch save           | —             |
-| WT-3 | `wt/studio-ux`        | 0%   | `Field`, ẩn trường kỹ thuật, bỏ placeholder dài                | —             |
-| WT-4 | `wt/character-assets` | 50%  | Chạy migration 38, upload flow, render avatar                  | 38 (chờ chạy) |
-| WT-5 | `wt/evidence-ux`      | 40%  | Bỏ metadata rác UI, preview theo bộ hồ sơ                      | —             |
-| WT-6 | `wt/cms-cutover`      | 50%  | Tab `evidences` API, thay 7 consumer, bỏ fallback Sheets       | —             |
-| WT-7 | `wt/ops-hardening`    | 70%  | HSTS, log redaction, systemd timer                             | —             |
+| Phần | Nhánh              | Phạm vi                                                                                                                   | Ước lượng | Migration     |
+| ---- | ------------------ | ------------------------------------------------------------------------------------------------------------------------- | --------- | ------------- |
+| A    | `main` (không WT)  | E2E baseline, xóa `/api/phone`, icon phone dùng chung, bỏ default case_000, chạy migration 38, checklist VPS              | 0.5 ngày  | 38 (chờ chạy) |
+| WT-1 | `wt/board-dynamic` | 89 hardcode / 9 file; migration 39; renderer theo `nodeKind`; board editor vào Checkpoint Studio; gameplay chỉ đọc        | 3–4 ngày  | 39            |
+| WT-5 | `wt/evidence-ux`   | Bỏ 4 field metadata (53 chỗ / 8 file); chip theo `case_dossiers`; breadcrumb bộ hồ sơ                                     | 1–2 ngày  | —             |
+| WT-3 | `wt/studio-ux`     | `components/ui/field.tsx` thay 7 `Field` cục bộ; 1 textarea tự giãn; picker `subjectKey`/`followupOf`; bỏ placeholder dài | 1–2 ngày  | —             |
 
-Quyết định đã chốt:
+WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần code; phần sót gom vào Phần A.
 
-- D1: **tạo** `case_board_nodes` (thu hẹp): node gắn checkpoint nằm trong `case_checkpoints.board_config`; bảng chỉ giữ node hệ thống + ghim tự do. Mọi node trên bảng đều dữ liệu hóa; editor bảng (kéo thả/xem toàn bộ/tạo node) chuyển hẳn vào Checkpoint Studio, gameplay chỉ còn hiển thị/playtest.
-- D2: **7 preset** iPhone.
-- D3: bỏ trường metadata khỏi UI/payload, **giữ** cột `metadata` trong DB.
-- D4: giữ `/api/phone` nhưng không gọi; xóa sau khi grep sạch consumer.
-- D5: đợt song song 1 gồm **WT-4, WT-2, WT-6, WT-7**; WT-1, WT-5, WT-3 chạy sau theo thứ tự tích hợp.
+Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Trạng thái base: đã commit + push (`aeca38c`→`9687ff5`). E2E chưa chạy lại sau batch commit — chạy trước khi tách worktree. Chưa tách worktree cho tới khi owner duyệt bắt đầu code.
+Trạng thái base: `main` tại `3a476f4`. Chưa tách worktree cho tới khi Phần A xong và owner duyệt.
 
 ---
 
