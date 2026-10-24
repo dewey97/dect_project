@@ -218,3 +218,24 @@ Toàn bộ các bảng sau trong phiên bản thử nghiệm ban đầu **đã �
 - `characters`, `relationships`, `timeline_events`, `locations`: Đã quy hoạch 100% vào **Google Sheets Live CMS**.
 - `evidence_nodes`, `evidence_edges`: Đã gộp vào `boardgame_pins` & `boardgame_connections` cho bảng canvas trinh thám.
 - `player_answers`: Lưu vết cục bộ qua Client State và LocalStorage theo nguyên tắc Zero-Black-Screen / Online-First.
+
+---
+
+## 4. Bảng điều tra động (Board Nodes & Config)
+
+### Table: `case_board_nodes` (`db/schema/39_board_nodes.sql`)
+
+Lưu trữ các node cố định và ghi chú bổ sung theo từng vụ án:
+
+| Tên Cột | Kiểu Dữ liệu | Mô tả |
+| :--- | :--- | :--- |
+| `id` | `TEXT` | Khóa chính dạng `${caseSlug}:${nodeKind}:${slotIndex}` |
+| `case_id` | `TEXT` | FK `cases.slug` |
+| `node_kind` | `TEXT` | `victim`, `victim_phone`, `reinvestigate`, `suspects_hub`, `evidence_hub`, `custom_note` |
+| `title` | `TEXT` | Nhãn hiển thị trên node ghi chú |
+| `slot_index` | `INTEGER` | Thứ tự hiển thị |
+| `config` | `JSONB` | Tọa độ x, y, note_style, photo_url, connections |
+
+### Table: `case_checkpoints` bổ sung `board_config` (`JSONB`)
+
+Cột `board_config` lưu trữ tọa độ tùy chỉnh `{ "position": { "x": 0.42, "y": 0.27 } }` cho từng checkpoint khi hiển thị trên bàn điều tra.

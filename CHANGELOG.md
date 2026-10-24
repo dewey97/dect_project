@@ -2,6 +2,24 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-10-25]
+
+### Features
+
+- **Full Multi-case Architecture & Checkpoint Studio Board Editor (B0-B11)**:
+  - **Migration 38 (`38_character_avatar.sql`)**: Thêm cột `avatar_url` cho `case_characters`, RLS admin write và backfill avatar production.
+  - **Migration 39 (`39_board_nodes.sql`)**: Tạo bảng `case_board_nodes` và cột `board_config` (JSONB) trong `case_checkpoints` cho phép cấu hình động 100% bàn điều tra. Dọn và migrate dữ liệu từ `boardgame_pins`.
+  - **Board Studio (`components/admin/checkpoint-studio/board/`)**: Biên tập trực quan các node trên bảng điều tra (`HeroInteractive` preview mode), cấu hình ghi chú, kết nối dây và vị trí, tích hợp switcher tab (`?view=board` & `?view=flow`).
+  - **Evidence Archival Dossier Grouping (WT-5 / B2)**: Grouping chứng cứ theo hồ sơ (`case_dossiers`), loại bỏ `integrity-indicator` và các trường rác metadata custody.
+  - **Read-only Gameplay (WT-1 1H / B10)**: Chuyển toàn bộ canvas gameplay sang chế độ chỉ đọc, dọn sạch nút edit/setup node, bỏ các so khớp hardcode `c0-pin-*` và tên nhân vật tĩnh `Nguyễn Văn Khang`.
+  - **Dynamic Modals**: Toàn bộ modal (`add-suspect-modal`, `indictment-modal`, `followup-question-modal`, `culprit-epilogue-modal`, `phone-lookup-modal`) hoạt động theo contract dữ liệu động từ provider/CMS.
+
+### Database & Schema
+
+- Migration 38: `avatar_url` trên `case_characters`.
+- Migration 39: `case_board_nodes` table + `case_checkpoints.board_config` column.
+- Backup và dọn dẹp hoàn tất trên Supabase production.
+
 ## [2026-10-24]
 
 ### Features

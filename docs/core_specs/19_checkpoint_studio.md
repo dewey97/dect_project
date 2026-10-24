@@ -238,3 +238,17 @@ node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --cas
 2. Đọc danh mục vật chứng từ tab `evidences` để gợi ý mã (vẫn giữ khả năng nhập tự do).
 3. Bổ sung realtime/subscription nếu cần cập nhật checkpoint ngay khi GM sửa.
 4. Loại bỏ hoàn toàn parser `checkpoint-cms.ts` sau khi hết nhu cầu import.
+
+---
+
+## 6. Checkpoint Studio Board Editor (Tab Bảng Điều Tra)
+
+Từ phiên bản 2026-10-25 (Migration 39, WT-1 1G), Checkpoint Studio tích hợp tab **Bảng điều tra** (`/studio/checkpoints?case=<slug>&view=board`).
+
+- **Tính năng**: Cho phép Game Master / Quản trị viên xem trước và biên tập vị trí toàn bộ các node ghim trên bảng điều tra bằng chính công cụ dựng `HeroInteractive` thời gian thực (Preview mode).
+- **Thao tác**:
+  - Di chuyển node trực tiếp bằng chuột (kéo thả và cập nhật tọa độ tương đối `0.0 - 1.0`).
+  - Thêm, sửa, xóa các node phụ / ghi chú vật chứng vụ án (`case_board_nodes`).
+  - Nối dây dẫn liên kết giữa các pin ghim (`boardgame_connections`).
+  - Lưu cấu hình trực tiếp vào cơ sở dữ liệu Supabase mà không làm gián đoạn người chơi.
+- **Chơi thử**: Tích hợp nút "Chơi thử" khởi chạy trực tiếp phiên điều tra `/evidence/web?case_id=<slug>` với tiến trình tương ứng.
