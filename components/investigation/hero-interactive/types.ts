@@ -31,6 +31,7 @@ export interface PinPoint {
   id: string;
   nodeKind?: string;
   subjectKey?: string;
+  role?: string;
   legacyId?: string;
   x: number;
   y: number;

@@ -70,9 +70,6 @@ export type PinBuilderInput = {
   sheetPhotoMap?: Record<string, string>;
   sheetPinnedItems?: SheetPinnedItem[];
   followupCulpritIds?: string[];
-  hasVuFollowup?: boolean;
-  hasTungFollowup?: boolean;
-  hasHaFollowup?: boolean;
   effectiveReinvestigateUnlocked?: boolean;
   effectivePhoneSolved?: boolean;
   effectiveIndictmentSolved?: boolean;
@@ -186,7 +183,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     });
   } else {
     // Fallback an toàn: Dựng 5 node cơ bản khi database chưa chạy migration 39
-    const victimName = input.victimName || "Nguyễn Văn Khang";
+    const victimName = input.victimName || "Nạn nhân";
 
     // 1.1. victim_phone
     const vpId = `${caseSlug}:victim_phone:item`;
@@ -319,7 +316,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     positions,
     { x: 0.42, y: 0.27 },
   );
-  const victimName = input.victimName || "Nguyễn Văn Khang";
+  const victimName = input.victimName || "Nạn nhân";
   const phoneDetail = input.effectivePhoneSolved
     ? "Đã xác minh danh tính SĐT thành công"
     : `Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân ${victimName}`;
@@ -467,9 +464,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   // 4. FOLLOWUP PINS (Ghim Nghi vấn mở rộng)
   // ============================================================================
   const activeFollowupSet = new Set<string>(input.followupCulpritIds || []);
-  if (input.hasVuFollowup) activeFollowupSet.add("vu");
-  if (input.hasTungFollowup) activeFollowupSet.add("tung");
-  if (input.hasHaFollowup) activeFollowupSet.add("ha");
 
   const c0DefaultFollowupCoords: Record<string, { x: number; y: number }> = {
     vu: { x: 0.44, y: 0.82 },
@@ -622,9 +616,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 export function buildCustomConnections(opts: {
   effectiveSuspects: SuspectItem[];
   followupCulpritIds?: string[];
-  hasVuFollowup?: boolean;
-  hasTungFollowup?: boolean;
-  hasHaFollowup?: boolean;
   vuSuspect?: SuspectItem;
   tungSuspect?: SuspectItem;
   haSuspect?: SuspectItem;
@@ -632,9 +623,6 @@ export function buildCustomConnections(opts: {
   adminConnections: CaseConnection[];
 }): CaseConnection[] {
   const activeFollowupSet = new Set<string>(opts.followupCulpritIds || []);
-  if (opts.hasVuFollowup) activeFollowupSet.add("vu");
-  if (opts.hasTungFollowup) activeFollowupSet.add("tung");
-  if (opts.hasHaFollowup) activeFollowupSet.add("ha");
 
   const conns: CaseConnection[] = [];
 

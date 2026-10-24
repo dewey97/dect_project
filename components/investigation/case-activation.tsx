@@ -45,7 +45,7 @@ const FALLBACK_CASES_CATALOG: CaseActivationItem[] = [
     code: "CASE #000",
     title: "Trốn Tìm",
     summary:
-      "Hồ sơ lưu trữ các biên bản khám nghiệm, tài liệu lời khai và chứng cứ liên quan đến vụ tử vong nghi vấn của Nguyễn Văn Khang.",
+      "Hồ sơ lưu trữ các biên bản khám nghiệm, tài liệu lời khai và chứng cứ liên quan đến vụ tử vong nghi vấn của nạn nhân.",
     status: "ready",
     estimatedTime: "20-30 phút",
     difficulty: "Trung bình",

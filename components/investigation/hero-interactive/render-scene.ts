@@ -268,13 +268,11 @@ export function renderScene({
     if (resolvedPhotoUrl) {
       const isReinvestigate =
         pin.nodeKind === "reinvestigate" ||
-        pin.id === "c0-pin-reinvestigate" ||
+        pin.id.includes("reinvestigate") ||
         (pin.label && pin.label.toLowerCase().includes("khám xét"));
       const isVictimPhone =
         pin.nodeKind === "victim_phone" ||
-        pin.id === "c0-pin-victim-phone" ||
         (pin.id.includes("phone") &&
-          pin.id !== "c0-pin-phone" &&
           pin.nodeKind !== "phone_lookup" &&
           Boolean(pin.photoUrl));
 
@@ -301,7 +299,7 @@ export function renderScene({
 
         const isReinvestigateProp =
           pin.nodeKind === "reinvestigate" ||
-          pin.id === "c0-pin-reinvestigate" ||
+          pin.id.includes("reinvestigate") ||
           Boolean(
             pin.photoUrl &&
             (pin.photoUrl.includes("crime_scene") ||
@@ -311,8 +309,7 @@ export function renderScene({
           pin.nodeKind === "victim" ||
           (!isVictimPhone &&
             !isReinvestigateProp &&
-            (pin.id.includes("khang") ||
-              (pin.label && pin.label.toLowerCase().includes("khang"))));
+            Boolean(pin.role === "victim" || (pin.label && pin.label.toLowerCase().includes("nạn nhân"))));
         const isCrimeScene =
           pin.id.includes("crime-scene") ||
           pin.id.includes("thi-the") ||
@@ -362,8 +359,7 @@ export function renderScene({
         // Lightweight fallback while image is loading
         const isVictim =
           pin.nodeKind === "victim" ||
-          pin.id.includes("khang") ||
-          (pin.label && pin.label.toLowerCase().includes("khang"));
+          Boolean(pin.role === "victim" || (pin.label && pin.label.toLowerCase().includes("nạn nhân")));
         const isCrimeScene =
           pin.id.includes("crime-scene") ||
           pin.id.includes("thi-the") ||
@@ -386,14 +382,12 @@ export function renderScene({
       if (isPhotoHovered || isPhotoSelected) {
         const isVictimPhone =
           pin.nodeKind === "victim_phone" ||
-          pin.id === "c0-pin-victim-phone" ||
           (pin.id.includes("phone") &&
-            pin.id !== "c0-pin-phone" &&
             pin.nodeKind !== "phone_lookup" &&
             Boolean(pin.photoUrl));
         const isReinvestigateProp =
           pin.nodeKind === "reinvestigate" ||
-          pin.id === "c0-pin-reinvestigate" ||
+          pin.id.includes("reinvestigate") ||
           Boolean(
             pin.photoUrl &&
             (pin.photoUrl.includes("crime_scene") ||
@@ -403,8 +397,7 @@ export function renderScene({
           pin.nodeKind === "victim" ||
           (!isVictimPhone &&
             !isReinvestigateProp &&
-            (pin.id.includes("khang") ||
-              (pin.label && pin.label.toLowerCase().includes("khang"))));
+            Boolean(pin.role === "victim" || (pin.label && pin.label.toLowerCase().includes("nạn nhân"))));
         const isCrimeScene =
           pin.id.includes("crime-scene") ||
           pin.id.includes("thi-the") ||
@@ -506,25 +499,18 @@ export function renderScene({
           customTextureUrl.includes("/notes/");
       } else if (
         pin.nodeKind === "evidence_hub" ||
-        pin.id === "c0-pin-evidence" ||
         upperLabel.includes("CHỨNG CỨ")
       ) {
         noteUrl = "/images/board/notes/note_bo_sung_chung_cu.png";
         isPreRendered = true;
       } else if (
         pin.nodeKind === "suspects_hub" ||
-        pin.id === "c0-pin-suspects" ||
         upperLabel.includes("NGHI PHẠM")
       ) {
         noteUrl = "/images/board/notes/note_nghi_pham.png";
         isPreRendered = true;
       } else if (
         pin.nodeKind === "followup" ||
-        pin.id === "c0-pin-followup-vu" ||
-        pin.id === "c0-pin-followup-tung" ||
-        pin.id === "c0-pin-followup-ha" ||
-        pin.id === "c0-pin-question" ||
-        pin.id.startsWith("c0-pin-followup") ||
         pin.id.startsWith("followup-") ||
         upperLabel.includes("NGHI VẤN") ||
         upperLabel.includes("CÂU HỎI")
@@ -533,14 +519,12 @@ export function renderScene({
         isPreRendered = true;
       } else if (
         pin.nodeKind === "phone_lookup" ||
-        pin.id === "c0-pin-phone" ||
         upperLabel.includes("MỞ RỘNG")
       ) {
         noteUrl = "/images/board/notes/note_mo_rong_dieu_tra.png";
         isPreRendered = true;
       } else if (
         pin.nodeKind === "reinvestigate" ||
-        pin.id === "c0-pin-reinvestigate" ||
         upperLabel.includes("KHÁM XÉT") ||
         upperLabel.includes("KHÁM NGHIỆM")
       ) {
@@ -548,7 +532,6 @@ export function renderScene({
         isPreRendered = true;
       } else if (
         pin.nodeKind === "indictment" ||
-        pin.id === "c0-pin-indictment" ||
         upperLabel.includes("KẾT LUẬN") ||
         upperLabel.includes("TRUY TỐ")
       ) {
@@ -566,11 +549,9 @@ export function renderScene({
 
       const isIndictment =
         pin.nodeKind === "indictment" ||
-        pin.id === "c0-pin-indictment" ||
         upperLabel.includes("KẾT LUẬN");
       const isFollowup =
         pin.nodeKind === "followup" ||
-        pin.id.startsWith("c0-pin-followup") ||
         pin.id.startsWith("followup-");
       const sizeMultiplier = 1.0;
 
@@ -598,24 +579,19 @@ export function renderScene({
 
       if (
         pin.nodeKind === "evidence_hub" ||
-        pin.id === "c0-pin-evidence" ||
         upperLabel.includes("CHỨNG CỨ")
       ) {
         pinAnchorX = 0.5;
         pinAnchorY = 0.08;
       } else if (
         pin.nodeKind === "suspects_hub" ||
-        pin.id === "c0-pin-suspects" ||
         upperLabel.includes("NGHI PHẠM")
       ) {
         pinAnchorX = 0.5;
         pinAnchorY = 0.08;
       } else if (
         pin.nodeKind === "followup" ||
-        pin.id === "c0-pin-followup-vu" ||
-        pin.id === "c0-pin-followup-tung" ||
-        pin.id === "c0-pin-followup-ha" ||
-        pin.id === "c0-pin-question" ||
+        pin.id.startsWith("followup-") ||
         upperLabel.includes("NGHI VẤN") ||
         upperLabel.includes("CÂU HỎI")
       ) {
@@ -623,14 +599,12 @@ export function renderScene({
         pinAnchorY = 0.08;
       } else if (
         pin.nodeKind === "phone_lookup" ||
-        pin.id === "c0-pin-phone" ||
         upperLabel.includes("MỞ RỘNG")
       ) {
         pinAnchorX = 0.5;
         pinAnchorY = 0.075;
       } else if (
         pin.nodeKind === "reinvestigate" ||
-        pin.id === "c0-pin-reinvestigate" ||
         upperLabel.includes("KHÁM XÉT") ||
         upperLabel.includes("KHÁM NGHIỆM")
       ) {
@@ -638,7 +612,6 @@ export function renderScene({
         pinAnchorY = 0.075;
       } else if (
         pin.nodeKind === "indictment" ||
-        pin.id === "c0-pin-indictment" ||
         upperLabel.includes("KẾT LUẬN")
       ) {
         pinAnchorX = 0.5;
@@ -820,7 +793,6 @@ export function renderScene({
       // Dấu tick '✓' kiểu font chữ viết tay, chỉ hiển thị duy nhất trên node 'Mở rộng điều tra' khi đã giải xong
       const isPhoneNode =
         pin.nodeKind === "phone_lookup" ||
-        pin.id === "c0-pin-phone" ||
         (pin.label || "").toUpperCase().includes("MỞ RỘNG");
       if (pin.isSolved && isPhoneNode) {
         context.save();
@@ -850,8 +822,7 @@ export function renderScene({
     const isSelfContainedProp =
       pin.nodeKind === "victim_phone" ||
       pin.nodeKind === "reinvestigate" ||
-      pin.id === "c0-pin-victim-phone" ||
-      pin.id === "c0-pin-reinvestigate" ||
+      pin.id.includes("reinvestigate") ||
       Boolean(
         pin.photoUrl &&
         (pin.photoUrl.includes("crime_scene") ||
@@ -1015,8 +986,7 @@ export function renderScene({
     if (
       pin.nodeKind === "victim_phone" ||
       pin.nodeKind === "reinvestigate" ||
-      pin.id === "c0-pin-victim-phone" ||
-      pin.id === "c0-pin-reinvestigate" ||
+      pin.id.includes("reinvestigate") ||
       Boolean(
         pin.photoUrl &&
         (pin.photoUrl.includes("crime_scene") ||
@@ -1029,18 +999,15 @@ export function renderScene({
     const isEvidencePin =
       pin.nodeKind === "evidence_hub" ||
       pin.nodeKind === "photo" ||
-      pin.id === "c0-pin-evidence" ||
       (pin.label && pin.label.toLowerCase().includes("bổ sung chứng cứ"));
     const isSuspectPin =
       pin.nodeKind === "suspect" ||
       pin.nodeKind === "suspects_hub" ||
       pin.nodeKind === "victim" ||
-      pin.id === "c0-pin-suspects" ||
       pin.id.includes("suspect") ||
       (pin.label && pin.label.toLowerCase().includes("nghi phạm"));
     const isIndictmentPin =
       pin.nodeKind === "indictment" ||
-      pin.id === "c0-pin-indictment" ||
       (pin.label && pin.label.toLowerCase().includes("kết luận"));
 
     const rawColor =

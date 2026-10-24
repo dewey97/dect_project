@@ -130,18 +130,15 @@ export function isPinHit(
 
   const isFollowup =
     pin.nodeKind === "followup" ||
-    pin.id.startsWith("c0-pin-followup") ||
     pin.id.startsWith("followup-");
   const isVictimPhone =
     pin.nodeKind === "victim_phone" ||
-    pin.id === "c0-pin-victim-phone" ||
     (pin.id.includes("phone") &&
-      pin.id !== "c0-pin-phone" &&
       pin.nodeKind !== "phone_lookup" &&
       Boolean(pin.photoUrl));
   const isReinvestigateProp =
     pin.nodeKind === "reinvestigate" ||
-    pin.id === "c0-pin-reinvestigate" ||
+    pin.id.includes("reinvestigate") ||
     Boolean(
       pin.photoUrl &&
       (pin.photoUrl.includes("crime_scene") ||
@@ -152,8 +149,7 @@ export function isPinHit(
     (!isFollowup &&
       !isVictimPhone &&
       !isReinvestigateProp &&
-      (pin.id.includes("khang") ||
-        (pin.label && pin.label.toLowerCase().includes("khang"))));
+      Boolean(pin.role === "victim" || (pin.label && pin.label.toLowerCase().includes("nạn nhân"))));
   const isCrimeScene =
     !isFollowup &&
     (pin.id.includes("crime-scene") ||

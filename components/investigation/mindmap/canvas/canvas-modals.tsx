@@ -13,7 +13,6 @@ import { IndictmentModal } from "../indictment-modal";
 import { CulpritEpilogueModal } from "../culprit-epilogue-modal";
 import { DossierResultModal } from "../dossier-result-modal";
 import { FollowupQuestionModal } from "../followup-question-modal";
-import { AdminCreatePinModal } from "../admin-create-pin-modal";
 import { CustomPinModal } from "../custom-pin-modal";
 import nextDynamic from "next/dynamic";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
@@ -36,10 +35,6 @@ export interface CanvasModalsProps {
   layout: ReturnType<typeof useBoardLayout>;
   state: ReturnType<typeof useInvestigationState>;
   displayPins: PinPoint[];
-  isCreatePinModalOpen: boolean;
-  setIsCreatePinModalOpen: (open: boolean) => void;
-  editingCustomPin: PinPoint | null;
-  setEditingCustomPin: (pin: PinPoint | null) => void;
   activeCustomPinModal: PinPoint | null;
   setActiveCustomPinModal: (pin: PinPoint | null) => void;
   onOpenPhoneSimulator?: () => void;
@@ -49,10 +44,6 @@ export function CanvasModals({
   layout,
   state,
   displayPins,
-  isCreatePinModalOpen,
-  setIsCreatePinModalOpen,
-  editingCustomPin,
-  setEditingCustomPin,
   activeCustomPinModal,
   setActiveCustomPinModal,
   onOpenPhoneSimulator,
@@ -273,20 +264,6 @@ export function CanvasModals({
           caseId={state.caseId}
           isOpen={state.isFinalEpilogueOpen}
           onClose={() => state.setIsFinalEpilogueOpen(false)}
-        />
-      )}
-
-      {/* 13. Modal Tạo / Chỉnh Sửa Node Ghim (Admin Setup) */}
-      {isCreatePinModalOpen && (
-        <AdminCreatePinModal
-          isOpen={isCreatePinModalOpen}
-          onClose={() => {
-            setIsCreatePinModalOpen(false);
-            setEditingCustomPin(null);
-          }}
-          onSavePin={layout.handleSaveAdminPin}
-          onDeletePin={layout.handleDeleteAdminPin}
-          initialPin={editingCustomPin}
         />
       )}
 

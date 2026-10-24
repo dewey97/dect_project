@@ -44,7 +44,6 @@ export function normalizeCheckpointId(id?: string, caseId?: string): string {
   if (
     clean === "phone" ||
     clean === "cp-000-0" ||
-    clean === "c0-pin-phone" ||
     clean.startsWith("phone")
   )
     return "cp-000-0";

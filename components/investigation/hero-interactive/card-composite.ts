@@ -20,7 +20,7 @@ export const resolveSuspectPhotoUrl = (
     pin.id.includes("-pin-reinvestigate") ||
     pin.id.includes("-pin-indictment") ||
     pin.id.endsWith("-pin-suspects") ||
-    pin.id === "c0-pin-suspects"
+    pin.id.includes("suspects_hub")
   ) {
     return undefined;
   }

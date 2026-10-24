@@ -12,7 +12,7 @@ export const CASES_LIST: CaseData[] = [
     bgImage: "/images/backgrounds/corkboard_vertical_empty.jpg",
     pins: [
       {
-        id: "c0-pin-question",
+        id: "case_000:followup:question",
         x: 0.42,
         y: 0.18,
         label: "NGHI VẤN",
@@ -20,7 +20,7 @@ export const CASES_LIST: CaseData[] = [
         noteColor: "yellow",
       },
       {
-        id: "c0-pin-suspects",
+        id: "case_000:suspects_hub:suspects",
         x: 0.68,
         y: 0.32,
         label: "NGHI PHẠM",
@@ -28,7 +28,7 @@ export const CASES_LIST: CaseData[] = [
         noteColor: "yellow",
       },
       {
-        id: "c0-pin-phone",
+        id: "case_000:phone_lookup:phone",
         x: 0.42,
         y: 0.27,
         label: "MỞ RỘNG ĐIỀU TRA",
@@ -36,7 +36,7 @@ export const CASES_LIST: CaseData[] = [
         noteColor: "white",
       },
       {
-        id: "c0-pin-reinvestigate",
+        id: "case_000:reinvestigate:reinvestigate",
         x: 0.18,
         y: 0.36,
         label: "KHÁM XÉT HIỆN TRƯỜNG",
@@ -44,7 +44,7 @@ export const CASES_LIST: CaseData[] = [
         noteColor: "white",
       },
       {
-        id: "c0-pin-indictment",
+        id: "case_000:indictment:indictment",
         x: 0.22,
         y: 0.8,
         label: "BẢN KẾT LUẬN ĐIỀU TRA",

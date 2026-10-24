@@ -80,7 +80,6 @@ export function useInvestigationState(opts?: {
   const [hasOpenedReinvestigation, setHasOpenedReinvestigation] =
     useState(false);
   const [phoneLookupSuccess, setPhoneLookupSuccess] = useState(false);
-  const [isShowAllPinsPreview, setIsShowAllPinsPreview] = useState(false);
 
   const [isIndictmentSolved, setIsIndictmentSolved] = useState(false);
   const [solvedCulprit, setSolvedCulprit] = useState<CulpritKey | null>(null);
@@ -396,10 +395,9 @@ export function useInvestigationState(opts?: {
 
   const effectiveReinvestigateUnlocked =
     !REQUIRE_REINVESTIGATION_APPROVAL ||
-    isShowAllPinsPreview ||
     isReinvestigateUnlocked;
-  const effectivePhoneSolved = isShowAllPinsPreview || phoneLookupSuccess;
-  const effectiveIndictmentSolved = isShowAllPinsPreview || isIndictmentSolved;
+  const effectivePhoneSolved = phoneLookupSuccess;
+  const effectiveIndictmentSolved = isIndictmentSolved;
 
   return {
     caseId,
@@ -417,8 +415,6 @@ export function useInvestigationState(opts?: {
     setHasOpenedReinvestigation,
     phoneLookupSuccess,
     setPhoneLookupSuccess,
-    isShowAllPinsPreview,
-    setIsShowAllPinsPreview,
     isIndictmentSolved,
     setIsIndictmentSolved,
     solvedCulprit,

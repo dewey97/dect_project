@@ -81,10 +81,6 @@ export function MainInvestigationCanvas({
   const characters = charactersValue?.characters || [];
 
   const [isAudioMuted, setIsAudioMuted] = useState(false);
-  const [isCreatePinModalOpen, setIsCreatePinModalOpen] = useState(false);
-  const [editingCustomPin, setEditingCustomPin] = useState<PinPoint | null>(
-    null,
-  );
   const [activeCustomPinModal, setActiveCustomPinModal] =
     useState<PinPoint | null>(null);
 
@@ -266,7 +262,7 @@ export function MainInvestigationCanvas({
         .trim();
       if (clean) return clean;
     }
-    return "Nguyễn Văn Khang";
+    return "Nạn nhân";
   }, [victimChar, victimItem]);
   const sheetPhotoMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -495,21 +491,10 @@ export function MainInvestigationCanvas({
 
   // Tập hợp toàn bộ culprit IDs có câu hỏi mở rộng
   const followupCulpritIds = useMemo(() => {
-    if (state.isShowAllPinsPreview) {
-      return effectiveSuspects.map(
-        (s) => getCanonicalSuspectKey(s).canonicalId,
-      );
-    }
     return state.investigatedSuspects.map((c) => String(c));
-  }, [
-    state.isShowAllPinsPreview,
-    effectiveSuspects,
-    state.investigatedSuspects,
-  ]);
+  }, [state.investigatedSuspects]);
 
-  const hasVuFollowup = followupCulpritIds.includes("vu");
-  const hasTungFollowup = followupCulpritIds.includes("tung");
-  const hasHaFollowup = followupCulpritIds.includes("ha");
+
 
   const isReinvestigateBlinking =
     state.effectiveReinvestigateUnlocked && !state.hasOpenedReinvestigation;
@@ -558,9 +543,6 @@ export function MainInvestigationCanvas({
         sheetPhotoMap,
         sheetPinnedItems,
         followupCulpritIds,
-        hasVuFollowup,
-        hasTungFollowup,
-        hasHaFollowup,
         effectiveReinvestigateUnlocked: state.effectiveReinvestigateUnlocked,
         effectivePhoneSolved: state.effectivePhoneSolved,
         effectiveIndictmentSolved: state.effectiveIndictmentSolved,
@@ -575,9 +557,6 @@ export function MainInvestigationCanvas({
       sheetPhotoMap,
       sheetPinnedItems,
       followupCulpritIds,
-      hasVuFollowup,
-      hasTungFollowup,
-      hasHaFollowup,
       state.effectiveReinvestigateUnlocked,
       state.effectivePhoneSolved,
       state.effectiveIndictmentSolved,
@@ -612,9 +591,6 @@ export function MainInvestigationCanvas({
       buildCustomConnections({
         effectiveSuspects,
         followupCulpritIds,
-        hasVuFollowup,
-        hasTungFollowup,
-        hasHaFollowup,
         vuSuspect,
         tungSuspect,
         haSuspect,
@@ -624,9 +600,6 @@ export function MainInvestigationCanvas({
     [
       effectiveSuspects,
       followupCulpritIds,
-      hasVuFollowup,
-      hasTungFollowup,
-      hasHaFollowup,
       vuSuspect,
       tungSuspect,
       haSuspect,
@@ -658,18 +631,7 @@ export function MainInvestigationCanvas({
         setStorageItem("last_viewed_suspect", pin.subjectKey);
       }
 
-      if (layout.isEditMode) {
-        layout.setSelectedPinId(id);
-        if (coords) {
-          const rect = layout.canvasWrapperRef.current?.getBoundingClientRect();
-          layout.setSelectionAnchor(
-            rect
-              ? { x: coords.clientX - rect.left, y: coords.clientY - rect.top }
-              : null,
-          );
-        }
-        return;
-      }
+
 
       if (id.startsWith("admin-pin-") || id.startsWith("custom-pin-")) {
         const targetPin =
@@ -808,135 +770,6 @@ export function MainInvestigationCanvas({
           return;
         }
       }
-
-      if (id === "c0-pin-suspects") {
-        // Node note 'Nghi phạm' giữ làm điểm neo nối dây chỉ đỏ nghiệp vụ, không bật modal nhập tên nữa
-        detectiveAudio.playPaperRustle();
-      } else if (id === "c0-pin-evidence") {
-        state.setIsEvidenceGuideOpen(true);
-      } else if (
-        id === "c0-pin-victim-phone" ||
-        id === "victim-phone" ||
-        (pin?.photoUrl && pin.photoUrl.includes("phone"))
-      ) {
-        detectiveAudio.playPaperRustle();
-        if (onOpenPhoneSimulator) onOpenPhoneSimulator();
-        else state.setIsInternalPhoneOpen(true);
-      } else if (
-        id === "c0-pin-reinvestigate" ||
-        id === "reinvestigate-prop" ||
-        (pin?.photoUrl && pin.photoUrl.includes("crime_scene")) ||
-        (pin?.photoUrl &&
-          pin.photoUrl.includes("reinvestigation_crime_scene_prop"))
-      ) {
-        if (state.effectiveReinvestigateUnlocked) {
-          detectiveAudio.playGlassSound();
-          if (onOpenReinvestigation) onOpenReinvestigation();
-          else state.handleOpenReinvestigation();
-        } else {
-          detectiveAudio.playGlassSound();
-        }
-      } else if (id === "c0-pin-phone") {
-        if (state.phoneLookupSuccess) state.setIsDossierEOpen(true);
-        else state.setIsPhoneLookupOpen(true);
-      } else if (id.startsWith("node-suspect-") || id.startsWith("suspect-")) {
-        // Thẻ chân dung nghi phạm/nhân vật trên bảng: Mở thẳng modal Thẩm tra Căn cứ tình nghi (Động cơ & Ngoại phạm)
-        const charName = (pin?.label || "")
-          .replace(
-            /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
-            "",
-          )
-          .replace(/\s*\([^)]*\)/g, "")
-          .trim();
-        const existing = state.suspects.find(
-          (s) => s.id === id || s.name.toLowerCase() === charName.toLowerCase(),
-        );
-        state.setEditingSuspect(
-          existing || {
-            id,
-            name: charName || pin?.label || "Nghi phạm",
-            clueIds: [],
-          },
-        );
-        state.setIsAddSuspectOpen(true);
-      } else if (
-        id.startsWith("c0-pin-evidence-") ||
-        id.startsWith("sheet-pin-") ||
-        pin?.photoUrl
-      ) {
-        if (pin?.photoUrl) {
-          handleOpenPhotoZoom(pin.photoUrl, coords);
-        }
-      } else if (id === "c0-pin-indictment") {
-        if (state.isIndictmentSolved) {
-          state.setIsFinalEpilogueOpen(true);
-          if (onOpenEpilogue) onOpenEpilogue();
-        } else {
-          state.setIsIndictmentOpen(true);
-        }
-      } else if (
-        id.startsWith("c0-pin-followup") ||
-        id.startsWith("followup-") ||
-        id.startsWith("c0-pin-question") ||
-        label.includes("nghi vấn")
-      ) {
-        const c = findFollowupCulprit(id, detail);
-        state.setActiveFollowupCulprit(c);
-
-        // Kiểm tra xem câu hỏi mở rộng của đối tượng này đã được giải xong chưa
-        const isAlreadySolved =
-          state.solvedFollowupQuestions.includes(c) ||
-          getStorageItem(caseStorageKey(caseId, `followup_${c}`)) ===
-            "solved" ||
-          (c === "ha" &&
-            !!getStorageItem(caseStorageKey(caseId, "followup_ha_password"))) ||
-          (c === "vu" &&
-            !!getStorageItem(caseStorageKey(caseId, "followup_vu")));
-
-        if (isAlreadySolved) {
-          if (c === "ha") {
-            // Hà: Mở modal câu hỏi kèm kích hoạt ngay popup 3 vật chứng hộp thiếc
-            state.setIsFollowupQuestionOpen(true);
-          } else {
-            // Vũ / Tùng: Mở thẳng narrative lời khai sau khi giải xong
-            const savedChoice =
-              getStorageItem(caseStorageKey(caseId, `followup_${c}_choice`)) ||
-              (c === "vu" ? "21:15" : "question_solved");
-            state.setNarrativeCulprit(c);
-            state.setNarrativeChoice(savedChoice);
-            state.setIsEpilogueOpen(true);
-          }
-        } else {
-          state.setIsFollowupQuestionOpen(true);
-        }
-      } else if (id.startsWith("node-suspect-") || id.startsWith("suspect-")) {
-        const targetId = id
-          .replace("node-suspect-", "")
-          .replace("suspect-", "");
-        if (
-          targetId === "suspect-khang" ||
-          targetId === "khang" ||
-          id.includes("khang")
-        ) {
-          handleOpenPhotoZoom(
-            sheetPhotoMap.khang || "/images/avatar_placeholder.svg",
-            coords,
-          );
-          return;
-        }
-        const foundSuspect = state.suspects.find((s) => {
-          const key = getCanonicalSuspectKey(s);
-          return (
-            s.id === targetId ||
-            key.canonicalId === targetId ||
-            s.id === `node-suspect-${targetId}`
-          );
-        });
-        if (foundSuspect) {
-          state.setEditingSuspect(foundSuspect);
-          state.setIsAddSuspectOpen(true);
-        }
-      }
     },
     [
       layout,
@@ -952,11 +785,7 @@ export function MainInvestigationCanvas({
     <div
       ref={layout.canvasWrapperRef}
       suppressHydrationWarning
-      className={`relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none transition-all duration-300 ${
-        layout.isEditMode
-          ? "ring-4 ring-amber-500/80 ring-inset shadow-[inset_0_0_90px_rgba(245,158,11,0.22)]"
-          : ""
-      }`}
+      className="relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none transition-all duration-300"
     >
       {/* 1. Header Toolbar & Floating Node Toolbar */}
       {!state.isReinvestigateModalOpen && (
@@ -969,15 +798,6 @@ export function MainInvestigationCanvas({
             setIsAudioMuted(next);
           }}
           selectedPin={selectedPin}
-          displayPins={displayPins}
-          onOpenCreatePinModal={() => {
-            setEditingCustomPin(null);
-            setIsCreatePinModalOpen(true);
-          }}
-          onEditSelectedPin={(pin) => {
-            setEditingCustomPin(pin);
-            setIsCreatePinModalOpen(true);
-          }}
           hideTitleBadgeOnMobile={hideTitleBadgeOnMobile}
           isBoardGame={isBoardGameMode}
           onOpenNotebook={onOpenNotebook}
@@ -1006,10 +826,6 @@ export function MainInvestigationCanvas({
         layout={layout}
         state={state}
         displayPins={displayPins}
-        isCreatePinModalOpen={isCreatePinModalOpen}
-        setIsCreatePinModalOpen={setIsCreatePinModalOpen}
-        editingCustomPin={editingCustomPin}
-        setEditingCustomPin={setEditingCustomPin}
         activeCustomPinModal={activeCustomPinModal}
         setActiveCustomPinModal={setActiveCustomPinModal}
         onOpenPhoneSimulator={onOpenPhoneSimulator}

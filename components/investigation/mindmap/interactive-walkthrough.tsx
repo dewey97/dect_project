@@ -110,12 +110,7 @@ export function InteractiveWalkthrough({
               (p) =>
                 p.id === step.targetPinId ||
                 p.legacyId === step.targetPinId ||
-                p.id.includes(step.targetPinId!) ||
-                (step.targetPinId === 'c0-pin-victim-khang' && (p.id.includes('khang') || p.label?.toLowerCase().includes('khang'))) ||
-                ((step.targetPinId === 'c0-pin-phone' || step.targetPinId === 'c0-pin-victim-phone') && (p.id.includes('victim-phone') || p.id.includes('phone') || p.id.includes('dev-00') || p.label?.toLowerCase().includes('điện thoại') || p.label?.toLowerCase().includes('mở rộng'))) ||
-                (step.targetPinId === 'c0-pin-suspects' && (p.id.includes('suspect') || p.label?.toLowerCase().includes('nghi phạm'))) ||
-                ((step.targetPinId === 'c0-pin-evidence' || step.targetPinId === 'c0-pin-reinvestigate') && (p.id.includes('evidence') || p.id.includes('reinvestigate') || p.label?.toLowerCase().includes('chứng cứ') || p.label?.toLowerCase().includes('khám xét') || p.label?.toLowerCase().includes('khám nghiệm'))) ||
-                (step.targetPinId === 'c0-pin-indictment' && (p.id.includes('indictment') || p.label?.toLowerCase().includes('kết luận') || p.label?.toLowerCase().includes('truy tố')))
+                p.id.includes(step.targetPinId!)
             )
         }
 

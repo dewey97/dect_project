@@ -590,9 +590,9 @@ export function AddSuspectModal({
       return;
     }
 
-    if (matchedChar.id === "khang") {
+    if ((matchedChar as any).role === "victim" || matchedChar.id === "khang") {
       setErrorMsg(
-        "Nguyễn Văn Khang là nạn nhân của vụ án, đã có vị trí chính thức trên bảng điều tra!",
+        `${matchedChar?.canonicalName || "Đối tượng"} là nạn nhân của vụ án, đã có vị trí chính thức trên bảng điều tra!`,
       );
       detectiveAudio.playGlassSound();
       return;
