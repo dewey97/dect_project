@@ -17,6 +17,7 @@ import type {
 import type { DbCaseDossier } from "@/lib/types/database";
 
 interface DossierTrayProps {
+  className?: string;
   dossierWidth: number;
   isDossierCollapsed: boolean;
   isViewerExpanded: boolean;
@@ -145,7 +146,7 @@ export function DossierTray({
         width: isDossierCollapsed ? 0 : `${dossierWidth}px`,
       }}
       className={cn(
-        "w-full lg:w-auto shrink-0 bg-[#130f0c] border-r border-[#261b12] rounded-none overflow-hidden flex flex-col h-full min-h-0 select-none transition-[width] duration-150 ease-out",
+        "w-full lg:w-auto shrink-0 bg-[#130f0c] border-l border-[#261b12] rounded-none overflow-hidden flex flex-col h-full min-h-0 select-none transition-[width] duration-150 ease-out",
         isDossierCollapsed && "lg:hidden",
         isViewerExpanded && "hidden xl:flex",
         mobileTab === "dossier" ? "flex" : "hidden lg:flex",

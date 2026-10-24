@@ -101,11 +101,13 @@ export function DossierCanvasBoard({
   const [activeDraggingId, setActiveDraggingId] = useState<string | null>(null);
   const draggingItemRef = useRef<{
     id: string;
-    startX: number;
-    startY: number;
-    initialItemX: number;
-    initialItemY: number;
+    grabOffsetX: number;
+    grabOffsetY: number;
   } | null>(null);
+  const autoPanRafRef = useRef<number | null>(null);
+  const edgeVelocityRef = useRef<{ vx: number; vy: number }>({ vx: 0, vy: 0 });
+  const autoPanLoopRunningRef = useRef(false);
+  const lastPointerPosRef = useRef<{ clientX: number; clientY: number }>({ clientX: 0, clientY: 0 });
 
   const storagePosKey = `dect_dossier_canvas_pos_${caseId}`;
 
@@ -187,52 +189,193 @@ export function DossierCanvasBoard({
     [customPositions, defaultPositions]
   );
 
+  // Vòng lặp cuộn bàn mượt mà khi người chơi kéo tài liệu ra sát cạnh màn hình (Edge Auto-Pan)
+  const startAutoPanLoop = useCallback(() => {
+    const loop = () => {
+      if (!draggingItemRef.current) {
+        autoPanLoopRunningRef.current = false;
+        return;
+      }
+
+      const { vx, vy } = edgeVelocityRef.current;
+      if (vx === 0 && vy === 0) {
+        autoPanLoopRunningRef.current = false;
+        return;
+      }
+
+      const container = containerRef.current;
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        const currentZoom = zoomScaleRef.current;
+
+        // Giới hạn biên độ di chuyển của bàn làm việc (8000x5000px)
+        const minPanX = -(8000 * currentZoom - rect.width * 0.8);
+        const maxPanX = rect.width * 0.2;
+        const minPanY = -(5000 * currentZoom - rect.height * 0.8);
+        const maxPanY = rect.height * 0.2;
+
+        const nextPanX = Math.min(maxPanX, Math.max(minPanX, panRef.current.x + vx));
+        const nextPanY = Math.min(maxPanY, Math.max(minPanY, panRef.current.y + vy));
+
+        panRef.current = { x: nextPanX, y: nextPanY };
+        setPan({ x: nextPanX, y: nextPanY });
+
+        // Đồng thời cập nhật toạ độ tài liệu theo vị trí chuột hiện tại trên màn hình
+        const { id, grabOffsetX, grabOffsetY } = draggingItemRef.current;
+        const { clientX, clientY } = lastPointerPosRef.current;
+
+        const newDocX = Math.round(
+          (clientX - rect.left - nextPanX) / currentZoom - grabOffsetX
+        );
+        const newDocY = Math.round(
+          (clientY - rect.top - nextPanY) / currentZoom - grabOffsetY
+        );
+
+        setCustomPositions((prev) => ({
+          ...prev,
+          [id]: { x: newDocX, y: newDocY },
+        }));
+      }
+
+      autoPanRafRef.current = requestAnimationFrame(loop);
+    };
+
+    autoPanRafRef.current = requestAnimationFrame(loop);
+  }, []);
+
+  // Kiểm tra con trỏ chuột có đang ở sát mép khung nhìn không
+  const checkAndTriggerEdgePan = useCallback(
+    (clientX: number, clientY: number) => {
+      const container = containerRef.current;
+      if (!container || !draggingItemRef.current) return;
+      const rect = container.getBoundingClientRect();
+
+      const EDGE_THRESHOLD = 75; // khoảng cách cách mép (px) để bắt đầu cuộn bàn
+      const MAX_SPEED = 14; // tốc độ cuộn tối đa mỗi khung hình
+
+      let vx = 0;
+      let vy = 0;
+
+      // Kéo sát mép trái -> bàn di chuyển sang phải (pan.x tăng)
+      if (clientX < rect.left + EDGE_THRESHOLD) {
+        const dist = Math.max(0, clientX - rect.left);
+        const ratio = 1 - dist / EDGE_THRESHOLD;
+        vx = Math.round(MAX_SPEED * Math.max(0.2, Math.min(1, ratio)));
+      } else if (clientX > rect.right - EDGE_THRESHOLD) {
+        // Kéo sát mép phải -> bàn di chuyển sang trái (pan.x giảm)
+        const dist = Math.max(0, rect.right - clientX);
+        const ratio = 1 - dist / EDGE_THRESHOLD;
+        vx = -Math.round(MAX_SPEED * Math.max(0.2, Math.min(1, ratio)));
+      }
+
+      // Kéo sát mép trên -> bàn di chuyển xuống dưới (pan.y tăng)
+      if (clientY < rect.top + EDGE_THRESHOLD) {
+        const dist = Math.max(0, clientY - rect.top);
+        const ratio = 1 - dist / EDGE_THRESHOLD;
+        vy = Math.round(MAX_SPEED * Math.max(0.2, Math.min(1, ratio)));
+      } else if (clientY > rect.bottom - EDGE_THRESHOLD) {
+        // Kéo sát mép dưới -> bàn di chuyển lên trên (pan.y giảm)
+        const dist = Math.max(0, rect.bottom - clientY);
+        const ratio = 1 - dist / EDGE_THRESHOLD;
+        vy = -Math.round(MAX_SPEED * Math.max(0.2, Math.min(1, ratio)));
+      }
+
+      edgeVelocityRef.current = { vx, vy };
+
+      if ((vx !== 0 || vy !== 0) && !autoPanLoopRunningRef.current) {
+        autoPanLoopRunningRef.current = true;
+        startAutoPanLoop();
+      }
+    },
+    [startAutoPanLoop]
+  );
+
   // Kéo di chuyển tài liệu
   const handleItemDragStart = useCallback(
     (e: React.PointerEvent, key: string) => {
       if (e.button !== 0) return;
       e.stopPropagation();
+      e.preventDefault();
+
+      const container = containerRef.current;
+      if (!container) return;
+
       try {
         e.currentTarget.setPointerCapture(e.pointerId);
       } catch {}
 
+      const rect = container.getBoundingClientRect();
+      const currentZoom = zoomScaleRef.current;
+      const currentPan = panRef.current;
       const currentPos = getItemPosition(key);
+
+      const cursorCanvasX = (e.clientX - rect.left - currentPan.x) / currentZoom;
+      const cursorCanvasY = (e.clientY - rect.top - currentPan.y) / currentZoom;
+
+      const grabOffsetX = cursorCanvasX - currentPos.x;
+      const grabOffsetY = cursorCanvasY - currentPos.y;
+
       setActiveDraggingId(key);
       draggingItemRef.current = {
         id: key,
-        startX: e.clientX,
-        startY: e.clientY,
-        initialItemX: currentPos.x,
-        initialItemY: currentPos.y,
+        grabOffsetX,
+        grabOffsetY,
       };
+      lastPointerPosRef.current = { clientX: e.clientX, clientY: e.clientY };
     },
     [getItemPosition]
   );
 
-  const handleItemPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!draggingItemRef.current) return;
-    e.stopPropagation();
-    const { id, startX, startY, initialItemX, initialItemY } = draggingItemRef.current;
-    const currentZoom = zoomScaleRef.current;
-    const deltaX = (e.clientX - startX) / currentZoom;
-    const deltaY = (e.clientY - startY) / currentZoom;
+  const handleItemPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!draggingItemRef.current) return;
+      e.stopPropagation();
+      e.preventDefault();
 
-    const newX = Math.round(initialItemX + deltaX);
-    const newY = Math.round(initialItemY + deltaY);
+      lastPointerPosRef.current = { clientX: e.clientX, clientY: e.clientY };
 
-    setCustomPositions((prev) => ({
-      ...prev,
-      [id]: { x: newX, y: newY },
-    }));
-  }, []);
+      const container = containerRef.current;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      const currentZoom = zoomScaleRef.current;
+      const currentPan = panRef.current;
+      const { id, grabOffsetX, grabOffsetY } = draggingItemRef.current;
+
+      const newDocX = Math.round(
+        (e.clientX - rect.left - currentPan.x) / currentZoom - grabOffsetX
+      );
+      const newDocY = Math.round(
+        (e.clientY - rect.top - currentPan.y) / currentZoom - grabOffsetY
+      );
+
+      setCustomPositions((prev) => ({
+        ...prev,
+        [id]: { x: newDocX, y: newDocY },
+      }));
+
+      // Khi kéo tài liệu ra sát cạnh màn hình thì mới cho di chuyển bàn
+      checkAndTriggerEdgePan(e.clientX, e.clientY);
+    },
+    [checkAndTriggerEdgePan]
+  );
 
   const handleItemPointerUp = useCallback(
     (e: React.PointerEvent) => {
       if (!draggingItemRef.current) return;
       e.stopPropagation();
+      e.preventDefault();
+
       try {
         e.currentTarget.releasePointerCapture(e.pointerId);
       } catch {}
+
+      if (autoPanRafRef.current) {
+        cancelAnimationFrame(autoPanRafRef.current);
+        autoPanRafRef.current = null;
+      }
+      edgeVelocityRef.current = { vx: 0, vy: 0 };
+      autoPanLoopRunningRef.current = false;
 
       draggingItemRef.current = null;
       setActiveDraggingId(null);
@@ -247,6 +390,15 @@ export function DossierCanvasBoard({
     },
     [storagePosKey]
   );
+
+  // Huỷ RAF khi unmount
+  useEffect(() => {
+    return () => {
+      if (autoPanRafRef.current) {
+        cancelAnimationFrame(autoPanRafRef.current);
+      }
+    };
+  }, []);
 
   // Xác định mã đang được chọn (Selected Tag / Code)
   const currentSelectedCode = useMemo(() => {
@@ -411,12 +563,18 @@ export function DossierCanvasBoard({
 
   // Mouse Drag to Pan
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Nếu đang trong quá trình kéo tài liệu -> tuyệt đối không pan bàn
+    if (draggingItemRef.current) return;
+
     const target = e.target as HTMLElement;
     if (
       target?.tagName === "BUTTON" ||
       target?.closest("button") ||
       target?.tagName === "A" ||
-      target?.closest("a")
+      target?.closest("a") ||
+      target?.closest("[data-dossier-card]") ||
+      target?.closest("[data-drag-handle]") ||
+      target?.closest("#dossier-floating-toolbar")
     ) {
       return;
     }
@@ -567,6 +725,8 @@ export function DossierCanvasBoard({
               <div
                 key={docItem.id}
                 id={`board-dossier-${docItem.tag_code}`}
+                data-dossier-card="true"
+                onMouseDown={(e) => e.stopPropagation()}
                 style={{
                   position: "absolute",
                   left: `${pos.x}px`,
@@ -583,6 +743,8 @@ export function DossierCanvasBoard({
               >
                 {/* Document Card Header Bar with Drag Handle */}
                 <div
+                  data-drag-handle="true"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onPointerDown={(e) => handleItemDragStart(e, key)}
                   onPointerMove={handleItemPointerMove}
                   onPointerUp={handleItemPointerUp}
@@ -714,6 +876,8 @@ export function DossierCanvasBoard({
               <div
                 key={docItem.id}
                 id={`board-dossier-${docItem.tag_code}`}
+                data-dossier-card="true"
+                onMouseDown={(e) => e.stopPropagation()}
                 style={{
                   position: "absolute",
                   left: `${pos.x}px`,
@@ -730,6 +894,8 @@ export function DossierCanvasBoard({
               >
                 {/* Document Card Header Bar with Drag Handle */}
                 <div
+                  data-drag-handle="true"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onPointerDown={(e) => handleItemDragStart(e, key)}
                   onPointerMove={handleItemPointerMove}
                   onPointerUp={handleItemPointerUp}
@@ -859,6 +1025,8 @@ export function DossierCanvasBoard({
               <div
                 key={`unmapped_pdf_${itemCode}`}
                 id={`board-pdf-${itemCode}`}
+                data-dossier-card="true"
+                onMouseDown={(e) => e.stopPropagation()}
                 style={{
                   position: "absolute",
                   left: `${pos.x}px`,
@@ -875,6 +1043,8 @@ export function DossierCanvasBoard({
               >
                 {/* Drag handle header */}
                 <div
+                  data-drag-handle="true"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onPointerDown={(e) => handleItemDragStart(e, key)}
                   onPointerMove={handleItemPointerMove}
                   onPointerUp={handleItemPointerUp}

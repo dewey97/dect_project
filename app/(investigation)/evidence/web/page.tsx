@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   FileText,
@@ -163,8 +163,9 @@ function WebEvidencePageContent() {
   }, []);
   const [isReinvestigationExpanded, setIsReinvestigationExpanded] =
     useState(false);
-  const [dossierWidth, setDossierWidth] = useState<number>(300);
-  const [viewerWidth, setViewerWidth] = useState<number>(460);
+  const [boardWidth, setBoardWidth] = useState<number>(540);
+  const [dossierWidth, setDossierWidth] = useState<number>(320);
+  const workspaceRef = useRef<HTMLDivElement>(null);
   const [isDraggingLeftSplit, setIsDraggingLeftSplit] =
     useState<boolean>(false);
   const [isDraggingRightSplit, setIsDraggingRightSplit] =
@@ -460,6 +461,18 @@ function WebEvidencePageContent() {
     }
 
     // Khôi phục layout preference từ storage
+    const savedBoardWidth = getStorageItem("web_board_width");
+    if (savedBoardWidth) {
+      const parsedB = parseFloat(savedBoardWidth);
+      if (!isNaN(parsedB) && parsedB >= 340 && parsedB <= 900) {
+        setBoardWidth(parsedB);
+      } else if (typeof window !== "undefined") {
+        setBoardWidth(Math.round((window.innerHeight - 80) * (896 / 1200)));
+      }
+    } else if (typeof window !== "undefined") {
+      setBoardWidth(Math.round((window.innerHeight - 80) * (896 / 1200)));
+    }
+
     const savedDossierWidth = getStorageItem("web_dossier_width");
     if (savedDossierWidth) {
       const parsedW = parseFloat(savedDossierWidth);
@@ -471,40 +484,42 @@ function WebEvidencePageContent() {
     } else {
       setDossierWidth(300);
     }
-    const savedViewerWidth = getStorageItem("web_viewer_width");
-    if (savedViewerWidth) {
-      const parsedV = parseFloat(savedViewerWidth);
-      if (!isNaN(parsedV) && parsedV >= 320 && parsedV <= 750) {
-        setViewerWidth(parsedV);
-      } else {
-        setViewerWidth(460);
-      }
-    } else {
-      setViewerWidth(460);
-    }
+
     const savedCollapsed = getStorageItem("web_dossier_collapsed");
     if (savedCollapsed === "true") {
       setIsDossierCollapsed(true);
     }
   }, [caseId, effectiveItems]);
 
-  // Xử lý kéo thả điều chỉnh độ rộng Khay tài liệu (Cột 1 bên trái)
+  // Xử lý kéo thả điều chỉnh độ rộng (Left Handle = Bảng điều tra, Right Handle = Khay vật chứng)
   useEffect(() => {
-    if (!isDraggingLeftSplit) return;
+    if (!isDraggingLeftSplit && !isDraggingRightSplit) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (window.innerWidth < 1024) return;
-      const windowWidth = window.innerWidth;
-      const maxLeft = Math.min(460, windowWidth - viewerWidth - 360);
-      const clamped = Math.min(
-        Math.max(e.clientX, 220),
-        Math.max(220, maxLeft),
-      );
-      setDossierWidth(clamped);
+      const workspace = workspaceRef.current;
+      if (!workspace) return;
+      const rect = workspace.getBoundingClientRect();
+
+      if (isDraggingLeftSplit) {
+        // Kéo thanh chia giữa Bảng điều tra (sát trái) và Bàn hồ sơ (ở giữa)
+        const newBoardWidth = e.clientX - rect.left;
+        const maxBoard = rect.width - dossierWidth - 320;
+        const clamped = Math.min(Math.max(newBoardWidth, 340), Math.max(340, maxBoard));
+        setBoardWidth(clamped);
+      } else if (isDraggingRightSplit) {
+        // Kéo thanh chia giữa Bàn hồ sơ (ở giữa) và Khay vật chứng (bên phải)
+        const newDossierWidth = rect.right - e.clientX;
+        const maxDossier = rect.width - boardWidth - 320;
+        const clamped = Math.min(Math.max(newDossierWidth, 220), Math.max(220, maxDossier));
+        setDossierWidth(clamped);
+      }
     };
 
     const handleMouseUp = () => {
       setIsDraggingLeftSplit(false);
+      setIsDraggingRightSplit(false);
+      setStorageItem("web_board_width", boardWidth.toString());
       setStorageItem("web_dossier_width", dossierWidth.toString());
     };
 
@@ -515,37 +530,7 @@ function WebEvidencePageContent() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDraggingLeftSplit, dossierWidth, viewerWidth]);
-
-  // Xử lý kéo thả điều chỉnh độ rộng Trình duyệt chi tiết (Cột 3 bên phải)
-  useEffect(() => {
-    if (!isDraggingRightSplit) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (window.innerWidth < 1024) return;
-      const windowWidth = window.innerWidth;
-      const newViewerWidth = windowWidth - e.clientX;
-      const maxRight = Math.min(750, windowWidth - dossierWidth - 360);
-      const clamped = Math.min(
-        Math.max(newViewerWidth, 320),
-        Math.max(320, maxRight),
-      );
-      setViewerWidth(clamped);
-    };
-
-    const handleMouseUp = () => {
-      setIsDraggingRightSplit(false);
-      setStorageItem("web_viewer_width", viewerWidth.toString());
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDraggingRightSplit, dossierWidth, viewerWidth]);
+  }, [isDraggingLeftSplit, isDraggingRightSplit, boardWidth, dossierWidth]);
 
   const toggleDossierCollapse = useCallback(() => {
     detectiveAudio.playPaperRustle();
@@ -744,63 +729,17 @@ function WebEvidencePageContent() {
         onOpenNotebook={() => setActiveModal("notebook")}
       />
 
-      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-1.5 p-0 lg:p-2.5">
+      <div ref={workspaceRef} className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-1.5 p-0 lg:p-2.5">
         {/* OVERLAY CHỐNG MẤT SỰ KIỆN KHI KÉO THẢ RESIZE TRÊN TOÀN MÀN HÌNH */}
         {(isDraggingLeftSplit || isDraggingRightSplit) && (
           <div className="fixed inset-0 z-50 cursor-col-resize select-none bg-transparent" />
         )}
 
-        {/* CỘT 1 (BÊN TRÁI): KHAY HỒ SƠ & VẬT CHỨNG (MANILA ARCHIVAL DOSSIER TRAY) */}
-        <DossierTray
-          dossierWidth={dossierWidth}
-          isDossierCollapsed={isDossierCollapsed}
-          isViewerExpanded={isViewerExpanded}
-          mobileTab={mobileTab}
-          filterTab={filterTab}
-          onSetFilterTab={(tab) => setFilterTab(tab)}
-          selectedPhaseFilter={selectedPhaseFilter}
-          onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
-          isPhaseUnlocked={isPhaseUnlocked}
-          isDossierUnlocked={isDossierUnlocked}
-          dossiers={dossiers}
-          pdfItems={pdfItems}
-          evidenceItems={evidenceItems}
-          selectedView={selectedView}
-          onSelectPdf={handleSelectPdf}
-          onSelectEvidence={handleSelectEvidence}
-          activePing={activePing}
-          onBroadcastPing={broadcastPing}
-        />
-
-        {/* RESIZABLE SPLIT DRAGGER GIỮA KHAY HỒ SƠ VÀ BẢNG ĐIỀU TRA (DESKTOP) */}
-        {!isDossierCollapsed && (
-          <div
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setIsDraggingLeftSplit(true);
-            }}
-            className={cn(
-              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
-              isDraggingLeftSplit && "cursor-col-resize",
-            )}
-            title="Kéo để điều chỉnh độ rộng Khay tài liệu vs. Bảng điều tra"
-          >
-            <div
-              className={cn(
-                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-                isDraggingLeftSplit &&
-                  "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
-              )}
-            >
-              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          </div>
-        )}
-
-        {/* CỘT 2 (Ở GIỮA): BẢNG GHIM ĐIỀU TRA (INVESTIGATION CANVAS) */}
+        {/* CỘT 1 (BÊN TRÁI CÙNG): BẢNG GHIM ĐIỀU TRA (LUÔN SÁT TRÁI) */}
         <div
+          style={{ width: isViewerExpanded ? undefined : `${boardWidth}px` }}
           className={cn(
-            "h-full flex-1 min-w-0 overflow-hidden flex flex-col min-h-0 relative",
+            "h-full shrink-0 relative overflow-hidden flex flex-col min-h-0 select-none",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
             mobileTab === "board"
               ? "flex w-full"
@@ -809,7 +748,6 @@ function WebEvidencePageContent() {
                 : "hidden lg:flex",
           )}
         >
-          {/* MAIN CANVAS — GIỚI HẠN VÙNG BẢNG ĐÚNG BẰNG ẢNH, KHÔNG BỊ HỞ 2 VÙNG TRỐNG 2 BÊN */}
           <div className="flex-1 w-full h-full min-h-0 relative overflow-hidden">
             <MainInvestigationCanvas
               caseId={caseId}
@@ -823,23 +761,23 @@ function WebEvidencePageContent() {
           </div>
         </div>
 
-        {/* RESIZABLE SPLIT DRAGGER GIỮA BẢNG ĐIỀU TRA VÀ TRÌNH DUYỆT CHI TIẾT (DESKTOP) */}
+        {/* THANH KÉO 1 (GIỮA BẢNG ĐIỀU TRA VÀ BÀN HỒ SƠ) */}
         {!isViewerExpanded && (
           <div
             onMouseDown={(e) => {
               e.preventDefault();
-              setIsDraggingRightSplit(true);
+              setIsDraggingLeftSplit(true);
             }}
             className={cn(
               "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
-              isDraggingRightSplit && "cursor-col-resize",
+              isDraggingLeftSplit && "cursor-col-resize",
             )}
-            title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Trình đọc chi tiết"
+            title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Bàn hồ sơ"
           >
             <div
               className={cn(
                 "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-                isDraggingRightSplit &&
+                isDraggingLeftSplit &&
                   "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
               )}
             >
@@ -848,14 +786,13 @@ function WebEvidencePageContent() {
           </div>
         )}
 
-        {/* CỘT 3 (BÊN PHẢI): TRÌNH DUYỆT CHI TIẾT HỒ SƠ & VẬT CHỨNG (RIGHT VIEWER INSPECTOR) */}
+        {/* CỘT 2 (Ở GIỮA): BÀN HỒ SƠ / PREVIEW CHI TIẾT (CHIẾM TRỌN KHÔNG GIAN CÒN LẠI) */}
         <div
-          style={isViewerExpanded ? undefined : { width: `${viewerWidth}px` }}
           className={cn(
-            "h-full flex-col min-h-0 overflow-hidden relative border-l border-[#2d1e13]",
+            "h-full flex-col min-h-0 overflow-hidden relative",
             isViewerExpanded
               ? "flex flex-1 w-full min-w-0"
-              : "hidden lg:flex shrink-0 min-w-[320px]",
+              : "hidden lg:flex flex-1 min-w-[320px]",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
           )}
         >
@@ -895,17 +832,6 @@ function WebEvidencePageContent() {
                 />
               </div>
             </div>
-          ) : activeModal === "reinvestigate" ? (
-            <ReinvestigationModal
-              caseId={caseId}
-              isOpen
-              inline={!isReinvestigationExpanded}
-              onExpand={() => setIsReinvestigationExpanded(true)}
-              onClose={() => {
-                setIsReinvestigationExpanded(false);
-                setActiveModal(null);
-              }}
-            />
           ) : viewMode === "canvas" ? (
             /* DOSSIER CANVAS BOARD — TRẢI TOÀN BỘ TÀI LIỆU VỤ ÁN */
             <DossierCanvasBoard
@@ -933,6 +859,53 @@ function WebEvidencePageContent() {
             />
           )}
         </div>
+
+        {/* THANH KÉO 2 (GIỮA BÀN HỒ SƠ VÀ KHAY VẬT CHỨNG) */}
+        {!isDossierCollapsed && (
+          <div
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setIsDraggingRightSplit(true);
+            }}
+            className={cn(
+              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+              isDraggingRightSplit && "cursor-col-resize",
+            )}
+            title="Kéo để điều chỉnh độ rộng Bàn hồ sơ vs. Khay tài liệu"
+          >
+            <div
+              className={cn(
+                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
+                isDraggingRightSplit &&
+                  "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+              )}
+            >
+              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </div>
+        )}
+
+        {/* CỘT 3 (BÊN PHẢI CÙNG): KHAY HỒ SƠ & VẬT CHỨNG (MANILA ARCHIVAL DOSSIER TRAY) */}
+        <DossierTray
+          dossierWidth={dossierWidth}
+          isDossierCollapsed={isDossierCollapsed}
+          isViewerExpanded={isViewerExpanded}
+          mobileTab={mobileTab}
+          filterTab={filterTab}
+          onSetFilterTab={(tab) => setFilterTab(tab)}
+          selectedPhaseFilter={selectedPhaseFilter}
+          onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
+          isPhaseUnlocked={isPhaseUnlocked}
+          isDossierUnlocked={isDossierUnlocked}
+          dossiers={dossiers}
+          pdfItems={pdfItems}
+          evidenceItems={evidenceItems}
+          selectedView={selectedView}
+          onSelectPdf={handleSelectPdf}
+          onSelectEvidence={handleSelectEvidence}
+          activePing={activePing}
+          onBroadcastPing={broadcastPing}
+        />
       </div>
 
       {/* PHASE UNLOCKED CINEMATIC STORY MODAL */}
