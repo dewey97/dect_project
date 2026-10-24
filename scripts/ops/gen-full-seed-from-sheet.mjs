@@ -132,23 +132,61 @@ if (calls.length > 0) {
 }
 
 // ===================== 4. MESSAGES =====================
+// Parse each thread's messages_text into individual message rows.
+// Format: "(dd/MM • HH:mm) text" = received, "> (dd/MM • HH:mm) text" = sent
+// Multi-line: text continues until next timestamp line.
 const messages = dump.messages || [];
 lines.push('');
-lines.push(`-- 4. phone_messages: ${messages.length} threads from Sheet tab "messages"`);
 lines.push("DELETE FROM public.phone_messages WHERE case_slug = 'case_000';");
 
-if (messages.length > 0) {
+function parseThreadMessages(rawText) {
+  if (!rawText) return [];
+  const parsed = [];
+  const lineArr = rawText.split('\n');
+  const tsPattern = /^(>?\s*)\((\d{2}\/\d{2})\s*[•·]\s*(\d{2}:\d{2})\)\s*(.*)/;
+  let current = null;
+
+  for (const line of lineArr) {
+    const match = line.match(tsPattern);
+    if (match) {
+      if (current) parsed.push(current);
+      const isSent = match[1].trim() === '>';
+      const dateStr = match[2];
+      const timeStr = match[3];
+      const bodyStart = match[4];
+      current = {
+        role: isSent ? 'sent' : 'received',
+        timestamp: `${dateStr} ${timeStr}`,
+        body: bodyStart,
+      };
+    } else if (current) {
+      current.body += '\n' + line;
+    }
+  }
+  if (current) parsed.push(current);
+  return parsed;
+}
+
+let totalMsgRows = 0;
+const allMsgRows = [];
+
+for (const m of messages) {
+  const threadKey = `thread_${(m.contact_name || 'unknown').toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+  const contactName = m.contact_name || 'Hội thoại';
+  const phone = m.phone_number || null;
+  const parsed = parseThreadMessages(m.messages_text);
+
+  for (const p of parsed) {
+    const sender = p.role === 'sent' ? 'Nạn nhân' : contactName;
+    allMsgRows.push(`  (${esc('case_000')}, ${esc(threadKey)}, ${esc(contactName)}, ${escOrNull(phone)}, ${esc(sender)}, ${esc(p.role)}, ${esc(p.body.trim())}, ${escOrNull(p.timestamp)}, NULL, false, NULL, NULL, NULL, NULL, NULL, ${totalMsgRows})`);
+    totalMsgRows++;
+  }
+}
+
+lines.push(`-- 4. phone_messages: ${totalMsgRows} rows from ${messages.length} threads (parsed from Sheet "messages")`);
+if (allMsgRows.length > 0) {
   lines.push('INSERT INTO public.phone_messages (case_slug, thread_key, thread_name, thread_phone, sender, role, body, timestamp, code, is_clue, clue_title, clue_analysis, attachment_type, attachment_url, attachment_duration, slot_index) VALUES');
-
-  const rows = messages.map((m, i) => {
-    const threadKey = `thread_${(m.contact_name || 'unknown').toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
-    const body = m.messages_text || '';
-    const unread = (m.unread || '').toUpperCase() === 'TRUE';
-
-    return `  (${esc('case_000')}, ${esc(threadKey)}, ${esc(m.contact_name || 'Hội thoại')}, ${escOrNull(m.phone_number)}, ${esc(m.contact_name || 'Người gửi')}, 'received', ${esc(body)}, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, ${i})`;
-  });
-
-  lines.push(rows.join(',\n') + ';');
+  lines.push(allMsgRows.join(',\n') + ';');
 }
 
 // ===================== 5. APPS (NOTE/SAFARI/BANK) =====================
@@ -225,6 +263,6 @@ console.log(`Generated: ${outPath}`);
 console.log(`  Evidence: ${evidences.length} records`);
 console.log(`  Contacts: ${validContacts.length} records (${contacts.length - validContacts.length} skipped, empty name)`);
 console.log(`  Calls: ${calls.length} records`);
-console.log(`  Messages: ${messages.length} threads`);
+console.log(`  Messages: ${totalMsgRows} rows from ${messages.length} threads`);
 console.log(`  Notes: ${notes.length}, Safari: ${safari.length}, Bank: ${bank.length}`);
 console.log(`  Cleanup: remove junk app_0..app_11`);

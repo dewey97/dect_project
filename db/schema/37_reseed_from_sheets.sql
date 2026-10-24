@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- 37. RE-SEED ALL CASE_000 DATA FROM GOOGLE SHEETS (replaces hardcoded data)
--- Generated: 2026-10-24T08:25:59.397Z
+-- Generated: 2026-10-24T08:29:10.223Z
 -- ==============================================================================
 
 BEGIN;
@@ -135,130 +135,120 @@ INSERT INTO public.phone_calls (case_slug, code, contact_name, phone_number, cal
   ('case_000', 'L20', 'Thảo Vy', '0978.552.109', 'OUTGOING', '21/07/2016 21:15', NULL, NULL, false, NULL, NULL, 19),
   ('case_000', 'L21', 'Tuấn Bia 88', '0945.888.188', 'OUTGOING', '21/07/2016 19:15', NULL, NULL, false, NULL, NULL, 20);
 
--- 4. phone_messages: 16 threads from Sheet tab "messages"
 DELETE FROM public.phone_messages WHERE case_slug = 'case_000';
+-- 4. phone_messages: 89 rows from 16 threads (parsed from Sheet "messages")
 INSERT INTO public.phone_messages (case_slug, thread_key, thread_name, thread_phone, sender, role, body, timestamp, code, is_clue, clue_title, clue_analysis, attachment_type, attachment_url, attachment_duration, slot_index) VALUES
-  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', '(04/05 • 14:15) Khoản đợt một em chuẩn bị xong tiền mặt rồi nhé. Tối mai tầm mấy giờ anh tiện nhận tiền?
-> (04/05 • 14:32) Tối mai 21h qua số 29 Đường Vĩnh Thái. Giờ đấy anh mới xong việc ở chỗ công trình. Nhớ mang đủ giấy tờ.
-(04/05 • 14:35) Oke anh
-(22/05 • 10:20) Khoản nợ mới lúc nào anh chuyển nốt em phần còn lại được? Em đang kẹt quá
-> (22/05 • 11:05) Cuối tuần này chuyển tiếp phần còn lại nhé.
-> (22/05 • 11:06) Cứ tối ra đúng địa chỉ cũ tôi đưa tiền, đừng chuyển khoản lằng nhằng mất công đối soát.
-(25/05 • 16:48) Tối nay vẫn số 29 Đường Vĩnh Thái anh nhỉ?
-> (25/05 • 16:49) Ừ 
-(12/06 • 16:40) Hôm nay em gửi lãi tháng 6 được không?
-> (12/06 • 17:15) Tầm 9 giờ tối đi, giờ đấy vắng người dễ làm việc. Mà hôm nay đừng có lề mề như lần trước.
-(12/06 • 17:18) Lần trước do kẹt xe thôi. Anh khó tính vừa thôi chứ.
-> (12/06 • 17:22) Không khó tính để bị trễ việc à? Vừa bực mình với con người yêu trời đánh xong. Trông chán phát khiếp.
-(12/06 • 17:28) Mà anh hay đi với em thế chị Hà có nghĩ gì k đấy
-> (12/06 • 17:49) Lắm chuyện, con mẹ ấy thì biết gì anh sắp chia tay với nó rồi kệ nó đi
-> (03/07 • 22:01) Anh mới kiểm tra lại sổ
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'Khoản đợt một em chuẩn bị xong tiền mặt rồi nhé. Tối mai tầm mấy giờ anh tiện nhận tiền?', '04/05 14:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 0),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Tối mai 21h qua số 29 Đường Vĩnh Thái. Giờ đấy anh mới xong việc ở chỗ công trình. Nhớ mang đủ giấy tờ.', '04/05 14:32', NULL, false, NULL, NULL, NULL, NULL, NULL, 1),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'Oke anh', '04/05 14:35', NULL, false, NULL, NULL, NULL, NULL, NULL, 2),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'Khoản nợ mới lúc nào anh chuyển nốt em phần còn lại được? Em đang kẹt quá', '22/05 10:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 3),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Cuối tuần này chuyển tiếp phần còn lại nhé.', '22/05 11:05', NULL, false, NULL, NULL, NULL, NULL, NULL, 4),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Cứ tối ra đúng địa chỉ cũ tôi đưa tiền, đừng chuyển khoản lằng nhằng mất công đối soát.', '22/05 11:06', NULL, false, NULL, NULL, NULL, NULL, NULL, 5),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'Tối nay vẫn số 29 Đường Vĩnh Thái anh nhỉ?', '25/05 16:48', NULL, false, NULL, NULL, NULL, NULL, NULL, 6),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Ừ', '25/05 16:49', NULL, false, NULL, NULL, NULL, NULL, NULL, 7),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'Hôm nay em gửi lãi tháng 6 được không?', '12/06 16:40', NULL, false, NULL, NULL, NULL, NULL, NULL, 8),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Tầm 9 giờ tối đi, giờ đấy vắng người dễ làm việc. Mà hôm nay đừng có lề mề như lần trước.', '12/06 17:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 9),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'Lần trước do kẹt xe thôi. Anh khó tính vừa thôi chứ.', '12/06 17:18', NULL, false, NULL, NULL, NULL, NULL, NULL, 10),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Không khó tính để bị trễ việc à? Vừa bực mình với con người yêu trời đánh xong. Trông chán phát khiếp.', '12/06 17:22', NULL, false, NULL, NULL, NULL, NULL, NULL, 11),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'Mà anh hay đi với em thế chị Hà có nghĩ gì k đấy', '12/06 17:28', NULL, false, NULL, NULL, NULL, NULL, NULL, 12),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Lắm chuyện, con mẹ ấy thì biết gì anh sắp chia tay với nó rồi kệ nó đi', '12/06 17:49', NULL, false, NULL, NULL, NULL, NULL, NULL, 13),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Anh mới kiểm tra lại sổ
 > Nhớ ngày mai trả lãi tháng 7 đấy
 > Em nhớ trả anh đúng hạn. Không liệu hồn
 Em biết rồi
 Cũng may là em chuẩn bị trước rồi
 Nhớ mai cho em vay thêm vài chục với. Em đang kẹt xíu
-Anh khỏi lo em đã khất nợ bao giờ đâu
-(24/07 • 16:05) Đợt cuối cùng gom xong rồi. Tối nay hẹn ở đâu để tất toán dứt điểm đây?
-> (24/07 • 16:20) 9h rưỡi tối nay. Chỗ mọi khi
-(24/07 • 16:22) À mà dạo này em cứ thấy có cảm giác như bị ai theo dõi ấy.
-Mà em có gây thù chuốc oán với ai bao giờ đâu nhỉ 😣
-> (24/07 • 16:23) Đùa à 😂 Em thì chỉ có zai theo thôi chứ ai', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 0),
-  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', '(17/07 • 21:49) Anh vẫn đang ở quán nhậu ạ? Sao anh nhậu lâu vậy, từ lúc 5h chiều tới giờ.
-10 giờ mà anh chưa về em sẽ ra quán chở anh về nhé.
-
-> (17/07 • 21:50) Cô điên à? Tôi đi với bạn bè đàng hoàng chứ có phải làm gì khuất tất đâu
-> Tôi tự biết đường về
-
-(17/07 • 21:51) Thế đúng 10h em gọi video nhé. Anh mà chưa về là em ra tận quán đưa anh về đấy.
-
-(18/07 • 10:12) Sáng em có ghé nhà anh dọn dẹp với nấu sẵn cho anh vài món, em để trong tủ lạnh, anh nhớ ăn nhé.
+Anh khỏi lo em đã khất nợ bao giờ đâu', '03/07 22:01', NULL, false, NULL, NULL, NULL, NULL, NULL, 14),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'Đợt cuối cùng gom xong rồi. Tối nay hẹn ở đâu để tất toán dứt điểm đây?', '24/07 16:05', NULL, false, NULL, NULL, NULL, NULL, NULL, 15),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', '9h rưỡi tối nay. Chỗ mọi khi', '24/07 16:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 16),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Thảo Vy', 'received', 'À mà dạo này em cứ thấy có cảm giác như bị ai theo dõi ấy.
+Mà em có gây thù chuốc oán với ai bao giờ đâu nhỉ 😣', '24/07 16:22', NULL, false, NULL, NULL, NULL, NULL, NULL, 17),
+  ('case_000', 'thread_th_o_vy', 'Thảo Vy', '0978.552.109', 'Nạn nhân', 'sent', 'Đùa à 😂 Em thì chỉ có zai theo thôi chứ ai', '24/07 16:23', NULL, false, NULL, NULL, NULL, NULL, NULL, 18),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Anh vẫn đang ở quán nhậu ạ? Sao anh nhậu lâu vậy, từ lúc 5h chiều tới giờ.
+10 giờ mà anh chưa về em sẽ ra quán chở anh về nhé.', '17/07 21:49', NULL, false, NULL, NULL, NULL, NULL, NULL, 19),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Nạn nhân', 'sent', 'Cô điên à? Tôi đi với bạn bè đàng hoàng chứ có phải làm gì khuất tất đâu
+> Tôi tự biết đường về', '17/07 21:50', NULL, false, NULL, NULL, NULL, NULL, NULL, 20),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Thế đúng 10h em gọi video nhé. Anh mà chưa về là em ra tận quán đưa anh về đấy.', '17/07 21:51', NULL, false, NULL, NULL, NULL, NULL, NULL, 21),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Sáng em có ghé nhà anh dọn dẹp với nấu sẵn cho anh vài món, em để trong tủ lạnh, anh nhớ ăn nhé.
 Mà sao em không thấy cái áo sơ mi trắng trong tủ anh đâu.
 Thường dịp đặc biệt anh mới mặc nó thôi mà.
 Nay anh đi gặp ai đặc biệt lắm ạ?
 
 > Cô rảnh à mà hỏi lắm thế.
-> Tôi đi đâu kệ tôi
-> (18/07 • 10:15) Mà bớt cái kiểu cứ đùng đùng qua nhà tôi thế đi.
-
-(21/07 • 19:03) Tối nay anh đi đâu hả?
-
-(21/07 • 19:03) Em qua dọn nhà cho anh nè. Mà không thấy anh đâu.
+> Tôi đi đâu kệ tôi', '18/07 10:12', NULL, false, NULL, NULL, NULL, NULL, NULL, 22),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Nạn nhân', 'sent', 'Mà bớt cái kiểu cứ đùng đùng qua nhà tôi thế đi.', '18/07 10:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 23),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Tối nay anh đi đâu hả?', '21/07 19:03', NULL, false, NULL, NULL, NULL, NULL, NULL, 24),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Em qua dọn nhà cho anh nè. Mà không thấy anh đâu.
 Hay là anh lại đi chơi bida với mấy thằng lông bông kia rồi.
 Em đã bảo anh đừng chơi vs lũ đấy nữa mà, có tốt đẹp j đâu.
 [VIDEO: https://drive.google.com/file/d/1X0Qq-_NgfpQ0Mfnz9cmMU2FDH4d6LWzA/view?usp=sharing]
-Anh xem chúng mình đẹp đôi chưa nè
-
-(22/07 • 21:17) Hnay em nấu canh cua rau đay, anh thích món đó mà. 
-Để em mang sag cho anh nhé? Em biết anh hay quên ăn tối...
-
-(22/07 • 22:03) Sao anh ko trả lời em?
-Em để phần anh trong hộp cơm ở trước cửa nhé. Anh nhớ lấy vào ăn kẻo nguội.
-
-(23/07 • 12:44) Em thấy hộp cơm hôm qua anh đã lấy vào rồi 🥰
-Vậy là anh có ăn pk? Chiều nay em nghỉ sớm, hay để em ghé qua dọn nhà cho anh nha?
-
-> (23/07 • 14:51) Đừng có sang. Bận.
-(24/07 • 19:00) Anh ơi, em vừa sao xong mẻ trà hoa cúc mới, thơm lắm anh. Lát anh có ở nhà ko, em mang qua nhé?
-(24/07 • 20:32)  [AUDIO: https://drive.google.com/file/d/1xFjEvvM5uE7zkXD93OIVY_NQNNH-tpvz/view?usp=drive_link]', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 1),
-  ('case_000', 'thread_0988_200_991', '0988.200.991', '0988.200.991', '0988.200.991', 'received', '> (21/07 • 09:14) Hạn 20 rồi mày không thấy lịch à. 300 triệu không phải 300 nghìn. Tắt máy trốn thì tao tìm đến tận nhà mày.
-> (22/07 • 20:31) Mày nghĩ tắt máy là xong à?
-> (22/07 • 20:31) Ngày mai không gọi lại tao thì tao cho rải giấy nợ để cả phố biết mặt thằng rể quý nhà họ Nguyễn.
-> (24/07 • 18:12) T cho m cơ hội cuối. Tối nay qua nhà tao nói chuyện cho đàng hoàng. Không thì ngày mai tao ghé nhà máy thăm bố vợ mày luôn thể.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 2),
-  ('case_000', 'thread_viettel_km', 'VIETTEL_KM', '198', 'VIETTEL_KM', 'received', '(05/07 • 08:00) [QC] Duy nhat ngay 05/07/2016, Viettel KM 50% gia tri the nap cho thue bao tra truoc. Chi tiet lien he 198 (0d).
-(20/07 • 08:30) [QC] Tu 00h-24h ngay 20/07/2016, Viettel KM 50% gia tri the nap cho thue bao tra truoc (25% cong vao TK KM, 25% cong vao TK KM2). Chi tiet LH 198 (0d).
-(23/07 • 10:00) [QC] Dang ky goi cuoc 3G Mimax chi voi 70.000d/thang co ngay 600MB toc do cao, het luu luong truy cap mien phi. Soan MIMAX gui 191.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 3),
-  ('case_000', 'thread_0912_331_888', '0912.331.888', '0912.331.888', '0912.331.888', 'received', '(22/07 • 20:15) 20 năm qua mày sống tốt nhỉ
-> (22/07 • 20:20) Thằng nào đấy?', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 4),
-  ('case_000', 'thread_c_m_ch__ba', 'Cơm Chị Ba', '0908.334.991', 'Cơm Chị Ba', 'received', '> (18/07 • 11:20) Cho em 2 suất sườn bì chả nhiều ớt cay qua 14 Bờ Sông chị nhé.
-(18/07 • 11:25) Có ngay em ơi, 15 phút nữa chú xe ôm mang qua nhé.
-> (22/07 • 11:30) Trưa nay có cá kho tộ với canh chua không chị?
-(22/07 • 11:32) Có cá hú kho tộ ngon lắm em, lấy thêm chén canh chua nha?
-> (22/07 • 11:33) Vâng cho 1 phần cơm cá kho + canh chua.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 5),
-  ('case_000', 'thread_ch__h_nh_gi_t_l_', 'Chị Hạnh Giặt Là', '0914.556.789', 'Chị Hạnh Giặt Là', 'received', '> (12/07 • 16:00) Chị Hạnh ơi em gửi thằng đệ mang 1 cái áo khoác da với 2 chăn lông qua giặt khô, làm cẩn thận hộ em.
-(12/07 • 16:10) Rồi chị nhận được rồi, giặt hấp da mất 2-3 hôm em nhé.
-(15/07 • 17:00) Đồ giặt xong rồi em ơi, tiện ghé lấy nhé.
-(21/07 • 15:20) Khang ơi áo da với chăn của em giặt xong cả tuần rồi để chật tiệm quá, chiều tiện ghé 42 Khâm Thiên lấy hộ chị.
-> (21/07 • 15:35) Vâng chiều em cho thằng Long qua vác về.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 6),
-  ('case_000', 'thread_long_s_o', 'Long Sẹo', '0979.441.223', 'Long Sẹo', 'received', '(08/07 • 09:10) Anh Khang ơi em dán xong 50 tờ thông báo nợ quanh khu chợ đầu mối rồi nhé.
-> (08/07 • 09:30) Tốt, tối lượn qua bến phà ngó xem có động tĩnh gì không.
-> (19/07 • 14:00) Mày thấy thằng Hải Lác chạy xe ở bến chưa?
-(19/07 • 16:45) Em đảo qua 2 vòng mà bọn xe ôm bảo nó nghỉ ốm mấy hôm nay rồi anh ạ.
-(21/07 • 11:15) Anh ơi em vừa tóm được quả xe Dream của nó dựng ở quán nước đầu bến!
-> (21/07 • 11:16) Giữ luôn chìa khóa xe nó, bảo khi nào mang đủ 75 triệu đến nhà tao thì trả xe.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 7),
-  ('case_000', 'thread_tu_n_b_o_x__ng_m_c', 'Tuấn Béo Xưởng Mộc', '0902.998.114', 'Tuấn Béo Xưởng Mộc', 'received', '> (08/06 • 09:00) Tuấn, tiền gỗ đợt trước 45 triệu đến hạn rồi. Chiều tao cho người qua lấy.
-(08/06 • 09:15) Anh Khang ơi đợt này bên chủ nhà họ chậm thanh toán quá, anh thư thư cho em mấy hôm với ạ.
-> (25/06 • 14:30) Mấy hôm của mày là nửa tháng rồi đấy à? Đừng để tao phải mang mấy anh em xuống tận xưởng mộc bốc máy cưa máy bào đi.
-(25/06 • 14:45) Em lạy anh, anh cho em xin đến đầu tháng 7 công trình xong em thanh toán đủ cả gốc lẫn lãi cho anh!
-
-> (21/07 • 10:20) 🎙️ [Tin nhắn thoại 0:06] [Khôn hồn thì trả đúng hạn cho bố nghe chưa? Không thì t cho cả mày và cái xưởng của mày sáng nhất Hà Nội đấy. Ông đây đếch phải chưa từng cho thằng nào bay màu đâu nhé]
-> (21/07 • 10:25) Biết điều đấy, trước 30/7 nốt 25 triệu còn lại không thì đừng trách tao.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 8),
-  ('case_000', 'thread_vnpt_notice', 'VNPT_Notice', 'VNPT', 'VNPT_Notice', 'received', '(10/07 • 08:30) [Thong bao] Cuoc Internet FiberVNN thang 06/2016 cua thue bao 0904888666 la 220.000d. Han thanh toan: 20/07/2016.
-(21/07 • 08:00) [Thong bao] Thue bao 0904888666 da thanh toan cuoc Internet FiberVNN thang 06/2016 so tien 220.000d qua ViettinBank. Cam on Quy khach.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 9),
-  ('case_000', 'thread_tu_n_bia_88', 'Tuấn Bia 88', '0945.888.188', 'Tuấn Bia 88', 'received', '(10/07 • 17:40) Tối nay chung kết Euro Pháp - Bồ Đào Nha ra quán làm nồi lẩu xem bóng đá không Khang ơi? Có mấy anh em xóm Cảng nữa.
-> (10/07 • 18:15) Bận rồi, tối phải đi chốt mấy khoản họ.
-> (15/07 • 11:20) Trưa nay quán có lòng non với cháo lòng không ông?
-(15/07 • 11:22) Có luôn ông ơi, vừa mổ lòng tươi rói. Ra nhanh kẻo hết.
-(20/07 • 18:30) Khang ơi, tối nay rảnh ra làm vài cốc bia hơi phố cổ không ông? Lô bia hơi Hà Nội mới về mát lịm.
-> (20/07 • 18:45) Tối bận đi thu nợ rồi ông. Để bữa khác.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 10),
-  ('case_000', 'thread_duy_bida_88', 'Duy Bida 88', '0916.334.556', 'Duy Bida 88', 'received', '(05/07 • 14:30) Chiều nay rảnh qua CLB làm độ bida lỗ 500k/ván với thằng Nam không anh Khang?
-> (05/07 • 14:45) Chiều bận, tối 8h tao qua.
-(18/07 • 19:20) Bàn số 1 vừa thay nỉ nhập khẩu mới mượt lắm anh ơi, tối rảnh qua test bàn.
-> (20/07 • 11:00) Dạo này đang bận mấy vụ gom tiền, để cuối tuần.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 11),
-  ('case_000', 'thread_195', '195', '195', '195', 'received', '(20/07 • 09:15) Tai khoan cua Quy khach da duoc cong 500.000d tu the cao nap ngay 20/07/2016. So du hien tai: 584.250d. Thoi han su dung den 30/12/2016.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 12),
-  ('case_000', 'thread_th_ng_s_a_xe', 'Thắng Sửa Xe', '0977.112.445', 'Thắng Sửa Xe', 'received', '> (14/07 • 10:00) Con SH của anh dạo này đi nồi kêu rè rè với phanh trước bị bó, chiều anh vứt qua xưởng chú coi hộ.
-(14/07 • 10:15) Vâng anh cứ vứt qua xưởng để em kiểm tra kỹ cho.
-(16/07 • 15:30) Anh Khang ơi tháo ra thấy mòn hết bố ba càng với bi nồi rồi, em thay luôn bộ mới xịn của Honda nhé? Tổng tầm hơn triệu.
-> (18/07 • 09:10) Ừ thay luôn đồ ngon cho anh.
-(18/07 • 14:00) Xe SH của anh thay dầu với làm nồi xong rồi nhé, tổng hết 850k anh nhé. Chiều rảnh ghé lấy.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 13),
-  ('case_000', 'thread_qu_n_l____', 'Quân Lô Đề', '0982.441.667', 'Quân Lô Đề', 'received', '> (16/07 • 16:45) Vào cho tao cặp 68 - 86 mỗi con 500 điểm lô, đề đít 8 năm trăm nghìn.
-(16/07 • 17:00) Đã nhận đủ bảng của anh Khang nhé. Chúc anh rực rỡ!
-(16/07 • 18:35) Nổ 68 hai nháy anh ơiii!! Tổng ăn 80 củ, trừ gốc còn lời 62 củ. Mai anh lấy tiền mặt hay bắn tài khoản?
-> (17/07 • 10:20) Chuyển thẳng vào thẻ Vietcombank cho tao.
-(17/07 • 10:45) Em vừa chuyển rồi đó anh, check tk hộ em nhé.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 14),
-  ('case_000', 'thread_th_m_t_', 'Thím Tư', '0964.881.332', 'Thím Tư', 'received', '(02/07 • 08:30) Khang ơi ở quê chú thím vừa gửi buồng chuối ngự với bao gạo nếp lên xe khách Mỹ Đình, trưa cháu ra bến đón lấy nhé.
-> (03/07 • 09:15) Cháu bận không đi được đâu, thím bảo phụ xe gọi xe ôm ship tận nhà cho cháu, cháu trả tiền ship.
-(15/07 • 16:20) Cuối tháng giỗ ông nội ở quê cháu có sắp xếp về được không Khang? Cả họ ai cũng hỏi thăm.', NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, 15);
+Anh xem chúng mình đẹp đôi chưa nè', '21/07 19:03', NULL, false, NULL, NULL, NULL, NULL, NULL, 25),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Hnay em nấu canh cua rau đay, anh thích món đó mà. 
+Để em mang sag cho anh nhé? Em biết anh hay quên ăn tối...', '22/07 21:17', NULL, false, NULL, NULL, NULL, NULL, NULL, 26),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Sao anh ko trả lời em?
+Em để phần anh trong hộp cơm ở trước cửa nhé. Anh nhớ lấy vào ăn kẻo nguội.', '22/07 22:03', NULL, false, NULL, NULL, NULL, NULL, NULL, 27),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Em thấy hộp cơm hôm qua anh đã lấy vào rồi 🥰
+Vậy là anh có ăn pk? Chiều nay em nghỉ sớm, hay để em ghé qua dọn nhà cho anh nha?', '23/07 12:44', NULL, false, NULL, NULL, NULL, NULL, NULL, 28),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Nạn nhân', 'sent', 'Đừng có sang. Bận.', '23/07 14:51', NULL, false, NULL, NULL, NULL, NULL, NULL, 29),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', 'Anh ơi, em vừa sao xong mẻ trà hoa cúc mới, thơm lắm anh. Lát anh có ở nhà ko, em mang qua nhé?', '24/07 19:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 30),
+  ('case_000', 'thread_h_', 'Hà', '0984.112.568', 'Hà', 'received', '[AUDIO: https://drive.google.com/file/d/1xFjEvvM5uE7zkXD93OIVY_NQNNH-tpvz/view?usp=drive_link]', '24/07 20:32', NULL, false, NULL, NULL, NULL, NULL, NULL, 31),
+  ('case_000', 'thread_0988_200_991', '0988.200.991', '0988.200.991', 'Nạn nhân', 'sent', 'Hạn 20 rồi mày không thấy lịch à. 300 triệu không phải 300 nghìn. Tắt máy trốn thì tao tìm đến tận nhà mày.', '21/07 09:14', NULL, false, NULL, NULL, NULL, NULL, NULL, 32),
+  ('case_000', 'thread_0988_200_991', '0988.200.991', '0988.200.991', 'Nạn nhân', 'sent', 'Mày nghĩ tắt máy là xong à?', '22/07 20:31', NULL, false, NULL, NULL, NULL, NULL, NULL, 33),
+  ('case_000', 'thread_0988_200_991', '0988.200.991', '0988.200.991', 'Nạn nhân', 'sent', 'Ngày mai không gọi lại tao thì tao cho rải giấy nợ để cả phố biết mặt thằng rể quý nhà họ Nguyễn.', '22/07 20:31', NULL, false, NULL, NULL, NULL, NULL, NULL, 34),
+  ('case_000', 'thread_0988_200_991', '0988.200.991', '0988.200.991', 'Nạn nhân', 'sent', 'T cho m cơ hội cuối. Tối nay qua nhà tao nói chuyện cho đàng hoàng. Không thì ngày mai tao ghé nhà máy thăm bố vợ mày luôn thể.', '24/07 18:12', NULL, false, NULL, NULL, NULL, NULL, NULL, 35),
+  ('case_000', 'thread_viettel_km', 'VIETTEL_KM', '198', 'VIETTEL_KM', 'received', '[QC] Duy nhat ngay 05/07/2016, Viettel KM 50% gia tri the nap cho thue bao tra truoc. Chi tiet lien he 198 (0d).', '05/07 08:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 36),
+  ('case_000', 'thread_viettel_km', 'VIETTEL_KM', '198', 'VIETTEL_KM', 'received', '[QC] Tu 00h-24h ngay 20/07/2016, Viettel KM 50% gia tri the nap cho thue bao tra truoc (25% cong vao TK KM, 25% cong vao TK KM2). Chi tiet LH 198 (0d).', '20/07 08:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 37),
+  ('case_000', 'thread_viettel_km', 'VIETTEL_KM', '198', 'VIETTEL_KM', 'received', '[QC] Dang ky goi cuoc 3G Mimax chi voi 70.000d/thang co ngay 600MB toc do cao, het luu luong truy cap mien phi. Soan MIMAX gui 191.', '23/07 10:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 38),
+  ('case_000', 'thread_0912_331_888', '0912.331.888', '0912.331.888', '0912.331.888', 'received', '20 năm qua mày sống tốt nhỉ', '22/07 20:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 39),
+  ('case_000', 'thread_0912_331_888', '0912.331.888', '0912.331.888', 'Nạn nhân', 'sent', 'Thằng nào đấy?', '22/07 20:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 40),
+  ('case_000', 'thread_c_m_ch__ba', 'Cơm Chị Ba', '0908.334.991', 'Nạn nhân', 'sent', 'Cho em 2 suất sườn bì chả nhiều ớt cay qua 14 Bờ Sông chị nhé.', '18/07 11:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 41),
+  ('case_000', 'thread_c_m_ch__ba', 'Cơm Chị Ba', '0908.334.991', 'Cơm Chị Ba', 'received', 'Có ngay em ơi, 15 phút nữa chú xe ôm mang qua nhé.', '18/07 11:25', NULL, false, NULL, NULL, NULL, NULL, NULL, 42),
+  ('case_000', 'thread_c_m_ch__ba', 'Cơm Chị Ba', '0908.334.991', 'Nạn nhân', 'sent', 'Trưa nay có cá kho tộ với canh chua không chị?', '22/07 11:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 43),
+  ('case_000', 'thread_c_m_ch__ba', 'Cơm Chị Ba', '0908.334.991', 'Cơm Chị Ba', 'received', 'Có cá hú kho tộ ngon lắm em, lấy thêm chén canh chua nha?', '22/07 11:32', NULL, false, NULL, NULL, NULL, NULL, NULL, 44),
+  ('case_000', 'thread_c_m_ch__ba', 'Cơm Chị Ba', '0908.334.991', 'Nạn nhân', 'sent', 'Vâng cho 1 phần cơm cá kho + canh chua.', '22/07 11:33', NULL, false, NULL, NULL, NULL, NULL, NULL, 45),
+  ('case_000', 'thread_ch__h_nh_gi_t_l_', 'Chị Hạnh Giặt Là', '0914.556.789', 'Nạn nhân', 'sent', 'Chị Hạnh ơi em gửi thằng đệ mang 1 cái áo khoác da với 2 chăn lông qua giặt khô, làm cẩn thận hộ em.', '12/07 16:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 46),
+  ('case_000', 'thread_ch__h_nh_gi_t_l_', 'Chị Hạnh Giặt Là', '0914.556.789', 'Chị Hạnh Giặt Là', 'received', 'Rồi chị nhận được rồi, giặt hấp da mất 2-3 hôm em nhé.', '12/07 16:10', NULL, false, NULL, NULL, NULL, NULL, NULL, 47),
+  ('case_000', 'thread_ch__h_nh_gi_t_l_', 'Chị Hạnh Giặt Là', '0914.556.789', 'Chị Hạnh Giặt Là', 'received', 'Đồ giặt xong rồi em ơi, tiện ghé lấy nhé.', '15/07 17:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 48),
+  ('case_000', 'thread_ch__h_nh_gi_t_l_', 'Chị Hạnh Giặt Là', '0914.556.789', 'Chị Hạnh Giặt Là', 'received', 'Khang ơi áo da với chăn của em giặt xong cả tuần rồi để chật tiệm quá, chiều tiện ghé 42 Khâm Thiên lấy hộ chị.', '21/07 15:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 49),
+  ('case_000', 'thread_ch__h_nh_gi_t_l_', 'Chị Hạnh Giặt Là', '0914.556.789', 'Nạn nhân', 'sent', 'Vâng chiều em cho thằng Long qua vác về.', '21/07 15:35', NULL, false, NULL, NULL, NULL, NULL, NULL, 50),
+  ('case_000', 'thread_long_s_o', 'Long Sẹo', '0979.441.223', 'Long Sẹo', 'received', 'Anh Khang ơi em dán xong 50 tờ thông báo nợ quanh khu chợ đầu mối rồi nhé.', '08/07 09:10', NULL, false, NULL, NULL, NULL, NULL, NULL, 51),
+  ('case_000', 'thread_long_s_o', 'Long Sẹo', '0979.441.223', 'Nạn nhân', 'sent', 'Tốt, tối lượn qua bến phà ngó xem có động tĩnh gì không.', '08/07 09:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 52),
+  ('case_000', 'thread_long_s_o', 'Long Sẹo', '0979.441.223', 'Nạn nhân', 'sent', 'Mày thấy thằng Hải Lác chạy xe ở bến chưa?', '19/07 14:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 53),
+  ('case_000', 'thread_long_s_o', 'Long Sẹo', '0979.441.223', 'Long Sẹo', 'received', 'Em đảo qua 2 vòng mà bọn xe ôm bảo nó nghỉ ốm mấy hôm nay rồi anh ạ.', '19/07 16:45', NULL, false, NULL, NULL, NULL, NULL, NULL, 54),
+  ('case_000', 'thread_long_s_o', 'Long Sẹo', '0979.441.223', 'Long Sẹo', 'received', 'Anh ơi em vừa tóm được quả xe Dream của nó dựng ở quán nước đầu bến!', '21/07 11:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 55),
+  ('case_000', 'thread_long_s_o', 'Long Sẹo', '0979.441.223', 'Nạn nhân', 'sent', 'Giữ luôn chìa khóa xe nó, bảo khi nào mang đủ 75 triệu đến nhà tao thì trả xe.', '21/07 11:16', NULL, false, NULL, NULL, NULL, NULL, NULL, 56),
+  ('case_000', 'thread_tu_n_b_o_x__ng_m_c', 'Tuấn Béo Xưởng Mộc', '0902.998.114', 'Nạn nhân', 'sent', 'Tuấn, tiền gỗ đợt trước 45 triệu đến hạn rồi. Chiều tao cho người qua lấy.', '08/06 09:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 57),
+  ('case_000', 'thread_tu_n_b_o_x__ng_m_c', 'Tuấn Béo Xưởng Mộc', '0902.998.114', 'Tuấn Béo Xưởng Mộc', 'received', 'Anh Khang ơi đợt này bên chủ nhà họ chậm thanh toán quá, anh thư thư cho em mấy hôm với ạ.', '08/06 09:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 58),
+  ('case_000', 'thread_tu_n_b_o_x__ng_m_c', 'Tuấn Béo Xưởng Mộc', '0902.998.114', 'Nạn nhân', 'sent', 'Mấy hôm của mày là nửa tháng rồi đấy à? Đừng để tao phải mang mấy anh em xuống tận xưởng mộc bốc máy cưa máy bào đi.', '25/06 14:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 59),
+  ('case_000', 'thread_tu_n_b_o_x__ng_m_c', 'Tuấn Béo Xưởng Mộc', '0902.998.114', 'Tuấn Béo Xưởng Mộc', 'received', 'Em lạy anh, anh cho em xin đến đầu tháng 7 công trình xong em thanh toán đủ cả gốc lẫn lãi cho anh!', '25/06 14:45', NULL, false, NULL, NULL, NULL, NULL, NULL, 60),
+  ('case_000', 'thread_tu_n_b_o_x__ng_m_c', 'Tuấn Béo Xưởng Mộc', '0902.998.114', 'Nạn nhân', 'sent', '🎙️ [Tin nhắn thoại 0:06] [Khôn hồn thì trả đúng hạn cho bố nghe chưa? Không thì t cho cả mày và cái xưởng của mày sáng nhất Hà Nội đấy. Ông đây đếch phải chưa từng cho thằng nào bay màu đâu nhé]', '21/07 10:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 61),
+  ('case_000', 'thread_tu_n_b_o_x__ng_m_c', 'Tuấn Béo Xưởng Mộc', '0902.998.114', 'Nạn nhân', 'sent', 'Biết điều đấy, trước 30/7 nốt 25 triệu còn lại không thì đừng trách tao.', '21/07 10:25', NULL, false, NULL, NULL, NULL, NULL, NULL, 62),
+  ('case_000', 'thread_vnpt_notice', 'VNPT_Notice', 'VNPT', 'VNPT_Notice', 'received', '[Thong bao] Cuoc Internet FiberVNN thang 06/2016 cua thue bao 0904888666 la 220.000d. Han thanh toan: 20/07/2016.', '10/07 08:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 63),
+  ('case_000', 'thread_vnpt_notice', 'VNPT_Notice', 'VNPT', 'VNPT_Notice', 'received', '[Thong bao] Thue bao 0904888666 da thanh toan cuoc Internet FiberVNN thang 06/2016 so tien 220.000d qua ViettinBank. Cam on Quy khach.', '21/07 08:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 64),
+  ('case_000', 'thread_tu_n_bia_88', 'Tuấn Bia 88', '0945.888.188', 'Tuấn Bia 88', 'received', 'Tối nay chung kết Euro Pháp - Bồ Đào Nha ra quán làm nồi lẩu xem bóng đá không Khang ơi? Có mấy anh em xóm Cảng nữa.', '10/07 17:40', NULL, false, NULL, NULL, NULL, NULL, NULL, 65),
+  ('case_000', 'thread_tu_n_bia_88', 'Tuấn Bia 88', '0945.888.188', 'Nạn nhân', 'sent', 'Bận rồi, tối phải đi chốt mấy khoản họ.', '10/07 18:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 66),
+  ('case_000', 'thread_tu_n_bia_88', 'Tuấn Bia 88', '0945.888.188', 'Nạn nhân', 'sent', 'Trưa nay quán có lòng non với cháo lòng không ông?', '15/07 11:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 67),
+  ('case_000', 'thread_tu_n_bia_88', 'Tuấn Bia 88', '0945.888.188', 'Tuấn Bia 88', 'received', 'Có luôn ông ơi, vừa mổ lòng tươi rói. Ra nhanh kẻo hết.', '15/07 11:22', NULL, false, NULL, NULL, NULL, NULL, NULL, 68),
+  ('case_000', 'thread_tu_n_bia_88', 'Tuấn Bia 88', '0945.888.188', 'Tuấn Bia 88', 'received', 'Khang ơi, tối nay rảnh ra làm vài cốc bia hơi phố cổ không ông? Lô bia hơi Hà Nội mới về mát lịm.', '20/07 18:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 69),
+  ('case_000', 'thread_tu_n_bia_88', 'Tuấn Bia 88', '0945.888.188', 'Nạn nhân', 'sent', 'Tối bận đi thu nợ rồi ông. Để bữa khác.', '20/07 18:45', NULL, false, NULL, NULL, NULL, NULL, NULL, 70),
+  ('case_000', 'thread_duy_bida_88', 'Duy Bida 88', '0916.334.556', 'Duy Bida 88', 'received', 'Chiều nay rảnh qua CLB làm độ bida lỗ 500k/ván với thằng Nam không anh Khang?', '05/07 14:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 71),
+  ('case_000', 'thread_duy_bida_88', 'Duy Bida 88', '0916.334.556', 'Nạn nhân', 'sent', 'Chiều bận, tối 8h tao qua.', '05/07 14:45', NULL, false, NULL, NULL, NULL, NULL, NULL, 72),
+  ('case_000', 'thread_duy_bida_88', 'Duy Bida 88', '0916.334.556', 'Duy Bida 88', 'received', 'Bàn số 1 vừa thay nỉ nhập khẩu mới mượt lắm anh ơi, tối rảnh qua test bàn.', '18/07 19:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 73),
+  ('case_000', 'thread_duy_bida_88', 'Duy Bida 88', '0916.334.556', 'Nạn nhân', 'sent', 'Dạo này đang bận mấy vụ gom tiền, để cuối tuần.', '20/07 11:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 74),
+  ('case_000', 'thread_195', '195', '195', '195', 'received', 'Tai khoan cua Quy khach da duoc cong 500.000d tu the cao nap ngay 20/07/2016. So du hien tai: 584.250d. Thoi han su dung den 30/12/2016.', '20/07 09:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 75),
+  ('case_000', 'thread_th_ng_s_a_xe', 'Thắng Sửa Xe', '0977.112.445', 'Nạn nhân', 'sent', 'Con SH của anh dạo này đi nồi kêu rè rè với phanh trước bị bó, chiều anh vứt qua xưởng chú coi hộ.', '14/07 10:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 76),
+  ('case_000', 'thread_th_ng_s_a_xe', 'Thắng Sửa Xe', '0977.112.445', 'Thắng Sửa Xe', 'received', 'Vâng anh cứ vứt qua xưởng để em kiểm tra kỹ cho.', '14/07 10:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 77),
+  ('case_000', 'thread_th_ng_s_a_xe', 'Thắng Sửa Xe', '0977.112.445', 'Thắng Sửa Xe', 'received', 'Anh Khang ơi tháo ra thấy mòn hết bố ba càng với bi nồi rồi, em thay luôn bộ mới xịn của Honda nhé? Tổng tầm hơn triệu.', '16/07 15:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 78),
+  ('case_000', 'thread_th_ng_s_a_xe', 'Thắng Sửa Xe', '0977.112.445', 'Nạn nhân', 'sent', 'Ừ thay luôn đồ ngon cho anh.', '18/07 09:10', NULL, false, NULL, NULL, NULL, NULL, NULL, 79),
+  ('case_000', 'thread_th_ng_s_a_xe', 'Thắng Sửa Xe', '0977.112.445', 'Thắng Sửa Xe', 'received', 'Xe SH của anh thay dầu với làm nồi xong rồi nhé, tổng hết 850k anh nhé. Chiều rảnh ghé lấy.', '18/07 14:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 80),
+  ('case_000', 'thread_qu_n_l____', 'Quân Lô Đề', '0982.441.667', 'Nạn nhân', 'sent', 'Vào cho tao cặp 68 - 86 mỗi con 500 điểm lô, đề đít 8 năm trăm nghìn.', '16/07 16:45', NULL, false, NULL, NULL, NULL, NULL, NULL, 81),
+  ('case_000', 'thread_qu_n_l____', 'Quân Lô Đề', '0982.441.667', 'Quân Lô Đề', 'received', 'Đã nhận đủ bảng của anh Khang nhé. Chúc anh rực rỡ!', '16/07 17:00', NULL, false, NULL, NULL, NULL, NULL, NULL, 82),
+  ('case_000', 'thread_qu_n_l____', 'Quân Lô Đề', '0982.441.667', 'Quân Lô Đề', 'received', 'Nổ 68 hai nháy anh ơiii!! Tổng ăn 80 củ, trừ gốc còn lời 62 củ. Mai anh lấy tiền mặt hay bắn tài khoản?', '16/07 18:35', NULL, false, NULL, NULL, NULL, NULL, NULL, 83),
+  ('case_000', 'thread_qu_n_l____', 'Quân Lô Đề', '0982.441.667', 'Nạn nhân', 'sent', 'Chuyển thẳng vào thẻ Vietcombank cho tao.', '17/07 10:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 84),
+  ('case_000', 'thread_qu_n_l____', 'Quân Lô Đề', '0982.441.667', 'Quân Lô Đề', 'received', 'Em vừa chuyển rồi đó anh, check tk hộ em nhé.', '17/07 10:45', NULL, false, NULL, NULL, NULL, NULL, NULL, 85),
+  ('case_000', 'thread_th_m_t_', 'Thím Tư', '0964.881.332', 'Thím Tư', 'received', 'Khang ơi ở quê chú thím vừa gửi buồng chuối ngự với bao gạo nếp lên xe khách Mỹ Đình, trưa cháu ra bến đón lấy nhé.', '02/07 08:30', NULL, false, NULL, NULL, NULL, NULL, NULL, 86),
+  ('case_000', 'thread_th_m_t_', 'Thím Tư', '0964.881.332', 'Nạn nhân', 'sent', 'Cháu bận không đi được đâu, thím bảo phụ xe gọi xe ôm ship tận nhà cho cháu, cháu trả tiền ship.', '03/07 09:15', NULL, false, NULL, NULL, NULL, NULL, NULL, 87),
+  ('case_000', 'thread_th_m_t_', 'Thím Tư', '0964.881.332', 'Thím Tư', 'received', 'Cuối tháng giỗ ông nội ở quê cháu có sắp xếp về được không Khang? Cả họ ai cũng hỏi thăm.', '15/07 16:20', NULL, false, NULL, NULL, NULL, NULL, NULL, 88);
 
 -- 5. phone_notes/phone_browser/phone_bank: 12 records from Sheet tab "apps"
 
