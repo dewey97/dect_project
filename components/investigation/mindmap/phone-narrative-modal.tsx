@@ -35,8 +35,8 @@ export function PhoneNarrativeModal({
       (c) =>
         c.kind === "phone_lookup" ||
         c.id.includes("phone") ||
-        !c.depends_on ||
-        c.depends_on.length === 0,
+        !c.dependsOn ||
+        c.dependsOn.length === 0,
     ) || checkpoints[0];
   const dateLabel = cp0?.title || "Thành công xác minh danh tính các thuê bao.";
   const storyText =

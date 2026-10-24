@@ -180,13 +180,13 @@ export function CulpritEpilogueModal({
       checkpoints.find(
         (c) =>
           c.kind === "suspect_interrogation" &&
-          (c.subject_key === targetCulprit ||
+          (c.subjectKey === targetCulprit ||
             c.id?.endsWith(`-${targetCulprit}`)),
       ) || matchedCp;
     const epilogueCp = checkpoints.find(
       (c) =>
         c.kind === "epilogue" &&
-        (c.subject_key === targetCulprit || c.id?.includes(targetCulprit)),
+        (c.subjectKey === targetCulprit || c.id?.includes(targetCulprit)),
     );
     storyText =
       suspectCp?.narrative ||

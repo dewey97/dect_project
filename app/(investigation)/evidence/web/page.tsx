@@ -33,6 +33,7 @@ import type {
   CombinedItem,
 } from "@/components/investigation/evidence/evidence-types";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
+import { CASE_000_PDFS } from "@/components/investigation/evidence/evidence-data";
 import {
   PhaseUnlockedModal,
   type UnlockedModalData,

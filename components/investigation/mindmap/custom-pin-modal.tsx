@@ -84,7 +84,7 @@ export function CustomPinModal({
         (c) =>
           (c.title && text.includes(c.title.toLowerCase())) ||
           (c.dossier && text.includes(`hồ sơ ${c.dossier.toLowerCase()}`)) ||
-          (c.subject_key && text.includes(c.subject_key.toLowerCase())),
+          (c.subjectKey && text.includes(c.subjectKey.toLowerCase())),
       );
       if (titleMatch) return titleMatch.id;
 

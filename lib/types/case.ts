@@ -172,6 +172,9 @@ export interface Checkpoint {
   unlockedEvidenceId?: string;
   nodeId?: string;
   followupOf?: string;
+  dependsOn?: string;
+  /** Dẫn truyện narrative trực tiếp từ Checkpoint Studio (cột narrative). */
+  narrative?: string;
   suspectId?: string;
   status: "locked" | "active" | "completed";
   dossier?: string;

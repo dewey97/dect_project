@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from "react";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
-import type { PhaseNarrative } from "@/lib/types";
+import type { Checkpoint, PhaseNarrative } from "@/lib/types";
 
 export const DEFAULT_NARRATIVES: Record<
   number,
@@ -67,7 +67,7 @@ const GENERIC_FALLBACK_NARRATIVES: Record<
 };
 
 function resolveCheckpointForPhase(
-  checkpoints: Record<string, unknown>[],
+  checkpoints: Checkpoint[],
   phase: number,
   _caseId: string,
 ) {
@@ -88,8 +88,8 @@ function resolveCheckpointForPhase(
     const p0 = checkpoints.find(
       (c) =>
         c.kind === "phone_lookup" ||
-        !c.depends_on ||
-        c.depends_on.length === 0 ||
+        !c.dependsOn ||
+        c.dependsOn.length === 0 ||
         c.id?.includes("phone"),
     );
     if (p0) return p0;

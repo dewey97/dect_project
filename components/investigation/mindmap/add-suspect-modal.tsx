@@ -220,7 +220,7 @@ export function AddSuspectModal({
     const bySubjectKey = checkpoints.find(
       (c) =>
         c.kind === "suspect_interrogation" &&
-        (c.subject_key === charKey || c.id?.endsWith(`-${charKey}`)),
+        (c.subjectKey === charKey || c.id?.endsWith(`-${charKey}`)),
     );
     if (bySubjectKey) return bySubjectKey.id;
 
@@ -241,7 +241,7 @@ export function AddSuspectModal({
         setStorageItem("last_interacted_checkpoint", suspectCpId);
 
         const suspectKey =
-          matchedCheckpoint?.subject_key ||
+          matchedCheckpoint?.subjectKey ||
           matchedCheckpoint?.suspectId ||
           matchedCheckpoint?.followupOf ||
           matchedChar?.id ||
