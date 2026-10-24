@@ -48,8 +48,12 @@
 | `7fcaded` | feat(evidence): add Evidence Studio, case_evidence table, and dual-source hook (M1-M3, M10, M12)                                      | WT-2, 18 files, migration 35            |
 | `49ff202` | refactor(narrative): remove cp-000 hardcodes, add dynamic checkpoint lookup (M4-M5, M8)                                               | WT-3, 19 files, migration 36            |
 | `01031c0` | fix(types): align Checkpoint snake_case props to camelCase after worktree merge                                                       | Post-merge, 7 files                     |
+| `479a140` | docs: update roadmap, changelog, techdebt after worktree merge; integrate duplicateEvidenceData                                       |                                         |
+| `1021a15` | data: add phone-migration.sql review output from Google Sheets extraction                                                             |                                         |
+| `261aeb5` | data: reseed all case_000 from Google Sheets, remove hardcoded/junk data                                                              | Migration 37 **đã chạy production**     |
+| `5f3e6a9` | fix(data): parse message threads into individual rows with sent/received roles                                                        | Migration 37 v2 **đã chạy production**  |
 
-### 1.2. Kiểm tra gần nhất (sau commit `01031c0`, 2026-10-24)
+### 1.2. Kiểm tra gần nhất (sau commit `5f3e6a9`, 2026-10-24)
 
 | Lệnh                                     | Kết quả       |
 | ---------------------------------------- | ------------- |
@@ -57,11 +61,18 @@
 | `NEXT_DIST_DIR=.next_dev npx next build` | Chưa chạy lại |
 | `pnpm test:e2e`                          | Chưa chạy lại |
 
-Typecheck clean sau merge 4 worktree + post-merge fix. Working tree sạch. 72 commits ahead of origin.
+Typecheck clean sau merge 4 worktree + post-merge fix. Working tree sạch. 76 commits ahead of origin.
 
 ### 1.3. Database production (Supabase project `zalyxhmwwmfyexoilejp`)
 
-- Migration đã chạy: `21_security_hardening_rls.sql`, `22_case_slug.sql`, `23_case_characters.sql`, `24_runtime_data_tables.sql`, `25_private_is_admin.sql`, `26_checkpoint_kind.sql`, `27_checkpoint_server_grading.sql`, `28_checkpoint_config_normalize.sql`.
+- Migration đã chạy: `21` → `37` (đầy đủ 21–37).
+  - 21–28: security, case_slug, characters, runtime data, private is_admin, checkpoint kind/grading/normalize.
+  - 29: boardgame_pins FK normalization.
+  - 30–34: phone tables (case_phone_apps, contacts, calls, messages, photos, notes, bank, browser, storage bucket).
+  - 35: case_evidence table + seed.
+  - 36: answer_config backfill interrogation criteria.
+  - 37: **reseed toàn bộ case_000 từ Google Sheets** — thay thế hardcode.
+- Data production (case_000): 54 evidence, 39 contacts, 21 calls, 89 messages (16 threads parsed sent/received), 2 notes, 4 safari history, 6 bank transactions. Junk apps xóa sạch.
 - `cases`: `case_000` ("TRỐN TÌM"), `case_001` ("test"). Slug do trigger `assign_case_slug` cấp.
 - `case_characters`: 10 nhân vật case_000 (1 nạn nhân, 6 nghi phạm, 1 nhân chứng, 2 liên quan).
 - `case_checkpoints`: 9 checkpoint case_000, 100% đã có `kind` và `subject_key` chuẩn hóa.
@@ -85,13 +96,14 @@ Typecheck clean sau merge 4 worktree + post-merge fix. Working tree sạch. 72 c
 | C        | C1-C7: ✅ Hoàn thành toàn bộ                                                                                                      | Claude            | ✅ Done       |
 | D        | D7 giảm `any`: ✅ Đợt 1 (4 file) + Đợt 2 (44 file, WT-5). Còn ~50 chỗ (chủ yếu admin-create-pin-modal, main-investigation-canvas) | Claude            | ✅ 2 đợt xong |
 | E        | Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`                                                                       | Chủ dự án         | ⛔ Chờ owner  |
-| Phone    | ✅ Phone Studio code + E2E auth + specs (absorbed into WT-5). Migration 30–34 chờ duyệt.                                          | WT-5              | ✅ Code done  |
-| M1–M12   | ✅ Evidence DB (M1-M3, M10, M12), Narrative (M4-M5, M8), Pin Photos (M9). Migration 35-36 chờ duyệt.                              | WT-2→WT-4         | ✅ Code done  |
-| Tích hợp | Worktree merge + post-merge typecheck + `duplicateEvidenceData` integration. Xóa worktree + nhánh chưa làm.                       | Claude            | 🟡 Gần xong   |
+| Phone    | ✅ Phone Studio + E2E + migration 30–34 + data seeded from Sheets (migration 37).                                                 | WT-5 + Claude     | ✅ Done       |
+| M1–M12   | ✅ Evidence DB (M1-M3, M10, M12), Narrative (M4-M5, M8), Pin Photos (M9). Migration 35-37 đã chạy production.                     | WT-2→WT-4         | ✅ Done       |
+| Data     | ✅ Reseed toàn bộ case_000 từ Google Sheets: 54 evidence, 39 contacts, 89 messages, 21 calls, apps parsed. Junk apps xóa.         | Claude            | ✅ Done       |
+| Tích hợp | ✅ Worktree merge + post-merge typecheck + `duplicateEvidenceData` integration. Xóa worktree + nhánh chưa làm.                    | Claude            | ✅ Done       |
 
 Xem plan worktree chi tiết: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md).
 
-**Đã hoàn tất (cập nhật 2026-10-24):** Migration 24–28 đã chạy production. B6-cleanup, A5, A9, L1, L2, B2–B6, C1–C7, D3, D7 (2 đợt), D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard. Phone Studio P1–P30 + E2E. Evidence DB M1-M3, M10, M12 (WT-2). Narrative M4-M5, M8 (WT-3). Pin Photos M9 (WT-4). Type reduction D7 batch 2 (WT-5). 4 worktree merged vào main, post-merge type alignment done.
+**Đã hoàn tất (cập nhật 2026-10-24):** Migration 21–37 đã chạy production. B6-cleanup, A5, A9, L1, L2, B2–B6, C1–C7, D3, D7 (2 đợt), D8, D11, E (chia scripts), fix bug grader, waitlist RLS, admin client env guard. Phone Studio P1–P30 + E2E. Evidence DB M1-M3, M10, M12 (WT-2). Narrative M4-M5, M8 (WT-3). Pin Photos M9 (WT-4). Type reduction D7 batch 2 (WT-5). 4 worktree merged vào main, post-merge type alignment done. **Data reseed case_000 từ Google Sheets** (migration 37): 54 evidence, 39 contacts, 89 messages (16 threads parsed sent/received), 21 calls, 2 notes, 4 safari, 6 bank. Hardcoded data + junk apps xóa sạch.
 
 ---
 
@@ -329,13 +341,7 @@ Hoàn tất: xóa heuristic chuỗi trong grader, admin client throw ở `NODE_E
 1. **Đặt env** trên VPS (`.env` ở thư mục dự án, container Docker đọc qua `env_file`):
    - `SUPABASE_SERVICE_ROLE_KEY=<lấy ở Supabase Dashboard → Project Settings → API → service_role>`
    - Reload compose: `docker compose up -d` (chưa cần image mới).
-2. **Chạy migration production** (Supabase Dashboard → SQL Editor hoặc `supabase db push`, theo thứ tự số):
-   - `db/schema/24_runtime_data_tables.sql`
-   - `db/schema/25_private_is_admin.sql`
-   - `db/schema/26_checkpoint_kind.sql`
-   - `db/schema/27_checkpoint_server_grading.sql`
-   - `db/schema/28_checkpoint_config_normalize.sql`
-   - Sau mỗi file: kiểm tra không lỗi, chạy `get_advisors security`.
+2. ~~Chạy migration production~~ ✅ Migration 21–37 đã chạy production. Không còn migration chờ duyệt.
 3. **Import dữ liệu runtime cũ** (nếu muốn giữ): `node scripts/ops/import-runtime-data.mjs` → sinh SQL vào `.tmp/`, apply qua Dashboard.
 4. **`git push origin main`**, theo dõi GitHub Actions (job `preflight` + `build-and-push`) rồi bước deploy VPS.
 5. **Smoke test production:**
@@ -597,8 +603,8 @@ Sau B6, GM tạo `case_001`:
 1. Push và theo dõi deploy (mục 5).
 2. Rotate toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase...), sau đó cho phép `git rm --cached .env`.
 3. Bật Leaked Password Protection (Supabase Dashboard → Auth → Password security).
-4. Duyệt và chạy migration 24 (A5), 25 (A9), 26 (B2). ✅ Đã chạy 24–28.
-5. Duyệt và chạy migration 29–36 theo thứ tự (29: boardgame FK, 30–34: phone tables, 35: case_evidence, 36: answer_config backfill). Sau đó chạy `scripts/ops/migrate-phone-sheets.mjs`.
+4. ~~Duyệt và chạy migration 24–28.~~ ✅ Đã chạy 24–37 toàn bộ.
+5. ~~Duyệt và chạy migration 29–36.~~ ✅ Đã chạy production (29–37). Data reseed từ Google Sheets hoàn tất.
 6. Quyết định `archive_3d_vault`, `evidence-theme-context.tsx`.
 7. Restart dev server cổng 3000 (`rm -rf .next/dev/cache`).
-8. `git push origin main` (72 commits ahead).
+8. `git push origin main` (76 commits ahead).

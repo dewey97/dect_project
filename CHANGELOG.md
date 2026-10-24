@@ -39,9 +39,17 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ### Database & Schema
 
+- Migration 29–34: boardgame FK normalization, phone tables (apps, contacts, calls, messages, photos, notes, bank, browser), storage bucket.
 - Migration 35: `case_evidence` table + `evidence-assets` bucket + seed data.
 - Migration 36: Backfill checkpoint `answer_config` fields.
-- (Cả 2 migration chờ owner duyệt chạy production.)
+- Migration 37: **Reseed toàn bộ case_000 từ Google Sheets Live CMS** — thay thế hardcoded data.
+  - Evidence: 8 → 54 records (đầy đủ từ Sheet tab `evidences`).
+  - Contacts: 39 records (3 bỏ do thiếu tên trên Sheet).
+  - Calls: 21 records với `date_str`, `time_str`, `display_name` từ Sheet.
+  - Messages: 89 rows parsed từ 16 threads (format `>` = sent, không `>` = received, timestamp riêng từng tin).
+  - Notes: 2, Safari: 4, Bank: 6 (từ Sheet tab `apps` phân loại NOTE/SAFARI/BANK).
+  - Junk apps (`app_0`..`app_11`) xóa sạch.
+- Tất cả migration 21–37 **đã chạy production**.
 
 ---
 
