@@ -7,9 +7,12 @@ import { useRoomSync } from "@/components/investigation/room-sync-context";
 import { RoomModal } from "@/components/investigation/room-modal";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { cn } from "@/lib/utils";
+import { FileText, Layers } from "lucide-react";
 
 interface GameDesktopHeaderProps {
   className?: string;
+  viewMode?: "single" | "canvas";
+  onViewModeChange?: (mode: "single" | "canvas") => void;
 }
 
 /**
@@ -17,8 +20,13 @@ interface GameDesktopHeaderProps {
  * Bố cục 3 cột đối xứng đảm bảo cụm Nav ở giữa luôn căn chính giữa tuyệt đối.
  * Hiển thị 3 lối tắt gameplay thiết yếu: Sổ tay hướng dẫn, Chơi nhóm, Báo lỗi.
  * Định dạng chữ proper case, không dùng uppercase, không kèm icon rườm rà.
+ * Cột phải tích hợp bộ chuyển đổi chế độ xem Soi đơn / Bàn hồ sơ và avatar profile.
  */
-export function GameDesktopHeader({ className }: GameDesktopHeaderProps) {
+export function GameDesktopHeader({
+  className,
+  viewMode = "single",
+  onViewModeChange,
+}: GameDesktopHeaderProps) {
   const { roomCode } = useRoomSync();
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
 
@@ -32,7 +40,7 @@ export function GameDesktopHeader({ className }: GameDesktopHeaderProps) {
       >
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
           {/* CỘT TRÁI: Logo XPLORE căn giữa trục dọc hoàn hảo */}
-          <div className="w-56 h-full flex items-center justify-start">
+          <div className="w-64 h-full flex items-center justify-start">
             <BrandMark
               href="/"
               className="h-full flex items-center"
@@ -75,8 +83,40 @@ export function GameDesktopHeader({ className }: GameDesktopHeaderProps) {
             </button>
           </nav>
 
-          {/* CỘT PHẢI: Avatar Profile thu nhỏ, cân bằng chiều rộng đối xứng */}
-          <div className="w-56 h-full flex items-center justify-end gap-3 text-muted-foreground">
+          {/* CỘT PHẢI: View Mode Switcher & Avatar Profile */}
+          <div className="w-64 h-full flex items-center justify-end gap-3 text-muted-foreground">
+            {onViewModeChange && (
+              <div className="flex items-center bg-[#15100c] p-0.5 rounded border border-[#3e2e20] text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={() => onViewModeChange("single")}
+                  className={cn(
+                    "flex items-center gap-1 px-2 py-1 rounded transition-colors text-xs font-medium cursor-pointer",
+                    viewMode === "single"
+                      ? "bg-[#d9a066]/20 text-[#f4e8d8] border border-[#d9a066]/50 shadow-sm"
+                      : "text-[#8a7768] hover:text-[#c4b3a3] hover:bg-[#251a13]"
+                  )}
+                  title="Chế độ soi một tài liệu đơn"
+                >
+                  <FileText className="size-3" />
+                  <span>Soi đơn</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onViewModeChange("canvas")}
+                  className={cn(
+                    "flex items-center gap-1 px-2 py-1 rounded transition-colors text-xs font-medium cursor-pointer",
+                    viewMode === "canvas"
+                      ? "bg-[#d9a066]/20 text-[#f4e8d8] border border-[#d9a066]/50 shadow-sm"
+                      : "text-[#8a7768] hover:text-[#c4b3a3] hover:bg-[#251a13]"
+                  )}
+                  title="Chế độ bàn hồ sơ trải rộng toàn cảnh"
+                >
+                  <Layers className="size-3" />
+                  <span>Bàn hồ sơ</span>
+                </button>
+              </div>
+            )}
             <UserNav size="sm" />
           </div>
         </div>

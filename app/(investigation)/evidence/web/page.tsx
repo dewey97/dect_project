@@ -38,6 +38,7 @@ import {
   type UnlockedModalData,
 } from "@/components/investigation/evidence/phase-unlocked-modal";
 import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
+import { DossierCanvasBoard } from "@/components/investigation/evidence/dossier-canvas-board";
 import { InvestigationMobileNav } from "@/components/investigation/evidence/investigation-mobile-nav";
 import { GameDesktopHeader } from "@/components/investigation/evidence/game-desktop-header";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
@@ -130,6 +131,36 @@ function WebEvidencePageContent() {
   // Cột 3 (Phải): Trình duyệt chi tiết PDF / Vật chứng / Phone (Viewer Inspector) - width cố định/resizable (320px -> 750px)
   const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
   const [isViewerExpanded, setIsViewerExpanded] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<"single" | "canvas">("single");
+
+  // Đọc preference chế độ xem tài liệu từ localStorage sau khi mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dect_evidence_view_mode");
+      if (saved === "canvas" || saved === "single") {
+        setViewMode(saved);
+        if (saved === "canvas") {
+          setIsViewerExpanded(true);
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const handleSetViewMode = useCallback((mode: "single" | "canvas") => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem("dect_evidence_view_mode", mode);
+    } catch {
+      // Ignore
+    }
+    if (mode === "canvas") {
+      setIsViewerExpanded(true);
+    } else {
+      setIsViewerExpanded(false);
+    }
+  }, []);
   const [isReinvestigationExpanded, setIsReinvestigationExpanded] =
     useState(false);
   const [dossierWidth, setDossierWidth] = useState<number>(300);
@@ -696,7 +727,10 @@ function WebEvidencePageContent() {
       className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start box-border min-h-0 min-w-0 select-none"
     >
       {/* DESKTOP HEADER (GIỐNG LANDING PAGE, CHỈ HIỂN THỊ TRÊN DESKTOP) */}
-      <GameDesktopHeader />
+      <GameDesktopHeader
+        viewMode={viewMode}
+        onViewModeChange={handleSetViewMode}
+      />
 
       {/* MOBILE VIEW SWITCHER (CHỈ HIỂN THỊ TRÊN MÀN HÌNH DI ĐỘNG < LG) */}
       <InvestigationMobileNav
@@ -768,7 +802,11 @@ function WebEvidencePageContent() {
           className={cn(
             "h-full flex-1 min-w-0 bg-[#16120e] border border-[#2d1e13] rounded-none overflow-hidden flex flex-col min-h-0 relative shadow-inner",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
-            mobileTab === "board" ? "flex w-full" : "hidden lg:flex",
+            mobileTab === "board"
+              ? "flex w-full"
+              : isViewerExpanded
+                ? "hidden"
+                : "hidden lg:flex",
           )}
         >
           {/* MAIN CANVAS */}
@@ -786,35 +824,38 @@ function WebEvidencePageContent() {
         </div>
 
         {/* RESIZABLE SPLIT DRAGGER GIỮA BẢNG ĐIỀU TRA VÀ TRÌNH DUYỆT CHI TIẾT (DESKTOP) */}
-        <div
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setIsDraggingRightSplit(true);
-          }}
-          className={cn(
-            "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
-            isDraggingRightSplit && "cursor-col-resize",
-          )}
-          title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Trình đọc chi tiết"
-        >
+        {!isViewerExpanded && (
           <div
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setIsDraggingRightSplit(true);
+            }}
             className={cn(
-              "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-              isDraggingRightSplit &&
-                "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+              isDraggingRightSplit && "cursor-col-resize",
             )}
+            title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Trình đọc chi tiết"
           >
-            <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div
+              className={cn(
+                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
+                isDraggingRightSplit &&
+                  "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
+              )}
+            >
+              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* CỘT 3 (BÊN PHẢI): TRÌNH DUYỆT CHI TIẾT HỒ SƠ & VẬT CHỨNG (RIGHT VIEWER INSPECTOR) */}
         <div
-          style={{
-            width: `${viewerWidth}px`,
-          }}
+          style={isViewerExpanded ? undefined : { width: `${viewerWidth}px` }}
           className={cn(
-            "hidden lg:flex shrink-0 min-w-[320px] h-full flex-col min-h-0 overflow-hidden relative border-l border-[#2d1e13]",
+            "h-full flex-col min-h-0 overflow-hidden relative border-l border-[#2d1e13]",
+            isViewerExpanded
+              ? "flex flex-1 w-full min-w-0"
+              : "hidden lg:flex shrink-0 min-w-[320px]",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
           )}
         >
@@ -865,8 +906,27 @@ function WebEvidencePageContent() {
                 setActiveModal(null);
               }}
             />
+          ) : viewMode === "canvas" ? (
+            /* DOSSIER CANVAS BOARD — TRẢI TOÀN BỘ TÀI LIỆU VỤ ÁN */
+            <DossierCanvasBoard
+              caseId={caseId}
+              pdfItems={pdfItems}
+              evidenceItems={evidenceItems}
+              dossierDocuments={dossierDocs}
+              selectedView={selectedView}
+              onSelectPdf={handleSelectPdf}
+              onSelectEvidence={handleSelectEvidence}
+              onOpenInspectModal={(view) => {
+                setSelectedView(view);
+                setActiveModal("mobile_pdf");
+              }}
+              onSwitchToSingleView={() => handleSetViewMode("single")}
+              isExpanded={isViewerExpanded}
+              onToggleExpand={() => setIsViewerExpanded((prev) => !prev)}
+              activeFilter={String(selectedPhaseFilter)}
+            />
           ) : (
-            /* EVIDENCE DETAIL INSPECTOR */
+            /* EVIDENCE DETAIL INSPECTOR — SOI ĐƠN LẺ 1 TÀI LIỆU */
             <EvidenceDetailInspector
               selectedView={selectedView}
               caseId={caseId}
