@@ -10,13 +10,13 @@ import { useOptionalCaseCharacters } from "@/components/investigation/case-chara
 
 interface CulpritEpilogueModalProps {
   isOpen: boolean;
-  culprit?: "vu" | "tung" | "ha" | string | null;
-  subjectKey?: "vu" | "tung" | "ha" | string | null;
+  culprit?: string | null;
+  subjectKey?: string | null;
   choice?: string | null;
   onClose: () => void;
   onOpenDossier?: (dossierType: "A" | "B" | "C") => void;
   onOpenFollowupQuestion?: (
-    targetCulprit?: "vu" | "tung" | "ha" | string,
+    targetCulprit?: string,
   ) => void;
   onOpenIndictment?: () => void;
   caseId?: string;
@@ -75,8 +75,6 @@ export function CulpritEpilogueModal({
       c.name.toLowerCase() === targetCulprit.toLowerCase(),
   );
 
-  const isVu = targetCulprit === "vu";
-  const isTung = targetCulprit === "tung";
   const isHa = targetCulprit === "ha";
   const isHaBoxSolved =
     (isHa || caseId !== "case-000") &&
@@ -87,7 +85,6 @@ export function CulpritEpilogueModal({
       choice === "indictment_ready");
   const isQuestionSolved = Boolean(choice) && !isHaBoxSolved;
   const showTwoChoiceButtons =
-    (isVu || isTung || caseId !== "case-000") &&
     isQuestionSolved &&
     !internalChoice;
 
@@ -104,15 +101,9 @@ export function CulpritEpilogueModal({
 
   const suspectName =
     matchedCharacter?.name ||
-    (isVu
-      ? "Lê Quang Vũ"
-      : isTung
-        ? "Nguyễn Thanh Tùng"
-        : isHa
-          ? "Trần Thị Hà"
-          : matchedCp?.title?.replace(/^Hồ sơ\s*[:\s]*/i, "") ||
-            targetCulprit ||
-            "Nghi phạm");
+    matchedCp?.title?.replace(/^Hồ sơ\s*[:\s]*/i, "") ||
+    targetCulprit ||
+    "Nghi phạm";
 
   const getCheckpointMonologue = (cpId: string) => {
     const cp = checkpoints.find((c) => c.id === cpId || c.id.endsWith(cpId));
@@ -132,15 +123,9 @@ export function CulpritEpilogueModal({
     return cp?.storyConfig?.monologue || "";
   };
 
-  let dateLabel = isVu
-    ? "THÔNG BÁO ĐIỀU TRA — LÊ QUANG VŨ"
-    : isTung
-      ? "THÔNG BÁO ĐIỀU TRA — NGUYỄN THANH TÙNG"
-      : isHaBoxSolved
-        ? `BẢN KẾT LUẬN ĐIỀU TRA — KẾT ÁN THỦ PHẠM ${suspectName.toUpperCase()}`
-        : isHa
-          ? "THÔNG BÁO ĐIỀU TRA — TRẦN THỊ HÀ"
-          : `THÔNG BÁO ĐIỀU TRA — ${suspectName.toUpperCase()}`;
+  let dateLabel = isHaBoxSolved
+    ? `BẢN KẾT LUẬN ĐIỀU TRA — KẾT ÁN THỦ PHẠM ${suspectName.toUpperCase()}`
+    : `THÔNG BÁO ĐIỀU TRA — ${suspectName.toUpperCase()}`;
 
   let storyText = "";
 

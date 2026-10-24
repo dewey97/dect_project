@@ -18,7 +18,7 @@ interface IndictmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmitIndictment: (data: {
-    culprit: "vu" | "tung" | "ha" | string;
+    culprit: string;
     suspectName: string;
     motive: string;
     selectedClueIds: string[];
@@ -51,7 +51,7 @@ function normalizeName(str: string): string {
 
 export function isCulpritValid(
   inputName: string,
-): "vu" | "tung" | "ha" | false {
+): string | false {
   if (isAdminBypassCode(inputName)) return "ha";
   const norm = normalizeName(inputName);
   if (norm.includes("vu") || norm.includes("lequangvu")) {
@@ -412,8 +412,8 @@ export function IndictmentModal({
                     className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-sm sm:text-base text-[#0e2b5c] font-sans font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
                   />
                   <datalist id="indictment-suspects-list">
-                    {suspectCharacters.map((c) => (
-                      <option key={c.id || c.key} value={c.name} />
+                    {suspectCharacters.map((c, idx) => (
+                      <option key={c.key || c.id || `suspect-opt-${idx}`} value={c.name} />
                     ))}
                   </datalist>
                 </div>

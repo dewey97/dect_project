@@ -387,7 +387,7 @@ export function CustomPinModal({
                           type="text"
                           value={selectedSuspect}
                           onChange={(e) => setSelectedSuspect(e.target.value)}
-                          placeholder="Nhập tên đối tượng (VD: Lê Quang Vũ)..."
+                          placeholder="Nhập tên đối tượng..."
                           className="w-full px-3 py-2 bg-white border-2 border-[#2b1f14] font-mono text-xs text-[#1a120b] focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
                         />
                       </div>

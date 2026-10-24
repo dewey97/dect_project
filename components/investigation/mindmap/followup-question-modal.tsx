@@ -131,11 +131,6 @@ export function FollowupQuestionModal({
       return "code";
     if (rawType === "text") return "text";
 
-    // Fallback thông minh cho Case #000 theo nhân vật
-    if (targetCulprit === "vu") return "time";
-    if (targetCulprit === "tung") return "choice";
-    if (targetCulprit === "ha") return "code";
-
     return "text";
   }, [activeCheckpoint, targetCulprit]);
 
@@ -144,9 +139,6 @@ export function FollowupQuestionModal({
     if (!targetCulprit) return "";
     if (matchedCharacter?.name) return matchedCharacter.name;
     if (activeCheckpoint?.suspectLabel) return activeCheckpoint.suspectLabel;
-    if (targetCulprit === "vu") return "Lê Quang Vũ";
-    if (targetCulprit === "tung") return "Nguyễn Thanh Tùng";
-    if (targetCulprit === "ha") return "Trần Thị Hà";
 
     if (Array.isArray(rawSheetPhotos)) {
       const match = rawSheetPhotos.find((p: any) => {

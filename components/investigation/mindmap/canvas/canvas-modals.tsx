@@ -175,7 +175,7 @@ export function CanvasModals({
             state.activeFollowupCulprit ||
             state.narrativeCulprit ||
             state.solvedCulprit ||
-            (state.suspects[0]?.id || "vu")
+            (state.suspects[0]?.id || "")
           }
           culprit={
             state.narrativeCulprit ||
@@ -195,7 +195,7 @@ export function CanvasModals({
               state.narrativeCulprit ||
               state.activeFollowupCulprit ||
               state.solvedCulprit ||
-              (state.suspects[0]?.id || "vu");
+              (state.suspects[0]?.id || "");
             state.setActiveFollowupCulprit(c);
             state.setIsEpilogueOpen(false);
             state.setNarrativeCulprit(null);
@@ -229,10 +229,10 @@ export function CanvasModals({
             state.setIsDossierOpen(false);
             const c =
               state.activeDossierType === "A"
-                ? (state.suspects[0]?.id || "vu")
+                ? (state.suspects[0]?.id || "")
                 : state.activeDossierType === "B"
-                  ? (state.suspects[1]?.id || "tung")
-                  : (state.suspects[2]?.id || "ha");
+                  ? (state.suspects[1]?.id || "")
+                  : (state.suspects[2]?.id || "");
             state.setActiveFollowupCulprit(c);
             state.setIsFollowupQuestionOpen(true);
           }}
@@ -242,20 +242,20 @@ export function CanvasModals({
       {/* 11. Modal Câu Hỏi Đào Sâu Nghi Vấn */}
       {state.isFollowupQuestionOpen && (
         <FollowupQuestionModal
-          key={`followup-${state.activeFollowupCulprit || state.narrativeCulprit || state.solvedCulprit || "vu"}`}
+          key={`followup-${state.activeFollowupCulprit || state.narrativeCulprit || state.solvedCulprit || state.suspects[0]?.id || "active"}`}
           caseId={state.caseId}
           isOpen={state.isFollowupQuestionOpen}
           subjectKey={
             state.activeFollowupCulprit ||
             state.narrativeCulprit ||
             state.solvedCulprit ||
-            (state.suspects[0]?.id || "vu")
+            (state.suspects[0]?.id || "")
           }
           culprit={
             state.activeFollowupCulprit ||
             state.narrativeCulprit ||
             state.solvedCulprit ||
-            (state.suspects[0]?.id || "vu")
+            (state.suspects[0]?.id || "")
           }
           onClose={() => {
             state.setIsFollowupQuestionOpen(false);

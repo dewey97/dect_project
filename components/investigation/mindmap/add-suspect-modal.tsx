@@ -43,7 +43,7 @@ interface AddSuspectModalProps {
   editingSuspect?: SuspectItemData | null;
   existingSuspects?: SuspectItemData[];
   onSelectSuspect?: (suspect: SuspectItemData | null) => void;
-  onSubmitConclusion?: (culprit: "vu" | "tung" | "ha" | string) => void;
+  onSubmitConclusion?: (culprit: string) => void;
   isPhoneSolved?: boolean;
 }
 
@@ -619,16 +619,11 @@ export function AddSuspectModal({
     const hasInterrogationReqs = !!(
       (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0 ||
       (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) >
-        0 ||
-      matchedChar.id === "vu" ||
-      matchedChar.id === "tung" ||
-      matchedChar.id === "ha"
+        0
     );
-    const isAdmin000 =
-      currentName === "000" || currentName === "00" || currentName === "0";
 
     // If non-core suspect (Bà Lụa, Đạt, Mai...), save directly as related person of interest
-    if (!hasInterrogationReqs && !isAdmin000) {
+    if (!hasInterrogationReqs) {
       detectiveAudio.playStampSound();
       const combinedClues = Array.from(
         new Set([...effectiveMotiveClues, ...effectiveContradictionClues]),
@@ -650,18 +645,16 @@ export function AddSuspectModal({
       return;
     }
 
-    const charId = (isAdmin000 ? "vu" : matchedChar.id) as string;
+    const charId = matchedChar.id as string;
     const hasMotiveReqs =
       (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0;
     const isMotiveOk =
-      isAdmin000 ||
       !hasMotiveReqs ||
       validateMotive(charId, effectiveMotiveClues);
     const hasContradictionReqs =
       (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) >
       0;
     const isContradictionOk =
-      isAdmin000 ||
       !hasContradictionReqs ||
       validateContradiction(charId, effectiveContradictionClues);
 
@@ -696,17 +689,15 @@ export function AddSuspectModal({
     onClose();
   };
 
-  const isValidName = !!matchedChar && matchedChar.id !== "khang";
+  const isValidName =
+    !!matchedChar &&
+    matchedChar.id !== "khang" &&
+    (matchedChar as any).role !== "victim";
   const hasInterrogationReqs = !!(
     (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0 ||
-    matchedChar?.id === "vu" ||
-    matchedChar?.id === "tung" ||
-    matchedChar?.id === "ha"
+    (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
   );
   const isCore = !!matchedChar && hasInterrogationReqs;
-  const isVu = matchedChar?.id === "vu";
-  const isTung = matchedChar?.id === "tung";
-  const isHa = matchedChar?.id === "ha";
 
   // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
   const hasMotiveReqs =
@@ -726,10 +717,8 @@ export function AddSuspectModal({
         ? validateContradiction(matchedChar.id, contradictionClueIds)
         : contradictionClueIds.length > 0
       : false;
-  const isAdmin000 =
-    name.trim() === "000" || name.trim() === "00" || name.trim() === "0";
   const isCoreReqsMet = isMotiveValid && isContradictionValid;
-  const isBothValid = isValidName && (!isCore || isCoreReqsMet || isAdmin000);
+  const isBothValid = isValidName && (!isCore || isCoreReqsMet);
 
   // XỬ LÝ KHI ẤN DẤU X ĐÓNG TRỰC TIẾP
   const handleDirectClose = (e?: React.MouseEvent) => {
