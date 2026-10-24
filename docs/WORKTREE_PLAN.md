@@ -11,9 +11,9 @@
 | Phần | Đã có trên `main` | Còn lại |
 | ---- | ----------------- | ------- |
 | A | ✅ `16cb60c` — A1–A7, A9 | A8 migration 38 chưa chạy production (→ B4, đã được duyệt); A10 checklist VPS — chủ dự án tự làm, không thuộc plan này |
-| WT-5 evidence | 🟡 `71ee301` — bỏ metadata ở form/preview/hook, khối "Nâng cao" `code`, bắt đầu nhóm tray theo dossier | **13 lỗi `tsc`** (xem B1); `page.tsx` metadata gán cứng; `integrity-indicator`; `isDossierUnlocked`; E2E |
-| WT-1 board | 🟡 `04527de`/`218836f`/`7946aad` — bước 1A–1C (migration 39 SQL, `/api/board-nodes`, `board-actions`, pin-builder theo `nodeKind`, note dùng chung `public/images/board/notes/`) | 1D–1H; xóa `legacyId`/`c0-pin-*` tương thích; migration 39 chưa chạy |
-| WT-3 studio | 🟡 `471a5c8` — `components/ui/field.tsx`, 0 `Field` cục bộ, 1 textarea, select `subjectKey`/`followupOf` (giữ key lạ), khối `<details>` nâng cao, bỏ `ID: {slug}`, `e2e/studio-ux.spec.ts` | Chạy E2E + rà placeholder/helper còn sót (lệnh ở mục 5.1) |
+| WT-5 evidence | ✅ `2699873` — Hoàn tất B1, B2: sạch tsc, dossier grouping, breadcrumb, drop integrity indicator, E2E xanh | Xong |
+| WT-1 board | 🟡 `04527de`/`218836f`/`7946aad` — bước 1A–1C (migration 39 SQL, `/api/board-nodes`, `board-actions`, pin-builder theo `nodeKind`, note dùng chung `public/images/board/notes/`) | 1D–1H (B5-B10); migration 39 chưa chạy |
+| WT-3 studio | ✅ `471a5c8` + B3 — Đã rà 0 placeholder >40 ký tự, 0 helper dài, ẩn khóa kỹ thuật, spec pass | Xong |
 
 ⚠ **`main` hiện KHÔNG qua typecheck** (13 lỗi, do WT-5 dở). **Không push** cho tới khi B1 xong — CI sẽ fail.
 
