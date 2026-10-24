@@ -9,6 +9,7 @@ import {
   Trash2,
   CloudOff,
   Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { cn, normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
@@ -35,7 +36,7 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
   const [showExifInfo, setShowExifInfo] = useState(false);
 
-  const { data: sheetPhotos, loading, error } = usePhoneData("evidences");
+  const { data: rawPhotos, loading, error, refetch } = usePhoneData("photos");
   const [isBoxUnlocked, setIsBoxUnlocked] = useState(false);
 
   useEffect(() => {
@@ -52,10 +53,14 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
     }
   }, []);
 
-  const photos: PhotoItem[] = sheetPhotos
+  const photos: PhotoItem[] = rawPhotos
     .filter((item: Record<string, unknown>) =>
       Boolean(
-        item.drive_url || item.direct_cdn_url || item.url || item.photo_url,
+        item.drive_url ||
+        item.direct_cdn_url ||
+        item.url ||
+        item.photo_url ||
+        item.image_url,
       ),
     )
     .filter((item: Record<string, unknown>) => {
@@ -196,8 +201,14 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
               <span className="text-xs">Đang tải...</span>
             </div>
           ) : error ? (
-            <div className="flex-1 p-4 text-center text-xs text-red-400">
-              Lỗi: {error}
+            <div className="flex-1 p-4 flex flex-col items-center justify-center text-center space-y-3">
+              <span className="text-xs text-red-400">Lỗi: {error}</span>
+              <button
+                onClick={refetch}
+                className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <RefreshCw className="size-3.5" /> Thử lại
+              </button>
             </div>
           ) : photos.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4 pb-14">
@@ -209,9 +220,15 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
                   Thư viện trống
                 </h2>
                 <p className="text-[12px] text-[#8E8E93]">
-                  Không có ảnh nào trong thư viện Google Sheets.
+                  Không tìm thấy ảnh trong hồ sơ vụ án.
                 </p>
               </div>
+              <button
+                onClick={refetch}
+                className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[#8E8E93] hover:text-white text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                <RefreshCw className="size-3" /> Làm mới
+              </button>
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto p-1 pb-10 flex flex-col justify-between">

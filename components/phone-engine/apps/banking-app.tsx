@@ -14,6 +14,7 @@ import {
   Wallet,
   ChevronLeft,
   Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
@@ -42,49 +43,50 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
   const [selectedTx, setSelectedTx] = useState<BankTransaction | null>(null);
   const [filterType, setFilterType] = useState<"all" | "in" | "out">("all");
 
-  const { data: sheetData, loading } = usePhoneData("apps");
+  const { data: rawData, loading, error, refetch } = usePhoneData("bank");
 
-  const transactions: BankTransaction[] = sheetData
-    .filter(
-      (item: Record<string, unknown>) =>
-        String(item.type).toUpperCase() === "BANK",
-    )
-    .map((item: Record<string, unknown>, idx: number) => {
-      const amount = Number(item.amount) || 0;
+  const transactions: BankTransaction[] = rawData.map(
+    (item: Record<string, unknown>, idx: number) => {
+      const rawAmount =
+        typeof item.amount === "number"
+          ? item.amount
+          : Number(item.amount) || 0;
+      const txType = String(item.tx_type || "").toLowerCase();
+      const amount = txType === "out" && rawAmount > 0 ? -rawAmount : rawAmount;
       const receiver = String(
-        item.receiver || item.title_or_domain || "Đối tác",
+        item.counterparty || item.receiver || item.title_or_domain || "Đối tác",
       );
       const note = String(item.note || item.content_or_url || "");
-      const isIncome = amount > 0;
+      const isIncome = amount > 0 || txType === "in";
       const title = String(
-        item.title ||
+        item.clue_title ||
+          item.title ||
           (isIncome
             ? `Nhận tiền từ ${receiver}`
             : `Chuyển tiền đến ${receiver}`),
       );
 
-      // Tự sinh mã FT chuẩn ngân hàng (năm 16 + index + hash số tiền), không bắt GM phải quản lý trên Sheet
-      const seed = Math.abs(amount % 900000) + 100000;
+      // Tự sinh mã FT chuẩn ngân hàng (năm 16 + index + hash số tiền)
+      const seed = Math.abs(Math.round(amount) % 900000) + 100000;
       const autoRefId = `FT16${String(idx + 1).padStart(2, "0")}${seed}`;
 
       return {
-        id: String(item.tx_id || `tx-${idx + 1}`),
+        id: String(item.id || item.tx_id || `tx-${idx + 1}`),
         code: String(item.code || item.tx_id || autoRefId),
         refId: String(item.ref_id || autoRefId),
         title,
         receiver,
         accountNo: String(item.account_no || "Chưa rõ STK"),
         amount,
-        time: String(item.timestamp || ""),
+        time: String(item.timestamp || item.created_at || ""),
         category: String(
           item.category || (isIncome ? "Nhận tiền" : "Chuyển tiền"),
         ),
         note,
-        isEvidence:
-          String(item.is_evidence).toLowerCase() === "true" ||
-          item.is_evidence === true,
+        isEvidence: Boolean(item.is_clue || item.is_evidence),
       };
-    });
+    },
+  );
 
   const filteredTransactions = transactions.filter((tx) => {
     if (filterType === "in") return tx.amount > 0;
@@ -205,10 +207,21 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
 
       {/* Transaction List Area */}
       <div className="flex-1 overflow-y-auto px-3 py-2 pb-12 space-y-2">
-        {loading && sheetData.length === 0 ? (
+        {loading ? (
           <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93] space-y-2">
             <Loader2 className="size-5 animate-spin text-[#0A84FF]" />
             <span className="text-[11px] font-mono">Đang tải...</span>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93] space-y-3">
+            <AlertCircle className="size-6 text-red-400" />
+            <span className="text-[12px] font-sans text-red-300">{error}</span>
+            <button
+              onClick={refetch}
+              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <RefreshCw className="size-3.5" /> Thử lại
+            </button>
           </div>
         ) : filteredTransactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93] space-y-2">
@@ -216,6 +229,12 @@ export function BankingApp({ onBackToHome }: BankingAppProps) {
             <span className="text-[12px] font-sans text-[#8E8E93]">
               Không tìm thấy giao dịch nào
             </span>
+            <button
+              onClick={refetch}
+              className="mt-2 px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[#8E8E93] hover:text-white text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <RefreshCw className="size-3" /> Làm mới
+            </button>
           </div>
         ) : (
           filteredTransactions.map((tx, idx) => {

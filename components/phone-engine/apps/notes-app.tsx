@@ -9,6 +9,8 @@ import {
   Lock,
   Unlock,
   Folder,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import type { Document } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -35,26 +37,21 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
   const [pinError, setPinError] = useState(false);
   const [unlockedNoteIds, setUnlockedNoteIds] = useState<string[]>([]);
 
-  // Fetch notes from Google Sheets live CMS (tab: apps)
-  const { data: rawData, loading } = usePhoneData("apps");
+  // Fetch notes from Supabase phone_notes (tab: notes)
+  const { data: rawData, loading, error, refetch } = usePhoneData("notes");
 
-  // Filter items where type == 'NOTE'
-  const sheetNotes: RichNote[] = rawData
-    .filter(
-      (item: Record<string, unknown>) =>
-        String(item.type).toUpperCase() === "NOTE",
-    )
-    .map((item: Record<string, unknown>, idx: number) => ({
-      id: `sheet-note-${idx}`,
-      title: String(item.title_or_domain || "Ghi chú không tên"),
-      content: String(item.content_or_url || ""),
-      timestamp: String(item.timestamp || ""),
-      meta: String(item.timestamp || ""),
-      isLocked: false,
-    }));
-
-  const allNotes: RichNote[] =
-    sheetNotes.length > 0 ? sheetNotes : (notes as RichNote[]) || [];
+  const allNotes: RichNote[] = rawData.map(
+    (item: Record<string, unknown>, idx: number) => ({
+      id: String(item.id || `note-${idx}`),
+      title: String(item.title || item.title_or_domain || "Ghi chú không tên"),
+      content: String(item.body || item.content_or_url || item.content || ""),
+      timestamp: String(item.timestamp || item.created_at || ""),
+      meta: String(item.timestamp || item.created_at || ""),
+      isLocked: Boolean(item.isLocked),
+      isPinned: Boolean(item.is_pinned),
+      code: item.code ? String(item.code) : undefined,
+    }),
+  );
 
   const filteredNotes = allNotes.filter(
     (n) =>
@@ -184,13 +181,37 @@ export function NotesApp({ notes, onBackToHome }: NotesAppProps) {
               chú
             </div>
 
-            {filteredNotes.length === 0 ? (
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20 text-[#8E8E93] space-y-2">
+                <Loader2 className="size-6 animate-spin text-[#FFD60A]" />
+                <span className="text-[12px]">Đang tải ghi chú...</span>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center space-y-3 px-4">
+                <FileText className="size-10 text-red-400/60" />
+                <div className="text-[13px] text-red-300 font-medium">
+                  {error}
+                </div>
+                <button
+                  onClick={refetch}
+                  className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="size-3.5" /> Thử lại
+                </button>
+              </div>
+            ) : filteredNotes.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-2">
                 <FileText className="size-10 text-[#8E8E93]/40" />
                 <span className="text-[14px] text-[#8E8E93] font-medium">
                   Không có ghi chú nào
                 </span>
                 <span className="text-[11px] text-[#8E8E93]/60">0 Ghi chú</span>
+                <button
+                  onClick={refetch}
+                  className="mt-2 px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[#8E8E93] hover:text-white text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="size-3" /> Làm mới
+                </button>
               </div>
             ) : (
               <div className="divide-y divide-[#2C2C2E] rounded-xl bg-[#1C1C1E] border border-[#2C2C2E] overflow-hidden">

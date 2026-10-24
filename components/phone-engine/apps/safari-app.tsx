@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Loader2,
   Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import type { BrowserHistory } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -36,12 +37,14 @@ interface SafariItem {
 }
 
 export function SafariApp({ onBackToHome }: SafariAppProps) {
-  const { data: rawData, loading } = usePhoneData("apps");
+  const { data: rawData, loading, error, refetch } = usePhoneData("browser");
 
-  // Filter items where type == 'SAFARI'
-  const safariItems = (rawData as SafariItem[]).filter(
-    (item) => String(item.type).toUpperCase() === "SAFARI",
-  );
+  const safariItems = (rawData as SafariItem[]).map((item) => ({
+    ...item,
+    title_or_domain: String(item.title || item.title_or_domain || "Trang web"),
+    content_or_url: String(item.url || item.content_or_url || ""),
+    timestamp: String(item.visited_at || item.timestamp || ""),
+  }));
 
   const [selectedItem, setSelectedItem] = useState<SafariItem | null>(null);
 
@@ -70,6 +73,24 @@ export function SafariApp({ onBackToHome }: SafariAppProps) {
             <Loader2 className="size-6 animate-spin text-[#0A84FF]" />
             <span className="text-[12px]">Đang tải...</span>
           </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+            <div className="size-14 rounded-full bg-red-950/40 border border-red-500/30 flex items-center justify-center text-red-400">
+              <Globe className="size-7 stroke-[1.5]" />
+            </div>
+            <div className="space-y-1 max-w-[240px]">
+              <h2 className="text-[14px] font-bold text-white tracking-tight">
+                Không thể tải lịch sử
+              </h2>
+              <p className="text-[11px] text-[#8E8E93]">{error}</p>
+            </div>
+            <button
+              onClick={refetch}
+              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <RefreshCw className="size-3.5" /> Thử lại
+            </button>
+          </div>
         ) : safariItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
             <div className="size-14 rounded-full bg-[#1C1C1E] border border-white/10 flex items-center justify-center text-[#8E8E93]">
@@ -83,6 +104,12 @@ export function SafariApp({ onBackToHome }: SafariAppProps) {
                 Không tìm thấy dữ liệu tìm kiếm duyệt web.
               </p>
             </div>
+            <button
+              onClick={refetch}
+              className="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[#8E8E93] hover:text-white text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <RefreshCw className="size-3" /> Làm mới
+            </button>
           </div>
         ) : (
           <div className="space-y-2">

@@ -1,15 +1,9 @@
-import { google } from "googleapis";
-import { createGoogleAuth } from "@/lib/google/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { denyIfNotAdmin } from "@/lib/security/admin-route-guard";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 export const dynamic = "force-dynamic";
-
-const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
-const DEFAULT_SPREADSHEET_ID =
-  process.env.GOOGLE_SHEETS_SPREADSHEET_ID ||
-  "1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q";
 
 export async function POST(req: NextRequest) {
   const denied = await denyIfNotAdmin();
@@ -101,61 +95,50 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const auth = createGoogleAuth(SHEETS_SCOPE);
-    if (!auth) {
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Không tìm thấy Service Account credentials để ghi vào Google Sheet.",
+    // Tab evidences: Ghi trực tiếp vào Supabase case_evidence (Cắt bỏ Google Sheets runtime)
+    const code = String(pin.id || `pin_${Date.now()}`).trim();
+    const label = String(pin.label || "Vật chứng ghim").trim();
+    const kind =
+      pin.pinType === "dossier" ? "pdf" : pin.photoUrl ? "photo" : "object";
+    const driveUrl = pin.photoUrl || pin.noteTextureUrl || null;
+    const description = pin.detail || "";
+    const caseSlug = normalizeCaseId(caseId);
+
+    const supabase = await createClient();
+    const { error: evError } = await supabase.from("case_evidence").upsert(
+      {
+        case_slug: caseSlug,
+        code,
+        title: label,
+        kind,
+        file_url: driveUrl,
+        thumb_url: driveUrl,
+        phase: 1,
+        description,
+        slot_index: 0,
+        metadata: {
+          pinType: pin.pinType || "note",
+          pinOnBoard: true,
+          dossier: pin.pinType === "dossier" ? "HỒ SƠ" : "TANG VẬT BẢNG",
         },
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "case_slug,code" },
+    );
+
+    if (evError) {
+      return NextResponse.json(
+        { success: false, error: evError.message },
         { status: 500 },
       );
     }
 
-    const sheets = google.sheets({ version: "v4", auth });
-    const spreadsheetId = DEFAULT_SPREADSHEET_ID;
-
-    {
-      // Tab evidences headers:
-      // case_id, code, bộ hồ sơ, label, category, pin_on_board, is_suspect, drive_url, description
-      const code = pin.id || `pin_${Date.now()}`;
-      const dossier = pin.pinType === "dossier" ? "HỒ SƠ" : "TANG VẬT BẢNG";
-      const label = pin.label || "Vật chứng ghim";
-      const category = pin.pinType || "note";
-      const pinOnBoard = "TRUE";
-      const isSuspect = "FALSE";
-      const driveUrl = pin.photoUrl || pin.noteTextureUrl || "";
-      const description = pin.detail || "";
-
-      const rowValues = [
-        caseId,
-        code,
-        dossier,
-        label,
-        category,
-        pinOnBoard,
-        isSuspect,
-        driveUrl,
-        description,
-      ];
-
-      await sheets.spreadsheets.values.append({
-        spreadsheetId,
-        range: "evidences!A:I",
-        valueInputOption: "RAW",
-        requestBody: {
-          values: [rowValues],
-        },
-      });
-
-      return NextResponse.json({
-        success: true,
-        tab: "evidences",
-        code,
-        message: `Đã đồng bộ vật chứng [${label}] lên Google Sheet tab evidences!`,
-      });
-    }
+    return NextResponse.json({
+      success: true,
+      tab: "evidences",
+      code,
+      message: `Đã đồng bộ vật chứng [${label}] vào Supabase case_evidence!`,
+    });
   } catch (error: unknown) {
     console.error("Lỗi khi đồng bộ pin:", error);
     const errorMsg =

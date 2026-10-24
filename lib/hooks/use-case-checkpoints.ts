@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
 import { toRuntimeCheckpoints } from "@/lib/cms/checkpoint-runtime";
 import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
@@ -19,7 +19,7 @@ export interface SheetEvidenceRow {
   label?: string;
   type?: string;
   category?: string;
-  description?: string;
+  description?: string | null;
   unlocked_by_phase?: string;
   position_x?: string | number;
   position_y?: string | number;
@@ -64,7 +64,7 @@ function enrichCheckpointsWithEvidences(
               item.label && item.label !== item.id
                 ? item.label
                 : meta.label || item.id,
-            description: item.description || meta.description,
+            description: (meta.description ?? item.description) || undefined,
           };
         }
         return item;
@@ -82,7 +82,7 @@ function enrichCheckpointsWithEvidences(
 
 /**
  * Hook runtime: checkpoint đọc từ Checkpoint Studio (Supabase), danh mục vật
- * chứng vẫn đọc từ Google Sheets để bổ sung label/description.
+ * chứng đọc từ useCaseEvidence (Supabase case_evidence).
  */
 export function useCaseCheckpoints(
   caseId: string = "case-000",
@@ -94,10 +94,10 @@ export function useCaseCheckpoints(
   } = useStudioCheckpoints(caseId);
 
   const {
-    data: evidenceRows,
+    rawEvidence: evidenceRows,
     loading: evLoading,
     refetch: refetchEv,
-  } = usePhoneData<SheetEvidenceRow>("evidences", caseId);
+  } = useCaseEvidence(caseId);
 
   const refetch = () => {
     refetchCp();

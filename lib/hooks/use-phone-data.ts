@@ -69,28 +69,12 @@ export function usePhoneData<T = any>(
 
     if (!requestPromise || isForcedRefetch) {
       requestPromise = (async () => {
-        // 1. Dual-source: Try Supabase phone-data first
-        try {
-          const supabaseUrl = `/api/phone-data/${encodeURIComponent(tab)}?caseId=${encodeURIComponent(effectiveCaseId)}&_t=${Date.now()}`;
-          const res = await fetch(supabaseUrl, { cache: "no-store" });
-          if (res.ok) {
-            const json = await res.json();
-            if (
-              json.success &&
-              Array.isArray(json.data) &&
-              json.data.length > 0
-            ) {
-              return json;
-            }
-          }
-        } catch {
-          // fall through to Google Sheets fallback
+        // Direct Supabase phone-data endpoint (Sheets runtime removed)
+        const supabaseUrl = `/api/phone-data/${encodeURIComponent(tab)}?caseId=${encodeURIComponent(effectiveCaseId)}&_t=${Date.now()}`;
+        const res = await fetch(supabaseUrl, { cache: "no-store" });
+        if (!res.ok) {
+          throw new Error(`Lỗi nạp dữ liệu phân hệ ${tab} (${res.status})`);
         }
-
-        // 2. Fallback to Google Sheets /api/phone
-        const sheetsUrl = `/api/phone?tab=${encodeURIComponent(tab)}&caseId=${encodeURIComponent(effectiveCaseId)}&_t=${Date.now()}${isForcedRefetch ? "&refresh=true" : ""}`;
-        const res = await fetch(sheetsUrl, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
         return res.json();
       })().finally(() => {
         delete inFlightPromises[cacheKey];

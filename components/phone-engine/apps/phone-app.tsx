@@ -17,7 +17,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
-import { getActiveVictim } from "@/lib/cases/case-characters";
+import {
+  findCharacterByPhoneOrName,
+  getActiveVictim,
+} from "@/lib/cases/case-characters";
 import { EvidenceAnchorItem } from "../core/evidence-anchor-item";
 
 interface PhoneAppProps {
@@ -446,9 +449,26 @@ export function PhoneApp({
               <div className="flex flex-col p-4 space-y-4 animate-in slide-in-from-right-4 duration-150">
                 {/* Contact Avatar & Header */}
                 <div className="flex flex-col items-center pt-2 pb-2">
-                  <div className="size-[72px] rounded-full bg-gradient-to-b from-[#8E8E93] to-[#636366] text-white flex items-center justify-center text-[28px] font-medium shadow-md">
-                    {selectedContact.name.charAt(0).toUpperCase()}
-                  </div>
+                  {(() => {
+                    const matchedChar = findCharacterByPhoneOrName(
+                      selectedContact.phone,
+                      selectedContact.name,
+                    );
+                    const avatarUrl =
+                      matchedChar?.avatar_url ||
+                      (matchedChar as any)?.avatarUrl;
+                    return avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt={selectedContact.name}
+                        className="size-[72px] rounded-full object-cover shadow-md border border-[#E3E2E7]"
+                      />
+                    ) : (
+                      <div className="size-[72px] rounded-full bg-gradient-to-b from-[#8E8E93] to-[#636366] text-white flex items-center justify-center text-[28px] font-medium shadow-md">
+                        {selectedContact.name.charAt(0).toUpperCase()}
+                      </div>
+                    );
+                  })()}
                   <h2 className="text-[22px] font-semibold text-[#1A1B1F] mt-2 text-center">
                     {selectedContact.name}
                   </h2>
@@ -554,26 +574,42 @@ export function PhoneApp({
                 </div>
 
                 {/* My Card */}
-                {!contactsSearch && (() => {
-                  const victim = getActiveVictim();
-                  const ownerName = victim?.name || "Nguyễn Văn Khang";
-                  const initial =
-                    ownerName.trim().split(" ").pop()?.charAt(0).toUpperCase() ||
-                    ownerName.charAt(0).toUpperCase() ||
-                    "K";
-                  return (
-                    <div className="px-4 py-2.5 border-b border-[#E3E2E7] flex items-center gap-3 bg-[#FFFFFF]">
-                      <div className="size-9 rounded-full bg-gradient-to-b from-[#8E8E93] to-[#636366] text-white flex items-center justify-center text-sm font-semibold">
-                        {initial}
+                {!contactsSearch &&
+                  (() => {
+                    const victim = getActiveVictim();
+                    const ownerName = victim?.name || "Nguyễn Văn Khang";
+                    const avatarUrl =
+                      victim?.avatar_url || (victim as any)?.avatarUrl;
+                    const initial =
+                      ownerName
+                        .trim()
+                        .split(" ")
+                        .pop()
+                        ?.charAt(0)
+                        .toUpperCase() ||
+                      ownerName.charAt(0).toUpperCase() ||
+                      "K";
+                    return (
+                      <div className="px-4 py-2.5 border-b border-[#E3E2E7] flex items-center gap-3 bg-[#FFFFFF]">
+                        {avatarUrl ? (
+                          <img
+                            src={avatarUrl}
+                            alt={ownerName}
+                            className="size-9 rounded-full object-cover border border-[#E3E2E7] shrink-0"
+                          />
+                        ) : (
+                          <div className="size-9 rounded-full bg-gradient-to-b from-[#8E8E93] to-[#636366] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+                            {initial}
+                          </div>
+                        )}
+                        <div className="flex flex-col">
+                          <span className="text-[15px] font-medium text-[#1A1B1F]">
+                            {ownerName}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-[15px] font-medium text-[#1A1B1F]">
-                          {ownerName}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })()}
+                    );
+                  })()}
 
                 {/* Contacts Grouped List */}
                 {contactsLoading ? (
@@ -596,20 +632,52 @@ export function PhoneApp({
 
                         {/* Contact Rows */}
                         <div className="divide-y divide-[#E3E2E7] bg-[#FFFFFF]">
-                          {list.map((c: PhoneContact) => (
-                            <div
-                              key={c.id}
-                              onClick={() => setSelectedContact(c)}
-                              className="h-[44px] px-4 flex items-center justify-between hover:bg-[#FAF9FE] active:bg-[#F2F2F7] cursor-pointer transition-colors"
-                            >
-                              <span className="text-[16px] font-normal text-[#1A1B1F] truncate pr-2">
-                                {c.name}
-                              </span>
-                              <span className="text-[12px] text-[#8E8E93] shrink-0 font-mono">
-                                {c.phone}
-                              </span>
-                            </div>
-                          ))}
+                          {list.map((c: PhoneContact) => {
+                            const matchedChar = findCharacterByPhoneOrName(
+                              c.phone,
+                              c.name,
+                            );
+                            const avatarUrl =
+                              matchedChar?.avatar_url ||
+                              (matchedChar as any)?.avatarUrl;
+                            const initial =
+                              c.name
+                                .trim()
+                                .split(" ")
+                                .pop()
+                                ?.charAt(0)
+                                .toUpperCase() ||
+                              c.name.charAt(0).toUpperCase() ||
+                              "?";
+
+                            return (
+                              <div
+                                key={c.id}
+                                onClick={() => setSelectedContact(c)}
+                                className="h-[46px] px-4 flex items-center justify-between hover:bg-[#FAF9FE] active:bg-[#F2F2F7] cursor-pointer transition-colors gap-3"
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  {avatarUrl ? (
+                                    <img
+                                      src={avatarUrl}
+                                      alt={c.name}
+                                      className="size-7 rounded-full object-cover shrink-0 border border-[#E3E2E7]"
+                                    />
+                                  ) : (
+                                    <div className="size-7 rounded-full bg-[#E5E5EA] text-[#636366] flex items-center justify-center text-xs font-semibold shrink-0">
+                                      {initial}
+                                    </div>
+                                  )}
+                                  <span className="text-[16px] font-normal text-[#1A1B1F] truncate">
+                                    {c.name}
+                                  </span>
+                                </div>
+                                <span className="text-[12px] text-[#8E8E93] shrink-0 font-mono">
+                                  {c.phone}
+                                </span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     ))}

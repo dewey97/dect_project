@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 
 export interface PinPhotoItem {
   id?: string;
@@ -25,31 +26,37 @@ export interface PinPhotoItem {
 }
 
 /**
- * Nạp ảnh từ Supabase phone_photos (/api/phone-data/photos) trước,
- * fallback Google Sheets (/api/phone?tab=photos), tạo bản đồ tra cứu ảnh ghim / avatar.
+ * Nạp ảnh từ Supabase phone_photos (/api/phone-data/photos) và case_evidence,
+ * tạo bản đồ tra cứu ảnh ghim / avatar. Cắt bỏ Google Sheets runtime.
  */
 export function useLivePinPhotos(caseId: string, onRequestRender?: () => void) {
-  const { data: sheetPhotos } = usePhoneData<PinPhotoItem>(
+  const effectiveCaseId = caseId || "case_000";
+  const { data: phonePhotos } = usePhoneData<PinPhotoItem>(
     "photos",
-    caseId || "case-000",
+    effectiveCaseId,
   );
+  const { rawEvidence } = useCaseEvidence(effectiveCaseId);
 
   const sheetPhotosMap = useMemo(() => {
     const map = new Map<string, string>();
-    if (!sheetPhotos || sheetPhotos.length === 0) return map;
+    const allPhotos: any[] = [...(phonePhotos || []), ...(rawEvidence || [])];
+    if (allPhotos.length === 0) return map;
 
-    for (const item of sheetPhotos) {
-      const liveUrl = (
+    for (const item of allPhotos) {
+      const liveUrl = String(
         item.image_url ||
-        item.url ||
-        item.direct_cdn_url ||
-        item.drive_url ||
-        item.photo_url ||
-        ""
+          item.thumb_url ||
+          item.file_url ||
+          item.url ||
+          item.direct_cdn_url ||
+          item.drive_url ||
+          item.photo_url ||
+          "",
       ).trim();
       if (!liveUrl) continue;
       const normalized = normalizeImageUrl(liveUrl);
-      const code = item.photo_code || item.code || item.photo_id;
+      const rawCode = item.photo_code || item.code || item.photo_id;
+      const code = typeof rawCode === "string" ? rawCode.trim() : "";
       if (code) {
         const pc = code.toLowerCase().trim();
         map.set(pc, normalized);
@@ -68,16 +75,16 @@ export function useLivePinPhotos(caseId: string, onRequestRender?: () => void) {
           map.set("thi_the", normalized);
         }
       }
-      const title = item.label || item.title || item.name;
+      const rawTitle = item.label || item.title || item.name;
+      const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
       if (title) {
         const titleLower = title.toLowerCase().trim();
         map.set(titleLower, normalized);
-        const pc = (item.photo_code || item.code || item.photo_id || "")
-          .toLowerCase()
-          .trim();
+        const pc = code.toLowerCase();
+        const category = typeof item.category === "string" ? item.category : "";
         const isAvatar =
           pc.startsWith("avatar_") ||
-          (item.category || "").toUpperCase().trim() === "AVATAR" ||
+          category.toUpperCase().trim() === "AVATAR" ||
           titleLower.includes("chân dung");
 
         // Only map suspect keys if the row is truly an avatar/portrait photo
@@ -113,7 +120,7 @@ export function useLivePinPhotos(caseId: string, onRequestRender?: () => void) {
       }
     }
     return map;
-  }, [sheetPhotos]);
+  }, [phonePhotos, rawEvidence]);
 
   const sheetPhotosMapRef = useRef<Map<string, string>>(sheetPhotosMap);
 
