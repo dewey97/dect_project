@@ -1126,6 +1126,8 @@ export function DossierCanvasBoard({
               <div
                 key={`evidence_${itemCode}`}
                 id={`board-evidence-${itemCode}`}
+                data-dossier-card="true"
+                onMouseDown={(e) => e.stopPropagation()}
                 style={{
                   position: "absolute",
                   left: `${pos.x}px`,
@@ -1142,6 +1144,8 @@ export function DossierCanvasBoard({
               >
                 {/* Drag handle header */}
                 <div
+                  data-drag-handle="true"
+                  onMouseDown={(e) => e.stopPropagation()}
                   onPointerDown={(e) => handleItemDragStart(e, key)}
                   onPointerMove={handleItemPointerMove}
                   onPointerUp={handleItemPointerUp}
@@ -1223,7 +1227,11 @@ export function DossierCanvasBoard({
       </main>
 
       {/* FLOATING TOOLBAR PHÍA DƯỚI MÀN HÌNH (GỒM CÔNG CỤ VẼ VỜI & BỘ THU PHÓNG ZOOM) */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066] max-w-[calc(100%-2rem)]">
+      <div
+        id="dossier-floating-toolbar"
+        onMouseDown={(e) => e.stopPropagation()}
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#1a120b]/95 backdrop-blur-md p-1.5 rounded-xl border border-[#4a3625] shadow-2xl text-[#d9a066] max-w-[calc(100%-2rem)]"
+      >
         {/* NÚT CHUỘT THƯỜNG / DI CHUYỂN */}
         <button
           type="button"
