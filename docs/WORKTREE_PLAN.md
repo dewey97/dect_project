@@ -1,26 +1,32 @@
-# Worktree Plan — Chạy song song phần việc còn lại
+# Worktree Plan v2 — Tách việc song song (2026-10-24)
 
-> Mục tiêu: chia việc còn lại thành 5 worktree độc lập, mỗi worktree một nhánh, một model.
-> Xong thì merge lần lượt về `main`. Mỗi worktree chỉ sửa file trong **vùng sở hữu** của nó.
+> Bản kế hoạch thay thế toàn bộ Worktree Plan cũ. Mọi worktree nhánh từ `main` tại commit `a9dcb5e` (hoặc commit base ở Bước 0).
+> Quy ước chung, ràng buộc dự án và điều kiện done giữ nguyên như `AGENTS.md` (global + dự án) và `docs/HANDOFF_ROADMAP.md` mục 2–3.
 >
-> Đọc trước: `AGENTS.md` (global + dự án), `docs/HANDOFF_ROADMAP.md` mục 2–3, `docs/PHONE_STUDIO_PLAN.md` mục "Tiến độ".
+> Tài liệu liên quan: `docs/TECHDEBT.md`, `docs/HANDOFF_ROADMAP.md`, `docs/core_specs/13_architecture_hardening_and_roadmap.md`, `docs/core_specs/20_phone_studio.md`.
 
 ---
 
-## 0. Tổng quan
+## 0. Trạng thái xuất phát
 
-| WT   | Nhánh             | Nội dung                                                     | Ước lượng | Migration    |
-| ---- | ----------------- | ------------------------------------------------------------ | --------- | ------------ |
-| WT-1 | `wt/phone-finish` | Phone Studio phần cuối: E2E auth, P28, P29, fallback app     | 1–2 ngày  | —            |
-| WT-2 | `wt/evidence-db`  | Hệ thống chứng cứ per-case: M1, M2, M3, M10, M12             | 5–7 ngày  | 35           |
-| WT-3 | `wt/narrative-ai` | Bỏ hardcode dẫn truyện, AI criteria, file case_000: M4 M5 M8 | 4–5 ngày  | 36 (nếu cần) |
-| WT-4 | `wt/pin-photos`   | M9 ảnh ghim đọc Supabase + giảm `any` trong hero-interactive | 1–2 ngày  | —            |
-| WT-5 | `wt/any-batch-2`  | D7 đợt 2: giảm `any` ở admin studio, API, lib                | 1–2 ngày  | —            |
+- `main` = `a9dcb5e`, đã push, working tree đang có thay đổi dở (xem Bước 0).
+- Build production (`NEXT_DIST_DIR=.next_dev npx next build`) đã pass sau merge 4 worktree.
+- E2E: 13 pass, 2 skip, 1 fail do `e2e/evidence-studio.spec.ts` thiếu auth admin — đã sửa spec, chưa chạy lại.
+- Migration production: 21–37 đã chạy. Số migration còn trống bắt đầu từ **38**.
+- Kết quả khảo sát nguồn dữ liệu và hardcode: xem mục 11 (phụ lục).
 
-Bỏ khỏi plan (YAGNI): **M11** nền bảng điều tra per-case. `board-stage` đã cho người chơi chọn nền cork chung, không phải dữ liệu vụ án.
+### Trả lời nhanh câu hỏi "đã chuyển hết từ Google Sheets sang chưa?"
 
-Thứ tự merge đề xuất: **WT-5 → WT-1 → WT-4 → WT-2 → WT-3**, sau đó bước tích hợp (mục 7).
-Lý do: WT-5 chỉ đổi type, rủi ro thấp nhất. WT-3 sửa nhiều file gameplay nhất, merge cuối để rebase một lần.
+**Chưa.** Còn 4 nhóm Sheet-only hoặc còn fallback Sheets:
+
+1. Tab `evidences` — 7 consumer (`main-investigation-canvas`, `add-suspect-modal`, `followup-question-modal`, `admin-create-pin-modal`, `photos-app`, `reinvestigation-modal`, `use-case-checkpoints`). Route `/api/phone-data/evidences` không tồn tại (trả 400) nên **luôn** rơi về Sheets, dù bảng `case_evidence` đã có dữ liệu.
+2. Ghi pin ảnh/dossier/note vào Sheet `evidences!A:I` tại `app/api/admin/pins/route.ts`.
+3. `usePhoneData` fallback Sheets cho `photos`, `contacts`, `calls`, `messages` mỗi khi bảng Supabase rỗng/lỗi.
+4. `useLivePinPhotos` (hero board) fallback ảnh Sheets khi `phone_photos` rỗng.
+
+Đã migrate xong, không còn Sheets: checkpoints, characters, apps launcher, trang evidence (`case_evidence`).
+
+Lệch pha cần sửa: `notes-app`, `safari-app`, `banking-app`, `photos-app` đang đọc sai nguồn (xem WT-6).
 
 ---
 
@@ -29,202 +35,363 @@ Lý do: WT-5 chỉ đổi type, rủi ro thấp nhất. WT-3 sửa nhiều file 
 ### 1.1. Tạo worktree
 
 ```bash
-git worktree add ../dect_wt1 -b wt/phone-finish main
-```
-
-Thay `wt1`/nhánh theo bảng trên. Trong worktree:
-
-```bash
+git worktree add ../dect_wt_<ten> -b wt/<ten> main
+cd ../dect_wt_<ten>
 pnpm install
+cp ../dect_project/.env .env
 ```
 
-- Chỉ dùng **pnpm**. Không chạy `npm install`.
-- Copy `.env` từ thư mục gốc sang worktree (`cp ../.env .env`). Không commit file env.
-- Mỗi worktree chạy dev server/E2E trên **cổng riêng**: WT-1 `3101`, WT-2 `3102`, WT-3 `3103`, WT-4 `3104`, WT-5 `3105` (`PORT=310x pnpm dev`, `PORT=310x pnpm test:e2e`).
+- Chỉ dùng **pnpm**.
+- Dev/E2E cổng riêng: WT-1 `3111`, WT-2 `3112`, WT-3 `3113`, WT-4 `3114`, WT-5 `3115`, WT-6 `3116`, WT-7 `3117` (`PORT=311x pnpm dev`, `PORT=311x pnpm test:e2e`).
+- Không `git push`. Commit khi xong trọn một đơn vị việc.
+- Không chạy migration production. Viết SQL, chủ dự án duyệt.
+- `import type` cho mọi type (AGENTS.md §12). Không `next/font/google` (§11). Không `autoFocus`/`.focus()` khi mở modal (§3).
+- Không thêm mock/fallback nội dung vụ án (§6). Fallback chỉ được là trạng thái rỗng/đang tải.
+- Không đụng `components/investigation/archive_3d_vault/`, `landing-hero.tsx` (§8, §9).
 
-### 1.2. Vùng sở hữu
+### 1.2. Vùng sở hữu và file dùng chung
 
-- Chỉ sửa file trong cột "Sở hữu" của worktree mình.
-- Cần sửa file ngoài vùng: **không sửa**, ghi vào mục "Việc tích hợp" trong báo cáo bàn giao.
-- File dùng chung có quy tắc riêng:
+| File dùng chung                                                                        | Quy tắc                                                                                    |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `lib/types/database.ts`                                                                | Chỉ **thêm** interface/field ở cuối file trong block `// WT-x`. Không sửa interface cũ.    |
+| `components/ui/*`                                                                      | WT-3 tạo primitive mới; worktree khác chỉ import, không sửa.                               |
+| `components/admin/admin-sidebar.tsx`                                                   | Không worktree nào sửa; integrator thêm menu nếu cần.                                      |
+| `CHANGELOG.md`, `docs/HANDOFF_ROADMAP.md`, `docs/TECHDEBT.md`, `docs/WORKTREE_PLAN.md` | Không worktree nào sửa; integrator cập nhật sau merge.                                     |
+| `db/schema/*.sql`                                                                      | Chỉ dùng số migration được cấp: WT-4 → `38`, WT-1 → `39`. Các WT khác không tạo migration. |
+| `e2e/*`                                                                                | Mỗi worktree tạo spec riêng; không sửa spec của worktree khác.                             |
+| `package.json`, `pnpm-lock.yaml`                                                       | Không thêm dependency nếu chưa được duyệt.                                                 |
 
-| File                                                          | Quy tắc                                                                                               |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `lib/types/database.ts`                                       | Chỉ **thêm** interface mới ở **cuối file**, trong block có comment `// WT-x`. Không sửa interface cũ. |
-| `components/admin/admin-sidebar.tsx`                          | Chỉ WT-2 được thêm 1 mục menu.                                                                        |
-| `CHANGELOG.md`, `docs/HANDOFF_ROADMAP.md`, `docs/TECHDEBT.md` | **Không worktree nào sửa.** Người tích hợp cập nhật sau merge.                                        |
-| `db/schema/*.sql`                                             | Chỉ dùng số migration đã cấp ở bảng mục 0.                                                            |
-| `e2e/*`                                                       | Mỗi worktree tạo file spec riêng. Chỉ WT-1 sửa `playwright.config.ts`.                                |
+### 1.3. Ma trận sở hữu file (chống conflict)
 
-### 1.3. Ràng buộc dự án (nhắc lại)
+| Nhóm file                                                                                                                                                                                                                    | WT-1 board |                        WT-2 phone                        | WT-3 studio ux |                WT-4 character                | WT-5 evidence |                   WT-6 cms                   | WT-7 ops |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------: | :------------------------------------------------------: | :------------: | :------------------------------------------: | :-----------: | :------------------------------------------: | :------: |
+| `components/investigation/mindmap/**`                                                                                                                                                                                        |   **X**    |                                                          |                | riêng `suspect/suspect-evaluation-modal.tsx` |               |                                              |          |
+| `components/phone-engine/**`                                                                                                                                                                                                 |            | **X** (trừ `apps/{notes,safari,banking,photos}-app.tsx`) |                |    `apps/phone-app.tsx` (avatar liên hệ)     |               | `apps/{notes,safari,banking,photos}-app.tsx` |          |
+| `components/admin/phone-studio/**`                                                                                                                                                                                           |            |                          **X**                           |                |                                              |               |                                              |          |
+| `components/admin/checkpoint-studio/**`, `dossier-studio/**`, `app/(admin)/studio/cases/**`                                                                                                                                  |            |                                                          |     **X**      |                                              |               |                                              |          |
+| `components/admin/character-studio/**`, `lib/actions/character-actions.ts`, `lib/cases/characters.ts`, `lib/cases/case-characters.ts`, `app/api/characters/route.ts`, `components/investigation/case-characters-context.tsx` |            |                                                          |                |                    **X**                     |               |                                              |          |
+| `components/admin/evidence-studio/**`, `components/investigation/evidence/**`, `app/(investigation)/evidence/**`, `lib/hooks/use-case-evidence.ts`, `lib/actions/evidence-actions.ts`                                        |            |                                                          |                |                                              |     **X**     |                                              |          |
+| `app/api/phone/**`, `app/api/phone-data/**`, `app/api/admin/pins/route.ts`, `lib/hooks/use-phone-data.ts`, `lib/google/**`, `lib/hooks/use-case-checkpoints.ts`                                                              |            |                                                          |                |                                              |               |                    **X**                     |          |
+| `components/investigation/hero-interactive/**`                                                                                                                                                                               |            |                                                          |                |            (chỉ đọc `avatarUrl`)             |               |       **X** (`use-live-pin-photos.ts`)       |          |
+| `docker-compose.yml`, `deploy/**`, `scripts/ops/vps-*`                                                                                                                                                                       |            |                                                          |                |                                              |               |                                              |  **X**   |
 
-- Không `git push`. Commit một lần khi xong trọn task (Conventional Commits).
-- Không chạy migration lên production. Viết SQL, chủ dự án duyệt.
-- `import type` cho mọi interface/type (AGENTS.md §12).
-- Không `autoFocus` / `.focus()` khi mở modal (AGENTS.md §3).
-- Không `next/font/google` (AGENTS.md §11).
-- Không thêm mock/fallback nội dung vụ án tĩnh (AGENTS.md §6). Fallback chỉ được là trạng thái rỗng/đang tải.
-- Không đụng `components/investigation/archive_3d_vault/` và `landing-hero.tsx` (AGENTS.md §8, §9).
+> WT-1 được phép sửa `main-investigation-canvas.tsx` (chuyển nguồn evidences sang `useCaseEvidence`) — WT-6 **không** sửa file này.
 
 ### 1.4. Điều kiện "done" của một worktree
 
 1. `npx tsc --noEmit --incremental false` sạch (chạy 1 lần ở cuối).
-2. `pnpm test:e2e` pass toàn bộ, gồm spec mới của worktree.
-3. Case_000 chơi được như trước (không regression).
-4. Báo cáo bàn giao gồm: danh sách file đã sửa, migration cần chạy, việc tích hợp còn lại.
+2. `pnpm test:e2e` pass toàn bộ trên cổng riêng, gồm spec mới của worktree.
+3. Case_000 chơi được như trước (không regression), kiểm tra desktop 1440×900 + mobile 375×812.
+4. Báo cáo bàn giao: file đã sửa, migration cần chạy, việc tích hợp còn lại, rủi ro.
 
 ---
 
-## 2. WT-1 — `wt/phone-finish`
+## 2. Bước 0 — Chốt base (làm trước khi tách worktree)
 
-**Sở hữu:** `e2e/**`, `playwright.config.ts`, `app/api/phone-data/**`, `components/phone-engine/**`, `lib/hooks/use-phone-data.ts`, `lib/hooks/use-phone-apps.ts`, `components/admin/phone-studio/**`, `docs/core_specs/20_phone_studio.md`, `.env.example`.
+Đang có thay đổi dở trong `main` từ việc gỡ fallback evidence (chưa commit):
 
-| #   | Việc                                                                                                                                                                                                                                                                               |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.1 | Thêm Playwright project `setup`: đăng nhập `/login` bằng `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`, lưu `storageState` vào `e2e/.auth/admin.json` (gitignore). Spec admin dùng storageState này. Thêm 2 biến vào `.env.example`. Thiếu biến thì `test.skip` spec admin, không fail. |
-| 1.2 | Sửa `e2e/phone-studio.spec.ts` dùng storageState admin.                                                                                                                                                                                                                            |
-| 1.3 | P28: spec `e2e/phone-runtime.spec.ts` — mở phone case_000, kiểm tra home screen đủ 15 app, mở Tin nhắn thấy ít nhất 1 thread.                                                                                                                                                      |
-| 1.4 | P29: spec tạo case tạm qua `duplicateCase` hoặc Studio, thêm 1 app, phone render app đó. Dọn dữ liệu sau test. Nếu cần DB đã migrate 30–34 thì `test.skip` khi bảng chưa có.                                                                                                       |
-| 1.5 | `app/api/phone-data/apps/route.ts`: bỏ fallback 15 app icon case_000 cho vụ khác case_000. Vụ chưa cấu hình trả `data: []`, `source: "empty"`. Case_000 vẫn giữ fallback tới khi migration 33 chạy.                                                                                |
-| 1.6 | Giảm `any` trong `components/phone-engine/**` (12 chỗ: banking 2, notes 3, photos 4, safari 2, phone-context 1) và `lib/hooks/use-phone-data.ts` (1 chỗ). Tổng 13.                                                                                                                 |
+- Đã xóa `components/investigation/evidence/evidence-data.ts`.
+- Đã sửa `use-case-evidence.ts`, `page.tsx`, `dossier-tray.tsx`, `evidence-detail-inspector.tsx`, `e2e/evidence-studio.spec.ts`.
+- `npx tsc --noEmit --incremental false`: **sạch** (sau khi xử lý `selectedView` nullable).
+- `pnpm test:e2e`: chưa chạy lại sau thay đổi.
 
----
+Việc cần làm khi bắt đầu đợt code (khoảng 15 phút):
 
-## 3. WT-2 — `wt/evidence-db`
+1. `pnpm test:e2e` pass (spec evidence studio sẽ skip nếu thiếu `E2E_ADMIN_*`; ghi rõ trong báo cáo).
+2. Commit `refactor(evidence): remove static case_000 fallback data` (không push).
+3. Tách các worktree từ commit này.
 
-**Sở hữu:** `components/investigation/evidence/**`, `components/investigation/scene-360-viewer.tsx`, `app/(investigation)/evidence/**`, `app/(investigation)/board-stage/**`, `app/(admin)/studio/evidence/**` (mới), `components/admin/evidence-studio/**` (mới), `lib/actions/evidence-actions.ts` (mới), `lib/hooks/use-case-evidence.ts` (mới), `db/schema/35_*.sql`, `docs/core_specs/21_evidence_studio.md` (mới), 1 mục trong `admin-sidebar.tsx`.
+Trong lúc chưa chốt base, working tree giữ nguyên, **không commit code**; chỉ commit tài liệu kế hoạch.
 
-| #   | Việc                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.1 | **M3** Migration 35: bảng `case_evidence` (`id`, `case_slug` FK `cases.slug`, `code` unique theo case, `title`, `kind` pdf/image/audio/object, `file_url`, `thumb_url`, `phase`, `description`, `slot_index`, timestamps). RLS: đọc public, ghi `private.is_admin()`. Bucket `evidence-assets` (đọc public, ghi admin). Thêm `cases.panorama_url`, `cases.scene_360_url` (TEXT NULL). Seed case_000 từ `CASE_000_PDFS` + `CASE_000_EVIDENCE`. |
-| 2.2 | Server actions CRUD + upload (`requireAdminAuth`), mở rộng `duplicatePhoneData`-style: export `duplicateEvidenceData(from, to)` — **không** sửa `case-actions.ts`, ghi vào việc tích hợp.                                                                                                                                                                                                                                                     |
-| 2.3 | **M1** Hook `useCaseEvidence(caseId)` đọc Supabase. `evidence-data.ts` giữ nguyên tên export cũ (`CASE_000_PDFS`, `CASE_000_EVIDENCE`) để file mindmap của WT-3 không vỡ; đánh dấu `@deprecated`. Các trang `evidence/**`, `board-stage` chuyển sang hook.                                                                                                                                                                                    |
-| 2.4 | **M2 + M10** Evidence Studio `/studio/evidence`: danh sách chứng cứ theo case, upload PDF/ảnh vào bucket, sửa metadata, sắp xếp. Giao diện theo Phone Studio (form + preview), không kiểu bảng tính.                                                                                                                                                                                                                                          |
-| 2.5 | **M12** `reinvestigation-modal.tsx` và `scene-360-viewer.tsx` đọc `cases.panorama_url` / `scene_360_url`; bỏ path cứng `/images/cases/case_000/...`. Thiếu URL thì hiện trạng thái "Chưa có ảnh hiện trường".                                                                                                                                                                                                                                 |
-| 2.6 | Spec `e2e/evidence-studio.spec.ts` + kiểm tra bàn chứng cứ case_000 vẫn đủ tài liệu.                                                                                                                                                                                                                                                                                                                                                          |
+Nếu chủ dự án muốn bỏ thay đổi dở: `git checkout -- .` và `git clean -fd components/investigation/evidence`, rồi chuyển toàn bộ việc trên vào WT-5.
 
 ---
 
-## 4. WT-3 — `wt/narrative-ai`
+## 3. WT-1 — `wt/board-dynamic` (Bảng điều tra không hardcode)
 
-**Sở hữu:** `components/investigation/mindmap/**`, `components/investigation/hint-modal.tsx`, `components/investigation/epilogue-modal.tsx`, `components/investigation/checkpoints-context.tsx`, `lib/hooks/use-case-narratives.ts`, `lib/ai/**`, `lib/cases/case-000-*.ts`, `lib/checkpoints/server-grader.ts`, `components/admin/checkpoint-studio/sections/**`, `db/schema/36_*.sql`.
+**Mục tiêu:** mọi node trên bảng điều tra đến từ dữ liệu (Supabase), không còn id/tọa độ/tên/mã chứng cứ gắn cứng case_000.
 
-| #   | Việc                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 3.1 | Thống kê 66 chỗ `cp-000-*` trong 11 file mindmap + 31 chỗ ngoài mindmap (hint-modal, epilogue, checkpoints-context, narratives). Phân loại: (a) id checkpoint thật đọc được từ DB, (b) id cố định cho logic chung, (c) dữ liệu chết. Ghi bảng vào báo cáo.                                                                                                                                                |
-| 3.2 | **M5** `use-case-narratives.ts`: đọc `case_checkpoints.narrative` theo `kind`/`depends_on`, bỏ map phase → `cp-000-*`. Giữ baseline narrative ngay lập tức (AGENTS.md §6 Zero-Black-Screen).                                                                                                                                                                                                              |
-| 3.3 | **M4** `CASE_000_INTERROGATION_CRITERIA` → đọc `case_checkpoints.ai_context` / `ai_valid_cases` / `ai_invalid_cases` của checkpoint `kind` thẩm tra theo `subject_key`. Nếu thiếu cột thì viết migration 36.                                                                                                                                                                                              |
-| 3.4 | **M8** Gỡ `lib/cases/case-000-suspects.ts`, `case-000-clues.ts`: chuyển sang `case_characters` + `case_checkpoints`. Xóa file khi không còn import. `server-grader.ts`: bỏ `DEFAULT_CASE_000_PHONE_INPUTS` hardcode, đọc config từ checkpoint `answer_config`.                                                                                                                                            |
-| 3.5 | Bỏ `cp-000-*` trong **11 file**: `main-investigation-canvas.tsx` (12), `admin-create-pin-modal.tsx` (22), `custom-pin-modal.tsx` (10), `culprit-epilogue-modal.tsx` (7), `add-suspect-modal.tsx` (6), `phone-lookup-modal.tsx` (3), `indictment-modal.tsx` (2), `phone-narrative-modal.tsx` (1), `followup-choice-form.tsx` (1), `followup-code-form.tsx` (1), `followup-time-form.tsx` (1). Tổng 66 chỗ. |
-| 3.6 | **Không** sửa dòng import `CASE_000_EVIDENCE` / `CASE_000_PDFS` trong mindmap (WT-2 đổi nguồn). Ghi vào việc tích hợp. Lưu ý: mindmap hiện **không import** `CASE_000_EVIDENCE`/`CASE_000_PDFS`, chỉ có trong `evidence/**` và `board-stage` (thuộc WT-2).                                                                                                                                                |
-| 3.7 | Spec `e2e/case-000.spec.ts` phải pass nguyên vẹn. Thêm spec chơi thử 1 vụ duplicate từ case_000 (slug khác) qua được checkpoint đầu. **Lưu ý:** E2E admin spec cần Playwright auth setup từ WT-1; nếu WT-1 chưa merge, dùng `test.skip` hoặc chỉ test route công khai.                                                                                                                                    |
+**Sở hữu:** `components/investigation/mindmap/**` (trừ `suspect/suspect-evaluation-modal.tsx`), `lib/guides/interactive-walkthrough-data.ts`, `db/schema/39_case_board_nodes.sql`, `e2e/board-dynamic.spec.ts`.
 
----
+**Hiện trạng (khảo sát):** 101 dòng khớp nhóm case/id và 130 dòng khớp nhóm tên/suspect key trên 18 file. Nặng nhất:
 
-## 5. WT-4 — `wt/pin-photos`
+- `canvas/pin-builder.ts`: `DESKTOP_SUSPECT_SLOTS`, `MOBILE_SUSPECT_SLOTS`, `DYNAMIC_PHOTO_SLOTS`, 5 pin nền `c0-pin-*` với tọa độ cứng, `c0-pin-followup-vu/tung/ha`, fallback tên "Nguyễn Văn Khang", connection id `c0-conn-*`.
+- `main-investigation-canvas.tsx`: map phase `cp-000-1a/1b/1c/0/2b`, map avatar `avatar_vu/tung/ha/...`, nhận diện nạn nhân theo `khang`, fallback tên.
+- `admin-create-pin-modal.tsx`: `PRESET_CASE_PHOTOS`, `PRESET_STICKY_TEMPLATES`, `PRESET_DOSSIER_TEMPLATES`, default `cp-000-0`, map `vu→cp-000-1a`.
+- Các modal còn fallback key/tên/mã: `add-suspect-modal`, `indictment-modal`, `followup-question-modal`, `culprit-epilogue-modal`, `canvas-modals`, `dossier-result-modal`, `phone-lookup-modal`, `interactive-walkthrough`.
 
-**Sở hữu:** `components/investigation/hero-interactive.tsx`, `components/investigation/hero-interactive/**`.
+**Thiết kế:**
 
-| #   | Việc                                                                                                                                                                                              |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 4.1 | **M9** `use-live-pin-photos.ts`: đọc ảnh từ `/api/phone-data/photos?caseId=` (Supabase) trước, fallback Sheets như `use-phone-data.ts`. Bỏ phụ thuộc tab Sheets `photos` khi Supabase có dữ liệu. |
-| 4.2 | `constants.ts`, `card-composite.ts`: bỏ tham chiếu cứng case_000 nếu có, nhận `caseId` qua props.                                                                                                 |
-| 4.3 | Giảm `any` trong `render-scene.ts` (28), `utils.ts` (7). Không đổi hành vi vẽ canvas.                                                                                                             |
-| 4.4 | Kiểm tra trực quan bảng điều tra case_000 trước/sau (screenshot so sánh).                                                                                                                         |
+1. **Migration 39 — `case_board_nodes`** (chủ dự án duyệt trước khi chạy):
+   - Cột: `id TEXT PRIMARY KEY`, `case_slug TEXT NOT NULL REFERENCES cases(slug) ON UPDATE CASCADE ON DELETE CASCADE`, `node_kind TEXT NOT NULL` (`phone | victim_phone | reinvestigate | suspects | indictment | evidence_hub | followup | question | note | dossier | custom`), `title TEXT`, `subject_key TEXT` (khớp `case_characters.key`), `checkpoint_id TEXT` (khớp `case_checkpoints.id`), `slot_index INTEGER`, `style JSONB` (màu/icon/ảnh), `position JSONB` (`{mobile:{x,y}, desktop:{x,y}}`), `created_at`, `updated_at`.
+   - RLS: đọc public, ghi `private.is_admin()`.
+   - Backfill case_000 từ các hằng số hiện tại: `c0-pin-phone`, `c0-pin-victim-phone`, `c0-pin-reinvestigate`, `c0-pin-suspects`, `c0-pin-indictment`, `c0-pin-followup-{vu,tung,ha}`. Không backfill node custom của GM.
+   - `boardgame_pins` tiếp tục lưu vị trí kéo tay; `case_board_nodes.position` là vị trí mặc định.
+2. **`pin-builder.ts`**: bỏ 3 mảng slot tĩnh + 5 pin nền cứng; dựng pin từ `case_board_nodes` + `case_characters` + `case_checkpoints`; tọa độ mặc định lấy từ node, override bằng `boardgame_pins`. Nếu vụ chưa có node: tính layout xác định theo danh sách nhân vật/checkpoint (không dùng id case_000).
+3. **Bỏ map key/tên**: `findFollowupCulprit` mặc định `vu/ha/tung`, `detectCheckpointForPin` suy `cp-${key}-followup`, `hasVu/Tung/HaFollowup`, tên "Lê Quang Vũ/Nguyễn Thanh Tùng/Trần Thị Hà", nạn nhân "Nguyễn Văn Khang" → lấy từ `CaseCharactersProvider` + `checkpoint.subjectKey` + `device.label`.
+4. **Click handler**: nhận node theo `case_board_nodes.node_kind`/`checkpoint_id`, không so id chữ cứng.
+5. **Modal**:
+   - `add-suspect-modal`: bỏ chặn `khang`, mã admin `"000"/"00"`, `isVu/isTung/isHa`; nghi phạm lấy từ `case_characters` role suspect.
+   - `indictment-modal`: bỏ `isCulpritValid` cứng và mã chứng cứ fallback; giữ `validSuspects/validMotives/requiredEvidenceIds`; thông tin vụ án (tội danh, thời gian, địa điểm, hung khí) đọc từ checkpoint/case metadata — nếu chưa có nguồn, ghi vào `case_checkpoints.answer_config` hoặc `cases.metadata`, **không** hardcode.
+   - `followup-question-modal`: bỏ fallback `vu→time/tung→choice/ha→code`, tên cứng, `TARGET_CODES` D-04..D-06; chỉ dùng `inputType`, `photoCodes`, `subjectKey`; storage key `followup_${subjectKey}`.
+   - `culprit-epilogue-modal`: bỏ `cp-epilogue-ha`, nhánh `isHaBoxSolved`.
+   - `phone-lookup-modal`, `canvas-modals`, `dossier-result-modal`: bỏ fallback key/tên/mã; nội dung Hồ sơ A/B/C đọc từ dossier/checkpoint.
+6. **Nguồn evidences**: thay `usePhoneData("evidences")` trong `main-investigation-canvas`, `add-suspect-modal`, `followup-question-modal`, `admin-create-pin-modal` bằng `useCaseEvidence(caseId)` (đã có sẵn). Không phụ thuộc WT-6.
+7. **Admin pin modal**: bỏ 3 bộ preset ảnh case_000; ảnh chọn từ `case_evidence` + `phone_photos`; checkpoint chọn theo `kind`; bỏ `cp-000-0` mặc định (rỗng thì yêu cầu chọn).
+8. **Walkthrough**: dữ liệu bước điều tra lấy `targetPinId` từ node DB theo `node_kind`; bỏ danh sách id cứng.
 
----
+**Kiểm tra:** spec mới `board-dynamic.spec.ts` — đếm node render = số node DB + checkpoint/nhân vật; click 5 node chính mở đúng modal; tạo case mới qua Studio (không seed) thấy node theo dữ liệu. Case_000 E2E cũ pass.
 
-## 6. WT-5 — `wt/any-batch-2`
-
-**Sở hữu:** `components/admin/checkpoint-studio/*.tsx` (trừ `sections/**`), `components/admin/map-studio/**`, `components/admin/dossier-studio/**`, `app/(admin)/studio/dashboard-client.tsx`, `app/(admin)/studio/players/**`, `app/api/**` (trừ `phone-data/**`), `lib/types/checkpoint-studio.ts`, `lib/cms/**`, `lib/hooks/use-case-checkpoints.ts`, `components/investigation/room-sync-context.tsx`, `components/investigation/feedback-modal.tsx`, `components/auth/user-nav.tsx`, `components/public/waitlist-form.tsx`.
-
-| #   | Việc                                                                                        |
-| --- | ------------------------------------------------------------------------------------------- |
-| 5.1 | Thay `any` bằng type thật hoặc `unknown` + type guard. Mục tiêu: 0 `any` trong vùng sở hữu. |
-| 5.2 | Không đổi hành vi, không đổi API response shape.                                            |
-| 5.3 | Ghi số `any` trước/sau vào báo cáo.                                                         |
+**Rủi ro:** migration 39 là thay đổi schema lõi; nếu chủ dự án chưa muốn bảng mới, phương án B: giữ cấu trúc pin nền nhưng đọc hoàn toàn từ `case_checkpoints`/`case_characters`, chấp nhận 5 node hệ thống không đổi tên. Cần chốt trước khi làm.
 
 ---
 
-## 7. Bước tích hợp sau merge (người tích hợp)
+## 4. WT-2 — `wt/phone-devices` (Nhiều dòng iPhone + sửa tin nhắn hàng loạt)
 
-1. ~~Merge theo thứ tự WT-5 → WT-1 → WT-4 → WT-2 → WT-3.~~ ✅ Done (2026-10-24). Thứ tự thực tế: WT-5 → WT-4 → WT-2 → WT-3. WT-1 hấp thụ vào WT-5.
-2. ~~Post-merge typecheck fix.~~ ✅ Done (`01031c0`): `depends_on` → `dependsOn`, `subject_key` → `subjectKey`, thêm `narrative`/`dependsOn` vào `Checkpoint`, restore `CASE_000_PDFS` import.
-3. Gọi `duplicateEvidenceData` trong `duplicateCase` (`lib/actions/case-actions.ts`). ⏳ Chưa làm.
-4. Đổi các import `CASE_000_EVIDENCE` / `CASE_000_PDFS` trong `server-grader.ts` sang truy vấn `case_evidence`. Xóa export deprecated trong `evidence-data.ts`. ⏳ Chưa làm.
-5. Cập nhật `CHANGELOG.md`, `docs/HANDOFF_ROADMAP.md`, `docs/TECHDEBT.md`, `docs/README.md`. ⏳ Chưa làm.
-6. **Chủ dự án duyệt và chạy migration 30–36** theo thứ tự, rồi chạy `scripts/ops/migrate-phone-sheets.mjs`. ⛔ Chờ owner.
-7. Xóa worktree: `git worktree remove ../dect_wtX`, xóa nhánh `wt/*` đã merge. ⏳ Chưa làm.
-8. `git push origin main` (72 commits ahead). ⛔ Chờ lệnh owner.
+**Mục tiêu:** (a) khung điện thoại theo nhiều model/kích thước; (b) soạn/sửa tin nhắn nhanh, không thêm từng tin.
+
+**Sở hữu:** `components/phone-engine/**` trừ `apps/{notes,safari,banking,photos}-app.tsx`, `components/admin/phone-studio/**`, `lib/types/phone.ts`, `lib/actions/phone-actions.ts`, `e2e/phone-devices.spec.ts`, `e2e/messages-editor.spec.ts`, `docs/core_specs/20_phone_studio.md`.
+
+**A. Khung thiết bị nhiều model**
+
+Hiện trạng: chỉ `chassis: "iphone_classic" | "iphone_modern" | "android_vintage"`; kích thước cứng 415×768 và 390×780; `android_vintage` không có renderer; "đời máy" chỉ là chuỗi hiển thị; app bên trong thiết kế cứng 375×600.
+
+1. `lib/phone/devices.ts`: bảng preset (id, tên, logicalW/logicalH, screenW/screenH, bezel, radius, notch/dynamic island, home indicator):
+
+   | id                          | Tên               | Khung   | Màn hình                |
+   | --------------------------- | ----------------- | ------- | ----------------------- |
+   | `iphone_se`                 | iPhone SE (2020)  | 375×667 | 375×667, viền trên/dưới |
+   | `iphone_8_plus`             | iPhone 8 Plus     | 414×736 | 414×736                 |
+   | `iphone_classic` (alias cũ) | iPhone 6s Plus    | 415×768 | 375×600                 |
+   | `iphone_12_mini`            | iPhone 12 mini    | 375×812 | 375×812, notch          |
+   | `iphone_13`                 | iPhone 13         | 390×844 | 390×844, notch          |
+   | `iphone_15`                 | iPhone 15         | 393×852 | 393×852, dynamic island |
+   | `iphone_15_pro_max`         | iPhone 15 Pro Max | 430×932 | 430×932, dynamic island |
+
+   Preset có thể chỉnh trong file; GM chọn ở Device Form. `android_vintage` ẩn khỏi select (không có renderer).
+
+2. Gộp `iphone-classic-chassis.tsx` + `modern-phone-chassis.tsx` thành `device-chassis.tsx` nhận preset; giữ export cũ để không vỡ import.
+3. Scale: dùng `ResizeObserver` trên container (thay vì chỉ `window.resize`), clamp theo preset; thêm test cho split-pane resize.
+4. Bên trong màn hình: giữ viewport logic cố định 375×600 scale theo khung để app không vỡ layout; nếu màn hình cao hơn (812–932), cho nền/chrome giãn (`h-full`) và app giữ tỉ lệ. Ghi rõ giới hạn này trong spec 20.
+5. `device.model` / `model_id` lưu trong `case_characters.device` JSONB — **không cần migration**; `device-form.tsx` select preset + hiển thị kích thước; `phone-simulator.tsx` đọc `model_id`, fallback `chassis`.
+6. Bỏ hardcode wallpaper case_000 trong chassis; thiếu ảnh thì nền trung tính.
+
+**B. Soạn tin nhắn hàng loạt**
+
+Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; không sửa tin đã tạo; `role` không nhất quán (`me|them` vs `sent|received`); `slot_index` mỗi thread tự đếm nên trùng toàn cục; Supabase trả row phẳng nhưng `MessagesApp` chỉ hiểu thread row kiểu Sheets.
+
+1. Sửa `MessagesApp` đọc đúng row phẳng `phone_messages` (group theo `thread_key`, sort theo `slot_index`), chuẩn hóa role `sent|received`; bỏ parse `messages_json`/`messages_text`. Đồng bộ Studio preview dùng cùng logic.
+2. `MessagesEditor` viết lại theo hướng bảng:
+   - Chọn thread → danh sách tin dạng dòng inline-edit (thời gian, người gửi, nội dung, đính kèm, cờ manh mối).
+   - Thêm nhiều dòng cùng lúc; dán khối text (mỗi dòng `Tên: nội dung`, hỗ trợ `[20:15]`) hoặc JSON.
+   - Lưu một lần (`savePhoneMessagesBatch`) thay vì gọi action mỗi tin; xóa/sửa/đổi thứ tự trong batch.
+   - Tạo thread mới không kèm tin mồi; `thread_key` tự sinh từ tên.
+   - `slot_index` đánh lại tuần tự trong thread khi lưu.
+3. `phone-actions.ts`: thêm `savePhoneMessagesBatch(caseSlug, threadKey, messages[])` (validate role, upsert theo id, delete thiếu), giữ action cũ cho tương thích.
+4. E2E: dán 5 dòng → lưu → mở Messages trong simulator thấy đúng 5 tin, đúng thứ tự/role; sửa nội dung 1 tin → preview cập nhật.
+
+**Rủi ro:** đổi shape dữ liệu Messages ảnh hưởng case_000 đang chạy; phải test với 89 tin/16 thread đã seed.
 
 ---
 
-## 8. Rủi ro
+## 5. WT-3 — `wt/studio-ux` (Dọn UI/UX Studio)
 
-| Rủi ro                                                | Giảm thiểu                                                                                                                                   |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| WT-2 và WT-3 cùng dùng dữ liệu chứng cứ               | WT-2 giữ export cũ; WT-3 không sửa import đó; nối ở bước tích hợp.                                                                           |
-| `main-investigation-canvas.tsx` lớn, dễ conflict      | Chỉ WT-3 sở hữu. WT-4 chỉ sửa `HeroInteractive` bên trong, không đổi props.                                                                  |
-| Migration chưa chạy làm E2E fail                      | Spec phụ thuộc bảng mới phải `test.skip` khi bảng chưa tồn tại.                                                                              |
-| 5 dev server cùng lúc tốn RAM                         | Chỉ bật dev server khi chạy E2E/kiểm tra UI, tắt sau khi xong.                                                                               |
-| `.next` cache lẫn giữa worktree                       | Mỗi worktree có `.next` riêng; không symlink.                                                                                                |
-| E2E admin cần auth setup từ WT-1                      | WT-2/WT-3/WT-4 dùng `test.skip` cho spec admin nếu WT-1 chưa merge. Hoặc rebase lên main sau khi WT-1 merge.                                 |
-| `CASE_000_EVIDENCE` import chỉ nằm ở WT-2             | Xác nhận: mindmap (WT-3) **không** import `CASE_000_EVIDENCE`/`CASE_000_PDFS`. Chỉ `evidence/**` và `board-stage` (WT-2). Không có xung đột. |
-| `server-grader.ts` có `DEFAULT_CASE_000_PHONE_INPUTS` | WT-3 sở hữu file này; cần bỏ hardcode fallback, đọc config từ checkpoint `answer_config`.                                                    |
+**Mục tiêu:** bớt thông tin thừa, bớt mô tả/placeholder dài, trường kỹ thuật ẩn/tự sinh, ô nhập 1 dòng + tự giãn khi cần.
+
+**Sở hữu:** `components/admin/checkpoint-studio/**`, `components/admin/dossier-studio/**`, `app/(admin)/studio/cases/**`, `app/(admin)/studio/settings/**`, `app/(admin)/studio/players/**`, `app/(admin)/studio/feedbacks/**`, `components/ui/field.tsx` (mới), `e2e/studio-ux.spec.ts`.
+
+**Không sở hữu** (đã chia): evidence studio (WT-5), phone studio (WT-2), character studio (WT-4).
+
+**Nguyên tắc chung:**
+
+1. Tạo `components/ui/field.tsx`: `Field({label, hint?, children})` + `AutoGrowTextarea` mặc định `rows=1` cho mọi trường văn bản dài. Thay các `Field` cục bộ trùng lặp trong checkpoint studio.
+2. **Bỏ khỏi UI chính** (vẫn tự sinh ngầm): `key`/`slug`, `tag_code`, `id` nội bộ (`cp-epilogue-N`, `lookup_<timestamp>`), `slot_index`, `phase`, `followupOf` nhập tay → chuyển sang select checkpoint; `subject_key` nhập tay → select nhân vật cùng vụ; mã chứng cứ nhập tay → picker.
+3. Trường kỹ thuật buộc phải còn (ví dụ `valid_suspects`): đặt trong khối "Nâng cao" thu gọn, mặc định đóng.
+4. **Xóa placeholder/helper dài** dạng mô tả quy trình; giữ label ngắn. Danh sách cụ thể: `checkpoint-identity-form.tsx:120-127`, `suspect-interrogation-config-form.tsx:136,186,236`, `phone-lookup-config-form.tsx:65-85`, `followup-config-form.tsx:100-108`, `indictment-config-form.tsx` (4 placeholder), `dossier-config-modal.tsx:205-227`, `dossier-studio-sidebar.tsx:181-289`.
+5. Dossier: ẩn "Khóa kỹ thuật", ghi chú dùng textarea auto-grow; giữ mã tag vì dùng liên kết chứng cứ.
+6. Cases: bỏ hiển thị `ID: {slug}`; giữ search theo slug ngầm.
+7. Settings/Players/Feedbacks: rà placeholder dài, bảng không cần thiết.
+
+**Kiểm tra:** spec `studio-ux.spec.ts` (skip khi thiếu credential admin): mở từng trang studio, không còn text placeholder dài được liệt kê, các trường auto-grow tăng chiều cao khi nhập nhiều dòng, không có trường `key`/`slug`/`slot_index` hiển thị ở form chính.
 
 ---
 
-## 9. Trạng thái review code (cập nhật 2026-10-24)
+## 6. WT-4 — `wt/character-assets` (Gắn ảnh vào nhân vật)
 
-### WT-5 (`wt/any-batch-2`) — 41 file modified + 3 new
+**Mục tiêu:** GM tải ảnh trực tiếp cho từng nhân vật; ảnh hiển thị ở bảng điều tra, modal thẩm tra, danh bạ điện thoại.
 
-**Kết quả:** Pass. Không có lỗi logic, chỉ thay đổi type-level.
+**Sở hữu:** `db/schema/38_character_avatar.sql`, `lib/actions/character-actions.ts`, `components/admin/character-studio/**`, `app/api/characters/route.ts`, `lib/cases/characters.ts`, `lib/cases/case-characters.ts`, `components/investigation/case-characters-context.tsx`, `components/phone-engine/apps/phone-app.tsx`, `components/investigation/mindmap/suspect/suspect-evaluation-modal.tsx`, `e2e/character-avatar.spec.ts`.
 
-- Phone engine (6 file): Tạo interface `BankTransaction`, `PhotoItem`, `RichNote`. Raw CMS data dùng `Record<string, unknown>`. `usePhoneData` default generic đổi từ `any` sang `Record<string, unknown>`.
-- API routes (10 file): Tất cả `catch (error: any)` → `catch (error: unknown)` + `String()` extraction. `Record<string, unknown>[]` cho data arrays.
-- Checkpoint studio (5 file): `answer_config as Record<string, unknown> | null` thay `as any`.
-- Map/Dossier studio: Chủ yếu formatting (Prettier) + vài `any` cast loại bỏ.
-- Room-sync-context: `PresencePayload[]` thay `any[]`, error handling đúng.
-- user-nav: Import `User as SupabaseUser` thay `any`.
-- E2E specs: `auth.setup.ts` đúng pattern (graceful skip khi thiếu env). `phone-runtime.spec.ts` (P28) OK. `phone-case-create.spec.ts` (P29) gọi `/api/admin/clean-temp-case` chưa tồn tại — test skip an toàn nhờ migration guard.
+**Hiện trạng:** `case_characters` chỉ có `avatar_code TEXT`; ảnh thật nằm ở evidence/phone photo mã `avatar_*`; Characters Studio chỉ nhập mã; bucket `avatars` tồn tại nhưng policy cho phép ghi công khai và không được dùng; gameplay hiển thị placeholder nếu không có ảnh evidence.
 
-**Lưu ý scope violation:** WT-5 đã làm luôn phần WT-1 (phone engine `any` reduction, E2E auth, phone specs, playwright config). WT-1 worktree không cần tạo riêng nữa.
+**Thiết kế:**
 
-### WT-2 (`wt/evidence-db`) — 8 modified + 10 new
+1. Migration 38:
+   - `ALTER TABLE case_characters ADD COLUMN avatar_url TEXT`, `avatar_asset_path TEXT`.
+   - Siết policy bucket `avatars`: đọc public, ghi/xóa chỉ `private.is_admin()` (hiện `13_storage_buckets.sql` cho phép public insert/update/delete — rủi ro bảo mật).
+   - Không backfill ảnh từ Sheet trong SQL; nếu muốn giữ ảnh cũ, script ops một lần đọc `case_evidence` code `avatar_*` rồi `UPDATE` (chủ dự án chạy).
+2. `lib/actions/character-actions.ts`: thêm `uploadCharacterAvatar(caseSlug, key, file)` — upload bucket `avatars` path `cases/{slug}/characters/{key}.{ext}`, lưu `avatar_url`/`avatar_asset_path`; xóa file cũ khi thay.
+3. Characters Studio: khối ảnh chân dung có preview + nút tải/xóa, thay ô `Mã ảnh trên tab evidences`; giữ trường device nạn nhân nhưng thu gọn.
+4. `/api/characters` trả `avatar_url`; `CaseCharactersProvider` map `avatarUrl = avatar_url || ảnh evidence legacy || placeholder`. `lib/cases/characters.ts` ưu tiên cột mới, bỏ map tên `vu/tung/ha/khang` (dùng `key`/aliases).
+5. Render:
+   - `pin-builder` dùng `avatarUrl` (hợp đồng đã có, không cần chờ WT-1).
+   - `suspect-evaluation-modal` hiển thị avatar + tên.
+   - `phone-app` danh bạ: nếu contact khớp alias/phone với character thì dùng `avatar_url`, fallback chữ cái đầu; "My Card" dùng ảnh nạn nhân.
+6. E2E: admin upload ảnh → API trả URL → pin bảng điều tra và modal thẩm tra có `<img>` đúng nguồn.
 
-**Kết quả:** Pass. Kiến trúc tốt, auth đúng.
+**Phụ thuộc:** WT-1 có thể dùng `avatarUrl` ngay; sau merge, ảnh thật xuất hiện mà không cần sửa thêm.
 
-- Migration 35: Schema `case_evidence` clean, RLS đúng (`is_admin()` write, public read), storage bucket policies đầy đủ 4 operation, seed case_000 đủ 8 record.
-- `evidence-actions.ts`: 6 server actions, tất cả write op có `requireAdminAuth()`. `uploadEvidenceAsset` sanitize filename, `duplicateEvidenceData` strip id/timestamps.
-- `use-case-evidence.ts`: Dual-source — Supabase first, fallback `CASE_000_PDFS`/`CASE_000_EVIDENCE` cho case_000 khi DB rỗng. Cache 30s.
-- `evidence-data.ts`: `@deprecated` annotation, export giữ nguyên backward compat.
-- Investigation pages: Chuyển từ static import sang `useCaseEvidence(caseId)` hook. `useEffect` deps correct.
-- Minor: Error branch có `if/else` redundant (cả 2 set `[]`) — cosmetic.
+---
 
-### WT-3 (`wt/narrative-ai`) — 16 modified + 3 new
+## 7. WT-5 — `wt/evidence-ux` (Chứng cứ: preview theo bộ hồ sơ, bỏ metadata rác)
 
-**Kết quả:** Pass với lưu ý.
+**Mục tiêu:** tài liệu xem theo bộ hồ sơ; bỏ các trường "thời điểm thu thập / niêm phong / người thu thập" vô nghĩa; form gọn.
 
-- `cp-000-*` removed: 14/16 modified file đã có 0 ref. Strategy: dynamic lookup qua `subject_key` + `kind` trên `case_checkpoints`.
-- **Còn lại:** `admin-create-pin-modal.tsx` (11 ref), `main-investigation-canvas.tsx` (12 ref, KHÔNG modified). Đây là checkpoint routing logic case_000 — cần multi-case engine (spec 14) mới dynamic được. Ngoài scope WT-3.
-- Migration 36: Backfill `textMatchInputs`, `motiveContext`, `alibiContext`, `contradictionContext` vào `answer_config`. Server-grader đọc từ DB, bỏ `DEFAULT_CASE_000_PHONE_INPUTS`.
-- `case-000-clues.ts`, `case-000-suspects.ts`: Gutted to `@deprecated` stubs. Logic chuyển sang generic `clues.ts`, `characters.ts`.
-- `use-case-narratives.ts`: Bỏ `PHASE_TO_CHECKPOINT` map cứng, dùng `resolveCheckpointForPhase` generic (match by dossier key, root checkpoint, subject_key).
+**Sở hữu:** `components/investigation/evidence/**`, `app/(investigation)/evidence/**`, `components/admin/evidence-studio/**`, `lib/hooks/use-case-evidence.ts`, `lib/actions/evidence-actions.ts`, `e2e/evidence-studio.spec.ts`, `e2e/evidence-dossier-grouping.spec.ts`.
 
-### WT-4 (`wt/pin-photos`) — 6 modified
+**Nhiệm vụ:**
 
-**Kết quả:** Pass. Type-level + data source mở rộng.
+1. Nhận base từ Bước 0 (fallback removal + spec auth).
+2. **Bỏ metadata rác khỏi UI**: `timestamp`, `recoveredBy`, `integrityStatus`, `chainOfCustody`, `evidenceId` trong `components/admin/evidence-studio/evidence-form.tsx:467-533`, `evidence-preview.tsx:204-245`; bỏ fallback tương ứng trong `use-case-evidence.ts:33-53` và hardcode trong `page.tsx:271-276`.
+   - Giữ `code` (khóa tham chiếu checkpoint) nhưng tự sinh từ tiêu đề, ẩn trong "Nâng cao"; bỏ hiển thị `#code`, `P{phase}`, `S{slot}` trong danh sách studio.
+   - `chainOfCustody` đang không có input nhưng vẫn ghi payload — xóa khỏi state/payload.
+3. **Preview theo bộ hồ sơ**:
+   - `dossier-tray.tsx`: nhóm tài liệu theo `case_dossiers` (`title`, `document_codes`) thay chip phase cứng "Khởi đầu/Bộ A/B/C"; nhóm "Vật chứng" riêng; nhóm chưa gán bộ.
+   - `use-case-dossiers.ts` bổ sung map `code → dossier{key,title}` (đã có `codeMap`, cần trả metadata).
+   - Inspector hiển thị breadcrumb "Bộ hồ sơ: <tên>" + preview PDF `DiegeticDossierSheet` khi khớp dossier; ảnh vẫn `EvidencePhotoAnnotator` nhưng bỏ badge `VẬT CHỨNG [evidenceId]` (dùng tiêu đề).
+   - `page.tsx`: truyền `dossierKey/title` vào item; không suy phase theo chữ cái khi dossier đã khai báo.
+4. **Form gọn**: placeholder ngắn; `description` dùng `AutoGrowTextarea` (WT-3 tạo; nếu chưa merge thì dùng `components/ui/auto-grow-textarea.tsx` sẵn có); upload file giữ nguyên.
+5. E2E: mở khay hồ sơ case_000, thấy group theo tên bộ; click tài liệu thuộc bộ A → inspector hiện đúng bộ + sheet; studio form không còn 4 trường metadata.
 
-- `types.ts`: Thêm `isCustomNode`, `isUser`, `caseId` vào `PinPoint`/`HeroInteractiveProps`.
-- `use-live-pin-photos.ts`: Tạo `PinPhotoItem` interface. Data source đổi từ `"evidences"` sang `"photos"` tab (Supabase first). Thêm fallback URL fields (`image_url`, `url`, `photo_url`).
-- `render-scene.ts`: Tạo `UnifiedPin` extending `PinPoint`. 28 `(pin as any).xxx` → direct property access.
-- Không thay đổi hành vi vẽ canvas.
+**Lưu ý dữ liệu:** xóa field khỏi payload nhưng **không** xóa cột `metadata` trong DB (tránh migration không cần thiết). Dữ liệu cũ vẫn nằm trong JSONB, UI bỏ qua.
 
-### Việc cần fix khi worktree tiếp tục — ĐÃ FIX XONG (2026-10-24)
+---
 
-| #   | WT   | File                                     | Vấn đề                                                                                                          | Trạng thái |
-| --- | ---- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------- |
-| F1  | WT-5 | `e2e/phone-case-create.spec.ts`          | `finally` block gọi cleanup API chưa tồn tại. Đã thay bằng comment giải thích orphan data acceptable.           | ✅ Fixed   |
-| F2  | WT-2 | `lib/hooks/use-case-evidence.ts:100-105` | Error branch `if/else` redundant. Đã gộp thành `setRawEvidence([])`.                                            | ✅ Fixed   |
-| F3  | WT-3 | `lib/hooks/use-case-narratives.ts`       | `resolveCheckpointForPhase(checkpoints: any[])`. Đã đổi sang `Checkpoint[]` + import type.                      | ✅ Fixed   |
-| F4  | Post | 5 files mindmap + types                  | `depends_on`/`subject_key` snake_case → camelCase, thêm `narrative`/`dependsOn` vào `Checkpoint`, import fixes. | ✅ Fixed   |
+## 8. WT-6 — `wt/cms-cutover` (Cắt hoàn toàn Google Sheets khỏi runtime)
+
+**Mục tiêu:** mọi dữ liệu runtime đọc Supabase; Sheets chỉ còn ở script ops một lần.
+
+**Sở hữu:** `app/api/phone/**`, `app/api/phone-data/**`, `app/api/admin/pins/route.ts`, `lib/hooks/use-phone-data.ts`, `lib/google/**`, `lib/hooks/use-case-checkpoints.ts`, `components/phone-engine/apps/{notes,safari,banking,photos}-app.tsx`, `components/investigation/hero-interactive/use-live-pin-photos.ts`, `scripts/ops/*sync*` (chỉ nhãn/đường dẫn), `.env.example`, `e2e/no-sheets.spec.ts`.
+
+**Nhiệm vụ:**
+
+1. Thêm `evidences` vào `app/api/phone-data/[tab]/route.ts` map `case_evidence`; giữ alias `code/photo_code`, `label/title`, `thumb_url/url` để `PhotosApp` và modal không vỡ; lọc `case_slug`.
+2. Sửa app đọc đúng bảng:
+   - `notes-app` → `phone_notes` (tab `notes`).
+   - `safari-app` → `phone_browser_history` (tab `browser`).
+   - `banking-app` → `phone_bank_transactions` (tab `bank`).
+   - `photos-app` → `phone_photos` (tab `photos`), bỏ fallback prop.
+   - Kiểm tra `MiscEditors` ghi đúng các bảng này (đang ghi đúng).
+3. `usePhoneData`: bỏ nhánh fallback `/api/phone`; lỗi/rỗng trả trạng thái lỗi + nút thử lại (không giả lập nội dung). Giữ cache in-memory 30s.
+4. `/api/admin/pins`: bỏ ghi Sheet `evidences!A:I`; ảnh/dossier/note pin ghi Supabase (`case_evidence` metadata hoặc `case_board_nodes` sau WT-1 — trước merge dùng `case_evidence`).
+5. `useCaseCheckpoints`: bỏ enrich evidences từ Sheets, dùng `case_evidence`.
+6. `use-live-pin-photos`: bỏ fallback Sheets; chỉ `phone_photos`/`case_evidence`.
+7. Xóa `app/api/phone/route.ts` (hoặc trả 410 kèm ghi chú) sau khi grep sạch consumer; gỡ `lib/google/auth.ts` khỏi runtime (giữ cho scripts ops nếu cần, chuyển vào `scripts/ops/lib`).
+8. `.env.example`: đánh dấu `GOOGLE_*` chỉ dùng cho script export/import một lần; không còn bắt buộc runtime.
+9. E2E `no-sheets.spec.ts`: chặn request tới `docs.google.com`/`sheets.googleapis.com`; mở game, phone, evidence, bảng điều tra — không request Sheets, dữ liệu vẫn đủ.
+
+**Rủi ro:** nếu một bảng Supabase rỗng ở production (case mới), UI sẽ trống thay vì rơi về Sheets — đúng chủ trương "Live-First, không fallback tĩnh", nhưng cần thông báo trạng thái rỗng rõ ràng.
+
+---
+
+## 9. WT-7 — `wt/ops-hardening` (Hạ tầng, không đụng code gameplay)
+
+**Sở hữu:** `docker-compose.yml`, `deploy/**`, `scripts/ops/vps-docker-reclaim.sh`, `docs/core_specs/06_cicd_deployment_guide.md`.
+
+1. `docker-compose.yml`: đổi `3000:3000` → `127.0.0.1:3000:3000` để không bypass Traefik/giả `X-Real-IP`.
+2. Caddy edge config (Pha 5): HSTS `max-age=31536000`, access-log redaction query string, chuyển tiếp `X-Real-IP` đúng chuỗi.
+3. Kiểm tra `vps-docker-reclaim.sh` giữ `:latest` + `:previous`, chỉ chạy khi container `running`; thêm systemd timer mẫu 03:00.
+4. Checklist thủ công: bật Leaked Password Protection, xác nhận `SUPABASE_SERVICE_ROLE_KEY` trong container; xoay key `.env` + `git rm --cached .env` (chủ dự án).
+5. Không sửa mã app.
+
+---
+
+## 10. Thứ tự tích hợp và xung đột
+
+| Bước | Việc                                                                                                                                                              | Lý do                                                               |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| 0    | Merge Bước 0 (base evidence fix)                                                                                                                                  | Mọi worktree cùng base                                              |
+| 1    | Merge WT-4 (character assets)                                                                                                                                     | Cung cấp `avatar_url` thật cho pin/modal                            |
+| 2    | Merge WT-2 (phone devices + messages)                                                                                                                             | Độc lập, chạm phone engine                                          |
+| 3    | Merge WT-6 (cms cutover)                                                                                                                                          | Sau WT-2 để tránh sửa trùng `messages-app`/`phone-app`              |
+| 4    | Merge WT-1 (board dynamic)                                                                                                                                        | Phụ thuộc WT-4 (avatar) và dùng `useCaseEvidence`; WT-6 đã bỏ Sheet |
+| 5    | Merge WT-5 (evidence ux)                                                                                                                                          | Chạm tray/inspector; sau WT-1 để tránh đổi cấu trúc item            |
+| 6    | Merge WT-3 (studio ux)                                                                                                                                            | Chạm form studio; sau cùng để áp primitive lên bản đã merge         |
+| 7    | Merge WT-7 (ops)                                                                                                                                                  | Không xung đột                                                      |
+| 8    | Integrator: chạy `tsc`, `pnpm test:e2e`, `NEXT_DIST_DIR=.next_dev npx next build`, cập nhật `CHANGELOG.md`, `HANDOFF_ROADMAP.md`, `TECHDEBT.md`, `docs/README.md` | Điều kiện done                                                      |
+
+**Xung đột tiềm ẩn đã xử lý bằng ma trận mục 1.3:**
+
+- `components/phone-engine/apps/phone-app.tsx`: WT-4 (avatar) — WT-2 không chạm.
+- `use-case-evidence.ts`: WT-5 — WT-1 chỉ import.
+- `lib/cases/characters.ts`: WT-4 — WT-1 dùng `avatarUrl` từ provider.
+- `lib/types/database.ts`: WT-4 thêm field `avatar_url` ở cuối file; WT-2 thêm type batch message ở cuối file (nếu cần). Integrator kiểm tra trùng tên.
+- `e2e/evidence-studio.spec.ts`: WT-5 sửa; WT-1/WT-6 không chạm.
+
+**Chạy song song tối đa:** WT-4 + WT-2 + WT-6 + WT-7 (4 worktree). WT-1 và WT-5 chờ WT-4/WT-6 merge nếu muốn tránh rebase; WT-3 chạy cuối.
+
+---
+
+## 11. Phụ lục — Kết quả khảo sát (2026-10-24)
+
+### 11.1. Nguồn dữ liệu còn đọc Google Sheets
+
+| Consumer                                                          | Tab / dữ liệu                    | Ghi chú                         |
+| ----------------------------------------------------------------- | -------------------------------- | ------------------------------- |
+| `main-investigation-canvas.tsx:198`                               | `evidences`                      | Danh sách nghi phạm/ảnh         |
+| `add-suspect-modal.tsx:121`                                       | `evidences`                      |                                 |
+| `followup-question-modal.tsx:70`                                  | `evidences`                      |                                 |
+| `admin-create-pin-modal.tsx:191`                                  | `evidences`                      |                                 |
+| `components/phone-engine/apps/photos-app.tsx:38`                  | `evidences`                      | Route Supabase không có tab này |
+| `components/investigation/evidence/reinvestigation-modal.tsx:234` | `evidences`                      |                                 |
+| `lib/hooks/use-case-checkpoints.ts:100`                           | `evidences`                      | Chỉ enrich label/mô tả          |
+| `app/api/admin/pins/route.ts:120-157`                             | ghi `evidences!A:I`              | Ảnh/dossier/note pin            |
+| `use-phone-data.ts:90-94`                                         | `photos/contacts/calls/messages` | Fallback khi Supabase rỗng      |
+| `use-live-pin-photos.ts:32`                                       | `photos`                         | Fallback ảnh bảng hero          |
+
+### 11.2. Hardcode bảng điều tra theo file
+
+| File                                    | Dòng khớp id/case | Dòng khớp tên/key | Chính                                              |
+| --------------------------------------- | ----------------: | ----------------: | -------------------------------------------------- |
+| `mindmap/main-investigation-canvas.tsx` |                24 |                40 | phase map `cp-000-*`, avatar map, nạn nhân "Khang" |
+| `mindmap/canvas/pin-builder.ts`         |                27 |                16 | slot tọa độ, 5 pin nền, followup `vu/tung/ha`      |
+| `mindmap/admin-create-pin-modal.tsx`    |                23 |                10 | 3 bộ preset ảnh case_000, `cp-000-0`               |
+| `mindmap/add-suspect-modal.tsx`         |                 1 |                16 | chặn "khang", mã `000` → `vu`                      |
+| `mindmap/indictment-modal.tsx`          |                 1 |                12 | tên/mã chứng cứ/vụ án tĩnh                         |
+| `mindmap/followup-question-modal.tsx`   |                 2 |                 9 | fallback type, `D-04..D-06`                        |
+| `mindmap/culprit-epilogue-modal.tsx`    |                 3 |                 9 | `cp-epilogue-ha`                                   |
+| `mindmap/canvas/canvas-modals.tsx`      |                 0 |                 8 | index A/B/C → `vu/tung/ha`                         |
+| `mindmap/dossier-result-modal.tsx`      |                 3 |                 5 | toàn bộ nội dung Hồ sơ A/B/C                       |
+| `mindmap/interactive-walkthrough.tsx`   |                 5 |                 2 | target pin id                                      |
+| `mindmap/phone-lookup-modal.tsx`        |                 1 |                 2 | 3 SĐT + đáp án                                     |
+
+### 11.3. Phone engine hiện trạng
+
+- Chỉ 2 renderer thực: classic 415×768 / modern 390×780; `android_vintage` không render.
+- App bên trong thiết kế cứng 375×600.
+- Messages editor: thêm từng tin, luôn tạo tin mồi, không sửa, role không nhất quán, `slot_index` trùng giữa các thread.
+- `notes/safari/banking/photos-app` đọc sai nguồn (tab `apps` hoặc Sheets `evidences`).
+
+### 11.4. Evidence inspector hiện trạng
+
+- Photo chỉ render ảnh + badge `VẬT CHỨNG [evidenceId]`; metadata không hiển thị.
+- Không nhóm theo bộ hồ sơ; chip phase cứng "Tất cả / Khởi đầu / Bộ A/B/C".
+- Studio form còn 4 trường metadata vô nghĩa + `chainOfCustody` ẩn trong payload.
+
+### 11.5. Character avatar hiện trạng
+
+- Chỉ `avatar_code`; không upload; bucket `avatars` cho phép ghi công khai và không dùng.
+- Ảnh thật nằm ở evidence/phone photo mã `avatar_*`.
+- Không render avatar trong modal thẩm tra và danh bạ điện thoại.
+
+---
+
+## 12. Quyết định đã chốt (2026-10-24)
+
+| #   | Quyết định                                                                           | Đã chốt                                                                   |
+| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| D1  | Có tạo bảng `case_board_nodes` (migration 39) để mọi node đều custom?                | **Có.** WT-1 viết migration 39, chờ chủ dự án duyệt trước khi chạy.       |
+| D2  | Danh sách model iPhone                                                               | **7 preset** ở WT-2 mục A.                                                |
+| D3  | Xóa hẳn trường "thời điểm thu thập/niêm phong/người thu thập" khỏi DB hay chỉ ẩn UI? | **Chỉ bỏ UI/payload**, giữ cột `metadata` trong DB.                       |
+| D4  | Xóa hẳn `/api/phone` (Google Sheets) sau cutover?                                    | **Giữ route nhưng không gọi**, xóa ở bước sau khi grep sạch consumer.     |
+| D5  | Ưu tiên chạy song song đợt 1                                                         | **WT-4, WT-2, WT-6, WT-7.** WT-1, WT-5, WT-3 chạy sau theo thứ tự mục 10. |

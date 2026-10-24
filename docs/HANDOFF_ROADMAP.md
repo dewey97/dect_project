@@ -107,6 +107,34 @@ Xem plan worktree chi tiết: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md).
 
 ---
 
+## 1.6. Kế hoạch Worktree v2 (chốt 2026-10-24)
+
+Plan cũ đã hoàn tất và được thay bằng [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md) v2. Mục tiêu: tách 7 worktree độc lập chạy song song theo ma trận sở hữu file, không chồng lấn.
+
+| WT   | Nhánh                 | Phạm vi chính                                                                                  | Migration |
+| ---- | --------------------- | ---------------------------------------------------------------------------------------------- | --------- |
+| WT-1 | `wt/board-dynamic`    | Bỏ hardcode node bảng điều tra; bảng `case_board_nodes`; pin-builder/modal động                | 39        |
+| WT-2 | `wt/phone-devices`    | 7 preset iPhone (SE → 15 Pro Max); editor tin nhắn dạng bảng + dán hàng loạt; sửa role/slot    | —         |
+| WT-3 | `wt/studio-ux`        | Dọn field thừa (key/slug/phase/slot), placeholder dài; `Field` + `AutoGrowTextarea`            | —         |
+| WT-4 | `wt/character-assets` | Upload ảnh nhân vật (`avatar_url`), siết policy bucket `avatars`, render pin/modal/danh bạ     | 38        |
+| WT-5 | `wt/evidence-ux`      | Preview theo bộ hồ sơ; bỏ 4 trường metadata rác; nhận base gỡ fallback tĩnh                    | —         |
+| WT-6 | `wt/cms-cutover`      | Cắt Google Sheets khỏi runtime; sửa 4 app đọc đúng bảng Supabase; thêm tab `evidences` cho API | —         |
+| WT-7 | `wt/ops-hardening`    | `127.0.0.1:3000:3000`, Caddy HSTS/log redaction, kiểm tra reclaim timer                        | —         |
+
+Quyết định đã chốt:
+
+- D1: **tạo** `case_board_nodes`, mọi node trên bảng điều tra đều dữ liệu hóa.
+- D2: **7 preset** iPhone.
+- D3: bỏ trường metadata khỏi UI/payload, **giữ** cột `metadata` trong DB.
+- D4: giữ `/api/phone` nhưng không gọi; xóa sau khi grep sạch consumer.
+- D5: đợt song song 1 gồm **WT-4, WT-2, WT-6, WT-7**; WT-1, WT-5, WT-3 chạy sau theo thứ tự tích hợp.
+
+Trạng thái base: working tree có thay đổi gỡ fallback evidence (chưa commit, `tsc` sạch, E2E chưa chạy lại). Chưa tách worktree cho tới khi owner duyệt bắt đầu code.
+
+Kết quả khảo sát nguồn dữ liệu và hardcode: xem phụ lục mục 11 của `WORKTREE_PLAN.md`.
+
+---
+
 ## 2. Quy ước bắt buộc
 
 ### 2.1. Quy tắc dự án
