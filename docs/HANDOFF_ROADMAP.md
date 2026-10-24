@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Trạng thái base: `main` tại `3a476f4`. Chưa tách worktree cho tới khi Phần A xong và owner duyệt.
+Tiến độ (2026-10-25): Phần A ✅ `16cb60c` (trừ A8 migration 38 — **chưa chạy production**). WT-1 3/8 bước (1A–1C). WT-5, WT-3 đang làm, chưa commit. Chi tiết + lệch plan: mục "Tiến độ thực thi" đầu `WORKTREE_PLAN.md`.
 
 ---
 

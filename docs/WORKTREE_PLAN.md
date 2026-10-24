@@ -9,6 +9,28 @@
 
 ---
 
+## Tiến độ thực thi (cập nhật 2026-10-25)
+
+| Phần | Nhánh / worktree                         | Commit                                   | Trạng thái                                                                                                                                                                                                                                                                                |
+| ---- | ---------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A    | `main`                                   | `16cb60c`                                | ✅ A1–A7, A9 xong (xóa `/api/phone`, icon → `public/images/phone/icons/`, fallback apps theo slug, `scripts/ops/backfill-character-avatars.mjs`). ⛔ **A8 chưa làm**: production chưa có cột `case_characters.avatar_url` và policy admin `avatars` (kiểm 2026-10-25). A10 chưa xác nhận. |
+| WT-1 | `wt/board-dynamic` (`../dect_wt_board`)  | `04527de` 1A, `218836f` 1B, `7946aad` 1C | 🟡 3/8 bước. Còn 1D–1H. Migration 39 viết xong, chưa chạy (đúng quy trình).                                                                                                                                                                                                               |
+| WT-5 | `wt/evidence-ux` (`../dect_wt_evidence`) | chưa có                                  | 🟡 8 file sửa **chưa commit**: đang làm ý 1 (metadata) + ý 3 (dossier tray, `use-case-dossiers`). Còn sót: `page.tsx:272-273`, `integrity-indicator.tsx`, `device-simulator-client.tsx`; chưa có `isDossierUnlocked`; chưa có E2E.                                                        |
+| WT-3 | `wt/studio-ux` (`../dect_wt_studio`)     | chưa có                                  | 🟡 18 file sửa **chưa commit**: ý 1–3 gần xong (`components/ui/field.tsx`, 0 `Field` cục bộ, xóa `auto-expanding-textarea`, select `subjectKey` có option giữ key lạ, bỏ `ID: {slug}`), `e2e/studio-ux.spec.ts` đã viết. Chưa xác nhận E2E/tsc.                                           |
+
+**Lệch khỏi plan cần xử lý:**
+
+1. **WT-1 giữ id cũ làm tương thích:** `pin-builder.ts` sinh `legacyId: "c0-pin-*"` (195–367, 501, 548, 675); `render-scene.ts` vẫn 25+ nhánh `pin.id === "c0-pin-*"` / `includes("khang")` (271–573); fallback `"Nguyễn Văn Khang"` (`pin-builder.ts:189, 322`); `hasVu/TungFollowup` (470–471, 635–636). Chấp nhận tạm trong lúc 1D–1G; **bước 1H phải xóa hết** — điều kiện done WT-1 bổ sung: `grep -rE 'c0-pin-|"khang"|Nguyễn Văn Khang|hasVuFollowup' components/investigation` = 0.
+2. **WT-5, WT-3 chưa commit theo bước** như brief → yêu cầu commit ngay phần đã xong trước khi làm tiếp (tránh mất việc, dễ review).
+3. **WT-3 sửa `checkpoint-editor.tsx` + `checkpoint-studio-client.tsx`** (chỉ thêm prop `characters`/`checkpoints`, +32/−7). Vùng khác với tab "Bảng điều tra" của WT-1 → rủi ro conflict thấp; vẫn merge WT-3 sau WT-1.
+
+**Việc chủ dự án đang chặn:**
+
+- Chạy migration 38 (A8) — WT-1 bước 1B/1D cần `avatar_url` để hiển thị ảnh thật; script A9 cần cột này.
+- Push `main` (đang ahead `origin/main` 3 commit: `3a476f4`, `5cb1c69`, `16cb60c`) khi muốn deploy Phần A.
+
+---
+
 ## 0. Trạng thái thật sau khảo sát
 
 | Track cũ (v3)  | Trạng thái thật | Bằng chứng                                                                                                                                                                            |
