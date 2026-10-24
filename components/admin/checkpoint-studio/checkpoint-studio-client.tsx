@@ -46,6 +46,7 @@ import { CheckpointEditor } from "./checkpoint-editor";
 import { DossierEditor } from "./dossier-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
 import { DossierConfigModal } from "./dossier-config-modal";
+import { BoardEditor } from "./board/board-editor";
 
 /** Mỗi lần click danh sách tăng nonce để Flow căn lại node, kể cả node đang chọn. */
 interface NodeFocusRequest {
@@ -88,14 +89,37 @@ export function CheckpointStudioClient({
   initialAvailableDocuments = [],
 }: CheckpointStudioClientProps) {
   const [caseId, setCaseId] = useState(initialCaseId);
+  const [activeView, setActiveView] = useState<"flow" | "board">(() => {
+    if (typeof window !== "undefined") {
+      const v = new URLSearchParams(window.location.search).get("view");
+      if (v === "board") return "board";
+    }
+    return "flow";
+  });
 
-  // Giữ vụ án đang chọn trên URL (?case=) để tải lại trang không quay về case_000.
+  // Giữ vụ án và view đang chọn trên URL (?case=...&view=...) để tải lại trang không mất view.
   useEffect(() => {
     const url = new URL(window.location.href);
-    if (url.searchParams.get("case") === caseId) return;
-    url.searchParams.set("case", caseId);
-    window.history.replaceState(null, "", url);
-  }, [caseId]);
+    let changed = false;
+    if (url.searchParams.get("case") !== caseId) {
+      url.searchParams.set("case", caseId);
+      changed = true;
+    }
+    if (activeView === "board") {
+      if (url.searchParams.get("view") !== "board") {
+        url.searchParams.set("view", "board");
+        changed = true;
+      }
+    } else {
+      if (url.searchParams.has("view")) {
+        url.searchParams.delete("view");
+        changed = true;
+      }
+    }
+    if (changed) {
+      window.history.replaceState(null, "", url);
+    }
+  }, [caseId, activeView]);
   const [sidebarWidth, setSidebarWidth] = useState<number>(420);
   // Đọc độ rộng đã lưu sau khi mount để HTML server và client khớp nhau.
   useEffect(() => {
@@ -821,7 +845,43 @@ export function CheckpointStudioClient({
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col md:flex-row">
+    <div className="flex h-full min-h-0 w-full flex-col">
+      {/* Thanh chuyển đổi View (Flow vs Board) */}
+      <div className="flex h-9 shrink-0 items-center justify-between border-b border-white/10 bg-[#090a0f] px-3 z-20">
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setActiveView("flow")}
+            className={cn(
+              "rounded px-2.5 py-1 text-xs font-semibold transition-colors",
+              activeView === "flow"
+                ? "bg-white/15 text-white shadow-xs"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
+            )}
+          >
+            Sơ đồ luồng (Flow)
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveView("board")}
+            className={cn(
+              "rounded px-2.5 py-1 text-xs font-semibold transition-colors",
+              activeView === "board"
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-xs"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
+            )}
+          >
+            Bảng điều tra (Board)
+          </button>
+        </div>
+      </div>
+
+      {activeView === "board" ? (
+        <div className="flex-1 min-h-0 min-w-0">
+          <BoardEditor caseId={caseId} checkpoints={rows} />
+        </div>
+      ) : (
+        <div className="flex flex-1 min-h-0 w-full flex-col md:flex-row">
       {/* 1. Sơ đồ FlowView bên trái */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <CheckpointFlowView
@@ -899,6 +959,8 @@ export function CheckpointStudioClient({
           ) : null}
         </CheckpointListSidebar>
       </div>
+        </div>
+      )}
 
       {/* Modal Case Linter */}
       <CaseLintModal
