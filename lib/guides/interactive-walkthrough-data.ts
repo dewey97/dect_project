@@ -8,6 +8,7 @@ export interface WalkthroughStep {
   actionHint?: string
   targetType: 'canvas-center' | 'pin' | 'dom-selector'
   targetPinId?: string
+  targetNodeKind?: string
   domSelector?: string
 }
 
@@ -29,7 +30,8 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     description:
       'Nơi xác lập đối tượng tình nghi khi chứng minh được đối tượng có:\n• Động cơ gây án\n• Mâu thuẫn trong lời khai hoặc ngoại phạm',
     targetType: 'pin',
-    targetPinId: 'c0-pin-suspects'
+    targetPinId: 'c0-pin-suspects',
+    targetNodeKind: 'suspects_hub'
   },
   {
     id: 'step-victim-phone',
@@ -39,7 +41,8 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     description:
       'Nơi lưu trữ các dấu vết số của nạn nhân. Bạn có thể tự thao tác trực tiếp trên điện thoại.',
     targetType: 'pin',
-    targetPinId: 'c0-pin-victim-phone'
+    targetPinId: 'c0-pin-victim-phone',
+    targetNodeKind: 'victim_phone'
   },
   {
     id: 'step-indictment',
@@ -49,7 +52,8 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     description:
       'Nơi đưa ra phán quyết cuối cùng về danh tính hung thủ. Tính năng luôn mở nhưng không cung cấp gợi ý, vì vậy hãy cân nhắc thật kỹ trước khi nộp kết luận.',
     targetType: 'pin',
-    targetPinId: 'c0-pin-indictment'
+    targetPinId: 'c0-pin-indictment',
+    targetNodeKind: 'indictment'
   },
   {
     id: 'step-quick-menu',

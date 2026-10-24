@@ -71,12 +71,15 @@ export function InteractiveWalkthrough({
   // Notify parent of active target pin for live canvas highlighting
   useEffect(() => {
     if (!isOpen) return
-    if (step.targetType === 'pin' && step.targetPinId) {
-      onStepChange?.(step.targetPinId)
+    if (step.targetType === 'pin') {
+      const targetPin = step.targetNodeKind
+        ? pins.find((p) => p.nodeKind === step.targetNodeKind)
+        : null
+      onStepChange?.(targetPin?.id || step.targetPinId || null)
     } else {
       onStepChange?.(null)
     }
-  }, [isOpen, currentStepIndex, step, onStepChange])
+  }, [isOpen, currentStepIndex, step, pins, onStepChange])
 
   // Calculate spotlight location precisely based on actual live board geometry
   useEffect(() => {
@@ -95,21 +98,25 @@ export function InteractiveWalkthrough({
           width,
           height
         })
-      } else if (step.targetType === 'pin' && step.targetPinId) {
-        // Find pin by id in current live pins
-        let targetPin = pinMap.get(step.targetPinId)
-        if (!targetPin) {
-          // Fallback search by prefix/label
-          targetPin = pins.find(
-            (p) =>
-              p.id === step.targetPinId ||
-              p.id.includes(step.targetPinId!) ||
-              (step.targetPinId === 'c0-pin-victim-khang' && (p.id.includes('khang') || p.label?.toLowerCase().includes('khang'))) ||
-              ((step.targetPinId === 'c0-pin-phone' || step.targetPinId === 'c0-pin-victim-phone') && (p.id.includes('victim-phone') || p.id.includes('phone') || p.id.includes('dev-00') || p.label?.toLowerCase().includes('điện thoại') || p.label?.toLowerCase().includes('mở rộng'))) ||
-              (step.targetPinId === 'c0-pin-suspects' && (p.id.includes('suspect') || p.label?.toLowerCase().includes('nghi phạm'))) ||
-              ((step.targetPinId === 'c0-pin-evidence' || step.targetPinId === 'c0-pin-reinvestigate') && (p.id.includes('evidence') || p.id.includes('reinvestigate') || p.label?.toLowerCase().includes('chứng cứ') || p.label?.toLowerCase().includes('khám xét') || p.label?.toLowerCase().includes('khám nghiệm'))) ||
-              (step.targetPinId === 'c0-pin-indictment' && (p.id.includes('indictment') || p.label?.toLowerCase().includes('kết luận') || p.label?.toLowerCase().includes('truy tố')))
-          )
+      } else if (step.targetType === 'pin' && (step.targetPinId || step.targetNodeKind)) {
+        // Find pin by targetNodeKind first, then fallback to id / legacyId
+        let targetPin = step.targetNodeKind
+          ? pins.find((p) => p.nodeKind === step.targetNodeKind)
+          : null
+        if (!targetPin && step.targetPinId) {
+          targetPin =
+            pinMap.get(step.targetPinId) ||
+            pins.find(
+              (p) =>
+                p.id === step.targetPinId ||
+                p.legacyId === step.targetPinId ||
+                p.id.includes(step.targetPinId!) ||
+                (step.targetPinId === 'c0-pin-victim-khang' && (p.id.includes('khang') || p.label?.toLowerCase().includes('khang'))) ||
+                ((step.targetPinId === 'c0-pin-phone' || step.targetPinId === 'c0-pin-victim-phone') && (p.id.includes('victim-phone') || p.id.includes('phone') || p.id.includes('dev-00') || p.label?.toLowerCase().includes('điện thoại') || p.label?.toLowerCase().includes('mở rộng'))) ||
+                (step.targetPinId === 'c0-pin-suspects' && (p.id.includes('suspect') || p.label?.toLowerCase().includes('nghi phạm'))) ||
+                ((step.targetPinId === 'c0-pin-evidence' || step.targetPinId === 'c0-pin-reinvestigate') && (p.id.includes('evidence') || p.id.includes('reinvestigate') || p.label?.toLowerCase().includes('chứng cứ') || p.label?.toLowerCase().includes('khám xét') || p.label?.toLowerCase().includes('khám nghiệm'))) ||
+                (step.targetPinId === 'c0-pin-indictment' && (p.id.includes('indictment') || p.label?.toLowerCase().includes('kết luận') || p.label?.toLowerCase().includes('truy tố')))
+            )
         }
 
         if (targetPin) {
