@@ -61,7 +61,7 @@
 | `NEXT_DIST_DIR=.next_dev npx next build` | Chưa chạy lại |
 | `pnpm test:e2e`                          | Chưa chạy lại |
 
-Typecheck clean sau merge 4 worktree + post-merge fix. Working tree sạch. 76 commits ahead of origin.
+Typecheck clean sau merge 4 worktree + post-merge fix + data reseed. Working tree sạch (trừ `data/_review/sheet-data-dump.json` untracked). 80 commits ahead of origin (76 pushed + 4 chưa push: worktree plan v2, ops hardening).
 
 ### 1.3. Database production (Supabase project `zalyxhmwwmfyexoilejp`)
 

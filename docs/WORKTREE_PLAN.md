@@ -12,8 +12,11 @@
 - `main` đã có các commit tài liệu mới nhất; working tree còn thay đổi code gỡ fallback evidence (xem Bước 0).
 - Build production (`NEXT_DIST_DIR=.next_dev npx next build`) đã pass sau merge 4 worktree.
 - E2E: 13 pass, 2 skip, 1 fail do `e2e/evidence-studio.spec.ts` thiếu auth admin — đã sửa spec, chưa chạy lại.
-- Migration production: 21–37 đã chạy. Số migration còn trống bắt đầu từ **38**.
+- Migration production: **21–37 đã chạy**. Migration 37 reseed toàn bộ case_000 từ Google Sheets (54 evidence, 39 contacts, 89 messages, 21 calls, 2 notes, 4 safari, 6 bank; junk apps xóa). Số migration còn trống bắt đầu từ **38**.
+- 4 commits chưa push: worktree plan v2, board editor doc, evidence base doc, ops hardening.
 - Kết quả khảo sát nguồn dữ liệu và hardcode: xem mục 11 (phụ lục).
+- **Không có worktree nào đang active** (tất cả WT cũ đã merge vào main, nhánh đã dọn). 7 local branches cũ đã merged — có thể xóa.
+- 6 remote branches cũ (`2d`, `feature/finding-matcher`, `master`, `worktree-ldp-flashlight-split`) — có thể dọn.
 
 ### Trả lời nhanh câu hỏi "đã chuyển hết từ Google Sheets sang chưa?"
 
@@ -76,7 +79,9 @@ cp ../dect_project/.env .env
 | `components/investigation/hero-interactive/**`                                                                                                                                                                               |            |                                                          |                |            (chỉ đọc `avatarUrl`)             |               |       **X** (`use-live-pin-photos.ts`)       |          |
 | `docker-compose.yml`, `deploy/**`, `scripts/ops/vps-*`                                                                                                                                                                       |            |                                                          |                |                                              |               |                                              |  **X**   |
 
-> WT-1 được phép sửa `main-investigation-canvas.tsx` (chuyển nguồn evidences sang `useCaseEvidence`) — WT-6 **không** sửa file này.
+> ~~WT-1 được phép sửa `main-investigation-canvas.tsx` (chuyển nguồn evidences sang `useCaseEvidence`) — WT-6 **không** sửa file này.~~
+>
+> **Điều chỉnh (2026-10-24 review):** Việc thay `usePhoneData("evidences")` → `useCaseEvidence` cho **tất cả** 7 consumer (`main-investigation-canvas`, `add-suspect-modal`, `followup-question-modal`, `admin-create-pin-modal`, `reinvestigation-modal`, `evidence/web/page.tsx`, `use-case-checkpoints`) chuyển **hoàn toàn sang WT-6**. WT-1 chỉ import `useCaseEvidence` (đã có sẵn sau merge WT-6). Lý do: tránh 2 worktree cùng sửa nguồn evidences trên cùng file, giảm xung đột merge.
 
 ### 1.4. Điều kiện "done" của một worktree
 
@@ -156,7 +161,7 @@ Nếu chủ dự án muốn bỏ thay đổi dở: `git checkout -- .` và `git 
    - `followup-question-modal`: bỏ fallback `vu→time/tung→choice/ha→code`, tên cứng, `TARGET_CODES` D-04..D-06; chỉ dùng `inputType`, `photoCodes`, `subjectKey`; storage key `followup_${subjectKey}`.
    - `culprit-epilogue-modal`: bỏ `cp-epilogue-ha`, nhánh `isHaBoxSolved`.
    - `phone-lookup-modal`, `canvas-modals`, `dossier-result-modal`: bỏ fallback key/tên/mã; nội dung Hồ sơ A/B/C đọc từ dossier/checkpoint.
-8. **Nguồn evidences**: thay `usePhoneData("evidences")` trong `main-investigation-canvas`, `add-suspect-modal`, `followup-question-modal` bằng `useCaseEvidence(caseId)` (đã có sẵn). Không phụ thuộc WT-6.
+8. **Nguồn evidences**: ~~thay `usePhoneData("evidences")` trong `main-investigation-canvas`, `add-suspect-modal`, `followup-question-modal` bằng `useCaseEvidence(caseId)`.~~ **Đã chuyển sang WT-6 (Điều chỉnh 1).** WT-1 chỉ import `useCaseEvidence` (đã có sẵn sau merge WT-6), không tự thay thế `usePhoneData`.
 9. **Walkthrough**: dữ liệu bước điều tra lấy `targetPinId` từ node DB theo `node_kind`; bỏ danh sách id cứng.
 
 **Kiểm tra:**
@@ -283,7 +288,7 @@ Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; khô
    - `use-case-dossiers.ts` bổ sung map `code → dossier{key,title}` (đã có `codeMap`, cần trả metadata).
    - Inspector hiển thị breadcrumb "Bộ hồ sơ: <tên>" + preview PDF `DiegeticDossierSheet` khi khớp dossier; ảnh vẫn `EvidencePhotoAnnotator` nhưng bỏ badge `VẬT CHỨNG [evidenceId]` (dùng tiêu đề).
    - `page.tsx`: truyền `dossierKey/title` vào item; không suy phase theo chữ cái khi dossier đã khai báo.
-4. **Form gọn**: placeholder ngắn; `description` dùng `AutoGrowTextarea` (WT-3 tạo; nếu chưa merge thì dùng `components/ui/auto-grow-textarea.tsx` sẵn có); upload file giữ nguyên.
+4. **Form gọn**: placeholder ngắn; `description` dùng `AutoGrowTextarea` (`components/ui/auto-grow-textarea.tsx` **đã tồn tại sẵn**, không phụ thuộc WT-3); upload file giữ nguyên.
 5. E2E: mở khay hồ sơ case_000, thấy group theo tên bộ; click tài liệu thuộc bộ A → inspector hiện đúng bộ + sheet; studio form không còn 4 trường metadata.
 
 **Lưu ý dữ liệu:** xóa field khỏi payload nhưng **không** xóa cột `metadata` trong DB (tránh migration không cần thiết). Dữ liệu cũ vẫn nằm trong JSONB, UI bỏ qua.
@@ -295,6 +300,8 @@ Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; khô
 **Mục tiêu:** mọi dữ liệu runtime đọc Supabase; Sheets chỉ còn ở script ops một lần.
 
 **Sở hữu:** `app/api/phone/**`, `app/api/phone-data/**`, `app/api/admin/pins/route.ts`, `lib/hooks/use-phone-data.ts`, `lib/google/**`, `lib/hooks/use-case-checkpoints.ts`, `components/phone-engine/apps/{notes,safari,banking,photos}-app.tsx`, `components/investigation/hero-interactive/use-live-pin-photos.ts`, `scripts/ops/*sync*` (chỉ nhãn/đường dẫn), `.env.example`, `e2e/no-sheets.spec.ts`.
+
+> **[Điều chỉnh 1]** WT-6 cũng sở hữu việc thay `usePhoneData("evidences")` → `useCaseEvidence` trên các file gameplay: `main-investigation-canvas.tsx`, `add-suspect-modal.tsx`, `followup-question-modal.tsx`, `admin-create-pin-modal.tsx`, `reinvestigation-modal.tsx`, `evidence/web/page.tsx`, `use-case-checkpoints.ts`. Phạm vi chạm các file thuộc `mindmap/**` chỉ giới hạn ở **dòng import và lời gọi `usePhoneData`** — không sửa logic nghiệp vụ (đó là WT-1).
 
 **Nhiệm vụ:**
 
@@ -337,7 +344,7 @@ Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; khô
 | 1    | Merge WT-4 (character assets)                                                                                                                                     | Cung cấp `avatar_url` thật cho pin/modal                            |
 | 2    | Merge WT-2 (phone devices + messages)                                                                                                                             | Độc lập, chạm phone engine                                          |
 | 3    | Merge WT-6 (cms cutover)                                                                                                                                          | Sau WT-2 để tránh sửa trùng `messages-app`/`phone-app`              |
-| 4    | Merge WT-1 (board dynamic)                                                                                                                                        | Phụ thuộc WT-4 (avatar) và dùng `useCaseEvidence`; WT-6 đã bỏ Sheet |
+| 4    | Merge WT-1 (board dynamic)                                                                                                                                        | Phụ thuộc WT-4 (avatar); WT-6 đã thay evidences → `useCaseEvidence` |
 | 5    | Merge WT-5 (evidence ux)                                                                                                                                          | Chạm tray/inspector; sau WT-1 để tránh đổi cấu trúc item            |
 | 6    | Merge WT-3 (studio ux)                                                                                                                                            | Chạm form studio; sau cùng để áp primitive lên bản đã merge         |
 | 7    | Merge WT-7 (ops)                                                                                                                                                  | Không xung đột                                                      |
@@ -350,6 +357,7 @@ Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; khô
 - `lib/cases/characters.ts`: WT-4 — WT-1 dùng `avatarUrl` từ provider.
 - `lib/types/database.ts`: WT-4 thêm field `avatar_url` ở cuối file; WT-2 thêm type batch message ở cuối file (nếu cần). Integrator kiểm tra trùng tên.
 - `e2e/evidence-studio.spec.ts`: WT-5 sửa; WT-1/WT-6 không chạm.
+- **[Điều chỉnh 1]** `usePhoneData("evidences")` → `useCaseEvidence` trên 7 consumer (`main-investigation-canvas`, `add-suspect-modal`, `followup-question-modal`, `admin-create-pin-modal`, `reinvestigation-modal`, `evidence/web/page.tsx`, `use-case-checkpoints`): **WT-6 sở hữu toàn bộ việc thay thế**. WT-1 merge **sau** WT-6 và chỉ import `useCaseEvidence` đã có sẵn — không còn xung đột trên nhóm file này.
 
 **Chạy song song tối đa:** WT-4 + WT-2 + WT-6 + WT-7 (4 worktree). WT-1 và WT-5 chờ WT-4/WT-6 merge nếu muốn tránh rebase; WT-3 chạy cuối.
 
@@ -418,3 +426,13 @@ Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; khô
 | D3  | Xóa hẳn trường "thời điểm thu thập/niêm phong/người thu thập" khỏi DB hay chỉ ẩn UI? | **Chỉ bỏ UI/payload**, giữ cột `metadata` trong DB.                                                                                                                                  |
 | D4  | Xóa hẳn `/api/phone` (Google Sheets) sau cutover?                                    | **Giữ route nhưng không gọi**, xóa ở bước sau khi grep sạch consumer.                                                                                                                |
 | D5  | Ưu tiên chạy song song đợt 1                                                         | **WT-4, WT-2, WT-6, WT-7.** WT-1, WT-5, WT-3 chạy sau theo thứ tự mục 10.                                                                                                            |
+
+### Điều chỉnh (review 2026-10-24)
+
+| #   | Điều chỉnh                                                                                          | Lý do                                                                                                       |
+| --- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| R1  | Thay `usePhoneData("evidences")` → `useCaseEvidence` trên 7 consumer chuyển **hoàn toàn sang WT-6** | WT-1 và WT-6 cùng chạm nhóm file `mindmap/**` trên dòng import evidences — gộp về WT-6 tránh xung đột merge |
+| R2  | WT-5 dùng `components/ui/auto-grow-textarea.tsx` (đã tồn tại), **không phụ thuộc WT-3**             | File đã có sẵn trong codebase; WT-3 chỉ tạo thêm `Field` wrapper                                            |
+| R3  | Lý do merge WT-1 sau WT-6 cập nhật: WT-6 đã thay evidences source, WT-1 chỉ import                  | Phù hợp thứ tự tích hợp hiện tại, không cần đổi                                                             |
+| R4  | `dossier-result-modal.tsx` xác nhận thuộc WT-1 (đã cover bởi `mindmap/**`)                          | Plan mục 7 đã liệt kê; ma trận sở hữu wildcard đã bao gồm — không cần thay đổi                              |
+| R5  | `TECHDEBT.md #16` cập nhật: `evidence-data.ts` đã xóa, fallback tĩnh không còn                      | Bước 0 working tree đã xóa file; trạng thái cũ trong TECHDEBT lỗi thời                                      |
