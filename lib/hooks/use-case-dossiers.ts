@@ -5,13 +5,37 @@ import type { DbCaseDossier } from "@/lib/types/database";
 import { getCaseDossiers } from "@/lib/actions/dossier-config-actions";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 
+export interface DossierOfResult {
+  key: string;
+  title: string;
+  slotIndex: number;
+}
+
 interface UseCaseDossiersResult {
   dossiers: DbCaseDossier[];
   loading: boolean;
   error: string | null;
   getPhaseForCode: (code: string) => number;
   getDossierForCode: (code: string) => DbCaseDossier | undefined;
+  dossierOf: (code: string) => DossierOfResult | null;
   refetch: () => Promise<void>;
+}
+
+function getDossierSlot(d: DbCaseDossier, fallbackIdx: number): number {
+  if (typeof (d as any).slot_index === "number") return (d as any).slot_index;
+  const key = (d.dossier_key || "").toLowerCase().trim();
+  if (
+    key === "ban_dau" ||
+    key.includes("khởi đầu") ||
+    key.includes("ban dau")
+  ) {
+    return 0;
+  }
+  if (key === "bo_a" || key === "phase_1") return 1;
+  if (key === "bo_b" || key === "phase_2") return 2;
+  if (key === "bo_c" || key === "phase_3") return 3;
+  if (key === "ket_luan" || key === "phase_4") return 4;
+  return fallbackIdx;
 }
 
 const dossierCache: Record<
@@ -62,47 +86,57 @@ export function useCaseDossiers(
     fetchDossiers();
   }, [normalizedCaseId, isFresh, fetchDossiers]);
 
-  // Tạo map tra cứu nhanh từ document_code -> DbCaseDossier & phase
+  // Sắp xếp dossiers theo slot_index
+  const sortedDossiers = useMemo(() => {
+    return [...dossiers].sort((a, b) => {
+      const idxA = dossiers.indexOf(a);
+      const idxB = dossiers.indexOf(b);
+      return getDossierSlot(a, idxA) - getDossierSlot(b, idxB);
+    });
+  }, [dossiers]);
+
+  // Tạo map tra cứu nhanh từ document_code -> DbCaseDossier & phase/slotIndex
   const { codeMap, dossierPhaseMap } = useMemo(() => {
-    const codeMap = new Map<string, DbCaseDossier>();
+    const codeMap = new Map<
+      string,
+      { dossier: DbCaseDossier; slotIndex: number }
+    >();
     const dossierPhaseMap = new Map<string, number>();
 
-    // Chuẩn hóa phase theo dossier_key hoặc vị trí danh sách
-    dossiers.forEach((d, idx) => {
+    sortedDossiers.forEach((d, idx) => {
+      const slotIndex = getDossierSlot(d, idx);
       const key = (d.dossier_key || "").toLowerCase().trim();
-      let phase = idx;
-      if (
-        key === "ban_dau" ||
-        key.includes("khởi đầu") ||
-        key.includes("ban dau")
-      ) {
-        phase = 0;
-      } else if (key === "bo_a" || key === "phase_1") {
-        phase = 1;
-      } else if (key === "bo_b" || key === "phase_2") {
-        phase = 2;
-      } else if (key === "bo_c" || key === "phase_3") {
-        phase = 3;
-      } else if (key === "ket_luan" || key === "phase_4") {
-        phase = 4;
-      }
-      dossierPhaseMap.set(key, phase);
+      dossierPhaseMap.set(key, slotIndex);
 
       const codes = d.document_codes || [];
       for (const code of codes) {
         if (typeof code === "string" && code.trim()) {
-          codeMap.set(code.trim().toUpperCase(), d);
+          codeMap.set(code.trim().toUpperCase(), { dossier: d, slotIndex });
         }
       }
     });
 
     return { codeMap, dossierPhaseMap };
-  }, [dossiers]);
+  }, [sortedDossiers]);
+
+  const dossierOf = useCallback(
+    (code: string): DossierOfResult | null => {
+      const clean = (code || "").trim().toUpperCase();
+      const matched = codeMap.get(clean);
+      if (!matched) return null;
+      return {
+        key: matched.dossier.dossier_key,
+        title: matched.dossier.title,
+        slotIndex: matched.slotIndex,
+      };
+    },
+    [codeMap],
+  );
 
   const getDossierForCode = useCallback(
     (code: string): DbCaseDossier | undefined => {
       const clean = (code || "").trim().toUpperCase();
-      return codeMap.get(clean);
+      return codeMap.get(clean)?.dossier;
     },
     [codeMap],
   );
@@ -111,11 +145,7 @@ export function useCaseDossiers(
     (code: string): number => {
       const clean = (code || "").trim().toUpperCase();
       const matched = codeMap.get(clean);
-      if (matched) {
-        const key = (matched.dossier_key || "").toLowerCase().trim();
-        const p = dossierPhaseMap.get(key);
-        if (p !== undefined) return p;
-      }
+      if (matched) return matched.slotIndex;
 
       // Fallback an toàn cho mã chưa gán vào dossier_codes
       const firstChar = clean.charAt(0);
@@ -124,15 +154,16 @@ export function useCaseDossiers(
       if (firstChar === "C" || firstChar === "D") return 3;
       return 0;
     },
-    [codeMap, dossierPhaseMap],
+    [codeMap],
   );
 
   return {
-    dossiers,
+    dossiers: sortedDossiers,
     loading,
     error,
     getPhaseForCode,
     getDossierForCode,
+    dossierOf,
     refetch: fetchDossiers,
   };
 }

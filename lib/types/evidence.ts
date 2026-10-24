@@ -18,7 +18,8 @@ export interface EvidenceDevice {
   owner: string;
   locked: boolean;
   status: DeviceStatus;
-  evidenceId: string;
+  code: string;
+  evidenceId?: string;
   recoveryLevel: number;
   lastUpdated: string;
   thumbnail?: string;
@@ -49,10 +50,7 @@ export interface Evidence {
   preview: string;
   timestamp: string;
   flagged?: boolean;
-  evidenceId: string;
-  recoveredBy: string;
-  integrityStatus: "secured" | "corrupted" | "analyzing";
-  chainOfCustody: string;
+  code?: string;
   thumbnail?: string;
 }
 

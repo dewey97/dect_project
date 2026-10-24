@@ -119,12 +119,7 @@ export function EvidenceStudioClient({
         phase: 0,
         slot_index: (evidenceList.length + 1) * 10,
         description: "",
-        metadata: {
-          recoveredBy: "ĐIỀU TRA VIÊN",
-          chainOfCustody: "VERIFIED",
-          integrityStatus: "secured",
-          timestamp: "20:00",
-        },
+        metadata: {},
       };
     }
     return evidenceList.find((e) => e.id === selectedId) || null;
@@ -357,20 +352,6 @@ export function EvidenceStudioClient({
 
                     {/* Content Details */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <span className="text-xs font-mono font-bold text-amber-400 truncate">
-                          #{item.code}
-                        </span>
-                        <div className="flex items-center gap-1 text-[10px] font-mono text-zinc-500">
-                          <span className="bg-zinc-800/80 px-1.5 py-0.5 rounded">
-                            P{item.phase}
-                          </span>
-                          <span className="bg-zinc-800/80 px-1.5 py-0.5 rounded">
-                            S{item.slot_index}
-                          </span>
-                        </div>
-                      </div>
-
                       <p className="text-xs text-zinc-200 font-medium truncate group-hover:text-amber-100 transition-colors">
                         {item.title}
                       </p>

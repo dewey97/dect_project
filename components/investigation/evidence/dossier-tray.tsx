@@ -14,6 +14,7 @@ import type {
   PhysicalEvidence,
   SelectedView,
 } from "@/components/investigation/evidence/evidence-types";
+import type { DbCaseDossier } from "@/lib/types/database";
 
 interface DossierTrayProps {
   dossierWidth: number;
@@ -22,9 +23,13 @@ interface DossierTrayProps {
   mobileTab: "board" | "dossier";
   filterTab: "pdf" | "evidence";
   onSetFilterTab: (tab: "pdf" | "evidence") => void;
-  selectedPhaseFilter: "all" | number;
-  onSetPhaseFilter: (val: "all" | number) => void;
-  isPhaseUnlocked: (phase: number) => boolean;
+  selectedPhaseFilter?: "all" | string | number;
+  onSetPhaseFilter?: (val: "all" | string | number) => void;
+  selectedDossierFilter?: string;
+  onSetDossierFilter?: (val: string) => void;
+  isPhaseUnlocked?: (phase: number) => boolean;
+  isDossierUnlocked?: (key: string) => boolean;
+  dossiers?: DbCaseDossier[];
   pdfItems: CombinedItem[];
   evidenceItems: CombinedItem[];
   selectedView: SelectedView | null;
@@ -56,7 +61,11 @@ export function DossierTray({
   onSetFilterTab,
   selectedPhaseFilter,
   onSetPhaseFilter,
+  selectedDossierFilter,
+  onSetDossierFilter,
   isPhaseUnlocked,
+  isDossierUnlocked,
+  dossiers = [],
   pdfItems,
   evidenceItems,
   selectedView,
@@ -66,6 +75,45 @@ export function DossierTray({
   onBroadcastPing,
 }: DossierTrayProps) {
   const [searchQuery, setSearchQuery] = useState("");
+
+  const activeFilter = String(
+    selectedDossierFilter || selectedPhaseFilter || "all",
+  );
+
+  const chips = useMemo(() => {
+    const list: { label: string; val: string }[] = [
+      { label: "Tất cả", val: "all" },
+    ];
+    if (dossiers && dossiers.length > 0) {
+      dossiers.forEach((d) => {
+        list.push({ label: d.title, val: d.dossier_key });
+      });
+    } else {
+      list.push(
+        { label: "Khởi đầu", val: "ban_dau" },
+        { label: "Bộ A", val: "bo_a" },
+        { label: "Bộ B", val: "bo_b" },
+        { label: "Bộ C", val: "bo_c" },
+      );
+    }
+    list.push(
+      { label: "Vật chứng", val: "evidence" },
+      { label: "Chưa gán bộ", val: "unassigned" },
+    );
+    return list;
+  }, [dossiers]);
+
+  const handleFilterSelect = (val: string) => {
+    if (val === "evidence") {
+      onSetFilterTab("evidence");
+    }
+    if (onSetDossierFilter) {
+      onSetDossierFilter(val);
+    }
+    if (onSetPhaseFilter) {
+      onSetPhaseFilter(val);
+    }
+  };
 
   // Lọc tài liệu theo từ khóa tìm kiếm
   const filteredPdfs = useMemo(() => {
@@ -199,22 +247,18 @@ export function DossierTray({
         </div>
       </div>
 
-      {/* 4. PHASE FILTER CHIPS (TẤT CẢ / KHỞI ĐẦU / BỘ A / BỘ B / BỘ C) */}
+      {/* 4. DOSSIER FILTER CHIPS (TẤT CẢ / CÁC BỘ HỒ SƠ / VẬT CHỨNG / CHƯA GÁN BỘ) */}
       <div className="shrink-0 px-3 pb-2.5 flex items-center gap-1 overflow-x-auto custom-scrollbar border-b border-[#23170e]">
-        {[
-          { label: "Tất cả", val: "all" as const },
-          { label: "Khởi đầu", val: 0 },
-          { label: "Bộ A", val: 1 },
-          { label: "Bộ B", val: 2 },
-          { label: "Bộ C", val: 3 },
-        ].map((p) => {
-          const isLocked = typeof p.val === "number" && !isPhaseUnlocked(p.val);
-          const isSelected = selectedPhaseFilter === p.val;
+        {chips.map((chip) => {
+          const isLocked = isDossierUnlocked
+            ? !isDossierUnlocked(chip.val)
+            : false;
+          const isSelected = activeFilter === chip.val;
           return (
             <button
-              key={p.label}
+              key={chip.val}
               disabled={isLocked}
-              onClick={() => onSetPhaseFilter(p.val)}
+              onClick={() => handleFilterSelect(chip.val)}
               className={cn(
                 "px-2 py-1 rounded text-[11px] font-sans font-medium transition-all whitespace-nowrap",
                 isLocked
@@ -224,7 +268,7 @@ export function DossierTray({
                     : "text-[#846f5d] hover:text-[#d4c3b3] hover:bg-[#1a120b] cursor-pointer",
               )}
             >
-              {p.label}
+              {chip.label}
             </button>
           );
         })}

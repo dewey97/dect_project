@@ -11,12 +11,8 @@ import {
   Volume2,
   Package,
   Layers,
-  Hash,
-  Clock,
-  User,
-  ShieldCheck,
-  AlertTriangle,
   FolderOpen,
+  ChevronDown,
 } from "lucide-react";
 import type { DbCaseEvidence } from "@/lib/types/database";
 import {
@@ -26,6 +22,8 @@ import {
 } from "@/lib/actions/evidence-actions";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
+import { slugifyVietnamese } from "@/lib/text";
 
 interface EvidenceFormProps {
   caseId: string;
@@ -45,6 +43,7 @@ export function EvidenceForm({
   const isEditing = Boolean(evidence?.id);
 
   const [code, setCode] = useState(evidence?.code || "");
+  const [isCodeManual, setIsCodeManual] = useState(Boolean(evidence?.code));
   const [title, setTitle] = useState(evidence?.title || "");
   const [kind, setKind] = useState<DbCaseEvidence["kind"]>(
     evidence?.kind || "photo",
@@ -55,24 +54,6 @@ export function EvidenceForm({
   const [fileUrl, setFileUrl] = useState(evidence?.file_url || "");
   const [thumbUrl, setThumbUrl] = useState(evidence?.thumb_url || "");
 
-  // Metadata
-  const initialMeta = evidence?.metadata || {};
-  const [evidenceId, setEvidenceId] = useState(
-    (initialMeta.evidenceId as string) || "",
-  );
-  const [recoveredBy, setRecoveredBy] = useState(
-    (initialMeta.recoveredBy as string) || "ĐIỀU TRA VIÊN",
-  );
-  const [chainOfCustody, setChainOfCustody] = useState(
-    (initialMeta.chainOfCustody as string) || "VERIFIED",
-  );
-  const [integrityStatus, setIntegrityStatus] = useState<string>(
-    (initialMeta.integrityStatus as string) || "secured",
-  );
-  const [timestamp, setTimestamp] = useState(
-    (initialMeta.timestamp as string) || "",
-  );
-
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const [isUploadingThumb, setIsUploadingThumb] = useState(false);
@@ -80,6 +61,7 @@ export function EvidenceForm({
   // Sync state when evidence changes
   useEffect(() => {
     setCode(evidence?.code || "");
+    setIsCodeManual(Boolean(evidence?.code));
     setTitle(evidence?.title || "");
     setKind(evidence?.kind || "photo");
     setPhase(evidence?.phase ?? 0);
@@ -87,14 +69,19 @@ export function EvidenceForm({
     setDescription(evidence?.description || "");
     setFileUrl(evidence?.file_url || "");
     setThumbUrl(evidence?.thumb_url || "");
-
-    const m = evidence?.metadata || {};
-    setEvidenceId((m.evidenceId as string) || "");
-    setRecoveredBy((m.recoveredBy as string) || "ĐIỀU TRA VIÊN");
-    setChainOfCustody((m.chainOfCustody as string) || "VERIFIED");
-    setIntegrityStatus((m.integrityStatus as string) || "secured");
-    setTimestamp((m.timestamp as string) || "");
   }, [evidence]);
+
+  const handleTitleChange = (val: string) => {
+    setTitle(val);
+    if (!isEditing && !isCodeManual) {
+      setCode(slugifyVietnamese(val));
+    }
+  };
+
+  const handleCodeChange = (val: string) => {
+    setCode(val);
+    setIsCodeManual(Boolean(val.trim()));
+  };
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -140,7 +127,8 @@ export function EvidenceForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code.trim()) {
+    const finalCode = (code.trim() || slugifyVietnamese(title)).trim();
+    if (!finalCode) {
       toast.error("Mã chứng cứ không được để trống");
       return;
     }
@@ -158,7 +146,7 @@ export function EvidenceForm({
       } = {
         ...(evidence?.id ? { id: evidence.id } : {}),
         case_slug: caseId,
-        code: code.trim(),
+        code: finalCode,
         title: title.trim(),
         kind,
         phase: Number(phase),
@@ -172,11 +160,6 @@ export function EvidenceForm({
             : null),
         metadata: {
           ...(evidence?.metadata || {}),
-          evidenceId: evidenceId.trim() || `EV-${code.trim().toUpperCase()}`,
-          recoveredBy: recoveredBy.trim(),
-          chainOfCustody: chainOfCustody.trim(),
-          integrityStatus: integrityStatus.trim(),
-          timestamp: timestamp.trim(),
         },
       };
 
@@ -276,122 +259,125 @@ export function EvidenceForm({
         </div>
       </div>
 
-      {/* Main Info Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Mã code */}
-        <div>
-          <label className="text-xs font-medium text-zinc-300 flex items-center gap-1.5 mb-1">
-            <Hash className="size-3.5 text-amber-500" />
-            <span>Mã chứng cứ (Code) *</span>
-          </label>
-          <input
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="VD: p1, p3, 00-HD, EV-GLASS"
-            required
-            className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 font-mono focus:outline-none focus:border-amber-500 transition-colors"
-          />
-          <p className="text-[11px] text-zinc-500 mt-1">
-            Duy nhất theo từng vụ án (case_slug + code).
-          </p>
-        </div>
-
-        {/* Phân loại Kind */}
-        <div>
-          <label className="text-xs font-medium text-zinc-300 flex items-center gap-1.5 mb-1">
-            <Package className="size-3.5 text-amber-500" />
-            <span>Loại chứng cứ *</span>
-          </label>
-          <div className="grid grid-cols-4 gap-1.5">
-            {[
-              { id: "photo", label: "Ảnh", icon: ImageIcon },
-              { id: "pdf", label: "PDF", icon: FileText },
-              { id: "audio", label: "Audio", icon: Volume2 },
-              { id: "object", label: "Vật phẩm", icon: Package },
-            ].map((k) => {
-              const Icon = k.icon;
-              const isSelected = kind === k.id;
-              return (
-                <button
-                  key={k.id}
-                  type="button"
-                  onClick={() => setKind(k.id as DbCaseEvidence["kind"])}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-2 rounded border text-xs gap-1 transition-all",
-                    isSelected
-                      ? "bg-amber-950/60 border-amber-500 text-amber-300 font-medium"
-                      : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200",
-                  )}
-                >
-                  <Icon className="size-4" />
-                  <span className="text-[11px]">{k.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
+      {/* Main Info */}
+      <div className="space-y-4">
         {/* Tiêu đề */}
-        <div className="md:col-span-2">
+        <div>
           <label className="text-xs font-medium text-zinc-300 mb-1 block">
             Tiêu đề chứng cứ *
           </label>
           <input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="VD: p1. Ảnh hiện trường phòng khách & bộ bình trà vỡ"
+            onChange={(e) => handleTitleChange(e.target.value)}
+            placeholder="VD: Ảnh hiện trường phòng khách"
             required
             className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
           />
         </div>
 
-        {/* Phase */}
-        <div>
-          <label className="text-xs font-medium text-zinc-300 flex items-center gap-1.5 mb-1">
-            <Layers className="size-3.5 text-amber-500" />
-            <span>Giai đoạn mở khóa (Phase)</span>
-          </label>
-          <select
-            value={phase}
-            onChange={(e) => setPhase(Number(e.target.value))}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
-          >
-            <option value={0}>Phase 0: Khởi đầu (Hồ sơ ban đầu)</option>
-            <option value={1}>Phase 1: Tuyến A (Phong bì 01)</option>
-            <option value={2}>Phase 2: Tuyến B (Phong bì 02)</option>
-            <option value={3}>Phase 3: Tuyến C (Định tội)</option>
-            <option value={4}>Phase 4: Hậu kết / Mở rộng</option>
-          </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Phân loại Kind */}
+          <div>
+            <label className="text-xs font-medium text-zinc-300 flex items-center gap-1.5 mb-1">
+              <Package className="size-3.5 text-amber-500" />
+              <span>Loại chứng cứ *</span>
+            </label>
+            <div className="grid grid-cols-4 gap-1.5">
+              {[
+                { id: "photo", label: "Ảnh", icon: ImageIcon },
+                { id: "pdf", label: "PDF", icon: FileText },
+                { id: "audio", label: "Audio", icon: Volume2 },
+                { id: "object", label: "Vật phẩm", icon: Package },
+              ].map((k) => {
+                const Icon = k.icon;
+                const isSelected = kind === k.id;
+                return (
+                  <button
+                    key={k.id}
+                    type="button"
+                    onClick={() => setKind(k.id as DbCaseEvidence["kind"])}
+                    className={cn(
+                      "flex flex-col items-center justify-center p-2 rounded border text-xs gap-1 transition-all",
+                      isSelected
+                        ? "bg-amber-950/60 border-amber-500 text-amber-300 font-medium"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200",
+                    )}
+                  >
+                    <Icon className="size-4" />
+                    <span className="text-[11px]">{k.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Phase */}
+          <div>
+            <label className="text-xs font-medium text-zinc-300 flex items-center gap-1.5 mb-1">
+              <Layers className="size-3.5 text-amber-500" />
+              <span>Giai đoạn mở khóa (Phase)</span>
+            </label>
+            <select
+              value={phase}
+              onChange={(e) => setPhase(Number(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+            >
+              <option value={0}>Phase 0: Khởi đầu (Hồ sơ ban đầu)</option>
+              <option value={1}>Phase 1: Tuyến A (Phong bì 01)</option>
+              <option value={2}>Phase 2: Tuyến B (Phong bì 02)</option>
+              <option value={3}>Phase 3: Tuyến C (Định tội)</option>
+              <option value={4}>Phase 4: Hậu kết / Mở rộng</option>
+            </select>
+          </div>
         </div>
 
-        {/* Slot index */}
+        {/* Description */}
         <div>
           <label className="text-xs font-medium text-zinc-300 mb-1 block">
-            Thứ tự hiển thị (Slot Index)
+            Mô tả / Tóm tắt nội dung chứng cứ
           </label>
-          <input
-            type="number"
-            value={slotIndex}
-            onChange={(e) => setSlotIndex(Number(e.target.value))}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 font-mono focus:outline-none focus:border-amber-500 transition-colors"
+          <AutoGrowTextarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Mô tả hiện trạng vật chứng..."
+            className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors leading-relaxed"
           />
         </div>
-      </div>
 
-      {/* Description */}
-      <div>
-        <label className="text-xs font-medium text-zinc-300 mb-1 block">
-          Mô tả / Tóm tắt nội dung chứng cứ
-        </label>
-        <textarea
-          rows={3}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Mô tả hiện trạng vật chứng, vết nứt, dấu vân tay hoặc bối cảnh thu thập..."
-          className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors leading-relaxed"
-        />
+        {/* Khối Nâng cao thu gọn: Mã code & Slot Index */}
+        <details className="group border border-zinc-800/80 rounded-lg p-3 bg-zinc-900/30">
+          <summary className="text-xs text-zinc-400 cursor-pointer flex items-center justify-between font-mono list-none">
+            <span>Cài đặt nâng cao (Mã code, thứ tự)</span>
+            <ChevronDown className="size-3.5 group-open:rotate-180 transition-transform" />
+          </summary>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 pt-3 border-t border-zinc-800/60">
+            <div>
+              <label className="text-[11px] font-medium text-zinc-400 mb-1 block font-mono">
+                Mã chứng cứ (Code)
+              </label>
+              <input
+                type="text"
+                value={code}
+                onChange={(e) => handleCodeChange(e.target.value)}
+                placeholder="Tự sinh từ tiêu đề (VD: p1)"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-amber-500"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-zinc-400 mb-1 block font-mono">
+                Thứ tự hiển thị (Slot Index)
+              </label>
+              <input
+                type="number"
+                value={slotIndex}
+                onChange={(e) => setSlotIndex(Number(e.target.value))}
+                placeholder="0"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-amber-500"
+              />
+            </div>
+          </div>
+        </details>
       </div>
 
       {/* Tệp tin chính & Upload */}
@@ -462,74 +448,6 @@ export function EvidenceForm({
             />
           </div>
         )}
-      </div>
-
-      {/* Forensics Metadata Section */}
-      <div className="p-4 rounded-lg bg-zinc-900/40 border border-zinc-800 space-y-3">
-        <h4 className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
-          <ShieldCheck className="size-3.5 text-amber-500" />
-          <span>Thông số Giám định & Chuỗi bảo quản (Metadata)</span>
-        </h4>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-          <div>
-            <label className="text-[11px] text-zinc-400 mb-1 flex items-center gap-1">
-              <Hash className="size-3 text-zinc-500" />
-              <span>Mã vật chứng pháp lý (evidenceId)</span>
-            </label>
-            <input
-              type="text"
-              value={evidenceId}
-              onChange={(e) => setEvidenceId(e.target.value)}
-              placeholder="VD: EV-SCENE-OVERVIEW, EV-GLASS-SHARD"
-              className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-amber-500"
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] text-zinc-400 mb-1 flex items-center gap-1">
-              <Clock className="size-3 text-zinc-500" />
-              <span>Thời điểm ghi nhận (timestamp)</span>
-            </label>
-            <input
-              type="text"
-              value={timestamp}
-              onChange={(e) => setTimestamp(e.target.value)}
-              placeholder="VD: 20:00, 24/07/2016"
-              className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-amber-500"
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] text-zinc-400 mb-1 flex items-center gap-1">
-              <User className="size-3 text-zinc-500" />
-              <span>Người thu thập (recoveredBy)</span>
-            </label>
-            <input
-              type="text"
-              value={recoveredBy}
-              onChange={(e) => setRecoveredBy(e.target.value)}
-              placeholder="VD: ĐIỀU TRA VIÊN"
-              className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-amber-500"
-            />
-          </div>
-
-          <div>
-            <label className="text-[11px] text-zinc-400 mb-1 flex items-center gap-1">
-              <AlertTriangle className="size-3 text-zinc-500" />
-              <span>Trạng thái niêm phong (integrityStatus)</span>
-            </label>
-            <select
-              value={integrityStatus}
-              onChange={(e) => setIntegrityStatus(e.target.value)}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-amber-500"
-            >
-              <option value="secured">secured (Nguyên vẹn)</option>
-              <option value="analyzing">analyzing (Đang giám định)</option>
-              <option value="corrupted">corrupted (Bị xâm phạm / vỡ)</option>
-            </select>
-          </div>
-        </div>
       </div>
     </form>
   );

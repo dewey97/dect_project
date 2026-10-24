@@ -6,10 +6,6 @@ import {
   Image as ImageIcon,
   Volume2,
   Package,
-  Calendar,
-  User,
-  ShieldCheck,
-  AlertTriangle,
   ExternalLink,
 } from "lucide-react";
 import type { DbCaseEvidence } from "@/lib/types/database";
@@ -36,13 +32,6 @@ export function EvidencePreview({ evidence }: EvidencePreviewProps) {
   }
 
   const kind = evidence.kind || "photo";
-  const meta = evidence.metadata || {};
-  const evidenceId =
-    (meta.evidenceId as string) || `EV-${(evidence.code || "").toUpperCase()}`;
-  const recoveredBy = (meta.recoveredBy as string) || "ĐIỀU TRA VIÊN";
-  const chainOfCustody = (meta.chainOfCustody as string) || "VERIFIED";
-  const integrityStatus = (meta.integrityStatus as string) || "secured";
-  const timestamp = (meta.timestamp as string) || "20:00";
   const imgUrl = evidence.thumb_url || evidence.file_url;
 
   return (
@@ -200,48 +189,12 @@ export function EvidencePreview({ evidence }: EvidencePreviewProps) {
           </div>
         )}
 
-        {/* Forensics Meta Badge Grid */}
-        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-amber-950/50 text-[11px] font-mono">
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <Calendar className="size-3.5 text-amber-500/70" />
-            <span className="text-zinc-500">Thời điểm:</span>
-            <span className="text-zinc-300">{timestamp}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <User className="size-3.5 text-amber-500/70" />
-            <span className="text-zinc-500">Thu thập:</span>
-            <span className="text-zinc-300 truncate">{recoveredBy}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <ShieldCheck className="size-3.5 text-emerald-500/70" />
-            <span className="text-zinc-500">Chuỗi:</span>
-            <span className="text-emerald-400">{chainOfCustody}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <AlertTriangle className="size-3.5 text-amber-500/70" />
-            <span className="text-zinc-500">Niêm phong:</span>
-            <span
-              className={cn(
-                "capitalize",
-                integrityStatus === "secured" && "text-emerald-400",
-                integrityStatus === "corrupted" && "text-rose-400",
-                integrityStatus === "analyzing" && "text-amber-400",
-              )}
-            >
-              {integrityStatus}
-            </span>
-          </div>
-        </div>
-
-        {/* Diegetic Stamp watermark */}
-        <div className="mt-4 pt-3 border-t border-dashed border-amber-950/60 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-          <span>REF: {evidenceId}</span>
-          <span className="tracking-widest text-amber-700/60">
-            CONFIDENTIAL DOSSIER
+        {/* Dossier footer badge */}
+        <div className="pt-3 border-t border-amber-950/50 flex items-center justify-between text-xs font-mono text-zinc-400">
+          <span className="text-zinc-500">
+            Bộ hồ sơ: Phase {evidence.phase ?? 0}
           </span>
+          <span className="text-amber-500/80 font-bold">#{evidence.code}</span>
         </div>
       </div>
     </div>
