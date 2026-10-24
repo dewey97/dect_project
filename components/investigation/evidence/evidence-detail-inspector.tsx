@@ -22,7 +22,7 @@ export function EvidenceDetailInspector({
   const isPdf = selectedView.type === "pdf";
   const displayCode = isPdf
     ? selectedView.data.code || "HỒ SƠ"
-    : selectedView.data.evidenceId || "VẬT CHỨNG";
+    : selectedView.data.code || "VẬT CHỨNG";
 
   const pdfUrl = isPdf ? normalizeDrivePdfUrl(selectedView.data.url) : "";
   const photoUrl = !isPdf ? normalizeImageUrl(selectedView.data.thumbnail) : "";

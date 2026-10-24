@@ -33,7 +33,7 @@ export function MetadataPanel({ device }: MetadataPanelProps) {
         </div>
         <div className="flex justify-between border-b border-border/10 pb-0.5">
           <span className="text-muted-foreground">IMEI/UUID:</span>
-          <span className="text-foreground">359902100486{device.evidenceId.replace('-', '')}</span>
+          <span className="text-foreground">359902100486{(device.code || device.evidenceId || "").replace(/-/g, "")}</span>
         </div>
         <div className="flex justify-between border-b border-border/10 pb-0.5">
           <span className="text-muted-foreground">TRẠNG THÁI SIM:</span>

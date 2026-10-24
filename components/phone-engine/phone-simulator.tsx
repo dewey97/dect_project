@@ -92,6 +92,7 @@ export interface PhoneSimulatorProps {
 const BASE_DEVICE: Device = {
   id: "dev-victim",
   caseId: "",
+  code: "DEV-VICTIM",
   evidenceId: "DEV-VICTIM",
   label: "Điện thoại nạn nhân",
   kind: "phone",

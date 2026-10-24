@@ -138,9 +138,9 @@ function WebEvidencePageContent() {
   const [isDraggingRightSplit, setIsDraggingRightSplit] =
     useState<boolean>(false);
 
-  // Phase filter: 'all' | 0 | 1 | 2 | 3
+  // Phase filter: 'all' | string | number
   const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<
-    "all" | number
+    "all" | string | number
   >("all");
 
   const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<
@@ -266,12 +266,9 @@ function WebEvidencePageContent() {
               kind: "photo",
               title,
               preview: String(row.description || title),
-              evidenceId: code,
+              code,
               thumbnail: imgUrl,
               timestamp: "24/07/2016",
-              recoveredBy: "ĐIỀU TRA VIÊN",
-              integrityStatus: "secured",
-              chainOfCustody: "VERIFIED",
               phase,
               order: idx * 10,
             },

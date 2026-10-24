@@ -37,7 +37,7 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, c
       if (durationSeconds >= 1) {
         if (isEvidence && selectedView) {
           trackPhotoInspected({
-            photoId: selectedView.data.evidenceId || selectedView.data.id || 'unknown_photo',
+            photoId: selectedView.data.code || selectedView.data.id || 'unknown_photo',
             title: activeTitle,
             durationSeconds,
           })
@@ -97,7 +97,7 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, c
             <EvidencePhotoAnnotator
               photoUrl={normalizeImageUrl(selectedView.data.thumbnail) || "/photo_scene_overview.jpg"}
               title={selectedView.data.title || "Vật chứng"}
-              evidenceId={selectedView.data.evidenceId}
+              evidenceId={selectedView.data.code}
             />
           ) : isPdf && matchedDossier ? (
             /* Hiển thị trực tiếp bản in Diegetic Dossier Sheet */

@@ -133,7 +133,7 @@ export function DossierTray({
     const q = searchQuery.toLowerCase().trim();
     return evidenceItems.filter((item) => {
       const ev = item.data as PhysicalEvidence;
-      const code = (ev.evidenceId || "").toLowerCase();
+      const code = (ev.code || "").toLowerCase();
       const title = (item.data.title || "").toLowerCase();
       return code.includes(q) || title.includes(q);
     });
@@ -297,8 +297,8 @@ export function DossierTray({
                 const isPinged =
                   activePing?.targetId === item.data.id ||
                   Boolean(
-                    evItem.evidenceId &&
-                    activePing?.targetId === evItem.evidenceId,
+                    evItem.code &&
+                    activePing?.targetId === evItem.code,
                   );
 
                 return (
@@ -329,9 +329,9 @@ export function DossierTray({
 
                     {/* Nhãn mã số + tiêu đề ở chân thẻ */}
                     <div className="absolute bottom-1.5 left-1.5 right-1.5 pointer-events-none">
-                      {evItem?.evidenceId && (
+                      {evItem?.code && (
                         <span className="inline-block px-1.5 py-0.5 rounded-xs bg-[#1a120c]/90 text-[0.6rem] font-mono font-bold tracking-wider text-[#e8a86a] border border-[#3d2719] mb-0.5">
-                          {evItem.evidenceId}
+                          {evItem.code}
                         </span>
                       )}
                       <p className="text-[11px] font-sans text-stone-200 truncate leading-tight">
@@ -345,7 +345,7 @@ export function DossierTray({
                       onClick={(e) => {
                         e.stopPropagation();
                         onBroadcastPing(
-                          evItem.evidenceId || item.data.id,
+                          evItem.code || item.data.id,
                           item.data.title,
                           undefined,
                           {

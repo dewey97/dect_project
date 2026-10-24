@@ -22,6 +22,7 @@ const ACTIVE_CASE_000: Case = {
 const DEFAULT_VICTIM_DEVICE: Device = {
   id: "dev-000-1",
   caseId: "case-000",
+  code: "EV-PHONE-KHANG",
   evidenceId: "EV-PHONE-KHANG",
   label: "Điện thoại nạn nhân",
   kind: "phone",
