@@ -1,6 +1,7 @@
 "use client";
 
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { CodeChipInput } from "../code-chip-input";
 
@@ -10,26 +11,6 @@ interface SimpleAnswerConfigFormProps {
 }
 
 const INPUT_CLASS = "h-7 border-white/10 bg-black/30 text-xs";
-
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block space-y-1">
-      <span className="flex items-baseline gap-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-        {required && <span className="text-amber-400">*</span>}
-      </span>
-      {children}
-    </label>
-  );
-}
 
 export function SimpleAnswerConfigForm({
   draft,
@@ -67,9 +48,7 @@ export function SimpleAnswerConfigForm({
       ) : (
         <Input
           value={config.correctAnswer || ""}
-          onChange={(event) =>
-            setConfig({ correctAnswer: event.target.value })
-          }
+          onChange={(event) => setConfig({ correctAnswer: event.target.value })}
           className={INPUT_CLASS}
         />
       )}

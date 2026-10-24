@@ -1,28 +1,12 @@
 "use client";
 
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
-import { AutoExpandingTextarea } from "../auto-expanding-textarea";
+import { Field } from "@/components/ui/field";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 
 interface CheckpointAiCheckFormProps {
   draft: CheckpointStudioDraft;
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
-}
-
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block space-y-1">
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-      </span>
-      {children}
-    </label>
-  );
 }
 
 export function CheckpointAiCheckForm({
@@ -32,7 +16,7 @@ export function CheckpointAiCheckForm({
   return (
     <div className="space-y-2">
       <Field label="Bối cảnh">
-        <AutoExpandingTextarea
+        <AutoGrowTextarea
           value={draft.aiContext}
           onChange={(event) => onChange({ aiContext: event.target.value })}
           minRows={1}
@@ -41,7 +25,7 @@ export function CheckpointAiCheckForm({
       </Field>
 
       <Field label="Mẫu ĐẠT">
-        <AutoExpandingTextarea
+        <AutoGrowTextarea
           value={draft.aiValidCases.join("\n")}
           onChange={(event) =>
             onChange({ aiValidCases: event.target.value.split("\n") })
@@ -52,7 +36,7 @@ export function CheckpointAiCheckForm({
       </Field>
 
       <Field label="Mẫu TRƯỢT">
-        <AutoExpandingTextarea
+        <AutoGrowTextarea
           value={draft.aiInvalidCases.join("\n")}
           onChange={(event) =>
             onChange({ aiInvalidCases: event.target.value.split("\n") })

@@ -1,13 +1,15 @@
 "use client";
 
-import type { DbCaseDossier } from "@/lib/types/database";
+import type { DbCaseCharacter, DbCaseDossier } from "@/lib/types/database";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
-import { AutoExpandingTextarea } from "../auto-expanding-textarea";
+import { Field } from "@/components/ui/field";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 import { Input } from "@/components/ui/input";
 
 interface CheckpointIdentityFormProps {
   draft: CheckpointStudioDraft;
   dossiers?: DbCaseDossier[];
+  characters?: DbCaseCharacter[];
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
 }
 
@@ -25,29 +27,10 @@ const KIND_OPTIONS = [
   { value: "epilogue", label: "📜 Hậu án" },
 ];
 
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block min-w-0 space-y-1">
-      <span className="flex items-baseline gap-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-        {required && <span className="text-amber-400">*</span>}
-      </span>
-      {children}
-    </label>
-  );
-}
-
 export function CheckpointIdentityForm({
   draft,
   dossiers = [],
+  characters = [],
   onChange,
 }: CheckpointIdentityFormProps) {
   const isEpilogue =
@@ -117,25 +100,53 @@ export function CheckpointIdentityForm({
         </Field>
 
         {showSubjectKey && (
-          <Field label="Khóa nhân vật (subjectKey)">
-            <Input
+          <Field label="Nhân vật liên quan">
+            <select
               value={draft.subjectKey || ""}
               onChange={(e) => onChange({ subjectKey: e.target.value })}
-              placeholder="VD: vu, tung, ha..."
-              className={INPUT_CLASS}
-            />
+              className="h-7 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50"
+            >
+              <option value="">-- Chọn nhân vật --</option>
+              {characters.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.name} ({c.key})
+                </option>
+              ))}
+              {draft.subjectKey &&
+                !characters.some((c) => c.key === draft.subjectKey) && (
+                  <option value={draft.subjectKey}>
+                    ⚠ {draft.subjectKey} (không tìm thấy)
+                  </option>
+                )}
+            </select>
           </Field>
         )}
       </div>
 
       <Field label="Câu hỏi">
-        <AutoExpandingTextarea
+        <AutoGrowTextarea
           value={draft.question}
           onChange={(event) => onChange({ question: event.target.value })}
           minRows={1}
           className="min-h-8"
         />
       </Field>
+
+      <details className="pt-1 text-xs text-zinc-500">
+        <summary className="cursor-pointer select-none text-[11px] font-medium text-zinc-500 hover:text-zinc-400">
+          Tùy chọn nâng cao
+        </summary>
+        <div className="mt-2 space-y-2 border-t border-white/5 pt-2">
+          <Field label="Mã định danh">
+            <Input
+              value={draft.checkpointId || ""}
+              onChange={(e) => onChange({ checkpointId: e.target.value })}
+              placeholder="VD: cp_01..."
+              className={INPUT_CLASS}
+            />
+          </Field>
+        </div>
+      </details>
     </div>
   );
 }

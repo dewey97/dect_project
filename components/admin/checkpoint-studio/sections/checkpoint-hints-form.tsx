@@ -7,7 +7,7 @@ import type {
   CheckpointHintGroup,
   CheckpointStudioDraft,
 } from "@/lib/types/checkpoint-studio";
-import { AutoExpandingTextarea } from "../auto-expanding-textarea";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 import { cn } from "@/lib/utils";
 
 const HINT_GROUPS: { key: CheckpointHintGroup; label: string }[] = [
@@ -29,10 +29,13 @@ export function CheckpointHintsForm({
   hideGroupTabs = false,
   onChange,
 }: CheckpointHintsFormProps) {
-  const isEvidencePicker = (draft.type || "evidence_picker") === "evidence_picker";
-  const [internalGroup, setInternalGroup] = useState<CheckpointHintGroup>("general");
+  const isEvidencePicker =
+    (draft.type || "evidence_picker") === "evidence_picker";
+  const [internalGroup, setInternalGroup] =
+    useState<CheckpointHintGroup>("general");
 
-  const effectiveGroup: CheckpointHintGroup = activeGroup ?? (isEvidencePicker ? internalGroup : "general");
+  const effectiveGroup: CheckpointHintGroup =
+    activeGroup ?? (isEvidencePicker ? internalGroup : "general");
 
   const indices = draft.hints
     .map((hint, index) => (hint.group === effectiveGroup ? index : -1))
@@ -69,7 +72,9 @@ export function CheckpointHintsForm({
       {isEvidencePicker && !hideGroupTabs && (
         <div className="flex flex-wrap items-center gap-1 pb-1">
           {HINT_GROUPS.map((item) => {
-            const count = draft.hints.filter((h) => h.group === item.key).length;
+            const count = draft.hints.filter(
+              (h) => h.group === item.key,
+            ).length;
             return (
               <button
                 key={item.key}
@@ -108,7 +113,7 @@ export function CheckpointHintsForm({
             <span className="mt-1 flex size-5 shrink-0 items-center justify-center rounded bg-white/5 font-mono text-[10px] text-zinc-400">
               {position + 1}
             </span>
-            <AutoExpandingTextarea
+            <AutoGrowTextarea
               value={draft.hints[absoluteIndex].text}
               onChange={(event) =>
                 updateHint(absoluteIndex, event.target.value)

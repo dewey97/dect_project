@@ -5,7 +5,7 @@ import { FolderOpen, Search, Check, Plus, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { AutoExpandingTextarea } from "./auto-expanding-textarea";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 import type { DbCaseDossier } from "@/lib/types/database";
 import type { AvailableDocumentItem } from "@/lib/actions/dossier-config-actions";
 import { saveCaseDossier } from "@/lib/actions/dossier-config-actions";
@@ -158,7 +158,7 @@ export function DossierEditor({
           <label className="mb-1 block text-[10px] uppercase tracking-wide text-zinc-500 font-semibold">
             Mô tả
           </label>
-          <AutoExpandingTextarea
+          <AutoGrowTextarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             minRows={1}

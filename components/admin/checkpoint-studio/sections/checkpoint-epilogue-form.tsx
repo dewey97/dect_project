@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { BookOpen, Plus, Trash2 } from "lucide-react";
-import type { CheckpointStudioDraft, EpilogueStoryItem } from "@/lib/types/checkpoint-studio";
-import { AutoExpandingTextarea } from "../auto-expanding-textarea";
+import type {
+  CheckpointStudioDraft,
+  EpilogueStoryItem,
+} from "@/lib/types/checkpoint-studio";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -16,15 +19,17 @@ export function CheckpointEpilogueForm({
   draft,
   onChange,
 }: CheckpointEpilogueFormProps) {
-  const stories: EpilogueStoryItem[] = Array.isArray(draft.answerConfig.epilogueStories) && draft.answerConfig.epilogueStories.length > 0
-    ? draft.answerConfig.epilogueStories
-    : [
-        {
-          id: "cp-epilogue-1",
-          title: "Phần 1",
-          monologue: draft.narrative || "",
-        },
-      ];
+  const stories: EpilogueStoryItem[] =
+    Array.isArray(draft.answerConfig.epilogueStories) &&
+    draft.answerConfig.epilogueStories.length > 0
+      ? draft.answerConfig.epilogueStories
+      : [
+          {
+            id: "cp-epilogue-1",
+            title: "Phần 1",
+            monologue: draft.narrative || "",
+          },
+        ];
 
   const [activeIdx, setActiveIdx] = useState(0);
   const currentStory = stories[activeIdx] || stories[0];
@@ -134,7 +139,7 @@ export function CheckpointEpilogueForm({
           )}
         </div>
 
-        <AutoExpandingTextarea
+        <AutoGrowTextarea
           value={currentStory.monologue}
           onChange={(e) => handleUpdateCurrentMonologue(e.target.value)}
           minRows={4}

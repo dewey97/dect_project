@@ -1,7 +1,7 @@
 "use client";
 
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
-import { AutoExpandingTextarea } from "../auto-expanding-textarea";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 
 interface CheckpointNarrativeFormProps {
   draft: CheckpointStudioDraft;
@@ -13,7 +13,7 @@ export function CheckpointNarrativeForm({
   onChange,
 }: CheckpointNarrativeFormProps) {
   return (
-    <AutoExpandingTextarea
+    <AutoGrowTextarea
       value={draft.narrative}
       onChange={(event) => onChange({ narrative: event.target.value })}
       minRows={1}

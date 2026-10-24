@@ -91,7 +91,7 @@ export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
                       {c.title}
                     </div>
                     <p className="text-xs text-zinc-500 font-mono mt-0.5">
-                      ID: {c.slug}
+                      {c.slug}
                     </p>
                   </td>
                   <td className="px-6 py-4">
