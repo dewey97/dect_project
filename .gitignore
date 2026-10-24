@@ -54,3 +54,5 @@ scripts/*.json
 scripts/**/*.json
 __pycache__/
 data/maps/*.backup*.json
+.worktrees/
+worktrees/

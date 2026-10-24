@@ -39,6 +39,7 @@ import {
 } from "@/components/investigation/evidence/phase-unlocked-modal";
 import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
 import { InvestigationMobileNav } from "@/components/investigation/evidence/investigation-mobile-nav";
+import { GameDesktopHeader } from "@/components/investigation/evidence/game-desktop-header";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
@@ -692,8 +693,11 @@ function WebEvidencePageContent() {
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start p-0 lg:p-3 box-border min-h-0 min-w-0 select-none"
+      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start box-border min-h-0 min-w-0 select-none"
     >
+      {/* DESKTOP HEADER (GIỐNG LANDING PAGE, CHỈ HIỂN THỊ TRÊN DESKTOP) */}
+      <GameDesktopHeader />
+
       {/* MOBILE VIEW SWITCHER (CHỈ HIỂN THỊ TRÊN MÀN HÌNH DI ĐỘNG < LG) */}
       <InvestigationMobileNav
         mobileTab={mobileTab}
@@ -706,7 +710,7 @@ function WebEvidencePageContent() {
         onOpenNotebook={() => setActiveModal("notebook")}
       />
 
-      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-1.5">
+      <div className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-1.5 p-0 lg:p-2.5">
         {/* OVERLAY CHỐNG MẤT SỰ KIỆN KHI KÉO THẢ RESIZE TRÊN TOÀN MÀN HÌNH */}
         {(isDraggingLeftSplit || isDraggingRightSplit) && (
           <div className="fixed inset-0 z-50 cursor-col-resize select-none bg-transparent" />

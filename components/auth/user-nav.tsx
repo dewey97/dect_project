@@ -5,8 +5,13 @@ import { useRouter } from "next/navigation";
 import { User, LogOut, Settings, UserCircle, Terminal } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
-export function UserNav() {
+interface UserNavProps {
+  size?: "sm" | "md";
+}
+
+export function UserNav({ size = "md" }: UserNavProps) {
   const router = useRouter();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,8 +76,17 @@ export function UserNav() {
     router.refresh();
   };
 
+  const isSmall = size === "sm";
+
   if (loading) {
-    return <div className="w-9 h-9 animate-pulse bg-muted rounded-full" />;
+    return (
+      <div
+        className={cn(
+          "animate-pulse bg-muted rounded-full",
+          isSmall ? "size-7.5" : "size-9"
+        )}
+      />
+    );
   }
 
   if (user) {
@@ -83,7 +97,10 @@ export function UserNav() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-primary text-primary-foreground font-semibold shadow-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+          className={cn(
+            "flex items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shadow-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+            isSmall ? "size-7.5 text-xs" : "size-9 text-sm"
+          )}
           title="Tài khoản của bạn"
         >
           {firstLetter}
@@ -148,10 +165,13 @@ export function UserNav() {
   return (
     <button
       onClick={() => router.push("/login")}
-      className="p-2 hover:bg-accent hover:text-accent-foreground rounded-full transition-colors cursor-pointer flex items-center justify-center"
+      className={cn(
+        "hover:bg-accent hover:text-accent-foreground rounded-full transition-colors cursor-pointer flex items-center justify-center",
+        isSmall ? "p-1.5" : "p-2"
+      )}
       title="Đăng nhập"
     >
-      <User className="size-5" />
+      <User className={isSmall ? "size-4" : "size-5"} />
     </button>
   );
 }
