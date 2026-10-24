@@ -11,11 +11,13 @@
 | Phần | Đã có trên `main` | Còn lại |
 | ---- | ----------------- | ------- |
 | A | ✅ Hoàn tất A1–A9, migration 38 và backfill avatar (B4) | A10 checklist VPS — chủ dự án tự làm, không thuộc plan này |
-| WT-5 evidence | ✅ `2699873` — Hoàn tất B1, B2: sạch tsc, dossier grouping, breadcrumb, drop integrity indicator, E2E xanh | Xong |
-| WT-1 board | 🟡 `04527de`/`218836f`/`7946aad` — bước 1A–1C (migration 39 SQL, `/api/board-nodes`, `board-actions`, pin-builder theo `nodeKind`, note dùng chung `public/images/board/notes/`) | 1D–1H (B5-B10); migration 39 chưa chạy |
-| WT-3 studio | ✅ `471a5c8` + B3 — Đã rà 0 placeholder >40 ký tự, 0 helper dài, ẩn khóa kỹ thuật, spec pass | Xong |
+| WT-5 evidence | ✅ `50aba03` B1, `2699873` B2: sạch tsc, dossier grouping, breadcrumb, drop integrity indicator | B12-8 (dossier rác "X"), B12-5 (spec admin chưa thực chạy) |
+| WT-1 board | 🟡 1A–1C + `796041b` B5, `18175dc` B6, `e5407aa` B7, `fa6c12c` B8 (migration 39 đã chạy production), `2b1a9da` B9, `de7dcf0` B10 | **B12-1 hồi quy luồng chính**, B12-2/3/4/6 (B10 chưa đạt tiêu chí) |
+| WT-3 studio | ✅ `471a5c8` + `bf1f35f` B3 — rà 0 placeholder >40 ký tự, ẩn khóa kỹ thuật | `studio-ux.spec.ts` **bị skip** (thiếu credential admin), chưa từng chạy thật → B12-5 |
 
-✅ **`main` đã qua typecheck 100% sạch** sau B1, B2, B3, B4.
+✅ `tsc` sạch tại `980ac4f`. ⛔ **Chưa push được**: review 2026-10-25 phát hiện hồi quy luồng chính case_000 → làm **B12** trước.
+
+**Kết quả review B0–B11 (2026-10-25, HEAD `980ac4f`):** E2E 24 pass / **3 fail** / 14 skip. DB production: migration 38 ✅ (9/10 avatar case_000), migration 39 ✅ (5 node, RLS bật, 0 pin id `c0-pin-*`), không lộ token. Chi tiết lỗi: bước B12.
 
 **Phê duyệt của chủ dự án (2026-10-25):** duyệt toàn bộ plan v5, gồm **chạy migration 38 và 39 lên production** bởi AI thực thi theo mục "Truy cập Supabase production". Đây là ngoại lệ có chủ đích cho quy tắc "không tự chạy migration" (`HANDOFF_ROADMAP.md` mục 2.1), chỉ áp dụng cho 2 file `db/schema/38_character_avatar.sql`, `db/schema/39_board_nodes.sql` và SQL backfill A9. **Push vẫn chỉ khi chủ dự án ra lệnh** (AGENTS.md global §1).
 
@@ -91,8 +93,34 @@ if (!res.ok) process.exit(1);
 | **B9** | WT-1 bước 1G (Board Studio trong Checkpoint Studio) | mục 3.3 | `e2e/board-studio.spec.ts` pass |
 | **B10** | WT-1 bước 1H (gameplay chỉ đọc, xóa `admin-create-pin-modal.tsx`, xóa id tương thích). Nếu `boardgame_pins` còn id `c0-pin-followup-*` / `c0-pin-evidence-*`: viết `db/schema/40_board_pins_legacy_ids.sql` đổi sang id mới (cùng quy trình B8, backup trước), đã được duyệt. | mục 3.3 | `grep -rE 'c0-pin-\|"khang"\|Nguyễn Văn Khang\|hasVuFollowup' components/investigation` = 0; `board-dynamic.spec.ts`, `board-new-case.spec.ts` pass |
 | **B11** | Tích hợp: `tsc`, toàn bộ E2E, `NEXT_DIST_DIR=.next_dev npx next build`, cập nhật `CHANGELOG.md`, `HANDOFF_ROADMAP.md`, `TECHDEBT.md` (#15, #16, #17), `docs/core_specs/19_checkpoint_studio.md` (tab bảng), `02_database_schema.md` (migration 38, 39) | mục 1.3 | Sẵn sàng push |
+| **B12** | **Sửa lỗi review B0–B11.** Làm B12-1 → B12-10 trong bảng "B12 — danh sách lỗi review" ngay dưới; mỗi mục 1 commit `fix(...)`. | bảng B12 | Toàn bộ tiêu chí bảng B12 đạt; `tsc` sạch; `pnpm test:e2e` **0 fail**, skip chỉ còn spec cần dữ liệu ngoài (ghi lý do); báo cáo mục 9 kèm số pass/fail/skip thật |
 
-**Prompt giao việc (1 session, chạy hết B0 → B11):**
+### B12 — danh sách lỗi review (2026-10-25)
+
+Số dòng tại `980ac4f`; grep lại trước khi sửa.
+
+| #      | Mức     | Lỗi | Vị trí | Sửa | Done khi |
+| ------ | ------- | --- | ------ | --- | -------- |
+| B12-1  | 🔴 Cao  | **Hồi quy luồng chính case_000.** Bấm "Mở rộng điều tra" (`phone_lookup`) không mở modal tra SĐT; ảnh lúc fail cho thấy **cả 7 nghi phạm hiện trên bảng ngay từ đầu** (trước đây chỉ hiện sau khi tra SĐT xong). | `e2e/case-000.spec.ts:137` fail tại `:65` (0 ô "Nhập tên nghi phạm..."). Nghi: `main-investigation-canvas.tsx:680-683` (`state.phoneLookupSuccess` true sai → mở `DossierE`) và điều kiện hiện suspect pin trong `pin-builder.ts` sau B5/B6 | Tìm nguyên nhân gốc (`git diff 7946aad..de7dcf0` phần state tiến trình + điều kiện hiện nghi phạm). Không sửa test cho khớp lỗi. Nghi phạm chỉ hiện theo tiến trình như trước. | `case-000.spec.ts` 9/9 pass; mở `/evidence/web?case_id=case_000` với localStorage sạch: chỉ thấy nạn nhân, điện thoại, "Mở rộng điều tra", hub, cáo trạng — chưa có ảnh nghi phạm; ảnh trước/sau trong báo cáo |
+| B12-2  | 🟠 TB   | B10 chưa đạt tiêu chí grep: còn 30 chỗ / 4 file. | `pin-builder.ts` (20 chỗ `legacyId: "c0-pin-*"`, 150–364, 495, 542); `main-investigation-canvas.tsx:246,316,438` (`"khang"`); `add-suspect-modal.tsx:593,694,735` (`"khang"`); `hero-interactive/card-composite.ts:46-47` (`isCase000`, `avatar_khang`) | Xóa `legacyId` + nhánh tương thích; nạn nhân nhận theo `role === "victim"` từ `CaseCharactersProvider`; avatar nạn nhân lấy `avatarUrl`. | `grep -rnE 'c0-pin-\|"khang"\|Nguyễn Văn Khang\|hasVuFollowup\|isCase000\|avatar_khang' components/investigation --exclude-dir=archive_3d_vault` = 0 dòng |
+| B12-3  | 🟠 TB   | Nút ghim ẩn bị **nhân đôi**: mỗi ghim có thêm nút `data-pin-id={pin.legacyId}` → `character-avatar.spec.ts` fail strict mode (3 phần tử "Lê Quang Vũ"). | `components/investigation/hero-interactive.tsx:545-562` | Xóa nút legacy (cùng B12-2). Đổi `clickPin` trong `e2e/case-000.spec.ts` sang `[data-node-kind]` / `[data-subject-key]` theo quyết định mục 7 câu 2 — chỉ đổi selector, không đổi kịch bản. | `character-avatar.spec.ts` pass; mỗi node đúng 1 phần tử `[data-pin-id]` |
+| B12-4  | 🟠 TB   | Fallback cứng 3 SĐT + đáp án case_000 còn trong modal (trái B6). | `components/investigation/mindmap/phone-lookup-modal.tsx:61-87` (`DEFAULT_PHONE_INPUTS`); `:106-109` không đọc key `textMatchInputs` (DB case_000 lưu camelCase `answer_config.textMatchInputs`); `:90` mặc định `caseId = "case-000"` | Đọc `answerConfig.textMatchInputs` ∥ `text_match_inputs`; xóa `DEFAULT_PHONE_INPUTS`; thiếu cấu hình → trạng thái rỗng "Checkpoint chưa cấu hình"; `caseId` bắt buộc. | grep `DEFAULT_PHONE_INPUTS` = 0; bước tra SĐT trong `case-000.spec.ts` pass (3 ô lấy từ DB) |
+| B12-5  | 🟠 TB   | 14 spec admin **bị skip** (thiếu `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD`): `board-studio`, `studio-ux`, `evidence-studio`, `phone-studio`, `messages-editor`, `phone-devices`… chưa từng chạy; plan từng ghi "spec pass" là sai. | `e2e/auth.setup.ts` | Chủ dự án thêm 2 biến vào `.env.local` (không phải `.env`); `auth.setup.ts` nạp `.env.local` bằng `process.loadEnvFile` nếu chưa. Chạy lại toàn bộ, sửa spec/code fail. | `pnpm test:e2e`: 0 fail, spec admin **chạy thật** (không skip); báo cáo ghi số liệu |
+| B12-6  | 🟠 TB   | Thiếu `e2e/board-new-case.spec.ts` (B10 yêu cầu). | `e2e/` | Viết theo mục 3.4 (seed `e2e_board_test` bằng service role, dọn trong `afterAll`). | Spec tồn tại và pass; bảng vụ mới không có chữ "Khang/Vũ/Tùng/Hà", không request ảnh `case_000` |
+| B12-7  | 🟡 Thấp | `no-sheets.spec.ts` fail: chặn mọi `*.googleapis.com` nên bắt 2 request **Firebase** (`firebase.googleapis.com`, `firebaseinstallations.googleapis.com`), không phải Sheets. | `e2e/no-sheets.spec.ts:154` | Thu hẹp pattern về `sheets.googleapis.com` + `docs.google.com/spreadsheets`. Firebase là việc riêng, không xử lý ở đây. | `no-sheets.spec.ts` pass |
+| B12-8  | 🟡 Thấp | Dossier rác trên production: `case_dossiers` case_000 `dossier_key='x'`, title "X", `document_codes=['A-03']` (tạo 2026-10-21) → hiện chip "X" trong khay hồ sơ. | DB production | Kiểm `A-03` có thuộc dossier khác; rồi `delete from case_dossiers where case_id='case_000' and dossier_key='x'` qua `run-sql.mjs` (đã duyệt). | Khay case_000 chỉ còn: Ban Đầu, Bộ A, Bộ B, Bộ C, Kết Luận (+ Vật chứng, Chưa gán bộ) |
+| B12-9  | 🟡 Thấp | 2 route mới mặc định `case_000` khi thiếu tham số; `board-nodes` nuốt lỗi `42P01` thành mảng rỗng (che thiếu migration). | `app/api/board-nodes/route.ts:14-19, 30-33`; `app/api/case-dossiers/route.ts:14-19` | Thiếu `case` → 400. Bỏ nhánh `42P01` (migration 39 đã chạy). | Gọi không tham số → 400; E2E không đổi |
+| B12-10 | 🟡 Thấp | Docs lệch: không có bằng chứng backup `boardgame_pins` trước B8 (bảng backup không tồn tại, không có báo cáo); B11 không cập nhật `HANDOFF_ROADMAP.md`. | `CHANGELOG.md`, `HANDOFF_ROADMAP.md` §1.5, §1.6 | Ghi trung thực vào CHANGELOG tình trạng backup B8; cập nhật ROADMAP sau B12. | ROADMAP khớp thực tế; CHANGELOG có mục B12 |
+
+**Tiêu chí push (sau B12):** `tsc` sạch; `pnpm test:e2e` 0 fail với credential admin; `NEXT_DIST_DIR=.next_dev npx next build` pass; chơi tay case_000 trọn luồng (tra SĐT → thẩm tra 3 nghi phạm → câu hỏi phụ → cáo trạng → hậu án) desktop + mobile. Push chỉ khi chủ dự án ra lệnh.
+
+**Prompt giao việc B12:**
+
+```
+Đọc docs/WORKTREE_PLAN.md mục "Thứ tự việc trên main" và bảng "B12 — danh sách lỗi review". Làm B12-1 → B12-10 trên main, mỗi mục 1 commit, không push. B12-1 phải tìm nguyên nhân gốc, không sửa test cho khớp lỗi. Báo cáo theo mục 9 kèm số E2E pass/fail/skip thật. Thiếu credential admin (B12-5) thì dừng và hỏi.
+```
+
+**Prompt giao việc cũ (B0 → B11, đã chạy xong):**
 
 ```
 Đọc docs/WORKTREE_PLAN.md (mục "Phê duyệt", "Truy cập Supabase production", "Thứ tự việc trên main"). Làm lần lượt B0 → B11 trên main, mỗi bước 1 commit, không push. Sau mỗi bước báo cáo ngắn theo mục 9. Gặp lỗi migration hoặc thiếu key thì dừng và hỏi.

@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-25): **chuyển về 1 nhánh `main`** (plan v5). WT-1/WT-5/WT-3 đã merge dang dở (`8e68a22`, `0078030`, `5771526`), worktree đã gỡ. Việc còn lại B1–B11 tuần tự trong `WORKTREE_PLAN.md`. ⚠ `main` đang lỗi `tsc` (13 lỗi, B1) — không push. Migration 38, 39 chưa chạy production — **đã duyệt cho AI chạy** (B4, B8) qua `scripts/ops/run-sql.mjs`, key đặt ở `.env.local` (xem mục "Truy cập Supabase production" trong plan).
+Tiến độ (2026-10-25): B0–B11 đã làm trên `main` (`3219d01`→`980ac4f`, chưa push). Migration 38, 39 **đã chạy production**. Review: `tsc` sạch, E2E 24 pass / 3 fail / 14 skip, **hồi quy luồng chính case_000** (tra SĐT không mở, nghi phạm hiện từ đầu) → **B12** (10 mục, `WORKTREE_PLAN.md`). ⛔ Không push trước khi B12 xong.
 
 ---
 
