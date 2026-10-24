@@ -8,15 +8,11 @@ import type {
 } from "@/components/investigation/evidence/evidence-types";
 import { getCaseEvidence } from "@/lib/actions/evidence-actions";
 import { normalizeCaseId } from "@/lib/cases/case-id";
-import {
-  CASE_000_PDFS,
-  CASE_000_EVIDENCE,
-} from "@/components/investigation/evidence/evidence-data";
 
 export interface CaseEvidenceState {
   pdfs: PDFDocument[];
   evidence: PhysicalEvidence[];
-  rawEvidence: DbCaseEvidence[];
+  rawEvidence: any[];
   loading: boolean;
   error: string | null;
   refetch: () => void;
@@ -97,15 +93,30 @@ export function useCaseEvidence(
       .then((res) => {
         if (!isMounted) return;
         if (res.success && res.data && res.data.length > 0) {
+          const enriched = res.data.map((item) => {
+            const primaryUrl = item.thumb_url || item.file_url || "";
+            const meta = (item.metadata as Record<string, unknown>) || {};
+            return {
+              ...meta,
+              ...item,
+              label: item.title,
+              url: primaryUrl,
+              drive_url: primaryUrl,
+              image_url: primaryUrl,
+              direct_cdn_url: primaryUrl,
+              photo_code: item.code,
+              photo_id: item.code,
+            };
+          });
           evidenceCache[effectiveSlug] = {
-            data: res.data,
+            data: enriched,
             timestamp: Date.now(),
           };
-          setRawEvidence(res.data);
+          setRawEvidence(enriched);
           setError(null);
         } else {
-          // Nếu Supabase chưa có dữ liệu hoặc migration 35 chưa chạy:
-          // Fallback an toàn cho case_000 để gameplay và E2E không gãy
+          // Chưa có dữ liệu trong DB hoặc fetch lỗi: giữ danh sách rỗng,
+          // hiển thị trạng thái đồng bộ thay vì dữ liệu tĩnh cũ.
           setRawEvidence([]);
           if (!res.success && res.error) {
             setError(res.error);
@@ -126,29 +137,19 @@ export function useCaseEvidence(
   }, [effectiveSlug, refreshToken, isFresh, cached]);
 
   const { pdfs, evidence } = useMemo(() => {
-    // Nếu có dữ liệu từ Supabase, map từ rawEvidence
-    if (rawEvidence.length > 0) {
-      const dbPdfs: PDFDocument[] = [];
-      const dbEvs: PhysicalEvidence[] = [];
+    const dbPdfs: PDFDocument[] = [];
+    const dbEvs: PhysicalEvidence[] = [];
 
-      for (const item of rawEvidence) {
-        if (item.kind === "pdf") {
-          dbPdfs.push(mapDbToPdf(item));
-        } else {
-          dbEvs.push(mapDbToPhysicalEvidence(item));
-        }
+    for (const item of rawEvidence) {
+      if (item.kind === "pdf") {
+        dbPdfs.push(mapDbToPdf(item));
+      } else {
+        dbEvs.push(mapDbToPhysicalEvidence(item));
       }
-
-      return { pdfs: dbPdfs, evidence: dbEvs };
     }
 
-    // Fallback cho case_000 khi DB chưa seed / offline
-    if (effectiveSlug === "case_000") {
-      return { pdfs: CASE_000_PDFS, evidence: CASE_000_EVIDENCE };
-    }
-
-    return { pdfs: [], evidence: [] };
-  }, [rawEvidence, effectiveSlug]);
+    return { pdfs: dbPdfs, evidence: dbEvs };
+  }, [rawEvidence]);
 
   return {
     pdfs,

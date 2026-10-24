@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { checkIsAdmin } from "@/lib/actions/auth-guard";
-import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { normalizeImageUrl } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { Scene360Viewer } from "@/components/investigation/scene-360-viewer";
@@ -230,11 +230,9 @@ export function ReinvestigationModal({
   const [isSavingDb, setIsSavingDb] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Fetch live photos & hotspots from Google Sheets (evidences tab)
-  const { data: rawSheetPhotos, loading: isPhotosLoading } = usePhoneData(
-    "evidences",
-    caseId,
-  );
+  // Fetch live photos & hotspots from Supabase (case_evidence)
+  const { rawEvidence: rawSheetPhotos, loading: isPhotosLoading } =
+    useCaseEvidence(caseId);
 
   // Load hotspots from Server API, falling back to localStorage
   useEffect(() => {

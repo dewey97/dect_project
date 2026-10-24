@@ -33,7 +33,6 @@ import type {
   CombinedItem,
 } from "@/components/investigation/evidence/evidence-types";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
-import { CASE_000_PDFS } from "@/components/investigation/evidence/evidence-data";
 import {
   PhaseUnlockedModal,
   type UnlockedModalData,
@@ -50,7 +49,6 @@ import nextDynamic from "next/dynamic";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
-import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
 import { useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
 import { normalizeImageUrl } from "@/lib/utils";
@@ -104,21 +102,12 @@ function WebEvidencePageContent() {
   const [unlockedModalData, setUnlockedModalData] =
     useState<UnlockedModalData | null>(null);
 
-  // Right column selection state (Default: First PDF)
-  const [selectedView, setSelectedView] = useState<SelectedView>({
-    type: "pdf",
-    data: CASE_000_PDFS[0],
-  });
+  // Right column selection state (tự chọn mục đầu tiên khi khay hồ sơ nạp xong)
+  const [selectedView, setSelectedView] = useState<SelectedView | null>(null);
 
   // Category filter: 'pdf' | 'evidence' (tách riêng hồ sơ và vật chứng)
   const [filterTab, setFilterTab] = useState<"pdf" | "evidence">("pdf");
   const [mobileTab, setMobileTab] = useState<"board" | "dossier">("board");
-
-  // Nạp dữ liệu Live CMS từ tab 'evidences' trên Google Sheets theo caseId
-  const { data: sheetEvidences, loading: isLoadingSheet } = usePhoneData<any>(
-    "evidences",
-    normalizedSheetCaseId,
-  );
 
   // Nạp toàn bộ hồ sơ từ Dossier Studio (nguồn tài liệu chính)
   const { documents: dossierDocs } = useDossierDocuments(caseId);
@@ -126,8 +115,13 @@ function WebEvidencePageContent() {
   // Nạp danh mục các bộ hồ sơ từ bảng case_dossiers theo đồ thị vụ án (C1)
   const { getPhaseForCode } = useCaseDossiers(caseId);
 
-  // Nạp danh mục chứng cứ & PDF per-case từ Supabase (M1 / WT-2)
-  const { pdfs: casePdfs, evidence: caseEvs } = useCaseEvidence(caseId);
+  // Nạp danh mục chứng cứ & PDF per-case từ Supabase (M1 / WT-2 / WT-6)
+  const {
+    pdfs: casePdfs,
+    evidence: caseEvs,
+    rawEvidence: sheetEvidences,
+    loading: isLoadingSheet,
+  } = useCaseEvidence(caseId);
 
   // 3-Zone Layout State (Desktop):
   // Cột 1 (Trái): Khay hồ sơ & vật chứng (Dossier Tray) - width cố định/resizable (240px -> 450px)
@@ -852,8 +846,8 @@ function WebEvidencePageContent() {
       <PDFViewerModal
         isOpen={activeModal === "mobile_pdf"}
         selectedView={selectedView}
-        pdfUrl={selectedView.type === "pdf" ? selectedView.data.url : null}
-        title={selectedView.data.title}
+        pdfUrl={selectedView?.type === "pdf" ? selectedView.data.url : null}
+        title={selectedView?.data.title}
         caseId={caseId}
         onClose={() => setActiveModal(null)}
       />

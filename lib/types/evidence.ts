@@ -25,6 +25,7 @@ export interface EvidenceDevice {
   description?: string;
   previewStats?: string;
   pinLength?: number;
+  model_id?: string;
   chassis?: "iphone_classic" | "iphone_modern" | "android_vintage";
   wallpaper_url?: string;
   lockscreen_url?: string;

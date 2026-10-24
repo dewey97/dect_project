@@ -1,38 +1,44 @@
-'use client'
+"use client";
 
-import React from 'react'
-import type { SelectedView } from './evidence-types'
-import { normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
-import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'
-import { DiegeticDossierSheet } from './diegetic-dossier-sheet'
-import { EvidencePhotoAnnotator } from './evidence-photo-annotator'
-import { NativePdfAnnotator } from './native-pdf-annotator'
+import React from "react";
+import type { SelectedView } from "./evidence-types";
+import { normalizeDrivePdfUrl, normalizeImageUrl } from "@/lib/utils";
+import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
+import { DiegeticDossierSheet } from "./diegetic-dossier-sheet";
+import { EvidencePhotoAnnotator } from "./evidence-photo-annotator";
+import { NativePdfAnnotator } from "./native-pdf-annotator";
 
 interface EvidenceDetailInspectorProps {
-  selectedView: SelectedView
-  caseId?: string
+  selectedView: SelectedView | null;
+  caseId?: string;
 }
 
-export function EvidenceDetailInspector({ selectedView, caseId = 'case_000' }: EvidenceDetailInspectorProps) {
-  const isPdf = selectedView.type === 'pdf'
-  const displayCode = isPdf 
-    ? (selectedView.data.code || 'HỒ SƠ')
-    : (selectedView.data.evidenceId || 'VẬT CHỨNG')
+export function EvidenceDetailInspector({
+  selectedView,
+  caseId = "case_000",
+}: EvidenceDetailInspectorProps) {
+  if (!selectedView) return null;
 
-  const pdfUrl = isPdf ? normalizeDrivePdfUrl(selectedView.data.url) : ''
-  const photoUrl = !isPdf ? normalizeImageUrl(selectedView.data.thumbnail) : ''
+  const isPdf = selectedView.type === "pdf";
+  const displayCode = isPdf
+    ? selectedView.data.code || "HỒ SƠ"
+    : selectedView.data.evidenceId || "VẬT CHỨNG";
+
+  const pdfUrl = isPdf ? normalizeDrivePdfUrl(selectedView.data.url) : "";
+  const photoUrl = !isPdf ? normalizeImageUrl(selectedView.data.thumbnail) : "";
 
   // Tra cứu xem hồ sơ này đã được biên soạn trên Dossier Studio chưa
-  const { findMatchingDocument } = useDossierDocuments(caseId)
-  const matchedDossier = isPdf ? findMatchingDocument({
-    code: selectedView.data.code,
-    title: selectedView.data.title,
-    id: selectedView.data.id
-  }) : undefined
+  const { findMatchingDocument } = useDossierDocuments(caseId);
+  const matchedDossier = isPdf
+    ? findMatchingDocument({
+        code: selectedView.data.code,
+        title: selectedView.data.title,
+        id: selectedView.data.id,
+      })
+    : undefined;
 
   return (
     <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex-col h-full relative">
-
       {/* Main View Container */}
       <div className="flex-1 min-h-0 min-w-0 bg-[#120d09] p-0 overflow-hidden flex flex-col">
         {isPdf ? (
@@ -58,5 +64,5 @@ export function EvidenceDetailInspector({ selectedView, caseId = 'case_000' }: E
         )}
       </div>
     </div>
-  )
+  );
 }

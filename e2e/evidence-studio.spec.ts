@@ -1,9 +1,18 @@
 import { expect, test } from "@playwright/test";
 
+test.use({ storageState: "e2e/.auth/admin.json" });
+
 test.describe("Evidence Studio & Case Evidence Engine", () => {
   test("Evidence Studio page loads 3-column layout, filters, and preview", async ({
     page,
-  }) => {
+  }, testInfo) => {
+    if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
+      testInfo.skip(
+        true,
+        "Thiếu biến môi trường E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD cho admin spec",
+      );
+    }
+
     await page.goto("/studio/evidence?case=case_000");
 
     // Header & Brand
