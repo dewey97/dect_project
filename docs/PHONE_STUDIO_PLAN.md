@@ -27,7 +27,7 @@ Lỗi/thiếu phát hiện khi review:
 1. **E2E Studio sẽ fail:** Playwright không có bước đăng nhập admin (`storageState`). `/studio/*` redirect `/login`. Cần project `setup` đăng nhập bằng tài khoản test đọc từ env.
 2. **Fallback app launcher dính case_000:** `app/api/phone-data/apps/route.ts` trả 15 app với icon `/images/cases/case_000/...` cho mọi vụ chưa cấu hình. Vụ mới nên trả danh sách rỗng hoặc icon chung `/images/phone/icons/*`.
 3. **Spoiler qua RLS public:** 7 bảng `phone_*` đọc công khai bằng anon key, không cần license. Mức độ tương đương `/api/phone` hiện tại, xử lý cùng hệ thống license (spec 07/08), không chặn release.
-4. Phần việc còn lại chuyển vào [`WORKTREE_PLAN.md`](WORKTREE_PLAN.md) — worktree **WT-1**.
+4. Phần việc còn lại chuyển vào [`WORKTREE_PLAN.md`](WORKTREE_PLAN.md) — worktree **WT-2** (phone devices + messages) và **WT-6** (cắt Sheets). Migration 30–34 đã chạy production; bảng tiến độ trên là ảnh chụp lịch sử.
 
 ---
 

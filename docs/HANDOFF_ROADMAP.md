@@ -61,7 +61,7 @@
 | `NEXT_DIST_DIR=.next_dev npx next build` | Chưa chạy lại |
 | `pnpm test:e2e`                          | Chưa chạy lại |
 
-Typecheck clean sau merge 4 worktree + post-merge fix + data reseed. Working tree sạch (trừ `data/_review/sheet-data-dump.json` untracked). 80 commits ahead of origin (76 pushed + 4 chưa push: worktree plan v2, ops hardening).
+Typecheck clean. Toàn bộ commit đã push lên `origin/main` (HEAD `9687ff5`, gồm 6 base commit theo track WT). Working tree sạch (trừ `data/_review/sheet-data-dump.json` untracked).
 
 ### 1.3. Database production (Supabase project `zalyxhmwwmfyexoilejp`)
 
@@ -107,19 +107,19 @@ Xem plan worktree chi tiết: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md).
 
 ---
 
-## 1.6. Kế hoạch Worktree v2 (chốt 2026-10-24)
+## 1.6. Kế hoạch Worktree v3 (2026-10-24)
 
-Plan cũ đã hoàn tất và được thay bằng [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md) v2. Mục tiêu: tách 7 worktree độc lập chạy song song theo ma trận sở hữu file, không chồng lấn.
+Bản duy nhất còn hiệu lực: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md) v3. Base work 7 track đã trên `main`; mỗi worktree làm nốt phần còn lại.
 
-| WT   | Nhánh                 | Phạm vi chính                                                                                                 | Migration |
-| ---- | --------------------- | ------------------------------------------------------------------------------------------------------------- | --------- |
-| WT-1 | `wt/board-dynamic`    | Bỏ hardcode node bảng điều tra; editor bảng chuyển vào Checkpoint Studio; `board_config` + `case_board_nodes` | 39        |
-| WT-2 | `wt/phone-devices`    | 7 preset iPhone (SE → 15 Pro Max); editor tin nhắn dạng bảng + dán hàng loạt; sửa role/slot                   | —         |
-| WT-3 | `wt/studio-ux`        | Dọn field thừa (key/slug/phase/slot), placeholder dài; `Field` + `AutoGrowTextarea`                           | —         |
-| WT-4 | `wt/character-assets` | Upload ảnh nhân vật (`avatar_url`), siết policy bucket `avatars`, render pin/modal/danh bạ                    | 38        |
-| WT-5 | `wt/evidence-ux`      | Preview theo bộ hồ sơ; bỏ 4 trường metadata rác; nhận base gỡ fallback tĩnh                                   | —         |
-| WT-6 | `wt/cms-cutover`      | Cắt Google Sheets khỏi runtime; sửa 4 app đọc đúng bảng Supabase; thêm tab `evidences` cho API                | —         |
-| WT-7 | `wt/ops-hardening`    | `127.0.0.1:3000:3000`, Caddy HSTS/log redaction, kiểm tra reclaim timer                                       | —         |
+| WT   | Nhánh                 | Base | Còn lại chính                                                  | Migration     |
+| ---- | --------------------- | ---- | -------------------------------------------------------------- | ------------- |
+| WT-1 | `wt/board-dynamic`    | 30%  | Migration 39, pin-builder data-driven, board editor vào Studio | 39            |
+| WT-2 | `wt/phone-devices`    | 40%  | Preset end-to-end, MessagesApp row phẳng, batch save           | —             |
+| WT-3 | `wt/studio-ux`        | 0%   | `Field`, ẩn trường kỹ thuật, bỏ placeholder dài                | —             |
+| WT-4 | `wt/character-assets` | 50%  | Chạy migration 38, upload flow, render avatar                  | 38 (chờ chạy) |
+| WT-5 | `wt/evidence-ux`      | 40%  | Bỏ metadata rác UI, preview theo bộ hồ sơ                      | —             |
+| WT-6 | `wt/cms-cutover`      | 50%  | Tab `evidences` API, thay 7 consumer, bỏ fallback Sheets       | —             |
+| WT-7 | `wt/ops-hardening`    | 70%  | HSTS, log redaction, systemd timer                             | —             |
 
 Quyết định đã chốt:
 
@@ -129,9 +129,7 @@ Quyết định đã chốt:
 - D4: giữ `/api/phone` nhưng không gọi; xóa sau khi grep sạch consumer.
 - D5: đợt song song 1 gồm **WT-4, WT-2, WT-6, WT-7**; WT-1, WT-5, WT-3 chạy sau theo thứ tự tích hợp.
 
-Trạng thái base: working tree có thay đổi gỡ fallback evidence (chưa commit, `tsc` sạch, E2E chưa chạy lại) — chi tiết file tại Bước 0 của `WORKTREE_PLAN.md`; phần này thuộc WT-5, đã implement sẵn, chỉ còn chạy E2E + commit base trước khi tách worktree. Chưa tách worktree cho tới khi owner duyệt bắt đầu code.
-
-Kết quả khảo sát nguồn dữ liệu và hardcode: xem phụ lục mục 11 của `WORKTREE_PLAN.md`.
+Trạng thái base: đã commit + push (`aeca38c`→`9687ff5`). E2E chưa chạy lại sau batch commit — chạy trước khi tách worktree. Chưa tách worktree cho tới khi owner duyệt bắt đầu code.
 
 ---
 
