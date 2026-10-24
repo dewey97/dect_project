@@ -120,6 +120,7 @@ export interface DbCaseCheckpoint {
   ai_context: string | null;
   ai_valid_cases: unknown;
   ai_invalid_cases: unknown;
+  board_config?: BoardConfig;
   created_at: string;
   updated_at: string;
 }
@@ -384,4 +385,48 @@ export interface DbCaseEvidence {
 export interface DbCaseWithEvidenceConfig extends DbCase {
   panorama_url?: string | null;
   scene_360_url?: string | null;
+}
+
+// WT-1
+export type BoardNodeKind =
+  | "victim"
+  | "victim_phone"
+  | "reinvestigate"
+  | "suspects_hub"
+  | "evidence_hub"
+  | "note"
+  | "photo"
+  | "dossier"
+  | "custom";
+
+export interface BoardPosition {
+  x: number;
+  y: number;
+}
+
+export interface BoardConfig {
+  pin_title?: string;
+  icon?: string;
+  photo_url?: string;
+  note_style?: string;
+  position?: {
+    desktop?: BoardPosition;
+    mobile?: BoardPosition;
+  };
+  connections?: string[];
+  hidden?: boolean;
+  locked_until_checkpoint?: string;
+}
+
+export interface DbCaseBoardNode {
+  id: string;
+  case_slug: string;
+  node_kind: BoardNodeKind;
+  title: string | null;
+  subject_key: string | null;
+  checkpoint_id: string | null;
+  slot_index: number;
+  config: BoardConfig;
+  created_at: string;
+  updated_at: string;
 }

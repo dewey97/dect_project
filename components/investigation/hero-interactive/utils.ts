@@ -129,25 +129,31 @@ export function isPinHit(
   const unrotY = dx * Math.sin(rad) + dy * Math.cos(rad);
 
   const isFollowup =
-    pin.id.startsWith("c0-pin-followup") || pin.id.startsWith("followup-");
+    pin.nodeKind === "followup" ||
+    pin.id.startsWith("c0-pin-followup") ||
+    pin.id.startsWith("followup-");
   const isVictimPhone =
+    pin.nodeKind === "victim_phone" ||
     pin.id === "c0-pin-victim-phone" ||
     (pin.id.includes("phone") &&
       pin.id !== "c0-pin-phone" &&
+      pin.nodeKind !== "phone_lookup" &&
       Boolean(pin.photoUrl));
   const isReinvestigateProp =
+    pin.nodeKind === "reinvestigate" ||
     pin.id === "c0-pin-reinvestigate" ||
     Boolean(
       pin.photoUrl &&
       (pin.photoUrl.includes("crime_scene") ||
         pin.photoUrl.includes("reinvestigation")),
     );
-  const isKhang =
-    !isFollowup &&
-    !isVictimPhone &&
-    !isReinvestigateProp &&
-    (pin.id.includes("khang") ||
-      (pin.label && pin.label.toLowerCase().includes("khang")));
+  const isVictim =
+    pin.nodeKind === "victim" ||
+    (!isFollowup &&
+      !isVictimPhone &&
+      !isReinvestigateProp &&
+      (pin.id.includes("khang") ||
+        (pin.label && pin.label.toLowerCase().includes("khang"))));
   const isCrimeScene =
     !isFollowup &&
     (pin.id.includes("crime-scene") ||
@@ -155,10 +161,12 @@ export function isPinHit(
       (pin.label && pin.label.toLowerCase().includes("thi thể")));
   const isSuspectPin =
     !isFollowup &&
-    (pin.id.startsWith("node-suspect-") ||
+    (pin.nodeKind === "suspect" ||
+      pin.nodeKind === "victim" ||
+      pin.id.startsWith("node-suspect-") ||
       pin.id.startsWith("suspect-") ||
       Boolean(pin.photoUrl) ||
-      isKhang ||
+      isVictim ||
       isCrimeScene ||
       isVictimPhone ||
       isReinvestigateProp);
@@ -168,7 +176,7 @@ export function isPinHit(
   let tagYRatio = -0.08;
 
   if (isSuspectPin) {
-    baseCardWidth = isKhang
+    baseCardWidth = isVictim
       ? 204
       : isCrimeScene
         ? 186

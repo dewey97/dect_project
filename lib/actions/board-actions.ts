@@ -4,12 +4,210 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { requireAdminAuth } from "@/lib/auth/admin";
 import { normalizeCaseId } from "@/lib/cases/case-id";
-import {
+import type {
   PinPoint,
   CaseConnection,
 } from "@/components/investigation/hero-interactive";
+import type {
+  DbCaseBoardNode,
+  BoardConfig,
+  BoardNodeKind,
+} from "@/lib/types/database";
 
-// Supabase DB Actions
+const STUDIO_PATH = "/studio/checkpoints";
+
+export interface BoardNodeDraft {
+  id?: string;
+  caseId: string;
+  nodeKind: BoardNodeKind;
+  title?: string | null;
+  subjectKey?: string | null;
+  checkpointId?: string | null;
+  slotIndex?: number;
+  config?: BoardConfig;
+}
+
+export type BoardActionResult<T> =
+  { success: true; data: T } | { success: false; error: string };
+
+// ==============================================================================
+// WT-1: Case Board Nodes (Dynamic Board System)
+// ==============================================================================
+
+/**
+ * Đọc danh sách board nodes của một vụ án (cho Studio / server components).
+ */
+export async function getBoardNodes(
+  caseId: string,
+): Promise<BoardActionResult<DbCaseBoardNode[]>> {
+  try {
+    const caseSlug = normalizeCaseId(caseId);
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("case_board_nodes")
+      .select("*")
+      .eq("case_slug", caseSlug)
+      .order("slot_index", { ascending: true });
+
+    if (error) {
+      if (error.code === "42P01") {
+        return { success: true, data: [] };
+      }
+      throw error;
+    }
+
+    return { success: true, data: (data || []) as DbCaseBoardNode[] };
+  } catch (error: unknown) {
+    console.error("Error loading board nodes:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+/**
+ * Tạo mới hoặc cập nhật một board node (admin only).
+ */
+export async function saveBoardNode(
+  draft: BoardNodeDraft,
+): Promise<BoardActionResult<DbCaseBoardNode>> {
+  try {
+    await requireAdminAuth();
+    const caseSlug = normalizeCaseId(draft.caseId);
+    const id =
+      draft.id ||
+      `${caseSlug}:${draft.nodeKind}:${draft.subjectKey || draft.checkpointId || crypto.randomUUID()}`;
+
+    const supabase = await createClient();
+    const payload = {
+      id,
+      case_slug: caseSlug,
+      node_kind: draft.nodeKind,
+      title: draft.title ?? null,
+      subject_key: draft.subjectKey ?? null,
+      checkpoint_id: draft.checkpointId ?? null,
+      slot_index: draft.slotIndex ?? 0,
+      config: draft.config ?? {},
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from("case_board_nodes")
+      .upsert(payload)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    revalidatePath(STUDIO_PATH);
+    revalidatePath(`/evidence/web`);
+    return { success: true, data: data as DbCaseBoardNode };
+  } catch (error: unknown) {
+    console.error("Error saving board node:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+/**
+ * Xóa một board node (admin only).
+ */
+export async function deleteBoardNode(
+  id: string,
+): Promise<BoardActionResult<{ id: string }>> {
+  try {
+    await requireAdminAuth();
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("case_board_nodes")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+
+    revalidatePath(STUDIO_PATH);
+    revalidatePath(`/evidence/web`);
+    return { success: true, data: { id } };
+  } catch (error: unknown) {
+    console.error("Error deleting board node:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+/**
+ * Lưu hàng loạt board nodes (vị trí kéo thả, cấu hình; admin only).
+ */
+export async function saveBoardNodesBatch(
+  nodes: Array<Partial<DbCaseBoardNode> & { id: string; case_slug: string }>,
+): Promise<BoardActionResult<number>> {
+  try {
+    await requireAdminAuth();
+    if (!nodes.length) return { success: true, data: 0 };
+
+    const supabase = await createClient();
+    const now = new Date().toISOString();
+    const rows = nodes.map((node) => ({
+      ...node,
+      updated_at: now,
+    }));
+
+    const { error } = await supabase.from("case_board_nodes").upsert(rows);
+
+    if (error) throw error;
+
+    revalidatePath(STUDIO_PATH);
+    revalidatePath(`/evidence/web`);
+    return { success: true, data: rows.length };
+  } catch (error: unknown) {
+    console.error("Error saving board nodes batch:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+/**
+ * Cập nhật cấu hình board_config cho một checkpoint (admin only).
+ */
+export async function updateCheckpointBoardConfig(
+  checkpointId: string,
+  boardConfig: BoardConfig,
+): Promise<BoardActionResult<{ id: string }>> {
+  try {
+    await requireAdminAuth();
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("case_checkpoints")
+      .update({
+        board_config: boardConfig,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", checkpointId);
+
+    if (error) throw error;
+
+    revalidatePath(STUDIO_PATH);
+    revalidatePath(`/evidence/web`);
+    return { success: true, data: { id: checkpointId } };
+  } catch (error: unknown) {
+    console.error("Error updating checkpoint board config:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+// ==============================================================================
+// Boardgame Pins & Connections (Legacy + Pin drag storage)
+// ==============================================================================
 
 // Save positions of default (system) pins + admin custom pins + connections
 export async function saveBoardgamePinPositions(
@@ -171,6 +369,10 @@ export async function getBoardgamePinPositions(caseId: string): Promise<{
     };
   }
 }
+
+// ==============================================================================
+// Evidence Board (Studio React Flow)
+// ==============================================================================
 
 export interface EvidenceNodeInput {
   id?: string;
@@ -347,6 +549,10 @@ export async function getEvidenceBoard(caseId: string) {
     };
   }
 }
+
+// ==============================================================================
+// Reinvestigate Hotspots
+// ==============================================================================
 
 export interface ReinvestigateHotspotConfig {
   id: string;
