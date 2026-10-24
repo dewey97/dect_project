@@ -243,7 +243,7 @@ test.describe("case_000 baseline", () => {
     await clickPin(page, "c0-pin-indictment");
 
     const submitIndictment = async (suspect: string, codes: string[]) => {
-      const nameInput = page.locator("input:visible").nth(1);
+      const nameInput = page.getByPlaceholder("Nhập hoặc chọn tên bị can...");
       await nameInput.fill(suspect);
       await page.getByRole("button", { name: /Mâu thuẫn tình cảm/ }).click();
       // Ô mã chứng cứ nhận nhiều mã phân tách bằng dấu phẩy; Enter sẽ nộp form.

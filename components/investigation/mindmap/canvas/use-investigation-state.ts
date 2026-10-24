@@ -148,17 +148,8 @@ export function useInvestigationState(opts?: {
       setHasOpenedReinvestigation(true);
     }
 
-    const phoneInputs = getStorageJson<Record<string, string>>(
-      sKey("phone_inputs"),
-      {},
-    );
     const isPhoneSolved = getStorageItem(sKey("phone_solved")) === "true";
-    if (
-      phoneInputs.phone1 ||
-      phoneInputs.phone2 ||
-      phoneInputs.phone3 ||
-      isPhoneSolved
-    ) {
+    if (isPhoneSolved) {
       setPhoneLookupSuccess(true);
     }
 
