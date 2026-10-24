@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { BookOpen, Users } from "lucide-react";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { UserNav } from "@/components/auth/user-nav";
 import { useRoomSync } from "@/components/investigation/room-sync-context";
 import { RoomModal } from "@/components/investigation/room-modal";
+import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { cn } from "@/lib/utils";
 
 interface GameDesktopHeaderProps {
@@ -16,7 +15,8 @@ interface GameDesktopHeaderProps {
 /**
  * Desktop Header dành riêng cho màn hình chơi game trực tuyến (/evidence/web).
  * Bố cục 3 cột đối xứng đảm bảo cụm Nav ở giữa luôn căn chính giữa tuyệt đối.
- * Chiều cao h-14 (56px) tạo độ thoáng và logo/avatar được căn giữa trục dọc hoàn hảo.
+ * Hiển thị 3 lối tắt gameplay thiết yếu: Sổ tay hướng dẫn, Chơi nhóm, Báo lỗi.
+ * Định dạng chữ proper case, không dùng uppercase, không kèm icon rườm rà.
  */
 export function GameDesktopHeader({ className }: GameDesktopHeaderProps) {
   const { roomCode } = useRoomSync();
@@ -40,48 +40,38 @@ export function GameDesktopHeader({ className }: GameDesktopHeaderProps) {
             />
           </div>
 
-          {/* CỘT GIỮA: 2 mục gameplay thiết yếu (Cẩm nang & Chơi nhóm) căn giữa tuyệt đối */}
-          <nav className="flex-1 flex items-center justify-center gap-3 font-sans text-xs uppercase tracking-wider font-semibold text-muted-foreground">
-            {/* 1. Cẩm nang phá án */}
-            <Link
-              href="/how-to-play"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-white/5 hover:text-primary transition-all cursor-pointer"
-              title="Mở cẩm nang quy tắc phá án trong tab mới"
+          {/* CỘT GIỮA: Điều hướng gameplay tinh gọn (Proper case, không icon) */}
+          <nav className="flex-1 flex items-center justify-center gap-7 font-sans text-sm font-medium text-muted-foreground">
+            {/* 1. Sổ tay hướng dẫn (mở modal cẩm nang nghiệp vụ gameplay) */}
+            <button
+              type="button"
+              onClick={() => emitInvestigationEvent("OPEN_GUIDE")}
+              className="hover:text-primary transition-colors cursor-pointer"
             >
-              <BookOpen className="size-3.5 text-amber-500/80" />
-              <span>Cẩm nang</span>
-            </Link>
+              Sổ tay hướng dẫn
+            </button>
 
             {/* 2. Chơi nhóm đồng bộ thời gian thực */}
             <button
               type="button"
               onClick={() => setIsRoomModalOpen(true)}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer",
-                roomCode
-                  ? "text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30"
-                  : "hover:bg-white/5 hover:text-primary"
-              )}
-              title={
-                roomCode
-                  ? `Đang trong phòng đồng bộ: ${roomCode}`
-                  : "Tạo hoặc tham gia phòng chơi nhóm nhiều người"
-              }
+              className="hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-2"
             >
-              <Users
-                className={cn(
-                  "size-3.5",
-                  roomCode ? "text-emerald-400" : "text-amber-500/80"
-                )}
-              />
               <span>Chơi nhóm</span>
               {roomCode && (
-                <span className="ml-1 px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold tracking-normal">
+                <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[11px] font-mono font-bold">
                   {roomCode}
                 </span>
               )}
+            </button>
+
+            {/* 3. Báo lỗi & Góp ý */}
+            <button
+              type="button"
+              onClick={() => emitInvestigationEvent("OPEN_FEEDBACK")}
+              className="hover:text-primary transition-colors cursor-pointer"
+            >
+              Báo lỗi
             </button>
           </nav>
 
