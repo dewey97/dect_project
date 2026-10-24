@@ -10,12 +10,12 @@
 
 | Phần | Đã có trên `main` | Còn lại |
 | ---- | ----------------- | ------- |
-| A | ✅ `16cb60c` — A1–A7, A9 | A8 migration 38 chưa chạy production (→ B4, đã được duyệt); A10 checklist VPS — chủ dự án tự làm, không thuộc plan này |
+| A | ✅ Hoàn tất A1–A9, migration 38 và backfill avatar (B4) | A10 checklist VPS — chủ dự án tự làm, không thuộc plan này |
 | WT-5 evidence | ✅ `2699873` — Hoàn tất B1, B2: sạch tsc, dossier grouping, breadcrumb, drop integrity indicator, E2E xanh | Xong |
 | WT-1 board | 🟡 `04527de`/`218836f`/`7946aad` — bước 1A–1C (migration 39 SQL, `/api/board-nodes`, `board-actions`, pin-builder theo `nodeKind`, note dùng chung `public/images/board/notes/`) | 1D–1H (B5-B10); migration 39 chưa chạy |
 | WT-3 studio | ✅ `471a5c8` + B3 — Đã rà 0 placeholder >40 ký tự, 0 helper dài, ẩn khóa kỹ thuật, spec pass | Xong |
 
-⚠ **`main` hiện KHÔNG qua typecheck** (13 lỗi, do WT-5 dở). **Không push** cho tới khi B1 xong — CI sẽ fail.
+✅ **`main` đã qua typecheck 100% sạch** sau B1, B2, B3, B4.
 
 **Phê duyệt của chủ dự án (2026-10-25):** duyệt toàn bộ plan v5, gồm **chạy migration 38 và 39 lên production** bởi AI thực thi theo mục "Truy cập Supabase production". Đây là ngoại lệ có chủ đích cho quy tắc "không tự chạy migration" (`HANDOFF_ROADMAP.md` mục 2.1), chỉ áp dụng cho 2 file `db/schema/38_character_avatar.sql`, `db/schema/39_board_nodes.sql` và SQL backfill A9. **Push vẫn chỉ khi chủ dự án ra lệnh** (AGENTS.md global §1).
 
