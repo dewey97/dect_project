@@ -139,9 +139,6 @@ function WebEvidencePageContent() {
       const saved = localStorage.getItem("dect_evidence_view_mode");
       if (saved === "canvas" || saved === "single") {
         setViewMode(saved);
-        if (saved === "canvas") {
-          setIsViewerExpanded(true);
-        }
       }
     } catch {
       // Ignore
@@ -154,11 +151,6 @@ function WebEvidencePageContent() {
       localStorage.setItem("dect_evidence_view_mode", mode);
     } catch {
       // Ignore
-    }
-    if (mode === "canvas") {
-      setIsViewerExpanded(true);
-    } else {
-      setIsViewerExpanded(false);
     }
   }, []);
   const [isReinvestigationExpanded, setIsReinvestigationExpanded] =
@@ -737,15 +729,11 @@ function WebEvidencePageContent() {
 
         {/* CỘT 1 (BÊN TRÁI CÙNG): BẢNG GHIM ĐIỀU TRA (LUÔN SÁT TRÁI) */}
         <div
-          style={{ width: isViewerExpanded ? undefined : `${boardWidth}px` }}
+          style={{ width: `${boardWidth}px` }}
           className={cn(
             "h-full shrink-0 relative overflow-hidden flex flex-col min-h-0 select-none",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
-            mobileTab === "board"
-              ? "flex w-full"
-              : isViewerExpanded
-                ? "hidden"
-                : "hidden lg:flex",
+            mobileTab === "board" ? "flex w-full" : "hidden lg:flex",
           )}
         >
           <div className="flex-1 w-full h-full min-h-0 relative overflow-hidden">
@@ -762,38 +750,34 @@ function WebEvidencePageContent() {
         </div>
 
         {/* THANH KÉO 1 (GIỮA BẢNG ĐIỀU TRA VÀ BÀN HỒ SƠ) */}
-        {!isViewerExpanded && (
+        <div
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setIsDraggingLeftSplit(true);
+          }}
+          className={cn(
+            "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
+            isDraggingLeftSplit && "cursor-col-resize",
+          )}
+          title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Bàn hồ sơ"
+        >
           <div
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setIsDraggingLeftSplit(true);
-            }}
             className={cn(
-              "hidden lg:flex w-2 items-center justify-center cursor-col-resize select-none shrink-0 group relative z-20 py-2",
-              isDraggingLeftSplit && "cursor-col-resize",
+              "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
+              isDraggingLeftSplit &&
+                "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
             )}
-            title="Kéo để điều chỉnh độ rộng Bảng điều tra vs. Bàn hồ sơ"
           >
-            <div
-              className={cn(
-                "w-1 h-14 rounded-full bg-[#4a3625] group-hover:bg-[#d9a066] group-hover:scale-y-125 transition-all flex items-center justify-center",
-                isDraggingLeftSplit &&
-                  "bg-[#d9a066] scale-y-150 shadow-[0_0_8px_#d9a066]",
-              )}
-            >
-              <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+            <GripVertical className="size-3 text-[#1a0f07] opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
-        )}
+        </div>
 
         {/* CỘT 2 (Ở GIỮA): BÀN HỒ SƠ / PREVIEW CHI TIẾT (CHIẾM TRỌN KHÔNG GIAN CÒN LẠI) */}
         <div
           className={cn(
-            "h-full flex-col min-h-0 overflow-hidden relative",
-            isViewerExpanded
-              ? "flex flex-1 w-full min-w-0"
-              : "hidden lg:flex flex-1 min-w-[320px]",
+            "h-full flex flex-col flex-1 min-w-[320px] min-h-0 overflow-hidden relative",
             (isDraggingLeftSplit || isDraggingRightSplit) && "transition-none",
+            mobileTab === "dossier" ? "flex" : "hidden lg:flex",
           )}
         >
           {activeModal === "phone" ? (
