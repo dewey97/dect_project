@@ -7,7 +7,7 @@ import { detectiveAudio } from "@/lib/investigation-audio";
 import { isAdminBypassCode } from "@/lib/cases/admin-bypass";
 import { getStorageItem, setStorageItem, getStorageJson } from "@/lib/storage";
 import { normalizeImageUrl } from "@/lib/utils";
-import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { HaDiscoveredPhotosPopup } from "./followup/ha-discovered-photos-popup";
 import { FollowupTimeForm } from "./followup/followup-time-form";
@@ -66,8 +66,8 @@ export function FollowupQuestionModal({
   const [showPhotoPopup, setShowPhotoPopup] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Fetch photos dynamically from Google Sheets Live CMS ('evidences' tab)
-  const { data: rawSheetPhotos } = usePhoneData("evidences", normalizedCaseId);
+  // Fetch photos dynamically from Supabase case_evidence
+  const { rawEvidence: rawSheetPhotos } = useCaseEvidence(caseId);
 
   // 1. Tự động nhận diện Checkpoint tương ứng với đối tượng đang thẩm vấn
   const activeCheckpoint = useMemo(() => {
@@ -154,7 +154,7 @@ export function FollowupQuestionModal({
         return code === targetCulprit || code === `avatar_${targetCulprit}`;
       });
       if (match) {
-        return String(match.label || match.title || "")
+        return String((match as any).label || match.title || "")
           .replace(
             /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
             "",

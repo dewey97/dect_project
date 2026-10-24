@@ -64,7 +64,7 @@ import {
   hasAdminBypassInArray,
 } from "@/lib/cases/admin-bypass";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
-import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { getInterrogationCriteria } from "@/lib/ai/suspect-interrogation-context";
 import { normalizeForMatch } from "@/lib/text";
 
@@ -118,7 +118,7 @@ export function AddSuspectModal({
 
   const normalizedCaseId = useMemo(() => caseId.replace(/-/g, "_"), [caseId]);
   const { checkpoints } = useCaseCheckpoints(caseId);
-  const { data: sheetEvidences } = usePhoneData("evidences", normalizedCaseId);
+  const { rawEvidence: sheetEvidences } = useCaseEvidence(caseId);
 
   // Parse all avatar/character items from Google Sheet
   const sheetCharacters: SuspectCharacter[] = useMemo(() => {
@@ -425,6 +425,7 @@ export function AddSuspectModal({
         subMessage: "Kiểm tra lại bằng chứng hoặc đối tượng đang thẩm tra",
         suspectName: suspectDisplayName,
         selectedCount: effectiveClues.length,
+        avatarUrl: matched?.avatarUrl,
       });
       return;
     }
@@ -447,6 +448,7 @@ export function AddSuspectModal({
         subMessage: "Bổ sung mốc thời gian, tài liệu hoặc nhân chứng cụ thể.",
         suspectName: suspectDisplayName,
         selectedCount: effectiveClues.length,
+        avatarUrl: matched?.avatarUrl,
       });
       return;
     }
@@ -474,6 +476,7 @@ export function AddSuspectModal({
       message: "Bằng chứng chính xác. Căn cứ động cơ đã được ghi nhận",
       suspectName: suspectDisplayName,
       selectedCount: effectiveClues.length,
+      avatarUrl: matched?.avatarUrl,
     });
     setErrorMsg("");
   };
@@ -513,6 +516,7 @@ export function AddSuspectModal({
         subMessage: "Kiểm tra lại bằng chứng hoặc đối tượng đang thẩm tra",
         suspectName: suspectDisplayName,
         selectedCount: effectiveClues.length,
+        avatarUrl: matched?.avatarUrl,
       });
       return;
     }
@@ -535,6 +539,7 @@ export function AddSuspectModal({
         subMessage: "Bổ sung chi tiết lời khai và căn cứ đối chiếu.",
         suspectName: suspectDisplayName,
         selectedCount: effectiveClues.length,
+        avatarUrl: matched?.avatarUrl,
       });
       return;
     }
@@ -562,6 +567,7 @@ export function AddSuspectModal({
       message: "Bằng chứng chính xác. Mâu thuẫn lời khai đã được ghi nhận",
       suspectName: suspectDisplayName,
       selectedCount: effectiveClues.length,
+      avatarUrl: matched?.avatarUrl,
     });
     setErrorMsg("");
   };
@@ -801,7 +807,14 @@ export function AddSuspectModal({
             </h3>
 
             {/* TÊN ĐỐI TƯỢNG CỐ ĐỊNH */}
-            <div className="pt-0.5">
+            <div className="pt-0.5 flex items-center gap-3">
+              {matchedChar?.avatarUrl && (
+                <img
+                  src={matchedChar.avatarUrl}
+                  alt={name || editingSuspect?.name || "Đối tượng"}
+                  className="size-10 rounded-full object-cover border border-[#2b1f14]/20 shadow-xs shrink-0"
+                />
+              )}
               <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-xl font-bold text-[#0e2b5c] normal-case tracking-normal">
                 {name || editingSuspect?.name || "Đối tượng điều tra"}
               </div>

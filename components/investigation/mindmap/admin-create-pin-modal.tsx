@@ -18,7 +18,7 @@ import {
 import type { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
-import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
 import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
 import { normalizeCaseId } from "@/lib/cases/case-id";
@@ -187,8 +187,10 @@ export function AdminCreatePinModal({
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
-  // Fetch live photos từ Sheets; checkpoint lấy từ Checkpoint Studio.
-  const { data: sheetPhotos } = usePhoneData("evidences");
+  // Fetch live photos từ Supabase case_evidence; checkpoint lấy từ Checkpoint Studio.
+  const { rawEvidence: sheetPhotos } = useCaseEvidence(
+    getActiveCaseId() ?? undefined,
+  );
   const { rows: studioCheckpoints } = useStudioCheckpoints(
     normalizeCaseId(getActiveCaseId()),
   );

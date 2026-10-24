@@ -56,7 +56,7 @@ function buildSuspectPins(
   }>,
 ): PinPoint[] {
   return effectiveSuspects.map((suspect, idx) => {
-    const { canonicalId, slotIndex, canonicalName } =
+    const { canonicalId, slotIndex, canonicalName, photoUrl } =
       getCanonicalSuspectKey(suspect);
     const assignedSlotIndex =
       typeof slotIndex === "number" && slotIndex >= 0 && slotIndex < 3
@@ -116,7 +116,10 @@ function buildSuspectPins(
       label: canonicalName || suspect.name,
       detail: `Nghi phạm: ${canonicalName || suspect.name} (${suspect.clueIds.length} manh mối liên quan)`,
       color: "blue" as const,
-      photoUrl: sheetPhotoMap[canonicalId] || "/images/avatar_placeholder.svg",
+      photoUrl:
+        photoUrl ||
+        sheetPhotoMap[canonicalId] ||
+        "/images/avatar_placeholder.svg",
       isAvatar: true,
       actionType: cpId ? ("sheet_checkpoint" as const) : ("info" as const),
       checkpointId: cpId || undefined,
@@ -276,17 +279,17 @@ export type PinBuilderInput = {
   effectiveSuspects: SuspectItem[];
   sheetPhotoMap: Record<string, string>;
   sheetPinnedItems?: Array<{
-    code?: string;
-    photo_code?: string;
-    label?: string;
-    title?: string;
-    drive_url?: string;
-    direct_cdn_url?: string;
-    url?: string;
-    description?: string;
-    category?: string;
-    board_x?: string | number;
-    board_y?: string | number;
+    code?: string | null;
+    photo_code?: string | null;
+    label?: string | null;
+    title?: string | null;
+    drive_url?: string | null;
+    direct_cdn_url?: string | null;
+    url?: string | null;
+    description?: string | null;
+    category?: string | null;
+    board_x?: string | number | null;
+    board_y?: string | number | null;
   }>;
   followupCulpritIds?: string[];
   hasVuFollowup?: boolean;

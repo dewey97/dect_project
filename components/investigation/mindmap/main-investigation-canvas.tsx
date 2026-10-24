@@ -14,12 +14,15 @@ import {
 import { getCanonicalSuspectKey } from "@/lib/cases/case-000-suspects";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
-import { usePhoneData } from "@/lib/hooks/use-phone-data";
+import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { setStorageItem, getStorageItem } from "@/lib/storage";
 import { useInvestigationEvent } from "@/lib/investigation-events";
 
 import { useBoardLayout } from "./canvas/use-board-layout";
-import { useInvestigationState, type SuspectItem } from "./canvas/use-investigation-state";
+import {
+  useInvestigationState,
+  type SuspectItem,
+} from "./canvas/use-investigation-state";
 import {
   buildCustomPins,
   buildCustomConnections,
@@ -151,7 +154,12 @@ export function MainInvestigationCanvas({
     } else if (state.isAddSuspectOpen || state.editingSuspect) {
       const sName = (state.editingSuspect?.name || "").toLowerCase().trim();
       const sId = (state.editingSuspect?.id || "").toLowerCase().trim();
-      if (sName === "vũ" || sName === "vu" || sName === "lê quang vũ" || sId === "vu")
+      if (
+        sName === "vũ" ||
+        sName === "vu" ||
+        sName === "lê quang vũ" ||
+        sId === "vu"
+      )
         currentCp = "cp-000-1a";
       else if (
         sName === "tùng" ||
@@ -160,7 +168,12 @@ export function MainInvestigationCanvas({
         sId === "tung"
       )
         currentCp = "cp-000-1b";
-      else if (sName === "hà" || sName === "ha" || sName === "trần thị hà" || sId === "ha")
+      else if (
+        sName === "hà" ||
+        sName === "ha" ||
+        sName === "trần thị hà" ||
+        sId === "ha"
+      )
         currentCp = "cp-000-1c";
     } else if (activeCustomPinModal) {
       currentCp = detectCheckpointForPin(activeCustomPinModal);
@@ -195,14 +208,20 @@ export function MainInvestigationCanvas({
     () => caseId.replace(/-/g, "_"),
     [caseId],
   );
-  const { data: sheetEvidences } = usePhoneData("evidences", normalizedSheetCaseId);
+  const { rawEvidence: sheetEvidences } = useCaseEvidence(caseId);
 
   const victimItem = useMemo(() => {
     if (!Array.isArray(sheetEvidences)) return null;
     return sheetEvidences.find((item: any) => {
-      const code = String(item.code || item.photo_code || "").toLowerCase().trim();
-      const cat = String(item.category || "").toUpperCase().trim();
-      const label = String(item.label || item.title || "").toLowerCase().trim();
+      const code = String(item.code || item.photo_code || "")
+        .toLowerCase()
+        .trim();
+      const cat = String(item.category || "")
+        .toUpperCase()
+        .trim();
+      const label = String(item.label || item.title || "")
+        .toLowerCase()
+        .trim();
       return (
         code === "avatar_khang" ||
         code === "khang" ||
@@ -214,7 +233,9 @@ export function MainInvestigationCanvas({
 
   const victimName = useMemo(() => {
     if (victimItem) {
-      const label = String(victimItem.label || victimItem.title || "").trim();
+      const label = String(
+        (victimItem as any).label || victimItem.title || "",
+      ).trim();
       const clean = label
         .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân)\s+/i, "")
         .replace(/\s*\([^)]*\)/g, "")
@@ -235,27 +256,60 @@ export function MainInvestigationCanvas({
           "";
         if (!rawUrl) return;
         const normUrl = normalizeImageUrl(rawUrl);
-        const rawCode = String(item.code || item.photo_code || "").toLowerCase().trim();
-        const rawLabel = String(item.label || item.title || "").toLowerCase().trim();
-        const category = String(item.category || "").toUpperCase().trim();
-        const isAvatar = rawCode.startsWith("avatar_") || category === "AVATAR" || rawLabel.includes("chân dung");
+        const rawCode = String(item.code || item.photo_code || "")
+          .toLowerCase()
+          .trim();
+        const rawLabel = String(item.label || item.title || "")
+          .toLowerCase()
+          .trim();
+        const category = String(item.category || "")
+          .toUpperCase()
+          .trim();
+        const isAvatar =
+          rawCode.startsWith("avatar_") ||
+          category === "AVATAR" ||
+          rawLabel.includes("chân dung");
 
         // 1. Suspect / Character avatars
-        if (rawCode === "avatar_vu" || (isAvatar && (rawCode === "vu" || rawLabel.includes("vũ"))))
+        if (
+          rawCode === "avatar_vu" ||
+          (isAvatar && (rawCode === "vu" || rawLabel.includes("vũ")))
+        )
           map.vu = normUrl;
-        if (rawCode === "avatar_tung" || (isAvatar && (rawCode === "tung" || rawLabel.includes("tùng"))))
+        if (
+          rawCode === "avatar_tung" ||
+          (isAvatar && (rawCode === "tung" || rawLabel.includes("tùng")))
+        )
           map.tung = normUrl;
-        if (rawCode === "avatar_ha" || (isAvatar && (rawCode === "ha" || rawLabel.includes("hà"))))
+        if (
+          rawCode === "avatar_ha" ||
+          (isAvatar && (rawCode === "ha" || rawLabel.includes("hà")))
+        )
           map.ha = normUrl;
-        if (rawCode === "avatar_mai" || (isAvatar && (rawCode === "mai" || rawLabel.includes("mai"))))
+        if (
+          rawCode === "avatar_mai" ||
+          (isAvatar && (rawCode === "mai" || rawLabel.includes("mai")))
+        )
           map.mai = normUrl;
-        if (rawCode === "avatar_khang" || (isAvatar && (rawCode === "khang" || rawLabel.includes("khang"))))
+        if (
+          rawCode === "avatar_khang" ||
+          (isAvatar && (rawCode === "khang" || rawLabel.includes("khang")))
+        )
           map.khang = normUrl;
-        if (rawCode === "avatar_dat" || (isAvatar && (rawCode === "dat" || rawLabel.includes("đạt"))))
+        if (
+          rawCode === "avatar_dat" ||
+          (isAvatar && (rawCode === "dat" || rawLabel.includes("đạt")))
+        )
           map.dat = normUrl;
-        if (rawCode === "avatar_lua" || (isAvatar && (rawCode === "lua" || rawLabel.includes("lụa"))))
+        if (
+          rawCode === "avatar_lua" ||
+          (isAvatar && (rawCode === "lua" || rawLabel.includes("lụa")))
+        )
           map.lua = normUrl;
-        if (rawCode === "avatar_vy" || (isAvatar && (rawCode === "vy" || rawLabel.includes("vy"))))
+        if (
+          rawCode === "avatar_vy" ||
+          (isAvatar && (rawCode === "vy" || rawLabel.includes("vy")))
+        )
           map.vy = normUrl;
 
         // 2. Crime scene
@@ -266,7 +320,8 @@ export function MainInvestigationCanvas({
           rawCode === "a-06" ||
           rawCode.includes("chalk") ||
           rawLabel.includes("thi thể") ||
-          (rawLabel.includes("hiện trường") && !rawLabel.includes("phòng khách"))
+          (rawLabel.includes("hiện trường") &&
+            !rawLabel.includes("phòng khách"))
         ) {
           map.crime_scene = normUrl;
         }
@@ -293,15 +348,21 @@ export function MainInvestigationCanvas({
 
   const parseSuspectFlag = useCallback((item: any): boolean => {
     if (!item) return false;
+    const meta = (item.metadata as Record<string, unknown>) || {};
     const suspectVal = String(
-      item.is_suspect ||
-      item["is suspect"] ||
-      item.suspect ||
-      item.nghi_pham ||
-      item["nghi pham"] ||
-      "",
-    ).toUpperCase().trim();
-    const cat = String(item.category || "").toUpperCase().trim();
+      item.is_suspect ??
+        meta.is_suspect ??
+        item["is suspect"] ??
+        meta["is suspect"] ??
+        item.suspect ??
+        item.nghi_pham ??
+        "",
+    )
+      .toUpperCase()
+      .trim();
+    const cat = String(item.category || meta.category || "")
+      .toUpperCase()
+      .trim();
     return (
       suspectVal === "TRUE" ||
       suspectVal === "1" ||
@@ -312,15 +373,20 @@ export function MainInvestigationCanvas({
 
   const parsePinOnBoardFlag = useCallback((item: any): boolean => {
     if (!item) return false;
+    const meta = (item.metadata as Record<string, unknown>) || {};
     const pinVal = String(
-      item.pin_on_board ||
-      item["pin on board"] ||
-      item.pin ||
-      item.ghim ||
-      item.ghim_len_bang ||
-      item["ghim len bang"] ||
-      "",
-    ).toUpperCase().trim();
+      item.pin_on_board ??
+        meta.pin_on_board ??
+        item["pin on board"] ??
+        meta["pin on board"] ??
+        item.pin ??
+        item.ghim ??
+        item.ghim_len_bang ??
+        item["ghim len bang"] ??
+        "",
+    )
+      .toUpperCase()
+      .trim();
     return pinVal === "TRUE" || pinVal === "1" || pinVal === "YES";
   }, []);
 
@@ -329,20 +395,25 @@ export function MainInvestigationCanvas({
     const seen = new Set<string>();
 
     const hasExplicitSuspectOnSheet =
-      Array.isArray(sheetEvidences) &&
-      sheetEvidences.some(parseSuspectFlag);
+      Array.isArray(sheetEvidences) && sheetEvidences.some(parseSuspectFlag);
 
     if (Array.isArray(sheetEvidences) && sheetEvidences.length > 0) {
       sheetEvidences.forEach((item: any) => {
         const isPinned = parsePinOnBoardFlag(item);
         const isExplicit = parseSuspectFlag(item);
-        const code = String(item.code || item.photo_code || "").toLowerCase().trim();
+        const code = String(item.code || item.photo_code || "")
+          .toLowerCase()
+          .trim();
 
         // Nếu trên Sheet có đánh dấu tường minh is_suspect: TRUE hoặc category: SUSPECT thì ưu tiên 100%
         // Nếu Sheet chưa cấu hình cột is_suspect (tất cả đều trống), giữ fallback cho 3 nhân vật kinh điển của Case #000
         const isSuspect = hasExplicitSuspectOnSheet
           ? isExplicit
-          : isExplicit || (isPinned && (code === "avatar_vu" || code === "avatar_tung" || code === "avatar_ha"));
+          : isExplicit ||
+            (isPinned &&
+              (code === "avatar_vu" ||
+                code === "avatar_tung" ||
+                code === "avatar_ha"));
 
         if (!isSuspect || code === "avatar_khang" || code === "khang") return;
 
@@ -350,7 +421,10 @@ export function MainInvestigationCanvas({
         const label = String(item.label || item.title || "").trim();
         const cleanName =
           label
-            .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i, "")
+            .replace(
+              /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
+              "",
+            )
             .replace(/\s*\([^)]*\)/g, "")
             .trim() || charId;
 
@@ -410,7 +484,11 @@ export function MainInvestigationCanvas({
       );
     }
     return state.investigatedSuspects.map((c) => String(c));
-  }, [state.isShowAllPinsPreview, effectiveSuspects, state.investigatedSuspects]);
+  }, [
+    state.isShowAllPinsPreview,
+    effectiveSuspects,
+    state.investigatedSuspects,
+  ]);
 
   const isReinvestigateBlinking =
     state.effectiveReinvestigateUnlocked && !state.hasOpenedReinvestigation;
@@ -427,7 +505,9 @@ export function MainInvestigationCanvas({
       const isPinned = parsePinOnBoardFlag(item);
       if (!isPinned) return false;
 
-      const code = String(item.code || item.photo_code || "").toLowerCase().trim();
+      const code = String(item.code || item.photo_code || "")
+        .toLowerCase()
+        .trim();
       const charId = code.replace(/^avatar_/, "");
 
       // NẾU ĐÃ LÀ NGHI PHẠM trong effectiveSuspects THÌ LOẠI TRỪ NGAY LẬP TỨC
@@ -442,7 +522,12 @@ export function MainInvestigationCanvas({
 
       return true;
     });
-  }, [sheetEvidences, effectiveSuspects, parsePinOnBoardFlag, parseSuspectFlag]);
+  }, [
+    sheetEvidences,
+    effectiveSuspects,
+    parsePinOnBoardFlag,
+    parseSuspectFlag,
+  ]);
 
   const basePins = useMemo(
     () =>
@@ -602,7 +687,8 @@ export function MainInvestigationCanvas({
         id === "c0-pin-reinvestigate" ||
         id === "reinvestigate-prop" ||
         (pin?.photoUrl && pin.photoUrl.includes("crime_scene")) ||
-        (pin?.photoUrl && pin.photoUrl.includes("reinvestigation_crime_scene_prop"))
+        (pin?.photoUrl &&
+          pin.photoUrl.includes("reinvestigation_crime_scene_prop"))
       ) {
         if (state.effectiveReinvestigateUnlocked) {
           detectiveAudio.playGlassSound();
@@ -614,13 +700,13 @@ export function MainInvestigationCanvas({
       } else if (id === "c0-pin-phone") {
         if (state.phoneLookupSuccess) state.setIsDossierEOpen(true);
         else state.setIsPhoneLookupOpen(true);
-      } else if (
-        id.startsWith("node-suspect-") ||
-        id.startsWith("suspect-")
-      ) {
+      } else if (id.startsWith("node-suspect-") || id.startsWith("suspect-")) {
         // Thẻ chân dung nghi phạm/nhân vật trên bảng: Mở thẳng modal Thẩm tra Căn cứ tình nghi (Động cơ & Ngoại phạm)
         const charName = (pin?.label || "")
-          .replace(/^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i, "")
+          .replace(
+            /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
+            "",
+          )
           .replace(/\s*\([^)]*\)/g, "")
           .trim();
         const existing = state.suspects.find(
@@ -661,17 +747,22 @@ export function MainInvestigationCanvas({
         // Kiểm tra xem câu hỏi mở rộng của đối tượng này đã được giải xong chưa
         const isAlreadySolved =
           state.solvedFollowupQuestions.includes(c) ||
-          getStorageItem(caseStorageKey(caseId, `followup_${c}`)) === 'solved' ||
-          (c === 'ha' && !!getStorageItem(caseStorageKey(caseId, 'followup_ha_password'))) ||
-          (c === 'vu' && !!getStorageItem(caseStorageKey(caseId, 'followup_vu')))
+          getStorageItem(caseStorageKey(caseId, `followup_${c}`)) ===
+            "solved" ||
+          (c === "ha" &&
+            !!getStorageItem(caseStorageKey(caseId, "followup_ha_password"))) ||
+          (c === "vu" &&
+            !!getStorageItem(caseStorageKey(caseId, "followup_vu")));
 
         if (isAlreadySolved) {
-          if (c === 'ha') {
+          if (c === "ha") {
             // Hà: Mở modal câu hỏi kèm kích hoạt ngay popup 3 vật chứng hộp thiếc
             state.setIsFollowupQuestionOpen(true);
           } else {
             // Vũ / Tùng: Mở thẳng narrative lời khai sau khi giải xong
-            const savedChoice = getStorageItem(caseStorageKey(caseId, `followup_${c}_choice`)) || (c === 'vu' ? '21:15' : 'question_solved');
+            const savedChoice =
+              getStorageItem(caseStorageKey(caseId, `followup_${c}_choice`)) ||
+              (c === "vu" ? "21:15" : "question_solved");
             state.setNarrativeCulprit(c);
             state.setNarrativeChoice(savedChoice);
             state.setIsEpilogueOpen(true);
