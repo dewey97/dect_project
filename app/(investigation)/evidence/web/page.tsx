@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  Suspense,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   FileText,
@@ -333,7 +340,15 @@ function WebEvidencePageContent() {
     }
 
     return [...testPdfItems, ...dossierItems, ...photoItems];
-  }, [dossierDocs, sheetEvidences, caseId, getPhaseForCode, dossierOf, casePdfs, caseEvs]);
+  }, [
+    dossierDocs,
+    sheetEvidences,
+    caseId,
+    getPhaseForCode,
+    dossierOf,
+    casePdfs,
+    caseEvs,
+  ]);
 
   // Tự động nhảy đến vị trí tài liệu/vật chứng khi có đồng đội chỉ điểm (Ping)
   useEffect(() => {
@@ -650,12 +665,15 @@ function WebEvidencePageContent() {
         onOpenNotebook={() => setActiveModal("notebook")}
       />
 
-      <div ref={workspaceRef} className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-2.5 p-0 lg:p-2.5">
+      <div
+        ref={workspaceRef}
+        className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-2.5 p-0 lg:p-2.5"
+      >
         {/* CỘT 1 (BÊN TRÁI CÙNG): BẢNG GHIM ĐIỀU TRA (TỶ LỆ KHUNG CHUẨN 896/1200 CỦA ẢNH, KHÔNG BỊ CO GIÃN) */}
         <div
           className={cn(
             "h-full shrink-0 aspect-[896/1200] max-w-full relative overflow-hidden flex flex-col min-h-0 select-none",
-            mobileTab === "board" ? "flex w-full" : "hidden lg:flex",
+            mobileTab === "board" ? "flex w-full lg:w-auto" : "hidden lg:flex",
           )}
         >
           <div className="flex-1 w-full h-full min-h-0 relative overflow-hidden">
