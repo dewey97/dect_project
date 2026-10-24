@@ -29,6 +29,8 @@ export interface BoardBounds {
 
 export interface PinPoint {
   id: string;
+  nodeKind?: string;
+  subjectKey?: string;
   x: number;
   y: number;
   label: string;
