@@ -111,19 +111,19 @@ Xem plan worktree chi tiết: [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md).
 
 Plan cũ đã hoàn tất và được thay bằng [`docs/WORKTREE_PLAN.md`](WORKTREE_PLAN.md) v2. Mục tiêu: tách 7 worktree độc lập chạy song song theo ma trận sở hữu file, không chồng lấn.
 
-| WT   | Nhánh                 | Phạm vi chính                                                                                  | Migration |
-| ---- | --------------------- | ---------------------------------------------------------------------------------------------- | --------- |
-| WT-1 | `wt/board-dynamic`    | Bỏ hardcode node bảng điều tra; bảng `case_board_nodes`; pin-builder/modal động                | 39        |
-| WT-2 | `wt/phone-devices`    | 7 preset iPhone (SE → 15 Pro Max); editor tin nhắn dạng bảng + dán hàng loạt; sửa role/slot    | —         |
-| WT-3 | `wt/studio-ux`        | Dọn field thừa (key/slug/phase/slot), placeholder dài; `Field` + `AutoGrowTextarea`            | —         |
-| WT-4 | `wt/character-assets` | Upload ảnh nhân vật (`avatar_url`), siết policy bucket `avatars`, render pin/modal/danh bạ     | 38        |
-| WT-5 | `wt/evidence-ux`      | Preview theo bộ hồ sơ; bỏ 4 trường metadata rác; nhận base gỡ fallback tĩnh                    | —         |
-| WT-6 | `wt/cms-cutover`      | Cắt Google Sheets khỏi runtime; sửa 4 app đọc đúng bảng Supabase; thêm tab `evidences` cho API | —         |
-| WT-7 | `wt/ops-hardening`    | `127.0.0.1:3000:3000`, Caddy HSTS/log redaction, kiểm tra reclaim timer                        | —         |
+| WT   | Nhánh                 | Phạm vi chính                                                                                                 | Migration |
+| ---- | --------------------- | ------------------------------------------------------------------------------------------------------------- | --------- |
+| WT-1 | `wt/board-dynamic`    | Bỏ hardcode node bảng điều tra; editor bảng chuyển vào Checkpoint Studio; `board_config` + `case_board_nodes` | 39        |
+| WT-2 | `wt/phone-devices`    | 7 preset iPhone (SE → 15 Pro Max); editor tin nhắn dạng bảng + dán hàng loạt; sửa role/slot                   | —         |
+| WT-3 | `wt/studio-ux`        | Dọn field thừa (key/slug/phase/slot), placeholder dài; `Field` + `AutoGrowTextarea`                           | —         |
+| WT-4 | `wt/character-assets` | Upload ảnh nhân vật (`avatar_url`), siết policy bucket `avatars`, render pin/modal/danh bạ                    | 38        |
+| WT-5 | `wt/evidence-ux`      | Preview theo bộ hồ sơ; bỏ 4 trường metadata rác; nhận base gỡ fallback tĩnh                                   | —         |
+| WT-6 | `wt/cms-cutover`      | Cắt Google Sheets khỏi runtime; sửa 4 app đọc đúng bảng Supabase; thêm tab `evidences` cho API                | —         |
+| WT-7 | `wt/ops-hardening`    | `127.0.0.1:3000:3000`, Caddy HSTS/log redaction, kiểm tra reclaim timer                                       | —         |
 
 Quyết định đã chốt:
 
-- D1: **tạo** `case_board_nodes`, mọi node trên bảng điều tra đều dữ liệu hóa.
+- D1: **tạo** `case_board_nodes` (thu hẹp): node gắn checkpoint nằm trong `case_checkpoints.board_config`; bảng chỉ giữ node hệ thống + ghim tự do. Mọi node trên bảng đều dữ liệu hóa; editor bảng (kéo thả/xem toàn bộ/tạo node) chuyển hẳn vào Checkpoint Studio, gameplay chỉ còn hiển thị/playtest.
 - D2: **7 preset** iPhone.
 - D3: bỏ trường metadata khỏi UI/payload, **giữ** cột `metadata` trong DB.
 - D4: giữ `/api/phone` nhưng không gọi; xóa sau khi grep sạch consumer.

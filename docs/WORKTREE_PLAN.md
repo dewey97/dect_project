@@ -68,7 +68,8 @@ cp ../dect_project/.env .env
 | `components/investigation/mindmap/**`                                                                                                                                                                                        |   **X**    |                                                          |                | riêng `suspect/suspect-evaluation-modal.tsx` |               |                                              |          |
 | `components/phone-engine/**`                                                                                                                                                                                                 |            | **X** (trừ `apps/{notes,safari,banking,photos}-app.tsx`) |                |    `apps/phone-app.tsx` (avatar liên hệ)     |               | `apps/{notes,safari,banking,photos}-app.tsx` |          |
 | `components/admin/phone-studio/**`                                                                                                                                                                                           |            |                          **X**                           |                |                                              |               |                                              |          |
-| `components/admin/checkpoint-studio/**`, `dossier-studio/**`, `app/(admin)/studio/cases/**`                                                                                                                                  |            |                                                          |     **X**      |                                              |               |                                              |          |
+| `components/admin/checkpoint-studio/**` (trừ `board/**` và tab bảng trong `checkpoint-editor.tsx`), `dossier-studio/**`, `app/(admin)/studio/cases/**`                                                                       |            |                                                          |     **X**      |                                              |               |                                              |          |
+| `components/admin/checkpoint-studio/board/**` (mới), tab "Bảng điều tra" trong `checkpoint-editor.tsx`, `components/investigation/mindmap/admin-create-pin-modal.tsx`                                                        |   **X**    |                                                          |                |                                              |               |                                              |          |
 | `components/admin/character-studio/**`, `lib/actions/character-actions.ts`, `lib/cases/characters.ts`, `lib/cases/case-characters.ts`, `app/api/characters/route.ts`, `components/investigation/case-characters-context.tsx` |            |                                                          |                |                    **X**                     |               |                                              |          |
 | `components/admin/evidence-studio/**`, `components/investigation/evidence/**`, `app/(investigation)/evidence/**`, `lib/hooks/use-case-evidence.ts`, `lib/actions/evidence-actions.ts`                                        |            |                                                          |                |                                              |     **X**     |                                              |          |
 | `app/api/phone/**`, `app/api/phone-data/**`, `app/api/admin/pins/route.ts`, `lib/hooks/use-phone-data.ts`, `lib/google/**`, `lib/hooks/use-case-checkpoints.ts`                                                              |            |                                                          |                |                                              |               |                    **X**                     |          |
@@ -107,42 +108,60 @@ Nếu chủ dự án muốn bỏ thay đổi dở: `git checkout -- .` và `git 
 
 ---
 
-## 3. WT-1 — `wt/board-dynamic` (Bảng điều tra không hardcode)
+## 3. WT-1 — `wt/board-dynamic` (Bảng điều tra dữ liệu hóa + chuyển editor về Checkpoint Studio)
 
-**Mục tiêu:** mọi node trên bảng điều tra đến từ dữ liệu (Supabase), không còn id/tọa độ/tên/mã chứng cứ gắn cứng case_000.
+**Mục tiêu:** mọi node trên bảng điều tra đến từ dữ liệu (Supabase), không còn id/tọa độ/tên/mã chứng cứ gắn cứng case_000. **Toàn bộ chế độ admin trên bảng gameplay (kéo thả, xem toàn bộ, tạo node) chuyển vào Checkpoint Studio**; bảng trong gameplay chỉ còn vai trò hiển thị/playtest.
 
-**Sở hữu:** `components/investigation/mindmap/**` (trừ `suspect/suspect-evaluation-modal.tsx`), `lib/guides/interactive-walkthrough-data.ts`, `db/schema/39_case_board_nodes.sql`, `e2e/board-dynamic.spec.ts`.
+**Sở hữu:** `components/investigation/mindmap/**` (trừ `suspect/suspect-evaluation-modal.tsx`), `components/admin/checkpoint-studio/board/**` (mới), `components/admin/checkpoint-studio/checkpoint-editor.tsx` (chỉ phần tab/shell), `lib/guides/interactive-walkthrough-data.ts`, `db/schema/39_board_nodes.sql`, `e2e/board-dynamic.spec.ts`, `e2e/board-studio.spec.ts`.
+
+> WT-3 **không** sửa `components/admin/checkpoint-studio/board/**` và `checkpoint-editor.tsx`; WT-3 chỉ sở hữu `sections/**` và các form config.
 
 **Hiện trạng (khảo sát):** 101 dòng khớp nhóm case/id và 130 dòng khớp nhóm tên/suspect key trên 18 file. Nặng nhất:
 
 - `canvas/pin-builder.ts`: `DESKTOP_SUSPECT_SLOTS`, `MOBILE_SUSPECT_SLOTS`, `DYNAMIC_PHOTO_SLOTS`, 5 pin nền `c0-pin-*` với tọa độ cứng, `c0-pin-followup-vu/tung/ha`, fallback tên "Nguyễn Văn Khang", connection id `c0-conn-*`.
 - `main-investigation-canvas.tsx`: map phase `cp-000-1a/1b/1c/0/2b`, map avatar `avatar_vu/tung/ha/...`, nhận diện nạn nhân theo `khang`, fallback tên.
-- `admin-create-pin-modal.tsx`: `PRESET_CASE_PHOTOS`, `PRESET_STICKY_TEMPLATES`, `PRESET_DOSSIER_TEMPLATES`, default `cp-000-0`, map `vu→cp-000-1a`.
+- `admin-create-pin-modal.tsx`: `PRESET_CASE_PHOTOS`, `PRESET_STICKY_TEMPLATES`, `PRESET_DOSSIER_TEMPLATES`, default `cp-000-0`, map `vu→cp-000-1a`. Đây là UI admin đang nằm trong gameplay.
+- `use-board-layout.ts` + `main-investigation-canvas.tsx`: chế độ admin kéo thả/tạo node ngay trên bảng gameplay.
 - Các modal còn fallback key/tên/mã: `add-suspect-modal`, `indictment-modal`, `followup-question-modal`, `culprit-epilogue-modal`, `canvas-modals`, `dossier-result-modal`, `phone-lookup-modal`, `interactive-walkthrough`.
 
 **Thiết kế:**
 
-1. **Migration 39 — `case_board_nodes`** (chủ dự án duyệt trước khi chạy):
-   - Cột: `id TEXT PRIMARY KEY`, `case_slug TEXT NOT NULL REFERENCES cases(slug) ON UPDATE CASCADE ON DELETE CASCADE`, `node_kind TEXT NOT NULL` (`phone | victim_phone | reinvestigate | suspects | indictment | evidence_hub | followup | question | note | dossier | custom`), `title TEXT`, `subject_key TEXT` (khớp `case_characters.key`), `checkpoint_id TEXT` (khớp `case_checkpoints.id`), `slot_index INTEGER`, `style JSONB` (màu/icon/ảnh), `position JSONB` (`{mobile:{x,y}, desktop:{x,y}}`), `created_at`, `updated_at`.
+1. **Migration 39 — `39_board_nodes.sql`** (chủ dự án duyệt trước khi chạy):
+   - `ALTER TABLE case_checkpoints ADD COLUMN board_config JSONB NOT NULL DEFAULT '{}'::jsonb` — cấu hình hiển thị node gắn checkpoint: `pin_title`, `icon`, `photo_url`, `style`, `position {mobile,desktop}`, `connections[]`, `hidden`, `locked_until`.
+   - Bảng `case_board_nodes` **chỉ cho node không gắn checkpoint** (node hệ thống + ghim tự do): `id TEXT PRIMARY KEY`, `case_slug TEXT NOT NULL REFERENCES cases(slug) ON UPDATE CASCADE ON DELETE CASCADE`, `node_kind TEXT NOT NULL` (`victim_phone | reinvestigate | suspects_hub | evidence_hub | note | photo | dossier | custom`), `title`, `subject_key`, `checkpoint_id TEXT NULL REFERENCES case_checkpoints(id) ON DELETE CASCADE` (cho phép ghim thêm một checkpoint ở vị trí khác), `slot_index`, `config JSONB` (`icon`, `photo_url`, `style`, `position`, `connections`), timestamps.
+   - Backfill case_000: chỉ các node không gắn checkpoint (`victim_phone`, `reinvestigate`, `suspects_hub`, `evidence_hub`). Node checkpoint (`phone_lookup`, nghi phạm, followup, indictment) **không** backfill vào bảng — dẫn xuất trực tiếp và đọc `board_config`.
    - RLS: đọc public, ghi `private.is_admin()`.
-   - Backfill case_000 từ các hằng số hiện tại: `c0-pin-phone`, `c0-pin-victim-phone`, `c0-pin-reinvestigate`, `c0-pin-suspects`, `c0-pin-indictment`, `c0-pin-followup-{vu,tung,ha}`. Không backfill node custom của GM.
-   - `boardgame_pins` tiếp tục lưu vị trí kéo tay; `case_board_nodes.position` là vị trí mặc định.
-2. **`pin-builder.ts`**: bỏ 3 mảng slot tĩnh + 5 pin nền cứng; dựng pin từ `case_board_nodes` + `case_characters` + `case_checkpoints`; tọa độ mặc định lấy từ node, override bằng `boardgame_pins`. Nếu vụ chưa có node: tính layout xác định theo danh sách nhân vật/checkpoint (không dùng id case_000).
-3. **Bỏ map key/tên**: `findFollowupCulprit` mặc định `vu/ha/tung`, `detectCheckpointForPin` suy `cp-${key}-followup`, `hasVu/Tung/HaFollowup`, tên "Lê Quang Vũ/Nguyễn Thanh Tùng/Trần Thị Hà", nạn nhân "Nguyễn Văn Khang" → lấy từ `CaseCharactersProvider` + `checkpoint.subjectKey` + `device.label`.
-4. **Click handler**: nhận node theo `case_board_nodes.node_kind`/`checkpoint_id`, không so id chữ cứng.
-5. **Modal**:
+   - `boardgame_pins` giữ nguyên vai trò lưu vị trí kéo tay; thứ tự ưu tiên vị trí: `boardgame_pins` → `board_config.position`/`case_board_nodes.config.position` → layout tự tính.
+2. **Node dẫn xuất, không nhân bản:** `pin-builder.ts` dựng node từ:
+   - `case_checkpoints` (kind `phone_lookup`, `followup`, `indictment`, `choice/code/time/text`) + `board_config`;
+   - `case_characters` role victim/suspect (nạn nhân, hub nghi phạm);
+   - `case_evidence` (hub vật chứng);
+   - `cases.scene_360_url`/`panorama_url` (node khám xét lại);
+   - `case_board_nodes` (node hệ thống còn lại + ghim tự do).
+     Bỏ 3 mảng slot tĩnh và 5 pin nền cứng; nếu vụ chưa cấu hình thì tính layout xác định từ danh sách, không dùng id case_000.
+3. **Chuyển editor bảng sang Checkpoint Studio:**
+   - Trang mới trong Checkpoint Studio: tab "Bảng điều tra" (route `/studio/checkpoints?case=<slug>&view=board` hoặc panel toàn màn hình), dùng lại renderer canvas nhưng có overlay chỉnh sửa: kéo thả node, nối dây, tạo node, sửa `board_config`/`case_board_nodes`, bật/tắt hiển thị, đặt điều kiện mở.
+   - Di chuyển logic của `admin-create-pin-modal.tsx` và chế độ admin trong `use-board-layout.ts` vào `components/admin/checkpoint-studio/board/**`; xóa nhánh admin khỏi bảng gameplay.
+   - Nút "Chơi thử" trong editor bảng gọi `lib/checkpoints/case-playtest.ts` (đã có ở C4) để mở gameplay từ trạng thái hiện tại — giữ playtest trong Studio.
+4. **Bảng gameplay chỉ đọc:** `MainInvestigationCanvas` bỏ toggle admin, bỏ tạo/kéo node, bỏ `admin-create-pin-modal`. Vẫn render đủ node, hover/click mở modal nghiệp vụ. Kiểm tra không còn nút admin nào lộ cho người chơi.
+5. **Bỏ map key/tên**: `findFollowupCulprit` mặc định `vu/ha/tung`, `detectCheckpointForPin` suy `cp-${key}-followup`, `hasVu/Tung/HaFollowup`, tên "Lê Quang Vũ/Nguyễn Thanh Tùng/Trần Thị Hà", nạn nhân "Nguyễn Văn Khang" → lấy từ `CaseCharactersProvider` + `checkpoint.subjectKey` + `device.label`.
+6. **Click handler**: nhận node theo `node_kind`/`checkpoint_id`, không so id chữ cứng.
+7. **Modal**:
    - `add-suspect-modal`: bỏ chặn `khang`, mã admin `"000"/"00"`, `isVu/isTung/isHa`; nghi phạm lấy từ `case_characters` role suspect.
    - `indictment-modal`: bỏ `isCulpritValid` cứng và mã chứng cứ fallback; giữ `validSuspects/validMotives/requiredEvidenceIds`; thông tin vụ án (tội danh, thời gian, địa điểm, hung khí) đọc từ checkpoint/case metadata — nếu chưa có nguồn, ghi vào `case_checkpoints.answer_config` hoặc `cases.metadata`, **không** hardcode.
    - `followup-question-modal`: bỏ fallback `vu→time/tung→choice/ha→code`, tên cứng, `TARGET_CODES` D-04..D-06; chỉ dùng `inputType`, `photoCodes`, `subjectKey`; storage key `followup_${subjectKey}`.
    - `culprit-epilogue-modal`: bỏ `cp-epilogue-ha`, nhánh `isHaBoxSolved`.
    - `phone-lookup-modal`, `canvas-modals`, `dossier-result-modal`: bỏ fallback key/tên/mã; nội dung Hồ sơ A/B/C đọc từ dossier/checkpoint.
-6. **Nguồn evidences**: thay `usePhoneData("evidences")` trong `main-investigation-canvas`, `add-suspect-modal`, `followup-question-modal`, `admin-create-pin-modal` bằng `useCaseEvidence(caseId)` (đã có sẵn). Không phụ thuộc WT-6.
-7. **Admin pin modal**: bỏ 3 bộ preset ảnh case_000; ảnh chọn từ `case_evidence` + `phone_photos`; checkpoint chọn theo `kind`; bỏ `cp-000-0` mặc định (rỗng thì yêu cầu chọn).
-8. **Walkthrough**: dữ liệu bước điều tra lấy `targetPinId` từ node DB theo `node_kind`; bỏ danh sách id cứng.
+8. **Nguồn evidences**: thay `usePhoneData("evidences")` trong `main-investigation-canvas`, `add-suspect-modal`, `followup-question-modal` bằng `useCaseEvidence(caseId)` (đã có sẵn). Không phụ thuộc WT-6.
+9. **Walkthrough**: dữ liệu bước điều tra lấy `targetPinId` từ node DB theo `node_kind`; bỏ danh sách id cứng.
 
-**Kiểm tra:** spec mới `board-dynamic.spec.ts` — đếm node render = số node DB + checkpoint/nhân vật; click 5 node chính mở đúng modal; tạo case mới qua Studio (không seed) thấy node theo dữ liệu. Case_000 E2E cũ pass.
+**Kiểm tra:**
 
-**Rủi ro:** migration 39 là thay đổi schema lõi; nếu chủ dự án chưa muốn bảng mới, phương án B: giữ cấu trúc pin nền nhưng đọc hoàn toàn từ `case_checkpoints`/`case_characters`, chấp nhận 5 node hệ thống không đổi tên. Cần chốt trước khi làm.
+- `board-dynamic.spec.ts`: đếm node render = số node dữ liệu; click 5 node chính mở đúng modal; bảng gameplay **không** có nút chế độ admin; tạo case mới không seed vẫn thấy node theo dữ liệu.
+- `board-studio.spec.ts` (admin): mở tab "Bảng điều tra", kéo node → lưu vị trí → mở gameplay thấy vị trí mới; tạo node note → xuất hiện ở gameplay; bấm "Chơi thử" mở gameplay đúng case.
+- Case_000 E2E cũ pass.
+
+**Rủi ro:** migration 39 là thay đổi schema lõi; `board_config` mặc định `{}` nên checkpoint cũ vẫn render bằng layout tự tính. Phương án lùi: nếu chưa muốn bảng `case_board_nodes`, node hệ thống suy từ `cases`/`case_characters` và ghim tự do tạm giữ trong `boardgame_pins` — nhưng sẽ không đáp ứng yêu cầu "mọi node custom".
 
 ---
 
@@ -198,9 +217,9 @@ Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; khô
 
 **Mục tiêu:** bớt thông tin thừa, bớt mô tả/placeholder dài, trường kỹ thuật ẩn/tự sinh, ô nhập 1 dòng + tự giãn khi cần.
 
-**Sở hữu:** `components/admin/checkpoint-studio/**`, `components/admin/dossier-studio/**`, `app/(admin)/studio/cases/**`, `app/(admin)/studio/settings/**`, `app/(admin)/studio/players/**`, `app/(admin)/studio/feedbacks/**`, `components/ui/field.tsx` (mới), `e2e/studio-ux.spec.ts`.
+**Sở hữu:** `components/admin/checkpoint-studio/**` (trừ `board/**` và tab "Bảng điều tra" trong `checkpoint-editor.tsx` — WT-1 giữ), `components/admin/dossier-studio/**`, `app/(admin)/studio/cases/**`, `app/(admin)/studio/settings/**`, `app/(admin)/studio/players/**`, `app/(admin)/studio/feedbacks/**`, `components/ui/field.tsx` (mới), `e2e/studio-ux.spec.ts`.
 
-**Không sở hữu** (đã chia): evidence studio (WT-5), phone studio (WT-2), character studio (WT-4).
+**Không sở hữu** (đã chia): board editor trong checkpoint studio (WT-1), evidence studio (WT-5), phone studio (WT-2), character studio (WT-4).
 
 **Nguyên tắc chung:**
 
@@ -388,10 +407,10 @@ Hiện trạng: mỗi tin một form; luôn tạo tin mồi "Xin chào..."; khô
 
 ## 12. Quyết định đã chốt (2026-10-24)
 
-| #   | Quyết định                                                                           | Đã chốt                                                                   |
-| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| D1  | Có tạo bảng `case_board_nodes` (migration 39) để mọi node đều custom?                | **Có.** WT-1 viết migration 39, chờ chủ dự án duyệt trước khi chạy.       |
-| D2  | Danh sách model iPhone                                                               | **7 preset** ở WT-2 mục A.                                                |
-| D3  | Xóa hẳn trường "thời điểm thu thập/niêm phong/người thu thập" khỏi DB hay chỉ ẩn UI? | **Chỉ bỏ UI/payload**, giữ cột `metadata` trong DB.                       |
-| D4  | Xóa hẳn `/api/phone` (Google Sheets) sau cutover?                                    | **Giữ route nhưng không gọi**, xóa ở bước sau khi grep sạch consumer.     |
-| D5  | Ưu tiên chạy song song đợt 1                                                         | **WT-4, WT-2, WT-6, WT-7.** WT-1, WT-5, WT-3 chạy sau theo thứ tự mục 10. |
+| #   | Quyết định                                                                           | Đã chốt                                                                                                                                                                              |
+| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D1  | Có tạo bảng `case_board_nodes` (migration 39) để mọi node đều custom?                | **Có, thu hẹp.** Node gắn checkpoint lưu trong `case_checkpoints.board_config`; `case_board_nodes` chỉ giữ node hệ thống + ghim tự do. Editor bảng chuyển hẳn vào Checkpoint Studio. |
+| D2  | Danh sách model iPhone                                                               | **7 preset** ở WT-2 mục A.                                                                                                                                                           |
+| D3  | Xóa hẳn trường "thời điểm thu thập/niêm phong/người thu thập" khỏi DB hay chỉ ẩn UI? | **Chỉ bỏ UI/payload**, giữ cột `metadata` trong DB.                                                                                                                                  |
+| D4  | Xóa hẳn `/api/phone` (Google Sheets) sau cutover?                                    | **Giữ route nhưng không gọi**, xóa ở bước sau khi grep sạch consumer.                                                                                                                |
+| D5  | Ưu tiên chạy song song đợt 1                                                         | **WT-4, WT-2, WT-6, WT-7.** WT-1, WT-5, WT-3 chạy sau theo thứ tự mục 10.                                                                                                            |
