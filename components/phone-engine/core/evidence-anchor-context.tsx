@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 
 export interface EvidenceAnchor {
   id: string; // Mã vật chứng (vd: "CALL-01", "MSG-03", "NOTE-02", "BANK-04")
@@ -17,9 +23,15 @@ interface EvidenceAnchorContextType {
   updateAnchorPos: (id: string, top: number, visible: boolean) => void;
 }
 
-const EvidenceAnchorContext = createContext<EvidenceAnchorContextType | null>(null);
+const EvidenceAnchorContext = createContext<EvidenceAnchorContextType | null>(
+  null,
+);
 
-export function EvidenceAnchorProvider({ children }: { children: React.ReactNode }) {
+export function EvidenceAnchorProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [anchors, setAnchors] = useState<Record<string, EvidenceAnchor>>({});
 
   const registerAnchor = useCallback((anchor: EvidenceAnchor) => {
@@ -31,27 +43,31 @@ export function EvidenceAnchorProvider({ children }: { children: React.ReactNode
 
   const unregisterAnchor = useCallback((id: string) => {
     setAnchors((prev) => {
+      if (!(id in prev)) return prev;
       const next = { ...prev };
       delete next[id];
       return next;
     });
   }, []);
 
-  const updateAnchorPos = useCallback((id: string, top: number, visible: boolean) => {
-    setAnchors((prev) => {
-      const curr = prev[id];
-      if (curr && curr.top === top && curr.visible === visible) return prev;
-      if (!curr) return prev;
-      return {
-        ...prev,
-        [id]: {
-          ...curr,
-          top,
-          visible,
-        },
-      };
-    });
-  }, []);
+  const updateAnchorPos = useCallback(
+    (id: string, top: number, visible: boolean) => {
+      setAnchors((prev) => {
+        const curr = prev[id];
+        if (curr && curr.top === top && curr.visible === visible) return prev;
+        if (!curr) return prev;
+        return {
+          ...prev,
+          [id]: {
+            ...curr,
+            top,
+            visible,
+          },
+        };
+      });
+    },
+    [],
+  );
 
   return (
     <EvidenceAnchorContext.Provider

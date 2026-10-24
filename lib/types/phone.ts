@@ -16,31 +16,32 @@ export type PhoneAppId =
   | "tetris";
 
 export type PhoneDeviceModel =
-  | "iphone_classic"   // Viền dày, nút Home vật lý (ví dụ: iPhone 6s/7/8 - hợp các case bối cảnh quá khứ như 2016)
-  | "iphone_modern"    // Viền mỏng, tai thỏ hoặc Dynamic Island
+  | "iphone_classic" // Viền dày, nút Home vật lý (ví dụ: iPhone 6s/7/8 - hợp các case bối cảnh quá khứ như 2016)
+  | "iphone_modern" // Viền mỏng, tai thỏ hoặc Dynamic Island
   | "android_vintage"; // Máy Android phổ thông
 
 /** Profile cấu hình thiết bị di động trong vụ án */
 export interface PhoneDeviceProfile {
-  id: string;                      // vd: "dev_khang_01"
-  caseId: string;                  // vd: "case_000"
-  label: string;                   // vd: "iPhone 6s Plus (Vàng Hồng)"
-  owner: string;                   // vd: "Nguyễn Văn Khang"
+  id: string; // vd: "dev_khang_01"
+  caseId: string; // vd: "case_000"
+  label: string; // vd: "iPhone 6s Plus (Vàng Hồng)"
+  owner: string; // vd: "Nguyễn Văn Khang"
   model: PhoneDeviceModel;
-  timeFreeze: string;              // Giờ hiển thị cố định ở status bar (vd: "17:55" hoặc "02:14")
-  dateFreeze?: string;             // Ngày hiển thị ở màn hình khóa (vd: "Chủ Nhật, 24 tháng 7")
-  batteryLevel?: number;           // vd: 14 (%)
-  wallpaperUrl?: string;           // Ảnh nền cá nhân của nạn nhân / nghi phạm
-  
+  model_id?: string;
+  timeFreeze: string; // Giờ hiển thị cố định ở status bar (vd: "17:55" hoặc "02:14")
+  dateFreeze?: string; // Ngày hiển thị ở màn hình khóa (vd: "Chủ Nhật, 24 tháng 7")
+  batteryLevel?: number; // vd: 14 (%)
+  wallpaperUrl?: string; // Ảnh nền cá nhân của nạn nhân / nghi phạm
+
   // Cơ chế giải mã / khóa
   isLocked: boolean;
-  passcode?: string;               // Mã PIN mở khóa (vd: "2407" hoặc "1994")
-  passcodeHint?: string;           // Gợi ý giải mã khi detective bị bế tắc
-  recoveryLevel?: number;          // Tỷ lệ khôi phục dữ liệu forensic (0 - 100%)
-  
+  passcode?: string; // Mã PIN mở khóa (vd: "2407" hoặc "1994")
+  passcodeHint?: string; // Gợi ý giải mã khi detective bị bế tắc
+  recoveryLevel?: number; // Tỷ lệ khôi phục dữ liệu forensic (0 - 100%)
+
   // Danh sách các App được kích hoạt trên máy này
   installedApps: PhoneAppId[];
-  
+
   // Dữ liệu ban đầu (nếu có)
   initialApp?: PhoneAppId | null;
 }
@@ -48,10 +49,10 @@ export interface PhoneDeviceProfile {
 /** Base interface cho bất kỳ mục nào có thể đóng vai trò là Manh mối phá án */
 export interface DigitalClueLink {
   isClue?: boolean;
-  clueId?: string;                 // ID manh mối trên Bảng điều tra / Mindmap
-  clueTitle?: string;              // Tên vắn tắt của chứng cứ
-  clueAnalysis?: string;           // Nhận định nghiệp vụ điều tra
-  leadsToCardId?: string;          // Node tương ứng trên Mindmap canvas
+  clueId?: string; // ID manh mối trên Bảng điều tra / Mindmap
+  clueTitle?: string; // Tên vắn tắt của chứng cứ
+  clueAnalysis?: string; // Nhận định nghiệp vụ điều tra
+  leadsToCardId?: string; // Node tương ứng trên Mindmap canvas
 }
 
 /** Message content in a thread */
@@ -108,8 +109,8 @@ export interface Photo extends DigitalClueLink {
   status: "recovered" | "corrupted" | "encrypted";
   caption?: string;
   timestamp?: string;
-  deviceModel?: string;            // EXIF: camera info
-  exifCoords?: string;             // EXIF: GPS vĩ độ, kinh độ
+  deviceModel?: string; // EXIF: camera info
+  exifCoords?: string; // EXIF: GPS vĩ độ, kinh độ
 }
 
 /** Voice Recording audio details */
@@ -164,4 +165,3 @@ export interface BrowserHistory extends DigitalClueLink {
   url?: string;
   redacted?: boolean;
 }
-

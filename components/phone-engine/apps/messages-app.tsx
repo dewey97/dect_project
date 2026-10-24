@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   ChevronLeft,
   Search,
@@ -58,23 +58,23 @@ interface MessageThread {
   messages: ParsedMessage[];
 }
 
-interface RawMessageThreadRow {
-  thread_id?: string;
+interface FlatMessageRow {
   id?: string;
-  message_id?: string;
-  name?: string;
-  contact_name?: string;
-  sender_name?: string;
-  phone_number?: string;
-  avatar_url?: string;
-  unread?: string | boolean;
-  unread_count?: number;
+  thread_key?: string;
+  thread_name?: string;
+  thread_phone?: string;
+  sender?: string;
+  role?: string;
+  body?: string;
   timestamp?: string;
-  last_time?: string;
-  preview_text?: string;
-  last_message?: string;
-  messages_json?: string | unknown[];
-  messages_text?: string;
+  code?: string;
+  is_clue?: boolean | string;
+  clue_title?: string;
+  clue_analysis?: string;
+  attachment_type?: string;
+  attachment_url?: string;
+  attachment_duration?: string;
+  slot_index?: number;
 }
 
 export function MessagesApp({ onBackToHome }: MessagesAppProps) {
@@ -131,254 +131,139 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     };
   }, [activeAudioId]);
 
-  // Map CMS rows to thread objects
-  const threads: MessageThread[] = (
-    rawMessagesData as RawMessageThreadRow[]
-  ).map((item: RawMessageThreadRow, idx: number): MessageThread => {
-    let parsedMessages: ParsedMessage[] = [];
-
-    if (item.messages_json) {
-      try {
-        parsedMessages =
-          typeof item.messages_json === "string"
-            ? JSON.parse(item.messages_json)
-            : (item.messages_json as ParsedMessage[]);
-      } catch {}
+  // Đọc danh sách tin nhắn phẳng (flat rows) từ bảng phone_messages,
+  // nhóm theo thread_key và sắp xếp tuần tự theo slot_index.
+  const threads: MessageThread[] = useMemo(() => {
+    if (!Array.isArray(rawMessagesData) || rawMessagesData.length === 0) {
+      return [];
     }
 
-    if (parsedMessages.length === 0 && item.messages_text) {
-      const lines = String(item.messages_text)
-        .split("\n")
-        .map((l) => l.trim())
-        .filter(Boolean);
+    const threadMap = new Map<
+      string,
+      {
+        id: string;
+        name: string;
+        phoneNumber: string;
+        code?: string;
+        unread: boolean;
+        messages: Array<{
+          msg: ParsedMessage;
+          slotIndex: number;
+        }>;
+      }
+    >();
 
-      parsedMessages = lines.map((line, mIdx): ParsedMessage => {
-        const isSent = line.startsWith(">");
-        let cleanLine = isSent ? line.substring(1).trim() : line;
+    const rows = rawMessagesData as FlatMessageRow[];
 
-        let clueTitle = "";
-        let clueAnalysis = "";
-        let isClue = false;
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const key = String(
+        row.thread_key || row.thread_name || `thread_${i}`,
+      ).trim();
+      const threadName = String(row.thread_name || key).trim();
+      const threadPhone = String(row.thread_phone || "").trim();
 
-        // 1. Parse [CLUE: title | analysis]
-        const clueMatch = cleanLine.match(
-          /\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i,
-        );
-        if (clueMatch) {
-          isClue = true;
-          clueTitle = clueMatch[1].trim();
-          clueAnalysis = clueMatch[2].trim();
-          cleanLine = cleanLine
-            .replace(/\[CLUE:\s*([^|]+)\s*\|\s*([^\]]+)\]$/i, "")
-            .trim();
-        }
+      if (!threadMap.has(key)) {
+        threadMap.set(key, {
+          id: key,
+          name: threadName,
+          phoneNumber: threadPhone,
+          unread: false,
+          messages: [],
+        });
+      }
 
-        // 2. Parse attachments: [AUDIO: url | duration], [IMAGE: url], [VIDEO: url]
-        let attachment: MessageAttachment | undefined = undefined;
+      const thread = threadMap.get(key)!;
+      if (!thread.phoneNumber && threadPhone) {
+        thread.phoneNumber = threadPhone;
+      }
+      if (row.code && !thread.code) {
+        thread.code = row.code;
+      }
 
-        const audioMatch = cleanLine.match(
-          /\[AUDIO:\s*([^|\]]+)(?:\s*\|\s*([^\]]+))?\]/i,
-        );
-        if (audioMatch) {
-          const rawUrl = audioMatch[1].trim();
-          const duration = audioMatch[2]?.trim() || "0:08";
-          attachment = {
-            type: "audio",
-            url:
-              rawUrl.includes("drive.google.com") ||
-              rawUrl.match(/\/file\/d\/[a-zA-Z0-9_-]+/)
-                ? `/api/audio-proxy?id=${(rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/))?.[1]}`
-                : normalizeMediaUrl(rawUrl),
-            duration,
-          };
-          cleanLine = cleanLine.replace(audioMatch[0], "").trim();
-        }
+      // Chuẩn hóa role thành "sent" | "received"
+      const roleStr = String(row.role || "")
+        .toLowerCase()
+        .trim();
+      const isSent =
+        roleStr === "sent" ||
+        roleStr === "me" ||
+        roleStr === "victim" ||
+        row.sender === "Nạn nhân" ||
+        row.sender === "Tôi";
+      const role = isSent ? "sent" : "received";
 
-        // Support Vietnamese tag with or without link:
-        // Cú pháp 1: 🎙️ [Tin nhắn thoại 0:08 | https://drive.google.com/...]
-        // Cú pháp 2: 🎙️ [Tin nhắn thoại | https://drive.google.com/... | 0:08]
-        // Cú pháp 3: 🎙️ [Tin nhắn thoại 0:08] (không link -> dùng mặc định)
-        if (!attachment) {
-          const vnAudioWithLinkMatch = cleanLine.match(
-            /(?:🎙️\s*)?\[(?:Tin nhắn thoại|Thư thoại|Voice|Audio)\s*(?:([0-9:]+)\s*\|\s*([^\]|]+)|([^\]|]+)\s*\|\s*([0-9:]+)|([^\]|]+))\]/i,
-          );
-          if (vnAudioWithLinkMatch) {
-            let duration = "0:08";
-            let rawUrl = "";
-
-            if (vnAudioWithLinkMatch[1] && vnAudioWithLinkMatch[2]) {
-              duration = vnAudioWithLinkMatch[1].trim();
-              rawUrl = vnAudioWithLinkMatch[2].trim();
-            } else if (vnAudioWithLinkMatch[3] && vnAudioWithLinkMatch[4]) {
-              rawUrl = vnAudioWithLinkMatch[3].trim();
-              duration = vnAudioWithLinkMatch[4].trim();
-            } else if (vnAudioWithLinkMatch[5]) {
-              const part = vnAudioWithLinkMatch[5].trim();
-              if (/^[0-9:]+$/.test(part)) {
-                duration = part;
-              } else if (
-                part.includes("http") ||
-                part.includes("/") ||
-                part.includes("drive")
-              ) {
-                rawUrl = part;
-              }
-            }
-
-            if (!rawUrl) {
-              rawUrl =
-                item.contact_name === "Hà"
-                  ? "/audio/ha_voicemail_2032.mp3"
-                  : "/audio/voice_khang.mp3";
-            }
-
-            attachment = {
-              type: "audio",
-              url:
-                rawUrl.includes("drive.google.com") ||
-                rawUrl.match(/\/file\/d\/[a-zA-Z0-9_-]+/)
-                  ? `/api/audio-proxy?id=${(rawUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/))?.[1]}`
-                  : normalizeMediaUrl(rawUrl),
-              duration,
-            };
-            cleanLine = cleanLine.replace(vnAudioWithLinkMatch[0], "").trim();
-          }
-        }
-
-        const imageMatch = cleanLine.match(/\[IMAGE:\s*([^\]]+)\]/i);
-        if (imageMatch) {
-          const rawUrl = imageMatch[1].trim();
-          attachment = {
-            type: "image",
-            url: normalizeImageUrl(rawUrl),
-          };
-          cleanLine = cleanLine.replace(imageMatch[0], "").trim();
-        }
-
-        const videoMatch = cleanLine.match(/\[VIDEO:\s*([^\]]+)\]/i);
-        if (videoMatch) {
-          const rawUrl = videoMatch[1].trim();
-          attachment = {
-            type: "video",
-            url: normalizeMediaUrl(rawUrl),
-          };
-          cleanLine = cleanLine.replace(videoMatch[0], "").trim();
-        }
-
-        // 3. Parse Timestamp: (24/07 • 20:32) or (20:32)
-        let timestamp = "";
-        const tsMatch = cleanLine.match(/^\(([^)]+)\)\s*(.*)$/);
-        let text = cleanLine;
-
-        if (tsMatch) {
-          timestamp = tsMatch[1].trim();
-          text = tsMatch[2].trim();
-        }
-
-        const victim = getActiveVictim();
-        const victimShortName =
-          victim?.name?.trim().split(" ").pop() || victim?.name || "Khang";
-
-        return {
-          id: `msg-${idx}-${mIdx}`,
-          sender: isSent ? victimShortName : item.contact_name || "Khác",
-          role: isSent ? "sent" : "received",
-          text,
-          timestamp,
-          attachment,
-          isClue,
-          clueTitle,
-          clueAnalysis,
+      // Đính kèm phương tiện
+      let attachment: MessageAttachment | undefined = undefined;
+      if (row.attachment_url && row.attachment_url.trim().length > 0) {
+        const rawUrl = row.attachment_url.trim();
+        const aType =
+          row.attachment_type === "audio" || row.attachment_type === "video"
+            ? row.attachment_type
+            : "image";
+        attachment = {
+          type: aType,
+          url:
+            aType === "image"
+              ? normalizeImageUrl(rawUrl)
+              : normalizeMediaUrl(rawUrl),
+          duration:
+            row.attachment_duration || (aType === "audio" ? "0:08" : undefined),
         };
+      }
+
+      const isClue =
+        row.is_clue === true ||
+        row.is_clue === "true" ||
+        row.is_clue === "TRUE";
+
+      const parsed: ParsedMessage = {
+        id: row.id || `msg-${key}-${i}`,
+        sender: row.sender || (isSent ? "Nạn nhân" : threadName),
+        role,
+        text: row.body || "",
+        timestamp: row.timestamp || "",
+        attachment,
+        isClue,
+        clueTitle: row.clue_title || "",
+        clueAnalysis: row.clue_analysis || "",
+        code: row.code || undefined,
+      };
+
+      thread.messages.push({
+        msg: parsed,
+        slotIndex: typeof row.slot_index === "number" ? row.slot_index : i,
       });
     }
 
-    const isUnread = item.unread === "TRUE" || item.unread === true;
-    const lastParsedMsg =
-      parsedMessages.length > 0
-        ? parsedMessages[parsedMessages.length - 1]
-        : null;
-    const resolvedTimestamp =
-      item.timestamp ||
-      (lastParsedMsg?.timestamp
-        ? lastParsedMsg.timestamp.replace(/^.*\s*•\s*/, "")
-        : "") ||
-      lastParsedMsg?.timestamp ||
-      "";
+    return Array.from(threadMap.values()).map((t) => {
+      // Sắp xếp tin nhắn trong thread theo slot_index tăng dần
+      t.messages.sort((a, b) => a.slotIndex - b.slotIndex);
+      const sortedMsgs = t.messages.map((m) => m.msg);
+      const lastMsg = sortedMsgs[sortedMsgs.length - 1];
 
-    return {
-      id: item.message_id || `conv-${idx + 1}`,
-      name: item.contact_name || item.name || "Không tên",
-      phoneNumber: item.phone_number || "",
-      unread: isUnread,
-      timestamp: resolvedTimestamp,
-      previewText:
-        item.preview_text ||
-        (lastParsedMsg
-          ? lastParsedMsg.attachment?.type === "audio"
-            ? "🎙️ Tin nhắn thoại"
-            : lastParsedMsg.attachment?.type === "image"
-              ? "📷 Hình ảnh"
-              : lastParsedMsg.attachment?.type === "video"
-                ? "📹 Video"
-                : lastParsedMsg.text
-          : ""),
-      messages: parsedMessages.map(
-        (m: ParsedMessage, mIdx: number): ParsedMessage => {
-          const victim = getActiveVictim();
-          const victimShortName =
-            victim?.name?.trim().split(" ").pop() || victim?.name || "Khang";
-          const isOwnerMsg =
-            m.sender === victimShortName ||
-            m.sender === "Khang" ||
-            m.sender === victim?.name;
-          return {
-            id: m.id || `msg-${idx}-${mIdx}`,
-            sender: m.sender || m.role || item.contact_name || "",
-            role: m.role || (isOwnerMsg ? "sent" : "received"),
-            text: m.text || (m as { content?: string }).content || "",
-            timestamp: m.timestamp || "",
-          attachment:
-            m.attachment ||
-            ((m as unknown as { media_url?: string }).media_url
-              ? {
-                  type:
-                    (
-                      m as unknown as {
-                        media_type?: "audio" | "image" | "video";
-                      }
-                    ).media_type || "image",
-                  url:
-                    (m as unknown as { media_type?: string }).media_type ===
-                      "audio" ||
-                    (m as unknown as { media_type?: string }).media_type ===
-                      "video"
-                      ? normalizeMediaUrl(
-                          (m as unknown as { media_url: string }).media_url,
-                        )
-                      : normalizeImageUrl(
-                          (m as unknown as { media_url: string }).media_url,
-                        ),
-                  duration: (m as unknown as { duration?: string }).duration,
-                }
-              : undefined),
-          isClue:
-            m.isClue ||
-            (m as unknown as { is_clue?: string | boolean }).is_clue ===
-              "TRUE" ||
-            (m as unknown as { is_clue?: string | boolean }).is_clue === true,
-          clueTitle:
-            m.clueTitle ||
-            (m as unknown as { clue_title?: string }).clue_title ||
-            "",
-          clueAnalysis:
-            m.clueAnalysis ||
-            (m as { clue_analysis?: string }).clue_analysis ||
-            "",
-        };
-      }),
-    };
-  });
+      const previewText = lastMsg
+        ? lastMsg.attachment?.type === "audio"
+          ? "🎙️ Tin nhắn thoại"
+          : lastMsg.attachment?.type === "image"
+            ? "📷 Hình ảnh"
+            : lastMsg.attachment?.type === "video"
+              ? "📹 Video"
+              : lastMsg.text
+        : "";
+
+      return {
+        id: t.id,
+        name: t.name,
+        phoneNumber: t.phoneNumber,
+        unread: t.unread,
+        timestamp: lastMsg?.timestamp || "",
+        previewText,
+        code: t.code,
+        messages: sortedMsgs,
+      };
+    });
+  }, [rawMessagesData]);
 
   useEffect(() => {
     setPinnedClueIds(getStorageJson<string[]>("khang_phone_pinned_clues", []));

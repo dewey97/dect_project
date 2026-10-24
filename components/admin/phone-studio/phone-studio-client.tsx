@@ -110,8 +110,23 @@ export function PhoneStudioClient({
 
   // Transform data for PhoneSimulator WYSIWYG
   const previewThreads: Conversation[] = useMemo(() => {
-    const threadMap = new Map<string, Conversation>();
-    for (const msg of messages) {
+    const threadMap = new Map<
+      string,
+      {
+        id: string;
+        name: string;
+        phoneNumber?: string;
+        timestamp: string;
+        previewText: string;
+        messages: Array<{
+          msg: Conversation["messages"][number];
+          slotIndex: number;
+        }>;
+      }
+    >();
+
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
       const key = msg.thread_key || "default";
       if (!threadMap.has(key)) {
         threadMap.set(key, {
@@ -120,29 +135,61 @@ export function PhoneStudioClient({
           phoneNumber: msg.thread_phone || undefined,
           timestamp: msg.timestamp || "",
           previewText: msg.body,
-          recoveryProgress: 100,
-          unread: false,
           messages: [],
         });
       }
       const t = threadMap.get(key)!;
+      const roleStr = String(msg.role || "")
+        .toLowerCase()
+        .trim();
+      const isSent =
+        roleStr === "sent" ||
+        roleStr === "me" ||
+        roleStr === "victim" ||
+        msg.sender === "Nạn nhân" ||
+        msg.sender === "Tôi";
+
       t.messages.push({
-        id: msg.id,
-        sender: msg.sender,
-        role: msg.role === "me" ? "sent" : "received",
-        text: msg.body,
-        timestamp: msg.timestamp || "",
-        attachment: msg.attachment_url
-          ? { type: "image", url: msg.attachment_url }
-          : undefined,
-        isClue: msg.is_clue,
-        clueTitle: msg.clue_title || undefined,
-        clueAnalysis: msg.clue_analysis || undefined,
+        msg: {
+          id: msg.id,
+          sender: msg.sender,
+          role: isSent ? "sent" : "received",
+          text: msg.body,
+          timestamp: msg.timestamp || "",
+          attachment: msg.attachment_url
+            ? {
+                type:
+                  msg.attachment_type === "audio" ||
+                  msg.attachment_type === "video"
+                    ? msg.attachment_type
+                    : "image",
+                url: msg.attachment_url,
+                duration: msg.attachment_duration || undefined,
+              }
+            : undefined,
+          isClue: msg.is_clue,
+          clueTitle: msg.clue_title || undefined,
+          clueAnalysis: msg.clue_analysis || undefined,
+        },
+        slotIndex: typeof msg.slot_index === "number" ? msg.slot_index : i,
       });
-      t.previewText = msg.body;
-      t.timestamp = msg.timestamp || t.timestamp;
     }
-    return Array.from(threadMap.values());
+
+    return Array.from(threadMap.values()).map((t) => {
+      t.messages.sort((a, b) => a.slotIndex - b.slotIndex);
+      const sorted = t.messages.map((m) => m.msg);
+      const last = sorted[sorted.length - 1];
+      return {
+        id: t.id,
+        name: t.name,
+        phoneNumber: t.phoneNumber,
+        timestamp: last?.timestamp || t.timestamp,
+        previewText: last?.text || t.previewText,
+        recoveryProgress: 100,
+        unread: false,
+        messages: sorted,
+      };
+    });
   }, [messages]);
 
   const previewPhotos: Photo[] = useMemo(() => {
@@ -196,6 +243,7 @@ export function PhoneStudioClient({
       status: "unlocked" as const,
       recoveryLevel: 100,
       lastUpdated: new Date().toISOString(),
+      model_id: device.model_id,
       chassis: device.chassis,
       wallpaper_url: device.wallpaper_url,
       selfie_url: device.selfie_url,

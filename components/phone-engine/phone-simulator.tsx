@@ -23,8 +23,7 @@ import {
 import { EvidenceAnchorProvider } from "./core/evidence-anchor-context";
 
 // Chassis
-import { IPhoneClassicChassis } from "./chassis/iphone-classic-chassis";
-import { ModernPhoneChassis } from "./chassis/modern-phone-chassis";
+import { DeviceChassis } from "./chassis/device-chassis";
 
 // System Views
 import { PhoneStatusBar } from "./system/status-bar";
@@ -114,6 +113,7 @@ function getCaseVictimDevice(): Partial<Device> {
     ...(victim.device?.label ? { label: victim.device.label } : {}),
     lastUpdated: victim.device?.lastUpdated || "",
     description: victim.device?.description || "",
+    model_id: victim.device?.model_id,
     chassis: victim.device?.chassis || "iphone_classic",
     wallpaper_url: victim.device?.wallpaper_url,
     lockscreen_url: victim.device?.lockscreen_url,
@@ -191,9 +191,7 @@ function PhoneScreenContent({
             {activeApp === "notes" && (
               <NotesApp notes={notes} onBackToHome={goHome} />
             )}
-            {activeApp === "photos" && (
-              <PhotosApp photos={photos} onBackToHome={goHome} />
-            )}
+            {activeApp === "photos" && <PhotosApp onBackToHome={goHome} />}
             {activeApp === "camera" && (
               <CameraApp onBackToHome={goHome} selfieUrl={device.selfie_url} />
             )}
@@ -349,27 +347,19 @@ function PhoneSimulatorShell({
   };
 
   const wallpaperUrl = device.wallpaper_url;
-  const isModern = device.chassis === "iphone_modern";
-
-  if (isModern) {
-    return (
-      <ModernPhoneChassis
-        onHomePress={handleHomePress}
-        wallpaperUrl={wallpaperUrl}
-      >
-        <PhoneScreenContent frameless={frameless} onClose={onClose} />
-      </ModernPhoneChassis>
-    );
-  }
+  const modelId =
+    device.model_id ||
+    (device.chassis === "iphone_modern" ? "iphone_15" : "iphone_classic");
 
   return (
-    <IPhoneClassicChassis
+    <DeviceChassis
+      modelId={modelId}
       frameless={frameless}
       onHomePress={handleHomePress}
       wallpaperUrl={wallpaperUrl}
     >
       <PhoneScreenContent frameless={frameless} onClose={onClose} />
-    </IPhoneClassicChassis>
+    </DeviceChassis>
   );
 }
 

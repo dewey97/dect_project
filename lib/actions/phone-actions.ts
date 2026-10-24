@@ -319,6 +319,161 @@ export async function deletePhoneMessage(id: string) {
   }
 }
 
+export interface BatchMessageItemInput {
+  id?: string;
+  sender?: string;
+  role?: string;
+  body: string;
+  timestamp?: string | null;
+  code?: string | null;
+  is_clue?: boolean;
+  clue_title?: string | null;
+  clue_analysis?: string | null;
+  attachment_type?: string | null;
+  attachment_url?: string | null;
+  attachment_duration?: string | null;
+}
+
+export async function savePhoneMessagesBatch(
+  caseSlug: string,
+  threadKey: string,
+  messages: BatchMessageItemInput[],
+  threadMeta?: { thread_name?: string; thread_phone?: string | null },
+) {
+  try {
+    await requireAdminAuth();
+    const slug = normalizeCaseId(caseSlug);
+    const key = threadKey.trim();
+    if (!key) throw new Error("thread_key không được để trống.");
+
+    const supabase = await createClient();
+    const resolvedName = threadMeta?.thread_name?.trim() || key;
+    const resolvedPhone = threadMeta?.thread_phone?.trim() || null;
+
+    // 1. Lấy danh sách ID hiện có trong thread này
+    const { data: existingRows, error: fetchErr } = await supabase
+      .from("phone_messages")
+      .select("id")
+      .eq("case_slug", slug)
+      .eq("thread_key", key);
+
+    if (fetchErr) throw fetchErr;
+
+    const UUID_REGEX =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    const incomingValidIds = new Set(
+      messages
+        .filter((m) => m.id && UUID_REGEX.test(m.id))
+        .map((m) => m.id as string),
+    );
+
+    // 2. Xóa các tin nhắn không còn nằm trong batch
+    const deletedIds = (existingRows || [])
+      .map((r) => r.id)
+      .filter((id) => !incomingValidIds.has(id));
+
+    if (deletedIds.length > 0) {
+      const { error: delErr } = await supabase
+        .from("phone_messages")
+        .delete()
+        .in("id", deletedIds);
+      if (delErr) throw delErr;
+    }
+
+    // 3. Nếu danh sách rỗng sau khi xóa
+    if (messages.length === 0) {
+      revalidatePath("/(admin)/studio/phone", "page");
+      return { success: true, data: [] };
+    }
+
+    // 4. Chuẩn bị payload và đánh lại slot_index tuần tự trong thread (0, 1, 2...)
+    const now = new Date().toISOString();
+    const payload = messages.map((m, slotIndex) => {
+      const roleStr = String(m.role || "")
+        .toLowerCase()
+        .trim();
+      const isSent =
+        roleStr === "sent" ||
+        roleStr === "me" ||
+        roleStr === "victim" ||
+        m.sender === "Nạn nhân" ||
+        m.sender === "Tôi";
+      const role = isSent ? "sent" : "received";
+      const sender = m.sender?.trim() || (isSent ? "Nạn nhân" : resolvedName);
+
+      const item: Record<string, unknown> = {
+        case_slug: slug,
+        thread_key: key,
+        thread_name: resolvedName,
+        thread_phone: resolvedPhone,
+        sender,
+        role,
+        body: m.body || "",
+        timestamp: m.timestamp?.trim() || null,
+        code: m.code?.trim() || null,
+        is_clue: Boolean(m.is_clue),
+        clue_title: m.clue_title?.trim() || null,
+        clue_analysis: m.clue_analysis?.trim() || null,
+        attachment_type: m.attachment_type || null,
+        attachment_url: m.attachment_url?.trim() || null,
+        attachment_duration: m.attachment_duration?.trim() || null,
+        slot_index: slotIndex,
+        updated_at: now,
+      };
+
+      if (m.id && UUID_REGEX.test(m.id)) {
+        item.id = m.id;
+      }
+
+      return item;
+    });
+
+    const { error: upsertErr } = await supabase
+      .from("phone_messages")
+      .upsert(payload);
+
+    if (upsertErr) throw upsertErr;
+
+    // Lấy lại danh sách đầy đủ sau khi upsert
+    const { data: refreshed, error: refErr } = await supabase
+      .from("phone_messages")
+      .select("*")
+      .eq("case_slug", slug)
+      .eq("thread_key", key)
+      .order("slot_index", { ascending: true });
+
+    if (refErr) throw refErr;
+
+    revalidatePath("/(admin)/studio/phone", "page");
+    return { success: true, data: (refreshed || []) as DbPhoneMessage[] };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return { success: false, error: msg, data: [] };
+  }
+}
+
+export async function deletePhoneThread(caseSlug: string, threadKey: string) {
+  try {
+    await requireAdminAuth();
+    const slug = normalizeCaseId(caseSlug);
+    const supabase = await createClient();
+
+    const { error } = await supabase
+      .from("phone_messages")
+      .delete()
+      .eq("case_slug", slug)
+      .eq("thread_key", threadKey);
+
+    if (error) throw error;
+    revalidatePath("/(admin)/studio/phone", "page");
+    return { success: true };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return { success: false, error: msg };
+  }
+}
+
 // ── 5. Phone Photos (Thư viện ảnh) ──
 
 export async function getPhonePhotos(caseId: string) {

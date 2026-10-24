@@ -20,12 +20,16 @@ export function EvidenceAnchorItem({
 }: EvidenceAnchorItemProps) {
   const itemRef = useRef<HTMLDivElement>(null);
   const anchorCtx = useEvidenceAnchors();
+  const registerAnchor = anchorCtx?.registerAnchor;
+  const unregisterAnchor = anchorCtx?.unregisterAnchor;
+  const updateAnchorPos = anchorCtx?.updateAnchorPos;
 
   useEffect(() => {
-    if (!anchorCtx || !code) return;
+    if (!registerAnchor || !unregisterAnchor || !updateAnchorPos || !code)
+      return;
 
     // Đăng ký anchor ban đầu
-    anchorCtx.registerAnchor({
+    registerAnchor({
       id: code,
       top: 0,
       visible: false,
@@ -51,7 +55,7 @@ export function EvidenceAnchorItem({
         itemRect.bottom > screenRect.top + 35 &&
         itemRect.top < screenRect.bottom - 20;
 
-      anchorCtx.updateAnchorPos(code, Math.round(relativeTop), isVisible);
+      updateAnchorPos(code, Math.round(relativeTop), isVisible);
     };
 
     // Kiểm tra ngay khi mount
@@ -60,7 +64,10 @@ export function EvidenceAnchorItem({
     // Tìm cha có scroll để lắng nghe sự kiện scroll
     const findScrollParent = (node: HTMLElement | null): HTMLElement | null => {
       if (!node) return null;
-      if (node.scrollHeight > node.clientHeight && getComputedStyle(node).overflowY !== "visible") {
+      if (
+        node.scrollHeight > node.clientHeight &&
+        getComputedStyle(node).overflowY !== "visible"
+      ) {
         return node;
       }
       return findScrollParent(node.parentElement);
@@ -83,9 +90,9 @@ export function EvidenceAnchorItem({
       clearTimeout(t);
       targetToListen.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScroll);
-      anchorCtx.unregisterAnchor(code);
+      unregisterAnchor(code);
     };
-  }, [code, anchorCtx]);
+  }, [code, registerAnchor, unregisterAnchor, updateAnchorPos]);
 
   return (
     <div ref={itemRef} className={className} data-evidence-code={code}>

@@ -17,6 +17,11 @@ import {
 } from "lucide-react";
 import type { CaseCharacterDevice } from "@/lib/types/database";
 import {
+  DEVICE_PRESET_LIST,
+  getDevicePreset,
+  type PhonePresetId,
+} from "@/lib/phone/devices";
+import {
   updateDeviceProfile,
   uploadPhoneAsset,
 } from "@/lib/actions/phone-actions";
@@ -204,29 +209,39 @@ export function DeviceForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-medium text-zinc-300 mb-1">
-              Khung viền máy (Chassis)
+              Đời máy & Khung viền (Device Preset)
             </label>
             <select
-              value={device.chassis || "iphone_classic"}
-              onChange={(e) =>
-                handleChange(
-                  "chassis",
-                  e.target.value as
-                    "iphone_classic" | "iphone_modern" | "android_vintage",
-                )
+              id="device-preset-select"
+              data-testid="device-preset-select"
+              value={
+                device.model_id ||
+                getDevicePreset(device.model_id, device.chassis).id
               }
+              onChange={(e) => {
+                const presetId = e.target.value as PhonePresetId;
+                const chosen = getDevicePreset(presetId);
+                const updated: CaseCharacterDevice = {
+                  ...device,
+                  model_id: chosen.id,
+                  chassis: chosen.chassis,
+                };
+                setDevice(updated);
+                onDeviceChange(updated);
+              }}
               className="w-full px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-sky-500"
             >
-              <option value="iphone_classic">
-                iPhone Classic (Touch ID, màn hình 16:9, viền trên/dưới)
-              </option>
-              <option value="iphone_modern">
-                iPhone Modern (Màn hình tràn viền, Dynamic Island, Home Bar)
-              </option>
-              <option value="android_vintage">
-                Android Vintage (Phím điều hướng cổ điển)
-              </option>
+              {DEVICE_PRESET_LIST.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.name} ({preset.description})
+                </option>
+              ))}
             </select>
+            <p className="text-[11px] text-zinc-400 mt-1">
+              Kích thước khung:{" "}
+              {getDevicePreset(device.model_id, device.chassis).frameW}×
+              {getDevicePreset(device.model_id, device.chassis).frameH}px
+            </p>
           </div>
 
           <div>
