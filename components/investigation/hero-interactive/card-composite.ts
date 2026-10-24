@@ -34,6 +34,7 @@ export const resolveSuspectPhotoUrl = (
     lower.includes("chalk");
 
   // 1. Check live photos map first (Live-First rule)
+  const isCase000 = !caseId || caseId === "case-000" || caseId === "case_000";
   if (photosMap) {
     if (isCrimeScenePin) {
       const liveCrime =
@@ -42,7 +43,7 @@ export const resolveSuspectPhotoUrl = (
         photosMap.get("thi_the");
       if (liveCrime) return liveCrime;
     }
-    if (lower.includes("khang")) {
+    if (isCase000 && lower.includes("khang")) {
       const liveKhang = photosMap.get("avatar_khang") || photosMap.get("khang");
       if (liveKhang) return liveKhang;
     }
@@ -53,7 +54,6 @@ export const resolveSuspectPhotoUrl = (
     if (directLabel) return directLabel;
 
     // Fallback to case-000 static character list only for case-000
-    const isCase000 = !caseId || caseId === "case-000" || caseId === "case_000";
     if (isCase000) {
       const char =
         findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);

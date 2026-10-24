@@ -267,12 +267,15 @@ export function renderScene({
     // If pin has a resolved photo URL (Polaroid format for suspects / victims / crime scenes)
     if (resolvedPhotoUrl) {
       const isReinvestigate =
+        pin.nodeKind === "reinvestigate" ||
         pin.id === "c0-pin-reinvestigate" ||
         (pin.label && pin.label.toLowerCase().includes("khám xét"));
       const isVictimPhone =
+        pin.nodeKind === "victim_phone" ||
         pin.id === "c0-pin-victim-phone" ||
         (pin.id.includes("phone") &&
           pin.id !== "c0-pin-phone" &&
+          pin.nodeKind !== "phone_lookup" &&
           Boolean(pin.photoUrl));
 
       let loadedSuspectImg: HTMLCanvasElement | HTMLImageElement | null = null;
@@ -297,22 +300,24 @@ export function renderScene({
           380;
 
         const isReinvestigateProp =
+          pin.nodeKind === "reinvestigate" ||
           pin.id === "c0-pin-reinvestigate" ||
           Boolean(
             pin.photoUrl &&
             (pin.photoUrl.includes("crime_scene") ||
               pin.photoUrl.includes("reinvestigation")),
           );
-        const isKhang =
-          !isVictimPhone &&
-          !isReinvestigateProp &&
-          (pin.id.includes("khang") ||
-            (pin.label && pin.label.toLowerCase().includes("khang")));
+        const isVictim =
+          pin.nodeKind === "victim" ||
+          (!isVictimPhone &&
+            !isReinvestigateProp &&
+            (pin.id.includes("khang") ||
+              (pin.label && pin.label.toLowerCase().includes("khang"))));
         const isCrimeScene =
           pin.id.includes("crime-scene") ||
           pin.id.includes("thi-the") ||
           (pin.label && pin.label.toLowerCase().includes("thi thể"));
-        const baseCardWidth = isKhang
+        const baseCardWidth = isVictim
           ? 204
           : isCrimeScene
             ? 186
@@ -355,14 +360,15 @@ export function renderScene({
         context.restore();
       } else {
         // Lightweight fallback while image is loading
-        const isKhang =
+        const isVictim =
+          pin.nodeKind === "victim" ||
           pin.id.includes("khang") ||
           (pin.label && pin.label.toLowerCase().includes("khang"));
         const isCrimeScene =
           pin.id.includes("crime-scene") ||
           pin.id.includes("thi-the") ||
           (pin.label && pin.label.toLowerCase().includes("thi thể"));
-        const baseCardWidth = isKhang ? 204 : isCrimeScene ? 186 : 158;
+        const baseCardWidth = isVictim ? 204 : isCrimeScene ? 186 : 158;
         const baseCardHeight = isCrimeScene
           ? (baseCardWidth * 420) / 560
           : (baseCardWidth * 380) / 300;
@@ -379,27 +385,31 @@ export function renderScene({
       const isPhotoSelected = selectedPinId === pin.id;
       if (isPhotoHovered || isPhotoSelected) {
         const isVictimPhone =
+          pin.nodeKind === "victim_phone" ||
           pin.id === "c0-pin-victim-phone" ||
           (pin.id.includes("phone") &&
             pin.id !== "c0-pin-phone" &&
+            pin.nodeKind !== "phone_lookup" &&
             Boolean(pin.photoUrl));
         const isReinvestigateProp =
+          pin.nodeKind === "reinvestigate" ||
           pin.id === "c0-pin-reinvestigate" ||
           Boolean(
             pin.photoUrl &&
             (pin.photoUrl.includes("crime_scene") ||
               pin.photoUrl.includes("reinvestigation")),
           );
-        const isKhang =
-          !isVictimPhone &&
-          !isReinvestigateProp &&
-          (pin.id.includes("khang") ||
-            (pin.label && pin.label.toLowerCase().includes("khang")));
+        const isVictim =
+          pin.nodeKind === "victim" ||
+          (!isVictimPhone &&
+            !isReinvestigateProp &&
+            (pin.id.includes("khang") ||
+              (pin.label && pin.label.toLowerCase().includes("khang"))));
         const isCrimeScene =
           pin.id.includes("crime-scene") ||
           pin.id.includes("thi-the") ||
           (pin.label && pin.label.toLowerCase().includes("thi thể"));
-        const baseCardWidth = isKhang
+        const baseCardWidth = isVictim
           ? 204
           : isCrimeScene
             ? 186
@@ -489,140 +499,79 @@ export function renderScene({
 
       const customTextureUrl = pin.noteTextureUrl as string | undefined;
 
-      if (isCustomPin) {
-        if (customTextureUrl) {
-          noteUrl = customTextureUrl;
-          isPreRendered = customTextureUrl.includes("rendered_notes/");
-        } else if (isWhiteNote) {
-          const whiteVariants = [
-            "/images/cases/case_000/clue_notes/clean_note_white_1.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_2.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_3.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_4.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_5.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_6.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_7.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_8.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_9.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_10.png",
-            "/images/cases/case_000/clue_notes/clean_note_white_11.png",
-          ];
-          const hash = (pin.id || "")
-            .split("")
-            .reduce((acc, c) => acc + c.charCodeAt(0), 0);
-          noteUrl = whiteVariants[Math.abs(hash) % whiteVariants.length];
-          isPreRendered = false;
-        } else {
-          const yellowVariants = [
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_1.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_2.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_3.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_4.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_5.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_6.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_7.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_8.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_9.png",
-            "/images/cases/case_000/clue_notes/clean_sticky_yellow_10.png",
-          ];
-          const hash = (pin.id || "")
-            .split("")
-            .reduce((acc, c) => acc + c.charCodeAt(0), 0);
-          noteUrl = yellowVariants[Math.abs(hash) % yellowVariants.length];
-          isPreRendered = false;
-        }
-      } else if (customTextureUrl) {
+      if (customTextureUrl) {
         noteUrl = customTextureUrl;
-        isPreRendered = customTextureUrl.includes("rendered_notes/");
+        isPreRendered =
+          customTextureUrl.includes("rendered_notes/") ||
+          customTextureUrl.includes("/notes/");
       } else if (
+        pin.nodeKind === "evidence_hub" ||
         pin.id === "c0-pin-evidence" ||
         upperLabel.includes("CHỨNG CỨ")
       ) {
-        noteUrl =
-          "/images/cases/case_000/clue_notes/rendered_notes/note_bo_sung_chung_cu.png";
+        noteUrl = "/images/board/notes/note_bo_sung_chung_cu.png";
         isPreRendered = true;
       } else if (
+        pin.nodeKind === "suspects_hub" ||
         pin.id === "c0-pin-suspects" ||
         upperLabel.includes("NGHI PHẠM")
       ) {
-        noteUrl =
-          "/images/cases/case_000/clue_notes/rendered_notes/note_nghi_pham.png";
+        noteUrl = "/images/board/notes/note_nghi_pham.png";
         isPreRendered = true;
       } else if (
+        pin.nodeKind === "followup" ||
         pin.id === "c0-pin-followup-vu" ||
         pin.id === "c0-pin-followup-tung" ||
         pin.id === "c0-pin-followup-ha" ||
         pin.id === "c0-pin-question" ||
         pin.id.startsWith("c0-pin-followup") ||
+        pin.id.startsWith("followup-") ||
         upperLabel.includes("NGHI VẤN") ||
         upperLabel.includes("CÂU HỎI")
       ) {
-        noteUrl =
-          "/images/cases/case_000/clue_notes/rendered_notes/note_nghi_van.png";
-        isPreRendered = true;
-      } else if (pin.id === "c0-pin-phone" || upperLabel.includes("MỞ RỘNG")) {
-        noteUrl =
-          "/images/cases/case_000/clue_notes/rendered_notes/note_mo_rong_dieu_tra.png";
+        noteUrl = "/images/board/notes/note_nghi_van.png";
         isPreRendered = true;
       } else if (
+        pin.nodeKind === "phone_lookup" ||
+        pin.id === "c0-pin-phone" ||
+        upperLabel.includes("MỞ RỘNG")
+      ) {
+        noteUrl = "/images/board/notes/note_mo_rong_dieu_tra.png";
+        isPreRendered = true;
+      } else if (
+        pin.nodeKind === "reinvestigate" ||
         pin.id === "c0-pin-reinvestigate" ||
         upperLabel.includes("KHÁM XÉT") ||
         upperLabel.includes("KHÁM NGHIỆM")
       ) {
-        noteUrl =
-          "/images/cases/case_000/clue_notes/rendered_notes/note_kham_xet_lai.png";
+        noteUrl = "/images/board/notes/note_kham_xet_lai.png";
         isPreRendered = true;
       } else if (
+        pin.nodeKind === "indictment" ||
         pin.id === "c0-pin-indictment" ||
         upperLabel.includes("KẾT LUẬN") ||
         upperLabel.includes("TRUY TỐ")
       ) {
-        noteUrl =
-          "/images/cases/case_000/clue_notes/rendered_notes/note_ket_luan_dieu_tra.png";
+        noteUrl = "/images/board/notes/note_ket_luan_dieu_tra.png";
         isPreRendered = true;
       } else if (isWhiteNote) {
-        const whiteVariants = [
-          "/images/cases/case_000/clue_notes/clean_note_white_1.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_2.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_3.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_4.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_5.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_6.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_7.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_8.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_9.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_10.png",
-          "/images/cases/case_000/clue_notes/clean_note_white_11.png",
-        ];
-        const hash = (pin.id || "")
-          .split("")
-          .reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        noteUrl = whiteVariants[Math.abs(hash) % whiteVariants.length];
+        noteUrl = "/images/board/notes/note_mo_rong_dieu_tra.png";
+        isPreRendered = false;
       } else {
-        const yellowVariants = [
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_1.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_2.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_3.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_4.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_5.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_6.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_7.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_8.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_9.png",
-          "/images/cases/case_000/clue_notes/clean_sticky_yellow_10.png",
-        ];
-        const hash = (pin.id || "")
-          .split("")
-          .reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        noteUrl = yellowVariants[Math.abs(hash) % yellowVariants.length];
+        noteUrl = "/images/board/notes/note_nghi_van.png";
+        isPreRendered = false;
       }
 
       const loadedNoteImg = getLoadedImage(noteUrl);
 
       const isIndictment =
-        pin.id === "c0-pin-indictment" || upperLabel.includes("KẾT LUẬN");
+        pin.nodeKind === "indictment" ||
+        pin.id === "c0-pin-indictment" ||
+        upperLabel.includes("KẾT LUẬN");
       const isFollowup =
-        pin.id.startsWith("c0-pin-followup") || pin.id.startsWith("followup-");
+        pin.nodeKind === "followup" ||
+        pin.id.startsWith("c0-pin-followup") ||
+        pin.id.startsWith("followup-");
       const sizeMultiplier = 1.0;
 
       // Note size: preserve aspect ratio cleanly without distortion
@@ -647,16 +596,22 @@ export function renderScene({
       let pinAnchorX = 0.5;
       let pinAnchorY = 0.08;
 
-      if (pin.id === "c0-pin-evidence" || upperLabel.includes("CHỨNG CỨ")) {
+      if (
+        pin.nodeKind === "evidence_hub" ||
+        pin.id === "c0-pin-evidence" ||
+        upperLabel.includes("CHỨNG CỨ")
+      ) {
         pinAnchorX = 0.5;
         pinAnchorY = 0.08;
       } else if (
+        pin.nodeKind === "suspects_hub" ||
         pin.id === "c0-pin-suspects" ||
         upperLabel.includes("NGHI PHẠM")
       ) {
         pinAnchorX = 0.5;
         pinAnchorY = 0.08;
       } else if (
+        pin.nodeKind === "followup" ||
         pin.id === "c0-pin-followup-vu" ||
         pin.id === "c0-pin-followup-tung" ||
         pin.id === "c0-pin-followup-ha" ||
@@ -666,10 +621,15 @@ export function renderScene({
       ) {
         pinAnchorX = 0.5;
         pinAnchorY = 0.08;
-      } else if (pin.id === "c0-pin-phone" || upperLabel.includes("MỞ RỘNG")) {
+      } else if (
+        pin.nodeKind === "phone_lookup" ||
+        pin.id === "c0-pin-phone" ||
+        upperLabel.includes("MỞ RỘNG")
+      ) {
         pinAnchorX = 0.5;
         pinAnchorY = 0.075;
       } else if (
+        pin.nodeKind === "reinvestigate" ||
         pin.id === "c0-pin-reinvestigate" ||
         upperLabel.includes("KHÁM XÉT") ||
         upperLabel.includes("KHÁM NGHIỆM")
@@ -677,6 +637,7 @@ export function renderScene({
         pinAnchorX = 0.5;
         pinAnchorY = 0.075;
       } else if (
+        pin.nodeKind === "indictment" ||
         pin.id === "c0-pin-indictment" ||
         upperLabel.includes("KẾT LUẬN")
       ) {
@@ -858,6 +819,7 @@ export function renderScene({
 
       // Dấu tick '✓' kiểu font chữ viết tay, chỉ hiển thị duy nhất trên node 'Mở rộng điều tra' khi đã giải xong
       const isPhoneNode =
+        pin.nodeKind === "phone_lookup" ||
         pin.id === "c0-pin-phone" ||
         (pin.label || "").toUpperCase().includes("MỞ RỘNG");
       if (pin.isSolved && isPhoneNode) {
@@ -886,6 +848,8 @@ export function renderScene({
 
     // Pinhole puncture (Skip for physical evidence props which already have realistic self-contained shadows & pins)
     const isSelfContainedProp =
+      pin.nodeKind === "victim_phone" ||
+      pin.nodeKind === "reinvestigate" ||
       pin.id === "c0-pin-victim-phone" ||
       pin.id === "c0-pin-reinvestigate" ||
       Boolean(
@@ -1049,6 +1013,8 @@ export function renderScene({
     const pinPosition = pinPositionsMap.get(pin.id);
     if (!pinPosition) return;
     if (
+      pin.nodeKind === "victim_phone" ||
+      pin.nodeKind === "reinvestigate" ||
       pin.id === "c0-pin-victim-phone" ||
       pin.id === "c0-pin-reinvestigate" ||
       Boolean(
@@ -1061,13 +1027,19 @@ export function renderScene({
     }
 
     const isEvidencePin =
+      pin.nodeKind === "evidence_hub" ||
+      pin.nodeKind === "photo" ||
       pin.id === "c0-pin-evidence" ||
       (pin.label && pin.label.toLowerCase().includes("bổ sung chứng cứ"));
     const isSuspectPin =
+      pin.nodeKind === "suspect" ||
+      pin.nodeKind === "suspects_hub" ||
+      pin.nodeKind === "victim" ||
       pin.id === "c0-pin-suspects" ||
       pin.id.includes("suspect") ||
       (pin.label && pin.label.toLowerCase().includes("nghi phạm"));
     const isIndictmentPin =
+      pin.nodeKind === "indictment" ||
       pin.id === "c0-pin-indictment" ||
       (pin.label && pin.label.toLowerCase().includes("kết luận"));
 

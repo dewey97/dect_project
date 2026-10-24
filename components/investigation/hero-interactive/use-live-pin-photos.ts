@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { normalizeImageUrl } from "@/lib/utils";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 
@@ -29,8 +30,11 @@ export interface PinPhotoItem {
  * Nạp ảnh từ Supabase phone_photos (/api/phone-data/photos) và case_evidence,
  * tạo bản đồ tra cứu ảnh ghim / avatar. Cắt bỏ Google Sheets runtime.
  */
-export function useLivePinPhotos(caseId: string, onRequestRender?: () => void) {
-  const effectiveCaseId = caseId || "case_000";
+export function useLivePinPhotos(
+  caseId?: string,
+  onRequestRender?: () => void,
+) {
+  const effectiveCaseId = caseId ? normalizeCaseId(caseId) : "";
   const { data: phonePhotos } = usePhoneData<PinPhotoItem>(
     "photos",
     effectiveCaseId,
@@ -39,6 +43,7 @@ export function useLivePinPhotos(caseId: string, onRequestRender?: () => void) {
 
   const sheetPhotosMap = useMemo(() => {
     const map = new Map<string, string>();
+    if (!effectiveCaseId) return map;
     const allPhotos: any[] = [...(phonePhotos || []), ...(rawEvidence || [])];
     if (allPhotos.length === 0) return map;
 
@@ -60,67 +65,16 @@ export function useLivePinPhotos(caseId: string, onRequestRender?: () => void) {
       if (code) {
         const pc = code.toLowerCase().trim();
         map.set(pc, normalized);
-        if (pc.startsWith("avatar_")) {
-          map.set(pc.replace("avatar_", ""), normalized);
-        }
-        if (
-          pc === "crime_scene" ||
-          pc === "chalk_outline" ||
-          pc === "thi_the" ||
-          pc === "a-06" ||
-          pc.includes("chalk")
-        ) {
-          map.set("crime_scene", normalized);
-          map.set("chalk_outline", normalized);
-          map.set("thi_the", normalized);
-        }
       }
       const rawTitle = item.label || item.title || item.name;
       const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
       if (title) {
         const titleLower = title.toLowerCase().trim();
         map.set(titleLower, normalized);
-        const pc = code.toLowerCase();
-        const category = typeof item.category === "string" ? item.category : "";
-        const isAvatar =
-          pc.startsWith("avatar_") ||
-          category.toUpperCase().trim() === "AVATAR" ||
-          titleLower.includes("chân dung");
-
-        // Only map suspect keys if the row is truly an avatar/portrait photo
-        if (isAvatar) {
-          if (titleLower.includes("khang")) map.set("khang", normalized);
-          if (titleLower.includes("vũ") || titleLower.includes("vu"))
-            map.set("vu", normalized);
-          if (titleLower.includes("tùng") || titleLower.includes("tung"))
-            map.set("tung", normalized);
-          if (titleLower.includes("hà") || titleLower.includes("ha"))
-            map.set("ha", normalized);
-          if (titleLower.includes("mai")) map.set("mai", normalized);
-          if (titleLower.includes("đạt") || titleLower.includes("dat"))
-            map.set("dat", normalized);
-          if (titleLower.includes("lụa") || titleLower.includes("lua"))
-            map.set("lua", normalized);
-          if (titleLower.includes("vy")) map.set("vy", normalized);
-          if (titleLower.includes("tiến") || titleLower.includes("tien"))
-            map.set("tien", normalized);
-        }
-
-        if (
-          titleLower.includes("thi thể") ||
-          titleLower.includes("thi-the") ||
-          titleLower.includes("chalk") ||
-          (titleLower.includes("hiện trường") &&
-            !titleLower.includes("phòng khách"))
-        ) {
-          map.set("crime_scene", normalized);
-          map.set("chalk_outline", normalized);
-          map.set("thi_the", normalized);
-        }
       }
     }
     return map;
-  }, [phonePhotos, rawEvidence]);
+  }, [effectiveCaseId, phonePhotos, rawEvidence]);
 
   const sheetPhotosMapRef = useRef<Map<string, string>>(sheetPhotosMap);
 
