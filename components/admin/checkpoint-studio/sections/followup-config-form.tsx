@@ -1,11 +1,14 @@
 "use client";
 
+import type { DbCaseCheckpoint } from "@/lib/types/database";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { CodeChipInput } from "../code-chip-input";
 
 interface FollowupConfigFormProps {
   draft: CheckpointStudioDraft;
+  checkpoints?: DbCaseCheckpoint[];
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
 }
 
@@ -20,10 +23,15 @@ const FOLLOWUP_TYPES = [
 
 export function FollowupConfigForm({
   draft,
+  checkpoints = [],
   onChange,
 }: FollowupConfigFormProps) {
   const config = draft.answerConfig;
   const questionType = draft.questionType || "time";
+
+  const interrogationCheckpoints = checkpoints.filter(
+    (c) => c.kind === "suspect_interrogation" || c.type === "evidence_picker",
+  );
 
   const setConfig = (patch: Partial<typeof config>) => {
     onChange({ answerConfig: { ...config, ...patch } });
@@ -97,35 +105,31 @@ export function FollowupConfigForm({
         />
       </Field>
 
-      {/* Checkpoint gốc (followup_of) */}
-      <Field label="Mã Checkpoint gốc cần vượt qua trước">
-        <Input
+      {/* Checkpoint thẩm tra gốc */}
+      <Field label="Checkpoint thẩm tra gốc">
+        <select
           value={draft.followupOf || ""}
           onChange={(e) => onChange({ followupOf: e.target.value })}
-          placeholder="VD: cp-000-1a"
-          className={INPUT_CLASS}
-        />
+          className="h-7 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50"
+        >
+          <option value="">-- Chọn checkpoint gốc --</option>
+          {interrogationCheckpoints.map((cp) => (
+            <option key={cp.checkpoint_id} value={cp.checkpoint_id}>
+              {cp.title
+                ? `${cp.title} (${cp.checkpoint_id})`
+                : cp.checkpoint_id}
+            </option>
+          ))}
+          {draft.followupOf &&
+            !interrogationCheckpoints.some(
+              (cp) => cp.checkpoint_id === draft.followupOf,
+            ) && (
+              <option value={draft.followupOf}>
+                ⚠ {draft.followupOf} (không tìm thấy)
+              </option>
+            )}
+        </select>
       </Field>
     </div>
-  );
-}
-
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block space-y-1">
-      <span className="flex items-baseline gap-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-        {required && <span className="text-amber-400">*</span>}
-      </span>
-      {children}
-    </label>
   );
 }

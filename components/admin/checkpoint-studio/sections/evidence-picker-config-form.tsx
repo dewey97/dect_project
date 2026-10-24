@@ -6,8 +6,9 @@ import type {
   CheckpointStudioDraft,
   EvidencePickerConfig,
 } from "@/lib/types/checkpoint-studio";
+import { Field } from "@/components/ui/field";
+import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 import { CodeChipInput } from "../code-chip-input";
-import { AutoExpandingTextarea } from "../auto-expanding-textarea";
 import { cn } from "@/lib/utils";
 import { CheckpointHintsForm } from "./checkpoint-hints-form";
 
@@ -22,7 +23,9 @@ export function EvidencePickerConfigForm({
   draft,
   onChange,
 }: EvidencePickerConfigFormProps) {
-  const [activeTab, setActiveTab] = useState<"motive" | "contradiction">("motive");
+  const [activeTab, setActiveTab] = useState<"motive" | "contradiction">(
+    "motive",
+  );
   const config = draft.answerConfig;
 
   const setList = (key: ConfigListKey, value: string[]) => {
@@ -100,7 +103,7 @@ export function EvidencePickerConfigForm({
           </Field>
 
           <Field label="Bối cảnh">
-            <AutoExpandingTextarea
+            <AutoGrowTextarea
               value={config.motiveContext || ""}
               onChange={(e) =>
                 onChange({
@@ -146,11 +149,14 @@ export function EvidencePickerConfigForm({
           </Field>
 
           <Field label="Bối cảnh">
-            <AutoExpandingTextarea
+            <AutoGrowTextarea
               value={config.contradictionContext || ""}
               onChange={(e) =>
                 onChange({
-                  answerConfig: { ...config, contradictionContext: e.target.value },
+                  answerConfig: {
+                    ...config,
+                    contradictionContext: e.target.value,
+                  },
                 })
               }
               minRows={1}
@@ -172,25 +178,5 @@ export function EvidencePickerConfigForm({
         </div>
       )}
     </div>
-  );
-}
-
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block space-y-1">
-      <span className="flex items-baseline gap-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-        {required && <span className="text-amber-400">*</span>}
-      </span>
-      {children}
-    </label>
   );
 }

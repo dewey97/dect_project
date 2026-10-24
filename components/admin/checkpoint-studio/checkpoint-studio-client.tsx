@@ -25,6 +25,7 @@ import {
   updateCheckpointDependencies,
   updateCheckpointPositions,
 } from "@/lib/actions/checkpoint-actions";
+import { getCharactersByCase } from "@/lib/actions/character-actions";
 import { createNewCase } from "@/lib/actions/case-actions";
 import { slugifyVietnamese } from "@/lib/text";
 import {
@@ -182,12 +183,17 @@ export function CheckpointStudioClient({
   const [isLintModalOpen, setIsLintModalOpen] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/characters?caseId=${caseId}`)
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success && json.data) setCharacters(json.data);
+    let cancelled = false;
+    getCharactersByCase(caseId)
+      .then((res) => {
+        if (!cancelled && res.success && res.data) {
+          setCharacters(res.data);
+        }
       })
       .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [caseId]);
 
   const lintResult = useMemo(() => {
@@ -306,10 +312,11 @@ export function CheckpointStudioClient({
   const loadCase = useCallback(async (nextCaseId: string) => {
     setIsLoading(true);
     try {
-      const [cpRes, dossierList, docsList] = await Promise.all([
+      const [cpRes, dossierList, docsList, charsRes] = await Promise.all([
         getCheckpointsByCase(nextCaseId),
         getCaseDossiers(nextCaseId),
         getAllCaseDocumentsCatalog(nextCaseId),
+        getCharactersByCase(nextCaseId),
       ]);
       if (!cpRes.success) {
         toast.error(cpRes.error);
@@ -318,6 +325,9 @@ export function CheckpointStudioClient({
       setRows(cpRes.data);
       setDossiers(dossierList);
       setAvailableDocs(docsList);
+      if (charsRes.success && charsRes.data) {
+        setCharacters(charsRes.data);
+      }
       setPendingEdges(buildDependencyEdges(cpRes.data));
       setPendingPositions({});
       setFocusRequest(null);
@@ -877,6 +887,8 @@ export function CheckpointStudioClient({
             <CheckpointEditor
               draft={draft}
               dossiers={dossiers}
+              characters={characters}
+              checkpoints={rows}
               onChange={updateDraft}
               onSave={handleSave}
               onDelete={handleDelete}

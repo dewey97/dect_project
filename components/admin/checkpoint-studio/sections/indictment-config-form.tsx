@@ -1,6 +1,7 @@
 "use client";
 
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
+import { Field } from "@/components/ui/field";
 import { CodeChipInput } from "../code-chip-input";
 
 interface IndictmentConfigFormProps {
@@ -35,7 +36,7 @@ export function IndictmentConfigForm({
         <CodeChipInput
           value={config.validMotives || []}
           onChange={(validMotives) => setConfig({ validMotives })}
-          placeholder="VD: Mâu thuẫn tình cảm, Tư thù cá nhân..."
+          placeholder="VD: Mâu thuẫn tình cảm..."
           className="min-h-8 border-white/10 bg-black/40"
         />
       </Field>
@@ -60,25 +61,5 @@ export function IndictmentConfigForm({
         />
       </Field>
     </div>
-  );
-}
-
-function Field({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block space-y-1">
-      <span className="flex items-baseline gap-1 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-        {required && <span className="text-amber-400">*</span>}
-      </span>
-      {children}
-    </label>
   );
 }

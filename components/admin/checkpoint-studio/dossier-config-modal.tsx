@@ -198,7 +198,7 @@ export function DossierConfigModal({
                     setDossierKey(slugifyVietnamese(e.target.value));
                   }
                 }}
-                placeholder="Ví dụ: Bộ A, Bộ B, Hồ Sơ Hiện Trường..."
+                placeholder="VD: Bộ A, Hồ Sơ Hiện Trường..."
                 className="border-white/10 bg-[#16161c] text-zinc-100 placeholder:text-zinc-600 focus:border-amber-400"
               />
             </div>
@@ -221,7 +221,7 @@ export function DossierConfigModal({
               <Input
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Mô tả tóm tắt nội dung bộ hồ sơ..."
+                placeholder="Mô tả tóm tắt nội dung..."
                 className="border-white/10 bg-[#16161c] text-zinc-100 placeholder:text-zinc-600 focus:border-amber-400"
               />
             </div>
@@ -278,7 +278,7 @@ export function DossierConfigModal({
               <Input
                 value={customCodeInput}
                 onChange={(e) => setCustomCodeInput(e.target.value)}
-                placeholder="Thêm mã tài liệu tự do (VD: D-04, A-01, KL-01)..."
+                placeholder="Mã tài liệu tự do (VD: D-04)..."
                 className="h-8 border-white/10 bg-[#181820] text-xs font-mono text-zinc-200 placeholder:font-sans placeholder:text-zinc-600"
               />
               <Button

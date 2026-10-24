@@ -1,7 +1,11 @@
 "use client";
 
 import { Play, Trash2 } from "lucide-react";
-import type { DbCaseDossier } from "@/lib/types/database";
+import type {
+  DbCaseCheckpoint,
+  DbCaseDossier,
+  DbCaseCharacter,
+} from "@/lib/types/database";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import { Button } from "@/components/ui/button";
 import { CheckpointIdentityForm } from "./sections/checkpoint-identity-form";
@@ -19,6 +23,8 @@ import { cn } from "@/lib/utils";
 interface CheckpointEditorProps {
   draft: CheckpointStudioDraft | null;
   dossiers?: DbCaseDossier[];
+  characters?: DbCaseCharacter[];
+  checkpoints?: DbCaseCheckpoint[];
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
   onSave: () => void;
   onDelete: () => void;
@@ -47,6 +53,8 @@ function Section({
 export function CheckpointEditor({
   draft,
   dossiers = [],
+  characters = [],
+  checkpoints = [],
   onChange,
   onSave,
   onDelete,
@@ -134,6 +142,7 @@ export function CheckpointEditor({
             <CheckpointIdentityForm
               draft={draft}
               dossiers={dossiers}
+              characters={characters}
               onChange={onChange}
             />
           )}
@@ -160,7 +169,11 @@ export function CheckpointEditor({
 
               {effectiveKind === "followup" && (
                 <Section title="Cấu hình câu hỏi phụ">
-                  <FollowupConfigForm draft={draft} onChange={onChange} />
+                  <FollowupConfigForm
+                    draft={draft}
+                    checkpoints={checkpoints}
+                    onChange={onChange}
+                  />
                 </Section>
               )}
 
