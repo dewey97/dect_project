@@ -10,12 +10,68 @@
 
 | Phần | Đã có trên `main` | Còn lại |
 | ---- | ----------------- | ------- |
-| A | ✅ `16cb60c` — A1–A7, A9 | ⛔ A8 migration 38 chưa chạy production; A10 checklist VPS chưa xác nhận |
+| A | ✅ `16cb60c` — A1–A7, A9 | A8 migration 38 chưa chạy production (→ B4, đã được duyệt); A10 checklist VPS — chủ dự án tự làm, không thuộc plan này |
 | WT-5 evidence | 🟡 `71ee301` — bỏ metadata ở form/preview/hook, khối "Nâng cao" `code`, bắt đầu nhóm tray theo dossier | **13 lỗi `tsc`** (xem B1); `page.tsx` metadata gán cứng; `integrity-indicator`; `isDossierUnlocked`; E2E |
 | WT-1 board | 🟡 `04527de`/`218836f`/`7946aad` — bước 1A–1C (migration 39 SQL, `/api/board-nodes`, `board-actions`, pin-builder theo `nodeKind`, note dùng chung `public/images/board/notes/`) | 1D–1H; xóa `legacyId`/`c0-pin-*` tương thích; migration 39 chưa chạy |
 | WT-3 studio | 🟡 `471a5c8` — `components/ui/field.tsx`, 0 `Field` cục bộ, 1 textarea, select `subjectKey`/`followupOf` (giữ key lạ), khối `<details>` nâng cao, bỏ `ID: {slug}`, `e2e/studio-ux.spec.ts` | Chạy E2E + rà placeholder/helper còn sót (lệnh ở mục 5.1) |
 
 ⚠ **`main` hiện KHÔNG qua typecheck** (13 lỗi, do WT-5 dở). **Không push** cho tới khi B1 xong — CI sẽ fail.
+
+**Phê duyệt của chủ dự án (2026-10-25):** duyệt toàn bộ plan v5, gồm **chạy migration 38 và 39 lên production** bởi AI thực thi theo mục "Truy cập Supabase production". Đây là ngoại lệ có chủ đích cho quy tắc "không tự chạy migration" (`HANDOFF_ROADMAP.md` mục 2.1), chỉ áp dụng cho 2 file `db/schema/38_character_avatar.sql`, `db/schema/39_board_nodes.sql` và SQL backfill A9. **Push vẫn chỉ khi chủ dự án ra lệnh** (AGENTS.md global §1).
+
+---
+
+## Truy cập Supabase production
+
+**Nơi để key:** file `.env.local` ở gốc repo (đã gitignore qua `.env*.local`, kiểm bằng `git check-ignore -v .env.local`). Chủ dự án tự thêm 2 dòng:
+
+```bash
+SUPABASE_PROJECT_REF=zalyxhmwwmfyexoilejp
+SUPABASE_ACCESS_TOKEN=<personal access token sbp_..., lấy ở supabase.com/dashboard/account/tokens>
+```
+
+**Quy tắc bắt buộc với key:**
+
+- Không ghi key vào `.env` (file này **đang bị track trong git** — xem A6 ở ROADMAP), docs, code, commit message, log hay báo cáo.
+- Không `cat`/in nội dung `.env.local`. Script tự nạp bằng `process.loadEnvFile(".env.local")`.
+- `SUPABASE_ACCESS_TOKEN` là token quản trị **toàn bộ tài khoản Supabase** (mọi project) → chỉ dùng cho `scripts/ops/run-sql.mjs`. Chủ dự án xoay token sau khi xong B8.
+
+**Bước B0 — tạo `scripts/ops/run-sql.mjs`** (commit được, không chứa secret):
+
+```js
+// Usage: node scripts/ops/run-sql.mjs <file.sql>   |   node scripts/ops/run-sql.mjs --query "select 1"
+import { readFileSync } from "node:fs";
+
+process.loadEnvFile(".env.local");
+const ref = process.env.SUPABASE_PROJECT_REF;
+const token = process.env.SUPABASE_ACCESS_TOKEN;
+if (!ref || !token) throw new Error("Missing SUPABASE_PROJECT_REF / SUPABASE_ACCESS_TOKEN in .env.local");
+
+const [flag, arg] = process.argv.slice(2);
+const query = flag === "--query" ? arg : readFileSync(flag, "utf8");
+if (!query) throw new Error("Pass a .sql file or --query");
+
+const res = await fetch(`https://api.supabase.com/v1/projects/${ref}/database/query`, {
+  method: "POST",
+  headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  body: JSON.stringify({ query }),
+});
+const text = await res.text();
+console.log(res.status, text);
+if (!res.ok) process.exit(1);
+```
+
+- Node ≥ 20.12 (có `process.loadEnvFile`). Kiểm `node -v`.
+- Dùng Node `fetch`, **không** PowerShell `Invoke-RestMethod` (treo với body lớn).
+- Toàn bộ file SQL chạy trong 1 request; file migration đã có `BEGIN/COMMIT` thì lỗi sẽ rollback cả khối.
+
+**Quy trình chạy 1 migration (B4, B8):**
+
+1. Backup bảng sẽ bị đổi (bước tương ứng ghi rõ lệnh).
+2. `node scripts/ops/run-sql.mjs db/schema/<NN>_*.sql` → phải trả `201`.
+3. Chạy truy vấn kiểm của bước → so với "Done khi".
+4. Ghi vào báo cáo: lệnh đã chạy, mã trả về, kết quả truy vấn kiểm (không ghi token).
+5. Lỗi → dừng, không sửa tay trên production, báo chủ dự án kèm thông báo lỗi.
 
 ---
 
@@ -23,22 +79,23 @@
 
 | Bước | Việc | Đặc tả | Done khi |
 | ---- | ---- | ------ | -------- |
+| **B0** | Tạo `scripts/ops/run-sql.mjs` theo mục "Truy cập Supabase production"; thử `node scripts/ops/run-sql.mjs --query "select 1"` | mục trên | Trả `201`; chủ dự án đã thêm key vào `.env.local` (nếu thiếu → dừng, hỏi) |
 | **B1** | Sửa 13 lỗi `tsc` do `evidenceId` bị bỏ khỏi type: `app/(investigation)/evidence/[id]/page.tsx:22` (thêm `code`), `app/(investigation)/evidence/web/page.tsx:269` (bỏ `evidenceId` + metadata 269–275), `:615` (`setState` kiểu chip mới `string \| number`), `components/investigation/evidence/dossier-tray.tsx:136,300,301,332,334,348`, `evidence-detail-inspector.tsx:25`, `components/investigation/pdf-viewer-modal.tsx:40,100` (→ `code`), `components/investigation/viewers/metadata-panel.tsx:36`, `components/phone-engine/phone-simulator.tsx:92` (thêm `code`) | mục 4.2 ý 1 | `npx tsc --noEmit --incremental false` sạch; `pnpm test:e2e` không fail mới |
 | **B2** | Hoàn tất WT-5: xóa `integrity-indicator.tsx` + khối ở `device-simulator-client.tsx:142-146`; `code` tự sinh từ tiêu đề; `isDossierUnlocked` + map `phase_N`; breadcrumb inspector; `e2e/evidence-dossier-grouping.spec.ts`, sửa `evidence-studio.spec.ts` | mục 4.2 ý 1–4, 4.3 | Spec mục 4.3 pass; mở được `/evidence/web?case_id=case_000` và `/evidence/victim-phone` |
 | **B3** | Hoàn tất WT-3: chạy `e2e/studio-ux.spec.ts`; rà placeholder >40 ký tự + helper dài còn sót (lệnh mục 5.1), `dossier-studio-sidebar.tsx` "Khóa kỹ thuật" | mục 5.2–5.3 | Spec mục 5.3 pass |
-| **B4** | ⛔ Chủ dự án chạy migration 38 (A8) + script A9 | mục 2 | `case_characters.avatar_url` có dữ liệu |
+| **B4** | Chạy migration 38 + backfill avatar (đã duyệt). (1) Kiểm trước: `--query "select count(*) from information_schema.columns where table_name='case_characters' and column_name='avatar_url'"` = 0. (2) `run-sql.mjs db/schema/38_character_avatar.sql`. (3) `node scripts/ops/backfill-character-avatars.mjs` → sinh `.tmp/backfill_avatars.sql`; đọc lại file, chỉ chứa `UPDATE case_characters ... WHERE ... AND avatar_url IS NULL`; rồi `run-sql.mjs .tmp/backfill_avatars.sql`. | mục 2 (A8, A9), mục "Truy cập Supabase" | Cột `avatar_url` tồn tại; `select count(*) from pg_policies where policyname='Admin Upload Access for avatars'` = 1; `select key, avatar_url from case_characters where case_slug='case_000'` có URL cho nhân vật có ảnh `avatar_*`; danh sách không khớp ghi vào báo cáo |
 | **B5** | WT-1 bước 1D (click handler theo `nodeKind`, bỏ map `cp-000-*`) | mục 3.3 | `case-000.spec.ts` pass |
 | **B6** | WT-1 bước 1E (modal bỏ `vu/tung/ha/khang`) | mục 3.3 | như trên |
 | **B7** | WT-1 bước 1F (walkthrough theo `nodeKind`) | mục 3.3 | như trên |
-| **B8** | ⛔ Chủ dự án duyệt + chạy migration 39 (cần trước B9 vì Studio ghi `case_board_nodes`) | mục 3.2 | bảng `case_board_nodes`, cột `board_config` tồn tại |
+| **B8** | Chạy migration 39 (đã duyệt; cần trước B9). (1) Đọc lại `db/schema/39_board_nodes.sql` khớp mục 3.2. File hiện **không có `BEGIN;`/`COMMIT;`** → bọc toàn file trong transaction rồi commit file. File chỉ đổi 5 id nền `c0-pin-{phone,victim-phone,reinvestigate,suspects,indictment}` (dòng 165–170); id `c0-pin-followup-*`, `c0-pin-evidence-*` xử lý ở B10. (2) Backup: `--query "create table if not exists public.boardgame_pins_backup_20261025 as select * from public.boardgame_pins"`. (3) `run-sql.mjs db/schema/39_board_nodes.sql`. (4) Mở `/evidence/web?case_id=case_000` local trỏ production: bố cục bảng giữ nguyên vị trí cũ. | mục 3.2, mục "Truy cập Supabase" | Bảng `case_board_nodes` tồn tại, có các dòng `case_000` đúng như INSERT trong file; cột `case_checkpoints.board_config` tồn tại; `select count(*) from boardgame_pins where id in ('c0-pin-phone','c0-pin-victim-phone','c0-pin-reinvestigate','c0-pin-suspects','c0-pin-indictment')` = 0; `case-000.spec.ts` pass. Backup bảng xóa sau khi B10 xong (ghi trong báo cáo) |
 | **B9** | WT-1 bước 1G (Board Studio trong Checkpoint Studio) | mục 3.3 | `e2e/board-studio.spec.ts` pass |
-| **B10** | WT-1 bước 1H (gameplay chỉ đọc, xóa `admin-create-pin-modal.tsx`, xóa id tương thích) | mục 3.3 | `grep -rE 'c0-pin-\|"khang"\|Nguyễn Văn Khang\|hasVuFollowup' components/investigation` = 0; `board-dynamic.spec.ts`, `board-new-case.spec.ts` pass |
+| **B10** | WT-1 bước 1H (gameplay chỉ đọc, xóa `admin-create-pin-modal.tsx`, xóa id tương thích). Nếu `boardgame_pins` còn id `c0-pin-followup-*` / `c0-pin-evidence-*`: viết `db/schema/40_board_pins_legacy_ids.sql` đổi sang id mới (cùng quy trình B8, backup trước), đã được duyệt. | mục 3.3 | `grep -rE 'c0-pin-\|"khang"\|Nguyễn Văn Khang\|hasVuFollowup' components/investigation` = 0; `board-dynamic.spec.ts`, `board-new-case.spec.ts` pass |
 | **B11** | Tích hợp: `tsc`, toàn bộ E2E, `NEXT_DIST_DIR=.next_dev npx next build`, cập nhật `CHANGELOG.md`, `HANDOFF_ROADMAP.md`, `TECHDEBT.md` (#15, #16, #17), `docs/core_specs/19_checkpoint_studio.md` (tab bảng), `02_database_schema.md` (migration 38, 39) | mục 1.3 | Sẵn sàng push |
 
-**Prompt giao việc (1 session, làm lần lượt):**
+**Prompt giao việc (1 session, chạy hết B0 → B11):**
 
 ```
-Đọc docs/WORKTREE_PLAN.md mục "Thứ tự việc trên main". Làm bước B<n> trên main, commit, báo cáo theo mục 9. Dừng ở bước có ⛔.
+Đọc docs/WORKTREE_PLAN.md (mục "Phê duyệt", "Truy cập Supabase production", "Thứ tự việc trên main"). Làm lần lượt B0 → B11 trên main, mỗi bước 1 commit, không push. Sau mỗi bước báo cáo ngắn theo mục 9. Gặp lỗi migration hoặc thiếu key thì dừng và hỏi.
 ```
 
 Có thể tách B2/B3 cho session khác chạy song song với B5–B7 vì không chung file (ma trận mục 1.2), nhưng **cùng làm trên `main` thì không chạy song song** — 2 session sửa chung một thư mục sẽ đè nhau.
