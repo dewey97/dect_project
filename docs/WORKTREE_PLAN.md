@@ -1,33 +1,47 @@
-# Worktree Plan v4 (2026-10-24)
+# Plan thực thi v5 — 1 nhánh `main` (2026-10-25)
 
-> Bản duy nhất còn hiệu lực. Thay v1–v3. Số liệu file:dòng khảo sát trên `main` tại `3a476f4`.
-> **Số dòng sẽ trôi** khi Phần A hoặc bước trước đã sửa file → trước mỗi bước, chạy lại lệnh grep ở cột "Vấn đề"/"Hardcode" để định vị, không sửa mù theo số dòng.
-> Người làm: đọc mục 1 → phần được giao → brief ở mục 8. Báo cáo theo mẫu mục 9.
-> Quy ước chung: `AGENTS.md` (global + dự án), `docs/HANDOFF_ROADMAP.md` mục 2–3.
->
-> Cấu trúc: **Phần A** dọn nhanh trực tiếp trên `main` (không tách worktree) → **3 worktree**: WT-1 board, WT-5 evidence, WT-3 studio.
+> Bản duy nhất còn hiệu lực. **Không còn worktree**: WT-1, WT-5, WT-3 đã merge dang dở vào `main` (`8e68a22`, `0078030`, `5771526`); mọi việc còn lại làm tuần tự trên `main`.
+> Mục 2–5 bên dưới (đặc tả WT-1/WT-5/WT-3) vẫn là đặc tả chi tiết — dùng làm tham chiếu thiết kế, file:dòng, E2E. Bỏ qua mọi chỉ dẫn tạo worktree / cổng riêng / thứ tự merge (mục 1.1, 6, 8).
+> **Số dòng sẽ trôi** → grep lại trước khi sửa. Quy ước chung: `AGENTS.md` (global + dự án), `docs/HANDOFF_ROADMAP.md` mục 2–3. Báo cáo theo mẫu mục 9.
 
 ---
 
-## Tiến độ thực thi (cập nhật 2026-10-25)
+## Trạng thái (2026-10-25, sau merge)
 
-| Phần | Nhánh / worktree                         | Commit                                   | Trạng thái                                                                                                                                                                                                                                                                                |
-| ---- | ---------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A    | `main`                                   | `16cb60c`                                | ✅ A1–A7, A9 xong (xóa `/api/phone`, icon → `public/images/phone/icons/`, fallback apps theo slug, `scripts/ops/backfill-character-avatars.mjs`). ⛔ **A8 chưa làm**: production chưa có cột `case_characters.avatar_url` và policy admin `avatars` (kiểm 2026-10-25). A10 chưa xác nhận. |
-| WT-1 | `wt/board-dynamic` (`../dect_wt_board`)  | `04527de` 1A, `218836f` 1B, `7946aad` 1C | 🟡 3/8 bước. Còn 1D–1H. Migration 39 viết xong, chưa chạy (đúng quy trình).                                                                                                                                                                                                               |
-| WT-5 | `wt/evidence-ux` (`../dect_wt_evidence`) | chưa có                                  | 🟡 8 file sửa **chưa commit**: đang làm ý 1 (metadata) + ý 3 (dossier tray, `use-case-dossiers`). Còn sót: `page.tsx:272-273`, `integrity-indicator.tsx`, `device-simulator-client.tsx`; chưa có `isDossierUnlocked`; chưa có E2E.                                                        |
-| WT-3 | `wt/studio-ux` (`../dect_wt_studio`)     | chưa có                                  | 🟡 18 file sửa **chưa commit**: ý 1–3 gần xong (`components/ui/field.tsx`, 0 `Field` cục bộ, xóa `auto-expanding-textarea`, select `subjectKey` có option giữ key lạ, bỏ `ID: {slug}`), `e2e/studio-ux.spec.ts` đã viết. Chưa xác nhận E2E/tsc.                                           |
+| Phần | Đã có trên `main` | Còn lại |
+| ---- | ----------------- | ------- |
+| A | ✅ `16cb60c` — A1–A7, A9 | ⛔ A8 migration 38 chưa chạy production; A10 checklist VPS chưa xác nhận |
+| WT-5 evidence | 🟡 `71ee301` — bỏ metadata ở form/preview/hook, khối "Nâng cao" `code`, bắt đầu nhóm tray theo dossier | **13 lỗi `tsc`** (xem B1); `page.tsx` metadata gán cứng; `integrity-indicator`; `isDossierUnlocked`; E2E |
+| WT-1 board | 🟡 `04527de`/`218836f`/`7946aad` — bước 1A–1C (migration 39 SQL, `/api/board-nodes`, `board-actions`, pin-builder theo `nodeKind`, note dùng chung `public/images/board/notes/`) | 1D–1H; xóa `legacyId`/`c0-pin-*` tương thích; migration 39 chưa chạy |
+| WT-3 studio | 🟡 `471a5c8` — `components/ui/field.tsx`, 0 `Field` cục bộ, 1 textarea, select `subjectKey`/`followupOf` (giữ key lạ), khối `<details>` nâng cao, bỏ `ID: {slug}`, `e2e/studio-ux.spec.ts` | Chạy E2E + rà placeholder/helper còn sót (lệnh ở mục 5.1) |
 
-**Lệch khỏi plan cần xử lý:**
+⚠ **`main` hiện KHÔNG qua typecheck** (13 lỗi, do WT-5 dở). **Không push** cho tới khi B1 xong — CI sẽ fail.
 
-1. **WT-1 giữ id cũ làm tương thích:** `pin-builder.ts` sinh `legacyId: "c0-pin-*"` (195–367, 501, 548, 675); `render-scene.ts` vẫn 25+ nhánh `pin.id === "c0-pin-*"` / `includes("khang")` (271–573); fallback `"Nguyễn Văn Khang"` (`pin-builder.ts:189, 322`); `hasVu/TungFollowup` (470–471, 635–636). Chấp nhận tạm trong lúc 1D–1G; **bước 1H phải xóa hết** — điều kiện done WT-1 bổ sung: `grep -rE 'c0-pin-|"khang"|Nguyễn Văn Khang|hasVuFollowup' components/investigation` = 0.
-2. **WT-5, WT-3 chưa commit theo bước** như brief → yêu cầu commit ngay phần đã xong trước khi làm tiếp (tránh mất việc, dễ review).
-3. **WT-3 sửa `checkpoint-editor.tsx` + `checkpoint-studio-client.tsx`** (chỉ thêm prop `characters`/`checkpoints`, +32/−7). Vùng khác với tab "Bảng điều tra" của WT-1 → rủi ro conflict thấp; vẫn merge WT-3 sau WT-1.
+---
 
-**Việc chủ dự án đang chặn:**
+## Thứ tự việc trên `main` (làm tuần tự, mỗi bước 1 commit)
 
-- Chạy migration 38 (A8) — WT-1 bước 1B/1D cần `avatar_url` để hiển thị ảnh thật; script A9 cần cột này.
-- Push `main` (đang ahead `origin/main` 3 commit: `3a476f4`, `5cb1c69`, `16cb60c`) khi muốn deploy Phần A.
+| Bước | Việc | Đặc tả | Done khi |
+| ---- | ---- | ------ | -------- |
+| **B1** | Sửa 13 lỗi `tsc` do `evidenceId` bị bỏ khỏi type: `app/(investigation)/evidence/[id]/page.tsx:22` (thêm `code`), `app/(investigation)/evidence/web/page.tsx:269` (bỏ `evidenceId` + metadata 269–275), `:615` (`setState` kiểu chip mới `string \| number`), `components/investigation/evidence/dossier-tray.tsx:136,300,301,332,334,348`, `evidence-detail-inspector.tsx:25`, `components/investigation/pdf-viewer-modal.tsx:40,100` (→ `code`), `components/investigation/viewers/metadata-panel.tsx:36`, `components/phone-engine/phone-simulator.tsx:92` (thêm `code`) | mục 4.2 ý 1 | `npx tsc --noEmit --incremental false` sạch; `pnpm test:e2e` không fail mới |
+| **B2** | Hoàn tất WT-5: xóa `integrity-indicator.tsx` + khối ở `device-simulator-client.tsx:142-146`; `code` tự sinh từ tiêu đề; `isDossierUnlocked` + map `phase_N`; breadcrumb inspector; `e2e/evidence-dossier-grouping.spec.ts`, sửa `evidence-studio.spec.ts` | mục 4.2 ý 1–4, 4.3 | Spec mục 4.3 pass; mở được `/evidence/web?case_id=case_000` và `/evidence/victim-phone` |
+| **B3** | Hoàn tất WT-3: chạy `e2e/studio-ux.spec.ts`; rà placeholder >40 ký tự + helper dài còn sót (lệnh mục 5.1), `dossier-studio-sidebar.tsx` "Khóa kỹ thuật" | mục 5.2–5.3 | Spec mục 5.3 pass |
+| **B4** | ⛔ Chủ dự án chạy migration 38 (A8) + script A9 | mục 2 | `case_characters.avatar_url` có dữ liệu |
+| **B5** | WT-1 bước 1D (click handler theo `nodeKind`, bỏ map `cp-000-*`) | mục 3.3 | `case-000.spec.ts` pass |
+| **B6** | WT-1 bước 1E (modal bỏ `vu/tung/ha/khang`) | mục 3.3 | như trên |
+| **B7** | WT-1 bước 1F (walkthrough theo `nodeKind`) | mục 3.3 | như trên |
+| **B8** | ⛔ Chủ dự án duyệt + chạy migration 39 (cần trước B9 vì Studio ghi `case_board_nodes`) | mục 3.2 | bảng `case_board_nodes`, cột `board_config` tồn tại |
+| **B9** | WT-1 bước 1G (Board Studio trong Checkpoint Studio) | mục 3.3 | `e2e/board-studio.spec.ts` pass |
+| **B10** | WT-1 bước 1H (gameplay chỉ đọc, xóa `admin-create-pin-modal.tsx`, xóa id tương thích) | mục 3.3 | `grep -rE 'c0-pin-\|"khang"\|Nguyễn Văn Khang\|hasVuFollowup' components/investigation` = 0; `board-dynamic.spec.ts`, `board-new-case.spec.ts` pass |
+| **B11** | Tích hợp: `tsc`, toàn bộ E2E, `NEXT_DIST_DIR=.next_dev npx next build`, cập nhật `CHANGELOG.md`, `HANDOFF_ROADMAP.md`, `TECHDEBT.md` (#15, #16, #17), `docs/core_specs/19_checkpoint_studio.md` (tab bảng), `02_database_schema.md` (migration 38, 39) | mục 1.3 | Sẵn sàng push |
+
+**Prompt giao việc (1 session, làm lần lượt):**
+
+```
+Đọc docs/WORKTREE_PLAN.md mục "Thứ tự việc trên main". Làm bước B<n> trên main, commit, báo cáo theo mục 9. Dừng ở bước có ⛔.
+```
+
+Có thể tách B2/B3 cho session khác chạy song song với B5–B7 vì không chung file (ma trận mục 1.2), nhưng **cùng làm trên `main` thì không chạy song song** — 2 session sửa chung một thư mục sẽ đè nhau.
 
 ---
 
@@ -349,6 +363,8 @@ grep -rnE '<p[^>]*text-(xs|\[1[01]px\])[^>]*>[^<]{80,}' components/admin/checkpo
 
 ## 6. Thứ tự tích hợp
 
+> ⚠ Đã thay bằng mục "Thứ tự việc trên `main`" (v5). Giữ lại để tham chiếu lịch sử.
+
 | Bước | Việc                                                                                                                    | Ghi chú                                                   |
 | ---- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | 0    | Phần A trên `main` + commit                                                                                             | Base chung                                                |
@@ -378,6 +394,8 @@ grep -rnE '<p[^>]*text-(xs|\[1[01]px\])[^>]*>[^<]{80,}' components/admin/checkpo
 ---
 
 ## 8. Brief giao việc (dán nguyên văn cho người làm)
+
+> ⚠ Brief worktree đã hết hiệu lực (v5 làm trên `main`). Dùng prompt ở mục "Thứ tự việc trên `main`".
 
 Mỗi brief là một phiên làm việc độc lập. Người làm không cần lịch sử hội thoại; chỉ cần repo + file này.
 
