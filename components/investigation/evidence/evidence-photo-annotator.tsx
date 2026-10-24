@@ -284,12 +284,7 @@ export function EvidencePhotoAnnotator({
             className="max-w-full max-h-[55vh] object-contain rounded-none shadow-md select-none pointer-events-none"
           />
 
-          {evidenceId && (
-            <div className="mt-2 text-center flex items-center gap-1.5 font-mono text-[0.68rem] font-bold text-[#d9a066] tracking-wider uppercase select-none">
-              <span>📸</span>
-              <span>VẬT CHỨNG [{evidenceId}]</span>
-            </div>
-          )}
+          
         </div>
       </div>
     </div>

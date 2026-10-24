@@ -93,7 +93,41 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
 
     // Check evidence header / tray has document items
     await expect(page.locator("body")).toContainText(
-      "00. Cẩm nang hướng dẫn điều tra ban đầu",
+      "Cẩm nang hướng dẫn điều tra ban đầu",
     );
+  });
+
+  test("Form excludes custody metadata and auto-generates code from title", async ({
+    page,
+  }, testInfo) => {
+    if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
+      testInfo.skip(
+        true,
+        "Thiếu biến môi trường E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD cho admin spec",
+      );
+    }
+
+    await page.goto("/studio/evidence?case=case_000");
+
+    // Click Thêm Chứng Cứ
+    await page.getByRole("button", { name: /Thêm Chứng Cứ/i }).click();
+
+    // Verify 4 legacy metadata fields are NOT in the form
+    await expect(page.getByText("Mã vật chứng pháp lý")).toHaveCount(0);
+    await expect(page.getByText("Thời điểm ghi nhận")).toHaveCount(0);
+    await expect(page.getByText("Người thu thập")).toHaveCount(0);
+    await expect(page.getByText("Trạng thái niêm phong")).toHaveCount(0);
+
+    // Fill title
+    const titleInput = page.getByPlaceholder("VD: Ảnh hiện trường phòng khách");
+    await titleInput.fill("Dấu vân tay trên cốc cà phê");
+
+    // Open advanced details and check auto-generated code
+    const advancedDetails = page.locator("details");
+    if (await advancedDetails.count()) {
+      await advancedDetails.click();
+      const codeInput = page.getByPlaceholder("Tự sinh từ tiêu đề (VD: p1)");
+      await expect(codeInput).toHaveValue("dau-van-tay-tren-coc-ca-phe");
+    }
   });
 });

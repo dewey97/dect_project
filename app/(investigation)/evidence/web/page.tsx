@@ -113,7 +113,7 @@ function WebEvidencePageContent() {
   const { documents: dossierDocs } = useDossierDocuments(caseId);
 
   // Nạp danh mục các bộ hồ sơ từ bảng case_dossiers theo đồ thị vụ án (C1)
-  const { getPhaseForCode } = useCaseDossiers(caseId);
+  const { dossiers, dossierOf, getPhaseForCode } = useCaseDossiers(caseId);
 
   // Nạp danh mục chứng cứ & PDF per-case từ Supabase (M1 / WT-2 / WT-6)
   const {
@@ -173,8 +173,8 @@ function WebEvidencePageContent() {
     // 1. Chuyển đổi toàn bộ hồ sơ từ Dossier Studio thành PDF/Dossier Items
     const dossierItems: CombinedItem[] = (dossierDocs || []).map((doc, idx) => {
       const code = (doc.tag_code || "").trim();
-      // Ánh xạ Phase / Bộ hồ sơ qua case_dossiers (C1), fallback tự động nếu chưa gán
-      const phase = getPhaseForCode(code);
+      const dInfo = dossierOf(code);
+      const phase = dInfo ? dInfo.slotIndex : getPhaseForCode(code);
 
       const rawContent: any = doc.content || {};
       const title =
@@ -198,6 +198,8 @@ function WebEvidencePageContent() {
         type: "pdf",
         phase,
         order: sortOrder,
+        dossierKey: dInfo?.key,
+        dossierTitle: dInfo?.title,
         data: {
           id: `dossier-${doc.id}`,
           code,
@@ -205,17 +207,29 @@ function WebEvidencePageContent() {
           url: "", // Sẽ render qua DiegeticDossierSheet
           phase,
           order: sortOrder,
+          dossierKey: dInfo?.key,
+          dossierTitle: dInfo?.title,
         },
       };
     });
 
     // 2. Thêm file PDF từ Supabase / Hook per-case
-    const testPdfItems: CombinedItem[] = casePdfs.map((doc) => ({
-      type: "pdf" as const,
-      data: doc,
-      phase: doc.phase,
-      order: doc.order,
-    }));
+    const testPdfItems: CombinedItem[] = casePdfs.map((doc) => {
+      const dInfo = dossierOf(doc.code);
+      const phase = dInfo ? dInfo.slotIndex : doc.phase;
+      return {
+        type: "pdf" as const,
+        data: {
+          ...doc,
+          dossierKey: dInfo?.key || doc.dossierKey,
+          dossierTitle: dInfo?.title || doc.dossierTitle,
+        },
+        phase,
+        order: doc.order,
+        dossierKey: dInfo?.key || doc.dossierKey,
+        dossierTitle: dInfo?.title || doc.dossierTitle,
+      };
+    });
 
     // 3. Vật chứng ảnh từ Sheet hoặc Supabase
     let photoItems: CombinedItem[] = [];
@@ -246,7 +260,8 @@ function WebEvidencePageContent() {
           const driveUrl = String(row.drive_url || "").trim();
 
           // Ánh xạ Phase / Bộ hồ sơ theo case_dossiers (C1)
-          const phase = getPhaseForCode(code);
+          const dInfo = dossierOf(code);
+          const phase = dInfo ? dInfo.slotIndex : getPhaseForCode(code);
 
           const localFallback = caseEvs.find(
             (e) =>
@@ -260,6 +275,8 @@ function WebEvidencePageContent() {
             type: "evidence",
             phase,
             order: idx * 10,
+            dossierKey: dInfo?.key,
+            dossierTitle: dInfo?.title,
             data: {
               id: `sheet-${code}`,
               caseId,
@@ -271,20 +288,32 @@ function WebEvidencePageContent() {
               timestamp: "24/07/2016",
               phase,
               order: idx * 10,
+              dossierKey: dInfo?.key,
+              dossierTitle: dInfo?.title,
             },
           };
         });
     } else if (caseEvs && caseEvs.length > 0) {
-      photoItems = caseEvs.map((item): CombinedItem => ({
-        type: "evidence",
-        data: item,
-        phase: item.phase,
-        order: item.order,
-      }));
+      photoItems = caseEvs.map((item): CombinedItem => {
+        const dInfo = dossierOf(item.code);
+        const phase = dInfo ? dInfo.slotIndex : item.phase;
+        return {
+          type: "evidence",
+          data: {
+            ...item,
+            dossierKey: dInfo?.key || item.dossierKey,
+            dossierTitle: dInfo?.title || item.dossierTitle,
+          },
+          phase,
+          order: item.order,
+          dossierKey: dInfo?.key || item.dossierKey,
+          dossierTitle: dInfo?.title || item.dossierTitle,
+        };
+      });
     }
 
     return [...testPdfItems, ...dossierItems, ...photoItems];
-  }, [dossierDocs, sheetEvidences, caseId, getPhaseForCode, casePdfs, caseEvs]);
+  }, [dossierDocs, sheetEvidences, caseId, getPhaseForCode, dossierOf, casePdfs, caseEvs]);
 
   // Tự động nhảy đến vị trí tài liệu/vật chứng khi có đồng đội chỉ điểm (Ping)
   useEffect(() => {
@@ -503,6 +532,71 @@ function WebEvidencePageContent() {
     [unlockedPhase],
   );
 
+  const isDossierUnlocked = useCallback(
+    (key: string): boolean => {
+      if (!key || key === "all" || key === "evidence" || key === "unassigned") {
+        return true;
+      }
+      const unlockedDossiers = getStorageJson<string[]>(
+        caseStorageKey(caseId, "unlocked_dossiers"),
+        [],
+      );
+      if (unlockedDossiers.includes(key)) {
+        return true;
+      }
+
+      // Tìm dossier theo key để xác định slot index
+      const matched = dossiers.find(
+        (d) =>
+          (d.dossier_key || "").toLowerCase().trim() ===
+          key.toLowerCase().trim(),
+      );
+      const slotIndex = matched
+        ? typeof (matched as any).slot_index === "number"
+          ? (matched as any).slot_index
+          : key === "ban_dau"
+            ? 0
+            : key === "bo_a"
+              ? 1
+              : key === "bo_b"
+                ? 2
+                : key === "bo_c"
+                  ? 3
+                  : key === "ket_luan"
+                    ? 4
+                    : 0
+        : key === "ban_dau"
+          ? 0
+          : key === "bo_a"
+            ? 1
+            : key === "bo_b"
+              ? 2
+              : key === "bo_c"
+                ? 3
+                : key === "ket_luan"
+                  ? 4
+                  : -1;
+
+      // Hỗ trợ tiến trình cũ dạng phase_N
+      if (slotIndex >= 0 && unlockedDossiers.includes(`phase_${slotIndex}`)) {
+        return true;
+      }
+
+      // Slot 0 (ban đầu) và slot 1 (bộ A) mặc định mở đầu game
+      if (slotIndex === 0 || slotIndex === 1) {
+        return true;
+      }
+
+      // Mở khóa theo tiến trình
+      if (slotIndex === 2 && unlockedPhase >= 2) return true;
+      if (slotIndex === 3 && unlockedPhase >= 2) return true;
+      if (slotIndex === 4 && unlockedPhase >= 3) return true;
+
+      return false;
+    },
+    [caseId, dossiers, unlockedPhase],
+  );
+
   const handleSelectPdf = (doc: PDFDocument) => {
     if (!isPhaseUnlocked(doc.phase)) return;
     setSelectedView({ type: "pdf", data: doc });
@@ -542,8 +636,17 @@ function WebEvidencePageContent() {
       .filter((item: CombinedItem) => {
         if (!isPhaseUnlocked(item.phase)) return false;
         if (item.type !== "pdf") return false;
-        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter)
-          return false;
+        if (selectedPhaseFilter !== "all") {
+          if (typeof selectedPhaseFilter === "number") {
+            if (item.phase !== selectedPhaseFilter) return false;
+          } else if (selectedPhaseFilter === "evidence") {
+            return false;
+          } else if (selectedPhaseFilter === "unassigned") {
+            if (item.dossierKey) return false;
+          } else {
+            if (item.dossierKey !== selectedPhaseFilter) return false;
+          }
+        }
         return true;
       })
       .sort((a: CombinedItem, b: CombinedItem) => a.order - b.order);
@@ -554,8 +657,17 @@ function WebEvidencePageContent() {
       .filter((item: CombinedItem) => {
         if (!isPhaseUnlocked(item.phase)) return false;
         if (item.type !== "evidence") return false;
-        if (selectedPhaseFilter !== "all" && item.phase !== selectedPhaseFilter)
-          return false;
+        if (selectedPhaseFilter !== "all") {
+          if (typeof selectedPhaseFilter === "number") {
+            if (item.phase !== selectedPhaseFilter) return false;
+          } else if (selectedPhaseFilter === "evidence") {
+            return true;
+          } else if (selectedPhaseFilter === "unassigned") {
+            if (item.dossierKey) return false;
+          } else {
+            if (item.dossierKey !== selectedPhaseFilter) return false;
+          }
+        }
         return true;
       })
       .sort((a: CombinedItem, b: CombinedItem) => a.order - b.order);
@@ -611,6 +723,8 @@ function WebEvidencePageContent() {
           selectedPhaseFilter={selectedPhaseFilter}
           onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
           isPhaseUnlocked={isPhaseUnlocked}
+          isDossierUnlocked={isDossierUnlocked}
+          dossiers={dossiers}
           pdfItems={pdfItems}
           evidenceItems={evidenceItems}
           selectedView={selectedView}

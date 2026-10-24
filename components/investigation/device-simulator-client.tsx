@@ -8,7 +8,6 @@ import { PhoneSimulator } from '@/components/phone-engine/phone-simulator'
 import { EvidenceHeader } from '@/components/investigation/viewers/evidence-header'
 import { MetadataPanel } from '@/components/investigation/viewers/metadata-panel'
 import { RecoveryStatusPanel } from '@/components/investigation/viewers/recovery-status-panel'
-import { IntegrityIndicator } from '@/components/investigation/viewers/integrity-indicator'
 import type { Case, Device, Conversation, Photo, Email, Document, BrowserHistory, RecoveredFile } from '@/lib/types'
 
 interface DeviceSimulatorClientProps {
@@ -136,14 +135,6 @@ export function DeviceSimulatorClient({
       <RecoveryStatusPanel
         progress={device.recoveryLevel}
         statusText="ĐANG TRÍCH XUẤT DỮ LIỆU"
-      />
-
-      {/* 5. Chain of Custody / Integrity Indicator */}
-      <IntegrityIndicator
-        recoveredBy="ĐTV. XPLORE"
-        timestamp={device.lastUpdated}
-        integrityStatus={device.recoveryLevel === 100 ? 'secured' : 'analyzing'}
-        chainOfCustody="BIÊN BẢN HỢP LỆ"
       />
     </div>
   )
