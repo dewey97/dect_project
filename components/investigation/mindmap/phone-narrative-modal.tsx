@@ -19,7 +19,7 @@ export function PhoneNarrativeModal({
   isOpen,
   onClose,
   onTakeTestimony,
-  caseId = "case-000",
+  caseId = "case_000",
 }: PhoneNarrativeModalProps) {
   const [isNarrativeComplete, setIsNarrativeComplete] = useState(false);
   const { checkpoints } = useCaseCheckpoints(caseId);

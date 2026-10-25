@@ -15,7 +15,7 @@ interface DetectiveNotebookModalProps {
 export function DetectiveNotebookModal({
   isOpen,
   onClose,
-  caseId = "case-000",
+  caseId = "case_000",
 }: DetectiveNotebookModalProps) {
   const { roomCode, roomState, syncUpdate } = useRoomSync();
   const storageKey = `detective_notebook_${caseId}`;

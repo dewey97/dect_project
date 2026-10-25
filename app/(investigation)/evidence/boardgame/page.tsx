@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { caseStorageKey } from "@/lib/cases/case-id";
+import { caseStorageKey, normalizeCaseId } from "@/lib/cases/case-id";
 import { useCheckpoints } from "@/components/investigation/checkpoints-context";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { BoardGameCompanionView } from "@/components/investigation/evidence/board-game-companion-view";
@@ -37,11 +37,8 @@ function BoardGameCompanionContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawCaseId =
-    searchParams.get("case_id") || searchParams.get("caseId") || "case-000";
-  const caseId =
-    rawCaseId === "case_000" || rawCaseId === "case-000"
-      ? "case-000"
-      : rawCaseId;
+    searchParams.get("case_id") || searchParams.get("caseId") || "case_000";
+  const caseId = normalizeCaseId(rawCaseId);
 
   const { completedCheckpointIds } = useCheckpoints();
 

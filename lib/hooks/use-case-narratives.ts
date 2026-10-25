@@ -89,7 +89,7 @@ function resolveCheckpointForPhase(
 }
 
 export function useCaseNarratives(
-  caseId: string = "case-000",
+  caseId: string = "case_000",
 ): CaseNarrativesState {
   const { checkpoints, loading, refetch } = useCaseCheckpoints(caseId);
 

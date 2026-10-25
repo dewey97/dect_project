@@ -1,8 +1,9 @@
 import { DeviceSimulatorClient } from "@/components/investigation/device-simulator-client";
 import type { Case, Device } from "@/lib/types";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 const ACTIVE_CASE_000: Case = {
-  id: "case-000",
+  id: "case_000",
   code: "TEST-99",
   title: "Trốn Tìm",
   logline:
@@ -21,7 +22,7 @@ const ACTIVE_CASE_000: Case = {
 
 const DEFAULT_VICTIM_DEVICE: Device = {
   id: "dev-000-1",
-  caseId: "case-000",
+  caseId: "case_000",
   code: "EV-PHONE-KHANG",
   evidenceId: "EV-PHONE-KHANG",
   label: "Điện thoại nạn nhân",
@@ -43,11 +44,8 @@ export default async function DeviceSimulatorPage({
 }) {
   const { id } = await params;
   const sParams = searchParams ? await searchParams : {};
-  const rawCaseId = sParams.case_id || sParams.caseId || "case-000";
-  const caseId =
-    rawCaseId === "case_000" || rawCaseId === "case-000"
-      ? "case-000"
-      : rawCaseId;
+  const rawCaseId = sParams.case_id || sParams.caseId || "case_000";
+  const caseId = normalizeCaseId(rawCaseId);
 
   const activeCase = {
     ...ACTIVE_CASE_000,

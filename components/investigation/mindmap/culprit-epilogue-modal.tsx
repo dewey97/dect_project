@@ -7,6 +7,7 @@ import { TypewriterNarrator } from "@/components/investigation/evidence/typewrit
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 interface CulpritEpilogueModalProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ export function CulpritEpilogueModal({
   onOpenDossier,
   onOpenFollowupQuestion,
   onOpenIndictment,
-  caseId = "case-000",
+  caseId = "case_000",
 }: CulpritEpilogueModalProps) {
   const charactersContext = useOptionalCaseCharacters();
   const characters = charactersContext?.characters || [];
@@ -77,7 +78,7 @@ export function CulpritEpilogueModal({
 
   const isHa = false;
   const isHaBoxSolved =
-    (isHa || caseId !== "case-000") &&
+    (isHa || normalizeCaseId(caseId) !== "case_000") &&
     (choice === "solved_box" ||
       choice === "solved" ||
       choice === "matched_3_tiles" ||

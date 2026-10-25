@@ -17,7 +17,7 @@ interface EpilogueModalProps {
 export function EpilogueModal({
   isOpen,
   onClose,
-  caseId = "case-000",
+  caseId = "case_000",
 }: EpilogueModalProps) {
   const [activeStoryIdx, setActiveStoryIdx] = useState(0);
   const { checkpoints, loading } = useCaseCheckpoints(caseId);

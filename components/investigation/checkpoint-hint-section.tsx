@@ -26,7 +26,7 @@ interface CheckpointHintSectionProps {
 
 export function CheckpointHintSection({
   checkpointId,
-  caseId = "case-000",
+  caseId = "case_000",
   category,
   className,
   renderActions,

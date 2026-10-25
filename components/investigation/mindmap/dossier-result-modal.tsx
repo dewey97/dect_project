@@ -19,7 +19,7 @@ export function DossierResultModal({
   dossierType,
   onClose,
   onOpenFollowupQuestion,
-  caseId = 'case-000',
+  caseId = "case_000",
   suspectName
 }: DossierResultModalProps) {
   if (!isOpen || !dossierType) return null

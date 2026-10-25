@@ -35,7 +35,7 @@ const DEFAULT_CHOICE_OPTIONS = [
 ];
 
 export function FollowupQuestionModal({
-  caseId = "case-000",
+  caseId = "case_000",
   isOpen,
   culprit,
   subjectKey,

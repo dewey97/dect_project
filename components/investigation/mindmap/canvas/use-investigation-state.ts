@@ -15,7 +15,7 @@ import {
   getStorageJson,
   setStorageJson,
 } from "@/lib/storage";
-import { caseStorageKey } from "@/lib/cases/case-id";
+import { caseStorageKey, clearCaseProgress } from "@/lib/cases/case-id";
 import { getActiveVictim, isVictimReference } from "@/lib/cases/case-characters";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
@@ -63,7 +63,7 @@ export function useInvestigationState(opts?: {
   onOpenReinvestigation?: () => void;
   onOpenEpilogue?: () => void;
 }) {
-  const caseId = opts?.caseId || "case-000";
+  const caseId = opts?.caseId || "case_000";
   const { roomCode, roomState, syncUpdate } = useRoomSync();
 
   const sKey = useCallback(
@@ -360,21 +360,7 @@ export function useInvestigationState(opts?: {
     setIsDossierOpen(false);
     setIsFollowupQuestionOpen(false);
     setIsPhoneNarrativeOpen(false);
-    if (caseId === "case-000") {
-      clearInvestigationStorage();
-    } else {
-      [
-        sKey("canvas_suspects"),
-        sKey("investigated_suspects"),
-        sKey("solved_followups"),
-        sKey("indictment_solved"),
-        sKey("indictment_culprit"),
-        sKey("reinvestigate_unlocked"),
-        sKey("reinvestigate_opened"),
-        sKey("phone_inputs"),
-        sKey("phone_solved"),
-      ].forEach(removeStorageItem);
-    }
+    clearCaseProgress(caseId);
   };
 
   const handleOpenReinvestigation = useCallback(() => {

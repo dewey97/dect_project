@@ -4,7 +4,7 @@ export const BOARD_FRAME_SRC = "/images/hero/evidence-board-frame.png";
 
 export const CASES_LIST: CaseData[] = [
   {
-    id: "case-000",
+    id: "case_000",
     title: "TRỐN TÌM (1996)",
     description:
       "Chuyên án 000 — Bi kịch trốn tìm 20 năm trước tại xóm Bờ Sông",

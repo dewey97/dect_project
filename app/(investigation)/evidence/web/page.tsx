@@ -67,7 +67,7 @@ import {
   clearInvestigationStorage,
   getStorageJson,
 } from "@/lib/storage";
-import { caseStorageKey, normalizeCaseId } from "@/lib/cases/case-id";
+import { caseStorageKey, normalizeCaseId, clearCaseProgress } from "@/lib/cases/case-id";
 import { useInvestigationEvent } from "@/lib/investigation-events";
 // Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.
 const ReinvestigationModal = nextDynamic(
@@ -91,11 +91,8 @@ function WebEvidencePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawCaseId =
-    searchParams.get("case_id") || searchParams.get("caseId") || "case-000";
-  const caseId =
-    rawCaseId === "case_000" || rawCaseId === "case-000"
-      ? "case-000"
-      : rawCaseId;
+    searchParams.get("case_id") || searchParams.get("caseId") || "case_000";
+  const caseId = normalizeCaseId(rawCaseId);
   const normalizedSheetCaseId = useMemo(
     () => normalizeCaseId(caseId),
     [caseId],
@@ -629,16 +626,7 @@ function WebEvidencePageContent() {
   };
 
   const resetAllProgress = () => {
-    if (normalizeCaseId(caseId) === "case_000") {
-      clearInvestigationStorage();
-    } else {
-      [
-        "intro_seen",
-        "solved_followups",
-        "reinvestigate_unlocked",
-        "indictment_solved",
-      ].forEach((k) => setStorageItem(caseStorageKey(caseId, k), ""));
-    }
+    clearCaseProgress(caseId);
     window.location.reload();
   };
 

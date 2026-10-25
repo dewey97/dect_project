@@ -68,7 +68,7 @@ interface DossierCanvasBoardProps {
 }
 
 export function DossierCanvasBoard({
-  caseId = "case-000",
+  caseId = "case_000",
   pdfItems,
   evidenceItems,
   dossierDocuments,

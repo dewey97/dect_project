@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { normalizeCaseId } from "@/lib/cases/case-id";
 
 export interface PhoneDataState<T> {
   data: T[];
@@ -22,15 +23,15 @@ export function usePhoneData<T = any>(
   tab: string,
   caseId: string = "case_000",
 ): PhoneDataState<T> {
-  let effectiveCaseId = caseId;
+  let effectiveCaseId = normalizeCaseId(caseId);
   if (
     typeof window !== "undefined" &&
-    (caseId === "case_000" || caseId === "case-000")
+    normalizeCaseId(caseId) === "case_000"
   ) {
     const params = new URLSearchParams(window.location.search);
     const paramCase = params.get("case_id") || params.get("caseId");
     if (paramCase) {
-      effectiveCaseId = paramCase.replace(/-/g, "_");
+      effectiveCaseId = normalizeCaseId(paramCase);
     }
   }
 

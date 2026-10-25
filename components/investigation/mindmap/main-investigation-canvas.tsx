@@ -54,7 +54,7 @@ interface MainInvestigationCanvasProps {
 }
 
 export function MainInvestigationCanvas({
-  caseId = "case-000",
+  caseId = "case_000",
   onOpenPhoneSimulator,
   onOpenReinvestigation,
   onOpenEpilogue,

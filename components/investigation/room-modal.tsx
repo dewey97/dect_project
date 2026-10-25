@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Users, X, Copy, Check, LogOut, ArrowRight, Sparkles, QrCode } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRoomSync } from '@/components/investigation/room-sync-context'
+import { normalizeCaseId } from '@/lib/cases/case-id'
 
 interface RoomModalProps {
   isOpen: boolean
@@ -74,8 +75,8 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
     const url = new URL(window.location.href)
     url.searchParams.set('room', roomCode)
     const rawCase = url.searchParams.get('case_id') || url.searchParams.get('caseId')
-    if (rawCase === 'case_000' || rawCase === 'case-000') {
-      url.searchParams.set('case_id', 'case-000')
+    if (rawCase) {
+      url.searchParams.set('case_id', normalizeCaseId(rawCase))
       url.searchParams.delete('caseId')
     }
     navigator.clipboard.writeText(url.toString())

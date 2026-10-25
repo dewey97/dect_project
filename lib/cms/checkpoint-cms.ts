@@ -847,7 +847,7 @@ export function transformSheetCheckpoint(row: SheetCheckpointRow): Checkpoint {
   return {
     id: effectiveId,
     nodeId: String(row.node_id || effectiveId).trim(),
-    caseId: row.case_id || "case-000",
+    caseId: row.case_id || "case_000",
     title: row.title || "",
     question: row.question || "",
     hint: dynamicHints[0] || "",

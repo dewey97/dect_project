@@ -24,7 +24,7 @@ import {
   setStorageItem,
   clearInvestigationStorage,
 } from "@/lib/storage";
-import { caseStorageKey } from "@/lib/cases/case-id";
+import { caseStorageKey, normalizeCaseId } from "@/lib/cases/case-id";
 import { useInvestigationEvent } from "@/lib/investigation-events";
 import {
   Lightbulb,
@@ -75,11 +75,8 @@ function BoardStageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rawCaseId =
-    searchParams.get("case_id") || searchParams.get("caseId") || "case-000";
-  const caseId =
-    rawCaseId === "case_000" || rawCaseId === "case-000"
-      ? "case-000"
-      : rawCaseId;
+    searchParams.get("case_id") || searchParams.get("caseId") || "case_000";
+  const caseId = normalizeCaseId(rawCaseId);
 
   const { completedCheckpointIds, completeCheckpoint } = useCheckpoints();
   const { checkpoints } = useCaseCheckpoints(caseId);

@@ -37,7 +37,7 @@ export function CustomPinModal({
   onClose,
   pin,
   onSolve,
-  caseId = "case-000",
+  caseId = "case_000",
 }: CustomPinModalProps) {
   const [userInput, setUserInput] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");

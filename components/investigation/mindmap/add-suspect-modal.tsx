@@ -71,7 +71,7 @@ import { normalizeForMatch } from "@/lib/text";
 export { findValidCaseCharacter, checkMotiveValid, checkContradictionValid };
 
 export function AddSuspectModal({
-  caseId = "case-000",
+  caseId = "case_000",
   isOpen,
   onClose,
   onSave,

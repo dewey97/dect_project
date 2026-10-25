@@ -85,7 +85,7 @@ function enrichCheckpointsWithEvidences(
  * chứng đọc từ useCaseEvidence (Supabase case_evidence).
  */
 export function useCaseCheckpoints(
-  caseId: string = "case-000",
+  caseId: string = "case_000",
 ): CaseCheckpointsState {
   const {
     rows: checkpointRows,

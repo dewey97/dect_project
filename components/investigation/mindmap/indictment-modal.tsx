@@ -120,7 +120,7 @@ export function checkIndictmentEvidenceMatch(
 }
 
 export function IndictmentModal({
-  caseId = "case-000",
+  caseId = "case_000",
   isOpen,
   onClose,
   onSubmitIndictment,

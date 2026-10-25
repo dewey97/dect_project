@@ -20,7 +20,7 @@ const inFlight: Record<string, Promise<DbCaseCheckpoint[]>> = {};
 
 function caseIdFromUrl(fallback: string): string {
   if (typeof window === "undefined") return fallback;
-  if (fallback !== "case_000" && fallback !== "case-000") return fallback;
+  if (normalizeCaseId(fallback) !== "case_000") return fallback;
   const params = new URLSearchParams(window.location.search);
   const param = params.get("case_id") || params.get("caseId");
   return param ? normalizeCaseId(param) : fallback;

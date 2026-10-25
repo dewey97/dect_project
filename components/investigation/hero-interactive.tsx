@@ -110,12 +110,12 @@ export function HeroInteractive({
   const reducedMotionRef = useRef(false);
 
   // ── Case and mode states ──
-  const [internalCaseId, setInternalCaseId] = useState<string>("case-000");
+  const [internalCaseId, setInternalCaseId] = useState<string>("case_000");
   const currentCaseId = controlledCaseId ?? propCaseId ?? internalCaseId;
 
   // ── Live Google Sheets Photos Integration ──
   const { sheetPhotosMapRef } = useLivePinPhotos(
-    currentCaseId || "case-000",
+    currentCaseId || "case_000",
     () => {
       if (requestRenderRef.current) requestRenderRef.current();
     },

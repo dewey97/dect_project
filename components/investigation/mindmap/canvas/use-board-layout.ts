@@ -20,7 +20,7 @@ const LAYOUT_VERSION = "2026.10.10_v8_db_sync";
  * Quản lý layout bảng điều tra cho màn chơi Gameplay (Chế độ chỉ đọc).
  * Các thao tác kéo thả, tạo node, nối dây đã chuyển toàn bộ sang Checkpoint Studio (Board Studio).
  */
-export function useBoardLayout(caseId: string = "case-000") {
+export function useBoardLayout(caseId: string = "case_000") {
   const pinsKey = `boardgame_pins_${caseId}`;
   const adminPinsKey = `admin_custom_pins_${caseId}`;
   const transformsKey = `boardgame_transforms_${caseId}`;
