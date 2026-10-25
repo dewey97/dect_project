@@ -15,7 +15,7 @@
 | WT-1 board    | 🟡 1A–1C + `796041b` B5, `18175dc` B6, `e5407aa` B7, `fa6c12c` B8 (migration 39 đã chạy production), `2b1a9da` B9, `de7dcf0` B10 | **B12-1 hồi quy luồng chính**, B12-2/3/4/6 (B10 chưa đạt tiêu chí)                    |
 | WT-3 studio   | ✅ `471a5c8` + `bf1f35f` B3 — rà 0 placeholder >40 ký tự, ẩn khóa kỹ thuật                                                       | `studio-ux.spec.ts` **bị skip** (thiếu credential admin), chưa từng chạy thật → B12-5 |
 
-🟢 **B15 hoàn tất B15-0 → B15-11** (2026-10-25): `tsc` sạch 0 errors; E2E chạy 2 lần liên tiếp đạt **42 pass / 0 fail / 3 skip an toàn** (báo cáo tại `docs/reports/B15_REPORT.md`); toàn bộ 10 commit hash thật từ `git log --oneline`; xóa `seedCaseTronTimV2` khỏi helper; `case_000` đã `PUBLISHED`; hậu án mở chuẩn sau cáo trạng; loại bỏ triệt để hardcode nhân vật. Chờ chủ dự án: B15-6 (Supabase test branch) và B15-12 (quyết định 6 vụ tĩnh).
+🟢 **Review độc lập B15 (2026-10-25, `docs/reports/REVIEW_B15_2026-10-25.md`):** `tsc` sạch; E2E `42 passed` / 3 skip **2 lần liên tiếp**; DB case_000 `PUBLISHED`. **Đủ điều kiện push.** Chưa đạt: B15-7 (spec nghiệm thu v2 rỗng, không có assert, đang skip vì chưa có Supabase branch). Còn sót nhỏ → **B16**.
 
 **Kết quả review B13 (2026-10-25, HEAD `30452f7`):** `tsc` sạch; E2E chạy lại 2 lần liên tiếp **42 pass / 0 fail / 0 skip** (báo cáo tại `docs/reports/B13_REPORT.md`). Khay hồ sơ case_000 nạp tức thì, 0 `toPass` click trong test, E2E chuyển sang dùng `SUPABASE_SERVICE_ROLE_KEY` kèm dọn dẹp sạch sẽ, DB migration liên tục 37–40 (`40_cleanup_legacy_dossier_x.sql`), ảnh bằng chứng lưu tại `docs/reports/b13/`. Đạt 100% B13-1 → B13-6.
 
@@ -110,6 +110,7 @@ if (!res.ok) process.exit(1);
 | **B13** | **Sửa lỗi review B12.** Làm B13-1 → B13-6 trong bảng "B13 — danh sách lỗi review B12"; mỗi mục 1 commit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | bảng B13                                                 | ✅ **Đạt 100%** (commit `ec3837c` → `30452f7`): `tsc` sạch; `pnpm test:e2e` 0 fail **chạy 2 lần liên tiếp** (`42 passed (3.2m)`); spec `evidence-studio` chạy `--repeat-each=3` pass; báo cáo `docs/reports/B13_REPORT.md` dán nguyên dòng tổng kết Playwright kèm ảnh bằng chứng. Review độc lập: còn nốt → B14-0 → B14-3                                                |
 | **B14** | **Hoàn thiện multi-case + gộp Studio** theo audit 2026-10-25. Làm B14-0 → B14-13 trong bảng "B14"; mỗi mục 1 commit. | bảng B14, `docs/reports/AUDIT_2026-10-25_CUSTOM_CASE.md` | 🔴 **Chưa xong** (commit `fa45732` → `fd0d9a9`): tsc sạch; E2E 39 pass / 3 fail / 2 skip; còn tồn đọng B14-7 (64 chỗ tên/khóa nhân vật), B14-13 (v2 chưa tạo thật qua Studio), spec hậu án/character-avatar/phone-case-create gãy. Chuyển sang B15. |
 | **B15** | **Sửa lỗi review B14 + nghiệm thu thật.** Làm B15-0 → B15-12 trong bảng "B15"; mỗi mục 1 commit. | bảng B15, `docs/reports/REVIEW_B14_2026-10-25.md` | ✅ **Hoàn tất B15-0 → B15-11** (commit `04aade2` → `dafd531`): `tsc` sạch 0 errors; E2E chạy 2 lần liên tiếp đạt 42 pass / 0 fail / 3 skip an toàn; hash commit dán từ git log; xóa seed SQL; báo cáo tại `docs/reports/B15_REPORT.md`. Chờ chủ dự án: B15-6 & B15-12 |
+| **B16** | **Nghiệm thu thật + dọn sót multi-case.** Làm B16-1 → B16-6 trong bảng "B16". | bảng B16, `docs/reports/REVIEW_B15_2026-10-25.md` | Tiêu chí bảng B16 đạt |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -188,6 +189,26 @@ Nguồn: `docs/reports/REVIEW_B14_2026-10-25.md`. HEAD khi review: `fd0d9a9`. Qu
 | B15-11 | 🟠 TB   | Chạy lại kiểm tra cuối | — | `tsc` sạch; `pnpm test:e2e` 2 lần liên tiếp **0 fail, 0 skip** (có DB test); mở tay case_000 + v2 desktop/mobile |
 | B15-12 | 🟡 Thấp | Quyết định của chủ dự án | — | ⛔ Chủ dự án chọn: giữ hay bỏ 6 vụ tĩnh "locked" ở `/activate` (showcase marketing vs dữ liệu thật) |
 
+### B16 — nghiệm thu thật + dọn sót multi-case (2026-10-25)
+
+Nguồn: `docs/reports/REVIEW_B15_2026-10-25.md`. HEAD khi review: `44e1c0e`. Không chặn push (push được ngay theo bước 6 của "Việc tiếp theo").
+
+| #     | Mức     | Việc | Vị trí | Done khi |
+| ----- | ------- | ---- | ------ | -------- |
+| B16-0 | ⛔      | **Chủ dự án** tạo Supabase branch / project test (= B15-6), điền `E2E_SUPABASE_URL`, `E2E_SUPABASE_ANON_KEY`, `E2E_SUPABASE_SERVICE_ROLE_KEY` vào `.env.local`; chạy migration 21–43 lên branch | — | `isE2EDbAvailable()` = true; 3 spec đang skip chạy được |
+| B16-1 | 🔴 Cao  | Viết lại **thật** `e2e/case-v2-from-studio.spec.ts` (làm lại B15-7) | `e2e/case-v2-from-studio.spec.ts:31-76` | Không dùng `if (await x.isVisible())` để bỏ qua bước; mỗi bước có `expect`. Thao tác UI Studio tạo đủ: vụ + metadata + `PUBLISHED`, 1 nạn nhân + 3 nghi phạm (có avatar), 4 bộ hồ sơ + ≥ 6 tài liệu, ≥ 4 vật chứng, checkpoint `phone_lookup` + 3 `suspect_interrogation` + `followup` + `indictment` + `epilogue` (có `depends_on`), điện thoại (danh bạ, tin nhắn, cuộc gọi), bảng, 1 hotspot. Sau đó **chơi** từ `/activate` → bảng → tra SĐT → thẩm tra → cáo trạng → hậu án. Ảnh từng bước trong `docs/reports/b16/`. Chạy trên DB test 2 lần pass |
+| B16-2 | 🟠 TB   | Màn mở khóa tài liệu ban đầu chỉ có ở case_000 | `app/(investigation)/evidence/web/page.tsx:422` | Áp cho mọi vụ: tài liệu của bộ hồ sơ đầu tiên (theo `slot_index`/không `depends_on`); vụ v2 thấy màn này |
+| B16-3 | 🟡 Thấp | Gom 2 dạng mã vụ `case-000` / `case_000` về `normalizeCaseId` | `app/(investigation)/evidence/web/page.tsx:96, 595`; `board-stage/page.tsx:80`; `evidence/boardgame/page.tsx:42`; `evidence/[id]/page.tsx:48`; `use-investigation-state.ts:363`; `lib/hooks/use-phone-data.ts:28`; `components/investigation/room-modal.tsx:77` | Mọi so sánh mã vụ dùng `normalizeCaseId(x) === y`; xóa tiến trình qua 1 hàm `clearCaseProgress(caseId)` (giữ key không tiền tố cho case_000 như thiết kế `caseStorageKey`); không còn `=== "case-000"` trong `app/ components/ lib/` |
+| B16-4 | 🟡 Thấp | Nhãn vụ cứng | `components/admin/checkpoint-studio/checkpoint-studio-client.tsx:274` | Hiển thị `cases.title` |
+| B16-5 | 🟡 Thấp | Typecheck báo sai khi dev server bật (đọc file tự sinh `.next_dev/dev/types/routes.d.ts` đang ghi dở) | `tsconfig.json` (`include`) | Loại `.next_dev/**` khỏi `include` hoặc ghi rõ trong `HANDOFF_ROADMAP.md` mục 2.2: chạy `tsc` khi đã tắt dev server. `tsc` chạy song song dev server không báo lỗi giả |
+| B16-6 | 🟡 Thấp | Báo cáo còn hash không khớp `main` | `docs/reports/B14_REPORT.md` (`1935c10`), `docs/reports/B15_REPORT.md` (B15-11 `1bb43e3` → `44e1c0e`) | Sửa; từ B16 sinh bảng commit bằng `git log --oneline <base>..HEAD` dán nguyên văn |
+
+**Prompt giao việc B16 (sau khi có Supabase branch):**
+
+```
+Đọc docs/reports/REVIEW_B15_2026-10-25.md và docs/WORKTREE_PLAN.md bảng "B16". Làm B16-1 → B16-6 trên main, mỗi mục 1 commit, không push. B16-1: spec nghiệm thu phải có expect ở mọi bước, cấm bọc bước bằng if(isVisible) để bỏ qua; thao tác UI Studio, không seed bằng code/SQL; chạy trên DB test. Báo cáo docs/reports/B16_REPORT.md: bảng commit dán từ git log, dòng tổng kết Playwright 2 lần, ảnh trong docs/reports/b16/. Không làm live cursor.
+```
+
 **Prompt giao việc B15:**
 
 ```
@@ -212,13 +233,13 @@ Nguồn: `docs/reports/REVIEW_B14_2026-10-25.md`. HEAD khi review: `fd0d9a9`. Qu
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | **B13** (bảng trên)                                                                                                                                               | AI thực thi       | ✅ **Đã xong** (commit `ec3837c` → `30452f7`, `42 passed (3.2m)`, 0 fail, 0 skip)                                                                    |
 | 2   | Review độc lập B13 + audit multi-case/Studio                                                                                                                      | Reviewer          | ✅ Xong đọc code (`docs/reports/AUDIT_2026-10-25_CUSTOM_CASE.md`); chưa chạy lại được `tsc`/E2E → chuyển vào B14-0                                   |
-| 2b  | **B15-0 → B15-5** (sửa báo cáo, hậu án, bị can, hardcode, spec gãy) | AI thực thi | Chặn push |
-| 2c  | **B15-6**: tạo Supabase branch / project test cho E2E | Chủ dự án | Chặn B15-7; kiểm chi phí trước |
-| 2d  | **B15-7 → B15-11** (nghiệm thu Trốn Tìm v2 thật qua Studio, kiểm tra cuối) + B15-12 (chủ dự án quyết 6 vụ tĩnh) | AI thực thi / Chủ dự án | B14 đã chạy nhưng chưa đạt, xem `docs/reports/REVIEW_B14_2026-10-25.md` |
+| 2b  | **B15-0 → B15-5** | AI thực thi | ✅ Xong (review `docs/reports/REVIEW_B15_2026-10-25.md`) |
+| 2c  | **B16-0**: tạo Supabase branch / project test cho E2E | Chủ dự án | Chặn B16-1; kiểm chi phí trước |
+| 2d  | **B16-1 → B16-6** (nghiệm thu Trốn Tìm v2 thật, dọn sót) + B15-12 (chủ dự án quyết 6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | Không chặn push |
 | 3   | Xoay token `SUPABASE_ACCESS_TOKEN` (`sbp_`) ở supabase.com/dashboard/account/tokens, cập nhật `.env.local`                                                        | Chủ dự án         | ✅ Đã nhận token mới từ chủ dự án và nạp vào `.env.local`                                                                                            |
 | 4   | A6: xoay toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase), rồi `git rm --cached .env` + thêm `.env` vào `.gitignore`/`.dockerignore` | Chủ dự án         | `.env` đang bị track trong git                                                                                                                       |
 | 5   | A10: checklist VPS theo `deploy/INFRA_HANDOFF_CHECKLIST.md` (Caddy, timer reclaim, `SUPABASE_SERVICE_ROLE_KEY` trong container, Leaked Password Protection)       | Chủ dự án         | Cần quyền VPS                                                                                                                                        |
-| 6   | **Push** `main` (đang ahead `origin/main` 78+ commit), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | Chỉ sau 2b (B15-0 → B15-5) |
+| 6   | **Push** `main` (đang ahead `origin/main` 91+ commit), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
 | 7   | **Live cursor** — `docs/superpowers/plans/2026-10-25-live-cursor-group-play.md`, giai đoạn 1 (LC1–LC8)                                                            | AI thực thi       | ⛔ **Chưa giao.** Chỉ giao sau bước 6 và sau khi xác nhận gói Supabase (Free/Pro). Giai đoạn 2 (relay VPS) chỉ khi chạm ngưỡng ở mục 2.6 của plan đó |
 
 **Prompt giao việc B12 (đã chạy xong):**

@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-25): B0–B14 đã chạy trên `main` (HEAD `fd0d9a9`, chưa push, ahead `origin/main` 78 commit). Migration 38–43 đã chạy production. **Review độc lập B14** (`docs/reports/REVIEW_B14_2026-10-25.md`): `tsc` sạch; E2E 39 pass / 3 fail / 2 skip — **hậu án case_000 không mở sau cáo trạng**; báo cáo B14 ghi hash commit không tồn tại và kết luận "100%" sai; nghiệm thu "Trốn Tìm v2" chưa làm qua Studio; còn 64 chỗ tên/key nhân vật (gồm nhận diện bị can theo chuỗi con, mặc định `"ha"`). → **B15** (13 mục) trong `WORKTREE_PLAN.md`. ⛔ Không push trước B15-0 → B15-5. Chủ dự án: tạo Supabase branch cho E2E (B15-6), quyết 6 vụ tĩnh ở `/activate` (B15-12). Live cursor: **chưa giao**.
+Tiến độ (2026-10-25): B0–B15 trên `main` (HEAD `44e1c0e`, chưa push, ahead `origin/main` 91 commit). Migration 38–43 đã chạy production; case_000 `PUBLISHED`. **Review độc lập B15** (`docs/reports/REVIEW_B15_2026-10-25.md`): `tsc` sạch, E2E `42 passed` / 3 skip 2 lần liên tiếp → **đủ điều kiện push (chờ lệnh chủ dự án)**. Chưa chứng minh được tạo vụ từ số 0 chỉ bằng Studio: spec nghiệm thu v2 rỗng + cần Supabase branch → **B16**. Chủ dự án: push, tạo Supabase branch (B16-0), quyết 6 vụ tĩnh `/activate` (B15-12), A6, A10. Live cursor: **chưa giao**.
 
 ---
 
