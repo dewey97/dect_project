@@ -4,6 +4,12 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-25]
 
+### B15 Review & Parity Hardening (B15-0 → B15-11)
+
+- **B15-10 (Migration 43 Drop Audit & Future Backup Policy)**:
+  - **Ghi nhận trung thực**: Migration `43_drop_legacy_evidence_board.sql` đã thực thi `DROP TABLE IF EXISTS public.evidence_edges CASCADE` và `DROP TABLE IF EXISTS public.evidence_nodes CASCADE` mà không tạo bảng snapshot backup trước; số dòng dữ liệu tại thời điểm drop không rõ (hệ thống điều tra đã chuyển toàn bộ sang `case_board_nodes` và `boardgame_pins` từ migration 39).
+  - **Quy tắc bắt buộc từ nay**: Mọi migration thực hiện thao tác DROP hoặc thay đổi phá hủy dữ liệu (destructive DDL) **BẮT BUỘC** phải kèm theo câu lệnh sao lưu dữ liệu snapshot (`CREATE TABLE IF NOT EXISTS <table_name>_backup_<YYYYMMDD> AS TABLE <table_name>`) ngay trong cùng file migration trước khi drop.
+
 ### B13 Bug Fixes & Robustness Verification (B13-1 → B13-6)
 
 - **B13-1 (Evidence In-Flight Deduplication)**: Khắc phục triệt để lỗi khay hồ sơ `case_000` bị trống khi load trang (`0 tài liệu / 0 vật chứng`) do 11 request Server Action dồn dập khiến React cleanup hủy kết quả fetch. Triển khai shared module-level in-flight Promise deduplication và đồng bộ fallback chips sang `"Ban Đầu"`. Khôi phục nguyên bản test `evidence-studio.spec.ts`, pass 100% với `--repeat-each=3`.
