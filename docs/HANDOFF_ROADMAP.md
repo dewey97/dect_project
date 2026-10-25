@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-26): `origin/main` tại `941b2f8` (đã push B0–B16 + review). B17 trên `main` (HEAD `1fbd029`, 6 commit chưa push). Migration 38–43 đã chạy production; case_000 `PUBLISHED`. **Review độc lập B17** (`docs/reports/REVIEW_B17_2026-10-26.md`): lint sạch, E2E `42 passed` / 3 skip khi mạng ổn — E2E dễ hỏng khi mạng tới Supabase chập chờn; màn "lệnh khám xét" của Hà đã bị xóa. Nghiệm thu tạo vụ từ số 0 bằng Studio vẫn chờ DB test → **B18**. Chủ dự án: chọn DB test (đề xuất project Supabase Free thứ 2), quyết màn khám xét của Hà, 6 vụ tĩnh `/activate`, A6, A10, smoke test production sau push. Live cursor: **chưa giao**.
+Tiến độ (2026-10-26): `origin/main` tại `941b2f8` (đã push B0–B16 + review). B17 trên `main` (HEAD `1fbd029`, 6 commit chưa push). Migration 38–43 đã chạy production; case_000 `PUBLISHED`. **Review độc lập B17** (`docs/reports/REVIEW_B17_2026-10-26.md`): lint sạch, E2E `42 passed` / 3 skip khi mạng ổn — E2E dễ hỏng khi mạng tới Supabase chập chờn; màn "lệnh khám xét" của Hà đã bị xóa. Nghiệm thu tạo vụ từ số 0 bằng Studio vẫn chờ DB test → **B18**. Chủ dự án: **đã chốt E2E dùng DB production** (thêm `ALLOW_E2E_PRODUCTION_SEED=true` + `SUPABASE_SERVICE_ROLE_KEY` vào `.env.local`), quyết màn khám xét của Hà, 6 vụ tĩnh `/activate`, A6, A10, smoke test production sau push. Live cursor: **chưa giao**.
 
 ---
 
