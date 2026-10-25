@@ -264,7 +264,7 @@ export function gradeCheckpoint(
       validSuspects.some((target) => {
         const normTarget = normalizeForMatch(target);
         const normUser = normalizeForMatch(userSuspect);
-        return normTarget.includes(normUser) || normUser.includes(normTarget);
+        return normTarget.trim() === normUser.trim();
       });
 
     if (!suspectOk) {

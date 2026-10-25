@@ -49,21 +49,39 @@ function normalizeName(str: string): string {
   return normalizeForMatch(str).replace(/[^a-z0-9]/g, "");
 }
 
+export function findSuspectMatch(
+  inputName: string,
+  suspects: Array<{ key: string; name: string; aliases?: string[] | null }>,
+): { key: string; name: string } | null {
+  const normInput = normalizeForMatch(inputName).trim();
+  if (!normInput) return null;
+
+  for (const s of suspects) {
+    if (normalizeForMatch(s.key).trim() === normInput) {
+      return { key: s.key, name: s.name };
+    }
+    if (normalizeForMatch(s.name).trim() === normInput) {
+      return { key: s.key, name: s.name };
+    }
+    if (s.aliases && Array.isArray(s.aliases)) {
+      for (const a of s.aliases) {
+        if (normalizeForMatch(a).trim() === normInput) {
+          return { key: s.key, name: s.name };
+        }
+      }
+    }
+  }
+  return null;
+}
+
 export function isCulpritValid(
   inputName: string,
+  suspects?: Array<{ key: string; name: string; aliases?: string[] | null }>,
 ): string | false {
-  if (isAdminBypassCode(inputName)) return "ha";
-  const norm = normalizeName(inputName);
-  if (norm.includes("vu") || norm.includes("lequangvu")) {
-    return "vu";
-  }
-  if (norm.includes("tung") || norm.includes("nguyenthanhtung")) {
-    return "tung";
-  }
-  if (norm.includes("ha") || norm.includes("tranthiha")) {
-    return "ha";
-  }
-  return false;
+  if (isAdminBypassCode(inputName)) return false;
+  if (!suspects || suspects.length === 0) return false;
+  const match = findSuspectMatch(inputName, suspects);
+  return match ? match.key : false;
 }
 export function checkIndictmentEvidenceMatch(
   val: string,
@@ -153,6 +171,23 @@ export function IndictmentModal({
     const isAdmin000 =
       isAdminBypassCode(suspectName) || isAdminBypassCode(cluesEvidenceInput);
 
+    let matchedCulprit: { key: string; name: string } | null = null;
+    if (isAdmin000) {
+      const fallbackTarget = indictmentCp?.pickerConfig?.validSuspects?.[0];
+      matchedCulprit = fallbackTarget
+        ? findSuspectMatch(fallbackTarget, suspectCharacters)
+        : suspectCharacters[0] || { key: "bypass", name: "Bypass" };
+    } else {
+      matchedCulprit = findSuspectMatch(suspectName, suspectCharacters);
+      if (!matchedCulprit) {
+        setErrorMsg(
+          "Không tìm thấy nghi can phù hợp trong hồ sơ vụ án! Vui lòng kiểm tra lại họ tên bị can.",
+        );
+        detectiveAudio.playGlassSound();
+        return;
+      }
+    }
+
     if (!selectedMotiveOption && !isAdmin000) {
       setErrorMsg("Vui lòng chọn Động cơ gây án chính của bị can!");
       detectiveAudio.playGlassSound();
@@ -189,41 +224,18 @@ export function IndictmentModal({
         }
       } else {
         // Fallback offline client-side nếu server lỗi/không phản hồi
-        const cleanInput = normalizeName(suspectName);
-        const matchedChar = allCharacters.find((c) => {
-          const cKey = normalizeName(c.key);
-          const cName = normalizeName(c.name);
-          return (
-            cleanInput === cKey ||
-            cleanInput === cName ||
-            cleanInput.includes(cName) ||
-            cName.includes(cleanInput)
-          );
-        });
-
         const validSuspectsFromSheet =
-          indictmentCp?.pickerConfig?.validSuspects;
-        const targetSuspects =
-          validSuspectsFromSheet && validSuspectsFromSheet.length > 0
-            ? validSuspectsFromSheet
-            : [];
+          indictmentCp?.pickerConfig?.validSuspects || [];
 
-        const isSuspectMatch = targetSuspects.some((ts) => {
-          const cleanTs = normalizeName(ts);
-          const cleanCharKey = matchedChar
-            ? normalizeName(matchedChar.key)
-            : "";
-          const cleanCharName = matchedChar
-            ? normalizeName(matchedChar.name)
-            : "";
-          return (
-            cleanInput === cleanTs ||
-            cleanCharKey === cleanTs ||
-            cleanCharName === cleanTs ||
-            cleanInput.includes(cleanTs) ||
-            cleanTs.includes(cleanInput)
-          );
-        });
+        const isSuspectMatch =
+          validSuspectsFromSheet.length === 0 ||
+          validSuspectsFromSheet.some((ts) => {
+            const cleanTs = normalizeForMatch(ts).trim();
+            return (
+              cleanTs === normalizeForMatch(matchedCulprit!.key).trim() ||
+              cleanTs === normalizeForMatch(matchedCulprit!.name).trim()
+            );
+          });
 
         if (!isSuspectMatch) {
           isCorrect = false;
@@ -300,23 +312,7 @@ export function IndictmentModal({
       if (!isCorrect) return; // Dừng nếu có lỗi từ server hoặc fallback client
     }
 
-    const cleanInputForCulprit = normalizeName(suspectName);
-    const matchedCharForCulprit = allCharacters.find((c) => {
-      const cKey = normalizeName(c.key);
-      const cName = normalizeName(c.name);
-      return (
-        cleanInputForCulprit === cKey ||
-        cleanInputForCulprit === cName ||
-        cleanInputForCulprit.includes(cName) ||
-        cName.includes(cleanInputForCulprit)
-      );
-    });
-
-    const culprit =
-      matchedCharForCulprit?.key ||
-      (isAdmin000 ? "ha" : isCulpritValid(suspectName)) ||
-      normalizeName(suspectName) ||
-      "ha";
+    const culprit = matchedCulprit.key;
 
     const combinedClueInputs = [cluesEvidenceInput].filter(
       (s) => s.trim().length > 0,
