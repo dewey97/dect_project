@@ -258,7 +258,7 @@ export function ReinvestigationModal({
   useEffect(() => {
     if (!isOpen) return;
     let mounted = true;
-    getCase360Config(caseId || "case_000")
+    getCase360Config(caseId || "")
       .then((res) => {
         if (!mounted) return;
         if (
@@ -567,8 +567,7 @@ export function ReinvestigationModal({
       title: `Điểm #${nextNum}`,
       x: 50.0,
       y: 50.0,
-      imageUrl:
-        "/images/cases/case_000/photo-reinvestigation-room-realistic.jpg",
+      imageUrl: "",
       soundFile: "sat_soat.mp3",
       soundCaption: "*Kiểm tra vật chứng...*",
     };

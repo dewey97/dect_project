@@ -1,32 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import type { MapVectorData } from "@/types/map-vector";
 import { denyIfNotAdmin } from "@/lib/security/admin-route-guard";
 import { createClient } from "@/lib/supabase/server";
 
-// NOTE: dynamic = 'force-dynamic' intentionally removed so Next.js can serve cached responses.
-// The map JSON only changes when admin saves via POST — no need to bypass HTTP cache on every read.
-
-const MAPS_DIR = path.join(process.cwd(), "data", "maps");
-
-function ensureDirExists(dir: string) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-}
-
-const WORLD_MAP_FILE = "world_vector_map.json";
-
-// Module-level in-process cache: avoids re-reading & re-parsing the 1.5MB JSON on every request.
-// Invalidated automatically when the POST handler saves a new version (bumps cachedAt).
+// Module-level in-process cache: avoids re-reading from database on every request.
+// Invalidated automatically when the POST handler saves a new version.
 let _mapCache: { data: MapVectorData; cachedAt: number } | null = null;
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const caseId = searchParams.get("caseId");
-
     // Serve from in-process cache if available (TTL: 10 minutes)
     const now = Date.now();
     if (_mapCache && now - _mapCache.cachedAt < 10 * 60 * 1000) {
@@ -41,66 +23,33 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 1. Thử đọc từ Supabase bảng map_vectors (id = 'world')
-    try {
-      const supabase = await createClient();
-      const { data: row, error: dbError } = await supabase
-        .from("map_vectors")
-        .select("data")
-        .eq("id", "world")
-        .maybeSingle();
+    const supabase = await createClient();
+    const { data: row, error: dbError } = await supabase
+      .from("map_vectors")
+      .select("data")
+      .eq("id", "world")
+      .maybeSingle();
 
-      if (!dbError && row && row.data) {
-        const parsedData = row.data as MapVectorData;
-        _mapCache = { data: parsedData, cachedAt: now };
-        return NextResponse.json(
-          { success: true, data: parsedData, source: "database" },
-          {
-            headers: {
-              "Cache-Control":
-                "public, s-maxage=3600, stale-while-revalidate=86400",
-            },
-          },
-        );
-      }
-    } catch (dbErr) {
-      console.warn(
-        "[API /api/admin/map-vector] DB fetch fallback to file:",
-        dbErr,
+    if (dbError) {
+      console.error("[API /api/admin/map-vector] DB fetch error:", dbError);
+      return NextResponse.json(
+        { success: false, error: dbError.message },
+        { status: 500 },
       );
     }
 
-    // 2. Fallback đọc file cục bộ (world_vector_map.json)
-    ensureDirExists(MAPS_DIR);
-    const worldFilePath = path.join(MAPS_DIR, WORLD_MAP_FILE);
-    const caseFilePath = caseId
-      ? path.join(MAPS_DIR, `${caseId}_vector.json`)
-      : null;
-
-    let filePath = worldFilePath;
-    if (
-      !fs.existsSync(worldFilePath) &&
-      caseFilePath &&
-      fs.existsSync(caseFilePath)
-    ) {
-      filePath = caseFilePath;
-    }
-
-    if (!fs.existsSync(filePath)) {
+    if (!row || !row.data) {
       return NextResponse.json(
         { success: false, error: "Unified world vector map data not found" },
         { status: 404 },
       );
     }
 
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const parsed: MapVectorData = JSON.parse(raw);
-
-    // Store in module-level cache
-    _mapCache = { data: parsed, cachedAt: now };
+    const parsedData = row.data as MapVectorData;
+    _mapCache = { data: parsedData, cachedAt: now };
 
     return NextResponse.json(
-      { success: true, data: parsed, source: "file" },
+      { success: true, data: parsedData, source: "database" },
       {
         headers: {
           "Cache-Control":
@@ -146,36 +95,23 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date().toISOString(),
     };
 
-    // 1. Lưu vào Supabase bảng map_vectors (id = 'world')
-    try {
-      const supabase = await createClient();
-      const { error: dbError } = await supabase.from("map_vectors").upsert(
-        {
-          id: "world",
-          data: dataToSave,
-          updated_at: dataToSave.updatedAt,
-        },
-        { onConflict: "id" },
-      );
-      if (dbError) {
-        console.error(
-          "[API /api/admin/map-vector] DB upsert warning:",
-          dbError,
-        );
-      }
-    } catch (dbErr) {
-      console.error("[API /api/admin/map-vector] DB connection error:", dbErr);
-    }
-
-    // 2. Ghi file backup cục bộ (world_vector_map.json)
-    //    LƯU Ý: Bỏ ghi case_000_vector.json legacy theo quy chuẩn bản đồ thế giới dùng chung duy nhất
-    ensureDirExists(MAPS_DIR);
-    const worldFilePath = path.join(MAPS_DIR, WORLD_MAP_FILE);
-    fs.writeFileSync(
-      worldFilePath,
-      JSON.stringify(dataToSave, null, 2),
-      "utf-8",
+    const supabase = await createClient();
+    const { error: dbError } = await supabase.from("map_vectors").upsert(
+      {
+        id: "world",
+        data: dataToSave,
+        updated_at: dataToSave.updatedAt,
+      },
+      { onConflict: "id" },
     );
+
+    if (dbError) {
+      console.error("[API /api/admin/map-vector] DB upsert error:", dbError);
+      return NextResponse.json(
+        { success: false, error: dbError.message },
+        { status: 500 },
+      );
+    }
 
     // Invalidate in-process GET cache so next read picks up the new data
     _mapCache = null;
