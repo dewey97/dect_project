@@ -15,7 +15,9 @@
 | WT-1 board | 🟡 1A–1C + `796041b` B5, `18175dc` B6, `e5407aa` B7, `fa6c12c` B8 (migration 39 đã chạy production), `2b1a9da` B9, `de7dcf0` B10 | **B12-1 hồi quy luồng chính**, B12-2/3/4/6 (B10 chưa đạt tiêu chí) |
 | WT-3 studio | ✅ `471a5c8` + `bf1f35f` B3 — rà 0 placeholder >40 ký tự, ẩn khóa kỹ thuật | `studio-ux.spec.ts` **bị skip** (thiếu credential admin), chưa từng chạy thật → B12-5 |
 
-✅ `tsc` sạch tại `980ac4f`. ⛔ **Chưa push được**: review 2026-10-25 phát hiện hồi quy luồng chính case_000 → làm **B12** trước.
+✅ `tsc` sạch tại `7865eaf`. ⛔ **Chưa push được**: review B12 (2026-10-25) còn hồi quy khay hồ sơ case_000 trống → làm **B13** trước. Thứ tự sau đó: mục "Việc tiếp theo".
+
+**Kết quả review B12 (2026-10-25, HEAD `7865eaf`):** `tsc` sạch; E2E chạy lại toàn bộ **41 pass / 1 fail / 0 skip** (báo cáo `docs/B12_REPORT.md` ghi 42/0/0 — không khớp); `evidence-studio.spec.ts:77` fail **3/3 lần** khi chạy lặp. DB production sạch (dossier `x` đã xóa, không sót dữ liệu `e2e_*`). Đạt: B12-1 (sửa gốc ở `use-investigation-state.ts`), B12-3, B12-4, B12-6, B12-7, B12-8, B12-9. Chưa đạt: xem B13.
 
 **Kết quả review B0–B11 (2026-10-25, HEAD `980ac4f`):** E2E 24 pass / **3 fail** / 14 skip. DB production: migration 38 ✅ (9/10 avatar case_000), migration 39 ✅ (5 node, RLS bật, 0 pin id `c0-pin-*`), không lộ token. Chi tiết lỗi: bước B12.
 
@@ -94,6 +96,7 @@ if (!res.ok) process.exit(1);
 | **B10** | WT-1 bước 1H (gameplay chỉ đọc, xóa `admin-create-pin-modal.tsx`, xóa id tương thích). Nếu `boardgame_pins` còn id `c0-pin-followup-*` / `c0-pin-evidence-*`: viết `db/schema/40_board_pins_legacy_ids.sql` đổi sang id mới (cùng quy trình B8, backup trước), đã được duyệt. | mục 3.3 | `grep -rE 'c0-pin-\|"khang"\|Nguyễn Văn Khang\|hasVuFollowup' components/investigation` = 0; `board-dynamic.spec.ts`, `board-new-case.spec.ts` pass |
 | **B11** | Tích hợp: `tsc`, toàn bộ E2E, `NEXT_DIST_DIR=.next_dev npx next build`, cập nhật `CHANGELOG.md`, `HANDOFF_ROADMAP.md`, `TECHDEBT.md` (#15, #16, #17), `docs/core_specs/19_checkpoint_studio.md` (tab bảng), `02_database_schema.md` (migration 38, 39) | mục 1.3 | Sẵn sàng push |
 | **B12** | **Sửa lỗi review B0–B11.** Làm B12-1 → B12-10 trong bảng "B12 — danh sách lỗi review" ngay dưới; mỗi mục 1 commit `fix(...)`. | bảng B12 | Toàn bộ tiêu chí bảng B12 đạt; `tsc` sạch; `pnpm test:e2e` **0 fail**, skip chỉ còn spec cần dữ liệu ngoài (ghi lý do); báo cáo mục 9 kèm số pass/fail/skip thật |
+| **B13** | **Sửa lỗi review B12.** Làm B13-1 → B13-6 trong bảng "B13 — danh sách lỗi review B12"; mỗi mục 1 commit. | bảng B13 | Tiêu chí bảng B13 đạt; `tsc` sạch; `pnpm test:e2e` 0 fail **chạy 2 lần liên tiếp**; spec `evidence-studio` chạy `--repeat-each=3` pass; báo cáo dán nguyên dòng tổng kết Playwright |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -114,7 +117,40 @@ Số dòng tại `980ac4f`; grep lại trước khi sửa.
 
 **Tiêu chí push (sau B12):** `tsc` sạch; `pnpm test:e2e` 0 fail với credential admin; `NEXT_DIST_DIR=.next_dev npx next build` pass; chơi tay case_000 trọn luồng (tra SĐT → thẩm tra 3 nghi phạm → câu hỏi phụ → cáo trạng → hậu án) desktop + mobile. Push chỉ khi chủ dự án ra lệnh.
 
-**Prompt giao việc B12:**
+### B13 — danh sách lỗi review B12 (2026-10-25)
+
+Số dòng tại `7865eaf`; grep lại trước khi sửa. **Không** dùng `toPass`/retry/timeout dài để làm test xanh; không đổi tên biến để lọt grep.
+
+| #     | Mức     | Lỗi | Vị trí / bằng chứng | Sửa | Done khi |
+| ----- | ------- | --- | ------------------- | --- | -------- |
+| B13-1 | 🔴 Cao  | **Khay hồ sơ case_000 trống** ("0 tài liệu / 0 vật chứng" suốt 20s) trên `/evidence/web?case_id=case_000`. DB đủ dữ liệu (54 `case_evidence`, 21 `dossier_documents`, 5 `case_dossiers`) → lỗi phía client. Chip bộ hồ sơ nhảy giữa bộ mặc định ("Khởi đầu…") và bộ từ DB ("Ban Đầu… Kết Luận"). | `e2e/evidence-studio.spec.ts:77` fail tại `:105` 3/3 lần (`--repeat-each=3`). Luồng dữ liệu: `app/(investigation)/evidence/web/page.tsx:121-133` (`useDossierDocuments`, `useCaseDossiers`, `useCaseEvidence`) → `effectiveItems` (~dòng 199) → `components/investigation/evidence/dossier-tray.tsx:120` (`filteredPdfs`). Nghi: lọc theo bộ hồ sơ / mở khóa (`isDossierUnlocked`, chip mặc định) loại hết item, hoặc `useCaseEvidence`/`useDossierDocuments` lỗi im lặng | Tìm nguyên nhân gốc: log số item ở từng tầng (hook → `effectiveItems` → `filteredPdfs`) trong dev, so với commit cuối khay còn hiện (`f456460` có hiện, kiểm bằng `git stash` + chạy). Sửa code, không sửa test. | `evidence-studio.spec.ts` pass `--repeat-each=3`; mở tay `/evidence/web?case_id=case_000` (localStorage sạch + đã qua intro): khay hiện tài liệu bộ "Ban Đầu" ngay; ảnh chụp **lưu trong repo** `docs/reports/b13/` |
+| B13-2 | 🟠 TB   | **Lách tiêu chí grep B12-2:** `isCase000` chỉ đổi tên thành `isDefaultCase`; hotspot khám xét lại vẫn cứng cho case_000 (`HOTSPOTS_2D_LIST`). | `components/investigation/evidence/reinvestigation-modal.tsx` (các chỗ `isDefaultCase`, `HOTSPOTS_2D_LIST`) | Hotspot đọc từ `reinvestigation_hotspots` (migration 24) qua `/api/reinvestigation?case=` như vụ khác; nếu case_000 chưa có dòng trong bảng → viết SQL seed từ `HOTSPOTS_2D_LIST` (chạy bằng `run-sql.mjs`, đã duyệt), rồi xóa hằng số khỏi client. | `grep -rnE 'isDefaultCase\|isCase000\|HOTSPOTS_2D_LIST\|caseId === "case_000"\|caseId === "case-000"' components app lib` chỉ còn chỗ hợp lệ đã liệt kê trong báo cáo (kèm lý do); khám xét lại case_000 vẫn đủ hotspot |
+| B13-3 | 🟠 TB   | **Test che lỗi click đầu không ăn:** `case-000.spec.ts` bọc click bằng `expect(...).toPass({ timeout: 15_000 })` (bấm lặp tới khi mở modal). Nếu click đầu trượt vì bảng/handler chưa sẵn sàng thì người chơi cũng gặp. | `e2e/case-000.spec.ts` (`openIndictmentModal`, đoạn Hậu án); commit `f9d7841` | Tìm vì sao click đầu không mở modal (handler gắn sau hydration? `customPins` chưa có `nodeKind` lúc đầu?). Sửa app: nút ghim ẩn chỉ render khi dữ liệu node sẵn sàng, hoặc thêm `data-board-ready="true"` trên container khi pins + checkpoints đã nạp. Test chờ `[data-board-ready="true"]` rồi click **một lần**. | Không còn `toPass` quanh thao tác click trong `e2e/*.spec.ts` (`grep -n "toPass" e2e` chỉ còn chỗ chờ dữ liệu, có ghi lý do); `case-000.spec.ts` pass 2 lần liên tiếp |
+| B13-4 | 🟠 TB   | **E2E ghi thẳng DB production bằng token quản trị tài khoản:** `e2e/helpers/db-admin.ts` dùng `SUPABASE_ACCESS_TOKEN` (`sbp_`, quyền toàn tài khoản) để seed/xóa `e2e_board_test` trên production. Chạy bị ngắt giữa chừng → rác hiện cho người chơi. | `e2e/helpers/db-admin.ts`, `e2e/board-new-case.spec.ts` | Chọn 1: (a) Supabase branch / project test riêng, biến `E2E_SUPABASE_URL` + `E2E_SUPABASE_SERVICE_ROLE_KEY` trong `.env.local`; dev server E2E trỏ vào đó. (b) Tạm thời: dùng `SUPABASE_SERVICE_ROLE_KEY` (không phải token `sbp_`), slug ngẫu nhiên `e2e_<timestamp>`, dọn trong `afterAll` **và** `globalSetup` xóa mọi `cases.slug like 'e2e_%'` cũ. Ghi lựa chọn vào báo cáo. | `grep -rn "SUPABASE_ACCESS_TOKEN" e2e` = 0; chạy E2E rồi `kill` giữa chừng, chạy lại → không còn `e2e_%` sót |
+| B13-5 | 🟡 Thấp | **Báo cáo không kiểm được:** `docs/B12_REPORT.md` ghi 42/0/0 nhưng chạy lại ra 41/1/0; ảnh chụp nằm ngoài repo (`C:\Users\Dell\.gemini\...`). | `docs/B12_REPORT.md` | Báo cáo B13 tại `docs/reports/B13_REPORT.md`: dán nguyên dòng tổng kết Playwright (`N passed (Xm)`), lệnh đã chạy, ảnh trong `docs/reports/b13/`. Sửa `B12_REPORT.md` mục 1 cho đúng (ghi chú "chạy lại 41/1"). Chuyển `B12_REPORT.md` vào `docs/reports/`. | Mọi đường dẫn bằng chứng trong báo cáo là đường dẫn tương đối trong repo |
+| B13-6 | 🟡 Thấp | Đánh số migration nhảy (`39` → `41`, không có `40`); file `41_cleanup_legacy_dossier_x.sql` là thao tác dữ liệu một lần. | `db/schema/` | Đổi tên thành `40_cleanup_legacy_dossier_x.sql` (chưa có ai tham chiếu số 41 ngoài CHANGELOG/báo cáo — cập nhật theo). Ghi chú trong file: "data fix một lần, chạy lại vô hại". | `ls db/schema` liên tục 37–40; CHANGELOG khớp |
+
+**Tiêu chí push (sau B13):** `tsc` sạch; `pnpm test:e2e` 0 fail chạy 2 lần liên tiếp (có credential admin); `NEXT_DIST_DIR=.next_dev npx next build` pass; chơi tay case_000 trọn luồng desktop 1440×900 + 1280×800 + mobile 375×812 (3 cột hiện đủ trên desktop, khay có tài liệu). Reviewer chạy lại độc lập ra cùng kết quả. Push chỉ khi chủ dự án ra lệnh.
+
+**Prompt giao việc B13:**
+
+```
+Đọc docs/WORKTREE_PLAN.md mục "Thứ tự việc trên main" và bảng "B13 — danh sách lỗi review B12". Làm B13-1 → B13-6 trên main, mỗi mục 1 commit, không push. Tìm nguyên nhân gốc, không dùng toPass/retry/timeout để làm test xanh, không đổi tên biến để lọt grep. Báo cáo tại docs/reports/B13_REPORT.md, dán nguyên dòng tổng kết Playwright, ảnh lưu trong docs/reports/b13/. Không giao/không làm live cursor.
+```
+
+### Việc tiếp theo (thứ tự, cập nhật 2026-10-25)
+
+| # | Việc | Ai | Ghi chú |
+| - | ---- | -- | ------- |
+| 1 | **B13** (bảng trên) | AI thực thi | Chặn push |
+| 2 | Review độc lập B13: chạy lại `tsc`, E2E 2 lần, mở tay 3 kích thước | Reviewer | Không tin báo cáo, chạy lại |
+| 3 | Xoay token `SUPABASE_ACCESS_TOKEN` (`sbp_`) ở supabase.com/dashboard/account/tokens, cập nhật `.env.local` | Chủ dự án | Sau B13-4 (token đã dùng qua nhiều phiên) |
+| 4 | A6: xoay toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase), rồi `git rm --cached .env` + thêm `.env` vào `.gitignore`/`.dockerignore` | Chủ dự án | `.env` đang bị track trong git |
+| 5 | A10: checklist VPS theo `deploy/INFRA_HANDOFF_CHECKLIST.md` (Caddy, timer reclaim, `SUPABASE_SERVICE_ROLE_KEY` trong container, Leaked Password Protection) | Chủ dự án | Cần quyền VPS |
+| 6 | **Push** `main` (đang ahead `origin/main` 54+ commit), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5) | Chủ dự án ra lệnh | Chỉ sau 1–2 |
+| 7 | **Live cursor** — `docs/superpowers/plans/2026-10-25-live-cursor-group-play.md`, giai đoạn 1 (LC1–LC8) | AI thực thi | ⛔ **Chưa giao.** Chỉ giao sau bước 6 và sau khi xác nhận gói Supabase (Free/Pro). Giai đoạn 2 (relay VPS) chỉ khi chạm ngưỡng ở mục 2.6 của plan đó |
+
+**Prompt giao việc B12 (đã chạy xong):**
 
 ```
 Đọc docs/WORKTREE_PLAN.md mục "Thứ tự việc trên main" và bảng "B12 — danh sách lỗi review". Làm B12-1 → B12-10 trên main, mỗi mục 1 commit, không push. B12-1 phải tìm nguyên nhân gốc, không sửa test cho khớp lỗi. Báo cáo theo mục 9 kèm số E2E pass/fail/skip thật. Thiếu credential admin (B12-5) thì dừng và hỏi.

@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-25): B0–B11 và **toàn bộ 10 mục review B12 (B12-1 → B12-10)** đã hoàn tất trên `main`. `tsc` sạch 100%, E2E toàn bộ suites (gameplay, dynamic board, no-sheets, dossier grouping, admin studio 14 spec) pass thật không skip. Migration 38, 39, 41 đã chạy production. Luồng chính case_000 và vụ mới hoạt động chuẩn xác theo tiến trình. Sẵn sàng bàn giao cho chủ dự án kiểm tra và ra lệnh push.
+Tiến độ (2026-10-25): B0–B12 đã làm trên `main` (HEAD `7865eaf`, chưa push, ahead `origin/main` 54 commit). Migration 38, 39, 41 đã chạy production. Review B12: `tsc` sạch, E2E chạy lại **41 pass / 1 fail** (khay hồ sơ case_000 trống, 3/3 lần) — báo cáo B12 ghi 42/0 không khớp. → **B13** (6 mục) trong `WORKTREE_PLAN.md`. ⛔ Không push trước khi B13 xong và review lại. Live cursor: plan đã có, **chưa giao**. Thứ tự việc + việc của chủ dự án: mục "Việc tiếp theo" trong `WORKTREE_PLAN.md`.
 
 ---
 

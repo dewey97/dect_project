@@ -1,5 +1,7 @@
 # 📋 Kế Hoạch Triển Khai: Con Trỏ Thời Gian Thực Trong Phòng Chơi Nhóm (Live Multiplayer Cursors)
 
+> ⛔ **Trạng thái (2026-10-25): CHƯA GIAO.** Chỉ bắt đầu sau khi B13 xong, đã push + smoke test production và đã xác nhận gói Supabase (Free/Pro). Xem `docs/WORKTREE_PLAN.md` mục "Việc tiếp theo", bước 7.
+
 > **Mục tiêu:** 2–6 thám tử cùng phòng thấy con trỏ chuột của nhau trên bàn điều tra theo thời gian thực, trỏ đúng cùng một ghim dù khác thiết bị/zoom. Trên điện thoại, chạm để chỉ điểm (dùng lại ping có sẵn).
 >
 > **Hai giai đoạn:**
