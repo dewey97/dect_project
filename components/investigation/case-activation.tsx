@@ -258,7 +258,6 @@ export function mapDbCasesToCatalog(dbCases: DbCase[]): CaseActivationItem[] {
 
     const isReady =
       c.status === "PUBLISHED" ||
-      slug === "case_000" ||
       fallback?.status === "ready";
 
     result.push({
@@ -825,9 +824,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                 </span>
               </div>
               <span className="font-[family-name:var(--font-handwriting)] text-sm font-bold text-[#1f1208] text-center mt-1">
-                {selectedCase.id === "case_000"
-                  ? "Hiện trường vụ tử vong"
-                  : `Hiện trường vụ án ${selectedCase.code}`}
+                {`Hiện trường vụ án ${selectedCase.code || selectedCase.title}`}
               </span>
             </div>
 
@@ -850,8 +847,8 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
                 </span>
               </div>
               <p className="font-[family-name:var(--font-handwriting)] text-base leading-snug font-bold text-[#1a0f07]">
-                {selectedCase.id === "case_000"
-                  ? '"Tôi thấy ánh đèn lấp lóe lúc 23h30 tại căn nhà dải tỏa..."'
+                {selectedCase.summary
+                  ? `"${selectedCase.summary.slice(0, 75)}..."`
                   : '"Chúng tôi đã ghi nhận các bất thường tại hiện trường vụ việc..."'}
               </p>
             </div>
