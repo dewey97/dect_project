@@ -15,6 +15,7 @@ const PORT = Number(process.env.E2E_PORT || process.env.PORT || 3101);
  */
 export default defineConfig({
   globalSetup: "./e2e/helpers/global-setup.ts",
+  globalTeardown: "./e2e/helpers/global-teardown.ts",
   testDir: "./e2e",
   timeout: 90_000,
   expect: { timeout: 15_000 },
