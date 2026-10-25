@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-25): B0–B15 trên `main` (HEAD `44e1c0e`, chưa push, ahead `origin/main` 91 commit). Migration 38–43 đã chạy production; case_000 `PUBLISHED`. **Review độc lập B15** (`docs/reports/REVIEW_B15_2026-10-25.md`): `tsc` sạch, E2E `42 passed` / 3 skip 2 lần liên tiếp → **đủ điều kiện push (chờ lệnh chủ dự án)**. Chưa chứng minh được tạo vụ từ số 0 chỉ bằng Studio: spec nghiệm thu v2 rỗng + cần Supabase branch → **B16**. Chủ dự án: push, tạo Supabase branch (B16-0), quyết 6 vụ tĩnh `/activate` (B15-12), A6, A10. Live cursor: **chưa giao**.
+Tiến độ (2026-10-25): B0–B16 trên `main` (HEAD `6079411`, chưa push, ahead `origin/main` 99 commit). Migration 38–43 đã chạy production; case_000 `PUBLISHED`. **Review độc lập B16** (`docs/reports/REVIEW_B16_2026-10-25.md`): `tsc` sạch, E2E `42 passed` / 3 skip 2 lần → **đủ điều kiện push (chờ lệnh chủ dự án)**. Nghiệm thu tạo vụ từ số 0 bằng Studio **chưa có bằng chứng** (spec v2 thiếu bước, chưa chạy — cần Supabase branch); B16-5 bị Next.js đảo ngược; `isHa = false` để lại code chết → **B17**. Chủ dự án: push, tạo Supabase branch + admin test (B17-0), quyết 6 vụ tĩnh `/activate` (B15-12), A6, A10. Live cursor: **chưa giao**.
 
 ---
 
