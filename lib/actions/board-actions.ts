@@ -573,26 +573,18 @@ export async function saveReinvestigationHotspots(
   try {
     await requireAdminAuth();
     const supabase = await createClient();
-    const formatted = hotspots.map((s) => ({
-      id: `reinvestigate-${caseId}-${s.num}`,
-      case_id: caseId,
-      position_x: s.x,
-      position_y: s.y,
-      label: s.title || `Điểm #${s.num}`,
-      detail: s.soundCaption || "",
-      photo_url: s.imageUrl || "",
-      color: s.soundFile || "sat_soat.mp3",
-      updated_at: new Date().toISOString(),
-    }));
+    const { error: dbError } = await supabase
+      .from("reinvestigation_hotspots")
+      .upsert(
+        {
+          case_slug: caseId,
+          hotspots,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "case_slug" },
+      );
 
-    if (formatted.length > 0) {
-      const { error } = await supabase
-        .from("boardgame_pins")
-        .upsert(formatted, { onConflict: "id" });
-      if (error) throw error;
-    }
-
-    revalidatePath(`/evidence/boardgame`);
+    if (dbError) throw dbError;
     revalidatePath(`/evidence/web`);
     return { success: true };
   } catch (error: unknown) {

@@ -25,6 +25,8 @@ import type {
 } from "@/lib/types/database";
 import { EvidenceForm } from "./evidence-form";
 import { EvidencePreview } from "./evidence-preview";
+import { CrimeSceneEditor } from "./crime-scene-editor";
+import { Compass } from "lucide-react";
 import { Scene360ConfigModal } from "./scene-360-config-modal";
 import { Scene360Viewer } from "@/components/investigation/scene-360-viewer";
 import { cn } from "@/lib/utils";
@@ -59,6 +61,7 @@ export function EvidenceStudioClient({
   const [is360ModalOpen, setIs360ModalOpen] = useState(false);
   const [config360, setConfig360] = useState(initial360Config);
   const [previewTab, setPreviewTab] = useState<"card" | "scene360">("card");
+  const [mainTab, setMainTab] = useState<"evidence" | "scene">("evidence");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Switch case
@@ -173,6 +176,36 @@ export function EvidenceStudioClient({
             </div>
           </div>
 
+          {/* Main View Tabs (G6) */}
+          <div className="flex bg-zinc-900 p-0.5 rounded-lg border border-zinc-700 ml-4">
+            <button
+              type="button"
+              onClick={() => setMainTab("evidence")}
+              className={cn(
+                "px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5",
+                mainTab === "evidence"
+                  ? "bg-amber-500 text-black shadow-sm"
+                  : "text-zinc-400 hover:text-white",
+              )}
+            >
+              <Archive className="size-3.5" />
+              <span>Vật Chứng ({evidenceList.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMainTab("scene")}
+              className={cn(
+                "px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5",
+                mainTab === "scene"
+                  ? "bg-amber-500 text-black shadow-sm"
+                  : "text-zinc-400 hover:text-white",
+              )}
+            >
+              <Compass className="size-3.5" />
+              <span>Hiện Trường (2D / 360)</span>
+            </button>
+          </div>
+
           {/* Case Selector Dropdown */}
           <div className="relative ml-4">
             <select
@@ -228,8 +261,16 @@ export function EvidenceStudioClient({
         </div>
       </div>
 
-      {/* ── 3-COLUMN WORKSPACE LAYOUT ── */}
-      <div className="flex-1 grid grid-cols-12 overflow-hidden">
+      {mainTab === "scene" ? (
+        <CrimeSceneEditor
+          caseId={currentCaseId}
+          evidenceList={evidenceList}
+          config360={config360}
+          onConfig360Updated={(up) => setConfig360(up)}
+        />
+      ) : (
+        /* ── 3-COLUMN WORKSPACE LAYOUT ── */
+        <div className="flex-1 grid grid-cols-12 overflow-hidden">
         {/* CỘT 1: DANH SÁCH CHỨNG CỨ & BỘ LỌC (4 Cols) */}
         <div className="col-span-12 lg:col-span-4 border-r border-zinc-800 flex flex-col bg-zinc-950/70 overflow-hidden">
           {/* Search & Filter Header */}
@@ -431,6 +472,7 @@ export function EvidenceStudioClient({
           </div>
         </div>
       </div>
+      )}
 
       {/* ── MODAL CẤU HÌNH HIỆN TRƯỜNG 360 ── */}
       <Scene360ConfigModal

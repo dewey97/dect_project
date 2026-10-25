@@ -20,7 +20,6 @@ import {
   Maximize2,
 } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import { checkIsAdmin } from "@/lib/actions/auth-guard";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { normalizeImageUrl } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
@@ -161,16 +160,7 @@ export function ReinvestigationModal({
     height: 800,
   });
 
-  // Admin & Calibrator states
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isCalibrateMode, setIsCalibrateMode] = useState(false);
-  const [selectedCalibrateSpotId, setSelectedCalibrateSpotId] = useState<
-    string | null
-  >(null);
-  const [isPhotoPickerOpen, setIsPhotoPickerOpen] = useState(false);
-  const [photoSearchQuery, setPhotoSearchQuery] = useState("");
-  const [isSavingDb, setIsSavingDb] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  // Gameplay state (read-only)
 
   // Fetch live photos & hotspots from Supabase (case_evidence)
   const { rawEvidence: rawSheetPhotos, loading: isPhotosLoading } =
@@ -223,31 +213,7 @@ export function ReinvestigationModal({
     };
   }, [isOpen, caseId]);
 
-  // Check admin role
-  useEffect(() => {
-    let mounted = true;
-    async function verifyAdmin() {
-      if (typeof window !== "undefined") {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (
-          urlParams.get("admin") === "true" ||
-          localStorage.getItem("is_admin") === "true" ||
-          localStorage.getItem("admin") === "true"
-        ) {
-          if (mounted) setIsAdmin(true);
-          return;
-        }
-      }
-      try {
-        const adminRole = await checkIsAdmin();
-        if (mounted && adminRole) setIsAdmin(true);
-      } catch {}
-    }
-    verifyAdmin();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+
 
   // Đọc ảnh 360 / Panorama theo case từ DB (M12 / WT-2)
   const [sceneConfig, setSceneConfig] = useState<{
@@ -338,27 +304,6 @@ export function ReinvestigationModal({
         };
       });
   }, [rawSheetPhotos]);
-
-  // Filtered photos for picker (Text only list)
-  const filteredSheetPhotos = useMemo(() => {
-    if (!photoSearchQuery.trim()) return sheetPhotosList;
-    const q = photoSearchQuery.toLowerCase();
-    return sheetPhotosList.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.id.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q),
-    );
-  }, [sheetPhotosList, photoSearchQuery]);
-
-  // Active hotspot in calibrate mode
-  const activeCalibrateSpot = useMemo(() => {
-    return (
-      hotspots.find((s) => s.id === selectedCalibrateSpotId) ||
-      hotspots[0] ||
-      null
-    );
-  }, [hotspots, selectedCalibrateSpotId]);
 
   // DYNAMICALLY SYNC HOTSPOTS FROM GOOGLE SHEETS BY photoId, code (C-01..C-05), or title
   // Nếu Sheet cập nhật link Drive hay title cho photoId, game tự động đọc theo photoId mới nhất!
@@ -479,18 +424,7 @@ export function ReinvestigationModal({
 
   // Handle clicking a hotspot pin on the scene
   const handleSpotClick = (spot: ReinvestigationHotspot2D) => {
-    if (isCalibrateMode) {
-      // Trong chế độ hiệu chỉnh: Nhấp vào số là mở luôn danh sách ảnh từ Sheet để chọn gán!
-      setSelectedCalibrateSpotId(spot.id);
-      setIsPhotoPickerOpen(true);
-      return;
-    }
-
     if (dragDistanceRef.current > 8) return;
-
-    // Tạm ẩn âm thanh SFX và toast phụ đề âm thanh
-    // playCustomSfx(spot.soundFile)
-    // setActiveAudioToast(spot.soundCaption)
     setSelectedSpot(spot);
   };
 
@@ -554,123 +488,6 @@ export function ReinvestigationModal({
       }
     };
     animFrameRef.current = requestAnimationFrame(applyMomentum);
-  };
-
-  // --- CALIBRATOR ACTION HANDLERS ---
-  const handleAddNewHotspot = () => {
-    const nextNum =
-      hotspots.length > 0 ? Math.max(...hotspots.map((s) => s.num)) + 1 : 1;
-    const newSpot: ReinvestigationHotspot2D = {
-      id: `spot-${Date.now().toString().slice(-4)}`,
-      num: nextNum,
-      photoId: "",
-      title: `Điểm #${nextNum}`,
-      x: 50.0,
-      y: 50.0,
-      imageUrl: "",
-      soundFile: "sat_soat.mp3",
-      soundCaption: "*Kiểm tra vật chứng...*",
-    };
-    const updated = [...hotspots, newSpot];
-    setHotspots(updated);
-    setSelectedCalibrateSpotId(newSpot.id);
-    setHasUnsavedChanges(true);
-    setIsPhotoPickerOpen(true); // Mở luôn danh sách để gán ảnh
-    toast.success(`Đã thêm điểm ${nextNum}. Chọn ảnh từ Sheet để gán!`);
-  };
-
-  const handleDeleteHotspot = (id: string) => {
-    if (hotspots.length <= 1) {
-      toast.error("Phải giữ lại ít nhất 1 điểm!");
-      return;
-    }
-    const updated = hotspots.filter((s) => s.id !== id);
-    setHotspots(updated);
-    setHasUnsavedChanges(true);
-    if (selectedCalibrateSpotId === id) {
-      setSelectedCalibrateSpotId(updated[0]?.id || null);
-    }
-    toast.info("Đã xóa điểm!");
-  };
-
-  // NÚT LƯU RIÊNG DÀNH CHO ADMIN: LƯU CẢ VỊ TRÍ (X, Y) VÀ ẢNH GÁN VÀO SERVER VÀ LOCAL
-  const handleSaveToSystem = async () => {
-    setIsSavingDb(true);
-    try {
-      localStorage.setItem(
-        `reinvestigate_custom_hotspots_${caseId}`,
-        JSON.stringify(hotspots),
-      );
-
-      const res = await fetch("/api/reinvestigation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ hotspots, caseId }),
-      });
-
-      if (res.ok) {
-        setHasUnsavedChanges(false);
-        toast.success(`Đã lưu thành công cấu hình điểm khám xét (${caseId})!`);
-      } else {
-        const data = await res.json();
-        toast.error(
-          "Lỗi khi lưu lên Server: " + (data.error || "Server error"),
-        );
-      }
-    } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : String(error);
-      toast.error("Lỗi khi lưu: " + msg);
-    } finally {
-      setIsSavingDb(false);
-    }
-  };
-
-  const handleResetToDefault = async () => {
-    try {
-      const res = await fetch(`/api/reinvestigation?case=${encodeURIComponent(caseId)}`, { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && Array.isArray(data.hotspots)) {
-          setHotspots(data.hotspots);
-          setSelectedCalibrateSpotId(data.hotspots[0]?.id || null);
-          setHasUnsavedChanges(true);
-        }
-      }
-    } catch {}
-    localStorage.removeItem(`reinvestigate_custom_hotspots_${caseId}`);
-    localStorage.removeItem("reinvestigate_custom_hotspots");
-    toast.info('Đã khôi phục danh sách điểm từ hệ thống!');
-  };
-
-  // GÁN ẢNH THEO ID (PHOTO_CODE) TỪ GOOGLE SHEETS
-  const handleSelectSheetPhoto = (photo: {
-    id: string;
-    title: string;
-    url: string;
-    driveUrl?: string;
-    description: string;
-  }) => {
-    if (!activeCalibrateSpot) return;
-    const updated = hotspots.map((s) =>
-      s.id === activeCalibrateSpot.id
-        ? {
-            ...s,
-            photoId: photo.id, // Đọc chính xác theo ID (photo_code) của Sheet!
-            title: photo.title,
-            imageUrl: photo.url,
-            driveUrl: photo.driveUrl,
-            soundCaption: photo.description
-              ? `*${photo.description}*`
-              : s.soundCaption,
-          }
-        : s,
-    );
-    setHotspots(updated);
-    setHasUnsavedChanges(true);
-    setIsPhotoPickerOpen(false);
-    toast.success(
-      `Đã gán ảnh [${photo.id}] "${photo.title}" cho Điểm ${activeCalibrateSpot.num}! Bấm "Lưu" để hoàn tất.`,
-    );
   };
 
   // Calculate dynamic dimensions for seamless wrapping
@@ -761,7 +578,7 @@ export function ReinvestigationModal({
 
       {/* LIGHTBOX PHOTO ZOOM MODAL (REGULAR PLAYER VIEW) */}
       <AnimatePresence>
-        {!isCalibrateMode && selectedSpot && (
+        {selectedSpot && (
           <div
             onClick={() => setSelectedSpot(null)}
             className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-8 cursor-zoom-out select-none"
@@ -805,153 +622,10 @@ export function ReinvestigationModal({
         )}
       </AnimatePresence>
 
-      {/* GOOGLE SHEETS PHOTO PICKER MODAL (TEXT ONLY - NO IMAGE PREVIEW) */}
-      <AnimatePresence>
-        {isPhotoPickerOpen && activeCalibrateSpot && (
-          <div
-            onClick={() => setIsPhotoPickerOpen(false)}
-            className="fixed inset-0 z-[120] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 select-none"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl max-h-[85vh] bg-[#140e09] border-2 border-[#59341c] rounded-xl flex flex-col overflow-hidden shadow-2xl font-mono text-[#f4e8d8]"
-            >
-              {/* PICKER HEADER */}
-              <div className="px-5 py-3.5 bg-[#1e130b] border-b border-[#3d2412] flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-sm sm:text-base text-amber-300 uppercase tracking-wide flex items-center gap-2">
-                    <FileText className="size-5 text-amber-400" />
-                    CHỌN ẢNH SHEET PHOTOS CHO ĐIỂM {activeCalibrateSpot.num}
-                  </h3>
-                  <p className="text-xs text-[#a88a6d] mt-0.5">
-                    Hệ thống sẽ lưu và đọc theo mã ID (`photo_code`). Bấm để
-                    gán.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsPhotoPickerOpen(false)}
-                  className="p-1.5 hover:bg-[#341b0e] text-[#d9a066] hover:text-white rounded border border-[#59341c] transition-colors cursor-pointer"
-                >
-                  <X className="size-5" />
-                </button>
-              </div>
-
-              {/* SEARCH INPUT */}
-              <div className="p-3 bg-[#180f08] border-b border-[#331c0e] flex items-center gap-2">
-                <Search className="size-4 text-amber-400 shrink-0 ml-1" />
-                <input
-                  type="text"
-                  value={photoSearchQuery}
-                  onChange={(e) => setPhotoSearchQuery(e.target.value)}
-                  placeholder="Tìm theo tên ảnh hoặc mã ID (VD: bua_yeu, p1, keo_toc...)"
-                  className="w-full bg-transparent border-0 text-sm text-[#f4e8d8] placeholder:text-neutral-500 focus:outline-none font-mono"
-                  autoFocus={false}
-                />
-                {photoSearchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setPhotoSearchQuery("")}
-                    className="text-xs text-neutral-400 hover:text-white px-2 cursor-pointer"
-                  >
-                    Xóa
-                  </button>
-                )}
-              </div>
-
-              {/* PHOTOS LIST (TEXT ONLY LIST - COMPACT & FAST) */}
-              <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
-                {isPhotosLoading ? (
-                  <div className="py-16 flex flex-col items-center justify-center gap-2 text-amber-400">
-                    <RefreshCw className="size-6 animate-spin" />
-                    <span className="text-xs">
-                      Đang nạp danh sách từ Google Sheets...
-                    </span>
-                  </div>
-                ) : filteredSheetPhotos.length === 0 ? (
-                  <div className="py-12 text-center text-xs text-neutral-500">
-                    Không tìm thấy mục nào khớp với từ khóa.
-                  </div>
-                ) : (
-                  filteredSheetPhotos.map((photo) => {
-                    const isAssigned = activeCalibrateSpot.photoId === photo.id;
-                    const hasDrive = Boolean(
-                      photo.driveUrl &&
-                      photo.driveUrl.includes("drive.google.com"),
-                    );
-
-                    return (
-                      <button
-                        key={photo.id}
-                        type="button"
-                        onClick={() => handleSelectSheetPhoto(photo)}
-                        className={`w-full px-3.5 py-2.5 rounded-lg border text-left transition-all cursor-pointer flex items-center justify-between gap-3 group ${
-                          isAssigned
-                            ? "bg-amber-500/20 border-amber-400 text-white ring-1 ring-amber-400"
-                            : "bg-[#180e07] hover:bg-[#2b170c] border-[#382010] hover:border-amber-600/70 text-[#e6d6c6]"
-                        }`}
-                      >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            {/* Mã photo_code ID */}
-                            <span className="px-1.5 py-0.5 rounded bg-amber-950/80 border border-amber-700/60 text-[11px] font-mono font-bold text-amber-300 shrink-0">
-                              {photo.id}
-                            </span>
-
-                            {/* Title ảnh */}
-                            <span className="font-bold text-xs sm:text-sm text-[#f5ebd9] group-hover:text-amber-200 truncate">
-                              {photo.title}
-                            </span>
-
-                            {hasDrive && (
-                              <span className="px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-400 text-[10px] border border-emerald-700/50 shrink-0 flex items-center gap-1 font-bold">
-                                <Link2 className="size-2.5" /> Drive
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Mô tả vật chứng */}
-                          {photo.description && (
-                            <p className="text-[11px] text-[#9e7a56] truncate mt-1 italic pl-0.5">
-                              {photo.description}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Selected Indicator */}
-                        {isAssigned && (
-                          <div className="shrink-0 text-amber-400 font-bold text-xs flex items-center gap-1">
-                            <Check className="size-4 text-amber-400" />
-                            <span className="hidden sm:inline">Đang gán</span>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-
-              {/* FOOTER */}
-              <div className="px-5 py-2.5 bg-[#190f08] border-t border-[#3d2412] text-xs text-[#a88a6d] flex items-center justify-between">
-                <span>
-                  Tổng cộng: {filteredSheetPhotos.length} ảnh trong Sheet
-                </span>
-                <span className="italic text-amber-400">
-                  Bấm vào mục để gán cho điểm {activeCalibrateSpot.num}
-                </span>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
       {/* AUDIO SUBTITLE TOAST AT BOTTOM LEFT (TẠM ẨN THEO YÊU CẦU) */}
       {/*
       <AnimatePresence>
-        {!isCalibrateMode && activeAudioToast && (
+        {activeAudioToast && (
           <motion.div
             initial={{ opacity: 0, y: 15, x: -10 }}
             animate={{ opacity: 1, y: 0, x: 0 }}
