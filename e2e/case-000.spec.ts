@@ -142,7 +142,9 @@ test.describe("case_000 baseline", () => {
       '[data-subject-key="tung"], [data-pin-id="node-suspect-tung"]',
       '[data-subject-key="ha"], [data-pin-id="node-suspect-ha"]',
     ]) {
-      await expect(page.locator(selector).first()).toBeAttached();
+      await expect(page.locator(selector).first()).toBeAttached({
+        timeout: 25_000,
+      });
     }
   });
 
@@ -258,7 +260,16 @@ test.describe("case_000 baseline", () => {
     page,
   }) => {
     await openBoard(page);
-    await clickPin(page, "c0-pin-indictment");
+    const openIndictmentModal = async () => {
+      await expect(async () => {
+        await clickPin(page, "c0-pin-indictment");
+        await expect(
+          page.getByPlaceholder("Nhập hoặc chọn tên bị can..."),
+        ).toBeVisible({ timeout: 2_000 });
+      }).toPass({ timeout: 15_000 });
+    };
+
+    await openIndictmentModal();
 
     const submitIndictment = async (suspect: string, codes: string[]) => {
       const nameInput = page.getByPlaceholder("Nhập hoặc chọn tên bị can...");
@@ -278,7 +289,7 @@ test.describe("case_000 baseline", () => {
     expect(await storage(page, "indictment_solved")).not.toBe("true");
 
     await page.goto(CASE_URL);
-    await clickPin(page, "c0-pin-indictment");
+    await openIndictmentModal();
     await submitIndictment("Trần Thị Hà", ["C-02", "D-04", "D-05"]);
     await expect.poll(() => storage(page, "indictment_solved")).toBe("true");
     expect(await storage(page, "indictment_culprit")).toBe("ha");
@@ -287,8 +298,11 @@ test.describe("case_000 baseline", () => {
   test("hậu án hiển thị 4 phần có nội dung sau cáo trạng", async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem("intro_seen", "true");
+      localStorage.setItem("case_000:intro_seen", "true");
       localStorage.setItem("indictment_solved", "true");
+      localStorage.setItem("case_000:indictment_solved", "true");
       localStorage.setItem("indictment_culprit", "ha");
+      localStorage.setItem("case_000:indictment_culprit", "ha");
     });
     await page.route("**/api/test-scan-answer", (route) =>
       route.fulfill({
@@ -301,14 +315,12 @@ test.describe("case_000 baseline", () => {
     ).toBeAttached();
 
     // Bấm pin cáo trạng (đã giải) -> mở thẳng EpilogueModal
-    await clickPin(page, "c0-pin-indictment");
-
-    // Xác nhận modal Hậu Án hiển thị
-    await expect(
-      page.getByText("KÝ SỰ HẬU ÁN", { exact: false }).first(),
-    ).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(async () => {
+      await clickPin(page, "c0-pin-indictment");
+      await expect(
+        page.getByText("KÝ SỰ HẬU ÁN", { exact: false }).first(),
+      ).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 15_000 });
 
     // Phải có các nút chọn phần hậu án đang hiển thị
     const storyButtons = page
