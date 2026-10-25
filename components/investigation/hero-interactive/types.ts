@@ -148,4 +148,5 @@ export interface HeroInteractiveProps {
     coneSpread: number;
     intensity: number;
   };
+  isBoardReady?: boolean;
 }

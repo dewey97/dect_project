@@ -81,6 +81,7 @@ export function useInvestigationState(opts?: {
     useState(false);
   const [phoneLookupSuccess, setPhoneLookupSuccess] = useState(false);
 
+  const [isProgressLoaded, setIsProgressLoaded] = useState(false);
   const [isIndictmentSolved, setIsIndictmentSolved] = useState(false);
   const [solvedCulprit, setSolvedCulprit] = useState<CulpritKey | null>(null);
   const [isEpilogueOpen, setIsEpilogueOpen] = useState(false);
@@ -117,7 +118,7 @@ export function useInvestigationState(opts?: {
   const [isPhoneLookupOpen, setIsPhoneLookupOpen] = useState(false);
   const [isIndictmentOpen, setIsIndictmentOpen] = useState(false);
 
-  const { checkpoints } = useCaseCheckpoints(caseId);
+  const { checkpoints, loading: isCheckpointsLoading } = useCaseCheckpoints(caseId);
 
   // Khám xét hiện trường luôn mở sẵn ngay từ đầu game
   const isReinvestigateConditionMet = useCallback(
@@ -166,6 +167,7 @@ export function useInvestigationState(opts?: {
         setSolvedCulprit(savedCulprit);
       }
     }
+    setIsProgressLoaded(true);
   }, [sKey, isReinvestigateConditionMet]);
 
   // Sync state when in a group room
@@ -406,6 +408,8 @@ export function useInvestigationState(opts?: {
     setHasOpenedReinvestigation,
     phoneLookupSuccess,
     setPhoneLookupSuccess,
+    isProgressLoaded,
+    isCheckpointsLoading,
     isIndictmentSolved,
     setIsIndictmentSolved,
     solvedCulprit,

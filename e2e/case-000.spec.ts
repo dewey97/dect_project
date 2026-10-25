@@ -38,10 +38,12 @@ async function openBoard(page: Page) {
     }),
   );
   await page.goto(CASE_URL);
+  await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached();
   await expect(page.locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]').first()).toBeAttached();
 }
 
 async function clickPin(page: Page, pinId: string) {
+  await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached();
   let selector = `[data-pin-id="${pinId}"]`;
   if (pinId === "c0-pin-phone") {
     selector = '[data-node-kind="phone_lookup"], [data-pin-id="c0-pin-phone"]';
@@ -161,7 +163,7 @@ test.describe("case_000 baseline", () => {
     await page.waitForTimeout(1_000);
     expect(await storage(page, "phone_solved")).not.toBe("true");
 
-    await page.goto(CASE_URL);
+    await openBoard(page);
     await solvePhoneLookup(page, ["Vũ", "Tùng", "Đạt"]);
     await expect.poll(() => storage(page, "phone_solved")).toBe("true");
     await expect(
@@ -260,16 +262,7 @@ test.describe("case_000 baseline", () => {
     page,
   }) => {
     await openBoard(page);
-    const openIndictmentModal = async () => {
-      await expect(async () => {
-        await clickPin(page, "c0-pin-indictment");
-        await expect(
-          page.getByPlaceholder("Nhập hoặc chọn tên bị can..."),
-        ).toBeVisible({ timeout: 2_000 });
-      }).toPass({ timeout: 15_000 });
-    };
-
-    await openIndictmentModal();
+    await clickPin(page, "c0-pin-indictment");
 
     const submitIndictment = async (suspect: string, codes: string[]) => {
       const nameInput = page.getByPlaceholder("Nhập hoặc chọn tên bị can...");
@@ -289,7 +282,8 @@ test.describe("case_000 baseline", () => {
     expect(await storage(page, "indictment_solved")).not.toBe("true");
 
     await page.goto(CASE_URL);
-    await openIndictmentModal();
+    await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached();
+    await clickPin(page, "c0-pin-indictment");
     await submitIndictment("Trần Thị Hà", ["C-02", "D-04", "D-05"]);
     await expect.poll(() => storage(page, "indictment_solved")).toBe("true");
     expect(await storage(page, "indictment_culprit")).toBe("ha");
@@ -314,13 +308,17 @@ test.describe("case_000 baseline", () => {
       page.locator('[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]').first(),
     ).toBeAttached();
 
+    await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached();
+
     // Bấm pin cáo trạng (đã giải) -> mở thẳng EpilogueModal
-    await expect(async () => {
-      await clickPin(page, "c0-pin-indictment");
-      await expect(
-        page.getByText("KÝ SỰ HẬU ÁN", { exact: false }).first(),
-      ).toBeVisible({ timeout: 2_000 });
-    }).toPass({ timeout: 15_000 });
+    await clickPin(page, "c0-pin-indictment");
+
+    // Xác nhận modal Hậu Án hiển thị
+    await expect(
+      page.getByText("KÝ SỰ HẬU ÁN", { exact: false }).first(),
+    ).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Phải có các nút chọn phần hậu án đang hiển thị
     const storyButtons = page

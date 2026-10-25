@@ -58,6 +58,7 @@ export function HeroInteractive({
   isEditMode = false,
   onPinPositionChange,
   lightConeConfig,
+  isBoardReady = true,
 }: HeroInteractiveProps) {
   const customPinsRef = useRef<PinPoint[] | undefined>(customPins);
   const customConnectionsRef = useRef<CaseConnection[] | undefined>(
@@ -519,7 +520,7 @@ export function HeroInteractive({
 
       {/* Ghim vẽ trên canvas không có trong DOM: danh sách nút ẩn cho bàn phím,
           trình đọc màn hình và kiểm thử E2E. Hiện ra khi được focus. */}
-      {!isEditMode && onPinClick && customPins && customPins.length > 0 && (
+      {!isEditMode && onPinClick && isBoardReady && customPins && customPins.length > 0 && (
         <nav
           aria-label="Danh sách ghim trên bảng điều tra"
           className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-2 focus-within:top-2 focus-within:z-50 focus-within:flex focus-within:max-w-xs focus-within:flex-col focus-within:gap-1 focus-within:rounded focus-within:bg-background/95 focus-within:p-2"

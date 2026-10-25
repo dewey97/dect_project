@@ -223,7 +223,8 @@ export function MainInvestigationCanvas({
     () => caseId.replace(/-/g, "_"),
     [caseId],
   );
-  const { rawEvidence: sheetEvidences } = useCaseEvidence(caseId);
+  const { rawEvidence: sheetEvidences, loading: isEvidenceLoading } =
+    useCaseEvidence(caseId);
 
   const victimChar = useMemo(() => {
     return characters.find((c) => c.role === "victim");
@@ -779,9 +780,17 @@ export function MainInvestigationCanvas({
     ],
   );
 
+  const isBoardReady = Boolean(
+    state.isProgressLoaded &&
+      !state.isCheckpointsLoading &&
+      !isEvidenceLoading &&
+      displayPins.length > 0,
+  );
+
   return (
     <div
       ref={layout.canvasWrapperRef}
+      data-board-ready={isBoardReady ? "true" : "false"}
       suppressHydrationWarning
       className="relative w-full h-full flex-1 min-h-0 flex flex-col items-center justify-center select-none transition-all duration-300"
     >
@@ -817,6 +826,7 @@ export function MainInvestigationCanvas({
         isEditMode={layout.isEditMode}
         onPinPositionChange={layout.handlePinPositionChange}
         lightConeConfig={lightConeConfig}
+        isBoardReady={isBoardReady}
       />
 
       {/* 3. Modals & Narrative Layers */}
