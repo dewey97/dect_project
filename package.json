@@ -15,7 +15,7 @@
     "scan:map-vector": "python scripts/ops/scan_figma_map_vector.py",
     "import:checkpoints": "node --experimental-strip-types scripts/ops/import-checkpoints-to-supabase.mjs",
     "start": "next start",
-    "lint": "tsc --noEmit",
+    "lint": "tsc --noEmit -p tsconfig.typecheck.json",
     "test:e2e": "playwright test"
   },
   "dependencies": {
