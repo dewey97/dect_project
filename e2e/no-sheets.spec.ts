@@ -44,9 +44,9 @@ test.describe("No Google Sheets Runtime (WT-6 / CMS Cutover)", () => {
     const interceptedGoogleCalls: string[] = [];
     const interceptedLegacyPhoneCalls: string[] = [];
 
-    // Block any external Google APIs and Google Docs/Sheets
+    // Block Google Sheets APIs and Docs Spreadsheets (B12-7)
     await page.route(
-      /.*(googleapis\.com|docs\.google\.com|spreadsheets\.google\.com).*/,
+      /.*(sheets\.googleapis\.com|docs\.google\.com\/spreadsheets|spreadsheets\.google\.com).*/,
       (route) => {
         interceptedGoogleCalls.push(route.request().url());
         return route.abort("blockedbyclient");
@@ -71,7 +71,11 @@ test.describe("No Google Sheets Runtime (WT-6 / CMS Cutover)", () => {
     await page.goto(CASE_URL);
 
     // Wait for investigation canvas
-    const phonePin = page.locator('[data-pin-id="c0-pin-victim-phone"]');
+    const phonePin = page
+      .locator(
+        '[data-node-kind="victim_phone"], [data-pin-id="c0-pin-victim-phone"]',
+      )
+      .first();
     await expect(phonePin).toBeAttached({ timeout: 20_000 });
     await phonePin.evaluate((el: HTMLElement) => el.click());
 
