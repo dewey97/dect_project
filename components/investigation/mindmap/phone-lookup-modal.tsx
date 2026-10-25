@@ -51,43 +51,16 @@ function isPhoneMatch(val: string, validKeywords: string[]): boolean {
 }
 
 interface PhoneLookupModalProps {
-  caseId?: string;
+  caseId: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (phone: string, info: string) => void;
   onOpenPhoneSimulator?: () => void;
 }
 
-const DEFAULT_PHONE_INPUTS = [
-  {
-    id: "phone1",
-    label: "SĐT 0988.200.991:",
-    placeholder: "Nhập tên nghi phạm...",
-    validAnswers: ["vu", "le quang vu", "vũ", "lê quang vũ"],
-  },
-  {
-    id: "phone2",
-    label: "SĐT 0912.331.888:",
-    placeholder: "Nhập tên nghi phạm...",
-    validAnswers: ["tung", "nguyen thanh tung", "tùng", "nguyễn thanh tùng"],
-  },
-  {
-    id: "phone3",
-    label: "SĐT 0984.180.357:",
-    placeholder: "Nhập tên nghi phạm...",
-    validAnswers: [
-      "dat",
-      "dat ga",
-      "tran van dat",
-      "đạt",
-      "đạt gà",
-      "trần văn đạt",
-    ],
-  },
-];
 
 export function PhoneLookupModal({
-  caseId = "case-000",
+  caseId,
   isOpen,
   onClose,
   onSuccess,
@@ -103,10 +76,11 @@ export function PhoneLookupModal({
   );
 
   const inputsList = useMemo(() => {
-    const rawInputs =
-      (cp0 as any)?.answerConfig?.text_match_inputs ||
-      (cp0 as any)?.answer_config?.text_match_inputs ||
-      cp0?.textMatchConfig?.inputs;
+    const cfg = (cp0 as any)?.answerConfig || (cp0 as any)?.answer_config;
+    const rawInputs =
+      cfg?.textMatchInputs ||
+      cfg?.text_match_inputs ||
+      cp0?.textMatchConfig?.inputs;
     if (rawInputs && Array.isArray(rawInputs) && rawInputs.length > 0) {
       return rawInputs.map((item: any, idx: number) => ({
         id: item.id || `phone${idx + 1}`,
@@ -115,7 +89,7 @@ export function PhoneLookupModal({
         validAnswers: item.validAnswers || item.valid_answers || [],
       }));
     }
-    return DEFAULT_PHONE_INPUTS;
+    return [];
   }, [cp0]);
 
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
