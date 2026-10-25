@@ -747,8 +747,7 @@ export function CheckpointFlowView({
     const actual: Edge[] = pendingEdges.map((edge) => {
       const id = edgeId(edge);
       const active = id === selectedEdgeId;
-      const isEpilogueEdge =
-        edge.target === "cp-000-epilogue" || edge.target.includes("epilogue");
+      const isEpilogueEdge = edge.target.includes("epilogue");
       return {
         id,
         source: edge.source,

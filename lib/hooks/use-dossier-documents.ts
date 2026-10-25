@@ -40,25 +40,7 @@ async function fetchDossierDocsShared(caseId: string) {
 /**
  * Bản đồ ánh xạ mã tài liệu vụ án (PDF code / Evidence code) sang mã Tag của Dossier Studio
  */
-export const CASE_000_DOSSIER_MAP: Record<string, string> = {
-  // Lời khai
-  '06-LK': 'A-13', // Lời khai nhân chứng: Nguyễn Thị Lụa
-  '07-LK': 'A-16', // Lời khai Nguyễn Ngọc Mai Lần 1
-  '08-LK': 'A-19', // Lời khai Lê Quang Vũ Lần 1
-  '09-LK': 'A-21', // Lời khai Trần Thị Hà Lần 1
-  'A-02': 'B-01',  // Lời khai lần 2: Lê Quang Vũ
-  'A-03': 'B-02',  // Biên bản làm việc chủ Quán Bia 88 (Nguyễn Văn Hùng)
-  'B-02': 'E-02',  // Lời khai Nguyễn Thanh Tùng Lần 1
-  'B-04': 'E-04',  // Lời khai Đạt Gà Chợ Cảng
-  'C-01': 'B-05',  // Lời khai lần 2: Trần Thị Hà
-  // Lý lịch
-  '04-NN': 'A-03', // Nhân thân nạn nhân Nguyễn Văn Khang
-  '05a-LL': 'A-15', // Lý lịch Nguyễn Ngọc Mai
-  '05b-LL': 'A-17', // Lý lịch Lê Quang Vũ
-  '05c-LL': 'A-20', // Lý lịch Trần Thị Hà
-  'B-03': 'E-01',  // Lý lịch Nguyễn Thanh Tùng
-  'B-05': 'E-03'   // Lý lịch Đạt Gà Chợ Cảng
-}
+export const CASE_000_DOSSIER_MAP: Record<string, string> = {};
 
 export function useDossierDocuments(caseId: string = 'case_000'): DossierDataState {
   const normalizedCaseId = caseId.replace(/-/g, '_')

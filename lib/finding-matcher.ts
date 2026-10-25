@@ -14,8 +14,8 @@ export function normalizeVietnameseText(str: string): string {
  * So khớp linh hoạt một chuỗi người chơi nhập với một đáp án trên Google Sheet.
  *
  * Chấp nhận: khác biệt hoa/thường, có dấu hay không dấu, và khớp theo cụm từ
- * (gõ `Vũ` vẫn đúng cho đáp án `Lê Quang Vũ`).
- * Từ chối khớp chuỗi con thô: `Khang` KHÔNG lọt vào đáp án `Hà`, `Vương` không lọt `Vũ`.
+ * (gõ `Đạt` vẫn đúng cho đáp án `Nguyễn Tiến Đạt`).
+ * Từ chối khớp chuỗi con thô: `Khang` KHÔNG lọt vào đáp án `An`, `Vương` không lọt `Đạt`.
  */
 export function isVietnameseTextMatch(
   input: string,
@@ -31,7 +31,7 @@ export function isVietnameseTextMatch(
   const inputWords = normInput.split(" ").filter(Boolean);
   const candidateWords = normCandidate.split(" ").filter(Boolean);
 
-  // 2. Input là tập con các từ của đáp án (VD: gõ `Vũ` cho đáp án `Lê Quang Vũ`, `Đạt Gà` cho `Đạt Gà Chợ Cảng`)
+  // 2. Input là tập con các từ của đáp án (VD: gõ `Đạt` cho đáp án `Nguyễn Tiến Đạt`, `Đạt Gà` cho `Đạt Gà Chợ Cảng`)
   // BẮT BUỘC: Mọi từ người chơi gõ đều phải nằm trong đáp án (không được có từ lạ / tên người khác)
   if (inputWords.length < candidateWords.length) {
     if (inputWords.every((word) => candidateWords.includes(word))) {
@@ -39,7 +39,7 @@ export function isVietnameseTextMatch(
     }
   }
 
-  // 3. Người chơi gõ họ tên đầy đủ (VD: `Lê Quang Vũ`) khi trên Sheet chỉ để tên gọi tắt (`Vũ`)
+  // 3. Người chơi gõ họ tên đầy đủ (VD: `Nguyễn Tiến Đạt`) khi trên Sheet chỉ để tên gọi tắt (`Đạt`)
   // BẮT BUỘC: Tên người chơi gõ phải kết thúc bằng từ của đáp án, độ dài hợp lý (<= 4 từ),
   // và KHÔNG được chứa các liên từ nối 2 người ("va", "cung", "hoac", "voi"...)
   if (

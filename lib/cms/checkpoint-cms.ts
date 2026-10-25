@@ -189,8 +189,8 @@ function normalizeKey(key: string): string {
 
 /**
  * Bóc một dòng ô nhập văn bản:
- * - Dạng tối giản: `0988.200.991: Vũ, Lê Quang Vũ` hoặc `SĐT 0988.200.991: Vũ`
- * - Dạng đầy đủ: `phone_1 | SĐT 0988.200.991: | Nhập tên nghi phạm... | Lê Quang Vũ, Vũ`
+ * - Dạng tối giản: `0988.200.991: Tên nghi phạm` hoặc `SĐT 0988.200.991: Tên nghi phạm`
+ * - Dạng đầy đủ: `phone_1 | SĐT 0988.200.991: | Nhập tên nghi phạm... | Tên, Bí danh`
  */
 function parseInputLine(
   value: string,
@@ -212,7 +212,7 @@ function parseInputLine(
     };
   }
 
-  // Dạng 2: Cú pháp tối giản gọn gàng: "0988.200.991: Vũ, Lê Quang Vũ" hoặc rawKey là số điện thoại
+  // Dạng 2: Cú pháp tối giản gọn gàng: "0988.200.991: Tên nghi phạm" hoặc rawKey là số điện thoại
   const colonIdx = value.indexOf(":");
   if (colonIdx !== -1) {
     const label = value.slice(0, colonIdx).trim();

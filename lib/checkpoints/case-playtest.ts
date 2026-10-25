@@ -80,7 +80,7 @@ export function launchPlaytestFromCheckpoint(params: {
       }
     } else if (kind === "indictment") {
       setStorageItem(caseStorageKey(caseId, "indictment_solved"), "true");
-      setStorageItem(caseStorageKey(caseId, "indictment_culprit"), sKey || "ha");
+      setStorageItem(caseStorageKey(caseId, "indictment_culprit"), sKey || "culprit");
       unlockedDossiers.push("ket_luan");
     }
 
@@ -121,7 +121,7 @@ export function launchPlaytestFromCheckpoint(params: {
     targetCheckpoint.type === "epilogue"
   ) {
     setStorageItem(caseStorageKey(caseId, "indictment_solved"), "true");
-    setStorageItem(caseStorageKey(caseId, "indictment_culprit"), "ha");
+    setStorageItem(caseStorageKey(caseId, "indictment_culprit"), "culprit");
     if (!unlockedDossiers.includes("ket_luan")) {
       unlockedDossiers.push("ket_luan");
       setStorageItem(

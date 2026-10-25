@@ -572,7 +572,7 @@ export function AddSuspectModal({
     setErrorMsg("");
   };
 
-  // NÚT: ĐIỀU TRA (Thẩm tra / điều tra nghi phạm Lê Quang Vũ, Nguyễn Thanh Tùng hoặc Trần Thị Hà)
+  // NÚT: ĐIỀU TRA (Thẩm tra / điều tra đối tượng tình nghi được chọn)
   const handleSubmitConclusion = () => {
     const currentName = name.trim() || editingSuspect?.name?.trim() || "";
     if (!currentName) {

@@ -9,7 +9,7 @@ import { getStorageItem, setStorageItem, getStorageJson } from "@/lib/storage";
 import { normalizeImageUrl } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
-import { HaDiscoveredPhotosPopup } from "./followup/ha-discovered-photos-popup";
+// Removed dead HaDiscoveredPhotosPopup
 import { FollowupTimeForm } from "./followup/followup-time-form";
 import { FollowupChoiceForm } from "./followup/followup-choice-form";
 import { FollowupCodeForm } from "./followup/followup-code-form";
@@ -385,8 +385,6 @@ export function FollowupQuestionModal({
         caseStorageKey(caseId, `followup_${targetCulprit}`),
         finalAnswer,
       );
-      if (targetCulprit === "vu")
-        setStorageItem(caseStorageKey(caseId, "followup_vu"), finalAnswer);
       if (onSuccess) {
         onSuccess(targetCulprit, finalAnswer);
       }
@@ -442,8 +440,6 @@ export function FollowupQuestionModal({
         caseStorageKey(caseId, `followup_${targetCulprit}`),
         selectedChoice,
       );
-      if (targetCulprit === "tung")
-        setStorageItem(caseStorageKey(caseId, "followup_tung"), selectedChoice);
       if (onSuccess) {
         onSuccess(targetCulprit, selectedChoice);
       }
@@ -500,19 +496,10 @@ export function FollowupQuestionModal({
       );
       setStorageItem(
         caseStorageKey(caseId, `followup_${targetCulprit}`),
-        "solved",
+        rawVal || "solved",
       );
-      if (targetCulprit === "ha") {
-        setStorageItem(caseStorageKey(caseId, "followup_ha_password"), rawVal);
-        setStorageItem(caseStorageKey(caseId, "followup_ha"), rawVal);
-      }
-      // Mở popup ảnh vật chứng nếu có
-      if (discoveredPhotos.length > 0) {
-        setShowPhotoPopup(true);
-      } else {
-        if (onSuccess) onSuccess(targetCulprit, "solved");
-        onClose();
-      }
+      if (onSuccess) onSuccess(targetCulprit, rawVal || "solved");
+      onClose();
     } else {
       detectiveAudio.playGlassSound();
       setErrorMsg(
@@ -711,12 +698,7 @@ export function FollowupQuestionModal({
         </motion.div>
       </div>
 
-      {/* POPUP ẢNH VẬT CHỨNG SAU KHI MỞ KHÓA THÀNH CÔNG */}
-      <HaDiscoveredPhotosPopup
-        isOpen={showPhotoPopup}
-        photos={discoveredPhotos}
-        onContinue={handleFinishAfterPhotoPopup}
-      />
+      {/* Kết thúc modal câu hỏi phụ */}
     </AnimatePresence>
   );
 }

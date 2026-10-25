@@ -146,7 +146,7 @@ export function MainInvestigationCanvas({
         state.activeFollowupCulprit ||
         state.narrativeCulprit ||
         state.solvedCulprit ||
-        "vu";
+        "";
       viewedSuspectKey = c;
       const matched = state.checkpoints?.find(
         (cp) =>
@@ -154,23 +154,17 @@ export function MainInvestigationCanvas({
           (((cp as any).subject_key || cp.subjectKey || "")
             .toLowerCase() === c.toLowerCase()),
       );
-      currentCp = matched
-        ? matched.id
-        : c === "vu"
-          ? "cp-000-1a"
-          : c === "tung"
-            ? "cp-000-1b"
-            : "cp-000-1c";
+      currentCp = matched ? matched.id : null;
     } else if (state.isPhoneLookupOpen) {
       const matched = state.checkpoints?.find(
         (cp) => cp.kind === "phone_lookup" || (cp as any).type === "phone_lookup",
       );
-      currentCp = matched ? matched.id : "cp-000-0";
+      currentCp = matched ? matched.id : null;
     } else if (state.isIndictmentOpen) {
       const matched = state.checkpoints?.find(
         (cp) => cp.kind === "indictment" || (cp as any).type === "indictment",
       );
-      currentCp = matched ? matched.id : "cp-000-2b";
+      currentCp = matched ? matched.id : null;
     } else if (state.isAddSuspectOpen || state.editingSuspect) {
       const sName = (state.editingSuspect?.name || "").toLowerCase().trim();
       const sId = (state.editingSuspect?.id || "").toLowerCase().trim();
@@ -181,17 +175,11 @@ export function MainInvestigationCanvas({
             cp.kind === "suspect" ||
             (cp as any).type === "suspect_interrogation") &&
           (((cp as any).subject_key || cp.subjectKey || "")
-            .toLowerCase() === sId),
+            .toLowerCase() === sId ||
+           ((cp as any).subject_key || cp.subjectKey || "")
+            .toLowerCase() === sName),
       );
-      currentCp = matched
-        ? matched.id
-        : sId === "vu"
-          ? "cp-000-1a"
-          : sId === "tung"
-            ? "cp-000-1b"
-            : sId === "ha"
-              ? "cp-000-1c"
-              : null;
+      currentCp = matched ? matched.id : null;
     } else if (activeCustomPinModal) {
       currentCp = detectCheckpointForPin(activeCustomPinModal);
     }
@@ -291,26 +279,12 @@ export function MainInvestigationCanvas({
           rawLabel.includes("chân dung");
 
         // 1. Suspect / Character avatars
-        if (
-          rawCode === "avatar_vu" ||
-          (isAvatar && (rawCode === "vu" || rawLabel.includes("vũ")))
-        )
-          map.vu = normUrl;
-        if (
-          rawCode === "avatar_tung" ||
-          (isAvatar && (rawCode === "tung" || rawLabel.includes("tùng")))
-        )
-          map.tung = normUrl;
-        if (
-          rawCode === "avatar_ha" ||
-          (isAvatar && (rawCode === "ha" || rawLabel.includes("hà")))
-        )
-          map.ha = normUrl;
-        if (
-          rawCode === "avatar_mai" ||
-          (isAvatar && (rawCode === "mai" || rawLabel.includes("mai")))
-        )
-          map.mai = normUrl;
+        if (rawCode.startsWith("avatar_")) {
+          const charKey = rawCode.replace(/^avatar_/, "");
+          map[charKey] = normUrl;
+        } else if (isAvatar && rawCode) {
+          map[rawCode] = normUrl;
+        }
         if (
           rawCode === "avatar_victim" || (isAvatar && (item.role === "victim" || rawLabel.includes("nạn nhân")))
         )
@@ -478,15 +452,7 @@ export function MainInvestigationCanvas({
     return state.suspects;
   }, [state.suspects, sheetEvidences]);
 
-  const vuSuspect = effectiveSuspects.find(
-    (s) => getCanonicalSuspectKey(s).canonicalId === "vu",
-  );
-  const tungSuspect = effectiveSuspects.find(
-    (s) => getCanonicalSuspectKey(s).canonicalId === "tung",
-  );
-  const haSuspect = effectiveSuspects.find(
-    (s) => getCanonicalSuspectKey(s).canonicalId === "ha",
-  );
+  // Suspects list for connections and pins
 
   // Tập hợp toàn bộ culprit IDs có câu hỏi mở rộng
   const followupCulpritIds = useMemo(() => {
@@ -590,18 +556,12 @@ export function MainInvestigationCanvas({
       buildCustomConnections({
         effectiveSuspects,
         followupCulpritIds,
-        vuSuspect,
-        tungSuspect,
-        haSuspect,
         activePins: displayPins,
         adminConnections: layout.adminConnections,
       }),
     [
       effectiveSuspects,
       followupCulpritIds,
-      vuSuspect,
-      tungSuspect,
-      haSuspect,
       displayPins,
       layout.adminConnections,
     ],
@@ -726,23 +686,16 @@ export function MainInvestigationCanvas({
           }
           const isAlreadySolved =
             state.solvedFollowupQuestions.includes(c) ||
-            getStorageItem(caseStorageKey(caseId, `followup_${c}`)) ===
-              "solved" ||
-            (c === "ha" &&
-              !!getStorageItem(caseStorageKey(caseId, "followup_ha_password"))) ||
-            (c === "vu" &&
-              !!getStorageItem(caseStorageKey(caseId, "followup_vu")));
+            Boolean(getStorageItem(caseStorageKey(caseId, `followup_${c}`)));
 
           if (isAlreadySolved) {
-            if (c === "ha") {
-              state.setIsFollowupQuestionOpen(true);
-            } else {
-              const savedChoice =
-                getStorageItem(caseStorageKey(caseId, `followup_${c}_choice`)) ||
-                (c === "vu" ? "21:15" : "question_solved");
+            const savedChoice = getStorageItem(caseStorageKey(caseId, `followup_${c}_choice`));
+            if (savedChoice) {
               state.setNarrativeChoice(savedChoice);
               state.setNarrativeCulprit(c);
               state.setIsEpilogueOpen(true);
+            } else {
+              state.setIsFollowupQuestionOpen(true);
             }
           } else {
             state.setIsFollowupQuestionOpen(true);

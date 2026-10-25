@@ -693,11 +693,11 @@ export function findFollowupCulprit(
     return id.replace("followup-", "");
   }
 
-  const d = (detail || "").toLowerCase();
-  if (id.includes("ha") || d.includes("hà")) return "ha";
-  if (id.includes("tung") || d.includes("tùng")) return "tung";
-  if (id.includes("vu") || d.includes("vũ")) return "vu";
-  return id || "vu";
+  if (detail) {
+    const d = detail.toLowerCase().trim();
+    return d || id;
+  }
+  return id;
 }
 
 /**

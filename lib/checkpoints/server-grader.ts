@@ -235,8 +235,7 @@ export function gradeCheckpoint(
   // 3. Indictment (Cáo trạng kết án)
   if (kind === "indictment") {
     const rawSuspects = (cfg.validSuspects || []) as string[];
-    const validSuspects =
-      rawSuspects.length > 0 ? rawSuspects : ["Trần Thị Hà", "ha", "hà"];
+    const validSuspects = rawSuspects;
     const validMotives = (cfg.validMotives || []) as string[];
     const requiredEvidence = (cfg.requiredEvidenceIds || []) as string[];
     const optionalEvidence = (cfg.optionalEvidenceIds || []) as string[];

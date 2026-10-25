@@ -30,52 +30,7 @@ export interface CheckpointGroupData {
  */
 export function normalizeCheckpointId(id?: string, caseId?: string): string {
   if (!id) return "";
-  const clean = id.trim().toLowerCase();
-  if (caseId && caseId !== "case-000") {
-    return clean;
-  }
-  if (clean.includes("followup")) {
-    if (clean.includes("vu") || clean.includes("1a"))
-      return "cp-000-1a-followup";
-    if (clean.includes("ha") || clean.includes("1c"))
-      return "cp-000-1c-followup";
-    return clean;
-  }
-  if (
-    clean === "phone" ||
-    clean === "cp-000-0" ||
-    clean.startsWith("phone")
-  )
-    return "cp-000-0";
-  if (
-    clean === "vu" ||
-    clean === "vũ" ||
-    clean === "cp-000-1a" ||
-    clean.endsWith("-vu")
-  )
-    return "cp-000-1a";
-  if (
-    clean === "tung" ||
-    clean === "tùng" ||
-    clean === "cp-000-1b" ||
-    clean.endsWith("-tung")
-  )
-    return "cp-000-1b";
-  if (
-    clean === "ha" ||
-    clean === "hà" ||
-    clean === "cp-000-1c" ||
-    clean.endsWith("-ha")
-  )
-    return "cp-000-1c";
-  if (
-    clean === "indictment" ||
-    clean === "cao-trang" ||
-    clean === "cp-000-2b" ||
-    clean.includes("indictment")
-  )
-    return "cp-000-2b";
-  return clean;
+  return id.trim();
 }
 
 /**
@@ -94,32 +49,7 @@ export function getLatestActiveCheckpointId(): string {
   const lastInteracted = getStorageItem("last_interacted_checkpoint");
   if (lastInteracted) return normalizeCheckpointId(lastInteracted);
 
-  const lastSuspect = getStorageItem("last_viewed_suspect");
-  if (lastSuspect) {
-    const normSuspect = lastSuspect.toLowerCase().trim();
-    if (normSuspect === "vu" || normSuspect.includes("vũ")) return "cp-000-1a";
-    if (normSuspect === "tung" || normSuspect.includes("tùng"))
-      return "cp-000-1b";
-    if (normSuspect === "ha" || normSuspect.includes("hà")) return "cp-000-1c";
-  }
-
-  // 2. Kiểm tra tiến trình giải đố thực tế trong storage
-  const isPhoneSolved = getStorageItem(caseStorageKey(getActiveCaseId(), "phone_solved")) === "true";
-  if (!isPhoneSolved) return "cp-000-0";
-
-  const isVuSolved = Boolean(getStorageItem(caseStorageKey(getActiveCaseId(), "followup_vu")));
-  if (!isVuSolved) return "cp-000-1a";
-
-  const isTungSolved = Boolean(getStorageItem(caseStorageKey(getActiveCaseId(), "followup_tung")));
-  if (!isTungSolved) return "cp-000-1b";
-
-  const isHaSolved = Boolean(getStorageItem(caseStorageKey(getActiveCaseId(), "followup_ha")));
-  if (!isHaSolved) return "cp-000-1c";
-
-  const isIndictmentSolved = getStorageItem(caseStorageKey(getActiveCaseId(), "indictment_solved")) === "true";
-  if (!isIndictmentSolved) return "cp-000-2b";
-
-  return "cp-000-2b";
+  return "";
 }
 
 /**

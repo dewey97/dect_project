@@ -11,7 +11,7 @@ export interface DetectivePing {
   id: string
   actorName: string
   targetId: string        // ID của ghim, tài liệu hoặc vật chứng được chỉ điểm
-  label: string           // Nhãn hiển thị (VD: "DOC-A01", "Lời khai Lê Quang Vũ")
+  label: string           // Nhãn hiển thị (VD: "DOC-A01", "Lời khai nhân chứng")
   targetType?: 'pin' | 'doc' | 'evidence' // Loại mục tiêu chỉ điểm
   docType?: 'pdf' | 'evidence'            // Loại tài liệu để tự động chuyển tab
   phase?: number                          // Phase của tài liệu để tự mở bộ hồ sơ tương ứng

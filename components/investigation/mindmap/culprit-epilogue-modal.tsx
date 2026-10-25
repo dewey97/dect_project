@@ -75,7 +75,7 @@ export function CulpritEpilogueModal({
       c.name.toLowerCase() === targetCulprit.toLowerCase(),
   );
 
-  const isHa = targetCulprit === "ha";
+  const isHa = false;
   const isHaBoxSolved =
     (isHa || caseId !== "case-000") &&
     (choice === "solved_box" ||
