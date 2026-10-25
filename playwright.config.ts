@@ -14,6 +14,7 @@ const PORT = Number(process.env.E2E_PORT || process.env.PORT || 3101);
  * cache `.next` của dev server đang chạy ở cổng 3000.
  */
 export default defineConfig({
+  globalSetup: "./e2e/helpers/global-setup.ts",
   testDir: "./e2e",
   timeout: 90_000,
   expect: { timeout: 15_000 },
