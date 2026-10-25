@@ -45,7 +45,7 @@ export function MapsApp({ onBackToHome }: MapsAppProps) {
 
     async function loadCustomMap() {
       try {
-        const res = await fetch('/api/admin/map-vector', { cache: 'force-cache' })
+        const res = await fetch('/api/map-vector', { cache: 'force-cache' })
         const json = await res.json()
         if (json.success && json.data && isMounted) {
           _clientMapCache = json.data

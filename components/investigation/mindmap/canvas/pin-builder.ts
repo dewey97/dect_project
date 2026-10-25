@@ -7,7 +7,7 @@ import type {
 import {
   getCanonicalSuspectKey,
   removeDiacritics,
-} from "@/lib/cases/case-000-suspects";
+} from "@/lib/cases/characters";
 import { normalizeImageUrl } from "@/lib/utils";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 import type { DbCaseBoardNode, DbCaseCharacter } from "@/lib/types/database";

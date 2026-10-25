@@ -366,14 +366,7 @@ export function DashboardClient({
               Google Sheet. Checkpoint đã chuyển sang Checkpoint Studio.
             </p>
           </div>
-          <a
-            href="https://docs.google.com/spreadsheets/d/1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q/edit"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-zinc-950 font-bold rounded-lg hover:bg-emerald-400 transition-all text-xs shadow-lg shadow-emerald-500/10 shrink-0"
-          >
-            Mở Google Sheet CMS ↗
-          </a>
+          <Link href="/studio/evidence" className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-zinc-950 font-bold rounded-lg hover:bg-emerald-400 transition-all text-xs shadow-lg shadow-emerald-500/10 shrink-0">Mở Studio Quản Trị ↗</Link>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">

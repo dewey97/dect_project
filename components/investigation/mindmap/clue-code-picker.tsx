@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { X } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 import { cn } from '@/lib/utils'
-import { resolveEvidenceCode, getSortedClues } from '@/lib/cases/case-000-clues'
+import { resolveEvidenceCode, getSortedClues } from '@/lib/cases/clues'
 
 export interface PendingClueInputs {
   code?: string

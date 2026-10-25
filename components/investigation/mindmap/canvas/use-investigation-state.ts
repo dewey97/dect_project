@@ -6,7 +6,7 @@ import { useRoomSync } from "@/components/investigation/room-sync-context";
 import {
   getCanonicalSuspectKey,
   findValidCaseCharacter,
-} from "@/lib/cases/case-000-suspects";
+} from "@/lib/cases/characters";
 import {
   getStorageItem,
   setStorageItem,

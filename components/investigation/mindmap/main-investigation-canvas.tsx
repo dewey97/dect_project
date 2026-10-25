@@ -11,7 +11,7 @@ import {
   HeroInteractive,
   type PinPoint,
 } from "@/components/investigation/hero-interactive";
-import { getCanonicalSuspectKey } from "@/lib/cases/case-000-suspects";
+import { getCanonicalSuspectKey } from "@/lib/cases/characters";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";

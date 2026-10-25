@@ -135,14 +135,6 @@ export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
                     >
                       Playtest
                     </Link>
-                    <a
-                      href="https://docs.google.com/spreadsheets/d/1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q/edit"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded text-xs font-medium hover:bg-emerald-500/20 transition-colors"
-                    >
-                      Sheet CMS
-                    </a>
                     <div className="inline-flex items-center gap-1 ml-2">
                       <DuplicateCaseButton caseId={c.id} />
                       <DeleteCaseButton caseId={c.id} caseTitle={c.title} />
