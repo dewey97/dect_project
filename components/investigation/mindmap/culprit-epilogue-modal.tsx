@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import { TypewriterNarrator } from "@/components/investigation/evidence/typewriter-narrator";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
-import { normalizeCaseId } from "@/lib/cases/case-id";
 
 interface CulpritEpilogueModalProps {
   isOpen: boolean;
@@ -29,10 +28,10 @@ export function CulpritEpilogueModal({
   subjectKey,
   choice,
   onClose,
-  onOpenDossier,
+  onOpenDossier: _onOpenDossier,
   onOpenFollowupQuestion,
   onOpenIndictment,
-  caseId = "case_000",
+  caseId,
 }: CulpritEpilogueModalProps) {
   const charactersContext = useOptionalCaseCharacters();
   const characters = charactersContext?.characters || [];
@@ -48,13 +47,11 @@ export function CulpritEpilogueModal({
       ? (choice as "CÓ" | "KHÔNG" | "tin" | "khong_tin")
       : null,
   );
-  const [haWarrantStep, setHaWarrantStep] = useState(false);
 
   const targetCulprit = subjectKey || culprit || null;
 
   React.useEffect(() => {
     setIsNarrativeComplete(false);
-    setHaWarrantStep(false);
     if (
       choice === "CÓ" ||
       choice === "KHÔNG" ||
@@ -76,15 +73,13 @@ export function CulpritEpilogueModal({
       c.name.toLowerCase() === targetCulprit.toLowerCase(),
   );
 
-  const isHa = false;
-  const isHaBoxSolved =
-    (isHa || normalizeCaseId(caseId) !== "case_000") &&
-    (choice === "solved_box" ||
-      choice === "solved" ||
-      choice === "matched_3_tiles" ||
-      choice === "matched_3_tiles_indictment" ||
-      choice === "indictment_ready");
-  const isQuestionSolved = Boolean(choice) && !isHaBoxSolved;
+  const isCulpritSolved =
+    choice === "solved_box" ||
+    choice === "solved" ||
+    choice === "matched_3_tiles" ||
+    choice === "matched_3_tiles_indictment" ||
+    choice === "indictment_ready";
+  const isQuestionSolved = Boolean(choice) && !isCulpritSolved;
   const showTwoChoiceButtons =
     isQuestionSolved &&
     !internalChoice;
@@ -124,13 +119,13 @@ export function CulpritEpilogueModal({
     return cp?.storyConfig?.monologue || "";
   };
 
-  let dateLabel = isHaBoxSolved
+  const dateLabel = isCulpritSolved
     ? `BẢN KẾT LUẬN ĐIỀU TRA — KẾT ÁN THỦ PHẠM ${suspectName.toUpperCase()}`
     : `THÔNG BÁO ĐIỀU TRA — ${suspectName.toUpperCase()}`;
 
   let storyText = "";
 
-  if (isHaBoxSolved) {
+  if (isCulpritSolved) {
     // Narrative kết án trực tiếp từ checkpoint indictment hoặc epilogue
     const dynamicIndictmentCp = checkpoints.find(
       (c) =>
@@ -149,18 +144,7 @@ export function CulpritEpilogueModal({
   } else if (internalChoice === "CÓ" || internalChoice === "tin") {
     storyText = `Bạn lựa chọn tạm thời tin tưởng ${suspectName}.\n\nHãy chuyển hướng điều tra vụ án.\nTuy nhiên, xin các thám tử nhớ rằng: Một người chỉ được kết luận vô tội khi bạn tìm ra được hung thủ thực sự.`;
   } else if (internalChoice === "KHÔNG" || internalChoice === "khong_tin") {
-    if (isHa && haWarrantStep) {
-      const indictmentCp = checkpoints.find(
-        (c) => c.kind === "indictment" || c.id.includes("indictment"),
-      );
-      storyText =
-        indictmentCp?.narrative ||
-        indictmentCp?.storyConfig?.monologue ||
-        getCheckpointMonologue(indictmentCp?.id || "") ||
-        `Lệnh khám xét khẩn cấp đối với ${suspectName} chính thức được phê duyệt!`;
-    } else {
-      storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`;
-    }
+    storyText = `Bạn không tin đối tượng ${suspectName} vô tội.\n\nHãy lập tức mở rộng điều tra, truy quét thêm các manh mối để chứng minh suy luận của mình.`;
   } else {
     const suspectCp =
       checkpoints.find(
@@ -185,23 +169,19 @@ export function CulpritEpilogueModal({
   }
 
   let ctaButtonText = "TIẾP TỤC ĐIỀU TRA";
-  if (isHaBoxSolved) {
+  if (isCulpritSolved) {
     ctaButtonText = "LẬP BẢN CÁO TRẠNG ĐỊNH TỘI";
   } else if (!choice && !internalChoice) {
     ctaButtonText = "Bắt đầu điều tra";
   } else if (internalChoice === "tin") {
     ctaButtonText = "Chuyển hướng điều tra";
   } else if (internalChoice === "khong_tin") {
-    if (isHa) {
-      ctaButtonText = haWarrantStep ? "Tiến hành khám xét" : "Mở rộng điều tra";
-    } else {
-      ctaButtonText = "Mở rộng điều tra";
-    }
+    ctaButtonText = "Mở rộng điều tra";
   }
 
   const handleCtaClick = () => {
     detectiveAudio.playStampSound();
-    if (isHaBoxSolved) {
+    if (isCulpritSolved) {
       onClose();
       if (onOpenIndictment) {
         onOpenIndictment();
@@ -235,7 +215,7 @@ export function CulpritEpilogueModal({
             {/* Typewriter Monologue */}
             <div className="pt-2 w-full flex-1 overflow-y-auto custom-scrollbar">
               <TypewriterNarrator
-                key={`${targetCulprit}-${internalChoice || (showTwoChoiceButtons ? "choice" : "default")}-${haWarrantStep}`}
+                key={`${targetCulprit}-${internalChoice || (showTwoChoiceButtons ? "choice" : "default")}`}
                 text={storyText}
                 speed={12}
                 onComplete={() => setIsNarrativeComplete(true)}
