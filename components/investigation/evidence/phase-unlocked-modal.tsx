@@ -8,7 +8,7 @@ import { TypewriterNarrator } from "./typewriter-narrator";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { useCaseNarratives } from "@/lib/hooks/use-case-narratives";
 import { setStorageItem } from "@/lib/storage";
-import { normalizeCaseId } from "@/lib/cases/case-id";
+import { normalizeCaseId, caseStorageKey } from "@/lib/cases/case-id";
 import { getActiveCaseId } from "@/lib/cases/case-characters";
 
 export interface UnlockedModalData {
@@ -25,6 +25,7 @@ interface PhaseUnlockedModalProps {
   onSetPhaseFilter: (phase: number) => void;
   playExperience?: "web" | "boardgame";
   autoStartStory?: boolean;
+  caseId?: string;
 }
 
 export function PhaseUnlockedModal({
@@ -35,12 +36,15 @@ export function PhaseUnlockedModal({
   onSetPhaseFilter,
   playExperience = "web",
   autoStartStory = false,
+  caseId,
 }: PhaseUnlockedModalProps) {
   const [isStoryStarted, setIsStoryStarted] = React.useState(autoStartStory);
   const [isNarrativeComplete, setIsNarrativeComplete] = React.useState(false);
 
+  const activeCase = normalizeCaseId(caseId || getActiveCaseId());
+
   // Đọc danh sách dẫn truyện cinematic trực tiếp từ tab `narratives` trên Google Sheet Live CMS
-  const { getPhaseNarrative } = useCaseNarratives(normalizeCaseId(getActiveCaseId()));
+  const { getPhaseNarrative } = useCaseNarratives(activeCase);
 
   const currentNarrative = React.useMemo(() => {
     if (!unlockedModalData) return null;
@@ -127,6 +131,7 @@ export function PhaseUnlockedModal({
                   onClick={() => {
                     if (unlockedModalData.unlockedPhase === 0) {
                       setStorageItem("intro_seen", "true");
+                      setStorageItem(caseStorageKey(activeCase, "intro_seen"), "true");
                     }
                     onSetPhaseFilter(unlockedModalData.unlockedPhase);
                     onClose();

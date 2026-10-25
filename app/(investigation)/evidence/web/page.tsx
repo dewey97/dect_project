@@ -404,27 +404,64 @@ function WebEvidencePageContent() {
   useEffect(() => {
     setStorageItem("play_experience", "web");
 
-    const isIntroSeen = getStorageItem(caseStorageKey(caseId, "intro_seen"));
-    if (isIntroSeen !== "true") {
+    const isIntroSeen =
+      getStorageItem(caseStorageKey(caseId, "intro_seen")) === "true" ||
+      (caseId === "case_000" && getStorageItem("intro_seen") === "true");
+    if (!isIntroSeen) {
+      const sorted = [...dossiers].sort((a, b) => {
+        const slotA =
+          typeof (a as any).slot_index === "number" ? (a as any).slot_index : 0;
+        const slotB =
+          typeof (b as any).slot_index === "number" ? (b as any).slot_index : 0;
+        return slotA - slotB;
+      });
+      const firstDossier = sorted[0];
+      const firstKey = firstDossier?.dossier_key;
+      const firstSlot =
+        typeof (firstDossier as any)?.slot_index === "number"
+          ? (firstDossier as any).slot_index
+          : 0;
+
+      const isInitialItem = (item: CombinedItem) => {
+        if (item.phase === 0) return true;
+        if (firstKey && item.dossierKey === firstKey) return true;
+        if (firstDossier && item.phase === firstSlot) return true;
+        return false;
+      };
+
       const initPdfs = (effectiveItems as CombinedItem[])
-        .filter((i) => i.type === "pdf" && i.phase === 0)
+        .filter((i) => i.type === "pdf" && isInitialItem(i))
         .map((i) => i.data as PDFDocument);
       const initEvidence = (effectiveItems as CombinedItem[])
-        .filter((i) => i.type === "evidence" && i.phase === 0)
+        .filter((i) => i.type === "evidence" && isInitialItem(i))
         .map((i) => i.data as PhysicalEvidence);
 
       if (initPdfs.length > 0 || initEvidence.length > 0) {
         setUnlockedModalData({
-          unlockedPhase: 0,
+          unlockedPhase: firstSlot,
           newPdfs: initPdfs,
           newEvidence: initEvidence,
         });
-      } else if (caseId === "case-000" || caseId === "case_000") {
-        setUnlockedModalData({
-          unlockedPhase: 0,
-          newPdfs: casePdfs.filter((d) => d.phase === 0),
-          newEvidence: caseEvs.filter((e) => e.phase === 0),
-        });
+      } else {
+        const fallbackPdfs = casePdfs.filter(
+          (d) =>
+            d.phase === 0 ||
+            (firstKey && d.dossierKey === firstKey) ||
+            d.phase === firstSlot,
+        );
+        const fallbackEvs = caseEvs.filter(
+          (e) =>
+            e.phase === 0 ||
+            (firstKey && e.dossierKey === firstKey) ||
+            e.phase === firstSlot,
+        );
+        if (fallbackPdfs.length > 0 || fallbackEvs.length > 0) {
+          setUnlockedModalData({
+            unlockedPhase: firstSlot,
+            newPdfs: fallbackPdfs,
+            newEvidence: fallbackEvs,
+          });
+        }
       }
     }
 
@@ -466,7 +503,7 @@ function WebEvidencePageContent() {
     if (savedCollapsed === "true") {
       setIsDossierCollapsed(true);
     }
-  }, [caseId, effectiveItems]);
+  }, [caseId, effectiveItems, dossiers, casePdfs, caseEvs]);
 
 
 
@@ -806,9 +843,13 @@ function WebEvidencePageContent() {
 
       {/* PHASE UNLOCKED CINEMATIC STORY MODAL */}
       <PhaseUnlockedModal
+        caseId={caseId}
         unlockedModalData={unlockedModalData}
         playExperience="web"
-        onClose={() => setUnlockedModalData(null)}
+        onClose={() => {
+          setStorageItem(caseStorageKey(caseId, "intro_seen"), "true");
+          setUnlockedModalData(null);
+        }}
         onSelectPdf={handleSelectPdf}
         onSelectEvidence={handleSelectEvidence}
         onSetPhaseFilter={(phase) => setSelectedPhaseFilter(phase)}
