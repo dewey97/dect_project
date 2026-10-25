@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-function getAdminClient(): SupabaseClient | null {
+export function getAdminClient(): SupabaseClient | null {
   try {
     process.loadEnvFile(".env.local");
   } catch {}

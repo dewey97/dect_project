@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { executeSql } from "./helpers/db-admin";
+import { getAdminClient, isE2EDbAvailable } from "./helpers/db-admin";
 
 test.use({ storageState: "e2e/.auth/admin.json" });
 
@@ -17,7 +17,21 @@ test.describe("Phone Case Custom App & Deep Clone (P29)", () => {
     page,
     request,
   }, testInfo) => {
-    // 1. Kiểm tra xem bảng case_phone_apps (migration 30-34) đã có trên database chưa
+    // 1. Kiểm tra môi trường DB ghi an toàn
+    if (!isE2EDbAvailable()) {
+      testInfo.skip(
+        true,
+        "Môi trường test không có DB ghi (E2E_SUPABASE_URL chưa cấu hình)",
+      );
+      return;
+    }
+    const supabase = getAdminClient();
+    if (!supabase) {
+      testInfo.skip(true, "Không khởi tạo được Supabase admin client");
+      return;
+    }
+
+    // 2. Kiểm tra xem bảng case_phone_apps (migration 30-34) đã có trên database chưa
     const probeRes = await request.get("/api/phone-data/apps?caseId=case_000");
     if (!probeRes.ok()) {
       testInfo.skip(true, "API phone-data không phản hồi thành công");
@@ -37,19 +51,21 @@ test.describe("Phone Case Custom App & Deep Clone (P29)", () => {
 
     try {
       // Đảm bảo case tạm tồn tại trong bảng cases để thỏa mãn FK constraint
-      await executeSql(
-        `INSERT INTO public.cases (slug, title, status) VALUES ('${tempCaseSlug}', 'Vụ Án Tạm E2E', 'DRAFT') ON CONFLICT (slug) DO NOTHING;`,
-      );
+      await supabase.from("cases").upsert({
+        slug: tempCaseSlug,
+        title: "Vụ Án Tạm E2E",
+        status: "DRAFT",
+      });
 
-      // 2. Mở Phone Studio cho case tạm thời
+      // 3. Mở Phone Studio cho case tạm thời
       await page.goto(`/studio/phone?case=${tempCaseSlug}`);
 
-      // 3. Chuyển sang tab Ứng dụng
+      // 4. Chuyển sang tab Ứng dụng
       const appsTab = page.getByRole("tab", { name: /Ứng dụng/i });
       await expect(appsTab).toBeVisible({ timeout: 10_000 });
       await appsTab.click();
 
-      // 4. Nhập tên app tùy biến và bấm Thêm ứng dụng
+      // 5. Nhập tên app tùy biến và bấm Thêm ứng dụng
       const customAppName = "AppThửNghiệm";
       const nameInput = page.getByPlaceholder("Tên hiển thị (tùy chọn)");
       await nameInput.fill(customAppName);
@@ -57,15 +73,13 @@ test.describe("Phone Case Custom App & Deep Clone (P29)", () => {
       const addBtn = page.getByRole("button", { name: /Thêm ứng dụng/i });
       await addBtn.click();
 
-      // 5. Kiểm tra Phone Simulator bên phải đã render app mới
+      // 6. Kiểm tra Phone Simulator bên phải đã render app mới
       const renderedApp = page.locator(`button[title*="${customAppName}"]`);
       await expect(renderedApp).toBeVisible({ timeout: 10_000 });
     } finally {
       // Dọn sạch case tạm và các bảng liên quan (ON DELETE CASCADE)
       try {
-        await executeSql(
-          `DELETE FROM public.cases WHERE slug = '${tempCaseSlug}';`,
-        );
+        await supabase.from("cases").delete().eq("slug", tempCaseSlug);
       } catch {}
     }
   });
