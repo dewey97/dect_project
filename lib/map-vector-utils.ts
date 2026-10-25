@@ -179,7 +179,7 @@ export function snapPoint(
   return p
 }
 
-export function getEmptyMapVectorData(caseId = 'case_000'): MapVectorData {
+export function getEmptyMapVectorData(caseId: string): MapVectorData {
   return {
     version: '2.0.0',
     caseId,

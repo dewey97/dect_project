@@ -42,7 +42,7 @@ async function fetchDossierDocsShared(caseId: string) {
  */
 export const CASE_000_DOSSIER_MAP: Record<string, string> = {};
 
-export function useDossierDocuments(caseId: string = 'case_000'): DossierDataState {
+export function useDossierDocuments(caseId: string): DossierDataState {
   const normalizedCaseId = caseId.replace(/-/g, '_')
   const cached = dossierCache[normalizedCaseId]
   const isFresh = cached && Date.now() - cached.timestamp < CACHE_TTL

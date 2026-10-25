@@ -16,10 +16,10 @@ interface PDFViewerModalProps {
   selectedView?: SelectedView | null
   isOpen: boolean
   onClose: () => void
-  caseId?: string
+  caseId: string
 }
 
-export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, caseId = 'case_000' }: PDFViewerModalProps) {
+export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, caseId }: PDFViewerModalProps) {
   const isEvidence = selectedView?.type === 'evidence'
   const isPdf = selectedView?.type === 'pdf'
   const activeTitle = title || (selectedView ? selectedView.data.title : 'Tài liệu')
