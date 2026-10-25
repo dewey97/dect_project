@@ -33,20 +33,21 @@
 
 | Bước | Commit | Thông điệp Commit | Trọng tâm thực hiện |
 | :--- | :--- | :--- | :--- |
-| **B14-0** | `fa45732` | `test(audit): step 14-0 - baseline audit numbers before multi-case refactor` | Ghi nhận số liệu ban đầu, ảnh chụp khay tài liệu và các viewport |
-| **B14-1** | `e08119e` | `fix(evidence): step 14-1 - normalize drive preview url and restore legacy pdf viewer` | Sửa link preview Google Drive, phục hồi PDF reader cho tài liệu A-01 |
-| **B14-2** | `7d483ae` | `fix(evidence): step 14-2 - sync dossier key normalization between tray and inspector` | Đồng bộ chuẩn hóa dossier_key giữa `dossier-tray.tsx` và `evidence-inspector.tsx` |
-| **B14-3** | `5102fc2` | `fix(evidence): step 14-3 - load crime scene backgrounds from db and remove fs fallback` | Ảnh khám xét 2D/360 nạp từ cột `cases`, bỏ fallback ghi file `data/*.json` |
-| **B14-4** | `d4e5f78` | `feat(cases): step 14-4 - add crime scene background image pickers to case settings` | Thêm trường ảnh nền hiện trường vào Case Studio (`cases-client.tsx`) |
-| **B14-5** | `1e9dc85` | `refactor(cases): step 14-5 - decouple default case id from core lib and hooks` | Gỡ hardcode `case_000` khỏi các helper `case-id.ts` và hook điều tra |
-| **B14-6** | `8440523` | `refactor(evidence): step 14-6 - load victim phone from case characters instead of static` | Điện thoại nạn nhân lấy động từ `role === 'victim'` của vụ án hiện tại |
-| **B14-7** | `e3b2e77` | `refactor(investigation): step 14-7 - generalize epilogue and followups for multi-case` | Tổng quát hóa hậu án & đối chất manh mối, gỡ bỏ tên nhân vật viết cứng |
-| **B14-8** | `ba30c99` | `feat(cases): step 14-8 - expand duplicateCase to clone board nodes, config and hotspots` | `duplicateCase` nhân bản toàn diện: board nodes, board config, hotspots |
-| **B14-9** | `ca8bfff` | `test(e2e): step 14-9 - isolate e2e db access via branch configuration` | E2E ngừng ghi đè production; hỗ trợ `E2E_SUPABASE_URL` và skip an toàn |
-| **B14-10**| `d7fa9c7` | `refactor(studio): step 14-10 - relocate dossier management to dossier studio` | Quản lý bộ hồ sơ chuyển sang Dossier Studio; Checkpoint Studio chỉ chọn unlocksDossier |
-| **B14-11**| `35db1da` | `refactor(studio): step 14-11 - integrate crime scene hotspot editor in evidence studio` | Thêm tab Hiện Trường (2D / 360) vào Evidence Studio; gỡ admin mode khỏi gameplay |
-| **B14-12**| `90441ee` | `refactor(cleanup): step 14-12 - remove deprecated board routes, legacy tables, and dead files` | Xóa `saveEvidenceBoard`, `/api/admin/pins`, link Sheet cũ, tách `/api/map-vector` |
-| **B14-13**| *(Đang commit)* | `test(e2e): step 14-13 - verify custom case Tron Tim v2 and generate final b14 report` | Tạo test nghiệm thu Trốn Tìm v2, chụp ảnh bằng chứng, lập báo cáo B14 |
+| **B14-0** | `fa45732` | `test(e2e): step 14-0 - stabilize cold-start auth setup and record independent baseline audit` | Ghi nhận số liệu ban đầu, ảnh chụp khay tài liệu và các viewport |
+| **B14-1** | `9215854` | `fix(evidence): step 14-1 - resolve empty center viewer and eliminate dev runtime console issues` | Sửa link preview Google Drive, phục hồi PDF reader cho tài liệu A-01 |
+| **B14-2** | `40f9ed0` | `refactor(core): step 14-2 - eliminate isDefaultCase and case_000 hardcoded branches` | Loại bỏ isDefaultCase và các nhánh rẽ tĩnh theo case_000 |
+| **B14-3** | `111c5ce` | `fix(hotspots): step 14-3 - eliminate local file fallbacks and decouple scene backgrounds from case_000` | Ảnh khám xét 2D/360 nạp từ cột cases, bỏ fallback ghi file data/*.json |
+| **B14-4** | `070beb0` | `feat(cases): step 14-4 - add case metadata editor and unify case creation flow` | Thêm trường ảnh nền hiện trường vào Case Studio (cases-client.tsx) |
+| **B14-5** | `a1ba81c` | `fix(checkpoints): step 14-5 - unlock indictment based on graph dependency data instead of hardcoded case check` | Khóa cáo trạng dựa vào đồ thị phụ thuộc checkpoint thay vì check cứng case |
+| **B14-6** | `41f7abc` | `refactor(ai): step 14-6 - remove hardcoded case_000 interrogation solution dictionary from client bundle` | Gỡ bỏ từ điển đáp án thẩm tra case_000 khỏi client bundle |
+| **B14-7** | `54c3f75` | `refactor(investigation): step 14-7 - decouple epilogues, dossier results, and phase narratives from hardcoded case_000 names` | Tách hậu án, kết quả hồ sơ khỏi tên cố định; tuy nhiên vẫn còn sót 64 chỗ tên/khóa |
+| **B14-8** | `ba30c99` | `feat(cases): step 14-8 - expand duplicateCase to clone board nodes, config and hotspots` | duplicateCase nhân bản toàn diện: board nodes, board config, hotspots |
+| **B14-9** | `ca8bfff` | `test(e2e): step 14-9 - isolate e2e db access via branch configuration` | E2E ngừng ghi đè production; hỗ trợ E2E_SUPABASE_URL và skip an toàn |
+| **B14-10**| `d7fa9c7` | `feat(dossier): step 14-10 - migrate dossier configuration to Dossier Studio (G3)` | Quản lý bộ hồ sơ chuyển sang Dossier Studio; Checkpoint Studio chỉ chọn unlocksDossier |
+| **B14-11**| `35db1da` | `feat(evidence): step 14-11 - move crime scene hotspot editor to Evidence Studio (G6)` | Thêm tab Hiện Trường (2D / 360) vào Evidence Studio; gỡ admin mode khỏi gameplay |
+| **B14-12**| `90441ee` | `refactor(cleanup): step 14-12 - remove deprecated board routes, legacy tables, and dead files` | Xóa saveEvidenceBoard, /api/admin/pins, link Sheet cũ, tách /api/map-vector |
+| **B14-13**| `d7fecc8` | `test(e2e): step 14-13 - verify custom case Tron Tim v2 and generate final b14 report` | Tạo test nghiệm thu Trốn Tìm v2 (chưa đạt do seed code bị skip, chưa qua Studio) |
+| Phụ trợ | `fd0d9a9` | `docs: step 14 - mark plan B14 complete 100%` | Đánh dấu hoàn tất (cần đính chính sang chưa xong ở B15) |
 
 ---
 
@@ -108,6 +109,9 @@
 ---
 
 ## 5. Kết luận & Cam kết
-- Toàn bộ 14 bước từ **B14-0 đến B14-13** đã hoàn thành 100%.
+- Đính chính theo review độc lập 2026-10-25: B14 **chưa xong**:
+  - B14-7 còn 64 chỗ tên/khóa nhân vật trong codebase.
+  - B14-13 chưa nghiệm thu thật qua Studio (seed bằng code helper, nhánh DB bị skip, DB không có vụ v2).
+  - 3 spec E2E fail: hậu án case_000 không mở sau cáo trạng, locator `character-avatar` vi phạm strict mode, và spec `phone-case-create` gọi `executeSql` đã bị xóa.
 - Không có bất kỳ thay đổi nào bị push lên remote (`origin/main`).
-- Hệ thống sẵn sàng cho bước chuyển giao hoặc ra mắt kịch bản nhiều vụ án tiếp theo.
+- Chuyển giao các hạng mục sửa lỗi và nghiệm thu thực chất sang kế hoạch **B15** (`docs/WORKTREE_PLAN.md`).
