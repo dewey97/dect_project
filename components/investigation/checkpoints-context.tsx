@@ -73,7 +73,6 @@ export function CheckpointsProvider({ children }: { children: React.ReactNode })
   /**
    * Conclusion unlocking rules based on graph data (depends_on).
    * Mở khi MỌI checkpoint mà checkpoint indictment phụ thuộc (depends_on) đã hoàn thành.
-   * Giữ tương thích tuyệt đối cho case_000: cp-000-2b depends_on cp-000-1c-followup hoặc fallback cp-000-2.
    */
   const isConclusionUnlocked = (
     caseId: string,
@@ -85,16 +84,7 @@ export function CheckpointsProvider({ children }: { children: React.ReactNode })
       return deps.every((depId) => isCheckpointCompleted(depId))
     }
 
-    // 2. Fallback cho case_000 theo quy ước cũ nếu chưa nạp được cấu hình đồ thị
-    if (caseId === 'case-000' || caseId === 'case_000') {
-      return (
-        isCheckpointCompleted('cp-000-2b') ||
-        isCheckpointCompleted('cp-000-2') ||
-        isCheckpointCompleted('cp-000-1c-followup')
-      )
-    }
-
-    // 3. Vụ mới không mở bừa nếu chưa có phụ thuộc
+    // 2. Không mở nếu chưa thỏa mãn phụ thuộc
     return false
   }
 
