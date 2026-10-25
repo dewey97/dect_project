@@ -206,7 +206,7 @@ export function IndictmentModal({
         const targetSuspects =
           validSuspectsFromSheet && validSuspectsFromSheet.length > 0
             ? validSuspectsFromSheet
-            : ["Trần Thị Hà", "ha"];
+            : [];
 
         const isSuspectMatch = targetSuspects.some((ts) => {
           const cleanTs = normalizeName(ts);

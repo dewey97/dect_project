@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import type { PDFDocument, PhysicalEvidence } from "./evidence-types";
 import { TypewriterNarrator } from "./typewriter-narrator";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import { useCaseNarratives, DEFAULT_NARRATIVES } from "@/lib/hooks/use-case-narratives";
+import { useCaseNarratives } from "@/lib/hooks/use-case-narratives";
 import { setStorageItem } from "@/lib/storage";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 import { getActiveCaseId } from "@/lib/cases/case-characters";
@@ -48,9 +48,9 @@ export function PhaseUnlockedModal({
   }, [unlockedModalData, getPhaseNarrative]);
 
   const fallbackNarrative = React.useMemo(() => {
-    const phase = unlockedModalData?.unlockedPhase ?? 0;
-    return DEFAULT_NARRATIVES[phase] || DEFAULT_NARRATIVES[0];
-  }, [unlockedModalData?.unlockedPhase]);
+    const p = unlockedModalData?.unlockedPhase ?? 0;
+    return getPhaseNarrative(p);
+  }, [unlockedModalData?.unlockedPhase, getPhaseNarrative]);
 
   const activeNarrative = currentNarrative || fallbackNarrative;
 

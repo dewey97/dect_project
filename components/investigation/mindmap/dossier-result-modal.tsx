@@ -30,7 +30,7 @@ export function DossierResultModal({
 
   const effectiveSuspectName =
     suspectName ||
-    (isA ? 'Lê Quang Vũ' : isB ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà')
+    (isA ? 'Nghi phạm Bộ A' : isB ? 'Nghi phạm Bộ B' : 'Nghi phạm Bộ C')
 
   const title = `HỒ SƠ ${dossierType} — BIÊN BẢN ${isC ? 'ĐỀ XUẤT LỆNH KHÁM XẾT' : 'KẾT LUẬN'} ĐỐI TƯỢNG ${effectiveSuspectName.toUpperCase()}`
   const code = `HỒ SƠ ${dossierType} // ${(caseId || 'case').toUpperCase()}`
