@@ -108,12 +108,20 @@ Running 42 tests using 1 worker
   - Query DB production sau test: `SELECT slug FROM cases WHERE slug LIKE 'e2e_%'` trả về rỗng `[]` (HTTP 201).
 
 ### B13-5: Chuẩn hóa báo cáo và chuyển đổi đường dẫn bằng chứng nội bộ repo
-- **Commit:** (commit hiện tại)
+- **Commit:** `97e5b56` — `docs(reports): step 13-5 - archive b12 report and create b13 report with verified run stats`
 - **Chi tiết:**
   - Đính chính mục 1 trong `docs/B12_REPORT.md` (ghi chú rõ: `chạy lại 41/1/0` do lỗi in-flight storm, đã giải quyết tại B13-1).
   - Chuyển `docs/B12_REPORT.md` vào thư mục `docs/reports/B12_REPORT.md`.
   - Di chuyển ảnh bằng chứng vào trong repo: `docs/reports/b13/b12-1-clean-board.png` và `docs/reports/b13/b13-1-evidence-tray.png`.
   - Viết `docs/reports/B13_REPORT.md` chứa đầy đủ dòng tổng kết Playwright thật, commit history và tiêu chuẩn kiểm thử.
+
+### B13-6: Đổi số migration liên tục và ghi chú data fix một lần
+- **Commit:** (commit hiện tại)
+- **Chi tiết:**
+  - Đổi tên `db/schema/41_cleanup_legacy_dossier_x.sql` thành `db/schema/40_cleanup_legacy_dossier_x.sql`.
+  - Bổ sung ghi chú rõ ràng: `-- data fix một lần, chạy lại vô hại`.
+  - Cập nhật số tham chiếu migration trong `CHANGELOG.md`.
+  - Kiểm tra thứ tự migration trong `db/schema`: liên tục từ `37_reseed_from_sheets.sql`, `38_character_avatar.sql`, `39_board_nodes.sql` đến `40_cleanup_legacy_dossier_x.sql`.
 
 ---
 

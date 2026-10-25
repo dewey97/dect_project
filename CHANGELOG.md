@@ -4,6 +4,15 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-25]
 
+### B13 Bug Fixes & Robustness Verification (B13-1 → B13-6)
+
+- **B13-1 (Evidence In-Flight Deduplication)**: Khắc phục triệt để lỗi khay hồ sơ `case_000` bị trống khi load trang (`0 tài liệu / 0 vật chứng`) do 11 request Server Action dồn dập khiến React cleanup hủy kết quả fetch. Triển khai shared module-level in-flight Promise deduplication và đồng bộ fallback chips sang `"Ban Đầu"`. Khôi phục nguyên bản test `evidence-studio.spec.ts`, pass 100% với `--repeat-each=3`.
+- **B13-2 (Reinvestigate Hotspots DB)**: Nạp 4 hotspots của `case_000` vào bảng `reinvestigation_hotspots` trên production (`db/schema/seed_case_000_hotspots.sql`). Xóa bỏ hoàn toàn hằng số `HOTSPOTS_2D_LIST` và cờ `isDefaultCase` trong `reinvestigation-modal.tsx`.
+- **B13-3 (Board Ready & No toPass)**: Bổ sung tín hiệu `isBoardReady` (`isProgressLoaded && !isCheckpointsLoading && !isEvidenceLoading && displayPins.length > 0`) và thuộc tính `data-board-ready="true"`. Xóa bỏ toàn bộ `toPass` trong `case-000.spec.ts`. Toàn bộ 11 tests pass chỉ bằng 1 lần click duy nhất.
+- **B13-4 (E2E Service Role Key & Cleanup)**: Thay thế hoàn toàn `SUPABASE_ACCESS_TOKEN` (`sbp_`) trong E2E helper bằng `SUPABASE_SERVICE_ROLE_KEY`. Tạo slug ngẫu nhiên `e2e_<timestamp>`, tự động dọn sạch trong `afterAll` và `globalSetup` (`cleanupE2ECases`), đảm bảo 0 rác trên database.
+- **B13-5 (Report Verification & Local Paths)**: Lưu trữ và chuyển `docs/B12_REPORT.md` vào `docs/reports/B12_REPORT.md` với ghi chú chạy lại 41/1 thật; toàn bộ ảnh bằng chứng lưu trong repo (`docs/reports/b13/`). Viết `docs/reports/B13_REPORT.md` với log tổng kết Playwright `42 passed (3.2m)`.
+- **B13-6 (Contiguous Migration Sequence)**: Đổi tên migration `41_cleanup_legacy_dossier_x.sql` thành `40_cleanup_legacy_dossier_x.sql` với chú thích "data fix một lần, chạy lại vô hại". Chuỗi migration trong `db/schema` liên tục 37–40.
+
 ### B12 Review & Bug Fixes (B12-1 → B12-10)
 
 - **B12-1 (Gameplay)**: Khắc phục nguyên nhân gốc khởi tạo state tra SĐT (`use-investigation-state.ts`); dọn metadata Supabase trả `mai/dat/vy` về đúng vai trò witness; khôi phục hiển thị nghi phạm theo tiến trình điều tra; `case-000.spec.ts` 11/11 pass.
@@ -13,7 +22,7 @@ All notable changes to the Detective Case System (dect_project) will be document
 - **B12-5 (Admin E2E)**: Nạp credential admin qua `.env.local` trong `playwright.config.ts` và `auth.setup.ts`. Chạy thật 100% các spec admin (`board-studio`, `studio-ux`, `evidence-studio`, `phone-studio`, `messages-editor`, `phone-devices`, `phone-case-create`, `character-avatar`), khắc phục các lỗi strict mode và placeholder; 21/21 passed (0 skip, 0 fail).
 - **B12-6 (Board New Case)**: Bổ sung `e2e/board-new-case.spec.ts` seed vụ án cô lập `e2e_board_test`, xác nhận render bàn điều tra động không chứa bất kỳ tên/ảnh nào của `case_000`. Dọn dẹp sạch trong `afterAll`.
 - **B12-7 (No Sheets E2E)**: Thu hẹp interceptor của `no-sheets.spec.ts` sang `sheets.googleapis.com` và `docs.google.com/spreadsheets`, không còn chặn nhầm Firebase network requests.
-- **B12-8 (Dossier DB)**: Dọn dẹp dossier rác `x` trên Supabase production (file migration `db/schema/41_cleanup_legacy_dossier_x.sql`). Khay hồ sơ `case_000` trở về 5 dossier chuẩn.
+- **B12-8 (Dossier DB)**: Dọn dẹp dossier rác `x` trên Supabase production (file migration `db/schema/40_cleanup_legacy_dossier_x.sql`). Khay hồ sơ `case_000` trở về 5 dossier chuẩn.
 - **B12-9 (API Enforcement)**: Yêu cầu bắt buộc tham số `case` (hoặc `case_id` / `caseId`) tại `/api/board-nodes` và `/api/case-dossiers`, trả HTTP 400 nếu thiếu. Bỏ nuốt lỗi `42P01` trong `board-nodes`.
 - **B12-10 (Docs & Backup Transparency)**: Ghi nhận trung thực: tại bước B8 trước đây, migration 39 được áp dụng trực tiếp lên production mà chưa tạo bảng snapshot `boardgame_pins_backup_20261025`; toàn bộ dữ liệu boardgame pins đã được migrate an toàn vào `case_board_nodes`. Cập nhật `HANDOFF_ROADMAP.md` phản ánh đầy đủ thực tế sau B12.
 
