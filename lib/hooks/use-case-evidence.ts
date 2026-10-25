@@ -54,13 +54,14 @@ const evidenceCache: Record<
 > = {};
 const evidenceInFlight: Record<
   string,
-  Promise<{ success: boolean; data?: DbCaseEvidence[]; error?: string }>
+  Promise<{ success: boolean; data?: DbCaseEvidence[]; error?: string }> | undefined
 > = {};
 const CACHE_TTL_MS = 30_000;
 
 async function fetchCaseEvidenceShared(slug: string) {
-  if (evidenceInFlight[slug]) {
-    return evidenceInFlight[slug];
+  const existing = evidenceInFlight[slug];
+  if (existing) {
+    return existing;
   }
 
   const promise = (async () => {

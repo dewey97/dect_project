@@ -14,12 +14,13 @@ interface DossierDataState {
 
 // Bộ nhớ đệm Client in-memory tránh gọi lặp lại Supabase
 const dossierCache: Record<string, { data: DbDossierDocument[]; timestamp: number }> = {}
-const dossierDocInFlight: Record<string, Promise<{ success: boolean; data?: DbDossierDocument[]; error?: string }>> = {}
+const dossierDocInFlight: Record<string, Promise<{ success: boolean; data?: DbDossierDocument[]; error?: string }> | undefined> = {}
 const CACHE_TTL = 60_000 // 1 phút
 
 async function fetchDossierDocsShared(caseId: string) {
-  if (dossierDocInFlight[caseId]) {
-    return dossierDocInFlight[caseId];
+  const existing = dossierDocInFlight[caseId];
+  if (existing) {
+    return existing;
   }
   const promise = (async () => {
     try {

@@ -42,12 +42,13 @@ const dossierCache: Record<
   string,
   { data: DbCaseDossier[]; timestamp: number }
 > = {};
-const dossierInFlight: Record<string, Promise<DbCaseDossier[]>> = {};
+const dossierInFlight: Record<string, Promise<DbCaseDossier[]> | undefined> = {};
 const CACHE_TTL = 60_000;
 
 async function fetchDossiersShared(caseId: string): Promise<DbCaseDossier[]> {
-  if (dossierInFlight[caseId]) {
-    return dossierInFlight[caseId];
+  const existing = dossierInFlight[caseId];
+  if (existing) {
+    return existing;
   }
   const promise = (async () => {
     try {

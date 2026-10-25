@@ -40,7 +40,7 @@ function ensureDirectoryExists() {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const rawCaseId = searchParams.get("caseId") || "case_000";
+    const rawCaseId = searchParams.get("case") || searchParams.get("caseId") || searchParams.get("case_id") || "case_000";
     const caseId = getSafeCaseId(rawCaseId);
     if (!caseId) {
       return defensiveErrorResponse(

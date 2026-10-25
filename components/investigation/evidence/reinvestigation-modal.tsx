@@ -132,61 +132,6 @@ const SFX_OPTIONS = [
   },
 ];
 
-// 4 ĐIỂM KHÁM XÉT KHỞI TẠO ĐỒNG BỘ TỪ DATA CASE #000
-export const HOTSPOTS_2D_LIST: ReinvestigationHotspot2D[] = [
-  {
-    id: "spot-1",
-    num: 1,
-    photoId: "tu_go",
-    title: "Tủ gỗ",
-    x: 44.5,
-    y: 51.1,
-    imageUrl: "/api/image-proxy?id=1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR",
-    soundFile: "train_sound.mp3",
-    soundCaption: "*Tu tu... Xình xịch...*",
-    driveUrl:
-      "https://drive.google.com/file/d/1BFoeURAu_ByUfOKUGttoXfxdAGHIrnuR/view?usp=drive_link",
-  },
-  {
-    id: "spot-2",
-    num: 2,
-    photoId: "bua_goi",
-    title: "Bùa yêu dưới gối",
-    x: 58.5,
-    y: 56,
-    imageUrl: "/api/image-proxy?id=11rPmlApf5TsTDguEOBKQBqL09SIks8eU",
-    soundFile: "sound_tu.mp3",
-    soundCaption: "*Két... Cạch...*",
-    driveUrl:
-      "https://drive.google.com/file/d/11rPmlApf5TsTDguEOBKQBqL09SIks8eU/view?usp=drive_link",
-  },
-  {
-    id: "spot-3",
-    num: 3,
-    photoId: "luoc_dinh_toc",
-    title: "Lược dính tóc",
-    x: 52.7,
-    y: 56.9,
-    imageUrl: "/api/image-proxy?id=1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe",
-    soundFile: "breaking.mp3",
-    soundCaption: "*Choang! Xoảng...*",
-    driveUrl:
-      "https://drive.google.com/file/d/1FsopgkatQllpT9-r9af8ttHQ_V0Lrroe/view?usp=drive_link",
-  },
-  {
-    id: "spot-4",
-    num: 4,
-    photoId: "canh_hoa",
-    title: "Cánh hoa xoan dưới sàn nhà",
-    x: 11.2,
-    y: 74,
-    imageUrl: "/api/image-proxy?id=1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z",
-    soundFile: "Clack.mp3",
-    soundCaption: "*Cạch... cạch...*",
-    driveUrl:
-      "https://drive.google.com/file/d/1CiQT5e5fYYiDg48fXUk4Oe036WZlWi_z/view?usp=drive_link",
-  },
-];
 
 export function ReinvestigationModal({
   isOpen,
@@ -195,11 +140,8 @@ export function ReinvestigationModal({
   inline = false,
   onExpand,
 }: ReinvestigationModalProps) {
-  const isDefaultCase = caseId === "case_000" || caseId === "case-000";
   // Hotspots list with server + localStorage persistence
-  const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>(
-    isDefaultCase ? HOTSPOTS_2D_LIST : [],
-  );
+  const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>([]);
   const [selectedSpot, setSelectedSpot] =
     useState<ReinvestigationHotspot2D | null>(null);
   const [activeAudioToast, setActiveAudioToast] = useState<string | null>(null);
@@ -240,7 +182,7 @@ export function ReinvestigationModal({
     async function loadSavedHotspots() {
       try {
         const res = await fetch(
-          `/api/reinvestigation?caseId=${encodeURIComponent(caseId)}`,
+          `/api/reinvestigation?case=${encodeURIComponent(caseId)}`,
           { cache: "no-store" },
         );
         if (res.ok) {
@@ -279,7 +221,7 @@ export function ReinvestigationModal({
     return () => {
       mounted = false;
     };
-  }, [isOpen]);
+  }, [isOpen, caseId]);
 
   // Check admin role
   useEffect(() => {
@@ -328,29 +270,19 @@ export function ReinvestigationModal({
             panorama_url: res.data.panorama_url,
             scene_360_url: res.data.scene_360_url,
           });
-        } else if (isDefaultCase) {
-          setSceneConfig({
-            panorama_url: "/images/cases/case_000/PANORAMA.png",
-            scene_360_url: "/images/cases/case_000/crime_scene_360.jpg",
-          });
         } else {
           setSceneConfig(null);
         }
       })
       .catch(() => {
-        if (mounted && isDefaultCase) {
-          setSceneConfig({
-            panorama_url: "/images/cases/case_000/PANORAMA.png",
-            scene_360_url: "/images/cases/case_000/crime_scene_360.jpg",
-          });
-        } else if (mounted) {
+        if (mounted) {
           setSceneConfig(null);
         }
       });
     return () => {
       mounted = false;
     };
-  }, [isOpen, caseId, isDefaultCase]);
+  }, [isOpen, caseId]);
 
   // Process Google Sheets photos: Map by photo_code ID & Title
   const sheetPhotosList = useMemo(() => {
@@ -431,7 +363,7 @@ export function ReinvestigationModal({
   // DYNAMICALLY SYNC HOTSPOTS FROM GOOGLE SHEETS BY photoId, code (C-01..C-05), or title
   // Nếu Sheet cập nhật link Drive hay title cho photoId, game tự động đọc theo photoId mới nhất!
   const resolvedHotspots = useMemo(() => {
-    if (!isDefaultCase && hotspots.length === 0) {
+    if (hotspots.length === 0) {
       // Tự động trích xuất các điểm khám xét từ Google Sheet của case động
       const customSpots = sheetPhotosList.filter(
         (p) =>
@@ -514,7 +446,7 @@ export function ReinvestigationModal({
       }
       return spot;
     });
-  }, [hotspots, sheetPhotosList, isDefaultCase]);
+  }, [hotspots, sheetPhotosList]);
 
   // Cleanup animation frame
   useEffect(() => {
@@ -694,15 +626,21 @@ export function ReinvestigationModal({
     }
   };
 
-  const handleResetToDefault = () => {
-    setHotspots(HOTSPOTS_2D_LIST);
-    setSelectedCalibrateSpotId(HOTSPOTS_2D_LIST[0]?.id || null);
-    setHasUnsavedChanges(true);
+  const handleResetToDefault = async () => {
+    try {
+      const res = await fetch(`/api/reinvestigation?case=${encodeURIComponent(caseId)}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.hotspots)) {
+          setHotspots(data.hotspots);
+          setSelectedCalibrateSpotId(data.hotspots[0]?.id || null);
+          setHasUnsavedChanges(true);
+        }
+      }
+    } catch {}
     localStorage.removeItem(`reinvestigate_custom_hotspots_${caseId}`);
     localStorage.removeItem("reinvestigate_custom_hotspots");
-    toast.info(
-      'Đã khôi phục danh sách điểm mặc định! Bấm "Lưu" để xác nhận lên hệ thống.',
-    );
+    toast.info('Đã khôi phục danh sách điểm từ hệ thống!');
   };
 
   // GÁN ẢNH THEO ID (PHOTO_CODE) TỪ GOOGLE SHEETS
