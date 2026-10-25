@@ -24,9 +24,12 @@ setup("authenticate as admin", async ({ page }) => {
   }
 
   await page.goto("/login");
+  await page.waitForSelector("#login-email", { state: "visible" });
   await page.fill("#login-email", email);
   await page.fill("#login-password", password);
-  await page.locator('form button[type="submit"]:has-text("Đăng Nhập")').click();
+  const submitButton = page.locator('form button[type="submit"]:has-text("Đăng Nhập")');
+  await submitButton.waitFor({ state: "visible" });
+  await submitButton.click();
 
   // Wait for login to complete (URL leaves /login)
   await page.waitForURL((url) => !url.pathname.includes("/login"), {
