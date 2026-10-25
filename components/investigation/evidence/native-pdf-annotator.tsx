@@ -76,6 +76,12 @@ export function NativePdfAnnotator({
     setLoading(true)
     setError(null)
 
+    if (!cleanUrl || cleanUrl.trim() === '') {
+      setLoading(false)
+      setError('Tài liệu không có tệp PDF đính kèm.')
+      return
+    }
+
     async function loadPdf() {
       try {
         const pdfjs = await import('pdfjs-dist/build/pdf.mjs')
@@ -218,6 +224,13 @@ export function NativePdfAnnotator({
 
   // Nếu lỗi (ví dụ file Drive không có CORS hoặc link preview), fallback về iframe chuẩn
   if (error) {
+    if (!url || url.trim() === '') {
+      return (
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center text-[#ad9885] bg-[#0d0906]">
+          <p className="font-mono text-sm">{error}</p>
+        </div>
+      );
+    }
     return (
       <iframe
         src={url}

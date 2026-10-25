@@ -99,6 +99,16 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
     await expect(page.locator("body")).toContainText(
       "Cẩm nang hướng dẫn điều tra ban đầu",
     );
+
+    // B14-1: Chọn tài liệu A-01 -> khung giữa hiển thị tiêu đề và breadcrumb
+    const a01Item = page.getByText("A-01").first();
+    await a01Item.click();
+    await expect(
+      page.locator('[data-testid="evidence-inspector-breadcrumb"]'),
+    ).toContainText("Cẩm nang hướng dẫn điều tra ban đầu");
+    await expect(
+      page.locator("h1:has-text('Cẩm nang hướng dẫn điều tra ban đầu')"),
+    ).toBeVisible();
   });
 
   test("Form excludes custody metadata and auto-generates code from title", async ({

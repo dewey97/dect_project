@@ -468,6 +468,8 @@ function WebEvidencePageContent() {
     }
   }, [caseId, effectiveItems]);
 
+
+
   const toggleDossierCollapse = useCallback(() => {
     detectiveAudio.playPaperRustle();
     setIsDossierCollapsed((prev) => {
@@ -549,6 +551,25 @@ function WebEvidencePageContent() {
     },
     [caseId, dossiers, unlockedPhase],
   );
+
+  // Tự động chọn tài liệu đầu tiên khi nạp xong dữ liệu nếu chưa có mục nào được chọn
+  useEffect(() => {
+    if (!selectedView && effectiveItems.length > 0) {
+      const firstUnlockedPdf = effectiveItems.find(
+        (item) => item.type === "pdf" && isDossierUnlocked(item.dossierKey || "")
+      );
+      if (firstUnlockedPdf) {
+        setSelectedView({ type: "pdf", data: firstUnlockedPdf.data as PDFDocument });
+      } else {
+        const firstItem = effectiveItems[0];
+        if (firstItem.type === "pdf") {
+          setSelectedView({ type: "pdf", data: firstItem.data as PDFDocument });
+        } else {
+          setSelectedView({ type: "evidence", data: firstItem.data as PhysicalEvidence });
+        }
+      }
+    }
+  }, [effectiveItems, isDossierUnlocked, selectedView]);
 
   const handleSelectPdf = (doc: PDFDocument) => {
     if (!isPhaseUnlocked(doc.phase)) return;

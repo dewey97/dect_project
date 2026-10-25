@@ -8,6 +8,7 @@ import { useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
 import { DiegeticDossierSheet } from "./diegetic-dossier-sheet";
 import { EvidencePhotoAnnotator } from "./evidence-photo-annotator";
 import { NativePdfAnnotator } from "./native-pdf-annotator";
+import { DiegeticDocumentReader } from "./diegetic-document-reader";
 
 interface EvidenceDetailInspectorProps {
   selectedView: SelectedView | null;
@@ -18,19 +19,29 @@ export function EvidenceDetailInspector({
   selectedView,
   caseId = "case_000",
 }: EvidenceDetailInspectorProps) {
-  if (!selectedView) return null;
+  // Hooks MUST be called unconditionally at the top level
+  const { findMatchingDocument } = useDossierDocuments(caseId);
+  const { dossierOf } = useCaseDossiers(caseId);
+
+  if (!selectedView) {
+    return (
+      <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] items-center justify-center p-8 text-center text-[#8c745f] h-full">
+        <p className="font-mono text-xs uppercase tracking-wider">
+          Chọn một tài liệu trong khay hồ sơ để bắt đầu điều tra
+        </p>
+      </div>
+    );
+  }
 
   const isPdf = selectedView.type === "pdf";
   const displayCode = isPdf
     ? selectedView.data.code || "HỒ SƠ"
     : selectedView.data.code || "VẬT CHỨNG";
 
-  const pdfUrl = isPdf ? normalizeDrivePdfUrl(selectedView.data.url) : "";
+  const rawPdfUrl = isPdf ? selectedView.data.url : "";
+  const pdfUrl = isPdf && rawPdfUrl ? normalizeDrivePdfUrl(rawPdfUrl) : "";
   const photoUrl = !isPdf ? normalizeImageUrl(selectedView.data.thumbnail) : "";
 
-  // Tra cứu xem hồ sơ này đã được biên soạn trên Dossier Studio chưa
-  const { findMatchingDocument } = useDossierDocuments(caseId);
-  const { dossierOf } = useCaseDossiers(caseId);
   const dossierTitle =
     selectedView.data.dossierTitle ||
     (selectedView.data.code ? dossierOf(selectedView.data.code)?.title : undefined);
@@ -42,6 +53,8 @@ export function EvidenceDetailInspector({
         id: selectedView.data.id,
       })
     : undefined;
+
+  const hasValidPdfUrl = Boolean(pdfUrl && pdfUrl.trim() !== "");
 
   return (
     <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex-col h-full relative">
@@ -64,12 +77,23 @@ export function EvidenceDetailInspector({
             <div className="w-full h-full min-h-0 min-w-0 bg-[#0f0c09] relative flex flex-col">
               <DiegeticDossierSheet document={matchedDossier} />
             </div>
-          ) : (
+          ) : hasValidPdfUrl ? (
             /* Hiển thị PDF dạng Native Canvas Annotator cho phép vẽ và tô màu */
             <NativePdfAnnotator
               url={pdfUrl}
               title={selectedView.data.title}
               docCode={selectedView.data.code}
+            />
+          ) : (
+            /* Hiển thị tài liệu nghiệp vụ dạng văn bản diegetic chính thức (ví dụ cẩm nang A-01, văn bản lưu trữ) */
+            <DiegeticDocumentReader
+              title={selectedView.data.title}
+              code={displayCode}
+              dossierTitle={dossierTitle}
+              description={
+                (selectedView.data as { preview?: string; description?: string }).preview ||
+                (selectedView.data as { preview?: string; description?: string }).description
+              }
             />
           )
         ) : (
