@@ -15,7 +15,7 @@
 | WT-1 board    | 🟡 1A–1C + `796041b` B5, `18175dc` B6, `e5407aa` B7, `fa6c12c` B8 (migration 39 đã chạy production), `2b1a9da` B9, `de7dcf0` B10 | **B12-1 hồi quy luồng chính**, B12-2/3/4/6 (B10 chưa đạt tiêu chí)                    |
 | WT-3 studio   | ✅ `471a5c8` + `bf1f35f` B3 — rà 0 placeholder >40 ký tự, ẩn khóa kỹ thuật                                                       | `studio-ux.spec.ts` **bị skip** (thiếu credential admin), chưa từng chạy thật → B12-5 |
 
-🟢 **Review độc lập B16 (2026-10-25, `docs/reports/REVIEW_B16_2026-10-25.md`):** `tsc` sạch; E2E `42 passed` / 3 skip **2 lần liên tiếp**; DB sạch. **Vẫn đủ điều kiện push.** Chưa đạt: B16-1 (spec v2 thiếu phần lớn bước, chưa chạy lần nào — chờ Supabase branch), B16-5 (Next.js tự thêm lại `.next_dev` vào `tsconfig.json`). Phát hiện: `isHa = false` để lại code chết, có thể mất bước "lệnh khám xét" của case_000. → **B17**.
+🟢 **Review độc lập B17 (2026-10-26, `docs/reports/REVIEW_B17_2026-10-26.md`):** `pnpm lint` sạch (kể cả khi dev server có file tự sinh); E2E `42 passed` / 3 skip khi mạng ổn. E2E **phụ thuộc mạng tới Supabase production**: 2/3 lần chạy hỏng vì `ECONNRESET` / đăng nhập `fetch failed`. B17-2 xóa luôn màn "lệnh khám xét" của Hà (nhịp kịch bản case_000) — cần chủ dự án quyết. B17-1 (nghiệm thu v2) vẫn chờ DB test. `main` đã push tới `941b2f8`; 6 commit B17 chưa push. → **B18**.
 
 **Kết quả review B13 (2026-10-25, HEAD `30452f7`):** `tsc` sạch; E2E chạy lại 2 lần liên tiếp **42 pass / 0 fail / 0 skip** (báo cáo tại `docs/reports/B13_REPORT.md`). Khay hồ sơ case_000 nạp tức thì, 0 `toPass` click trong test, E2E chuyển sang dùng `SUPABASE_SERVICE_ROLE_KEY` kèm dọn dẹp sạch sẽ, DB migration liên tục 37–40 (`40_cleanup_legacy_dossier_x.sql`), ảnh bằng chứng lưu tại `docs/reports/b13/`. Đạt 100% B13-1 → B13-6.
 
@@ -112,6 +112,7 @@ if (!res.ok) process.exit(1);
 | **B15** | **Sửa lỗi review B14 + nghiệm thu thật.** Làm B15-0 → B15-12 trong bảng "B15"; mỗi mục 1 commit. | bảng B15, `docs/reports/REVIEW_B14_2026-10-25.md` | ✅ **Hoàn tất B15-0 → B15-11** (commit `04aade2` → `dafd531`): `tsc` sạch 0 errors; E2E chạy 2 lần liên tiếp đạt 42 pass / 0 fail / 3 skip an toàn; hash commit dán từ git log; xóa seed SQL; báo cáo tại `docs/reports/B15_REPORT.md`. Chờ chủ dự án: B15-6 & B15-12 |
 | **B16** | **Nghiệm thu thật + dọn sót multi-case.** Làm B16-1 → B16-6 trong bảng "B16". | bảng B16, `docs/reports/REVIEW_B15_2026-10-25.md` | Tiêu chí bảng B16 đạt |
 | **B17** | **Nghiệm thu v2 đầy đủ + sửa sót B16.** Làm B17-0 → B17-6 trong bảng "B17". | bảng B17, `docs/reports/REVIEW_B16_2026-10-25.md` | Tiêu chí bảng B17 đạt; spec v2 chạy thật trên DB test 2 lần pass |
+| **B18** | **Chốt DB test, nghiệm thu v2, ổn định E2E.** Làm B18-0 → B18-5 trong bảng "B18". | bảng B18, `docs/reports/REVIEW_B17_2026-10-26.md` | Tiêu chí bảng B18 đạt |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -218,6 +219,27 @@ Nguồn: `docs/reports/REVIEW_B16_2026-10-25.md`. HEAD khi review: `6079411`. Kh
 | B17-5 | 🟡 Thấp | Bỏ tham số mặc định case_000 ở hook (nguồn của các chỗ vá đọc URL) | `lib/hooks/use-phone-data.ts:29`, `lib/hooks/use-studio-checkpoints.ts:23` và các hook/component có `caseId = "case-000"`/`"case_000"` mặc định | `caseId` là tham số bắt buộc; bỏ đoạn đọc lại URL; `grep -rnE 'caseId[^=]*= ?"case[-_]000"' app components lib` = 0 (trừ trang route đọc `?case_id` có mặc định) |
 | B17-6 | 🟡 Thấp | Báo cáo B16 ghi B16-1 "chơi trọn" trong khi mục 5 nói tạm dừng | `docs/reports/B16_REPORT.md` mục 1 | Sửa dòng B16-1: "viết khung spec, chưa chạy (chờ DB test)" |
 
+### B18 — chốt DB test, nghiệm thu v2, ổn định E2E (2026-10-26)
+
+Nguồn: `docs/reports/REVIEW_B17_2026-10-26.md`. HEAD khi review: `1fbd029`.
+
+| #     | Mức     | Việc | Ai | Done khi |
+| ----- | ------- | ---- | -- | -------- |
+| B18-0 | ⛔      | **Chọn DB cho E2E** (xem review mục 3). Đề xuất **A: project Supabase Free thứ 2** (0đ, tách hẳn production). Phương án C (dùng production với `ALLOW_E2E_PRODUCTION_SEED=true`) chỉ khi chấp nhận rủi ro ghi rác/hiện vụ test trên `/activate` | Chủ dự án | Chọn A: tạo project, điền `E2E_SUPABASE_URL`, `E2E_SUPABASE_ANON_KEY`, `E2E_SUPABASE_SERVICE_ROLE_KEY`, `E2E_ADMIN_*` (admin test trên project mới) vào `.env.local`. Chọn C: ghi rõ quyết định vào plan |
+| B18-1 | 🔴 Cao  | Dựng DB test (nếu A): chạy `db/schema` 00 → 43 theo thứ tự + seed tối thiểu case_000 (copy từ production bằng script `scripts/ops/clone-case-to-test.mjs`: `cases`, `case_characters`, `case_checkpoints`, `case_dossiers`, `dossier_documents`, `case_evidence`, 8 bảng phone, `case_board_nodes`, `boardgame_pins/connections`, `reinvestigation_hotspots`; **chỉ đọc** production, ghi vào test) | AI | `pnpm test:e2e` chạy toàn bộ trên DB test (dev server E2E trỏ `E2E_SUPABASE_URL`) → 45 spec, 0 skip, 0 fail |
+| B18-2 | ⛔ / 🟠 | **Màn "lệnh khám xét" của Hà** (bị xóa ở B17-2 `ea6d5cb`). Chủ dự án chọn: (a) bỏ hẳn; (b) khôi phục dạng cấu hình chung — checkpoint `followup`/`suspect_interrogation` có `answer_config.warrant_step = { cta_label, narrative }`; khi người chơi chọn "KHÔNG tin" và có `warrant_step` → hiện màn trung gian trước khi mở câu hỏi phụ; seed `warrant_step` cho checkpoint của Hà bằng SQL (đã duyệt) | Chủ dự án quyết → AI làm | (b): E2E case_000 kiểm màn "Lệnh khám xét khẩn cấp…" và nút "Tiến hành khám xét"; không có tên/khóa nhân vật trong component |
+| B18-3 | 🔴 Cao  | **Nghiệm thu "Trốn Tìm v2"** (= B17-1) trên DB đã chọn | AI | Như B17-1; nếu phương án C: spec đặt lại `DRAFT` ngay sau khi kiểm form xuất bản, phần chơi vào thẳng `/evidence/web?case_id=…`, upload vào thư mục `e2e/` và xóa trong `afterAll` |
+| B18-4 | 🟠 TB   | E2E báo lỗi rõ khi mạng tới Supabase hỏng (hôm nay: 7 fail khó hiểu / cả bộ không chạy) | AI | `globalSetup` gọi thử Supabase (`/auth/v1/health` + 1 query) trước khi chạy; lỗi → dừng ngay với 1 thông báo "Supabase không truy cập được: <lỗi>". **Không** thêm retry vào spec |
+| B18-5 | 🟡 Thấp | Working tree bẩn sau mỗi lần chạy (Next.js ghi `tsconfig.json`, `next-env.d.ts`); báo cáo ghi hash commit trước khi amend | AI | Ghi vào `HANDOFF_ROADMAP.md` mục 2.2: sau E2E chạy `git checkout -- tsconfig.json next-env.d.ts`. Quy tắc báo cáo: không liệt kê commit của chính báo cáo; không amend sau khi đã ghi hash |
+
+**Prompt giao việc B18 (sau khi chủ dự án chốt B18-0 và B18-2):**
+
+```
+Đọc docs/reports/REVIEW_B17_2026-10-26.md và docs/WORKTREE_PLAN.md bảng "B18". Làm trên main, mỗi mục 1 commit, không push: B18-4, B18-5, rồi B18-1 (nếu chọn project test riêng), B18-2 (theo quyết định ghi trong plan), B18-3.
+Không ghi gì vào DB production ngoài phạm vi đã duyệt; script clone chỉ đọc production. Không retry/toPass trong spec. Không gán hằng hay đổi tên để vô hiệu hardcode.
+Báo cáo docs/reports/B18_REPORT.md: bảng commit dán git log --oneline 1fbd029..HEAD (không liệt kê commit báo cáo, không amend sau khi ghi), dòng tổng kết Playwright 2 lần, ảnh trong docs/reports/b18/. Không làm live cursor.
+```
+
 **Prompt giao việc B17:**
 
 ```
@@ -260,12 +282,12 @@ Báo cáo docs/reports/B17_REPORT.md: bảng commit dán nguyên văn git log --
 | 1   | **B13** (bảng trên)                                                                                                                                               | AI thực thi       | ✅ **Đã xong** (commit `ec3837c` → `30452f7`, `42 passed (3.2m)`, 0 fail, 0 skip)                                                                    |
 | 2   | Review độc lập B13 + audit multi-case/Studio                                                                                                                      | Reviewer          | ✅ Xong đọc code (`docs/reports/AUDIT_2026-10-25_CUSTOM_CASE.md`); chưa chạy lại được `tsc`/E2E → chuyển vào B14-0                                   |
 | 2b  | **B15-0 → B15-5** | AI thực thi | ✅ Xong (review `docs/reports/REVIEW_B15_2026-10-25.md`) |
-| 2c  | **B17-0**: tạo Supabase branch / project test cho E2E (kèm admin test) | Chủ dự án | Chặn B17-1; kiểm chi phí trước |
-| 2d  | **B17-1 → B17-6** (nghiệm thu v2 đầy đủ, sửa sót B16) + B15-12 (chủ dự án quyết 6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | B16 đã chạy, review `docs/reports/REVIEW_B16_2026-10-25.md`. Không chặn push |
+| 2c  | **B18-0**: chọn DB cho E2E (đề xuất project Supabase Free thứ 2) + **B18-2**: quyết màn "lệnh khám xét" của Hà | Chủ dự án | Chặn B18-1, B18-3 |
+| 2d  | **B18-1 → B18-5** (dựng DB test, nghiệm thu v2, ổn định E2E) + B15-12 (6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | B17 xong phần không cần DB, review `docs/reports/REVIEW_B17_2026-10-26.md` |
 | 3   | Xoay token `SUPABASE_ACCESS_TOKEN` (`sbp_`) ở supabase.com/dashboard/account/tokens, cập nhật `.env.local`                                                        | Chủ dự án         | ✅ Đã nhận token mới từ chủ dự án và nạp vào `.env.local`                                                                                            |
 | 4   | A6: xoay toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase), rồi `git rm --cached .env` + thêm `.env` vào `.gitignore`/`.dockerignore` | Chủ dự án         | `.env` đang bị track trong git                                                                                                                       |
 | 5   | A10: checklist VPS theo `deploy/INFRA_HANDOFF_CHECKLIST.md` (Caddy, timer reclaim, `SUPABASE_SERVICE_ROLE_KEY` trong container, Leaked Password Protection)       | Chủ dự án         | Cần quyền VPS                                                                                                                                        |
-| 6   | **Push** `main` (đang ahead `origin/main` 99+ commit), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
+| 6   | **Push** `main` (✅ đã push tới `941b2f8` ngày 2026-10-25; 6 commit B17 chưa push), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
 | 7   | **Live cursor** — `docs/superpowers/plans/2026-10-25-live-cursor-group-play.md`, giai đoạn 1 (LC1–LC8)                                                            | AI thực thi       | ⛔ **Chưa giao.** Chỉ giao sau bước 6 và sau khi xác nhận gói Supabase (Free/Pro). Giai đoạn 2 (relay VPS) chỉ khi chạm ngưỡng ở mục 2.6 của plan đó |
 
 **Prompt giao việc B12 (đã chạy xong):**
