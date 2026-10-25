@@ -174,18 +174,21 @@ export function IndictmentModal({
     let matchedCulprit: { key: string; name: string } | null = null;
     if (isAdmin000) {
       const fallbackTarget = indictmentCp?.pickerConfig?.validSuspects?.[0];
-      matchedCulprit = fallbackTarget
-        ? findSuspectMatch(fallbackTarget, suspectCharacters)
-        : suspectCharacters[0] || { key: "bypass", name: "Bypass" };
+      matchedCulprit =
+        (fallbackTarget
+          ? findSuspectMatch(fallbackTarget, suspectCharacters)
+          : null) ||
+        suspectCharacters[0] || { key: "bypass", name: "Bypass" };
     } else {
       matchedCulprit = findSuspectMatch(suspectName, suspectCharacters);
-      if (!matchedCulprit) {
-        setErrorMsg(
-          "Không tìm thấy nghi can phù hợp trong hồ sơ vụ án! Vui lòng kiểm tra lại họ tên bị can.",
-        );
-        detectiveAudio.playGlassSound();
-        return;
-      }
+    }
+
+    if (!matchedCulprit) {
+      setErrorMsg(
+        "Không tìm thấy nghi can phù hợp trong hồ sơ vụ án! Vui lòng kiểm tra lại họ tên bị can.",
+      );
+      detectiveAudio.playGlassSound();
+      return;
     }
 
     if (!selectedMotiveOption && !isAdmin000) {
