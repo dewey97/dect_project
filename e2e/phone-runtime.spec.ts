@@ -34,7 +34,11 @@ test.describe("Phone Runtime — Case #000 (P28)", () => {
     await page.goto(CASE_URL);
 
     // Wait for investigation canvas to be ready
-    const phonePin = page.locator('[data-pin-id="c0-pin-victim-phone"]');
+    const phonePin = page
+      .locator(
+        '[data-node-kind="victim_phone"], [data-pin-id="c0-pin-victim-phone"]',
+      )
+      .first();
     await expect(phonePin).toBeAttached({ timeout: 20_000 });
     await phonePin.evaluate((el: HTMLElement) => el.click());
 
