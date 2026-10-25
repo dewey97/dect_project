@@ -1,5 +1,4 @@
 import { normalizeImageUrl } from "@/lib/utils";
-import { findValidCaseCharacter } from "@/lib/cases/case-000-suspects";
 
 export const resolveSuspectPhotoUrl = (
   pin: {
@@ -34,7 +33,6 @@ export const resolveSuspectPhotoUrl = (
     lower.includes("chalk");
 
   // 1. Check live photos map first (Live-First rule)
-  const isDefaultCase = !caseId || caseId === "case-000" || caseId === "case_000";
   if (photosMap) {
     if (isCrimeScenePin) {
       const liveCrime =
@@ -53,26 +51,12 @@ export const resolveSuspectPhotoUrl = (
     const directLabel = photosMap.get(pin.label.toLowerCase().trim());
     if (directLabel) return directLabel;
 
-    // Fallback to case-000 static character list only for case-000
-    if (isDefaultCase) {
-      const char =
-        findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
-      if (char) {
-        const liveChar =
-          photosMap.get(`avatar_${char.id}`) || photosMap.get(char.id);
-        if (liveChar) return liveChar;
-        if (char.avatarUrl) return char.avatarUrl;
-      }
-    }
-  } else {
-    const isDefaultCase = !caseId || caseId === "case-000" || caseId === "case_000";
-    if (isDefaultCase) {
-      const char =
-        findValidCaseCharacter(pin.label) || findValidCaseCharacter(pin.id);
-      if (char && char.avatarUrl) return char.avatarUrl;
+    const subjectKey = (pin as any).subjectKey;
+    if (subjectKey) {
+      const liveSubject = photosMap.get(`avatar_${subjectKey.toLowerCase()}`) || photosMap.get(subjectKey.toLowerCase());
+      if (liveSubject) return liveSubject;
     }
   }
-
   // 2. Fallback if not found in live Google Sheets
   if (isCrimeScenePin) {
     return "/images/avatar_placeholder.svg";

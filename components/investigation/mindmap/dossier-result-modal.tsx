@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, FileText, ShieldAlert, CheckCircle2, Award } from 'lucide-react'
+import { X, FileText, Award } from 'lucide-react'
 import { detectiveAudio } from '@/lib/investigation-audio'
 
 interface DossierResultModalProps {
@@ -27,27 +27,13 @@ export function DossierResultModal({
   const isA = dossierType === 'A'
   const isB = dossierType === 'B'
   const isC = dossierType === 'C'
-  const isDefaultCase = caseId === 'case-000'
 
   const effectiveSuspectName =
     suspectName ||
     (isA ? 'Lê Quang Vũ' : isB ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà')
 
-  const title = isDefaultCase
-    ? isA
-      ? 'HỒ SƠ A — BIÊN BẢN KẾT LUẬN ĐỐI TƯỢNG LÊ QUANG VŨ'
-      : isB
-      ? 'HỒ SƠ B — BIÊN BẢN KẾT LUẬN ĐỐI TƯỢNG NGUYỄN THANH TÙNG'
-      : 'HỒ SƠ C — ĐỀ XUẤT LỆNH KHÁM XẾT CHỖ Ở TRẦN THỊ HÀ'
-    : `HỒ SƠ ${dossierType} — BIÊN BẢN ĐIỀU TRA ĐỐI TƯỢNG ${effectiveSuspectName.toUpperCase()}`
-
-  const code = isDefaultCase
-    ? isA
-      ? 'HỒ SƠ A // CÁO TRẠNG 001'
-      : isB
-      ? 'HỒ SƠ B // CÁO TRẠNG 002'
-      : 'HỒ SƠ C // LỆNH KHÁM XẾT 003'
-    : `HỒ SƠ ${dossierType} // ${caseId.toUpperCase()}`
+  const title = `HỒ SƠ ${dossierType} — BIÊN BẢN ${isC ? 'ĐỀ XUẤT LỆNH KHÁM XẾT' : 'KẾT LUẬN'} ĐỐI TƯỢNG ${effectiveSuspectName.toUpperCase()}`
+  const code = `HỒ SƠ ${dossierType} // ${(caseId || 'case').toUpperCase()}`
 
   return (
     <AnimatePresence>
@@ -88,11 +74,7 @@ export function DossierResultModal({
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#4a3520] uppercase">
                 <FileText className="size-4 text-[#8c1d1d]" />
                 <span>
-                  {isDefaultCase
-                    ? isC
-                      ? 'ĐỀ XUẤT LỆNH KHÁM XẾT KHẨN CẤP'
-                      : 'BIÊN BẢN KẾT THÚC CHUYÊN ÁN #000'
-                    : `BIÊN BẢN ĐIỀU TRA HỒ SƠ ${dossierType}`}
+                  {isC ? 'ĐỀ XUẤT LỆNH KHÁM XẾT KHẨN CẤP' : `BIÊN BẢN ĐIỀU TRA HỒ SƠ ${dossierType}`}
                 </span>
               </div>
               <div className="px-3 py-1 border-2 border-[#8c1d1d] text-[#8c1d1d] bg-red-900/10 font-mono text-[11px] font-black uppercase tracking-wider">
@@ -107,25 +89,17 @@ export function DossierResultModal({
                 <span>ĐỐI TƯỢNG: {effectiveSuspectName.toUpperCase()}</span>
               </div>
               <div className="text-xs sm:text-sm text-[#1a120b] font-medium leading-relaxed whitespace-pre-line space-y-2">
-                {!isDefaultCase ? (
-                  <p>
-                    Đây là Hồ sơ {dossierType} ghi nhận đầy đủ diễn tiến vụ án, biên bản điều tra và lời khai của đối tượng {effectiveSuspectName} cùng toàn bộ tài liệu bằng chứng liên quan đã được thu thập và phê chuẩn.
-                  </p>
-                ) : (
+                {isC ? (
                   <>
-                    {isA &&
-                      'Đây là Hồ sơ A ghi nhận đầy đủ diễn tiến vụ án, biên bản hỏi cung đối tượng Lê Quang Vũ cùng toàn bộ lời khai và bằng chứng buộc tội chính thức đã được Viện Kiểm sát phê chuẩn.'}
-                    {isB &&
-                      'Đây là Hồ sơ B ghi nhận đầy đủ diễn tiến vụ án, biên bản hỏi cung đối tượng Nguyễn Thanh Tùng cùng toàn bộ lời khai và bằng chứng buộc tội chính thức đã được Viện Kiểm sát phê chuẩn.'}
-                    {isC && (
-                      <>
-                        <p>Đối tượng Trần Thị Hà có thái độ bất hợp tác, không giải trình được các mâu thuẫn trong lời khai ban đầu.</p>
-                        <p>Qua đánh giá dấu vết nghiệp vụ, có căn cứ nhận định nhiều khả năng các vật chứng, tư trang hoặc công cụ gây án hiện đang được cất giấu tại nơi ở của đối tượng.</p>
-                        <p>Để ngăn chặn nguy cơ tẩu tán chứng cứ, căn cứ Điều 140 và Điều 141 Bộ luật Tố tụng hình sự, Đội 5 kính đề xuất:</p>
-                        <p className="font-bold text-[#8c1d1d] italic">Phê duyệt Lệnh khám xét khẩn cấp chỗ ở đối với Trần Thị Hà, giao Tổ công tác phối hợp cùng Công an phường Phân khu Cảng và VKSND TP. Hà Nội thực hiện theo quy định.</p>
-                      </>
-                    )}
+                    <p>Đối tượng {effectiveSuspectName} có thái độ bất hợp tác, không giải trình được các mâu thuẫn trong lời khai ban đầu.</p>
+                    <p>Qua đánh giá dấu vết nghiệp vụ, có căn cứ nhận định nhiều khả năng các vật chứng, tư trang hoặc công cụ gây án hiện đang được cất giấu tại nơi ở của đối tượng.</p>
+                    <p>Để ngăn chặn nguy cơ tẩu tán chứng cứ, căn cứ quy định tố tụng hình sự, Ban chuyên án đề xuất:</p>
+                    <p className="font-bold text-[#8c1d1d] italic">Phê duyệt Lệnh khám xét khẩn cấp chỗ ở đối với đối tượng {effectiveSuspectName}, giao Tổ công tác phối hợp cùng Viện Kiểm sát thực hiện theo quy định.</p>
                   </>
+                ) : (
+                  <p>
+                    Đây là Hồ sơ {dossierType} ghi nhận đầy đủ diễn tiến vụ án, biên bản hỏi cung đối tượng {effectiveSuspectName} cùng toàn bộ lời khai và bằng chứng buộc tội chính thức đã được Viện Kiểm sát phê chuẩn.
+                  </p>
                 )}
               </div>
             </div>
@@ -135,23 +109,30 @@ export function DossierResultModal({
               {onOpenFollowupQuestion ? (
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation()
                     detectiveAudio.playPaperRustle()
-                    onClose()
                     onOpenFollowupQuestion()
                   }}
-                  className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-mono font-bold text-xs uppercase tracking-wider transition-all cursor-pointer border-2 border-amber-400 shadow-md"
+                  className="px-5 py-2.5 bg-[#8c1d1d] hover:bg-[#a82525] text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors shadow-md rounded-none flex items-center gap-2 cursor-pointer border border-[#6b1414] active:scale-[0.99] pointer-events-auto"
                 >
-                  {isC ? 'Tiến hành khám xét' : '⚡ TIẾP TỤC: MỞ CÂU HỎI'}
+                  <Award className="size-4 pointer-events-none" />
+                  <span>Mở câu hỏi mở rộng {isC ? '(Lệnh khám xét)' : ''}</span>
                 </button>
-              ) : <div />}
+              ) : (
+                <div />
+              )}
 
               <button
                 type="button"
-                onClick={onClose}
-                className="px-6 py-2.5 bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer border-2 border-[#2b1f14]"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  detectiveAudio.playPaperRustle()
+                  onClose()
+                }}
+                className="px-4 py-2 border border-[#5c4026] text-[#5c4026] hover:bg-[#dfd3bd] font-mono text-xs font-bold uppercase tracking-wider transition-colors rounded-none cursor-pointer pointer-events-auto"
               >
-                ĐÓNG HỒ SƠ
+                Đóng hồ sơ
               </button>
             </div>
           </div>

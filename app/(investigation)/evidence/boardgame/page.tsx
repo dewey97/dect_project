@@ -79,19 +79,20 @@ function BoardGameCompanionContent() {
   );
 
   const { pdfs: casePdfs, evidence: caseEvs } = useCaseEvidence(caseId);
-  const isCase000 = caseId === "case-000" || caseId === "case_000";
 
   useEffect(() => {
     setStorageItem("play_experience", "boardgame");
     const isIntroSeen = getStorageItem(caseStorageKey(caseId, "intro_seen"));
-    if (isIntroSeen !== "true" && isCase000) {
+    const initPdfs = casePdfs.filter((d) => d.phase === 0);
+    const initEvidence = caseEvs.filter((e) => e.phase === 0);
+    if (isIntroSeen !== "true" && (initPdfs.length > 0 || initEvidence.length > 0)) {
       setUnlockedModalData({
         unlockedPhase: 0,
-        newPdfs: casePdfs.filter((d) => d.phase === 0),
-        newEvidence: caseEvs.filter((e) => e.phase === 0),
+        newPdfs: initPdfs,
+        newEvidence: initEvidence,
       });
     }
-  }, [caseId, isCase000, casePdfs, caseEvs]);
+  }, [caseId, casePdfs, caseEvs]);
 
   const resetFindingsProgress = () => {
     clearInvestigationStorage();
