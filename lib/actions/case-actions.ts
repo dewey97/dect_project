@@ -150,6 +150,7 @@ export async function createNewCase(title: string = "Mật vụ mới (Bản nh�
           question: "Nghiên cứu tài liệu khởi đầu vụ án.",
           answer_config: {},
           hints: [],
+          depends_on: [],
         },
         {
           case_id: normalizedCaseId,
@@ -197,12 +198,17 @@ export async function getCaseBySlug(slugOrId: string) {
     await requireAdminAuth();
     const supabase = await createClient();
     const slug = normalizeCaseId(slugOrId);
+    const UUID_REGEX =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-    const { data, error } = await supabase
-      .from("cases")
-      .select("*")
-      .or(`slug.eq.${slug},id.eq.${slugOrId}`)
-      .maybeSingle();
+    let query = supabase.from("cases").select("*");
+    if (UUID_REGEX.test(slugOrId)) {
+      query = query.or(`slug.eq.${slug},id.eq.${slugOrId}`);
+    } else {
+      query = query.eq("slug", slug);
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error) throw error;
     return { success: true, data: data as DbCase | null };

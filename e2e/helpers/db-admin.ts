@@ -105,9 +105,9 @@ export async function cleanupE2ECases(prefix = "e2e_") {
     await supabase.from("phone_notes").delete().in("case_slug", slugs);
     await supabase.from("phone_browser_history").delete().in("case_slug", slugs);
     await supabase.from("phone_bank_transactions").delete().in("case_slug", slugs);
-    await supabase.from("boardgame_pins").delete().in("case_slug", slugs);
-    await supabase.from("boardgame_connections").delete().in("case_slug", slugs);
-    await supabase.from("reinvestigation_hotspots").delete().in("case_id", slugs);
+    await supabase.from("boardgame_pins").delete().in("case_id", slugs);
+    await supabase.from("boardgame_connections").delete().in("case_id", slugs);
+    await supabase.from("reinvestigation_hotspots").delete().in("case_slug", slugs);
 
     // 3. Xóa chính case
     await supabase.from("cases").delete().in("slug", slugs);
@@ -139,9 +139,9 @@ export async function deleteTestCase(slug: string) {
   await supabase.from("phone_notes").delete().eq("case_slug", slug);
   await supabase.from("phone_browser_history").delete().eq("case_slug", slug);
   await supabase.from("phone_bank_transactions").delete().eq("case_slug", slug);
-  await supabase.from("boardgame_pins").delete().eq("case_slug", slug);
-  await supabase.from("boardgame_connections").delete().eq("case_slug", slug);
-  await supabase.from("reinvestigation_hotspots").delete().eq("case_id", slug);
+  await supabase.from("boardgame_pins").delete().eq("case_id", slug);
+  await supabase.from("boardgame_connections").delete().eq("case_id", slug);
+  await supabase.from("reinvestigation_hotspots").delete().eq("case_slug", slug);
   await supabase.from("cases").delete().eq("slug", slug);
 }
 
