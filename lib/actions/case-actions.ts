@@ -100,22 +100,149 @@ export async function getPublicCases() {
   }
 }
 
-/** Tạo Vụ án mới (Bản nháp) */
-export async function createCaseDraft(title: string = "Untitled Mystery") {
+/** Tạo Vụ án mới (Hợp nhất: Tự sinh slug hoặc nhận custom slug, seed cp-start & cp-epilogue) */
+export async function createNewCase(title: string = "Mật vụ mới (Bản nháp)", customCaseId?: string) {
   try {
     await requireAdminAuth();
     const supabase = await createClient();
+
+    if (!title.trim()) {
+      return { success: false, error: "Vui lòng nhập tên vụ án." };
+    }
+    if (customCaseId?.trim() && !isValidCaseId(customCaseId)) {
+      return {
+        success: false,
+        error:
+          "Mã vụ án chỉ gồm chữ thường, số và dấu gạch dưới (vd: case_002).",
+      };
+    }
+
+    // 1. Tạo bản ghi trong cases
+    const { data: newCase, error: insertError } = await supabase
+      .from("cases")
+      .insert([
+        {
+          title: title.trim(),
+          status: "DRAFT",
+          ...(customCaseId?.trim()
+            ? { slug: normalizeCaseId(customCaseId) }
+            : {}),
+        },
+      ])
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    // 2. Mã vụ án do DB cấp
+    const normalizedCaseId = (newCase as DbCase).slug;
+
+    // 3. Tự động sinh 2 node cốt lõi: Hồ sơ ban đầu và Hậu án
+    const { error: seedError } = await supabase
+      .from("case_checkpoints")
+      .insert([
+        {
+          case_id: normalizedCaseId,
+          checkpoint_id: "cp-start",
+          title: "Hồ sơ ban đầu",
+          type: "choice",
+          kind: "choice",
+          question: "Nghiên cứu tài liệu khởi đầu vụ án.",
+          answer_config: {},
+          hints: [],
+        },
+        {
+          case_id: normalizedCaseId,
+          checkpoint_id: "cp-epilogue",
+          title: "Hậu án",
+          type: "epilogue",
+          kind: "epilogue",
+          question: "Tổng kết vụ án",
+          answer_config: {
+            epilogueStories: [
+              {
+                id: "cp-epilogue-1",
+                title: "Phần 1: Sự thật phơi bày",
+                monologue: "",
+              },
+            ],
+          },
+          hints: [],
+          depends_on: ["cp-start"],
+        },
+      ]);
+    if (seedError) throw seedError;
+
+    revalidatePath("/studio/cases");
+    revalidatePath("/studio/checkpoints");
+
+    return {
+      success: true,
+      data: newCase as DbCase,
+      caseId: normalizedCaseId,
+    };
+  } catch (error: unknown) {
+    console.error("Error creating new case:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Không tạo được vụ án mới.",
+    };
+  }
+}
+
+/** Lấy chi tiết vụ án theo slug hoặc id */
+export async function getCaseBySlug(slugOrId: string) {
+  try {
+    await requireAdminAuth();
+    const supabase = await createClient();
+    const slug = normalizeCaseId(slugOrId);
+
     const { data, error } = await supabase
       .from("cases")
-      .insert([{ title, status: "DRAFT" }])
+      .select("*")
+      .or(`slug.eq.${slug},id.eq.${slugOrId}`)
+      .maybeSingle();
+
+    if (error) throw error;
+    return { success: true, data: data as DbCase | null };
+  } catch (error: unknown) {
+    console.error("Error fetching case details:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+      data: null,
+    };
+  }
+}
+
+/** Cập nhật metadata Vụ án */
+export async function updateCase(
+  caseId: string,
+  updates: Partial<Pick<DbCase, "title" | "synopsis" | "full_story" | "difficulty" | "status" | "cover_image_url" | "panorama_url" | "scene_360_url" | "reinvestigation_bg_url">>
+) {
+  try {
+    await requireAdminAuth();
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("cases")
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", caseId)
       .select()
       .single();
 
     if (error) throw error;
+
     revalidatePath("/studio/cases");
+    revalidatePath(`/studio/cases/${data.slug}`);
+    revalidatePath("/activate");
     return { success: true, data: data as DbCase };
   } catch (error: unknown) {
-    console.error("Error creating case draft:", error);
+    console.error("Error updating case:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : String(error),
@@ -268,94 +395,4 @@ export async function duplicateCase(caseId: string) {
   }
 }
 
-/** Tạo một vụ án mới hoàn chỉnh với 2 node cơ bản: Hồ sơ ban đầu và Hậu án */
-export async function createNewCase(title: string, customCaseId?: string) {
-  try {
-    await requireAdminAuth();
-    const supabase = await createClient();
 
-    if (!title.trim()) {
-      return { success: false, error: "Vui lòng nhập tên vụ án." };
-    }
-    if (customCaseId?.trim() && !isValidCaseId(customCaseId)) {
-      return {
-        success: false,
-        error:
-          "Mã vụ án chỉ gồm chữ thường, số và dấu gạch dưới (vd: case_002).",
-      };
-    }
-
-    // 1. Tạo bản ghi trong cases
-    const { data: newCase, error: insertError } = await supabase
-      .from("cases")
-      .insert([
-        {
-          title: title.trim(),
-          status: "DRAFT",
-          // Bỏ trống slug để DB tự cấp mã tuần tự (trigger assign_case_slug).
-          ...(customCaseId?.trim()
-            ? { slug: normalizeCaseId(customCaseId) }
-            : {}),
-        },
-      ])
-      .select()
-      .single();
-
-    if (insertError) throw insertError;
-
-    // 2. Mã vụ án do DB cấp
-    const normalizedCaseId = (newCase as DbCase).slug;
-
-    // 3. Tự động sinh 2 node cốt lõi: Hồ sơ ban đầu và Hậu án
-    const { error: seedError } = await supabase
-      .from("case_checkpoints")
-      .insert([
-        {
-          case_id: normalizedCaseId,
-          checkpoint_id: "cp-start",
-          title: "Hồ sơ ban đầu",
-          type: "choice",
-          kind: "choice",
-          question: "Nghiên cứu tài liệu khởi đầu vụ án.",
-          answer_config: {},
-          hints: [],
-        },
-        {
-          case_id: normalizedCaseId,
-          checkpoint_id: "cp-epilogue",
-          title: "Hậu án",
-          type: "epilogue",
-          kind: "epilogue",
-          question: "Tổng kết vụ án",
-          answer_config: {
-            epilogueStories: [
-              {
-                id: "cp-epilogue-1",
-                title: "Phần 1: Sự thật phơi bày",
-                monologue: "",
-              },
-            ],
-          },
-          hints: [],
-          depends_on: ["cp-start"],
-        },
-      ]);
-    if (seedError) throw seedError;
-
-    revalidatePath("/studio/checkpoints");
-    revalidatePath("/studio/cases");
-
-    return {
-      success: true,
-      data: newCase as DbCase,
-      caseId: normalizedCaseId,
-    };
-  } catch (error: unknown) {
-    console.error("Error creating new case:", error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "Không tạo được vụ án mới.",
-    };
-  }
-}

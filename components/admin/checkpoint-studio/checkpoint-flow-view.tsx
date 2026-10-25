@@ -82,7 +82,6 @@ interface CheckpointFlowViewProps {
   onSaveAll?: () => void;
   onDossierClick?: (dossierOrName: DbCaseDossier | string) => void;
   onCreateDossier?: () => void;
-  onCreateCase?: () => void;
   lintResult?: CaseLintResult;
   onOpenLintModal?: () => void;
 }
@@ -434,7 +433,6 @@ export function CheckpointFlowView({
   onSaveAll,
   onDossierClick,
   onCreateDossier,
-  onCreateCase,
   lintResult,
   onOpenLintModal,
 }: CheckpointFlowViewProps) {
@@ -876,20 +874,7 @@ export function CheckpointFlowView({
               ))}
             </select>
 
-            {onCreateCase && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={onCreateCase}
-                className="h-8 border-white/10 bg-white/[0.04] text-xs text-zinc-300 hover:text-amber-300 hover:border-amber-500/40 px-2"
-                title="Tạo vụ án mới"
-              >
-                <Plus className="size-3.5" />
-                <span>Case</span>
-              </Button>
-            )}
-          </div>
+                      </div>
         )}
 
         <div className="mr-auto min-w-0">

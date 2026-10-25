@@ -26,7 +26,6 @@ import {
   updateCheckpointPositions,
 } from "@/lib/actions/checkpoint-actions";
 import { getCharactersByCase } from "@/lib/actions/character-actions";
-import { createNewCase } from "@/lib/actions/case-actions";
 import { slugifyVietnamese } from "@/lib/text";
 import {
   getCaseDossiers,
@@ -173,10 +172,6 @@ export function CheckpointStudioClient({
     };
   }, [isResizing, sidebarWidth]);
   const [allCases, setAllCases] = useState<DbCase[]>(initialCases);
-  const [isCreateCaseOpen, setIsCreateCaseOpen] = useState(false);
-  const [newCaseTitle, setNewCaseTitle] = useState("");
-  const [newCaseCode, setNewCaseCode] = useState("");
-  const [isCreatingCase, setIsCreatingCase] = useState(false);
   const [rows, setRows] = useState<DbCaseCheckpoint[]>(initialRows);
   const [dossiers, setDossiers] = useState<DbCaseDossier[]>(initialDossiers);
   const [availableDocs, setAvailableDocs] = useState<AvailableDocumentItem[]>(
@@ -283,43 +278,6 @@ export function CheckpointStudioClient({
     return Array.from(map, ([value, label]) => ({ value, label }));
   }, [allCases, caseId]);
 
-  const handleCreateCaseSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCaseTitle.trim()) {
-      toast.error("Vui lòng nhập tên vụ án");
-      return;
-    }
-
-    setIsCreatingCase(true);
-    try {
-      const res = await createNewCase(newCaseTitle, newCaseCode || undefined);
-      if (!res.success || !res.caseId) {
-        toast.error(res.error || "Không tạo được vụ án mới");
-        return;
-      }
-
-      toast.success(`Đã tạo vụ án "${newCaseTitle}" thành công!`);
-      if (res.data) {
-        setAllCases((prev) => [res.data as DbCase, ...prev]);
-      }
-      setIsCreateCaseOpen(false);
-      setNewCaseTitle("");
-      setNewCaseCode("");
-
-      setCaseId(res.caseId);
-      setSelectedId(null);
-      setDraft(null);
-      setBaseline("");
-      setPendingEdges([]);
-      setPendingPositions({});
-      await loadCase(res.caseId);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Lỗi tạo vụ án";
-      toast.error(message);
-    } finally {
-      setIsCreatingCase(false);
-    }
-  };
 
   const confirmDiscardForm = useCallback(() => {
     if (!formDirty) return true;
@@ -912,7 +870,6 @@ export function CheckpointStudioClient({
           onSaveAll={handleSaveAll}
           onDossierClick={handleDossierClick}
           onCreateDossier={handleCreateDossier}
-          onCreateCase={() => setIsCreateCaseOpen(true)}
           lintResult={lintResult}
           onOpenLintModal={() => setIsLintModalOpen(true)}
         />
@@ -978,61 +935,6 @@ export function CheckpointStudioClient({
         }}
       />
 
-      {/* Modal Tạo Vụ Án Mới */}
-      {isCreateCaseOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-xl border border-white/10 bg-[#0e0e14] p-4 shadow-2xl">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-200 mb-3">
-              Tạo vụ án mới
-            </h3>
-            <form onSubmit={handleCreateCaseSubmit} className="space-y-3">
-              <div>
-                <label className="mb-1 block text-[10px] font-semibold uppercase text-zinc-500">
-                  Tên vụ án *
-                </label>
-                <input
-                  type="text"
-                  value={newCaseTitle}
-                  onChange={(e) => setNewCaseTitle(e.target.value)}
-                  className="w-full rounded-md border border-white/10 bg-black/40 px-2.5 py-1.5 text-xs text-zinc-100 outline-none focus:border-amber-500/50"
-                  autoFocus={false}
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-[10px] font-semibold uppercase text-zinc-500">
-                  Mã vụ án (Tùy chọn)
-                </label>
-                <input
-                  type="text"
-                  value={newCaseCode}
-                  onChange={(e) => setNewCaseCode(e.target.value)}
-                  className="w-full rounded-md border border-white/10 bg-black/40 px-2.5 py-1.5 font-mono text-xs text-zinc-200 outline-none focus:border-amber-500/50"
-                  autoFocus={false}
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setIsCreateCaseOpen(false)}
-                  disabled={isCreatingCase}
-                  className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-zinc-400 hover:bg-white/5"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={isCreatingCase || !newCaseTitle.trim()}
-                  className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-black hover:bg-amber-400 disabled:opacity-50"
-                >
-                  {isCreatingCase ? "Đang tạo…" : "Tạo vụ án"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -15,6 +15,9 @@ export interface DbCase {
   difficulty: number;
   status: CaseStatus;
   cover_image_url: string | null;
+  panorama_url?: string | null;
+  scene_360_url?: string | null;
+  reinvestigation_bg_url?: string | null;
   created_at: string;
   updated_at: string;
 }

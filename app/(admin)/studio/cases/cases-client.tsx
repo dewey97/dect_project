@@ -87,9 +87,9 @@ export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
                   className="hover:bg-white/[0.02] transition-colors group"
                 >
                   <td className="px-6 py-4">
-                    <div className="font-medium text-zinc-100 text-base">
+                    <Link href={`/studio/cases/${c.slug}`} className="font-medium text-zinc-100 text-base hover:text-amber-400 transition-colors block">
                       {c.title}
-                    </div>
+                    </Link>
                     <p className="text-xs text-zinc-500 font-mono mt-0.5">
                       {c.slug}
                     </p>
@@ -123,6 +123,12 @@ export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
                     {new Date(c.updated_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
+                    <Link
+                      href={`/studio/cases/${c.slug}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 text-zinc-200 border border-white/20 rounded text-xs font-medium hover:bg-white/20 transition-colors"
+                    >
+                      Edit
+                    </Link>
                     <Link
                       href={`/evidence/web?case_id=${c.slug}`}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/20 text-primary border border-primary/30 rounded text-xs font-medium hover:bg-primary/30 transition-colors"

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { createCaseDraft } from "@/lib/actions/case-actions";
+import { createNewCase } from "@/lib/actions/case-actions";
 import { useRouter } from "next/navigation";
 
 export function CreateCaseButton() {
@@ -11,9 +11,9 @@ export function CreateCaseButton() {
 
   const handleCreate = async () => {
     setIsPending(true);
-    const res = await createCaseDraft("Mật vụ mới (Bản nháp)");
+    const res = await createNewCase("Mật vụ mới (Bản nháp)");
     if (res.success && res.data) {
-      router.refresh();
+      router.push(`/studio/cases/${res.data.slug}`);
       setIsPending(false);
     } else {
       console.error(res.error);
