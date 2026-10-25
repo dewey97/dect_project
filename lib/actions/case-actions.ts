@@ -290,7 +290,7 @@ export async function duplicateCase(caseId: string) {
 
     const sourceSlug = c.slug || normalizeCaseId(caseId);
 
-    // 2. Insert case mới
+    // 2. Insert case mới (sao chép đầy đủ metadata gồm ảnh bìa, 360, panorama, nền 2D)
     const { data: newCase, error: insertError } = await supabase
       .from("cases")
       .insert([
@@ -301,6 +301,9 @@ export async function duplicateCase(caseId: string) {
           difficulty: c.difficulty,
           status: "DRAFT",
           cover_image_url: c.cover_image_url,
+          panorama_url: c.panorama_url,
+          scene_360_url: c.scene_360_url,
+          reinvestigation_bg_url: c.reinvestigation_bg_url,
         },
       ])
       .select()
@@ -309,11 +312,13 @@ export async function duplicateCase(caseId: string) {
 
     const targetSlug = (newCase as DbCase).slug;
 
-    // 3. Clone case_checkpoints
+    // 3. Clone case_checkpoints (lưu lại map checkpoint_id -> uuid mới để remap node bảng)
     const { data: checkpoints } = await supabase
       .from("case_checkpoints")
       .select("*")
       .eq("case_id", sourceSlug);
+
+    const checkpointIdToNewUuid = new Map<string, string>();
 
     if (checkpoints && checkpoints.length > 0) {
       const clonedCps = (checkpoints as DbCaseCheckpoint[]).map(
@@ -322,10 +327,94 @@ export async function duplicateCase(caseId: string) {
           case_id: targetSlug,
         }),
       );
-      await supabase.from("case_checkpoints").insert(clonedCps);
+      const { data: insertedCps, error: cpInsertErr } = await supabase
+        .from("case_checkpoints")
+        .insert(clonedCps)
+        .select("id, checkpoint_id");
+
+      if (!cpInsertErr && insertedCps) {
+        insertedCps.forEach((row) => {
+          checkpointIdToNewUuid.set(row.checkpoint_id, row.id);
+        });
+      }
     }
 
-    // 4. Clone case_dossiers
+    // 4. Clone case_board_nodes (remap case_slug và checkpoint_id UUID mới)
+    const { data: boardNodes } = await supabase
+      .from("case_board_nodes")
+      .select("*")
+      .eq("case_slug", sourceSlug);
+
+    if (boardNodes && boardNodes.length > 0) {
+      const clonedBoardNodes = boardNodes.map(
+        ({ id, created_at, updated_at, ...rest }) => {
+          let remappedCpId = rest.checkpoint_id;
+          if (rest.checkpoint_id && checkpoints) {
+            const oldCp = checkpoints.find((cp) => cp.id === rest.checkpoint_id);
+            if (oldCp && checkpointIdToNewUuid.has(oldCp.checkpoint_id)) {
+              remappedCpId = checkpointIdToNewUuid.get(oldCp.checkpoint_id);
+            }
+          }
+          return {
+            ...rest,
+            case_slug: targetSlug,
+            checkpoint_id: remappedCpId,
+          };
+        },
+      );
+      await supabase.from("case_board_nodes").insert(clonedBoardNodes);
+    }
+
+    // 5. Clone boardgame_pins & boardgame_connections (đổi tiền tố id và case_id)
+    const { data: pins } = await supabase
+      .from("boardgame_pins")
+      .select("*")
+      .eq("case_id", sourceSlug);
+
+    if (pins && pins.length > 0) {
+      const clonedPins = pins.map((p) => ({
+        ...p,
+        id: p.id.replace(new RegExp(`^${sourceSlug}:`), `${targetSlug}:`),
+        case_id: targetSlug,
+      }));
+      await supabase.from("boardgame_pins").insert(clonedPins);
+    }
+
+    const { data: connections } = await supabase
+      .from("boardgame_connections")
+      .select("*")
+      .eq("case_id", sourceSlug);
+
+    if (connections && connections.length > 0) {
+      const clonedConnections = connections.map((conn) => ({
+        ...conn,
+        id: conn.id.replace(new RegExp(`^${sourceSlug}:`), `${targetSlug}:`),
+        case_id: targetSlug,
+        from_pin_id: conn.from_pin_id.replace(new RegExp(`^${sourceSlug}:`), `${targetSlug}:`),
+        to_pin_id: conn.to_pin_id.replace(new RegExp(`^${sourceSlug}:`), `${targetSlug}:`),
+      }));
+      await supabase.from("boardgame_connections").insert(clonedConnections);
+    }
+
+    // 6. Clone reinvestigation_hotspots
+    const { data: hotspotRow } = await supabase
+      .from("reinvestigation_hotspots")
+      .select("*")
+      .eq("case_slug", sourceSlug)
+      .maybeSingle();
+
+    if (hotspotRow && hotspotRow.hotspots) {
+      await supabase.from("reinvestigation_hotspots").upsert(
+        {
+          case_slug: targetSlug,
+          hotspots: hotspotRow.hotspots,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "case_slug" },
+      );
+    }
+
+    // 7. Clone case_dossiers
     const { data: dossiers } = await supabase
       .from("case_dossiers")
       .select("*")
@@ -341,7 +430,7 @@ export async function duplicateCase(caseId: string) {
       await supabase.from("case_dossiers").insert(clonedDossiers);
     }
 
-    // 5. Clone case_characters
+    // 8. Clone case_characters
     const { data: characters } = await supabase
       .from("case_characters")
       .select("*")
@@ -357,7 +446,7 @@ export async function duplicateCase(caseId: string) {
       await supabase.from("case_characters").insert(clonedChars);
     }
 
-    // 6. Clone dossier_documents
+    // 9. Clone dossier_documents
     const { data: documents } = await supabase
       .from("dossier_documents")
       .select("*")
@@ -373,10 +462,10 @@ export async function duplicateCase(caseId: string) {
       await supabase.from("dossier_documents").insert(clonedDocs);
     }
 
-    // 7. Clone phone data (apps, contacts, calls, messages, photos, notes, bank, browser)
+    // 10. Clone phone data (apps, contacts, calls, messages, photos, notes, bank, browser)
     await duplicatePhoneData(sourceSlug, targetSlug);
 
-    // 8. Clone case_evidence (chứng cứ vật lý, PDF hồ sơ, ảnh 360)
+    // 11. Clone case_evidence (chứng cứ vật lý, PDF hồ sơ, ảnh 360)
     await duplicateEvidenceData(sourceSlug, targetSlug);
 
     revalidatePath("/studio/cases");
