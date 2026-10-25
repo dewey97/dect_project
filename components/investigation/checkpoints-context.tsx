@@ -9,7 +9,7 @@ interface CheckpointsContextType {
   completeCheckpoint: (id: string) => void
   isCheckpointCompleted: (id: string) => boolean
   isDeviceLockedByCheckpoint: (caseId: string, deviceId: string) => boolean
-  isConclusionUnlocked: (caseId: string) => boolean
+  isConclusionUnlocked: (caseId: string, indictmentCheckpoint?: { depends_on?: string[]; dependsOn?: string[] } | null) => boolean
 }
 
 const CheckpointsContext = createContext<CheckpointsContextType | undefined>(undefined)
@@ -70,14 +70,32 @@ export function CheckpointsProvider({ children }: { children: React.ReactNode })
     return false
   }
 
-  // Conclusion unlocking rules based on checkpoints
-  const isConclusionUnlocked = (caseId: string) => {
-    if (caseId === 'case-000') {
-      // Case 000 requires cp-000-2b or cp-000-2 completed to conclude
-      return isCheckpointCompleted('cp-000-2b') || isCheckpointCompleted('cp-000-2')
+  /**
+   * Conclusion unlocking rules based on graph data (depends_on).
+   * Mở khi MỌI checkpoint mà checkpoint indictment phụ thuộc (depends_on) đã hoàn thành.
+   * Giữ tương thích tuyệt đối cho case_000: cp-000-2b depends_on cp-000-1c-followup hoặc fallback cp-000-2.
+   */
+  const isConclusionUnlocked = (
+    caseId: string,
+    indictmentCheckpoint?: { depends_on?: string[]; dependsOn?: string[] } | null
+  ) => {
+    // 1. Nếu có checkpoint indictment và có danh sách phụ thuộc depends_on
+    const deps = indictmentCheckpoint?.depends_on || indictmentCheckpoint?.dependsOn
+    if (deps && deps.length > 0) {
+      return deps.every((depId) => isCheckpointCompleted(depId))
     }
-    // Case 001 does not strictly lock conclusion, or we can check if needed
-    return true
+
+    // 2. Fallback cho case_000 theo quy ước cũ nếu chưa nạp được cấu hình đồ thị
+    if (caseId === 'case-000' || caseId === 'case_000') {
+      return (
+        isCheckpointCompleted('cp-000-2b') ||
+        isCheckpointCompleted('cp-000-2') ||
+        isCheckpointCompleted('cp-000-1c-followup')
+      )
+    }
+
+    // 3. Vụ mới không mở bừa nếu chưa có phụ thuộc
+    return false
   }
 
   return (
