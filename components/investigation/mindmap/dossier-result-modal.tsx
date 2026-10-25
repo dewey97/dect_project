@@ -27,13 +27,13 @@ export function DossierResultModal({
   const isA = dossierType === 'A'
   const isB = dossierType === 'B'
   const isC = dossierType === 'C'
-  const isCase000 = caseId === 'case-000'
+  const isDefaultCase = caseId === 'case-000'
 
   const effectiveSuspectName =
     suspectName ||
     (isA ? 'Lê Quang Vũ' : isB ? 'Nguyễn Thanh Tùng' : 'Trần Thị Hà')
 
-  const title = isCase000
+  const title = isDefaultCase
     ? isA
       ? 'HỒ SƠ A — BIÊN BẢN KẾT LUẬN ĐỐI TƯỢNG LÊ QUANG VŨ'
       : isB
@@ -41,7 +41,7 @@ export function DossierResultModal({
       : 'HỒ SƠ C — ĐỀ XUẤT LỆNH KHÁM XẾT CHỖ Ở TRẦN THỊ HÀ'
     : `HỒ SƠ ${dossierType} — BIÊN BẢN ĐIỀU TRA ĐỐI TƯỢNG ${effectiveSuspectName.toUpperCase()}`
 
-  const code = isCase000
+  const code = isDefaultCase
     ? isA
       ? 'HỒ SƠ A // CÁO TRẠNG 001'
       : isB
@@ -88,7 +88,7 @@ export function DossierResultModal({
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#4a3520] uppercase">
                 <FileText className="size-4 text-[#8c1d1d]" />
                 <span>
-                  {isCase000
+                  {isDefaultCase
                     ? isC
                       ? 'ĐỀ XUẤT LỆNH KHÁM XẾT KHẨN CẤP'
                       : 'BIÊN BẢN KẾT THÚC CHUYÊN ÁN #000'
@@ -107,7 +107,7 @@ export function DossierResultModal({
                 <span>ĐỐI TƯỢNG: {effectiveSuspectName.toUpperCase()}</span>
               </div>
               <div className="text-xs sm:text-sm text-[#1a120b] font-medium leading-relaxed whitespace-pre-line space-y-2">
-                {!isCase000 ? (
+                {!isDefaultCase ? (
                   <p>
                     Đây là Hồ sơ {dossierType} ghi nhận đầy đủ diễn tiến vụ án, biên bản điều tra và lời khai của đối tượng {effectiveSuspectName} cùng toàn bộ tài liệu bằng chứng liên quan đã được thu thập và phê chuẩn.
                   </p>

@@ -195,10 +195,10 @@ export function ReinvestigationModal({
   inline = false,
   onExpand,
 }: ReinvestigationModalProps) {
-  const isCase000 = caseId === "case_000" || caseId === "case-000";
+  const isDefaultCase = caseId === "case_000" || caseId === "case-000";
   // Hotspots list with server + localStorage persistence
   const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>(
-    isCase000 ? HOTSPOTS_2D_LIST : [],
+    isDefaultCase ? HOTSPOTS_2D_LIST : [],
   );
   const [selectedSpot, setSelectedSpot] =
     useState<ReinvestigationHotspot2D | null>(null);
@@ -328,7 +328,7 @@ export function ReinvestigationModal({
             panorama_url: res.data.panorama_url,
             scene_360_url: res.data.scene_360_url,
           });
-        } else if (isCase000) {
+        } else if (isDefaultCase) {
           setSceneConfig({
             panorama_url: "/images/cases/case_000/PANORAMA.png",
             scene_360_url: "/images/cases/case_000/crime_scene_360.jpg",
@@ -338,7 +338,7 @@ export function ReinvestigationModal({
         }
       })
       .catch(() => {
-        if (mounted && isCase000) {
+        if (mounted && isDefaultCase) {
           setSceneConfig({
             panorama_url: "/images/cases/case_000/PANORAMA.png",
             scene_360_url: "/images/cases/case_000/crime_scene_360.jpg",
@@ -350,7 +350,7 @@ export function ReinvestigationModal({
     return () => {
       mounted = false;
     };
-  }, [isOpen, caseId, isCase000]);
+  }, [isOpen, caseId, isDefaultCase]);
 
   // Process Google Sheets photos: Map by photo_code ID & Title
   const sheetPhotosList = useMemo(() => {
@@ -431,7 +431,7 @@ export function ReinvestigationModal({
   // DYNAMICALLY SYNC HOTSPOTS FROM GOOGLE SHEETS BY photoId, code (C-01..C-05), or title
   // Nếu Sheet cập nhật link Drive hay title cho photoId, game tự động đọc theo photoId mới nhất!
   const resolvedHotspots = useMemo(() => {
-    if (!isCase000 && hotspots.length === 0) {
+    if (!isDefaultCase && hotspots.length === 0) {
       // Tự động trích xuất các điểm khám xét từ Google Sheet của case động
       const customSpots = sheetPhotosList.filter(
         (p) =>
@@ -514,7 +514,7 @@ export function ReinvestigationModal({
       }
       return spot;
     });
-  }, [hotspots, sheetPhotosList, isCase000]);
+  }, [hotspots, sheetPhotosList, isDefaultCase]);
 
   // Cleanup animation frame
   useEffect(() => {

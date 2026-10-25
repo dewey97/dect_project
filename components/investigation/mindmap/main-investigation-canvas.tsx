@@ -242,8 +242,7 @@ export function MainInvestigationCanvas({
         .toLowerCase()
         .trim();
       return (
-        code === "avatar_khang" ||
-        code === "khang" ||
+        item.role === "victim" || item.metadata?.role === "victim" ||
         cat === "VICTIM" ||
         label.includes("nạn nhân")
       );
@@ -312,10 +311,9 @@ export function MainInvestigationCanvas({
         )
           map.mai = normUrl;
         if (
-          rawCode === "avatar_khang" ||
-          (isAvatar && (rawCode === "khang" || rawLabel.includes("khang")))
+          rawCode === "avatar_victim" || (isAvatar && (item.role === "victim" || rawLabel.includes("nạn nhân")))
         )
-          map.khang = normUrl;
+          map.victim = normUrl;
         if (
           rawCode === "avatar_dat" ||
           (isAvatar && (rawCode === "dat" || rawLabel.includes("đạt")))
@@ -435,7 +433,7 @@ export function MainInvestigationCanvas({
                 code === "avatar_tung" ||
                 code === "avatar_ha"));
 
-        if (!isSuspect || code === "avatar_khang" || code === "khang") return;
+        if (!isSuspect || item.role === "victim" || item.metadata?.role === "victim") return;
 
         const charId = code.replace(/^avatar_/, "");
         const label = String(item.label || item.title || "").trim();

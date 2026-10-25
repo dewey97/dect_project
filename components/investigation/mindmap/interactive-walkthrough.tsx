@@ -145,7 +145,7 @@ export function InteractiveWalkthrough({
           const scaleFactor = boardWidth / BOARD_BASE_WIDTH
           const isPhoto =
             !!targetPin.photoUrl ||
-            targetPin.id.includes('khang') ||
+            targetPin.nodeKind === "victim" || targetPin.id.includes("victim") ||
             targetPin.id.includes('victim') ||
             targetPin.id.includes('thi-the') ||
             targetPin.id.includes('scene')

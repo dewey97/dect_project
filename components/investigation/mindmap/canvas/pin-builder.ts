@@ -93,7 +93,6 @@ export type PinBuilderInput = {
  */
 function resolveNodePosition(
   primaryId: string,
-  legacyId: string | undefined,
   configPosition:
     | { desktop?: { x: number; y: number }; mobile?: { x: number; y: number } }
     | undefined,
@@ -104,7 +103,7 @@ function resolveNodePosition(
 ): { x: number; y: number } {
   if (positions) {
     if (positions[primaryId]) return positions[primaryId];
-    if (legacyId && positions[legacyId]) return positions[legacyId];
+    // legacyId positions check removed
   }
 
   const explicit = isMobile ? configPosition?.mobile : configPosition?.desktop;
@@ -130,8 +129,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   const caseSlug = normalizeCaseId(
     input.caseSlug || input.caseId || "case_000",
   );
-  const isCase000 = caseSlug === "case_000";
-  const isMobile = input.isMobile;
+    const isMobile = input.isMobile;
   const positions = input.positions;
 
   const pins: PinPoint[] = [];
@@ -145,20 +143,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
   if (hasDbBoardNodes && input.boardNodes) {
     input.boardNodes.forEach((node) => {
-      const legacyId = isCase000
-        ? node.node_kind === "victim_phone"
-          ? "c0-pin-victim-phone"
-          : node.node_kind === "reinvestigate"
-            ? "c0-pin-reinvestigate"
-            : node.node_kind === "suspects_hub"
-              ? "c0-pin-suspects"
-              : undefined
-        : undefined;
+      const legacyId = undefined;
 
       const pos = resolveNodePosition(
         node.id,
-        legacyId,
-        node.config?.position,
+                node.config?.position,
         node.slot_index,
         isMobile,
         positions,
@@ -169,8 +158,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         nodeKind: node.node_kind,
         subjectKey: node.subject_key || undefined,
         checkpointId: node.checkpoint_id || undefined,
-        legacyId,
-        x: pos.x,
+                x: pos.x,
         y: pos.y,
         label: node.title || node.config?.pin_title || node.node_kind,
         detail: node.title ? `Vật chứng / Khu vực: ${node.title}` : "",
@@ -189,7 +177,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     const vpId = `${caseSlug}:victim_phone:item`;
     const vpPos = resolveNodePosition(
       vpId,
-      "c0-pin-victim-phone",
       undefined,
       1,
       isMobile,
@@ -199,7 +186,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     pins.push({
       id: vpId,
       nodeKind: "victim_phone",
-      legacyId: "c0-pin-victim-phone",
+      legacyId: undefined,
       x: vpPos.x,
       y: vpPos.y,
       label: "Điện thoại nạn nhân",
@@ -214,26 +201,21 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     const reinvId = `${caseSlug}:reinvestigate:scene`;
     const reinvPos = resolveNodePosition(
       reinvId,
-      "c0-pin-reinvestigate",
       undefined,
       2,
       isMobile,
       positions,
       { x: 0.18, y: 0.36 },
     );
-    const crimeScenePhotoUrl = isCase000
-      ? "/images/cases/case_000/crime_scene.png"
-      : `/images/cases/${caseSlug}/crime_scene.png`;
+    const crimeScenePhotoUrl = `/images/cases/${caseSlug}/crime_scene.png`;
     pins.push({
       id: reinvId,
       nodeKind: "reinvestigate",
-      legacyId: "c0-pin-reinvestigate",
+      legacyId: undefined,
       x: reinvPos.x,
       y: reinvPos.y,
       label: "Khám xét hiện trường",
-      detail: isCase000
-        ? "Mở biên bản và rà soát toàn cảnh 360 hiện trường số 14 Đường Bờ Sông"
-        : "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án",
+      detail: "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án",
       color: "yellow",
       pinColor: "yellow",
       noteColor: "white",
@@ -248,7 +230,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     const shId = `${caseSlug}:suspects_hub:hub`;
     const shPos = resolveNodePosition(
       shId,
-      "c0-pin-suspects",
       undefined,
       3,
       isMobile,
@@ -258,7 +239,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     pins.push({
       id: shId,
       nodeKind: "suspects_hub",
-      legacyId: "c0-pin-suspects",
+      legacyId: undefined,
       x: shPos.x,
       y: shPos.y,
       label: "Nghi phạm",
@@ -309,7 +290,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   const phoneBoardCfg = phoneCp?.boardConfig || phoneCp?.board_config;
   const phonePos = resolveNodePosition(
     phoneNodeId,
-    "c0-pin-phone",
     phoneBoardCfg?.position,
     0,
     isMobile,
@@ -325,7 +305,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     id: phoneNodeId,
     nodeKind: "phone_lookup",
     checkpointId: phoneCpId,
-    legacyId: "c0-pin-phone",
+    legacyId: undefined,
     x: phonePos.x,
     y: phonePos.y,
     label: phoneBoardCfg?.pin_title || "Mở rộng điều tra",
@@ -350,7 +330,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     indictmentCp?.boardConfig || indictmentCp?.board_config;
   const indictmentPos = resolveNodePosition(
     indictmentNodeId,
-    "c0-pin-indictment",
     indictmentBoardCfg?.position,
     4,
     isMobile,
@@ -361,7 +340,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     id: indictmentNodeId,
     nodeKind: "indictment",
     checkpointId: indictmentCpId,
-    legacyId: "c0-pin-indictment",
+    legacyId: undefined,
     x: indictmentPos.x,
     y: indictmentPos.y,
     label: indictmentBoardCfg?.pin_title || "Bản kết luận điều tra",
@@ -414,7 +393,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
   suspectsList.forEach((s) => {
     const primaryId = `${caseSlug}:suspect:${s.key}`;
-    const legacyId = `node-suspect-${s.key}`;
+    const legacyId = undefined;
 
     // Tìm checkpoint thẩm tra tương ứng
     const matchCp = allCheckpoints.find((cp) => {
@@ -426,13 +405,12 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     });
 
     const fallbackCoord =
-      isCase000 && c0DefaultSuspectCoords[s.key]
+      c0DefaultSuspectCoords[s.key]
         ? c0DefaultSuspectCoords[s.key]
         : undefined;
 
     const pos = resolveNodePosition(
       primaryId,
-      legacyId,
       undefined,
       s.slotIndex,
       isMobile,
@@ -444,8 +422,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       id: primaryId,
       nodeKind: "suspect",
       subjectKey: s.key,
-      legacyId,
-      checkpointId: matchCp?.id,
+            checkpointId: matchCp?.id,
       x: pos.x,
       y: pos.y,
       label: s.name,
@@ -492,14 +469,14 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     if (!matchCp) return;
 
     const primaryId = `${caseSlug}:followup:${s.key}`;
-    const legacyId = `c0-pin-followup-${s.key}`;
+    const legacyId = undefined;
     const boardCfg = matchCp.boardConfig || matchCp.board_config;
 
     const suspectPin = pins.find(
       (p) => p.nodeKind === "suspect" && p.subjectKey === s.key,
     );
     const fallbackCoord =
-      isCase000 && c0DefaultFollowupCoords[s.key]
+      c0DefaultFollowupCoords[s.key]
         ? c0DefaultFollowupCoords[s.key]
         : suspectPin
           ? { x: suspectPin.x, y: Math.min(suspectPin.y + 0.22, 0.88) }
@@ -507,8 +484,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
     const pos = resolveNodePosition(
       primaryId,
-      legacyId,
-      boardCfg?.position,
+            boardCfg?.position,
       s.slotIndex + 8,
       isMobile,
       positions,
@@ -520,8 +496,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       nodeKind: "followup",
       subjectKey: s.key,
       checkpointId: matchCp.id,
-      legacyId,
-      x: pos.x,
+            x: pos.x,
       y: pos.y,
       label: boardCfg?.pin_title || "Nghi vấn",
       detail: `Nghi vấn suy luận mở rộng đối tượng ${s.name}`,
@@ -539,7 +514,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     const rawCode = (item.code || item.photo_code || `ev_${idx}`).trim();
     const codeLower = rawCode.toLowerCase();
     const primaryId = `${caseSlug}:evidence:${codeLower}`;
-    const legacyId = `c0-pin-evidence-${codeLower}`;
+    const legacyId = undefined;
 
     const rawX =
       typeof item.board_x === "number"
@@ -564,10 +539,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       if (positions[primaryId]) {
         posX = positions[primaryId].x;
         posY = positions[primaryId].y;
-      } else if (positions[legacyId]) {
-        posX = positions[legacyId].x;
-        posY = positions[legacyId].y;
-      }
+            }
     }
 
     const rawUrl = item.drive_url || item.direct_cdn_url || item.url || "";
@@ -593,8 +565,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     pins.push({
       id: primaryId,
       nodeKind: isAvatar ? "photo" : "photo",
-      legacyId,
-      x: posX,
+            x: posX,
       y: posY,
       label: item.label || item.title || rawCode || "Vật chứng",
       detail: item.description || `Vật chứng vụ án: ${item.label || rawCode}`,
@@ -643,7 +614,7 @@ export function buildCustomConnections(opts: {
       (p) =>
         (p.nodeKind === "suspect" && p.subjectKey === canonicalId) ||
         p.id === `node-suspect-${canonicalId}` ||
-        p.legacyId === `node-suspect-${canonicalId}`,
+        p.id === `node-suspect-${canonicalId}`,
     );
 
     if (hubPin && sPin) {
@@ -659,8 +630,7 @@ export function buildCustomConnections(opts: {
       const fPin = findPin(
         (p) =>
           (p.nodeKind === "followup" && p.subjectKey === canonicalId) ||
-          p.id.includes(`followup-${canonicalId}`) ||
-          p.legacyId === `c0-pin-followup-${canonicalId}`,
+          p.id.includes(`followup-${canonicalId}`)
       );
       if (fPin) {
         conns.push({
@@ -718,9 +688,7 @@ export function findFollowupCulprit(
     return parts[2];
   }
 
-  if (id.startsWith("c0-pin-followup-")) {
-    return id.replace("c0-pin-followup-", "");
-  }
+  
   if (id.startsWith("followup-")) {
     return id.replace("followup-", "");
   }
@@ -744,9 +712,7 @@ export function detectCheckpointForPin(pin?: PinPoint): string | null {
   if (parts.length >= 3 && parts[1] === "followup") {
     return `cp-${parts[2]}-followup`;
   }
-  if (id.startsWith("c0-pin-followup-")) {
-    return `cp-${id.replace("c0-pin-followup-", "")}-followup`;
-  }
+  
 
   return null;
 }

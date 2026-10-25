@@ -590,7 +590,7 @@ export function AddSuspectModal({
       return;
     }
 
-    if ((matchedChar as any).role === "victim" || matchedChar.id === "khang") {
+    if ((matchedChar as any).role === "victim") {
       setErrorMsg(
         `${matchedChar?.canonicalName || "Đối tượng"} là nạn nhân của vụ án, đã có vị trí chính thức trên bảng điều tra!`,
       );
@@ -691,7 +691,6 @@ export function AddSuspectModal({
 
   const isValidName =
     !!matchedChar &&
-    matchedChar.id !== "khang" &&
     (matchedChar as any).role !== "victim";
   const hasInterrogationReqs = !!(
     (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0 ||
@@ -732,7 +731,7 @@ export function AddSuspectModal({
     const matched = findValidCaseCharacter(currentName);
     if (
       matched &&
-      matched.id !== "khang" &&
+      (matched as any).role !== "victim" &&
       (motiveClueIds.length > 0 || contradictionClueIds.length > 0)
     ) {
       const suspectId = matched.id;
