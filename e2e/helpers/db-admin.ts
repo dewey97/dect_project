@@ -96,6 +96,7 @@ export async function cleanupE2ECases(prefix = "e2e_") {
     await supabase.from("case_checkpoints").delete().in("case_id", slugs);
     await supabase.from("case_characters").delete().in("case_slug", slugs);
     await supabase.from("case_evidence").delete().in("case_slug", slugs);
+    await supabase.from("dossier_documents").delete().in("case_id", slugs);
     await supabase.from("case_dossiers").delete().in("case_id", slugs);
     await supabase.from("case_phone_apps").delete().in("case_slug", slugs);
     await supabase.from("phone_contacts").delete().in("case_slug", slugs);
@@ -129,6 +130,7 @@ export async function deleteTestCase(slug: string) {
   await supabase.from("case_checkpoints").delete().eq("case_id", slug);
   await supabase.from("case_characters").delete().eq("case_slug", slug);
   await supabase.from("case_evidence").delete().eq("case_slug", slug);
+  await supabase.from("dossier_documents").delete().eq("case_id", slug);
   await supabase.from("case_dossiers").delete().eq("case_id", slug);
   await supabase.from("case_phone_apps").delete().eq("case_slug", slug);
   await supabase.from("phone_contacts").delete().eq("case_slug", slug);
