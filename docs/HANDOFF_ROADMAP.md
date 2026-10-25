@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-25): B0–B12 đã làm trên `main` (HEAD `7865eaf`, chưa push, ahead `origin/main` 54 commit). Migration 38, 39, 41 đã chạy production. Review B12: `tsc` sạch, E2E chạy lại **41 pass / 1 fail** (khay hồ sơ case_000 trống, 3/3 lần) — báo cáo B12 ghi 42/0 không khớp. → **B13** (6 mục) trong `WORKTREE_PLAN.md`. ⛔ Không push trước khi B13 xong và review lại. Live cursor: plan đã có, **chưa giao**. Thứ tự việc + việc của chủ dự án: mục "Việc tiếp theo" trong `WORKTREE_PLAN.md`.
+Tiến độ (2026-10-25): B0–B13 đã làm xong trên `main` (HEAD `30452f7`, chưa push, ahead `origin/main` 61 commit). Migration 38, 39, 40 đã chạy production. Review B13: `tsc` sạch 0 lỗi, E2E chạy lại 2 lần liên tiếp đạt **42 pass / 0 fail / 0 skip** (khay hồ sơ case_000 nạp tức thì, 0 `toPass`, E2E dùng `SUPABASE_SERVICE_ROLE_KEY`, DB sạch). Báo cáo tại `docs/reports/B13_REPORT.md` kèm ảnh trong repo `docs/reports/b13/`. ⛔ Không push trước khi Reviewer kiểm định độc lập và chủ dự án ra lệnh. Live cursor: plan đã có, **chưa giao**. Thứ tự việc + việc của chủ dự án: mục "Việc tiếp theo" trong `WORKTREE_PLAN.md`.
 
 ---
 
