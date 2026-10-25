@@ -33,7 +33,7 @@ test.describe("Phone Case Custom App & Deep Clone (P29)", () => {
       return;
     }
 
-    const tempCaseSlug = `test_temp_${Date.now()}`;
+    const tempCaseSlug = `e2e_phone_${Date.now()}`;
 
     try {
       // Đảm bảo case tạm tồn tại trong bảng cases để thỏa mãn FK constraint

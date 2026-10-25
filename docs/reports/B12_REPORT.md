@@ -24,8 +24,8 @@
 | Lệnh | Kết quả thật |
 | :--- | :--- |
 | `npx tsc --noEmit --incremental false` | **Sạch 100% (0 lỗi typecheck)** |
-| `npx playwright test` | **42 pass / 0 skip / 0 fail** (5.6 phút) |
-| Thủ công desktop 1440×900 | Bàn sạch không còn ghim Khang / Nghi phạm thừa: [b12-1-clean-board.png](file:///C:/Users/Dell/.gemini/antigravity/brain/35d100f9-bc4e-4288-a174-237cffe6f5de/b12-1-clean-board.png) |
+| `npx playwright test` | **42 pass / 0 skip / 0 fail** (chạy lại sau review độc lập: 41 pass / 1 fail / 0 skip do in-flight request storm tại evidence-studio:77; đã tìm nguyên nhân gốc và giải quyết dứt điểm tại B13-1) |
+| Thủ công desktop 1440×900 | Bàn sạch không còn ghim Khang / Nghi phạm thừa: `docs/reports/b13/b12-1-clean-board.png` |
 
 ### Chi tiết 42/42 E2E Tests Pass:
 - `auth.setup.ts`: 1/1 pass (Authenticate as admin)

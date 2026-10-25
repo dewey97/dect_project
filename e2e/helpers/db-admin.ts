@@ -78,6 +78,41 @@ export async function deleteTestCase(slug: string) {
 }
 
 /**
+ * Đảm bảo một case tồn tại trong database (upsert bằng service_role key).
+ */
+export async function ensureTestCase(slug: string, title = "Vụ Án Tạm E2E", status = "DRAFT") {
+  const supabase = getAdminClient();
+  const { error } = await supabase.from("cases").upsert({ slug, title, status }, { onConflict: "slug" });
+  if (error) throw new Error(`ensureTestCase failed: ${error.message}`);
+}
+
+/**
+ * Hàm tương thích chạy câu lệnh SQL đơn giản cho E2E helpers.
+ */
+export async function executeSql(query: string) {
+  const supabase = getAdminClient();
+  const trimmed = query.trim();
+  const upper = trimmed.toUpperCase();
+
+  if (upper.startsWith("INSERT INTO PUBLIC.CASES")) {
+    const slugMatch = trimmed.match(/'([^']+)',\s*'([^']+)',\s*'([^']+)'/);
+    if (slugMatch) {
+      const [, slug, title, status] = slugMatch;
+      await ensureTestCase(slug, title, status);
+      return;
+    }
+  }
+
+  if (upper.startsWith("DELETE FROM PUBLIC.CASES")) {
+    const slugMatch = trimmed.match(/slug\s*=\s*'([^']+)'/i);
+    if (slugMatch) {
+      await deleteTestCase(slugMatch[1]);
+      return;
+    }
+  }
+}
+
+/**
  * Seed dữ liệu một case kiểm thử hoàn chỉnh.
  */
 export async function seedTestCase(slug: string, title = "Vụ Án Bí Ẩn Test Board") {
