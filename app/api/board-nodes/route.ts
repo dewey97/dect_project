@@ -13,8 +13,15 @@ export async function GET(request: Request) {
   const caseParam =
     searchParams.get("case") ||
     searchParams.get("case_id") ||
-    searchParams.get("caseId") ||
-    "case_000";
+    searchParams.get("caseId");
+
+  if (!caseParam) {
+    return NextResponse.json(
+      { success: false, error: "Missing required parameter 'case'" },
+      { status: 400 },
+    );
+  }
+
   const caseSlug = normalizeCaseId(caseParam);
 
   try {
@@ -26,10 +33,6 @@ export async function GET(request: Request) {
       .order("slot_index", { ascending: true });
 
     if (error) {
-      // Bảng chưa tạo qua migration 39 trên database thật -> trả mảng rỗng an toàn
-      if (error.code === "42P01") {
-        return NextResponse.json({ success: true, data: [] });
-      }
       return NextResponse.json(
         { success: false, error: error.message },
         { status: 500 },

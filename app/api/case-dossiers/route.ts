@@ -13,8 +13,15 @@ export async function GET(request: Request) {
   const caseParam =
     searchParams.get("case") ||
     searchParams.get("case_id") ||
-    searchParams.get("caseId") ||
-    "case_000";
+    searchParams.get("caseId");
+
+  if (!caseParam) {
+    return NextResponse.json(
+      { success: false, error: "Missing required parameter 'case'" },
+      { status: 400 },
+    );
+  }
+
   const caseSlug = normalizeCaseId(caseParam);
 
   try {
