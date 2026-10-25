@@ -4,6 +4,20 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-25]
 
+### B12 Review & Bug Fixes (B12-1 → B12-10)
+
+- **B12-1 (Gameplay)**: Khắc phục nguyên nhân gốc khởi tạo state tra SĐT (`use-investigation-state.ts`); dọn metadata Supabase trả `mai/dat/vy` về đúng vai trò witness; khôi phục hiển thị nghi phạm theo tiến trình điều tra; `case-000.spec.ts` 11/11 pass.
+- **B12-2 (Board)**: Xóa toàn bộ `legacyId` (`c0-pin-*`) và các hardcode tên nhân vật `khang` trong canvas và modal (`add-suspect`, `card-composite`, `reinvestigation`, `dossier-result`, `walkthrough`). Grep kiểm tra đạt 0 dòng.
+- **B12-3 (Board)**: Xóa nút ghim ẩn legacy nhân đôi trong `hero-interactive.tsx`, tránh vi phạm Playwright strict mode. Đổi selector clickPin sang `[data-node-kind]` và `[data-subject-key]`.
+- **B12-4 (Phone)**: Đọc cấu hình `textMatchInputs` trực tiếp từ DB checkpoint (`phone-lookup-modal.tsx`), xóa `DEFAULT_PHONE_INPUTS` (grep = 0), thêm empty state khi checkpoint chưa cấu hình.
+- **B12-5 (Admin E2E)**: Nạp credential admin qua `.env.local` trong `playwright.config.ts` và `auth.setup.ts`. Chạy thật 100% các spec admin (`board-studio`, `studio-ux`, `evidence-studio`, `phone-studio`, `messages-editor`, `phone-devices`, `phone-case-create`, `character-avatar`), khắc phục các lỗi strict mode và placeholder; 21/21 passed (0 skip, 0 fail).
+- **B12-6 (Board New Case)**: Bổ sung `e2e/board-new-case.spec.ts` seed vụ án cô lập `e2e_board_test`, xác nhận render bàn điều tra động không chứa bất kỳ tên/ảnh nào của `case_000`. Dọn dẹp sạch trong `afterAll`.
+- **B12-7 (No Sheets E2E)**: Thu hẹp interceptor của `no-sheets.spec.ts` sang `sheets.googleapis.com` và `docs.google.com/spreadsheets`, không còn chặn nhầm Firebase network requests.
+- **B12-8 (Dossier DB)**: Dọn dẹp dossier rác `x` trên Supabase production (file migration `db/schema/41_cleanup_legacy_dossier_x.sql`). Khay hồ sơ `case_000` trở về 5 dossier chuẩn.
+- **B12-9 (API Enforcement)**: Yêu cầu bắt buộc tham số `case` (hoặc `case_id` / `caseId`) tại `/api/board-nodes` và `/api/case-dossiers`, trả HTTP 400 nếu thiếu. Bỏ nuốt lỗi `42P01` trong `board-nodes`.
+- **B12-10 (Docs & Backup Transparency)**: Ghi nhận trung thực: tại bước B8 trước đây, migration 39 được áp dụng trực tiếp lên production mà chưa tạo bảng snapshot `boardgame_pins_backup_20261025`; toàn bộ dữ liệu boardgame pins đã được migrate an toàn vào `case_board_nodes`. Cập nhật `HANDOFF_ROADMAP.md` phản ánh đầy đủ thực tế sau B12.
+
+
 ### Features
 
 - **Full Multi-case Architecture & Checkpoint Studio Board Editor (B0-B11)**:
