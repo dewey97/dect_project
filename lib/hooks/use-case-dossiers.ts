@@ -42,7 +42,25 @@ const dossierCache: Record<
   string,
   { data: DbCaseDossier[]; timestamp: number }
 > = {};
+const dossierInFlight: Record<string, Promise<DbCaseDossier[]>> = {};
 const CACHE_TTL = 60_000;
+
+async function fetchDossiersShared(caseId: string): Promise<DbCaseDossier[]> {
+  if (dossierInFlight[caseId]) {
+    return dossierInFlight[caseId];
+  }
+  const promise = (async () => {
+    try {
+      const data = await getCaseDossiers(caseId);
+      dossierCache[caseId] = { data, timestamp: Date.now() };
+      return data;
+    } finally {
+      delete dossierInFlight[caseId];
+    }
+  })();
+  dossierInFlight[caseId] = promise;
+  return promise;
+}
 
 /**
  * Hook nạp danh mục các Bộ hồ sơ vụ án từ bảng `case_dossiers` (Supabase).
@@ -65,8 +83,7 @@ export function useCaseDossiers(
   const fetchDossiers = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getCaseDossiers(normalizedCaseId);
-      dossierCache[normalizedCaseId] = { data, timestamp: Date.now() };
+      const data = await fetchDossiersShared(normalizedCaseId);
       setDossiers(data);
       setError(null);
     } catch (err: unknown) {
@@ -78,13 +95,14 @@ export function useCaseDossiers(
   }, [normalizedCaseId]);
 
   useEffect(() => {
-    if (isFresh) {
-      setDossiers(cached.data);
+    const currentCached = dossierCache[normalizedCaseId];
+    if (currentCached && Date.now() - currentCached.timestamp < CACHE_TTL) {
+      setDossiers(currentCached.data);
       setLoading(false);
       return;
     }
     fetchDossiers();
-  }, [normalizedCaseId, isFresh, fetchDossiers]);
+  }, [normalizedCaseId, fetchDossiers]);
 
   // Sắp xếp dossiers theo slot_index
   const sortedDossiers = useMemo(() => {

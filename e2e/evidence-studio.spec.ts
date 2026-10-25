@@ -95,16 +95,9 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
     // Board canvas should attach
     await expect(page.locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]').first()).toBeAttached();
 
-    // Ensure Ban Đầu or Tất cả dossier chip is active
-    const banDauChip = page.getByRole("button", { name: "Ban Đầu", exact: true });
-    if (await banDauChip.isVisible().catch(() => false)) {
-      await banDauChip.click();
-    }
-
     // Check evidence header / tray has document items
     await expect(page.locator("body")).toContainText(
       "Cẩm nang hướng dẫn điều tra ban đầu",
-      { timeout: 20_000 },
     );
   });
 

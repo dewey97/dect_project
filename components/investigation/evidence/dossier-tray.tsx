@@ -91,10 +91,11 @@ export function DossierTray({
       });
     } else {
       list.push(
-        { label: "Khởi đầu", val: "ban_dau" },
+        { label: "Ban Đầu", val: "ban_dau" },
         { label: "Bộ A", val: "bo_a" },
         { label: "Bộ B", val: "bo_b" },
         { label: "Bộ C", val: "bo_c" },
+        { label: "Kết Luận", val: "ket_luan" },
       );
     }
     list.push(
@@ -513,3 +514,4 @@ export function DossierTray({
     </div>
   );
 }
+

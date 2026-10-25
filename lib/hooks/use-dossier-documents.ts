@@ -14,7 +14,27 @@ interface DossierDataState {
 
 // Bộ nhớ đệm Client in-memory tránh gọi lặp lại Supabase
 const dossierCache: Record<string, { data: DbDossierDocument[]; timestamp: number }> = {}
+const dossierDocInFlight: Record<string, Promise<{ success: boolean; data?: DbDossierDocument[]; error?: string }>> = {}
 const CACHE_TTL = 60_000 // 1 phút
+
+async function fetchDossierDocsShared(caseId: string) {
+  if (dossierDocInFlight[caseId]) {
+    return dossierDocInFlight[caseId];
+  }
+  const promise = (async () => {
+    try {
+      const res = await getDossierDocuments(caseId);
+      if (res.success && res.data) {
+        dossierCache[caseId] = { data: res.data, timestamp: Date.now() };
+      }
+      return res;
+    } finally {
+      delete dossierDocInFlight[caseId];
+    }
+  })();
+  dossierDocInFlight[caseId] = promise;
+  return promise;
+}
 
 /**
  * Bản đồ ánh xạ mã tài liệu vụ án (PDF code / Evidence code) sang mã Tag của Dossier Studio
@@ -50,19 +70,18 @@ export function useDossierDocuments(caseId: string = 'case_000'): DossierDataSta
 
   useEffect(() => {
     let isMounted = true
-
-    if (isFresh) {
-      setDocuments(cached.data)
+    const currentCached = dossierCache[normalizedCaseId]
+    if (currentCached && Date.now() - currentCached.timestamp < CACHE_TTL) {
+      setDocuments(currentCached.data)
       setLoading(false)
       return
     }
 
     setLoading(true)
-    getDossierDocuments(normalizedCaseId)
+    fetchDossierDocsShared(normalizedCaseId)
       .then((res) => {
         if (!isMounted) return
         if (res.success && res.data) {
-          dossierCache[normalizedCaseId] = { data: res.data, timestamp: Date.now() }
           setDocuments(res.data)
         } else {
           setError(res.error || 'Failed to load dossiers')
@@ -79,7 +98,7 @@ export function useDossierDocuments(caseId: string = 'case_000'): DossierDataSta
     return () => {
       isMounted = false
     }
-  }, [normalizedCaseId, isFresh])
+  }, [normalizedCaseId])
 
   const findByTagCode = (tagCode: string): DbDossierDocument | undefined => {
     const cleanTag = tagCode.trim().toUpperCase()

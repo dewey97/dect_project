@@ -52,66 +52,94 @@ const evidenceCache: Record<
   string,
   { data: DbCaseEvidence[]; timestamp: number }
 > = {};
+const evidenceInFlight: Record<
+  string,
+  Promise<{ success: boolean; data?: DbCaseEvidence[]; error?: string }>
+> = {};
 const CACHE_TTL_MS = 30_000;
+
+async function fetchCaseEvidenceShared(slug: string) {
+  if (evidenceInFlight[slug]) {
+    return evidenceInFlight[slug];
+  }
+
+  const promise = (async () => {
+    try {
+      const res = await getCaseEvidence(slug);
+      if (res.success && res.data && res.data.length > 0) {
+        const enriched = res.data.map((item) => {
+          const primaryUrl = item.thumb_url || item.file_url || "";
+          const meta = (item.metadata as Record<string, unknown>) || {};
+          return {
+            ...meta,
+            ...item,
+            label: item.title,
+            url: primaryUrl,
+            drive_url: primaryUrl,
+            image_url: primaryUrl,
+            direct_cdn_url: primaryUrl,
+            photo_code: item.code,
+            photo_id: item.code,
+          };
+        });
+        evidenceCache[slug] = {
+          data: enriched,
+          timestamp: Date.now(),
+        };
+        return { success: true, data: enriched };
+      }
+      return { success: res.success, data: [], error: res.error };
+    } finally {
+      delete evidenceInFlight[slug];
+    }
+  })();
+
+  evidenceInFlight[slug] = promise;
+  return promise;
+}
 
 export function useCaseEvidence(
   caseId: string = "case_000",
 ): CaseEvidenceState {
   const effectiveSlug = normalizeCaseId(caseId);
   const cached = evidenceCache[effectiveSlug];
-  const isFresh = cached && Date.now() - cached.timestamp < CACHE_TTL_MS;
+  const isFresh = Boolean(cached && Date.now() - cached.timestamp < CACHE_TTL_MS);
 
   const [rawEvidence, setRawEvidence] = useState<DbCaseEvidence[]>(
     cached ? cached.data : [],
   );
-  const [loading, setLoading] = useState<boolean>(!isFresh);
+  const [loading, setLoading] = useState<boolean>(!isFresh && !cached);
   const [error, setError] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<number>(0);
 
   const refetch = useCallback(() => {
     delete evidenceCache[effectiveSlug];
+    delete evidenceInFlight[effectiveSlug];
     setRefreshToken((prev) => prev + 1);
   }, [effectiveSlug]);
 
   useEffect(() => {
     let isMounted = true;
+    const currentCached = evidenceCache[effectiveSlug];
+    const isCurrentFresh = Boolean(
+      currentCached && Date.now() - currentCached.timestamp < CACHE_TTL_MS,
+    );
 
-    if (refreshToken === 0 && isFresh) {
-      setRawEvidence(cached.data);
+    if (refreshToken === 0 && isCurrentFresh && currentCached) {
+      setRawEvidence(currentCached.data);
       setLoading(false);
       return;
     }
 
     setLoading(true);
 
-    getCaseEvidence(effectiveSlug)
+    fetchCaseEvidenceShared(effectiveSlug)
       .then((res) => {
         if (!isMounted) return;
         if (res.success && res.data && res.data.length > 0) {
-          const enriched = res.data.map((item) => {
-            const primaryUrl = item.thumb_url || item.file_url || "";
-            const meta = (item.metadata as Record<string, unknown>) || {};
-            return {
-              ...meta,
-              ...item,
-              label: item.title,
-              url: primaryUrl,
-              drive_url: primaryUrl,
-              image_url: primaryUrl,
-              direct_cdn_url: primaryUrl,
-              photo_code: item.code,
-              photo_id: item.code,
-            };
-          });
-          evidenceCache[effectiveSlug] = {
-            data: enriched,
-            timestamp: Date.now(),
-          };
-          setRawEvidence(enriched);
+          setRawEvidence(res.data);
           setError(null);
         } else {
-          // Chưa có dữ liệu trong DB hoặc fetch lỗi: giữ danh sách rỗng,
-          // hiển thị trạng thái đồng bộ thay vì dữ liệu tĩnh cũ.
           setRawEvidence([]);
           if (!res.success && res.error) {
             setError(res.error);
@@ -129,7 +157,7 @@ export function useCaseEvidence(
     return () => {
       isMounted = false;
     };
-  }, [effectiveSlug, refreshToken, isFresh, cached]);
+  }, [effectiveSlug, refreshToken]);
 
   const { pdfs, evidence } = useMemo(() => {
     const dbPdfs: PDFDocument[] = [];
