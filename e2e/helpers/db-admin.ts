@@ -160,9 +160,9 @@ export async function seedTestCase(slug: string, title = "Vụ Án Tạm E2E") {
   const { error: cErr } = await supabase.from("cases").upsert({
     slug,
     title,
-    summary: "Vụ án tự động sinh cho bài test E2E B12-6",
+    synopsis: "Vụ án tự động sinh cho bài test E2E B12-6",
     status: "DRAFT",
-    difficulty: "EASY",
+    difficulty: 1,
   });
   if (cErr) throw cErr;
 
@@ -194,11 +194,10 @@ export async function seedTestCase(slug: string, title = "Vụ Án Tạm E2E") {
 
   // Tạo checkpoint cáo trạng
   const { error: cpErr } = await supabase.from("case_checkpoints").upsert({
-    id: `cp_${slug}_indictment`,
     case_id: slug,
+    checkpoint_id: `cp_${slug}_indictment`,
     title: "Cáo trạng kết thúc",
     kind: "indictment",
-    order_index: 99,
     board_config: {
       position: { desktop: { x: 500, y: 500 }, mobile: { x: 200, y: 400 } },
     },
