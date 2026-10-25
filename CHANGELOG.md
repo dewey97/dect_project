@@ -2,6 +2,12 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-10-26]
+
+### B18 Review & Decision Records (B18-2 & B18-5)
+
+- **B18-2 (Kịch bản kết án Hà & Lệnh khám xét)**: Đã chốt chính thức bỏ hẳn màn "Lệnh khám xét khẩn cấp đối với Trần Thị Hà..." trong `culprit-epilogue-modal.tsx`. Ý kịch bản khám xét đã được thể hiện đầy đủ trong dẫn truyện của checkpoint `cp-000-1c` và kết quả mở khóa Hồ Sơ C; việc gỡ bỏ màn trung gian này giúp tinh gọn luồng kết án sang `indictment_modal` mà không làm mất bất kỳ đầu mối chứng cứ nào.
+
 ## [2026-10-25]
 
 ### B15 Review & Parity Hardening (B15-0 → B15-11)

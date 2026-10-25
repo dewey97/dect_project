@@ -143,9 +143,11 @@ Tiến độ (2026-10-26): `origin/main` tại `941b2f8` (đã push B0–B16 + r
 | Mục đích                 | Lệnh                                               | Lưu ý                                                                                                           |
 | ------------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Typecheck                | `npx tsc --noEmit --incremental false`             | Chạy khi dev server tắt. Đã loại `.next_dev/**` khỏi include để tránh báo lỗi file dở dang.                      |
-| E2E                      | `pnpm test:e2e`                                    | Playwright tự chạy dev server cổng 3100 với `NEXT_DIST_DIR=.next_dev`                                           |
+| E2E                      | `pnpm test:e2e`                                    | Playwright tự chạy dev server cổng 3100 với `NEXT_DIST_DIR=.next_dev`. Sau khi chạy E2E, chạy `git checkout -- tsconfig.json next-env.d.ts` để giữ working tree sạch sẽ (do Next.js tự động cập nhật include). Chạy E2E ghi DB production chỉ thực hiện thủ công ngoài giờ cao điểm. |
 | Build                    | `NEXT_DIST_DIR=.next_dev npx next build`           | Sau khi build: `git checkout -- next-env.d.ts tsconfig.json` (Next tự sửa 2 file theo distDir); xóa `.next_dev` |
 | Chạy Next không qua pnpm | `node node_modules/next/dist/bin/next dev -p 3100` | Dùng khi `pnpm exec` bị chặn bởi kiểm tra dependency                                                            |
+
+- **Quy tắc báo cáo nghiệm thu**: Bảng commit trong báo cáo dán từ `git log --oneline <base>..HEAD` (không liệt kê commit của chính báo cáo; không amend sau khi đã ghi hash vào báo cáo).
 
 - **Không build vào thư mục không gitignore** khi dev server đang chạy: Tailwind v4 quét toàn repo (trừ file gitignore) và cache sai CSS. Chỉ dùng `.next_dev` (đã gitignore).
 - Không chạy `next build` vào `.next_dev` trong khi E2E/dev server cổng 3100 đang dùng thư mục đó.
