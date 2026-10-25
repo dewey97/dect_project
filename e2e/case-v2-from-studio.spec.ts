@@ -13,7 +13,7 @@ test.describe("B16-1: Nghiệm thu Trốn Tìm v2 (Tạo qua Studio UI)", () => 
     }
   });
 
-  test("1. Studio Cases list hiển thị và sẵn sàng tạo vụ mới", async ({ page }) => {
+  test("1. Studio Cases list hiển thị và sẵn sàng tạo vụ mới", async ({ page }, testInfo) => {
     await page.goto("/studio/cases");
     await expect(page.locator("h1")).toContainText(/Cases/i, {
       timeout: 15_000,
@@ -22,9 +22,9 @@ test.describe("B16-1: Nghiệm thu Trốn Tìm v2 (Tạo qua Studio UI)", () => 
     const createBtn = page.getByRole("button", { name: /Create New Case/i });
     await expect(createBtn).toBeVisible();
 
-    // Chụp ảnh Studio Cases list
+    // Chụp ảnh Studio Cases list vào testInfo.outputPath
     await page.screenshot({
-      path: "docs/reports/b16/b16-1-studio-cases-list.png",
+      path: testInfo.outputPath("studio-cases-list.png"),
       fullPage: false,
     });
   });
