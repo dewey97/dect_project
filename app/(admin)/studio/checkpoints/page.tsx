@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CheckpointStudioClient } from "@/components/admin/checkpoint-studio/checkpoint-studio-client";
 import { getCases } from "@/lib/actions/case-actions";
 import { getCheckpointsByCase } from "@/lib/actions/checkpoint-actions";
+import { getCharactersByCase } from "@/lib/actions/character-actions";
 import {
   getCaseDossiers,
   getAllCaseDocumentsCatalog,
@@ -22,13 +23,23 @@ export default async function CheckpointStudioPage({
   searchParams: Promise<{ case?: string }>;
 }) {
   const caseId = normalizeCaseId((await searchParams).case);
-  const [casesResult, checkpointsResult, dossiers, availableDocs] =
+  const [casesResult, checkpointsResult, dossiers, availableDocs, charactersResult] =
     await Promise.all([
       getCases(),
       getCheckpointsByCase(caseId),
       getCaseDossiers(caseId),
       getAllCaseDocumentsCatalog(caseId),
+      getCharactersByCase(caseId),
     ]);
+
+  const initialCharacters = (charactersResult.data || []).map((c) => ({
+    id: c.id,
+    case_slug: c.case_slug,
+    key: c.key,
+    name: c.name,
+    role: c.role,
+    avatar_url: c.avatar_url,
+  })) as typeof charactersResult.data;
 
   return (
     <CheckpointStudioClient
@@ -37,6 +48,7 @@ export default async function CheckpointStudioPage({
       initialRows={checkpointsResult.data || []}
       initialDossiers={dossiers}
       initialAvailableDocuments={availableDocs}
+      initialCharacters={initialCharacters || []}
     />
   );
 }

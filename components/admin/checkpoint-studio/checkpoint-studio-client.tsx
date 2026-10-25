@@ -79,6 +79,7 @@ interface CheckpointStudioClientProps {
   initialRows?: DbCaseCheckpoint[];
   initialDossiers?: DbCaseDossier[];
   initialAvailableDocuments?: AvailableDocumentItem[];
+  initialCharacters?: DbCaseCharacter[];
 }
 
 export function CheckpointStudioClient({
@@ -87,6 +88,7 @@ export function CheckpointStudioClient({
   initialRows = [],
   initialDossiers = [],
   initialAvailableDocuments = [],
+  initialCharacters = [],
 }: CheckpointStudioClientProps) {
   const [caseId, setCaseId] = useState(initialCaseId);
   const [activeView, setActiveView] = useState<"flow" | "board">(() => {
@@ -203,7 +205,7 @@ export function CheckpointStudioClient({
   const [pendingPositions, setPendingPositions] = useState<
     Record<string, CheckpointFlowPosition>
   >({});
-  const [characters, setCharacters] = useState<DbCaseCharacter[]>([]);
+  const [characters, setCharacters] = useState<DbCaseCharacter[]>(initialCharacters);
   const [isLintModalOpen, setIsLintModalOpen] = useState(false);
 
   useEffect(() => {
@@ -848,7 +850,10 @@ export function CheckpointStudioClient({
     <div className="flex h-full min-h-0 w-full flex-col">
       {/* Thanh chuyển đổi View (Flow vs Board) */}
       <div className="flex h-9 shrink-0 items-center justify-between border-b border-white/10 bg-[#090a0f] px-3 z-20">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-zinc-300 mr-1.5 tracking-wide">
+            Checkpoint Studio
+          </span>
           <button
             type="button"
             onClick={() => setActiveView("flow")}

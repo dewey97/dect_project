@@ -1,5 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
+try {
+  process.loadEnvFile(".env.local");
+} catch {
+  // .env.local optional
+}
+
 const PORT = Number(process.env.E2E_PORT || process.env.PORT || 3101);
 
 /**

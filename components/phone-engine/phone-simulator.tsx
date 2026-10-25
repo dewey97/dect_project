@@ -21,6 +21,7 @@ import {
   type ActivePhoneApp,
 } from "./core/phone-context";
 import { EvidenceAnchorProvider } from "./core/evidence-anchor-context";
+import type { DbCasePhoneApp } from "@/lib/types/database";
 
 // Chassis
 import { DeviceChassis } from "./chassis/device-chassis";
@@ -84,6 +85,7 @@ export interface PhoneSimulatorProps {
   notes?: Document[];
   history?: BrowserHistory[];
   files?: RecoveredFile[];
+  apps?: DbCasePhoneApp[];
   frameless?: boolean;
   onClose?: () => void;
   onPinClue?: (clueId: string, metadata?: Record<string, unknown>) => void;
@@ -132,9 +134,11 @@ function getCaseVictimDevice(): Partial<Device> {
 function PhoneScreenContent({
   frameless = false,
   onClose,
+  apps: customApps,
 }: {
   frameless?: boolean;
   onClose?: () => void;
+  apps?: DbCasePhoneApp[];
 }) {
   const {
     device,
@@ -149,9 +153,10 @@ function PhoneScreenContent({
     goHome,
   } = usePhone();
 
-  const { apps } = usePhoneApps(
+  const { apps: fetchedApps } = usePhoneApps(
     device.caseId || getActiveCaseId() || "case_000",
   );
+  const activeApps = customApps && customApps.length > 0 ? customApps : fetchedApps;
 
   const isLightStatusBar =
     !isLocked && (activeApp === "messages" || activeApp === "notes");
@@ -321,7 +326,7 @@ function PhoneScreenContent({
             onOpenApp={(app) => openApp(app as ActivePhoneApp)}
             unreadMessages={1}
             missedCalls={1}
-            apps={apps}
+            apps={activeApps}
           />
         )}
       </div>
@@ -335,9 +340,11 @@ function PhoneScreenContent({
 function PhoneSimulatorShell({
   frameless = false,
   onClose,
+  apps,
 }: {
   frameless?: boolean;
   onClose?: () => void;
+  apps?: DbCasePhoneApp[];
 }) {
   const { isLocked, unlock, goHome, device } = usePhone();
 
@@ -361,7 +368,7 @@ function PhoneSimulatorShell({
       onHomePress={handleHomePress}
       wallpaperUrl={wallpaperUrl}
     >
-      <PhoneScreenContent frameless={frameless} onClose={onClose} />
+      <PhoneScreenContent frameless={frameless} onClose={onClose} apps={apps} />
     </DeviceChassis>
   );
 }
@@ -376,6 +383,7 @@ export function PhoneSimulator({
   notes = [],
   history = [],
   files = [],
+  apps,
   frameless = false,
   onClose,
   onPinClue,
@@ -398,7 +406,7 @@ export function PhoneSimulator({
       onPinClue={onPinClue}
     >
       <EvidenceAnchorProvider>
-        <PhoneSimulatorShell frameless={frameless} onClose={onClose} />
+        <PhoneSimulatorShell frameless={frameless} onClose={onClose} apps={apps} />
       </EvidenceAnchorProvider>
     </PhoneProvider>
   );

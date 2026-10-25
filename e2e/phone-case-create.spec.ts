@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { executeSql } from "./helpers/db-admin";
 
 test.use({ storageState: "e2e/.auth/admin.json" });
 
@@ -35,6 +36,11 @@ test.describe("Phone Case Custom App & Deep Clone (P29)", () => {
     const tempCaseSlug = `test_temp_${Date.now()}`;
 
     try {
+      // Đảm bảo case tạm tồn tại trong bảng cases để thỏa mãn FK constraint
+      await executeSql(
+        `INSERT INTO public.cases (slug, title, status) VALUES ('${tempCaseSlug}', 'Vụ Án Tạm E2E', 'DRAFT') ON CONFLICT (slug) DO NOTHING;`,
+      );
+
       // 2. Mở Phone Studio cho case tạm thời
       await page.goto(`/studio/phone?case=${tempCaseSlug}`);
 
@@ -55,9 +61,12 @@ test.describe("Phone Case Custom App & Deep Clone (P29)", () => {
       const renderedApp = page.locator(`button[title*="${customAppName}"]`);
       await expect(renderedApp).toBeVisible({ timeout: 10_000 });
     } finally {
-      // Cleanup: test data uses unique timestamp slug (test_temp_${Date.now()})
-      // and won't collide with real cases. /api/admin/clean-temp-case chưa tồn tại;
-      // orphan rows acceptable cho E2E, sẽ bị xóa khi reset test DB.
+      // Dọn sạch case tạm và các bảng liên quan (ON DELETE CASCADE)
+      try {
+        await executeSql(
+          `DELETE FROM public.cases WHERE slug = '${tempCaseSlug}';`,
+        );
+      } catch {}
     }
   });
 });

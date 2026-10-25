@@ -319,7 +319,7 @@ export function PhoneStudioClient({
           {/* Case Picker */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-              <FolderOpen className="size-3.5 text-zinc-400" /> Vụ án đang chọn
+              <FolderOpen className="size-3.5 text-zinc-400" /> Case đang biên soạn:
             </label>
             <div className="relative">
               <select
@@ -401,6 +401,8 @@ export function PhoneStudioClient({
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "device"}
               onClick={() => setActiveTab("device")}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
                 activeTab === "device"
@@ -413,6 +415,8 @@ export function PhoneStudioClient({
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "apps"}
               onClick={() => setActiveTab("apps")}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
                 activeTab === "apps"
@@ -420,11 +424,13 @@ export function PhoneStudioClient({
                   : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
               }`}
             >
-              <Grid className="size-3.5" /> App Launcher ({apps.length})
+              <Grid className="size-3.5" /> Ứng dụng (App Launcher) ({apps.length})
             </button>
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "messages"}
               onClick={() => setActiveTab("messages")}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
                 activeTab === "messages"
@@ -432,12 +438,13 @@ export function PhoneStudioClient({
                   : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
               }`}
             >
-              <MessageSquare className="size-3.5" /> Tin nhắn ({messages.length}
-              )
+              <MessageSquare className="size-3.5" /> Tin nhắn ({messages.length})
             </button>
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "calls"}
               onClick={() => setActiveTab("calls")}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
                 activeTab === "calls"
@@ -450,6 +457,8 @@ export function PhoneStudioClient({
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "contacts"}
               onClick={() => setActiveTab("contacts")}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
                 activeTab === "contacts"
@@ -462,6 +471,8 @@ export function PhoneStudioClient({
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "photos"}
               onClick={() => setActiveTab("photos")}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
                 activeTab === "photos"
@@ -469,11 +480,13 @@ export function PhoneStudioClient({
                   : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
               }`}
             >
-              <ImageIcon className="size-3.5" /> Album Ảnh ({photos.length})
+              <ImageIcon className="size-3.5" /> Thư viện ảnh ({photos.length})
             </button>
 
             <button
               type="button"
+              role="tab"
+              aria-selected={activeTab === "misc"}
               onClick={() => setActiveTab("misc")}
               className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
                 activeTab === "misc"
@@ -481,7 +494,7 @@ export function PhoneStudioClient({
                   : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
               }`}
             >
-              <Edit3 className="size-3.5" /> Ghi chú / Bank / Web
+              <Edit3 className="size-3.5" /> Ghi chú & Khác
             </button>
           </div>
         </div>
@@ -566,7 +579,7 @@ export function PhoneStudioClient({
             <div className="flex items-center gap-2">
               <Eye className="size-3.5 text-sky-400" />
               <span className="text-xs font-semibold text-zinc-200">
-                Mô phỏng Trực tiếp (Live Preview)
+                Mô phỏng Trực tiếp (WYSIWYG)
               </span>
             </div>
             <button
@@ -591,6 +604,7 @@ export function PhoneStudioClient({
                 photos={previewPhotos}
                 notes={previewNotes}
                 history={previewHistory}
+                apps={apps}
                 frameless={false}
               />
             </div>

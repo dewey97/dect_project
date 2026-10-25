@@ -614,7 +614,7 @@ export function AppLauncherEditor({
 
           <input
             type="text"
-            placeholder="Tên hiển thị tùy chỉnh (để trống lấy mặc định)..."
+            placeholder="Tên hiển thị (tùy chọn)"
             value={newAppName}
             onChange={(e) => setNewAppName(e.target.value)}
             className="flex-1 min-w-[200px] px-2.5 py-1.5 bg-zinc-950 border border-zinc-700 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-sky-500"
@@ -636,7 +636,7 @@ export function AppLauncherEditor({
             disabled={isPending}
             className="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            <Plus className="size-3.5" /> Thêm app
+            <Plus className="size-3.5" /> Thêm ứng dụng
           </button>
         </div>
       </div>

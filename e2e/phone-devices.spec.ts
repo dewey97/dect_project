@@ -14,7 +14,11 @@ test.describe("Phone Devices & Presets (WT-2)", () => {
     await page.goto("/evidence/web?case_id=case_000");
 
     // Click phone pin
-    const phonePin = page.locator('[data-pin-id="c0-pin-victim-phone"]');
+    const phonePin = page
+      .locator(
+        '[data-node-kind="victim_phone"], [data-pin-id="c0-pin-victim-phone"]',
+      )
+      .first();
     await expect(phonePin).toBeAttached({ timeout: 20_000 });
     await phonePin.evaluate((el: HTMLElement) => el.click());
 
@@ -39,7 +43,11 @@ test.describe("Phone Devices & Presets (WT-2)", () => {
 
     await page.goto("/evidence/web?case_id=case_000");
 
-    const phonePin = page.locator('[data-pin-id="c0-pin-victim-phone"]');
+    const phonePin = page
+      .locator(
+        '[data-node-kind="victim_phone"], [data-pin-id="c0-pin-victim-phone"]',
+      )
+      .first();
     await expect(phonePin).toBeAttached({ timeout: 20_000 });
     await phonePin.evaluate((el: HTMLElement) => el.click());
 

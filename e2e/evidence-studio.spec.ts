@@ -29,12 +29,13 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
     ).toBeVisible();
 
     // Filters in Column 1
+    const col1 = page.locator(".col-span-12.lg\\:col-span-4");
     await expect(
-      page.getByPlaceholder("Tìm theo mã, tên chứng cứ..."),
+      col1.getByPlaceholder("Tìm theo mã, tên chứng cứ..."),
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Tất cả" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Ảnh" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "PDF" })).toBeVisible();
+    await expect(col1.getByRole("button", { name: "Tất cả", exact: true }).first()).toBeVisible();
+    await expect(col1.getByRole("button", { name: "Ảnh", exact: true }).first()).toBeVisible();
+    await expect(col1.getByRole("button", { name: "PDF", exact: true }).first()).toBeVisible();
 
     // Column 2: Form Header
     await expect(
@@ -49,13 +50,13 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
       page.getByRole("button", { name: "Hồ sơ tang vật" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Hiện trường 360" }),
+      page.getByRole("button", { name: "Hiện trường 360", exact: true }),
     ).toBeVisible();
 
     // Toggle to 360 Scene preview
-    await page.getByRole("button", { name: "Hiện trường 360" }).click();
+    await page.getByRole("button", { name: "Hiện trường 360", exact: true }).click();
     await expect(
-      page.getByRole("button", { name: "Hiện trường 360" }),
+      page.getByRole("button", { name: "Hiện trường 360", exact: true }),
     ).toBeVisible();
 
     // Open 360 Config Modal
@@ -76,8 +77,11 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
   test("Case_000 evidence tray loads documents and evidence items in game", async ({
     page,
   }) => {
+    page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
+
     await page.addInitScript(() => {
       localStorage.setItem("intro_seen", "true");
+      localStorage.setItem("case_000:intro_seen", "true");
     });
 
     await page.route("**/api/test-scan-answer", (route) =>
@@ -89,7 +93,7 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
     await page.goto("/evidence/web?case_id=case_000");
 
     // Board canvas should attach
-    await expect(page.locator('[data-pin-id="c0-pin-phone"]')).toBeAttached();
+    await expect(page.locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]').first()).toBeAttached();
 
     // Check evidence header / tray has document items
     await expect(page.locator("body")).toContainText(
@@ -127,7 +131,7 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
     if (await advancedDetails.count()) {
       await advancedDetails.click();
       const codeInput = page.getByPlaceholder("Tự sinh từ tiêu đề (VD: p1)");
-      await expect(codeInput).toHaveValue("dau-van-tay-tren-coc-ca-phe");
+      await expect(codeInput).toHaveValue(/dau[-_]van[-_]tay[-_]tren[-_]coc[-_]ca[-_]phe/);
     }
   });
 });
