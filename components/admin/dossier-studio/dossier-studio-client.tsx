@@ -21,7 +21,15 @@ import {
   reorderDossierDocuments,
   type DbDossierDocument,
 } from "@/lib/actions/dossier-actions";
-import type { DbCase } from "@/lib/types/database";
+import type { DbCase, DbCaseDossier } from "@/lib/types/database";
+import {
+  getCaseDossiers,
+  getAllCaseDocumentsCatalog,
+  deleteCaseDossier,
+  type AvailableDocumentItem,
+} from "@/lib/actions/dossier-config-actions";
+import { DossierListPanel } from "./dossier-list-panel";
+import { DossierConfigModal } from "./dossier-config-modal";
 
 import { DossierStudioHeader } from "./dossier-studio-header";
 import { DossierLoiKhaiSheet } from "./dossier-loi-khai-sheet";
@@ -33,6 +41,8 @@ interface DossierStudioClientProps {
   initialCases?: DbCase[];
   initialLkDocuments?: DbDossierDocument[];
   initialHsDocuments?: DbDossierDocument[];
+  initialDossiers?: DbCaseDossier[];
+  initialAvailableDocuments?: AvailableDocumentItem[];
 }
 
 const EMPTY_LK: LoiKhaiData = {
@@ -79,8 +89,82 @@ export function DossierStudioClient({
   initialCases = [],
   initialLkDocuments = [],
   initialHsDocuments = [],
+  initialDossiers = [],
+  initialAvailableDocuments = [],
 }: DossierStudioClientProps) {
+  const [dossiers, setDossiers] = useState<DbCaseDossier[]>(initialDossiers);
+  const [availableDocs, setAvailableDocs] = useState<AvailableDocumentItem[]>(initialAvailableDocuments);
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [editingDossier, setEditingDossier] = useState<DbCaseDossier | null>(null);
+  const [activeDossierFilterKey, setActiveDossierFilterKey] = useState<string | null>(null);
   const [caseId, setCaseId] = useState<string>(initialCaseId);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [dList, cList] = await Promise.all([
+          getCaseDossiers(caseId),
+          getAllCaseDocumentsCatalog(caseId),
+        ]);
+        if (isMounted) {
+          setDossiers(dList);
+          setAvailableDocs(cList);
+        }
+      } catch (err) {
+        console.error("Failed to load dossiers for case:", err);
+      }
+    })();
+    return () => { isMounted = false; };
+  }, [caseId]);
+
+  const handleCreateDossier = useCallback(() => {
+    setEditingDossier({
+      id: "",
+      case_id: caseId,
+      dossier_key: "",
+      title: "",
+      document_codes: [],
+      flow_position: null,
+      description: "",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+    setIsConfigModalOpen(true);
+  }, [caseId]);
+
+  const handleEditDossier = useCallback((d: DbCaseDossier) => {
+    setEditingDossier(d);
+    setIsConfigModalOpen(true);
+  }, []);
+
+  const handleDeleteDossier = useCallback(
+    async (dossierKey: string) => {
+      try {
+        const res = await deleteCaseDossier(caseId, dossierKey);
+        if (res.ok) {
+          setDossiers((prev) => prev.filter((d) => d.dossier_key !== dossierKey));
+        } else {
+          alert("Lỗi xóa bộ hồ sơ: " + (res.error || ""));
+        }
+      } catch (err) {
+        console.error("Error deleting dossier:", err);
+      }
+    },
+    [caseId],
+  );
+
+  const handleDossierSaved = useCallback((saved: DbCaseDossier) => {
+    setDossiers((prev) => {
+      const idx = prev.findIndex((d) => d.dossier_key === saved.dossier_key);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = saved;
+        return next;
+      }
+      return [...prev, saved];
+    });
+  }, []);
 
   // Giữ vụ án đang chọn trên URL (?case=) để tải lại trang không quay về case_000.
   useEffect(() => {
@@ -856,6 +940,20 @@ export function DossierStudioClient({
 
       {/* Main Container */}
       <div className="flex-1 min-h-0 w-full flex overflow-hidden">
+        {/* Cột trái: Bộ hồ sơ */}
+        <DossierListPanel
+          dossiers={dossiers}
+          caseId={caseId}
+          onEditDossier={handleEditDossier}
+          onCreateDossier={handleCreateDossier}
+          onDeleteDossier={handleDeleteDossier}
+          activeDossierKey={activeDossierFilterKey}
+          onSelectDossier={(d) => {
+            setActiveDossierFilterKey((prev) =>
+              prev === d.dossier_key ? null : d.dossier_key,
+            );
+          }}
+        />
         {/* Center Workspace: Infinite Vector Canvas */}
         <main
           ref={canvasContainerRef}
@@ -961,6 +1059,19 @@ export function DossierStudioClient({
           setSealAngle={setSealAngle}
         />
       </div>
+
+      {/* Modal Cấu hình Bộ hồ sơ */}
+      <DossierConfigModal
+        isOpen={isConfigModalOpen}
+        onClose={() => {
+          setIsConfigModalOpen(false);
+          setEditingDossier(null);
+        }}
+        caseId={caseId}
+        dossier={editingDossier}
+        availableDocuments={availableDocs}
+        onSaved={handleDossierSaved}
+      />
     </div>
   );
 }

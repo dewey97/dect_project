@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import type {
   DbCase,
   DbCaseCheckpoint,
@@ -42,9 +43,7 @@ import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
 import { CheckpointEditor } from "./checkpoint-editor";
-import { DossierEditor } from "./dossier-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
-import { DossierConfigModal } from "./dossier-config-modal";
 import { BoardEditor } from "./board/board-editor";
 
 /** Mỗi lần click danh sách tăng nonce để Flow căn lại node, kể cả node đang chọn. */
@@ -171,14 +170,13 @@ export function CheckpointStudioClient({
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isResizing, sidebarWidth]);
+  const router = useRouter();
   const [allCases, setAllCases] = useState<DbCase[]>(initialCases);
   const [rows, setRows] = useState<DbCaseCheckpoint[]>(initialRows);
   const [dossiers, setDossiers] = useState<DbCaseDossier[]>(initialDossiers);
   const [availableDocs, setAvailableDocs] = useState<AvailableDocumentItem[]>(
     initialAvailableDocuments,
   );
-  const [activeDossierForEdit, setActiveDossierForEdit] =
-    useState<DbCaseDossier | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(
     initialRows[0]?.id ?? null,
   );
@@ -326,7 +324,6 @@ export function CheckpointStudioClient({
   }, []);
 
   const selectRow = (row: DbCaseCheckpoint): boolean => {
-    setActiveDossierForEdit(null); // Đóng dossier editor nếu đang mở để quay về checkpoint
     if (row.id === selectedId) return true;
     if (!confirmDiscardForm()) return false;
     const nextDraft = toDraft(row);
@@ -345,7 +342,6 @@ export function CheckpointStudioClient({
   };
 
   const createRow = () => {
-    setActiveDossierForEdit(null);
     if (!confirmDiscardForm()) return;
     const nextDraft = createEmptyDraft(caseId);
     setSelectedId(null);
@@ -458,66 +454,15 @@ export function CheckpointStudioClient({
   }, []);
 
   const handleDossierClick = useCallback(
-    (dossierOrName: DbCaseDossier | string) => {
-      // Khi mở cấu hình dossier trong sidebar, tạm bỏ chọn checkpoint để sidebar hiển thị DossierEditor
-      if (typeof dossierOrName === "object" && dossierOrName !== null) {
-        setActiveDossierForEdit(dossierOrName);
-        return;
-      }
-
-      const label = String(dossierOrName).trim();
-      const found = dossiers.find(
-        (d) =>
-          d.title.toLowerCase() === label.toLowerCase() ||
-          d.dossier_key.toLowerCase() === label.toLowerCase(),
-      );
-
-      if (found) {
-        setActiveDossierForEdit(found);
-      } else {
-        const generatedKey = slugifyVietnamese(label);
-
-        setActiveDossierForEdit({
-          id: "",
-          case_id: caseId,
-          dossier_key: generatedKey || "bo_moi",
-          title: label,
-          document_codes: [] as string[],
-          description: "",
-          flow_position: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-      }
+    () => {
+      router.push(`/studio/dossier?case=${encodeURIComponent(caseId)}`);
     },
-    [dossiers, caseId],
+    [router, caseId],
   );
 
   const handleCreateDossier = useCallback(() => {
-    setActiveDossierForEdit({
-      id: "",
-      case_id: caseId,
-      dossier_key: "",
-      title: "",
-      document_codes: [] as string[],
-      description: "",
-      flow_position: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-  }, [caseId]);
-
-  const handleDossierSaved = useCallback((saved: DbCaseDossier) => {
-    setDossiers((prev) => {
-      const exists = prev.some((d) => d.dossier_key === saved.dossier_key);
-      if (exists) {
-        return prev.map((d) =>
-          d.dossier_key === saved.dossier_key ? saved : d,
-        );
-      }
-      return [...prev, saved];
-    });
-  }, []);
+    router.push(`/studio/dossier?case=${encodeURIComponent(caseId)}`);
+  }, [router, caseId]);
 
   const applySuggestions = useCallback(() => {
     if (suggestions.length === 0) return;
@@ -894,18 +839,7 @@ export function CheckpointStudioClient({
         )}
       >
         <CheckpointListSidebar onCreate={createRow} isLoading={isLoading}>
-          {activeDossierForEdit ? (
-            <DossierEditor
-              caseId={caseId}
-              dossier={activeDossierForEdit}
-              availableDocuments={availableDocs}
-              onSaved={(saved) => {
-                handleDossierSaved(saved);
-                setActiveDossierForEdit(saved);
-              }}
-              onClose={() => setActiveDossierForEdit(null)}
-            />
-          ) : draft ? (
+          {draft ? (
             <CheckpointEditor
               draft={draft}
               dossiers={dossiers}
