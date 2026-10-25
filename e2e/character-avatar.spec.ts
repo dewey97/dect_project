@@ -65,7 +65,7 @@ test.describe("WT-4 Character Avatar Engine & Gameplay Integration", () => {
     await vuPin.evaluate((el: HTMLElement) => el.click());
 
     // Suspect modal should be visible with suspect name and avatar image
-    await expect(page.getByText("THẨM TRA ĐỐI TƯỢNG")).toBeVisible({
+    await expect(page.getByRole("heading", { name: "THẨM TRA ĐỐI TƯỢNG" })).toBeVisible({
       timeout: 10_000,
     });
     await expect(page.getByText("Lê Quang Vũ").first()).toBeVisible();
