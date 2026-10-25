@@ -46,7 +46,21 @@ export default defineConfig({
   webServer: {
     command: `node node_modules/next/dist/bin/next dev -p ${PORT}`,
     url: `http://localhost:${PORT}/evidence/web?case_id=case_000`,
-    env: { NEXT_DIST_DIR: ".next_dev" },
+    env: {
+      NEXT_DIST_DIR: ".next_dev",
+      ...(process.env.E2E_SUPABASE_URL
+        ? {
+            NEXT_PUBLIC_SUPABASE_URL: process.env.E2E_SUPABASE_URL,
+            SUPABASE_URL: process.env.E2E_SUPABASE_URL,
+            ...(process.env.E2E_SUPABASE_ANON_KEY
+              ? { NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.E2E_SUPABASE_ANON_KEY }
+              : {}),
+            ...(process.env.E2E_SUPABASE_SERVICE_ROLE_KEY
+              ? { SUPABASE_SERVICE_ROLE_KEY: process.env.E2E_SUPABASE_SERVICE_ROLE_KEY }
+              : {}),
+          }
+        : {}),
+    },
     reuseExistingServer: true,
     timeout: 180_000,
   },

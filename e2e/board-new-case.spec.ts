@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { seedTestCase, deleteTestCase, cleanupE2ECases } from "./helpers/db-admin";
+import { seedTestCase, deleteTestCase, cleanupE2ECases, isE2EDbAvailable } from "./helpers/db-admin";
 
 const TEST_CASE_SLUG = `e2e_${Date.now()}`;
 
@@ -7,6 +7,9 @@ test.describe("B12-6: Dynamic New Case Board (Isolated Workspace)", () => {
   let isSeeded = false;
 
   test.beforeAll(async () => {
+    if (!isE2EDbAvailable()) {
+      return;
+    }
     try {
       // Dọn mọi case e2e cũ nếu có và seed case mới
       await cleanupE2ECases("e2e_");
@@ -31,7 +34,10 @@ test.describe("B12-6: Dynamic New Case Board (Isolated Workspace)", () => {
     page,
   }, testInfo) => {
     if (!isSeeded) {
-      testInfo.skip(true, "Database chưa được cấu hình hoặc seed thất bại");
+      testInfo.skip(
+        true,
+        "B14-9: Bỏ qua vì chưa cấu hình E2E_SUPABASE_URL / E2E_SUPABASE_SERVICE_ROLE_KEY trong .env.local (chống ghi dữ liệu test lên production). Đặt ALLOW_E2E_PRODUCTION_SEED=true để cho phép ghi tạm.",
+      );
       return;
     }
 
