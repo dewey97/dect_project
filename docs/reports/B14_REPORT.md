@@ -1,7 +1,7 @@
 # Báo cáo Nghiệm thu B14 (Hoàn Thiện Multi-Case & Gộp Studio) — 2026-10-25
 
 **Nhánh:** `main`  
-**Base:** `1935c10` (Docs plan B14)  
+**Base:** `dac1a05` (Docs plan B14)  
 **Mục tiêu:** Thực hiện tuần tự B14-0 → B14-13 trên main theo `docs/WORKTREE_PLAN.md` và `docs/reports/AUDIT_2026-10-25_CUSTOM_CASE.md`. Mỗi mục 1 commit riêng biệt, **tuyệt đối KHÔNG push git lên remote**. Không dùng `toPass`/retry/timeout mù quáng, không đổi tên biến để lọt grep, bảo đảm nguyên tắc đa vụ án (multi-case độc lập hoàn toàn khỏi case_000).
 
 ---

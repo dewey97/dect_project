@@ -24,7 +24,7 @@ Toàn bộ mã hash dưới đây được trích xuất trực tiếp từ nh�
 | **B15-8** | `654d269` | `fix(activation): step 15-8 - remove case_000 slug special casing in activation page and rely on published status` | Cập nhật `case_000` thành `PUBLISHED` trong cơ sở dữ liệu `cases`. Loại bỏ hoàn toàn đặc cách theo slug `"case_000"` trên trang `/activate`. |
 | **B15-9** | `6ac351f` | `refactor(checkpoints): step 15-9 - remove case_000 specific fallback branch in isConclusionUnlocked` | Xóa nhánh fallback riêng biệt cho `case_000` trong `isConclusionUnlocked` (`checkpoints-context.tsx`). Mở khóa cáo trạng 100% dựa trên đồ thị `depends_on`. |
 | **B15-10** | `dafd531` | `docs(changelog): step 15-10 - document unbacked migration 43 drop and enforce in-file backup policy` | Ghi trung thực vào `CHANGELOG.md` việc migration 43 drop `evidence_nodes/edges` mà chưa backup. Thiết lập quy tắc bắt buộc sao lưu snapshot trước mọi lệnh destructive DDL từ nay về sau. |
-| **B15-11** | `1bb43e3` | `docs(report): step 15-11 - verify final e2e suite and publish b15 verification report` | Chạy typecheck và Playwright E2E 2 lần liên tiếp đạt 0 fail, 42 pass, 3 skip an toàn; xuất bản báo cáo nghiệm thu chi tiết B15. |
+| **B15-11** | `44e1c0e` | `docs(report): step 15-11 - verify final e2e suite and publish b15 verification report` | Chạy typecheck và Playwright E2E 2 lần liên tiếp đạt 0 fail, 42 pass, 3 skip an toàn; xuất bản báo cáo nghiệm thu chi tiết B15. |
 
 ---
 
