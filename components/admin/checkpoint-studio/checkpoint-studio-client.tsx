@@ -271,7 +271,8 @@ export function CheckpointStudioClient({
       map.set(item.slug, item.title);
     }
     if (!map.has(caseId)) {
-      map.set(caseId, caseId === "case_000" ? "Vụ án #000" : caseId);
+      const currentCase = allCases.find((c) => c.slug === caseId);
+      map.set(caseId, currentCase?.title || caseId);
     }
     return Array.from(map, ([value, label]) => ({ value, label }));
   }, [allCases, caseId]);
