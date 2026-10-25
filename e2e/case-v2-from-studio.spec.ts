@@ -3,9 +3,7 @@ import { isE2EDbAvailable, cleanupCaseTronTimV2 } from "./helpers/db-admin";
 
 test.use({ storageState: "e2e/.auth/admin.json" });
 
-const TEST_CASE_SLUG = "case_tron_tim_v2";
-
-test.describe("B15-7: Nghiệm thu Trốn Tìm v2 (Tạo qua Studio UI)", () => {
+test.describe("B16-1: Nghiệm thu Trốn Tìm v2 (Tạo qua Studio UI)", () => {
   test.beforeEach(async ({}, testInfo) => {
     if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
       testInfo.skip(
@@ -21,57 +19,108 @@ test.describe("B15-7: Nghiệm thu Trốn Tìm v2 (Tạo qua Studio UI)", () => 
       timeout: 15_000,
     });
 
+    const createBtn = page.getByRole("button", { name: /Create New Case/i });
+    await expect(createBtn).toBeVisible();
+
     // Chụp ảnh Studio Cases list
     await page.screenshot({
-      path: "docs/reports/b15/b15-7-studio-cases-list.png",
+      path: "docs/reports/b16/b16-1-studio-cases-list.png",
       fullPage: false,
     });
   });
 
-  test("2. Tạo và cấu hình vụ án Trốn Tìm v2 qua Studio UI", async ({
+  test("2. Tạo và cấu hình vụ án Trốn Tìm v2 qua Studio UI và vào game", async ({
     page,
   }, testInfo) => {
-    // B15-6: Yêu cầu Supabase test branch để ghi dữ liệu, không ghi đè production
+    // B16-1: Chỉ chạy khi isE2EDbAvailable() = true (đã có DB test riêng)
     if (!isE2EDbAvailable()) {
       testInfo.skip(
         true,
-        "B15-6/B15-7: Chưa cấu hình Supabase test branch (E2E_SUPABASE_URL). Tự động skip an toàn để bảo vệ DB production.",
+        "B16-1: Chưa cấu hình Supabase test branch (E2E_SUPABASE_URL, E2E_SUPABASE_SERVICE_ROLE_KEY). Tự động skip an toàn để bảo vệ DB production.",
       );
       return;
     }
 
+    let createdSlug = "";
+
     try {
-      // 1. Mở trang Cases Studio
+      // 1. Mở trang Cases Studio và bấm Tạo Vụ Án mới
       await page.goto("/studio/cases");
       await expect(page.locator("h1")).toContainText(/Cases/i);
 
-      // 2. Mở form tạo vụ án
-      const createBtn = page.getByRole("button", { name: /Tạo vụ án|New Case/i });
-      if (await createBtn.isVisible()) {
-        await createBtn.click();
-        const slugInput = page.getByPlaceholder(/slug/i);
-        if (await slugInput.isVisible()) {
-          await slugInput.fill(TEST_CASE_SLUG);
-          const titleInput = page.getByPlaceholder(/tên vụ án|title/i);
-          if (await titleInput.isVisible()) {
-            await titleInput.fill("Trốn Tìm v2 (Studio Test)");
-          }
-          const submitBtn = page.getByRole("button", { name: /Xác nhận|Lưu|Tạo/i });
-          if (await submitBtn.isVisible()) {
-            await submitBtn.click();
-          }
-        }
-      }
+      const createBtn = page.getByRole("button", { name: /Create New Case/i });
+      await expect(createBtn).toBeVisible();
+      await createBtn.click();
 
-      // Chụp ảnh từng bước nghiệm thu
-      await page.screenshot({
-        path: "docs/reports/b15/b15-7-studio-create-step.png",
-        fullPage: false,
+      // Đợi chuyển hướng sang trang chi tiết vụ án
+      await page.waitForURL(/\/studio\/cases\/case_/, { timeout: 15_000 });
+      const currentUrl = page.url();
+      createdSlug = currentUrl.split("/").pop()!;
+      expect(createdSlug).toMatch(/^case_/);
+
+      // 2. Chỉnh sửa metadata vụ án
+      const titleInput = page.locator('input[type="text"]').first();
+      await expect(titleInput).toBeVisible();
+      await titleInput.fill("Trốn Tìm v2 (Studio Test)");
+
+      const statusSelect = page.locator("select").first();
+      await expect(statusSelect).toBeVisible();
+      await statusSelect.selectOption("PUBLISHED");
+
+      const saveCaseBtn = page.getByRole("button", { name: /Lưu thay đổi/i });
+      await expect(saveCaseBtn).toBeVisible();
+      await saveCaseBtn.click();
+      await expect(
+        page.getByText(/Đã cập nhật metadata vụ án thành công/i),
+      ).toBeVisible({ timeout: 10_000 });
+
+      // 3. Chuyển sang Character Studio để thêm nhân vật nạn nhân
+      await page.goto(`/studio/characters?case=${createdSlug}`);
+      await expect(page.locator("h1")).toContainText(/Nhân vật/i);
+
+      const addCharBtn = page.getByRole("button", { name: /Thêm nhân vật/i });
+      await expect(addCharBtn).toBeVisible();
+      await addCharBtn.click();
+
+      const nameInput = page.locator('label:has-text("Họ tên") input');
+      await expect(nameInput).toBeVisible();
+      await nameInput.fill("Nguyễn Văn Khang");
+
+      const keyInput = page.locator('label:has-text("Mã") input');
+      await expect(keyInput).toBeVisible();
+      await keyInput.fill("khang");
+
+      const roleSelect = page.locator('label:has-text("Vai trò") select');
+      await expect(roleSelect).toBeVisible();
+      await roleSelect.selectOption("victim");
+
+      const saveCharBtn = page.getByRole("button", { name: /Tạo nhân vật|Lưu thay đổi/i });
+      await expect(saveCharBtn).toBeVisible();
+      await saveCharBtn.click();
+
+      await expect(page.locator("aside").getByText("Nguyễn Văn Khang")).toBeVisible({
+        timeout: 10_000,
+      });
+
+      // 4. Kiểm tra vụ án xuất hiện trên trang /activate
+      await page.goto("/activate");
+      const caseCard = page.getByText("Trốn Tìm v2 (Studio Test)");
+      await expect(caseCard).toBeVisible({ timeout: 10_000 });
+
+      // 5. Mở bàn điều tra của vụ án v2
+      await page.goto(`/evidence/web?case_id=${createdSlug}`);
+      await expect(page.locator('[data-experience-shell="web"]')).toBeVisible({
+        timeout: 15_000,
+      });
+      await expect(page.locator('[data-board-ready="true"]')).toBeVisible({
+        timeout: 15_000,
       });
     } finally {
-      try {
-        await cleanupCaseTronTimV2(TEST_CASE_SLUG);
-      } catch {}
+      if (createdSlug) {
+        try {
+          await cleanupCaseTronTimV2(createdSlug);
+        } catch {}
+      }
     }
   });
 });
