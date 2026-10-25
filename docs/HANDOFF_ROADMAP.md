@@ -142,7 +142,7 @@ Tiến độ (2026-10-25): B0–B15 trên `main` (HEAD `44e1c0e`, chưa push, ah
 
 | Mục đích                 | Lệnh                                               | Lưu ý                                                                                                           |
 | ------------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Typecheck                | `npx tsc --noEmit --incremental false`             | Lỗi trong `.next/types/*` cũ là file sinh tự động; xóa file đó nếu nó chặn build                                |
+| Typecheck                | `npx tsc --noEmit --incremental false`             | Chạy khi dev server tắt. Đã loại `.next_dev/**` khỏi include để tránh báo lỗi file dở dang.                      |
 | E2E                      | `pnpm test:e2e`                                    | Playwright tự chạy dev server cổng 3100 với `NEXT_DIST_DIR=.next_dev`                                           |
 | Build                    | `NEXT_DIST_DIR=.next_dev npx next build`           | Sau khi build: `git checkout -- next-env.d.ts tsconfig.json` (Next tự sửa 2 file theo distDir); xóa `.next_dev` |
 | Chạy Next không qua pnpm | `node node_modules/next/dist/bin/next dev -p 3100` | Dùng khi `pnpm exec` bị chặn bởi kiểm tra dependency                                                            |
