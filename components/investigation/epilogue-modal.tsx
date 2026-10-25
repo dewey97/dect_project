@@ -92,7 +92,7 @@ export function EpilogueModal({
             </div>
             <div>
               <h2 className="text-sm font-bold tracking-widest uppercase text-amber-200">
-                HẬU ÁN — TỔNG KẾT CHUYÊN ÁN
+                KÝ SỰ HẬU ÁN — TỔNG KẾT CHUYÊN ÁN
               </h2>
               <p className="text-xs text-zinc-400 font-mono">
                 {caseId.toUpperCase()} // BÁO CÁO KẾT THÚC ĐIỀU TRA
