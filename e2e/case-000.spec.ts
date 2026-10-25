@@ -38,11 +38,29 @@ async function openBoard(page: Page) {
     }),
   );
   await page.goto(CASE_URL);
-  await expect(page.locator('[data-pin-id="c0-pin-phone"]')).toBeAttached();
+  await expect(page.locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]').first()).toBeAttached();
 }
 
 async function clickPin(page: Page, pinId: string) {
-  const pin = page.locator(`[data-pin-id="${pinId}"]`);
+  let selector = `[data-pin-id="${pinId}"]`;
+  if (pinId === "c0-pin-phone") {
+    selector = '[data-node-kind="phone_lookup"], [data-pin-id="c0-pin-phone"]';
+  } else if (pinId === "c0-pin-indictment") {
+    selector = '[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]';
+  } else if (pinId === "c0-pin-suspects") {
+    selector = '[data-node-kind="suspects_hub"], [data-pin-id="c0-pin-suspects"]';
+  } else if (pinId === "c0-pin-victim-phone") {
+    selector = '[data-node-kind="victim_phone"], [data-pin-id="c0-pin-victim-phone"]';
+  } else if (pinId === "c0-pin-reinvestigate") {
+    selector = '[data-node-kind="reinvestigate"], [data-pin-id="c0-pin-reinvestigate"]';
+  } else if (pinId.startsWith("c0-pin-followup-")) {
+    const key = pinId.replace("c0-pin-followup-", "");
+    selector = `[data-node-kind="followup"][data-subject-key="${key}"], [data-pin-id="${pinId}"]`;
+  } else if (pinId.startsWith("node-suspect-")) {
+    const key = pinId.replace("node-suspect-", "");
+    selector = `[data-subject-key="${key}"], [data-pin-id="${pinId}"]`;
+  }
+  const pin = page.locator(selector).first();
   await expect(pin).toBeAttached();
   await pin.evaluate((el: HTMLElement) => el.click());
 }
@@ -116,15 +134,15 @@ test.describe("case_000 baseline", () => {
     expect(charactersBody.data).toHaveLength(10);
     expect((await checkpoints).ok()).toBe(true);
 
-    for (const pinId of [
-      "c0-pin-phone",
-      "c0-pin-suspects",
-      "c0-pin-indictment",
-      "node-suspect-vu",
-      "node-suspect-tung",
-      "node-suspect-ha",
+    for (const selector of [
+      '[data-node-kind="phone_lookup"], [data-pin-id="c0-pin-phone"]',
+      '[data-node-kind="suspects_hub"], [data-pin-id="c0-pin-suspects"]',
+      '[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]',
+      '[data-subject-key="vu"], [data-pin-id="node-suspect-vu"]',
+      '[data-subject-key="tung"], [data-pin-id="node-suspect-tung"]',
+      '[data-subject-key="ha"], [data-pin-id="node-suspect-ha"]',
     ]) {
-      await expect(page.locator(`[data-pin-id="${pinId}"]`)).toBeAttached();
+      await expect(page.locator(selector).first()).toBeAttached();
     }
   });
 
@@ -279,7 +297,7 @@ test.describe("case_000 baseline", () => {
     );
     await page.goto(CASE_URL);
     await expect(
-      page.locator('[data-pin-id="c0-pin-indictment"]'),
+      page.locator('[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]').first(),
     ).toBeAttached();
 
     // Bấm pin cáo trạng (đã giải) -> mở thẳng EpilogueModal

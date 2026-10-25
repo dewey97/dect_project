@@ -55,12 +55,12 @@ test.describe("WT-4 Character Avatar Engine & Gameplay Integration", () => {
     });
 
     await page.goto(CASE_URL);
-    await expect(page.locator('[data-pin-id="c0-pin-phone"]')).toBeAttached({
+    await expect(page.locator('[data-node-kind="phone_lookup"], [data-pin-id="c0-pin-phone"]').first()).toBeAttached({
       timeout: 25_000,
     });
 
     // Locate suspect pin
-    const vuPin = page.locator('[data-pin-id="node-suspect-vu"]');
+    const vuPin = page.locator('[data-subject-key="vu"], [data-pin-id="node-suspect-vu"]').first();
     await expect(vuPin).toBeAttached({ timeout: 20_000 });
     await vuPin.evaluate((el: HTMLElement) => el.click());
 
@@ -68,7 +68,7 @@ test.describe("WT-4 Character Avatar Engine & Gameplay Integration", () => {
     await expect(page.getByText("THẨM TRA ĐỐI TƯỢNG")).toBeVisible({
       timeout: 10_000,
     });
-    await expect(page.getByText("Lê Quang Vũ")).toBeVisible();
+    await expect(page.getByText("Lê Quang Vũ").first()).toBeVisible();
 
     const avatarImg = page.locator('img[alt="Lê Quang Vũ"]');
     await expect(avatarImg).toBeVisible({ timeout: 5_000 });
@@ -86,7 +86,7 @@ test.describe("WT-4 Character Avatar Engine & Gameplay Integration", () => {
     await page.goto(CASE_URL);
 
     // Open phone simulator
-    const phonePin = page.locator('[data-pin-id="c0-pin-victim-phone"]');
+    const phonePin = page.locator('[data-node-kind="victim_phone"], [data-pin-id="c0-pin-victim-phone"]').first();
     await expect(phonePin).toBeAttached({ timeout: 20_000 });
     await phonePin.evaluate((el: HTMLElement) => el.click());
 

@@ -525,48 +525,23 @@ export function HeroInteractive({
           className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-2 focus-within:top-2 focus-within:z-50 focus-within:flex focus-within:max-w-xs focus-within:flex-col focus-within:gap-1 focus-within:rounded focus-within:bg-background/95 focus-within:p-2"
         >
           {customPins.map((pin) => (
-            <Fragment key={pin.id}>
-              <button
-                type="button"
-                data-pin-id={pin.id}
-                data-node-kind={pin.nodeKind}
-                data-subject-key={pin.subjectKey}
-                onClick={(event) => {
-                  const rect = containerRef.current?.getBoundingClientRect();
-                  onPinClick(pin.id, pin, {
-                    clientX: rect ? rect.left + rect.width / 2 : event.clientX,
-                    clientY: rect ? rect.top + rect.height / 2 : event.clientY,
-                  });
-                }}
-                className="min-h-11 rounded px-2 text-left text-sm text-foreground hover:bg-muted"
-              >
-                {pin.label || pin.id}
-              </button>
-              {pin.legacyId && pin.legacyId !== pin.id && (
-                <button
-                  type="button"
-                  data-pin-id={pin.legacyId}
-                  data-node-kind={pin.nodeKind}
-                  data-subject-key={pin.subjectKey}
-                  onClick={(event) => {
-                    const rect = containerRef.current?.getBoundingClientRect();
-                    onPinClick(pin.id, pin, {
-                      clientX: rect
-                        ? rect.left + rect.width / 2
-                        : event.clientX,
-                      clientY: rect
-                        ? rect.top + rect.height / 2
-                        : event.clientY,
-                    });
-                  }}
-                  className="sr-only"
-                  tabIndex={-1}
-                  aria-hidden="true"
-                >
-                  {pin.label || pin.legacyId}
-                </button>
-              )}
-            </Fragment>
+            <button
+              key={pin.id}
+              type="button"
+              data-pin-id={pin.id}
+              data-node-kind={pin.nodeKind}
+              data-subject-key={pin.subjectKey}
+              onClick={(event) => {
+                const rect = containerRef.current?.getBoundingClientRect();
+                onPinClick(pin.id, pin, {
+                  clientX: rect ? rect.left + rect.width / 2 : event.clientX,
+                  clientY: rect ? rect.top + rect.height / 2 : event.clientY,
+                });
+              }}
+              className="min-h-11 rounded px-2 text-left text-sm text-foreground hover:bg-muted"
+            >
+              {pin.label || pin.id}
+            </button>
           ))}
         </nav>
       )}
