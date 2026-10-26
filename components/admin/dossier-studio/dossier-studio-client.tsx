@@ -830,7 +830,7 @@ export function DossierStudioClient({
   };
 
   return (
-    <div className="h-full w-full bg-[#0a0a0d] text-zinc-100 flex flex-col overflow-hidden font-sans antialiased selection:bg-amber-500/30">
+    <div data-studio-ready="true" className="h-full w-full bg-[#0a0a0d] text-zinc-100 flex flex-col overflow-hidden font-sans antialiased selection:bg-amber-500/30">
       {/* Print Specific CSS */}
       <style jsx global>{`
         @media print {

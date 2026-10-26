@@ -169,7 +169,11 @@ export async function deleteTestCase(slug: string) {
   await supabase.from("boardgame_pins").delete().eq("case_id", slug);
   await supabase.from("boardgame_connections").delete().eq("case_id", slug);
   await supabase.from("reinvestigation_hotspots").delete().eq("case_slug", slug);
-  await supabase.from("cases").delete().eq("slug", slug);
+  const { error } = await supabase.from("cases").delete().eq("slug", slug);
+  if (error) {
+    console.error(`[deleteTestCase ERROR] Failed to delete case '${slug}':`, error);
+    throw error;
+  }
 }
 
 /**

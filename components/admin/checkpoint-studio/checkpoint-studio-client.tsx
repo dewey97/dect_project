@@ -78,6 +78,7 @@ interface CheckpointStudioClientProps {
   initialDossiers?: DbCaseDossier[];
   initialAvailableDocuments?: AvailableDocumentItem[];
   initialCharacters?: DbCaseCharacter[];
+  initialView?: "flow" | "board";
 }
 
 export function CheckpointStudioClient({
@@ -87,15 +88,10 @@ export function CheckpointStudioClient({
   initialDossiers = [],
   initialAvailableDocuments = [],
   initialCharacters = [],
+  initialView = "flow",
 }: CheckpointStudioClientProps) {
   const [caseId, setCaseId] = useState(initialCaseId);
-  const [activeView, setActiveView] = useState<"flow" | "board">(() => {
-    if (typeof window !== "undefined") {
-      const v = new URLSearchParams(window.location.search).get("view");
-      if (v === "board") return "board";
-    }
-    return "flow";
-  });
+  const [activeView, setActiveView] = useState<"flow" | "board">(initialView);
 
   // Giữ vụ án và view đang chọn trên URL (?case=...&view=...) để tải lại trang không mất view.
   useEffect(() => {
@@ -756,7 +752,10 @@ export function CheckpointStudioClient({
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col">
+    <div
+      data-studio-ready={activeView === "flow" ? "true" : undefined}
+      className="flex h-full min-h-0 w-full flex-col"
+    >
       {/* Thanh chuyển đổi View (Flow vs Board) */}
       <div className="flex h-9 shrink-0 items-center justify-between border-b border-white/10 bg-[#090a0f] px-3 z-20">
         <div className="flex items-center gap-2">

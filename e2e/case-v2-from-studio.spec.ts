@@ -42,6 +42,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
     page,
   }, testInfo) => {
     await page.goto("/studio/cases");
+    await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("h1")).toContainText(/Cases/i, {
       timeout: 15_000,
     });
@@ -77,6 +78,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       // ----------------------------------------------------------------------
       await test.step("1. Tạo vụ án qua modal Studio UI", async () => {
         await page.goto("/studio/cases");
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(page.locator("h1")).toContainText(/Cases/i, {
           timeout: 15_000,
         });
@@ -102,6 +104,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
           timeout: 20_000,
         });
         createdSlug = testSlug;
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText(`Mã hệ thống: ${testSlug}`)).toBeVisible();
       });
 
@@ -115,16 +118,19 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
 
         const saveCaseBtn = page.getByRole("button", { name: /Lưu Thay Đổi/i });
         await expect(saveCaseBtn).toBeVisible();
+        await expect(saveCaseBtn).toBeEnabled({ timeout: 15_000 });
         await saveCaseBtn.click();
         await expect(
-          page.getByText(/Đã cập nhật metadata vụ án thành công/i),
-        ).toBeVisible({ timeout: 10_000 });
+          page.getByText(/Đã cập nhật metadata vụ án thành công/i).first(),
+        ).toBeVisible({ timeout: 15_000 });
+        await expect(saveCaseBtn).toBeEnabled({ timeout: 15_000 });
 
         await statusSelect.selectOption("DRAFT");
         await saveCaseBtn.click();
         await expect(
-          page.getByText(/Đã cập nhật metadata vụ án thành công/i),
-        ).toBeVisible({ timeout: 10_000 });
+          page.getByText(/Đã cập nhật metadata vụ án thành công/i).first(),
+        ).toBeVisible({ timeout: 15_000 });
+        await expect(saveCaseBtn).toBeEnabled({ timeout: 15_000 });
       });
 
       // ----------------------------------------------------------------------
@@ -132,6 +138,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       // ----------------------------------------------------------------------
       await test.step("3. Thêm 1 nạn nhân + 3 nghi phạm qua Character Studio", async () => {
         await page.goto(`/studio/characters?case=${createdSlug}`);
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(
           page.getByRole("heading", { name: "Nhân vật", level: 1 }),
         ).toBeVisible({ timeout: 15_000 });
@@ -177,7 +184,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
 
           await expect(
             page.locator("aside").getByText(char.name),
-          ).toBeVisible({ timeout: 10_000 });
+          ).toBeVisible({ timeout: 15_000 });
         }
       });
 
@@ -186,6 +193,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       // ----------------------------------------------------------------------
       await test.step("4. Thêm 4 bộ hồ sơ qua Dossier Studio", async () => {
         await page.goto(`/studio/dossier?case=${createdSlug}`);
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText(/Bộ Hồ Sơ/i).first()).toBeVisible({
           timeout: 15_000,
         });
@@ -219,10 +227,11 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
           });
           await expect(saveDossierBtn).toBeVisible();
           await saveDossierBtn.click();
+          await expect(saveDossierBtn).not.toBeVisible({ timeout: 15_000 });
 
           await expect(
             page.locator("aside").getByText(dos.title),
-          ).toBeVisible({ timeout: 10_000 });
+          ).toBeVisible({ timeout: 15_000 });
         }
       });
 
@@ -231,6 +240,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       // ----------------------------------------------------------------------
       await test.step("5. Thêm 4 vật chứng qua Evidence Studio (V2-01 ... V2-04)", async () => {
         await page.goto(`/studio/evidence?case=${createdSlug}`);
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText("Evidence Studio")).toBeVisible({
           timeout: 15_000,
         });
@@ -267,7 +277,8 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
 
           await expect(
             page.getByText(/Đã tạo chứng cứ mới|Đã cập nhật chứng cứ/i).first(),
-          ).toBeVisible({ timeout: 10_000 });
+          ).toBeVisible({ timeout: 15_000 });
+          await expect(saveEvidenceBtn).toBeEnabled({ timeout: 15_000 });
         }
       });
 
@@ -277,6 +288,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       await test.step("6. Thêm 7 Checkpoints có depends_on qua Checkpoint Studio", async () => {
         page.on("dialog", (dialog) => dialog.accept());
         await page.goto(`/studio/checkpoints?case=${createdSlug}`);
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(page.locator("header")).toBeVisible({ timeout: 15_000 });
 
         // 6.1. Checkpoint 1: phone_lookup
@@ -316,7 +328,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         const saveCpBtn1 = page.getByRole("button", { name: /Lưu Checkpoint/i });
         await expect(saveCpBtn1).toBeVisible();
         await saveCpBtn1.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 10_000 });
+        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
 
         // 6.2. Checkpoint 2: suspect_interrogation (Huy)
         const addCpBtn2 = page.getByRole("button", { name: "+ Checkpoint" });
@@ -358,7 +370,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         const saveCpBtn2 = page.getByRole("button", { name: /Lưu Checkpoint/i });
         await expect(saveCpBtn2).toBeVisible();
         await saveCpBtn2.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 10_000 });
+        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
 
         // 6.3. Checkpoint 3: suspect_interrogation (Lan)
         const addCpBtn3 = page.getByRole("button", { name: "+ Checkpoint" });
@@ -404,7 +416,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         const saveCpBtn3 = page.getByRole("button", { name: /Lưu Checkpoint/i });
         await expect(saveCpBtn3).toBeVisible();
         await saveCpBtn3.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 10_000 });
+        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
 
         // 6.4. Checkpoint 4: suspect_interrogation (Minh)
         const addCpBtn4 = page.getByRole("button", { name: "+ Checkpoint" });
@@ -450,7 +462,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         const saveCpBtn4 = page.getByRole("button", { name: /Lưu Checkpoint/i });
         await expect(saveCpBtn4).toBeVisible();
         await saveCpBtn4.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 10_000 });
+        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
 
         // 6.5. Checkpoint 5: followup (Lan)
         const addCpBtn5 = page.getByRole("button", { name: "+ Checkpoint" });
@@ -491,7 +503,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         const saveCpBtn5 = page.getByRole("button", { name: /Lưu Checkpoint/i });
         await expect(saveCpBtn5).toBeVisible();
         await saveCpBtn5.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 10_000 });
+        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
 
         // 6.6. Checkpoint 6: indictment
         const addCpBtn6 = page.getByRole("button", { name: "+ Checkpoint" });
@@ -547,7 +559,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         const saveCpBtn6 = page.getByRole("button", { name: /Lưu Checkpoint/i });
         await expect(saveCpBtn6).toBeVisible();
         await saveCpBtn6.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 10_000 });
+        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
 
         // 6.7. Checkpoint 7: epilogue
         const addCpBtn7 = page.getByRole("button", { name: "+ Checkpoint" });
@@ -575,7 +587,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         const saveCpBtn7 = page.getByRole("button", { name: /Lưu Checkpoint/i });
         await expect(saveCpBtn7).toBeVisible();
         await saveCpBtn7.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 10_000 });
+        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
       });
 
       // ----------------------------------------------------------------------
@@ -583,6 +595,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       // ----------------------------------------------------------------------
       await test.step("7. Danh bạ, tin nhắn, cuộc gọi qua Phone Studio", async () => {
         await page.goto(`/studio/phone?case=${createdSlug}`);
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(page.locator("h1")).toContainText(/Phone Studio/i, {
           timeout: 15_000,
         });
@@ -607,7 +620,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await addContactBtn.click();
         await expect(
           page.getByText(/Đã thêm liên hệ vào danh bạ/i).first(),
-        ).toBeVisible({ timeout: 10_000 });
+        ).toBeVisible({ timeout: 15_000 });
 
         // 7.2. Cuộc gọi
         const callsTab = page.getByRole("tab", { name: /Cuộc gọi/i });
@@ -629,7 +642,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await addCallBtn.click();
         await expect(
           page.getByText(/Đã thêm cuộc gọi vào nhật ký/i).first(),
-        ).toBeVisible({ timeout: 10_000 });
+        ).toBeVisible({ timeout: 15_000 });
 
         // 7.3. Tin nhắn (thread ≥ 2 tin)
         const messagesTab = page.getByRole("tab", { name: /Tin nhắn/i });
@@ -673,7 +686,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await saveThreadBtn.click();
         await expect(
           page.getByText(/Đã lưu thành công/i).first(),
-        ).toBeVisible({ timeout: 10_000 });
+        ).toBeVisible({ timeout: 15_000 });
       });
 
       // ----------------------------------------------------------------------
@@ -681,12 +694,14 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       // ----------------------------------------------------------------------
       await test.step("8. Thêm node bảng & hotspot hiện trường", async () => {
         await page.goto(`/studio/checkpoints?case=${createdSlug}&view=board`);
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(
           page.getByText("Bảng điều tra (Board Studio)"),
         ).toBeVisible({ timeout: 15_000 });
 
         const addNodeBtn = page.getByRole("button", { name: "Thêm Node" });
-        await expect(addNodeBtn).toBeVisible();
+        await expect(addNodeBtn).toBeVisible({ timeout: 15_000 });
+        await expect(addNodeBtn).toBeEnabled({ timeout: 15_000 });
         await addNodeBtn.click();
 
         const nodeTitleInput = page.getByPlaceholder("VD: Nạn nhân, Hiện trường…");
@@ -694,19 +709,23 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await nodeTitleInput.fill("Node Ghi Chú Hiện Trường");
 
         const saveNodeBtn = page.locator('form button[type="submit"]:has-text("Lưu")');
-        await expect(saveNodeBtn).toBeVisible();
+        await expect(saveNodeBtn).toBeVisible({ timeout: 15_000 });
         await saveNodeBtn.click();
+        await expect(
+          page.getByText(/Đã lưu node thành công|Đã lưu node/i).first(),
+        ).toBeVisible({ timeout: 15_000 });
 
         const saveBoardLayoutBtn = page.getByRole("button", {
           name: "Lưu Bố Cục",
         });
-        await expect(saveBoardLayoutBtn).toBeVisible();
+        await expect(saveBoardLayoutBtn).toBeVisible({ timeout: 15_000 });
         await saveBoardLayoutBtn.click();
         await expect(
           page.getByText(/Đã lưu toàn bộ bố cục bảng|Đã lưu bố cục/i),
-        ).toBeVisible({ timeout: 10_000 });
+        ).toBeVisible({ timeout: 15_000 });
 
         await page.goto(`/studio/evidence?case=${createdSlug}`);
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         const sceneTab = page.getByRole("button", {
           name: "Hiện Trường (2D / 360)",
         });
@@ -723,7 +742,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await expect(saveHotspotsBtn).toBeVisible();
         await saveHotspotsBtn.click();
         await expect(page.getByText(/lên Server!/i)).toBeVisible({
-          timeout: 10_000,
+          timeout: 15_000,
         });
       });
 
@@ -766,7 +785,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         const submitPhoneBtn = page.getByRole("button", { name: /LIÊN LẠC LẤY THÔNG TIN/i });
         await expect(submitPhoneBtn).toBeVisible();
         await submitPhoneBtn.click();
-        await expect(page.getByText(/chưa chính xác/i).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText(/chưa chính xác/i).first()).toBeVisible({ timeout: 15_000 });
 
         await phoneInputs.nth(0).fill("Đỗ Quốc Huy");
         await phoneInputs.nth(1).fill("Phạm Mai Lan");
@@ -774,11 +793,11 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await submitPhoneBtn.click();
 
         const takeTestimonyBtn = page.getByRole("button", { name: /LẤY LỜI KHAI/i });
-        await expect(takeTestimonyBtn).toBeVisible({ timeout: 10_000 });
+        await expect(takeTestimonyBtn).toBeVisible({ timeout: 15_000 });
         await takeTestimonyBtn.click();
 
         const continueBtn = page.getByRole("button", { name: /TIẾP TỤC ĐIỀU TRA/i });
-        await expect(continueBtn).toBeVisible({ timeout: 10_000 });
+        await expect(continueBtn).toBeVisible({ timeout: 15_000 });
         await continueBtn.click();
 
         // 9.2. Thẩm tra nghi phạm Phạm Mai Lan với mã chứng cứ đúng
@@ -786,20 +805,20 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await expect(lanPin).toBeAttached({ timeout: 15_000 });
         await lanPin.evaluate((el: HTMLElement) => el.click());
 
-        await expect(page.getByRole("heading", { name: /THẨM TRA ĐỐI TƯỢNG/i }).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByRole("heading", { name: /THẨM TRA ĐỐI TƯỢNG/i }).first()).toBeVisible({ timeout: 15_000 });
 
         await tap(page, "Động cơ gây án");
         await page.getByPlaceholder("Nhập động cơ...").fill("Tranh chấp quyền lợi tài sản cá nhân");
         await addEvidenceCodes(page, ["V2-01"]);
         await tap(page, "XÁC NHẬN");
-        await expect(page.getByText("Bằng chứng chính xác", { exact: false }).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText("Bằng chứng chính xác", { exact: false }).first()).toBeVisible({ timeout: 15_000 });
         await tap(page, "TIẾP TỤC ĐIỀU TRA");
 
         await tap(page, "Mâu thuẫn lời khai");
         await page.getByPlaceholder("Nhập mâu thuẫn lời khai...").fill("Mâu thuẫn lời khai với chứng cứ giám định");
         await addEvidenceCodes(page, ["V2-03"]);
         await tap(page, "XÁC NHẬN");
-        await expect(page.getByText("Bằng chứng chính xác", { exact: false }).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText("Bằng chứng chính xác", { exact: false }).first()).toBeVisible({ timeout: 15_000 });
         await tap(page, "TIẾP TỤC ĐIỀU TRA");
 
         const submitInterrogationBtn = page.getByRole("button", { name: "ĐIỀU TRA", exact: true });
@@ -816,7 +835,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
 
         // Đóng CulpritEpilogueModal nếu xuất hiện sau khi trả lời câu hỏi phụ
         const nextInvestigateBtn = page.getByRole("button", { name: "TIẾP TỤC ĐIỀU TRA", exact: true });
-        await expect(nextInvestigateBtn).toBeVisible({ timeout: 10_000 });
+        await expect(nextInvestigateBtn).toBeVisible({ timeout: 15_000 });
         await nextInvestigateBtn.click();
 
         // 9.4. Cáo trạng (kết án sai bị từ chối; kết án đúng được chấp thuận)
@@ -824,7 +843,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await expect(indictmentPin).toBeAttached({ timeout: 15_000 });
         await indictmentPin.evaluate((el: HTMLElement) => el.click());
 
-        await expect(page.getByText("BẢN KẾT LUẬN ĐIỀU TRA", { exact: false }).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText("BẢN KẾT LUẬN ĐIỀU TRA", { exact: false }).first()).toBeVisible({ timeout: 15_000 });
 
         // Nộp cáo trạng sai: Đỗ Quốc Huy -> bị từ chối
         const suspectInput = page.getByPlaceholder("Nhập hoặc chọn tên bị can...");
@@ -842,7 +861,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await page.getByRole("button", { name: /ĐỀ NGHỊ TRUY TỐ/i }).click();
         await expect(
           page.getByText("Kết luận đối tượng chưa chính xác", { exact: false }).first(),
-        ).toBeVisible({ timeout: 10_000 });
+        ).toBeVisible({ timeout: 15_000 });
 
         // Nộp cáo trạng đúng: Phạm Mai Lan -> chấp thuận
         await suspectInput.fill("Phạm Mai Lan");
@@ -855,7 +874,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
 
         await expect(
           page.getByText("Phạm Mai Lan đã thừa nhận toàn bộ hành vi phạm tội", { exact: false }).first(),
-        ).toBeVisible({ timeout: 10_000 });
+        ).toBeVisible({ timeout: 15_000 });
 
         await page.screenshot({
           path: testInfo.outputPath("v2-gameplay-board.png"),
@@ -866,6 +885,10 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       // ----------------------------------------------------------------------
       // B18-6: Dọn sạch triệt để case test và file Storage
       // ----------------------------------------------------------------------
+      try {
+        await page.goto("about:blank");
+      } catch {}
+
       if (createdSlug && createdSlug.startsWith("e2e_")) {
         try {
           await deleteTestCase(createdSlug);

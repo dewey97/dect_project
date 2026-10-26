@@ -23,7 +23,10 @@ export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
   }, [initialCases, searchQuery, statusFilter]);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div
+      data-studio-ready="true"
+      className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700"
+    >
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight">Cases</h1>

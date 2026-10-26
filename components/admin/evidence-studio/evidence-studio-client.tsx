@@ -152,7 +152,10 @@ export function EvidenceStudioClient({
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-zinc-950 text-zinc-100 overflow-hidden">
+    <div
+      data-studio-ready="true"
+      className="flex flex-col h-[calc(100vh-3.5rem)] bg-zinc-950 text-zinc-100 overflow-hidden"
+    >
       {/* ── TOP HEADER / TOOLBAR ── */}
       <div className="flex items-center justify-between px-6 py-3 border-b border-zinc-800 bg-zinc-900/40">
         <div className="flex items-center gap-4">

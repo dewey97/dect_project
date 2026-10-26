@@ -263,7 +263,10 @@ export function PhoneStudioClient({
     history.filter((h) => h.is_clue).length;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-zinc-950 text-zinc-100 font-sans">
+    <div
+      data-studio-ready="true"
+      className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-zinc-950 text-zinc-100 font-sans"
+    >
       {/* Top Header Bar */}
       <div className="h-14 px-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">

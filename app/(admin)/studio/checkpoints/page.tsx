@@ -20,9 +20,11 @@ export const dynamic = "force-dynamic";
 export default async function CheckpointStudioPage({
   searchParams,
 }: {
-  searchParams: Promise<{ case?: string }>;
+  searchParams: Promise<{ case?: string; view?: string }>;
 }) {
-  const caseId = normalizeCaseId((await searchParams).case);
+  const sp = await searchParams;
+  const caseId = normalizeCaseId(sp.case);
+  const initialView = sp.view === "board" ? "board" : "flow";
   const [casesResult, checkpointsResult, dossiers, availableDocs, charactersResult] =
     await Promise.all([
       getCases(),
@@ -44,6 +46,7 @@ export default async function CheckpointStudioPage({
   return (
     <CheckpointStudioClient
       initialCaseId={caseId}
+      initialView={initialView}
       initialCases={casesResult.data || []}
       initialRows={checkpointsResult.data || []}
       initialDossiers={dossiers}

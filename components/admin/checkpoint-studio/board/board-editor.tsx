@@ -62,27 +62,36 @@ export function BoardEditor({ caseId, checkpoints = [] }: BoardEditorProps) {
   };
 
   const handleCreateNewNode = async () => {
-    const randomSuffix = Math.random().toString(36).substring(2, 6);
-    const newId = `${caseId}:custom:node_${randomSuffix}`;
-    const draft = {
-      id: newId,
-      caseId,
-      nodeKind: "custom" as const,
-      title: "Ghim mới",
-      config: {
-        pin_title: "Ghim mới",
-        position: {
-          desktop: { x: 0.5, y: 0.5 },
-          mobile: { x: 0.5, y: 0.5 },
+    if (isLoading || isCreatingNode) return;
+    setIsCreatingNode(true);
+    try {
+      const randomSuffix = Math.random().toString(36).substring(2, 6);
+      const newId = `${caseId}:custom:node_${randomSuffix}`;
+      const draft = {
+        id: newId,
+        caseId,
+        nodeKind: "custom" as const,
+        title: "Ghim mới",
+        config: {
+          pin_title: "Ghim mới",
+          position: {
+            desktop: { x: 0.5, y: 0.5 },
+            mobile: { x: 0.5, y: 0.5 },
+          },
         },
-      },
-    };
-    const ok = await handleSaveNode(draft);
-    if (ok) setSelectedNodeId(newId);
+      };
+      const ok = await handleSaveNode(draft);
+      if (ok) setSelectedNodeId(newId);
+    } finally {
+      setIsCreatingNode(false);
+    }
   };
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col bg-[#0c0d12]">
+    <div
+      data-studio-ready={isLoading ? "false" : "true"}
+      className="flex h-full min-h-0 w-full flex-col bg-[#0c0d12]"
+    >
       {/* 1. Header Toolbar của Board Studio */}
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-white/10 bg-[#0f1016] px-4">
         <div className="flex items-center gap-2">
@@ -132,6 +141,7 @@ export function BoardEditor({ caseId, checkpoints = [] }: BoardEditorProps) {
             variant="outline"
             size="sm"
             onClick={handleCreateNewNode}
+            disabled={isLoading || isCreatingNode}
             className="gap-1 text-xs border-white/10 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
           >
             <Plus className="size-3.5 text-amber-400" />
