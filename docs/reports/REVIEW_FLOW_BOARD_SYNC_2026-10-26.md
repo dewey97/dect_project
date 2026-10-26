@@ -33,3 +33,7 @@ Nguyên tắc: **một mô hình bảng dùng chung** giữa Studio và gameplay
 5. **Dây:** giữ tách biệt, ghi chú rõ trên UI ("Dây mở khóa" ở Flow / "Dây manh mối" ở Board); thêm nút tùy chọn "Vẽ dây theo phụ thuộc" trong Board Studio để sinh dây đỏ từ `depends_on` nếu GM muốn.
 
 E2E: tạo checkpoint `phone_lookup` ở Flow → mở Board Studio thấy ghim tương ứng → kéo → mở gameplay thấy đúng vị trí; đổi tên checkpoint → nhãn ghim đổi ở cả Studio và gameplay; ẩn khỏi bảng → gameplay không còn ghim.
+
+## 4. Quyết định (chủ dự án, 2026-10-26)
+
+Gộp Flow và Board thành **một mặt phẳng** trong Checkpoint Studio: bảng người chơi thấy là mặt phẳng chính, có "Lớp logic" (mũi tên `depends_on`) và khay "Ngoài bảng"; một nơi lưu vị trí (`boardgame_pins`). Chi tiết: `docs/WORKTREE_PLAN.md` bảng B23.

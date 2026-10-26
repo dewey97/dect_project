@@ -139,7 +139,7 @@ Quy tắc thêm:
 | **B20** | **Ổn định spec v2 + E2E.** Làm B20-1 → B20-3 trong bảng "B20". | bảng B20, `docs/reports/REVIEW_B19_2026-10-26.md` | Spec v2 pass 5/5 liên tiếp; `pnpm test:e2e` 3 lần liên tiếp 0 fail |
 | **B21** | **Tín hiệu sẵn sàng thật + sửa script cổng.** Làm B21-1 → B21-3. | bảng B21, `docs/reports/REVIEW_B20_2026-10-26.md` | Tiêu chí bảng B21 đạt |
 | **B22** | **Chốt ổn định spec v2.** Làm B22-1 → B22-2. | bảng B22, `docs/reports/REVIEW_B21_2026-10-26.md` | Spec v2 `--repeat-each=3` → 3 passed; cả bộ 1 lần 0 fail |
-| **B23** | **Đồng bộ Flow ↔ Board (một mô hình bảng dùng chung).** Làm B23-1 → B23-5. | `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md` | Board Studio hiển thị đúng như gameplay; kéo/ẩn/đổi tên đồng bộ; E2E mới pass |
+| **B23** | **Gộp Flow + Board thành một mặt phẳng** (chủ dự án chốt). Làm B23-1 → B23-5. | `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md` | Một màn hình, một dữ liệu, một nơi lưu vị trí; E2E mới pass |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -328,19 +328,34 @@ Nguồn: `docs/reports/REVIEW_B21_2026-10-26.md`. HEAD khi review: `9f80665`. Th
 
 Cuối bước: `pnpm test:e2e` **1 lần** (0 fail) rồi báo cáo ngắn `docs/reports/B22_REPORT.md`.
 
-### B23 — đồng bộ Flow ↔ Board (2026-10-26)
+### B23 — gộp Flow + Board thành một mặt phẳng (chốt 2026-10-26)
 
-Nguồn: `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md`. ⛔ Chờ chủ dự án duyệt phương án (mục 3 của review), đặc biệt chọn **một nơi lưu vị trí** (đề xuất `boardgame_pins`).
+Nguồn: `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md`. **Chủ dự án đã chốt:** quản lý bảng điều tra và luồng checkpoint trên **một mặt phẳng** trong Checkpoint Studio; sửa ở đâu cũng là sửa một dữ liệu.
+
+**Nguyên tắc:**
+
+- **Một mặt phẳng = bảng người chơi thấy** (render bằng chính `buildCustomPins` + `buildCustomConnections` của gameplay). GM kéo, sửa, tạo, xóa trực tiếp trên đó.
+- **Một dữ liệu:** node gắn checkpoint đọc nội dung từ `case_checkpoints` (tên, loại, `subject_key`, `depends_on`, ẩn/hiện); sửa ở panel bên → bảng cập nhật ngay, không có bản sao.
+- **Một nơi lưu vị trí:** `boardgame_pins` theo id node ổn định, có `desktop` / `mobile` (2 chế độ xem mobile/desktop trên cùng mặt phẳng). Ngừng dùng `case_checkpoints.flow_position`, `case_board_nodes.config.position`, `board_config.position` (chỉ đọc làm dữ liệu cũ khi chưa có `boardgame_pins`).
+- **Logic hiện trên cùng mặt phẳng:** công tắc "Lớp logic" vẽ mũi tên `depends_on` (khác màu/kiểu với dây đỏ manh mối) và huy hiệu khóa/mở trên node; nối mũi tên = sửa `depends_on`.
+- **Khay "Ngoài bảng"** ở cạnh mặt phẳng: checkpoint không hiện cho người chơi (hậu án, choice/code/time/text, node bộ hồ sơ) — vẫn chọn/sửa/nối logic được; kéo vào bảng = hiện ra (`board_config.hidden = false`), kéo ra = ẩn.
 
 | #     | Mức    | Việc | Done khi |
 | ----- | ------ | ---- | -------- |
-| B23-1 | 🔴 Cao | Hook dùng chung `useBoardModel(caseId)` gọi `buildCustomPins` + `buildCustomConnections`; Board Studio (`use-board-editor.ts`) và bảng gameplay cùng dùng | Board Studio hiện đủ ghim phone_lookup, nghi phạm, câu hỏi phụ, cáo trạng như gameplay; `grep -n "getBoardNodes\|getBoardgamePinPositions" components/admin/checkpoint-studio/board/use-board-editor.ts` không còn nạp riêng |
-| B23-2 | 🔴 Cao | Một nơi lưu vị trí cho mọi node (đề xuất `boardgame_pins` theo id node); ngừng ghi `case_board_nodes.config.position` | Kéo node sinh từ checkpoint trong Studio → gameplay thấy đúng vị trí |
-| B23-3 | 🟠 TB  | Liên kết Flow ↔ Board: click node gắn checkpoint trong Board → mở checkpoint trong editor; Flow có công tắc "Ẩn khỏi bảng" ghi `board_config.hidden` (nối `updateCheckpointBoardConfig`); nhãn node lấy từ `checkpoint.title` | Đổi tên/ẩn ở Flow → Board Studio và gameplay đổi theo |
-| B23-4 | 🟡 Thấp | Vị trí node bộ hồ sơ trong Flow lưu DB (`case_dossiers.flow_position`, migration mới) thay `localStorage` khóa chung | Không còn `checkpoint_studio_dossier_positions` trong code |
-| B23-5 | 🟡 Thấp | Ghi chú UI 2 loại dây ("Dây mở khóa" / "Dây manh mối"); nút tùy chọn "Vẽ dây theo phụ thuộc" trong Board Studio | Nhãn hiển thị; nút sinh dây từ `depends_on` |
+| B23-1 | 🔴 Cao | Hook dùng chung `useBoardModel(caseId)` (nạp checkpoints, characters, evidence, board nodes, `boardgame_pins/connections`; gọi `buildCustomPins` + `buildCustomConnections`); gameplay và Studio cùng dùng | Studio hiện đủ ghim như gameplay (phone_lookup, nghi phạm, câu hỏi phụ, cáo trạng) |
+| B23-2 | 🔴 Cao | Màn hình gộp trong Checkpoint Studio: mặt phẳng bảng + panel sửa node (dùng lại các form `sections/**`) + khay "Ngoài bảng". Bỏ view Flow riêng (`checkpoint-flow-view.tsx`) và tab Board riêng | Một route `/studio/checkpoints?case=…`; tạo checkpoint → ghim mới xuất hiện (ô trống kế tiếp hoặc khay nếu kind không lên bảng); xóa → mất; đổi tên/loại/nghi phạm → nhãn/ảnh đổi ngay |
+| B23-3 | 🔴 Cao | Vị trí: kéo node → ghi `boardgame_pins` (desktop/mobile theo chế độ đang xem); migration chuyển vị trí cũ (`board_config.position`, `case_board_nodes.config.position`) sang `boardgame_pins` nếu chưa có, backup trước | Kéo trong Studio → gameplay đúng vị trí ở cả desktop và mobile; `grep -rn "flow_position" components lib` chỉ còn đọc dữ liệu cũ (hoặc 0) |
+| B23-4 | 🟠 TB  | "Lớp logic": mũi tên `depends_on` + huy hiệu khóa/mở; kéo nối giữa 2 node = thêm phụ thuộc; chọn mũi tên + Delete = bỏ; nút "Sắp tự động lớp logic" chỉ để nhìn, không ghi đè vị trí bảng | Nối/bỏ trên mặt phẳng → `depends_on` trong DB đổi; linter vụ (`case-linter.ts`) vẫn chạy được |
+| B23-5 | 🟡 Thấp | Node bộ hồ sơ: vị trí trong khay/bảng lưu DB, bỏ `localStorage["checkpoint_studio_dossier_positions"]` | `grep -rn "checkpoint_studio_dossier_positions" components` = 0 |
 
-E2E mới `e2e/flow-board-sync.spec.ts` (theo "Ngân sách kiểm thử"): tạo checkpoint ở Flow → thấy ghim trong Board Studio → kéo → gameplay đúng vị trí; đổi tên → nhãn đổi; ẩn → gameplay mất ghim.
+E2E `e2e/board-flow-unified.spec.ts` (theo "Ngân sách kiểm thử"): tạo checkpoint `phone_lookup` → thấy ghim trên mặt phẳng → kéo → gameplay đúng vị trí; đổi tên → nhãn đổi ở Studio + gameplay; kéo hậu án vào khay → không hiện ở gameplay; nối mũi tên ở Lớp logic → `depends_on` cập nhật. Cập nhật `e2e/case-v2-from-studio.spec.ts`, `board-studio.spec.ts`, `studio-ux.spec.ts` theo màn hình mới. Cập nhật `docs/core_specs/19_checkpoint_studio.md`.
+
+**Prompt giao việc B23:**
+
+```
+Đọc docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md, docs/WORKTREE_PLAN.md mục "Ngân sách kiểm thử cho AI thực thi" và bảng "B23" (chủ dự án đã chốt: gộp Flow + Board thành một mặt phẳng). Làm B23-1 → B23-5 trên main, mỗi mục 1 commit, không push. Migration chuyển vị trí: backup trước, chạy qua scripts/ops/run-sql.mjs.
+Chỉ chạy spec liên quan trong lúc làm; cuối bước pnpm test:e2e 1 lần. Báo cáo ngắn docs/reports/B23_REPORT.md: git log --oneline 91c827e..HEAD, ảnh màn hình mới trong docs/reports/b23/, dòng tổng kết test. Không làm live cursor.
+```
 
 **Prompt giao việc B22:**
 
