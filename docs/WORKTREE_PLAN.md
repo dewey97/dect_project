@@ -241,7 +241,7 @@ Nguồn: `docs/reports/REVIEW_B18_2026-10-26.md`. HEAD khi review: `78e7aaf`. R�
 | #     | Mức     | Việc | Done khi |
 | ----- | ------- | ---- | -------- |
 | B19-1 | 🔴 Cao  | Bổ sung `e2e/case-v2-from-studio.spec.ts` cho đủ kịch bản (chi tiết bên dưới) | Checklist B19-1 đạt + `npx playwright test e2e/case-v2-from-studio.spec.ts` pass 2 lần + toàn bộ `pnpm test:e2e` 0 fail |
-| B19-2 | 🟡 Thấp | Rác `case_002` "Mật vụ mới (Bản nháp)" (`DRAFT`, tạo 2026-10-25 18:02 UTC) trên production | ⛔ Chủ dự án xác nhận không dùng → xóa qua `/studio/cases` (nút xóa). Không xóa bằng SQL |
+| B19-2 | ✅      | **Đã xong (2026-10-26, reviewer, chủ dự án duyệt):** xóa `case_002` "Mật vụ mới (Bản nháp)" — rỗng hoàn toàn (0 checkpoint/nhân vật/hồ sơ/vật chứng/phiên chơi). Bản sao dòng: `docs/reports/backups/case_002_deleted_2026-10-26.json`. Production còn `case_000` (PUBLISHED), `case_001` (DRAFT) | — |
 | B19-3 | 🟡 Thấp | Placeholder tên nhân vật case_000 trong Board Studio | `components/admin/checkpoint-studio/board/board-node-form.tsx`: "VD: Nguyễn Văn Khang..." → ví dụ trung tính (vd "VD: Nạn nhân, Hiện trường…") |
 | B19-4 | 🟡 Thấp | Báo cáo kiểm chứng được | `docs/reports/B19_REPORT.md` dán: (a) output `npx playwright test e2e/case-v2-from-studio.spec.ts --reporter=list` (thấy tên từng `test.step`), (b) output nguyên văn các lệnh grep của checklist B19-1. Không mô tả bước nào không có trong spec |
 
@@ -274,7 +274,7 @@ Nguồn: `docs/reports/REVIEW_B18_2026-10-26.md`. HEAD khi review: `78e7aaf`. R�
 **Prompt giao việc B19:**
 
 ```
-Đọc docs/reports/REVIEW_B18_2026-10-26.md và docs/WORKTREE_PLAN.md bảng "B19". Làm B19-3, B19-1, B19-4 trên main, mỗi mục 1 commit, không push (B19-2 chờ chủ dự án).
+Đọc docs/reports/REVIEW_B18_2026-10-26.md và docs/WORKTREE_PLAN.md bảng "B19". Làm B19-3, B19-1, B19-4 trên main, mỗi mục 1 commit, không push (B19-2 đã xong).
 B19-1: viết đúng kịch bản v2 trong plan (nhân vật Nam/Huy/Lan/Minh, không dùng tên/khóa case_000; đủ 7 checkpoint có depends_on; upload avatar; thread tin nhắn; chơi tới "KÝ SỰ HẬU ÁN" kèm 1 lần cáo trạng sai bị từ chối). Mọi bước có expect, không if(isVisible), không retry/toPass. Rào B18-6 giữ nguyên.
 Trước khi viết báo cáo, tự chạy toàn bộ lệnh trong "Checklist B19-1" và dán nguyên văn kết quả. Không mô tả bước nào không có trong spec.
 Báo cáo docs/reports/B19_REPORT.md: bảng commit dán git log --oneline 78e7aaf..HEAD, output --reporter=list của spec v2, dòng tổng kết pnpm test:e2e 2 lần. Không làm live cursor.
@@ -330,7 +330,7 @@ Báo cáo docs/reports/B17_REPORT.md: bảng commit dán nguyên văn git log --
 | 1   | **B13** (bảng trên)                                                                                                                                               | AI thực thi       | ✅ **Đã xong** (commit `ec3837c` → `30452f7`, `42 passed (3.2m)`, 0 fail, 0 skip)                                                                    |
 | 2   | Review độc lập B13 + audit multi-case/Studio                                                                                                                      | Reviewer          | ✅ Xong đọc code (`docs/reports/AUDIT_2026-10-25_CUSTOM_CASE.md`); chưa chạy lại được `tsc`/E2E → chuyển vào B14-0                                   |
 | 2b  | **B15-0 → B15-5** | AI thực thi | ✅ Xong (review `docs/reports/REVIEW_B15_2026-10-25.md`) |
-| 2c  | ✅ B18-0 (E2E dùng DB production), ✅ B18-2 (bỏ màn lệnh khám xét). ⛔ Mới: **B19-2** — xác nhận xóa `case_002` "Mật vụ mới (Bản nháp)" | Chủ dự án | Không chặn |
+| 2c  | ✅ B18-0 (E2E dùng DB production), ✅ B18-2 (bỏ màn lệnh khám xét), ✅ B19-2 (đã xóa `case_002`) | Chủ dự án | — |
 | 2d  | **B19-3, B19-1, B19-4** (hoàn tất nghiệm thu v2 theo checklist grep được) + B15-12 (6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | B18 xong phần rào an toàn, review `docs/reports/REVIEW_B18_2026-10-26.md` |
 | 3   | Xoay token `SUPABASE_ACCESS_TOKEN` (`sbp_`) ở supabase.com/dashboard/account/tokens, cập nhật `.env.local`                                                        | Chủ dự án         | ✅ Đã nhận token mới từ chủ dự án và nạp vào `.env.local`                                                                                            |
 | 4   | A6: xoay toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase), rồi `git rm --cached .env` + thêm `.env` vào `.gitignore`/`.dockerignore` | Chủ dự án         | `.env` đang bị track trong git                                                                                                                       |

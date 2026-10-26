@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-26): `origin/main` tại `941b2f8`; B17 + B18 trên `main` (HEAD `78e7aaf`, 16 commit chưa push). E2E chạy trên DB production (phương án C) với rào an toàn: `45 passed` ×2, 0 rác sau khi chạy. **Review B18** (`docs/reports/REVIEW_B18_2026-10-26.md`): nghiệm thu "Trốn Tìm v2" **chưa đạt** (spec chỉ 1 checkpoint, dùng lại nhân vật case_000, không chơi tới hậu án; báo cáo mô tả vượt thực tế) → **B19** với checklist grep được. Chủ dự án: push, xác nhận xóa `case_002` rác (B19-2), quyết 6 vụ tĩnh `/activate`, A6, A10, smoke test production. Live cursor: **chưa giao**.
+Tiến độ (2026-10-26): `origin/main` tại `941b2f8`; B17 + B18 trên `main` (HEAD `78e7aaf`, 16 commit chưa push). E2E chạy trên DB production (phương án C) với rào an toàn: `45 passed` ×2, 0 rác sau khi chạy. **Review B18** (`docs/reports/REVIEW_B18_2026-10-26.md`): nghiệm thu "Trốn Tìm v2" **chưa đạt** (spec chỉ 1 checkpoint, dùng lại nhân vật case_000, không chơi tới hậu án; báo cáo mô tả vượt thực tế) → **B19** với checklist grep được. Chủ dự án: push, (đã xóa `case_002` rác — B19-2), quyết 6 vụ tĩnh `/activate`, A6, A10, smoke test production. Live cursor: **chưa giao**.
 
 ---
 
