@@ -140,6 +140,7 @@ Quy tắc thêm:
 | **B21** | **Tín hiệu sẵn sàng thật + sửa script cổng.** Làm B21-1 → B21-3. | bảng B21, `docs/reports/REVIEW_B20_2026-10-26.md` | Tiêu chí bảng B21 đạt |
 | **B22** | **Chốt ổn định spec v2.** Làm B22-1 → B22-2. | bảng B22, `docs/reports/REVIEW_B21_2026-10-26.md` | Spec v2 `--repeat-each=3` → 3 passed; cả bộ 1 lần 0 fail |
 | **B23** | **Gộp Flow + Board thành một mặt phẳng** (chủ dự án chốt). Làm B23-1 → B23-5. | `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md` | Một màn hình, một dữ liệu, một nơi lưu vị trí; E2E mới pass |
+| **B24** | **Hoàn tất B23 trong worktree trước khi merge.** Làm B24-1 → B24-5. | `docs/reports/REVIEW_B23_2026-10-27.md` | E2E chạy được trong worktree, 0 fail; vị trí mobile có chỗ lưu; migration 44 chạy |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -349,6 +350,28 @@ Nguồn: `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md`. **Chủ dự án �
 | B23-5 | 🟡 Thấp | Node bộ hồ sơ: vị trí trong khay/bảng lưu DB, bỏ `localStorage["checkpoint_studio_dossier_positions"]` | `grep -rn "checkpoint_studio_dossier_positions" components` = 0 |
 
 E2E `e2e/board-flow-unified.spec.ts` (theo "Ngân sách kiểm thử"): tạo checkpoint `phone_lookup` → thấy ghim trên mặt phẳng → kéo → gameplay đúng vị trí; đổi tên → nhãn đổi ở Studio + gameplay; kéo hậu án vào khay → không hiện ở gameplay; nối mũi tên ở Lớp logic → `depends_on` cập nhật. Cập nhật `e2e/case-v2-from-studio.spec.ts`, `board-studio.spec.ts`, `studio-ux.spec.ts` theo màn hình mới. Cập nhật `docs/core_specs/19_checkpoint_studio.md`.
+
+### B24 — hoàn tất B23 trong worktree (2026-10-27)
+
+Nguồn: `docs/reports/REVIEW_B23_2026-10-27.md`. Làm tiếp trong `D:\code_world\dect_wt_b23`, nhánh `wt/b23-unified` (giữ quy tắc "Làm song song với chủ dự án"). **Chưa merge vào `main` cho tới khi B24 đạt.**
+
+| #     | Mức    | Việc | Done khi |
+| ----- | ------ | ---- | -------- |
+| B24-1 | 🔴 Cao | Sửa môi trường worktree: gỡ junction `node_modules` bằng `cmd /c rmdir node_modules` (**không** `rm -rf` — sẽ xóa luôn `node_modules` của `main`), rồi `pnpm install` trong worktree | `E2E_PORT=3113 npx playwright test e2e/board-flow-unified.spec.ts` khởi động được dev server |
+| B24-2 | 🔴 Cao | Chạy và sửa cho pass: `board-flow-unified`, `board-studio`, `studio-ux`, `case-v2-from-studio`, `case-000`, `board-dynamic` (cập nhật spec Studio cũ theo màn hình gộp), rồi `pnpm test:e2e` 1 lần (cổng 3113) | Dán dòng tổng kết từng lần; 0 fail |
+| B24-3 | 🟠 TB  | Vị trí mobile: thêm cột `mobile_x`, `mobile_y` vào `boardgame_pins` (migration 45, backup trước) **hoặc** lưu mobile dưới id `<nodeId>@mobile`; gameplay mobile đọc đúng; ngừng ghi `case_board_nodes.config.position` | Kéo node ở chế độ mobile trong Studio → gameplay mobile đúng vị trí, desktop không đổi |
+| B24-4 | 🟠 TB  | Chạy migration 44 (+45 nếu có) lên production: backup, `run-sql.mjs`, kiểm số dòng; báo chủ dự án trước khi chạy | Có `boardgame_pins_backup_b23`; bảng case_000 trên gameplay giữ nguyên bố cục |
+| B24-5 | 🟡 Thấp | Xóa `checkpoint-flow-view.tsx` (code chết); ghi `lib/types/checkpoint-studio.ts` vào mục "Chạm ngoài vùng" của báo cáo | `grep -rn "checkpoint-flow-view" components app` = 0 |
+
+**Prompt giao việc B24:**
+
+```
+Đọc docs/reports/REVIEW_B23_2026-10-27.md, docs/WORKTREE_PLAN.md mục "Ngân sách kiểm thử cho AI thực thi", mục "Làm song song với chủ dự án" và bảng "B24". Làm tiếp trong D:\code_world\dect_wt_b23, nhánh wt/b23-unified, mỗi mục 1 commit, không push, không merge vào main.
+B24-1: gỡ junction node_modules bằng cmd /c rmdir node_modules (KHÔNG dùng rm -rf), rồi pnpm install.
+B24-2: báo cáo phải có dòng tổng kết Playwright thật của từng lần chạy (E2E_PORT=3113). Không ghi "đạt" nếu chưa chạy.
+B24-4: báo chủ dự án trước khi chạy migration production.
+Báo cáo docs/reports/B24_REPORT.md: git log --oneline 2eaedc7..HEAD, dòng tổng kết test, danh sách file chạm ngoài vùng. Không làm live cursor.
+```
 
 **Làm song song với chủ dự án (bắt buộc):** B23 chạy trong **worktree riêng**, không sửa thư mục `main` (`D:\code_world\dect_project`) — chủ dự án sửa UI/UX trên `main` cùng lúc.
 
