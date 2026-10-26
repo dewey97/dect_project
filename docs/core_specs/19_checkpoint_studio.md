@@ -252,3 +252,29 @@ Từ phiên bản 2026-10-25 (Migration 39, WT-1 1G), Checkpoint Studio tích h�
   - Nối dây dẫn liên kết giữa các pin ghim (`boardgame_connections`).
   - Lưu cấu hình trực tiếp vào cơ sở dữ liệu Supabase mà không làm gián đoạn người chơi.
 - **Chơi thử**: Tích hợp nút "Chơi thử" khởi chạy trực tiếp phiên điều tra `/evidence/web?case_id=<slug>` với tiến trình tương ứng.
+
+
+---
+
+## 7. Unified Canvas: Gộp Flow & Board thành một mặt phẳng duy nhất (B23)
+
+Từ phiên bản 2026-10-26 (B23, Plan Unified Canvas): Checkpoint Studio hợp nhất hoàn toàn Flow view và Board view thành **một mặt phẳng duy nhất**, xóa bỏ ranh giới giữa hai giao diện độc lập.
+
+### 7.1. Nguyên tắc cốt lõi
+1. **Một mặt phẳng duy nhất = Bảng điều tra Canvas**:
+   - Sử dụng chung hook mô hình bảng `useBoardModel(caseId)` giữa gameplay và Studio.
+   - Studio hiển thị đầy đủ 100% tất cả các ghim mà người chơi thấy: Ghim nạn nhân, Ghim tra cứu SĐT, Hub nghi phạm, Toàn bộ ảnh đối tượng nghi phạm, Ghim câu hỏi phụ sau thẩm tra, Ghim cáo trạng kết án, và các Ghim ghi chú tự tạo (`case_board_nodes`).
+2. **Một nơi lưu vị trí duy nhất (`boardgame_pins`)**:
+   - Mọi thao tác kéo thả trên canvas trong Studio được lưu trực tiếp vào bảng `boardgame_pins` (hỗ trợ cả desktop/mobile).
+   - Ngừng ghi `case_checkpoints.flow_position`; các vị trí cũ được backfill tự động qua migration 44.
+3. **Lớp logic (Logic Overlay)**:
+   - Công tắc "Lớp logic" trên thanh công cụ toolbar bật/tắt hiển thị các mũi tên phụ thuộc `depends_on` (nét đứt màu tím, có mũi tên chỉ hướng từ nguồn sang đích).
+   - Cho phép kéo nối trực tiếp giữa hai node trên canvas để thiết lập quan hệ phụ thuộc (`target` phụ thuộc vào `source`), kiểm tra chu trình vòng lặp và cập nhật DB tức thời.
+   - Hỗ trợ nút "Sắp tự động" theo thuật toán phân tầng DAG (Topological layers) để trực quan hóa đồ thị mà không tự ý ghi đè tọa độ bảng.
+4. **Khay Ngoài Bảng (Off-board Tray)**:
+   - Đặt ở đáy màn hình dưới Canvas, quản lý các checkpoint không ghim trực tiếp cho người chơi (Hậu án `epilogue`, các checkpoint ẩn `board_config.hidden === true`, và Bộ hồ sơ `dossiers`).
+   - Cung cấp nút "Lên bảng" để bỏ ẩn checkpoint và hiển thị ghim lên Canvas ngay lập tức.
+   - Bấm vào bất kỳ thẻ nào trong khay mở ngay form biên tập tương ứng ở Inspector bên phải.
+5. **Liên kết tương tác hai chiều**:
+   - Bấm vào bất kỳ node nào trên Canvas hoặc trong Khay: Inspector bên phải mở ngay form biên tập phù hợp (`CheckpointEditor` với các section chuyên sâu hoặc `BoardNodeForm` cho custom pin).
+   - Sửa tên, loại, nghi phạm liên quan: Canvas cập nhật phản ánh theo thời gian thực (0s độ trễ).
