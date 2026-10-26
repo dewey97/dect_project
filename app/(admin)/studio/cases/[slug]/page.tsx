@@ -11,7 +11,13 @@ export default async function CaseDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const res = await getCaseBySlug(slug);
+  let res = await getCaseBySlug(slug);
+
+  if (!res.success || !res.data) {
+    // Chờ 800ms và thử lại 1 lần để chống lệch pha read-after-write trên Supabase Cloud
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    res = await getCaseBySlug(slug);
+  }
 
   if (!res.success || !res.data) {
     notFound();
