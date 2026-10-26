@@ -7,14 +7,13 @@ import type {
 } from "@/components/investigation/hero-interactive";
 import type { DbCaseBoardNode } from "@/lib/types/database";
 import {
-  getBoardNodes,
   saveBoardNode,
   deleteBoardNode,
   saveBoardNodesBatch,
   saveBoardgamePinPositions,
-  getBoardgamePinPositions,
   type BoardNodeDraft,
 } from "@/lib/actions/board-actions";
+import { useBoardModel } from "@/components/investigation/mindmap/canvas/use-board-model";
 import { toast } from "@/components/ui/toast";
 
 export interface BoardEditorSnapshot {
@@ -24,8 +23,9 @@ export interface BoardEditorSnapshot {
   positions: Record<string, { x: number; y: number }>;
 }
 
-export function useBoardEditor(caseId: string) {
-  const [isLoading, setIsLoading] = useState(true);
+export function useBoardEditor(caseId: string, options?: { isMobile?: boolean }) {
+  const boardModel = useBoardModel(caseId, { isMobile: options?.isMobile });
+
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -40,79 +40,29 @@ export function useBoardEditor(caseId: string) {
     future: BoardEditorSnapshot[];
   }>({ past: [], future: [] });
 
+  // Đồng bộ từ boardModel khi nạp xong hoặc khi refresh
+  useEffect(() => {
+    if (!boardModel.isLoading) {
+      setNodes(boardModel.boardNodes);
+      setPins(boardModel.pins);
+      setConnections(boardModel.connections);
+      setPositions(boardModel.positions);
+      setHasUnsavedChanges(false);
+    }
+  }, [
+    boardModel.isLoading,
+    boardModel.boardNodes,
+    boardModel.pins,
+    boardModel.connections,
+    boardModel.positions,
+  ]);
+
   const currentSnapshot = useCallback((): BoardEditorSnapshot => ({
     nodes: [...nodes],
     pins: [...pins],
     connections: [...connections],
     positions: { ...positions },
   }), [nodes, pins, connections, positions]);
-
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [nodesRes, boardgameRes] = await Promise.all([
-        getBoardNodes(caseId),
-        getBoardgamePinPositions(caseId),
-      ]);
-
-      const loadedNodes = nodesRes.success ? nodesRes.data : [];
-      setNodes(loadedNodes);
-
-      // Loại bỏ các pin trùng ID với node từ bảng case_board_nodes để tránh bị vẽ đè 2 lần
-      const nodeIds = new Set(loadedNodes.map((n) => n.id));
-      const loadedPins: PinPoint[] = boardgameRes.success
-        ? boardgameRes.pins
-            .filter((p) => !nodeIds.has(p.id))
-            .map((p) => ({
-              id: p.id,
-              nodeKind: "custom",
-              x: p.x,
-              y: p.y,
-              label: p.label || p.id,
-              detail: p.detail || "",
-              photoUrl: p.photoUrl || undefined,
-              noteColor: (p.noteColor as any) || "white",
-              pinColor: (p.pinColor as any) || "red",
-              scale: p.scale ?? 1.0,
-              rotation: p.rotation ?? 0,
-            }))
-        : [];
-      setPins(loadedPins);
-
-      const posMap: Record<string, { x: number; y: number }> = {};
-      loadedNodes.forEach((n) => {
-        const pos = (n.config as any)?.position?.desktop;
-        if (pos && typeof pos.x === "number" && typeof pos.y === "number") {
-          posMap[n.id] = { x: pos.x, y: pos.y };
-        }
-      });
-      loadedPins.forEach((p) => {
-        posMap[p.id] = { x: p.x, y: p.y };
-      });
-      setPositions(posMap);
-
-      const loadedConns: CaseConnection[] = boardgameRes.success && boardgameRes.connections
-        ? boardgameRes.connections.map((c) => ({
-            id: c.id,
-            fromPinId: c.fromPinId,
-            toPinId: c.toPinId,
-          }))
-        : [];
-      setConnections(loadedConns);
-
-      historyRef.current = { past: [], future: [] };
-      setHasUnsavedChanges(false);
-    } catch (err: unknown) {
-      console.error("Failed to load board editor data:", err);
-      toast.error("Không thể tải dữ liệu bảng điều tra");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [caseId]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   const commitSnapshot = useCallback((before: BoardEditorSnapshot) => {
     historyRef.current.past.push(before);
@@ -179,7 +129,7 @@ export function useBoardEditor(caseId: string) {
         }),
       );
 
-      // Cập nhật vị trí trong pins nếu là custom pin
+      // Cập nhật vị trí trong pins nếu là custom pin hoặc checkpoint pin
       setPins((prev) =>
         prev.map((pin) => (pin.id === pinId ? { ...pin, x, y } : pin)),
       );
@@ -232,14 +182,14 @@ export function useBoardEditor(caseId: string) {
         }
 
         toast.success("Đã lưu node thành công");
-        await loadData();
+        await boardModel.refresh();
         return true;
       } catch (err: unknown) {
         toast.error("Lỗi khi lưu node");
         return false;
       }
     },
-    [currentSnapshot, commitSnapshot, loadData],
+    [currentSnapshot, commitSnapshot, boardModel],
   );
 
   const handleDeleteNode = useCallback(
@@ -301,7 +251,7 @@ export function useBoardEditor(caseId: string) {
         await saveBoardNodesBatch(batchNodes);
       }
 
-      // 2. Lưu pins & connections qua saveBoardgamePinPositions
+      // 2. Lưu toàn bộ pins & connections qua saveBoardgamePinPositions
       await saveBoardgamePinPositions(
         caseId,
         pins.map((p) => ({
@@ -324,34 +274,14 @@ export function useBoardEditor(caseId: string) {
   }, [caseId, nodes, pins, connections, positions]);
 
   // Ghép toàn bộ pins hiển thị trên canvas
-  const displayPins: PinPoint[] = [
-    ...nodes.map((n) => {
-      const cfg = (n.config as any) || {};
-      const pos = positions[n.id] || cfg.position?.desktop || { x: 0.5, y: 0.5 };
-      return {
-        id: n.id,
-        nodeKind: n.node_kind as any,
-        subjectKey: n.subject_key || undefined,
-        checkpointId: n.checkpoint_id || undefined,
-        x: pos.x,
-        y: pos.y,
-        label: cfg.pin_title || n.title || n.id,
-        detail: n.title || "",
-        photoUrl: cfg.photo_url || undefined,
-        scale: cfg.scale ?? 1.0,
-        rotation: cfg.rotation ?? 0,
-        noteColor: (cfg.note_style ? "white" : undefined) as "white" | undefined,
-      };
-    }),
-    ...pins.map((p) => {
-      const pos = positions[p.id] || { x: p.x, y: p.y };
-      return {
-        ...p,
-        x: pos.x,
-        y: pos.y,
-      };
-    }),
-  ];
+  const displayPins: PinPoint[] = pins.map((p) => {
+    const pos = positions[p.id] || { x: p.x, y: p.y };
+    return {
+      ...p,
+      x: pos.x,
+      y: pos.y,
+    };
+  });
 
   const selectedNode =
     nodes.find((n) => n.id === selectedNodeId) ||
@@ -359,7 +289,7 @@ export function useBoardEditor(caseId: string) {
     null;
 
   return {
-    isLoading,
+    isLoading: boardModel.isLoading,
     isSaving,
     hasUnsavedChanges,
     nodes,
