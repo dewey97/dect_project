@@ -168,6 +168,15 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
         }
 
         toast.success("Đã lưu node thành công");
+        if (res.data) {
+          setNodes((prev) => {
+            const exists = prev.some((n) => n.id === res.data!.id);
+            if (exists) {
+              return prev.map((n) => (n.id === res.data!.id ? res.data! : n));
+            }
+            return [...prev, res.data!];
+          });
+        }
         await boardModel.refresh();
         return true;
       } catch (err: unknown) {

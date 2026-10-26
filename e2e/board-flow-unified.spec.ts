@@ -31,7 +31,7 @@ test.describe("B23: Gộp Flow + Board thành một mặt phẳng duy nhất tro
     await expect(page.getByRole("button", { name: "+ Checkpoint" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Thêm Node" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Lưu Bố Cục" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Chơi Thử" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Chơi Thử", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Lớp logic" })).toBeVisible();
 
     // 5. Canvas bảng điều tra render

@@ -24,7 +24,7 @@ test.describe("Board Studio trong Checkpoint Studio", () => {
     ).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole("button", { name: "Thêm Node" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Lưu Bố Cục" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Chơi Thử" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Chơi Thử", exact: true })).toBeVisible();
 
     // 3. Canvas bảng điều tra render
     const canvas = page.locator("canvas");
