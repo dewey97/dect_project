@@ -180,11 +180,16 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
             name: /Tạo nhân vật|Lưu thay đổi/i,
           });
           await expect(saveBtn).toBeVisible();
+          await expect(saveBtn).toBeEnabled({ timeout: 15_000 });
           await saveBtn.click();
 
           await expect(
+            page.locator('[data-studio-ready="true"]').first(),
+          ).toBeVisible({ timeout: 15_000 });
+          await expect(
             page.locator("aside").getByText(char.name),
           ).toBeVisible({ timeout: 15_000 });
+          await expect(saveBtn).toBeEnabled({ timeout: 15_000 });
         }
       });
 

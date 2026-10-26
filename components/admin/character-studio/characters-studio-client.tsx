@@ -187,6 +187,7 @@ export function CharactersStudioClient({
     }));
 
   const handleSave = () => {
+    if (isPending || isUploadingAvatar) return;
     startTransition(async () => {
       const res = await saveCharacter({
         ...draft,
@@ -195,7 +196,7 @@ export function CharactersStudioClient({
         device: draft.role === "victim" ? draft.device : null,
       });
       if (!res.success) {
-        toast.error(res.error);
+        toast.error(res.error || "Không lưu được nhân vật.");
         return;
       }
       setCharacters((prev) =>
@@ -516,11 +517,15 @@ export function CharactersStudioClient({
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || isUploadingAvatar}
               className="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-60"
             >
               <Save className="size-4" />{" "}
-              {draft.id ? "Lưu thay đổi" : "Tạo nhân vật"}
+              {isPending
+                ? "Đang lưu..."
+                : draft.id
+                  ? "Lưu thay đổi"
+                  : "Tạo nhân vật"}
             </button>
             {draft.id && (
               <button
