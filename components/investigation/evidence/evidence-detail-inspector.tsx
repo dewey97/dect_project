@@ -25,7 +25,7 @@ export function EvidenceDetailInspector({
 
   if (!selectedView) {
     return (
-      <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] items-center justify-center p-8 text-center text-[#8c745f] h-full">
+      <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-0 rounded-none items-center justify-center p-8 text-center text-[#8c745f] h-full">
         <p className="font-mono text-xs uppercase tracking-wider">
           Chọn một tài liệu trong khay hồ sơ để bắt đầu điều tra
         </p>
@@ -57,7 +57,7 @@ export function EvidenceDetailInspector({
   const hasValidPdfUrl = Boolean(pdfUrl && pdfUrl.trim() !== "");
 
   return (
-    <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-2 border-[#3d2c1e] rounded-none shadow-[0_25px_60px_rgba(0,0,0,0.95)] overflow-hidden flex-col h-full relative">
+    <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex-col h-full relative">
       {dossierTitle && (
         <div
           data-testid="evidence-inspector-breadcrumb"

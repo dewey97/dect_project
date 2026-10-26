@@ -3,10 +3,11 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 import { getStorageJson, setStorageJson } from '@/lib/storage'
 import { useRoomSync } from '@/components/investigation/room-sync-context'
+import { recordAnnotationStroke } from '@/lib/annotation-history'
 import type { AnnotationStroke } from '@/lib/types/room'
 
 export type AnnotationTool = 'cursor' | 'pen' | 'highlighter' | 'eraser'
-export type AnnotationColor = '#dc2626' | '#2563eb' | '#16a34a' | '#eab308' | '#9333ea' | '#171717'
+export type AnnotationColor = string
 export type { AnnotationStroke }
 
 interface DossierAnnotationLayerProps {
@@ -76,6 +77,59 @@ export function DossierAnnotationLayer({
       }
     }
   }, [onClearTrigger, storageKey, roomCode, documentId, syncUpdate])
+
+  // Lắng nghe sự kiện Hoàn tác (Undo Ctrl+Z) và Làm lại (Redo Ctrl+Y)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const handleUndo = (e: Event) => {
+      const customEvent = e as CustomEvent<{ documentId: string; strokeId?: string }>
+      if (customEvent.detail?.documentId !== documentId) return
+
+      setStrokes((prev) => {
+        if (prev.length === 0) return prev
+        let next: AnnotationStroke[]
+        if (customEvent.detail?.strokeId) {
+          next = prev.filter((s) => s.id !== customEvent.detail.strokeId)
+        } else {
+          next = prev.slice(0, -1)
+        }
+        setStorageJson(storageKey, next)
+        if (roomCode) {
+          syncUpdate(
+            { annotations: { [documentId]: next } },
+            `đã hoàn tác nét vẽ trên hồ sơ ${documentId}`
+          )
+        }
+        return next
+      })
+    }
+
+    const handleRedo = (e: Event) => {
+      const customEvent = e as CustomEvent<{ documentId: string; stroke: AnnotationStroke }>
+      if (customEvent.detail?.documentId !== documentId) return
+      if (!customEvent.detail?.stroke) return
+
+      setStrokes((prev) => {
+        const next = [...prev, customEvent.detail.stroke]
+        setStorageJson(storageKey, next)
+        if (roomCode) {
+          syncUpdate(
+            { annotations: { [documentId]: next } },
+            `đã làm lại nét vẽ trên hồ sơ ${documentId}`
+          )
+        }
+        return next
+      })
+    }
+
+    window.addEventListener('dossier:annotation-undo', handleUndo)
+    window.addEventListener('dossier:annotation-redo', handleRedo)
+    return () => {
+      window.removeEventListener('dossier:annotation-undo', handleUndo)
+      window.removeEventListener('dossier:annotation-redo', handleRedo)
+    }
+  }, [documentId, storageKey, roomCode, syncUpdate])
 
   // Render canvas
   const redrawCanvas = useCallback(() => {
@@ -290,6 +344,7 @@ export function DossierAnnotationLayer({
       const newStrokes = [...strokes, roundedStroke]
       setStrokes(newStrokes)
       setStorageJson(storageKey, newStrokes)
+      recordAnnotationStroke(documentId, roundedStroke)
 
       if (roomCode) {
         syncUpdate(

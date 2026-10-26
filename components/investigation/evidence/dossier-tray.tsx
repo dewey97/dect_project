@@ -1,13 +1,13 @@
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   FileText,
   ImageIcon,
   Target,
   FolderOpen,
-  Search,
-  X,
+  ChevronRight,
 } from "lucide-react";
 import { cn, normalizeImageUrl } from "@/lib/utils";
+import { emitInvestigationEvent } from "@/lib/investigation-events";
 import type {
   CombinedItem,
   PDFDocument,
@@ -20,6 +20,7 @@ interface DossierTrayProps {
   className?: string;
   dossierWidth: number;
   isDossierCollapsed: boolean;
+  onToggleCollapse?: () => void;
   isViewerExpanded: boolean;
   mobileTab: "board" | "dossier";
   filterTab: "pdf" | "evidence";
@@ -56,6 +57,7 @@ interface DossierTrayProps {
 export function DossierTray({
   dossierWidth,
   isDossierCollapsed,
+  onToggleCollapse,
   isViewerExpanded,
   mobileTab,
   filterTab,
@@ -75,71 +77,98 @@ export function DossierTray({
   activePing,
   onBroadcastPing,
 }: DossierTrayProps) {
-  const [searchQuery, setSearchQuery] = useState("");
+  // Nhóm tài liệu theo từng tập hồ sơ (hiển thị nối tiếp từ trên xuống dưới)
+  const groupedPdfs = useMemo(() => {
+    const orderedDossiers = [...dossiers].sort((a, b) => {
+      const slotA =
+        typeof (a as any).slot_index === "number" ? (a as any).slot_index : 0;
+      const slotB =
+        typeof (b as any).slot_index === "number" ? (b as any).slot_index : 0;
+      return slotA - slotB;
+    });
 
-  const activeFilter = String(
-    selectedDossierFilter || selectedPhaseFilter || "all",
-  );
+    const groupsMap = new Map<
+      string,
+      { key: string; title: string; items: CombinedItem[] }
+    >();
 
-  const chips = useMemo(() => {
-    const list: { label: string; val: string }[] = [
-      { label: "Tất cả", val: "all" },
-    ];
-    if (dossiers && dossiers.length > 0) {
-      dossiers.forEach((d) => {
-        list.push({ label: d.title, val: d.dossier_key });
+    orderedDossiers.forEach((d) => {
+      groupsMap.set(d.dossier_key, {
+        key: d.dossier_key,
+        title: d.title,
+        items: [],
       });
-    } else {
-      list.push(
-        { label: "Ban Đầu", val: "ban_dau" },
-        { label: "Bộ A", val: "bo_a" },
-        { label: "Bộ B", val: "bo_b" },
-        { label: "Bộ C", val: "bo_c" },
-        { label: "Kết Luận", val: "ket_luan" },
-      );
-    }
-    list.push(
-      { label: "Vật chứng", val: "evidence" },
-      { label: "Chưa gán bộ", val: "unassigned" },
-    );
-    return list;
-  }, [dossiers]);
-
-  const handleFilterSelect = (val: string) => {
-    if (val === "evidence") {
-      onSetFilterTab("evidence");
-    }
-    if (onSetDossierFilter) {
-      onSetDossierFilter(val);
-    }
-    if (onSetPhaseFilter) {
-      onSetPhaseFilter(val);
-    }
-  };
-
-  // Lọc tài liệu theo từ khóa tìm kiếm
-  const filteredPdfs = useMemo(() => {
-    if (!searchQuery.trim()) return pdfItems;
-    const q = searchQuery.toLowerCase().trim();
-    return pdfItems.filter((item) => {
-      const pdf = item.data as PDFDocument;
-      const code = (pdf.code || "").toLowerCase();
-      const title = (item.data.title || "").toLowerCase();
-      return code.includes(q) || title.includes(q);
     });
-  }, [pdfItems, searchQuery]);
 
-  // Lọc vật chứng theo từ khóa tìm kiếm
-  const filteredEvidence = useMemo(() => {
-    if (!searchQuery.trim()) return evidenceItems;
-    const q = searchQuery.toLowerCase().trim();
-    return evidenceItems.filter((item) => {
-      const ev = item.data as PhysicalEvidence;
-      const code = (ev.code || "").toLowerCase();
-      const title = (item.data.title || "").toLowerCase();
-      return code.includes(q) || title.includes(q);
+    if (groupsMap.size === 0) {
+      [
+        { key: "ban_dau", title: "Hồ sơ ban đầu" },
+        { key: "bo_a", title: "Bộ A - Hiện trường" },
+        { key: "bo_b", title: "Bộ B - Lời khai & Pháp y" },
+        { key: "bo_c", title: "Bộ C - Mở rộng điều tra" },
+        { key: "ket_luan", title: "Hồ sơ kết luận" },
+      ].forEach((g) => {
+        groupsMap.set(g.key, { ...g, items: [] });
+      });
+    }
+
+    const unassignedGroup: {
+      key: string;
+      title: string;
+      items: CombinedItem[];
+    } = {
+      key: "unassigned",
+      title: "Chưa phân loại",
+      items: [],
+    };
+
+    pdfItems.forEach((item) => {
+      const pdfDoc = item.data as PDFDocument;
+      const dKey = item.dossierKey || pdfDoc?.dossierKey;
+      const dTitle = item.dossierTitle || pdfDoc?.dossierTitle;
+
+      if (dKey && groupsMap.has(dKey)) {
+        groupsMap.get(dKey)!.items.push(item);
+      } else if (dKey) {
+        groupsMap.set(dKey, {
+          key: dKey,
+          title: dTitle || dKey,
+          items: [item],
+        });
+      } else {
+        let mappedKey: string | null = null;
+        if (item.phase === 0) mappedKey = "ban_dau";
+        else if (item.phase === 1) mappedKey = "bo_a";
+        else if (item.phase === 2) mappedKey = "bo_b";
+        else if (item.phase === 3) mappedKey = "bo_c";
+        else if (item.phase === 4) mappedKey = "ket_luan";
+
+        if (mappedKey && groupsMap.has(mappedKey)) {
+          groupsMap.get(mappedKey)!.items.push(item);
+        } else {
+          unassignedGroup.items.push(item);
+        }
+      }
     });
-  }, [evidenceItems, searchQuery]);
+
+    const result: { key: string; title: string; items: CombinedItem[] }[] = [];
+    groupsMap.forEach((g) => {
+      if (g.items.length > 0) {
+        g.items.sort((a, b) => a.order - b.order);
+        result.push(g);
+      }
+    });
+
+    if (unassignedGroup.items.length > 0) {
+      unassignedGroup.items.sort((a, b) => a.order - b.order);
+      result.push(unassignedGroup);
+    }
+
+    return result;
+  }, [dossiers, pdfItems]);
+
+  const filteredPdfs = pdfItems;
+  const filteredEvidence = evidenceItems;
 
   return (
     <div
@@ -147,7 +176,7 @@ export function DossierTray({
         width: isDossierCollapsed ? 0 : `${dossierWidth}px`,
       }}
       className={cn(
-        "w-full lg:w-auto shrink-0 bg-[#130f0c] border-l border-[#261b12] rounded-none overflow-hidden flex flex-col h-full min-h-0 select-none transition-[width] duration-150 ease-out",
+        "w-full lg:w-auto shrink-0 bg-[#0f1115] border-l border-[#1e232b] rounded-none overflow-hidden flex flex-col h-full min-h-0 select-none transition-[width] duration-150 ease-out",
         isDossierCollapsed && "lg:hidden",
         isViewerExpanded && "hidden xl:flex",
         mobileTab === "dossier" ? "flex" : "hidden lg:flex",
@@ -156,29 +185,41 @@ export function DossierTray({
       {/* 1. SIDEBAR HEADER: TÊN DANH MỤC + TỔNG SỐ LƯỢNG */}
       <div className="shrink-0 px-3 pt-3 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0">
-          <FolderOpen className="size-4 text-[#d9a066] shrink-0" />
-          <span className="font-sans text-xs font-semibold tracking-wide text-[#e8dcce] uppercase truncate">
+          <FolderOpen className="size-4 text-zinc-300 shrink-0" />
+          <span className="font-sans text-xs font-semibold tracking-wide text-zinc-200 uppercase truncate">
             Hồ sơ & Vật chứng
           </span>
         </div>
-        <span className="font-mono text-[10px] text-[#9c8472] bg-[#1d1510] px-1.5 py-0.5 rounded border border-[#302115] shrink-0">
-          {filterTab === "pdf"
-            ? `${filteredPdfs.length} tài liệu`
-            : `${filteredEvidence.length} vật chứng`}
-        </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="font-mono text-[10px] text-zinc-400 bg-[#161a22] px-1.5 py-0.5 rounded border border-[#262c37]">
+            {filterTab === "pdf"
+              ? `${filteredPdfs.length} tài liệu`
+              : `${filteredEvidence.length} vật chứng`}
+          </span>
+          {onToggleCollapse && (
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              className="hidden lg:flex size-6 items-center justify-center rounded hover:bg-[#1b202a] text-zinc-400 hover:text-zinc-100 transition-colors cursor-pointer border border-[#262c37]"
+              title="Thu gọn khay hồ sơ"
+            >
+              <ChevronRight className="size-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 2. MODERN SEGMENTED TABS (TÀI LIỆU | VẬT CHỨNG) */}
       <div className="shrink-0 px-3 pb-2">
-        <div className="p-1 bg-[#0b0806] rounded-md border border-[#23170e] flex items-center gap-1">
+        <div className="p-1 bg-[#090b0e] rounded-md border border-[#1b2029] flex items-center gap-1">
           <button
             type="button"
             onClick={() => onSetFilterTab("pdf")}
             className={cn(
               "flex-1 py-1.5 px-2 rounded-sm font-sans text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer",
               filterTab === "pdf"
-                ? "bg-[#291b12] text-[#f4e8d8] font-semibold border border-[#442e1f] shadow-xs"
-                : "text-[#846f5d] hover:text-[#d4c3b3] hover:bg-[#160f09]",
+                ? "bg-[#1c2330] text-zinc-100 font-semibold border border-[#2d3748] shadow-xs"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-[#13171f]",
             )}
           >
             <FileText className="size-3.5 shrink-0" />
@@ -187,8 +228,8 @@ export function DossierTray({
               className={cn(
                 "font-mono text-[10px] px-1.5 py-0.2 rounded-full leading-none",
                 filterTab === "pdf"
-                  ? "bg-[#3d2719] text-[#e8a86a]"
-                  : "bg-[#18110b] text-[#6d5b4d]",
+                  ? "bg-[#2d3748] text-zinc-200"
+                  : "bg-[#141820] text-zinc-500",
               )}
             >
               {pdfItems.length}
@@ -201,8 +242,8 @@ export function DossierTray({
             className={cn(
               "flex-1 py-1.5 px-2 rounded-sm font-sans text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer",
               filterTab === "evidence"
-                ? "bg-[#291b12] text-[#f4e8d8] font-semibold border border-[#442e1f] shadow-xs"
-                : "text-[#846f5d] hover:text-[#d4c3b3] hover:bg-[#160f09]",
+                ? "bg-[#1c2330] text-zinc-100 font-semibold border border-[#2d3748] shadow-xs"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-[#13171f]",
             )}
           >
             <ImageIcon className="size-3.5 shrink-0" />
@@ -211,8 +252,8 @@ export function DossierTray({
               className={cn(
                 "font-mono text-[10px] px-1.5 py-0.2 rounded-full leading-none",
                 filterTab === "evidence"
-                  ? "bg-[#3d2719] text-[#e8a86a]"
-                  : "bg-[#18110b] text-[#6d5b4d]",
+                  ? "bg-[#2d3748] text-zinc-200"
+                  : "bg-[#141820] text-zinc-500",
               )}
             >
               {evidenceItems.length}
@@ -221,72 +262,20 @@ export function DossierTray({
         </div>
       </div>
 
-      {/* 3. TÌM KIẾM NHANH (SEARCH INPUT) */}
-      <div className="shrink-0 px-3 pb-2">
-        <div className="relative flex items-center">
-          <Search className="size-3.5 absolute left-2.5 text-[#6c5746] pointer-events-none shrink-0" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={
-              filterTab === "pdf"
-                ? "Tìm mã hoặc tên tài liệu..."
-                : "Tìm tên hoặc mã vật chứng..."
-            }
-            className="w-full pl-8 pr-7 py-1.5 bg-[#0b0806] border border-[#23170e] focus:border-[#d9a066]/60 rounded-md text-xs text-[#e5d8cb] placeholder:text-[#5e4b3c] outline-none transition-colors"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-2 p-0.5 text-[#846f5d] hover:text-[#f4e8d8] cursor-pointer"
-              title="Xóa tìm kiếm"
-            >
-              <X className="size-3" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* 4. DOSSIER FILTER CHIPS (TẤT CẢ / CÁC BỘ HỒ SƠ / VẬT CHỨNG / CHƯA GÁN BỘ) */}
-      <div className="shrink-0 px-3 pb-2.5 flex items-center gap-1 overflow-x-auto custom-scrollbar border-b border-[#23170e]">
-        {chips.map((chip) => {
-          const isLocked = isDossierUnlocked
-            ? !isDossierUnlocked(chip.val)
-            : false;
-          const isSelected = activeFilter === chip.val;
-          return (
-            <button
-              key={chip.val}
-              disabled={isLocked}
-              onClick={() => handleFilterSelect(chip.val)}
-              className={cn(
-                "px-2 py-1 rounded text-[11px] font-sans font-medium transition-all whitespace-nowrap",
-                isLocked
-                  ? "opacity-25 cursor-not-allowed text-[#5a483a]"
-                  : isSelected
-                    ? "bg-[#d9a066] text-[#120a05] font-bold shadow-xs cursor-default"
-                    : "text-[#846f5d] hover:text-[#d4c3b3] hover:bg-[#1a120b] cursor-pointer",
-              )}
-            >
-              {chip.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 5. DANH SÁCH CUỘN CHÍNH (MAIN SCROLLABLE CONTENT) */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 p-2 space-y-1.5">
+      {/* 3. DANH SÁCH CUỘN CHÍNH: TÀI LIỆU NHÓM THEO TẬP HỒ SƠ TỪ TRÊN XUỐNG, VẬT CHỨNG HIỂN THỊ LƯỚI KHÔNG NHÓM */}
+      <div
+        className={cn(
+          "flex-1 overflow-y-auto custom-scrollbar min-h-0",
+          filterTab === "evidence" ? "p-2" : "p-0",
+        )}
+      >
         {filterTab === "evidence" ? (
-          /* DANH SÁCH VẬT CHỨNG: 2 CỘT GRID HIỆN ĐẠI */
+          /* DANH SÁCH VẬT CHỨNG: 2 CỘT GRID HIỆN ĐẠI (KHÔNG NHÓM) */
           filteredEvidence.length === 0 ? (
             <div className="py-12 px-4 text-center">
-              <ImageIcon className="size-8 text-[#3d2c1e] mx-auto mb-2" />
-              <p className="text-xs font-sans text-[#78614e]">
-                {searchQuery
-                  ? "Không tìm thấy vật chứng phù hợp."
-                  : "Chưa thu thập vật chứng nào."}
+              <ImageIcon className="size-8 text-zinc-600 mx-auto mb-2" />
+              <p className="text-xs font-sans text-zinc-500">
+                Chưa thu thập vật chứng nào.
               </p>
             </div>
           ) : (
@@ -307,14 +296,20 @@ export function DossierTray({
                   <div
                     id={`doc-card-${item.data.id}`}
                     key={`evidence-${item.data.id}`}
-                    onClick={() => onSelectEvidence(evItem)}
+                    onClick={() => {
+                      onSelectEvidence(evItem);
+                      emitInvestigationEvent("FOCUS_CANVAS_DOC", {
+                        code: evItem.code || evItem.id,
+                        id: item.data.id,
+                      });
+                    }}
                     className={cn(
-                      "w-full aspect-[4/3] text-left rounded-md border transition-all duration-150 cursor-pointer relative overflow-hidden group bg-[#090705]",
+                      "w-full aspect-[4/3] text-left rounded-md border transition-all duration-150 cursor-pointer relative overflow-hidden group bg-[#0c0e12]",
                       isPinged
-                        ? "border-amber-400 ring-2 ring-amber-400/80 shadow-[0_0_16px_rgba(245,158,11,0.5)] animate-pulse"
+                        ? "border-rose-500/70 ring-1 ring-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.3)]"
                         : isSelected
-                          ? "border-[#d9a066] ring-1 ring-[#d9a066] shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
-                          : "border-[#261b12] hover:border-[#4d3624]",
+                          ? "border-zinc-300 ring-1 ring-zinc-300/40 shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
+                          : "border-[#1f2530] hover:border-[#323d4e]",
                     )}
                   >
                     <img
@@ -332,11 +327,11 @@ export function DossierTray({
                     {/* Nhãn mã số + tiêu đề ở chân thẻ */}
                     <div className="absolute bottom-1.5 left-1.5 right-1.5 pointer-events-none">
                       {evItem?.code && (
-                        <span className="inline-block px-1.5 py-0.5 rounded-xs bg-[#1a120c]/90 text-[0.6rem] font-mono font-bold tracking-wider text-[#e8a86a] border border-[#3d2719] mb-0.5">
+                        <span className="inline-block px-1.5 py-0.5 rounded-xs bg-[#141820]/95 text-[0.6rem] font-mono font-bold tracking-wider text-zinc-200 border border-[#2b3545] mb-0.5">
                           {evItem.code}
                         </span>
                       )}
-                      <p className="text-[11px] font-sans text-stone-200 truncate leading-tight">
+                      <p className="text-[11px] font-sans text-zinc-200 truncate leading-tight">
                         {item.data.title}
                       </p>
                     </div>
@@ -356,16 +351,16 @@ export function DossierTray({
                           },
                         );
                       }}
-                      className="absolute top-1.5 right-1.5 size-6 rounded bg-black/75 hover:bg-amber-500 text-stone-300 hover:text-black border border-white/15 transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer shadow-sm z-10"
+                      className="absolute top-1.5 right-1.5 size-6 rounded bg-black/80 hover:bg-rose-600 text-zinc-300 hover:text-white border border-white/15 transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer shadow-sm z-10"
                       title="Chỉ điểm vật chứng này cho đồng đội"
                     >
                       <Target className="size-3.5" />
                     </button>
 
-                    {/* Badge đồng đội đang chỉ điểm */}
+                    {/* Badge đồng đội đang chỉ điểm (gọn gàng, tinh tế) */}
                     {isPinged && activePing && (
-                      <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-amber-500 text-black font-mono text-[0.6rem] font-bold tracking-wider shadow-md flex items-center gap-1 z-10 animate-bounce">
-                        <Target className="size-2.5" />
+                      <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-black/85 backdrop-blur-md border border-rose-500/40 text-rose-300 font-mono text-[9px] leading-tight flex items-center gap-1 z-10 shadow-sm animate-pulse">
+                        <span className="size-1.5 rounded-full bg-rose-400 animate-ping" />
                         <span className="truncate max-w-[70px]">
                           {activePing.actorName}
                         </span>
@@ -376,139 +371,130 @@ export function DossierTray({
               })}
             </div>
           )
-        ) : /* DANH SÁCH HỒ SƠ TÀI LIỆU: SIDEBAR LIST ITEMS HIỆN ĐẠI */
-        filteredPdfs.length === 0 ? (
+        ) : /* DANH SÁCH HỒ SƠ TÀI LIỆU: NHÓM THEO TẬP HỒ SƠ, NGĂN BẰNG LINE, MÃ + TÊN CÙNG DÒNG */
+        groupedPdfs.length === 0 ? (
           <div className="py-12 px-4 text-center">
-            <FileText className="size-8 text-[#3d2c1e] mx-auto mb-2" />
-            <p className="text-xs font-sans text-[#78614e]">
-              {searchQuery
-                ? "Không tìm thấy tài liệu phù hợp."
-                : "Chưa có tài liệu trong giai đoạn này."}
+            <FileText className="size-8 text-zinc-600 mx-auto mb-2" />
+            <p className="text-xs font-sans text-zinc-500">
+              Chưa có tài liệu trong giai đoạn này.
             </p>
           </div>
         ) : (
-          filteredPdfs.map((item) => {
-            const isSelected =
-              selectedView?.type === item.type &&
-              selectedView?.data.id === item.data.id;
-            const pdfDoc = item.data as PDFDocument;
-            const code = pdfDoc?.code || "DOC";
-            const title = item.data.title || "";
-            const titleLower = title.toLowerCase();
-
-            const isLyLich =
-              titleLower.includes("lý lịch") ||
-              titleLower.includes("nhân thân");
-            const isLoiKhai =
-              titleLower.includes("lời khai") ||
-              titleLower.includes("hỏi cung") ||
-              titleLower.includes("tự thú");
-            const isHuongDan =
-              code === "00-HD" || titleLower.includes("hướng dẫn");
-
-            const badgeText = isLyLich
-              ? "Lý lịch"
-              : isLoiKhai
-                ? "Lời khai"
-                : isHuongDan
-                  ? "Chỉ dẫn"
-                  : "Hồ sơ";
-
-            const badgeColor = isLyLich
-              ? "text-rose-400 bg-rose-950/40 border-rose-900/40"
-              : isLoiKhai
-                ? "text-sky-400 bg-sky-950/40 border-sky-900/40"
-                : isHuongDan
-                  ? "text-emerald-400 bg-emerald-950/40 border-emerald-900/40"
-                  : "text-amber-400 bg-amber-950/40 border-amber-900/40";
-
-            const isPinged =
-              activePing?.targetId === item.data.id ||
-              Boolean(code && activePing?.targetId === code);
-
-            return (
-              <div
-                id={`doc-card-${item.data.id}`}
-                key={`pdf-${item.data.id}`}
-                onClick={() => onSelectPdf(pdfDoc)}
-                className={cn(
-                  "w-full text-left p-2.5 rounded-md transition-all duration-150 cursor-pointer relative overflow-hidden group select-none border",
-                  isPinged
-                    ? "bg-amber-950/30 border-amber-400 ring-2 ring-amber-400/80 shadow-[0_0_16px_rgba(245,158,11,0.4)] animate-pulse"
-                    : isSelected
-                      ? "bg-[#21160e] border-[#d9a066]/70 shadow-xs ring-1 ring-[#d9a066]/20"
-                      : "bg-[#150f0a] hover:bg-[#1b130d] border-[#241910] hover:border-[#382618]",
-                )}
-              >
-                {/* Vạch chỉ thị active bên trái */}
-                {isSelected && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#d9a066]" />
-                )}
-
-                {/* Dòng 1: Mã hồ sơ + Badge phân loại + Nút Ping */}
-                <div className="flex items-center justify-between gap-1.5 mb-1 pl-1">
+          <div className="divide-y divide-[#1c222b]">
+            {groupedPdfs.map((group) => (
+              <div key={`pdf-group-${group.key}`} className="w-full">
+                {/* Tiêu đề nhóm tập hồ sơ */}
+                <div className="sticky top-0 z-10 px-3.5 py-1.5 bg-[#12151c]/95 backdrop-blur-sm border-b border-[#1c222b] flex items-center justify-between">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span
-                      className={cn(
-                        "font-mono text-[11px] font-bold tracking-wide transition-colors shrink-0",
-                        isSelected
-                          ? "text-[#d9a066]"
-                          : "text-[#b88c60] group-hover:text-[#e0ad7b]",
-                      )}
-                    >
-                      {code}
-                    </span>
-                    <span
-                      className={cn(
-                        "font-sans text-[10px] px-1.5 py-0.2 rounded border font-medium shrink-0",
-                        badgeColor,
-                      )}
-                    >
-                      {badgeText}
+                    <FolderOpen className="size-3 text-zinc-400 shrink-0" />
+                    <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-zinc-300 truncate">
+                      {group.title}
                     </span>
                   </div>
-
-                  {/* Nút chỉ điểm nhanh */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onBroadcastPing(item.data.id, title, undefined, {
-                        targetType: "doc",
-                        docType: "pdf",
-                      });
-                    }}
-                    className="size-5 rounded hover:bg-amber-500/20 text-[#846f5d] hover:text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center shrink-0"
-                    title="Chỉ điểm tài liệu này cho đồng đội"
-                  >
-                    <Target className="size-3" />
-                  </button>
+                  <span className="font-mono text-[10px] text-zinc-400 bg-[#181d26] px-1.5 py-0.5 rounded border border-[#262f3e] shrink-0 leading-none">
+                    {group.items.length}
+                  </span>
                 </div>
 
-                {/* Badge báo đồng đội đang ping */}
-                {isPinged && activePing && (
-                  <div className="mb-1.5 ml-1 px-1.5 py-0.5 rounded bg-amber-500 text-black font-mono text-[10px] font-bold flex items-center gap-1 shadow-xs">
-                    <Target className="size-2.5 animate-spin shrink-0" />
-                    <span className="truncate">
-                      {activePing.actorName} đang chỉ điểm
-                    </span>
-                  </div>
-                )}
+                {/* Danh sách tài liệu trong nhóm */}
+                <div>
+                  {group.items.map((item) => {
+                    const isSelected =
+                      selectedView?.type === item.type &&
+                      selectedView?.data.id === item.data.id;
+                    const pdfDoc = item.data as PDFDocument;
+                    const code = pdfDoc?.code || "DOC";
+                    const title = item.data.title || "";
 
-                {/* Dòng 2: Tiêu đề tài liệu */}
-                <p
-                  className={cn(
-                    "font-sans text-xs leading-snug line-clamp-2 pl-1 transition-colors",
-                    isSelected
-                      ? "text-[#fbf4eb] font-medium"
-                      : "text-[#beb09f] group-hover:text-[#f2e7db]",
-                  )}
-                >
-                  {title}
-                </p>
+                    const isPinged =
+                      activePing?.targetId === item.data.id ||
+                      Boolean(code && activePing?.targetId === code);
+
+                    return (
+                      <div
+                        id={`doc-card-${item.data.id}`}
+                        key={`pdf-${item.data.id}`}
+                        onClick={() => {
+                          onSelectPdf(pdfDoc);
+                          emitInvestigationEvent("FOCUS_CANVAS_DOC", {
+                            code: pdfDoc.code || pdfDoc.id,
+                            id: item.data.id,
+                          });
+                        }}
+                        className={cn(
+                          "w-full text-left px-3.5 py-3 transition-colors duration-150 cursor-pointer relative group select-none border-b border-[#1c222b] last:border-b-0 flex items-center justify-between gap-2.5",
+                          isPinged
+                            ? "bg-rose-950/20"
+                            : isSelected
+                              ? "bg-white/[0.06]"
+                              : "bg-transparent hover:bg-white/[0.03]",
+                        )}
+                      >
+                        {/* Vạch chỉ thị active / ping bên trái */}
+                        {isSelected ? (
+                          <div className="absolute left-0 top-0 bottom-0 w-[2.5px] bg-zinc-200" />
+                        ) : isPinged ? (
+                          <div className="absolute left-0 top-0 bottom-0 w-[2.5px] bg-rose-400 animate-pulse" />
+                        ) : null}
+
+                        {/* Khối chính trên 1 dòng: Mã + Tiêu đề */}
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <span
+                            className={cn(
+                              "font-mono text-xs font-bold tracking-wide shrink-0",
+                              isSelected
+                                ? "text-zinc-100"
+                                : "text-zinc-400 group-hover:text-zinc-200",
+                            )}
+                          >
+                            {code}
+                          </span>
+
+                          <span
+                            className={cn(
+                              "font-sans text-[13px] truncate transition-colors flex-1",
+                              isSelected
+                                ? "text-zinc-100 font-semibold"
+                                : "text-zinc-300 group-hover:text-white font-normal",
+                            )}
+                            title={title}
+                          >
+                            {title}
+                          </span>
+
+                          {/* Chỉ điểm đồng đội: Gọn gàng ngay cùng dòng */}
+                          {isPinged && activePing && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 font-mono text-[9px] leading-tight animate-pulse shrink-0">
+                              <span className="size-1.5 rounded-full bg-rose-400 animate-ping" />
+                              <span className="truncate max-w-[65px]">
+                                {activePing.actorName}
+                              </span>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Nút chỉ điểm nhanh */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onBroadcastPing(item.data.id, title, undefined, {
+                              targetType: "doc",
+                              docType: "pdf",
+                            });
+                          }}
+                          className="size-6 rounded hover:bg-rose-500/15 text-zinc-500 hover:text-rose-300 opacity-0 group-hover:opacity-100 transition-all cursor-pointer flex items-center justify-center shrink-0"
+                          title="Chỉ điểm tài liệu này cho đồng đội"
+                        >
+                          <Target className="size-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            );
-          })
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -14,9 +14,14 @@ import {
   ChevronRight,
   Loader2,
   Target,
+  PenLine,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRoomSync } from '../room-sync-context'
+import { detectiveAudio } from '@/lib/investigation-audio'
+import { emitInvestigationEvent } from '@/lib/investigation-events'
 import {
   DossierAnnotationLayer,
   type AnnotationTool,
@@ -47,6 +52,11 @@ export function NativePdfAnnotator({
 }: NativePdfAnnotatorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const { broadcastPing } = useRoomSync()
+  const [isAudioMuted, setIsAudioMuted] = useState(() => detectiveAudio.isMuted)
+  const handleToggleAudio = useCallback(() => {
+    const next = detectiveAudio.toggleMute()
+    setIsAudioMuted(next)
+  }, [])
   const [numPages, setNumPages] = useState<number>(0)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [zoom, setZoom] = useState<number>(1)
@@ -359,6 +369,34 @@ export function NativePdfAnnotator({
           title="Tẩy nét vẽ (Chạm vào nét vẽ để xóa)"
         >
           <Eraser className="size-4" />
+        </button>
+
+        {/* VÁCH NGĂN CÁCH BIỆT GIỮA VẼ VÀ SỔ TAY / ÂM THANH */}
+        <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />
+
+        {/* NÚT SỔ TAY THÁM TỬ */}
+        <button
+          type="button"
+          onClick={() => emitInvestigationEvent("OPEN_NOTEBOOK")}
+          className="p-1.5 rounded-lg hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-mono font-medium"
+          title="Mở sổ tay ghi chép thám tử"
+        >
+          <PenLine className="size-4 text-amber-500" />
+          <span className="hidden sm:inline">Sổ tay</span>
+        </button>
+
+        {/* NÚT BẬT / TẮT ÂM THANH TRINH THÁM */}
+        <button
+          type="button"
+          onClick={handleToggleAudio}
+          className="p-1.5 rounded-lg hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec] transition-colors cursor-pointer flex items-center justify-center"
+          title={isAudioMuted ? "Bật âm thanh trinh thám" : "Tắt âm thanh trinh thám"}
+        >
+          {isAudioMuted ? (
+            <VolumeX className="size-4 text-amber-500/60" />
+          ) : (
+            <Volume2 className="size-4 text-amber-400" />
+          )}
         </button>
 
         <div className="w-[1px] h-4 bg-[#4a3625] mx-1" />

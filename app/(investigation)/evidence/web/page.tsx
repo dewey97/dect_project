@@ -44,12 +44,13 @@ import {
   PhaseUnlockedModal,
   type UnlockedModalData,
 } from "@/components/investigation/evidence/phase-unlocked-modal";
-import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
-import { DossierCanvasBoard } from "@/components/investigation/evidence/dossier-canvas-board";
-import { InvestigationMobileNav } from "@/components/investigation/evidence/investigation-mobile-nav";
+import { CanvasInvestigationWorkspace } from "@/components/investigation/evidence/workspaces/canvas-investigation-workspace";
+import { SingleInvestigationWorkspace } from "@/components/investigation/evidence/workspaces/single-investigation-workspace";
+import { MobileInvestigationWorkspace } from "@/components/investigation/evidence/workspaces/mobile-investigation-workspace";
 import { GameDesktopHeader } from "@/components/investigation/evidence/game-desktop-header";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
+import { IndictmentModal } from "@/components/investigation/mindmap/indictment-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
@@ -81,6 +82,7 @@ const ReinvestigationModal = nextDynamic(
 type ActiveModal =
   | "phone"
   | "reinvestigate"
+  | "indictment"
   | "epilogue"
   | "hint"
   | "mobile_pdf"
@@ -159,6 +161,7 @@ function WebEvidencePageContent() {
   }, []);
   const [isReinvestigationExpanded, setIsReinvestigationExpanded] =
     useState(false);
+  const [isBoardOpen, setIsBoardOpen] = useState(false);
   const dossierWidth = 320;
   const workspaceRef = useRef<HTMLDivElement>(null);
 
@@ -177,6 +180,9 @@ function WebEvidencePageContent() {
   const { activePing, broadcastPing, roomCode } = useRoomSync();
 
   // Event bus listeners
+  useInvestigationEvent("OPEN_BOARD", () => setIsBoardOpen(true));
+  useInvestigationEvent("TOGGLE_BOARD", () => setIsBoardOpen((prev) => !prev));
+  useInvestigationEvent("OPEN_INDICTMENT", () => setActiveModal("indictment"));
   useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
   useInvestigationEvent("OPEN_NOTEBOOK", () => setActiveModal("notebook"));
@@ -691,142 +697,94 @@ function WebEvidencePageContent() {
   return (
     <div
       suppressHydrationWarning
-      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-center justify-start box-border min-h-0 min-w-0 select-none"
+      className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-stretch justify-start box-border min-h-0 min-w-0 select-none"
     >
       {/* DESKTOP HEADER (GIỐNG LANDING PAGE, CHỈ HIỂN THỊ TRÊN DESKTOP) */}
       <GameDesktopHeader
         viewMode={viewMode}
         onViewModeChange={handleSetViewMode}
+        isBoardOpen={isBoardOpen}
+        onToggleBoard={() => setIsBoardOpen((prev) => !prev)}
       />
 
-      {/* MOBILE VIEW SWITCHER (CHỈ HIỂN THỊ TRÊN MÀN HÌNH DI ĐỘNG < LG) */}
-      <InvestigationMobileNav
-        mobileTab={mobileTab}
-        filterTab={filterTab}
-        onSelectBoard={() => setMobileTab("board")}
-        onSelectDossierTab={(tab: "pdf" | "evidence") => {
-          setMobileTab("dossier");
-          setFilterTab(tab);
-        }}
-        onOpenNotebook={() => setActiveModal("notebook")}
-      />
-
-      <div
-        ref={workspaceRef}
-        className="w-full max-w-[1920px] flex-1 min-h-0 flex flex-col lg:flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 lg:gap-2.5 p-0 lg:p-2.5"
-      >
-        {/* CỘT 1 (BÊN TRÁI CÙNG): BẢNG GHIM ĐIỀU TRA (TỶ LỆ KHUNG CHUẨN 896/1200 CỦA ẢNH, KHÔNG BỊ CO GIÃN) */}
-        <div
-          className={cn(
-            "h-full shrink-0 aspect-[896/1200] max-w-full relative overflow-hidden flex flex-col min-h-0 select-none",
-            mobileTab === "board" ? "flex w-full lg:w-auto" : "hidden lg:flex",
-          )}
-        >
-          <div className="flex-1 w-full h-full min-h-0 relative overflow-hidden">
-            <MainInvestigationCanvas
-              caseId={caseId}
-              isBoardGame={false}
-              hideTitleBadgeOnMobile={true}
-              onOpenPhoneSimulator={() => setActiveModal("phone")}
-              onOpenReinvestigation={() => setActiveModal("reinvestigate")}
-              onOpenEpilogue={() => setActiveModal("epilogue")}
-              onOpenNotebook={() => setActiveModal("notebook")}
-            />
-          </div>
-        </div>
-
-        {/* CỘT 2 (Ở GIỮA): BÀN HỒ SƠ / PREVIEW CHI TIẾT (CHIẾM TRỌN KHÔNG GIAN CÒN LẠI) */}
-        <div
-          className={cn(
-            "h-full flex-col flex-1 min-w-[320px] min-h-0 overflow-hidden relative",
-            mobileTab === "dossier" ? "flex" : "hidden lg:flex",
-          )}
-        >
-          {activeModal === "phone" ? (
-            /* ĐIỆN THOẠI NHÚNG INLINE — DESKTOP ONLY */
-            <div className="flex-1 h-full flex flex-col min-h-0 overflow-hidden bg-[#0A0A0C]">
-              {/* Toolbar nhỏ phía trên */}
-              <div className="shrink-0 h-10 px-3 flex items-center justify-between bg-[#0A0A0C] border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <span className="size-2 rounded-full bg-[#FF453A] animate-pulse" />
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 font-bold">
-                    Điện thoại nạn nhân
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Link
-                    href="/evidence/victim-phone"
-                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#1C1C1E] text-zinc-400 hover:text-white border border-white/10 text-[11px] font-sans transition-all"
-                  >
-                    <ExternalLink className="size-3" />
-                    <span>Mở riêng</span>
-                  </Link>
-                  <button
-                    onClick={() => setActiveModal(null)}
-                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#1C1C1E] text-zinc-400 hover:text-white border border-white/10 text-[11px] font-sans transition-all cursor-pointer"
-                  >
-                    <X className="size-3" />
-                    <span>Đóng</span>
-                  </button>
-                </div>
-              </div>
-              {/* Phone Simulator */}
-              <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
-                <PhoneSimulator
-                  onClose={() => setActiveModal(null)}
-                  device={caseId ? { caseId } : undefined}
-                />
-              </div>
-            </div>
-          ) : viewMode === "canvas" ? (
-            /* DOSSIER CANVAS BOARD — TRẢI TOÀN BỘ TÀI LIỆU VỤ ÁN */
-            <DossierCanvasBoard
-              caseId={caseId}
-              pdfItems={pdfItems}
-              evidenceItems={evidenceItems}
-              dossierDocuments={dossierDocs}
-              selectedView={selectedView}
-              onSelectPdf={handleSelectPdf}
-              onSelectEvidence={handleSelectEvidence}
-              onOpenInspectModal={(view) => {
-                setSelectedView(view);
-                setActiveModal("mobile_pdf");
-              }}
-              onSwitchToSingleView={() => handleSetViewMode("single")}
-              isExpanded={isViewerExpanded}
-              onToggleExpand={() => setIsViewerExpanded((prev) => !prev)}
-              activeFilter={String(selectedPhaseFilter)}
-            />
-          ) : (
-            /* EVIDENCE DETAIL INSPECTOR — SOI ĐƠN LẺ 1 TÀI LIỆU */
-            <EvidenceDetailInspector
-              selectedView={selectedView}
-              caseId={caseId}
-            />
-          )}
-        </div>
-
-        {/* CỘT 3 (BÊN PHẢI CÙNG): KHAY HỒ SƠ & VẬT CHỨNG (MANILA ARCHIVAL DOSSIER TRAY) */}
-        <DossierTray
-          dossierWidth={dossierWidth}
-          isDossierCollapsed={isDossierCollapsed}
-          isViewerExpanded={isViewerExpanded}
+      {/* 1. MÀN HÌNH DI ĐỘNG (< LG): WORKSPACE RIÊNG BIỆT CHO MOBILE */}
+      <div className="lg:hidden w-full flex-1 min-h-0 flex flex-col overflow-hidden relative">
+        <MobileInvestigationWorkspace
+          caseId={caseId}
           mobileTab={mobileTab}
+          onSelectBoard={() => setMobileTab("board")}
+          onSelectDossierTab={(tab: "pdf" | "evidence") => {
+            setMobileTab("dossier");
+            setFilterTab(tab);
+          }}
           filterTab={filterTab}
           onSetFilterTab={(tab) => setFilterTab(tab)}
           selectedPhaseFilter={selectedPhaseFilter}
           onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
-          isPhaseUnlocked={isPhaseUnlocked}
-          isDossierUnlocked={isDossierUnlocked}
-          dossiers={dossiers}
           pdfItems={pdfItems}
           evidenceItems={evidenceItems}
+          dossiers={dossiers}
           selectedView={selectedView}
           onSelectPdf={handleSelectPdf}
           onSelectEvidence={handleSelectEvidence}
+          isPhaseUnlocked={isPhaseUnlocked}
+          isDossierUnlocked={isDossierUnlocked}
           activePing={activePing}
-          onBroadcastPing={broadcastPing}
+          broadcastPing={broadcastPing}
+          activeModal={activeModal}
+          setActiveModal={setActiveModal}
         />
+      </div>
+
+      {/* 2. MÀN HÌNH MÁY TÍNH (>= LG): WORKSPACE RIÊNG BIỆT CHO DESKTOP (BÀN HỒ SƠ HOẶC XEM LẺ) */}
+      <div
+        ref={workspaceRef}
+        className="hidden lg:flex w-full flex-1 min-h-0 flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 p-0"
+      >
+        {viewMode === "canvas" ? (
+          <CanvasInvestigationWorkspace
+            caseId={caseId}
+            filterTab={filterTab}
+            onSetFilterTab={(tab) => setFilterTab(tab)}
+            selectedPhaseFilter={selectedPhaseFilter}
+            onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
+            pdfItems={pdfItems}
+            evidenceItems={evidenceItems}
+            dossierDocs={dossierDocs}
+            dossiers={dossiers}
+            selectedView={selectedView}
+            onSelectPdf={handleSelectPdf}
+            onSelectEvidence={handleSelectEvidence}
+            isPhaseUnlocked={isPhaseUnlocked}
+            isDossierUnlocked={isDossierUnlocked}
+            activePing={activePing}
+            broadcastPing={broadcastPing}
+            activeModal={activeModal}
+            setActiveModal={setActiveModal}
+            setSelectedView={setSelectedView}
+            onSwitchToSingleView={() => handleSetViewMode("single")}
+          />
+        ) : (
+          <SingleInvestigationWorkspace
+            caseId={caseId}
+            filterTab={filterTab}
+            onSetFilterTab={(tab) => setFilterTab(tab)}
+            selectedPhaseFilter={selectedPhaseFilter}
+            onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
+            pdfItems={pdfItems}
+            evidenceItems={evidenceItems}
+            dossiers={dossiers}
+            selectedView={selectedView}
+            onSelectPdf={handleSelectPdf}
+            onSelectEvidence={handleSelectEvidence}
+            isPhaseUnlocked={isPhaseUnlocked}
+            isDossierUnlocked={isDossierUnlocked}
+            activePing={activePing}
+            broadcastPing={broadcastPing}
+            activeModal={activeModal}
+            setActiveModal={setActiveModal}
+          />
+        )}
       </div>
 
       {/* PHASE UNLOCKED CINEMATIC STORY MODAL */}
@@ -852,6 +810,17 @@ function WebEvidencePageContent() {
         }}
       />
 
+      {/* BẢN KẾT LUẬN ĐIỀU TRA VỤ ÁN (PHÁN QUYẾT & TRẢ LỜI CÂU HỎI KẾT TỘI) */}
+      <IndictmentModal
+        caseId={caseId}
+        isOpen={activeModal === "indictment"}
+        onClose={() => setActiveModal(null)}
+        onSubmitIndictment={() => {
+          // Sau khi nộp đúng đáp án bản kết luận điều tra, lúc này mới hiển thị Hậu án!
+          setActiveModal("epilogue");
+        }}
+      />
+
       {/* POST-CASE EPILOGUE STORIES MODAL */}
       <EpilogueModal
         caseId={caseId}
@@ -859,16 +828,18 @@ function WebEvidencePageContent() {
         onClose={() => setActiveModal(null)}
       />
 
-      {/* QUICK ACTION FAB MENU */}
+      {/* QUICK ACTION FAB MENU (CHỈ HIỂN THỊ TRÊN MOBILE, ẨN TRÊN DESKTOP) */}
       {activeModal !== "reinvestigate" && (
-        <QuickActionFab
-          onOpenBoardGame={() => {
-            detectiveAudio.playPaperRustle();
-            router.push("/evidence/boardgame");
-          }}
-          onResetCase={resetAllProgress}
-          onGoHome={() => router.push("/")}
-        />
+        <div className="lg:hidden">
+          <QuickActionFab
+            onOpenBoardGame={() => {
+              detectiveAudio.playPaperRustle();
+              router.push("/evidence/boardgame");
+            }}
+            onResetCase={resetAllProgress}
+            onGoHome={() => router.push("/")}
+          />
+        </div>
       )}
 
       {/* HINT SYSTEM MODAL */}

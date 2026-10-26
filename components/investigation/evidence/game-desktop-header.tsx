@@ -1,24 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { UserNav } from "@/components/auth/user-nav";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { GoogleSheetsPresenceBar } from "@/components/investigation/google-sheets-presence-bar";
 import { RoomModal } from "@/components/investigation/room-modal";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { cn } from "@/lib/utils";
-import { FileText, Layers } from "lucide-react";
+import { FileText, Layers, ChevronDown, Eye } from "lucide-react";
 
 interface GameDesktopHeaderProps {
   className?: string;
   viewMode?: "single" | "canvas";
   onViewModeChange?: (mode: "single" | "canvas") => void;
+  isBoardOpen?: boolean;
+  onToggleBoard?: () => void;
 }
 
 /**
  * Desktop Header dành riêng cho màn hình chơi game trực tuyến (/evidence/web).
  * Bố cục 3 cột đối xứng đảm bảo cụm Nav ở giữa luôn căn chính giữa tuyệt đối.
- * Hiển thị 3 lối tắt gameplay thiết yếu: Sổ tay hướng dẫn, Chơi nhóm, Báo lỗi.
+ * Hiển thị các lối tắt gameplay thiết yếu: Bảng điều tra, Sổ tay hướng dẫn, Chơi nhóm, Báo lỗi.
  * Định dạng chữ proper case, không dùng uppercase, không kèm icon rườm rà.
  * Cột phải tích hợp bộ chuyển đổi chế độ xem Soi đơn / Bàn hồ sơ và avatar profile.
  */
@@ -26,9 +28,28 @@ export function GameDesktopHeader({
   className,
   viewMode = "single",
   onViewModeChange,
+  isBoardOpen,
+  onToggleBoard,
 }: GameDesktopHeaderProps) {
-  const { roomCode } = useRoomSync();
   const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [isViewDropdownOpen, setIsViewDropdownOpen] = useState(false);
+  const viewDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        viewDropdownRef.current &&
+        !viewDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsViewDropdownOpen(false);
+      }
+    };
+    if (isViewDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isViewDropdownOpen]);
 
   return (
     <>
@@ -38,7 +59,7 @@ export function GameDesktopHeader({
           className
         )}
       >
-        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+        <div className="w-full px-4 sm:px-6 h-full flex items-center justify-between">
           {/* CỘT TRÁI: Logo XPLORE căn giữa trục dọc hoàn hảo */}
           <div className="w-64 h-full flex items-center justify-start">
             <BrandMark
@@ -50,7 +71,68 @@ export function GameDesktopHeader({
 
           {/* CỘT GIỮA: Điều hướng gameplay tinh gọn (Proper case, không icon) */}
           <nav className="flex-1 flex items-center justify-center gap-7 font-sans text-sm font-medium text-muted-foreground">
-            {/* 1. Sổ tay hướng dẫn (mở modal cẩm nang nghiệp vụ gameplay) */}
+            {/* 1. Kiểu xem: Dropdown chọn Bàn hồ sơ hoặc Xem lẻ */}
+            {onViewModeChange && (
+              <div className="relative" ref={viewDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsViewDropdownOpen((prev) => !prev)}
+                  className="hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  <span>Kiểu xem</span>
+                  <ChevronDown
+                    className={cn(
+                      "size-3 text-muted-foreground transition-transform duration-200",
+                      isViewDropdownOpen && "rotate-180 text-primary"
+                    )}
+                  />
+                </button>
+
+                {isViewDropdownOpen && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-36 bg-[#16100c]/98 border border-[#3e2e20] rounded-xl shadow-2xl p-1 z-50 text-xs font-sans backdrop-blur-md animate-in fade-in zoom-in-95 duration-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onViewModeChange("canvas");
+                        setIsViewDropdownOpen(false);
+                      }}
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors cursor-pointer",
+                        viewMode === "canvas"
+                          ? "bg-[#d9a066]/20 text-[#f4e8d8] font-semibold"
+                          : "text-muted-foreground hover:text-foreground hover:bg-[#201710]"
+                      )}
+                    >
+                      <span>Bàn hồ sơ</span>
+                      {viewMode === "canvas" && (
+                        <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onViewModeChange("single");
+                        setIsViewDropdownOpen(false);
+                      }}
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors cursor-pointer mt-0.5",
+                        viewMode === "single"
+                          ? "bg-[#d9a066]/20 text-[#f4e8d8] font-semibold"
+                          : "text-muted-foreground hover:text-foreground hover:bg-[#201710]"
+                      )}
+                    >
+                      <span>Xem lẻ</span>
+                      {viewMode === "single" && (
+                        <span className="size-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 3. Sổ tay hướng dẫn (mở modal cẩm nang nghiệp vụ gameplay) */}
             <button
               type="button"
               onClick={() => emitInvestigationEvent("OPEN_GUIDE")}
@@ -59,21 +141,16 @@ export function GameDesktopHeader({
               Sổ tay hướng dẫn
             </button>
 
-            {/* 2. Chơi nhóm đồng bộ thời gian thực */}
+            {/* 4. Chơi nhóm đồng bộ thời gian thực */}
             <button
               type="button"
               onClick={() => setIsRoomModalOpen(true)}
-              className="hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-2"
+              className="hover:text-primary transition-colors cursor-pointer"
             >
-              <span>Chơi nhóm</span>
-              {roomCode && (
-                <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[11px] font-mono font-bold">
-                  {roomCode}
-                </span>
-              )}
+              Chơi nhóm
             </button>
 
-            {/* 3. Báo lỗi & Góp ý */}
+            {/* 5. Báo lỗi & Góp ý */}
             <button
               type="button"
               onClick={() => emitInvestigationEvent("OPEN_FEEDBACK")}
@@ -83,40 +160,10 @@ export function GameDesktopHeader({
             </button>
           </nav>
 
-          {/* CỘT PHẢI: View Mode Switcher & Avatar Profile */}
-          <div className="w-64 h-full flex items-center justify-end gap-3 text-muted-foreground">
-            {onViewModeChange && (
-              <div className="flex items-center bg-[#15100c] p-0.5 rounded border border-[#3e2e20] text-xs font-mono">
-                <button
-                  type="button"
-                  onClick={() => onViewModeChange("single")}
-                  className={cn(
-                    "flex items-center gap-1 px-2 py-1 rounded transition-colors text-xs font-medium cursor-pointer",
-                    viewMode === "single"
-                      ? "bg-[#d9a066]/20 text-[#f4e8d8] border border-[#d9a066]/50 shadow-sm"
-                      : "text-[#8a7768] hover:text-[#c4b3a3] hover:bg-[#251a13]"
-                  )}
-                  title="Chế độ soi một tài liệu đơn"
-                >
-                  <FileText className="size-3" />
-                  <span>Soi đơn</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onViewModeChange("canvas")}
-                  className={cn(
-                    "flex items-center gap-1 px-2 py-1 rounded transition-colors text-xs font-medium cursor-pointer",
-                    viewMode === "canvas"
-                      ? "bg-[#d9a066]/20 text-[#f4e8d8] border border-[#d9a066]/50 shadow-sm"
-                      : "text-[#8a7768] hover:text-[#c4b3a3] hover:bg-[#251a13]"
-                  )}
-                  title="Chế độ bàn hồ sơ trải rộng toàn cảnh"
-                >
-                  <Layers className="size-3" />
-                  <span>Bàn hồ sơ</span>
-                </button>
-              </div>
-            )}
+          {/* CỘT PHẢI: Dải Avatar đồng đội trực tuyến chuẩn Google Sheets + User Profile */}
+          <div className="min-w-64 h-full flex items-center justify-end gap-3 text-muted-foreground">
+            <GoogleSheetsPresenceBar onOpenModal={() => setIsRoomModalOpen(true)} />
+            <div className="w-px h-5 bg-border/20" />
             <UserNav size="sm" />
           </div>
         </div>
