@@ -61,6 +61,8 @@ export interface DbBoardgamePin {
   case_id: string;
   position_x: number;
   position_y: number;
+  mobile_x?: number | null;
+  mobile_y?: number | null;
   label: string | null;
   detail: string | null;
   color: string | null;

@@ -109,29 +109,15 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
         [pinId]: { x, y },
       }));
 
-      // Cập nhật vị trí trong nodes nếu là board node
-      setNodes((prev) =>
-        prev.map((node) => {
-          if (node.id !== pinId) return node;
-          const cfg = (node.config as any) || {};
-          const currentPos = cfg.position || {};
-          return {
-            ...node,
-            config: {
-              ...cfg,
-              position: {
-                ...currentPos,
-                desktop: { x, y },
-                mobile: currentPos.mobile || { x, y },
-              },
-            },
-          };
-        }),
-      );
-
-      // Cập nhật vị trí trong pins nếu là custom pin hoặc checkpoint pin
+      // Cập nhật vị trí trong pins (chuẩn hóa vào boardgame_pins: desktop hoặc mobile)
       setPins((prev) =>
-        prev.map((pin) => (pin.id === pinId ? { ...pin, x, y } : pin)),
+        prev.map((pin) => {
+          if (pin.id !== pinId) return pin;
+          if (options?.isMobile) {
+            return { ...pin, mobileX: x, mobileY: y };
+          }
+          return { ...pin, x, y };
+        }),
       );
     },
     [currentSnapshot, commitSnapshot],
@@ -223,10 +209,9 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
   const handleSaveAll = useCallback(async () => {
     setIsSaving(true);
     try {
-      // 1. Lưu nodes batch
+      // 1. Lưu nodes batch (metadata thuần túy, không ghi đè position)
       if (nodes.length > 0) {
         const batchNodes = nodes.map((n) => {
-          const currentPos = positions[n.id];
           const cfg = (n.config as any) || {};
           return {
             id: n.id,
@@ -236,29 +221,30 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
             subject_key: n.subject_key,
             checkpoint_id: n.checkpoint_id,
             slot_index: n.slot_index,
-            config: currentPos
-              ? {
-                  ...cfg,
-                  position: {
-                    ...cfg.position,
-                    desktop: currentPos,
-                    mobile: cfg.position?.mobile || currentPos,
-                  },
-                }
-              : cfg,
+            config: cfg,
           };
         });
         await saveBoardNodesBatch(batchNodes);
       }
 
-      // 2. Lưu toàn bộ pins & connections qua saveBoardgamePinPositions
+      // 2. Lưu toàn bộ pins & connections qua saveBoardgamePinPositions (single source of truth for coordinates)
       await saveBoardgamePinPositions(
         caseId,
-        pins.map((p) => ({
-          ...p,
-          x: positions[p.id]?.x ?? p.x,
-          y: positions[p.id]?.y ?? p.y,
-        })),
+        pins.map((p) => {
+          const currentPos = positions[p.id];
+          if (options?.isMobile) {
+            return {
+              ...p,
+              mobileX: currentPos?.x ?? p.mobileX ?? p.x,
+              mobileY: currentPos?.y ?? p.mobileY ?? p.y,
+            };
+          }
+          return {
+            ...p,
+            x: currentPos?.x ?? p.x,
+            y: currentPos?.y ?? p.y,
+          };
+        }),
         connections,
       );
 

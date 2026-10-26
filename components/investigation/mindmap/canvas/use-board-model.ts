@@ -167,7 +167,9 @@ export function useBoardModel(
 
       if (boardgameRes.success) {
         boardgameRes.pins.forEach((p) => {
-          posMap[p.id] = { x: p.x, y: p.y };
+          const posX = isMobile && typeof p.mobileX === 'number' ? p.mobileX : p.x;
+          const posY = isMobile && typeof p.mobileY === 'number' ? p.mobileY : p.y;
+          posMap[p.id] = { x: posX, y: posY };
           if (
             p.id.startsWith("admin-pin-") ||
             p.id.startsWith("custom-pin-") ||

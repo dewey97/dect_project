@@ -35,6 +35,8 @@ export interface PinPoint {
   legacyId?: string;
   x: number;
   y: number;
+  mobileX?: number | null;
+  mobileY?: number | null;
   label: string;
   detail: string;
   color?:
