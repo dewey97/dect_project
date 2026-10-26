@@ -753,7 +753,7 @@ export function CheckpointStudioClient({
 
   return (
     <div
-      data-studio-ready={activeView === "flow" ? "true" : undefined}
+      data-studio-ready={activeView === "flow" ? (isSaving ? "false" : "true") : undefined}
       className="flex h-full min-h-0 w-full flex-col"
     >
       {/* Thanh chuyển đổi View (Flow vs Board) */}

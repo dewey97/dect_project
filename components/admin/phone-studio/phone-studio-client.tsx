@@ -262,9 +262,11 @@ export function PhoneStudioClient({
     bankTxs.filter((b) => b.is_clue).length +
     history.filter((h) => h.is_clue).length;
 
+  const [isBusy, setIsBusy] = useState(false);
+
   return (
     <div
-      data-studio-ready="true"
+      data-studio-ready={isBusy ? "false" : "true"}
       className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-zinc-950 text-zinc-100 font-sans"
     >
       {/* Top Header Bar */}

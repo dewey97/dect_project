@@ -35,6 +35,7 @@ interface CrimeSceneEditorProps {
   evidenceList: DbCaseEvidence[];
   config360: DbCaseWithEvidenceConfig | null;
   onConfig360Updated?: (updated: DbCaseWithEvidenceConfig) => void;
+  onSavingChange?: (saving: boolean) => void;
 }
 
 export function CrimeSceneEditor({
@@ -42,6 +43,7 @@ export function CrimeSceneEditor({
   evidenceList,
   config360,
   onConfig360Updated,
+  onSavingChange,
 }: CrimeSceneEditorProps) {
   const [sceneMode, setSceneMode] = useState<"2d" | "360">("2d");
   const [hotspots, setHotspots] = useState<ReinvestigationHotspot2D[]>([]);
@@ -49,6 +51,10 @@ export function CrimeSceneEditor({
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [is360ModalOpen, setIs360ModalOpen] = useState(false);
+
+  useEffect(() => {
+    onSavingChange?.(isLoading || isSaving);
+  }, [isLoading, isSaving, onSavingChange]);
 
   // Background 2D image
   const backgroundUrl =

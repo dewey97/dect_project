@@ -84,9 +84,11 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
     }
   };
 
+  const isBusy = isSaving || isUploadingCover || isUploadingBg || isUploading360 || isUploadingPano;
+
   return (
     <div
-      data-studio-ready="true"
+      data-studio-ready={isBusy ? "false" : "true"}
       className="max-w-4xl mx-auto space-y-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500"
     >
       {/* Top Header */}

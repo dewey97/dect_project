@@ -98,10 +98,12 @@ export function DossierStudioClient({
   const [editingDossier, setEditingDossier] = useState<DbCaseDossier | null>(null);
   const [activeDossierFilterKey, setActiveDossierFilterKey] = useState<string | null>(null);
   const [caseId, setCaseId] = useState<string>(initialCaseId);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
     (async () => {
+      setIsLoadingData(true);
       try {
         const [dList, cList] = await Promise.all([
           getCaseDossiers(caseId),
@@ -113,6 +115,8 @@ export function DossierStudioClient({
         }
       } catch (err) {
         console.error("Failed to load dossiers for case:", err);
+      } finally {
+        if (isMounted) setIsLoadingData(false);
       }
     })();
     return () => { isMounted = false; };
@@ -830,7 +834,7 @@ export function DossierStudioClient({
   };
 
   return (
-    <div data-studio-ready="true" className="h-full w-full bg-[#0a0a0d] text-zinc-100 flex flex-col overflow-hidden font-sans antialiased selection:bg-amber-500/30">
+    <div data-studio-ready={isLoadingData ? "false" : "true"} className="h-full w-full bg-[#0a0a0d] text-zinc-100 flex flex-col overflow-hidden font-sans antialiased selection:bg-amber-500/30">
       {/* Print Specific CSS */}
       <style jsx global>{`
         @media print {

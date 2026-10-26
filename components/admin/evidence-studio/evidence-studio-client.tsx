@@ -151,9 +151,13 @@ export function EvidenceStudioClient({
     setSelectedId((prev) => (prev === deletedId ? null : prev));
   };
 
+  const [isSceneSaving, setIsSceneSaving] = useState(false);
+
+  const isBusy = isRefreshing || isSceneSaving;
+
   return (
     <div
-      data-studio-ready="true"
+      data-studio-ready={isBusy ? "false" : "true"}
       className="flex flex-col h-[calc(100vh-3.5rem)] bg-zinc-950 text-zinc-100 overflow-hidden"
     >
       {/* ── TOP HEADER / TOOLBAR ── */}
@@ -270,6 +274,7 @@ export function EvidenceStudioClient({
           evidenceList={evidenceList}
           config360={config360}
           onConfig360Updated={(up) => setConfig360(up)}
+          onSavingChange={setIsSceneSaving}
         />
       ) : (
         /* ── 3-COLUMN WORKSPACE LAYOUT ── */

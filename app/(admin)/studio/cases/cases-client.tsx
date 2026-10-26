@@ -11,6 +11,7 @@ import type { DbCase } from "@/lib/types/database";
 export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [isPending, setIsPending] = useState(false);
 
   const filteredCases = useMemo(() => {
     return initialCases.filter((c) => {
@@ -24,7 +25,7 @@ export function CasesListClient({ initialCases }: { initialCases: DbCase[] }) {
 
   return (
     <div
-      data-studio-ready="true"
+      data-studio-ready={isPending ? "false" : "true"}
       className="max-w-6xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700"
     >
       <div className="flex items-center justify-between">

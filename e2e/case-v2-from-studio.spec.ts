@@ -741,6 +741,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         });
         await expect(saveHotspotsBtn).toBeVisible();
         await saveHotspotsBtn.click();
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
         await expect(page.getByText(/lên Server!/i)).toBeVisible({
           timeout: 15_000,
         });
