@@ -28,9 +28,20 @@ interface ToastNotice {
   timestamp: number;
 }
 
+export interface CurrentDetectiveUser {
+  id: string;
+  email?: string;
+  avatarUrl?: string | null;
+  displayName?: string | null;
+}
+
 interface PresencePayload {
   nickname?: string;
   joinedAt?: number;
+  avatarUrl?: string | null;
+  userId?: string | null;
+  email?: string | null;
+  isAuthenticated?: boolean;
 }
 
 interface RoomSyncContextType {
@@ -41,6 +52,8 @@ interface RoomSyncContextType {
   roomState: RoomInvestigationState;
   members: RoomMember[];
   memberCount: number;
+  currentUser: CurrentDetectiveUser | null;
+  deviceId: string;
   activeToast: ToastNotice | null;
   activePing: DetectivePing | null;
   joinRoom: (
@@ -97,6 +110,9 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const [roomState, setRoomState] =
     useState<RoomInvestigationState>(DEFAULT_ROOM_STATE);
   const [members, setMembers] = useState<RoomMember[]>([]);
+  const [currentUser, setCurrentUser] = useState<CurrentDetectiveUser | null>(null);
+  const currentUserRef = useRef<CurrentDetectiveUser | null>(null);
+  const [deviceId, setDeviceId] = useState<string>("");
   const [activeToast, setActiveToast] = useState<ToastNotice | null>(null);
   const [activePing, setActivePing] = useState<DetectivePing | null>(null);
   const activePingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -108,6 +124,125 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const channelRef = useRef<RealtimeChannel | null>(null);
   const roomStateRef = useRef<RoomInvestigationState>(DEFAULT_ROOM_STATE);
   const didAutoConnectRef = useRef(false);
+
+  useEffect(() => {
+    setDeviceId(getDeviceId());
+  }, []);
+
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
+
+  // Nạp thông tin đăng nhập từ Supabase session & profiles
+  useEffect(() => {
+    let isMounted = true;
+    const loadUser = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session?.user) {
+          if (isMounted) setCurrentUser(null);
+          return;
+        }
+        const u = session.user;
+        let avatar: string | null =
+          u.user_metadata?.avatar_url || u.user_metadata?.picture || null;
+        let displayName: string | null =
+          u.user_metadata?.full_name || u.user_metadata?.name || null;
+
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("avatar_url, display_name")
+            .eq("id", u.id)
+            .maybeSingle();
+          if (profile) {
+            if (profile.avatar_url) avatar = profile.avatar_url;
+            if (profile.display_name) displayName = profile.display_name;
+          }
+        } catch {}
+
+        if (isMounted) {
+          setCurrentUser({
+            id: u.id,
+            email: u.email,
+            avatarUrl: avatar,
+            displayName,
+          });
+
+          // Nếu chưa từng đặt nickname hoặc là mặc định, gợi ý lấy theo profile
+          if (typeof window !== "undefined") {
+            const saved = localStorage.getItem(NICKNAME_STORAGE_KEY);
+            if ((!saved || saved === "Thám tử") && displayName) {
+              setNicknameState(displayName);
+              nicknameRef.current = displayName;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("[RoomSync] Auth error:", err);
+      }
+    };
+
+    loadUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!session?.user) {
+        if (isMounted) setCurrentUser(null);
+        return;
+      }
+      const u = session.user;
+      let avatar: string | null =
+        u.user_metadata?.avatar_url || u.user_metadata?.picture || null;
+      let displayName: string | null =
+        u.user_metadata?.full_name || u.user_metadata?.name || null;
+
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("avatar_url, display_name")
+          .eq("id", u.id)
+          .maybeSingle();
+        if (profile) {
+          if (profile.avatar_url) avatar = profile.avatar_url;
+          if (profile.display_name) displayName = profile.display_name;
+        }
+      } catch {}
+
+      if (isMounted) {
+        setCurrentUser({
+          id: u.id,
+          email: u.email,
+          avatarUrl: avatar,
+          displayName,
+        });
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  // Tái đồng bộ Presence nếu đăng nhập/đăng xuất trong lúc đang ở phòng
+  useEffect(() => {
+    if (channelRef.current && isConnected) {
+      channelRef.current
+        .track({
+          nickname: nicknameRef.current,
+          joinedAt: Date.now(),
+          avatarUrl: currentUser?.avatarUrl || null,
+          userId: currentUser?.id || null,
+          email: currentUser?.email || null,
+          isAuthenticated: !!currentUser,
+        })
+        .catch(() => {});
+    }
+  }, [currentUser, isConnected]);
 
   // Keep refs synchronized
   useEffect(() => {
@@ -150,6 +285,10 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
         .track({
           nickname: clean,
           joinedAt: Date.now(),
+          avatarUrl: currentUserRef.current?.avatarUrl || null,
+          userId: currentUserRef.current?.id || null,
+          email: currentUserRef.current?.email || null,
+          isAuthenticated: !!currentUserRef.current,
         })
         .catch(() => {});
     }
@@ -355,6 +494,10 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
                   key,
                   nickname: p.nickname || "Thám tử",
                   joinedAt: p.joinedAt || Date.now(),
+                  avatarUrl: p.avatarUrl || null,
+                  userId: p.userId || null,
+                  email: p.email || null,
+                  isAuthenticated: !!p.isAuthenticated,
                 });
               }
             });
@@ -467,6 +610,10 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
                 await channel.track({
                   nickname: activeNick,
                   joinedAt: Date.now(),
+                  avatarUrl: currentUserRef.current?.avatarUrl || null,
+                  userId: currentUserRef.current?.id || null,
+                  email: currentUserRef.current?.email || null,
+                  isAuthenticated: !!currentUserRef.current,
                 });
               } catch (trackErr) {
                 console.warn("[RoomSync] Track error:", trackErr);
@@ -648,6 +795,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       roomState,
       members,
       memberCount,
+      currentUser,
+      deviceId,
       activeToast,
       activePing,
       joinRoom,
@@ -664,6 +813,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       roomState,
       members,
       memberCount,
+      currentUser,
+      deviceId,
       activeToast,
       activePing,
       joinRoom,
@@ -680,13 +831,13 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       {/* Toast Notification for Teammate Progress */}
       {activeToast && (
         <div className="fixed top-4 right-4 z-50 pointer-events-none animate-in fade-in slide-in-from-top-3 duration-300">
-          <div className="bg-[#1b140e]/95 border-2 border-amber-500/70 text-[#f5ebd9] px-4 py-3 rounded-lg shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-sm pointer-events-auto">
+          <div className="bg-zinc-900/95 border border-zinc-700 text-zinc-100 px-4 py-3 rounded-lg shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-sm pointer-events-auto">
             <span className="text-xl">🕵️</span>
             <div className="flex-1 text-xs font-mono">
-              <span className="font-bold text-amber-400">
+              <span className="font-bold text-white">
                 {activeToast.actorName}
               </span>{" "}
-              <span className="text-[#e8d5b5]">{activeToast.actionText}</span>
+              <span className="text-zinc-300">{activeToast.actionText}</span>
             </div>
           </div>
         </div>
@@ -703,6 +854,8 @@ const DEFAULT_ROOM_SYNC_CONTEXT: RoomSyncContextType = {
   roomState: DEFAULT_ROOM_STATE,
   members: [],
   memberCount: 0,
+  currentUser: null,
+  deviceId: "",
   activeToast: null,
   activePing: null,
   joinRoom: async () => ({ success: false, error: "No Room Provider" }),

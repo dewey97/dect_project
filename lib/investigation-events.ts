@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
 
 export const INVESTIGATION_EVENTS = {
+  FOCUS_CANVAS_DOC: "focus-canvas-doc",
   OPEN_PHONE: "open-phone-modal",
   OPEN_HINT: "open-hint-modal",
+  OPEN_INDICTMENT: "open-indictment-modal",
   OPEN_EPILOGUE: "open-epilogue-modal",
   OPEN_REINVESTIGATE: "open-reinvestigate-modal",
   OPEN_GUIDE: "open-gameplay-guide-modal",
@@ -11,6 +13,8 @@ export const INVESTIGATION_EVENTS = {
   BOARD_ZOOM_IN: "board-zoom-in",
   OPEN_FEEDBACK: "open-feedback-modal",
   OPEN_NOTEBOOK: "open-notebook-modal",
+  OPEN_BOARD: "open-board-modal",
+  TOGGLE_BOARD: "toggle-board-modal",
 } as const;
 
 export type InvestigationEventName =

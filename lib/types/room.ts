@@ -25,6 +25,10 @@ export interface RoomMember {
   key: string;
   nickname: string;
   joinedAt: number;
+  avatarUrl?: string | null;
+  userId?: string | null;
+  email?: string | null;
+  isAuthenticated?: boolean;
 }
 
 export interface RoomInvestigationState {
