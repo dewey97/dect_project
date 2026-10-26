@@ -895,15 +895,46 @@ export function renderScene({
     context.stroke();
     context.restore();
 
-    // Fine Crimson Yarn thread (thin & elegant)
-    context.save();
-    context.strokeStyle = "rgba(200, 35, 35, 0.85)";
-    context.lineWidth = (1.15 * scaleFactor) / transform.scale;
-    context.beginPath();
-    context.moveTo(start.x, start.y);
-    context.quadraticCurveTo(middleX, middleY, end.x, end.y);
-    context.stroke();
-    context.restore();
+    if (conn.isDependency) {
+      // Logic Dependency Arrow (Dashed Purple & Arrowhead)
+      context.save();
+      context.strokeStyle = "rgba(168, 85, 247, 0.95)";
+      context.lineWidth = (1.6 * scaleFactor) / transform.scale;
+      context.setLineDash([(6 * scaleFactor) / transform.scale, (4 * scaleFactor) / transform.scale]);
+      context.beginPath();
+      context.moveTo(start.x, start.y);
+      context.quadraticCurveTo(middleX, middleY, end.x, end.y);
+      context.stroke();
+
+      // Mũi tên chỉ hướng quan hệ phụ thuộc (source -> target)
+      const angle = Math.atan2(end.y - middleY, end.x - middleX);
+      const headLen = (11 * scaleFactor) / transform.scale;
+      context.setLineDash([]);
+      context.fillStyle = "rgba(168, 85, 247, 0.95)";
+      context.beginPath();
+      context.moveTo(end.x, end.y);
+      context.lineTo(
+        end.x - headLen * Math.cos(angle - Math.PI / 6),
+        end.y - headLen * Math.sin(angle - Math.PI / 6)
+      );
+      context.lineTo(
+        end.x - headLen * Math.cos(angle + Math.PI / 6),
+        end.y - headLen * Math.sin(angle + Math.PI / 6)
+      );
+      context.closePath();
+      context.fill();
+      context.restore();
+    } else {
+      // Fine Crimson Yarn thread (thin & elegant)
+      context.save();
+      context.strokeStyle = "rgba(200, 35, 35, 0.85)";
+      context.lineWidth = (1.15 * scaleFactor) / transform.scale;
+      context.beginPath();
+      context.moveTo(start.x, start.y);
+      context.quadraticCurveTo(middleX, middleY, end.x, end.y);
+      context.stroke();
+      context.restore();
+    }
   });
 
   // User custom connections

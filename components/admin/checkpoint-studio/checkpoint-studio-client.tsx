@@ -21,6 +21,7 @@ import {
   deleteCheckpoint,
   getCheckpointsByCase,
   saveCheckpoint,
+  updateCheckpointDependencies,
 } from "@/lib/actions/checkpoint-actions";
 import { updateCheckpointBoardConfig } from "@/lib/actions/board-actions";
 import { getCharactersByCase } from "@/lib/actions/character-actions";
@@ -29,12 +30,19 @@ import {
   getAllCaseDocumentsCatalog,
   type AvailableDocumentItem,
 } from "@/lib/actions/dossier-config-actions";
+import {
+  buildDependencyEdges,
+  wouldCreateCycle,
+} from "@/lib/cms/checkpoint-graph";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
 import { CheckpointEditor } from "./checkpoint-editor";
 import { OffBoardTray } from "./off-board-tray";
-import { HeroInteractive } from "@/components/investigation/hero-interactive";
+import {
+  HeroInteractive,
+  type CaseConnection,
+} from "@/components/investigation/hero-interactive";
 import { useBoardEditor } from "./board/use-board-editor";
 import { BoardNodeForm } from "./board/board-node-form";
 import { Button } from "@/components/ui/button";
@@ -49,6 +57,8 @@ import {
   Minus,
   Sparkles,
   Layers,
+  Network,
+  GitBranch,
 } from "lucide-react";
 
 interface CheckpointStudioClientProps {
@@ -166,6 +176,9 @@ export function CheckpointStudioClient({
   const [characters, setCharacters] = useState<DbCaseCharacter[]>(initialCharacters);
   const [isLintModalOpen, setIsLintModalOpen] = useState(false);
   const [isCreatingCustomNode, setIsCreatingCustomNode] = useState(false);
+
+  // Chế độ "Lớp logic" (Logic Overlay)
+  const [isLogicLayerActive, setIsLogicLayerActive] = useState(false);
 
   // Hook Board Editor thống nhất
   const {
@@ -601,6 +614,239 @@ export function CheckpointStudioClient({
     }
   };
 
+  // Mũi tên quan hệ phụ thuộc depends_on trong Lớp logic (B23-4)
+  const dependencyConnections: CaseConnection[] = useMemo(() => {
+    if (!isLogicLayerActive) return [];
+    const conns: CaseConnection[] = [];
+
+    const findPinForCheckpoint = (cp: DbCaseCheckpoint) => {
+      return displayPins.find(
+        (p) =>
+          p.checkpointId === cp.id ||
+          p.checkpointId === cp.checkpoint_id ||
+          (cp.kind === "phone_lookup" && p.nodeKind === "phone_lookup") ||
+          (cp.kind === "suspect_interrogation" &&
+            p.nodeKind === "suspect" &&
+            p.subjectKey === cp.subject_key) ||
+          (cp.kind === "followup" && p.nodeKind === "followup") ||
+          (cp.kind === "indictment" && p.nodeKind === "indictment"),
+      );
+    };
+
+    for (const cp of rows) {
+      if (!cp.depends_on || !Array.isArray(cp.depends_on)) continue;
+      const targetPin = findPinForCheckpoint(cp);
+      if (!targetPin) continue;
+
+      for (const depId of cp.depends_on) {
+        const sourceCp = rows.find(
+          (r) => r.id === depId || r.checkpoint_id === depId,
+        );
+        if (!sourceCp) continue;
+        const sourcePin = findPinForCheckpoint(sourceCp);
+        if (!sourcePin) continue;
+
+        conns.push({
+          id: `dep:${sourceCp.checkpoint_id}:to:${cp.checkpoint_id}`,
+          fromPinId: sourcePin.id,
+          toPinId: targetPin.id,
+          isDependency: true,
+        });
+      }
+    }
+    return conns;
+  }, [isLogicLayerActive, rows, displayPins]);
+
+  const activeConnections = useMemo(() => {
+    return [...connections, ...dependencyConnections];
+  }, [connections, dependencyConnections]);
+
+  const handleConnectPinsWithLogic = async (
+    fromPinId: string,
+    toPinId: string,
+  ) => {
+    if (!isLogicLayerActive) {
+      handleConnectPins(fromPinId, toPinId);
+      return;
+    }
+
+    // Ở chế độ logic layer: nối fromPin -> toPin biểu diễn quan hệ toPin phụ thuộc vào fromPin
+    const findCpByPinId = (pinId: string) => {
+      const pin = displayPins.find((p) => p.id === pinId);
+      if (!pin) return null;
+      if (pin.checkpointId) {
+        const cp = rows.find(
+          (r) =>
+            r.id === pin.checkpointId || r.checkpoint_id === pin.checkpointId,
+        );
+        if (cp) return cp;
+      }
+      if (pin.nodeKind === "phone_lookup") {
+        return rows.find((r) => r.kind === "phone_lookup") || null;
+      }
+      if (pin.nodeKind === "suspect" && pin.subjectKey) {
+        return (
+          rows.find(
+            (r) =>
+              r.kind === "suspect_interrogation" &&
+              r.subject_key === pin.subjectKey,
+          ) || null
+        );
+      }
+      if (pin.nodeKind === "followup") {
+        return rows.find((r) => r.kind === "followup") || null;
+      }
+      if (pin.nodeKind === "indictment") {
+        return rows.find((r) => r.kind === "indictment") || null;
+      }
+      return null;
+    };
+
+    const sourceCp = findCpByPinId(fromPinId);
+    const targetCp = findCpByPinId(toPinId);
+
+    if (!sourceCp || !targetCp) {
+      toast.info("Chỉ có thể tạo quan hệ phụ thuộc giữa các node Checkpoint.");
+      return;
+    }
+
+    if (sourceCp.checkpoint_id === targetCp.checkpoint_id) {
+      toast.error("Checkpoint không thể phụ thuộc chính nó.");
+      return;
+    }
+
+    const currentDeps = targetCp.depends_on || [];
+    if (currentDeps.includes(sourceCp.checkpoint_id)) {
+      toast.info("Quan hệ phụ thuộc này đã tồn tại.");
+      return;
+    }
+
+    const currentEdges = buildDependencyEdges(rows);
+    if (
+      wouldCreateCycle(currentEdges, {
+        source: sourceCp.checkpoint_id,
+        target: targetCp.checkpoint_id,
+      })
+    ) {
+      toast.error("Liên kết tạo chu trình vòng lặp phụ thuộc.");
+      return;
+    }
+
+    const nextDeps = [...currentDeps, sourceCp.checkpoint_id];
+    setRows((prev) =>
+      prev.map((r) =>
+        r.checkpoint_id === targetCp.checkpoint_id
+          ? { ...r, depends_on: nextDeps }
+          : r,
+      ),
+    );
+    if (draft && draft.checkpointId === targetCp.checkpoint_id) {
+      setDraft((d) => (d ? { ...d, dependsOn: nextDeps } : d));
+    }
+
+    const res = await updateCheckpointDependencies(caseId, [
+      { checkpointId: targetCp.checkpoint_id, dependsOn: nextDeps },
+    ]);
+
+    if (res.success) {
+      toast.success(
+        `Đã nối phụ thuộc: "${targetCp.title || targetCp.checkpoint_id}" phụ thuộc vào "${sourceCp.title || sourceCp.checkpoint_id}"`,
+      );
+    } else {
+      toast.error(res.error || "Lỗi khi lưu quan hệ phụ thuộc.");
+    }
+  };
+
+  const handleDeleteConnectionWithLogic = async (connId: string) => {
+    if (connId.startsWith("dep:")) {
+      const parts = connId.split(":");
+      const sourceCpId = parts[1];
+      const targetCpId = parts[3];
+
+      if (!sourceCpId || !targetCpId) return;
+
+      const targetCp = rows.find((r) => r.checkpoint_id === targetCpId);
+      if (!targetCp) return;
+
+      const nextDeps = (targetCp.depends_on || []).filter(
+        (id) => id !== sourceCpId,
+      );
+      setRows((prev) =>
+        prev.map((r) =>
+          r.checkpoint_id === targetCpId ? { ...r, depends_on: nextDeps } : r,
+        ),
+      );
+      if (draft && draft.checkpointId === targetCpId) {
+        setDraft((d) => (d ? { ...d, dependsOn: nextDeps } : d));
+      }
+
+      await updateCheckpointDependencies(caseId, [
+        { checkpointId: targetCpId, dependsOn: nextDeps },
+      ]);
+      toast.info("Đã xóa quan hệ phụ thuộc.");
+      return;
+    }
+
+    handleDeleteConnection(connId);
+  };
+
+  const handleAutoLayoutLogic = () => {
+    const ids = rows.map((r) => r.checkpoint_id);
+    const inDegree = new Map<string, number>(ids.map((id) => [id, 0]));
+    const adj = new Map<string, string[]>(ids.map((id) => [id, []]));
+
+    for (const r of rows) {
+      for (const dep of r.depends_on || []) {
+        if (adj.has(dep)) {
+          adj.get(dep)!.push(r.checkpoint_id);
+          inDegree.set(r.checkpoint_id, (inDegree.get(r.checkpoint_id) || 0) + 1);
+        }
+      }
+    }
+
+    const levels = new Map<string, number>(ids.map((id) => [id, 0]));
+    const queue = ids.filter((id) => (inDegree.get(id) || 0) === 0);
+
+    while (queue.length > 0) {
+      const u = queue.shift()!;
+      const curL = levels.get(u) || 0;
+      for (const v of adj.get(u) || []) {
+        levels.set(v, Math.max(levels.get(v) || 0, curL + 1));
+        inDegree.set(v, (inDegree.get(v) || 0) - 1);
+        if ((inDegree.get(v) || 0) === 0) queue.push(v);
+      }
+    }
+
+    const maxLevel = Math.max(0, ...Array.from(levels.values()));
+    const levelNodes = new Map<number, string[]>();
+    for (const [id, lvl] of levels.entries()) {
+      const list = levelNodes.get(lvl) || [];
+      list.push(id);
+      levelNodes.set(lvl, list);
+    }
+
+    levelNodes.forEach((nodeList, lvl) => {
+      const x = maxLevel === 0 ? 0.5 : 0.15 + (lvl / Math.max(1, maxLevel)) * 0.7;
+      nodeList.forEach((cpId, idx) => {
+        const y = 0.2 + ((idx + 1) / (nodeList.length + 1)) * 0.6;
+        const pin = displayPins.find(
+          (p) =>
+            p.checkpointId === cpId ||
+            (cpId.includes("phone") && p.nodeKind === "phone_lookup") ||
+            (cpId.includes("indictment") && p.nodeKind === "indictment") ||
+            p.id.includes(cpId),
+        );
+        if (pin) {
+          handlePositionChange(pin.id, Number(x.toFixed(3)), Number(y.toFixed(3)));
+        }
+      });
+    });
+
+    toast.info(
+      "Đã sắp xếp tự động lớp logic (chỉ hiển thị tạm thời, bấm 'Lưu Bố Cục' nếu muốn áp dụng).",
+    );
+  };
+
   const isEditingCustomNode = Boolean(
     selectedNode &&
       !("checkpoint_id" in selectedNode && selectedNode.checkpoint_id) &&
@@ -637,6 +883,34 @@ export function CheckpointStudioClient({
 
         {/* Thanh công cụ giữa & phải */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Nút bật/tắt Lớp logic (B23-4) */}
+          <button
+            type="button"
+            onClick={() => setIsLogicLayerActive(!isLogicLayerActive)}
+            className={cn(
+              "flex items-center gap-1.5 rounded px-2 py-1 text-xs font-semibold transition-colors border",
+              isLogicLayerActive
+                ? "bg-purple-500/20 text-purple-300 border-purple-500/40 shadow-xs"
+                : "border-white/10 bg-white/5 text-zinc-400 hover:text-zinc-200",
+            )}
+            title="Bật/tắt hiển thị mũi tên phụ thuộc depends_on (Lớp logic)"
+          >
+            <GitBranch className="size-3.5" />
+            <span>Lớp logic</span>
+          </button>
+
+          {isLogicLayerActive && (
+            <button
+              type="button"
+              onClick={handleAutoLayoutLogic}
+              className="hidden lg:flex items-center gap-1 rounded bg-purple-950/30 hover:bg-purple-900/40 text-purple-300 border border-purple-500/30 px-2 py-1 text-[11px] transition-colors"
+              title="Tự động sắp xếp phân tầng đồ thị logic (không tự động ghi đè vị trí bảng)"
+            >
+              <Network className="size-3" />
+              <span>Sắp tự động</span>
+            </button>
+          )}
+
           {/* Chuyển nhanh param ?view=... phục vụ kiểm thử E2E */}
           <div className="flex items-center gap-1 bg-black/40 rounded border border-white/5 p-0.5 mr-1">
             <button
@@ -773,7 +1047,11 @@ export function CheckpointStudioClient({
           {selectedNode && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-3 py-1.5 bg-[#16120e]/95 backdrop-blur-md rounded-lg border border-amber-500/50 shadow-2xl font-mono text-xs select-none">
               <span className="text-amber-200/90 font-bold max-w-[140px] truncate pr-1">
-                {("title" in selectedNode ? selectedNode.title : ("label" in selectedNode ? selectedNode.label : "")) || "Ghim"}
+                {("title" in selectedNode
+                  ? selectedNode.title
+                  : "label" in selectedNode
+                    ? selectedNode.label
+                    : "") || "Ghim"}
               </span>
 
               <div className="h-4 w-px bg-white/15 mx-0.5" />
@@ -800,7 +1078,9 @@ export function CheckpointStudioClient({
 
               <button
                 type="button"
-                onClick={() => handleAdjustNodeTransform(selectedNode.id, 0, -0.1)}
+                onClick={() =>
+                  handleAdjustNodeTransform(selectedNode.id, 0, -0.1)
+                }
                 className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
                 title="Thu nhỏ (-0.1x)"
               >
@@ -824,14 +1104,14 @@ export function CheckpointStudioClient({
               className="w-full h-full"
               controlledCaseId={caseId}
               customPins={displayPins}
-              customConnections={connections}
+              customConnections={activeConnections}
               isEditMode={true}
               selectedPinId={selectedNodeId}
               onSelectPin={handleSelectPinOnBoard}
               onPinClick={handleSelectPinOnBoard}
               onPinPositionChange={handlePositionChange}
-              onConnectPins={handleConnectPins}
-              onDeleteConnection={handleDeleteConnection}
+              onConnectPins={handleConnectPinsWithLogic}
+              onDeleteConnection={handleDeleteConnectionWithLogic}
             />
           </div>
 
