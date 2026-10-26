@@ -22,14 +22,15 @@
 
 ### 2.1. Cải tiến kỹ thuật
 1. **Bổ sung tín hiệu sẵn sàng `data-studio-ready="true"`:**
-   - Đã gắn thuộc tính vào container gốc của toàn bộ 7 phân hệ Studio:
+   - Đã gắn thuộc tính vào container gốc của các phân hệ Studio:
      - Cases (`app/(admin)/studio/cases/cases-client.tsx`)
-     - Characters (`app/(admin)/studio/characters/characters-client.tsx`)
-     - Dossier (`app/(admin)/studio/dossier/dossier-client.tsx`)
-     - Evidence (`app/(admin)/studio/evidence/evidence-client.tsx`)
-     - Checkpoints (`app/(admin)/studio/checkpoints/checkpoint-studio-client.tsx`)
-     - Board (`components/investigation/board-editor.tsx`)
-     - Phone (`app/(admin)/studio/phone/phone-studio-client.tsx`)
+     - Case Detail (`app/(admin)/studio/cases/[slug]/case-detail-client.tsx`)
+     - Characters (`components/admin/character-studio/characters-studio-client.tsx`)
+     - Dossier (`components/admin/dossier-studio/dossier-studio-client.tsx`)
+     - Evidence (`components/admin/evidence-studio/evidence-studio-client.tsx`)
+     - Checkpoints (`components/admin/checkpoint-studio/checkpoint-studio-client.tsx`)
+     - Board (`components/admin/checkpoint-studio/board/board-editor.tsx`)
+     - Phone (`components/admin/phone-studio/phone-studio-client.tsx`)
 2. **Khắc phục lỗi SSR Hydration Mismatch tại Checkpoint Studio:**
    - Server Component `app/(admin)/studio/checkpoints/page.tsx` đọc `searchParams.view` và truyền xuống `initialView` cho `CheckpointStudioClient`, ngăn chặn hiện tượng flash layout client/server khác nhau làm trễ render form.
 3. **Chống race condition tại Board Studio:**
