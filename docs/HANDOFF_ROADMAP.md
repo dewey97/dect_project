@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-26): `origin/main` tại `26d1d46` (B0–B19 đã push); B20 trên `main` (3 commit chưa push). Đã chứng minh tạo vụ từ số 0 bằng Studio và chơi tới hậu án (spec v2), còn chập chờn do tín hiệu sẵn sàng giả → **B21** (việc nhỏ). Review từ nay theo cách nhanh (đọc diff + grep + lint + spec bị đụng). Chủ dự án: smoke test production, 6 vụ tĩnh `/activate`, A6, A10, xác nhận gói Supabase trước live cursor.
+Tiến độ (2026-10-26): `origin/main` tại `26d1d46`; B20 + B21 trên `main` (9 commit chưa push). Spec v2 (tạo vụ từ số 0 bằng Studio + chơi tới hậu án) đã 2/3 pass → **B22** chốt nốt (Phone Studio `isBusy`, bước 3 Character Studio). Chủ dự án: smoke test production, 6 vụ tĩnh `/activate`, A6, A10, xác nhận gói Supabase trước live cursor.
 
 ---
 
