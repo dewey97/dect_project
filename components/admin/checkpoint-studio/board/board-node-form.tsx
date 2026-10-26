@@ -155,7 +155,7 @@ export function BoardNodeForm({
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="VD: Nguyễn Văn Khang..."
+            placeholder="VD: Nạn nhân, Hiện trường…"
             className="w-full rounded bg-zinc-800 border border-white/10 px-2.5 py-1.5 text-zinc-100 focus:border-amber-400 focus:outline-none"
           />
         </div>
@@ -181,7 +181,7 @@ export function BoardNodeForm({
             type="text"
             value={subjectKey}
             onChange={(e) => setSubjectKey(e.target.value)}
-            placeholder="VD: khang, vu, tung..."
+            placeholder="VD: victim, suspect_a..."
             className="w-full rounded bg-zinc-800 border border-white/10 px-2.5 py-1.5 text-zinc-100 focus:border-amber-400 focus:outline-none"
           />
         </div>
