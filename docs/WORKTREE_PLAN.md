@@ -15,7 +15,7 @@
 | WT-1 board    | 🟡 1A–1C + `796041b` B5, `18175dc` B6, `e5407aa` B7, `fa6c12c` B8 (migration 39 đã chạy production), `2b1a9da` B9, `de7dcf0` B10 | **B12-1 hồi quy luồng chính**, B12-2/3/4/6 (B10 chưa đạt tiêu chí)                    |
 | WT-3 studio   | ✅ `471a5c8` + `bf1f35f` B3 — rà 0 placeholder >40 ký tự, ẩn khóa kỹ thuật                                                       | `studio-ux.spec.ts` **bị skip** (thiếu credential admin), chưa từng chạy thật → B12-5 |
 
-🟢 **Review độc lập B18 (2026-10-26, `docs/reports/REVIEW_B18_2026-10-26.md`):** `pnpm lint` sạch; E2E trên DB production `45 passed` ×2, 0 skip, 0 fail; 0 rác `e2e_` trong DB/Storage sau khi chạy (rào B18-6 đạt). **B18-3 chưa đạt**: spec v2 chỉ tạo 1 checkpoint `phone_lookup`, dùng lại nhân vật case_000, không chơi quá màn bảng — báo cáo B18 mô tả vượt thực tế. Rác production: `case_002` "Mật vụ mới (Bản nháp)". `main` ahead `origin/main` 16 commit. → **B19**.
+🟡 **Review độc lập B19 (2026-10-26, `docs/reports/REVIEW_B19_2026-10-26.md`):** spec "Trốn Tìm v2" lần đầu **đúng phạm vi** — tạo vụ từ số 0 bằng Studio (Nam/Huy/Lan/Minh, 7 checkpoint có `depends_on`, avatar, tin nhắn) và **chơi tới "KÝ SỰ HẬU ÁN"**; checklist grep đạt; 0 rác production. **Nhưng chập chờn nặng: 0/4 lần pass** trên máy reviewer (gãy ở bước 4, 8, 7, 7) + 1 lần dev server không khởi động kịp. 44/45 spec khác pass. Không chặn push. `main` ahead `origin/main` 21 commit. → **B20**.
 
 **Kết quả review B13 (2026-10-25, HEAD `30452f7`):** `tsc` sạch; E2E chạy lại 2 lần liên tiếp **42 pass / 0 fail / 0 skip** (báo cáo tại `docs/reports/B13_REPORT.md`). Khay hồ sơ case_000 nạp tức thì, 0 `toPass` click trong test, E2E chuyển sang dùng `SUPABASE_SERVICE_ROLE_KEY` kèm dọn dẹp sạch sẽ, DB migration liên tục 37–40 (`40_cleanup_legacy_dossier_x.sql`), ảnh bằng chứng lưu tại `docs/reports/b13/`. Đạt 100% B13-1 → B13-6.
 
@@ -114,6 +114,7 @@ if (!res.ok) process.exit(1);
 | **B17** | **Nghiệm thu v2 đầy đủ + sửa sót B16.** Làm B17-0 → B17-6 trong bảng "B17". | bảng B17, `docs/reports/REVIEW_B16_2026-10-25.md` | Tiêu chí bảng B17 đạt; spec v2 chạy thật trên DB test 2 lần pass |
 | **B18** | **Chốt DB test, nghiệm thu v2, ổn định E2E.** Làm B18-0 → B18-5 trong bảng "B18". | bảng B18, `docs/reports/REVIEW_B17_2026-10-26.md` | Tiêu chí bảng B18 đạt |
 | **B19** | **Hoàn tất nghiệm thu v2 (checklist grep được).** Làm B19-1 → B19-4 trong bảng "B19". | bảng B19, `docs/reports/REVIEW_B18_2026-10-26.md` | Mọi lệnh kiểm trong checklist B19-1 cho đúng số; spec pass 2 lần |
+| **B20** | **Ổn định spec v2 + E2E.** Làm B20-1 → B20-3 trong bảng "B20". | bảng B20, `docs/reports/REVIEW_B19_2026-10-26.md` | Spec v2 pass 5/5 liên tiếp; `pnpm test:e2e` 3 lần liên tiếp 0 fail |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -271,6 +272,25 @@ Nguồn: `docs/reports/REVIEW_B18_2026-10-26.md`. HEAD khi review: `78e7aaf`. R�
 | `grep -cE 'Nhập tên nghi phạm\|placeholder.*nghi phạm' e2e/case-v2-from-studio.spec.ts` | ≥ `1` (bước tra SĐT thật) |
 | Sau khi chạy: `select count(*) from cases where slug like 'e2e%'` + `storage.objects` tên `e2e/%` | `0` / `0` |
 
+### B20 — ổn định spec v2 + E2E (2026-10-26)
+
+Nguồn: `docs/reports/REVIEW_B19_2026-10-26.md`. HEAD khi review: `b99c057`. Không chặn push.
+
+| #     | Mức     | Việc | Done khi |
+| ----- | ------- | ---- | -------- |
+| B20-1 | 🔴 Cao  | Spec v2 gãy ngẫu nhiên vì thao tác trước khi trang Studio sẵn sàng (bước 4 Dossier: bộ hồ sơ vừa tạo chưa hiện trong `aside`; bước 7 Phone Studio; bước 8: bấm "Thêm Node" nhưng form chưa mở). Thêm **tín hiệu sẵn sàng** cho từng trang Studio giống `data-board-ready` ở gameplay: `data-studio-ready="true"` trên container khi dữ liệu vụ đã nạp và handler đã gắn (Cases, Characters, Dossier, Evidence, Checkpoints, Board, Phone). Spec chờ tín hiệu này sau mỗi `goto`, và sau mỗi thao tác lưu thì chờ kết quả lưu (toast/danh sách cập nhật) trước bước kế. **Không** thêm retry/`toPass`/timeout dài | `npx playwright test e2e/case-v2-from-studio.spec.ts --repeat-each=5` → `5 passed` (dán nguyên dòng tổng kết) |
+| B20-2 | 🟠 TB   | Dev server E2E 1 lần không khởi động kịp (`Timed out waiting 180000ms from config.webServer`) | Tìm nguyên nhân (cổng 3101 còn bị process cũ giữ? build lạnh `.next_dev`?). Nếu do process cũ: `globalSetup`/tài liệu hướng dẫn giải phóng cổng; nếu do build lạnh: warm-up. `pnpm test:e2e` 3 lần liên tiếp (tắt server giữa các lần) đều khởi động được và 0 fail |
+| B20-3 | 🟡 Thấp | Báo cáo B19 ghi sai môi trường ("Supabase Test DB") và không dán đúng lệnh checklist | Sửa `docs/reports/B19_REPORT.md`: môi trường = DB production (phương án C); thêm output đúng các lệnh checklist trong plan. Từ B20: báo cáo dán output **lệnh reviewer định sẵn**, không tự đổi lệnh |
+
+**Prompt giao việc B20:**
+
+```
+Đọc docs/reports/REVIEW_B19_2026-10-26.md và docs/WORKTREE_PLAN.md bảng "B20". Làm B20-1 → B20-3 trên main, mỗi mục 1 commit, không push.
+B20-1: thêm data-studio-ready cho các trang Studio và cho spec chờ tín hiệu đó; không retry/toPass/timeout dài. Chạy npx playwright test e2e/case-v2-from-studio.spec.ts --repeat-each=5 và dán nguyên dòng tổng kết (phải 5 passed).
+B20-2: tìm nguyên nhân webServer timeout, rồi chạy pnpm test:e2e 3 lần liên tiếp (tắt server giữa các lần), dán 3 dòng tổng kết.
+Báo cáo docs/reports/B20_REPORT.md: bảng commit dán git log --oneline b99c057..HEAD; ghi đúng môi trường là DB production. Không làm live cursor.
+```
+
 **Prompt giao việc B19:**
 
 ```
@@ -331,12 +351,12 @@ Báo cáo docs/reports/B17_REPORT.md: bảng commit dán nguyên văn git log --
 | 2   | Review độc lập B13 + audit multi-case/Studio                                                                                                                      | Reviewer          | ✅ Xong đọc code (`docs/reports/AUDIT_2026-10-25_CUSTOM_CASE.md`); chưa chạy lại được `tsc`/E2E → chuyển vào B14-0                                   |
 | 2b  | **B15-0 → B15-5** | AI thực thi | ✅ Xong (review `docs/reports/REVIEW_B15_2026-10-25.md`) |
 | 2c  | ✅ B18-0 (E2E dùng DB production), ✅ B18-2 (bỏ màn lệnh khám xét), ✅ B19-2 (đã xóa `case_002`) | Chủ dự án | — |
-| 2d  | **B19-3, B19-1, B19-4** (hoàn tất nghiệm thu v2 theo checklist grep được) + B15-12 (6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | B18 xong phần rào an toàn, review `docs/reports/REVIEW_B18_2026-10-26.md` |
+| 2d  | **B20-1 → B20-3** (ổn định spec v2, dev server E2E, sửa báo cáo B19) + B15-12 (6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | B19 đạt phạm vi, review `docs/reports/REVIEW_B19_2026-10-26.md` |
 | 3   | Xoay token `SUPABASE_ACCESS_TOKEN` (`sbp_`) ở supabase.com/dashboard/account/tokens, cập nhật `.env.local`                                                        | Chủ dự án         | ✅ Đã nhận token mới từ chủ dự án và nạp vào `.env.local`                                                                                            |
 | 4   | A6: xoay toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase), rồi `git rm --cached .env` + thêm `.env` vào `.gitignore`/`.dockerignore` | Chủ dự án         | `.env` đang bị track trong git                                                                                                                       |
 | 5   | A10: checklist VPS theo `deploy/INFRA_HANDOFF_CHECKLIST.md` (Caddy, timer reclaim, `SUPABASE_SERVICE_ROLE_KEY` trong container, Leaked Password Protection)       | Chủ dự án         | Cần quyền VPS                                                                                                                                        |
-| 6   | **Push** `main` (✅ đã push tới `941b2f8` ngày 2026-10-25; B17 + B18 chưa push (16 commit) — push được, không hồi quy), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
-| 7   | **Live cursor** — `docs/superpowers/plans/2026-10-25-live-cursor-group-play.md`, giai đoạn 1 (LC1–LC8)                                                            | AI thực thi       | ⛔ **Chưa giao.** Chỉ giao sau bước 6 và sau khi xác nhận gói Supabase (Free/Pro). Giai đoạn 2 (relay VPS) chỉ khi chạm ngưỡng ở mục 2.6 của plan đó |
+| 6   | **Push** `main` (✅ đã push tới `941b2f8` ngày 2026-10-25; B17 + B18 + B19 chưa push (21 commit) — push được, không hồi quy), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
+| 7   | **Live cursor** — `docs/superpowers/plans/2026-10-25-live-cursor-group-play.md`, giai đoạn 1 (LC1–LC8)                                                            | AI thực thi       | ⛔ **Chưa giao.** Đủ điều kiện giao sau khi push + smoke test production + xác nhận gói Supabase (Free/Pro). Không phụ thuộc B20 |
 
 **Prompt giao việc B12 (đã chạy xong):**
 
