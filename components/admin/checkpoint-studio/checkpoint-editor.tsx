@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Trash2 } from "lucide-react";
+import { Play, Trash2, Save, Loader2 } from "lucide-react";
 import type {
   DbCaseCheckpoint,
   DbCaseDossier,
@@ -102,11 +102,29 @@ export function CheckpointEditor({
           <input
             value={draft.title}
             onChange={(e) => onChange({ title: e.target.value })}
+            placeholder="Tiêu đề checkpoint..."
+            aria-label="Tiêu đề checkpoint"
             className="min-w-0 flex-1 bg-transparent text-xs font-semibold text-zinc-100 outline-none border-b border-transparent focus:border-amber-500/50 hover:bg-white/[0.04] px-1.5 py-0.5 rounded transition-colors"
           />
         )}
 
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          <Button
+            type="button"
+            size="sm"
+            onClick={onSave}
+            disabled={isSaving}
+            className="h-7 px-2.5 text-[11px] bg-amber-500 text-black hover:bg-amber-400 gap-1 font-semibold cursor-pointer"
+            title="Lưu checkpoint hiện tại"
+          >
+            {isSaving ? (
+              <Loader2 className="size-3 animate-spin" />
+            ) : (
+              <Save className="size-3" />
+            )}
+            <span>Lưu Checkpoint</span>
+          </Button>
+
           {onPlaytest && draft.checkpointId && (
             <Button
               type="button"
@@ -143,12 +161,17 @@ export function CheckpointEditor({
               draft={draft}
               dossiers={dossiers}
               characters={characters}
+              checkpoints={checkpoints}
               onChange={onChange}
             />
           )}
 
           {isEpilogue ? (
-            <CheckpointEpilogueForm draft={draft} onChange={onChange} />
+            <CheckpointEpilogueForm
+              draft={draft}
+              checkpoints={checkpoints}
+              onChange={onChange}
+            />
           ) : (
             <>
               {/* Form đáp án theo kind */}

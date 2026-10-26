@@ -605,14 +605,19 @@ export function CheckpointStudioClient({
 
   const handleSave = async () => {
     if (!draft) return;
-    if (!draft.title.trim()) {
+    const effectiveTitle =
+      draft.title.trim() || (draft.kind === "epilogue" ? "Hậu án" : "");
+    if (!effectiveTitle) {
       toast.error("Nhập tiêu đề checkpoint trước khi lưu.");
       return;
     }
+    const draftToSave = draft.title.trim()
+      ? draft
+      : { ...draft, title: effectiveTitle };
 
     setIsSaving(true);
     try {
-      const result = await saveCheckpoint(draft);
+      const result = await saveCheckpoint(draftToSave);
       if (!result.success) {
         toast.error(result.error);
         return;

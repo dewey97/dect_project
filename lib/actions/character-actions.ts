@@ -173,7 +173,9 @@ export async function uploadCharacterAvatar(
 
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
     const cleanExt = ext.replace(/[^a-z0-9]/g, "") || "jpg";
-    const filePath = `cases/${slug}/characters/${cleanKey}.${cleanExt}`;
+    const filePath = slug.startsWith("e2e_")
+      ? `e2e/${slug}_${cleanKey}.${cleanExt}`
+      : `cases/${slug}/characters/${cleanKey}.${cleanExt}`;
 
     const supabase = await createClient();
 

@@ -346,7 +346,7 @@ export function EvidenceForm({
         </div>
 
         {/* Khối Nâng cao thu gọn: Mã code & Slot Index */}
-        <details className="group border border-zinc-800/80 rounded-lg p-3 bg-zinc-900/30">
+        <details open className="group border border-zinc-800/80 rounded-lg p-3 bg-zinc-900/30">
           <summary className="text-xs text-zinc-400 cursor-pointer flex items-center justify-between font-mono list-none">
             <span>Cài đặt nâng cao (Mã code, thứ tự)</span>
             <ChevronDown className="size-3.5 group-open:rotate-180 transition-transform" />

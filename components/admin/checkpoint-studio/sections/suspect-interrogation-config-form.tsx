@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Flame, Clock, Scale } from "lucide-react";
 import type {
   CheckpointStudioDraft,

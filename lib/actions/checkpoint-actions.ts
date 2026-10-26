@@ -62,18 +62,27 @@ export async function saveCheckpoint(
   try {
     await requireAdminAuth();
 
-    if (!draft.title.trim()) {
+    const isEpilogue =
+      draft.kind === "epilogue" ||
+      draft.type === "epilogue" ||
+      draft.checkpointId?.includes("epilogue");
+    const effectiveTitle = draft.title.trim() || (isEpilogue ? "Hậu án" : "");
+    if (!effectiveTitle) {
       return {
         success: false,
         error: "Tiêu đề checkpoint không được để trống.",
       };
     }
-    if (!draft.caseId.trim()) {
+    const cleanDraft = draft.title.trim()
+      ? draft
+      : { ...draft, title: effectiveTitle };
+
+    if (!cleanDraft.caseId.trim()) {
       return { success: false, error: "Vụ án không hợp lệ." };
     }
 
     const supabase = await createClient();
-    const payload = toRowPayload(draft);
+    const payload = toRowPayload(cleanDraft);
     const checkpointId = payload.checkpoint_id;
 
     if (draft.id) {
@@ -97,7 +106,11 @@ export async function saveCheckpoint(
 
       const { data, error } = await supabase
         .from("case_checkpoints")
-        .update({ ...payload, updated_at: new Date().toISOString() })
+        .update({
+          ...payload,
+          ...(Array.isArray(draft.dependsOn) ? { depends_on: draft.dependsOn } : {}),
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", draft.id)
         .select()
         .single();
@@ -109,7 +122,10 @@ export async function saveCheckpoint(
 
     const { data, error } = await supabase
       .from("case_checkpoints")
-      .insert(payload)
+      .insert({
+        ...payload,
+        depends_on: Array.isArray(draft.dependsOn) ? draft.dependsOn : [],
+      })
       .select()
       .single();
 

@@ -1,6 +1,10 @@
 "use client";
 
-import type { DbCaseCharacter, DbCaseDossier } from "@/lib/types/database";
+import type {
+  DbCaseCharacter,
+  DbCaseDossier,
+  DbCaseCheckpoint,
+} from "@/lib/types/database";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import { Field } from "@/components/ui/field";
 import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
@@ -10,6 +14,7 @@ interface CheckpointIdentityFormProps {
   draft: CheckpointStudioDraft;
   dossiers?: DbCaseDossier[];
   characters?: DbCaseCharacter[];
+  checkpoints?: DbCaseCheckpoint[];
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
 }
 
@@ -31,6 +36,7 @@ export function CheckpointIdentityForm({
   draft,
   dossiers = [],
   characters = [],
+  checkpoints = [],
   onChange,
 }: CheckpointIdentityFormProps) {
   const isEpilogue =
@@ -132,9 +138,9 @@ export function CheckpointIdentityForm({
         />
       </Field>
 
-      <details className="pt-1 text-xs text-zinc-500">
+      <details className="pt-1 text-xs text-zinc-500" open>
         <summary className="cursor-pointer select-none text-[11px] font-medium text-zinc-500 hover:text-zinc-400">
-          Tùy chọn nâng cao
+          Tùy chọn nâng cao & Phụ thuộc
         </summary>
         <div className="mt-2 space-y-2 border-t border-white/5 pt-2">
           <Field label="Mã định danh">
@@ -145,6 +151,44 @@ export function CheckpointIdentityForm({
               className={INPUT_CLASS}
             />
           </Field>
+
+          {checkpoints && checkpoints.length > 0 && (
+            <div className="space-y-1">
+              <span className="flex items-baseline gap-1 text-xs font-medium text-zinc-300">
+                Phụ thuộc vào checkpoint (depends_on)
+              </span>
+              <div className="space-y-1 max-h-36 overflow-y-auto rounded border border-white/10 bg-black/40 p-2">
+                {checkpoints
+                  .filter((c) => c.checkpoint_id !== draft.checkpointId)
+                  .map((c) => {
+                    const isChecked = (draft.dependsOn || []).includes(c.checkpoint_id);
+                    return (
+                      <label
+                        key={c.checkpoint_id}
+                        className="flex items-center gap-2 text-[11px] text-zinc-300 hover:text-white cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            const cur = draft.dependsOn || [];
+                            const next = e.target.checked
+                              ? [...cur.filter((id) => id !== c.checkpoint_id), c.checkpoint_id]
+                              : cur.filter((id) => id !== c.checkpoint_id);
+                            onChange({ dependsOn: next });
+                          }}
+                          className="rounded border-zinc-700 bg-zinc-900 text-amber-500"
+                        />
+                        <span className="truncate">{c.title || c.checkpoint_id}</span>
+                        <span className="font-mono text-[9px] text-zinc-500 ml-auto">
+                          {c.checkpoint_id}
+                        </span>
+                      </label>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
         </div>
       </details>
     </div>

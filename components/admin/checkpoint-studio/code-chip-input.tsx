@@ -22,10 +22,10 @@ export function CodeChipInput({
   const [text, setText] = useState("");
 
   const commit = (raw: string) => {
-    const parts = raw
-      .split(/[\s,;\n]+/)
-      .map((item) => item.trim())
-      .filter(Boolean);
+    const separator = /[,;\n]/;
+    const parts = separator.test(raw)
+      ? raw.split(/[,;\n]+/).map((item) => item.trim()).filter(Boolean)
+      : [raw.trim()].filter(Boolean);
     if (parts.length === 0) return;
 
     const next = [...value];
@@ -66,6 +66,7 @@ export function CodeChipInput({
 
       <Input
         value={text}
+        placeholder={placeholder}
         onChange={(event) => setText(event.target.value)}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === ",") {

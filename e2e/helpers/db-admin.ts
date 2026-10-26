@@ -61,12 +61,39 @@ export async function cleanupE2EStorage(prefix = "e2e") {
   const buckets = ["avatars", "phone-assets", "evidence-assets"];
   for (const bucket of buckets) {
     try {
-      const { data: files } = await supabase.storage.from(bucket).list(prefix, {
+      async function listFolder(folder: string): Promise<string[]> {
+        const { data: items } = await supabase!.storage.from(bucket).list(folder, {
+          limit: 100,
+        });
+        if (!items || items.length === 0) return [];
+        const result: string[] = [];
+        for (const item of items) {
+          const itemPath = folder ? `${folder}/${item.name}` : item.name;
+          if (item.id === null) {
+            const sub = await listFolder(itemPath);
+            result.push(...sub);
+          } else {
+            result.push(itemPath);
+          }
+        }
+        return result;
+      }
+
+      const filesToDelete = await listFolder(prefix);
+      if (filesToDelete.length > 0) {
+        await supabase.storage.from(bucket).remove(filesToDelete);
+      }
+
+      const { data: rootItems } = await supabase.storage.from(bucket).list("", {
         limit: 100,
       });
-      if (files && files.length > 0) {
-        const paths = files.map((f) => `${prefix}/${f.name}`);
-        await supabase.storage.from(bucket).remove(paths);
+      if (rootItems && rootItems.length > 0) {
+        const rootPaths = rootItems
+          .filter((i) => i.name.startsWith("e2e"))
+          .map((i) => i.name);
+        if (rootPaths.length > 0) {
+          await supabase.storage.from(bucket).remove(rootPaths);
+        }
       }
     } catch (err) {
       console.warn(`[cleanupE2EStorage] Không thể xóa storage ${bucket}/${prefix}:`, err);

@@ -443,14 +443,39 @@ export function MainInvestigationCanvas({
       });
     }
 
-    // Nếu đã nạp từ Sheet thì ưu tiên 100% Sheet
+    // Nếu không có sheetEvidences (case Studio/Multi-case), nạp danh sách nghi phạm từ characters DB
+    if (list.length === 0 && Array.isArray(characters) && characters.length > 0) {
+      characters.forEach((char) => {
+        if (char.role === "victim") return;
+        const charId = char.key;
+        if (!seen.has(charId)) {
+          seen.add(charId);
+          const saved = state.suspects.find(
+            (s) =>
+              s.id === charId ||
+              s.id === `suspect-${charId}` ||
+              s.name.toLowerCase() === char.name.toLowerCase(),
+          );
+          list.push({
+            id: `suspect-${charId}`,
+            name: char.name,
+            clueIds: saved?.clueIds || [],
+            motiveClueIds: saved?.motiveClueIds,
+            alibiClueIds: saved?.alibiClueIds,
+            contradictionClueIds: saved?.contradictionClueIds,
+          });
+        }
+      });
+    }
+
+    // Nếu đã nạp từ Sheet hoặc Characters DB thì ưu tiên
     if (list.length > 0) {
       return list;
     }
 
     // Fallback tạm thời nếu Sheet đang load và local state đã có sẵn
     return state.suspects;
-  }, [state.suspects, sheetEvidences]);
+  }, [state.suspects, sheetEvidences, characters]);
 
   // Suspects list for connections and pins
 
@@ -505,6 +530,7 @@ export function MainInvestigationCanvas({
       buildCustomPins({
         isMobile,
         effectiveSuspects,
+        characters,
         sheetPhotoMap,
         sheetPinnedItems,
         followupCulpritIds,
@@ -519,6 +545,7 @@ export function MainInvestigationCanvas({
     [
       isMobile,
       effectiveSuspects,
+      characters,
       sheetPhotoMap,
       sheetPinnedItems,
       followupCulpritIds,

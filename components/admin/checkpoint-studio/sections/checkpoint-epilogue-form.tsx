@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BookOpen, Plus, Trash2 } from "lucide-react";
+import type { DbCaseCheckpoint } from "@/lib/types/database";
 import type {
   CheckpointStudioDraft,
   EpilogueStoryItem,
@@ -12,11 +13,13 @@ import { cn } from "@/lib/utils";
 
 interface CheckpointEpilogueFormProps {
   draft: CheckpointStudioDraft;
+  checkpoints?: DbCaseCheckpoint[];
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
 }
 
 export function CheckpointEpilogueForm({
   draft,
+  checkpoints = [],
   onChange,
 }: CheckpointEpilogueFormProps) {
   const stories: EpilogueStoryItem[] =
@@ -146,6 +149,45 @@ export function CheckpointEpilogueForm({
           className="min-h-24 text-xs leading-relaxed text-zinc-200 focus:border-amber-400"
         />
       </div>
+
+      {/* Phụ thuộc depends_on cho Hậu án */}
+      {checkpoints && checkpoints.length > 0 && (
+        <div className="space-y-1.5 pt-2 border-t border-white/10">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+            Phụ thuộc vào checkpoint (depends_on)
+          </span>
+          <div className="space-y-1 max-h-36 overflow-y-auto rounded border border-white/10 bg-black/40 p-2">
+            {checkpoints
+              .filter((c) => c.checkpoint_id !== draft.checkpointId)
+              .map((c) => {
+                const isChecked = (draft.dependsOn || []).includes(c.checkpoint_id);
+                return (
+                  <label
+                    key={c.checkpoint_id}
+                    className="flex items-center gap-2 text-[11px] text-zinc-300 hover:text-white cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const cur = draft.dependsOn || [];
+                        const next = e.target.checked
+                          ? [...cur.filter((id) => id !== c.checkpoint_id), c.checkpoint_id]
+                          : cur.filter((id) => id !== c.checkpoint_id);
+                        onChange({ dependsOn: next });
+                      }}
+                      className="rounded border-zinc-700 bg-zinc-900 text-amber-500"
+                    />
+                    <span className="truncate">{c.title || c.checkpoint_id}</span>
+                    <span className="font-mono text-[9px] text-zinc-500 ml-auto">
+                      {c.checkpoint_id}
+                    </span>
+                  </label>
+                );
+              })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
