@@ -152,6 +152,8 @@ Tiến độ (2026-10-26): `origin/main` tại `26d1d46` (B0–B19 đã push); B
 - **Không build vào thư mục không gitignore** khi dev server đang chạy: Tailwind v4 quét toàn repo (trừ file gitignore) và cache sai CSS. Chỉ dùng `.next_dev` (đã gitignore).
 - Không chạy `next build` vào `.next_dev` trong khi E2E/dev server cổng 3100 đang dùng thư mục đó.
 
+**Ngân sách Playwright:** trong lúc làm chỉ chạy spec liên quan (`npx playwright test e2e/<spec>.spec.ts`, có thể `-g`), cả bộ `pnpm test:e2e` **1 lần** trước báo cáo/push; `--repeat-each` đúng số plan ghi; tổng ≤ 20 phút/bước. Chi tiết: `docs/WORKTREE_PLAN.md` mục "Ngân sách kiểm thử cho AI thực thi".
+
 ### 2.3. Kiến trúc cần nắm
 
 - **Mã vụ án:** luôn qua `normalizeCaseId()` (`lib/cases/case-id.ts`) → dạng `case_000`. URL gameplay `/evidence/web?case_id=<slug>`; Studio `?case=<slug>`.

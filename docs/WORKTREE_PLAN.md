@@ -90,6 +90,28 @@ if (!res.ok) process.exit(1);
 
 ---
 
+## Ngân sách kiểm thử cho AI thực thi (bắt buộc, từ 2026-10-26)
+
+Mục tiêu: mỗi bước B xong trong thời gian hợp lý, không chạy Playwright lặp lại vô ích, không đụng cổng với reviewer.
+
+| Khi nào | Chạy gì | Không chạy |
+| --- | --- | --- |
+| Trong lúc sửa code | `pnpm lint` (1 lần khi xong một mục) + **chỉ spec liên quan trực tiếp** tới file vừa sửa: `npx playwright test e2e/<spec>.spec.ts` | Cả bộ `pnpm test:e2e` |
+| Muốn kiểm 1 đoạn trong spec dài | `npx playwright test e2e/<spec>.spec.ts -g "<tên test>"` hoặc `--grep` | Chạy lại cả spec dài nhiều lần để dò lỗi |
+| Bước yêu cầu "ổn định" | `--repeat-each` **đúng số plan ghi** (thường 3), **1 lần** | Lặp thêm "cho chắc" |
+| Hết bước B (trước báo cáo) | `pnpm test:e2e` **1 lần** | Chạy 2–3 lần cả bộ |
+| Spec fail | Đọc lỗi + trace (`npx playwright show-trace`) và code, sửa nguyên nhân, chạy lại **chỉ spec đó** | Chạy lại nguyên bộ để "xem có tự hết không" |
+
+Quy tắc thêm:
+
+- Tìm lỗi bằng **đọc code / grep / `pnpm lint` trước**, Playwright chỉ để xác nhận. Lỗi hardcode, tên biến, cờ gắn cứng, import sai… không cần chạy trình duyệt mới thấy.
+- Không chạy E2E chạy nền kéo dài khi reviewer có thể đang chạy (cùng cổng 3101, `scripts/ops/ensure-e2e-port.mjs` sẽ kill tiến trình của bên kia). Nếu cần chạy dài: ghi rõ trong báo cáo thời điểm chạy.
+- Spec ghi DB production (phương án C) chỉ chạy khi bước đó cần; không lặp spec v2 (`e2e/case-v2-from-studio.spec.ts`, ~2–3 phút/lần, ghi production) quá số lần plan yêu cầu.
+- Báo cáo: dán **dòng tổng kết** mỗi lần chạy (kể cả lần fail), ghi tổng thời gian chạy test của cả bước.
+- Giới hạn tham khảo: tổng thời gian chạy Playwright cho một bước B **≤ 20 phút**; vượt thì dừng, ghi lý do vào báo cáo và hỏi chủ dự án.
+
+---
+
 ## Thứ tự việc trên `main` (làm tuần tự, mỗi bước 1 commit)
 
 | Bước    | Việc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Đặc tả                                                   | Done khi                                                                                                                                                                                                                                                                                                                                                                  |
@@ -296,7 +318,7 @@ Nguồn: `docs/reports/REVIEW_B20_2026-10-26.md`. HEAD khi review: `f4014a5`.
 **Prompt giao việc B21:**
 
 ```
-Đọc docs/reports/REVIEW_B20_2026-10-26.md và docs/WORKTREE_PLAN.md bảng "B21". Làm B21-1 → B21-3 trên main, mỗi mục 1 commit, không push.
+Đọc docs/reports/REVIEW_B20_2026-10-26.md, docs/WORKTREE_PLAN.md mục "Ngân sách kiểm thử cho AI thực thi" và bảng "B21". Làm B21-1 → B21-3 trên main, mỗi mục 1 commit, không push.
 B21-1: data-studio-ready lấy từ state loading thật của từng trang; không còn giá trị "true" cứng. Chỉ chạy spec bị đụng: npx playwright test e2e/case-v2-from-studio.spec.ts --repeat-each=3 (dán dòng tổng kết). Không chạy cả bộ nhiều lần.
 Báo cáo docs/reports/B21_REPORT.md ngắn: commit (git log --oneline f4014a5..HEAD), output grep tiêu chí, dòng tổng kết spec. Không làm live cursor.
 ```
