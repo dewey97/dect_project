@@ -66,11 +66,11 @@ export function DeviceChassis({
       const availH = rect && rect.height > 50 ? rect.height : vpH;
 
       const isMobile = vpW < 640;
-      const padX = isMobile ? 8 : 24;
-      const padY = isMobile ? 8 : 24;
+      const padX = isMobile ? 4 : 6;
+      const padY = isMobile ? 4 : 6;
 
-      const maxUsableW = Math.max(availW - padX * 2, 280);
-      const maxUsableH = Math.max(availH - padY * 2, 380);
+      const maxUsableW = Math.max(availW - padX * 2, 220);
+      const maxUsableH = Math.max(availH - padY * 2, 340);
 
       const scaleX = maxUsableW / TARGET_W;
       const scaleY = maxUsableH / TARGET_H;
