@@ -252,20 +252,14 @@ export async function saveBoardgamePinPositions(
 
     const pinIds = formattedPins.map((p) => p.id);
 
-    // 2. Xóa các pins không còn tồn tại (id TEXT nên phải quote từng giá trị
-    //    trong filter `in`, nếu không PostgREST parse sai id có dấu gạch ngang)
-    const quotedPinIds = pinIds.map((id) => `"${id}"`).join(",");
+    // 2. Xóa các pins không còn tồn tại (chỉ thực hiện khi có pinIds hợp lệ, tránh xóa sạch toàn bộ)
     if (pinIds.length > 0) {
+      const quotedPinIds = pinIds.map((id) => `"${id}"`).join(",");
       await supabase
         .from("boardgame_pins")
         .delete()
         .eq("case_id", normalizedId)
         .not("id", "in", `(${quotedPinIds})`);
-    } else {
-      await supabase
-        .from("boardgame_pins")
-        .delete()
-        .eq("case_id", normalizedId);
     }
 
     // 3. Upsert Pins (bao rotation/scale, id TEXT cho phép c0-pin-...)

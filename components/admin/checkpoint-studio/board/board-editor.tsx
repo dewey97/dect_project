@@ -13,6 +13,9 @@ import {
   Play,
   Layers,
   Sparkles,
+  RotateCcw,
+  RotateCw,
+  Minus,
 } from "lucide-react";
 import { launchPlaytestFromCheckpoint } from "@/lib/checkpoints/case-playtest";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
@@ -43,6 +46,7 @@ export function BoardEditor({ caseId, checkpoints = [] }: BoardEditorProps) {
     handleRedo,
     canUndo,
     canRedo,
+    handleAdjustNodeTransform,
   } = useBoardEditor(caseId);
 
   const [isCreatingNode, setIsCreatingNode] = useState(false);
@@ -175,6 +179,55 @@ export function BoardEditor({ caseId, checkpoints = [] }: BoardEditorProps) {
       {/* 2. Main Content Canvas & Node Form Inspector */}
       <div className="flex flex-1 min-h-0 min-w-0 overflow-hidden relative">
         <div className="flex-1 h-full min-h-0 relative">
+          {/* Thanh công cụ Quick Transform nổi ngay trên Canvas khi chọn 1 ghim */}
+          {selectedNode && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-3 py-1.5 bg-[#16120e]/95 backdrop-blur-md rounded-lg border border-amber-500/50 shadow-2xl font-mono text-xs select-none">
+              <span className="text-amber-200/90 font-bold max-w-[140px] truncate pr-1">
+                {("title" in selectedNode ? selectedNode.title : ("label" in selectedNode ? selectedNode.label : "")) || "Ghim"}
+              </span>
+
+              <div className="h-4 w-px bg-white/15 mx-0.5" />
+
+              <button
+                type="button"
+                onClick={() => handleAdjustNodeTransform(selectedNode.id, -2, 0)}
+                className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
+                title="Xoay nghiêng trái (-2°)"
+              >
+                <RotateCcw className="size-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleAdjustNodeTransform(selectedNode.id, 2, 0)}
+                className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
+                title="Xoay nghiêng phải (+2°)"
+              >
+                <RotateCw className="size-3.5" />
+              </button>
+
+              <div className="h-4 w-px bg-white/15 mx-0.5" />
+
+              <button
+                type="button"
+                onClick={() => handleAdjustNodeTransform(selectedNode.id, 0, -0.1)}
+                className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
+                title="Thu nhỏ (-0.1x)"
+              >
+                <Minus className="size-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleAdjustNodeTransform(selectedNode.id, 0, 0.1)}
+                className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
+                title="Phóng to (+0.1x)"
+              >
+                <Plus className="size-3.5" />
+              </button>
+            </div>
+          )}
+
           <HeroInteractive
             className="w-full h-full"
             controlledCaseId={caseId}

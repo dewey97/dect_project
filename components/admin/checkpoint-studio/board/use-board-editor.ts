@@ -58,20 +58,24 @@ export function useBoardEditor(caseId: string) {
       const loadedNodes = nodesRes.success ? nodesRes.data : [];
       setNodes(loadedNodes);
 
+      // Loại bỏ các pin trùng ID với node từ bảng case_board_nodes để tránh bị vẽ đè 2 lần
+      const nodeIds = new Set(loadedNodes.map((n) => n.id));
       const loadedPins: PinPoint[] = boardgameRes.success
-        ? boardgameRes.pins.map((p) => ({
-            id: p.id,
-            nodeKind: "custom",
-            x: p.x,
-            y: p.y,
-            label: p.label || p.id,
-            detail: p.detail || "",
-            photoUrl: p.photoUrl || undefined,
-            noteColor: (p.noteColor as any) || "white",
-            pinColor: (p.pinColor as any) || "red",
-            scale: p.scale ?? 1.0,
-            rotation: p.rotation ?? 0,
-          }))
+        ? boardgameRes.pins
+            .filter((p) => !nodeIds.has(p.id))
+            .map((p) => ({
+              id: p.id,
+              nodeKind: "custom",
+              x: p.x,
+              y: p.y,
+              label: p.label || p.id,
+              detail: p.detail || "",
+              photoUrl: p.photoUrl || undefined,
+              noteColor: (p.noteColor as any) || "white",
+              pinColor: (p.pinColor as any) || "red",
+              scale: p.scale ?? 1.0,
+              rotation: p.rotation ?? 0,
+            }))
         : [];
       setPins(loadedPins);
 
@@ -366,6 +370,50 @@ export function useBoardEditor(caseId: string) {
     selectedNodeId,
     selectedNode,
     setSelectedNodeId,
+    handleAdjustNodeTransform: (pinId: string, deltaRot: number, deltaScale: number) => {
+      const targetNode = nodes.find((n) => n.id === pinId);
+      if (targetNode) {
+        const snap = currentSnapshot();
+        commitSnapshot(snap);
+        setNodes((prev) =>
+          prev.map((n) => {
+            if (n.id !== pinId) return n;
+            const cfg = (n.config as any) || {};
+            const curRot = cfg.rotation ?? 0;
+            const curScale = cfg.scale ?? 1.0;
+            return {
+              ...n,
+              config: {
+                ...cfg,
+                rotation: Math.round(curRot + deltaRot),
+                scale: Math.max(0.4, Math.min(2.5, Math.round((curScale + deltaScale) * 10) / 10)),
+              },
+            };
+          })
+        );
+        setHasUnsavedChanges(true);
+        return;
+      }
+
+      const targetPin = pins.find((p) => p.id === pinId);
+      if (targetPin) {
+        const snap = currentSnapshot();
+        commitSnapshot(snap);
+        setPins((prev) =>
+          prev.map((p) => {
+            if (p.id !== pinId) return p;
+            const curRot = p.rotation ?? 0;
+            const curScale = p.scale ?? 1.0;
+            return {
+              ...p,
+              rotation: Math.round(curRot + deltaRot),
+              scale: Math.max(0.4, Math.min(2.5, Math.round((curScale + deltaScale) * 10) / 10)),
+            };
+          })
+        );
+        setHasUnsavedChanges(true);
+      }
+    },
     handlePositionChange,
     handleConnectPins,
     handleDeleteConnection,

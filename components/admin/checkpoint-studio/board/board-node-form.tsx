@@ -44,6 +44,7 @@ export function BoardNodeForm({
   const [pinTitle, setPinTitle] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [scale, setScale] = useState(1.0);
+  const [rotation, setRotation] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export function BoardNodeForm({
       setPinTitle(cfg.pin_title || "");
       setPhotoUrl(cfg.photo_url || "");
       setScale(cfg.scale ?? 1.0);
+      setRotation(cfg.rotation ?? 0);
     } else if (pinNode) {
       setTitle(pinNode.label || "");
       setNodeKind((pinNode.nodeKind as BoardNodeKind) || "custom");
@@ -62,6 +64,7 @@ export function BoardNodeForm({
       setPinTitle(pinNode.label || "");
       setPhotoUrl(pinNode.photoUrl || "");
       setScale(pinNode.scale ?? 1.0);
+      setRotation(pinNode.rotation ?? 0);
     } else {
       setTitle("");
       setNodeKind("note");
@@ -69,6 +72,7 @@ export function BoardNodeForm({
       setPinTitle("");
       setPhotoUrl("");
       setScale(1.0);
+      setRotation(0);
     }
   }, [dbNode, pinNode]);
 
@@ -92,6 +96,7 @@ export function BoardNodeForm({
           pin_title: pinTitle.trim() || title.trim(),
           photo_url: photoUrl.trim() || undefined,
           scale,
+          rotation,
         },
       };
 
@@ -206,12 +211,37 @@ export function BoardNodeForm({
           <input
             type="range"
             min="0.5"
-            max="2.0"
+            max="2.5"
             step="0.05"
             value={scale}
             onChange={(e) => setScale(parseFloat(e.target.value))}
             className="w-full accent-amber-400"
           />
+        </div>
+
+        <div>
+          <label className="mb-1 block font-mono text-[10px] text-zinc-300 uppercase">
+            Góc xoay nghiêng (rotation: {rotation}°)
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              type="range"
+              min="-45"
+              max="45"
+              step="1"
+              value={rotation}
+              onChange={(e) => setRotation(parseInt(e.target.value, 10))}
+              className="w-full accent-amber-400"
+            />
+            <button
+              type="button"
+              onClick={() => setRotation(0)}
+              className="px-2 py-0.5 rounded bg-zinc-800 text-[10px] font-mono text-zinc-400 hover:text-white border border-white/10"
+              title="Đặt lại về 0 độ"
+            >
+              0°
+            </button>
+          </div>
         </div>
 
         <div className="pt-4 flex items-center justify-between border-t border-white/10">
