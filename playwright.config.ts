@@ -45,8 +45,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `node node_modules/next/dist/bin/next dev -p ${PORT}`,
-    url: `http://localhost:${PORT}/evidence/web?case_id=case_000`,
+    command: `node scripts/ops/ensure-e2e-port.mjs && node node_modules/next/dist/bin/next dev -p ${PORT}`,
+    url: `http://localhost:${PORT}/api/health`,
     env: {
       NEXT_DIST_DIR: ".next_dev",
       ...(process.env.E2E_SUPABASE_URL
