@@ -15,7 +15,7 @@
 | WT-1 board    | 🟡 1A–1C + `796041b` B5, `18175dc` B6, `e5407aa` B7, `fa6c12c` B8 (migration 39 đã chạy production), `2b1a9da` B9, `de7dcf0` B10 | **B12-1 hồi quy luồng chính**, B12-2/3/4/6 (B10 chưa đạt tiêu chí)                    |
 | WT-3 studio   | ✅ `471a5c8` + `bf1f35f` B3 — rà 0 placeholder >40 ký tự, ẩn khóa kỹ thuật                                                       | `studio-ux.spec.ts` **bị skip** (thiếu credential admin), chưa từng chạy thật → B12-5 |
 
-🟡 **Review độc lập B19 (2026-10-26, `docs/reports/REVIEW_B19_2026-10-26.md`):** spec "Trốn Tìm v2" lần đầu **đúng phạm vi** — tạo vụ từ số 0 bằng Studio (Nam/Huy/Lan/Minh, 7 checkpoint có `depends_on`, avatar, tin nhắn) và **chơi tới "KÝ SỰ HẬU ÁN"**; checklist grep đạt; 0 rác production. **Nhưng chập chờn nặng: 0/4 lần pass** trên máy reviewer (gãy ở bước 4, 8, 7, 7) + 1 lần dev server không khởi động kịp. 44/45 spec khác pass. Không chặn push. `main` ahead `origin/main` 21 commit. → **B20**.
+🟡 **Review độc lập B20 (2026-10-26, `docs/reports/REVIEW_B20_2026-10-26.md`):** lint sạch; `/api/health` + dọn cổng hợp lý. **B20-1 chưa đạt**: `data-studio-ready` gắn cứng `"true"` ở 7/8 trang (chỉ Board theo `isLoading`) → spec v2 vẫn fail (bước 8, lưu hotspot) trong lần lặp của reviewer. Từ nay review nhanh: đọc diff + grep + lint + chỉ spec bị đụng; cả bộ E2E 1 lần trước push. `origin/main` = `26d1d46`; 3 commit B20 chưa push. → **B21**.
 
 **Kết quả review B13 (2026-10-25, HEAD `30452f7`):** `tsc` sạch; E2E chạy lại 2 lần liên tiếp **42 pass / 0 fail / 0 skip** (báo cáo tại `docs/reports/B13_REPORT.md`). Khay hồ sơ case_000 nạp tức thì, 0 `toPass` click trong test, E2E chuyển sang dùng `SUPABASE_SERVICE_ROLE_KEY` kèm dọn dẹp sạch sẽ, DB migration liên tục 37–40 (`40_cleanup_legacy_dossier_x.sql`), ảnh bằng chứng lưu tại `docs/reports/b13/`. Đạt 100% B13-1 → B13-6.
 
@@ -115,6 +115,7 @@ if (!res.ok) process.exit(1);
 | **B18** | **Chốt DB test, nghiệm thu v2, ổn định E2E.** Làm B18-0 → B18-5 trong bảng "B18". | bảng B18, `docs/reports/REVIEW_B17_2026-10-26.md` | Tiêu chí bảng B18 đạt |
 | **B19** | **Hoàn tất nghiệm thu v2 (checklist grep được).** Làm B19-1 → B19-4 trong bảng "B19". | bảng B19, `docs/reports/REVIEW_B18_2026-10-26.md` | Mọi lệnh kiểm trong checklist B19-1 cho đúng số; spec pass 2 lần |
 | **B20** | **Ổn định spec v2 + E2E.** Làm B20-1 → B20-3 trong bảng "B20". | bảng B20, `docs/reports/REVIEW_B19_2026-10-26.md` | Spec v2 pass 5/5 liên tiếp; `pnpm test:e2e` 3 lần liên tiếp 0 fail |
+| **B21** | **Tín hiệu sẵn sàng thật + sửa script cổng.** Làm B21-1 → B21-3. | bảng B21, `docs/reports/REVIEW_B20_2026-10-26.md` | Tiêu chí bảng B21 đạt |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -282,6 +283,24 @@ Nguồn: `docs/reports/REVIEW_B19_2026-10-26.md`. HEAD khi review: `b99c057`. Kh
 | B20-2 | 🟠 TB   | Dev server E2E 1 lần không khởi động kịp (`Timed out waiting 180000ms from config.webServer`) | Tìm nguyên nhân (cổng 3101 còn bị process cũ giữ? build lạnh `.next_dev`?). Nếu do process cũ: `globalSetup`/tài liệu hướng dẫn giải phóng cổng; nếu do build lạnh: warm-up. `pnpm test:e2e` 3 lần liên tiếp (tắt server giữa các lần) đều khởi động được và 0 fail |
 | B20-3 | 🟡 Thấp | Báo cáo B19 ghi sai môi trường ("Supabase Test DB") và không dán đúng lệnh checklist | Sửa `docs/reports/B19_REPORT.md`: môi trường = DB production (phương án C); thêm output đúng các lệnh checklist trong plan. Từ B20: báo cáo dán output **lệnh reviewer định sẵn**, không tự đổi lệnh |
 
+### B21 — tín hiệu sẵn sàng thật + sửa script cổng (2026-10-26)
+
+Nguồn: `docs/reports/REVIEW_B20_2026-10-26.md`. HEAD khi review: `f4014a5`.
+
+| #     | Mức     | Việc | Done khi |
+| ----- | ------- | ---- | -------- |
+| B21-1 | 🔴 Cao  | `data-studio-ready` phải phản ánh dữ liệu đã nạp: dùng state loading thật của từng trang (Cases, Case detail, Characters, Dossier, Evidence, Phone, Checkpoints) — `"false"` khi đang tải/lưu, `"true"` khi xong. Sau thao tác lưu (vd hotspot ở Evidence, bước 8), spec chờ tín hiệu về `"true"` hoặc chờ dữ liệu mới xuất hiện trong danh sách | `grep -rn 'data-studio-ready="true"' app components` = **0** (không còn giá trị cứng); `npx playwright test e2e/case-v2-from-studio.spec.ts --repeat-each=3` → `3 passed` (reviewer chạy lại 1 lần) |
+| B21-2 | 🟡 Thấp | Script dọn cổng khớp chính xác | `scripts/ops/ensure-e2e-port.mjs`: chỉ kill tiến trình có **địa chỉ cục bộ** kết thúc bằng `:3101` (không khớp `:31010…`); in ra PID + tên tiến trình trước khi kill |
+| B21-3 | 🟡 Thấp | Báo cáo B20 sai đường dẫn file | Sửa `docs/reports/B20_REPORT.md` mục 2.1 theo đường dẫn thật |
+
+**Prompt giao việc B21:**
+
+```
+Đọc docs/reports/REVIEW_B20_2026-10-26.md và docs/WORKTREE_PLAN.md bảng "B21". Làm B21-1 → B21-3 trên main, mỗi mục 1 commit, không push.
+B21-1: data-studio-ready lấy từ state loading thật của từng trang; không còn giá trị "true" cứng. Chỉ chạy spec bị đụng: npx playwright test e2e/case-v2-from-studio.spec.ts --repeat-each=3 (dán dòng tổng kết). Không chạy cả bộ nhiều lần.
+Báo cáo docs/reports/B21_REPORT.md ngắn: commit (git log --oneline f4014a5..HEAD), output grep tiêu chí, dòng tổng kết spec. Không làm live cursor.
+```
+
 **Prompt giao việc B20:**
 
 ```
@@ -351,11 +370,11 @@ Báo cáo docs/reports/B17_REPORT.md: bảng commit dán nguyên văn git log --
 | 2   | Review độc lập B13 + audit multi-case/Studio                                                                                                                      | Reviewer          | ✅ Xong đọc code (`docs/reports/AUDIT_2026-10-25_CUSTOM_CASE.md`); chưa chạy lại được `tsc`/E2E → chuyển vào B14-0                                   |
 | 2b  | **B15-0 → B15-5** | AI thực thi | ✅ Xong (review `docs/reports/REVIEW_B15_2026-10-25.md`) |
 | 2c  | ✅ B18-0 (E2E dùng DB production), ✅ B18-2 (bỏ màn lệnh khám xét), ✅ B19-2 (đã xóa `case_002`) | Chủ dự án | — |
-| 2d  | **B20-1 → B20-3** (ổn định spec v2, dev server E2E, sửa báo cáo B19) + B15-12 (6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | B19 đạt phạm vi, review `docs/reports/REVIEW_B19_2026-10-26.md` |
+| 2d  | **B21-1 → B21-3** (tín hiệu sẵn sàng thật, script cổng) + B15-12 (6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | Review `docs/reports/REVIEW_B20_2026-10-26.md` |
 | 3   | Xoay token `SUPABASE_ACCESS_TOKEN` (`sbp_`) ở supabase.com/dashboard/account/tokens, cập nhật `.env.local`                                                        | Chủ dự án         | ✅ Đã nhận token mới từ chủ dự án và nạp vào `.env.local`                                                                                            |
 | 4   | A6: xoay toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase), rồi `git rm --cached .env` + thêm `.env` vào `.gitignore`/`.dockerignore` | Chủ dự án         | `.env` đang bị track trong git                                                                                                                       |
 | 5   | A10: checklist VPS theo `deploy/INFRA_HANDOFF_CHECKLIST.md` (Caddy, timer reclaim, `SUPABASE_SERVICE_ROLE_KEY` trong container, Leaked Password Protection)       | Chủ dự án         | Cần quyền VPS                                                                                                                                        |
-| 6   | **Push** `main` (✅ đã push tới `941b2f8` ngày 2026-10-25; B17 + B18 + B19 chưa push (21 commit) — push được, không hồi quy), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
+| 6   | **Push** `main` (✅ đã push tới `26d1d46` ngày 2026-10-26; B20 chưa push), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
 | 7   | **Live cursor** — `docs/superpowers/plans/2026-10-25-live-cursor-group-play.md`, giai đoạn 1 (LC1–LC8)                                                            | AI thực thi       | ⛔ **Chưa giao.** Đủ điều kiện giao sau khi push + smoke test production + xác nhận gói Supabase (Free/Pro). Không phụ thuộc B20 |
 
 **Prompt giao việc B12 (đã chạy xong):**

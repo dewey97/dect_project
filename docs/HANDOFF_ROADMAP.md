@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-26): `origin/main` tại `941b2f8`; B17–B19 trên `main` (HEAD `b99c057`, 21 commit chưa push). E2E chạy trên DB production có rào an toàn, 0 rác. **Review B19** (`docs/reports/REVIEW_B19_2026-10-26.md`): spec "Trốn Tìm v2" lần đầu chứng minh **tạo vụ từ số 0 bằng Studio và chơi tới hậu án** (đúng phạm vi), nhưng **chập chờn 0/4 lần pass** trên máy reviewer → **B20** (tín hiệu `data-studio-ready`). Chủ dự án: push (không có hồi quy sản phẩm), quyết 6 vụ tĩnh `/activate`, A6, A10, smoke test production, xác nhận gói Supabase trước khi giao live cursor.
+Tiến độ (2026-10-26): `origin/main` tại `26d1d46` (B0–B19 đã push); B20 trên `main` (3 commit chưa push). Đã chứng minh tạo vụ từ số 0 bằng Studio và chơi tới hậu án (spec v2), còn chập chờn do tín hiệu sẵn sàng giả → **B21** (việc nhỏ). Review từ nay theo cách nhanh (đọc diff + grep + lint + spec bị đụng). Chủ dự án: smoke test production, 6 vụ tĩnh `/activate`, A6, A10, xác nhận gói Supabase trước live cursor.
 
 ---
 
