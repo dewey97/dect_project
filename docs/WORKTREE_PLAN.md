@@ -350,11 +350,27 @@ Nguồn: `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md`. **Chủ dự án �
 
 E2E `e2e/board-flow-unified.spec.ts` (theo "Ngân sách kiểm thử"): tạo checkpoint `phone_lookup` → thấy ghim trên mặt phẳng → kéo → gameplay đúng vị trí; đổi tên → nhãn đổi ở Studio + gameplay; kéo hậu án vào khay → không hiện ở gameplay; nối mũi tên ở Lớp logic → `depends_on` cập nhật. Cập nhật `e2e/case-v2-from-studio.spec.ts`, `board-studio.spec.ts`, `studio-ux.spec.ts` theo màn hình mới. Cập nhật `docs/core_specs/19_checkpoint_studio.md`.
 
+**Làm song song với chủ dự án (bắt buộc):** B23 chạy trong **worktree riêng**, không sửa thư mục `main` (`D:\code_world\dect_project`) — chủ dự án sửa UI/UX trên `main` cùng lúc.
+
+| Mục | Giá trị |
+| --- | --- |
+| Tạo worktree | `git worktree add ../dect_wt_b23 -b wt/b23-unified main` → làm trong `D:\code_world\dect_wt_b23`; `pnpm install`; copy `.env` và `.env.local` từ thư mục `main` (không commit) |
+| Cổng | dev `PORT=3112`; E2E `E2E_PORT=3113` (không dùng 3100/3101/3000) |
+| Commit | chỉ vào nhánh `wt/b23-unified`; **không** commit lên `main`, không push |
+| Vùng B23 sở hữu | `components/admin/checkpoint-studio/**`, `components/investigation/mindmap/canvas/**`, `components/investigation/hero-interactive*`, `lib/actions/board-actions.ts`, `lib/actions/checkpoint-actions.ts`, `lib/types/database.ts` (chỉ thêm cuối file), `db/schema/44_*.sql`, `e2e/board-*.spec.ts`, `e2e/case-v2-from-studio.spec.ts`, `e2e/studio-ux.spec.ts`, `docs/core_specs/19_checkpoint_studio.md` |
+| Ngoài vùng | Không sửa; nếu bắt buộc → ghi vào báo cáo mục "Chạm ngoài vùng" |
+| DB production | Dùng chung. Migration chuyển vị trí: backup trước, báo chủ dự án trước khi chạy (để không kéo thả bảng trong Studio cùng lúc) |
+| Trước khi bàn giao | `git fetch` + `git rebase main` (hoặc merge `main` vào nhánh), giải conflict, chạy lại spec liên quan + `pnpm test:e2e` 1 lần trên cổng 3113. Chủ dự án/reviewer merge vào `main` |
+| Dọn | Sau merge: `git worktree remove ../dect_wt_b23`, `git branch -d wt/b23-unified` (reviewer làm) |
+
 **Prompt giao việc B23:**
 
 ```
-Đọc docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md, docs/WORKTREE_PLAN.md mục "Ngân sách kiểm thử cho AI thực thi" và bảng "B23" (chủ dự án đã chốt: gộp Flow + Board thành một mặt phẳng). Làm B23-1 → B23-5 trên main, mỗi mục 1 commit, không push. Migration chuyển vị trí: backup trước, chạy qua scripts/ops/run-sql.mjs.
-Chỉ chạy spec liên quan trong lúc làm; cuối bước pnpm test:e2e 1 lần. Báo cáo ngắn docs/reports/B23_REPORT.md: git log --oneline 91c827e..HEAD, ảnh màn hình mới trong docs/reports/b23/, dòng tổng kết test. Không làm live cursor.
+Đọc docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md, docs/WORKTREE_PLAN.md mục "Ngân sách kiểm thử cho AI thực thi", bảng "B23" và mục "Làm song song với chủ dự án" (chủ dự án đã chốt: gộp Flow + Board thành một mặt phẳng).
+Tạo worktree: git worktree add ../dect_wt_b23 -b wt/b23-unified main; làm toàn bộ trong D:\code_world\dect_wt_b23 (pnpm install, copy .env và .env.local từ thư mục main, không commit chúng). Dev PORT=3112, E2E E2E_PORT=3113. KHÔNG sửa hay commit trong thư mục main: chủ dự án đang sửa UI/UX ở đó.
+Làm B23-1 → B23-5, mỗi mục 1 commit vào nhánh wt/b23-unified, không push. Chỉ sửa file trong "Vùng B23 sở hữu"; chạm ngoài vùng thì ghi rõ trong báo cáo. Migration chuyển vị trí: backup trước, chạy qua scripts/ops/run-sql.mjs, báo trước khi chạy.
+Trước khi bàn giao: rebase lên main mới nhất, giải conflict, chạy spec liên quan + pnpm test:e2e 1 lần (E2E_PORT=3113).
+Báo cáo docs/reports/B23_REPORT.md (trong nhánh): git log --oneline main..wt/b23-unified, danh sách file chạm ngoài vùng (nếu có), ảnh màn hình mới trong docs/reports/b23/, dòng tổng kết test. Không làm live cursor.
 ```
 
 **Prompt giao việc B22:**
