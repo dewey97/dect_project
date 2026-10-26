@@ -5,7 +5,7 @@ import type {
   PinPoint,
   CaseConnection,
 } from "@/components/investigation/hero-interactive";
-import type { DbCaseBoardNode } from "@/lib/types/database";
+import type { DbCaseBoardNode, DbCaseCheckpoint, DbCaseCharacter } from "@/lib/types/database";
 import {
   saveBoardNode,
   deleteBoardNode,
@@ -23,8 +23,8 @@ export interface BoardEditorSnapshot {
   positions: Record<string, { x: number; y: number }>;
 }
 
-export function useBoardEditor(caseId: string, options?: { isMobile?: boolean }) {
-  const boardModel = useBoardModel(caseId, { isMobile: options?.isMobile });
+export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; checkpoints?: DbCaseCheckpoint[]; characters?: DbCaseCharacter[] }) {
+  const boardModel = useBoardModel(caseId, { isMobile: options?.isMobile, initialCheckpoints: options?.checkpoints, initialCharacters: options?.characters });
 
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -300,6 +300,7 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean })
     selectedNodeId,
     selectedNode,
     setSelectedNodeId,
+    refreshBoardModel: boardModel.refresh,
     handleAdjustNodeTransform: (pinId: string, deltaRot: number, deltaScale: number) => {
       const targetNode = nodes.find((n) => n.id === pinId);
       if (targetNode) {

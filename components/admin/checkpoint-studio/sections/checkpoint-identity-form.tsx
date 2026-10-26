@@ -142,7 +142,7 @@ export function CheckpointIdentityForm({
         <summary className="cursor-pointer select-none text-[11px] font-medium text-zinc-500 hover:text-zinc-400">
           Tùy chọn nâng cao & Phụ thuộc
         </summary>
-        <div className="mt-2 space-y-2 border-t border-white/5 pt-2">
+        <div className="mt-2 space-y-2.5 border-t border-white/5 pt-2">
           <Field label="Mã định danh">
             <Input
               value={draft.checkpointId || ""}
@@ -151,6 +151,44 @@ export function CheckpointIdentityForm({
               className={INPUT_CLASS}
             />
           </Field>
+
+          {/* Cấu hình hiển thị trên Bảng điều tra */}
+          <div className="space-y-1.5 rounded border border-white/5 bg-black/20 p-2">
+            <label className="flex items-center gap-2 text-[11px] text-zinc-300 hover:text-white cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={!draft.boardConfig?.hidden}
+                onChange={(e) => {
+                  onChange({
+                    boardConfig: {
+                      ...(draft.boardConfig || {}),
+                      hidden: !e.target.checked,
+                    },
+                  });
+                }}
+                className="rounded border-zinc-700 bg-zinc-900 text-amber-500"
+              />
+              <span className="font-medium">Hiển thị ghim trên Bảng điều tra</span>
+            </label>
+
+            {!draft.boardConfig?.hidden && (
+              <Field label="Tiêu đề ghim tùy chỉnh (nếu muốn khác tiêu đề checkpoint)">
+                <Input
+                  value={draft.boardConfig?.pin_title || ""}
+                  onChange={(e) =>
+                    onChange({
+                      boardConfig: {
+                        ...(draft.boardConfig || {}),
+                        pin_title: e.target.value,
+                      },
+                    })
+                  }
+                  placeholder="Để trống nếu lấy theo tiêu đề checkpoint"
+                  className={INPUT_CLASS}
+                />
+              </Field>
+            )}
+          </div>
 
           {checkpoints && checkpoints.length > 0 && (
             <div className="space-y-1">

@@ -1,4 +1,4 @@
-import type { DbCaseCheckpoint } from "./database";
+import type { DbCaseCheckpoint, BoardConfig } from "./database";
 import { slugifyVietnamese } from "@/lib/text";
 
 /**
@@ -94,6 +94,7 @@ export interface CheckpointStudioDraft {
   aiContext: string;
   aiValidCases: string[];
   aiInvalidCases: string[];
+  boardConfig?: BoardConfig;
 }
 
 /** Batch cập nhật cạnh phụ thuộc do Flow view gửi lên. */
@@ -152,6 +153,7 @@ export function createEmptyDraft(caseId: string): CheckpointStudioDraft {
     aiContext: "",
     aiValidCases: [],
     aiInvalidCases: [],
+    boardConfig: {},
   };
 }
 
@@ -277,6 +279,7 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     aiContext: asString(row.ai_context),
     aiValidCases: asStringArray(row.ai_valid_cases),
     aiInvalidCases: asStringArray(row.ai_invalid_cases),
+    boardConfig: (row.board_config as BoardConfig) || {},
   };
 }
 
@@ -385,5 +388,6 @@ export function toRowPayload(
     ai_context: draft.aiContext.trim() || null,
     ai_valid_cases: cleanList(draft.aiValidCases),
     ai_invalid_cases: cleanList(draft.aiInvalidCases),
+    board_config: draft.boardConfig || {},
   };
 }

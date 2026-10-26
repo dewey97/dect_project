@@ -109,6 +109,18 @@ export function useBoardModel(
 
   const isMountedRef = useRef(false);
 
+  useEffect(() => {
+    if (options.initialCheckpoints && options.initialCheckpoints.length > 0) {
+      setCheckpoints(options.initialCheckpoints as DbCaseCheckpoint[]);
+    }
+  }, [options.initialCheckpoints]);
+
+  useEffect(() => {
+    if (options.initialCharacters && options.initialCharacters.length > 0) {
+      setCharacters(options.initialCharacters);
+    }
+  }, [options.initialCharacters]);
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
