@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import {
   Phone,
   PhoneIncoming,
@@ -25,15 +25,21 @@ interface CallsEditorProps {
   caseId: string;
   initialCalls: DbPhoneCall[];
   onCallsChange: (calls: DbPhoneCall[]) => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 export function CallsEditor({
   caseId,
   initialCalls,
   onCallsChange,
+  onBusyChange,
 }: CallsEditorProps) {
   const [calls, setCalls] = useState<DbPhoneCall[]>(initialCalls);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    onBusyChange?.(isPending);
+  }, [isPending, onBusyChange]);
   const [statusMsg, setStatusMsg] = useState<{
     type: "idle" | "success" | "error";
     text?: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import {
   Grid,
   Plus,
@@ -30,6 +30,7 @@ interface AppLauncherEditorProps {
   initialApps: DbCasePhoneApp[];
   checkpoints?: Array<{ checkpoint_id: string; title: string }>;
   onAppsChange: (apps: DbCasePhoneApp[]) => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 const KNOWN_APP_TYPES = [
@@ -55,9 +56,14 @@ export function AppLauncherEditor({
   initialApps,
   checkpoints = [],
   onAppsChange,
+  onBusyChange,
 }: AppLauncherEditorProps) {
   const [apps, setApps] = useState<DbCasePhoneApp[]>(initialApps);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    onBusyChange?.(isPending);
+  }, [isPending, onBusyChange]);
   const [statusMsg, setStatusMsg] = useState<{
     type: "idle" | "success" | "error";
     text?: string;

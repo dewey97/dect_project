@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import {
   Users,
   Plus,
@@ -24,6 +24,7 @@ interface ContactsEditorProps {
   initialContacts: DbPhoneContact[];
   characters?: DbCaseCharacter[];
   onContactsChange: (contacts: DbPhoneContact[]) => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 export function ContactsEditor({
@@ -31,9 +32,14 @@ export function ContactsEditor({
   initialContacts,
   characters = [],
   onContactsChange,
+  onBusyChange,
 }: ContactsEditorProps) {
   const [contacts, setContacts] = useState<DbPhoneContact[]>(initialContacts);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    onBusyChange?.(isPending);
+  }, [isPending, onBusyChange]);
   const [statusMsg, setStatusMsg] = useState<{
     type: "idle" | "success" | "error";
     text?: string;

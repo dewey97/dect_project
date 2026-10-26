@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import {
   Image as ImageIcon,
   Plus,
@@ -24,12 +24,14 @@ interface PhotosEditorProps {
   caseId: string;
   initialPhotos: DbPhonePhoto[];
   onPhotosChange: (photos: DbPhonePhoto[]) => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 export function PhotosEditor({
   caseId,
   initialPhotos,
   onPhotosChange,
+  onBusyChange,
 }: PhotosEditorProps) {
   const [photos, setPhotos] = useState<DbPhonePhoto[]>(initialPhotos);
   const [isPending, startTransition] = useTransition();
@@ -39,6 +41,10 @@ export function PhotosEditor({
   }>({ type: "idle" });
 
   const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    onBusyChange?.(isPending || isUploading);
+  }, [isPending, isUploading, onBusyChange]);
   const [editingPhoto, setEditingPhoto] = useState<DbPhonePhoto | null>(null);
 
   // New photo manual form

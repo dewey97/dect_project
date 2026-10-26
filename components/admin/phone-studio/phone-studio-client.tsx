@@ -515,6 +515,7 @@ export function PhoneStudioClient({
               caseId={caseId}
               initialDevice={device}
               onDeviceChange={(d) => setDevice(d)}
+              onBusyChange={setIsBusy}
             />
           )}
 
@@ -524,6 +525,7 @@ export function PhoneStudioClient({
               initialApps={apps}
               checkpoints={checkpoints}
               onAppsChange={(newApps) => setApps(newApps)}
+              onBusyChange={setIsBusy}
             />
           )}
 
@@ -532,6 +534,7 @@ export function PhoneStudioClient({
               caseId={caseId}
               initialMessages={messages}
               onMessagesChange={(newMsgs) => setMessages(newMsgs)}
+              onBusyChange={setIsBusy}
             />
           )}
 
@@ -540,6 +543,7 @@ export function PhoneStudioClient({
               caseId={caseId}
               initialCalls={calls}
               onCallsChange={(newCalls) => setCalls(newCalls)}
+              onBusyChange={setIsBusy}
             />
           )}
 
@@ -549,6 +553,7 @@ export function PhoneStudioClient({
               initialContacts={contacts}
               characters={initialCharacters}
               onContactsChange={(newContacts) => setContacts(newContacts)}
+              onBusyChange={setIsBusy}
             />
           )}
 
@@ -557,6 +562,7 @@ export function PhoneStudioClient({
               caseId={caseId}
               initialPhotos={photos}
               onPhotosChange={(newPhotos) => setPhotos(newPhotos)}
+              onBusyChange={setIsBusy}
             />
           )}
 
@@ -569,6 +575,7 @@ export function PhoneStudioClient({
               onNotesChange={(n) => setNotes(n)}
               onBankChange={(b) => setBankTxs(b)}
               onHistoryChange={(h) => setHistory(h)}
+              onBusyChange={setIsBusy}
             />
           )}
         </div>

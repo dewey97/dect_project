@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import {
   Smartphone,
   Save,
@@ -30,12 +30,14 @@ interface DeviceFormProps {
   caseId: string;
   initialDevice: CaseCharacterDevice;
   onDeviceChange: (updated: CaseCharacterDevice) => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 export function DeviceForm({
   caseId,
   initialDevice,
   onDeviceChange,
+  onBusyChange,
 }: DeviceFormProps) {
   const [device, setDevice] = useState<CaseCharacterDevice>(initialDevice);
   const [isPending, startTransition] = useTransition();
@@ -44,6 +46,10 @@ export function DeviceForm({
     message?: string;
   }>({ type: "idle" });
   const [uploadingField, setUploadingField] = useState<string | null>(null);
+
+  useEffect(() => {
+    onBusyChange?.(isPending || Boolean(uploadingField));
+  }, [isPending, uploadingField, onBusyChange]);
 
   const [customKey, setCustomKey] = useState("");
   const [customVal, setCustomVal] = useState("");

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import {
   FileText,
   CreditCard,
@@ -35,6 +35,7 @@ interface MiscEditorsProps {
   onNotesChange: (notes: DbPhoneNote[]) => void;
   onBankChange: (txs: DbPhoneBankTx[]) => void;
   onHistoryChange: (history: DbPhoneBrowserHistory[]) => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 export function MiscEditors({
@@ -45,6 +46,7 @@ export function MiscEditors({
   onNotesChange,
   onBankChange,
   onHistoryChange,
+  onBusyChange,
 }: MiscEditorsProps) {
   const [subTab, setSubTab] = useState<"notes" | "bank" | "safari">("notes");
   const [notes, setNotes] = useState<DbPhoneNote[]>(initialNotes);
@@ -53,6 +55,10 @@ export function MiscEditors({
     useState<DbPhoneBrowserHistory[]>(initialHistory);
 
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    onBusyChange?.(isPending);
+  }, [isPending, onBusyChange]);
   const [statusMsg, setStatusMsg] = useState<{
     type: "idle" | "success" | "error";
     text?: string;

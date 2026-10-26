@@ -32,6 +32,7 @@ interface MessagesEditorProps {
   caseId: string;
   initialMessages: DbPhoneMessage[];
   onMessagesChange: (messages: DbPhoneMessage[]) => void;
+  onBusyChange?: (busy: boolean) => void;
 }
 
 interface DraftMessageItem extends BatchMessageItemInput {
@@ -182,10 +183,15 @@ export function MessagesEditor({
   caseId,
   initialMessages,
   onMessagesChange,
+  onBusyChange,
 }: MessagesEditorProps) {
   const [messages, setMessages] = useState<DbPhoneMessage[]>(initialMessages);
   const [activeThreadKey, setActiveThreadKey] = useState<string>("");
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    onBusyChange?.(isPending);
+  }, [isPending, onBusyChange]);
   const [statusMsg, setStatusMsg] = useState<{
     type: "idle" | "success" | "error";
     text?: string;
@@ -382,6 +388,7 @@ export function MessagesEditor({
   const handleSaveBatch = () => {
     if (!activeThreadKey) return;
 
+    onBusyChange?.(true);
     startTransition(async () => {
       setStatusMsg({ type: "idle" });
 
@@ -446,6 +453,7 @@ export function MessagesEditor({
       return;
     }
 
+    onBusyChange?.(true);
     startTransition(async () => {
       const res = await deletePhoneThread(caseId, key);
       if (res.success) {
