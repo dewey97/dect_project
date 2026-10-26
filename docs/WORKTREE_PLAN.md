@@ -139,6 +139,7 @@ Quy tắc thêm:
 | **B20** | **Ổn định spec v2 + E2E.** Làm B20-1 → B20-3 trong bảng "B20". | bảng B20, `docs/reports/REVIEW_B19_2026-10-26.md` | Spec v2 pass 5/5 liên tiếp; `pnpm test:e2e` 3 lần liên tiếp 0 fail |
 | **B21** | **Tín hiệu sẵn sàng thật + sửa script cổng.** Làm B21-1 → B21-3. | bảng B21, `docs/reports/REVIEW_B20_2026-10-26.md` | Tiêu chí bảng B21 đạt |
 | **B22** | **Chốt ổn định spec v2.** Làm B22-1 → B22-2. | bảng B22, `docs/reports/REVIEW_B21_2026-10-26.md` | Spec v2 `--repeat-each=3` → 3 passed; cả bộ 1 lần 0 fail |
+| **B23** | **Đồng bộ Flow ↔ Board (một mô hình bảng dùng chung).** Làm B23-1 → B23-5. | `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md` | Board Studio hiển thị đúng như gameplay; kéo/ẩn/đổi tên đồng bộ; E2E mới pass |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -326,6 +327,20 @@ Nguồn: `docs/reports/REVIEW_B21_2026-10-26.md`. HEAD khi review: `9f80665`. Th
 | B22-2 | 🟠 TB  | Bước 3 Character Studio: nhân vật vừa lưu đôi khi không hiện trong `aside` sau 15s (`e2e/case-v2-from-studio.spec.ts:186`). Đọc trace của lần fail (`npx playwright show-trace`) xác định: lưu bị lỗi (thông báo lỗi có hiện không? request trả gì?) hay danh sách không cập nhật. Nếu là lỗi sản phẩm (lỗi bị nuốt, danh sách không thêm) → sửa sản phẩm + hiển thị lỗi cho GM; nếu do spec bấm lưu khi form chưa hợp lệ → spec chờ nút lưu `enabled` | Ghi nguyên nhân trong báo cáo; `npx playwright test e2e/case-v2-from-studio.spec.ts --repeat-each=3` → `3 passed` |
 
 Cuối bước: `pnpm test:e2e` **1 lần** (0 fail) rồi báo cáo ngắn `docs/reports/B22_REPORT.md`.
+
+### B23 — đồng bộ Flow ↔ Board (2026-10-26)
+
+Nguồn: `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md`. ⛔ Chờ chủ dự án duyệt phương án (mục 3 của review), đặc biệt chọn **một nơi lưu vị trí** (đề xuất `boardgame_pins`).
+
+| #     | Mức    | Việc | Done khi |
+| ----- | ------ | ---- | -------- |
+| B23-1 | 🔴 Cao | Hook dùng chung `useBoardModel(caseId)` gọi `buildCustomPins` + `buildCustomConnections`; Board Studio (`use-board-editor.ts`) và bảng gameplay cùng dùng | Board Studio hiện đủ ghim phone_lookup, nghi phạm, câu hỏi phụ, cáo trạng như gameplay; `grep -n "getBoardNodes\|getBoardgamePinPositions" components/admin/checkpoint-studio/board/use-board-editor.ts` không còn nạp riêng |
+| B23-2 | 🔴 Cao | Một nơi lưu vị trí cho mọi node (đề xuất `boardgame_pins` theo id node); ngừng ghi `case_board_nodes.config.position` | Kéo node sinh từ checkpoint trong Studio → gameplay thấy đúng vị trí |
+| B23-3 | 🟠 TB  | Liên kết Flow ↔ Board: click node gắn checkpoint trong Board → mở checkpoint trong editor; Flow có công tắc "Ẩn khỏi bảng" ghi `board_config.hidden` (nối `updateCheckpointBoardConfig`); nhãn node lấy từ `checkpoint.title` | Đổi tên/ẩn ở Flow → Board Studio và gameplay đổi theo |
+| B23-4 | 🟡 Thấp | Vị trí node bộ hồ sơ trong Flow lưu DB (`case_dossiers.flow_position`, migration mới) thay `localStorage` khóa chung | Không còn `checkpoint_studio_dossier_positions` trong code |
+| B23-5 | 🟡 Thấp | Ghi chú UI 2 loại dây ("Dây mở khóa" / "Dây manh mối"); nút tùy chọn "Vẽ dây theo phụ thuộc" trong Board Studio | Nhãn hiển thị; nút sinh dây từ `depends_on` |
+
+E2E mới `e2e/flow-board-sync.spec.ts` (theo "Ngân sách kiểm thử"): tạo checkpoint ở Flow → thấy ghim trong Board Studio → kéo → gameplay đúng vị trí; đổi tên → nhãn đổi; ẩn → gameplay mất ghim.
 
 **Prompt giao việc B22:**
 
