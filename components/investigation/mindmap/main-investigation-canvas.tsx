@@ -50,6 +50,10 @@ interface MainInvestigationCanvasProps {
     intensity: number;
   };
   hideTitleBadgeOnMobile?: boolean;
+  hideTitleBadge?: boolean;
+  hideGroupPlay?: boolean;
+  hideAudio?: boolean;
+  hideNotebook?: boolean;
   isBoardGame?: boolean;
 }
 
@@ -62,6 +66,10 @@ export function MainInvestigationCanvas({
   customBgImage,
   lightConeConfig,
   hideTitleBadgeOnMobile = false,
+  hideTitleBadge = false,
+  hideGroupPlay = false,
+  hideAudio = false,
+  hideNotebook = false,
   isBoardGame,
 }: MainInvestigationCanvasProps) {
   const isBoardGameMode =
@@ -529,6 +537,7 @@ export function MainInvestigationCanvas({
     () =>
       buildCustomPins({
         isMobile,
+        boardNodes: layout.boardNodes,
         effectiveSuspects,
         characters,
         sheetPhotoMap,
@@ -544,6 +553,7 @@ export function MainInvestigationCanvas({
       }),
     [
       isMobile,
+      layout.boardNodes,
       effectiveSuspects,
       characters,
       sheetPhotoMap,
@@ -786,6 +796,10 @@ export function MainInvestigationCanvas({
           }}
           selectedPin={selectedPin}
           hideTitleBadgeOnMobile={hideTitleBadgeOnMobile}
+          hideTitleBadge={hideTitleBadge}
+          hideGroupPlay={hideGroupPlay}
+          hideAudio={hideAudio}
+          hideNotebook={hideNotebook}
           isBoardGame={isBoardGameMode}
           onOpenNotebook={onOpenNotebook}
         />

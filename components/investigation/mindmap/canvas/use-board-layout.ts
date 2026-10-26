@@ -5,7 +5,11 @@ import type {
   CaseConnection,
   PinPoint,
 } from "@/components/investigation/hero-interactive";
-import { getBoardgamePinPositions } from "@/lib/actions/board-actions";
+import type { DbCaseBoardNode } from "@/lib/types/database";
+import {
+  getBoardgamePinPositions,
+  getBoardNodes,
+} from "@/lib/actions/board-actions";
 import {
   getStorageItem,
   setStorageItem,
@@ -26,6 +30,7 @@ export function useBoardLayout(caseId: string = "case_000") {
   const transformsKey = `boardgame_transforms_${caseId}`;
   const connectionsKey = `admin_connections_${caseId}`;
 
+  const [boardNodes, setBoardNodes] = useState<DbCaseBoardNode[]>([]);
   const [customPinPositions, setCustomPinPositions] = useState<
     Record<string, { x: number; y: number }>
   >({});
@@ -63,22 +68,25 @@ export function useBoardLayout(caseId: string = "case_000") {
       );
 
       try {
-        const res = await getBoardgamePinPositions(caseId);
+        const [res, nodesRes] = await Promise.all([
+          getBoardgamePinPositions(caseId),
+          getBoardNodes(caseId),
+        ]);
+
+        const posMap: Record<string, { x: number; y: number }> = {};
+        const tfMap: Record<string, { rotation: number; scale: number }> = {};
+        const dbCustomPins: PinPoint[] = [];
+
+        // 1. Nạp từ boardgame_pins
         if (res.success && res.pins.length > 0) {
-          const posMap: Record<string, { x: number; y: number }> = {};
-          const dbCustomPins: PinPoint[] = [];
           res.pins.forEach((p) => {
             posMap[p.id] = { x: p.x, y: p.y };
             if (
               p.id.startsWith("admin-pin-") ||
-              p.id.startsWith("custom-pin-")
+              p.id.startsWith("custom-pin-") || p.id.includes(":custom:")
             ) {
               dbCustomPins.push(p);
             }
-          });
-          setCustomPinPositions(posMap);
-          const tfMap: Record<string, { rotation: number; scale: number }> = {};
-          res.pins.forEach((p) => {
             if (typeof p.rotation === "number" || typeof p.scale === "number") {
               tfMap[p.id] = {
                 rotation: p.rotation ?? 0,
@@ -86,22 +94,38 @@ export function useBoardLayout(caseId: string = "case_000") {
               };
             }
           });
-          setPinTransforms(tfMap);
-          if (dbCustomPins.length > 0) {
-            setAdminCustomPins(dbCustomPins);
-          }
           if (res.connections && res.connections.length > 0) {
             setAdminConnections(res.connections);
-          }
-          setStorageJson(pinsKey, posMap);
-          setStorageJson(transformsKey, tfMap);
-          if (dbCustomPins.length > 0) {
-            setStorageJson(adminPinsKey, dbCustomPins);
-          }
-          if (res.connections && res.connections.length > 0) {
             setStorageJson(connectionsKey, res.connections);
           }
         }
+
+        // 2. Nạp thêm từ case_board_nodes (để đồng bộ vị trí, scale, rotation của các node chính)
+        if (nodesRes.success && nodesRes.data.length > 0) {
+          setBoardNodes(nodesRes.data);
+          nodesRes.data.forEach((n) => {
+            const cfg = (n.config as any) || {};
+            const pos = cfg.position?.desktop || cfg.position?.mobile;
+            if (pos && typeof pos.x === "number" && typeof pos.y === "number") {
+              posMap[n.id] = { x: pos.x, y: pos.y };
+            }
+            if (typeof cfg.rotation === "number" || typeof cfg.scale === "number") {
+              tfMap[n.id] = {
+                rotation: cfg.rotation ?? 0,
+                scale: cfg.scale ?? 1.0,
+              };
+            }
+          });
+        }
+
+        setCustomPinPositions(posMap);
+        setPinTransforms(tfMap);
+        if (dbCustomPins.length > 0) {
+          setAdminCustomPins(dbCustomPins);
+          setStorageJson(adminPinsKey, dbCustomPins);
+        }
+        setStorageJson(pinsKey, posMap);
+        setStorageJson(transformsKey, tfMap);
       } catch {}
     }
     initLayout();
@@ -110,6 +134,7 @@ export function useBoardLayout(caseId: string = "case_000") {
   return {
     isAdmin: false,
     isEditMode: false,
+    boardNodes,
     customPinPositions,
     adminCustomPins,
     adminConnections,

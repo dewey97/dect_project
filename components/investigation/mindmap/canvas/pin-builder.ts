@@ -142,33 +142,151 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   );
 
   if (hasDbBoardNodes && input.boardNodes) {
-    input.boardNodes.forEach((node) => {
-      const legacyId = undefined;
+    const victimName = input.victimName || "Nạn nhân";
 
+    input.boardNodes.forEach((node) => {
+      const cfg = (node.config as any) || {};
       const pos = resolveNodePosition(
         node.id,
-                node.config?.position,
+        cfg.position,
         node.slot_index,
         isMobile,
         positions,
       );
+
+      let detail = node.title ? `Vật chứng / Khu vực: ${node.title}` : "";
+      let photoUrl = cfg.photo_url || undefined;
+      let scale =
+        typeof cfg.scale === "number" && cfg.scale > 0 ? cfg.scale : 1.0;
+      const rotation = typeof cfg.rotation === "number" ? cfg.rotation : 0;
+      let color = (cfg.note_style as PinPoint["color"]) || "yellow";
+      let pinColor: PinPoint["pinColor"] = "yellow";
+      let noteColor: PinPoint["noteColor"] = cfg.note_style ? "white" : undefined;
+      let pulseBorder: boolean | undefined = undefined;
+
+      if (node.node_kind === "victim_phone") {
+        detail = `Vật chứng: Điện thoại thu giữ của nạn nhân ${victimName}`;
+        if (!photoUrl) photoUrl = "/phone.png";
+        if (typeof cfg.scale !== "number") scale = 0.85;
+      } else if (node.node_kind === "reinvestigate") {
+        detail = "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án";
+        if (!photoUrl) photoUrl = `/images/cases/${caseSlug}/crime_scene.png`;
+        if (typeof cfg.scale !== "number") scale = 0.95;
+        noteColor = "white";
+        pulseBorder = input.isReinvestigateBlinking;
+      } else if (node.node_kind === "suspects_hub") {
+        detail = "Thêm và xem danh sách nghi phạm vụ án";
+        color = isMobile ? "yellow" : "red";
+        pinColor = isMobile ? "yellow" : "red";
+        noteColor = "yellow";
+      } else if (node.node_kind === "victim") {
+        detail = `Hồ sơ nạn nhân: ${node.title || victimName}`;
+        if (!photoUrl) photoUrl = `/images/cases/${caseSlug}/victim_khang.png`;
+        noteColor = "white";
+      } else if (node.node_kind === "evidence_hub") {
+        detail = "Danh mục vật chứng và tài liệu vụ án";
+        noteColor = "white";
+        pinColor = "blue";
+      }
 
       pins.push({
         id: node.id,
         nodeKind: node.node_kind,
         subjectKey: node.subject_key || undefined,
         checkpointId: node.checkpoint_id || undefined,
-                x: pos.x,
+        x: pos.x,
         y: pos.y,
-        label: node.title || node.config?.pin_title || node.node_kind,
-        detail: node.title ? `Vật chứng / Khu vực: ${node.title}` : "",
-        photoUrl: node.config?.photo_url || undefined,
+        label: cfg.pin_title || node.title || node.node_kind,
+        detail,
+        photoUrl,
         noteTextureUrl: undefined,
         isAvatar: node.node_kind === "victim",
-        color: (node.config?.note_style as PinPoint["color"]) || "yellow",
+        color,
+        pinColor,
+        noteColor,
+        scale,
+        rotation,
+        pulseBorder,
         actionType: "info",
       });
     });
+
+    // Bổ sung an toàn: Nếu DB chưa có 1 trong 3 node cơ bản thì tự bù
+    const hasVp = pins.some((p) => p.nodeKind === "victim_phone");
+    const hasReinv = pins.some((p) => p.nodeKind === "reinvestigate");
+    const hasSh = pins.some((p) => p.nodeKind === "suspects_hub");
+
+    if (!hasVp) {
+      const vpId = `${caseSlug}:victim_phone:item`;
+      const vpPos = resolveNodePosition(
+        vpId,
+        undefined,
+        1,
+        isMobile,
+        positions,
+        { x: 0.38, y: 0.14 },
+      );
+      pins.push({
+        id: vpId,
+        nodeKind: "victim_phone",
+        x: vpPos.x,
+        y: vpPos.y,
+        label: "Điện thoại nạn nhân",
+        detail: `Vật chứng: Điện thoại thu giữ của nạn nhân ${victimName}`,
+        color: "yellow",
+        pinColor: "yellow",
+        photoUrl: "/phone.png",
+        scale: 0.85,
+      });
+    }
+    if (!hasReinv) {
+      const reinvId = `${caseSlug}:reinvestigate:scene`;
+      const reinvPos = resolveNodePosition(
+        reinvId,
+        undefined,
+        2,
+        isMobile,
+        positions,
+        { x: 0.18, y: 0.36 },
+      );
+      pins.push({
+        id: reinvId,
+        nodeKind: "reinvestigate",
+        x: reinvPos.x,
+        y: reinvPos.y,
+        label: "Khám xét hiện trường",
+        detail: "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án",
+        color: "yellow",
+        pinColor: "yellow",
+        noteColor: "white",
+        photoUrl: `/images/cases/${caseSlug}/crime_scene.png`,
+        scale: 0.95,
+        pulseBorder: input.isReinvestigateBlinking,
+        actionType: "info",
+      });
+    }
+    if (!hasSh) {
+      const shId = `${caseSlug}:suspects_hub:hub`;
+      const shPos = resolveNodePosition(
+        shId,
+        undefined,
+        3,
+        isMobile,
+        positions,
+        { x: 0.58, y: 0.38 },
+      );
+      pins.push({
+        id: shId,
+        nodeKind: "suspects_hub",
+        x: shPos.x,
+        y: shPos.y,
+        label: "Nghi phạm",
+        detail: "Thêm và xem danh sách nghi phạm vụ án",
+        color: isMobile ? "yellow" : "red",
+        pinColor: isMobile ? "yellow" : "red",
+        noteColor: "yellow",
+      });
+    }
   } else {
     // Fallback an toàn: Dựng 5 node cơ bản khi database chưa chạy migration 39
     const victimName = input.victimName || "Nạn nhân";
@@ -642,7 +760,110 @@ export function buildCustomConnections(opts: {
     }
   });
 
-  return [...conns, ...opts.adminConnections];
+  const seenPair = new Set<string>();
+  const finalConns: CaseConnection[] = [];
+
+  for (const c of [...conns, ...opts.adminConnections]) {
+    const key1 = `${c.fromPinId}->${c.toPinId}`;
+    const key2 = `${c.toPinId}->${c.fromPinId}`;
+    if (!seenPair.has(key1) && !seenPair.has(key2)) {
+      seenPair.add(key1);
+      finalConns.push(c);
+    }
+  }
+
+  return finalConns;
+}
+
+/**
+ * Áp dụng các thay đổi vị trí kéo thả và transform (xoay, tỉ lệ)
+ */
+function findMatchingOverride<T>(
+  pin: PinPoint,
+  dict?: Record<string, T>,
+): T | undefined {
+  if (!dict) return undefined;
+  // 1. Khớp chính xác ID tuyệt đối
+  if (dict[pin.id] !== undefined) return dict[pin.id];
+  // 2. Khớp theo legacyId nếu có
+  if (pin.legacyId && dict[pin.legacyId] !== undefined) return dict[pin.legacyId];
+
+  // 3. Khớp tương quan theo chủng loại node (canonical alias matching)
+  if (pin.nodeKind === "phone_lookup") {
+    for (const [key, val] of Object.entries(dict)) {
+      if (
+        key.includes(":phone_lookup:") ||
+        key === "c0-pin-phone" ||
+        key.endsWith(":phone")
+      ) {
+        return val;
+      }
+    }
+  }
+
+  if (pin.nodeKind === "indictment") {
+    for (const [key, val] of Object.entries(dict)) {
+      if (
+        key.includes(":indictment:") ||
+        key === "c0-pin-indictment" ||
+        key.endsWith(":indictment")
+      ) {
+        return val;
+      }
+    }
+  }
+
+  if (pin.subjectKey) {
+    const sKey = pin.subjectKey.toLowerCase();
+    if (pin.nodeKind === "suspect") {
+      for (const [key, val] of Object.entries(dict)) {
+        const k = key.toLowerCase();
+        if (
+          k.endsWith(`:suspect:${sKey}`) ||
+          k === `node-suspect-${sKey}` ||
+          k === `c0-pin-suspect-${sKey}` ||
+          k === `suspect-${sKey}`
+        ) {
+          return val;
+        }
+      }
+    } else if (pin.nodeKind === "followup") {
+      for (const [key, val] of Object.entries(dict)) {
+        const k = key.toLowerCase();
+        if (
+          k.endsWith(`:followup:${sKey}`) ||
+          k === `node-followup-${sKey}` ||
+          k === `c0-pin-followup-${sKey}` ||
+          k === `followup-${sKey}`
+        ) {
+          return val;
+        }
+      }
+    }
+  }
+
+  if (pin.nodeKind === "victim_phone") {
+    for (const [key, val] of Object.entries(dict)) {
+      if (key.includes(":victim_phone:") || key === "c0-pin-victim-phone") return val;
+    }
+  }
+  if (pin.nodeKind === "reinvestigate") {
+    for (const [key, val] of Object.entries(dict)) {
+      if (key.includes(":reinvestigate:") || key === "c0-pin-reinvestigate") return val;
+    }
+  }
+  if (pin.nodeKind === "suspects_hub") {
+    for (const [key, val] of Object.entries(dict)) {
+      if (key.includes(":suspects_hub:") || key === "c0-pin-suspects") return val;
+    }
+  }
+  if (pin.nodeKind === "evidence_hub") {
+    for (const [key, val] of Object.entries(dict)) {
+      if (key.includes(":evidence_hub:") || key === "c0-pin-evidence") return val;
+    }
+  }
+
+  return undefined;
 }
 
 /**
@@ -654,13 +875,20 @@ export function applyLayoutOverrides(
   customPinPositions: Record<string, { x: number; y: number }>,
   pinTransforms: Record<string, { rotation: number; scale: number }>,
 ): PinPoint[] {
-  return [...customPins, ...adminCustomPins].map((pin) => {
-    const override =
-      customPinPositions[pin.id] ||
-      (pin.legacyId ? customPinPositions[pin.legacyId] : undefined);
-    const tf =
-      pinTransforms[pin.id] ||
-      (pin.legacyId ? pinTransforms[pin.legacyId] : undefined);
+  // Khử trùng lặp ID giữa basePins và adminCustomPins
+  const seenIds = new Set<string>();
+  const allPins: PinPoint[] = [];
+
+  for (const pin of [...customPins, ...adminCustomPins]) {
+    if (!seenIds.has(pin.id)) {
+      seenIds.add(pin.id);
+      allPins.push(pin);
+    }
+  }
+
+  return allPins.map((pin) => {
+    const override = findMatchingOverride(pin, customPinPositions);
+    const tf = findMatchingOverride(pin, pinTransforms);
 
     return {
       ...pin,
