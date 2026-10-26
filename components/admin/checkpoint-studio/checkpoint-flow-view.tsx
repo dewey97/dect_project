@@ -462,31 +462,23 @@ export function CheckpointFlowView({
   const [dossierPositions, setDossierPositions] = useState<
     Record<string, { x: number; y: number }>
   >({});
-  // Nạp vị trí node hồ sơ đã lưu sau khi mount (tránh lệch hydration).
+  // Nạp vị trí node hồ sơ từ DB case_dossiers.flow_position (B23-5: bỏ hoàn toàn localStorage).
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("checkpoint_studio_dossier_positions");
-      if (raw) setDossierPositions(JSON.parse(raw));
-    } catch {
-      // Bỏ qua dữ liệu hỏng, dùng vị trí mặc định.
+    const initialPos: Record<string, { x: number; y: number }> = {};
+    for (const d of dossiers) {
+      if (d.flow_position && typeof d.flow_position === "object") {
+        initialPos[d.dossier_key] = d.flow_position;
+      }
     }
-  }, []);
+    setDossierPositions(initialPos);
+  }, [dossiers]);
 
   const handleDossierPositionChange = useCallback(
     (id: string, pos: { x: number; y: number }) => {
-      setDossierPositions((prev) => {
-        const next = {
-          ...prev,
-          [id]: { x: Math.round(pos.x), y: Math.round(pos.y) },
-        };
-        try {
-          localStorage.setItem(
-            "checkpoint_studio_dossier_positions",
-            JSON.stringify(next),
-          );
-        } catch {}
-        return next;
-      });
+      setDossierPositions((prev) => ({
+        ...prev,
+        [id]: { x: Math.round(pos.x), y: Math.round(pos.y) },
+      }));
     },
     [],
   );
