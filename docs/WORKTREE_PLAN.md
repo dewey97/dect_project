@@ -15,7 +15,7 @@
 | WT-1 board    | 🟡 1A–1C + `796041b` B5, `18175dc` B6, `e5407aa` B7, `fa6c12c` B8 (migration 39 đã chạy production), `2b1a9da` B9, `de7dcf0` B10 | **B12-1 hồi quy luồng chính**, B12-2/3/4/6 (B10 chưa đạt tiêu chí)                    |
 | WT-3 studio   | ✅ `471a5c8` + `bf1f35f` B3 — rà 0 placeholder >40 ký tự, ẩn khóa kỹ thuật                                                       | `studio-ux.spec.ts` **bị skip** (thiếu credential admin), chưa từng chạy thật → B12-5 |
 
-🟢 **Review độc lập B17 (2026-10-26, `docs/reports/REVIEW_B17_2026-10-26.md`):** `pnpm lint` sạch (kể cả khi dev server có file tự sinh); E2E `42 passed` / 3 skip khi mạng ổn. E2E **phụ thuộc mạng tới Supabase production**: 2/3 lần chạy hỏng vì `ECONNRESET` / đăng nhập `fetch failed`. B17-2 xóa luôn màn "lệnh khám xét" của Hà (nhịp kịch bản case_000) — cần chủ dự án quyết. B17-1 (nghiệm thu v2) vẫn chờ DB test. `main` đã push tới `941b2f8`; 6 commit B17 chưa push. → **B18**.
+🟢 **Review độc lập B18 (2026-10-26, `docs/reports/REVIEW_B18_2026-10-26.md`):** `pnpm lint` sạch; E2E trên DB production `45 passed` ×2, 0 skip, 0 fail; 0 rác `e2e_` trong DB/Storage sau khi chạy (rào B18-6 đạt). **B18-3 chưa đạt**: spec v2 chỉ tạo 1 checkpoint `phone_lookup`, dùng lại nhân vật case_000, không chơi quá màn bảng — báo cáo B18 mô tả vượt thực tế. Rác production: `case_002` "Mật vụ mới (Bản nháp)". `main` ahead `origin/main` 16 commit. → **B19**.
 
 **Kết quả review B13 (2026-10-25, HEAD `30452f7`):** `tsc` sạch; E2E chạy lại 2 lần liên tiếp **42 pass / 0 fail / 0 skip** (báo cáo tại `docs/reports/B13_REPORT.md`). Khay hồ sơ case_000 nạp tức thì, 0 `toPass` click trong test, E2E chuyển sang dùng `SUPABASE_SERVICE_ROLE_KEY` kèm dọn dẹp sạch sẽ, DB migration liên tục 37–40 (`40_cleanup_legacy_dossier_x.sql`), ảnh bằng chứng lưu tại `docs/reports/b13/`. Đạt 100% B13-1 → B13-6.
 
@@ -113,6 +113,7 @@ if (!res.ok) process.exit(1);
 | **B16** | **Nghiệm thu thật + dọn sót multi-case.** Làm B16-1 → B16-6 trong bảng "B16". | bảng B16, `docs/reports/REVIEW_B15_2026-10-25.md` | Tiêu chí bảng B16 đạt |
 | **B17** | **Nghiệm thu v2 đầy đủ + sửa sót B16.** Làm B17-0 → B17-6 trong bảng "B17". | bảng B17, `docs/reports/REVIEW_B16_2026-10-25.md` | Tiêu chí bảng B17 đạt; spec v2 chạy thật trên DB test 2 lần pass |
 | **B18** | **Chốt DB test, nghiệm thu v2, ổn định E2E.** Làm B18-0 → B18-5 trong bảng "B18". | bảng B18, `docs/reports/REVIEW_B17_2026-10-26.md` | Tiêu chí bảng B18 đạt |
+| **B19** | **Hoàn tất nghiệm thu v2 (checklist grep được).** Làm B19-1 → B19-4 trong bảng "B19". | bảng B19, `docs/reports/REVIEW_B18_2026-10-26.md` | Mọi lệnh kiểm trong checklist B19-1 cho đúng số; spec pass 2 lần |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -233,6 +234,52 @@ Nguồn: `docs/reports/REVIEW_B17_2026-10-26.md`. HEAD khi review: `1fbd029`.
 | B18-5 | 🟡 Thấp | Working tree bẩn sau mỗi lần chạy (Next.js ghi `tsconfig.json`, `next-env.d.ts`); báo cáo ghi hash commit trước khi amend | AI | Ghi vào `HANDOFF_ROADMAP.md` mục 2.2: sau E2E chạy `git checkout -- tsconfig.json next-env.d.ts`. Quy tắc báo cáo: không liệt kê commit của chính báo cáo; không amend sau khi đã ghi hash |
 | B18-6 | 🔴 Cao  | **Rào an toàn khi E2E ghi production** (bắt buộc trước B18-3) | AI | (1) `cleanupE2ECases` xóa cả dữ liệu con của vụ `e2e_%` ở mọi bảng có `case_slug`/`case_id` (kiểm FK cascade; bảng nào không cascade thì xóa tường minh) **và** file Storage dưới tiền tố `e2e/` (bucket `avatars`, `phone-assets`, bucket evidence); chạy trong `globalSetup` **và** `globalTeardown`. (2) Spec ghi DB từ chối chạy nếu slug không bắt đầu bằng `e2e_` (assert trong helper). (3) CI (GitHub Actions) **không** chạy E2E ghi DB: kiểm `.github/workflows/*` không có `ALLOW_E2E_PRODUCTION_SEED`. (4) Ghi trong `HANDOFF_ROADMAP.md` mục 2.2: chạy E2E ghi production chỉ thủ công, ngoài giờ cao điểm người chơi |
 
+### B19 — hoàn tất nghiệm thu "Trốn Tìm v2" (2026-10-26)
+
+Nguồn: `docs/reports/REVIEW_B18_2026-10-26.md`. HEAD khi review: `78e7aaf`. Rào an toàn B18-6 giữ nguyên (E2E trên production, slug `e2e_`).
+
+| #     | Mức     | Việc | Done khi |
+| ----- | ------- | ---- | -------- |
+| B19-1 | 🔴 Cao  | Bổ sung `e2e/case-v2-from-studio.spec.ts` cho đủ kịch bản (chi tiết bên dưới) | Checklist B19-1 đạt + `npx playwright test e2e/case-v2-from-studio.spec.ts` pass 2 lần + toàn bộ `pnpm test:e2e` 0 fail |
+| B19-2 | 🟡 Thấp | Rác `case_002` "Mật vụ mới (Bản nháp)" (`DRAFT`, tạo 2026-10-25 18:02 UTC) trên production | ⛔ Chủ dự án xác nhận không dùng → xóa qua `/studio/cases` (nút xóa). Không xóa bằng SQL |
+| B19-3 | 🟡 Thấp | Placeholder tên nhân vật case_000 trong Board Studio | `components/admin/checkpoint-studio/board/board-node-form.tsx`: "VD: Nguyễn Văn Khang..." → ví dụ trung tính (vd "VD: Nạn nhân, Hiện trường…") |
+| B19-4 | 🟡 Thấp | Báo cáo kiểm chứng được | `docs/reports/B19_REPORT.md` dán: (a) output `npx playwright test e2e/case-v2-from-studio.spec.ts --reporter=list` (thấy tên từng `test.step`), (b) output nguyên văn các lệnh grep của checklist B19-1. Không mô tả bước nào không có trong spec |
+
+**Kịch bản B19-1 (vụ v2 — không dùng tên/khóa của case_000):**
+
+- Nhân vật: nạn nhân "Hoàng Văn Nam" (`nam`); nghi phạm "Đỗ Quốc Huy" (`huy`), "Phạm Mai Lan" (`lan`), "Bùi Đức Minh" (`minh`). Upload avatar cho ít nhất 1 người (file trong `e2e/fixtures/`, lưu Storage dưới `e2e/`).
+- Vật chứng: mã `V2-01`…`V2-04` (dùng làm đáp án thẩm tra/cáo trạng).
+- Checkpoint (qua Checkpoint Studio):
+  1. `phone_lookup` với 3 ô tra SĐT (đáp án: Huy, Lan, Minh).
+  2. 3 × `suspect_interrogation` (`subject_key` = `huy`/`lan`/`minh`), mỗi cái có mã chứng cứ động cơ/mâu thuẫn từ `V2-0x`, `depends_on` = phone_lookup.
+  3. `followup` cho `lan`, kiểu `choice`, đáp án "KHÔNG", `depends_on` = thẩm tra `lan`.
+  4. `indictment`: `valid_suspects` = [`lan`], `required_evidence_ids` ⊂ `V2-0x`, `depends_on` = 3 thẩm tra + followup.
+  5. `epilogue` có ≥ 1 đoạn hậu án.
+- Điện thoại: 1 liên hệ, 1 cuộc gọi, **1 thread tin nhắn ≥ 2 tin**.
+- Chơi (bước 9), mỗi thao tác có `expect`:
+  tra SĐT (nhập sai → không mở; nhập đúng 3 tên → mở) → thẩm tra `lan` với mã đúng → câu hỏi phụ chọn "KHÔNG" → cáo trạng chọn "Phạm Mai Lan" + mã chứng cứ → **thấy "KÝ SỰ HẬU ÁN"** và nội dung hậu án đã soạn. Thêm 1 lần cáo trạng sai ("Đỗ Quốc Huy") bị từ chối.
+
+**Checklist B19-1 (reviewer chạy lại, phải ra đúng):**
+
+| Lệnh | Kết quả bắt buộc |
+| --- | --- |
+| `grep -cE '"khang"\|"vu"\|"tung"\|"ha"\|Nguyễn Văn Khang\|Lê Quang Vũ\|Nguyễn Thanh Tùng\|Trần Thị Hà' e2e/case-v2-from-studio.spec.ts` | `0` |
+| `grep -c 'selectOption("suspect_interrogation")' e2e/case-v2-from-studio.spec.ts` | ≥ `3` (hoặc 1 trong vòng lặp 3 phần tử — ghi rõ trong báo cáo) |
+| `grep -cE 'selectOption\("(followup\|indictment\|epilogue\|phone_lookup)"\)' e2e/case-v2-from-studio.spec.ts` | ≥ `4` |
+| `grep -c 'setInputFiles' e2e/case-v2-from-studio.spec.ts` | ≥ `1` |
+| `grep -n 'KÝ SỰ HẬU ÁN' e2e/case-v2-from-studio.spec.ts` | có ít nhất 1 dòng trong `expect(...)` của bước 9 |
+| `grep -cE 'Nhập tên nghi phạm\|placeholder.*nghi phạm' e2e/case-v2-from-studio.spec.ts` | ≥ `1` (bước tra SĐT thật) |
+| Sau khi chạy: `select count(*) from cases where slug like 'e2e%'` + `storage.objects` tên `e2e/%` | `0` / `0` |
+
+**Prompt giao việc B19:**
+
+```
+Đọc docs/reports/REVIEW_B18_2026-10-26.md và docs/WORKTREE_PLAN.md bảng "B19". Làm B19-3, B19-1, B19-4 trên main, mỗi mục 1 commit, không push (B19-2 chờ chủ dự án).
+B19-1: viết đúng kịch bản v2 trong plan (nhân vật Nam/Huy/Lan/Minh, không dùng tên/khóa case_000; đủ 7 checkpoint có depends_on; upload avatar; thread tin nhắn; chơi tới "KÝ SỰ HẬU ÁN" kèm 1 lần cáo trạng sai bị từ chối). Mọi bước có expect, không if(isVisible), không retry/toPass. Rào B18-6 giữ nguyên.
+Trước khi viết báo cáo, tự chạy toàn bộ lệnh trong "Checklist B19-1" và dán nguyên văn kết quả. Không mô tả bước nào không có trong spec.
+Báo cáo docs/reports/B19_REPORT.md: bảng commit dán git log --oneline 78e7aaf..HEAD, output --reporter=list của spec v2, dòng tổng kết pnpm test:e2e 2 lần. Không làm live cursor.
+```
+
 **Prompt giao việc B18 (sau khi chủ dự án chốt B18-0 và B18-2):**
 
 ```
@@ -283,12 +330,12 @@ Báo cáo docs/reports/B17_REPORT.md: bảng commit dán nguyên văn git log --
 | 1   | **B13** (bảng trên)                                                                                                                                               | AI thực thi       | ✅ **Đã xong** (commit `ec3837c` → `30452f7`, `42 passed (3.2m)`, 0 fail, 0 skip)                                                                    |
 | 2   | Review độc lập B13 + audit multi-case/Studio                                                                                                                      | Reviewer          | ✅ Xong đọc code (`docs/reports/AUDIT_2026-10-25_CUSTOM_CASE.md`); chưa chạy lại được `tsc`/E2E → chuyển vào B14-0                                   |
 | 2b  | **B15-0 → B15-5** | AI thực thi | ✅ Xong (review `docs/reports/REVIEW_B15_2026-10-25.md`) |
-| 2c  | ✅ B18-0 đã chốt C (dùng DB production cho E2E) → thêm `ALLOW_E2E_PRODUCTION_SEED=true` + `SUPABASE_SERVICE_ROLE_KEY` vào `.env.local`. ✅ B18-2 đã chốt bỏ màn "lệnh khám xét" | Chủ dự án | B18-3 cần `.env.local` |
-| 2d  | **B18-4 → B18-6**, rồi B18-3 (nghiệm thu v2 trên production có rào an toàn) + B15-12 (6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | Review `docs/reports/REVIEW_B17_2026-10-26.md` |
+| 2c  | ✅ B18-0 (E2E dùng DB production), ✅ B18-2 (bỏ màn lệnh khám xét). ⛔ Mới: **B19-2** — xác nhận xóa `case_002` "Mật vụ mới (Bản nháp)" | Chủ dự án | Không chặn |
+| 2d  | **B19-3, B19-1, B19-4** (hoàn tất nghiệm thu v2 theo checklist grep được) + B15-12 (6 vụ tĩnh `/activate`) | AI thực thi / Chủ dự án | B18 xong phần rào an toàn, review `docs/reports/REVIEW_B18_2026-10-26.md` |
 | 3   | Xoay token `SUPABASE_ACCESS_TOKEN` (`sbp_`) ở supabase.com/dashboard/account/tokens, cập nhật `.env.local`                                                        | Chủ dự án         | ✅ Đã nhận token mới từ chủ dự án và nạp vào `.env.local`                                                                                            |
 | 4   | A6: xoay toàn bộ key trong `.env` (Supabase, Gemini, Google service account, Firebase), rồi `git rm --cached .env` + thêm `.env` vào `.gitignore`/`.dockerignore` | Chủ dự án         | `.env` đang bị track trong git                                                                                                                       |
 | 5   | A10: checklist VPS theo `deploy/INFRA_HANDOFF_CHECKLIST.md` (Caddy, timer reclaim, `SUPABASE_SERVICE_ROLE_KEY` trong container, Leaked Password Protection)       | Chủ dự án         | Cần quyền VPS                                                                                                                                        |
-| 6   | **Push** `main` (✅ đã push tới `941b2f8` ngày 2026-10-25; 6 commit B17 chưa push), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
+| 6   | **Push** `main` (✅ đã push tới `941b2f8` ngày 2026-10-25; B17 + B18 chưa push (16 commit) — push được, không hồi quy), theo dõi GitHub Actions → deploy VPS → smoke test production (`HANDOFF_ROADMAP.md` mục 5)                  | Chủ dự án ra lệnh | ✅ **Đủ điều kiện — chờ lệnh chủ dự án** |
 | 7   | **Live cursor** — `docs/superpowers/plans/2026-10-25-live-cursor-group-play.md`, giai đoạn 1 (LC1–LC8)                                                            | AI thực thi       | ⛔ **Chưa giao.** Chỉ giao sau bước 6 và sau khi xác nhận gói Supabase (Free/Pro). Giai đoạn 2 (relay VPS) chỉ khi chạm ngưỡng ở mục 2.6 của plan đó |
 
 **Prompt giao việc B12 (đã chạy xong):**
