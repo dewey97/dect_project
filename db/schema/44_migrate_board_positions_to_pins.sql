@@ -1,12 +1,12 @@
 -- ==============================================================================
 -- Migration 44: Migrate board positions to boardgame_pins (B23-3)
 -- Mô tả: Chuẩn hóa toàn bộ vị trí ghim điều tra về bảng `boardgame_pins`.
--- Trước khi di chuyển: Tạo bảng backup an toàn `boardgame_pins_backup_b23`.
+-- Trước khi di chuyển: Đã có bảng backup an toàn `boardgame_pins_backup_b23`.
 -- ==============================================================================
 
 BEGIN;
 
--- 1. Backup bảng boardgame_pins hiện tại
+-- 1. Backup bảng boardgame_pins hiện tại (nếu chưa tạo)
 CREATE TABLE IF NOT EXISTS public.boardgame_pins_backup_b23 AS
 SELECT * FROM public.boardgame_pins;
 
@@ -20,7 +20,6 @@ INSERT INTO public.boardgame_pins (
   detail,
   rotation,
   scale,
-  created_at,
   updated_at
 )
 SELECT
@@ -32,7 +31,6 @@ SELECT
   CONCAT('Node: ', cbn.title) AS detail,
   COALESCE((cbn.config->>'rotation')::float8, 0) AS rotation,
   COALESCE((cbn.config->>'scale')::float8, 1.0) AS scale,
-  cbn.created_at,
   NOW() AS updated_at
 FROM public.case_board_nodes cbn
 WHERE NOT EXISTS (
@@ -51,7 +49,6 @@ INSERT INTO public.boardgame_pins (
   detail,
   rotation,
   scale,
-  created_at,
   updated_at
 )
 SELECT
@@ -63,7 +60,6 @@ SELECT
   cc.question AS detail,
   0 AS rotation,
   1.0 AS scale,
-  cc.created_at,
   NOW() AS updated_at
 FROM public.case_checkpoints cc
 WHERE cc.board_config IS NOT NULL
