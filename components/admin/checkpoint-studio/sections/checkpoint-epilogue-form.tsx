@@ -153,39 +153,26 @@ export function CheckpointEpilogueForm({
       {/* Phụ thuộc depends_on cho Hậu án */}
       {checkpoints && checkpoints.length > 0 && (
         <div className="space-y-1.5 pt-2 border-t border-white/10">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-            Phụ thuộc vào checkpoint (depends_on)
-          </span>
-          <div className="space-y-1 max-h-36 overflow-y-auto rounded border border-white/10 bg-black/40 p-2">
+          <label className="block text-xs font-semibold text-zinc-300">
+            Phụ thuộc
+          </label>
+          <select
+            value={(draft.dependsOn && draft.dependsOn[0]) || ""}
+            onChange={(e) => {
+              const val = e.target.value;
+              onChange({ dependsOn: val ? [val] : [] });
+            }}
+            className="w-full h-8 px-2 rounded-md bg-black/40 border border-white/10 text-xs text-zinc-200 outline-none focus:border-amber-400 cursor-pointer"
+          >
+            <option value="">-- Không phụ thuộc (Mở sẵn) --</option>
             {checkpoints
               .filter((c) => c.checkpoint_id !== draft.checkpointId)
-              .map((c) => {
-                const isChecked = (draft.dependsOn || []).includes(c.checkpoint_id);
-                return (
-                  <label
-                    key={c.checkpoint_id}
-                    className="flex items-center gap-2 text-[11px] text-zinc-300 hover:text-white cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={(e) => {
-                        const cur = draft.dependsOn || [];
-                        const next = e.target.checked
-                          ? [...cur.filter((id) => id !== c.checkpoint_id), c.checkpoint_id]
-                          : cur.filter((id) => id !== c.checkpoint_id);
-                        onChange({ dependsOn: next });
-                      }}
-                      className="rounded border-zinc-700 bg-zinc-900 text-amber-500"
-                    />
-                    <span className="truncate">{c.title || c.checkpoint_id}</span>
-                    <span className="font-mono text-[9px] text-zinc-500 ml-auto">
-                      {c.checkpoint_id}
-                    </span>
-                  </label>
-                );
-              })}
-          </div>
+              .map((c) => (
+                <option key={c.checkpoint_id} value={c.checkpoint_id}>
+                  {c.title || "Checkpoint không tên"}
+                </option>
+              ))}
+          </select>
         </div>
       )}
     </div>

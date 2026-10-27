@@ -1561,6 +1561,44 @@ export function CheckpointStudioClient({
                   </button>
                 </div>
 
+                {/* Dropdown danh sách nhân vật để xem và chuyển đổi nhanh */}
+                {characters.length > 0 && (
+                  <select
+                    value={selectedCharacter?.id || selectedCharacter?.key || ""}
+                    onChange={(e) => {
+                      const found = characters.find(
+                        (c) => c.id === e.target.value || c.key === e.target.value,
+                      );
+                      if (found) {
+                        setSelectedCharacter(found);
+                        setInspectorTab("characters");
+                        setSelectedNodeId(null);
+                      }
+                    }}
+                    className="max-w-[170px] h-7 px-2 rounded bg-black/50 border border-white/10 text-xs text-purple-200 outline-none focus:border-purple-400 cursor-pointer font-sans truncate"
+                    title="Chọn nhân vật để xem hồ sơ"
+                  >
+                    <option value="" disabled>
+                      -- Danh sách ({characters.length}) --
+                    </option>
+                    {characters.map((c) => {
+                      const roleText =
+                        c.role === "victim"
+                          ? "Nạn nhân"
+                          : c.role === "suspect"
+                            ? "Nghi phạm"
+                            : c.role === "witness"
+                              ? "Nhân chứng"
+                              : "Liên quan";
+                      return (
+                        <option key={c.id || c.key} value={c.id || c.key}>
+                          {c.name || "Không tên"} ({roleText})
+                        </option>
+                      );
+                    })}
+                  </select>
+                )}
+
 
               </div>
 

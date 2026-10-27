@@ -212,7 +212,7 @@ export function CheckpointEditor({
                 </Section>
               )}
 
-              <Section title="Narrative (Lời dẫn / Độc thoại)">
+              <Section title="Lời dẫn">
                 <CheckpointNarrativeForm draft={draft} onChange={onChange} />
               </Section>
 
