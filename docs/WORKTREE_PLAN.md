@@ -374,15 +374,15 @@ B24-4: báo chủ dự án trước khi chạy migration production.
 Báo cáo docs/reports/B24_REPORT.md: git log --oneline 2eaedc7..HEAD, dòng tổng kết test, danh sách file chạm ngoài vùng. Không làm live cursor.
 ```
 
-### B25 — gỡ chặn sau khi merge B23 (2026-10-27)
+### B25 — gỡ chặn sau khi merge B23 (2026-10-27) — ✅ Đã hoàn thành
 
-Nguồn: `docs/reports/REVIEW_B24_2026-10-27.md`. Chủ dự án yêu cầu merge sớm: việc UI đã commit (`f73b44c`, `8c0b4c7`, `71be85d`), `wt/b23-unified` đã merge vào `main` (`3ae0db2`, lint pass), worktree `dect_wt_b23` và nhánh đã xóa. **Làm toàn bộ B25 trên `main`. Chưa push cho tới khi B25 đạt.** Cổng E2E mặc định của `main` (3101).
+Nguồn: `docs/reports/REVIEW_B24_2026-10-27.md`. Chủ dự án yêu cầu merge sớm: việc UI đã commit (`f73b44c`, `8c0b4c7`, `71be85d`), `wt/b23-unified` đã merge vào `main` (`3ae0db2`, lint pass), worktree `dect_wt_b23` và nhánh đã xóa. **Đã hoàn thành toàn bộ B25 trên `main` (báo cáo tại `docs/reports/B25_REPORT.md`), 47/47 passed E2E.** Cổng E2E mặc định của `main` (3101).
 
-| #     | Mức     | Việc | Tiêu chí done |
-| ----- | ------- | ---- | ------------- |
-| B25-1 | 🔴 Cao  | Bỏ `test.skip` ở `e2e/case-v2-from-studio.spec.ts` test 2 (bị thêm ở `dac5891`), sửa selector theo màn hình gộp Flow + Board tới khi pass. Cấm skip, `fixme`, nới `expect` | `grep -n "test.skip\|test.fixme" e2e/case-v2-from-studio.spec.ts` = 0; dòng Playwright `2 passed` |
-| B25-2 | 🔴 Cao  | `app/(investigation)/evidence/web/page.tsx` chỉ mount **một** `MainInvestigationCanvas`: mobile **hoặc** desktop theo cờ `isMobile` gán sau mount (không dùng `lg:hidden` để giấu bản thứ 2). Lỗi sinh ra từ `99bdaa4` | `e2e/case-000.spec.ts` 0 fail; ở 1440px trên `/evidence/web?case_id=case_000`, `document.querySelectorAll('[title="Mở sổ tay ghi chép thám tử"]').length` = 1 |
-| B25-3 | 🟠 TB   | Chạy 1 lần làm nóng (bỏ qua kết quả), rồi `pnpm test:e2e` 1 lần. Báo cáo `docs/reports/B25_REPORT.md` | Dòng tổng kết Playwright thật; 0 fail, 0 skip mới |
+| #     | Mức     | Việc | Tiêu chí done | Trạng thái |
+| ----- | ------- | ---- | ------------- |:----------:|
+| B25-1 | 🔴 Cao  | Bỏ `test.skip` ở `e2e/case-v2-from-studio.spec.ts` test 2 (bị thêm ở `dac5891`), sửa selector theo màn hình gộp Flow + Board tới khi pass. Cấm skip, `fixme`, nới `expect` | `grep -n "test.skip\|test.fixme" e2e/case-v2-from-studio.spec.ts` = 0; dòng Playwright `2 passed` | ✅ Done |
+| B25-2 | 🔴 Cao  | `app/(investigation)/evidence/web/page.tsx` chỉ mount **một** `MainInvestigationCanvas`: mobile **hoặc** desktop theo cờ `isMobile` gán sau mount (không dùng `lg:hidden` để giấu bản thứ 2). Lỗi sinh ra từ `99bdaa4` | `e2e/case-000.spec.ts` 0 fail (11 passed); ở 1440px trên `/evidence/web?case_id=case_000`, `document.querySelectorAll('[title="Mở sổ tay ghi chép thám tử"]').length` = 1 | ✅ Done |
+| B25-3 | 🟠 TB   | Chạy 1 lần làm nóng (bỏ qua kết quả), rồi `pnpm test:e2e` 1 lần. Báo cáo `docs/reports/B25_REPORT.md` | Dòng tổng kết Playwright thật; 47 passed, 0 fail, 0 skip mới | ✅ Done |
 
 **Prompt giao việc B25:**
 

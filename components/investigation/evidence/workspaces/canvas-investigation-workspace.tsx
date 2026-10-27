@@ -620,6 +620,7 @@ export function CanvasInvestigationWorkspace({
       {/* 0. SIDEBAR LIỀN BÊN TRÁI: DOCK CỐ ĐỊNH TẤT CẢ LỐI TẮT NGHIỆP VỤ & HỆ THỐNG */}
       <aside
         id="canvas-left-sidebar"
+        data-tour="canvas-left-dock"
         aria-label="Thanh điều hướng nghiệp vụ điều tra"
         className={cn(
           "w-16 sm:w-[68px] h-full shrink-0 z-30 bg-[#0d0f14]/98 border-r border-[#262c38] backdrop-blur-xl flex flex-col justify-between items-center py-2 px-1 select-none transition-all duration-200 overflow-y-auto overflow-x-hidden scrollbar-none",
@@ -771,12 +772,12 @@ export function CanvasInvestigationWorkspace({
             </span>
           </button>
 
-          {/* 8. Hướng dẫn nghiệp vụ */}
+          {/* 8. Hướng dẫn nghiệp vụ Bàn hồ sơ */}
           <button
             type="button"
-            onClick={() => emitInvestigationEvent("OPEN_GUIDE")}
+            onClick={() => setIsGuideModalOpen(true)}
             className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
-            title="Sổ tay hướng dẫn gameplay"
+            title="Cẩm nang tác nghiệp Bàn hồ sơ"
           >
             <HelpCircle className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
@@ -806,6 +807,31 @@ export function CanvasInvestigationWorkspace({
 
       {/* KHÔNG GIAN BÀN HỒ SƠ & CÁC CỬA SỔ FLOATING */}
       <div className="h-full flex-1 min-w-0 min-h-0 relative flex flex-col overflow-hidden">
+        {/* GỢI Ý KHÁM PHÁ LẦN ĐẦU CHO NGƯỜI CHƠI MỚI (TỰ ĐỘNG BIẾN MẤT HOẶC BỎ QUA) */}
+        {showFirstTimePill && !isTourOpen && !isGuideModalOpen && (
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#16120e]/95 border border-[#4a3625] shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-3 duration-200 text-xs font-sans text-zinc-200 select-none">
+            <Sparkles className="size-3.5 text-amber-400 shrink-0 animate-pulse" />
+            <span className="font-medium text-amber-100 hidden sm:inline">
+              Lần đầu dùng Bàn hồ sơ?
+            </span>
+            <button
+              type="button"
+              onClick={handleStartTourFromPill}
+              className="px-2.5 py-1 rounded-full bg-[#d9a066] hover:bg-[#e6b986] active:bg-[#c89257] text-[#140e08] font-semibold text-[11px] transition-all cursor-pointer shadow-sm active:scale-95"
+            >
+              Xem hướng dẫn (1 phút)
+            </button>
+            <button
+              type="button"
+              onClick={handleDismissPill}
+              className="size-5 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              title="Bỏ qua"
+            >
+              <X className="size-3" />
+            </button>
+          </div>
+        )}
+
         {/* 1. NÚT MỞ BẢNG ĐIỀU TRA NỔI (GÓC PHẢI TRÊN KHI ĐANG ĐÓNG) */}
         {!isBoardOpen && (
           <button
@@ -833,6 +859,7 @@ export function CanvasInvestigationWorkspace({
       {/* 2. BẢNG ĐIỀU TRA FLOATING / TOÀN MÀN HÌNH (TỶ LỆ DỌC CHUẨN 896/1200 - GÓC PHẢI BÀN) */}
       {isBoardOpen && (
         <div
+          data-tour="canvas-floating-board"
           style={
             isBoardFullscreen
               ? { height: "calc(100vh - 36px)", maxHeight: "calc(100vh - 36px)" }
@@ -1149,6 +1176,24 @@ export function CanvasInvestigationWorkspace({
       <RoomModal
         isOpen={isRoomModalOpen}
         onClose={() => setIsRoomModalOpen(false)}
+      />
+
+      {/* CẨM NANG HƯỚNG DẪN BÀN HỒ SƠ */}
+      <CanvasGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
+        onStartTour={() => setIsTourOpen(true)}
+      />
+
+      {/* TOUR TRỰC QUAN TƯƠNG TÁC TỪNG BƯỚC */}
+      <CanvasWalkthroughTour
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onComplete={() => {
+          try {
+            localStorage.setItem("dect_canvas_guide_seen_v1", "true");
+          } catch {}
+        }}
       />
     </div>
   );
