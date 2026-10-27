@@ -7,16 +7,12 @@ import {
   Folders,
   Users,
   Settings,
-  LogOut,
   MessageSquare,
-  Bell,
-  ExternalLink,
   Map,
   FileText,
   ListChecks,
   ChevronLeft,
   ChevronRight,
-  UserRound,
   Smartphone,
   Archive,
 } from "lucide-react";
@@ -74,12 +70,6 @@ const navGroups: NavGroup[] = [
         shortName: "Chứng cứ",
         href: "/studio/evidence",
         icon: Archive,
-      },
-      {
-        name: "Nhân vật",
-        shortName: "Nhân vật",
-        href: "/studio/characters",
-        icon: UserRound,
       },
       {
         name: "Checkpoint Studio",
@@ -142,7 +132,7 @@ export function AdminSidebar({
       {/* HEADER */}
       <div
         className={cn(
-          "p-4 h-16 flex items-center shrink-0 border-b border-white/10",
+          "p-4 h-16 flex items-center shrink-0",
           isCollapsed
             ? "flex-col justify-center gap-1.5 p-2 h-auto py-3"
             : "justify-between",
@@ -194,7 +184,7 @@ export function AdminSidebar({
       {/* NAVIGATION */}
       <nav
         className={cn(
-          "flex-1 py-4 space-y-4 overflow-y-auto overflow-x-hidden",
+          "flex-1 py-4 pb-6 space-y-4 overflow-y-auto overflow-x-hidden",
           isCollapsed ? "px-1.5 space-y-3" : "px-2.5 space-y-5",
         )}
       >
@@ -204,9 +194,6 @@ export function AdminSidebar({
               <div className="px-2.5 py-1 text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-semibold">
                 {group.groupName}
               </div>
-            )}
-            {isCollapsed && groupIdx > 0 && (
-              <div className="mx-2 my-2 h-px bg-white/5" />
             )}
             {group.items.map((item) => {
               const isActive =
@@ -282,51 +269,6 @@ export function AdminSidebar({
           </div>
         ))}
       </nav>
-
-      {/* FOOTER ACTIONS */}
-      <div className="p-2.5 border-t border-white/10">
-        <div
-          className={cn(
-            "flex items-center gap-1.5",
-            isCollapsed && "flex-col gap-2",
-          )}
-        >
-          {/* Exit Studio */}
-          <Link
-            href="/"
-            title="Thoát Studio"
-            className={cn(
-              "rounded-md text-xs text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 transition-colors",
-              isCollapsed
-                ? "flex flex-col items-center justify-center py-1.5 w-full gap-1 text-[10px]"
-                : "flex-1 flex items-center gap-2 px-2.5 py-1.5",
-            )}
-          >
-            <LogOut className="size-3.5 shrink-0" />
-            <span>Thoát</span>
-          </Link>
-
-          {/* Notifications */}
-          <Link
-            href="/studio/feedbacks"
-            title="Góp ý & Báo lỗi"
-            className={cn(
-              "relative text-zinc-400 hover:text-zinc-100 transition-colors rounded-md hover:bg-zinc-800/50",
-              isCollapsed
-                ? "flex flex-col items-center justify-center py-1.5 w-full gap-1 text-[10px]"
-                : "p-1.5",
-            )}
-          >
-            <div className="relative">
-              <Bell className="size-3.5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-red-500 animate-pulse border border-zinc-950" />
-              )}
-            </div>
-            {isCollapsed && <span>Thông báo</span>}
-          </Link>
-        </div>
-      </div>
     </aside>
   );
 }

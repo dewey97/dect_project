@@ -22,7 +22,6 @@ const INPUT_CLASS = "h-7 border-white/10 bg-black/30 text-xs text-zinc-100";
 
 const KIND_OPTIONS = [
   { value: "phone_lookup", label: "📞 Tra cứu SĐT / Danh bạ" },
-  { value: "suspect_interrogation", label: "🕵️ Thẩm tra nghi phạm (3 lớp)" },
   { value: "followup", label: "❓ Câu hỏi phụ sau thẩm tra" },
   { value: "indictment", label: "⚖️ Cáo trạng kết án" },
   { value: "choice", label: "🔘 Trắc nghiệm" },
@@ -45,17 +44,12 @@ export function CheckpointIdentityForm({
     draft.checkpointId.includes("epilogue");
   if (isEpilogue) return null;
 
-  const currentKind =
-    draft.kind ||
-    (draft.type === "evidence_picker"
-      ? "suspect_interrogation"
-      : draft.type || "text");
+  const currentKind = draft.kind || draft.type || "text";
 
   const handleKindChange = (nextKind: string) => {
-    // Map kind sang type để tương thích ngược với runtime cũ
+    // Map kind sang type de tuong thich nguoc
     let legacyType = nextKind;
-    if (nextKind === "suspect_interrogation") legacyType = "evidence_picker";
-    else if (nextKind === "phone_lookup") legacyType = "text";
+    if (nextKind === "phone_lookup") legacyType = "text";
     else if (nextKind === "indictment") legacyType = "evidence_picker";
 
     onChange({
@@ -65,8 +59,7 @@ export function CheckpointIdentityForm({
     });
   };
 
-  const showSubjectKey =
-    currentKind === "suspect_interrogation" || currentKind === "followup";
+  const showSubjectKey = currentKind === "followup";
 
   return (
     <div className="space-y-2.5">

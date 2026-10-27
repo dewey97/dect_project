@@ -6,15 +6,16 @@ import {
   ChevronDown,
   Inbox,
   Eye,
+  EyeOff,
   BookOpen,
   FolderArchive,
-  EyeOff,
-  HelpCircle,
+  User,
   ExternalLink,
 } from "lucide-react";
 import type {
   DbCaseCheckpoint,
   DbCaseDossier,
+  DbCaseCharacter,
   BoardConfig,
 } from "@/lib/types/database";
 import { cn } from "@/lib/utils";
@@ -22,28 +23,31 @@ import { cn } from "@/lib/utils";
 interface OffBoardTrayProps {
   checkpoints: DbCaseCheckpoint[];
   dossiers: DbCaseDossier[];
+  characters?: DbCaseCharacter[];
   selectedCheckpointId?: string | null;
+  selectedCharacterId?: string | null;
   onSelectCheckpoint: (checkpoint: DbCaseCheckpoint) => void;
   onSelectDossier?: (dossier: DbCaseDossier) => void;
+  onSelectCharacter?: (character: DbCaseCharacter) => void;
   onMoveToBoard: (checkpointId: string) => void;
+  onPromoteCharacterToSuspect?: (character: DbCaseCharacter) => void;
   className?: string;
 }
 
 export function OffBoardTray({
   checkpoints,
   dossiers,
+  characters = [],
   selectedCheckpointId,
+  selectedCharacterId,
   onSelectCheckpoint,
   onSelectDossier,
+  onSelectCharacter,
   onMoveToBoard,
+  onPromoteCharacterToSuspect,
   className,
 }: OffBoardTrayProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-
   // Lọc các checkpoint không hiển thị trên bảng:
-  // 1. Kind === "epilogue"
-  // 2. board_config?.hidden === true
-  // 3. Hoặc các loại checkpoint phụ không cắm ghim tự động
   const offBoardCheckpoints = checkpoints.filter((cp) => {
     const isEpilogue =
       cp.kind === "epilogue" ||
@@ -54,56 +58,30 @@ export function OffBoardTray({
     return isEpilogue || isExplicitlyHidden;
   });
 
-  const totalItems = offBoardCheckpoints.length + dossiers.length;
+  // Lọc các nhân vật không hiển thị trên bảng (nhân chứng, người liên quan)
+  const offBoardCharacters = characters.filter(
+    (c) => c.role === "witness" || c.role === "related",
+  );
+
+  const totalItems =
+    offBoardCheckpoints.length + dossiers.length + offBoardCharacters.length;
 
   return (
     <div
       className={cn(
-        "flex flex-col border-t border-white/10 bg-[#0c0d14]/95 backdrop-blur-md transition-all duration-200 z-20",
-        isExpanded ? "h-40" : "h-9",
+        "flex flex-col border-t border-white/10 bg-[#0c0d14]/95 backdrop-blur-md transition-all duration-200 z-20 h-32 shrink-0",
         className,
       )}
     >
-      {/* Header bar của Tray */}
-      <div className="flex h-9 shrink-0 items-center justify-between px-3 border-b border-white/5 select-none">
-        <div className="flex items-center gap-2">
-          <Inbox className="size-3.5 text-amber-400" />
-          <span className="text-xs font-semibold text-zinc-200 tracking-wide">
-            Khay Ngoài Bảng
-          </span>
-          <span className="rounded bg-white/10 px-1.5 py-0.2 font-mono text-[10px] text-zinc-300">
-            {totalItems} mục
-          </span>
-          <span className="hidden sm:inline text-[10px] text-zinc-500">
-            (Hậu án, hồ sơ và các checkpoint ẩn không ghim trên canvas)
-          </span>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-1 rounded px-2 py-0.5 text-xs text-zinc-400 hover:bg-white/5 hover:text-zinc-200 transition-colors"
-          title={isExpanded ? "Thu gọn khay" : "Mở rộng khay"}
-        >
-          <span className="text-[11px]">{isExpanded ? "Thu gọn" : "Mở khay"}</span>
-          {isExpanded ? (
-            <ChevronDown className="size-3.5" />
-          ) : (
-            <ChevronUp className="size-3.5" />
-          )}
-        </button>
-      </div>
-
-      {/* Danh sách items khi mở rộng */}
-      {isExpanded && (
-        <div className="flex-1 min-h-0 overflow-x-auto overflow-y-hidden p-2.5 flex items-center gap-2.5">
-          {totalItems === 0 ? (
-            <div className="flex items-center justify-center w-full text-xs text-zinc-500 italic py-4">
-              Không có mục nào ngoài bảng. Tất cả checkpoints đang hiển thị trên bảng điều tra.
-            </div>
-          ) : (
+      {/* Danh sách items ngoài bảng (Hậu án, Nhân chứng, Người liên quan, Checkpoint ẩn, Hồ sơ) */}
+      <div className="flex-1 min-h-0 overflow-x-auto overflow-y-hidden p-2.5 flex items-center gap-2.5">
+        {totalItems === 0 ? (
+          <div className="flex items-center justify-center w-full text-xs text-zinc-500 italic py-4">
+            Không có mục nào ngoài bảng. Tất cả checkpoints & nhân vật đang hiển thị trên bảng.
+          </div>
+        ) : (
             <>
-              {/* Checkpoints ngoài bảng */}
+              {/* 1. Checkpoints ngoài bảng */}
               {offBoardCheckpoints.map((cp) => {
                 const isEpilogue =
                   cp.kind === "epilogue" ||
@@ -141,7 +119,7 @@ export function OffBoardTray({
                         </span>
                       </div>
 
-                      {/* Nút Đưa lên bảng (chỉ hiện cho checkpoint thông thường đang ẩn) */}
+                      {/* Nút Đưa lên bảng */}
                       {!isEpilogue && (
                         <button
                           type="button"
@@ -177,7 +155,66 @@ export function OffBoardTray({
                 );
               })}
 
-              {/* Bộ hồ sơ ngoài bảng */}
+              {/* 2. Nhân vật ngoài bảng (Nhân chứng, Liên quan) */}
+              {offBoardCharacters.map((char) => {
+                const isSelected = selectedCharacterId === char.id;
+                return (
+                  <div
+                    key={char.id}
+                    onClick={() => onSelectCharacter?.(char)}
+                    className={cn(
+                      "group relative flex flex-col justify-between h-full min-w-[200px] max-w-[240px] rounded-md border p-2 text-left cursor-pointer transition-all duration-150 select-none shrink-0",
+                      isSelected
+                        ? "border-purple-500 bg-purple-500/10 shadow-md shadow-purple-950/30"
+                        : "border-purple-500/20 bg-purple-950/10 hover:border-purple-500/40 hover:bg-purple-900/20",
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-1.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <User className="size-3.5 text-purple-400 shrink-0" />
+                        <span className="text-[9px] font-bold uppercase tracking-wider rounded px-1 py-0.2 bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0 font-mono">
+                          {char.role === "witness" ? "NHÂN CHỨNG" : "LIÊN QUAN"}
+                        </span>
+                      </div>
+
+                      {onPromoteCharacterToSuspect && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onPromoteCharacterToSuspect(char);
+                          }}
+                          className="opacity-80 group-hover:opacity-100 flex items-center gap-1 rounded bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 px-1.5 py-0.5 text-[10px] font-medium transition-colors"
+                          title="Chuyển thành Nghi phạm để đưa lên bảng điều tra"
+                        >
+                          <Eye className="size-3" />
+                          <span>Lên bảng</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="my-1 min-w-0">
+                      <div className="text-xs font-medium text-zinc-100 truncate" title={char.name}>
+                        {char.name}
+                      </div>
+                      <div className="text-[10px] text-zinc-400 truncate font-mono">
+                        @{char.key}
+                      </div>
+                    </div>
+
+                    <div className="text-[9px] text-zinc-500 flex items-center justify-between">
+                      <span>Vai trò: {char.role}</span>
+                      {isSelected ? (
+                        <span className="text-purple-400 font-semibold text-[10px]">Đang chọn</span>
+                      ) : (
+                        <span className="text-[9px] text-zinc-500 group-hover:text-purple-300">Bấm để sửa</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* 3. Bộ hồ sơ ngoài bảng */}
               {dossiers.map((dossier) => (
                 <div
                   key={dossier.id}
@@ -216,7 +253,6 @@ export function OffBoardTray({
             </>
           )}
         </div>
-      )}
-    </div>
-  );
-}
+      </div>
+    );
+  }

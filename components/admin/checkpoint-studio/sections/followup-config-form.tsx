@@ -15,9 +15,9 @@ interface FollowupConfigFormProps {
 const INPUT_CLASS = "h-7 border-white/10 bg-black/40 text-xs text-zinc-100";
 
 const FOLLOWUP_TYPES = [
-  { value: "time", label: "Mốc thời gian (VD: 21:15)" },
+  { value: "time", label: "Mốc thời gian" },
   { value: "choice", label: "Trắc nghiệm lựa chọn" },
-  { value: "code", label: "Mật khẩu / Mã số (VD: 120713)" },
+  { value: "code", label: "Mật khẩu / Mã số" },
   { value: "text", label: "Nhập văn bản tự do" },
 ];
 
@@ -74,9 +74,9 @@ export function FollowupConfigForm({
       <Field
         label={
           questionType === "time"
-            ? "Mốc thời gian đúng (định dạng HH:MM, VD: 21:15)"
+            ? "Mốc thời gian đúng (HH:MM)"
             : questionType === "code"
-              ? "Mã số / Mật khẩu đúng (VD: 120713)"
+              ? "Mã số / Mật khẩu đúng"
               : "Đáp án đúng"
         }
         required

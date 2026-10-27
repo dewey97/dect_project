@@ -16,7 +16,7 @@ interface CodeChipInputProps {
 export function CodeChipInput({
   value,
   onChange,
-  placeholder = "Nhập mã rồi Enter…",
+  placeholder = "",
   className,
 }: CodeChipInputProps) {
   const [text, setText] = useState("");

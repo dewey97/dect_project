@@ -16,15 +16,15 @@ interface BoardNodeFormProps {
 }
 
 const NODE_KINDS: Array<{ value: BoardNodeKind; label: string }> = [
-  { value: "victim", label: "Nạn nhân (Victim)" },
+  { value: "victim", label: "Nạn nhân" },
   { value: "victim_phone", label: "Điện thoại nạn nhân" },
   { value: "reinvestigate", label: "Khám xét hiện trường" },
   { value: "suspects_hub", label: "Hub Nghi phạm" },
   { value: "evidence_hub", label: "Hub Vật chứng" },
-  { value: "note", label: "Giấy ghi chú (Note)" },
+  { value: "note", label: "Giấy ghi chú" },
   { value: "photo", label: "Ghim ảnh hiện trường/vật chứng" },
   { value: "dossier", label: "Hồ sơ tài liệu" },
-  { value: "custom", label: "Tự do (Custom)" },
+  { value: "custom", label: "Tự do" },
 ];
 
 export function BoardNodeForm({

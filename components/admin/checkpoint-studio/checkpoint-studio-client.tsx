@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type {
   DbCase,
@@ -38,6 +38,8 @@ import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
 import { CheckpointEditor } from "./checkpoint-editor";
+import { CheckpointFlowView } from "./checkpoint-flow-view";
+import { CharacterEditor } from "./character-editor";
 import { OffBoardTray } from "./off-board-tray";
 import {
   HeroInteractive,
@@ -47,18 +49,14 @@ import { useBoardEditor } from "./board/use-board-editor";
 import { BoardNodeForm } from "./board/board-node-form";
 import { Button } from "@/components/ui/button";
 import {
-  Undo2,
-  Redo2,
+  Users,
   Save,
   Plus,
-  Play,
   RotateCcw,
   RotateCw,
   Minus,
   Sparkles,
   Layers,
-  Network,
-  GitBranch,
 } from "lucide-react";
 
 interface CheckpointStudioClientProps {
@@ -106,6 +104,54 @@ export function CheckpointStudioClient({
       window.history.replaceState(null, "", url);
     }
   }, [caseId, activeView]);
+
+  const [flowWidth, setFlowWidth] = useState<number>(440);
+  useEffect(() => {
+    const saved = Number(
+      localStorage.getItem("checkpoint_studio_flow_width"),
+    );
+    if (saved) setFlowWidth(Math.max(300, Math.min(800, saved)));
+  }, []);
+  const [isResizingFlow, setIsResizingFlow] = useState(false);
+
+  const startResizingFlow = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingFlow(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isResizingFlow) return;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = e.clientX;
+      if (newWidth >= 280 && newWidth <= 800) {
+        setFlowWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingFlow(false);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      try {
+        localStorage.setItem(
+          "checkpoint_studio_flow_width",
+          String(flowWidth),
+        );
+      } catch {}
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isResizingFlow, flowWidth]);
 
   const [sidebarWidth, setSidebarWidth] = useState<number>(420);
   useEffect(() => {
@@ -176,6 +222,8 @@ export function CheckpointStudioClient({
   const [characters, setCharacters] = useState<DbCaseCharacter[]>(initialCharacters);
   const [isLintModalOpen, setIsLintModalOpen] = useState(false);
   const [isCreatingCustomNode, setIsCreatingCustomNode] = useState(false);
+  const [inspectorTab, setInspectorTab] = useState<"checkpoints" | "characters">("checkpoints");
+  const [selectedCharacter, setSelectedCharacter] = useState<DbCaseCharacter | null>(null);
 
   // Chế độ "Lớp logic" (Logic Overlay)
   const [isLogicLayerActive, setIsLogicLayerActive] = useState(false);
@@ -241,6 +289,17 @@ export function CheckpointStudioClient({
       window.open(`/evidence/web?case_id=${caseId}`, "_blank");
     }
   };
+
+  const generalCheckpoints = useMemo(
+    () =>
+      rows.filter(
+        (r) =>
+          r.kind !== "suspect_interrogation" &&
+          r.type !== "evidence_picker" &&
+          !r.checkpoint_id.includes("interrogation"),
+      ),
+    [rows],
+  );
 
   const formDirty = useMemo(
     () => (draft ? JSON.stringify(draft) !== baseline : false),
@@ -496,6 +555,318 @@ export function CheckpointStudioClient({
     }
   };
 
+  const [hasUnsavedCharacter, setHasUnsavedCharacter] = useState(false);
+  const activeCharacterDraftRef = useRef<DbCaseCharacter | null>(null);
+
+  const handleCharacterLiveDraftChange = (updatedChar: DbCaseCharacter) => {
+    activeCharacterDraftRef.current = updatedChar;
+    setHasUnsavedCharacter(true);
+
+    // Cập nhật ngay lập tức vào state characters để Bảng điều tra và Khay ngoài bảng nhảy tức thì (0s độ trễ)
+    setCharacters((prev) => {
+      const exists = prev.some((c) => c.id === updatedChar.id || c.key === updatedChar.key);
+      if (exists) {
+        return prev.map((c) =>
+          c.id === updatedChar.id || c.key === updatedChar.key ? updatedChar : c,
+        );
+      }
+      return [...prev, updatedChar];
+    });
+  };
+
+  const [isUnifiedSaving, setIsUnifiedSaving] = useState(false);
+
+  const handleSaveAllUnified = async () => {
+    setIsUnifiedSaving(true);
+    try {
+      const promises: Promise<unknown>[] = [];
+
+      // 1. Lưu Checkpoint nếu có thay đổi
+      if (formDirty && draft) {
+        promises.push(handleSave());
+      }
+
+      // 2. Lưu Nhân vật nếu có thay đổi
+      if (hasUnsavedCharacter && activeCharacterDraftRef.current) {
+        const charToSave = activeCharacterDraftRef.current;
+        const { saveCharacter } = await import("@/lib/actions/character-actions");
+        promises.push(
+          saveCharacter({
+            id: charToSave.id?.startsWith("temp_") ? undefined : charToSave.id,
+            caseId,
+            key: charToSave.key,
+            name: charToSave.name,
+            aliases: charToSave.aliases || [],
+            role: charToSave.role,
+            description: charToSave.description || "",
+            avatarCode: charToSave.avatar_code || `avatar_${charToSave.key}`,
+            avatarUrl: charToSave.avatar_url || null,
+            avatarAssetPath: charToSave.avatar_asset_path || null,
+            phones: charToSave.phones || [],
+            slotIndex: charToSave.slot_index ?? characters.length,
+            device: charToSave.device || null,
+          }).then((res) => {
+            if (res.success && res.data) {
+              setCharacters((prev) =>
+                prev.map((c) => (c.key === res.data.key ? res.data : c)),
+              );
+              activeCharacterDraftRef.current = res.data;
+              setHasUnsavedCharacter(false);
+            }
+          }),
+        );
+      }
+
+      // 2b. Lưu Thẩm tra nghi phạm gắn liền nếu có thay đổi
+      if (activeInterrogationDraftRef.current) {
+        promises.push(saveCheckpoint(activeInterrogationDraftRef.current));
+      }
+
+      // 3. Lưu bố cục bảng điều tra (tọa độ ghim, xoay, scale, dây nối)
+      promises.push(handleSaveBoardLayout());
+
+      await Promise.all(promises);
+      toast.success("Đã lưu toàn bộ thay đổi thành công!");
+      // baseline is updated by handleSave()
+      setHasUnsavedCharacter(false);
+      await refreshBoardModel();
+    } catch (err) {
+      console.error(err);
+      toast.error("Lỗi khi lưu dữ liệu");
+    } finally {
+      setIsUnifiedSaving(false);
+    }
+  };
+
+  // Lắng nghe Ctrl+S toàn cục để bấm Lưu tức thì
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        handleSaveAllUnified();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [formDirty, draft, hasUnsavedCharacter, handleSaveBoardLayout]);
+
+  const activeInterrogationDraftRef = useRef<CheckpointStudioDraft | null>(null);
+
+  const handleCharacterInterrogationChange = (interrogationDraft: CheckpointStudioDraft) => {
+    activeInterrogationDraftRef.current = interrogationDraft;
+
+    // Cập nhật live vào rows để Flow View phản ánh ngay lập tức
+    setRows((prevRows) => {
+      const exists = prevRows.some(
+        (r) =>
+          (interrogationDraft.id && r.id === interrogationDraft.id) ||
+          r.checkpoint_id === interrogationDraft.checkpointId ||
+          (interrogationDraft.subjectKey && r.subject_key === interrogationDraft.subjectKey),
+      );
+
+      if (exists) {
+        return prevRows.map((r) => {
+          const isTarget =
+            (interrogationDraft.id && r.id === interrogationDraft.id) ||
+            r.checkpoint_id === interrogationDraft.checkpointId ||
+            (interrogationDraft.subjectKey && r.subject_key === interrogationDraft.subjectKey);
+          if (isTarget) {
+            return {
+              ...r,
+              title: interrogationDraft.title,
+              kind: "suspect_interrogation",
+              type: "evidence_picker",
+              subject_key: interrogationDraft.subjectKey || r.subject_key,
+              question: interrogationDraft.question,
+              answer_config: interrogationDraft.answerConfig as any,
+              hints: interrogationDraft.hints as any,
+            };
+          }
+          return r;
+        });
+      }
+
+      // Nếu chưa có, thêm mới vào rows
+      const newRow: DbCaseCheckpoint = {
+        id: interrogationDraft.id || ("temp_" + interrogationDraft.checkpointId),
+        case_id: caseId,
+        checkpoint_id: interrogationDraft.checkpointId,
+        node_id: null,
+        dossier: null,
+        title: interrogationDraft.title,
+        question: interrogationDraft.question,
+        type: "evidence_picker",
+        kind: "suspect_interrogation",
+        subject_key: interrogationDraft.subjectKey || null,
+        question_type: null,
+        unlocked_evidence_id: null,
+        followup_of: null,
+        suspect_label: null,
+        evidence_step_label: null,
+        depends_on: [],
+        flow_position: null,
+        answer_config: interrogationDraft.answerConfig as any,
+        hints: interrogationDraft.hints as any,
+        narrative: null,
+        ai_context: null,
+        ai_valid_cases: null,
+        ai_invalid_cases: null,
+        board_config: undefined,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      return [...prevRows, newRow];
+    });
+  };
+
+  const handleCreateNewCharacter = () => {
+    setSelectedCharacter(null);
+    setInspectorTab("characters");
+    setSelectedNodeId(null);
+  };
+
+  const handleSaveCharacter = async (savedChar: DbCaseCharacter) => {
+    setCharacters((prev) => {
+      const exists = prev.some((c) => c.id === savedChar.id || c.key === savedChar.key);
+      if (exists) {
+        return prev.map((c) =>
+          c.id === savedChar.id || c.key === savedChar.key ? savedChar : c,
+        );
+      }
+      return [...prev, savedChar];
+    });
+    setSelectedCharacter(savedChar);
+    await refreshBoardModel();
+  };
+
+  const handleDeleteCharacter = async (charId: string) => {
+    setCharacters((prev) => prev.filter((c) => c.id !== charId));
+    setSelectedCharacter(null);
+    setInspectorTab("checkpoints");
+    await refreshBoardModel();
+  };
+
+  const handlePromoteCharacterToSuspect = async (char: DbCaseCharacter) => {
+    try {
+      const { saveCharacter } = await import("@/lib/actions/character-actions");
+      const res = await saveCharacter({
+        id: char.id,
+        caseId,
+        key: char.key,
+        name: char.name,
+        role: "suspect",
+        avatarCode: char.avatar_code || `avatar_${char.key}`,
+        avatarUrl: char.avatar_url || null,
+        avatarAssetPath: char.avatar_asset_path || null,
+        phones: char.phones || [],
+        aliases: char.aliases || [],
+        description: char.description || "",
+        slotIndex: char.slot_index ?? characters.length,
+        device: char.device || null,
+      });
+      if (res.success) {
+        toast.success(`Đã đưa "${char.name}" lên bảng điều tra làm Nghi phạm`);
+        await handleSaveCharacter(res.data);
+      } else {
+        toast.error(res.error || "Lỗi khi đưa nhân vật lên bảng");
+      }
+    } catch (err: unknown) {
+      toast.error("Lỗi khi đưa nhân vật lên bảng");
+    }
+  };
+
+  const handleSelectFromFlow = (cp: DbCaseCheckpoint) => {
+    selectRow(cp);
+    const matchingPin = displayPins.find(
+      (p) =>
+        p.checkpointId === cp.checkpoint_id ||
+        (cp.checkpoint_id.includes("phone") && p.nodeKind === "phone_lookup") ||
+        (cp.checkpoint_id.includes("indictment") && p.nodeKind === "indictment") ||
+        p.id.includes(cp.checkpoint_id),
+    );
+    if (matchingPin) {
+      setSelectedNodeId(matchingPin.id);
+    } else {
+      setSelectedNodeId(null);
+    }
+  };
+
+  const handleConnectDependencyFromFlow = async (
+    sourceCpId: string,
+    targetCpId: string,
+  ) => {
+    const targetCp = rows.find((r) => r.checkpoint_id === targetCpId);
+    const sourceCp = rows.find((r) => r.checkpoint_id === sourceCpId);
+
+    if (!targetCp || !sourceCp) return;
+
+    const currentDeps = targetCp.depends_on || [];
+    if (currentDeps.includes(sourceCp.checkpoint_id)) {
+      toast.info("Quan hệ phụ thuộc này đã tồn tại.");
+      return;
+    }
+
+    const currentEdges = buildDependencyEdges(rows);
+    if (
+      wouldCreateCycle(currentEdges, {
+        source: sourceCp.checkpoint_id,
+        target: targetCp.checkpoint_id,
+      })
+    ) {
+      toast.error("Liên kết tạo chu trình vòng lặp phụ thuộc.");
+      return;
+    }
+
+    const nextDeps = [...currentDeps, sourceCp.checkpoint_id];
+    setRows((prev) =>
+      prev.map((r) =>
+        r.checkpoint_id === targetCp.checkpoint_id
+          ? { ...r, depends_on: nextDeps }
+          : r,
+      ),
+    );
+    if (draft && draft.checkpointId === targetCp.checkpoint_id) {
+      setDraft((d) => (d ? { ...d, dependsOn: nextDeps } : d));
+    }
+
+    const res = await updateCheckpointDependencies(caseId, [
+      { checkpointId: targetCp.checkpoint_id, dependsOn: nextDeps },
+    ]);
+
+    if (res.success) {
+      toast.success(
+        `Đã nối phụ thuộc: "${targetCp.title || targetCp.checkpoint_id}" phụ thuộc vào "${sourceCp.title || sourceCp.checkpoint_id}"`,
+      );
+    } else {
+      toast.error(res.error || "Lỗi khi lưu quan hệ phụ thuộc.");
+    }
+  };
+
+  const handleDeleteDependencyFromFlow = async (
+    sourceCpId: string,
+    targetCpId: string,
+  ) => {
+    const targetCp = rows.find((r) => r.checkpoint_id === targetCpId);
+    if (!targetCp) return;
+
+    const nextDeps = (targetCp.depends_on || []).filter(
+      (id) => id !== sourceCpId,
+    );
+    setRows((prev) =>
+      prev.map((r) =>
+        r.checkpoint_id === targetCpId ? { ...r, depends_on: nextDeps } : r,
+      ),
+    );
+    if (draft && draft.checkpointId === targetCpId) {
+      setDraft((d) => (d ? { ...d, dependsOn: nextDeps } : d));
+    }
+
+    await updateCheckpointDependencies(caseId, [
+      { checkpointId: targetCpId, dependsOn: nextDeps },
+    ]);
+    toast.info("Đã xóa quan hệ phụ thuộc.");
+  };
+
   const handleSelectPinOnBoard = (pinId: string | null) => {
     setSelectedNodeId(pinId);
     if (!pinId) return;
@@ -524,13 +895,24 @@ export function CheckpointStudioClient({
     }
 
     if (pin.nodeKind === "suspect" && pin.subjectKey) {
+      const matchedChar = characters.find(
+        (c) =>
+          c.key.toLowerCase() === pin.subjectKey?.toLowerCase() ||
+          pin.id.includes(c.key.toLowerCase()),
+      );
+      if (matchedChar) {
+        setSelectedCharacter(matchedChar);
+        setInspectorTab("characters");
+      }
       const cp = rows.find(
-        (r) => r.kind === "suspect_interrogation" && r.subject_key === pin.subjectKey,
+        (r) =>
+          (r.kind === "suspect_interrogation" || (r as any).type === "suspect_interrogation") &&
+          r.subject_key === pin.subjectKey,
       );
       if (cp) {
         selectRow(cp);
-        return;
       }
+      return;
     }
 
     if (pin.nodeKind === "followup") {
@@ -869,14 +1251,6 @@ export function CheckpointStudioClient({
           <span className="text-xs font-bold text-zinc-100 tracking-wide uppercase">
             Checkpoint Studio
           </span>
-          <span className="hidden sm:inline-block text-[11px] font-semibold text-zinc-400">
-            • Bảng điều tra (Board Studio)
-          </span>
-
-          <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-zinc-400">
-            {displayPins.length} nodes
-          </span>
-
           {hasUnsaved && (
             <span className="flex items-center gap-1 rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/20">
               <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -885,140 +1259,23 @@ export function CheckpointStudioClient({
           )}
         </div>
 
-        {/* Thanh công cụ giữa & phải */}
+        {/* Thanh công cụ phải */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Nút bật/tắt Lớp logic (B23-4) */}
-          <button
-            type="button"
-            onClick={() => setIsLogicLayerActive(!isLogicLayerActive)}
-            className={cn(
-              "flex items-center gap-1.5 rounded px-2 py-1 text-xs font-semibold transition-colors border",
-              isLogicLayerActive
-                ? "bg-purple-500/20 text-purple-300 border-purple-500/40 shadow-xs"
-                : "border-white/10 bg-white/5 text-zinc-400 hover:text-zinc-200",
-            )}
-            title="Bật/tắt hiển thị mũi tên phụ thuộc depends_on (Lớp logic)"
-          >
-            <GitBranch className="size-3.5" />
-            <span>Lớp logic</span>
-          </button>
-
-          {isLogicLayerActive && (
-            <button
-              type="button"
-              onClick={handleAutoLayoutLogic}
-              className="hidden lg:flex items-center gap-1 rounded bg-purple-950/30 hover:bg-purple-900/40 text-purple-300 border border-purple-500/30 px-2 py-1 text-[11px] transition-colors"
-              title="Tự động sắp xếp phân tầng đồ thị logic (không tự động ghi đè vị trí bảng)"
-            >
-              <Network className="size-3" />
-              <span>Sắp tự động</span>
-            </button>
-          )}
-
-          {/* Chuyển nhanh param ?view=... phục vụ kiểm thử E2E */}
-          <div className="flex items-center gap-1 bg-black/40 rounded border border-white/5 p-0.5 mr-1">
-            <button
-              type="button"
-              onClick={() => setActiveView("flow")}
-              className={cn(
-                "rounded px-2 py-0.5 text-[11px] font-medium transition-colors",
-                activeView === "flow"
-                  ? "bg-white/15 text-white"
-                  : "text-zinc-400 hover:text-zinc-200",
-              )}
-            >
-              Sơ đồ luồng (Flow)
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveView("board")}
-              className={cn(
-                "rounded px-2 py-0.5 text-[11px] font-medium transition-colors",
-                activeView === "board"
-                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                  : "text-zinc-400 hover:text-zinc-200",
-              )}
-            >
-              Bảng điều tra (Board)
-            </button>
-          </div>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleUndo}
-            disabled={!canUndo}
-            title="Hoàn tác (Ctrl+Z)"
-            className="size-7 p-0 text-zinc-400 hover:text-white"
-          >
-            <Undo2 className="size-3.5" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleRedo}
-            disabled={!canRedo}
-            title="Làm lại (Ctrl+Shift+Z)"
-            className="size-7 p-0 text-zinc-400 hover:text-white"
-          >
-            <Redo2 className="size-3.5" />
-          </Button>
-
-          <div className="h-4 w-px bg-white/10 mx-0.5" />
-
-          {/* Nút Tạo Checkpoint Mới */}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={createRow}
-            disabled={isBusy}
-            className="gap-1 text-xs border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 h-7 px-2.5"
-          >
-            <Plus className="size-3.5 text-amber-400" />
-            + Checkpoint
-          </Button>
-
-          {/* Nút Thêm Node Custom Ghim */}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCreateNewCustomNode}
-            disabled={isBusy}
-            className="gap-1 text-xs border-white/10 bg-zinc-900 text-zinc-200 hover:bg-zinc-800 h-7 px-2.5"
-          >
-            <Plus className="size-3.5 text-zinc-300" />
-            Thêm Node
-          </Button>
-
-          {/* Nút Lưu Bố Cục Bảng */}
+          {/* Nút LƯU DUY NHẤT (Checkpoint, Nhân vật, Bố cục Bảng) */}
           <Button
             type="button"
             size="sm"
-            onClick={handleSaveBoardLayout}
-            disabled={isBusy || isBoardSaving}
-            className="gap-1 text-xs bg-amber-500 text-black font-semibold hover:bg-amber-600 disabled:opacity-50 h-7 px-2.5"
+            onClick={handleSaveAllUnified}
+            disabled={isBusy || isUnifiedSaving}
+            className="gap-1.5 text-xs bg-amber-500 text-black font-bold hover:bg-amber-400 disabled:opacity-50 h-7 px-3.5 shadow-md cursor-pointer"
+            title="Lưu tất cả thay đổi (Ctrl+S)"
           >
             <Save className="size-3.5" />
-            {isBoardSaving ? "Đang lưu..." : "Lưu Bố Cục"}
-          </Button>
-
-          {/* Nút Chơi Thử */}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => handlePlaytest(draft?.checkpointId)}
-            className="gap-1 text-xs border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/30 h-7 px-2.5"
-          >
-            <Play className="size-3.5 fill-current" />
-            Chơi Thử
+            <span>{isUnifiedSaving ? "Đang lưu..." : "LƯU"}</span>
           </Button>
 
           {/* Nút Linter Vụ Án */}
+
           <Button
             type="button"
             variant="ghost"
@@ -1043,9 +1300,37 @@ export function CheckpointStudioClient({
         </div>
       </header>
 
-      {/* 2. Main Workspace: Canvas Bảng Điều Tra + Inspector */}
+      {/* 2. Main Workspace: Dual-View (Flow + Board) + Inspector */}
       <div className="flex flex-1 min-h-0 w-full flex-col md:flex-row overflow-hidden relative">
-        {/* Khung Canvas Bảng Điều Tra ở giữa */}
+        {/* CỘT 1: Sơ đồ luồng Flow hình hộp (Bên trái) */}
+        <div
+          style={{ width: `${flowWidth}px` }}
+          className={cn(
+            "hidden md:flex flex-col min-h-0 shrink-0 border-r border-white/10 bg-[#0d0d12] relative overflow-hidden",
+            !isResizingFlow && "transition-[width] duration-75 ease-out",
+          )}
+        >
+          <CheckpointFlowView
+            rows={rows}
+            selectedId={selectedId}
+            onSelectCheckpoint={handleSelectFromFlow}
+            onCreateCheckpoint={createRow}
+            onConnectDependencies={handleConnectDependencyFromFlow}
+            onDeleteDependency={handleDeleteDependencyFromFlow}
+          />
+        </div>
+
+        {/* Thanh kéo phân cách Flow và Board */}
+        <div
+          onMouseDown={startResizingFlow}
+          className={cn(
+            "hidden md:block relative z-30 w-1.5 -mr-1 cursor-col-resize select-none shrink-0 bg-white/5 transition-colors hover:bg-purple-500 active:bg-purple-600",
+            isResizingFlow && "bg-purple-500",
+          )}
+          title="Kéo sang trái/phải để điều chỉnh tỷ lệ giữa Sơ đồ luồng Flow và Bảng điều tra Board"
+        />
+
+        {/* CỘT 2: Bảng điều tra Board (Ở giữa) */}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col relative h-full">
           {/* Thanh công cụ Quick Transform nổi trên Canvas */}
           {selectedNode && (
@@ -1123,11 +1408,21 @@ export function CheckpointStudioClient({
           <OffBoardTray
             checkpoints={rows}
             dossiers={dossiers}
+            characters={characters}
             selectedCheckpointId={selectedId}
+            selectedCharacterId={selectedCharacter?.id}
             onSelectCheckpoint={(cp) => {
               selectRow(cp);
+              setSelectedCharacter(null);
+              setInspectorTab("checkpoints");
               setSelectedNodeId(null);
             }}
+            onSelectCharacter={(char) => {
+              setSelectedCharacter(char);
+              setInspectorTab("characters");
+              setSelectedNodeId(null);
+            }}
+            onPromoteCharacterToSuspect={handlePromoteCharacterToSuspect}
             onSelectDossier={() => {
               router.push(`/studio/dossier?case=${encodeURIComponent(caseId)}`);
             }}
@@ -1162,22 +1457,108 @@ export function CheckpointStudioClient({
               onClose={() => setSelectedNodeId(null)}
             />
           ) : (
-            <CheckpointListSidebar onCreate={createRow} isLoading={isLoading}>
-              {draft ? (
-                <CheckpointEditor
-                  draft={draft}
-                  dossiers={dossiers}
-                  characters={characters}
-                  checkpoints={rows}
-                  onChange={updateDraft}
-                  onSave={handleSave}
-                  onDelete={handleDelete}
-                  onPlaytest={() => handlePlaytest(draft.checkpointId)}
-                  isSaving={isSaving}
-                  isDirty={formDirty}
-                />
-              ) : null}
-            </CheckpointListSidebar>
+            <div className="flex h-full w-full min-h-0 flex-col bg-[#0c0c10] border-t border-white/10 md:border-l md:border-t-0">
+              {/* Segmented Switcher Tab giữa Checkpoint và Nhân vật */}
+              <div className="h-10 shrink-0 px-3 bg-[#111118] border-b border-white/10 flex items-center justify-between text-xs font-mono select-none">
+                <div className="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInspectorTab("checkpoints");
+                      setSelectedCharacter(null);
+                    }}
+                    className={cn(
+                      "px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors",
+                      inspectorTab === "checkpoints" && !selectedCharacter
+                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                        : "text-zinc-400 hover:text-zinc-200",
+                    )}
+                  >
+                    Mục tiêu ({generalCheckpoints.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInspectorTab("characters");
+                      if (!selectedCharacter && characters.length > 0) {
+                        setSelectedCharacter(characters[0]);
+                      }
+                    }}
+                    className={cn(
+                      "px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors",
+                      inspectorTab === "characters" || selectedCharacter
+                        ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                        : "text-zinc-400 hover:text-zinc-200",
+                    )}
+                  >
+                    Nhân vật ({characters.length})
+                  </button>
+                </div>
+
+                {inspectorTab === "characters" || selectedCharacter ? (
+                  <button
+                    type="button"
+                    onClick={handleCreateNewCharacter}
+                    className="flex items-center gap-1 px-2 py-0.5 rounded bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 text-[10px] font-semibold transition-colors"
+                  >
+                    <Plus className="size-3" />
+                    <span>Thêm Nhân vật</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={createRow}
+                    className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-[10px] font-semibold transition-colors"
+                  >
+                    <Plus className="size-3" />
+                    <span>Thêm Checkpoint</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Nội dung Inspector */}
+              <div className="flex-1 min-h-0 overflow-hidden">
+                {inspectorTab === "characters" || selectedCharacter ? (
+                  <CharacterEditor
+                    caseId={caseId}
+                    character={selectedCharacter}
+                    allCharacters={characters}
+                    checkpoints={rows}
+                    onSave={handleSaveCharacter}
+                    onDelete={handleDeleteCharacter}
+                    onOpenInterrogation={(cp) => {
+                      selectRow(cp);
+                      setSelectedCharacter(null);
+                      setInspectorTab("checkpoints");
+                    }}
+                    onClose={() => {
+                      setSelectedCharacter(null);
+                      setInspectorTab("checkpoints");
+                    }}
+                  />
+                ) : draft ? (
+                  <CheckpointEditor
+                    draft={draft}
+                    dossiers={dossiers}
+                    characters={characters}
+                    checkpoints={rows}
+                    onChange={updateDraft}
+                    onSave={handleSave}
+                    onDelete={handleDelete}
+                    onPlaytest={() => handlePlaytest(draft.checkpointId)}
+                    isSaving={isSaving}
+                    isDirty={formDirty}
+                  />
+                ) : (
+                  <div className="flex flex-1 flex-col items-center justify-center p-6 text-center text-zinc-500">
+                    <p className="text-xs font-medium text-zinc-300">Chưa chọn mục nào</p>
+                    <p className="mt-1 text-[11px] text-zinc-500 max-w-[240px]">
+                      Bấm vào checkpoint trên sơ đồ hoặc ghim trên bảng để chỉnh sửa.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>

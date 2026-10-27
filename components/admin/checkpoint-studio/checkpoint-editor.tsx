@@ -109,22 +109,6 @@ export function CheckpointEditor({
         )}
 
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
-          <Button
-            type="button"
-            size="sm"
-            onClick={onSave}
-            disabled={isSaving}
-            className="h-7 px-2.5 text-[11px] bg-amber-500 text-black hover:bg-amber-400 gap-1 font-semibold cursor-pointer"
-            title="Lưu checkpoint hiện tại"
-          >
-            {isSaving ? (
-              <Loader2 className="size-3 animate-spin" />
-            ) : (
-              <Save className="size-3" />
-            )}
-            <span>Lưu Checkpoint</span>
-          </Button>
-
           {onPlaytest && draft.checkpointId && (
             <Button
               type="button"

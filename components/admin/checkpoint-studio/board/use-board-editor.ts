@@ -24,7 +24,7 @@ export interface BoardEditorSnapshot {
 }
 
 export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; checkpoints?: DbCaseCheckpoint[]; characters?: DbCaseCharacter[] }) {
-  const boardModel = useBoardModel(caseId, { isMobile: options?.isMobile, initialCheckpoints: options?.checkpoints, initialCharacters: options?.characters });
+  const boardModel = useBoardModel(caseId, { isMobile: options?.isMobile, initialCheckpoints: options?.checkpoints, initialCharacters: options?.characters, isStudioMode: true });
 
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
