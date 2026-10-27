@@ -442,7 +442,7 @@ Cột `kind`, `subject_key` (`db/schema/26_checkpoint_kind.sql`). Đã cập nh�
 Thư mục `components/admin/checkpoint-studio/sections/`:
 
 - `phone_lookup`: `phone-lookup-config-form.tsx` — quản lý danh sách ô `textMatchInputs` (label, placeholder, validAnswers).
-- `suspect_interrogation`: `suspect-interrogation-config-form.tsx` — 3 lớp (Động cơ / Ngoại phạm / Mâu thuẫn), mã chứng cứ bắt buộc/tùy chọn, bối cảnh AI, gợi ý từng lớp.
+- `suspect_interrogation`: `suspect-interrogation-config-form.tsx` — 2 lớp (Động cơ / Mâu thuẫn lời khai), mã chứng cứ bắt buộc/tùy chọn, bối cảnh AI, gợi ý từng lớp.
 - `followup`: `followup-config-form.tsx` — loại phụ (time/choice/code/text), `correctAnswer`, `options`, `photoCodes`, `followupOf`.
 - `indictment`: `indictment-config-form.tsx` — `validSuspects`, `validMotives`, `requiredEvidenceIds`, `optionalEvidenceIds`.
 - `epilogue`: `checkpoint-epilogue-form.tsx` — danh sách `epilogueStories`.

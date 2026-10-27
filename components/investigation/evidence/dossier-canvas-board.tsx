@@ -42,6 +42,8 @@ import {
   Palette,
   Check,
   HelpCircle,
+  Sun,
+  Moon,
 } from "lucide-react";
 import {
   DOSSIER_CANVAS_PRESETS,
@@ -128,6 +130,8 @@ export type { CanvasStickyNote };
 
 interface DossierCanvasBoardProps {
   caseId?: string;
+  uiTheme?: "dark" | "light";
+  onToggleUiTheme?: () => void;
   pdfItems: CombinedItem[];
   evidenceItems: CombinedItem[];
   dossierDocuments: DbDossierDocument[];
@@ -147,6 +151,8 @@ interface DossierCanvasBoardProps {
 
 export function DossierCanvasBoard({
   caseId = "case_000",
+  uiTheme = "dark",
+  onToggleUiTheme,
   pdfItems,
   evidenceItems,
   dossierDocuments,
@@ -159,6 +165,7 @@ export function DossierCanvasBoard({
   onOpenIndictment,
   isBoardFullscreen = false,
 }: DossierCanvasBoardProps) {
+  const isLight = uiTheme === "light";
   // Đồng bộ Realtime Group Play
   const { roomCode, roomState, syncUpdate, nickname } = useRoomSync();
 
@@ -263,6 +270,26 @@ export function DossierCanvasBoard({
 
   // Canvas Theme states (Tùy chọn màu & ánh sáng mặt bàn hồ sơ)
   const [canvasTheme, setCanvasTheme] = useState<CanvasThemeConfig>(DOSSIER_CANVAS_PRESETS[0]);
+
+  // Tự động căn chỉnh mặt bàn hồ sơ phù hợp với chế độ Sáng / Tối khi đổi UI Theme
+  useEffect(() => {
+    if (uiTheme === "light") {
+      setCanvasTheme((prev) => {
+        if (prev.id === "mahogany-warm" || prev.id === "noir-leather" || prev.id === "obsidian-minimal") {
+          const lightPreset = DOSSIER_CANVAS_PRESETS.find((p) => p.id === "light-linen");
+          return lightPreset || prev;
+        }
+        return prev;
+      });
+    } else if (uiTheme === "dark") {
+      setCanvasTheme((prev) => {
+        if (prev.id === "light-linen" || prev.id === "architect-vellum") {
+          return DOSSIER_CANVAS_PRESETS[0];
+        }
+        return prev;
+      });
+    }
+  }, [uiTheme]);
   const [isThemePopupOpen, setIsThemePopupOpen] = useState<boolean>(false);
   const [themeActiveTab, setThemeActiveTab] = useState<"presets" | "custom">("presets");
   const [customBaseColor, setCustomBaseColor] = useState<string>("#130f0b");
@@ -2076,7 +2103,10 @@ export function DossierCanvasBoard({
         data-tour="canvas-bottom-toolbar"
         onMouseDown={(e) => e.stopPropagation()}
         className={cn(
-          "fixed bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#121418]/98 backdrop-blur-2xl px-2.5 py-1.5 rounded-2xl border border-[#353945] shadow-[0_16px_48px_rgba(0,0,0,0.9)] text-zinc-300 w-max max-w-[calc(100vw-2rem)] select-none overflow-visible transition-all duration-300 ease-in-out",
+          "fixed bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 px-2.5 py-1.5 rounded-2xl w-max max-w-[calc(100vw-2rem)] select-none overflow-visible transition-all duration-300 ease-in-out backdrop-blur-2xl",
+          isLight
+            ? "bg-white/98 border border-zinc-200 shadow-[0_16px_40px_rgba(0,0,0,0.12)] text-zinc-800"
+            : "bg-[#121418]/98 border border-[#353945] shadow-[0_16px_48px_rgba(0,0,0,0.9)] text-zinc-300",
           isBoardFullscreen
             ? "opacity-0 pointer-events-none translate-y-8 scale-95"
             : "opacity-100 pointer-events-auto translate-y-0 scale-100"
@@ -2199,7 +2229,7 @@ export function DossierCanvasBoard({
             "p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0",
             activeTool === "cursor"
               ? "bg-[#f5c344] text-[#121316] font-bold shadow-md scale-105"
-              : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+              : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70")
           )}
           title="Bàn tay (Di chuyển góc nhìn & kéo tài liệu)"
         >
@@ -2222,7 +2252,7 @@ export function DossierCanvasBoard({
               "p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0",
               activeTool === "pen"
                 ? "bg-[#f5c344] text-[#121316] font-bold shadow-md scale-105"
-                : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70")
             )}
             title="Bút vẽ hồ sơ"
           >
@@ -2241,8 +2271,10 @@ export function DossierCanvasBoard({
               setIsPenPopupOpen((prev) => !prev);
             }}
             className={cn(
-              "p-1 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80 transition-all cursor-pointer flex items-center justify-center shrink-0",
-              isPenPopupOpen && "text-[#f5c344] bg-zinc-800/90 rotate-180"
+              "p-1 rounded-md transition-all cursor-pointer flex items-center justify-center shrink-0",
+              isLight
+                ? (isPenPopupOpen ? "text-amber-600 bg-zinc-100 rotate-180" : "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100")
+                : (isPenPopupOpen ? "text-[#f5c344] bg-zinc-800/90 rotate-180" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80")
             )}
             title="Chọn màu & độ dày nét vẽ"
           >
@@ -2325,7 +2357,7 @@ export function DossierCanvasBoard({
               "p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0",
               activeTool === "highlighter"
                 ? "bg-[#f5c344] text-[#121316] font-bold shadow-md scale-105"
-                : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70")
             )}
             title="Bút nhớ dạ quang"
           >
@@ -2344,8 +2376,10 @@ export function DossierCanvasBoard({
               setIsHighlighterPopupOpen((prev) => !prev);
             }}
             className={cn(
-              "p-1 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80 transition-all cursor-pointer flex items-center justify-center shrink-0",
-              isHighlighterPopupOpen && "text-[#f5c344] bg-zinc-800/90 rotate-180"
+              "p-1 rounded-md transition-all cursor-pointer flex items-center justify-center shrink-0",
+              isLight
+                ? (isHighlighterPopupOpen ? "text-amber-600 bg-zinc-100 rotate-180" : "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100")
+                : (isHighlighterPopupOpen ? "text-[#f5c344] bg-zinc-800/90 rotate-180" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80")
             )}
             title="Chọn màu & bản tô dạ quang"
           >
@@ -2430,7 +2464,7 @@ export function DossierCanvasBoard({
               "p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0",
               activeTool === "eraser"
                 ? "bg-[#f5c344] text-[#121316] font-bold shadow-md scale-105"
-                : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70")
             )}
             title={eraserMode === "freeform" ? "Tẩy nét tùy ý (Gọt tỉa nét)" : "Tẩy trọn nét liền (Chạm là xóa cả nét)"}
           >
@@ -2450,8 +2484,10 @@ export function DossierCanvasBoard({
               setIsEraserPopupOpen((prev) => !prev);
             }}
             className={cn(
-              "p-1 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80 transition-all cursor-pointer flex items-center justify-center shrink-0",
-              isEraserPopupOpen && "text-[#f5c344] bg-zinc-800/90 rotate-180"
+              "p-1 rounded-md transition-all cursor-pointer flex items-center justify-center shrink-0",
+              isLight
+                ? (isEraserPopupOpen ? "text-amber-600 bg-zinc-100 rotate-180" : "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100")
+                : (isEraserPopupOpen ? "text-[#f5c344] bg-zinc-800/90 rotate-180" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80")
             )}
             title="Chọn chế độ tẩy xóa"
           >
@@ -2521,7 +2557,10 @@ export function DossierCanvasBoard({
               setIsThemePopupOpen(false);
               handleAddStickyNote(currentNoteColor);
             }}
-            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70 transition-all cursor-pointer flex items-center justify-center shrink-0 active:scale-95"
+            className={cn(
+              "p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0 active:scale-95",
+              isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+            )}
             title="Dán giấy ghi chú vuông (Hover để chọn màu)"
           >
             <StickyNote className="size-4.5" />
@@ -2539,8 +2578,10 @@ export function DossierCanvasBoard({
               setIsNotePopupOpen((prev) => !prev);
             }}
             className={cn(
-              "p-1 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80 transition-all cursor-pointer flex items-center justify-center shrink-0",
-              isNotePopupOpen && "text-[#f5c344] bg-zinc-800/90 rotate-180"
+              "p-1 rounded-md transition-all cursor-pointer flex items-center justify-center shrink-0",
+              isLight
+                ? (isNotePopupOpen ? "text-amber-600 bg-zinc-100 rotate-180" : "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100")
+                : (isNotePopupOpen ? "text-[#f5c344] bg-zinc-800/90 rotate-180" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80")
             )}
             title="Chọn màu giấy note"
           >
@@ -2579,7 +2620,7 @@ export function DossierCanvasBoard({
         </div>
 
         {/* VÁCH NGĂN */}
-        <div className="w-[1px] h-5 bg-zinc-700/60 mx-1 shrink-0" />
+        <div className={cn("w-[1px] h-5 mx-1 shrink-0", isLight ? "bg-zinc-200" : "bg-zinc-700/60")} />
 
         {/* 2. CỤM TIỆN ÍCH: TÌM KIẾM, SỔ TAY, ÂM THANH */}
         {/* NÚT TÌM KIẾM (KÍNH LÚP) */}
@@ -2603,8 +2644,8 @@ export function DossierCanvasBoard({
           className={cn(
             "p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center shrink-0",
             isSearchOpen
-              ? "bg-zinc-800 text-white shadow-sm"
-              : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+              ? (isLight ? "bg-zinc-100 text-zinc-950 shadow-sm" : "bg-zinc-800 text-white shadow-sm")
+              : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70")
           )}
           title="Tìm chữ trong toàn bộ hồ sơ vụ án (Ctrl+F)"
         >
@@ -2621,7 +2662,10 @@ export function DossierCanvasBoard({
               emitInvestigationEvent("OPEN_NOTEBOOK");
             }
           }}
-          className="p-2 rounded-xl text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-center shrink-0"
+          className={cn(
+            "p-2 rounded-xl transition-colors cursor-pointer flex items-center justify-center shrink-0",
+            isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+          )}
           title="Ghi chép bàn hồ sơ"
         >
           <BookOpen className="size-4.5 text-amber-500 hover:text-amber-400 transition-colors" />
@@ -2631,7 +2675,10 @@ export function DossierCanvasBoard({
         <button
           type="button"
           onClick={handleToggleAudio}
-          className="p-2 rounded-xl text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-center shrink-0"
+          className={cn(
+            "p-2 rounded-xl transition-colors cursor-pointer flex items-center justify-center shrink-0",
+            isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+          )}
           title={isAudioMuted ? "Bật âm thanh trinh thám" : "Tắt âm thanh trinh thám"}
         >
           {isAudioMuted ? (
@@ -2642,13 +2689,16 @@ export function DossierCanvasBoard({
         </button>
 
         {/* VÁCH NGĂN */}
-        <div className="w-[1px] h-4 bg-zinc-700/60 mx-0.5 shrink-0" />
+        <div className={cn("w-[1px] h-4 mx-0.5 shrink-0", isLight ? "bg-zinc-200" : "bg-zinc-700/60")} />
 
         {/* 3. CỤM THU PHÓNG ZOOM */}
         <button
           type="button"
           onClick={handleZoomOut}
-          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-center shrink-0"
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0",
+            isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+          )}
           title="Thu nhỏ (Zoom out • hoặc lăn chuột xuống)"
         >
           <Minus className="size-3.5" />
@@ -2657,7 +2707,10 @@ export function DossierCanvasBoard({
         <button
           type="button"
           onClick={handleResetZoom}
-          className="px-2 py-0.5 font-sans text-xs font-semibold text-zinc-300 hover:text-white min-w-[42px] text-center cursor-pointer transition-colors shrink-0"
+          className={cn(
+            "px-2 py-0.5 font-sans text-xs font-semibold min-w-[42px] text-center cursor-pointer transition-colors shrink-0",
+            isLight ? "text-zinc-800 hover:text-zinc-950 font-bold" : "text-zinc-300 hover:text-white"
+          )}
           title="Đặt lại tỉ lệ chuẩn 80%"
         >
           {Math.round(zoomScale * 100)}%
@@ -2666,7 +2719,10 @@ export function DossierCanvasBoard({
         <button
           type="button"
           onClick={handleZoomIn}
-          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-center shrink-0"
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0",
+            isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+          )}
           title="Phóng to (Zoom in • hoặc lăn chuột lên)"
         >
           <Plus className="size-3.5" />
@@ -2676,14 +2732,49 @@ export function DossierCanvasBoard({
         <button
           type="button"
           onClick={() => emitInvestigationEvent("OPEN_CANVAS_GUIDE")}
-          className="p-1.5 rounded-lg text-zinc-400 hover:text-amber-400 hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-center shrink-0"
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0",
+            isLight ? "text-zinc-500 hover:text-amber-600 hover:bg-zinc-100" : "text-zinc-400 hover:text-amber-400 hover:bg-zinc-800/70"
+          )}
           title="Cẩm nang hướng dẫn Bàn hồ sơ"
         >
           <HelpCircle className="size-3.5" />
         </button>
 
+        {/* NÚT CHUYỂN ĐỔI GIAO DIỆN SÁNG / TỐI (LIGHT / DARK THEME) */}
+        {onToggleUiTheme && (
+          <button
+            type="button"
+            onClick={onToggleUiTheme}
+            className={cn(
+              "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0",
+              isLight
+                ? "text-amber-600 hover:text-amber-800 hover:bg-zinc-100"
+                : "text-zinc-400 hover:text-amber-400 hover:bg-zinc-800/70"
+            )}
+            title={isLight ? "Chuyển sang giao diện Tối (Dark)" : "Chuyển sang giao diện Sáng (Light)"}
+          >
+            {isLight ? <Moon className="size-3.5" /> : <Sun className="size-3.5" />}
+          </button>
+        )}
+
+        {/* NÚT BẢNG MÀU MẶT BÀN HỒ SƠ */}
+        <button
+          type="button"
+          onClick={() => setIsThemePopupOpen((prev) => !prev)}
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer flex items-center justify-center shrink-0",
+            isThemePopupOpen
+              ? (isLight ? "bg-zinc-100 text-amber-700 font-bold" : "bg-zinc-800 text-amber-300 font-bold")
+              : (isLight ? "text-zinc-500 hover:text-amber-600 hover:bg-zinc-100" : "text-zinc-400 hover:text-amber-400 hover:bg-zinc-800/70")
+          )}
+          title="Tùy chọn màu mặt bàn hồ sơ"
+        >
+          <Palette className="size-3.5" />
+        </button>
+
         {/* VÁCH NGĂN */}
-        <div className="w-[1px] h-4 bg-zinc-700/60 mx-0.5 shrink-0" />
+        <div className={cn("w-[1px] h-4 mx-0.5 shrink-0", isLight ? "bg-zinc-200" : "bg-zinc-700/60")} />
 
         {/* 4. NÚT KẾT LUẬN */}
         <button
@@ -2695,7 +2786,12 @@ export function DossierCanvasBoard({
               emitInvestigationEvent("OPEN_EPILOGUE");
             }
           }}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-950/40 transition-all cursor-pointer active:scale-95 shrink-0"
+          className={cn(
+            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer active:scale-95 shrink-0",
+            isLight
+              ? "text-red-700 hover:text-red-800 hover:bg-red-100/70"
+              : "text-red-400 hover:text-red-300 hover:bg-red-950/40"
+          )}
           title="Kết luận vụ án & Đưa ra phán quyết"
         >
           <ClipboardCheck className="size-4 text-red-400" />
@@ -2708,7 +2804,12 @@ export function DossierCanvasBoard({
         <div
           ref={themePopupRef}
           onMouseDown={(e) => e.stopPropagation()}
-          className="fixed top-16 right-4 sm:right-6 w-[420px] max-w-[calc(100vw-2rem)] bg-[#121418]/98 backdrop-blur-2xl rounded-2xl border border-[#353945] shadow-[0_25px_60px_rgba(0,0,0,0.95)] p-3.5 flex flex-col gap-3 z-50 text-zinc-200 animate-in fade-in zoom-in-95 duration-100 select-none"
+          className={cn(
+            "fixed top-16 right-4 sm:right-6 w-[420px] max-w-[calc(100vw-2rem)] backdrop-blur-2xl rounded-2xl p-3.5 flex flex-col gap-3 z-50 animate-in fade-in zoom-in-95 duration-100 select-none",
+            isLight
+              ? "bg-white/98 border border-zinc-200 shadow-[0_25px_60px_rgba(0,0,0,0.15)] text-zinc-900"
+              : "bg-[#121418]/98 border border-[#353945] shadow-[0_25px_60px_rgba(0,0,0,0.95)] text-zinc-200"
+          )}
         >
           {/* Header: Title + Reset + Close */}
           <div className="flex items-center justify-between pb-1 border-b border-zinc-800/80">

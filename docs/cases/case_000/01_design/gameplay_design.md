@@ -117,12 +117,11 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 ---
 
 * 🧩 **CÂU HỎI 2A (Thẩm tra Lê Quang Vũ):**
-  - **Hình thức trả lời (Giao diện Thẩm vấn 3 lớp — AddSuspectModal):**
+  - **Hình thức trả lời (Giao diện Thẩm vấn 2 lớp — AddSuspectModal):**
     - **Bước 1 (Nhập tên nghi vấn):** `Lê Quang Vũ` (hoặc `Vũ`).
-    - **Bước 2 (Chất vấn 3 lớp bằng chứng):**
+    - **Bước 2 (Chất vấn 2 lớp bằng chứng):**
       - 🎯 *Tile 1 — Động cơ phạm tội:* `Sổ tay ghi nợ 300M của Khang` (`05`), `Ảnh chân dung Vũ` (`p6`).
-      - ⏱️ *Tile 2 — Xác minh ngoại phạm:* `Screenshot App đặt xe lúc 19:30` (`p10`), `Lời khai bà Lụa` (`11`).
-      - ⚡ *Tile 3 — Mâu thuẫn lời khai:* `SMS đòi nợ Lệch Pha` (`dev-00`).
+      - ⚡ *Tile 2 — Mâu thuẫn lời khai:* `SMS đòi nợ Lệch Pha` (`dev-00`).
     - **Quy tắc nghiệm thu:** Áp dụng `validateEvidenceSelection`, bắt buộc thỏa mãn manh mối cốt lõi và không chọn dư mã sai ngoài pool hợp lệ.
 
 ---
@@ -147,12 +146,11 @@ Sau khi hoàn thành Giai đoạn 0, người chơi có thể tự do chọn 1 t
 ---
 
 * 🧩 **CÂU HỎI 2B (Thẩm tra Nguyễn Thanh Tùng):**
-  - **Hình thức trả lời (Giao diện Thẩm vấn 3 lớp — AddSuspectModal):**
+  - **Hình thức trả lời (Giao diện Thẩm vấn 2 lớp — AddSuspectModal):**
     - **Bước 1 (Nhập tên nghi phạm hiện trường):** `Nguyễn Thanh Tùng` (hoặc `Tùng`).
-    - **Bước 2 (Chất vấn 3 lớp bằng chứng):**
+    - **Bước 2 (Chất vấn 2 lớp bằng chứng):**
       - 🎯 *Tile 1 — Động cơ phạm tội:* `Mảnh báo cũ xé vụn` (`p5`), `Ảnh kỷ niệm 1996` (`p4`).
-      - ⏱️ *Tile 2 — Xác minh ngoại phạm:* `Cuống vé xe buýt` (`cuong_ve_xe_tung` / `14`).
-      - ⚡ *Tile 3 — Mâu thuẫn lời khai:* `Lời khai Tùng lần 1` (`14`), `Dấu vân tay trên khung bức ảnh vỡ` (`p4`).
+      - ⚡ *Tile 2 — Mâu thuẫn lời khai:* `Lời khai Tùng lần 1` (`14`), `Dấu vân tay trên khung bức ảnh vỡ` (`p4`).
     - **Quy tắc nghiệm thu:** Bắt buộc nhập đủ chứng cứ mâu thuẫn then chốt để mở khóa Thẻ tự thú.
 
 ---

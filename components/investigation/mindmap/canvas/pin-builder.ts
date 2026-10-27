@@ -56,6 +56,7 @@ export type SheetPinnedItem = {
 };
 
 export type PinBuilderInput = {
+  isStudioMode?: boolean;
   isMobile: boolean;
   caseId?: string;
   caseSlug?: string;
@@ -567,7 +568,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   };
 
   suspectsList.forEach((s) => {
-    if (!activeFollowupSet.has(s.key)) return;
+    if (!input.isStudioMode && !activeFollowupSet.has(s.key)) return;
 
     // Tìm checkpoint followup
     const matchCp = allCheckpoints.find((cp) => {

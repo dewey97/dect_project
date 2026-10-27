@@ -27,6 +27,7 @@ export interface ActiveInspectorInfo {
 
 interface DossierTrayProps {
   className?: string;
+  uiTheme?: "dark" | "light";
   dossierWidth: number;
   isDossierCollapsed: boolean;
   highlightSelected?: boolean;
@@ -74,6 +75,7 @@ interface DossierTrayProps {
 
 export function DossierTray({
   className,
+  uiTheme = "dark",
   dossierWidth,
   isDossierCollapsed,
   highlightSelected = true,
@@ -109,6 +111,7 @@ export function DossierTray({
     resizable === true ? "left" : typeof resizable === "string" ? resizable : undefined;
 
   const [isResizing, setIsResizing] = React.useState(false);
+  const isLight = uiTheme === "light";
   const resizeRef = React.useRef({
     startX: 0,
     startWidth: dossierWidth,
@@ -285,8 +288,10 @@ export function DossierTray({
         transition: isResizing ? "none" : undefined,
       }}
       className={cn(
-        "w-full lg:w-auto shrink-0 bg-[#0f1115] rounded-none flex flex-col h-full min-h-0 select-none relative transition-[width] duration-150 ease-out",
-        resizableSide === "right" ? "border-r border-[#1e232b]" : "border-l border-[#1e232b]",
+        "w-full lg:w-auto shrink-0 rounded-none flex flex-col h-full min-h-0 select-none relative transition-[width] duration-150 ease-out",
+        isLight
+          ? (resizableSide === "right" ? "border-r border-zinc-200 bg-white text-zinc-900" : "border-l border-zinc-200 bg-white text-zinc-900")
+          : (resizableSide === "right" ? "border-r border-[#1e232b] bg-[#0f1115] text-zinc-300" : "border-l border-[#1e232b] bg-[#0f1115] text-zinc-300"),
         isDossierCollapsed && "lg:hidden",
         isViewerExpanded && "hidden xl:flex",
         mobileTab === "dossier" ? "flex" : "hidden lg:flex",
@@ -301,14 +306,16 @@ export function DossierTray({
           className={cn(
             "absolute top-0 bottom-0 z-40 w-3 cursor-ew-resize flex items-center justify-center select-none group touch-none transition-colors",
             resizableSide === "left" ? "left-0 -translate-x-1.5" : "right-0 translate-x-1.5",
-            isResizing && "bg-zinc-500/20"
+            isResizing && (isLight ? "bg-zinc-200" : "bg-zinc-500/20")
           )}
           title="Kéo sang hai bên để thay đổi độ rộng khay (Nhấp đúp để đặt lại mặc định)"
         >
           <div
             className={cn(
-              "w-[2px] h-12 rounded-full transition-all group-hover:h-24 group-hover:w-[3px] group-hover:bg-zinc-300 drop-shadow-[0_0_6px_rgba(255,255,255,0.3)]",
-              isResizing ? "bg-zinc-300 h-full w-[2px]" : "bg-white/20 group-hover:bg-zinc-300"
+              "w-[2px] h-12 rounded-full transition-all group-hover:h-24 group-hover:w-[3px] drop-shadow-[0_0_6px_rgba(0,0,0,0.2)]",
+              isResizing
+                ? (isLight ? "bg-zinc-600 h-full w-[2px]" : "bg-zinc-300 h-full w-[2px]")
+                : (isLight ? "bg-zinc-300 group-hover:bg-zinc-600" : "bg-white/20 group-hover:bg-zinc-300")
             )}
           />
         </div>
@@ -316,18 +323,27 @@ export function DossierTray({
 
       {/* 2. PHẦN TRÊN: PANEL CÂU HỎI / THẨM TRA (TỰ ÔM KHÍT NỘI DUNG, KHÔNG BỊ HỞ KHOẢNG TRỐNG) */}
       {activeInspector && inspectorContent && (
-        <div className="shrink-0 max-h-[52vh] flex flex-col bg-[#16181d] border-b border-[#262c37] overflow-y-auto shadow-md relative animate-in fade-in slide-in-from-top-2 duration-150 custom-scrollbar">
+        <div className={cn(
+          "shrink-0 max-h-[52vh] flex flex-col overflow-y-auto shadow-md relative animate-in fade-in slide-in-from-top-2 duration-150 custom-scrollbar",
+          isLight ? "bg-zinc-50 border-b border-zinc-200" : "bg-[#16181d] border-b border-[#262c37]"
+        )}>
           {inspectorContent}
         </div>
       )}
 
       {/* 3. PHẦN DƯỚI: KHAY HỒ SƠ & VẬT CHỨNG (HIỆN BÊN DƯỚI) */}
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-[#0f1115]">
+      <div className={cn("flex-1 min-h-0 flex flex-col overflow-hidden", isLight ? "bg-white" : "bg-[#0f1115]")}>
         {/* 1. SIDEBAR HEADER: TÊN DANH MỤC */}
-        <div className="shrink-0 px-3.5 pt-3 pb-2 flex items-center justify-between border-b border-[#1b2029]">
+        <div className={cn(
+          "shrink-0 px-3.5 pt-3 pb-2 flex items-center justify-between border-b",
+          isLight ? "border-zinc-200 bg-zinc-50" : "border-[#1b2029]"
+        )}>
           <div className="flex items-center gap-2 min-w-0">
-            <FolderOpen className="size-4 text-zinc-400 shrink-0" />
-            <span className="font-sans text-xs font-semibold tracking-wide text-zinc-200 uppercase truncate">
+            <FolderOpen className={cn("size-4 shrink-0", isLight ? "text-zinc-500" : "text-zinc-400")} />
+            <span className={cn(
+              "font-sans text-xs font-semibold tracking-wide uppercase truncate",
+              isLight ? "text-zinc-900" : "text-zinc-200"
+            )}>
               Hồ sơ & Vật chứng
             </span>
           </div>
@@ -335,7 +351,12 @@ export function DossierTray({
             <button
               type="button"
               onClick={onToggleCollapse}
-              className="hidden lg:flex size-6 items-center justify-center rounded hover:bg-[#1b202a] text-zinc-400 hover:text-zinc-100 transition-colors cursor-pointer border border-[#262c37]"
+              className={cn(
+                "hidden lg:flex size-6 items-center justify-center rounded transition-colors cursor-pointer border",
+                isLight
+                  ? "hover:bg-zinc-100 text-zinc-500 hover:text-zinc-950 border-zinc-200"
+                  : "hover:bg-[#1b202a] text-zinc-400 hover:text-zinc-100 border-[#262c37]"
+              )}
               title="Thu gọn khay tài liệu"
             >
               {resizableSide === "right" ? (
@@ -349,15 +370,22 @@ export function DossierTray({
 
       {/* 2. MODERN SEGMENTED TABS (TÀI LIỆU | VẬT CHỨNG | THẨM TRA) */}
       <div className="shrink-0 px-3 pt-2.5 pb-2">
-        <div className="p-1 bg-[#090b0e] rounded-md border border-[#1b2029] flex items-center gap-1">
+        <div className={cn(
+          "p-1 rounded-md border flex items-center gap-1",
+          isLight ? "bg-zinc-100 border-zinc-200" : "bg-[#090b0e] border-[#1b2029]"
+        )}>
           <button
             type="button"
             onClick={() => onSetFilterTab("pdf")}
             className={cn(
               "flex-1 py-1.5 px-2 rounded-sm font-sans text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer",
               filterTab === "pdf"
-                ? "bg-[#1c2330] text-zinc-100 font-semibold border border-[#2d3748] shadow-xs"
-                : "text-zinc-400 hover:text-zinc-200 hover:bg-[#13171f]",
+                ? (isLight
+                    ? "bg-white text-zinc-950 font-bold border border-zinc-300 shadow-xs"
+                    : "bg-[#1c2330] text-zinc-100 font-semibold border border-[#2d3748] shadow-xs")
+                : (isLight
+                    ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-200/70"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-[#13171f]"),
             )}
           >
             <FileText className="size-3.5 shrink-0" />
@@ -370,8 +398,12 @@ export function DossierTray({
             className={cn(
               "flex-1 py-1.5 px-2 rounded-sm font-sans text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer",
               filterTab === "evidence"
-                ? "bg-[#1c2330] text-zinc-100 font-semibold border border-[#2d3748] shadow-xs"
-                : "text-zinc-400 hover:text-zinc-200 hover:bg-[#13171f]",
+                ? (isLight
+                    ? "bg-white text-zinc-950 font-bold border border-zinc-300 shadow-xs"
+                    : "bg-[#1c2330] text-zinc-100 font-semibold border border-[#2d3748] shadow-xs")
+                : (isLight
+                    ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-200/70"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-[#13171f]"),
             )}
           >
             <ImageIcon className="size-3.5 shrink-0" />
@@ -397,8 +429,12 @@ export function DossierTray({
                 className={cn(
                   "px-2.5 py-1 rounded-full text-[11px] font-sans font-medium whitespace-nowrap transition-colors cursor-pointer shrink-0 border",
                   isActive
-                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40 font-semibold"
-                    : "bg-[#141820] text-zinc-400 border-[#262c37] hover:text-zinc-200 hover:bg-[#1a202c]",
+                    ? (isLight
+                        ? "bg-amber-600/20 text-amber-900 border-amber-600/40 font-bold"
+                        : "bg-amber-500/20 text-amber-300 border-amber-500/40 font-semibold")
+                    : (isLight
+                        ? "bg-zinc-100 text-zinc-700 border-zinc-200 hover:text-zinc-950 hover:bg-zinc-200/80"
+                        : "bg-[#141820] text-zinc-400 border-[#262c37] hover:text-zinc-200 hover:bg-[#1a202c]"),
                 )}
               >
                 {chip.label}
@@ -451,12 +487,13 @@ export function DossierTray({
                       });
                     }}
                     className={cn(
-                      "w-full aspect-[4/3] text-left rounded-md border transition-all duration-150 cursor-pointer relative overflow-hidden group bg-[#0c0e12]",
+                      "w-full aspect-[4/3] text-left rounded-md border transition-all duration-150 cursor-pointer relative overflow-hidden group",
+                      isLight ? "bg-zinc-100" : "bg-[#0c0e12]",
                       isPinged
                         ? "border-rose-500/70 ring-1 ring-rose-500/40 shadow-[0_0_12px_rgba(244,63,94,0.3)]"
                         : isSelected
-                          ? "border-zinc-300 ring-1 ring-zinc-300/40 shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
-                          : "border-[#1f2530] hover:border-[#323d4e]",
+                          ? (isLight ? "border-zinc-900 ring-1 ring-zinc-900/40 shadow-md" : "border-zinc-300 ring-1 ring-zinc-300/40 shadow-[0_4px_16px_rgba(0,0,0,0.8)]")
+                          : (isLight ? "border-zinc-200 hover:border-zinc-300" : "border-[#1f2530] hover:border-[#323d4e]"),
                     )}
                   >
                     <img
@@ -474,7 +511,10 @@ export function DossierTray({
                     {/* Nhãn mã số + tiêu đề ở chân thẻ */}
                     <div className="absolute bottom-1.5 left-1.5 right-1.5 pointer-events-none">
                       {evItem?.code && (
-                        <span className="inline-block px-1.5 py-0.5 rounded-xs bg-[#141820]/95 text-[0.6rem] font-mono font-bold tracking-wider text-zinc-200 border border-[#2b3545] mb-0.5">
+                        <span className={cn(
+                          "inline-block px-1.5 py-0.5 rounded-xs text-[0.6rem] font-mono font-bold tracking-wider mb-0.5 border",
+                          isLight ? "bg-white/95 text-zinc-900 border-zinc-200" : "bg-[#141820]/95 text-zinc-200 border-[#2b3545]"
+                        )}>
                           {evItem.code}
                         </span>
                       )}
@@ -527,18 +567,27 @@ export function DossierTray({
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-[#1c222b]">
+          <div className={cn("divide-y", isLight ? "divide-zinc-100" : "divide-[#1c222b]")}>
             {groupedPdfs.map((group) => (
               <div key={`pdf-group-${group.key}`} className="w-full">
                 {/* Tiêu đề nhóm tập hồ sơ */}
-                <div className="sticky top-0 z-10 px-3.5 py-1.5 bg-[#12151c]/95 backdrop-blur-sm border-b border-[#1c222b] flex items-center justify-between">
+                <div className={cn(
+                  "sticky top-0 z-10 px-3.5 py-1.5 backdrop-blur-sm border-b flex items-center justify-between",
+                  isLight ? "bg-zinc-50/95 border-zinc-200" : "bg-[#12151c]/95 border-[#1c222b]"
+                )}>
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <FolderOpen className="size-3 text-zinc-400 shrink-0" />
-                    <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-zinc-300 truncate">
+                    <FolderOpen className={cn("size-3 shrink-0", isLight ? "text-zinc-500" : "text-zinc-400")} />
+                    <span className={cn(
+                      "font-mono text-[11px] font-bold uppercase tracking-wider truncate",
+                      isLight ? "text-zinc-900" : "text-zinc-300"
+                    )}>
                       {group.title}
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-zinc-400 bg-[#181d26] px-1.5 py-0.5 rounded border border-[#262f3e] shrink-0 leading-none">
+                  <span className={cn(
+                    "font-mono text-[10px] px-1.5 py-0.5 rounded border shrink-0 leading-none",
+                    isLight ? "text-zinc-500 bg-zinc-100 border-zinc-200" : "text-zinc-400 bg-[#181d26] border-[#262f3e]"
+                  )}>
                     {group.items.length}
                   </span>
                 </div>
@@ -570,17 +619,18 @@ export function DossierTray({
                           });
                         }}
                         className={cn(
-                          "w-full text-left px-3.5 py-3 transition-colors duration-150 cursor-pointer relative group select-none border-b border-[#1c222b] last:border-b-0 flex items-center justify-between gap-2.5",
+                          "w-full text-left px-3.5 py-3 transition-colors duration-150 cursor-pointer relative group select-none border-b last:border-b-0 flex items-center justify-between gap-2.5",
+                          isLight ? "border-zinc-100" : "border-[#1c222b]",
                           isPinged
-                            ? "bg-rose-950/20"
+                            ? (isLight ? "bg-rose-100/60" : "bg-rose-950/20")
                             : isSelected
-                              ? "bg-white/[0.06]"
-                              : "bg-transparent hover:bg-white/[0.03]",
+                              ? (isLight ? "bg-zinc-100" : "bg-white/[0.06]")
+                              : (isLight ? "bg-transparent hover:bg-zinc-50" : "bg-transparent hover:bg-white/[0.03]"),
                         )}
                       >
                         {/* Vạch chỉ thị active / ping bên trái */}
                         {isSelected ? (
-                          <div className="absolute left-0 top-0 bottom-0 w-[2.5px] bg-zinc-200" />
+                          <div className={cn("absolute left-0 top-0 bottom-0 w-[2.5px]", isLight ? "bg-zinc-900" : "bg-zinc-200")} />
                         ) : isPinged ? (
                           <div className="absolute left-0 top-0 bottom-0 w-[2.5px] bg-rose-400 animate-pulse" />
                         ) : null}
@@ -591,8 +641,8 @@ export function DossierTray({
                             className={cn(
                               "font-mono text-xs font-bold tracking-wide shrink-0",
                               isSelected
-                                ? "text-zinc-100"
-                                : "text-zinc-400 group-hover:text-zinc-200",
+                                ? (isLight ? "text-zinc-950 font-bold" : "text-zinc-100")
+                                : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200"),
                             )}
                           >
                             {code}
@@ -602,8 +652,8 @@ export function DossierTray({
                             className={cn(
                               "font-sans text-[13px] truncate transition-colors flex-1",
                               isSelected
-                                ? "text-zinc-100 font-semibold"
-                                : "text-zinc-300 group-hover:text-white font-normal",
+                                ? (isLight ? "text-zinc-950 font-bold" : "text-zinc-100 font-semibold")
+                                : (isLight ? "text-zinc-900 group-hover:text-zinc-950 font-normal" : "text-zinc-300 group-hover:text-white font-normal"),
                             )}
                             title={title}
                           >

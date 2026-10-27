@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
   SquareKanban,
@@ -19,6 +19,8 @@ import {
   MessageSquareWarning,
   FileText,
   Sparkles,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { CanvasGuideModal } from "@/components/investigation/evidence/canvas-guide/canvas-guide-modal";
 import { CanvasWalkthroughTour } from "@/components/investigation/evidence/canvas-guide/canvas-walkthrough-tour";
@@ -112,6 +114,29 @@ export function CanvasInvestigationWorkspace({
   const [isTourOpen, setIsTourOpen] = useState(false);
   const [showFirstTimePill, setShowFirstTimePill] = useState(false);
 
+  // Chế độ giao diện UI Canvas (Dark / Light Theme)
+  const [uiTheme, setUiTheme] = useState<"dark" | "light">(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("dect_canvas_ui_theme");
+        if (saved === "light" || saved === "dark") return saved;
+      } catch {}
+    }
+    return "dark";
+  });
+
+  const handleToggleUiTheme = useCallback(() => {
+    setUiTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      try {
+        localStorage.setItem("dect_canvas_ui_theme", next);
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  const isLight = uiTheme === "light";
+
   React.useEffect(() => {
     try {
       const seen = localStorage.getItem("dect_canvas_guide_seen_v1");
@@ -155,7 +180,7 @@ export function CanvasInvestigationWorkspace({
     return null;
   });
 
-  const defaultDossierWidth = activeInspector ? 440 : 340;
+  const defaultDossierWidth = 340;
   const currentDossierWidth = customDossierWidth ?? defaultDossierWidth;
 
   const handleResizeDossier = (newWidth: number) => {
@@ -179,7 +204,6 @@ export function CanvasInvestigationWorkspace({
       label: suspect?.name ? `Nghi phạm: ${suspect.name}` : "Nghi phạm",
       pinId,
     });
-    setIsDossierCollapsed(false);
   };
 
   const handleOpenFollowupInspector = (culprit: string | null, pinId?: string) => {
@@ -189,7 +213,6 @@ export function CanvasInvestigationWorkspace({
       label: culprit ? `Nghi vấn: ${culprit}` : "Nghi vấn",
       pinId,
     });
-    setIsDossierCollapsed(false);
   };
 
   const handleOpenPinInspector = (pin: PinPoint, pinId?: string) => {
@@ -199,7 +222,6 @@ export function CanvasInvestigationWorkspace({
       label: pin?.label ? `Ghim: ${pin.label}` : "Manh mối",
       pinId: pinId || pin?.id,
     });
-    setIsDossierCollapsed(false);
   };
 
   // Sổ tay thám tử hiển thị modal riêng biệt (giống như điện thoại nạn nhân), không chèn vào sidebar khay hồ sơ
@@ -335,16 +357,22 @@ export function CanvasInvestigationWorkspace({
   const startDragYRef = React.useRef(0);
   const startHeightRef = React.useRef(0);
 
-  // Phím tắt ESC để thoát chế độ xem toàn màn hình của bảng điều tra
+  // Phím tắt ESC để đóng inspector câu hỏi hoặc thoát chế độ xem toàn màn hình của bảng điều tra
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isBoardFullscreen) {
-        setIsBoardFullscreen(false);
+      if (e.key === "Escape") {
+        if (activeInspector) {
+          handleCloseInspector();
+          return;
+        }
+        if (isBoardFullscreen) {
+          setIsBoardFullscreen(false);
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isBoardFullscreen]);
+  }, [activeInspector, isBoardFullscreen]);
 
   // Bắt đầu resize khi kéo góc dưới phải của Bảng điều tra
   const handleResizeStart = (e: React.MouseEvent) => {
@@ -623,7 +651,10 @@ export function CanvasInvestigationWorkspace({
         data-tour="canvas-left-dock"
         aria-label="Thanh điều hướng nghiệp vụ điều tra"
         className={cn(
-          "w-16 sm:w-[68px] h-full shrink-0 z-30 bg-[#0d0f14]/98 border-r border-[#262c38] backdrop-blur-xl flex flex-col justify-between items-center py-2 px-1 select-none transition-all duration-200 overflow-y-auto overflow-x-hidden scrollbar-none",
+          "w-16 sm:w-[68px] h-full shrink-0 z-30 flex flex-col justify-between items-center py-2 px-1 select-none transition-all duration-200 overflow-y-auto overflow-x-hidden scrollbar-none",
+          isLight
+            ? "bg-white border-r border-zinc-200 shadow-sm text-zinc-900"
+            : "bg-[#0d0f14]/98 border-r border-[#262c38] text-zinc-300 backdrop-blur-xl",
           isBoardFullscreen && "opacity-20 pointer-events-none"
         )}
       >
@@ -634,7 +665,10 @@ export function CanvasInvestigationWorkspace({
             <BrandMark
               href="/"
               variant="favicon"
-              className="flex items-center justify-center p-1 rounded-xl hover:bg-zinc-800/60 transition-colors"
+              className={cn(
+                "flex items-center justify-center p-1 rounded-xl transition-colors",
+                isLight ? "hover:bg-zinc-100" : "hover:bg-zinc-800/60"
+              )}
               imageClassName="size-7.5 sm:size-8 object-contain"
             />
           </div>
@@ -644,15 +678,19 @@ export function CanvasInvestigationWorkspace({
             type="button"
             onClick={() => setIsDossierCollapsed((prev) => !prev)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
-              !isDossierCollapsed && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              !isDossierCollapsed
+                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
+                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
             )}
             title={!isDossierCollapsed ? "Thu gọn Khay tài liệu" : "Mở Khay tài liệu"}
           >
             <FolderOpen
               className={cn(
                 "size-5 transition-transform group-hover:scale-105",
-                !isDossierCollapsed ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+                !isDossierCollapsed
+                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
+                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
               )}
             />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
@@ -665,15 +703,19 @@ export function CanvasInvestigationWorkspace({
             type="button"
             onClick={() => setIsBoardOpen((prev) => !prev)}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
-              isBoardOpen && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              isBoardOpen
+                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
+                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
             )}
             title={isBoardOpen ? "Thu gọn Bảng điều tra" : "Mở Bảng điều tra"}
           >
             <SquareKanban
               className={cn(
                 "size-5 transition-transform group-hover:scale-105",
-                isBoardOpen ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+                isBoardOpen
+                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
+                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
               )}
             />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
@@ -686,15 +728,19 @@ export function CanvasInvestigationWorkspace({
             type="button"
             onClick={() => setActiveModal(activeModal === "phone" ? null : "phone")}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
-              activeModal === "phone" && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              activeModal === "phone"
+                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
+                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
             )}
             title="Điện thoại nạn nhân"
           >
             <Smartphone
               className={cn(
                 "size-5 transition-transform group-hover:scale-105",
-                activeModal === "phone" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+                activeModal === "phone"
+                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
+                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
               )}
             />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
@@ -707,15 +753,19 @@ export function CanvasInvestigationWorkspace({
             type="button"
             onClick={() => setActiveModal(activeModal === "reinvestigate" ? null : "reinvestigate")}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
-              activeModal === "reinvestigate" && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              activeModal === "reinvestigate"
+                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
+                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
             )}
             title="Khám xét lại hiện trường 360"
           >
             <Compass
               className={cn(
                 "size-5 transition-transform group-hover:scale-105",
-                activeModal === "reinvestigate" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+                activeModal === "reinvestigate"
+                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
+                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
               )}
             />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
@@ -728,15 +778,19 @@ export function CanvasInvestigationWorkspace({
             type="button"
             onClick={handleOpenNotebook}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
-              activeModal === "notebook" && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              activeModal === "notebook"
+                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
+                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
             )}
             title="Sổ tay ghi chép nghiệp vụ"
           >
             <BookOpen
               className={cn(
                 "size-5 transition-transform group-hover:scale-105",
-                activeModal === "notebook" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+                activeModal === "notebook"
+                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
+                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
               )}
             />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
@@ -747,14 +801,39 @@ export function CanvasInvestigationWorkspace({
 
         {/* PHẦN DƯỚI: TIỆN ÍCH HỆ THỐNG, CHƠI NHÓM & USER PROFILE */}
         <div className="flex flex-col items-center gap-1.5 w-full pt-1">
+          {/* Nút Chuyển đổi Theme Sáng / Tối */}
+          <button
+            type="button"
+            onClick={handleToggleUiTheme}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              isLight
+                ? "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+                : "text-zinc-400 hover:text-amber-300 hover:bg-zinc-800/50"
+            )}
+            title={isLight ? "Chuyển sang giao diện Tối (Dark)" : "Chuyển sang giao diện Sáng (Light)"}
+          >
+            {isLight ? (
+              <Sun className="size-4.5 text-amber-600 group-hover:text-amber-700 transition-transform group-hover:rotate-45 duration-300" />
+            ) : (
+              <Moon className="size-4.5 text-zinc-400 group-hover:text-amber-300 transition-transform group-hover:-rotate-12 duration-300" />
+            )}
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+              {isLight ? "Sáng" : "Tối"}
+            </span>
+          </button>
+
           {/* 6. Chơi nhóm */}
           <button
             type="button"
             onClick={() => setIsRoomModalOpen(true)}
-            className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none relative"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none relative",
+              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+            )}
             title="Chơi nhóm đồng bộ thời gian thực"
           >
-            <Users className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <Users className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Nhóm
             </span>
@@ -764,10 +843,13 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={onSwitchToSingleView}
-            className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+            )}
             title="Chuyển sang chế độ Xem lẻ"
           >
-            <FileText className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <FileText className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Xem lẻ
             </span>
@@ -777,10 +859,13 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={() => setIsGuideModalOpen(true)}
-            className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+            )}
             title="Cẩm nang tác nghiệp Bàn hồ sơ"
           >
-            <HelpCircle className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <HelpCircle className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Chỉ dẫn
             </span>
@@ -790,10 +875,13 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={() => emitInvestigationEvent("OPEN_FEEDBACK")}
-            className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
+              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+            )}
             title="Báo lỗi & Góp ý"
           >
-            <MessageSquareWarning className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <MessageSquareWarning className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
             <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Báo lỗi
             </span>
@@ -809,7 +897,7 @@ export function CanvasInvestigationWorkspace({
       {/* KHÔNG GIAN BÀN HỒ SƠ & CÁC CỬA SỔ FLOATING */}
       <div className="h-full flex-1 min-w-0 min-h-0 relative flex flex-col overflow-hidden">
         {/* GỢI Ý KHÁM PHÁ LẦN ĐẦU CHO NGƯỜI CHƠI MỚI (TỰ ĐỘNG BIẾN MẤT HOẶC BỎ QUA) */}
-        {showFirstTimePill && !isTourOpen && !isGuideModalOpen && (
+        {showFirstTimePill && !isTourOpen && !isGuideModalOpen && !activeInspector && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#16120e]/95 border border-[#4a3625] shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-top-3 duration-200 text-xs font-sans text-zinc-200 select-none">
             <Sparkles className="size-3.5 text-amber-400 shrink-0 animate-pulse" />
             <span className="font-medium text-amber-100 hidden sm:inline">
@@ -830,6 +918,23 @@ export function CanvasInvestigationWorkspace({
             >
               <X className="size-3" />
             </button>
+          </div>
+        )}
+
+        {/* TOP-DOCKED NODE INSPECTOR (DÍNH VIỀN TRÊN, CĂN GIỮA CANVAS) */}
+        {activeInspector && (
+          <div
+            data-tour="canvas-top-inspector"
+            style={{ top: 0 }}
+            className={cn(
+              "absolute top-0 left-1/2 -translate-x-1/2 z-35 w-[680px] max-w-[calc(100vw-220px)] max-h-[78vh] flex flex-col rounded-b-2xl border-x-2 border-b-2 border-t-0 border-[#2b1f14] bg-[#f6f1e5] shadow-[0_25px_70px_rgba(0,0,0,0.92)] overflow-hidden animate-in fade-in duration-150 select-none",
+              isBoardFullscreen && "opacity-0 pointer-events-none"
+            )}
+          >
+            {/* Ruột nội dung câu hỏi thẩm tra */}
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+              {renderInspectorContent()}
+            </div>
           </div>
         )}
 
@@ -1115,6 +1220,8 @@ export function CanvasInvestigationWorkspace({
       <div className="h-full flex-col flex-1 min-w-[320px] min-h-0 overflow-hidden relative flex">
         <DossierCanvasBoard
           caseId={caseId}
+          uiTheme={uiTheme}
+          onToggleUiTheme={handleToggleUiTheme}
           pdfItems={pdfItems}
           evidenceItems={evidenceItems}
           dossierDocuments={dossierDocs}
@@ -1138,6 +1245,7 @@ export function CanvasInvestigationWorkspace({
 
       {/* 5. KHAY HỒ SƠ FLOATING (TRƯỢT RA TỪ BÊN TRÁI CẠNH SIDEBAR) */}
       <DossierTray
+        uiTheme={uiTheme}
         className={cn(
           "absolute top-0 left-0 bottom-0 z-30 h-full shadow-2xl transition-all duration-300",
           isBoardFullscreen && "opacity-0 pointer-events-none"
@@ -1155,9 +1263,9 @@ export function CanvasInvestigationWorkspace({
         mobileTab="dossier"
         filterTab={filterTab}
         onSetFilterTab={onSetFilterTab}
-        activeInspector={activeInspector}
+        activeInspector={null}
         onCloseInspector={handleCloseInspector}
-        inspectorContent={renderInspectorContent()}
+        inspectorContent={null}
         selectedPhaseFilter={selectedPhaseFilter}
         onSetPhaseFilter={onSetPhaseFilter}
         isPhaseUnlocked={isPhaseUnlocked}

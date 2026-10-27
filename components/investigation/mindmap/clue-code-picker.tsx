@@ -23,6 +23,7 @@ interface ClueCodePickerProps {
   placeholder?: string
   emptyStateText?: string
   hidePhoneInputs?: boolean
+  inlineInput?: boolean
 }
 
 export function ClueCodePicker({
@@ -34,6 +35,7 @@ export function ClueCodePicker({
   label = 'BẰNG CHỨNG ĐÃ CHỌN',
   placeholder = 'Nhập mã chứng cứ...',
   emptyStateText = 'Chưa có bằng chứng nào được chọn.',
+  inlineInput = false,
 }: ClueCodePickerProps) {
   const [codeInput, setCodeInput] = useState('')
 
@@ -77,55 +79,107 @@ export function ClueCodePicker({
   return (
     <div className="space-y-3">
       {/* 1. THANH NHẬP MÃ BẰNG CHỨNG */}
-      <div className="space-y-1">
-        <label className="text-[11px] font-mono font-bold text-[#1a120b] flex items-center gap-1.5">
-          🔍 Mã bằng chứng:
-        </label>
-        <div className="flex gap-2 items-center">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              value={codeInput}
-              onChange={(e) => {
-                const val = e.target.value
-                if (val.includes(',') || val.includes(';')) {
-                  handleAddCode(val)
-                } else {
-                  setCodeInput(val)
-                  onPendingChange?.({
-                    code: val,
-                  })
-                }
-              }}
-              onBlur={() => {
-                if (codeInput.trim()) {
-                  handleAddCode(codeInput)
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  handleAddCode(codeInput)
-                }
-              }}
-              placeholder={placeholder}
-              className="w-full px-3 py-2 bg-white border-2 border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none focus:border-black placeholder:text-[#8c7355]/60 shadow-inner"
-            />
+      {inlineInput ? (
+        <div className="flex items-center gap-2">
+          <label className="text-[11px] font-mono font-bold text-[#1a120b] flex items-center gap-1 shrink-0 whitespace-nowrap">
+            🔍 Mã bằng chứng:
+          </label>
+          <div className="flex gap-2 items-center flex-1 min-w-0">
+            <div className="relative flex-1 min-w-0">
+              <input
+                type="text"
+                value={codeInput}
+                onChange={(e) => {
+                  const val = e.target.value
+                  if (val.includes(',') || val.includes(';')) {
+                    handleAddCode(val)
+                  } else {
+                    setCodeInput(val)
+                    onPendingChange?.({
+                      code: val,
+                    })
+                  }
+                }}
+                onBlur={() => {
+                  if (codeInput.trim()) {
+                    handleAddCode(codeInput)
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleAddCode(codeInput)
+                  }
+                }}
+                placeholder={placeholder}
+                className="w-full px-3 py-1.5 bg-white border-2 border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none focus:border-black placeholder:text-[#8c7355]/60 shadow-inner"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => handleAddCode(codeInput)}
+              className={cn(
+                "px-3.5 py-1.5 font-mono text-xs uppercase shrink-0 cursor-pointer shadow-sm transition-all active:scale-95 flex items-center justify-center",
+                codeInput.trim().length > 0
+                  ? "bg-amber-600 hover:bg-amber-700 text-white font-black shadow-md ring-2 ring-amber-400/80 animate-pulse"
+                  : "bg-[#2b1f14] text-[#f6f1e5] font-bold hover:bg-[#140d08]"
+              )}
+            >
+              Thêm
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => handleAddCode(codeInput)}
-            className={cn(
-              "px-4 py-2 font-mono text-xs uppercase shrink-0 cursor-pointer shadow-sm transition-all active:scale-95 flex items-center justify-center",
-              codeInput.trim().length > 0
-                ? "bg-amber-600 hover:bg-amber-700 text-white font-black shadow-md ring-2 ring-amber-400/80 animate-pulse"
-                : "bg-[#2b1f14] text-[#f6f1e5] font-bold hover:bg-[#140d08]"
-            )}
-          >
-            Thêm
-          </button>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-1">
+          <label className="text-[11px] font-mono font-bold text-[#1a120b] flex items-center gap-1.5">
+            🔍 Mã bằng chứng:
+          </label>
+          <div className="flex gap-2 items-center">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={codeInput}
+                onChange={(e) => {
+                  const val = e.target.value
+                  if (val.includes(',') || val.includes(';')) {
+                    handleAddCode(val)
+                  } else {
+                    setCodeInput(val)
+                    onPendingChange?.({
+                      code: val,
+                    })
+                  }
+                }}
+                onBlur={() => {
+                  if (codeInput.trim()) {
+                    handleAddCode(codeInput)
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleAddCode(codeInput)
+                  }
+                }}
+                placeholder={placeholder}
+                className="w-full px-3 py-2 bg-white border-2 border-[#2b1f14] text-xs font-mono text-[#1a120b] focus:outline-none focus:border-black placeholder:text-[#8c7355]/60 shadow-inner"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => handleAddCode(codeInput)}
+              className={cn(
+                "px-4 py-2 font-mono text-xs uppercase shrink-0 cursor-pointer shadow-sm transition-all active:scale-95 flex items-center justify-center",
+                codeInput.trim().length > 0
+                  ? "bg-amber-600 hover:bg-amber-700 text-white font-black shadow-md ring-2 ring-amber-400/80 animate-pulse"
+                  : "bg-[#2b1f14] text-[#f6f1e5] font-bold hover:bg-[#140d08]"
+              )}
+            >
+              Thêm
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 3. DANH SÁCH BẰNG CHỨNG ĐÃ CHỌN (BADGES CONTAINER) */}
       <div className="space-y-1.5">

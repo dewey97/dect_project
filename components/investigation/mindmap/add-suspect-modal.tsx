@@ -766,52 +766,73 @@ export function AddSuspectModal({
       className={cn(
         "relative bg-[#f6f1e5] text-[#1a120b] select-text paper-scrollbar flex flex-col",
         embedded
-          ? "w-full p-3 sm:p-4 border-0"
+          ? "w-full px-4 pt-2.5 pb-3 border-0"
           : "w-full max-w-2xl border-2 border-[#2b1f14] p-5 sm:p-7 rounded-none max-h-[90vh] overflow-y-auto cursor-default"
       )}
     >
           {/* TOP RIGHT ACTIONS */}
-          <div className="absolute top-4 right-4 flex items-center gap-2 z-20 pointer-events-auto">
+          <div className="absolute top-2.5 right-3 flex items-center gap-2 z-20 pointer-events-auto">
             <button
               type="button"
               onClick={handleDirectClose}
-              className="p-1.5 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer border border-[#5c4026]/40"
+              className="p-1 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer border border-[#5c4026]/40"
               title="Đóng"
             >
-              <X className="size-5 pointer-events-none" />
+              <X className="size-4.5 pointer-events-none" />
             </button>
           </div>
 
           {/* DOCUMENT HEADER & QUESTION */}
-          <div className="space-y-1.5 pr-8">
-            <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e]">
-              {subTileView === "motive"
-                ? "ĐỘNG CƠ"
-                : subTileView === "contradiction"
-                  ? "MÂU THUẪN LỜI KHAI"
-                  : "THẨM TRA ĐỐI TƯỢNG"}
-            </h3>
-
-            {/* TÊN ĐỐI TƯỢNG CỐ ĐỊNH */}
-            <div className="pt-0.5 flex items-center gap-3">
-              {!embedded && matchedChar?.avatarUrl && (
-                <img
-                  src={matchedChar.avatarUrl}
-                  alt={name || editingSuspect?.name || "Đối tượng"}
-                  className="size-10 rounded-full object-cover border border-[#2b1f14]/20 shadow-xs shrink-0"
-                />
-              )}
-              <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-xl font-bold text-[#0e2b5c] normal-case tracking-normal">
+          {embedded ? (
+            /* Canvas View: Tiêu đề và Tên đối tượng trên cùng 1 dòng */
+            <div className="flex items-center gap-2 pr-10 flex-wrap">
+              <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e] shrink-0">
+                {subTileView === "motive"
+                  ? "ĐỘNG CƠ:"
+                  : subTileView === "contradiction"
+                    ? "MÂU THUẪN LỜI KHAI:"
+                    : "THẨM TRA ĐỐI TƯỢNG:"}
+              </h3>
+              <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-lg font-bold text-[#0e2b5c] normal-case tracking-normal">
                 {name || editingSuspect?.name || "Đối tượng điều tra"}
               </div>
+              {errorMsg && (
+                <p className="w-full text-xs text-red-700 font-mono font-bold mt-0.5">
+                  ⚠️ {errorMsg}
+                </p>
+              )}
             </div>
+          ) : (
+            /* Standalone Modal: Layout 2 dòng tiêu chuẩn kèm ảnh đại diện */
+            <div className="space-y-1.5 pr-8">
+              <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e]">
+                {subTileView === "motive"
+                  ? "ĐỘNG CƠ"
+                  : subTileView === "contradiction"
+                    ? "MÂU THUẪN LỜI KHAI"
+                    : "THẨM TRA ĐỐI TƯỢNG"}
+              </h3>
 
-            {errorMsg && (
-              <p className="text-xs text-red-700 font-mono font-bold mt-1">
-                ⚠️ {errorMsg}
-              </p>
-            )}
-          </div>
+              <div className="pt-0.5 flex items-center gap-3">
+                {matchedChar?.avatarUrl && (
+                  <img
+                    src={matchedChar.avatarUrl}
+                    alt={name || editingSuspect?.name || "Đối tượng"}
+                    className="size-10 rounded-full object-cover border border-[#2b1f14]/20 shadow-xs shrink-0"
+                  />
+                )}
+                <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-xl font-bold text-[#0e2b5c] normal-case tracking-normal">
+                  {name || editingSuspect?.name || "Đối tượng điều tra"}
+                </div>
+              </div>
+
+              {errorMsg && (
+                <p className="text-xs text-red-700 font-mono font-bold mt-1">
+                  ⚠️ {errorMsg}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* FORM BODY */}
           <form onSubmit={(e) => e.preventDefault()} className="space-y-4 pt-2">
@@ -889,6 +910,7 @@ export function AddSuspectModal({
                 reason={motiveReason}
                 onReasonChange={setMotiveReason}
                 isLoading={isVerifyingAI}
+                embedded={embedded}
                 onAddClueId={(id) => {
                   setMotiveClueIds((prev) =>
                     prev.includes(id) ? prev : [...prev, id],
@@ -918,6 +940,7 @@ export function AddSuspectModal({
                 reason={contradictionReason}
                 onReasonChange={setContradictionReason}
                 isLoading={isVerifyingAI}
+                embedded={embedded}
                 onAddClueId={(id) => {
                   setContradictionClueIds((prev) =>
                     prev.includes(id) ? prev : [...prev, id],
@@ -941,40 +964,56 @@ export function AddSuspectModal({
 
             {/* ACTION TOOLBAR: SAVE & SUBMIT (ONLY VISIBLE ON OVERVIEW) */}
             {subTileView === "overview" && (
-              <div className="pt-3 flex items-center justify-between gap-2 select-none">
-                <div>
-                  {editingSuspect && onDelete && (
+              embedded ? (
+                /* Canvas View (embedded): Chỉ hiện nút ĐIỀU TRA khi cả 2 hạng mục hợp lệ, không hiện nút xóa */
+                isBothValid ? (
+                  <div className="pt-2 flex items-center justify-end select-none">
                     <button
                       type="button"
-                      onClick={() => {
-                        detectiveAudio.playGlassSound();
-                        onDelete(editingSuspect.id);
-                        onClose();
-                      }}
-                      title="Xóa hồ sơ nghi phạm"
-                      className="h-10 px-3 rounded-none border-2 border-[#a81c1c] bg-[#fce8e6] hover:bg-[#f8d7d4] text-[#a81c1c] transition-all cursor-pointer flex items-center justify-center active:scale-95 shrink-0 shadow-xs"
+                      onClick={handleSubmitConclusion}
+                      className="h-9 px-5 rounded-none font-bold font-mono text-xs uppercase tracking-wider transition-all border-2 cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95 flex items-center justify-center whitespace-nowrap shrink-0 animate-in fade-in zoom-in-95 duration-200"
                     >
-                      <Trash2 className="size-4" />
+                      <span>ĐIỀU TRA</span>
                     </button>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2.5 ml-auto">
-                  <button
-                    type="button"
-                    disabled={!isBothValid}
-                    onClick={handleSubmitConclusion}
-                    className={cn(
-                      "h-10 px-5 rounded-none font-bold font-mono text-xs uppercase tracking-wider transition-all border-2 flex items-center justify-center whitespace-nowrap shrink-0",
-                      isBothValid
-                        ? "cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
-                        : "opacity-40 cursor-not-allowed bg-[#2b1f14]/50 text-[#f6f1e5]/60 border-[#2b1f14]/40",
+                  </div>
+                ) : null
+              ) : (
+                /* Standalone Modal View (!embedded): Giữ nguyên nút Xóa và nút ĐIỀU TRA với disabled state */
+                <div className="pt-3 flex items-center justify-between gap-2 select-none">
+                  <div>
+                    {editingSuspect && onDelete && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          detectiveAudio.playGlassSound();
+                          onDelete(editingSuspect.id);
+                          onClose();
+                        }}
+                        title="Xóa hồ sơ nghi phạm"
+                        className="h-10 px-3 rounded-none border-2 border-[#a81c1c] bg-[#fce8e6] hover:bg-[#f8d7d4] text-[#a81c1c] transition-all cursor-pointer flex items-center justify-center active:scale-95 shrink-0 shadow-xs"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
                     )}
-                  >
-                    <span>ĐIỀU TRA</span>
-                  </button>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 ml-auto">
+                    <button
+                      type="button"
+                      disabled={!isBothValid}
+                      onClick={handleSubmitConclusion}
+                      className={cn(
+                        "h-10 px-5 rounded-none font-bold font-mono text-xs uppercase tracking-wider transition-all border-2 flex items-center justify-center whitespace-nowrap shrink-0",
+                        isBothValid
+                          ? "cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
+                          : "opacity-40 cursor-not-allowed bg-[#2b1f14]/50 text-[#f6f1e5]/60 border-[#2b1f14]/40",
+                      )}
+                    >
+                      <span>ĐIỀU TRA</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )
             )}
           </form>
     </div>

@@ -211,7 +211,7 @@ node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --cas
 - **Ẩn hoàn toàn ID kỹ thuật**: `Node ID`, `checkpoint_id`, `Khóa` được hệ thống quản lý ngầm trong background (tự sinh slug từ tiêu đề khi tạo mới). Người biên tập chỉ nhìn và quản lý checkpoint theo Tên / Tiêu đề (`title`).
 - **Nối liên kết trực quan trên sơ đồ**: Mọi quan hệ phụ thuộc (`depends_on`, follow-up) được kéo nối trực tiếp giữa các cổng node trên canvas React Flow; không nhập thủ công mã liên kết trong form.
 - **Ẩn/hiện động theo Loại câu hỏi**:
-  - Hỗ trợ chọn loại câu hỏi: `evidence_picker` (Thẩm tra vật chứng 3 lớp), `choice` (Trắc nghiệm), `text` (Nhập văn bản/Tự luận), `code` (Mật mã/Mã số), `time` (Mốc thời gian).
+  - Hỗ trợ chọn loại câu hỏi: `evidence_picker` (Thẩm tra vật chứng 2 lớp: Động cơ & Mâu thuẫn lời khai), `choice` (Trắc nghiệm), `text` (Nhập văn bản/Tự luận), `code` (Mật mã/Mã số), `time` (Mốc thời gian).
   - Khi chọn `evidence_picker`: hiển thị các thẻ thẩm tra vật chứng (Động cơ, Mâu thuẫn, Ngoại phạm, Bổ sung) và nhãn bước thẩm tra.
   - Khi chọn các loại câu hỏi khác: tự động **ẨN** toàn bộ các mục thẩm tra vật chứng không tương ứng; hiển thị hộp cấu hình đáp án đơn giản (phương án lựa chọn hoặc đáp án chính xác).
 - Danh sách node compact: chỉ hiển thị tiêu đề, phân cách bằng đường mảnh, không card padding lớn. Tìm kiếm nội bộ nhận tiêu đề và nội dung câu hỏi.

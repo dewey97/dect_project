@@ -126,6 +126,36 @@ export const DOSSIER_CANVAS_PRESETS: CanvasThemeConfig[] = [
     swatchGradient: "radial-gradient(circle at 40% 40%, #8c7d69 0%, #33302a 60%, #171614 100%)",
     lampTone: "warm",
   },
+  {
+    id: "light-linen",
+    name: "Trắng tinh khiết (Pure Light)",
+    description: "Mặt bàn trắng sáng hiện đại, lưới định vị xám nhạt tối giản, không ám vàng",
+    outerBg: "#f4f4f5",
+    baseColor: "#ffffff",
+    glowColorCenter: "rgba(255, 255, 255, 0.80)",
+    glowColorMid: "rgba(244, 244, 245, 0.40)",
+    glowColorOuter: "rgba(228, 228, 231, 0.50)",
+    gridColor: "rgba(161, 161, 170, 0.35)",
+    gridType: "crosses",
+    lampIntensity: 0.5,
+    swatchGradient: "radial-gradient(circle at 40% 40%, #ffffff 0%, #f4f4f5 60%, #e4e4e7 100%)",
+    lampTone: "cool",
+  },
+  {
+    id: "architect-vellum",
+    name: "Giấy kỹ thuật sáng",
+    description: "Bàn vẽ can kỹ thuật màu trắng xám nhạt, lưới định vị tối giản",
+    outerBg: "#e2e8f0",
+    baseColor: "#f8fafc",
+    glowColorCenter: "rgba(255, 255, 255, 0.70)",
+    glowColorMid: "rgba(241, 245, 249, 0.40)",
+    glowColorOuter: "rgba(226, 232, 240, 0.50)",
+    gridColor: "rgba(148, 163, 184, 0.30)",
+    gridType: "grid",
+    lampIntensity: 0.5,
+    swatchGradient: "radial-gradient(circle at 40% 40%, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%)",
+    lampTone: "cool",
+  },
 ];
 
 export const QUICK_CUSTOM_COLORS = [
@@ -135,8 +165,8 @@ export const QUICK_CUSTOM_COLORS = [
   { color: "#0c1520", label: "Đá slate" },
   { color: "#1b110a", label: "Gỗ sồi" },
   { color: "#0a0a0c", label: "Đen tuyền" },
-  { color: "#1b1822", label: "Tím than" },
-  { color: "#1a1318", label: "Rượu vang" },
+  { color: "#ffffff", label: "Trắng tinh" },
+  { color: "#eef1f5", label: "Giấy can" },
 ];
 
 /**

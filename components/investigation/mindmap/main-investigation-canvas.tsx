@@ -461,8 +461,18 @@ export function MainInvestigationCanvas({
 
     // Nếu không có sheetEvidences (case Studio/Multi-case), nạp danh sách nghi phạm từ characters DB
     if (list.length === 0 && Array.isArray(characters) && characters.length > 0) {
+      const checkpointSubjectKeys = new Set(
+        (state.checkpoints || [])
+          .map((cp: any) => (cp.subject_key || cp.subjectKey || "").trim().toLowerCase())
+          .filter(Boolean),
+      );
       characters.forEach((char) => {
         if (char.role === "victim") return;
+        const isSuspectRole =
+          char.role === "suspect" ||
+          (char as any).is_suspect === true ||
+          checkpointSubjectKeys.has(char.key.toLowerCase());
+        if (!isSuspectRole) return;
         const charId = char.key;
         if (!seen.has(charId)) {
           seen.add(charId);
@@ -529,6 +539,16 @@ export function MainInvestigationCanvas({
       }
 
       if (parseSuspectFlag(item)) {
+        return false;
+      }
+
+      if (
+        item.role === "victim" ||
+        item.metadata?.role === "victim" ||
+        code === "avatar_khang" ||
+        code === "crime_scene" ||
+        code === "ev-10"
+      ) {
         return false;
       }
 

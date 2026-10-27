@@ -191,14 +191,14 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
 
 ---
 
-## ⚖️ 13. Quy Chuẩn Thẩm Tra Nghi Phạm 3 Lớp & Chặn Chọn Manh Mối Rác (3-Tier Interrogation & Valid Clue Pool Rule)
+## ⚖️ 13. Quy Chuẩn Thẩm Tra Nghi Phạm 2 Lớp & Chặn Chọn Manh Mối Rác (2-Tier Interrogation & Valid Clue Pool Rule)
 
-- **Mô hình Thẩm tra 3 lớp độc lập (`AddSuspectModal`)**:
-  - Giao diện thẩm tra đối tượng tình nghi phân chia thành 3 thẻ (Tiles) tương tác độc lập:
+- **Mô hình Thẩm tra 2 lớp độc lập (`AddSuspectModal`)**:
+  - Giao diện thẩm tra đối tượng tình nghi phân chia thành 2 thẻ (Tiles) tương tác cốt lõi:
     1. **Động cơ phạm tội (Motive)**: Cần các chứng cứ chứng minh lý do đối tượng có hiềm khích/lợi ích khi nạn nhân chết.
-    2. **Xác minh ngoại phạm (Alibi)**: Bóc tách mâu thuẫn giữa khung giờ đối tượng khai báo với lịch trình thực tế.
-    3. **Mâu thuẫn lời khai (Contradiction)**: Bắt thóp những điểm nói dối trắng trợn trong biên bản lấy lời khai (doc `14`, `08`, `12`...).
-  - Checkpoint CMS quản lý đáp án qua các nhóm key: `dong_co`/`tuy_chon_dong_co`, `ngoai_pham`/`tuy_chon_ngoai_pham`, `mau_thuan` (`contradiction`)/`tuy_chon_mau_thuan`, và phân loại gợi ý đa cấp bằng tiêu đề block `[động cơ]`, `[ngoại phạm]`, `[mâu thuẫn]`.
+    2. **Mâu thuẫn lời khai (Contradiction)**: Bắt thóp những điểm nói dối trắng trợn trong biên bản lấy lời khai (doc `14`, `08`, `12`...).
+  - *(Đã loại bỏ hoàn toàn tầng Xác minh ngoại phạm / Alibi theo quy chuẩn thiết kế tinh gọn).*
+  - Checkpoint CMS quản lý đáp án qua các nhóm key: `dong_co`/`tuy_chon_dong_co`, `mau_thuan` (`contradiction`)/`tuy_chon_mau_thuan`, và phân loại gợi ý đa cấp bằng tiêu đề block `[động cơ]`, `[mâu thuẫn]`.
 - **Nguyên tắc Chặn Chọn Manh Mối Rác (`validateEvidenceSelection`)**:
   - Khi người chơi chọn bộ chứng cứ để giải đố, hệ thống áp dụng hàm thẩm tra hai chiều `validateEvidenceSelection`:
     1. Thỏa mãn đầy đủ tất cả manh mối bắt buộc (`targetCodes`).

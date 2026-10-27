@@ -28,6 +28,7 @@ import {
 import type { SuspectItem } from "./use-investigation-state";
 
 export interface UseBoardModelOptions {
+  isStudioMode?: boolean;
   isMobile?: boolean;
   // Cho phép Studio/Gameplay truyền sẵn dữ liệu để tránh gọi lại API không cần thiết
   initialCheckpoints?: DbCaseCheckpoint[] | Checkpoint[];
@@ -147,16 +148,66 @@ export function useBoardModel(
       }
 
       if (evidenceRes.success && evidenceRes.data) {
-        const mappedEv: SheetPinnedItem[] = evidenceRes.data.map((e) => ({
-          code: e.code,
-          photo_code: e.code,
-          title: e.title,
-          label: e.title,
-          direct_cdn_url: e.file_url || e.thumb_url || undefined,
-          url: e.file_url || e.thumb_url || undefined,
-          description: e.description || undefined,
-          category: e.kind,
-        }));
+        const suspectKeys = new Set(
+          (charactersRes.data || characters || []).map((c) =>
+            c.key.toLowerCase(),
+          ),
+        );
+
+        const mappedEv: SheetPinnedItem[] = evidenceRes.data
+          .filter((e) => {
+            const meta = (e.metadata as Record<string, unknown>) || {};
+            const pinVal = String(
+              (e as any).pin_on_board ??
+                meta.pin_on_board ??
+                (e as any)["pin on board"] ??
+                meta["pin on board"] ??
+                (e as any).pin ??
+                meta.pin ??
+                (e as any).ghim ??
+                meta.ghim ??
+                (e as any).ghim_len_bang ??
+                meta.ghim_len_bang ??
+                "",
+            )
+              .toUpperCase()
+              .trim();
+            const isPinned =
+              pinVal === "TRUE" || pinVal === "1" || pinVal === "YES";
+            if (!isPinned) return false;
+
+            const code = String(e.code || "").toLowerCase().trim();
+            const charKey = code.replace(/^avatar_/, "");
+
+            // Không ghim đè nếu đã là nhân vật (nghi phạm / nạn nhân) hoặc vật chứng đặc biệt đã có node riêng
+            if (suspectKeys.has(charKey) || suspectKeys.has(code)) return false;
+            if (
+              code === "avatar_khang" ||
+              (e as any).role === "victim" ||
+              (meta as any).role === "victim"
+            )
+              return false;
+            if (code === "crime_scene" || code === "ev-10") return false;
+
+            return true;
+          })
+          .map((e) => {
+            const meta = (e.metadata as Record<string, unknown>) || {};
+            return {
+              code: e.code,
+              photo_code: e.code,
+              title: e.title,
+              label: e.title,
+              direct_cdn_url: e.file_url || e.thumb_url || undefined,
+              url: e.file_url || e.thumb_url || undefined,
+              description: e.description || undefined,
+              category: e.kind,
+              board_x:
+                (meta.board_x as number | undefined) ?? (e as any).board_x,
+              board_y:
+                (meta.board_y as number | undefined) ?? (e as any).board_y,
+            };
+          });
         setEvidence(mappedEv);
       }
 
@@ -251,18 +302,28 @@ export function useBoardModel(
   // Tạo danh sách nghi phạm hợp nhất:
   // Nếu caller truyền effectiveSuspects (gameplay) thì dùng;
   // Nếu không (Studio), tự động sinh đầy đủ từ characters để GM luôn thấy mọi nghi phạm trên bảng
-  const effectiveSuspectsList = useMemo(() => {
+    const effectiveSuspectsList = useMemo(() => {
     if (options.effectiveSuspects && options.effectiveSuspects.length > 0) {
       return options.effectiveSuspects;
     }
+    const checkpointSubjectKeys = new Set(
+      checkpoints
+        .map((cp) => (cp.subject_key || "").trim().toLowerCase())
+        .filter(Boolean),
+    );
     return characters
-      .filter((c) => c.role !== "victim")
+      .filter(
+        (c) =>
+          c.role === "suspect" ||
+          (c as any).is_suspect === true ||
+          checkpointSubjectKeys.has(c.key.toLowerCase()),
+      )
       .map((c) => ({
         id: `suspect-${c.key}`,
         name: c.name,
         clueIds: [],
       }));
-  }, [options.effectiveSuspects, characters]);
+  }, [options.effectiveSuspects, characters, checkpoints]);
 
   // Tên nạn nhân
   const victimName = useMemo(() => {

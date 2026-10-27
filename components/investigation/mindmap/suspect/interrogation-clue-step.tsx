@@ -20,6 +20,7 @@ interface InterrogationClueStepProps {
   onBack: () => void;
   onConfirm: () => void;
   isLoading?: boolean;
+  embedded?: boolean;
 }
 
 const CATEGORY_CONFIG = {
@@ -52,6 +53,7 @@ export function InterrogationClueStep({
   onBack,
   onConfirm,
   isLoading = false,
+  embedded = false,
 }: InterrogationClueStepProps) {
   const cfg = CATEGORY_CONFIG[category];
 
@@ -100,10 +102,12 @@ export function InterrogationClueStep({
     <div className="space-y-4 pt-1">
       {/* 1. Ô LÝ DO & LẬP LUẬN (TÙY CHỌN, KHÔNG BỌC BOX NGOÀI) */}
       {onReasonChange && (
-        <div className="space-y-1.5">
-          <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-            {cfg.reasonLabel}:
-          </label>
+        <div className="space-y-1">
+          {!embedded && (
+            <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
+              {cfg.reasonLabel}:
+            </label>
+          )}
           <AutoGrowTextarea
             value={reason}
             onChange={(e) => onReasonChange?.(e.target.value)}
@@ -126,6 +130,7 @@ export function InterrogationClueStep({
           label={cfg.clueLabel}
           placeholder={cfg.cluePlaceholder}
           emptyStateText={cfg.emptyStateText}
+          inlineInput={embedded}
         />
       </div>
 
