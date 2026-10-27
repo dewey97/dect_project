@@ -109,20 +109,6 @@ export function CheckpointEditor({
         )}
 
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
-          {onPlaytest && draft.checkpointId && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={onPlaytest}
-              className="h-7 px-2 text-[11px] border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 gap-1 cursor-pointer"
-              title="Chơi thử vụ án từ checkpoint này (C4: Tự động mở khóa các node tiên quyết)"
-            >
-              <Play className="size-3 fill-amber-300" />
-              <span>Chơi thử</span>
-            </Button>
-          )}
-
           {draft.id && !isEpilogue && (
             <Button
               type="button"

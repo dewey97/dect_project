@@ -1525,22 +1525,26 @@ export function CheckpointStudioClient({
           ) : (
             <div className="flex h-full w-full min-h-0 flex-col bg-[#0c0c10] border-t border-white/10 md:border-l md:border-t-0">
               {/* Segmented Switcher Tab giữa Checkpoint và Nhân vật */}
-              <div className="h-10 shrink-0 px-3 bg-[#111118] border-b border-white/10 flex items-center justify-between text-xs font-mono select-none">
-                <div className="flex items-center gap-1 bg-black/40 p-0.5 rounded-lg border border-white/5">
+              <div className="shrink-0 p-2.5 bg-[#111118] border-b border-white/10 space-y-2 select-none">
+                {/* Hàng 1: Toggle chia đều 50/50 */}
+                <div className="grid grid-cols-2 gap-1.5 bg-black/50 p-1 rounded-lg border border-white/10">
                   <button
                     type="button"
                     onClick={() => {
                       setInspectorTab("checkpoints");
                       setSelectedCharacter(null);
+                      if (!draft && generalCheckpoints.length > 0) {
+                        selectRow(generalCheckpoints[0]);
+                      }
                     }}
                     className={cn(
-                      "px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors",
+                      "flex items-center justify-center py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
                       inspectorTab === "checkpoints" && !selectedCharacter
-                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                        : "text-zinc-400 hover:text-zinc-200",
+                        ? "bg-amber-500 text-black shadow-md font-bold"
+                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
                     )}
                   >
-                    Mục tiêu ({generalCheckpoints.length})
+                    Checkpoint ({generalCheckpoints.length})
                   </button>
                   <button
                     type="button"
@@ -1551,55 +1555,91 @@ export function CheckpointStudioClient({
                       }
                     }}
                     className={cn(
-                      "px-2.5 py-0.5 rounded text-[11px] font-medium transition-colors",
+                      "flex items-center justify-center py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
                       inspectorTab === "characters" || selectedCharacter
-                        ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                        : "text-zinc-400 hover:text-zinc-200",
+                        ? "bg-purple-600 text-white shadow-md font-bold"
+                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
                     )}
                   >
                     Nhân vật ({characters.length})
                   </button>
                 </div>
 
-                {/* Dropdown danh sách nhân vật để xem và chuyển đổi nhanh */}
-                {characters.length > 0 && (
-                  <select
-                    value={selectedCharacter?.id || selectedCharacter?.key || ""}
-                    onChange={(e) => {
-                      const found = characters.find(
-                        (c) => c.id === e.target.value || c.key === e.target.value,
-                      );
-                      if (found) {
-                        setSelectedCharacter(found);
-                        setInspectorTab("characters");
-                        setSelectedNodeId(null);
-                      }
-                    }}
-                    className="max-w-[170px] h-7 px-2 rounded bg-black/50 border border-white/10 text-xs text-purple-200 outline-none focus:border-purple-400 cursor-pointer font-sans truncate"
-                    title="Chọn nhân vật để xem hồ sơ"
-                  >
-                    <option value="" disabled>
-                      -- Danh sách ({characters.length}) --
-                    </option>
-                    {characters.map((c) => {
-                      const roleText =
-                        c.role === "victim"
-                          ? "Nạn nhân"
-                          : c.role === "suspect"
-                            ? "Nghi phạm"
-                            : c.role === "witness"
-                              ? "Nhân chứng"
-                              : "Liên quan";
-                      return (
-                        <option key={c.id || c.key} value={c.id || c.key}>
-                          {c.name || "Không tên"} ({roleText})
+                {/* Hàng 2: Dropdown động tương ứng */}
+                {inspectorTab === "characters" || selectedCharacter ? (
+                  <div>
+                    <select
+                      value={selectedCharacter?.id || selectedCharacter?.key || ""}
+                      onChange={(e) => {
+                        const found = characters.find(
+                          (c) => c.id === e.target.value || c.key === e.target.value,
+                        );
+                        if (found) {
+                          setSelectedCharacter(found);
+                          setInspectorTab("characters");
+                          setSelectedNodeId(null);
+                        }
+                      }}
+                      className="w-full h-8 px-2.5 rounded-md bg-[#181822] border border-purple-500/30 text-xs text-purple-200 outline-none focus:border-purple-400 cursor-pointer font-sans"
+                      title="Chọn nhân vật để điều chỉnh"
+                    >
+                      <option value="" disabled className="bg-[#181822] text-zinc-400">
+                        -- Chọn nhân vật ({characters.length}) --
+                      </option>
+                      {characters.map((c) => {
+                        const roleText =
+                          c.role === "victim"
+                            ? "Nạn nhân"
+                            : c.role === "suspect"
+                              ? "Nghi phạm"
+                              : c.role === "witness"
+                                ? "Nhân chứng"
+                                : "Liên quan";
+                        return (
+                          <option
+                            key={c.id || c.key}
+                            value={c.id || c.key}
+                            className="bg-[#181822] text-zinc-100 py-1"
+                          >
+                            {c.name || "Không tên"} ({roleText})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <select
+                      value={selectedId || draft?.id || draft?.checkpointId || ""}
+                      onChange={(e) => {
+                        const found = rows.find(
+                          (r) => r.id === e.target.value || r.checkpoint_id === e.target.value,
+                        );
+                        if (found) {
+                          selectRow(found);
+                          setSelectedCharacter(null);
+                          setInspectorTab("checkpoints");
+                          setSelectedNodeId(null);
+                        }
+                      }}
+                      className="w-full h-8 px-2.5 rounded-md bg-[#181822] border border-amber-500/30 text-xs text-amber-200 outline-none focus:border-amber-400 cursor-pointer font-sans"
+                      title="Chọn checkpoint để edit"
+                    >
+                      <option value="" disabled className="bg-[#181822] text-zinc-400">
+                        -- Chọn checkpoint ({generalCheckpoints.length}) --
+                      </option>
+                      {generalCheckpoints.map((cp) => (
+                        <option
+                          key={cp.id || cp.checkpoint_id}
+                          value={cp.id || cp.checkpoint_id}
+                          className="bg-[#181822] text-zinc-100 py-1"
+                        >
+                          {cp.title || "Checkpoint không tên"}
                         </option>
-                      );
-                    })}
-                  </select>
+                      ))}
+                    </select>
+                  </div>
                 )}
-
-
               </div>
 
               {/* Nội dung Inspector */}
