@@ -629,12 +629,13 @@ export function CanvasInvestigationWorkspace({
       >
         {/* PHẦN TRÊN: LOGO THƯƠNG HIỆU + CÁC CÔNG CỤ ĐIỀU TRA CHÍNH */}
         <div className="flex flex-col items-center gap-1.5 w-full">
-          {/* Logo XPLORE ở đỉnh sidebar */}
-          <div className="pb-2 border-b border-[#262c38]/80 w-full flex items-center justify-center">
+          {/* Logo XPLORE (phiên bản favicon) ở đỉnh sidebar */}
+          <div className="pt-0.5 pb-1 w-full flex items-center justify-center">
             <BrandMark
               href="/"
-              className="flex items-center justify-center p-1 rounded-lg hover:bg-zinc-800/60 transition-colors"
-              imageClassName="h-3.5 w-auto object-contain"
+              variant="favicon"
+              className="flex items-center justify-center p-1 rounded-xl hover:bg-zinc-800/60 transition-colors"
+              imageClassName="size-7.5 sm:size-8 object-contain"
             />
           </div>
 
@@ -745,7 +746,7 @@ export function CanvasInvestigationWorkspace({
         </div>
 
         {/* PHẦN DƯỚI: TIỆN ÍCH HỆ THỐNG, CHƠI NHÓM & USER PROFILE */}
-        <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-[#262c38]/80">
+        <div className="flex flex-col items-center gap-1.5 w-full pt-1">
           {/* 6. Chơi nhóm */}
           <button
             type="button"

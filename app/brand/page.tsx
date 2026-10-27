@@ -213,11 +213,9 @@ export default function BrandGuidelinesPage() {
 
               <div className="flex items-center justify-center py-6">
                 <img
-                  src="/brand/logo-x.png"
+                  src={logoTheme === 'light' ? '/brand/logo-x-light.png' : '/brand/logo-x.png'}
                   alt="XPLORE Mark"
-                  className={`max-h-16 w-auto object-contain transition-all ${
-                    logoTheme === 'light' ? 'invert brightness-50' : ''
-                  }`}
+                  className="max-h-16 w-auto object-contain transition-all"
                 />
               </div>
 

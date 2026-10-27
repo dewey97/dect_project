@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { User, LogOut, Settings, UserCircle, Terminal, Palette } from "lucide-react";
+import { User, LogOut, Settings, UserCircle, Terminal, Palette, LogIn } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
@@ -19,8 +20,21 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState<{
+    left?: number;
+    right?: number;
+    top?: number;
+    bottom?: number;
+  } | null>(null);
+
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const getUser = async () => {
@@ -58,19 +72,40 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
     return () => subscription.unsubscribe();
   }, [supabase]);
 
-  // Xử lý click ra ngoài để đóng menu
+  // Xử lý click ra ngoài để đóng menu (hỗ trợ cả Portal)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      if (buttonRef.current && buttonRef.current.contains(target)) {
+        return;
+      }
+      if (menuRef.current && !menuRef.current.contains(target)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isOpen]);
+
+  const handleToggle = () => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      if (placement === "sidebar") {
+        setDropdownPos({
+          left: rect.right + 10,
+          bottom: Math.max(12, window.innerHeight - rect.bottom),
+        });
+      } else {
+        setDropdownPos({
+          right: Math.max(12, window.innerWidth - rect.right),
+          top: rect.bottom + 8,
+        });
+      }
+    }
+    setIsOpen((prev) => !prev);
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -84,50 +119,65 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
     return (
       <div
         className={cn(
-          "animate-pulse bg-muted rounded-full",
+          "animate-pulse bg-muted rounded-full shrink-0",
           isSmall ? "size-7.5" : "size-9"
         )}
       />
     );
   }
 
-  if (user) {
-    const firstLetter = user.email?.charAt(0).toUpperCase() || "U";
-    const isSuperAdmin = user.app_metadata?.role === "super_admin";
+  const firstLetter = user?.email?.charAt(0).toUpperCase() || "T";
 
-    return (
-      <div className="relative" ref={dropdownRef} data-user-nav="true">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className={cn(
-            "flex items-center justify-center rounded-full bg-primary text-primary-foreground font-semibold shadow-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
-            isSmall ? "size-7.5 text-xs" : "size-9 text-sm"
-          )}
-          title="Tài khoản của bạn"
-        >
-          {firstLetter}
-        </button>
+  return (
+    <>
+      <button
+        ref={buttonRef}
+        onClick={handleToggle}
+        className={cn(
+          "flex items-center justify-center rounded-full font-semibold shadow-sm hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background cursor-pointer shrink-0 select-none",
+          user
+            ? "bg-primary text-primary-foreground"
+            : "bg-zinc-800 text-zinc-300 border border-zinc-700/80 hover:bg-zinc-700",
+          isSmall ? "size-7.5 text-xs" : "size-9 text-sm"
+        )}
+        title={user ? `Tài khoản: ${user.email}` : "Hồ sơ thám tử & Tùy chọn"}
+        data-user-nav="true"
+      >
+        {user ? (
+          firstLetter
+        ) : (
+          <User className={isSmall ? "size-3.5" : "size-4"} />
+        )}
+      </button>
 
-        {isOpen && (
+      {/* PORTAL DROPDOWN: Render trực tiếp vào document.body để không bao giờ bị overflow-hidden hay backdrop-filter của sidebar chặn/cắt */}
+      {isOpen && isMounted && typeof document !== "undefined" &&
+        createPortal(
           <div
-            className={cn(
-              "w-56 bg-popover text-popover-foreground rounded-xl shadow-2xl border border-border/70 p-1 z-50",
-              placement === "sidebar"
-                ? "absolute left-full bottom-0 ml-3 animate-in fade-in slide-in-from-left-2 duration-150"
-                : "absolute right-0 mt-2 shadow-lg border-border/60 animate-in fade-in slide-in-from-top-2 duration-200"
-            )}
+            ref={menuRef}
+            data-user-nav="true"
+            style={{
+              position: "fixed",
+              left: dropdownPos?.left,
+              right: dropdownPos?.right,
+              top: dropdownPos?.top,
+              bottom: dropdownPos?.bottom,
+              zIndex: 9999,
+            }}
+            className="w-56 bg-[#16181e]/98 text-zinc-100 rounded-xl shadow-2xl border border-zinc-700/80 p-1 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150 select-none"
           >
-            <div className="px-3 py-2 border-b border-border/60 mb-1 flex items-center justify-between">
-              <div className="overflow-hidden">
-                <p className="text-xs text-muted-foreground">
-                  Đã đăng nhập bằng
+            {/* Header: Thông tin tài khoản hoặc trạng thái khách */}
+            <div className="px-3 py-2 border-b border-zinc-800/80 mb-1 flex items-center justify-between">
+              <div className="overflow-hidden min-w-0 flex-1">
+                <p className="text-[11px] text-zinc-400">
+                  {user ? "Đã đăng nhập bằng" : "Trạng thái người chơi"}
                 </p>
-                <p className="text-sm font-medium truncate" title={user.email}>
-                  {user.email}
+                <p className="text-xs font-semibold truncate text-zinc-200" title={user?.email || "Thám tử khách"}>
+                  {user ? user.email : "Thám tử khách"}
                 </p>
               </div>
               {isAdmin && (
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-destructive text-destructive-foreground ml-2">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-destructive text-destructive-foreground ml-2 shrink-0">
                   ADMIN
                 </span>
               )}
@@ -140,57 +190,64 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
                     setIsOpen(false);
                     router.push("/studio");
                   }}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 transition-colors text-left font-medium border border-indigo-500/20 mb-1 cursor-pointer"
+                  className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 transition-colors text-left font-medium border border-indigo-500/20 mb-0.5 cursor-pointer"
                 >
                   <Terminal className="w-4 h-4" />
                   Creator Studio
                 </button>
               )}
+
+              {/* TÙY CHỌN MÀU BÀN HỒ SƠ (Khả dụng cho tất cả người chơi) */}
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  setTimeout(() => emitInvestigationEvent("OPEN_CANVAS_THEME"), 20);
+                  setTimeout(() => emitInvestigationEvent("OPEN_CANVAS_THEME"), 50);
                 }}
-                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-colors text-left font-medium border border-amber-500/20 mb-1 cursor-pointer"
+                className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition-colors text-left font-medium border border-amber-500/20 mb-0.5 cursor-pointer"
               >
-                <Palette className="w-4 h-4 text-amber-500" />
+                <Palette className="w-4 h-4 text-amber-400" />
                 Màu bàn hồ sơ (Canvas)
               </button>
-              <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors text-left cursor-not-allowed opacity-50">
-                <UserCircle className="w-4 h-4" />
-                Hồ sơ cá nhân
-              </button>
-              <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors text-left cursor-not-allowed opacity-50">
-                <Settings className="w-4 h-4" />
-                Cài đặt
-              </button>
+
+              {user ? (
+                <>
+                  <button className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors text-left cursor-not-allowed opacity-50">
+                    <UserCircle className="w-4 h-4" />
+                    Hồ sơ cá nhân
+                  </button>
+                  <button className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors text-left cursor-not-allowed opacity-50">
+                    <Settings className="w-4 h-4" />
+                    Cài đặt
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/login");
+                  }}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-left font-medium cursor-pointer"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Đăng nhập tài khoản
+                </button>
+              )}
             </div>
 
-            <div className="border-t border-border/60 mt-1 p-1">
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-destructive/10 hover:text-destructive transition-colors text-left text-destructive font-medium"
-              >
-                <LogOut className="w-4 h-4" />
-                Đăng xuất
-              </button>
-            </div>
-          </div>
+            {user && (
+              <div className="border-t border-zinc-800/80 mt-1 p-1">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-destructive/15 hover:text-destructive transition-colors text-left text-destructive font-medium cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Đăng xuất
+                </button>
+              </div>
+            )}
+          </div>,
+          document.body
         )}
-      </div>
-    );
-  }
-
-  return (
-    <button
-      onClick={() => router.push("/login")}
-      className={cn(
-        "hover:bg-accent hover:text-accent-foreground rounded-full transition-colors cursor-pointer flex items-center justify-center",
-        isSmall ? "p-1.5" : "p-2"
-      )}
-      title="Đăng nhập"
-    >
-      <User className={isSmall ? "size-4" : "size-5"} />
-    </button>
+    </>
   );
 }
