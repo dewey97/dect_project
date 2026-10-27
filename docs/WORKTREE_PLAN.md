@@ -376,6 +376,8 @@ Báo cáo docs/reports/B24_REPORT.md: git log --oneline 2eaedc7..HEAD, dòng t�
 
 ### B25 — gỡ chặn merge B23 (2026-10-27)
 
+> **Cập nhật 2026-10-27:** chủ dự án yêu cầu merge sớm. `wt/b23-unified` đã merge vào `main` (`3ae0db2`), lint pass. Làm cả B25-1 → B25-3 **trên `main`** (bỏ bước merge `main` vào worktree ở B25-3). Chưa push cho tới khi B25 đạt.
+
 Nguồn: `docs/reports/REVIEW_B24_2026-10-27.md`. B25-1 làm trong worktree `D:\code_world\dect_wt_b23`. B25-2 làm trên `main` (vùng UI của chủ dự án): chủ dự án commit xong việc đang sửa rồi mới giao.
 
 | #     | Mức     | Việc | Tiêu chí done |
