@@ -55,6 +55,10 @@ interface MainInvestigationCanvasProps {
   hideAudio?: boolean;
   hideNotebook?: boolean;
   isBoardGame?: boolean;
+  activePinId?: string | null;
+  onSelectSuspectInspector?: (suspect: SuspectItem, pinId?: string) => void;
+  onSelectFollowupInspector?: (culprit: string | null, pinId?: string) => void;
+  onSelectPinInspector?: (pin: PinPoint, pinId?: string) => void;
 }
 
 export function MainInvestigationCanvas({
@@ -71,6 +75,10 @@ export function MainInvestigationCanvas({
   hideAudio = false,
   hideNotebook = false,
   isBoardGame,
+  activePinId,
+  onSelectSuspectInspector,
+  onSelectFollowupInspector,
+  onSelectPinInspector,
 }: MainInvestigationCanvasProps) {
   const isBoardGameMode =
     isBoardGame !== undefined
@@ -585,8 +593,29 @@ export function MainInvestigationCanvas({
     ],
   );
 
+  const effectiveSelectedPinId = useMemo(() => {
+    if (layout.isEditMode) {
+      return layout.selectedPinId;
+    }
+    if (activePinId) {
+      const directMatch = displayPins.find((p) => p.id === activePinId);
+      if (directMatch) return directMatch.id;
+
+      const match = displayPins.find(
+        (p) =>
+          p.id === activePinId ||
+          p.subjectKey === activePinId ||
+          (activePinId === "phone" && (p.nodeKind === "victim_phone" || p.id.includes("phone"))) ||
+          (activePinId === "reinvestigate" && (p.nodeKind === "reinvestigate" || p.id.includes("reinvestigate"))) ||
+          (activePinId === "indictment" && p.nodeKind === "indictment")
+      );
+      if (match) return match.id;
+    }
+    return null;
+  }, [layout.isEditMode, layout.selectedPinId, activePinId, displayPins]);
+
   const selectedPin =
-    displayPins.find((p) => p.id === layout.selectedPinId) || null;
+    displayPins.find((p) => p.id === (effectiveSelectedPinId ?? layout.selectedPinId)) || null;
 
   const customConnections = useMemo(
     () =>
@@ -635,14 +664,16 @@ export function MainInvestigationCanvas({
         if (!targetPin) return;
 
         if (targetPin.actionType === "custom_question") {
-          setActiveCustomPinModal(targetPin);
+          if (onSelectPinInspector) onSelectPinInspector(targetPin, id);
+          else setActiveCustomPinModal(targetPin);
           return;
         }
         if (targetPin.photoUrl && targetPin.actionType !== "sheet_checkpoint") {
           handleOpenPhotoZoom(targetPin.photoUrl, coords);
           return;
         }
-        setActiveCustomPinModal(targetPin);
+        if (onSelectPinInspector) onSelectPinInspector(targetPin, id);
+        else setActiveCustomPinModal(targetPin);
         return;
       }
 
@@ -705,14 +736,17 @@ export function MainInvestigationCanvas({
           if (subjectKey) {
             setStorageItem("last_viewed_suspect", subjectKey);
           }
-          state.setEditingSuspect(
-            existing || {
-              id: subjectKey || id,
-              name: charName || pin?.label || "Nghi phạm",
-              clueIds: [],
-            },
-          );
-          state.setIsAddSuspectOpen(true);
+          const suspectData = existing || {
+            id: subjectKey || id,
+            name: charName || pin?.label || "Nghi phạm",
+            clueIds: [],
+          };
+          if (onSelectSuspectInspector) {
+            onSelectSuspectInspector(suspectData, id);
+          } else {
+            state.setEditingSuspect(suspectData);
+            state.setIsAddSuspectOpen(true);
+          }
           return;
         }
         case "followup": {
@@ -720,6 +754,10 @@ export function MainInvestigationCanvas({
           state.setActiveFollowupCulprit(c);
           if (c) {
             setStorageItem("last_viewed_suspect", c);
+          }
+          if (onSelectFollowupInspector) {
+            onSelectFollowupInspector(c, id);
+            return;
           }
           const isAlreadySolved =
             state.solvedFollowupQuestions.includes(c) ||
@@ -753,6 +791,8 @@ export function MainInvestigationCanvas({
         case "custom": {
           if (pin?.photoUrl && pin.actionType !== "sheet_checkpoint") {
             handleOpenPhotoZoom(pin.photoUrl, coords);
+          } else if (onSelectPinInspector && pin) {
+            onSelectPinInspector(pin, id);
           } else {
             setActiveCustomPinModal(pin || null);
           }
@@ -812,7 +852,7 @@ export function MainInvestigationCanvas({
         customPins={displayPins}
         customConnections={customConnections}
         customBgImage={customBgImage}
-        selectedPinId={layout.selectedPinId}
+        selectedPinId={effectiveSelectedPinId ?? layout.selectedPinId}
         onSelectPin={layout.setSelectedPinId}
         onConnectPins={layout.handleConnectPins}
         onDeleteConnection={layout.handleDeleteConnection}

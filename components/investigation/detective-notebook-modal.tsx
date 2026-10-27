@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, BookOpen, Users } from "lucide-react";
@@ -10,12 +12,16 @@ interface DetectiveNotebookModalProps {
   isOpen: boolean;
   onClose: () => void;
   caseId?: string;
+  embedded?: boolean;
+  hideHeader?: boolean;
 }
 
 export function DetectiveNotebookModal({
   isOpen,
   onClose,
   caseId = "case_000",
+  embedded = false,
+  hideHeader = false,
 }: DetectiveNotebookModalProps) {
   const { roomCode, roomState, syncUpdate } = useRoomSync();
   const storageKey = `detective_notebook_${caseId}`;
@@ -78,51 +84,39 @@ export function DetectiveNotebookModal({
     isTypingRef.current = false;
   };
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 select-none">
-          {/* BACKDROP */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer"
-          />
-
-          {/* NOTEBOOK CONTAINER */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 12 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-xl h-[85vh] max-h-[640px] bg-[#f8f6f0] rounded-lg border border-[#3d2c1e] shadow-[0_20px_60px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden z-10"
-          >
+  const notebookBody = (
+    <div className={cn(
+      "relative bg-[#f8f6f0] flex flex-col overflow-hidden select-none",
+      embedded
+        ? "w-full h-full border-0"
+        : "w-full max-w-xl h-[85vh] max-h-[640px] rounded-lg border border-[#3d2c1e] shadow-[0_20px_60px_rgba(0,0,0,0.85)] z-10"
+    )}>
             {/* MINIMAL HEADER */}
-            <div className="shrink-0 px-4 py-2.5 bg-[#eae5d9] border-b border-[#d8d0c2] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <BookOpen className="size-4 text-[#6e5845]" />
-                <h3 className="text-xs sm:text-sm font-mono font-bold tracking-wider text-[#3d2f24] uppercase">
-                  SỔ TAY
-                </h3>
-                {roomCode && (
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-900/15 border border-emerald-700/40 text-[0.65rem] text-emerald-800 font-mono font-medium">
-                    <Users className="size-3 text-emerald-700" />
-                    <span>Phòng {roomCode}</span>
-                  </span>
-                )}
-              </div>
+            {!hideHeader && (
+              <div className="shrink-0 px-4 py-2.5 bg-[#eae5d9] border-b border-[#d8d0c2] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="size-4 text-[#6e5845]" />
+                  <h3 className="text-xs sm:text-sm font-mono font-bold tracking-wider text-[#3d2f24] uppercase">
+                    SỔ TAY
+                  </h3>
+                  {roomCode && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-900/15 border border-emerald-700/40 text-[0.65rem] text-emerald-800 font-mono font-medium">
+                      <Users className="size-3 text-emerald-700" />
+                      <span>Phòng {roomCode}</span>
+                    </span>
+                  )}
+                </div>
 
-              <button
-                type="button"
-                onClick={onClose}
-                className="size-7 rounded bg-[#ded6c7] hover:bg-[#cfc6b5] text-[#5c4938] hover:text-[#261d15] flex items-center justify-center transition-colors cursor-pointer"
-                title="Đóng sổ tay"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="size-7 rounded bg-[#ded6c7] hover:bg-[#cfc6b5] text-[#5c4938] hover:text-[#261d15] flex items-center justify-center transition-colors cursor-pointer"
+                  title="Đóng sổ tay"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            )}
 
             {/* WARM OFF-WHITE PAPER WITH SUBTLE RULED LINES */}
             <div className="flex-1 relative overflow-hidden bg-[#faf8f3] flex flex-col p-4 sm:p-6">
@@ -146,6 +140,37 @@ export function DetectiveNotebookModal({
                 autoFocus={false}
               />
             </div>
+    </div>
+  );
+
+  if (embedded) {
+    return (
+      <div className="w-full h-full flex flex-col bg-[#f8f6f0] relative overflow-hidden">
+        {notebookBody}
+      </div>
+    );
+  }
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 select-none">
+          {/* BACKDROP */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer"
+          />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {notebookBody}
           </motion.div>
         </div>
       )}

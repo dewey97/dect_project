@@ -6,7 +6,6 @@ import {
   VolumeX,
   BookOpen,
   Users,
-  Target,
   PenLine,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -90,36 +89,29 @@ export function CanvasToolbar({
             {roomCode ? (
               <>
                 <span className="tracking-wider text-zinc-200">{roomCode}</span>
-                {/* Avatar Stack của các thành viên trực tuyến */}
-                <div className="flex items-center -space-x-1.5 overflow-visible">
-                  {(members.length > 0
-                    ? members.slice(0, 3)
-                    : [
-                        {
-                          key: "me",
-                          nickname,
-                          joinedAt: Date.now(),
-                          avatarUrl: currentUser?.avatarUrl,
-                        },
-                      ]
-                  ).map((m) => (
-                    <div
-                      key={m.key}
-                      className="rounded-full ring-2 ring-zinc-950"
-                      title={m.nickname}
-                    >
-                      <DetectiveAvatar
-                        src={
-                          m.nickname === nickname
-                            ? currentUser?.avatarUrl || m.avatarUrl
-                            : m.avatarUrl
-                        }
-                        name={m.nickname}
-                        size="xs"
-                      />
+                {/* Avatar Stack của các đồng đội khác trực tuyến */}
+                {(() => {
+                  const otherMembers = members.filter((m) => m.nickname !== nickname);
+                  if (otherMembers.length === 0) return null;
+                  return (
+                    <div className="flex items-center -space-x-1.5 overflow-visible">
+                      {otherMembers.slice(0, 3).map((m) => (
+                        <div
+                          key={m.key}
+                          className="rounded-full ring-2 ring-zinc-950"
+                          title={m.nickname}
+                        >
+                          <DetectiveAvatar
+                            src={m.avatarUrl}
+                            name={m.nickname}
+                            size="xs"
+                            showOnlineDot={false}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  );
+                })()}
                 <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
               </>
             ) : (
@@ -177,42 +169,6 @@ export function CanvasToolbar({
 
 
       </div>
-
-      {/* Quick ping button when a pin is selected */}
-      <AnimatePresence>
-        {selectedPin && (
-          <motion.div
-            data-board-ui="true"
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-2.5 py-1.5 bg-[#1b140e]/95 backdrop-blur-md rounded-lg border border-amber-500/60 shadow-[0_12px_40px_rgba(0,0,0,0.85)] font-mono text-xs select-none pointer-events-auto"
-            style={{
-              top: "calc(max(12px, env(safe-area-inset-top, 12px)) + 44px)",
-            }}
-          >
-            <span className="text-amber-200/90 truncate max-w-[140px] sm:max-w-[200px] font-bold text-[11px]">
-              {selectedPin.label}
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                broadcastPing(selectedPin.id, selectedPin.label || "Ghim điều tra", {
-                  x: selectedPin.x,
-                  y: selectedPin.y,
-                });
-              }}
-              className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 border border-amber-500/60 transition-colors flex items-center gap-1 font-bold text-[11px] cursor-pointer"
-              title="Phát tín hiệu radar chỉ điểm ghim này cho đồng đội"
-            >
-              <Target className="size-3.5 text-amber-400 animate-pulse" />
-              <span>Chỉ điểm 🎯</span>
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <RoomModal
         isOpen={isRoomModalOpen}
         onClose={() => setIsRoomModalOpen(false)}

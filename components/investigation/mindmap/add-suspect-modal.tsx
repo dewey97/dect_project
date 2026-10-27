@@ -45,6 +45,7 @@ interface AddSuspectModalProps {
   onSelectSuspect?: (suspect: SuspectItemData | null) => void;
   onSubmitConclusion?: (culprit: string) => void;
   isPhoneSolved?: boolean;
+  embedded?: boolean;
 }
 
 import {
@@ -81,6 +82,7 @@ export function AddSuspectModal({
   onSelectSuspect,
   onSubmitConclusion,
   isPhoneSolved = false,
+  embedded = false,
 }: AddSuspectModalProps) {
   const [name, setName] = useState(() => editingSuspect?.name || "");
   const [subTileView, setSubTileView] = useState<
@@ -759,19 +761,15 @@ export function AddSuspectModal({
     handleDirectClose();
   };
 
-  return (
-    <AnimatePresence>
-      <div
-        onClick={handleBackdropClick}
-        className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
-      >
-        <motion.div
-          onClick={(e) => e.stopPropagation()}
-          initial={{ opacity: 0, scale: 0.96, y: 12 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: 12 }}
-          className="relative w-full max-w-2xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] p-5 sm:p-7 rounded-none font-sans select-text max-h-[90vh] overflow-y-auto cursor-default paper-scrollbar"
-        >
+  const modalBody = (
+    <div
+      className={cn(
+        "relative bg-[#f6f1e5] text-[#1a120b] select-text paper-scrollbar flex flex-col",
+        embedded
+          ? "w-full p-3 sm:p-4 border-0"
+          : "w-full max-w-2xl border-2 border-[#2b1f14] p-5 sm:p-7 rounded-none max-h-[90vh] overflow-y-auto cursor-default"
+      )}
+    >
           {/* TOP RIGHT ACTIONS */}
           <div className="absolute top-4 right-4 flex items-center gap-2 z-20 pointer-events-auto">
             <button
@@ -796,7 +794,7 @@ export function AddSuspectModal({
 
             {/* TÊN ĐỐI TƯỢNG CỐ ĐỊNH */}
             <div className="pt-0.5 flex items-center gap-3">
-              {matchedChar?.avatarUrl && (
+              {!embedded && matchedChar?.avatarUrl && (
                 <img
                   src={matchedChar.avatarUrl}
                   alt={name || editingSuspect?.name || "Đối tượng"}
@@ -979,9 +977,39 @@ export function AddSuspectModal({
               </div>
             )}
           </form>
-        </motion.div>
+    </div>
+  );
 
-        {/* MODAL PHẢN HỒI KẾT QUẢ XÁC NHẬN MANH MỐI */}
+  if (embedded) {
+    return (
+      <div className="w-full flex flex-col bg-[#f6f1e5] relative">
+        {modalBody}
+        <SuspectEvaluationModal
+          evalModal={evalModal}
+          onCloseSuccess={() => {
+            setEvalModal(null);
+            setSubTileView("overview");
+          }}
+          onCloseFailure={() => setEvalModal(null)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <AnimatePresence>
+      <div
+        onClick={handleBackdropClick}
+        className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
+      >
+        <motion.div
+          onClick={(e) => e.stopPropagation()}
+          initial={{ opacity: 0, scale: 0.96, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        >
+          {modalBody}
+        </motion.div>
         <SuspectEvaluationModal
           evalModal={evalModal}
           onCloseSuccess={() => {

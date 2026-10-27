@@ -6,7 +6,7 @@ import { X, HelpCircle } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { isAdminBypassCode } from "@/lib/cases/admin-bypass";
 import { getStorageItem, setStorageItem, getStorageJson } from "@/lib/storage";
-import { normalizeImageUrl } from "@/lib/utils";
+import { normalizeImageUrl, cn } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 // Removed dead HaDiscoveredPhotosPopup
@@ -27,6 +27,7 @@ interface FollowupQuestionModalProps {
   onSuccess?: (culprit: string, choice?: string) => void;
   onOpenDossier?: (dossierType: "A" | "B" | "C") => void;
   isPhoneSolved?: boolean;
+  embedded?: boolean;
 }
 
 const DEFAULT_CHOICE_OPTIONS = [
@@ -43,6 +44,7 @@ export function FollowupQuestionModal({
   onSuccess,
   onOpenDossier,
   isPhoneSolved,
+  embedded = false,
 }: FollowupQuestionModalProps) {
   const targetCulprit = subjectKey || culprit || null;
   const charactersContext = useOptionalCaseCharacters();
@@ -590,19 +592,15 @@ export function FollowupQuestionModal({
     onClose();
   };
 
-  return (
-    <AnimatePresence>
-      <div
-        onClick={handleBackdropClick}
-        className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
-      >
-        <motion.div
-          onClick={(e) => e.stopPropagation()}
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-3xl bg-[#f6f1e5] text-[#1a120b] border-2 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden flex flex-col max-h-[92vh] cursor-default"
-        >
+  const modalBody = (
+    <div
+      className={cn(
+        "relative bg-[#f6f1e5] text-[#1a120b] flex flex-col cursor-default",
+        embedded
+          ? "w-full p-3 sm:p-4 border-0"
+          : "w-full max-w-3xl border-2 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden max-h-[92vh]"
+      )}
+    >
           {/* HEADER */}
           <div className="bg-[#ede3d1] p-4 sm:p-5 border-b-2 border-[#2b1f14] flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -695,10 +693,32 @@ export function FollowupQuestionModal({
               onClose={onClose}
             />
           )}
+    </div>
+  );
+
+  if (embedded) {
+    return (
+      <div className="w-full flex flex-col bg-[#f6f1e5] relative">
+        {modalBody}
+      </div>
+    );
+  }
+
+  return (
+    <AnimatePresence>
+      <div
+        onClick={handleBackdropClick}
+        className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 font-sans select-none overflow-y-auto cursor-pointer"
+      >
+        <motion.div
+          onClick={(e) => e.stopPropagation()}
+          initial={{ opacity: 0, scale: 0.95, y: 15 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 15 }}
+        >
+          {modalBody}
         </motion.div>
       </div>
-
-      {/* Kết thúc modal câu hỏi phụ */}
     </AnimatePresence>
   );
 }

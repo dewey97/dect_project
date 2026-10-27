@@ -17,6 +17,7 @@ import {
 import type { PinPoint } from "@/components/investigation/hero-interactive";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { parseAnswersColumn } from "@/lib/cms/checkpoint-cms";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
@@ -30,6 +31,7 @@ interface CustomPinModalProps {
   pin: PinPoint | null;
   onSolve?: (pinId: string) => void;
   caseId?: string;
+  embedded?: boolean;
 }
 
 export function CustomPinModal({
@@ -38,6 +40,7 @@ export function CustomPinModal({
   pin,
   onSolve,
   caseId = "case_000",
+  embedded = false,
 }: CustomPinModalProps) {
   const [userInput, setUserInput] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");
@@ -282,9 +285,13 @@ export function CustomPinModal({
     );
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 select-none">
-      <div className="relative w-full max-w-lg bg-[#f6f1e5] text-[#1a120b] border-4 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden flex flex-col max-h-[88vh] font-sans">
+  const modalBody = (
+    <div className={cn(
+      "relative bg-[#f6f1e5] text-[#1a120b] flex flex-col font-sans",
+      embedded
+        ? "w-full border-0 p-0"
+        : "w-full max-w-lg border-4 border-[#2b1f14] shadow-[0_30px_90px_rgba(0,0,0,0.98)] rounded-none overflow-hidden max-h-[88vh]"
+    )}>
         {/* HEADER */}
         <div className="bg-[#ede3d1] px-5 py-3.5 border-b-2 border-[#2b1f14] flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -587,7 +594,20 @@ export function CustomPinModal({
             ĐÓNG
           </button>
         </div>
+    </div>
+  );
+
+  if (embedded) {
+    return (
+      <div className="w-full flex flex-col bg-[#f6f1e5] relative select-none">
+        {modalBody}
       </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200 select-none">
+      {modalBody}
     </div>
   );
 }

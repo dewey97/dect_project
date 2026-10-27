@@ -172,20 +172,13 @@ export function renderScene({
 
   // Draw case evidence map with refined focus on corkboard surface
   if (image) {
-    // Crop ~11.5-12% margin for subtle reduction vs original
-    const cropMarginX = image.width * 0.12;
-    const cropMarginY = image.height * 0.11;
-    const sx = cropMarginX;
-    const sy = cropMarginY;
-    const sw = image.width - cropMarginX * 2;
-    const sh = image.height - cropMarginY * 2;
-
+    // Draw full original image directly without code-side cropping
     context.drawImage(
       image,
-      sx,
-      sy,
-      sw,
-      sh,
+      0,
+      0,
+      image.width,
+      image.height,
       bounds.x,
       bounds.y,
       bounds.width,
@@ -433,10 +426,10 @@ export function renderScene({
 
         context.save();
         if (isPhotoSelected) {
-          context.shadowColor = "rgba(245, 158, 11, 0.95)";
-          context.shadowBlur = (18 * scaleFactor) / transform.scale;
+          context.shadowColor = "rgba(245, 158, 11, 1)";
+          context.shadowBlur = (24 * scaleFactor) / transform.scale;
           context.strokeStyle = "#f59e0b";
-          context.lineWidth = (2.8 * scaleFactor) / transform.scale;
+          context.lineWidth = (3.2 * scaleFactor) / transform.scale;
         } else {
           context.shadowColor = "rgba(251, 191, 36, 0.8)";
           context.shadowBlur = (12 * scaleFactor) / transform.scale;
@@ -679,21 +672,21 @@ export function renderScene({
         const bh = noteHeight + pad * 2;
 
         if (isNoteSelected) {
-          context.shadowColor = "rgba(245, 158, 11, 0.95)";
-          context.shadowBlur = (18 * scaleFactor) / transform.scale;
+          context.shadowColor = "rgba(245, 158, 11, 1)";
+          context.shadowBlur = (24 * scaleFactor) / transform.scale;
           context.strokeStyle = "#f59e0b";
-          context.lineWidth = (2.8 * scaleFactor) / transform.scale;
+          context.lineWidth = (3.2 * scaleFactor) / transform.scale;
+          context.setLineDash([]);
         } else {
           context.shadowColor = "rgba(251, 191, 36, 0.85)";
           context.shadowBlur = (12 * scaleFactor) / transform.scale;
           context.strokeStyle = "#fbbf24";
           context.lineWidth = (2 * scaleFactor) / transform.scale;
+          context.setLineDash([
+            (6 * scaleFactor) / transform.scale,
+            (4 * scaleFactor) / transform.scale,
+          ]);
         }
-
-        context.setLineDash([
-          (6 * scaleFactor) / transform.scale,
-          (4 * scaleFactor) / transform.scale,
-        ]);
         context.strokeRect(bx, by, bw, bh);
         context.setLineDash([]);
 
