@@ -1494,6 +1494,7 @@ export function DossierCanvasBoard({
                 key={docItem.id}
                 id={`board-dossier-${docItem.tag_code}`}
                 data-dossier-card="true"
+                data-tour="canvas-desk-cards"
                 onMouseDown={(e) => e.stopPropagation()}
                 style={{
                   position: "absolute",
@@ -1593,6 +1594,7 @@ export function DossierCanvasBoard({
                 key={docItem.id}
                 id={`board-dossier-${docItem.tag_code}`}
                 data-dossier-card="true"
+                data-tour="canvas-desk-cards"
                 onMouseDown={(e) => e.stopPropagation()}
                 style={{
                   position: "absolute",
