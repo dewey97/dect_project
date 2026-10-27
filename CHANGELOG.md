@@ -2,6 +2,26 @@
 
 All notable changes to the Detective Case System (dect_project) will be documented in this file.
 
+## [2026-10-28]
+
+### Checkpoint Studio & Investigation Board Unified Architecture
+
+- **Unified Character Management into Checkpoint Studio**:
+  - Tích hợp toàn diện quản lý nhân vật vào Checkpoint Studio (`/studio/checkpoints`): bổ sung tab Segmented *Mục tiêu* & *Nhân vật*, component `CharacterEditor` với preview avatar, vai trò (`suspect` vs `witness` / `related`), biệt danh và liên kết câu hỏi thẩm tra.
+  - Ngừng sử dụng Standalone Characters Studio (`/studio/characters`), gỡ bỏ khỏi Admin Sidebar và tự động redirect sang `/studio/checkpoints`.
+  - Khay ngoài bảng (`OffBoardTray`): hiển thị và quản lý trực quan các nhân vật ngoài bảng (nhân chứng / liên quan), hỗ trợ nút "Lên bảng" để đưa nhanh nhân vật thành nghi phạm trên bảng điều tra.
+- **Live Reactive In-Memory Synchronization**:
+  - Đồng bộ tức thì 0s độ trễ giữa Inspector, Flow View (Sơ đồ luồng), và Board (Bảng điều tra): khi chỉnh sửa tên, vai trò nhân vật hay nội dung câu hỏi checkpoint, cả sơ đồ Flow và Bảng điều tra tự động cập nhật ngay trên giao diện mà không cần chờ lưu.
+  - Hiển thị đầy đủ tất cả các node được cấu hình cho bảng điều tra trong Checkpoint Studio (`isStudioMode: true`) để GM dễ dàng sắp đặt, căn chỉnh tọa độ và nối dây.
+- **Unified Single [LƯU] Button**:
+  - Gộp toàn bộ các nút lưu lẻ tẻ (`Lưu Checkpoint`, `Lưu Nhân Vật`, `Lưu Bố Cục`) thành **1 nút [LƯU] duy nhất** trên Top Header, hỗ trợ phím tắt toàn cục `Ctrl+S`.
+- **UI Clutter Cleanup & 2-Tier Interrogation Standardization**:
+  - Dọn sạch các nút và nhãn thừa trên header: gỡ bỏ badge Dual-View, 2 nút Undo thừa, phụ đề và bộ đếm node, nút Sắp xếp và nút Zoom ở góc Flow View. Sửa triệt để lỗi hiển thị 2 dấu cộng `++` trên các nút tạo mới.
+  - Ẩn toàn bộ các trường kỹ thuật không cần thiết đối với người dùng (mã định danh, ID, key, số điện thoại) khỏi giao diện, hệ thống tự động sinh slug và quản lý an toàn trong database.
+  - Chuẩn hóa 100% mô hình Thẩm tra nghi phạm 2 lớp (**Động cơ** & **Mâu thuẫn lời khai**), loại bỏ hoàn toàn các cấu hình và tài liệu cũ liên quan đến tầng Xác minh ngoại phạm (Alibi).
+- **Gameplay Canvas Board Parity**:
+  - Lọc bỏ các ảnh vật chứng chưa ghim và ảnh đại diện trùng lặp khỏi canvas gameplay; chỉ hiển thị các nhân vật có vai trò nghi phạm (`role === 'suspect'`) trên bàn phá án.
+
 ## [2026-10-26]
 
 ### B18 Review & Decision Records (B18-2 & B18-5)
