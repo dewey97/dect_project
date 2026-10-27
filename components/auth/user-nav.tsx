@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils";
 
 interface UserNavProps {
   size?: "sm" | "md";
+  placement?: "default" | "sidebar";
 }
 
-export function UserNav({ size = "md" }: UserNavProps) {
+export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
   const router = useRouter();
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,7 +109,14 @@ export function UserNav({ size = "md" }: UserNavProps) {
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-56 bg-popover text-popover-foreground rounded-xl shadow-lg border border-border/60 p-1 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div
+            className={cn(
+              "w-56 bg-popover text-popover-foreground rounded-xl shadow-2xl border border-border/70 p-1 z-50",
+              placement === "sidebar"
+                ? "absolute left-full bottom-0 ml-3 animate-in fade-in slide-in-from-left-2 duration-150"
+                : "absolute right-0 mt-2 shadow-lg border-border/60 animate-in fade-in slide-in-from-top-2 duration-200"
+            )}
+          >
             <div className="px-3 py-2 border-b border-border/60 mb-1 flex items-center justify-between">
               <div className="overflow-hidden">
                 <p className="text-xs text-muted-foreground">

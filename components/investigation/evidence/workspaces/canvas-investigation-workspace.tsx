@@ -14,7 +14,17 @@ import {
   Smartphone,
   Compass,
   BookOpen,
+  Users,
+  HelpCircle,
+  MessageSquareWarning,
+  FileText,
+  Sparkles,
 } from "lucide-react";
+import { CanvasGuideModal } from "@/components/investigation/evidence/canvas-guide/canvas-guide-modal";
+import { CanvasWalkthroughTour } from "@/components/investigation/evidence/canvas-guide/canvas-walkthrough-tour";
+import { BrandMark } from "@/components/investigation/brand-mark";
+import { UserNav } from "@/components/auth/user-nav";
+import { RoomModal } from "@/components/investigation/room-modal";
 import { cn } from "@/lib/utils";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
 import { DossierCanvasBoard } from "@/components/investigation/evidence/dossier-canvas-board";
@@ -97,6 +107,32 @@ export function CanvasInvestigationWorkspace({
   const [isBoardOpen, setIsBoardOpen] = useState(true);
   const [isBoardFullscreen, setIsBoardFullscreen] = useState(false);
   const [isDossierCollapsed, setIsDossierCollapsed] = useState(false);
+  const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const [showFirstTimePill, setShowFirstTimePill] = useState(false);
+
+  React.useEffect(() => {
+    try {
+      const seen = localStorage.getItem("dect_canvas_guide_seen_v1");
+      if (!seen) {
+        const timer = setTimeout(() => setShowFirstTimePill(true), 800);
+        return () => clearTimeout(timer);
+      }
+    } catch {}
+  }, []);
+
+  const handleDismissPill = () => {
+    setShowFirstTimePill(false);
+    try {
+      localStorage.setItem("dect_canvas_guide_seen_v1", "true");
+    } catch {}
+  };
+
+  const handleStartTourFromPill = () => {
+    handleDismissPill();
+    setIsTourOpen(true);
+  };
 
   type InspectorItem =
     | { type: "suspect"; data: any; label: string; pinId?: string }
@@ -552,6 +588,12 @@ export function CanvasInvestigationWorkspace({
   useInvestigationEvent("TOGGLE_BOARD", () => {
     setIsBoardOpen((prev) => !prev);
   });
+  useInvestigationEvent("OPEN_CANVAS_GUIDE", () => {
+    setIsGuideModalOpen(true);
+  });
+  useInvestigationEvent("OPEN_CANVAS_TOUR", () => {
+    setIsTourOpen(true);
+  });
 
   // Xác định node cần highlight trên bảng điều tra khi modal/inspector đang mở
   const boardActivePinId = useMemo(() => {
@@ -575,39 +617,64 @@ export function CanvasInvestigationWorkspace({
 
   return (
     <div className="w-full h-full flex-1 min-h-0 flex items-stretch justify-start overflow-hidden min-w-0 relative gap-0 p-0 select-none">
-      {/* 0. SIDEBAR LIỀN BÊN TRÁI: DOCK CỐ ĐỊNH CÁC LỐI TẮT NGHIỆP VỤ */}
+      {/* 0. SIDEBAR LIỀN BÊN TRÁI: DOCK CỐ ĐỊNH TẤT CẢ LỐI TẮT NGHIỆP VỤ & HỆ THỐNG */}
       <aside
         id="canvas-left-sidebar"
         aria-label="Thanh điều hướng nghiệp vụ điều tra"
         className={cn(
-          "w-16 sm:w-[68px] h-full shrink-0 z-30 bg-[#0d0f14]/98 border-r border-[#262c38] backdrop-blur-xl flex flex-col items-center py-3 px-1 select-none transition-all duration-200",
+          "w-16 sm:w-[68px] h-full shrink-0 z-30 bg-[#0d0f14]/98 border-r border-[#262c38] backdrop-blur-xl flex flex-col justify-between items-center py-2 px-1 select-none transition-all duration-200 overflow-y-auto overflow-x-hidden scrollbar-none",
           isBoardFullscreen && "opacity-20 pointer-events-none"
         )}
       >
-        {/* Nhóm công cụ: Các phân hệ điều tra chính (Giao diện phẳng, đồng nhất, không nổi active) */}
-        <div className="flex flex-col items-center gap-2 w-full">
-          {/* 1. Khay tài liệu (bên trái cạnh sidebar) */}
+        {/* PHẦN TRÊN: LOGO THƯƠNG HIỆU + CÁC CÔNG CỤ ĐIỀU TRA CHÍNH */}
+        <div className="flex flex-col items-center gap-1.5 w-full">
+          {/* Logo XPLORE ở đỉnh sidebar */}
+          <div className="pb-2 border-b border-[#262c38]/80 w-full flex items-center justify-center">
+            <BrandMark
+              href="/"
+              className="flex items-center justify-center p-1 rounded-lg hover:bg-zinc-800/60 transition-colors"
+              imageClassName="h-3.5 w-auto object-contain"
+            />
+          </div>
+
+          {/* 1. Khay tài liệu */}
           <button
             type="button"
             onClick={() => setIsDossierCollapsed((prev) => !prev)}
-            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
+              !isDossierCollapsed && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+            )}
             title={!isDossierCollapsed ? "Thu gọn Khay tài liệu" : "Mở Khay tài liệu"}
           >
-            <FolderOpen className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
+            <FolderOpen
+              className={cn(
+                "size-5 transition-transform group-hover:scale-105",
+                !isDossierCollapsed ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+              )}
+            />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Tài liệu
             </span>
           </button>
 
-          {/* 2. Bảng điều tra (bên phải) */}
+          {/* 2. Bảng điều tra */}
           <button
             type="button"
             onClick={() => setIsBoardOpen((prev) => !prev)}
-            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
+              isBoardOpen && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+            )}
             title={isBoardOpen ? "Thu gọn Bảng điều tra" : "Mở Bảng điều tra"}
           >
-            <SquareKanban className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
+            <SquareKanban
+              className={cn(
+                "size-5 transition-transform group-hover:scale-105",
+                isBoardOpen ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+              )}
+            />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Bảng
             </span>
           </button>
@@ -616,11 +683,19 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={() => setActiveModal(activeModal === "phone" ? null : "phone")}
-            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
+              activeModal === "phone" && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+            )}
             title="Điện thoại nạn nhân"
           >
-            <Smartphone className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
+            <Smartphone
+              className={cn(
+                "size-5 transition-transform group-hover:scale-105",
+                activeModal === "phone" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+              )}
+            />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Điện thoại
             </span>
           </button>
@@ -629,11 +704,19 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={() => setActiveModal(activeModal === "reinvestigate" ? null : "reinvestigate")}
-            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
+              activeModal === "reinvestigate" && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+            )}
             title="Khám xét lại hiện trường 360"
           >
-            <Compass className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
+            <Compass
+              className={cn(
+                "size-5 transition-transform group-hover:scale-105",
+                activeModal === "reinvestigate" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+              )}
+            />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Hiện trường
             </span>
           </button>
@@ -642,14 +725,82 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={handleOpenNotebook}
-            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none",
+              activeModal === "notebook" && "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs"
+            )}
             title="Sổ tay ghi chép nghiệp vụ"
           >
-            <BookOpen className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
+            <BookOpen
+              className={cn(
+                "size-5 transition-transform group-hover:scale-105",
+                activeModal === "notebook" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
+              )}
+            />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
               Sổ tay
             </span>
           </button>
+        </div>
+
+        {/* PHẦN DƯỚI: TIỆN ÍCH HỆ THỐNG, CHƠI NHÓM & USER PROFILE */}
+        <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-[#262c38]/80">
+          {/* 6. Chơi nhóm */}
+          <button
+            type="button"
+            onClick={() => setIsRoomModalOpen(true)}
+            className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none relative"
+            title="Chơi nhóm đồng bộ thời gian thực"
+          >
+            <Users className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+              Nhóm
+            </span>
+          </button>
+
+          {/* 7. Chuyển sang Xem lẻ */}
+          <button
+            type="button"
+            onClick={onSwitchToSingleView}
+            className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            title="Chuyển sang chế độ Xem lẻ"
+          >
+            <FileText className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+              Xem lẻ
+            </span>
+          </button>
+
+          {/* 8. Hướng dẫn nghiệp vụ */}
+          <button
+            type="button"
+            onClick={() => emitInvestigationEvent("OPEN_GUIDE")}
+            className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            title="Sổ tay hướng dẫn gameplay"
+          >
+            <HelpCircle className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+              Chỉ dẫn
+            </span>
+          </button>
+
+          {/* 9. Báo lỗi */}
+          <button
+            type="button"
+            onClick={() => emitInvestigationEvent("OPEN_FEEDBACK")}
+            className="flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
+            title="Báo lỗi & Góp ý"
+          >
+            <MessageSquareWarning className="size-4.5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+              Báo lỗi
+            </span>
+          </button>
+
+          {/* 10. Avatar Profile (UserNav) */}
+          <div className="pt-1.5 pb-0.5 flex items-center justify-center w-full">
+            <UserNav size="sm" placement="sidebar" />
+          </div>
         </div>
       </aside>
 
@@ -993,6 +1144,12 @@ export function CanvasInvestigationWorkspace({
         onBroadcastPing={broadcastPing}
       />
       </div>
+
+      {/* MODAL PHÒNG CHƠI NHÓM */}
+      <RoomModal
+        isOpen={isRoomModalOpen}
+        onClose={() => setIsRoomModalOpen(false)}
+      />
     </div>
   );
 }

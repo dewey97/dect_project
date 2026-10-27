@@ -17,6 +17,8 @@ export const INVESTIGATION_EVENTS = {
   TOGGLE_BOARD: "toggle-board-modal",
   REFRESH_CANVAS_STATE: "refresh-canvas-state",
   OPEN_CANVAS_THEME: "open-canvas-theme-modal",
+  OPEN_CANVAS_GUIDE: "open-canvas-guide-modal",
+  OPEN_CANVAS_TOUR: "open-canvas-tour",
 } as const;
 
 export type InvestigationEventName =

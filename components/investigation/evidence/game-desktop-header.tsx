@@ -135,10 +135,16 @@ export function GameDesktopHeader({
               </div>
             )}
 
-            {/* 3. Sổ tay hướng dẫn (mở modal cẩm nang nghiệp vụ gameplay) */}
+            {/* 3. Sổ tay hướng dẫn (mở modal cẩm nang nghiệp vụ gameplay phù hợp theo từng chế độ xem) */}
             <button
               type="button"
-              onClick={() => emitInvestigationEvent("OPEN_GUIDE")}
+              onClick={() => {
+                if (viewMode === "canvas") {
+                  emitInvestigationEvent("OPEN_CANVAS_GUIDE");
+                } else {
+                  emitInvestigationEvent("OPEN_GUIDE");
+                }
+              }}
               className="hover:text-[#d9a066] transition-colors cursor-pointer"
             >
               Sổ tay hướng dẫn

@@ -730,8 +730,8 @@ function WebEvidencePageContent() {
       suppressHydrationWarning
       className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-stretch justify-start box-border min-h-0 min-w-0 select-none"
     >
-      {/* DESKTOP HEADER (GIỐNG LANDING PAGE, CHỈ HIỂN THỊ TRÊN DESKTOP) */}
-      {!(isMounted && isMobile) && (
+      {/* DESKTOP HEADER (CHỈ HIỂN THỊ KHI Ở CHẾ ĐỘ XEM LẺ; CHẾ ĐỘ CANVAS ĐÃ TÍCH HỢP TOÀN BỘ VÀO SIDEBAR DỌC) */}
+      {!(isMounted && isMobile) && viewMode !== "canvas" && (
         <GameDesktopHeader
           viewMode={viewMode}
           onViewModeChange={handleSetViewMode}

@@ -229,27 +229,57 @@ export function DossierTray({
       }
     });
 
+    const filterKey =
+      selectedPhaseFilter && selectedPhaseFilter !== "all"
+        ? String(selectedPhaseFilter)
+        : null;
+
     const result: { key: string; title: string; items: CombinedItem[] }[] = [];
     groupsMap.forEach((g) => {
+      if (filterKey && g.key !== filterKey) return;
       if (g.items.length > 0) {
         g.items.sort((a, b) => a.order - b.order);
         result.push(g);
       }
     });
 
-    if (unassignedGroup.items.length > 0) {
-      unassignedGroup.items.sort((a, b) => a.order - b.order);
-      result.push(unassignedGroup);
+    if (!filterKey || filterKey === "unassigned") {
+      if (unassignedGroup.items.length > 0) {
+        unassignedGroup.items.sort((a, b) => a.order - b.order);
+        result.push(unassignedGroup);
+      }
     }
 
     return result;
-  }, [dossiers, pdfItems]);
+  }, [dossiers, pdfItems, selectedPhaseFilter]);
+
+  const chips = useMemo(() => {
+    const list: { label: string; val: string }[] = [
+      { label: "Tất cả", val: "all" },
+    ];
+    if (dossiers && dossiers.length > 0) {
+      dossiers.forEach((d) => {
+        list.push({ label: d.title, val: d.dossier_key });
+      });
+    } else {
+      list.push(
+        { label: "Ban Đầu", val: "ban_dau" },
+        { label: "Bộ A", val: "bo_a" },
+        { label: "Bộ B", val: "bo_b" },
+        { label: "Bộ C", val: "bo_c" },
+        { label: "Kết Luận", val: "ket_luan" },
+      );
+    }
+    list.push({ label: "Chưa gán bộ", val: "unassigned" });
+    return list;
+  }, [dossiers]);
 
   const filteredPdfs = pdfItems;
   const filteredEvidence = evidenceItems;
 
   return (
     <div
+      data-tour="canvas-dossier-tray"
       style={{
         width: isDossierCollapsed ? 0 : `${dossierWidth}px`,
         transition: isResizing ? "none" : undefined,
@@ -349,6 +379,34 @@ export function DossierTray({
           </button>
         </div>
       </div>
+
+      {/* 2.5. CHIP LỌC TẬP HỒ SƠ (Tất cả, Ban Đầu, Bộ A, ...) */}
+      {filterTab === "pdf" && chips.length > 1 && (
+        <div className="shrink-0 px-3 pb-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          {chips.map((chip) => {
+            const isActive = (selectedPhaseFilter || "all") === chip.val;
+            return (
+              <button
+                key={chip.val}
+                type="button"
+                onClick={() => {
+                  if (onSetPhaseFilter) {
+                    onSetPhaseFilter(chip.val);
+                  }
+                }}
+                className={cn(
+                  "px-2.5 py-1 rounded-full text-[11px] font-sans font-medium whitespace-nowrap transition-colors cursor-pointer shrink-0 border",
+                  isActive
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40 font-semibold"
+                    : "bg-[#141820] text-zinc-400 border-[#262c37] hover:text-zinc-200 hover:bg-[#1a202c]",
+                )}
+              >
+                {chip.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* 3. DANH SÁCH CUỘN CHÍNH: TÀI LIỆU NHÓM THEO TẬP HỒ SƠ TỪ TRÊN XUỐNG, VẬT CHỨNG HIỂN THỊ LƯỚI KHÔNG NHÓM */}
       <div

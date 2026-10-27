@@ -41,6 +41,7 @@ import {
   Stamp,
   Palette,
   Check,
+  HelpCircle,
 } from "lucide-react";
 import {
   DOSSIER_CANVAS_PRESETS,
@@ -1442,6 +1443,7 @@ export function DossierCanvasBoard({
     >
       {/* Center Interactive Surface (Vector Workspace with customizable theme & lighting) */}
       <main
+        data-tour="canvas-workspace"
         ref={containerRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -2069,6 +2071,7 @@ export function DossierCanvasBoard({
       {/* FLOATING TOOLBAR PHÍA DƯỚI MÀN HÌNH (THIẾT KẾ GỌN GÀNG, KHÔNG BAO GIỜ BỊ TRÀN HAY THỌT NÚT) */}
       <div
         id="dossier-floating-toolbar"
+        data-tour="canvas-bottom-toolbar"
         onMouseDown={(e) => e.stopPropagation()}
         className={cn(
           "fixed bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 bg-[#121418]/98 backdrop-blur-2xl px-2.5 py-1.5 rounded-2xl border border-[#353945] shadow-[0_16px_48px_rgba(0,0,0,0.9)] text-zinc-300 w-max max-w-[calc(100vw-2rem)] select-none overflow-visible transition-all duration-300 ease-in-out",
@@ -2665,6 +2668,16 @@ export function DossierCanvasBoard({
           title="Phóng to (Zoom in • hoặc lăn chuột lên)"
         >
           <Plus className="size-3.5" />
+        </button>
+
+        {/* NÚT CẨM NANG HƯỚNG DẪN BÀN HỒ SƠ */}
+        <button
+          type="button"
+          onClick={() => emitInvestigationEvent("OPEN_CANVAS_GUIDE")}
+          className="p-1.5 rounded-lg text-zinc-400 hover:text-amber-400 hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-center shrink-0"
+          title="Cẩm nang hướng dẫn Bàn hồ sơ"
+        >
+          <HelpCircle className="size-3.5" />
         </button>
 
         {/* VÁCH NGĂN */}
