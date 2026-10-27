@@ -557,7 +557,7 @@ export function CheckpointStudioClient({
   };
 
   const handleCreateNewCustomNode = async () => {
-    if (isLoading || isBoardLoading || isCreatingCustomNode) return;
+    if (isLoading || isBoardLoading || isCreatingCustomNode || isSaving || isBoardSaving) return;
     setIsCreatingCustomNode(true);
     try {
       const randomSuffix = Math.random().toString(36).substring(2, 6);
@@ -850,12 +850,16 @@ export function CheckpointStudioClient({
   const isEditingCustomNode = Boolean(
     selectedNode &&
       !("checkpoint_id" in selectedNode && selectedNode.checkpoint_id) &&
-      selectedNode.id.includes(":custom:"),
+      (selectedNode.id.includes(":custom:") ||
+        ("node_kind" in selectedNode && selectedNode.node_kind === "custom") ||
+        ("nodeKind" in selectedNode && selectedNode.nodeKind === "custom")),
   );
+
+  const isBusy = isLoading || isBoardLoading || isSaving || isBoardSaving || isCreatingCustomNode;
 
   return (
     <div
-      data-studio-ready={isSaving || isBoardSaving ? "false" : "true"}
+      data-studio-ready={isBusy ? "false" : "true"}
       className="flex h-full min-h-0 w-full flex-col bg-[#0c0d12]"
     >
       {/* 1. Header Toolbar của Checkpoint Studio & Board Studio gộp */}
@@ -970,7 +974,7 @@ export function CheckpointStudioClient({
             variant="outline"
             size="sm"
             onClick={createRow}
-            disabled={isSaving}
+            disabled={isBusy}
             className="gap-1 text-xs border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 h-7 px-2.5"
           >
             <Plus className="size-3.5 text-amber-400" />
@@ -983,7 +987,7 @@ export function CheckpointStudioClient({
             variant="outline"
             size="sm"
             onClick={handleCreateNewCustomNode}
-            disabled={isLoading || isCreatingCustomNode}
+            disabled={isBusy}
             className="gap-1 text-xs border-white/10 bg-zinc-900 text-zinc-200 hover:bg-zinc-800 h-7 px-2.5"
           >
             <Plus className="size-3.5 text-zinc-300" />
@@ -995,7 +999,7 @@ export function CheckpointStudioClient({
             type="button"
             size="sm"
             onClick={handleSaveBoardLayout}
-            disabled={isBoardSaving || !boardHasUnsavedChanges}
+            disabled={isBusy || isBoardSaving}
             className="gap-1 text-xs bg-amber-500 text-black font-semibold hover:bg-amber-600 disabled:opacity-50 h-7 px-2.5"
           >
             <Save className="size-3.5" />

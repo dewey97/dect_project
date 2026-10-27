@@ -281,6 +281,7 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
   const selectedNode =
     nodes.find((n) => n.id === selectedNodeId) ||
     pins.find((p) => p.id === selectedNodeId) ||
+    displayPins.find((p) => p.id === selectedNodeId) ||
     null;
 
   return {

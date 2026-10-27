@@ -56,7 +56,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
     });
   });
 
-  test.skip("2. Toàn trình tạo dữ liệu Trốn Tìm v2 qua Studio UI và nghiệm thu gameplay", async ({
+  test("2. Toàn trình tạo dữ liệu Trốn Tìm v2 qua Studio UI và nghiệm thu gameplay", async ({
     page,
   }, testInfo) => {
     test.setTimeout(240_000);
