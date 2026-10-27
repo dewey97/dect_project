@@ -141,6 +141,7 @@ Quy tắc thêm:
 | **B22** | **Chốt ổn định spec v2.** Làm B22-1 → B22-2. | bảng B22, `docs/reports/REVIEW_B21_2026-10-26.md` | Spec v2 `--repeat-each=3` → 3 passed; cả bộ 1 lần 0 fail |
 | **B23** | **Gộp Flow + Board thành một mặt phẳng** (chủ dự án chốt). Làm B23-1 → B23-5. | `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md` | Một màn hình, một dữ liệu, một nơi lưu vị trí; E2E mới pass |
 | **B24** | **Hoàn tất B23 trong worktree trước khi merge.** Làm B24-1 → B24-5. | `docs/reports/REVIEW_B23_2026-10-27.md` | E2E chạy được trong worktree, 0 fail; vị trí mobile có chỗ lưu; migration 44 chạy |
+| **B25** | **Bỏ skip test v2 trong worktree; sửa 2 canvas trùng trên `main`; rồi merge.** Làm B25-1 → B25-3. | `docs/reports/REVIEW_B24_2026-10-27.md` | `case-v2-from-studio` 2/2 pass, `case-000` 0 fail, `pnpm test:e2e` 0 fail |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -371,6 +372,26 @@ B24-1: gỡ junction node_modules bằng cmd /c rmdir node_modules (KHÔNG dùng
 B24-2: báo cáo phải có dòng tổng kết Playwright thật của từng lần chạy (E2E_PORT=3113). Không ghi "đạt" nếu chưa chạy.
 B24-4: báo chủ dự án trước khi chạy migration production.
 Báo cáo docs/reports/B24_REPORT.md: git log --oneline 2eaedc7..HEAD, dòng tổng kết test, danh sách file chạm ngoài vùng. Không làm live cursor.
+```
+
+### B25 — gỡ chặn merge B23 (2026-10-27)
+
+Nguồn: `docs/reports/REVIEW_B24_2026-10-27.md`. B25-1 làm trong worktree `D:\code_world\dect_wt_b23`. B25-2 làm trên `main` (vùng UI của chủ dự án): chủ dự án commit xong việc đang sửa rồi mới giao.
+
+| #     | Mức     | Việc | Tiêu chí done |
+| ----- | ------- | ---- | ------------- |
+| B25-1 | 🔴 Cao  | Worktree: bỏ `test.skip` ở `e2e/case-v2-from-studio.spec.ts` test 2, sửa selector theo màn hình gộp tới khi pass. Không được skip, `fixme` hay nới `expect` | `grep -n "test.skip\|test.fixme" e2e/case-v2-from-studio.spec.ts` = 0; dòng Playwright `2 passed` |
+| B25-2 | 🔴 Cao  | `main`: `app/(investigation)/evidence/web/page.tsx` chỉ mount **một** `MainInvestigationCanvas` (mobile **hoặc** desktop theo `useMediaQuery`/cờ `isMobile` sau mount, không dùng `lg:hidden` để giấu bản thứ 2). Sinh ra từ `99bdaa4` | `e2e/case-000.spec.ts` 0 fail; trên trang `/evidence/web?case_id=case_000` ở 1440px, `document.querySelectorAll('[title="Mở sổ tay ghi chép thám tử"]').length` = 1 |
+| B25-3 | 🟠 TB   | Sau B25-2: worktree merge `main` mới nhất, chạy 1 lần làm nóng rồi `pnpm test:e2e` (cổng 3113). Báo cáo `docs/reports/B25_REPORT.md`: dòng tổng kết thật từng lần chạy, mục "Chạm ngoài vùng" | 0 fail, 0 skip mới; reviewer merge `wt/b23-unified` vào `main` và dọn worktree |
+
+**Prompt giao việc B25:**
+
+```
+Đọc docs/reports/REVIEW_B24_2026-10-27.md, docs/WORKTREE_PLAN.md mục "Ngân sách kiểm thử cho AI thực thi" và bảng "B25".
+B25-1: trong D:\code_world\dect_wt_b23 (nhánh wt/b23-unified). Bỏ test.skip test 2 của e2e/case-v2-from-studio.spec.ts, sửa cho pass. Cấm skip/fixme/nới expect.
+B25-2: trên main, chỉ khi chủ dự án báo đã commit xong việc UI. Sửa app/(investigation)/evidence/web/page.tsx để chỉ mount một MainInvestigationCanvas. Chạy e2e/case-000.spec.ts tới 0 fail.
+B25-3: merge main vào wt/b23-unified, chạy 1 lần làm nóng (bỏ qua kết quả), rồi pnpm test:e2e (E2E_PORT=3113).
+Mỗi mục 1 commit, không push, không merge vào main. Báo cáo docs/reports/B25_REPORT.md với dòng tổng kết Playwright thật. Không làm live cursor.
 ```
 
 **Làm song song với chủ dự án (bắt buộc):** B23 chạy trong **worktree riêng**, không sửa thư mục `main` (`D:\code_world\dect_project`) — chủ dự án sửa UI/UX trên `main` cùng lúc.
