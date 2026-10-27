@@ -181,8 +181,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         pinColor = isMobile ? "yellow" : "red";
         noteColor = "yellow";
       } else if (node.node_kind === "victim") {
-        detail = `Hồ sơ nạn nhân: ${node.title || victimName}`;
-        if (!photoUrl) photoUrl = `/images/cases/${caseSlug}/victim_khang.png`;
+        const vChar = characters.find((c) => c.role === "victim");
+        detail = `Hồ sơ nạn nhân: ${vChar?.name || node.title || victimName}`;
+        if (!photoUrl) {
+          photoUrl = vChar?.avatar_url || (vChar as unknown as { avatarUrl?: string })?.avatarUrl || undefined;
+        }
         noteColor = "white";
       } else if (node.node_kind === "evidence_hub") {
         detail = "Danh mục vật chứng và tài liệu vụ án";

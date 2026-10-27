@@ -21,14 +21,14 @@ interface CheckpointIdentityFormProps {
 const INPUT_CLASS = "h-7 border-white/10 bg-black/30 text-xs text-zinc-100";
 
 const KIND_OPTIONS = [
-  { value: "phone_lookup", label: "📞 Tra cứu SĐT / Danh bạ" },
-  { value: "followup", label: "❓ Câu hỏi phụ sau thẩm tra" },
-  { value: "indictment", label: "⚖️ Cáo trạng kết án" },
-  { value: "choice", label: "🔘 Trắc nghiệm" },
-  { value: "code", label: "🔢 Nhập mã số / Mật khẩu" },
-  { value: "time", label: "⏰ Mốc thời gian" },
-  { value: "text", label: "📝 Nhập văn bản / Tự luận" },
-  { value: "epilogue", label: "📜 Hậu án" },
+  { value: "phone_lookup", label: "Tra cứu SĐT / Danh bạ" },
+  { value: "followup", label: "Câu hỏi phụ sau thẩm tra" },
+  { value: "indictment", label: "Cáo trạng kết án" },
+  { value: "choice", label: "Trắc nghiệm" },
+  { value: "code", label: "Nhập mã số / Mật khẩu" },
+  { value: "time", label: "Mốc thời gian" },
+  { value: "text", label: "Nhập văn bản / Tự luận" },
+  { value: "epilogue", label: "Hậu án" },
 ];
 
 export function CheckpointIdentityForm({
@@ -63,32 +63,13 @@ export function CheckpointIdentityForm({
 
   return (
     <div className="space-y-2.5">
-      {/* Chọn Bộ Hồ Sơ Mở Khóa */}
-      <select
-        value={draft.unlocksDossier || ""}
-        onChange={(event) => onChange({ unlocksDossier: event.target.value })}
-        className="h-7 w-full rounded-md border border-purple-500/30 bg-[#14101e] px-2 text-xs font-medium text-purple-200 outline-none focus:border-purple-400"
-      >
-        <option value="" className="text-zinc-500 bg-[#101014]">
-          -- Không mở khóa hồ sơ --
-        </option>
-        {dossiers.map((d) => (
-          <option
-            key={d.dossier_key}
-            value={d.title || d.dossier_key}
-            className="text-purple-200 bg-[#161220]"
-          >
-            📁 {d.title || d.dossier_key}
-          </option>
-        ))}
-      </select>
-
+      {/* 1. Loại Checkpoint đưa lên đầu với Title 'Checkpoint' */}
       <div className={showSubjectKey ? "grid grid-cols-2 gap-2" : ""}>
-        <Field label="Loại Checkpoint (Kind)" required>
+        <Field label="Checkpoint" required>
           <select
             value={currentKind}
             onChange={(e) => handleKindChange(e.target.value)}
-            className="h-7 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50"
+            className="h-8 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50 cursor-pointer"
           >
             {KIND_OPTIONS.map((item) => (
               <option key={item.value} value={item.value}>
@@ -103,25 +84,42 @@ export function CheckpointIdentityForm({
             <select
               value={draft.subjectKey || ""}
               onChange={(e) => onChange({ subjectKey: e.target.value })}
-              className="h-7 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50"
+              className="h-8 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50 cursor-pointer"
             >
               <option value="">-- Chọn nhân vật --</option>
               {characters.map((c) => (
                 <option key={c.key} value={c.key}>
-                  {c.name} ({c.key})
+                  {c.name}
                 </option>
               ))}
-              {draft.subjectKey &&
-                !characters.some((c) => c.key === draft.subjectKey) && (
-                  <option value={draft.subjectKey}>
-                    ⚠ {draft.subjectKey} (không tìm thấy)
-                  </option>
-                )}
             </select>
           </Field>
         )}
       </div>
 
+      {/* 2. Mở khóa hồ sơ gọn gàng, bỏ icon */}
+      <Field label="Mở khóa hồ sơ">
+        <select
+          value={draft.unlocksDossier || ""}
+          onChange={(event) => onChange({ unlocksDossier: event.target.value })}
+          className="h-8 w-full rounded-md border border-white/10 bg-black/40 px-2 text-xs font-medium text-purple-200 outline-none focus:border-purple-400 cursor-pointer"
+        >
+          <option value="" className="text-zinc-500 bg-[#101014]">
+            -- Không mở khóa hồ sơ --
+          </option>
+          {dossiers.map((d) => (
+            <option
+              key={d.dossier_key}
+              value={d.title || d.dossier_key}
+              className="text-purple-200 bg-[#161220]"
+            >
+              {d.title || d.dossier_key}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      {/* 3. Câu hỏi */}
       <Field label="Câu hỏi">
         <AutoGrowTextarea
           value={draft.question}
@@ -136,14 +134,7 @@ export function CheckpointIdentityForm({
           Tùy chọn nâng cao & Phụ thuộc
         </summary>
         <div className="mt-2 space-y-2.5 border-t border-white/5 pt-2">
-          <Field label="Mã định danh">
-            <Input
-              value={draft.checkpointId || ""}
-              onChange={(e) => onChange({ checkpointId: e.target.value })}
-              placeholder="VD: cp_01..."
-              className={INPUT_CLASS}
-            />
-          </Field>
+          
 
           {/* Cấu hình hiển thị trên Bảng điều tra */}
           <div className="space-y-1.5 rounded border border-white/5 bg-black/20 p-2">
