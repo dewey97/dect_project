@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-27): B23/B24 (gộp Flow + Board) đạt phần code trong worktree `wt/b23-unified`, **chưa merge**: test v2 bị skip (B25-1) và `case-000` fail do 2 canvas trùng từ `99bdaa4` trên `main` (B25-2). Chủ dự án: commit việc UI đang làm để giao B25-2; sau B25 mới push, smoke test production, A6, A10, xác nhận gói Supabase rồi giao live cursor.
+Tiến độ (2026-10-27): B23/B24 (gộp Flow + Board) đã merge vào `main` (`3ae0db2`), worktree đã dọn; `main` chưa push. Còn B25 trên `main`: bỏ skip test v2 (B25-1), chỉ mount 1 canvas để `case-000` hết fail (B25-2), chạy cả bộ E2E (B25-3). Sau B25: push, smoke test production, 6 vụ tĩnh `/activate`, A6, A10, xác nhận gói Supabase rồi giao live cursor.
 
 ---
 
