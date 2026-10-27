@@ -6,6 +6,16 @@ export interface AnnotationStroke {
   points: { x: number; y: number }[];
 }
 
+export interface CanvasStickyNote {
+  id: string;
+  x: number;
+  y: number;
+  content: string;
+  color: string;
+  createdAt: number;
+  authorName?: string;
+}
+
 /** Ping sự kiện thám tử chỉ điểm - realtime broadcast */
 export interface DetectivePing {
   id: string
@@ -43,6 +53,7 @@ export interface RoomInvestigationState {
   solvedCulprit: string | null;
   annotations?: Record<string, AnnotationStroke[]>;
   teamNotes?: string;
+  canvasNotes?: CanvasStickyNote[];
   lastAction?: {
     by?: string;
     text: string;
@@ -71,4 +82,5 @@ export const DEFAULT_ROOM_STATE: RoomInvestigationState = {
   solvedCulprit: null,
   annotations: {},
   teamNotes: '',
+  canvasNotes: [],
 };

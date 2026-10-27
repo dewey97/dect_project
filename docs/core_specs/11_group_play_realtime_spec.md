@@ -85,6 +85,11 @@ export interface RoomInvestigationState {
   indictmentSolved: boolean
   indictmentCulprit: 'vu' | 'tung' | 'ha' | null
 
+  // Ghi chú & Lớp vẽ tương tác nhóm
+  teamNotes?: string                  // Cuốn sổ tay điều tra chung (Notebook Modal)
+  annotations?: Record<string, AnnotationStroke[]> // Lớp vẽ/dạ quang đè trên tài liệu
+  canvasNotes?: CanvasStickyNote[]    // Giấy dán ghi chú trực tiếp trên bàn Canvas (Sticky Notes)
+
   // Nhật ký hành động gần nhất để hiển thị Toast thông báo
   lastAction?: {
     actorName: string

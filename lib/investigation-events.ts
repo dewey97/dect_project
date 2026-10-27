@@ -15,6 +15,8 @@ export const INVESTIGATION_EVENTS = {
   OPEN_NOTEBOOK: "open-notebook-modal",
   OPEN_BOARD: "open-board-modal",
   TOGGLE_BOARD: "toggle-board-modal",
+  REFRESH_CANVAS_STATE: "refresh-canvas-state",
+  OPEN_CANVAS_THEME: "open-canvas-theme-modal",
 } as const;
 
 export type InvestigationEventName =

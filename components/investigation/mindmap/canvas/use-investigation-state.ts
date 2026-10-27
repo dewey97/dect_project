@@ -18,7 +18,7 @@ import {
 import { caseStorageKey, clearCaseProgress } from "@/lib/cases/case-id";
 import { getActiveVictim, isVictimReference } from "@/lib/cases/case-characters";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { emitInvestigationEvent, useInvestigationEvent } from "@/lib/investigation-events";
 
 export interface SuspectItem {
   id: string;
@@ -126,7 +126,7 @@ export function useInvestigationState(opts?: {
     []
   );
 
-  useEffect(() => {
+  const reloadProgress = useCallback(() => {
     const rawSuspects = getStorageJson<any[]>(sKey("canvas_suspects"), []);
     const validList = rawSuspects.filter((s) => s && s.id && s.name);
     if (validList.length > 0) {
@@ -167,8 +167,16 @@ export function useInvestigationState(opts?: {
         setSolvedCulprit(savedCulprit);
       }
     }
-    setIsProgressLoaded(true);
   }, [sKey, isReinvestigateConditionMet]);
+
+  useEffect(() => {
+    reloadProgress();
+    setIsProgressLoaded(true);
+  }, [reloadProgress]);
+
+  useInvestigationEvent("REFRESH_CANVAS_STATE", () => {
+    reloadProgress();
+  });
 
   // Sync state when in a group room
   useEffect(() => {

@@ -572,6 +572,9 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
               if (patch.teamNotes !== undefined) {
                 next.teamNotes = patch.teamNotes;
               }
+              if (patch.canvasNotes !== undefined) {
+                next.canvasNotes = patch.canvasNotes;
+              }
               return next;
             });
 
@@ -599,6 +602,10 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
                     newRow.state_json.teamNotes !== undefined
                       ? newRow.state_json.teamNotes
                       : prev.teamNotes,
+                  canvasNotes:
+                    newRow.state_json.canvasNotes !== undefined
+                      ? newRow.state_json.canvasNotes
+                      : prev.canvasNotes,
                 }));
               }
             },
@@ -689,6 +696,9 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       }
       if (patch.teamNotes !== undefined) {
         nextMerged.teamNotes = patch.teamNotes;
+      }
+      if (patch.canvasNotes !== undefined) {
+        nextMerged.canvasNotes = patch.canvasNotes;
       }
 
       setRoomState(nextMerged);
