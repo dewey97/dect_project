@@ -47,15 +47,15 @@ export function OffBoardTray({
   onPromoteCharacterToSuspect,
   className,
 }: OffBoardTrayProps) {
-  // Lọc các checkpoint không hiển thị trên bảng:
+  // Lọc các checkpoint không hiển thị trên bảng (loại trừ epilogue theo yêu cầu):
   const offBoardCheckpoints = checkpoints.filter((cp) => {
     const isEpilogue =
       cp.kind === "epilogue" ||
       cp.type === "epilogue" ||
       cp.checkpoint_id.includes("epilogue");
+    if (isEpilogue) return false;
     const boardCfg = cp.board_config as BoardConfig | null;
-    const isExplicitlyHidden = boardCfg?.hidden === true;
-    return isEpilogue || isExplicitlyHidden;
+    return boardCfg?.hidden === true;
   });
 
   // Lọc các nhân vật không hiển thị trên bảng (nhân chứng, người liên quan)
@@ -64,7 +64,7 @@ export function OffBoardTray({
   );
 
   const totalItems =
-    offBoardCheckpoints.length + dossiers.length + offBoardCharacters.length;
+    offBoardCheckpoints.length + offBoardCharacters.length;
 
   return (
     <div
@@ -197,59 +197,16 @@ export function OffBoardTray({
                       <div className="text-xs font-medium text-zinc-100 truncate" title={char.name}>
                         {char.name}
                       </div>
-                      <div className="text-[10px] text-zinc-400 truncate font-mono">
-                        @{char.key}
-                      </div>
                     </div>
 
-                    <div className="text-[9px] text-zinc-500 flex items-center justify-between">
-                      <span>Vai trò: {char.role}</span>
-                      {isSelected ? (
+                    <div className="text-[9px] text-zinc-500 flex items-center justify-end">
+                      {isSelected && (
                         <span className="text-purple-400 font-semibold text-[10px]">Đang chọn</span>
-                      ) : (
-                        <span className="text-[9px] text-zinc-500 group-hover:text-purple-300">Bấm để sửa</span>
                       )}
                     </div>
                   </div>
                 );
               })}
-
-              {/* 3. Bộ hồ sơ ngoài bảng */}
-              {dossiers.map((dossier) => (
-                <div
-                  key={dossier.id}
-                  onClick={() => onSelectDossier?.(dossier)}
-                  className="group relative flex flex-col justify-between h-full min-w-[200px] max-w-[240px] rounded-md border border-cyan-500/20 bg-cyan-950/20 hover:border-cyan-500/40 hover:bg-cyan-900/30 p-2 text-left cursor-pointer transition-all duration-150 select-none shrink-0"
-                >
-                  <div className="flex items-start justify-between gap-1.5">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <FolderArchive className="size-3.5 text-cyan-400 shrink-0" />
-                      <span className="text-[9px] font-bold uppercase tracking-wider rounded px-1 py-0.2 bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shrink-0 font-mono">
-                        BỘ HỒ SƠ
-                      </span>
-                    </div>
-
-                    <div className="opacity-0 group-hover:opacity-100 text-cyan-400 text-[10px] flex items-center gap-0.5">
-                      <span>Dossier</span>
-                      <ExternalLink className="size-2.5" />
-                    </div>
-                  </div>
-
-                  <div className="my-1 min-w-0">
-                    <div className="text-xs font-medium text-cyan-100 truncate" title={dossier.title}>
-                      {dossier.title}
-                    </div>
-                    <div className="text-[10px] text-cyan-400/70 truncate font-mono">
-                      Khóa: {dossier.dossier_key}
-                    </div>
-                  </div>
-
-                  <div className="text-[9px] text-cyan-400/60 flex items-center justify-between">
-                    <span>{dossier.document_codes?.length || 0} tài liệu</span>
-                    <span className="text-[9px] text-zinc-500">Dossier Studio</span>
-                  </div>
-                </div>
-              ))}
             </>
           )}
         </div>

@@ -76,7 +76,7 @@ export function CheckpointEditor({
       : draft.type || "text");
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-[#0a0a0d]">
+    <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-[#0a0a0d] overflow-hidden">
       <header className="flex shrink-0 items-center gap-2 border-b border-white/10 bg-[#0b0b0e]/95 px-3 py-2">
         <span
           className={cn(
@@ -160,9 +160,7 @@ export function CheckpointEditor({
             <>
               {/* Form đáp án theo kind */}
               {effectiveKind === "phone_lookup" && (
-                <Section title="Cấu hình tra cứu SĐT / Danh bạ">
-                  <PhoneLookupConfigForm draft={draft} onChange={onChange} />
-                </Section>
+                <PhoneLookupConfigForm draft={draft} onChange={onChange} />
               )}
 
               {effectiveKind === "suspect_interrogation" && (

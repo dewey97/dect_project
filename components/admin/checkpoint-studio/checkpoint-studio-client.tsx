@@ -52,6 +52,7 @@ import {
   Users,
   Save,
   Plus,
+  Play,
   RotateCcw,
   RotateCw,
   Minus,
@@ -720,7 +721,28 @@ export function CheckpointStudioClient({
   };
 
   const handleCreateNewCharacter = () => {
-    setSelectedCharacter(null);
+    const tempKey = "char_" + Date.now().toString(36);
+    const newChar: DbCaseCharacter = {
+      id: "temp_" + tempKey,
+      case_slug: caseId,
+      key: tempKey,
+      name: "",
+      role: "witness",
+      avatar_url: null,
+      avatar_code: `avatar_${tempKey}`,
+      avatar_asset_path: null,
+      phones: [],
+      aliases: [],
+      description: "",
+      slot_index: characters.length,
+      device: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    setSelectedCharacter(newChar);
+    activeCharacterDraftRef.current = newChar;
+    setHasUnsavedCharacter(true);
+    setCharacters((prev) => [...prev, newChar]);
     setInspectorTab("characters");
     setSelectedNodeId(null);
   };
@@ -1261,6 +1283,44 @@ export function CheckpointStudioClient({
 
         {/* Thanh công cụ phải */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Nút Thêm Checkpoint */}
+          <Button
+            type="button"
+            size="sm"
+            onClick={createRow}
+            className="gap-1 text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 h-7 px-2.5 font-semibold cursor-pointer"
+            title="Tạo checkpoint mới"
+          >
+            <Plus className="size-3.5" />
+            <span>Thêm Checkpoint</span>
+          </Button>
+
+          {/* Nút Thêm Nhân vật */}
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleCreateNewCharacter}
+            className="gap-1 text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 h-7 px-2.5 font-semibold cursor-pointer"
+            title="Tạo nhân vật mới"
+          >
+            <Plus className="size-3.5" />
+            <span>Thêm Nhân vật</span>
+          </Button>
+
+          {/* Nút Chơi thử */}
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => handlePlaytest(draft?.checkpointId)}
+            className="gap-1 text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 h-7 px-2.5 font-semibold cursor-pointer"
+            title="Chơi thử vụ án"
+          >
+            <Play className="size-3.5" />
+            <span>Chơi thử</span>
+          </Button>
+
+          <div className="h-4 w-px bg-white/10 mx-0.5" />
+
           {/* Nút LƯU DUY NHẤT (Checkpoint, Nhân vật, Bố cục Bảng) */}
           <Button
             type="button"
@@ -1501,29 +1561,11 @@ export function CheckpointStudioClient({
                   </button>
                 </div>
 
-                {inspectorTab === "characters" || selectedCharacter ? (
-                  <button
-                    type="button"
-                    onClick={handleCreateNewCharacter}
-                    className="flex items-center gap-1 px-2 py-0.5 rounded bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 text-[10px] font-semibold transition-colors"
-                  >
-                    <Plus className="size-3" />
-                    <span>Thêm Nhân vật</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={createRow}
-                    className="flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-[10px] font-semibold transition-colors"
-                  >
-                    <Plus className="size-3" />
-                    <span>Thêm Checkpoint</span>
-                  </button>
-                )}
+
               </div>
 
               {/* Nội dung Inspector */}
-              <div className="flex-1 min-h-0 overflow-hidden">
+              <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                 {inspectorTab === "characters" || selectedCharacter ? (
                   <CharacterEditor
                     caseId={caseId}
@@ -1532,6 +1574,8 @@ export function CheckpointStudioClient({
                     checkpoints={rows}
                     onSave={handleSaveCharacter}
                     onDelete={handleDeleteCharacter}
+                    onDraftChange={handleCharacterLiveDraftChange}
+                    onInterrogationChange={handleCharacterInterrogationChange}
                     onOpenInterrogation={(cp) => {
                       selectRow(cp);
                       setSelectedCharacter(null);
