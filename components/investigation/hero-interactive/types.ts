@@ -35,6 +35,8 @@ export interface PinPoint {
   legacyId?: string;
   x: number;
   y: number;
+  mobileX?: number | null;
+  mobileY?: number | null;
   label: string;
   detail: string;
   color?:
@@ -91,6 +93,7 @@ export interface CaseConnection {
   id: string;
   fromPinId: string;
   toPinId: string;
+  isDependency?: boolean;
 }
 
 export type BoardMode = "zoom" | "pin";

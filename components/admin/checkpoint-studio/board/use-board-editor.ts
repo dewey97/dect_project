@@ -5,16 +5,15 @@ import type {
   PinPoint,
   CaseConnection,
 } from "@/components/investigation/hero-interactive";
-import type { DbCaseBoardNode } from "@/lib/types/database";
+import type { DbCaseBoardNode, DbCaseCheckpoint, DbCaseCharacter } from "@/lib/types/database";
 import {
-  getBoardNodes,
   saveBoardNode,
   deleteBoardNode,
   saveBoardNodesBatch,
   saveBoardgamePinPositions,
-  getBoardgamePinPositions,
   type BoardNodeDraft,
 } from "@/lib/actions/board-actions";
+import { useBoardModel } from "@/components/investigation/mindmap/canvas/use-board-model";
 import { toast } from "@/components/ui/toast";
 
 export interface BoardEditorSnapshot {
@@ -24,8 +23,9 @@ export interface BoardEditorSnapshot {
   positions: Record<string, { x: number; y: number }>;
 }
 
-export function useBoardEditor(caseId: string) {
-  const [isLoading, setIsLoading] = useState(true);
+export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; checkpoints?: DbCaseCheckpoint[]; characters?: DbCaseCharacter[] }) {
+  const boardModel = useBoardModel(caseId, { isMobile: options?.isMobile, initialCheckpoints: options?.checkpoints, initialCharacters: options?.characters });
+
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -40,79 +40,29 @@ export function useBoardEditor(caseId: string) {
     future: BoardEditorSnapshot[];
   }>({ past: [], future: [] });
 
+  // Đồng bộ từ boardModel khi nạp xong hoặc khi refresh
+  useEffect(() => {
+    if (!boardModel.isLoading) {
+      setNodes(boardModel.boardNodes);
+      setPins(boardModel.pins);
+      setConnections(boardModel.connections);
+      setPositions(boardModel.positions);
+      setHasUnsavedChanges(false);
+    }
+  }, [
+    boardModel.isLoading,
+    boardModel.boardNodes,
+    boardModel.pins,
+    boardModel.connections,
+    boardModel.positions,
+  ]);
+
   const currentSnapshot = useCallback((): BoardEditorSnapshot => ({
     nodes: [...nodes],
     pins: [...pins],
     connections: [...connections],
     positions: { ...positions },
   }), [nodes, pins, connections, positions]);
-
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [nodesRes, boardgameRes] = await Promise.all([
-        getBoardNodes(caseId),
-        getBoardgamePinPositions(caseId),
-      ]);
-
-      const loadedNodes = nodesRes.success ? nodesRes.data : [];
-      setNodes(loadedNodes);
-
-      // Loại bỏ các pin trùng ID với node từ bảng case_board_nodes để tránh bị vẽ đè 2 lần
-      const nodeIds = new Set(loadedNodes.map((n) => n.id));
-      const loadedPins: PinPoint[] = boardgameRes.success
-        ? boardgameRes.pins
-            .filter((p) => !nodeIds.has(p.id))
-            .map((p) => ({
-              id: p.id,
-              nodeKind: "custom",
-              x: p.x,
-              y: p.y,
-              label: p.label || p.id,
-              detail: p.detail || "",
-              photoUrl: p.photoUrl || undefined,
-              noteColor: (p.noteColor as any) || "white",
-              pinColor: (p.pinColor as any) || "red",
-              scale: p.scale ?? 1.0,
-              rotation: p.rotation ?? 0,
-            }))
-        : [];
-      setPins(loadedPins);
-
-      const posMap: Record<string, { x: number; y: number }> = {};
-      loadedNodes.forEach((n) => {
-        const pos = (n.config as any)?.position?.desktop;
-        if (pos && typeof pos.x === "number" && typeof pos.y === "number") {
-          posMap[n.id] = { x: pos.x, y: pos.y };
-        }
-      });
-      loadedPins.forEach((p) => {
-        posMap[p.id] = { x: p.x, y: p.y };
-      });
-      setPositions(posMap);
-
-      const loadedConns: CaseConnection[] = boardgameRes.success && boardgameRes.connections
-        ? boardgameRes.connections.map((c) => ({
-            id: c.id,
-            fromPinId: c.fromPinId,
-            toPinId: c.toPinId,
-          }))
-        : [];
-      setConnections(loadedConns);
-
-      historyRef.current = { past: [], future: [] };
-      setHasUnsavedChanges(false);
-    } catch (err: unknown) {
-      console.error("Failed to load board editor data:", err);
-      toast.error("Không thể tải dữ liệu bảng điều tra");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [caseId]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
 
   const commitSnapshot = useCallback((before: BoardEditorSnapshot) => {
     historyRef.current.past.push(before);
@@ -159,29 +109,15 @@ export function useBoardEditor(caseId: string) {
         [pinId]: { x, y },
       }));
 
-      // Cập nhật vị trí trong nodes nếu là board node
-      setNodes((prev) =>
-        prev.map((node) => {
-          if (node.id !== pinId) return node;
-          const cfg = (node.config as any) || {};
-          const currentPos = cfg.position || {};
-          return {
-            ...node,
-            config: {
-              ...cfg,
-              position: {
-                ...currentPos,
-                desktop: { x, y },
-                mobile: currentPos.mobile || { x, y },
-              },
-            },
-          };
-        }),
-      );
-
-      // Cập nhật vị trí trong pins nếu là custom pin
+      // Cập nhật vị trí trong pins (chuẩn hóa vào boardgame_pins: desktop hoặc mobile)
       setPins((prev) =>
-        prev.map((pin) => (pin.id === pinId ? { ...pin, x, y } : pin)),
+        prev.map((pin) => {
+          if (pin.id !== pinId) return pin;
+          if (options?.isMobile) {
+            return { ...pin, mobileX: x, mobileY: y };
+          }
+          return { ...pin, x, y };
+        }),
       );
     },
     [currentSnapshot, commitSnapshot],
@@ -232,14 +168,23 @@ export function useBoardEditor(caseId: string) {
         }
 
         toast.success("Đã lưu node thành công");
-        await loadData();
+        if (res.data) {
+          setNodes((prev) => {
+            const exists = prev.some((n) => n.id === res.data!.id);
+            if (exists) {
+              return prev.map((n) => (n.id === res.data!.id ? res.data! : n));
+            }
+            return [...prev, res.data!];
+          });
+        }
+        await boardModel.refresh();
         return true;
       } catch (err: unknown) {
         toast.error("Lỗi khi lưu node");
         return false;
       }
     },
-    [currentSnapshot, commitSnapshot, loadData],
+    [currentSnapshot, commitSnapshot, boardModel],
   );
 
   const handleDeleteNode = useCallback(
@@ -273,10 +218,9 @@ export function useBoardEditor(caseId: string) {
   const handleSaveAll = useCallback(async () => {
     setIsSaving(true);
     try {
-      // 1. Lưu nodes batch
+      // 1. Lưu nodes batch (metadata thuần túy, không ghi đè position)
       if (nodes.length > 0) {
         const batchNodes = nodes.map((n) => {
-          const currentPos = positions[n.id];
           const cfg = (n.config as any) || {};
           return {
             id: n.id,
@@ -286,29 +230,30 @@ export function useBoardEditor(caseId: string) {
             subject_key: n.subject_key,
             checkpoint_id: n.checkpoint_id,
             slot_index: n.slot_index,
-            config: currentPos
-              ? {
-                  ...cfg,
-                  position: {
-                    ...cfg.position,
-                    desktop: currentPos,
-                    mobile: cfg.position?.mobile || currentPos,
-                  },
-                }
-              : cfg,
+            config: cfg,
           };
         });
         await saveBoardNodesBatch(batchNodes);
       }
 
-      // 2. Lưu pins & connections qua saveBoardgamePinPositions
+      // 2. Lưu toàn bộ pins & connections qua saveBoardgamePinPositions (single source of truth for coordinates)
       await saveBoardgamePinPositions(
         caseId,
-        pins.map((p) => ({
-          ...p,
-          x: positions[p.id]?.x ?? p.x,
-          y: positions[p.id]?.y ?? p.y,
-        })),
+        pins.map((p) => {
+          const currentPos = positions[p.id];
+          if (options?.isMobile) {
+            return {
+              ...p,
+              mobileX: currentPos?.x ?? p.mobileX ?? p.x,
+              mobileY: currentPos?.y ?? p.mobileY ?? p.y,
+            };
+          }
+          return {
+            ...p,
+            x: currentPos?.x ?? p.x,
+            y: currentPos?.y ?? p.y,
+          };
+        }),
         connections,
       );
 
@@ -324,34 +269,14 @@ export function useBoardEditor(caseId: string) {
   }, [caseId, nodes, pins, connections, positions]);
 
   // Ghép toàn bộ pins hiển thị trên canvas
-  const displayPins: PinPoint[] = [
-    ...nodes.map((n) => {
-      const cfg = (n.config as any) || {};
-      const pos = positions[n.id] || cfg.position?.desktop || { x: 0.5, y: 0.5 };
-      return {
-        id: n.id,
-        nodeKind: n.node_kind as any,
-        subjectKey: n.subject_key || undefined,
-        checkpointId: n.checkpoint_id || undefined,
-        x: pos.x,
-        y: pos.y,
-        label: cfg.pin_title || n.title || n.id,
-        detail: n.title || "",
-        photoUrl: cfg.photo_url || undefined,
-        scale: cfg.scale ?? 1.0,
-        rotation: cfg.rotation ?? 0,
-        noteColor: (cfg.note_style ? "white" : undefined) as "white" | undefined,
-      };
-    }),
-    ...pins.map((p) => {
-      const pos = positions[p.id] || { x: p.x, y: p.y };
-      return {
-        ...p,
-        x: pos.x,
-        y: pos.y,
-      };
-    }),
-  ];
+  const displayPins: PinPoint[] = pins.map((p) => {
+    const pos = positions[p.id] || { x: p.x, y: p.y };
+    return {
+      ...p,
+      x: pos.x,
+      y: pos.y,
+    };
+  });
 
   const selectedNode =
     nodes.find((n) => n.id === selectedNodeId) ||
@@ -359,7 +284,7 @@ export function useBoardEditor(caseId: string) {
     null;
 
   return {
-    isLoading,
+    isLoading: boardModel.isLoading,
     isSaving,
     hasUnsavedChanges,
     nodes,
@@ -370,6 +295,7 @@ export function useBoardEditor(caseId: string) {
     selectedNodeId,
     selectedNode,
     setSelectedNodeId,
+    refreshBoardModel: boardModel.refresh,
     handleAdjustNodeTransform: (pinId: string, deltaRot: number, deltaScale: number) => {
       const targetNode = nodes.find((n) => n.id === pinId);
       if (targetNode) {
