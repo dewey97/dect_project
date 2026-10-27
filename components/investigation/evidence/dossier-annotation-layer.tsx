@@ -8,6 +8,7 @@ import type { AnnotationStroke } from '@/lib/types/room'
 
 export type AnnotationTool = 'cursor' | 'pen' | 'highlighter' | 'eraser'
 export type AnnotationColor = string
+export type EraserMode = 'freeform' | 'stroke'
 export type { AnnotationStroke }
 
 interface DossierAnnotationLayerProps {
@@ -16,9 +17,27 @@ interface DossierAnnotationLayerProps {
   activeColor: AnnotationColor
   activeSize: number
   scale: number
+  eraserMode?: EraserMode
+  eraserSize?: number
   onClearTrigger?: number
   width?: number
   height?: number
+}
+
+// Hàm tính khoảng cách từ điểm P đến đoạn thẳng AB
+function distToSegment(
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number
+): number {
+  const l2 = (bx - ax) ** 2 + (by - ay) ** 2
+  if (l2 === 0) return Math.hypot(px - ax, py - ay)
+  let t = ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / l2
+  t = Math.max(0, Math.min(1, t))
+  return Math.hypot(px - (ax + t * (bx - ax)), py - (ay + t * (by - ay)))
 }
 
 /**
@@ -32,6 +51,8 @@ export function DossierAnnotationLayer({
   activeColor,
   activeSize,
   scale,
+  eraserMode = 'stroke',
+  eraserSize = 18,
   onClearTrigger,
   width: explicitWidth,
   height: explicitHeight,
@@ -267,21 +288,10 @@ export function DossierAnnotationLayer({
     const pt = getCanvasPoint(e)
 
     if (activeTool === 'eraser') {
-      // Find stroke closest to eraser point (ngưỡng 22px thực tế)
-      const remaining = strokes.filter((s) => {
-        const isLegacy = s.points.some((p) => p.x > 1.05 || p.y > 1.05)
-        return !s.points.some((p) => {
-          const px = isLegacy ? p.x : p.x * w
-          const py = isLegacy ? p.y : p.y * h
-          const ptx = pt.x * w
-          const pty = pt.y * h
-          return Math.hypot(px - ptx, py - pty) < 22
-        })
-      })
-      if (remaining.length !== strokes.length) {
-        setStrokes(remaining)
-        setStorageJson(storageKey, remaining)
-        hasErasedRef.current = true
+      if (eraserMode === 'freeform') {
+        eraseFreeformAtPoint(pt, w, h)
+      } else {
+        eraseStrokeAtPoint(pt, w, h)
       }
       return
     }
@@ -296,6 +306,111 @@ export function DossierAnnotationLayer({
     redrawCanvas()
   }
 
+  // 1. Chế độ XÓA TRỌN NÉT (Stroke/Object Eraser - Chạm vào bất kỳ điểm nào là xóa cả nét liền)
+  const eraseStrokeAtPoint = (pt: { x: number; y: number }, w: number, h: number) => {
+    const threshold = 22
+    const remaining = strokes.filter((s) => {
+      const isLegacy = s.points.some((p) => p.x > 1.05 || p.y > 1.05)
+      return !s.points.some((p) => {
+        const px = isLegacy ? p.x : p.x * w
+        const py = isLegacy ? p.y : p.y * h
+        const ptx = pt.x * w
+        const pty = pt.y * h
+        return Math.hypot(px - ptx, py - pty) < threshold
+      })
+    })
+    if (remaining.length !== strokes.length) {
+      setStrokes(remaining)
+      setStorageJson(storageKey, remaining)
+      hasErasedRef.current = true
+    }
+  }
+
+  // 2. Chế độ XÓA NÉT TÙY Ý (Freeform / Pixel Eraser - Tẩy đến đâu cắt tỉa và xóa nét tại vị trí đó)
+  const eraseFreeformAtPoint = (pt: { x: number; y: number }, w: number, h: number) => {
+    const radius = eraserSize || 18
+    const ptx = pt.x * w
+    const pty = pt.y * h
+    let anyChanged = false
+
+    const nextStrokes: AnnotationStroke[] = []
+
+    for (const s of strokes) {
+      if (!s.points || s.points.length === 0) continue
+
+      const isLegacy = s.points.some((p) => p.x > 1.05 || p.y > 1.05)
+      const getPx = (p: { x: number; y: number }) => (isLegacy ? p.x : p.x * w)
+      const getPy = (p: { x: number; y: number }) => (isLegacy ? p.y : p.y * h)
+
+      // Kiểm tra sơ bộ xem nét này có nằm trong bán kính tẩy không
+      let strokeTouched = false
+      for (let i = 0; i < s.points.length; i++) {
+        const px = getPx(s.points[i])
+        const py = getPy(s.points[i])
+        if (Math.hypot(px - ptx, py - pty) <= radius) {
+          strokeTouched = true
+          break
+        }
+        if (i > 0) {
+          const prevPx = getPx(s.points[i - 1])
+          const prevPy = getPy(s.points[i - 1])
+          if (distToSegment(ptx, pty, prevPx, prevPy, px, py) <= radius) {
+            strokeTouched = true
+            break
+          }
+        }
+      }
+
+      if (!strokeTouched) {
+        nextStrokes.push(s)
+        continue
+      }
+
+      // Nét bị cọ tẩy chạm vào: Cắt tỉa nét và chia thành các sub-strokes
+      anyChanged = true
+      const currentRun: { x: number; y: number }[] = []
+
+      for (let i = 0; i < s.points.length; i++) {
+        const p = s.points[i]
+        const px = getPx(p)
+        const py = getPy(p)
+        const prevPx = i > 0 ? getPx(s.points[i - 1]) : px
+        const prevPy = i > 0 ? getPy(s.points[i - 1]) : py
+
+        const distPoint = Math.hypot(px - ptx, py - pty)
+        const distSeg = i > 0 ? distToSegment(ptx, pty, prevPx, prevPy, px, py) : Infinity
+        const inEraser = distPoint <= radius || distSeg <= radius
+
+        if (!inEraser) {
+          currentRun.push(p)
+        } else {
+          if (currentRun.length > 0) {
+            nextStrokes.push({
+              ...s,
+              id: `${s.id}_${nextStrokes.length}_${Math.random().toString(36).substring(2, 5)}`,
+              points: [...currentRun],
+            })
+            currentRun.length = 0
+          }
+        }
+      }
+
+      if (currentRun.length > 0) {
+        nextStrokes.push({
+          ...s,
+          id: `${s.id}_${nextStrokes.length}_${Math.random().toString(36).substring(2, 5)}`,
+          points: [...currentRun],
+        })
+      }
+    }
+
+    if (anyChanged) {
+      setStrokes(nextStrokes)
+      setStorageJson(storageKey, nextStrokes)
+      hasErasedRef.current = true
+    }
+  }
+
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isDrawingRef.current) return
     const canvas = canvasRef.current
@@ -304,20 +419,10 @@ export function DossierAnnotationLayer({
     const pt = getCanvasPoint(e)
 
     if (activeTool === 'eraser') {
-      const remaining = strokes.filter((s) => {
-        const isLegacy = s.points.some((p) => p.x > 1.05 || p.y > 1.05)
-        return !s.points.some((p) => {
-          const px = isLegacy ? p.x : p.x * w
-          const py = isLegacy ? p.y : p.y * h
-          const ptx = pt.x * w
-          const pty = pt.y * h
-          return Math.hypot(px - ptx, py - pty) < 22
-        })
-      })
-      if (remaining.length !== strokes.length) {
-        setStrokes(remaining)
-        setStorageJson(storageKey, remaining)
-        hasErasedRef.current = true
+      if (eraserMode === 'freeform') {
+        eraseFreeformAtPoint(pt, w, h)
+      } else {
+        eraseStrokeAtPoint(pt, w, h)
       }
       return
     }
@@ -379,6 +484,11 @@ export function DossierAnnotationLayer({
           cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23facc15" stroke="%23854d0e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h3l6-6"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>') 2 22, cell`,
         }
       case 'eraser':
+        if (eraserMode === 'freeform') {
+          return {
+            cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23f5c344" stroke-width="2"><circle cx="12" cy="12" r="8" stroke-dasharray="2 2"/><circle cx="12" cy="12" r="1.5" fill="%23f5c344"/></svg>') 12 12, crosshair`,
+          }
+        }
         // Con trỏ hình cục tẩy điều tra (hotspot: 6, 18)
         return {
           cursor: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23fca5a5" stroke="%23991b1b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>') 6 18, pointer`,

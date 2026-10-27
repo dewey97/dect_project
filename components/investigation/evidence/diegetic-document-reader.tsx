@@ -22,6 +22,8 @@ export function DiegeticDocumentReader({
   const [zoom, setZoom] = useState(1);
 
   const isA01 = code === "A-01" || title.toLowerCase().includes("cẩm nang");
+  const isA04 = code === "A-04" || title.toLowerCase().includes("khám nghiệm tử thi") || title.toLowerCase().includes("pháp y");
+  const isA05 = code === "A-05" || title.toLowerCase().includes("khám nghiệm hiện trường");
 
   return (
     <div className={cn("w-full h-full flex flex-col bg-[#0c0805] text-[#e5d8cb] overflow-hidden select-none", className)}>
@@ -140,6 +142,56 @@ export function DiegeticDocumentReader({
                     <p>
                       <strong>Hoàn tất hồ sơ cáo trạng:</strong> Kết luận hung thủ và nộp bản cáo trạng chính xác lên Viện Kiểm sát.
                     </p>
+                  </div>
+                </div>
+              </>
+            ) : isA04 ? (
+              <>
+                <div className="p-3 bg-[#ebe2d3] border-l-4 border-[#b91c1c] text-xs font-sans text-[#4a3625]">
+                  <strong>KẾT LUẬN GIÁM ĐỊNH PHÁP Y TỬ THI:</strong> Căn cứ biên bản giám định pháp y số 48/GĐPY-TTPY ngày 25/07/2016 đối với tử thi Nguyễn Văn Khang.
+                </div>
+
+                <div className="space-y-3 pt-2 text-sm leading-relaxed">
+                  <div>
+                    <p className="font-bold text-[#1b1510]">I. THÔNG TIN NẠN NHÂN:</p>
+                    <p>Họ và tên: <span className="font-semibold">Nguyễn Văn Khang</span> — Sinh ngày: 04/08/1988.</p>
+                    <p>Nơi cư trú: Số 14 Đường Bờ Sông, Phường Vĩnh Tuy, TP Hà Nội.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-bold text-[#1b1510]">II. DẤU VẾT THƯƠNG TÍCH NGOÀI DA:</p>
+                    <p>• Vết bầm tím kích thước 3x2cm ở vùng trán trái và gò má, bờ mép không rách da, hình thành do va đập với vật tày diện rộng.</p>
+                    <p>• Vùng cổ: Xuất hiện các điểm xuất huyết li ti dưới da; không phát hiện rãnh hằn dây thắt hay vết siết cơ học bằng dây.</p>
+                    <p>• Các đầu ngón tay tím tái, niêm mạc mắt và vòm họng xuất huyết dạng chấm điển hình của tình trạng ngạt cấp.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-bold text-[#1b1510]">III. KẾT LUẬN NGUYÊN NHÂN TỬ VONG:</p>
+                    <p>• <strong>Nguyên nhân tử vong:</strong> Ngạt thở cấp do thiếu dưỡng khí trong không gian kín (ngạt cơ học / ngạt khí).</p>
+                    <p>• <strong>Thời gian tử vong ước tính:</strong> Trong khoảng từ <span className="font-bold text-[#b91c1c]">20:30 đến 21:00 ngày 24/07/2016</span>.</p>
+                    <p>• Không phát hiện nồng độ độc chất hay thuốc an thần trong máu và dịch dạ dày.</p>
+                  </div>
+                </div>
+              </>
+            ) : isA05 ? (
+              <>
+                <div className="p-3 bg-[#ebe2d3] border-l-4 border-[#8c6b4f] text-xs font-sans text-[#4a3625]">
+                  <strong>BIÊN BẢN KHÁM NGHIỆM HIỆN TRƯỜNG:</strong> Lập hồi 07:00 ngày 25/07/2016 tại căn nhà cấp 4 số 14 Đường Bờ Sông.
+                </div>
+
+                <div className="space-y-3 pt-2 text-sm leading-relaxed">
+                  <div>
+                    <p className="font-bold text-[#1b1510]">I. TÌNH TRẠNG HIỆN TRƯỜNG:</p>
+                    <p>• Cửa chính khép nhưng không khóa chốt trong. Cửa sổ hông hướng ra đường ray tàu hỏa hé mở 15cm.</p>
+                    <p>• Phòng khách: Bàn uống nước bị xô lệch, một ấm trà gốm hoa cúc vỡ vụn dưới sàn gạch men, nước chè đã khô quánh, dính vết máu nhỏ văng (ký hiệu mẫu M1).</p>
+                    <p>• Phòng ngủ: Chiếc tủ gỗ đứng cao 1m80, then cài kim loại bên ngoài đang ở trạng thái sập chốt đóng chặt.</p>
+                  </div>
+
+                  <div>
+                    <p className="font-bold text-[#1b1510]">II. TANG VẬT VÀ DẤU VẾT THU GIỮ BAN ĐẦU:</p>
+                    <p>1. 01 điện thoại di động iPhone dính dấu vân tay mờ rơi gần chân ghế sô-pha (ký hiệu ev-10).</p>
+                    <p>2. Xấp tài liệu giấy tờ liên quan đơn từ tranh chấp quyền sử dụng đất vương vãi trên sàn.</p>
+                    <p>3. Các mảnh sành sứ vỡ của ấm trà dính dấu vết sinh học gửi giám định AND phòng KTHS.</p>
                   </div>
                 </div>
               </>

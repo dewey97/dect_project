@@ -5,6 +5,8 @@ import {
   Target,
   FolderOpen,
   ChevronRight,
+  ChevronLeft,
+  X,
 } from "lucide-react";
 import { cn, normalizeImageUrl } from "@/lib/utils";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
@@ -16,15 +18,30 @@ import type {
 } from "@/components/investigation/evidence/evidence-types";
 import type { DbCaseDossier } from "@/lib/types/database";
 
+export type DossierFilterTab = "pdf" | "evidence";
+
+export interface ActiveInspectorInfo {
+  type: "suspect" | "followup" | "custom_pin" | "notebook";
+  label: string;
+}
+
 interface DossierTrayProps {
   className?: string;
   dossierWidth: number;
   isDossierCollapsed: boolean;
   onToggleCollapse?: () => void;
+  resizable?: "left" | "right" | boolean;
+  onResizeWidth?: (width: number) => void;
+  onResetWidth?: () => void;
+  minWidth?: number;
+  maxWidth?: number;
   isViewerExpanded: boolean;
   mobileTab: "board" | "dossier";
-  filterTab: "pdf" | "evidence";
-  onSetFilterTab: (tab: "pdf" | "evidence") => void;
+  filterTab: DossierFilterTab;
+  onSetFilterTab: (tab: any) => void;
+  activeInspector?: ActiveInspectorInfo | null;
+  onCloseInspector?: () => void;
+  inspectorContent?: React.ReactNode;
   selectedPhaseFilter?: "all" | string | number;
   onSetPhaseFilter?: (val: "all" | string | number) => void;
   selectedDossierFilter?: string;
@@ -55,13 +72,22 @@ interface DossierTrayProps {
 }
 
 export function DossierTray({
+  className,
   dossierWidth,
   isDossierCollapsed,
   onToggleCollapse,
+  resizable,
+  onResizeWidth,
+  onResetWidth,
+  minWidth = 280,
+  maxWidth = 750,
   isViewerExpanded,
   mobileTab,
   filterTab,
   onSetFilterTab,
+  activeInspector,
+  onCloseInspector,
+  inspectorContent,
   selectedPhaseFilter,
   onSetPhaseFilter,
   selectedDossierFilter,
@@ -77,6 +103,56 @@ export function DossierTray({
   activePing,
   onBroadcastPing,
 }: DossierTrayProps) {
+  const resizableSide =
+    resizable === true ? "left" : typeof resizable === "string" ? resizable : undefined;
+
+  const [isResizing, setIsResizing] = React.useState(false);
+  const resizeRef = React.useRef({
+    startX: 0,
+    startWidth: dossierWidth,
+  });
+
+  const handlePointerDownResize = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+    resizeRef.current = {
+      startX: e.clientX,
+      startWidth: dossierWidth,
+    };
+
+    const targetEl = e.currentTarget;
+    try {
+      targetEl.setPointerCapture(e.pointerId);
+    } catch {}
+
+    const handlePointerMove = (ev: PointerEvent) => {
+      const deltaX =
+        resizableSide === "left"
+          ? resizeRef.current.startX - ev.clientX
+          : ev.clientX - resizeRef.current.startX;
+      const effectiveMin = minWidth;
+      const effectiveMax = Math.min(maxWidth, typeof window !== "undefined" ? window.innerWidth - 300 : maxWidth);
+      const nextWidth = Math.max(
+        effectiveMin,
+        Math.min(effectiveMax, resizeRef.current.startWidth + deltaX)
+      );
+      onResizeWidth?.(nextWidth);
+    };
+
+    const handlePointerUp = (ev: PointerEvent) => {
+      setIsResizing(false);
+      try {
+        targetEl.releasePointerCapture(ev.pointerId);
+      } catch {}
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
   // Nhóm tài liệu theo từng tập hồ sơ (hiển thị nối tiếp từ trên xuống dưới)
   const groupedPdfs = useMemo(() => {
     const orderedDossiers = [...dossiers].sort((a, b) => {
@@ -174,43 +250,73 @@ export function DossierTray({
     <div
       style={{
         width: isDossierCollapsed ? 0 : `${dossierWidth}px`,
+        transition: isResizing ? "none" : undefined,
       }}
       className={cn(
-        "w-full lg:w-auto shrink-0 bg-[#0f1115] border-l border-[#1e232b] rounded-none overflow-hidden flex flex-col h-full min-h-0 select-none transition-[width] duration-150 ease-out",
+        "w-full lg:w-auto shrink-0 bg-[#0f1115] rounded-none flex flex-col h-full min-h-0 select-none relative transition-[width] duration-150 ease-out",
+        resizableSide === "right" ? "border-r border-[#1e232b]" : "border-l border-[#1e232b]",
         isDossierCollapsed && "lg:hidden",
         isViewerExpanded && "hidden xl:flex",
         mobileTab === "dossier" ? "flex" : "hidden lg:flex",
+        className
       )}
     >
-      {/* 1. SIDEBAR HEADER: TÊN DANH MỤC + TỔNG SỐ LƯỢNG */}
-      <div className="shrink-0 px-3 pt-3 pb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2 min-w-0">
-          <FolderOpen className="size-4 text-zinc-300 shrink-0" />
-          <span className="font-sans text-xs font-semibold tracking-wide text-zinc-200 uppercase truncate">
-            Hồ sơ & Vật chứng
-          </span>
+      {/* THANH KÉO CO GIÃN ĐỘ RỘNG KHAY (MÉP TRÁI) */}
+      {resizableSide && !isDossierCollapsed && (
+        <div
+          onPointerDown={handlePointerDownResize}
+          onDoubleClick={onResetWidth}
+          className={cn(
+            "absolute top-0 bottom-0 z-40 w-3 cursor-ew-resize flex items-center justify-center select-none group touch-none transition-colors",
+            resizableSide === "left" ? "left-0 -translate-x-1.5" : "right-0 translate-x-1.5",
+            isResizing && "bg-zinc-500/20"
+          )}
+          title="Kéo sang hai bên để thay đổi độ rộng khay (Nhấp đúp để đặt lại mặc định)"
+        >
+          <div
+            className={cn(
+              "w-[2px] h-12 rounded-full transition-all group-hover:h-24 group-hover:w-[3px] group-hover:bg-zinc-300 drop-shadow-[0_0_6px_rgba(255,255,255,0.3)]",
+              isResizing ? "bg-zinc-300 h-full w-[2px]" : "bg-white/20 group-hover:bg-zinc-300"
+            )}
+          />
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="font-mono text-[10px] text-zinc-400 bg-[#161a22] px-1.5 py-0.5 rounded border border-[#262c37]">
-            {filterTab === "pdf"
-              ? `${filteredPdfs.length} tài liệu`
-              : `${filteredEvidence.length} vật chứng`}
-          </span>
+      )}
+
+      {/* 2. PHẦN TRÊN: PANEL CÂU HỎI / THẨM TRA (TỰ ÔM KHÍT NỘI DUNG, KHÔNG BỊ HỞ KHOẢNG TRỐNG) */}
+      {activeInspector && inspectorContent && (
+        <div className="shrink-0 max-h-[52vh] flex flex-col bg-[#16181d] border-b border-[#262c37] overflow-y-auto shadow-md relative animate-in fade-in slide-in-from-top-2 duration-150 custom-scrollbar">
+          {inspectorContent}
+        </div>
+      )}
+
+      {/* 3. PHẦN DƯỚI: KHAY HỒ SƠ & VẬT CHỨNG (HIỆN BÊN DƯỚI) */}
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-[#0f1115]">
+        {/* 1. SIDEBAR HEADER: TÊN DANH MỤC */}
+        <div className="shrink-0 px-3.5 pt-3 pb-2 flex items-center justify-between border-b border-[#1b2029]">
+          <div className="flex items-center gap-2 min-w-0">
+            <FolderOpen className="size-4 text-zinc-400 shrink-0" />
+            <span className="font-sans text-xs font-semibold tracking-wide text-zinc-200 uppercase truncate">
+              Hồ sơ & Vật chứng
+            </span>
+          </div>
           {onToggleCollapse && (
             <button
               type="button"
               onClick={onToggleCollapse}
               className="hidden lg:flex size-6 items-center justify-center rounded hover:bg-[#1b202a] text-zinc-400 hover:text-zinc-100 transition-colors cursor-pointer border border-[#262c37]"
-              title="Thu gọn khay hồ sơ"
+              title="Thu gọn khay tài liệu"
             >
-              <ChevronRight className="size-3.5" />
+              {resizableSide === "right" ? (
+                <ChevronLeft className="size-3.5" />
+              ) : (
+                <ChevronRight className="size-3.5" />
+              )}
             </button>
           )}
         </div>
-      </div>
 
-      {/* 2. MODERN SEGMENTED TABS (TÀI LIỆU | VẬT CHỨNG) */}
-      <div className="shrink-0 px-3 pb-2">
+      {/* 2. MODERN SEGMENTED TABS (TÀI LIỆU | VẬT CHỨNG | THẨM TRA) */}
+      <div className="shrink-0 px-3 pt-2.5 pb-2">
         <div className="p-1 bg-[#090b0e] rounded-md border border-[#1b2029] flex items-center gap-1">
           <button
             type="button"
@@ -224,16 +330,6 @@ export function DossierTray({
           >
             <FileText className="size-3.5 shrink-0" />
             <span className="truncate">Tài liệu</span>
-            <span
-              className={cn(
-                "font-mono text-[10px] px-1.5 py-0.2 rounded-full leading-none",
-                filterTab === "pdf"
-                  ? "bg-[#2d3748] text-zinc-200"
-                  : "bg-[#141820] text-zinc-500",
-              )}
-            >
-              {pdfItems.length}
-            </span>
           </button>
 
           <button
@@ -248,16 +344,6 @@ export function DossierTray({
           >
             <ImageIcon className="size-3.5 shrink-0" />
             <span className="truncate">Vật chứng</span>
-            <span
-              className={cn(
-                "font-mono text-[10px] px-1.5 py-0.2 rounded-full leading-none",
-                filterTab === "evidence"
-                  ? "bg-[#2d3748] text-zinc-200"
-                  : "bg-[#141820] text-zinc-500",
-              )}
-            >
-              {evidenceItems.length}
-            </span>
           </button>
         </div>
       </div>
@@ -498,6 +584,7 @@ export function DossierTray({
         )}
       </div>
     </div>
-  );
+  </div>
+);
 }
 

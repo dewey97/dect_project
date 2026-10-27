@@ -3,12 +3,12 @@
 import { useEffect, useRef } from 'react'
 import { X, FileText, ImageIcon, ShieldCheck } from 'lucide-react'
 import type { SelectedView } from '@/components/investigation/evidence/evidence-types'
-import { normalizeDrivePdfUrl, normalizeImageUrl } from '@/lib/utils'
+import { normalizeImageUrl } from '@/lib/utils'
 import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'
 import { trackDossierView, trackPhotoInspected } from '@/lib/analytics'
 import { DiegeticDossierSheet } from './evidence/diegetic-dossier-sheet'
 import { EvidencePhotoAnnotator } from './evidence/evidence-photo-annotator'
-import { NativePdfAnnotator } from './evidence/native-pdf-annotator'
+import { DiegeticDocumentReader } from './evidence/diegetic-document-reader'
 
 interface PDFViewerModalProps {
   pdfUrl?: string | null
@@ -23,8 +23,6 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, c
   const isEvidence = selectedView?.type === 'evidence'
   const isPdf = selectedView?.type === 'pdf'
   const activeTitle = title || (selectedView ? selectedView.data.title : 'Tài liệu')
-  const rawPdfUrl = pdfUrl || (isPdf ? selectedView.data.url : null)
-  const normalizedPdfUrl = rawPdfUrl ? normalizeDrivePdfUrl(rawPdfUrl) : null
 
   // Tracking thời gian xem tài liệu hoặc soi ảnh
   const openTimeRef = useRef<number>(Date.now())
@@ -104,11 +102,16 @@ export function PDFViewerModal({ pdfUrl, title, selectedView, isOpen, onClose, c
             <div className="w-full h-full min-h-0 min-w-0 bg-[#0f0c09] relative flex flex-col">
               <DiegeticDossierSheet document={matchedDossier} />
             </div>
-          ) : normalizedPdfUrl ? (
-            <NativePdfAnnotator
-              url={normalizedPdfUrl}
+          ) : selectedView ? (
+            /* Hiển thị tài liệu nghiệp vụ dạng văn bản diegetic chính thức */
+            <DiegeticDocumentReader
               title={activeTitle}
-              docCode={selectedView?.type === 'pdf' ? selectedView.data.code : undefined}
+              code={selectedView.data.code || "HỒ SƠ"}
+              dossierTitle={selectedView.data.dossierTitle}
+              description={
+                (selectedView.data as { preview?: string; description?: string }).preview ||
+                (selectedView.data as { preview?: string; description?: string }).description
+              }
             />
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">

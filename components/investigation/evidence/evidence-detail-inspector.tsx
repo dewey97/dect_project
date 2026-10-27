@@ -2,12 +2,11 @@
 
 import React from "react";
 import type { SelectedView } from "./evidence-types";
-import { normalizeDrivePdfUrl, normalizeImageUrl } from "@/lib/utils";
+import { normalizeImageUrl } from "@/lib/utils";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
 import { useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
 import { DiegeticDossierSheet } from "./diegetic-dossier-sheet";
 import { EvidencePhotoAnnotator } from "./evidence-photo-annotator";
-import { NativePdfAnnotator } from "./native-pdf-annotator";
 import { DiegeticDocumentReader } from "./diegetic-document-reader";
 
 interface EvidenceDetailInspectorProps {
@@ -27,7 +26,7 @@ export function EvidenceDetailInspector({
     return (
       <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-0 rounded-none items-center justify-center p-8 text-center text-[#8c745f] h-full">
         <p className="font-mono text-xs uppercase tracking-wider">
-          Chọn một tài liệu trong khay hồ sơ để bắt đầu điều tra
+          Chọn một tài liệu trong khay tài liệu để bắt đầu điều tra
         </p>
       </div>
     );
@@ -38,8 +37,6 @@ export function EvidenceDetailInspector({
     ? selectedView.data.code || "HỒ SƠ"
     : selectedView.data.code || "VẬT CHỨNG";
 
-  const rawPdfUrl = isPdf ? selectedView.data.url : "";
-  const pdfUrl = isPdf && rawPdfUrl ? normalizeDrivePdfUrl(rawPdfUrl) : "";
   const photoUrl = !isPdf ? normalizeImageUrl(selectedView.data.thumbnail) : "";
 
   const dossierTitle =
@@ -53,8 +50,6 @@ export function EvidenceDetailInspector({
         id: selectedView.data.id,
       })
     : undefined;
-
-  const hasValidPdfUrl = Boolean(pdfUrl && pdfUrl.trim() !== "");
 
   return (
     <div className="hidden lg:flex flex-1 min-w-0 min-h-0 bg-[#16120e] border-0 rounded-none overflow-hidden flex-col h-full relative">
@@ -77,15 +72,8 @@ export function EvidenceDetailInspector({
             <div className="w-full h-full min-h-0 min-w-0 bg-[#0f0c09] relative flex flex-col">
               <DiegeticDossierSheet document={matchedDossier} />
             </div>
-          ) : hasValidPdfUrl ? (
-            /* Hiển thị PDF dạng Native Canvas Annotator cho phép vẽ và tô màu */
-            <NativePdfAnnotator
-              url={pdfUrl}
-              title={selectedView.data.title}
-              docCode={selectedView.data.code}
-            />
           ) : (
-            /* Hiển thị tài liệu nghiệp vụ dạng văn bản diegetic chính thức (ví dụ cẩm nang A-01, văn bản lưu trữ) */
+            /* Hiển thị tài liệu nghiệp vụ dạng văn bản diegetic chính thức (ví dụ cẩm nang A-01, pháp y A-04, hiện trường A-05) */
             <DiegeticDocumentReader
               title={selectedView.data.title}
               code={displayCode}

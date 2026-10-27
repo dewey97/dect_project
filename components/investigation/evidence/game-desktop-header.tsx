@@ -55,7 +55,7 @@ export function GameDesktopHeader({
     <>
       <header
         className={cn(
-          "hidden lg:flex w-full shrink-0 z-40 border-b border-border/10 bg-card/90 backdrop-blur-md h-14",
+          "hidden lg:flex w-full shrink-0 z-40 border-b border-[#261b12]/80 bg-[#0d0a08]/95 backdrop-blur-md h-11",
           className
         )}
       >
@@ -65,25 +65,28 @@ export function GameDesktopHeader({
             <BrandMark
               href="/"
               className="h-full flex items-center"
-              imageClassName="h-5.5 w-auto block object-contain"
+              imageClassName="h-3.5 w-auto block object-contain"
             />
           </div>
 
           {/* CỘT GIỮA: Điều hướng gameplay tinh gọn (Proper case, không icon) */}
-          <nav className="flex-1 flex items-center justify-center gap-7 font-sans text-sm font-medium text-muted-foreground">
+          <nav className="flex-1 flex items-center justify-center gap-6 font-sans text-[13px] font-medium text-zinc-400">
             {/* 1. Kiểu xem: Dropdown chọn Bàn hồ sơ hoặc Xem lẻ */}
             {onViewModeChange && (
               <div className="relative" ref={viewDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsViewDropdownOpen((prev) => !prev)}
-                  className="hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className={cn(
+                    "hover:text-[#d9a066] transition-colors cursor-pointer inline-flex items-center gap-1.5",
+                    isViewDropdownOpen && "text-[#d9a066]"
+                  )}
                 >
                   <span>Kiểu xem</span>
                   <ChevronDown
                     className={cn(
-                      "size-3 text-muted-foreground transition-transform duration-200",
-                      isViewDropdownOpen && "rotate-180 text-primary"
+                      "size-3 text-zinc-500 transition-transform duration-200",
+                      isViewDropdownOpen && "rotate-180 text-[#d9a066]"
                     )}
                   />
                 </button>
@@ -100,7 +103,7 @@ export function GameDesktopHeader({
                         "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors cursor-pointer",
                         viewMode === "canvas"
                           ? "bg-[#d9a066]/20 text-[#f4e8d8] font-semibold"
-                          : "text-muted-foreground hover:text-foreground hover:bg-[#201710]"
+                          : "text-zinc-400 hover:text-zinc-100 hover:bg-[#201710]"
                       )}
                     >
                       <span>Bàn hồ sơ</span>
@@ -119,7 +122,7 @@ export function GameDesktopHeader({
                         "w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors cursor-pointer mt-0.5",
                         viewMode === "single"
                           ? "bg-[#d9a066]/20 text-[#f4e8d8] font-semibold"
-                          : "text-muted-foreground hover:text-foreground hover:bg-[#201710]"
+                          : "text-zinc-400 hover:text-zinc-100 hover:bg-[#201710]"
                       )}
                     >
                       <span>Xem lẻ</span>
@@ -136,7 +139,7 @@ export function GameDesktopHeader({
             <button
               type="button"
               onClick={() => emitInvestigationEvent("OPEN_GUIDE")}
-              className="hover:text-primary transition-colors cursor-pointer"
+              className="hover:text-[#d9a066] transition-colors cursor-pointer"
             >
               Sổ tay hướng dẫn
             </button>
@@ -145,7 +148,7 @@ export function GameDesktopHeader({
             <button
               type="button"
               onClick={() => setIsRoomModalOpen(true)}
-              className="hover:text-primary transition-colors cursor-pointer"
+              className="hover:text-[#d9a066] transition-colors cursor-pointer"
             >
               Chơi nhóm
             </button>
@@ -154,16 +157,16 @@ export function GameDesktopHeader({
             <button
               type="button"
               onClick={() => emitInvestigationEvent("OPEN_FEEDBACK")}
-              className="hover:text-primary transition-colors cursor-pointer"
+              className="hover:text-[#d9a066] transition-colors cursor-pointer"
             >
               Báo lỗi
             </button>
           </nav>
 
           {/* CỘT PHẢI: Dải Avatar đồng đội trực tuyến chuẩn Google Sheets + User Profile */}
-          <div className="min-w-64 h-full flex items-center justify-end gap-3 text-muted-foreground">
+          <div className="min-w-64 h-full flex items-center justify-end gap-3 text-zinc-400">
             <GoogleSheetsPresenceBar onOpenModal={() => setIsRoomModalOpen(true)} />
-            <div className="w-px h-5 bg-border/20" />
+            <div className="w-px h-4 bg-border/20" />
             <UserNav size="sm" />
           </div>
         </div>

@@ -186,6 +186,11 @@ function WebEvidencePageContent() {
   useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
   useInvestigationEvent("OPEN_NOTEBOOK", () => setActiveModal("notebook"));
+  useInvestigationEvent("OPEN_CANVAS_THEME", () => {
+    if (viewMode !== "canvas") {
+      handleSetViewMode("canvas");
+    }
+  });
   useInvestigationEvent("OPEN_HINT", (e: any) => {
     const cpId =
       e?.detail?.checkpointId ||
@@ -243,23 +248,36 @@ function WebEvidencePageContent() {
       };
     });
 
-    // 2. Thêm file PDF từ Supabase / Hook per-case
-    const testPdfItems: CombinedItem[] = casePdfs.map((doc) => {
-      const dInfo = dossierOf(doc.code);
-      const phase = dInfo ? dInfo.slotIndex : doc.phase;
-      return {
-        type: "pdf" as const,
-        data: {
-          ...doc,
+    // 2. Bổ sung các tài liệu giấy thuộc bộ hồ sơ chính (như A-01, A-04, A-05 trong Ban Đầu), loại bỏ trùng lặp và các mã rác/stub
+    const dossierCodes = new Set(
+      (dossierDocs || []).map((d) => (d.tag_code || "").trim().toUpperCase()),
+    );
+    const validAdditionalPdfs: CombinedItem[] = casePdfs
+      .filter((doc) => {
+        const c = (doc.code || "").trim().toUpperCase();
+        // Không nhận mã đã có trong Dossier Studio (tránh trùng A-15, A-17, A-20)
+        if (dossierCodes.has(c)) return false;
+        // Chỉ nhận các tài liệu thực sự thuộc bộ hồ sơ vụ án đã đăng ký trong case_dossiers
+        const dInfo = dossierOf(doc.code);
+        return Boolean(dInfo);
+      })
+      .map((doc) => {
+        const dInfo = dossierOf(doc.code);
+        const phase = dInfo ? dInfo.slotIndex : doc.phase;
+        return {
+          type: "pdf" as const,
+          data: {
+            ...doc,
+            url: "", // Giấy tờ điều tra: luôn preview dạng giấy diegetic, không mở PDF gốc
+            dossierKey: dInfo?.key || doc.dossierKey,
+            dossierTitle: dInfo?.title || doc.dossierTitle,
+          },
+          phase,
+          order: doc.order,
           dossierKey: dInfo?.key || doc.dossierKey,
           dossierTitle: dInfo?.title || doc.dossierTitle,
-        },
-        phase,
-        order: doc.order,
-        dossierKey: dInfo?.key || doc.dossierKey,
-        dossierTitle: dInfo?.title || doc.dossierTitle,
-      };
-    });
+        };
+      });
 
     // 3. Vật chứng ảnh từ Sheet hoặc Supabase
     let photoItems: CombinedItem[] = [];
@@ -342,7 +360,7 @@ function WebEvidencePageContent() {
       });
     }
 
-    return [...testPdfItems, ...dossierItems, ...photoItems];
+    return [...validAdditionalPdfs, ...dossierItems, ...photoItems];
   }, [
     dossierDocs,
     sheetEvidences,
@@ -879,12 +897,14 @@ function WebEvidencePageContent() {
         />
       </div>
 
-      {/* DETECTIVE NOTEBOOK MODAL */}
-      <DetectiveNotebookModal
-        isOpen={activeModal === "notebook"}
-        onClose={() => setActiveModal(null)}
-        caseId={caseId}
-      />
+      {/* DETECTIVE NOTEBOOK MODAL — Chỉ mở modal toàn cục có backdrop khi ở Single/Mobile view. Canvas view dùng Floating Notebook độc lập */}
+      {viewMode !== "canvas" && (
+        <DetectiveNotebookModal
+          isOpen={activeModal === "notebook"}
+          onClose={() => setActiveModal(null)}
+          caseId={caseId}
+        />
+      )}
 
       {/* MOBILE FULL SCREEN MODAL */}
       <PDFViewerModal

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { X, ExternalLink } from "lucide-react";
+import { X, ExternalLink, FolderOpen } from "lucide-react";
 import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
 import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
@@ -63,6 +63,7 @@ export function SingleInvestigationWorkspace({
   setActiveModal,
 }: SingleInvestigationWorkspaceProps) {
   const [dossierWidth] = useState<number>(340);
+  const [isDossierCollapsed, setIsDossierCollapsed] = useState<boolean>(false);
 
   return (
     <div className="w-full h-full flex-1 min-h-0 flex items-stretch justify-start overflow-hidden min-w-0 relative gap-0 p-0 select-none">
@@ -127,10 +128,24 @@ export function SingleInvestigationWorkspace({
         )}
       </div>
 
-      {/* CỘT 3: KHAY HỒ SƠ & VẬT CHỨNG (CỐ ĐỊNH BÊN PHẢI) */}
+      {/* NÚT MỞ LẠI KHAY TÀI LIỆU NỔI (GÓC PHẢI TRÊN KHI ĐANG THU GỌN) */}
+      {isDossierCollapsed && (
+        <button
+          type="button"
+          onClick={() => setIsDossierCollapsed(false)}
+          className="flex items-center gap-2 absolute top-3 right-3 z-30 px-3.5 py-2 rounded-lg bg-[#141210]/95 hover:bg-[#221c16] border border-[#3e2e20] hover:border-amber-500/50 text-[#d9a066] hover:text-[#f4e8d8] shadow-2xl backdrop-blur-md font-mono text-xs font-bold transition-all cursor-pointer group active:scale-95"
+          title="Mở Khay tài liệu"
+        >
+          <FolderOpen className="size-4 text-[#d9a066] transition-transform group-hover:scale-110" />
+          <span>Khay tài liệu</span>
+        </button>
+      )}
+
+      {/* CỘT 3: KHAY HỒ SƠ & VẬT CHỨNG (BÊN PHẢI) */}
       <DossierTray
         dossierWidth={dossierWidth}
-        isDossierCollapsed={false}
+        isDossierCollapsed={isDossierCollapsed}
+        onToggleCollapse={() => setIsDossierCollapsed(true)}
         isViewerExpanded={false}
         mobileTab="dossier"
         filterTab={filterTab}

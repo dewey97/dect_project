@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { User, LogOut, Settings, UserCircle, Terminal } from "lucide-react";
+import { User, LogOut, Settings, UserCircle, Terminal, Palette } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { cn } from "@/lib/utils";
 
 interface UserNavProps {
@@ -94,7 +95,7 @@ export function UserNav({ size = "md" }: UserNavProps) {
     const isSuperAdmin = user.app_metadata?.role === "super_admin";
 
     return (
-      <div className="relative" ref={dropdownRef}>
+      <div className="relative" ref={dropdownRef} data-user-nav="true">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
@@ -126,16 +127,28 @@ export function UserNav({ size = "md" }: UserNavProps) {
 
             <div className="p-1 flex flex-col gap-1">
               {isAdmin && (
-                <button
-                  onClick={() => {
-                    setIsOpen(false);
-                    router.push("/studio");
-                  }}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 transition-colors text-left font-medium border border-indigo-500/20 mb-1"
-                >
-                  <Terminal className="w-4 h-4" />
-                  Creator Studio
-                </button>
+                <>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      router.push("/studio");
+                    }}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 transition-colors text-left font-medium border border-indigo-500/20 mb-1 cursor-pointer"
+                  >
+                    <Terminal className="w-4 h-4" />
+                    Creator Studio
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      emitInvestigationEvent("OPEN_CANVAS_THEME");
+                    }}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-colors text-left font-medium border border-amber-500/20 mb-1 cursor-pointer"
+                  >
+                    <Palette className="w-4 h-4 text-amber-500" />
+                    Màu bàn hồ sơ (Canvas)
+                  </button>
+                </>
               )}
               <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors text-left cursor-not-allowed opacity-50">
                 <UserCircle className="w-4 h-4" />
