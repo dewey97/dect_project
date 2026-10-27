@@ -1302,6 +1302,8 @@ export function CheckpointStudioClient({
 
       {/* 2. Main Workspace: Dual-View (Flow + Board) + Inspector */}
       <div className="flex flex-1 min-h-0 w-full flex-col md:flex-row overflow-hidden relative">
+        <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden relative">
+          <div className="flex flex-1 min-h-0 w-full flex-row overflow-hidden relative">
         {/* CỘT 1: Sơ đồ luồng Flow hình hộp (Bên trái) */}
         <div
           style={{ width: `${flowWidth}px` }}
@@ -1402,6 +1404,10 @@ export function CheckpointStudioClient({
               onConnectPins={handleConnectPinsWithLogic}
               onDeleteConnection={handleDeleteConnectionWithLogic}
             />
+          </div>
+
+        </div>
+
           </div>
 
           {/* Khay "Ngoài bảng" (Off-board Tray) ở đáy canvas */}

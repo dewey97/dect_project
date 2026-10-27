@@ -93,7 +93,7 @@ function CheckpointFlowNodeCard({
   return (
     <div
       className={cn(
-        "w-[240px] rounded-xl border p-2.5 shadow-xl transition-all cursor-pointer select-none",
+        "w-[220px] rounded-xl border p-2.5 shadow-xl transition-all cursor-pointer select-none",
         active
           ? "border-purple-400 bg-[#161224] ring-2 ring-purple-400/40 shadow-[0_0_20px_rgba(168,85,247,0.25)]"
           : "border-white/10 bg-[#101016] hover:border-white/25 hover:bg-[#14141c]",
@@ -137,19 +137,6 @@ function CheckpointFlowNodeCard({
       <h4 className="font-sans text-xs font-bold text-zinc-100 line-clamp-1">
         {row.title || "Chưa đặt tiêu đề"}
       </h4>
-
-      {/* Question / Subtitle */}
-      {row.question && (
-        <p className="mt-1 text-[10px] text-zinc-400 line-clamp-2 leading-relaxed font-sans">
-          {row.question}
-        </p>
-      )}
-
-      {/* Footer metadata */}
-      <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-zinc-500">
-        <span className="truncate max-w-[120px] text-zinc-400">{row.dossier || "Hồ sơ"}</span>
-        <span>{hintCount} gợi ý</span>
-      </div>
 
       {/* Source handle (điểm nguồn mở khóa sang node khác) */}
       <Handle
