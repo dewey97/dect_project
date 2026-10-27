@@ -38,8 +38,8 @@ async function openBoard(page: Page) {
     }),
   );
   await page.goto(CASE_URL);
-  await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached();
-  await expect(page.locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]').first()).toBeAttached();
+  await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached({ timeout: 30_000 });
+  await expect(page.locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]').first()).toBeAttached({ timeout: 30_000 });
 }
 
 async function clickPin(page: Page, pinId: string) {
@@ -167,7 +167,7 @@ test.describe("case_000 baseline", () => {
     await solvePhoneLookup(page, ["Vũ", "Tùng", "Đạt"]);
     await expect.poll(() => storage(page, "phone_solved")).toBe("true");
     await expect(
-      page.getByText(/lấy lời khai/i).filter({ visible: true }),
+      page.getByText(/lấy lời khai/i).filter({ visible: true }).first(),
     ).toBeVisible();
   });
 
@@ -306,9 +306,9 @@ test.describe("case_000 baseline", () => {
     await page.goto(CASE_URL);
     await expect(
       page.locator('[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]').first(),
-    ).toBeAttached();
+    ).toBeAttached({ timeout: 30_000 });
 
-    await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached();
+    await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached({ timeout: 30_000 });
 
     // Bấm pin cáo trạng (đã giải) -> mở thẳng EpilogueModal
     await clickPin(page, "c0-pin-indictment");

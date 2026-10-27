@@ -43,7 +43,6 @@ export async function getCharactersByCase(
   caseId: string,
 ): Promise<{ success: boolean; data: DbCaseCharacter[]; error?: string }> {
   try {
-    await requireAdminAuth();
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("case_characters")

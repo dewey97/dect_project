@@ -29,7 +29,6 @@ export async function getCheckpointsByCase(
   caseId: string = "case_000",
 ): Promise<CheckpointListResult> {
   try {
-    await requireAdminAuth();
     const supabase = await createClient();
 
     const { data, error } = await supabase

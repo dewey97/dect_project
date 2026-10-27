@@ -170,6 +170,19 @@ function WebEvidencePageContent() {
     "all" | string | number
   >("all");
 
+  const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const [activeHintCheckpointId, setActiveHintCheckpointId] = useState<
     string | undefined
   >(undefined);
@@ -718,47 +731,51 @@ function WebEvidencePageContent() {
       className="h-full w-full bg-[#0d0a08] text-[#e5d8cb] font-sans selection:bg-[#d9a066]/30 selection:text-[#f4e8d8] overflow-hidden flex flex-col items-stretch justify-start box-border min-h-0 min-w-0 select-none"
     >
       {/* DESKTOP HEADER (GIỐNG LANDING PAGE, CHỈ HIỂN THỊ TRÊN DESKTOP) */}
-      <GameDesktopHeader
-        viewMode={viewMode}
-        onViewModeChange={handleSetViewMode}
-        isBoardOpen={isBoardOpen}
-        onToggleBoard={() => setIsBoardOpen((prev) => !prev)}
-      />
-
-      {/* 1. MÀN HÌNH DI ĐỘNG (< LG): WORKSPACE RIÊNG BIỆT CHO MOBILE */}
-      <div className="lg:hidden w-full flex-1 min-h-0 flex flex-col overflow-hidden relative">
-        <MobileInvestigationWorkspace
-          caseId={caseId}
-          mobileTab={mobileTab}
-          onSelectBoard={() => setMobileTab("board")}
-          onSelectDossierTab={(tab: "pdf" | "evidence") => {
-            setMobileTab("dossier");
-            setFilterTab(tab);
-          }}
-          filterTab={filterTab}
-          onSetFilterTab={(tab) => setFilterTab(tab)}
-          selectedPhaseFilter={selectedPhaseFilter}
-          onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
-          pdfItems={pdfItems}
-          evidenceItems={evidenceItems}
-          dossiers={dossiers}
-          selectedView={selectedView}
-          onSelectPdf={handleSelectPdf}
-          onSelectEvidence={handleSelectEvidence}
-          isPhaseUnlocked={isPhaseUnlocked}
-          isDossierUnlocked={isDossierUnlocked}
-          activePing={activePing}
-          broadcastPing={broadcastPing}
-          activeModal={activeModal}
-          setActiveModal={setActiveModal}
+      {!(isMounted && isMobile) && (
+        <GameDesktopHeader
+          viewMode={viewMode}
+          onViewModeChange={handleSetViewMode}
+          isBoardOpen={isBoardOpen}
+          onToggleBoard={() => setIsBoardOpen((prev) => !prev)}
         />
-      </div>
+      )}
 
-      {/* 2. MÀN HÌNH MÁY TÍNH (>= LG): WORKSPACE RIÊNG BIỆT CHO DESKTOP (BÀN HỒ SƠ HOẶC XEM LẺ) */}
-      <div
-        ref={workspaceRef}
-        className="hidden lg:flex w-full flex-1 min-h-0 flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 p-0"
-      >
+      {/* CHỈ MOUNT DUY NHẤT 1 WORKSPACE: MOBILE HOẶC DESKTOP THEO TRẠNG THÁI isMobile SAU MOUNT */}
+      {isMounted && isMobile ? (
+        /* 1. MÀN HÌNH DI ĐỘNG (< LG): WORKSPACE RIÊNG BIỆT CHO MOBILE */
+        <div className="w-full flex-1 min-h-0 flex flex-col overflow-hidden relative">
+          <MobileInvestigationWorkspace
+            caseId={caseId}
+            mobileTab={mobileTab}
+            onSelectBoard={() => setMobileTab("board")}
+            onSelectDossierTab={(tab: "pdf" | "evidence") => {
+              setMobileTab("dossier");
+              setFilterTab(tab);
+            }}
+            filterTab={filterTab}
+            onSetFilterTab={(tab) => setFilterTab(tab)}
+            selectedPhaseFilter={selectedPhaseFilter}
+            onSetPhaseFilter={(val) => setSelectedPhaseFilter(val)}
+            pdfItems={pdfItems}
+            evidenceItems={evidenceItems}
+            dossiers={dossiers}
+            selectedView={selectedView}
+            onSelectPdf={handleSelectPdf}
+            onSelectEvidence={handleSelectEvidence}
+            isPhaseUnlocked={isPhaseUnlocked}
+            isDossierUnlocked={isDossierUnlocked}
+            activePing={activePing}
+            broadcastPing={broadcastPing}
+            activeModal={activeModal}
+            setActiveModal={setActiveModal}
+          />
+        </div>
+      ) : (
+        /* 2. MÀN HÌNH MÁY TÍNH (>= LG): WORKSPACE RIÊNG BIỆT CHO DESKTOP (BÀN HỒ SƠ HOẶC XEM LẺ) */
+        <div
+          ref={workspaceRef}
+          className="w-full flex-1 min-h-0 flex flex-row items-stretch justify-start overflow-hidden min-w-0 relative gap-0 p-0"
+        >
         {viewMode === "canvas" ? (
           <CanvasInvestigationWorkspace
             caseId={caseId}
@@ -804,6 +821,7 @@ function WebEvidencePageContent() {
           />
         )}
       </div>
+      )}
 
       {/* PHASE UNLOCKED CINEMATIC STORY MODAL */}
       <PhaseUnlockedModal

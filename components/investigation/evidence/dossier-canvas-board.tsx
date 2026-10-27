@@ -1514,19 +1514,18 @@ export function DossierCanvasBoard({
                   className="flex items-center justify-between w-full px-4 py-2.5 min-h-[46px] bg-[#16181d] border border-[#2d3139] border-b-0 rounded-t-lg text-xs font-mono cursor-grab active:cursor-grabbing select-none shadow-md transition-colors hover:bg-[#1e222a]"
                   title="Nhấn giữ và kéo để di chuyển tài liệu này trên bàn làm việc"
                 >
-                  <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0 pr-3">
                     <GripHorizontal className="size-5 text-zinc-400 group-hover/dossier-card:text-zinc-200 transition-colors shrink-0" />
                     <span className="font-mono font-bold px-2.5 py-1 rounded text-xs bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 shrink-0 tracking-wider shadow-sm">
                       {docItem.tag_code}
                     </span>
-                    <span className="font-semibold text-sm sm:text-[15px] text-zinc-100 truncate max-w-[420px] tracking-wide">
-                      {docData.subjectName || docItem.subject_name}
+                    <span className="font-semibold text-sm sm:text-[15px] text-zinc-100 truncate tracking-wide">
+                      {docData.docTitle
+                        ? `${docData.docTitle} — ${docData.subjectName || docItem.subject_name}`
+                        : `Biên bản ghi lời khai: ${docData.subjectName || docItem.subject_name}`}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-300 px-2.5 py-1 rounded bg-zinc-800/60 border border-zinc-700/60">
-                      Lời khai
-                    </span>
                     <span className="text-[11px] font-mono text-zinc-400 hidden md:inline">
                       KÉO ĐỂ DI CHUYỂN
                     </span>
@@ -1614,19 +1613,16 @@ export function DossierCanvasBoard({
                   className="flex items-center justify-between w-full px-4 py-2.5 min-h-[46px] bg-[#16181d] border border-[#2d3139] border-b-0 rounded-t-lg text-xs font-mono cursor-grab active:cursor-grabbing select-none shadow-md transition-colors hover:bg-[#1e222a]"
                   title="Nhấn giữ và kéo để di chuyển tài liệu này trên bàn làm việc"
                 >
-                  <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0 pr-3">
                     <GripHorizontal className="size-5 text-zinc-400 group-hover/dossier-card:text-zinc-200 transition-colors shrink-0" />
                     <span className="font-mono font-bold px-2.5 py-1 rounded text-xs bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 shrink-0 tracking-wider shadow-sm">
                       {docItem.tag_code}
                     </span>
-                    <span className="font-semibold text-sm sm:text-[15px] text-zinc-100 truncate max-w-[480px] tracking-wide">
-                      {docData.fullName || docItem.subject_name}
+                    <span className="font-semibold text-sm sm:text-[15px] text-zinc-100 truncate tracking-wide">
+                      {`Lý lịch bị can: ${docData.fullName || docItem.subject_name}`}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-300 px-2.5 py-1 rounded bg-zinc-800/60 border border-zinc-700/60">
-                      Lý lịch bị can
-                    </span>
                     <span className="text-[11px] font-mono text-zinc-400 hidden md:inline">
                       KÉO ĐỂ DI CHUYỂN
                     </span>
@@ -1716,19 +1712,16 @@ export function DossierCanvasBoard({
                   className="flex items-center justify-between w-full px-4 py-2.5 min-h-[46px] bg-[#16181d] border border-[#2d3139] border-b-0 rounded-t-lg text-xs font-mono cursor-grab active:cursor-grabbing select-none shadow-md transition-colors hover:bg-[#1e222a]"
                   title="Nhấn giữ và kéo để di chuyển tài liệu này trên bàn làm việc"
                 >
-                  <div className="flex items-center gap-3 overflow-hidden">
+                  <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0 pr-3">
                     <GripHorizontal className="size-5 text-zinc-400 group-hover/dossier-card:text-zinc-200 transition-colors shrink-0" />
                     <span className="font-mono font-bold px-2.5 py-1 rounded text-xs bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 shrink-0 tracking-wider shadow-sm">
                       {itemCode}
                     </span>
-                    <span className="font-semibold text-sm sm:text-[15px] text-zinc-100 truncate max-w-[420px] tracking-wide">
+                    <span className="font-semibold text-sm sm:text-[15px] text-zinc-100 truncate tracking-wide">
                       {pdf.title}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-red-300 px-2.5 py-1 rounded bg-red-950/70 border border-red-700/70 shadow-sm">
-                      Tài liệu mật #{itemCode}
-                    </span>
                     <span className="text-[11px] font-mono text-zinc-400 hidden md:inline">
                       KÉO ĐỂ DI CHUYỂN
                     </span>
@@ -1921,67 +1914,56 @@ export function DossierCanvasBoard({
                   position: "absolute",
                   left: `${pos.x}px`,
                   top: `${pos.y}px`,
-                  zIndex: isDragging ? 50 : 10,
+                  zIndex: isDragging ? 50 : isSelected ? 20 : 10,
                 }}
                 className={cn(
-                  "w-[280px] bg-[#14100c] border-2 transition-shadow duration-150 p-3 rounded-lg flex flex-col justify-between shadow-xl border-[#38281b]",
-                  isDragging && "shadow-[0_25px_60px_rgba(0,0,0,0.85)] scale-[1.02]"
+                  "w-[280px] bg-[#16181d] rounded-lg overflow-hidden flex flex-col shadow-xl transition-all duration-150 select-none group/evidence-card",
+                  isSelected
+                    ? "ring-2 ring-amber-500/90 shadow-[0_12px_32px_rgba(245,158,11,0.25)]"
+                    : "border border-zinc-800/80 hover:border-zinc-700",
+                  isDragging && "shadow-[0_25px_60px_rgba(0,0,0,0.95)] scale-[1.02]"
                 )}
               >
-                {/* Drag handle header */}
+                {/* Header thanh tiêu đề trên cùng (kiêm drag handle) */}
                 <div
                   data-drag-handle="true"
                   onMouseDown={(e) => e.stopPropagation()}
                   onPointerDown={(e) => handleItemDragStart(e, key)}
                   onPointerMove={handleItemPointerMove}
                   onPointerUp={handleItemPointerUp}
-                  className="flex items-center justify-between pb-2 mb-2 border-b border-[#2d2015] cursor-grab active:cursor-grabbing select-none"
-                  title="Nhấn giữ và kéo để di chuyển vật chứng này trên bàn làm việc"
+                  className="flex items-center justify-between px-2.5 py-2 min-h-[36px] bg-[#1a1d24] border-b border-zinc-800/90 text-xs font-mono cursor-grab active:cursor-grabbing select-none group-hover/evidence-card:bg-[#20242d] transition-colors"
+                  title="Nhấn giữ và kéo để di chuyển ảnh trên bàn làm việc"
                 >
-                  <div className="flex items-center gap-1.5">
-                    <GripHorizontal className="size-4 text-[#8a7768] hover:text-[#d9a066] transition-colors shrink-0" />
-                    <span className="font-mono text-[10px] font-bold text-[#e8a86a] bg-black/80 px-2 py-0.5 border border-[#4a3523]">
-                      {ev.code || "TANG VẬT"}
+                  <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0 pr-1">
+                    <GripHorizontal className="size-4 text-zinc-400 group-hover/evidence-card:text-zinc-200 transition-colors shrink-0" />
+                    {ev.code && (
+                      <span className="font-mono text-[11px] font-bold text-amber-300 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-800/60 shrink-0">
+                        {ev.code}
+                      </span>
+                    )}
+                    <span className="font-sans font-semibold text-xs text-zinc-200 truncate tracking-wide">
+                      {ev.title}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-[#786454]">
-                    {ev.kind || "Ảnh"}
-                  </span>
                 </div>
 
-                {/* Photo Thumbnail */}
+                {/* Ảnh vật chứng tràn viền clean, không khung viền thừa, không mô tả */}
                 <div
                   onClick={() => {
                     setFocusedTag(itemCode);
                     onSelectEvidence(ev);
                   }}
-                  className="w-full aspect-[4/3] bg-black/60 border border-[#2d2015] relative overflow-hidden flex items-center justify-center cursor-pointer"
+                  className="w-full aspect-[4/3] bg-black/80 relative overflow-hidden flex items-center justify-center cursor-pointer"
                 >
                   {photoUrl ? (
                     <img
                       src={photoUrl}
                       alt={ev.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover select-none"
                     />
                   ) : (
-                    <ImageIcon className="size-8 text-[#5a402a]" />
+                    <ImageIcon className="size-8 text-zinc-600" />
                   )}
-                </div>
-
-                {/* Photo Title & Code */}
-                <div
-                  onClick={() => {
-                    setFocusedTag(itemCode);
-                    onSelectEvidence(ev);
-                  }}
-                  className="py-2.5 cursor-pointer"
-                >
-                  <h4 className="font-mono font-bold text-[#e5d8cb] text-xs truncate">
-                    {ev.title}
-                  </h4>
-                  <p className="font-sans text-[11px] text-[#8a7768] mt-1 line-clamp-2">
-                    {ev.preview || "Tang vật thu thập tại hiện trường phục vụ công tác điều tra."}
-                  </p>
                 </div>
               </div>
             );
@@ -2192,302 +2174,6 @@ export function DossierCanvasBoard({
                     </button>
                   );
                 })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* BẢNG CHỌN & SO SÁNH MÀU MẶT BÀN HỒ SƠ (CANVAS THEME POPUP) */}
-        {isThemePopupOpen && (
-          <div
-            ref={themePopupRef}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="fixed top-16 right-4 sm:right-6 w-[420px] max-w-[calc(100vw-2rem)] bg-[#121418]/98 backdrop-blur-2xl rounded-2xl border border-[#353945] shadow-[0_25px_60px_rgba(0,0,0,0.95)] p-3.5 flex flex-col gap-3 z-50 text-zinc-200 animate-in fade-in zoom-in-95 duration-100 select-none"
-          >
-            {/* Header: Title + Reset + Close */}
-            <div className="flex items-center justify-between pb-1 border-b border-zinc-800/80">
-              <div className="flex items-center gap-2">
-                <Palette className="size-4 text-amber-400 shrink-0" />
-                <span className="font-mono text-xs font-bold tracking-wider text-amber-300 uppercase">
-                  Mặt bàn hồ sơ
-                </span>
-                <span className="text-[10px] font-mono text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded truncate max-w-[130px]">
-                  {canvasTheme.name}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {(canvasTheme.id !== "mahogany-warm" || canvasTheme.isCustom) && (
-                  <button
-                    type="button"
-                    onClick={handleResetDefaultTheme}
-                    className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 transition-colors cursor-pointer"
-                    title="Khôi phục mặt bàn gỗ gụ mặc định"
-                  >
-                    <RotateCcw className="size-3" />
-                    <span>Mặc định</span>
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setIsThemePopupOpen(false)}
-                  className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
-                  title="Đóng bảng màu"
-                >
-                  <X className="size-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Tab navigation: [Mẫu sẵn có] / [Tùy biến tự do] */}
-            <div className="grid grid-cols-2 gap-1 p-0.5 bg-zinc-900/90 rounded-xl border border-zinc-800/80 text-xs font-mono">
-              <button
-                type="button"
-                onClick={() => setThemeActiveTab("presets")}
-                className={cn(
-                  "py-1.5 px-2 rounded-lg font-medium transition-all text-center cursor-pointer",
-                  themeActiveTab === "presets"
-                    ? "bg-zinc-800 text-amber-300 font-semibold shadow-sm"
-                    : "text-zinc-400 hover:text-zinc-200"
-                )}
-              >
-                Mẫu sẵn có ({DOSSIER_CANVAS_PRESETS.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setThemeActiveTab("custom")}
-                className={cn(
-                  "py-1.5 px-2 rounded-lg font-medium transition-all text-center cursor-pointer",
-                  themeActiveTab === "custom"
-                    ? "bg-zinc-800 text-amber-300 font-semibold shadow-sm"
-                    : "text-zinc-400 hover:text-zinc-200"
-                )}
-              >
-                Tùy biến tự do
-              </button>
-            </div>
-
-            {/* TAB 1: PRESETS (Chuyển đổi & So sánh nhanh) */}
-            {themeActiveTab === "presets" && (
-              <div className="flex flex-col gap-1.5 max-h-[310px] overflow-y-auto pr-1 scrollbar-thin">
-                <div className="text-[11px] text-zinc-400 px-0.5 flex items-center justify-between">
-                  <span>Nhấp để đổi ngay & so sánh màu:</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                  {DOSSIER_CANVAS_PRESETS.map((preset) => {
-                    const isActive = canvasTheme.id === preset.id && !canvasTheme.isCustom;
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() => handleApplyTheme(preset)}
-                        className={cn(
-                          "group relative flex items-center gap-2 p-2 rounded-xl text-left transition-all cursor-pointer border text-xs",
-                          isActive
-                            ? "bg-zinc-800/95 border-amber-500/80 shadow-[0_0_12px_rgba(245,195,68,0.25)] ring-1 ring-amber-500/50"
-                            : "bg-zinc-900/60 border-zinc-800/80 hover:bg-zinc-800/60 hover:border-zinc-700"
-                        )}
-                      >
-                        {/* Mini spotlight swatch */}
-                        <div
-                          className="size-7 rounded-lg shrink-0 shadow-inner border border-white/20 relative overflow-hidden flex items-center justify-center"
-                          style={{ background: preset.swatchGradient }}
-                        >
-                          {isActive && (
-                            <Check className="size-3.5 text-amber-300 stroke-[3] drop-shadow" />
-                          )}
-                        </div>
-                        <div className="flex flex-col min-w-0 flex-1">
-                          <span
-                            className={cn(
-                              "font-medium truncate leading-tight",
-                              isActive
-                                ? "text-amber-300 font-bold"
-                                : "text-zinc-200 group-hover:text-white"
-                            )}
-                          >
-                            {preset.name}
-                          </span>
-                          <span className="text-[10px] text-zinc-400 truncate mt-0.5">
-                            {preset.description}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: TÙY BIẾN TỰ DO (Custom Color Picker & Spotlight) */}
-            {themeActiveTab === "custom" && (
-              <div className="flex flex-col gap-3 text-xs">
-                {/* 1. Chọn màu nền mặt bàn */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[11px] text-zinc-400">1. Màu nền bàn (Base Color)</span>
-                    <span className="font-mono text-[11px] text-amber-400 uppercase font-semibold">
-                      {customBaseColor}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <label className="relative flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700/80 hover:border-amber-500/60 cursor-pointer transition-colors shrink-0">
-                      <div
-                        className="size-5 rounded-md border border-white/20 shadow-sm shrink-0"
-                        style={{ backgroundColor: customBaseColor }}
-                      />
-                      <span className="font-mono text-[11px] text-zinc-200 font-medium">Bảng màu...</span>
-                      <input
-                        type="color"
-                        value={customBaseColor}
-                        onChange={(e) =>
-                          handleUpdateCustomTheme(
-                            e.target.value,
-                            customLampTone,
-                            customLampIntensity,
-                            customGridType
-                          )
-                        }
-                        className="opacity-0 absolute inset-0 size-full cursor-pointer"
-                      />
-                    </label>
-
-                    {/* Quick color dots */}
-                    <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none flex-1">
-                      {QUICK_CUSTOM_COLORS.map((qc) => (
-                        <button
-                          key={qc.color}
-                          type="button"
-                          onClick={() =>
-                            handleUpdateCustomTheme(
-                              qc.color,
-                              customLampTone,
-                              customLampIntensity,
-                              customGridType
-                            )
-                          }
-                          style={{ backgroundColor: qc.color }}
-                          className={cn(
-                            "size-6 rounded-md border transition-transform cursor-pointer shrink-0 shadow-sm",
-                            customBaseColor.toLowerCase() === qc.color.toLowerCase()
-                              ? "border-amber-400 scale-115 ring-2 ring-amber-400/40"
-                              : "border-zinc-700 hover:scale-110"
-                          )}
-                          title={qc.label}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. Ánh đèn bàn rọi (Spotlight Lamp) */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[11px] text-zinc-400">2. Ánh đèn rọi tâm bàn (Spotlight)</span>
-                    <span className="font-mono text-[11px] text-zinc-300">
-                      {customLampTone === "warm"
-                        ? "Vàng ấm"
-                        : customLampTone === "cool"
-                          ? "Trắng dịu"
-                          : customLampTone === "cyan"
-                            ? "Xanh pháp y"
-                            : "Không đèn"}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1">
-                    {(
-                      [
-                        { id: "warm", label: "Vàng ấm" },
-                        { id: "cool", label: "Trắng dịu" },
-                        { id: "cyan", label: "Xanh pháp y" },
-                        { id: "none", label: "Tắt đèn" },
-                      ] as const
-                    ).map((t) => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() =>
-                          handleUpdateCustomTheme(
-                            customBaseColor,
-                            t.id,
-                            customLampIntensity,
-                            customGridType
-                          )
-                        }
-                        className={cn(
-                          "py-1 px-1.5 rounded-lg font-mono text-[11px] transition-all cursor-pointer border text-center truncate",
-                          customLampTone === t.id
-                            ? "bg-zinc-800 border-amber-500/80 text-amber-300 font-semibold"
-                            : "bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200"
-                        )}
-                      >
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {customLampTone !== "none" && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] font-mono text-zinc-400 shrink-0">Độ sáng:</span>
-                      <input
-                        type="range"
-                        min="0.1"
-                        max="1"
-                        step="0.05"
-                        value={customLampIntensity}
-                        onChange={(e) =>
-                          handleUpdateCustomTheme(
-                            customBaseColor,
-                            customLampTone,
-                            parseFloat(e.target.value),
-                            customGridType
-                          )
-                        }
-                        className="w-full accent-amber-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg"
-                      />
-                      <span className="text-[10px] font-mono text-zinc-300 w-8 text-right">
-                        {Math.round(customLampIntensity * 100)}%
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* 3. Kiểu lưới định vị (Grid Style) */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[11px] text-zinc-400">3. Kiểu lưới định vị (Grid)</span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1">
-                    {(
-                      [
-                        { id: "crosses", label: "Dấu thập (+)" },
-                        { id: "dots", label: "Điểm chấm (•)" },
-                        { id: "grid", label: "Kẻ ô (#)" },
-                        { id: "none", label: "Ẩn lưới" },
-                      ] as const
-                    ).map((g) => (
-                      <button
-                        key={g.id}
-                        type="button"
-                        onClick={() =>
-                          handleUpdateCustomTheme(
-                            customBaseColor,
-                            customLampTone,
-                            customLampIntensity,
-                            g.id
-                          )
-                        }
-                        className={cn(
-                          "py-1 px-1 rounded-lg font-mono text-[11px] transition-all cursor-pointer border text-center truncate",
-                          customGridType === g.id
-                            ? "bg-zinc-800 border-amber-500/80 text-amber-300 font-semibold"
-                            : "bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200"
-                        )}
-                      >
-                        {g.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
             )}
           </div>
@@ -2931,7 +2617,7 @@ export function DossierCanvasBoard({
             }
           }}
           className="p-2 rounded-xl text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-center shrink-0"
-          title="Mở sổ tay ghi chép thám tử"
+          title="Ghi chép bàn hồ sơ"
         >
           <BookOpen className="size-4.5 text-amber-500 hover:text-amber-400 transition-colors" />
         </button>
@@ -3001,6 +2687,302 @@ export function DossierCanvasBoard({
           <span className="tracking-wide">KẾT LUẬN</span>
         </button>
       </div>
+
+      {/* BẢNG CHỌN & SO SÁNH MÀU MẶT BÀN HỒ SƠ (CANVAS THEME POPUP - ĐẶT NGOÀI TOOLBAR ĐỂ FIXED VIEWPORT KHÔNG BỊ LỆCH) */}
+      {isThemePopupOpen && (
+        <div
+          ref={themePopupRef}
+          onMouseDown={(e) => e.stopPropagation()}
+          className="fixed top-16 right-4 sm:right-6 w-[420px] max-w-[calc(100vw-2rem)] bg-[#121418]/98 backdrop-blur-2xl rounded-2xl border border-[#353945] shadow-[0_25px_60px_rgba(0,0,0,0.95)] p-3.5 flex flex-col gap-3 z-50 text-zinc-200 animate-in fade-in zoom-in-95 duration-100 select-none"
+        >
+          {/* Header: Title + Reset + Close */}
+          <div className="flex items-center justify-between pb-1 border-b border-zinc-800/80">
+            <div className="flex items-center gap-2">
+              <Palette className="size-4 text-amber-400 shrink-0" />
+              <span className="font-mono text-xs font-bold tracking-wider text-amber-300 uppercase">
+                Mặt bàn hồ sơ
+              </span>
+              <span className="text-[10px] font-mono text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded truncate max-w-[130px]">
+                {canvasTheme.name}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {(canvasTheme.id !== "mahogany-warm" || canvasTheme.isCustom) && (
+                <button
+                  type="button"
+                  onClick={handleResetDefaultTheme}
+                  className="flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 transition-colors cursor-pointer"
+                  title="Khôi phục mặt bàn gỗ gụ mặc định"
+                >
+                  <RotateCcw className="size-3" />
+                  <span>Mặc định</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsThemePopupOpen(false)}
+                className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                title="Đóng bảng màu"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Tab navigation: [Mẫu sẵn có] / [Tùy biến tự do] */}
+          <div className="grid grid-cols-2 gap-1 p-0.5 bg-zinc-900/90 rounded-xl border border-zinc-800/80 text-xs font-mono">
+            <button
+              type="button"
+              onClick={() => setThemeActiveTab("presets")}
+              className={cn(
+                "py-1.5 px-2 rounded-lg font-medium transition-all text-center cursor-pointer",
+                themeActiveTab === "presets"
+                  ? "bg-zinc-800 text-amber-300 font-semibold shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
+              )}
+            >
+              Mẫu sẵn có ({DOSSIER_CANVAS_PRESETS.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setThemeActiveTab("custom")}
+              className={cn(
+                "py-1.5 px-2 rounded-lg font-medium transition-all text-center cursor-pointer",
+                themeActiveTab === "custom"
+                  ? "bg-zinc-800 text-amber-300 font-semibold shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
+              )}
+            >
+              Tùy biến tự do
+            </button>
+          </div>
+
+          {/* TAB 1: PRESETS (Chuyển đổi & So sánh nhanh) */}
+          {themeActiveTab === "presets" && (
+            <div className="flex flex-col gap-1.5 max-h-[310px] overflow-y-auto pr-1 scrollbar-thin">
+              <div className="text-[11px] text-zinc-400 px-0.5 flex items-center justify-between">
+                <span>Nhấp để đổi ngay & so sánh màu:</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                {DOSSIER_CANVAS_PRESETS.map((preset) => {
+                  const isActive = canvasTheme.id === preset.id && !canvasTheme.isCustom;
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => handleApplyTheme(preset)}
+                      className={cn(
+                        "group relative flex items-center gap-2 p-2 rounded-xl text-left transition-all cursor-pointer border text-xs",
+                        isActive
+                          ? "bg-zinc-800/95 border-amber-500/80 shadow-[0_0_12px_rgba(245,195,68,0.25)] ring-1 ring-amber-500/50"
+                          : "bg-zinc-900/60 border-zinc-800/80 hover:bg-zinc-800/60 hover:border-zinc-700"
+                      )}
+                    >
+                      {/* Mini spotlight swatch */}
+                      <div
+                        className="size-7 rounded-lg shrink-0 shadow-inner border border-white/20 relative overflow-hidden flex items-center justify-center"
+                        style={{ background: preset.swatchGradient }}
+                      >
+                        {isActive && (
+                          <Check className="size-3.5 text-amber-300 stroke-[3] drop-shadow" />
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span
+                          className={cn(
+                            "font-medium truncate leading-tight",
+                            isActive
+                              ? "text-amber-300 font-bold"
+                              : "text-zinc-200 group-hover:text-white"
+                          )}
+                        >
+                          {preset.name}
+                        </span>
+                        <span className="text-[10px] text-zinc-400 truncate mt-0.5">
+                          {preset.description}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: TÙY BIẾN TỰ DO (Custom Color Picker & Spotlight) */}
+          {themeActiveTab === "custom" && (
+            <div className="flex flex-col gap-3 text-xs">
+              {/* 1. Chọn màu nền mặt bàn */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] text-zinc-400">1. Màu nền bàn (Base Color)</span>
+                  <span className="font-mono text-[11px] text-amber-400 uppercase font-semibold">
+                    {customBaseColor}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="relative flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700/80 hover:border-amber-500/60 cursor-pointer transition-colors shrink-0">
+                    <div
+                      className="size-5 rounded-md border border-white/20 shadow-sm shrink-0"
+                      style={{ backgroundColor: customBaseColor }}
+                    />
+                    <span className="font-mono text-[11px] text-zinc-200 font-medium">Bảng màu...</span>
+                    <input
+                      type="color"
+                      value={customBaseColor}
+                      onChange={(e) =>
+                        handleUpdateCustomTheme(
+                          e.target.value,
+                          customLampTone,
+                          customLampIntensity,
+                          customGridType
+                        )
+                      }
+                      className="opacity-0 absolute inset-0 size-full cursor-pointer"
+                    />
+                  </label>
+
+                  {/* Quick color dots */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none flex-1">
+                    {QUICK_CUSTOM_COLORS.map((qc) => (
+                      <button
+                        key={qc.color}
+                        type="button"
+                        onClick={() =>
+                          handleUpdateCustomTheme(
+                            qc.color,
+                            customLampTone,
+                            customLampIntensity,
+                            customGridType
+                          )
+                        }
+                        style={{ backgroundColor: qc.color }}
+                        className={cn(
+                          "size-6 rounded-md border transition-transform cursor-pointer shrink-0 shadow-sm",
+                          customBaseColor.toLowerCase() === qc.color.toLowerCase()
+                            ? "border-amber-400 scale-115 ring-2 ring-amber-400/40"
+                            : "border-zinc-700 hover:scale-110"
+                        )}
+                        title={qc.label}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Ánh đèn bàn rọi (Spotlight Lamp) */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] text-zinc-400">2. Ánh đèn rọi tâm bàn (Spotlight)</span>
+                  <span className="font-mono text-[11px] text-zinc-300">
+                    {customLampTone === "warm"
+                      ? "Vàng ấm"
+                      : customLampTone === "cool"
+                        ? "Trắng dịu"
+                        : customLampTone === "cyan"
+                          ? "Xanh pháp y"
+                          : "Không đèn"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-1">
+                  {(
+                    [
+                      { id: "warm", label: "Vàng ấm" },
+                      { id: "cool", label: "Trắng dịu" },
+                      { id: "cyan", label: "Xanh pháp y" },
+                      { id: "none", label: "Tắt đèn" },
+                    ] as const
+                  ).map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() =>
+                        handleUpdateCustomTheme(
+                          customBaseColor,
+                          t.id,
+                          customLampIntensity,
+                          customGridType
+                        )
+                      }
+                      className={cn(
+                        "py-1 px-1.5 rounded-lg font-mono text-[11px] transition-all cursor-pointer border text-center truncate",
+                        customLampTone === t.id
+                          ? "bg-zinc-800 border-amber-500/80 text-amber-300 font-semibold"
+                          : "bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                      )}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+
+                {customLampTone !== "none" && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[10px] font-mono text-zinc-400 shrink-0">Độ sáng:</span>
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="1"
+                      step="0.05"
+                      value={customLampIntensity}
+                      onChange={(e) =>
+                        handleUpdateCustomTheme(
+                          customBaseColor,
+                          customLampTone,
+                          parseFloat(e.target.value),
+                          customGridType
+                        )
+                      }
+                      className="w-full accent-amber-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg"
+                    />
+                    <span className="text-[10px] font-mono text-zinc-300 w-8 text-right">
+                      {Math.round(customLampIntensity * 100)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Kiểu lưới định vị (Grid Style) */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] text-zinc-400">3. Kiểu lưới định vị (Grid)</span>
+                </div>
+                <div className="grid grid-cols-4 gap-1">
+                  {(
+                    [
+                      { id: "crosses", label: "Dấu thập (+)" },
+                      { id: "dots", label: "Điểm chấm (•)" },
+                      { id: "grid", label: "Kẻ ô (#)" },
+                      { id: "none", label: "Ẩn lưới" },
+                    ] as const
+                  ).map((g) => (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() =>
+                        handleUpdateCustomTheme(
+                          customBaseColor,
+                          customLampTone,
+                          customLampIntensity,
+                          g.id
+                        )
+                      }
+                      className={cn(
+                        "py-1 px-1 rounded-lg font-mono text-[11px] transition-all cursor-pointer border text-center truncate",
+                        customGridType === g.id
+                          ? "bg-zinc-800 border-amber-500/80 text-amber-300 font-semibold"
+                          : "bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200"
+                      )}
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

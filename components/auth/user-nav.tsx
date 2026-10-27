@@ -127,29 +127,27 @@ export function UserNav({ size = "md" }: UserNavProps) {
 
             <div className="p-1 flex flex-col gap-1">
               {isAdmin && (
-                <>
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      router.push("/studio");
-                    }}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 transition-colors text-left font-medium border border-indigo-500/20 mb-1 cursor-pointer"
-                  >
-                    <Terminal className="w-4 h-4" />
-                    Creator Studio
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      emitInvestigationEvent("OPEN_CANVAS_THEME");
-                    }}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-colors text-left font-medium border border-amber-500/20 mb-1 cursor-pointer"
-                  >
-                    <Palette className="w-4 h-4 text-amber-500" />
-                    Màu bàn hồ sơ (Canvas)
-                  </button>
-                </>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push("/studio");
+                  }}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 transition-colors text-left font-medium border border-indigo-500/20 mb-1 cursor-pointer"
+                >
+                  <Terminal className="w-4 h-4" />
+                  Creator Studio
+                </button>
               )}
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  setTimeout(() => emitInvestigationEvent("OPEN_CANVAS_THEME"), 20);
+                }}
+                className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-colors text-left font-medium border border-amber-500/20 mb-1 cursor-pointer"
+              >
+                <Palette className="w-4 h-4 text-amber-500" />
+                Màu bàn hồ sơ (Canvas)
+              </button>
               <button className="w-full flex items-center gap-2 px-2 py-1.5 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors text-left cursor-not-allowed opacity-50">
                 <UserCircle className="w-4 h-4" />
                 Hồ sơ cá nhân

@@ -379,7 +379,7 @@ export function NativePdfAnnotator({
           type="button"
           onClick={() => emitInvestigationEvent("OPEN_NOTEBOOK")}
           className="p-1.5 rounded-lg hover:bg-[#342417] text-[#ad9885] hover:text-[#fef5ec] transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-mono font-medium"
-          title="Mở sổ tay ghi chép thám tử"
+          title="Ghi chép tài liệu"
         >
           <PenLine className="size-4 text-amber-500" />
           <span className="hidden sm:inline">Sổ tay</span>

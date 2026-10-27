@@ -29,6 +29,7 @@ interface DossierTrayProps {
   className?: string;
   dossierWidth: number;
   isDossierCollapsed: boolean;
+  highlightSelected?: boolean;
   onToggleCollapse?: () => void;
   resizable?: "left" | "right" | boolean;
   onResizeWidth?: (width: number) => void;
@@ -75,6 +76,7 @@ export function DossierTray({
   className,
   dossierWidth,
   isDossierCollapsed,
+  highlightSelected = true,
   onToggleCollapse,
   resizable,
   onResizeWidth,
@@ -368,6 +370,7 @@ export function DossierTray({
             <div className="grid grid-cols-2 gap-2">
               {filteredEvidence.map((item) => {
                 const isSelected =
+                  highlightSelected &&
                   selectedView?.type === item.type &&
                   selectedView?.data.id === item.data.id;
                 const evItem = item.data as PhysicalEvidence;
@@ -404,7 +407,7 @@ export function DossierTray({
                         "/photo_scene_overview.jpg"
                       }
                       alt={item.data.title || "Vật chứng"}
-                      className="w-full h-full object-cover select-none transition-transform duration-200 group-hover:scale-105"
+                      className="w-full h-full object-cover select-none"
                     />
 
                     {/* Gradient overlay nhẹ cho chân ảnh */}
@@ -486,6 +489,7 @@ export function DossierTray({
                 <div>
                   {group.items.map((item) => {
                     const isSelected =
+                      highlightSelected &&
                       selectedView?.type === item.type &&
                       selectedView?.data.id === item.data.id;
                     const pdfDoc = item.data as PDFDocument;

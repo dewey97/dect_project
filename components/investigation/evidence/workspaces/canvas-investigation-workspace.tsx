@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
-  Layers,
+  SquareKanban,
   FolderOpen,
   X,
   ExternalLink,
@@ -584,27 +584,17 @@ export function CanvasInvestigationWorkspace({
           isBoardFullscreen && "opacity-20 pointer-events-none"
         )}
       >
-        {/* Nhóm công cụ: Các phân hệ điều tra chính */}
+        {/* Nhóm công cụ: Các phân hệ điều tra chính (Giao diện phẳng, đồng nhất, không nổi active) */}
         <div className="flex flex-col items-center gap-2 w-full">
           {/* 1. Khay tài liệu (bên trái cạnh sidebar) */}
           <button
             type="button"
             onClick={() => setIsDossierCollapsed((prev) => !prev)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl transition-all cursor-pointer group select-none",
-              !isDossierCollapsed
-                ? "bg-zinc-800 text-zinc-100 font-semibold shadow-sm border border-zinc-700/80"
-                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
+            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
             title={!isDossierCollapsed ? "Thu gọn Khay tài liệu" : "Mở Khay tài liệu"}
           >
-            <FolderOpen
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                !isDossierCollapsed ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+            <FolderOpen className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
               Tài liệu
             </span>
           </button>
@@ -613,22 +603,12 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={() => setIsBoardOpen((prev) => !prev)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl transition-all cursor-pointer group select-none",
-              isBoardOpen
-                ? "bg-zinc-800 text-zinc-100 font-semibold shadow-sm border border-zinc-700/80"
-                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
+            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
             title={isBoardOpen ? "Thu gọn Bảng điều tra" : "Mở Bảng điều tra"}
           >
-            <Layers
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                isBoardOpen ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Điều tra
+            <SquareKanban className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
+              Bảng
             </span>
           </button>
 
@@ -636,21 +616,11 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={() => setActiveModal(activeModal === "phone" ? null : "phone")}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl transition-all cursor-pointer group select-none",
-              activeModal === "phone"
-                ? "bg-zinc-800 text-zinc-100 font-semibold shadow-sm border border-zinc-700/80"
-                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
+            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
             title="Điện thoại nạn nhân"
           >
-            <Smartphone
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                activeModal === "phone" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+            <Smartphone className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
               Điện thoại
             </span>
           </button>
@@ -659,21 +629,11 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={() => setActiveModal(activeModal === "reinvestigate" ? null : "reinvestigate")}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl transition-all cursor-pointer group select-none",
-              activeModal === "reinvestigate"
-                ? "bg-zinc-800 text-zinc-100 font-semibold shadow-sm border border-zinc-700/80"
-                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
+            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
             title="Khám xét lại hiện trường 360"
           >
-            <Compass
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                activeModal === "reinvestigate" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+            <Compass className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
               Hiện trường
             </span>
           </button>
@@ -682,21 +642,11 @@ export function CanvasInvestigationWorkspace({
           <button
             type="button"
             onClick={handleOpenNotebook}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl transition-all cursor-pointer group select-none",
-              activeModal === "notebook"
-                ? "bg-zinc-800 text-zinc-100 font-semibold shadow-sm border border-zinc-700/80"
-                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
+            className="flex flex-col items-center justify-center gap-1.5 w-full py-2.5 px-1 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 active:scale-95 transition-all cursor-pointer group select-none"
             title="Sổ tay ghi chép nghiệp vụ"
           >
-            <BookOpen
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                activeModal === "notebook" ? "text-zinc-100" : "text-zinc-400 group-hover:text-zinc-200"
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
+            <BookOpen className="size-5 text-zinc-400 group-hover:text-zinc-200 transition-transform group-hover:scale-105" />
+            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none text-zinc-400 group-hover:text-zinc-200">
               Sổ tay
             </span>
           </button>
@@ -716,7 +666,7 @@ export function CanvasInvestigationWorkspace({
             )}
             title="Mở Bảng điều tra (Ghim manh mối)"
           >
-            <Layers className="size-4 text-zinc-400 group-hover:text-zinc-100 transition-transform group-hover:scale-105" />
+            <SquareKanban className="size-4 text-zinc-400 group-hover:text-zinc-100 transition-transform group-hover:scale-105" />
             <span>Bảng điều tra</span>
           </button>
         )}
@@ -1013,6 +963,7 @@ export function CanvasInvestigationWorkspace({
           "absolute top-0 left-0 bottom-0 z-30 h-full shadow-2xl transition-all duration-300",
           isBoardFullscreen && "opacity-0 pointer-events-none"
         )}
+        highlightSelected={false}
         dossierWidth={currentDossierWidth}
         resizable="right"
         onResizeWidth={handleResizeDossier}
