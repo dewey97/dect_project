@@ -133,6 +133,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     const isMobile = input.isMobile;
   const positions = input.positions;
 
+  const characters = input.characters || [];
   const pins: PinPoint[] = [];
 
   // ============================================================================
@@ -480,7 +481,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   // 3. SUSPECTS (Nhân vật nghi phạm)
   // ============================================================================
   const effectiveSuspects = input.effectiveSuspects || [];
-  const characters = input.characters || [];
 
   // Gom danh sách nghi phạm hợp nhất (ưu tiên characters context có avatar_url)
   const suspectsList = effectiveSuspects.map((s, idx) => {
