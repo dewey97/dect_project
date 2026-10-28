@@ -113,10 +113,7 @@ export interface DbCaseCheckpoint {
   /** Khóa nhân vật liên quan (`case_characters.key` cùng vụ). */
   subject_key?: string | null;
   question_type: string | null;
-  unlocked_evidence_id: string | null;
   followup_of: string | null;
-  suspect_label: string | null;
-  evidence_step_label: string | null;
   depends_on: string[];
   flow_position: { x: number; y: number } | null;
   answer_config: Record<string, unknown>;

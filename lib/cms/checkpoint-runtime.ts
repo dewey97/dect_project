@@ -173,12 +173,9 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
     ),
   };
   const availableEvidences = parseAvailableEvidences(config.availableEvidences);
-  const suspectLabel = asString(row.suspect_label);
-  const evidenceStepLabel = asString(row.evidence_step_label);
   const hasPickerConfig =
     Object.values(pickerFields).some((list) => list.length > 0) ||
-    availableEvidences.length > 0 ||
-    Boolean(suspectLabel || evidenceStepLabel);
+    availableEvidences.length > 0;
 
   const pickerConfig = hasPickerConfig
     ? {
@@ -227,8 +224,6 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
             }
           : {}),
         ...(availableEvidences.length > 0 ? { availableEvidences } : {}),
-        ...(suspectLabel ? { suspectLabel } : {}),
-        ...(evidenceStepLabel ? { evidenceStepLabel } : {}),
       }
     : undefined;
 
@@ -266,7 +261,6 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
     options,
     correctAnswer:
       asString(config.correctAnswer || config.correct_answer) || undefined,
-    unlockedEvidenceId: row.unlocked_evidence_id || undefined,
     status: "locked",
     kind,
     subjectKey,
@@ -286,7 +280,6 @@ export function toRuntimeCheckpoint(row: DbCaseCheckpoint): Checkpoint {
       : undefined,
     dossier: row.dossier || undefined,
     unlocksDossier: asString(config.unlocksDossier) || undefined,
-    suspectLabel: suspectLabel || undefined,
     aiContext: asString(row.ai_context) || undefined,
     aiValidCases: asStringArray(row.ai_valid_cases),
     aiInvalidCases: asStringArray(row.ai_invalid_cases),

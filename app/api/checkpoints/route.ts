@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     const modernQuery = await supabase
       .from("case_checkpoints")
       .select(
-        "id, case_id, checkpoint_id, node_id, dossier, title, question, type, kind, subject_key, question_type, unlocked_evidence_id, followup_of, suspect_label, evidence_step_label, depends_on, answer_config, hints, narrative, ai_context, ai_valid_cases, ai_invalid_cases, created_at, updated_at",
+        "id, case_id, checkpoint_id, node_id, dossier, title, question, type, kind, subject_key, question_type, followup_of, depends_on, answer_config, hints, narrative, ai_context, ai_valid_cases, ai_invalid_cases, created_at, updated_at",
       )
       .eq("case_id", caseId)
       .order("dossier", { ascending: true })
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
       const legacyQuery = await supabase
         .from("case_checkpoints")
         .select(
-          "id, case_id, checkpoint_id, node_id, dossier, title, question, type, question_type, unlocked_evidence_id, followup_of, suspect_label, evidence_step_label, depends_on, answer_config, hints, narrative, ai_context, ai_valid_cases, ai_invalid_cases, created_at, updated_at",
+          "id, case_id, checkpoint_id, node_id, dossier, title, question, type, question_type, followup_of, depends_on, answer_config, hints, narrative, ai_context, ai_valid_cases, ai_invalid_cases, created_at, updated_at",
         )
         .eq("case_id", caseId)
         .order("dossier", { ascending: true })

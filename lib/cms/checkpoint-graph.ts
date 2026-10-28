@@ -81,7 +81,6 @@ function findReferencedCheckpoint(
       [
         checkpoint.checkpoint_id,
         checkpoint.title,
-        checkpoint.suspect_label || "",
       ].join(" "),
     );
     return keyTokens.every((token) => haystack.includes(token));

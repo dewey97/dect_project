@@ -82,10 +82,7 @@ export interface CheckpointStudioDraft {
   /** Khóa nhân vật liên quan (`case_characters.key` cùng vụ). */
   subjectKey: string;
   questionType: string;
-  unlockedEvidenceId: string;
   followupOf: string;
-  suspectLabel: string;
-  evidenceStepLabel: string;
   /** checkpoint_id của các checkpoint phải hoàn thành trước (graph Studio). */
   dependsOn: string[];
   answerConfig: EvidencePickerConfig;
@@ -142,10 +139,7 @@ export function createEmptyDraft(caseId: string): CheckpointStudioDraft {
     kind: "text",
     subjectKey: "",
     questionType: "evidence_picker",
-    unlockedEvidenceId: "",
     followupOf: "",
-    suspectLabel: "",
-    evidenceStepLabel: "",
     dependsOn: [],
     answerConfig: { ...EMPTY_EVIDENCE_CONFIG },
     hints: [],
@@ -253,10 +247,7 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     kind: asString(row.kind) || "text",
     subjectKey: asString(row.subject_key),
     questionType: asString(row.question_type) || "evidence_picker",
-    unlockedEvidenceId: asString(row.unlocked_evidence_id),
     followupOf: asString(row.followup_of),
-    suspectLabel: asString(row.suspect_label),
-    evidenceStepLabel: asString(row.evidence_step_label),
     dependsOn: asStringArray(row.depends_on),
     answerConfig: config,
     hints: parseHints(row.hints),
@@ -299,12 +290,9 @@ export function toRowPayload(
     kind: draft.kind.trim() || "text",
     subject_key: draft.subjectKey.trim() || null,
     question_type: draft.questionType.trim() || draft.type.trim() || null,
-    unlocked_evidence_id: draft.unlockedEvidenceId.trim() || null,
     followup_of:
       draft.followupOf.trim() ||
       (draft.kind === "followup" ? draft.dependsOn[0] || null : null),
-    suspect_label: draft.suspectLabel.trim() || null,
-    evidence_step_label: draft.evidenceStepLabel.trim() || null,
     answer_config: {
       validSuspects: cleanList(draft.answerConfig.validSuspects),
       validMotives: cleanList(draft.answerConfig.validMotives),

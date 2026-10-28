@@ -104,7 +104,6 @@ export function gradeCheckpoint(
   const kind = inferCheckpointKind(checkpoint);
   const cfg = (checkpoint.answer_config || {}) as Record<string, any>;
   const baseUnlock = {
-    unlocksEvidenceId: checkpoint.unlocked_evidence_id || undefined,
     unlocksDossier: cfg.unlocksDossier || undefined,
   };
 
