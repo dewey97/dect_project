@@ -187,7 +187,7 @@ function WebEvidencePageContent() {
     string | undefined
   >(undefined);
   const [activeHintCategory, setActiveHintCategory] = useState<
-    "motive" | "alibi" | undefined
+    "motive" | "contradiction" | undefined
   >(undefined);
 
   const { activePing, broadcastPing, roomCode } = useRoomSync();

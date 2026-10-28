@@ -75,7 +75,7 @@ Mở rộng thông tin định danh người dùng từ `auth.users` của Supab
 - `feedbacks`: ai cũng gửi được; chỉ admin đọc và cập nhật.
 - `play_sessions`: người chơi thao tác phiên của mình; admin thao tác tất cả.
 - Bucket `avatars`: đọc công khai, ghi chỉ admin.
-- Đã bảo mật đáp án: `case_checkpoints` chỉ cấp quyền SELECT cho `service_role` (hoặc admin qua `private.is_admin()`). Client/anon đọc danh sách checkpoint qua view `case_checkpoints_public` (chỉ lộ gợi ý, không lộ `answer_config` hay đáp án).
+- Bảo mật đáp án (migration 48 `48_checkpoint_answers_server_only.sql`): bỏ policy public read của migration 18 và bỏ view `case_checkpoints_public`. `case_checkpoints` chỉ đọc được bằng `service_role` hoặc admin (policy migration 16). Gameplay đọc qua `/api/checkpoints`, route này dùng service role và lọc `answer_config` theo allowlist (`lib/checkpoints/public-checkpoint.ts`): giữ `options`, nhãn ô nhập, `availableEvidences`, `epilogueStories`, `unlocksDossier`, `photoCodes`, cờ `hasMotive`/`hasContradiction`; bỏ mọi đáp án và cột `ai_*`. Chấm điểm qua `/api/checkpoints/verify` và `/api/scan-answer`.
 - Chưa khóa: `game_rooms` (chơi nhóm cần ghi công khai).
 - Server phải tự kiểm tra quyền trước khi ghi: `requireAdminAuth()` trong server action, `denyIfNotAdmin()` (`lib/security/admin-route-guard.ts`) trong Route Handler.
 

@@ -1,30 +1,50 @@
 import { NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp } from '@/lib/security/rate-limiter'
 import { rateLimitResponse } from '@/lib/security/defensive-cache'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { normalizeCaseId } from '@/lib/cases/case-id'
+import { getInterrogationCriteria } from '@/lib/ai/suspect-interrogation-context'
+import { parseRuntimeHints } from '@/lib/cms/checkpoint-runtime'
+import { asString, asStringArray } from '@/lib/text'
+import type { DbCaseCheckpoint } from '@/lib/types/database'
 
 export const dynamic = 'force-dynamic'
 
-interface TestCaseItem {
-  text: string
-  reason?: string
-}
-
 interface RequestBody {
-  context: string
-  answer: string
-  validCases?: (string | TestCaseItem)[]
-  invalidCases?: (string | TestCaseItem)[]
+  caseId?: string
+  checkpointId?: string
+  category?: string
+  suspect?: string
+  answer?: string
 }
 
-// Người chơi không cần đăng nhập, nên chặn lạm dụng key Gemini bằng hạn mức theo IP
-// và giới hạn độ dài input (không cho dùng route làm proxy LLM tùy ý).
-const MAX_CONTEXT_CHARS = 4000
 const MAX_ANSWER_CHARS = 1000
-const MAX_CASES = 20
-const MAX_CASE_CHARS = 500
 
-function caseLength(c: string | TestCaseItem): number {
-  return typeof c === 'string' ? c.length : (c.text?.length ?? 0) + (c.reason?.length ?? 0)
+/** Đọc tiêu chí AI của checkpoint ở server; client chỉ gửi câu trả lời. */
+async function loadCriteria(body: RequestBody, category: 'motive' | 'contradiction') {
+  let checkpoint: DbCaseCheckpoint | null = null
+  if (body.checkpointId) {
+    const { data } = await createAdminClient()
+      .from('case_checkpoints')
+      .select('*')
+      .eq('case_id', normalizeCaseId(body.caseId || 'case_000'))
+      .eq('checkpoint_id', body.checkpointId)
+      .maybeSingle()
+    checkpoint = (data as DbCaseCheckpoint | null) ?? null
+  }
+  const cfg = (checkpoint?.answer_config ?? {}) as Record<string, unknown>
+  const hint = parseRuntimeHints(checkpoint?.hints)[0]?.text
+  return getInterrogationCriteria(String(body.suspect || ''), category, {
+    title: checkpoint?.title,
+    question: checkpoint?.question,
+    hint,
+    aiContext: checkpoint?.ai_context || undefined,
+    aiValidCases: asStringArray(checkpoint?.ai_valid_cases),
+    aiInvalidCases: asStringArray(checkpoint?.ai_invalid_cases),
+    motiveContext: asString(cfg.motiveContext || cfg.motive_context) || undefined,
+    contradictionContext:
+      asString(cfg.contradictionContext || cfg.contradiction_context) || undefined,
+  })
 }
 
 export async function POST(req: Request) {
@@ -34,31 +54,18 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { context, answer, validCases = [], invalidCases = [] }: RequestBody = await req.json()
+    const body: RequestBody = await req.json()
+    const answer = typeof body.answer === 'string' ? body.answer : ''
+    const category = body.category === 'contradiction' ? 'contradiction' : 'motive'
 
-    if (
-      typeof context !== 'string' ||
-      typeof answer !== 'string' ||
-      !Array.isArray(validCases) ||
-      !Array.isArray(invalidCases) ||
-      context.length > MAX_CONTEXT_CHARS ||
-      answer.length > MAX_ANSWER_CHARS ||
-      validCases.length > MAX_CASES ||
-      invalidCases.length > MAX_CASES ||
-      [...validCases, ...invalidCases].some((c) => caseLength(c) > MAX_CASE_CHARS)
-    ) {
+    if (!answer.trim() || answer.length > MAX_ANSWER_CHARS) {
       return NextResponse.json(
-        { isCorrect: false, feedback: 'Dữ liệu kiểm tra không hợp lệ.' },
+        { isCorrect: false, feedback: 'Thiếu hoặc quá dài câu trả lời để kiểm tra.' },
         { status: 400 }
       )
     }
 
-    if (!context || !answer) {
-      return NextResponse.json(
-        { isCorrect: false, feedback: 'Thiếu bối cảnh hoặc câu trả lời để kiểm tra.' },
-        { status: 400 }
-      )
-    }
+    const { context, validCases, invalidCases } = await loadCriteria(body, category)
 
     const apiKey = process.env.GEMINI_API_KEY
 

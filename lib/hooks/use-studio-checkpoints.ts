@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { DbCaseCheckpoint } from "@/lib/types/database";
+import type { PublicCheckpointRow } from "@/lib/checkpoints/public-checkpoint";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 
 export interface StudioCheckpointsState {
-  rows: DbCaseCheckpoint[];
+  rows: PublicCheckpointRow[];
   loading: boolean;
   error: string | null;
   refetch: () => void;
@@ -14,9 +14,9 @@ export interface StudioCheckpointsState {
 const CACHE_TTL_MS = 30_000;
 const memoryCache: Record<
   string,
-  { rows: DbCaseCheckpoint[]; timestamp: number }
+  { rows: PublicCheckpointRow[]; timestamp: number }
 > = {};
-const inFlight: Record<string, Promise<DbCaseCheckpoint[]>> = {};
+const inFlight: Record<string, Promise<PublicCheckpointRow[]>> = {};
 
 function caseIdFromUrl(fallback: string): string {
   if (typeof window === "undefined") return fallback;
@@ -26,14 +26,14 @@ function caseIdFromUrl(fallback: string): string {
   return param ? normalizeCaseId(param) : fallback;
 }
 
-async function fetchRows(caseId: string): Promise<DbCaseCheckpoint[]> {
+async function fetchRows(caseId: string): Promise<PublicCheckpointRow[]> {
   const url = `/api/checkpoints?caseId=${encodeURIComponent(caseId)}&_t=${Date.now()}`;
   const response = await fetch(url, { cache: "no-store" });
   const result = await response.json();
   if (!response.ok || !result.success) {
     throw new Error(result?.error || `HTTP ${response.status}`);
   }
-  return Array.isArray(result.data) ? (result.data as DbCaseCheckpoint[]) : [];
+  return Array.isArray(result.data) ? (result.data as PublicCheckpointRow[]) : [];
 }
 
 /**
@@ -47,7 +47,7 @@ export function useStudioCheckpoints(
   const [effectiveCaseId, setEffectiveCaseId] = useState(() =>
     normalizeCaseId(caseId),
   );
-  const [rows, setRows] = useState<DbCaseCheckpoint[]>([]);
+  const [rows, setRows] = useState<PublicCheckpointRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
@@ -80,7 +80,7 @@ export function useStudioCheckpoints(
     const pending =
       reloadToken === 0
         ? (inFlight[effectiveCaseId] as
-            | Promise<DbCaseCheckpoint[]>
+            | Promise<PublicCheckpointRow[]>
             | undefined)
         : undefined;
     const request = pending ?? fetchRows(effectiveCaseId);

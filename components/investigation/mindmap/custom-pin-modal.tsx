@@ -20,8 +20,10 @@ import { normalizeImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
-import { isVietnameseTextMatch } from "@/lib/finding-matcher";
-import { isEvidenceMatching } from "@/lib/cases/clues";
+import {
+  verifyCheckpointOnServer,
+  VERIFY_UNAVAILABLE_MESSAGE,
+} from "@/lib/checkpoints/client-verify";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 
 interface CustomPinModalProps {
@@ -168,93 +170,39 @@ export function CustomPinModal({
   const [activeHintIdx, setActiveHintIdx] = useState<number>(0);
 
   const unlockedEvidence =
-    matchedCheckpoint?.unlockedEvidenceId || pin?.unlockedEvidenceId || "";
+    pin?.unlockedEvidenceId || "";
 
   const checkpointType = matchedCheckpoint?.type || pin?.questionType || "text";
 
   if (!isOpen || !pin) return null;
 
-  // Answer checking logic
-  const handleCheckAnswer = (answerOverride?: string) => {
+  // Chấm qua server khi pin gắn checkpoint; pin tự do chấp nhận câu trả lời không rỗng.
+  const handleCheckAnswer = async (answerOverride?: string) => {
     detectiveAudio.playTypewriterClick();
-    let isCorrect = false;
+    const answer = (answerOverride !== undefined ? answerOverride : userInput).trim();
+    let isCorrect = answer.length > 0;
 
-    // CASE 1: Evidence Picker (Suspect verification + evidence selection)
-    if (
-      checkpointType === "evidence_picker" &&
-      matchedCheckpoint?.pickerConfig
-    ) {
-      const config = matchedCheckpoint.pickerConfig;
-      const suspectName = selectedSuspect.trim().toLowerCase();
-
-      const validSuspects = (config.validSuspects || []).map((s) =>
-        s.toLowerCase(),
-      );
-      const isSuspectCorrect =
-        validSuspects.length === 0 ||
-        validSuspects.some(
-          (s) =>
-            s === suspectName ||
-            suspectName.includes(s) ||
-            s.includes(suspectName),
-        );
-
-      const requiredEvs = config.requiredEvidenceIds || [];
-      const hasAllRequiredEvidences =
-        requiredEvs.length === 0 ||
-        requiredEvs.every((req) =>
-          selectedEvidences.some((sel) => isEvidenceMatching(sel, [req])),
-        );
-
-      if (isSuspectCorrect && hasAllRequiredEvidences) {
-        isCorrect = true;
+    if (matchedCheckpoint) {
+      const phoneValues = [phoneInput1, phoneInput2, phoneInput3];
+      const result = await verifyCheckpointOnServer({
+        caseId,
+        checkpointId: matchedCheckpoint.id,
+        answer,
+        suspect: selectedSuspect.trim(),
+        selectedCodes: selectedEvidences,
+        inputs: Object.fromEntries(
+          (matchedCheckpoint.textMatchConfig?.inputs || []).map((inp, idx) => [
+            inp.id,
+            phoneValues[idx] || "",
+          ]),
+        ),
+      });
+      if (!result.success) {
+        detectiveAudio.playPaperRustle();
+        setFeedback({ type: "error", message: VERIFY_UNAVAILABLE_MESSAGE });
+        return;
       }
-    }
-    // CASE 2: Text Match 3 (3 phone numbers)
-    else if (
-      checkpointType === "text_match_3" &&
-      matchedCheckpoint?.textMatchConfig?.inputs
-    ) {
-      const inputsConfig = matchedCheckpoint.textMatchConfig.inputs;
-      const val1 = phoneInput1.trim().toLowerCase();
-      const val2 = phoneInput2.trim().toLowerCase();
-      const val3 = phoneInput3.trim().toLowerCase();
-
-      const check1 = (inputsConfig[0]?.validAnswers || []).some((a) =>
-        isVietnameseTextMatch(val1, a),
-      );
-      const check2 = (inputsConfig[1]?.validAnswers || []).some((a) =>
-        isVietnameseTextMatch(val2, a),
-      );
-      const check3 = (inputsConfig[2]?.validAnswers || []).some((a) =>
-        isVietnameseTextMatch(val3, a),
-      );
-
-      if (check1 && check2 && check3) {
-        isCorrect = true;
-      }
-    }
-    // CASE 3: MCQ or Standard Text Match
-    else {
-      const ans = (answerOverride !== undefined ? answerOverride : userInput)
-        .trim()
-        .toLowerCase();
-      const expected = (pin.answers || "").trim().toLowerCase();
-
-      if (ans) {
-        if (expected && (expected.includes(ans) || ans.includes(expected))) {
-          isCorrect = true;
-        } else if (expected) {
-          const cleanExpected = expected.replace(/[^a-z0-9à-ỹ]/g, "");
-          const cleanAns = ans.replace(/[^a-z0-9à-ỹ]/g, "");
-          if (cleanExpected.length > 0 && cleanExpected.includes(cleanAns)) {
-            isCorrect = true;
-          }
-        } else {
-          // If no rigid answer set, accept non-empty input
-          isCorrect = true;
-        }
-      }
+      isCorrect = result.correct;
     }
 
     if (isCorrect) {
@@ -386,8 +334,7 @@ export function CustomPinModal({
                     <div className="space-y-3">
                       <div>
                         <label className="block text-[11px] font-mono font-bold text-[#5c4026] mb-1">
-                          {matchedCheckpoint.pickerConfig.suspectLabel ||
-                            "Tên đối tượng tình nghi:"}
+                          Tên đối tượng tình nghi:
                         </label>
                         <input
                           type="text"
@@ -400,8 +347,7 @@ export function CustomPinModal({
 
                       <div>
                         <label className="block text-[11px] font-mono font-bold text-[#5c4026] mb-1.5">
-                          {matchedCheckpoint.pickerConfig.evidenceStepLabel ||
-                            "Chọn tài liệu & chứng cứ buộc tội:"}
+                          Chọn tài liệu & chứng cứ buộc tội:
                         </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-48 overflow-y-auto p-1 border border-[#2b1f14]/30 bg-[#ebdcc4]/40 rounded">
                           {(

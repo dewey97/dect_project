@@ -15,7 +15,7 @@ import {
 interface CheckpointHintSectionProps {
   checkpointId: string;
   caseId?: string;
-  category?: "motive" | "alibi" | "contradiction" | "all";
+  category?: "motive" | "contradiction" | "all";
   className?: string;
   /**
    * Khi truyền vào: nút gợi ý gọn ("GỢI Ý n", vẫn nhấn giữ để mở) được đưa
@@ -50,7 +50,6 @@ export function CheckpointHintSection({
         dossier: "Hồ sơ chuyên án",
         hints: [],
         motiveHints: [],
-        alibiHints: [],
         contradictionHints: [],
         hasCategories: false,
       }
@@ -58,28 +57,25 @@ export function CheckpointHintSection({
   }, [groupedMap, effectiveCpId]);
 
   const activeCategory = useMemo<
-    "motive" | "alibi" | "contradiction" | "all"
+    "motive" | "contradiction" | "all"
   >(() => {
     if (!currentGroup.hasCategories) {
       return "all";
     }
     if (
       category === "motive" ||
-      category === "alibi" ||
       category === "contradiction"
     )
       return category;
 
     const rawId = (checkpointId || "").toLowerCase();
     if (rawId.includes("motive") || rawId.includes("dong_co")) return "motive";
-    if (rawId.includes("alibi") || rawId.includes("ngoai_pham")) return "alibi";
     if (rawId.includes("contradiction") || rawId.includes("mau_thuan"))
       return "contradiction";
 
     const savedCat = getStorageItem("active_suspect_category");
     if (
       savedCat === "motive" ||
-      savedCat === "alibi" ||
       savedCat === "contradiction"
     )
       return savedCat;
@@ -118,9 +114,6 @@ export function CheckpointHintSection({
   const displayHints = useMemo(() => {
     if (activeCategory === "motive" && currentGroup.motiveHints.length > 0) {
       return currentGroup.motiveHints;
-    }
-    if (activeCategory === "alibi" && currentGroup.alibiHints.length > 0) {
-      return currentGroup.alibiHints;
     }
     if (
       activeCategory === "contradiction" &&

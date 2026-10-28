@@ -117,7 +117,7 @@ Studio áp dụng mô hình thẩm tra 2 lớp cốt lõi: **Động cơ** và *
 ]
 ```
 
-`group` nhận một trong `general | motive | alibi | contradiction`.
+`group` nhận một trong `general | motive | contradiction`. Giá trị cũ `alibi` được đọc thành `general`.
 
 ### 3.3. Đồ thị phụ thuộc (`depends_on`)
 
@@ -142,7 +142,7 @@ Người dùng phải bấm nhận gợi ý thì cạnh mới được ghi.
 
 - Ghi: chỉ admin.
 - Policy ghi chấp nhận `service_role`, JWT `app_metadata.role` là `admin`/`super_admin`, hoặc `profiles.role = 'admin'`.
-- Đọc: policy public (`anon`, `authenticated`) tại [`db/schema/18_case_checkpoints_public_read.sql`](../db/schema/18_case_checkpoints_public_read.sql) để runtime tải checkpoint.
+- Đọc: chỉ admin/service role (migration 48 bỏ policy public của migration 18). Runtime tải checkpoint đã lọc đáp án qua `/api/checkpoints`; chấm điểm chỉ ở server (`/api/checkpoints/verify`, `/api/scan-answer`).
 
 ---
 
@@ -194,7 +194,7 @@ Update cũng từ chối đổi `checkpoint_id` và `case_id` của row đã t�
 - **Nối liên kết trực quan trên sơ đồ**: Mọi quan hệ phụ thuộc (`depends_on`, follow-up) được kéo nối trực tiếp giữa các cổng node trên canvas React Flow; không nhập thủ công mã liên kết trong form.
 - **Ẩn/hiện động theo Loại câu hỏi**:
   - Hỗ trợ chọn loại câu hỏi: `evidence_picker` (Thẩm tra vật chứng 2 lớp: Động cơ & Mâu thuẫn lời khai), `choice` (Trắc nghiệm), `text` (Nhập văn bản/Tự luận), `code` (Mật mã/Mã số), `time` (Mốc thời gian).
-  - Khi chọn `evidence_picker`: hiển thị các thẻ thẩm tra vật chứng (Động cơ, Mâu thuẫn, Ngoại phạm, Bổ sung) và nhãn bước thẩm tra.
+  - Khi chọn `evidence_picker`: hiển thị các thẻ thẩm tra vật chứng (Động cơ, Mâu thuẫn, Bổ sung) và nhãn bước thẩm tra.
   - Khi chọn các loại câu hỏi khác: tự động **ẨN** toàn bộ các mục thẩm tra vật chứng không tương ứng; hiển thị hộp cấu hình đáp án đơn giản (phương án lựa chọn hoặc đáp án chính xác).
 - Danh sách node compact: chỉ hiển thị tiêu đề, phân cách bằng đường mảnh, không card padding lớn. Tìm kiếm nội bộ nhận tiêu đề và nội dung câu hỏi.
 - Bấm một dòng trong danh sách sẽ chọn checkpoint, mở hộp biên tập dưới rail và căn node tương ứng vào giữa Flow view. Bấm lại vẫn căn lại.

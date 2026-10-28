@@ -99,7 +99,7 @@ export function useCaseNarratives(
     const list: PhaseNarrative[] = [];
     [0, 1, 2, 3].forEach((phase) => {
       const cp = resolveCheckpointForPhase(checkpoints, phase, caseId);
-      const monologue = cp?.narrative || cp?.storyConfig?.monologue;
+      const monologue = cp?.storyConfig?.monologue;
       if (cp && monologue) {
         list.push({
           caseId,
@@ -115,7 +115,7 @@ export function useCaseNarratives(
   const getPhaseNarrative = useCallback(
     (phase: number) => {
       const cp = resolveCheckpointForPhase(checkpoints, phase, caseId);
-      const monologue = cp?.narrative || cp?.storyConfig?.monologue;
+      const monologue = cp?.storyConfig?.monologue;
       if (cp && monologue) {
         return {
           date: cp.storyConfig?.date || fallbackRecord[phase]?.date || "",

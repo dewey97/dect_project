@@ -149,37 +149,6 @@ export function checkMotiveValid(
 }
 
 /**
- * Validates alibi evidence selection strictly against target codes from Live CMS.
- */
-export function checkAlibiValid(
-  targetCodes: string[],
-  selectedIds: string[],
-  optionalCodes: string[] = [],
-): boolean {
-  if (
-    !targetCodes ||
-    targetCodes.length === 0 ||
-    !selectedIds ||
-    selectedIds.length === 0
-  )
-    return false;
-  if (hasAdminBypassInArray(selectedIds)) return true;
-
-  const allRequiredSatisfied = targetCodes.every((target) =>
-    selectedIds.some((c) => isEvidenceMatching(c, [target])),
-  );
-  if (!allRequiredSatisfied) return false;
-
-  const allowedPool = [...targetCodes, ...optionalCodes];
-  const allSelectedAreValid = selectedIds.every((selected) =>
-    allowedPool.some((target) => isEvidenceMatching(selected, [target])),
-  );
-  if (!allSelectedAreValid) return false;
-
-  return true;
-}
-
-/**
  * Validates contradiction evidence selection strictly against target codes from Live CMS.
  */
 export function checkContradictionValid(

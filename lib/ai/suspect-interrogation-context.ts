@@ -11,18 +11,17 @@ export interface SuspectCategoryCriteria {
 
 export interface SuspectCriteriaMap {
   motive?: SuspectCategoryCriteria;
-  alibi?: SuspectCategoryCriteria;
   contradiction?: SuspectCategoryCriteria;
 }
 
 /**
  * Trả về bối cảnh thẩm tra động cho bất kỳ nghi phạm nào.
  * 100% dữ liệu lấy từ cấu hình Checkpoint (aiContext, aiValidCases, aiInvalidCases, pickerConfig).
- * Không lưu cứng lời giải cụ thể của case nào trong bundle client.
+ * Chỉ chạy ở server (`/api/scan-answer`); tiêu chí không gửi xuống client.
  */
 export function getInterrogationCriteria(
   suspectId: string,
-  category: "motive" | "alibi" | "contradiction",
+  category: "motive" | "contradiction",
   checkpointData?: {
     title?: string;
     question?: string;
@@ -31,26 +30,17 @@ export function getInterrogationCriteria(
     aiValidCases?: string[];
     aiInvalidCases?: string[];
     motiveContext?: string;
-    alibiContext?: string;
     contradictionContext?: string;
   },
 ): SuspectCategoryCriteria {
   const categoryLabel =
-    category === "motive"
-      ? "Động cơ gây án"
-      : category === "alibi"
-        ? "Xác minh ngoại phạm"
-        : "Mâu thuẫn lời khai";
+    category === "motive" ? "Động cơ gây án" : "Mâu thuẫn lời khai";
 
   // 1. Ưu tiên cao nhất: Bối cảnh riêng biệt từng hạng mục được biên soạn trong Checkpoint Studio
   const specificCategoryContext =
     category === "motive"
       ? checkpointData?.motiveContext?.trim()
-      : category === "alibi"
-        ? checkpointData?.alibiContext?.trim()
-        : category === "contradiction"
-          ? checkpointData?.contradictionContext?.trim()
-          : "";
+      : checkpointData?.contradictionContext?.trim();
 
   if (specificCategoryContext) {
     return {

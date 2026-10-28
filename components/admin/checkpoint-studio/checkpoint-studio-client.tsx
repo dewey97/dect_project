@@ -447,8 +447,6 @@ export function CheckpointStudioClient({
                 optionalEvidenceIds: [],
                 motiveEvidenceIds: [],
                 optionalMotiveIds: [],
-                alibiEvidenceIds: [],
-                optionalAlibiIds: [],
                 contradictionEvidenceIds: [],
                 optionalContradictionIds: [],
               }
@@ -459,8 +457,6 @@ export function CheckpointStudioClient({
                 optionalEvidenceIds: [],
                 motiveEvidenceIds: [],
                 optionalMotiveIds: [],
-                alibiEvidenceIds: [],
-                optionalAlibiIds: [],
                 contradictionEvidenceIds: [],
                 optionalContradictionIds: [],
                 epilogueStories: [{ id: "story_1", title: "Phần 1", monologue: "" }],

@@ -53,7 +53,7 @@ export function EpilogueModal({
       return dynamicEpilogues.map((cp, idx) => ({
         id: cp.id,
         title: cp.title || `Hậu Án ${idx + 1}`,
-        monologue: cp.narrative || cp.storyConfig?.monologue || "",
+        monologue: cp.storyConfig?.monologue || "",
       }));
     }
 
@@ -64,7 +64,6 @@ export function EpilogueModal({
         id: lastCp?.id || "epilogue-final",
         title: lastCp?.title || "Khép lại chuyên án",
         monologue:
-          lastCp?.narrative ||
           lastCp?.storyConfig?.monologue ||
           "Chuyên án điều tra chính thức khép lại. Mọi chứng cứ và diễn biến đã được thu thập đầy đủ.",
       },

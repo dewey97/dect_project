@@ -53,23 +53,19 @@ import {
   buildDynamicSuspectCharacters,
   type SuspectCharacter,
 } from "@/lib/cases/characters";
-import {
-  isEvidenceMatching,
-  checkMotiveValid,
-  checkContradictionValid,
-  resolveEvidenceCode,
-} from "@/lib/cases/clues";
+import { resolveEvidenceCode } from "@/lib/cases/clues";
 import { getKnownCasePhones } from "@/lib/cases/case-characters";
-import {
-  isAdminBypassCode,
-  hasAdminBypassInArray,
-} from "@/lib/cases/admin-bypass";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
-import { getInterrogationCriteria } from "@/lib/ai/suspect-interrogation-context";
+import {
+  verifyCheckpointOnServer,
+  VERIFY_UNAVAILABLE_MESSAGE,
+} from "@/lib/checkpoints/client-verify";
 import { normalizeForMatch } from "@/lib/text";
 
-export { findValidCaseCharacter, checkMotiveValid, checkContradictionValid };
+export { findValidCaseCharacter };
+
+const clueKey = (ids: readonly string[]) => [...ids].sort().join("|");
 
 export function AddSuspectModal({
   caseId = "case_000",
@@ -105,6 +101,11 @@ export function AddSuspectModal({
   const [contradictionReason, setContradictionReason] = useState<string>(
     () => editingSuspect?.contradictionReason || "",
   );
+  // Bộ mã đã được server xác nhận đúng cho từng lớp (khóa = mã đã sắp xếp).
+  const [verifiedKeys, setVerifiedKeys] = useState<{
+    motive?: string;
+    contradiction?: string;
+  }>({});
   const [isVerifyingAI, setIsVerifyingAI] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [evalModal, setEvalModal] = useState<EvaluationModalState | null>(null);
@@ -158,60 +159,28 @@ export function AddSuspectModal({
     });
     if (kindMatch) return kindMatch.id;
 
-    // 1. Quét tìm Checkpoint khớp trực tiếp theo suspectId, followupOf, hoặc suspectLabel
+    // 1. Khớp theo followupOf hoặc theo tên nhân vật trong tiêu đề
     const directMatch = checkpoints.find((cp) => {
-      const sId = (cp.suspectId || "").toLowerCase().trim();
       const fOf = (cp.followupOf || "").toLowerCase().trim();
-      const sLabel = (cp.suspectLabel || "").toLowerCase().trim();
-      const validSuspects = (cp.pickerConfig?.validSuspects || []).map((s) =>
-        s.toLowerCase().trim(),
-      );
-
-      return (
-        (sId && (norm === sId || norm.includes(sId) || sId.includes(norm))) ||
-        (fOf && (norm === fOf || norm.includes(fOf) || fOf.includes(norm))) ||
-        (sLabel &&
-          (norm === sLabel ||
-            norm.includes(sLabel) ||
-            sLabel.includes(norm))) ||
-        validSuspects.some(
-          (v) => norm === v || norm.includes(v) || v.includes(norm),
-        )
-      );
+      return fOf && (norm === fOf || norm.includes(fOf) || fOf.includes(norm));
     });
     if (directMatch) return directMatch.id;
 
-    // 2. Tìm theo matchedChar (từ danh mục nhân vật)
     if (matchedChar) {
       const charId = matchedChar.id.toLowerCase();
       const charName = matchedChar.canonicalName.toLowerCase();
       const charAliases = (matchedChar.aliases || []).map((a) =>
         a.toLowerCase(),
       );
-
       const foundCp = checkpoints.find((cp) => {
         const titleLower = (cp.title || "").toLowerCase();
         const questionLower = (cp.question || "").toLowerCase();
-        const suspectLabelLower = (cp.suspectLabel || "").toLowerCase();
-        const sId = (cp.suspectId || "").toLowerCase();
-        const fOf = (cp.followupOf || "").toLowerCase();
-        const validSuspects = (cp.pickerConfig?.validSuspects || []).map((s) =>
-          s.toLowerCase(),
-        );
-
         return (
-          sId === charId ||
-          fOf === charId ||
+          (cp.followupOf || "").toLowerCase() === charId ||
           titleLower.includes(charId) ||
           titleLower.includes(charName) ||
           questionLower.includes(charName) ||
-          suspectLabelLower.includes(charName) ||
-          validSuspects.includes(charName) ||
-          validSuspects.includes(charId) ||
-          charAliases.some(
-            (alias) =>
-              titleLower.includes(alias) || validSuspects.includes(alias),
-          )
+          charAliases.some((alias) => titleLower.includes(alias))
         );
       });
       if (foundCp) return foundCp.id;
@@ -244,7 +213,6 @@ export function AddSuspectModal({
 
         const suspectKey =
           matchedCheckpoint?.subjectKey ||
-          matchedCheckpoint?.suspectId ||
           matchedCheckpoint?.followupOf ||
           matchedChar?.id ||
           (name || "").toLowerCase().trim();
@@ -321,26 +289,60 @@ export function AddSuspectModal({
     return ids;
   };
 
-  const validateMotive = (_charId: string, clues: string[]) => {
-    if (hasAdminBypassInArray(clues)) return true;
-    const liveMotive = matchedCheckpoint?.pickerConfig?.motiveEvidenceIds || [];
-    const optionalMotive =
-      matchedCheckpoint?.pickerConfig?.optionalMotiveIds || [];
-    return checkMotiveValid(liveMotive, clues, optionalMotive);
+  /** Chấm một lớp thẩm tra qua server. Trả null khi không kết nối được. */
+  const verifyStage = async (
+    stage: "motive" | "contradiction",
+    clues: string[],
+  ): Promise<boolean | null> => {
+    if (!matchedCheckpoint) return true;
+    const result = await verifyCheckpointOnServer({
+      caseId: normalizedCaseId,
+      checkpointId: matchedCheckpoint.id,
+      ...(stage === "motive"
+        ? { motiveCodes: clues }
+        : { contradictionCodes: clues }),
+    });
+    if (!result.success) {
+      detectiveAudio.playGlassSound();
+      setErrorMsg(VERIFY_UNAVAILABLE_MESSAGE);
+      return null;
+    }
+    return result.correct;
   };
 
-  const validateContradiction = (_charId: string, clues: string[]) => {
-    if (hasAdminBypassInArray(clues)) return true;
-    const liveContradiction =
-      matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds || [];
-    const optionalContradiction =
-      matchedCheckpoint?.pickerConfig?.optionalContradictionIds || [];
-    return checkContradictionValid(
-      liveContradiction,
-      clues,
-      optionalContradiction,
-    );
-  };
+  // Khi mở lại nghi phạm đã có mã chứng cứ: hỏi server để hiện lại dấu tích.
+  useEffect(() => {
+    if (!isOpen || !matchedCheckpoint) return;
+    let cancelled = false;
+    setVerifiedKeys({});
+    const stages = [
+      ["motive", motiveClueIds, matchedCheckpoint.pickerConfig?.hasMotive],
+      [
+        "contradiction",
+        contradictionClueIds,
+        matchedCheckpoint.pickerConfig?.hasContradiction,
+      ],
+    ] as const;
+    for (const [stage, clues, required] of stages) {
+      if (!required || clues.length === 0) continue;
+      verifyCheckpointOnServer({
+        caseId: normalizedCaseId,
+        checkpointId: matchedCheckpoint.id,
+        ...(stage === "motive"
+          ? { motiveCodes: [...clues] }
+          : { contradictionCodes: [...clues] }),
+      }).then((result) => {
+        if (!cancelled && result.success && result.correct) {
+          setVerifiedKeys((prev) => ({ ...prev, [stage]: clueKey(clues) }));
+        }
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+    // Chỉ chạy khi mở modal cho một checkpoint; thay đổi mã sau đó đi qua nút xác nhận.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, matchedCheckpoint?.id]);
 
   // HÀM HỖ TRỢ GỌI AI KIỂM TRA LẬP LUẬN LÝ DO
   const verifyReasonWithAI = async (
@@ -354,26 +356,15 @@ export function AddSuspectModal({
 
     setIsVerifyingAI(true);
     try {
-      const criteria = getInterrogationCriteria(charId, category, {
-        title: matchedCheckpoint?.title,
-        question: matchedCheckpoint?.question,
-        hint: matchedCheckpoint?.hint,
-        aiContext: matchedCheckpoint?.aiContext,
-        aiValidCases: matchedCheckpoint?.aiValidCases,
-        aiInvalidCases: matchedCheckpoint?.aiInvalidCases,
-        motiveContext: matchedCheckpoint?.pickerConfig?.motiveContext,
-        contradictionContext:
-          matchedCheckpoint?.pickerConfig?.contradictionContext,
-      });
-
       const res = await fetch("/api/scan-answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          context: criteria.context,
+          caseId: normalizedCaseId,
+          checkpointId: matchedCheckpoint?.id,
+          category,
+          suspect: charId,
           answer: reasonText,
-          validCases: criteria.validCases,
-          invalidCases: criteria.invalidCases,
         }),
       });
 
@@ -410,11 +401,11 @@ export function AddSuspectModal({
     const matched = findValidCaseCharacter(name, sheetCharacters);
 
     // Kiểm tra mã chứng cứ
-    const hasMotiveReqs =
-      (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0;
+    const hasMotiveReqs = Boolean(matchedCheckpoint?.pickerConfig?.hasMotive);
     const isCluesValid = hasMotiveReqs
-      ? validateMotive(matched?.id || "", effectiveClues)
+      ? await verifyStage("motive", effectiveClues)
       : true;
+    if (isCluesValid === null) return;
 
     if (hasMotiveReqs && !isCluesValid) {
       detectiveAudio.playGlassSound();
@@ -456,6 +447,7 @@ export function AddSuspectModal({
     }
 
     detectiveAudio.playStampSound();
+    setVerifiedKeys((prev) => ({ ...prev, motive: clueKey(effectiveClues) }));
     if (matched) {
       const combinedClues = Array.from(
         new Set([...effectiveClues, ...contradictionClueIds]),
@@ -500,12 +492,13 @@ export function AddSuspectModal({
     const matched = findValidCaseCharacter(name, sheetCharacters);
 
     // Kiểm tra mã chứng cứ
-    const hasContradictionReqs =
-      (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) >
-      0;
+    const hasContradictionReqs = Boolean(
+      matchedCheckpoint?.pickerConfig?.hasContradiction,
+    );
     const isCluesValid = hasContradictionReqs
-      ? validateContradiction(matched?.id || "", effectiveClues)
+      ? await verifyStage("contradiction", effectiveClues)
       : true;
+    if (isCluesValid === null) return;
 
     if (hasContradictionReqs && !isCluesValid) {
       detectiveAudio.playGlassSound();
@@ -547,6 +540,10 @@ export function AddSuspectModal({
     }
 
     detectiveAudio.playStampSound();
+    setVerifiedKeys((prev) => ({
+      ...prev,
+      contradiction: clueKey(effectiveClues),
+    }));
     if (matched) {
       const combinedClues = Array.from(
         new Set([...motiveClueIds, ...effectiveClues]),
@@ -575,7 +572,7 @@ export function AddSuspectModal({
   };
 
   // NÚT: ĐIỀU TRA (Thẩm tra / điều tra đối tượng tình nghi được chọn)
-  const handleSubmitConclusion = () => {
+  const handleSubmitConclusion = async () => {
     const currentName = name.trim() || editingSuspect?.name?.trim() || "";
     if (!currentName) {
       setErrorMsg("Vui lòng nhập họ và tên đối tượng tình nghi!");
@@ -619,9 +616,8 @@ export function AddSuspectModal({
     pendingContradictionRef.current = {};
 
     const hasInterrogationReqs = !!(
-      (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0 ||
-      (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) >
-        0
+      Boolean(matchedCheckpoint?.pickerConfig?.hasMotive) ||
+      Boolean(matchedCheckpoint?.pickerConfig?.hasContradiction)
     );
 
     // If non-core suspect (Bà Lụa, Đạt, Mai...), save directly as related person of interest
@@ -649,17 +645,19 @@ export function AddSuspectModal({
 
     const charId = matchedChar.id as string;
     const hasMotiveReqs =
-      (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0;
+      Boolean(matchedCheckpoint?.pickerConfig?.hasMotive);
     const isMotiveOk =
       !hasMotiveReqs ||
-      validateMotive(charId, effectiveMotiveClues);
+      verifiedKeys.motive === clueKey(effectiveMotiveClues) ||
+      (await verifyStage("motive", effectiveMotiveClues));
     const hasContradictionReqs =
-      (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) >
-      0;
+      Boolean(matchedCheckpoint?.pickerConfig?.hasContradiction);
     const isContradictionOk =
       !hasContradictionReqs ||
-      validateContradiction(charId, effectiveContradictionClues);
+      verifiedKeys.contradiction === clueKey(effectiveContradictionClues) ||
+      (await verifyStage("contradiction", effectiveContradictionClues));
 
+    if (isMotiveOk === null || isContradictionOk === null) return;
     if (!isMotiveOk || !isContradictionOk) {
       setErrorMsg(
         "Bằng chứng động cơ hoặc mâu thuẫn lời khai chưa chính xác. Vui lòng rà soát lại trước khi hoàn tất thẩm tra!",
@@ -695,27 +693,26 @@ export function AddSuspectModal({
     !!matchedChar &&
     (matchedChar as any).role !== "victim";
   const hasInterrogationReqs = !!(
-    (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0 ||
-    (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) > 0
+    Boolean(matchedCheckpoint?.pickerConfig?.hasMotive) ||
+    Boolean(matchedCheckpoint?.pickerConfig?.hasContradiction)
   );
   const isCore = !!matchedChar && hasInterrogationReqs;
 
   // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
   const hasMotiveReqs =
-    (matchedCheckpoint?.pickerConfig?.motiveEvidenceIds?.length ?? 0) > 0;
+    Boolean(matchedCheckpoint?.pickerConfig?.hasMotive);
   const isMotiveValid =
     matchedChar && isCore
       ? hasMotiveReqs
-        ? validateMotive(matchedChar.id, motiveClueIds)
+        ? verifiedKeys.motive === clueKey(motiveClueIds)
         : motiveClueIds.length > 0
       : false;
   const hasContradictionReqs =
-    (matchedCheckpoint?.pickerConfig?.contradictionEvidenceIds?.length ?? 0) >
-    0;
+    Boolean(matchedCheckpoint?.pickerConfig?.hasContradiction);
   const isContradictionValid =
     matchedChar && isCore
       ? hasContradictionReqs
-        ? validateContradiction(matchedChar.id, contradictionClueIds)
+        ? verifiedKeys.contradiction === clueKey(contradictionClueIds)
         : contradictionClueIds.length > 0
       : false;
   const isCoreReqsMet = isMotiveValid && isContradictionValid;

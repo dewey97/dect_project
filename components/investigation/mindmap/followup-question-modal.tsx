@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, HelpCircle } from "lucide-react";
 import { detectiveAudio } from "@/lib/investigation-audio";
-import { isAdminBypassCode } from "@/lib/cases/admin-bypass";
 import { getStorageItem, setStorageItem, getStorageJson } from "@/lib/storage";
 import { normalizeImageUrl, cn } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
@@ -15,7 +14,10 @@ import { FollowupChoiceForm } from "./followup/followup-choice-form";
 import { FollowupCodeForm } from "./followup/followup-code-form";
 import { FollowupTextForm } from "./followup/followup-text-form";
 import { caseStorageKey } from "@/lib/cases/case-id";
-import { verifyCheckpointOnServer } from "@/lib/checkpoints/client-verify";
+import {
+  verifyCheckpointOnServer,
+  VERIFY_UNAVAILABLE_MESSAGE,
+} from "@/lib/checkpoints/client-verify";
 import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
 import { removeDiacritics } from "@/lib/cases/characters";
 
@@ -124,7 +126,6 @@ export function FollowupQuestionModal({
   // 2. Xác định Loại Form tương tác tổng quan (time | choice | code | text)
   const questionType = useMemo<"time" | "choice" | "code" | "text">(() => {
     const rawType = (
-      activeCheckpoint?.inputType ||
       activeCheckpoint?.questionType ||
       activeCheckpoint?.type
     )
@@ -151,7 +152,6 @@ export function FollowupQuestionModal({
   const suspectDisplayLabel = useMemo(() => {
     if (!targetCulprit) return "";
     if (matchedCharacter?.name) return matchedCharacter.name;
-    if (activeCheckpoint?.suspectLabel) return activeCheckpoint.suspectLabel;
 
     if (Array.isArray(rawSheetPhotos)) {
       const match = rawSheetPhotos.find((p: any) => {
@@ -202,10 +202,7 @@ export function FollowupQuestionModal({
         ),
       }));
 
-    const targetCodes: string[] =
-      activeCheckpoint?.photoCodes ||
-      (activeCheckpoint as any)?.answerConfig?.photoCodes ||
-      [];
+    const targetCodes: string[] = activeCheckpoint?.photoCodes || [];
 
     if (!targetCodes || targetCodes.length === 0) return [];
 
@@ -302,6 +299,22 @@ export function FollowupQuestionModal({
 
   if (!isOpen || !targetCulprit) return null;
 
+  /** Chấm qua server. Trả null khi không kết nối được (đã báo lỗi). */
+  const verifyAnswer = async (answer: string): Promise<boolean | null> => {
+    if (!activeCheckpoint?.id) return false;
+    const result = await verifyCheckpointOnServer({
+      caseId: normalizedCaseId,
+      checkpointId: activeCheckpoint.id,
+      answer,
+    });
+    if (!result.success) {
+      detectiveAudio.playGlassSound();
+      setErrorMsg(VERIFY_UNAVAILABLE_MESSAGE);
+      return null;
+    }
+    return result.correct;
+  };
+
   // 1. Xử lý nộp đáp án Mốc Thời Gian (Time Form)
   const handleSubmitTime = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -313,49 +326,13 @@ export function FollowupQuestionModal({
       return;
     }
 
-    const isBypass = isAdminBypassCode(normalized);
-    let isCorrect = isBypass;
-
-    if (!isBypass && activeCheckpoint?.id) {
-      // 1. Thử chấm server-side trước
-      const serverResult = await verifyCheckpointOnServer({
-        caseId: normalizedCaseId,
-        checkpointId: activeCheckpoint.id,
-        answer: rawAnswer,
-      });
-
-      if (serverResult.success) {
-        isCorrect = serverResult.correct;
-        // If server returned `success: true` but `correct: false`, try client-side fallback
-        if (!isCorrect) {
-          const expected = (activeCheckpoint.correctAnswer || "")
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "");
-          isCorrect =
-            Boolean(expected) &&
-            (normalized === expected ||
-              normalized === expected.replace(":", "h") ||
-              normalized === expected.replace("h", ":"));
-        }
-      } else {
-        // Server did not succeed, fallback offline client-side
-        const expected = (activeCheckpoint.correctAnswer || "")
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, "");
-        isCorrect =
-          Boolean(expected) &&
-          (normalized === expected ||
-            normalized === expected.replace(":", "h") ||
-            normalized === expected.replace("h", ":"));
-      }
-    }
+    const isCorrect = await verifyAnswer(rawAnswer);
+    if (isCorrect === null) return;
 
     if (isCorrect) {
       detectiveAudio.playStampSound();
       setErrorMsg("");
-      const finalAnswer = activeCheckpoint?.correctAnswer || timeInput.trim();
+      const finalAnswer = rawAnswer;
       setStorageItem(
         caseStorageKey(caseId, `followup_${targetCulprit}`),
         finalAnswer,
@@ -381,32 +358,11 @@ export function FollowupQuestionModal({
       return;
     }
 
-    const isBypass = isAdminBypassCode(selectedChoice);
     const selectedLabel =
       choiceOptions.find((opt) => opt.id === selectedChoice)?.label ??
       selectedChoice;
-    let isCorrect = isBypass;
-
-    if (!isBypass && activeCheckpoint?.id) {
-      const serverResult = await verifyCheckpointOnServer({
-        caseId: normalizedCaseId,
-        checkpointId: activeCheckpoint.id,
-        answer: selectedLabel,
-      });
-
-      if (serverResult.success && serverResult.correct) {
-        isCorrect = true;
-      } else {
-        // Fallback offline client-side
-        const expected = (activeCheckpoint.correctAnswer || "")
-          .trim()
-          .toLowerCase();
-        isCorrect =
-          !expected ||
-          selectedLabel.trim().toLowerCase() === expected ||
-          selectedChoice.trim().toLowerCase() === expected;
-      }
-    }
+    const isCorrect = await verifyAnswer(selectedLabel);
+    if (isCorrect === null) return;
 
     if (isCorrect) {
       detectiveAudio.playStampSound();
@@ -437,30 +393,8 @@ export function FollowupQuestionModal({
       return;
     }
 
-    const isMasterBypass = isAdminBypassCode(rawVal);
-    let isCorrect = isMasterBypass;
-
-    if (!isMasterBypass && activeCheckpoint?.id) {
-      const serverResult = await verifyCheckpointOnServer({
-        caseId: normalizedCaseId,
-        checkpointId: activeCheckpoint.id,
-        answer: codeInput.trim(),
-      });
-
-      if (serverResult.success) {
-        isCorrect = serverResult.correct;
-      } else {
-        // Fallback offline
-        const expected = (activeCheckpoint.correctAnswer || "")
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, "");
-        isCorrect =
-          Boolean(expected) &&
-          (rawVal === expected ||
-            (expected.length >= 6 && expected.includes(rawVal)));
-      }
-    }
+    const isCorrect = await verifyAnswer(codeInput.trim());
+    if (isCorrect === null) return;
 
     if (isCorrect) {
       detectiveAudio.playStampSound();
@@ -494,28 +428,8 @@ export function FollowupQuestionModal({
     }
 
     const finalVal = selectedChoice || rawVal;
-    const isBypass = isAdminBypassCode(finalVal);
-    let isCorrect = isBypass;
-
-    if (!isBypass && activeCheckpoint?.id) {
-      const serverResult = await verifyCheckpointOnServer({
-        caseId: normalizedCaseId,
-        checkpointId: activeCheckpoint.id,
-        answer: finalVal,
-      });
-
-      if (serverResult.success) {
-        isCorrect = serverResult.correct;
-      } else {
-        const expected = (activeCheckpoint.correctAnswer || "")
-          .trim()
-          .toLowerCase();
-        isCorrect =
-          !expected ||
-          finalVal.toLowerCase().replace(/\s+/g, "") ===
-            expected.replace(/\s+/g, "");
-      }
-    }
+    const isCorrect = await verifyAnswer(finalVal);
+    if (isCorrect === null) return;
 
     if (isCorrect) {
       detectiveAudio.playStampSound();

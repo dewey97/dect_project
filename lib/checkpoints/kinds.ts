@@ -40,14 +40,12 @@ export interface PhoneLookupConfig {
   }[];
 }
 
-/** Cấu hình thẩm tra nghi phạm 3 lớp (Động cơ / Ngoại phạm / Mâu thuẫn). */
+/** Cấu hình thẩm tra nghi phạm 2 lớp (Động cơ / Mâu thuẫn), AGENTS.md §13. */
 export interface SuspectInterrogationConfig {
   kind: "suspect_interrogation";
   motiveEvidenceIds: string[];
   optionalMotiveIds: string[];
   motiveContext?: string;
-  alibiEvidenceIds: string[];
-  optionalAlibiIds: string[];
   contradictionEvidenceIds: string[];
   optionalContradictionIds: string[];
   contradictionContext?: string;
@@ -147,8 +145,6 @@ export function parseCheckpointConfig(
         motiveEvidenceIds: asStringArray(source.motiveEvidenceIds),
         optionalMotiveIds: asStringArray(source.optionalMotiveIds),
         motiveContext: asString(source.motiveContext) || undefined,
-        alibiEvidenceIds: asStringArray(source.alibiEvidenceIds),
-        optionalAlibiIds: asStringArray(source.optionalAlibiIds),
         contradictionEvidenceIds: asStringArray(
           source.contradictionEvidenceIds,
         ),

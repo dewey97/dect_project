@@ -16,7 +16,7 @@ import { slugifyVietnamese, asStringArray, cleanList } from "@/lib/text";
 export type CheckpointStudioType = string;
 
 export type CheckpointHintGroup =
-  "general" | "motive" | "alibi" | "contradiction";
+  "general" | "motive" | "contradiction";
 
 export interface CheckpointHint {
   group: CheckpointHintGroup;
@@ -49,8 +49,6 @@ export interface EvidencePickerConfig {
   motiveEvidenceIds: string[];
   optionalMotiveIds: string[];
   motiveContext?: string;
-  alibiEvidenceIds: string[];
-  optionalAlibiIds: string[];
   contradictionEvidenceIds: string[];
   optionalContradictionIds: string[];
   contradictionContext?: string;
@@ -107,8 +105,6 @@ export const EMPTY_EVIDENCE_CONFIG: EvidencePickerConfig = {
   optionalEvidenceIds: [],
   motiveEvidenceIds: [],
   optionalMotiveIds: [],
-  alibiEvidenceIds: [],
-  optionalAlibiIds: [],
   contradictionEvidenceIds: [],
   optionalContradictionIds: [],
   correctAnswer: "",
@@ -157,7 +153,6 @@ function asString(value: unknown): string {
 
 function normalizeHintGroup(value: unknown): CheckpointHintGroup {
   return value === "motive" ||
-    value === "alibi" ||
     value === "contradiction" ||
     value === "general"
     ? value
@@ -176,8 +171,6 @@ function parseConfig(
     motiveEvidenceIds: asStringArray(source.motiveEvidenceIds),
     optionalMotiveIds: asStringArray(source.optionalMotiveIds),
     motiveContext: asString(source.motiveContext || source.motive_context),
-    alibiEvidenceIds: asStringArray(source.alibiEvidenceIds),
-    optionalAlibiIds: asStringArray(source.optionalAlibiIds),
     contradictionEvidenceIds: asStringArray(source.contradictionEvidenceIds),
     optionalContradictionIds: asStringArray(source.optionalContradictionIds),
     contradictionContext: asString(
@@ -303,8 +296,6 @@ export function toRowPayload(
       ...(draft.answerConfig.motiveContext?.trim()
         ? { motiveContext: draft.answerConfig.motiveContext.trim() }
         : {}),
-      alibiEvidenceIds: cleanList(draft.answerConfig.alibiEvidenceIds),
-      optionalAlibiIds: cleanList(draft.answerConfig.optionalAlibiIds),
       contradictionEvidenceIds: cleanList(
         draft.answerConfig.contradictionEvidenceIds,
       ),

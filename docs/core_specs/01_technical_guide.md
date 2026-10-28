@@ -28,7 +28,7 @@ d:\code_world\dect_project/
 │   │   ├── image-proxy/            # Proxy tải ảnh/GIF Google Drive (in-memory caching 0ms)
 │   │   ├── phone/                  # API trích xuất dữ liệu điện thoại tang vật
 │   │   ├── reinvestigation/        # API nạp & lưu tọa độ điểm khám xét lại hiện trường
-│   │   ├── scan-answer/            # API AI Gemini phân tích & chấm câu trả lời người chơi
+│   │   ├── scan-answer/            # API AI Gemini chấm lập luận; nhận {caseId, checkpointId, category, answer}, tiêu chí đọc ở server
 │   │   ├── verify-finding/         # API xác thực lập luận & nghiệm thu manh mối
 │   │   └── waitlist/               # API tiếp nhận đăng ký waitlist trải nghiệm vụ án
 │   ├── layout.tsx                  # Root Layout & Theme Providers

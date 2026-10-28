@@ -134,7 +134,6 @@ export function CulpritEpilogueModal({
         c.id.includes("indictment"),
     );
     storyText =
-      dynamicIndictmentCp?.narrative ||
       dynamicIndictmentCp?.storyConfig?.monologue ||
       getCheckpointMonologue(dynamicIndictmentCp?.id || "") ||
       getCheckpointMonologue("cp-epilogue-ha") ||
@@ -159,9 +158,7 @@ export function CulpritEpilogueModal({
         (c.subjectKey === targetCulprit || c.id?.includes(targetCulprit)),
     );
     storyText =
-      suspectCp?.narrative ||
       suspectCp?.storyConfig?.monologue ||
-      epilogueCp?.narrative ||
       epilogueCp?.storyConfig?.monologue ||
       getCheckpointMonologue(suspectCp?.id || "") ||
       getCheckpointMonologue(epilogueCp?.id || "") ||

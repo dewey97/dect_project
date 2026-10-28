@@ -157,6 +157,22 @@ caseId là tham số bắt buộc, không có default "case_000" ngoài trang la
 
 ## 5. Lộ Trình Thực Thi
 
+### Tiến độ (2026-10-28)
+
+| Giai đoạn | Trạng thái | Ghi chú |
+| :--- | :--- | :--- |
+| 0 | Phần lớn đã chốt | Còn câu 4 (gộp modal). |
+| 1 | Xong | Xóa `/board-stage`, `followup-config-form`, cờ `REQUIRE_REINVESTIGATION_APPROVAL`, prefix storage cũ; đổi tên `RoomPresenceBar`. |
+| 2 | Xong phần code | Grader dùng parser duy nhất `kinds.ts`, một hàm `matchAnswer`, một hàm so khớp tên (`isVietnameseTextMatch`). Bỏ alibi toàn bộ. Model runtime bỏ alias (`inputType`, `suspectId`, `rawAnswers`, `correctAnswer`...). **Chưa gộp kind trong DB** (`followup/choice/code/time/text` → `question`): cần truy vấn production trước, grader đã xử lý chung các kind này. |
+| 3A | Xong phần code | `/api/checkpoints` dùng service role và lọc allowlist; mọi modal chấm qua `/api/checkpoints/verify`; `/api/scan-answer` tự đọc tiêu chí AI ở server (trước đây client gửi cả tiêu chí, route là proxy LLM mở). Migration `48_checkpoint_answers_server_only.sql` đã viết, **chưa chạy**: chạy sau khi deploy code. |
+| 4–6 | Chưa làm | |
+
+Phát hiện thêm khi làm GĐ3A:
+- `indictment-modal.tsx` có danh sách mã chứng cứ đáp án Case #000 hardcode trong client (`"53"`, `"c-02"`, `"d-06"`...). Đã xóa.
+- Mã bypass admin (`0`, `000`, `admin`...) qua được checkpoint ở production cho mọi người chơi. Ghi nhận `TECHDEBT #19`.
+- Mất kết nối server chấm điểm: modal báo "thử lại" thay vì tự chấm. Không còn fallback offline.
+
+
 Mỗi giai đoạn là một commit/PR riêng. Mỗi giai đoạn chạy `pnpm lint` một lần ở cuối, và E2E đầy đủ một lần trước khi push.
 
 ### Giai đoạn 0 — Quyết định sản phẩm (chặn các giai đoạn sau)
@@ -164,9 +180,9 @@ Mỗi giai đoạn là một commit/PR riêng. Mỗi giai đoạn chạy `pnpm l
 Chủ dự án trả lời:
 
 1. ~~Chấm điểm: Phương án A (server-only) hay B (client-only)? §3.2.~~ **Đã chốt: A (server-only), 2026-10-28.**
-2. Chế độ `canvas` ở `/evidence/web` còn giữ không? Nếu bỏ: xóa ~4.500 dòng (§3.5).
-3. `/board-stage` và `/evidence/boardgame` còn là luồng chính thức không?
-4. Giữ hệ hướng dẫn nào trong 4 hệ? Giữ modal hậu án nào trong 2?
+2. ~~Chế độ `canvas` còn giữ không?~~ **Đã chốt: giữ canvas.** Chỉ dọn logic bên trong.
+3. ~~`/board-stage` và `/evidence/boardgame`?~~ **Đã chốt: bỏ `/board-stage`, giữ `/evidence/boardgame`.**
+4. Giữ hệ hướng dẫn nào trong 4 hệ? Giữ modal hậu án nào trong 2? **Chờ đề xuất** (đọc luồng kích hoạt từng modal trước khi gộp).
 
 ### Giai đoạn 1 — Xóa an toàn (rủi ro thấp)
 

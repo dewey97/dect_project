@@ -10,7 +10,10 @@ import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 import { trackEvent } from "@/lib/analytics";
-import { verifyCheckpointOnServer } from "@/lib/checkpoints/client-verify";
+import {
+  verifyCheckpointOnServer,
+  VERIFY_UNAVAILABLE_MESSAGE,
+} from "@/lib/checkpoints/client-verify";
 import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
 
 interface IndictmentModalProps {
@@ -38,16 +41,8 @@ const DEFAULT_MOTIVE_OPTIONS = [
   },
 ];
 
-import {
-  isAdminBypassCode,
-  hasAdminBypassInArray,
-} from "@/lib/cases/admin-bypass";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { normalizeForMatch } from "@/lib/text";
-
-function normalizeName(str: string): string {
-  return normalizeForMatch(str).replace(/[^a-z0-9]/g, "");
-}
 
 export function findSuspectMatch(
   inputName: string,
@@ -72,51 +67,6 @@ export function findSuspectMatch(
     }
   }
   return null;
-}
-
-export function isCulpritValid(
-  inputName: string,
-  suspects?: Array<{ key: string; name: string; aliases?: string[] | null }>,
-): string | false {
-  if (isAdminBypassCode(inputName)) return false;
-  if (!suspects || suspects.length === 0) return false;
-  const match = findSuspectMatch(inputName, suspects);
-  return match ? match.key : false;
-}
-export function checkIndictmentEvidenceMatch(
-  val: string,
-  targetCodes: string[],
-): boolean {
-  if (isAdminBypassCode(val)) return true;
-  const trimmed = val.trim().toLowerCase();
-  if (!trimmed) return false;
-
-  // Tách các token do người dùng nhập (hỗ trợ phân tách bằng dấu phẩy, khoảng trắng, gạch nối)
-  const tokens = trimmed
-    .split(/[\s,;]+/)
-    .map((t) => t.trim().toLowerCase())
-    .filter(Boolean);
-  const nums: string[] = val.match(/\d+/g) || [];
-
-  return targetCodes.some((tc) => {
-    const targetNorm = tc.trim().toLowerCase();
-    const targetClean = targetNorm.replace(/[^a-z0-9]/g, "");
-    // 1. Trùng chính xác mã (ví dụ: '53', 'c-02', 'd-04', 'd-05', 'd-02')
-    if (
-      tokens.some(
-        (tok) =>
-          tok === targetNorm || tok.replace(/[^a-z0-9]/g, "") === targetClean,
-      )
-    ) {
-      return true;
-    }
-    // 2. Trùng chuỗi số
-    const targetNum = targetNorm.match(/\d+/)?.[0];
-    if (targetNum && nums.includes(targetNum)) {
-      return true;
-    }
-    return false;
-  });
 }
 
 export function IndictmentModal({
@@ -168,30 +118,9 @@ export function IndictmentModal({
       return;
     }
 
-    const isAdmin000 =
-      isAdminBypassCode(suspectName) || isAdminBypassCode(cluesEvidenceInput);
-
-    let matchedCulprit: { key: string; name: string } | null = null;
-    if (isAdmin000) {
-      const fallbackTarget = indictmentCp?.pickerConfig?.validSuspects?.[0];
-      matchedCulprit =
-        (fallbackTarget
-          ? findSuspectMatch(fallbackTarget, suspectCharacters)
-          : null) ||
-        suspectCharacters[0] || { key: "bypass", name: "Bypass" };
-    } else {
-      matchedCulprit = findSuspectMatch(suspectName, suspectCharacters);
-    }
-
-    if (!matchedCulprit) {
-      setErrorMsg(
-        "Không tìm thấy nghi can phù hợp trong hồ sơ vụ án! Vui lòng kiểm tra lại họ tên bị can.",
-      );
-      detectiveAudio.playGlassSound();
-      return;
-    }
-
-    if (!selectedMotiveOption && !isAdmin000) {
+    // Tên có trong hồ sơ thì bắt chọn động cơ trước; tên lạ vẫn gửi server (mã bypass).
+    const localMatch = findSuspectMatch(suspectName, suspectCharacters);
+    if (localMatch && !selectedMotiveOption) {
       setErrorMsg("Vui lòng chọn Động cơ gây án chính của bị can!");
       detectiveAudio.playGlassSound();
       return;
@@ -205,114 +134,37 @@ export function IndictmentModal({
       .map((s) => s.trim())
       .filter(Boolean);
 
-    // 1. Thử chấm điểm trên server-side trước
-    if (!isAdmin000) {
-      const serverResult = await verifyCheckpointOnServer({
-        caseId,
-        checkpointId: indictmentCp?.id || "",
-        suspect: suspectName.trim(),
-        motive: selectedOptionLabel,
-        selectedCodes: parsedClues,
-      });
+    const serverResult = await verifyCheckpointOnServer({
+      caseId,
+      checkpointId: indictmentCp?.id || "",
+      suspect: suspectName.trim(),
+      motive: selectedOptionLabel,
+      selectedCodes: parsedClues,
+    });
 
-      let isCorrect = true; // Assume correct by default if server fails or is bypassed
-      if (serverResult.success) {
-        if (!serverResult.correct) {
-          isCorrect = false;
-          setErrorMsg(
-            serverResult.feedback ||
+    if (!serverResult.success || !serverResult.correct) {
+      setErrorMsg(
+        !serverResult.success
+          ? VERIFY_UNAVAILABLE_MESSAGE
+          : !localMatch
+            ? "Không tìm thấy nghi can phù hợp trong hồ sơ vụ án! Vui lòng kiểm tra lại họ tên bị can."
+            : serverResult.feedback ||
               "Kết luận đối tượng chưa chính xác. Vui lòng đối chiếu lại toàn bộ chứng cứ.",
-          );
-          detectiveAudio.playGlassSound();
-        }
-      } else {
-        // Fallback offline client-side nếu server lỗi/không phản hồi
-        const validSuspectsFromSheet =
-          indictmentCp?.pickerConfig?.validSuspects || [];
+      );
+      detectiveAudio.playGlassSound();
+      return;
+    }
 
-        const isSuspectMatch =
-          validSuspectsFromSheet.length === 0 ||
-          validSuspectsFromSheet.some((ts) => {
-            const cleanTs = normalizeForMatch(ts).trim();
-            return (
-              cleanTs === normalizeForMatch(matchedCulprit!.key).trim() ||
-              cleanTs === normalizeForMatch(matchedCulprit!.name).trim()
-            );
-          });
-
-        if (!isSuspectMatch) {
-          isCorrect = false;
-          setErrorMsg(
-            "Kết luận đối tượng chưa chính xác. Vui lòng đối chiếu lại toàn bộ chứng cứ.",
-          );
-          detectiveAudio.playGlassSound();
-        }
-
-        const validMotivesFromSheet = indictmentCp?.pickerConfig?.validMotives;
-        if (validMotivesFromSheet && validMotivesFromSheet.length > 0) {
-          const isMotiveMatch = validMotivesFromSheet.some((vm) => {
-            const cleanVm = normalizeName(vm);
-            const cleanOpt = normalizeName(selectedOptionLabel);
-            return (
-              cleanOpt.includes(cleanVm) ||
-              selectedMotiveOption.toLowerCase() === vm.toLowerCase()
-            );
-          });
-          if (!isMotiveMatch) {
-            isCorrect = false;
-            setErrorMsg(
-              "Động cơ gây án chưa chính xác. Vui lòng xem xét lại bản chất mâu thuẫn!",
-            );
-            detectiveAudio.playGlassSound();
-          }
-        }
-
-        if (!cluesEvidenceInput.trim()) {
-          isCorrect = false;
-          setErrorMsg("Vui lòng nhập Mã chứng cứ chứng minh dấu vết phạm tội!");
-          detectiveAudio.playGlassSound();
-        } else {
-          const fallbackEvidenceCodes = [
-            "53",
-            "c-02",
-            "c02",
-            "c2",
-            "d-06",
-            "d06",
-            "d6",
-            "d-04",
-            "d04",
-            "d4",
-            "d-05",
-            "d05",
-            "d5",
-            "d-02",
-            "d02",
-            "d2",
-          ];
-          const sheetRequiredCodes =
-            indictmentCp?.pickerConfig?.requiredEvidenceIds;
-          const sheetOptionalCodes =
-            indictmentCp?.pickerConfig?.optionalEvidenceIds || [];
-          const validEvidenceCodes =
-            sheetRequiredCodes && sheetRequiredCodes.length > 0
-              ? [...sheetRequiredCodes, ...sheetOptionalCodes]
-              : fallbackEvidenceCodes;
-
-          if (
-            !checkIndictmentEvidenceMatch(
-              cluesEvidenceInput,
-              validEvidenceCodes,
-            )
-          ) {
-            isCorrect = false;
-            setErrorMsg("Mã chứng cứ mục 2 chưa chính xác!");
-            detectiveAudio.playGlassSound();
-          }
-        }
-      }
-
-      if (!isCorrect) return; // Dừng nếu có lỗi từ server hoặc fallback client
+    const matchedCulprit =
+      (serverResult.culprit &&
+        findSuspectMatch(serverResult.culprit, suspectCharacters)) ||
+      localMatch;
+    if (!matchedCulprit) {
+      setErrorMsg(
+        "Không tìm thấy nghi can phù hợp trong hồ sơ vụ án! Vui lòng kiểm tra lại họ tên bị can.",
+      );
+      detectiveAudio.playGlassSound();
+      return;
     }
 
     const culprit = matchedCulprit.key;

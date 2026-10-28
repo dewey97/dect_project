@@ -161,87 +161,50 @@ export interface EpilogueStoryRuntime {
   monologue: string;
 }
 
+/**
+ * Model runtime của checkpoint phía client gameplay.
+ * Không chứa đáp án: dữ liệu đến từ `/api/checkpoints` đã lọc
+ * (`lib/checkpoints/public-checkpoint.ts`). Chấm điểm qua server.
+ */
 export interface Checkpoint {
   id: string;
   caseId: string;
   title: string;
   question: string;
   hint: string;
+  hintsList?: string[];
   options?: string[];
-  correctAnswer?: string;
-  unlockedEvidenceId?: string;
   nodeId?: string;
   followupOf?: string;
-  dependsOn?: string;
-  /** Dẫn truyện narrative trực tiếp từ Checkpoint Studio (cột narrative). */
-  narrative?: string;
-  suspectId?: string;
+  dependsOn?: string[];
   status: "locked" | "active" | "completed";
   dossier?: string;
   unlocksDossier?: string;
-  suspectLabel?: string;
-  aiContext?: string;
-  aiValidCases?: string[];
-  aiInvalidCases?: string[];
   /** Loại checkpoint theo gameplay (migration 26). */
   kind?: string;
   /** Khóa nhân vật liên quan (`case_characters.key` cùng vụ). */
   subjectKey?: string;
-  type?:
-    "mcq" | "text_match_3" | "evidence_picker" | "convergence" | "accusation";
-  questionType?:
-    "time" | "choice" | "code" | "text" | "evidence_picker" | string;
-  inputType?: string;
-  hintsList?: string[];
+  type?: string;
+  /** Kiểu ô nhập: time | choice | code | text | text_match_3 | evidence_picker. */
+  questionType?: string;
   storyConfig?: {
     /** Mốc thời gian in trên header, ví dụ `Đêm 24/07/2016`. */
     date?: string;
     /** Dòng phụ đề ngắn (mặc định dùng chung `date` nếu bỏ trống). */
     subtitle?: string;
-    /** Đoạn độc thoại dẫn truyện (xuống dòng bằng Alt+Enter trên Sheet). */
     monologue: string;
   };
   /** Danh sách bài Hậu Án (chỉ có khi kind = epilogue). */
   epilogueStories?: EpilogueStoryRuntime[];
   textMatchConfig?: {
-    inputs: {
-      id: string;
-      label: string;
-      placeholder: string;
-      validAnswers: string[];
-    }[];
+    inputs: { id: string; label: string; placeholder: string }[];
   };
   photoCodes?: string[];
-  rawAnswersId?: string;
-  rawAnswers?: string;
   pickerConfig?: {
-    suspectLabel?: string;
-    validSuspects?: string[];
-    evidenceStepLabel?: string;
-    motiveLabel?: string;
-    validMotives?: string[];
     availableEvidences?: CheckpointOptionItem[];
-    requiredEvidenceIds?: string[];
-    optionalEvidenceIds?: string[];
-    motiveEvidenceIds?: string[];
-    optionalMotiveIds?: string[];
-    motiveContext?: string;
-    alibiEvidenceIds?: string[];
-    optionalAlibiIds?: string[];
-    contradictionEvidenceIds?: string[];
-    optionalContradictionIds?: string[];
-    contradictionContext?: string;
-    mismatchTypeLabel?: string;
-    validMismatchTypes?: string[];
-    mismatchTypeOptions?: string[];
-  };
-  convergenceConfig?: {
-    suspects: {
-      id: string;
-      name: string;
-      validReasons: string[];
-      reasonOptions: string[];
-    }[];
+    /** Thẩm tra 2 lớp: lớp nào có yêu cầu mã chứng cứ. */
+    hasMotive?: boolean;
+    hasContradiction?: boolean;
   };
 }
 
@@ -260,16 +223,3 @@ export interface PhaseNarrative {
   monologue: string;
 }
 
-/** Phát hiện điều tra trong sổ tay ghi chép */
-export interface Finding {
-  id: string;
-  phase: number;
-  title: string;
-  description: string;
-  evidenceRef: string;
-  // Mảng các nhóm từ khóa bắt buộc — người chơi phải nhập khớp ít nhất 1 từ đồng nghĩa ở MỖI nhóm
-  keywordGroups: string[][];
-  hint: string;
-  // Key Finding kích hoạt mở khóa chặng tiếp theo
-  isKeyFinding?: boolean;
-}

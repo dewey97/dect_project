@@ -1,10 +1,12 @@
 /**
  * Client-side helper để gửi bài giải tới `/api/checkpoints/verify`.
  *
- * Chấm điểm tập trung trên server-side, giấu hoàn toàn answer_config.
- * Khi mất kết nối mạng hoặc lỗi server, trả về `offline: true` để modal
- * có thể xử lý fallback nếu cần.
+ * Chấm điểm chỉ diễn ra ở server; client không giữ đáp án.
+ * Khi mất mạng hoặc lỗi server, trả về `success: false` để modal báo thử lại.
  */
+
+export const VERIFY_UNAVAILABLE_MESSAGE =
+  "Không kết nối được máy chủ chấm điểm. Vui lòng thử lại sau giây lát.";
 
 export interface VerifyCheckpointPayload {
   caseId: string;
@@ -12,7 +14,6 @@ export interface VerifyCheckpointPayload {
   answer?: string;
   selectedCodes?: string[];
   motiveCodes?: string[];
-  alibiCodes?: string[];
   contradictionCodes?: string[];
   inputs?: Record<string, string>;
   suspect?: string;
@@ -23,11 +24,10 @@ export interface VerifyCheckpointResult {
   success: boolean;
   correct: boolean;
   feedback?: string;
-  unlocksEvidenceId?: string;
+  culprit?: string;
   unlocksDossier?: string;
   stageResults?: {
     motive?: boolean;
-    alibi?: boolean;
     contradiction?: boolean;
   };
   error?: string;
@@ -60,7 +60,7 @@ export async function verifyCheckpointOnServer(
       success: true,
       correct: Boolean(json.correct),
       feedback: json.feedback,
-      unlocksEvidenceId: json.unlocksEvidenceId,
+      culprit: json.culprit,
       unlocksDossier: json.unlocksDossier,
       stageResults: json.stageResults,
     };

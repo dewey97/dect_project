@@ -1,7 +1,7 @@
 "use client";
 
 import { parseRuntimeHints } from "@/lib/cms/checkpoint-runtime";
-import type { DbCaseCheckpoint } from "@/lib/types/database";
+import type { PublicCheckpointRow } from "@/lib/checkpoints/public-checkpoint";
 import { getStorageItem } from "@/lib/storage";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { getActiveCaseId } from "@/lib/cases/case-characters";
@@ -10,7 +10,7 @@ interface HintModalProps {
   isOpen: boolean;
   onClose: () => void;
   checkpointId?: string;
-  category?: "motive" | "alibi" | "contradiction" | "all";
+  category?: "motive" | "contradiction" | "all";
   caseId?: string;
 }
 
@@ -20,7 +20,6 @@ export interface CheckpointGroupData {
   dossier: string;
   hints: string[];
   motiveHints: string[];
-  alibiHints: string[];
   contradictionHints: string[];
   hasCategories: boolean;
 }
@@ -57,7 +56,7 @@ export function getLatestActiveCheckpointId(): string {
  * tự động bóc tách các nhóm [ĐỘNG CƠ], [NGOẠI PHẠM], [MÂU THUẪN].
  */
 export function buildGroupedCheckpointsMap(
-  checkpoints: DbCaseCheckpoint[],
+  checkpoints: PublicCheckpointRow[],
 ): Map<string, CheckpointGroupData> {
   const map = new Map<string, CheckpointGroupData>();
 
@@ -72,7 +71,6 @@ export function buildGroupedCheckpointsMap(
         dossier: row.dossier || "",
         hints: [],
         motiveHints: [],
-        alibiHints: [],
         contradictionHints: [],
         hasCategories: false,
       });
@@ -96,11 +94,9 @@ export function buildGroupedCheckpointsMap(
       const target =
         hint.group === "motive"
           ? entry.motiveHints
-          : hint.group === "alibi"
-            ? entry.alibiHints
-            : hint.group === "contradiction"
-              ? entry.contradictionHints
-              : null;
+          : hint.group === "contradiction"
+            ? entry.contradictionHints
+            : null;
       if (target && !target.includes(hint.text)) {
         target.push(hint.text);
       }

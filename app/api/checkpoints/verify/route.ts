@@ -79,7 +79,6 @@ export async function POST(request: Request) {
       answer: body.answer,
       selectedCodes: body.selectedCodes,
       motiveCodes: body.motiveCodes,
-      alibiCodes: body.alibiCodes,
       contradictionCodes: body.contradictionCodes,
       inputs: body.inputs,
       suspect: body.suspect,
@@ -92,7 +91,7 @@ export async function POST(request: Request) {
       checkpointId,
       correct: grade.correct,
       feedback: grade.feedback,
-      unlocksEvidenceId: grade.unlocksEvidenceId,
+      culprit: grade.culprit,
       unlocksDossier: grade.unlocksDossier,
       stageResults: grade.stageResults,
     });

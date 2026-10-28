@@ -4,6 +4,15 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-28]
 
+### Server-only checkpoint grading (SPEC-22 GĐ1–3A)
+
+- Gameplay không còn nhận đáp án: `/api/checkpoints` đọc bằng service role và lọc `answer_config` theo allowlist (`lib/checkpoints/public-checkpoint.ts`).
+- Mọi modal (follow-up, tra cứu SĐT, thẩm tra nghi phạm, cáo trạng, pin tùy chỉnh) chấm qua `/api/checkpoints/verify`; bỏ toàn bộ fallback chấm ở client.
+- `/api/scan-answer` nhận `{ caseId, checkpointId, category, suspect, answer }` và tự dựng tiêu chí AI ở server.
+- Grader dùng một parser (`lib/checkpoints/kinds.ts`) và một hàm so khớp tên; bỏ tầng Alibi khỏi code.
+- Migration `48_checkpoint_answers_server_only.sql`: bỏ policy public read và view `case_checkpoints_public` (chạy sau deploy).
+- Xóa route `/board-stage`, cờ `REQUIRE_REINVESTIGATION_APPROVAL`, prefix localStorage cũ; đổi tên `GoogleSheetsPresenceBar` thành `RoomPresenceBar`.
+
 ### Checkpoint Studio & Investigation Board Unified Architecture
 
 - **Unified Character Management into Checkpoint Studio**:
