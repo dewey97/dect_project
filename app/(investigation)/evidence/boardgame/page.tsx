@@ -106,6 +106,7 @@ function BoardGameCompanionContent() {
       <div className="noir-scanlines pointer-events-none fixed inset-0 opacity-15 z-0" />
 
       <BoardGameCompanionView
+        caseId={caseId}
         onOpenEpilogue={() => setActiveModal("epilogue")}
         onOpenPhoneSimulator={() => setActiveModal("phone")}
         onOpenReinvestigation={() => setActiveModal("reinvestigate")}
@@ -166,6 +167,7 @@ function BoardGameCompanionContent() {
 
       {/* RE-INVESTIGATION CRIME SCENE MODAL */}
       <ReinvestigationModal
+        caseId={caseId}
         isOpen={activeModal === "reinvestigate"}
         onClose={() => setActiveModal(null)}
       />

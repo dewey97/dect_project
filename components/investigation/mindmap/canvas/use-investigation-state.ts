@@ -75,10 +75,6 @@ export function useInvestigationState(opts?: {
   const [solvedCulprit, setSolvedCulprit] = useState<CulpritKey | null>(null);
   const [isEpilogueOpen, setIsEpilogueOpen] = useState(false);
   const [isFinalEpilogueOpen, setIsFinalEpilogueOpen] = useState(false);
-  const [isDossierOpen, setIsDossierOpen] = useState(false);
-  const [activeDossierType, setActiveDossierType] = useState<
-    "A" | "B" | "C" | null
-  >(null);
   const [isFollowupQuestionOpen, setIsFollowupQuestionOpen] = useState(false);
   const [isGameplayGuideOpen, setIsGameplayGuideOpen] = useState(false);
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
@@ -310,11 +306,6 @@ export function useInvestigationState(opts?: {
     }
   };
 
-  const handleOpenDossier = (dossierType: "A" | "B" | "C") => {
-    setActiveDossierType(dossierType);
-    setIsDossierOpen(true);
-  };
-
   const handleResetAll = () => {
     detectiveAudio.playGlassSound();
     setSuspects([]);
@@ -329,7 +320,6 @@ export function useInvestigationState(opts?: {
     setHasOpenedReinvestigation(false);
     setIsEpilogueOpen(false);
     setIsFinalEpilogueOpen(false);
-    setIsDossierOpen(false);
     setIsFollowupQuestionOpen(false);
     setIsPhoneNarrativeOpen(false);
     clearCaseProgress(caseId);
@@ -373,10 +363,6 @@ export function useInvestigationState(opts?: {
     setIsEpilogueOpen,
     isFinalEpilogueOpen,
     setIsFinalEpilogueOpen,
-    isDossierOpen,
-    setIsDossierOpen,
-    activeDossierType,
-    setActiveDossierType,
     isFollowupQuestionOpen,
     setIsFollowupQuestionOpen,
     isGameplayGuideOpen,
@@ -410,7 +396,6 @@ export function useInvestigationState(opts?: {
     handlePhoneLookupSuccess,
     handleFollowupSuccess,
     handleSubmitIndictment,
-    handleOpenDossier,
     handleResetAll,
     handleOpenReinvestigation,
     effectiveReinvestigateUnlocked,

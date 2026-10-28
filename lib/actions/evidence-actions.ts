@@ -205,7 +205,8 @@ export async function uploadEvidenceAsset(formData: FormData) {
   try {
     await requireAdminAuth();
     const file = formData.get("file") as File | null;
-    const caseId = (formData.get("caseId") as string) || "case_000";
+    const caseId = formData.get("caseId") as string | null;
+    if (!caseId) return { success: false, error: "Thiếu mã vụ án (caseId)." };
     const subfolder = (formData.get("subfolder") as string) || "misc";
 
     if (!file) {

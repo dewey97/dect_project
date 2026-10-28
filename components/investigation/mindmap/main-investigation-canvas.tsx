@@ -1,5 +1,7 @@
 "use client";
 
+import { getActiveVictim } from "@/lib/cases/case-characters";
+import { isAnswerKind } from "@/lib/checkpoints/kinds";
 import React, {
   useState,
   useEffect,
@@ -37,7 +39,7 @@ import { CanvasPhotoZoom } from "./canvas/canvas-photo-zoom";
 import { caseStorageKey } from "@/lib/cases/case-id";
 
 interface MainInvestigationCanvasProps {
-  caseId?: string;
+  caseId: string;
   onOpenPhoneSimulator?: () => void;
   onOpenReinvestigation?: () => void;
   onOpenEpilogue?: () => void;
@@ -62,7 +64,7 @@ interface MainInvestigationCanvasProps {
 }
 
 export function MainInvestigationCanvas({
-  caseId = "case_000",
+  caseId,
   onOpenPhoneSimulator,
   onOpenReinvestigation,
   onOpenEpilogue,
@@ -166,7 +168,7 @@ export function MainInvestigationCanvas({
       viewedSuspectKey = c;
       const matched = state.checkpoints?.find(
         (cp) =>
-          (cp.kind === "followup" || (cp as any).type === "followup") &&
+          isAnswerKind(cp.kind) &&
           (((cp as any).subject_key || cp.subjectKey || "")
             .toLowerCase() === c.toLowerCase()),
       );
@@ -545,7 +547,7 @@ export function MainInvestigationCanvas({
       if (
         item.role === "victim" ||
         item.metadata?.role === "victim" ||
-        code === "avatar_khang" ||
+        code === `avatar_${getActiveVictim()?.key}` ||
         code === "crime_scene" ||
         code === "ev-10"
       ) {

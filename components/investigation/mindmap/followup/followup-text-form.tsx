@@ -122,6 +122,7 @@ export function FollowupTextForm({
               onTextInputChange(e.target.value)
               onClearError()
             }}
+            aria-label="Câu trả lời"
             placeholder={placeholder || 'Nhập đáp án hoặc kết luận...'}
             className="w-full p-3.5 bg-[#fdfcf9] border-2 border-[#2b1f14] text-[#1a120b] font-mono text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#8c1d1d]"
           />

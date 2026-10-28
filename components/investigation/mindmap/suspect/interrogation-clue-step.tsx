@@ -16,7 +16,7 @@ interface InterrogationClueStepProps {
   onRemoveClueId: (id: string) => void;
   onPendingChange: (pending: PendingClueInputs) => void;
   checkpointId?: string;
-  caseId?: string;
+  caseId: string;
   onBack: () => void;
   onConfirm: () => void;
   isLoading?: boolean;

@@ -26,7 +26,7 @@ type CheckpointMutationResult =
 
 /** Lấy danh sách checkpoint của một vụ án từ bảng case_checkpoints. */
 export async function getCheckpointsByCase(
-  caseId: string = "case_000",
+  caseId: string,
 ): Promise<CheckpointListResult> {
   try {
     const supabase = await createClient();

@@ -1,5 +1,6 @@
 "use client";
 
+import { getActiveVictim } from "@/lib/cases/case-characters";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   CaseConnection,
@@ -78,7 +79,7 @@ export interface BoardModelReturn {
  * - Các custom board nodes
  */
 export function useBoardModel(
-  caseIdInput: string = "case_000",
+  caseIdInput: string,
   options: UseBoardModelOptions = {},
 ): BoardModelReturn {
   const caseId = normalizeCaseId(caseIdInput);
@@ -182,7 +183,7 @@ export function useBoardModel(
             // Không ghim đè nếu đã là nhân vật (nghi phạm / nạn nhân) hoặc vật chứng đặc biệt đã có node riêng
             if (suspectKeys.has(charKey) || suspectKeys.has(code)) return false;
             if (
-              code === "avatar_khang" ||
+              code === `avatar_${getActiveVictim()?.key}` ||
               (e as any).role === "victim" ||
               (meta as any).role === "victim"
             )

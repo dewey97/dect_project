@@ -122,14 +122,23 @@ function submittedValues(sub: CheckpointSubmission): string[] {
   ].filter((v): v is string => typeof v === "string");
 }
 
+/** Submission có chứa mã bypass admin (`000`, `admin`...) ở bất kỳ ô nào. */
+export function hasBypassCode(sub: CheckpointSubmission): boolean {
+  return submittedValues(sub).some((value) => isAdminBypassCode(value));
+}
+
 function inferCheckpointKind(checkpoint: DbCaseCheckpoint): CheckpointKind {
   return (checkpoint.kind || checkpoint.type || "text") as CheckpointKind;
 }
 
-/** Chấm điểm tập trung server-side cho một submission. */
+/**
+ * Chấm điểm tập trung server-side cho một submission.
+ * `allowBypass`: route chỉ bật khi không phải production hoặc người gửi là admin.
+ */
 export function gradeCheckpoint(
   checkpoint: DbCaseCheckpoint,
   sub: CheckpointSubmission,
+  { allowBypass = false }: { allowBypass?: boolean } = {},
 ): GradeResult {
   const rawConfig = (checkpoint.answer_config ?? {}) as Record<string, unknown>;
   const config = parseCheckpointConfig(inferCheckpointKind(checkpoint), rawConfig);
@@ -138,7 +147,7 @@ export function gradeCheckpoint(
     undefined;
   const base = { unlocksDossier };
 
-  if (submittedValues(sub).some(isAdminBypassCode)) {
+  if (allowBypass && hasBypassCode(sub)) {
     const culprit =
       config.kind === "indictment" ? config.validSuspects[0] : undefined;
     return {
@@ -215,6 +224,7 @@ export function gradeCheckpoint(
       const culprit = config.validSuspects.find(
         (target) => normalizeForMatch(target).trim() === userSuspect,
       );
+      // Chưa cấu hình nghi phạm thì không chấm tên (Studio linter báo thiếu).
       if (config.validSuspects.length > 0 && !culprit) {
         return {
           correct: false,

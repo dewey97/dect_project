@@ -27,7 +27,7 @@ import { slugifyVietnamese } from "@/lib/text";
 interface DossierConfigModalProps {
   isOpen: boolean;
   onClose: () => void;
-  caseId?: string;
+  caseId: string;
   dossier: DbCaseDossier | null;
   availableDocuments: AvailableDocumentItem[];
   onSaved: (updated: DbCaseDossier) => void;
@@ -36,7 +36,7 @@ interface DossierConfigModalProps {
 export function DossierConfigModal({
   isOpen,
   onClose,
-  caseId = "case_000",
+  caseId,
   dossier,
   availableDocuments,
   onSaved,

@@ -51,7 +51,7 @@ import { UserCheck, FileText, Camera, Plus, X } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 
 interface DossierStudioClientProps {
-  initialCaseId?: string;
+  initialCaseId: string;
   initialCases?: DbCase[];
   initialLkDocuments?: DbDossierDocument[];
   initialHsDocuments?: DbDossierDocument[];
@@ -112,7 +112,7 @@ const FIXED_HS_PAPER: PaperConfig = {
 };
 
 export function DossierStudioClient({
-  initialCaseId = "case_000",
+  initialCaseId,
   initialCases = [],
   initialLkDocuments = [],
   initialHsDocuments = [],

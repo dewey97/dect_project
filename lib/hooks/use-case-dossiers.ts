@@ -69,7 +69,7 @@ async function fetchDossiersShared(caseId: string): Promise<DbCaseDossier[]> {
  * thay thế hoàn toàn cho heuristic suy đoán theo chữ cái đầu của mã.
  */
 export function useCaseDossiers(
-  caseId: string = "case_000",
+  caseId: string,
 ): UseCaseDossiersResult {
   const normalizedCaseId = normalizeCaseId(caseId);
   const cached = dossierCache[normalizedCaseId];

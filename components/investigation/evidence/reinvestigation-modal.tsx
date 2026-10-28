@@ -30,7 +30,7 @@ import { getCase360Config } from "@/lib/actions/evidence-actions";
 interface ReinvestigationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  caseId?: string;
+  caseId: string;
   /** Nếu true: render inline trong container cha (không fullscreen fixed). Desktop Zone 3 mode. */
   inline?: boolean;
   /** Callback khi ấn nút mở toàn màn hình (chỉ hiển thị khi inline=true) */
@@ -135,7 +135,7 @@ const SFX_OPTIONS = [
 export function ReinvestigationModal({
   isOpen,
   onClose,
-  caseId = "case_000",
+  caseId,
   inline = false,
   onExpand,
 }: ReinvestigationModalProps) {

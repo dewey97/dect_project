@@ -356,6 +356,19 @@ export function validateCheckpointConfig(
   return errors;
 }
 
+/** Kind câu hỏi một đáp án: câu hỏi phụ cũ (`followup`) và các kind ô nhập lẻ Studio tạo. */
+export const ANSWER_KINDS: readonly CheckpointKind[] = [
+  "followup",
+  "choice",
+  "code",
+  "time",
+  "text",
+];
+
+export function isAnswerKind(kind?: string | null): boolean {
+  return (ANSWER_KINDS as readonly string[]).includes(kind || "");
+}
+
 /** Kiểm tra giá trị có phải kind hợp lệ. */
 export function isValidKind(value: unknown): value is CheckpointKind {
   return (

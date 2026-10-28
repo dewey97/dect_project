@@ -58,7 +58,7 @@ import {
 } from "lucide-react";
 
 interface CheckpointStudioClientProps {
-  initialCaseId?: string;
+  initialCaseId: string;
   initialCases?: DbCase[];
   initialRows?: DbCaseCheckpoint[];
   initialDossiers?: DbCaseDossier[];
@@ -68,7 +68,7 @@ interface CheckpointStudioClientProps {
 }
 
 export function CheckpointStudioClient({
-  initialCaseId = "case_000",
+  initialCaseId,
   initialCases = [],
   initialRows = [],
   initialDossiers = [],
@@ -1189,7 +1189,8 @@ export function CheckpointStudioClient({
 
     if (pin.nodeKind === "victim") {
       const victimChar =
-        characters.find((c) => c.key === (pin.subjectKey || "khang")) ||
+        (pin.subjectKey &&
+          characters.find((c) => c.key === pin.subjectKey)) ||
         characters.find((c) => c.role === "victim");
       if (victimChar) {
         setSelectedCharacter(victimChar);

@@ -209,6 +209,7 @@ export function PhoneLookupModal({
                     <input
                       type="text"
                       value={currentVal}
+                      aria-label={displayLabel}
                       placeholder={inp.placeholder || "Nhập tên nghi phạm..."}
                       onChange={(e) => {
                         const val = e.target.value;

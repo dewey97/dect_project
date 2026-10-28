@@ -14,7 +14,7 @@ import {
 
 interface CheckpointHintSectionProps {
   checkpointId: string;
-  caseId?: string;
+  caseId: string;
   category?: "motive" | "contradiction" | "all";
   className?: string;
   /**
@@ -26,7 +26,7 @@ interface CheckpointHintSectionProps {
 
 export function CheckpointHintSection({
   checkpointId,
-  caseId = "case_000",
+  caseId,
   category,
   className,
   renderActions,

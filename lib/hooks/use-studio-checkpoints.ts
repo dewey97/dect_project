@@ -42,7 +42,7 @@ async function fetchRows(caseId: string): Promise<PublicCheckpointRow[]> {
  * cùng mở một checkpoint.
  */
 export function useStudioCheckpoints(
-  caseId: string = "case_000",
+  caseId: string,
 ): StudioCheckpointsState {
   const [effectiveCaseId, setEffectiveCaseId] = useState(() =>
     normalizeCaseId(caseId),

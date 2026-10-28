@@ -4,6 +4,14 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-28]
 
+### SPEC-22 GĐ4 và dọn tiếp
+
+- Mã bypass admin chỉ có hiệu lực ở dev hoặc với session admin.
+- Câu hỏi phụ nhận mọi kind ô nhập (`followup/code/time/choice/text`).
+- `/evidence/boardgame` truyền đúng `caseId` cho bảng điều tra và modal khám xét.
+- Gỡ hardcode Case #000 (key followup, nạn nhân `khang`, tọa độ ghim) và default `"case_000"` ở component/hook/server action.
+- Xóa `DossierResultModal` (không thể mở).
+
 ### Server-only checkpoint grading (SPEC-22 GĐ1–3A)
 
 - Gameplay không còn nhận đáp án: `/api/checkpoints` đọc bằng service role và lọc `answer_config` theo allowlist (`lib/checkpoints/public-checkpoint.ts`).

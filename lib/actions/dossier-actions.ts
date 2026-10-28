@@ -24,7 +24,7 @@ export interface DbDossierDocument {
 
 /** Lấy danh sách hồ sơ theo case_id và mode (loi_khai / ly_lich) từ Supabase */
 export async function getDossierDocuments(
-  caseId: string = "case_000",
+  caseId: string,
   mode?: DossierMode,
 ) {
   try {
@@ -71,7 +71,7 @@ export async function getDossierDocuments(
 
 /** Lưu hoặc cập nhật hồ sơ vào Supabase */
 export async function saveDossierDocument(params: {
-  caseId?: string;
+  caseId: string;
   mode: DossierMode;
   tagCode: string;
   subjectName: string;
@@ -81,7 +81,8 @@ export async function saveDossierDocument(params: {
   try {
     await requireAdminAuth();
     const supabase = await createClient();
-    const caseId = params.caseId || "case_000";
+    const caseId = params.caseId;
+    if (!caseId) return { success: false, error: "Thiếu mã vụ án (caseId)." };
 
     const payload = {
       case_id: caseId,
@@ -115,7 +116,7 @@ export async function saveDossierDocument(params: {
 /** Lưu đồng loạt danh sách hồ sơ (Cả Lời Khai và Lý Lịch) vào Supabase */
 export async function saveDossierDocumentsBatch(
   documents: {
-    caseId?: string;
+    caseId: string;
     mode: DossierMode;
     tagCode: string;
     subjectName: string;
@@ -129,7 +130,7 @@ export async function saveDossierDocumentsBatch(
     const supabase = await createClient();
 
     const payload = documents.map((doc) => ({
-      case_id: doc.caseId || "case_000",
+      case_id: doc.caseId,
       mode: doc.mode,
       tag_code: doc.tagCode,
       subject_name: doc.subjectName,

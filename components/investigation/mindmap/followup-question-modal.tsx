@@ -8,6 +8,7 @@ import { getStorageItem, setStorageItem, getStorageJson } from "@/lib/storage";
 import { normalizeImageUrl, cn } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
+import { isAnswerKind } from "@/lib/checkpoints/kinds";
 // Removed dead HaDiscoveredPhotosPopup
 import { FollowupTimeForm } from "./followup/followup-time-form";
 import { FollowupChoiceForm } from "./followup/followup-choice-form";
@@ -22,13 +23,12 @@ import { useOptionalCaseCharacters } from "@/components/investigation/case-chara
 import { removeDiacritics } from "@/lib/cases/characters";
 
 interface FollowupQuestionModalProps {
-  caseId?: string;
+  caseId: string;
   isOpen: boolean;
   culprit?: string | null;
   subjectKey?: string | null;
   onClose: () => void;
   onSuccess?: (culprit: string, choice?: string) => void;
-  onOpenDossier?: (dossierType: "A" | "B" | "C") => void;
   isPhoneSolved?: boolean;
   embedded?: boolean;
 }
@@ -39,13 +39,12 @@ const DEFAULT_CHOICE_OPTIONS = [
 ];
 
 export function FollowupQuestionModal({
-  caseId = "case_000",
+  caseId,
   isOpen,
   culprit,
   subjectKey,
   onClose,
   onSuccess,
-  onOpenDossier,
   isPhoneSolved,
   embedded = false,
 }: FollowupQuestionModalProps) {
@@ -82,7 +81,7 @@ export function FollowupQuestionModal({
     return (
       checkpoints.find(
         (cp) =>
-          cp.kind === "followup" &&
+          isAnswerKind(cp.kind) &&
           ((cp.subjectKey &&
             (cp.subjectKey.toLowerCase().trim() === cLow ||
               cp.subjectKey.toLowerCase().trim() === charKeyLow)) ||
@@ -94,7 +93,7 @@ export function FollowupQuestionModal({
       (matchedCharacter?.name
         ? checkpoints.find(
             (cp) =>
-              cp.kind === "followup" &&
+              isAnswerKind(cp.kind) &&
               removeDiacritics(cp.title || "")
                 .toLowerCase()
                 .includes(removeDiacritics(matchedCharacter.name).toLowerCase()),
@@ -266,18 +265,14 @@ export function FollowupQuestionModal({
     if (questionType === "code") {
       setCodeInput("");
     } else if (questionType === "time") {
-      const savedTime =
-        getStorageItem(caseStorageKey(caseId, `followup_${targetKey}`)) ||
-        (targetKey === "vu"
-          ? getStorageItem(caseStorageKey(caseId, "followup_vu"))
-          : null);
+      const savedTime = getStorageItem(
+        caseStorageKey(caseId, `followup_${targetKey}`),
+      );
       setTimeInput(savedTime || "");
     } else if (questionType === "choice") {
-      const savedChoice =
-        getStorageItem(caseStorageKey(caseId, `followup_${targetKey}`)) ||
-        (targetKey === "tung"
-          ? getStorageItem(caseStorageKey(caseId, "followup_tung"))
-          : null);
+      const savedChoice = getStorageItem(
+        caseStorageKey(caseId, `followup_${targetKey}`),
+      );
       setSelectedChoice(savedChoice || null);
     } else {
       const savedText = getStorageItem(

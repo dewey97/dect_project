@@ -4,8 +4,10 @@ import { normalizeCaseId } from "@/lib/cases/case-id";
 import { checkRateLimit, getClientIp } from "@/lib/security/rate-limiter";
 import {
   gradeCheckpoint,
+  hasBypassCode,
   type CheckpointSubmission,
 } from "@/lib/checkpoints/server-grader";
+import { checkIsAdmin } from "@/lib/auth/admin";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 
 export const dynamic = "force-dynamic";
@@ -73,7 +75,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const grade = gradeCheckpoint(checkpoint as DbCaseCheckpoint, {
+    const submission: CheckpointSubmission = {
       caseId,
       checkpointId,
       answer: body.answer,
@@ -83,6 +85,13 @@ export async function POST(request: Request) {
       inputs: body.inputs,
       suspect: body.suspect,
       motive: body.motive,
+    };
+    // Mã bypass (`000`, `admin`...) chỉ có hiệu lực ở môi trường dev hoặc với admin.
+    const allowBypass =
+      hasBypassCode(submission) &&
+      (process.env.NODE_ENV !== "production" || (await checkIsAdmin()));
+    const grade = gradeCheckpoint(checkpoint as DbCaseCheckpoint, submission, {
+      allowBypass,
     });
 
     const res = NextResponse.json({

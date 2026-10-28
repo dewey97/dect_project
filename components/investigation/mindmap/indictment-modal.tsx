@@ -17,7 +17,7 @@ import {
 import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
 
 interface IndictmentModalProps {
-  caseId?: string;
+  caseId: string;
   isOpen: boolean;
   onClose: () => void;
   onSubmitIndictment: (data: {
@@ -70,7 +70,7 @@ export function findSuspectMatch(
 }
 
 export function IndictmentModal({
-  caseId = "case_000",
+  caseId,
   isOpen,
   onClose,
   onSubmitIndictment,

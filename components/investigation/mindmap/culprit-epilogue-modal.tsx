@@ -14,12 +14,11 @@ interface CulpritEpilogueModalProps {
   subjectKey?: string | null;
   choice?: string | null;
   onClose: () => void;
-  onOpenDossier?: (dossierType: "A" | "B" | "C") => void;
   onOpenFollowupQuestion?: (
     targetCulprit?: string,
   ) => void;
   onOpenIndictment?: () => void;
-  caseId?: string;
+  caseId: string;
 }
 
 export function CulpritEpilogueModal({
@@ -28,7 +27,6 @@ export function CulpritEpilogueModal({
   subjectKey,
   choice,
   onClose,
-  onOpenDossier: _onOpenDossier,
   onOpenFollowupQuestion,
   onOpenIndictment,
   caseId,

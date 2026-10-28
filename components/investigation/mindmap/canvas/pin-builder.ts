@@ -1,5 +1,6 @@
 "use client";
 
+import { isAnswerKind } from "@/lib/checkpoints/kinds";
 import type {
   CaseConnection,
   PinPoint,
@@ -194,18 +195,19 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         noteColor = "yellow";
       } else if (node.node_kind === "victim") {
         const vChar =
-          characters.find((c) => c.key === (node.subject_key || "khang")) ||
+          (node.subject_key &&
+            characters.find((c) => c.key === node.subject_key)) ||
           characters.find((c) => c.role === "victim");
         detail = `Hồ sơ nạn nhân: ${vChar?.name || node.title || victimName}`;
         const charAvatar =
           vChar?.avatar_url ||
           (vChar as unknown as { avatarUrl?: string })?.avatarUrl ||
-          input.sheetPhotoMap?.[vChar?.key || "khang"] ||
+          (vChar?.key ? input.sheetPhotoMap?.[vChar.key] : undefined) ||
           input.sheetPhotoMap?.["victim"] ||
-          input.sheetPhotoMap?.["avatar_khang"];
+          (vChar?.key ? input.sheetPhotoMap?.[`avatar_${vChar.key}`] : undefined);
         if (charAvatar) {
           photoUrl = charAvatar;
-        } else if (!photoUrl || photoUrl.includes("victim_khang.png")) {
+        } else if (!photoUrl) {
           photoUrl = "/images/avatar_placeholder.svg";
         }
         noteColor = "white";
@@ -213,7 +215,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
       const victimChar =
         node.node_kind === "victim"
-          ? characters.find((c) => c.key === (node.subject_key || "khang")) ||
+          ? (node.subject_key &&
+            characters.find((c) => c.key === node.subject_key)) ||
             characters.find((c) => c.role === "victim")
           : undefined;
 
@@ -222,7 +225,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         nodeKind: node.node_kind,
         subjectKey:
           node.subject_key ||
-          (node.node_kind === "victim" ? victimChar?.key || "khang" : undefined),
+          (node.node_kind === "victim" ? victimChar?.key : undefined),
         checkpointId: node.checkpoint_id || undefined,
         x: pos.x,
         y: pos.y,
@@ -606,19 +609,13 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   // ============================================================================
   const activeFollowupSet = new Set<string>(input.followupCulpritIds || []);
 
-  const c0DefaultFollowupCoords: Record<string, { x: number; y: number }> = {
-    vu: { x: 0.44, y: 0.82 },
-    tung: { x: 0.6, y: 0.75 },
-    ha: { x: 0.76, y: 0.77 },
-  };
-
   suspectsList.forEach((s) => {
     if (!input.isStudioMode && !activeFollowupSet.has(s.key)) return;
 
     // Tìm checkpoint followup
     const matchCp = allCheckpoints.find((cp) => {
       const isFollowup =
-        cp.kind === "followup" ||
+        isAnswerKind(cp.kind) ||
         cp.id.toLowerCase().includes("followup") ||
         (cp.followupOf && String(cp.followupOf).toLowerCase().includes(s.key));
       if (!isFollowup) return false;
@@ -641,12 +638,10 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     const suspectPin = pins.find(
       (p) => p.nodeKind === "suspect" && p.subjectKey === s.key,
     );
-    const fallbackCoord =
-      c0DefaultFollowupCoords[s.key]
-        ? c0DefaultFollowupCoords[s.key]
-        : suspectPin
-          ? { x: suspectPin.x, y: Math.min(suspectPin.y + 0.22, 0.88) }
-          : undefined;
+    // Chưa có vị trí lưu: đặt ngay dưới ghim nghi phạm tương ứng.
+    const fallbackCoord = suspectPin
+      ? { x: suspectPin.x, y: Math.min(suspectPin.y + 0.22, 0.88) }
+      : undefined;
 
     const pos = resolveNodePosition(
       primaryId,

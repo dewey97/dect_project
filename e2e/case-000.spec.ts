@@ -94,7 +94,7 @@ async function addEvidenceCodes(page: Page, codes: string[]) {
 /** Số ô tra cứu lấy theo cấu hình checkpoint hiện tại; điền `names` theo thứ tự ô. */
 async function solvePhoneLookup(page: Page, names: string[]) {
   await clickPin(page, "c0-pin-phone");
-  const inputs = page.getByPlaceholder("Nhập tên nghi phạm...");
+  const inputs = page.getByRole("textbox", { name: /^SĐT/ });
   await expect(inputs.first()).toBeVisible();
   const count = await inputs.count();
   expect(count).toBeGreaterThan(0);
@@ -228,13 +228,14 @@ test.describe("case_000 baseline", () => {
     ).toContain("vu");
 
     await clickPin(page, "c0-pin-followup-vu");
-    const answer = page.getByPlaceholder("Nhập đáp án hoặc kết luận...");
+    // Ô trả lời theo nhãn, không theo placeholder: Studio có thể đổi kiểu ô (mốc giờ / mã).
+    const answer = page.getByRole("textbox", { name: "Câu trả lời" });
     await answer.fill("20:00");
-    await tap(page, "CẬP NHẬT KẾT LUẬN");
+    await answer.press("Enter");
     await expect.poll(() => storage(page, "followup_vu")).toBeNull();
 
     await answer.fill("21:15");
-    await tap(page, "CẬP NHẬT KẾT LUẬN");
+    await answer.press("Enter");
     await expect.poll(() => storage(page, "followup_vu")).toBe("21:15");
     expect(
       JSON.parse((await storage(page, "solved_followups")) || "[]"),

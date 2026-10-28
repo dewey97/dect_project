@@ -31,7 +31,7 @@ interface CustomPinModalProps {
   onClose: () => void;
   pin: PinPoint | null;
   onSolve?: (pinId: string) => void;
-  caseId?: string;
+  caseId: string;
   embedded?: boolean;
 }
 
@@ -40,7 +40,7 @@ export function CustomPinModal({
   onClose,
   pin,
   onSolve,
-  caseId = "case_000",
+  caseId,
   embedded = false,
 }: CustomPinModalProps) {
   const [userInput, setUserInput] = useState("");

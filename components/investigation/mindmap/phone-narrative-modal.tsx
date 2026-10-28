@@ -12,14 +12,14 @@ interface PhoneNarrativeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onTakeTestimony?: () => void;
-  caseId?: string;
+  caseId: string;
 }
 
 export function PhoneNarrativeModal({
   isOpen,
   onClose,
   onTakeTestimony,
-  caseId = "case_000",
+  caseId,
 }: PhoneNarrativeModalProps) {
   const [isNarrativeComplete, setIsNarrativeComplete] = useState(false);
   const { checkpoints } = useCaseCheckpoints(caseId);

@@ -35,7 +35,7 @@ interface SuspectItemData {
 }
 
 interface AddSuspectModalProps {
-  caseId?: string;
+  caseId: string;
   isOpen: boolean;
   onClose: () => void;
   onSave: (suspect: SuspectItemData) => void;
@@ -68,7 +68,7 @@ export { findValidCaseCharacter };
 const clueKey = (ids: readonly string[]) => [...ids].sort().join("|");
 
 export function AddSuspectModal({
-  caseId = "case_000",
+  caseId,
   isOpen,
   onClose,
   onSave,

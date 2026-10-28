@@ -11,12 +11,12 @@ import { DiegeticDocumentReader } from "./diegetic-document-reader";
 
 interface EvidenceDetailInspectorProps {
   selectedView: SelectedView | null;
-  caseId?: string;
+  caseId: string;
 }
 
 export function EvidenceDetailInspector({
   selectedView,
-  caseId = "case_000",
+  caseId,
 }: EvidenceDetailInspectorProps) {
   // Hooks MUST be called unconditionally at the top level
   const { findMatchingDocument } = useDossierDocuments(caseId);

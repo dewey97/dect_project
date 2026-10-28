@@ -100,7 +100,7 @@ async function fetchCaseEvidenceShared(slug: string) {
 }
 
 export function useCaseEvidence(
-  caseId: string = "case_000",
+  caseId: string,
 ): CaseEvidenceState {
   const effectiveSlug = normalizeCaseId(caseId);
   const cached = evidenceCache[effectiveSlug];

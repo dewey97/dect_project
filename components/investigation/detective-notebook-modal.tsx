@@ -11,7 +11,7 @@ import { useRoomSync } from "@/components/investigation/room-sync-context";
 interface DetectiveNotebookModalProps {
   isOpen: boolean;
   onClose: () => void;
-  caseId?: string;
+  caseId: string;
   embedded?: boolean;
   hideHeader?: boolean;
 }
@@ -19,7 +19,7 @@ interface DetectiveNotebookModalProps {
 export function DetectiveNotebookModal({
   isOpen,
   onClose,
-  caseId = "case_000",
+  caseId,
   embedded = false,
   hideHeader = false,
 }: DetectiveNotebookModalProps) {

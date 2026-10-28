@@ -21,7 +21,7 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
     });
 
     await expect(
-      page.getByTitle("Thêm chứng cứ / ảnh hiện trường mới"),
+      page.getByTitle("Thêm chứng cứ / ảnh / mục khác"),
     ).toBeVisible();
 
     await page
@@ -60,7 +60,8 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
     );
 
     // B14-1: Chọn tài liệu A-01 -> khung giữa hiển thị tiêu đề và breadcrumb
-    const a01Item = page.getByText("A-01").first();
+    // Migration 47 bỏ gạch nối trong mã tài liệu: A-01 -> A01.
+    const a01Item = page.getByText(/^A-?01$/).filter({ visible: true }).first();
     await a01Item.click();
     await expect(
       page.locator('[data-testid="evidence-inspector-breadcrumb"]'),
@@ -85,10 +86,10 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
       timeout: 15_000,
     });
 
-    await page.getByTitle("Thêm chứng cứ / ảnh hiện trường mới").click();
+    await page.getByTitle("Thêm chứng cứ / ảnh / mục khác").click();
 
     // Form vật chứng hiện ra với các ô chính
-    await expect(page.getByPlaceholder("VD: A-01, B-02...")).toBeVisible();
+    await expect(page.getByPlaceholder("VD: A01, B02...")).toBeVisible();
     await expect(
       page.getByPlaceholder("VD: Ảnh mảnh bình vỡ, Sổ ghi nợ, Bài báo cũ 1996..."),
     ).toBeVisible();

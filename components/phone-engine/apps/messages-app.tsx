@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import { cn, normalizeImageUrl, normalizeMediaUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
-import { getActiveVictim } from "@/lib/cases/case-characters";
+import { getActiveCaseId, getActiveVictim } from "@/lib/cases/case-characters";
+import { caseStorageKey } from "@/lib/cases/case-id";
 import { getStorageJson, setStorageJson } from "@/lib/storage";
 import { EvidenceAnchorItem } from "../core/evidence-anchor-item";
 
@@ -266,7 +267,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
   }, [rawMessagesData]);
 
   useEffect(() => {
-    setPinnedClueIds(getStorageJson<string[]>("khang_phone_pinned_clues", []));
+    setPinnedClueIds(getStorageJson<string[]>(caseStorageKey(getActiveCaseId(), "phone_pinned_clues"), []));
   }, []);
 
   const togglePinClue = (clueId: string, title?: string) => {
@@ -274,7 +275,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
       const next = prev.includes(clueId)
         ? prev.filter((id) => id !== clueId)
         : [...prev, clueId];
-      setStorageJson("khang_phone_pinned_clues", next);
+      setStorageJson(caseStorageKey(getActiveCaseId(), "phone_pinned_clues"), next);
       return next;
     });
     setPinnedNotification(

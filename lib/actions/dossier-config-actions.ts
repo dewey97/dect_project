@@ -14,7 +14,7 @@ export interface AvailableDocumentItem {
 
 /** Lấy toàn bộ danh sách Bộ Hồ Sơ của vụ án từ bảng case_dossiers */
 export async function getCaseDossiers(
-  caseId: string = "case_000",
+  caseId: string,
 ): Promise<DbCaseDossier[]> {
   try {
     const supabase = await createClient();
@@ -116,7 +116,7 @@ export async function deleteCaseDossier(
 
 /** Lấy danh mục tất cả tài liệu có trong Dossier Studio & Vật chứng để hiển thị checklist lựa chọn */
 export async function getAllCaseDocumentsCatalog(
-  caseId: string = "case_000",
+  caseId: string,
 ): Promise<AvailableDocumentItem[]> {
   try {
     const supabase = await createClient();

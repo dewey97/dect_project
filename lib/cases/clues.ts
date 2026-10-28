@@ -23,7 +23,6 @@ export function isEvidenceMatching(
   targetCodes: string[],
 ): boolean {
   if (!clueId) return false;
-  if (isAdminBypassCode(clueId)) return true;
 
   const cleanClue = clueId
     .toLowerCase()
@@ -49,7 +48,6 @@ export function isEvidenceMatching(
 
   return targetCodes.some((target) => {
     if (!target) return false;
-    if (isAdminBypassCode(target)) return true;
 
     const cleanTarget = target
       .toLowerCase()
@@ -124,7 +122,6 @@ export function checkMotiveValid(
     selectedIds.length === 0
   )
     return false;
-  if (hasAdminBypassInArray(selectedIds)) return true;
 
   const isAllPhoneSms = targetCodes.every((t) => /phone|sdt|sms|09/i.test(t));
   if (isAllPhoneSms && targetCodes.length > 1) {
@@ -163,7 +160,6 @@ export function checkContradictionValid(
     selectedIds.length === 0
   )
     return false;
-  if (hasAdminBypassInArray(selectedIds)) return true;
 
   const allRequiredSatisfied = targetCodes.every((target) =>
     selectedIds.some((c) => isEvidenceMatching(c, [target])),

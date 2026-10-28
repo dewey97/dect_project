@@ -11,13 +11,13 @@ import { cn } from "@/lib/utils";
 interface EpilogueModalProps {
   isOpen: boolean;
   onClose?: () => void;
-  caseId?: string;
+  caseId: string;
 }
 
 export function EpilogueModal({
   isOpen,
   onClose,
-  caseId = "case_000",
+  caseId,
 }: EpilogueModalProps) {
   const [activeStoryIdx, setActiveStoryIdx] = useState(0);
   const { checkpoints, loading } = useCaseCheckpoints(caseId);

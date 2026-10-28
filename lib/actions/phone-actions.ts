@@ -933,9 +933,9 @@ export async function uploadPhoneAsset(formData: FormData) {
 
     const file = formData.get("file") as File | null;
     const folder = (formData.get("folder") as string) || "photos";
-    const caseSlug = normalizeCaseId(
-      (formData.get("caseSlug") as string) || "case_000",
-    );
+    const rawCaseSlug = formData.get("caseSlug") as string | null;
+    if (!rawCaseSlug) return { success: false, error: "Thiếu mã vụ án (caseSlug)." };
+    const caseSlug = normalizeCaseId(rawCaseSlug);
 
     if (!file || file.size === 0) {
       return { success: false, error: "File không hợp lệ hoặc rỗng." };

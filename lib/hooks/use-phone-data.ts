@@ -1,5 +1,6 @@
 "use client";
 
+import { getActiveCaseId } from "@/lib/cases/case-characters";
 import { useState, useEffect } from "react";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 
@@ -21,19 +22,17 @@ const CACHE_TTL_MS = 30_000; // 30 seconds fresh cache
 
 export function usePhoneData<T = any>(
   tab: string,
-  caseId: string = "case_000",
+  /** Bỏ trống: lấy theo `?case_id=` trên URL, rồi vụ án đang chơi. */
+  caseId?: string,
 ): PhoneDataState<T> {
-  let effectiveCaseId = normalizeCaseId(caseId);
-  if (
-    typeof window !== "undefined" &&
-    normalizeCaseId(caseId) === "case_000"
-  ) {
-    const params = new URLSearchParams(window.location.search);
-    const paramCase = params.get("case_id") || params.get("caseId");
-    if (paramCase) {
-      effectiveCaseId = normalizeCaseId(paramCase);
-    }
-  }
+  const urlCaseId =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("case_id") ||
+        new URLSearchParams(window.location.search).get("caseId")
+      : null;
+  const effectiveCaseId = normalizeCaseId(
+    caseId || urlCaseId || getActiveCaseId(),
+  );
 
   const cacheKey = `${tab}:${effectiveCaseId}`;
   const cached = memoryCache[cacheKey];

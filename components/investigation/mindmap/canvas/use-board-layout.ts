@@ -12,7 +12,7 @@ import { useBoardModel } from "./use-board-model";
  * Quản lý layout bảng điều tra cho màn chơi Gameplay (Chế độ chỉ đọc).
  * Kế thừa trực tiếp từ hook dùng chung useBoardModel(caseId).
  */
-export function useBoardLayout(caseId: string = "case_000") {
+export function useBoardLayout(caseId: string) {
   const boardModel = useBoardModel(caseId);
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const canvasWrapperRef = useRef<HTMLDivElement>(null);

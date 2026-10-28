@@ -77,7 +77,6 @@ export function clearCaseProgress(caseId?: string | null): void {
           "solved_followups",
           "indictment_solved",
           "indictment_culprit",
-          "reinvestigate_unlocked",
           "reinvestigate_opened",
           "phone_inputs",
           "phone_solved",

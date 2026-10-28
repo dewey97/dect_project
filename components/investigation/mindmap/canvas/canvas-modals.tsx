@@ -10,7 +10,6 @@ import { GameplayGuideModal } from "../gameplay-guide-modal";
 import { InteractiveWalkthrough } from "../interactive-walkthrough";
 import { IndictmentModal } from "../indictment-modal";
 import { CulpritEpilogueModal } from "../culprit-epilogue-modal";
-import { DossierResultModal } from "../dossier-result-modal";
 import { FollowupQuestionModal } from "../followup-question-modal";
 import { CustomPinModal } from "../custom-pin-modal";
 import nextDynamic from "next/dynamic";
@@ -168,7 +167,6 @@ export function CanvasModals({
             state.setNarrativeCulprit(null);
             state.setNarrativeChoice(null);
           }}
-          onOpenDossier={state.handleOpenDossier}
           onOpenFollowupQuestion={(targetCulprit) => {
             const c =
               targetCulprit ||
@@ -187,34 +185,6 @@ export function CanvasModals({
             state.setNarrativeCulprit(null);
             state.setNarrativeChoice(null);
             state.setIsIndictmentOpen(true);
-          }}
-        />
-      )}
-
-      {/* 10. Modal Kết Quả Hồ Sơ Nghi Phạm (A, B, C) */}
-      {state.isDossierOpen && (
-        <DossierResultModal
-          caseId={state.caseId}
-          suspectName={
-            state.activeDossierType === "A"
-              ? state.suspects[0]?.name
-              : state.activeDossierType === "B"
-                ? state.suspects[1]?.name
-                : state.suspects[2]?.name
-          }
-          isOpen={state.isDossierOpen}
-          dossierType={state.activeDossierType}
-          onClose={() => state.setIsDossierOpen(false)}
-          onOpenFollowupQuestion={() => {
-            state.setIsDossierOpen(false);
-            const c =
-              state.activeDossierType === "A"
-                ? (state.suspects[0]?.id || "")
-                : state.activeDossierType === "B"
-                  ? (state.suspects[1]?.id || "")
-                  : (state.suspects[2]?.id || "");
-            state.setActiveFollowupCulprit(c);
-            state.setIsFollowupQuestionOpen(true);
           }}
         />
       )}
@@ -242,7 +212,6 @@ export function CanvasModals({
             state.setActiveFollowupCulprit(null);
           }}
           onSuccess={state.handleFollowupSuccess}
-          onOpenDossier={state.handleOpenDossier}
           isPhoneSolved={state.phoneLookupSuccess}
         />
       )}

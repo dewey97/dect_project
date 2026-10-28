@@ -130,7 +130,7 @@ const STICKY_NOTE_COLORS = [
 export type { CanvasStickyNote };
 
 interface DossierCanvasBoardProps {
-  caseId?: string;
+  caseId: string;
   uiTheme?: "dark" | "light";
   onToggleUiTheme?: () => void;
   pdfItems: CombinedItem[];
@@ -152,7 +152,7 @@ interface DossierCanvasBoardProps {
 }
 
 export function DossierCanvasBoard({
-  caseId = "case_000",
+  caseId,
   uiTheme = "dark",
   onToggleUiTheme,
   pdfItems,
