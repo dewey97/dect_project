@@ -4,6 +4,16 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-28]
 
+### Quy hoạch lại tài liệu
+
+- `docs/` chia nhóm: `architecture/`, `studio/`, `ops/`, `design/`, `product/`, `process/`, `plans/`, `history/`; bỏ đánh số trùng của `core_specs/`.
+- Tài liệu mới: `docs/ROADMAP.md` (trạng thái, việc tiếp theo), `docs/architecture/codebase_architecture.md` (kiến trúc hiện hành).
+- Gộp `HANDOFF_ROADMAP.md` + phần quy ước của `WORKTREE_PLAN.md` thành `docs/process/workflow.md`, thêm bài học đợt SPEC-22.
+- Plan, audit đã xong chuyển vào `docs/history/` kèm banner lưu trữ.
+- `docs/readme.md` → `docs/README.md` (AGENTS.md trỏ `README.md`; Linux phân biệt hoa thường).
+- Sửa mô tả lỗi thời (Google Sheets CMS, cây thư mục cũ, `npm`), cập nhật state phòng chơi nhóm và luật mở bộ hồ sơ của Case #000.
+- Code: gom `lib/cms/*` và `lib/finding-matcher.ts` vào `lib/checkpoints/` (`graph.ts`, `runtime.ts`, `name-match.ts`).
+
 ### Mở bộ hồ sơ theo `unlocksDossier` (SPEC-22 GĐ5)
 
 - Giải đúng checkpoint có `unlocksDossier` thì mở bộ hồ sơ tương ứng (`lib/progress/case-progress.ts`). Trước đây giá trị này bị bỏ qua và phase mở theo số câu hỏi phụ đã giải (Bộ B và Bộ C mở cùng lúc).
@@ -213,7 +223,7 @@ All notable changes to the Detective Case System (dect_project) will be document
   - Hỗ trợ `subject_key` liên kết trực tiếp tới `case_characters.key`, xóa bỏ hardcode `CulpritKey "vu" | "tung" | "ha"` trong `use-investigation-state.ts`.
   - Khám nghiệm & thẩm tra động: `FollowupQuestionModal`, `IndictmentModal`, và `CulpritEpilogueModal` tự động nạp ảnh, tên nhân vật và độc thoại từ Checkpoint Studio qua `useOptionalCaseCharacters()`.
   - Loại bỏ hoàn toàn việc tự động nối ghép mã chứng cứ cứng case_000 trong `IndictmentModal`.
-  - Hỗ trợ 2 chiều `snake_case` và `camelCase` cho `pickerConfig` và `answer_config` trong `lib/cms/checkpoint-runtime.ts`.
+  - Hỗ trợ 2 chiều `snake_case` và `camelCase` cho `pickerConfig` và `answer_config` trong `lib/checkpoints/runtime.ts`.
   - Thêm cấu hình warm-up route `/evidence/web?case_id=case_000` trong `playwright.config.ts`, giải quyết triệt để lỗi Turbopack 404 race condition khi dev server khởi động.
   - Verification: `npx tsc --noEmit --incremental false` pass 100%, `pnpm test:e2e` **9/9 PASS** (1.4m).
 
@@ -304,7 +314,7 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 - **Checkpoint dependency graph & Flow view (`/studio/checkpoints`)**:
   - Cột `case_checkpoints.depends_on TEXT[]` + GIN index (`db/schema/17_case_checkpoint_dependencies.sql`).
-  - Graph engine `lib/cms/checkpoint-graph.ts`: dựng cạnh, gợi ý từ `followup_of` / `requiredEvidenceIds`, chặn cycle, layout theo tầng.
+  - Graph engine `lib/checkpoints/graph.ts`: dựng cạnh, gợi ý từ `followup_of` / `requiredEvidenceIds`, chặn cycle, layout theo tầng.
   - React Flow view `components/admin/checkpoint-studio/checkpoint-flow-view.tsx`: kéo nối, xóa cạnh, nhận gợi ý, Fit, tự sắp xếp; mobile read-only.
   - Server action `updateCheckpointDependencies()` validate batch và chỉ ghi `depends_on`.
   - Form/Flow toggle trong Checkpoint Studio; dirty tracking độc lập cho form và sơ đồ.
@@ -315,7 +325,7 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 - **Runtime checkpoint chuyển sang Checkpoint Studio (Supabase)**:
   - Thêm `app/api/checkpoints/route.ts` (`force-dynamic`, `no-store`) và hook `useStudioCheckpoints` (memory cache 30s, dedupe request).
-  - Thêm `lib/cms/checkpoint-runtime.ts` map row `case_checkpoints` sang `Checkpoint` runtime.
+  - Thêm `lib/checkpoints/runtime.ts` map row `case_checkpoints` sang `Checkpoint` runtime.
   - `useCaseCheckpoints` ghép checkpoint từ Studio với evidences từ Google Sheets; không còn đọc tab `checkpoints`.
   - `hint-modal`, `checkpoint-hint-section`, `use-active-checkpoint-hints` đọc dữ liệu Studio.
   - Migration `db/schema/18_case_checkpoints_public_read.sql` mở quyền đọc public cho runtime.
@@ -349,7 +359,7 @@ All notable changes to the Detective Case System (dect_project) will be document
   - Server actions CRUD `getCheckpointsByCase`, `saveCheckpoint`, `deleteCheckpoint` trong `lib/actions/checkpoint-actions.ts`.
   - Bộ component `components/admin/checkpoint-studio/*` và section form theo 3 lớp Động cơ / Ngoại phạm / Mâu thuẫn.
   - Sidebar Admin Studio bổ sung mục Checkpoint Studio; `AdminShell` mở full-bleed cho route mới.
-  - Đặc tả kỹ thuật `docs/core_specs/19_checkpoint_studio.md`.
+  - Đặc tả kỹ thuật `docs/studio/checkpoint_studio.md`.
   - Script `scripts/import-checkpoints-to-supabase.mjs` (`pnpm import:checkpoints`) import toàn bộ tab `checkpoints` vào `case_checkpoints`, upsert theo `(case_id, checkpoint_id)`.
   - Giữ nguyên `type` gốc khi import; checkpoint ngoài `evidence_picker` hiển thị read-only trong Studio V1.
 

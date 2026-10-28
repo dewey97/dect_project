@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Baseline E2E cho case_000 (bước B1 trong docs/HANDOFF_ROADMAP.md).
+ * Baseline E2E cho case_000 (bước B1 trong docs/process/workflow.md).
  * Khóa hành vi hiện tại trước khi refactor checkpoint theo `kind` và chuyển
  * chấm điểm lên server. Đáp án lấy từ `case_checkpoints` của case_000.
  *

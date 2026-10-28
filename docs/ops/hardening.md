@@ -6,7 +6,7 @@
 
 ## 🎯 1. Bối Cảnh & Mục Tiêu
 
-Dự án `dect_project` (XPLORE) là một hệ thống web game trinh thám tương tác cao, phục vụ người chơi phá án realtime kết hợp tài liệu hồ sơ vụ án và Google Sheets Live CMS. Khi quy mô người chơi tăng và các vụ án mới (Case #001, #002...) ra đời, hệ thống đòi hỏi:
+Dự án `dect_project` (XPLORE) là một hệ thống web game trinh thám tương tác cao, phục vụ người chơi phá án realtime kết hợp tài liệu hồ sơ vụ án và dữ liệu Studio trên Supabase. Khi quy mô người chơi tăng và các vụ án mới (Case #001, #002...) ra đời, hệ thống đòi hỏi:
 
 1. **Độ ổn định tuyệt đối (Zero Downtime)**: Deploy không làm gián đoạn người chơi đang phá án; tự động khôi phục (Auto-Rollback) khi có sự cố.
 2. **Bảo mật & Công bằng (Anti-Cheat & Anti-Spam)**: Chặn đứng hành vi brute-force mật mã, spam request làm nghẽn server và rò rỉ dữ liệu vụ án.
@@ -23,7 +23,7 @@ Dự án `dect_project` (XPLORE) là một hệ thống web game trinh thám tư
 | **Zero-Downtime Deploy**       | Probing healthcheck 45s, `trap on_exit` tự động rollback     | Probe `http://127.0.0.1:3000/` sau khi `docker compose up`; nếu fail tự rollback về `:previous`         | Không bao giờ bị sập web khi bản build mới gặp lỗi runtime             |
 | **VPS Disk Management**        | `docker-reclaim.sh` với điều kiện witnesses & keep-list      | Script dọn dẹp Docker có điều kiện: chỉ dọn khi container chính đang `running`, giữ lại bản `:previous` | VPS không bao giờ bị tràn ổ đĩa, không bao giờ xóa nhầm image đang cần |
 | **Rate Limiting & Anti-Cheat** | Gom cụm IPv6 `/64`, caller-level throttling, docs throttling | Bọc rate limit cho các API submit password, mở khóa checkpoint, chống brute-force đáp án                | Bảo vệ tính toàn vẹn và công bằng của game trinh thám                  |
-| **Defensive Caching**          | Đè `Cache-Control: no-store` cho response lỗi (500/400)      | Các route API fetch Google Sheets Live CMS / Supabase luôn gắn `no-store` khi có lỗi fetch              | Chống tình trạng trình duyệt / proxy cache lại màn hình lỗi            |
+| **Defensive Caching**          | Đè `Cache-Control: no-store` cho response lỗi (500/400)      | Các route API fetch Supabase luôn gắn `no-store` khi có lỗi fetch              | Chống tình trạng trình duyệt / proxy cache lại màn hình lỗi            |
 | **Log Security**               | Regex redaction toàn bộ query params trong Access Log        | Lọc sạch các access token, license key, secret parameters khỏi web server log                           | Ngăn rò rỉ thông tin nhạy cảm vào disk log                             |
 | **Tech Debt Management**       | `TECHDEBT.md` chia 2 tầng, gắn ID vĩnh viễn `#ID`            | Quản lý minh bạch: Manh mối nào đang dùng mock data, nút nào chưa nối CMS, nợ refactor                  | AI Agent và dev không bị quên việc, không có mock "ma"                 |
 
@@ -62,10 +62,10 @@ flowchart TD
 
 ---
 
-### ⏳ Pha 3: Defensive Caching & API Anti-Cheat _(BƯỚC TIẾP THEO)_
+### ✅ Pha 3: Defensive Caching & API Anti-Cheat _(đã làm, xem `TECHDEBT.md` #04, #05, #19)_
 
 1. **Chống Cache Lỗi (Defensive Cache-Control)**:
-   - Toàn bộ các API route (`app/api/...`) khi bắt được exception/lỗi fetch từ Google Sheets hoặc Supabase phải luôn trả về:
+   - Toàn bộ các API route (`app/api/...`) khi bắt được exception/lỗi fetch Supabase phải luôn trả về:
      ```ts
      headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
      ```

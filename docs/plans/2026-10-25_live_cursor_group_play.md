@@ -1,6 +1,6 @@
 # 📋 Kế Hoạch Triển Khai: Con Trỏ Thời Gian Thực Trong Phòng Chơi Nhóm (Live Multiplayer Cursors)
 
-> ⛔ **Trạng thái (2026-10-25): CHƯA GIAO.** Chỉ bắt đầu sau khi B13 xong, đã push + smoke test production và đã xác nhận gói Supabase (Free/Pro). Xem `docs/WORKTREE_PLAN.md` mục "Việc tiếp theo", bước 7.
+> ⛔ **Trạng thái (2026-10-25): CHƯA GIAO.** Chỉ bắt đầu sau khi B13 xong, đã push + smoke test production và đã xác nhận gói Supabase (Free/Pro). Xem `docs/ROADMAP.md` mục "Việc tiếp theo", bước 7.
 
 > **Mục tiêu:** 2–6 thám tử cùng phòng thấy con trỏ chuột của nhau trên bàn điều tra theo thời gian thực, trỏ đúng cùng một ghim dù khác thiết bị/zoom. Trên điện thoại, chạm để chỉ điểm (dùng lại ping có sẵn).
 >
@@ -132,7 +132,7 @@ Màu: `CURSOR_PALETTE[hash(deviceId) % length]`, ổn định giữa các lần 
 | **LC5** | `render-scene.ts`: vẽ con trỏ (mũi bút máy) + thẻ tên giấy cũ cạnh mũi; nội suy `drawX += (target − drawX) * CURSOR_LERP`; mờ dần 500ms cuối trước khi xóa; chỉ vẽ cursor có `s === "board"`. Màu có tương phản ≥ 4.5:1 với chữ thẻ tên                                                                    | Zoom/pan bên nhận: con trỏ đồng đội vẫn nằm trên đúng ghim                                                                    |
 | **LC6** | Bề mặt khác: khung tài liệu (`s: "doc"`) và `DossierCanvasBoard` (`s: "desk"`) **chưa vẽ con trỏ** trong giai đoạn này; trên bàn hiện chip nhỏ "Nam đang xem tài liệu" khi đồng đội ở bề mặt khác                                                                                                          | Chip đúng tên, biến mất khi đồng đội quay lại bàn                                                                             |
 | **LC7** | Đo lưu lượng: log đếm tin `CURSOR` gửi/giây trong dev (`process.env.NODE_ENV === "development"`)                                                                                                                                                                                                           | 1 người rê chuột liên tục ≤ 10 tin/giây; đứng yên = 0                                                                         |
-| **LC8** | E2E + docs                                                                                                                                                                                                                                                                                                 | Xem 2.5; cập nhật `docs/core_specs/11_group_play_realtime_spec.md` (event `CURSOR`, payload, ngân sách tin) và `CHANGELOG.md` |
+| **LC8** | E2E + docs                                                                                                                                                                                                                                                                                                 | Xem 2.5; cập nhật `docs/architecture/group_play_realtime.md` (event `CURSOR`, payload, ngân sách tin) và `CHANGELOG.md` |
 
 ### 2.5. E2E — `e2e/live-cursor.spec.ts`
 
@@ -190,7 +190,7 @@ Dùng 2 `browser.newContext()` (A desktop 1440×900, B mobile 375×812 hoặc de
 | R3   | `createRelayCursorTransport` + cờ `NEXT_PUBLIC_CURSOR_TRANSPORT`                                |
 | R4   | Chuyển `DETECTIVE_PING` sang cùng transport                                                     |
 | R5   | E2E 2.5 chạy lại với `relay`; thử tắt container relay → game vẫn chơi được                      |
-| R6   | Cập nhật `docs/core_specs/06_cicd_deployment_guide.md`, `11_group_play_realtime_spec.md`        |
+| R6   | Cập nhật `docs/ops/cicd_deployment.md`, `11_group_play_realtime_spec.md`        |
 
 ---
 

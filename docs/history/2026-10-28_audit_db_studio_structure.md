@@ -1,5 +1,7 @@
 # Audit DB, Studio, cấu trúc thư mục — 2026-10-28
 
+> **Lưu trữ.** Các mục của audit này đã xử lý trong B26/B27 và SPEC-22, phần còn lại nằm ở [`../ROADMAP.md`](../ROADMAP.md) và [`../TECHDEBT.md`](../TECHDEBT.md).
+
 > Reviewer: Claude. Cách làm: truy vấn trực tiếp DB production (`scripts/ops/run-sql.mjs`: số dòng, số ô có dữ liệu từng cột, khóa), grep code, quét file không được import ở đâu. Không chạy Playwright. HEAD `5522d73` (đã có B25 và 17 commit UI/Studio sau `db95875`).
 
 ## 0. Tóm tắt
@@ -82,7 +84,7 @@ Cách tìm: script quét mọi file trong `components/`, `lib/`, `hooks/`, coi l
 
 ### 3.3. Trùng lặp
 
-- `asString`, `asStringArray`: 3 bản (`lib/checkpoints/kinds.ts`, `lib/cms/checkpoint-runtime.ts`, `lib/types/checkpoint-studio.ts`).
+- `asString`, `asStringArray`: 3 bản (`lib/checkpoints/kinds.ts`, `lib/checkpoints/runtime.ts`, `lib/types/checkpoint-studio.ts`).
 - `checkIsAdmin`: 2 bản (`lib/actions/auth-guard.ts` chết, `lib/auth/admin.ts`).
 - `cleanList` (`character-actions.ts`, `checkpoint-studio.ts`), `toWords` (`phone-lookup-modal.tsx`, `server-grader.ts`).
 - `data/maps/case_000_vector.json` giống hệt kích thước `world_vector_map.json` (718.893 byte), cộng 2 file `*.backup*.json` (~1,4 MB) — trái quy tắc 1 bản đồ (§14).
@@ -106,4 +108,4 @@ Cách tìm: script quét mọi file trong `components/`, `lib/`, `hooks/`, coi l
 
 ## 4. Việc tiếp theo
 
-→ `docs/WORKTREE_PLAN.md` bảng **B26**.
+→ `docs/ROADMAP.md` bảng **B26**.

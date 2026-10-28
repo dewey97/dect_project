@@ -1,8 +1,10 @@
 # Figma Design Workflow & Integration Guide (dect_project)
 
-> **Mã tài liệu**: `docs/core_specs/10_figma_design_workflow.md`  
+> **Mã tài liệu**: `docs/design/figma_workflow.md`  
 > **Phiên bản**: v1.0.0 — Ngày ban hành: 10/10/2026  
 > **Phạm vi áp dụng**: Toàn bộ UI/UX vụ án, màn hình điều tra thiết bị (Phone/PC), bảng chứng cứ, hiện trường và landing page.
+>
+> **Lưu ý (2026-10-29):** Mọi chỗ nhắc "Google Sheets CMS" trong tài liệu này là thiết kế cũ. Nội dung vụ án nay ở Supabase, biên tập qua Studio ([`../studio/authoring_guide.md`](../studio/authoring_guide.md)); quy trình Figma → asset vẫn áp dụng.
 
 ---
 
@@ -14,7 +16,7 @@ Trong dự án **Detective Case System (`dect_project`)**, giao diện người 
 
 1. **Không code giả lập CSS/SVG vu vơ**: Không tự chế icon, bố cục hoặc font chữ sai lệch khi đã có bản thiết kế chính thức trên Figma.
 2. **Khai thác trực tiếp Asset Render từ Figma API**: Xuất ảnh độ phân giải cao (`@3x` / `@4x` PNG hoặc SVG gốc) từ Frame Figma để làm visual layer nền, sau đó phủ các vùng tương tác (**Interactive Hotspots**) hoặc form nhập liệu lên trên.
-3. **Đồng bộ hóa 2 chiều Token & Content**: Màu sắc, khoảng cách, thông số kỹ thuật và ID bằng chứng phải khớp 100% giữa Figma, Google Sheets CMS và Codebase.
+3. **Đồng bộ hóa 2 chiều Token & Content**: Màu sắc, khoảng cách, thông số kỹ thuật và ID bằng chứng phải khớp 100% giữa Figma, dữ liệu Studio (Supabase) và Codebase.
 
 ---
 

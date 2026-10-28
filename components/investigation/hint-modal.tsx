@@ -1,6 +1,6 @@
 "use client";
 
-import { parseRuntimeHints } from "@/lib/cms/checkpoint-runtime";
+import { parseRuntimeHints } from "@/lib/checkpoints/runtime";
 import type { PublicCheckpointRow } from "@/lib/checkpoints/public-checkpoint";
 import { getStorageItem } from "@/lib/storage";
 import { caseStorageKey } from "@/lib/cases/case-id";

@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
-import { toRuntimeCheckpoints } from "@/lib/cms/checkpoint-runtime";
+import { toRuntimeCheckpoints } from "@/lib/checkpoints/runtime";
 import type { Checkpoint, CheckpointOptionItem } from "@/lib/types";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 

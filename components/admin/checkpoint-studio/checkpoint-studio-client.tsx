@@ -34,7 +34,7 @@ import {
 import {
   buildDependencyEdges,
   wouldCreateCycle,
-} from "@/lib/cms/checkpoint-graph";
+} from "@/lib/checkpoints/graph";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";

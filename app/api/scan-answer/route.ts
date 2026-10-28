@@ -4,7 +4,7 @@ import { rateLimitResponse } from '@/lib/security/defensive-cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeCaseId } from '@/lib/cases/case-id'
 import { getInterrogationCriteria } from '@/lib/ai/suspect-interrogation-context'
-import { parseRuntimeHints } from '@/lib/cms/checkpoint-runtime'
+import { parseRuntimeHints } from '@/lib/checkpoints/runtime'
 import { asString, asStringArray } from '@/lib/text'
 import type { DbCaseCheckpoint } from '@/lib/types/database'
 

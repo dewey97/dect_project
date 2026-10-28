@@ -1,7 +1,7 @@
 # Cấu trúc Cơ sở dữ liệu (Database Architecture)
 
 > **Hệ thống Database Supabase (PostgreSQL) — Kiến trúc Tinh gọn (5 Core Tables)**  
-> _Toàn bộ nội dung vụ án (nhân vật, checkpoint, đáp án, vật chứng, hồ sơ, điện thoại, bản đồ) lưu trong Supabase và biên tập qua Studio (`/studio/*`). Xem [`21_studio_authoring_guide.md`](21_studio_authoring_guide.md) cho bảng trường nhập ↔ cột DB._
+> _Toàn bộ nội dung vụ án (nhân vật, checkpoint, đáp án, vật chứng, hồ sơ, điện thoại, bản đồ) lưu trong Supabase và biên tập qua Studio (`/studio/*`). Xem [`21_studio_authoring_guide.md`](../studio/authoring_guide.md) cho bảng trường nhập ↔ cột DB._
 
 ---
 
@@ -215,7 +215,7 @@ RLS: Thêm công khai (`anon`, `authenticated`), Đọc/sửa/xóa chỉ admin (
 
 Toàn bộ các bảng sau trong phiên bản thử nghiệm ban đầu **đã được lược bỏ và dọn sạch khỏi database**:
 
-- `characters`, `relationships`, `timeline_events`, `locations`: Đã quy hoạch 100% vào **Google Sheets Live CMS**.
+- `characters`, `relationships`, `timeline_events`, `locations`: thay bằng `case_characters` và dữ liệu Studio trên Supabase.
 - `evidence_nodes`, `evidence_edges`: Đã gộp vào `boardgame_pins` & `boardgame_connections` cho bảng canvas trinh thám.
 - `player_answers`: Lưu vết cục bộ qua Client State và LocalStorage theo nguyên tắc Zero-Black-Screen / Online-First.
 

@@ -18,7 +18,7 @@ Optional
 42
 ```
 
-Cách nhập này dễ sai cú pháp, khó rà soát chéo và phụ thuộc vào thứ tự dòng. Parser [`lib/cms/checkpoint-cms.ts`](../lib/cms/checkpoint-cms.ts) phải duy trì nhiều alias key để tương thích ngược.
+Cách nhập này dễ sai cú pháp, khó rà soát chéo và phụ thuộc vào thứ tự dòng. Parser `lib/cms/checkpoint-cms.ts` (đã xóa) phải duy trì nhiều alias key để tương thích ngược.
 
 Checkpoint Studio thay thế thao tác biên tập bằng form:
 
@@ -41,7 +41,7 @@ Luồng runtime:
 ```
 app/api/checkpoints/route.ts
   → lib/hooks/use-studio-checkpoints.ts   (memory cache 30s + dedupe request)
-  → lib/cms/checkpoint-runtime.ts         (map row DB → Checkpoint runtime)
+  → lib/checkpoints/runtime.ts         (map row DB → Checkpoint runtime)
   → lib/hooks/use-case-checkpoints.ts     (ghép checkpoint với evidences)
   → components/investigation/*
 ```
@@ -55,7 +55,7 @@ app/api/checkpoints/route.ts
 
 ## 3. Database
 
-Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.sql) và [`db/schema/20_case_dossiers.sql`](../db/schema/20_case_dossiers.sql)
+Schema: [`db/schema/16_case_checkpoints.sql`](../../db/schema/16_case_checkpoints.sql) và [`db/schema/20_case_dossiers.sql`](../../db/schema/20_case_dossiers.sql)
 
 | Cột                                                | Kiểu       | Ghi chú                                                         |
 | :------------------------------------------------- | :--------- | :-------------------------------------------------------------- |
@@ -80,7 +80,7 @@ Schema: [`db/schema/16_case_checkpoints.sql`](../db/schema/16_case_checkpoints.s
 
 ### 3.1. Bảng `case_dossiers` (Quản lý Hồ sơ Vụ án)
 
-Migration: [`db/schema/20_case_dossiers.sql`](../db/schema/20_case_dossiers.sql)
+Migration: [`db/schema/20_case_dossiers.sql`](../../db/schema/20_case_dossiers.sql)
 
 - Quản lý các tập hồ sơ (Bộ Ban Đầu, Bộ A, Bộ B, Bộ C, ...) và danh sách tài liệu/vật chứng thuộc mỗi bộ (`document_codes: TEXT[]`).
 - Lưu vị trí node dossier trên Canvas (`flow_position: JSONB`).
@@ -121,7 +121,7 @@ Studio áp dụng mô hình thẩm tra 2 lớp cốt lõi: **Động cơ** và *
 
 ### 3.3. Đồ thị phụ thuộc (`depends_on`)
 
-Migration: [`db/schema/17_case_checkpoint_dependencies.sql`](../db/schema/17_case_checkpoint_dependencies.sql)
+Migration: [`db/schema/17_case_checkpoint_dependencies.sql`](../../db/schema/17_case_checkpoint_dependencies.sql)
 
 - Cạnh có hướng: prerequisite (`source`) → checkpoint phụ thuộc (`target`).
 - `depends_on` lưu mảng `checkpoint_id`; GIN index `idx_case_checkpoints_depends_on`.
@@ -132,7 +132,7 @@ Migration: [`db/schema/17_case_checkpoint_dependencies.sql`](../db/schema/17_cas
 - UI quản lý theo `node_id`: sidebar, node flow và nhãn cạnh hiển thị `node_id`, không hiển thị `checkpoint_id`. `checkpoint_id` chỉ là khóa kỹ thuật nội bộ của graph.
 - Danh sách node nằm bên phải, không hiển thị badge hay bộ lọc bộ hồ sơ. Bộ hồ sơ chỉ thể hiện bằng lane nền trên Flow view.
 - Kéo node trên Flow view rồi bấm **Lưu sơ đồ** để ghi `flow_position`; **Tự sắp xếp** cũng ghi vị trí mới vào batch chờ lưu.
-- Migration vị trí: [`db/schema/19_case_checkpoint_flow_positions.sql`](../db/schema/19_case_checkpoint_flow_positions.sql).
+- Migration vị trí: [`db/schema/19_case_checkpoint_flow_positions.sql`](../../db/schema/19_case_checkpoint_flow_positions.sql).
 
 Gợi ý cạnh (`suggestDependencyEdges`) chỉ đọc dữ liệu CMS: `followup_of` và `requiredEvidenceIds`.
 Không hardcode tên nhân vật, tên bộ hồ sơ hay mã vụ án; checkpoint mới có thể dùng khóa tham chiếu tùy ý.
@@ -163,13 +163,13 @@ components/admin/checkpoint-studio/
     checkpoint-narrative-form.tsx
     checkpoint-ai-check-form.tsx
 lib/actions/checkpoint-actions.ts                # Server actions CRUD + dependencies
-lib/cms/checkpoint-graph.ts                      # Graph build/suggest/validate/layout
+lib/checkpoints/graph.ts                      # Graph build/suggest/validate/layout
 lib/types/checkpoint-studio.ts                   # Draft model + mapping
 lib/types/database.ts                            # DbCaseCheckpoint
 
 app/api/checkpoints/route.ts                     # Runtime API, force-dynamic, no-store
 lib/hooks/use-studio-checkpoints.ts              # Fetch + memory cache 30s + dedupe
-lib/cms/checkpoint-runtime.ts                    # Map DB row → Checkpoint runtime
+lib/checkpoints/runtime.ts                    # Map DB row → Checkpoint runtime
 lib/hooks/use-case-checkpoints.ts                # Nạp checkpoint + vật chứng từ Supabase
 ```
 

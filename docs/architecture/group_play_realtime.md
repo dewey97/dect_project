@@ -3,7 +3,7 @@
 > **Tài liệu Kỹ thuật Tầng 1 (Technical Spec #11)**  
 > **Trạng thái:** Approved Architecture  
 > **Cập nhật lần cuối:** 2026-10-14  
-> **Tài liệu liên quan:** [`07_license_access_system.md`](07_license_access_system.md), [`08_license_technical_spec.md`](08_license_technical_spec.md), [`02_database_schema.md`](02_database_schema.md)
+> **Tài liệu liên quan:** [`07_license_access_system.md`](../product/license_access.md), [`08_license_technical_spec.md`](../product/license_technical.md), [`02_database_schema.md`](database_schema.md)
 
 ---
 
@@ -66,24 +66,22 @@ WHERE status = 'active';
 export interface RoomInvestigationState {
   // Giai đoạn 0: Bẻ khóa điện thoại nạn nhân
   phoneSolved: boolean
-  phoneInputs: {
-    phone1?: string
-    phone2?: string
-    phone3?: string
-  }
+  phoneInputs: Record<string, string>   // key = id ô nhập trong checkpoint phone_lookup
 
   // Giai đoạn 1: Thẩm vấn nghi phạm & Checkpoints
-  investigatedSuspects: ('vu' | 'tung' | 'ha')[]
-  solvedFollowups: ('vu' | 'tung' | 'ha')[]
+  investigatedSuspects: string[]      // key nhân vật (case_characters.key)
+  solvedFollowups: string[]
   completedCheckpoints: string[]     // ID các checkpoint đã giải (VD: ["cp-000-1", "cp-000-2a"])
 
-  // Giai đoạn 2: Khám xét lại hiện trường
-  reinvestigateUnlocked: boolean
+  // Bộ hồ sơ đã mở theo unlocksDossier (lib/progress/case-progress.ts)
+  unlockedDossiers?: string[]
+
+  // Khám xét lại hiện trường: mở sẵn từ đầu, chỉ lưu đã mở hay chưa
   reinvestigateOpened: boolean
 
   // Giai đoạn kết: Cáo trạng & Thủ phạm
   indictmentSolved: boolean
-  indictmentCulprit: 'vu' | 'tung' | 'ha' | null
+  solvedCulprit: string | null
 
   // Ghi chú & Lớp vẽ tương tác nhóm
   teamNotes?: string                  // Cuốn sổ tay điều tra chung (Notebook Modal)

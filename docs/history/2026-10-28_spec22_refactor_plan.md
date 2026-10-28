@@ -1,5 +1,7 @@
 # Đặc Tả Kiến Trúc Codebase & Kế Hoạch Tái Cấu Trúc (Bản Final)
 
+> **Lưu trữ (2026-10-29).** Kế hoạch SPEC-22 đã thực hiện xong GĐ1–6 (trừ phần ghi "chưa làm"). Kiến trúc hiện hành: [`../architecture/codebase_architecture.md`](../architecture/codebase_architecture.md). Việc còn lại: [`../ROADMAP.md`](../ROADMAP.md).
+
 > **Mã tài liệu**: `SPEC-22`
 > **Trạng thái**: Bản final — chờ chủ dự án duyệt từng giai đoạn trước khi thực thi
 > **Ngày rà soát**: 2026-10-28
@@ -48,7 +50,7 @@ Cùng một row `case_checkpoints.answer_config` được parse ở 3 nơi, mỗ
 | File                                                                         | Vai trò                                                        | Shape                                                                                                                                                          |
 | :--------------------------------------------------------------------------- | :------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`lib/checkpoints/kinds.ts`](../../lib/checkpoints/kinds.ts)                 | Discriminated union theo `kind`, parser + validator cho Studio | Typed, sạch                                                                                                                                                    |
-| [`lib/cms/checkpoint-runtime.ts`](../../lib/cms/checkpoint-runtime.ts)       | Chuyển row sang `Checkpoint` cho gameplay                      | Phẳng, legacy: `type` + `questionType` + `inputType`, `pickerConfig` gom mọi field, suy luận `questionType` qua 6 nhánh (`text_match_3`, `evidence_picker`...) |
+| [`lib/checkpoints/runtime.ts`](../../lib/checkpoints/runtime.ts)       | Chuyển row sang `Checkpoint` cho gameplay                      | Phẳng, legacy: `type` + `questionType` + `inputType`, `pickerConfig` gom mọi field, suy luận `questionType` qua 6 nhánh (`text_match_3`, `evidence_picker`...) |
 | [`lib/checkpoints/server-grader.ts`](../../lib/checkpoints/server-grader.ts) | Chấm điểm                                                      | Không dùng parser của `kinds.ts`. Đọc thẳng `cfg as Record<string, any>`                                                                                       |
 
 Hệ quả:
@@ -64,9 +66,9 @@ Hệ quả:
 - Gameplay gọi `/api/checkpoints?caseId=...` **không có** `mode=public` ([`use-studio-checkpoints.ts:30`](../../lib/hooks/use-studio-checkpoints.ts)). Route trả nguyên `answer_config` (đáp án, `validAnswers`, `correctAnswer`) xuống trình duyệt.
 - Policy `18_case_checkpoints_public_read.sql` cho `anon` đọc thẳng bảng `case_checkpoints`. View `case_checkpoints_public` tồn tại nhưng không ai dùng.
 - Client tự chấm lại sau server:
-  - [`followup-question-modal.tsx`](../../components/investigation/mindmap/followup-question-modal.tsx) (~dòng 321–352): khi server trả `correct: false`, client **vẫn thử so khớp `activeCheckpoint.correctAnswer`** và có thể chấp nhận. Client ghi đè quyết định của server.
-  - [`phone-lookup-modal.tsx`](../../components/investigation/mindmap/phone-lookup-modal.tsx) (~dòng 152–185): server sai thì client chấm lại bằng `isPhoneMatch`.
-  - [`custom-pin-modal.tsx`](../../components/investigation/mindmap/custom-pin-modal.tsx) (~dòng 223): chấm hoàn toàn client bằng `isVietnameseTextMatch`.
+  - [`followup-question-modal.tsx`](../../components/investigation/board/followup-question-modal.tsx) (~dòng 321–352): khi server trả `correct: false`, client **vẫn thử so khớp `activeCheckpoint.correctAnswer`** và có thể chấp nhận. Client ghi đè quyết định của server.
+  - [`phone-lookup-modal.tsx`](../../components/investigation/board/phone-lookup-modal.tsx) (~dòng 152–185): server sai thì client chấm lại bằng `isPhoneMatch`.
+  - [`custom-pin-modal.tsx`](../../components/investigation/board/custom-pin-modal.tsx) (~dòng 223): chấm hoàn toàn client bằng `isVietnameseTextMatch`.
 - Hai hàm so khớp tên có ngữ nghĩa khác nhau: server dùng `toWords` (mọi từ của đáp án phải có trong input), client dùng `isVietnameseTextMatch` (input là tập con của đáp án). Cùng một câu trả lời có thể đúng ở client và sai ở server.
 
 Đây là chỗ **phức tạp thừa lớn nhất**: duy trì hai đường chấm, hai thuật toán so khớp, một view và một endpoint verify, nhưng không đạt mục tiêu giấu đáp án.

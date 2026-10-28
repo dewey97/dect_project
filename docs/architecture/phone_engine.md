@@ -1,6 +1,6 @@
 # Phone Engine Architecture & Multi-Device Modular Guide
 
-> **Mã tài liệu**: `docs/core_specs/15_cross_case_phone_simulator_spec.md`  
+> **Mã tài liệu**: `docs/architecture/phone_engine.md`  
 > **Trạng thái**: Đã chuẩn hóa Kiến trúc 4 Tầng & Định hướng Tách Module dùng chung cho mọi Case  
 > **Áp dụng cho**: Toàn bộ các vụ án (Case #000, #001, #002,...) và các dòng thiết bị (iOS, Android, Dumbphone)
 
@@ -25,9 +25,9 @@ Do đó, Phone Engine được thiết kế tách rời **Khung vỏ phần cứ
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │ 1. DATA LAYER (Data-Driven / Case-Agnostic)                            │
-│    - API & Live CMS: /api/phone?caseId=...&deviceId=...                │
+│    - API: /api/phone-data/*?caseId=...                                 │
 │    - Schema thuần dữ liệu: messages, calls, photos, notes, banking     │
-│    - Không chứa mã giao diện, dễ dàng nạp từ Google Sheets             │
+│    - Không chứa mã giao diện, nạp từ Supabase (Phone Studio)           │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
 ┌───────────────────────────────────▼────────────────────────────────────┐

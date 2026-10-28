@@ -1,7 +1,9 @@
 # Plan thực thi v6 — nhánh `main` (2026-10-28)
 
-> Bản duy nhất còn hiệu lực. Các bước B0–B25 đã xong và đã bỏ khỏi file này; nội dung cũ xem bằng `git show 1179a99:docs/WORKTREE_PLAN.md`, báo cáo cũ trong lịch sử git của `docs/reports/`.
-> Quy ước chung: `AGENTS.md` (global + dự án). Studio và trường dữ liệu: `docs/core_specs/21_studio_authoring_guide.md`. Nợ kỹ thuật: `docs/TECHDEBT.md`.
+> **Lưu trữ (2026-10-29).** Plan B26/B27 đã xong. Quy ước, ngân sách kiểm thử, mẫu worktree/báo cáo chuyển sang [`../process/workflow.md`](../process/workflow.md); việc tiếp theo sang [`../ROADMAP.md`](../ROADMAP.md).
+
+> Bản duy nhất còn hiệu lực. Các bước B0–B25 đã xong và đã bỏ khỏi file này; nội dung cũ xem bằng `git show 1179a99:docs/ROADMAP.md`, báo cáo cũ trong lịch sử git của `docs/reports/`.
+> Quy ước chung: `AGENTS.md` (global + dự án). Studio và trường dữ liệu: `docs/studio/authoring_guide.md`. Nợ kỹ thuật: `docs/TECHDEBT.md`.
 
 ---
 
@@ -44,7 +46,7 @@
 
 ## B26 — dọn sau audit DB/Studio/cấu trúc (2026-10-28)
 
-Nguồn: `docs/reports/AUDIT_2026-10-28_DB_STUDIO_STRUCTURE.md`. Làm trên `main`, mỗi mục 1 commit, không push.
+Nguồn: `docs/history/2026-10-28_audit_db_studio_structure.md`. Làm trên `main`, mỗi mục 1 commit, không push.
 
 | #     | Mức     | Việc                                                                                                                                                                                                                                                                                                                         | Tiêu chí done                                                                         | Trạng thái                                                                                  |
 | ----- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -64,7 +66,7 @@ Backlog (không làm trong B26): đổi tên `case_id` → `case_slug`; tách n�
 **Prompt giao việc B26 (phần còn lại):**
 
 ```
-Đọc docs/reports/AUDIT_2026-10-28_DB_STUDIO_STRUCTURE.md, docs/WORKTREE_PLAN.md mục "Truy cập Supabase production", "Ngân sách kiểm thử cho AI thực thi" và bảng "B26". Làm trên main.
+Đọc docs/history/2026-10-28_audit_db_studio_structure.md, docs/ROADMAP.md mục "Truy cập Supabase production", "Ngân sách kiểm thử cho AI thực thi" và bảng "B26". Làm trên main.
 Làm B26-9 trước, rồi B26-2, phần code của B26-5, B26-8; mỗi mục 1 commit, không push.
 KHÔNG chạy migration bỏ cột (B26-5, B26-6) khi chưa push và deploy: chỉ viết file db/schema/46_*.sql, ghi lệnh backup + kiểm vào báo cáo.
 Báo cáo docs/reports/B26_REPORT.md: git log --oneline 1179a99..HEAD, dòng tổng kết Playwright thật. Không làm live cursor, không đụng dữ liệu bản đồ.
@@ -84,7 +86,7 @@ Báo cáo docs/reports/B26_REPORT.md: git log --oneline 1179a99..HEAD, dòng t�
 | 6   | A6: xoay key trong `.env`, `git rm --cached .env`, thêm vào `.gitignore`/`.dockerignore` | Chủ dự án         | `.env` đang bị track                                                   |
 | 7   | A10: checklist VPS `deploy/INFRA_HANDOFF_CHECKLIST.md`                                   | Chủ dự án         | Cần quyền VPS                                                          |
 | 8   | B15-12: giữ hay bỏ 6 vụ tĩnh trên `/activate`                                            | Chủ dự án         |                                                                        |
-| 9   | **Live cursor** — `docs/superpowers/plans/2026-10-25-live-cursor-group-play.md`          | AI thực thi       | ⛔ Chưa giao: cần push + smoke test + xác nhận gói Supabase (Free/Pro) |
+| 9   | **Live cursor** — `docs/plans/2026-10-25_live_cursor_group_play.md`          | AI thực thi       | ⛔ Chưa giao: cần push + smoke test + xác nhận gói Supabase (Free/Pro) |
 
 ---
 

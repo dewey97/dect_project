@@ -6,7 +6,7 @@ import { slugifyVietnamese, asStringArray, cleanList } from "@/lib/text";
  *
  * Lưu ý: đây là model biên tập của Studio trên bảng `case_checkpoints`.
  * Runtime gameplay đọc cùng bảng qua `/api/checkpoints` và
- * `lib/cms/checkpoint-runtime.ts`. Toàn bộ dữ liệu vụ án nằm trong database.
+ * `lib/checkpoints/runtime.ts`. Toàn bộ dữ liệu vụ án nằm trong database.
  */
 
 /**

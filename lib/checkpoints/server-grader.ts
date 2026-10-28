@@ -6,7 +6,7 @@ import {
   checkMotiveValid,
   isEvidenceMatching,
 } from "@/lib/cases/clues";
-import { isVietnameseTextMatch } from "@/lib/finding-matcher";
+import { isVietnameseTextMatch } from "@/lib/checkpoints/name-match";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 import {
   parseCheckpointConfig,

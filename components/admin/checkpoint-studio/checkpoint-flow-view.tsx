@@ -25,7 +25,7 @@ import {
   getCheckpointIssues,
   layoutCheckpointGraph,
   wouldCreateCycle,
-} from "@/lib/cms/checkpoint-graph";
+} from "@/lib/checkpoints/graph";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

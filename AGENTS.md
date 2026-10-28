@@ -7,35 +7,23 @@
 
 ## 📚 Documentation Map (Bản Đồ Tài Liệu 2 Tầng)
 
-Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
+Chỉ mục đầy đủ: [`docs/README.md`](docs/README.md). Trạng thái và việc tiếp theo: [`docs/ROADMAP.md`](docs/ROADMAP.md). Quy trình, lệnh kiểm tra, bài học: [`docs/process/workflow.md`](docs/process/workflow.md).
 
-- **⚙️ Technical Docs (Kỹ thuật hệ thống)**:
-  - Hướng dẫn kỹ thuật hệ thống: [`docs/core_specs/01_technical_guide.md`](docs/core_specs/01_technical_guide.md)
-  - Cơ sở dữ liệu: [`docs/core_specs/02_database_schema.md`](docs/core_specs/02_database_schema.md)
-  - Design System & UI/UX: [`docs/core_specs/04_ux_ui_design_system.md`](docs/core_specs/04_ux_ui_design_system.md)
-  - Analytics & Tracking: [`docs/core_specs/05_analytics_tracking_spec.md`](docs/core_specs/05_analytics_tracking_spec.md)
-  - CI/CD & VPS Deployment: [`docs/core_specs/06_cicd_deployment_guide.md`](docs/core_specs/06_cicd_deployment_guide.md)
-  - License & Access Control: [`docs/core_specs/07_license_access_system.md`](docs/core_specs/07_license_access_system.md)
-  - License Technical Spec: [`docs/core_specs/08_license_technical_spec.md`](docs/core_specs/08_license_technical_spec.md)
-  - Business Model Spec: [`docs/core_specs/09_business_model_spec.md`](docs/core_specs/09_business_model_spec.md)
-  - Financial & Founder Model: [`docs/core_specs/10_financial_founder_model.md`](docs/core_specs/10_financial_founder_model.md)
-  - Figma Design Workflow & Integration: [`docs/core_specs/10_figma_design_workflow.md`](docs/core_specs/10_figma_design_workflow.md)
-  - Group Play Realtime Architecture: [`docs/core_specs/11_group_play_realtime_spec.md`](docs/core_specs/11_group_play_realtime_spec.md)
-  - Architecture Hardening & Roadmap: [`docs/core_specs/13_architecture_hardening_and_roadmap.md`](docs/core_specs/13_architecture_hardening_and_roadmap.md)
-  - Cross-Case Phone Simulator Spec: [`docs/core_specs/15_cross_case_phone_simulator_spec.md`](docs/core_specs/15_cross_case_phone_simulator_spec.md)
-  - Detective Rating & Leaderboard Spec: [`docs/core_specs/16_detective_rating_and_leaderboard_spec.md`](docs/core_specs/16_detective_rating_and_leaderboard_spec.md)
-  - Vector Map Engine & Studio Spec: [`docs/core_specs/17_vector_map_engine_and_studio_spec.md`](docs/core_specs/17_vector_map_engine_and_studio_spec.md)
-  - Dossier Studio & Document Spec: [`docs/core_specs/18_dossier_studio_and_document_spec.md`](docs/core_specs/18_dossier_studio_and_document_spec.md)
-  - Checkpoint Studio & Structured Authoring: [`docs/core_specs/19_checkpoint_studio.md`](docs/core_specs/19_checkpoint_studio.md)
-  - Phone Studio & Dynamic Phone Engine: [`docs/core_specs/20_phone_studio.md`](docs/core_specs/20_phone_studio.md)
-  - Studio Authoring Guide (chức năng, trường, lý do thiết kế): [`docs/core_specs/21_studio_authoring_guide.md`](docs/core_specs/21_studio_authoring_guide.md)
-  - Codebase Architecture & Refactoring Plan: [`docs/core_specs/22_codebase_architecture_and_refactoring_plan.md`](docs/core_specs/22_codebase_architecture_and_refactoring_plan.md)
-  - Tech Debt Ledger: [`docs/TECHDEBT.md`](docs/TECHDEBT.md)
-- **🧠 Domain & Case Docs (Nghiệp vụ & Hồ sơ vụ án)**:
-  - Bối cảnh & Cốt truyện Master Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)
-  - Gameplay & Hành trình điều tra: [`docs/cases/case_000/01_design/gameplay_design.md`](docs/cases/case_000/01_design/gameplay_design.md)
-  - Điểm khám xét lại hiện trường: [`docs/cases/case_000/01_design/reinvestigation_hotspots.md`](docs/cases/case_000/01_design/reinvestigation_hotspots.md)
-  - Hồ sơ bàn giao thiết kế Figma Case #000: [`docs/cases/case_000/01_design/FIGMA_HANDOVER_SPEC.md`](docs/cases/case_000/01_design/FIGMA_HANDOVER_SPEC.md)
+- **⚙️ Technical Docs**:
+  - Kiến trúc codebase (cây thư mục, chấm điểm server, mở bộ hồ sơ): [`docs/architecture/codebase_architecture.md`](docs/architecture/codebase_architecture.md)
+  - Hướng dẫn kỹ thuật: [`docs/architecture/technical_guide.md`](docs/architecture/technical_guide.md)
+  - Cơ sở dữ liệu: [`docs/architecture/database_schema.md`](docs/architecture/database_schema.md)
+  - Chơi nhóm realtime: [`docs/architecture/group_play_realtime.md`](docs/architecture/group_play_realtime.md)
+  - Điện thoại giả lập: [`docs/architecture/phone_engine.md`](docs/architecture/phone_engine.md)
+  - Bản đồ vector: [`docs/architecture/vector_map_engine.md`](docs/architecture/vector_map_engine.md)
+  - Studio: [`docs/studio/authoring_guide.md`](docs/studio/authoring_guide.md), [`checkpoint_studio.md`](docs/studio/checkpoint_studio.md), [`dossier_studio.md`](docs/studio/dossier_studio.md), [`phone_studio.md`](docs/studio/phone_studio.md)
+  - Vận hành: [`docs/ops/cicd_deployment.md`](docs/ops/cicd_deployment.md), [`hardening.md`](docs/ops/hardening.md), [`analytics_tracking.md`](docs/ops/analytics_tracking.md)
+  - Thiết kế: [`docs/design/design_system.md`](docs/design/design_system.md), [`figma_workflow.md`](docs/design/figma_workflow.md)
+  - Nợ kỹ thuật: [`docs/TECHDEBT.md`](docs/TECHDEBT.md)
+- **🧠 Domain Docs**:
+  - Case #000: [`case_design.md`](docs/cases/case_000/01_design/case_design.md), [`gameplay_design.md`](docs/cases/case_000/01_design/gameplay_design.md), [`reinvestigation_hotspots.md`](docs/cases/case_000/01_design/reinvestigation_hotspots.md), [`FIGMA_HANDOVER_SPEC.md`](docs/cases/case_000/01_design/FIGMA_HANDOVER_SPEC.md), [`ASSET_CATALOG.md`](docs/cases/case_000/02_photos/ASSET_CATALOG.md)
+  - Sản phẩm: [`docs/product/`](docs/product/) (license, mô hình kinh doanh, tài chính, xếp hạng)
+- **📦 Kế hoạch và lịch sử**: [`docs/plans/`](docs/plans/) (chưa thực hiện), [`docs/history/`](docs/history/) (đã xong, chỉ đọc)
 
 ---
 
@@ -54,7 +42,7 @@ Mọi sửa đổi liên quan đến nội dung vụ án phải đảm bảo tí
 
 Nguồn dữ liệu duy nhất của vụ án là **Supabase**; nơi biên tập duy nhất là **Studio** (`/studio/*`). Google Sheets không còn là CMS.
 
-1. **Thứ tự dựng vụ**: Cases → Checkpoints (nhân vật, checkpoint, bảng điều tra) → Dossier (hồ sơ, vật chứng, hiện trường 360) → Phone → Map. Chi tiết trường nhập ↔ cột DB: [`docs/core_specs/21_studio_authoring_guide.md`](docs/core_specs/21_studio_authoring_guide.md).
+1. **Thứ tự dựng vụ**: Cases → Checkpoints (nhân vật, checkpoint, bảng điều tra) → Dossier (hồ sơ, vật chứng, hiện trường 360) → Phone → Map. Chi tiết trường nhập ↔ cột DB: [`docs/studio/authoring_guide.md`](docs/studio/authoring_guide.md).
 2. **Kiểm tra trước khi xuất bản**: chạy Linter và Chơi thử trong Checkpoint Studio, rồi chuyển `cases.status` sang `PUBLISHED`.
 3. **Không sửa dữ liệu vụ án bằng SQL tay** trừ khi chủ dự án duyệt (migration có backup).
 4. **PDF cũ của case_000**: `npm run export:docs-pdf` vẫn xuất PDF từ Master Google Doc vào `public/documents/case_000/<phase>/` khi cần; vụ mới dùng Dossier Studio.

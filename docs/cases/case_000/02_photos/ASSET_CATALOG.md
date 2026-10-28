@@ -111,9 +111,9 @@ Hệ thống ghim cắm bảng phân loại theo màu sắc nghiệp vụ (mỗi
 
 ### 7.1. Ảnh Thẻ Nhân Vật, Avatar Placeholder & Dynamic Canvas Composite
 
-- **`/public/images/avatar_placeholder.svg`**: Hình bóng avatar điều tra trung tính chuẩn, hiển thị mặc định cho mọi nghi phạm và nhân chứng khi chưa có ảnh chân dung từ Live CMS Google Sheets.
+- **`/public/images/avatar_placeholder.svg`**: Hình bóng avatar điều tra trung tính chuẩn, hiển thị mặc định cho mọi nghi phạm và nhân chứng khi chưa có ảnh chân dung trong Studio.
 - **Loại bỏ ảnh tĩnh `pinned_photos_with_tape/`**: Toàn bộ các ảnh PNG ghép sẵn băng dính giấy tĩnh trước đây (`pinned_tape_khang.png`, `pinned_tape_vu.png`...) đã được gỡ bỏ khỏi `public/` để tối ưu dung lượng và chuyển sang kiến trúc **Dynamic Card Composite**.
-- **Cơ chế Dựng Thẻ Động (`card-composite.ts`)**: Trình duyệt nạp ảnh chân dung gốc từ Google Drive Live CMS, tự động ghép khung Polaroid và vẽ băng dính giấy răng cưa trên Canvas bộ nhớ (Offscreen Canvas 60 FPS), đảm bảo nội dung luôn đồng bộ với dữ liệu bảng tính mà không cần re-build code.
+- **Cơ chế Dựng Thẻ Động (`card-composite.ts`)**: Trình duyệt nạp ảnh chân dung từ Supabase Storage / `public/`, tự động ghép khung Polaroid và vẽ băng dính giấy răng cưa trên Canvas bộ nhớ (Offscreen Canvas 60 FPS), đảm bảo nội dung luôn đồng bộ với dữ liệu bảng tính mà không cần re-build code.
 
 ### 7.2. Giấy Ghi Chú Nghiệp Vụ (`clue_notes/rendered_notes/`)
 

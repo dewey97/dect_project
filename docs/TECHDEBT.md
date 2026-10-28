@@ -7,7 +7,7 @@
 
 ## 📑 Mục Lục & Cấu Trúc 2 Tầng
 
-- **[Phần 1 — Nghẽn do Dữ liệu / Live CMS / Backend](#phần-1--nghẽn-do-dữ-liệu--live-cms--backend)**: Các thành phần giao diện hiện đang hiển thị dạng **Mock / Trang trí (Decorative) / Fallback tĩnh**, chỉ có thể kích hoạt hoàn chỉnh khi có dữ liệu thật từ Google Sheets Live CMS hoặc Backend.
+- **[Phần 1 — Nghẽn do Dữ liệu / Studio / Backend](#phần-1--nghẽn-do-dữ-liệu--studio--backend)**: Các thành phần giao diện hiện đang hiển thị dạng **Mock / Trang trí (Decorative) / Fallback tĩnh**, chỉ có thể kích hoạt hoàn chỉnh khi có dữ liệu thật trong Studio (Supabase) hoặc Backend.
 - **[Phần 2 — Nợ Tối Ưu Hóa & Công Cụ (Codebase & Tooling Debt)](#phần-2--nợ-tối-ưu-hóa--công-cụ-codebase--tooling-debt)**: Các tính năng đã hoạt động được; phần việc còn lại là refactor mã nguồn, dọn dẹp import, tối ưu bundle hoặc bổ sung kiểm thử tự động.
 
 > [!IMPORTANT]
@@ -15,7 +15,7 @@
 
 ---
 
-## 🧩 Phần 1 — Nghẽn do Dữ liệu / Live CMS / Backend
+## 🧩 Phần 1 — Nghẽn do Dữ liệu / Studio / Backend
 
 | #      | Hạng Mục                                                                      | Hiện Trạng Trong Mã Nguồn                                                                                                                                                                                               | Điều Kiện Tháo Gỡ (Unblock Requirement)                                                                                              | Vị Trí Hiển Thị UI Hiện Tại                              |
 | ------ | :---------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------- |
@@ -23,7 +23,7 @@
 | **02** | **Tính năng Chơi Nhóm Realtime (Group Play)**                                 | Đã kích hoạt hoàn chỉnh phòng chơi 4 ký tự Crockford Base32, Supabase Realtime Broadcast đồng bộ tiến trình giải checkpoint và chỉ điểm tài liệu/vật chứng giữa các thám tử.                                            | ✅ Đã hoàn thành                                                                                                                     | Menu phòng chơi nhóm & Header (`room-sync-context.tsx`). |
 | **03** | **Khám xét hiện trường 360 Panorama (Mở ngay từ đầu)**                        | Chế độ khám xét hiện trường được mở ngay từ đầu vụ án (không yêu cầu mở khóa muộn). Sử dụng `Scene360Viewer` (Three.js WebGL equirectangular sphere) nhúng vào `reinvestigation-modal.tsx` cùng ảnh 360 `PANORAMA.png`. | ✅ Đã hoàn thành                                                                                                                     | Thanh công cụ phá án (`reinvestigation-modal.tsx`).      |
 | **08** | **Liên kết Google Sheet cho Waitlist Landing Page**                           | Giao diện và API `/api/waitlist` đã dựng xong với rate-limit và local backup `data/waitlist_pending.json`.                                                                                                              | Cung cấp ID Google Sheet vào biến môi trường `WAITLIST_SHEET_ID` để kích hoạt ghi realtime vào Sheet.                                | Landing Hero, Case Dispatch Section, Landing Footer.     |
-| **09** | **Hệ thống Quản lý Lượt Chơi & Thanh Toán License (Credit / PayOS / VietQR)** | Logic game và tạo phòng hiện đang mở tự do (Open Access). Cần bảng `licenses` trong Supabase để trừ lượt tạo phòng của Host (`group_credits`) và tích hợp cổng thanh toán VietQR / SePay để mua thêm lượt.              | Tạo bảng `licenses` và webhook thanh toán theo [`core_specs/08_license_technical_spec.md`](core_specs/08_license_technical_spec.md). | Header Host & Modal tạo phòng nhóm.                      |
+| **09** | **Hệ thống Quản lý Lượt Chơi & Thanh Toán License (Credit / PayOS / VietQR)** | Logic game và tạo phòng hiện đang mở tự do (Open Access). Cần bảng `licenses` trong Supabase để trừ lượt tạo phòng của Host (`group_credits`) và tích hợp cổng thanh toán VietQR / SePay để mua thêm lượt.              | Tạo bảng `licenses` và webhook thanh toán theo [`product/license_technical.md`](product/license_technical.md). | Header Host & Modal tạo phòng nhóm.                      |
 
 ---
 

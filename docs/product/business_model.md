@@ -120,7 +120,7 @@ Hệ thống phục vụ 2 nhóm khách hàng B2C chính và 1 nhóm tiềm năn
   * Bộ hồ sơ thiết kế đồ họa độc bản (biên bản hiện trường, lời khai, sơ đồ, ảnh polaroid).
 * **Hạ Tầng Công Nghệ (Tech Stack & Platform):**
   * Mã nguồn hệ thống Web App Next.js 16, kiến trúc Docker trên VPS `72.62.199.110`.
-  * Hệ thống CMS thời gian thực Google Sheets quản lý kịch bản.
+  * Studio biên tập vụ án trên Supabase (`/studio/*`) quản lý kịch bản.
   * Hệ thống quản lý mã kích hoạt, mã phòng (Room Engine) và bảo mật tài liệu.
 * **Tài Sản Vật Chất:**
   * Tồn kho bao bì (túi Kraft dây quấn / hộp carton), vật liệu in ấn, phụ kiện vật chứng.

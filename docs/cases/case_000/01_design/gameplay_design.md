@@ -42,6 +42,26 @@
 
 ---
 
+## ⚙️ CÁCH BẢN WEB ĐANG THỰC THI (2026-10-29)
+
+Sơ đồ trên là thiết kế kịch bản. Bản web hiện chạy như sau; nguồn dữ liệu là Checkpoint Studio, luật chung ở [`studio/authoring_guide.md`](../../../studio/authoring_guide.md).
+
+- **Khám xét lại hiện trường mở sẵn từ đầu** (USP). Điều kiện "hoàn thành Tuyến A và B" ở mục dưới **không** được áp dụng trong game web.
+- **Bộ hồ sơ mở theo `unlocksDossier` của checkpoint** (cấu hình Studio lúc viết):
+
+| Checkpoint | Nội dung | Mở bộ |
+| --- | --- | --- |
+| `cp-000-0` | Tra danh tính SĐT | Bộ A (đã mở sẵn từ đầu) |
+| `cp-000-1a-followup` | Câu hỏi phụ Vũ (mốc giờ Quán Bia 88) | Bộ B |
+| `cp-000-1b-followup` | Câu hỏi phụ Tùng (trắc nghiệm) | Không |
+| `cp-000-1c-followup` | Câu hỏi phụ Hà (mật khẩu hộp thiếc) | Bộ C |
+| `cp-000-2b` | Cáo trạng | Mọi bộ còn lại |
+
+- Đổi thứ tự mở bộ: sửa ô "Mở bộ hồ sơ khi xong" của checkpoint trong Studio, không sửa code.
+- Dữ liệu production `cp-000-0` và `cp-000-2b` đang lệch kịch bản: [`TECHDEBT.md`](../../../TECHDEBT.md) #20.
+
+---
+
 ## 🔒 ĐIỀU KIỆN KÍCH HOẠT LỆNH KHÁM XÉT LẠI HIỆN TRƯỜNG
 
 - **Vị trí:** Nút hội tụ chuyển từ Phase 1 ➔ Phase 2.

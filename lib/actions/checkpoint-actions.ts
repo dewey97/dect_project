@@ -9,7 +9,7 @@ import {
   type CheckpointPositionUpdate,
   type CheckpointStudioDraft,
 } from "@/lib/types/checkpoint-studio";
-import { validateDependencyUpdates } from "@/lib/cms/checkpoint-graph";
+import { validateDependencyUpdates } from "@/lib/checkpoints/graph";
 import { requireAdminAuth } from "@/lib/auth/admin";
 
 const STUDIO_PATH = "/studio/checkpoints";
