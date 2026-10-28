@@ -57,7 +57,7 @@ export const resolveSuspectPhotoUrl = (
       if (liveSubject) return liveSubject;
     }
   }
-  // 2. Fallback if not found in live Google Sheets
+  // 2. Fallback if not found in case evidence
   if (isCrimeScenePin) {
     return "/images/avatar_placeholder.svg";
   }

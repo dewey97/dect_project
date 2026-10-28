@@ -84,7 +84,7 @@ export function findValidCaseCharacter(
 }
 
 /**
- * Tự động tạo danh sách SuspectCharacter từ các hàng avatar trong Google Sheet ('evidences' tab).
+ * Tự động tạo danh sách SuspectCharacter từ các hàng avatar trong case_evidence.
  */
 export function buildDynamicSuspectCharacters(
   sheetEvidences?: any[],

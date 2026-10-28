@@ -246,7 +246,7 @@ export interface Checkpoint {
 }
 
 /**
- * Dẫn truyện cinematic của một chặng điều tra (tab `narratives` trên Google Sheet).
+ * Dẫn truyện cinematic của một chặng điều tra.
  * `phase`: 0 = Ban Đầu, 1 = Bộ A, 2 = Bộ B, 3 = Bộ C.
  */
 export interface PhaseNarrative {

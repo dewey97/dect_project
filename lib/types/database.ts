@@ -97,7 +97,7 @@ export interface DbAppSettings {
 
 /**
  * Bảng case_checkpoints: Dữ liệu checkpoint do Checkpoint Studio biên tập.
- * Chưa nối vào runtime — gameplay vẫn đọc Google Sheets.
+ * Gameplay đọc cùng bảng qua `/api/checkpoints`.
  */
 export interface DbCaseCheckpoint {
   id: string;

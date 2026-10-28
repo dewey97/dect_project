@@ -40,7 +40,7 @@ interface ReinvestigationModalProps {
 export interface ReinvestigationHotspot2D {
   id: string;
   num: number;
-  photoId?: string; // Mã photo_code trong Google Sheets (VD: photo_bua_yeu, p1, photo_keo_toc...)
+  photoId?: string; // Mã vật chứng trong case_evidence (VD: photo_bua_yeu, p1, photo_keo_toc...)
   title?: string;
   x: number; // percentage 0-100
   y: number; // percentage 0-100
@@ -250,7 +250,7 @@ export function ReinvestigationModal({
     };
   }, [isOpen, caseId]);
 
-  // Process Google Sheets photos: Map by photo_code ID & Title
+  // Process case evidence photos: Map by photo_code ID & Title
   const sheetPhotosList = useMemo(() => {
     if (!Array.isArray(rawSheetPhotos)) return [];
     return (rawSheetPhotos as RawSheetPhotoItem[])
@@ -309,7 +309,7 @@ export function ReinvestigationModal({
   // Nếu Sheet cập nhật link Drive hay title cho photoId, game tự động đọc theo photoId mới nhất!
   const resolvedHotspots = useMemo(() => {
     if (hotspots.length === 0) {
-      // Tự động trích xuất các điểm khám xét từ Google Sheet của case động
+      // Tự động trích xuất các điểm khám xét từ dữ liệu vụ án trong database
       const customSpots = sheetPhotosList.filter(
         (p) =>
           p.category?.toLowerCase().includes("reinvestigat") ||

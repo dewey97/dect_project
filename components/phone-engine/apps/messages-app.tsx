@@ -104,7 +104,7 @@ export function MessagesApp({ onBackToHome }: MessagesAppProps) {
     title?: string;
   } | null>(null);
 
-  // Fetch messages live from Google Sheets CMS
+  // Fetch messages from database
   const { data: rawMessagesData, loading, error } = usePhoneData("messages");
 
   // Ref to message stream container to auto-scroll to latest message

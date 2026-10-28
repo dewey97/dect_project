@@ -43,7 +43,7 @@ export function PhaseUnlockedModal({
 
   const activeCase = normalizeCaseId(caseId || getActiveCaseId());
 
-  // Đọc danh sách dẫn truyện cinematic trực tiếp từ tab `narratives` trên Google Sheet Live CMS
+  // Đọc danh sách dẫn truyện cinematic từ database
   const { getPhaseNarrative } = useCaseNarratives(activeCase);
 
   const currentNarrative = React.useMemo(() => {

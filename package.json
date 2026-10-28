@@ -7,13 +7,8 @@
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "export:docs-pdf": "node scripts/ops/export-docs-to-pdf.js",
-    "build:master-doc": "node scripts/ops/build-all-documents-gdoc-and-sheet.js",
-    "sync:docs-to-sheet": "node scripts/ops/sync-docs-to-sheet.js",
-    "sync:gdocs": "node scripts/ops/sync-testimonies-from-sheet.js",
-    "sync:testimonies": "node scripts/ops/sync-testimonies-from-sheet.js",
     "sync:map": "node scripts/ops/sync-figma-map.js",
     "scan:map-vector": "python scripts/ops/scan_figma_map_vector.py",
-    "import:checkpoints": "node --experimental-strip-types scripts/ops/import-checkpoints-to-supabase.mjs",
     "start": "next start",
     "lint": "tsc --noEmit -p tsconfig.typecheck.json",
     "test:e2e": "node scripts/ops/ensure-e2e-port.mjs && playwright test"

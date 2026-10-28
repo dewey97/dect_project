@@ -113,7 +113,7 @@ export function HeroInteractive({
   const [internalCaseId, setInternalCaseId] = useState<string>("case_000");
   const currentCaseId = controlledCaseId ?? propCaseId ?? internalCaseId;
 
-  // ── Live Google Sheets Photos Integration ──
+  // ── Case evidence photos ──
   const { sheetPhotosMapRef } = useLivePinPhotos(
     currentCaseId || "case_000",
     () => {

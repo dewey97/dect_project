@@ -254,7 +254,7 @@ export function renderScene({
       context.rotate((rotationDeg * Math.PI) / 180);
     }
 
-    // Resolve suspect photo URL using live Google Sheets or case-000 suspects mapping
+    // Resolve suspect photo URL from case characters and evidence
     const resolvedPhotoUrl = resolveSuspectPhotoUrl(pin, currentCaseId);
 
     // If pin has a resolved photo URL (Polaroid format for suspects / victims / crime scenes)

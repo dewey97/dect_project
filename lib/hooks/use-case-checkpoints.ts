@@ -32,7 +32,7 @@ export interface SheetEvidenceRow {
 
 /**
  * Bổ sung label & description từ danh mục `evidences` vào các chip vật chứng trong `availableEvidences`
- * khi GM chỉ nhập danh sách mã code ngắn trên Google Sheet.
+ * khi GM chỉ nhập danh sách mã code ngắn trong Studio.
  */
 function enrichCheckpointsWithEvidences(
   checkpoints: Checkpoint[],

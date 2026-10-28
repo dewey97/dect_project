@@ -6,7 +6,7 @@ import { normalizeForMatch } from "@/lib/text";
  *
  * Cạnh có hướng: prerequisite (`source`) → checkpoint phụ thuộc (`target`).
  * Dữ liệu lưu ở `case_checkpoints.depends_on` (mảng `checkpoint_id`).
- * Runtime gameplay vẫn đọc Google Sheets; module này chỉ dùng trong Studio.
+ * Module này chỉ dùng trong Studio.
  */
 
 export interface CheckpointGraphEdge {

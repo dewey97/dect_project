@@ -122,7 +122,7 @@ export function AddSuspectModal({
   const { checkpoints } = useCaseCheckpoints(caseId);
   const { rawEvidence: sheetEvidences } = useCaseEvidence(caseId);
 
-  // Parse all avatar/character items from Google Sheet
+  // Parse all avatar/character items from case characters
   const sheetCharacters: SuspectCharacter[] = useMemo(() => {
     return buildDynamicSuspectCharacters(sheetEvidences);
   }, [sheetEvidences]);

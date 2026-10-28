@@ -8,7 +8,7 @@ export const revalidate = 0;
 
 /**
  * Runtime checkpoint feed — đọc trực tiếp Checkpoint Studio (Supabase).
- * Không đọc tab `checkpoints` trên Google Sheets.
+ * Nguồn duy nhất: bảng `case_checkpoints`.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

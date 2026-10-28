@@ -19,7 +19,6 @@ import { detectiveAudio } from "@/lib/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
-import { parseAnswersColumn } from "@/lib/cms/checkpoint-cms";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { isVietnameseTextMatch } from "@/lib/finding-matcher";
 import { isEvidenceMatching } from "@/lib/cases/clues";
@@ -489,7 +488,7 @@ export function CustomPinModal({
                     </div>
                   )}
 
-                  {/* Hints Display — Multi-level from Google Sheets */}
+                  {/* Hints Display — Multi-level from checkpoint hints */}
                   {hintsList.length > 0 && (
                     <div className="p-2.5 bg-[#ebdcc4]/80 border-2 border-[#a88c6f]/60 rounded-none space-y-1.5 font-mono">
                       <div className="flex items-center justify-between text-[10px] font-bold text-[#8c1d1d] uppercase border-b border-[#a88c6f]/30 pb-1">

@@ -38,7 +38,6 @@ import {
   deleteCaseEvidence,
   getCase360Config,
   upsertMultipleCaseEvidence,
-  syncEvidenceFromGoogleSheet,
 } from "@/lib/actions/evidence-actions";
 import { DossierListPanel } from "./dossier-list-panel";
 import { DossierConfigModal } from "./dossier-config-modal";

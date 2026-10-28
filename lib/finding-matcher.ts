@@ -11,7 +11,7 @@ export function normalizeVietnameseText(str: string): string {
 }
 
 /**
- * So khớp linh hoạt một chuỗi người chơi nhập với một đáp án trên Google Sheet.
+ * So khớp linh hoạt một chuỗi người chơi nhập với một đáp án trong checkpoint.
  *
  * Chấp nhận: khác biệt hoa/thường, có dấu hay không dấu, và khớp theo cụm từ
  * (gõ `Đạt` vẫn đúng cho đáp án `Nguyễn Tiến Đạt`).
