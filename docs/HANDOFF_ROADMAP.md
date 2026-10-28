@@ -10,7 +10,7 @@
 
 ## 1. Trạng thái
 
-Tiến độ (2026-10-28): B0–B25 xong; dữ liệu vụ án 100% trên Supabase, biên tập qua Studio; tạo vụ mới từ số 0 bằng Studio đã có spec E2E. B26 (dọn sau audit) đang làm. `main` chưa push (75 commit), E2E sau đợt dọn chưa xác nhận. Bản đồ (`map_vectors` rỗng) là `TECHDEBT.md` #18, chủ dự án giữ. Chi tiết và thứ tự việc: [`WORKTREE_PLAN.md`](WORKTREE_PLAN.md) mục "Việc tiếp theo".
+Tiến độ (2026-10-28): B0–B25 xong; dữ liệu vụ án 100% trên Supabase, biên tập qua Studio; tạo vụ mới từ số 0 bằng Studio đã có spec E2E. B26 (dọn sau audit) đang làm. B26/B27 xong, `pnpm test:e2e` 47/47 pass; `main` chưa push (84 commit), đủ điều kiện push. Bản đồ (`map_vectors` rỗng) là `TECHDEBT.md` #18, chủ dự án giữ. Chi tiết và thứ tự việc: [`WORKTREE_PLAN.md`](WORKTREE_PLAN.md) mục "Việc tiếp theo".
 
 ---
 
