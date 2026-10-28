@@ -26,7 +26,7 @@ test.describe("WT-4 Character Avatar Engine & Gameplay Integration", () => {
     expect(khang).toHaveProperty("avatar_url");
   });
 
-  test("2. Character Studio loads avatar upload/preview section for admin", async ({
+  test("2. Form nhân vật trong Checkpoint Studio có ô ảnh đại diện", async ({
     page,
   }, testInfo) => {
     if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
@@ -36,13 +36,27 @@ test.describe("WT-4 Character Avatar Engine & Gameplay Integration", () => {
       );
     }
 
+    // Studio nhân vật riêng đã gộp vào Checkpoint Studio
     await page.goto("/studio/characters?case=case_000");
+    await expect(page).toHaveURL(/\/studio\/checkpoints\?case=case_000/);
+    await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({
+      timeout: 15_000,
+    });
 
+    await page.getByRole("button", { name: /^Nhân vật \(\d+\)$/ }).click();
+    const picker = page.getByTitle("Chọn nhân vật để điều chỉnh");
+    const vuValue = await picker
+      .locator("option", { hasText: "Lê Quang Vũ" })
+      .first()
+      .getAttribute("value");
+    expect(vuValue).toBeTruthy();
+    await picker.selectOption(vuValue!);
+
+    // Ô link ảnh mở bằng nút trên khung ảnh 3:4
+    await page.getByTitle("Dán link ảnh đại diện (Drive / Web)").click();
     await expect(
-      page.getByRole("heading", { name: "Nhân vật", level: 1 }),
+      page.getByPlaceholder("Dán link ảnh Google Drive hoặc URL trực tiếp..."),
     ).toBeVisible();
-    await expect(page.getByText("Ảnh chân dung (Avatar)")).toBeVisible();
-    await expect(page.getByText(/Tải ảnh lên|Đổi ảnh khác/i)).toBeVisible();
   });
 
   test("3. Investigation board suspect pin opens modal with avatar", async ({

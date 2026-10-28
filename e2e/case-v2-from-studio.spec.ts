@@ -28,6 +28,22 @@ async function addEvidenceCodes(page: Page, codes: string[]) {
   }
 }
 
+/** Bấm nút LƯU chung của Checkpoint Studio và chờ lưu xong. */
+async function saveStudio(page: Page) {
+  const btn = page.getByTitle("Lưu tất cả thay đổi (Ctrl+S)");
+  await expect(btn).toBeEnabled({ timeout: 15_000 });
+  await btn.click();
+  await expect(
+    page.getByText("Đã lưu toàn bộ thay đổi thành công!").first(),
+  ).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText("Chưa lưu", { exact: true })).toHaveCount(0, {
+    timeout: 15_000,
+  });
+  await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({
+    timeout: 15_000,
+  });
+}
+
 test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Gameplay)", () => {
   test.beforeEach(async ({}, testInfo) => {
     if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
@@ -71,6 +87,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
 
     const testSlug = `e2e_v2_${Date.now()}`;
     let createdSlug = "";
+    let lanKey = "";
 
     try {
       // ----------------------------------------------------------------------
@@ -134,122 +151,45 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       });
 
       // ----------------------------------------------------------------------
-      // BƯỚC 3: Thêm 1 nạn nhân + 3 nghi phạm qua Character Studio (có upload avatar)
+      // BƯỚC 3: Thêm 4 bộ hồ sơ qua Dossier Studio
       // ----------------------------------------------------------------------
-      await test.step("3. Thêm 1 nạn nhân + 3 nghi phạm qua Character Studio", async () => {
-        await page.goto(`/studio/characters?case=${createdSlug}`);
-        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
-        await expect(
-          page.getByRole("heading", { name: "Nhân vật", level: 1 }),
-        ).toBeVisible({ timeout: 15_000 });
-
-        const characters = [
-          { name: "Hoàng Văn Nam", key: "nam", role: "victim" },
-          { name: "Đỗ Quốc Huy", key: "huy", role: "suspect" },
-          { name: "Phạm Mai Lan", key: "lan", role: "suspect" },
-          { name: "Bùi Đức Minh", key: "minh", role: "suspect" },
-        ];
-
-        for (const char of characters) {
-          const addCharBtn = page.getByRole("button", { name: /Thêm nhân vật/i });
-          await expect(addCharBtn).toBeVisible();
-          await addCharBtn.click();
-
-          const nameInput = page.locator('label:has-text("Họ tên") input');
-          await expect(nameInput).toBeVisible();
-          await nameInput.fill(char.name);
-
-          const keyInput = page.locator('label:has-text("Mã") input');
-          await expect(keyInput).toBeVisible();
-          await keyInput.fill(char.key);
-
-          const roleSelect = page.locator('label:has-text("Vai trò") select');
-          await expect(roleSelect).toBeVisible();
-          await roleSelect.selectOption(char.role);
-
-          if (char.key === "lan") {
-            const avatarInput = page.locator('input[type="file"][accept="image/*"]');
-            await expect(avatarInput).toBeAttached();
-            await avatarInput.setInputFiles("e2e/fixtures/avatar-lan.png");
-            await expect(
-              page.getByText(/Đã tải ảnh chân dung thành công/i).first(),
-            ).toBeVisible({ timeout: 15_000 });
-          }
-
-          const saveBtn = page.getByRole("button", {
-            name: /Tạo nhân vật|Lưu thay đổi/i,
-          });
-          await expect(saveBtn).toBeVisible();
-          await expect(saveBtn).toBeEnabled({ timeout: 15_000 });
-          await saveBtn.click();
-
-          await expect(
-            page.locator('[data-studio-ready="true"]').first(),
-          ).toBeVisible({ timeout: 15_000 });
-          await expect(
-            page.locator("aside").getByText(char.name),
-          ).toBeVisible({ timeout: 15_000 });
-          await expect(saveBtn).toBeEnabled({ timeout: 15_000 });
-        }
-      });
-
-      // ----------------------------------------------------------------------
-      // BƯỚC 4: Thêm 4 bộ hồ sơ qua Dossier Studio
-      // ----------------------------------------------------------------------
-      await test.step("4. Thêm 4 bộ hồ sơ qua Dossier Studio", async () => {
+      await test.step("3. Thêm 4 bộ hồ sơ qua Dossier Studio", async () => {
         await page.goto(`/studio/dossier?case=${createdSlug}`);
-        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
-        await expect(page.getByText(/Bộ Hồ Sơ/i).first()).toBeVisible({
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({
           timeout: 15_000,
         });
 
         const dossiers = [
-          { title: "Bộ A - Hồ Sơ Khởi Đầu", key: "bo_a" },
-          { title: "Bộ B - Hồ Sơ Pháp Y", key: "bo_b" },
-          { title: "Bộ C - Hồ Sơ Hiện Trường", key: "bo_c" },
-          { title: "Bộ D - Hồ Sơ Mở Rộng", key: "bo_d" },
+          "Bộ A - Hồ Sơ Khởi Đầu",
+          "Bộ B - Hồ Sơ Pháp Y",
+          "Bộ C - Hồ Sơ Hiện Trường",
+          "Bộ D - Hồ Sơ Mở Rộng",
         ];
 
-        for (const dos of dossiers) {
+        for (const title of dossiers) {
           const addBtn = page
-            .getByRole("button", { name: /Thêm|\+ Tạo bộ hồ sơ đầu tiên/i })
+            .getByRole("button", { name: /^\s*(Thêm|\+ Tạo bộ hồ sơ đầu tiên)\s*$/i })
             .first();
           await expect(addBtn).toBeVisible();
           await addBtn.click();
 
-          const titleInput = page.getByPlaceholder(
-            "VD: Bộ A, Hồ Sơ Hiện Trường...",
-          );
+          const titleInput = page.getByPlaceholder("VD: Bộ A, Hồ Sơ Hiện Trường...");
           await expect(titleInput).toBeVisible();
-          await titleInput.fill(dos.title);
+          await titleInput.fill(title);
 
-          const keyInput = page.getByPlaceholder("bo_a, bo_b...");
-          await expect(keyInput).toBeVisible();
-          await keyInput.fill(dos.key);
-
-          const saveDossierBtn = page.getByRole("button", {
-            name: "Lưu bộ hồ sơ",
-          });
-          await expect(saveDossierBtn).toBeVisible();
+          const saveDossierBtn = page.getByRole("button", { name: "Lưu bộ hồ sơ" });
           await saveDossierBtn.click();
           await expect(saveDossierBtn).not.toBeVisible({ timeout: 15_000 });
-
-          await expect(
-            page.locator("aside").getByText(dos.title),
-          ).toBeVisible({ timeout: 15_000 });
+          await expect(page.getByText(title).first()).toBeVisible({
+            timeout: 15_000,
+          });
         }
       });
 
       // ----------------------------------------------------------------------
-      // BƯỚC 5: Thêm 4 vật chứng qua Evidence Studio (V2-01 ... V2-04)
+      // BƯỚC 4: Thêm 4 vật chứng trong Dossier Studio (V2-01 ... V2-04)
       // ----------------------------------------------------------------------
-      await test.step("5. Thêm 4 vật chứng qua Evidence Studio (V2-01 ... V2-04)", async () => {
-        await page.goto(`/studio/evidence?case=${createdSlug}`);
-        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
-        await expect(page.getByText("Evidence Studio")).toBeVisible({
-          timeout: 15_000,
-        });
-
+      await test.step("4. Thêm 4 vật chứng trong Dossier Studio (V2-01 ... V2-04)", async () => {
         const items = [
           { title: "Dao găm sắc nhọn", code: "V2-01" },
           { title: "Bản kê giao dịch", code: "V2-02" },
@@ -258,343 +198,239 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         ];
 
         for (const item of items) {
-          const addEvidenceBtn = page.getByRole("button", {
-            name: /Thêm Chứng Cứ/i,
-          });
-          await expect(addEvidenceBtn).toBeVisible();
-          await addEvidenceBtn.click();
+          await page.getByTitle("Thêm chứng cứ / ảnh hiện trường mới").click();
 
-          const titleInput = page.getByPlaceholder(
-            "VD: Ảnh hiện trường phòng khách",
-          );
-          await expect(titleInput).toBeVisible();
-          await titleInput.fill(item.title);
-
-          const codeInput = page.getByPlaceholder("Tự sinh từ tiêu đề (VD: p1)");
+          const codeInput = page.getByPlaceholder("VD: A-01, B-02...");
           await expect(codeInput).toBeVisible();
           await codeInput.fill(item.code);
 
-          const saveEvidenceBtn = page.getByRole("button", {
-            name: /Tạo chứng cứ|Lưu thay đổi/i,
-          });
-          await expect(saveEvidenceBtn).toBeVisible();
-          await saveEvidenceBtn.click();
+          const titleInput = page.getByPlaceholder(
+            "VD: Ảnh mảnh bình vỡ, Sổ ghi nợ, Bài báo cũ 1996...",
+          );
+          await titleInput.fill(item.title);
+        }
 
-          await expect(
-            page.getByText(/Đã tạo chứng cứ mới|Đã cập nhật chứng cứ/i).first(),
-          ).toBeVisible({ timeout: 15_000 });
-          await expect(saveEvidenceBtn).toBeEnabled({ timeout: 15_000 });
+        await page
+          .getByTitle("Lưu lại toàn bộ dữ liệu vào Database Supabase")
+          .click();
+        await expect(
+          page.getByText("Đã lưu toàn bộ tài liệu & chứng cứ!").first(),
+        ).toBeVisible({ timeout: 15_000 });
+
+        const admin = getAdminClient();
+        if (admin) {
+          const { data } = await admin
+            .from("case_evidence")
+            .select("code")
+            .eq("case_slug", createdSlug);
+          expect((data || []).map((r) => r.code).sort()).toEqual(
+            items.map((i) => i.code).sort(),
+          );
         }
       });
 
       // ----------------------------------------------------------------------
-      // BƯỚC 6: Checkpoints qua Checkpoint Studio (đủ 7 checkpoint có depends_on)
+      // BƯỚC 5: Nhân vật + thẩm tra 2 lớp trong Checkpoint Studio
       // ----------------------------------------------------------------------
-      await test.step("6. Thêm 7 Checkpoints có depends_on qua Checkpoint Studio", async () => {
+      await test.step("5. Thêm nạn nhân + 3 nghi phạm (kèm thẩm tra) trong Checkpoint Studio", async () => {
         page.on("dialog", (dialog) => dialog.accept());
         await page.goto(`/studio/checkpoints?case=${createdSlug}`);
-        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
-        await expect(page.locator("header").first()).toBeVisible({ timeout: 15_000 });
+        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({
+          timeout: 15_000,
+        });
 
-        // 6.1. Checkpoint 1: phone_lookup
-        const addCpBtn1 = page.getByRole("button", { name: "+ Checkpoint" });
-        await expect(addCpBtn1).toBeVisible();
-        await addCpBtn1.click();
+        const characters = [
+          { name: "Hoàng Văn Nam", role: "victim" },
+          {
+            name: "Đỗ Quốc Huy",
+            role: "suspect",
+            motive: "V2-01",
+            contradiction: "V2-02",
+          },
+          {
+            name: "Phạm Mai Lan",
+            role: "suspect",
+            motive: "V2-01",
+            contradiction: "V2-03",
+            avatar: "/brand/logo-x.png",
+          },
+          {
+            name: "Bùi Đức Minh",
+            role: "suspect",
+            motive: "V2-02",
+            contradiction: "V2-04",
+          },
+        ];
 
-        const cpTitleInput1 = page.getByPlaceholder("Tiêu đề checkpoint...");
-        await expect(cpTitleInput1).toBeVisible();
-        await expect(cpTitleInput1).toHaveValue("");
-        await cpTitleInput1.fill("Tra cứu số điện thoại nghi phạm");
-        await expect(cpTitleInput1).toHaveValue("Tra cứu số điện thoại nghi phạm");
+        for (const char of characters) {
+          await page.getByTitle("Tạo nhân vật mới").click();
 
-        const kindSelect1 = page.locator('label:has-text("Loại Checkpoint") select');
-        await expect(kindSelect1).toBeVisible();
-        await kindSelect1.selectOption("phone_lookup");
+          const nameInput = page.getByPlaceholder(
+            "VD: Lê Quang Vũ, Nguyễn Thanh Tùng...",
+          );
+          await expect(nameInput).toBeVisible();
+          await nameInput.fill(char.name);
 
-        const questionInput1 = page.locator('label:has-text("Câu hỏi") textarea');
-        await expect(questionInput1).toBeVisible();
-        await questionInput1.fill("Tra cứu danh bạ để tìm danh tính các nghi phạm");
+          const roleSelect = page.locator("select", {
+            has: page.locator('option[value="related"]'),
+          });
+          await roleSelect.selectOption(char.role);
 
-        for (let i = 0; i < 3; i++) {
-          const addLookupBtn = page.getByRole("button", { name: "Thêm ô tra cứu" });
-          await expect(addLookupBtn).toBeVisible();
-          await addLookupBtn.click();
+          if (char.avatar) {
+            await page.getByTitle("Dán link ảnh đại diện (Drive / Web)").click();
+            await page
+              .getByPlaceholder("Dán link ảnh Google Drive hoặc URL trực tiếp...")
+              .fill(char.avatar);
+          }
+
+          if (char.motive && char.contradiction) {
+            const motiveInput = page
+              .locator(
+                'label:has-text("Vật chứng bắt buộc (chứng minh động cơ)") input',
+              )
+              .first();
+            await expect(motiveInput).toBeVisible();
+            await motiveInput.fill(char.motive);
+            await motiveInput.press("Enter");
+
+            await page
+              .getByRole("button", { name: "Mâu thuẫn lời khai" })
+              .first()
+              .click();
+            const contradictionInput = page
+              .locator(
+                'label:has-text("Vật chứng bắt buộc (chứng minh mâu thuẫn)") input',
+              )
+              .first();
+            await expect(contradictionInput).toBeVisible();
+            await contradictionInput.fill(char.contradiction);
+            await contradictionInput.press("Enter");
+          }
+
+          await saveStudio(page);
         }
 
-        const answerInputs = page.getByPlaceholder("Nhập tên/từ khóa rồi Enter...");
-        await expect(answerInputs).toHaveCount(3);
-        await answerInputs.nth(0).fill("Đỗ Quốc Huy, Huy");
-        await answerInputs.nth(0).press("Enter");
-        await answerInputs.nth(1).fill("Phạm Mai Lan, Lan");
-        await answerInputs.nth(1).press("Enter");
-        await answerInputs.nth(2).fill("Bùi Đức Minh, Minh");
-        await answerInputs.nth(2).press("Enter");
-
-        const saveCpBtn1 = page.getByRole("button", { name: /Lưu Checkpoint/i });
-        await expect(saveCpBtn1).toBeVisible();
-        await saveCpBtn1.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
-
-        // 6.2. Checkpoint 2: suspect_interrogation (Huy)
-        const addCpBtn2 = page.getByRole("button", { name: "+ Checkpoint" });
-        await expect(addCpBtn2).toBeVisible();
-        await addCpBtn2.click();
-
-        const cpTitleInput2 = page.getByPlaceholder("Tiêu đề checkpoint...");
-        await expect(cpTitleInput2).toBeVisible();
-        await expect(cpTitleInput2).toHaveValue("");
-        await cpTitleInput2.fill("Thẩm tra Đỗ Quốc Huy");
-        await expect(cpTitleInput2).toHaveValue("Thẩm tra Đỗ Quốc Huy");
-
-        const kindSelect2 = page.locator('label:has-text("Loại Checkpoint") select');
-        await expect(kindSelect2).toBeVisible();
-        await kindSelect2.selectOption("suspect_interrogation");
-
-        const charSelect2 = page.locator('label:has-text("Nhân vật liên quan") select');
-        await expect(charSelect2).toBeVisible();
-        await charSelect2.selectOption("huy");
-
-        const motiveInput2 = page.locator('label:has-text("Vật chứng bắt buộc (chứng minh động cơ)") input').first();
-        await expect(motiveInput2).toBeVisible();
-        await motiveInput2.fill("V2-01");
-        await motiveInput2.press("Enter");
-
-        const tabContradiction2 = page.getByRole("button", { name: "Mâu thuẫn" });
-        await expect(tabContradiction2).toBeVisible();
-        await tabContradiction2.click();
-
-        const contradictionInput2 = page.locator('label:has-text("Vật chứng bắt buộc (chứng minh mâu thuẫn)") input').first();
-        await expect(contradictionInput2).toBeVisible();
-        await contradictionInput2.fill("V2-02");
-        await contradictionInput2.press("Enter");
-
-        const depLabel2 = page.locator('label:has-text("Tra cứu số điện thoại nghi phạm") input[type="checkbox"]');
-        await expect(depLabel2).toBeVisible();
-        await depLabel2.check();
-
-        const saveCpBtn2 = page.getByRole("button", { name: /Lưu Checkpoint/i });
-        await expect(saveCpBtn2).toBeVisible();
-        await saveCpBtn2.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
-
-        // 6.3. Checkpoint 3: suspect_interrogation (Lan)
-        const addCpBtn3 = page.getByRole("button", { name: "+ Checkpoint" });
-        await expect(addCpBtn3).toBeVisible();
-        await addCpBtn3.click();
-
-        const cpTitleInput3 = page.getByPlaceholder("Tiêu đề checkpoint...");
-        await expect(cpTitleInput3).toBeVisible();
-        await expect(cpTitleInput3).toHaveValue("");
-        await cpTitleInput3.fill("Thẩm tra Phạm Mai Lan");
-        await expect(cpTitleInput3).toHaveValue("Thẩm tra Phạm Mai Lan");
-
-        const kindSelect3 = page.locator('label:has-text("Loại Checkpoint") select');
-        await expect(kindSelect3).toBeVisible();
-        await kindSelect3.selectOption("suspect_interrogation");
-
-        const charSelect3 = page.locator('label:has-text("Nhân vật liên quan") select');
-        await expect(charSelect3).toBeVisible();
-        await charSelect3.selectOption("lan");
-
-        const tabMotive3 = page.getByRole("button", { name: "Động cơ" });
-        await expect(tabMotive3).toBeVisible();
-        await tabMotive3.click();
-
-        const motiveInput3 = page.locator('label:has-text("Vật chứng bắt buộc (chứng minh động cơ)") input').first();
-        await expect(motiveInput3).toBeVisible();
-        await motiveInput3.fill("V2-01");
-        await motiveInput3.press("Enter");
-
-        const tabContradiction3 = page.getByRole("button", { name: "Mâu thuẫn" });
-        await expect(tabContradiction3).toBeVisible();
-        await tabContradiction3.click();
-
-        const contradictionInput3 = page.locator('label:has-text("Vật chứng bắt buộc (chứng minh mâu thuẫn)") input').first();
-        await expect(contradictionInput3).toBeVisible();
-        await contradictionInput3.fill("V2-03");
-        await contradictionInput3.press("Enter");
-
-        const depLabel3 = page.locator('label:has-text("Tra cứu số điện thoại nghi phạm") input[type="checkbox"]');
-        await expect(depLabel3).toBeVisible();
-        await depLabel3.check();
-
-        const saveCpBtn3 = page.getByRole("button", { name: /Lưu Checkpoint/i });
-        await expect(saveCpBtn3).toBeVisible();
-        await saveCpBtn3.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
-
-        // 6.4. Checkpoint 4: suspect_interrogation (Minh)
-        const addCpBtn4 = page.getByRole("button", { name: "+ Checkpoint" });
-        await expect(addCpBtn4).toBeVisible();
-        await addCpBtn4.click();
-
-        const cpTitleInput4 = page.getByPlaceholder("Tiêu đề checkpoint...");
-        await expect(cpTitleInput4).toBeVisible();
-        await expect(cpTitleInput4).toHaveValue("");
-        await cpTitleInput4.fill("Thẩm tra Bùi Đức Minh");
-        await expect(cpTitleInput4).toHaveValue("Thẩm tra Bùi Đức Minh");
-
-        const kindSelect4 = page.locator('label:has-text("Loại Checkpoint") select');
-        await expect(kindSelect4).toBeVisible();
-        await kindSelect4.selectOption("suspect_interrogation");
-
-        const charSelect4 = page.locator('label:has-text("Nhân vật liên quan") select');
-        await expect(charSelect4).toBeVisible();
-        await charSelect4.selectOption("minh");
-
-        const tabMotive4 = page.getByRole("button", { name: "Động cơ" });
-        await expect(tabMotive4).toBeVisible();
-        await tabMotive4.click();
-
-        const motiveInput4 = page.locator('label:has-text("Vật chứng bắt buộc (chứng minh động cơ)") input').first();
-        await expect(motiveInput4).toBeVisible();
-        await motiveInput4.fill("V2-02");
-        await motiveInput4.press("Enter");
-
-        const tabContradiction4 = page.getByRole("button", { name: "Mâu thuẫn" });
-        await expect(tabContradiction4).toBeVisible();
-        await tabContradiction4.click();
-
-        const contradictionInput4 = page.locator('label:has-text("Vật chứng bắt buộc (chứng minh mâu thuẫn)") input').first();
-        await expect(contradictionInput4).toBeVisible();
-        await contradictionInput4.fill("V2-04");
-        await contradictionInput4.press("Enter");
-
-        const depLabel4 = page.locator('label:has-text("Tra cứu số điện thoại nghi phạm") input[type="checkbox"]');
-        await expect(depLabel4).toBeVisible();
-        await depLabel4.check();
-
-        const saveCpBtn4 = page.getByRole("button", { name: /Lưu Checkpoint/i });
-        await expect(saveCpBtn4).toBeVisible();
-        await saveCpBtn4.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
-
-        // 6.5. Checkpoint 5: followup (Lan)
-        const addCpBtn5 = page.getByRole("button", { name: "+ Checkpoint" });
-        await expect(addCpBtn5).toBeVisible();
-        await addCpBtn5.click();
-
-        const cpTitleInput5 = page.getByPlaceholder("Tiêu đề checkpoint...");
-        await expect(cpTitleInput5).toBeVisible();
-        await expect(cpTitleInput5).toHaveValue("");
-        await cpTitleInput5.fill("Chất vấn mở rộng Phạm Mai Lan");
-        await expect(cpTitleInput5).toHaveValue("Chất vấn mở rộng Phạm Mai Lan");
-
-        const kindSelect5 = page.locator('label:has-text("Loại Checkpoint") select');
-        await expect(kindSelect5).toBeVisible();
-        await kindSelect5.selectOption("followup");
-
-        const charSelect5 = page.locator('label:has-text("Nhân vật liên quan") select');
-        await expect(charSelect5).toBeVisible();
-        await charSelect5.selectOption("lan");
-
-        const qTypeSelect5 = page.locator('label:has-text("Loại câu hỏi phụ") select');
-        await expect(qTypeSelect5).toBeVisible();
-        await qTypeSelect5.selectOption("choice");
-
-        const optionsInput5 = page.getByPlaceholder("Nhập phương án rồi Enter...");
-        await expect(optionsInput5).toBeVisible();
-        await optionsInput5.fill("CÓ, KHÔNG");
-        await optionsInput5.press("Enter");
-
-        const correctAnsInput5 = page.locator('label:has-text("Đáp án đúng") input');
-        await expect(correctAnsInput5).toBeVisible();
-        await correctAnsInput5.fill("KHÔNG");
-
-        const depLabel5 = page.locator('label:has-text("Thẩm tra Phạm Mai Lan") input[type="checkbox"]');
-        await expect(depLabel5).toBeVisible();
-        await depLabel5.check();
-
-        const saveCpBtn5 = page.getByRole("button", { name: /Lưu Checkpoint/i });
-        await expect(saveCpBtn5).toBeVisible();
-        await saveCpBtn5.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
-
-        // 6.6. Checkpoint 6: indictment
-        const addCpBtn6 = page.getByRole("button", { name: "+ Checkpoint" });
-        await expect(addCpBtn6).toBeVisible();
-        await addCpBtn6.click();
-
-        const cpTitleInput6 = page.getByPlaceholder("Tiêu đề checkpoint...");
-        await expect(cpTitleInput6).toBeVisible();
-        await expect(cpTitleInput6).toHaveValue("");
-        await cpTitleInput6.fill("Lập bản cáo trạng kết án");
-        await expect(cpTitleInput6).toHaveValue("Lập bản cáo trạng kết án");
-
-        const kindSelect6 = page.locator('label:has-text("Loại Checkpoint") select');
-        await expect(kindSelect6).toBeVisible();
-        await kindSelect6.selectOption("indictment");
-
-        const suspectChips6 = page.locator('label:has-text("Nghi phạm bị can đúng") input').first();
-        await expect(suspectChips6).toBeVisible();
-        await suspectChips6.fill("Phạm Mai Lan, lan");
-        await suspectChips6.press("Enter");
-
-        const motiveChips6 = page.locator('label:has-text("Động cơ phạm tội được chấp nhận") input').first();
-        await expect(motiveChips6).toBeVisible();
-        await motiveChips6.fill("Mâu thuẫn tài chính");
-        await motiveChips6.press("Enter");
-
-        const reqEvChips6 = page.locator('label:has-text("Mã chứng cứ bắt buộc để truy tố") input').first();
-        await expect(reqEvChips6).toBeVisible();
-        await reqEvChips6.fill("V2-01");
-        await reqEvChips6.press("Enter");
-
-        const optEvChips6 = page.locator('label:has-text("Mã chứng cứ bổ trợ") input').first();
-        await expect(optEvChips6).toBeVisible();
-        await optEvChips6.fill("V2-02, V2-03");
-        await optEvChips6.press("Enter");
-
-        const depHuy6 = page.locator('label:has-text("Thẩm tra Đỗ Quốc Huy") input[type="checkbox"]');
-        await expect(depHuy6).toBeVisible();
-        await depHuy6.check();
-
-        const depLan6 = page.locator('label:has-text("Thẩm tra Phạm Mai Lan") input[type="checkbox"]');
-        await expect(depLan6).toBeVisible();
-        await depLan6.check();
-
-        const depMinh6 = page.locator('label:has-text("Thẩm tra Bùi Đức Minh") input[type="checkbox"]');
-        await expect(depMinh6).toBeVisible();
-        await depMinh6.check();
-
-        const depFollowup6 = page.locator('label:has-text("Chất vấn mở rộng Phạm Mai Lan") input[type="checkbox"]');
-        await expect(depFollowup6).toBeVisible();
-        await depFollowup6.check();
-
-        const saveCpBtn6 = page.getByRole("button", { name: /Lưu Checkpoint/i });
-        await expect(saveCpBtn6).toBeVisible();
-        await saveCpBtn6.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
-
-        // 6.7. Checkpoint 7: epilogue
-        const addCpBtn7 = page.getByRole("button", { name: "+ Checkpoint" });
-        await expect(addCpBtn7).toBeVisible();
-        await addCpBtn7.click();
-
-        const cpTitleInput7 = page.getByPlaceholder("Tiêu đề checkpoint...");
-        await expect(cpTitleInput7).toBeVisible();
-        await expect(cpTitleInput7).toHaveValue("");
-        await cpTitleInput7.fill("Hậu án tổng kết");
-        await expect(cpTitleInput7).toHaveValue("Hậu án tổng kết");
-
-        const kindSelect7 = page.locator('label:has-text("Loại Checkpoint") select');
-        await expect(kindSelect7).toBeVisible();
-        await kindSelect7.selectOption("epilogue");
-
-        const monologueArea = page.locator('textarea').first();
-        await expect(monologueArea).toBeVisible();
-        await monologueArea.fill("Vụ án Trốn Tìm v2 đã được làm sáng tỏ. Phạm Mai Lan đã thừa nhận toàn bộ hành vi phạm tội.");
-
-        const depIndictment7 = page.locator('label:has-text("Lập bản cáo trạng kết án") input[type="checkbox"]');
-        await expect(depIndictment7).toBeVisible();
-        await depIndictment7.check();
-
-        const saveCpBtn7 = page.getByRole("button", { name: /Lưu Checkpoint/i });
-        await expect(saveCpBtn7).toBeVisible();
-        await saveCpBtn7.click();
-        await expect(page.locator('aside header span[title="Đã lưu"]')).toBeVisible({ timeout: 15_000 });
+        const admin = getAdminClient();
+        if (admin) {
+          const { data: chars } = await admin
+            .from("case_characters")
+            .select("key, name, role")
+            .eq("case_slug", createdSlug);
+          expect(chars).toHaveLength(4);
+          const suspects = (chars || []).filter((c) => c.role === "suspect");
+          lanKey = suspects.find((c) => c.name === "Phạm Mai Lan")?.key || "";
+          expect(lanKey).toBeTruthy();
+          const { data: interrogations } = await admin
+            .from("case_checkpoints")
+            .select("subject_key")
+            .eq("case_id", createdSlug)
+            .eq("kind", "suspect_interrogation");
+          expect((interrogations || []).map((r) => r.subject_key).sort()).toEqual(
+            suspects.map((c) => c.key).sort(),
+          );
+        }
       });
 
+      // ----------------------------------------------------------------------
+      // BƯỚC 6: Checkpoint tra SĐT, câu hỏi phụ, cáo trạng, hậu án (có depends_on)
+      // ----------------------------------------------------------------------
+      await test.step("6. Thêm checkpoint tra SĐT, câu hỏi phụ, cáo trạng, hậu án", async () => {
+        const kindSelect = page.locator("select", {
+          has: page.locator('option[value="phone_lookup"]'),
+        });
+        const dependsSelect = page.locator("select", {
+          has: page.locator("option", { hasText: "Không phụ thuộc" }),
+        });
+
+        async function newCheckpoint(kind: string, title?: string) {
+          await page.getByTitle("Tạo checkpoint mới").click();
+          await expect(kindSelect).toBeVisible();
+          await kindSelect.selectOption(kind);
+          if (title) {
+            const titleInput = page.getByLabel("Tiêu đề checkpoint");
+            await titleInput.fill(title);
+            await expect(titleInput).toHaveValue(title);
+          }
+        }
+
+        // 6.1. Tra cứu SĐT: 3 ô
+        await newCheckpoint("phone_lookup", "Tra cứu số điện thoại nghi phạm");
+        for (let i = 0; i < 3; i++) {
+          await page.getByRole("button", { name: "Thêm ô tra cứu" }).click();
+        }
+        const answerInputs = page.getByPlaceholder("VD: Lê Quang Vũ");
+        await expect(answerInputs).toHaveCount(3);
+        await answerInputs.nth(0).fill("Đỗ Quốc Huy");
+        await answerInputs.nth(1).fill("Phạm Mai Lan");
+        await answerInputs.nth(2).fill("Bùi Đức Minh");
+        await saveStudio(page);
+
+        // 6.2. Câu hỏi phụ cho Lan (pin khớp theo tên trong tiêu đề)
+        await newCheckpoint("followup", "Chất vấn mở rộng Phạm Mai Lan");
+        await page
+          .locator('label:has-text("Loại câu hỏi phụ") select')
+          .selectOption("choice");
+        const optionsInput = page.getByPlaceholder("Nhập phương án rồi Enter...");
+        await optionsInput.fill("CÓ");
+        await optionsInput.press("Enter");
+        await optionsInput.fill("KHÔNG");
+        await optionsInput.press("Enter");
+        await page.getByPlaceholder("Nhập đáp án đúng...").fill("KHÔNG");
+        await dependsSelect.selectOption({ label: "Thẩm tra Phạm Mai Lan" });
+        await saveStudio(page);
+
+        // 6.3. Cáo trạng
+        await newCheckpoint("indictment", "Lập bản cáo trạng kết án");
+        const chip = async (label: string, values: string[]) => {
+          const input = page.locator(`label:has-text("${label}") input`).first();
+          await expect(input).toBeVisible();
+          for (const v of values) {
+            await input.fill(v);
+            await input.press("Enter");
+          }
+        };
+        await chip("Nghi phạm bị can đúng", ["Phạm Mai Lan"]);
+        await chip("Động cơ phạm tội được chấp nhận", ["Mâu thuẫn tài chính"]);
+        await chip("Mã chứng cứ bắt buộc để truy tố", ["V2-01"]);
+        await chip("Mã chứng cứ bổ trợ", ["V2-02", "V2-03"]);
+        await dependsSelect.selectOption({ label: "Chất vấn mở rộng Phạm Mai Lan" });
+        await saveStudio(page);
+
+        // 6.4. Hậu án: vụ mới đã có sẵn checkpoint "Hậu án" từ mẫu, sửa nội dung
+        await page.getByRole("button", { name: /^Checkpoint \(\d+\)$/ }).click();
+        const cpPicker = page.getByTitle("Chọn checkpoint để edit");
+        const epilogueValue = await cpPicker
+          .locator("option", { hasText: "Hậu án" })
+          .first()
+          .getAttribute("value");
+        expect(epilogueValue).toBeTruthy();
+        await cpPicker.selectOption(epilogueValue!);
+        const monologue = page.locator("textarea").filter({ visible: true }).last();
+        await expect(monologue).toBeVisible();
+        await monologue.fill(
+          "Vụ án Trốn Tìm v2 đã được làm sáng tỏ. Phạm Mai Lan đã thừa nhận toàn bộ hành vi phạm tội.",
+        );
+        await dependsSelect.selectOption({ label: "Lập bản cáo trạng kết án" });
+        await saveStudio(page);
+
+        const admin = getAdminClient();
+        if (admin) {
+          const { data } = await admin
+            .from("case_checkpoints")
+            .select("kind")
+            .eq("case_id", createdSlug);
+          expect((data || []).map((r) => r.kind).sort()).toEqual([
+            "choice",
+            "epilogue",
+            "followup",
+            "indictment",
+            "phone_lookup",
+            "suspect_interrogation",
+            "suspect_interrogation",
+            "suspect_interrogation",
+          ]);
+        }
+      });
       // ----------------------------------------------------------------------
       // BƯỚC 7: Danh bạ, tin nhắn, cuộc gọi qua Phone Studio (thread >= 2 tin)
       // ----------------------------------------------------------------------
@@ -695,67 +531,9 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       });
 
       // ----------------------------------------------------------------------
-      // BƯỚC 8: Thêm 1 node bảng & 1 hotspot hiện trường
+      // BƯỚC 8: Chơi thử trực tiếp từ /evidence/web?case_id=<slug> đến KÝ SỰ HẬU ÁN
       // ----------------------------------------------------------------------
-      await test.step("8. Thêm node bảng & hotspot hiện trường", async () => {
-        await page.goto(`/studio/checkpoints?case=${createdSlug}&view=board`);
-        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
-        await expect(
-          page.getByText("Bảng điều tra (Board Studio)"),
-        ).toBeVisible({ timeout: 15_000 });
-
-        const addNodeBtn = page.getByRole("button", { name: "Thêm Node" });
-        await expect(addNodeBtn).toBeVisible({ timeout: 15_000 });
-        await expect(addNodeBtn).toBeEnabled({ timeout: 15_000 });
-        await addNodeBtn.click();
-
-        const nodeTitleInput = page.getByPlaceholder("VD: Nạn nhân, Hiện trường…");
-        await expect(nodeTitleInput).toBeVisible({ timeout: 15_000 });
-        await nodeTitleInput.fill("Node Ghi Chú Hiện Trường");
-
-        const saveNodeBtn = page.locator('form button[type="submit"]:has-text("Lưu")');
-        await expect(saveNodeBtn).toBeVisible({ timeout: 15_000 });
-        await saveNodeBtn.click();
-        await expect(
-          page.getByText(/Đã lưu node thành công|Đã lưu node/i).first(),
-        ).toBeVisible({ timeout: 15_000 });
-
-        const saveBoardLayoutBtn = page.getByRole("button", {
-          name: "Lưu Bố Cục",
-        });
-        await expect(saveBoardLayoutBtn).toBeVisible({ timeout: 15_000 });
-        await saveBoardLayoutBtn.click();
-        await expect(
-          page.getByText(/Đã lưu toàn bộ bố cục bảng|Đã lưu bố cục/i),
-        ).toBeVisible({ timeout: 15_000 });
-
-        await page.goto(`/studio/evidence?case=${createdSlug}`);
-        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
-        const sceneTab = page.getByRole("button", {
-          name: "Hiện Trường (2D / 360)",
-        });
-        await expect(sceneTab).toBeVisible();
-        await sceneTab.click();
-
-        const addSpotBtn = page.getByRole("button", { name: "Thêm Điểm" });
-        await expect(addSpotBtn).toBeVisible();
-        await addSpotBtn.click();
-
-        const saveHotspotsBtn = page.getByRole("button", {
-          name: /Lưu \(.*điểm\)|Lưu/i,
-        });
-        await expect(saveHotspotsBtn).toBeVisible();
-        await saveHotspotsBtn.click();
-        await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({ timeout: 15_000 });
-        await expect(page.getByText(/lên Server!/i)).toBeVisible({
-          timeout: 15_000,
-        });
-      });
-
-      // ----------------------------------------------------------------------
-      // BƯỚC 9: Chơi thử trực tiếp từ /evidence/web?case_id=<slug> đến KÝ SỰ HẬU ÁN
-      // ----------------------------------------------------------------------
-      await test.step("9. Chơi thử trực tiếp tại /evidence/web?case_id=<slug>", async () => {
+      await test.step("8. Chơi thử trực tiếp tại /evidence/web?case_id=<slug>", async () => {
         await page.route("**/api/scan-answer", (route) =>
           route.fulfill({
             json: { isCorrect: true, confidenceScore: 95, feedback: "E2E mock" },
@@ -782,7 +560,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await expect(phonePin).toBeAttached({ timeout: 15_000 });
         await phonePin.evaluate((el: HTMLElement) => el.click());
 
-        const phoneInputs = page.getByPlaceholder("Nhập họ tên cần tra...");
+        const phoneInputs = page.getByPlaceholder("Nhập họ tên đầy đủ...");
         await expect(phoneInputs).toHaveCount(3);
 
         await phoneInputs.nth(0).fill("Sai Một");
@@ -807,7 +585,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await continueBtn.click();
 
         // 9.2. Thẩm tra nghi phạm Phạm Mai Lan với mã chứng cứ đúng
-        const lanPin = page.locator('[data-node-kind="suspect"][data-subject-key="lan"], [data-pin-id*="lan"]').first();
+        const lanPin = page.locator(`[data-node-kind="suspect"][data-subject-key="${lanKey}"]`).first();
         await expect(lanPin).toBeAttached({ timeout: 15_000 });
         await lanPin.evaluate((el: HTMLElement) => el.click());
 
@@ -832,7 +610,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
         await submitInterrogationBtn.click();
 
         // 9.3. Câu hỏi phụ chất vấn mở rộng Lan
-        const followupPin = page.locator('[data-node-kind="followup"][data-subject-key="lan"], [data-pin-id*="followup"]').first();
+        const followupPin = page.locator(`[data-node-kind="followup"][data-subject-key="${lanKey}"]`).first();
         await expect(followupPin).toBeAttached({ timeout: 15_000 });
         await followupPin.evaluate((el: HTMLElement) => el.click());
 

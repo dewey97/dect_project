@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.use({ storageState: "e2e/.auth/admin.json" });
 
 test.describe("Evidence Studio & Case Evidence Engine", () => {
-  test("Evidence Studio page loads 3-column layout, filters, and preview", async ({
+  test("/studio/evidence chuyển sang Dossier Studio; mở và đóng cấu hình Hiện Trường 360", async ({
     page,
   }, testInfo) => {
     if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
@@ -13,65 +13,24 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
       );
     }
 
+    // Evidence Studio đã gộp vào Dossier Studio
     await page.goto("/studio/evidence?case=case_000");
+    await expect(page).toHaveURL(/\/studio\/dossier\?case=case_000/);
+    await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({
+      timeout: 15_000,
+    });
 
-    // Header & Brand
-    await expect(page.getByText("Evidence Studio")).toBeVisible();
-    await expect(page.getByText("M1 / M2 / M3 / M10 / M12")).toBeVisible();
-
-    // Top action buttons
-    await expect(page.getByRole("button", { name: /Làm mới/i })).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /Cấu hình Hiện Trường 360/i }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /Thêm Chứng Cứ/i }),
+      page.getByTitle("Thêm chứng cứ / ảnh hiện trường mới"),
     ).toBeVisible();
 
-    // Filters in Column 1
-    const col1 = page.locator(".col-span-12.lg\\:col-span-4");
-    await expect(
-      col1.getByPlaceholder("Tìm theo mã, tên chứng cứ..."),
-    ).toBeVisible();
-    await expect(col1.getByRole("button", { name: "Tất cả", exact: true }).first()).toBeVisible();
-    await expect(col1.getByRole("button", { name: "Ảnh", exact: true }).first()).toBeVisible();
-    await expect(col1.getByRole("button", { name: "PDF", exact: true }).first()).toBeVisible();
-
-    // Column 2: Form Header
-    await expect(
-      page.getByText(/Chỉnh sửa Chứng Cứ|Thêm Chứng Cứ Mới/i),
-    ).toBeVisible();
-
-    // Column 3: Live Preview Header & Toggle Tabs
-    await expect(
-      page.getByText("Bản Mô Phỏng Thực Tế (Live Preview)"),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Hồ sơ tang vật" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Hiện trường 360", exact: true }),
-    ).toBeVisible();
-
-    // Toggle to 360 Scene preview
-    await page.getByRole("button", { name: "Hiện trường 360", exact: true }).click();
-    await expect(
-      page.getByRole("button", { name: "Hiện trường 360", exact: true }),
-    ).toBeVisible();
-
-    // Open 360 Config Modal
     await page
-      .getByRole("button", { name: /Cấu hình Hiện Trường 360/i })
+      .getByTitle("Xem & Cấu hình không gian Khám xét Hiện trường 360")
       .click();
     await expect(
       page.getByText("Cấu hình Hiện Trường 360 & Panorama"),
     ).toBeVisible();
-    await expect(
-      page.getByText("Ảnh cầu 360 độ (Equirectangular Sphere Image)"),
-    ).toBeVisible();
-
-    // Close Modal
-    await page.getByRole("button", { name: "Đóng" }).click();
+    await page.keyboard.press("Escape");
   });
 
   test("Case_000 evidence tray loads documents and evidence items in game", async ({
@@ -111,7 +70,7 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
     ).toBeVisible();
   });
 
-  test("Form excludes custody metadata and auto-generates code from title", async ({
+  test("Form vật chứng trong Dossier Studio không còn trường lưu ký cũ", async ({
     page,
   }, testInfo) => {
     if (!process.env.E2E_ADMIN_EMAIL || !process.env.E2E_ADMIN_PASSWORD) {
@@ -121,27 +80,24 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
       );
     }
 
-    await page.goto("/studio/evidence?case=case_000");
+    await page.goto("/studio/dossier?case=case_000");
+    await expect(page.locator('[data-studio-ready="true"]').first()).toBeVisible({
+      timeout: 15_000,
+    });
 
-    // Click Thêm Chứng Cứ
-    await page.getByRole("button", { name: /Thêm Chứng Cứ/i }).click();
+    await page.getByTitle("Thêm chứng cứ / ảnh hiện trường mới").click();
 
-    // Verify 4 legacy metadata fields are NOT in the form
+    // Form vật chứng hiện ra với các ô chính
+    await expect(page.getByPlaceholder("VD: A-01, B-02...")).toBeVisible();
+    await expect(
+      page.getByPlaceholder("VD: Ảnh mảnh bình vỡ, Sổ ghi nợ, Bài báo cũ 1996..."),
+    ).toBeVisible();
+    await expect(page.getByPlaceholder("Mô tả chi tiết vật chứng...")).toBeVisible();
+
+    // 4 trường lưu ký cũ đã bỏ
     await expect(page.getByText("Mã vật chứng pháp lý")).toHaveCount(0);
     await expect(page.getByText("Thời điểm ghi nhận")).toHaveCount(0);
     await expect(page.getByText("Người thu thập")).toHaveCount(0);
     await expect(page.getByText("Trạng thái niêm phong")).toHaveCount(0);
-
-    // Fill title
-    const titleInput = page.getByPlaceholder("VD: Ảnh hiện trường phòng khách");
-    await titleInput.fill("Dấu vân tay trên cốc cà phê");
-
-    // Open advanced details and check auto-generated code
-    const advancedDetails = page.locator("details");
-    if (await advancedDetails.count()) {
-      await advancedDetails.click();
-      const codeInput = page.getByPlaceholder("Tự sinh từ tiêu đề (VD: p1)");
-      await expect(codeInput).toHaveValue(/dau[-_]van[-_]tay[-_]tren[-_]coc[-_]ca[-_]phe/);
-    }
   });
 });
