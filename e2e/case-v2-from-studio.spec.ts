@@ -756,7 +756,7 @@ test.describe("B19-1: Nghiệm thu toàn trình Trốn Tìm v2 (Studio UI & Game
       // BƯỚC 9: Chơi thử trực tiếp từ /evidence/web?case_id=<slug> đến KÝ SỰ HẬU ÁN
       // ----------------------------------------------------------------------
       await test.step("9. Chơi thử trực tiếp tại /evidence/web?case_id=<slug>", async () => {
-        await page.route("**/api/test-scan-answer", (route) =>
+        await page.route("**/api/scan-answer", (route) =>
           route.fulfill({
             json: { isCorrect: true, confidenceScore: 95, feedback: "E2E mock" },
           }),

@@ -5,7 +5,7 @@ import { expect, test, type Page } from "@playwright/test";
  * Khóa hành vi hiện tại trước khi refactor checkpoint theo `kind` và chuyển
  * chấm điểm lên server. Đáp án lấy từ `case_checkpoints` của case_000.
  *
- * - Chấm AI (`/api/test-scan-answer`) được mock để test không gọi Gemini.
+ * - Chấm AI (`/api/scan-answer`) được mock để test không gọi Gemini.
  * - Ghim vẽ trên canvas; test bấm qua danh sách nút `[data-pin-id]` (sr-only).
  * - Nhiều nút dùng CSS `uppercase`, nên so chữ không phân biệt hoa thường.
  */
@@ -32,7 +32,7 @@ async function openBoard(page: Page) {
       localStorage.setItem("intro_seen", "true");
     }
   });
-  await page.route("**/api/test-scan-answer", (route) =>
+  await page.route("**/api/scan-answer", (route) =>
     route.fulfill({
       json: { isCorrect: true, confidenceScore: 95, feedback: "E2E mock" },
     }),
@@ -324,7 +324,7 @@ test.describe("case_000 baseline", () => {
       localStorage.setItem("indictment_culprit", "ha");
       localStorage.setItem("case_000:indictment_culprit", "ha");
     });
-    await page.route("**/api/test-scan-answer", (route) =>
+    await page.route("**/api/scan-answer", (route) =>
       route.fulfill({
         json: { isCorrect: true, confidenceScore: 95, feedback: "E2E mock" },
       }),

@@ -366,7 +366,7 @@ export function AddSuspectModal({
           matchedCheckpoint?.pickerConfig?.contradictionContext,
       });
 
-      const res = await fetch("/api/test-scan-answer", {
+      const res = await fetch("/api/scan-answer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

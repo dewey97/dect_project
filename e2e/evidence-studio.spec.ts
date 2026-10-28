@@ -84,7 +84,7 @@ test.describe("Evidence Studio & Case Evidence Engine", () => {
       localStorage.setItem("case_000:intro_seen", "true");
     });
 
-    await page.route("**/api/test-scan-answer", (route) =>
+    await page.route("**/api/scan-answer", (route) =>
       route.fulfill({
         json: { isCorrect: true, confidenceScore: 95, feedback: "E2E mock" },
       }),

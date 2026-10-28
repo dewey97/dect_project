@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server'
+import { checkRateLimit, getClientIp } from '@/lib/security/rate-limiter'
+import { rateLimitResponse } from '@/lib/security/defensive-cache'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,9 +16,42 @@ interface RequestBody {
   invalidCases?: (string | TestCaseItem)[]
 }
 
+// Người chơi không cần đăng nhập, nên chặn lạm dụng key Gemini bằng hạn mức theo IP
+// và giới hạn độ dài input (không cho dùng route làm proxy LLM tùy ý).
+const MAX_CONTEXT_CHARS = 4000
+const MAX_ANSWER_CHARS = 1000
+const MAX_CASES = 20
+const MAX_CASE_CHARS = 500
+
+function caseLength(c: string | TestCaseItem): number {
+  return typeof c === 'string' ? c.length : (c.text?.length ?? 0) + (c.reason?.length ?? 0)
+}
+
 export async function POST(req: Request) {
+  const rate = checkRateLimit(`scan_answer:${getClientIp(req)}`, { limit: 10, windowMs: 60_000 })
+  if (!rate.allowed) {
+    return rateLimitResponse(rate.retryAfterSeconds, 'Bạn gửi lập luận quá nhanh. Vui lòng thử lại sau giây lát.')
+  }
+
   try {
     const { context, answer, validCases = [], invalidCases = [] }: RequestBody = await req.json()
+
+    if (
+      typeof context !== 'string' ||
+      typeof answer !== 'string' ||
+      !Array.isArray(validCases) ||
+      !Array.isArray(invalidCases) ||
+      context.length > MAX_CONTEXT_CHARS ||
+      answer.length > MAX_ANSWER_CHARS ||
+      validCases.length > MAX_CASES ||
+      invalidCases.length > MAX_CASES ||
+      [...validCases, ...invalidCases].some((c) => caseLength(c) > MAX_CASE_CHARS)
+    ) {
+      return NextResponse.json(
+        { isCorrect: false, feedback: 'Dữ liệu kiểm tra không hợp lệ.' },
+        { status: 400 }
+      )
+    }
 
     if (!context || !answer) {
       return NextResponse.json(
