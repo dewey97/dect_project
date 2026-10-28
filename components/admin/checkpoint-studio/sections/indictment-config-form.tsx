@@ -21,8 +21,8 @@ export function IndictmentConfigForm({
 
   return (
     <div className="space-y-3">
-      {/* 1. Bị can kết án */}
-      <Field label="Nghi phạm bị can đúng (Tên hoặc mã định danh)" required>
+      {/* 1. Tên */}
+      <Field label="Tên" required>
         <CodeChipInput
           value={config.validSuspects || []}
           onChange={(validSuspects) => setConfig({ validSuspects })}
@@ -31,8 +31,8 @@ export function IndictmentConfigForm({
         />
       </Field>
 
-      {/* 2. Động cơ kết án */}
-      <Field label="Động cơ phạm tội được chấp nhận (Enter để thêm)" required>
+      {/* 2. Động cơ */}
+      <Field label="Động cơ" required>
         <CodeChipInput
           value={config.validMotives || []}
           onChange={(validMotives) => setConfig({ validMotives })}
@@ -42,11 +42,11 @@ export function IndictmentConfigForm({
       </Field>
 
       {/* 3. Chứng cứ bắt buộc */}
-      <Field label="Mã chứng cứ bắt buộc để truy tố" required>
+      <Field label="Mã chứng cứ bắt buộc" required>
         <CodeChipInput
           value={config.requiredEvidenceIds || []}
           onChange={(requiredEvidenceIds) => setConfig({ requiredEvidenceIds })}
-          placeholder="VD: C-02, D-04, D-05..."
+          placeholder="VD: C02, D04, D05..."
           className="min-h-8 border-white/10 bg-black/40"
         />
       </Field>
@@ -56,7 +56,7 @@ export function IndictmentConfigForm({
         <CodeChipInput
           value={config.optionalEvidenceIds || []}
           onChange={(optionalEvidenceIds) => setConfig({ optionalEvidenceIds })}
-          placeholder="VD: D-01, B-03..."
+          placeholder="VD: D01, B03..."
           className="min-h-8 border-white/10 bg-black/40"
         />
       </Field>

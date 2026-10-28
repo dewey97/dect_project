@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Trash2, Save, Loader2 } from "lucide-react";
+import { Trash2, Eye, EyeOff, Bot, ChevronDown } from "lucide-react";
 import type {
   DbCaseCheckpoint,
   DbCaseDossier,
@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { CheckpointIdentityForm } from "./sections/checkpoint-identity-form";
 import { SuspectInterrogationConfigForm } from "./sections/suspect-interrogation-config-form";
 import { PhoneLookupConfigForm } from "./sections/phone-lookup-config-form";
-import { FollowupConfigForm } from "./sections/followup-config-form";
 import { IndictmentConfigForm } from "./sections/indictment-config-form";
 import { SimpleAnswerConfigForm } from "./sections/simple-answer-config-form";
 import { CheckpointHintsForm } from "./sections/checkpoint-hints-form";
@@ -69,11 +68,20 @@ export function CheckpointEditor({
     draft.type === "epilogue" ||
     draft.checkpointId.includes("epilogue");
 
+  const isIndictment =
+    draft.kind === "indictment" ||
+    draft.type === "indictment" ||
+    draft.checkpointId.includes("indictment");
+
+  const rawKind = draft.kind || draft.type || "text";
   const effectiveKind =
-    draft.kind ||
-    (draft.type === "evidence_picker"
-      ? "suspect_interrogation"
-      : draft.type || "text");
+    rawKind === "followup"
+      ? (draft.questionType || draft.type || "code")
+      : rawKind === "time"
+        ? "code"
+        : rawKind === "evidence_picker" || rawKind === "suspect_interrogation"
+          ? "suspect_interrogation"
+          : rawKind;
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-[#0a0a0d] overflow-hidden">
@@ -85,7 +93,13 @@ export function CheckpointEditor({
           )}
           title={isDirty ? "Chưa lưu" : "Đã lưu"}
         />
-        {isEpilogue ? (
+        {isIndictment ? (
+          <div className="flex items-center gap-1.5 flex-1 min-w-0">
+            <span className="text-xs font-bold uppercase tracking-wider text-rose-400">
+              Kết luận
+            </span>
+          </div>
+        ) : isEpilogue ? (
           <div className="flex items-center gap-1.5 flex-1 min-w-0">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
               Hậu án
@@ -108,8 +122,39 @@ export function CheckpointEditor({
           />
         )}
 
-        <div className="ml-auto flex shrink-0 items-center gap-1.5">
-          {draft.id && !isEpilogue && (
+        <div className="ml-auto flex shrink-0 items-center gap-1">
+          {!isEpilogue && !isIndictment && (
+            <button
+              type="button"
+              onClick={() => {
+                onChange({
+                  boardConfig: {
+                    ...(draft.boardConfig || {}),
+                    hidden: !draft.boardConfig?.hidden,
+                  },
+                });
+              }}
+              className={cn(
+                "h-7 w-7 flex items-center justify-center rounded border transition-colors cursor-pointer",
+                !draft.boardConfig?.hidden
+                  ? "border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300"
+                  : "border-white/10 bg-white/5 text-zinc-500 hover:bg-white/10 hover:text-zinc-300",
+              )}
+              title={
+                draft.boardConfig?.hidden
+                  ? "Ghim đang ẩn khỏi bảng (Bấm để hiển thị)"
+                  : "Đang hiển thị ghim trên bảng (Bấm để ẩn)"
+              }
+            >
+              {draft.boardConfig?.hidden ? (
+                <EyeOff className="size-3.5" />
+              ) : (
+                <Eye className="size-3.5" />
+              )}
+            </button>
+          )}
+
+          {draft.id && !isEpilogue && !isIndictment && (
             <Button
               type="button"
               variant="destructive"
@@ -117,6 +162,7 @@ export function CheckpointEditor({
               onClick={onDelete}
               disabled={isSaving}
               title="Xóa checkpoint"
+              className="h-7 w-7"
             >
               <Trash2 className="size-3.5" />
             </Button>
@@ -126,7 +172,7 @@ export function CheckpointEditor({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
         <div className="min-w-0 space-y-4">
-          {!isEpilogue && (
+          {!isEpilogue && !isIndictment && (
             <CheckpointIdentityForm
               draft={draft}
               dossiers={dossiers}
@@ -142,6 +188,13 @@ export function CheckpointEditor({
               checkpoints={checkpoints}
               onChange={onChange}
             />
+          ) : isIndictment ? (
+            <>
+              <IndictmentConfigForm draft={draft} onChange={onChange} />
+              <Section title="Lời dẫn">
+                <CheckpointNarrativeForm draft={draft} onChange={onChange} />
+              </Section>
+            </>
           ) : (
             <>
               {/* Form đáp án theo kind */}
@@ -159,30 +212,28 @@ export function CheckpointEditor({
                 </Section>
               )}
 
-              {effectiveKind === "followup" && (
-                <Section title="Cấu hình câu hỏi phụ">
-                  <FollowupConfigForm
-                    draft={draft}
-                    checkpoints={checkpoints}
-                    onChange={onChange}
-                  />
-                </Section>
-              )}
-
-              {effectiveKind === "indictment" && (
-                <Section title="Cấu hình cáo trạng kết án">
-                  <IndictmentConfigForm draft={draft} onChange={onChange} />
-                </Section>
-              )}
-
               {(effectiveKind === "choice" ||
                 effectiveKind === "code" ||
                 effectiveKind === "time" ||
                 effectiveKind === "text") && (
                 <>
-                  <Section title="Đáp án">
-                    <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
-                  </Section>
+                  <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
+
+                  {/* Đối với Tự do: AI check thu gọn/mở rộng ngay bên dưới đáp án */}
+                  {(effectiveKind === "text" || draft.type === "text") && (
+                    <details className="group rounded-md border border-white/5 bg-[#121216] p-2 text-xs">
+                      <summary className="flex cursor-pointer select-none items-center justify-between text-zinc-400 hover:text-zinc-200 font-medium">
+                        <span className="flex items-center gap-1.5">
+                          <Bot className="size-3.5 text-purple-400" />
+                          <span>AI Check (Đánh giá ngữ nghĩa tự do)</span>
+                        </span>
+                        <ChevronDown className="size-3.5 transition-transform group-open:rotate-180 text-zinc-500" />
+                      </summary>
+                      <div className="mt-2.5 pt-2 border-t border-white/5">
+                        <CheckpointAiCheckForm draft={draft} onChange={onChange} />
+                      </div>
+                    </details>
+                  )}
 
                   <CheckpointHintsForm
                     draft={draft}
@@ -192,10 +243,7 @@ export function CheckpointEditor({
                 </>
               )}
 
-              {/* Gợi ý cho phone_lookup / followup / indictment nếu chưa có trong form riêng */}
-              {(effectiveKind === "phone_lookup" ||
-                effectiveKind === "followup" ||
-                effectiveKind === "indictment") && (
+              {effectiveKind === "phone_lookup" && (
                 <CheckpointHintsForm
                   draft={draft}
                   onChange={onChange}
@@ -206,13 +254,6 @@ export function CheckpointEditor({
               <Section title="Lời dẫn">
                 <CheckpointNarrativeForm draft={draft} onChange={onChange} />
               </Section>
-
-              {/* AI check dành cho câu hỏi nhập văn bản / tự luận */}
-              {(effectiveKind === "text" || draft.type === "text") && (
-                <Section title="AI check (Đánh giá câu trả lời)">
-                  <CheckpointAiCheckForm draft={draft} onChange={onChange} />
-                </Section>
-              )}
             </>
           )}
         </div>

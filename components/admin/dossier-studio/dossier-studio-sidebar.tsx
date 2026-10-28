@@ -5,7 +5,17 @@ import { cn } from '@/lib/utils'
 import type { DossierMode, LoiKhaiData, LyLichData } from '@/types/dossier'
 import type { DbDossierDocument } from '@/lib/actions/dossier-actions'
 import type { DbCaseEvidence } from '@/lib/types/database'
-import { UserCheck, FileText, Plus, Camera, Image as ImageIcon, Volume2, Package, Sparkles } from 'lucide-react'
+import {
+  UserCheck,
+  FileText,
+  Plus,
+  Image as ImageIcon,
+  Volume2,
+  Package,
+  Sparkles,
+  ChevronDown,
+  FolderArchive,
+} from 'lucide-react'
 import { EvidenceForm } from '@/components/admin/evidence-studio/evidence-form'
 
 interface DossierStudioSidebarProps {
@@ -32,10 +42,10 @@ interface DossierStudioSidebarProps {
   // HS Form States
   hsData: LyLichData
   setHsData: React.Dispatch<React.SetStateAction<LyLichData>>
-  showSeal: boolean
-  setShowSeal: React.Dispatch<React.SetStateAction<boolean>>
-  sealAngle: number
-  setSealAngle: React.Dispatch<React.SetStateAction<number>>
+  showSeal?: boolean
+  setShowSeal?: React.Dispatch<React.SetStateAction<boolean>>
+  sealAngle?: number
+  setSealAngle?: React.Dispatch<React.SetStateAction<number>>
 }
 
 export function DossierStudioSidebar({
@@ -67,9 +77,19 @@ export function DossierStudioSidebar({
   const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null)
 
+  const [collapsedGroups, setCollapsedGroups] = React.useState<Record<string, boolean>>({
+    ly_lich: false,
+    loi_khai: false,
+    evidence: false,
+  })
+
+  const toggleGroup = (key: string) => {
+    setCollapsedGroups(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
   const renderDocList = (docs: DbDossierDocument[], listMode: DossierMode) => {
     return (
-      <div className="space-y-1">
+      <div className="border border-white/10 rounded-md overflow-hidden bg-black/20 divide-y divide-white/[0.06] max-h-56 overflow-y-auto">
         {docs.map((d, index) => {
           const isSelected = activeSectionType !== 'evidence' && selectedTagCode === d.tag_code
           const isDragging = draggedMode === listMode && draggedIndex === index
@@ -117,19 +137,22 @@ export function DossierStudioSidebar({
               }}
               onClick={() => onSelectDossier(d.tag_code)}
               className={cn(
-                "w-full text-left px-2.5 py-1.5 rounded transition-all flex items-center justify-between text-xs border cursor-grab active:cursor-grabbing select-none",
-                isDragging && "opacity-40 scale-95 border-dashed border-amber-400",
-                isDragOver && !isDragging && "border-amber-400 bg-amber-500/10 ring-2 ring-amber-400/30",
+                "w-full text-left px-2.5 py-1.5 transition-colors flex items-center justify-between text-xs cursor-grab active:cursor-grabbing select-none border-l-2",
+                isDragging && "opacity-40 bg-amber-500/10",
+                isDragOver && !isDragging && "bg-amber-500/20 ring-1 ring-inset ring-amber-400/50",
                 isSelected
-                  ? "bg-amber-500/20 border-amber-500/50 text-amber-300 font-semibold shadow-sm"
-                  : "bg-white/5 border-white/5 text-neutral-300 hover:bg-white/10 hover:text-white"
+                  ? "bg-amber-500/15 border-l-amber-400 text-amber-300 font-medium"
+                  : "border-l-transparent text-neutral-300 hover:bg-white/[0.04] hover:text-white"
               )}
             >
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="text-neutral-500 cursor-grab hover:text-neutral-300">⋮⋮</span>
+              <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                <span className="text-neutral-500 cursor-grab hover:text-neutral-300 text-[10px] select-none shrink-0">⋮⋮</span>
                 <span className="truncate">{d.subject_name || 'Chưa đặt tên'}</span>
               </div>
-              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-black/40 text-neutral-400 flex-shrink-0">
+              <span className={cn(
+                "font-mono text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 transition-colors",
+                isSelected ? "bg-amber-400/20 text-amber-300 font-bold" : "bg-white/5 text-neutral-400"
+              )}>
                 {d.tag_code}
               </span>
             </div>
@@ -161,7 +184,7 @@ export function DossierStudioSidebar({
       <div className="flex items-center justify-between pb-1 gap-1">
         <span className="font-semibold text-neutral-300 uppercase tracking-wider text-[11px] truncate">
           {activeSectionType === 'evidence'
-            ? '📸 Vật Chứng & Ảnh'
+            ? '📂 Khác'
             : activeSectionType === 'ly_lich'
               ? '📋 Lý Lịch'
               : '📝 Lời Khai'}
@@ -194,95 +217,125 @@ export function DossierStudioSidebar({
               type="button"
               onClick={onCreateNewEvidence}
               className="flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-amber-500 hover:bg-amber-400 text-black font-bold text-[10px] transition-all shadow-sm active:scale-95"
-              title="Thêm chứng cứ / ảnh hiện trường mới"
+              title="Thêm chứng cứ / ảnh / mục khác"
             >
               <Plus className="size-3" />
-              <span>Chứng Cứ</span>
+              <span>Khác</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Danh sách Hồ sơ & Vật chứng */}
-      <div className="space-y-3.5">
+      <div className="space-y-3">
         {/* Nhóm Hồ sơ Lý Lịch */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-neutral-400">
-            <label className="text-amber-400 font-semibold flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+        <div className="space-y-1">
+          <button
+            type="button"
+            onClick={() => toggleGroup('ly_lich')}
+            className="w-full flex items-center justify-between text-neutral-400 hover:text-neutral-200 transition-colors py-1 group select-none"
+          >
+            <div className="text-amber-400/90 group-hover:text-amber-400 font-semibold flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+              <ChevronDown
+                className={cn(
+                  "size-3.5 transition-transform duration-200 text-neutral-500 group-hover:text-amber-400",
+                  collapsedGroups.ly_lich && "-rotate-90"
+                )}
+              />
               <UserCheck className="size-3.5" />
-              <span>Lý Lịch ({hsDocuments.length})</span>
-            </label>
-          </div>
-          {hsDocuments.length === 0 ? (
-            <p className="text-[11px] text-neutral-500 italic px-1">Chưa có hồ sơ lý lịch</p>
-          ) : (
-            renderDocList(hsDocuments, 'ly_lich')
+              <span>Lý Lịch</span>
+              <span className="font-mono text-[10px] text-neutral-500 font-normal">({hsDocuments.length})</span>
+            </div>
+          </button>
+          {!collapsedGroups.ly_lich && (
+            hsDocuments.length === 0 ? (
+              <p className="text-[11px] text-neutral-500 italic px-2 py-1">Chưa có hồ sơ lý lịch</p>
+            ) : (
+              renderDocList(hsDocuments, 'ly_lich')
+            )
           )}
         </div>
 
         {/* Nhóm Biên Bản Lời Khai */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-neutral-400">
-            <label className="text-amber-400 font-semibold flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+        <div className="space-y-1">
+          <button
+            type="button"
+            onClick={() => toggleGroup('loi_khai')}
+            className="w-full flex items-center justify-between text-neutral-400 hover:text-neutral-200 transition-colors py-1 group select-none"
+          >
+            <div className="text-amber-400/90 group-hover:text-amber-400 font-semibold flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+              <ChevronDown
+                className={cn(
+                  "size-3.5 transition-transform duration-200 text-neutral-500 group-hover:text-amber-400",
+                  collapsedGroups.loi_khai && "-rotate-90"
+                )}
+              />
               <FileText className="size-3.5" />
-              <span>Lời Khai ({lkDocuments.length})</span>
-            </label>
-          </div>
-          {lkDocuments.length === 0 ? (
-            <p className="text-[11px] text-neutral-500 italic px-1">Chưa có biên bản lời khai</p>
-          ) : (
-            renderDocList(lkDocuments, 'loi_khai')
+              <span>Lời Khai</span>
+              <span className="font-mono text-[10px] text-neutral-500 font-normal">({lkDocuments.length})</span>
+            </div>
+          </button>
+          {!collapsedGroups.loi_khai && (
+            lkDocuments.length === 0 ? (
+              <p className="text-[11px] text-neutral-500 italic px-2 py-1">Chưa có biên bản lời khai</p>
+            ) : (
+              renderDocList(lkDocuments, 'loi_khai')
+            )
           )}
         </div>
 
-        {/* Nhóm Vật Chứng & Ảnh Hiện Trường (Chỉ gồm Ảnh & PDF từ bên ngoài) */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-neutral-400">
-            <label className="text-amber-400 font-semibold flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
-              <Camera className="size-3.5" />
-              <span>Vật Chứng & Ảnh ({evidenceList.length})</span>
-            </label>
-            <span className="text-[10px] text-neutral-500 font-mono">Ảnh & PDF ngoài</span>
-          </div>
-          {evidenceList.length === 0 ? (
-            <p className="text-[11px] text-neutral-500 italic px-1">Chưa có vật chứng (Ảnh / PDF ngoài)</p>
-          ) : (
-            <div className="space-y-1 max-h-48 overflow-y-auto pr-0.5">
-              {evidenceList.map((item) => {
-                const isSelected = activeSectionType === 'evidence' && (selectedEvidence?.id === item.id || selectedTagCode === item.code)
-                const isPdf = item.kind === 'pdf'
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => onSelectEvidence(item)}
-                    className={cn(
-                      "w-full text-left px-2.5 py-1.5 rounded transition-all flex items-center justify-between text-xs border cursor-pointer select-none",
-                      isSelected
-                        ? "bg-amber-500/20 border-amber-500/50 text-amber-300 font-semibold shadow-sm"
-                        : "bg-white/5 border-white/5 text-neutral-300 hover:bg-white/10 hover:text-white"
-                    )}
-                  >
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      {renderEvidenceKindIcon(item.kind)}
-                      <span className="truncate">{item.title || item.code}</span>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
+        {/* Nhóm Khác */}
+        <div className="space-y-1">
+          <button
+            type="button"
+            onClick={() => toggleGroup('evidence')}
+            className="w-full flex items-center justify-between text-neutral-400 hover:text-neutral-200 transition-colors py-1 group select-none"
+          >
+            <div className="text-amber-400/90 group-hover:text-amber-400 font-semibold flex items-center gap-1.5 text-[11px] uppercase tracking-wider">
+              <ChevronDown
+                className={cn(
+                  "size-3.5 transition-transform duration-200 text-neutral-500 group-hover:text-amber-400",
+                  collapsedGroups.evidence && "-rotate-90"
+                )}
+              />
+              <FolderArchive className="size-3.5" />
+              <span>Khác</span>
+              <span className="font-mono text-[10px] text-neutral-500 font-normal">({evidenceList.length})</span>
+            </div>
+          </button>
+          {!collapsedGroups.evidence && (
+            evidenceList.length === 0 ? (
+              <p className="text-[11px] text-neutral-500 italic px-2 py-1">Chưa có mục nào</p>
+            ) : (
+              <div className="border border-white/10 rounded-md overflow-hidden bg-black/20 divide-y divide-white/[0.06] max-h-52 overflow-y-auto">
+                {evidenceList.map((item) => {
+                  const isSelected = activeSectionType === 'evidence' && (selectedEvidence?.id === item.id || selectedTagCode === item.code)
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => onSelectEvidence(item)}
+                      className={cn(
+                        "w-full text-left px-2.5 py-1.5 transition-colors flex items-center justify-between text-xs cursor-pointer select-none border-l-2",
+                        isSelected
+                          ? "bg-amber-500/15 border-l-amber-400 text-amber-300 font-medium"
+                          : "border-l-transparent text-neutral-300 hover:bg-white/[0.04] hover:text-white"
+                      )}
+                    >
+                      <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                        {renderEvidenceKindIcon(item.kind)}
+                        <span className="truncate">{item.title || item.code}</span>
+                      </div>
                       <span className={cn(
-                        "font-mono text-[9px] px-1 py-0.5 rounded font-bold uppercase",
-                        isPdf
-                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                          : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                        "font-mono text-[10px] px-1.5 py-0.5 rounded shrink-0 transition-colors",
+                        isSelected ? "bg-amber-400/20 text-amber-300 font-bold" : "bg-white/5 text-neutral-400"
                       )}>
-                        {isPdf ? "PDF" : "Ảnh"}
-                      </span>
-                      <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-black/40 text-neutral-400">
                         {item.code}
                       </span>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )
           )}
         </div>
       </div>
@@ -292,7 +345,7 @@ export function DossierStudioSidebar({
         <div className="flex items-center justify-between text-[11px] text-neutral-400 font-semibold uppercase tracking-wider">
           <span>
             {activeSectionType === 'evidence'
-              ? `Vật Chứng: ${selectedEvidence?.code || selectedTagCode || 'Mới'}`
+              ? `Khác: ${selectedEvidence?.code || selectedTagCode || 'Mới'}`
               : `Chi Tiết: ${selectedTagCode || '...'}`}
           </span>
           <span className="font-mono text-amber-400/90 text-[10px]">
@@ -304,7 +357,7 @@ export function DossierStudioSidebar({
           </span>
         </div>
 
-        {/* Form Vật Chứng */}
+        {/* Form Vật Chứng / Khác */}
         {activeSectionType === 'evidence' ? (
           <div className="rounded-lg bg-black/30 border border-white/5 p-2.5">
             <EvidenceForm
@@ -399,33 +452,7 @@ export function DossierStudioSidebar({
               />
             </div>
 
-            <div className="pt-2 border-t border-white/10 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-300 font-medium">Dấu đỏ giáp lai & PC02</span>
-                <input
-                  type="checkbox"
-                  checked={showSeal}
-                  onChange={e => setShowSeal(e.target.checked)}
-                  className="w-4 h-4 rounded accent-amber-500 cursor-pointer"
-                />
-              </div>
-              {showSeal && (
-                <div>
-                  <div className="flex justify-between text-neutral-400 mb-1">
-                    <span>Độ nghiêng con dấu</span>
-                    <span className="font-mono text-amber-400">{sealAngle}°</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="-15"
-                    max="15"
-                    value={sealAngle}
-                    onChange={e => setSealAngle(parseInt(e.target.value))}
-                    className="w-full accent-amber-500 cursor-pointer"
-                  />
-                </div>
-              )}
-            </div>
+
           </>
         )}
       </div>

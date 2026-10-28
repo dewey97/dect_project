@@ -1768,9 +1768,10 @@ export function DossierCanvasBoard({
             const isSelected =
               focusedTag === itemCode || currentSelectedCode === itemCode;
 
-            const isA01 = itemCode === "A-01" || pdf.title.toLowerCase().includes("cẩm nang");
-            const isA04 = itemCode === "A-04" || pdf.title.toLowerCase().includes("khám nghiệm tử thi") || pdf.title.toLowerCase().includes("pháp y");
-            const isA05 = itemCode === "A-05" || pdf.title.toLowerCase().includes("khám nghiệm hiện trường");
+            const normItemCode = itemCode?.toUpperCase().replace(/-/g, "");
+            const isA01 = normItemCode === "A01" || pdf.title.toLowerCase().includes("cẩm nang");
+            const isA04 = normItemCode === "A04" || pdf.title.toLowerCase().includes("khám nghiệm tử thi") || pdf.title.toLowerCase().includes("pháp y");
+            const isA05 = normItemCode === "A05" || pdf.title.toLowerCase().includes("khám nghiệm hiện trường");
 
             return (
               <div

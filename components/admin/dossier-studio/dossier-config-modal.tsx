@@ -255,7 +255,7 @@ export function DossierConfigModal({
               <Input
                 value={customCodeInput}
                 onChange={(e) => setCustomCodeInput(e.target.value)}
-                placeholder="Mã tài liệu tự do (VD: D-04)..."
+                placeholder="Mã tài liệu tự do (VD: D04)..."
                 className="h-8 border-white/10 bg-[#181820] text-xs font-mono text-zinc-200 placeholder:font-sans placeholder:text-zinc-600"
               />
               <Button

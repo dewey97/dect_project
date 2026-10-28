@@ -202,14 +202,16 @@ export function FollowupQuestionModal({
         ),
       }));
 
-    const TARGET_CODES =
-      activeCheckpoint?.photoCodes && activeCheckpoint.photoCodes.length >= 3
-        ? activeCheckpoint.photoCodes
-        : ["D-06", "D-05", "D-04"];
+    const targetCodes: string[] =
+      activeCheckpoint?.photoCodes ||
+      (activeCheckpoint as any)?.answerConfig?.photoCodes ||
+      [];
+
+    if (!targetCodes || targetCodes.length === 0) return [];
 
     const discovered: Array<{ id: string; title: string; url: string }> = [];
 
-    for (const code of TARGET_CODES) {
+    for (const code of targetCodes) {
       const cleanCode = code.trim().toLowerCase();
       const normCode = cleanCode.replace(/[-_\s]/g, "");
 
@@ -232,54 +234,7 @@ export function FollowupQuestionModal({
       }
     }
 
-    if (discovered.length < 3) {
-      const codeFallbacks: Array<{ code: string; keywords: string[] }> = [
-        { code: "D-06", keywords: ["d-06", "d06", "bùa", "túi bùa"] },
-        { code: "D-05", keywords: ["d-05", "d05", "kéo"] },
-        { code: "D-04", keywords: ["d-04", "d04", "tóc", "túi zip"] },
-      ];
-
-      for (const fb of codeFallbacks) {
-        if (discovered.length >= 3) break;
-        const alreadyHas = discovered.some((d) => {
-          const did = d.id.toLowerCase();
-          return (
-            did.includes(fb.code.toLowerCase()) ||
-            fb.keywords.some(
-              (kw) => did.includes(kw) || d.title.toLowerCase().includes(kw),
-            )
-          );
-        });
-        if (alreadyHas) continue;
-
-        const found = mappedPhotos.find((p) => {
-          const pid = p.id.toLowerCase();
-          const ptitle = p.title.toLowerCase();
-          return (
-            fb.keywords.some((kw) => pid.includes(kw) || ptitle.includes(kw)) &&
-            !discovered.some((d) => d.id === p.id)
-          );
-        });
-
-        if (found) {
-          discovered.push(found);
-        }
-      }
-    }
-
-    if (discovered.length < 3) {
-      for (const p of mappedPhotos) {
-        const t = p.title.toLowerCase();
-        if (t.includes("chân dung") || p.id.toLowerCase().startsWith("avatar_"))
-          continue;
-        if (!discovered.some((item) => item.id === p.id)) {
-          discovered.push(p);
-        }
-        if (discovered.length >= 3) break;
-      }
-    }
-
-    return discovered.slice(0, 3);
+    return discovered;
   }, [rawSheetPhotos, activeCheckpoint]);
 
   const openTimeRef = useRef(0);
@@ -308,21 +263,28 @@ export function FollowupQuestionModal({
     setErrorMsg("");
     setShowPhotoPopup(false);
 
+    const targetKey =
+      targetCulprit || activeCheckpoint?.subjectKey || activeCheckpoint?.id || "default";
+
     if (questionType === "code") {
       setCodeInput("");
     } else if (questionType === "time") {
       const savedTime =
-        getStorageItem(caseStorageKey(caseId, `followup_${targetCulprit}`)) ||
-        getStorageItem(caseStorageKey(caseId, "followup_vu"));
+        getStorageItem(caseStorageKey(caseId, `followup_${targetKey}`)) ||
+        (targetKey === "vu"
+          ? getStorageItem(caseStorageKey(caseId, "followup_vu"))
+          : null);
       setTimeInput(savedTime || "");
     } else if (questionType === "choice") {
       const savedChoice =
-        getStorageItem(caseStorageKey(caseId, `followup_${targetCulprit}`)) ||
-        getStorageItem(caseStorageKey(caseId, "followup_tung"));
+        getStorageItem(caseStorageKey(caseId, `followup_${targetKey}`)) ||
+        (targetKey === "tung"
+          ? getStorageItem(caseStorageKey(caseId, "followup_tung"))
+          : null);
       setSelectedChoice(savedChoice || null);
     } else {
       const savedText = getStorageItem(
-        caseStorageKey(caseId, `followup_${targetCulprit}`),
+        caseStorageKey(caseId, `followup_${targetKey}`),
       );
       setTextInput(savedText || "");
       setSelectedChoice(savedText || null);

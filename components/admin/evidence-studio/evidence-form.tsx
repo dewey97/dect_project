@@ -155,7 +155,7 @@ export function EvidenceForm({
           type="text"
           value={code}
           onChange={(e) => handleCodeChange(e.target.value)}
-          placeholder="VD: A-01, B-02..."
+          placeholder="VD: A01, B02..."
           className="flex-1 min-w-0 bg-black/40 border border-white/10 rounded px-2.5 py-1 font-mono text-amber-400 font-bold focus:outline-none focus:border-amber-500 text-right"
         />
       </div>
@@ -174,45 +174,39 @@ export function EvidenceForm({
         />
       </div>
 
-      {/* 3. Loại chứng cứ (Chỉ gồm 2 loại: Ảnh hoặc PDF từ bên ngoài) */}
+      {/* 3. Loại chứng cứ */}
       <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="text-neutral-400 font-medium">
-            Loại chứng cứ
-          </label>
-          <span className="text-[10px] text-neutral-500">2 loại: Ảnh hoặc PDF ngoài</span>
-        </div>
+        <label className="text-neutral-400 mb-1 block font-medium">
+          Loại chứng cứ
+        </label>
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => handleKindChange("photo")}
             className={cn(
-              "flex items-center justify-center p-2 rounded border text-xs gap-1.5 transition-all font-medium",
+              "flex items-center justify-center py-1.5 px-2 rounded border text-xs gap-1.5 transition-all font-medium",
               kind === "photo" || kind === "image"
                 ? "bg-amber-500/20 border-amber-500 text-amber-300 shadow-sm font-semibold"
                 : "bg-black/40 border-white/10 text-neutral-400 hover:text-white",
             )}
           >
             <ImageIcon className="size-3.5" />
-            <span>Ảnh (Hiện trường / Vật phẩm)</span>
+            <span>Ảnh</span>
           </button>
           <button
             type="button"
             onClick={() => handleKindChange("pdf")}
             className={cn(
-              "flex items-center justify-center p-2 rounded border text-xs gap-1.5 transition-all font-medium",
+              "flex items-center justify-center py-1.5 px-2 rounded border text-xs gap-1.5 transition-all font-medium",
               kind === "pdf"
                 ? "bg-amber-500/20 border-amber-500 text-amber-300 shadow-sm font-semibold"
                 : "bg-black/40 border-white/10 text-neutral-400 hover:text-white",
             )}
           >
             <FileText className="size-3.5" />
-            <span>PDF từ bên ngoài</span>
+            <span>PDF</span>
           </button>
         </div>
-        <p className="mt-1 text-[10px] text-neutral-500 italic">
-          * Lưu ý: Hồ sơ Lý lịch và Biên bản Lời khai được quản lý & soạn thảo riêng trong Studio.
-        </p>
       </div>
 
       {/* 4. Mô tả */}

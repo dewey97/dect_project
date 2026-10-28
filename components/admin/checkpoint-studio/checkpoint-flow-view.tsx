@@ -108,19 +108,19 @@ function CheckpointFlowNodeCard({
       case "text":
         return "Tự do";
       case "phone_lookup":
-        return "Tra SĐT";
+        return "Tra cứu";
       case "suspect_interrogation":
       case "suspect":
-        return "Thẩm tra";
+      case "evidence_picker":
+        return "Chọn tài liệu";
       case "followup":
-        return "Nghi vấn";
+        return "So khớp";
       case "indictment":
-        return "Cáo trạng";
+        return "Kết luận";
       case "epilogue":
         return "Hậu án";
-      case "evidence_picker":
       default:
-        return "Tài liệu";
+        return "Chọn tài liệu";
     }
   }, [row.kind, row.type]);
 

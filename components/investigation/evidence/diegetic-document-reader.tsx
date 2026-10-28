@@ -21,9 +21,10 @@ export function DiegeticDocumentReader({
 }: DiegeticDocumentReaderProps) {
   const [zoom, setZoom] = useState(1);
 
-  const isA01 = code === "A-01" || title.toLowerCase().includes("cẩm nang");
-  const isA04 = code === "A-04" || title.toLowerCase().includes("khám nghiệm tử thi") || title.toLowerCase().includes("pháp y");
-  const isA05 = code === "A-05" || title.toLowerCase().includes("khám nghiệm hiện trường");
+  const normCode = code?.toUpperCase().replace(/-/g, "");
+  const isA01 = normCode === "A01" || title.toLowerCase().includes("cẩm nang");
+  const isA04 = normCode === "A04" || title.toLowerCase().includes("khám nghiệm tử thi") || title.toLowerCase().includes("pháp y");
+  const isA05 = normCode === "A05" || title.toLowerCase().includes("khám nghiệm hiện trường");
 
   return (
     <div className={cn("w-full h-full flex flex-col bg-[#0c0805] text-[#e5d8cb] overflow-hidden select-none", className)}>

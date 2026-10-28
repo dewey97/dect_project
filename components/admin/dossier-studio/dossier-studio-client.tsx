@@ -253,7 +253,7 @@ export function DossierStudioClient({
     initialHsDocuments[0]?.tag_code ||
       initialLkDocuments[0]?.tag_code ||
       initialEvidence[0]?.code ||
-      "A-17",
+      "A17",
   );
 
   // Vật chứng đang chọn

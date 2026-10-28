@@ -37,19 +37,38 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
   const [showExifInfo, setShowExifInfo] = useState(false);
 
   const { data: rawPhotos, loading, error, refetch } = usePhoneData("photos");
-  const [isBoxUnlocked, setIsBoxUnlocked] = useState(false);
+  const [unlockedPhase, setUnlockedPhase] = useState<number>(0);
+  const [unlockedDossiers, setUnlockedDossiers] = useState<string[]>([]);
+  const [isLegacyBoxUnlocked, setIsLegacyBoxUnlocked] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const unlocked = Boolean(
+      const activeCase = getActiveCaseId();
+      const phaseNum = Number(
+        localStorage.getItem(caseStorageKey(activeCase, "unlocked_phase")) || 0,
+      );
+      setUnlockedPhase(phaseNum);
+
+      try {
+        const dossiers = JSON.parse(
+          localStorage.getItem(
+            caseStorageKey(activeCase, "unlocked_dossiers"),
+          ) || "[]",
+        );
+        if (Array.isArray(dossiers)) setUnlockedDossiers(dossiers);
+      } catch {
+        setUnlockedDossiers([]);
+      }
+
+      const legacyUnlocked = Boolean(
         localStorage.getItem(
-          caseStorageKey(getActiveCaseId(), "followup_ha_password"),
+          caseStorageKey(activeCase, "followup_ha_password"),
         ) ||
         localStorage.getItem(
-          caseStorageKey(getActiveCaseId(), "followup_ha"),
+          caseStorageKey(activeCase, "followup_ha"),
         ) === "solved",
       );
-      setIsBoxUnlocked(unlocked);
+      setIsLegacyBoxUnlocked(legacyUnlocked);
     }
   }, []);
 
@@ -64,12 +83,25 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
       ),
     )
     .filter((item: Record<string, unknown>) => {
-      const code = String(item.code || item.photo_code || item.photo_id || "")
-        .toUpperCase()
-        .trim();
-      // 3 vật chứng hộp thiếc D-06, D-05, D-04 chỉ được mở ra sau khi đã trả lời đúng mã khóa
-      if (["D-06", "D-05", "D-04", "D06", "D05", "D04"].includes(code)) {
-        return isBoxUnlocked;
+      // Ảnh mở khóa theo phase / bộ hồ sơ
+      const itemPhase =
+        typeof item.phase === "number"
+          ? item.phase
+          : typeof (item.metadata as any)?.phase === "number"
+            ? (item.metadata as any).phase
+            : 0;
+
+      if (itemPhase > 0) {
+        if (unlockedPhase >= itemPhase) return true;
+        if (
+          itemPhase === 3 &&
+          (unlockedDossiers.includes("bo_c") ||
+            unlockedDossiers.includes("Bộ C") ||
+            isLegacyBoxUnlocked)
+        ) {
+          return true;
+        }
+        return false;
       }
       return true;
     })

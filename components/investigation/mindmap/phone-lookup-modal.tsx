@@ -190,7 +190,9 @@ export function PhoneLookupModal({
     setStorageJson(sKey("phone_inputs"), inputValues);
     setStorageItem(sKey("phone_solved"), "true");
 
-    onSuccess("0988200991", "Đã xác minh danh tính SĐT thành công.");
+    const resolvedPhone =
+      (inputsList[0] as any)?.phone || inputsList[0]?.id || "phone_solved";
+    onSuccess(resolvedPhone, "Đã xác minh danh tính SĐT thành công.");
     onClose();
   };
 

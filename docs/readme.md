@@ -29,6 +29,7 @@ Tài liệu về kiến trúc kỹ thuật, cơ sở dữ liệu, quy trình xu�
 | **19. Checkpoint Studio & Structured Authoring** | Đặc tả module biên tập checkpoint, bảng `case_checkpoints`, runtime Supabase, đồ thị phụ thuộc và lưu vị trí node        | [`core_specs/19_checkpoint_studio.md`](core_specs/19_checkpoint_studio.md)                                           |
 | **20. Phone Studio & Dynamic Architecture**      | Đặc tả module biên soạn điện thoại tang vật `/studio/phone`, Supabase phone tables, dual-source và WYSIWYG               | [`core_specs/20_phone_studio.md`](core_specs/20_phone_studio.md)                                                     |
 | **21. Studio Authoring Guide** | Chức năng, trường thông tin và lý do thiết kế của toàn bộ Studio (`/studio/*`), luồng dựng vụ mới từ số 0 | [`core_specs/21_studio_authoring_guide.md`](core_specs/21_studio_authoring_guide.md) |
+| **22. Codebase Architecture & Refactoring Plan** | Đặc tả kiến trúc codebase, rà soát loại bỏ dead code zombie và kế hoạch quy hoạch cây thư mục | [`core_specs/22_codebase_architecture_and_refactoring_plan.md`](core_specs/22_codebase_architecture_and_refactoring_plan.md) |
 | **Nợ Kỹ Thuật (Tech Debt)**                      | Sổ cái quản lý nợ kỹ thuật 2 tầng, danh mục mock UI và mã số bất biến `#ID`                                              | [`TECHDEBT.md`](TECHDEBT.md)                                                                                         |
 
 ---

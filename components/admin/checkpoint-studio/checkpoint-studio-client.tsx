@@ -218,10 +218,20 @@ export function CheckpointStudioClient({
   const [isLintModalOpen, setIsLintModalOpen] = useState(false);
   const [isCreatingCustomNode, setIsCreatingCustomNode] = useState(false);
   const [inspectorTab, setInspectorTab] = useState<
-    "checkpoints" | "characters"
+    "checkpoints" | "characters" | "indictment" | "epilogue"
   >("checkpoints");
   const [selectedCharacter, setSelectedCharacter] =
     useState<DbCaseCharacter | null>(null);
+
+  const investigationCheckpoints = useMemo(() => {
+    return rows.filter(
+      (r) =>
+        r.kind !== "indictment" &&
+        r.kind !== "epilogue" &&
+        !r.checkpoint_id.includes("indictment") &&
+        !r.checkpoint_id.includes("epilogue"),
+    );
+  }, [rows]);
 
   // Chế độ "Lớp logic" (Logic Overlay)
   const [isLogicLayerActive, setIsLogicLayerActive] = useState(false);
@@ -289,7 +299,8 @@ export function CheckpointStudioClient({
   };
 
   const currentSelectCheckpointId = useMemo(() => {
-    const matched = rows.find(
+    if (inspectorTab !== "checkpoints") return "";
+    const matched = investigationCheckpoints.find(
       (r) =>
         (selectedId &&
           (r.id === selectedId || r.checkpoint_id === selectedId)) ||
@@ -297,9 +308,15 @@ export function CheckpointStudioClient({
           (r.id === draft.id || r.checkpoint_id === draft.checkpointId)),
     );
     if (matched) return matched.id || matched.checkpoint_id;
-    if (draft && !draft.id) return "__new__";
+    if (
+      draft &&
+      !draft.id &&
+      draft.kind !== "indictment" &&
+      draft.kind !== "epilogue"
+    )
+      return "__new__";
     return "";
-  }, [rows, selectedId, draft]);
+  }, [investigationCheckpoints, selectedId, draft, inspectorTab]);
 
   const formDirty = useMemo(
     () => (draft ? JSON.stringify(draft) !== baseline : false),
@@ -378,13 +395,81 @@ export function CheckpointStudioClient({
   );
 
   const selectRow = (row: DbCaseCheckpoint): boolean => {
-    if (row.id === selectedId && draft) return true;
+    const isSpecialIndictment =
+      row.kind === "indictment" || row.checkpoint_id.includes("indictment");
+    const isSpecialEpilogue =
+      row.kind === "epilogue" || row.checkpoint_id.includes("epilogue");
+
+    if (row.id === selectedId && draft) {
+      if (isSpecialIndictment) setInspectorTab("indictment");
+      else if (isSpecialEpilogue) setInspectorTab("epilogue");
+      else setInspectorTab("checkpoints");
+      return true;
+    }
     if (!confirmDiscardForm()) return false;
     const nextDraft = toDraft(row);
     setSelectedId(row.id);
     setDraft(nextDraft);
     setBaseline(JSON.stringify(nextDraft));
+    if (isSpecialIndictment) setInspectorTab("indictment");
+    else if (isSpecialEpilogue) setInspectorTab("epilogue");
+    else setInspectorTab("checkpoints");
     return true;
+  };
+
+  const handleOpenSpecialCheckpoint = (kind: "indictment" | "epilogue") => {
+    setSelectedCharacter(null);
+    setSelectedNodeId(null);
+    setInspectorTab(kind);
+    const existing = rows.find(
+      (r) => r.kind === kind || r.checkpoint_id.includes(kind),
+    );
+    if (existing) {
+      const nextDraft = toDraft(existing);
+      setSelectedId(existing.id);
+      setDraft(nextDraft);
+      setBaseline(JSON.stringify(nextDraft));
+    } else {
+      const defaultId = `${caseId}-checkpoint-${kind}`;
+      const newDraft: CheckpointStudioDraft = {
+        ...createEmptyDraft(caseId),
+        checkpointId: defaultId,
+        title: kind === "indictment" ? "Kết luận" : "Hậu án",
+        kind: kind,
+        type: kind === "indictment" ? "evidence_picker" : "epilogue",
+        question: kind === "indictment" ? "Bản kết luận điều tra" : "Hậu án",
+        answerConfig:
+          kind === "indictment"
+            ? {
+                validSuspects: [],
+                validMotives: [],
+                requiredEvidenceIds: [],
+                optionalEvidenceIds: [],
+                motiveEvidenceIds: [],
+                optionalMotiveIds: [],
+                alibiEvidenceIds: [],
+                optionalAlibiIds: [],
+                contradictionEvidenceIds: [],
+                optionalContradictionIds: [],
+              }
+            : {
+                validSuspects: [],
+                validMotives: [],
+                requiredEvidenceIds: [],
+                optionalEvidenceIds: [],
+                motiveEvidenceIds: [],
+                optionalMotiveIds: [],
+                alibiEvidenceIds: [],
+                optionalAlibiIds: [],
+                contradictionEvidenceIds: [],
+                optionalContradictionIds: [],
+                epilogueStories: [{ id: "story_1", title: "Phần 1", monologue: "" }],
+              },
+      };
+      setDraft(newDraft);
+      setSelectedId(null);
+      setBaseline("");
+    }
   };
 
   const createRow = () => {
@@ -478,7 +563,12 @@ export function CheckpointStudioClient({
   const handleSave = async () => {
     if (!draft) return;
     const effectiveTitle =
-      draft.title.trim() || (draft.kind === "epilogue" ? "Hậu án" : "");
+      draft.title.trim() ||
+      (draft.kind === "epilogue"
+        ? "Hậu án"
+        : draft.kind === "indictment" || draft.type === "indictment"
+          ? "Kết luận"
+          : "");
     if (!effectiveTitle) {
       toast.error("Nhập tiêu đề checkpoint trước khi lưu.");
       return;
@@ -1045,6 +1135,15 @@ export function CheckpointStudioClient({
     const pin = displayPins.find((p) => p.id === pinId);
     if (!pin) return;
 
+    // 0. Tang vật điện thoại nạn nhân (Device Evidence) - không can thiệp inspector
+    if (
+      pin.nodeKind === "victim_phone" ||
+      pin.id.includes("victim_phone") ||
+      pin.id.includes("victim-phone")
+    ) {
+      return;
+    }
+
     // 1. Nếu pin có checkpointId
     if (pin.checkpointId) {
       const cp = rows.find(
@@ -1060,7 +1159,7 @@ export function CheckpointStudioClient({
     }
 
     // 2. Tìm theo nodeKind đặc thù của checkpoint
-    if (pin.nodeKind === "phone_lookup" || pin.nodeKind === "victim_phone") {
+    if (pin.nodeKind === "phone_lookup") {
       const cp = rows.find((r) => r.kind === "phone_lookup");
       if (cp) {
         setInspectorTab("checkpoints");
@@ -1113,14 +1212,14 @@ export function CheckpointStudioClient({
       }
     }
 
-    if (pin.nodeKind === "indictment") {
-      const cp = rows.find((r) => r.kind === "indictment");
-      if (cp) {
-        setInspectorTab("checkpoints");
-        setSelectedCharacter(null);
-        selectRow(cp);
-        return;
-      }
+    if (pin.nodeKind === "indictment" || pin.id.includes("indictment")) {
+      handleOpenSpecialCheckpoint("indictment");
+      return;
+    }
+
+    if (pin.nodeKind === "epilogue" || pin.id.includes("epilogue")) {
+      handleOpenSpecialCheckpoint("epilogue");
+      return;
     }
 
     // 3. Nếu là custom node (không gắn checkpoint)
@@ -1633,27 +1732,32 @@ export function CheckpointStudioClient({
             />
           ) : (
             <div className="flex h-full w-full min-h-0 flex-col bg-[#0c0c10] border-t border-white/10 md:border-l md:border-t-0">
-              {/* Segmented Switcher Tab giữa Checkpoint và Nhân vật */}
+              {/* Segmented Switcher Tab giữa Checkpoint, Nhân vật, Kết luận và Hậu án */}
               <div className="shrink-0 p-2.5 bg-[#111118] border-b border-white/10 space-y-2 select-none">
-                {/* Hàng 1: Toggle chia đều 50/50 */}
-                <div className="grid grid-cols-2 gap-1.5 bg-black/50 p-1 rounded-lg border border-white/10">
+                {/* Hàng 1: 4 Tabs phân định rõ ràng */}
+                <div className="grid grid-cols-4 gap-1 bg-black/50 p-1 rounded-lg border border-white/10">
                   <button
                     type="button"
                     onClick={() => {
                       setInspectorTab("checkpoints");
                       setSelectedCharacter(null);
-                      if (!draft && rows.length > 0) {
-                        selectRow(rows[0]);
+                      if (
+                        (!draft ||
+                          draft.kind === "indictment" ||
+                          draft.kind === "epilogue") &&
+                        investigationCheckpoints.length > 0
+                      ) {
+                        selectRow(investigationCheckpoints[0]);
                       }
                     }}
                     className={cn(
-                      "flex items-center justify-center py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                      "flex items-center justify-center py-1.5 px-1 rounded-md text-xs font-semibold transition-all cursor-pointer truncate",
                       inspectorTab === "checkpoints"
                         ? "bg-amber-500 text-black shadow-md font-bold"
                         : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
                     )}
                   >
-                    Checkpoint ({rows.length})
+                    Checkpoint ({investigationCheckpoints.length})
                   </button>
                   <button
                     type="button"
@@ -1664,13 +1768,37 @@ export function CheckpointStudioClient({
                       }
                     }}
                     className={cn(
-                      "flex items-center justify-center py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
+                      "flex items-center justify-center py-1.5 px-1 rounded-md text-xs font-semibold transition-all cursor-pointer truncate",
                       inspectorTab === "characters"
                         ? "bg-purple-600 text-white shadow-md font-bold"
                         : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
                     )}
                   >
                     Nhân vật ({characters.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenSpecialCheckpoint("indictment")}
+                    className={cn(
+                      "flex items-center justify-center py-1.5 px-1 rounded-md text-xs font-semibold transition-all cursor-pointer truncate",
+                      inspectorTab === "indictment"
+                        ? "bg-rose-600 text-white shadow-md font-bold"
+                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
+                    )}
+                  >
+                    Kết luận
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenSpecialCheckpoint("epilogue")}
+                    className={cn(
+                      "flex items-center justify-center py-1.5 px-1 rounded-md text-xs font-semibold transition-all cursor-pointer truncate",
+                      inspectorTab === "epilogue"
+                        ? "bg-emerald-600 text-white shadow-md font-bold"
+                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
+                    )}
+                  >
+                    Hậu án
                   </button>
                 </div>
 
@@ -1724,13 +1852,13 @@ export function CheckpointStudioClient({
                     </select>
                     <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
                   </div>
-                ) : (
+                ) : inspectorTab === "checkpoints" ? (
                   <div className="relative">
                     <select
                       value={currentSelectCheckpointId}
                       onChange={(e) => {
                         if (e.target.value === "__new__") return;
-                        const found = rows.find(
+                        const found = investigationCheckpoints.find(
                           (r) =>
                             r.id === e.target.value ||
                             r.checkpoint_id === e.target.value,
@@ -1750,11 +1878,11 @@ export function CheckpointStudioClient({
                         disabled
                         className="bg-[#14141c] text-zinc-400"
                       >
-                        -- Chọn checkpoint ({rows.length}) --
+                        -- Chọn checkpoint ({investigationCheckpoints.length}) --
                       </option>
                       {draft &&
                         !draft.id &&
-                        !rows.some(
+                        !investigationCheckpoints.some(
                           (r) => r.checkpoint_id === draft.checkpointId,
                         ) && (
                           <option
@@ -1767,29 +1895,27 @@ export function CheckpointStudioClient({
                               "Checkpoint mới"}
                           </option>
                         )}
-                      {rows.map((cp) => {
+                      {investigationCheckpoints.map((cp) => {
                         const kindBadge =
                           cp.kind === "phone_lookup"
-                            ? "[Tra SĐT]"
-                            : cp.kind === "suspect_interrogation"
-                              ? "[Thẩm tra]"
-                              : cp.kind === "followup"
-                                ? "[Nghi vấn]"
-                                : cp.kind === "indictment"
-                                  ? "[Cáo trạng]"
-                                  : cp.kind === "epilogue"
-                                    ? "[Hậu án]"
-                                    : cp.kind === "code" || cp.kind === "time"
-                                      ? "[Mã / Giờ]"
-                                      : "[Chứng cứ]";
+                            ? "Tra cứu"
+                            : cp.kind === "suspect_interrogation" ||
+                                cp.kind === "evidence_picker"
+                              ? "Chọn tài liệu"
+                              : cp.kind === "code" || cp.kind === "time"
+                                ? "So khớp"
+                                : cp.kind === "choice"
+                                  ? "Trắc nghiệm"
+                                  : cp.kind === "text"
+                                    ? "Tự do"
+                                    : "Chọn tài liệu";
                         return (
                           <option
                             key={cp.id || cp.checkpoint_id}
                             value={cp.id || cp.checkpoint_id}
                             className="bg-[#14141c] text-zinc-100 py-1.5"
                           >
-                            {kindBadge}{" "}
-                            {cp.title ||
+                            {kindBadge} · {cp.title ||
                               cp.checkpoint_id ||
                               "Checkpoint không tên"}
                           </option>
@@ -1798,7 +1924,7 @@ export function CheckpointStudioClient({
                     </select>
                     <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
                   </div>
-                )}
+                ) : null}
               </div>
 
               {/* Nội dung Inspector */}

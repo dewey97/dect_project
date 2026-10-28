@@ -511,7 +511,7 @@ export function IndictmentModal({
                   setCluesEvidenceInput(e.target.value);
                   if (errorMsg) setErrorMsg("");
                 }}
-                placeholder="Nhập mã chứng cứ (ví dụ: D-06, D-05, D-04, C-02 hoặc 53)..."
+                placeholder="Nhập mã chứng cứ (ví dụ: D06, D05, D04, C02 hoặc 53)..."
                 className="w-full bg-[#fdfcf9] border-2 border-[#2b1f14] rounded-none px-3.5 py-2 text-xs sm:text-sm text-[#0e2b5c] font-mono font-bold focus:outline-none focus:border-black transition-colors shadow-inner"
               />
             </div>

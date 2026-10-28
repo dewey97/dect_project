@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -338,31 +338,14 @@ export function ReinvestigationModal({
     return hotspots.map((spot) => {
       if (!spot.photoId) return spot;
       const pid = (spot.photoId || "").toLowerCase();
+      const spotTitle = (spot.title || "").toLowerCase();
+
       const matched = sheetPhotosList.find((p) => {
         const idLower = (p.id || "").toLowerCase();
         const titleLower = (p.title || "").toLowerCase();
+
         if (idLower === pid) return true;
-        if (
-          pid === "tu_go" &&
-          (idLower === "c-05" || titleLower.includes("tủ gỗ"))
-        )
-          return true;
-        if (
-          pid === "bua_goi" &&
-          (idLower === "c-04" || titleLower.includes("bùa"))
-        )
-          return true;
-        if (
-          pid === "luoc_dinh_toc" &&
-          (idLower === "c-03" || titleLower.includes("lược"))
-        )
-          return true;
-        if (
-          pid === "canh_hoa" &&
-          (idLower === "c-02" ||
-            titleLower.includes("hoa xoan") ||
-            titleLower.includes("cánh hoa"))
-        )
+        if (spotTitle && (titleLower.includes(spotTitle) || spotTitle.includes(titleLower)))
           return true;
         return false;
       });

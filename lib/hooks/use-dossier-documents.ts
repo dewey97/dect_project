@@ -84,14 +84,14 @@ export function useDossierDocuments(caseId: string): DossierDataState {
   }, [normalizedCaseId])
 
   const findByTagCode = (tagCode: string): DbDossierDocument | undefined => {
-    const cleanTag = tagCode.trim().toUpperCase()
-    return documents.find(d => d.tag_code.toUpperCase() === cleanTag)
+    const cleanTag = tagCode.trim().toUpperCase().replace(/-/g, '')
+    return documents.find(d => d.tag_code.toUpperCase().replace(/-/g, '') === cleanTag)
   }
 
   const findMatchingDocument = (query: { code?: string; title?: string; id?: string }): DbDossierDocument | undefined => {
     if (!documents.length) return undefined
 
-    // 1. Tìm qua CASE_000_DOSSIER_MAP theo code (ví dụ '08-LK' -> 'A-19')
+    // 1. Tìm qua CASE_000_DOSSIER_MAP theo code (ví dụ '08-LK' -> 'A19')
     if (query.code) {
       const cleanCode = query.code.trim().toUpperCase()
       const mappedTag = CASE_000_DOSSIER_MAP[cleanCode] || CASE_000_DOSSIER_MAP[query.code.trim()]
@@ -123,47 +123,44 @@ export function useDossierDocuments(caseId: string): DossierDataState {
       }
     }
 
-    // 3. Tìm theo tên nhân vật trong tiêu đề
+    // 3. Tìm động theo tiêu đề và tên nhân vật trong danh mục hồ sơ
     if (query.title) {
-      const titleLower = query.title.toLowerCase()
-      // Nếu là Lời khai
-      if (titleLower.includes('lời khai') || titleLower.includes('hỏi cung')) {
-        const isLan2 = titleLower.includes('lần 2')
-        if (titleLower.includes('vũ')) {
-          return findByTagCode(isLan2 ? 'B-01' : 'A-19')
-        }
-        if (titleLower.includes('mai')) {
-          return findByTagCode('A-16')
-        }
-        if (titleLower.includes('hà')) {
-          return findByTagCode(isLan2 ? 'B-05' : 'A-21')
-        }
-        if (titleLower.includes('tùng')) {
-          return findByTagCode(isLan2 ? 'B-04' : 'E-02')
-        }
-        if (titleLower.includes('lụa')) {
-          return findByTagCode('A-13')
-        }
-        if (titleLower.includes('tiến')) {
-          return findByTagCode('A-14')
-        }
-        if (titleLower.includes('đạt')) {
-          return findByTagCode('E-04')
-        }
-        if (titleLower.includes('quán bia') || titleLower.includes('hùng')) {
-          return findByTagCode('B-02')
-        }
-      }
+      const titleLower = query.title.toLowerCase();
+      const isLan2 = titleLower.includes('lần 2');
+      const isLoiKhai = titleLower.includes('lời khai') || titleLower.includes('hỏi cung');
+      const isLyLich = titleLower.includes('lý lịch') || titleLower.includes('nhân thân');
 
-      // Nếu là Lý lịch
-      if (titleLower.includes('lý lịch') || titleLower.includes('nhân thân')) {
-        if (titleLower.includes('vũ')) return findByTagCode('A-17')
-        if (titleLower.includes('mai')) return findByTagCode('A-15')
-        if (titleLower.includes('hà')) return findByTagCode('A-20')
-        if (titleLower.includes('tùng')) return findByTagCode('E-01')
-        if (titleLower.includes('đạt')) return findByTagCode('E-03')
-        if (titleLower.includes('khang')) return findByTagCode('A-03')
-      }
+      // Tìm tài liệu có subject_name xuất hiện trong tiêu đề
+      const matched = documents.find((d) => {
+        if (isLoiKhai && d.mode !== 'loi_khai') return false;
+        if (isLyLich && d.mode !== 'ly_lich') return false;
+
+        const subjName = (d.subject_name || '').toLowerCase().trim();
+        if (!subjName) return false;
+
+        // Trích xuất tên gọi (từ cuối cùng) và so khớp
+        const lastName = subjName.split(/\s+/).pop() || subjName;
+        const nameMatches =
+          titleLower.includes(subjName) ||
+          (lastName.length >= 2 && titleLower.includes(lastName));
+
+        if (!nameMatches) return false;
+
+        if (isLan2) {
+          const docTitle = ((d.content as any)?.title || '').toLowerCase();
+          const docNotes = ((d.content as any)?.ghi_chu || '').toLowerCase();
+          return (
+            docTitle.includes('lần 2') ||
+            docTitle.includes('bổ sung') ||
+            docNotes.includes('lần 2') ||
+            docNotes.includes('bổ sung')
+          );
+        }
+
+        return true;
+      });
+
+      if (matched) return matched;
     }
 
     return undefined
