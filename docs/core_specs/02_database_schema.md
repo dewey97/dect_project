@@ -1,7 +1,7 @@
 # Cấu trúc Cơ sở dữ liệu (Database Architecture)
 
 > **Hệ thống Database Supabase (PostgreSQL) — Kiến trúc Tinh gọn (5 Core Tables)**  
-> _Toàn bộ nội dung kịch bản, dòng thời gian, nhân vật, đáp án checkpoints và vật chứng vụ án được quản lý trực tiếp qua **Google Sheets Live CMS** (Xem chi tiết tại [`03_google_sheets_cms.md`](03_google_sheets_cms.md)). Database Supabase đóng vai trò lưu trữ User Identity, Session, System Settings và Analytics._
+> _Toàn bộ nội dung vụ án (nhân vật, checkpoint, đáp án, vật chứng, hồ sơ, điện thoại, bản đồ) lưu trong Supabase và biên tập qua Studio (`/studio/*`). Xem [`21_studio_authoring_guide.md`](21_studio_authoring_guide.md) cho bảng trường nhập ↔ cột DB._
 
 ---
 

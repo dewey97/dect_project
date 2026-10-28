@@ -12,7 +12,6 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
 - **⚙️ Technical Docs (Kỹ thuật hệ thống)**:
   - Hướng dẫn kỹ thuật hệ thống: [`docs/core_specs/01_technical_guide.md`](docs/core_specs/01_technical_guide.md)
   - Cơ sở dữ liệu: [`docs/core_specs/02_database_schema.md`](docs/core_specs/02_database_schema.md)
-  - Google Sheets Live CMS: [`docs/core_specs/03_google_sheets_cms.md`](docs/core_specs/03_google_sheets_cms.md)
   - Design System & UI/UX: [`docs/core_specs/04_ux_ui_design_system.md`](docs/core_specs/04_ux_ui_design_system.md)
   - Analytics & Tracking: [`docs/core_specs/05_analytics_tracking_spec.md`](docs/core_specs/05_analytics_tracking_spec.md)
   - CI/CD & VPS Deployment: [`docs/core_specs/06_cicd_deployment_guide.md`](docs/core_specs/06_cicd_deployment_guide.md)
@@ -22,7 +21,6 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
   - Financial & Founder Model: [`docs/core_specs/10_financial_founder_model.md`](docs/core_specs/10_financial_founder_model.md)
   - Figma Design Workflow & Integration: [`docs/core_specs/10_figma_design_workflow.md`](docs/core_specs/10_figma_design_workflow.md)
   - Group Play Realtime Architecture: [`docs/core_specs/11_group_play_realtime_spec.md`](docs/core_specs/11_group_play_realtime_spec.md)
-  - Group Play Implementation Plan: [`docs/core_specs/12_group_play_implementation_plan.md`](docs/core_specs/12_group_play_implementation_plan.md)
   - Architecture Hardening & Roadmap: [`docs/core_specs/13_architecture_hardening_and_roadmap.md`](docs/core_specs/13_architecture_hardening_and_roadmap.md)
   - Multi-Case Engine & Hybrid CMS: [`docs/core_specs/14_multi_case_engine_and_cms_architecture.md`](docs/core_specs/14_multi_case_engine_and_cms_architecture.md)
   - Cross-Case Phone Simulator Spec: [`docs/core_specs/15_cross_case_phone_simulator_spec.md`](docs/core_specs/15_cross_case_phone_simulator_spec.md)
