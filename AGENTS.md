@@ -1,6 +1,6 @@
 # Detective Case System (dect_project) — Workspace Agent Guidelines
 
-> **Dự án: dect_project** — Hệ thống game trinh thám điều tra tương tác, tài liệu chứng cứ vụ án và hồ sơ Google Docs / Live CMS.
+> **Dự án: dect_project** — Hệ thống game trinh thám điều tra tương tác, hồ sơ chứng cứ vụ án, dữ liệu trên Supabase và biên tập qua Studio.
 > _Kế thừa toàn bộ quy tắc Global từ `D:\code_world\AGENTS.md` (Strict Git Commit, Proposal-First, Code-Doc Sync)._
 
 ---
@@ -22,7 +22,6 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
   - Figma Design Workflow & Integration: [`docs/core_specs/10_figma_design_workflow.md`](docs/core_specs/10_figma_design_workflow.md)
   - Group Play Realtime Architecture: [`docs/core_specs/11_group_play_realtime_spec.md`](docs/core_specs/11_group_play_realtime_spec.md)
   - Architecture Hardening & Roadmap: [`docs/core_specs/13_architecture_hardening_and_roadmap.md`](docs/core_specs/13_architecture_hardening_and_roadmap.md)
-  - Multi-Case Engine & Hybrid CMS: [`docs/core_specs/14_multi_case_engine_and_cms_architecture.md`](docs/core_specs/14_multi_case_engine_and_cms_architecture.md)
   - Cross-Case Phone Simulator Spec: [`docs/core_specs/15_cross_case_phone_simulator_spec.md`](docs/core_specs/15_cross_case_phone_simulator_spec.md)
   - Detective Rating & Leaderboard Spec: [`docs/core_specs/16_detective_rating_and_leaderboard_spec.md`](docs/core_specs/16_detective_rating_and_leaderboard_spec.md)
   - Vector Map Engine & Studio Spec: [`docs/core_specs/17_vector_map_engine_and_studio_spec.md`](docs/core_specs/17_vector_map_engine_and_studio_spec.md)
@@ -44,27 +43,20 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
 Mọi sửa đổi liên quan đến nội dung vụ án phải đảm bảo tính đồng bộ 100% giữa 4 lớp tài liệu:
 
 - **Cốt truyện & Dòng thời gian**: Sự thật vụ án, timeline các nhân vật.
-- **Cơ chế giải đố & Checkpoints**: Luồng suy luận, điều kiện mở khóa manh mối trên Google Sheets.
+- **Cơ chế giải đố & Checkpoints**: Luồng suy luận, điều kiện mở khóa manh mối trong Checkpoint Studio (bảng `case_checkpoints`).
 - **Danh mục tổng thể vật chứng & Master Asset Table**: Đường dẫn tài liệu, mã chứng cứ, ảnh và file thoại.
-- **Bộ tài liệu Google Docs Master & PDF xuất bản (`public/documents/`)**: Hồ sơ pháp y, lời khai nhân chứng, lý lịch nghi phạm và biên bản hiện trường được xuất bản trực tiếp từ Google Docs vào web app.
+- **Bộ hồ sơ & tài liệu (Dossier Studio)**: Lý lịch, lời khai, biên bản và vật chứng (bảng `case_dossiers`, `dossier_documents`, `case_evidence`); file PDF/ảnh lưu ở Supabase Storage hoặc `public/documents/<case_id>/`.
 
 ---
 
-## 📑 2. Quy Trình Biên Soạn Google Docs & Xuất Bản PDF (Google Docs Live CMS Protocol)
+## 📑 2. Quy Trình Biên Soạn Nội Dung Vụ Án (Studio + Supabase)
 
-Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên bản hiện trường được quản lý tại **Master Google Doc**:
+Nguồn dữ liệu duy nhất của vụ án là **Supabase**; nơi biên tập duy nhất là **Studio** (`/studio/*`). Google Sheets không còn là CMS.
 
-1. **Biên soạn & Cập nhật nội dung**:
-   - Chỉnh sửa trực tiếp trên Document Tab tương ứng của file Master Google Docs (ID: `1pJxlZpfCfIbnQ0YGx3mvCUmYTRng7zLyDxJ2EggJkgc`).
-   - Cập nhật các điểm nút logic, tóm tắt manh mối cốt lõi (`core_content`) trên Google Sheets (không lưu trữ văn bản dài tràn lan trên Sheet).
-2. **Xuất bản PDF tự động vào Web App**:
-   - Chạy lệnh xuất bản PDF từ Google Docs về thư mục tĩnh của Web:
-     ```bash
-     npm run export:docs-pdf
-     ```
-   - Tự động tải và đồng bộ các file PDF tạo thành vào đúng thư mục đích: `public/documents/case_000/<phase>/`.
-3. **Đồng bộ hóa 2 chiều**:
-   - Dùng `npm run sync:docs-to-sheet` để đồng bộ metadata từ Google Docs về Google Sheets khi cần.
+1. **Thứ tự dựng vụ**: Cases → Checkpoints (nhân vật, checkpoint, bảng điều tra) → Dossier (hồ sơ, vật chứng, hiện trường 360) → Phone → Map. Chi tiết trường nhập ↔ cột DB: [`docs/core_specs/21_studio_authoring_guide.md`](docs/core_specs/21_studio_authoring_guide.md).
+2. **Kiểm tra trước khi xuất bản**: chạy Linter và Chơi thử trong Checkpoint Studio, rồi chuyển `cases.status` sang `PUBLISHED`.
+3. **Không sửa dữ liệu vụ án bằng SQL tay** trừ khi chủ dự án duyệt (migration có backup).
+4. **PDF cũ của case_000**: `npm run export:docs-pdf` vẫn xuất PDF từ Master Google Doc vào `public/documents/case_000/<phase>/` khi cần; vụ mới dùng Dossier Studio.
 
 ---
 
@@ -100,12 +92,12 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
 ## 🌐 6. Nguyên Tắc Trực Tuyến & Bộ Nhớ Đệm (Live-First & Cache Policy — No Static Hardcoded Fallback Rule)
 
 - **Mô hình Trực tuyến (Online-First)**: Hệ thống game hoạt động với giả định người chơi có kết nối internet để nạp vụ án và đồng bộ tiến độ.
-- **Tuyệt đối không nhồi nhét Mock/Hardcoded Fallback tĩnh**: Dữ liệu kịch bản, lời khai, dẫn truyện (narratives/epilogues), đáp án và sự kiện do Google Sheets Live CMS quản lý 100%. Không duy trì các mảng text cố định lỗi thời trong code vì sẽ gây lệch pha logic với kịch bản biên soạn của GM.
-- **Cơ chế Chống gián đoạn (In-memory & Client Cache)**: Khi đã fetch thành công một lần từ Live CMS, dữ liệu được giữ trong memory cache / client state. Trường hợp mạng chập chờn sau khi đã vào game, hệ thống tận dụng cache có sẵn. Nếu chưa có dữ liệu và lỗi mạng, hiển thị trạng thái đang đồng bộ/thử lại thay vì hiển thị kịch bản giả lập cũ.
+- **Tuyệt đối không nhồi nhét Mock/Hardcoded Fallback tĩnh**: Dữ liệu kịch bản, lời khai, dẫn truyện (narratives/epilogues), đáp án và sự kiện do Supabase quản lý 100% (biên tập qua Studio). Không duy trì các mảng text cố định lỗi thời trong code vì sẽ gây lệch pha logic với kịch bản biên soạn của GM.
+- **Cơ chế Chống gián đoạn (In-memory & Client Cache)**: Khi đã fetch thành công một lần từ Supabase, dữ liệu được giữ trong memory cache / client state. Trường hợp mạng chập chờn sau khi đã vào game, hệ thống tận dụng cache có sẵn. Nếu chưa có dữ liệu và lỗi mạng, hiển thị trạng thái đang đồng bộ/thử lại thay vì hiển thị kịch bản giả lập cũ.
 - **Quy Tắc Chống Màn Hình Đen Khi Render Bất Đồng Bộ (Zero-Black-Screen / Immediate-Transition Rule)**:
   - Khi người chơi ấn các nút bắt đầu / chuyển cảnh (ví dụ: `[ TRỐN TÌM ]`, mở Phase mới, xem Epilogue), giao diện **BẮT BUỘC PHẢI PHẢN HỒI VÀ RENDER NGAY LẬP TỨC** (`activeNarrative` / baseline monologue).
-  - **Tuyệt đối CẤM** render `null` hoặc để trống toàn bộ khung nhìn modal khi dữ liệu Live CMS đang trong trạng thái nạp ngầm (in-flight fetch) hoặc mạng có độ trễ.
-  - Phải luôn có baseline narrative fallback đồng bộ hoặc trạng thái typing tức thì, sau đó Live CMS tự động hydrate/cập nhật đè lên khi có dữ liệu mới từ GM.
+  - **Tuyệt đối CẤM** render `null` hoặc để trống toàn bộ khung nhìn modal khi dữ liệu Supabase đang trong trạng thái nạp ngầm (in-flight fetch) hoặc mạng có độ trễ.
+  - Phải luôn có baseline narrative fallback đồng bộ hoặc trạng thái typing tức thì, sau đó dữ liệu Supabase tự động hydrate/cập nhật đè lên khi có dữ liệu mới từ GM.
 
 ---
 
@@ -132,7 +124,7 @@ Toàn bộ nội dung văn bản hành chính, lời khai chi tiết và biên b
   - Bảng này **CÁCH LY HOÀN TOÀN** khỏi state, tiến trình phá án, modal nghiệp vụ và các node tương tác của gameplay thực tế (`MainInvestigationCanvas`).
   - **Tuyệt đối CẤM** gán nhầm hoặc kết nối logic game, ghim node tang vật động của Case #000 vào bảng Landing Page.
 - **Bảng Điều Tra Trong Game (`MainInvestigationCanvas`)**:
-  - Là không gian phá án chính thức, nhận dữ liệu động từ Google Sheets Live CMS, local state và checkpoint gameplay.
+  - Là không gian phá án chính thức, nhận dữ liệu động từ Supabase (Studio), local state và checkpoint gameplay.
   - Tang vật thiết bị (như túi đựng điện thoại `victim-phone`) hiển thị dưới dạng vật chứng thực tế độc lập: **tuyệt đối KHÔNG ghim đè thêm ghim pushpin 3D hay nối sợi chỉ đỏ** vào thiết bị tang vật. Node `Mở rộng điều tra` (`c0-pin-phone`) là giấy note nghiệp vụ riêng biệt, không được gán nhầm ảnh túi điện thoại vào node này.
 
 ---
@@ -155,7 +147,7 @@ Mọi tính năng, trang hoặc thành phần mới phải đảm bảo chạy �
    - Tuyệt đối không hardcode domain `http://localhost:3000` hay IP nội bộ trong client-side code hay API calls.
    - Luôn sử dụng đường dẫn tương đối (như `/api/...`, `/images/...`) hoặc biến môi trường `NEXT_PUBLIC_*`.
 5. **Đồng Bộ Dữ Liệu Thời Gian Thực & Cache (Consistent Live Fetch Policy)**:
-   - Tránh tình trạng local fetch mới nhưng production trả về cache cũ: Các route API đọc dữ liệu động (Google Sheets CMS, Supabase live tables) phải luôn có `export const dynamic = 'force-dynamic'` hoặc gắn headers `cache: 'no-store'`.
+   - Tránh tình trạng local fetch mới nhưng production trả về cache cũ: Các route API đọc dữ liệu động (Supabase live tables) phải luôn có `export const dynamic = 'force-dynamic'` hoặc gắn headers `cache: 'no-store'`.
 6. **Tiền Kiểm Tra Biên Dịch & Typecheck Bắt Buộc (Pre-Flight Verification Protocol)**:
    - **Tần suất & thời điểm**: Chỉ chạy `npm run lint` (`tsc --noEmit`) **1 lần duy nhất ở bước cuối cùng** trước khi thông báo hoàn tất tác vụ hoặc xin lệnh commit. Tuyệt đối **KHÔNG lạm dụng chạy liên tục** giữa các bước sửa mã nhỏ/đang debug dở để tránh làm chậm tiến độ và gây gián đoạn phiên làm việc.
    - Khi có thay đổi lớn liên quan đến cấu hình Next.js, routing, server actions hoặc build scripts: Phải chủ động kiểm tra hoặc khuyến nghị chạy `npm run build` cục bộ trước khi deploy.

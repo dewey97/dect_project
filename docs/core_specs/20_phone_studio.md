@@ -2,7 +2,7 @@
 
 > **Phạm vi:** Module quản trị `/studio/phone` cho phép biên tập thiết bị tang vật điện thoại (chassis iPhone/Android, lock screen, status bar, wallpaper, passcode), launcher 15 ứng dụng và toàn bộ chứng cứ số (tin nhắn, cuộc gọi ghi âm, danh bạ, ảnh thư viện, ghi chú, sao kê ngân hàng, lịch sử duyệt web) lưu trữ trực tiếp trên Supabase.
 >
-> **Trạng thái:** Runtime hỗ trợ Dual-source querying (ưu tiên đọc Supabase qua `/api/phone-data/*`, tự động fallback về Google Sheets `/api/phone` nếu chưa migrate).
+> **Trạng thái:** Runtime đọc 100% từ Supabase qua `/api/phone-data/*`. Fallback Google Sheets đã gỡ.
 
 ---
 
@@ -34,13 +34,7 @@ Hệ thống áp dụng cơ chế chuyển dịch an toàn, không làm gián đ
        ▼
 usePhoneData(tab, caseId)
        │
-       ├─► 1. Gọi /api/phone-data/[tab]?caseId=[caseId] (Supabase)
-       │      │
-       │      ├─ Có data (> 0 rows) ──► Trả về runtime render
-       │      └─ Rỗng / Lỗi / Chưa migrate
-       │             │
-       │             ▼
-       └─► 2. Fallback: Gọi /api/phone?tab=[tab]&caseId=[caseId] (Google Sheets)
+       └─► Gọi /api/phone-data/[tab]?caseId=[caseId] (Supabase) ──► runtime render
 ```
 
 ### Các Endpoint API:

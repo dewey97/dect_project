@@ -2,7 +2,7 @@
 
 > **Phạm vi:** Module quản trị `/studio/checkpoints` cho phép biên tập checkpoint, đáp án, gợi ý đa cấp, narrative và cấu hình AI check bằng form có cấu trúc, lưu vào Supabase.
 >
-> **Trạng thái:** Runtime đọc checkpoint trực tiếp từ Supabase (`case_checkpoints`) qua `/api/checkpoints`. Google Sheets chỉ còn quản lý `evidences`.
+> **Trạng thái:** Runtime đọc checkpoint trực tiếp từ Supabase (`case_checkpoints`) qua `/api/checkpoints`. Vật chứng đọc từ `case_evidence` (Dossier Studio). Không còn nguồn Google Sheets.
 
 ---
 
@@ -34,7 +34,7 @@ Checkpoint Studio thay thế thao tác biên tập bằng form:
 | :---------------- | :-------------------------------------------------------------------------------------------------------- |
 | Gameplay          | Supabase `public.case_checkpoints` → `/api/checkpoints` → `useStudioCheckpoints` → `toRuntimeCheckpoints` |
 | Checkpoint Studio | Supabase — cùng bảng, đọc/ghi qua server actions admin                                                    |
-| Vật chứng         | Google Sheets tab `evidences`                                                                             |
+| Vật chứng         | `case_evidence` (Dossier Studio) |
 
 Luồng runtime:
 
@@ -170,7 +170,7 @@ lib/types/database.ts                            # DbCaseCheckpoint
 app/api/checkpoints/route.ts                     # Runtime API, force-dynamic, no-store
 lib/hooks/use-studio-checkpoints.ts              # Fetch + memory cache 30s + dedupe
 lib/cms/checkpoint-runtime.ts                    # Map DB row → Checkpoint runtime
-lib/hooks/use-case-checkpoints.ts                # Ghép checkpoint Studio + evidences Sheet
+lib/hooks/use-case-checkpoints.ts                # Nạp checkpoint + vật chứng từ Supabase
 ```
 
 ### 4.1. Server actions
@@ -186,24 +186,6 @@ lib/hooks/use-case-checkpoints.ts                # Ghép checkpoint Studio + evi
 Mọi action gọi `requireAdminAuth()` trước khi thao tác Supabase.
 `saveCheckpoint` từ chối mọi draft có `type !== 'evidence_picker'` để tránh ghi đè dữ liệu loại khác.
 Update cũng từ chối đổi `checkpoint_id` và `case_id` của row đã tạo.
-
-### 4.2. Import dữ liệu Google Sheets
-
-Script [`scripts/import-checkpoints-to-supabase.mjs`](../scripts/import-checkpoints-to-supabase.mjs) đọc tab
-`<case_id>_checkpoints` (fallback `checkpoints`), bóc DSL bằng chính parser runtime, rồi sinh SQL upsert:
-
-```bash
-pnpm import:checkpoints
-# hoặc chọn vụ án khác (Node >= 22.6):
-node --experimental-strip-types scripts/import-checkpoints-to-supabase.mjs --case=case_001
-```
-
-- Kết quả ghi vào `.tmp/checkpoints-import.sql`; áp dụng bằng Supabase MCP `execute_sql` hoặc `psql`.
-- Upsert theo `(case_id, checkpoint_id)`, chạy lại nhiều lần không tạo bản ghi trùng.
-- Import **tất cả** loại checkpoint. Loại chưa có editor (`text_match_3`, `mcq`, `text`, ...) được lưu read-only:
-  form hiển thị dữ liệu nhưng khóa toàn bộ field và nút Lưu.
-- Script chỉ đọc Sheet và ghi SQL vào `.tmp/`; không ghi ngược Google Sheets.
-- Sau khi import, runtime đọc trực tiếp Supabase. Script không còn là nguồn runtime.
 
 ### 4.3. Quy tắc UX
 
