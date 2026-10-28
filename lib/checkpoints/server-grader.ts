@@ -1,5 +1,5 @@
 import "server-only";
-import { normalizeForMatch } from "@/lib/text";
+import { normalizeForMatch, toWords } from "@/lib/text";
 import { isAdminBypassCode } from "@/lib/cases/admin-bypass";
 import { isEvidenceMatching } from "@/lib/cases/clues";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
@@ -43,13 +43,6 @@ export interface GradeResult {
     alibi?: boolean;
     contradiction?: boolean;
   };
-}
-
-function toWords(str: string): string[] {
-  return normalizeForMatch(str)
-    .replace(/[^a-z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
 }
 
 function matchPhoneInput(value: string, validAnswers: string[]): boolean {

@@ -5,35 +5,17 @@ import type {
   EpilogueStoryRuntime,
 } from "@/lib/types";
 import type { CheckpointHintGroup } from "@/lib/types/checkpoint-studio";
+import { asString, asStringArray } from "@/lib/text";
 
 /**
  * Chuyển row `case_checkpoints` (Checkpoint Studio / Supabase) thành model
  * runtime `Checkpoint` mà gameplay đang dùng. Đây là nguồn duy nhất cho runtime;
- * không đọc lại tab `checkpoints` trên Google Sheets.
+ * nguồn duy nhất là bảng `case_checkpoints`.
  */
 
 export interface RuntimeCheckpointHint {
   group: CheckpointHintGroup;
   text: string;
-}
-
-function asString(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function asStringArray(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => (typeof item === "string" ? item.trim() : ""))
-      .filter(Boolean);
-  }
-  if (typeof value === "string") {
-    return value
-      .split(/[\n,|]+/)
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  return [];
 }
 
 function asHintGroup(value: unknown): CheckpointHintGroup {

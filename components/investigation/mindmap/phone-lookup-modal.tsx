@@ -22,15 +22,8 @@ import {
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
-import { normalizeForMatch } from "@/lib/text";
+import { normalizeForMatch, toWords } from "@/lib/text";
 import { verifyCheckpointOnServer } from "@/lib/checkpoints/client-verify";
-
-function toWords(str: string): string[] {
-  return normalizeForMatch(str)
-    .replace(/[^a-z0-9\s]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
-}
 
 function isPhoneMatch(val: string, validKeywords: string[]): boolean {
   if (isAdminBypassCode(val)) return true;

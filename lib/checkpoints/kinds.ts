@@ -9,6 +9,7 @@
  */
 
 import type { EpilogueStoryItem } from "@/lib/types/checkpoint-studio";
+import { asString, asStringArray } from "@/lib/text";
 
 // ---------------------------------------------------------------------------
 // 1. Kind enum & discriminated union
@@ -118,25 +119,6 @@ export type CheckpointConfig =
 // ---------------------------------------------------------------------------
 // 2. Parser: raw answer_config + kind → typed config
 // ---------------------------------------------------------------------------
-
-function asString(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function asStringArray(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => (typeof item === "string" ? item.trim() : ""))
-      .filter(Boolean);
-  }
-  if (typeof value === "string") {
-    return value
-      .split(/[\n,|]+/)
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  return [];
-}
 
 /** Parse answer_config JSONB thô thành typed config theo kind. */
 export function parseCheckpointConfig(

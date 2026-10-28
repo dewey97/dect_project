@@ -33,3 +33,39 @@ export function slugifyVietnamese(str: string): string {
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "");
 }
+
+/** Chuỗi đã trim, hoặc "" nếu không phải chuỗi. */
+export function asString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+/** Mảng chuỗi đã trim từ mảng hoặc chuỗi phân tách bằng xuống dòng, `,` hoặc `|`. */
+export function asStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value
+      .split(/[\n,|]+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+/** Trim, áp `transform`, bỏ rỗng và bỏ trùng (giữ thứ tự). */
+export function cleanList(values: string[], transform = (v: string) => v): string[] {
+  return Array.from(
+    new Set(values.map((v) => transform(v.trim())).filter(Boolean)),
+  );
+}
+
+/** Tách chuỗi đã chuẩn hóa thành các từ a-z0-9. */
+export function toWords(str: string): string[] {
+  return normalizeForMatch(str)
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+}

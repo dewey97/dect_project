@@ -1,12 +1,12 @@
 import type { DbCaseCheckpoint, BoardConfig } from "./database";
-import { slugifyVietnamese } from "@/lib/text";
+import { slugifyVietnamese, asStringArray, cleanList } from "@/lib/text";
 
 /**
  * Checkpoint Studio (Admin) — model biên tập có cấu trúc.
  *
  * Lưu ý: đây là model biên tập của Studio trên bảng `case_checkpoints`.
  * Runtime gameplay đọc cùng bảng qua `/api/checkpoints` và
- * `lib/cms/checkpoint-runtime.ts`; Google Sheets chỉ còn quản lý `evidences`.
+ * `lib/cms/checkpoint-runtime.ts`. Toàn bộ dữ liệu vụ án nằm trong database.
  */
 
 /**
@@ -161,21 +161,6 @@ function asString(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
 
-function asStringArray(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => (typeof item === "string" ? item.trim() : ""))
-      .filter(Boolean);
-  }
-  if (typeof value === "string") {
-    return value
-      .split(/[\n,|]+/)
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  return [];
-}
-
 function normalizeHintGroup(value: unknown): CheckpointHintGroup {
   return value === "motive" ||
     value === "alibi" ||
@@ -281,18 +266,6 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     aiInvalidCases: asStringArray(row.ai_invalid_cases),
     boardConfig: (row.board_config as BoardConfig) || {},
   };
-}
-
-function cleanList(values: string[]): string[] {
-  const seen = new Set<string>();
-  const result: string[] = [];
-  for (const value of values) {
-    const trimmed = value.trim();
-    if (!trimmed || seen.has(trimmed)) continue;
-    seen.add(trimmed);
-    result.push(trimmed);
-  }
-  return result;
 }
 
 /**

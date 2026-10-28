@@ -9,6 +9,7 @@ import type {
   CaseCharacterRole,
   DbCaseCharacter,
 } from "@/lib/types/database";
+import { cleanList } from "@/lib/text";
 
 const STUDIO_PATH = "/studio/characters";
 const KEY_PATTERN = /^[a-z0-9_]{1,40}$/;
@@ -32,12 +33,6 @@ export interface CaseCharacterDraft {
 
 type CharacterResult =
   { success: true; data: DbCaseCharacter } | { success: false; error: string };
-
-function cleanList(values: string[], transform = (v: string) => v): string[] {
-  return Array.from(
-    new Set(values.map((v) => transform(v.trim())).filter(Boolean)),
-  );
-}
 
 export async function getCharactersByCase(
   caseId: string,
