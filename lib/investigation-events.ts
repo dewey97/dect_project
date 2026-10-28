@@ -16,6 +16,7 @@ export const INVESTIGATION_EVENTS = {
   OPEN_BOARD: "open-board-modal",
   TOGGLE_BOARD: "toggle-board-modal",
   REFRESH_CANVAS_STATE: "refresh-canvas-state",
+  DOSSIER_UNLOCKED: "dossier-unlocked",
   OPEN_CANVAS_THEME: "open-canvas-theme-modal",
   OPEN_CANVAS_GUIDE: "open-canvas-guide-modal",
   OPEN_CANVAS_TOUR: "open-canvas-tour",

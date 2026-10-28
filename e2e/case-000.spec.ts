@@ -240,6 +240,10 @@ test.describe("case_000 baseline", () => {
     expect(
       JSON.parse((await storage(page, "solved_followups")) || "[]"),
     ).toContain("vu");
+    // Checkpoint câu hỏi phụ của Vũ có unlocksDossier = Bộ B.
+    await expect
+      .poll(async () => JSON.parse((await storage(page, "unlocked_dossiers")) || "[]"))
+      .toContain("bo_b");
   });
 
   test("Tùng: câu hỏi phụ trắc nghiệm chấm theo nhãn phương án", async ({
@@ -281,6 +285,10 @@ test.describe("case_000 baseline", () => {
     await answer.fill("120713");
     await tap(page, "CẬP NHẬT KẾT LUẬN");
     await expect.poll(() => storage(page, "followup_ha")).toBe("120713");
+    // Checkpoint câu hỏi phụ của Hà có unlocksDossier = Bộ C.
+    await expect
+      .poll(async () => JSON.parse((await storage(page, "unlocked_dossiers")) || "[]"))
+      .toContain("bo_c");
   });
 
   test("cáo trạng: sai bị can bị từ chối, đúng thì kết án", async ({

@@ -21,7 +21,8 @@ interface UseCaseDossiersResult {
   refetch: () => Promise<void>;
 }
 
-function getDossierSlot(d: DbCaseDossier, fallbackIdx: number): number {
+/** Slot (thứ tự mở) của bộ hồ sơ: `slot_index`, rồi suy từ key, rồi vị trí. */
+export function getDossierSlot(d: DbCaseDossier, fallbackIdx: number): number {
   if (typeof (d as any).slot_index === "number") return (d as any).slot_index;
   const key = (d.dossier_key || "").toLowerCase().trim();
   if (

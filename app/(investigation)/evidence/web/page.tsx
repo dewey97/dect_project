@@ -60,7 +60,13 @@ import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
 import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
-import { useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
+import { getDossierSlot, useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
+import {
+  getUnlockedDossiers,
+  getUnlockedPhase,
+  isDossierSlotOpen,
+  normalizeDossierRef,
+} from "@/lib/progress/case-progress";
 import { normalizeImageUrl } from "@/lib/utils";
 import {
   getStorageItem,
@@ -106,7 +112,9 @@ function WebEvidencePageContent() {
   const [isAudioMuted, setIsAudioMuted] = useState(detectiveAudio.isMuted);
 
   // Unlocked phase tracking (read from storage / boardgame progress)
-  const [unlockedPhase, setUnlockedPhase] = useState<number>(0);
+  // Tiến độ mở bộ hồ sơ (lib/progress/case-progress.ts); phase suy ra từ đây.
+  const [unlockedDossierRefs, setUnlockedDossierRefs] = useState<string[]>([]);
+  const [isIndictmentSolved, setIsIndictmentSolved] = useState(false);
   const [unlockedModalData, setUnlockedModalData] =
     useState<UnlockedModalData | null>(null);
 
@@ -122,6 +130,32 @@ function WebEvidencePageContent() {
 
   // Nạp danh mục các bộ hồ sơ từ bảng case_dossiers theo đồ thị vụ án (C1)
   const { dossiers, dossierOf, getPhaseForCode } = useCaseDossiers(caseId);
+
+  const refreshDossierProgress = useCallback(() => {
+    setUnlockedDossierRefs(getUnlockedDossiers(caseId));
+    setIsIndictmentSolved(
+      getStorageItem(caseStorageKey(caseId, "indictment_solved")) === "true",
+    );
+  }, [caseId]);
+  useEffect(() => {
+    refreshDossierProgress();
+  }, [refreshDossierProgress]);
+  useInvestigationEvent("DOSSIER_UNLOCKED", refreshDossierProgress);
+  useInvestigationEvent("REFRESH_CANVAS_STATE", refreshDossierProgress);
+
+  // Phase cao nhất đã mở = slot lớn nhất trong các bộ hồ sơ đang mở.
+  const unlockedPhase = useMemo(
+    () =>
+      getUnlockedPhase(
+        dossiers.map((dossier, idx) => ({
+          dossier,
+          slot: getDossierSlot(dossier, idx),
+        })),
+        unlockedDossierRefs,
+        isIndictmentSolved,
+      ),
+    [dossiers, unlockedDossierRefs, isIndictmentSolved],
+  );
 
   // Nạp danh mục chứng cứ & PDF per-case từ Supabase (M1 / WT-2 / WT-6)
   const {
@@ -531,36 +565,6 @@ function WebEvidencePageContent() {
       }
     }
 
-    // Check current unlocked phase from boardgame progress & graph unlocks (C1)
-    const solvedFollowups = getStorageJson<string[]>(
-      caseStorageKey(caseId, "solved_followups"),
-      [],
-    );
-    const isIndictmentSolved =
-      getStorageItem(caseStorageKey(caseId, "indictment_solved")) === "true";
-    const unlockedDossiers = getStorageJson<string[]>(
-      caseStorageKey(caseId, "unlocked_dossiers"),
-      [],
-    );
-
-    if (
-      isIndictmentSolved ||
-      unlockedDossiers.includes("ket_luan") ||
-      unlockedDossiers.includes("phase_4")
-    ) {
-      setUnlockedPhase(3);
-    } else if (
-      solvedFollowups.length >= 1 ||
-      unlockedDossiers.includes("bo_b") ||
-      unlockedDossiers.includes("bo_c") ||
-      unlockedDossiers.includes("phase_2") ||
-      unlockedDossiers.includes("phase_3")
-    ) {
-      setUnlockedPhase(2);
-    } else {
-      setUnlockedPhase(1);
-    }
-
     const savedCollapsed = getStorageItem("web_dossier_collapsed");
     if (savedCollapsed === "true") {
       setIsDossierCollapsed(true);
@@ -591,64 +595,25 @@ function WebEvidencePageContent() {
       if (!key || key === "all" || key === "evidence" || key === "unassigned") {
         return true;
       }
-      const unlockedDossiers = getStorageJson<string[]>(
-        caseStorageKey(caseId, "unlocked_dossiers"),
-        [],
-      );
-      if (unlockedDossiers.includes(key)) {
-        return true;
-      }
-
-      // Tìm dossier theo key để xác định slot index
-      const matched = dossiers.find(
+      const idx = dossiers.findIndex(
         (d) =>
           (d.dossier_key || "").toLowerCase().trim() ===
           key.toLowerCase().trim(),
       );
-      const slotIndex = matched
-        ? typeof (matched as any).slot_index === "number"
-          ? (matched as any).slot_index
-          : key === "ban_dau"
-            ? 0
-            : key === "bo_a"
-              ? 1
-              : key === "bo_b"
-                ? 2
-                : key === "bo_c"
-                  ? 3
-                  : key === "ket_luan"
-                    ? 4
-                    : 0
-        : key === "ban_dau"
-          ? 0
-          : key === "bo_a"
-            ? 1
-            : key === "bo_b"
-              ? 2
-              : key === "bo_c"
-                ? 3
-                : key === "ket_luan"
-                  ? 4
-                  : -1;
-
-      // Hỗ trợ tiến trình cũ dạng phase_N
-      if (slotIndex >= 0 && unlockedDossiers.includes(`phase_${slotIndex}`)) {
-        return true;
+      if (idx < 0) {
+        return (
+          isIndictmentSolved ||
+          unlockedDossierRefs.includes(normalizeDossierRef(key))
+        );
       }
-
-      // Slot 0 (ban đầu) và slot 1 (bộ A) mặc định mở đầu game
-      if (slotIndex === 0 || slotIndex === 1) {
-        return true;
-      }
-
-      // Mở khóa theo tiến trình
-      if (slotIndex === 2 && unlockedPhase >= 2) return true;
-      if (slotIndex === 3 && unlockedPhase >= 2) return true;
-      if (slotIndex === 4 && unlockedPhase >= 3) return true;
-
-      return false;
+      return isDossierSlotOpen(
+        dossiers[idx],
+        getDossierSlot(dossiers[idx], idx),
+        unlockedDossierRefs,
+        isIndictmentSolved,
+      );
     },
-    [caseId, dossiers, unlockedPhase],
+    [dossiers, unlockedDossierRefs, isIndictmentSolved],
   );
 
   // Tự động chọn tài liệu đầu tiên khi nạp xong dữ liệu nếu chưa có mục nào được chọn

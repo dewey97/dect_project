@@ -146,6 +146,13 @@ Biên tập hồ sơ giấy như tài liệu thật, trên một mặt bàn có 
 
 Bộ hồ sơ được mở khóa bởi checkpoint qua `answer_config.unlocksDossier`.
 
+Luật mở khóa khi chơi (`lib/progress/case-progress.ts`):
+- Bộ ở slot 0 và 1 (hồ sơ ban đầu, bộ đầu tiên) mở từ đầu.
+- Người chơi giải đúng một checkpoint thì server trả `unlocksDossier`; game mở bộ có `dossier_key` hoặc `title` khớp giá trị đó (so khớp không dấu, không phân biệt hoa thường: `Bộ B` = `bo_b`).
+- Nộp cáo trạng đúng thì mở mọi bộ còn lại.
+- Phase hiển thị = slot lớn nhất trong các bộ đang mở. Phòng chơi nhóm đồng bộ danh sách bộ đã mở (`unlockedDossiers` trong state phòng).
+- Checkpoint không điền `unlocksDossier` thì không mở bộ nào. Muốn một bộ mở sau một câu hỏi, phải điền ô này.
+
 **Tài liệu (`dossier_documents`, `mode` = loại):**
 
 | Loại                                    | Trường                                                                                                                            | Lưu ở                      |

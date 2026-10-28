@@ -4,6 +4,12 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-28]
 
+### Mở bộ hồ sơ theo `unlocksDossier` (SPEC-22 GĐ5)
+
+- Giải đúng checkpoint có `unlocksDossier` thì mở bộ hồ sơ tương ứng (`lib/progress/case-progress.ts`). Trước đây giá trị này bị bỏ qua và phase mở theo số câu hỏi phụ đã giải (Bộ B và Bộ C mở cùng lúc).
+- Khay hồ sơ web và app Ảnh dùng chung luật; bỏ key `unlocked_phase` không ai ghi và nhánh "hộp thiếc" riêng của Case #000.
+- Phòng chơi nhóm đồng bộ `unlockedDossiers`; tiến độ cũ được dựng lại từ câu hỏi phụ / tra SĐT đã giải.
+
 ### SPEC-22 GĐ6: cấu trúc thư mục
 
 - `types/` gộp vào `lib/types/`; `components/admin/evidence-studio/` chuyển vào `components/admin/dossier-studio/evidence/`.

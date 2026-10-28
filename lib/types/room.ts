@@ -47,6 +47,8 @@ export interface RoomInvestigationState {
   phoneInputs: Record<string, string>;
   investigatedSuspects: string[];
   solvedFollowups: string[];
+  /** Bộ hồ sơ đã mở (ref chuẩn hóa, xem lib/progress/case-progress.ts). */
+  unlockedDossiers?: string[];
   reinvestigateOpened: boolean;
   indictmentSolved: boolean;
   solvedCulprit: string | null;

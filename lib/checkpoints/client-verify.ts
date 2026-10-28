@@ -3,7 +3,11 @@
  *
  * Chấm điểm chỉ diễn ra ở server; client không giữ đáp án.
  * Khi mất mạng hoặc lỗi server, trả về `success: false` để modal báo thử lại.
+ * Chấm đúng và checkpoint có `unlocksDossier` thì mở bộ hồ sơ đó ngay tại đây,
+ * để mọi modal dùng chung một đường mở khóa.
  */
+
+import { unlockDossiers } from "@/lib/progress/case-progress";
 
 export const VERIFY_UNAVAILABLE_MESSAGE =
   "Không kết nối được máy chủ chấm điểm. Vui lòng thử lại sau giây lát.";
@@ -56,6 +60,9 @@ export async function verifyCheckpointOnServer(
     }
 
     const json = await res.json();
+    if (json.correct && json.unlocksDossier) {
+      unlockDossiers(payload.caseId, [json.unlocksDossier]);
+    }
     return {
       success: true,
       correct: Boolean(json.correct),

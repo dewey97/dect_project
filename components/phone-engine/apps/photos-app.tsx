@@ -15,6 +15,12 @@ import { cn, normalizeImageUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { getActiveCaseId } from "@/lib/cases/case-characters";
+import { getDossierSlot, useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
+import { getStorageItem } from "@/lib/storage";
+import {
+  getUnlockedDossiers,
+  getUnlockedPhase,
+} from "@/lib/progress/case-progress";
 import type { Photo } from "@/lib/types";
 
 interface PhotoItem {
@@ -37,40 +43,25 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
   const [showExifInfo, setShowExifInfo] = useState(false);
 
   const { data: rawPhotos, loading, error, refetch } = usePhoneData("photos");
-  const [unlockedPhase, setUnlockedPhase] = useState<number>(0);
-  const [unlockedDossiers, setUnlockedDossiers] = useState<string[]>([]);
-  const [isLegacyBoxUnlocked, setIsLegacyBoxUnlocked] = useState(false);
-
+  // Ảnh theo phase mở cùng bộ hồ sơ (lib/progress/case-progress.ts).
+  const caseId = getActiveCaseId() || "";
+  const { dossiers } = useCaseDossiers(caseId);
+  const [unlockedRefs, setUnlockedRefs] = useState<string[]>([]);
+  const [isIndictmentSolved, setIsIndictmentSolved] = useState(false);
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const activeCase = getActiveCaseId();
-      const phaseNum = Number(
-        localStorage.getItem(caseStorageKey(activeCase, "unlocked_phase")) || 0,
-      );
-      setUnlockedPhase(phaseNum);
-
-      try {
-        const dossiers = JSON.parse(
-          localStorage.getItem(
-            caseStorageKey(activeCase, "unlocked_dossiers"),
-          ) || "[]",
-        );
-        if (Array.isArray(dossiers)) setUnlockedDossiers(dossiers);
-      } catch {
-        setUnlockedDossiers([]);
-      }
-
-      const legacyUnlocked = Boolean(
-        localStorage.getItem(
-          caseStorageKey(activeCase, "followup_ha_password"),
-        ) ||
-        localStorage.getItem(
-          caseStorageKey(activeCase, "followup_ha"),
-        ) === "solved",
-      );
-      setIsLegacyBoxUnlocked(legacyUnlocked);
-    }
-  }, []);
+    setUnlockedRefs(getUnlockedDossiers(caseId));
+    setIsIndictmentSolved(
+      getStorageItem(caseStorageKey(caseId, "indictment_solved")) === "true",
+    );
+  }, [caseId]);
+  const unlockedPhase = getUnlockedPhase(
+    dossiers.map((dossier, idx) => ({
+      dossier,
+      slot: getDossierSlot(dossier, idx),
+    })),
+    unlockedRefs,
+    isIndictmentSolved,
+  );
 
   const photos: PhotoItem[] = rawPhotos
     .filter((item: Record<string, unknown>) =>
@@ -91,19 +82,7 @@ export function PhotosApp({ onBackToHome }: PhotosAppProps) {
             ? (item.metadata as any).phase
             : 0;
 
-      if (itemPhase > 0) {
-        if (unlockedPhase >= itemPhase) return true;
-        if (
-          itemPhase === 3 &&
-          (unlockedDossiers.includes("bo_c") ||
-            unlockedDossiers.includes("Bộ C") ||
-            isLegacyBoxUnlocked)
-        ) {
-          return true;
-        }
-        return false;
-      }
-      return true;
+      return itemPhase <= unlockedPhase;
     })
     .map((item: Record<string, unknown>, idx: number) => ({
       id: String(

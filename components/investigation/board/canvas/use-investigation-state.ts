@@ -15,10 +15,20 @@ import {
   getStorageJson,
   setStorageJson,
 } from "@/lib/storage";
-import { caseStorageKey, clearCaseProgress } from "@/lib/cases/case-id";
+import {
+  caseStorageKey,
+  clearCaseProgress,
+  normalizeCaseId,
+} from "@/lib/cases/case-id";
 import { getActiveVictim, isVictimReference } from "@/lib/cases/case-characters";
 import { detectiveAudio } from "@/lib/investigation-audio";
 import { emitInvestigationEvent, useInvestigationEvent } from "@/lib/investigation-events";
+import { isAnswerKind } from "@/lib/checkpoints/kinds";
+import {
+  getUnlockedDossiers,
+  unlockDossiers,
+  type DossierUnlockedDetail,
+} from "@/lib/progress/case-progress";
 
 export interface SuspectItem {
   id: string;
@@ -148,6 +158,49 @@ export function useInvestigationState(opts?: {
   useInvestigationEvent("REFRESH_CANVAS_STATE", () => {
     reloadProgress();
   });
+
+  // Dựng lại bộ hồ sơ đã mở từ checkpoint đã giải (tiến độ lưu trước khi có
+  // cơ chế unlocksDossier, hoặc giải ở thiết bị khác trong phòng).
+  useEffect(() => {
+    if (checkpoints.length === 0) return;
+    const refs: (string | undefined)[] = [];
+    if (phoneLookupSuccess) {
+      checkpoints
+        .filter((cp) => cp.kind === "phone_lookup")
+        .forEach((cp) => refs.push(cp.unlocksDossier));
+    }
+    for (const culprit of solvedFollowupQuestions) {
+      checkpoints
+        .filter(
+          (cp) =>
+            isAnswerKind(cp.kind) &&
+            (cp.subjectKey === culprit || cp.followupOf === culprit),
+        )
+        .forEach((cp) => refs.push(cp.unlocksDossier));
+    }
+    unlockDossiers(caseId, refs);
+  }, [caseId, checkpoints, phoneLookupSuccess, solvedFollowupQuestions]);
+
+  // Phòng chơi nhóm: phát bộ hồ sơ mới mở lên phòng, nhận bộ do đồng đội mở.
+  useInvestigationEvent("DOSSIER_UNLOCKED", (e) => {
+    const detail = e.detail as DossierUnlockedDetail | undefined;
+    if (
+      !roomCode ||
+      !detail ||
+      detail.fromRoom ||
+      normalizeCaseId(detail.caseId) !== normalizeCaseId(caseId)
+    )
+      return;
+    const merged = Array.from(
+      new Set([...(roomState.unlockedDossiers || []), ...getUnlockedDossiers(caseId)]),
+    );
+    syncUpdate({ unlockedDossiers: merged }, "đã mở khóa bộ hồ sơ mới");
+  });
+
+  useEffect(() => {
+    if (!roomCode || !roomState.unlockedDossiers?.length) return;
+    unlockDossiers(caseId, roomState.unlockedDossiers, { fromRoom: true });
+  }, [caseId, roomCode, roomState.unlockedDossiers]);
 
   // Sync state when in a group room
   useEffect(() => {
