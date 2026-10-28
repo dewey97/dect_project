@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { X, ExternalLink, FolderOpen } from "lucide-react";
-import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
+import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { EvidenceDetailInspector } from "@/components/investigation/evidence/evidence-detail-inspector";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import { PhoneSimulator } from "@/components/phone-engine/phone-simulator";

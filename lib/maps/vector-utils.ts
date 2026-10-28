@@ -1,4 +1,4 @@
-import type { Point, MapVectorData, WaterFeature, RoadFeature, RailwayFeature, ZoneFeature, PoiFeature, LabelFeature, PoiCategory } from '@/types/map-vector'
+import type { Point, MapVectorData, WaterFeature, RoadFeature, RailwayFeature, ZoneFeature, PoiFeature, LabelFeature, PoiCategory } from '@/lib/types/map-vector'
 import type { CaseLocation, LocationCategory } from '@/lib/case-locations-data'
 
 /**
@@ -196,7 +196,7 @@ export function getEmptyMapVectorData(caseId: string): MapVectorData {
   }
 }
 
-import { canvasXYToLatLng } from '@/lib/map-routing-engine'
+import { canvasXYToLatLng } from '@/lib/maps/routing-engine'
 
 /**
  * Transform a POI from Vector Map Studio to a standard CaseLocation for the phone app

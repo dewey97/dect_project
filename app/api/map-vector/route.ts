@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { MapVectorData } from "@/types/map-vector";
+import type { MapVectorData } from "@/lib/types/map-vector";
 import { createClient } from "@/lib/supabase/server";
 
 // Module-level in-process cache: avoids re-reading from database on every request (TTL: 10 minutes)

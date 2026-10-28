@@ -72,7 +72,7 @@ import type {
   SelectedView,
 } from "./evidence-types";
 import type { DbDossierDocument } from "@/lib/actions/dossier-actions";
-import type { LoiKhaiData, LyLichData } from "@/types/dossier";
+import type { LoiKhaiData, LyLichData } from "@/lib/types/dossier";
 import { DossierLoiKhaiSheet } from "@/components/admin/dossier-studio/dossier-loi-khai-sheet";
 import { DossierLyLichSheet } from "@/components/admin/dossier-studio/dossier-ly-lich-sheet";
 import {

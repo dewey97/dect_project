@@ -19,9 +19,9 @@ import {
   type RouteResult,
   type TransportMode
 } from '@/lib/case-locations-data'
-import { calculateVectorRoute, METERS_PER_PIXEL } from '@/lib/map-routing-engine'
-import type { MapVectorData } from '@/types/map-vector'
-import { transformPoiToCaseLocation } from '@/lib/map-vector-utils'
+import { calculateVectorRoute, METERS_PER_PIXEL } from '@/lib/maps/routing-engine'
+import type { MapVectorData } from '@/lib/types/map-vector'
+import { transformPoiToCaseLocation } from '@/lib/maps/vector-utils'
 import { VectorMapCanvas } from './vector-map-canvas'
 
 interface MapsAppProps {

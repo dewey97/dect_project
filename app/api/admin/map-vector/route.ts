@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { MapVectorData } from "@/types/map-vector";
+import type { MapVectorData } from "@/lib/types/map-vector";
 import { denyIfNotAdmin } from "@/lib/security/admin-route-guard";
 import { createClient } from "@/lib/supabase/server";
 

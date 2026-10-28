@@ -25,6 +25,18 @@ const nextConfig = {
         destination: '/studio',
         permanent: true,
       },
+      // Studio Nhân vật gộp vào Checkpoint Studio, Evidence Studio gộp vào Dossier Studio.
+      // Query `?case=` được giữ nguyên khi chuyển hướng.
+      {
+        source: '/studio/characters',
+        destination: '/studio/checkpoints',
+        permanent: true,
+      },
+      {
+        source: '/studio/evidence',
+        destination: '/studio/dossier',
+        permanent: true,
+      },
     ]
   },
   async headers() {

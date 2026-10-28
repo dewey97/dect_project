@@ -4,6 +4,13 @@ All notable changes to the Detective Case System (dect_project) will be document
 
 ## [2026-10-28]
 
+### SPEC-22 GĐ6: cấu trúc thư mục
+
+- `types/` gộp vào `lib/types/`; `components/admin/evidence-studio/` chuyển vào `components/admin/dossier-studio/evidence/`.
+- Engine bản đồ gom về `lib/maps/` (`routing-engine`, `canvas-renderer`, `vector-utils`, `simplify-polyline`).
+- `components/investigation/mindmap/` đổi tên thành `components/investigation/board/`.
+- `/studio/characters` và `/studio/evidence` chuyển hướng bằng `redirects` trong `next.config.mjs` thay vì page riêng.
+
 ### SPEC-22 GĐ4 và dọn tiếp
 
 - Mã bypass admin chỉ có hiệu lực ở dev hoặc với session admin.

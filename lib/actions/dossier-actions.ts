@@ -7,7 +7,7 @@ import type {
   PaperConfig,
   LoiKhaiData,
   LyLichData,
-} from "@/types/dossier";
+} from "@/lib/types/dossier";
 import { requireAdminAuth } from "@/lib/auth/admin";
 
 export interface DbDossierDocument {

@@ -43,7 +43,7 @@ Tiến độ (2026-10-28): B0–B25 xong; dữ liệu vụ án 100% trên Supaba
 - **Storage tiến trình:** `caseStorageKey(caseId, key)`. case_000 giữ key không tiền tố; vụ khác `<slug>::<key>`.
 - **Nhân vật:** `CaseCharactersProvider` nạp `/api/characters` trước khi render bàn điều tra.
 - **Quyền admin:** `requireAdminAuth()` / `checkIsAdmin()` ở `lib/auth/admin.ts` (server-only). Route Handler dùng `denyIfNotAdmin()` (`lib/security/admin-route-guard.ts`). RLS dùng `private.is_admin()`.
-- **Bảng điều tra:** `useBoardModel` (`components/investigation/mindmap/canvas/use-board-model.ts`) dùng chung cho Studio và gameplay; vị trí ở `boardgame_pins` (desktop + `mobile_x/mobile_y`). Danh sách nút ghim ẩn `[data-pin-id]` phục vụ bàn phím, trình đọc màn hình và E2E — **không xóa**.
+- **Bảng điều tra:** `useBoardModel` (`components/investigation/board/canvas/use-board-model.ts`) dùng chung cho Studio và gameplay; vị trí ở `boardgame_pins` (desktop + `mobile_x/mobile_y`). Danh sách nút ghim ẩn `[data-pin-id]` phục vụ bàn phím, trình đọc màn hình và E2E — **không xóa**.
 - **Chấm điểm:** server (`lib/checkpoints/server-grader.ts`, `/api/checkpoints/verify`), so đáp án theo giá trị đã normalize.
 - **Sẵn sàng cho test:** trang Studio gắn `data-studio-ready="true"` khi tải xong và không đang lưu; bảng gameplay gắn `data-board-ready`.
 

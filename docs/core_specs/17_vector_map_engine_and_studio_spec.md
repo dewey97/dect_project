@@ -21,7 +21,7 @@ Trước phiên bản 2.0.0, ứng dụng Bản đồ trên điện thoại nạ
 
 ## 🏛️ 2. Kiến Trúc Phân Lớp Vector (Multi-Layer Vector Hierarchy)
 
-Dữ liệu bản đồ được chuẩn hóa theo mô hình `MapVectorData` (`types/map-vector.ts`), lưu trữ dưới dạng cấu trúc phân cấp tuần tự từ lớp nền đến lớp tương tác:
+Dữ liệu bản đồ được chuẩn hóa theo mô hình `MapVectorData` (`lib/types/map-vector.ts`), lưu trữ dưới dạng cấu trúc phân cấp tuần tự từ lớp nền đến lớp tương tác:
 
 ```mermaid
 graph TD
@@ -48,7 +48,7 @@ graph TD
 
 ## 📐 3. Thuật Toán Hình Học & Đường Cong Tự Nhiên
 
-Được hiện thực hóa trong thư viện `lib/map-vector-utils.ts`:
+Được hiện thực hóa trong thư viện `lib/maps/vector-utils.ts`:
 
 ### 3.1. Thuật toán Catmull-Rom sang Cubic Bezier (`pointsToSvgPath`)
 Để bờ sông Hồng và các cung đường lớn không bị gấp khúc dạng đa giác gãy, hệ thống chuyển đổi chuỗi điểm điều khiển $P_i$ thành các đoạn cong bậc ba Bezier với tiếp tuyến trơn mượt:

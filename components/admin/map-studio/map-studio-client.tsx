@@ -56,13 +56,13 @@ import type {
   PoiFeature,
   PoiCategory,
   LabelFeature,
-} from "@/types/map-vector";
+} from "@/lib/types/map-vector";
 import {
   snapPoint,
   getEmptyMapVectorData,
   pointsToSvgPath,
-} from "@/lib/map-vector-utils";
-import { simplifyPolyline } from "@/lib/geometry/simplify-polyline";
+} from "@/lib/maps/vector-utils";
+import { simplifyPolyline } from "@/lib/maps/simplify-polyline";
 import {
   POI_CATEGORY_CONFIG,
   MemoWaterFeature,

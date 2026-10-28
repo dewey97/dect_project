@@ -20,10 +20,10 @@ import {
 import { BOARD_ASPECT } from "@/components/investigation/hero-interactive/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
-import { CustomPinModal } from "@/components/investigation/mindmap/custom-pin-modal";
-import { AddSuspectModal } from "@/components/investigation/mindmap/add-suspect-modal";
-import { IndictmentModal } from "@/components/investigation/mindmap/indictment-modal";
-import { PhoneLookupModal } from "@/components/investigation/mindmap/phone-lookup-modal";
+import { CustomPinModal } from "@/components/investigation/board/custom-pin-modal";
+import { AddSuspectModal } from "@/components/investigation/board/add-suspect-modal";
+import { IndictmentModal } from "@/components/investigation/board/indictment-modal";
+import { PhoneLookupModal } from "@/components/investigation/board/phone-lookup-modal";
 
 const ReinvestigationModal = nextDynamic(
   () =>

@@ -10,8 +10,8 @@ import type {
   PoiFeature,
   LabelFeature,
   PoiCategory
-} from '@/types/map-vector'
-import { pointsToSvgPath, generateRailwayPaths } from '@/lib/map-vector-utils'
+} from '@/lib/types/map-vector'
+import { pointsToSvgPath, generateRailwayPaths } from '@/lib/maps/vector-utils'
 import { cn } from '@/lib/utils'
 
 export const POI_CATEGORY_CONFIG: Record<

@@ -92,7 +92,7 @@ Sử dụng 2 họ font chính:
 - **Mở rộng linh hoạt (Expanded State)**: Khi người chơi click chọn một tài liệu, tấm thẻ bung rộng với viền amber nổi bật (`#d9a066`), đổ bóng đa tầng (`shadow-[0_8px_24px_rgba(0,0,0,0.7)]`), hiện trích yếu và nút gọi hành động mở đọc toàn văn hồ sơ.
 
 ### 2. Sổ Tay Trinh Thám Lật Trang 3 Tầng (Detective Flip Notebook Modal):
-Áp dụng tại `components/investigation/mindmap/gameplay-guide-modal.tsx`:
+Áp dụng tại `components/investigation/board/gameplay-guide-modal.tsx`:
 - **Cấu trúc lật sách (Book Page Flipping)**: Mô phỏng cuốn sổ tay bìa da/giấy bồi ghi chép nghiệp vụ của điều tra viên kỳ cựu với 3 trang nội dung chuyên sâu:
   - **Trang 1 / 3 (Quy Trình Nghiệp Vụ)**: 4 bước điều tra cốt lõi (Rà soát hiện trường ➔ Bóc tách lời khai ➔ Đối chiếu mâu thuẫn ➔ Kết luận điều tra).
   - **Trang 2 / 3 (Sơ Đồ Manh Mối)**: Giải thích hệ thống đường nối chỉ đỏ, logic liên kết vật chứng và cách suy luận từ các mẩu tin nhắn điện thoại.

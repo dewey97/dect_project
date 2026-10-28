@@ -4,7 +4,7 @@
  * Tỉ lệ khoảng cách thực tế: 1px ≈ 1.70 mét (590px ≈ 1.0 km)
  */
 
-import type { Point, RoadFeature, MapVectorData } from '@/types/map-vector'
+import type { Point, RoadFeature, MapVectorData } from '@/lib/types/map-vector'
 import type { CaseLocation, RouteResult, RouteStep, TransportMode } from '@/lib/case-locations-data'
 
 export const BBOX_SOUTH = 21.010

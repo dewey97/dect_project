@@ -2,7 +2,7 @@
 
 import React from "react";
 import { InvestigationMobileNav } from "@/components/investigation/evidence/investigation-mobile-nav";
-import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
+import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import type {
   CombinedItem,

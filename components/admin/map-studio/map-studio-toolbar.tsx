@@ -27,7 +27,7 @@ import type {
   PoiCategory,
   Point,
   MapVectorData,
-} from "@/types/map-vector";
+} from "@/lib/types/map-vector";
 import { POI_CATEGORY_CONFIG } from "./map-features";
 
 // =============================================================================

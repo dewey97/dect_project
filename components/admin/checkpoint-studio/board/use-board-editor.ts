@@ -13,7 +13,7 @@ import {
   saveBoardgamePinPositions,
   type BoardNodeDraft,
 } from "@/lib/actions/board-actions";
-import { useBoardModel } from "@/components/investigation/mindmap/canvas/use-board-model";
+import { useBoardModel } from "@/components/investigation/board/canvas/use-board-model";
 import { toast } from "@/components/ui/toast";
 
 export interface BoardEditorSnapshot {

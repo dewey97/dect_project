@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { cn } from '@/lib/utils'
-import type { DossierMode, LoiKhaiData, LyLichData } from '@/types/dossier'
+import type { DossierMode, LoiKhaiData, LyLichData } from '@/lib/types/dossier'
 import type { DbDossierDocument } from '@/lib/actions/dossier-actions'
 import type { DbCaseEvidence } from '@/lib/types/database'
 import {
@@ -16,7 +16,7 @@ import {
   ChevronDown,
   FolderArchive,
 } from 'lucide-react'
-import { EvidenceForm } from '@/components/admin/evidence-studio/evidence-form'
+import { EvidenceForm } from '@/components/admin/dossier-studio/evidence/evidence-form'
 
 interface DossierStudioSidebarProps {
   caseId: string

@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react'
 import { MoveUp, MoveDown, Plus, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { LoiKhaiData, PaperConfig, QABlock } from '@/types/dossier'
+import type { LoiKhaiData, PaperConfig, QABlock } from '@/lib/types/dossier'
 import type { DbDossierDocument } from '@/lib/actions/dossier-actions'
 
 interface DossierLoiKhaiSheetProps {

@@ -14,7 +14,7 @@ import type {
   QABlock,
   LoiKhaiData,
   LyLichData,
-} from "@/types/dossier";
+} from "@/lib/types/dossier";
 import {
   getDossierDocuments,
   reorderDossierDocuments,
@@ -46,7 +46,7 @@ import { DossierLoiKhaiSheet } from "./dossier-loi-khai-sheet";
 import { DossierLyLichSheet } from "./dossier-ly-lich-sheet";
 import { DossierStudioSidebar } from "./dossier-studio-sidebar";
 import { DossierEvidenceCard } from "./dossier-evidence-card";
-import { Scene360ConfigModal } from "@/components/admin/evidence-studio/scene-360-config-modal";
+import { Scene360ConfigModal } from "@/components/admin/dossier-studio/evidence/scene-360-config-modal";
 import { UserCheck, FileText, Camera, Plus, X } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 

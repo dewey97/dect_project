@@ -6,7 +6,7 @@
  * Provides smooth 60-120 FPS panning & zooming by bypassing DOM/SVG rasterization entirely.
  */
 
-import type { Point, MapVectorData, RoadFeature } from '@/types/map-vector'
+import type { Point, MapVectorData, RoadFeature } from '@/lib/types/map-vector'
 
 export interface ViewportBox {
   minX: number

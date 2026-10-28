@@ -3,7 +3,7 @@
 import React from 'react'
 import { Image as ImageIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { LyLichData, PaperConfig } from '@/types/dossier'
+import type { LyLichData, PaperConfig } from '@/lib/types/dossier'
 import type { DbDossierDocument } from '@/lib/actions/dossier-actions'
 
 interface DossierLyLichSheetProps {

@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { MainInvestigationCanvas } from '@/components/investigation/mindmap/main-investigation-canvas'
+import { MainInvestigationCanvas } from '@/components/investigation/board/main-investigation-canvas'
 
 interface BoardGameCompanionViewProps {
   caseId: string

@@ -167,7 +167,7 @@ caseId là tham số bắt buộc, không có default "case_000" ngoài trang la
 | 3A | Xong phần code | `/api/checkpoints` dùng service role và lọc allowlist; mọi modal chấm qua `/api/checkpoints/verify`; `/api/scan-answer` tự đọc tiêu chí AI ở server (trước đây client gửi cả tiêu chí, route là proxy LLM mở). Migration `48_checkpoint_answers_server_only.sql` đã viết, **chưa chạy**: chạy sau khi deploy code. |
 | 4 | Phần lớn xong | Gỡ key `followup_vu/tung`, fallback nạn nhân `khang`, tọa độ ghim cứng, key `khang_phone_pinned_clues`; bỏ default `"case_000"` ở component/hook/server action (TS chỉ ra `/evidence/boardgame` chưa từng truyền `caseId` → vụ nào cũng đọc case_000, đã sửa). Còn so khớp key `c0-pin-*` (cần dữ liệu `board_nodes`). |
 | 5 | Chưa làm | Phát hiện: gameplay không ghi `unlocked_dossiers`; `unlocksDossier` server trả về bị bỏ qua, phase mở theo số câu hỏi phụ đã giải. Store tiến độ cần nối lại cơ chế này. |
-| 6 | Chưa làm | |
+| 6 | Xong (trừ chia nhỏ file monolith) | `types/` → `lib/types/`; `admin/evidence-studio` → `admin/dossier-studio/evidence/`; `lib/map-*`, `lib/geometry` → `lib/maps/`; `investigation/mindmap/` → `investigation/board/`; 2 route redirect Studio → `redirects` trong `next.config.mjs`. Chia nhỏ file monolith (§3.6) chưa làm: nên làm sau GĐ5. |
 
 Phát hiện thêm khi làm GĐ3A:
 - `indictment-modal.tsx` có danh sách mã chứng cứ đáp án Case #000 hardcode trong client (`"53"`, `"c-02"`, `"d-06"`...). Đã xóa.

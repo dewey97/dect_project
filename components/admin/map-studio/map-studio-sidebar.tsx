@@ -29,7 +29,7 @@ import type {
   LabelFeature,
   PoiFeature,
   PoiCategory,
-} from "@/types/map-vector";
+} from "@/lib/types/map-vector";
 import { POI_CATEGORY_CONFIG } from "./map-features";
 
 export type FeatureType =

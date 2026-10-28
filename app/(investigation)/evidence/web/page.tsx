@@ -50,7 +50,7 @@ import { MobileInvestigationWorkspace } from "@/components/investigation/evidenc
 import { GameDesktopHeader } from "@/components/investigation/evidence/game-desktop-header";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import { EpilogueModal } from "@/components/investigation/epilogue-modal";
-import { IndictmentModal } from "@/components/investigation/mindmap/indictment-modal";
+import { IndictmentModal } from "@/components/investigation/board/indictment-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
@@ -58,7 +58,7 @@ import { PhoneSimulator } from "@/components/phone-engine/phone-simulator";
 import nextDynamic from "next/dynamic";
 import { HintModal } from "@/components/investigation/hint-modal";
 import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
-import { MainInvestigationCanvas } from "@/components/investigation/mindmap/main-investigation-canvas";
+import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { useDossierDocuments } from "@/lib/hooks/use-dossier-documents";
 import { useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
 import { normalizeImageUrl } from "@/lib/utils";

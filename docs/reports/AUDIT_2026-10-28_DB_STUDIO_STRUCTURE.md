@@ -51,7 +51,7 @@ Luồng hiện tại: **Cases** (meta, ảnh bìa, 360) → **Checkpoints** (nh�
 | File                                                                                     | Dòng | Ghi chú                                                                                                                                       |
 | ---------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `components/admin/character-studio/characters-studio-client.tsx`                         | 546  | Studio nhân vật đã gộp vào Checkpoints                                                                                                        |
-| `components/admin/evidence-studio/evidence-studio-client.tsx`                            | 500  | Route đã chuyển sang Dossier (các file khác trong thư mục vẫn dùng)                                                                           |
+| `components/admin/dossier-studio/evidence/evidence-studio-client.tsx`                            | 500  | Route đã chuyển sang Dossier (các file khác trong thư mục vẫn dùng)                                                                           |
 | `components/investigation/evidence/native-pdf-annotator.tsx`                             | 535  |                                                                                                                                               |
 | `components/admin/dossier-studio/dossier-editor.tsx`                                     | 371  |                                                                                                                                               |
 | `components/admin/checkpoint-studio/board/board-editor.tsx`                              | 259  |                                                                                                                                               |
@@ -76,7 +76,7 @@ Cách tìm: script quét mọi file trong `components/`, `lib/`, `hooks/`, coi l
 | `components/investigation/evidence/workspaces/canvas-investigation-workspace.tsx` | 1.326 |
 | `components/investigation/hero-interactive/render-scene.ts`                       | 1.241 |
 | `components/admin/phone-studio/messages-editor.tsx`                               | 1.100 |
-| `components/investigation/mindmap/add-suspect-modal.tsx`                          | 1.063 |
+| `components/investigation/board/add-suspect-modal.tsx`                          | 1.063 |
 
 `dossier-canvas-board.tsx` là chỗ đáng tách nhất (3.182 dòng, vừa sửa nhiều). Tách khi sắp sửa lớn tiếp, không tách chỉ để tách.
 

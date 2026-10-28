@@ -64,7 +64,7 @@
 | **`checkpoint_attempt`** | Khi người chơi bấm "Kiểm tra suy luận" | • `checkpoint_id`: Mã câu hỏi (vd: `c0-cp-01`)<br>• `is_correct`: `true` hoặc `false`<br>• `attempt_number`: Lần thử thứ n<br>• `selected_clues_count`: Số manh mối đã chọn | **Boolean, Đếm**.<br>Đo tỷ lệ giải đúng ngay lần đầu vs tỷ lệ đoán mò. |
 | **`checkpoint_solved`** | Khi giải đúng một Checkpoint | • `checkpoint_id`: Mã câu hỏi<br>• `total_attempts`: Tổng số lần đã thử<br>• `time_to_solve_seconds`: Thời gian từ lúc mở đến lúc giải xong | **Giây, Đếm**.<br>Đánh giá độ khó thực tế của từng nút thắt logic. |
 | **`hint_viewed`** | Khi giữ nút mở khóa gợi ý ([`CheckpointHintSection`](../../components/investigation/checkpoint-hint-section.tsx)) | • `checkpoint_id`: Mã câu hỏi<br>• `hint_tier`: Cấp độ gợi ý (`1`, `2`, hoặc `3`) | **Cấp độ**.<br>Phát hiện câu hỏi nào gây bí bách buộc người chơi phải xem giải. |
-| **`indictment_submitted`** | Khi đóng dấu nộp Cáo trạng bắt hung thủ ([`IndictmentModal`](../../components/investigation/mindmap/indictment-modal.tsx)) | • `culprit`: Mã hung thủ bị chỉ điểm (`ha`, `vu`, `tung`)<br>• `suspect_name`: Tên nghi phạm nhập tay<br>• `motive`: Động cơ đã chọn | **Nghiệp vụ**.<br>Tỷ lệ phá án thành công và các ngộ nhận phổ biến. |
+| **`indictment_submitted`** | Khi đóng dấu nộp Cáo trạng bắt hung thủ ([`IndictmentModal`](../../components/investigation/board/indictment-modal.tsx)) | • `culprit`: Mã hung thủ bị chỉ điểm (`ha`, `vu`, `tung`)<br>• `suspect_name`: Tên nghi phạm nhập tay<br>• `motive`: Động cơ đã chọn | **Nghiệp vụ**.<br>Tỷ lệ phá án thành công và các ngộ nhận phổ biến. |
 
 ---
 

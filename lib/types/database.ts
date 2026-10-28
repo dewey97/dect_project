@@ -1,4 +1,4 @@
-import type { PaperConfig, LoiKhaiData, LyLichData } from "@/types/dossier";
+import type { PaperConfig, LoiKhaiData, LyLichData } from "@/lib/types/dossier";
 
 export type CaseStatus = "DRAFT" | "IN_REVIEW" | "PUBLISHED" | "ARCHIVED";
 export type UserRole = "player" | "admin";
