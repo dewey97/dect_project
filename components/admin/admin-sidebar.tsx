@@ -9,7 +9,7 @@ import {
   Settings,
   MessageSquare,
   Map,
-  FileText,
+  Files,
   ListChecks,
   ChevronLeft,
   ChevronRight,
@@ -54,22 +54,16 @@ const navGroups: NavGroup[] = [
     items: [
       { name: "Map Studio", shortName: "Map", href: "/studio/map", icon: Map },
       {
-        name: "Dossier Studio",
-        shortName: "Hồ sơ",
+        name: "Tài Liệu",
+        shortName: "Tài liệu",
         href: "/studio/dossier",
-        icon: FileText,
+        icon: Files,
       },
       {
         name: "Phone Studio",
         shortName: "Điện thoại",
         href: "/studio/phone",
         icon: Smartphone,
-      },
-      {
-        name: "Evidence Studio",
-        shortName: "Chứng cứ",
-        href: "/studio/evidence",
-        icon: Archive,
       },
       {
         name: "Checkpoint Studio",
@@ -132,52 +126,56 @@ export function AdminSidebar({
       {/* HEADER */}
       <div
         className={cn(
-          "p-4 h-16 flex items-center shrink-0",
+          "h-16 flex items-center shrink-0 border-b border-white/5",
           isCollapsed
-            ? "flex-col justify-center gap-1.5 p-2 h-auto py-3"
-            : "justify-between",
+            ? "justify-center px-2 py-3 h-14"
+            : "justify-between px-4",
         )}
       >
-        <Link
-          href="/studio"
-          className={cn(
-            "flex items-center gap-2.5 transition-opacity hover:opacity-80 min-w-0",
-            isCollapsed && "flex-col gap-1 text-center",
-          )}
-        >
-          <div className="size-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0">
-            <span className="font-mono text-primary font-bold text-xs tracking-tighter">
+        {isCollapsed ? (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className="group relative size-9 rounded-lg bg-primary/20 hover:bg-primary/30 border border-primary/30 hover:border-primary/50 flex items-center justify-center transition-all cursor-pointer shadow-sm"
+            title="Mở rộng thanh điều hướng"
+          >
+            <span className="font-mono text-primary font-bold text-xs tracking-tighter transition-all duration-200 group-hover:opacity-0 group-hover:scale-75">
               AS
             </span>
-          </div>
-          {!isCollapsed && (
-            <div className="min-w-0">
-              <h1 className="font-semibold text-sm leading-tight text-zinc-100 truncate">
-                Admin Studio
-              </h1>
-            </div>
-          )}
-        </Link>
-
-        {onToggleCollapse && (
-          <button
-            onClick={onToggleCollapse}
-            className={cn(
-              "p-1.5 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 transition-colors",
-              isCollapsed && "mx-auto mt-0.5",
-            )}
-            title={
-              isCollapsed
-                ? "Mở rộng thanh điều hướng"
-                : "Thu gọn thanh điều hướng"
-            }
-          >
-            {isCollapsed ? (
-              <ChevronRight className="size-4" />
-            ) : (
-              <ChevronLeft className="size-4" />
-            )}
+            <ChevronRight className="size-4 text-primary absolute opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-200" />
           </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              className="group flex items-center gap-2.5 transition-opacity hover:opacity-90 min-w-0 text-left cursor-pointer"
+              title="Thu gọn thanh điều hướng"
+            >
+              <div className="relative size-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30 shrink-0 group-hover:bg-primary/30 group-hover:border-primary/50 transition-all">
+                <span className="font-mono text-primary font-bold text-xs tracking-tighter transition-all duration-200 group-hover:opacity-0 group-hover:scale-75">
+                  AS
+                </span>
+                <ChevronLeft className="size-4 text-primary absolute opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-200" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="font-semibold text-sm leading-tight text-zinc-100 truncate group-hover:text-primary transition-colors">
+                  Admin Studio
+                </h1>
+              </div>
+            </button>
+
+            {onToggleCollapse && (
+              <button
+                type="button"
+                onClick={onToggleCollapse}
+                className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 transition-colors cursor-pointer"
+                title="Thu gọn thanh điều hướng"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+            )}
+          </>
         )}
       </div>
 

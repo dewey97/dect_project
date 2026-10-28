@@ -302,7 +302,19 @@ function WebEvidencePageContent() {
 
       photoItems = validRows
         .filter((row: any) => {
+          const code = String(row.code || "").trim().toUpperCase();
+          if (dossierCodes.has(code)) return false;
+
           const title = String(row.label || row.title || "").toLowerCase();
+          if (
+            title.includes("lời khai") ||
+            title.includes("lý lịch") ||
+            title.includes("trích lục") ||
+            title.includes("biên bản lấy lời khai")
+          ) {
+            return false;
+          }
+
           const cat = String(row.category || "").toUpperCase();
           return (
             title.includes("ảnh") ||
@@ -310,7 +322,9 @@ function WebEvidencePageContent() {
             cat === "SCENE" ||
             title.includes("lược") ||
             title.includes("hoa xoan") ||
-            title.includes("bùa yêu")
+            title.includes("bùa yêu") ||
+            row.kind === "photo" ||
+            row.kind === "pdf"
           );
         })
         .map((row: any, idx: number): CombinedItem => {
@@ -355,7 +369,25 @@ function WebEvidencePageContent() {
           };
         });
     } else if (caseEvs && caseEvs.length > 0) {
-      photoItems = caseEvs.map((item): CombinedItem => {
+      photoItems = caseEvs
+        .filter((item) => {
+          const code = String(item.code || "").trim().toUpperCase();
+          if (!code || code.startsWith("AVATAR_") || code === "CRIME_SCENE") {
+            return false;
+          }
+          if (dossierCodes.has(code)) return false;
+          const title = String(item.title || "").toLowerCase();
+          if (
+            title.includes("lời khai") ||
+            title.includes("lý lịch") ||
+            title.includes("trích lục") ||
+            title.includes("biên bản lấy lời khai")
+          ) {
+            return false;
+          }
+          return true;
+        })
+        .map((item): CombinedItem => {
         const dInfo = dossierOf(item.code);
         const phase = dInfo ? dInfo.slotIndex : item.phase;
         return {

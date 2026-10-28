@@ -44,6 +44,7 @@ import {
   HelpCircle,
   Sun,
   Moon,
+  SquareKanban,
 } from "lucide-react";
 import {
   DOSSIER_CANVAS_PRESETS,
@@ -147,6 +148,7 @@ interface DossierCanvasBoardProps {
   onToggleDossierTray?: () => void;
   onOpenIndictment?: () => void;
   isBoardFullscreen?: boolean;
+  renderInvestigationBoard?: React.ReactNode;
 }
 
 export function DossierCanvasBoard({
@@ -164,6 +166,7 @@ export function DossierCanvasBoard({
   onToggleDossierTray,
   onOpenIndictment,
   isBoardFullscreen = false,
+  renderInvestigationBoard,
 }: DossierCanvasBoardProps) {
   const isLight = uiTheme === "light";
   // Đồng bộ Realtime Group Play
@@ -582,26 +585,29 @@ export function DossierCanvasBoard({
   const defaultPositions = useMemo(() => {
     const map: Record<string, { x: number; y: number }> = {};
 
-    // Hàng 1: Biên bản Lời khai (A4 portrait ~860px bước nhảy)
+    // 0. Bảng Điều Tra (Đặt ở vị trí trang trọng đầu bàn hồ sơ)
+    map["inv_board"] = { x: 80, y: 80 };
+
+    // Hàng 1: Biên bản Lời khai (A4 portrait ~860px bước nhảy, bắt đầu ngay sau Bảng điều tra)
     lkDocuments.forEach((doc, idx) => {
-      map[`lk_${doc.tag_code}`] = { x: 80 + idx * 920, y: 80 };
+      map[`lk_${doc.tag_code}`] = { x: 1040 + idx * 920, y: 80 };
     });
 
-    // Hàng 2: Lý lịch bị can (A4 landscape ~1180px bước nhảy)
+    // Hàng 2: Lý lịch bị can (A4 landscape ~1180px bước nhảy, ngay dưới Bảng điều tra)
     hsDocuments.forEach((doc, idx) => {
-      map[`hs_${doc.tag_code}`] = { x: 80 + idx * 1180, y: 1300 };
+      map[`hs_${doc.tag_code}`] = { x: 80 + idx * 1180, y: 1380 };
     });
 
     // Hàng 3: Tài liệu lưu trữ & Kết quả giám định (A4 portrait ~920px bước nhảy)
     unmappedPdfItems.forEach((item, idx) => {
       const code = item.data.code || item.data.id;
-      map[`pdf_${code}`] = { x: 80 + idx * 920, y: 2250 };
+      map[`pdf_${code}`] = { x: 80 + idx * 920, y: 2350 };
     });
 
     // Hàng 4: Tang vật hiện trường
     evidenceItems.forEach((item, idx) => {
       const code = item.data.code || item.data.id;
-      map[`ev_${code}`] = { x: 80 + idx * 320, y: 2720 };
+      map[`ev_${code}`] = { x: 80 + idx * 320, y: 3300 };
     });
 
     return map;
@@ -1501,6 +1507,56 @@ export function DossierCanvasBoard({
           }}
           className="absolute top-0 left-0 relative select-none"
         >
+          {/* ============================================================== */}
+          {/* PHÂN KHU 0: BẢNG ĐIỀU TRA TRÊN MẶT BÀN (MAIN INVESTIGATION CANVAS) */}
+          {/* ============================================================== */}
+          {renderInvestigationBoard && (() => {
+            const key = "inv_board";
+            const pos = getItemPosition(key);
+            const isDragging = activeDraggingId === key;
+
+            return (
+              <div
+                key="inv_board"
+                id="board-investigation-canvas"
+                data-dossier-card="true"
+                data-tour="canvas-desk-investigation-board"
+                onMouseDown={(e) => e.stopPropagation()}
+                style={{
+                  position: "absolute",
+                  left: `${pos.x}px`,
+                  top: `${pos.y}px`,
+                  zIndex: isDragging ? 55 : 12,
+                  width: "896px",
+                  height: "1200px",
+                }}
+                className={cn(
+                  "relative select-none border-0 bg-transparent transition-shadow duration-150 group/board-item shadow-[0_20px_50px_rgba(0,0,0,0.85)]",
+                  isDragging && "shadow-[0_35px_90px_rgba(0,0,0,0.95)] scale-[1.01]"
+                )}
+              >
+                {/* Tay nắm kéo di chuyển nổi tinh tế (chỉ hiện khi hover ở đỉnh bảng) */}
+                <div
+                  data-drag-handle="true"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => handleItemDragStart(e, key)}
+                  onPointerMove={handleItemPointerMove}
+                  onPointerUp={handleItemPointerUp}
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 z-40 opacity-0 group-hover/board-item:opacity-100 transition-all duration-200 flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-900/95 border border-amber-600/50 text-amber-200 shadow-xl cursor-grab active:cursor-grabbing text-[11px] font-mono whitespace-nowrap backdrop-blur-md select-none"
+                  title="Nhấn giữ và kéo để di chuyển Bảng điều tra trên bàn"
+                >
+                  <GripHorizontal className="size-3.5 text-amber-400" />
+                  <span>KÉO DI CHUYỂN BẢNG</span>
+                </div>
+
+                {/* Bảng điều tra Fullsize Không Viền */}
+                <div className="w-full h-full relative overflow-hidden">
+                  {renderInvestigationBoard}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* ============================================================== */}
           {/* PHÂN KHU 1: HỒ SƠ & BIÊN BẢN LẤY LỜI KHAI (STATEMENTS)        */}
           {/* ============================================================== */}
@@ -2670,6 +2726,28 @@ export function DossierCanvasBoard({
         >
           <BookOpen className="size-4.5 text-amber-500 hover:text-amber-400 transition-colors" />
         </button>
+
+        {/* NÚT TẬP TRUNG VÀO BẢNG ĐIỀU TRA TRÊN BÀN */}
+        {renderInvestigationBoard && (
+          <button
+            type="button"
+            onClick={() => {
+              setIsPenPopupOpen(false);
+              setIsHighlighterPopupOpen(false);
+              setIsEraserPopupOpen(false);
+              setIsNotePopupOpen(false);
+              setIsThemePopupOpen(false);
+              focusOnElement("board-investigation-canvas", 0.75);
+            }}
+            className={cn(
+              "p-2 rounded-xl transition-colors cursor-pointer flex items-center justify-center shrink-0",
+              isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/70"
+            )}
+            title="Đến vị trí Bảng điều tra trên bàn"
+          >
+            <SquareKanban className="size-4.5 text-amber-500 hover:text-amber-400 transition-colors" />
+          </button>
+        )}
 
         {/* NÚT BẬT / TẮT ÂM THANH */}
         <button

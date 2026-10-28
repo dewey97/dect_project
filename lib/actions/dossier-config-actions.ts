@@ -9,6 +9,7 @@ export interface AvailableDocumentItem {
   title: string;
   category: "loi_khai" | "ly_lich" | "evidence";
   description?: string;
+  kind?: "photo" | "pdf";
 }
 
 /** Lấy toàn bộ danh sách Bộ Hồ Sơ của vụ án từ bảng case_dossiers */
@@ -113,21 +114,27 @@ export async function deleteCaseDossier(
   }
 }
 
-/** Lấy danh mục tất cả tài liệu có trong Dossier Studio để hiển thị checklist lựa chọn */
+/** Lấy danh mục tất cả tài liệu có trong Dossier Studio & Vật chứng để hiển thị checklist lựa chọn */
 export async function getAllCaseDocumentsCatalog(
   caseId: string = "case_000",
 ): Promise<AvailableDocumentItem[]> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("dossier_documents")
-      .select("tag_code, subject_name, mode, content")
-      .eq("case_id", caseId)
-      .order("tag_code", { ascending: true });
+    const [dossierRes, evidenceRes] = await Promise.all([
+      supabase
+        .from("dossier_documents")
+        .select("tag_code, subject_name, mode, content")
+        .eq("case_id", caseId)
+        .order("tag_code", { ascending: true }),
+      supabase
+        .from("case_evidence")
+        .select("code, title, kind, description")
+        .eq("case_slug", caseId)
+        .order("code", { ascending: true }),
+    ]);
 
-    if (error) {
-      console.error("[getAllCaseDocumentsCatalog] Error:", error);
-      return [];
+    if (dossierRes.error) {
+      console.error("[getAllCaseDocumentsCatalog] Dossier error:", dossierRes.error);
     }
 
     interface RawDossierCatalogRow {
@@ -141,10 +148,13 @@ export async function getAllCaseDocumentsCatalog(
       } | null;
     }
 
-    const list: AvailableDocumentItem[] = (
-      (data || []) as RawDossierCatalogRow[]
+    const docTagCodes = new Set<string>();
+
+    const dossierList: AvailableDocumentItem[] = (
+      (dossierRes.data || []) as RawDossierCatalogRow[]
     ).map((doc) => {
       const code = (doc.tag_code || "").trim();
+      docTagCodes.add(code.toUpperCase());
       const rawContent = doc.content || {};
       const title =
         doc.mode === "ly_lich"
@@ -165,7 +175,43 @@ export async function getAllCaseDocumentsCatalog(
       };
     });
 
-    return list;
+    // Vật chứng & Ảnh: Chỉ gồm 2 loại: Ảnh hoặc PDF từ bên ngoài
+    // Tuyệt đối không lặp lại tài liệu lời khai và lý lịch đã soạn trong Studio
+    const evidenceList: AvailableDocumentItem[] = (evidenceRes.data || [])
+      .filter((item: any) => {
+        const code = String(item.code || "").trim().toUpperCase();
+        if (!code || code.startsWith("AVATAR_") || code === "CRIME_SCENE") {
+          return false;
+        }
+        if (docTagCodes.has(code)) {
+          return false;
+        }
+        const title = String(item.title || "").toLowerCase();
+        if (
+          title.includes("lời khai") ||
+          title.includes("lý lịch") ||
+          title.includes("trích lục") ||
+          title.includes("biên bản lấy lời khai")
+        ) {
+          return false;
+        }
+        return true;
+      })
+      .map((item: any) => {
+        const code = String(item.code || "").trim();
+        const isPdf = item.kind === "pdf";
+        return {
+          code,
+          title: item.title || (isPdf ? `Tài liệu PDF #${code}` : `Ảnh vật chứng #${code}`),
+          category: "evidence" as const,
+          kind: isPdf ? ("pdf" as const) : ("photo" as const),
+          description:
+            item.description ||
+            (isPdf ? "Tài liệu PDF từ bên ngoài" : "Ảnh hiện trường / vật chứng"),
+        };
+      });
+
+    return [...dossierList, ...evidenceList];
   } catch (err) {
     console.error("[getAllCaseDocumentsCatalog] Error:", err);
     return [];

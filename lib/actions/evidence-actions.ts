@@ -86,6 +86,48 @@ export async function upsertCaseEvidence(
   }
 }
 
+
+/** Lưu đồng loạt danh sách chứng cứ vào Supabase */
+export async function upsertMultipleCaseEvidence(
+  caseId: string,
+  evidenceList: Partial<DbCaseEvidence>[],
+) {
+  try {
+    await requireAdminAuth();
+    if (!evidenceList.length) return { success: true, data: [] };
+    const slug = normalizeCaseId(caseId);
+    const supabase = await createClient();
+
+    const payload = evidenceList.map((item) => {
+      const cleanItem = { ...item };
+      if (!cleanItem.id || cleanItem.id.startsWith("temp-")) {
+        delete cleanItem.id;
+      }
+      return {
+        ...cleanItem,
+        case_slug: slug,
+        code: cleanItem.code || ("ev_" + Date.now()),
+        title: cleanItem.title || "Chưa đặt tên",
+        kind: cleanItem.kind || "photo",
+        metadata: cleanItem.metadata || {},
+        updated_at: new Date().toISOString(),
+      };
+    });
+
+    const { data, error } = await supabase
+      .from("case_evidence")
+      .upsert(payload, { onConflict: "case_slug,code" })
+      .select();
+
+    if (error) throw error;
+    revalidatePath("/studio/dossier");
+    return { success: true, data: (data || []) as DbCaseEvidence[] };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return { success: false, error: msg, data: [] };
+  }
+}
+
 // ── 3. Xóa chứng cứ ──
 
 export async function deleteCaseEvidence(id: string) {
@@ -261,5 +303,111 @@ export async function duplicateEvidenceData(
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
     return { success: false, error: msg, count: 0 };
+  }
+}
+
+
+// ── 7. Trích xuất & Đồng bộ ảnh / vật chứng từ Google Sheets Live CMS ──
+
+export async function syncEvidenceFromGoogleSheet(caseId: string = "case_000") {
+  try {
+    await requireAdminAuth();
+    const slug = normalizeCaseId(caseId);
+    const { createGoogleAuth } = await import("@/lib/google/auth");
+    const { google } = await import("googleapis");
+    const auth = createGoogleAuth("https://www.googleapis.com/auth/spreadsheets.readonly");
+    if (!auth) {
+      return { success: false, error: "Không tìm thấy cấu hình Google Service Account (google-service-account.json)" };
+    }
+
+    const sheets = google.sheets({ version: "v4", auth });
+    const sheetId = process.env.GOOGLE_SHEETS_ID || "1h2P9VaBC9PELUMhipo6ze1SkJIVv3IOm5SP3ynURm4Q";
+
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: sheetId,
+      range: "evidences!A1:Z100",
+    });
+
+    const rows = res.data.values || [];
+    if (rows.length < 2) {
+      return { success: false, error: "Không tìm thấy dữ liệu trong tab evidences của Google Sheets" };
+    }
+
+    const supabase = await createClient();
+    const { data: studioDocs } = await supabase
+      .from("dossier_documents")
+      .select("tag_code")
+      .eq("case_id", slug);
+    const studioCodes = new Set((studioDocs || []).map((d) => (d.tag_code || "").trim().toUpperCase()));
+
+    const updates: Partial<DbCaseEvidence>[] = [];
+
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      const code = (r[1] || "").trim();
+      if (!code) continue;
+
+      const title = (r[3] || code).trim();
+      const driveUrl = (r[7] || "").trim();
+      const description = (r[8] || "").trim();
+      const cat = (r[4] || "").toUpperCase();
+
+      // Loại trừ avatar hoặc marker hiện trường
+      if (code.startsWith("avatar_") || code === "crime_scene") continue;
+
+      // Loại trừ lời khai / lý lịch (soạn riêng trong Studio)
+      const tLower = title.toLowerCase();
+      if (
+        tLower.includes("lời khai") ||
+        tLower.includes("lý lịch") ||
+        tLower.includes("trích lục") ||
+        tLower.includes("biên bản lấy lời khai") ||
+        studioCodes.has(code.toUpperCase())
+      ) {
+        continue;
+      }
+
+      // Trích xuất Drive ID thành proxy link
+      const driveMatch = driveUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || driveUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      const driveId = driveMatch?.[1];
+      const proxyUrl = driveId ? `/api/image-proxy?id=${driveId}` : (driveUrl || null);
+
+      const isPdf = cat === "DOCUMENT" || tLower.includes("pdf") || tLower.includes("báo cáo") || tLower.includes("biên bản");
+      const kind = isPdf ? "pdf" : "photo";
+
+      updates.push({
+        case_slug: slug,
+        code,
+        title,
+        kind,
+        file_url: driveUrl || null,
+        thumb_url: proxyUrl,
+        description: description || null,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    for (const item of updates) {
+      const payload: any = {
+        case_slug: item.case_slug,
+        code: item.code,
+        title: item.title,
+        kind: item.kind,
+        description: item.description,
+        updated_at: item.updated_at,
+      };
+      if (item.file_url) payload.file_url = item.file_url;
+      if (item.thumb_url) payload.thumb_url = item.thumb_url;
+
+      await supabase
+        .from("case_evidence")
+        .upsert(payload, { onConflict: "case_slug,code" });
+    }
+
+    revalidatePath("/studio/dossier");
+    return { success: true, count: updates.length };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return { success: false, error: msg };
   }
 }

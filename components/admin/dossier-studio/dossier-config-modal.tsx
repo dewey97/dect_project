@@ -113,11 +113,10 @@ export function DossierConfigModal({
       return;
     }
 
-    const finalKey = slugifyVietnamese((dossierKey || title).trim());
-    if (!finalKey) {
-      toast.error("Vui lòng nhập mã định danh (key) cho bộ hồ sơ");
-      return;
-    }
+    const finalKey =
+      (dossierKey && dossierKey.trim()) ||
+      slugifyVietnamese(title.trim()) ||
+      `dossier_${Date.now()}`;
 
     setIsSaving(true);
     try {
@@ -160,17 +159,7 @@ export function DossierConfigModal({
               <h2 className="text-base font-bold text-zinc-100">
                 {title ? `Bộ Hồ Sơ: ${title}` : "Tạo Bộ Hồ Sơ Mới"}
               </h2>
-              <p className="text-xs text-zinc-500">
-                Khóa kỹ thuật:{" "}
-                <span className="font-mono text-zinc-400">
-                  {dossierKey || "tự động tạo"}
-                </span>{" "}
-                ·{" "}
-                <span className="font-semibold text-amber-400">
-                  {selectedCodes.length}
-                </span>{" "}
-                tài liệu được mở khóa
-              </p>
+              
             </div>
           </div>
           <button
@@ -186,7 +175,7 @@ export function DossierConfigModal({
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-5 space-y-4">
           {/* Metadata fields */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-3">
               <label className="mb-1 block text-xs font-semibold text-zinc-300">
                 Tên hiển thị bộ hồ sơ <span className="text-amber-400">*</span>
               </label>
@@ -200,18 +189,6 @@ export function DossierConfigModal({
                 }}
                 placeholder="VD: Bộ A, Hồ Sơ Hiện Trường..."
                 className="border-white/10 bg-[#16161c] text-zinc-100 placeholder:text-zinc-600 focus:border-amber-400"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-semibold text-zinc-300">
-                Mã định danh (Key)
-              </label>
-              <Input
-                value={dossierKey}
-                onChange={(e) => setDossierKey(e.target.value)}
-                placeholder="bo_a, bo_b..."
-                disabled={Boolean(dossier.id && dossier.dossier_key)}
-                className="border-white/10 bg-[#16161c] font-mono text-zinc-100 placeholder:text-zinc-600 focus:border-amber-400 disabled:opacity-60"
               />
             </div>
             <div className="sm:col-span-3">
@@ -301,8 +278,9 @@ export function DossierConfigModal({
                 {(
                   [
                     { id: "all", label: "Tất cả" },
-                    { id: "loi_khai", label: "Lời khai" },
-                    { id: "ly_lich", label: "Lý lịch" },
+                    { id: "loi_khai", label: "Lời khai (Studio)" },
+                    { id: "ly_lich", label: "Lý lịch (Studio)" },
+                    { id: "evidence", label: "Vật chứng & Ảnh" },
                   ] as const
                 ).map((cat) => (
                   <button
@@ -394,12 +372,14 @@ export function DossierConfigModal({
                       </div>
 
                       {/* Category tag */}
-                      <span className="shrink-0 text-[10px] uppercase tracking-wider text-zinc-600">
+                      <span className="shrink-0 text-[10px] uppercase tracking-wider text-zinc-400 font-mono">
                         {doc.category === "loi_khai"
                           ? "Lời khai"
                           : doc.category === "ly_lich"
                             ? "Lý lịch"
-                            : "Vật chứng"}
+                            : doc.kind === "pdf"
+                              ? "PDF ngoài"
+                              : "Ảnh"}
                       </span>
                     </div>
                   );

@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Folder, FolderOpen, Plus, Settings2, Trash2, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import type { DbCaseDossier } from "@/lib/types/database";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +56,6 @@ export function DossierListPanel({
             <h2 className="font-bold text-neutral-200 text-xs uppercase tracking-wider">
               Bộ Hồ Sơ ({dossiers.length})
             </h2>
-            <p className="text-[10px] text-neutral-400">Giai đoạn & tài liệu</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -112,7 +110,7 @@ export function DossierListPanel({
                     : "border-white/10 bg-[#18191e] hover:border-white/20 hover:bg-[#1e2026]",
                 )}
               >
-                {/* Top Row: Title + Key */}
+                {/* Top Row: Title */}
                 <div className="flex items-start justify-between gap-1">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <Folder className="size-3.5 text-amber-400/80 shrink-0" />
@@ -120,12 +118,6 @@ export function DossierListPanel({
                       {d.title || d.dossier_key}
                     </span>
                   </div>
-                  <Badge
-                    variant="outline"
-                    className="font-mono text-[9px] px-1 py-0 border-white/15 text-neutral-400 shrink-0"
-                  >
-                    {d.dossier_key}
-                  </Badge>
                 </div>
 
                 {/* Description */}
@@ -137,9 +129,9 @@ export function DossierListPanel({
 
                 {/* Document Codes Chips */}
                 <div className="mt-2 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1 text-[11px] text-neutral-400">
-                    <FileText className="size-3" />
-                    <span>{docCount} tài liệu</span>
+                  <div className="flex items-center gap-1.5 text-[11px] text-neutral-400" title={`${docCount} mục`}>
+                    <FileText className="size-3 text-amber-400/70" />
+                    <span className="font-mono font-medium">{docCount}</span>
                   </div>
 
                   {/* Actions */}
@@ -151,7 +143,7 @@ export function DossierListPanel({
                         onEditDossier(d);
                       }}
                       className="p-1 rounded bg-white/5 hover:bg-amber-500/20 hover:text-amber-300 text-neutral-300 transition-colors"
-                      title="Chỉnh sửa & Gán tài liệu"
+                      title="Chỉnh sửa cấu hình"
                     >
                       <Settings2 className="size-3.5" />
                     </button>

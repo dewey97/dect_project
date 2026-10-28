@@ -1240,6 +1240,23 @@ export function CanvasInvestigationWorkspace({
           onToggleDossierTray={() => setIsDossierCollapsed((prev) => !prev)}
           onOpenIndictment={() => setActiveModal("indictment")}
           isBoardFullscreen={isBoardFullscreen}
+          renderInvestigationBoard={
+            <MainInvestigationCanvas
+              caseId={caseId}
+              isBoardGame={false}
+              hideTitleBadge={true}
+              hideGroupPlay={true}
+              hideAudio={true}
+              hideNotebook={true}
+              activePinId={boardActivePinId}
+              onOpenPhoneSimulator={() => setActiveModal("phone")}
+              onOpenReinvestigation={() => setActiveModal("reinvestigate")}
+              onOpenEpilogue={() => setActiveModal("epilogue")}
+              onSelectSuspectInspector={handleOpenSuspectInspector}
+              onSelectFollowupInspector={handleOpenFollowupInspector}
+              onSelectPinInspector={handleOpenPinInspector}
+            />
+          }
         />
       </div>
 

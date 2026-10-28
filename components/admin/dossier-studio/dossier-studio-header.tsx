@@ -2,8 +2,6 @@
 
 import React from 'react'
 import {
-  FileText,
-  UserCheck,
   Briefcase,
   Edit3,
   ZoomIn,
@@ -11,18 +9,16 @@ import {
   RotateCcw,
   Check,
   Save,
-  Printer
+  Printer,
+  Compass
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { DossierMode } from '@/types/dossier'
 import type { DbCase } from '@/lib/types/database'
 
 interface DossierStudioHeaderProps {
   caseId: string
   setCaseId: (id: string) => void
   initialCases: DbCase[]
-  mode: DossierMode
-  setMode: (mode: DossierMode) => void
   highlightEditable: boolean
   setHighlightEditable: React.Dispatch<React.SetStateAction<boolean>>
   zoomScale: number
@@ -34,14 +30,13 @@ interface DossierStudioHeaderProps {
   isSavingDb: boolean
   savedNotification: boolean
   onPrint: () => void
+  onOpen360Config?: () => void
 }
 
 export function DossierStudioHeader({
   caseId,
   setCaseId,
   initialCases,
-  mode,
-  setMode,
   highlightEditable,
   setHighlightEditable,
   zoomScale,
@@ -52,7 +47,8 @@ export function DossierStudioHeader({
   onSaveData,
   isSavingDb,
   savedNotification,
-  onPrint
+  onPrint,
+  onOpen360Config
 }: DossierStudioHeaderProps) {
   return (
     <header className="no-print h-14 border-b border-white/10 bg-zinc-950/90 backdrop-blur-md px-4 flex items-center justify-between z-30 flex-shrink-0">
@@ -79,35 +75,20 @@ export function DossierStudioHeader({
           </select>
         </div>
 
-        <div className="h-5 w-px bg-white/10" />
+        {/* Nút Cấu hình Không gian Hiện Trường 360 */}
+        {onOpen360Config && (
+          <button
+            type="button"
+            onClick={onOpen360Config}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 transition-all shadow-sm active:scale-95"
+            title="Xem & Cấu hình không gian Khám xét Hiện trường 360"
+          >
+            <Compass className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Hiện Trường 360</span>
+          </button>
+        )}
 
-        {/* Document Type Selector (2 Loại Hồ Sơ Cốt Lõi) */}
-        <div className="flex items-center bg-black/50 p-1 rounded-lg border border-white/10 text-xs font-medium">
-          <button
-            onClick={() => setMode('loi_khai')}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all",
-              mode === 'loi_khai'
-                ? "bg-amber-500 text-black font-semibold shadow-sm"
-                : "text-neutral-400 hover:text-white"
-            )}
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Lời Khai</span>
-          </button>
-          <button
-            onClick={() => setMode('ly_lich')}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all",
-              mode === 'ly_lich'
-                ? "bg-amber-500 text-black font-semibold shadow-sm"
-                : "text-neutral-400 hover:text-white"
-            )}
-          >
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>Lý Lịch</span>
-          </button>
-        </div>
+
       </div>
 
       <div className="flex items-center gap-3">

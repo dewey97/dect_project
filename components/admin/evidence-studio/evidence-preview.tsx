@@ -9,7 +9,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { DbCaseEvidence } from "@/lib/types/database";
-import { cn } from "@/lib/utils";
+import { cn, normalizeImageUrl } from "@/lib/utils";
 
 interface EvidencePreviewProps {
   evidence: Partial<DbCaseEvidence> | null;
@@ -32,7 +32,8 @@ export function EvidencePreview({ evidence }: EvidencePreviewProps) {
   }
 
   const kind = evidence.kind || "photo";
-  const imgUrl = evidence.thumb_url || evidence.file_url;
+  const rawUrl = evidence.thumb_url || evidence.file_url;
+  const imgUrl = normalizeImageUrl(rawUrl);
 
   return (
     <div className="h-full flex flex-col overflow-y-auto space-y-4 pr-1">
