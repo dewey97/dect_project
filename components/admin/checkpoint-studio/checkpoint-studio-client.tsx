@@ -22,6 +22,7 @@ import {
   getCheckpointsByCase,
   saveCheckpoint,
   updateCheckpointDependencies,
+  updateCheckpointPositions,
 } from "@/lib/actions/checkpoint-actions";
 import { updateCheckpointBoardConfig } from "@/lib/actions/board-actions";
 import { getCharactersByCase } from "@/lib/actions/character-actions";
@@ -39,12 +40,9 @@ import { cn } from "@/lib/utils";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
 import { CheckpointEditor } from "./checkpoint-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
+import { FloatingBoardPanel } from "./floating-board-panel";
 import { CharacterEditor } from "./character-editor";
-import { OffBoardTray } from "./off-board-tray";
-import {
-  HeroInteractive,
-  type CaseConnection,
-} from "@/components/investigation/hero-interactive";
+import type { CaseConnection } from "@/components/investigation/hero-interactive";
 import { useBoardEditor } from "./board/use-board-editor";
 import { BoardNodeForm } from "./board/board-node-form";
 import { Button } from "@/components/ui/button";
@@ -53,11 +51,10 @@ import {
   Save,
   Plus,
   Play,
-  RotateCcw,
-  RotateCw,
-  Minus,
+  Pin,
   Sparkles,
   Layers,
+  ChevronDown,
 } from "lucide-react";
 
 interface CheckpointStudioClientProps {
@@ -106,6 +103,7 @@ export function CheckpointStudioClient({
     }
   }, [caseId, activeView]);
 
+  const [isFloatingBoardOpen, setIsFloatingBoardOpen] = useState(true);
   const [flowWidth, setFlowWidth] = useState<number>(440);
   useEffect(() => {
     const saved = Number(
@@ -291,16 +289,16 @@ export function CheckpointStudioClient({
     }
   };
 
-  const generalCheckpoints = useMemo(
-    () =>
-      rows.filter(
-        (r) =>
-          r.kind !== "suspect_interrogation" &&
-          r.type !== "evidence_picker" &&
-          !r.checkpoint_id.includes("interrogation"),
-      ),
-    [rows],
-  );
+  const currentSelectCheckpointId = useMemo(() => {
+    const matched = rows.find(
+      (r) =>
+        (selectedId && (r.id === selectedId || r.checkpoint_id === selectedId)) ||
+        (draft && (r.id === draft.id || r.checkpoint_id === draft.checkpointId)),
+    );
+    if (matched) return matched.id || matched.checkpoint_id;
+    if (draft && !draft.id) return "__new__";
+    return "";
+  }, [rows, selectedId, draft]);
 
   const formDirty = useMemo(
     () => (draft ? JSON.stringify(draft) !== baseline : false),
@@ -432,7 +430,12 @@ export function CheckpointStudioClient({
               kind: next.kind,
               subject_key: next.subjectKey || null,
               question: next.question,
-              board_config: next.boardConfig || r.board_config,
+              depends_on:
+                next.dependsOn !== undefined ? next.dependsOn : r.depends_on,
+              board_config:
+                next.boardConfig !== undefined
+                  ? next.boardConfig
+                  : r.board_config,
               answer_config: {
                 ...(r.answer_config as Record<string, unknown>),
                 ...next.answerConfig,
@@ -558,21 +561,27 @@ export function CheckpointStudioClient({
 
   const [hasUnsavedCharacter, setHasUnsavedCharacter] = useState(false);
   const activeCharacterDraftRef = useRef<DbCaseCharacter | null>(null);
+  const characterDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCharacterLiveDraftChange = (updatedChar: DbCaseCharacter) => {
     activeCharacterDraftRef.current = updatedChar;
     setHasUnsavedCharacter(true);
 
-    // Cập nhật ngay lập tức vào state characters để Bảng điều tra và Khay ngoài bảng nhảy tức thì (0s độ trễ)
-    setCharacters((prev) => {
-      const exists = prev.some((c) => c.id === updatedChar.id || c.key === updatedChar.key);
-      if (exists) {
-        return prev.map((c) =>
-          c.id === updatedChar.id || c.key === updatedChar.key ? updatedChar : c,
-        );
-      }
-      return [...prev, updatedChar];
-    });
+    // Debounce cập nhật lên state cha để gõ phím không bị lag giật toàn bộ canvas/pins
+    if (characterDebounceTimerRef.current) {
+      clearTimeout(characterDebounceTimerRef.current);
+    }
+    characterDebounceTimerRef.current = setTimeout(() => {
+      setCharacters((prev) => {
+        const exists = prev.some((c) => c.id === updatedChar.id || c.key === updatedChar.key);
+        if (exists) {
+          return prev.map((c) =>
+            c.id === updatedChar.id || c.key === updatedChar.key ? updatedChar : c,
+          );
+        }
+        return [...prev, updatedChar];
+      });
+    }, 200);
   };
 
   const [isUnifiedSaving, setIsUnifiedSaving] = useState(false);
@@ -587,16 +596,24 @@ export function CheckpointStudioClient({
         promises.push(handleSave());
       }
 
-      // 2. Lưu Nhân vật nếu có thay đổi
-      if (hasUnsavedCharacter && activeCharacterDraftRef.current) {
-        const charToSave = activeCharacterDraftRef.current;
+      // 2. Lưu Nhân vật nếu có thay đổi hoặc đang chỉnh sửa
+      const charToSave =
+        activeCharacterDraftRef.current ||
+        (inspectorTab === 'characters' ? selectedCharacter : null);
+
+      if (charToSave && (hasUnsavedCharacter || charToSave.id?.startsWith('temp_'))) {
+        if (!charToSave.name?.trim()) {
+          toast.error("Tên nhân vật không được để trống");
+          setIsUnifiedSaving(false);
+          return;
+        }
         const { saveCharacter } = await import("@/lib/actions/character-actions");
         promises.push(
           saveCharacter({
             id: charToSave.id?.startsWith("temp_") ? undefined : charToSave.id,
             caseId,
             key: charToSave.key,
-            name: charToSave.name,
+            name: charToSave.name.trim(),
             aliases: charToSave.aliases || [],
             role: charToSave.role,
             description: charToSave.description || "",
@@ -607,13 +624,19 @@ export function CheckpointStudioClient({
             slotIndex: charToSave.slot_index ?? characters.length,
             device: charToSave.device || null,
           }).then((res) => {
-            if (res.success && res.data) {
-              setCharacters((prev) =>
-                prev.map((c) => (c.key === res.data.key ? res.data : c)),
-              );
-              activeCharacterDraftRef.current = res.data;
-              setHasUnsavedCharacter(false);
+            if (!res.success) {
+              throw new Error(res.error || "Lỗi khi lưu nhân vật");
             }
+            const realChar = res.data;
+            setCharacters((prev) => {
+              const filtered = prev.filter(
+                (c) => c.id !== charToSave.id && c.key !== charToSave.key,
+              );
+              return [...filtered, realChar];
+            });
+            setSelectedCharacter(realChar);
+            activeCharacterDraftRef.current = realChar;
+            setHasUnsavedCharacter(false);
           }),
         );
       }
@@ -639,17 +662,55 @@ export function CheckpointStudioClient({
     }
   };
 
-  // Lắng nghe Ctrl+S toàn cục để bấm Lưu tức thì
+  // Lắng nghe Ctrl+S (Lưu) và Ctrl+Z (Undo) / Ctrl+Y, Ctrl+Shift+Z (Redo) toàn cục
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+      const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+      if (!isCmdOrCtrl) return;
+
+      const key = e.key.toLowerCase();
+
+      // 1. Phím tắt Ctrl + S: Lưu toàn bộ
+      if (key === "s") {
         e.preventDefault();
         handleSaveAllUnified();
+        return;
+      }
+
+      // Kiểm tra nếu đang focus trong input/textarea thì giữ nguyên native browser undo text
+      const target = e.target as HTMLElement | null;
+      const isInputFocused =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable);
+
+      if (isInputFocused) return;
+
+      // 2. Phím tắt Ctrl + Shift + Z hoặc Ctrl + Y: Làm lại (Redo)
+      if ((key === "z" && e.shiftKey) || key === "y") {
+        e.preventDefault();
+        handleRedo();
+        return;
+      }
+
+      // 3. Phím tắt Ctrl + Z: Hoàn tác (Undo)
+      if (key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+        return;
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [formDirty, draft, hasUnsavedCharacter, handleSaveBoardLayout]);
+  }, [
+    formDirty,
+    draft,
+    hasUnsavedCharacter,
+    handleSaveBoardLayout,
+    handleUndo,
+    handleRedo,
+  ]);
 
   const activeInterrogationDraftRef = useRef<CheckpointStudioDraft | null>(null);
 
@@ -748,17 +809,46 @@ export function CheckpointStudioClient({
   };
 
   const handleSaveCharacter = async (savedChar: DbCaseCharacter) => {
-    setCharacters((prev) => {
-      const exists = prev.some((c) => c.id === savedChar.id || c.key === savedChar.key);
-      if (exists) {
-        return prev.map((c) =>
-          c.id === savedChar.id || c.key === savedChar.key ? savedChar : c,
-        );
+    try {
+      const isTemp = savedChar.id?.startsWith("temp_");
+      const { saveCharacter } = await import("@/lib/actions/character-actions");
+      const res = await saveCharacter({
+        id: isTemp ? undefined : savedChar.id,
+        caseId,
+        key: savedChar.key,
+        name: savedChar.name.trim(),
+        aliases: savedChar.aliases || [],
+        role: savedChar.role,
+        description: savedChar.description || "",
+        avatarCode: savedChar.avatar_code || `avatar_${savedChar.key}`,
+        avatarUrl: savedChar.avatar_url || null,
+        avatarAssetPath: savedChar.avatar_asset_path || null,
+        phones: savedChar.phones || [],
+        slotIndex: savedChar.slot_index ?? characters.length,
+        device: savedChar.device || null,
+      });
+
+      if (!res.success) {
+        toast.error(res.error || "Không thể lưu nhân vật");
+        return;
       }
-      return [...prev, savedChar];
-    });
-    setSelectedCharacter(savedChar);
-    await refreshBoardModel();
+
+      const realChar = res.data;
+      setCharacters((prev) => {
+        const filtered = prev.filter(
+          (c) => c.id !== savedChar.id && c.key !== savedChar.key,
+        );
+        return [...filtered, realChar];
+      });
+      setSelectedCharacter(realChar);
+      activeCharacterDraftRef.current = realChar;
+      setHasUnsavedCharacter(false);
+      toast.success(`Đã lưu nhân vật "${realChar.name}"`);
+      await refreshBoardModel();
+    } catch (err: unknown) {
+      console.error("Lỗi khi lưu nhân vật:", err);
+      toast.error("Lỗi khi lưu thông tin nhân vật");
+    }
   };
 
   const handleDeleteCharacter = async (charId: string) => {
@@ -798,6 +888,8 @@ export function CheckpointStudioClient({
   };
 
   const handleSelectFromFlow = (cp: DbCaseCheckpoint) => {
+    setInspectorTab("checkpoints");
+    setSelectedCharacter(null);
     selectRow(cp);
     const matchingPin = displayPins.find(
       (p) =>
@@ -889,6 +981,29 @@ export function CheckpointStudioClient({
     toast.info("Đã xóa quan hệ phụ thuộc.");
   };
 
+  const handleFlowNodePositionChange = useCallback(
+    async (checkpointId: string, pos: { x: number; y: number }) => {
+      setRows((prev) =>
+        prev.map((r) =>
+          r.checkpoint_id === checkpointId
+            ? { ...r, flow_position: pos }
+            : r,
+        ),
+      );
+      try {
+        const res = await updateCheckpointPositions(caseId, [
+          { checkpointId, position: pos },
+        ]);
+        if (!res.success) {
+          console.error("Lỗi khi lưu vị trí flow:", res.error);
+        }
+      } catch (err) {
+        console.error("Lỗi khi lưu vị trí flow:", err);
+      }
+    },
+    [caseId],
+  );
+
   const handleSelectPinOnBoard = (pinId: string | null) => {
     setSelectedNodeId(pinId);
     if (!pinId) return;
@@ -902,15 +1017,19 @@ export function CheckpointStudioClient({
         (r) => r.id === pin.checkpointId || r.checkpoint_id === pin.checkpointId,
       );
       if (cp) {
+        setInspectorTab("checkpoints");
+        setSelectedCharacter(null);
         selectRow(cp);
         return;
       }
     }
 
     // 2. Tìm theo nodeKind đặc thù của checkpoint
-    if (pin.nodeKind === "phone_lookup") {
+    if (pin.nodeKind === "phone_lookup" || pin.nodeKind === "victim_phone") {
       const cp = rows.find((r) => r.kind === "phone_lookup");
       if (cp) {
+        setInspectorTab("checkpoints");
+        setSelectedCharacter(null);
         selectRow(cp);
         return;
       }
@@ -937,9 +1056,22 @@ export function CheckpointStudioClient({
       return;
     }
 
+    if (pin.nodeKind === "victim") {
+      const victimChar =
+        characters.find((c) => c.key === (pin.subjectKey || "khang")) ||
+        characters.find((c) => c.role === "victim");
+      if (victimChar) {
+        setSelectedCharacter(victimChar);
+        setInspectorTab("characters");
+        return;
+      }
+    }
+
     if (pin.nodeKind === "followup") {
       const cp = rows.find((r) => r.kind === "followup");
       if (cp) {
+        setInspectorTab("checkpoints");
+        setSelectedCharacter(null);
         selectRow(cp);
         return;
       }
@@ -948,6 +1080,8 @@ export function CheckpointStudioClient({
     if (pin.nodeKind === "indictment") {
       const cp = rows.find((r) => r.kind === "indictment");
       if (cp) {
+        setInspectorTab("checkpoints");
+        setSelectedCharacter(null);
         selectRow(cp);
         return;
       }
@@ -1032,7 +1166,9 @@ export function CheckpointStudioClient({
           (cp.kind === "suspect_interrogation" &&
             p.nodeKind === "suspect" &&
             p.subjectKey === cp.subject_key) ||
-          (cp.kind === "followup" && p.nodeKind === "followup") ||
+          (cp.kind === "followup" &&
+            p.nodeKind === "followup" &&
+            (!cp.subject_key || p.subjectKey === cp.subject_key || p.id === cp.checkpoint_id)) ||
           (cp.kind === "indictment" && p.nodeKind === "indictment"),
       );
     };
@@ -1319,6 +1455,23 @@ export function CheckpointStudioClient({
             <span>Chơi thử</span>
           </Button>
 
+          {/* Nút Bật/Tắt Cửa sổ Bảng điều tra nổi (Floating Panel) */}
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => setIsFloatingBoardOpen((prev) => !prev)}
+            className={cn(
+              "gap-1 text-xs h-7 px-2.5 font-semibold cursor-pointer border transition-colors",
+              isFloatingBoardOpen
+                ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
+                : "bg-white/5 text-zinc-400 border-white/10 hover:text-zinc-200",
+            )}
+            title="Bật/Tắt Cửa sổ Bảng điều tra nổi"
+          >
+            <Pin className="size-3.5 rotate-45" />
+            <span>Bảng điều tra</span>
+          </Button>
+
           <div className="h-4 w-px bg-white/10 mx-0.5" />
 
           {/* Nút LƯU DUY NHẤT (Checkpoint, Nhân vật, Bố cục Bảng) */}
@@ -1360,139 +1513,35 @@ export function CheckpointStudioClient({
         </div>
       </header>
 
-      {/* 2. Main Workspace: Dual-View (Flow + Board) + Inspector */}
+      {/* 2. Main Workspace: Canvas Sơ đồ luồng toàn màn hình + Bảng điều tra nổi (Floating Resizable) + Inspector */}
       <div className="flex flex-1 min-h-0 w-full flex-col md:flex-row overflow-hidden relative">
-        <div className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden relative">
-          <div className="flex flex-1 min-h-0 w-full flex-row overflow-hidden relative">
-        {/* CỘT 1: Sơ đồ luồng Flow hình hộp (Bên trái) */}
-        <div
-          style={{ width: `${flowWidth}px` }}
-          className={cn(
-            "hidden md:flex flex-col min-h-0 shrink-0 border-r border-white/10 bg-[#0d0d12] relative overflow-hidden",
-            !isResizingFlow && "transition-[width] duration-75 ease-out",
-          )}
-        >
+        {/* VÙNG CHÍNH: Sơ đồ luồng Flow toàn màn hình */}
+        <div className="flex-1 min-h-0 min-w-0 relative h-full w-full bg-[#0d0d12] overflow-hidden">
           <CheckpointFlowView
             rows={rows}
-            selectedId={selectedId}
+            selectedId={selectedId || draft?.id || draft?.checkpointId || null}
             onSelectCheckpoint={handleSelectFromFlow}
             onCreateCheckpoint={createRow}
             onConnectDependencies={handleConnectDependencyFromFlow}
             onDeleteDependency={handleDeleteDependencyFromFlow}
+            onNodePositionChange={handleFlowNodePositionChange}
+            className="w-full h-full"
           />
-        </div>
 
-        {/* Thanh kéo phân cách Flow và Board */}
-        <div
-          onMouseDown={startResizingFlow}
-          className={cn(
-            "hidden md:block relative z-30 w-1.5 -mr-1 cursor-col-resize select-none shrink-0 bg-white/5 transition-colors hover:bg-purple-500 active:bg-purple-600",
-            isResizingFlow && "bg-purple-500",
-          )}
-          title="Kéo sang trái/phải để điều chỉnh tỷ lệ giữa Sơ đồ luồng Flow và Bảng điều tra Board"
-        />
-
-        {/* CỘT 2: Bảng điều tra Board (Ở giữa) */}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col relative h-full">
-          {/* Thanh công cụ Quick Transform nổi trên Canvas */}
-          {selectedNode && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-3 py-1.5 bg-[#16120e]/95 backdrop-blur-md rounded-lg border border-amber-500/50 shadow-2xl font-mono text-xs select-none">
-              <span className="text-amber-200/90 font-bold max-w-[140px] truncate pr-1">
-                {("title" in selectedNode
-                  ? selectedNode.title
-                  : "label" in selectedNode
-                    ? selectedNode.label
-                    : "") || "Ghim"}
-              </span>
-
-              <div className="h-4 w-px bg-white/15 mx-0.5" />
-
-              <button
-                type="button"
-                onClick={() => handleAdjustNodeTransform(selectedNode.id, -2, 0)}
-                className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
-                title="Xoay nghiêng trái (-2°)"
-              >
-                <RotateCcw className="size-3.5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleAdjustNodeTransform(selectedNode.id, 2, 0)}
-                className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
-                title="Xoay nghiêng phải (+2°)"
-              >
-                <RotateCw className="size-3.5" />
-              </button>
-
-              <div className="h-4 w-px bg-white/15 mx-0.5" />
-
-              <button
-                type="button"
-                onClick={() =>
-                  handleAdjustNodeTransform(selectedNode.id, 0, -0.1)
-                }
-                className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
-                title="Thu nhỏ (-0.1x)"
-              >
-                <Minus className="size-3.5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleAdjustNodeTransform(selectedNode.id, 0, 0.1)}
-                className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors"
-                title="Phóng to (+0.1x)"
-              >
-                <Plus className="size-3.5" />
-              </button>
-            </div>
-          )}
-
-          {/* Canvas chính */}
-          <div className="flex-1 h-full min-h-0 relative">
-            <HeroInteractive
-              className="w-full h-full"
-              controlledCaseId={caseId}
-              customPins={displayPins}
-              customConnections={activeConnections}
-              isEditMode={true}
-              selectedPinId={selectedNodeId}
-              onSelectPin={handleSelectPinOnBoard}
-              onPinClick={handleSelectPinOnBoard}
-              onPinPositionChange={handlePositionChange}
-              onConnectPins={handleConnectPinsWithLogic}
-              onDeleteConnection={handleDeleteConnectionWithLogic}
-            />
-          </div>
-
-        </div>
-
-          </div>
-
-          {/* Khay "Ngoài bảng" (Off-board Tray) ở đáy canvas */}
-          <OffBoardTray
-            checkpoints={rows}
-            dossiers={dossiers}
-            characters={characters}
-            selectedCheckpointId={selectedId}
-            selectedCharacterId={selectedCharacter?.id}
-            onSelectCheckpoint={(cp) => {
-              selectRow(cp);
-              setSelectedCharacter(null);
-              setInspectorTab("checkpoints");
-              setSelectedNodeId(null);
-            }}
-            onSelectCharacter={(char) => {
-              setSelectedCharacter(char);
-              setInspectorTab("characters");
-              setSelectedNodeId(null);
-            }}
-            onPromoteCharacterToSuspect={handlePromoteCharacterToSuspect}
-            onSelectDossier={() => {
-              router.push(`/studio/dossier?case=${encodeURIComponent(caseId)}`);
-            }}
-            onMoveToBoard={handleMoveToBoard}
+          {/* Cửa sổ nổi Bảng điều tra (Kéo di chuyển, Phóng to/Thu nhỏ & Resize tự do) */}
+          <FloatingBoardPanel
+            caseId={caseId}
+            displayPins={displayPins}
+            activeConnections={activeConnections}
+            selectedNodeId={selectedNodeId}
+            selectedNode={selectedNode}
+            isOpen={isFloatingBoardOpen}
+            onClose={() => setIsFloatingBoardOpen(false)}
+            onSelectPin={handleSelectPinOnBoard}
+            onPinPositionChange={handlePositionChange}
+            onConnectPins={handleConnectPinsWithLogic}
+            onDeleteConnection={handleDeleteConnectionWithLogic}
+            onAdjustNodeTransform={handleAdjustNodeTransform}
           />
         </div>
 
@@ -1533,18 +1582,18 @@ export function CheckpointStudioClient({
                     onClick={() => {
                       setInspectorTab("checkpoints");
                       setSelectedCharacter(null);
-                      if (!draft && generalCheckpoints.length > 0) {
-                        selectRow(generalCheckpoints[0]);
+                      if (!draft && rows.length > 0) {
+                        selectRow(rows[0]);
                       }
                     }}
                     className={cn(
                       "flex items-center justify-center py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
-                      inspectorTab === "checkpoints" && !selectedCharacter
+                      inspectorTab === "checkpoints"
                         ? "bg-amber-500 text-black shadow-md font-bold"
                         : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
                     )}
                   >
-                    Checkpoint ({generalCheckpoints.length})
+                    Checkpoint ({rows.length})
                   </button>
                   <button
                     type="button"
@@ -1556,7 +1605,7 @@ export function CheckpointStudioClient({
                     }}
                     className={cn(
                       "flex items-center justify-center py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer",
-                      inspectorTab === "characters" || selectedCharacter
+                      inspectorTab === "characters"
                         ? "bg-purple-600 text-white shadow-md font-bold"
                         : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
                     )}
@@ -1566,8 +1615,8 @@ export function CheckpointStudioClient({
                 </div>
 
                 {/* Hàng 2: Dropdown động tương ứng */}
-                {inspectorTab === "characters" || selectedCharacter ? (
-                  <div>
+                {inspectorTab === "characters" ? (
+                  <div className="relative">
                     <select
                       value={selectedCharacter?.id || selectedCharacter?.key || ""}
                       onChange={(e) => {
@@ -1580,10 +1629,10 @@ export function CheckpointStudioClient({
                           setSelectedNodeId(null);
                         }
                       }}
-                      className="w-full h-8 px-2.5 rounded-md bg-[#181822] border border-purple-500/30 text-xs text-purple-200 outline-none focus:border-purple-400 cursor-pointer font-sans"
+                      className="w-full h-8 pl-3 pr-8 rounded-md bg-[#14141c] border border-white/10 hover:border-purple-500/50 text-xs text-zinc-200 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/20 cursor-pointer font-sans appearance-none transition-colors"
                       title="Chọn nhân vật để điều chỉnh"
                     >
-                      <option value="" disabled className="bg-[#181822] text-zinc-400">
+                      <option value="" disabled className="bg-[#14141c] text-zinc-400">
                         -- Chọn nhân vật ({characters.length}) --
                       </option>
                       {characters.map((c) => {
@@ -1599,19 +1648,21 @@ export function CheckpointStudioClient({
                           <option
                             key={c.id || c.key}
                             value={c.id || c.key}
-                            className="bg-[#181822] text-zinc-100 py-1"
+                            className="bg-[#14141c] text-zinc-100 py-1.5"
                           >
                             {c.name || "Không tên"} ({roleText})
                           </option>
                         );
                       })}
                     </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
                   </div>
                 ) : (
-                  <div>
+                  <div className="relative">
                     <select
-                      value={selectedId || draft?.id || draft?.checkpointId || ""}
+                      value={currentSelectCheckpointId}
                       onChange={(e) => {
+                        if (e.target.value === "__new__") return;
                         const found = rows.find(
                           (r) => r.id === e.target.value || r.checkpoint_id === e.target.value,
                         );
@@ -1622,29 +1673,51 @@ export function CheckpointStudioClient({
                           setSelectedNodeId(null);
                         }
                       }}
-                      className="w-full h-8 px-2.5 rounded-md bg-[#181822] border border-amber-500/30 text-xs text-amber-200 outline-none focus:border-amber-400 cursor-pointer font-sans"
+                      className="w-full h-8 pl-3 pr-8 rounded-md bg-[#14141c] border border-white/10 hover:border-amber-500/50 text-xs text-zinc-200 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 cursor-pointer font-sans appearance-none transition-colors"
                       title="Chọn checkpoint để edit"
                     >
-                      <option value="" disabled className="bg-[#181822] text-zinc-400">
-                        -- Chọn checkpoint ({generalCheckpoints.length}) --
+                      <option value="" disabled className="bg-[#14141c] text-zinc-400">
+                        -- Chọn checkpoint ({rows.length}) --
                       </option>
-                      {generalCheckpoints.map((cp) => (
-                        <option
-                          key={cp.id || cp.checkpoint_id}
-                          value={cp.id || cp.checkpoint_id}
-                          className="bg-[#181822] text-zinc-100 py-1"
-                        >
-                          {cp.title || "Checkpoint không tên"}
+                      {draft && !draft.id && !rows.some((r) => r.checkpoint_id === draft.checkpointId) && (
+                        <option value="__new__" className="bg-[#14141c] text-amber-300">
+                          + Đang tạo: {draft.title || draft.checkpointId || "Checkpoint mới"}
                         </option>
-                      ))}
+                      )}
+                      {rows.map((cp) => {
+                        const kindBadge =
+                          cp.kind === "phone_lookup"
+                            ? "[Tra SĐT]"
+                            : cp.kind === "suspect_interrogation"
+                              ? "[Thẩm tra]"
+                              : cp.kind === "followup"
+                                ? "[Nghi vấn]"
+                                : cp.kind === "indictment"
+                                  ? "[Cáo trạng]"
+                                  : cp.kind === "epilogue"
+                                    ? "[Hậu án]"
+                                    : cp.kind === "code" || cp.kind === "time"
+                                      ? "[Mã / Giờ]"
+                                      : "[Chứng cứ]";
+                        return (
+                          <option
+                            key={cp.id || cp.checkpoint_id}
+                            value={cp.id || cp.checkpoint_id}
+                            className="bg-[#14141c] text-zinc-100 py-1.5"
+                          >
+                            {kindBadge} {cp.title || cp.checkpoint_id || "Checkpoint không tên"}
+                          </option>
+                        );
+                      })}
                     </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
                   </div>
                 )}
               </div>
 
               {/* Nội dung Inspector */}
               <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-                {inspectorTab === "characters" || selectedCharacter ? (
+                {inspectorTab === "characters" ? (
                   <CharacterEditor
                     caseId={caseId}
                     character={selectedCharacter}

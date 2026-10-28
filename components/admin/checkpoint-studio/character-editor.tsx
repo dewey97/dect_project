@@ -159,6 +159,47 @@ export function CharacterEditor({
     });
   };
 
+  const handleSave = () => {
+    const cleanName = name.trim();
+    if (!cleanName) {
+      alert("Vui lòng nhập họ và tên nhân vật!");
+      return;
+    }
+    const slugFromName = cleanName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/[^a-z0-9_]/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .slice(0, 32);
+
+    const isTemp = !character?.id || character.id.startsWith("temp_");
+    const effectiveKey =
+      (isTemp ? (slugFromName || key || character?.key) : (key || character?.key || slugFromName)) ||
+      ("char_" + Date.now().toString(36));
+
+    const updatedChar: DbCaseCharacter = {
+      id: character?.id || "temp_" + effectiveKey,
+      case_slug: caseId,
+      key: effectiveKey,
+      name: cleanName,
+      role,
+      avatar_url: avatarUrl.trim() || null,
+      avatar_code: character?.avatar_code || `avatar_${effectiveKey}`,
+      avatar_asset_path: character?.avatar_asset_path || null,
+      phones: character?.phones || [],
+      aliases: character?.aliases || [],
+      description: description.trim(),
+      slot_index: character?.slot_index ?? allCharacters.length,
+      device: character?.device || null,
+      created_at: character?.created_at || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    onSave(updatedChar);
+  };
+
   const handleDelete = async () => {
     if (!character?.id) return;
     if (
@@ -186,41 +227,7 @@ export function CharacterEditor({
 
   return (
     <div className="flex flex-col h-full w-full bg-[#0d0e14] text-zinc-100 overflow-hidden">
-      {/* 1. Header Bar Tinh Gọn (Không lặp lại tên và ảnh) */}
-      <div className="h-9 shrink-0 px-3 bg-[#12131b] border-b border-white/10 flex items-center justify-between text-xs select-none">
-        <span className="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-          HỒ SƠ NHÂN VẬT
-        </span>
-
-        <div className="flex items-center gap-1">
-          {!isNew && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 text-xs h-6 px-1.5 cursor-pointer"
-              title="Xóa nhân vật"
-            >
-              <Trash2 className="size-3.5" />
-            </Button>
-          )}
-
-          {onClose && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="size-6 rounded hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-              title="Đóng"
-            >
-              <X className="size-3.5" />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* 2. Form Body (Scrollable) */}
+      {/* Form Body (Scrollable) */}
       <div className="flex-1 min-h-0 overflow-y-auto p-3.5 space-y-3.5 text-xs font-sans">
         {/* Khối Ảnh 3:4 chuẩn tài liệu phẳng (không bo viền) + Tên & Role cùng kích thước bên cạnh */}
         <div className="space-y-2">
@@ -360,6 +367,22 @@ export function CharacterEditor({
                 onChange={handleInterrogationDraftChange}
               />
             )}
+          </div>
+        )}
+
+        {/* Nút xóa nhân vật gọn gàng ở cuối form */}
+        {!isNew && (
+          <div className="pt-4 border-t border-white/5 flex items-center justify-end select-none">
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500 hover:text-rose-400 hover:bg-rose-950/20 px-2.5 py-1 rounded transition-colors cursor-pointer"
+              title="Xóa nhân vật này khỏi vụ án"
+            >
+              <Trash2 className="size-3.5" />
+              <span>{isDeleting ? "Đang xóa..." : "Xóa nhân vật"}</span>
+            </button>
           </div>
         )}
       </div>

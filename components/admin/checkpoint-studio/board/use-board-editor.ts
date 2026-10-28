@@ -40,14 +40,34 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
     future: BoardEditorSnapshot[];
   }>({ past: [], future: [] });
 
-  // Đồng bộ từ boardModel khi nạp xong hoặc khi refresh
+  // Đồng bộ từ boardModel khi nạp xong hoặc khi có cập nhật live từ Checkpoint Studio
   useEffect(() => {
     if (!boardModel.isLoading) {
-      setNodes(boardModel.boardNodes);
-      setPins(boardModel.pins);
-      setConnections(boardModel.connections);
-      setPositions(boardModel.positions);
-      setHasUnsavedChanges(false);
+      if (!hasUnsavedChanges) {
+        setNodes(boardModel.boardNodes);
+        setPins(boardModel.pins);
+        setConnections(boardModel.connections);
+        setPositions(boardModel.positions);
+        setHasUnsavedChanges(false);
+      } else {
+        // Khi đang có thay đổi chưa lưu trên bảng (ví dụ vừa kéo thả pin),
+        // vẫn đồng bộ live các thuộc tính nội dung (nhãn, màu, ẩn/hiện, tiêu đề) từ boardModel.pins
+        setPins((prevPins) => {
+          return boardModel.pins.map((modelPin) => {
+            const existing = prevPins.find((p) => p.id === modelPin.id);
+            if (existing) {
+              return {
+                ...modelPin,
+                x: existing.x,
+                y: existing.y,
+                rotation: existing.rotation ?? modelPin.rotation,
+                scale: existing.scale ?? modelPin.scale,
+              };
+            }
+            return modelPin;
+          });
+        });
+      }
     }
   }, [
     boardModel.isLoading,
@@ -55,6 +75,7 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
     boardModel.pins,
     boardModel.connections,
     boardModel.positions,
+    hasUnsavedChanges,
   ]);
 
   const currentSnapshot = useCallback((): BoardEditorSnapshot => ({
@@ -298,48 +319,75 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
     setSelectedNodeId,
     refreshBoardModel: boardModel.refresh,
     handleAdjustNodeTransform: (pinId: string, deltaRot: number, deltaScale: number) => {
-      const targetNode = nodes.find((n) => n.id === pinId);
+      // Tìm target trong nodes hoặc pins (khớp id, legacyId, checkpointId)
+      const targetNode = nodes.find(
+        (n) => n.id === pinId || n.checkpoint_id === pinId || (pinId && n.id.includes(pinId)),
+      );
+      const targetPin = pins.find(
+        (p) =>
+          p.id === pinId ||
+          p.legacyId === pinId ||
+          p.checkpointId === pinId ||
+          (pinId && (p.id.includes(pinId) || pinId.includes(p.id))),
+      );
+
+      if (!targetNode && !targetPin) return;
+
+      const snap = currentSnapshot();
+      commitSnapshot(snap);
+
+      const curRot =
+        typeof targetPin?.rotation === "number"
+          ? targetPin.rotation
+          : typeof (targetNode?.config as any)?.rotation === "number"
+            ? (targetNode?.config as any).rotation
+            : 0;
+
+      const curScale =
+        typeof targetPin?.scale === "number" && targetPin.scale > 0
+          ? targetPin.scale
+          : typeof (targetNode?.config as any)?.scale === "number" && (targetNode?.config as any).scale > 0
+            ? (targetNode?.config as any).scale
+            : 1.0;
+
+      const nextRot = Math.round(curRot + deltaRot);
+      const nextScale = Math.max(0.4, Math.min(2.5, Math.round((curScale + deltaScale) * 10) / 10));
+
       if (targetNode) {
-        const snap = currentSnapshot();
-        commitSnapshot(snap);
         setNodes((prev) =>
           prev.map((n) => {
-            if (n.id !== pinId) return n;
+            const isMatch = n.id === pinId || n.checkpoint_id === pinId || n.id === targetNode.id;
+            if (!isMatch) return n;
             const cfg = (n.config as any) || {};
-            const curRot = cfg.rotation ?? 0;
-            const curScale = cfg.scale ?? 1.0;
             return {
               ...n,
               config: {
                 ...cfg,
-                rotation: Math.round(curRot + deltaRot),
-                scale: Math.max(0.4, Math.min(2.5, Math.round((curScale + deltaScale) * 10) / 10)),
+                rotation: nextRot,
+                scale: nextScale,
               },
             };
-          })
+          }),
         );
-        setHasUnsavedChanges(true);
-        return;
       }
 
-      const targetPin = pins.find((p) => p.id === pinId);
-      if (targetPin) {
-        const snap = currentSnapshot();
-        commitSnapshot(snap);
-        setPins((prev) =>
-          prev.map((p) => {
-            if (p.id !== pinId) return p;
-            const curRot = p.rotation ?? 0;
-            const curScale = p.scale ?? 1.0;
-            return {
-              ...p,
-              rotation: Math.round(curRot + deltaRot),
-              scale: Math.max(0.4, Math.min(2.5, Math.round((curScale + deltaScale) * 10) / 10)),
-            };
-          })
-        );
-        setHasUnsavedChanges(true);
-      }
+      setPins((prev) =>
+        prev.map((p) => {
+          const isMatch =
+            p.id === pinId ||
+            p.legacyId === pinId ||
+            p.checkpointId === pinId ||
+            (targetPin && p.id === targetPin.id) ||
+            (targetNode && (p.id === targetNode.id || p.checkpointId === targetNode.checkpoint_id));
+          if (!isMatch) return p;
+          return {
+            ...p,
+            rotation: nextRot,
+            scale: nextScale,
+          };
+        }),
+      );
+      setHasUnsavedChanges(true);
     },
     handlePositionChange,
     handleConnectPins,
