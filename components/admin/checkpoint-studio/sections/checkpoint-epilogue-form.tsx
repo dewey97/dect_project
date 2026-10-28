@@ -152,8 +152,8 @@ export function CheckpointEpilogueForm({
 
       {/* Phụ thuộc depends_on cho Hậu án */}
       {checkpoints && checkpoints.length > 0 && (
-        <div className="space-y-1.5 pt-2 border-t border-white/10">
-          <label className="block text-xs font-semibold text-zinc-300">
+        <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+          <label className="shrink-0 text-xs font-semibold text-zinc-300">
             Phụ thuộc
           </label>
           <select
@@ -162,7 +162,7 @@ export function CheckpointEpilogueForm({
               const val = e.target.value;
               onChange({ dependsOn: val ? [val] : [] });
             }}
-            className="w-full h-8 px-2 rounded-md bg-black/40 border border-white/10 text-xs text-zinc-200 outline-none focus:border-amber-400 cursor-pointer"
+            className="h-8 flex-1 px-2 rounded-md bg-black/40 border border-white/10 text-xs text-zinc-200 outline-none focus:border-amber-400 cursor-pointer"
           >
             <option value="">-- Không phụ thuộc (Mở sẵn) --</option>
             {checkpoints

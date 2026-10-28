@@ -327,7 +327,9 @@ export function toRowPayload(
     subject_key: draft.subjectKey.trim() || null,
     question_type: draft.questionType.trim() || draft.type.trim() || null,
     unlocked_evidence_id: draft.unlockedEvidenceId.trim() || null,
-    followup_of: draft.followupOf.trim() || null,
+    followup_of:
+      draft.followupOf.trim() ||
+      (draft.kind === "followup" ? draft.dependsOn[0] || null : null),
     suspect_label: draft.suspectLabel.trim() || null,
     evidence_step_label: draft.evidenceStepLabel.trim() || null,
     answer_config: {

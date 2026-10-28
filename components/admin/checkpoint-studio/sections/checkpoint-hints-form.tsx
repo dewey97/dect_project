@@ -20,6 +20,7 @@ interface CheckpointHintsFormProps {
   draft: CheckpointStudioDraft;
   activeGroup?: CheckpointHintGroup;
   hideGroupTabs?: boolean;
+  title?: string;
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
 }
 
@@ -27,6 +28,7 @@ export function CheckpointHintsForm({
   draft,
   activeGroup,
   hideGroupTabs = false,
+  title = "Gợi ý",
   onChange,
 }: CheckpointHintsFormProps) {
   const isEvidencePicker =
@@ -69,6 +71,20 @@ export function CheckpointHintsForm({
 
   return (
     <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+          {title}
+        </span>
+        <button
+          type="button"
+          onClick={addHint}
+          className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-400 hover:text-amber-300 transition-colors"
+        >
+          <Plus className="size-3" />
+          <span>Thêm gợi ý</span>
+        </button>
+      </div>
+
       {isEvidencePicker && !hideGroupTabs && (
         <div className="flex flex-wrap items-center gap-1 pb-1">
           {HINT_GROUPS.map((item) => {
@@ -131,15 +147,6 @@ export function CheckpointHintsForm({
             </button>
           </div>
         ))}
-
-        <button
-          type="button"
-          onClick={addHint}
-          className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-400 hover:text-amber-300 transition-colors pt-0.5"
-        >
-          <Plus className="size-3" />
-          <span>Thêm gợi ý</span>
-        </button>
       </div>
     </div>
   );

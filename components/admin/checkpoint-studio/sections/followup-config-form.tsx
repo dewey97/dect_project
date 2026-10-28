@@ -15,23 +15,18 @@ interface FollowupConfigFormProps {
 const INPUT_CLASS = "h-7 border-white/10 bg-black/40 text-xs text-zinc-100";
 
 const FOLLOWUP_TYPES = [
-  { value: "time", label: "Mốc thời gian" },
-  { value: "choice", label: "Trắc nghiệm lựa chọn" },
-  { value: "code", label: "Mật khẩu / Mã số" },
-  { value: "text", label: "Nhập văn bản tự do" },
+  { value: "code", label: "So khớp" },
+  { value: "choice", label: "Trắc nghiệm" },
+  { value: "text", label: "Tự do" },
 ];
 
 export function FollowupConfigForm({
   draft,
-  checkpoints = [],
   onChange,
 }: FollowupConfigFormProps) {
   const config = draft.answerConfig;
-  const questionType = draft.questionType || "time";
-
-  const interrogationCheckpoints = checkpoints.filter(
-    (c) => c.kind === "suspect_interrogation" || c.type === "evidence_picker",
-  );
+  const rawQuestionType = draft.questionType || "code";
+  const questionType = rawQuestionType === "time" ? "code" : rawQuestionType;
 
   const setConfig = (patch: Partial<typeof config>) => {
     onChange({ answerConfig: { ...config, ...patch } });
@@ -73,11 +68,9 @@ export function FollowupConfigForm({
       {/* Đáp án đúng */}
       <Field
         label={
-          questionType === "time"
-            ? "Mốc thời gian đúng (HH:MM)"
-            : questionType === "code"
-              ? "Mã số / Mật khẩu đúng"
-              : "Đáp án đúng"
+          questionType === "code" || questionType === "time"
+            ? "Đáp án so khớp"
+            : "Đáp án đúng"
         }
         required
       >
@@ -85,50 +78,12 @@ export function FollowupConfigForm({
           value={config.correctAnswer || ""}
           onChange={(e) => setConfig({ correctAnswer: e.target.value })}
           placeholder={
-            questionType === "time"
-              ? "21:15"
-              : questionType === "code"
-                ? "120713"
-                : "Nhập đáp án đúng..."
+            questionType === "code" || questionType === "time"
+              ? "120713 hoặc 21:15"
+              : "Nhập đáp án đúng..."
           }
           className={INPUT_CLASS}
         />
-      </Field>
-
-      {/* Mã ảnh mở khóa */}
-      <Field label="Mã ảnh mở khóa sau khi giải đúng (nếu có)">
-        <CodeChipInput
-          value={config.photoCodes || []}
-          onChange={(photoCodes) => setConfig({ photoCodes })}
-          placeholder="VD: photo_01, photo_02..."
-          className="min-h-8 border-white/10 bg-black/40"
-        />
-      </Field>
-
-      {/* Checkpoint thẩm tra gốc */}
-      <Field label="Checkpoint thẩm tra gốc">
-        <select
-          value={draft.followupOf || ""}
-          onChange={(e) => onChange({ followupOf: e.target.value })}
-          className="h-7 w-full rounded-md border border-white/10 bg-[#121216] px-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50"
-        >
-          <option value="">-- Chọn checkpoint gốc --</option>
-          {interrogationCheckpoints.map((cp) => (
-            <option key={cp.checkpoint_id} value={cp.checkpoint_id}>
-              {cp.title
-                ? `${cp.title} (${cp.checkpoint_id})`
-                : cp.checkpoint_id}
-            </option>
-          ))}
-          {draft.followupOf &&
-            !interrogationCheckpoints.some(
-              (cp) => cp.checkpoint_id === draft.followupOf,
-            ) && (
-              <option value={draft.followupOf}>
-                ⚠ {draft.followupOf} (không tìm thấy)
-              </option>
-            )}
-        </select>
       </Field>
     </div>
   );

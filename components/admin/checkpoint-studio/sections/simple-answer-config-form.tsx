@@ -46,11 +46,25 @@ export function SimpleAnswerConfigForm({
           </Field>
         </>
       ) : (
-        <Input
-          value={config.correctAnswer || ""}
-          onChange={(event) => setConfig({ correctAnswer: event.target.value })}
-          className={INPUT_CLASS}
-        />
+        <Field
+          label={
+            type === "code" || type === "time" || draft.kind === "code" || draft.kind === "time"
+              ? "Đáp án so khớp"
+              : "Đáp án đúng"
+          }
+          required
+        >
+          <Input
+            value={config.correctAnswer || ""}
+            onChange={(event) => setConfig({ correctAnswer: event.target.value })}
+            placeholder={
+              type === "code" || type === "time" || draft.kind === "code" || draft.kind === "time"
+                ? "120713 hoặc 21:15"
+                : "Nhập đáp án..."
+            }
+            className={INPUT_CLASS}
+          />
+        </Field>
       )}
     </div>
   );

@@ -149,8 +149,9 @@ export function CheckpointEditor({
                 <PhoneLookupConfigForm draft={draft} onChange={onChange} />
               )}
 
-              {effectiveKind === "suspect_interrogation" && (
-                <Section title="Thẩm tra nghi phạm (3 lớp)">
+              {(effectiveKind === "suspect_interrogation" ||
+                effectiveKind === "evidence_picker") && (
+                <Section title="Cấu hình Chọn tài liệu (Động cơ & Mâu thuẫn)">
                   <SuspectInterrogationConfigForm
                     draft={draft}
                     onChange={onChange}
@@ -183,9 +184,11 @@ export function CheckpointEditor({
                     <SimpleAnswerConfigForm draft={draft} onChange={onChange} />
                   </Section>
 
-                  <Section title="Gợi ý">
-                    <CheckpointHintsForm draft={draft} onChange={onChange} />
-                  </Section>
+                  <CheckpointHintsForm
+                    draft={draft}
+                    onChange={onChange}
+                    title="Gợi ý"
+                  />
                 </>
               )}
 
@@ -193,9 +196,11 @@ export function CheckpointEditor({
               {(effectiveKind === "phone_lookup" ||
                 effectiveKind === "followup" ||
                 effectiveKind === "indictment") && (
-                <Section title="Gợi ý">
-                  <CheckpointHintsForm draft={draft} onChange={onChange} />
-                </Section>
+                <CheckpointHintsForm
+                  draft={draft}
+                  onChange={onChange}
+                  title="Gợi ý"
+                />
               )}
 
               <Section title="Lời dẫn">

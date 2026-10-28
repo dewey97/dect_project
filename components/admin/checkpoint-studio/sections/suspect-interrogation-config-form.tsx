@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Flame, Scale } from "lucide-react";
 import type {
   CheckpointStudioDraft,
   EvidencePickerConfig,
@@ -31,14 +30,6 @@ export function SuspectInterrogationConfigForm({
     onChange({ answerConfig: { ...config, [key]: value } });
   };
 
-  const motiveCount =
-    (config.motiveEvidenceIds?.length || 0) +
-    (config.optionalMotiveIds?.length || 0);
-
-  const contradictionCount =
-    (config.contradictionEvidenceIds?.length || 0) +
-    (config.optionalContradictionIds?.length || 0);
-
   return (
     <div className="space-y-3">
       {/* 2 Subtabs phẳng: Động cơ & Mâu thuẫn lời khai */}
@@ -47,38 +38,26 @@ export function SuspectInterrogationConfigForm({
           type="button"
           onClick={() => setActiveTab("motive")}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 rounded py-1.5 text-xs font-semibold transition-all cursor-pointer",
+            "flex flex-1 items-center justify-center rounded py-1.5 text-xs font-semibold transition-all cursor-pointer",
             activeTab === "motive"
               ? "bg-amber-500/20 text-amber-300 shadow-sm border border-amber-500/30"
               : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
           )}
         >
-          <Flame className="size-3.5 text-amber-400" />
           <span>Động cơ</span>
-          {motiveCount > 0 && (
-            <span className="rounded bg-amber-500/30 px-1.5 py-0.2 font-mono text-[9px] font-bold text-amber-200">
-              {motiveCount}
-            </span>
-          )}
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("contradiction")}
           className={cn(
-            "flex flex-1 items-center justify-center gap-1.5 rounded py-1.5 text-xs font-semibold transition-all cursor-pointer",
+            "flex flex-1 items-center justify-center rounded py-1.5 text-xs font-semibold transition-all cursor-pointer",
             activeTab === "contradiction"
               ? "bg-rose-500/20 text-rose-300 shadow-sm border border-rose-500/30"
               : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
           )}
         >
-          <Scale className="size-3.5 text-rose-400" />
           <span>Mâu thuẫn lời khai</span>
-          {contradictionCount > 0 && (
-            <span className="rounded bg-rose-500/30 px-1.5 py-0.2 font-mono text-[9px] font-bold text-rose-200">
-              {contradictionCount}
-            </span>
-          )}
         </button>
       </div>
 
@@ -143,17 +122,13 @@ export function SuspectInterrogationConfigForm({
             />
           </Field>
 
-          <div>
-            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-              Gợi ý cho phần Động cơ
-            </span>
-            <CheckpointHintsForm
-              draft={draft}
-              activeGroup="motive"
-              hideGroupTabs
-              onChange={onChange}
-            />
-          </div>
+          <CheckpointHintsForm
+            draft={draft}
+            activeGroup="motive"
+            hideGroupTabs
+            title="Gợi ý cho phần Động cơ"
+            onChange={onChange}
+          />
         </div>
       )}
 
@@ -221,17 +196,13 @@ export function SuspectInterrogationConfigForm({
             />
           </Field>
 
-          <div>
-            <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
-              Gợi ý cho phần Mâu thuẫn
-            </span>
-            <CheckpointHintsForm
-              draft={draft}
-              activeGroup="contradiction"
-              hideGroupTabs
-              onChange={onChange}
-            />
-          </div>
+          <CheckpointHintsForm
+            draft={draft}
+            activeGroup="contradiction"
+            hideGroupTabs
+            title="Gợi ý cho phần Mâu thuẫn"
+            onChange={onChange}
+          />
         </div>
       )}
     </div>
