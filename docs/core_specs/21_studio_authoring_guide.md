@@ -88,7 +88,7 @@ Màn hình chính để dựng logic vụ án. Gồm 3 vùng:
 |           | Loại                                                                    | `kind`                                             |
 |           | Dạng ô trả lời                                                          | `question_type`                                    |
 |           | Câu hỏi                                                                 | `question`                                         |
-|           | Nhân vật liên quan                                                      | `subject_key` (chọn từ dropdown)                   |
+| | Nhân vật liên quan | `subject_key`: không chọn trong form checkpoint. Checkpoint thẩm tra được tạo/mở từ form nhân vật (chọn nghi phạm ở tab "Nhân vật"), `subject_key` = mã nhân vật |
 |           | Phụ thuộc                                                               | `depends_on[]` (chọn checkpoint phải xong trước)   |
 |           | Mở bộ hồ sơ khi xong                                                    | `answer_config.unlocksDossier`                     |
 |           | Hiện trên bảng / vị trí bảng                                            | `board_config`                                     |
