@@ -142,6 +142,7 @@ Quy tắc thêm:
 | **B23** | **Gộp Flow + Board thành một mặt phẳng** (chủ dự án chốt). Làm B23-1 → B23-5. | `docs/reports/REVIEW_FLOW_BOARD_SYNC_2026-10-26.md` | Một màn hình, một dữ liệu, một nơi lưu vị trí; E2E mới pass |
 | **B24** | **Hoàn tất B23 trong worktree trước khi merge.** ✅ Đã merge vào `main` (`3ae0db2`), worktree đã dọn. Làm B24-1 → B24-5. | `docs/reports/REVIEW_B23_2026-10-27.md` | E2E chạy được trong worktree, 0 fail; vị trí mobile có chỗ lưu; migration 44 chạy |
 | **B25** | **Trên `main`: bỏ skip test v2; chỉ mount 1 canvas; chạy cả bộ E2E.** Làm B25-1 → B25-3. | `docs/reports/REVIEW_B24_2026-10-27.md` | `case-v2-from-studio` 2/2 pass, `case-000` 0 fail, `pnpm test:e2e` 0 fail, 0 skip mới |
+| **B26** | **Dọn sau audit 2026-10-28: sửa Bản đồ + chặn API Gemini, bỏ cột/bảng thừa, xóa code chết và dữ liệu tĩnh.** Làm B26-1 → B26-8. | `docs/reports/AUDIT_2026-10-28_DB_STUDIO_STRUCTURE.md` | App Bản đồ có dữ liệu trên production; `/api/test-scan-answer` từ chối khi chưa đăng nhập; 0 file chết trong danh sách; lint + spec liên quan pass |
 
 ### B12 — danh sách lỗi review (2026-10-25)
 
@@ -392,6 +393,33 @@ B25-1: bỏ test.skip test 2 của e2e/case-v2-from-studio.spec.ts, sửa cho pa
 B25-2: sửa app/(investigation)/evidence/web/page.tsx để chỉ mount một MainInvestigationCanvas (theo isMobile sau mount). Chạy e2e/case-000.spec.ts tới 0 fail.
 B25-3: chạy 1 lần làm nóng (bỏ qua kết quả), rồi pnpm test:e2e 1 lần.
 Mỗi mục 1 commit, không push. Báo cáo docs/reports/B25_REPORT.md: git log --oneline 3d549ae..HEAD, dòng tổng kết Playwright thật từng lần chạy. Không làm live cursor.
+```
+
+### B26 — dọn sau audit DB/Studio/cấu trúc (2026-10-28)
+
+Nguồn: `docs/reports/AUDIT_2026-10-28_DB_STUDIO_STRUCTURE.md`. Làm trên `main`, mỗi mục 1 commit. Migration production: backup bảng bị đụng trước, chạy qua `scripts/ops/run-sql.mjs`, báo chủ dự án trước khi chạy. **B26-3 chờ chủ dự án chốt.**
+
+| #     | Mức     | Việc | Tiêu chí done |
+| ----- | ------- | ---- | ------------- |
+| B26-1 | 🔴 Cao  | Nạp `data/maps/world_vector_map.json` vào `map_vectors` (id `world`) bằng script 1 lần trong `scripts/ops/`. Sau đó xóa `data/maps/case_000_vector.json`, `case_000_vector.backup_old.json`, `world_vector_map.backup.json` | `select count(*) from map_vectors where id='world'` = 1; `GET /api/map-vector` trả 200 |
+| B26-2 | 🔴 Cao  | `app/api/test-scan-answer/route.ts`: bắt buộc đăng nhập (trả 401 nếu chưa), giới hạn tần suất đơn giản theo user (vd 20 lần/phút, in-memory). Đổi tên route thành `/api/scan-answer`, sửa chỗ gọi `add-suspect-modal.tsx:369` | `curl -X POST /api/scan-answer` không cookie → 401; spec `case-000` pass |
+| B26-3 | 🟠 TB   | **Chờ chủ dự án chốt** Flow view: (a) giữ Flow làm sơ đồ logic, vị trí riêng ở `flow_position`; hoặc (b) bỏ `checkpoint-flow-view.tsx`, dùng "Lớp logic" trên bảng. Theo lựa chọn: (a) xóa `off-board-tray.tsx`; (b) xóa flow view + cột `case_checkpoints.flow_position` | Ghi lựa chọn vào báo cáo; `grep` file bị xóa = 0 |
+| B26-4 | 🟠 TB   | Xóa code chết (danh sách mục 3.1 của audit, trừ `off-board-tray.tsx` chờ B26-3). `lib/case-locations-data.ts`: giữ type và hàm tính đường, xóa `ROAD_NODES`, `ROAD_EDGES`, `LOCATION_METAS`, `CASE_LOCATIONS`, `DEFAULT_CASE_LOCATIONS`, `SCANNED_MAP_DOT_CODES` nếu không còn ai dùng | Script quét file không được import ra 0 dòng cho danh sách; `grep -rn DEFAULT_CASE_LOCATIONS app components lib` = 0; lint pass |
+| B26-5 | 🟠 TB   | `case_checkpoints`: bỏ cột `unlocked_evidence_id`, `suspect_label`, `evidence_step_label`; đổi mọi chỗ đọc `type` sang `question_type` (giá trị `mcq` → `choice`), rồi bỏ cột `type`. Sửa `app/api/checkpoints/route.ts:53,67`, `lib/types/database.ts`, `lib/types/checkpoint-studio.ts:328`. Migration 46, backup trước | `information_schema.columns` không còn 4 cột; spec `case-000` + `case-v2-from-studio` pass |
+| B26-6 | 🟡 Thấp | DB nhỏ: bỏ unique thừa `dossier_documents_case_id_mode_tag_code_key`; bỏ `case_dossiers.flow_position`, `case_board_nodes.checkpoint_id` (0 dữ liệu); chuyển nhân vật thiếu `avatar_url` rồi bỏ `case_characters.avatar_code`; xóa `boardgame_pins_backup_b23` sau khi chủ dự án smoke test production | Truy vấn đếm cột/ràng buộc khớp; lint pass |
+| B26-7 | 🟡 Thấp | Gộp helper trùng: `asString`/`asStringArray` về `lib/checkpoints/kinds.ts`, `cleanList`, `toWords` về 1 chỗ. Chuyển `parseAnswersColumn` sang `lib/checkpoints/`, xóa `lib/cms/checkpoint-cms.ts` nếu không còn ai dùng; xóa `syncEvidenceFromGoogleSheet` và script `sync:docs-to-sheet`, `sync:gdocs`, `sync:testimonies`, `import:checkpoints` | `grep -rn "function asString\b" lib` = 1; `grep -rn googleapis lib/actions` = 0 |
+| B26-8 | 🟡 Thấp | Asset: xóa `public/keyhole.glb`, `public/audio/sfx/tiktok_source.wav` (không ai dùng); nén `public/images/cases/case_000/PANORAMA.png` sang JPG/WebP ≤ 2 MB và sửa đường dẫn; `git rm -r scripts/archive` (giữ bản cục bộ nếu cần) | `du` 2 file đã xóa; Khám xét lại hiện trường vẫn mở ảnh 360 |
+
+Không làm trong B26 (backlog): đổi tên `case_id` → `case_slug` (D7), tách nội dung khỏi `boardgame_pins` (D4), gộp `panorama_url`/`scene_360_url` (D6, chờ chủ dự án), tách file > 1.000 dòng, trang tiến độ vụ trên `/studio/cases/[slug]` (S2), mẹo 800 ms.
+
+**Prompt giao việc B26:**
+
+```
+Đọc docs/reports/AUDIT_2026-10-28_DB_STUDIO_STRUCTURE.md, docs/WORKTREE_PLAN.md mục "Ngân sách kiểm thử cho AI thực thi" và bảng "B26". Làm trên main.
+Làm B26-1, B26-2, B26-4 → B26-8, mỗi mục 1 commit, không push. B26-3 chỉ làm khi chủ dự án đã ghi lựa chọn (a) hoặc (b).
+Migration production (B26-1, B26-5, B26-6): backup bảng bị đụng trước, chạy qua scripts/ops/run-sql.mjs, báo chủ dự án trước khi chạy.
+Chỉ chạy spec liên quan tới mục đang làm; cuối cùng pnpm lint + pnpm test:e2e 1 lần.
+Báo cáo docs/reports/B26_REPORT.md: git log --oneline 5522d73..HEAD, dòng tổng kết Playwright thật, kết quả truy vấn DB của từng tiêu chí. Không làm live cursor.
 ```
 
 > Đã đóng 2026-10-27: worktree `dect_wt_b23` đã merge (`3ae0db2`) và xóa. Giữ mục dưới làm mẫu cho worktree sau.

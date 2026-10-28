@@ -122,7 +122,7 @@ WT-2 (phone), WT-4 (character), WT-6 (cắt Sheets), WT-7 (ops) đã xong phần
 
 Quyết định đã chốt: D1 (`case_board_nodes` thu hẹp + `board_config`), D2 (7 preset iPhone — xong), D3 (bỏ metadata UI, giữ cột DB), D4 (xóa `/api/phone` ở Phần A), D6 (chỉ tách 3 worktree). Câu hỏi mở cho WT-1: xem mục 7 của plan.
 
-Tiến độ (2026-10-27): B23/B24 (gộp Flow + Board) đã merge vào `main` (`3ae0db2`), worktree đã dọn; `main` chưa push. Còn B25 trên `main`: bỏ skip test v2 (B25-1), chỉ mount 1 canvas để `case-000` hết fail (B25-2), chạy cả bộ E2E (B25-3). Sau B25: push, smoke test production, 6 vụ tĩnh `/activate`, A6, A10, xác nhận gói Supabase rồi giao live cursor.
+Tiến độ (2026-10-28): B23/B24 đã merge; B25 đã có commit (`fe8b006`, `a751c2b`, `861e96c`), chưa review. Audit DB/Studio/cấu trúc (`docs/reports/AUDIT_2026-10-28_DB_STUDIO_STRUCTURE.md`): 2 lỗi đỏ (Bản đồ trống trên production, API Gemini không kiểm tra đăng nhập) → B26. Chủ dự án: chốt Flow view (B26-3); sau B25 + B26-1/2: push, smoke test production, A6, A10, xác nhận gói Supabase rồi giao live cursor.
 
 ---
 
