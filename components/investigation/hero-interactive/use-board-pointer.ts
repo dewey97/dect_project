@@ -96,9 +96,11 @@ export function useBoardPointer({
     (screenX: number, screenY: number) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
+      const layoutWidth = containerRef.current.clientWidth || rect.width;
+      const layoutHeight = containerRef.current.clientHeight || rect.height;
       const bounds = getInnerBoardBounds(
-        rect.width,
-        rect.height,
+        layoutWidth,
+        layoutHeight,
         boardFrameRef.current,
       );
       const transform = getViewTransform(zoomRef.current, panRef.current);
@@ -156,13 +158,19 @@ export function useBoardPointer({
         return;
       }
 
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) {
+      const container = containerRef.current;
+      if (!container) {
         return;
       }
+      const rect = container.getBoundingClientRect();
 
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const layoutWidth = container.clientWidth || rect.width;
+      const layoutHeight = container.clientHeight || rect.height;
+      const scaleX = rect.width > 0 ? layoutWidth / rect.width : 1;
+      const scaleY = rect.height > 0 ? layoutHeight / rect.height : 1;
+
+      const x = (event.clientX - rect.left) * scaleX;
+      const y = (event.clientY - rect.top) * scaleY;
 
       activePointerIdRef.current = event.pointerId;
       isPointerDownRef.current = true;
@@ -270,13 +278,19 @@ export function useBoardPointer({
 
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) {
+      const container = containerRef.current;
+      if (!container) {
         return;
       }
+      const rect = container.getBoundingClientRect();
 
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const layoutWidth = container.clientWidth || rect.width;
+      const layoutHeight = container.clientHeight || rect.height;
+      const scaleX = rect.width > 0 ? layoutWidth / rect.width : 1;
+      const scaleY = rect.height > 0 ? layoutHeight / rect.height : 1;
+
+      const x = (event.clientX - rect.left) * scaleX;
+      const y = (event.clientY - rect.top) * scaleY;
 
       pointerRef.current = {
         x,
@@ -404,17 +418,23 @@ export function useBoardPointer({
         return;
       }
 
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) {
+      const container = containerRef.current;
+      if (!container) {
         isPointerDownRef.current = false;
         activePointerIdRef.current = null;
         draggingPinIdRef.current = null;
         clickedPinIdRef.current = null;
         return;
       }
+      const rect = container.getBoundingClientRect();
 
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const layoutWidth = container.clientWidth || rect.width;
+      const layoutHeight = container.clientHeight || rect.height;
+      const scaleX = rect.width > 0 ? layoutWidth / rect.width : 1;
+      const scaleY = rect.height > 0 ? layoutHeight / rect.height : 1;
+
+      const x = (event.clientX - rect.left) * scaleX;
+      const y = (event.clientY - rect.top) * scaleY;
 
       isPointerDownRef.current = false;
       activePointerIdRef.current = null;

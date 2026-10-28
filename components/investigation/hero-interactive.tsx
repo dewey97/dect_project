@@ -323,9 +323,13 @@ export function HeroInteractive({
     }
 
     const resizeCanvas = () => {
+      // Use clientWidth / clientHeight to obtain the unscaled layout box dimensions,
+      // avoiding double-scaling when mounted inside a CSS scaled container (e.g. DossierCanvasBoard)
+      const layoutWidth = container.clientWidth;
+      const layoutHeight = container.clientHeight;
       const rect = container.getBoundingClientRect();
-      const width = Math.max(1, rect.width);
-      const height = Math.max(1, rect.height);
+      const width = Math.max(1, layoutWidth || rect.width);
+      const height = Math.max(1, layoutHeight || rect.height);
       const devicePixelRatio = Math.min(
         window.devicePixelRatio || 1,
         MAX_DEVICE_PIXEL_RATIO,
@@ -336,8 +340,8 @@ export function HeroInteractive({
 
       canvas.width = Math.round(width * devicePixelRatio);
       canvas.height = Math.round(height * devicePixelRatio);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
 
       context.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
       requestRenderRef.current();

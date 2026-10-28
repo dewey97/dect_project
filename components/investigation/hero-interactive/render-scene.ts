@@ -491,7 +491,6 @@ export function renderScene({
           customTextureUrl.includes("rendered_notes/") ||
           customTextureUrl.includes("/notes/");
       } else if (
-        pin.nodeKind === "evidence_hub" ||
         upperLabel.includes("CHỨNG CỨ")
       ) {
         noteUrl = "/images/board/notes/note_bo_sung_chung_cu.png";
@@ -571,7 +570,6 @@ export function renderScene({
       let pinAnchorY = 0.08;
 
       if (
-        pin.nodeKind === "evidence_hub" ||
         upperLabel.includes("CHỨNG CỨ")
       ) {
         pinAnchorX = 0.5;
@@ -1021,7 +1019,6 @@ export function renderScene({
     }
 
     const isEvidencePin =
-      pin.nodeKind === "evidence_hub" ||
       pin.nodeKind === "photo" ||
       (pin.label && pin.label.toLowerCase().includes("bổ sung chứng cứ"));
     const isSuspectPin =

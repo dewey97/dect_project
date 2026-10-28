@@ -9,7 +9,7 @@ export const resolveSuspectPhotoUrl = (
   photosMap?: Map<string, string>,
   caseId?: string,
 ): string | undefined => {
-  if (pin.photoUrl) return normalizeImageUrl(pin.photoUrl);
+  if (pin.photoUrl && !pin.photoUrl.includes("victim_khang.png")) return normalizeImageUrl(pin.photoUrl);
   if (
     pin.id.includes("-pin-followup") ||
     pin.id.includes("-pin-question") ||
