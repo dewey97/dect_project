@@ -31,6 +31,7 @@ Tài liệu về kiến trúc kỹ thuật, cơ sở dữ liệu, quy trình xu�
 | **18. Dossier Studio & Document Spec**           | Đặc tả hệ thống biên soạn hồ sơ hành chính, lời khai, lý lịch bị can, con dấu nghiệp vụ và in ấn A4/A5                   | [`core_specs/18_dossier_studio_and_document_spec.md`](core_specs/18_dossier_studio_and_document_spec.md)             |
 | **19. Checkpoint Studio & Structured Authoring** | Đặc tả module biên tập checkpoint, bảng `case_checkpoints`, runtime Supabase, đồ thị phụ thuộc và lưu vị trí node        | [`core_specs/19_checkpoint_studio.md`](core_specs/19_checkpoint_studio.md)                                           |
 | **20. Phone Studio & Dynamic Architecture**      | Đặc tả module biên soạn điện thoại tang vật `/studio/phone`, Supabase phone tables, dual-source và WYSIWYG               | [`core_specs/20_phone_studio.md`](core_specs/20_phone_studio.md)                                                     |
+| **21. Studio Authoring Guide** | Chức năng, trường thông tin và lý do thiết kế của toàn bộ Studio (`/studio/*`), luồng dựng vụ mới từ số 0 | [`core_specs/21_studio_authoring_guide.md`](core_specs/21_studio_authoring_guide.md) |
 | **Nợ Kỹ Thuật (Tech Debt)**                      | Sổ cái quản lý nợ kỹ thuật 2 tầng, danh mục mock UI và mã số bất biến `#ID`                                              | [`TECHDEBT.md`](TECHDEBT.md)                                                                                         |
 
 ---

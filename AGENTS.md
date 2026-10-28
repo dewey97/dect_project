@@ -31,6 +31,7 @@ Xem chi tiết danh mục đầy đủ tại [`docs/README.md`](docs/README.md):
   - Dossier Studio & Document Spec: [`docs/core_specs/18_dossier_studio_and_document_spec.md`](docs/core_specs/18_dossier_studio_and_document_spec.md)
   - Checkpoint Studio & Structured Authoring: [`docs/core_specs/19_checkpoint_studio.md`](docs/core_specs/19_checkpoint_studio.md)
   - Phone Studio & Dynamic Phone Engine: [`docs/core_specs/20_phone_studio.md`](docs/core_specs/20_phone_studio.md)
+  - Studio Authoring Guide (chức năng, trường, lý do thiết kế): [`docs/core_specs/21_studio_authoring_guide.md`](docs/core_specs/21_studio_authoring_guide.md)
   - Tech Debt Ledger: [`docs/TECHDEBT.md`](docs/TECHDEBT.md)
 - **🧠 Domain & Case Docs (Nghiệp vụ & Hồ sơ vụ án)**:
   - Bối cảnh & Cốt truyện Master Case #000: [`docs/cases/case_000/01_design/case_design.md`](docs/cases/case_000/01_design/case_design.md)
