@@ -17,6 +17,7 @@ import { FollowupTextForm } from "./followup/followup-text-form";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { verifyCheckpointOnServer } from "@/lib/checkpoints/client-verify";
 import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
+import { removeDiacritics } from "@/lib/cases/characters";
 
 interface FollowupQuestionModalProps {
   caseId?: string;
@@ -87,6 +88,16 @@ export function FollowupQuestionModal({
               (cp.followupOf.toLowerCase().trim() === cLow ||
                 cp.followupOf.toLowerCase().trim() === charKeyLow))),
       ) ||
+      // Câu hỏi phụ tạo trong Studio không có subject_key: khớp theo tên trong tiêu đề như pin-builder
+      (matchedCharacter?.name
+        ? checkpoints.find(
+            (cp) =>
+              cp.kind === "followup" &&
+              removeDiacritics(cp.title || "")
+                .toLowerCase()
+                .includes(removeDiacritics(matchedCharacter.name).toLowerCase()),
+          )
+        : undefined) ||
       checkpoints.find(
         (cp) =>
           cp.subjectKey &&

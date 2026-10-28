@@ -106,9 +106,7 @@ export function CheckpointStudioClient({
   const [isFloatingBoardOpen, setIsFloatingBoardOpen] = useState(true);
   const [flowWidth, setFlowWidth] = useState<number>(440);
   useEffect(() => {
-    const saved = Number(
-      localStorage.getItem("checkpoint_studio_flow_width"),
-    );
+    const saved = Number(localStorage.getItem("checkpoint_studio_flow_width"));
     if (saved) setFlowWidth(Math.max(300, Math.min(800, saved)));
   }, []);
   const [isResizingFlow, setIsResizingFlow] = useState(false);
@@ -135,10 +133,7 @@ export function CheckpointStudioClient({
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
       try {
-        localStorage.setItem(
-          "checkpoint_studio_flow_width",
-          String(flowWidth),
-        );
+        localStorage.setItem("checkpoint_studio_flow_width", String(flowWidth));
       } catch {}
     };
 
@@ -218,11 +213,15 @@ export function CheckpointStudioClient({
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [characters, setCharacters] = useState<DbCaseCharacter[]>(initialCharacters);
+  const [characters, setCharacters] =
+    useState<DbCaseCharacter[]>(initialCharacters);
   const [isLintModalOpen, setIsLintModalOpen] = useState(false);
   const [isCreatingCustomNode, setIsCreatingCustomNode] = useState(false);
-  const [inspectorTab, setInspectorTab] = useState<"checkpoints" | "characters">("checkpoints");
-  const [selectedCharacter, setSelectedCharacter] = useState<DbCaseCharacter | null>(null);
+  const [inspectorTab, setInspectorTab] = useState<
+    "checkpoints" | "characters"
+  >("checkpoints");
+  const [selectedCharacter, setSelectedCharacter] =
+    useState<DbCaseCharacter | null>(null);
 
   // Chế độ "Lớp logic" (Logic Overlay)
   const [isLogicLayerActive, setIsLogicLayerActive] = useState(false);
@@ -292,8 +291,10 @@ export function CheckpointStudioClient({
   const currentSelectCheckpointId = useMemo(() => {
     const matched = rows.find(
       (r) =>
-        (selectedId && (r.id === selectedId || r.checkpoint_id === selectedId)) ||
-        (draft && (r.id === draft.id || r.checkpoint_id === draft.checkpointId)),
+        (selectedId &&
+          (r.id === selectedId || r.checkpoint_id === selectedId)) ||
+        (draft &&
+          (r.id === draft.id || r.checkpoint_id === draft.checkpointId)),
     );
     if (matched) return matched.id || matched.checkpoint_id;
     if (draft && !draft.id) return "__new__";
@@ -343,35 +344,38 @@ export function CheckpointStudioClient({
     );
   }, [hasUnsaved]);
 
-  const loadCase = useCallback(async (nextCaseId: string) => {
-    setIsLoading(true);
-    try {
-      const [cpRes, dossierList, docsList, charsRes] = await Promise.all([
-        getCheckpointsByCase(nextCaseId),
-        getCaseDossiers(nextCaseId),
-        getAllCaseDocumentsCatalog(nextCaseId),
-        getCharactersByCase(nextCaseId),
-      ]);
-      if (!cpRes.success) {
-        toast.error(cpRes.error);
-        return;
+  const loadCase = useCallback(
+    async (nextCaseId: string) => {
+      setIsLoading(true);
+      try {
+        const [cpRes, dossierList, docsList, charsRes] = await Promise.all([
+          getCheckpointsByCase(nextCaseId),
+          getCaseDossiers(nextCaseId),
+          getAllCaseDocumentsCatalog(nextCaseId),
+          getCharactersByCase(nextCaseId),
+        ]);
+        if (!cpRes.success) {
+          toast.error(cpRes.error);
+          return;
+        }
+        setRows(cpRes.data);
+        setDossiers(dossierList);
+        setAvailableDocs(docsList);
+        if (charsRes.success && charsRes.data) {
+          setCharacters(charsRes.data);
+        }
+        const first = cpRes.data[0] ?? null;
+        setSelectedId(first?.id ?? null);
+        const nextDraft = first ? toDraft(first) : null;
+        setDraft(nextDraft);
+        setBaseline(nextDraft ? JSON.stringify(nextDraft) : "");
+        setSelectedNodeId(null);
+      } finally {
+        setIsLoading(false);
       }
-      setRows(cpRes.data);
-      setDossiers(dossierList);
-      setAvailableDocs(docsList);
-      if (charsRes.success && charsRes.data) {
-        setCharacters(charsRes.data);
-      }
-      const first = cpRes.data[0] ?? null;
-      setSelectedId(first?.id ?? null);
-      const nextDraft = first ? toDraft(first) : null;
-      setDraft(nextDraft);
-      setBaseline(nextDraft ? JSON.stringify(nextDraft) : "");
-      setSelectedNodeId(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [setSelectedNodeId]);
+    },
+    [setSelectedNodeId],
+  );
 
   const selectRow = (row: DbCaseCheckpoint): boolean => {
     if (row.id === selectedId && draft) return true;
@@ -390,6 +394,8 @@ export function CheckpointStudioClient({
     setSelectedNodeId(null);
     setDraft(nextDraft);
     setBaseline(JSON.stringify(nextDraft));
+    setSelectedCharacter(null);
+    setInspectorTab("checkpoints");
   };
 
   const changeCase = async (nextCaseId: string) => {
@@ -573,10 +579,14 @@ export function CheckpointStudioClient({
     }
     characterDebounceTimerRef.current = setTimeout(() => {
       setCharacters((prev) => {
-        const exists = prev.some((c) => c.id === updatedChar.id || c.key === updatedChar.key);
+        const exists = prev.some(
+          (c) => c.id === updatedChar.id || c.key === updatedChar.key,
+        );
         if (exists) {
           return prev.map((c) =>
-            c.id === updatedChar.id || c.key === updatedChar.key ? updatedChar : c,
+            c.id === updatedChar.id || c.key === updatedChar.key
+              ? updatedChar
+              : c,
           );
         }
         return [...prev, updatedChar];
@@ -599,15 +609,19 @@ export function CheckpointStudioClient({
       // 2. Lưu Nhân vật nếu có thay đổi hoặc đang chỉnh sửa
       const charToSave =
         activeCharacterDraftRef.current ||
-        (inspectorTab === 'characters' ? selectedCharacter : null);
+        (inspectorTab === "characters" ? selectedCharacter : null);
 
-      if (charToSave && (hasUnsavedCharacter || charToSave.id?.startsWith('temp_'))) {
+      if (
+        charToSave &&
+        (hasUnsavedCharacter || charToSave.id?.startsWith("temp_"))
+      ) {
         if (!charToSave.name?.trim()) {
           toast.error("Tên nhân vật không được để trống");
           setIsUnifiedSaving(false);
           return;
         }
-        const { saveCharacter } = await import("@/lib/actions/character-actions");
+        const { saveCharacter } =
+          await import("@/lib/actions/character-actions");
         promises.push(
           saveCharacter({
             id: charToSave.id?.startsWith("temp_") ? undefined : charToSave.id,
@@ -643,7 +657,25 @@ export function CheckpointStudioClient({
 
       // 2b. Lưu Thẩm tra nghi phạm gắn liền nếu có thay đổi
       if (activeInterrogationDraftRef.current) {
-        promises.push(saveCheckpoint(activeInterrogationDraftRef.current));
+        // Thẩm tra của nghi phạm mới mang id tạm "temp_…" (dòng hiển thị tạm trên Flow): lưu như bản ghi mới.
+        const interrogation = activeInterrogationDraftRef.current;
+        const toSave = interrogation.id?.startsWith("temp_")
+          ? { ...interrogation, id: "" }
+          : interrogation;
+        promises.push(
+          saveCheckpoint(toSave).then((res) => {
+            if (!res.success) throw new Error(res.error);
+            activeInterrogationDraftRef.current = null;
+            setRows((prev) => [
+              ...prev.filter(
+                (r) =>
+                  r.id !== interrogation.id &&
+                  r.checkpoint_id !== res.data.checkpoint_id,
+              ),
+              res.data,
+            ]);
+          }),
+        );
       }
 
       // 3. Lưu bố cục bảng điều tra (tọa độ ghim, xoay, scale, dây nối)
@@ -712,9 +744,13 @@ export function CheckpointStudioClient({
     handleRedo,
   ]);
 
-  const activeInterrogationDraftRef = useRef<CheckpointStudioDraft | null>(null);
+  const activeInterrogationDraftRef = useRef<CheckpointStudioDraft | null>(
+    null,
+  );
 
-  const handleCharacterInterrogationChange = (interrogationDraft: CheckpointStudioDraft) => {
+  const handleCharacterInterrogationChange = (
+    interrogationDraft: CheckpointStudioDraft,
+  ) => {
     activeInterrogationDraftRef.current = interrogationDraft;
 
     // Cập nhật live vào rows để Flow View phản ánh ngay lập tức
@@ -723,7 +759,8 @@ export function CheckpointStudioClient({
         (r) =>
           (interrogationDraft.id && r.id === interrogationDraft.id) ||
           r.checkpoint_id === interrogationDraft.checkpointId ||
-          (interrogationDraft.subjectKey && r.subject_key === interrogationDraft.subjectKey),
+          (interrogationDraft.subjectKey &&
+            r.subject_key === interrogationDraft.subjectKey),
       );
 
       if (exists) {
@@ -731,7 +768,8 @@ export function CheckpointStudioClient({
           const isTarget =
             (interrogationDraft.id && r.id === interrogationDraft.id) ||
             r.checkpoint_id === interrogationDraft.checkpointId ||
-            (interrogationDraft.subjectKey && r.subject_key === interrogationDraft.subjectKey);
+            (interrogationDraft.subjectKey &&
+              r.subject_key === interrogationDraft.subjectKey);
           if (isTarget) {
             return {
               ...r,
@@ -750,7 +788,7 @@ export function CheckpointStudioClient({
 
       // Nếu chưa có, thêm mới vào rows
       const newRow: DbCaseCheckpoint = {
-        id: interrogationDraft.id || ("temp_" + interrogationDraft.checkpointId),
+        id: interrogationDraft.id || "temp_" + interrogationDraft.checkpointId,
         case_id: caseId,
         checkpoint_id: interrogationDraft.checkpointId,
         node_id: null,
@@ -892,7 +930,8 @@ export function CheckpointStudioClient({
       (p) =>
         p.checkpointId === cp.checkpoint_id ||
         (cp.checkpoint_id.includes("phone") && p.nodeKind === "phone_lookup") ||
-        (cp.checkpoint_id.includes("indictment") && p.nodeKind === "indictment") ||
+        (cp.checkpoint_id.includes("indictment") &&
+          p.nodeKind === "indictment") ||
         p.id.includes(cp.checkpoint_id),
     );
     if (matchingPin) {
@@ -982,9 +1021,7 @@ export function CheckpointStudioClient({
     async (checkpointId: string, pos: { x: number; y: number }) => {
       setRows((prev) =>
         prev.map((r) =>
-          r.checkpoint_id === checkpointId
-            ? { ...r, flow_position: pos }
-            : r,
+          r.checkpoint_id === checkpointId ? { ...r, flow_position: pos } : r,
         ),
       );
       try {
@@ -1011,7 +1048,8 @@ export function CheckpointStudioClient({
     // 1. Nếu pin có checkpointId
     if (pin.checkpointId) {
       const cp = rows.find(
-        (r) => r.id === pin.checkpointId || r.checkpoint_id === pin.checkpointId,
+        (r) =>
+          r.id === pin.checkpointId || r.checkpoint_id === pin.checkpointId,
       );
       if (cp) {
         setInspectorTab("checkpoints");
@@ -1044,7 +1082,8 @@ export function CheckpointStudioClient({
       }
       const cp = rows.find(
         (r) =>
-          (r.kind === "suspect_interrogation" || (r as any).type === "suspect_interrogation") &&
+          (r.kind === "suspect_interrogation" ||
+            (r as any).type === "suspect_interrogation") &&
           r.subject_key === pin.subjectKey,
       );
       if (cp) {
@@ -1092,7 +1131,14 @@ export function CheckpointStudioClient({
   };
 
   const handleCreateNewCustomNode = async () => {
-    if (isLoading || isBoardLoading || isCreatingCustomNode || isSaving || isBoardSaving) return;
+    if (
+      isLoading ||
+      isBoardLoading ||
+      isCreatingCustomNode ||
+      isSaving ||
+      isBoardSaving
+    )
+      return;
     setIsCreatingCustomNode(true);
     try {
       const randomSuffix = Math.random().toString(36).substring(2, 6);
@@ -1142,7 +1188,9 @@ export function CheckpointStudioClient({
       if (draft && draft.id === cp.id) {
         setDraft((d) => (d ? { ...d, boardConfig: nextBoardConfig } : d));
       }
-      toast.success(`Đã đưa "${cp.title || cp.checkpoint_id}" lên bảng điều tra.`);
+      toast.success(
+        `Đã đưa "${cp.title || cp.checkpoint_id}" lên bảng điều tra.`,
+      );
       await refreshBoardModel();
     } else {
       toast.error(res.error || "Lỗi khi đưa checkpoint lên bảng.");
@@ -1165,7 +1213,9 @@ export function CheckpointStudioClient({
             p.subjectKey === cp.subject_key) ||
           (cp.kind === "followup" &&
             p.nodeKind === "followup" &&
-            (!cp.subject_key || p.subjectKey === cp.subject_key || p.id === cp.checkpoint_id)) ||
+            (!cp.subject_key ||
+              p.subjectKey === cp.subject_key ||
+              p.id === cp.checkpoint_id)) ||
           (cp.kind === "indictment" && p.nodeKind === "indictment"),
       );
     };
@@ -1336,7 +1386,10 @@ export function CheckpointStudioClient({
       for (const dep of r.depends_on || []) {
         if (adj.has(dep)) {
           adj.get(dep)!.push(r.checkpoint_id);
-          inDegree.set(r.checkpoint_id, (inDegree.get(r.checkpoint_id) || 0) + 1);
+          inDegree.set(
+            r.checkpoint_id,
+            (inDegree.get(r.checkpoint_id) || 0) + 1,
+          );
         }
       }
     }
@@ -1363,7 +1416,8 @@ export function CheckpointStudioClient({
     }
 
     levelNodes.forEach((nodeList, lvl) => {
-      const x = maxLevel === 0 ? 0.5 : 0.15 + (lvl / Math.max(1, maxLevel)) * 0.7;
+      const x =
+        maxLevel === 0 ? 0.5 : 0.15 + (lvl / Math.max(1, maxLevel)) * 0.7;
       nodeList.forEach((cpId, idx) => {
         const y = 0.2 + ((idx + 1) / (nodeList.length + 1)) * 0.6;
         const pin = displayPins.find(
@@ -1374,7 +1428,11 @@ export function CheckpointStudioClient({
             p.id.includes(cpId),
         );
         if (pin) {
-          handlePositionChange(pin.id, Number(x.toFixed(3)), Number(y.toFixed(3)));
+          handlePositionChange(
+            pin.id,
+            Number(x.toFixed(3)),
+            Number(y.toFixed(3)),
+          );
         }
       });
     });
@@ -1386,13 +1444,18 @@ export function CheckpointStudioClient({
 
   const isEditingCustomNode = Boolean(
     selectedNode &&
-      !("checkpoint_id" in selectedNode && selectedNode.checkpoint_id) &&
-      (selectedNode.id.includes(":custom:") ||
-        ("node_kind" in selectedNode && selectedNode.node_kind === "custom") ||
-        ("nodeKind" in selectedNode && selectedNode.nodeKind === "custom")),
+    !("checkpoint_id" in selectedNode && selectedNode.checkpoint_id) &&
+    (selectedNode.id.includes(":custom:") ||
+      ("node_kind" in selectedNode && selectedNode.node_kind === "custom") ||
+      ("nodeKind" in selectedNode && selectedNode.nodeKind === "custom")),
   );
 
-  const isBusy = isLoading || isBoardLoading || isSaving || isBoardSaving || isCreatingCustomNode;
+  const isBusy =
+    isLoading ||
+    isBoardLoading ||
+    isSaving ||
+    isBoardSaving ||
+    isCreatingCustomNode;
 
   return (
     <div
@@ -1615,10 +1678,13 @@ export function CheckpointStudioClient({
                 {inspectorTab === "characters" ? (
                   <div className="relative">
                     <select
-                      value={selectedCharacter?.id || selectedCharacter?.key || ""}
+                      value={
+                        selectedCharacter?.id || selectedCharacter?.key || ""
+                      }
                       onChange={(e) => {
                         const found = characters.find(
-                          (c) => c.id === e.target.value || c.key === e.target.value,
+                          (c) =>
+                            c.id === e.target.value || c.key === e.target.value,
                         );
                         if (found) {
                           setSelectedCharacter(found);
@@ -1629,7 +1695,11 @@ export function CheckpointStudioClient({
                       className="w-full h-8 pl-3 pr-8 rounded-md bg-[#14141c] border border-white/10 hover:border-purple-500/50 text-xs text-zinc-200 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/20 cursor-pointer font-sans appearance-none transition-colors"
                       title="Chọn nhân vật để điều chỉnh"
                     >
-                      <option value="" disabled className="bg-[#14141c] text-zinc-400">
+                      <option
+                        value=""
+                        disabled
+                        className="bg-[#14141c] text-zinc-400"
+                      >
                         -- Chọn nhân vật ({characters.length}) --
                       </option>
                       {characters.map((c) => {
@@ -1661,7 +1731,9 @@ export function CheckpointStudioClient({
                       onChange={(e) => {
                         if (e.target.value === "__new__") return;
                         const found = rows.find(
-                          (r) => r.id === e.target.value || r.checkpoint_id === e.target.value,
+                          (r) =>
+                            r.id === e.target.value ||
+                            r.checkpoint_id === e.target.value,
                         );
                         if (found) {
                           selectRow(found);
@@ -1673,14 +1745,28 @@ export function CheckpointStudioClient({
                       className="w-full h-8 pl-3 pr-8 rounded-md bg-[#14141c] border border-white/10 hover:border-amber-500/50 text-xs text-zinc-200 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 cursor-pointer font-sans appearance-none transition-colors"
                       title="Chọn checkpoint để edit"
                     >
-                      <option value="" disabled className="bg-[#14141c] text-zinc-400">
+                      <option
+                        value=""
+                        disabled
+                        className="bg-[#14141c] text-zinc-400"
+                      >
                         -- Chọn checkpoint ({rows.length}) --
                       </option>
-                      {draft && !draft.id && !rows.some((r) => r.checkpoint_id === draft.checkpointId) && (
-                        <option value="__new__" className="bg-[#14141c] text-amber-300">
-                          + Đang tạo: {draft.title || draft.checkpointId || "Checkpoint mới"}
-                        </option>
-                      )}
+                      {draft &&
+                        !draft.id &&
+                        !rows.some(
+                          (r) => r.checkpoint_id === draft.checkpointId,
+                        ) && (
+                          <option
+                            value="__new__"
+                            className="bg-[#14141c] text-amber-300"
+                          >
+                            + Đang tạo:{" "}
+                            {draft.title ||
+                              draft.checkpointId ||
+                              "Checkpoint mới"}
+                          </option>
+                        )}
                       {rows.map((cp) => {
                         const kindBadge =
                           cp.kind === "phone_lookup"
@@ -1702,7 +1788,10 @@ export function CheckpointStudioClient({
                             value={cp.id || cp.checkpoint_id}
                             className="bg-[#14141c] text-zinc-100 py-1.5"
                           >
-                            {kindBadge} {cp.title || cp.checkpoint_id || "Checkpoint không tên"}
+                            {kindBadge}{" "}
+                            {cp.title ||
+                              cp.checkpoint_id ||
+                              "Checkpoint không tên"}
                           </option>
                         );
                       })}
@@ -1749,9 +1838,12 @@ export function CheckpointStudioClient({
                   />
                 ) : (
                   <div className="flex flex-1 flex-col items-center justify-center p-6 text-center text-zinc-500">
-                    <p className="text-xs font-medium text-zinc-300">Chưa chọn mục nào</p>
+                    <p className="text-xs font-medium text-zinc-300">
+                      Chưa chọn mục nào
+                    </p>
                     <p className="mt-1 text-[11px] text-zinc-500 max-w-[240px]">
-                      Bấm vào checkpoint trên sơ đồ hoặc ghim trên bảng để chỉnh sửa.
+                      Bấm vào checkpoint trên sơ đồ hoặc ghim trên bảng để chỉnh
+                      sửa.
                     </p>
                   </div>
                 )}
