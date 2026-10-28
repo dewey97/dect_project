@@ -112,9 +112,6 @@ export function launchPlaytestFromCheckpoint(params: {
     );
   }
 
-  // Khám xét hiện trường mở sẵn
-  setStorageItem(caseStorageKey(caseId, "reinvestigate_unlocked"), "true");
-
   // Nếu mục tiêu chính là Hậu án (Epilogue)
   if (
     targetCheckpoint.kind === "epilogue" ||

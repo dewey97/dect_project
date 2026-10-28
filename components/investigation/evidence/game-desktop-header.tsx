@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { UserNav } from "@/components/auth/user-nav";
-import { GoogleSheetsPresenceBar } from "@/components/investigation/google-sheets-presence-bar";
+import { RoomPresenceBar } from "@/components/investigation/room-presence-bar";
 import { RoomModal } from "@/components/investigation/room-modal";
 import { emitInvestigationEvent } from "@/lib/investigation-events";
 import { cn } from "@/lib/utils";
@@ -171,7 +171,7 @@ export function GameDesktopHeader({
 
           {/* CỘT PHẢI: Dải Avatar đồng đội trực tuyến chuẩn Google Sheets + User Profile */}
           <div className="min-w-64 h-full flex items-center justify-end gap-3 text-zinc-400">
-            <GoogleSheetsPresenceBar onOpenModal={() => setIsRoomModalOpen(true)} />
+            <RoomPresenceBar onOpenModal={() => setIsRoomModalOpen(true)} />
             <div className="w-px h-4 bg-border/20" />
             <UserNav size="sm" />
           </div>

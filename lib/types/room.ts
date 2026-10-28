@@ -47,7 +47,6 @@ export interface RoomInvestigationState {
   phoneInputs: Record<string, string>;
   investigatedSuspects: string[];
   solvedFollowups: string[];
-  reinvestigateUnlocked: boolean;
   reinvestigateOpened: boolean;
   indictmentSolved: boolean;
   solvedCulprit: string | null;
@@ -76,7 +75,6 @@ export const DEFAULT_ROOM_STATE: RoomInvestigationState = {
   phoneInputs: {},
   investigatedSuspects: [],
   solvedFollowups: [],
-  reinvestigateUnlocked: false,
   reinvestigateOpened: false,
   indictmentSolved: false,
   solvedCulprit: null,

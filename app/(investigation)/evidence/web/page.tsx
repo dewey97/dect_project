@@ -536,9 +536,6 @@ function WebEvidencePageContent() {
       caseStorageKey(caseId, "solved_followups"),
       [],
     );
-    const isReinvestigateUnlocked =
-      getStorageItem(caseStorageKey(caseId, "reinvestigate_unlocked")) ===
-      "true";
     const isIndictmentSolved =
       getStorageItem(caseStorageKey(caseId, "indictment_solved")) === "true";
     const unlockedDossiers = getStorageJson<string[]>(
@@ -553,8 +550,7 @@ function WebEvidencePageContent() {
     ) {
       setUnlockedPhase(3);
     } else if (
-      isReinvestigateUnlocked ||
-      solvedFollowups.length >= 2 ||
+      solvedFollowups.length >= 1 ||
       unlockedDossiers.includes("bo_b") ||
       unlockedDossiers.includes("bo_c") ||
       unlockedDossiers.includes("phase_2") ||

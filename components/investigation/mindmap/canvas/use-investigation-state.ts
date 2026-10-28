@@ -49,14 +49,6 @@ export function sanitizeSuspectsList(items: SuspectItem[]): SuspectItem[] {
   return Array.from(map.values());
 }
 
-/**
- * CỜ CẤU HÌNH PHÊ DUYỆT KHÁM XÉT LẠI (USP FEATURE):
- * - false (MẶC ĐỊNH HIỆN TẠI): Khám xét hiện trường là USP đặc sắc của game, được MỞ SẴN NGAY TỪ ĐẦU cho người chơi.
- * - true (DỰ PHÒNG TƯƠNG LAI): Yêu cầu vượt qua điều kiện câu hỏi suy luận / checkpoints của Vũ & Tùng mới phê duyệt lệnh.
- * Giữ nguyên toàn bộ logic điều kiện phê duyệt để khi cần có thể kích hoạt lại bất kỳ lúc nào.
- */
-export const REQUIRE_REINVESTIGATION_APPROVAL = false;
-
 /** Gom state tiến trình vụ án: suspects, phone, followup, indictment, reinvestigate. */
 export function useInvestigationState(opts?: {
   caseId?: string;
@@ -72,9 +64,6 @@ export function useInvestigationState(opts?: {
   );
 
   const [suspects, setSuspects] = useState<SuspectItem[]>([]);
-  const [isReinvestigateUnlocked, setIsReinvestigateUnlocked] = useState(
-    !REQUIRE_REINVESTIGATION_APPROVAL,
-  );
   const [isReinvestigateModalOpen, setIsReinvestigateModalOpen] =
     useState(false);
   const [hasOpenedReinvestigation, setHasOpenedReinvestigation] =
@@ -119,12 +108,6 @@ export function useInvestigationState(opts?: {
 
   const { checkpoints, loading: isCheckpointsLoading } = useCaseCheckpoints(caseId);
 
-  // Khám xét hiện trường luôn mở sẵn ngay từ đầu game
-  const isReinvestigateConditionMet = useCallback(
-    (_solved?: string[]) => true,
-    []
-  );
-
   const reloadProgress = useCallback(() => {
     const rawSuspects = getStorageJson<any[]>(sKey("canvas_suspects"), []);
     const validList = rawSuspects.filter((s) => s && s.id && s.name);
@@ -137,13 +120,6 @@ export function useInvestigationState(opts?: {
       [],
     );
     setSolvedFollowupQuestions(solvedFollowups);
-    if (
-      !REQUIRE_REINVESTIGATION_APPROVAL ||
-      isReinvestigateConditionMet(solvedFollowups) ||
-      getStorageItem(sKey("reinvestigate_unlocked")) === "true"
-    ) {
-      setIsReinvestigateUnlocked(true);
-    }
     if (getStorageItem(sKey("reinvestigate_opened")) === "true") {
       setHasOpenedReinvestigation(true);
     }
@@ -166,7 +142,7 @@ export function useInvestigationState(opts?: {
         setSolvedCulprit(savedCulprit);
       }
     }
-  }, [sKey, isReinvestigateConditionMet]);
+  }, [sKey]);
 
   useEffect(() => {
     reloadProgress();
@@ -189,9 +165,6 @@ export function useInvestigationState(opts?: {
         const merged = Array.from(new Set([...prev, ...roomState.solvedFollowups])) as CulpritKey[];
         return merged;
       });
-      if (roomState.reinvestigateUnlocked || isReinvestigateConditionMet(roomState.solvedFollowups)) {
-        setIsReinvestigateUnlocked(true);
-      }
     }
     if (roomState.investigatedSuspects && roomState.investigatedSuspects.length > 0) {
       setInvestigatedSuspects((prev) => {
@@ -203,7 +176,7 @@ export function useInvestigationState(opts?: {
       setIsIndictmentSolved(true);
       setSolvedCulprit(roomState.solvedCulprit as CulpritKey);
     }
-  }, [roomCode, roomState, isReinvestigateConditionMet]);
+  }, [roomCode, roomState]);
 
   const saveSuspectsState = (newSuspects: SuspectItem[]) => {
     const sanitized = sanitizeSuspectsList(newSuspects);
@@ -289,23 +262,16 @@ export function useInvestigationState(opts?: {
   const handleFollowupSuccess = (culprit: CulpritKey, choice?: string) => {
     const updated = Array.from(new Set([...solvedFollowupQuestions, culprit]));
     setSolvedFollowupQuestions(updated);
-    const isUnlocked = isReinvestigateConditionMet(updated);
-    if (isUnlocked) {
-      setIsReinvestigateUnlocked(true);
-    }
 
     if (roomCode) {
       syncUpdate(
-        { solvedFollowups: updated, reinvestigateUnlocked: isUnlocked },
+        { solvedFollowups: updated },
         `đã hoàn thành thẩm tra nghi phạm`
       );
     } else {
       setStorageItem(sKey("solved_followups"), JSON.stringify(updated));
       if (choice) {
         setStorageItem(sKey(`followup_${culprit}_choice`), choice);
-      }
-      if (isUnlocked) {
-        setStorageItem(sKey("reinvestigate_unlocked"), "true");
       }
     }
 
@@ -359,7 +325,6 @@ export function useInvestigationState(opts?: {
     setNarrativeChoice(null);
     setIsIndictmentSolved(false);
     setSolvedCulprit(null);
-    setIsReinvestigateUnlocked(!REQUIRE_REINVESTIGATION_APPROVAL);
     setIsReinvestigateModalOpen(false);
     setHasOpenedReinvestigation(false);
     setIsEpilogueOpen(false);
@@ -379,9 +344,8 @@ export function useInvestigationState(opts?: {
     }
   }, [opts?.onOpenReinvestigation, sKey]);
 
-  const effectiveReinvestigateUnlocked =
-    !REQUIRE_REINVESTIGATION_APPROVAL ||
-    isReinvestigateUnlocked;
+  // Khám xét hiện trường mở sẵn từ đầu game (USP).
+  const effectiveReinvestigateUnlocked = true;
   const effectivePhoneSolved = phoneLookupSuccess;
   const effectiveIndictmentSolved = isIndictmentSolved;
 
@@ -393,8 +357,6 @@ export function useInvestigationState(opts?: {
     saveSuspectsState,
     handleSaveSuspect,
     handleDeleteSuspect,
-    isReinvestigateUnlocked,
-    setIsReinvestigateUnlocked,
     isReinvestigateModalOpen,
     setIsReinvestigateModalOpen,
     hasOpenedReinvestigation,

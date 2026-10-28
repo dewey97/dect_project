@@ -1,24 +1,13 @@
 /**
  * Domain Storage Helper
  * 
- * Quản lý localStorage thuần nghiệp vụ (domain-driven), KHÔNG gắn nhãn thương hiệu
- * (không prefix veritas_, nocturne_, xplore_).
- * 
- * Tự động đọc fallback nếu người dùng còn dữ liệu từ các phiên bản gắn brand cũ.
+ * Quản lý localStorage thuần nghiệp vụ (domain-driven), KHÔNG gắn nhãn thương hiệu.
  */
-
-const LEGACY_PREFIXES = ['xplore_', 'veritas_', 'nocturne_']
 
 export function getStorageItem(key: string): string | null {
   if (typeof window === 'undefined') return null
   try {
-    const directVal = localStorage.getItem(key)
-    if (directVal !== null) return directVal
-
-    for (const prefix of LEGACY_PREFIXES) {
-      const legacyVal = localStorage.getItem(`${prefix}${key}`)
-      if (legacyVal !== null) return legacyVal
-    }
+    return localStorage.getItem(key)
   } catch {}
   return null
 }
@@ -50,9 +39,6 @@ export function removeStorageItem(key: string): void {
   if (typeof window === 'undefined') return
   try {
     localStorage.removeItem(key)
-    for (const prefix of LEGACY_PREFIXES) {
-      localStorage.removeItem(`${prefix}${key}`)
-    }
   } catch {}
 }
 

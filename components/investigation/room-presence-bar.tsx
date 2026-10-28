@@ -8,7 +8,7 @@ import { DetectiveAvatar } from '@/components/investigation/detective-avatar'
 import { RoomModal } from '@/components/investigation/room-modal'
 import { normalizeCaseId } from '@/lib/cases/case-id'
 
-interface GoogleSheetsPresenceBarProps {
+interface RoomPresenceBarProps {
   className?: string
   showShareButton?: boolean
   onOpenModal?: () => void
@@ -21,11 +21,11 @@ interface GoogleSheetsPresenceBarProps {
  * - Nhấp vào avatar hoặc nút phòng: Mở modal quản lý phòng / chia sẻ
  * - Màu sắc hoàn toàn trung tính (zinc / slate)
  */
-export function GoogleSheetsPresenceBar({
+export function RoomPresenceBar({
   className,
   showShareButton = true,
   onOpenModal,
-}: GoogleSheetsPresenceBarProps) {
+}: RoomPresenceBarProps) {
   const {
     roomCode,
     isConnected,
