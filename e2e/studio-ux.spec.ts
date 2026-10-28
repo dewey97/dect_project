@@ -83,44 +83,37 @@ test.describe("WT-3 Studio UX & Form Polish", () => {
     expect(expandedBox!.height).toBeGreaterThan(initialHeight);
   });
 
-  test("4. subjectKey select picker changes and reflects into draft", async ({
+  test("4. chọn nghi phạm trong dropdown nhân vật mở form thẩm tra gắn với nhân vật đó", async ({
     page,
   }) => {
     await page.goto("/studio/checkpoints?case=case_000");
-    await expect(page.getByText("Checkpoint Studio")).toBeVisible({
+    await expect(
+      page.locator('[data-studio-ready="true"]').first(),
+    ).toBeVisible({
       timeout: 15_000,
     });
 
-    // Find the kind selector and ensure suspect interrogation is selected
-    const kindSelect = page
-      .locator("select")
-      .filter({ hasText: "Thẩm tra nghi phạm (3 lớp)" });
+    // Thẩm tra gắn với nhân vật (subject_key = key nhân vật), không còn ô chọn
+    // "Nhân vật liên quan" trong form checkpoint.
+    await page.getByRole("button", { name: /^Nhân vật \(\d+\)$/ }).click();
+    const picker = page.getByTitle("Chọn nhân vật để điều chỉnh");
+    await expect(picker).toBeVisible();
+    const suspectValue = await picker
+      .locator("option", { hasText: "(Nghi phạm)" })
+      .first()
+      .getAttribute("value");
+    expect(suspectValue).toBeTruthy();
+    await picker.selectOption(suspectValue!);
+    await expect(picker).toHaveValue(suspectValue!);
 
-    if (await kindSelect.isVisible()) {
-      await kindSelect.selectOption("suspect_interrogation");
-    }
-
-    // Locate the "Nhân vật liên quan" select
-    const subjectKeySelect = page
-      .locator("label", { hasText: "Nhân vật liên quan" })
-      .locator("select");
-
-    await expect(subjectKeySelect).toBeVisible();
-
-    // Verify it contains character options (not raw text input)
-    const options = await subjectKeySelect.locator("option").allTextContents();
-    expect(options.length).toBeGreaterThan(1);
-
-    // Pick second option and assert value changed
-    const optionValues = await subjectKeySelect
-      .locator("option")
-      .evaluateAll((opts) => opts.map((o) => (o as HTMLOptionElement).value));
-    const nonBlankValue = optionValues.find((v) => v !== "");
-
-    if (nonBlankValue) {
-      await subjectKeySelect.selectOption(nonBlankValue);
-      await expect(subjectKeySelect).toHaveValue(nonBlankValue);
-    }
+    await expect(
+      page.getByText("Vật chứng bắt buộc (chứng minh động cơ)").first(),
+    ).toBeVisible();
+    // Form thẩm tra 2 lớp: chuyển sang tab "Mâu thuẫn lời khai".
+    await page.getByRole("button", { name: "Mâu thuẫn lời khai" }).first().click();
+    await expect(
+      page.getByText("Vật chứng bắt buộc (chứng minh mâu thuẫn)").first(),
+    ).toBeVisible();
   });
 
   test("5. Cases list does not render raw 'ID: ' prefix", async ({ page }) => {

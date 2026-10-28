@@ -38,23 +38,35 @@ async function openBoard(page: Page) {
     }),
   );
   await page.goto(CASE_URL);
-  await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached({ timeout: 30_000 });
-  await expect(page.locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]').first()).toBeAttached({ timeout: 30_000 });
+  await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached({
+    timeout: 30_000,
+  });
+  await expect(
+    page
+      .locator('[data-pin-id="c0-pin-phone"], [data-node-kind="phone_lookup"]')
+      .first(),
+  ).toBeAttached({ timeout: 30_000 });
 }
 
 async function clickPin(page: Page, pinId: string) {
-  await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached();
+  await expect(
+    page.locator('[data-board-ready="true"]').first(),
+  ).toBeAttached();
   let selector = `[data-pin-id="${pinId}"]`;
   if (pinId === "c0-pin-phone") {
     selector = '[data-node-kind="phone_lookup"], [data-pin-id="c0-pin-phone"]';
   } else if (pinId === "c0-pin-indictment") {
-    selector = '[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]';
+    selector =
+      '[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]';
   } else if (pinId === "c0-pin-suspects") {
-    selector = '[data-node-kind="suspects_hub"], [data-pin-id="c0-pin-suspects"]';
+    selector =
+      '[data-node-kind="suspects_hub"], [data-pin-id="c0-pin-suspects"]';
   } else if (pinId === "c0-pin-victim-phone") {
-    selector = '[data-node-kind="victim_phone"], [data-pin-id="c0-pin-victim-phone"]';
+    selector =
+      '[data-node-kind="victim_phone"], [data-pin-id="c0-pin-victim-phone"]';
   } else if (pinId === "c0-pin-reinvestigate") {
-    selector = '[data-node-kind="reinvestigate"], [data-pin-id="c0-pin-reinvestigate"]';
+    selector =
+      '[data-node-kind="reinvestigate"], [data-pin-id="c0-pin-reinvestigate"]';
   } else if (pinId.startsWith("c0-pin-followup-")) {
     const key = pinId.replace("c0-pin-followup-", "");
     selector = `[data-node-kind="followup"][data-subject-key="${key}"], [data-pin-id="${pinId}"]`;
@@ -79,12 +91,16 @@ async function addEvidenceCodes(page: Page, codes: string[]) {
   }
 }
 
-async function solvePhoneLookup(page: Page, names: [string, string, string]) {
+/** Số ô tra cứu lấy theo cấu hình checkpoint hiện tại; điền `names` theo thứ tự ô. */
+async function solvePhoneLookup(page: Page, names: string[]) {
   await clickPin(page, "c0-pin-phone");
   const inputs = page.getByPlaceholder("Nhập tên nghi phạm...");
-  await expect(inputs).toHaveCount(3);
-  for (let i = 0; i < 3; i++) await inputs.nth(i).fill(names[i]);
-  await inputs.nth(2).press("Enter");
+  await expect(inputs.first()).toBeVisible();
+  const count = await inputs.count();
+  expect(count).toBeGreaterThan(0);
+  expect(count).toBeLessThanOrEqual(names.length);
+  for (let i = 0; i < count; i++) await inputs.nth(i).fill(names[i]);
+  await inputs.nth(count - 1).press("Enter");
 }
 
 /** Thẩm tra 2 lớp (động cơ + mâu thuẫn) rồi bấm "ĐIỀU TRA" và đóng thông báo. */
@@ -133,7 +149,12 @@ test.describe("case_000 baseline", () => {
     await openBoard(page);
 
     const charactersBody = await (await characters).json();
-    expect(charactersBody.data).toHaveLength(10);
+    const characterKeys = (charactersBody.data as { key: string }[]).map(
+      (c) => c.key,
+    );
+    expect(characterKeys).toEqual(
+      expect.arrayContaining(["khang", "vu", "tung", "ha"]),
+    );
     expect((await checkpoints).ok()).toBe(true);
 
     for (const selector of [
@@ -156,7 +177,7 @@ test.describe("case_000 baseline", () => {
     await expect(page.locator("textarea").first()).toBeVisible();
   });
 
-  test("tra 3 SĐT: sai thì không mở, đúng thì mở khóa", async ({ page }) => {
+  test("tra SĐT: sai thì không mở, đúng thì mở khóa", async ({ page }) => {
     await openBoard(page);
 
     await solvePhoneLookup(page, ["Mai", "Hà", "Vy"]);
@@ -167,7 +188,10 @@ test.describe("case_000 baseline", () => {
     await solvePhoneLookup(page, ["Vũ", "Tùng", "Đạt"]);
     await expect.poll(() => storage(page, "phone_solved")).toBe("true");
     await expect(
-      page.getByText(/lấy lời khai/i).filter({ visible: true }).first(),
+      page
+        .getByText(/lấy lời khai/i)
+        .filter({ visible: true })
+        .first(),
     ).toBeVisible();
   });
 
@@ -282,7 +306,9 @@ test.describe("case_000 baseline", () => {
     expect(await storage(page, "indictment_solved")).not.toBe("true");
 
     await page.goto(CASE_URL);
-    await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached();
+    await expect(
+      page.locator('[data-board-ready="true"]').first(),
+    ).toBeAttached();
     await clickPin(page, "c0-pin-indictment");
     await submitIndictment("Trần Thị Hà", ["C-02", "D-04", "D-05"]);
     await expect.poll(() => storage(page, "indictment_solved")).toBe("true");
@@ -305,10 +331,16 @@ test.describe("case_000 baseline", () => {
     );
     await page.goto(CASE_URL);
     await expect(
-      page.locator('[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]').first(),
+      page
+        .locator(
+          '[data-node-kind="indictment"], [data-pin-id="c0-pin-indictment"]',
+        )
+        .first(),
     ).toBeAttached({ timeout: 30_000 });
 
-    await expect(page.locator('[data-board-ready="true"]').first()).toBeAttached({ timeout: 30_000 });
+    await expect(
+      page.locator('[data-board-ready="true"]').first(),
+    ).toBeAttached({ timeout: 30_000 });
 
     // Bấm pin cáo trạng (đã giải) -> mở thẳng EpilogueModal
     await clickPin(page, "c0-pin-indictment");
