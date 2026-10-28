@@ -197,7 +197,7 @@ export function Scene360ConfigModal({
                   </label>
                   <p className="text-[11px] text-zinc-500">
                     Sử dụng khi ảnh 360 chưa tải xong hoặc mạng chậm (e.g.
-                    PANORAMA.png).
+                    PANORAMA.webp).
                   </p>
                 </div>
 
@@ -221,7 +221,7 @@ export function Scene360ConfigModal({
                 type="text"
                 value={panoramaUrl}
                 onChange={(e) => setPanoramaUrl(e.target.value)}
-                placeholder="/images/cases/case_000/PANORAMA.png hoặc https://..."
+                placeholder="/images/cases/case_000/PANORAMA.webp hoặc https://..."
                 className="w-full bg-zinc-950 border border-zinc-800 rounded px-3 py-2 text-xs text-zinc-200 font-mono focus:outline-none focus:border-amber-500"
               />
             </div>

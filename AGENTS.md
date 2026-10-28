@@ -112,7 +112,7 @@ Nguồn dữ liệu duy nhất của vụ án là **Supabase**; nơi biên tập
 
 - **Phân hệ 3D tiếp tục đóng băng trong `archive_3d_vault/`**: Các thành phần dựng hình học 3D Three.js nặng (tủ hồ sơ 3D `3d-cabinet`, `file_cabinet_3d`, `crime-scene-3d` và các file model `.glb`) tiếp tục bị cách ly và đóng băng an toàn trong `components/investigation/archive_3d_vault/`. Tuyệt đối CẤM tự ý import hoặc render các component này trừ khi User trực tiếp yêu cầu.
 - **Ngoại lệ mở khóa chính thức — Trình xem ảnh 360 Panorama (`Scene360Viewer`)**:
-  - Component `components/investigation/scene-360-viewer.tsx` (sử dụng Three.js ánh xạ hình cầu Equirectangular Sphere chiếu ảnh `PANORAMA.png` / `crime_scene_360.jpg`) **ĐÃ ĐƯỢC MỞ KHÓA HOẠT ĐỘNG** phục vụ chế độ Khám xét lại hiện trường tại `ReinvestigationModal`.
+  - Component `components/investigation/scene-360-viewer.tsx` (sử dụng Three.js ánh xạ hình cầu Equirectangular Sphere chiếu ảnh `PANORAMA.webp` / `crime_scene_360.jpg`) **ĐÃ ĐƯỢC MỞ KHÓA HOẠT ĐỘNG** phục vụ chế độ Khám xét lại hiện trường tại `ReinvestigationModal`.
   - Đây là giải pháp chiếu ảnh toàn cảnh nhẹ, không phải mô hình dựng 3D polygon. Mọi hiệu chỉnh liên quan đến hotspot 360, camera yaw/pitch được phép thực hiện trên component này.
 
 ---

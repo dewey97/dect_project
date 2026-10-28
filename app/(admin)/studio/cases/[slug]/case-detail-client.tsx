@@ -317,7 +317,7 @@ export function CaseDetailClient({ initialCase }: { initialCase: DbCase }) {
                 type="text"
                 value={caseData.panorama_url || ""}
                 onChange={(e) => setCaseData({ ...caseData, panorama_url: e.target.value })}
-                placeholder="VD: /images/cases/case_000/PANORAMA.png"
+                placeholder="VD: /images/cases/case_000/PANORAMA.webp"
                 className="flex-1 bg-zinc-950 border border-white/10 rounded-md px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-amber-500 font-mono text-xs"
               />
               <label className="cursor-pointer inline-flex items-center px-3 py-2 bg-zinc-800 border border-white/10 hover:bg-zinc-700 rounded-md text-xs font-medium text-zinc-200">
