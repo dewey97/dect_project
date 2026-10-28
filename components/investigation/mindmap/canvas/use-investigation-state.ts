@@ -91,7 +91,6 @@ export function useInvestigationState(opts?: {
     "A" | "B" | "C" | null
   >(null);
   const [isFollowupQuestionOpen, setIsFollowupQuestionOpen] = useState(false);
-  const [isEvidenceGuideOpen, setIsEvidenceGuideOpen] = useState(false);
   const [isGameplayGuideOpen, setIsGameplayGuideOpen] = useState(false);
   const [isWalkthroughOpen, setIsWalkthroughOpen] = useState(false);
   const [isPhoneNarrativeOpen, setIsPhoneNarrativeOpen] = useState(false);
@@ -418,8 +417,6 @@ export function useInvestigationState(opts?: {
     setActiveDossierType,
     isFollowupQuestionOpen,
     setIsFollowupQuestionOpen,
-    isEvidenceGuideOpen,
-    setIsEvidenceGuideOpen,
     isGameplayGuideOpen,
     setIsGameplayGuideOpen,
     isWalkthroughOpen,

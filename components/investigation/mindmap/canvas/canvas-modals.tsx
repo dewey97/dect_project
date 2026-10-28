@@ -6,7 +6,6 @@ import { AddSuspectModal } from "../add-suspect-modal";
 import { PhoneLookupModal } from "../phone-lookup-modal";
 import { PhoneNarrativeModal } from "../phone-narrative-modal";
 import { DossierEModal } from "../dossier-e-modal";
-import { EvidenceGuideModal } from "../evidence-guide-modal";
 import { GameplayGuideModal } from "../gameplay-guide-modal";
 import { InteractiveWalkthrough } from "../interactive-walkthrough";
 import { IndictmentModal } from "../indictment-modal";
@@ -124,16 +123,6 @@ export function CanvasModals({
         <DossierEModal
           isOpen={state.isDossierEOpen}
           onClose={() => state.setIsDossierEOpen(false)}
-        />
-      )}
-
-      {/* 6. Modal Hướng Dẫn Chứng Cứ Tang Vật */}
-      {state.isEvidenceGuideOpen && (
-        <EvidenceGuideModal
-          isOpen={state.isEvidenceGuideOpen}
-          onClose={() => state.setIsEvidenceGuideOpen(false)}
-          isPhoneSolved={state.phoneLookupSuccess}
-          isReinvestigateUnlocked={state.effectiveReinvestigateUnlocked}
         />
       )}
 

@@ -704,10 +704,6 @@ export function MainInvestigationCanvas({
           detectiveAudio.playPaperRustle();
           return;
         }
-        case "evidence_hub": {
-          state.setIsEvidenceGuideOpen(true);
-          return;
-        }
         case "victim_phone": {
           detectiveAudio.playPaperRustle();
           if (onOpenPhoneSimulator) onOpenPhoneSimulator();

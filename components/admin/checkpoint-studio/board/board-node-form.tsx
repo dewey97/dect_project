@@ -20,7 +20,6 @@ const NODE_KINDS: Array<{ value: BoardNodeKind; label: string }> = [
   { value: "victim_phone", label: "Điện thoại nạn nhân" },
   { value: "reinvestigate", label: "Khám xét hiện trường" },
   { value: "suspects_hub", label: "Hub Nghi phạm" },
-  { value: "evidence_hub", label: "Hub Vật chứng" },
   { value: "note", label: "Giấy ghi chú" },
   { value: "photo", label: "Ghim ảnh hiện trường/vật chứng" },
   { value: "dossier", label: "Hồ sơ tài liệu" },

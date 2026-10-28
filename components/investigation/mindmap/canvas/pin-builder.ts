@@ -148,6 +148,17 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
     input.boardNodes.forEach((node) => {
       const cfg = (node.config as any) || {};
+      if (cfg.hidden === true) return;
+      if (node.node_kind === "evidence_hub") return;
+
+      if (node.checkpoint_id) {
+        const linkedCp = allCheckpoints.find(
+          (c) => c.id === node.checkpoint_id || (c as any).checkpoint_id === node.checkpoint_id,
+        );
+        const cpBoardCfg = (linkedCp?.boardConfig || linkedCp?.board_config) as any;
+        if (cpBoardCfg?.hidden === true) return;
+      }
+
       const pos = resolveNodePosition(
         node.id,
         cfg.position,
@@ -182,26 +193,40 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         pinColor = isMobile ? "yellow" : "red";
         noteColor = "yellow";
       } else if (node.node_kind === "victim") {
-        const vChar = characters.find((c) => c.role === "victim");
+        const vChar =
+          characters.find((c) => c.key === (node.subject_key || "khang")) ||
+          characters.find((c) => c.role === "victim");
         detail = `Hồ sơ nạn nhân: ${vChar?.name || node.title || victimName}`;
-        if (!photoUrl) {
-          photoUrl = vChar?.avatar_url || (vChar as unknown as { avatarUrl?: string })?.avatarUrl || undefined;
+        const charAvatar =
+          vChar?.avatar_url ||
+          (vChar as unknown as { avatarUrl?: string })?.avatarUrl ||
+          input.sheetPhotoMap?.[vChar?.key || "khang"] ||
+          input.sheetPhotoMap?.["victim"] ||
+          input.sheetPhotoMap?.["avatar_khang"];
+        if (charAvatar) {
+          photoUrl = charAvatar;
+        } else if (!photoUrl || photoUrl.includes("victim_khang.png")) {
+          photoUrl = "/images/avatar_placeholder.svg";
         }
         noteColor = "white";
-      } else if (node.node_kind === "evidence_hub") {
-        detail = "Danh mục vật chứng và tài liệu vụ án";
-        noteColor = "white";
-        pinColor = "blue";
       }
+
+      const victimChar =
+        node.node_kind === "victim"
+          ? characters.find((c) => c.key === (node.subject_key || "khang")) ||
+            characters.find((c) => c.role === "victim")
+          : undefined;
 
       pins.push({
         id: node.id,
         nodeKind: node.node_kind,
-        subjectKey: node.subject_key || undefined,
+        subjectKey:
+          node.subject_key ||
+          (node.node_kind === "victim" ? victimChar?.key || "khang" : undefined),
         checkpointId: node.checkpoint_id || undefined,
         x: pos.x,
         y: pos.y,
-        label: cfg.pin_title || node.title || node.node_kind,
+        label: victimChar?.name || cfg.pin_title || node.title || node.node_kind,
         detail,
         photoUrl,
         noteTextureUrl: undefined,
@@ -410,35 +435,41 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   );
   const phoneCpId = phoneCp?.id;
   const phoneNodeId = `${caseSlug}:phone_lookup:${phoneCpId || "system"}`;
-  const phoneBoardCfg = phoneCp?.boardConfig || phoneCp?.board_config;
-  const phonePos = resolveNodePosition(
-    phoneNodeId,
-    phoneBoardCfg?.position,
-    0,
-    isMobile,
-    positions,
-    { x: 0.42, y: 0.27 },
-  );
-  const victimName = input.victimName || "Nạn nhân";
-  const phoneDetail = input.effectivePhoneSolved
-    ? "Đã xác minh danh tính SĐT thành công"
-    : `Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân ${victimName}`;
+  const phoneBoardCfg = (phoneCp?.boardConfig || phoneCp?.board_config) as any;
+  const isPhoneHidden = phoneBoardCfg?.hidden === true;
 
-  pins.push({
-    id: phoneNodeId,
-    nodeKind: "phone_lookup",
-    checkpointId: phoneCpId,
-    legacyId: undefined,
-    x: phonePos.x,
-    y: phonePos.y,
-    label: phoneBoardCfg?.pin_title || "Mở rộng điều tra",
-    detail: phoneDetail,
-    color: input.effectivePhoneSolved ? "cyan" : "yellow",
-    pinColor: input.effectivePhoneSolved ? "cyan" : "yellow",
-    noteColor: "white",
-    isSolved: input.effectivePhoneSolved,
-    actionType: phoneCpId ? "sheet_checkpoint" : "info",
-  });
+  if (!isPhoneHidden) {
+    const phonePos = resolveNodePosition(
+      phoneNodeId,
+      phoneBoardCfg?.position,
+      0,
+      isMobile,
+      positions,
+      { x: 0.42, y: 0.27 },
+    );
+    const victimName = input.victimName || "Nạn nhân";
+    const phoneDetail = input.effectivePhoneSolved
+      ? "Đã xác minh danh tính SĐT thành công"
+      : `Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân ${victimName}`;
+
+    pins.push({
+      id: phoneNodeId,
+      nodeKind: "phone_lookup",
+      checkpointId: phoneCpId,
+      legacyId: undefined,
+      x: phonePos.x,
+      y: phonePos.y,
+      label: phoneBoardCfg?.pin_title || "Mở rộng điều tra",
+      detail: phoneDetail,
+      color: input.effectivePhoneSolved ? "cyan" : "yellow",
+      pinColor: input.effectivePhoneSolved ? "cyan" : "yellow",
+      noteColor: "white",
+      isSolved: input.effectivePhoneSolved,
+      actionType: phoneCpId ? "sheet_checkpoint" : "info",
+      rotation: typeof phoneBoardCfg?.rotation === "number" ? phoneBoardCfg.rotation : 0,
+      scale: typeof phoneBoardCfg?.scale === "number" && phoneBoardCfg.scale > 0 ? phoneBoardCfg.scale : 1.0,
+    });
+  }
 
   // 2.2. Checkpoint: indictment
   const indictmentCp = allCheckpoints.find(
@@ -450,32 +481,38 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   const indictmentCpId = indictmentCp?.id;
   const indictmentNodeId = `${caseSlug}:indictment:${indictmentCpId || "verdict"}`;
   const indictmentBoardCfg =
-    indictmentCp?.boardConfig || indictmentCp?.board_config;
-  const indictmentPos = resolveNodePosition(
-    indictmentNodeId,
-    indictmentBoardCfg?.position,
-    4,
-    isMobile,
-    positions,
-    { x: 0.22, y: 0.8 },
-  );
-  pins.push({
-    id: indictmentNodeId,
-    nodeKind: "indictment",
-    checkpointId: indictmentCpId,
-    legacyId: undefined,
-    x: indictmentPos.x,
-    y: indictmentPos.y,
-    label: indictmentBoardCfg?.pin_title || "Bản kết luận điều tra",
-    detail: input.effectiveIndictmentSolved
-      ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
-      : "Lập bản cáo trạng gửi Viện Kiểm sát",
-    color: "red",
-    pinColor: "red",
-    noteColor: "white",
-    isSolved: input.effectiveIndictmentSolved,
-    actionType: indictmentCpId ? "sheet_checkpoint" : "info",
-  });
+    (indictmentCp?.boardConfig || indictmentCp?.board_config) as any;
+  const isIndictmentHidden = indictmentBoardCfg?.hidden === true;
+
+  if (!isIndictmentHidden) {
+    const indictmentPos = resolveNodePosition(
+      indictmentNodeId,
+      indictmentBoardCfg?.position,
+      4,
+      isMobile,
+      positions,
+      { x: 0.22, y: 0.8 },
+    );
+    pins.push({
+      id: indictmentNodeId,
+      nodeKind: "indictment",
+      checkpointId: indictmentCpId,
+      legacyId: undefined,
+      x: indictmentPos.x,
+      y: indictmentPos.y,
+      label: indictmentBoardCfg?.pin_title || "Bản kết luận điều tra",
+      detail: input.effectiveIndictmentSolved
+        ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
+        : "Lập bản cáo trạng gửi Viện Kiểm sát",
+      color: "red",
+      pinColor: "red",
+      noteColor: "white",
+      isSolved: input.effectiveIndictmentSolved,
+      actionType: indictmentCpId ? "sheet_checkpoint" : "info",
+      rotation: typeof indictmentBoardCfg?.rotation === "number" ? indictmentBoardCfg.rotation : 0,
+      scale: typeof indictmentBoardCfg?.scale === "number" && indictmentBoardCfg.scale > 0 ? indictmentBoardCfg.scale : 1.0,
+    });
+  }
 
   // ============================================================================
   // 3. SUSPECTS (Nhân vật nghi phạm)
@@ -526,6 +563,9 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       return titleClean.includes(s.key) || titleClean.includes(sNameClean);
     });
 
+    const cpBoardCfg = (matchCp?.boardConfig || matchCp?.board_config) as any;
+    if (cpBoardCfg?.hidden === true) return;
+
     const fallbackCoord =
       c0DefaultSuspectCoords[s.key]
         ? c0DefaultSuspectCoords[s.key]
@@ -544,7 +584,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       id: primaryId,
       nodeKind: "suspect",
       subjectKey: s.key,
-            checkpointId: matchCp?.id,
+      checkpointId: matchCp?.id,
       x: pos.x,
       y: pos.y,
       label: s.name,
@@ -556,6 +596,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         "/images/avatar_placeholder.svg",
       isAvatar: true,
       actionType: matchCp?.id ? "sheet_checkpoint" : "info",
+      rotation: typeof cpBoardCfg?.rotation === "number" ? cpBoardCfg.rotation : 0,
+      scale: typeof cpBoardCfg?.scale === "number" && cpBoardCfg.scale > 0 ? cpBoardCfg.scale : 1.0,
     });
   });
 
@@ -590,9 +632,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
     if (!matchCp) return;
 
+    const boardCfg = (matchCp.boardConfig || matchCp.board_config) as any;
+    if (boardCfg?.hidden === true) return;
+
     const primaryId = `${caseSlug}:followup:${s.key}`;
     const legacyId = undefined;
-    const boardCfg = matchCp.boardConfig || matchCp.board_config;
 
     const suspectPin = pins.find(
       (p) => p.nodeKind === "suspect" && p.subjectKey === s.key,
@@ -606,7 +650,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
     const pos = resolveNodePosition(
       primaryId,
-            boardCfg?.position,
+      boardCfg?.position,
       s.slotIndex + 8,
       isMobile,
       positions,
@@ -618,13 +662,15 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       nodeKind: "followup",
       subjectKey: s.key,
       checkpointId: matchCp.id,
-            x: pos.x,
+      x: pos.x,
       y: pos.y,
       label: boardCfg?.pin_title || "Nghi vấn",
       detail: `Nghi vấn suy luận mở rộng đối tượng ${s.name}`,
       color: "purple",
       noteColor: "yellow",
       actionType: "sheet_checkpoint",
+      rotation: typeof boardCfg?.rotation === "number" ? boardCfg.rotation : 0,
+      scale: typeof boardCfg?.scale === "number" && boardCfg.scale > 0 ? boardCfg.scale : 1.0,
     });
   });
 
@@ -791,6 +837,8 @@ function findMatchingOverride<T>(
   if (dict[pin.id] !== undefined) return dict[pin.id];
   // 2. Khớp theo legacyId nếu có
   if (pin.legacyId && dict[pin.legacyId] !== undefined) return dict[pin.legacyId];
+  // 3. Khớp theo checkpointId nếu có
+  if (pin.checkpointId && dict[pin.checkpointId] !== undefined) return dict[pin.checkpointId];
 
   // 3. Khớp tương quan theo chủng loại node (canonical alias matching)
   if (pin.nodeKind === "phone_lookup") {
@@ -859,11 +907,6 @@ function findMatchingOverride<T>(
   if (pin.nodeKind === "suspects_hub") {
     for (const [key, val] of Object.entries(dict)) {
       if (key.includes(":suspects_hub:") || key === "c0-pin-suspects") return val;
-    }
-  }
-  if (pin.nodeKind === "evidence_hub") {
-    for (const [key, val] of Object.entries(dict)) {
-      if (key.includes(":evidence_hub:") || key === "c0-pin-evidence") return val;
     }
   }
 
