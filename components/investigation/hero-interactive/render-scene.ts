@@ -485,7 +485,13 @@ export function renderScene({
 
       const customTextureUrl = pin.noteTextureUrl as string | undefined;
 
-      if (customTextureUrl) {
+      if (pin.noteTemplate && pin.noteTemplate.startsWith("/images/")) {
+        noteUrl = pin.noteTemplate;
+        isPreRendered = true;
+      } else if (pin.noteTemplate === "custom") {
+        noteUrl = "";
+        isPreRendered = false;
+      } else if (customTextureUrl) {
         noteUrl = customTextureUrl;
         isPreRendered =
           customTextureUrl.includes("rendered_notes/") ||
@@ -507,8 +513,13 @@ export function renderScene({
         upperLabel.includes("NGHI VẤN") ||
         upperLabel.includes("CÂU HỎI")
       ) {
-        noteUrl = "/images/board/notes/note_nghi_van.png";
-        isPreRendered = true;
+        if (pin.label && pin.label !== "NGHI VẤN") {
+          noteUrl = "";
+          isPreRendered = false;
+        } else {
+          noteUrl = "/images/board/notes/note_nghi_van.png";
+          isPreRendered = true;
+        }
       } else if (
         pin.nodeKind === "phone_lookup" ||
         upperLabel.includes("MỞ RỘNG")
@@ -533,7 +544,7 @@ export function renderScene({
         noteUrl = "/images/board/notes/note_mo_rong_dieu_tra.png";
         isPreRendered = false;
       } else {
-        noteUrl = "/images/board/notes/note_nghi_van.png";
+        noteUrl = "";
         isPreRendered = false;
       }
 
@@ -632,14 +643,33 @@ export function renderScene({
         context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
         context.restore();
       } else {
-        // Fallback fill
+        // Fallback fill / custom tactile handwritten note card
         context.save();
         context.shadowColor = "rgba(10, 5, 2, 0.48)";
         context.shadowBlur = (12 * scaleFactor) / transform.scale;
         context.shadowOffsetX = (2.2 * scaleFactor) / transform.scale;
         context.shadowOffsetY = (6 * scaleFactor) / transform.scale;
-        context.fillStyle = isWhiteNote ? "#faf8f2" : "#fde047";
+
+        const noteBg =
+          pin.noteColor === "red"
+            ? "#fecdd3"
+            : pin.noteColor === "blue"
+              ? "#bae6fd"
+              : isWhiteNote
+                ? "#faf8f2"
+                : "#fef08a";
+        context.fillStyle = noteBg;
         context.fillRect(tagX, tagY, noteWidth, noteHeight);
+
+        // Subtle top adhesive band for realistic tactile sticky note
+        context.fillStyle = "rgba(255, 255, 255, 0.22)";
+        context.fillRect(tagX, tagY, noteWidth, noteHeight * 0.14);
+
+        // Subtle paper edge border
+        context.strokeStyle = "rgba(0, 0, 0, 0.08)";
+        context.lineWidth = 1;
+        context.strokeRect(tagX, tagY, noteWidth, noteHeight);
+
         context.restore();
       }
 

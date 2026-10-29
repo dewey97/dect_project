@@ -411,6 +411,13 @@ export interface BoardConfig {
   icon?: string;
   photo_url?: string;
   note_style?: string;
+  display_mode?: "note" | "photo" | "badge";
+  note_template?: string;
+  note_color?: "yellow" | "white" | "red" | "blue" | "black";
+  pin_color?: "red" | "yellow" | "blue" | "green" | "black" | "silver" | "brass";
+  scale?: number;
+  rotation?: number;
+  pulse?: boolean;
   position?: {
     desktop?: BoardPosition;
     mobile?: BoardPosition;

@@ -67,6 +67,8 @@ export interface PinPoint {
   pulseBorder?: boolean;
   photoUrl?: string;
   isAvatar?: boolean;
+  displayMode?: "note" | "photo" | "badge";
+  noteTemplate?: string;
   noteTextureUrl?: string;
   isLocked?: boolean;
   isSolved?: boolean;

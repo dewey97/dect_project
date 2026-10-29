@@ -341,6 +341,7 @@ export function useBoardModel(
   // Dựng danh sách toàn bộ các ghim (pins)
   const basePins = useMemo(() => {
     return buildCustomPins({
+      isStudioMode: options.isStudioMode,
       isMobile,
       caseId,
       caseSlug: caseId,

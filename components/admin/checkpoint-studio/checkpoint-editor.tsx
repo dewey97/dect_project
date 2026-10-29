@@ -9,6 +9,7 @@ import type {
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import { Button } from "@/components/ui/button";
 import { CheckpointIdentityForm } from "./sections/checkpoint-identity-form";
+import { CheckpointBoardDisplayForm } from "./sections/checkpoint-board-display-form";
 import { SuspectInterrogationConfigForm } from "./sections/suspect-interrogation-config-form";
 import { PhoneLookupConfigForm } from "./sections/phone-lookup-config-form";
 import { IndictmentConfigForm } from "./sections/indictment-config-form";
@@ -178,6 +179,14 @@ export function CheckpointEditor({
               dossiers={dossiers}
               characters={characters}
               checkpoints={checkpoints}
+              onChange={onChange}
+            />
+          )}
+
+          {!isEpilogue && (
+            <CheckpointBoardDisplayForm
+              draft={draft}
+              characters={characters}
               onChange={onChange}
             />
           )}

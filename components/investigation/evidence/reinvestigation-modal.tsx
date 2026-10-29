@@ -547,7 +547,10 @@ export function ReinvestigationModal({
       <div className="relative flex-1 w-full h-full overflow-hidden bg-[#060402]">
         <Scene360Viewer
           imageUrl={sceneConfig?.scene_360_url || undefined}
-          fallbackImageUrl={sceneConfig?.panorama_url || undefined}
+          fallbackImageUrl={
+            sceneConfig?.panorama_url ||
+            `/images/cases/${caseId || "case_000"}/PANORAMA.webp`
+          }
           hotspots={resolvedHotspots}
           onSelectSpot={(spot) => {
             const matched = resolvedHotspots.find((s) => s.id === spot.id);

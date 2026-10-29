@@ -405,69 +405,16 @@ export function MainInvestigationCanvas({
     const list: SuspectItem[] = [];
     const seen = new Set<string>();
 
-    const hasExplicitSuspectOnSheet =
-      Array.isArray(sheetEvidences) && sheetEvidences.some(parseSuspectFlag);
+    const checkpointSubjectKeys = new Set(
+      (state.checkpoints || [])
+        .map((cp: any) =>
+          (cp.subject_key || cp.subjectKey || "").trim().toLowerCase(),
+        )
+        .filter(Boolean),
+    );
 
-    if (Array.isArray(sheetEvidences) && sheetEvidences.length > 0) {
-      sheetEvidences.forEach((item: any) => {
-        const isPinned = parsePinOnBoardFlag(item);
-        const isExplicit = parseSuspectFlag(item);
-        const code = String(item.code || item.photo_code || "")
-          .toLowerCase()
-          .trim();
-
-        // Nếu trên Sheet có đánh dấu tường minh is_suspect: TRUE hoặc category: SUSPECT thì ưu tiên 100%
-        // Nếu Sheet chưa cấu hình cột is_suspect (tất cả đều trống), giữ fallback cho 3 nhân vật kinh điển của Case #000
-        const isSuspect = hasExplicitSuspectOnSheet
-          ? isExplicit
-          : isExplicit ||
-            (isPinned &&
-              (code === "avatar_vu" ||
-                code === "avatar_tung" ||
-                code === "avatar_ha"));
-
-        if (!isSuspect || item.role === "victim" || item.metadata?.role === "victim") return;
-
-        const charId = code.replace(/^avatar_/, "");
-        const label = String(item.label || item.title || "").trim();
-        const cleanName =
-          label
-            .replace(
-              /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
-              "",
-            )
-            .replace(/\s*\([^)]*\)/g, "")
-            .trim() || charId;
-
-        // Bảo lưu tiến trình điều tra manh mối từ local state nếu có
-        const saved = state.suspects.find(
-          (s) =>
-            s.id === charId ||
-            s.id === `suspect-${charId}` ||
-            s.name.toLowerCase() === cleanName.toLowerCase(),
-        );
-
-        if (!seen.has(charId)) {
-          seen.add(charId);
-          list.push({
-            id: `suspect-${charId}`,
-            name: cleanName,
-            clueIds: saved?.clueIds || [],
-            motiveClueIds: saved?.motiveClueIds,
-            alibiClueIds: saved?.alibiClueIds,
-            contradictionClueIds: saved?.contradictionClueIds,
-          });
-        }
-      });
-    }
-
-    // Nếu không có sheetEvidences (case Studio/Multi-case), nạp danh sách nghi phạm từ characters DB
-    if (list.length === 0 && Array.isArray(characters) && characters.length > 0) {
-      const checkpointSubjectKeys = new Set(
-        (state.checkpoints || [])
-          .map((cp: any) => (cp.subject_key || cp.subjectKey || "").trim().toLowerCase())
-          .filter(Boolean),
-      );
+    // 1. Nguồn nhân vật chính thức từ Database (case_characters)
+    if (Array.isArray(characters) && characters.length > 0) {
       characters.forEach((char) => {
         if (char.role === "victim") return;
         const isSuspectRole =
@@ -496,14 +443,67 @@ export function MainInvestigationCanvas({
       });
     }
 
-    // Nếu đã nạp từ Sheet hoặc Characters DB thì ưu tiên
+    // 2. Bổ sung từ case_evidence (sheetEvidences) nếu có đối tượng tình nghi chưa khai báo trong case_characters
+    if (Array.isArray(sheetEvidences) && sheetEvidences.length > 0) {
+      const hasExplicitSuspectOnSheet = sheetEvidences.some(parseSuspectFlag);
+
+      sheetEvidences.forEach((item: any) => {
+        const isPinned = parsePinOnBoardFlag(item);
+        const isExplicit = parseSuspectFlag(item);
+        const code = String(item.code || item.photo_code || "")
+          .toLowerCase()
+          .trim();
+
+        const isSuspect = hasExplicitSuspectOnSheet
+          ? isExplicit
+          : isExplicit ||
+            (isPinned &&
+              (code === "avatar_vu" ||
+                code === "avatar_tung" ||
+                code === "avatar_ha"));
+
+        if (!isSuspect || item.role === "victim" || item.metadata?.role === "victim") return;
+
+        const charId = code.replace(/^avatar_/, "");
+        if (seen.has(charId)) return;
+
+        const label = String(item.label || item.title || "").trim();
+        const cleanName =
+          label
+            .replace(
+              /^(Ảnh chân dung|Ảnh thẻ|Ảnh|Chân dung|Nạn nhân|Nghi phạm|Nhân chứng)\s+/i,
+              "",
+            )
+            .replace(/\s*\([^)]*\)/g, "")
+            .trim() || charId;
+
+        seen.add(charId);
+        const saved = state.suspects.find(
+          (s) =>
+            s.id === charId ||
+            s.id === `suspect-${charId}` ||
+            s.name.toLowerCase() === cleanName.toLowerCase(),
+        );
+
+        list.push({
+          id: `suspect-${charId}`,
+          name: cleanName,
+          clueIds: saved?.clueIds || [],
+          motiveClueIds: saved?.motiveClueIds,
+          alibiClueIds: saved?.alibiClueIds,
+          contradictionClueIds: saved?.contradictionClueIds,
+        });
+      });
+    }
+
+    // Nếu đã nạp từ Characters DB hoặc Sheet thì ưu tiên
     if (list.length > 0) {
       return list;
     }
 
     // Fallback tạm thời nếu Sheet đang load và local state đã có sẵn
     return state.suspects;
-  }, [state.suspects, sheetEvidences, characters]);
+  }, [state.suspects, sheetEvidences, characters, state.checkpoints, parseSuspectFlag, parsePinOnBoardFlag]);
 
   // Suspects list for connections and pins
 
@@ -580,10 +580,12 @@ export function MainInvestigationCanvas({
         caseCheckpoints: state.checkpoints,
         victimName,
         caseId,
+        positions: layout.customPinPositions,
       }),
     [
       isMobile,
       layout.boardNodes,
+      layout.customPinPositions,
       effectiveSuspects,
       characters,
       sheetPhotoMap,
@@ -678,7 +680,36 @@ export function MainInvestigationCanvas({
         setStorageItem("last_viewed_suspect", pin.subjectKey);
       }
 
+      const nodeKind = pin?.nodeKind;
 
+      // Ưu tiên các node nghiệp vụ đặc thù (Khám xét hiện trường 360, Điện thoại nạn nhân)
+      if (
+        nodeKind === "reinvestigate" ||
+        id.includes(":reinvestigate:") ||
+        id === "c0-pin-reinvestigate" ||
+        label.includes("khám xét") ||
+        (label.includes("hiện trường") && !label.includes("biên bản"))
+      ) {
+        if (state.effectiveReinvestigateUnlocked) {
+          detectiveAudio.playGlassSound();
+          if (onOpenReinvestigation) onOpenReinvestigation();
+          else state.handleOpenReinvestigation();
+        } else {
+          detectiveAudio.playGlassSound();
+        }
+        return;
+      }
+
+      if (
+        nodeKind === "victim_phone" ||
+        id.includes(":victim_phone:") ||
+        id === "c0-pin-victim-phone"
+      ) {
+        detectiveAudio.playPaperRustle();
+        if (onOpenPhoneSimulator) onOpenPhoneSimulator();
+        else state.setIsInternalPhoneOpen(true);
+        return;
+      }
 
       if (id.startsWith("admin-pin-") || id.startsWith("custom-pin-")) {
         const targetPin =
@@ -698,8 +729,6 @@ export function MainInvestigationCanvas({
         else setActiveCustomPinModal(targetPin);
         return;
       }
-
-      const nodeKind = pin?.nodeKind;
 
       switch (nodeKind) {
         case "suspects_hub": {

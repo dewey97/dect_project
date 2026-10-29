@@ -232,6 +232,7 @@ function WebEvidencePageContent() {
   useInvestigationEvent("OPEN_INDICTMENT", () => setActiveModal("indictment"));
   useInvestigationEvent("OPEN_EPILOGUE", () => setActiveModal("epilogue"));
   useInvestigationEvent("OPEN_PHONE", () => setActiveModal("phone"));
+  useInvestigationEvent("OPEN_REINVESTIGATE", () => setActiveModal("reinvestigate"));
   useInvestigationEvent("OPEN_NOTEBOOK", () => setActiveModal("notebook"));
   useInvestigationEvent("OPEN_CANVAS_THEME", () => {
     if (viewMode !== "canvas") {
@@ -896,17 +897,15 @@ function WebEvidencePageContent() {
         />
       </div>
 
-      {/* RE-INVESTIGATION CRIME SCENE MODAL — MOBILE ONLY */}
-      <div className="lg:hidden">
-        <ReinvestigationModal
-          caseId={caseId}
-          isOpen={activeModal === "reinvestigate"}
-          onClose={() => {
-            setIsReinvestigationExpanded(false);
-            setActiveModal(null);
-          }}
-        />
-      </div>
+      {/* RE-INVESTIGATION CRIME SCENE MODAL (Desktop & Mobile) */}
+      <ReinvestigationModal
+        caseId={caseId}
+        isOpen={activeModal === "reinvestigate"}
+        onClose={() => {
+          setIsReinvestigationExpanded(false);
+          setActiveModal(null);
+        }}
+      />
 
       {/* DETECTIVE NOTEBOOK MODAL — Chỉ mở modal toàn cục có backdrop khi ở Single/Mobile view. Canvas view dùng Floating Notebook độc lập */}
       {viewMode !== "canvas" && (

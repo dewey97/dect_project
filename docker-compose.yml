@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     ports:
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -18,7 +18,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1",
+          "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1",
         ]
       interval: 30s
       timeout: 10s
@@ -26,12 +26,13 @@ services:
       start_period: 20s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dect-http.rule=Host(`xplore.vn`) || Host(`www.xplore.vn`)"
-      - "traefik.http.routers.dect-http.entrypoints=http"
-      - "traefik.http.routers.dect-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.dect-http.rule=Host(`xplore.vn`) || Host(`www.xplore.vn`) || Host(`72.62.199.110`)"
+      - "traefik.http.routers.dect-http.entrypoints=web"
       - "traefik.http.routers.dect-https.rule=Host(`xplore.vn`) || Host(`www.xplore.vn`)"
-      - "traefik.http.routers.dect-https.entrypoints=https"
+      - "traefik.http.routers.dect-https.entrypoints=websecure"
       - "traefik.http.routers.dect-https.tls=true"
       - "traefik.http.routers.dect-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dect-ip.rule=Host(`72.62.199.110`)"
+      - "traefik.http.routers.dect-ip.entrypoints=websecure"
+      - "traefik.http.routers.dect-ip.tls=true"
       - "traefik.http.services.dect-app.loadbalancer.server.port=3000"

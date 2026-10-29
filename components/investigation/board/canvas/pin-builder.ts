@@ -102,10 +102,17 @@ function resolveNodePosition(
   isMobile: boolean,
   positions: Record<string, { x: number; y: number }> | undefined,
   hardcodedDefault?: { x: number; y: number },
+  pinHint?: Partial<PinPoint>,
 ): { x: number; y: number } {
   if (positions) {
     if (positions[primaryId]) return positions[primaryId];
-    // legacyId positions check removed
+    if (pinHint) {
+      const matched = findMatchingOverride(
+        { id: primaryId, ...pinHint } as PinPoint,
+        positions,
+      );
+      if (matched) return matched;
+    }
   }
 
   const explicit = isMobile ? configPosition?.mobile : configPosition?.desktop;
@@ -131,11 +138,39 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   const caseSlug = normalizeCaseId(
     input.caseSlug || input.caseId || "case_000",
   );
-    const isMobile = input.isMobile;
+  const isMobile = input.isMobile;
   const positions = input.positions;
 
   const characters = input.characters || [];
   const pins: PinPoint[] = [];
+
+  // ============================================================================
+  // CHECKPOINTS REFERENCE (Định nghĩa trước để tránh lỗi TDZ ReferenceError)
+  // ============================================================================
+  const allCheckpoints = (input.checkpoints ||
+    input.caseCheckpoints ||
+    []) as Array<{
+    id: string;
+    kind?: string;
+    title?: string;
+    subjectKey?: string;
+    subject_key?: string;
+    boardConfig?: {
+      pin_title?: string;
+      position?: {
+        desktop?: { x: number; y: number };
+        mobile?: { x: number; y: number };
+      };
+    };
+    board_config?: {
+      pin_title?: string;
+      position?: {
+        desktop?: { x: number; y: number };
+        mobile?: { x: number; y: number };
+      };
+    };
+    [key: string]: unknown;
+  }>;
 
   // ============================================================================
   // 1. BOARD NODES (Node hệ thống & Ghim cố định)
@@ -243,191 +278,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         actionType: "info",
       });
     });
-
-    // Bổ sung an toàn: Nếu DB chưa có 1 trong 3 node cơ bản thì tự bù
-    const hasVp = pins.some((p) => p.nodeKind === "victim_phone");
-    const hasReinv = pins.some((p) => p.nodeKind === "reinvestigate");
-    const hasSh = pins.some((p) => p.nodeKind === "suspects_hub");
-
-    if (!hasVp) {
-      const vpId = `${caseSlug}:victim_phone:item`;
-      const vpPos = resolveNodePosition(
-        vpId,
-        undefined,
-        1,
-        isMobile,
-        positions,
-        { x: 0.38, y: 0.14 },
-      );
-      pins.push({
-        id: vpId,
-        nodeKind: "victim_phone",
-        x: vpPos.x,
-        y: vpPos.y,
-        label: "Điện thoại nạn nhân",
-        detail: `Vật chứng: Điện thoại thu giữ của nạn nhân ${victimName}`,
-        color: "yellow",
-        pinColor: "yellow",
-        photoUrl: "/phone.png",
-        scale: 0.85,
-      });
-    }
-    if (!hasReinv) {
-      const reinvId = `${caseSlug}:reinvestigate:scene`;
-      const reinvPos = resolveNodePosition(
-        reinvId,
-        undefined,
-        2,
-        isMobile,
-        positions,
-        { x: 0.18, y: 0.36 },
-      );
-      pins.push({
-        id: reinvId,
-        nodeKind: "reinvestigate",
-        x: reinvPos.x,
-        y: reinvPos.y,
-        label: "Khám xét hiện trường",
-        detail: "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án",
-        color: "yellow",
-        pinColor: "yellow",
-        noteColor: "white",
-        photoUrl: `/images/cases/${caseSlug}/crime_scene.png`,
-        scale: 0.95,
-        pulseBorder: input.isReinvestigateBlinking,
-        actionType: "info",
-      });
-    }
-    if (!hasSh) {
-      const shId = `${caseSlug}:suspects_hub:hub`;
-      const shPos = resolveNodePosition(
-        shId,
-        undefined,
-        3,
-        isMobile,
-        positions,
-        { x: 0.58, y: 0.38 },
-      );
-      pins.push({
-        id: shId,
-        nodeKind: "suspects_hub",
-        x: shPos.x,
-        y: shPos.y,
-        label: "Nghi phạm",
-        detail: "Thêm và xem danh sách nghi phạm vụ án",
-        color: isMobile ? "yellow" : "red",
-        pinColor: isMobile ? "yellow" : "red",
-        noteColor: "yellow",
-      });
-    }
-  } else {
-    // Fallback an toàn: Dựng 5 node cơ bản khi database chưa chạy migration 39
-    const victimName = input.victimName || "Nạn nhân";
-
-    // 1.1. victim_phone
-    const vpId = `${caseSlug}:victim_phone:item`;
-    const vpPos = resolveNodePosition(
-      vpId,
-      undefined,
-      1,
-      isMobile,
-      positions,
-      { x: 0.38, y: 0.14 },
-    );
-    pins.push({
-      id: vpId,
-      nodeKind: "victim_phone",
-      legacyId: undefined,
-      x: vpPos.x,
-      y: vpPos.y,
-      label: "Điện thoại nạn nhân",
-      detail: `Vật chứng: Điện thoại thu giữ của nạn nhân ${victimName}`,
-      color: "yellow",
-      pinColor: "yellow",
-      photoUrl: "/phone.png",
-      scale: 0.85,
-    });
-
-    // 1.2. reinvestigate
-    const reinvId = `${caseSlug}:reinvestigate:scene`;
-    const reinvPos = resolveNodePosition(
-      reinvId,
-      undefined,
-      2,
-      isMobile,
-      positions,
-      { x: 0.18, y: 0.36 },
-    );
-    const crimeScenePhotoUrl = `/images/cases/${caseSlug}/crime_scene.png`;
-    pins.push({
-      id: reinvId,
-      nodeKind: "reinvestigate",
-      legacyId: undefined,
-      x: reinvPos.x,
-      y: reinvPos.y,
-      label: "Khám xét hiện trường",
-      detail: "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án",
-      color: "yellow",
-      pinColor: "yellow",
-      noteColor: "white",
-      photoUrl: crimeScenePhotoUrl,
-      scale: 0.95,
-      pulseBorder: input.isReinvestigateBlinking,
-      isLocked: false,
-      actionType: "info",
-    });
-
-    // 1.3. suspects_hub
-    const shId = `${caseSlug}:suspects_hub:hub`;
-    const shPos = resolveNodePosition(
-      shId,
-      undefined,
-      3,
-      isMobile,
-      positions,
-      { x: 0.58, y: 0.38 },
-    );
-    pins.push({
-      id: shId,
-      nodeKind: "suspects_hub",
-      legacyId: undefined,
-      x: shPos.x,
-      y: shPos.y,
-      label: "Nghi phạm",
-      detail: "Thêm & xem danh sách nghi phạm vụ án",
-      color: isMobile ? "yellow" : "red",
-      pinColor: isMobile ? "yellow" : "red",
-      noteColor: "yellow",
-    });
   }
 
   // ============================================================================
   // 2. CHECKPOINTS (phone_lookup, indictment, followup)
   // ============================================================================
-  const allCheckpoints = (input.checkpoints ||
-    input.caseCheckpoints ||
-    []) as Array<{
-    id: string;
-    kind?: string;
-    title?: string;
-    subjectKey?: string;
-    subject_key?: string;
-    boardConfig?: {
-      pin_title?: string;
-      position?: {
-        desktop?: { x: number; y: number };
-        mobile?: { x: number; y: number };
-      };
-    };
-    board_config?: {
-      pin_title?: string;
-      position?: {
-        desktop?: { x: number; y: number };
-        mobile?: { x: number; y: number };
-      };
-    };
-    [key: string]: unknown;
-  }>;
 
   // 2.1. Checkpoint: phone_lookup
   const phoneCp = allCheckpoints.find(
@@ -436,42 +291,44 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       cp.id.includes("phone") ||
       cp.id.includes("-0"),
   );
-  const phoneCpId = phoneCp?.id;
-  const phoneNodeId = `${caseSlug}:phone_lookup:${phoneCpId || "system"}`;
-  const phoneBoardCfg = (phoneCp?.boardConfig || phoneCp?.board_config) as any;
-  const isPhoneHidden = phoneBoardCfg?.hidden === true;
+  if (phoneCp) {
+    const phoneCpId = phoneCp.id;
+    const phoneNodeId = `${caseSlug}:phone_lookup:${phoneCpId || "system"}`;
+    const phoneBoardCfg = (phoneCp.boardConfig || phoneCp.board_config) as any;
+    const isPhoneHidden = phoneBoardCfg?.hidden === true;
 
-  if (!isPhoneHidden) {
-    const phonePos = resolveNodePosition(
-      phoneNodeId,
-      phoneBoardCfg?.position,
-      0,
-      isMobile,
-      positions,
-      { x: 0.42, y: 0.27 },
-    );
-    const victimName = input.victimName || "Nạn nhân";
-    const phoneDetail = input.effectivePhoneSolved
-      ? "Đã xác minh danh tính SĐT thành công"
-      : `Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân ${victimName}`;
+    if (!isPhoneHidden) {
+      const phonePos = resolveNodePosition(
+        phoneNodeId,
+        phoneBoardCfg?.position,
+        0,
+        isMobile,
+        positions,
+        { x: 0.42, y: 0.27 },
+      );
+      const victimName = input.victimName || "Nạn nhân";
+      const phoneDetail = input.effectivePhoneSolved
+        ? "Đã xác minh danh tính SĐT thành công"
+        : `Tra cứu SĐT & khai thác dữ liệu điện thoại nạn nhân ${victimName}`;
 
-    pins.push({
-      id: phoneNodeId,
-      nodeKind: "phone_lookup",
-      checkpointId: phoneCpId,
-      legacyId: undefined,
-      x: phonePos.x,
-      y: phonePos.y,
-      label: phoneBoardCfg?.pin_title || "Mở rộng điều tra",
-      detail: phoneDetail,
-      color: input.effectivePhoneSolved ? "cyan" : "yellow",
-      pinColor: input.effectivePhoneSolved ? "cyan" : "yellow",
-      noteColor: "white",
-      isSolved: input.effectivePhoneSolved,
-      actionType: phoneCpId ? "sheet_checkpoint" : "info",
-      rotation: typeof phoneBoardCfg?.rotation === "number" ? phoneBoardCfg.rotation : 0,
-      scale: typeof phoneBoardCfg?.scale === "number" && phoneBoardCfg.scale > 0 ? phoneBoardCfg.scale : 1.0,
-    });
+      pins.push({
+        id: phoneNodeId,
+        nodeKind: "phone_lookup",
+        checkpointId: phoneCpId,
+        legacyId: undefined,
+        x: phonePos.x,
+        y: phonePos.y,
+        label: phoneBoardCfg?.pin_title || "Mở rộng điều tra",
+        detail: phoneDetail,
+        color: input.effectivePhoneSolved ? "cyan" : "yellow",
+        pinColor: input.effectivePhoneSolved ? "cyan" : "yellow",
+        noteColor: "white",
+        isSolved: input.effectivePhoneSolved,
+        actionType: phoneCpId ? "sheet_checkpoint" : "info",
+        rotation: typeof phoneBoardCfg?.rotation === "number" ? phoneBoardCfg.rotation : 0,
+        scale: typeof phoneBoardCfg?.scale === "number" && phoneBoardCfg.scale > 0 ? phoneBoardCfg.scale : 1.0,
+      });
+    }
   }
 
   // 2.2. Checkpoint: indictment
@@ -481,40 +338,42 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       cp.id.includes("indictment") ||
       cp.id.includes("-2b"),
   );
-  const indictmentCpId = indictmentCp?.id;
-  const indictmentNodeId = `${caseSlug}:indictment:${indictmentCpId || "verdict"}`;
-  const indictmentBoardCfg =
-    (indictmentCp?.boardConfig || indictmentCp?.board_config) as any;
-  const isIndictmentHidden = indictmentBoardCfg?.hidden === true;
+  if (indictmentCp) {
+    const indictmentCpId = indictmentCp.id;
+    const indictmentNodeId = `${caseSlug}:indictment:${indictmentCpId || "verdict"}`;
+    const indictmentBoardCfg =
+      (indictmentCp.boardConfig || indictmentCp.board_config) as any;
+    const isIndictmentHidden = indictmentBoardCfg?.hidden === true;
 
-  if (!isIndictmentHidden) {
-    const indictmentPos = resolveNodePosition(
-      indictmentNodeId,
-      indictmentBoardCfg?.position,
-      4,
-      isMobile,
-      positions,
-      { x: 0.22, y: 0.8 },
-    );
-    pins.push({
-      id: indictmentNodeId,
-      nodeKind: "indictment",
-      checkpointId: indictmentCpId,
-      legacyId: undefined,
-      x: indictmentPos.x,
-      y: indictmentPos.y,
-      label: indictmentBoardCfg?.pin_title || "Bản kết luận điều tra",
-      detail: input.effectiveIndictmentSolved
-        ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
-        : "Lập bản cáo trạng gửi Viện Kiểm sát",
-      color: "red",
-      pinColor: "red",
-      noteColor: "white",
-      isSolved: input.effectiveIndictmentSolved,
-      actionType: indictmentCpId ? "sheet_checkpoint" : "info",
-      rotation: typeof indictmentBoardCfg?.rotation === "number" ? indictmentBoardCfg.rotation : 0,
-      scale: typeof indictmentBoardCfg?.scale === "number" && indictmentBoardCfg.scale > 0 ? indictmentBoardCfg.scale : 1.0,
-    });
+    if (!isIndictmentHidden) {
+      const indictmentPos = resolveNodePosition(
+        indictmentNodeId,
+        indictmentBoardCfg?.position,
+        4,
+        isMobile,
+        positions,
+        { x: 0.22, y: 0.8 },
+      );
+      pins.push({
+        id: indictmentNodeId,
+        nodeKind: "indictment",
+        checkpointId: indictmentCpId,
+        legacyId: undefined,
+        x: indictmentPos.x,
+        y: indictmentPos.y,
+        label: indictmentBoardCfg?.pin_title || "Bản kết luận điều tra",
+        detail: input.effectiveIndictmentSolved
+          ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
+          : "Lập bản cáo trạng gửi Viện Kiểm sát",
+        color: "red",
+        pinColor: "red",
+        noteColor: "white",
+        isSolved: input.effectiveIndictmentSolved,
+        actionType: indictmentCpId ? "sheet_checkpoint" : "info",
+        rotation: typeof indictmentBoardCfg?.rotation === "number" ? indictmentBoardCfg.rotation : 0,
+        scale: typeof indictmentBoardCfg?.scale === "number" && indictmentBoardCfg.scale > 0 ? indictmentBoardCfg.scale : 1.0,
+      });
+    }
   }
 
   // ============================================================================
@@ -608,6 +467,10 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   // 4. FOLLOWUP PINS (Ghim Nghi vấn mở rộng)
   // ============================================================================
   const activeFollowupSet = new Set<string>(input.followupCulpritIds || []);
+  const processedCpIds = new Set<string>();
+
+  if (phoneCp) processedCpIds.add(phoneCp.id);
+  if (indictmentCp) processedCpIds.add(indictmentCp.id);
 
   suspectsList.forEach((s) => {
     if (!input.isStudioMode && !activeFollowupSet.has(s.key)) return;
@@ -628,12 +491,12 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     });
 
     if (!matchCp) return;
+    processedCpIds.add(matchCp.id);
 
     const boardCfg = (matchCp.boardConfig || matchCp.board_config) as any;
     if (boardCfg?.hidden === true) return;
 
     const primaryId = `${caseSlug}:followup:${s.key}`;
-    const legacyId = undefined;
 
     const suspectPin = pins.find(
       (p) => p.nodeKind === "suspect" && p.subjectKey === s.key,
@@ -652,17 +515,81 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       fallbackCoord,
     );
 
+    const displayMode = boardCfg?.display_mode || (boardCfg?.photo_url ? "photo" : "note");
+    const photoUrl = displayMode === "photo" && boardCfg?.photo_url ? boardCfg.photo_url : undefined;
+    const noteTemplate = boardCfg?.note_template || (displayMode === "note" ? "custom" : undefined);
+    const noteColor = boardCfg?.note_color || "yellow";
+    const pinColor = boardCfg?.pin_color || (boardCfg?.color || "yellow");
+    const pulseBorder = Boolean(boardCfg?.pulse || (input.isReinvestigateBlinking && s.key === "reinvestigate"));
+    const label = boardCfg?.pin_title || matchCp.title || "Nghi vấn";
+
     pins.push({
       id: primaryId,
-      nodeKind: "followup",
+      nodeKind: displayMode === "photo" ? "photo" : "followup",
       subjectKey: s.key,
       checkpointId: matchCp.id,
       x: pos.x,
       y: pos.y,
-      label: boardCfg?.pin_title || "Nghi vấn",
+      label,
       detail: `Nghi vấn suy luận mở rộng đối tượng ${s.name}`,
-      color: "purple",
-      noteColor: "yellow",
+      color: pinColor,
+      pinColor,
+      noteColor,
+      displayMode,
+      noteTemplate,
+      photoUrl,
+      pulseBorder,
+      actionType: "sheet_checkpoint",
+      rotation: typeof boardCfg?.rotation === "number" ? boardCfg.rotation : 0,
+      scale: typeof boardCfg?.scale === "number" && boardCfg.scale > 0 ? boardCfg.scale : 1.0,
+    });
+  });
+
+  // 4.2. STANDALONE CHECKPOINT PINS (Checkpoints tự do đưa lên bảng)
+  allCheckpoints.forEach((cp, idx) => {
+    if (processedCpIds.has(cp.id)) return;
+    if (cp.kind === "epilogue" || cp.kind === "suspect_interrogation") return;
+
+    const boardCfg = (cp.boardConfig || cp.board_config) as any;
+    if (!boardCfg || boardCfg.hidden !== false) return;
+
+    processedCpIds.add(cp.id);
+    const cpKey = (cp.subjectKey || cp.subject_key || cp.id).toLowerCase();
+    const primaryId = `${caseSlug}:checkpoint:${cp.id || (cp as any).checkpoint_id || idx}`;
+
+    const pos = resolveNodePosition(
+      primaryId,
+      boardCfg?.position,
+      idx + 14,
+      isMobile,
+      positions,
+      { x: 0.5, y: 0.5 },
+    );
+
+    const displayMode = boardCfg?.display_mode || (boardCfg?.photo_url ? "photo" : "note");
+    const photoUrl = displayMode === "photo" && boardCfg?.photo_url ? boardCfg.photo_url : undefined;
+    const noteTemplate = boardCfg?.note_template || (displayMode === "note" ? "custom" : undefined);
+    const noteColor = boardCfg?.note_color || "yellow";
+    const pinColor = boardCfg?.pin_color || (boardCfg?.color || "yellow");
+    const pulseBorder = Boolean(boardCfg?.pulse);
+    const label = boardCfg?.pin_title || cp.title || "Nghi vấn";
+
+    pins.push({
+      id: primaryId,
+      nodeKind: displayMode === "photo" ? "photo" : "followup",
+      subjectKey: cpKey,
+      checkpointId: cp.id,
+      x: pos.x,
+      y: pos.y,
+      label,
+      detail: cp.title || "Nghi vấn điều tra",
+      color: pinColor,
+      pinColor,
+      noteColor,
+      displayMode,
+      noteTemplate,
+      photoUrl,
+      pulseBorder,
       actionType: "sheet_checkpoint",
       rotation: typeof boardCfg?.rotation === "number" ? boardCfg.rotation : 0,
       scale: typeof boardCfg?.scale === "number" && boardCfg.scale > 0 ? boardCfg.scale : 1.0,
@@ -889,6 +816,17 @@ function findMatchingOverride<T>(
     }
   }
 
+  if (pin.nodeKind === "victim") {
+    for (const [key, val] of Object.entries(dict)) {
+      if (
+        key.includes(":victim:") ||
+        key === "c0-pin-victim" ||
+        key.endsWith(":victim")
+      ) {
+        return val;
+      }
+    }
+  }
   if (pin.nodeKind === "victim_phone") {
     for (const [key, val] of Object.entries(dict)) {
       if (key.includes(":victim_phone:") || key === "c0-pin-victim-phone") return val;

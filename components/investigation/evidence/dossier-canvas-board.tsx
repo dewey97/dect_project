@@ -45,6 +45,7 @@ import {
   Sun,
   Moon,
   SquareKanban,
+  Compass,
 } from "lucide-react";
 import {
   DOSSIER_CANVAS_PRESETS,
@@ -1943,6 +1944,25 @@ export function DossierCanvasBoard({
                                 <p>2. Xấp tài liệu giấy tờ liên quan đơn từ tranh chấp quyền sử dụng đất vương vãi trên sàn.</p>
                                 <p>3. Các mảnh sành sứ vỡ của ấm trà dính dấu vết sinh học gửi giám định AND phòng KTHS.</p>
                               </div>
+                                {/* Nút CTA Khám xét 360 trực tiếp từ biên bản hiện trường */}
+                                <div className="mt-4 pt-3 border-t border-[#8c6b4f]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[#ebe2d3]/50 p-2.5 rounded">
+                                  <div className="text-[11px] font-mono text-[#5c4033]">
+                                    Tư liệu ảnh 360° toàn cảnh hiện trường vụ án:
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      detectiveAudio.playGlassSound();
+                                      emitInvestigationEvent("OPEN_REINVESTIGATE");
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#2b170c] hover:bg-[#422413] border border-[#8c6b4f] text-[#f5ebd9] text-xs font-mono font-bold rounded shadow transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
+                                    title="Mở toàn cảnh khám xét hiện trường 360 độ"
+                                  >
+                                    <Compass className="size-3.5 text-amber-400" />
+                                    <span>Khám xét hiện trường 360°</span>
+                                  </button>
+                                </div>
                             </div>
                           </>
                         ) : (
