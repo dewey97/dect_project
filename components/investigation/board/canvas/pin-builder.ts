@@ -204,7 +204,9 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       );
 
       let detail = node.title ? `Vật chứng / Khu vực: ${node.title}` : "";
-      let photoUrl = cfg.photo_url || undefined;
+      let photoUrl =
+        cfg.photo_url ||
+        (cfg.display_mode === "photo" ? "/images/avatar_placeholder.svg" : undefined);
       let scale =
         typeof cfg.scale === "number" && cfg.scale > 0 ? cfg.scale : 1.0;
       const rotation = typeof cfg.rotation === "number" ? cfg.rotation : 0;
@@ -225,8 +227,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         pulseBorder = input.isReinvestigateBlinking;
       } else if (node.node_kind === "suspects_hub") {
         detail = "Thêm và xem danh sách nghi phạm vụ án";
-        color = isMobile ? "yellow" : "red";
-        pinColor = isMobile ? "yellow" : "red";
+        color = cfg.pin_color || (isMobile ? "yellow" : "red");
+        pinColor = cfg.pin_color || (isMobile ? "yellow" : "red");
         if (!noteColor) noteColor = "yellow";
       } else if (node.node_kind === "victim") {
         const vChar =
@@ -264,14 +266,18 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         checkpointId: node.checkpoint_id || undefined,
         x: pos.x,
         y: pos.y,
-        label: victimChar?.name || cfg.pin_title || node.title || node.node_kind,
+        label: cfg.pin_title || victimChar?.name || node.title || node.node_kind,
         detail,
         photoUrl,
         noteTextureUrl: undefined,
         isAvatar: node.node_kind === "victim",
-        color,
+        color: pinColor,
         pinColor,
         noteColor,
+        displayMode: cfg.display_mode || (photoUrl ? "photo" : "note"),
+        hasPin: Boolean(cfg.has_pin ?? (cfg.display_mode === "photo" || Boolean(photoUrl))),
+        isPolaroid: cfg.is_polaroid !== false,
+        textScale: typeof cfg.text_scale === "number" && cfg.text_scale > 0 ? cfg.text_scale : 1.0,
         scale,
         rotation,
         zIndex: typeof (cfg as any)?.z_index === "number" ? (cfg as any).z_index : 0,
@@ -501,6 +507,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       photoUrl,
       isAvatar: displayMode === "photo",
       hasPin: Boolean(cpBoardCfg?.has_pin ?? (displayMode === "photo")),
+      isPolaroid: cpBoardCfg?.is_polaroid !== false,
+      textScale:
+        typeof cpBoardCfg?.text_scale === "number" && cpBoardCfg.text_scale > 0
+          ? cpBoardCfg.text_scale
+          : 1.0,
       zIndex: typeof cpBoardCfg?.z_index === "number" ? cpBoardCfg.z_index : 0,
       pulseBorder,
       actionType: matchCp?.id ? "sheet_checkpoint" : "info",
@@ -521,19 +532,49 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   suspectsList.forEach((s) => {
     if (!input.isStudioMode && !activeFollowupSet.has(s.key)) return;
 
-    // Tìm checkpoint followup
+    // Tìm checkpoint followup khớp chính xác với nghi phạm s
     const matchCp = allCheckpoints.find((cp) => {
+      if (
+        processedCpIds.has(cp.id) ||
+        ((cp as any).checkpoint_id && processedCpIds.has((cp as any).checkpoint_id))
+      ) {
+        return false;
+      }
+
       const isFollowup =
         isAnswerKind(cp.kind) ||
         cp.id.toLowerCase().includes("followup") ||
         (cp.followupOf && String(cp.followupOf).toLowerCase().includes(s.key));
       if (!isFollowup) return false;
 
+      // 1. Khớp ưu tiên: subjectKey / subject_key
       const sKey = (cp.subjectKey || cp.subject_key || "").trim().toLowerCase();
-      if (sKey === s.key) return true;
+      if (sKey) {
+        return sKey === s.key;
+      }
+
+      // 2. Khớp qua followupOf
+      if (cp.followupOf && String(cp.followupOf).toLowerCase().includes(s.key)) {
+        return true;
+      }
+
+      // 3. Khớp qua checkpoint id định danh (vd: cp-000-1c-followup hoặc followup-ha)
+      const cpIdLower = (cp.id || (cp as any).checkpoint_id || "").toLowerCase();
+      if (
+        cpIdLower.includes(`followup-${s.key}`) ||
+        cpIdLower.includes(`:${s.key}`) ||
+        cpIdLower.endsWith(`-${s.key}`)
+      ) {
+        return true;
+      }
+
+      // 4. Khớp qua tên đầy đủ hoặc từ nguyên vẹn trong title (tránh substring như "thanh" chứa "ha")
       const titleClean = removeDiacritics(cp.title || "").toLowerCase();
       const sNameClean = removeDiacritics(s.name || "").toLowerCase();
-      return titleClean.includes(s.key) || titleClean.includes(sNameClean);
+      if (sNameClean && titleClean.includes(sNameClean)) return true;
+
+      const titleWords = titleClean.split(/[^a-z0-9_]+/);
+      return titleWords.includes(s.key);
     });
 
     if (!matchCp) return;
@@ -563,7 +604,10 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     );
 
     const displayMode = boardCfg?.display_mode || (boardCfg?.photo_url ? "photo" : "note");
-    const photoUrl = displayMode === "photo" && boardCfg?.photo_url ? boardCfg.photo_url : undefined;
+    const photoUrl =
+      displayMode === "photo"
+        ? (boardCfg?.photo_url || "/images/avatar_placeholder.svg")
+        : (boardCfg?.photo_url || undefined);
     const noteTemplate = boardCfg?.note_template || (displayMode === "note" ? "custom" : undefined);
     const noteColor = boardCfg?.note_color || "yellow";
     const pinColor = boardCfg?.pin_color || (boardCfg?.color || "yellow");
@@ -586,6 +630,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       noteTemplate,
       photoUrl,
       hasPin: Boolean(boardCfg?.has_pin),
+      isPolaroid: boardCfg?.is_polaroid !== false,
+      textScale:
+        typeof boardCfg?.text_scale === "number" && boardCfg.text_scale > 0
+          ? boardCfg.text_scale
+          : 1.0,
       zIndex: typeof boardCfg?.z_index === "number" ? boardCfg.z_index : 0,
       pulseBorder,
       actionType: "sheet_checkpoint",
@@ -617,7 +666,10 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     );
 
     const displayMode = boardCfg?.display_mode || (boardCfg?.photo_url ? "photo" : "note");
-    const photoUrl = displayMode === "photo" && boardCfg?.photo_url ? boardCfg.photo_url : undefined;
+    const photoUrl =
+      displayMode === "photo"
+        ? (boardCfg?.photo_url || "/images/avatar_placeholder.svg")
+        : (boardCfg?.photo_url || undefined);
     const noteTemplate = boardCfg?.note_template || (displayMode === "note" ? "custom" : undefined);
     const noteColor = boardCfg?.note_color || "yellow";
     const pinColor = boardCfg?.pin_color || (boardCfg?.color || "yellow");
@@ -640,6 +692,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       noteTemplate,
       photoUrl,
       hasPin: Boolean(boardCfg?.has_pin),
+      isPolaroid: boardCfg?.is_polaroid !== false,
+      textScale:
+        typeof boardCfg?.text_scale === "number" && boardCfg.text_scale > 0
+          ? boardCfg.text_scale
+          : 1.0,
       zIndex: typeof boardCfg?.z_index === "number" ? boardCfg.z_index : 0,
       pulseBorder,
       actionType: "sheet_checkpoint",
@@ -841,7 +898,7 @@ function findMatchingOverride<T>(
 
   if (pin.subjectKey) {
     const sKey = pin.subjectKey.toLowerCase();
-    if (pin.nodeKind === "suspect") {
+    if (pin.nodeKind === "suspect" || pin.id.includes(":suspect:")) {
       for (const [key, val] of Object.entries(dict)) {
         const k = key.toLowerCase();
         if (
@@ -853,7 +910,7 @@ function findMatchingOverride<T>(
           return val;
         }
       }
-    } else if (pin.nodeKind === "followup") {
+    } else if (pin.nodeKind === "followup" || pin.id.includes(":followup:")) {
       for (const [key, val] of Object.entries(dict)) {
         const k = key.toLowerCase();
         if (
@@ -922,11 +979,16 @@ export function applyLayoutOverrides(
     const override = findMatchingOverride(pin, customPinPositions);
     const tf = findMatchingOverride(pin, pinTransforms);
 
+    // Ưu tiên rotation và scale được định cấu hình tường minh trong pin (từ board_config của checkpoint hoặc board_node).
+    // Chỉ fallback sang tf (từ boardgame_pins) nếu pin chưa có scale/rotation
+    const finalRot = typeof pin.rotation === "number" ? pin.rotation : tf?.rotation ?? 0;
+    const finalScale = typeof pin.scale === "number" && pin.scale > 0 ? pin.scale : tf?.scale ?? 1.0;
+
     return {
       ...pin,
       ...(override ? { x: override.x, y: override.y } : {}),
-      rotation: tf?.rotation !== undefined ? tf.rotation : pin.rotation,
-      scale: tf?.scale !== undefined ? tf.scale : pin.scale,
+      rotation: finalRot,
+      scale: finalScale,
     };
   });
 }

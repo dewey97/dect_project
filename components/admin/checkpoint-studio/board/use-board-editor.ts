@@ -5,7 +5,7 @@ import type {
   PinPoint,
   CaseConnection,
 } from "@/components/investigation/hero-interactive";
-import type { DbCaseBoardNode, DbCaseCheckpoint, DbCaseCharacter } from "@/lib/types/database";
+import type { DbCaseBoardNode, DbCaseCheckpoint, DbCaseCharacter, BoardConfig } from "@/lib/types/database";
 import {
   saveBoardNode,
   deleteBoardNode,
@@ -50,21 +50,34 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
         setPositions(boardModel.positions);
         setHasUnsavedChanges(false);
       } else {
-        // Khi đang có thay đổi chưa lưu trên bảng (ví dụ vừa kéo thả pin),
-        // vẫn đồng bộ live các thuộc tính nội dung (nhãn, màu, ẩn/hiện, tiêu đề) từ boardModel.pins
+        // Khi đang có thay đổi chưa lưu trên bảng (ví dụ vừa kéo thả pin hoặc sửa node),
+        // vẫn đồng bộ live các thuộc tính nội dung (nhãn, màu, ẩn/hiện, tiêu đề) từ boardModel.pins cho CHECKPOINT,
+        // nhưng bảo lưu toàn bộ chỉnh sửa cục bộ của BOARD NODES trong prevPins
         setPins((prevPins) => {
-          return boardModel.pins.map((modelPin) => {
-            const existing = prevPins.find((p) => p.id === modelPin.id);
-            if (existing) {
+          return prevPins.map((existing) => {
+            const modelPin = boardModel.pins.find((p) => p.id === existing.id);
+            if (!modelPin) return existing;
+
+            const isCheckpoint = Boolean(
+              existing.checkpointId ||
+                modelPin.checkpointId ||
+                existing.id.includes("checkpoint") ||
+                existing.id.includes("phone_lookup") ||
+                existing.id.includes("indictment") ||
+                existing.id.includes("epilogue") ||
+                existing.id.includes(":suspect:") ||
+                existing.id.includes(":followup:"),
+            );
+
+            if (isCheckpoint) {
               return {
+                ...existing,
                 ...modelPin,
                 x: existing.x,
                 y: existing.y,
-                rotation: existing.rotation ?? modelPin.rotation,
-                scale: existing.scale ?? modelPin.scale,
               };
             }
-            return modelPin;
+            return existing;
           });
         });
       }
@@ -291,32 +304,52 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
 
   // Ghép toàn bộ pins hiển thị trên canvas
   const displayPins: PinPoint[] = useMemo(() => {
-    const sourcePins = hasUnsavedChanges ? pins : boardModel.pins;
-    return sourcePins.map((p) => {
-      // Khi đang có thay đổi chưa lưu trên bảng (ví dụ vừa kéo thả pin),
-      // vẫn đồng bộ live các thuộc tính nội dung (nhãn, màu, ẩn/hiện, tiêu đề, zIndex, hasPin) từ boardModel.pins
-      const modelPin = hasUnsavedChanges
-        ? boardModel.pins.find((mp) => mp.id === p.id)
-        : null;
-      const base = modelPin
-        ? {
-            ...p,
-            ...modelPin,
-            x: p.x,
-            y: p.y,
-            rotation: p.rotation ?? modelPin.rotation,
-            scale: p.scale ?? modelPin.scale,
-            zIndex: p.zIndex ?? modelPin.zIndex,
-          }
-        : p;
-      const pos = positions[base.id] || { x: base.x, y: base.y };
+    return pins.map((p) => {
+      const modelPin = boardModel.pins.find((mp) => mp.id === p.id);
+      const isCheckpoint = Boolean(
+        p.checkpointId ||
+          modelPin?.checkpointId ||
+          p.id.includes("checkpoint") ||
+          p.id.includes("phone_lookup") ||
+          p.id.includes("indictment") ||
+          p.id.includes("epilogue") ||
+          p.id.includes(":suspect:") ||
+          p.id.includes(":followup:"),
+      );
+
+      let merged: PinPoint;
+      if (isCheckpoint && modelPin) {
+        // Với checkpoint: modelPin phản ánh tức thì từ draft trong Inspector qua liveRows,
+        // nhưng các tinh chỉnh trên canvas bằng toolbar (rotation, scale, zIndex, x, y) trong p PHẢI ĐƯỢC BẢO LƯU!
+        merged = {
+          ...p,
+          ...modelPin,
+          x: p.x,
+          y: p.y,
+          rotation: typeof p.rotation === "number" ? p.rotation : modelPin.rotation,
+          scale: typeof p.scale === "number" && p.scale > 0 ? p.scale : modelPin.scale,
+          zIndex: typeof p.zIndex === "number" ? p.zIndex : modelPin.zIndex,
+        };
+      } else if (modelPin) {
+        // Với board node (như suspects_hub, reinvestigate, custom node):
+        // p chứa các giá trị người dùng vừa sửa ở BoardNodeForm (noteColor, pinColor, title, scale, rotation)
+        // modelPin chỉ là dữ liệu ban đầu từ DB -> p PHẢI ĐÈ LÊN modelPin!
+        merged = {
+          ...modelPin,
+          ...p,
+        };
+      } else {
+        merged = p;
+      }
+
+      const pos = positions[merged.id] || { x: merged.x, y: merged.y };
       return {
-        ...base,
+        ...merged,
         x: pos.x,
         y: pos.y,
       };
     });
-  }, [hasUnsavedChanges, pins, boardModel.pins, positions]);
+  }, [pins, boardModel.pins, positions]);
 
   const selectedNode =
     nodes.find((n) => n.id === selectedNodeId) ||
@@ -424,6 +457,49 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
           return {
             ...p,
             zIndex: currentZ + deltaZ,
+          };
+        }),
+      );
+      setHasUnsavedChanges(true);
+    },
+    handleUpdateNodeLocal: (nodeId: string, patch: { title?: string; config?: Partial<BoardConfig> }) => {
+      setNodes((prev) =>
+        prev.map((n) => {
+          const isMatch = n.id === nodeId || (nodeId && n.id.includes(nodeId));
+          if (!isMatch) return n;
+          return {
+            ...n,
+            title: patch.title !== undefined ? patch.title : n.title,
+            config: {
+              ...((n.config as any) || {}),
+              ...(patch.config || {}),
+            },
+          };
+        }),
+      );
+
+      setPins((prev) =>
+        prev.map((p) => {
+          const isMatch =
+            p.id === nodeId ||
+            p.checkpointId === nodeId ||
+            (p.nodeKind === "suspects_hub" && nodeId === "suspects_hub") ||
+            (p.nodeKind === "reinvestigate" && nodeId === "reinvestigate");
+          if (!isMatch) return p;
+          const cfg = patch.config || {};
+          return {
+            ...p,
+            label: cfg.pin_title ?? patch.title ?? p.label,
+            noteColor: (cfg.note_color as any) ?? p.noteColor,
+            pinColor: (cfg.pin_color as any) ?? p.pinColor,
+            displayMode: (cfg.display_mode as any) ?? p.displayMode,
+            hasPin: cfg.has_pin !== undefined ? cfg.has_pin : p.hasPin,
+            rotation: cfg.rotation !== undefined ? cfg.rotation : p.rotation,
+            scale: cfg.scale !== undefined ? cfg.scale : p.scale,
+            zIndex: cfg.z_index !== undefined ? cfg.z_index : p.zIndex,
+            photoUrl: cfg.photo_url !== undefined ? (cfg.photo_url || undefined) : p.photoUrl,
+            isPolaroid: cfg.is_polaroid !== undefined ? cfg.is_polaroid : p.isPolaroid,
+            textScale: cfg.text_scale !== undefined ? cfg.text_scale : p.textScale,
           };
         }),
       );
