@@ -91,7 +91,7 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
                 key={poster.id}
                 onClick={() => {
                   if (isActive && isTrontim) {
-                    router.push('/evidence/boardgame')
+                    router.push('/play/case_000')
                   } else {
                     setActivePoster(index)
                   }

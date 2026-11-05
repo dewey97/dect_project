@@ -32,7 +32,7 @@ export default function HowToPlayPage() {
 
           <div className="flex items-center gap-4">
             <Link
-              href="/evidence/web"
+              href="/play/case_000"
               className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono font-bold rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-400 hover:bg-amber-500/25 transition-colors"
             >
               <span>Vào phá án</span>
@@ -132,7 +132,7 @@ export default function HowToPlayPage() {
         {/* CTA to start case */}
         <div className="mt-14 w-full flex flex-col items-center gap-3 text-center">
           <Link
-            href="/evidence/web"
+            href="/play/case_000"
             className="group inline-flex items-center justify-center gap-2.5 h-13 px-10 font-mono text-sm sm:text-base font-black uppercase tracking-wider rounded-md bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] border border-amber-300 transition-all duration-300 active:scale-[0.98] cursor-pointer"
           >
             <span>Bắt Đầu Phá Án Vụ #000</span>

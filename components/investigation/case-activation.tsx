@@ -396,9 +396,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
 
       // Step 5: Navigate to Evidence Page
       setTimeout(() => {
-        router.push(
-          `/evidence/web?case_id=${normalizeCaseId(selectedCase.id)}`,
-        );
+        router.push(`/play/${normalizeCaseId(selectedCase.id)}`);
       }, 1800);
     } else {
       setCodeError(true);
