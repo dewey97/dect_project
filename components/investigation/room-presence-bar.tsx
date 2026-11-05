@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { useRoomSync } from '@/components/investigation/room-sync-context'
 import { DetectiveAvatar } from '@/components/investigation/detective-avatar'
 import { RoomModal } from '@/components/investigation/room-modal'
-import { normalizeCaseId } from '@/lib/cases/case-id'
+import { roomInviteUrl } from '@/lib/rooms/client'
 
 interface RoomPresenceBarProps {
   className?: string
@@ -26,15 +26,7 @@ export function RoomPresenceBar({
   showShareButton = true,
   onOpenModal,
 }: RoomPresenceBarProps) {
-  const {
-    roomCode,
-    isConnected,
-    members,
-    memberCount,
-    currentUser,
-    deviceId,
-    nickname,
-  } = useRoomSync()
+  const { room, roomCode, members, memberCount, me } = useRoomSync()
 
   const [internalModalOpen, setInternalModalOpen] = useState(false)
   const isModalOpen = onOpenModal ? false : internalModalOpen
@@ -49,21 +41,14 @@ export function RoomPresenceBar({
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (typeof window === 'undefined' || !roomCode) return
-    const url = new URL(window.location.href)
-    url.searchParams.set('room', roomCode)
-    const rawCase = url.searchParams.get('case_id') || url.searchParams.get('caseId')
-    if (rawCase) {
-      url.searchParams.set('case_id', normalizeCaseId(rawCase))
-      url.searchParams.delete('caseId')
-    }
-    navigator.clipboard.writeText(url.toString())
+    if (!room?.code) return
+    navigator.clipboard.writeText(roomInviteUrl(room.caseId, room.code)).catch(() => {})
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   // Khi chưa kết nối vào phòng: Hiển thị nút "Chơi nhóm" tối giản
-  if (!isConnected || !roomCode) {
+  if (!room || !roomCode) {
     return (
       <>
         <button
@@ -87,13 +72,7 @@ export function RoomPresenceBar({
   }
 
   // Lọc chỉ hiển thị các đồng đội khác đang trong phòng (không cần hiển thị chính mình)
-  const otherMembers = members.filter((m) => {
-    const isMe =
-      (deviceId && m.key === deviceId) ||
-      m.nickname === nickname ||
-      (currentUser?.id && m.userId === currentUser.id)
-    return !isMe
-  })
+  const otherMembers = members.filter((m) => m.key !== me?.id)
 
   const maxVisible = 5
   const visibleMembers = otherMembers.slice(0, maxVisible)

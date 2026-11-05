@@ -2,12 +2,40 @@
  * Domain Storage Helper
  * 
  * Quản lý localStorage thuần nghiệp vụ (domain-driven), KHÔNG gắn nhãn thương hiệu.
+ *
+ * Cách ly Solo và Room (spec group_play_realtime.md 1.3 mục 3, 8.1 mục 3):
+ * khi thiết bị đang ở một phòng chơi nhóm, RoomSyncProvider gọi `setStorageScope(roomId)`.
+ * Mọi key đi qua helper này được thêm tiền tố `room:<id>::`, nên đang ở phòng thì
+ * không đọc, không ghi savegame Solo. Trừ vài tùy chọn giao diện của thiết bị.
  */
+
+const UNSCOPED_KEYS = new Set(['play_experience', 'investigation_mode', 'walkthrough_completed'])
+
+let scopePrefix = ''
+
+export function setStorageScope(roomId: string | null): void {
+  scopePrefix = roomId ? `room:${roomId}::` : ''
+}
+
+/** Xóa toàn bộ key cục bộ của một phòng (khi rời phòng). */
+export function clearStorageScope(roomId: string): void {
+  if (typeof window === 'undefined') return
+  const prefix = `room:${roomId}::`
+  try {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith(prefix))
+      .forEach((k) => localStorage.removeItem(k))
+  } catch {}
+}
+
+function scoped(key: string): string {
+  return scopePrefix && !UNSCOPED_KEYS.has(key) ? scopePrefix + key : key
+}
 
 export function getStorageItem(key: string): string | null {
   if (typeof window === 'undefined') return null
   try {
-    return localStorage.getItem(key)
+    return localStorage.getItem(scoped(key))
   } catch {}
   return null
 }
@@ -15,7 +43,7 @@ export function getStorageItem(key: string): string | null {
 export function setStorageItem(key: string, value: string): void {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(key, value)
+    localStorage.setItem(scoped(key), value)
   } catch {}
 }
 
@@ -38,7 +66,7 @@ export function setStorageJson<T>(key: string, value: T): void {
 export function removeStorageItem(key: string): void {
   if (typeof window === 'undefined') return
   try {
-    localStorage.removeItem(key)
+    localStorage.removeItem(scoped(key))
   } catch {}
 }
 

@@ -90,7 +90,7 @@ Tách 2 file để không làm hỏng chơi nhóm v1 đang chạy production:
 - 10 route (`dynamic = 'force-dynamic'`, `Cache-Control: no-store`): `create`, `join`, `enter`, `reconnect`, `leave`, `phase`, `host` (`transfer`, `kick`, `max_players`, `claim`), `progress`, `conclusion`, `state`. Khác spec 5.1: `GET /api/rooms/state` xác thực bằng token, không nhận `?code=` (mã đổi khi phòng kích hoạt lại); nhận `?since=<eventId>`.
 - **Kiểm chứng:** unit test pass, `pnpm lint` pass. Smoke `node scripts/ops/rooms-smoke.mjs` (create → mã sai 404 → join + hậu tố nickname → quyền Host → phase → người vào muộn → đủ người → 3 ghi tiến trình song song không mất dữ liệu → 2 kết luận cùng lúc chỉ nhận 1 → mã cũ hết hiệu lực) **chưa chạy**: cần migration 51 trên Supabase và `SUPABASE_SERVICE_ROLE_KEY` ở dev server.
 
-### P3 — Viết lại `RoomSyncProvider` (client)
+### P3 — Viết lại `RoomSyncProvider` (client) (đã viết 2026-11-05)
 
 - Giữ nguyên chữ ký các field consumer đang dùng (`roomCode`, `roomState`, `syncUpdate`, `broadcastPing`, `activePing`, `nickname`, `members`, `memberCount`, `isConnected`), để 12 consumer không phải sửa.
 - Thêm: `roomId`, `phase`, `version`, `participantId`, `isHost`, `hostParticipantId`, `maxPlayers`, `participants` (từ server, gộp trạng thái online từ presence), `events`, `channel`; hành động `createRoom`, `joinRoom` (không bao giờ tự tạo), `reconnect`, `enter`, `leave`, `advancePhase`, `hostAction`, `submitConclusion`, `markRead`.
@@ -100,6 +100,14 @@ Tách 2 file để không làm hỏng chơi nhóm v1 đang chạy production:
 - Catch-up theo `version` khi `visibilitychange` / `online`; heartbeat nếu duyệt D1.
 - Rà soát cách ly Solo: khi có phòng, các consumer không đọc/ghi key Solo (đã có nhánh `roomCode` ở các consumer, kiểm lại từng chỗ).
 - Sửa `RoomModal`, `RoomPresenceBar` theo D5. Không còn sinh mã ở client.
+- **Đã làm, khác dự kiến:**
+  - Rà soát cho thấy consumer vẫn ghi key Solo khi ở phòng (`unlockDossiers` của `lib/progress/case-progress.ts`, `reinvestigate_opened`, merge `getUnlockedDossiers` vào phòng). Sửa tập trung ở `lib/storage.ts`: `setStorageScope(roomId)` thêm tiền tố `room:<id>::` cho mọi key qua helper (trừ `play_experience`, `investigation_mode`, `walkthrough_completed`). Provider đặt scope ngay lần render đầu nếu URL có `?room=` và thiết bị có phiên, trước khi effect của component con đọc storage. Rời phòng, bị kick, phòng bị hủy: xóa key của phòng.
+  - Chỉ tự kết nối khi URL có `?room=<CODE>` và thiết bị có phiên của mã đó (không tự kéo người chơi Solo vào phòng cũ như v1). Có `?room=` nhưng chưa có phiên: `pendingRoomCode` cho màn nickname ở P4.
+  - `syncUpdate` có `indictmentSolved` (bảng điều tra) đi `POST /api/rooms/conclusion`. `annotations`, `canvasNotes`, `teamNotes` gom 500 ms rồi gửi.
+  - `roomCode` vẫn khác null sau khi phòng kết thúc (mã đã giải phóng, trả `----`) để consumer giữ chế độ phòng.
+  - Catch-up 30 giây/lần kiêm heartbeat. Tự nhận Host (D1) để P7.
+  - Toast chuyển xuống góc dưới phải (spec 2.7). Hàng đợi 3 toast + chuông ở P6.
+- **Kiểm chứng:** `pnpm lint` pass. Dev server: `/evidence/web` chế độ Solo không lỗi mới, không còn request `game_rooms`; `?room=AB12` không có phiên thì không gọi API, không tạo phòng; modal "Chơi nhóm" dẫn tới `/play/case_000` (trang có ở P4). Luồng trong phòng chưa test được: migration 51 chưa chạy (`PGRST202 Could not find the function public.room_join`).
 
 ### P4 — Màn vào game và phòng chờ (`app/(investigation)/play/[caseId]/page.tsx`)
 

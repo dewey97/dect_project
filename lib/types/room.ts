@@ -31,13 +31,15 @@ export interface DetectivePing {
   timestamp: number;
 }
 
+/**
+ * Thành viên đang online (Presence). Không chứa email/userId: người lạ cùng phòng
+ * chỉ thấy nickname (spec 8.2). `key` = participant id.
+ */
 export interface RoomMember {
   key: string;
   nickname: string;
   joinedAt: number;
   avatarUrl?: string | null;
-  userId?: string | null;
-  email?: string | null;
   isAuthenticated?: boolean;
 }
 

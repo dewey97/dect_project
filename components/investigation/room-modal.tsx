@@ -1,125 +1,63 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Users, X, Copy, Check, LogOut, ArrowRight, Sparkles, Pencil, ShieldCheck } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { useRoomSync } from '@/components/investigation/room-sync-context'
-import { DetectiveAvatar } from '@/components/investigation/detective-avatar'
-import { normalizeCaseId } from '@/lib/cases/case-id'
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { Users, X, Copy, Check, LogOut, ArrowRight, Crown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { DetectiveAvatar } from "@/components/investigation/detective-avatar";
+import { normalizeCaseId } from "@/lib/cases/case-id";
+import { roomInviteUrl } from "@/lib/rooms/client";
 
 interface RoomModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
+/** Vụ án đang mở, đọc từ URL (`?case_id=`), để dẫn tới màn vào game của đúng vụ. */
+function currentCaseId(): string {
+  if (typeof window === "undefined") return normalizeCaseId(null);
+  const params = new URLSearchParams(window.location.search);
+  return normalizeCaseId(params.get("case_id") || params.get("caseId"));
+}
+
+/**
+ * Modal phòng trong màn điều tra (plan D5).
+ * Chưa ở phòng: dẫn tới màn vào game `/play/<case_id>` (tạo/vào phòng ở đó).
+ * Đang ở phòng: mã phòng, link mời, thành viên, Rời phòng.
+ */
 export function RoomModal({ isOpen, onClose }: RoomModalProps) {
-  const {
-    roomCode,
-    nickname,
-    isConnected,
-    isConnecting,
-    joinRoom,
-    leaveRoom,
-    setNickname,
-    syncUpdate,
-    members,
-    memberCount,
-    currentUser,
-    deviceId,
-  } = useRoomSync()
+  const { room, roomCode, me, participants, onlineIds, leaveRoom } =
+    useRoomSync();
 
-  const [isMounted, setIsMounted] = useState(false)
-  const [inputCode, setInputCode] = useState('')
-  const [inputNick, setInputNick] = useState(nickname)
-  const [isEditingNick, setIsEditingNick] = useState(false)
-  const [editNickVal, setEditNickVal] = useState(nickname)
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [isMounted, setIsMounted] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      setInputNick(nickname)
-      setEditNickVal(nickname)
-      setIsEditingNick(false)
-      setErrorMsg(null)
-      if (roomCode) {
-        setInputCode(roomCode)
-      }
-    }
-  }, [isOpen, nickname, roomCode])
+    if (isOpen) setConfirmLeave(false);
+  }, [isOpen]);
 
-  const generateRandomCode = () => {
-    const chars = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'
-    let res = ''
-    for (let i = 0; i < 4; i++) {
-      res += chars[Math.floor(Math.random() * chars.length)]
+  const handleCopyLink = async () => {
+    if (!room?.code) return;
+    try {
+      await navigator.clipboard.writeText(
+        roomInviteUrl(room.caseId, room.code),
+      );
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard bị chặn: người chơi vẫn đọc mã phòng trên màn hình.
     }
-    setInputCode(res)
-    setErrorMsg(null)
-  }
+  };
 
-  const handleJoin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!inputCode.trim()) {
-      setErrorMsg('Vui lòng nhập mã phòng')
-      return
-    }
-    setErrorMsg(null)
-    const res = await joinRoom(inputCode, inputNick)
-    if (!res.success) {
-      setErrorMsg(res.error || 'Không thể kết nối phòng')
-    }
-    // Khi tham gia thành công, modal chuyển sang chế độ "Đang kết nối phòng"
-    // để người dùng nhìn thấy mã phòng và danh sách tổ chuyên án ngay lập tức
-  }
-
-  const handleCopyLink = () => {
-    if (typeof window === 'undefined' || !roomCode) return
-    const url = new URL(window.location.href)
-    url.searchParams.set('room', roomCode)
-    const rawCase = url.searchParams.get('case_id') || url.searchParams.get('caseId')
-    if (rawCase) {
-      url.searchParams.set('case_id', normalizeCaseId(rawCase))
-      url.searchParams.delete('caseId')
-    }
-    navigator.clipboard.writeText(url.toString())
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  const handleSaveNickname = (e: React.FormEvent) => {
-    e.preventDefault()
-    const clean = editNickVal.trim().slice(0, 20)
-    if (clean) {
-      setNickname(clean)
-      syncUpdate({}, `đã đổi tên hiển thị thành ${clean}`)
-      setIsEditingNick(false)
-    }
-  }
-
-  // Danh sách hiển thị: nếu mảng members rỗng nhưng đang kết nối, hiển thị ít nhất chính mình
-  const displayMembers =
-    members.length > 0
-      ? members
-      : [
-          {
-            key: deviceId || 'me',
-            nickname,
-            joinedAt: 0,
-            avatarUrl: currentUser?.avatarUrl || null,
-            userId: currentUser?.id || null,
-            email: currentUser?.email || null,
-            isAuthenticated: !!currentUser,
-          },
-        ]
-
-  if (!isMounted) return null
+  if (!isMounted) return null;
 
   const modalContent = (
     <AnimatePresence>
@@ -127,321 +65,196 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
           onClick={(e) => {
-            if (e.target === e.currentTarget) onClose()
+            if (e.target === e.currentTarget) onClose();
           }}
         >
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="room-modal-title"
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
             className="w-full max-w-md bg-zinc-950 border border-zinc-800 text-zinc-100 rounded-2xl shadow-2xl overflow-hidden font-sans"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800/80 bg-zinc-900/50">
               <div className="flex items-center gap-2.5">
                 <Users className="size-4 text-zinc-400" />
-                <h3 className="font-semibold text-sm tracking-wide text-zinc-100 uppercase font-mono">
-                  Chơi Nhóm Đồng Bộ
+                <h3
+                  id="room-modal-title"
+                  className="font-semibold text-sm tracking-wide text-zinc-100 uppercase font-mono"
+                >
+                  Chơi nhóm
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="text-zinc-400 hover:text-white p-1 rounded-md hover:bg-zinc-800/60 transition-colors cursor-pointer"
+                className="text-zinc-400 hover:text-white p-2.5 -m-1.5 rounded-md hover:bg-zinc-800/60 transition-colors cursor-pointer"
                 aria-label="Đóng"
               >
                 <X className="size-4" />
               </button>
             </div>
 
-            {/* Body */}
             <div className="p-5 space-y-4">
-              {isConnected && roomCode ? (
-                /* Đang kết nối trong phòng */
+              {room && roomCode ? (
                 <div className="space-y-4">
-                  {/* Thẻ mã phòng */}
                   <div className="p-4 rounded-xl bg-zinc-900/70 border border-zinc-800 flex flex-col items-center text-center space-y-2">
-                    <div className="flex items-center gap-2 text-xs font-medium text-emerald-400">
-                      <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span>ĐANG KẾT NỐI PHÒNG • {memberCount} TRỰC TUYẾN</span>
+                    <div className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                      {room.code ? "Mã phòng" : "Phòng đã kết thúc"}
                     </div>
-
-                    <div className="text-3xl font-extrabold text-white tracking-widest font-mono select-all">
-                      {roomCode}
-                    </div>
-
+                    {room.code && (
+                      <div className="text-3xl font-extrabold text-white tracking-widest font-mono select-all">
+                        {room.code}
+                      </div>
+                    )}
                     <p className="text-xs text-zinc-400 max-w-xs leading-relaxed">
-                      Tiến trình điều tra, manh mối và cáo trạng sẽ tự động đồng bộ giữa các thành viên.
+                      Tiến trình điều tra, manh mối và kết luận đồng bộ cho cả
+                      phòng.
                     </p>
                   </div>
 
-                  {/* DANH SÁCH THÀNH VIÊN (MỖI NGƯỜI LÀ MỘT DÒNG) */}
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs font-medium text-zinc-400 px-0.5">
-                      <span className="flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
-                        <Users className="size-3.5" />
-                        <span>Tổ chuyên án ({displayMembers.length})</span>
+                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-400 uppercase tracking-wider px-0.5">
+                      <Users className="size-3.5" />
+                      <span>
+                        Thành viên ({participants.length}/{room.maxPlayers})
                       </span>
-                      <span className="text-[11px] text-zinc-500 font-mono">Supabase Realtime</span>
                     </div>
 
-                    <div className="space-y-2 max-h-56 overflow-y-auto pr-0.5 custom-scrollbar">
-                      {displayMembers.map((m, index) => {
-                        const isMe =
-                          (deviceId && m.key === deviceId) ||
-                          m.nickname === nickname ||
-                          (currentUser?.id && m.userId === currentUser.id)
-
-                        const effectiveAvatar = isMe
-                          ? currentUser?.avatarUrl || m.avatarUrl
-                          : m.avatarUrl
-
-                        const isHost = index === 0
-
+                    <ul className="space-y-2 max-h-56 overflow-y-auto pr-0.5 custom-scrollbar">
+                      {participants.map((p) => {
+                        const isMe = p.id === me?.id;
+                        const online = isMe || onlineIds.has(p.id);
                         return (
-                          <div
-                            key={m.key}
+                          <li
+                            key={p.id}
                             className={cn(
-                              'flex items-center justify-between gap-3 p-2.5 rounded-xl border transition-colors',
+                              "flex items-center gap-3 p-2.5 rounded-xl border",
                               isMe
-                                ? 'bg-zinc-900 border-zinc-700/80 shadow-sm'
-                                : 'bg-zinc-900/40 border-zinc-800/80 hover:bg-zinc-900/60'
+                                ? "bg-zinc-900 border-zinc-700/80"
+                                : "bg-zinc-900/40 border-zinc-800/80",
                             )}
                           >
-                            {/* Cột trái: Avatar + Tên */}
-                            <div className="flex items-center gap-3 min-w-0">
-                              <DetectiveAvatar
-                                src={effectiveAvatar}
-                                name={m.nickname}
-                                size="md"
-                                showOnlineDot={true}
-                                isOnline={true}
-                              />
-
-                              <div className="min-w-0">
-                                {isMe && isEditingNick ? (
-                                  <form onSubmit={handleSaveNickname} className="flex items-center gap-1.5 py-0.5">
-                                    <input
-                                      type="text"
-                                      value={editNickVal}
-                                      onChange={(e) => setEditNickVal(e.target.value)}
-                                      maxLength={20}
-                                      placeholder="Tên thám tử..."
-                                      className="px-2 py-0.5 bg-zinc-950 border border-zinc-700 text-zinc-100 text-xs rounded font-sans focus:outline-none focus:border-zinc-500 w-28 sm:w-36"
-                                    />
-                                    <button
-                                      type="submit"
-                                      className="px-2 py-0.5 bg-zinc-200 hover:bg-white text-zinc-950 text-xs font-semibold rounded cursor-pointer transition-colors"
-                                    >
-                                      Lưu
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => setIsEditingNick(false)}
-                                      className="px-1.5 py-0.5 text-zinc-400 hover:text-white text-xs cursor-pointer"
-                                    >
-                                      Hủy
-                                    </button>
-                                  </form>
-                                ) : (
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className="font-semibold text-sm text-zinc-100 truncate">
-                                      {m.nickname}
-                                    </span>
-
-                                    {isMe && (
-                                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 border border-zinc-700 text-zinc-300">
-                                        Bạn
-                                      </span>
-                                    )}
-
-                                    {isHost && (
-                                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800/70 border border-zinc-700/60 text-zinc-400">
-                                        Chỉ huy
-                                      </span>
-                                    )}
-
-                                    {m.isAuthenticated && (
-                                      <span
-                                        className="text-zinc-400 inline-flex items-center"
-                                        title="Tài khoản đã xác thực"
-                                      >
-                                        <ShieldCheck className="size-3.5 text-zinc-400" />
-                                      </span>
-                                    )}
-                                  </div>
+                            <DetectiveAvatar
+                              name={p.nickname}
+                              size="md"
+                              showOnlineDot
+                              isOnline={online}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-semibold text-sm text-zinc-100 truncate">
+                                  {p.nickname}
+                                </span>
+                                {isMe && (
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800 border border-zinc-700 text-zinc-300">
+                                    Bạn
+                                  </span>
                                 )}
-
-                                {!isEditingNick && (
-                                  <div className="text-[11px] text-zinc-400 truncate">
-                                    {m.isAuthenticated
-                                      ? 'Đã đăng nhập • Đang trực tuyến'
-                                      : 'Khách • Đang trực tuyến'}
-                                  </div>
+                                {p.isHost && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-950/40 border border-amber-800/50 text-amber-300">
+                                    <Crown className="size-3" aria-hidden />
+                                    Host
+                                  </span>
                                 )}
                               </div>
+                              <div className="text-[11px] text-zinc-400">
+                                {online ? "Đang trực tuyến" : "Mất kết nối"}
+                              </div>
                             </div>
-
-                            {/* Cột phải: Thao tác */}
-                            {isMe && !isEditingNick && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setEditNickVal(nickname)
-                                  setIsEditingNick(true)
-                                }}
-                                className="px-2 py-1 text-xs text-zinc-400 hover:text-white hover:bg-zinc-800/80 rounded-md transition-colors flex items-center gap-1 cursor-pointer shrink-0"
-                                title="Đổi tên hiển thị của bạn"
-                              >
-                                <Pencil className="size-3" />
-                                <span>Đổi tên</span>
-                              </button>
-                            )}
-                          </div>
-                        )
+                          </li>
+                        );
                       })}
-                    </div>
+                    </ul>
                   </div>
 
-                  {/* Nút hành động */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={handleCopyLink}
-                      className="flex-1 py-2.5 px-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-zinc-100 text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="size-4 text-emerald-400" />
-                          <span>Đã sao chép link mời!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="size-4 text-zinc-300" />
-                          <span>Sao chép Link mời bạn bè</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        leaveRoom()
-                        onClose()
-                      }}
-                      className="py-2.5 px-3 bg-zinc-900 hover:bg-red-950/40 border border-zinc-800 hover:border-red-800/60 rounded-xl text-zinc-300 hover:text-red-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-                      title="Rời phòng và trở về chế độ Solo"
-                    >
-                      <LogOut className="size-4" />
-                      <span>Rời</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                /* Form Kết nối / Tạo phòng */
-                <form onSubmit={handleJoin} className="space-y-4">
-                  {/* Trạng thái tài khoản người chơi */}
-                  <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800 flex items-center gap-3">
-                    <DetectiveAvatar
-                      src={currentUser?.avatarUrl}
-                      name={currentUser?.displayName || inputNick}
-                      size="md"
-                    />
-
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-medium text-zinc-200 truncate">
-                        {currentUser ? (
-                          <span className="flex items-center gap-1.5">
-                            <span>{currentUser.displayName || currentUser.email}</span>
-                            <ShieldCheck className="size-3.5 text-zinc-400 shrink-0" />
-                          </span>
-                        ) : (
-                          'Chế độ Khách (Chưa đăng nhập)'
-                        )}
+                  {confirmLeave ? (
+                    <div className="p-3 rounded-xl border border-red-900/50 bg-red-950/20 space-y-2">
+                      <p className="text-xs text-zinc-200">
+                        Rời phòng sẽ giải phóng chỗ của bạn. Quay lại thì vào
+                        như người mới nếu phòng còn chỗ.
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await leaveRoom();
+                            onClose();
+                          }}
+                          className="flex-1 min-h-11 px-3 bg-red-900/60 hover:bg-red-800/70 rounded-lg text-xs font-semibold text-red-100 cursor-pointer"
+                        >
+                          Rời phòng
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmLeave(false)}
+                          className="flex-1 min-h-11 px-3 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-xs font-semibold cursor-pointer"
+                        >
+                          Ở lại
+                        </button>
                       </div>
-                      {!currentUser && (
-                        <div className="text-[11px] text-zinc-500 truncate">
-                          Chơi ẩn danh với avatar mặc định
-                        </div>
-                      )}
                     </div>
-                  </div>
-
-                  {/* Tên thám tử */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-zinc-300 font-semibold uppercase tracking-wider font-mono">
-                      Tên thám tử của bạn:
-                    </label>
-                    <input
-                      type="text"
-                      value={inputNick}
-                      onChange={(e) => setInputNick(e.target.value)}
-                      placeholder="VD: Minh, Vy, An..."
-                      maxLength={20}
-                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-zinc-100 text-sm rounded-xl focus:outline-none focus:border-zinc-500 placeholder-zinc-500 transition-colors"
-                    />
-                  </div>
-
-                  {/* Mã phòng */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs text-zinc-300 font-semibold uppercase tracking-wider font-mono">
-                        Mã phòng (Group ID):
-                      </label>
+                  ) : (
+                    <div className="flex items-center gap-2 pt-1">
+                      {room.code && (
+                        <button
+                          type="button"
+                          onClick={handleCopyLink}
+                          className="flex-1 min-h-11 px-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl text-zinc-100 text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          {copied ? (
+                            <>
+                              <Check className="size-4 text-emerald-400" />
+                              <span>Đã sao chép link mời</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="size-4 text-zinc-300" />
+                              <span>Sao chép link mời</span>
+                            </>
+                          )}
+                        </button>
+                      )}
                       <button
                         type="button"
-                        onClick={generateRandomCode}
-                        className="text-[11px] text-zinc-400 hover:text-zinc-200 flex items-center gap-1 cursor-pointer transition-colors"
+                        onClick={() => setConfirmLeave(true)}
+                        className="min-h-11 px-3 bg-zinc-900 hover:bg-red-950/40 border border-zinc-800 hover:border-red-800/60 rounded-xl text-zinc-300 hover:text-red-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
                       >
-                        <Sparkles className="size-3" />
-                        Tạo mã mới
+                        <LogOut className="size-4" />
+                        <span>Rời phòng</span>
                       </button>
                     </div>
-                    <input
-                      type="text"
-                      value={inputCode}
-                      onChange={(e) => {
-                        setInputCode(e.target.value.toUpperCase())
-                        setErrorMsg(null)
-                      }}
-                      placeholder="VD: 8888 hoặc SHER"
-                      maxLength={10}
-                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 text-zinc-100 text-base font-bold tracking-widest rounded-xl focus:outline-none focus:border-zinc-500 uppercase font-mono placeholder-zinc-600 transition-colors"
-                    />
-                  </div>
-
-                  {errorMsg && (
-                    <div className="text-xs text-red-400 bg-red-950/30 p-2.5 rounded-xl border border-red-900/40">
-                      {errorMsg}
-                    </div>
                   )}
-
-                  <button
-                    type="submit"
-                    disabled={isConnecting}
-                    className="w-full py-2.5 px-4 bg-zinc-100 hover:bg-white text-zinc-950 font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-zinc-300 leading-relaxed">
+                    Một người trong nhóm tạo phòng, những người khác vào bằng mã
+                    4 ký tự hoặc quét QR của phòng. Phòng mới bắt đầu từ 0%,
+                    không dùng tiến trình chơi Solo.
+                  </p>
+                  <Link
+                    href={`/play/${currentCaseId()}`}
+                    onClick={onClose}
+                    className="w-full min-h-11 px-4 bg-zinc-100 hover:bg-white text-zinc-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2"
                   >
-                    {isConnecting ? (
-                      <span>Đang kết nối...</span>
-                    ) : (
-                      <>
-                        <span>Tham Gia / Tạo Phòng</span>
-                        <ArrowRight className="size-4" />
-                      </>
-                    )}
-                  </button>
-                </form>
+                    <span>Tạo hoặc vào phòng</span>
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </div>
               )}
             </div>
           </motion.div>
         </div>
       )}
     </AnimatePresence>
-  )
+  );
 
-  return typeof document !== 'undefined'
+  return typeof document !== "undefined"
     ? createPortal(modalContent, document.body)
-    : null
+    : null;
 }

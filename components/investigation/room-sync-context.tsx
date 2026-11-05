@@ -2,24 +2,56 @@
 
 import React, {
   createContext,
-  useContext,
-  useState,
-  useEffect,
   useCallback,
-  useRef,
+  useContext,
+  useEffect,
   useMemo,
+  useRef,
+  useState,
 } from "react";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import type {
-  RoomInvestigationState,
-  GameRoomRow,
-  RoomMember,
   DetectivePing,
+  PublicParticipant,
+  PublicRoom,
+  PublicRoomEvent,
+  RoomBroadcastPayload,
+  RoomInvestigationState,
+  RoomMember,
+  RoomPhase,
+  RoomSnapshot,
 } from "@/lib/types/room";
 import { DEFAULT_ROOM_STATE } from "@/lib/types/room";
-import type { RealtimeChannel } from "@supabase/supabase-js";
-import { normalizeCaseId } from "@/lib/cases/case-id";
-import { getActiveCaseId } from "@/lib/cases/case-characters";
+import {
+  mergeRoomState,
+  normalizeRoomState,
+  sanitizeProgressPatch,
+  type ProgressPatch,
+} from "@/lib/rooms/merge";
+import { normalizeRoomCode } from "@/lib/rooms/code";
+import {
+  findSessionByCode,
+  readRoomSessions,
+  removeRoomSession,
+  roomApi,
+  saveRoomSession,
+  type RoomApiResult,
+  type StoredRoomSession,
+} from "@/lib/rooms/client";
+import { clearStorageScope, setStorageScope } from "@/lib/storage";
+
+/**
+ * Chơi nhóm v3 (spec docs/architecture/group_play_realtime.md).
+ *
+ * - Mọi thao tác ghi đi qua `/api/rooms/*` bằng participant token. Client không đọc,
+ *   không ghi `game_rooms` trực tiếp.
+ * - Kênh realtime `room:<room_id>`: server broadcast PHASE_CHANGE, PROGRESS_UPDATE,
+ *   MEMBER_UPDATE, HOST_CHANGE, ROOM_EVENT. Client chỉ tự gửi DETECTIVE_PING
+ *   (và CURSOR của live cursor #12 qua `channel`).
+ * - Presence chỉ mang `{ pid, nickname, readPhase }`. Không email, không userId.
+ * - Catch-up theo `version` khi tab active lại, khi có mạng lại và mỗi 30 giây.
+ */
 
 interface ToastNotice {
   id: string;
@@ -36,31 +68,34 @@ export interface CurrentDetectiveUser {
 }
 
 interface PresencePayload {
+  pid?: string;
   nickname?: string;
-  joinedAt?: number;
-  avatarUrl?: string | null;
-  userId?: string | null;
-  email?: string | null;
-  isAuthenticated?: boolean;
+  readPhase?: RoomPhase | null;
 }
 
+type ActionResult = { success: boolean; error?: string; code?: string | null };
+
+/** Trạng thái kết thúc phiên do server quyết định (để UI báo cho người chơi). */
+export type RoomExitReason =
+  "kicked" | "closed" | "left_elsewhere" | "invalid" | null;
+
 interface RoomSyncContextType {
+  // ---- API giữ nguyên cho các consumer v1 ----
+  /** Mã phòng đang chơi. Phòng đã kết thúc (mã đã giải phóng) vẫn trả chuỗi khác rỗng để consumer biết đang ở chế độ phòng. */
   roomCode: string | null;
   nickname: string;
   isConnected: boolean;
   isConnecting: boolean;
   roomState: RoomInvestigationState;
+  /** Thành viên đang online (theo Presence). */
   members: RoomMember[];
   memberCount: number;
   currentUser: CurrentDetectiveUser | null;
   deviceId: string;
   activeToast: ToastNotice | null;
   activePing: DetectivePing | null;
-  joinRoom: (
-    code: string,
-    customNick?: string,
-  ) => Promise<{ success: boolean; error?: string }>;
-  leaveRoom: () => void;
+  joinRoom: (code: string, nickname?: string) => Promise<ActionResult>;
+  leaveRoom: () => Promise<void>;
   syncUpdate: (
     patch: Partial<RoomInvestigationState>,
     actionText?: string,
@@ -76,281 +111,793 @@ interface RoomSyncContextType {
       page?: number;
     },
   ) => void;
-  setNickname: (name: string) => void;
+
+  // ---- v3 ----
+  room: PublicRoom | null;
+  roomId: string | null;
+  phase: RoomPhase | null;
+  version: number;
+  me: PublicParticipant | null;
+  isHost: boolean;
+  /** Thành viên đang giữ chỗ (từ server), theo thứ tự vào phòng. */
+  participants: PublicParticipant[];
+  onlineIds: ReadonlySet<string>;
+  /** Phase mà từng participant đã báo "đã đọc" (intro). */
+  readPhaseById: Readonly<Record<string, RoomPhase | null>>;
+  events: PublicRoomEvent[];
+  /** Kênh realtime hiện tại (chỉ đọc), cho live cursor dùng chung. */
+  channel: RealtimeChannel | null;
+  /** `?room=<CODE>` trên URL mà thiết bị chưa có phiên: cần nhập nickname để vào. */
+  pendingRoomCode: string | null;
+  savedSessions: StoredRoomSession[];
+  exitReason: RoomExitReason;
+  lastError: string | null;
+  createRoom: (input: {
+    caseId: string;
+    maxPlayers: number;
+    nickname: string;
+  }) => Promise<ActionResult>;
+  resumeRoom: (roomId: string) => Promise<ActionResult>;
+  enterRoom: () => Promise<ActionResult>;
+  advancePhase: () => Promise<ActionResult>;
+  hostAction: (
+    action:
+      | { action: "transfer"; participantId: string }
+      | { action: "kick"; participantId: string }
+      | { action: "max_players"; maxPlayers: number }
+      | { action: "claim" },
+  ) => Promise<ActionResult>;
+  submitConclusion: (culprit?: string | null) => Promise<ActionResult>;
+  markRead: (phase: RoomPhase) => void;
+  refreshRoom: () => Promise<void>;
+  clearExitReason: () => void;
 }
 
 const RoomSyncContext = createContext<RoomSyncContextType | undefined>(
   undefined,
 );
 
-const ROOM_CODE_STORAGE_KEY = "dect_current_room_code";
-const NICKNAME_STORAGE_KEY = "dect_player_nickname";
-const DEVICE_ID_KEY = "dect_device_id";
+const CATCH_UP_INTERVAL_MS = 30_000;
+const HEAVY_FLUSH_MS = 500;
+/** Field ghi dày (vẽ, kéo note, gõ sổ tay): gom và gửi sau 500 ms. */
+const HEAVY_KEYS = ["annotations", "canvasNotes", "teamNotes"] as const;
 
-function getDeviceId(): string {
-  if (typeof window === "undefined") return "server";
+function randomId(): string {
+  return Math.random().toString(36).slice(2, 12);
+}
+
+function mergeEvents(
+  prev: PublicRoomEvent[],
+  incoming: PublicRoomEvent[],
+): PublicRoomEvent[] {
+  if (incoming.length === 0) return prev;
+  const seen = new Set(prev.map((e) => e.id));
+  const next = [...prev, ...incoming.filter((e) => !seen.has(e.id))];
+  next.sort((a, b) => a.id - b.id);
+  return next.slice(-200);
+}
+
+/** Gộp 2 patch nặng: annotations theo key, notes last-write-wins. */
+function combineHeavy(a: ProgressPatch, b: ProgressPatch): ProgressPatch {
+  return {
+    ...a,
+    ...b,
+    ...(a.annotations || b.annotations
+      ? { annotations: { ...(a.annotations ?? {}), ...(b.annotations ?? {}) } }
+      : {}),
+  };
+}
+
+function setRoomUrlParam(code: string | null): void {
   try {
-    let id = localStorage.getItem(DEVICE_ID_KEY);
-    if (!id) {
-      id = "dev_" + Math.random().toString(36).slice(2, 10);
-      localStorage.setItem(DEVICE_ID_KEY, id);
-    }
-    return id;
+    const url = new URL(window.location.href);
+    if (code) url.searchParams.set("room", code);
+    else url.searchParams.delete("room");
+    window.history.replaceState(window.history.state, "", url.toString());
   } catch {
-    return "dev_" + Math.random().toString(36).slice(2, 10);
+    // ignore
   }
 }
 
+/**
+ * Đặt storage scope ngay ở lần render đầu, trước khi effect của các component con
+ * đọc localStorage: F5 trong phòng (`?room=<CODE>` + có phiên) không được nạp
+ * savegame Solo dù chỉ một khoảnh khắc.
+ */
+function initialStorageScope(): null {
+  if (typeof window === "undefined") return null;
+  try {
+    const code = normalizeRoomCode(new URLSearchParams(window.location.search).get("room"));
+    const session = code ? findSessionByCode(code) : undefined;
+    setStorageScope(session?.roomId ?? null);
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
-  const [roomCode, setRoomCode] = useState<string | null>(null);
-  const [nickname, setNicknameState] = useState<string>("Thám tử");
-  const nicknameRef = useRef<string>("Thám tử");
-  const [isConnected, setIsConnected] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const supabase = useMemo(() => createClient(), []);
+  useState(initialStorageScope);
+
+  const [room, setRoom] = useState<PublicRoom | null>(null);
   const [roomState, setRoomState] =
     useState<RoomInvestigationState>(DEFAULT_ROOM_STATE);
-  const [members, setMembers] = useState<RoomMember[]>([]);
-  const [currentUser, setCurrentUser] = useState<CurrentDetectiveUser | null>(null);
-  const currentUserRef = useRef<CurrentDetectiveUser | null>(null);
-  const [deviceId, setDeviceId] = useState<string>("");
-  const [activeToast, setActiveToast] = useState<ToastNotice | null>(null);
-  const [activePing, setActivePing] = useState<DetectivePing | null>(null);
-  const activePingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const activeToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+  const [participants, setParticipants] = useState<PublicParticipant[]>([]);
+  const [events, setEvents] = useState<PublicRoomEvent[]>([]);
+  const [me, setMe] = useState<PublicParticipant | null>(null);
+  const [onlineIds, setOnlineIds] = useState<ReadonlySet<string>>(new Set());
+  const [readPhaseById, setReadPhaseById] = useState<
+    Record<string, RoomPhase | null>
+  >({});
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [pendingRoomCode, setPendingRoomCode] = useState<string | null>(null);
+  const [savedSessions, setSavedSessions] = useState<StoredRoomSession[]>([]);
+  const [exitReason, setExitReason] = useState<RoomExitReason>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentDetectiveUser | null>(
     null,
   );
+  const [activeToast, setActiveToast] = useState<ToastNotice | null>(null);
+  const [activePing, setActivePing] = useState<DetectivePing | null>(null);
+  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const [clientId, setClientId] = useState("");
 
-  const supabase = useMemo(() => createClient(), []);
+  const sessionRef = useRef<StoredRoomSession | null>(null);
+  const roomRef = useRef<PublicRoom | null>(null);
+  const meRef = useRef<PublicParticipant | null>(null);
+  const versionRef = useRef(0);
+  const stateRef = useRef<RoomInvestigationState>(DEFAULT_ROOM_STATE);
+  const pendingHeavyRef = useRef<ProgressPatch | null>(null);
+  const heavyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastEventIdRef = useRef(0);
   const channelRef = useRef<RealtimeChannel | null>(null);
-  const roomStateRef = useRef<RoomInvestigationState>(DEFAULT_ROOM_STATE);
-  const didAutoConnectRef = useRef(false);
+  const clientIdRef = useRef("");
+  const readPhaseRef = useRef<RoomPhase | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didInitRef = useRef(false);
 
+  // id phiên tab: echo guard cho broadcast của server (spec 5.2).
   useEffect(() => {
-    setDeviceId(getDeviceId());
+    const id = randomId();
+    clientIdRef.current = id;
+    setClientId(id);
+    setSavedSessions(readRoomSessions());
   }, []);
 
+  // Thông tin đăng nhập chỉ dùng hiển thị cục bộ, không bao giờ gửi cho người khác.
   useEffect(() => {
-    currentUserRef.current = currentUser;
-  }, [currentUser]);
-
-  // Nạp thông tin đăng nhập từ Supabase session & profiles
-  useEffect(() => {
-    let isMounted = true;
-    const loadUser = async () => {
+    let alive = true;
+    const load = async () => {
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
-        if (!session?.user) {
-          if (isMounted) setCurrentUser(null);
-          return;
-        }
-        const u = session.user;
-        let avatar: string | null =
-          u.user_metadata?.avatar_url || u.user_metadata?.picture || null;
-        let displayName: string | null =
-          u.user_metadata?.full_name || u.user_metadata?.name || null;
-
-        try {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("avatar_url, display_name")
-            .eq("id", u.id)
-            .maybeSingle();
-          if (profile) {
-            if (profile.avatar_url) avatar = profile.avatar_url;
-            if (profile.display_name) displayName = profile.display_name;
-          }
-        } catch {}
-
-        if (isMounted) {
-          setCurrentUser({
-            id: u.id,
-            email: u.email,
-            avatarUrl: avatar,
-            displayName,
-          });
-
-          // Nếu chưa từng đặt nickname hoặc là mặc định, gợi ý lấy theo profile
-          if (typeof window !== "undefined") {
-            const saved = localStorage.getItem(NICKNAME_STORAGE_KEY);
-            if ((!saved || saved === "Thám tử") && displayName) {
-              setNicknameState(displayName);
-              nicknameRef.current = displayName;
-            }
-          }
-        }
-      } catch (err) {
-        console.warn("[RoomSync] Auth error:", err);
+        const u = session?.user;
+        if (!alive) return;
+        setCurrentUser(
+          u
+            ? {
+                id: u.id,
+                email: u.email,
+                avatarUrl:
+                  u.user_metadata?.avatar_url ||
+                  u.user_metadata?.picture ||
+                  null,
+                displayName:
+                  u.user_metadata?.full_name || u.user_metadata?.name || null,
+              }
+            : null,
+        );
+      } catch {
+        // ignore
       }
     };
-
-    loadUser();
-
+    load();
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (!session?.user) {
-        if (isMounted) setCurrentUser(null);
-        return;
-      }
-      const u = session.user;
-      let avatar: string | null =
-        u.user_metadata?.avatar_url || u.user_metadata?.picture || null;
-      let displayName: string | null =
-        u.user_metadata?.full_name || u.user_metadata?.name || null;
-
-      try {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("avatar_url, display_name")
-          .eq("id", u.id)
-          .maybeSingle();
-        if (profile) {
-          if (profile.avatar_url) avatar = profile.avatar_url;
-          if (profile.display_name) displayName = profile.display_name;
-        }
-      } catch {}
-
-      if (isMounted) {
-        setCurrentUser({
-          id: u.id,
-          email: u.email,
-          avatarUrl: avatar,
-          displayName,
-        });
-      }
+    } = supabase.auth.onAuthStateChange(() => {
+      load();
     });
-
     return () => {
-      isMounted = false;
+      alive = false;
       subscription.unsubscribe();
     };
   }, [supabase]);
 
-  // Tái đồng bộ Presence nếu đăng nhập/đăng xuất trong lúc đang ở phòng
-  useEffect(() => {
-    if (channelRef.current && isConnected) {
-      channelRef.current
-        .track({
-          nickname: nicknameRef.current,
-          joinedAt: Date.now(),
-          avatarUrl: currentUser?.avatarUrl || null,
-          userId: currentUser?.id || null,
-          email: currentUser?.email || null,
-          isAuthenticated: !!currentUser,
-        })
-        .catch(() => {});
-    }
-  }, [currentUser, isConnected]);
+  // ---------------------------------------------------------------------------
+  // Toast & ping
+  // ---------------------------------------------------------------------------
 
-  // Keep refs synchronized
-  useEffect(() => {
-    roomStateRef.current = roomState;
-  }, [roomState]);
-
-  useEffect(() => {
-    nicknameRef.current = nickname;
-  }, [nickname]);
-
-  // Cleanup channel and timers on unmount
-  useEffect(() => {
-    return () => {
-      if (activePingTimerRef.current) {
-        clearTimeout(activePingTimerRef.current);
-        activePingTimerRef.current = null;
-      }
-      if (activeToastTimerRef.current) {
-        clearTimeout(activeToastTimerRef.current);
-        activeToastTimerRef.current = null;
-      }
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
-    };
-  }, [supabase]);
-
-  const setNickname = useCallback((name: string) => {
-    const clean = name.trim().slice(0, 30) || "Thám tử";
-    setNicknameState(clean);
-    nicknameRef.current = clean;
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem(NICKNAME_STORAGE_KEY, clean);
-      } catch {}
-    }
-    if (channelRef.current) {
-      channelRef.current
-        .track({
-          nickname: clean,
-          joinedAt: Date.now(),
-          avatarUrl: currentUserRef.current?.avatarUrl || null,
-          userId: currentUserRef.current?.id || null,
-          email: currentUserRef.current?.email || null,
-          isAuthenticated: !!currentUserRef.current,
-        })
-        .catch(() => {});
-    }
-  }, []);
-
-  // Show auto-dismissing toast
   const triggerToast = useCallback((actorName: string, actionText: string) => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       try {
         navigator.vibrate(40);
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
     const notice: ToastNotice = {
-      id: Math.random().toString(36).slice(2),
+      id: randomId(),
       actorName,
       actionText,
       timestamp: Date.now(),
     };
     setActiveToast(notice);
-    if (activeToastTimerRef.current) {
-      clearTimeout(activeToastTimerRef.current);
-    }
-    activeToastTimerRef.current = setTimeout(() => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
       setActiveToast((prev) => (prev?.id === notice.id ? null : prev));
-      activeToastTimerRef.current = null;
+      toastTimerRef.current = null;
     }, 4500);
   }, []);
 
-  // Handle incoming or local ping
   const triggerPing = useCallback((ping: DetectivePing) => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       try {
         navigator.vibrate([30, 40, 30]);
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
-    if (activePingTimerRef.current) {
-      clearTimeout(activePingTimerRef.current);
-    }
+    if (pingTimerRef.current) clearTimeout(pingTimerRef.current);
     setActivePing(ping);
-    activePingTimerRef.current = setTimeout(() => {
+    pingTimerRef.current = setTimeout(() => {
       setActivePing(null);
-      activePingTimerRef.current = null;
+      pingTimerRef.current = null;
     }, 4500);
   }, []);
 
-  // Broadcast ping to teammates
-  const broadcastPing = useCallback(
-    (
-      targetId: string,
-      label: string,
-      coords?: { x: number; y: number },
-      options?: {
-        targetType?: "pin" | "doc" | "evidence";
-        docType?: "pdf" | "evidence";
-        phase?: number;
-        page?: number;
-      },
-    ) => {
-      const currentNick = nicknameRef.current;
+  const showEventToasts = useCallback(
+    (incoming: PublicRoomEvent[]) => {
+      const fresh = incoming.filter(
+        (e) =>
+          e.id > lastEventIdRef.current &&
+          e.actorParticipantId !== meRef.current?.id,
+      );
+      const last = fresh[fresh.length - 1];
+      // P6 thay bằng hàng đợi tối đa 3 toast + chuông.
+      if (last) triggerToast("", last.message);
+    },
+    [triggerToast],
+  );
+
+  const ingestEvents = useCallback(
+    (incoming: PublicRoomEvent[], toast: boolean) => {
+      if (incoming.length === 0) return;
+      if (toast) showEventToasts(incoming);
+      setEvents((prev) => mergeEvents(prev, incoming));
+      lastEventIdRef.current = Math.max(
+        lastEventIdRef.current,
+        ...incoming.map((e) => e.id),
+      );
+    },
+    [showEventToasts],
+  );
+
+  // ---------------------------------------------------------------------------
+  // Áp dữ liệu server vào state
+  // ---------------------------------------------------------------------------
+
+  const applyState = useCallback((serverState: RoomInvestigationState) => {
+    const pending = pendingHeavyRef.current;
+    const next = pending ? mergeRoomState(serverState, pending) : serverState;
+    stateRef.current = next;
+    setRoomState(next);
+  }, []);
+
+  const applyRoom = useCallback((next: PublicRoom) => {
+    roomRef.current = next;
+    setRoom(next);
+    if (
+      sessionRef.current &&
+      next.code &&
+      sessionRef.current.code !== next.code
+    ) {
+      sessionRef.current = { ...sessionRef.current, code: next.code };
+    }
+  }, []);
+
+  const applyParticipants = useCallback((list: PublicParticipant[]) => {
+    setParticipants(list);
+    const mine = meRef.current && list.find((p) => p.id === meRef.current?.id);
+    if (mine) {
+      meRef.current = mine;
+      setMe(mine);
+    }
+  }, []);
+
+  const resetRoom = useCallback(
+    (reason: RoomExitReason) => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+      if (heavyTimerRef.current) clearTimeout(heavyTimerRef.current);
+      heavyTimerRef.current = null;
+      pendingHeavyRef.current = null;
+      sessionRef.current = null;
+      roomRef.current = null;
+      meRef.current = null;
+      setStorageScope(null);
+      versionRef.current = 0;
+      lastEventIdRef.current = 0;
+      readPhaseRef.current = null;
+      stateRef.current = DEFAULT_ROOM_STATE;
+      setChannel(null);
+      setIsSubscribed(false);
+      setRoom(null);
+      setMe(null);
+      setParticipants([]);
+      setEvents([]);
+      setOnlineIds(new Set());
+      setReadPhaseById({});
+      setRoomState(DEFAULT_ROOM_STATE);
+      setExitReason(reason);
+      setSavedSessions(readRoomSessions());
+      if (typeof window !== "undefined") setRoomUrlParam(null);
+    },
+    [supabase],
+  );
+
+  // ---------------------------------------------------------------------------
+  // Kênh realtime room:<id>
+  // ---------------------------------------------------------------------------
+
+  const trackPresence = useCallback(() => {
+    const ch = channelRef.current;
+    const mine = meRef.current;
+    if (!ch || !mine) return;
+    ch.track({
+      pid: mine.id,
+      nickname: mine.nickname,
+      readPhase: readPhaseRef.current,
+    }).catch(() => {});
+  }, []);
+
+  const subscribe = useCallback(
+    (roomId: string, participantId: string) => {
+      if (channelRef.current) {
+        if (channelRef.current.topic === `realtime:room:${roomId}`) return;
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+
+      const ch = supabase.channel(`room:${roomId}`, {
+        config: {
+          broadcast: { self: false },
+          presence: { key: participantId },
+        },
+      });
+
+      const isEcho = (p: RoomBroadcastPayload | undefined) =>
+        !!p?.senderId && p.senderId === clientIdRef.current;
+
+      ch.on("presence", { event: "sync" }, () => {
+        const state = ch.presenceState() as Record<string, PresencePayload[]>;
+        const ids = new Set<string>();
+        const reads: Record<string, RoomPhase | null> = {};
+        for (const [key, metas] of Object.entries(state)) {
+          ids.add(key);
+          reads[key] = metas?.[0]?.readPhase ?? null;
+        }
+        setOnlineIds(ids);
+        setReadPhaseById(reads);
+      })
+        .on("broadcast", { event: "DETECTIVE_PING" }, ({ payload }) => {
+          if (!payload) return;
+          const ping = payload as DetectivePing;
+          triggerPing(ping);
+          triggerToast(
+            ping.actorName || "Đồng đội",
+            `đang chỉ vào: ${ping.label || "manh mối"}`,
+          );
+        })
+        .on("broadcast", { event: "PROGRESS_UPDATE" }, ({ payload }) => {
+          const p = payload as RoomBroadcastPayload;
+          if (!p?.state || isEcho(p) || p.version <= versionRef.current) return;
+          versionRef.current = p.version;
+          applyState(normalizeRoomState(p.state));
+        })
+        .on("broadcast", { event: "PHASE_CHANGE" }, ({ payload }) => {
+          const p = payload as RoomBroadcastPayload;
+          if (!p?.room || p.version < versionRef.current) return;
+          versionRef.current = Math.max(versionRef.current, p.version);
+          applyRoom(p.room);
+          if (p.state) applyState(normalizeRoomState(p.state));
+        })
+        .on("broadcast", { event: "HOST_CHANGE" }, ({ payload }) => {
+          const p = payload as RoomBroadcastPayload;
+          if (!p?.room || p.version < versionRef.current) return;
+          versionRef.current = Math.max(versionRef.current, p.version);
+          applyRoom(p.room);
+        })
+        .on("broadcast", { event: "MEMBER_UPDATE" }, ({ payload }) => {
+          const p = payload as RoomBroadcastPayload;
+          if (!p) return;
+          if (p.closed) {
+            if (sessionRef.current) {
+              removeRoomSession(sessionRef.current.roomId);
+              clearStorageScope(sessionRef.current.roomId);
+            }
+            resetRoom("closed");
+            return;
+          }
+          if (
+            p.kickedParticipantId &&
+            p.kickedParticipantId === meRef.current?.id
+          ) {
+            if (sessionRef.current) {
+              removeRoomSession(sessionRef.current.roomId);
+              clearStorageScope(sessionRef.current.roomId);
+            }
+            resetRoom("kicked");
+            return;
+          }
+          if (p.room && p.version >= versionRef.current) {
+            versionRef.current = p.version;
+            applyRoom(p.room);
+          }
+          if (p.participants) applyParticipants(p.participants);
+        })
+        .on("broadcast", { event: "ROOM_EVENT" }, ({ payload }) => {
+          const p = payload as RoomBroadcastPayload;
+          if (p?.events) ingestEvents(p.events, true);
+        })
+        .subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            setIsSubscribed(true);
+            trackPresence();
+          } else if (
+            status === "CLOSED" ||
+            status === "CHANNEL_ERROR" ||
+            status === "TIMED_OUT"
+          ) {
+            setIsSubscribed(false);
+          }
+        });
+
+      channelRef.current = ch;
+      setChannel(ch);
+    },
+    [
+      supabase,
+      triggerPing,
+      triggerToast,
+      applyState,
+      applyRoom,
+      applyParticipants,
+      ingestEvents,
+      resetRoom,
+      trackPresence,
+    ],
+  );
+
+  /** Nạp snapshot từ server (create / join / reconnect / state). */
+  const applySnapshot = useCallback(
+    (snapshot: RoomSnapshot, token?: string) => {
+      const prevRoomId = roomRef.current?.id;
+      const sameRoom = prevRoomId === snapshot.room.id;
+      setStorageScope(snapshot.room.id);
+
+      if (token) {
+        sessionRef.current = saveRoomSession(token, snapshot);
+        setSavedSessions(readRoomSessions());
+      }
+
+      meRef.current = snapshot.me;
+      setMe(snapshot.me);
+      if (!sameRoom || snapshot.room.version >= versionRef.current) {
+        versionRef.current = snapshot.room.version;
+        applyRoom(snapshot.room);
+        applyState(normalizeRoomState(snapshot.state));
+      }
+      setParticipants(snapshot.participants);
+      if (!sameRoom) {
+        setEvents([]);
+        lastEventIdRef.current = 0;
+      }
+      ingestEvents(snapshot.events, sameRoom);
+      setExitReason(null);
+      setPendingRoomCode(null);
+      if (snapshot.room.code) setRoomUrlParam(snapshot.room.code);
+      subscribe(snapshot.room.id, snapshot.me.id);
+    },
+    [applyRoom, applyState, ingestEvents, subscribe],
+  );
+
+  /** Xử lý lỗi phiên chung (token hết hạn, bị kick, đã rời, phòng bị xóa). */
+  const handleSessionError = useCallback(
+    (res: RoomApiResult<unknown>): boolean => {
+      if (
+        res.status === 401 ||
+        res.status === 403 ||
+        res.status === 410 ||
+        res.status === 404
+      ) {
+        if (sessionRef.current) removeRoomSession(sessionRef.current.roomId);
+        resetRoom(
+          res.code === "KICKED"
+            ? "kicked"
+            : res.code === "LEFT"
+              ? "left_elsewhere"
+              : res.code === "ROOM_NOT_FOUND"
+                ? "closed"
+                : "invalid",
+        );
+        return true;
+      }
+      return false;
+    },
+    [resetRoom],
+  );
+
+  // ---------------------------------------------------------------------------
+  // Hành động
+  // ---------------------------------------------------------------------------
+
+  const call = useCallback(
+    <T,>(path: string, body?: unknown, method: "GET" | "POST" = "POST") =>
+      roomApi<T>(path, {
+        method,
+        body,
+        token: sessionRef.current?.token,
+        clientId: clientIdRef.current,
+      }),
+    [],
+  );
+
+  const reconnectWith = useCallback(
+    async (session: StoredRoomSession): Promise<ActionResult> => {
+      setIsConnecting(true);
+      sessionRef.current = session;
+      const res = await call<{ snapshot: RoomSnapshot }>("reconnect");
+      setIsConnecting(false);
+      if (res.ok && res.data) {
+        applySnapshot(res.data.snapshot, session.token);
+        return { success: true };
+      }
+      if (!handleSessionError(res)) sessionRef.current = null;
+      setLastError(res.error);
+      return { success: false, error: res.error ?? undefined, code: res.code };
+    },
+    [call, applySnapshot, handleSessionError],
+  );
+
+  const createRoom = useCallback(
+    async (input: { caseId: string; maxPlayers: number; nickname: string }) => {
+      setIsConnecting(true);
+      const res = await roomApi<{ token: string; snapshot: RoomSnapshot }>(
+        "create",
+        {
+          body: input,
+          clientId: clientIdRef.current,
+        },
+      );
+      setIsConnecting(false);
+      if (res.ok && res.data) {
+        applySnapshot(res.data.snapshot, res.data.token);
+        return { success: true };
+      }
+      setLastError(res.error);
+      return { success: false, error: res.error ?? undefined, code: res.code };
+    },
+    [applySnapshot],
+  );
+
+  /** Vào phòng bằng mã. Không bao giờ tạo phòng mới (spec 2.3). */
+  const joinRoom = useCallback(
+    async (rawCode: string, nickname?: string): Promise<ActionResult> => {
+      const code = normalizeRoomCode(rawCode);
+      if (!code)
+        return {
+          success: false,
+          error: "Mã phòng gồm 4 ký tự.",
+          code: "INVALID_CODE",
+        };
+      const existing = findSessionByCode(code);
+      setIsConnecting(true);
+      const res = await roomApi<{ token: string; snapshot: RoomSnapshot }>(
+        "join",
+        {
+          body: {
+            code,
+            nickname: nickname ?? existing?.nickname,
+            token: existing?.token,
+          },
+          clientId: clientIdRef.current,
+        },
+      );
+      setIsConnecting(false);
+      if (res.ok && res.data) {
+        applySnapshot(res.data.snapshot, res.data.token);
+        return { success: true };
+      }
+      setLastError(res.error);
+      return { success: false, error: res.error ?? undefined, code: res.code };
+    },
+    [applySnapshot],
+  );
+
+  const resumeRoom = useCallback(
+    async (roomId: string): Promise<ActionResult> => {
+      const session = readRoomSessions().find((s) => s.roomId === roomId);
+      if (!session)
+        return { success: false, error: "Không còn phiên của phòng này." };
+      return reconnectWith(session);
+    },
+    [reconnectWith],
+  );
+
+  const refreshRoom = useCallback(async () => {
+    if (!sessionRef.current) return;
+    const res = await call<{ snapshot: RoomSnapshot }>(
+      `state?since=${lastEventIdRef.current}`,
+      undefined,
+      "GET",
+    );
+    if (res.ok && res.data) {
+      const snap = res.data.snapshot;
+      if (snap.room.version > versionRef.current) {
+        versionRef.current = snap.room.version;
+        applyRoom(snap.room);
+        applyState(normalizeRoomState(snap.state));
+      }
+      applyParticipants(snap.participants);
+      ingestEvents(snap.events, true);
+      return;
+    }
+    handleSessionError(res);
+  }, [
+    call,
+    applyRoom,
+    applyState,
+    applyParticipants,
+    ingestEvents,
+    handleSessionError,
+  ]);
+
+  /** Chạy một thao tác trả snapshot, rồi nạp snapshot. */
+  const runSnapshotAction = useCallback(
+    async (path: string, body?: unknown): Promise<ActionResult> => {
+      if (!sessionRef.current)
+        return { success: false, error: "Chưa vào phòng." };
+      const res = await call<{ snapshot: RoomSnapshot }>(path, body);
+      if (res.ok && res.data) {
+        applySnapshot(res.data.snapshot);
+        return { success: true };
+      }
+      if (!handleSessionError(res)) {
+        setLastError(res.error);
+        // Lệch phase (người khác đã chuyển) hoặc bận: đọc lại trạng thái mới nhất.
+        if (res.status === 409) await refreshRoom();
+      }
+      return { success: false, error: res.error ?? undefined, code: res.code };
+    },
+    [call, applySnapshot, handleSessionError, refreshRoom],
+  );
+
+  const enterRoom = useCallback(
+    () => runSnapshotAction("enter"),
+    [runSnapshotAction],
+  );
+
+  const advancePhase = useCallback(
+    () => runSnapshotAction("phase", { from: roomRef.current?.phase }),
+    [runSnapshotAction],
+  );
+
+  const hostAction = useCallback<RoomSyncContextType["hostAction"]>(
+    (action) => runSnapshotAction("host", action),
+    [runSnapshotAction],
+  );
+
+  const submitConclusion = useCallback(
+    (culprit?: string | null) =>
+      runSnapshotAction("conclusion", { culprit: culprit ?? null }),
+    [runSnapshotAction],
+  );
+
+  const leaveRoom = useCallback(async () => {
+    const session = sessionRef.current;
+    if (!session) return;
+    await call("leave");
+    removeRoomSession(session.roomId);
+    clearStorageScope(session.roomId);
+    resetRoom(null);
+  }, [call, resetRoom]);
+
+  const markRead = useCallback(
+    (phase: RoomPhase) => {
+      if (readPhaseRef.current === phase) return;
+      readPhaseRef.current = phase;
+      trackPresence();
+    },
+    [trackPresence],
+  );
+
+  // ---------------------------------------------------------------------------
+  // Ghi tiến trình
+  // ---------------------------------------------------------------------------
+
+  const sendProgress = useCallback(
+    async (patch: ProgressPatch) => {
+      if (!sessionRef.current || roomRef.current?.phase !== "investigating")
+        return;
+      const res = await call<{
+        version: number;
+        state: RoomInvestigationState;
+      }>("progress", {
+        patch,
+      });
+      if (res.ok && res.data) {
+        if (res.data.version > versionRef.current) {
+          versionRef.current = res.data.version;
+          applyState(normalizeRoomState(res.data.state));
+        }
+        return;
+      }
+      if (!handleSessionError(res)) {
+        console.warn("[RoomSync] progress failed:", res.status, res.error);
+        await refreshRoom();
+      }
+    },
+    [call, applyState, handleSessionError, refreshRoom],
+  );
+
+  const flushHeavy = useCallback(() => {
+    if (heavyTimerRef.current) clearTimeout(heavyTimerRef.current);
+    heavyTimerRef.current = null;
+    const patch = pendingHeavyRef.current;
+    pendingHeavyRef.current = null;
+    if (patch) void sendProgress(patch);
+  }, [sendProgress]);
+
+  const syncUpdate = useCallback(
+    async (rawPatch: Partial<RoomInvestigationState>, _actionText?: string) => {
+      if (!sessionRef.current) return;
+
+      // Nộp kết luận từ bảng điều tra (use-investigation-state): đi route riêng.
+      if (rawPatch.indictmentSolved) {
+        await submitConclusion(rawPatch.solvedCulprit ?? null);
+        return;
+      }
+
+      const patch = sanitizeProgressPatch(rawPatch);
+      if (!patch) return;
+
+      // Cập nhật lạc quan tại chỗ.
+      const optimistic = mergeRoomState(stateRef.current, patch);
+      stateRef.current = optimistic;
+      setRoomState(optimistic);
+
+      const heavy: ProgressPatch = {};
+      const light: ProgressPatch = { ...patch };
+      for (const key of HEAVY_KEYS) {
+        if (patch[key] !== undefined) {
+          (heavy as Record<string, unknown>)[key] = patch[key];
+          delete (light as Record<string, unknown>)[key];
+        }
+      }
+
+      if (Object.keys(heavy).length > 0) {
+        pendingHeavyRef.current = pendingHeavyRef.current
+          ? combineHeavy(pendingHeavyRef.current, heavy)
+          : heavy;
+        if (heavyTimerRef.current) clearTimeout(heavyTimerRef.current);
+        heavyTimerRef.current = setTimeout(flushHeavy, HEAVY_FLUSH_MS);
+      }
+      if (Object.keys(light).length > 0) await sendProgress(light);
+    },
+    [submitConclusion, sendProgress, flushHeavy],
+  );
+
+  const broadcastPing = useCallback<RoomSyncContextType["broadcastPing"]>(
+    (targetId, label, coords, options) => {
       const ping: DetectivePing = {
-        id: Math.random().toString(36).slice(2),
-        actorName: currentNick,
+        id: randomId(),
+        actorName: meRef.current?.nickname ?? "Thám tử",
         targetId,
         label,
         coords,
@@ -360,493 +907,192 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
         page: options?.page,
         timestamp: Date.now(),
       };
-
-      // Trigger locally immediately
       triggerPing(ping);
-
-      // Broadcast over channel
-      if (channelRef.current) {
-        channelRef.current.send({
-          type: "broadcast",
-          event: "DETECTIVE_PING",
-          payload: ping,
-        });
-      }
+      channelRef.current?.send({
+        type: "broadcast",
+        event: "DETECTIVE_PING",
+        payload: ping,
+      });
     },
     [triggerPing],
   );
 
-  // Leave room logic
-  const leaveRoom = useCallback(() => {
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
+  // ---------------------------------------------------------------------------
+  // Khởi động: chỉ tự kết nối khi URL có ?room=<CODE> và thiết bị có phiên của mã đó.
+  // Không tự kéo người chơi Solo vào phòng cũ (spec 1.3 mục 3).
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (didInitRef.current || !clientId) return;
+    didInitRef.current = true;
+    try {
+      const code = normalizeRoomCode(
+        new URLSearchParams(window.location.search).get("room"),
+      );
+      if (!code) return;
+      const session = findSessionByCode(code);
+      if (session) void reconnectWith(session);
+      else setPendingRoomCode(code);
+    } catch {
+      // ignore
+    }
+  }, [clientId, reconnectWith]);
+
+  // Catch-up theo version + heartbeat (spec 5.4, plan D1).
+  useEffect(() => {
+    if (!room?.id || room.status === "completed") return;
+    const onWake = () => {
+      if (document.visibilityState === "visible") void refreshRoom();
+    };
+    document.addEventListener("visibilitychange", onWake);
+    window.addEventListener("online", onWake);
+    const timer = setInterval(() => {
+      if (document.visibilityState === "visible") void refreshRoom();
+    }, CATCH_UP_INTERVAL_MS);
+    return () => {
+      document.removeEventListener("visibilitychange", onWake);
+      window.removeEventListener("online", onWake);
+      clearInterval(timer);
+    };
+  }, [room?.id, room?.status, refreshRoom]);
+
+  // Gửi nốt patch nặng khi rời trang.
+  useEffect(() => {
+    const onHide = () => {
+      if (document.visibilityState === "hidden" && pendingHeavyRef.current)
+        flushHeavy();
+    };
+    document.addEventListener("visibilitychange", onHide);
+    return () => document.removeEventListener("visibilitychange", onHide);
+  }, [flushHeavy]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (pingTimerRef.current) clearTimeout(pingTimerRef.current);
+      if (heavyTimerRef.current) clearTimeout(heavyTimerRef.current);
+      if (channelRef.current) supabase.removeChannel(channelRef.current);
       channelRef.current = null;
-    }
-    setRoomCode(null);
-    setIsConnected(false);
-    setMembers([]);
-    setRoomState(DEFAULT_ROOM_STATE);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.removeItem(ROOM_CODE_STORAGE_KEY);
-        const url = new URL(window.location.href);
-        url.searchParams.delete("room");
-        window.history.replaceState({}, "", url.toString());
-      } catch {}
-    }
+    };
   }, [supabase]);
 
-  // Join or create room
-  const joinRoom = useCallback(
-    async (
-      code: string,
-      customNick?: string,
-    ): Promise<{ success: boolean; error?: string }> => {
-      const cleanCode = code
-        .trim()
-        .toUpperCase()
-        .replace(/[^A-Z0-9]/g, "");
-      if (!cleanCode || cleanCode.length < 2) {
-        return { success: false, error: "Mã phòng phải có ít nhất 2 ký tự" };
-      }
+  // ---------------------------------------------------------------------------
+  // Giá trị context
+  // ---------------------------------------------------------------------------
 
-      setIsConnecting(true);
-
-      const activeNick = customNick?.trim() || nicknameRef.current;
-      if (customNick) {
-        setNickname(activeNick);
-      }
-
-      try {
-        // 1. Check or create row in Supabase
-        const { data: existingRoom, error: fetchErr } = await supabase
-          .from("game_rooms")
-          .select("*")
-          .eq("room_code", cleanCode)
-          .maybeSingle();
-
-        if (fetchErr) {
-          console.error("[RoomSync] Fetch error:", fetchErr);
-        }
-
-        let initialRoomState = DEFAULT_ROOM_STATE;
-
-        if (existingRoom) {
-          initialRoomState = {
-            ...DEFAULT_ROOM_STATE,
-            ...(existingRoom.state_json || {}),
-          };
-        } else {
-          // Create new room row
-          const { error: insertErr } = await supabase
-            .from("game_rooms")
-            .insert({
-              room_code: cleanCode,
-              game_id: normalizeCaseId(getActiveCaseId()),
-              state_json: DEFAULT_ROOM_STATE,
-              last_action: `${activeNick} đã tạo phòng`,
-            });
-
-          if (insertErr) {
-            console.error("[RoomSync] Insert error:", insertErr);
-          }
-        }
-
-        setRoomState(initialRoomState);
-        roomStateRef.current = initialRoomState;
-        setRoomCode(cleanCode);
-        setIsConnected(true);
-
-        // Save to storage & URL
-        if (typeof window !== "undefined") {
-          try {
-            localStorage.setItem(ROOM_CODE_STORAGE_KEY, cleanCode);
-            const url = new URL(window.location.href);
-            url.searchParams.set("room", cleanCode);
-            window.history.replaceState({}, "", url.toString());
-          } catch {}
-        }
-
-        // 2. Unsubscribe old channel if any
-        if (channelRef.current) {
-          supabase.removeChannel(channelRef.current);
-          channelRef.current = null;
-        }
-
-        // 3. Subscribe to Realtime Channel with Presence tracking
-        const deviceId = getDeviceId();
-        const channel = supabase.channel(`room:${cleanCode}`, {
-          config: {
-            broadcast: { self: false },
-            presence: { key: deviceId },
-          },
-        });
-
-        channel
-          .on("presence", { event: "sync" }, () => {
-            const state = channel.presenceState();
-            const list: RoomMember[] = [];
-            Object.keys(state).forEach((key) => {
-              const presences = state[key] as unknown as PresencePayload[];
-              if (presences && presences.length > 0) {
-                const p = presences[0];
-                list.push({
-                  key,
-                  nickname: p.nickname || "Thám tử",
-                  joinedAt: p.joinedAt || Date.now(),
-                  avatarUrl: p.avatarUrl || null,
-                  userId: p.userId || null,
-                  email: p.email || null,
-                  isAuthenticated: !!p.isAuthenticated,
-                });
-              }
-            });
-            list.sort((a, b) => a.joinedAt - b.joinedAt);
-            setMembers(list);
-          })
-          .on("presence", { event: "join" }, ({ newPresences }) => {
-            const actor = (newPresences?.[0] as PresencePayload | undefined)
-              ?.nickname;
-            if (actor && actor !== activeNick) {
-              triggerToast(actor, "vừa tham gia tổ chuyên án");
-            }
-          })
-          .on("presence", { event: "leave" }, ({ leftPresences }) => {
-            const actor = (leftPresences?.[0] as PresencePayload | undefined)
-              ?.nickname;
-            if (actor && actor !== activeNick) {
-              triggerToast(actor, "đã rời phòng");
-            }
-          })
-          .on("broadcast", { event: "DETECTIVE_PING" }, ({ payload }) => {
-            if (!payload) return;
-            const ping = payload as DetectivePing;
-            triggerPing(ping);
-            triggerToast(
-              ping.actorName || "Đồng đội",
-              `đang chỉ vào: ${ping.label || "manh mối"}`,
-            );
-          })
-          .on("broadcast", { event: "STATE_PATCH" }, ({ payload }) => {
-            if (!payload || !payload.patch) return;
-            const patch = payload.patch as Partial<RoomInvestigationState>;
-            const actor = payload.actorName || "Đồng đội";
-            const action = payload.actionText || "đã cập nhật tiến trình";
-
-            setRoomState((prev) => {
-              const next = { ...prev, ...patch };
-              // Merge arrays cleanly
-              if (patch.completedCheckpoints) {
-                next.completedCheckpoints = Array.from(
-                  new Set([
-                    ...prev.completedCheckpoints,
-                    ...patch.completedCheckpoints,
-                  ]),
-                );
-              }
-              if (patch.investigatedSuspects) {
-                next.investigatedSuspects = Array.from(
-                  new Set([
-                    ...prev.investigatedSuspects,
-                    ...patch.investigatedSuspects,
-                  ]),
-                );
-              }
-              if (patch.solvedFollowups) {
-                next.solvedFollowups = Array.from(
-                  new Set([...prev.solvedFollowups, ...patch.solvedFollowups]),
-                );
-              }
-              if (patch.phoneInputs) {
-                next.phoneInputs = {
-                  ...prev.phoneInputs,
-                  ...patch.phoneInputs,
-                };
-              }
-              if (patch.annotations) {
-                next.annotations = {
-                  ...(prev.annotations || {}),
-                  ...patch.annotations,
-                };
-              }
-              if (patch.teamNotes !== undefined) {
-                next.teamNotes = patch.teamNotes;
-              }
-              if (patch.canvasNotes !== undefined) {
-                next.canvasNotes = patch.canvasNotes;
-              }
-              return next;
-            });
-
-            triggerToast(actor, action);
-          })
-          .on(
-            "postgres_changes",
-            {
-              event: "UPDATE",
-              schema: "public",
-              table: "game_rooms",
-              filter: `room_code=eq.${cleanCode}`,
-            },
-            (payload) => {
-              const newRow = payload.new as GameRoomRow;
-              if (newRow?.state_json) {
-                setRoomState((prev) => ({
-                  ...prev,
-                  ...newRow.state_json,
-                  annotations: {
-                    ...(prev.annotations || {}),
-                    ...(newRow.state_json.annotations || {}),
-                  },
-                  teamNotes:
-                    newRow.state_json.teamNotes !== undefined
-                      ? newRow.state_json.teamNotes
-                      : prev.teamNotes,
-                  canvasNotes:
-                    newRow.state_json.canvasNotes !== undefined
-                      ? newRow.state_json.canvasNotes
-                      : prev.canvasNotes,
-                }));
-              }
-            },
-          )
-          .subscribe(async (status) => {
-            if (status === "SUBSCRIBED") {
-              setIsConnected(true);
-              try {
-                await channel.track({
-                  nickname: activeNick,
-                  joinedAt: Date.now(),
-                  avatarUrl: currentUserRef.current?.avatarUrl || null,
-                  userId: currentUserRef.current?.id || null,
-                  email: currentUserRef.current?.email || null,
-                  isAuthenticated: !!currentUserRef.current,
-                });
-              } catch (trackErr) {
-                console.warn("[RoomSync] Track error:", trackErr);
-              }
-            }
-          });
-
-        channelRef.current = channel;
-        return { success: true };
-      } catch (err: unknown) {
-        console.error("[RoomSync] Join room failed:", err);
-        const errorMsg =
-          err instanceof Error
-            ? err.message
-            : typeof err === "object" && err !== null && "message" in err
-              ? String((err as { message: unknown }).message)
-              : "Không thể kết nối phòng";
-        return {
-          success: false,
-          error: errorMsg,
-        };
-      } finally {
-        setIsConnecting(false);
-      }
-    },
-    [setNickname, supabase, triggerPing, triggerToast],
+  const members = useMemo<RoomMember[]>(
+    () =>
+      participants
+        .filter((p) => onlineIds.has(p.id) || p.id === me?.id)
+        .map((p) => ({
+          key: p.id,
+          nickname: p.nickname,
+          joinedAt: Date.parse(p.joinedAt) || 0,
+          avatarUrl: null,
+          isAuthenticated: false,
+        })),
+    [participants, onlineIds, me?.id],
   );
 
-  // Broadcast & DB update
-  const syncUpdate = useCallback(
-    async (patch: Partial<RoomInvestigationState>, actionText?: string) => {
-      if (!roomCode) return;
+  const roomCode = room ? (room.code ?? "----") : null;
+  const isHost = !!room && !!me && room.hostParticipantId === me.id;
 
-      const currentState = roomStateRef.current;
-      const nextMerged: RoomInvestigationState = {
-        ...currentState,
-        ...patch,
-      };
-
-      // Merge arrays
-      if (patch.completedCheckpoints) {
-        nextMerged.completedCheckpoints = Array.from(
-          new Set([
-            ...currentState.completedCheckpoints,
-            ...patch.completedCheckpoints,
-          ]),
-        );
-      }
-      if (patch.investigatedSuspects) {
-        nextMerged.investigatedSuspects = Array.from(
-          new Set([
-            ...currentState.investigatedSuspects,
-            ...patch.investigatedSuspects,
-          ]),
-        );
-      }
-      if (patch.solvedFollowups) {
-        nextMerged.solvedFollowups = Array.from(
-          new Set([...currentState.solvedFollowups, ...patch.solvedFollowups]),
-        );
-      }
-      if (patch.phoneInputs) {
-        nextMerged.phoneInputs = {
-          ...currentState.phoneInputs,
-          ...patch.phoneInputs,
-        };
-      }
-      if (patch.annotations) {
-        nextMerged.annotations = {
-          ...(currentState.annotations || {}),
-          ...patch.annotations,
-        };
-      }
-      if (patch.teamNotes !== undefined) {
-        nextMerged.teamNotes = patch.teamNotes;
-      }
-      if (patch.canvasNotes !== undefined) {
-        nextMerged.canvasNotes = patch.canvasNotes;
-      }
-
-      setRoomState(nextMerged);
-      roomStateRef.current = nextMerged;
-
-      const currentNick = nicknameRef.current;
-      const actionDesc = actionText || "đã mở khóa manh mối";
-
-      // 1. Broadcast immediately to peers (< 30ms)
-      if (channelRef.current) {
-        channelRef.current.send({
-          type: "broadcast",
-          event: "STATE_PATCH",
-          payload: {
-            patch,
-            actorName: currentNick,
-            actionText: actionDesc,
-            timestamp: Date.now(),
-          },
-        });
-      }
-
-      // 2. Persist to Postgres
-      try {
-        await supabase
-          .from("game_rooms")
-          .update({
-            state_json: nextMerged,
-            last_action: `${currentNick} ${actionDesc}`,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("room_code", roomCode);
-      } catch (err) {
-        console.error("[RoomSync] DB persist failed:", err);
-      }
-    },
-    [roomCode, supabase],
-  );
-
-  // Catch-up on tab visibility change or reconnect
-  useEffect(() => {
-    if (!roomCode) return;
-
-    const handleCatchUp = async () => {
-      if (document.visibilityState === "visible" && roomCode) {
-        try {
-          const { data } = await supabase
-            .from("game_rooms")
-            .select("state_json")
-            .eq("room_code", roomCode)
-            .single();
-
-          if (data?.state_json) {
-            setRoomState((prev) => ({
-              ...prev,
-              ...data.state_json,
-            }));
-          }
-        } catch {}
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleCatchUp);
-    window.addEventListener("online", handleCatchUp);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleCatchUp);
-      window.removeEventListener("online", handleCatchUp);
-    };
-  }, [roomCode, supabase]);
-
-  // Initial auto-connect from URL or localStorage (runs once on mount)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (didAutoConnectRef.current) return;
-    didAutoConnectRef.current = true;
-
-    try {
-      const savedNick = localStorage.getItem(NICKNAME_STORAGE_KEY);
-      if (savedNick) {
-        setNicknameState(savedNick);
-        nicknameRef.current = savedNick;
-      }
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlRoom = urlParams.get("room");
-      const savedRoom = localStorage.getItem(ROOM_CODE_STORAGE_KEY);
-
-      const targetRoom = urlRoom || savedRoom;
-      if (targetRoom) {
-        joinRoom(targetRoom, savedNick || undefined);
-      }
-    } catch {}
-  }, [joinRoom]);
-
-  const memberCount = Math.max(isConnected ? 1 : 0, members.length);
-
-  const contextValue = useMemo<RoomSyncContextType>(
+  const value = useMemo<RoomSyncContextType>(
     () => ({
       roomCode,
-      nickname,
-      isConnected,
+      nickname: me?.nickname ?? "Thám tử",
+      isConnected: !!room && isSubscribed,
       isConnecting,
       roomState,
       members,
-      memberCount,
+      memberCount: members.length,
       currentUser,
-      deviceId,
+      deviceId: me?.id ?? "",
       activeToast,
       activePing,
       joinRoom,
       leaveRoom,
       syncUpdate,
       broadcastPing,
-      setNickname,
+      room,
+      roomId: room?.id ?? null,
+      phase: room?.phase ?? null,
+      version: room?.version ?? 0,
+      me,
+      isHost,
+      participants,
+      onlineIds,
+      readPhaseById,
+      events,
+      channel,
+      pendingRoomCode,
+      savedSessions,
+      exitReason,
+      lastError,
+      createRoom,
+      resumeRoom,
+      enterRoom,
+      advancePhase,
+      hostAction,
+      submitConclusion,
+      markRead,
+      refreshRoom,
+      clearExitReason: () => setExitReason(null),
     }),
     [
       roomCode,
-      nickname,
-      isConnected,
+      me,
+      room,
+      isSubscribed,
       isConnecting,
       roomState,
       members,
-      memberCount,
       currentUser,
-      deviceId,
       activeToast,
       activePing,
       joinRoom,
       leaveRoom,
       syncUpdate,
       broadcastPing,
-      setNickname,
+      isHost,
+      participants,
+      onlineIds,
+      readPhaseById,
+      events,
+      channel,
+      pendingRoomCode,
+      savedSessions,
+      exitReason,
+      lastError,
+      createRoom,
+      resumeRoom,
+      enterRoom,
+      advancePhase,
+      hostAction,
+      submitConclusion,
+      markRead,
+      refreshRoom,
     ],
   );
 
   return (
-    <RoomSyncContext.Provider value={contextValue}>
+    <RoomSyncContext.Provider value={value}>
       {children}
-      {/* Toast Notification for Teammate Progress */}
       {activeToast && (
-        <div className="fixed top-4 right-4 z-50 pointer-events-none animate-in fade-in slide-in-from-top-3 duration-300">
-          <div className="bg-zinc-900/95 border border-zinc-700 text-zinc-100 px-4 py-3 rounded-lg shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-sm pointer-events-auto">
-            <span className="text-xl">🕵️</span>
+        <div className="fixed bottom-4 right-4 z-50 pointer-events-none animate-in fade-in slide-in-from-bottom-3 duration-300">
+          <div
+            role="status"
+            className="bg-zinc-900/95 border border-zinc-700 text-zinc-100 px-4 py-3 rounded-lg shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-sm pointer-events-auto"
+          >
+            <span className="text-xl" aria-hidden>
+              🕵️
+            </span>
             <div className="flex-1 text-xs font-mono">
-              <span className="font-bold text-white">
-                {activeToast.actorName}
-              </span>{" "}
+              {activeToast.actorName && (
+                <span className="font-bold text-white">
+                  {activeToast.actorName}{" "}
+                </span>
+              )}
               <span className="text-zinc-300">{activeToast.actionText}</span>
             </div>
           </div>
@@ -855,6 +1101,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
     </RoomSyncContext.Provider>
   );
 }
+
+const noop = async () => ({ success: false, error: "No Room Provider" });
 
 const DEFAULT_ROOM_SYNC_CONTEXT: RoomSyncContextType = {
   roomCode: null,
@@ -868,17 +1116,36 @@ const DEFAULT_ROOM_SYNC_CONTEXT: RoomSyncContextType = {
   deviceId: "",
   activeToast: null,
   activePing: null,
-  joinRoom: async () => ({ success: false, error: "No Room Provider" }),
-  leaveRoom: () => {},
+  joinRoom: noop,
+  leaveRoom: async () => {},
   syncUpdate: async () => {},
   broadcastPing: () => {},
-  setNickname: () => {},
+  room: null,
+  roomId: null,
+  phase: null,
+  version: 0,
+  me: null,
+  isHost: false,
+  participants: [],
+  onlineIds: new Set(),
+  readPhaseById: {},
+  events: [],
+  channel: null,
+  pendingRoomCode: null,
+  savedSessions: [],
+  exitReason: null,
+  lastError: null,
+  createRoom: noop,
+  resumeRoom: noop,
+  enterRoom: noop,
+  advancePhase: noop,
+  hostAction: noop,
+  submitConclusion: noop,
+  markRead: () => {},
+  refreshRoom: async () => {},
+  clearExitReason: () => {},
 };
 
 export function useRoomSync() {
-  const context = useContext(RoomSyncContext);
-  if (!context) {
-    return DEFAULT_ROOM_SYNC_CONTEXT;
-  }
-  return context;
+  return useContext(RoomSyncContext) ?? DEFAULT_ROOM_SYNC_CONTEXT;
 }
