@@ -11,7 +11,8 @@
     "scan:map-vector": "python scripts/ops/scan_figma_map_vector.py",
     "start": "next start",
     "lint": "tsc --noEmit -p tsconfig.typecheck.json",
-    "test:e2e": "node scripts/ops/ensure-e2e-port.mjs && playwright test"
+    "test:e2e": "node scripts/ops/ensure-e2e-port.mjs && playwright test",
+    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"lib/**/*.test.ts\""
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

@@ -1,6 +1,6 @@
 # Kế hoạch triển khai: Chơi nhóm v3 (ROADMAP #14)
 
-> **Trạng thái:** Đã duyệt 2026-11-05, kể cả D1–D7 theo đề xuất. P1 đã viết (chờ chạy migration 51). P2–P7 chưa làm.
+> **Trạng thái:** Đã duyệt 2026-11-05, kể cả D1–D7 theo đề xuất. P1 đã commit (chờ chạy migration 51). P2 đã viết (chưa smoke test, cần migration 51). P3–P7 chưa làm.
 > **Spec gốc:** [`architecture/group_play_realtime.md`](../architecture/group_play_realtime.md) (chốt 2026-11-05). Kế hoạch này không thay đổi spec, trừ các điểm ghi ở mục 2 (cần duyệt).
 > **Ngoài phạm vi:** hệ thống điểm và bảng xếp hạng (Q2, Q8b ở mục 9.2 của spec, ROADMAP #15). Chơi nhóm bản online (Q11). Live cursor (#12) làm sau, kế hoạch này chỉ giữ tương thích.
 > **Không đụng:** `components/admin/checkpoint-studio/**`, `components/investigation/board/canvas/pin-builder.ts` (session khác đang sửa).
@@ -82,15 +82,13 @@ Tách 2 file để không làm hỏng chơi nhóm v1 đang chạy production:
 - `lib/types/room.ts`: thêm `RoomPhase`, `ROOM_PHASES`, `RoomStatus`, `RoomMode`, `GameRoomRow` mới, `RoomParticipantRow`, `RoomEventRow`, `RoomEventType`. Việc bỏ `email`/`userId` khỏi `RoomMember` dời sang P3 (cùng lúc sửa presence và `RoomModal`).
 - **Kiểm chứng:** chủ dự án chạy 51 trên Supabase SQL Editor, chạy các câu kiểm tra ở cuối file. P2 cần 51 đã chạy để test thật.
 
-### P2 — Logic server và API `/api/rooms/*`
+### P2 — Logic server và API `/api/rooms/*` (đã viết 2026-11-05)
 
-- `lib/rooms/code.ts` (sinh/chuẩn hóa mã), `lib/rooms/merge.ts` (`mergeRoomState`), `lib/rooms/phase.ts` (thứ tự phase, `nextPhase`), `lib/rooms/nickname.ts` (cắt 1–20 ký tự, avatar màu từ nickname). Test bằng `node --test lib/rooms/*.test.ts` (không thêm dependency; thêm script `test:unit`).
-- `lib/rooms/auth.ts` (server-only): hash token, `requireParticipant(request, roomId)` trả participant + room hoặc lỗi 401/403/410.
-- `lib/rooms/broadcast.ts` (server-only): gọi Realtime Broadcast REST (`/realtime/v1/api/broadcast`) bằng service role, payload luôn có `version`, `senderId`.
-- `lib/rooms/events.ts`: ghi `room_events` + broadcast `ROOM_EVENT`.
-- 10 route theo bảng 5.1 của spec, tất cả `dynamic = 'force-dynamic'`, `Cache-Control: no-store`:
-  `create`, `join` (rate limit 10 lần sai / 5 phút / IP, chỉ đếm lần sai), `enter`, `reconnect` (phòng `dormant` thì cấp mã mới, về `active`), `leave`, `phase`, `host` (`transfer`, `kick`, `max_players`, `claim`), `progress`, `conclusion`, `state`.
-- **Kiểm chứng:** unit test + script smoke `scripts/ops/rooms-smoke.mjs` gọi lần lượt các route trên dev server (create → join sai mã 404 → join đúng → phase → progress song song 2 client không mất dữ liệu → conclusion 2 lần chỉ nhận 1).
+- Logic thuần, không import alias, test bằng `pnpm test:unit` (`node --test`, 14 test): `lib/rooms/code.ts` (Crockford, chuẩn hóa O→0, I/L→1), `merge.ts` (`sanitizeProgressPatch`, `mergeRoomState`, `normalizeRoomState`, `progressDelta`), `phase.ts`, `nickname.ts`, `join-guard.ts` (10 lần sai / 5 phút / IP, chặn 5 phút), `host.ts` (`pickSuccessor`, `autoHostCandidate`), `messages.ts` (text thông báo sinh ở server). `tsconfig.json` thêm `allowImportingTsExtensions` để file test import `./x.ts`.
+- `lib/rooms/server.ts` (server-only): token (32 byte, DB lưu sha256), `requireParticipant` qua `Authorization: Bearer`, `updateRoomCas` (ghi kèm điều kiện `version`, thử lại tối đa 4 lần), `reactivateWithNewCode`, snapshot public (không `token_hash`), `addEvents`, `broadcastRoom` (Realtime REST `/realtime/v1/api/broadcast`, topic `room:<id>`, lỗi broadcast không làm hỏng request).
+- Type public trong `lib/types/room.ts`: `PublicRoom`, `PublicParticipant`, `PublicRoomEvent`, `RoomSnapshot`, `RoomBroadcastPayload`.
+- 10 route (`dynamic = 'force-dynamic'`, `Cache-Control: no-store`): `create`, `join`, `enter`, `reconnect`, `leave`, `phase`, `host` (`transfer`, `kick`, `max_players`, `claim`), `progress`, `conclusion`, `state`. Khác spec 5.1: `GET /api/rooms/state` xác thực bằng token, không nhận `?code=` (mã đổi khi phòng kích hoạt lại); nhận `?since=<eventId>`.
+- **Kiểm chứng:** unit test pass, `pnpm lint` pass. Smoke `node scripts/ops/rooms-smoke.mjs` (create → mã sai 404 → join + hậu tố nickname → quyền Host → phase → người vào muộn → đủ người → 3 ghi tiến trình song song không mất dữ liệu → 2 kết luận cùng lúc chỉ nhận 1 → mã cũ hết hiệu lực) **chưa chạy**: cần migration 51 trên Supabase và `SUPABASE_SERVICE_ROLE_KEY` ở dev server.
 
 ### P3 — Viết lại `RoomSyncProvider` (client)
 
@@ -141,7 +139,7 @@ Tách 2 file để không làm hỏng chơi nhóm v1 đang chạy production:
 
 | Rủi ro                                                                                          | Xử lý                                                                                                    |
 | :---------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
-| Schema thật của `game_rooms` khác giả định (không có `id`, `room_code` là khóa chính)           | Migration 51 đọc catalog và tự xử lý; FK lạ thì rollback                                                              |
+| Schema thật của `game_rooms` khác giả định (không có `id`, `room_code` là khóa chính)           | Migration 51 đọc catalog và tự xử lý; FK lạ thì rollback                                                 |
 | Rate limiter in-memory mất khi container restart, không chia sẻ nếu sau này chạy nhiều instance | Chấp nhận (một container VPS). Ghi `TECHDEBT.md`                                                         |
 | Broadcast REST thất bại sau khi DB đã ghi                                                       | Client luôn có catch-up theo `version` khi quay lại tab; thêm catch-up định kỳ 30 giây nếu phòng đang mở |
 | Quota Realtime gói Free (100 tin/giây toàn project)                                             | Server chỉ broadcast khi có thay đổi; không broadcast heartbeat                                          |

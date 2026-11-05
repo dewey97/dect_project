@@ -149,3 +149,73 @@ export const DEFAULT_ROOM_STATE: RoomInvestigationState = {
   teamNotes: "",
   canvasNotes: [],
 };
+
+// ---------------------------------------------------------------------------
+// Dữ liệu phòng trả về client (API /api/rooms/* và broadcast kênh room:<id>).
+// Không bao giờ chứa token_hash, email hay userId.
+// ---------------------------------------------------------------------------
+
+export interface PublicRoom {
+  id: string;
+  code: string | null;
+  caseId: string;
+  mode: RoomMode;
+  status: RoomStatus;
+  phase: RoomPhase;
+  phaseChangedAt: string | null;
+  maxPlayers: number;
+  hostParticipantId: string | null;
+  startedAt: string | null;
+  endedAt: string | null;
+  version: number;
+}
+
+export interface PublicParticipant {
+  id: string;
+  nickname: string;
+  joinedAt: string;
+  /** NULL = còn ở phòng chờ. */
+  enteredAt: string | null;
+  isHost: boolean;
+}
+
+export interface PublicRoomEvent {
+  id: number;
+  type: RoomEventType;
+  actorParticipantId: string | null;
+  targetRef: string | null;
+  message: string;
+  createdAt: string;
+}
+
+export interface RoomSnapshot {
+  room: PublicRoom;
+  state: RoomInvestigationState;
+  /** Thành viên đang giữ chỗ (chưa rời, chưa bị kick), theo thứ tự vào phòng. */
+  participants: PublicParticipant[];
+  /** Sự kiện mới nhất (tăng dần theo id). */
+  events: PublicRoomEvent[];
+  me: PublicParticipant;
+  serverTime: string;
+}
+
+/** Tên sự kiện broadcast server gửi trên kênh `room:<id>` (spec 5.2). */
+export type RoomBroadcastEvent =
+  | "PHASE_CHANGE"
+  | "PROGRESS_UPDATE"
+  | "MEMBER_UPDATE"
+  | "HOST_CHANGE"
+  | "ROOM_EVENT";
+
+export interface RoomBroadcastPayload {
+  /** `x-room-client` của request gây ra thay đổi, để client bỏ qua echo của mình. */
+  senderId: string | null;
+  version: number;
+  room?: PublicRoom;
+  state?: RoomInvestigationState;
+  participants?: PublicParticipant[];
+  events?: PublicRoomEvent[];
+  kickedParticipantId?: string;
+  /** Phòng bị hủy (Host rời khi phòng trống, còn ở lobby). */
+  closed?: boolean;
+}
