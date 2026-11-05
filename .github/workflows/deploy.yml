@@ -26,6 +26,18 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
+      # .env được track và chép vào image: chỉ cho phép biến công khai.
+      # Secret server đặt ở .env.local (dev) hoặc .env.server (VPS).
+      - name: 🔐 Block secrets in tracked .env
+        run: |
+          # Chỉ in tên biến, không in giá trị ra log CI.
+          BAD=$(grep -nEv '^\s*(#|$|NEXT_PUBLIC_[A-Z0-9_]+=)' .env | cut -d= -f1 || true)
+          if [ -n "$BAD" ]; then
+            echo "$BAD"
+            echo "::error file=.env::.env chỉ được chứa biến NEXT_PUBLIC_*. Chuyển secret sang .env.local / .env.server."
+            exit 1
+          fi
+
       - name: ⚙️ Setup Node.js 22
         uses: actions/setup-node@v4
         with:
