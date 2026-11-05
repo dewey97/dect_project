@@ -88,7 +88,12 @@ Modal ──verifyCheckpointOnServer()──► POST /api/checkpoints/verify ─
 - Thẩm tra nghi phạm gửi từng lớp (`motiveCodes` hoặc `contradictionCodes`); server chỉ chấm lớp được gửi.
 - Mã chứng cứ: phải đủ mã bắt buộc và không có mã ngoài tập `bắt buộc + bổ trợ` (AGENTS.md §13).
 - So khớp tên tiếng Việt: một hàm `isVietnameseTextMatch()` (`lib/checkpoints/name-match.ts`).
-- Lập luận AI: client gửi `{ caseId, checkpointId, category, suspect, answer }`; server dựng tiêu chí từ `ai_context`, `ai_valid_cases`, `motiveContext`... (`lib/ai/suspect-interrogation-context.ts`).
+- Lập luận AI: client gửi `{ caseId, checkpointId, category, suspect, answer }`; server dựng tiêu chí ở `lib/ai/suspect-interrogation-context.ts`:
+  - Bối cảnh: `motiveContext` / `contradictionContext` theo hạng mục, nếu trống thì `ai_context`.
+  - Ví dụ đạt/trượt: `answer_config.motiveValidCases` / `motiveInvalidCases` / `contradictionValidCases` / `contradictionInvalidCases`. Hạng mục chưa có ví dụ riêng thì dùng `ai_valid_cases` / `ai_invalid_cases` cũ dùng chung.
+  - Bỏ trống lập luận: trượt nếu checkpoint có bối cảnh do GM biên soạn, đạt nếu không có.
+  - Chỉ dẫn chấm gửi qua `systemInstruction`; câu trả lời đi riêng trong `contents`, bọc trong `<cau_tra_loi>`, prompt coi đó là dữ liệu, không phải lệnh.
+  - Client chỉ cho qua khi server lỗi 5xx (Gemini hết quota, mạng). Lỗi 429 hoặc 4xx đều tính là trượt.
 - Mã bypass (`0`, `000`, `admin`, `doc_000`...): chỉ có hiệu lực khi `NODE_ENV !== "production"` hoặc người gửi có session admin.
 - Migration 48 bỏ quyền `anon` đọc bảng gốc `case_checkpoints`. Chạy sau khi deploy code này.
 

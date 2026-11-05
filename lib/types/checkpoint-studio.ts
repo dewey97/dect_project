@@ -15,8 +15,7 @@ import { slugifyVietnamese, asStringArray, cleanList } from "@/lib/text";
  */
 export type CheckpointStudioType = string;
 
-export type CheckpointHintGroup =
-  "general" | "motive" | "contradiction";
+export type CheckpointHintGroup = "general" | "motive" | "contradiction";
 
 export interface CheckpointHint {
   group: CheckpointHintGroup;
@@ -49,9 +48,15 @@ export interface EvidencePickerConfig {
   motiveEvidenceIds: string[];
   optionalMotiveIds: string[];
   motiveContext?: string;
+  /** Ví dụ đạt / trượt riêng cho lập luận Động cơ (AI chấm). */
+  motiveValidCases?: string[];
+  motiveInvalidCases?: string[];
   contradictionEvidenceIds: string[];
   optionalContradictionIds: string[];
   contradictionContext?: string;
+  /** Ví dụ đạt / trượt riêng cho lập luận Mâu thuẫn lời khai (AI chấm). */
+  contradictionValidCases?: string[];
+  contradictionInvalidCases?: string[];
   correctAnswer?: string;
   options?: string[];
   unlocksDossier?: string;
@@ -152,11 +157,21 @@ function asString(value: unknown): string {
 }
 
 function normalizeHintGroup(value: unknown): CheckpointHintGroup {
-  return value === "motive" ||
-    value === "contradiction" ||
-    value === "general"
+  return value === "motive" || value === "contradiction" || value === "general"
     ? value
     : "general";
+}
+
+/** Chỉ ghi các danh sách có nội dung, tránh rác `[]` trong `answer_config`. */
+function nonEmptyLists(
+  lists: Record<string, string[] | undefined>,
+): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const [key, value] of Object.entries(lists)) {
+    const cleaned = cleanList(value ?? []);
+    if (cleaned.length > 0) out[key] = cleaned;
+  }
+  return out;
 }
 
 function parseConfig(
@@ -171,11 +186,15 @@ function parseConfig(
     motiveEvidenceIds: asStringArray(source.motiveEvidenceIds),
     optionalMotiveIds: asStringArray(source.optionalMotiveIds),
     motiveContext: asString(source.motiveContext || source.motive_context),
+    motiveValidCases: asStringArray(source.motiveValidCases),
+    motiveInvalidCases: asStringArray(source.motiveInvalidCases),
     contradictionEvidenceIds: asStringArray(source.contradictionEvidenceIds),
     optionalContradictionIds: asStringArray(source.optionalContradictionIds),
     contradictionContext: asString(
       source.contradictionContext || source.contradiction_context,
     ),
+    contradictionValidCases: asStringArray(source.contradictionValidCases),
+    contradictionInvalidCases: asStringArray(source.contradictionInvalidCases),
     correctAnswer:
       asString(source.correctAnswer) || asString(source.correct_answer),
     options: asStringArray(source.options),
@@ -250,9 +269,10 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     aiInvalidCases: asStringArray(row.ai_invalid_cases),
     boardConfig: {
       ...((row.board_config as BoardConfig) || {}),
-      pin_title: (row.board_config as BoardConfig)?.pin_title !== undefined
-        ? (row.board_config as BoardConfig).pin_title
-        : asString(row.title),
+      pin_title:
+        (row.board_config as BoardConfig)?.pin_title !== undefined
+          ? (row.board_config as BoardConfig).pin_title
+          : asString(row.title),
     },
   };
 }
@@ -301,6 +321,12 @@ export function toRowPayload(
       ...(draft.answerConfig.motiveContext?.trim()
         ? { motiveContext: draft.answerConfig.motiveContext.trim() }
         : {}),
+      ...nonEmptyLists({
+        motiveValidCases: draft.answerConfig.motiveValidCases,
+        motiveInvalidCases: draft.answerConfig.motiveInvalidCases,
+        contradictionValidCases: draft.answerConfig.contradictionValidCases,
+        contradictionInvalidCases: draft.answerConfig.contradictionInvalidCases,
+      }),
       contradictionEvidenceIds: cleanList(
         draft.answerConfig.contradictionEvidenceIds,
       ),

@@ -350,10 +350,7 @@ export function AddSuspectModal({
     reasonText: string,
     charId: string,
   ): Promise<{ isCorrect: boolean; feedback: string }> => {
-    if (!reasonText.trim()) {
-      return { isCorrect: true, feedback: "" };
-    }
-
+    // Luôn hỏi server, kể cả khi bỏ trống: server biết checkpoint có bắt buộc lập luận không.
     setIsVerifyingAI(true);
     try {
       const res = await fetch("/api/scan-answer", {
@@ -368,9 +365,18 @@ export function AddSuspectModal({
         }),
       });
 
-      if (!res.ok) {
-        // Nếu API lỗi tạm thời (hết quota / mạng), không chặn người chơi nếu mã chứng cứ đã đúng
+      if (res.status === 429) {
+        return {
+          isCorrect: false,
+          feedback: "Bạn gửi lập luận quá nhanh. Đợi giây lát rồi thử lại.",
+        };
+      }
+      if (res.status >= 500) {
+        // Server / Gemini lỗi tạm thời (hết quota, mạng): không chặn người chơi khi mã chứng cứ đã đúng.
         return { isCorrect: true, feedback: "Xác nhận căn cứ lập luận." };
+      }
+      if (!res.ok) {
+        return { isCorrect: false, feedback: "Không kiểm tra được lập luận." };
       }
 
       const data = await res.json();
@@ -644,14 +650,14 @@ export function AddSuspectModal({
     }
 
     const charId = matchedChar.id as string;
-    const hasMotiveReqs =
-      Boolean(matchedCheckpoint?.pickerConfig?.hasMotive);
+    const hasMotiveReqs = Boolean(matchedCheckpoint?.pickerConfig?.hasMotive);
     const isMotiveOk =
       !hasMotiveReqs ||
       verifiedKeys.motive === clueKey(effectiveMotiveClues) ||
       (await verifyStage("motive", effectiveMotiveClues));
-    const hasContradictionReqs =
-      Boolean(matchedCheckpoint?.pickerConfig?.hasContradiction);
+    const hasContradictionReqs = Boolean(
+      matchedCheckpoint?.pickerConfig?.hasContradiction,
+    );
     const isContradictionOk =
       !hasContradictionReqs ||
       verifiedKeys.contradiction === clueKey(effectiveContradictionClues) ||
@@ -689,9 +695,7 @@ export function AddSuspectModal({
     onClose();
   };
 
-  const isValidName =
-    !!matchedChar &&
-    (matchedChar as any).role !== "victim";
+  const isValidName = !!matchedChar && (matchedChar as any).role !== "victim";
   const hasInterrogationReqs = !!(
     Boolean(matchedCheckpoint?.pickerConfig?.hasMotive) ||
     Boolean(matchedCheckpoint?.pickerConfig?.hasContradiction)
@@ -699,16 +703,16 @@ export function AddSuspectModal({
   const isCore = !!matchedChar && hasInterrogationReqs;
 
   // Hiển thị tích xanh khi các manh mối được chọn đạt đủ điều kiện của đối tượng
-  const hasMotiveReqs =
-    Boolean(matchedCheckpoint?.pickerConfig?.hasMotive);
+  const hasMotiveReqs = Boolean(matchedCheckpoint?.pickerConfig?.hasMotive);
   const isMotiveValid =
     matchedChar && isCore
       ? hasMotiveReqs
         ? verifiedKeys.motive === clueKey(motiveClueIds)
         : motiveClueIds.length > 0
       : false;
-  const hasContradictionReqs =
-    Boolean(matchedCheckpoint?.pickerConfig?.hasContradiction);
+  const hasContradictionReqs = Boolean(
+    matchedCheckpoint?.pickerConfig?.hasContradiction,
+  );
   const isContradictionValid =
     matchedChar && isCore
       ? hasContradictionReqs
@@ -764,255 +768,252 @@ export function AddSuspectModal({
         "relative bg-[#f6f1e5] text-[#1a120b] select-text paper-scrollbar flex flex-col",
         embedded
           ? "w-full px-4 pt-2.5 pb-3 border-0"
-          : "w-full max-w-2xl border-2 border-[#2b1f14] p-5 sm:p-7 rounded-none max-h-[90vh] overflow-y-auto cursor-default"
+          : "w-full max-w-2xl border-2 border-[#2b1f14] p-5 sm:p-7 rounded-none max-h-[90vh] overflow-y-auto cursor-default",
       )}
     >
-          {/* TOP RIGHT ACTIONS */}
-          <div className="absolute top-2.5 right-3 flex items-center gap-2 z-20 pointer-events-auto">
-            <button
-              type="button"
-              onClick={handleDirectClose}
-              className="p-1 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer border border-[#5c4026]/40"
-              title="Đóng"
-            >
-              <X className="size-4.5 pointer-events-none" />
-            </button>
+      {/* TOP RIGHT ACTIONS */}
+      <div className="absolute top-2.5 right-3 flex items-center gap-2 z-20 pointer-events-auto">
+        <button
+          type="button"
+          onClick={handleDirectClose}
+          className="p-1 text-[#2b1f14] hover:bg-[#2b1f14]/10 transition-colors cursor-pointer border border-[#5c4026]/40"
+          title="Đóng"
+        >
+          <X className="size-4.5 pointer-events-none" />
+        </button>
+      </div>
+
+      {/* DOCUMENT HEADER & QUESTION */}
+      {embedded ? (
+        /* Canvas View: Tiêu đề và Tên đối tượng trên cùng 1 dòng */
+        <div className="flex items-center gap-2 pr-10 flex-wrap">
+          <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e] shrink-0">
+            {subTileView === "motive"
+              ? "ĐỘNG CƠ:"
+              : subTileView === "contradiction"
+                ? "MÂU THUẪN LỜI KHAI:"
+                : "THẨM TRA ĐỐI TƯỢNG:"}
+          </h3>
+          <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-lg font-bold text-[#0e2b5c] normal-case tracking-normal">
+            {name || editingSuspect?.name || "Đối tượng điều tra"}
+          </div>
+          {errorMsg && (
+            <p className="w-full text-xs text-red-700 font-mono font-bold mt-0.5">
+              ⚠️ {errorMsg}
+            </p>
+          )}
+        </div>
+      ) : (
+        /* Standalone Modal: Layout 2 dòng tiêu chuẩn kèm ảnh đại diện */
+        <div className="space-y-1.5 pr-8">
+          <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e]">
+            {subTileView === "motive"
+              ? "ĐỘNG CƠ"
+              : subTileView === "contradiction"
+                ? "MÂU THUẪN LỜI KHAI"
+                : "THẨM TRA ĐỐI TƯỢNG"}
+          </h3>
+
+          <div className="pt-0.5 flex items-center gap-3">
+            {matchedChar?.avatarUrl && (
+              <img
+                src={matchedChar.avatarUrl}
+                alt={name || editingSuspect?.name || "Đối tượng"}
+                className="size-10 rounded-full object-cover border border-[#2b1f14]/20 shadow-xs shrink-0"
+              />
+            )}
+            <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-xl font-bold text-[#0e2b5c] normal-case tracking-normal">
+              {name || editingSuspect?.name || "Đối tượng điều tra"}
+            </div>
           </div>
 
-          {/* DOCUMENT HEADER & QUESTION */}
-          {embedded ? (
-            /* Canvas View: Tiêu đề và Tên đối tượng trên cùng 1 dòng */
-            <div className="flex items-center gap-2 pr-10 flex-wrap">
-              <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e] shrink-0">
-                {subTileView === "motive"
-                  ? "ĐỘNG CƠ:"
-                  : subTileView === "contradiction"
-                    ? "MÂU THUẪN LỜI KHAI:"
-                    : "THẨM TRA ĐỐI TƯỢNG:"}
-              </h3>
-              <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-lg font-bold text-[#0e2b5c] normal-case tracking-normal">
-                {name || editingSuspect?.name || "Đối tượng điều tra"}
-              </div>
-              {errorMsg && (
-                <p className="w-full text-xs text-red-700 font-mono font-bold mt-0.5">
-                  ⚠️ {errorMsg}
-                </p>
-              )}
-            </div>
-          ) : (
-            /* Standalone Modal: Layout 2 dòng tiêu chuẩn kèm ảnh đại diện */
-            <div className="space-y-1.5 pr-8">
-              <h3 className="font-mono text-xs sm:text-sm font-bold uppercase tracking-wider text-[#6b4e2e]">
-                {subTileView === "motive"
-                  ? "ĐỘNG CƠ"
-                  : subTileView === "contradiction"
-                    ? "MÂU THUẪN LỜI KHAI"
-                    : "THẨM TRA ĐỐI TƯỢNG"}
-              </h3>
-
-              <div className="pt-0.5 flex items-center gap-3">
-                {matchedChar?.avatarUrl && (
-                  <img
-                    src={matchedChar.avatarUrl}
-                    alt={name || editingSuspect?.name || "Đối tượng"}
-                    className="size-10 rounded-full object-cover border border-[#2b1f14]/20 shadow-xs shrink-0"
-                  />
-                )}
-                <div className="font-[family-name:var(--font-handwriting)] text-base sm:text-xl font-bold text-[#0e2b5c] normal-case tracking-normal">
-                  {name || editingSuspect?.name || "Đối tượng điều tra"}
-                </div>
-              </div>
-
-              {errorMsg && (
-                <p className="text-xs text-red-700 font-mono font-bold mt-1">
-                  ⚠️ {errorMsg}
-                </p>
-              )}
-            </div>
+          {errorMsg && (
+            <p className="text-xs text-red-700 font-mono font-bold mt-1">
+              ⚠️ {errorMsg}
+            </p>
           )}
+        </div>
+      )}
 
-          {/* FORM BODY */}
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-4 pt-2">
-            {/* 3-TILE OVERVIEW VIEW */}
-            {subTileView === "overview" && (
-              <>
-                <div className="space-y-3 pt-1">
-                  <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
-                    HẠNG MỤC:
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 items-stretch">
-                    {/* Tile 1: ĐỘNG CƠ GÂY ÁN */}
-                    <button
-                      type="button"
-                      disabled={isMotiveValid}
-                      onClick={() => {
-                        if (isMotiveValid) return;
-                        detectiveAudio.playTypewriterClick();
-                        setErrorMsg("");
-                        setSubTileView("motive");
-                      }}
-                      className={cn(
-                        "w-full text-left p-3 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]",
-                        isMotiveValid
-                          ? "bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95"
-                          : "bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer",
-                      )}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
-                          Động cơ gây án
-                        </span>
-                        {isMotiveValid && (
-                          <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
-                        )}
-                      </div>
-                    </button>
-
-                    {/* Tile 3: MÂU THUẪN LỜI KHAI */}
-                    <button
-                      type="button"
-                      disabled={isContradictionValid}
-                      onClick={() => {
-                        if (isContradictionValid) return;
-                        detectiveAudio.playTypewriterClick();
-                        setErrorMsg("");
-                        setSubTileView("contradiction");
-                      }}
-                      className={cn(
-                        "w-full text-left p-3 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]",
-                        isContradictionValid
-                          ? "bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95"
-                          : "bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer",
-                      )}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
-                          Mâu thuẫn lời khai
-                        </span>
-                        {isContradictionValid && (
-                          <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
-                        )}
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Sub-View for Tile 1: MOTIVE / ĐỘNG CƠ GÂY ÁN */}
-            {subTileView === "motive" && (
-              <InterrogationClueStep
-                category="motive"
-                clueIds={motiveClueIds}
-                reason={motiveReason}
-                onReasonChange={setMotiveReason}
-                isLoading={isVerifyingAI}
-                embedded={embedded}
-                onAddClueId={(id) => {
-                  setMotiveClueIds((prev) =>
-                    prev.includes(id) ? prev : [...prev, id],
-                  );
-                  if (errorMsg) setErrorMsg("");
-                }}
-                onRemoveClueId={(id) => {
-                  setMotiveClueIds((prev) =>
-                    prev.filter((item) => item !== id),
-                  );
-                }}
-                onPendingChange={(pending) => {
-                  pendingMotiveRef.current = pending;
-                }}
-                checkpointId={suspectCpId}
-                caseId={caseId}
-                onBack={() => setSubTileView("overview")}
-                onConfirm={handleConfirmMotiveClues}
-              />
-            )}
-
-            {/* Sub-View for Tile 3: CONTRADICTION / MÂU THUẪN LỜI KHAI */}
-            {subTileView === "contradiction" && (
-              <InterrogationClueStep
-                category="contradiction"
-                clueIds={contradictionClueIds}
-                reason={contradictionReason}
-                onReasonChange={setContradictionReason}
-                isLoading={isVerifyingAI}
-                embedded={embedded}
-                onAddClueId={(id) => {
-                  setContradictionClueIds((prev) =>
-                    prev.includes(id) ? prev : [...prev, id],
-                  );
-                  if (errorMsg) setErrorMsg("");
-                }}
-                onRemoveClueId={(id) => {
-                  setContradictionClueIds((prev) =>
-                    prev.filter((item) => item !== id),
-                  );
-                }}
-                onPendingChange={(pending) => {
-                  pendingContradictionRef.current = pending;
-                }}
-                checkpointId={suspectCpId}
-                caseId={caseId}
-                onBack={() => setSubTileView("overview")}
-                onConfirm={handleConfirmContradictionClues}
-              />
-            )}
-
-            {/* ACTION TOOLBAR: SAVE & SUBMIT (ONLY VISIBLE ON OVERVIEW) */}
-            {subTileView === "overview" && (
-              embedded ? (
-                /* Canvas View (embedded): Chỉ hiện nút ĐIỀU TRA khi cả 2 hạng mục hợp lệ, không hiện nút xóa */
-                isBothValid ? (
-                  <div className="pt-2 flex items-center justify-end select-none">
-                    <button
-                      type="button"
-                      onClick={handleSubmitConclusion}
-                      className="h-9 px-5 rounded-none font-bold font-mono text-xs uppercase tracking-wider transition-all border-2 cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95 flex items-center justify-center whitespace-nowrap shrink-0 animate-in fade-in zoom-in-95 duration-200"
-                    >
-                      <span>ĐIỀU TRA</span>
-                    </button>
-                  </div>
-                ) : null
-              ) : (
-                /* Standalone Modal View (!embedded): Giữ nguyên nút Xóa và nút ĐIỀU TRA với disabled state */
-                <div className="pt-3 flex items-center justify-between gap-2 select-none">
-                  <div>
-                    {editingSuspect && onDelete && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          detectiveAudio.playGlassSound();
-                          onDelete(editingSuspect.id);
-                          onClose();
-                        }}
-                        title="Xóa hồ sơ nghi phạm"
-                        className="h-10 px-3 rounded-none border-2 border-[#a81c1c] bg-[#fce8e6] hover:bg-[#f8d7d4] text-[#a81c1c] transition-all cursor-pointer flex items-center justify-center active:scale-95 shrink-0 shadow-xs"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
+      {/* FORM BODY */}
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-4 pt-2">
+        {/* 3-TILE OVERVIEW VIEW */}
+        {subTileView === "overview" && (
+          <>
+            <div className="space-y-3 pt-1">
+              <label className="text-xs font-mono font-bold text-[#4a3520] block uppercase tracking-wider">
+                HẠNG MỤC:
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 items-stretch">
+                {/* Tile 1: ĐỘNG CƠ GÂY ÁN */}
+                <button
+                  type="button"
+                  disabled={isMotiveValid}
+                  onClick={() => {
+                    if (isMotiveValid) return;
+                    detectiveAudio.playTypewriterClick();
+                    setErrorMsg("");
+                    setSubTileView("motive");
+                  }}
+                  className={cn(
+                    "w-full text-left p-3 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]",
+                    isMotiveValid
+                      ? "bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95"
+                      : "bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer",
+                  )}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
+                      Động cơ gây án
+                    </span>
+                    {isMotiveValid && (
+                      <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
                     )}
                   </div>
+                </button>
 
-                  <div className="flex items-center gap-2.5 ml-auto">
-                    <button
-                      type="button"
-                      disabled={!isBothValid}
-                      onClick={handleSubmitConclusion}
-                      className={cn(
-                        "h-10 px-5 rounded-none font-bold font-mono text-xs uppercase tracking-wider transition-all border-2 flex items-center justify-center whitespace-nowrap shrink-0",
-                        isBothValid
-                          ? "cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
-                          : "opacity-40 cursor-not-allowed bg-[#2b1f14]/50 text-[#f6f1e5]/60 border-[#2b1f14]/40",
-                      )}
-                    >
-                      <span>ĐIỀU TRA</span>
-                    </button>
+                {/* Tile 3: MÂU THUẪN LỜI KHAI */}
+                <button
+                  type="button"
+                  disabled={isContradictionValid}
+                  onClick={() => {
+                    if (isContradictionValid) return;
+                    detectiveAudio.playTypewriterClick();
+                    setErrorMsg("");
+                    setSubTileView("contradiction");
+                  }}
+                  className={cn(
+                    "w-full text-left p-3 border-2 transition-all flex items-center justify-between select-none relative group h-full min-h-[64px]",
+                    isContradictionValid
+                      ? "bg-[#e7f0dc] border-[#2e5220] text-[#193310] shadow-sm cursor-not-allowed opacity-95"
+                      : "bg-[#f4ebd9] border-[#d4c5b0] hover:border-[#4a3520] text-[#3d2f22] cursor-pointer",
+                  )}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#1a120b] leading-tight">
+                      Mâu thuẫn lời khai
+                    </span>
+                    {isContradictionValid && (
+                      <Check className="size-5 text-[#2e5220] stroke-[2.5]" />
+                    )}
                   </div>
-                </div>
-              )
-            )}
-          </form>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Sub-View for Tile 1: MOTIVE / ĐỘNG CƠ GÂY ÁN */}
+        {subTileView === "motive" && (
+          <InterrogationClueStep
+            category="motive"
+            clueIds={motiveClueIds}
+            reason={motiveReason}
+            onReasonChange={setMotiveReason}
+            isLoading={isVerifyingAI}
+            embedded={embedded}
+            onAddClueId={(id) => {
+              setMotiveClueIds((prev) =>
+                prev.includes(id) ? prev : [...prev, id],
+              );
+              if (errorMsg) setErrorMsg("");
+            }}
+            onRemoveClueId={(id) => {
+              setMotiveClueIds((prev) => prev.filter((item) => item !== id));
+            }}
+            onPendingChange={(pending) => {
+              pendingMotiveRef.current = pending;
+            }}
+            checkpointId={suspectCpId}
+            caseId={caseId}
+            onBack={() => setSubTileView("overview")}
+            onConfirm={handleConfirmMotiveClues}
+          />
+        )}
+
+        {/* Sub-View for Tile 3: CONTRADICTION / MÂU THUẪN LỜI KHAI */}
+        {subTileView === "contradiction" && (
+          <InterrogationClueStep
+            category="contradiction"
+            clueIds={contradictionClueIds}
+            reason={contradictionReason}
+            onReasonChange={setContradictionReason}
+            isLoading={isVerifyingAI}
+            embedded={embedded}
+            onAddClueId={(id) => {
+              setContradictionClueIds((prev) =>
+                prev.includes(id) ? prev : [...prev, id],
+              );
+              if (errorMsg) setErrorMsg("");
+            }}
+            onRemoveClueId={(id) => {
+              setContradictionClueIds((prev) =>
+                prev.filter((item) => item !== id),
+              );
+            }}
+            onPendingChange={(pending) => {
+              pendingContradictionRef.current = pending;
+            }}
+            checkpointId={suspectCpId}
+            caseId={caseId}
+            onBack={() => setSubTileView("overview")}
+            onConfirm={handleConfirmContradictionClues}
+          />
+        )}
+
+        {/* ACTION TOOLBAR: SAVE & SUBMIT (ONLY VISIBLE ON OVERVIEW) */}
+        {subTileView === "overview" &&
+          (embedded ? (
+            /* Canvas View (embedded): Chỉ hiện nút ĐIỀU TRA khi cả 2 hạng mục hợp lệ, không hiện nút xóa */
+            isBothValid ? (
+              <div className="pt-2 flex items-center justify-end select-none">
+                <button
+                  type="button"
+                  onClick={handleSubmitConclusion}
+                  className="h-9 px-5 rounded-none font-bold font-mono text-xs uppercase tracking-wider transition-all border-2 cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95 flex items-center justify-center whitespace-nowrap shrink-0 animate-in fade-in zoom-in-95 duration-200"
+                >
+                  <span>ĐIỀU TRA</span>
+                </button>
+              </div>
+            ) : null
+          ) : (
+            /* Standalone Modal View (!embedded): Giữ nguyên nút Xóa và nút ĐIỀU TRA với disabled state */
+            <div className="pt-3 flex items-center justify-between gap-2 select-none">
+              <div>
+                {editingSuspect && onDelete && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      detectiveAudio.playGlassSound();
+                      onDelete(editingSuspect.id);
+                      onClose();
+                    }}
+                    title="Xóa hồ sơ nghi phạm"
+                    className="h-10 px-3 rounded-none border-2 border-[#a81c1c] bg-[#fce8e6] hover:bg-[#f8d7d4] text-[#a81c1c] transition-all cursor-pointer flex items-center justify-center active:scale-95 shrink-0 shadow-xs"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2.5 ml-auto">
+                <button
+                  type="button"
+                  disabled={!isBothValid}
+                  onClick={handleSubmitConclusion}
+                  className={cn(
+                    "h-10 px-5 rounded-none font-bold font-mono text-xs uppercase tracking-wider transition-all border-2 flex items-center justify-center whitespace-nowrap shrink-0",
+                    isBothValid
+                      ? "cursor-pointer shadow-md bg-[#2b1f14] hover:bg-[#140d08] text-[#f6f1e5] border-[#2b1f14] active:scale-95"
+                      : "opacity-40 cursor-not-allowed bg-[#2b1f14]/50 text-[#f6f1e5]/60 border-[#2b1f14]/40",
+                  )}
+                >
+                  <span>ĐIỀU TRA</span>
+                </button>
+              </div>
+            </div>
+          ))}
+      </form>
     </div>
   );
 

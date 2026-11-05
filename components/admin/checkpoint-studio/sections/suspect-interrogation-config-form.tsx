@@ -26,7 +26,7 @@ export function SuspectInterrogationConfigForm({
   const [activeTab, setActiveTab] = useState<TabKey>("motive");
   const config = draft.answerConfig;
 
-  const setList = (key: ConfigListKey, value: string[]) => {
+  const setList = (key: ConfigListKey, value: string[] | undefined) => {
     onChange({ answerConfig: { ...config, [key]: value } });
   };
 
@@ -94,33 +94,21 @@ export function SuspectInterrogationConfigForm({
             />
           </Field>
 
-          <Field label="Thế nào là đúng (Ví dụ đạt)">
-            <AutoGrowTextarea
-              value={(draft.aiValidCases || []).join("\n")}
-              onChange={(e) =>
-                onChange({
-                  aiValidCases: e.target.value.split("\n").filter(Boolean),
-                })
-              }
-              minRows={2}
-              className="min-h-8"
-              placeholder="Nhập từng tiêu chí hoặc ví dụ đạt (mỗi dòng một câu)..."
-            />
-          </Field>
+          <ExampleListField
+            label="Thế nào là đúng (Ví dụ đạt)"
+            value={config.motiveValidCases}
+            onChange={(value) => setList("motiveValidCases", value)}
+            placeholder="Mỗi dòng một câu trả lời đạt..."
+          />
 
-          <Field label="Thế nào là sai (Ví dụ không đạt)">
-            <AutoGrowTextarea
-              value={(draft.aiInvalidCases || []).join("\n")}
-              onChange={(e) =>
-                onChange({
-                  aiInvalidCases: e.target.value.split("\n").filter(Boolean),
-                })
-              }
-              minRows={2}
-              className="min-h-8"
-              placeholder="Nhập từng lý do hoặc câu trả lời không đạt (mỗi dòng một câu)..."
-            />
-          </Field>
+          <ExampleListField
+            label="Thế nào là sai (Ví dụ không đạt)"
+            value={config.motiveInvalidCases}
+            onChange={(value) => setList("motiveInvalidCases", value)}
+            placeholder="Mỗi dòng một câu trả lời không đạt..."
+          />
+
+          <LegacySharedExamples draft={draft} onChange={onChange} />
 
           <CheckpointHintsForm
             draft={draft}
@@ -168,33 +156,21 @@ export function SuspectInterrogationConfigForm({
             />
           </Field>
 
-          <Field label="Thế nào là đúng (Ví dụ đạt)">
-            <AutoGrowTextarea
-              value={(draft.aiValidCases || []).join("\n")}
-              onChange={(e) =>
-                onChange({
-                  aiValidCases: e.target.value.split("\n").filter(Boolean),
-                })
-              }
-              minRows={2}
-              className="min-h-8"
-              placeholder="Nhập từng tiêu chí hoặc ví dụ đạt (mỗi dòng một câu)..."
-            />
-          </Field>
+          <ExampleListField
+            label="Thế nào là đúng (Ví dụ đạt)"
+            value={config.contradictionValidCases}
+            onChange={(value) => setList("contradictionValidCases", value)}
+            placeholder="Mỗi dòng một câu trả lời đạt..."
+          />
 
-          <Field label="Thế nào là sai (Ví dụ không đạt)">
-            <AutoGrowTextarea
-              value={(draft.aiInvalidCases || []).join("\n")}
-              onChange={(e) =>
-                onChange({
-                  aiInvalidCases: e.target.value.split("\n").filter(Boolean),
-                })
-              }
-              minRows={2}
-              className="min-h-8"
-              placeholder="Nhập từng lý do hoặc câu trả lời không đạt (mỗi dòng một câu)..."
-            />
-          </Field>
+          <ExampleListField
+            label="Thế nào là sai (Ví dụ không đạt)"
+            value={config.contradictionInvalidCases}
+            onChange={(value) => setList("contradictionInvalidCases", value)}
+            placeholder="Mỗi dòng một câu trả lời không đạt..."
+          />
+
+          <LegacySharedExamples draft={draft} onChange={onChange} />
 
           <CheckpointHintsForm
             draft={draft}
@@ -205,6 +181,74 @@ export function SuspectInterrogationConfigForm({
           />
         </div>
       )}
+    </div>
+  );
+}
+
+function ExampleListField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string[] | undefined;
+  onChange: (value: string[]) => void;
+  placeholder: string;
+}) {
+  return (
+    <Field label={label}>
+      <AutoGrowTextarea
+        value={(value || []).join("\n")}
+        onChange={(e) => onChange(e.target.value.split("\n"))}
+        minRows={2}
+        className="min-h-8"
+        placeholder={placeholder}
+      />
+    </Field>
+  );
+}
+
+/**
+ * Dữ liệu cũ: `ai_valid_cases` / `ai_invalid_cases` dùng chung cho cả 2 hạng mục.
+ * Server chỉ dùng khi hạng mục chưa có ví dụ riêng. Hiện để GM chia lại rồi xóa.
+ */
+function LegacySharedExamples({
+  draft,
+  onChange,
+}: SuspectInterrogationConfigFormProps) {
+  const valid = draft.aiValidCases.filter((line) => line.trim());
+  const invalid = draft.aiInvalidCases.filter((line) => line.trim());
+  if (valid.length === 0 && invalid.length === 0) return null;
+
+  return (
+    <div className="space-y-1.5 rounded-md border border-amber-500/30 bg-amber-500/5 p-2 text-xs text-amber-200">
+      <p className="font-semibold">Ví dụ cũ đang dùng chung cho cả 2 phần</p>
+      <p className="text-amber-200/70">
+        AI dùng danh sách này cho phần nào chưa có ví dụ riêng. Chép từng câu
+        sang đúng phần ở trên, rồi xóa danh sách cũ.
+      </p>
+      {valid.length > 0 && (
+        <ul className="list-disc space-y-0.5 pl-4">
+          {valid.map((line, i) => (
+            <li key={`v-${i}`}>Đạt: {line}</li>
+          ))}
+        </ul>
+      )}
+      {invalid.length > 0 && (
+        <ul className="list-disc space-y-0.5 pl-4">
+          {invalid.map((line, i) => (
+            <li key={`i-${i}`}>Trượt: {line}</li>
+          ))}
+        </ul>
+      )}
+      <button
+        type="button"
+        onClick={() => onChange({ aiValidCases: [], aiInvalidCases: [] })}
+        className="min-h-8 rounded border border-amber-500/40 px-2 py-1 font-semibold hover:bg-amber-500/10"
+      >
+        Xóa ví dụ dùng chung
+      </button>
     </div>
   );
 }
