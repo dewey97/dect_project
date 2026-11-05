@@ -12,6 +12,7 @@ import type {
 import { revalidatePath } from "next/cache";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
 import { requireAdminAuth } from "@/lib/auth/admin";
+import { lintCase } from "@/lib/checkpoints/case-linter";
 import { duplicatePhoneData } from "./phone-actions";
 import { duplicateEvidenceData } from "./evidence-actions";
 
@@ -231,6 +232,11 @@ export async function updateCase(
     await requireAdminAuth();
     const supabase = await createClient();
 
+    if (updates.status === "PUBLISHED") {
+      const blocker = await findPublishBlocker(supabase, caseId);
+      if (blocker) return { success: false, error: blocker };
+    }
+
     const { data, error } = await supabase
       .from("cases")
       .update({
@@ -254,6 +260,43 @@ export async function updateCase(
       error: error instanceof Error ? error.message : String(error),
     };
   }
+}
+
+/**
+ * Chặn chuyển sang PUBLISHED khi Checkpoint Studio linter còn lỗi (level error).
+ * Case đã PUBLISHED thì không chặn lưu metadata; grader server tự chặn đáp án
+ * thiếu cấu hình.
+ */
+async function findPublishBlocker(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  caseId: string,
+): Promise<string | null> {
+  const { data: current, error: caseError } = await supabase
+    .from("cases")
+    .select("slug, status")
+    .eq("id", caseId)
+    .single();
+  if (caseError) throw caseError;
+  if (current.status === "PUBLISHED") return null;
+
+  const { data: checkpoints, error: cpError } = await supabase
+    .from("case_checkpoints")
+    .select("*")
+    .eq("case_id", current.slug);
+  if (cpError) throw cpError;
+
+  const errors = lintCase({
+    checkpoints: (checkpoints || []) as DbCaseCheckpoint[],
+  }).issues.filter((issue) => issue.level === "error");
+  if (errors.length === 0) return null;
+
+  const lines = errors
+    .slice(0, 3)
+    .map((issue) =>
+      issue.checkpointId ? `${issue.checkpointId}: ${issue.message}` : issue.message,
+    );
+  const more = errors.length > 3 ? ` (và ${errors.length - 3} lỗi khác)` : "";
+  return `Chưa thể xuất bản: Checkpoint Studio còn ${errors.length} lỗi. ${lines.join(" | ")}${more}`;
 }
 
 /** Xóa Vụ án */

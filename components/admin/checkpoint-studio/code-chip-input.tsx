@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,8 @@ interface CodeChipInputProps {
   onChange: (value: string[]) => void;
   placeholder?: string;
   className?: string;
+  /** Gợi ý mã có sẵn (datalist gốc của trình duyệt). */
+  suggestions?: { code: string; title?: string }[];
 }
 
 /** Ô nhập mã chứng cứ dạng chip: Enter, dấu phẩy hoặc dán nhiều mã cùng lúc. */
@@ -18,8 +20,10 @@ export function CodeChipInput({
   onChange,
   placeholder = "",
   className,
+  suggestions,
 }: CodeChipInputProps) {
   const [text, setText] = useState("");
+  const listId = useId();
 
   const commit = (raw: string) => {
     const separator = /[,;\n]/;
@@ -66,6 +70,7 @@ export function CodeChipInput({
 
       <Input
         value={text}
+        list={suggestions?.length ? listId : undefined}
         placeholder={placeholder}
         onChange={(event) => setText(event.target.value)}
         onKeyDown={(event) => {
@@ -86,6 +91,15 @@ export function CodeChipInput({
         }}
         className="h-6 min-w-28 flex-1 border-0 bg-transparent px-1 text-xs shadow-none focus-visible:ring-0 dark:bg-transparent"
       />
+      {suggestions?.length ? (
+        <datalist id={listId}>
+          {suggestions.map((item) => (
+            <option key={item.code} value={item.code}>
+              {item.title}
+            </option>
+          ))}
+        </datalist>
+      ) : null}
     </div>
   );
 }

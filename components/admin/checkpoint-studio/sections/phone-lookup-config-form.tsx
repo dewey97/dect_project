@@ -3,7 +3,9 @@
 import { Plus, Trash2 } from "lucide-react";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { CodeChipInput } from "../code-chip-input";
 
 interface PhoneLookupConfigFormProps {
   draft: CheckpointStudioDraft;
@@ -45,7 +47,7 @@ export function PhoneLookupConfigForm({
         id: nextId,
         label: `Mục tra cứu #${inputs.length + 1}`,
         placeholder: "Nhập thông tin tra cứu...",
-        validAnswers: [""],
+        validAnswers: [],
       },
     ]);
   };
@@ -85,7 +87,7 @@ export function PhoneLookupConfigForm({
       ) : (
         <div className="space-y-2">
           {inputs.map((item, index) => {
-            const currentAnswer = (item.validAnswers && item.validAnswers[0]) || "";
+            const answers = (item.validAnswers || []).filter((a) => a.trim());
             return (
               <div
                 key={item.id || index}
@@ -97,12 +99,7 @@ export function PhoneLookupConfigForm({
                   </span>
                   <Input
                     value={item.label}
-                    onChange={(e) =>
-                      updateItem(index, {
-                        label: e.target.value,
-                        placeholder: "Nhập họ tên đầy đủ...",
-                      })
-                    }
+                    onChange={(e) => updateItem(index, { label: e.target.value })}
                     placeholder="VD: Số điện thoại, Biển số xe, Từ khóa..."
                     className={INPUT_CLASS}
                   />
@@ -110,17 +107,16 @@ export function PhoneLookupConfigForm({
 
                 <label className="flex-1 space-y-1 min-w-0">
                   <span className="text-[10px] font-medium text-zinc-400">
-                    Đáp án
+                    Đáp án (mọi cách gọi chấp nhận)
                   </span>
-                  <Input
-                    value={currentAnswer}
-                    onChange={(e) => {
-                      updateItem(index, {
-                        validAnswers: [e.target.value],
-                      });
-                    }}
-                    placeholder="VD: Lê Quang Vũ..."
-                    className={INPUT_CLASS}
+                  <CodeChipInput
+                    value={answers}
+                    onChange={(validAnswers) => updateItem(index, { validAnswers })}
+                    placeholder="VD: Lê Quang Vũ, Vũ..."
+                    className={cn(
+                      "min-h-8 border-white/10 bg-black/40",
+                      answers.length === 0 && "border-rose-500/50",
+                    )}
                   />
                 </label>
 

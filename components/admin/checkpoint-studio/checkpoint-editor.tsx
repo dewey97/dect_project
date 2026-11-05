@@ -7,6 +7,7 @@ import type {
   DbCaseCharacter,
 } from "@/lib/types/database";
 import type { CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
+import type { AvailableDocumentItem } from "@/lib/actions/dossier-config-actions";
 import { Button } from "@/components/ui/button";
 import { CheckpointIdentityForm } from "./sections/checkpoint-identity-form";
 import { CheckpointBoardDisplayForm } from "./sections/checkpoint-board-display-form";
@@ -25,6 +26,8 @@ interface CheckpointEditorProps {
   dossiers?: DbCaseDossier[];
   characters?: DbCaseCharacter[];
   checkpoints?: DbCaseCheckpoint[];
+  /** Mã tài liệu / vật chứng của vụ, dùng làm gợi ý khi nhập mã. */
+  availableDocs?: AvailableDocumentItem[];
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
   onSave: () => void;
   onDelete: () => void;
@@ -55,6 +58,7 @@ export function CheckpointEditor({
   dossiers = [],
   characters = [],
   checkpoints = [],
+  availableDocs = [],
   onChange,
   onSave,
   onDelete,
@@ -216,7 +220,11 @@ export function CheckpointEditor({
             />
           ) : isIndictment ? (
             <>
-              <IndictmentConfigForm draft={draft} onChange={onChange} />
+              <IndictmentConfigForm
+                draft={draft}
+                availableDocs={availableDocs}
+                onChange={onChange}
+              />
               <Section title="Lời dẫn">
                 <CheckpointNarrativeForm draft={draft} onChange={onChange} />
               </Section>

@@ -197,11 +197,28 @@ export function lintCase(params: {
       const inputs = cfg.text_match_inputs || cfg.textMatchInputs;
       if (!Array.isArray(inputs) || inputs.length === 0) {
         issues.push({
-          level: "warning",
+          level: "error",
           checkpointId: cp.checkpoint_id,
           rule: "missing_answer",
           message: "Tra cứu danh bạ (phone_lookup) chưa cấu hình danh sách trường số điện thoại.",
         });
+      } else {
+        for (const input of inputs as Record<string, unknown>[]) {
+          const answers = Array.isArray(input?.validAnswers)
+            ? (input.validAnswers as unknown[])
+            : [];
+          const hasAnswer = answers.some(
+            (a) => typeof a === "string" && a.trim().length > 0,
+          );
+          if (!hasAnswer) {
+            issues.push({
+              level: "error",
+              checkpointId: cp.checkpoint_id,
+              rule: "missing_answer",
+              message: `Ô tra cứu "${String(input?.label || input?.id || "")}" chưa có đáp án.`,
+            });
+          }
+        }
       }
     } else if (kind === "suspect_interrogation") {
       const motive = cfg.motive_evidence_ids || cfg.motiveEvidenceIds || [];
@@ -229,7 +246,7 @@ export function lintCase(params: {
       }
       if (required.length === 0) {
         issues.push({
-          level: "warning",
+          level: "error",
           checkpointId: cp.checkpoint_id,
           rule: "missing_answer",
           message: "Cáo trạng chưa chỉ định danh sách mã chứng cứ bắt buộc (required_evidence_ids).",
@@ -241,9 +258,14 @@ export function lintCase(params: {
     if (availableEvidenceCodes.length > 0) {
       const codesToCheck = [
         ...(cfg.required_evidence_ids || cfg.requiredEvidenceIds || []),
+        ...(cfg.optional_evidence_ids || cfg.optionalEvidenceIds || []),
         ...(cfg.motive_evidence_ids || cfg.motiveEvidenceIds || []),
         ...(cfg.contradiction_evidence_ids ||
           cfg.contradictionEvidenceIds ||
+          []),
+        ...(cfg.optional_motive_ids || cfg.optionalMotiveIds || []),
+        ...(cfg.optional_contradiction_ids ||
+          cfg.optionalContradictionIds ||
           []),
         ...(cfg.photo_codes || cfg.photoCodes || []),
       ];
@@ -258,7 +280,7 @@ export function lintCase(params: {
         const clean = String(code).trim().toLowerCase().replace(/[^a-z0-9]/g, "");
         if (clean && !cleanPool.has(clean)) {
           issues.push({
-            level: "info",
+            level: "warning",
             checkpointId: cp.checkpoint_id,
             rule: "unknown_evidence_code",
             message: `Mã chứng cứ "${code}" không tìm thấy trong danh mục vật chứng của vụ án.`,

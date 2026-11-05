@@ -2048,6 +2048,7 @@ export function CheckpointStudioClient({
                     dossiers={dossiers}
                     characters={characters}
                     checkpoints={rows}
+                    availableDocs={availableDocs}
                     onChange={updateDraft}
                     onSave={handleSave}
                     onDelete={handleDelete}

@@ -10,6 +10,7 @@ import { isVietnameseTextMatch } from "@/lib/checkpoints/name-match";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 import {
   parseCheckpointConfig,
+  validateCheckpointConfig,
   type CheckpointKind,
   type FollowupConfig,
 } from "./kinds";
@@ -158,15 +159,19 @@ export function gradeCheckpoint(
     };
   }
 
+  // Thiếu đáp án thì chặn, không cho qua (fail-closed). Studio linter báo cùng lỗi.
+  if (
+    (config.kind === "phone_lookup" || config.kind === "indictment") &&
+    validateCheckpointConfig(config).length > 0
+  ) {
+    return {
+      correct: false,
+      feedback: "Câu hỏi này chưa được cấu hình đáp án. Vui lòng báo quản trò.",
+    };
+  }
+
   switch (config.kind) {
     case "phone_lookup": {
-      if (config.textMatchInputs.length === 0) {
-        return {
-          correct: false,
-          feedback:
-            "Checkpoint tra cứu danh bạ chưa được cấu hình danh sách số điện thoại.",
-        };
-      }
       const userInputs = sub.inputs || {};
       const allMatch = config.textMatchInputs.every((inp) =>
         inp.validAnswers.some((ans) =>
@@ -224,8 +229,7 @@ export function gradeCheckpoint(
       const culprit = config.validSuspects.find(
         (target) => normalizeForMatch(target).trim() === userSuspect,
       );
-      // Chưa cấu hình nghi phạm thì không chấm tên (Studio linter báo thiếu).
-      if (config.validSuspects.length > 0 && !culprit) {
+      if (!culprit) {
         return {
           correct: false,
           feedback:
@@ -244,13 +248,11 @@ export function gradeCheckpoint(
         return { correct: false, feedback: "Động cơ gây án chưa chính xác." };
       }
 
-      const evidenceOk =
-        config.requiredEvidenceIds.length === 0 ||
-        validateEvidenceSelection(
-          sub.selectedCodes || [],
-          config.requiredEvidenceIds,
-          config.optionalEvidenceIds,
-        );
+      const evidenceOk = validateEvidenceSelection(
+        sub.selectedCodes || [],
+        config.requiredEvidenceIds,
+        config.optionalEvidenceIds,
+      );
       if (!evidenceOk) {
         return {
           correct: false,
