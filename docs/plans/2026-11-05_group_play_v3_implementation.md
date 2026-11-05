@@ -1,6 +1,6 @@
 # Kế hoạch triển khai: Chơi nhóm v3 (ROADMAP #14)
 
-> **Trạng thái:** Đã duyệt 2026-11-05, kể cả D1–D7 theo đề xuất. P1–P7 và Q12 đã commit trên nhánh `claude/group-play-v3-5791c0` (chưa push). Chưa test với DB thật: migration 51 chưa chạy.
+> **Trạng thái:** Đã duyệt 2026-11-05, kể cả D1–D7 theo đề xuất. P1–P7 và Q12 đã commit trên nhánh `claude/group-play-v3-5791c0` (chưa push). Migration 51 đã chạy trên Supabase; smoke `rooms-smoke.mjs` 16/16 pass. E2E chưa chạy (cần DB E2E riêng, tạm bỏ qua). Còn: push/deploy, rồi migration 52.
 > **Spec gốc:** [`architecture/group_play_realtime.md`](../architecture/group_play_realtime.md) (chốt 2026-11-05). Kế hoạch này không thay đổi spec, trừ các điểm ghi ở mục 2 (cần duyệt).
 > **Ngoài phạm vi:** hệ thống điểm và bảng xếp hạng (Q2, Q8b ở mục 9.2 của spec, ROADMAP #15). Chơi nhóm bản online (Q11). Live cursor (#12) làm sau, kế hoạch này chỉ giữ tương thích.
 > **Không đụng:** `components/admin/checkpoint-studio/**`, `components/investigation/board/canvas/pin-builder.ts` (session khác đang sửa).
@@ -168,7 +168,8 @@ Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
 
 - **Đã làm:** provider tự gửi `claim` khi Host vắng Presence 60 giây và mình là thành viên online vào sớm nhất (server kiểm lại `last_seen_at`). E2E `e2e/group-play-v3.spec.ts` (3 người chơi: tạo phòng, mã sai, vào bằng mã, phòng chờ, Host bắt đầu, intro, tiếp nhận vụ án, người vào muộn, F5 giữ phòng; tự dọn phòng). Docs: spec mục 8.2 (bảng lỗi v1 → cách sửa), 4.2, 5.1; `database_schema.md`; `ROADMAP.md` #14; `TECHDEBT.md` #02, #24 mới; plan live cursor.
 - **Kiểm chứng:** `pnpm lint` pass. `pnpm build` (xem commit P7). E2E chạy được nhưng **skip**: chưa có DB E2E và migration 51 chưa chạy.
-- **Trước khi push:** chạy migration 51; chạy `node scripts/ops/rooms-smoke.mjs` và E2E với DB E2E; deploy; rồi chạy migration 52.
+- **Kết quả với DB thật (2026-11-05):** migration 51 đã chạy; `node scripts/ops/rooms-smoke.mjs` 16/16 bước pass, log server không có lỗi broadcast. Smoke để lại phòng đã kết thúc `2c59270e-89d9-4caa-a1ee-854cb4a2b284`. E2E tạm bỏ qua: chỉ chạy được với DB E2E riêng (`E2E_SUPABASE_URL`) hoặc ghi lên production.
+- **Còn lại:** push/deploy, rồi chạy migration 52; chạy E2E khi có DB E2E.
 
 ## 5. Rủi ro và điểm gãy
 
