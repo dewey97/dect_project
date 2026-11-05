@@ -21,6 +21,11 @@ export const resolveSuspectPhotoUrl = (
   // 1. Nếu pin có photoUrl chỉ định
   if (pin.photoUrl) return normalizeImageUrl(pin.photoUrl);
 
+  // 1b. Nếu displayMode là photo nhưng chưa có photoUrl, trả về avatar placeholder mặc định
+  if (pin.displayMode === "photo") {
+    return "/images/avatar_placeholder.svg";
+  }
+
   // 2. Blacklist: Các node loại câu hỏi, nghi vấn, tra cứu điện thoại, kết luận điều tra, hub
   const isQuestionOrNote =
     pin.nodeKind === "followup" ||
@@ -268,10 +273,10 @@ export const getCompositeCard = (
     ctx.save();
     ctx.fillStyle = "rgba(18, 20, 26, 0.96)";
     let fontSize = 23;
-    ctx.font = `900 ${fontSize}px Arial, "SF Pro Display", -apple-system, sans-serif`;
-    while (ctx.measureText(cleanLabel).width > cardW - 36 && fontSize > 14) {
+    ctx.font = `700 ${fontSize}px Inter, "Segoe UI", Roboto, Arial, sans-serif`;
+    while (ctx.measureText(cleanLabel).width > cardW - 36 && fontSize > 13) {
       fontSize -= 1;
-      ctx.font = `900 ${fontSize}px Arial, "SF Pro Display", -apple-system, sans-serif`;
+      ctx.font = `700 ${fontSize}px Inter, "Segoe UI", Roboto, Arial, sans-serif`;
     }
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";

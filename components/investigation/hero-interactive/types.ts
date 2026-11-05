@@ -69,6 +69,8 @@ export interface PinPoint {
   pulseBorder?: boolean;
   photoUrl?: string;
   isAvatar?: boolean;
+  isPolaroid?: boolean;
+  textScale?: number;
   displayMode?: "note" | "photo" | "badge";
   noteTemplate?: string;
   noteTextureUrl?: string;

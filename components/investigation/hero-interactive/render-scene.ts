@@ -276,8 +276,9 @@ export function renderScene({
           pin.nodeKind !== "phone_lookup" &&
           Boolean(pin.photoUrl));
 
+      const isPolaroid = pin.isPolaroid !== false;
       let loadedSuspectImg: HTMLCanvasElement | HTMLImageElement | null = null;
-      if (isReinvestigate || isVictimPhone) {
+      if (!isPolaroid || isReinvestigate || isVictimPhone) {
         loadedSuspectImg = getLoadedImage(resolvedPhotoUrl);
       } else {
         loadedSuspectImg = getCompositeCard(
@@ -782,15 +783,23 @@ export function renderScene({
       const maxTextWidth = noteWidth * (isWhiteNote ? 0.65 : 0.72);
       const availableHeight = noteHeight * (isWhiteNote ? 0.55 : 0.6);
 
+      const textScaleMod =
+        typeof pin.textScale === "number" && pin.textScale > 0
+          ? pin.textScale
+          : 1.0;
       let fontSize =
-        (isIndictment ? 15.5 : isWhiteNote ? 14.5 : 14.0) * scaleFactor;
+        (isIndictment ? 15.5 : isWhiteNote ? 14.5 : 14.0) *
+        scaleFactor *
+        textScaleMod;
       context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
       let lines = wrapText(context, pin.label, maxTextWidth, 3);
 
+      const minFontSize = 7.0 * scaleFactor * textScaleMod;
       while (
-        fontSize > 9.0 * scaleFactor &&
+        fontSize > minFontSize &&
         (lines.some((l) => context.measureText(l).width > maxTextWidth) ||
-          lines.length * ((fontSize + 1.5 * scaleFactor) / transform.scale) >
+          lines.length *
+            ((fontSize + 1.5 * scaleFactor * textScaleMod) / transform.scale) >
             availableHeight)
       ) {
         fontSize -= 0.5 * scaleFactor;
@@ -798,7 +807,8 @@ export function renderScene({
         lines = wrapText(context, pin.label, maxTextWidth, 3);
       }
 
-      const lineHeight = (fontSize + 1.5 * scaleFactor) / transform.scale;
+      const lineHeight =
+        (fontSize + 1.5 * scaleFactor * textScaleMod) / transform.scale;
       const textBlockHeight = lines.length * lineHeight;
 
       context.save();

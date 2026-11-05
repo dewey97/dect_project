@@ -239,9 +239,16 @@ export function CheckpointStudioClient({
   // Live Checkpoints: kết hợp giữa rows và draft đang chỉnh sửa trong Inspector
   // để Bảng điều tra (Board Canvas) cập nhật tức thì (0s delay) khi đổi display_mode, note_color, label, v.v.
   const liveRows = useMemo(() => {
-    if (!draft || !selectedId) return rows;
+    if (!draft) return rows;
+    const targetId = selectedId || draft.id || draft.checkpointId;
+    if (!targetId) return rows;
     return rows.map((r) => {
-      if (r.id === selectedId) {
+      const isMatch =
+        r.id === targetId ||
+        r.checkpoint_id === targetId ||
+        (draft.id && r.id === draft.id) ||
+        (draft.checkpointId && r.checkpoint_id === draft.checkpointId);
+      if (isMatch) {
         return {
           ...r,
           title: draft.title,
@@ -275,7 +282,52 @@ export function CheckpointStudioClient({
     canRedo,
     handleAdjustNodeTransform,
     handleAdjustNodeZIndex,
+    handleUpdateNodeLocal,
   } = useBoardEditor(caseId, { checkpoints: liveRows, characters });
+
+  const onAdjustNodeTransformUnified = useCallback(
+    (pinId: string, deltaRot: number, deltaScale: number) => {
+      handleAdjustNodeTransform(pinId, deltaRot, deltaScale);
+
+      const pin = displayPins.find((p) => p.id === pinId);
+      const cpId = pin?.checkpointId;
+      const sKey = pin?.subjectKey;
+
+      const targetCp = rows.find(
+        (r) =>
+          r.id === pinId ||
+          r.checkpoint_id === pinId ||
+          (cpId && (r.id === cpId || r.checkpoint_id === cpId)) ||
+          (sKey && (r.subject_key === sKey || (r.checkpoint_id && r.checkpoint_id.includes(sKey)))) ||
+          (pinId && r.checkpoint_id && pinId.includes(r.checkpoint_id)),
+      );
+
+      if (targetCp) {
+        const curCfg = ((targetCp.board_config as BoardConfig) || {}) as BoardConfig;
+        const curRot = typeof curCfg.rotation === "number" ? curCfg.rotation : 0;
+        const curScale = typeof curCfg.scale === "number" && curCfg.scale > 0 ? curCfg.scale : 1.0;
+        const nextRot = Math.round(curRot + deltaRot);
+        const nextScale = Math.max(0.4, Math.min(2.5, Math.round((curScale + deltaScale) * 10) / 10));
+
+        const updatedBoardConfig: BoardConfig = {
+          ...curCfg,
+          rotation: nextRot,
+          scale: nextScale,
+        };
+
+        setRows((prev) =>
+          prev.map((r) =>
+            r.id === targetCp.id ? { ...r, board_config: updatedBoardConfig } : r,
+          ),
+        );
+
+        if (draft && (draft.id === targetCp.id || draft.checkpointId === targetCp.checkpoint_id)) {
+          setDraft((d) => (d ? { ...d, boardConfig: updatedBoardConfig } : d));
+        }
+      }
+    },
+    [handleAdjustNodeTransform, displayPins, rows, draft],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -1157,6 +1209,16 @@ export function CheckpointStudioClient({
       return;
     }
 
+    // 0.1. Node chức năng Bảng: suspects_hub (Danh sách Nghi phạm), reinvestigate (Khám xét)
+    if (
+      pin.nodeKind === "suspects_hub" ||
+      pin.id.includes("suspects_hub") ||
+      pin.id.includes("c0-pin-suspects")
+    ) {
+      setSelectedNodeId(pin.id);
+      return;
+    }
+
     // 1. Nếu pin có checkpointId
     if (pin.checkpointId) {
       const cp = rows.find(
@@ -1216,8 +1278,14 @@ export function CheckpointStudioClient({
       }
     }
 
-    if (pin.nodeKind === "followup") {
-      const cp = rows.find((r) => r.kind === "followup");
+    if (pin.nodeKind === "followup" || pin.id.includes(":followup:")) {
+      const cp = rows.find(
+        (r) =>
+          (r.kind === "followup" || r.checkpoint_id?.includes("followup")) &&
+          (!pin.subjectKey ||
+            r.subject_key === pin.subjectKey ||
+            r.checkpoint_id?.includes(pin.subjectKey)),
+      );
       if (cp) {
         setInspectorTab("checkpoints");
         setSelectedCharacter(null);
@@ -1555,12 +1623,21 @@ export function CheckpointStudioClient({
     );
   };
 
-  const isEditingCustomNode = Boolean(
+  const isEditingBoardNode = Boolean(
     selectedNode &&
     !("checkpoint_id" in selectedNode && selectedNode.checkpoint_id) &&
-    (selectedNode.id.includes(":custom:") ||
-      ("node_kind" in selectedNode && selectedNode.node_kind === "custom") ||
-      ("nodeKind" in selectedNode && selectedNode.nodeKind === "custom")),
+    (selectedNode.id.includes(":suspects_hub:") ||
+      selectedNode.id.includes(":custom:") ||
+      selectedNode.id.includes(":reinvestigate:") ||
+      selectedNode.id.includes("c0-pin-suspects") ||
+      ("node_kind" in selectedNode &&
+        (selectedNode.node_kind === "suspects_hub" ||
+          selectedNode.node_kind === "custom" ||
+          selectedNode.node_kind === "reinvestigate")) ||
+      ("nodeKind" in selectedNode &&
+        (selectedNode.nodeKind === "suspects_hub" ||
+          selectedNode.nodeKind === "custom" ||
+          selectedNode.nodeKind === "reinvestigate"))),
   );
 
   const isBusy =
@@ -1714,7 +1791,7 @@ export function CheckpointStudioClient({
             onPinPositionChange={handlePositionChange}
             onConnectPins={handleConnectPinsWithLogic}
             onDeleteConnection={handleDeleteConnectionWithLogic}
-            onAdjustNodeTransform={handleAdjustNodeTransform}
+            onAdjustNodeTransform={onAdjustNodeTransformUnified}
             onAdjustNodeZIndex={handleAdjustNodeZIndex}
           />
         </div>
@@ -1737,13 +1814,14 @@ export function CheckpointStudioClient({
             !isResizing && "transition-[width] duration-75 ease-out",
           )}
         >
-          {isEditingCustomNode && selectedNode ? (
+          {isEditingBoardNode && selectedNode ? (
             <BoardNodeForm
               caseId={caseId}
               node={selectedNode}
               onSave={handleSaveNode}
               onDelete={handleDeleteNode}
               onClose={() => setSelectedNodeId(null)}
+              onLiveUpdate={handleUpdateNodeLocal}
             />
           ) : (
             <div className="flex h-full w-full min-h-0 flex-col bg-[#0c0c10] border-t border-white/10 md:border-l md:border-t-0">

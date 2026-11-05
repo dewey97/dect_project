@@ -62,10 +62,13 @@ export function CheckpointBoardDisplayForm({
     (isSuspectInterrogation && matchedChar?.avatar_url
       ? matchedChar.avatar_url
       : "");
-  const scale = typeof cfg.scale === "number" && cfg.scale > 0 ? cfg.scale : 1.0;
-  const rotation = typeof cfg.rotation === "number" ? cfg.rotation : 0;
   const hasPin = Boolean(cfg.has_pin);
   const zIndex = typeof cfg.z_index === "number" ? cfg.z_index : 0;
+  const isPolaroid = cfg.is_polaroid !== false;
+  const textScale =
+    typeof cfg.text_scale === "number" && cfg.text_scale > 0
+      ? cfg.text_scale
+      : 1.0;
 
   const updateCfg = (patch: Partial<BoardConfig>) => {
     onChange({
@@ -173,7 +176,7 @@ export function CheckpointBoardDisplayForm({
               )}
             >
               <ImageIcon className="size-3" />
-              <span>Ảnh Polaroid</span>
+              <span>Ảnh</span>
             </button>
             <button
               type="button"
@@ -264,12 +267,45 @@ export function CheckpointBoardDisplayForm({
                   </div>
                 )}
               </div>
+
+              {/* Cỡ chữ trên note - cùng dòng */}
+              <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                <span className="text-[10px] text-zinc-400">Cỡ chữ</span>
+                <div className="flex items-center gap-2 flex-1 max-w-[170px]">
+                  <input
+                    type="range"
+                    min="0.7"
+                    max="1.8"
+                    step="0.05"
+                    value={textScale}
+                    onChange={(e) =>
+                      updateCfg({ text_scale: parseFloat(e.target.value) })
+                    }
+                    className="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-amber-400"
+                  />
+                  <span className="text-amber-400 font-mono text-[10px] w-8 text-right shrink-0">
+                    {textScale.toFixed(2)}x
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* 3B. Cấu hình Ảnh Polaroid */}
+          {/* 3B. Cấu hình Ảnh */}
           {displayMode === "photo" && (
             <div className="space-y-2 rounded bg-black/20 p-2.5 border border-white/5">
+              {/* Khung Polaroid checkbox */}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-1.5 text-[11px] text-zinc-300 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isPolaroid}
+                    onChange={(e) => updateCfg({ is_polaroid: e.target.checked })}
+                    className="rounded border-white/20 bg-zinc-800 text-purple-500 focus:ring-0 cursor-pointer"
+                  />
+                  <span>Khung Polaroid</span>
+                </label>
+              </div>
               {/* URL ảnh - cùng dòng */}
               <div className="flex items-center gap-2">
                 <label className="text-[10px] text-zinc-400 shrink-0 w-10">URL</label>
@@ -444,41 +480,6 @@ export function CheckpointBoardDisplayForm({
               </div>
             </div>
           )}
-
-          {/* 4. Kích thước (Scale) & Góc xoay (Rotation) */}
-          <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/5">
-            <div className="space-y-1">
-              <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
-                <span>Tỉ lệ</span>
-                <span className="text-amber-400 font-semibold">{scale.toFixed(2)}x</span>
-              </div>
-              <input
-                type="range"
-                min="0.6"
-                max="2.0"
-                step="0.05"
-                value={scale}
-                onChange={(e) => updateCfg({ scale: parseFloat(e.target.value) })}
-                className="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-amber-400"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
-                <span>Góc xoay</span>
-                <span className="text-amber-400 font-semibold">{rotation}°</span>
-              </div>
-              <input
-                type="range"
-                min="-30"
-                max="30"
-                step="1"
-                value={rotation}
-                onChange={(e) => updateCfg({ rotation: parseInt(e.target.value, 10) })}
-                className="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-amber-400"
-              />
-            </div>
-          </div>
         </>
       )}
     </div>

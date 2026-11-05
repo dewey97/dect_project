@@ -409,6 +409,8 @@ export interface BoardConfig {
   pin_title?: string;
   icon?: string;
   photo_url?: string;
+  is_polaroid?: boolean;
+  text_scale?: number;
   note_style?: string;
   display_mode?: "note" | "photo" | "badge";
   note_template?: string;
