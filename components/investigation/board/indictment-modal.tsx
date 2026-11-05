@@ -15,6 +15,7 @@ import {
   VERIFY_UNAVAILABLE_MESSAGE,
 } from "@/lib/checkpoints/client-verify";
 import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
+import { useRoomSync } from "@/components/investigation/room-sync-context";
 
 interface IndictmentModalProps {
   caseId: string;
@@ -86,6 +87,7 @@ export function IndictmentModal({
   }, [allCharacters]);
 
   const { checkpoints } = useCaseCheckpoints(caseId);
+  const { roomCode, submitConclusion } = useRoomSync();
   const indictmentCp = checkpoints.find(
     (c) =>
       c.kind === "indictment" ||
@@ -129,6 +131,14 @@ export function IndictmentModal({
     const selectedOptionLabel =
       motiveOptions.find((m) => m.id === selectedMotiveOption)?.label || "";
 
+    // Chơi nhóm: nộp kết luận kết thúc vụ án cho cả phòng (spec 2.7).
+    if (
+      roomCode &&
+      !window.confirm("Nộp kết luận sẽ kết thúc vụ án cho cả phòng. Tiếp tục?")
+    ) {
+      return;
+    }
+
     const parsedClues = cluesEvidenceInput
       .split(/[,;\s]+/)
       .map((s) => s.trim())
@@ -168,6 +178,16 @@ export function IndictmentModal({
     }
 
     const culprit = matchedCulprit.key;
+
+    if (roomCode) {
+      const res = await submitConclusion(culprit);
+      // 409: người khác đã nộp trước; phòng vẫn sang hậu truyện qua broadcast.
+      if (!res.success && res.code !== "ALREADY_CONCLUDED") {
+        setErrorMsg(res.error || "Không gửi được kết luận. Thử lại.");
+        return;
+      }
+      if (!res.success && res.error) setErrorMsg(res.error);
+    }
 
     const combinedClueInputs = [cluesEvidenceInput].filter(
       (s) => s.trim().length > 0,

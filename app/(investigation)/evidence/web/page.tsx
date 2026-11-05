@@ -224,7 +224,34 @@ function WebEvidencePageContent() {
     "motive" | "contradiction" | undefined
   >(undefined);
 
-  const { activePing, broadcastPing, roomCode } = useRoomSync();
+  const { activePing, broadcastPing, roomCode, room, me, pendingRoomCode } =
+    useRoomSync();
+
+  // Link phòng mà thiết bị chưa có phiên: sang màn nhập nickname.
+  useEffect(() => {
+    if (pendingRoomCode) router.replace(`/play/${caseId}?room=${pendingRoomCode}`);
+  }, [pendingRoomCode, caseId, router]);
+
+  // Chơi nhóm v3: bàn điều tra chỉ mở khi phòng đã vào `investigating` và người chơi
+  // đã vào cuộc. Phòng còn ở phòng chờ / intro (F5, mở link cũ): về /play.
+  useEffect(() => {
+    if (!room || !me) return;
+    const inGame =
+      !!me.enteredAt && (room.phase === "investigating" || room.phase === "epilogue");
+    if (!inGame) {
+      router.replace(`/play/${room.caseId}${room.code ? `?room=${room.code}` : ""}`);
+    }
+  }, [room, me, router]);
+
+  // Có người nộp kết luận: mọi máy cùng mở hậu truyện (spec 2.8).
+  const roomPhase = room?.phase ?? null;
+  const prevRoomPhaseRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (roomPhase === "epilogue" && prevRoomPhaseRef.current !== "epilogue") {
+      setActiveModal("epilogue");
+    }
+    prevRoomPhaseRef.current = roomPhase;
+  }, [roomPhase]);
 
   // Event bus listeners
   useInvestigationEvent("OPEN_BOARD", () => setIsBoardOpen(true));
@@ -505,7 +532,10 @@ function WebEvidencePageContent() {
   useEffect(() => {
     setStorageItem("play_experience", "web");
 
+    // Trong phòng, intro đã chiếu đồng bộ ở /play (intro_scene, intro_handover).
     const isIntroSeen =
+      !!roomCode ||
+      !!searchParams.get("room") ||
       getStorageItem(caseStorageKey(caseId, "intro_seen")) === "true" ||
       (caseId === "case_000" && getStorageItem("intro_seen") === "true");
     if (!isIntroSeen) {
@@ -570,7 +600,7 @@ function WebEvidencePageContent() {
     if (savedCollapsed === "true") {
       setIsDossierCollapsed(true);
     }
-  }, [caseId, effectiveItems, dossiers, casePdfs, caseEvs]);
+  }, [caseId, effectiveItems, dossiers, casePdfs, caseEvs, roomCode, searchParams]);
 
 
 

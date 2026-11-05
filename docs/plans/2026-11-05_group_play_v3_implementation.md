@@ -134,13 +134,17 @@ Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
 - **Đã làm:** `app/(investigation)/play/[caseId]/page.tsx` (server, đọc `cases` theo slug, 404 nếu không có) + `components/play/*`: `play-entry.tsx` (Tạo phòng với số người tối đa, Vào phòng, nickname nhớ trên thiết bị, [Tiếp tục phòng cũ] kèm nhãn không xếp hạng, link "Chơi một mình"), `play-lobby.tsx` (mã + QR + chia sẻ, thành viên online, Host sửa số người / chuyển quyền / kick có xác nhận, [Bắt đầu], người vào muộn thấy màn hiện tại + số phút và [Vào cuộc], cảnh báo Q12, [Rời phòng] có xác nhận), `room-qr.tsx` (thư viện `qrcode`, D2), `play-room-client.tsx` (điều hướng theo phase). CTA landing dẫn tới `/play/case_000`.
 - **Kiểm chứng:** `pnpm lint` pass. Dev server mobile 375px: màn vào game render đúng, không tràn ngang; mã sai giữ form và hiện lỗi. Phòng chờ chưa test được với dữ liệu thật (migration 51 chưa chạy).
 
-### P5 — Đồng bộ phase
+### P5 — Đồng bộ phase (đã làm 2026-11-05)
 
 - `intro_scene` trong `/play/[caseId]`: render ngay bằng nội dung baseline (Zero-Black-Screen), voice tự bấm phát, báo "đã đọc" qua presence `readPhase` khi cuộn hết hoặc bấm phát; Host thấy `3/5 đã đọc` và **[Tiếp tục]**, thành viên thấy "Chờ Host chuyển màn".
 - `intro_handover`: nội dung bàn giao (D3), Host **[Tiếp nhận vụ án]** → server ghi `started_at`, chuyển `investigating`.
 - `investigating`: client chuyển tới `/evidence/web?case_id=<id>&room=<CODE>` (cùng layout nên provider giữ kết nối). Trong phòng, trang web bỏ qua luồng `intro_seen` của Solo.
 - Nộp kết luận: `IndictmentModal` thêm hộp xác nhận "Nộp kết luận sẽ kết thúc vụ án cho cả phòng. Tiếp tục?" khi ở phòng; sau khi chấm đúng, gọi `POST /api/rooms/conclusion`. 409 thì báo "<tên> đã nộp kết luận". Mọi máy nhận `PHASE_CHANGE → epilogue` thì mở `EpilogueModal`. Hành vi khi nộp sai giữ như hiện tại (Q2 chưa chốt).
 - F5 ở bất kỳ phase nào: reconnect bằng token, render đúng màn của phòng.
+
+- **Đã làm:** `components/play/play-intro.tsx` (intro_scene: ảnh bìa + narrative phase 0; intro_handover: tóm tắt vụ + nhiệm vụ; "đã đọc" qua Presence khi cuộn tới cuối, Host thấy `x/y đã đọc`; nút Host [Tiếp tục] / [Tiếp nhận vụ án]). `/evidence/web`: bỏ intro Solo khi ở phòng hoặc URL có `?room=`; phòng chưa tới `investigating` hoặc chưa vào cuộc thì về `/play`; `?room=` chưa có phiên thì sang bước nickname; phase `epilogue` mở `EpilogueModal` trên mọi máy. `IndictmentModal`: hộp xác nhận (`window.confirm`) khi ở phòng, chấm đúng thì gọi `/api/rooms/conclusion`; 409 vẫn sang hậu truyện.
+- **Chưa làm:** voice người báo án (chưa có trường trong Studio, D3); bảng điều tra kiểu boardgame nộp kết luận qua `syncUpdate` → `submitConclusion`, chưa có hộp xác nhận.
+- **Kiểm chứng:** `pnpm lint` pass. Dev server: Solo vẫn hiện intro; `/evidence/web?room=AB12` chưa có phiên chuyển sang `/play/case_000?room=AB12` bước nickname. Luồng phase thật chờ migration 51.
 
 ### P6 — Thông báo phòng
 
