@@ -123,7 +123,7 @@ export function LandingHero() {
             {/* Primary Hero CTA: Phá Án Ngay */}
             <div className="w-full mt-2 sm:mt-3 flex items-center">
               <Link
-                href="/play/case_000"
+                href="/cases/case_000"
                 className="group inline-flex items-center justify-center gap-2.5 h-12 sm:h-13 px-8 sm:px-10 font-mono text-sm sm:text-base font-black uppercase tracking-wider rounded-md bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] border border-amber-300 transition-all duration-300 active:scale-[0.98] cursor-pointer"
               >
                 <span>Phá Án Ngay</span>

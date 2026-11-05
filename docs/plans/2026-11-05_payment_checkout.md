@@ -20,7 +20,8 @@ Khác với bản kế hoạch dưới đây:
 - `orders` có thêm trạng thái `failed` (tạo link PayOS lỗi, hoặc số tiền lệch) và cột `group_credits` chụp lại lúc mua.
 - Link thanh toán hết hạn sau 15 phút (`expiredAt`).
 - Seed case_000: Solo 69.000đ, Nhóm 79.000đ (+1 lượt), Party 89.000đ (+3 lượt), Bộ hộp chưa có link sàn. Sửa giá bằng SQL trên `case_offers`.
-- `.env.example` chưa được cập nhật tự động (agent không có quyền đọc file `.env*`). Cần thêm tay 4 dòng: `PAYOS_CLIENT_ID=`, `PAYOS_API_KEY=`, `PAYOS_CHECKSUM_KEY=`, `APP_BASE_URL=`.
+- `/buy/<case_id>` nay chuyển hướng sang `/cases/<case_id>#online` (trang vụ án, xem mục Flow).
+- `.env.example` chưa được cập nhật tự động (agent không có quyền đọc file `.env*`). Cần thêm tay 5 dòng: `PAYOS_CLIENT_ID=`, `PAYOS_API_KEY=`, `PAYOS_CHECKSUM_KEY=`, `APP_BASE_URL=`, `PLAY_GATING_ENABLED=false`.
 
 Các bước khi có key:
 
@@ -30,6 +31,35 @@ Các bước khi có key:
 4. Mua thử 1 gói, kiểm `orders.status = 'paid'` và có dòng trong `licenses`.
 
 > Liên quan: [`product/license_access.md`](../product/license_access.md), [`product/license_technical.md`](../product/license_technical.md), [`product/business_model.md`](../product/business_model.md).
+
+## Flow mua và chơi (chốt 2026-11-06)
+
+```
+Landing (băng chuyền: badge sở hữu + [Chơi online] [Đặt hộp], hoặc [Vào chơi] khi đã sở hữu)
+  │  Hero "Phá Án Ngay", how-to-play cũng trỏ về đây
+  ▼
+/cases/<case_id>   trang vụ án, cửa duy nhất
+  ├── badge: Chưa sở hữu / Đã có bản online / Đã kích hoạt hộp
+  ├── [Vào chơi]  khóa khi bật chặn và chưa sở hữu
+  ├── #box     ảnh hộp, [Đặt hàng] (link sàn), form "Nhập mã trong nắp hộp"
+  └── #online  gói Solo / Nhóm / Party, [Mua] → PayOS → /buy/result/<orderCode>
+  ▼
+/play/<case_id>    Tạo phòng / Vào phòng / Chơi một mình
+```
+
+Quyết định:
+
+1. Sở hữu hộp: mỗi hộp một mã 12 ký tự (`XXXX-XXXX-XXXX`), dùng 1 lần, gắn vào tài khoản (cần đăng nhập). DB chỉ lưu sha256 (`box_codes`). QR trong nắp hộp trỏ `/cases/<case_id>?code=<mã>` để điền sẵn. Sinh mã: `scripts/ops/generate-box-codes.mjs`.
+2. Chỉ Host cần sở hữu. Link có `?room=` (người được mời) không bị chặn. Có hộp: tạo phòng miễn phí (mode `box`). Chỉ có bản online: mỗi lần tạo phòng trừ 1 `group_credits` (mode `online`), hoàn lượt nếu tạo phòng lỗi.
+3. Chơi một mình cũng cần sở hữu (link nằm trong `/play`, đã bị chặn theo).
+
+Cờ `PLAY_GATING_ENABLED=true` (server) bật việc chặn. Khi tắt (mặc định):
+
+- trang vụ án và băng chuyền vẫn hiện trạng thái, nút Vào chơi mở cho mọi người;
+- `/api/rooms/create` không kiểm quyền, không trừ lượt;
+- `/activate` vẫn cho vào bằng mã bất kỳ như cũ (API trả `gating: false`).
+
+Bật cờ sau khi PayOS chạy thật và đã in mã hộp. Còn hở khi bật cờ: vào thẳng `/evidence/web?case_id=` không bị chặn; người vào phòng (không sở hữu) mở lại `/play` không có `?room=` sẽ bị chuyển về trang vụ án.
 
 ## Mục tiêu
 

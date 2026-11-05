@@ -61,8 +61,10 @@ Nhóm người chơi cùng điều tra một vụ án trên nhiều thiết bị
 
 - Ai cũng vào tự do, không đồng bộ với ai.
 - Hiển thị danh sách vụ án: độ khó, độ kinh dị, thời lượng dự kiến, số người khuyến nghị.
-- Bấm vào một vụ án: chuyển sang màn vào game của vụ đó.
-- Người quét QR trên hộp **bỏ qua landing**, vào thẳng màn vào game của vụ in trên hộp.
+- Bấm vào một vụ án: chuyển sang trang vụ án `/cases/<case_id>` (mua bản online, đặt hộp, kích hoạt mã hộp, trạng thái sở hữu), rồi mới vào màn vào game.
+- Người quét QR trên hộp **bỏ qua landing**, vào trang vụ án với mã hộp điền sẵn.
+
+> Cập nhật 2026-11-06 (sở hữu và chặn vào game): khi bật `PLAY_GATING_ENABLED`, Host phải sở hữu vụ án (mua online hoặc kích hoạt mã hộp, cần đăng nhập). Người vào phòng qua mã/QR phòng không cần mua và không cần tài khoản. Có hộp: tạo phòng miễn phí; chỉ có bản online: trừ 1 lượt nhóm mỗi phòng. Chi tiết: [`plans/2026-11-05_payment_checkout.md`](../plans/2026-11-05_payment_checkout.md) mục Flow.
 
 ### 2.3. Giai đoạn 2 — Màn vào game
 
@@ -267,17 +269,17 @@ Giữ cấu trúc `RoomInvestigationState` hiện tại (`phoneSolved`, `complet
 
 Mọi thao tác ghi đi qua server, xác thực bằng participant token. Client không ghi trực tiếp `game_rooms`.
 
-| Route                        | Ai gọi      | Tác dụng                                                                                              |
-| :--------------------------- | :---------- | :---------------------------------------------------------------------------------------------------- |
-| `POST /api/rooms/create`     | bất kỳ      | Tạo phòng với `max_players`, tạo participant Host, trả token + mã                                     |
-| `POST /api/rooms/join`       | bất kỳ      | Kiểm tra mã, rate limit, số chỗ. Tạo participant, trả token. Mã không tồn tại thì trả 404             |
-| `POST /api/rooms/enter`      | participant | Bấm Vào cuộc (người vào muộn), ghi `entered_at`                                                       |
-| `POST /api/rooms/reconnect`  | participant | Nhận lại đúng người cũ bằng token, không tạo nickname mới. Phòng `dormant` thì kích hoạt lại (Phần 6) |
-| `POST /api/rooms/leave`      | participant | Rời phòng, giải phóng chỗ. Host rời thì chuyển quyền hoặc hủy phòng trống                             |
-| `POST /api/rooms/phase`      | Host        | Chuyển phase. Chỉ cho phép chuyển tới phase kế tiếp                                                   |
-| `POST /api/rooms/host`       | Host        | Chuyển quyền Host, kick thành viên, sửa `max_players`                                                 |
-| `POST /api/rooms/progress`   | participant | Ghi tiến trình (merge), ghi `room_events`                                                             |
-| `POST /api/rooms/conclusion` | participant | Nộp kết luận. Chỉ nhận khi phòng ở `investigating`. Chuyển `epilogue`, ghi `ended_at`                 |
+| Route                         | Ai gọi      | Tác dụng                                                                                                                                                 |
+| :---------------------------- | :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /api/rooms/create`      | bất kỳ      | Tạo phòng với `max_players`, tạo participant Host, trả token + mã                                                                                        |
+| `POST /api/rooms/join`        | bất kỳ      | Kiểm tra mã, rate limit, số chỗ. Tạo participant, trả token. Mã không tồn tại thì trả 404                                                                |
+| `POST /api/rooms/enter`       | participant | Bấm Vào cuộc (người vào muộn), ghi `entered_at`                                                                                                          |
+| `POST /api/rooms/reconnect`   | participant | Nhận lại đúng người cũ bằng token, không tạo nickname mới. Phòng `dormant` thì kích hoạt lại (Phần 6)                                                    |
+| `POST /api/rooms/leave`       | participant | Rời phòng, giải phóng chỗ. Host rời thì chuyển quyền hoặc hủy phòng trống                                                                                |
+| `POST /api/rooms/phase`       | Host        | Chuyển phase. Chỉ cho phép chuyển tới phase kế tiếp                                                                                                      |
+| `POST /api/rooms/host`        | Host        | Chuyển quyền Host, kick thành viên, sửa `max_players`                                                                                                    |
+| `POST /api/rooms/progress`    | participant | Ghi tiến trình (merge), ghi `room_events`                                                                                                                |
+| `POST /api/rooms/conclusion`  | participant | Nộp kết luận. Chỉ nhận khi phòng ở `investigating`. Chuyển `epilogue`, ghi `ended_at`                                                                    |
 | `GET /api/rooms/state?since=` | participant | Snapshot: phase, state, version, thành viên, sự kiện mới hơn `since`. Xác thực bằng token, không cần mã (mã đổi khi phòng kích hoạt lại). Kiêm heartbeat |
 
 Các route đọc dữ liệu động có `export const dynamic = 'force-dynamic'`.
@@ -359,35 +361,35 @@ Phòng `dormant` (7 ngày không hoạt động) đương nhiên đã có `unran
 
 Bản v1 (`room-sync-context.tsx` trước commit `73e810d`) lệch spec ở các điểm dưới. Code v3 trên nhánh `claude/group-play-v3-5791c0` đã sửa; có hiệu lực trên production sau khi chạy migration 51, deploy, rồi chạy migration 52. Kế hoạch và tiến độ: [`plans/2026-11-05_group_play_v3_implementation.md`](../plans/2026-11-05_group_play_v3_implementation.md).
 
-| Lỗi v1                                                                  | Đã sửa                                                                                                                                          |
-| :---------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vào phòng bằng mã không tồn tại thì client **tự tạo phòng mới**         | `POST /api/rooms/join` trả 404, không bao giờ tạo phòng; giới hạn 10 lần sai / 5 phút / IP                                                       |
-| Client ghi thẳng `game_rooms` bằng anon key                             | Mọi thao tác qua `/api/rooms/*` (service role, participant token). Migration 52 bật RLS và thu quyền `anon`/`authenticated`                    |
-| Ghi đè toàn bộ `state_json` (last write wins)                           | Server merge (`lib/rooms/merge.ts`) và ghi kèm điều kiện `version` (compare-and-swap), thử lại khi lệch                                          |
-| Không có phase, Host, participant, giới hạn số người                    | Cột phase/Host/`max_players`, bảng `room_participants`, `room_events`; phòng chờ, intro đồng bộ, quyền Host ở `/play/<case_id>`                  |
-| Catch-up không so `version`                                             | Client chỉ nạp snapshot khi `version` server lớn hơn, khi tab active lại, có mạng lại và mỗi 30 giây                                             |
-| Mã phòng sinh ở client bằng `Math.random`                               | Server sinh mã Crockford, unique index `WHERE status = 'active'`, thử tối đa 5 lần                                                              |
-| Presence gửi `email`, `userId`                                          | Presence chỉ gửi `{ pid, nickname, readPhase }`                                                                                                  |
-| Đang ở phòng vẫn đọc/ghi savegame Solo                                  | `lib/storage.ts` thêm tiền tố `room:<id>::` cho mọi key khi ở phòng                                                                              |
-| Thuật ngữ và identifier `indictment` / "cáo trạng"                       | Chưa đổi, theo dõi ở [`TECHDEBT.md`](../TECHDEBT.md) #21                                                                                          |
+| Lỗi v1                                                          | Đã sửa                                                                                                                          |
+| :-------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
+| Vào phòng bằng mã không tồn tại thì client **tự tạo phòng mới** | `POST /api/rooms/join` trả 404, không bao giờ tạo phòng; giới hạn 10 lần sai / 5 phút / IP                                      |
+| Client ghi thẳng `game_rooms` bằng anon key                     | Mọi thao tác qua `/api/rooms/*` (service role, participant token). Migration 52 bật RLS và thu quyền `anon`/`authenticated`     |
+| Ghi đè toàn bộ `state_json` (last write wins)                   | Server merge (`lib/rooms/merge.ts`) và ghi kèm điều kiện `version` (compare-and-swap), thử lại khi lệch                         |
+| Không có phase, Host, participant, giới hạn số người            | Cột phase/Host/`max_players`, bảng `room_participants`, `room_events`; phòng chờ, intro đồng bộ, quyền Host ở `/play/<case_id>` |
+| Catch-up không so `version`                                     | Client chỉ nạp snapshot khi `version` server lớn hơn, khi tab active lại, có mạng lại và mỗi 30 giây                            |
+| Mã phòng sinh ở client bằng `Math.random`                       | Server sinh mã Crockford, unique index `WHERE status = 'active'`, thử tối đa 5 lần                                              |
+| Presence gửi `email`, `userId`                                  | Presence chỉ gửi `{ pid, nickname, readPhase }`                                                                                 |
+| Đang ở phòng vẫn đọc/ghi savegame Solo                          | `lib/storage.ts` thêm tiền tố `room:<id>::` cho mọi key khi ở phòng                                                             |
+| Thuật ngữ và identifier `indictment` / "cáo trạng"              | Chưa đổi, theo dõi ở [`TECHDEBT.md`](../TECHDEBT.md) #21                                                                        |
 
 ## 9. Đã chốt và còn chờ quyết định
 
 ### 9.1. Đã chốt (2026-11-05)
 
-| #   | Nội dung                         | Quyết định                                                  |
-| :-- | :------------------------------- | :---------------------------------------------------------- |
-| Q1  | Ai được nộp kết luận             | Mọi thành viên, có hộp xác nhận                             |
-| Q3  | Nút Sẵn sàng                     | Bỏ. Host bắt đầu lúc nào cũng được                          |
-| Q4  | Số người mỗi phòng               | Host đặt khi tạo phòng, không vượt quá. Ra vào tự do        |
-| Q5  | Người vào muộn                   | Được vào. Qua phòng chờ, thấy người đang chơi, bấm Vào cuộc |
-| Q6  | Lưu phòng                        | Lưu lại, theo vòng đời ở Phần 6                             |
-| Q7  | Trừ thời gian nghỉ               | Không trừ                                                   |
-| Q8  | Phân hạng xếp hạng theo số người | Có (quy chế còn chờ, xem 9.2)                               |
-| Q9  | Voice khi ngồi cùng bàn          | Để sau. Bản đầu: mỗi máy tự phát                            |
-| Q10 | Solo                             | Online solo không qua phòng chờ. Bản hộp luôn qua phòng chờ |
-| Q11 | Bản online chơi nhóm, license    | Để sau                                                      |
-| —   | Thuật ngữ                        | Dùng "kết luận", bỏ "cáo trạng"                             |
+| #   | Nội dung                         | Quyết định                                                                                                              |
+| :-- | :------------------------------- | :---------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Ai được nộp kết luận             | Mọi thành viên, có hộp xác nhận                                                                                         |
+| Q3  | Nút Sẵn sàng                     | Bỏ. Host bắt đầu lúc nào cũng được                                                                                      |
+| Q4  | Số người mỗi phòng               | Host đặt khi tạo phòng, không vượt quá. Ra vào tự do                                                                    |
+| Q5  | Người vào muộn                   | Được vào. Qua phòng chờ, thấy người đang chơi, bấm Vào cuộc                                                             |
+| Q6  | Lưu phòng                        | Lưu lại, theo vòng đời ở Phần 6                                                                                         |
+| Q7  | Trừ thời gian nghỉ               | Không trừ                                                                                                               |
+| Q8  | Phân hạng xếp hạng theo số người | Có (quy chế còn chờ, xem 9.2)                                                                                           |
+| Q9  | Voice khi ngồi cùng bàn          | Để sau. Bản đầu: mỗi máy tự phát                                                                                        |
+| Q10 | Solo                             | Online solo không qua phòng chờ. Bản hộp luôn qua phòng chờ                                                             |
+| Q11 | Bản online chơi nhóm, license    | Để sau                                                                                                                  |
+| —   | Thuật ngữ                        | Dùng "kết luận", bỏ "cáo trạng"                                                                                         |
 | Q12 | Xếp hạng khi phòng bị bỏ dở      | Cả phòng vắng quá 15 phút sau khi bắt đầu tính giờ thì mất xếp hạng vĩnh viễn, vẫn chơi tiếp (mục 7.1). Chốt 2026-11-05 |
 
 ### 9.2. Còn chờ quyết định

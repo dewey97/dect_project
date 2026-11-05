@@ -1,35 +1,51 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { POSTER_ITEMS } from '@/lib/data/landing-data'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Lock,
+  Monitor,
+  Package,
+} from "lucide-react";
+import { POSTER_ITEMS } from "@/lib/data/landing-data";
 
 interface CaseCarouselSectionProps {
-  activePoster: number
-  setActivePoster: (update: number | ((prev: number) => number)) => void
+  activePoster: number;
+  setActivePoster: (update: number | ((prev: number) => number)) => void;
 }
 
-export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarouselSectionProps) {
-  const router = useRouter()
-  const total = POSTER_ITEMS.length
-  const [isMobile, setIsMobile] = useState(false)
+export function CaseCarouselSection({
+  activePoster,
+  setActivePoster,
+}: CaseCarouselSectionProps) {
+  const router = useRouter();
+  const total = POSTER_ITEMS.length;
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-    handleResize()
-    window.addEventListener('resize', handleResize, { passive: true })
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  const currentCase = POSTER_ITEMS[activePoster] || POSTER_ITEMS[0]
+  const currentCase = POSTER_ITEMS[activePoster] || POSTER_ITEMS[0];
 
   return (
-    <section id="vuan" className="w-full max-w-6xl px-6 py-6 z-10 flex flex-col items-center justify-center relative overflow-hidden">
+    <section
+      id="vuan"
+      className="w-full max-w-6xl px-6 py-6 z-10 flex flex-col items-center justify-center relative overflow-hidden"
+    >
       <div className="relative w-full md:max-w-3xl max-w-xl flex items-center justify-center h-[270px] select-none">
         {/* Navigation Arrows */}
         <button
-          onClick={() => setActivePoster((prev) => (prev === 0 ? total - 1 : prev - 1))}
+          onClick={() =>
+            setActivePoster((prev) => (prev === 0 ? total - 1 : prev - 1))
+          }
           className="absolute left-2 md:left-6 z-40 p-2.5 rounded-full border border-border/60 bg-background/90 hover:bg-primary/20 hover:border-primary text-foreground transition-all cursor-pointer shadow-md"
           title="Vụ án trước"
         >
@@ -37,7 +53,9 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
         </button>
 
         <button
-          onClick={() => setActivePoster((prev) => (prev === total - 1 ? 0 : prev + 1))}
+          onClick={() =>
+            setActivePoster((prev) => (prev === total - 1 ? 0 : prev + 1))
+          }
           className="absolute right-2 md:right-6 z-40 p-2.5 rounded-full border border-border/60 bg-background/90 hover:bg-primary/20 hover:border-primary text-foreground transition-all cursor-pointer shadow-md"
           title="Vụ án kế tiếp"
         >
@@ -45,65 +63,70 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
         </button>
 
         {/* 3D Perspective container */}
-        <div className="relative w-full flex items-center justify-center h-[270px]" style={{ perspective: '900px' }}>
+        <div
+          className="relative w-full flex items-center justify-center h-[270px]"
+          style={{ perspective: "900px" }}
+        >
           {POSTER_ITEMS.map((poster, index) => {
-            const isActive = activePoster === index
-            const isLeft = (activePoster - 1 + total) % total === index
-            const isRight = (activePoster + 1) % total === index
-            const isFarLeft = (activePoster - 2 + total) % total === index
-            const isFarRight = (activePoster + 2) % total === index
+            const isActive = activePoster === index;
+            const isLeft = (activePoster - 1 + total) % total === index;
+            const isRight = (activePoster + 1) % total === index;
+            const isFarLeft = (activePoster - 2 + total) % total === index;
+            const isFarRight = (activePoster + 2) % total === index;
 
-            const leftOffset = isMobile ? -135 : -190
-            const rightOffset = isMobile ? 135 : 190
-            const farLeftOffset = isMobile ? -225 : -350
-            const farRightOffset = isMobile ? 225 : 350
+            const leftOffset = isMobile ? -135 : -190;
+            const rightOffset = isMobile ? 135 : 190;
+            const farLeftOffset = isMobile ? -225 : -350;
+            const farRightOffset = isMobile ? 225 : 350;
 
-            let transformStyle = 'scale(0) translate3d(0, 0, -200px)'
-            let opacity = 0
-            let zIndex = 5
+            let transformStyle = "scale(0) translate3d(0, 0, -200px)";
+            let opacity = 0;
+            let zIndex = 5;
 
             if (isActive) {
-              transformStyle = 'translate3d(0, 0, 0) scale(1) rotateY(0deg)'
-              opacity = 1
-              zIndex = 30
+              transformStyle = "translate3d(0, 0, 0) scale(1) rotateY(0deg)";
+              opacity = 1;
+              zIndex = 30;
             } else if (isLeft) {
-              transformStyle = `translate3d(${leftOffset}px, 0, -80px) scale(0.8) rotateY(20deg)`
-              opacity = 0.45
-              zIndex = 20
+              transformStyle = `translate3d(${leftOffset}px, 0, -80px) scale(0.8) rotateY(20deg)`;
+              opacity = 0.45;
+              zIndex = 20;
             } else if (isRight) {
-              transformStyle = `translate3d(${rightOffset}px, 0, -80px) scale(0.8) rotateY(-20deg)`
-              opacity = 0.45
-              zIndex = 20
+              transformStyle = `translate3d(${rightOffset}px, 0, -80px) scale(0.8) rotateY(-20deg)`;
+              opacity = 0.45;
+              zIndex = 20;
             } else if (isFarLeft) {
-              transformStyle = `translate3d(${farLeftOffset}px, 0, -140px) scale(0.65) rotateY(35deg)`
-              opacity = 0.18
-              zIndex = 10
+              transformStyle = `translate3d(${farLeftOffset}px, 0, -140px) scale(0.65) rotateY(35deg)`;
+              opacity = 0.18;
+              zIndex = 10;
             } else if (isFarRight) {
-              transformStyle = `translate3d(${farRightOffset}px, 0, -140px) scale(0.65) rotateY(-35deg)`
-              opacity = 0.18
-              zIndex = 10
+              transformStyle = `translate3d(${farRightOffset}px, 0, -140px) scale(0.65) rotateY(-35deg)`;
+              opacity = 0.18;
+              zIndex = 10;
             }
 
-            const isTrontim = index === 0
+            const isTrontim = index === 0;
 
             return (
               <div
                 key={poster.id}
                 onClick={() => {
                   if (isActive && isTrontim) {
-                    router.push('/play/case_000')
+                    router.push("/cases/case_000");
                   } else {
-                    setActivePoster(index)
+                    setActivePoster(index);
                   }
                 }}
                 style={{
                   transform: transformStyle,
                   opacity: opacity,
                   zIndex: zIndex,
-                  transition: 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)',
-                  transformStyle: 'preserve-3d',
+                  transition: "all 0.5s cubic-bezier(0.25, 1, 0.5, 1)",
+                  transformStyle: "preserve-3d",
                 }}
-                title={isActive && isTrontim ? "Bấm để vào chơi vụ án Trốn Tìm" : undefined}
+                title={
+                  isActive && isTrontim ? "Mở hồ sơ vụ án Trốn Tìm" : undefined
+                }
                 className="absolute w-[170px] h-[240px] aspect-[1/1.414] rounded-md overflow-hidden cursor-pointer group bg-zinc-950 transition-all duration-300 border border-white/45 shadow-[0_0_14px_rgba(255,255,255,0.12),0_12px_28px_rgba(0,0,0,0.85)] hover:border-white/75 hover:shadow-[0_0_18px_rgba(255,255,255,0.2),0_14px_32px_rgba(0,0,0,0.9)]"
               >
                 <img
@@ -111,15 +134,23 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
                   alt={poster.title}
                   className="w-full h-full object-cover filter brightness-[0.9] contrast-105 group-hover:brightness-100 transition-all duration-300"
                 />
-                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.08, backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    pointerEvents: "none",
+                    opacity: 0.08,
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                  }}
+                />
 
                 {isActive && isTrontim && (
                   <div className="absolute inset-x-0 bottom-0 py-1.5 bg-black/85 backdrop-blur-xs text-center text-[0.68rem] font-mono text-amber-400 font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">
-                    VÀO CHƠI NGAY →
+                    XEM HỒ SƠ →
                   </div>
                 )}
               </div>
-            )
+            );
           })}
         </div>
       </div>
@@ -182,6 +213,87 @@ export function CaseCarouselSection({ activePoster, setActivePoster }: CaseCarou
           )}
         </div>
       </div>
+
+      {activePoster === 0 && <CaseCtas caseId="case_000" />}
     </section>
-  )
+  );
+}
+
+interface OwnershipState {
+  loggedIn: boolean;
+  online: boolean;
+  box: boolean;
+}
+
+/** Ownership badge and the two purchase entries under the active case. */
+function CaseCtas({ caseId }: { caseId: string }) {
+  const [ownership, setOwnership] = useState<OwnershipState | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch(`/api/ownership?caseId=${caseId}`, { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (alive && data) setOwnership(data);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [caseId]);
+
+  const owned = Boolean(ownership && (ownership.online || ownership.box));
+  const base = `/cases/${caseId}`;
+  const btn =
+    "inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-4 font-mono text-xs font-bold uppercase tracking-wider transition-colors";
+
+  return (
+    <div className="mt-4 flex w-full max-w-sm flex-col items-center gap-2">
+      {ownership && (
+        <span
+          className={
+            owned
+              ? "inline-flex items-center gap-1.5 rounded-full border border-emerald-800 bg-emerald-950/40 px-3 py-1 text-[0.7rem] font-semibold text-emerald-300"
+              : "inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-[0.7rem] font-semibold text-zinc-400"
+          }
+        >
+          {owned ? (
+            <CheckCircle2 className="size-3.5" aria-hidden />
+          ) : (
+            <Lock className="size-3.5" aria-hidden />
+          )}
+          {ownership.box
+            ? "Đã kích hoạt hộp"
+            : ownership.online
+              ? "Đã có bản online"
+              : "Chưa sở hữu"}
+        </span>
+      )}
+      {owned ? (
+        <Link
+          href={`/play/${caseId}`}
+          className={`${btn} w-full bg-amber-500 text-black hover:bg-amber-400`}
+        >
+          Vào chơi
+        </Link>
+      ) : (
+        <div className="flex w-full gap-2">
+          <Link
+            href={`${base}#online`}
+            className={`${btn} bg-amber-500 text-black hover:bg-amber-400`}
+          >
+            <Monitor className="size-4" aria-hidden />
+            Chơi online
+          </Link>
+          <Link
+            href={`${base}#box`}
+            className={`${btn} border border-zinc-600 bg-zinc-900 text-zinc-100 hover:bg-zinc-800`}
+          >
+            <Package className="size-4" aria-hidden />
+            Đặt hộp
+          </Link>
+        </div>
+      )}
+    </div>
+  );
 }

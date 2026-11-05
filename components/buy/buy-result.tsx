@@ -114,10 +114,10 @@ export function BuyResult({ orderCode }: { orderCode: string }) {
           )}
           {view.state === "order" && view.order.status !== "paid" && (
             <Link
-              href={`/buy/${view.order.caseId}`}
+              href={`/cases/${view.order.caseId}`}
               className={`${linkClass} border border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800`}
             >
-              Quay lại màn mua
+              Quay lại trang vụ án
             </Link>
           )}
         </PlayCard>

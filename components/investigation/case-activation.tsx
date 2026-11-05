@@ -256,9 +256,7 @@ export function mapDbCasesToCatalog(dbCases: DbCase[]): CaseActivationItem[] {
       ? `CASE #${slugNumberMatch[1]}`
       : slug.toUpperCase();
 
-    const isReady =
-      c.status === "PUBLISHED" ||
-      fallback?.status === "ready";
+    const isReady = c.status === "PUBLISHED" || fallback?.status === "ready";
 
     result.push({
       id: slug,
@@ -362,7 +360,7 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
     setCodeError(false);
   };
 
-  const handleActivateSubmit = (e: React.FormEvent) => {
+  const handleActivateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCase || selectedCase.status === "locked" || isOpeningFolder)
       return;
@@ -370,8 +368,41 @@ export function CaseActivation({ initialCases }: CaseActivationProps = {}) {
     const cleaned = inputCode.trim().toUpperCase();
     if (!cleaned) return;
 
-    // Verify activation code
-    if (selectedCase.validCodes.includes(cleaned) || cleaned.length >= 4) {
+    // Verify the box code on the server (POST /api/box/redeem). The code ties
+    // the case to the account and may belong to another case than the one shown.
+    let activatedCaseId: string | null = null;
+    try {
+      const res = await fetch("/api/box/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: cleaned }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok && typeof body.caseId === "string") {
+        activatedCaseId = body.caseId;
+      } else if (body.gating === false) {
+        // Gating off (PLAY_GATING_ENABLED unset): no real box codes yet, keep
+        // the old open entry so current players are not locked out.
+        activatedCaseId = selectedCase.id;
+      } else if (res.status === 401) {
+        toast.error("Đăng nhập để kích hoạt hộp vào tài khoản của bạn.");
+        router.push(`/login?redirect=${encodeURIComponent("/activate")}`);
+        return;
+      } else if (body.error === "code_used") {
+        setCodeError(true);
+        toast.error("Mã này đã được kích hoạt trên một tài khoản khác.");
+        return;
+      } else if (body.error === "rate_limited") {
+        toast.error("Nhập sai quá nhiều lần. Thử lại sau 1 phút.");
+        return;
+      }
+    } catch {
+      toast.error("Mất kết nối. Thử lại sau.");
+      return;
+    }
+
+    if (activatedCaseId) {
+      const targetCaseId = activatedCaseId;
       toast.success(
         `Mã xác thực chính xác! Đang mở hồ sơ chuyên án ${selectedCase.title}...`,
       );

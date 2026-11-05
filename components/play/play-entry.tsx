@@ -213,12 +213,6 @@ export function PlayEntry({
           >
             Chơi một mình (không qua phòng)
           </Link>
-          <Link
-            href={`/buy/${caseId}`}
-            className="self-center py-3 text-sm text-amber-400/80 underline-offset-4 hover:text-amber-300 hover:underline"
-          >
-            Mua vụ án
-          </Link>
         </div>
       )}
 
