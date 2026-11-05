@@ -581,8 +581,9 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       const sameRoom = prevRoomId === snapshot.room.id;
       setStorageScope(snapshot.room.id);
 
-      if (token) {
-        sessionRef.current = saveRoomSession(token, snapshot);
+      const sessionToken = token ?? sessionRef.current?.token;
+      if (sessionToken) {
+        sessionRef.current = saveRoomSession(sessionToken, snapshot);
         setSavedSessions(readRoomSessions());
       }
 

@@ -13,6 +13,8 @@ export interface StoredRoomSession {
   code: string | null;
   caseId: string;
   nickname: string;
+  /** Q12: phòng đã mất xếp hạng (lần cuối thiết bị biết). */
+  unranked?: boolean;
   updatedAt: number;
 }
 
@@ -56,6 +58,7 @@ export function saveRoomSession(
     code: snapshot.room.code,
     caseId: snapshot.room.caseId,
     nickname: snapshot.me.nickname,
+    unranked: !!snapshot.room.unrankedAt,
     updatedAt: Date.now(),
   };
   writeRoomSessions([

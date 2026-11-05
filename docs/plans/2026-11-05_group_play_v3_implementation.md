@@ -121,7 +121,7 @@ Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
 - **Còn lại:** P4 (cảnh báo chính ở phòng chờ, nhãn ở [Tiếp tục phòng cũ]); P5 (ẩn đồng hồ khi `unrankedAt`); #15 (không ghi bảng xếp hạng khi `unranked_at`, hiện chưa có bảng xếp hạng).
 - **Giới hạn:** máy khóa màn hình không gửi heartbeat. Nhóm bản hộp đọc giấy quá 15 phút với mọi máy khóa màn hình sẽ mất xếp hạng.
 
-### P4 — Màn vào game và phòng chờ (`app/(investigation)/play/[caseId]/page.tsx`)
+### P4 — Màn vào game và phòng chờ (`app/(investigation)/play/[caseId]/page.tsx`) (đã làm 2026-11-05)
 
 - Bước theo URL: không tham số / `?mode=box` → màn 2 lựa chọn **[Tạo phòng]** (nhập số người tối đa) / **[Vào phòng]** (ô mã 4 ký tự, lỗi rõ ràng: "Không tìm thấy phòng", "Phòng đã đủ người", "Thử lại sau 5 phút"); `?room=<CODE>` → thẳng bước nickname; có phiên cũ trong localStorage → nút **[Tiếp tục phòng cũ]**.
 - Nickname 1–20 ký tự, avatar chữ cái đầu + màu.
@@ -130,6 +130,9 @@ Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
 - Q12: cảnh báo chính về xếp hạng liền mạch trên phòng chờ trước khi Host bắt đầu; [Tiếp tục phòng cũ] hiện nhãn không xếp hạng nếu có `unranked_at`.
 - Không `autoFocus`. Touch target ≥ 44px. Phong cách hồ sơ trinh thám theo `docs/design/design_system.md`.
 - Landing: CTA chơi vụ án dẫn tới `/play/<case_id>` (chỉ đổi link, không đụng bảng ghim landing).
+
+- **Đã làm:** `app/(investigation)/play/[caseId]/page.tsx` (server, đọc `cases` theo slug, 404 nếu không có) + `components/play/*`: `play-entry.tsx` (Tạo phòng với số người tối đa, Vào phòng, nickname nhớ trên thiết bị, [Tiếp tục phòng cũ] kèm nhãn không xếp hạng, link "Chơi một mình"), `play-lobby.tsx` (mã + QR + chia sẻ, thành viên online, Host sửa số người / chuyển quyền / kick có xác nhận, [Bắt đầu], người vào muộn thấy màn hiện tại + số phút và [Vào cuộc], cảnh báo Q12, [Rời phòng] có xác nhận), `room-qr.tsx` (thư viện `qrcode`, D2), `play-room-client.tsx` (điều hướng theo phase). CTA landing dẫn tới `/play/case_000`.
+- **Kiểm chứng:** `pnpm lint` pass. Dev server mobile 375px: màn vào game render đúng, không tràn ngang; mã sai giữ form và hiện lỗi. Phòng chờ chưa test được với dữ liệu thật (migration 51 chưa chạy).
 
 ### P5 — Đồng bộ phase
 
