@@ -146,12 +146,15 @@ Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
 - **Chưa làm:** voice người báo án (chưa có trường trong Studio, D3); bảng điều tra kiểu boardgame nộp kết luận qua `syncUpdate` → `submitConclusion`, chưa có hộp xác nhận.
 - **Kiểm chứng:** `pnpm lint` pass. Dev server: Solo vẫn hiện intro; `/evidence/web?room=AB12` chưa có phiên chuyển sang `/play/case_000?room=AB12` bước nickname. Luồng phase thật chờ migration 51.
 
-### P6 — Thông báo phòng
+### P6 — Thông báo phòng (đã làm 2026-11-05)
 
 - Nguồn: `room_events` (snapshot trong `GET /state` + broadcast `ROOM_EVENT`). Bỏ `state_json.lastAction`.
 - Sự kiện: `checkpoint_solved`, `dossier_unlocked`, `phone_solved`, `member_joined`, `member_left`, `member_entered`, `host_changed`, `conclusion_submitted`. Server tự sinh `message` từ nickname của actor, không nhận text tự do từ client.
 - Toast góc dưới phải, tối đa 3 cùng lúc. Chuông có số chưa đọc (localStorage theo phòng), bấm thông báo thì phát `investigation-events` tương ứng để mở nội dung (`target_ref`).
 - Tick done tại mục liên quan dùng lại state hiện có (`completedCheckpoints`, `unlockedDossiers`).
+
+- **Đã làm:** `components/investigation/room-notifications.tsx`: `RoomToastStack` (tối đa 3 toast góc dưới phải, toast cũ nhường chỗ, bấm để mở nội dung) và `RoomBell` (chuông trong `RoomPresenceBar`, số chưa đọc lưu theo thiết bị và theo phòng qua `lib/storage`, danh sách mọi sự kiện, Escape để đóng). Mở nội dung: `checkpoint_solved` / `dossier_unlocked` → `OPEN_BOARD`, `phone_solved` → `OPEN_PHONE`, `conclusion_submitted` → `OPEN_EPILOGUE`. Ping chỉ điểm dùng chung hàng đợi toast.
+- **Kiểm chứng:** `pnpm lint` pass; `/evidence/web` Solo không lỗi console. Toast và chuông với sự kiện thật chờ migration 51.
 
 ### P7 — Quyền Host, vòng đời phòng, hardening, E2E, tài liệu
 

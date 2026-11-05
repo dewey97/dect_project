@@ -40,6 +40,7 @@ import {
   type StoredRoomSession,
 } from "@/lib/rooms/client";
 import { clearStorageScope, setStorageScope } from "@/lib/storage";
+import { RoomToastStack } from "@/components/investigation/room-notifications";
 
 /**
  * Chơi nhóm v3 (spec docs/architecture/group_play_realtime.md).
@@ -53,12 +54,17 @@ import { clearStorageScope, setStorageScope } from "@/lib/storage";
  * - Catch-up theo `version` khi tab active lại, khi có mạng lại và mỗi 30 giây.
  */
 
-interface ToastNotice {
+export interface ToastNotice {
   id: string;
   actorName: string;
   actionText: string;
   timestamp: number;
+  /** Sự kiện phòng gắn với toast (bấm để mở nội dung). */
+  event?: PublicRoomEvent;
 }
+
+const MAX_TOASTS = 3;
+const TOAST_MS = 4500;
 
 export interface CurrentDetectiveUser {
   id: string;
@@ -239,7 +245,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<CurrentDetectiveUser | null>(
     null,
   );
-  const [activeToast, setActiveToast] = useState<ToastNotice | null>(null);
+  const [toasts, setToasts] = useState<ToastNotice[]>([]);
+  const activeToast = toasts[toasts.length - 1] ?? null;
   const [activePing, setActivePing] = useState<DetectivePing | null>(null);
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
   const [clientId, setClientId] = useState("");
@@ -255,7 +262,6 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   const channelRef = useRef<RealtimeChannel | null>(null);
   const clientIdRef = useRef("");
   const readPhaseRef = useRef<RoomPhase | null>(null);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didInitRef = useRef(false);
 
@@ -311,7 +317,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   // Toast & ping
   // ---------------------------------------------------------------------------
 
-  const triggerToast = useCallback((actorName: string, actionText: string) => {
+  const triggerToast = useCallback(
+    (actorName: string, actionText: string, event?: PublicRoomEvent) => {
     if (typeof navigator !== "undefined" && "vibrate" in navigator) {
       try {
         navigator.vibrate(40);
@@ -324,13 +331,13 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       actorName,
       actionText,
       timestamp: Date.now(),
+      event,
     };
-    setActiveToast(notice);
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = setTimeout(() => {
-      setActiveToast((prev) => (prev?.id === notice.id ? null : prev));
-      toastTimerRef.current = null;
-    }, 4500);
+    // Tối đa 3 toast cùng lúc (spec 2.7); toast cũ nhất nhường chỗ, vẫn còn trong chuông.
+    setToasts((prev) => [...prev, notice].slice(-MAX_TOASTS));
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== notice.id));
+    }, TOAST_MS);
   }, []);
 
   const triggerPing = useCallback((ping: DetectivePing) => {
@@ -356,9 +363,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
           e.id > lastEventIdRef.current &&
           e.actorParticipantId !== meRef.current?.id,
       );
-      const last = fresh[fresh.length - 1];
-      // P6 thay bằng hàng đợi tối đa 3 toast + chuông.
-      if (last) triggerToast("", last.message);
+      for (const e of fresh.slice(-MAX_TOASTS)) triggerToast("", e.message, e);
     },
     [triggerToast],
   );
@@ -969,7 +974,6 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     return () => {
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       if (pingTimerRef.current) clearTimeout(pingTimerRef.current);
       if (heavyTimerRef.current) clearTimeout(heavyTimerRef.current);
       if (channelRef.current) supabase.removeChannel(channelRef.current);
@@ -1079,26 +1083,7 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
   return (
     <RoomSyncContext.Provider value={value}>
       {children}
-      {activeToast && (
-        <div className="fixed bottom-4 right-4 z-50 pointer-events-none animate-in fade-in slide-in-from-bottom-3 duration-300">
-          <div
-            role="status"
-            className="bg-zinc-900/95 border border-zinc-700 text-zinc-100 px-4 py-3 rounded-lg shadow-2xl backdrop-blur-md flex items-center gap-3 max-w-sm pointer-events-auto"
-          >
-            <span className="text-xl" aria-hidden>
-              🕵️
-            </span>
-            <div className="flex-1 text-xs font-mono">
-              {activeToast.actorName && (
-                <span className="font-bold text-white">
-                  {activeToast.actorName}{" "}
-                </span>
-              )}
-              <span className="text-zinc-300">{activeToast.actionText}</span>
-            </div>
-          </div>
-        </div>
-      )}
+      <RoomToastStack toasts={toasts} />
     </RoomSyncContext.Provider>
   );
 }

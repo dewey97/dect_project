@@ -5,6 +5,7 @@ import { Users, Copy, Check, ShieldCheck, Share2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRoomSync } from '@/components/investigation/room-sync-context'
 import { DetectiveAvatar } from '@/components/investigation/detective-avatar'
+import { RoomBell } from '@/components/investigation/room-notifications'
 import { RoomModal } from '@/components/investigation/room-modal'
 import { roomInviteUrl } from '@/lib/rooms/client'
 
@@ -127,6 +128,8 @@ export function RoomPresenceBar({
             )}
           </div>
         )}
+
+        <RoomBell />
 
         {/* Nút Phòng & Chia sẻ nhanh (kiểu nút Share góc phải của Google Sheets) */}
         {showShareButton && (
