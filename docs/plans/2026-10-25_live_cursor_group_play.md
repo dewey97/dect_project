@@ -1,6 +1,8 @@
 # 📋 Kế Hoạch Triển Khai: Con Trỏ Thời Gian Thực Trong Phòng Chơi Nhóm (Live Multiplayer Cursors)
 
 > [!NOTE]
+> **2026-11-05 (sau v3):** kênh đã đổi thành `room:<room_id>`, presence key = participant id, payload presence `{ pid, nickname, readPhase }`. `useRoomSync()` xuất `channel` (kênh hiện tại) để `CursorTransport` dùng lại, và `onlineIds`. Client chỉ được tự gửi broadcast cho con trỏ và ping; tiến trình đi qua `/api/rooms/*`.
+>
 > **2026-11-05:** spec chơi nhóm v3 ([`architecture/group_play_realtime.md`](../architecture/group_play_realtime.md)) đổi kênh sang `room:<room_id>` và thêm phase, participant token. Số dòng dẫn chiếu `room-sync-context.tsx` bên dưới có thể đã lệch. Làm live cursor sau khi xong chơi nhóm v3 (ROADMAP #14).
 
 > ⛔ **Trạng thái (2026-10-25): CHƯA GIAO.** Chỉ bắt đầu sau khi B13 xong, đã push + smoke test production và đã xác nhận gói Supabase (Free/Pro). Xem `docs/ROADMAP.md` mục "Việc tiếp theo", bước 7.

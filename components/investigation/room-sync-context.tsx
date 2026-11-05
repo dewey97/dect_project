@@ -164,6 +164,8 @@ const RoomSyncContext = createContext<RoomSyncContextType | undefined>(
 );
 
 const CATCH_UP_INTERVAL_MS = 30_000;
+const HOST_CLAIM_AFTER_MS = 60_000;
+const HOST_CLAIM_CHECK_MS = 10_000;
 const HEAVY_FLUSH_MS = 500;
 /** Field ghi dày (vẽ, kéo note, gõ sổ tay): gom và gửi sau 500 ms. */
 const HEAVY_KEYS = ["annotations", "canvasNotes", "teamNotes"] as const;
@@ -961,6 +963,40 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
       clearInterval(timer);
     };
   }, [room?.id, room?.status, refreshRoom]);
+
+  // Tự nhận quyền Host khi Host vắng Presence quá 60 giây (spec Phần 3, plan D1).
+  // Chỉ thành viên online vào phòng sớm nhất gửi yêu cầu; server kiểm lại bằng
+  // last_seen_at của Host, nên client không tự giành được quyền khi Host còn hoạt động.
+  const hostMissingSinceRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!room || room.status !== "active" || !me || !isSubscribed) return;
+    const tick = () => {
+      const hostId = roomRef.current?.hostParticipantId ?? null;
+      const mine = meRef.current;
+      if (!mine || hostId === mine.id) {
+        hostMissingSinceRef.current = null;
+        return;
+      }
+      if (hostId && onlineIds.has(hostId)) {
+        hostMissingSinceRef.current = null;
+        return;
+      }
+      const now = Date.now();
+      hostMissingSinceRef.current ??= now;
+      if (now - hostMissingSinceRef.current < HOST_CLAIM_AFTER_MS) return;
+      const firstOnline = participants
+        .filter((p) => p.id !== hostId && (p.id === mine.id || onlineIds.has(p.id)))
+        .sort((a, b) => Date.parse(a.joinedAt) - Date.parse(b.joinedAt))[0];
+      if (firstOnline?.id === mine.id) {
+        void call<{ snapshot: RoomSnapshot }>("host", { action: "claim" }).then((res) => {
+          if (res.ok && res.data) applySnapshot(res.data.snapshot);
+        });
+        hostMissingSinceRef.current = now; // thử lại sau một chu kỳ nữa nếu server từ chối
+      }
+    };
+    const timer = setInterval(tick, HOST_CLAIM_CHECK_MS);
+    return () => clearInterval(timer);
+  }, [room, me, isSubscribed, onlineIds, participants, call, applySnapshot]);
 
   // Gửi nốt patch nặng khi rời trang.
   useEffect(() => {

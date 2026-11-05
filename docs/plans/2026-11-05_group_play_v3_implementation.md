@@ -1,6 +1,6 @@
 # Kế hoạch triển khai: Chơi nhóm v3 (ROADMAP #14)
 
-> **Trạng thái:** Đã duyệt 2026-11-05, kể cả D1–D7 theo đề xuất. P1 đã commit (chờ chạy migration 51). P2 đã viết (chưa smoke test, cần migration 51). P3–P7 chưa làm.
+> **Trạng thái:** Đã duyệt 2026-11-05, kể cả D1–D7 theo đề xuất. P1–P7 và Q12 đã commit trên nhánh `claude/group-play-v3-5791c0` (chưa push). Chưa test với DB thật: migration 51 chưa chạy.
 > **Spec gốc:** [`architecture/group_play_realtime.md`](../architecture/group_play_realtime.md) (chốt 2026-11-05). Kế hoạch này không thay đổi spec, trừ các điểm ghi ở mục 2 (cần duyệt).
 > **Ngoài phạm vi:** hệ thống điểm và bảng xếp hạng (Q2, Q8b ở mục 9.2 của spec, ROADMAP #15). Chơi nhóm bản online (Q11). Live cursor (#12) làm sau, kế hoạch này chỉ giữ tương thích.
 > **Không đụng:** `components/admin/checkpoint-studio/**`, `components/investigation/board/canvas/pin-builder.ts` (session khác đang sửa).
@@ -156,7 +156,7 @@ Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
 - **Đã làm:** `components/investigation/room-notifications.tsx`: `RoomToastStack` (tối đa 3 toast góc dưới phải, toast cũ nhường chỗ, bấm để mở nội dung) và `RoomBell` (chuông trong `RoomPresenceBar`, số chưa đọc lưu theo thiết bị và theo phòng qua `lib/storage`, danh sách mọi sự kiện, Escape để đóng). Mở nội dung: `checkpoint_solved` / `dossier_unlocked` → `OPEN_BOARD`, `phone_solved` → `OPEN_PHONE`, `conclusion_submitted` → `OPEN_EPILOGUE`. Ping chỉ điểm dùng chung hàng đợi toast.
 - **Kiểm chứng:** `pnpm lint` pass; `/evidence/web` Solo không lỗi console. Toast và chuông với sự kiện thật chờ migration 51.
 
-### P7 — Quyền Host, vòng đời phòng, hardening, E2E, tài liệu
+### P7 — Quyền Host, vòng đời phòng, hardening, E2E, tài liệu (đã làm 2026-11-05)
 
 - Tự chuyển quyền Host khi vắng 60 giây (D1). Host cũ quay lại là thành viên thường. Host rời phòng khi còn ở `lobby` và không còn ai thì hủy phòng.
 - Rate limit `join` (đã làm ở P2) + giới hạn tần suất `progress` theo token.
@@ -165,6 +165,10 @@ Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
 - Tài liệu: `group_play_realtime.md` (mục 8.2 chuyển sang "đã sửa", cập nhật 4.2 nếu duyệt D1), `database_schema.md` (bỏ dòng "chưa khóa `game_rooms`", thêm 2 bảng), `ROADMAP.md` #14, `TECHDEBT.md` (D3, D6, D7, LWW của `teamNotes`/`canvasNotes`), plan live cursor (#12) cập nhật dòng dẫn chiếu kênh.
 
 ---
+
+- **Đã làm:** provider tự gửi `claim` khi Host vắng Presence 60 giây và mình là thành viên online vào sớm nhất (server kiểm lại `last_seen_at`). E2E `e2e/group-play-v3.spec.ts` (3 người chơi: tạo phòng, mã sai, vào bằng mã, phòng chờ, Host bắt đầu, intro, tiếp nhận vụ án, người vào muộn, F5 giữ phòng; tự dọn phòng). Docs: spec mục 8.2 (bảng lỗi v1 → cách sửa), 4.2, 5.1; `database_schema.md`; `ROADMAP.md` #14; `TECHDEBT.md` #02, #24 mới; plan live cursor.
+- **Kiểm chứng:** `pnpm lint` pass. `pnpm build` (xem commit P7). E2E chạy được nhưng **skip**: chưa có DB E2E và migration 51 chưa chạy.
+- **Trước khi push:** chạy migration 51; chạy `node scripts/ops/rooms-smoke.mjs` và E2E với DB E2E; deploy; rồi chạy migration 52.
 
 ## 5. Rủi ro và điểm gãy
 

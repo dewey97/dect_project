@@ -1,7 +1,7 @@
 # Đặc Tả Hệ Thống Chơi Nhóm Đồng Bộ (Group Play Realtime Specification)
 
 > **Tài liệu Kỹ thuật Tầng 1 (Technical Spec #11)**
-> **Trạng thái:** Draft v3 — luồng đã chốt, còn các điểm ở Phần 9 chờ quyết định
+> **Trạng thái:** v3 đã implement trên nhánh `claude/group-play-v3-5791c0` (2026-11-05), chờ chạy migration 51/52 và deploy. Điểm số, xếp hạng còn chờ Phần 9.2
 > **Cập nhật lần cuối:** 2026-11-05
 > **Tài liệu liên quan:** [`license_access.md`](../product/license_access.md), [`license_technical.md`](../product/license_technical.md), [`database_schema.md`](database_schema.md), [`rating_leaderboard.md`](../product/rating_leaderboard.md)
 
@@ -226,6 +226,7 @@ CREATE TABLE room_participants (
   room_id UUID NOT NULL REFERENCES game_rooms(id) ON DELETE CASCADE,
   nickname VARCHAR(20) NOT NULL,
   token_hash TEXT NOT NULL,          -- hash của participant token, token gốc chỉ lưu ở client
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), -- lần gọi API có token cuối cùng (tự chuyển Host, Q12)
   joined_at TIMESTAMPTZ DEFAULT NOW(),
   entered_at TIMESTAMPTZ,            -- bấm Vào cuộc (hoặc Host bấm Bắt đầu khi đang ở lobby). NULL = còn ở phòng chờ
   left_at TIMESTAMPTZ,               -- bấm Rời phòng. NULL = đang giữ chỗ
@@ -235,7 +236,7 @@ CREATE TABLE room_participants (
 ```
 
 - Số chỗ đã dùng = số dòng có `left_at IS NULL AND kicked = false`. Server kiểm tra với `max_players` trong cùng transaction khi join.
-- Trạng thái online lấy từ Supabase Presence, không ghi vào bảng.
+- Trạng thái online hiển thị lấy từ Supabase Presence. Server không thấy Presence nên dùng `last_seen_at` (heartbeat qua mọi route có token) cho hai việc: tự chuyển Host khi vắng 60 giây và quy tắc Q12.
 
 ### 4.3. Bảng `room_events` (mới)
 
@@ -277,7 +278,7 @@ Mọi thao tác ghi đi qua server, xác thực bằng participant token. Client
 | `POST /api/rooms/host`       | Host        | Chuyển quyền Host, kick thành viên, sửa `max_players`                                                 |
 | `POST /api/rooms/progress`   | participant | Ghi tiến trình (merge), ghi `room_events`                                                             |
 | `POST /api/rooms/conclusion` | participant | Nộp kết luận. Chỉ nhận khi phòng ở `investigating`. Chuyển `epilogue`, ghi `ended_at`                 |
-| `GET /api/rooms/state?code=` | participant | Snapshot: phase, state, version, thành viên, sự kiện mới                                              |
+| `GET /api/rooms/state?since=` | participant | Snapshot: phase, state, version, thành viên, sự kiện mới hơn `since`. Xác thực bằng token, không cần mã (mã đổi khi phòng kích hoạt lại). Kiêm heartbeat |
 
 Các route đọc dữ liệu động có `export const dynamic = 'force-dynamic'`.
 
@@ -354,22 +355,21 @@ Phòng `dormant` (7 ngày không hoạt động) đương nhiên đã có `unran
 2. **Participant token:** sinh ngẫu nhiên, lưu ở localStorage của client, DB chỉ lưu hash. Mọi route ghi đều kiểm tra token thuộc đúng phòng và chưa bị kick.
 3. **Cách ly localStorage:** khi ở trong phòng, không đọc hoặc ghi key lưu trữ của chế độ Solo.
 
-### 8.2. Hiện trạng code lệch spec (cần sửa khi implement)
+### 8.2. Lỗi của bản v1 và cách đã sửa (2026-11-05)
 
-Đối chiếu [`room-sync-context.tsx`](../../components/investigation/room-sync-context.tsx) ngày 2026-11-05:
+Bản v1 (`room-sync-context.tsx` trước commit `73e810d`) lệch spec ở các điểm dưới. Code v3 trên nhánh `claude/group-play-v3-5791c0` đã sửa; có hiệu lực trên production sau khi chạy migration 51, deploy, rồi chạy migration 52. Kế hoạch và tiến độ: [`plans/2026-11-05_group_play_v3_implementation.md`](../plans/2026-11-05_group_play_v3_implementation.md).
 
-| Vấn đề                                                              | Vị trí                              | Hậu quả                                                                                                          |
-| :------------------------------------------------------------------ | :---------------------------------- | :--------------------------------------------------------------------------------------------------------------- |
-| Vào phòng bằng mã không tồn tại thì client **tự tạo phòng mới**     | `room-sync-context.tsx:441`         | Gõ sai mã là vào một phòng trống, không báo lỗi. Trái với mục 2.3                                                |
-| Client ghi thẳng `game_rooms` bằng anon key, không qua server route | `room-sync-context.tsx:423`, `:727` | Ai có anon key đều sửa được tiến trình phòng bất kỳ. `database_schema.md` ghi `game_rooms` chưa khóa RLS         |
-| Ghi đè toàn bộ `state_json` từ client (last write wins)             | `room-sync-context.tsx:727`         | Hai người giải gần cùng lúc có thể mất tiến trình của một người. Merge ở client chỉ gộp với state client đang có |
-| Không có phase, Host, participant, giới hạn số người                | toàn bộ                             | Chưa có phòng chờ, intro đồng bộ, quyền Host                                                                     |
-| Catch-up không so `version`                                         | `room-sync-context.tsx:748`         | Nạp lại kể cả khi không có gì mới |
-| Mã phòng sinh ở client bằng `Math.random`, không kiểm tra trùng | `room-modal.tsx:57` | Mã sinh trùng phòng đang có thì người tạo vào nhầm phòng của nhóm khác |
-| Presence gửi `email` và `userId` của người đăng nhập cho mọi thành viên | `room-sync-context.tsx:617` | Lộ email cho người lạ trong phòng. Chỉ cần gửi nickname và avatar |
-| Thuật ngữ và identifier `indictment` / "cáo trạng" | toàn codebase | Đổi sang "kết luận" theo [`TECHDEBT.md`](../TECHDEBT.md) #21                                                                                |
-
----
+| Lỗi v1                                                                  | Đã sửa                                                                                                                                          |
+| :---------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vào phòng bằng mã không tồn tại thì client **tự tạo phòng mới**         | `POST /api/rooms/join` trả 404, không bao giờ tạo phòng; giới hạn 10 lần sai / 5 phút / IP                                                       |
+| Client ghi thẳng `game_rooms` bằng anon key                             | Mọi thao tác qua `/api/rooms/*` (service role, participant token). Migration 52 bật RLS và thu quyền `anon`/`authenticated`                    |
+| Ghi đè toàn bộ `state_json` (last write wins)                           | Server merge (`lib/rooms/merge.ts`) và ghi kèm điều kiện `version` (compare-and-swap), thử lại khi lệch                                          |
+| Không có phase, Host, participant, giới hạn số người                    | Cột phase/Host/`max_players`, bảng `room_participants`, `room_events`; phòng chờ, intro đồng bộ, quyền Host ở `/play/<case_id>`                  |
+| Catch-up không so `version`                                             | Client chỉ nạp snapshot khi `version` server lớn hơn, khi tab active lại, có mạng lại và mỗi 30 giây                                             |
+| Mã phòng sinh ở client bằng `Math.random`                               | Server sinh mã Crockford, unique index `WHERE status = 'active'`, thử tối đa 5 lần                                                              |
+| Presence gửi `email`, `userId`                                          | Presence chỉ gửi `{ pid, nickname, readPhase }`                                                                                                  |
+| Đang ở phòng vẫn đọc/ghi savegame Solo                                  | `lib/storage.ts` thêm tiền tố `room:<id>::` cho mọi key khi ở phòng                                                                              |
+| Thuật ngữ và identifier `indictment` / "cáo trạng"                       | Chưa đổi, theo dõi ở [`TECHDEBT.md`](../TECHDEBT.md) #21                                                                                          |
 
 ## 9. Đã chốt và còn chờ quyết định
 
