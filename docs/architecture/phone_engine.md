@@ -32,7 +32,7 @@ Do đó, Phone Engine được thiết kế tách rời **Khung vỏ phần cứ
                                     │
 ┌───────────────────────────────────▼────────────────────────────────────┐
 │ 2. CORE HEADLESS ENGINE (usePhoneEngine / PhoneContext)                │
-│    - Quản lý trạng thái logic: isLocked, passcodeAttempt, PIN hint     │
+│    - Quản lý trạng thái logic: isLocked (mở bằng chạm, không có PIN)   │
 │    - Điều hướng màn hình: activeApp, openApp, goHome, goBack           │
 │    - Cầu nối Mindmap: isCluePinned, togglePinClue(clueId)              │
 │    - Cơ chế pin ảo, đồng hồ đóng băng theo mốc thời gian vụ án         │
@@ -79,7 +79,7 @@ components/phone-engine/
 │   ├── banking/                 # Sao kê tài chính / Biến động số dư
 │   └── maps/                    # Bản đồ số & Dấu vết di chuyển
 ├── system/                      # Màn hình hệ điều hành
-│   ├── lock-screen.tsx          # Màn hình khóa (nhập PIN, passcode)
+│   ├── lock-screen.tsx          # Màn hình khóa (chạm để mở)
 │   ├── home-screen.tsx          # Lưới ứng dụng (Grid App Icons)
 │   └── status-bar.tsx           # Đồng hồ đóng băng, pin, cột sóng
 ├── phone-simulator.tsx          # Facade Entrypoint: Cắm Chassis + Engine + Screen
@@ -109,8 +109,6 @@ export interface PhoneDeviceProfile {
   
   // Bảo mật & Giải mã
   isLocked: boolean;
-  passcode?: string;               // "2407"
-  passcodeHint?: string;           // "Ngày sinh nhật hoặc ngày kỷ niệm"
   
   // Danh sách ứng dụng cài sẵn
   installedApps: PhoneAppId[];     // ['messages', 'banking', 'photos', 'notes', 'maps']

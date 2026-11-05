@@ -72,7 +72,6 @@ export default async function PhoneStudioPage({
         service_text: "Không có Dịch vụ",
       },
       lock_screen: { time: "21:30", date: "Thứ Bảy, 23 tháng 7" },
-      passcode: "120713",
       settings_info: {
         owner: victimChar?.name || "Nguyễn Văn Khang",
         model: "iPhone 6s Plus (64GB, Space Gray)",

@@ -247,7 +247,6 @@ export function PhoneStudioClient({
       chassis: device.chassis,
       wallpaper_url: device.wallpaper_url,
       selfie_url: device.selfie_url,
-      passcode: device.passcode,
       status_bar: device.status_bar,
       lock_screen: device.lock_screen,
       settings_info: device.settings_info,
@@ -324,7 +323,8 @@ export function PhoneStudioClient({
           {/* Case Picker */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-              <FolderOpen className="size-3.5 text-zinc-400" /> Case đang biên soạn:
+              <FolderOpen className="size-3.5 text-zinc-400" /> Case đang biên
+              soạn:
             </label>
             <div className="relative">
               <select
@@ -429,7 +429,8 @@ export function PhoneStudioClient({
                   : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
               }`}
             >
-              <Grid className="size-3.5" /> Ứng dụng (App Launcher) ({apps.length})
+              <Grid className="size-3.5" /> Ứng dụng (App Launcher) (
+              {apps.length})
             </button>
 
             <button
@@ -443,7 +444,8 @@ export function PhoneStudioClient({
                   : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
               }`}
             >
-              <MessageSquare className="size-3.5" /> Tin nhắn ({messages.length})
+              <MessageSquare className="size-3.5" /> Tin nhắn ({messages.length}
+              )
             </button>
 
             <button

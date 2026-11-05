@@ -166,7 +166,6 @@ export interface CaseCharacterDevice {
   wallpaper_url?: string;
   lockscreen_url?: string;
   selfie_url?: string;
-  passcode?: string;
   status_bar?: {
     time?: string;
     battery?: number;
@@ -414,7 +413,8 @@ export interface BoardConfig {
   display_mode?: "note" | "photo" | "badge";
   note_template?: string;
   note_color?: "yellow" | "white" | "red" | "blue" | "black";
-  pin_color?: "red" | "yellow" | "blue" | "green" | "black" | "silver" | "brass";
+  pin_color?:
+    "red" | "yellow" | "blue" | "green" | "black" | "silver" | "brass";
   has_pin?: boolean;
   z_index?: number;
   scale?: number;

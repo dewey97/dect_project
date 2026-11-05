@@ -35,8 +35,6 @@ export interface PhoneDeviceProfile {
 
   // Cơ chế giải mã / khóa
   isLocked: boolean;
-  passcode?: string; // Mã PIN mở khóa (vd: "2407" hoặc "1994")
-  passcodeHint?: string; // Gợi ý giải mã khi detective bị bế tắc
   recoveryLevel?: number; // Tỷ lệ khôi phục dữ liệu forensic (0 - 100%)
 
   // Danh sách các App được kích hoạt trên máy này

@@ -1,6 +1,6 @@
 # 20. Phone Studio & Dynamic Phone Engine Architecture
 
-> **Phạm vi:** Module quản trị `/studio/phone` cho phép biên tập thiết bị tang vật điện thoại (chassis iPhone/Android, lock screen, status bar, wallpaper, passcode), launcher 15 ứng dụng và toàn bộ chứng cứ số (tin nhắn, cuộc gọi ghi âm, danh bạ, ảnh thư viện, ghi chú, sao kê ngân hàng, lịch sử duyệt web) lưu trữ trực tiếp trên Supabase.
+> **Phạm vi:** Module quản trị `/studio/phone` cho phép biên tập thiết bị tang vật điện thoại (chassis iPhone/Android, lock screen, status bar, wallpaper), launcher 15 ứng dụng và toàn bộ chứng cứ số (tin nhắn, cuộc gọi ghi âm, danh bạ, ảnh thư viện, ghi chú, sao kê ngân hàng, lịch sử duyệt web) lưu trữ trực tiếp trên Supabase.
 >
 > **Trạng thái:** Runtime đọc 100% từ Supabase qua `/api/phone-data/*`. Fallback Google Sheets đã gỡ.
 
@@ -65,7 +65,6 @@ usePhoneData(tab, caseId)
   "chassis": "iphone_classic",
   "wallpaper_url": "/images/cases/case_000/phone/clean_beach_wallpaper.png",
   "selfie_url": "/images/cases/case_000/phone/monkey_selfie.png",
-  "passcode": "120713",
   "status_bar": {
     "time": "21:30",
     "battery": 15,
@@ -104,7 +103,7 @@ Giao diện quản trị 3 cột tại `app/(admin)/studio/phone/`:
    - Nút nạp template mặc định 15 apps iOS chuẩn.
 
 2. **Cột 2 — Editor Tabs chuyên biệt**:
-   - **Thiết bị**: Đổi chassis (`iphone_classic`, `iphone_modern`, `android_vintage`), ảnh nền, ảnh selfie, pin, sóng, passcode.
+   - **Thiết bị**: Đổi chassis (`iphone_classic`, `iphone_modern`, `android_vintage`), ảnh nền, ảnh selfie, pin, sóng. Không có mã mở khóa: màn khóa mở bằng chạm, không lưu passcode (migration 50).
    - **Launcher Apps**: Bật/tắt app, đổi tên, icon, toggle Dock, khóa app theo Checkpoint ID.
    - **Tin nhắn**: Quản lý thread hội thoại, chat bubble `me`/`them`, đính kèm ảnh, gắn thẻ manh mối.
    - **Cuộc gọi**: Lịch sử gọi, upload file ghi âm thoại `.mp3`/`.wav`.

@@ -121,7 +121,6 @@ function getCaseVictimDevice(): Partial<Device> {
     wallpaper_url: victim.device?.wallpaper_url,
     lockscreen_url: victim.device?.lockscreen_url,
     selfie_url: victim.device?.selfie_url,
-    passcode: victim.device?.passcode,
     status_bar: victim.device?.status_bar,
     lock_screen: victim.device?.lock_screen,
     settings_info: victim.device?.settings_info,
@@ -156,7 +155,8 @@ function PhoneScreenContent({
   const { apps: fetchedApps } = usePhoneApps(
     device.caseId || getActiveCaseId() || "case_000",
   );
-  const activeApps = customApps && customApps.length > 0 ? customApps : fetchedApps;
+  const activeApps =
+    customApps && customApps.length > 0 ? customApps : fetchedApps;
 
   const isLightStatusBar =
     !isLocked && (activeApp === "messages" || activeApp === "notes");
@@ -406,7 +406,11 @@ export function PhoneSimulator({
       onPinClue={onPinClue}
     >
       <EvidenceAnchorProvider>
-        <PhoneSimulatorShell frameless={frameless} onClose={onClose} apps={apps} />
+        <PhoneSimulatorShell
+          frameless={frameless}
+          onClose={onClose}
+          apps={apps}
+        />
       </EvidenceAnchorProvider>
     </PhoneProvider>
   );

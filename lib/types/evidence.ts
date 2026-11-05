@@ -31,7 +31,6 @@ export interface EvidenceDevice {
   wallpaper_url?: string;
   lockscreen_url?: string;
   selfie_url?: string;
-  passcode?: string;
   status_bar?: { time?: string; battery?: number; service_text?: string };
   lock_screen?: { time?: string; date?: string };
   settings_info?: Record<string, string>;

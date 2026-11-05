@@ -437,20 +437,6 @@ export function DeviceForm({
               className="w-full px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-lg text-xs text-zinc-200 focus:outline-none focus:border-sky-500"
             />
           </div>
-
-          <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1 flex items-center gap-1">
-              <Shield className="size-3 text-zinc-400" />
-              Mã PIN mở khóa (Passcode)
-            </label>
-            <input
-              type="text"
-              value={device.passcode || ""}
-              onChange={(e) => handleChange("passcode", e.target.value)}
-              placeholder="VD: 120713 (để trống nếu không khóa số)"
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-lg text-xs text-zinc-200 font-mono focus:outline-none focus:border-sky-500"
-            />
-          </div>
         </div>
       </div>
 
