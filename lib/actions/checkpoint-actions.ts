@@ -1,6 +1,11 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  toPublicCheckpointRow,
+  type PublicCheckpointRow,
+} from "@/lib/checkpoints/public-checkpoint";
 import { revalidatePath } from "next/cache";
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 import {
@@ -24,11 +29,12 @@ type CheckpointRowResult =
 type CheckpointMutationResult =
   { success: true } | { success: false; error: string };
 
-/** Lấy danh sách checkpoint của một vụ án từ bảng case_checkpoints. */
+/** Lấy danh sách checkpoint của một vụ án từ bảng case_checkpoints (Studio, có đáp án). */
 export async function getCheckpointsByCase(
   caseId: string,
 ): Promise<CheckpointListResult> {
   try {
+    await requireAdminAuth();
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -43,6 +49,43 @@ export async function getCheckpointsByCase(
     return { success: true, data: (data || []) as DbCaseCheckpoint[] };
   } catch (error: unknown) {
     console.error("Error fetching checkpoints:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Không tải được danh sách checkpoint.",
+      data: [],
+    };
+  }
+}
+
+/**
+ * Checkpoint cho board gameplay: đọc bằng service role rồi lọc bỏ đáp án,
+ * giống `/api/checkpoints`. Người chơi không đọc được bảng gốc (migration 48).
+ */
+export async function getPublicCheckpointsByCase(
+  caseId: string,
+): Promise<
+  | { success: true; data: PublicCheckpointRow[] }
+  | { success: false; error: string; data: PublicCheckpointRow[] }
+> {
+  try {
+    const { data, error } = await createAdminClient()
+      .from("case_checkpoints")
+      .select("*")
+      .eq("case_id", caseId)
+      .order("dossier", { ascending: true })
+      .order("checkpoint_id", { ascending: true });
+
+    if (error) throw error;
+
+    return {
+      success: true,
+      data: ((data || []) as DbCaseCheckpoint[]).map(toPublicCheckpointRow),
+    };
+  } catch (error: unknown) {
+    console.error("Error fetching public checkpoints:", error);
     return {
       success: false,
       error:
@@ -107,7 +150,9 @@ export async function saveCheckpoint(
         .from("case_checkpoints")
         .update({
           ...payload,
-          ...(Array.isArray(draft.dependsOn) ? { depends_on: draft.dependsOn } : {}),
+          ...(Array.isArray(draft.dependsOn)
+            ? { depends_on: draft.dependsOn }
+            : {}),
           updated_at: new Date().toISOString(),
         })
         .eq("id", draft.id)

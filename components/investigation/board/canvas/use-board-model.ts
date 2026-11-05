@@ -17,7 +17,10 @@ import {
   getBoardNodes,
   getBoardgamePinPositions,
 } from "@/lib/actions/board-actions";
-import { getCheckpointsByCase } from "@/lib/actions/checkpoint-actions";
+import {
+  getCheckpointsByCase,
+  getPublicCheckpointsByCase,
+} from "@/lib/actions/checkpoint-actions";
 import { getCharactersByCase } from "@/lib/actions/character-actions";
 import { getCaseEvidence } from "@/lib/actions/evidence-actions";
 import {
@@ -107,7 +110,9 @@ export function useBoardModel(
     Record<string, { rotation: number; scale: number }>
   >({});
   const [adminCustomPins, setAdminCustomPins] = useState<PinPoint[]>([]);
-  const [adminConnections, setAdminConnections] = useState<CaseConnection[]>([]);
+  const [adminConnections, setAdminConnections] = useState<CaseConnection[]>(
+    [],
+  );
 
   const isMountedRef = useRef(false);
 
@@ -127,25 +132,44 @@ export function useBoardModel(
     setIsLoading(true);
     setError(null);
     try {
-      const [nodesRes, boardgameRes, checkpointsRes, charactersRes, evidenceRes] =
-        await Promise.all([
-          getBoardNodes(caseId),
-          getBoardgamePinPositions(caseId),
-          getCheckpointsByCase(caseId),
-          getCharactersByCase(caseId),
-          getCaseEvidence(caseId),
-        ]);
+      const [
+        nodesRes,
+        boardgameRes,
+        checkpointsRes,
+        charactersRes,
+        evidenceRes,
+      ] = await Promise.all([
+        getBoardNodes(caseId),
+        getBoardgamePinPositions(caseId),
+        // Gameplay chỉ nhận checkpoint đã lọc đáp án; Studio (admin) đọc bản đầy đủ.
+        options.isStudioMode
+          ? getCheckpointsByCase(caseId)
+          : getPublicCheckpointsByCase(caseId),
+        getCharactersByCase(caseId),
+        getCaseEvidence(caseId),
+      ]);
 
       if (nodesRes.success && nodesRes.data) {
         setBoardNodes(nodesRes.data);
       }
 
       if (checkpointsRes.success && checkpointsRes.data) {
-        setCheckpoints(checkpointsRes.data);
+        if (
+          !options.initialCheckpoints ||
+          options.initialCheckpoints.length === 0
+        ) {
+          // Board chỉ đọc kind/subject_key/board_config, không đọc đáp án.
+          setCheckpoints(checkpointsRes.data as DbCaseCheckpoint[]);
+        }
       }
 
       if (charactersRes.success && charactersRes.data) {
-        setCharacters(charactersRes.data);
+        if (
+          !options.initialCharacters ||
+          options.initialCharacters.length === 0
+        ) {
+          setCharacters(charactersRes.data);
+        }
       }
 
       if (evidenceRes.success && evidenceRes.data) {
@@ -177,7 +201,9 @@ export function useBoardModel(
               pinVal === "TRUE" || pinVal === "1" || pinVal === "YES";
             if (!isPinned) return false;
 
-            const code = String(e.code || "").toLowerCase().trim();
+            const code = String(e.code || "")
+              .toLowerCase()
+              .trim();
             const charKey = code.replace(/^avatar_/, "");
 
             // Không ghim đè nếu đã là nhân vật (nghi phạm / nạn nhân) hoặc vật chứng đặc biệt đã có node riêng
@@ -219,8 +245,10 @@ export function useBoardModel(
 
       if (boardgameRes.success) {
         boardgameRes.pins.forEach((p) => {
-          const posX = isMobile && typeof p.mobileX === 'number' ? p.mobileX : p.x;
-          const posY = isMobile && typeof p.mobileY === 'number' ? p.mobileY : p.y;
+          const posX =
+            isMobile && typeof p.mobileX === "number" ? p.mobileX : p.x;
+          const posY =
+            isMobile && typeof p.mobileY === "number" ? p.mobileY : p.y;
           posMap[p.id] = { x: posX, y: posY };
           if (
             p.id.startsWith("admin-pin-") ||
@@ -265,7 +293,7 @@ export function useBoardModel(
     } finally {
       setIsLoading(false);
     }
-  }, [caseId, isMobile]);
+  }, [caseId, isMobile, options.isStudioMode]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -291,7 +319,8 @@ export function useBoardModel(
         return {
           ...prev,
           [pinId]: {
-            rotation: tf.rotation !== undefined ? tf.rotation : current.rotation,
+            rotation:
+              tf.rotation !== undefined ? tf.rotation : current.rotation,
             scale: tf.scale !== undefined ? tf.scale : current.scale,
           },
         };
@@ -300,19 +329,34 @@ export function useBoardModel(
     [],
   );
 
+  // Sử dụng trực tiếp initialCheckpoints / initialCharacters nếu có (Studio mode phản hồi tức thì 0s)
+  const effectiveCheckpoints = useMemo(() => {
+    if (options.initialCheckpoints && options.initialCheckpoints.length > 0) {
+      return options.initialCheckpoints as DbCaseCheckpoint[];
+    }
+    return checkpoints;
+  }, [options.initialCheckpoints, checkpoints]);
+
+  const effectiveCharacters = useMemo(() => {
+    if (options.initialCharacters && options.initialCharacters.length > 0) {
+      return options.initialCharacters;
+    }
+    return characters;
+  }, [options.initialCharacters, characters]);
+
   // Tạo danh sách nghi phạm hợp nhất:
   // Nếu caller truyền effectiveSuspects (gameplay) thì dùng;
   // Nếu không (Studio), tự động sinh đầy đủ từ characters để GM luôn thấy mọi nghi phạm trên bảng
-    const effectiveSuspectsList = useMemo(() => {
+  const effectiveSuspectsList = useMemo(() => {
     if (options.effectiveSuspects && options.effectiveSuspects.length > 0) {
       return options.effectiveSuspects;
     }
     const checkpointSubjectKeys = new Set(
-      checkpoints
+      effectiveCheckpoints
         .map((cp) => (cp.subject_key || "").trim().toLowerCase())
         .filter(Boolean),
     );
-    return characters
+    return effectiveCharacters
       .filter(
         (c) =>
           c.role === "suspect" ||
@@ -324,13 +368,13 @@ export function useBoardModel(
         name: c.name,
         clueIds: [],
       }));
-  }, [options.effectiveSuspects, characters, checkpoints]);
+  }, [options.effectiveSuspects, effectiveCharacters, effectiveCheckpoints]);
 
   // Tên nạn nhân
   const victimName = useMemo(() => {
-    const victim = characters.find((c) => c.role === "victim");
+    const victim = effectiveCharacters.find((c) => c.role === "victim");
     return victim?.name || "Nạn nhân";
-  }, [characters]);
+  }, [effectiveCharacters]);
 
   // Hợp nhất vị trí thực tế (kết hợp positions và overridePositions nếu có)
   const mergedPositions = useMemo(() => {
@@ -346,8 +390,8 @@ export function useBoardModel(
       caseId,
       caseSlug: caseId,
       boardNodes,
-      characters,
-      caseCheckpoints: checkpoints as unknown as Checkpoint[],
+      characters: effectiveCharacters,
+      caseCheckpoints: effectiveCheckpoints as unknown as Checkpoint[],
       evidence,
       positions: mergedPositions,
       effectiveSuspects: effectiveSuspectsList,
@@ -359,11 +403,12 @@ export function useBoardModel(
       victimName,
     });
   }, [
+    options.isStudioMode,
     isMobile,
     caseId,
     boardNodes,
-    characters,
-    checkpoints,
+    effectiveCharacters,
+    effectiveCheckpoints,
     evidence,
     mergedPositions,
     effectiveSuspectsList,
@@ -406,8 +451,8 @@ export function useBoardModel(
     positions: mergedPositions,
     transforms,
     boardNodes,
-    checkpoints,
-    characters,
+    checkpoints: effectiveCheckpoints,
+    characters: effectiveCharacters,
     evidence,
     isLoading,
     error,
