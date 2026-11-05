@@ -1,208 +1,399 @@
-# 👥 Đặc Tả Hệ Thống Chơi Nhóm Đồng Bộ Tiến Trình (Group Play Realtime Specification)
+# Đặc Tả Hệ Thống Chơi Nhóm Đồng Bộ (Group Play Realtime Specification)
 
-> **Tài liệu Kỹ thuật Tầng 1 (Technical Spec #11)**  
-> **Trạng thái:** Approved Architecture  
-> **Cập nhật lần cuối:** 2026-10-14  
-> **Tài liệu liên quan:** [`07_license_access_system.md`](../product/license_access.md), [`08_license_technical_spec.md`](../product/license_technical.md), [`02_database_schema.md`](database_schema.md)
+> **Tài liệu Kỹ thuật Tầng 1 (Technical Spec #11)**
+> **Trạng thái:** Draft v3 — luồng đã chốt, còn các điểm ở Phần 9 chờ quyết định
+> **Cập nhật lần cuối:** 2026-11-05
+> **Tài liệu liên quan:** [`license_access.md`](../product/license_access.md), [`license_technical.md`](../product/license_technical.md), [`database_schema.md`](database_schema.md), [`rating_leaderboard.md`](../product/rating_leaderboard.md)
 
----
-
-## 🧭 PHẦN 1: TỔNG QUAN HỆ THỐNG & TRIẾT LÝ THIẾT KẾ (OVERVIEW)
-
-### 1.1. Bối cảnh & Mục đích
-Hệ thống **Group Play (Chơi Nhóm)** cho phép một nhóm bạn (2 – 6 người) cùng tham gia điều tra phá án một vụ án trên nhiều thiết bị cá nhân (điện thoại hoặc máy tính). Nhóm có thể ngồi cùng quanh một bàn chơi trực tiếp (kèm bộ hộp Boardgame vật lý) hoặc chơi từ xa qua các kênh đàm thoại (Discord, Google Meet, Zalo).
-
-### 1.2. Triết lý Thiết kế Cốt Lõi (Core Principles)
-1. **Zero-Friction Access (Vào phòng không rào cản):**
-   * Người tạo phòng (Host) sinh mã phòng 4 chữ cái (VD: `SHER`) và mã QR / Link mời.
-   * Khách mời (Guests) quét QR hoặc bấm link, nhập Nickname là vào bàn chơi ngay trong 3 giây.
-   * **Tuyệt đối không bắt khách mời tạo tài khoản, xác thực email hay tải app.**
-2. **Strict Silo Separation (Cách ly tuyệt đối Solo vs Room):**
-   * Chế độ **Solo (Cá nhân)** và chế độ **Room (Nhóm)** là hai thế giới tách biệt hoàn toàn.
-   * Khi tạo phòng mới, tiến trình phòng luôn xuất phát từ **0% (Vụ án mới tinh)** để đảm bảo công bằng và nguyên vẹn trải nghiệm cho cả nhóm.
-   * Vào phòng chơi nhóm **không bao giờ ảnh hưởng hoặc làm bẩn savegame Solo** của từng cá nhân.
-3. **Shared Truth vs. Private Viewport (Tiến trình chung vs. Góc nhìn riêng):**
-   * **Đồng bộ chung:** Trạng thái bẻ khóa điện thoại, mở khóa manh mối, giải đúng checkpoint, kích hoạt lệnh khám xét lại, nộp Cáo trạng kết án.
-   * **Độc lập riêng:** Vị trí cuộn trang, zoom tài liệu, popup đọc hồ sơ lời khai. Ai đọc gì tùy ý, không bị cướp màn hình của nhau.
-4. **Curated Board Layout (Bố cục do Game Master định hình):**
-   * Người chơi không kéo thả ghim tự do hay can thiệp bố cục Canvas. Vị trí các manh mối trên bảng điều tra do kịch bản và Admin thiết kế sẵn, chỉ hiển thị mở dần khi nhóm mở khóa thành công.
-5. **Dual Entry Model (Bản Hộp Giấy vs Bản Online):**
-   * **Bản Hộp Giấy (Physical Companion):** Quét Static QR in trong nắp hộp (`?mode=box`) ➔ Vào thẳng công cụ hỗ trợ mà không cần tài khoản; người cầm hộp có thể bấm [Tạo phòng] để đồng bộ máy cho bạn bè cùng bàn.
-   * **Bản Online (Digital Access):** Đăng nhập Supabase Auth ➔ Quản lý license và số lượt tạo phòng; chia sẻ link Discord cho bạn bè chơi từ xa.
+> [!NOTE]
+> **Thuật ngữ:** bước cuối của vụ án gọi là **kết luận** (người chơi nộp kết luận: thủ phạm, động cơ, mâu thuẫn). Không dùng từ "cáo trạng". Code, DB và các tài liệu khác hiện vẫn dùng `indictment` / "cáo trạng"; việc đổi tên theo dõi ở [`TECHDEBT.md`](../TECHDEBT.md) #21.
 
 ---
 
-## 🗄️ PHẦN 2: CƠ SỞ DỮ LIỆU & KIẾN TRÚC BACKEND (DATABASE SCHEMA)
+## 1. Tổng quan
 
-Hệ thống tận dụng nền tảng **Supabase PostgreSQL** đã có sẵn trong dự án.
+### 1.1. Bối cảnh
 
-### 2.1. Bảng `game_rooms`
+Nhóm người chơi cùng điều tra một vụ án trên nhiều thiết bị cá nhân. Nhóm thường ngồi quanh bộ hộp vật lý (tài liệu mật in trên giấy), hoặc chơi từ xa qua Discord, Meet, Zalo. Web app là công cụ phụ trợ: bẻ khóa điện thoại, nghe audio, nhập đáp án checkpoint, nộp kết luận.
+
+### 1.2. Hai chế độ vào game
+
+| Chế độ                            | Điểm vào                       | Phòng chờ                                |
+| :-------------------------------- | :----------------------------- | :--------------------------------------- |
+| **Bản hộp vật lý** (`mode = box`) | QR tĩnh in chung trong nắp hộp | **Bắt buộc**, kể cả khi chơi 1 người     |
+| **Bản online, chơi solo**         | Tài khoản + license            | **Không qua** phòng chờ, vào thẳng intro |
+| **Bản online, chơi nhóm**         | Tài khoản + license            | Chưa thiết kế, để sau (Phần 9, Q11)      |
+
+### 1.3. Nguyên tắc cốt lõi
+
+1. **Vào phòng không rào cản:** không tài khoản, không email, không tải app. Quét QR, nhập nickname, vào phòng.
+2. **QR chung, phòng do Host tạo:** mọi hộp in chung một QR tĩnh. QR chỉ mở đúng vụ án. Danh tính phòng do người bấm **[Tạo phòng]** sinh ra. Không chống chép bằng mã riêng từng hộp (lý do ở [`license_technical.md`](../product/license_technical.md) mục 1.1).
+3. **Cách ly Solo và Room:** phòng mới luôn bắt đầu từ 0%. Vào phòng không đọc, không ghi savegame Solo.
+4. **Tiến trình chung, góc nhìn riêng:**
+   - Đồng bộ chung: phase màn hình, checkpoint đã giải, điện thoại đã mở, hồ sơ đã mở khóa, kết luận.
+   - Độc lập riêng: tài liệu đang đọc, vị trí cuộn, zoom, xem lại lịch sử, phát voice.
+5. **Host điều nhịp, ai cũng điều tra:** chỉ Host chuyển các màn dẫn truyện (intro). Trong gameplay, mọi thành viên đều giải được checkpoint và nộp được kết luận.
+6. **Bố cục do Game Master định hình:** người chơi không kéo thả ghim trên bảng điều tra.
+
+---
+
+## 2. Luồng người chơi
+
+### 2.1. Sơ đồ phase của phòng
+
+```
+[Landing] ──chọn vụ──► [Màn vào game] ──Tạo / Vào──► [Nickname] ──► [Phòng chờ]
+                                                                       │
+                    ┌──────────────────────────────────────────────────┘
+                    ▼
+   lobby ──Host: Bắt đầu──► intro_scene ──Host: Tiếp tục──► intro_handover
+                                                               │
+                                          Host: Tiếp nhận vụ án│ (bắt đầu tính giờ)
+                                                               ▼
+                       epilogue ◄──nộp kết luận── investigating
+```
+
+- **Phase là trạng thái của phòng**, lưu trên server. Mọi thiết bị đã vào cuộc render theo phase hiện tại.
+- F5 hoặc mất mạng: client đọc lại phase từ server, quay về đúng màn của phòng.
+- Vòng đời lưu trữ của phòng (`status`) tách riêng với phase, xem Phần 6.
+
+### 2.2. Giai đoạn 1 — Landing Page (cá nhân)
+
+- Ai cũng vào tự do, không đồng bộ với ai.
+- Hiển thị danh sách vụ án: độ khó, độ kinh dị, thời lượng dự kiến, số người khuyến nghị.
+- Bấm vào một vụ án: chuyển sang màn vào game của vụ đó.
+- Người quét QR trên hộp **bỏ qua landing**, vào thẳng màn vào game của vụ in trên hộp.
+
+### 2.3. Giai đoạn 2 — Màn vào game
+
+**Điểm vào:**
+
+- QR tĩnh trong nắp hộp: `https://<domain>/play/<case_id>?mode=box`.
+- Hoặc từ landing.
+
+**Màn hình có 2 lựa chọn:**
+
+| Lựa chọn        | Hành vi                                                                                                                                                                                           |
+| :-------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **[Tạo phòng]** | Người bấm trở thành Host. Host đặt **số người tối đa** của phòng. Server sinh mã phòng 4 ký tự và QR động. Gợi ý dưới nút: _"Chỉ 1 người trong nhóm tạo phòng, những người khác chọn Vào phòng."_ |
+| **[Vào phòng]** | Ô nhập mã 4 ký tự. Mã sai hoặc phòng không tồn tại thì báo lỗi, **không bao giờ tự tạo phòng mới**.                                                                                               |
+
+**Số người tối đa:**
+
+- Host bắt buộc đặt khi tạo phòng. Hệ thống không có giới hạn chung.
+- Host sửa được trong phòng chờ, nhưng không thấp hơn số người đang có trong phòng.
+- Phòng đủ người thì từ chối người mới, báo _"Phòng đã đủ người"_.
+
+**QR động của phòng:**
+
+- Hiển thị trên phòng chờ của Host (và của mọi thành viên, để mời thêm người), kèm mã to và nút chia sẻ link.
+- Link dạng `https://<domain>/play/<case_id>?room=<CODE>`. Quét vào là đi thẳng tới bước nhập nickname, bỏ qua màn 2 lựa chọn.
+
+**Nickname:**
+
+- Bắt buộc, 1–20 ký tự. Trùng tên trong phòng thì server tự thêm hậu tố (`Vy 2`).
+- Avatar tự sinh từ nickname (chữ cái đầu + màu), không upload.
+
+**Giới hạn nhập mã sai:**
+
+- Rate limit theo IP: tối đa 10 lần sai trong 5 phút, sau đó chờ 5 phút. Lý do: mã 4 ký tự có khoảng 920 nghìn tổ hợp, đoán mò được nếu không giới hạn.
+- Không khóa mã phòng khi bị nhập sai, tránh người khác cố tình làm khóa phòng.
+
+### 2.4. Giai đoạn 3 — Phòng chờ
+
+Mọi người chơi bản hộp đều đi qua phòng chờ, kể cả khi chơi 1 người hoặc vào muộn.
+
+**Khi phòng đang ở `lobby`:**
+
+- Danh sách thành viên realtime: avatar, nickname, nhãn Host, trạng thái online (Supabase Presence).
+- Nút Sẵn sàng **không** có. Host bấm **[Bắt đầu]** lúc nào cũng được, cả phòng chuyển sang `intro_scene` cùng lúc.
+
+**Khi phòng đã bắt đầu (người vào muộn):**
+
+- Người mới vẫn vào phòng chờ trước. Phòng chờ hiển thị:
+  - Danh sách người **đang chơi**, kèm màn hiện tại của phòng (ví dụ _"Đang điều tra — 25 phút"_).
+  - Nút **[Vào cuộc]**. Bấm vào thì đi thẳng tới phase hiện tại của phòng, thấy toàn bộ tiến trình chung đã có.
+- Cả phòng nhận thông báo _"Vy vừa vào cuộc"_.
+
+**Mọi lúc:**
+
+- Mọi người có nút **[Rời phòng]**.
+- Chỉ Host thấy: sửa số người tối đa, kick thành viên, chuyển quyền Host.
+- Host rời phòng khi chưa có ai khác: phòng bị hủy (chỉ khi còn ở `lobby`).
+
+**Ra vào tự do:**
+
+- **Rời phòng** (bấm nút): giải phóng chỗ. Quay lại thì vào như người mới, nếu phòng còn chỗ. Server nhận lại đúng nickname cũ nhờ token trên thiết bị.
+- **Mất kết nối** (tắt màn hình, mất mạng, F5): vẫn giữ chỗ. Mở lại là tự kết nối, không phải nhập lại gì.
+
+### 2.5. Giai đoạn 4.1 — Cảnh mở đầu (`intro_scene`)
+
+- Ảnh hiện trường, đoạn mở đầu, voice người báo án.
+- Voice: người chơi tự bấm phát trên máy mình (trình duyệt mobile chặn autoplay). Không tự phát.
+- Mỗi máy báo "đã đọc" khi người chơi cuộn hết nội dung hoặc bấm phát voice. Host thấy chỉ báo `3/5 đã đọc`.
+- Chỉ Host có **[Tiếp tục]**. Thành viên thấy dòng _"Chờ Host chuyển màn"_.
+- Màn render ngay khi đổi phase, dùng nội dung đã cache. Không render màn trống trong lúc chờ Supabase (quy tắc Zero-Black-Screen ở `AGENTS.md`).
+
+### 2.6. Giai đoạn 4.2 — Bàn giao hồ sơ (`intro_handover`)
+
+- Hồ sơ bàn giao, thông tin ban đầu, nhiệm vụ điều tra. Mỗi người xem độc lập.
+- Chỉ Host có **[Tiếp nhận vụ án]**. Bấm xong:
+  - Server ghi `started_at`. Đây là mốc bắt đầu tính giờ.
+  - Cả phòng chuyển sang `investigating`.
+
+### 2.7. Giai đoạn 5 — Điều tra (`investigating`)
+
+- **Tiến trình chung:** thành viên nào giải đúng checkpoint thì cả phòng mở khóa nội dung tương ứng.
+- **Nghiên cứu tự do:** ai cũng xem lại tài liệu cũ qua lịch sử, không ảnh hưởng người khác.
+- **Thông báo:**
+  - Có sự kiện: tick done tại mục liên quan, cộng toast ở góc dưới bên phải.
+  - Icon chuông chứa danh sách mọi thông báo của phòng, có số chưa đọc.
+  - Bấm vào một thông báo: mở thẳng nội dung tương ứng.
+  - Số chưa đọc lưu theo từng thiết bị (localStorage).
+  - Phòng đông: tối đa 3 toast cùng lúc, toast thừa chỉ vào chuông.
+- **Sự kiện tạo thông báo:** giải checkpoint, mở khóa hồ sơ, bẻ khóa điện thoại, thành viên vào hoặc rời phòng, chuyển quyền Host, nộp kết luận.
+- **Chỉ điểm tài liệu (giữ từ spec cũ):** thành viên bấm **[Chỉ điểm]** trên thẻ tài liệu hoặc vật chứng. Máy đồng đội hiện badge _"Nam đang chỉ điểm văn bản này"_ trên thẻ đó và cuộn danh mục tới thẻ. Không áp dụng lên bảng ghim.
+- **Nộp kết luận:**
+  - **Mọi thành viên** đều nộp được.
+  - Bắt buộc hộp xác nhận: _"Nộp kết luận sẽ kết thúc vụ án cho cả phòng. Tiếp tục?"_.
+  - Hai người nộp gần cùng lúc: server chỉ nhận bản đến trước (khóa theo phase: chỉ chấp nhận khi phòng còn ở `investigating`). Bản sau nhận thông báo _"Nam đã nộp kết luận"_.
+  - Nộp sai thì sao: phụ thuộc hệ thống điểm, xem Phần 9 (Q2).
+
+### 2.8. Giai đoạn 6 — Hậu truyện (`epilogue`)
+
+- Mọi máy cùng chuyển sang kết quả, đáp án, epilogue.
+- Server ghi `ended_at`, tính thời gian hoàn thành, ghi bảng xếp hạng (Phần 7).
+- Người chơi vẫn xem lại hồ sơ được. Phòng chuyển `status = completed` và được lưu lại (Phần 6).
+
+---
+
+## 3. Quyền Host
+
+| Hành động                                                    | Host | Thành viên |
+| :----------------------------------------------------------- | :--: | :--------: |
+| Bắt đầu game, chuyển màn intro, tiếp nhận vụ án              |  ✓   |            |
+| Sửa số người tối đa, kick thành viên, chuyển quyền Host      |  ✓   |            |
+| Giải checkpoint, bẻ khóa điện thoại, ghi chú chung, chỉ điểm |  ✓   |     ✓      |
+| Nộp kết luận                                                 |  ✓   |     ✓      |
+
+**Chuyển quyền khi Host vắng mặt:**
+
+- Host chủ động chuyển cho thành viên bất kỳ.
+- Host offline (theo Presence) quá 60 giây: server tự chuyển quyền cho thành viên online vào phòng sớm nhất. Thông báo cho cả phòng.
+- Host cũ quay lại: là thành viên thường, không tự lấy lại quyền.
+
+---
+
+## 4. Cơ sở dữ liệu
+
+### 4.1. Bảng `game_rooms` (thêm cột)
 
 ```sql
 CREATE TABLE IF NOT EXISTS game_rooms (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  room_code VARCHAR(4) NOT NULL,               -- Mã phòng 4 ký tự Crockford Base32 (VD: "SHER")
-  game_id VARCHAR(50) NOT NULL DEFAULT 'case_000',
-  host_nickname VARCHAR(100) NOT NULL,        -- Tên người tạo phòng
-  status VARCHAR(20) NOT NULL DEFAULT 'active', -- 'active' | 'completed' | 'archived'
-  
-  -- Single Source of Truth cho tiến trình vụ án
-  state_json JSONB NOT NULL DEFAULT '{}'::jsonb,
-  
-  version INTEGER NOT NULL DEFAULT 1,          -- Version counter phục vụ sync chống rớt mạng
+  room_code VARCHAR(4),                          -- Crockford Base32. NULL khi phòng không còn active (mã được giải phóng)
+  game_id VARCHAR(50) NOT NULL,
+
+  -- Mới
+  mode VARCHAR(10) NOT NULL DEFAULT 'box',       -- 'box' | 'online'
+  status VARCHAR(20) NOT NULL DEFAULT 'active',  -- 'active' | 'dormant' | 'completed' (Phần 6)
+  phase VARCHAR(20) NOT NULL DEFAULT 'lobby',    -- lobby | intro_scene | intro_handover | investigating | epilogue
+  phase_changed_at TIMESTAMPTZ DEFAULT NOW(),
+  max_players SMALLINT NOT NULL CHECK (max_players >= 1),
+  host_participant_id UUID,                      -- FK room_participants(id)
+  started_at TIMESTAMPTZ,                        -- Host bấm Tiếp nhận vụ án
+  ended_at TIMESTAMPTZ,                          -- nộp kết luận
+  last_activity_at TIMESTAMPTZ DEFAULT NOW(),
+
+  state_json JSONB NOT NULL DEFAULT '{}'::jsonb, -- tiến trình điều tra (mục 4.4)
+  version INTEGER NOT NULL DEFAULT 1,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Index tra cứu phòng đang hoạt động
-CREATE UNIQUE INDEX IF NOT EXISTS idx_game_rooms_active_code 
-ON game_rooms(room_code) 
-WHERE status = 'active';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_game_rooms_active_code
+ON game_rooms(room_code) WHERE status = 'active';
 ```
 
-### 2.2. Cấu trúc Tiến Trình `state_json`
+Sinh mã: server thử `INSERT` với mã ngẫu nhiên. Nếu vi phạm unique index thì sinh mã khác, tối đa 5 lần. Không cần Redis hay khóa phân tán.
 
-```ts
-export interface RoomInvestigationState {
-  // Giai đoạn 0: Bẻ khóa điện thoại nạn nhân
-  phoneSolved: boolean
-  phoneInputs: Record<string, string>   // key = id ô nhập trong checkpoint phone_lookup
+### 4.2. Bảng `room_participants` (mới)
 
-  // Giai đoạn 1: Thẩm vấn nghi phạm & Checkpoints
-  investigatedSuspects: string[]      // key nhân vật (case_characters.key)
-  solvedFollowups: string[]
-  completedCheckpoints: string[]     // ID các checkpoint đã giải (VD: ["cp-000-1", "cp-000-2a"])
-
-  // Bộ hồ sơ đã mở theo unlocksDossier (lib/progress/case-progress.ts)
-  unlockedDossiers?: string[]
-
-  // Khám xét lại hiện trường: mở sẵn từ đầu, chỉ lưu đã mở hay chưa
-  reinvestigateOpened: boolean
-
-  // Giai đoạn kết: Cáo trạng & Thủ phạm
-  indictmentSolved: boolean
-  solvedCulprit: string | null
-
-  // Ghi chú & Lớp vẽ tương tác nhóm
-  teamNotes?: string                  // Cuốn sổ tay điều tra chung (Notebook Modal)
-  annotations?: Record<string, AnnotationStroke[]> // Lớp vẽ/dạ quang đè trên tài liệu
-  canvasNotes?: CanvasStickyNote[]    // Giấy dán ghi chú trực tiếp trên bàn Canvas (Sticky Notes)
-
-  // Nhật ký hành động gần nhất để hiển thị Toast thông báo
-  lastAction?: {
-    actorName: string
-    actionText: string
-    timestamp: number
-  }
-}
-```
-
----
-
-## 🔄 PHẦN 3: GIAO THỨC ĐỒNG BỘ REALTIME & LUỒNG DỮ LIỆU (DATA FLOW)
-
-```
-[ Client A (Nam) ] ──────── Bấm giải đúng ────────┐
-       │                                         │
-       ▼ (1. Local Optimistic Update)            │
-  Giao diện Nam mở khóa                          │
-                                                 ▼
-                                     [ POST /api/rooms/progress ]
-                                     (Server Route bảo mật bằng Service Role)
-                                                 │
-                                                 ├────────────────────────┐
-                                                 ▼ (2. JSON Patch DB)     ▼ (3. Supabase Broadcast)
-                                         [ Postgres game_rooms ]   [ Kênh room:SHER ]
-                                         state_json || :patch      bắn event PROGRESS_UPDATE
-                                         version = version + 1                    │
-                                                                  ┌───────────────┴───────────────┐
-                                                                  ▼                               ▼
-                                                          [ Client B (Vy) ]               [ Client C (Tuấn) ]
-                                                          Merge state                     Merge state
-                                                          Toast: "Nam vừa..."             Toast: "Nam vừa..."
-```
-
-### 3.1. Kênh Supabase Realtime Channel
-* Mỗi phòng lắng nghe trên 1 kênh duy nhất: `room:${room_code}`.
-* **Payload Event `PROGRESS_UPDATE`:**
-  ```json
-  {
-    "type": "PROGRESS_UPDATE",
-    "version": 4,
-    "senderId": "client_abc123",
-    "patch": { "phoneSolved": true },
-    "actorName": "Nam",
-    "actionText": "đã bẻ khóa thành công điện thoại của Khang"
-  }
-  ```
-
-### 3.2. Cơ chế Vá Dữ Liệu (JSON Patch Merge) chống Race Condition
-Khi nhiều người chơi submit hành động gần như đồng thời, Server không ghi đè toàn bộ `state_json`. Server áp dụng phép merge của PostgreSQL:
 ```sql
-UPDATE game_rooms 
-SET 
-  state_json = state_json || $1::jsonb,
-  version = version + 1,
-  updated_at = NOW()
-WHERE room_code = $2 AND status = 'active'
-RETURNING state_json, version;
+CREATE TABLE room_participants (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  room_id UUID NOT NULL REFERENCES game_rooms(id) ON DELETE CASCADE,
+  nickname VARCHAR(20) NOT NULL,
+  token_hash TEXT NOT NULL,          -- hash của participant token, token gốc chỉ lưu ở client
+  joined_at TIMESTAMPTZ DEFAULT NOW(),
+  entered_at TIMESTAMPTZ,            -- bấm Vào cuộc (hoặc Host bấm Bắt đầu khi đang ở lobby). NULL = còn ở phòng chờ
+  left_at TIMESTAMPTZ,               -- bấm Rời phòng. NULL = đang giữ chỗ
+  kicked BOOLEAN DEFAULT false,
+  UNIQUE (room_id, nickname)
+);
 ```
-Đối với các mảng (như `completedCheckpoints`), server thực hiện phép hợp (Union) để bảo toàn đáp án của mọi thành viên.
 
-### 3.3. Cơ chế Khôi Phục Mạng (Sleep / Reconnect Fallback)
-Khi người chơi tắt màn hình điện thoại hoặc mạng 4G bị gián đoạn:
-1. Khi tab trình duyệt active trở lại (`visibilitychange` hoặc sự kiện `online`):
-2. Client gửi một truy vấn nhẹ kiểm tra: `GET /api/rooms/state?code=SHER`.
-3. Nếu `serverVersion > localVersion`, Client tự động nạp lại bản Snapshot mới nhất từ DB.
+- Số chỗ đã dùng = số dòng có `left_at IS NULL AND kicked = false`. Server kiểm tra với `max_players` trong cùng transaction khi join.
+- Trạng thái online lấy từ Supabase Presence, không ghi vào bảng.
 
----
+### 4.3. Bảng `room_events` (mới)
 
-## 🎨 PHẦN 4: THIẾT KẾ TRẢI NGHIỆM NGƯỜI CHÙNG (UI/UX SPECIFICATION)
+Phục vụ danh sách thông báo và bấm chuyển nhanh. Thay cho `state_json.lastAction` (chỉ giữ được 1 sự kiện).
 
-### 4.1. Mã Phòng (Room Code Generator)
-* Sử dụng bộ ký tự an toàn **Crockford Base32**: `23456789ABCDEFGHJKMNPQRSTUVWXYZ`.
-* Loại bỏ hoàn toàn các ký tự gây nhầm lẫn: `0`, `O`, `1`, `I`, `L`.
-* Độ dài: đúng **4 ký tự** (VD: `SHER`, `W9TK`, `7KAP`).
+```sql
+CREATE TABLE room_events (
+  id BIGSERIAL PRIMARY KEY,
+  room_id UUID NOT NULL REFERENCES game_rooms(id) ON DELETE CASCADE,
+  actor_participant_id UUID REFERENCES room_participants(id),
+  type VARCHAR(40) NOT NULL,         -- checkpoint_solved | dossier_unlocked | phone_solved | member_joined | host_changed | conclusion_submitted ...
+  target_ref TEXT,                   -- id nội dung để mở nhanh (checkpoint id, dossier id ...)
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_room_events_room ON room_events(room_id, id);
+```
 
-### 4.2. Giao Diện Tương Tác
-1. **Nút `[ 👥 Chơi Nhóm ]`:** Đặt trên Header điều tra chính.
-2. **Modal Quản Lý Phòng (`RoomModal`):**
-   * **Tab Tạo phòng:** Bấm nút ➔ Sinh mã to bản + Nút *[Sao chép Link mời Discord]* + Nút *[Hiện mã QR]*.
-   * **Tab Vào phòng:** Ô nhập mã 4 ký tự + Ô nhập Nickname thám tử.
-3. **Thanh Trạng Thái Phòng (`RoomBadge`):**
-   * Hiển thị gọn gàng góc trên: `[ 🟢 Phòng: SHER ]`.
-   * Bấm vào để sao chép lại link mời hoặc chọn *[Rời phòng]*.
-4. **Thông Báo Vinh Danh Đồng Đội (Team Toast):**
-   * Khi thành viên giải xong mục tiêu, góc màn hình hiện Toast thông báo màu vàng/xanh kèm âm thanh hiệu ứng nhẹ:  
-     `🕵️ Nam vừa bẻ khóa thành công tin nhắn của Khang!`
+### 4.4. `state_json`
 
-
-5. **Cơ Chế Chỉ Điểm Đồng Đội (Document & Clue Ping Protocol):**
-   * **Tập trung vào Tài Liệu & Vật Chứng (Dossier / Evidence Focus):** Khi một thành viên phát hiện manh mối hoặc văn bản mấu chốt, bấm nút [ 🎯 Chỉ điểm ] trên thẻ tài liệu hoặc vật chứng.
-   * **Phản hồi tức thì trên máy đồng đội:**
-     - Tên thám tử và badge chỉ điểm [ 🎯 Nam đang chỉ điểm văn bản này ] hiển thị ngay trên thẻ tài liệu tương ứng của tất cả các thành viên trong phòng.
-     - Tự động cuộn (auto-scroll) danh mục tới tài liệu được chỉ điểm để mọi người cùng mở ra đối chiếu.
-   * **Quy chuẩn Cách Ly Bảng Ghim:** Không áp dụng laser ping / radar ping gây nhiễu lên bảng ghim Corkboard; tính năng chỉ điểm được giới hạn tập trung trong không gian hồ sơ chứng cứ và tài liệu đọc.
-### 4.3. Cơ Chế Room Token & Phục Hồi Session (Handshake Protocol)
-1. **Phân quyền Host vs Guest:**
-   * Khi Host tạo phòng (`POST /api/rooms/create`): Server cấp `host_token` lưu trong `localStorage` của Host. Chỉ Host mới có quyền đóng phòng/kết thúc phiên.
-   * Khi Guest tham gia (`POST /api/rooms/join`): Server cấp `guest_token` tạm thời.
-2. **Chống trùng lặp & Tự hồi phục khi F5 / Mất mạng:**
-   * Client lưu session: `{ roomCode: "SHER", participantToken: "tok_...", nickname: "Vy" }`.
-   * Khi người chơi reload trang hoặc mở lại Safari: App tự động gọi `POST /api/rooms/reconnect` với token cũ ➔ Server nhận diện đúng người cũ, không bắt nhập lại tên, không sinh ra "Vy (1)".
+Giữ cấu trúc `RoomInvestigationState` hiện tại (`phoneSolved`, `completedCheckpoints`, `unlockedDossiers`, `teamNotes`, ...). Bỏ `lastAction` sau khi `room_events` chạy. Field `indictmentSolved` đổi tên theo [`TECHDEBT.md`](../TECHDEBT.md) #21.
 
 ---
 
-## 🔒 PHẦN 5: BẢO MẬT & XỬ LÝ NGOẠI LỆ (SECURITY & EDGE CASES)
+## 5. API và giao thức đồng bộ
 
-1. **Chống can thiệp Client (No Anon Direct Writes):**
-   * Quyền `UPDATE` trên bảng `game_rooms` bị vô hiệu hóa đối với `anon role`.
-   * Mọi cập nhật trạng thái bắt buộc phải thông qua Next.js Server Route (`/api/rooms/progress`) được xác thực.
-2. **Chống Vòng Lặp Vô Tận (Echo Loop Guard):**
-   * Mỗi client sinh một UUID tạm thời `clientId` khi mount.
-   * Khi nhận event Broadcast: Nếu `senderId === myClientId` ➔ Bỏ qua ngay lập tức.
-3. **Cách Ly Tuyệt Đối LocalStorage:**
-   * Khi đang ở trong phòng (`roomCode !== null`), toàn bộ state điều tra chỉ tồn tại trong React Context/Memory và đồng bộ qua Supabase.
-   * Không bao giờ đọc/ghi đè vào các key lưu trữ của chế độ Solo.
-4. **Hết Hạn Phòng (Room Expiration):**
-   * Phòng tự động lưu trữ (`status = 'archived'`) sau 24 giờ kể từ khi tạo hoặc khi nhóm nộp xong Bản Cáo Trạng thành công.
+### 5.1. Route Handlers
+
+Mọi thao tác ghi đi qua server, xác thực bằng participant token. Client không ghi trực tiếp `game_rooms`.
+
+| Route                        | Ai gọi      | Tác dụng                                                                                              |
+| :--------------------------- | :---------- | :---------------------------------------------------------------------------------------------------- |
+| `POST /api/rooms/create`     | bất kỳ      | Tạo phòng với `max_players`, tạo participant Host, trả token + mã                                     |
+| `POST /api/rooms/join`       | bất kỳ      | Kiểm tra mã, rate limit, số chỗ. Tạo participant, trả token. Mã không tồn tại thì trả 404             |
+| `POST /api/rooms/enter`      | participant | Bấm Vào cuộc (người vào muộn), ghi `entered_at`                                                       |
+| `POST /api/rooms/reconnect`  | participant | Nhận lại đúng người cũ bằng token, không tạo nickname mới. Phòng `dormant` thì kích hoạt lại (Phần 6) |
+| `POST /api/rooms/leave`      | participant | Rời phòng, giải phóng chỗ. Host rời thì chuyển quyền hoặc hủy phòng trống                             |
+| `POST /api/rooms/phase`      | Host        | Chuyển phase. Chỉ cho phép chuyển tới phase kế tiếp                                                   |
+| `POST /api/rooms/host`       | Host        | Chuyển quyền Host, kick thành viên, sửa `max_players`                                                 |
+| `POST /api/rooms/progress`   | participant | Ghi tiến trình (merge), ghi `room_events`                                                             |
+| `POST /api/rooms/conclusion` | participant | Nộp kết luận. Chỉ nhận khi phòng ở `investigating`. Chuyển `epilogue`, ghi `ended_at`                 |
+| `GET /api/rooms/state?code=` | participant | Snapshot: phase, state, version, thành viên, sự kiện mới                                              |
+
+Các route đọc dữ liệu động có `export const dynamic = 'force-dynamic'`.
+
+### 5.2. Kênh realtime
+
+- Một kênh mỗi phòng: `room:${room_id}` (dùng id, không dùng mã phòng, vì mã có thể đổi khi phòng được kích hoạt lại).
+- Sự kiện broadcast: `PHASE_CHANGE`, `PROGRESS_UPDATE`, `MEMBER_UPDATE`, `HOST_CHANGE`, `ROOM_EVENT`.
+- Server broadcast sau khi ghi DB thành công. Payload luôn có `version`.
+- Echo guard: bỏ qua sự kiện có `senderId` trùng `clientId` của mình.
+
+### 5.3. Ghi tiến trình chống race condition
+
+Server merge, không ghi đè toàn bộ `state_json`. Mảng (`completedCheckpoints`, `unlockedDossiers`, ...) dùng phép hợp (union). Mỗi lần ghi tăng `version`.
+
+### 5.4. Khôi phục mạng
+
+Khi tab active lại (`visibilitychange`, `online`): gọi `GET /api/rooms/state`. Nếu `serverVersion > localVersion` thì nạp snapshot, gồm cả phase.
+
+---
+
+## 6. Lưu trữ phòng
+
+Phòng được lưu lại, không xóa sau khi chơi xong. Để không tốn tài nguyên, phòng chuyển qua các trạng thái:
+
+| `status`    | Khi nào                                                    | Mã phòng                            | Realtime | Hành vi                                                                                                |
+| :---------- | :--------------------------------------------------------- | :---------------------------------- | :------- | :----------------------------------------------------------------------------------------------------- |
+| `active`    | Đang chơi hoặc có hoạt động trong 7 ngày                   | Giữ                                 | Bật      | Bình thường                                                                                            |
+| `dormant`   | Chưa kết thúc, không có hoạt động 7 ngày                   | **Giải phóng** (`room_code = NULL`) | Tắt      | Tiến trình vẫn lưu đủ. Thiết bị từng chơi bấm **[Tiếp tục phòng cũ]** thì phòng về `active` với mã mới |
+| `completed` | Đã nộp kết luận                                            | Giải phóng                          | Tắt      | Chỉ đọc: xem lại hồ sơ, kết quả, xếp hạng                                                              |
+| (xóa)       | Phòng ở `lobby`, chưa bắt đầu, không ai online quá 30 phút |                                     |          | Xóa hẳn, là phòng rác                                                                                  |
+
+**Vì sao phải giải phóng mã phòng:** mã 4 ký tự chỉ có khoảng 920 nghìn tổ hợp. Nếu mọi phòng cũ giữ mã mãi, kho mã cạn dần và sinh mã mới ngày càng hay trùng. Mã chỉ cần cho phòng đang chơi.
+
+**Tiếp tục phòng cũ:** thiết bị lưu danh sách phòng đã tham gia (participant token) trong localStorage. Màn vào game hiển thị **[Tiếp tục phòng cũ]** nếu có.
+
+**Chi phí lưu trữ (ước tính):**
+
+- `state_json`: 5–20 KB mỗi phòng. `room_participants`: không đáng kể.
+- `room_events`: khoảng 100–300 dòng mỗi phòng, khoảng 50 KB. Đây là phần nặng nhất.
+- Giữ nguyên mọi thứ: khoảng 70 KB mỗi phòng, 10.000 phòng ≈ 700 MB. Vượt gói Free của Supabase (500 MB), còn rất nhỏ so với gói Pro (8 GB).
+- Đề xuất: xóa `room_events` sau 30 ngày kể từ khi `completed`. Kết quả, xếp hạng và tiến trình vẫn giữ. Còn khoảng 20 KB mỗi phòng, 10.000 phòng ≈ 200 MB.
+- Dọn dẹp chạy bằng job định kỳ (pg_cron trên Supabase hoặc cron trên VPS), mỗi ngày một lần.
+
+---
+
+## 7. Tính giờ và bảng xếp hạng
+
+- Thời gian hoàn thành = `ended_at - started_at`, do server tính. **Không trừ thời gian nghỉ**, kể cả khi phòng chuyển `dormant`.
+- Bảng xếp hạng **phân hạng theo số người chơi**. Quy chế đếm số người và các mức phân hạng: xem Phần 9 (Q8).
+- Xếp theo điểm trước, thời gian sau, như index `score DESC, completion_time_seconds ASC` trong [`rating_leaderboard.md`](../product/rating_leaderboard.md). Cách tính điểm: xem Phần 9 (Q2).
+- Mỗi bản ghi xếp hạng lưu số người chơi của phòng.
+
+---
+
+## 8. Bảo mật, ngoại lệ và hiện trạng code
+
+### 8.1. Bảo mật
+
+1. **Không ghi trực tiếp từ client:** khóa quyền `INSERT`/`UPDATE` của `anon` trên `game_rooms`, `room_participants`, `room_events`. Đọc qua server route hoặc RLS theo phòng.
+2. **Participant token:** sinh ngẫu nhiên, lưu ở localStorage của client, DB chỉ lưu hash. Mọi route ghi đều kiểm tra token thuộc đúng phòng và chưa bị kick.
+3. **Cách ly localStorage:** khi ở trong phòng, không đọc hoặc ghi key lưu trữ của chế độ Solo.
+
+### 8.2. Hiện trạng code lệch spec (cần sửa khi implement)
+
+Đối chiếu [`room-sync-context.tsx`](../../components/investigation/room-sync-context.tsx) ngày 2026-11-05:
+
+| Vấn đề                                                              | Vị trí                              | Hậu quả                                                                                                          |
+| :------------------------------------------------------------------ | :---------------------------------- | :--------------------------------------------------------------------------------------------------------------- |
+| Vào phòng bằng mã không tồn tại thì client **tự tạo phòng mới**     | `room-sync-context.tsx:441`         | Gõ sai mã là vào một phòng trống, không báo lỗi. Trái với mục 2.3                                                |
+| Client ghi thẳng `game_rooms` bằng anon key, không qua server route | `room-sync-context.tsx:423`, `:727` | Ai có anon key đều sửa được tiến trình phòng bất kỳ. `database_schema.md` ghi `game_rooms` chưa khóa RLS         |
+| Ghi đè toàn bộ `state_json` từ client (last write wins)             | `room-sync-context.tsx:727`         | Hai người giải gần cùng lúc có thể mất tiến trình của một người. Merge ở client chỉ gộp với state client đang có |
+| Không có phase, Host, participant, giới hạn số người                | toàn bộ                             | Chưa có phòng chờ, intro đồng bộ, quyền Host                                                                     |
+| Catch-up không so `version`                                         | `room-sync-context.tsx:748`         | Nạp lại kể cả khi không có gì mới |
+| Mã phòng sinh ở client bằng `Math.random`, không kiểm tra trùng | `room-modal.tsx:57` | Mã sinh trùng phòng đang có thì người tạo vào nhầm phòng của nhóm khác |
+| Presence gửi `email` và `userId` của người đăng nhập cho mọi thành viên | `room-sync-context.tsx:617` | Lộ email cho người lạ trong phòng. Chỉ cần gửi nickname và avatar |
+| Thuật ngữ và identifier `indictment` / "cáo trạng" | toàn codebase | Đổi sang "kết luận" theo [`TECHDEBT.md`](../TECHDEBT.md) #21                                                                                |
+
+---
+
+## 9. Đã chốt và còn chờ quyết định
+
+### 9.1. Đã chốt (2026-11-05)
+
+| #   | Nội dung                         | Quyết định                                                  |
+| :-- | :------------------------------- | :---------------------------------------------------------- |
+| Q1  | Ai được nộp kết luận             | Mọi thành viên, có hộp xác nhận                             |
+| Q3  | Nút Sẵn sàng                     | Bỏ. Host bắt đầu lúc nào cũng được                          |
+| Q4  | Số người mỗi phòng               | Host đặt khi tạo phòng, không vượt quá. Ra vào tự do        |
+| Q5  | Người vào muộn                   | Được vào. Qua phòng chờ, thấy người đang chơi, bấm Vào cuộc |
+| Q6  | Lưu phòng                        | Lưu lại, theo vòng đời ở Phần 6                             |
+| Q7  | Trừ thời gian nghỉ               | Không trừ                                                   |
+| Q8  | Phân hạng xếp hạng theo số người | Có (quy chế còn chờ, xem 9.2)                               |
+| Q9  | Voice khi ngồi cùng bàn          | Để sau. Bản đầu: mỗi máy tự phát                            |
+| Q10 | Solo                             | Online solo không qua phòng chờ. Bản hộp luôn qua phòng chờ |
+| Q11 | Bản online chơi nhóm, license    | Để sau                                                      |
+| —   | Thuật ngữ                        | Dùng "kết luận", bỏ "cáo trạng"                             |
+
+### 9.2. Còn chờ quyết định
+
+**Q2 — Hệ thống điểm theo checkpoint, và nộp kết luận sai.**
+Mô hình hiện có trong [`rating_leaderboard.md`](../product/rating_leaderboard.md): khởi điểm 100, trừ điểm khi mở gợi ý (-5 / -15 / -25) và khi đoán sai liên tục (-2 mỗi lần). Mô hình này chưa có điểm riêng cho từng checkpoint. Đề xuất:
+
+- Mỗi checkpoint có trường `points` (cấu hình trong Checkpoint Studio). Kết luận là một checkpoint, thường có điểm cao nhất.
+- Điểm tối đa của vụ = tổng `points`. Điểm hiển thị quy về thang 100, để giữ các rank S/A/B/C hiện có.
+- Mở gợi ý trừ theo tỷ lệ điểm của chính checkpoint đó (ví dụ mức 1 trừ 20%, mức 2 trừ 50%, mức 3 trừ 100%), thay vì trừ số cố định. Lý do: checkpoint nhỏ không bị trừ nặng hơn giá trị của nó.
+- Đoán sai checkpoint: giữ -2 mỗi lần sau lần sai thứ 3, không trừ quá điểm của checkpoint.
+- Nộp kết luận sai: cho nộp lại, mỗi lần sai trừ 25% điểm kết luận. Tối đa 3 lần; lần 3 sai thì vào kết cục sai, điểm kết luận = 0.
+- Các checkpoint không bắt buộc (nhánh phụ) chỉ cộng điểm, không chặn kết luận.
+
+Cần quyết: chấp nhận mô hình này, hay giữ mô hình trừ điểm cố định từ 100?
+
+**Q8b — Quy chế phân hạng theo số người.**
+
+- Đếm số người thế nào:
+  - (a) `max_players` Host đặt. Dễ gian lận: đặt 1 nhưng thực tế cả nhóm xem chung một máy.
+  - (b) Số người đã **vào cuộc** (`entered_at` khác NULL) trong suốt ván.
+  - (c) Số người online lúc nộp kết luận.
+- Đề xuất: **(b)**. Người vào rồi rời vẫn được tính, vì đã đóng góp.
+- Các mức phân hạng, đề xuất: **1 người**, **2 người**, **3–4 người**, **5–6 người**, **7+ người**.
+- Giới hạn tự nhiên không chặn được: nhiều người cùng xem một máy. Chấp nhận, vì bản hộp vốn chơi chung quanh bàn.
