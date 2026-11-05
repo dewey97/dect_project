@@ -8,6 +8,10 @@ services:
     restart: always
     env_file:
       - .env
+      # Secret server-only (SUPABASE_SERVICE_ROLE_KEY). Không track git để
+      # `git reset --hard` khi deploy không ghi đè.
+      - path: .env.server
+        required: false
     ports:
       - "3000:3000"
     environment:
