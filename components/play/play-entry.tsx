@@ -191,9 +191,13 @@ export function PlayEntry({
                         {s.nickname}
                       </span>
                       <span className="flex flex-col items-end text-xs text-zinc-400">
-                        <span className="font-mono">{s.code ?? "mã mới khi mở lại"}</span>
+                        <span className="font-mono">
+                          {s.code ?? "mã mới khi mở lại"}
+                        </span>
                         {s.unranked && (
-                          <span className="text-amber-300">Không tính xếp hạng</span>
+                          <span className="text-amber-300">
+                            Không tính xếp hạng
+                          </span>
                         )}
                       </span>
                     </PlayButton>
@@ -208,6 +212,12 @@ export function PlayEntry({
             className="self-center py-3 text-sm text-zinc-500 underline-offset-4 hover:text-zinc-300 hover:underline"
           >
             Chơi một mình (không qua phòng)
+          </Link>
+          <Link
+            href={`/buy/${caseId}`}
+            className="self-center py-3 text-sm text-amber-400/80 underline-offset-4 hover:text-amber-300 hover:underline"
+          >
+            Mua vụ án
           </Link>
         </div>
       )}
