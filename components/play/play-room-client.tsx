@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useRoomSync } from "@/components/investigation/room-sync-context";
 import { PlayEntry } from "@/components/play/play-entry";
 import { PlayLobby } from "@/components/play/play-lobby";
@@ -25,6 +25,7 @@ export interface PlayCaseInfo {
  */
 export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { room, me, isConnecting } = useRoomSync();
   // F5 / mở lại link phòng mà thiết bị đã có phiên: provider tự nối lại, hiện trạng thái chờ
   // thay vì màn vào game. Các thao tác khác (tạo, vào phòng) giữ nguyên form để không mất lỗi.
@@ -39,6 +40,15 @@ export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
     !!me &&
     !!me.enteredAt &&
     (room.phase === "investigating" || room.phase === "epilogue");
+
+  // Giữ `?room=<CODE>` trên URL để F5 tự nối lại phòng (router của Next có thể ghi đè
+  // URL đã sửa bằng history.replaceState).
+  const urlRoom = searchParams.get("room");
+  useEffect(() => {
+    if (room?.code && urlRoom !== room.code && normalizeCaseId(room.caseId) === info.caseId) {
+      router.replace(`/play/${info.caseId}?room=${room.code}`, { scroll: false });
+    }
+  }, [room?.code, room?.caseId, urlRoom, info.caseId, router]);
 
   // Phòng thuộc vụ án khác (mở link cũ): chuyển về đúng vụ của phòng.
   useEffect(() => {

@@ -487,7 +487,8 @@ export function RoomSyncProvider({ children }: { children: React.ReactNode }) {
         const reads: Record<string, RoomPhase | null> = {};
         for (const [key, metas] of Object.entries(state)) {
           ids.add(key);
-          reads[key] = metas?.[0]?.readPhase ?? null;
+          // track() lần sau thêm meta mới vào cuối mảng, bản cũ có thể còn: lấy bản cuối.
+          reads[key] = metas?.[metas.length - 1]?.readPhase ?? null;
         }
         setOnlineIds(ids);
         setReadPhaseById(reads);

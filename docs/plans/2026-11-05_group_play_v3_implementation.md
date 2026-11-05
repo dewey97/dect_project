@@ -169,7 +169,10 @@ Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
 - **Đã làm:** provider tự gửi `claim` khi Host vắng Presence 60 giây và mình là thành viên online vào sớm nhất (server kiểm lại `last_seen_at`). E2E `e2e/group-play-v3.spec.ts` (3 người chơi: tạo phòng, mã sai, vào bằng mã, phòng chờ, Host bắt đầu, intro, tiếp nhận vụ án, người vào muộn, F5 giữ phòng; tự dọn phòng). Docs: spec mục 8.2 (bảng lỗi v1 → cách sửa), 4.2, 5.1; `database_schema.md`; `ROADMAP.md` #14; `TECHDEBT.md` #02, #24 mới; plan live cursor.
 - **Kiểm chứng:** `pnpm lint` pass. `pnpm build` (xem commit P7). E2E chạy được nhưng **skip**: chưa có DB E2E và migration 51 chưa chạy.
 - **Kết quả với DB thật (2026-11-05):** migration 51 đã chạy; `node scripts/ops/rooms-smoke.mjs` 16/16 bước pass, log server không có lỗi broadcast. Smoke để lại phòng đã kết thúc `2c59270e-89d9-4caa-a1ee-854cb4a2b284`. E2E tạm bỏ qua: chỉ chạy được với DB E2E riêng (`E2E_SUPABASE_URL`) hoặc ghi lên production.
-- **Còn lại:** push/deploy, rồi chạy migration 52; chạy E2E khi có DB E2E.
+- **Deploy (2026-11-05):** push `main` (`527c864..19cdf7c`), CI/CD pass, production phục vụ `/play` và `/api/rooms/*`. Migration 52 đã chạy: anon nhận `permission denied` khi đọc/ghi `game_rooms`, `room_participants` và gọi `room_join`. Smoke chạy lại sau khi khóa RLS: pass.
+- **Kiểm tay realtime 2 người (dev, cùng DB):** MEMBER_UPDATE (thành viên mới hiện sau ~3 giây), HOST_CHANGE, PHASE_CHANGE (máy khác tự sang intro, F5 giữ phòng), tự nhận Host khi Host vắng (~110 giây), "đã đọc" qua Presence, PROGRESS_UPDATE + ROOM_EVENT (toast, chuông có số chưa đọc), kết luận của người khác tự mở hậu truyện.
+- **Lỗi tìm thấy khi kiểm tay và đã sửa:** (1) Presence giữ cả meta cũ và mới sau `track()` lần hai, code đọc meta đầu nên "đã đọc" không bao giờ tăng: đọc meta cuối. (2) Chỉ báo "đã đọc" dựa hoàn toàn vào IntersectionObserver: thêm kiểm tra lúc mount khi nội dung đã vừa màn hình. (3) `?room=` trên URL `/play` có thể bị router ghi đè: tự đặt lại bằng `router.replace`.
+- **Còn lại:** chạy E2E khi có DB E2E.
 
 ## 5. Rủi ro và điểm gãy
 

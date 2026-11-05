@@ -39,11 +39,13 @@ export function PlayIntro({ info }: { info: PlayCaseInfo }) {
   useEffect(() => {
     const el = endRef.current;
     if (!el || (phase !== "intro_scene" && phase !== "intro_handover")) return;
+    // Nội dung ngắn, đã thấy cuối trang ngay khi mở: báo đã đọc luôn.
+    if (el.getBoundingClientRect().top <= window.innerHeight) markRead(phase);
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) markRead(phase);
       },
-      { threshold: 1 },
+      { threshold: 0 },
     );
     io.observe(el);
     return () => io.disconnect();
