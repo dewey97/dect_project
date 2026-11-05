@@ -1,9 +1,13 @@
 # Đặc Tả Kỹ Thuật: Hệ Thống Điểm Nghiệp Vụ & Bảng Xếp Hạng Thám Tử
+
 ## (Detective Rating, Penalty System & Leaderboard Spec)
 
 > **Mã đặc tả**: `SPEC-CORE-16`  
 > **Trạng thái**: Đã phê duyệt ý tưởng & ghi nhận kiến trúc (Ready for Roadmap Implementation)  
 > **Phân hệ**: Core Gameplay, Epilogue & Global Leaderboard
+
+> [!NOTE]
+> **Cập nhật 2026-11-05 (chơi nhóm):** đã chốt bảng xếp hạng phân hạng theo số người chơi, thời gian = `ended_at - started_at` do server tính, không trừ thời gian nghỉ. **Chưa chốt:** mô hình điểm theo từng checkpoint (thay cho trừ cố định từ 100) và quy chế đếm số người / các mức phân hạng. Đề xuất đang chờ: [`group_play_realtime.md`](../architecture/group_play_realtime.md) mục 9.2 (Q2, Q8b). Ma trận điểm dưới đây có thể đổi theo quyết định đó.
 
 ---
 
@@ -13,6 +17,7 @@ Trong các tựa game trinh thám điều tra thực tế, cảm giác thỏa m�
 Nếu hệ thống gợi ý quá dễ tiếp cận và miễn phí, người chơi dễ hình thành phản xạ bấm xem ngay khi gặp khó, làm suy giảm nghiêm trọng giá trị cốt lõi của trò chơi.
 
 Hệ thống **Điểm Nghiệp Vụ & Bảng Xếp Hạng (Detective Rating & Leaderboard)** được thiết kế nhằm:
+
 1. **Tạo ra "cái giá" đánh đổi rõ ràng**: Mỗi lần xé niêm phong gợi ý đều ảnh hưởng trực tiếp đến kết quả đánh giá năng lực phá án cuối cùng.
 2. **Kích thích lòng tự tôn và động lực chơi lại**: Người chơi cạnh tranh để đạt **Rank S (Thám Tử Bậc Thầy)** mà không cần bất kỳ sự trợ giúp nào.
 3. **Mở rộng tính năng Bảng Xếp Hạng (Global Leaderboard)**: Vinh danh các thám tử phá án độc lập và chính xác nhất trên nền tảng.
@@ -22,16 +27,17 @@ Hệ thống **Điểm Nghiệp Vụ & Bảng Xếp Hạng (Detective Rating & L
 ## ⚖️ 2. Cơ Chế Thang Điểm Nghiệp Vụ (Detective Rating Points)
 
 ### 2.1. Điểm khởi điểm
+
 - Khi bắt đầu một chuyên án mới, người chơi được cấp **100 Điểm Nghiệp Vụ** tối đa.
 
 ### 2.2. Ma trận trừ điểm (Penalty Matrix)
 
-| Hành động | Mức độ can thiệp | Điểm trừ | Ghi chú nghiệp vụ |
-| :--- | :--- | :---: | :--- |
-| **Bóc Gợi ý Mức 1** | Định hướng tài liệu (Directional) | **-5 điểm** | Tham vấn bước đầu, chỉ điểm hồ sơ cần đọc lại |
-| **Bóc Gợi ý Mức 2** | Gợi mở mâu thuẫn (Methodological) | **-15 điểm** | Đặt câu hỏi logic then chốt |
-| **Bóc Gợi ý Mức 3** | Tiết lộ lời giải (Critical Reveal) | **-25 điểm** | Can thiệp trực tiếp vào kết luận |
-| **Đoán sai Checkpoint liên tục** | Thử bừa đáp án (>3 lần sai) | **-2 điểm / lần** | Chống brute-force form nhập liệu |
+| Hành động                        | Mức độ can thiệp                   |     Điểm trừ      | Ghi chú nghiệp vụ                             |
+| :------------------------------- | :--------------------------------- | :---------------: | :-------------------------------------------- |
+| **Bóc Gợi ý Mức 1**              | Định hướng tài liệu (Directional)  |    **-5 điểm**    | Tham vấn bước đầu, chỉ điểm hồ sơ cần đọc lại |
+| **Bóc Gợi ý Mức 2**              | Gợi mở mâu thuẫn (Methodological)  |   **-15 điểm**    | Đặt câu hỏi logic then chốt                   |
+| **Bóc Gợi ý Mức 3**              | Tiết lộ lời giải (Critical Reveal) |   **-25 điểm**    | Can thiệp trực tiếp vào kết luận              |
+| **Đoán sai Checkpoint liên tục** | Thử bừa đáp án (>3 lần sai)        | **-2 điểm / lần** | Chống brute-force form nhập liệu              |
 
 ---
 
@@ -55,14 +61,14 @@ Tại màn hình kết thúc vụ án (**Ký Sự Hậu Án / Epilogue**), hệ 
 
 ### Chi tiết các cấp bậc:
 
-1. **Rank S — Thám Tử Bậc Thầy (Master Detective)** *(95 – 100 điểm)*:
+1. **Rank S — Thám Tử Bậc Thầy (Master Detective)** _(95 – 100 điểm)_:
    - **Tiêu chuẩn**: Hoàn toàn tự lực cánh sinh, hoặc tối đa chỉ mở 1 gợi ý Mức 1 trong suốt vụ án.
    - **Phần thưởng**: Huy chương vàng điều tra độc lập, hiệu ứng đặc biệt trên bảng vinh danh và mở khóa tư liệu tuyệt mật hậu trường vụ án.
-2. **Rank A — Thám Tử Ưu Tú (Senior Detective)** *(80 – 94 điểm)*:
+2. **Rank A — Thám Tử Ưu Tú (Senior Detective)** _(80 – 94 điểm)_:
    - **Tiêu chuẩn**: Sử dụng rất ít viện trợ, suy luận logic vững vàng.
-3. **Rank B — Thám Tử Cần Cù (Field Detective)** *(65 – 79 điểm)*:
+3. **Rank B — Thám Tử Cần Cù (Field Detective)** _(65 – 79 điểm)_:
    - **Tiêu chuẩn**: Cần sự trợ giúp ở các nút thắt then chốt, nhưng vẫn hoàn tất bản cáo trạng chuẩn xác.
-4. **Rank C — Học Việc Nghiệp Vụ (Junior Investigator)** *(Dưới 65 điểm)*:
+4. **Rank C — Học Việc Nghiệp Vụ (Junior Investigator)** _(Dưới 65 điểm)_:
    - **Tiêu chuẩn**: Lạm dụng nhiều gợi ý Mức 2 và Mức 3. Bản án hoàn thành nhưng được đánh giá là phụ thuộc nhiều vào chỉ đạo tuyến trên.
 
 ---
@@ -83,7 +89,7 @@ CREATE TABLE public.case_leaderboards (
     completion_time_seconds INTEGER NOT NULL,
     completed_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
     is_verified BOOLEAN DEFAULT true,
-    
+
     CONSTRAINT unique_user_case UNIQUE (user_id, case_id)
 );
 
@@ -94,6 +100,7 @@ CREATE INDEX idx_case_leaderboards_rank ON public.case_leaderboards (case_id, sc
 ### 4.2. Local Storage State (Client-Side)
 
 Để hỗ trợ cả chế độ khách (Guest / Offline-first):
+
 - `detective_score`: Lưu điểm số hiện tại của vụ án.
 - `hint_unlocked_levels`: Ghi nhận số lượng và cấp độ gợi ý đã bóc niêm phong.
 - `case_started_at`: Timestamp bắt đầu phá án.

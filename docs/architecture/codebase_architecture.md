@@ -98,7 +98,8 @@ Modal ──verifyCheckpointOnServer()──► POST /api/checkpoints/verify ─
 
 - Lưu ở `localStorage` qua `caseStorageKey(caseId, key)`. `case_000` giữ key không tiền tố; vụ khác `<slug>::<key>`. Reset: `clearCaseProgress()`.
 - Key chính: `canvas_suspects`, `investigated_suspects`, `solved_followups`, `followup_<nghi phạm>`, `phone_solved`, `indictment_solved`, `indictment_culprit`, `unlocked_dossiers`.
-- Chơi nhóm: `RoomSyncProvider` đồng bộ `RoomInvestigationState` qua Supabase Realtime + bảng `game_rooms` ([`group_play_realtime.md`](group_play_realtime.md)).
+- Chơi nhóm (hiện trạng): `RoomSyncProvider` (`components/investigation/room-sync-context.tsx`) đồng bộ `RoomInvestigationState`. Kênh `room:<mã>`: presence (key = `deviceId`), broadcast `STATE_PATCH` và `DETECTIVE_PING`, cộng `postgres_changes` trên `game_rooms`. Mã phòng sinh ở client (`room-modal.tsx`). Client tự đọc, tạo và ghi `game_rooms`; chưa có Route Handler, phase, Host hay phòng chờ.
+- Chơi nhóm (kế hoạch đã chốt 2026-11-05): QR chung → Tạo/Vào phòng → phòng chờ → intro đồng bộ → điều tra → kết luận. Spec và danh sách chỗ code lệch spec: [`group_play_realtime.md`](group_play_realtime.md) Phần 8.2.
 
 ### 5.1. Mở bộ hồ sơ
 

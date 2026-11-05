@@ -10,12 +10,12 @@
 
 Hai hình thức chơi, phân biệt bởi **nơi tài liệu được lưu trữ**:
 
-| | **Board Game** | **Bản Online** |
-|---|---|---|
-| Tài liệu ở đâu? | Bản in trong bộ game, đọc bằng tay | Hiển thị trên màn hình trong app |
-| App làm gì? | Hỗ trợ gameplay (manh mối, bản đồ, timeline...) | Cung cấp cả gameplay lẫn toàn bộ tài liệu số |
-| Kích hoạt | Quét QR in trong bộ game | Mua license, đăng nhập |
-| Cần account? | ❌ | ✅ |
+|                 | **Board Game**                                  | **Bản Online**                               |
+| --------------- | ----------------------------------------------- | -------------------------------------------- |
+| Tài liệu ở đâu? | Bản in trong bộ game, đọc bằng tay              | Hiển thị trên màn hình trong app             |
+| App làm gì?     | Hỗ trợ gameplay (manh mối, bản đồ, timeline...) | Cung cấp cả gameplay lẫn toàn bộ tài liệu số |
+| Kích hoạt       | Quét QR in trong bộ game                        | Mua license, đăng nhập                       |
+| Cần account?    | ❌                                              | ✅                                           |
 
 ---
 
@@ -25,14 +25,14 @@ Hai hình thức chơi, phân biệt bởi **nơi tài liệu được lưu tr�
 - Web app đóng vai trò **công cụ hỗ trợ điều tra** — không thay thế tài liệu in
 - Không cần account, không cần mạng
 
-| Vấn đề | Quyết định |
-|---|---|
-| Cần account? | ❌ Không |
-| Cần mạng? | ❌ Không (khi chơi solo) / Có (khi sync phòng nhóm) |
-| Chống share QR? | ❌ Không cần — share QR chỉ vào app công cụ, tài liệu trên giấy là ổ khóa chính. Share link đóng vai trò phễu bán hàng (upsell mua hộp). |
-| Định dạng QR | Static QR tĩnh in chung toàn bộ hộp (`dect.vn/play/case-000?mode=box`) |
-| Có expiry? | ❌ Không hết hạn |
-| Track lượt chơi? | ❌ Không track được — chấp nhận |
+| Vấn đề           | Quyết định                                                                                                                               |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Cần account?     | ❌ Không                                                                                                                                 |
+| Cần mạng?        | ❌ Không (khi chơi solo) / Có (khi sync phòng nhóm)                                                                                      |
+| Chống share QR?  | ❌ Không cần — share QR chỉ vào app công cụ, tài liệu trên giấy là ổ khóa chính. Share link đóng vai trò phễu bán hàng (upsell mua hộp). |
+| Định dạng QR     | Static QR tĩnh in chung toàn bộ hộp (`dect.vn/play/case-000?mode=box`)                                                                   |
+| Có expiry?       | ❌ Không hết hạn                                                                                                                         |
+| Track lượt chơi? | ❌ Không track được — chấp nhận                                                                                                          |
 
 ---
 
@@ -42,24 +42,24 @@ Hai hình thức chơi, phân biệt bởi **nơi tài liệu được lưu tr�
 - Cung cấp **toàn bộ tài liệu số**: lời khai, hồ sơ, ảnh hiện trường, chứng cứ số
 - Bắt buộc có account — 1 license = 1 game, gắn vào account
 
-| Vấn đề | Quyết định |
-|---|---|
-| Account bắt buộc? | ✅ Có |
-| Giới hạn thiết bị? | Không áp dụng — xung đột với group play |
-| Upgrade từ board game lên online? | Chưa quyết định |
+| Vấn đề                            | Quyết định                              |
+| --------------------------------- | --------------------------------------- |
+| Account bắt buộc?                 | ✅ Có                                   |
+| Giới hạn thiết bị?                | Không áp dụng — xung đột với group play |
+| Upgrade từ board game lên online? | Chưa quyết định                         |
 
 ---
 
 ## 4. So Sánh 2 Hình Thức
 
-| | **Board Game** | **Bản Online** |
-|---|---|---|
-| Kích hoạt | QR trong bộ game | Mua license trên web |
-| Cần account | ❌ | ✅ |
-| Cần mạng | ❌ | ✅ |
-| Tài liệu | Bản in trong bộ game | Tài liệu số trên màn hình |
-| Vai trò của App | Hỗ trợ gameplay | Gameplay + toàn bộ tài liệu |
-| Track lượt chơi | ❌ | ✅ |
+|                 | **Board Game**       | **Bản Online**              |
+| --------------- | -------------------- | --------------------------- |
+| Kích hoạt       | QR trong bộ game     | Mua license trên web        |
+| Cần account     | ❌                   | ✅                          |
+| Cần mạng        | ❌                   | ✅                          |
+| Tài liệu        | Bản in trong bộ game | Tài liệu số trên màn hình   |
+| Vai trò của App | Hỗ trợ gameplay      | Gameplay + toàn bộ tài liệu |
+| Track lượt chơi | ❌                   | ✅                          |
 
 ---
 
@@ -74,28 +74,31 @@ Mua license case_000
 ```
 
 **Flow chơi nhóm:**
+
 ```
 Host tạo phòng (tốn 1 lượt) → nhận mã phòng → share cho nhóm
 Mọi người join bất kỳ lúc, chỉ cần nickname
 Bất kỳ ai submit đáp án → Case kết thúc → Phòng đóng
 ```
 
-| Quy tắc | Quyết định |
-|---|---|
-| Host phải online liên tục? | ❌ Không |
-| Ai submit được đáp án? | ✅ Bất kỳ ai trong phòng |
-| Phòng active cùng lúc/license | Tối đa 1 |
-| Số người tối đa/phòng | Chưa chốt |
-| Thời gian tối đa 1 phòng | Chưa chốt |
+| Quy tắc                       | Quyết định                                                                             |
+| ----------------------------- | -------------------------------------------------------------------------------------- |
+| Host phải online liên tục?    | ❌ Không. Host offline quá 60 giây thì quyền tự chuyển cho thành viên khác             |
+| Ai nộp được kết luận?         | ✅ Bất kỳ ai trong phòng, có hộp xác nhận                                              |
+| Phòng active cùng lúc/license | Tối đa 1 (bản online, chưa thiết kế lại)                                               |
+| Số người tối đa/phòng         | Host đặt khi tạo phòng, không có giới hạn chung                                        |
+| Thời gian tối đa 1 phòng      | Không giới hạn. Phòng được lưu lại; không hoạt động 7 ngày thì tạm ngủ và trả mã phòng |
+
+> Cập nhật 2026-11-05: luồng chơi nhóm của **bản hộp** đã chốt trong [`group_play_realtime.md`](../architecture/group_play_realtime.md) (tạo phòng miễn phí, không trừ lượt). Luồng chơi nhóm của **bản online** (trừ `group_credits` hay không) để sau. Thuật ngữ: bước cuối gọi là "kết luận".
 
 **Gói bán gợi ý:**
 
-| Gói | Nội dung |
-|---|---|
-| **Solo** | Tự chơi vĩnh viễn, 0 lượt nhóm |
-| **Duo/Nhóm** | Tự chơi + 1 lượt nhóm |
-| **Party** | Tự chơi + 3 lượt nhóm |
-| **Add-on** | +1 lượt nhóm |
+| Gói          | Nội dung                       |
+| ------------ | ------------------------------ |
+| **Solo**     | Tự chơi vĩnh viễn, 0 lượt nhóm |
+| **Duo/Nhóm** | Tự chơi + 1 lượt nhóm          |
+| **Party**    | Tự chơi + 3 lượt nhóm          |
+| **Add-on**   | +1 lượt nhóm                   |
 
 ---
 
@@ -104,17 +107,21 @@ Bất kỳ ai submit đáp án → Case kết thúc → Phòng đóng
 > Rủi ro kỹ thuật xem tại `08_license_technical_spec.md`
 
 #### [VUL-01] Chia Sẻ Tài Khoản
+
 ```
 Ai đó tạo email rác → mua 1 license → share thông tin đăng nhập
 → Nhiều người dùng chung 1 tài khoản, không tốn lượt nhóm
 ```
+
 - **Rào cản tự nhiên:** Email cá nhân → share = mất quyền kiểm soát tài khoản
 - **Quyết định:** Chấp nhận — theo dõi qua đo lường, xử lý thủ công nếu phát hiện bất thường
 
 #### [VUL-02] Bẻ Khóa Ứng Dụng
+
 ```
 Can thiệp vào app → bỏ qua kiểm tra QR → vào game không cần mua Boardgame
 ```
+
 - **Tác động:** Thấp — vì không có tài liệu số trong app
 - **Quyết định:** Chấp nhận
 

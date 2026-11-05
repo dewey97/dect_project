@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Trạng thái (2026-10-29)
+## 1. Trạng thái (2026-10-29, cập nhật chơi nhóm 2026-11-05)
 
 - Dữ liệu vụ án 100% trên Supabase, biên tập qua Studio. Tạo vụ mới từ số 0 bằng Studio có spec E2E (`e2e/case-v2-from-studio.spec.ts`).
 - B0–B27 xong ([`history/2026-10-28_worktree_plan_v6.md`](history/2026-10-28_worktree_plan_v6.md)). Push gần nhất: `b0fd1f3` (2026-10-28).
@@ -13,6 +13,7 @@
   - Mã bypass chỉ có hiệu lực ở dev hoặc với admin.
   - Bộ hồ sơ mở theo `unlocksDossier` của checkpoint.
   - Gỡ hardcode Case #000; `caseId` bắt buộc; cây thư mục gom lại.
+- 2026-11-05: chốt luồng chơi nhóm v3 (QR chung, phòng chờ, phase, quyền Host, lưu phòng). Code chơi nhóm hiện vẫn là bản v1, lệch spec ở nhiều điểm (việc #14).
 - E2E lần cuối: 2 test `case-000` fail do dữ liệu production (`TECHDEBT.md` #20), các spec còn lại đã chạy đều qua. Chưa chạy full suite.
 
 ---
@@ -34,5 +35,8 @@
 | 11  | A10: DNS `xplore.vn` + edge proxy VPS, checklist `deploy/INFRA_HANDOFF_CHECKLIST.md`, bật Leaked Password Protection                                                  | Chủ dự án                    | IP VPS trả `404 page not found`                                 |
 | 12  | Live cursor ([`plans/2026-10-25_live_cursor_group_play.md`](plans/2026-10-25_live_cursor_group_play.md))                                                              | AI thực thi                  | Chờ push + smoke test + xác nhận gói Supabase                   |
 | 13  | Quyết `archive_3d_vault/` + `/cabinet-demo` (AGENTS.md §8); 6 vụ tĩnh trên `/activate`; gộp `panorama_url` / `scene_360_url`                                          | Chủ dự án                    |                                                                 |
+| 14  | Chơi nhóm v3 theo [`architecture/group_play_realtime.md`](architecture/group_play_realtime.md): Route Handler `/api/rooms/*`, bảng `room_participants` + `room_events`, phase + phòng chờ + intro đồng bộ, quyền Host, khóa RLS `anon` trên `game_rooms`, sửa các lỗi ở mục 8.2 (gõ sai mã tự tạo phòng, ghi đè `state_json`, lộ email qua presence) | AI thực thi, chủ dự án duyệt | Spec đã chốt 2026-11-05. Kênh realtime đổi sang `room:<id>`, ảnh hưởng #12 |
+| 15  | Chốt hệ thống điểm theo checkpoint và quy chế phân hạng xếp hạng theo số người (Q2, Q8b ở mục 9.2 của spec chơi nhóm) | Chủ dự án quyết | Pending. Chỉ chặn phần điểm số và bảng xếp hạng, không chặn #14 |
+| 16  | Đổi "cáo trạng" thành "kết luận": bước 1 chữ hiển thị UI/Studio/docs, bước 2 identifier `indictment` + migration checkpoint kind | AI thực thi, bước 2 cần chủ dự án duyệt | `TECHDEBT.md` #21 |
 
 Backlog: đổi tên `case_id` → `case_slug`; tách nội dung khỏi `boardgame_pins`; trang tiến độ vụ trên `/studio/cases/[slug]`; gom ~25 key tiến độ `localStorage` về một object.

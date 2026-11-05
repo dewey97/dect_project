@@ -76,7 +76,8 @@ Mở rộng thông tin định danh người dùng từ `auth.users` của Supab
 - `play_sessions`: người chơi thao tác phiên của mình; admin thao tác tất cả.
 - Bucket `avatars`: đọc công khai, ghi chỉ admin.
 - Bảo mật đáp án (migration 48 `48_checkpoint_answers_server_only.sql`): bỏ policy public read của migration 18 và bỏ view `case_checkpoints_public`. `case_checkpoints` chỉ đọc được bằng `service_role` hoặc admin (policy migration 16). Gameplay đọc qua `/api/checkpoints`, route này dùng service role và lọc `answer_config` theo allowlist (`lib/checkpoints/public-checkpoint.ts`): giữ `options`, nhãn ô nhập, `availableEvidences`, `epilogueStories`, `unlocksDossier`, `photoCodes`, cờ `hasMotive`/`hasContradiction`; bỏ mọi đáp án và cột `ai_*`. Chấm điểm qua `/api/checkpoints/verify` và `/api/scan-answer`.
-- Chưa khóa: `game_rooms` (chơi nhóm cần ghi công khai).
+- Chưa khóa: `game_rooms`. Hiện client đọc, tạo và ghi đè `state_json` trực tiếp bằng anon key (`room-sync-context.tsx`), nên ai có anon key đều sửa được phòng bất kỳ. Cột thật đang dùng: `room_code`, `game_id`, `state_json`, `last_action`, `created_at`, `updated_at` (`GameRoomRow` trong `lib/types/room.ts`). Chưa có migration tạo bảng trong `db/schema/`.
+- Kế hoạch đã chốt (2026-11-05, chưa implement): thêm cột phase, host, `max_players`, `status` theo vòng đời lưu trữ; thêm bảng `room_participants`, `room_events`; mọi thao tác ghi qua Route Handler `/api/rooms/*` và khóa `INSERT`/`UPDATE` của `anon`. Chi tiết: [`group_play_realtime.md`](group_play_realtime.md) Phần 4–6.
 - Server phải tự kiểm tra quyền trước khi ghi: `requireAdminAuth()` trong server action, `denyIfNotAdmin()` (`lib/security/admin-route-guard.ts`) trong Route Handler.
 
 ### Table: `play_sessions`
@@ -227,14 +228,14 @@ Toàn bộ các bảng sau trong phiên bản thử nghiệm ban đầu **đã �
 
 Lưu trữ các node cố định và ghi chú bổ sung theo từng vụ án:
 
-| Tên Cột | Kiểu Dữ liệu | Mô tả |
-| :--- | :--- | :--- |
-| `id` | `TEXT` | Khóa chính dạng `${caseSlug}:${nodeKind}:${slotIndex}` |
-| `case_id` | `TEXT` | FK `cases.slug` |
-| `node_kind` | `TEXT` | `victim`, `victim_phone`, `reinvestigate`, `suspects_hub`, `evidence_hub`, `custom_note` |
-| `title` | `TEXT` | Nhãn hiển thị trên node ghi chú |
-| `slot_index` | `INTEGER` | Thứ tự hiển thị |
-| `config` | `JSONB` | Tọa độ x, y, note_style, photo_url, connections |
+| Tên Cột      | Kiểu Dữ liệu | Mô tả                                                                                    |
+| :----------- | :----------- | :--------------------------------------------------------------------------------------- |
+| `id`         | `TEXT`       | Khóa chính dạng `${caseSlug}:${nodeKind}:${slotIndex}`                                   |
+| `case_id`    | `TEXT`       | FK `cases.slug`                                                                          |
+| `node_kind`  | `TEXT`       | `victim`, `victim_phone`, `reinvestigate`, `suspects_hub`, `evidence_hub`, `custom_note` |
+| `title`      | `TEXT`       | Nhãn hiển thị trên node ghi chú                                                          |
+| `slot_index` | `INTEGER`    | Thứ tự hiển thị                                                                          |
+| `config`     | `JSONB`      | Tọa độ x, y, note_style, photo_url, connections                                          |
 
 ### Table: `case_checkpoints` bổ sung `board_config` (`JSONB`)
 
