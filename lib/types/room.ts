@@ -93,6 +93,8 @@ export interface GameRoomRow {
   host_participant_id: string | null;
   started_at: string | null;
   ended_at: string | null;
+  /** Q12: không còn tính xếp hạng (vắng cả phòng quá 15 phút). Ghi một lần, không gỡ. */
+  unranked_at: string | null;
   last_activity_at: string | null;
   state_json: RoomInvestigationState;
   version: number;
@@ -169,6 +171,8 @@ export interface PublicRoom {
   hostParticipantId: string | null;
   startedAt: string | null;
   endedAt: string | null;
+  /** Khác null: phòng không còn tính xếp hạng (Q12). Client ẩn đồng hồ. */
+  unrankedAt: string | null;
   version: number;
 }
 

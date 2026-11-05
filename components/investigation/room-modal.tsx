@@ -10,6 +10,9 @@ import { useRoomSync } from "@/components/investigation/room-sync-context";
 import { DetectiveAvatar } from "@/components/investigation/detective-avatar";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 import { roomInviteUrl } from "@/lib/rooms/client";
+import { UNRANKED_GAP_MS } from "@/lib/rooms/ranking";
+
+const UNRANKED_GAP_MINUTES = UNRANKED_GAP_MS / 60_000;
 
 interface RoomModalProps {
   isOpen: boolean;
@@ -31,6 +34,14 @@ function currentCaseId(): string {
 export function RoomModal({ isOpen, onClose }: RoomModalProps) {
   const { room, roomCode, me, participants, onlineIds, leaveRoom } =
     useRoomSync();
+
+  // Cảnh báo phụ Q12: người online cuối cùng rời khi phòng đang tính giờ.
+  const isLastOnlineInRankedGame =
+    !!room &&
+    !!room.startedAt &&
+    !room.endedAt &&
+    !room.unrankedAt &&
+    participants.every((p) => p.id === me?.id || !onlineIds.has(p.id));
 
   const [isMounted, setIsMounted] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -106,6 +117,11 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
                     <div className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
                       {room.code ? "Mã phòng" : "Phòng đã kết thúc"}
                     </div>
+                    {room.unrankedAt && (
+                      <p className="text-xs text-amber-300">
+                        Phòng này không còn tính xếp hạng.
+                      </p>
+                    )}
                     {room.code && (
                       <div className="text-3xl font-extrabold text-white tracking-widest font-mono select-all">
                         {room.code}
@@ -178,6 +194,13 @@ export function RoomModal({ isOpen, onClose }: RoomModalProps) {
                         Rời phòng sẽ giải phóng chỗ của bạn. Quay lại thì vào
                         như người mới nếu phòng còn chỗ.
                       </p>
+                      {isLastOnlineInRankedGame && (
+                        <p className="text-xs text-amber-300">
+                          Bạn là người cuối cùng đang online. Nếu cả phòng vắng
+                          quá {UNRANKED_GAP_MINUTES} phút, phòng vẫn chơi tiếp
+                          nhưng không còn tính xếp hạng.
+                        </p>
+                      )}
                       <div className="flex gap-2">
                         <button
                           type="button"

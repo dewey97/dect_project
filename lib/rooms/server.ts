@@ -18,6 +18,7 @@ import type {
 import { generateRoomCode } from "@/lib/rooms/code";
 import { normalizeRoomState } from "@/lib/rooms/merge";
 import { isSeated } from "@/lib/rooms/host";
+import { shouldMarkUnranked } from "@/lib/rooms/ranking";
 
 /**
  * Helper dùng chung cho Route Handler `/api/rooms/*` (server-only, service role).
@@ -194,8 +195,88 @@ export async function requireParticipant(
     );
   }
 
-  const room = await loadRoom(db, p.room_id);
-  return { db, participant: p, room, senderId: readClientId(request) };
+  let room = await loadRoom(db, p.room_id);
+  const senderId = readClientId(request);
+  // Kiểm khoảng trống TRƯỚC khi ghi nhận hoạt động của người gọi (Q12).
+  room = await markUnrankedIfIdle(db, room, senderId);
+  const participantNow = await touchParticipant(db, p);
+  return { db, participant: participantNow, room, senderId };
+}
+
+const TOUCH_MIN_MS = 15_000;
+
+/**
+ * Ghi nhận hoạt động của participant (`last_seen_at`): dùng cho tự chuyển Host (D1)
+ * và quy tắc không xếp hạng (Q12). Mọi route có token đều gọi qua đây.
+ * Bỏ qua nếu vừa ghi trong 15 giây, để heartbeat không ghi DB liên tục.
+ */
+export async function touchParticipant(
+  db: Db,
+  p: RoomParticipantRow,
+): Promise<RoomParticipantRow> {
+  if (Date.now() - Date.parse(p.last_seen_at) <= TOUCH_MIN_MS) return p;
+  const now = new Date().toISOString();
+  const { error } = await db
+    .from("room_participants")
+    .update({ last_seen_at: now })
+    .eq("id", p.id);
+  if (error) throw error;
+  return { ...p, last_seen_at: now };
+}
+
+/**
+ * Q12: sau `started_at`, cả phòng vắng quá 15 phút thì ghi `unranked_at` (một lần,
+ * không gỡ) và báo cả phòng. Chỉ áp dụng khi phòng đang chơi (`investigating`,
+ * chưa có `ended_at`). `excludeParticipantId`: người vừa được ghi nhận hoạt động
+ * trong chính request này (join) thì không tính.
+ */
+export async function markUnrankedIfIdle(
+  db: Db,
+  room: GameRoomRow,
+  senderId: string | null,
+  excludeParticipantId?: string,
+): Promise<GameRoomRow> {
+  if (!room.started_at || room.ended_at || room.unranked_at) return room;
+  const { data, error } = await db
+    .from("room_participants")
+    .select("id, last_seen_at")
+    .eq("room_id", room.id);
+  if (error) throw error;
+  const lastSeenAt = ((data ?? []) as { id: string; last_seen_at: string }[])
+    .filter((r) => r.id !== excludeParticipantId)
+    .map((r) => r.last_seen_at);
+  if (
+    !shouldMarkUnranked({
+      startedAt: room.started_at,
+      unrankedAt: room.unranked_at,
+      lastSeenAt,
+      now: Date.now(),
+    })
+  ) {
+    return room;
+  }
+
+  const now = new Date().toISOString();
+  const { data: updated, error: upErr } = await db
+    .from("game_rooms")
+    .update({ unranked_at: now, version: room.version + 1, updated_at: now })
+    .eq("id", room.id)
+    .eq("version", room.version)
+    .is("unranked_at", null)
+    .select("*")
+    .maybeSingle();
+  if (upErr) throw upErr;
+  // Không có dòng: request khác vừa ghi trước (version đổi). Đọc lại là đủ.
+  const next = (updated as GameRoomRow | null) ?? (await loadRoom(db, room.id));
+  if (updated) {
+    await broadcastRoom(room.id, [
+      {
+        event: "MEMBER_UPDATE",
+        payload: { senderId, version: next.version, room: toPublicRoom(next) },
+      },
+    ]);
+  }
+  return next;
 }
 
 export async function loadRoom(db: Db, roomId: string): Promise<GameRoomRow> {
@@ -319,6 +400,7 @@ export function toPublicRoom(r: GameRoomRow): PublicRoom {
     hostParticipantId: r.host_participant_id,
     startedAt: r.started_at,
     endedAt: r.ended_at,
+    unrankedAt: r.unranked_at ?? null,
     version: r.version,
   };
 }

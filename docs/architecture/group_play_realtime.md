@@ -203,6 +203,7 @@ CREATE TABLE IF NOT EXISTS game_rooms (
   host_participant_id UUID,                      -- FK room_participants(id)
   started_at TIMESTAMPTZ,                        -- Host bấm Tiếp nhận vụ án
   ended_at TIMESTAMPTZ,                          -- nộp kết luận
+  unranked_at TIMESTAMPTZ,                       -- Q12: cả phòng vắng quá 15 phút sau started_at. Ghi một lần, không gỡ
   last_activity_at TIMESTAMPTZ DEFAULT NOW(),
 
   state_json JSONB NOT NULL DEFAULT '{}'::jsonb, -- tiến trình điều tra (mục 4.4)
@@ -308,6 +309,8 @@ Phòng được lưu lại, không xóa sau khi chơi xong. Để không tốn t
 | `completed` | Đã nộp kết luận                                            | Giải phóng                          | Tắt      | Chỉ đọc: xem lại hồ sơ, kết quả, xếp hạng                                                              |
 | (xóa)       | Phòng ở `lobby`, chưa bắt đầu, không ai online quá 30 phút |                                     |          | Xóa hẳn, là phòng rác                                                                                  |
 
+Phòng `dormant` (7 ngày không hoạt động) đương nhiên đã có `unranked_at` nếu đã bắt đầu tính giờ, vì 7 ngày vượt xa ngưỡng 15 phút ở Phần 7. Hàm dọn dẹp ghi `unranked_at` khi chuyển phòng sang `dormant` nếu chưa có.
+
 **Vì sao phải giải phóng mã phòng:** mã 4 ký tự chỉ có khoảng 920 nghìn tổ hợp. Nếu mọi phòng cũ giữ mã mãi, kho mã cạn dần và sinh mã mới ngày càng hay trùng. Mã chỉ cần cho phòng đang chơi.
 
 **Tiếp tục phòng cũ:** thiết bị lưu danh sách phòng đã tham gia (participant token) trong localStorage. Màn vào game hiển thị **[Tiếp tục phòng cũ]** nếu có.
@@ -328,6 +331,18 @@ Phòng được lưu lại, không xóa sau khi chơi xong. Để không tốn t
 - Bảng xếp hạng **phân hạng theo số người chơi**. Quy chế đếm số người và các mức phân hạng: xem Phần 9 (Q8).
 - Xếp theo điểm trước, thời gian sau, như index `score DESC, completion_time_seconds ASC` trong [`rating_leaderboard.md`](../product/rating_leaderboard.md). Cách tính điểm: xem Phần 9 (Q2).
 - Mỗi bản ghi xếp hạng lưu số người chơi của phòng.
+
+### 7.1. Chơi liền một mạch (Q12, chốt 2026-11-05)
+
+- Một phòng chỉ được xếp hạng khi chơi liền một mạch.
+- Sau `started_at`, nếu có một khoảng trống **quá 15 phút** mà không participant nào hoạt động, server ghi `game_rooms.unranked_at = now()`. Đánh dấu này vĩnh viễn, không bao giờ gỡ.
+- Phòng vẫn chơi tiếp bình thường. Client ẩn đồng hồ và hiện dòng _"Phòng này không còn tính xếp hạng"_. Khi phòng `completed`, server không ghi bảng xếp hạng.
+- Áp dụng cho chơi nhóm, solo online và bản hộp.
+- **Server tự quyết**, client không tự báo mình online. "Hoạt động" = lần gọi `/api/rooms/*` có token cuối cùng của participant (`room_participants.last_seen_at`). Client gọi `GET /api/rooms/state` mỗi 30 giây khi tab đang hiển thị, kiêm heartbeat.
+- Mỗi lần gọi `/api/rooms/*` sau `started_at` (kể cả nộp kết luận và người vào muộn): server đo `now - max(started_at, last_seen_at của mọi participant)` **trước** khi ghi nhận lần hoạt động của người gọi. Quá ngưỡng thì ghi `unranked_at` và broadcast `MEMBER_UPDATE` kèm `room`. Ngưỡng là hằng số `UNRANKED_GAP_MS` (`lib/rooms/ranking.ts`).
+- Cảnh báo chính: phòng chờ hoặc intro, trước khi Host bắt đầu: _"Bảng xếp hạng chỉ tính khi chơi liền một mạch. Nếu cả phòng rời quá 15 phút, phòng vẫn chơi tiếp nhưng không xếp hạng."_ Cảnh báo phụ: hộp xác nhận khi người online cuối cùng bấm **[Rời phòng]**. Không dùng `beforeunload` (trình duyệt không cho ghi chữ riêng).
+- Màn **[Tiếp tục phòng cũ]** hiện trạng thái không xếp hạng nếu phòng có `unranked_at`.
+- **Giới hạn đã biết:** trình duyệt mobile dừng JavaScript khi khóa màn hình hoặc chuyển app. Nhóm chơi bản hộp đọc tài liệu giấy hơn 15 phút mà mọi máy đều khóa màn hình thì phòng mất xếp hạng, dù vẫn đang chơi.
 
 ---
 
@@ -373,6 +388,7 @@ Phòng được lưu lại, không xóa sau khi chơi xong. Để không tốn t
 | Q10 | Solo                             | Online solo không qua phòng chờ. Bản hộp luôn qua phòng chờ |
 | Q11 | Bản online chơi nhóm, license    | Để sau                                                      |
 | —   | Thuật ngữ                        | Dùng "kết luận", bỏ "cáo trạng"                             |
+| Q12 | Xếp hạng khi phòng bị bỏ dở      | Cả phòng vắng quá 15 phút sau khi bắt đầu tính giờ thì mất xếp hạng vĩnh viễn, vẫn chơi tiếp (mục 7.1). Chốt 2026-11-05 |
 
 ### 9.2. Còn chờ quyết định
 

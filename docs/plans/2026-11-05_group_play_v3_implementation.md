@@ -109,12 +109,25 @@ Tách 2 file để không làm hỏng chơi nhóm v1 đang chạy production:
   - Toast chuyển xuống góc dưới phải (spec 2.7). Hàng đợi 3 toast + chuông ở P6.
 - **Kiểm chứng:** `pnpm lint` pass. Dev server: `/evidence/web` chế độ Solo không lỗi mới, không còn request `game_rooms`; `?room=AB12` không có phiên thì không gọi API, không tạo phòng; modal "Chơi nhóm" dẫn tới `/play/case_000` (trang có ở P4). Luồng trong phòng chưa test được: migration 51 chưa chạy (`PGRST202 Could not find the function public.room_join`).
 
+### Q12 — Không xếp hạng khi cả phòng vắng quá 15 phút (thêm 2026-11-05)
+
+Chủ dự án duyệt qua session điều phối. Quy tắc ở spec mục 7.1.
+
+- **Đã làm (cùng đợt P3):**
+  - Migration 51 (chưa chạy) thêm `game_rooms.unranked_at`. `room_lifecycle_sweep` ghi `unranked_at` khi chuyển phòng đã bắt đầu sang `dormant`.
+  - `lib/rooms/ranking.ts`: `UNRANKED_GAP_MS = 15 phút`, `shouldMarkUnranked()` (quá ngưỡng mới đánh dấu; đúng ngưỡng vẫn xếp hạng; đã đánh dấu thì giữ). 6 unit test.
+  - `requireParticipant` (mọi route có token) kiểm khoảng trống trước, rồi mới ghi `last_seen_at` của người gọi (gộp heartbeat cũ của `state`/`reconnect`). `join` kiểm sau RPC, bỏ qua chính người vừa vào. Nộp kết luận đi qua cùng chỗ kiểm.
+  - `PublicRoom.unrankedAt`. `RoomModal` hiện "Phòng này không còn tính xếp hạng" và cảnh báo phụ khi người online cuối cùng bấm Rời phòng.
+- **Còn lại:** P4 (cảnh báo chính ở phòng chờ, nhãn ở [Tiếp tục phòng cũ]); P5 (ẩn đồng hồ khi `unrankedAt`); #15 (không ghi bảng xếp hạng khi `unranked_at`, hiện chưa có bảng xếp hạng).
+- **Giới hạn:** máy khóa màn hình không gửi heartbeat. Nhóm bản hộp đọc giấy quá 15 phút với mọi máy khóa màn hình sẽ mất xếp hạng.
+
 ### P4 — Màn vào game và phòng chờ (`app/(investigation)/play/[caseId]/page.tsx`)
 
 - Bước theo URL: không tham số / `?mode=box` → màn 2 lựa chọn **[Tạo phòng]** (nhập số người tối đa) / **[Vào phòng]** (ô mã 4 ký tự, lỗi rõ ràng: "Không tìm thấy phòng", "Phòng đã đủ người", "Thử lại sau 5 phút"); `?room=<CODE>` → thẳng bước nickname; có phiên cũ trong localStorage → nút **[Tiếp tục phòng cũ]**.
 - Nickname 1–20 ký tự, avatar chữ cái đầu + màu.
 - Phòng chờ khi `lobby`: danh sách thành viên realtime (avatar, nickname, nhãn Host, chấm online), mã to, QR (D2), nút chia sẻ (Web Share API, fallback copy), **[Rời phòng]**; Host thấy **[Bắt đầu]**, sửa số người tối đa (không thấp hơn số đang có), kick, chuyển quyền.
 - Phòng chờ cho người vào muộn (phase khác `lobby`): danh sách người đang chơi, màn hiện tại + thời gian ("Đang điều tra — 25 phút"), nút **[Vào cuộc]**.
+- Q12: cảnh báo chính về xếp hạng liền mạch trên phòng chờ trước khi Host bắt đầu; [Tiếp tục phòng cũ] hiện nhãn không xếp hạng nếu có `unranked_at`.
 - Không `autoFocus`. Touch target ≥ 44px. Phong cách hồ sơ trinh thám theo `docs/design/design_system.md`.
 - Landing: CTA chơi vụ án dẫn tới `/play/<case_id>` (chỉ đổi link, không đụng bảng ghim landing).
 

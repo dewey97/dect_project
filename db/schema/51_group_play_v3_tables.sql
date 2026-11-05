@@ -5,8 +5,8 @@
 --
 -- What it does:
 --   1. game_rooms: adds id (primary key), mode, status, phase, phase_changed_at,
---      max_players, host_participant_id, started_at, ended_at, last_activity_at,
---      version. room_code becomes nullable and is unique only among active rooms.
+--      max_players, host_participant_id, started_at, ended_at, unranked_at,
+--      last_activity_at, version. room_code becomes nullable and is unique only among active rooms.
 --   2. New tables room_participants and room_events (RLS on, no anon policy).
 --   3. RPC room_create, room_join (atomic seat check), room_lifecycle_sweep.
 --      Only service_role can execute them.
@@ -104,6 +104,9 @@ ALTER TABLE public.game_rooms
   ADD COLUMN IF NOT EXISTS host_participant_id UUID,
   ADD COLUMN IF NOT EXISTS started_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS ended_at TIMESTAMPTZ,
+  -- Q12 (2026-11-05): set once, never cleared, when nobody in the room was active
+  -- for more than 15 minutes after started_at. The room keeps playing but is not ranked.
+  ADD COLUMN IF NOT EXISTS unranked_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ DEFAULT NOW(),
   ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1,
   ADD COLUMN IF NOT EXISTS state_json JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -395,8 +398,12 @@ BEGIN
   GET DIAGNOSTICS v_deleted_lobby = ROW_COUNT;
 
   -- Unfinished rooms with no activity for 7 days: keep progress, free the code.
+  -- A 7-day gap is far over the 15-minute rule (Q12), so started rooms also
+  -- become unranked here if no API call has marked them yet.
   UPDATE game_rooms
-  SET status = 'dormant', room_code = NULL, updated_at = NOW()
+  SET status = 'dormant', room_code = NULL, updated_at = NOW(),
+      unranked_at = CASE WHEN started_at IS NOT NULL
+                         THEN COALESCE(unranked_at, NOW()) ELSE unranked_at END
   WHERE status = 'active'
     AND phase <> 'lobby'
     AND last_activity_at < NOW() - INTERVAL '7 days';
@@ -469,6 +476,7 @@ COMMIT;
 --     DROP COLUMN IF EXISTS phase, DROP COLUMN IF EXISTS phase_changed_at,
 --     DROP COLUMN IF EXISTS max_players, DROP COLUMN IF EXISTS host_participant_id,
 --     DROP COLUMN IF EXISTS started_at, DROP COLUMN IF EXISTS ended_at,
+--     DROP COLUMN IF EXISTS unranked_at,
 --     DROP COLUMN IF EXISTS last_activity_at, DROP COLUMN IF EXISTS version;
 --   COMMIT;
 -- ------------------------------------------------------------------------------

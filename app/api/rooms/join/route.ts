@@ -10,6 +10,7 @@ import {
   buildSnapshot,
   getDb,
   hashToken,
+  markUnrankedIfIdle,
   mapRpcError,
   newToken,
   readBody,
@@ -95,6 +96,14 @@ export async function POST(request: Request) {
       participant: RoomParticipantRow;
       is_new_seat: boolean;
     };
+    // Q12: người vào muộn sau một khoảng cả phòng vắng quá 15 phút. RPC vừa ghi
+    // last_seen_at của chính người này, nên không tính họ khi đo khoảng trống.
+    result.room = await markUnrankedIfIdle(
+      db,
+      result.room,
+      readClientId(request),
+      result.participant.id,
+    );
     if (result.is_new_seat) {
       const events = await addEvents(db, result.room.id, [
         {

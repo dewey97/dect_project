@@ -219,3 +219,85 @@ test("messages: server builds event text", () => {
     "Phòng chuyển sang: Đang điều tra",
   );
 });
+
+// ---------------------------------------------------------------------------
+// Không xếp hạng khi cả phòng vắng quá 15 phút (Q12, 2026-11-05)
+// ---------------------------------------------------------------------------
+import { shouldMarkUnranked, UNRANKED_GAP_MS } from "./ranking.ts";
+
+const T0 = Date.parse("2026-11-05T10:00:00Z");
+const iso = (ms: number) => new Date(ms).toISOString();
+
+test("unranked: threshold is 15 minutes", () => {
+  assert.equal(UNRANKED_GAP_MS, 15 * 60_000);
+});
+
+test("unranked: below the threshold keeps the room ranked", () => {
+  const now = T0 + 20 * 60_000;
+  assert.equal(
+    shouldMarkUnranked({
+      startedAt: iso(T0),
+      unrankedAt: null,
+      lastSeenAt: [iso(now - UNRANKED_GAP_MS + 1_000), iso(T0)],
+      now,
+    }),
+    false,
+  );
+});
+
+test("unranked: exactly at the threshold keeps the room ranked", () => {
+  const now = T0 + 30 * 60_000;
+  assert.equal(
+    shouldMarkUnranked({
+      startedAt: iso(T0),
+      unrankedAt: null,
+      lastSeenAt: [iso(now - UNRANKED_GAP_MS)],
+      now,
+    }),
+    false,
+  );
+});
+
+test("unranked: above the threshold marks the room", () => {
+  const now = T0 + 30 * 60_000;
+  assert.equal(
+    shouldMarkUnranked({
+      startedAt: iso(T0),
+      unrankedAt: null,
+      lastSeenAt: [iso(now - UNRANKED_GAP_MS - 1), iso(T0)],
+      now,
+    }),
+    true,
+  );
+});
+
+test("unranked: already unranked stays as is (no new mark)", () => {
+  const now = T0 + 60 * 60_000;
+  assert.equal(
+    shouldMarkUnranked({
+      startedAt: iso(T0),
+      unrankedAt: iso(T0 + 20 * 60_000),
+      lastSeenAt: [iso(T0)],
+      now,
+    }),
+    false,
+  );
+});
+
+test("unranked: not started, or no activity data, never marks", () => {
+  const now = T0 + 60 * 60_000;
+  assert.equal(
+    shouldMarkUnranked({ startedAt: null, unrankedAt: null, lastSeenAt: [iso(T0)], now }),
+    false,
+  );
+  // Activity before started_at does not count as a gap: the gap starts at started_at.
+  assert.equal(
+    shouldMarkUnranked({
+      startedAt: iso(now - 5 * 60_000),
+      unrankedAt: null,
+      lastSeenAt: [iso(T0)],
+      now,
+    }),
+    false,
+  );
+});
