@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 export interface Ownership {
   /** Bought online through PayOS (or granted by hand). */
@@ -27,6 +28,25 @@ export function ownsCase(o: Ownership): boolean {
  */
 export function isPlayGatingEnabled(): boolean {
   return process.env.PLAY_GATING_ENABLED?.trim() === "true";
+}
+
+/**
+ * Server half of the play gate for /play and /evidence/web.
+ * true: render the page. false: the client guard (CaseAccessGuard) still lets
+ * the visitor in when this device holds a room session of the case (an invited
+ * player), otherwise sends them to /cases/<case_id>.
+ * A `?room=` link always passes: only the Host needs to own the case.
+ */
+export async function serverAllowsPlay(
+  caseId: string,
+  roomParam: string | undefined,
+): Promise<boolean> {
+  if (!isPlayGatingEnabled() || roomParam) return true;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return ownsCase(await getOwnership(user?.id, caseId));
 }
 
 /** Reads the license row with the service role. Missing table or row: not owned. */

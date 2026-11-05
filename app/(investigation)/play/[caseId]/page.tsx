@@ -1,11 +1,8 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
-import {
-  getOwnership,
-  isPlayGatingEnabled,
-  ownsCase,
-} from "@/lib/payments/ownership";
+import { serverAllowsPlay } from "@/lib/payments/ownership";
+import { CaseAccessGuard } from "@/components/cases/case-access-guard";
 import {
   PlayRoomClient,
   type PlayCaseInfo,
@@ -18,8 +15,8 @@ export const dynamic = "force-dynamic";
  * QR động của phòng: `/play/<case_id>?room=<CODE>`.
  *
  * Khi bật PLAY_GATING_ENABLED: chưa sở hữu (mua online hoặc kích hoạt hộp) thì
- * chuyển về trang vụ án. Link có `?room=` không bị chặn: người được mời vào
- * phòng không cần mua, chỉ Host cần.
+ * về trang vụ án. Không chặn link có `?room=` và thiết bị đang có phiên phòng
+ * của vụ này: người được mời vào phòng không cần mua, chỉ Host cần.
  */
 export default async function PlayPage({
   params,
@@ -33,21 +30,14 @@ export default async function PlayPage({
   const caseId = normalizeCaseId(raw);
 
   const supabase = await createClient();
-
-  if (isPlayGatingEnabled() && !query.room) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!ownsCase(await getOwnership(user?.id, caseId))) {
-      redirect(`/cases/${caseId}`);
-    }
-  }
-
-  const { data } = await supabase
-    .from("cases")
-    .select("slug, title, synopsis, cover_image_url")
-    .eq("slug", caseId)
-    .maybeSingle();
+  const [{ data }, allowed] = await Promise.all([
+    supabase
+      .from("cases")
+      .select("slug, title, synopsis, cover_image_url")
+      .eq("slug", caseId)
+      .maybeSingle(),
+    serverAllowsPlay(caseId, query.room),
+  ]);
   if (!data) notFound();
 
   const info: PlayCaseInfo = {
@@ -56,5 +46,9 @@ export default async function PlayPage({
     synopsis: data.synopsis ?? null,
     coverImageUrl: data.cover_image_url ?? null,
   };
-  return <PlayRoomClient info={info} />;
+  return (
+    <CaseAccessGuard caseId={caseId} allowed={allowed}>
+      <PlayRoomClient info={info} />
+    </CaseAccessGuard>
+  );
 }

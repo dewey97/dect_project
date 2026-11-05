@@ -59,7 +59,14 @@ Cờ `PLAY_GATING_ENABLED=true` (server) bật việc chặn. Khi tắt (mặc �
 - `/api/rooms/create` không kiểm quyền, không trừ lượt;
 - `/activate` vẫn cho vào bằng mã bất kỳ như cũ (API trả `gating: false`).
 
-Bật cờ sau khi PayOS chạy thật và đã in mã hộp. Còn hở khi bật cờ: vào thẳng `/evidence/web?case_id=` không bị chặn; người vào phòng (không sở hữu) mở lại `/play` không có `?room=` sẽ bị chuyển về trang vụ án.
+Bật cờ sau khi PayOS chạy thật và đã in mã hộp.
+
+Cổng quyền chơi áp cho `/play/<case_id>`, `/evidence/web` và `/evidence/boardgame` (2026-11-06):
+
+- Server (`serverAllowsPlay`): cho qua khi cờ tắt, khi URL có `?room=`, hoặc khi tài khoản sở hữu vụ.
+- Client (`CaseAccessGuard`): server từ chối nhưng thiết bị còn phiên phòng của vụ này (người được mời) thì vẫn cho vào; còn lại chuyển về `/cases/<case_id>`.
+
+Còn hở: `/evidence/[id]` (xem một vật chứng lẻ) không chặn; API nội dung (`/api/checkpoints`, `/api/case-dossiers`...) không kiểm quyền, nên người rành kỹ thuật vẫn đọc được dữ liệu. Phiên phòng nằm ở localStorage nên người cố tình vẫn giả được.
 
 ## Mục tiêu
 
