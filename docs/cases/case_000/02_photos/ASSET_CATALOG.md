@@ -115,17 +115,9 @@ Hệ thống ghim cắm bảng phân loại theo màu sắc nghiệp vụ (mỗi
 - **Loại bỏ ảnh tĩnh `pinned_photos_with_tape/`**: Toàn bộ các ảnh PNG ghép sẵn băng dính giấy tĩnh trước đây (`pinned_tape_khang.png`, `pinned_tape_vu.png`...) đã được gỡ bỏ khỏi `public/` để tối ưu dung lượng và chuyển sang kiến trúc **Dynamic Card Composite**.
 - **Cơ chế Dựng Thẻ Động (`card-composite.ts`)**: Trình duyệt nạp ảnh chân dung từ Supabase Storage / `public/`, tự động ghép khung Polaroid và vẽ băng dính giấy răng cưa trên Canvas bộ nhớ (Offscreen Canvas 60 FPS), đảm bảo nội dung luôn đồng bộ với dữ liệu bảng tính mà không cần re-build code.
 
-### 7.2. Giấy Ghi Chú Nghiệp Vụ (`clue_notes/rendered_notes/`)
+### 7.2. Giấy Ghi Chú Nghiệp Vụ (Dynamic HTML5 Canvas Rendering)
 
-Giấy note vàng/trắng viết tay đã kết xuất sẵn nét mực để cắm lên bảng:
-
-- `note_bo_sung_chung_cu.png`: Hướng dẫn bổ sung tài liệu.
-- `note_nghi_van.png`: Danh sách các điểm nghi vấn mở màn.
-- `note_nghi_pham.png`: Danh mục nghi phạm cần thẩm tra.
-- `note_cau_hoi_vu.png` / `note_cau_hoi_tung.png` / `note_cau_hoi_ha.png`: Phiếu thẩm vấn từng đối tượng.
-- `note_mo_rong_dieu_tra.png`: Manh mối nhật ký cuộc gọi & sổ nợ.
-- `note_kham_xet_lai.png`: Lệnh khám xét lại hiện trường.
-- `note_ket_luan_dieu_tra.png`: Bản kết luận điều tra và cáo trạng.
+Toàn bộ giấy note ghi chú nghiệp vụ trên bảng điều tra hiện được vẽ động hoàn toàn bằng HTML5 Canvas (`render-scene.ts`) với typography chân thực, đổ bóng 2 lớp xúc giác và hỗ trợ 4 màu (`yellow`, `white`, `blue`, `red`). Các file PNG cố định cũ (`public/images/cases/case_000/clue_notes/` và `public/images/board/notes/`) đã được dọn sạch khỏi `public/` để giảm dung lượng bundle và tránh hardcode kịch bản.
 
 ### 7.3. Ảnh Hiện Trường & Manh Mối Chi Tiết
 

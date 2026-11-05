@@ -167,11 +167,16 @@ export function isPinHit(
       isVictimPhone ||
       isReinvestigateProp);
 
+  const isBadge = pin.displayMode === "badge";
   let baseCardWidth = 142;
   let baseCardHeight = 167;
   let tagYRatio = -0.08;
 
-  if (isSuspectPin) {
+  if (isBadge) {
+    baseCardWidth = 145;
+    baseCardHeight = 34;
+    tagYRatio = -0.5;
+  } else if (isSuspectPin && pin.displayMode !== "note") {
     baseCardWidth = isVictim
       ? 204
       : isCrimeScene

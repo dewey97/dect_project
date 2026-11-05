@@ -11,6 +11,9 @@ import {
   Edit3,
   Play,
   X,
+  ArrowDown,
+  ArrowUp,
+  Layers,
 } from "lucide-react";
 import {
   HeroInteractive,
@@ -54,6 +57,7 @@ interface FloatingBoardPanelProps {
   onConnectPins: (fromId: string, toId: string) => void;
   onDeleteConnection: (connId: string) => void;
   onAdjustNodeTransform: (nodeId: string, deltaRot: number, deltaScale: number) => void;
+  onAdjustNodeZIndex?: (nodeId: string, deltaZ: number) => void;
 }
 
 const STORAGE_KEY = "xplore_checkpoint_studio_floating_board";
@@ -79,6 +83,7 @@ export function FloatingBoardPanel({
   onConnectPins,
   onDeleteConnection,
   onAdjustNodeTransform,
+  onAdjustNodeZIndex,
 }: FloatingBoardPanelProps) {
   // Mặc định rộng 380px -> cao 509px chuẩn 100% tỷ lệ bảng
   const defaultW = 380;
@@ -380,6 +385,30 @@ export function FloatingBoardPanel({
             >
               <Plus className="size-3" />
             </button>
+
+            {onAdjustNodeZIndex && (
+              <>
+                <div className="h-3.5 w-px bg-white/15 mx-0.5" />
+
+                <button
+                  type="button"
+                  onClick={() => onAdjustNodeZIndex(selectedNode.id, -1)}
+                  className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors cursor-pointer"
+                  title="Xuống 1 lớp (Lớp sau)"
+                >
+                  <ArrowDown className="size-3" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onAdjustNodeZIndex(selectedNode.id, 1)}
+                  className="p-1 rounded bg-white/5 hover:bg-amber-500/20 text-zinc-300 hover:text-amber-200 border border-white/10 transition-colors cursor-pointer"
+                  title="Lên 1 lớp (Lớp trước)"
+                >
+                  <ArrowUp className="size-3" />
+                </button>
+              </>
+            )}
           </div>
         )}
 

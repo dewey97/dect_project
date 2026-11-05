@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   PinPoint,
   CaseConnection,
@@ -290,14 +290,33 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
   }, [caseId, nodes, pins, connections, positions]);
 
   // Ghép toàn bộ pins hiển thị trên canvas
-  const displayPins: PinPoint[] = pins.map((p) => {
-    const pos = positions[p.id] || { x: p.x, y: p.y };
-    return {
-      ...p,
-      x: pos.x,
-      y: pos.y,
-    };
-  });
+  const displayPins: PinPoint[] = useMemo(() => {
+    const sourcePins = hasUnsavedChanges ? pins : boardModel.pins;
+    return sourcePins.map((p) => {
+      // Khi đang có thay đổi chưa lưu trên bảng (ví dụ vừa kéo thả pin),
+      // vẫn đồng bộ live các thuộc tính nội dung (nhãn, màu, ẩn/hiện, tiêu đề, zIndex, hasPin) từ boardModel.pins
+      const modelPin = hasUnsavedChanges
+        ? boardModel.pins.find((mp) => mp.id === p.id)
+        : null;
+      const base = modelPin
+        ? {
+            ...p,
+            ...modelPin,
+            x: p.x,
+            y: p.y,
+            rotation: p.rotation ?? modelPin.rotation,
+            scale: p.scale ?? modelPin.scale,
+            zIndex: p.zIndex ?? modelPin.zIndex,
+          }
+        : p;
+      const pos = positions[base.id] || { x: base.x, y: base.y };
+      return {
+        ...base,
+        x: pos.x,
+        y: pos.y,
+      };
+    });
+  }, [hasUnsavedChanges, pins, boardModel.pins, positions]);
 
   const selectedNode =
     nodes.find((n) => n.id === selectedNodeId) ||
@@ -384,6 +403,27 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
             ...p,
             rotation: nextRot,
             scale: nextScale,
+          };
+        }),
+      );
+      setHasUnsavedChanges(true);
+    },
+    handleAdjustNodeZIndex: (pinId: string, deltaZ: number) => {
+      const snap = currentSnapshot();
+      commitSnapshot(snap);
+
+      setPins((prev) =>
+        prev.map((p) => {
+          const isMatch =
+            p.id === pinId ||
+            p.legacyId === pinId ||
+            p.checkpointId === pinId ||
+            (pinId && (p.id.includes(pinId) || pinId.includes(p.id)));
+          if (!isMatch) return p;
+          const currentZ = p.zIndex ?? 0;
+          return {
+            ...p,
+            zIndex: currentZ + deltaZ,
           };
         }),
       );

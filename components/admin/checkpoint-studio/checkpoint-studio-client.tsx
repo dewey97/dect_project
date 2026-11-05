@@ -236,6 +236,22 @@ export function CheckpointStudioClient({
   // Chế độ "Lớp logic" (Logic Overlay)
   const [isLogicLayerActive, setIsLogicLayerActive] = useState(false);
 
+  // Live Checkpoints: kết hợp giữa rows và draft đang chỉnh sửa trong Inspector
+  // để Bảng điều tra (Board Canvas) cập nhật tức thì (0s delay) khi đổi display_mode, note_color, label, v.v.
+  const liveRows = useMemo(() => {
+    if (!draft || !selectedId) return rows;
+    return rows.map((r) => {
+      if (r.id === selectedId) {
+        return {
+          ...r,
+          title: draft.title,
+          board_config: draft.boardConfig,
+        };
+      }
+      return r;
+    });
+  }, [rows, draft, selectedId]);
+
   // Hook Board Editor thống nhất
   const {
     isLoading: isBoardLoading,
@@ -258,7 +274,8 @@ export function CheckpointStudioClient({
     canUndo,
     canRedo,
     handleAdjustNodeTransform,
-  } = useBoardEditor(caseId, { checkpoints: rows, characters });
+    handleAdjustNodeZIndex,
+  } = useBoardEditor(caseId, { checkpoints: liveRows, characters });
 
   useEffect(() => {
     let cancelled = false;
@@ -1698,6 +1715,7 @@ export function CheckpointStudioClient({
             onConnectPins={handleConnectPinsWithLogic}
             onDeleteConnection={handleDeleteConnectionWithLogic}
             onAdjustNodeTransform={handleAdjustNodeTransform}
+            onAdjustNodeZIndex={handleAdjustNodeZIndex}
           />
         </div>
 

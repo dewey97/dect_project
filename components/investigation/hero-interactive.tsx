@@ -126,6 +126,10 @@ export function HeroInteractive({
       id: string;
       label: string;
       photoUrl?: string;
+      nodeKind?: string;
+      displayMode?: string;
+      isAvatar?: boolean;
+      subjectKey?: string;
     }): string | undefined =>
       resolveSuspectPhotoUrlHelper(
         pin,

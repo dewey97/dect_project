@@ -64,6 +64,8 @@ export interface PinPoint {
     | "brass"
     | "silver"
     | "dark";
+  hasPin?: boolean;
+  zIndex?: number;
   pulseBorder?: boolean;
   photoUrl?: string;
   isAvatar?: boolean;

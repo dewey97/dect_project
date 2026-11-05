@@ -210,7 +210,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       const rotation = typeof cfg.rotation === "number" ? cfg.rotation : 0;
       let color = (cfg.note_style as PinPoint["color"]) || "yellow";
       let pinColor: PinPoint["pinColor"] = "yellow";
-      let noteColor: PinPoint["noteColor"] = cfg.note_style ? "white" : undefined;
+      let noteColor: PinPoint["noteColor"] = (cfg.note_color as PinPoint["noteColor"]) || (cfg.note_style ? "white" : undefined);
       let pulseBorder: boolean | undefined = undefined;
 
       if (node.node_kind === "victim_phone") {
@@ -221,13 +221,13 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         detail = "Mở biên bản và rà soát toàn cảnh 360 hiện trường vụ án";
         if (!photoUrl) photoUrl = `/images/cases/${caseSlug}/crime_scene.png`;
         if (typeof cfg.scale !== "number") scale = 0.95;
-        noteColor = "white";
+        if (!noteColor) noteColor = "white";
         pulseBorder = input.isReinvestigateBlinking;
       } else if (node.node_kind === "suspects_hub") {
         detail = "Thêm và xem danh sách nghi phạm vụ án";
         color = isMobile ? "yellow" : "red";
         pinColor = isMobile ? "yellow" : "red";
-        noteColor = "yellow";
+        if (!noteColor) noteColor = "yellow";
       } else if (node.node_kind === "victim") {
         const vChar =
           (node.subject_key &&
@@ -245,7 +245,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         } else if (!photoUrl) {
           photoUrl = "/images/avatar_placeholder.svg";
         }
-        noteColor = "white";
+        if (!noteColor) noteColor = "white";
       }
 
       const victimChar =
@@ -274,6 +274,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         noteColor,
         scale,
         rotation,
+        zIndex: typeof (cfg as any)?.z_index === "number" ? (cfg as any).z_index : 0,
         pulseBorder,
         actionType: "info",
       });
@@ -283,6 +284,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   // ============================================================================
   // 2. CHECKPOINTS (phone_lookup, indictment, followup)
   // ============================================================================
+  const processedCpIds = new Set<string>();
 
   // 2.1. Checkpoint: phone_lookup
   const phoneCp = allCheckpoints.find(
@@ -293,6 +295,9 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   );
   if (phoneCp) {
     const phoneCpId = phoneCp.id;
+    processedCpIds.add(phoneCp.id);
+    if ((phoneCp as any).checkpoint_id) processedCpIds.add((phoneCp as any).checkpoint_id);
+
     const phoneNodeId = `${caseSlug}:phone_lookup:${phoneCpId || "system"}`;
     const phoneBoardCfg = (phoneCp.boardConfig || phoneCp.board_config) as any;
     const isPhoneHidden = phoneBoardCfg?.hidden === true;
@@ -321,8 +326,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
         label: phoneBoardCfg?.pin_title || "Mở rộng điều tra",
         detail: phoneDetail,
         color: input.effectivePhoneSolved ? "cyan" : "yellow",
-        pinColor: input.effectivePhoneSolved ? "cyan" : "yellow",
-        noteColor: "white",
+        pinColor: phoneBoardCfg?.pin_color || (input.effectivePhoneSolved ? "cyan" : "yellow"),
+        noteColor: phoneBoardCfg?.note_color || "white",
+        displayMode: phoneBoardCfg?.display_mode || "note",
+        hasPin: Boolean(phoneBoardCfg?.has_pin),
+        zIndex: typeof phoneBoardCfg?.z_index === "number" ? phoneBoardCfg.z_index : 0,
         isSolved: input.effectivePhoneSolved,
         actionType: phoneCpId ? "sheet_checkpoint" : "info",
         rotation: typeof phoneBoardCfg?.rotation === "number" ? phoneBoardCfg.rotation : 0,
@@ -340,6 +348,9 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   );
   if (indictmentCp) {
     const indictmentCpId = indictmentCp.id;
+    processedCpIds.add(indictmentCp.id);
+    if ((indictmentCp as any).checkpoint_id) processedCpIds.add((indictmentCp as any).checkpoint_id);
+
     const indictmentNodeId = `${caseSlug}:indictment:${indictmentCpId || "verdict"}`;
     const indictmentBoardCfg =
       (indictmentCp.boardConfig || indictmentCp.board_config) as any;
@@ -366,8 +377,11 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
           ? "Bản cáo trạng đã được Viện Kiểm sát phê chuẩn!"
           : "Lập bản cáo trạng gửi Viện Kiểm sát",
         color: "red",
-        pinColor: "red",
-        noteColor: "white",
+        pinColor: indictmentBoardCfg?.pin_color || "red",
+        noteColor: indictmentBoardCfg?.note_color || "white",
+        displayMode: indictmentBoardCfg?.display_mode || "note",
+        hasPin: Boolean(indictmentBoardCfg?.has_pin ?? true),
+        zIndex: typeof indictmentBoardCfg?.z_index === "number" ? indictmentBoardCfg.z_index : 0,
         isSolved: input.effectiveIndictmentSolved,
         actionType: indictmentCpId ? "sheet_checkpoint" : "info",
         rotation: typeof indictmentBoardCfg?.rotation === "number" ? indictmentBoardCfg.rotation : 0,
@@ -416,14 +430,25 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
     const primaryId = `${caseSlug}:suspect:${s.key}`;
     const legacyId = undefined;
 
-    // Tìm checkpoint thẩm tra tương ứng
-    const matchCp = allCheckpoints.find((cp) => {
+    // Tìm checkpoint thẩm tra tương ứng (ưu tiên kind === suspect_interrogation)
+    let matchCp = allCheckpoints.find((cp) => {
+      if (cp.kind !== "suspect_interrogation") return false;
       const sKey = (cp.subjectKey || cp.subject_key || "").trim().toLowerCase();
       if (sKey && sKey === s.key) return true;
       const titleClean = removeDiacritics(cp.title || "").toLowerCase();
       const sNameClean = removeDiacritics(s.name || "").toLowerCase();
       return titleClean.includes(s.key) || titleClean.includes(sNameClean);
     });
+    if (!matchCp) {
+      matchCp = allCheckpoints.find((cp) => {
+        const sKey = (cp.subjectKey || cp.subject_key || "").trim().toLowerCase();
+        return sKey && sKey === s.key;
+      });
+    }
+    if (matchCp) {
+      processedCpIds.add(matchCp.id);
+      if ((matchCp as any).checkpoint_id) processedCpIds.add((matchCp as any).checkpoint_id);
+    }
 
     const cpBoardCfg = (matchCp?.boardConfig || matchCp?.board_config) as any;
     if (cpBoardCfg?.hidden === true) return;
@@ -442,24 +467,49 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       fallbackCoord,
     );
 
+    const displayMode = cpBoardCfg?.display_mode || "photo";
+    const photoUrl =
+      displayMode === "photo"
+        ? (cpBoardCfg?.photo_url ||
+          s.avatarUrl ||
+          input.sheetPhotoMap?.[s.key] ||
+          "/images/avatar_placeholder.svg")
+        : undefined;
+    const noteTemplate =
+      cpBoardCfg?.note_template ||
+      (displayMode === "note" ? "custom" : undefined);
+    const noteColor = cpBoardCfg?.note_color || "yellow";
+    const pinColor =
+      cpBoardCfg?.pin_color || (displayMode === "photo" ? "blue" : "yellow");
+    const label = cpBoardCfg?.pin_title || s.name;
+    const pulseBorder = Boolean(cpBoardCfg?.pulse);
+
     pins.push({
       id: primaryId,
-      nodeKind: "suspect",
+      nodeKind: displayMode === "photo" ? "suspect" : displayMode === "badge" ? "badge" : "note",
       subjectKey: s.key,
       checkpointId: matchCp?.id,
       x: pos.x,
       y: pos.y,
-      label: s.name,
+      label,
       detail: `Nghi phạm: ${s.name} (${s.clueCount} manh mối liên quan)`,
-      color: "blue",
-      photoUrl:
-        s.avatarUrl ||
-        input.sheetPhotoMap?.[s.key] ||
-        "/images/avatar_placeholder.svg",
-      isAvatar: true,
+      color: pinColor,
+      pinColor,
+      noteColor,
+      displayMode,
+      noteTemplate,
+      photoUrl,
+      isAvatar: displayMode === "photo",
+      hasPin: Boolean(cpBoardCfg?.has_pin ?? (displayMode === "photo")),
+      zIndex: typeof cpBoardCfg?.z_index === "number" ? cpBoardCfg.z_index : 0,
+      pulseBorder,
       actionType: matchCp?.id ? "sheet_checkpoint" : "info",
-      rotation: typeof cpBoardCfg?.rotation === "number" ? cpBoardCfg.rotation : 0,
-      scale: typeof cpBoardCfg?.scale === "number" && cpBoardCfg.scale > 0 ? cpBoardCfg.scale : 1.0,
+      rotation:
+        typeof cpBoardCfg?.rotation === "number" ? cpBoardCfg.rotation : 0,
+      scale:
+        typeof cpBoardCfg?.scale === "number" && cpBoardCfg.scale > 0
+          ? cpBoardCfg.scale
+          : 1.0,
     });
   });
 
@@ -467,10 +517,6 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
   // 4. FOLLOWUP PINS (Ghim Nghi vấn mở rộng)
   // ============================================================================
   const activeFollowupSet = new Set<string>(input.followupCulpritIds || []);
-  const processedCpIds = new Set<string>();
-
-  if (phoneCp) processedCpIds.add(phoneCp.id);
-  if (indictmentCp) processedCpIds.add(indictmentCp.id);
 
   suspectsList.forEach((s) => {
     if (!input.isStudioMode && !activeFollowupSet.has(s.key)) return;
@@ -492,6 +538,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
     if (!matchCp) return;
     processedCpIds.add(matchCp.id);
+    if ((matchCp as any).checkpoint_id) processedCpIds.add((matchCp as any).checkpoint_id);
 
     const boardCfg = (matchCp.boardConfig || matchCp.board_config) as any;
     if (boardCfg?.hidden === true) return;
@@ -525,7 +572,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
     pins.push({
       id: primaryId,
-      nodeKind: displayMode === "photo" ? "photo" : "followup",
+      nodeKind: displayMode === "photo" ? "photo" : displayMode === "badge" ? "badge" : "followup",
       subjectKey: s.key,
       checkpointId: matchCp.id,
       x: pos.x,
@@ -538,6 +585,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       displayMode,
       noteTemplate,
       photoUrl,
+      hasPin: Boolean(boardCfg?.has_pin),
+      zIndex: typeof boardCfg?.z_index === "number" ? boardCfg.z_index : 0,
       pulseBorder,
       actionType: "sheet_checkpoint",
       rotation: typeof boardCfg?.rotation === "number" ? boardCfg.rotation : 0,
@@ -547,13 +596,14 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
   // 4.2. STANDALONE CHECKPOINT PINS (Checkpoints tự do đưa lên bảng)
   allCheckpoints.forEach((cp, idx) => {
-    if (processedCpIds.has(cp.id)) return;
+    if (processedCpIds.has(cp.id) || ((cp as any).checkpoint_id && processedCpIds.has((cp as any).checkpoint_id))) return;
     if (cp.kind === "epilogue" || cp.kind === "suspect_interrogation") return;
 
     const boardCfg = (cp.boardConfig || cp.board_config) as any;
     if (!boardCfg || boardCfg.hidden !== false) return;
 
     processedCpIds.add(cp.id);
+    if ((cp as any).checkpoint_id) processedCpIds.add((cp as any).checkpoint_id);
     const cpKey = (cp.subjectKey || cp.subject_key || cp.id).toLowerCase();
     const primaryId = `${caseSlug}:checkpoint:${cp.id || (cp as any).checkpoint_id || idx}`;
 
@@ -576,7 +626,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
 
     pins.push({
       id: primaryId,
-      nodeKind: displayMode === "photo" ? "photo" : "followup",
+      nodeKind: displayMode === "photo" ? "photo" : displayMode === "badge" ? "badge" : "followup",
       subjectKey: cpKey,
       checkpointId: cp.id,
       x: pos.x,
@@ -589,6 +639,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       displayMode,
       noteTemplate,
       photoUrl,
+      hasPin: Boolean(boardCfg?.has_pin),
+      zIndex: typeof boardCfg?.z_index === "number" ? boardCfg.z_index : 0,
       pulseBorder,
       actionType: "sheet_checkpoint",
       rotation: typeof boardCfg?.rotation === "number" ? boardCfg.rotation : 0,

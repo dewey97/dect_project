@@ -415,6 +415,8 @@ export interface BoardConfig {
   note_template?: string;
   note_color?: "yellow" | "white" | "red" | "blue" | "black";
   pin_color?: "red" | "yellow" | "blue" | "green" | "black" | "silver" | "brass";
+  has_pin?: boolean;
+  z_index?: number;
   scale?: number;
   rotation?: number;
   pulse?: boolean;

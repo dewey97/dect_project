@@ -52,6 +52,10 @@ export interface RenderSceneParams {
       id: string;
       label: string;
       photoUrl?: string;
+      nodeKind?: string;
+      displayMode?: string;
+      isAvatar?: boolean;
+      subjectKey?: string;
     },
     caseId?: string,
   ) => string | undefined;
@@ -228,6 +232,9 @@ export function renderScene({
     })),
   ];
 
+  // Sắp xếp thứ tự vẽ theo zIndex (lớp sau vẽ trước, lớp trước vẽ sau đè lên)
+  allPinsUnified.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+
   const pinPositionsMap = new Map<string, Point>();
   allPinsUnified.forEach((pin) => {
     pinPositionsMap.set(pin.id, {
@@ -258,7 +265,7 @@ export function renderScene({
     const resolvedPhotoUrl = resolveSuspectPhotoUrl(pin, currentCaseId);
 
     // If pin has a resolved photo URL (Polaroid format for suspects / victims / crime scenes)
-    if (resolvedPhotoUrl) {
+    if (resolvedPhotoUrl && pin.displayMode !== "note" && pin.displayMode !== "badge") {
       const isReinvestigate =
         pin.nodeKind === "reinvestigate" ||
         pin.id.includes("reinvestigate") ||
@@ -468,11 +475,160 @@ export function renderScene({
         }
         context.restore();
       }
+    } else if (pin.displayMode === "badge") {
+      // ── TACTILE EVIDENCE BADGE / INDEX LABEL TAG ──
+      const baseBadgeWidth = 145;
+      const baseBadgeHeight = 34;
+      const badgeWidth =
+        (baseBadgeWidth * scaleFactor * scaleMod) / transform.scale;
+      const badgeHeight =
+        (baseBadgeHeight * scaleFactor * scaleMod) / transform.scale;
+
+      const tagX = -badgeWidth / 2;
+      const tagY = -badgeHeight / 2;
+
+      // 2-pass drop shadow onto corkboard
+      context.save();
+      context.shadowColor = "rgba(10, 5, 2, 0.40)";
+      context.shadowBlur = (9 * scaleFactor) / transform.scale;
+      context.shadowOffsetX = (1.5 * scaleFactor) / transform.scale;
+      context.shadowOffsetY = (3.5 * scaleFactor) / transform.scale;
+
+      const badgeBg =
+        pin.noteColor === "red"
+          ? "#fee2e2"
+          : pin.noteColor === "blue"
+            ? "#e0f2fe"
+            : pin.noteColor === "white"
+              ? "#fafafa"
+              : "#f5ecd7"; // classic vintage manila/kraft file tag
+
+      context.fillStyle = badgeBg;
+      const radius = (3 * scaleFactor) / transform.scale;
+      context.beginPath();
+      if (typeof context.roundRect === "function") {
+        context.roundRect(tagX, tagY, badgeWidth, badgeHeight, radius);
+      } else {
+        context.rect(tagX, tagY, badgeWidth, badgeHeight);
+      }
+      context.fill();
+
+      // Pass 2: Crisp contact shadow
+      context.shadowColor = "rgba(10, 5, 2, 0.45)";
+      context.shadowBlur = (3.5 * scaleFactor) / transform.scale;
+      context.shadowOffsetX = (1 * scaleFactor) / transform.scale;
+      context.shadowOffsetY = (1.8 * scaleFactor) / transform.scale;
+      context.beginPath();
+      if (typeof context.roundRect === "function") {
+        context.roundRect(tagX, tagY, badgeWidth, badgeHeight, radius);
+      } else {
+        context.rect(tagX, tagY, badgeWidth, badgeHeight);
+      }
+      context.fill();
+
+      // Vintage cardstock border
+      context.strokeStyle = "rgba(80, 60, 40, 0.45)";
+      context.lineWidth = 1;
+      context.stroke();
+
+      // Inner hairline decorative frame
+      const innerPad = (2.2 * scaleFactor) / transform.scale;
+      context.strokeStyle = "rgba(80, 60, 40, 0.18)";
+      context.lineWidth = 0.75;
+      context.strokeRect(
+        tagX + innerPad,
+        tagY + innerPad,
+        badgeWidth - innerPad * 2,
+        badgeHeight - innerPad * 2,
+      );
+
+      // Eyelet (lỗ bấm khoen kim loại) ở bên trái
+      const eyeletX = tagX + (12 * scaleFactor) / transform.scale;
+      const eyeletY = 0;
+      const eyeletOuterR = (3.5 * scaleFactor) / transform.scale;
+      const eyeletInnerR = (1.8 * scaleFactor) / transform.scale;
+
+      // Brass outer ring
+      context.fillStyle = "#a1783f";
+      context.beginPath();
+      context.arc(eyeletX, eyeletY, eyeletOuterR, 0, Math.PI * 2);
+      context.fill();
+
+      // Inner hole into corkboard
+      context.fillStyle = "#261a10";
+      context.beginPath();
+      context.arc(eyeletX, eyeletY, eyeletInnerR, 0, Math.PI * 2);
+      context.fill();
+
+      context.restore();
+
+      // Text bên trong Thẻ nhãn: Font máy chữ / hồ sơ công an, chữ in hoa sắc nét
+      context.save();
+      const textStartX = eyeletX + (8 * scaleFactor) / transform.scale;
+      const maxTextW = badgeWidth - (textStartX - tagX) - (8 * scaleFactor) / transform.scale;
+      let bFontSize = (11.5 * scaleFactor) / transform.scale;
+      context.font = `700 ${bFontSize}px 'Courier Prime', 'Roboto Mono', 'Special Elite', monospace`;
+
+      const badgeText = (pin.label || "").trim().toUpperCase();
+      while (
+        bFontSize > (7.5 * scaleFactor) / transform.scale &&
+        context.measureText(badgeText).width > maxTextW
+      ) {
+        bFontSize -= 0.5 * scaleFactor;
+        context.font = `700 ${bFontSize}px 'Courier Prime', 'Roboto Mono', 'Special Elite', monospace`;
+      }
+
+      context.fillStyle = "#1e140c";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      const textCenterX = textStartX + maxTextW / 2;
+      context.fillText(badgeText, textCenterX, 0);
+      context.restore();
+
+      // Hover / Selection highlight cho Badge
+      const isBadgeHovered = hoveredPinId === pin.id;
+      const isBadgeSelected = selectedPinId === pin.id;
+      if (isBadgeHovered || isBadgeSelected) {
+        context.save();
+        const pad = (3 * scaleFactor) / transform.scale;
+        const bx = tagX - pad;
+        const by = tagY - pad;
+        const bw = badgeWidth + pad * 2;
+        const bh = badgeHeight + pad * 2;
+
+        if (isBadgeSelected) {
+          context.shadowColor = "rgba(245, 158, 11, 1)";
+          context.shadowBlur = (20 * scaleFactor) / transform.scale;
+          context.strokeStyle = "#f59e0b";
+          context.lineWidth = (2.5 * scaleFactor) / transform.scale;
+          context.setLineDash([]);
+        } else {
+          context.shadowColor = "rgba(251, 191, 36, 0.85)";
+          context.shadowBlur = (10 * scaleFactor) / transform.scale;
+          context.strokeStyle = "#fbbf24";
+          context.lineWidth = (1.8 * scaleFactor) / transform.scale;
+          context.setLineDash([
+            (5 * scaleFactor) / transform.scale,
+            (3 * scaleFactor) / transform.scale,
+          ]);
+        }
+        context.strokeRect(bx, by, bw, bh);
+        context.setLineDash([]);
+
+        if (isEditMode) {
+          const handleSize = (5 * scaleFactor) / transform.scale;
+          context.fillStyle = isBadgeSelected ? "#f59e0b" : "#fbbf24";
+          context.fillRect(bx - handleSize / 2, by - handleSize / 2, handleSize, handleSize);
+          context.fillRect(bx + bw - handleSize / 2, by - handleSize / 2, handleSize, handleSize);
+          context.fillRect(bx - handleSize / 2, by + bh - handleSize / 2, handleSize, handleSize);
+          context.fillRect(bx + bw - handleSize / 2, by + bh - handleSize / 2, handleSize, handleSize);
+        }
+        context.restore();
+      }
     } else {
-      // ── DISTINGUISH WHITE PINNED NOTES vs YELLOW STICKY NOTES ──
+      // ── TACTILE CUSTOM HANDWRITTEN STICKY NOTES ──
       const upperLabel = (pin.label || "").toUpperCase();
-      const isWhiteNote =
-        pin.noteColor === "white" ||
+      const isWhiteNoteByLabel =
         upperLabel.includes("MỞ RỘNG") ||
         upperLabel.includes("KHÁM XÉT") ||
         upperLabel.includes("KHÁM NGHIỆM") ||
@@ -480,75 +636,7 @@ export function renderScene({
         upperLabel.includes("BIÊN BẢN") ||
         upperLabel.includes("TRUY TỐ");
 
-      let noteUrl = "";
-      let isPreRendered = false;
-
-      const customTextureUrl = pin.noteTextureUrl as string | undefined;
-
-      if (pin.noteTemplate && pin.noteTemplate.startsWith("/images/")) {
-        noteUrl = pin.noteTemplate;
-        isPreRendered = true;
-      } else if (pin.noteTemplate === "custom") {
-        noteUrl = "";
-        isPreRendered = false;
-      } else if (customTextureUrl) {
-        noteUrl = customTextureUrl;
-        isPreRendered =
-          customTextureUrl.includes("rendered_notes/") ||
-          customTextureUrl.includes("/notes/");
-      } else if (
-        upperLabel.includes("CHỨNG CỨ")
-      ) {
-        noteUrl = "/images/board/notes/note_bo_sung_chung_cu.png";
-        isPreRendered = true;
-      } else if (
-        pin.nodeKind === "suspects_hub" ||
-        upperLabel.includes("NGHI PHẠM")
-      ) {
-        noteUrl = "/images/board/notes/note_nghi_pham.png";
-        isPreRendered = true;
-      } else if (
-        pin.nodeKind === "followup" ||
-        pin.id.startsWith("followup-") ||
-        upperLabel.includes("NGHI VẤN") ||
-        upperLabel.includes("CÂU HỎI")
-      ) {
-        if (pin.label && pin.label !== "NGHI VẤN") {
-          noteUrl = "";
-          isPreRendered = false;
-        } else {
-          noteUrl = "/images/board/notes/note_nghi_van.png";
-          isPreRendered = true;
-        }
-      } else if (
-        pin.nodeKind === "phone_lookup" ||
-        upperLabel.includes("MỞ RỘNG")
-      ) {
-        noteUrl = "/images/board/notes/note_mo_rong_dieu_tra.png";
-        isPreRendered = true;
-      } else if (
-        pin.nodeKind === "reinvestigate" ||
-        upperLabel.includes("KHÁM XÉT") ||
-        upperLabel.includes("KHÁM NGHIỆM")
-      ) {
-        noteUrl = "/images/board/notes/note_kham_xet_lai.png";
-        isPreRendered = true;
-      } else if (
-        pin.nodeKind === "indictment" ||
-        upperLabel.includes("KẾT LUẬN") ||
-        upperLabel.includes("TRUY TỐ")
-      ) {
-        noteUrl = "/images/board/notes/note_ket_luan_dieu_tra.png";
-        isPreRendered = true;
-      } else if (isWhiteNote) {
-        noteUrl = "/images/board/notes/note_mo_rong_dieu_tra.png";
-        isPreRendered = false;
-      } else {
-        noteUrl = "";
-        isPreRendered = false;
-      }
-
-      const loadedNoteImg = getLoadedImage(noteUrl);
+      const isWhiteNote = pin.noteColor === "white" || (!pin.noteColor && isWhiteNoteByLabel);
 
       const isIndictment =
         pin.nodeKind === "indictment" ||
@@ -556,122 +644,61 @@ export function renderScene({
       const isFollowup =
         pin.nodeKind === "followup" ||
         pin.id.startsWith("followup-");
-      const sizeMultiplier = 1.0;
 
-      // Note size: preserve aspect ratio cleanly without distortion
-      const baseCardWidth = isFollowup ? 144 : isWhiteNote ? 142 : 115;
+      // Kích thước chuẩn tỉ lệ sticky note
+      const baseCardWidth = isFollowup ? 144 : isWhiteNote ? 142 : 125;
       const noteWidth =
-        (baseCardWidth * scaleFactor * scaleMod * sizeMultiplier) /
-        transform.scale;
+        (baseCardWidth * scaleFactor * scaleMod) / transform.scale;
+      const noteHeight = noteWidth * (isFollowup ? 0.95 : isWhiteNote ? 1.05 : 0.96);
 
-      let noteHeight = noteWidth;
-      if (
-        loadedNoteImg &&
-        loadedNoteImg.naturalWidth &&
-        loadedNoteImg.naturalHeight
-      ) {
-        noteHeight =
-          (noteWidth * loadedNoteImg.naturalHeight) /
-          loadedNoteImg.naturalWidth;
-      } else {
-        noteHeight = noteWidth * (isFollowup ? 0.92 : isWhiteNote ? 1.18 : 1.0);
-      }
-
-      let pinAnchorX = 0.5;
-      let pinAnchorY = 0.08;
-
-      if (
-        upperLabel.includes("CHỨNG CỨ")
-      ) {
-        pinAnchorX = 0.5;
-        pinAnchorY = 0.08;
-      } else if (
-        pin.nodeKind === "suspects_hub" ||
-        upperLabel.includes("NGHI PHẠM")
-      ) {
-        pinAnchorX = 0.5;
-        pinAnchorY = 0.08;
-      } else if (
-        pin.nodeKind === "followup" ||
-        pin.id.startsWith("followup-") ||
-        upperLabel.includes("NGHI VẤN") ||
-        upperLabel.includes("CÂU HỎI")
-      ) {
-        pinAnchorX = 0.5;
-        pinAnchorY = 0.08;
-      } else if (
-        pin.nodeKind === "phone_lookup" ||
-        upperLabel.includes("MỞ RỘNG")
-      ) {
-        pinAnchorX = 0.5;
-        pinAnchorY = 0.075;
-      } else if (
-        pin.nodeKind === "reinvestigate" ||
-        upperLabel.includes("KHÁM XÉT") ||
-        upperLabel.includes("KHÁM NGHIỆM")
-      ) {
-        pinAnchorX = 0.5;
-        pinAnchorY = 0.075;
-      } else if (
-        pin.nodeKind === "indictment" ||
-        upperLabel.includes("KẾT LUẬN")
-      ) {
-        pinAnchorX = 0.5;
-        pinAnchorY = 0.075;
-      }
-
+      const pinAnchorX = 0.5;
+      const pinAnchorY = 0.08;
       const tagX = -noteWidth * pinAnchorX;
       const tagY = -noteHeight * pinAnchorY;
 
-      // Draw the realistic Ultra HD note PNG asset with tactile 2-pass drop shadow onto corkboard
-      if (loadedNoteImg) {
-        // Pass 1 — ambient occlusion lift
-        context.save();
-        context.shadowColor = "rgba(10, 5, 2, 0.30)";
-        context.shadowBlur = (18 * scaleFactor) / transform.scale;
-        context.shadowOffsetX = (1.2 * scaleFactor) / transform.scale;
-        context.shadowOffsetY = (8 * scaleFactor) / transform.scale;
-        context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
-        context.restore();
+      // Tactile 2-pass drop shadow onto corkboard
+      context.save();
+      // Pass 1: Soft ambient lift
+      context.shadowColor = "rgba(10, 5, 2, 0.32)";
+      context.shadowBlur = (14 * scaleFactor) / transform.scale;
+      context.shadowOffsetX = (1.5 * scaleFactor) / transform.scale;
+      context.shadowOffsetY = (7 * scaleFactor) / transform.scale;
 
-        // Pass 2 — crisp contact edge
-        context.save();
-        context.shadowColor = "rgba(10, 5, 2, 0.52)";
-        context.shadowBlur = (6.5 * scaleFactor) / transform.scale;
-        context.shadowOffsetX = (2.4 * scaleFactor) / transform.scale;
-        context.shadowOffsetY = (4.6 * scaleFactor) / transform.scale;
-        context.drawImage(loadedNoteImg, tagX, tagY, noteWidth, noteHeight);
-        context.restore();
-      } else {
-        // Fallback fill / custom tactile handwritten note card
-        context.save();
-        context.shadowColor = "rgba(10, 5, 2, 0.48)";
-        context.shadowBlur = (12 * scaleFactor) / transform.scale;
-        context.shadowOffsetX = (2.2 * scaleFactor) / transform.scale;
-        context.shadowOffsetY = (6 * scaleFactor) / transform.scale;
+      const noteBg =
+        pin.noteColor === "red"
+          ? "#fecdd3"
+          : pin.noteColor === "blue"
+            ? "#bae6fd"
+            : pin.noteColor === "white"
+              ? "#faf8f2"
+              : pin.noteColor === "yellow"
+                ? "#fef08a"
+                : isWhiteNoteByLabel
+                  ? "#faf8f2"
+                  : "#fef08a";
+      context.fillStyle = noteBg;
+      context.fillRect(tagX, tagY, noteWidth, noteHeight);
 
-        const noteBg =
-          pin.noteColor === "red"
-            ? "#fecdd3"
-            : pin.noteColor === "blue"
-              ? "#bae6fd"
-              : isWhiteNote
-                ? "#faf8f2"
-                : "#fef08a";
-        context.fillStyle = noteBg;
-        context.fillRect(tagX, tagY, noteWidth, noteHeight);
+      // Pass 2: Crisp contact shadow edge
+      context.shadowColor = "rgba(10, 5, 2, 0.45)";
+      context.shadowBlur = (5 * scaleFactor) / transform.scale;
+      context.shadowOffsetX = (1.8 * scaleFactor) / transform.scale;
+      context.shadowOffsetY = (3.5 * scaleFactor) / transform.scale;
+      context.fillRect(tagX, tagY, noteWidth, noteHeight);
 
-        // Subtle top adhesive band for realistic tactile sticky note
-        context.fillStyle = "rgba(255, 255, 255, 0.22)";
-        context.fillRect(tagX, tagY, noteWidth, noteHeight * 0.14);
+      // Subtle top adhesive band for realistic tactile sticky note (dải keo dán mép trên)
+      context.fillStyle = "rgba(255, 255, 255, 0.28)";
+      context.fillRect(tagX, tagY, noteWidth, noteHeight * 0.15);
 
-        // Subtle paper edge border
-        context.strokeStyle = "rgba(0, 0, 0, 0.08)";
-        context.lineWidth = 1;
-        context.strokeRect(tagX, tagY, noteWidth, noteHeight);
+      // Subtle bottom paper curl shadow
+      context.fillStyle = "rgba(0, 0, 0, 0.03)";
+      context.fillRect(tagX, tagY + noteHeight * 0.92, noteWidth, noteHeight * 0.08);
 
-        context.restore();
-      }
+      // Subtle paper edge border
+      context.strokeStyle = "rgba(0, 0, 0, 0.08)";
+      context.lineWidth = 1;
+      context.strokeRect(tagX, tagY, noteWidth, noteHeight);
+      context.restore();
 
       // Pulsing border highlight if active
       if (pin.pulseBorder) {
@@ -749,44 +776,42 @@ export function renderScene({
         context.restore();
       }
 
-      // Render handwritten text (only if not using pre-rendered note asset or while loading)
-      if (!isPreRendered || !loadedNoteImg) {
-        const paperFaceCenterX = tagX + noteWidth / 2;
-        const paperFaceCenterY = tagY + noteHeight * 0.52;
-        const maxTextWidth = noteWidth * (isWhiteNote ? 0.65 : 0.72);
-        const availableHeight = noteHeight * (isWhiteNote ? 0.55 : 0.6);
+      // Render handwritten text
+      const paperFaceCenterX = tagX + noteWidth / 2;
+      const paperFaceCenterY = tagY + noteHeight * 0.52;
+      const maxTextWidth = noteWidth * (isWhiteNote ? 0.65 : 0.72);
+      const availableHeight = noteHeight * (isWhiteNote ? 0.55 : 0.6);
 
-        let fontSize =
-          (isIndictment ? 15.5 : isWhiteNote ? 14.5 : 14.0) * scaleFactor;
+      let fontSize =
+        (isIndictment ? 15.5 : isWhiteNote ? 14.5 : 14.0) * scaleFactor;
+      context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
+      let lines = wrapText(context, pin.label, maxTextWidth, 3);
+
+      while (
+        fontSize > 9.0 * scaleFactor &&
+        (lines.some((l) => context.measureText(l).width > maxTextWidth) ||
+          lines.length * ((fontSize + 1.5 * scaleFactor) / transform.scale) >
+            availableHeight)
+      ) {
+        fontSize -= 0.5 * scaleFactor;
         context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
-        let lines = wrapText(context, pin.label, maxTextWidth, 3);
-
-        while (
-          fontSize > 9.0 * scaleFactor &&
-          (lines.some((l) => context.measureText(l).width > maxTextWidth) ||
-            lines.length * ((fontSize + 1.5 * scaleFactor) / transform.scale) >
-              availableHeight)
-        ) {
-          fontSize -= 0.5 * scaleFactor;
-          context.font = `700 ${fontSize / transform.scale}px 'Caveat', 'Playpen Sans', 'Segoe Print', cursive, sans-serif`;
-          lines = wrapText(context, pin.label, maxTextWidth, 3);
-        }
-
-        const lineHeight = (fontSize + 1.5 * scaleFactor) / transform.scale;
-        const textBlockHeight = lines.length * lineHeight;
-
-        context.save();
-        context.translate(paperFaceCenterX, paperFaceCenterY);
-        context.fillStyle = "#1e1b18";
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-
-        const textStartY = -textBlockHeight / 2 + lineHeight / 2;
-        lines.forEach((line, lineIdx) => {
-          context.fillText(line, 0, textStartY + lineIdx * lineHeight);
-        });
-        context.restore();
+        lines = wrapText(context, pin.label, maxTextWidth, 3);
       }
+
+      const lineHeight = (fontSize + 1.5 * scaleFactor) / transform.scale;
+      const textBlockHeight = lines.length * lineHeight;
+
+      context.save();
+      context.translate(paperFaceCenterX, paperFaceCenterY);
+      context.fillStyle = "#1e1b18";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+
+      const textStartY = -textBlockHeight / 2 + lineHeight / 2;
+      lines.forEach((line, lineIdx) => {
+        context.fillText(line, 0, textStartY + lineIdx * lineHeight);
+      });
+      context.restore();
 
       // Lock overlay and text if pin is locked
       if (pin.isLocked) {
@@ -839,7 +864,14 @@ export function renderScene({
 
     context.restore(); // restore paper / polaroid transform
 
-    // Pinhole puncture (Skip for physical evidence props which already have realistic self-contained shadows & pins)
+    // Pinhole puncture (Chỉ đục lỗ kim cho ảnh Polaroid cắm ghim hoặc note có tickbox ghim; giấy note dính bằng keo không đục lỗ)
+    const resolvedPhotoForHole = resolveSuspectPhotoUrl(pin, currentCaseId);
+    const isPhotoForHole = Boolean(
+      resolvedPhotoForHole &&
+      pin.displayMode !== "note" &&
+      pin.displayMode !== "badge"
+    );
+    const hasPinAttachment = isPhotoForHole || Boolean(pin.hasPin);
     const isSelfContainedProp =
       pin.nodeKind === "victim_phone" ||
       pin.nodeKind === "reinvestigate" ||
@@ -849,7 +881,7 @@ export function renderScene({
         (pin.photoUrl.includes("crime_scene") ||
           pin.photoUrl.includes("reinvestigation")),
       );
-    if (!isSelfContainedProp) {
+    if (hasPinAttachment && !isSelfContainedProp) {
       context.save();
       context.fillStyle = "rgba(35, 20, 10, 0.85)";
       context.beginPath();
@@ -1035,6 +1067,19 @@ export function renderScene({
   allPinsUnified.forEach((pin) => {
     const pinPosition = pinPositionsMap.get(pin.id);
     if (!pinPosition) return;
+
+    // Giấy note dính bằng keo ở mép trên; chỉ cắm ghim nếu là ảnh Polaroid hoặc note có tickbox hasPin
+    const resolvedPhotoUrl = resolveSuspectPhotoUrl(pin, currentCaseId);
+    const isPhotoCard = Boolean(
+      resolvedPhotoUrl &&
+      pin.displayMode !== "note" &&
+      pin.displayMode !== "badge"
+    );
+    const shouldDrawPushpin = isPhotoCard || Boolean(pin.hasPin);
+    if (!shouldDrawPushpin) {
+      return; // Giấy note không bật ghim -> không cắm ghim
+    }
+
     if (
       pin.nodeKind === "victim_phone" ||
       pin.nodeKind === "reinvestigate" ||

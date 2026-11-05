@@ -248,7 +248,12 @@ export function toDraft(row: DbCaseCheckpoint): CheckpointStudioDraft {
     aiContext: asString(row.ai_context),
     aiValidCases: asStringArray(row.ai_valid_cases),
     aiInvalidCases: asStringArray(row.ai_invalid_cases),
-    boardConfig: (row.board_config as BoardConfig) || {},
+    boardConfig: {
+      ...((row.board_config as BoardConfig) || {}),
+      pin_title: (row.board_config as BoardConfig)?.pin_title !== undefined
+        ? (row.board_config as BoardConfig).pin_title
+        : asString(row.title),
+    },
   };
 }
 

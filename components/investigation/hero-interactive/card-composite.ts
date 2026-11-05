@@ -5,24 +5,46 @@ export const resolveSuspectPhotoUrl = (
     id: string;
     label: string;
     photoUrl?: string;
+    nodeKind?: string;
+    displayMode?: string;
+    isAvatar?: boolean;
+    subjectKey?: string;
   },
   photosMap?: Map<string, string>,
   caseId?: string,
 ): string | undefined => {
+  // 0. Nếu displayMode là note hoặc badge -> tuyệt đối KHÔNG trả về ảnh polaroid
+  if (pin.displayMode === "note" || pin.displayMode === "badge") {
+    return undefined;
+  }
+
+  // 1. Nếu pin có photoUrl chỉ định
   if (pin.photoUrl) return normalizeImageUrl(pin.photoUrl);
-  if (
+
+  // 2. Blacklist: Các node loại câu hỏi, nghi vấn, tra cứu điện thoại, kết luận điều tra, hub
+  const isQuestionOrNote =
+    pin.nodeKind === "followup" ||
+    pin.nodeKind === "phone_lookup" ||
+    pin.nodeKind === "indictment" ||
+    pin.nodeKind === "note" ||
+    pin.nodeKind === "custom" ||
+    pin.id.includes(":followup:") ||
     pin.id.includes("-pin-followup") ||
+    pin.id.includes(":checkpoint:") ||
+    pin.id.includes(":phone_lookup:") ||
+    pin.id.includes("-pin-phone") ||
+    pin.id.includes(":indictment:") ||
+    pin.id.includes("-pin-indictment") ||
     pin.id.includes("-pin-question") ||
     pin.id.includes("-pin-clue") ||
     pin.id.includes("-pin-evidence") ||
-    pin.id.includes("-pin-phone") ||
-    pin.id.includes("-pin-reinvestigate") ||
-    pin.id.includes("-pin-indictment") ||
     pin.id.endsWith("-pin-suspects") ||
-    pin.id.includes("suspects_hub")
-  ) {
+    pin.id.includes("suspects_hub");
+
+  if (isQuestionOrNote) {
     return undefined;
   }
+
   const lower = `${pin.id} ${pin.label}`.toLowerCase();
   const isCrimeScenePin =
     lower.includes("thi-the") ||
@@ -32,7 +54,7 @@ export const resolveSuspectPhotoUrl = (
     lower.includes("crime_scene") ||
     lower.includes("chalk");
 
-  // 1. Check live photos map first (Live-First rule)
+  // 3. Check live photos map first (Live-First rule)
   if (photosMap) {
     if (isCrimeScenePin) {
       const liveCrime =
@@ -51,13 +73,21 @@ export const resolveSuspectPhotoUrl = (
     const directLabel = photosMap.get(pin.label.toLowerCase().trim());
     if (directLabel) return directLabel;
 
+    // Chỉ gán avatar của subjectKey nếu đây thực sự là node avatar của nhân vật (isAvatar, suspect, victim)
+    const isCharacterAvatarNode =
+      pin.isAvatar ||
+      pin.nodeKind === "suspect" ||
+      pin.nodeKind === "victim" ||
+      pin.id.includes(":suspect:") ||
+      pin.id.includes(":victim:");
+
     const subjectKey = (pin as any).subjectKey;
-    if (subjectKey) {
+    if (isCharacterAvatarNode && subjectKey) {
       const liveSubject = photosMap.get(`avatar_${subjectKey.toLowerCase()}`) || photosMap.get(subjectKey.toLowerCase());
       if (liveSubject) return liveSubject;
     }
   }
-  // 2. Fallback if not found in case evidence
+  // 4. Fallback if not found in case evidence
   if (isCrimeScenePin) {
     return "/images/avatar_placeholder.svg";
   }
