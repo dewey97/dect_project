@@ -1,19 +1,9 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
-import Link from "next/link";
 import {
   SquareKanban,
-  FolderOpen,
   X,
-  ExternalLink,
-  Maximize2,
-  Minimize2,
-  Minus,
-  GripHorizontal,
-  Smartphone,
-  Compass,
-  BookOpen,
   Users,
   HelpCircle,
   MessageSquareWarning,
@@ -53,6 +43,10 @@ import type {
 import type { DbDossierDocument } from "@/lib/actions/dossier-actions";
 import type { DbCaseDossier } from "@/lib/types/database";
 import type { InvestigationActiveModal } from "./mobile-investigation-workspace";
+import { CanvasNotebookWindow } from "./canvas/notebook-window";
+import { CanvasPhoneWindow } from "./canvas/phone-window";
+import { CanvasBoardWindow } from "./canvas/board-window";
+import { CanvasSidebar } from "./canvas/sidebar";
 
 export interface CanvasInvestigationWorkspaceProps {
   caseId: string;
@@ -648,253 +642,21 @@ export function CanvasInvestigationWorkspace({
   return (
     <div className="w-full h-full flex-1 min-h-0 flex items-stretch justify-start overflow-hidden min-w-0 relative gap-0 p-0 select-none">
       {/* 0. SIDEBAR LIỀN BÊN TRÁI: DOCK CỐ ĐỊNH TẤT CẢ LỐI TẮT NGHIỆP VỤ & HỆ THỐNG */}
-      <aside
-        id="canvas-left-sidebar"
-        data-tour="canvas-left-dock"
-        aria-label="Thanh điều hướng nghiệp vụ điều tra"
-        className={cn(
-          "w-16 sm:w-[68px] h-full shrink-0 z-30 flex flex-col justify-between items-center py-2 px-1 select-none transition-all duration-200 overflow-y-auto overflow-x-hidden scrollbar-none",
-          isLight
-            ? "bg-white border-r border-zinc-200 shadow-sm text-zinc-900"
-            : "bg-[#0d0f14]/98 border-r border-[#262c38] text-zinc-300 backdrop-blur-xl",
-          isBoardFullscreen && "opacity-20 pointer-events-none"
-        )}
-      >
-        {/* PHẦN TRÊN: LOGO THƯƠNG HIỆU + CÁC CÔNG CỤ ĐIỀU TRA CHÍNH */}
-        <div className="flex flex-col items-center gap-1.5 w-full">
-          {/* Logo XPLORE (phiên bản favicon) ở đỉnh sidebar */}
-          <div className="pt-0.5 pb-1 w-full flex items-center justify-center">
-            <BrandMark
-              href="/"
-              variant="favicon"
-              className={cn(
-                "flex items-center justify-center p-1 rounded-xl transition-colors",
-                isLight ? "hover:bg-zinc-100" : "hover:bg-zinc-800/60"
-              )}
-              imageClassName="size-7.5 sm:size-8 object-contain"
-            />
-          </div>
-
-          {/* 1. Khay tài liệu */}
-          <button
-            type="button"
-            onClick={() => setIsDossierCollapsed((prev) => !prev)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              !isDossierCollapsed
-                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
-                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
-            )}
-            title={!isDossierCollapsed ? "Thu gọn Khay tài liệu" : "Mở Khay tài liệu"}
-          >
-            <FolderOpen
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                !isDossierCollapsed
-                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
-                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Tài liệu
-            </span>
-          </button>
-
-          {/* 2. Bảng điều tra */}
-          <button
-            type="button"
-            onClick={() => setIsBoardOpen((prev) => !prev)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              isBoardOpen
-                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
-                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
-            )}
-            title={isBoardOpen ? "Thu gọn Bảng điều tra" : "Mở Bảng điều tra"}
-          >
-            <SquareKanban
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                isBoardOpen
-                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
-                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Bảng
-            </span>
-          </button>
-
-          {/* 3. Điện thoại nạn nhân */}
-          <button
-            type="button"
-            onClick={() => setActiveModal(activeModal === "phone" ? null : "phone")}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              activeModal === "phone"
-                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
-                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
-            )}
-            title="Điện thoại nạn nhân"
-          >
-            <Smartphone
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                activeModal === "phone"
-                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
-                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Điện thoại
-            </span>
-          </button>
-
-          {/* 4. Khám xét lại hiện trường 360 */}
-          <button
-            type="button"
-            onClick={() => setActiveModal(activeModal === "reinvestigate" ? null : "reinvestigate")}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              activeModal === "reinvestigate"
-                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
-                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
-            )}
-            title="Khám xét lại hiện trường 360"
-          >
-            <Compass
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                activeModal === "reinvestigate"
-                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
-                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Hiện trường
-            </span>
-          </button>
-
-          {/* 5. Sổ tay điều tra */}
-          <button
-            type="button"
-            onClick={handleOpenNotebook}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              activeModal === "notebook"
-                ? (isLight ? "bg-zinc-100 text-zinc-950 font-bold border border-zinc-200 shadow-xs" : "bg-zinc-800/70 text-zinc-100 font-semibold shadow-xs")
-                : (isLight ? "text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50")
-            )}
-            title="Sổ tay ghi chép nghiệp vụ"
-          >
-            <BookOpen
-              className={cn(
-                "size-5 transition-transform group-hover:scale-105",
-                activeModal === "notebook"
-                  ? (isLight ? "text-zinc-950" : "text-zinc-100")
-                  : (isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")
-              )}
-            />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Sổ tay
-            </span>
-          </button>
-        </div>
-
-        {/* PHẦN DƯỚI: TIỆN ÍCH HỆ THỐNG, CHƠI NHÓM & USER PROFILE */}
-        <div className="flex flex-col items-center gap-1.5 w-full pt-1">
-          {/* Nút Chuyển đổi Theme Sáng / Tối */}
-          <button
-            type="button"
-            onClick={handleToggleUiTheme}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              isLight
-                ? "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
-                : "text-zinc-400 hover:text-amber-300 hover:bg-zinc-800/50"
-            )}
-            title={isLight ? "Chuyển sang giao diện Tối (Dark)" : "Chuyển sang giao diện Sáng (Light)"}
-          >
-            {isLight ? (
-              <Sun className="size-4.5 text-amber-600 group-hover:text-amber-700 transition-transform group-hover:rotate-45 duration-300" />
-            ) : (
-              <Moon className="size-4.5 text-zinc-400 group-hover:text-amber-300 transition-transform group-hover:-rotate-12 duration-300" />
-            )}
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              {isLight ? "Sáng" : "Tối"}
-            </span>
-          </button>
-
-          {/* 6. Chơi nhóm */}
-          <button
-            type="button"
-            onClick={() => setIsRoomModalOpen(true)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none relative",
-              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
-            title="Chơi nhóm đồng bộ thời gian thực"
-          >
-            <Users className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Nhóm
-            </span>
-          </button>
-
-          {/* 7. Chuyển sang Xem lẻ */}
-          <button
-            type="button"
-            onClick={onSwitchToSingleView}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
-            title="Chuyển sang chế độ Xem lẻ"
-          >
-            <FileText className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Xem lẻ
-            </span>
-          </button>
-
-          {/* 8. Hướng dẫn nghiệp vụ Bàn hồ sơ */}
-          <button
-            type="button"
-            onClick={() => setIsGuideModalOpen(true)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
-            title="Cẩm nang tác nghiệp Bàn hồ sơ"
-          >
-            <HelpCircle className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Chỉ dẫn
-            </span>
-          </button>
-
-          {/* 9. Báo lỗi */}
-          <button
-            type="button"
-            onClick={() => emitInvestigationEvent("OPEN_FEEDBACK")}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 w-full py-2 px-1 rounded-xl active:scale-95 transition-all cursor-pointer group select-none",
-              isLight ? "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100" : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
-            )}
-            title="Báo lỗi & Góp ý"
-          >
-            <MessageSquareWarning className={cn("size-4.5 transition-transform group-hover:scale-105", isLight ? "text-zinc-500 group-hover:text-zinc-900" : "text-zinc-400 group-hover:text-zinc-200")} />
-            <span className="text-[10px] font-sans font-medium tracking-tight text-center leading-none">
-              Báo lỗi
-            </span>
-          </button>
-
-          {/* 10. Avatar Profile (UserNav) */}
-          <div className="pt-1.5 pb-0.5 flex items-center justify-center w-full">
-            <UserNav size="sm" placement="sidebar" />
-          </div>
-        </div>
-      </aside>
+      <CanvasSidebar
+  isLight={isLight}
+  isBoardFullscreen={isBoardFullscreen}
+  setIsDossierCollapsed={setIsDossierCollapsed}
+  isDossierCollapsed={isDossierCollapsed}
+  setIsBoardOpen={setIsBoardOpen}
+  isBoardOpen={isBoardOpen}
+  setActiveModal={setActiveModal}
+  activeModal={activeModal}
+  handleOpenNotebook={handleOpenNotebook}
+  handleToggleUiTheme={handleToggleUiTheme}
+  setIsRoomModalOpen={setIsRoomModalOpen}
+  onSwitchToSingleView={onSwitchToSingleView}
+  setIsGuideModalOpen={setIsGuideModalOpen}
+/>
 
       {/* KHÔNG GIAN BÀN HỒ SƠ & CÁC CỬA SỔ FLOATING */}
       <div className="h-full flex-1 min-w-0 min-h-0 relative flex flex-col overflow-hidden">
@@ -966,257 +728,48 @@ export function CanvasInvestigationWorkspace({
 
       {/* 2. BẢNG ĐIỀU TRA FLOATING / TOÀN MÀN HÌNH (TỶ LỆ DỌC CHUẨN 896/1200 - GÓC PHẢI BÀN) */}
       {isBoardOpen && (
-        <div
-          data-tour="canvas-floating-board"
-          style={
-            isBoardFullscreen
-              ? { height: "calc(100vh - 36px)", maxHeight: "calc(100vh - 36px)" }
-              : { height: `${boardHeight}px` }
-          }
-          className={cn(
-            "flex aspect-[896/1200] rounded-md border-0 bg-transparent flex-col overflow-visible transition-[height,transform] duration-150",
-            isBoardFullscreen
-              ? "fixed inset-0 m-auto z-50 shadow-[0_30px_90px_rgba(0,0,0,0.98)]"
-              : "absolute top-3 right-3 z-30 max-h-[calc(100%-24px)] w-auto max-w-[48vw] shadow-2xl shadow-black/95"
-          )}
-        >
-          {/* 2 DÂY THỪNG / DÂY TREO BẢNG (CHỈ HIỆN KHI Ở DẠNG TREO GÓC BÀN) */}
-          {!isBoardFullscreen && (
-            <>
-              {/* Dây bên trái */}
-              <div className="absolute -top-12 left-[18%] z-50 flex flex-col items-center pointer-events-none">
-                <div className="w-[3px] h-14 bg-gradient-to-b from-[#150e09] via-[#4d3824] to-[#241a11] shadow-[1px_0_3px_rgba(0,0,0,0.9)]" />
-              </div>
-
-              {/* Dây bên phải */}
-              <div className="absolute -top-12 right-[18%] z-50 flex flex-col items-center pointer-events-none">
-                <div className="w-[3px] h-14 bg-gradient-to-b from-[#150e09] via-[#4d3824] to-[#241a11] shadow-[1px_0_3px_rgba(0,0,0,0.9)]" />
-              </div>
-            </>
-          )}
-
-          {/* DẢI NÚT ĐIỀU KHIỂN DỌC Ở VIỀN TRÁI BẢNG (DOCKED LEFT-EDGE BUTTONS) */}
-          <div className="absolute top-2 -left-6 z-40 flex flex-col gap-0.5 p-0.5 bg-zinc-900/95 border border-r-0 border-zinc-700/60 rounded-l shadow-xl backdrop-blur-md select-none">
-            {/* 1. Xem toàn màn hình / Thu nhỏ lại */}
-            <button
-              type="button"
-              onClick={() => setIsBoardFullscreen((prev) => !prev)}
-              className="size-5.5 flex items-center justify-center rounded hover:bg-zinc-800 text-zinc-300 hover:text-white transition-all cursor-pointer group"
-              title={isBoardFullscreen ? "Thu nhỏ về góc bàn (Esc)" : "Xem toàn màn hình"}
-            >
-              {isBoardFullscreen ? (
-                <Minimize2 className="size-3 transition-transform group-hover:scale-110 text-zinc-200" />
-              ) : (
-                <Maximize2 className="size-3 transition-transform group-hover:scale-110 text-zinc-400 group-hover:text-zinc-200" />
-              )}
-            </button>
-
-            {/* 2. Thu gọn / Cất bảng điều tra */}
-            <button
-              type="button"
-              onClick={() => {
-                setIsBoardFullscreen(false);
-                setIsBoardOpen(false);
-              }}
-              className="size-5.5 flex items-center justify-center rounded hover:bg-rose-950/70 text-zinc-400 hover:text-rose-300 transition-all cursor-pointer group"
-              title="Thu gọn / Cất bảng điều tra"
-            >
-              <Minus className="size-3 transition-transform group-hover:scale-110" />
-            </button>
-          </div>
-
-          {/* Canvas Bảng Điều Tra (Ẩn title, group play, audio, notebook) */}
-          <div className="flex-1 w-full h-full min-h-0 relative overflow-hidden rounded-md border border-black/40">
-            <MainInvestigationCanvas
-              caseId={caseId}
-              isBoardGame={false}
-              hideTitleBadge={true}
-              hideGroupPlay={true}
-              hideAudio={true}
-              hideNotebook={true}
-              activePinId={boardActivePinId}
-              onOpenPhoneSimulator={() => setActiveModal("phone")}
-              onOpenReinvestigation={() => setActiveModal("reinvestigate")}
-              onOpenEpilogue={() => setActiveModal("epilogue")}
-              onSelectSuspectInspector={handleOpenSuspectInspector}
-              onSelectFollowupInspector={handleOpenFollowupInspector}
-              onSelectPinInspector={handleOpenPinInspector}
-              onBoardReady={onBoardReady}
-            />
-          </div>
-
-          {/* GÓC RESIZE CO KÉO BẢNG ĐIỀU TRA (GÓC DƯỚI TRÁI KHI Ở BÊN PHẢI) */}
-          {!isBoardFullscreen && (
-            <div
-              onMouseDown={handleResizeStart}
-              className="absolute bottom-0 left-0 z-40 size-7 sm:size-8 cursor-nesw-resize flex items-end justify-start p-1.5 group select-none transition-colors"
-              title="Kéo để thay đổi kích thước bảng điều tra (giữ đúng tỉ lệ)"
-            >
-              <svg
-                className="size-4 text-zinc-400 group-hover:text-zinc-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] transition-colors rotate-90"
-                viewBox="0 0 10 10"
-                fill="currentColor"
-              >
-                <circle cx="8.5" cy="8.5" r="1.1" />
-                <circle cx="8.5" cy="5" r="1.1" />
-                <circle cx="8.5" cy="1.5" r="1.1" />
-                <circle cx="5" cy="8.5" r="1.1" />
-                <circle cx="5" cy="5" r="1.1" />
-                <circle cx="1.5" cy="8.5" r="1.1" />
-              </svg>
-            </div>
-          )}
-        </div>
+        <CanvasBoardWindow
+  isBoardFullscreen={isBoardFullscreen}
+  boardHeight={boardHeight}
+  setIsBoardFullscreen={setIsBoardFullscreen}
+  setIsBoardOpen={setIsBoardOpen}
+  caseId={caseId}
+  boardActivePinId={boardActivePinId}
+  setActiveModal={setActiveModal}
+  handleOpenSuspectInspector={handleOpenSuspectInspector}
+  handleOpenFollowupInspector={handleOpenFollowupInspector}
+  handleOpenPinInspector={handleOpenPinInspector}
+  onBoardReady={onBoardReady}
+  handleResizeStart={handleResizeStart}
+/>
       )}
 
       {/* 2.5. ĐIỆN THOẠI NẠN NHÂN FLOATING (KÉO THẢ & CO KÉO RESIZE KHÓA ĐÚNG TỶ LỆ, ÔM KHÍT THÂN MÁY) */}
       {activeModal === "phone" && (
-        <div
-          style={{
-            transform: `translate3d(${phonePos.x}px, ${phonePos.y}px, 0)`,
-            width: `${phoneSize.width}px`,
-            height: `${phoneSize.height}px`,
-            transition: isDraggingPhone || isResizingPhone ? "none" : undefined,
-          }}
-          className="flex fixed top-0 left-0 z-40 max-h-[calc(100vh-16px)] max-w-[calc(100vw-16px)] rounded-2xl border border-white/15 bg-black/60 shadow-[0_20px_50px_rgba(0,0,0,0.95)] backdrop-blur-md flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 group/phone"
-        >
-          {/* Header thanh điều khiển điện thoại (vùng nắm kéo thả mỏng gọn, không che bàn) */}
-          <div
-            onPointerDown={handlePhonePointerDown}
-            className={cn(
-              "shrink-0 h-[30px] px-2.5 flex items-center justify-between bg-[#0f1218]/95 border-b border-white/10 select-none",
-              isDraggingPhone ? "cursor-grabbing" : "cursor-grab"
-            )}
-            title="Nhấn giữ để di chuyển điện thoại tự do trên màn hình"
-          >
-            <div className="flex items-center gap-1.5 pointer-events-none">
-              <GripHorizontal className="size-3 text-zinc-500" />
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-300 font-bold truncate">
-                Điện thoại nạn nhân
-              </span>
-            </div>
-            <div className="flex items-center gap-1 pointer-events-auto">
-              <Link
-                href="/evidence/victim-phone"
-                target="_blank"
-                className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-zinc-100 border border-white/10 text-[10px] font-sans transition-all"
-                title="Mở trong tab mới"
-              >
-                <ExternalLink className="size-2.5" />
-                <span className="hidden sm:inline">Mở riêng</span>
-              </Link>
-              <button
-                type="button"
-                onClick={() => setActiveModal(null)}
-                className="size-5 rounded flex items-center justify-center bg-white/5 hover:bg-rose-500/20 text-zinc-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/40 transition-all cursor-pointer"
-                title="Cất điện thoại"
-              >
-                <X className="size-3" />
-              </button>
-            </div>
-          </div>
-
-          {/* Màn hình điện thoại tương tác: Ôm sát thân máy, không viền đen thừa */}
-          <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden p-0 bg-transparent relative">
-            <PhoneSimulator
-              onClose={() => setActiveModal(null)}
-              device={caseId ? { caseId } : undefined}
-            />
-          </div>
-
-          {/* Tay cầm co kéo Resize ở góc dưới phải */}
-          <div
-            onPointerDown={handlePhoneResizeStart}
-            className="absolute bottom-0 right-0 size-6 flex items-end justify-end p-1 cursor-se-resize z-50 group/handle select-none transition-colors"
-            title="Kéo để thay đổi kích thước theo đúng tỷ lệ"
-          >
-            <svg
-              className="size-3 text-zinc-400 group-hover/handle:text-amber-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] transition-colors"
-              viewBox="0 0 10 10"
-              fill="currentColor"
-            >
-              <circle cx="8.5" cy="8.5" r="1.1" />
-              <circle cx="8.5" cy="5" r="1.1" />
-              <circle cx="8.5" cy="1.5" r="1.1" />
-              <circle cx="5" cy="8.5" r="1.1" />
-              <circle cx="5" cy="5" r="1.1" />
-              <circle cx="1.5" cy="8.5" r="1.1" />
-            </svg>
-          </div>
-        </div>
+        <CanvasPhoneWindow
+  phonePos={phonePos}
+  phoneSize={phoneSize}
+  isDraggingPhone={isDraggingPhone}
+  isResizingPhone={isResizingPhone}
+  handlePhonePointerDown={handlePhonePointerDown}
+  setActiveModal={setActiveModal}
+  caseId={caseId}
+  handlePhoneResizeStart={handlePhoneResizeStart}
+/>
       )}
 
       {/* 2.6. SỔ TAY THÁM TỬ FLOATING (KÉO THẢ TỰ DO KHÔNG LÀM MỜ ĐẰNG SAU, RESIZE TỰ DO) */}
       {activeModal === "notebook" && (
-        <div
-          style={{
-            transform: `translate3d(${notebookPos.x}px, ${notebookPos.y}px, 0)`,
-            width: `${notebookSize.width}px`,
-            height: `${notebookSize.height}px`,
-            transition: isDraggingNotebook || isResizingNotebook ? "none" : undefined,
-          }}
-          className="flex fixed top-0 left-0 z-40 max-h-[calc(100vh-16px)] max-w-[calc(100vw-16px)] rounded-xl border border-[#3d2c1e]/70 bg-[#f8f6f0] shadow-[0_25px_60px_rgba(0,0,0,0.85)] flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 group/notebook select-none"
-        >
-          {/* Header thanh điều khiển sổ tay (vùng nắm kéo thả mỏng gọn, không che bàn) */}
-          <div
-            onPointerDown={handleNotebookPointerDown}
-            className={cn(
-              "shrink-0 h-[32px] px-3 flex items-center justify-between bg-[#eae5d9] border-b border-[#d8d0c2] select-none",
-              isDraggingNotebook ? "cursor-grabbing" : "cursor-grab"
-            )}
-            title="Nhấn giữ để di chuyển sổ tay tự do trên màn hình"
-          >
-            <div className="flex items-center gap-1.5 pointer-events-none">
-              <GripHorizontal className="size-3 text-[#6e5845]" />
-              <BookOpen className="size-3.5 text-[#5c4938]" />
-              <span className="text-[11px] font-mono uppercase tracking-wider text-[#3d2f24] font-bold truncate">
-                Sổ tay thám tử
-              </span>
-            </div>
-            <div className="flex items-center gap-1 pointer-events-auto">
-              <button
-                type="button"
-                onClick={() => setActiveModal(null)}
-                className="size-5 rounded flex items-center justify-center bg-black/5 hover:bg-rose-500/20 text-[#6e5845] hover:text-rose-700 transition-all cursor-pointer"
-                title="Đóng sổ tay"
-              >
-                <X className="size-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Ruột sổ tay tương tác */}
-          <div className="flex-1 min-h-0 flex flex-col overflow-hidden p-0 bg-transparent relative">
-            <DetectiveNotebookModal
-              caseId={caseId}
-              isOpen={true}
-              embedded={true}
-              hideHeader={true}
-              onClose={() => setActiveModal(null)}
-            />
-          </div>
-
-          {/* Tay cầm co kéo Resize ở góc dưới phải */}
-          <div
-            onPointerDown={handleNotebookResizeStart}
-            className="absolute bottom-0 right-0 size-6 flex items-end justify-end p-1 cursor-se-resize z-50 group/handle select-none transition-colors"
-            title="Kéo để thay đổi kích thước sổ tay"
-          >
-            <svg
-              className="size-3 text-[#8c735d] group-hover/handle:text-amber-700 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-colors"
-              viewBox="0 0 10 10"
-              fill="currentColor"
-            >
-              <circle cx="8.5" cy="8.5" r="1.1" />
-              <circle cx="8.5" cy="5" r="1.1" />
-              <circle cx="8.5" cy="1.5" r="1.1" />
-              <circle cx="5" cy="8.5" r="1.1" />
-              <circle cx="5" cy="5" r="1.1" />
-              <circle cx="1.5" cy="8.5" r="1.1" />
-            </svg>
-          </div>
-        </div>
+        <CanvasNotebookWindow
+  notebookPos={notebookPos}
+  notebookSize={notebookSize}
+  isDraggingNotebook={isDraggingNotebook}
+  isResizingNotebook={isResizingNotebook}
+  handleNotebookPointerDown={handleNotebookPointerDown}
+  setActiveModal={setActiveModal}
+  caseId={caseId}
+  handleNotebookResizeStart={handleNotebookResizeStart}
+/>
       )}
 
       {/* 3. MẶT BÀN HỒ SƠ PHẲNG (DOSSIER CANVAS TRẢI TOÀN MÀN HÌNH - KHÔNG BỊ PHONE ĐÈ MẤT NỮA) */}

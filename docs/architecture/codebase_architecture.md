@@ -13,14 +13,19 @@ app/
   (investigation)/       Gameplay: evidence/web (chính), evidence/boardgame, evidence/[id] (điện thoại), cabinet-demo (đóng băng)
   api/                   Route Handler (bảng mục 2)
   activate/ brand/ how-to-play/ login/ auth/   Trang công khai
+  cases/ buy/ me/        Cửa hàng: danh sách vụ, trang vụ án, kết quả thanh toán, vụ án của tôi
 components/
   admin/                 UI Studio: checkpoint-studio/, dossier-studio/ (+ evidence/), phone-studio/, map-studio/
   investigation/
-    board/               Bảng điều tra: main-investigation-canvas, canvas/ (state, model, pin-builder), modal giải đố
-    evidence/            Khay hồ sơ, workspace single / canvas / mobile, trình đọc tài liệu, khám xét 360
-    hero-interactive/    Renderer Canvas 2D của bảng điều tra
+    board/               Bảng điều tra: main-investigation-canvas, canvas/ (state, model, pin-builder), renderer/ (Canvas 2D), modal giải đố
+    evidence/            Khay hồ sơ, workspace single / canvas (+ canvas/: sidebar, cửa sổ nổi) / mobile, dossier-canvas/ (mặt bàn, toolbar, preset), trình đọc tài liệu, khám xét 360
+    room/                Chơi nhóm: RoomSyncProvider, modal phòng, thông báo, presence
+    contexts/            Context nhân vật, checkpoint, cài đặt
+    modals/              Sổ tay, hậu truyện, gợi ý, góp ý, xem PDF
     archive_3d_vault/    [ĐÓNG BĂNG] 3D cũ, AGENTS.md §8
   phone-engine/          Hệ điều hành điện thoại giả lập: apps/, chassis/, core/, system/
+  play/                  Màn vào game, phòng chờ, intro
+  store/                 Trang vụ án, badge sở hữu, cổng quyền chơi, kết quả thanh toán
   public/                Landing page (cách ly gameplay, AGENTS.md §9)
   ui/                    Primitive dùng chung
 lib/
@@ -29,7 +34,13 @@ lib/
   progress/              Tiến độ mở bộ hồ sơ
   cases/                 Mã vụ án, nhân vật, mã chứng cứ, mã bypass
   hooks/                 Hook nạp dữ liệu (checkpoint, hồ sơ, vật chứng, điện thoại)
-  maps/                  Engine bản đồ vector
+  maps/                  Engine bản đồ vector, type địa điểm (locations.ts)
+  payments/              PayOS, mã hộp, quyền sở hữu
+  rooms/                 Chơi nhóm v3 (server + client)
+  investigation/         Lịch sử ghi chú, âm thanh, event bus, localStorage
+  analytics/             Firebase Analytics
+  utils/                 cn, xử lý chuỗi tiếng Việt (text.ts), preload ảnh
+  http.ts                noStoreJson cho Route Handler
   ai/                    Tiêu chí chấm lập luận AI (chỉ server)
   security/ supabase/ auth/   Rate limit, client Supabase, kiểm quyền admin
   types/                 Nguồn type duy nhất
@@ -132,6 +143,6 @@ Nguồn: [`lib/progress/case-progress.ts`](../../lib/progress/case-progress.ts).
 
 Xem [`../TECHDEBT.md`](../TECHDEBT.md) và [`../ROADMAP.md`](../ROADMAP.md). Điểm kiến trúc đáng chú ý:
 
-- File > 1.000 dòng: `dossier-canvas-board.tsx`, `checkpoint-studio-client.tsx`, `map-studio-client.tsx`, `dossier-studio-client.tsx`, `canvas-investigation-workspace.tsx`, `add-suspect-modal.tsx`.
+- File > 1.000 dòng: `dossier-canvas-board.tsx` (1.550, phần còn lại là state và handler), `checkpoint-studio-client.tsx` (1.970), `map-studio-client.tsx` (1.400), `dossier-studio-client.tsx`, `render-scene.ts`, `room-sync-context.tsx`, `messages-editor.tsx`, `pin-builder.ts`, `add-suspect-modal.tsx`. Đợt 2026-11-06 đã tách phần JSX (toolbar, mặt bàn, inspector, cửa sổ nổi); bước sau là tách state/handler thành hook.
 - `pin-builder.ts` còn so khớp key bố cục cũ `c0-pin-*`.
 - ~25 key tiến độ rời trong `localStorage`; chưa gom về một object.

@@ -38,23 +38,12 @@ import {
 import { isAnswerKind } from "@/lib/checkpoints/kinds";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
-import { CheckpointEditor } from "./checkpoint-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
 import { FloatingBoardPanel } from "./floating-board-panel";
-import { CharacterEditor } from "./character-editor";
 import type { CaseConnection } from "@/components/investigation/board/renderer/hero-interactive";
 import { useBoardEditor } from "./board/use-board-editor";
-import { BoardNodeForm } from "./board/board-node-form";
-import { Button } from "@/components/ui/button";
-import {
-  Save,
-  Plus,
-  Play,
-  Pin,
-  Sparkles,
-  Layers,
-  ChevronDown,
-} from "lucide-react";
+import { CheckpointStudioInspector } from "./studio-inspector";
+import { CheckpointStudioHeader } from "./studio-header";
 
 interface CheckpointStudioClientProps {
   initialCaseId: string;
@@ -1861,123 +1850,21 @@ export function CheckpointStudioClient({
       className="flex h-full min-h-0 w-full flex-col bg-[#0c0d12]"
     >
       {/* 1. Header Toolbar của Checkpoint Studio & Board Studio gộp */}
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-white/10 bg-[#090a0f] px-3 z-30">
-        <div className="flex items-center gap-2">
-          <Layers className="size-4 text-amber-400" />
-          <span className="text-xs font-bold text-zinc-100 tracking-wide uppercase">
-            Checkpoint Studio
-          </span>
-          {hasUnsaved && (
-            <span className="flex items-center gap-1 rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/20">
-              <span className="size-1.5 rounded-full bg-amber-400 animate-pulse" />
-              Chưa lưu
-            </span>
-          )}
-        </div>
-
-        {/* Thanh công cụ phải */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Nút Thêm Checkpoint */}
-          <Button
-            type="button"
-            size="sm"
-            onClick={createRow}
-            className="gap-1 text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 h-7 px-2.5 font-semibold cursor-pointer"
-            title="Tạo checkpoint mới"
-          >
-            <Plus className="size-3.5" />
-            <span>Thêm Checkpoint</span>
-          </Button>
-
-          {/* Nút Thêm Nhân vật */}
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleCreateNewCharacter}
-            className="gap-1 text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 h-7 px-2.5 font-semibold cursor-pointer"
-            title="Tạo nhân vật mới"
-          >
-            <Plus className="size-3.5" />
-            <span>Thêm Nhân vật</span>
-          </Button>
-
-          {/* Nút Chơi thử */}
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => handlePlaytest(draft?.checkpointId)}
-            className="gap-1 text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 h-7 px-2.5 font-semibold cursor-pointer"
-            title="Chơi thử vụ án"
-          >
-            <Play className="size-3.5" />
-            <span>Chơi thử</span>
-          </Button>
-
-          {/* Nút Bật/Tắt Cửa sổ Bảng điều tra nổi (Floating Panel) */}
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => setIsFloatingBoardOpen((prev) => !prev)}
-            className={cn(
-              "gap-1 text-xs h-7 px-2.5 font-semibold cursor-pointer border transition-colors",
-              isFloatingBoardOpen
-                ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
-                : "bg-white/5 text-zinc-400 border-white/10 hover:text-zinc-200",
-            )}
-            title="Bật/Tắt Cửa sổ Bảng điều tra nổi"
-          >
-            <Pin className="size-3.5 rotate-45" />
-            <span>Bảng điều tra</span>
-          </Button>
-
-          <div className="h-4 w-px bg-white/10 mx-0.5" />
-
-          {/* Nút LƯU DUY NHẤT TOÀN STUDIO (Checkpoint, Nhân vật, Bố cục Bảng) */}
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleSaveAllUnified}
-            disabled={isBusy || isUnifiedSaving}
-            className={cn(
-              "gap-1.5 text-xs font-bold h-7 px-3.5 shadow-md cursor-pointer transition-all",
-              hasAnyUnsaved
-                ? "bg-amber-500 text-black hover:bg-amber-400 ring-2 ring-amber-400/50"
-                : "bg-white/10 text-zinc-300 hover:bg-white/20",
-            )}
-            title="Lưu tất cả thay đổi (Ctrl+S)"
-          >
-            <Save className="size-3.5" />
-            <span>{isUnifiedSaving ? "Đang lưu..." : "LƯU TẤT CẢ"}</span>
-            {hasAnyUnsaved && (
-              <span className="size-1.5 rounded-full bg-amber-950 inline-block animate-ping" />
-            )}
-          </Button>
-
-          {/* Nút Linter Vụ Án */}
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsLintModalOpen(true)}
-            className={cn(
-              "gap-1 text-xs h-7 px-2",
-              lintResult.errorCount > 0
-                ? "text-rose-400 bg-rose-950/20"
-                : "text-zinc-400 hover:text-zinc-200",
-            )}
-            title="Kiểm tra logic vụ án (Case Linter)"
-          >
-            <Sparkles className="size-3.5" />
-            <span>Linter</span>
-            {lintResult.errorCount > 0 && (
-              <span className="rounded bg-rose-500/30 px-1 text-[10px] text-rose-300 font-mono">
-                {lintResult.errorCount}
-              </span>
-            )}
-          </Button>
-        </div>
-      </header>
+      <CheckpointStudioHeader
+  hasUnsaved={hasUnsaved}
+  createRow={createRow}
+  handleCreateNewCharacter={handleCreateNewCharacter}
+  handlePlaytest={handlePlaytest}
+  draft={draft}
+  setIsFloatingBoardOpen={setIsFloatingBoardOpen}
+  isFloatingBoardOpen={isFloatingBoardOpen}
+  handleSaveAllUnified={handleSaveAllUnified}
+  isBusy={isBusy}
+  isUnifiedSaving={isUnifiedSaving}
+  hasAnyUnsaved={hasAnyUnsaved}
+  setIsLintModalOpen={setIsLintModalOpen}
+  lintResult={lintResult}
+/>
 
       {/* 2. Main Workspace: Canvas Sơ đồ luồng toàn màn hình + Bảng điều tra nổi (Floating Resizable) + Inspector */}
       <div className="flex flex-1 min-h-0 w-full flex-col md:flex-row overflow-hidden relative">
@@ -2023,270 +1910,40 @@ export function CheckpointStudioClient({
         />
 
         {/* Hộp biên tập Inspector bên phải */}
-        <div
-          style={{ width: `${sidebarWidth}px` }}
-          className={cn(
-            "flex h-[55%] min-h-0 shrink-0 flex-col md:h-full max-w-[85vw]",
-            !isResizing && "transition-[width] duration-75 ease-out",
-          )}
-        >
-          {isEditingBoardNode && selectedNode ? (
-            <BoardNodeForm
-              caseId={caseId}
-              node={selectedNode}
-              onSave={handleSaveNode}
-              onDelete={handleDeleteNode}
-              onClose={() => setSelectedNodeId(null)}
-              onLiveUpdate={handleUpdateNodeLocal}
-            />
-          ) : (
-            <div className="flex h-full w-full min-h-0 flex-col bg-[#0c0c10] border-t border-white/10 md:border-l md:border-t-0">
-              {/* Segmented Switcher Tab giữa Checkpoint, Nhân vật, Kết luận và Hậu án */}
-              <div className="shrink-0 p-2.5 bg-[#111118] border-b border-white/10 space-y-2 select-none">
-                {/* Hàng 1: 4 Tabs phân định rõ ràng */}
-                <div className="grid grid-cols-4 gap-1 bg-black/50 p-1 rounded-lg border border-white/10">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInspectorTab("checkpoints");
-                      setSelectedCharacter(null);
-                      if (
-                        (!draft ||
-                          draft.kind === "indictment" ||
-                          draft.kind === "epilogue") &&
-                        investigationCheckpoints.length > 0
-                      ) {
-                        selectRow(investigationCheckpoints[0]);
-                      }
-                    }}
-                    className={cn(
-                      "flex items-center justify-center py-1.5 px-1 rounded-md text-xs font-semibold transition-all cursor-pointer truncate",
-                      inspectorTab === "checkpoints"
-                        ? "bg-amber-500 text-black shadow-md font-bold"
-                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
-                    )}
-                  >
-                    Checkpoint ({investigationCheckpoints.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInspectorTab("characters");
-                      if (!selectedCharacter && characters.length > 0) {
-                        setSelectedCharacter(characters[0]);
-                      }
-                    }}
-                    className={cn(
-                      "flex items-center justify-center py-1.5 px-1 rounded-md text-xs font-semibold transition-all cursor-pointer truncate",
-                      inspectorTab === "characters"
-                        ? "bg-purple-600 text-white shadow-md font-bold"
-                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
-                    )}
-                  >
-                    Nhân vật ({characters.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenSpecialCheckpoint("indictment")}
-                    className={cn(
-                      "flex items-center justify-center py-1.5 px-1 rounded-md text-xs font-semibold transition-all cursor-pointer truncate",
-                      inspectorTab === "indictment"
-                        ? "bg-rose-600 text-white shadow-md font-bold"
-                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
-                    )}
-                  >
-                    Kết luận
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenSpecialCheckpoint("epilogue")}
-                    className={cn(
-                      "flex items-center justify-center py-1.5 px-1 rounded-md text-xs font-semibold transition-all cursor-pointer truncate",
-                      inspectorTab === "epilogue"
-                        ? "bg-emerald-600 text-white shadow-md font-bold"
-                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/5",
-                    )}
-                  >
-                    Hậu án
-                  </button>
-                </div>
-
-                {/* Hàng 2: Dropdown động tương ứng */}
-                {inspectorTab === "characters" ? (
-                  <div className="relative">
-                    <select
-                      value={
-                        selectedCharacter?.id || selectedCharacter?.key || ""
-                      }
-                      onChange={(e) => {
-                        const found = characters.find(
-                          (c) =>
-                            c.id === e.target.value || c.key === e.target.value,
-                        );
-                        if (found) {
-                          setSelectedCharacter(found);
-                          setInspectorTab("characters");
-                          setSelectedNodeId(null);
-                        }
-                      }}
-                      className="w-full h-8 pl-3 pr-8 rounded-md bg-[#14141c] border border-white/10 hover:border-purple-500/50 text-xs text-zinc-200 outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/20 cursor-pointer font-sans appearance-none transition-colors"
-                      title="Chọn nhân vật để điều chỉnh"
-                    >
-                      <option
-                        value=""
-                        disabled
-                        className="bg-[#14141c] text-zinc-400"
-                      >
-                        -- Chọn nhân vật ({characters.length}) --
-                      </option>
-                      {characters.map((c) => {
-                        const roleText =
-                          c.role === "victim"
-                            ? "Nạn nhân"
-                            : c.role === "suspect"
-                              ? "Nghi phạm"
-                              : c.role === "witness"
-                                ? "Nhân chứng"
-                                : "Liên quan";
-                        return (
-                          <option
-                            key={c.id || c.key}
-                            value={c.id || c.key}
-                            className="bg-[#14141c] text-zinc-100 py-1.5"
-                          >
-                            {c.name || "Không tên"} ({roleText})
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
-                  </div>
-                ) : inspectorTab === "checkpoints" ? (
-                  <div className="relative">
-                    <select
-                      value={currentSelectCheckpointId}
-                      onChange={(e) => {
-                        if (e.target.value === "__new__") return;
-                        const found = investigationCheckpoints.find(
-                          (r) =>
-                            r.id === e.target.value ||
-                            r.checkpoint_id === e.target.value,
-                        );
-                        if (found) {
-                          selectRow(found);
-                          setSelectedCharacter(null);
-                          setInspectorTab("checkpoints");
-                          setSelectedNodeId(null);
-                        }
-                      }}
-                      className="w-full h-8 pl-3 pr-8 rounded-md bg-[#14141c] border border-white/10 hover:border-amber-500/50 text-xs text-zinc-200 outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/20 cursor-pointer font-sans appearance-none transition-colors"
-                      title="Chọn checkpoint để edit"
-                    >
-                      <option
-                        value=""
-                        disabled
-                        className="bg-[#14141c] text-zinc-400"
-                      >
-                        -- Chọn checkpoint ({investigationCheckpoints.length}) --
-                      </option>
-                      {draft &&
-                        !draft.id &&
-                        !investigationCheckpoints.some(
-                          (r) => r.checkpoint_id === draft.checkpointId,
-                        ) && (
-                          <option
-                            value="__new__"
-                            className="bg-[#14141c] text-amber-300"
-                          >
-                            + Đang tạo:{" "}
-                            {draft.title ||
-                              draft.checkpointId ||
-                              "Checkpoint mới"}
-                          </option>
-                        )}
-                      {investigationCheckpoints.map((cp) => {
-                        const kindBadge =
-                          cp.kind === "phone_lookup"
-                            ? "Tra cứu"
-                            : cp.kind === "suspect_interrogation" ||
-                                cp.kind === "evidence_picker"
-                              ? "Chọn tài liệu"
-                              : cp.kind === "code" || cp.kind === "time"
-                                ? "So khớp"
-                                : cp.kind === "choice"
-                                  ? "Trắc nghiệm"
-                                  : cp.kind === "text"
-                                    ? "Tự do"
-                                    : "Chọn tài liệu";
-                        return (
-                          <option
-                            key={cp.id || cp.checkpoint_id}
-                            value={cp.id || cp.checkpoint_id}
-                            className="bg-[#14141c] text-zinc-100 py-1.5"
-                          >
-                            {kindBadge} · {cp.title ||
-                              cp.checkpoint_id ||
-                              "Checkpoint không tên"}
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
-                  </div>
-                ) : null}
-              </div>
-
-              {/* Nội dung Inspector */}
-              <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-                {inspectorTab === "characters" ? (
-                  <CharacterEditor
-                    caseId={caseId}
-                    character={selectedCharacter}
-                    allCharacters={characters}
-                    checkpoints={rows}
-                    onSave={handleSaveCharacter}
-                    onDelete={handleDeleteCharacter}
-                    onDraftChange={handleCharacterLiveDraftChange}
-                    onInterrogationChange={handleCharacterInterrogationChange}
-                    onOpenInterrogation={(cp) => {
-                      selectRow(cp);
-                      setSelectedCharacter(null);
-                      setInspectorTab("checkpoints");
-                    }}
-                    onClose={() => {
-                      setSelectedCharacter(null);
-                      setInspectorTab("checkpoints");
-                    }}
-                  />
-                ) : draft ? (
-                  <CheckpointEditor
-                    draft={draft}
-                    dossiers={dossiers}
-                    characters={characters}
-                    checkpoints={rows}
-                    availableDocs={availableDocs}
-                    onChange={updateDraft}
-                    onSave={handleSave}
-                    onDelete={handleDelete}
-                    onPlaytest={() => handlePlaytest(draft.checkpointId)}
-                    isSaving={isSaving}
-                    isDirty={formDirty}
-                  />
-                ) : (
-                  <div className="flex flex-1 flex-col items-center justify-center p-6 text-center text-zinc-500">
-                    <p className="text-xs font-medium text-zinc-300">
-                      Chưa chọn mục nào
-                    </p>
-                    <p className="mt-1 text-[11px] text-zinc-500 max-w-[240px]">
-                      Bấm vào checkpoint trên sơ đồ hoặc ghim trên bảng để chỉnh
-                      sửa.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        <CheckpointStudioInspector
+  sidebarWidth={sidebarWidth}
+  isResizing={isResizing}
+  isEditingBoardNode={isEditingBoardNode}
+  selectedNode={selectedNode}
+  caseId={caseId}
+  handleSaveNode={handleSaveNode}
+  handleDeleteNode={handleDeleteNode}
+  setSelectedNodeId={setSelectedNodeId}
+  handleUpdateNodeLocal={handleUpdateNodeLocal}
+  setInspectorTab={setInspectorTab}
+  setSelectedCharacter={setSelectedCharacter}
+  draft={draft}
+  investigationCheckpoints={investigationCheckpoints}
+  selectRow={selectRow}
+  inspectorTab={inspectorTab}
+  selectedCharacter={selectedCharacter}
+  characters={characters}
+  handleOpenSpecialCheckpoint={handleOpenSpecialCheckpoint}
+  currentSelectCheckpointId={currentSelectCheckpointId}
+  rows={rows}
+  handleSaveCharacter={handleSaveCharacter}
+  handleDeleteCharacter={handleDeleteCharacter}
+  handleCharacterLiveDraftChange={handleCharacterLiveDraftChange}
+  handleCharacterInterrogationChange={handleCharacterInterrogationChange}
+  dossiers={dossiers}
+  availableDocs={availableDocs}
+  updateDraft={updateDraft}
+  handleSave={handleSave}
+  handleDelete={handleDelete}
+  handlePlaytest={handlePlaytest}
+  isSaving={isSaving}
+  formDirty={formDirty}
+/>
       </div>
 
       {/* Modal Case Linter */}
