@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getCases } from "@/lib/actions/case-actions";
 import { getCase360Config } from "@/lib/actions/evidence-actions";
-import { normalizeCaseId } from "@/lib/cases/case-id";
+import { getStudioCaseId } from "@/lib/studio/active-case";
 import { Scene360StudioClient } from "@/components/admin/scene-360-studio/scene-360-studio-client";
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ export default async function Scene360StudioPage({
 }: {
   searchParams: Promise<{ case?: string }>;
 }) {
-  const caseId = normalizeCaseId((await searchParams).case);
+  const caseId = await getStudioCaseId((await searchParams).case);
   const [casesRes, configRes] = await Promise.all([
     getCases(),
     getCase360Config(caseId),
@@ -25,6 +25,7 @@ export default async function Scene360StudioPage({
 
   return (
     <Scene360StudioClient
+      key={caseId}
       caseId={caseId}
       cases={(casesRes.data || []).map((c) => ({
         slug: c.slug,

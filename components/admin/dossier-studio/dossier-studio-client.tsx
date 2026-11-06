@@ -15,7 +15,6 @@ import type {
   LyLichData,
 } from "@/lib/types/dossier";
 import {
-  getDossierDocuments,
   reorderDossierDocuments,
   saveDossierDocumentsBatch,
   type DbDossierDocument,
@@ -26,13 +25,10 @@ import type {
   DbCaseEvidence,
 } from "@/lib/types/database";
 import {
-  getCaseDossiers,
-  getAllCaseDocumentsCatalog,
   deleteCaseDossier,
   type AvailableDocumentItem,
 } from "@/lib/actions/dossier-config-actions";
 import {
-  getCaseEvidence,
   deleteCaseEvidence,
   upsertMultipleCaseEvidence,
 } from "@/lib/actions/evidence-actions";
@@ -115,8 +111,8 @@ export function DossierStudioClient({
   const [activeDossierFilterKey, setActiveDossierFilterKey] = useState<
     string | null
   >(null);
-  const [caseId, setCaseId] = useState<string>(initialCaseId);
-  const [isLoadingData, setIsLoadingData] = useState(false);
+  // Case from the sidebar picker; the page remounts this client when it changes.
+  const caseId = initialCaseId;
 
   // Danh sách hồ sơ & chứng cứ trên cùng một canvas:
   const [hsDocuments, setHsDocuments] =
@@ -134,37 +130,6 @@ export function DossierStudioClient({
   const [activeSectionType, setActiveSectionType] = useState<
     "ly_lich" | "loi_khai" | "evidence"
   >("ly_lich");
-
-  // Nạp lại dữ liệu khi chuyển caseId
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      setIsLoadingData(true);
-      try {
-        const [dList, cList, hsRes, lkRes, evRes] = await Promise.all([
-          getCaseDossiers(caseId),
-          getAllCaseDocumentsCatalog(caseId),
-          getDossierDocuments(caseId, "ly_lich"),
-          getDossierDocuments(caseId, "loi_khai"),
-          getCaseEvidence(caseId),
-        ]);
-        if (isMounted) {
-          setDossiers(dList);
-          setAvailableDocs(cList);
-          if (hsRes.success && hsRes.data) setHsDocuments(hsRes.data);
-          if (lkRes.success && lkRes.data) setLkDocuments(lkRes.data);
-          if (evRes.success && evRes.data) setEvidenceList(evRes.data);
-        }
-      } catch (err) {
-        console.error("Failed to load dossiers for case:", err);
-      } finally {
-        if (isMounted) setIsLoadingData(false);
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, [caseId]);
 
   // Giữ vụ án đang chọn trên URL (?case=)
   useEffect(() => {
@@ -972,7 +937,7 @@ export function DossierStudioClient({
 
   return (
     <div
-      data-studio-ready={isLoadingData ? "false" : "true"}
+      data-studio-ready="true"
       className="h-full w-full bg-[#0a0a0d] text-zinc-100 flex flex-col overflow-hidden font-sans antialiased selection:bg-amber-500/30"
     >
       {/* Print Specific CSS */}
@@ -1065,7 +1030,6 @@ export function DossierStudioClient({
       {/* Header Controller */}
       <DossierStudioHeader
         caseId={caseId}
-        setCaseId={setCaseId}
         initialCases={initialCases}
         highlightEditable={highlightEditable}
         setHighlightEditable={setHighlightEditable}

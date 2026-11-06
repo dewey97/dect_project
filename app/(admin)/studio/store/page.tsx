@@ -1,10 +1,18 @@
 import { getStoreData } from "@/lib/actions/store-actions";
+import { getStudioCaseId } from "@/lib/studio/active-case";
 import { StoreClient } from "./store-client";
 
 export const dynamic = "force-dynamic";
 
-export default async function StorePage() {
-  const result = await getStoreData();
+export default async function StorePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ case?: string }>;
+}) {
+  const [result, caseId] = await Promise.all([
+    getStoreData(),
+    searchParams.then((sp) => getStudioCaseId(sp.case)),
+  ]);
   if (!result.success) {
     return (
       <p className="p-6 text-sm text-red-300">
@@ -12,5 +20,5 @@ export default async function StorePage() {
       </p>
     );
   }
-  return <StoreClient data={result.data} />;
+  return <StoreClient key={caseId} data={result.data} caseId={caseId} />;
 }

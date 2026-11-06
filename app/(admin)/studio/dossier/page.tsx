@@ -9,7 +9,7 @@ import {
 import {
   getCaseEvidence,
 } from "@/lib/actions/evidence-actions";
-import { normalizeCaseId } from "@/lib/cases/case-id";
+import { getStudioCaseId } from "@/lib/studio/active-case";
 
 export const metadata: Metadata = {
   title: "Hồ Sơ & Chứng Cứ Studio | Detective Case System",
@@ -24,7 +24,7 @@ export default async function DossierStudioPage({
 }: {
   searchParams: Promise<{ case?: string }>;
 }) {
-  const caseId = normalizeCaseId((await searchParams).case);
+  const caseId = await getStudioCaseId((await searchParams).case);
   const [
     lkRes,
     hsRes,
@@ -43,6 +43,7 @@ export default async function DossierStudioPage({
 
   return (
     <DossierStudioClient
+      key={caseId}
       initialCaseId={caseId}
       initialCases={casesRes.data || []}
       initialLkDocuments={lkRes.data || []}

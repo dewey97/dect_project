@@ -3,9 +3,19 @@
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { AdminSidebar } from "./admin-sidebar";
+import type { SwitcherCase } from "./case-switcher";
 import { cn } from "@/lib/utils";
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  cases,
+  savedCaseId,
+}: {
+  children: React.ReactNode;
+  cases: SwitcherCase[];
+  /** Case from the sidebar cookie; the URL ?case= wins over it. */
+  savedCaseId: string;
+}) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(true);
 
@@ -18,6 +28,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen w-screen bg-[#0a0a0d] text-zinc-100 selection:bg-primary/30 font-sans overflow-hidden">
       <AdminSidebar
+        cases={cases}
+        savedCaseId={savedCaseId}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
       />

@@ -2,7 +2,6 @@
 
 import React from 'react'
 import {
-  Briefcase,
   Edit3,
   ZoomIn,
   ZoomOut,
@@ -15,7 +14,6 @@ import type { DbCase } from '@/lib/types/database'
 
 interface DossierStudioHeaderProps {
   caseId: string
-  setCaseId: (id: string) => void
   initialCases: DbCase[]
   highlightEditable: boolean
   setHighlightEditable: React.Dispatch<React.SetStateAction<boolean>>
@@ -32,7 +30,6 @@ interface DossierStudioHeaderProps {
 
 export function DossierStudioHeader({
   caseId,
-  setCaseId,
   initialCases,
   highlightEditable,
   setHighlightEditable,
@@ -48,32 +45,6 @@ export function DossierStudioHeader({
 }: DossierStudioHeaderProps) {
   return (
     <header className="no-print h-14 border-b border-white/10 bg-zinc-950/90 backdrop-blur-md px-4 flex items-center justify-between z-30 flex-shrink-0">
-      <div className="flex items-center gap-3">
-        {/* Bộ lọc Vụ Án (Case Selector từ Database) */}
-        <div className="flex items-center gap-1.5 bg-black/50 px-2.5 py-1 rounded-lg border border-white/10 text-xs">
-          <Briefcase className="w-3.5 h-3.5 text-amber-400" />
-          <select
-            value={caseId}
-            onChange={(e) => setCaseId(e.target.value)}
-            className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer pr-1"
-          >
-            {initialCases.length > 0 ? (
-              initialCases.map(c => (
-                <option key={c.id} value={c.slug} className="bg-[#141618] text-white">
-                  {c.title}
-                </option>
-              ))
-            ) : (
-              <option value="case_000" className="bg-[#141618] text-white">
-                TRỐN TÌM
-              </option>
-            )}
-          </select>
-        </div>
-
-
-      </div>
-
       <div className="flex items-center gap-3">
         {/* Toggle Chế Độ Soạn Thảo: EDIT ON / OFF */}
         <button

@@ -55,7 +55,7 @@ export function CheckpointStudioClient({
   initialCharacters = [],
   initialView = "flow",
 }: CheckpointStudioClientProps) {
-  const [caseId] = useState(initialCaseId);
+  const caseId = initialCaseId;
   const [activeView] = useState<"flow" | "board">(initialView);
 
   // Giữ vụ án và view đang chọn trên URL (?case=...&view=...) để tương thích ngược 100% với URL query cũ

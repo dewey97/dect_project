@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { normalizeCaseId } from "@/lib/cases/case-id";
+import { getStudioCaseId } from "@/lib/studio/active-case";
 import { getCases } from "@/lib/actions/case-actions";
 import {
   getPhoneApps,
@@ -30,7 +30,7 @@ export default async function PhoneStudioPage({
   searchParams: Promise<{ case?: string }>;
 }) {
   const resolvedParams = await searchParams;
-  const caseId = normalizeCaseId(resolvedParams.case || "case_000");
+  const caseId = await getStudioCaseId(resolvedParams.case);
 
   const [
     casesRes,
@@ -90,6 +90,7 @@ export default async function PhoneStudioPage({
 
   return (
     <PhoneStudioClient
+      key={caseId}
       initialCaseId={caseId}
       initialCases={casesRes.data || []}
       initialDevice={device}

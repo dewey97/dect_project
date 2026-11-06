@@ -33,25 +33,9 @@ export function Scene360StudioClient({
             Ảnh dùng cho bước khám xét lại hiện trường của người chơi.
           </p>
         </div>
-        <label className="space-y-1 text-xs font-medium text-zinc-400">
-          <span>Vụ án</span>
-          <select
-            value={caseId}
-            onChange={(e) =>
-              router.push(
-                `/studio/scene-360?case=${encodeURIComponent(e.target.value)}`,
-              )
-            }
-            className="h-9 min-w-56 rounded-md border border-white/10 bg-zinc-900/60 px-2.5 text-sm text-zinc-100 focus:border-amber-500 focus:outline-none"
-          >
-            {cases.length === 0 && <option value={caseId}>{caseId}</option>}
-            {cases.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.title}
-              </option>
-            ))}
-          </select>
-        </label>
+        <span className="rounded-md border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 text-sm text-amber-200">
+          Case: {cases.find((c) => c.slug === caseId)?.title ?? caseId}
+        </span>
       </header>
 
       <Scene360Editor

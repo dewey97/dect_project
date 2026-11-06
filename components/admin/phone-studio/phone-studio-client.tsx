@@ -8,12 +8,10 @@ import {
   Phone,
   Users,
   Image as ImageIcon,
-  FolderOpen,
   RefreshCw,
   Eye,
   Edit3,
   Sliders,
-  ChevronDown,
 } from "lucide-react";
 import type {
   DbCase,
@@ -74,7 +72,7 @@ export function PhoneStudioClient({
   initialCharacters,
   checkpoints = [],
 }: PhoneStudioClientProps) {
-  const [caseId, setCaseId] = useState<string>(initialCaseId);
+  const caseId = initialCaseId;
   const [activeTab, setActiveTab] = useState<
     "device" | "apps" | "messages" | "calls" | "contacts" | "photos" | "misc"
   >("device");
@@ -320,29 +318,7 @@ export function PhoneStudioClient({
       <div className="flex-1 min-h-0 flex overflow-hidden">
         {/* COLUMN 1: Case Picker & Overview Sidebar (w-64) */}
         <div className="w-64 border-r border-zinc-800 bg-zinc-900/60 p-4 shrink-0 hidden md:flex flex-col space-y-5 overflow-y-auto">
-          {/* Case Picker */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-              <FolderOpen className="size-3.5 text-zinc-400" /> Case đang biên
-              soạn:
-            </label>
-            <div className="relative">
-              <select
-                value={caseId}
-                onChange={(e) => {
-                  setCaseId(e.target.value);
-                  window.location.search = `?case=${e.target.value}`;
-                }}
-                className="w-full px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-lg text-xs font-medium text-zinc-100 appearance-none focus:outline-none focus:border-sky-500 cursor-pointer pr-8"
-              >
-                {initialCases.map((c) => (
-                  <option key={c.slug} value={c.slug}>
-                    {c.slug}: {c.title}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="size-3.5 text-zinc-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
             {activeCase && (
               <div className="text-[11px] text-zinc-400 flex items-center justify-between px-1 pt-0.5">
                 <span>Trạng thái:</span>

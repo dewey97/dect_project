@@ -93,10 +93,16 @@ function Section({
   );
 }
 
-export function StoreClient({ data }: { data: StoreData }) {
+export function StoreClient({
+  data,
+  caseId,
+}: {
+  data: StoreData;
+  /** Case from the sidebar picker. */
+  caseId: string;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [caseId, setCaseId] = useState(data.cases[0]?.slug ?? "case_000");
   const [editing, setEditing] = useState<OfferInput | null>(null);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(
     null,
@@ -214,23 +220,9 @@ export function StoreClient({ data }: { data: StoreData }) {
             Gói bán, mã hộp, cấp quyền tay và đơn hàng.
           </p>
         </div>
-        <label className={label}>
-          <span>Vụ án</span>
-          <select
-            value={caseId}
-            onChange={(e) => {
-              setCaseId(e.target.value);
-              setEditing(null);
-            }}
-            className={`${input} min-w-56`}
-          >
-            {data.cases.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.title} ({c.slug})
-              </option>
-            ))}
-          </select>
-        </label>
+        <span className="rounded-md border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 text-sm text-amber-200">
+          Case: {titleOf(caseId)}
+        </span>
       </header>
 
       {message && (

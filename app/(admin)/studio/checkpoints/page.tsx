@@ -7,7 +7,7 @@ import {
   getCaseDossiers,
   getAllCaseDocumentsCatalog,
 } from "@/lib/actions/dossier-config-actions";
-import { normalizeCaseId } from "@/lib/cases/case-id";
+import { getStudioCaseId } from "@/lib/studio/active-case";
 
 export const metadata: Metadata = {
   title: "Checkpoint Studio | Detective Case System",
@@ -23,7 +23,7 @@ export default async function CheckpointStudioPage({
   searchParams: Promise<{ case?: string; view?: string }>;
 }) {
   const sp = await searchParams;
-  const caseId = normalizeCaseId(sp.case);
+  const caseId = await getStudioCaseId(sp.case);
   const initialView = sp.view === "board" ? "board" : "flow";
   const [casesResult, checkpointsResult, dossiers, availableDocs, charactersResult] =
     await Promise.all([
@@ -45,6 +45,7 @@ export default async function CheckpointStudioPage({
 
   return (
     <CheckpointStudioClient
+      key={caseId}
       initialCaseId={caseId}
       initialView={initialView}
       initialCases={casesResult.data || []}

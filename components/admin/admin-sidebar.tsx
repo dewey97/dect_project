@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
+import { CaseSwitcher, type SwitcherCase } from "./case-switcher";
+import { isCaseScopedPath } from "@/lib/studio/case-scope";
+import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
 import {
   LayoutDashboard,
-  Folders,
   Users,
   Settings,
   MessageSquare,
@@ -41,12 +43,6 @@ const navGroups: NavGroup[] = [
         shortName: "Tổng quan",
         href: "/studio",
         icon: LayoutDashboard,
-      },
-      {
-        name: "Danh sách Vụ Án",
-        shortName: "Vụ án",
-        href: "/studio/cases",
-        icon: Folders,
       },
     ],
   },
@@ -112,15 +108,24 @@ const navGroups: NavGroup[] = [
 ];
 
 interface AdminSidebarProps {
+  cases: SwitcherCase[];
+  savedCaseId: string;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
 }
 
 export function AdminSidebar({
+  cases,
+  savedCaseId,
   isCollapsed = false,
   onToggleCollapse,
 }: AdminSidebarProps) {
   const pathname = usePathname();
+  const urlCase = useSearchParams().get("case");
+  const currentCaseId =
+    urlCase && isValidCaseId(urlCase) ? normalizeCaseId(urlCase) : savedCaseId;
+  const hrefFor = (href: string) =>
+    isCaseScopedPath(href) ? `${href}?case=${encodeURIComponent(currentCaseId)}` : href;
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -192,6 +197,15 @@ export function AdminSidebar({
         )}
       </div>
 
+      {/* CASE dùng chung cho mọi mục Studio */}
+      <div className={cn("pt-3", isCollapsed ? "px-1.5" : "px-2.5")}>
+        <CaseSwitcher
+          cases={cases}
+          currentCaseId={currentCaseId}
+          isCollapsed={isCollapsed}
+        />
+      </div>
+
       {/* NAVIGATION */}
       <nav
         className={cn(
@@ -215,7 +229,7 @@ export function AdminSidebar({
               return (
                 <Link
                   key={item.name}
-                  href={item.href}
+                  href={hrefFor(item.href)}
                   title={item.name}
                   className={cn(
                     "rounded-lg text-sm transition-all duration-200 group relative",
