@@ -68,6 +68,19 @@ Cổng quyền chơi áp cho `/play/<case_id>`, `/evidence/web` và `/evidence/b
 
 Còn hở: `/evidence/[id]` (xem một vật chứng lẻ) không chặn; API nội dung (`/api/checkpoints`, `/api/case-dossiers`...) không kiểm quyền, nên người rành kỹ thuật vẫn đọc được dữ liệu. Phiên phòng nằm ở localStorage nên người cố tình vẫn giả được.
 
+## Các màn (2026-11-06)
+
+| Màn                | Đường dẫn                 | Nội dung                                                                                                    |
+| ------------------ | ------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Danh sách vụ án    | `/cases`                  | Vụ `PUBLISHED`, badge sở hữu, mở trang vụ án                                                                |
+| Trang vụ án        | `/cases/<case_id>`        | Badge, Vào chơi, khối bộ hộp (đặt hàng + nhập mã), khối gói online                                          |
+| Kết quả thanh toán | `/buy/result/<orderCode>` | Chờ / đã thanh toán / hủy / hết hạn                                                                         |
+| Vụ án của tôi      | `/me` (menu tài khoản)    | Vụ đã sở hữu, lượt nhóm còn lại, Vào chơi; 20 đơn gần nhất, "Thanh toán tiếp" cho đơn chờ còn hạn           |
+| Màn vào game       | `/play/<case_id>`         | Khi bật cờ: ghi chú lượt nhóm, khóa Tạo phòng khi hết lượt hoặc chưa sở hữu, link mua thêm                  |
+| Studio Cửa hàng    | `/studio/store`           | Sửa gói bán (giá, lượt, link sàn, ảnh, ẩn/hiện), sinh mã hộp và tải CSV, cấp quyền tay theo email, đơn hàng |
+
+Sinh mã hộp có 2 cách: Studio Cửa hàng (tối đa 2.000 mã mỗi lần, tải CSV ngay) hoặc `scripts/ops/generate-box-codes.mjs` (lô lớn, xuất SQL). Cấp quyền tay tìm tài khoản qua Supabase Auth, giới hạn 1.000 tài khoản đầu; khi vượt thì cần cột email trong `profiles`.
+
 ## Mục tiêu
 
 Làm sẵn màn mua và luồng thanh toán. Khi chưa có key PayOS, màn mua vẫn hiện đầy đủ nhưng nút thanh toán báo "Sắp mở bán". Khi điền 3 key vào `.env.server` và đăng ký webhook, luồng chạy ngay, không sửa code.

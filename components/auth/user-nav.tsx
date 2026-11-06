@@ -211,9 +211,15 @@ export function UserNav({ size = "md", placement = "default" }: UserNavProps) {
 
               {user ? (
                 <>
-                  <button className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors text-left cursor-not-allowed opacity-50">
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      router.push("/me");
+                    }}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-300 hover:text-zinc-100 transition-colors text-left cursor-pointer"
+                  >
                     <UserCircle className="w-4 h-4" />
-                    Hồ sơ cá nhân
+                    Vụ án của tôi
                   </button>
                   <button className="w-full flex items-center gap-2 px-2 py-1.5 text-xs rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors text-left cursor-not-allowed opacity-50">
                     <Settings className="w-4 h-4" />

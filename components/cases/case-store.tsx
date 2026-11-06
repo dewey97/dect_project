@@ -3,14 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  CheckCircle2,
-  ExternalLink,
-  KeyRound,
-  Lock,
-  Monitor,
-  Package,
-} from "lucide-react";
+import { ExternalLink, KeyRound, Lock, Monitor, Package } from "lucide-react";
 import {
   PlayButton,
   PlayCard,
@@ -19,7 +12,7 @@ import {
   inputClass,
 } from "@/components/play/play-ui";
 import { formatVnd } from "@/lib/payments/format";
-import { cn } from "@/lib/utils";
+import { OwnershipBadge } from "@/components/cases/ownership-badge";
 
 export interface CaseOffer {
   sku: string;
@@ -154,15 +147,6 @@ export function CaseStore({
     setRedeeming(false);
   };
 
-  const status =
-    ownership.box && ownership.online
-      ? "Đã kích hoạt hộp · Đã có bản online"
-      : ownership.box
-        ? "Đã kích hoạt hộp"
-        : ownership.online
-          ? "Đã có bản online"
-          : "Chưa sở hữu";
-
   return (
     <div className="min-h-dvh w-full bg-[#0d0c0a] text-zinc-100">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-6 sm:py-10">
@@ -181,21 +165,9 @@ export function CaseStore({
             <h1 className="text-3xl font-bold leading-tight text-zinc-50">
               {caseTitle}
             </h1>
-            <p
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold",
-                owned
-                  ? "border-emerald-800 bg-emerald-950/40 text-emerald-300"
-                  : "border-zinc-700 bg-zinc-900 text-zinc-300",
-              )}
-            >
-              {owned ? (
-                <CheckCircle2 className="size-3.5" aria-hidden />
-              ) : (
-                <Lock className="size-3.5" aria-hidden />
-              )}
-              {status}
-            </p>
+            <div>
+              <OwnershipBadge ownership={ownership} />
+            </div>
             {synopsis && (
               <p className="max-w-prose text-sm leading-relaxed text-zinc-400">
                 {synopsis}
@@ -395,12 +367,19 @@ export function CaseStore({
           </section>
         </div>
 
-        <Link
-          href="/"
-          className="self-center px-3 py-3 text-sm text-zinc-500 hover:text-zinc-300"
-        >
-          Về trang chủ
-        </Link>
+        <nav className="flex flex-wrap justify-center gap-x-6 text-sm text-zinc-500">
+          <Link href="/cases" className="px-1 py-3 hover:text-zinc-300">
+            Các vụ án khác
+          </Link>
+          {loggedIn && (
+            <Link href="/me" className="px-1 py-3 hover:text-zinc-300">
+              Vụ án của tôi
+            </Link>
+          )}
+          <Link href="/" className="px-1 py-3 hover:text-zinc-300">
+            Về trang chủ
+          </Link>
+        </nav>
       </div>
     </div>
   );

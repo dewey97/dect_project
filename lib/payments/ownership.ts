@@ -49,6 +49,27 @@ export async function serverAllowsPlay(
   return ownsCase(await getOwnership(user?.id, caseId));
 }
 
+/** All licenses of a user, keyed by case slug. Missing table: empty. */
+export async function getOwnedCases(
+  userId: string | null | undefined,
+): Promise<Record<string, Ownership>> {
+  if (!userId) return {};
+  const { data, error } = await createAdminClient()
+    .from("licenses")
+    .select("case_id, online_at, box_activated_at, group_credits")
+    .eq("user_id", userId);
+  if (error || !data) return {};
+  const out: Record<string, Ownership> = {};
+  for (const row of data) {
+    out[row.case_id] = {
+      online: Boolean(row.online_at),
+      box: Boolean(row.box_activated_at),
+      groupCredits: row.group_credits ?? 0,
+    };
+  }
+  return out;
+}
+
 /** Reads the license row with the service role. Missing table or row: not owned. */
 export async function getOwnership(
   userId: string | null | undefined,

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Smartphone,
   Archive,
+  ShoppingCart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -81,6 +82,12 @@ const navGroups: NavGroup[] = [
         shortName: "Players",
         href: "/studio/players",
         icon: Users,
+      },
+      {
+        name: "Cửa hàng",
+        shortName: "Cửa hàng",
+        href: "/studio/store",
+        icon: ShoppingCart,
       },
       {
         name: "Góp ý & Báo lỗi",

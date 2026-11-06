@@ -16,6 +16,8 @@ export interface PlayCaseInfo {
   title: string;
   synopsis: string | null;
   coverImageUrl: string | null;
+  /** Ownership of the current account; null when PLAY_GATING_ENABLED is off. */
+  access?: { online: boolean; box: boolean; groupCredits: number } | null;
 }
 
 /**
@@ -31,7 +33,9 @@ export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
   // thay vì màn vào game. Các thao tác khác (tạo, vào phòng) giữ nguyên form để không mất lỗi.
   const [autoResuming, setAutoResuming] = useState(false);
   useEffect(() => {
-    const code = normalizeRoomCode(new URLSearchParams(window.location.search).get("room"));
+    const code = normalizeRoomCode(
+      new URLSearchParams(window.location.search).get("room"),
+    );
     setAutoResuming(!!code && !!findSessionByCode(code));
   }, []);
 
@@ -45,8 +49,14 @@ export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
   // URL đã sửa bằng history.replaceState).
   const urlRoom = searchParams.get("room");
   useEffect(() => {
-    if (room?.code && urlRoom !== room.code && normalizeCaseId(room.caseId) === info.caseId) {
-      router.replace(`/play/${info.caseId}?room=${room.code}`, { scroll: false });
+    if (
+      room?.code &&
+      urlRoom !== room.code &&
+      normalizeCaseId(room.caseId) === info.caseId
+    ) {
+      router.replace(`/play/${info.caseId}?room=${room.code}`, {
+        scroll: false,
+      });
     }
   }, [room?.code, room?.caseId, urlRoom, info.caseId, router]);
 
@@ -72,7 +82,11 @@ export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
           Đang kết nối phòng…
         </p>
       ) : (
-        <PlayEntry caseId={info.caseId} caseTitle={info.title} />
+        <PlayEntry
+          caseId={info.caseId}
+          caseTitle={info.title}
+          access={info.access ?? null}
+        />
       );
   } else if (room.phase === "lobby" || !me.enteredAt) {
     body = <PlayLobby caseTitle={info.title} />;

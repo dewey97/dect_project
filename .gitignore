@@ -25,6 +25,7 @@ node_modules
 build_log.txt
 *.tsbuildinfo
 .next_dev/
+.next_gated/
 .tmp/
 .claude/
 .playwright-cli/

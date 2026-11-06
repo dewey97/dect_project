@@ -72,10 +72,27 @@ type Step = "choose" | "create" | "join";
 export function PlayEntry({
   caseId,
   caseTitle,
+  access = null,
 }: {
   caseId: string;
   caseTitle: string;
+  /** null when PLAY_GATING_ENABLED is off: no ownership rules shown. */
+  access?: { online: boolean; box: boolean; groupCredits: number } | null;
 }) {
+  // Who may create a room (only the Host needs to own the case):
+  // box owners for free, online owners while they have group credits.
+  const ownsCase = !!access && (access.box || access.online);
+  const canCreate =
+    !access || access.box || (access.online && access.groupCredits > 0);
+  const createNote = !access
+    ? null
+    : access.box
+      ? "Bộ hộp: tạo phòng miễn phí."
+      : access.online
+        ? access.groupCredits > 0
+          ? `Còn ${access.groupCredits} lượt tạo phòng nhóm. Mỗi phòng tốn 1 lượt.`
+          : "Hết lượt tạo phòng nhóm. Vẫn chơi một mình được."
+        : "Chỉ người đã mua vụ án mới tạo phòng. Bạn vẫn vào phòng bạn bè bằng mã.";
   const {
     pendingRoomCode,
     savedSessions,
@@ -152,13 +169,30 @@ export function PlayEntry({
       {step === "choose" && (
         <div className="flex flex-col gap-3">
           <PlayCard className="space-y-3">
-            <PlayButton className="w-full" onClick={() => go("create")}>
+            <PlayButton
+              className="w-full"
+              disabled={!canCreate}
+              onClick={() => go("create")}
+            >
               <Users className="size-4" aria-hidden />
               Tạo phòng
             </PlayButton>
             <p className="text-xs leading-relaxed text-zinc-400">
               Chỉ 1 người trong nhóm tạo phòng, những người khác chọn Vào phòng.
             </p>
+            {createNote && (
+              <p className="text-xs leading-relaxed text-amber-300/90">
+                {createNote}{" "}
+                {!canCreate && (
+                  <Link
+                    href={`/cases/${caseId}#online`}
+                    className="font-semibold underline underline-offset-4"
+                  >
+                    {ownsCase ? "Mua thêm lượt" : "Mua vụ án"}
+                  </Link>
+                )}
+              </p>
+            )}
             <PlayButton
               variant="secondary"
               className="w-full"
@@ -207,11 +241,19 @@ export function PlayEntry({
             </PlayCard>
           )}
 
+          {(!access || ownsCase) && (
+            <Link
+              href={`/evidence/web?case_id=${caseId}`}
+              className="self-center py-3 text-sm text-zinc-500 underline-offset-4 hover:text-zinc-300 hover:underline"
+            >
+              Chơi một mình (không qua phòng)
+            </Link>
+          )}
           <Link
-            href={`/evidence/web?case_id=${caseId}`}
-            className="self-center py-3 text-sm text-zinc-500 underline-offset-4 hover:text-zinc-300 hover:underline"
+            href={`/cases/${caseId}`}
+            className="self-center py-1 text-xs text-zinc-600 underline-offset-4 hover:text-zinc-400 hover:underline"
           >
-            Chơi một mình (không qua phòng)
+            Trang vụ án
           </Link>
         </div>
       )}
@@ -256,8 +298,18 @@ export function PlayEntry({
               <p className="text-xs text-zinc-500">Sửa được trong phòng chờ.</p>
             </div>
           </PlayCard>
+          {access && !access.box && access.online && (
+            <p className="text-xs text-amber-300/90">
+              Tạo phòng dùng 1 lượt nhóm (còn {access.groupCredits}). Tạo lỗi
+              thì lượt được hoàn lại.
+            </p>
+          )}
           <PlayError>{error}</PlayError>
-          <PlayButton type="submit" disabled={isConnecting} className="w-full">
+          <PlayButton
+            type="submit"
+            disabled={isConnecting || !canCreate}
+            className="w-full"
+          >
             {isConnecting ? "Đang tạo phòng…" : "Tạo phòng"}
           </PlayButton>
           <PlayButton variant="ghost" onClick={() => go("choose")}>

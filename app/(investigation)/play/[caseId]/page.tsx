@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
-import { serverAllowsPlay } from "@/lib/payments/ownership";
+import {
+  getOwnership,
+  isPlayGatingEnabled,
+  ownsCase,
+} from "@/lib/payments/ownership";
 import { CaseAccessGuard } from "@/components/cases/case-access-guard";
 import {
   PlayRoomClient,
@@ -17,6 +21,7 @@ export const dynamic = "force-dynamic";
  * Khi bật PLAY_GATING_ENABLED: chưa sở hữu (mua online hoặc kích hoạt hộp) thì
  * về trang vụ án. Không chặn link có `?room=` và thiết bị đang có phiên phòng
  * của vụ này: người được mời vào phòng không cần mua, chỉ Host cần.
+ * Cùng quy tắc với serverAllowsPlay; ở đây tính trực tiếp để có luôn số lượt nhóm.
  */
 export default async function PlayPage({
   params,
@@ -30,21 +35,26 @@ export default async function PlayPage({
   const caseId = normalizeCaseId(raw);
 
   const supabase = await createClient();
-  const [{ data }, allowed] = await Promise.all([
+  const [{ data }, { data: userData }] = await Promise.all([
     supabase
       .from("cases")
       .select("slug, title, synopsis, cover_image_url")
       .eq("slug", caseId)
       .maybeSingle(),
-    serverAllowsPlay(caseId, query.room),
+    supabase.auth.getUser(),
   ]);
   if (!data) notFound();
+
+  const gating = isPlayGatingEnabled();
+  const ownership = await getOwnership(userData.user?.id, caseId);
+  const allowed = !gating || Boolean(query.room) || ownsCase(ownership);
 
   const info: PlayCaseInfo = {
     caseId,
     title: data.title,
     synopsis: data.synopsis ?? null,
     coverImageUrl: data.cover_image_url ?? null,
+    access: gating ? ownership : null,
   };
   return (
     <CaseAccessGuard caseId={caseId} allowed={allowed}>
