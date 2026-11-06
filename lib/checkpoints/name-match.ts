@@ -1,4 +1,4 @@
-import { normalizeForMatch } from "@/lib/text";
+import { normalizeForMatch } from "@/lib/utils/text";
 
 /**
  * Removes Vietnamese diacritics / accents and converts string to lowercase for fuzzy matching

@@ -12,14 +12,14 @@ import {
 import {
   HeroInteractive,
   type PinPoint,
-} from "@/components/investigation/hero-interactive";
+} from "@/components/investigation/board/renderer/hero-interactive";
 import { getCanonicalSuspectKey } from "@/lib/cases/characters";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
-import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
-import { setStorageItem, getStorageItem } from "@/lib/storage";
-import { useInvestigationEvent } from "@/lib/investigation-events";
+import { useOptionalCaseCharacters } from "@/components/investigation/contexts/case-characters-context";
+import { setStorageItem, getStorageItem } from "@/lib/investigation/storage";
+import { useInvestigationEvent } from "@/lib/investigation/investigation-events";
 
 import { useBoardLayout } from "./canvas/use-board-layout";
 import {

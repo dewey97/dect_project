@@ -1,6 +1,6 @@
 "use client";
 
-import type { PinPoint } from "@/components/investigation/hero-interactive";
+import type { PinPoint } from "@/components/investigation/board/renderer/hero-interactive";
 import { AddSuspectModal } from "../add-suspect-modal";
 import { PhoneLookupModal } from "../phone-lookup-modal";
 import { PhoneNarrativeModal } from "../phone-narrative-modal";
@@ -13,10 +13,10 @@ import { FollowupQuestionModal } from "../followup-question-modal";
 import { CustomPinModal } from "../custom-pin-modal";
 import nextDynamic from "next/dynamic";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
-import { EpilogueModal } from "@/components/investigation/epilogue-modal";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { EpilogueModal } from "@/components/investigation/modals/epilogue-modal";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { toast } from "@/components/ui/toast";
-import { setStorageItem } from "@/lib/storage";
+import { setStorageItem } from "@/lib/investigation/storage";
 import type { useBoardLayout } from "./use-board-layout";
 import type { useInvestigationState, CulpritKey } from "./use-investigation-state";
 // Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.

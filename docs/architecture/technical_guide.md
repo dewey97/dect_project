@@ -40,7 +40,7 @@ Dữ liệu vụ án nằm trong Supabase và được biên tập qua Studio (`
 2. **PDF cũ của case_000** (tùy chọn): `pnpm export:docs-pdf` xuất PDF từ Master Google Doc (ID: `1pJxlZpfCfIbnQ0YGx3mvCUmYTRng7zLyDxJ2EggJkgc`) vào `public/documents/case_000/<phase>/`.
 3. **Vụ mới**: tải PDF/ảnh lên qua Dossier Studio (Supabase Storage).
 4. **Nhúng PDF & Chuẩn hóa URL (`normalizeDrivePdfUrl`)**:
-   - Tài liệu PDF từ Google Drive hoặc thư mục tĩnh `/documents/` được hiển thị qua `<iframe>` với hàm `normalizeDrivePdfUrl()` (`lib/utils.ts`).
+   - Tài liệu PDF từ Google Drive hoặc thư mục tĩnh `/documents/` được hiển thị qua `<iframe>` với hàm `normalizeDrivePdfUrl()` (`lib/utils/index.ts`).
    - Tự động chuyển đổi link Drive sang dạng `/file/d/{id}/preview` và gắn `#toolbar=0&navpanes=0` cho file local, triệt tiêu thanh công cụ thừa của trình duyệt để tạo trải nghiệm đọc hồ sơ trinh thám liền mạch.
 
 ---
@@ -70,7 +70,7 @@ Dữ liệu vụ án nằm trong Supabase và được biên tập qua Studio (`
 
 * **Zero-Gate Async Blocking**: Tuyệt đối không bọc nút tương tác mở màn (như `[ TRỐN TÌM ]`, nút vào game) vào điều kiện async đang tải. Giao diện phải tương tác được ngay lập tức.
 * **Static Fallback cho Dẫn truyện**: Mọi hook dữ liệu động (`useCaseNarratives`, Supabase) phải có sẵn `DEFAULT_NARRATIVES` dự phòng để tránh trắng/đen màn hình khi mất mạng hoặc API chậm.
-* **Safe LocalStorage Wrapper**: Mọi thao tác đọc/ghi Storage phải đi qua `lib/storage.ts` để tránh lỗi khi người chơi duyệt web ở chế độ ẩn danh (Incognito), Safari ITP hoặc Webview nhúng.
+* **Safe LocalStorage Wrapper**: Mọi thao tác đọc/ghi Storage phải đi qua `lib/investigation/storage.ts` để tránh lỗi khi người chơi duyệt web ở chế độ ẩn danh (Incognito), Safari ITP hoặc Webview nhúng.
 * **Mobile Focus Rule**: Không sử dụng `autoFocus` hoặc `.focus()` tự động khi mở Modal/Dialog nhằm tránh bật bàn phím ảo che khuất nội dung trên di động.
 * **No Inactive Component State Pollution (Cô lập Side-Effect Modal Khi Đóng)**: Tuyệt đối CẤM các component Modal/Walkthrough/Overlay thực thi reset state toàn cục (như `onStepChange?.(null)`) bên trong `useEffect` khi component đang ở trạng thái đóng (`!isOpen`). Mọi callback giao tiếp giữa canvas và modal con bắt buộc phải ổn định tham chiếu (`useCallback`), tránh truyền inline arrow functions làm kích hoạt effect ma dập tắt state của người dùng.
 * **Asset Storage Boundary Rule**: Toàn bộ tư liệu gốc, ảnh tài liệu, moodboard, storyboard, test renders phải lưu tại `docs/cases/<case_id>/`. Thư mục `public/` chỉ chứa tài nguyên runtime production đang hoạt động trực tiếp trên web app. Chi tiết xem tại [`docs/cases/case_000/02_photos/ASSET_CATALOG.md`](../cases/case_000/02_photos/ASSET_CATALOG.md).

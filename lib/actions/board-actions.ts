@@ -7,7 +7,7 @@ import { normalizeCaseId } from "@/lib/cases/case-id";
 import type {
   PinPoint,
   CaseConnection,
-} from "@/components/investigation/hero-interactive";
+} from "@/components/investigation/board/renderer/hero-interactive";
 import type {
   DbCaseBoardNode,
   BoardConfig,

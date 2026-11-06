@@ -1,7 +1,7 @@
 import { caseStorageKey } from "@/lib/cases/case-id";
-import { getStorageJson, setStorageJson } from "@/lib/storage";
-import { slugifyVietnamese } from "@/lib/text";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { getStorageJson, setStorageJson } from "@/lib/investigation/storage";
+import { slugifyVietnamese } from "@/lib/utils/text";
+import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
 
 /**
  * Tiến độ mở bộ hồ sơ của một vụ án.

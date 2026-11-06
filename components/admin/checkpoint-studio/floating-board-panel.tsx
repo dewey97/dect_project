@@ -17,8 +17,8 @@ import {
   HeroInteractive,
   type CaseConnection,
   type PinPoint,
-} from "@/components/investigation/hero-interactive";
-import { BOARD_ASPECT } from "@/components/investigation/hero-interactive/constants";
+} from "@/components/investigation/board/renderer/hero-interactive";
+import { BOARD_ASPECT } from "@/components/investigation/board/renderer/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { CustomPinModal } from "@/components/investigation/board/custom-pin-modal";

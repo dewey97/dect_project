@@ -1,4 +1,4 @@
-import type { CaseData } from "./types";
+import type { CaseData } from "@/components/investigation/board/renderer/types";
 
 export const BOARD_FRAME_SRC = "/images/hero/evidence-board-frame.png";
 

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { FeedbackModal } from '@/components/investigation/feedback-modal'
+import { FeedbackModal } from '@/components/investigation/modals/feedback-modal'
 import './globals.css'
 
 export const metadata: Metadata = {

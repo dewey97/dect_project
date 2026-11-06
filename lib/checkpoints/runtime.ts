@@ -5,7 +5,7 @@ import type {
 } from "@/lib/types";
 import type { CheckpointHintGroup } from "@/lib/types/checkpoint-studio";
 import type { PublicCheckpointRow } from "@/lib/checkpoints/public-checkpoint";
-import { asString, asStringArray } from "@/lib/text";
+import { asString, asStringArray } from "@/lib/utils/text";
 
 /**
  * Chuyển row checkpoint đã lọc (`/api/checkpoints`) thành model runtime

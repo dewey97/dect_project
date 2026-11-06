@@ -1,5 +1,5 @@
 import type { DbCaseCheckpoint, BoardConfig } from "./database";
-import { slugifyVietnamese, asStringArray, cleanList } from "@/lib/text";
+import { slugifyVietnamese, asStringArray, cleanList } from "@/lib/utils/text";
 
 /**
  * Checkpoint Studio (Admin) — model biên tập có cấu trúc.

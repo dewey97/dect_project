@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, BookOpen, Users } from "lucide-react";
-import { getStorageItem, setStorageItem } from "@/lib/storage";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { getStorageItem, setStorageItem } from "@/lib/investigation/storage";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 
 interface DetectiveNotebookModalProps {
   isOpen: boolean;

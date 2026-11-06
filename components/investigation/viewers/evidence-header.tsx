@@ -3,7 +3,7 @@
 import type { Device } from '@/lib/types'
 import { Unlock, Lock, Battery, Shield, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useSettings } from '@/components/investigation/settings-context'
+import { useSettings } from '@/components/investigation/contexts/settings-context'
 
 interface EvidenceHeaderProps {
   device: Device

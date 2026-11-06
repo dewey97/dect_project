@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
 import { getAppBaseUrl, getPayosConfig } from "@/lib/payments/payos";
 import { getOwnership, isPlayGatingEnabled } from "@/lib/payments/ownership";
-import { CaseStore, type CaseOffer } from "@/components/cases/case-store";
+import { CaseStore, type CaseOffer } from "@/components/store/case-store";
 
 export const dynamic = "force-dynamic";
 

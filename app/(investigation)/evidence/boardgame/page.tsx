@@ -1,6 +1,6 @@
 import { normalizeCaseId } from "@/lib/cases/case-id";
 import { serverAllowsPlay } from "@/lib/payments/ownership";
-import { CaseAccessGuard } from "@/components/cases/case-access-guard";
+import { CaseAccessGuard } from "@/components/store/case-access-guard";
 import { BoardGameClient } from "./boardgame-client";
 
 export const dynamic = "force-dynamic";

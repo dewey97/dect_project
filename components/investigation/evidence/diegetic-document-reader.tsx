@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { ZoomIn, ZoomOut, RotateCcw, FileText, Stamp, Compass } from "lucide-react";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { cn } from "@/lib/utils";
 
 interface DiegeticDocumentReaderProps {

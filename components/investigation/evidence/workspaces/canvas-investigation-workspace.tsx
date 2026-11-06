@@ -26,23 +26,23 @@ import { CanvasGuideModal } from "@/components/investigation/evidence/canvas-gui
 import { CanvasWalkthroughTour } from "@/components/investigation/evidence/canvas-guide/canvas-walkthrough-tour";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { UserNav } from "@/components/auth/user-nav";
-import { RoomModal } from "@/components/investigation/room-modal";
+import { RoomModal } from "@/components/investigation/room/room-modal";
 import { cn } from "@/lib/utils";
 import { MainInvestigationCanvas } from "@/components/investigation/board/main-investigation-canvas";
 import { DossierCanvasBoard } from "@/components/investigation/evidence/dossier-canvas-board";
 import { DossierTray } from "@/components/investigation/evidence/dossier-tray";
 import { PhoneSimulator } from "@/components/phone-engine/phone-simulator";
-import { useInvestigationEvent, emitInvestigationEvent } from "@/lib/investigation-events";
+import { useInvestigationEvent, emitInvestigationEvent } from "@/lib/investigation/investigation-events";
 import { AddSuspectModal } from "@/components/investigation/board/add-suspect-modal";
 import { FollowupQuestionModal } from "@/components/investigation/board/followup-question-modal";
 import { CustomPinModal } from "@/components/investigation/board/custom-pin-modal";
-import { DetectiveNotebookModal } from "@/components/investigation/detective-notebook-modal";
-import type { PinPoint } from "@/components/investigation/hero-interactive";
-import { getStorageJson, setStorageItem } from "@/lib/storage";
+import { DetectiveNotebookModal } from "@/components/investigation/modals/detective-notebook-modal";
+import type { PinPoint } from "@/components/investigation/board/renderer/hero-interactive";
+import { getStorageJson, setStorageItem } from "@/lib/investigation/storage";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { getCanonicalSuspectKey } from "@/lib/cases/characters";
 import { isVictimReference } from "@/lib/cases/case-characters";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { toast } from "@/components/ui/toast";
 import type {
   CombinedItem,

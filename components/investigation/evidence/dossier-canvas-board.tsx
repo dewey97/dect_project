@@ -47,15 +47,15 @@ import {
   type LampTone,
 } from "./dossier-canvas-themes";
 import { cn, normalizeImageUrl } from "@/lib/utils";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import {
   emitInvestigationEvent,
   useInvestigationEvent,
-} from "@/lib/investigation-events";
+} from "@/lib/investigation/investigation-events";
 import {
   popAnnotationUndo,
   popAnnotationRedo,
-} from "@/lib/annotation-history";
+} from "@/lib/investigation/annotation-history";
 import type {
   CombinedItem,
   PDFDocument,
@@ -73,7 +73,7 @@ import {
   type EraserMode,
 } from "./dossier-annotation-layer";
 import { CASE_000_DOSSIER_MAP } from "@/lib/hooks/use-dossier-documents";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import type { CanvasStickyNote } from "@/lib/types/room";
 
 // Bảng màu & Kích thước chuyên biệt cho Bút vẽ (Pen)

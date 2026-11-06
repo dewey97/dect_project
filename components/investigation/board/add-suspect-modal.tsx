@@ -7,10 +7,10 @@ import {
   Trash2,
   Check,
 } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { cn } from "@/lib/utils";
 import { type PendingClueInputs } from "./clue-code-picker";
-import { setStorageItem } from "@/lib/storage";
+import { setStorageItem } from "@/lib/investigation/storage";
 import {
   SuspectEvaluationModal,
   type EvaluationModalState,
@@ -54,7 +54,7 @@ import {
   verifyCheckpointOnServer,
   VERIFY_UNAVAILABLE_MESSAGE,
 } from "@/lib/checkpoints/client-verify";
-import { normalizeForMatch } from "@/lib/text";
+import { normalizeForMatch } from "@/lib/utils/text";
 
 export { findValidCaseCharacter };
 

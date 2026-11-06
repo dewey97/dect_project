@@ -9,14 +9,14 @@ import {
   Check
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { setStorageItem } from '@/lib/storage'
-import { emitInvestigationEvent } from '@/lib/investigation-events'
+import { detectiveAudio } from '@/lib/investigation/investigation-audio'
+import { setStorageItem } from '@/lib/investigation/storage'
+import { emitInvestigationEvent } from '@/lib/investigation/investigation-events'
 import {
   WALKTHROUGH_STEPS,
   WalkthroughStep
 } from '@/lib/guides/interactive-walkthrough-data'
-import type { PinPoint } from '@/components/investigation/hero-interactive'
+import type { PinPoint } from '@/components/investigation/board/renderer/hero-interactive'
 
 const BOARD_BASE_WIDTH = 896
 const BOARD_BASE_HEIGHT = 1200

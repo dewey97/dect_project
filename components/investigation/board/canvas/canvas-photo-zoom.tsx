@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 
 export interface CanvasPhotoZoomProps {
   zoomedPhotoUrl: string | null;

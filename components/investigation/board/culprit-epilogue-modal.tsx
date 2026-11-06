@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import { TypewriterNarrator } from "@/components/investigation/evidence/typewriter-narrator";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
-import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
+import { useOptionalCaseCharacters } from "@/components/investigation/contexts/case-characters-context";
 
 interface CulpritEpilogueModalProps {
   isOpen: boolean;

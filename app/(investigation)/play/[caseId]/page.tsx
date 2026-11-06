@@ -6,7 +6,7 @@ import {
   isPlayGatingEnabled,
   ownsCase,
 } from "@/lib/payments/ownership";
-import { CaseAccessGuard } from "@/components/cases/case-access-guard";
+import { CaseAccessGuard } from "@/components/store/case-access-guard";
 import {
   PlayRoomClient,
   type PlayCaseInfo,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import {
   PlayButton,
   PlayCard,

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getOwnedCases, NOT_OWNED } from "@/lib/payments/ownership";
-import { OwnershipBadge } from "@/components/cases/ownership-badge";
+import { OwnershipBadge } from "@/components/store/ownership-badge";
 import { PlayLabel } from "@/components/play/play-ui";
 
 export const dynamic = "force-dynamic";

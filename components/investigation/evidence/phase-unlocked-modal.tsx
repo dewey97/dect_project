@@ -5,9 +5,9 @@ import { AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import type { PDFDocument, PhysicalEvidence } from "./evidence-types";
 import { TypewriterNarrator } from "./typewriter-narrator";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { useCaseNarratives } from "@/lib/hooks/use-case-narratives";
-import { setStorageItem } from "@/lib/storage";
+import { setStorageItem } from "@/lib/investigation/storage";
 import { normalizeCaseId, caseStorageKey } from "@/lib/cases/case-id";
 import { getActiveCaseId } from "@/lib/cases/case-characters";
 

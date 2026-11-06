@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { cn } from "@/lib/utils";
 import { useStudioCheckpoints } from "@/lib/hooks/use-studio-checkpoints";
-import { getStorageJson, setStorageJson, getStorageItem } from "@/lib/storage";
-import { trackHintViewed } from "@/lib/analytics";
+import { getStorageJson, setStorageJson, getStorageItem } from "@/lib/investigation/storage";
+import { trackHintViewed } from "@/lib/analytics/analytics";
 import {
   buildGroupedCheckpointsMap,
   normalizeCheckpointId,
-} from "@/components/investigation/hint-modal";
+} from "@/components/investigation/modals/hint-modal";
 
 interface CheckpointHintSectionProps {
   checkpointId: string;

@@ -370,7 +370,7 @@ Bản v1 (`room-sync-context.tsx` trước commit `73e810d`) lệch spec ở cá
 | Catch-up không so `version`                                     | Client chỉ nạp snapshot khi `version` server lớn hơn, khi tab active lại, có mạng lại và mỗi 30 giây                            |
 | Mã phòng sinh ở client bằng `Math.random`                       | Server sinh mã Crockford, unique index `WHERE status = 'active'`, thử tối đa 5 lần                                              |
 | Presence gửi `email`, `userId`                                  | Presence chỉ gửi `{ pid, nickname, readPhase }`                                                                                 |
-| Đang ở phòng vẫn đọc/ghi savegame Solo                          | `lib/storage.ts` thêm tiền tố `room:<id>::` cho mọi key khi ở phòng                                                             |
+| Đang ở phòng vẫn đọc/ghi savegame Solo                          | `lib/investigation/storage.ts` thêm tiền tố `room:<id>::` cho mọi key khi ở phòng                                                             |
 | Thuật ngữ và identifier `indictment` / "cáo trạng"              | Chưa đổi, theo dõi ở [`TECHDEBT.md`](../TECHDEBT.md) #21                                                                        |
 
 ## 9. Đã chốt và còn chờ quyết định

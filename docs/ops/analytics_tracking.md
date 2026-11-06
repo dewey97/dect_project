@@ -18,8 +18,8 @@
 - **Nền tảng**: Firebase Analytics / Google Analytics 4 (GA4)
 - **Measurement ID**: `G-MJNW2MDLND`
 - **Firebase Project ID**: `lrp-dectective`
-- **Khởi tạo Singleton & SSR Safe**: [`lib/firebase.ts`](../../lib/firebase.ts)
-- **Module điều phối Event & Bấm giờ**: [`lib/analytics.ts`](../../lib/analytics.ts)
+- **Khởi tạo Singleton & SSR Safe**: [`lib/analytics/firebase.ts`](../../lib/analytics/firebase.ts)
+- **Module điều phối Event & Bấm giờ**: [`lib/analytics/analytics.ts`](../../lib/analytics/analytics.ts)
 - **Nguyên tắc lọc rác**: Tự động bỏ qua các hành vi click mở rồi đóng ngay dưới **1 giây** (tránh làm nhiễu dữ liệu bởi click nhầm).
 
 ---
@@ -41,7 +41,7 @@
 
 | Event Name | Trigger / Vị trí Code | Tham Số (Parameters) | Đơn Vị Đo & Mục Đích |
 | :--- | :--- | :--- | :--- |
-| **`dossier_viewed`** | Khi đóng modal xem tài liệu ([`PDFViewerModal`](../../components/investigation/pdf-viewer-modal.tsx)) | • `doc_id`: Mã tài liệu (vd: `DOC-01`, `14`)<br>• `doc_title`: Tên tài liệu<br>• `doc_type`: `pdf_dossier` \| `legacy_pdf`<br>• `duration_seconds`: Thời gian mở đọc<br>• `case_id`: Mã vụ án | **Giây**.<br>Biết tài liệu nào được đọc kỹ, tài liệu nào bị lướt qua. |
+| **`dossier_viewed`** | Khi đóng modal xem tài liệu ([`PDFViewerModal`](../../components/investigation/modals/pdf-viewer-modal.tsx)) | • `doc_id`: Mã tài liệu (vd: `DOC-01`, `14`)<br>• `doc_title`: Tên tài liệu<br>• `doc_type`: `pdf_dossier` \| `legacy_pdf`<br>• `duration_seconds`: Thời gian mở đọc<br>• `case_id`: Mã vụ án | **Giây**.<br>Biết tài liệu nào được đọc kỹ, tài liệu nào bị lướt qua. |
 | **`evidence_photo_inspected`** | Khi đóng modal xem ảnh vật chứng phóng to | • `photo_id`: Mã ảnh/vật chứng<br>• `title`: Tên ảnh<br>• `duration_seconds`: Thời gian soi ảnh<br>• `has_annotated`: Có dùng bút vẽ/note không | **Giây**.<br>Biết ảnh nào chứa chi tiết mấu chốt được người chơi quan sát kỹ. |
 | **`scene_360_viewed`** | Khi thoát khỏi phòng khám nghiệm 360 ([`ReinvestigationModal`](../../components/investigation/evidence/reinvestigation-modal.tsx)) | • `case_id`: Mã vụ án<br>• `duration_seconds`: Thời gian ở trong phòng<br>• `hotspots_visited_count`: Số điểm nghi vấn đã xem | **Giây**, **Số lượng**.<br>Đo mức độ tò mò tại hiện trường 360. |
 | **`scene_360_hotspot_clicked`** | Mỗi khi click vào một điểm nghi vấn trong 360 | • `hotspot_id`: Mã điểm (vd: `spot-1`, `tu_go`)<br>• `title`: Tên điểm nóng<br>• `has_audio`: Có phát âm thanh sfx không | **ID**.<br>Xem điểm nghi vấn nào thu hút người chơi nhất. |
@@ -81,7 +81,7 @@
 
 ## 🛠️ 4. Hướng Dẫn Sử Dụng Trong Mã Nguồn (Developer Guidelines)
 
-Mọi hàm tracking đã được đóng gói định kiểu chặt chẽ (Type-Safe) tại [`lib/analytics.ts`](../../lib/analytics.ts). Lập trình viên chỉ cần gọi trực tiếp:
+Mọi hàm tracking đã được đóng gói định kiểu chặt chẽ (Type-Safe) tại [`lib/analytics/analytics.ts`](../../lib/analytics/analytics.ts). Lập trình viên chỉ cần gọi trực tiếp:
 
 ```typescript
 import {

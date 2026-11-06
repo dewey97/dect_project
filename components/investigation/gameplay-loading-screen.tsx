@@ -10,11 +10,11 @@ import {
   Sparkles,
   UserPlus,
 } from "lucide-react";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import { DetectiveAvatar } from "@/components/investigation/detective-avatar";
 import { RoomQr } from "@/components/play/room-qr";
 import { roomInviteUrl } from "@/lib/rooms/client";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { cn } from "@/lib/utils";
 
 interface GameplayLoadingScreenProps {

@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 import {
   useRoomSync,
   type ToastNotice,
-} from "@/components/investigation/room-sync-context";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
-import { getStorageItem, setStorageItem } from "@/lib/storage";
+} from "@/components/investigation/room/room-sync-context";
+import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
+import { getStorageItem, setStorageItem } from "@/lib/investigation/storage";
 import type { PublicRoomEvent } from "@/lib/types/room";
 
 /**

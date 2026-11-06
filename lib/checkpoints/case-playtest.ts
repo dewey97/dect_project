@@ -2,7 +2,7 @@
 
 import type { DbCaseCheckpoint } from "@/lib/types/database";
 import { caseStorageKey } from "@/lib/cases/case-id";
-import { setStorageItem } from "@/lib/storage";
+import { setStorageItem } from "@/lib/investigation/storage";
 
 /**
  * Tìm toàn bộ các checkpoint tiên quyết (tổ tiên) cần hoàn thành trước targetCpId

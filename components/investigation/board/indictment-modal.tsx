@@ -3,18 +3,18 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Gavel, AlertTriangle } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { cn } from "@/lib/utils";
-import { setStorageItem } from "@/lib/storage";
+import { setStorageItem } from "@/lib/investigation/storage";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent } from "@/lib/analytics/analytics";
 import {
   verifyCheckpointOnServer,
   VERIFY_UNAVAILABLE_MESSAGE,
 } from "@/lib/checkpoints/client-verify";
-import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { useOptionalCaseCharacters } from "@/components/investigation/contexts/case-characters-context";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 
 interface IndictmentModalProps {
   caseId: string;
@@ -42,7 +42,7 @@ const DEFAULT_MOTIVE_OPTIONS = [
 ];
 
 import { caseStorageKey } from "@/lib/cases/case-id";
-import { normalizeForMatch } from "@/lib/text";
+import { normalizeForMatch } from "@/lib/utils/text";
 
 export function findSuspectMatch(
   inputName: string,

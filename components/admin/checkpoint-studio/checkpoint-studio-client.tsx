@@ -42,7 +42,7 @@ import { CheckpointEditor } from "./checkpoint-editor";
 import { CheckpointFlowView } from "./checkpoint-flow-view";
 import { FloatingBoardPanel } from "./floating-board-panel";
 import { CharacterEditor } from "./character-editor";
-import type { CaseConnection } from "@/components/investigation/hero-interactive";
+import type { CaseConnection } from "@/components/investigation/board/renderer/hero-interactive";
 import { useBoardEditor } from "./board/use-board-editor";
 import { BoardNodeForm } from "./board/board-node-form";
 import { Button } from "@/components/ui/button";

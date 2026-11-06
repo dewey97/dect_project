@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { User, LogOut, Settings, UserCircle, Terminal, Palette, LogIn } from "lucide-react";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
 import { cn } from "@/lib/utils";
 
 interface UserNavProps {

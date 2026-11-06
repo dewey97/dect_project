@@ -15,7 +15,7 @@ import {
   StickyNote,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import { detectiveAudio } from '@/lib/investigation/investigation-audio'
 import {
   CANVAS_SHORTCUTS,
   CANVAS_INVESTIGATION_TIPS,

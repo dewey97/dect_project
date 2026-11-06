@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import { detectiveAudio } from '@/lib/investigation/investigation-audio'
 import { cn } from '@/lib/utils'
 import { resolveEvidenceCode, getSortedClues } from '@/lib/cases/clues'
 

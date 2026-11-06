@@ -12,7 +12,7 @@ import {
   inputClass,
 } from "@/components/play/play-ui";
 import { formatVnd } from "@/lib/payments/format";
-import { OwnershipBadge } from "@/components/cases/ownership-badge";
+import { OwnershipBadge } from "@/components/store/ownership-badge";
 
 export interface CaseOffer {
   sku: string;

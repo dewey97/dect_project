@@ -1,5 +1,5 @@
 import { logEvent, setUserProperties, setUserId } from "@firebase/analytics";
-import { getFirebaseAnalytics } from "./firebase";
+import { getFirebaseAnalytics } from "@/lib/analytics/firebase";
 
 // ==========================================
 // 1. CORE EVENT TRACKING WRAPPER

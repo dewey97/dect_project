@@ -5,10 +5,10 @@ import { X, FileText, ImageIcon } from 'lucide-react'
 import type { SelectedView } from '@/components/investigation/evidence/evidence-types'
 import { normalizeImageUrl } from '@/lib/utils'
 import { useDossierDocuments } from '@/lib/hooks/use-dossier-documents'
-import { trackDossierView, trackPhotoInspected } from '@/lib/analytics'
-import { DiegeticDossierSheet } from './evidence/diegetic-dossier-sheet'
-import { EvidencePhotoAnnotator } from './evidence/evidence-photo-annotator'
-import { DiegeticDocumentReader } from './evidence/diegetic-document-reader'
+import { trackDossierView, trackPhotoInspected } from '@/lib/analytics/analytics'
+import { DiegeticDossierSheet } from '@/components/investigation/evidence/diegetic-dossier-sheet'
+import { EvidencePhotoAnnotator } from '@/components/investigation/evidence/evidence-photo-annotator'
+import { DiegeticDocumentReader } from '@/components/investigation/evidence/diegetic-document-reader'
 
 interface PDFViewerModalProps {
   pdfUrl?: string | null

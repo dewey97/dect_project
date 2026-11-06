@@ -4,7 +4,7 @@ import { isAnswerKind } from "@/lib/checkpoints/kinds";
 import type {
   CaseConnection,
   PinPoint,
-} from "@/components/investigation/hero-interactive";
+} from "@/components/investigation/board/renderer/hero-interactive";
 import {
   getCanonicalSuspectKey,
   removeDiacritics,

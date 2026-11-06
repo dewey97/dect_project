@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { ClueCodePicker, type PendingClueInputs } from "../clue-code-picker";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";

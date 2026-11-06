@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, DoorOpen, History, Minus, Plus, Users } from "lucide-react";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import { normalizeRoomCode } from "@/lib/rooms/code";
 import { NICKNAME_MAX_LENGTH, cleanNickname } from "@/lib/rooms/nickname";
 import {

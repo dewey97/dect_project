@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   CaseConnection,
   PinPoint,
-} from "@/components/investigation/hero-interactive";
+} from "@/components/investigation/board/renderer/hero-interactive";
 import type {
   DbCaseBoardNode,
   DbCaseCharacter,

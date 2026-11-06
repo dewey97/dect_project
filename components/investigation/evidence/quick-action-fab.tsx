@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, RefreshCw, X, Box, BookOpen, Home, MessageSquare, PenLine } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
+import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
 
 interface QuickActionFabProps {
   onOpenPhone?: () => void;

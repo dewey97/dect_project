@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BuyResult } from "@/components/buy/buy-result";
+import { BuyResult } from "@/components/store/buy-result";
 
 export const dynamic = "force-dynamic";
 

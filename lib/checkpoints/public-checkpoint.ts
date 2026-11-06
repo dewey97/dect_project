@@ -1,5 +1,5 @@
 import type { DbCaseCheckpoint } from "@/lib/types/database";
-import { asString, asStringArray } from "@/lib/text";
+import { asString, asStringArray } from "@/lib/utils/text";
 
 /**
  * Lọc row `case_checkpoints` trước khi gửi xuống client gameplay.

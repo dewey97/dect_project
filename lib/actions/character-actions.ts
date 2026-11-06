@@ -9,7 +9,7 @@ import type {
   CaseCharacterRole,
   DbCaseCharacter,
 } from "@/lib/types/database";
-import { cleanList } from "@/lib/text";
+import { cleanList } from "@/lib/utils/text";
 
 const STUDIO_PATH = "/studio/characters";
 const KEY_PATTERN = /^[a-z0-9_]{1,40}$/;

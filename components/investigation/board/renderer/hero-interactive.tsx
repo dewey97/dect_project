@@ -15,23 +15,23 @@ import type {
   Size,
   UserConnection,
   UserPin,
-} from "./hero-interactive/types";
+} from "@/components/investigation/board/renderer/types";
 import {
   BOARD_FRAME_SRC,
   CASES_LIST,
   MAX_DEVICE_PIXEL_RATIO,
-} from "./hero-interactive/constants";
+} from "@/components/investigation/board/renderer/constants";
 import {
   getCompositeCard as getCompositeCardHelper,
   getLoadedImage as getLoadedImageHelper,
   resolveSuspectPhotoUrl as resolveSuspectPhotoUrlHelper,
-} from "./hero-interactive/card-composite";
-import { useLivePinPhotos } from "./hero-interactive/use-live-pin-photos";
-import { useBoardZoom } from "./hero-interactive/use-board-zoom";
-import { useBoardPointer } from "./hero-interactive/use-board-pointer";
-import { renderScene } from "./hero-interactive/render-scene";
+} from "@/components/investigation/board/renderer/card-composite";
+import { useLivePinPhotos } from "@/components/investigation/board/renderer/use-live-pin-photos";
+import { useBoardZoom } from "@/components/investigation/board/renderer/use-board-zoom";
+import { useBoardPointer } from "@/components/investigation/board/renderer/use-board-pointer";
+import { renderScene } from "@/components/investigation/board/renderer/render-scene";
 
-export type { HeroInteractiveProps } from "./hero-interactive/types";
+export type { HeroInteractiveProps } from "@/components/investigation/board/renderer/types";
 export type { PinPoint, CaseConnection, CaseData };
 
 // ────────────────────────────────────────

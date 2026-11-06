@@ -1,8 +1,8 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { getStorageJson, setStorageJson } from '@/lib/storage'
-import { useRoomSync } from '@/components/investigation/room-sync-context'
+import { getStorageJson, setStorageJson } from '@/lib/investigation/storage'
+import { useRoomSync } from '@/components/investigation/room/room-sync-context'
 
 interface CheckpointsContextType {
   completedCheckpointIds: string[]

@@ -2,7 +2,7 @@
 
 import type { Device } from '@/lib/types'
 import { Activity } from 'lucide-react'
-import { useSettings } from '@/components/investigation/settings-context'
+import { useSettings } from '@/components/investigation/contexts/settings-context'
 
 interface MetadataPanelProps {
   device: Device

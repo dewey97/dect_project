@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import { PlayEntry } from "@/components/play/play-entry";
 import { PlayLobby } from "@/components/play/play-lobby";
 import { PlayIntro } from "@/components/play/play-intro";

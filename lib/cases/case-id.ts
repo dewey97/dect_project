@@ -1,4 +1,4 @@
-import { clearInvestigationStorage, removeStorageItem } from "@/lib/storage";
+import { clearInvestigationStorage, removeStorageItem } from "@/lib/investigation/storage";
 
 /**
  * Mã định danh vụ án (case slug) dùng chung cho Studio, API và gameplay.

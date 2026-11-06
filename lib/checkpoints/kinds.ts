@@ -9,7 +9,7 @@
  */
 
 import type { EpilogueStoryItem } from "@/lib/types/checkpoint-studio";
-import { asString, asStringArray } from "@/lib/text";
+import { asString, asStringArray } from "@/lib/utils/text";
 
 // ---------------------------------------------------------------------------
 // 1. Kind enum & discriminated union

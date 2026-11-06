@@ -1,5 +1,5 @@
 import type { DbCaseCheckpoint } from "@/lib/types/database";
-import { normalizeForMatch } from "@/lib/text";
+import { normalizeForMatch } from "@/lib/utils/text";
 
 /**
  * Đồ thị phụ thuộc checkpoint cho Checkpoint Studio.

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Cpu, Lock, AlertCircle } from 'lucide-react'
-import { useCheckpoints } from '@/components/investigation/checkpoints-context'
+import { useCheckpoints } from '@/components/investigation/contexts/checkpoints-context'
 import { PhoneSimulator } from '@/components/phone-engine/phone-simulator'
 import { EvidenceHeader } from '@/components/investigation/viewers/evidence-header'
 import { MetadataPanel } from '@/components/investigation/viewers/metadata-panel'

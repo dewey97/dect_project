@@ -1,5 +1,5 @@
 import "server-only";
-import { asString, normalizeForMatch } from "@/lib/text";
+import { asString, normalizeForMatch } from "@/lib/utils/text";
 import { isAdminBypassCode } from "@/lib/cases/admin-bypass";
 import {
   checkContradictionValid,

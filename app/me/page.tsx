@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getOwnedCases } from "@/lib/payments/ownership";
 import { formatVnd } from "@/lib/payments/format";
-import { OwnershipBadge } from "@/components/cases/ownership-badge";
+import { OwnershipBadge } from "@/components/store/ownership-badge";
 import { PlayCard, PlayLabel } from "@/components/play/play-ui";
 
 export const dynamic = "force-dynamic";

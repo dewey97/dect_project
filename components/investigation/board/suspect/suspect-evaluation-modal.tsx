@@ -7,7 +7,7 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { findValidCaseCharacter } from "@/lib/cases/characters";
 import { cn } from "@/lib/utils";
 

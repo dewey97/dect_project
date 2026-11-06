@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import { BrandMark } from "@/components/investigation/brand-mark";
 import { UserNav } from "@/components/auth/user-nav";
-import { RoomPresenceBar } from "@/components/investigation/room-presence-bar";
-import { RoomModal } from "@/components/investigation/room-modal";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { RoomPresenceBar } from "@/components/investigation/room/room-presence-bar";
+import { RoomModal } from "@/components/investigation/room/room-modal";
+import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Mail, CheckCircle2, AlertCircle, Loader2, Send } from "lucide-react";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent } from "@/lib/analytics/analytics";
 
 interface WaitlistFormProps {
   source?: "hero" | "dispatch_banner" | "footer" | "cases";

@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, HelpCircle } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
-import { getStorageItem, setStorageItem } from "@/lib/storage";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
+import { getStorageItem, setStorageItem } from "@/lib/investigation/storage";
 import { normalizeImageUrl, cn } from "@/lib/utils";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
@@ -19,7 +19,7 @@ import {
   verifyCheckpointOnServer,
   VERIFY_UNAVAILABLE_MESSAGE,
 } from "@/lib/checkpoints/client-verify";
-import { useOptionalCaseCharacters } from "@/components/investigation/case-characters-context";
+import { useOptionalCaseCharacters } from "@/components/investigation/contexts/case-characters-context";
 import { removeDiacritics } from "@/lib/cases/characters";
 
 interface FollowupQuestionModalProps {

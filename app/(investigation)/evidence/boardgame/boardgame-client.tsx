@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { caseStorageKey, normalizeCaseId } from "@/lib/cases/case-id";
-import { useCheckpoints } from "@/components/investigation/checkpoints-context";
+import { useCheckpoints } from "@/components/investigation/contexts/checkpoints-context";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { BoardGameCompanionView } from "@/components/investigation/evidence/board-game-companion-view";
 import { GameplayLoadingScreen } from "@/components/investigation/gameplay-loading-screen";
@@ -11,18 +11,18 @@ import {
   PhaseUnlockedModal,
   type UnlockedModalData,
 } from "@/components/investigation/evidence/phase-unlocked-modal";
-import { EpilogueModal } from "@/components/investigation/epilogue-modal";
+import { EpilogueModal } from "@/components/investigation/modals/epilogue-modal";
 import { JumpscareEndgame } from "@/components/investigation/jumpscare-endgame";
 import { QuickActionFab } from "@/components/investigation/evidence/quick-action-fab";
 import { PhoneModal } from "@/components/investigation/evidence/phone-modal";
 import nextDynamic from "next/dynamic";
-import { HintModal } from "@/components/investigation/hint-modal";
+import { HintModal } from "@/components/investigation/modals/hint-modal";
 import {
   getStorageItem,
   setStorageItem,
   clearInvestigationStorage,
-} from "@/lib/storage";
-import { useInvestigationEvent } from "@/lib/investigation-events";
+} from "@/lib/investigation/storage";
+import { useInvestigationEvent } from "@/lib/investigation/investigation-events";
 // Modal khám xét hiện trường kéo theo three.js (Scene360Viewer) — chỉ tải khi cần.
 const ReinvestigationModal = nextDynamic(
   () =>

@@ -9,7 +9,7 @@
 | Migration        | [`db/schema/53_payments.sql`](../../db/schema/53_payments.sql) (chủ dự án chạy)                                                        |
 | Client PayOS     | `lib/payments/payos.ts`, test `lib/payments/payos.test.ts`                                                                             |
 | API              | `app/api/checkout/route.ts`, `app/api/payments/payos/webhook/route.ts`, `app/api/orders/[orderCode]/route.ts`                          |
-| Màn hình         | `app/buy/[caseId]/page.tsx` + `components/buy/buy-offers.tsx`; `app/buy/result/[orderCode]/page.tsx` + `components/buy/buy-result.tsx` |
+| Màn hình         | `app/buy/[caseId]/page.tsx` + `components/buy/buy-offers.tsx`; `app/buy/result/[orderCode]/page.tsx` + `components/store/buy-result.tsx` |
 | Đăng ký webhook  | `scripts/ops/payos-confirm-webhook.mjs`                                                                                                |
 | Link vào màn mua | `components/play/play-entry.tsx` ("Mua vụ án")                                                                                         |
 

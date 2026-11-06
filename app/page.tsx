@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent } from "@/lib/analytics/analytics";
 import { LandingHero } from "@/components/public/landing-hero";
 import { CaseCarouselSection } from "@/components/public/case-carousel-section";
 import { LandingPhoneShowcase } from "@/components/public/landing-phone-showcase";

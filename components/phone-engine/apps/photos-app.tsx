@@ -14,7 +14,7 @@ import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { getActiveCaseId } from "@/lib/cases/case-characters";
 import { getDossierSlot, useCaseDossiers } from "@/lib/hooks/use-case-dossiers";
-import { getStorageItem } from "@/lib/storage";
+import { getStorageItem } from "@/lib/investigation/storage";
 import {
   getUnlockedDossiers,
   getUnlockedPhase,

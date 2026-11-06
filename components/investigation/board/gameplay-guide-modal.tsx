@@ -14,9 +14,9 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import { detectiveAudio } from '@/lib/investigation/investigation-audio'
 import { GAMEPLAY_GUIDE_CONFIG } from '@/lib/guides/gameplay-guide-data'
-import { emitInvestigationEvent } from '@/lib/investigation-events'
+import { emitInvestigationEvent } from '@/lib/investigation/investigation-events'
 
 interface GameplayGuideModalProps {
   isOpen: boolean

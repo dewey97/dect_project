@@ -6,14 +6,14 @@ import {
   X,
   ArrowRight,
 } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { cn } from "@/lib/utils";
 import {
   getStorageItem,
   setStorageItem,
   getStorageJson,
   setStorageJson,
-} from "@/lib/storage";
+} from "@/lib/investigation/storage";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { caseStorageKey } from "@/lib/cases/case-id";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";

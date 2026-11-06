@@ -1,5 +1,5 @@
 import type { CaseCharacterRole, DbCaseCharacter } from "@/lib/types/database";
-import { normalizeForMatch } from "@/lib/text";
+import { normalizeForMatch } from "@/lib/utils/text";
 
 /**
  * Registry nhân vật của vụ án đang chơi (nguồn: bảng `case_characters`).

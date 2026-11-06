@@ -18,7 +18,7 @@ import type {
   RecoveredFile,
 } from "@/lib/types";
 import type { PhoneAppId } from "@/lib/types/phone";
-import { trackPhoneAppUsed, trackEvent } from "@/lib/analytics";
+import { trackPhoneAppUsed, trackEvent } from "@/lib/analytics/analytics";
 
 export type ActivePhoneApp = PhoneAppId | "camera" | null;
 

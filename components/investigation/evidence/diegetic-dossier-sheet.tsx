@@ -19,9 +19,9 @@ import {
   VolumeX,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useRoomSync } from '@/components/investigation/room-sync-context'
-import { detectiveAudio } from '@/lib/investigation-audio'
-import { emitInvestigationEvent } from '@/lib/investigation-events'
+import { useRoomSync } from '@/components/investigation/room/room-sync-context'
+import { detectiveAudio } from '@/lib/investigation/investigation-audio'
+import { emitInvestigationEvent } from '@/lib/investigation/investigation-events'
 import {
   DossierAnnotationLayer,
   type AnnotationTool,

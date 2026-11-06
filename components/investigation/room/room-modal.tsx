@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, X, Copy, Check, LogOut, ArrowRight, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import { DetectiveAvatar } from "@/components/investigation/detective-avatar";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 import { roomInviteUrl } from "@/lib/rooms/client";

@@ -1,6 +1,6 @@
 import React from "react";
 import { Sparkles, ArrowRight } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { CheckpointHintSection } from "@/components/investigation/checkpoint-hint-section";
 import type { Checkpoint } from "@/lib/types/case";
 

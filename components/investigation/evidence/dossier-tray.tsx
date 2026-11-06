@@ -8,7 +8,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { cn, normalizeImageUrl } from "@/lib/utils";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
 import type {
   CombinedItem,
   PDFDocument,

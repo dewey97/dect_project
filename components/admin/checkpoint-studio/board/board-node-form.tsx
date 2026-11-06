@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import type { DbCaseBoardNode, BoardNodeKind, BoardConfig } from "@/lib/types/database";
-import type { PinPoint } from "@/components/investigation/hero-interactive";
+import type { PinPoint } from "@/components/investigation/board/renderer/hero-interactive";
 import type { BoardNodeDraft } from "@/lib/actions/board-actions";
 import {
   X,

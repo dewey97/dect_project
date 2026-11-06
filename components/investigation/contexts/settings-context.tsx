@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
-import { getStorageItem, setStorageItem } from '@/lib/storage'
+import { getStorageItem, setStorageItem } from '@/lib/investigation/storage'
 
 interface SettingsContextType {
   leftSidebarOpen: boolean

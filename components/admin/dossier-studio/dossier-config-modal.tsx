@@ -17,7 +17,7 @@ import type { AvailableDocumentItem } from "@/lib/actions/dossier-config-actions
 import { saveCaseDossier } from "@/lib/actions/dossier-config-actions";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
-import { slugifyVietnamese } from "@/lib/text";
+import { slugifyVietnamese } from "@/lib/utils/text";
 
 interface DossierConfigModalProps {
   isOpen: boolean;

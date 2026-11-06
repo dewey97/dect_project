@@ -6,14 +6,14 @@ import type {
   UserConnection,
   UserPin,
   ZoomState,
-} from "./types";
-import { BOARD_BASE_WIDTH } from "./constants";
+} from "@/components/investigation/board/renderer/types";
+import { BOARD_BASE_WIDTH } from "@/components/investigation/board/renderer/constants";
 import {
   getInnerBoardBounds,
   getViewTransform,
   screenToWorld,
   wrapText,
-} from "./utils";
+} from "@/components/investigation/board/renderer/utils";
 
 export type UnifiedPin = PinPoint & {
   isUser?: boolean;

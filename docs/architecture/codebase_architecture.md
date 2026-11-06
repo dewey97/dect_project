@@ -103,7 +103,7 @@ Modal ──verifyCheckpointOnServer()──► POST /api/checkpoints/verify ─
 
 - Lưu ở `localStorage` qua `caseStorageKey(caseId, key)`. `case_000` giữ key không tiền tố; vụ khác `<slug>::<key>`. Reset: `clearCaseProgress()`.
 - Key chính: `canvas_suspects`, `investigated_suspects`, `solved_followups`, `followup_<nghi phạm>`, `phone_solved`, `indictment_solved`, `indictment_culprit`, `unlocked_dossiers`.
-- Chơi nhóm (hiện trạng): `RoomSyncProvider` (`components/investigation/room-sync-context.tsx`) đồng bộ `RoomInvestigationState`. Kênh `room:<mã>`: presence (key = `deviceId`), broadcast `STATE_PATCH` và `DETECTIVE_PING`, cộng `postgres_changes` trên `game_rooms`. Mã phòng sinh ở client (`room-modal.tsx`). Client tự đọc, tạo và ghi `game_rooms`; chưa có Route Handler, phase, Host hay phòng chờ.
+- Chơi nhóm (hiện trạng): `RoomSyncProvider` (`components/investigation/room/room-sync-context.tsx`) đồng bộ `RoomInvestigationState`. Kênh `room:<mã>`: presence (key = `deviceId`), broadcast `STATE_PATCH` và `DETECTIVE_PING`, cộng `postgres_changes` trên `game_rooms`. Mã phòng sinh ở client (`room-modal.tsx`). Client tự đọc, tạo và ghi `game_rooms`; chưa có Route Handler, phase, Host hay phòng chờ.
 - Chơi nhóm (kế hoạch đã chốt 2026-11-05): QR chung → Tạo/Vào phòng → phòng chờ → intro đồng bộ → điều tra → kết luận. Spec và danh sách chỗ code lệch spec: [`group_play_realtime.md`](group_play_realtime.md) Phần 8.2.
 
 ### 5.1. Mở bộ hồ sơ
@@ -121,7 +121,7 @@ Nguồn: [`lib/progress/case-progress.ts`](../../lib/progress/case-progress.ts).
 ## 6. Bảng điều tra
 
 - `useBoardModel` (`components/investigation/board/canvas/use-board-model.ts`) dùng chung cho Studio và gameplay; `pin-builder.ts` dựng ghim từ `case_board_nodes`, nhân vật và checkpoint.
-- Renderer: `HeroInteractive` (`components/investigation/hero-interactive/`), Canvas 2D.
+- Renderer: `HeroInteractive` (`components/investigation/board/renderer/`), Canvas 2D.
 - Vị trí ghim: `boardgame_pins` (desktop + `mobile_x/mobile_y`).
 - Danh sách nút ẩn `[data-pin-id]` phục vụ bàn phím, trình đọc màn hình và E2E. Không xóa.
 - Modal giải đố: `board/canvas/canvas-modals.tsx`. Chế độ `/evidence/web`: `single` (mặc định) hoặc `canvas` (bàn hồ sơ tự do, `dossier-canvas-board.tsx`).

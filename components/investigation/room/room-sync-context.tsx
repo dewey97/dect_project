@@ -39,8 +39,8 @@ import {
   type RoomApiResult,
   type StoredRoomSession,
 } from "@/lib/rooms/client";
-import { clearStorageScope, setStorageScope } from "@/lib/storage";
-import { RoomToastStack } from "@/components/investigation/room-notifications";
+import { clearStorageScope, setStorageScope } from "@/lib/investigation/storage";
+import { RoomToastStack } from "@/components/investigation/room/room-notifications";
 
 /**
  * Chơi nhóm v3 (spec docs/architecture/group_play_realtime.md).

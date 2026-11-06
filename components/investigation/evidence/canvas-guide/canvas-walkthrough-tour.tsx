@@ -10,7 +10,7 @@ import {
   X,
   Sparkles,
 } from 'lucide-react'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import { detectiveAudio } from '@/lib/investigation/investigation-audio'
 import {
   CANVAS_TOUR_STEPS,
   type CanvasTourStep,

@@ -8,7 +8,7 @@ import {
   getInterrogationCriteria,
   wrapPlayerAnswer,
 } from '@/lib/ai/suspect-interrogation-context'
-import { asString, asStringArray } from '@/lib/text'
+import { asString, asStringArray } from '@/lib/utils/text'
 import type { DbCaseCheckpoint } from '@/lib/types/database'
 
 export const dynamic = 'force-dynamic'

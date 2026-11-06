@@ -1,6 +1,6 @@
 import { isAdminBypassCode } from "./admin-bypass";
 import { getActiveCaseCharacters, isVictimReference } from "./case-characters";
-import { normalizeForMatch } from "@/lib/text";
+import { normalizeForMatch } from "@/lib/utils/text";
 
 export interface SuspectCharacter {
   id: string;

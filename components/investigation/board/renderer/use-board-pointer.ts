@@ -5,14 +5,14 @@ import {
   useRef,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import type {
   CaseData,
   PinPoint,
   Point,
   ZoomState,
-} from "./types";
-import { BOARD_BASE_WIDTH, DRAG_THRESHOLD } from "./constants";
+} from "@/components/investigation/board/renderer/types";
+import { BOARD_BASE_WIDTH, DRAG_THRESHOLD } from "@/components/investigation/board/renderer/constants";
 import {
   clamp,
   distance,
@@ -21,7 +21,7 @@ import {
   getViewTransform,
   isPinHit,
   screenToWorld,
-} from "./utils";
+} from "@/components/investigation/board/renderer/utils";
 
 export interface UseBoardPointerOptions {
   containerRef: React.RefObject<HTMLDivElement | null>;

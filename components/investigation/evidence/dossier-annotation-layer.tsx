@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useRef, useEffect, useState, useCallback } from 'react'
-import { getStorageJson, setStorageJson } from '@/lib/storage'
-import { useRoomSync } from '@/components/investigation/room-sync-context'
-import { recordAnnotationStroke } from '@/lib/annotation-history'
+import { getStorageJson, setStorageJson } from '@/lib/investigation/storage'
+import { useRoomSync } from '@/components/investigation/room/room-sync-context'
+import { recordAnnotationStroke } from '@/lib/investigation/annotation-history'
 import type { AnnotationStroke } from '@/lib/types/room'
 
 export type AnnotationTool = 'cursor' | 'pen' | 'highlighter' | 'eraser'

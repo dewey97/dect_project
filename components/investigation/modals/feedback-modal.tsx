@@ -5,7 +5,7 @@ import { MessageSquare, X, Send, Star, AlertCircle } from "lucide-react";
 import { submitFeedback } from "@/lib/actions/feedback-actions";
 import type { DbFeedback } from "@/lib/types/database";
 import { toast } from "@/components/ui/toast";
-import { useInvestigationEvent } from "@/lib/investigation-events";
+import { useInvestigationEvent } from "@/lib/investigation/investigation-events";
 
 export function FeedbackModal() {
   const [isOpen, setIsOpen] = useState(false);

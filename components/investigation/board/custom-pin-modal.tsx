@@ -14,12 +14,12 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import type { PinPoint } from "@/components/investigation/hero-interactive";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import type { PinPoint } from "@/components/investigation/board/renderer/hero-interactive";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { normalizeImageUrl } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
-import { emitInvestigationEvent } from "@/lib/investigation-events";
+import { emitInvestigationEvent } from "@/lib/investigation/investigation-events";
 import {
   verifyCheckpointOnServer,
   VERIFY_UNAVAILABLE_MESSAGE,

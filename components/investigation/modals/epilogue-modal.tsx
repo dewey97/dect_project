@@ -3,8 +3,8 @@
 import { useState, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
 import { BookOpen, X } from "lucide-react";
-import { TypewriterNarrator } from "./evidence/typewriter-narrator";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { TypewriterNarrator } from "@/components/investigation/evidence/typewriter-narrator";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
 import { cn } from "@/lib/utils";
 

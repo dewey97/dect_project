@@ -3,10 +3,10 @@
 import React, { useState } from 'react'
 import { Users, Copy, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useRoomSync } from '@/components/investigation/room-sync-context'
+import { useRoomSync } from '@/components/investigation/room/room-sync-context'
 import { DetectiveAvatar } from '@/components/investigation/detective-avatar'
-import { RoomBell } from '@/components/investigation/room-notifications'
-import { RoomModal } from '@/components/investigation/room-modal'
+import { RoomBell } from '@/components/investigation/room/room-notifications'
+import { RoomModal } from '@/components/investigation/room/room-modal'
 import { roomInviteUrl } from '@/lib/rooms/client'
 
 interface RoomPresenceBarProps {

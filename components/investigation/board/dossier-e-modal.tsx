@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import { detectiveAudio } from '@/lib/investigation-audio'
+import { detectiveAudio } from '@/lib/investigation/investigation-audio'
 
 interface DossierEModalProps {
   isOpen: boolean

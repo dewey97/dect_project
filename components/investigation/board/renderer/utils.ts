@@ -2,14 +2,14 @@ import {
   BOARD_ASPECT,
   BOARD_BASE_HEIGHT,
   BOARD_BASE_WIDTH,
-} from "./constants";
+} from "@/components/investigation/board/renderer/constants";
 import type {
   BoardBounds,
   PinPoint,
   Point,
   ViewTransform,
   ZoomState,
-} from "./types";
+} from "@/components/investigation/board/renderer/types";
 
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));

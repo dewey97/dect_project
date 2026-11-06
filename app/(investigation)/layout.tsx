@@ -1,9 +1,9 @@
 import { Suspense, type ReactNode } from "react";
 import { ResponsiveLayout } from "@/components/investigation/responsive-layout";
-import { SettingsProvider } from "@/components/investigation/settings-context";
-import { CheckpointsProvider } from "@/components/investigation/checkpoints-context";
-import { RoomSyncProvider } from "@/components/investigation/room-sync-context";
-import { CaseCharactersProvider } from "@/components/investigation/case-characters-context";
+import { SettingsProvider } from "@/components/investigation/contexts/settings-context";
+import { CheckpointsProvider } from "@/components/investigation/contexts/checkpoints-context";
+import { RoomSyncProvider } from "@/components/investigation/room/room-sync-context";
+import { CaseCharactersProvider } from "@/components/investigation/contexts/case-characters-context";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

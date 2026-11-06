@@ -9,7 +9,7 @@ import {
   FileText,
   Maximize2,
 } from "lucide-react";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { useCaseEvidence } from "@/lib/hooks/use-case-evidence";
 import { normalizeImageUrl } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";

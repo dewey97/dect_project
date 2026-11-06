@@ -8,11 +8,11 @@ import {
   Users,
   PenLine,
 } from "lucide-react";
-import type { PinPoint } from "@/components/investigation/hero-interactive";
-import { detectiveAudio } from "@/lib/investigation-audio";
+import type { PinPoint } from "@/components/investigation/board/renderer/hero-interactive";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
 import { cn } from "@/lib/utils";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
-import { RoomModal } from "@/components/investigation/room-modal";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
+import { RoomModal } from "@/components/investigation/room/room-modal";
 import { DetectiveAvatar } from "@/components/investigation/detective-avatar";
 import type { useBoardLayout } from "./use-board-layout";
 import type { useInvestigationState } from "./use-investigation-state";

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useCaseCheckpoints } from "@/lib/hooks/use-case-checkpoints";
-import { useRoomSync } from "@/components/investigation/room-sync-context";
+import { useRoomSync } from "@/components/investigation/room/room-sync-context";
 import {
   getCanonicalSuspectKey,
 } from "@/lib/cases/characters";
@@ -12,15 +12,15 @@ import {
   removeStorageItem,
   getStorageJson,
   setStorageJson,
-} from "@/lib/storage";
+} from "@/lib/investigation/storage";
 import {
   caseStorageKey,
   clearCaseProgress,
   normalizeCaseId,
 } from "@/lib/cases/case-id";
 import { getActiveVictim, isVictimReference } from "@/lib/cases/case-characters";
-import { detectiveAudio } from "@/lib/investigation-audio";
-import { emitInvestigationEvent, useInvestigationEvent } from "@/lib/investigation-events";
+import { detectiveAudio } from "@/lib/investigation/investigation-audio";
+import { emitInvestigationEvent, useInvestigationEvent } from "@/lib/investigation/investigation-events";
 import { isAnswerKind } from "@/lib/checkpoints/kinds";
 import {
   getUnlockedDossiers,

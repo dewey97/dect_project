@@ -19,7 +19,7 @@ import { cn, normalizeImageUrl, normalizeMediaUrl } from "@/lib/utils";
 import { usePhoneData } from "@/lib/hooks/use-phone-data";
 import { getActiveCaseId } from "@/lib/cases/case-characters";
 import { caseStorageKey } from "@/lib/cases/case-id";
-import { getStorageJson, setStorageJson } from "@/lib/storage";
+import { getStorageJson, setStorageJson } from "@/lib/investigation/storage";
 import { EvidenceAnchorItem } from "../core/evidence-anchor-item";
 
 interface MessagesAppProps {

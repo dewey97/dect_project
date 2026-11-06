@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { useInvestigationEvent } from "@/lib/investigation-events";
-import type { Point, Size, ZoomState } from "./types";
+import { useInvestigationEvent } from "@/lib/investigation/investigation-events";
+import type { Point, Size, ZoomState } from "@/components/investigation/board/renderer/types";
 
 interface UseBoardZoomOptions {
   containerSizeRef: React.RefObject<Size>;
