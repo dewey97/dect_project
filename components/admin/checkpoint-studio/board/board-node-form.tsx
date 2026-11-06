@@ -406,6 +406,27 @@ export function BoardNodeForm({
               )}
             </div>
 
+            {/* Kích thước note (Scale) - cùng dòng */}
+            <div className="flex items-center justify-between pt-1 border-t border-white/5">
+              <span className="text-[10px] text-zinc-400">Kích thước note</span>
+              <div className="flex items-center gap-2 flex-1 max-w-[170px]">
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2.5"
+                  step="0.05"
+                  value={scale}
+                  onChange={(e) =>
+                    handleUpdateCfg({ scale: parseFloat(e.target.value) })
+                  }
+                  className="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-amber-400"
+                />
+                <span className="text-amber-400 font-mono text-[10px] w-8 text-right shrink-0">
+                  {scale.toFixed(2)}x
+                </span>
+              </div>
+            </div>
+
             {/* Cỡ chữ trên note - cùng dòng */}
             <div className="flex items-center justify-between pt-1 border-t border-white/5">
               <span className="text-[10px] text-zinc-400">Cỡ chữ</span>
@@ -490,6 +511,27 @@ export function BoardNodeForm({
                     <span className={cn("size-2.5 rounded-full", pc.dotClass)} />
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Kích thước ảnh (Scale) - cùng dòng */}
+            <div className="flex items-center justify-between pt-1 border-t border-white/5">
+              <span className="text-[10px] text-zinc-400">Kích thước ảnh</span>
+              <div className="flex items-center gap-2 flex-1 max-w-[170px]">
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2.5"
+                  step="0.05"
+                  value={scale}
+                  onChange={(e) =>
+                    handleUpdateCfg({ scale: parseFloat(e.target.value) })
+                  }
+                  className="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-purple-400"
+                />
+                <span className="text-purple-400 font-mono text-[10px] w-8 text-right shrink-0">
+                  {scale.toFixed(2)}x
+                </span>
               </div>
             </div>
 
@@ -585,6 +627,27 @@ export function BoardNodeForm({
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Kích thước thẻ (Scale) - cùng dòng */}
+            <div className="flex items-center justify-between pt-1 border-t border-white/5">
+              <span className="text-[10px] text-zinc-400">Kích thước thẻ</span>
+              <div className="flex items-center gap-2 flex-1 max-w-[170px]">
+                <input
+                  type="range"
+                  min="0.5"
+                  max="2.5"
+                  step="0.05"
+                  value={scale}
+                  onChange={(e) =>
+                    handleUpdateCfg({ scale: parseFloat(e.target.value) })
+                  }
+                  className="w-full h-1 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                />
+                <span className="text-emerald-400 font-mono text-[10px] w-8 text-right shrink-0">
+                  {scale.toFixed(2)}x
+                </span>
+              </div>
             </div>
           </div>
         )}

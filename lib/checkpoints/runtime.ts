@@ -138,6 +138,8 @@ export function toRuntimeCheckpoint(row: PublicCheckpointRow): Checkpoint {
     followupOf: asString(row.followup_of) || cfg.followupOf || undefined,
     dependsOn: asStringArray(row.depends_on),
     nodeId: asString(row.node_id) || row.checkpoint_id,
+    boardConfig: row.board_config,
+    board_config: row.board_config,
   };
 }
 

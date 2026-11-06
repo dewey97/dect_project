@@ -2,6 +2,8 @@
  * Case & Investigation domain types
  */
 
+import type { BoardConfig } from "@/lib/types/database";
+
 export type CaseStatus = "locked" | "active" | "solved" | "sealed";
 export type DifficultyRating = 1 | 2 | 3 | 4 | 5;
 
@@ -206,6 +208,8 @@ export interface Checkpoint {
     hasMotive?: boolean;
     hasContradiction?: boolean;
   };
+  boardConfig?: BoardConfig;
+  board_config?: BoardConfig;
 }
 
 /**

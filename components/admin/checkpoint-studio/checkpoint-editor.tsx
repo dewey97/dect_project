@@ -29,7 +29,7 @@ interface CheckpointEditorProps {
   /** Mã tài liệu / vật chứng của vụ, dùng làm gợi ý khi nhập mã. */
   availableDocs?: AvailableDocumentItem[];
   onChange: (patch: Partial<CheckpointStudioDraft>) => void;
-  onSave: () => void;
+  onSave?: () => void;
   onDelete: () => void;
   onPlaytest?: () => void;
   isSaving: boolean;
@@ -159,22 +159,7 @@ export function CheckpointEditor({
             </button>
           )}
 
-          <Button
-            type="button"
-            size="sm"
-            onClick={onSave}
-            disabled={isSaving || !isDirty}
-            className={cn(
-              "h-7 px-2.5 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer",
-              isDirty
-                ? "bg-amber-500 hover:bg-amber-400 text-black shadow-sm"
-                : "bg-white/10 text-zinc-400 hover:bg-white/15 hover:text-zinc-200",
-            )}
-            title="Lưu checkpoint này (Ctrl+S)"
-          >
-            <Save className="size-3.5" />
-            <span>Lưu</span>
-          </Button>
+
 
           {draft.id && !isEpilogue && !isIndictment && (
             <Button

@@ -35,6 +35,7 @@ import {
   buildDependencyEdges,
   wouldCreateCycle,
 } from "@/lib/checkpoints/graph";
+import { isAnswerKind } from "@/lib/checkpoints/kinds";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { CheckpointListSidebar } from "./checkpoint-list-sidebar";
@@ -223,6 +224,17 @@ export function CheckpointStudioClient({
   const [selectedCharacter, setSelectedCharacter] =
     useState<DbCaseCharacter | null>(null);
 
+  // Lưu nháp toàn cục các Checkpoint đã chỉnh sửa (targetKey -> Draft)
+  const [modifiedCheckpoints, setModifiedCheckpoints] = useState<
+    Map<string, CheckpointStudioDraft>
+  >(new Map());
+
+  // Lưu nháp toàn cục các Nhân vật/Nghi phạm đã chỉnh sửa (charKey -> DbCaseCharacter)
+  const [modifiedCharacters, setModifiedCharacters] = useState<
+    Map<string, DbCaseCharacter>
+  >(new Map());
+  const [hasUnsavedCharacter, setHasUnsavedCharacter] = useState(false);
+
   const investigationCheckpoints = useMemo(() => {
     return rows.filter(
       (r) =>
@@ -236,28 +248,31 @@ export function CheckpointStudioClient({
   // Chế độ "Lớp logic" (Logic Overlay)
   const [isLogicLayerActive, setIsLogicLayerActive] = useState(false);
 
-  // Live Checkpoints: kết hợp giữa rows và draft đang chỉnh sửa trong Inspector
-  // để Bảng điều tra (Board Canvas) cập nhật tức thì (0s delay) khi đổi display_mode, note_color, label, v.v.
+  // Live Checkpoints: kết hợp giữa rows, draft đang chỉnh sửa và modifiedCheckpoints
+  // để Bảng điều tra (Board Canvas) cập nhật tức thì (0s delay) khi đổi display_mode, note_color, label, scale, v.v.
   const liveRows = useMemo(() => {
-    if (!draft) return rows;
-    const targetId = selectedId || draft.id || draft.checkpointId;
-    if (!targetId) return rows;
     return rows.map((r) => {
-      const isMatch =
-        r.id === targetId ||
-        r.checkpoint_id === targetId ||
-        (draft.id && r.id === draft.id) ||
-        (draft.checkpointId && r.checkpoint_id === draft.checkpointId);
-      if (isMatch) {
+      const draftFromMap =
+        modifiedCheckpoints.get(r.id) ||
+        modifiedCheckpoints.get(r.checkpoint_id);
+      const isCurrentDraft =
+        draft &&
+        (r.id === draft.id ||
+          r.checkpoint_id === draft.checkpointId ||
+          r.id === selectedId ||
+          r.checkpoint_id === selectedId);
+
+      const effectiveDraft = isCurrentDraft ? draft : draftFromMap;
+      if (effectiveDraft) {
         return {
           ...r,
-          title: draft.title,
-          board_config: draft.boardConfig,
+          title: effectiveDraft.title,
+          board_config: effectiveDraft.boardConfig,
         };
       }
       return r;
     });
-  }, [rows, draft, selectedId]);
+  }, [rows, draft, selectedId, modifiedCheckpoints]);
 
   // Hook Board Editor thống nhất
   const {
@@ -292,15 +307,59 @@ export function CheckpointStudioClient({
       const pin = displayPins.find((p) => p.id === pinId);
       const cpId = pin?.checkpointId;
       const sKey = pin?.subjectKey;
+      const isFollowup =
+        pin?.nodeKind === "followup" ||
+        pinId.includes(":followup:") ||
+        pinId.startsWith("followup-");
 
-      const targetCp = rows.find(
+      // Tìm targetCp theo thứ tự ưu tiên chuẩn xác tuyệt đối:
+      // 1. Khớp theo cpId / pinId trực tiếp
+      let targetCp = rows.find(
         (r) =>
           r.id === pinId ||
           r.checkpoint_id === pinId ||
-          (cpId && (r.id === cpId || r.checkpoint_id === cpId)) ||
-          (sKey && (r.subject_key === sKey || (r.checkpoint_id && r.checkpoint_id.includes(sKey)))) ||
-          (pinId && r.checkpoint_id && pinId.includes(r.checkpoint_id)),
+          (cpId && (r.id === cpId || r.checkpoint_id === cpId)),
       );
+
+      // 2. Nếu là pin Nghi vấn (followup), BẮT BUỘC chỉ tìm checkpoint loại followup
+      if (!targetCp && isFollowup) {
+        targetCp = rows.find((r) => {
+          const isF =
+            r.kind === "followup" ||
+            isAnswerKind(r.kind) ||
+            r.checkpoint_id.toLowerCase().includes("followup") ||
+            Boolean(r.followup_of);
+          if (!isF) return false;
+          if (sKey && r.subject_key && r.subject_key.toLowerCase() === sKey.toLowerCase()) return true;
+          if (sKey && r.checkpoint_id.toLowerCase().includes(sKey.toLowerCase())) return true;
+          return false;
+        });
+      }
+
+      // 3. Nếu là pin Nghi phạm (suspect), tìm checkpoint suspect_interrogation
+      if (!targetCp && (pin?.nodeKind === "suspect" || pinId.includes(":suspect:"))) {
+        targetCp = rows.find((r) => {
+          if (r.kind !== "suspect_interrogation") return false;
+          if (sKey && r.subject_key && r.subject_key.toLowerCase() === sKey.toLowerCase()) return true;
+          if (sKey && r.checkpoint_id.toLowerCase().includes(sKey.toLowerCase())) return true;
+          return false;
+        });
+      }
+
+      // 4. Fallback dò subject_key / substring nếu vẫn chưa tìm thấy
+      if (!targetCp) {
+        targetCp = rows.find(
+          (r) =>
+            (sKey &&
+              (r.subject_key === sKey ||
+                (r.checkpoint_id &&
+                  (r.checkpoint_id.endsWith(`-${sKey}`) ||
+                    r.checkpoint_id.endsWith(`:${sKey}`) ||
+                    r.checkpoint_id.includes(`-${sKey}-`) ||
+                    r.checkpoint_id.includes(`:${sKey}:`))))) ||
+            (pinId && r.checkpoint_id && pinId.includes(r.checkpoint_id)),
+        );
+      }
 
       if (targetCp) {
         const curCfg = ((targetCp.board_config as BoardConfig) || {}) as BoardConfig;
@@ -320,6 +379,14 @@ export function CheckpointStudioClient({
             r.id === targetCp.id ? { ...r, board_config: updatedBoardConfig } : r,
           ),
         );
+
+        const targetKey = targetCp.id || targetCp.checkpoint_id;
+        setModifiedCheckpoints((prev) => {
+          const nextMap = new Map(prev);
+          const existing = nextMap.get(targetKey) || toDraft(targetCp);
+          nextMap.set(targetKey, { ...existing, boardConfig: updatedBoardConfig });
+          return nextMap;
+        });
 
         if (draft && (draft.id === targetCp.id || draft.checkpointId === targetCp.checkpoint_id)) {
           setDraft((d) => (d ? { ...d, boardConfig: updatedBoardConfig } : d));
@@ -392,7 +459,13 @@ export function CheckpointStudioClient({
     [draft, baseline],
   );
 
-  const hasUnsaved = formDirty || boardHasUnsavedChanges;
+  const hasAnyUnsaved =
+    formDirty ||
+    modifiedCheckpoints.size > 0 ||
+    modifiedCharacters.size > 0 ||
+    hasUnsavedCharacter ||
+    boardHasUnsavedChanges;
+  const hasUnsaved = hasAnyUnsaved;
 
   useEffect(() => {
     if (!hasUnsaved) return;
@@ -475,11 +548,30 @@ export function CheckpointStudioClient({
       else setInspectorTab("checkpoints");
       return true;
     }
-    if (!confirmDiscardForm()) return false;
-    const nextDraft = toDraft(row);
+
+    // Tự động lưu nháp checkpoint hiện tại nếu có thay đổi mà KHÔNG hiện popup hỏi
+    if (draft) {
+      const curKey = draft.id || draft.checkpointId;
+      if (curKey && JSON.stringify(draft) !== baseline) {
+        setModifiedCheckpoints((prev) => {
+          const nextMap = new Map(prev);
+          nextMap.set(curKey, draft);
+          return nextMap;
+        });
+      }
+    }
+
+    // Nạp draft: nếu checkpoint mục tiêu đã có bản nháp đang sửa dở thì lấy bản nháp đó
+    const targetKey = row.id || row.checkpoint_id;
+    const existingDraft =
+      modifiedCheckpoints.get(targetKey) ||
+      modifiedCheckpoints.get(row.id) ||
+      modifiedCheckpoints.get(row.checkpoint_id);
+    const nextDraft = existingDraft ? { ...existingDraft } : toDraft(row);
+
     setSelectedId(row.id);
     setDraft(nextDraft);
-    setBaseline(JSON.stringify(nextDraft));
+    setBaseline(JSON.stringify(toDraft(row)));
     if (isSpecialIndictment) setInspectorTab("indictment");
     else if (isSpecialEpilogue) setInspectorTab("epilogue");
     else setInspectorTab("checkpoints");
@@ -490,14 +582,32 @@ export function CheckpointStudioClient({
     setSelectedCharacter(null);
     setSelectedNodeId(null);
     setInspectorTab(kind);
+
+    if (draft) {
+      const curKey = draft.id || draft.checkpointId;
+      if (curKey && JSON.stringify(draft) !== baseline) {
+        setModifiedCheckpoints((prev) => {
+          const nextMap = new Map(prev);
+          nextMap.set(curKey, draft);
+          return nextMap;
+        });
+      }
+    }
+
     const existing = rows.find(
       (r) => r.kind === kind || r.checkpoint_id.includes(kind),
     );
     if (existing) {
-      const nextDraft = toDraft(existing);
+      const targetKey = existing.id || existing.checkpoint_id;
+      const existingDraft =
+        modifiedCheckpoints.get(targetKey) ||
+        modifiedCheckpoints.get(existing.id) ||
+        modifiedCheckpoints.get(existing.checkpoint_id);
+      const nextDraft = existingDraft ? { ...existingDraft } : toDraft(existing);
+
       setSelectedId(existing.id);
       setDraft(nextDraft);
-      setBaseline(JSON.stringify(nextDraft));
+      setBaseline(JSON.stringify(toDraft(existing)));
     } else {
       const defaultId = `${caseId}-checkpoint-${kind}`;
       const newDraft: CheckpointStudioDraft = {
@@ -538,7 +648,16 @@ export function CheckpointStudioClient({
   };
 
   const createRow = () => {
-    if (!confirmDiscardForm()) return;
+    if (draft) {
+      const curKey = draft.id || draft.checkpointId;
+      if (curKey && JSON.stringify(draft) !== baseline) {
+        setModifiedCheckpoints((prev) => {
+          const nextMap = new Map(prev);
+          nextMap.set(curKey, draft);
+          return nextMap;
+        });
+      }
+    }
     const nextDraft = createEmptyDraft(caseId);
     setSelectedId(null);
     setSelectedNodeId(null);
@@ -563,6 +682,15 @@ export function CheckpointStudioClient({
     setDraft((current) => {
       if (!current) return current;
       const next = { ...current, ...patch };
+
+      const key = current.id || current.checkpointId;
+      if (key) {
+        setModifiedCheckpoints((prev) => {
+          const nextMap = new Map(prev);
+          nextMap.set(key, next);
+          return nextMap;
+        });
+      }
 
       // Cập nhật live vào rows ngay lập tức để Canvas phản ánh theo thời gian thực (0s độ trễ)
       setRows((prevRows) => {
@@ -720,13 +848,21 @@ export function CheckpointStudioClient({
     }
   };
 
-  const [hasUnsavedCharacter, setHasUnsavedCharacter] = useState(false);
   const activeCharacterDraftRef = useRef<DbCaseCharacter | null>(null);
   const characterDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCharacterLiveDraftChange = (updatedChar: DbCaseCharacter) => {
     activeCharacterDraftRef.current = updatedChar;
     setHasUnsavedCharacter(true);
+
+    const charKey = updatedChar.id || updatedChar.key;
+    if (charKey) {
+      setModifiedCharacters((prev) => {
+        const nextMap = new Map(prev);
+        nextMap.set(charKey, updatedChar);
+        return nextMap;
+      });
+    }
 
     // Debounce cập nhật lên state cha để gõ phím không bị lag giật toàn bộ canvas/pins
     if (characterDebounceTimerRef.current) {
@@ -756,63 +892,96 @@ export function CheckpointStudioClient({
     try {
       const promises: Promise<unknown>[] = [];
 
-      // 1. Lưu Checkpoint nếu có thay đổi
-      if (formDirty && draft) {
-        promises.push(handleSave());
+      // 1. Thu thập tất cả Checkpoint cần lưu:
+      // Bao gồm tất cả bản ghi trong modifiedCheckpoints + draft hiện tại nếu dirty
+      const checkpointsToSaveMap = new Map<string, CheckpointStudioDraft>();
+      modifiedCheckpoints.forEach((val, k) => {
+        checkpointsToSaveMap.set(k, val);
+      });
+      if (draft) {
+        const curKey = draft.id || draft.checkpointId;
+        if (curKey && JSON.stringify(draft) !== baseline) {
+          checkpointsToSaveMap.set(curKey, draft);
+        }
       }
 
-      // 2. Lưu Nhân vật nếu có thay đổi hoặc đang chỉnh sửa
-      const charToSave =
-        activeCharacterDraftRef.current ||
-        (inspectorTab === "characters" ? selectedCharacter : null);
+      for (const cpDraft of Array.from(checkpointsToSaveMap.values())) {
+        const effectiveTitle =
+          cpDraft.title.trim() ||
+          (cpDraft.kind === "epilogue"
+            ? "Hậu án"
+            : cpDraft.kind === "indictment" || cpDraft.type === "indictment"
+              ? "Kết luận"
+              : "");
+        const toSave = cpDraft.title.trim()
+          ? cpDraft
+          : { ...cpDraft, title: effectiveTitle };
 
-      if (
-        charToSave &&
-        (hasUnsavedCharacter || charToSave.id?.startsWith("temp_"))
-      ) {
-        if (!charToSave.name?.trim()) {
-          toast.error("Tên nhân vật không được để trống");
-          setIsUnifiedSaving(false);
-          return;
-        }
-        const { saveCharacter } =
-          await import("@/lib/actions/character-actions");
         promises.push(
-          saveCharacter({
-            id: charToSave.id?.startsWith("temp_") ? undefined : charToSave.id,
-            caseId,
-            key: charToSave.key,
-            name: charToSave.name.trim(),
-            aliases: charToSave.aliases || [],
-            role: charToSave.role,
-            description: charToSave.description || "",
-            avatarCode: charToSave.avatar_code || `avatar_${charToSave.key}`,
-            avatarUrl: charToSave.avatar_url || null,
-            avatarAssetPath: charToSave.avatar_asset_path || null,
-            phones: charToSave.phones || [],
-            slotIndex: charToSave.slot_index ?? characters.length,
-            device: charToSave.device || null,
-          }).then((res) => {
-            if (!res.success) {
-              throw new Error(res.error || "Lỗi khi lưu nhân vật");
-            }
-            const realChar = res.data;
-            setCharacters((prev) => {
-              const filtered = prev.filter(
-                (c) => c.id !== charToSave.id && c.key !== charToSave.key,
+          saveCheckpoint(toSave).then((res) => {
+            if (!res.success) throw new Error(res.error);
+            const saved = res.data;
+            setRows((current) => {
+              const exists = current.some((r) => r.id === saved.id);
+              const next = exists
+                ? current.map((r) => (r.id === saved.id ? saved : r))
+                : [...current, saved];
+              return next.sort((a, b) =>
+                a.checkpoint_id.localeCompare(b.checkpoint_id),
               );
-              return [...filtered, realChar];
             });
-            setSelectedCharacter(realChar);
-            activeCharacterDraftRef.current = realChar;
-            setHasUnsavedCharacter(false);
           }),
         );
       }
 
+      // 2. Thu thập tất cả Nhân vật/Nghi phạm cần lưu:
+      const charactersToSaveMap = new Map<string, DbCaseCharacter>();
+      modifiedCharacters.forEach((val, k) => {
+        charactersToSaveMap.set(k, val);
+      });
+      const activeChar =
+        activeCharacterDraftRef.current ||
+        (inspectorTab === "characters" ? selectedCharacter : null);
+      if (activeChar && (hasUnsavedCharacter || activeChar.id?.startsWith("temp_"))) {
+        const key = activeChar.id || activeChar.key;
+        charactersToSaveMap.set(key, activeChar);
+      }
+
+      const charactersList = Array.from(charactersToSaveMap.values());
+      if (charactersList.length > 0) {
+        const { saveCharacter } = await import("@/lib/actions/character-actions");
+        for (const charToSave of charactersList) {
+          if (!charToSave.name?.trim()) continue;
+          promises.push(
+            saveCharacter({
+              id: charToSave.id?.startsWith("temp_") ? undefined : charToSave.id,
+              caseId,
+              key: charToSave.key,
+              name: charToSave.name.trim(),
+              aliases: charToSave.aliases || [],
+              role: charToSave.role,
+              description: charToSave.description || "",
+              avatarCode: charToSave.avatar_code || ("avatar_" + charToSave.key),
+              avatarUrl: charToSave.avatar_url || null,
+              avatarAssetPath: charToSave.avatar_asset_path || null,
+              phones: charToSave.phones || [],
+              slotIndex: charToSave.slot_index ?? characters.length,
+              device: charToSave.device || null,
+            }).then((res) => {
+              if (!res.success) throw new Error(res.error || "Lỗi khi lưu nhân vật");
+              const realChar = res.data;
+              setCharacters((prev) =>
+                prev.map((c) =>
+                  c.id === charToSave.id || c.key === charToSave.key ? realChar : c,
+                ),
+              );
+            }),
+          );
+        }
+      }
+
       // 2b. Lưu Thẩm tra nghi phạm gắn liền nếu có thay đổi
       if (activeInterrogationDraftRef.current) {
-        // Thẩm tra của nghi phạm mới mang id tạm "temp_…" (dòng hiển thị tạm trên Flow): lưu như bản ghi mới.
         const interrogation = activeInterrogationDraftRef.current;
         const toSave = interrogation.id?.startsWith("temp_")
           ? { ...interrogation, id: "" }
@@ -837,13 +1006,21 @@ export function CheckpointStudioClient({
       promises.push(handleSaveBoardLayout());
 
       await Promise.all(promises);
-      toast.success("Đã lưu toàn bộ thay đổi thành công!");
-      // baseline is updated by handleSave()
+
+      // Xóa sạch trạng thái dirty toàn cục
+      setModifiedCheckpoints(new Map());
+      setModifiedCharacters(new Map());
       setHasUnsavedCharacter(false);
+      activeCharacterDraftRef.current = null;
+      if (draft) {
+        setBaseline(JSON.stringify(draft));
+      }
+
+      toast.success("Đã lưu toàn bộ thay đổi thành công!");
       await refreshBoardModel();
     } catch (err) {
       console.error(err);
-      toast.error("Lỗi khi lưu dữ liệu");
+      toast.error(err instanceof Error ? err.message : "Lỗi khi lưu dữ liệu");
     } finally {
       setIsUnifiedSaving(false);
     }
@@ -1233,6 +1410,30 @@ export function CheckpointStudioClient({
       }
     }
 
+    // 1.1. Node Nghi vấn mở rộng (followup) - đảm bảo chọn đúng checkpoint followup
+    if (
+      pin.nodeKind === "followup" ||
+      pin.id.includes(":followup:") ||
+      pin.id.startsWith("followup-")
+    ) {
+      const sKey = pin.subjectKey;
+      const cp = rows.find(
+        (r) =>
+          (r.kind === "followup" ||
+            isAnswerKind(r.kind) ||
+            r.checkpoint_id.toLowerCase().includes("followup") ||
+            Boolean(r.followup_of)) &&
+          ((sKey && r.subject_key?.toLowerCase() === sKey.toLowerCase()) ||
+            (sKey && r.checkpoint_id.toLowerCase().includes(sKey.toLowerCase()))),
+      );
+      if (cp) {
+        setInspectorTab("checkpoints");
+        setSelectedCharacter(null);
+        selectRow(cp);
+        return;
+      }
+    }
+
     // 2. Tìm theo nodeKind đặc thù của checkpoint
     if (pin.nodeKind === "phone_lookup") {
       const cp = rows.find((r) => r.kind === "phone_lookup");
@@ -1279,13 +1480,22 @@ export function CheckpointStudioClient({
     }
 
     if (pin.nodeKind === "followup" || pin.id.includes(":followup:")) {
-      const cp = rows.find(
-        (r) =>
-          (r.kind === "followup" || r.checkpoint_id?.includes("followup")) &&
-          (!pin.subjectKey ||
-            r.subject_key === pin.subjectKey ||
-            r.checkpoint_id?.includes(pin.subjectKey)),
-      );
+      const sKey = pin.subjectKey?.toLowerCase().trim();
+      const cp = rows.find((r) => {
+        const isFollowupRow =
+          r.kind === "followup" ||
+          r.checkpoint_id?.toLowerCase().includes("followup");
+        if (!isFollowupRow) return false;
+        if (!sKey) return true;
+        if (r.subject_key?.toLowerCase().trim() === sKey) return true;
+        const cId = (r.checkpoint_id || "").toLowerCase();
+        return (
+          cId.endsWith(`-${sKey}`) ||
+          cId.endsWith(`:${sKey}`) ||
+          cId.includes(`:${sKey}:`) ||
+          cId.includes(`-${sKey}-`)
+        );
+      });
       if (cp) {
         setInspectorTab("checkpoints");
         setSelectedCharacter(null);
@@ -1724,17 +1934,25 @@ export function CheckpointStudioClient({
 
           <div className="h-4 w-px bg-white/10 mx-0.5" />
 
-          {/* Nút LƯU DUY NHẤT (Checkpoint, Nhân vật, Bố cục Bảng) */}
+          {/* Nút LƯU DUY NHẤT TOÀN STUDIO (Checkpoint, Nhân vật, Bố cục Bảng) */}
           <Button
             type="button"
             size="sm"
             onClick={handleSaveAllUnified}
             disabled={isBusy || isUnifiedSaving}
-            className="gap-1.5 text-xs bg-amber-500 text-black font-bold hover:bg-amber-400 disabled:opacity-50 h-7 px-3.5 shadow-md cursor-pointer"
+            className={cn(
+              "gap-1.5 text-xs font-bold h-7 px-3.5 shadow-md cursor-pointer transition-all",
+              hasAnyUnsaved
+                ? "bg-amber-500 text-black hover:bg-amber-400 ring-2 ring-amber-400/50"
+                : "bg-white/10 text-zinc-300 hover:bg-white/20",
+            )}
             title="Lưu tất cả thay đổi (Ctrl+S)"
           >
             <Save className="size-3.5" />
-            <span>{isUnifiedSaving ? "Đang lưu..." : "LƯU"}</span>
+            <span>{isUnifiedSaving ? "Đang lưu..." : "LƯU TẤT CẢ"}</span>
+            {hasAnyUnsaved && (
+              <span className="size-1.5 rounded-full bg-amber-950 inline-block animate-ping" />
+            )}
           </Button>
 
           {/* Nút Linter Vụ Án */}

@@ -75,6 +75,18 @@ export function useBoardEditor(caseId: string, options?: { isMobile?: boolean; c
                 ...modelPin,
                 x: existing.x,
                 y: existing.y,
+                rotation:
+                  typeof existing.rotation === "number"
+                    ? existing.rotation
+                    : modelPin.rotation,
+                scale:
+                  typeof existing.scale === "number" && existing.scale > 0
+                    ? existing.scale
+                    : modelPin.scale,
+                zIndex:
+                  typeof existing.zIndex === "number"
+                    ? existing.zIndex
+                    : modelPin.zIndex,
               };
             }
             return existing;
