@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { noStoreJson } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkRateLimit, getClientIp } from "@/lib/security/rate-limiter";
@@ -11,16 +11,9 @@ import { isPlayGatingEnabled } from "@/lib/payments/ownership";
 
 export const dynamic = "force-dynamic";
 
-function json(body: Record<string, unknown>, status = 200) {
-  // `gating` tells /activate whether it may fall back to the old open entry.
-  return NextResponse.json(
-    { ...body, gating: isPlayGatingEnabled() },
-    {
-      status,
-      headers: { "Cache-Control": "no-store" },
-    },
-  );
-}
+// `gating` tells /activate whether it may fall back to the old open entry.
+const json = (body: Record<string, unknown>, status = 200) =>
+  noStoreJson({ ...body, gating: isPlayGatingEnabled() }, status);
 
 /**
  * Redeems the code printed in a box and ties the case to the account.

@@ -17,6 +17,7 @@ import { AutoGrowTextarea } from "@/components/ui/auto-grow-textarea";
 import { normalizeImageUrl } from "@/lib/utils";
 import { SuspectInterrogationConfigForm } from "./sections/suspect-interrogation-config-form";
 import { toDraft, createEmptyDraft, type CheckpointStudioDraft } from "@/lib/types/checkpoint-studio";
+import { slugifyVietnamese } from "@/lib/utils/text";
 
 export interface CharacterEditorProps {
   caseId: string;
@@ -79,13 +80,7 @@ export function CharacterEditor({
     const effectiveKey =
       key ||
       character?.key ||
-      cleanName
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/[^a-z0-9_]/g, "_")
-        .replace(/^_+|_+$/g, "") ||
+      slugifyVietnamese(cleanName) ||
       ("char_" + (character?.id || Date.now().toString(36)));
 
     const updatedChar: DbCaseCharacter = {
@@ -163,14 +158,7 @@ export function CharacterEditor({
       alert("Vui lòng nhập họ và tên nhân vật!");
       return;
     }
-    const slugFromName = cleanName
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d")
-      .replace(/[^a-z0-9_]/g, "_")
-      .replace(/^_+|_+$/g, "")
-      .slice(0, 32);
+    const slugFromName = slugifyVietnamese(cleanName).slice(0, 32);
 
     const isTemp = !character?.id || character.id.startsWith("temp_");
     const effectiveKey =

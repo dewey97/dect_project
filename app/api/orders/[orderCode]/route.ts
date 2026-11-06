@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { noStoreJson } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -8,13 +8,6 @@ import {
 } from "@/lib/payments/payos";
 
 export const dynamic = "force-dynamic";
-
-function json(body: Record<string, unknown>, status = 200) {
-  return NextResponse.json(body, {
-    status,
-    headers: { "Cache-Control": "no-store" },
-  });
-}
 
 /**
  * Status of one order, for its owner. While the order is pending, asks PayOS
@@ -27,14 +20,14 @@ export async function GET(
   const { orderCode: raw } = await params;
   const orderCode = Number(raw);
   if (!/^\d{1,15}$/.test(raw) || !Number.isSafeInteger(orderCode)) {
-    return json({ error: "bad_request" }, 400);
+    return noStoreJson({ error: "bad_request" }, 400);
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return json({ error: "not_logged_in" }, 401);
+  if (!user) return noStoreJson({ error: "not_logged_in" }, 401);
 
   const admin = createAdminClient();
   const { data: order } = await admin
@@ -45,7 +38,7 @@ export async function GET(
     .eq("order_code", orderCode)
     .maybeSingle();
   if (!order || order.user_id !== user.id) {
-    return json({ error: "not_found" }, 404);
+    return noStoreJson({ error: "not_found" }, 404);
   }
 
   let status: string = order.status;
@@ -84,7 +77,7 @@ export async function GET(
     }
   }
 
-  return json({
+  return noStoreJson({
     orderCode,
     caseId: order.case_id,
     sku: order.sku,

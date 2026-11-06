@@ -20,7 +20,7 @@ import {
   VERIFY_UNAVAILABLE_MESSAGE,
 } from "@/lib/checkpoints/client-verify";
 import { useOptionalCaseCharacters } from "@/components/investigation/contexts/case-characters-context";
-import { removeDiacritics } from "@/lib/cases/characters";
+import { normalizeForMatch } from "@/lib/utils/text";
 
 interface FollowupQuestionModalProps {
   caseId: string;
@@ -94,9 +94,9 @@ export function FollowupQuestionModal({
         ? checkpoints.find(
             (cp) =>
               isAnswerKind(cp.kind) &&
-              removeDiacritics(cp.title || "")
+              normalizeForMatch(cp.title || "")
                 .toLowerCase()
-                .includes(removeDiacritics(matchedCharacter.name).toLowerCase()),
+                .includes(normalizeForMatch(matchedCharacter.name).toLowerCase()),
           )
         : undefined) ||
       checkpoints.find(

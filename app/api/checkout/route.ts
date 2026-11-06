@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { noStoreJson } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isValidCaseId, normalizeCaseId } from "@/lib/cases/case-id";
@@ -16,13 +16,6 @@ export const dynamic = "force-dynamic";
 const SKU_PATTERN = /^[a-z0-9_-]{1,32}$/;
 const LINK_LIFETIME_SECONDS = 15 * 60;
 
-function json(body: Record<string, unknown>, status = 200) {
-  return NextResponse.json(body, {
-    status,
-    headers: { "Cache-Control": "no-store" },
-  });
-}
-
 /**
  * Creates an order and a PayOS payment link. Body: { caseId, sku }.
  * The price comes from case_offers (order_create RPC), never from the client.
@@ -34,25 +27,25 @@ export async function POST(req: Request) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return json({ error: "not_logged_in" }, 401);
+  if (!user) return noStoreJson({ error: "not_logged_in" }, 401);
 
   const rate = checkRateLimit(`checkout:${user.id}`, {
     limit: 10,
     windowMs: 60_000,
   });
-  if (!rate.allowed) return json({ error: "rate_limited" }, 429);
+  if (!rate.allowed) return noStoreJson({ error: "rate_limited" }, 429);
 
   const body = await req.json().catch(() => null);
   const rawCaseId = typeof body?.caseId === "string" ? body.caseId : "";
   const sku = typeof body?.sku === "string" ? body.sku.trim() : "";
   if (!isValidCaseId(rawCaseId) || !SKU_PATTERN.test(sku)) {
-    return json({ error: "bad_request" }, 400);
+    return noStoreJson({ error: "bad_request" }, 400);
   }
   const caseId = normalizeCaseId(rawCaseId);
 
   const config = getPayosConfig();
   const baseUrl = getAppBaseUrl();
-  if (!config || !baseUrl) return json({ error: "payments_disabled" }, 503);
+  if (!config || !baseUrl) return noStoreJson({ error: "payments_disabled" }, 503);
 
   const admin = createAdminClient();
   const { data: order, error } = await admin.rpc("order_create", {
@@ -62,10 +55,10 @@ export async function POST(req: Request) {
   });
   if (error || !order) {
     if (error?.message?.includes("OFFER_NOT_FOUND")) {
-      return json({ error: "offer_not_found" }, 404);
+      return noStoreJson({ error: "offer_not_found" }, 404);
     }
     console.error("[CHECKOUT] order_create failed:", error?.message);
-    return json({ error: "server_error" }, 500);
+    return noStoreJson({ error: "server_error" }, 500);
   }
 
   const orderCode = Number(order.order_code);
@@ -92,7 +85,7 @@ export async function POST(req: Request) {
       })
       .eq("id", order.id);
 
-    return json({ orderCode, checkoutUrl: link.checkoutUrl });
+    return noStoreJson({ orderCode, checkoutUrl: link.checkoutUrl });
   } catch (err) {
     const message = err instanceof PayosError ? err.message : String(err);
     console.error(
@@ -103,6 +96,6 @@ export async function POST(req: Request) {
       .from("orders")
       .update({ status: "failed", updated_at: new Date().toISOString() })
       .eq("id", order.id);
-    return json({ error: "provider_error" }, 502);
+    return noStoreJson({ error: "provider_error" }, 502);
   }
 }

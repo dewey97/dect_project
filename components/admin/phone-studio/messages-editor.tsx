@@ -19,6 +19,7 @@ import {
   Paperclip,
 } from "lucide-react";
 import type { DbPhoneMessage } from "@/lib/types/database";
+import { slugifyVietnamese } from "@/lib/utils/text";
 import {
   savePhoneMessagesBatch,
   deletePhoneThread,
@@ -280,12 +281,7 @@ export function MessagesEditor({
       return;
     }
     const cleanName = newThreadName.trim();
-    const generatedKey = `thread_${cleanName
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "")
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "")}`;
+    const generatedKey = `thread_${slugifyVietnamese(cleanName)}`;
 
     // Switch view to new thread draft with 1 empty row
     setActiveThreadKey(generatedKey);

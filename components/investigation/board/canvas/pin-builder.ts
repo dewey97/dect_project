@@ -5,10 +5,8 @@ import type {
   CaseConnection,
   PinPoint,
 } from "@/components/investigation/board/renderer/hero-interactive";
-import {
-  getCanonicalSuspectKey,
-  removeDiacritics,
-} from "@/lib/cases/characters";
+import { getCanonicalSuspectKey } from "@/lib/cases/characters";
+import { normalizeForMatch } from "@/lib/utils/text";
 import { normalizeImageUrl } from "@/lib/utils";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 import type { DbCaseBoardNode, DbCaseCharacter } from "@/lib/types/database";
@@ -409,7 +407,7 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       (c) =>
         c.key === canonicalId ||
         (s.id && c.key === s.id.toLowerCase()) ||
-        removeDiacritics(c.name || "") === removeDiacritics(s.name || ""),
+        normalizeForMatch(c.name || "") === normalizeForMatch(s.name || ""),
     );
 
     return {
@@ -458,8 +456,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       }
 
       // 3. Fallback chỉ khi hoàn toàn không có subject_key: khớp theo tên đầy đủ không dấu hoặc từ nguyên vẹn
-      const titleClean = removeDiacritics(cp.title || "").toLowerCase();
-      const sNameClean = removeDiacritics(s.name || "").toLowerCase();
+      const titleClean = normalizeForMatch(cp.title || "").toLowerCase();
+      const sNameClean = normalizeForMatch(s.name || "").toLowerCase();
       if (sNameClean && titleClean.includes(sNameClean)) return true;
 
       const titleWords = titleClean.split(/[^a-z0-9_]+/);
@@ -600,8 +598,8 @@ export function buildCustomPins(input: PinBuilderInput): PinPoint[] {
       }
 
       // 4. Khớp qua tên đầy đủ hoặc từ nguyên vẹn trong title (tránh substring như "thanh" chứa "ha")
-      const titleClean = removeDiacritics(cp.title || "").toLowerCase();
-      const sNameClean = removeDiacritics(s.name || "").toLowerCase();
+      const titleClean = normalizeForMatch(cp.title || "").toLowerCase();
+      const sNameClean = normalizeForMatch(s.name || "").toLowerCase();
       if (sNameClean && titleClean.includes(sNameClean)) return true;
 
       const titleWords = titleClean.split(/[^a-z0-9_]+/);

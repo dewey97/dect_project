@@ -30,9 +30,6 @@ export function getValidCaseCharacters(): SuspectCharacter[] {
     }));
 }
 
-export function removeDiacritics(str: string): string {
-  return normalizeForMatch(str);
-}
 
 export function findValidCaseCharacter(
   input: string,
@@ -43,7 +40,7 @@ export function findValidCaseCharacter(
   if (isAdminBypassCode(raw)) {
     return getValidCaseCharacters()[0] ?? null;
   }
-  const cleanRaw = removeDiacritics(raw);
+  const cleanRaw = normalizeForMatch(raw);
   const rawWords = cleanRaw.split(/\s+/).filter(Boolean);
   const pool =
     Array.isArray(extraCharacters) && extraCharacters.length > 0
@@ -55,10 +52,10 @@ export function findValidCaseCharacter(
     if (c.id === raw || c.id === cleanRaw) return c;
     if (
       c.canonicalName.toLowerCase() === raw ||
-      removeDiacritics(c.canonicalName) === cleanRaw
+      normalizeForMatch(c.canonicalName) === cleanRaw
     )
       return c;
-    if (c.aliases?.some((a) => a === raw || removeDiacritics(a) === cleanRaw))
+    if (c.aliases?.some((a) => a === raw || normalizeForMatch(a) === cleanRaw))
       return c;
   }
 
@@ -66,7 +63,7 @@ export function findValidCaseCharacter(
   for (const c of pool) {
     if (!c.aliases) continue;
     for (const alias of c.aliases) {
-      const cleanAlias = removeDiacritics(alias);
+      const cleanAlias = normalizeForMatch(alias);
       const aliasWords = cleanAlias.split(/\s+/).filter(Boolean);
       if (aliasWords.length === 1) {
         if (rawWords.includes(aliasWords[0])) {
@@ -119,7 +116,7 @@ export function buildDynamicSuspectCharacters(
           .replace(/\s*\([^)]*\)/g, "")
           .trim() || id;
 
-      const noAccents = removeDiacritics(cleanName);
+      const noAccents = normalizeForMatch(cleanName);
       const words = cleanName.split(/\s+/).filter(Boolean);
       const wordsNoAccents = noAccents.split(/\s+/).filter(Boolean);
 
@@ -138,7 +135,7 @@ export function buildDynamicSuspectCharacters(
           const lastTwo =
             `${words[words.length - 2]} ${words[words.length - 1]}`.toLowerCase();
           aliases.add(lastTwo);
-          aliases.add(removeDiacritics(lastTwo));
+          aliases.add(normalizeForMatch(lastTwo));
         }
       }
 
