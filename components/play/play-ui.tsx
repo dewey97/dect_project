@@ -5,10 +5,24 @@ import { cn } from "@/lib/utils";
 
 /** Khối giao diện dùng chung cho màn vào game và phòng chờ (phong cách hồ sơ trinh thám). */
 
-export function PlayShell({ children }: { children: ReactNode }) {
+export function PlayShell({
+  children,
+  wide = false,
+  className,
+}: {
+  children: ReactNode;
+  wide?: boolean;
+  className?: string;
+}) {
   return (
     <div className="h-full w-full overflow-y-auto bg-[#0d0c0a] text-zinc-100">
-      <div className="mx-auto flex min-h-full w-full max-w-[30rem] flex-col gap-5 px-4 py-6 sm:py-10">
+      <div
+        className={cn(
+          "mx-auto flex min-h-full w-full flex-col gap-5 px-4 py-6 sm:py-8",
+          wide ? "max-w-6xl" : "max-w-[30rem]",
+          className,
+        )}
+      >
         {children}
       </div>
     </div>

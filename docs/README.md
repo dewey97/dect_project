@@ -28,7 +28,7 @@ docs/
 | [`architecture/codebase_architecture.md`](architecture/codebase_architecture.md) | Cây thư mục, route API, luồng dữ liệu, mô hình checkpoint, chấm điểm server, tiến độ và mở bộ hồ sơ, bảng điều tra                              |
 | [`architecture/technical_guide.md`](architecture/technical_guide.md)             | Setup, stack Next.js 16, quy chuẩn code                                                                                                         |
 | [`architecture/database_schema.md`](architecture/database_schema.md)             | Bảng Supabase, RLS, migration                                                                                                                   |
-| [`architecture/group_play_realtime.md`](architecture/group_play_realtime.md)     | Chơi nhóm: luồng QR chung → phòng chờ → phase, quyền Host, lưu phòng (spec v3, chưa implement)                                                                                                                 |
+| [`architecture/group_play_realtime.md`](architecture/group_play_realtime.md)     | Chơi nhóm: luồng QR chung → phòng chờ → phase, quyền Host, lưu phòng (spec v3, chưa implement)                                                  |
 | [`architecture/phone_engine.md`](architecture/phone_engine.md)                   | Điện thoại giả lập dùng chung mọi vụ                                                                                                            |
 | [`architecture/vector_map_engine.md`](architecture/vector_map_engine.md)         | Bản đồ vector thế giới và Map Studio                                                                                                            |
 | [`studio/authoring_guide.md`](studio/authoring_guide.md)                         | Chức năng, trường, luồng dựng vụ mới; luật mở bộ hồ sơ                                                                                          |
@@ -56,6 +56,7 @@ docs/
 | [`product/business_model.md`](product/business_model.md)                                                       | Mô hình kinh doanh                                 |
 | [`product/financial_founder_model.md`](product/financial_founder_model.md)                                     | Chi phí, hòa vốn, founder                          |
 | [`product/rating_leaderboard.md`](product/rating_leaderboard.md)                                               | Điểm thám tử, xếp hạng (chưa triển khai)           |
+| [`product/online_market_research.md`](product/online_market_research.md)                                       | Nghiên cứu thị trường bản online, đối thủ, rào cản |
 
 ### Tư liệu gốc vụ án (`cases/<case_id>/`)
 

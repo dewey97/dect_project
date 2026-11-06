@@ -89,7 +89,13 @@ export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
         />
       );
   } else if (room.phase === "lobby" || !me.enteredAt) {
-    body = <PlayLobby caseTitle={info.title} />;
+    body = (
+      <PlayLobby
+        caseId={info.caseId}
+        caseTitle={info.title}
+        caseSynopsis={info.synopsis}
+      />
+    );
   } else if (room.phase === "intro_scene" || room.phase === "intro_handover") {
     body = <PlayIntro info={info} />;
   } else {
@@ -100,5 +106,6 @@ export function PlayRoomClient({ info }: { info: PlayCaseInfo }) {
     );
   }
 
-  return <PlayShell>{body}</PlayShell>;
+  const isLobby = Boolean(room && (room.phase === "lobby" || !me?.enteredAt));
+  return <PlayShell wide={isLobby}>{body}</PlayShell>;
 }
