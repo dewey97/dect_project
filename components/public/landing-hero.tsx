@@ -105,8 +105,14 @@ export function LandingHero() {
             <h1 className="text-balance text-2xl sm:text-3xl lg:text-4xl font-black leading-tight tracking-tight uppercase">
               Những vụ án chưa có lời giải...
             </h1>
+
+            {/* Subtitle value prop */}
+            <p className="text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
+              Trải nghiệm hồ sơ trinh thám vật lý cao cấp kết hợp bàn điều tra trực tuyến.
+            </p>
+
             {/* Animated Rotating Detective Quote */}
-            <div className="w-full min-h-[68px] sm:min-h-[68px] flex items-center">
+            <div className="w-full min-h-[52px] sm:min-h-[52px] flex items-center">
               <p
                 className={cn(
                   "text-pretty text-xs lg:text-sm leading-relaxed text-muted-foreground font-mono italic transition-all duration-400 ease-in-out",
@@ -121,7 +127,7 @@ export function LandingHero() {
             </div>
 
             {/* Primary Hero CTA: Phá Án Ngay */}
-            <div className="w-full mt-2 sm:mt-3 flex items-center">
+            <div className="w-full mt-1 sm:mt-2 flex items-center">
               <Link
                 href="/cases/case_000"
                 className="group inline-flex items-center justify-center gap-2.5 h-12 sm:h-13 px-8 sm:px-10 font-mono text-sm sm:text-base font-black uppercase tracking-wider rounded-md bg-amber-500 hover:bg-amber-400 text-black shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.6)] border border-amber-300 transition-all duration-300 active:scale-[0.98] cursor-pointer"

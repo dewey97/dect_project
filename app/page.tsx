@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import { trackEvent } from "@/lib/analytics/analytics";
 import { LandingHero } from "@/components/public/landing-hero";
+import { LandingDualPlaySection } from "@/components/public/landing-dual-play-section";
 import { CaseCarouselSection } from "@/components/public/case-carousel-section";
 import { LandingPhoneShowcase } from "@/components/public/landing-phone-showcase";
 import { LandingScene360Showcase } from "@/components/public/landing-scene-360-showcase";
@@ -40,6 +41,9 @@ export default function MarketingLandingPage() {
 
       {/* World Archive & Lore */}
       <WorldArchiveSection />
+
+      {/* Dual Play / Hybrid Model Section (Nhấn mạnh kết hợp tài liệu online và boardgame vật lý) */}
+      <LandingDualPlaySection />
 
       {/* 3D Poster Carousel */}
       <CaseCarouselSection
