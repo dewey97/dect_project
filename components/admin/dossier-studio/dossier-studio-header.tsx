@@ -9,9 +9,7 @@ import {
   RotateCcw,
   Check,
   Save,
-  Printer,
-  Compass
-} from 'lucide-react'
+  Printer} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { DbCase } from '@/lib/types/database'
 
@@ -30,7 +28,6 @@ interface DossierStudioHeaderProps {
   isSavingDb: boolean
   savedNotification: boolean
   onPrint: () => void
-  onOpen360Config?: () => void
 }
 
 export function DossierStudioHeader({
@@ -48,7 +45,6 @@ export function DossierStudioHeader({
   isSavingDb,
   savedNotification,
   onPrint,
-  onOpen360Config
 }: DossierStudioHeaderProps) {
   return (
     <header className="no-print h-14 border-b border-white/10 bg-zinc-950/90 backdrop-blur-md px-4 flex items-center justify-between z-30 flex-shrink-0">
@@ -74,19 +70,6 @@ export function DossierStudioHeader({
             )}
           </select>
         </div>
-
-        {/* Nút Cấu hình Không gian Hiện Trường 360 */}
-        {onOpen360Config && (
-          <button
-            type="button"
-            onClick={onOpen360Config}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 transition-all shadow-sm active:scale-95"
-            title="Xem & Cấu hình không gian Khám xét Hiện trường 360"
-          >
-            <Compass className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Hiện Trường 360</span>
-          </button>
-        )}
 
 
       </div>

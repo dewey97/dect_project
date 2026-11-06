@@ -171,7 +171,11 @@ Luật mở khóa khi chơi (`lib/progress/case-progress.ts`):
 | Tệp (tải lên hoặc URL)                    | `file_url`, `thumb_url`    |
 | Mô tả                                     | `description`              |
 
-**Hiện Trường 360 (`scene-360-config-modal.tsx`):** tải ảnh 360 và panorama (ghi `cases.scene_360_url`, `cases.panorama_url`), đặt hotspot khám xét lại (ghi `reinvestigation_hotspots.hotspots`).
+**Hiện Trường 360:** đã tách thành mục riêng trong sidebar, xem mục 5b.
+
+## 5b. Hiện Trường 360 — `/studio/scene-360?case=<slug>`
+
+Tải ảnh cầu 360 và ảnh panorama dự phòng (ghi `cases.scene_360_url`, `cases.panorama_url`), có khung xem thử. Hotspot khám xét lại (`reinvestigation_hotspots`) chưa có giao diện sửa (ROADMAP #8).
 
 ## 6. Phone — `/studio/phone?case=<slug>`
 

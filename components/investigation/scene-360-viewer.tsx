@@ -19,6 +19,9 @@ export interface HotspotItem {
   soundCaption?: string;
 }
 
+// Stable default: a new [] each render would re-run the scene effect forever.
+const NO_HOTSPOTS: HotspotItem[] = [];
+
 interface Scene360ViewerProps {
   imageUrl?: string;
   fallbackImageUrl?: string;
@@ -34,7 +37,7 @@ interface Scene360ViewerProps {
 export function Scene360Viewer({
   imageUrl,
   fallbackImageUrl,
-  hotspots = [],
+  hotspots = NO_HOTSPOTS,
   onSelectSpot,
   selectedSpotId,
   hideControls = false,

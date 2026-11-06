@@ -8,7 +8,6 @@ import {
 } from "@/lib/actions/dossier-config-actions";
 import {
   getCaseEvidence,
-  getCase360Config,
 } from "@/lib/actions/evidence-actions";
 import { normalizeCaseId } from "@/lib/cases/case-id";
 
@@ -33,7 +32,6 @@ export default async function DossierStudioPage({
     dossiersRes,
     catalogRes,
     evidenceRes,
-    config360Res,
   ] = await Promise.all([
     getDossierDocuments(caseId, "loi_khai"),
     getDossierDocuments(caseId, "ly_lich"),
@@ -41,7 +39,6 @@ export default async function DossierStudioPage({
     getCaseDossiers(caseId),
     getAllCaseDocumentsCatalog(caseId),
     getCaseEvidence(caseId),
-    getCase360Config(caseId),
   ]);
 
   return (
@@ -53,7 +50,6 @@ export default async function DossierStudioPage({
       initialDossiers={dossiersRes || []}
       initialAvailableDocuments={catalogRes || []}
       initialEvidence={evidenceRes.data || []}
-      initial360Config={config360Res.data || null}
     />
   );
 }

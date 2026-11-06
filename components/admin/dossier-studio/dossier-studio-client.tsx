@@ -24,7 +24,6 @@ import type {
   DbCase,
   DbCaseDossier,
   DbCaseEvidence,
-  DbCaseWithEvidenceConfig,
 } from "@/lib/types/database";
 import {
   getCaseDossiers,
@@ -35,14 +34,12 @@ import {
 import {
   getCaseEvidence,
   deleteCaseEvidence,
-  getCase360Config,
   upsertMultipleCaseEvidence,
 } from "@/lib/actions/evidence-actions";
 import { DossierListPanel } from "./dossier-list-panel";
 import { DossierConfigModal } from "./dossier-config-modal";
 import { DossierStudioHeader } from "./dossier-studio-header";
 import { DossierStudioSidebar } from "./dossier-studio-sidebar";
-import { Scene360ConfigModal } from "@/components/admin/dossier-studio/evidence/scene-360-config-modal";
 import { X } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { DossierStudioWorkspace } from "./dossier-studio-workspace";
@@ -56,7 +53,6 @@ interface DossierStudioClientProps {
   initialDossiers?: DbCaseDossier[];
   initialAvailableDocuments?: AvailableDocumentItem[];
   initialEvidence?: DbCaseEvidence[];
-  initial360Config?: DbCaseWithEvidenceConfig | null;
 }
 
 const EMPTY_LK: LoiKhaiData = {
@@ -107,7 +103,6 @@ export function DossierStudioClient({
   initialDossiers = [],
   initialAvailableDocuments = [],
   initialEvidence = [],
-  initial360Config = null,
 }: DossierStudioClientProps) {
   const [dossiers, setDossiers] = useState<DbCaseDossier[]>(initialDossiers);
   const [availableDocs, setAvailableDocs] = useState<AvailableDocumentItem[]>(
@@ -131,10 +126,6 @@ export function DossierStudioClient({
   const [evidenceList, setEvidenceList] =
     useState<DbCaseEvidence[]>(initialEvidence);
 
-  // Cấu hình không gian 360 độ hiện trường
-  const [config360, setConfig360] =
-    useState<DbCaseWithEvidenceConfig | null>(initial360Config);
-  const [is360ModalOpen, setIs360ModalOpen] = useState(false);
 
   // Lightbox xem ảnh lớn
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -150,13 +141,12 @@ export function DossierStudioClient({
     (async () => {
       setIsLoadingData(true);
       try {
-        const [dList, cList, hsRes, lkRes, evRes, c360Res] = await Promise.all([
+        const [dList, cList, hsRes, lkRes, evRes] = await Promise.all([
           getCaseDossiers(caseId),
           getAllCaseDocumentsCatalog(caseId),
           getDossierDocuments(caseId, "ly_lich"),
           getDossierDocuments(caseId, "loi_khai"),
           getCaseEvidence(caseId),
-          getCase360Config(caseId),
         ]);
         if (isMounted) {
           setDossiers(dList);
@@ -164,7 +154,6 @@ export function DossierStudioClient({
           if (hsRes.success && hsRes.data) setHsDocuments(hsRes.data);
           if (lkRes.success && lkRes.data) setLkDocuments(lkRes.data);
           if (evRes.success && evRes.data) setEvidenceList(evRes.data);
-          if (c360Res.success) setConfig360(c360Res.data);
         }
       } catch (err) {
         console.error("Failed to load dossiers for case:", err);
@@ -1089,7 +1078,6 @@ export function DossierStudioClient({
         isSavingDb={isSavingDb}
         savedNotification={savedNotification}
         onPrint={handlePrint}
-        onOpen360Config={() => setIs360ModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -1184,18 +1172,6 @@ export function DossierStudioClient({
         dossier={editingDossier}
         availableDocuments={availableDocs}
         onSaved={handleDossierSaved}
-      />
-
-      {/* Modal Cấu hình Hiện Trường 360 */}
-      <Scene360ConfigModal
-        caseId={caseId}
-        initialConfig={config360}
-        isOpen={is360ModalOpen}
-        onClose={() => setIs360ModalOpen(false)}
-        onSave={(updated) => {
-          setConfig360((prev) => (prev ? { ...prev, ...updated } : null));
-          toast.success("Đã cập nhật cấu hình 360");
-        }}
       />
 
       {/* Modal Lightbox Phóng to ảnh */}

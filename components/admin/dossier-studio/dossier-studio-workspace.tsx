@@ -7,36 +7,15 @@ import type {
   LyLichData,
 } from "@/lib/types/dossier";
 import {
-  reorderDossierDocuments,
-  saveDossierDocumentsBatch,
   type DbDossierDocument,
 } from "@/lib/actions/dossier-actions";
 import type {
-  DbCase,
   DbCaseDossier,
   DbCaseEvidence,
-  DbCaseWithEvidenceConfig,
 } from "@/lib/types/database";
-import {
-  getCaseDossiers,
-  getAllCaseDocumentsCatalog,
-  deleteCaseDossier,
-  type AvailableDocumentItem,
-} from "@/lib/actions/dossier-config-actions";
-import {
-  getCaseEvidence,
-  deleteCaseEvidence,
-  getCase360Config,
-  upsertMultipleCaseEvidence,
-} from "@/lib/actions/evidence-actions";
-import { DossierListPanel } from "./dossier-list-panel";
-import { DossierConfigModal } from "./dossier-config-modal";
-import { DossierStudioHeader } from "./dossier-studio-header";
 import { DossierLoiKhaiSheet } from "./dossier-loi-khai-sheet";
 import { DossierLyLichSheet } from "./dossier-ly-lich-sheet";
-import { DossierStudioSidebar } from "./dossier-studio-sidebar";
 import { DossierEvidenceCard } from "./dossier-evidence-card";
-import { Scene360ConfigModal } from "@/components/admin/dossier-studio/evidence/scene-360-config-modal";
 import { UserCheck, FileText, Camera, Plus, X } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { FIXED_HS_PAPER, FIXED_LK_PAPER } from "./paper-presets";

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  X,
   Upload,
   RefreshCw,
   Save,
@@ -16,27 +15,24 @@ import {
 import { toast } from "@/components/ui/toast";
 import { Scene360Viewer } from "@/components/investigation/scene-360-viewer";
 
-interface Scene360ConfigModalProps {
+interface Scene360EditorProps {
   caseId: string;
   initialConfig: {
     panorama_url?: string | null;
     scene_360_url?: string | null;
   } | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (config: {
+  onSave?: (config: {
     panorama_url?: string | null;
     scene_360_url?: string | null;
   }) => void;
 }
 
-export function Scene360ConfigModal({
+/** Panorama sources of a case for the crime-scene revisit (Scene360Viewer). */
+export function Scene360Editor({
   caseId,
   initialConfig,
-  isOpen,
-  onClose,
   onSave,
-}: Scene360ConfigModalProps) {
+}: Scene360EditorProps) {
   const [scene360Url, setScene360Url] = useState(
     initialConfig?.scene_360_url || "",
   );
@@ -52,8 +48,6 @@ export function Scene360ConfigModal({
     setScene360Url(initialConfig?.scene_360_url || "");
     setPanoramaUrl(initialConfig?.panorama_url || "");
   }, [initialConfig]);
-
-  if (!isOpen) return null;
 
   const handleUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -98,11 +92,10 @@ export function Scene360ConfigModal({
 
       if (res.success) {
         toast.success("Đã cập nhật cấu hình ảnh hiện trường 360");
-        onSave({
+        onSave?.({
           scene_360_url: scene360Url.trim() || null,
           panorama_url: panoramaUrl.trim() || null,
         });
-        onClose();
       } else {
         toast.error(res.error || "Lưu thất bại");
       }
@@ -114,8 +107,8 @@ export function Scene360ConfigModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-3xl bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="w-full">
+      <div className="w-full bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-900/50">
           <div className="flex items-center gap-2.5">
@@ -135,14 +128,6 @@ export function Scene360ConfigModal({
               </p>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
-          >
-            <X className="size-5" />
-          </button>
         </div>
 
         {/* Body */}
@@ -241,7 +226,7 @@ export function Scene360ConfigModal({
                 </button>
 
                 {isPreviewActive && (
-                  <div className="h-64 w-full rounded-lg overflow-hidden border border-zinc-800 bg-black relative">
+                  <div className="h-[420px] w-full rounded-lg overflow-hidden border border-zinc-800 bg-black relative">
                     <Scene360Viewer
                       imageUrl={scene360Url || undefined}
                       fallbackImageUrl={panoramaUrl || undefined}
@@ -253,13 +238,6 @@ export function Scene360ConfigModal({
 
             {/* Footer Buttons */}
             <div className="flex items-center justify-end gap-2 pt-4 border-t border-zinc-800">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-xs text-zinc-400 hover:text-zinc-200 bg-zinc-800 hover:bg-zinc-700 rounded transition-colors"
-              >
-                Đóng
-              </button>
 
               <button
                 type="submit"

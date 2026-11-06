@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Smartphone,
   ShoppingCart,
+  Rotate3d,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -58,6 +59,12 @@ const navGroups: NavGroup[] = [
         shortName: "Tài liệu",
         href: "/studio/dossier",
         icon: Files,
+      },
+      {
+        name: "Hiện Trường 360",
+        shortName: "360",
+        href: "/studio/scene-360",
+        icon: Rotate3d,
       },
       {
         name: "Phone Studio",
